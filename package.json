@@ -1,0 +1,17 @@
+{
+  "name": "irmandade-conhecimento-com-luz-site",
+  "version": "1.0.0",
+  "description": "Site da Irmandade Conhecimento com Luz - estático servido via Express para deploy fácil no Render.",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "compression": "^1.7.4",
+    "express": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
