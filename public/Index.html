@@ -1,85 +1,44 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Jornada Conhecimento com Luz</title>
+  <title>Jornada • Conhecimento com Luz</title>
   <style>
     :root { --bg:#0f1226; --panel:#1b1f3a; --txt:#f5f7ff; --gold:#ffd54a; }
-    * { box-sizing: border-box; }
-    body {
-      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    *{ box-sizing:border-box }
+    body{ margin:0; font-family:system-ui,Segoe UI,Roboto,Inter,Arial;
       color:var(--txt); background:linear-gradient(135deg,#0b0e22,#1b1f3a);
-      min-height:100svh; display:flex; align-items:center; justify-content:center; padding:24px;
-    }
-    .wrap { width:100%; max-width:900px; background:rgba(255,255,255,.06);
+      min-height:100svh; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .wrap{ width:100%; max-width:900px; background:rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:24px 20px 16px; backdrop-filter: blur(6px); }
-    h1 { margin:0 0 4px; text-align:center; font-size:clamp(22px,3.6vw,32px); color:var(--gold) }
-    p.sub { text-align:center; margin:0 0 18px; opacity:.85 }
-    form { display:grid; gap:18px; }
-    .q { background:var(--panel); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:14px }
-    .q label { display:block; font-weight:600; margin-bottom:8px; }
-    .q textarea, .q input[type="text"] {
+    h1{ margin:0 0 4px; text-align:center; font-size:clamp(22px,3.6vw,32px); color:var(--gold) }
+    p.sub{ text-align:center; margin:0 0 18px; opacity:.85 }
+    form{ display:grid; gap:18px }
+    .q{ background:var(--panel); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:14px }
+    .q label{ display:block; font-weight:600; margin-bottom:8px }
+    .q textarea,.q input[type="text"]{
       width:100%; background:#101429; color:var(--txt); border:1px solid rgba(255,255,255,.12);
       border-radius:10px; padding:10px 12px; min-height:84px; resize:vertical; outline:none;
     }
-    .q textarea:focus, .q input[type="text"]:focus { border-color: var(--gold); box-shadow:0 0 0 2px rgba(255,213,74,.25); }
-    .row { display:grid; gap:12px; grid-template-columns: 1fr; }
-    @media (min-width:720px){ .row{ grid-template-columns: 1fr 1fr; } }
-    .actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:6px }
-    button {
-      background:var(--gold); color:#000; border:0; border-radius:10px; padding:12px 18px; font-weight:700; cursor:pointer;
-    }
-    button.secondary { background:transparent; color:var(--gold); border:1px solid var(--gold); }
-    .msg { text-align:center; font-weight:700; min-height:24px; }
-    .small { font-size:12px; opacity:.7; text-align:center; margin-top:6px }
-    .hidden { display:none !important; }
-
-    /* Porta de senha */
-    .gate {
-      position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
-      background: rgba(0,0,0,.55); z-index: 50;
-    }
-    .card {
-      background:var(--panel); border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:22px; width:min(420px, 92vw);
-      box-shadow:0 10px 40px rgba(0,0,0,.35);
-    }
-    .card h2 { margin:0 0 8px; color:var(--gold); text-align:center }
-    .card input { width:100%; background:#101429; color:var(--txt); border:1px solid rgba(255,255,255,.2); border-radius:10px; padding:10px 12px; }
-    .card .rowbtn { display:flex; gap:10px; justify-content:center; margin-top:12px }
-    .thanks { text-align:center; font-weight:700; }
-    .debug { text-align:center; margin-top:10px; font-size:12px; opacity:.7 }
-    .debug a { color:var(--gold); }
+    .q textarea:focus,.q input[type="text"]:focus{ border-color:var(--gold); box-shadow:0 0 0 2px rgba(255,213,74,.25)}
+    .row{ display:grid; gap:12px; grid-template-columns:1fr }
+    @media (min-width:720px){ .row{ grid-template-columns:1fr 1fr } }
+    .actions{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:6px }
+    button{ background:var(--gold); color:#000; border:0; border-radius:10px; padding:12px 18px; font-weight:700; cursor:pointer }
+    button.secondary{ background:transparent; color:var(--gold); border:1px solid var(--gold) }
+    .msg{ text-align:center; font-weight:700; min-height:24px }
+    .hidden{ display:none !important }
+    .downloads{ display:flex; gap:10px; justify-content:center; margin-top:10px; flex-wrap:wrap }
+    .downloads a{ background:#12d6ff; color:#001018; padding:10px 14px; border-radius:10px; text-decoration:none; font-weight:800 }
   </style>
 </head>
 <body>
-  <!-- Portão de Senha -->
-  <div id="gate" class="gate hidden">
-    <div class="card">
-      <h2>Acesso restrito</h2>
-      <p style="text-align:center;opacity:.85">Informe a senha para responder à Jornada.</p>
-      <input type="password" id="senha" placeholder="Senha de acesso" autocomplete="off">
-      <div class="rowbtn">
-        <button id="entrar">Entrar</button>
-      </div>
-      <div id="gateMsg" class="msg"></div>
-    </div>
-  </div>
-
-  <div class="wrap" id="app">
+  <div class="wrap">
     <h1>Jornada — Conhecimento com Luz ✨</h1>
     <p class="sub">Responda com sinceridade. Seus dados são usados apenas para a Jornada.</p>
 
-    <!-- Mensagem de “já enviado” -->
-    <div id="thanks" class="q thanks hidden">
-      ✅ Você já enviou este formulário neste dispositivo. Gratidão pela confiança!
-      <div class="debug hidden" id="debugBox">
-        <a href="#" id="liberar">[debug] liberar este dispositivo</a>
-      </div>
-    </div>
-
-    <!-- Formulário -->
-    <form id="jornada" class="hidden">
+    <form id="jornada">
       <div class="row">
         <div class="q">
           <label for="nome">Seu nome</label>
@@ -91,167 +50,126 @@
         </div>
       </div>
 
+      <!-- Perguntas virão daqui -->
       <div id="perguntas"></div>
 
       <div class="actions">
         <button type="button" class="secondary" id="btnLimpar">Limpar respostas</button>
-        <button type="submit">Enviar respostas</button>
+        <button type="submit" id="btnEnviar">Enviar respostas</button>
       </div>
       <div id="mensagem" class="msg"></div>
-      <div class="small">Ao enviar, você concorda com o tratamento responsável das informações.</div>
+
+      <!-- Área de download pós-envio -->
+      <div id="downloads" class="downloads hidden">
+        <a id="linkPdf" href="#" target="_blank" rel="noopener">Baixar PDF 📄</a>
+        <a id="linkHq"  href="#" target="_blank" rel="noopener">Baixar HQ 📘</a>
+      </div>
     </form>
   </div>
 
   <script>
-    // ========= CONFIG =========
-    const API_URL = "https://lumen-backend-api.onrender.com/formulario";
+    // ===== CONFIG =====
+    const API_BASE = "https://lumen-backend-api.onrender.com";
+    const URL_PERGUNTAS  = API_BASE + "/perguntas";
+    const URL_FORMULARIO = API_BASE + "/formulario";
 
-    // 1) Trava por dispositivo
-    const STORAGE_KEY = "jornada_enviada_v1";   // mude a versão se quiser “liberar” todos
+    // ===== helpers =====
+    const $ = (sel)=>document.querySelector(sel);
+    const perguntasDiv = $("#perguntas");
+    const form = $("#jornada");
+    const msg  = $("#mensagem");
+    const downloadsBox = $("#downloads");
+    const linkPdf = $("#linkPdf");
+    const linkHq  = $("#linkHq");
+    const btnEnviar = $("#btnEnviar");
 
-    // 2) Porta de senha (opcional)
-    const REQUIRE_PASSWORD = true;              // <- troque para false se não quiser senha
-    const ACCESS_PASSWORD = "LuzEterna01";      // <- defina a senha
-    const SESSION_PASS_KEY = "jornada_pass_ok"; // sessão do navegador
-
-    // 3) Perguntas
-    const PERGUNTAS = [
-      "Como você tem percebido sua própria vida até aqui?",
-      "E a vida das pessoas ao seu redor, como você a enxerga?",
-      "Como lida com seus traumas? Consegue falar sobre eles?",
-      "Qual é a sua maior paixão na vida?",
-      "O que te faz verdadeiramente alegre?",
-      "Há algo que você sente que precisa perdoar (ou pedir perdão)?",
-      "Como você se relaciona com o sagrado/espiritualidade hoje?",
-      "Quando pensa no futuro, o que te dá esperança?",
-      "Existe um hábito que você deseja mudar nos próximos 30 dias?",
-      "O que você gostaria de aprender ou desenvolver este ano?",
-      "Qual conselho daria a alguém que está passando por lutas como as suas?",
-      "Se pudesse resumir sua missão de vida em uma frase, qual seria?",
-    ];
-
-    // ========= UI helpers =========
-    const $ = sel => document.querySelector(sel);
-    const qs = sel => document.querySelectorAll(sel);
-    const show = el => el.classList.remove("hidden");
-    const hide = el => el.classList.add("hidden");
-
-    // Render perguntas
-    function montarPerguntas() {
-      const container = $("#perguntas");
-      container.innerHTML = "";
-      PERGUNTAS.forEach((texto, i) => {
-        const id = `q${i+1}`;
-        const bloco = document.createElement("div");
-        bloco.className = "q";
-        bloco.innerHTML = `
-          <label for="${id}">${i+1}. ${texto}</label>
-          <textarea id="${id}" name="${id}" rows="4" required></textarea>
-        `;
-        container.appendChild(bloco);
-      });
-    }
-
-    // Porta de senha
-    function checarSenha() {
-      if (!REQUIRE_PASSWORD) return true;
-      const ok = sessionStorage.getItem(SESSION_PASS_KEY) === "1";
-      if (ok) return true;
-      show($("#gate"));
-      return false;
-    }
-
-    function aceitarSenha() {
-      const v = $("#senha").value.trim();
-      if (v === ACCESS_PASSWORD) {
-        sessionStorage.setItem(SESSION_PASS_KEY, "1");
-        hide($("#gate"));
-        iniciar();
-      } else {
-        $("#gateMsg").textContent = "❌ Senha incorreta.";
-      }
-    }
-
-    // Trava por dispositivo
-    function jaEnviado() {
-      return !!localStorage.getItem(STORAGE_KEY);
-    }
-    function marcarEnviado() {
-      localStorage.setItem(STORAGE_KEY, new Date().toISOString());
-    }
-
-    // Inicialização
-    function iniciar() {
-      // se já enviou, mostra agradecimento
-      if (jaEnviado()) {
-        hide($("#jornada"));
-        show($("#thanks"));
-        // debug link se ?debug=1
-        const params = new URLSearchParams(location.search);
-        if (params.get("debug") === "1") {
-          show($("#debugBox"));
-          $("#liberar").onclick = (e)=>{ e.preventDefault(); localStorage.removeItem(STORAGE_KEY); location.reload(); };
-        }
-        return;
-      }
-
-      montarPerguntas();
-      show($("#jornada"));
-      hide($("#thanks"));
-
-      $("#btnLimpar").onclick = () => $("#jornada").reset();
-
-      $("#jornada").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const msg = $("#mensagem");
-        msg.textContent = "Enviando… aguarde.";
-
-        const payload = {
-          meta: {
-            enviado_em: new Date().toISOString(),
-            user_agent: navigator.userAgent
-          },
-          contato: {
-            nome: $("#nome").value.trim(),
-            email: $("#email").value.trim()
-          },
-          respostas: {}
-        };
-        PERGUNTAS.forEach((_, i) => {
-          payload.respostas[`q${i+1}`] = $(`#q${i+1}`).value.trim();
+    // Renderiza perguntas vindas da API
+    async function carregarPerguntas(){
+      msg.textContent = "Carregando…";
+      try{
+        const r = await fetch(URL_PERGUNTAS);
+        if(!r.ok) throw new Error("Falha ao carregar perguntas");
+        const data = await r.json();
+        perguntasDiv.innerHTML = "";
+        const perguntas = data.perguntas || {};
+        const keys = Object.keys(perguntas).sort((a,b)=>Number(a)-Number(b));
+        keys.forEach(k=>{
+          const texto = perguntas[k];
+          const id = "q"+k;
+          const bloco = document.createElement("div");
+          bloco.className = "q";
+          bloco.innerHTML = `
+            <label for="${id}">${k}. ${texto}</label>
+            <textarea id="${id}" name="${id}" rows="4" required></textarea>
+          `;
+          perguntasDiv.appendChild(bloco);
         });
-
-        try {
-          const r = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type":"application/json" },
-            body: JSON.stringify(payload)
-          });
-          const data = await r.json().catch(()=> ({}));
-          if (r.ok && (data.status || data.sucesso)) {
-            marcarEnviado();
-            msg.textContent = "✅ Enviado com sucesso! Gratidão pela confiança.";
-            $("#jornada").reset();
-            // oculta formulário e mostra “já enviado”
-            setTimeout(()=>location.reload(), 800);
-          } else {
-            msg.textContent = "⚠️ Não foi possível enviar agora. Tente novamente em instantes.";
-          }
-        } catch (err) {
-          console.error(err);
-          msg.textContent = "❌ Erro de conexão. Verifique sua internet e tente de novo.";
-        }
-      });
+        msg.textContent = "";
+      }catch(e){
+        console.error(e);
+        msg.textContent = "Não foi possível carregar as perguntas. Tente novamente.";
+      }
     }
 
-    // Eventos
-    $("#entrar").addEventListener("click", aceitarSenha);
-    $("#senha").addEventListener("keydown", (e)=>{ if(e.key==="Enter") aceitarSenha(); });
+    // Envio do formulário
+    form.addEventListener("submit", async (e)=>{
+      e.preventDefault();
+      msg.textContent = "Gerando sua devolutiva… isso pode levar alguns segundos.";
+      btnEnviar.disabled = true;
 
-    // Boot
-    (function boot(){
-      if (checarSenha()) iniciar();
+      // monta payload
+      const payload = {
+        meta: {
+          enviado_em: new Date().toISOString(),
+          user_agent: navigator.userAgent
+        },
+        contato: {
+          nome: $("#nome").value.trim(),
+          email: $("#email").value.trim()
+        },
+        respostas: {}
+      };
+
+      // coleta respostas
+      document.querySelectorAll("#perguntas textarea").forEach(area=>{
+        const k = area.id.replace("q","");
+        payload.respostas[k] = area.value.trim();
+      });
+
+      try{
+        const r = await fetch(URL_FORMULARIO, {
+          method:"POST",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await r.json().catch(()=>({}));
+        if(!r.ok || data.status!=="ok"){
+          throw new Error(data.mensagem || "Falha no processamento");
+        }
+
+        msg.textContent = "✅ Pronto! Baixe seus arquivos abaixo.";
+        // Links de download que vieram da API
+        linkPdf.href = API_BASE + data.links.pdf;
+        linkHq.href  = API_BASE + data.links.hq;
+        downloadsBox.classList.remove("hidden");
+        // rola até os botões
+        downloadsBox.scrollIntoView({behavior:"smooth", block:"center"});
+
+      }catch(err){
+        console.error(err);
+        msg.textContent = "❌ Não foi possível gerar agora. Tente novamente em instantes.";
+      }finally{
+        btnEnviar.disabled = false;
+      }
+    });
+
+    $("#btnLimpar").onclick = ()=> form.reset();
+
+    // “Acorda” a instância free e carrega perguntas
+    (async ()=>{
+      try{ await fetch(API_BASE + "/ping"); }catch(_){}
+      await carregarPerguntas();
     })();
   </script>
 </body>
-  </html>
+</html>
