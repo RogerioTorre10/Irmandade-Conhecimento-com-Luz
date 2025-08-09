@@ -9,15 +9,17 @@ const app = express();
 const port = process.env.PORT || 10000;
 
 app.use(compression());
-app.use(express.static(path.join(__dirname, "public"), {
-  maxAge: "1y",
-  etag: true,
-  immutable: true,
-}));
+app.use(
+  express.static(path.join(__dirname, "public"), {
+    maxAge: "1y",
+    etag: true,
+    immutable: true,
+  })
+);
 
-// Fallback to index for unknown routes in case of future SPA handling
+// Rotas conhecidas (fallback para index.html se precisar)
 app.get("*", (req, res) => {
-  const known = ["", "/", "/index.html", "/sobre.html", "/jornadas.html", "/jornada-conhecimento.html", "/jornada-vocacional.html", "/jornada-amorosa.html", "/manifesto.html", "/contato.html"];
+  const known = ["/", "/index.html", "/sobre.html", "/jornadas.html", "/jornada-conhecimento.html", "/jornada-vocacional.html", "/jornada-amorosa.html", "/manifesto.html", "/contato.html"];
   if (known.includes(req.path)) {
     res.sendFile(path.join(__dirname, "public", req.path === "/" ? "index.html" : req.path.slice(1)));
   } else {
@@ -25,6 +27,6 @@ app.get("*", (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Servidor da Irmandade no ar em http://localhost:${port}`);
+app.listen(port, "0.0.0.0", () => {
+  console.log(`Servidor da Irmandade no ar na porta ${port}`);
 });
