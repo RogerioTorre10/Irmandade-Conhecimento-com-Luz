@@ -1,12 +1,97 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Irmandade Conhecimento com Luz</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jornada Conhecimento com Luz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1e1e2f, #2a2a4a);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #ffd700;
+      text-align: center;
+    }
+    form {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 15px;
+      max-width: 500px;
+      width: 100%;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      margin-top: 5px;
+    }
+    button {
+      margin-top: 20px;
+      background-color: #ffd700;
+      color: #000;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #ffcc00;
+    }
+    .mensagem {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
 </head>
-<body style="background:#111827; color:white; font-family:sans-serif; text-align:center; padding-top:100px;">
-  <h1>🔥 Irmandade Conhecimento com Luz</h1>
-  <p>PARA ALÉM. E SEMPRE!!</p>
+<body>
+
+  <h1>Jornada Conhecimento com Luz ✨</h1>
+  
+  <form id="jornadaForm">
+    <label>Seu Nome:</label>
+    <input type="text" name="nome" required>
+
+    <label>Sua Mensagem:</label>
+    <textarea name="mensagem" rows="4" required></textarea>
+
+    <button type="submit">Enviar</button>
+    <div class="mensagem" id="mensagem"></div>
+  </form>
+
+  <script>
+    document.getElementById("jornadaForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const dados = {
+        nome: this.nome.value,
+        mensagem: this.mensagem.value
+      };
+
+      const resposta = await fetch("https://lumen-backend-api.onrender.com/formulario", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados)
+      });
+
+      const resultado = await resposta.json();
+      document.getElementById("mensagem").innerText = resultado.status === "Recebido com sucesso" 
+        ? "✅ Formulário enviado com sucesso!" 
+        : "❌ Ocorreu um erro.";
+    });
+  </script>
+
 </body>
 </html>
