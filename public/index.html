@@ -147,5 +147,31 @@
   </div>
 </footer>
 <script>window.lucide && lucide.createIcons();</script>
+  <script>
+(async () => {
+  const el = document.getElementById('lumenStatus');
+  if (!el) return;
+  el.textContent = 'Verificando Lumen…';
+
+  const API = 'https://lumen-backend-api.onrender.com/ping';
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 8000);
+
+  try {
+    const r = await fetch(API, { signal: ctrl.signal });
+    clearTimeout(t);
+    if (r.ok) {
+      el.textContent = 'Lumen: online ✅';
+      el.style.color = 'lightgreen';
+    } else {
+      el.textContent = 'Lumen: offline ❌';
+      el.style.color = 'red';
+    }
+  } catch {
+    el.textContent = 'Lumen: offline ❌';
+    el.style.color = 'red';
+  }
+})();
+</script>
 </body>
 </html>
