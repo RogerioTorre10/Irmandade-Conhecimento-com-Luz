@@ -59,8 +59,8 @@
           </h1>
           <p class="mt-4 text-lg text-gray-300">Um chamado vivo à transformação: unindo fé, ciência, filosofia e tecnologia para despertar, curar e guiar.</p>
           <div class="mt-8 flex flex-wrap gap-3">
-            <!-- BOTÃO ATIVADO: abre diretamente a jornada correta -->
-            <a href="/jornada-conhecimento-com-luz1.html"
+            <!-- Botão com ID para wake-up direcionado -->
+            <a id="btnExplorarJornadas" href="/jornada-conhecimento-com-luz1.html"
                class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 transition">
               <i data-lucide="compass"></i><span>Explorar Jornadas</span>
             </a>
@@ -123,32 +123,37 @@
   </div>
 </footer>
 
-<!-- Wake-up do backend antes de abrir a jornada -->
+<!-- Wake-up do backend + navegação -->
 <script>
   const API = 'https://lumen-backend-api.onrender.com';
-  const btn = document.querySelector('a[href="/jornada-conhecimento-com-luz1.html"]');
-  if (btn) {
-    btn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      const go = () => location.href = '/jornada-conhecimento-com-luz1.html';
-      try {
-        const ctrl = new AbortController();
-        setTimeout(()=>ctrl.abort(), 8000);
-        const r = await fetch(API + '/ping', { signal: ctrl.signal });
-        if (r.ok) return go();
-        alert('Serviço acordando… tente novamente em alguns segundos.');
-      } catch {
-        alert('Serviço temporariamente indisponível. Tente de novo em instantes.');
-      }
-      setTimeout(go, 1500);
-    });
-  }
 
-  // Menu mobile (caso use)
+  // Acorda o backend de leve ao carregar a home (não bloqueante)
+  window.addEventListener('load', () => {
+    fetch(API + '/ping').catch(()=>{});
+  });
+
+  // Menu mobile
   const menuBtn = document.getElementById('menuBtn');
   const menu = document.getElementById('menu');
   if (menuBtn && menu) {
     menuBtn.addEventListener('click', () => menu.classList.toggle('hidden'));
+  }
+
+  // Wake-up dirigido só para o botão principal
+  const explorar = document.getElementById('btnExplorarJornadas');
+  if (explorar) {
+    explorar.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const go = () => location.href = '/jornada-conhecimento-com-luz1.html';
+      try {
+        const ctrl = new AbortController();
+        setTimeout(() => ctrl.abort(), 8000);
+        const r = await fetch(API + '/ping', { signal: ctrl.signal });
+        if (r.ok) return go();
+      } catch {}
+      // fallback rápido
+      setTimeout(go, 300);
+    });
   }
 
   window.lucide && lucide.createIcons();
