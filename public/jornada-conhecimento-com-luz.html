@@ -99,8 +99,8 @@
           const bloco = document.createElement("div");
           bloco.className = "q";
           bloco.innerHTML = `
-            <label for="${id}">${k}. ${texto}</label>
-            <textarea id="${id}" name="${id}" rows="4" required></textarea>
+            <label for="\${id}">\${k}. \${texto}</label>
+            <textarea id="\${id}" name="\${id}" rows="4" required></textarea>
           `;
           perguntasDiv.appendChild(bloco);
         });
@@ -148,11 +148,20 @@
         }
 
         msg.textContent = "✅ Pronto! Baixe seus arquivos abaixo.";
-        // Links de download que vieram da API
-        linkPdf.href = API_BASE + data.links.pdf;
-        linkHq.href  = API_BASE + data.links.hq;
+
+        // Só mostra os botões que vierem na resposta
+        if (data?.links?.pdf) {
+          linkPdf.href = API_BASE + data.links.pdf;
+        } else {
+          linkPdf.remove();
+        }
+        if (data?.links?.hq) {
+          linkHq.href  = API_BASE + data.links.hq;
+        } else {
+          linkHq.remove();
+        }
+
         downloadsBox.classList.remove("hidden");
-        // rola até os botões
         downloadsBox.scrollIntoView({behavior:"smooth", block:"center"});
 
       }catch(err){
@@ -167,7 +176,11 @@
 
     // “Acorda” a instância free e carrega perguntas
     (async ()=>{
-      try{ await fetch(API_BASE + "/ping"); }catch(_){}
+      try{
+        const ctrl = new AbortController();
+        setTimeout(()=>ctrl.abort(), 8000);
+        await fetch(API_BASE + "/ping", { signal: ctrl.signal });
+      }catch(_){}
       await carregarPerguntas();
     })();
   </script>
