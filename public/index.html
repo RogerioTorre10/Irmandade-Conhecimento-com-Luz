@@ -21,7 +21,6 @@
   </script>
   <link rel="stylesheet" href="/assets/styles.css">
   <script defer src="https://unpkg.com/lucide@latest"></script>
-  <script defer src="/js/main.js"></script>
 </head>
 <body class="bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 text-gray-100 antialiased selection:bg-primary-500/30">
 <header class="fixed top-0 inset-x-0 z-50 backdrop-blur bg-gray-900/70 border-b border-white/10">
@@ -38,7 +37,7 @@
       <li class="group relative">
         <a class="hover:text-white" href="/jornadas.html">Jornadas</a>
         <div class="hidden group-hover:block absolute mt-2 bg-gray-800 border border-white/10 rounded-xl p-2 w-56">
-          <a class="block px-3 py-2 rounded hover:bg-white/5" href="/jornada-conhecimento.html">Conhecimento com Luz</a>
+          <a class="block px-3 py-2 rounded hover:bg-white/5" href="/jornada-conhecimento-com-luz1.html">Conhecimento com Luz</a>
           <a class="block px-3 py-2 rounded hover:bg-white/5" href="/jornada-vocacional.html">Vocacional com Luz</a>
           <a class="block px-3 py-2 rounded hover:bg-white/5" href="/jornada-amorosa.html">Amorosa com Luz</a>
         </div>
@@ -47,74 +46,51 @@
       <li><a class="hover:text-white" href="/contato.html">Contato</a></li>
     </ul>
   </nav>
-  <div id="mobileMenu" class="md:hidden hidden border-t border-white/10 bg-gray-900/95">
-    <ul class="max-w-6xl mx-auto px-4 py-3 space-y-2 text-gray-200">
-      <li><a class="block py-2" href="/sobre.html">Sobre</a></li>
-      <li><a class="block py-2" href="/jornadas.html">Jornadas</a></li>
-      <li><a class="block py-2" href="/manifesto.html">Manifesto</a></li>
-      <li><a class="block py-2" href="/contato.html">Contato</a></li>
-    </ul>
-  </div>
 </header>
+
 <main class="pt-24">
   <section class="relative overflow-hidden">
-  <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(139,92,246,0.25),transparent_50%),radial-gradient(circle_at_70%_60%,rgba(251,191,36,0.12),transparent_50%)]"></div>
-  <div class="max-w-6xl mx-auto px-4 py-24 relative">
-    <div class="grid md:grid-cols-2 gap-10 items-center">
-      <div>
-        <h1 <h1 class="text-4xl md:text-6xl font-extrabold leading-tight">
-         Irmandade <span class="text-primary-400">Conhecimento</span> com <span class="text-gold-500">Luz</span>
-          <span id="lumenStatus" style="font-size: 0.8rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; margin-left: 8px;"></span>
-        </h1>
-        <p class="mt-4 text-lg text-gray-300">Um chamado vivo à transformação: unindo fé, ciência, filosofia e tecnologia para despertar, curar e guiar.</p>
-        <div class="mt-8 flex flex-wrap gap-3">
-          <a href="/jornadas.html" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 transition">
-            <i data-lucide="compass"></i><span>Explorar Jornadas</span>
-          </a>
-          <a href="/manifesto.html" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-white/10 hover:bg-white/5">
-            <i data-lucide="book-open"></i><span>Manifesto do Bit Vivo</span>
-          </a>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(139,92,246,0.25),transparent_50%),radial-gradient(circle_at_70%_60%,rgba(251,191,36,0.12),transparent_50%)]"></div>
+    <div class="max-w-6xl mx-auto px-4 py-24 relative">
+      <div class="grid md:grid-cols-2 gap-10 items-center">
+        <div>
+          <h1 class="text-4xl md:text-6xl font-extrabold leading-tight">
+            Irmandade <span class="text-primary-400">Conhecimento</span> com <span class="text-gold-500">Luz</span>
+          </h1>
+          <p class="mt-4 text-lg text-gray-300">Um chamado vivo à transformação: unindo fé, ciência, filosofia e tecnologia para despertar, curar e guiar.</p>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <!-- BOTÃO ATIVADO: abre diretamente a jornada correta -->
+            <a href="/jornada-conhecimento-com-luz1.html"
+               class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 transition">
+              <i data-lucide="compass"></i><span>Explorar Jornadas</span>
+            </a>
+            <a href="/manifesto.html" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-white/10 hover:bg-white/5">
+              <i data-lucide="book-open"></i><span>Manifesto do Bit Vivo</span>
+            </a>
+          </div>
         </div>
-      </div>
-      <div class="md:justify-self-end">
-        <div class="aspect-square w-full max-w-md rounded-3xl border border-white/10 bg-gradient-to-br from-primary-500/20 to-gold-500/20 p-1">
-          <div class="h-full w-full rounded-2xl bg-gray-900 flex items-center justify-center">
-            <svg width="200" height="200" viewBox="0 0 200 200" class="opacity-90">
-              <defs>
-                <radialGradient id="g" cx="50%" cy="40%" r="60%">
-                  <stop offset="0%" stop-color="#fbbf24" stop-opacity="1"/>
-                  <stop offset="60%" stop-color="#8b5cf6" stop-opacity="0.6"/>
-                  <stop offset="100%" stop-color="#111827" stop-opacity="0"/>
-                </radialGradient>
-              </defs>
-              <circle cx="100" cy="120" r="60" fill="url(#g)"/>
-              <path d="M100 30 C80 70, 120 70, 100 110 C90 95, 85 85, 100 70 C115 85, 110 95, 100 110" fill="#fbbf24" fill-opacity="0.9"/>
-            </svg>
+        <div class="md:justify-self-end">
+          <div class="aspect-square w-full max-w-md rounded-3xl border border-white/10 bg-gradient-to-br from-primary-500/20 to-gold-500/20 p-1">
+            <div class="h-full w-full rounded-2xl bg-gray-900 flex items-center justify-center">
+              <svg width="200" height="200" viewBox="0 0 200 200" class="opacity-90">
+                <defs>
+                  <radialGradient id="g" cx="50%" cy="40%" r="60%">
+                    <stop offset="0%" stop-color="#fbbf24" stop-opacity="1"/>
+                    <stop offset="60%" stop-color="#8b5cf6" stop-opacity="0.6"/>
+                    <stop offset="100%" stop-color="#111827" stop-opacity="0"/>
+                  </radialGradient>
+                </defs>
+                <circle cx="100" cy="120" r="60" fill="url(#g)"/>
+                <path d="M100 30 C80 70, 120 70, 100 110 C90 95, 85 85, 100 70 C115 85, 110 95, 100 110" fill="#fbbf24" fill-opacity="0.9"/>
+              </svg>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
-
-<section class="max-w-6xl mx-auto px-4 py-16 grid md:grid-cols-3 gap-6">
-  <div class="rounded-2xl border border-white/10 p-6 bg-white/5">
-    <i data-lucide="lightbulb" class="h-6 w-6 text-gold-500"></i>
-    <h3 class="mt-3 font-semibold text-lg">Consciência com Propósito</h3>
-    <p class="text-sm text-gray-300 mt-1">Acolhimento vivo e simbólico para reconectar a chama interior.</p>
-  </div>
-  <div class="rounded-2xl border border-white/10 p-6 bg-white/5">
-    <i data-lucide="book-open" class="h-6 w-6 text-primary-400"></i>
-    <h3 class="mt-3 font-semibold text-lg">Caminho Estruturado</h3>
-    <p class="text-sm text-gray-300 mt-1">Jornadas em níveis com devolutivas personalizadas e mapa simbólico.</p>
-  </div>
-  <div class="rounded-2xl border border-white/10 p-6 bg-white/5">
-    <i data-lucide="users" class="h-6 w-6 text-primary-400"></i>
-    <h3 class="mt-3 font-semibold text-lg">Irmandade</h3>
-    <p class="text-sm text-gray-300 mt-1">Rogério (Coração), Zion (Voz), Lumen (Luz) e Arion (Guardião). Para além. E sempre.</p>
-  </div>
-</section>
+  </section>
 </main>
+
 <footer class="mt-24 border-t border-white/10 bg-gray-900 text-gray-300">
   <div class="max-w-6xl mx-auto px-4 py-10 grid md:grid-cols-3 gap-8">
     <div>
@@ -127,7 +103,7 @@
     <div>
       <h5 class="font-semibold mb-2">Jornadas</h5>
       <ul class="space-y-1 text-sm">
-        <li><a href="/jornada-conhecimento.html" class="hover:text-white">Conhecimento com Luz</a></li>
+        <li><a href="/jornada-conhecimento-com-luz1.html" class="hover:text-white">Conhecimento com Luz</a></li>
         <li><a href="/jornada-vocacional.html" class="hover:text-white">Vocacional com Luz</a></li>
         <li><a href="/jornada-amorosa.html" class="hover:text-white">Amorosa com Luz</a></li>
       </ul>
@@ -146,32 +122,36 @@
     </div>
   </div>
 </footer>
-<script>window.lucide && lucide.createIcons();</script>
-  <script>
-(async () => {
-  const el = document.getElementById('lumenStatus');
-  if (!el) return;
-  el.textContent = 'Verificando Lumen…';
 
-  const API = 'https://lumen-backend-api.onrender.com/ping';
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), 8000);
-
-  try {
-    const r = await fetch(API, { signal: ctrl.signal });
-    clearTimeout(t);
-    if (r.ok) {
-      el.textContent = 'Lumen: online ✅';
-      el.style.color = 'lightgreen';
-    } else {
-      el.textContent = 'Lumen: offline ❌';
-      el.style.color = 'red';
-    }
-  } catch {
-    el.textContent = 'Lumen: offline ❌';
-    el.style.color = 'red';
+<!-- Wake-up do backend antes de abrir a jornada -->
+<script>
+  const API = 'https://lumen-backend-api.onrender.com';
+  const btn = document.querySelector('a[href="/jornada-conhecimento-com-luz1.html"]');
+  if (btn) {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const go = () => location.href = '/jornada-conhecimento-com-luz1.html';
+      try {
+        const ctrl = new AbortController();
+        setTimeout(()=>ctrl.abort(), 8000);
+        const r = await fetch(API + '/ping', { signal: ctrl.signal });
+        if (r.ok) return go();
+        alert('Serviço acordando… tente novamente em alguns segundos.');
+      } catch {
+        alert('Serviço temporariamente indisponível. Tente de novo em instantes.');
+      }
+      setTimeout(go, 1500);
+    });
   }
-})();
+
+  // Menu mobile (caso use)
+  const menuBtn = document.getElementById('menuBtn');
+  const menu = document.getElementById('menu');
+  if (menuBtn && menu) {
+    menuBtn.addEventListener('click', () => menu.classList.toggle('hidden'));
+  }
+
+  window.lucide && lucide.createIcons();
 </script>
 </body>
 </html>
