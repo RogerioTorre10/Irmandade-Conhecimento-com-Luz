@@ -50,7 +50,7 @@
         </div>
       </div>
 
-      <!-- Perguntas virão daqui -->
+      <div id="lista-perguntas"></div>
       <div id="perguntas"></div>
 
       <div class="actions">
@@ -184,5 +184,236 @@
       await carregarPerguntas();
     })();
   </script>
+  <script>
+  // === JORNADA CONHECIMENTO COM LUZ — ESSENCIAL ===
+  // Lista oficial de perguntas (32+), organizada por blocos
+
+  const PERGUNTAS = [
+    // BLOCO 1 – Reflexões da Alma e da Existência (10)
+    "Como você tem percebido sua própria vida até aqui?",
+    "E a vida das pessoas ao seu redor, como você a enxerga?",
+    "Como lida com seus traumas? Consegue falar sobre eles?",
+    "Você acredita que a verdade existe ou tudo é relativo? Explique.",
+    "O que significa a doença para você? Está enfrentando alguma? Fale livremente.",
+    "Há alguém que você gostaria de ter ao seu lado agora? Quem é essa pessoa e por que ela não está?",
+    "Qual é o seu maior vício? Por que você acha que ele surgiu? Já tentou vencê-lo?",
+    "Sente que tem outros vícios, mesmo que sutis ou emocionais? Quais?",
+    "Como você percebe a morte? Ela te assusta, conforta ou provoca curiosidade?",
+    "Você acredita em continuidade após a morte? O que imagina que exista?",
+
+    // BLOCO 2 – Raízes e Experiências de Vida (8)
+    "Com quem foi criado: ambos os pais biológicos, só um dos pais biológicos (divórcio ou morte), pais afetivos (adoção) ou parentes?",
+    "É filho único?",
+    "Quantos irmãos tem? É primogênito, do meio ou caçula?",
+    "Passou fome quando criança?",
+    "Nível de escolaridade e formação acadêmica.",
+    "Estado civil: solteiro, namorando, casado, divorciado, viúvo?",
+    "Tem alguma deficiência física?",
+    "Você já sofreu algum tipo de preconceito? Foi superado ou ainda interfere nas suas decisões?",
+
+    // BLOCO 3 – Futuro e Propósito (5)
+    "Quais são os seus maiores sonhos para o futuro?",
+    "O que você considera essencial para ter uma vida plena?",
+    "Se pudesse mudar algo na sociedade, o que mudaria?",
+    "Qual legado gostaria de deixar?",
+    "Se pudesse passar uma mensagem para o mundo inteiro agora, qual seria?",
+
+    // BLOCO 4 – Jornada Iluminada (9)
+    "Você se recorda da idade em que, pela primeira vez, percebeu que era alguém neste mundo?",
+    "Se encontrasse seu 'eu' de 10 anos atrás, o que diria?",
+    "O que significa fé para você?",
+    "Já teve alguma experiência que mudou sua forma de ver a vida?",
+    "Quais pessoas mais marcaram sua caminhada? Por quê?",
+    "Você acredita que tudo tem um propósito?",
+    "Se pudesse receber uma resposta direta de Deus agora, qual pergunta faria?",
+    "Que hábito você pode iniciar hoje que te aproximaria do seu propósito?",
+    "Qual é a decisão corajosa que você vem adiando e precisa tomar?"
+  ];
+
+  // Cabeçalho visual por blocos (opcional)
+  const BLOCO_TITULOS = {
+    0: "Reflexões da Alma e da Existência",
+    10: "Raízes e Experiências de Vida",
+    18: "Futuro e Propósito",
+    23: "Jornada Iluminada"
+  };
+
+  const lista = document.getElementById("lista-perguntas");
+  const parts = [];
+
+  PERGUNTAS.forEach((texto, i) => {
+    // Se existir um título para este índice, insere um separador
+    if (BLOCO_TITULOS[i]) {
+      parts.push(`
+        <h3 class="mt-10 mb-4 text-xl font-extrabold tracking-wide text-primary-300">
+          ${BLOCO_TITULOS[i]}
+        </h3>
+      `);
+    }
+    parts.push(`
+      <div class="mb-6 rounded-2xl bg-white/5 p-4 border border-white/10">
+        <label class="block font-semibold mb-2">${i + 1}. ${texto}</label>
+        <textarea name="q${i + 1}" rows="4"
+          class="w-full rounded-xl bg-gray-900/60 border border-white/10 p-3"
+          placeholder="Escreva com sinceridade..."></textarea>
+      </div>
+    `);
+  });
+
+  lista.innerHTML = parts.join("");
+</script>
+  <script>
+  // === COLETA + ENVIO PARA O BACKEND ===
+  const API = 'https://lumen-backend-api.onrender.com';
+  const ENDPOINT = '/jornada/essencial'; // ajuste se necessário
+  const MIN_CAMPOS = 10;                 // mínimo de respostas preenchidas para enviar
+
+  // 1) Injeta barra de controle (senha + botões) se não existir no HTML
+  (function injectControls() {
+    if (document.getElementById('painel-controles')) return;
+    const painel = document.createElement('div');
+    painel.id = 'painel-controles';
+    painel.className = 'sticky bottom-0 left-0 right-0 z-40 bg-gray-900/90 border-t border-white/10 backdrop-blur';
+    painel.innerHTML = `
+      <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+        <div class="flex items-center gap-3">
+          <label class="text-sm text-gray-300">Senha de acesso</label>
+          <input id="senha" type="password" placeholder="Digite sua senha"
+                 class="rounded-lg bg-gray-800 border border-white/10 px-3 py-2 text-sm w-56" />
+        </div>
+        <div class="flex gap-3">
+          <button id="btnLimpar" class="px-4 py-2 rounded-xl border border-yellow-400/50 text-yellow-300 hover:bg-yellow-400/10">
+            Limpar respostas
+          </button>
+          <button id="btnEnviar" class="px-4 py-2 rounded-xl bg-yellow-400 text-gray-900 font-semibold hover:bg-yellow-300">
+            Enviar respostas
+          </button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(painel);
+  })();
+
+  // 2) Persistência simples (auto-save local) enquanto o usuário digita
+  const campos = () => Array.from(document.querySelectorAll('textarea[name^="q"]'));
+  const KEY_PREFIX = 'jornada_essencial_';
+  function salvarAuto() {
+    campos().forEach((t, i) => localStorage.setItem(KEY_PREFIX + (i+1), t.value));
+  }
+  function restaurarAuto() {
+    campos().forEach((t, i) => {
+      const v = localStorage.getItem(KEY_PREFIX + (i+1));
+      if (v) t.value = v;
+    });
+  }
+  restaurarAuto();
+  document.addEventListener('input', (e) => {
+    if (e.target && e.target.matches('textarea[name^="q"]')) salvarAuto();
+  });
+
+  // 3) Botão Limpar
+  document.getElementById('btnLimpar').addEventListener('click', () => {
+    if (!confirm('Deseja limpar todas as respostas desta página?')) return;
+    campos().forEach(t => t.value = '');
+    salvarAuto();
+  });
+
+  // 4) Envio
+  document.getElementById('btnEnviar').addEventListener('click', async () => {
+    const senha = document.getElementById('senha').value.trim();
+    if (!senha) { alert('Digite a senha de acesso.'); return; }
+
+    const respostas = campos().map((t, i) => ({
+      id: i + 1,
+      pergunta: (typeof PERGUNTAS !== 'undefined' ? PERGUNTAS[i] : `Q${i+1}`),
+      resposta: t.value.trim()
+    }));
+
+    const preenchidas = respostas.filter(r => r.resposta.length > 0).length;
+    if (preenchidas < MIN_CAMPOS) {
+      const ok = confirm(`Somente ${preenchidas} respostas preenchidas. Deseja enviar assim mesmo?`);
+      if (!ok) return;
+    }
+
+    // Metadados úteis (timezone e horário de início p/ regra 15d/24h se quiser usar)
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+    const startedKey = KEY_PREFIX + 'started_at';
+    if (!localStorage.getItem(startedKey)) localStorage.setItem(startedKey, new Date().toISOString());
+
+    const payload = {
+      senha,
+      respostas,
+      meta: {
+        dispositivo: navigator.userAgent,
+        timezone: tz,
+        started_at: localStorage.getItem(startedKey),
+        enviado_em: new Date().toISOString()
+      }
+    };
+
+    // UI: loading state
+    const btn = document.getElementById('btnEnviar');
+    const original = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Gerando PDF...';
+
+    try {
+      // Aquece o backend (opcional)
+      await fetch(API + '/ping', { method: 'GET' }).catch(()=>{});
+
+      const r = await fetch(API + ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/pdf'   // backend deve retornar PDF direto
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const ct = r.headers.get('Content-Type') || '';
+      if (!r.ok) {
+        // Se vier JSON de erro, mostra mensagem amigável
+        if (ct.includes('application/json')) {
+          const err = await r.json().catch(()=>({detail:'Erro desconhecido'}));
+          throw new Error(err.detail || err.message || 'Falha ao gerar PDF.');
+        }
+        throw new Error('Falha ao gerar PDF. Tente novamente em instantes.');
+      }
+
+      if (ct.includes('application/pdf')) {
+        const blob = await r.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Jornada-Conhecimento-com-Luz.pdf';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+
+        // Política: apagar respostas locais após download
+        campos().forEach((t, i) => localStorage.removeItem(KEY_PREFIX + (i+1)));
+        localStorage.removeItem(startedKey);
+        alert('PDF gerado com sucesso! Lembre-se: baixe e guarde. Os dados foram limpos do dispositivo.');
+      } else if (ct.includes('application/json')) {
+        // Alternativa: backend pode retornar { url: '...' }
+        const data = await r.json();
+        if (data.url) {
+          location.href = data.url;
+        } else if (data.message) {
+          alert(data.message);
+        } else {
+          alert('Resposta recebida, mas não reconhecida.');
+        }
+      } else {
+        alert('Formato de resposta inesperado do servidor.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err.message || 'Erro ao enviar. Tente novamente.');
+    } finally {
+      btn.disabled = false; btn.textContent = original;
+    }
+  });
+</script>
 </body>
 </html>
