@@ -162,11 +162,13 @@
     `);
   });
   lista.innerHTML = parts.join("");
-</script>
-
+  
 <script>
-  // === CONFIG ===
-  const API = 'https://conhecimento-com-luz-api.onrender.com';
+  // === CONFIG com fallback ===
+  const APIS = [
+    'https://conhecimento-com-luz-api.onrender.com', // principal
+    'https://lumen-backend-api.onrender.com'          // backup
+  ];
   const MIN_CAMPOS = 10;
   const KEY_PREFIX = 'jornada_essencial_';
 
@@ -201,14 +203,43 @@
   document.getElementById('btnLimpar').addEventListener('click', () => {
     if (!confirm('Deseja limpar todas as respostas desta página?')) return;
     campos().forEach(t => t.value = '');
-    salvarAuto(); // sobrescreve com vazio
+    salvarAuto();
   });
 
-  // Aquece backend ao abrir a página (não bloqueante) e ícones
+  // Aquece ambos os backends
   window.addEventListener('load', () => {
-    fetch(API + '/ping').catch(() => {});
+    APIS.forEach(api => fetch(api + '/ping').catch(()=>{}));
     window.lucide && lucide.createIcons();
   });
+
+  // Post com fallback de host e timeout
+  async function postComFallback(path, body) {
+    const supportsAbortTimeout = typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal;
+    for (const api of APIS) {
+      let controller, timer;
+      const opts = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, application/pdf' },
+        body: JSON.stringify(body),
+        mode: 'cors'
+      };
+      if (supportsAbortTimeout) {
+        opts.signal = AbortSignal.timeout(30000);
+      } else {
+        controller = new AbortController();
+        timer = setTimeout(() => controller.abort(), 30000);
+        opts.signal = controller.signal;
+      }
+      try {
+        const res = await fetch(api + path, opts);
+        if (timer) clearTimeout(timer);
+        return { res, api };
+      } catch (e) {
+        // tenta o próximo host
+      }
+    }
+    throw new Error('Falha de rede. Tente novamente em instantes.');
+  }
 
   // === Enviar ===
   document.getElementById('btnEnviar').addEventListener('click', async () => {
@@ -217,8 +248,7 @@
 
     if (!senhaEl?.value.trim()) {
       mostrarFeedback('Por favor, digite a senha de acesso.');
-      senhaEl?.focus();
-      return;
+      senhaEl?.focus(); return;
     }
 
     const respostas = campos().map((el, i) => ({
@@ -228,10 +258,7 @@
     }));
 
     const preenchidas = respostas.filter(r => r.resposta.length);
-    if (!preenchidas.length) {
-      mostrarFeedback('Preencha ao menos uma resposta antes de enviar.');
-      return;
-    }
+    if (!preenchidas.length) return mostrarFeedback('Preencha ao menos uma resposta antes de enviar.');
     if (preenchidas.length < MIN_CAMPOS) {
       if (!confirm(`Somente ${preenchidas.length} respostas preenchidas. Deseja enviar assim mesmo?`)) return;
     }
@@ -249,30 +276,12 @@
       }
     };
 
-    // UI: loading
+    // UI
     const oldTxt = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = 'Enviando...';
-
-    // Timeout compatível
-    const supportsAbortTimeout = typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal;
-    let controller, timer;
-    const fetchOpts = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, application/pdf' },
-      body: JSON.stringify(payload)
-    };
-    if (supportsAbortTimeout) {
-      fetchOpts.signal = AbortSignal.timeout(30000);
-    } else {
-      controller = new AbortController();
-      timer = setTimeout(() => controller.abort(), 30000);
-      fetchOpts.signal = controller.signal;
-    }
+    btn.disabled = true; btn.textContent = 'Enviando...';
 
     try {
-      const res = await fetch(`${API}/jornada/essencial`, fetchOpts);
-      if (timer) clearTimeout(timer);
+      const { res } = await postComFallback('/jornada/essencial', payload);
 
       const contentType = res.headers.get('Content-Type') || '';
       let data = null, blob = null, text = null;
@@ -294,38 +303,30 @@
         throw new Error(msg);
       }
 
-      // Sucesso
       mostrarFeedback((data && (data.message || data.msg)) || 'Respostas enviadas com sucesso!', 'sucesso');
 
-      // PDF: três formatos
       if (blob) {
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'jornada-essencial.pdf';
-        a.click();
+        const a = document.createElement('a'); a.href = url; a.download = 'jornada-essencial.pdf'; a.click();
         URL.revokeObjectURL(url);
       } else if (data?.pdf_url) {
-        window.location.href = data.pdf_url;
+        location.href = data.pdf_url;
       } else if (data?.pdf_base64) {
         const a = document.createElement('a');
         a.href = `data:application/pdf;base64,${data.pdf_base64}`;
         a.download = data?.pdf_filename || 'jornada-essencial.pdf';
         a.click();
       } else {
-        // Se não veio PDF, mas veio texto/JSON simples
-        if (!data) mostrarFeedback('Nenhum PDF retornado pelo servidor.', 'erro');
+        mostrarFeedback('Nenhum PDF retornado pelo servidor.', 'erro');
       }
 
-      // Limpa auto-save após sucesso
       campos().forEach((_, i) => localStorage.removeItem(KEY_PREFIX + (i + 1)));
       localStorage.removeItem(KEY_PREFIX + 'started_at');
     } catch (err) {
-      console.error('Erro:', err);
+      console.error(err);
       mostrarFeedback(err.message || 'Falha de rede. Tente novamente.', 'erro');
     } finally {
-      btn.disabled = false;
-      btn.textContent = oldTxt || 'Enviar respostas';
+      btn.disabled = false; btn.textContent = oldTxt || 'Enviar respostas';
     }
   });
 </script>
