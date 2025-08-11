@@ -137,10 +137,28 @@ function renderPerguntas() {
 
   document.addEventListener('input', (e)=>{ if (e.target && e.target.matches('textarea[name^="q"]')) salvarAuto(); });
 
-  btnLimpar?.addEventListener('click', ()=>{
-    if (!confirm('Deseja limpar todas as respostas desta página?')) return;
-    campos().forEach(t=>t.value=''); salvarAuto();
-  });
+  btnLimpar?.addEventListener('click', () => {
+  // Se não tem nada preenchido, evita susto
+  const temAlgo = campos().some(t => t.value.trim().length);
+  if (!temAlgo) {
+    mostrarFeedback('Não há respostas para limpar.', 'erro');
+    return;
+  }
+
+  const msg = [
+    '⚠️ Este botão apaga TODAS as respostas desta página.',
+    '',
+    'Se deseja apagar apenas uma resposta, use o teclado na pergunta desejada (Ctrl+A e Backspace/Apagar).',
+    '',
+    'Tem certeza de que deseja apagar TUDO agora?'
+  ].join('\n');
+
+  if (!confirm(msg)) return;
+
+  campos().forEach(t => (t.value = ''));
+  salvarAuto(); // sobrescreve no localStorage
+  mostrarFeedback('Todas as respostas foram apagadas deste dispositivo.', 'sucesso');
+});
 
   async function postComFallback(path, body) {
     const supportsAbortTimeout = typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal;
