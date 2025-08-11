@@ -324,19 +324,25 @@
         a.href = `data:application/pdf;base64,${data.pdf_base64}`;
         a.download = data?.pdf_filename || 'jornada-essencial.pdf';
         a.click();
-      } else {
+            } else {
         mostrarFeedback('Nenhum PDF retornado pelo servidor.', 'erro');
       }
 
+      // limpar local depois do sucesso
       campos().forEach((_, i) => localStorage.removeItem(KEY_PREFIX + (i + 1)));
       localStorage.removeItem(KEY_PREFIX + 'started_at');
+
     } catch (err) {
       console.error(err);
       mostrarFeedback(err.message || 'Falha de rede. Tente novamente.', 'erro');
     } finally {
-      btn.disabled = false; btn.textContent = oldTxt || 'Enviar respostas';
+      btn.disabled = false;
+      btn.textContent = oldTxt || 'Enviar respostas';
     }
-  });
-</script>
+  }); <!-- fecha o addEventListener -->
+</script> <!-- fecha o script inline -->
+
+<script src="/assets/jornada-essencial.js?v=1" defer></script>
 </body>
 </html>
+
