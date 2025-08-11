@@ -6,23 +6,17 @@
   <title>Jornada Conhecimento com Luz — Essencial</title>
   <meta name="description" content="Jornada Conhecimento com Luz — Essencial. Responda com sinceridade e baixe seu PDF ao final.">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+
+  <!-- Tailwind via CDN (garante estilo mesmo sem build) -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: {"50":"#f5f3ff","100":"#ede9fe","200":"#ddd6fe","300":"#c4b5fd","400":"#a78bfa","500":"#8b5cf6","600":"#7c3aed","700":"#6d28d9","800":"#5b21b6","900":"#4c1d95"},
-            gold: {"500":"#fbbf24"}
-          }
-        }
-      }
-    }
-  </script>
+
+  <!-- (Opcional) Seu CSS adicional -->
   <link rel="stylesheet" href="/assets/styles.css">
+
+  <!-- Ícones Lucide -->
   <script defer src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 text-gray-100 antialiased selection:bg-primary-500/30">
+<body class="bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 text-gray-100 antialiased selection:bg-yellow-500/30">
 
 <header class="fixed top-0 inset-x-0 z-50 backdrop-blur bg-gray-900/70 border-b border-white/10">
   <nav class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
@@ -50,11 +44,10 @@
 
   <!-- Container das perguntas -->
   <section class="max-w-3xl mx-auto px-4 mt-8">
+    <div id="feedback" class="hidden rounded-xl p-4 mb-4 text-sm"></div>
     <h1 class="text-2xl font-extrabold tracking-wide mb-4">
-      Jornada Conhecimento com Luz — <span class="text-primary-300">Essencial</span>
+      Jornada Conhecimento com Luz — <span class="text-yellow-300">Essencial</span>
     </h1>
-
-    <!-- Aqui as perguntas serão renderizadas -->
     <div id="lista-perguntas"></div>
   </section>
 
@@ -82,9 +75,8 @@
   </div>
 </div>
 
-<!-- Scripts -->
+<!-- Ajuste de espaço para o painel fixo -->
 <script>
-  // Ajuste de espaço para o painel fixo no mobile
   (function padBottomForFooter() {
     const painel = document.getElementById('painel-controles');
     function ajusta() {
@@ -155,7 +147,7 @@
   PERGUNTAS.forEach((texto, i) => {
     if (BLOCO_TITULOS[i]) {
       parts.push(`
-        <h3 class="mt-10 mb-4 text-xl font-extrabold tracking-wide text-primary-300">
+        <h3 class="mt-10 mb-4 text-xl font-extrabold tracking-wide text-yellow-300">
           ${BLOCO_TITULOS[i]}
         </h3>
       `);
@@ -173,222 +165,169 @@
 </script>
 
 <script>
-  // === COLETA + ENVIO PARA O BACKEND ===
- const API = 'https://lumen-backend-api.onrender.com';
- const ENDPOINT = '/formulario'; // ajuste se necessário
-  const MIN_CAMPOS = 10;                 // mínimo de respostas para permitir envio
-
-  // Aquece backend ao abrir a página (não bloqueante)
-  window.addEventListener('load', () => {
-    fetch(API + '/ping').catch(()=>{});
-  });
-
-  // Utilidades
-  const campos = () => Array.from(document.querySelectorAll('textarea[name^="q"]'));
+  // === CONFIG ===
+  const API = 'https://conhecimento-com-luz-api.onrender.com';
+  const MIN_CAMPOS = 10;
   const KEY_PREFIX = 'jornada_essencial_';
 
+  // === Helpers ===
+  const campos = () => Array.from(document.querySelectorAll('textarea[name^="q"]'));
+
+  function mostrarFeedback(mensagem, tipo = 'erro') {
+    const el = document.getElementById('feedback');
+    el.className = `rounded-xl p-4 mb-4 text-sm ${
+      tipo === 'sucesso' ? 'bg-green-500/20 text-green-200' : 'bg-red-500/20 text-red-200'
+    }`;
+    el.textContent = mensagem;
+    el.classList.remove('hidden');
+    setTimeout(() => el.classList.add('hidden'), 5000);
+  }
+
   // Auto-save local
-  function salvarAuto() {
-    campos().forEach((t, i) => localStorage.setItem(KEY_PREFIX + (i+1), t.value));
-  }
-  function restaurarAuto() {
-    campos().forEach((t, i) => {
-      const v = localStorage.getItem(KEY_PREFIX + (i+1));
-      if (v) t.value = v;
-    });
-  }
-  // Restaura após primeira renderização
+  function salvarAuto() { campos().forEach((t, i) => localStorage.setItem(KEY_PREFIX + (i + 1), t.value)); }
+  function restaurarAuto() { campos().forEach((t, i) => { const v = localStorage.getItem(KEY_PREFIX + (i + 1)); if (v) t.value = v; }); }
+
+  // started_at (primeiro acesso)
+  (function ensureStartedAt(){
+    const k = KEY_PREFIX + 'started_at';
+    if (!localStorage.getItem(k)) localStorage.setItem(k, new Date().toISOString());
+  })();
+
+  // Restaura e registra autosave
   setTimeout(restaurarAuto, 0);
-  document.addEventListener('input', (e) => {
-    if (e.target && e.target.matches('textarea[name^="q"]')) salvarAuto();
-  });
+  document.addEventListener('input', (e) => { if (e.target && e.target.matches('textarea[name^="q"]')) salvarAuto(); });
 
   // Limpar
   document.getElementById('btnLimpar').addEventListener('click', () => {
     if (!confirm('Deseja limpar todas as respostas desta página?')) return;
     campos().forEach(t => t.value = '');
-    salvarAuto();
+    salvarAuto(); // sobrescreve com vazio
   });
 
-  <script>
-// === CONFIG ===
-const API = 'https://conhecimento-com-luz-api.onrender.com'; // troque se estiver usando outro backend
-
-// === Helpers já existentes no seu arquivo ===
-// campos(): Array de textareas
-// KEY_PREFIX: prefixo do localStorage
-// salvarAuto(), restaurarAuto() etc. já estão acima
-
-// ================== ENVIAR ==================
-document.getElementById('btnEnviar').addEventListener('click', async () => {
-  const btn = document.getElementById('btnEnviar');
-  const senhaEl = document.getElementById('senha');
-
-  if (!senhaEl || !senhaEl.value.trim()) {
-    alert('Digite a senha de acesso.');
-    return;
-  }
-
-  // Monta respostas a partir dos <textarea name="q[1]">, q[2]...
-  const respostas = campos().map((el, i) => {
-    const idx = Number((el.name.match(/\[(\d+)\]/) || [])[1] || i + 1);
-    const label = document.querySelector(`label[for="${el.id}"]`);
-    const perguntaEl = label || el.closest('.pergunta') || el.previousElementSibling;
-    const pergunta = perguntaEl ? perguntaEl.textContent.trim() : `Pergunta ${idx}`;
-    return {
-      indice: idx,
-      pergunta,
-      resposta: (el.value || '').trim()
-    };
+  // Aquece backend ao abrir a página (não bloqueante) e ícones
+  window.addEventListener('load', () => {
+    fetch(API + '/ping').catch(() => {});
+    window.lucide && lucide.createIcons();
   });
 
-  // Validação simples (opcional): exige ao menos 1 resposta
-  if (!respostas.some(r => r.resposta.length)) {
-    alert('Preencha ao menos uma resposta antes de enviar.');
-    return;
-  }
+  // === Enviar ===
+  document.getElementById('btnEnviar').addEventListener('click', async () => {
+    const btn = document.getElementById('btnEnviar');
+    const senhaEl = document.getElementById('senha');
 
-  // Payload padrão
-  const payload = {
-    senha: senhaEl.value.trim(),
-    origem: 'site-irmandade',
-    jornada: 'essencial',
-    respostas
-  };
-
-  // Feedback de envio
-  const oldTxt = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = 'Enviando...';
-
-  try {
-    const res = await fetch(`${API}/jornada/essencial`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    // Mesmo se não vier JSON válido, seguimos sem quebrar
-    const data = await res.json().catch(() => ({}));
-
-    if (!res.ok) {
-      const msg = data?.detail || data?.message || `Erro ${res.status}`;
-      alert('Erro ao enviar: ' + msg);
+    if (!senhaEl?.value.trim()) {
+      mostrarFeedback('Por favor, digite a senha de acesso.');
+      senhaEl?.focus();
       return;
     }
 
-    // Mensagem clara (sem [object Object])
-    alert(data?.message || data?.msg || 'Respostas enviadas com sucesso!');
-
-    // PDF: url direta OU base64
-    if (data?.pdf_url) {
-      window.location.href = data.pdf_url; // abre/baixa o PDF
-    } else if (data?.pdf_base64) {
-      const a = document.createElement('a');
-      a.href = 'data:application/pdf;base64,' + data.pdf_base64;
-      a.download = data?.pdf_filename || 'jornada-essencial.pdf';
-      a.click();
-    }
-
-    // Limpa auto-save local após sucesso
-    campos().forEach((_, i) => localStorage.removeItem(KEY_PREFIX + (i + 1)));
-  } catch (err) {
-    console.error(err);
-    alert('Falha de rede. Tente novamente em instantes.');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = oldTxt || 'Enviar';
-  }
-});
-</script>
-
-    const respostas = campos().map((t, i) => ({
-      id: i + 1,
-      pergunta: (typeof PERGUNTAS !== 'undefined' ? PERGUNTAS[i] : `Q${i+1}`),
-      resposta: t.value.trim()
+    const respostas = campos().map((el, i) => ({
+      indice: i + 1,
+      pergunta: PERGUNTAS[i] || `Pergunta ${i + 1}`,
+      resposta: el.value.trim()
     }));
 
-    const preenchidas = respostas.filter(r => r.resposta.length > 0).length;
-    if (preenchidas < MIN_CAMPOS) {
-      const ok = confirm(`Somente ${preenchidas} respostas preenchidas. Deseja enviar assim mesmo?`);
-      if (!ok) return;
+    const preenchidas = respostas.filter(r => r.resposta.length);
+    if (!preenchidas.length) {
+      mostrarFeedback('Preencha ao menos uma resposta antes de enviar.');
+      return;
+    }
+    if (preenchidas.length < MIN_CAMPOS) {
+      if (!confirm(`Somente ${preenchidas.length} respostas preenchidas. Deseja enviar assim mesmo?`)) return;
     }
 
-    // Metadados (timezone e horários)
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
-    const startedKey = KEY_PREFIX + 'started_at';
-    if (!localStorage.getItem(startedKey)) localStorage.setItem(startedKey, new Date().toISOString());
-
     const payload = {
-      senha,
+      senha: senhaEl.value.trim(),
+      origem: 'site-irmandade',
+      jornada: 'essencial',
       respostas,
       meta: {
         dispositivo: navigator.userAgent,
-        timezone: tz,
-        started_at: localStorage.getItem(startedKey),
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+        started_at: localStorage.getItem(KEY_PREFIX + 'started_at') || new Date().toISOString(),
         enviado_em: new Date().toISOString()
       }
     };
 
-    // UI loading
-    const btn = document.getElementById('btnEnviar');
-    const original = btn.textContent;
-    btn.disabled = true; btn.textContent = 'Gerando PDF...';
+    // UI: loading
+    const oldTxt = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
+    // Timeout compatível
+    const supportsAbortTimeout = typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal;
+    let controller, timer;
+    const fetchOpts = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, application/pdf' },
+      body: JSON.stringify(payload)
+    };
+    if (supportsAbortTimeout) {
+      fetchOpts.signal = AbortSignal.timeout(30000);
+    } else {
+      controller = new AbortController();
+      timer = setTimeout(() => controller.abort(), 30000);
+      fetchOpts.signal = controller.signal;
+    }
 
     try {
-      const r = await fetch(API + ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/pdf'
-        },
-        body: JSON.stringify(payload)
-      });
+      const res = await fetch(`${API}/jornada/essencial`, fetchOpts);
+      if (timer) clearTimeout(timer);
 
-      const ct = r.headers.get('Content-Type') || '';
-      if (!r.ok) {
-        if (ct.includes('application/json')) {
-          const err = await r.json().catch(()=>({detail:'Erro desconhecido'}));
-          throw new Error(err.detail || err.message || 'Falha ao gerar PDF.');
-        }
-        throw new Error('Falha ao gerar PDF. Tente novamente em instantes.');
+      const contentType = res.headers.get('Content-Type') || '';
+      let data = null, blob = null, text = null;
+
+      if (contentType.includes('application/pdf')) {
+        blob = await res.blob();
+      } else if (contentType.includes('application/json')) {
+        data = await res.json().catch(() => null);
+      } else {
+        text = await res.text().catch(() => null);
       }
 
-      if (ct.includes('application/pdf')) {
-        const blob = await r.blob();
+      if (!res.ok) {
+        let msg = 'Erro ao enviar.';
+        if (res.status === 401) msg = 'Senha inválida. Verifique e tente novamente.';
+        else if (res.status === 400) msg = (data && (data.detail || data.message)) || 'Dados inválidos. Verifique suas respostas.';
+        else if (res.status >= 500) msg = 'Erro no servidor. Tente novamente mais tarde.';
+        else msg = (data && (data.detail || data.message)) || text || `Erro ${res.status}`;
+        throw new Error(msg);
+      }
+
+      // Sucesso
+      mostrarFeedback((data && (data.message || data.msg)) || 'Respostas enviadas com sucesso!', 'sucesso');
+
+      // PDF: três formatos
+      if (blob) {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'Jornada-Conhecimento-com-Luz.pdf';
-        document.body.appendChild(a);
+        a.download = 'jornada-essencial.pdf';
         a.click();
-        a.remove();
         URL.revokeObjectURL(url);
-
-        // Limpa armazenamento local conforme a política
-        campos().forEach((t, i) => localStorage.removeItem(KEY_PREFIX + (i+1)));
-        localStorage.removeItem(startedKey);
-        alert('PDF gerado com sucesso! Baixe e guarde com carinho. Os dados locais foram limpos.');
-      } else if (ct.includes('application/json')) {
-        const data = await r.json();
-        if (data.url) {
-          location.href = data.url;
-        } else {
-          alert(data.message || 'Resposta recebida, mas não reconhecida.');
-        }
+      } else if (data?.pdf_url) {
+        window.location.href = data.pdf_url;
+      } else if (data?.pdf_base64) {
+        const a = document.createElement('a');
+        a.href = `data:application/pdf;base64,${data.pdf_base64}`;
+        a.download = data?.pdf_filename || 'jornada-essencial.pdf';
+        a.click();
       } else {
-        alert('Formato de resposta inesperado do servidor.');
+        // Se não veio PDF, mas veio texto/JSON simples
+        if (!data) mostrarFeedback('Nenhum PDF retornado pelo servidor.', 'erro');
       }
+
+      // Limpa auto-save após sucesso
+      campos().forEach((_, i) => localStorage.removeItem(KEY_PREFIX + (i + 1)));
+      localStorage.removeItem(KEY_PREFIX + 'started_at');
     } catch (err) {
-      console.error(err);
-      alert(err.message || 'Erro ao enviar. Tente novamente.');
+      console.error('Erro:', err);
+      mostrarFeedback(err.message || 'Falha de rede. Tente novamente.', 'erro');
     } finally {
-      btn.disabled = false; btn.textContent = original;
+      btn.disabled = false;
+      btn.textContent = oldTxt || 'Enviar respostas';
     }
   });
-
-  window.lucide && lucide.createIcons();
 </script>
-
 </body>
 </html>
