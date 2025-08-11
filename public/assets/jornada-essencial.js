@@ -1,4 +1,4 @@
-// --- A) Ajuste do rodapé fixo ---
+// --- Rodapé fixo: padding ---
 (function padBottomForFooter() {
   const painel = document.getElementById('painel-controles');
   function ajusta() {
@@ -10,7 +10,7 @@
   setTimeout(ajusta, 0);
 })();
 
-// --- B) Perguntas + render ---
+// --- Perguntas + render ---
 const PERGUNTAS = [
   "Como você tem percebido sua própria vida até aqui?",
   "E a vida das pessoas ao seu redor, como você a enxerga?",
@@ -46,12 +46,7 @@ const PERGUNTAS = [
   "Qual é a decisão corajosa que você vem adiando e precisa tomar?"
 ];
 
-const BLOCO_TITULOS = {
-  0: "Reflexões da Alma e da Existência",
-  10: "Raízes e Experiências de Vida",
-  18: "Futuro e Propósito",
-  23: "Jornada Iluminada"
-};
+const BLOCO_TITULOS = {0:"Reflexões da Alma e da Existência",10:"Raízes e Experiências de Vida",18:"Futuro e Propósito",23:"Jornada Iluminada"};
 
 function renderPerguntas() {
   const lista = document.getElementById("lista-perguntas");
@@ -82,7 +77,7 @@ function renderPerguntas() {
   });
 }
 
-// --- C) Fluxo iniciar + enviar (com fallback de API) ---
+// --- Fluxo: iniciar / limpar / enviar (sem auto-abrir) ---
 (function () {
   const APIS = [
     'https://conhecimento-com-luz-api.onrender.com',
@@ -109,22 +104,26 @@ function renderPerguntas() {
   function salvarAuto(){ campos().forEach((t,i)=>localStorage.setItem(KEY_PREFIX+(i+1), t.value)); }
   function restaurarAuto(){ campos().forEach((t,i)=>{ const v=localStorage.getItem(KEY_PREFIX+(i+1)); if(v) t.value=v; }); }
 
-  // aquece
-  window.addEventListener('load', () => { APIS.forEach(api => fetch(api + '/ping').catch(()=>{})); });
-
   function habilitaAcoes(on) {
     btnLimpar.disabled = !on;
     btnEnviar.disabled = !on;
-    if (on) {
-      btnEnviar.classList.remove('bg-yellow-400/60');
-      btnEnviar.classList.add('bg-yellow-400','hover:bg-yellow-300');
-    }
+    btnEnviar.classList.toggle('bg-yellow-400/60', !on);
+    btnEnviar.classList.toggle('bg-yellow-400', on);
+    btnEnviar.classList.toggle('hover:bg-yellow-300', on);
   }
+
+  // nunca auto-abre: mantém escondido até clicar "Iniciar"
+  areaJornada?.classList.add('hidden');
+  habilitaAcoes(false);
+
+  // aquece backends
+  window.addEventListener('load', () => { APIS.forEach(api => fetch(api + '/ping').catch(()=>{})); });
 
   function iniciar() {
     if (!senhaEl?.value.trim()) {
       mostrarFeedback('Por favor, digite a senha de acesso.'); senhaEl?.focus(); return;
     }
+    // marca início e exibe
     if (!localStorage.getItem(KEY_PREFIX + 'started_at')) {
       localStorage.setItem(KEY_PREFIX + 'started_at', new Date().toISOString());
     }
@@ -134,16 +133,7 @@ function renderPerguntas() {
     habilitaAcoes(true);
     mostrarFeedback('Jornada iniciada. Boa escrita! ✨', 'sucesso');
   }
-
   btnIniciar?.addEventListener('click', iniciar);
-
-  // reabrir se já iniciou
-  if (localStorage.getItem(KEY_PREFIX + 'started_at')) {
-    renderPerguntas();
-    setTimeout(restaurarAuto, 0);
-    areaJornada?.classList.remove('hidden');
-    habilitaAcoes(true);
-  }
 
   document.addEventListener('input', (e)=>{ if (e.target && e.target.matches('textarea[name^="q"]')) salvarAuto(); });
 
@@ -167,7 +157,7 @@ function renderPerguntas() {
         const res = await fetch(api + path, opts);
         if (timer) clearTimeout(timer);
         return res;
-      } catch { /* tenta próximo */ }
+      } catch { /* tenta próximo host */ }
     }
     throw new Error('Falha de rede. Tente novamente em instantes.');
   }
