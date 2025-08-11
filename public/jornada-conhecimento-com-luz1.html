@@ -210,10 +210,97 @@
     salvarAuto();
   });
 
-  // Enviar
-  document.getElementById('btnEnviar').addEventListener('click', async () => {
-    const senha = document.getElementById('senha').value.trim();
-    if (!senha) { alert('Digite a senha de acesso.'); return; }
+  <script>
+// === CONFIG ===
+const API = 'https://conhecimento-com-luz-api.onrender.com'; // troque se estiver usando outro backend
+
+// === Helpers já existentes no seu arquivo ===
+// campos(): Array de textareas
+// KEY_PREFIX: prefixo do localStorage
+// salvarAuto(), restaurarAuto() etc. já estão acima
+
+// ================== ENVIAR ==================
+document.getElementById('btnEnviar').addEventListener('click', async () => {
+  const btn = document.getElementById('btnEnviar');
+  const senhaEl = document.getElementById('senha');
+
+  if (!senhaEl || !senhaEl.value.trim()) {
+    alert('Digite a senha de acesso.');
+    return;
+  }
+
+  // Monta respostas a partir dos <textarea name="q[1]">, q[2]...
+  const respostas = campos().map((el, i) => {
+    const idx = Number((el.name.match(/\[(\d+)\]/) || [])[1] || i + 1);
+    const label = document.querySelector(`label[for="${el.id}"]`);
+    const perguntaEl = label || el.closest('.pergunta') || el.previousElementSibling;
+    const pergunta = perguntaEl ? perguntaEl.textContent.trim() : `Pergunta ${idx}`;
+    return {
+      indice: idx,
+      pergunta,
+      resposta: (el.value || '').trim()
+    };
+  });
+
+  // Validação simples (opcional): exige ao menos 1 resposta
+  if (!respostas.some(r => r.resposta.length)) {
+    alert('Preencha ao menos uma resposta antes de enviar.');
+    return;
+  }
+
+  // Payload padrão
+  const payload = {
+    senha: senhaEl.value.trim(),
+    origem: 'site-irmandade',
+    jornada: 'essencial',
+    respostas
+  };
+
+  // Feedback de envio
+  const oldTxt = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  try {
+    const res = await fetch(`${API}/jornada/essencial`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    // Mesmo se não vier JSON válido, seguimos sem quebrar
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      const msg = data?.detail || data?.message || `Erro ${res.status}`;
+      alert('Erro ao enviar: ' + msg);
+      return;
+    }
+
+    // Mensagem clara (sem [object Object])
+    alert(data?.message || data?.msg || 'Respostas enviadas com sucesso!');
+
+    // PDF: url direta OU base64
+    if (data?.pdf_url) {
+      window.location.href = data.pdf_url; // abre/baixa o PDF
+    } else if (data?.pdf_base64) {
+      const a = document.createElement('a');
+      a.href = 'data:application/pdf;base64,' + data.pdf_base64;
+      a.download = data?.pdf_filename || 'jornada-essencial.pdf';
+      a.click();
+    }
+
+    // Limpa auto-save local após sucesso
+    campos().forEach((_, i) => localStorage.removeItem(KEY_PREFIX + (i + 1)));
+  } catch (err) {
+    console.error(err);
+    alert('Falha de rede. Tente novamente em instantes.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = oldTxt || 'Enviar';
+  }
+});
+</script>
 
     const respostas = campos().map((t, i) => ({
       id: i + 1,
