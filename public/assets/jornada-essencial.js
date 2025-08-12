@@ -394,7 +394,6 @@ async function validarSenhaAntesDeIniciar(senha) {
     }
   }
       try {
-    try {
   const res = await postComFallbackPathList(API_PATHS, payload);
 
   const ct = res.headers.get('Content-Type') || '';
@@ -421,8 +420,6 @@ async function validarSenhaAntesDeIniciar(senha) {
   btnEnviar.disabled = false;
   btnEnviar.textContent = oldTxt || 'Enviar respostas';
 }
-
-    }
 
     // ... tratamento do PDF / sucesso ...
   } catch (err) {
