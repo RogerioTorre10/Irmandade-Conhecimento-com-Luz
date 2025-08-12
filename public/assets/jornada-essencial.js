@@ -73,8 +73,6 @@ const btnIniciar = document.getElementById('btnIniciar');
 const btnLimpar  = document.getElementById('btnLimpar');
 const btnEnviar  = document.getElementById('btnEnviar');
 const senhaEl    = document.getElementById('senha');
-const FEEDBACK = document.getElementById('feedback');
-const BTN_ENVIAR = document.getElementById('btnEnviar');
 
 function mostrarFeedback(msg, tipo='erro') {
   if (!feedbackEl) return;
