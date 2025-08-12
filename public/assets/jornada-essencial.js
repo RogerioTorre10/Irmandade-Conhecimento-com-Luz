@@ -14,22 +14,13 @@
   setTimeout(ajusta, 0);
 })();
 
-/* B) Configuração */
-const APIS = [
-  'https://conhecimento-com-luz-api.onrender.com', // principal
-  'https://lumen-backend-api.onrender.com'         // backup
-];
-
-const API_PATHS = [
-  '/jornada/essencial',
-  '/jornada-essencial',
-  '/jornada/essencial/pdf',
-  '/jornada',
-];
-
+/* B) Configuração (API FIXA, sem fallback) */
+const API_BASE = 'https://lumen-backend-api.onrender.com';
+const JOURNEY_POST_PATH = '/formulario'; // POST oficial
+const API_AUTH_PATHS = ['/auth/validar', '/auth/check']; // se existir
 const MIN_CAMPOS = 10;
 const KEY_PREFIX = 'jornada_essencial_';
-const API_AUTH_PATHS = ['/auth/validar', '/auth/check'];
+const DEBUG_API = true;
 
 /* C) Perguntas e blocos */
 const PERGUNTAS = [
@@ -97,9 +88,21 @@ const campos = () => Array.from(document.querySelectorAll('#lista-perguntas text
 function salvarAuto() { campos().forEach((t,i) => localStorage.setItem(KEY_PREFIX + (i+1), t.value)); }
 function getSalvas()  { return PERGUNTAS.map((_,i) => localStorage.getItem(KEY_PREFIX + (i+1)) || ''); }
 function setSalva(i, v){ localStorage.setItem(KEY_PREFIX + (i+1), v); }
+
+// LIMPEZA TOTAL garantida
 function limparSalvas(){
-  PERGUNTAS.forEach((_,i)=>localStorage.removeItem(KEY_PREFIX+(i+1)));
-  localStorage.removeItem(KEY_PREFIX + 'started_at');
+  const prefix = KEY_PREFIX;
+  const extras = [
+    'jornada_pdf_url','jornada_meta','jornada_progress','jornada_started_at',
+    'jornada_result','jornada_nome','jornada_email','jornada_telefone'
+  ];
+  const toRemove = [];
+  for (let i=0;i<localStorage.length;i++){
+    const k = localStorage.key(i);
+    if (!k) continue;
+    if (k.startsWith(prefix) || extras.includes(k)) toRemove.push(k);
+  }
+  for (const k of toRemove) localStorage.removeItem(k);
 }
 
 const respondidasCount = vals => vals.filter(v => (v||'').trim().length>0).length;
@@ -117,51 +120,83 @@ function habilitaAcoes(on){
 }
 
 /* --- Helpers de rede --- */
+// valida senha se existir endpoint; se não existir, segue fluxo
 async function validarSenhaAntesDeIniciar(senha) {
-  for (const api of APIS) {
-    for (const p of API_AUTH_PATHS) {
-      try {
-        let res = await fetch(`${api}${p}?senha=${encodeURIComponent(senha)}`, { method: 'GET' });
+  for (const p of API_AUTH_PATHS) {
+    try {
+      let res = await fetch(`${API_BASE}${p}?senha=${encodeURIComponent(senha)}`, { method: 'GET' });
+      if (res.status === 200) return true;
+      if (res.status === 401) return false;
+
+      if (res.status !== 404) {
+        res = await fetch(`${API_BASE}${p}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ senha }),
+        });
         if (res.status === 200) return true;
         if (res.status === 401) return false;
-
-        if (res.status !== 404) {
-          res = await fetch(`${api}${p}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ senha }),
-          });
-          if (res.status === 200) return true;
-          if (res.status === 401) return false;
-        }
-      } catch { /* tenta próximo host */ }
-    }
+      }
+    } catch { /* ignora e tenta próximo path */ }
   }
-  return true; // se não houver endpoint de auth, valida no envio
+  return true; // sem /auth → prossegue
 }
 
-async function postComFallbackPathList(paths, body) {
-  const supportsAbortTimeout = typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal;
-  let lastErr;
-  for (const path of paths) {
-    for (const api of APIS) {
-      let controller, timer;
-      const opts = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, application/pdf' },
-        body: JSON.stringify(body),
-      };
-      if (supportsAbortTimeout) opts.signal = AbortSignal.timeout(30000);
-      else { controller = new AbortController(); timer = setTimeout(()=>controller.abort(), 30000); opts.signal = controller.signal; }
-      try {
-        const res = await fetch(api + path, opts);
-        if (timer) clearTimeout(timer);
-        if (res.ok || res.status === 400 || res.status === 401) return res;
-        lastErr = new Error(`HTTP ${res.status} em ${api+path}`);
-      } catch (e) { lastErr = e; }
-    }
+function montarPayload() {
+  // respostas: { q1: '...', q2: '...', ... }
+  const vals = getSalvas();
+  const respostas = {};
+  vals.forEach((v, i) => respostas['q' + (i + 1)] = (v ?? '').trim());
+
+  const meta = {
+    started_at: localStorage.getItem(KEY_PREFIX + 'started_at') || new Date().toISOString(),
+    origem: 'site-irmandade',
+    versao_form: 'essencial-v1',
+    dispositivo: navigator.userAgent,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+    enviado_em: new Date().toISOString()
+  };
+
+  const contato = {
+    nome: localStorage.getItem('jornada_nome') || '',
+    email: localStorage.getItem('jornada_email') || '',
+    telefone: localStorage.getItem('jornada_telefone') || ''
+  };
+
+  return { respostas, meta, contato };
+}
+
+async function enviarJornada() {
+  const url = API_BASE + JOURNEY_POST_PATH;
+  const body = montarPayload();
+  if (DEBUG_API) console.debug('POST', url, body);
+
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    mode: 'cors',
+    body: JSON.stringify(body),
+  });
+
+  if (!resp.ok) {
+    const ct = resp.headers.get('Content-Type') || '';
+    const txt = ct.includes('application/json') ? JSON.stringify(await resp.json().catch(()=>null)) : await resp.text().catch(()=> '');
+    throw new Error(`POST falhou ${resp.status} ${resp.statusText} — ${txt}`);
   }
-  throw lastErr || new Error('Falha de rede.');
+
+  const data = await resp.json();
+  if (DEBUG_API) console.debug('Resposta:', data);
+
+  // Convenções de retorno do backend
+  if (data.pdf_filename) {
+    const pdfUrl = `${API_BASE}/download/pdf/${encodeURIComponent(data.pdf_filename)}`;
+    window.open(pdfUrl, '_blank', 'noopener');
+  }
+  if (data.hq_filename) {
+    const hqUrl = `${API_BASE}/download/hq/${encodeURIComponent(data.hq_filename)}`;
+    window.open(hqUrl, '_blank', 'noopener');
+  }
+  return data;
 }
 
 /* E) Render: modos passo e todas */
@@ -288,7 +323,7 @@ function renderPerguntasTodas(){
     ta.name = `q${i+1}`;
     ta.id = `q${i+1}`;
     ta.rows = 4;
-    ta.className = 'w-full min-h-[110px] rounded-xl bg-gray-900/60 border border-white/10 p-3';
+    ta.className = 'w-full min-h-[110px] rounded-xl bg-gray-900/60 border border-white/10';
     ta.placeholder = 'Escreva com sinceridade...';
     ta.value = localStorage.getItem(KEY_PREFIX + (i+1)) || '';
     ta.addEventListener('input', () => setSalva(i, ta.value));
@@ -306,7 +341,8 @@ function renderPerguntas(){
 
 /* F) Fluxo principal */
 window.addEventListener('load', () => {
-  APIS.forEach(api => fetch(api + '/ping').catch(()=>{}));
+  // acorda o backend
+  fetch(API_BASE + '/ping').catch(()=>{});
 });
 
 /* Iniciar */
@@ -336,7 +372,7 @@ document.addEventListener('input', (e) => {
   }
 });
 
-/* Limpar com aviso forte */
+/* Limpar com aviso forte (apaga TUDO mesmo) */
 btnLimpar?.addEventListener('click', () => {
   const temAlgo = campos().some(t => t.value.trim().length);
   if (!temAlgo) { mostrarFeedback('Não há respostas para limpar.', 'erro'); return; }
@@ -351,8 +387,9 @@ btnLimpar?.addEventListener('click', () => {
 
   if (!confirm(msg)) return;
 
-  campos().forEach(t => t.value = '');
-  salvarAuto();
+  limparSalvas();         // <- limpa localStorage
+  renderPerguntas();      // <- re-render zerado
+  window.scrollTo?.({ top: 0, behavior: 'smooth' });
   mostrarFeedback('Todas as respostas foram apagadas deste dispositivo.', 'sucesso');
 });
 
@@ -364,18 +401,18 @@ btnEnviar?.addEventListener('click', async () => {
     return;
   }
 
-  const respostas = PERGUNTAS.map((texto, i) => ({
+  const respostasArr = PERGUNTAS.map((texto, i) => ({
     indice: i + 1,
     pergunta: texto,
     resposta: (localStorage.getItem(KEY_PREFIX + (i+1)) || '').trim()
   }));
-  const preenchidas = respostas.filter(r => r.resposta.length);
+  const preenchidas = respostasArr.filter(r => r.resposta.length);
 
   if (!preenchidas.length) { mostrarFeedback('Preencha ao menos uma resposta antes de enviar.'); return; }
 
   if (modo === 'passo' && preenchidas.length < PERGUNTAS.length) {
     if (!confirm(`Você respondeu ${preenchidas.length} de ${PERGUNTAS.length}. Deseja enviar assim mesmo?`)) {
-      const idx = respostas.findIndex(r => !r.resposta.length);
+      const idx = respostasArr.findIndex(r => !r.resposta.length);
       if (idx >= 0) { atual = idx; renderPerguntas(); setTimeout(()=>document.getElementById(`q${idx+1}`)?.focus(),0); }
       return;
     }
@@ -383,72 +420,18 @@ btnEnviar?.addEventListener('click', async () => {
     if (!confirm(`Somente ${preenchidas.length} respostas preenchidas. Deseja enviar assim mesmo?`)) return;
   }
 
-  const payload = {
-    senha: senhaEl.value.trim(),
-    origem: 'site-irmandade',
-    jornada: 'essencial',
-    respostas,
-    meta: {
-      dispositivo: navigator.userAgent,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
-      started_at: localStorage.getItem(KEY_PREFIX + 'started_at') || new Date().toISOString(),
-      enviado_em: new Date().toISOString()
-    }
-  };
-
   const oldTxt = btnEnviar.textContent;
   btnEnviar.disabled = true; btnEnviar.textContent = 'Enviando...';
 
   try {
-    const res = await postComFallbackPathList(API_PATHS, payload);
+    const data = await enviarJornada();
 
-    const ct = res.headers.get('Content-Type') || '';
-    let data = null, blob = null, text = null;
-
-    if (!res.ok) {
-      if (ct.includes('application/json')) data = await res.json().catch(()=>null);
-      else                                  text = await res.text().catch(()=>null);
-
-      let msg = 'Erro ao enviar.';
-      if (res.status === 401) msg = 'Senha inválida. Verifique e tente novamente.';
-      else if (res.status === 400) msg = (data && (data.detail || data.message)) || 'Dados inválidos. Verifique suas respostas.';
-      else if (res.status >= 500) msg = 'Erro no servidor. Tente novamente mais tarde.';
-      else msg = (data && (data.detail || data.message)) || text || `Erro ${res.status}`;
-      throw new Error(msg);
-    }
-
-    if (ct.includes('application/pdf')) {
-      blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = 'jornada-essencial.pdf'; a.click();
-      URL.revokeObjectURL(url);
-      mostrarFeedback('PDF gerado com sucesso! 🎉', 'sucesso');
-    } else if (ct.includes('application/json')) {
-      data = await res.json().catch(()=>null);
-      mostrarFeedback((data && (data.message || data.msg)) || 'Respostas enviadas com sucesso!', 'sucesso');
-
-      if (data?.pdf_url) {
-        location.href = data.pdf_url;
-      } else if (data?.pdf_base64) {
-        const a = document.createElement('a');
-        a.href = `data:application/pdf;base64,${data.pdf_base64}`;
-        a.download = data?.pdf_filename || 'jornada-essencial.pdf';
-        a.click();
-      } else {
-        mostrarFeedback('Resposta recebida, mas o PDF não veio. Tente novamente.', 'erro');
-      }
+    if (data?.message || data?.msg) {
+      mostrarFeedback(data.message || data.msg, 'sucesso');
     } else {
-      text = await res.text().catch(()=>null);
-      console.error('Resposta inesperada:', text);
-      mostrarFeedback('Formato de resposta inesperado do servidor.', 'erro');
+      mostrarFeedback('Respostas enviadas com sucesso!', 'sucesso');
     }
 
+    // limpa e reseta a tela
     limparSalvas();
-  } catch (err) {
-    console.error(err);
-    mostrarFeedback(err.message || 'Falha de rede. Tente novamente.', 'erro');
-  } finally {
-    btnEnviar.disabled = false; btnEnviar.textContent = oldTxt || 'Enviar respostas';
-  }
-});
+    renderPergunta
