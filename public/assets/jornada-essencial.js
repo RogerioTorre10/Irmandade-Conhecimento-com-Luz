@@ -21,7 +21,12 @@ const APIS = [
   'https://conhecimento-com-luz-api.onrender.com', // principal
   'https://lumen-backend-api.onrender.com'         // backup
 ];
-const API_PATH = '/jornada/essencial';
+const API_PATHS = [
+  '/jornada/essencial',     // nossa primeira suposição
+  '/jornada-essencial',     // variação com hífen
+  '/jornada/essencial/pdf', // se o backend devolver direto o PDF
+  '/jornada',               // variação curtinha
+];
 const MIN_CAMPOS = 10;
 const KEY_PREFIX = 'jornada_essencial_';
 const API_AUTH_PATHS = ['/auth/validar', '/auth/check'];
@@ -96,7 +101,56 @@ const campos = () => Array.from(document.querySelectorAll('#lista-perguntas text
 function salvarAuto() { campos().forEach((t,i) => localStorage.setItem(KEY_PREFIX + (i+1), t.value)); }
 function getSalvas()  { return PERGUNTAS.map((_,i) => localStorage.getItem(KEY_PREFIX + (i+1)) || ''); }
 function setSalva(i, v){ localStorage.setItem(KEY_PREFIX + (i+1), v); }
-function limparSalvas(){
+function limparSalvas()
+async function validarSenhaAntesDeIniciar(senha) {
+  for (const api of APIS) {
+    for (const p of API_AUTH_PATHS) {
+      try {
+        let res = await fetch(`${api}${p}?senha=${encodeURIComponent(senha)}`, { method: 'GET' });
+        if (res.status === 200) return true;
+        if (res.status === 401) return false;
+        if (res.status !== 404) {
+          // tenta POST também
+          res = await fetch(`${api}${p}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ senha }),
+          });
+          if (res.status === 200) return true;
+          if (res.status === 401) return false;
+        }
+      } catch { /* tenta próximo host */ }
+    }
+  }
+  // se não existir endpoint de auth, deixa passar; o backend barra no Enviar (401)
+  return true;
+}
+
+// tenta vários paths em ambos os hosts; para no primeiro que responde útil
+async function postComFallbackPathList(paths, body) {
+  const supportsAbortTimeout = typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal;
+  let lastErr;
+  for (const path of paths) {
+    for (const api of APIS) {
+      let controller, timer;
+      const opts = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, application/pdf' },
+        body: JSON.stringify(body),
+      };
+      if (supportsAbortTimeout) opts.signal = AbortSignal.timeout(30000);
+      else { controller = new AbortController(); timer = setTimeout(()=>controller.abort(), 30000); opts.signal = controller.signal; }
+      try {
+        const res = await fetch(api + path, opts);
+        if (timer) clearTimeout(timer);
+        if (res.ok || res.status === 400 || res.status === 401) return res;
+        lastErr = new Error(`HTTP ${res.status} em ${api+path}`);
+      } catch (e) { lastErr = e; }
+    }
+  }
+  throw lastErr || new Error('Falha de rede.');
+}
+{
   PERGUNTAS.forEach((_,i)=>localStorage.removeItem(KEY_PREFIX+(i+1)));
   localStorage.removeItem(KEY_PREFIX + 'started_at');
 }
@@ -270,12 +324,13 @@ window.addEventListener('load', () => {
 });
 
 /* Iniciar */
-btnIniciar?.addEventListener('click', () => {
-  if (!senhaEl?.value.trim()) {
-    mostrarFeedback('Por favor, digite a senha de acesso.');
-    senhaEl?.focus();
-    return;
-  }
+btnIniciar?.addEventListener('click', async () => {
+  const senha = senhaEl?.value.trim();
+  if (!senha) { mostrarFeedback('Por favor, digite a senha de acesso.'); senhaEl?.focus(); return; }
+
+  const ok = await validarSenhaAntesDeIniciar(senha);
+  if (!ok) { mostrarFeedback('Senha inválida. Verifique e tente novamente.'); senhaEl?.focus(); return; }
+
   if (!localStorage.getItem(KEY_PREFIX + 'started_at')) {
     localStorage.setItem(KEY_PREFIX + 'started_at', new Date().toISOString());
   }
@@ -317,10 +372,66 @@ btnLimpar?.addEventListener('click', () => {
 
 /* POST com fallback (tenta outro host em 404/5xx) */
 async function validarSenhaAntesDeIniciar(senha) {
-  // tenta GET e POST em /auth/validar e /auth/check em ambos os hosts
   for (const api of APIS) {
     for (const p of API_AUTH_PATHS) {
       try {
+        // GET ?senha=
+        let res = await fetch(`${api}${p}?senha=${encodeURIComponent(senha)}`, { method: 'GET' });
+        if (res.status === 200) return true;
+        if (res.status === 401) return false;
+
+        // Se não for 404, tenta POST também
+        if (res.status !== 404) {
+          res = await fetch(`${api}${p}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ senha }),
+          });
+          if (res.status === 200) return true;
+          if (res.status === 401) return false;
+        }
+      } catch { /* tenta próximo host */ }
+    }
+  }
+      try {
+    try {
+  const res = await postComFallbackPathList(API_PATHS, payload);
+
+  const ct = res.headers.get('Content-Type') || '';
+  let data=null, blob=null, text=null;
+
+  if (ct.includes('application/pdf'))      blob = await res.blob();
+  else if (ct.includes('application/json')) data = await res.json().catch(()=>null);
+  else                                       text = await res.text().catch(()=>null);
+
+  if (!res.ok) {
+    let msg = 'Erro ao enviar.';
+    if (res.status === 401) msg = 'Senha inválida. Verifique e tente novamente.';
+    else if (res.status === 400) msg = (data && (data.detail || data.message)) || 'Dados inválidos. Verifique suas respostas.';
+    else if (res.status >= 500) msg = 'Erro no servidor. Tente novamente mais tarde.';
+    else msg = (data && (data.detail || data.message)) || text || `Erro ${res.status}`;
+    throw new Error(msg);
+  }
+
+  // ... sucesso (PDF / url / base64) ...
+} catch (err) {
+  console.error(err);
+  mostrarFeedback(err.message || 'Falha de rede. Tente novamente.', 'erro');
+} finally {
+  btnEnviar.disabled = false;
+  btnEnviar.textContent = oldTxt || 'Enviar respostas';
+}
+
+    }
+
+    // ... tratamento do PDF / sucesso ...
+  } catch (err) {
+    // ... feedback de erro ...
+  } finally {
+    btnEnviar.disabled = false;
+    btnEnviar.textContent = oldTxt || 'Enviar respostas';
+  }
+});
         // 1) GET ?senha=
         let res = await fetch(`${api}${p}?senha=${encodeURIComponent(senha)}`, { method: 'GET' });
         if (res.status === 200) return true;
