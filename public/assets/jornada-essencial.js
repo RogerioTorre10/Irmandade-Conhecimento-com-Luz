@@ -16,7 +16,7 @@
 
 /* B) Configuração (API FIXA, sem fallback) */
 const API_BASE = 'https://lumen-backend-api.onrender.com';
-const JOURNEY_POST_PATH = '/formulario'; // POST oficial
+const JOURNEY_POST_PATH = '/formulario';
 const API_AUTH_PATHS = ['/auth/validar', '/auth/check']; // se existir
 const MIN_CAMPOS = 10;
 const KEY_PREFIX = 'jornada_essencial_';
@@ -73,6 +73,8 @@ const btnIniciar = document.getElementById('btnIniciar');
 const btnLimpar  = document.getElementById('btnLimpar');
 const btnEnviar  = document.getElementById('btnEnviar');
 const senhaEl    = document.getElementById('senha');
+const FEEDBACK = document.getElementById('feedback');
+const BTN_ENVIAR = document.getElementById('btnEnviar');
 
 function mostrarFeedback(msg, tipo='erro') {
   if (!feedbackEl) return;
