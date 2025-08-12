@@ -24,6 +24,7 @@ const APIS = [
 const API_PATH = '/jornada/essencial';
 const MIN_CAMPOS = 10;
 const KEY_PREFIX = 'jornada_essencial_';
+const API_AUTH_PATHS = ['/auth/validar', '/auth/check'];
 
 /* C) Perguntas e blocos */
 const PERGUNTAS = [
@@ -315,6 +316,31 @@ btnLimpar?.addEventListener('click', () => {
 });
 
 /* POST com fallback (tenta outro host em 404/5xx) */
+async function validarSenhaAntesDeIniciar(senha) {
+  // tenta GET e POST em /auth/validar e /auth/check em ambos os hosts
+  for (const api of APIS) {
+    for (const p of API_AUTH_PATHS) {
+      try {
+        // 1) GET ?senha=
+        let res = await fetch(`${api}${p}?senha=${encodeURIComponent(senha)}`, { method: 'GET' });
+        if (res.status === 200) return true;
+        if (res.status === 401) return false;
+        if (res.status === 404) continue; // endpoint não existe nesse host → tenta o próximo
+        // 2) POST {senha}
+        res = await fetch(`${api}${p}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ senha })
+        });
+        if (res.status === 200) return true;
+        if (res.status === 401) return false;
+      } catch (_) { /* tenta o próximo */ }
+    }
+  }
+  // se nenhum endpoint existir, não bloqueia — validação final ocorrerá no envio (401)
+  return true;
+}
+
 async function postComFallback(path, body) {
   const supportsAbortTimeout = typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal;
   let lastErr;
