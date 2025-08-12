@@ -2,8 +2,6 @@
    Jornada Essencial – Front
    ========================= */
 
-/* --- Anti-flash já está no <head>. Aqui focamos na lógica. --- */
-
 /* A) padding para o rodapé fixo */
 (function padBottomForFooter() {
   const painel = document.getElementById('painel-controles');
@@ -21,19 +19,20 @@ const APIS = [
   'https://conhecimento-com-luz-api.onrender.com', // principal
   'https://lumen-backend-api.onrender.com'         // backup
 ];
+
 const API_PATHS = [
-  '/jornada/essencial',     // nossa primeira suposição
-  '/jornada-essencial',     // variação com hífen
-  '/jornada/essencial/pdf', // se o backend devolver direto o PDF
-  '/jornada',               // variação curtinha
+  '/jornada/essencial',
+  '/jornada-essencial',
+  '/jornada/essencial/pdf',
+  '/jornada',
 ];
+
 const MIN_CAMPOS = 10;
 const KEY_PREFIX = 'jornada_essencial_';
 const API_AUTH_PATHS = ['/auth/validar', '/auth/check'];
 
 /* C) Perguntas e blocos */
 const PERGUNTAS = [
-  // 1–10
   "Como você tem percebido sua própria vida até aqui?",
   "E a vida das pessoas ao seu redor, como você a enxerga?",
   "Como lida com seus traumas? Consegue falar sobre eles?",
@@ -44,7 +43,6 @@ const PERGUNTAS = [
   "Sente que tem outros vícios, mesmo que sutis ou emocionais? Quais?",
   "Como você percebe a morte? Ela te assusta, conforta ou provoca curiosidade?",
   "Você acredita em continuidade após a morte? O que imagina que exista?",
-  // 11–18
   "Com quem foi criado: ambos os pais biológicos, só um dos pais biológicos (divórcio ou morte), pais afetivos (adoção) ou parentes?",
   "É filho único?",
   "Quantos irmãos tem? É primogênito, do meio ou caçula?",
@@ -53,13 +51,11 @@ const PERGUNTAS = [
   "Estado civil: solteiro, namorando, casado, divorciado, viúvo?",
   "Tem alguma deficiência física?",
   "Você já sofreu algum tipo de preconceito? Foi superado ou ainda interfere nas suas decisões?",
-  // 19–23
   "Quais são os seus maiores sonhos para o futuro?",
   "O que você considera essencial para ter uma vida plena?",
   "Se pudesse mudar algo na sociedade, o que mudaria?",
   "Qual legado gostaria de deixar?",
   "Se pudesse passar uma mensagem para o mundo inteiro agora, qual seria?",
-  // 24–32
   "Você se recorda da idade em que, pela primeira vez, percebeu que era alguém neste mundo?",
   "Se encontrasse seu 'eu' de 10 anos atrás, o que diria?",
   "O que significa fé para você?",
@@ -101,7 +97,26 @@ const campos = () => Array.from(document.querySelectorAll('#lista-perguntas text
 function salvarAuto() { campos().forEach((t,i) => localStorage.setItem(KEY_PREFIX + (i+1), t.value)); }
 function getSalvas()  { return PERGUNTAS.map((_,i) => localStorage.getItem(KEY_PREFIX + (i+1)) || ''); }
 function setSalva(i, v){ localStorage.setItem(KEY_PREFIX + (i+1), v); }
-function limparSalvas()
+function limparSalvas(){
+  PERGUNTAS.forEach((_,i)=>localStorage.removeItem(KEY_PREFIX+(i+1)));
+  localStorage.removeItem(KEY_PREFIX + 'started_at');
+}
+
+const respondidasCount = vals => vals.filter(v => (v||'').trim().length>0).length;
+const primeiraNaoRespondida = vals => {
+  for (let i=0;i<vals.length;i++) if (!(vals[i]||'').trim()) return i;
+  return vals.length-1;
+};
+
+function habilitaAcoes(on){
+  btnLimpar.disabled = !on;
+  btnEnviar.disabled = !on;
+  btnEnviar.classList.toggle('bg-yellow-400/60', !on);
+  btnEnviar.classList.toggle('bg-yellow-400', on);
+  btnEnviar.classList.toggle('hover:bg-yellow-300', on);
+}
+
+/* --- Helpers de rede --- */
 async function validarSenhaAntesDeIniciar(senha) {
   for (const api of APIS) {
     for (const p of API_AUTH_PATHS) {
@@ -109,8 +124,8 @@ async function validarSenhaAntesDeIniciar(senha) {
         let res = await fetch(`${api}${p}?senha=${encodeURIComponent(senha)}`, { method: 'GET' });
         if (res.status === 200) return true;
         if (res.status === 401) return false;
+
         if (res.status !== 404) {
-          // tenta POST também
           res = await fetch(`${api}${p}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -122,11 +137,9 @@ async function validarSenhaAntesDeIniciar(senha) {
       } catch { /* tenta próximo host */ }
     }
   }
-  // se não existir endpoint de auth, deixa passar; o backend barra no Enviar (401)
-  return true;
+  return true; // se não houver endpoint de auth, valida no envio
 }
 
-// tenta vários paths em ambos os hosts; para no primeiro que responde útil
 async function postComFallbackPathList(paths, body) {
   const supportsAbortTimeout = typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal;
   let lastErr;
@@ -150,27 +163,10 @@ async function postComFallbackPathList(paths, body) {
   }
   throw lastErr || new Error('Falha de rede.');
 }
-{
-  PERGUNTAS.forEach((_,i)=>localStorage.removeItem(KEY_PREFIX+(i+1)));
-  localStorage.removeItem(KEY_PREFIX + 'started_at');
-}
-const respondidasCount = vals => vals.filter(v => (v||'').trim().length>0).length;
-const primeiraNaoRespondida = vals => {
-  for (let i=0;i<vals.length;i++) if (!(vals[i]||'').trim()) return i;
-  return vals.length-1;
-};
-
-function habilitaAcoes(on){
-  btnLimpar.disabled = !on;
-  btnEnviar.disabled = !on;
-  btnEnviar.classList.toggle('bg-yellow-400/60', !on);
-  btnEnviar.classList.toggle('bg-yellow-400', on);
-  btnEnviar.classList.toggle('hover:bg-yellow-300', on);
-}
 
 /* E) Render: modos passo e todas */
-let modo = 'passo';        // 'passo' | 'todas'
-let atual = 0;             // índice atual no modo passo
+let modo = 'passo'; // 'passo' | 'todas'
+let atual = 0;      // índice atual
 
 function renderTopoControle(qIndex) {
   const barra = document.createElement('div');
@@ -194,14 +190,12 @@ function renderTopoControle(qIndex) {
     renderPerguntas();
   });
   barra.appendChild(b);
-
   return barra;
 }
 
 function renderPerguntaUnica(i){
   lista.innerHTML = '';
 
-  // título do bloco
   const blocosIndices = Object.keys(BLOCO_TITULOS).map(n=>parseInt(n,10)).sort((a,b)=>a-b);
   let titulo = '';
   for (const idx of blocosIndices) if (i >= idx) titulo = BLOCO_TITULOS[idx];
@@ -212,10 +206,8 @@ function renderPerguntaUnica(i){
     lista.appendChild(h3);
   }
 
-  // topo: progresso + toggle
   lista.appendChild(renderTopoControle(i));
 
-  // wrapper da pergunta
   const wrap = document.createElement('div');
   wrap.className = 'mb-6 rounded-2xl bg-white/5 p-4 border border-white/10';
 
@@ -236,9 +228,9 @@ function renderPerguntaUnica(i){
   wrap.appendChild(label);
   wrap.appendChild(ta);
 
-  // navegação passo-a-passo
   const nav = document.createElement('div');
   nav.className = 'mt-4 flex gap-3';
+
   const btnVoltar = document.createElement('button');
   btnVoltar.className = 'px-4 py-2 rounded-xl border border-white/15 hover:bg-white/5 disabled:opacity-50';
   btnVoltar.textContent = 'Voltar';
@@ -252,10 +244,8 @@ function renderPerguntaUnica(i){
   const btnAvancar = document.createElement('button');
   btnAvancar.className = 'px-4 py-2 rounded-xl bg-yellow-400 text-gray-900 font-semibold hover:bg-yellow-300 disabled:opacity-50';
   btnAvancar.textContent = (i === PERGUNTAS.length-1) ? 'Concluir' : 'Avançar';
-  btnAvancar.disabled = !(ta.value.trim().length); // exige resposta pra avançar
-  ta.addEventListener('input', () => {
-    btnAvancar.disabled = !(ta.value.trim().length);
-  });
+  btnAvancar.disabled = !(ta.value.trim().length);
+  ta.addEventListener('input', () => { btnAvancar.disabled = !(ta.value.trim().length); });
   btnAvancar.addEventListener('click', () => {
     if (i === PERGUNTAS.length-1) {
       mostrarFeedback('Você concluiu todas as perguntas. Revise e clique em Enviar respostas.', 'sucesso');
@@ -272,14 +262,11 @@ function renderPerguntaUnica(i){
   wrap.appendChild(nav);
   lista.appendChild(wrap);
 
-  // foco
   setTimeout(()=>ta.focus(), 0);
 }
 
 function renderPerguntasTodas(){
   lista.innerHTML = '';
-
-  // controle topo
   lista.appendChild(renderTopoControle(Math.max(atual,0)));
 
   PERGUNTAS.forEach((texto, i) => {
@@ -319,7 +306,6 @@ function renderPerguntas(){
 
 /* F) Fluxo principal */
 window.addEventListener('load', () => {
-  // aquece backend(s)
   APIS.forEach(api => fetch(api + '/ping').catch(()=>{}));
 });
 
@@ -370,139 +356,6 @@ btnLimpar?.addEventListener('click', () => {
   mostrarFeedback('Todas as respostas foram apagadas deste dispositivo.', 'sucesso');
 });
 
-/* POST com fallback (tenta outro host em 404/5xx) */
-async function validarSenhaAntesDeIniciar(senha) {
-  for (const api of APIS) {
-    for (const p of API_AUTH_PATHS) {
-      try {
-        // GET ?senha=
-        let res = await fetch(`${api}${p}?senha=${encodeURIComponent(senha)}`, { method: 'GET' });
-        if (res.status === 200) return true;
-        if (res.status === 401) return false;
-
-        // Se não for 404, tenta POST também
-        if (res.status !== 404) {
-          res = await fetch(`${api}${p}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ senha }),
-          });
-          if (res.status === 200) return true;
-          if (res.status === 401) return false;
-        }
-      } catch { /* tenta próximo host */ }
-    }
-  }
-      try {
-  try {
-  const res = await postComFallbackPathList(API_PATHS, payload);
-
-  const ct = res.headers.get('Content-Type') || '';
-  let data = null, blob = null, text = null;
-
-  // Se NÃO ok, lê erro e lança mensagem amigável
-  if (!res.ok) {
-    if (ct.includes('application/json')) data = await res.json().catch(()=>null);
-    else                                  text = await res.text().catch(()=>null);
-
-    let msg = 'Erro ao enviar.';
-    if (res.status === 401) msg = 'Senha inválida. Verifique e tente novamente.';
-    else if (res.status === 400) msg = (data && (data.detail || data.message)) || 'Dados inválidos. Verifique suas respostas.';
-    else if (res.status >= 500) msg = 'Erro no servidor. Tente novamente mais tarde.';
-    else msg = (data && (data.detail || data.message)) || text || `Erro ${res.status}`;
-    throw new Error(msg);
-  }
-
-  // OK: trata sucesso (PDF ou JSON com link/base64)
-  if (ct.includes('application/pdf')) {
-    blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'jornada-essencial.pdf';
-    a.click();
-    URL.revokeObjectURL(url);
-    mostrarFeedback('PDF gerado com sucesso! 🎉', 'sucesso');
-  } else if (ct.includes('application/json')) {
-    data = await res.json().catch(()=>null);
-    mostrarFeedback((data && (data.message || data.msg)) || 'Respostas enviadas com sucesso!', 'sucesso');
-
-    if (data?.pdf_url) {
-      location.href = data.pdf_url;
-    } else if (data?.pdf_base64) {
-      const a = document.createElement('a');
-      a.href = `data:application/pdf;base64,${data.pdf_base64}`;
-      a.download = data?.pdf_filename || 'jornada-essencial.pdf';
-      a.click();
-    } else {
-      // JSON sem PDF — informa
-      mostrarFeedback('Resposta recebida, mas o PDF não veio. Tente novamente.', 'erro');
-    }
-  } else {
-    // Tipo inesperado
-    text = await res.text().catch(()=>null);
-    console.error('Resposta inesperada:', text);
-    mostrarFeedback('Formato de resposta inesperado do servidor.', 'erro');
-  }
-
-  // Limpa storage após sucesso
-  limparSalvas();
-
-} catch (err) {
-  console.error(err);
-  mostrarFeedback(err.message || 'Falha de rede. Tente novamente.', 'erro');
-} finally {
-  btnEnviar.disabled = false;
-  btnEnviar.textContent = oldTxt || 'Enviar respostas';
-}
-});
-        // 1) GET ?senha=
-        let res = await fetch(`${api}${p}?senha=${encodeURIComponent(senha)}`, { method: 'GET' });
-        if (res.status === 200) return true;
-        if (res.status === 401) return false;
-        if (res.status === 404) continue; // endpoint não existe nesse host → tenta o próximo
-        // 2) POST {senha}
-        res = await fetch(`${api}${p}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ senha })
-        });
-        if (res.status === 200) return true;
-        if (res.status === 401) return false;
-      } catch (_) { /* tenta o próximo */ }
-    }
-  }
-  // se nenhum endpoint existir, não bloqueia — validação final ocorrerá no envio (401)
-  return true;
-}
-
-async function postComFallback(path, body) {
-  const supportsAbortTimeout = typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal;
-  let lastErr;
-  for (const api of APIS) {
-    let controller, timer;
-    const opts = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, application/pdf' },
-      body: JSON.stringify(body)
-    };
-    if (supportsAbortTimeout) opts.signal = AbortSignal.timeout(30000);
-    else { controller = new AbortController(); timer = setTimeout(()=>controller.abort(), 30000); opts.signal = controller.signal; }
-
-    try {
-      const res = await fetch(api + path, opts);
-      if (timer) clearTimeout(timer);
-      if (res.ok || res.status === 400 || res.status === 401) return res; // devolve; quem chama decide
-      lastErr = new Error(`HTTP ${res.status}`);
-      continue; // tenta próximo host
-    } catch (e) {
-      lastErr = e;
-      continue;
-    }
-  }
-  throw lastErr || new Error('Falha de rede.');
-}
-
 /* Enviar */
 btnEnviar?.addEventListener('click', async () => {
   if (!senhaEl?.value.trim()) {
@@ -511,7 +364,6 @@ btnEnviar?.addEventListener('click', async () => {
     return;
   }
 
-  // monta respostas
   const respostas = PERGUNTAS.map((texto, i) => ({
     indice: i + 1,
     pergunta: texto,
@@ -519,12 +371,10 @@ btnEnviar?.addEventListener('click', async () => {
   }));
   const preenchidas = respostas.filter(r => r.resposta.length);
 
-  // valida mínimo e, no modo passo, incentiva completar todas
   if (!preenchidas.length) { mostrarFeedback('Preencha ao menos uma resposta antes de enviar.'); return; }
 
   if (modo === 'passo' && preenchidas.length < PERGUNTAS.length) {
     if (!confirm(`Você respondeu ${preenchidas.length} de ${PERGUNTAS.length}. Deseja enviar assim mesmo?`)) {
-      // foca na primeira em branco
       const idx = respostas.findIndex(r => !r.resposta.length);
       if (idx >= 0) { atual = idx; renderPerguntas(); setTimeout(()=>document.getElementById(`q${idx+1}`)?.focus(),0); }
       return;
@@ -550,15 +400,15 @@ btnEnviar?.addEventListener('click', async () => {
   btnEnviar.disabled = true; btnEnviar.textContent = 'Enviando...';
 
   try {
-    const res = await postComFallback(API_PATH, payload);
-    const ct = res.headers.get('Content-Type') || '';
-    let data=null, blob=null, text=null;
+    const res = await postComFallbackPathList(API_PATHS, payload);
 
-    if (ct.includes('application/pdf'))      blob = await res.blob();
-    else if (ct.includes('application/json')) data = await res.json().catch(()=>null);
-    else                                       text = await res.text().catch(()=>null);
+    const ct = res.headers.get('Content-Type') || '';
+    let data = null, blob = null, text = null;
 
     if (!res.ok) {
+      if (ct.includes('application/json')) data = await res.json().catch(()=>null);
+      else                                  text = await res.text().catch(()=>null);
+
       let msg = 'Erro ao enviar.';
       if (res.status === 401) msg = 'Senha inválida. Verifique e tente novamente.';
       else if (res.status === 400) msg = (data && (data.detail || data.message)) || 'Dados inválidos. Verifique suas respostas.';
@@ -567,24 +417,33 @@ btnEnviar?.addEventListener('click', async () => {
       throw new Error(msg);
     }
 
-    mostrarFeedback((data && (data.message || data.msg)) || 'Respostas enviadas com sucesso!', 'sucesso');
-
-    if (blob) {
+    if (ct.includes('application/pdf')) {
+      blob = await res.blob();
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = 'jornada-essencial.pdf'; a.click();
-      URL.revokeObjectURL(url);
-    } else if (data?.pdf_url) {
-      location.href = data.pdf_url;
-    } else if (data?.pdf_base64) {
       const a = document.createElement('a');
-      a.href = `data:application/pdf;base64,${data.pdf_base64}`;
-      a.download = data?.pdf_filename || 'jornada-essencial.pdf';
-      a.click();
+      a.href = url; a.download = 'jornada-essencial.pdf'; a.click();
+      URL.revokeObjectURL(url);
+      mostrarFeedback('PDF gerado com sucesso! 🎉', 'sucesso');
+    } else if (ct.includes('application/json')) {
+      data = await res.json().catch(()=>null);
+      mostrarFeedback((data && (data.message || data.msg)) || 'Respostas enviadas com sucesso!', 'sucesso');
+
+      if (data?.pdf_url) {
+        location.href = data.pdf_url;
+      } else if (data?.pdf_base64) {
+        const a = document.createElement('a');
+        a.href = `data:application/pdf;base64,${data.pdf_base64}`;
+        a.download = data?.pdf_filename || 'jornada-essencial.pdf';
+        a.click();
+      } else {
+        mostrarFeedback('Resposta recebida, mas o PDF não veio. Tente novamente.', 'erro');
+      }
     } else {
-      mostrarFeedback('Nenhum PDF retornado pelo servidor.', 'erro');
+      text = await res.text().catch(()=>null);
+      console.error('Resposta inesperada:', text);
+      mostrarFeedback('Formato de resposta inesperado do servidor.', 'erro');
     }
 
-    // limpa storage após sucesso
     limparSalvas();
   } catch (err) {
     console.error(err);
