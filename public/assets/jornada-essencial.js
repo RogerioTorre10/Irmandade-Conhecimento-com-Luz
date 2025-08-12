@@ -14,19 +14,17 @@
   setTimeout(ajusta, 0);
 })();
 
-/* B) Configuração (API FIXA) */
+/* B) Configuração */
 const API_BASE = 'https://lumen-backend-api.onrender.com';
 const JOURNEY_POST_PATH = '/formulario';
-const API_AUTH_PATHS = ['/auth/validar']; // se existir
-const MIN_CAMPOS = 10;
+const API_AUTH_PATHS = ['/auth/validar']; // backend fornece
 const KEY_PREFIX = 'jornada_essencial_';
-const DEBUG_API = true;
-
-/* C) Estado & perguntas (carregadas do backend) */
-let PERGUNTAS = [];
 const PERGUNTAS_CACHE_KEY = 'perguntas_cache_v1';
 
-/* D) Elementos */
+/* C) Estado & elementos */
+let PERGUNTAS = [];
+let SESSION_SENHA = "";
+
 const areaJornada = document.getElementById('area-jornada');
 const lista = document.getElementById('lista-perguntas');
 const feedbackEl = document.getElementById('feedback');
@@ -35,7 +33,6 @@ const btnLimpar  = document.getElementById('btnLimpar');
 const btnEnviar  = document.getElementById('btnEnviar');
 const senhaEl    = document.getElementById('senha');
 
-/* E) Feedback (único) */
 feedbackEl?.setAttribute('aria-live', 'polite');
 function mostrarFeedback(msg, tipo='erro') {
   if (!feedbackEl) return;
@@ -47,7 +44,7 @@ function mostrarFeedback(msg, tipo='erro') {
   setTimeout(() => feedbackEl.classList.add('hidden'), 6000);
 }
 
-/* F) Helpers de armazenamento */
+/* D) Storage helpers */
 const campos = () => Array.from(document.querySelectorAll('#lista-perguntas textarea[name^="q"]'));
 function salvarAuto() { campos().forEach((t,i) => localStorage.setItem(KEY_PREFIX + (i+1), t.value)); }
 function getSalvas()  { return PERGUNTAS.map((_,i) => localStorage.getItem(KEY_PREFIX + (i+1)) || ''); }
@@ -57,24 +54,11 @@ function limparSalvas(){
   localStorage.removeItem(KEY_PREFIX + 'started_at');
 }
 
-/* G) Helpers diversos */
-const respondidasCount = vals => vals.filter(v => (v||'').trim().length>0).length;
-const primeiraNaoRespondida = vals => {
-  for (let i=0;i<vals.length;i++) if (!(vals[i]||'').trim()) return i;
-  return vals.length-1;
-};
-function habilitaAcoes(on){
-  btnLimpar.disabled = !on;
-  btnEnviar.disabled = !on;
-  btnEnviar.classList.toggle('bg-yellow-400/60', !on);
-  btnEnviar.classList.toggle('bg-yellow-400', on);
-  btnEnviar.classList.toggle('hover:bg-yellow-300', on);
-}
-
-/* H) Carregar perguntas do backend (com cache) */
-async function carregarPerguntas() {
+/* E) Perguntas via backend (com senha) */
+async function carregarPerguntas(senha) {
   try {
-    const r = await fetch(`${API_BASE}/perguntas`, { cache: 'no-store' });
+    const qp = senha ? `?senha=${encodeURIComponent(senha)}` : "";
+    const r = await fetch(`${API_BASE}/perguntas${qp}`, { cache: 'no-store' });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const data = await r.json();
     const map = data?.perguntas || {};
@@ -87,9 +71,9 @@ async function carregarPerguntas() {
   }
 }
 
-/* I) Validação de senha (opcional) */
+/* F) Senha */
 async function validarSenhaAntesDeIniciar(senha) {
-  if (!senha) return true; // se não quiser senha, basta deixar vazio
+  if (!senha) return false;
   for (const p of API_AUTH_PATHS) {
     try {
       const res = await fetch(`${API_BASE}${p}?senha=${encodeURIComponent(senha)}`);
@@ -97,11 +81,10 @@ async function validarSenhaAntesDeIniciar(senha) {
       if (res.status === 401) return false;
     } catch {}
   }
-  return true; // se não houver endpoint de auth
+  return false;
 }
 
-/* J) Renderização (passo / todas) */
-let modo = 'passo';
+/* G) Render passo-a-passo (sem "todas") */
 let atual = 0;
 
 function renderTopoControle(qIndex) {
@@ -113,19 +96,6 @@ function renderTopoControle(qIndex) {
   progresso.textContent = `Pergunta ${qIndex+1} de ${PERGUNTAS.length}`;
   barra.appendChild(progresso);
 
-  const b = document.createElement('button');
-  b.id = 'btnToggleModo';
-  b.className = 'px-3 py-1.5 rounded-lg border border-white/15 hover:bg-white/5';
-  b.textContent = (modo === 'passo') ? 'Exibir todas' : 'Modo passo-a-passo';
-  b.addEventListener('click', () => {
-    modo = (modo === 'passo') ? 'todas' : 'passo';
-    if (modo === 'passo') {
-      const vals = getSalvas();
-      atual = Math.max(0, primeiraNaoRespondida(vals));
-    }
-    renderPerguntas();
-  });
-  barra.appendChild(b);
   return barra;
 }
 
@@ -191,64 +161,41 @@ function renderPerguntaUnica(i){
   setTimeout(()=>ta.focus(), 0);
 }
 
-function renderPerguntasTodas(){
-  lista.innerHTML = '';
-  lista.appendChild(renderTopoControle(Math.max(atual,0)));
-
-  PERGUNTAS.forEach((texto, i) => {
-    const wrap = document.createElement('div');
-    wrap.className = 'mb-6 rounded-2xl bg-white/5 p-4 border border-white/10';
-
-    const label = document.createElement('label');
-    label.className = 'block font-semibold mb-2 break-words';
-    label.htmlFor = `q${i+1}`;
-    label.textContent = `${i+1}. ${texto}`;
-
-    const ta = document.createElement('textarea');
-    ta.name = `q${i+1}`;
-    ta.id = `q${i+1}`;
-    ta.rows = 4;
-    ta.className = 'w-full min-h-[110px] rounded-xl bg-gray-900/60 border border-white/10 p-3';
-    ta.placeholder = 'Escreva com sinceridade...';
-    ta.value = localStorage.getItem(KEY_PREFIX + (i+1)) || '';
-    ta.addEventListener('input', () => setSalva(i, ta.value));
-
-    wrap.appendChild(label);
-    wrap.appendChild(ta);
-    lista.appendChild(wrap);
-  });
-}
-
 function renderPerguntas(){
   if (!PERGUNTAS.length) {
     lista.innerHTML = '<div class="text-sm opacity-70">Carregando perguntas…</div>';
     return;
   }
-  if (modo === 'todas') renderPerguntasTodas();
-  else renderPerguntaUnica(atual);
+  renderPerguntaUnica(atual);
 }
 
-/* K) Fluxo principal */
+/* H) Fluxo inicial: só acorda o backend; espera senha para carregar perguntas */
 window.addEventListener('load', async () => {
   fetch(API_BASE + '/ping').catch(()=>{});
-  await carregarPerguntas();
-  renderPerguntas();
 });
 
-/* Iniciar */
+/* Iniciar (senha obrigatória) */
 btnIniciar?.addEventListener('click', async () => {
-  const senha = senhaEl?.value.trim();
-  const ok = await validarSenhaAntesDeIniciar(senha || "");
+  const senha = (senhaEl?.value || "").trim();
+  if (!senha) { mostrarFeedback('Por favor, digite a senha de acesso.'); senhaEl?.focus(); return; }
+
+  const ok = await validarSenhaAntesDeIniciar(senha);
   if (!ok) { mostrarFeedback('Senha inválida. Verifique e tente novamente.'); senhaEl?.focus(); return; }
+
+  SESSION_SENHA = senha;
+
+  await carregarPerguntas(SESSION_SENHA);
+  if (!PERGUNTAS.length) { mostrarFeedback('Não foi possível carregar as perguntas.', 'erro'); return; }
 
   if (!localStorage.getItem(KEY_PREFIX + 'started_at')) {
     localStorage.setItem(KEY_PREFIX + 'started_at', new Date().toISOString());
   }
   const vals = getSalvas();
-  atual = Math.max(0, primeiraNaoRespondida(vals));
-  modo = 'passo';
+  atual = Math.max(0, (function(v){ for (let i=0;i<v.length;i++) if (!(v[i]||'').trim()) return i; return v.length-1; })(vals));
+
   areaJornada?.classList.remove('hidden');
-  habilitaAcoes(true);
+  btnEnviar.disabled = false;
+  btnLimpar.disabled = false;
   renderPerguntas();
   mostrarFeedback('Jornada iniciada. Boa escrita! ✨', 'sucesso');
 });
@@ -260,23 +207,24 @@ document.addEventListener('input', (e) => {
   }
 });
 
-/* Limpar tudo (com aviso) */
+/* Limpar tudo */
 btnLimpar?.addEventListener('click', () => {
-  const temAlgo = campos().some(t => t.value.trim().length);
+  const temAlgo = getSalvas().some(v => (v||'').trim().length);
   if (!temAlgo) { mostrarFeedback('Não há respostas para limpar.', 'erro'); return; }
 
   const msg = [
-    '⚠️ ATENÇÃO: Este botão apaga TODAS as respostas desta página.',
-    '',
-    'Para apagar somente UMA resposta, use o teclado na pergunta desejada (Ctrl+A e Backspace/Apagar).',
+    '⚠️ ATENÇÃO: Este botão apaga TODAS as respostas desta jornada neste dispositivo.',
     '',
     'Tem certeza de que deseja apagar TUDO agora?'
   ].join('\n');
 
   if (!confirm(msg)) return;
 
-  campos().forEach(t => t.value = '');
-  salvarAuto();
+  limparSalvas();
+  const vals = getSalvas();
+  atual = Math.max(0, (function(v){ for (let i=0;i<v.length;i++) if (!(v[i]||'').trim()) return i; return v.length-1; })(vals));
+  renderPerguntas();
+
   mostrarFeedback('Todas as respostas foram apagadas deste dispositivo.', 'sucesso');
 });
 
@@ -292,12 +240,13 @@ function montarPayload() {
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
     started_at: localStorage.getItem(KEY_PREFIX + 'started_at') || new Date().toISOString(),
     enviado_em: new Date().toISOString(),
+    senha: SESSION_SENHA || ''
   };
   const contato = {};
   return { respostas, meta, contato };
 }
 
-/* Enviar com retry + reset bonito */
+/* Enviar (32 obrigatórias) */
 async function enviarJornada() {
   const url = API_BASE + JOURNEY_POST_PATH;
   const body = montarPayload();
@@ -331,21 +280,19 @@ async function enviarJornada() {
   }
 }
 
-/* Botão Enviar */
 btnEnviar?.addEventListener('click', async () => {
   if (!PERGUNTAS.length) { mostrarFeedback('Perguntas ainda não carregadas. Tente novamente.', 'erro'); return; }
 
-  const respostas = montarPayload().respostas;
-  const preenchidas = Object.values(respostas).filter(v => (v||'').trim()).length;
-
-  if (modo === 'passo' && preenchidas < PERGUNTAS.length) {
-    if (!confirm(`Você respondeu ${preenchidas} de ${PERGUNTAS.length}. Deseja enviar assim mesmo?`)) {
-      const idx = Object.values(respostas).findIndex(v => !(v||'').trim());
-      if (idx >= 0) { atual = idx; renderPerguntas(); setTimeout(()=>document.getElementById(`q${idx+1}`)?.focus(),0); }
-      return;
-    }
-  } else if (preenchidas < MIN_CAMPOS) {
-    if (!confirm(`Somente ${preenchidas} respostas preenchidas. Deseja enviar assim mesmo?`)) return;
+  const respostas = {};
+  PERGUNTAS.forEach((_, i) => respostas[String(i+1)] = (localStorage.getItem(KEY_PREFIX + (i+1)) || '').trim());
+  const faltando = Object.keys(respostas).filter(k => !respostas[k]);
+  if (faltando.length) {
+    mostrarFeedback(`Responda todas as perguntas. Faltando: ${faltando.join(', ')}`, 'erro');
+    const idx = Number(faltando[0]) - 1;
+    atual = Math.max(0, idx);
+    renderPerguntas();
+    setTimeout(()=>document.getElementById(`q${idx+1}`)?.focus(), 0);
+    return;
   }
 
   const oldTxt = btnEnviar.textContent;
