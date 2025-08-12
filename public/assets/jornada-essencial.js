@@ -394,16 +394,17 @@ async function validarSenhaAntesDeIniciar(senha) {
     }
   }
       try {
+  try {
   const res = await postComFallbackPathList(API_PATHS, payload);
 
   const ct = res.headers.get('Content-Type') || '';
-  let data=null, blob=null, text=null;
+  let data = null, blob = null, text = null;
 
-  if (ct.includes('application/pdf'))      blob = await res.blob();
-  else if (ct.includes('application/json')) data = await res.json().catch(()=>null);
-  else                                       text = await res.text().catch(()=>null);
-
+  // Se NÃO ok, lê erro e lança mensagem amigável
   if (!res.ok) {
+    if (ct.includes('application/json')) data = await res.json().catch(()=>null);
+    else                                  text = await res.text().catch(()=>null);
+
     let msg = 'Erro ao enviar.';
     if (res.status === 401) msg = 'Senha inválida. Verifique e tente novamente.';
     else if (res.status === 400) msg = (data && (data.detail || data.message)) || 'Dados inválidos. Verifique suas respostas.';
@@ -412,7 +413,41 @@ async function validarSenhaAntesDeIniciar(senha) {
     throw new Error(msg);
   }
 
-  // ... sucesso (PDF / url / base64) ...
+  // OK: trata sucesso (PDF ou JSON com link/base64)
+  if (ct.includes('application/pdf')) {
+    blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'jornada-essencial.pdf';
+    a.click();
+    URL.revokeObjectURL(url);
+    mostrarFeedback('PDF gerado com sucesso! 🎉', 'sucesso');
+  } else if (ct.includes('application/json')) {
+    data = await res.json().catch(()=>null);
+    mostrarFeedback((data && (data.message || data.msg)) || 'Respostas enviadas com sucesso!', 'sucesso');
+
+    if (data?.pdf_url) {
+      location.href = data.pdf_url;
+    } else if (data?.pdf_base64) {
+      const a = document.createElement('a');
+      a.href = `data:application/pdf;base64,${data.pdf_base64}`;
+      a.download = data?.pdf_filename || 'jornada-essencial.pdf';
+      a.click();
+    } else {
+      // JSON sem PDF — informa
+      mostrarFeedback('Resposta recebida, mas o PDF não veio. Tente novamente.', 'erro');
+    }
+  } else {
+    // Tipo inesperado
+    text = await res.text().catch(()=>null);
+    console.error('Resposta inesperada:', text);
+    mostrarFeedback('Formato de resposta inesperado do servidor.', 'erro');
+  }
+
+  // Limpa storage após sucesso
+  limparSalvas();
+
 } catch (err) {
   console.error(err);
   mostrarFeedback(err.message || 'Falha de rede. Tente novamente.', 'erro');
@@ -420,14 +455,6 @@ async function validarSenhaAntesDeIniciar(senha) {
   btnEnviar.disabled = false;
   btnEnviar.textContent = oldTxt || 'Enviar respostas';
 }
-
-    // ... tratamento do PDF / sucesso ...
-  } catch (err) {
-    // ... feedback de erro ...
-  } finally {
-    btnEnviar.disabled = false;
-    btnEnviar.textContent = oldTxt || 'Enviar respostas';
-  }
 });
         // 1) GET ?senha=
         let res = await fetch(`${api}${p}?senha=${encodeURIComponent(senha)}`, { method: 'GET' });
