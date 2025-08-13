@@ -17,9 +17,11 @@
 /* B) Configuração */
 const API_BASE = 'https://lumen-backend-api.onrender.com';
 const JOURNEY_POST_PATH = '/formulario';
-const API_AUTH_PATHS = ['/auth/validar']; // backend fornece
 const KEY_PREFIX = 'jornada_essencial_';
 const PERGUNTAS_CACHE_KEY = 'perguntas_cache_v1';
+
+// Modo teste no front (não bloqueia por senha)
+const FRONT_MODO_TESTE = true;
 
 /* C) Estado & elementos */
 let PERGUNTAS = [];
@@ -33,6 +35,28 @@ const btnLimpar  = document.getElementById('btnLimpar');
 const btnEnviar  = document.getElementById('btnEnviar');
 const senhaEl    = document.getElementById('senha');
 
+/* C.1) Olhinho para ver/esconder senha (sem precisar mexer no HTML) */
+(function addSenhaToggle() {
+  if (!senhaEl) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'relative inline-block w-full';
+  senhaEl.parentNode.insertBefore(wrap, senhaEl);
+  wrap.appendChild(senhaEl);
+  senhaEl.classList.add('pr-10'); // espaço pro botão
+
+  const eye = document.createElement('button');
+  eye.type = 'button';
+  eye.title = 'Mostrar/ocultar senha';
+  eye.className = 'absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-sm rounded hover:bg-white/10';
+  eye.innerText = '👁️';
+  eye.addEventListener('click', () => {
+    senhaEl.type = (senhaEl.type === 'password') ? 'text' : 'password';
+    eye.innerText = (senhaEl.type === 'password') ? '👁️' : '🙈';
+  });
+  wrap.appendChild(eye);
+})();
+
+/* D) Feedback */
 feedbackEl?.setAttribute('aria-live', 'polite');
 function mostrarFeedback(msg, tipo='erro') {
   if (!feedbackEl) return;
@@ -44,7 +68,7 @@ function mostrarFeedback(msg, tipo='erro') {
   setTimeout(() => feedbackEl.classList.add('hidden'), 6000);
 }
 
-/* D) Storage helpers */
+/* E) Storage helpers */
 const campos = () => Array.from(document.querySelectorAll('#lista-perguntas textarea[name^="q"]'));
 function salvarAuto() { campos().forEach((t,i) => localStorage.setItem(KEY_PREFIX + (i+1), t.value)); }
 function getSalvas()  { return PERGUNTAS.map((_,i) => localStorage.getItem(KEY_PREFIX + (i+1)) || ''); }
@@ -54,10 +78,10 @@ function limparSalvas(){
   localStorage.removeItem(KEY_PREFIX + 'started_at');
 }
 
-/* E) Perguntas via backend (com senha) */
+/* F) Perguntas via backend (em teste não manda senha) */
 async function carregarPerguntas(senha) {
   try {
-    const qp = senha ? `?senha=${encodeURIComponent(senha)}` : "";
+    const qp = (!FRONT_MODO_TESTE && senha) ? `?senha=${encodeURIComponent(senha)}` : "";
     const r = await fetch(`${API_BASE}/perguntas${qp}`, { cache: 'no-store' });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const data = await r.json();
@@ -71,31 +95,26 @@ async function carregarPerguntas(senha) {
   }
 }
 
-/* F) Senha */
+/* G) Validação de senha (em teste, sempre OK) */
 async function validarSenhaAntesDeIniciar(senha) {
+  if (FRONT_MODO_TESTE) return true;
   if (!senha) return false;
-  for (const p of API_AUTH_PATHS) {
-    try {
-      const res = await fetch(`${API_BASE}${p}?senha=${encodeURIComponent(senha)}`);
-      if (res.status === 200) return true;
-      if (res.status === 401) return false;
-    } catch {}
-  }
-  return false;
+  try {
+    const res = await fetch(`${API_BASE}/auth/validar?senha=${encodeURIComponent(senha)}`);
+    return res.status === 200;
+  } catch { return false; }
 }
 
-/* G) Render passo-a-passo (sem "todas") */
+/* H) Render passo-a-passo */
 let atual = 0;
 
 function renderTopoControle(qIndex) {
   const barra = document.createElement('div');
   barra.className = 'mb-3 flex items-center justify-between text-sm';
-
   const progresso = document.createElement('div');
   progresso.className = 'font-semibold text-yellow-300';
   progresso.textContent = `Pergunta ${qIndex+1} de ${PERGUNTAS.length}`;
   barra.appendChild(progresso);
-
   return barra;
 }
 
@@ -219,19 +238,22 @@ function renderPerguntas(){
   renderPerguntaUnica(atual);
 }
 
-/* H) Fluxo inicial: só acorda o backend; espera senha para carregar perguntas */
+/* I) Fluxo inicial: acorda backend e libera iniciar sem bloquear pela senha (modo teste) */
 window.addEventListener('load', async () => {
   fetch(API_BASE + '/ping').catch(()=>{});
 });
 
-/* Iniciar (senha obrigatória) */
+/* Iniciar */
 btnIniciar?.addEventListener('click', async () => {
   const senha = (senhaEl?.value || "").trim();
-  if (!senha) { mostrarFeedback('Por favor, digite a senha de acesso.'); senhaEl?.focus(); return; }
 
-  const ok = await validarSenhaAntesDeIniciar(senha);
-  if (!ok) { mostrarFeedback('Senha inválida. Verifique e tente novamente.'); senhaEl?.focus(); return; }
-
+  // Em teste, não bloqueia; em produção valida
+  const ok = FRONT_MODO_TESTE ? true : await validarSenhaAntesDeIniciar(senha);
+  if (!ok) {
+    mostrarFeedback('Senha inválida ou expirada. Por favor, verifique.', 'erro');
+    senhaEl?.focus();
+    return;
+  }
   SESSION_SENHA = senha;
 
   await carregarPerguntas(SESSION_SENHA);
@@ -241,7 +263,6 @@ btnIniciar?.addEventListener('click', async () => {
     localStorage.setItem(KEY_PREFIX + 'started_at', new Date().toISOString());
   }
   const vals = getSalvas();
-  // primeira não respondida
   let idx = 0; for (let i=0;i<vals.length;i++) { if (!(vals[i]||'').trim()) { idx=i; break; } else { idx=vals.length-1; } }
   atual = Math.max(0, idx);
 
@@ -293,6 +314,7 @@ function montarPayload() {
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
     started_at: localStorage.getItem(KEY_PREFIX + 'started_at') || new Date().toISOString(),
     enviado_em: new Date().toISOString(),
+    // senha segue junto; em MODO_TESTE o backend ignora
     senha: SESSION_SENHA || ''
   };
   const contato = {};
