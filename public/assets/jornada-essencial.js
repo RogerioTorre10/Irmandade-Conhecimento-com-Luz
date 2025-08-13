@@ -99,6 +99,51 @@ function renderTopoControle(qIndex) {
   return barra;
 }
 
+// --- Prompt final (aparece na última pergunta) ---
+function mostrarPromptFinal() {
+  document.getElementById('final-prompt')?.remove();
+
+  const box = document.createElement('div');
+  box.id = 'final-prompt';
+  box.className = 'mt-4 rounded-xl border border-yellow-400/40 bg-yellow-400/10 p-4 text-yellow-100';
+
+  box.innerHTML = `
+    <div class="font-semibold mb-2">Você finalizou a Jornada 🎉</div>
+    <div class="text-sm opacity-90 mb-3">
+      Deseja enviar agora para gerar o PDF (e HQ, quando disponível)?
+    </div>
+    <div class="flex gap-2">
+      <button id="btnEnviarAgora"
+        class="px-4 py-2 rounded-lg bg-yellow-400 text-gray-900 font-semibold hover:bg-yellow-300">
+        Enviar agora
+      </button>
+      <button id="btnRevisar"
+        class="px-4 py-2 rounded-lg border border-white/20 hover:bg-white/5">
+        Revisar respostas
+      </button>
+    </div>
+  `;
+
+  lista.appendChild(box);
+
+  document.getElementById('btnEnviarAgora')?.addEventListener('click', () => {
+    if (btnEnviar) {
+      btnEnviar.classList.add('ring-4','ring-yellow-300','ring-offset-2','ring-offset-transparent');
+      btnEnviar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => btnEnviar.focus(), 300);
+      setTimeout(() => btnEnviar.click(), 350);
+      setTimeout(() => btnEnviar.classList.remove('ring-4','ring-yellow-300','ring-offset-2','ring-offset-transparent'), 1500);
+    }
+  });
+
+  document.getElementById('btnRevisar')?.addEventListener('click', () => {
+    mostrarFeedback('Use “Voltar” para revisar suas respostas.', 'sucesso');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
 function renderPerguntaUnica(i){
   lista.innerHTML = '';
   lista.appendChild(renderTopoControle(i));
@@ -142,8 +187,13 @@ function renderPerguntaUnica(i){
   ta.addEventListener('input', () => { btnAvancar.disabled = !(ta.value.trim().length); });
   btnAvancar.addEventListener('click', () => {
     if (i === PERGUNTAS.length-1) {
-      mostrarFeedback('Você concluiu todas as perguntas. Revise e clique em Enviar respostas.', 'sucesso');
-      btnEnviar?.focus();
+      mostrarPromptFinal();
+      if (btnEnviar) {
+        btnEnviar.classList.add('ring-4','ring-yellow-300','ring-offset-2','ring-offset-transparent');
+        btnEnviar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => btnEnviar.focus(), 300);
+        setTimeout(() => btnEnviar.classList.remove('ring-4','ring-yellow-300','ring-offset-2','ring-offset-transparent'), 1500);
+      }
     } else {
       atual = Math.min(PERGUNTAS.length-1, i+1);
       renderPerguntas();
@@ -191,7 +241,9 @@ btnIniciar?.addEventListener('click', async () => {
     localStorage.setItem(KEY_PREFIX + 'started_at', new Date().toISOString());
   }
   const vals = getSalvas();
-  atual = Math.max(0, (function(v){ for (let i=0;i<v.length;i++) if (!(v[i]||'').trim()) return i; return v.length-1; })(vals));
+  // primeira não respondida
+  let idx = 0; for (let i=0;i<vals.length;i++) { if (!(vals[i]||'').trim()) { idx=i; break; } else { idx=vals.length-1; } }
+  atual = Math.max(0, idx);
 
   areaJornada?.classList.remove('hidden');
   btnEnviar.disabled = false;
@@ -222,7 +274,8 @@ btnLimpar?.addEventListener('click', () => {
 
   limparSalvas();
   const vals = getSalvas();
-  atual = Math.max(0, (function(v){ for (let i=0;i<v.length;i++) if (!(v[i]||'').trim()) return i; return v.length-1; })(vals));
+  let idx = 0; for (let i=0;i<vals.length;i++) { if (!(vals[i]||'').trim()) { idx=i; break; } else { idx=vals.length-1; } }
+  atual = Math.max(0, idx);
   renderPerguntas();
 
   mostrarFeedback('Todas as respostas foram apagadas deste dispositivo.', 'sucesso');
@@ -266,6 +319,16 @@ async function enviarJornada() {
         throw new Error(msg);
       }
       const data = await resp.json();
+
+      // dica sobre onde o arquivo será salvo
+      const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+      const dicaPath = isMobile
+        ? 'no seu celular, geralmente em Arquivos > Downloads.'
+        : 'na pasta padrão de Downloads do seu sistema.';
+      mostrarFeedback(
+        `Vamos baixar seu PDF; ele ficará ${dicaPath} Após o download, as respostas serão apagadas deste dispositivo.`,
+        'sucesso'
+      );
 
       if (data.links?.pdf) window.open(`${API_BASE}${data.links.pdf}`, '_blank', 'noopener');
       else if (data.pdf_filename) window.open(`${API_BASE}/download/pdf/${encodeURIComponent(data.pdf_filename)}`, '_blank', 'noopener');
