@@ -1,454 +1,282 @@
-/* =========================
-   Jornada Essencial – Front
-   ========================= */
+/* jornada.js – v8.2
+   - Tela de login sempre (FORCE_LOGIN)
+   - Progresso (respondidas/total)
+   - Validação das obrigatórias no botão Enviar (mostra faltantes)
+   - Downloads com Authorization e tratamento de 404
+*/
+const CONFIG = {
+  BUILD: '2025-08-14-2',
+  BACKEND_URL: 'https://lumen-backend-api.onrender.com',
 
-/* A) padding para o rodapé fixo */
-(function padBottomForFooter() {
-  const painel = document.getElementById('painel-controles');
-  function ajusta() {
-    const h = painel?.getBoundingClientRect().height || 80;
-    document.body.style.paddingBottom = (h + 16) + 'px';
-  }
-  window.addEventListener('load', ajusta);
-  window.addEventListener('resize', ajusta);
-  setTimeout(ajusta, 0);
+  // Controle de fluxo
+  FORCE_LOGIN: true, // força clicar "Iniciar" antes de carregar perguntas
+
+  // IDs (se existirem no HTML)
+  PASSWORD_INPUT: '#senha-acesso',
+  START_BUTTON: '#btn-iniciar',
+  FORM_ROOT_SELECTOR: '#form-root',
+  DEVOLUTIVA_SELECTOR: '#devolutiva',
+  SEND_BUTTON_SELECTOR: '#btn-enviar-oficial',
+  PROGRESS_SELECTOR: '#icl-progress',
+
+  // IDs para os downloads
+  DOWNLOAD_BUTTON_FORM: '#btn-download-form',
+  DOWNLOAD_BUTTON_HQ: '#btn-download-hq',
+
+  // Fallbacks por texto
+  START_TEXT: 'iniciar',
+  SEND_TEXT: 'enviar respostas',
+};
+
+/* 0) Anti-cache */
+(() => {
+  try {
+    const KEY = 'icl:build';
+    if (localStorage.getItem(KEY) !== CONFIG.BUILD) {
+      localStorage.setItem(KEY, CONFIG.BUILD);
+      const u = new URL(location.href); u.searchParams.set('v', CONFIG.BUILD);
+      location.replace(u.toString());
+    }
+  } catch (_) {}
 })();
 
-/* B) Configuração */
-const APIS = [
-  'https://conhecimento-com-luz-api.onrender.com', // principal
-  'https://lumen-backend-api.onrender.com'         // backup
-];
-
-const API_PATHS = [
-  '/jornada/essencial',
-  '/jornada-essencial',
-  '/jornada/essencial/pdf',
-  '/jornada',
-];
-
-const MIN_CAMPOS = 10;
-const KEY_PREFIX = 'jornada_essencial_';
-const API_AUTH_PATHS = ['/auth/validar', '/auth/check'];
-
-/* C) Perguntas e blocos */
-const PERGUNTAS = [
-  "Como você tem percebido sua própria vida até aqui?",
-  "E a vida das pessoas ao seu redor, como você a enxerga?",
-  "Como lida com seus traumas? Consegue falar sobre eles?",
-  "Você acredita que a verdade existe ou tudo é relativo? Explique.",
-  "O que significa a doença para você? Está enfrentando alguma? Fale livremente.",
-  "Há alguém que você gostaria de ter ao seu lado agora? Quem é essa pessoa e por que ela não está?",
-  "Qual é o seu maior vício? Por que você acha que ele surgiu? Já tentou vencê-lo?",
-  "Sente que tem outros vícios, mesmo que sutis ou emocionais? Quais?",
-  "Como você percebe a morte? Ela te assusta, conforta ou provoca curiosidade?",
-  "Você acredita em continuidade após a morte? O que imagina que exista?",
-  "Com quem foi criado: ambos os pais biológicos, só um dos pais biológicos (divórcio ou morte), pais afetivos (adoção) ou parentes?",
-  "É filho único?",
-  "Quantos irmãos tem? É primogênito, do meio ou caçula?",
-  "Passou fome quando criança?",
-  "Nível de escolaridade e formação acadêmica.",
-  "Estado civil: solteiro, namorando, casado, divorciado, viúvo?",
-  "Tem alguma deficiência física?",
-  "Você já sofreu algum tipo de preconceito? Foi superado ou ainda interfere nas suas decisões?",
-  "Quais são os seus maiores sonhos para o futuro?",
-  "O que você considera essencial para ter uma vida plena?",
-  "Se pudesse mudar algo na sociedade, o que mudaria?",
-  "Qual legado gostaria de deixar?",
-  "Se pudesse passar uma mensagem para o mundo inteiro agora, qual seria?",
-  "Você se recorda da idade em que, pela primeira vez, percebeu que era alguém neste mundo?",
-  "Se encontrasse seu 'eu' de 10 anos atrás, o que diria?",
-  "O que significa fé para você?",
-  "Já teve alguma experiência que mudou sua forma de ver a vida?",
-  "Quais pessoas mais marcaram sua caminhada? Por quê?",
-  "Você acredita que tudo tem um propósito?",
-  "Se pudesse receber uma resposta direta de Deus agora, qual pergunta faria?",
-  "Que hábito você pode iniciar hoje que te aproximaria do seu propósito?",
-  "Qual é a decisão corajosa que você vem adiando e precisa tomar?"
-];
-
-const BLOCO_TITULOS = {
-  0: "Reflexões da Alma e da Existência",
-  10: "Raízes e Experiências de Vida",
-  18: "Futuro e Propósito",
-  23: "Jornada Iluminada"
+/* Utils */
+const store = {
+  set(k, v){ sessionStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v)); },
+  get(k){ const v = sessionStorage.getItem(k); try { return JSON.parse(v); } catch { return v; } },
+  del(k){ sessionStorage.removeItem(k); },
+  has(k){ return sessionStorage.getItem(k) != null; }
 };
 
-/* D) Elementos e helpers */
-const areaJornada = document.getElementById('area-jornada');
-const lista = document.getElementById('lista-perguntas');
-const feedbackEl = document.getElementById('feedback');
-const btnIniciar = document.getElementById('btnIniciar');
-const btnLimpar  = document.getElementById('btnLimpar');
-const btnEnviar  = document.getElementById('btnEnviar');
-const senhaEl    = document.getElementById('senha');
-
-function mostrarFeedback(msg, tipo='erro') {
-  if (!feedbackEl) return;
-  feedbackEl.className = `rounded-xl p-4 mb-4 text-sm ${
-    tipo === 'sucesso' ? 'bg-green-500/20 text-green-200' : 'bg-red-500/20 text-red-200'
-  }`;
-  feedbackEl.textContent = msg;
-  feedbackEl.classList.remove('hidden');
-  setTimeout(() => feedbackEl.classList.add('hidden'), 5000);
-}
-
-const campos = () => Array.from(document.querySelectorAll('#lista-perguntas textarea[name^="q"]'));
-function salvarAuto() { campos().forEach((t,i) => localStorage.setItem(KEY_PREFIX + (i+1), t.value)); }
-function getSalvas()  { return PERGUNTAS.map((_,i) => localStorage.getItem(KEY_PREFIX + (i+1)) || ''); }
-function setSalva(i, v){ localStorage.setItem(KEY_PREFIX + (i+1), v); }
-function limparSalvas(){
-  PERGUNTAS.forEach((_,i)=>localStorage.removeItem(KEY_PREFIX+(i+1)));
-  localStorage.removeItem(KEY_PREFIX + 'started_at');
-}
-
-const respondidasCount = vals => vals.filter(v => (v||'').trim().length>0).length;
-const primeiraNaoRespondida = vals => {
-  for (let i=0;i<vals.length;i++) if (!(vals[i]||'').trim()) return i;
-  return vals.length-1;
-};
-
-function habilitaAcoes(on){
-  btnLimpar.disabled = !on;
-  btnEnviar.disabled = !on;
-  btnEnviar.classList.toggle('bg-yellow-400/60', !on);
-  btnEnviar.classList.toggle('bg-yellow-400', on);
-  btnEnviar.classList.toggle('hover:bg-yellow-300', on);
-}
-
-/* --- Helpers de rede --- */
-async function validarSenhaAntesDeIniciar(senha) {
-  for (const api of APIS) {
-    for (const p of API_AUTH_PATHS) {
-      try {
-        let res = await fetch(`${api}${p}?senha=${encodeURIComponent(senha)}`, { method: 'GET' });
-        if (res.status === 200) return true;
-        if (res.status === 401) return false;
-
-        if (res.status !== 404) {
-          res = await fetch(`${api}${p}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ senha }),
-          });
-          if (res.status === 200) return true;
-          if (res.status === 401) return false;
-        }
-      } catch { /* tenta próximo host */ }
-    }
+function h(tag, attrs = {}, ...children) {
+  const el = document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs||{})) {
+    if (k==='class') el.className=v; else if (k==='for') el.htmlFor=v; else el.setAttribute(k,v);
   }
-  return true; // se não houver endpoint de auth, valida no envio
+  children.flat().forEach(c => el.appendChild(typeof c==='string' ? document.createTextNode(c) : c));
+  return el;
 }
 
-async function postComFallbackPathList(paths, body) {
-  const supportsAbortTimeout = typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal;
-  let lastErr;
-  for (const path of paths) {
-    for (const api of APIS) {
-      let controller, timer;
-      const opts = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, application/pdf' },
-        body: JSON.stringify(body),
-      };
-      if (supportsAbortTimeout) opts.signal = AbortSignal.timeout(30000);
-      else { controller = new AbortController(); timer = setTimeout(()=>controller.abort(), 30000); opts.signal = controller.signal; }
-      try {
-        const res = await fetch(api + path, opts);
-        if (timer) clearTimeout(timer);
-        if (res.ok || res.status === 400 || res.status === 401) return res;
-        lastErr = new Error(`HTTP ${res.status} em ${api+path}`);
-      } catch (e) { lastErr = e; }
-    }
-  }
-  throw lastErr || new Error('Falha de rede.');
+function byText(root, tag, textLike){
+  const needle = (textLike || '').toLowerCase();
+  return [...(root||document).querySelectorAll(tag)]
+    .find(el => (el.textContent||'').trim().toLowerCase().includes(needle));
 }
 
-/* E) Render: modos passo e todas */
-let modo = 'passo'; // 'passo' | 'todas'
-let atual = 0;      // índice atual
-
-function renderTopoControle(qIndex) {
-  const barra = document.createElement('div');
-  barra.className = 'mb-3 flex items-center justify-between text-sm';
-
-  const progresso = document.createElement('div');
-  progresso.className = 'font-semibold text-yellow-300';
-  progresso.textContent = `Pergunta ${qIndex+1} de ${PERGUNTAS.length}`;
-  barra.appendChild(progresso);
-
-  const b = document.createElement('button');
-  b.id = 'btnToggleModo';
-  b.className = 'px-3 py-1.5 rounded-lg border border-white/15 hover:bg-white/5';
-  b.textContent = (modo === 'passo') ? 'Exibir todas' : 'Modo passo-a-passo';
-  b.addEventListener('click', () => {
-    modo = (modo === 'passo') ? 'todas' : 'passo';
-    if (modo === 'passo') {
-      const vals = getSalvas();
-      atual = Math.max(0, primeiraNaoRespondida(vals));
-    }
-    renderPerguntas();
-  });
-  barra.appendChild(b);
-  return barra;
+function pickPasswordInput(){
+  return document.querySelector(CONFIG.PASSWORD_INPUT) || document.querySelector('input[type="password"]');
 }
+function pickStartButton(){
+  return document.querySelector(CONFIG.START_BUTTON) || byText(document, 'button', CONFIG.START_TEXT);
+}
+function pickSendButton(){
+  return document.querySelector(CONFIG.SEND_BUTTON_SELECTOR) || byText(document, 'button', CONFIG.SEND_TEXT);
+}
+function pickFormRoot(){
+  return document.querySelector(CONFIG.FORM_ROOT_SELECTOR) || (() => {
+    // se não existir #form-root, cria um container antes do painel de botões
+    const panel = byText(document, 'button', CONFIG.START_TEXT)?.closest('div') || document.body;
+    const div = document.createElement('div'); div.id = 'form-root'; div.className = 'max-w-3xl mx-auto px-4 py-6';
+    panel.parentNode.insertBefore(div, panel);
+    return div;
+  })();
+}
+function pickDevolutivaBox(){
+  return document.querySelector(CONFIG.DEVOLUTIVA_SELECTOR) || (() => {
+    const div = document.createElement('div'); div.id = 'devolutiva'; div.className = 'max-w-3xl mx-auto px-4 py-4';
+    document.body.appendChild(div); return div;
+  })();
+}
+function pickProgress(){
+  return document.querySelector(CONFIG.PROGRESS_SELECTOR) || (() => {
+    const bar = h('div', { id: 'icl-progress', class: 'max-w-3xl mx-auto px-4 py-2 text-sm text-gray-300' }, '');
+    const root = pickFormRoot();
+    root.parentNode.insertBefore(bar, root);
+    return bar;
+  })();
+}
+function authHeaders(){ const t = store.get('icl:token'); return t ? { Authorization:`Bearer ${t}` } : {}; }
 
-function renderPerguntaUnica(i){
-  lista.innerHTML = '';
+/* Estado em memória */
+let QUESTIONS_META = []; // [{id, required, kind}, ...]
+let TOTAL = 0;
 
-  const blocosIndices = Object.keys(BLOCO_TITULOS).map(n=>parseInt(n,10)).sort((a,b)=>a-b);
-  let titulo = '';
-  for (const idx of blocosIndices) if (i >= idx) titulo = BLOCO_TITULOS[idx];
-  if (titulo) {
-    const h3 = document.createElement('h3');
-    h3.className = 'mt-6 mb-3 text-xl font-extrabold tracking-wide text-yellow-300';
-    h3.textContent = titulo;
-    lista.appendChild(h3);
-  }
+/* --- Funções extras --- */
 
-  lista.appendChild(renderTopoControle(i));
+// Olho mágico
+function addPasswordToggle(input) {
+  const container = input.parentNode || input.closest('div') || input;
+  container.style.position = 'relative';
+  if (container.querySelector('[data-eye]')) return;
 
-  const wrap = document.createElement('div');
-  wrap.className = 'mb-6 rounded-2xl bg-white/5 p-4 border border-white/10';
+  const toggleBtn = h('button', {
+    type: 'button',
+    'data-eye': '1',
+    class: 'absolute right-2 top-1/2 -translate-y-1/2 p-2 focus:outline-none text-gray-400 hover:text-gray-600',
+    'aria-label': 'mostrar/ocultar senha',
+  }, '👁️');
 
-  const label = document.createElement('label');
-  label.className = 'block font-semibold mb-2 break-words';
-  label.htmlFor = `q${i+1}`;
-  label.textContent = `${i+1}. ${PERGUNTAS[i]}`;
-
-  const ta = document.createElement('textarea');
-  ta.name = `q${i+1}`;
-  ta.id = `q${i+1}`;
-  ta.rows = 4;
-  ta.className = 'w-full min-h-[110px] rounded-xl bg-gray-900/60 border border-white/10 p-3';
-  ta.placeholder = 'Escreva com sinceridade...';
-  ta.value = localStorage.getItem(KEY_PREFIX + (i+1)) || '';
-  ta.addEventListener('input', () => setSalva(i, ta.value));
-
-  wrap.appendChild(label);
-  wrap.appendChild(ta);
-
-  const nav = document.createElement('div');
-  nav.className = 'mt-4 flex gap-3';
-
-  const btnVoltar = document.createElement('button');
-  btnVoltar.className = 'px-4 py-2 rounded-xl border border-white/15 hover:bg-white/5 disabled:opacity-50';
-  btnVoltar.textContent = 'Voltar';
-  btnVoltar.disabled = (i === 0);
-  btnVoltar.addEventListener('click', () => {
-    atual = Math.max(0, i-1);
-    renderPerguntas();
-    setTimeout(()=>document.getElementById(`q${atual+1}`)?.focus(), 0);
+  toggleBtn.addEventListener('click', () => {
+    const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+    input.setAttribute('type', type);
   });
 
-  const btnAvancar = document.createElement('button');
-  btnAvancar.className = 'px-4 py-2 rounded-xl bg-yellow-400 text-gray-900 font-semibold hover:bg-yellow-300 disabled:opacity-50';
-  btnAvancar.textContent = (i === PERGUNTAS.length-1) ? 'Concluir' : 'Avançar';
-  btnAvancar.disabled = !(ta.value.trim().length);
-  ta.addEventListener('input', () => { btnAvancar.disabled = !(ta.value.trim().length); });
-  btnAvancar.addEventListener('click', () => {
-    if (i === PERGUNTAS.length-1) {
-      mostrarFeedback('Você concluiu todas as perguntas. Revise e clique em Enviar respostas.', 'sucesso');
-      btnEnviar?.focus();
-    } else {
-      atual = Math.min(PERGUNTAS.length-1, i+1);
-      renderPerguntas();
-      setTimeout(()=>document.getElementById(`q${atual+1}`)?.focus(), 0);
-    }
-  });
-
-  nav.appendChild(btnVoltar);
-  nav.appendChild(btnAvancar);
-  wrap.appendChild(nav);
-  lista.appendChild(wrap);
-
-  setTimeout(()=>ta.focus(), 0);
+  container.appendChild(toggleBtn);
 }
 
-function renderPerguntasTodas(){
-  lista.innerHTML = '';
-  lista.appendChild(renderTopoControle(Math.max(atual,0)));
-
-  PERGUNTAS.forEach((texto, i) => {
-    if (BLOCO_TITULOS[i]) {
-      const h3 = document.createElement('h3');
-      h3.className = 'mt-10 mb-4 text-xl font-extrabold tracking-wide text-yellow-300';
-      h3.textContent = BLOCO_TITULOS[i];
-      lista.appendChild(h3);
-    }
-    const wrap = document.createElement('div');
-    wrap.className = 'mb-6 rounded-2xl bg-white/5 p-4 border border-white/10';
-
-    const label = document.createElement('label');
-    label.className = 'block font-semibold mb-2 break-words';
-    label.htmlFor = `q${i+1}`;
-    label.textContent = `${i+1}. ${texto}`;
-
-    const ta = document.createElement('textarea');
-    ta.name = `q${i+1}`;
-    ta.id = `q${i+1}`;
-    ta.rows = 4;
-    ta.className = 'w-full min-h-[110px] rounded-xl bg-gray-900/60 border border-white/10 p-3';
-    ta.placeholder = 'Escreva com sinceridade...';
-    ta.value = localStorage.getItem(KEY_PREFIX + (i+1)) || '';
-    ta.addEventListener('input', () => setSalva(i, ta.value));
-
-    wrap.appendChild(label);
-    wrap.appendChild(ta);
-    lista.appendChild(wrap);
-  });
-}
-
-function renderPerguntas(){
-  if (modo === 'todas') renderPerguntasTodas();
-  else renderPerguntaUnica(atual);
-}
-
-/* F) Fluxo principal */
-window.addEventListener('load', () => {
-  APIS.forEach(api => fetch(api + '/ping').catch(()=>{}));
-});
-
-/* Iniciar */
-btnIniciar?.addEventListener('click', async () => {
-  const senha = senhaEl?.value.trim();
-  if (!senha) { mostrarFeedback('Por favor, digite a senha de acesso.'); senhaEl?.focus(); return; }
-
-  const ok = await validarSenhaAntesDeIniciar(senha);
-  if (!ok) { mostrarFeedback('Senha inválida. Verifique e tente novamente.'); senhaEl?.focus(); return; }
-
-  if (!localStorage.getItem(KEY_PREFIX + 'started_at')) {
-    localStorage.setItem(KEY_PREFIX + 'started_at', new Date().toISOString());
-  }
-  const vals = getSalvas();
-  atual = Math.max(0, primeiraNaoRespondida(vals));
-  modo = 'passo';
-  areaJornada?.classList.remove('hidden');
-  habilitaAcoes(true);
-  renderPerguntas();
-  mostrarFeedback('Jornada iniciada. Boa escrita! ✨', 'sucesso');
-});
-
-/* Autosave global */
-document.addEventListener('input', (e) => {
-  if (e.target && e.target.matches('#lista-perguntas textarea[name^="q"]')) {
-    salvarAuto();
-  }
-});
-
-/* Limpar com aviso forte */
-btnLimpar?.addEventListener('click', () => {
-  const temAlgo = campos().some(t => t.value.trim().length);
-  if (!temAlgo) { mostrarFeedback('Não há respostas para limpar.', 'erro'); return; }
-
-  const msg = [
-    '⚠️ ATENÇÃO: Este botão apaga TODAS as respostas desta página.',
-    '',
-    'Para apagar somente UMA resposta, use o teclado na pergunta desejada (Ctrl+A e Backspace/Apagar).',
-    '',
-    'Tem certeza de que deseja apagar TUDO agora?'
-  ].join('\n');
-
-  if (!confirm(msg)) return;
-
-  campos().forEach(t => t.value = '');
-  salvarAuto();
-  mostrarFeedback('Todas as respostas foram apagadas deste dispositivo.', 'sucesso');
-});
-
-/* Enviar */
-btnEnviar?.addEventListener('click', async () => {
-  if (!senhaEl?.value.trim()) {
-    mostrarFeedback('Por favor, digite a senha de acesso.');
-    senhaEl?.focus();
-    return;
-  }
-
-  const respostas = PERGUNTAS.map((texto, i) => ({
-    indice: i + 1,
-    pergunta: texto,
-    resposta: (localStorage.getItem(KEY_PREFIX + (i+1)) || '').trim()
-  }));
-  const preenchidas = respostas.filter(r => r.resposta.length);
-
-  if (!preenchidas.length) { mostrarFeedback('Preencha ao menos uma resposta antes de enviar.'); return; }
-
-  if (modo === 'passo' && preenchidas.length < PERGUNTAS.length) {
-    if (!confirm(`Você respondeu ${preenchidas.length} de ${PERGUNTAS.length}. Deseja enviar assim mesmo?`)) {
-      const idx = respostas.findIndex(r => !r.resposta.length);
-      if (idx >= 0) { atual = idx; renderPerguntas(); setTimeout(()=>document.getElementById(`q${idx+1}`)?.focus(),0); }
-      return;
-    }
-  } else if (preenchidas.length < MIN_CAMPOS) {
-    if (!confirm(`Somente ${preenchidas.length} respostas preenchidas. Deseja enviar assim mesmo?`)) return;
-  }
-
-  const payload = {
-    senha: senhaEl.value.trim(),
-    origem: 'site-irmandade',
-    jornada: 'essencial',
-    respostas,
-    meta: {
-      dispositivo: navigator.userAgent,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
-      started_at: localStorage.getItem(KEY_PREFIX + 'started_at') || new Date().toISOString(),
-      enviado_em: new Date().toISOString()
-    }
-  };
-
-  const oldTxt = btnEnviar.textContent;
-  btnEnviar.disabled = true; btnEnviar.textContent = 'Enviando...';
-
+// Token público (modo aberto)
+async function getPublicToken(){
   try {
-    const res = await postComFallbackPathList(API_PATHS, payload);
-
-    const ct = res.headers.get('Content-Type') || '';
-    let data = null, blob = null, text = null;
-
-    if (!res.ok) {
-      if (ct.includes('application/json')) data = await res.json().catch(()=>null);
-      else                                  text = await res.text().catch(()=>null);
-
-      let msg = 'Erro ao enviar.';
-      if (res.status === 401) msg = 'Senha inválida. Verifique e tente novamente.';
-      else if (res.status === 400) msg = (data && (data.detail || data.message)) || 'Dados inválidos. Verifique suas respostas.';
-      else if (res.status >= 500) msg = 'Erro no servidor. Tente novamente mais tarde.';
-      else msg = (data && (data.detail || data.message)) || text || `Erro ${res.status}`;
-      throw new Error(msg);
+    const r = await fetch(`${CONFIG.BACKEND_URL}/public/token`, { method: 'POST' });
+    if (!r.ok) throw new Error('public token indisponível');
+    const d = await r.json();
+    if (d && d.token) {
+      store.set('icl:token', d.token);
+      store.set('icl:deadline', d.deadline_iso || '');
+      console.info('[Lumen] Token público obtido.');
+      return d.token;
     }
-
-    if (ct.includes('application/pdf')) {
-      blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = 'jornada-essencial.pdf'; a.click();
-      URL.revokeObjectURL(url);
-      mostrarFeedback('PDF gerado com sucesso! 🎉', 'sucesso');
-    } else if (ct.includes('application/json')) {
-      data = await res.json().catch(()=>null);
-      mostrarFeedback((data && (data.message || data.msg)) || 'Respostas enviadas com sucesso!', 'sucesso');
-
-      if (data?.pdf_url) {
-        location.href = data.pdf_url;
-      } else if (data?.pdf_base64) {
-        const a = document.createElement('a');
-        a.href = `data:application/pdf;base64,${data.pdf_base64}`;
-        a.download = data?.pdf_filename || 'jornada-essencial.pdf';
-        a.click();
-      } else {
-        mostrarFeedback('Resposta recebida, mas o PDF não veio. Tente novamente.', 'erro');
-      }
-    } else {
-      text = await res.text().catch(()=>null);
-      console.error('Resposta inesperada:', text);
-      mostrarFeedback('Formato de resposta inesperado do servidor.', 'erro');
-    }
-
-    limparSalvas();
-  } catch (err) {
-    console.error(err);
-    mostrarFeedback(err.message || 'Falha de rede. Tente novamente.', 'erro');
-  } finally {
-    btnEnviar.disabled = false; btnEnviar.textContent = oldTxt || 'Enviar respostas';
+  } catch (e) {
+    console.warn('[Lumen] Falha ao obter token público:', e);
   }
-});
+  return null;
+}
+
+async function ensureToken(){
+  if (store.get('icl:token')) return true;
+  const t = await getPublicToken();
+  return !!t;
+}
+
+function downloadBlob(filename, blob){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  a.remove(); URL.revokeObjectURL(url);
+}
+
+async function downloadWithAuth(fileName){
+  try {
+    let r = await fetch(`${CONFIG.BACKEND_URL}/jornada/download/${fileName}`, { headers: { ...authHeaders() } });
+    if (r.status === 404) { alert('Arquivo ainda não está disponível para download.'); return; }
+    if (r.status === 401 || r.status === 403) {
+      const ok = await ensureToken();
+      if (!ok) throw new Error('Sessão inválida e token público indisponível.');
+      r = await fetch(`${CONFIG.BACKEND_URL}/jornada/download/${fileName}`, { headers: { ...authHeaders() } });
+      if (r.status === 404) { alert('Arquivo ainda não está disponível para download.'); return; }
+    }
+    if (!r.ok) throw new Error(`Falha no download (${r.status})`);
+    const blob = await r.blob();
+    downloadBlob(fileName, blob);
+  } catch (e) {
+    alert(e.message || 'Não foi possível baixar o arquivo.');
+  }
+}
+
+/* Progresso e validação */
+function answeredCount(){
+  const root = pickFormRoot();
+  let count = 0;
+  QUESTIONS_META.forEach(q => {
+    const els = root.querySelectorAll(`[name="${q.id}"],#${q.id}`);
+    let val = '';
+    if (q.kind === 'checkbox') {
+      const any = [...els].some(el => el.checked);
+      if (any) count++;
+    } else if (q.kind === 'radio') {
+      const r = root.querySelector(`input[type="radio"][name="${q.id}"]:checked`);
+      if (r) count++;
+    } else {
+      const el = els[0];
+      if (el && (el.value || '').trim() !== '') count++;
+    }
+  });
+  return count;
+}
+
+function missingRequired(){
+  const root = pickFormRoot();
+  const missing = [];
+  QUESTIONS_META.forEach(q => {
+    if (!q.required) return;
+    const els = root.querySelectorAll(`[name="${q.id}"],#${q.id}`);
+    let ok = false;
+    if (q.kind === 'checkbox') {
+      ok = [...els].some(el => el.checked);
+    } else if (q.kind === 'radio') {
+      ok = !!root.querySelector(`input[type="radio"][name="${q.id}"]:checked`);
+    } else {
+      const el = els[0];
+      ok = !!(el && (el.value || '').trim());
+    }
+    if (!ok) missing.push(q.id);
+  });
+  return missing;
+}
+
+function updateProgressUI(){
+  const bar = pickProgress();
+  const done = answeredCount();
+  bar.textContent = `Respondidas ${done}/${TOTAL}`;
+  const btn = pickSendButton();
+  if (!btn) return;
+  const pend = missingRequired().length;
+  if (pend > 0) {
+    btn.disabled = false; // permite enviar mesmo assim? se quiser bloquear: true
+    btn.textContent = `Enviar respostas (faltam ${pend})`;
+  } else {
+    btn.disabled = false;
+    btn.textContent = 'Enviar respostas';
+  }
+}
+
+/* Render */
+function renderDownloadButtons(root) {
+  const btnPanel = h('div', { class: 'mt-6 flex flex-col sm:flex-row gap-4' },
+    h('button', {
+      id: CONFIG.DOWNLOAD_BUTTON_FORM.slice(1),
+      type: 'button',
+      class: 'w-full sm:w-1/2 px-6 py-3 border border-gray-300 rounded-xl text-center text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors',
+    }, 'Baixar Formulário da Jornada'),
+    h('button', {
+      id: CONFIG.DOWNLOAD_BUTTON_HQ.slice(1),
+      type: 'button',
+      class: 'w-full sm:w-1/2 px-6 py-3 border border-gray-300 rounded-xl text-center text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors',
+    }, 'Baixar HQ da Irmandade')
+  );
+
+  btnPanel.addEventListener('click', (ev) => {
+    const t = ev.target;
+    if (!t) return;
+    if (t.id === CONFIG.DOWNLOAD_BUTTON_FORM.slice(1)) {
+      ev.preventDefault(); downloadWithAuth('formulario.pdf');
+    } else if (t.id === CONFIG.DOWNLOAD_BUTTON_HQ.slice(1)) {
+      ev.preventDefault(); downloadWithAuth('hq.pdf');
+    }
+  });
+
+  root.appendChild(btnPanel);
+}
+
+/* API */
+async function fetchQuestions() {
+  // Não chama ensureToken aqui se FORCE_LOGIN=true — o login cuidará do token
+  let r = await fetch(`${CONFIG.BACKEND_URL}/jornada/questions`, { headers: { ...authHeaders() } });
+  if (r.status === 401 || r.status === 403) {
+    // se quiser fallback automático mesmo sem login, desative FORCE_LOGIN
+    if (!CONFIG.FORCE_LOGIN) {
+      const ok = await ensureToken();
+      if (!ok) throw new Error('Sessão inválida/expirada');
+      r = await fetch(`${CONFIG.BACKEND_URL}/jornada/questions`, { headers: { ...authHeaders() } });
+    } else {
+      throw new Error('Sessão inválida/expirada');
+    }
+  }
+  if (!r.ok) throw new Error(`Falha ao obter perguntas (${r.status})`);
+  return r.json();
+}
+
+function renderQuestions(root, payload){
+  QUESTIONS_META = payload.questions.map(q => ({ id: q.id, required: !!q.required, kind: q.kind }));
+  TOTAL = payload.questions.length
