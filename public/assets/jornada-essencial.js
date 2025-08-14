@@ -1,14 +1,23 @@
-/* jornada.js – v8.1 (resiliente + fallback token público + download com Authorization) */
+/* jornada.js – v8.2
+   - Tela de login sempre (FORCE_LOGIN)
+   - Progresso (respondidas/total)
+   - Validação das obrigatórias no botão Enviar (mostra faltantes)
+   - Downloads com Authorization e tratamento de 404
+*/
 const CONFIG = {
-  BUILD: '2025-08-14-1', // Versão atualizada
+  BUILD: '2025-08-14-2',
   BACKEND_URL: 'https://lumen-backend-api.onrender.com',
 
-  // IDs (usados se existirem)
+  // Controle de fluxo
+  FORCE_LOGIN: true, // força clicar "Iniciar" antes de carregar perguntas
+
+  // IDs (se existirem no HTML)
   PASSWORD_INPUT: '#senha-acesso',
   START_BUTTON: '#btn-iniciar',
   FORM_ROOT_SELECTOR: '#form-root',
   DEVOLUTIVA_SELECTOR: '#devolutiva',
   SEND_BUTTON_SELECTOR: '#btn-enviar-oficial',
+  PROGRESS_SELECTOR: '#icl-progress',
 
   // IDs para os downloads
   DOWNLOAD_BUTTON_FORM: '#btn-download-form',
@@ -35,8 +44,10 @@ const CONFIG = {
 const store = {
   set(k, v){ sessionStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v)); },
   get(k){ const v = sessionStorage.getItem(k); try { return JSON.parse(v); } catch { return v; } },
-  del(k){ sessionStorage.removeItem(k); }
+  del(k){ sessionStorage.removeItem(k); },
+  has(k){ return sessionStorage.getItem(k) != null; }
 };
+
 function h(tag, attrs = {}, ...children) {
   const el = document.createElement(tag);
   for (const [k,v] of Object.entries(attrs||{})) {
@@ -45,11 +56,13 @@ function h(tag, attrs = {}, ...children) {
   children.flat().forEach(c => el.appendChild(typeof c==='string' ? document.createTextNode(c) : c));
   return el;
 }
+
 function byText(root, tag, textLike){
   const needle = (textLike || '').toLowerCase();
   return [...(root||document).querySelectorAll(tag)]
     .find(el => (el.textContent||'').trim().toLowerCase().includes(needle));
 }
+
 function pickPasswordInput(){
   return document.querySelector(CONFIG.PASSWORD_INPUT) || document.querySelector('input[type="password"]');
 }
@@ -74,11 +87,23 @@ function pickDevolutivaBox(){
     document.body.appendChild(div); return div;
   })();
 }
+function pickProgress(){
+  return document.querySelector(CONFIG.PROGRESS_SELECTOR) || (() => {
+    const bar = h('div', { id: 'icl-progress', class: 'max-w-3xl mx-auto px-4 py-2 text-sm text-gray-300' }, '');
+    const root = pickFormRoot();
+    root.parentNode.insertBefore(bar, root);
+    return bar;
+  })();
+}
 function authHeaders(){ const t = store.get('icl:token'); return t ? { Authorization:`Bearer ${t}` } : {}; }
 
-/* --- NOVAS FUNÇÕES --- */
+/* Estado em memória */
+let QUESTIONS_META = []; // [{id, required, kind}, ...]
+let TOTAL = 0;
 
-// Adiciona o botão de "olho mágico" ao campo de senha
+/* --- Funções extras --- */
+
+// Olho mágico
 function addPasswordToggle(input) {
   const container = input.parentNode || input.closest('div') || input;
   container.style.position = 'relative';
@@ -134,10 +159,12 @@ function downloadBlob(filename, blob){
 async function downloadWithAuth(fileName){
   try {
     let r = await fetch(`${CONFIG.BACKEND_URL}/jornada/download/${fileName}`, { headers: { ...authHeaders() } });
+    if (r.status === 404) { alert('Arquivo ainda não está disponível para download.'); return; }
     if (r.status === 401 || r.status === 403) {
       const ok = await ensureToken();
       if (!ok) throw new Error('Sessão inválida e token público indisponível.');
       r = await fetch(`${CONFIG.BACKEND_URL}/jornada/download/${fileName}`, { headers: { ...authHeaders() } });
+      if (r.status === 404) { alert('Arquivo ainda não está disponível para download.'); return; }
     }
     if (!r.ok) throw new Error(`Falha no download (${r.status})`);
     const blob = await r.blob();
@@ -147,7 +174,64 @@ async function downloadWithAuth(fileName){
   }
 }
 
-// Renderiza os botões de download (agora como <button> com fetch + header)
+/* Progresso e validação */
+function answeredCount(){
+  const root = pickFormRoot();
+  let count = 0;
+  QUESTIONS_META.forEach(q => {
+    const els = root.querySelectorAll(`[name="${q.id}"],#${q.id}`);
+    let val = '';
+    if (q.kind === 'checkbox') {
+      const any = [...els].some(el => el.checked);
+      if (any) count++;
+    } else if (q.kind === 'radio') {
+      const r = root.querySelector(`input[type="radio"][name="${q.id}"]:checked`);
+      if (r) count++;
+    } else {
+      const el = els[0];
+      if (el && (el.value || '').trim() !== '') count++;
+    }
+  });
+  return count;
+}
+
+function missingRequired(){
+  const root = pickFormRoot();
+  const missing = [];
+  QUESTIONS_META.forEach(q => {
+    if (!q.required) return;
+    const els = root.querySelectorAll(`[name="${q.id}"],#${q.id}`);
+    let ok = false;
+    if (q.kind === 'checkbox') {
+      ok = [...els].some(el => el.checked);
+    } else if (q.kind === 'radio') {
+      ok = !!root.querySelector(`input[type="radio"][name="${q.id}"]:checked`);
+    } else {
+      const el = els[0];
+      ok = !!(el && (el.value || '').trim());
+    }
+    if (!ok) missing.push(q.id);
+  });
+  return missing;
+}
+
+function updateProgressUI(){
+  const bar = pickProgress();
+  const done = answeredCount();
+  bar.textContent = `Respondidas ${done}/${TOTAL}`;
+  const btn = pickSendButton();
+  if (!btn) return;
+  const pend = missingRequired().length;
+  if (pend > 0) {
+    btn.disabled = false; // permite enviar mesmo assim? se quiser bloquear: true
+    btn.textContent = `Enviar respostas (faltam ${pend})`;
+  } else {
+    btn.disabled = false;
+    btn.textContent = 'Enviar respostas';
+  }
+}
+
+/* Render */
 function renderDownloadButtons(root) {
   const btnPanel = h('div', { class: 'mt-6 flex flex-col sm:flex-row gap-4' },
     h('button', {
@@ -175,143 +259,24 @@ function renderDownloadButtons(root) {
   root.appendChild(btnPanel);
 }
 
-/* Login */
-async function doLogin() {
-  const input = pickPasswordInput();
-  const btn = pickStartButton();
-  if (!btn) {
-    console.error('[Lumen] Botão Iniciar não encontrado.');
-    alert('Não achei o botão Iniciar.');
-    return;
-  }
-
-  if (input) addPasswordToggle(input);
-  const pwd = (input && input.value || '').trim();
-  const original = btn.textContent; btn.disabled = true; btn.textContent = 'Validando…';
-
-  try {
-    // 1) Se tiver senha, tenta /validar-senha
-    if (pwd) {
-      const res = await fetch(`${CONFIG.BACKEND_URL}/validar-senha`, {
-        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ senha: pwd })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        store.set('icl:token', data.token); store.set('icl:deadline', data.deadline_iso);
-        console.info('[Lumen] Login OK. Deadline:', data.deadline_iso);
-        await bootQuestions();
-        return;
-      }
-      console.warn('[Lumen] validar-senha falhou; tentando token público…');
-    }
-
-    // 2) Sem senha (ou falhou), tenta /public/token
-    const t = await getPublicToken();
-    if (!t) throw new Error('Falha ao obter acesso. Tente novamente.');
-    await bootQuestions();
-  } catch (e) {
-    console.error('[Lumen] Auth erro:', e);
-    alert(e.message || 'Falha ao validar acesso');
-  } finally {
-    btn.disabled = false; btn.textContent = original;
-  }
-}
-document.addEventListener('click', ev => {
-  const t = ev.target; if (!t) return;
-  const startBtn = pickStartButton();
-  if (startBtn && (t === startBtn || t.closest('#btn-iniciar'))) { ev.preventDefault(); doLogin(); }
-});
-
-/* Perguntas */
+/* API */
 async function fetchQuestions() {
+  // Não chama ensureToken aqui se FORCE_LOGIN=true — o login cuidará do token
   let r = await fetch(`${CONFIG.BACKEND_URL}/jornada/questions`, { headers: { ...authHeaders() } });
   if (r.status === 401 || r.status === 403) {
-    const ok = await ensureToken();
-    if (!ok) throw new Error('Sessão inválida/expirada');
-    r = await fetch(`${CONFIG.BACKEND_URL}/jornada/questions`, { headers: { ...authHeaders() } });
+    // se quiser fallback automático mesmo sem login, desative FORCE_LOGIN
+    if (!CONFIG.FORCE_LOGIN) {
+      const ok = await ensureToken();
+      if (!ok) throw new Error('Sessão inválida/expirada');
+      r = await fetch(`${CONFIG.BACKEND_URL}/jornada/questions`, { headers: { ...authHeaders() } });
+    } else {
+      throw new Error('Sessão inválida/expirada');
+    }
   }
   if (!r.ok) throw new Error(`Falha ao obter perguntas (${r.status})`);
   return r.json();
 }
 
 function renderQuestions(root, payload){
-  root.innerHTML=''; const form = h('form',{id:'form-jornada',class:'space-y-6'});
-  let cur=null, sec=null;
-  payload.questions.forEach(q=>{
-    if(q.section!==cur){ cur=q.section;
-      sec=h('section',{class:'bg-white rounded-2xl shadow p-6'},
-        h('h2',{class:'text-xl font-semibold mb-4'}, q.section||''));
-      form.appendChild(sec);
-    }
-    const wrap=h('div',{class:'mb-4'});
-    wrap.appendChild(h('label',{class:'block text-sm text-gray-700',for:q.id}, q.label));
-    if(q.help) wrap.appendChild(h('div',{class:'text-xs text-gray-500 mt-1'}, q.help));
-    const base={id:q.id,name:q.id,class:'mt-1 w-full rounded-xl border-gray-300'};
-    let input;
-    if(q.kind==='textarea') input=h('textarea',{...base,rows:'3',placeholder:q.placeholder||''});
-    else if(q.kind==='select') input=h('select',base, h('option',{value:''},'Selecione…'), ...(q.options||[]).map(o=>h('option',{value:o.value},o.label)));
-    else if(q.kind==='radio') input=h('div',{class:'mt-1 flex flex-wrap gap-3'}, ...(q.options||[]).map(o=>h('label',{class:'inline-flex items-center gap-2'}, h('input',{type:'radio',name:q.id,value:o.value}), o.label)));
-    else if(q.kind==='checkbox') input=h('div',{class:'mt-1 flex flex-wrap gap-3'}, ...(q.options||[]).map(o=>h('label',{class:'inline-flex items-center gap-2'}, h('input',{type:'checkbox',name:q.id,value:o.value}), o.label)));
-    else input=h('input',{...base,type:'text',placeholder:q.placeholder||''});
-    wrap.appendChild(input); (sec||form).appendChild(wrap);
-  });
-  root.appendChild(form);
-}
-
-async function bootQuestions(){
-  const root = pickFormRoot();
-  try {
-    const payload = await fetchQuestions();
-    renderQuestions(root, payload);
-    console.info('[Lumen] Perguntas renderizadas:', payload.questions.length);
-  } catch(e) {
-    console.error('[Lumen] Erro ao carregar perguntas:', e);
-    alert('Não foi possível carregar as perguntas. Tente iniciar novamente.');
-  }
-}
-
-/* Submit + devolutiva */
-function collectAnswers(root=document){
-  const a={}; root.querySelectorAll('input,textarea,select').forEach(el=>{
-    const n=el.name||el.id; if(!n) return;
-    if(el.type==='checkbox'){ a[n]=a[n]||[]; if(el.checked) a[n].push(el.value||true); }
-    else if(el.type==='radio'){ if(el.checked) a[n]=el.value; else if(!(n in a)) a[n]=''; }
-    else { a[n]=el.value; }
-  }); return a;
-}
-
-async function submitAnswers(){
-  const root = pickFormRoot();
-  const payload={answers:collectAnswers(root), meta:{tzOffsetMin:new Date().getTimezoneOffset(), ua:navigator.userAgent}};
-  let r = await fetch(`${CONFIG.BACKEND_URL}/jornada/submit`, {method:'POST', headers:{'Content-Type':'application/json', ...authHeaders()}, body:JSON.stringify(payload)});
-  if (r.status===401||r.status===403) {
-    const ok = await ensureToken();
-    if (!ok) { alert('Sessão expirada. Faça login novamente.'); return; }
-    r = await fetch(`${CONFIG.BACKEND_URL}/jornada/submit`, {method:'POST', headers:{'Content-Type':'application/json', ...authHeaders()}, body:JSON.stringify(payload)});
-  }
-  if (!r.ok) { alert('Falha ao enviar.'); return; }
-  const d= await r.json();
-  const box = pickDevolutivaBox();
-  box.innerHTML='';
-  box.appendChild(h('div',{class:'bg-white rounded-2xl shadow p-6 prose max-w-none'},
-    h('h3',{class:'text-xl font-semibold mb-2'},'Devolutiva do Lumen'),
-    h('pre',{class:'whitespace-pre-wrap leading-relaxed'}, d.devolutiva || '—')
-  ));
-  // Botões de download autenticados
-  renderDownloadButtons(box);
-  box.scrollIntoView({behavior:'smooth',block:'start'});
-}
-
-/* Wire do botão Enviar (por ID ou por texto) */
-document.addEventListener('click', async ev=>{
-  const t = ev.target; if (!t) return;
-  const sendBtn = pickSendButton();
-  if (sendBtn && (t===sendBtn || t.closest('#btn-enviar-oficial'))) {
-    ev.preventDefault();
-    const original = sendBtn.textContent; sendBtn.textContent = 'Enviando…';
-    try { await submitAnswers(); } finally { sendBtn.textContent = original; }
-  }
-});
-
-/* Boot automático se já houver token (ou modo aberto com retry) */
-(async ()=>{ try { await bootQuestions(); } catch(_){} })();
+  QUESTIONS_META = payload.questions.map(q => ({ id: q.id, required: !!q.required, kind: q.kind }));
+  TOTAL = payload.questions.length
