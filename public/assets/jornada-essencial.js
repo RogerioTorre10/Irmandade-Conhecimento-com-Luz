@@ -408,33 +408,46 @@ function clearCurrentAnswer(){
   const section = root.querySelector('section');
   if (!section) return;
 
-  // checkbox
-  if (q.kind === 'checkbox') {
-    section.querySelectorAll(`input[type="checkbox"][name="${q.id}"]`).forEach(el => {
-      el.checked = false;
-      el.dispatchEvent(new Event('input', {bubbles:true}));
-    });
-  }
-  // radio
-  else if (q.kind === 'radio') {
-    section.querySelectorAll(`input[type="radio"][name="${q.id}"]`).forEach(el => {
-      el.checked = false;
-      el.dispatchEvent(new Event('input', {bubbles:true}));
-    });
-  }
-  // texto, textarea, select...
-  else {
-    const el = section.querySelector(`#${q.id}`);
-    if (el) {
-      el.value = '';
-      el.dispatchEvent(new Event('input', {bubbles:true}));
-    }
-  }
-
-  // limpa no array de respostas também
+  // limpa no objeto de respostas
   ANSWERS[q.id] = (q.kind === 'checkbox') ? [] : '';
 
+  // limpa visualmente no DOM
+  if (q.kind === 'checkbox') {
+    section.querySelectorAll(`input[type="checkbox"][name="${q.id}"]`).forEach(cb => {
+      cb.checked = false;
+    });
+  } else if (q.kind === 'radio') {
+    section.querySelectorAll(`input[type="radio"][name="${q.id}"]`).forEach(r => {
+      r.checked = false;
+    });
+  } else {
+    const el = section.querySelector('#' + q.id);
+    if (el) el.value = '';
+  }
+
   updateProgressUI();
+}
+
+/* Liga o botão "Apagar resposta" */
+function wireClearButton(){
+  const textos = ['apagar resposta','limpar resposta','limpar respostas'];
+  let btn = document.querySelector('#btn-limpar-oficial');
+  if (!btn) {
+    btn = [...document.querySelectorAll('button')].find(b =>
+      textos.some(t => (b.textContent||'').toLowerCase().includes(t))
+    );
+  }
+  if (!btn || btn.dataset.iclWired === '1') return;
+
+  try { btn.type = 'button'; } catch(_) {}
+  btn.textContent = 'Apagar resposta';
+  btn.dataset.iclWired = '1';
+
+  btn.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+    clearCurrentAnswer();
+  });
 }
 
 /* Login */
