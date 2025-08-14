@@ -1,28 +1,28 @@
-/* jornada.js – v9.2 (wizard paginado + countdown + dark + contador sticky + “Apagar resposta” só a atual) */
+/* jornada.js – v9.3 (wizard + countdown + dark + contador extra + “Apagar resposta”) */
 const CONFIG = {
-  BUILD: '2025-08-14-9.2',
+  BUILD: '2025-08-14-9.3',
   BACKEND_URL: 'https://lumen-backend-api.onrender.com',
 
   FORCE_LOGIN: true,
 
-  // Seletores (se existir ID no HTML, usamos; senão criamos)
+  // Seletores
   PASSWORD_INPUT: '#senha-acesso',
   START_BUTTON: '#btn-iniciar',
   FORM_ROOT_SELECTOR: '#form-root',
   DEVOLUTIVA_SELECTOR: '#devolutiva',
 
-  // Rodapé do seu HTML
-  SEND_BUTTON_SELECTOR: '#btn-enviar-oficial',   // botão do rodapé (fica oculto até o final do wizard)
-  CLEAR_BUTTON_SELECTOR: '#btn-limpar-oficial',  // botão do rodapé para limpar a resposta atual
+  // Rodapé do HTML
+  SEND_BUTTON_SELECTOR: '#btn-enviar-oficial',   // oculto até o fim do wizard
+  CLEAR_BUTTON_SELECTOR: '#btn-limpar-oficial',  // botão para limpar a resposta ATUAL
   START_TEXT: 'iniciar',
   SEND_TEXT: 'enviar respostas',
-  CLEAR_TEXT: 'limpar respostas',
+  CLEAR_TEXT: 'apagar resposta',                 // <<< agora buscamos esse texto
 
   // Indicadores
   PROGRESS_SELECTOR: '#icl-progress',
   COUNTDOWN_SELECTOR: '#icl-countdown',
 
-  // Downloads (mostrados após devolutiva)
+  // Downloads (após a devolutiva)
   DOWNLOAD_BUTTON_FORM: '#btn-download-form',
   DOWNLOAD_BUTTON_HQ: '#btn-download-hq',
 };
@@ -62,7 +62,12 @@ function byText(root, tag, textLike){
 function pickPasswordInput(){ return document.querySelector(CONFIG.PASSWORD_INPUT) || document.querySelector('input[type="password"]'); }
 function pickStartButton(){ return document.querySelector(CONFIG.START_BUTTON) || byText(document, 'button', CONFIG.START_TEXT); }
 function pickSendButton(){ return document.querySelector(CONFIG.SEND_BUTTON_SELECTOR) || byText(document, 'button', CONFIG.SEND_TEXT); }
-function pickClearButton(){ return document.querySelector(CONFIG.CLEAR_BUTTON_SELECTOR) || byText(document, 'button', CONFIG.CLEAR_TEXT); }
+function pickClearButton(){
+  // tenta por ID; se não, procura por texto "apagar resposta"
+  return document.querySelector(CONFIG.CLEAR_BUTTON_SELECTOR)
+      || byText(document, 'button', CONFIG.CLEAR_TEXT)
+      || byText(document, 'button', 'apagar resposta');
+}
 function pickFormRoot(){
   return document.querySelector(CONFIG.FORM_ROOT_SELECTOR) || (() => {
     const panel = byText(document, 'button', CONFIG.START_TEXT)?.closest('div') || document.body;
@@ -94,10 +99,6 @@ function pickCountdown(){
   })();
 }
 function authHeaders(){ const t = store.get('icl:token'); return t ? { Authorization:`Bearer ${t}` } : {}; }
-function ensureClearButtonLabel(){
-  const clearBtn = pickClearButton();
-  if (clearBtn) clearBtn.textContent = 'Apagar resposta';
-}
 
 /* 2) Estado do wizard */
 let QUESTIONS = [];
@@ -106,7 +107,7 @@ let TOTAL = 0;
 let ANSWERS = {};
 let countdownTimer = null;
 
-/* 3) Dark mode + contador sticky */
+/* 3) Estilos (dark + barra sticky) */
 (function injectDarkStyle(){
   const css = `
   #form-root input[type="text"],
@@ -121,7 +122,6 @@ let countdownTimer = null;
   #form-root input::placeholder,
   #form-root textarea::placeholder { color: #9ca3af; }
 
-  /* Barra de progresso mais visível e fixa no topo */
   #icl-progress {
     position: sticky;
     top: 0;
@@ -135,7 +135,6 @@ let countdownTimer = null;
     border-bottom: 1px solid rgba(253,230,138,0.25);
     border-radius: 0 0 .75rem .75rem;
   }
-
   #icl-countdown { color: #fcd34d; }
 
   .btn-yellow { background:#fbbf24; color:#111827; }
@@ -273,6 +272,9 @@ function bindAndLoadValue(container, q){
       ANSWERS[q.id] = el ? el.value : '';
     }
     updateProgressUI();
+    // atualiza também o contador inline
+    const inline = container.querySelector('[data-inline-progress]');
+    if (inline) inline.textContent = `Pergunta ${IDX+1}/${TOTAL} • Respondidas ${answeredCount()}/${TOTAL}`;
   };
   container.addEventListener('input', (ev)=>{ const t = ev.target; if (!t) return; if (t.name===q.id || t.id===q.id) apply(); }, true);
   const v = ANSWERS[q.id]; if (v == null) return;
@@ -291,6 +293,11 @@ function renderOneQuestion(root){
   root.innerHTML = '';
 
   const section = h('section',{class:'card p-6 space-y-4'});
+
+  // contador inline (além da barra sticky)
+  section.appendChild(h('div',{ 'data-inline-progress':'1', class:'text-sm text-yellow-300' },
+    `Pergunta ${IDX+1}/${TOTAL} • Respondidas ${answeredCount()}/${TOTAL}`));
+
   section.appendChild(h('h2',{class:'text-xl font-semibold text-gray-100'}, q.section || ''));
   section.appendChild(h('div',{class:'text-base font-medium text-gray-100'}, q.label));
   if (q.help) section.appendChild(h('div',{class:'text-xs text-gray-300'}, q.help));
@@ -354,13 +361,13 @@ async function bootQuestions(){
     ANSWERS = ANSWERS || {};
     QUESTIONS.forEach(q=>{ if (!(q.id in ANSWERS)) ANSWERS[q.id] = (q.kind==='checkbox') ? [] : ''; });
 
-    // Esconde o botão do rodapé até o final e ajusta label do "limpar"
+    // Esconde o botão do rodapé até o final e garante texto do botão de limpar
     const footerSend = pickSendButton(); if (footerSend) footerSend.style.display = 'none';
-    ensureClearButtonLabel();
+    const clearBtn = pickClearButton(); if (clearBtn) clearBtn.textContent = 'Apagar resposta';
 
     renderOneQuestion(root);
 
-    // garante criação imediata do contador e atualização já na 1ª render
+    // cria/atualiza contador sticky já na primeira etapa
     pickProgress();
     updateProgressUI();
   } catch(e) {
@@ -391,12 +398,10 @@ async function submitAnswers(){
   box.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-/* 11) Apagar apenas a resposta ATUAL (não zera o restante) */
+/* 11) Apagar apenas a resposta ATUAL */
 function clearCurrentAnswer(){
   const q = QUESTIONS[IDX]; if (!q) return;
-  // Zera no estado
   ANSWERS[q.id] = (q.kind==='checkbox') ? [] : '';
-  // Zera nos campos visíveis dessa etapa
   const root = pickFormRoot();
   const section = root.querySelector('section');
   if (!section) return;
@@ -451,7 +456,7 @@ document.addEventListener('click', (ev)=>{
   if (clearBtn && (t===clearBtn || t.closest('#btn-limpar-oficial'))) { ev.preventDefault(); clearCurrentAnswer(); return; }
 });
 
-/* Ajusta rótulo do botão assim que carregar */
-ensureClearButtonLabel();
+/* Ajusta label do botão se vier no HTML com outro texto */
+(() => { const c = pickClearButton(); if (c) c.textContent = 'Apagar resposta'; })();
 
 /* Sem boot automático pra não pular a tela de senha */
