@@ -1,18 +1,19 @@
-/* jornada.js – v9.1 (wizard paginado + countdown + dark + limpar + botões visíveis) */
+/* jornada.js – v9.2 (wizard paginado + countdown + dark + contador sticky + “Apagar resposta” só a atual) */
 const CONFIG = {
-  BUILD: '2025-08-14-9.1',
+  BUILD: '2025-08-14-9.2',
   BACKEND_URL: 'https://lumen-backend-api.onrender.com',
 
   FORCE_LOGIN: true,
 
+  // Seletores (se existir ID no HTML, usamos; senão criamos)
   PASSWORD_INPUT: '#senha-acesso',
   START_BUTTON: '#btn-iniciar',
   FORM_ROOT_SELECTOR: '#form-root',
   DEVOLUTIVA_SELECTOR: '#devolutiva',
 
   // Rodapé do seu HTML
-  SEND_BUTTON_SELECTOR: '#btn-enviar-oficial',   // botão do rodapé (vamos esconder até o final)
-  CLEAR_BUTTON_SELECTOR: '#btn-limpar-oficial',  // se existir; senão buscamos por texto
+  SEND_BUTTON_SELECTOR: '#btn-enviar-oficial',   // botão do rodapé (fica oculto até o final do wizard)
+  CLEAR_BUTTON_SELECTOR: '#btn-limpar-oficial',  // botão do rodapé para limpar a resposta atual
   START_TEXT: 'iniciar',
   SEND_TEXT: 'enviar respostas',
   CLEAR_TEXT: 'limpar respostas',
@@ -78,7 +79,7 @@ function pickDevolutivaBox(){
 }
 function pickProgress(){
   return document.querySelector(CONFIG.PROGRESS_SELECTOR) || (() => {
-    const bar = h('div', { id: 'icl-progress', class: 'max-w-3xl mx-auto px-4 py-2 text-base font-medium' }, '');
+    const bar = h('div', { id: 'icl-progress', class: 'max-w-3xl mx-auto py-2 text-base font-semibold' }, '');
     const root = pickFormRoot();
     root.parentNode.insertBefore(bar, root);
     return bar;
@@ -93,6 +94,10 @@ function pickCountdown(){
   })();
 }
 function authHeaders(){ const t = store.get('icl:token'); return t ? { Authorization:`Bearer ${t}` } : {}; }
+function ensureClearButtonLabel(){
+  const clearBtn = pickClearButton();
+  if (clearBtn) clearBtn.textContent = 'Apagar resposta';
+}
 
 /* 2) Estado do wizard */
 let QUESTIONS = [];
@@ -101,7 +106,7 @@ let TOTAL = 0;
 let ANSWERS = {};
 let countdownTimer = null;
 
-/* 3) Dark mode: injeta estilo nos inputs para não ficarem “brancos” no tema escuro */
+/* 3) Dark mode + contador sticky */
 (function injectDarkStyle(){
   const css = `
   #form-root input[type="text"],
@@ -115,8 +120,24 @@ let countdownTimer = null;
   }
   #form-root input::placeholder,
   #form-root textarea::placeholder { color: #9ca3af; }
-  #icl-progress { color: #fde68a; }         /* amarelo visível */
-  #icl-countdown { color: #fcd34d; }        /* amarelo */
+
+  /* Barra de progresso mais visível e fixa no topo */
+  #icl-progress {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: rgba(17,24,39,0.8);
+    backdrop-filter: saturate(1.2) blur(4px);
+    color: #fde68a;
+    padding: 8px 16px;
+    margin: 0 auto;
+    max-width: 48rem;
+    border-bottom: 1px solid rgba(253,230,138,0.25);
+    border-radius: 0 0 .75rem .75rem;
+  }
+
+  #icl-countdown { color: #fcd34d; }
+
   .btn-yellow { background:#fbbf24; color:#111827; }
   .btn-yellow:hover { background:#f59e0b; }
   .btn-gray { background:#374151; color:#e5e7eb; border:1px solid #4b5563; }
@@ -333,10 +354,14 @@ async function bootQuestions(){
     ANSWERS = ANSWERS || {};
     QUESTIONS.forEach(q=>{ if (!(q.id in ANSWERS)) ANSWERS[q.id] = (q.kind==='checkbox') ? [] : ''; });
 
-    // Esconde o botão do rodapé até o final
+    // Esconde o botão do rodapé até o final e ajusta label do "limpar"
     const footerSend = pickSendButton(); if (footerSend) footerSend.style.display = 'none';
+    ensureClearButtonLabel();
 
     renderOneQuestion(root);
+
+    // garante criação imediata do contador e atualização já na 1ª render
+    pickProgress();
     updateProgressUI();
   } catch(e) {
     console.error('[Lumen] Erro ao carregar perguntas:', e);
@@ -366,18 +391,22 @@ async function submitAnswers(){
   box.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-/* 11) Limpar respostas (rodapé) */
-function clearAll(){
-  ANSWERS = {};
-  // limpa campos na etapa atual
+/* 11) Apagar apenas a resposta ATUAL (não zera o restante) */
+function clearCurrentAnswer(){
+  const q = QUESTIONS[IDX]; if (!q) return;
+  // Zera no estado
+  ANSWERS[q.id] = (q.kind==='checkbox') ? [] : '';
+  // Zera nos campos visíveis dessa etapa
   const root = pickFormRoot();
-  root.querySelectorAll('input,textarea,select').forEach(el=>{
-    if (el.type==='checkbox' || el.type==='radio') el.checked = false;
-    else el.value = '';
-  });
-  // volta para a primeira pergunta
-  IDX = 0;
-  renderOneQuestion(root);
+  const section = root.querySelector('section');
+  if (!section) return;
+  if (q.kind==='checkbox') {
+    section.querySelectorAll(`input[type="checkbox"][name="${q.id}"]`).forEach(el=> el.checked = false);
+  } else if (q.kind==='radio') {
+    section.querySelectorAll(`input[type="radio"][name="${q.id}"]`).forEach(el=> el.checked = false);
+  } else {
+    const el = section.querySelector('#'+q.id); if (el) el.value = '';
+  }
   updateProgressUI();
 }
 
@@ -419,7 +448,10 @@ document.addEventListener('click', (ev)=>{
   if (startBtn && (t===startBtn || t.closest('#btn-iniciar'))) { ev.preventDefault(); doLogin(); return; }
 
   const clearBtn = pickClearButton();
-  if (clearBtn && (t===clearBtn || t.closest('#btn-limpar-oficial'))) { ev.preventDefault(); clearAll(); return; }
+  if (clearBtn && (t===clearBtn || t.closest('#btn-limpar-oficial'))) { ev.preventDefault(); clearCurrentAnswer(); return; }
 });
 
-// Sem boot automático pra não pular a tela de senha
+/* Ajusta rótulo do botão assim que carregar */
+ensureClearButtonLabel();
+
+/* Sem boot automático pra não pular a tela de senha */
