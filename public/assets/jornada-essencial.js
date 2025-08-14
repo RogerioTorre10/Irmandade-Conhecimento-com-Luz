@@ -1,7 +1,7 @@
 /* jornada.js – v8 (resiliente a IDs) */
 const CONFIG = {
-  BUILD: '2025-08-13-8',
-  BACKEND_URL: 'https://lumen-backend-api.onrender.com', // AJUSTE SE O SEU HOST FOR OUTRO
+  BUILD: '2025-08-14-1', // Versão atualizada
+  BACKEND_URL: 'https://lumen-backend-api.onrender.com',
 
   // IDs (usados se existirem)
   PASSWORD_INPUT: '#senha-acesso',
@@ -9,6 +9,10 @@ const CONFIG = {
   FORM_ROOT_SELECTOR: '#form-root',
   DEVOLUTIVA_SELECTOR: '#devolutiva',
   SEND_BUTTON_SELECTOR: '#btn-enviar-oficial',
+  
+  // Adicionado: IDs para os downloads
+  DOWNLOAD_BUTTON_FORM: '#btn-download-form',
+  DOWNLOAD_BUTTON_HQ: '#btn-download-hq',
 
   // Fallbacks por texto
   START_TEXT: 'iniciar',
@@ -72,6 +76,48 @@ function pickDevolutivaBox(){
 }
 function authHeaders(){ const t = store.get('icl:token'); return t ? { Authorization:`Bearer ${t}` } : {}; }
 
+/* --- NOVAS FUNÇÕES --- */
+
+// Adiciona o botão de "olho mágico" ao campo de senha
+function addPasswordToggle(input) {
+  const container = input.parentNode;
+  container.style.position = 'relative';
+
+  const toggleBtn = h('button', {
+    type: 'button',
+    class: 'absolute right-2 top-1/2 -translate-y-1/2 p-2 focus:outline-none text-gray-400 hover:text-gray-600',
+  }, '👁️'); // Ícone de olho mágico
+
+  toggleBtn.addEventListener('click', () => {
+    const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+    input.setAttribute('type', type);
+  });
+
+  container.appendChild(toggleBtn);
+}
+
+// Renderiza os botões de download
+function renderDownloadButtons(root) {
+  const btnPanel = h('div', { class: 'mt-6 flex flex-col sm:flex-row gap-4' },
+    h('a', {
+      id: CONFIG.DOWNLOAD_BUTTON_FORM.slice(1), // Remove o #
+      class: 'w-full sm:w-1/2 px-6 py-3 border border-gray-300 rounded-xl text-center text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors',
+      href: `${CONFIG.BACKEND_URL}/jornada/download/formulario.pdf`,
+      download: ''
+    }, 'Baixar Formulário da Jornada'),
+    h('a', {
+      id: CONFIG.DOWNLOAD_BUTTON_HQ.slice(1),
+      class: 'w-full sm:w-1/2 px-6 py-3 border border-gray-300 rounded-xl text-center text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors',
+      href: `${CONFIG.BACKEND_URL}/jornada/download/hq.pdf`,
+      download: ''
+    }, 'Baixar HQ da Irmandade')
+  );
+
+  root.appendChild(btnPanel);
+}
+
+/* FIM DAS NOVAS FUNÇÕES */
+
 /* Login */
 async function doLogin() {
   const input = pickPasswordInput();
@@ -83,6 +129,12 @@ async function doLogin() {
   }
   const pwd = (input.value||'').trim();
   if (!pwd) { alert('Digite a senha.'); return; }
+  
+  // Chamada à nova função do olho mágico
+  // Se o botão não foi adicionado ainda, adiciona
+  if (!input.parentNode.querySelector('button')) {
+    addPasswordToggle(input);
+  }
 
   const original = btn.textContent; btn.disabled = true; btn.textContent = 'Validando…';
   try {
@@ -171,6 +223,8 @@ async function submitAnswers(){
     h('h3',{class:'text-xl font-semibold mb-2'},'Devolutiva do Lumen'),
     h('pre',{class:'whitespace-pre-wrap leading-relaxed'}, d.devolutiva || '—')
   ));
+  // Novo trecho: adiciona os botões de download após a devolutiva
+  renderDownloadButtons(box);
   box.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
@@ -187,3 +241,4 @@ document.addEventListener('click', async ev=>{
 
 /* Boot automático se já houver token */
 (async ()=>{ try { await bootQuestions(); } catch(_){} })();
+
