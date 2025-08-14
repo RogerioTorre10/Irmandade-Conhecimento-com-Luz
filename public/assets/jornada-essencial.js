@@ -241,4 +241,3 @@ document.addEventListener('click', async ev=>{
 
 /* Boot automático se já houver token */
 (async ()=>{ try { await bootQuestions(); } catch(_){} })();
-
