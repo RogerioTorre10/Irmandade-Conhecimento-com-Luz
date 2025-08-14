@@ -138,10 +138,10 @@ async function doLogin() {
 
   const original = btn.textContent; btn.disabled = true; btn.textContent = 'Validando…';
   try {
-   // Código corrigido para funcionar com o main.py
-const res = await fetch(`${CONFIG.BACKEND_URL}/validar-senha`, {
-  method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ senha: pwd })
-});
+    // CORREÇÃO AQUI: Mudando a URL e o nome da chave para 'senha'
+    const res = await fetch(`${CONFIG.BACKEND_URL}/validar-senha`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ senha: pwd })
+    });
     if (!res.ok) {
       const e = await res.json().catch(()=>({})); throw new Error(e.detail || `Falha no auth (${res.status})`);
     }
