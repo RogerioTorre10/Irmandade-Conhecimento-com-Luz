@@ -1,4 +1,4 @@
-/* jornada.js – v8 (resiliente a IDs) */
+/* jornada.js – v8.1 (resiliente + fallback token público + download com Authorization) */
 const CONFIG = {
   BUILD: '2025-08-14-1', // Versão atualizada
   BACKEND_URL: 'https://lumen-backend-api.onrender.com',
@@ -9,8 +9,8 @@ const CONFIG = {
   FORM_ROOT_SELECTOR: '#form-root',
   DEVOLUTIVA_SELECTOR: '#devolutiva',
   SEND_BUTTON_SELECTOR: '#btn-enviar-oficial',
-  
-  // Adicionado: IDs para os downloads
+
+  // IDs para os downloads
   DOWNLOAD_BUTTON_FORM: '#btn-download-form',
   DOWNLOAD_BUTTON_HQ: '#btn-download-hq',
 
@@ -80,13 +80,16 @@ function authHeaders(){ const t = store.get('icl:token'); return t ? { Authoriza
 
 // Adiciona o botão de "olho mágico" ao campo de senha
 function addPasswordToggle(input) {
-  const container = input.parentNode;
+  const container = input.parentNode || input.closest('div') || input;
   container.style.position = 'relative';
+  if (container.querySelector('[data-eye]')) return;
 
   const toggleBtn = h('button', {
     type: 'button',
+    'data-eye': '1',
     class: 'absolute right-2 top-1/2 -translate-y-1/2 p-2 focus:outline-none text-gray-400 hover:text-gray-600',
-  }, '👁️'); // Ícone de olho mágico
+    'aria-label': 'mostrar/ocultar senha',
+  }, '👁️');
 
   toggleBtn.addEventListener('click', () => {
     const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -96,78 +99,141 @@ function addPasswordToggle(input) {
   container.appendChild(toggleBtn);
 }
 
-// Renderiza os botões de download
+// Token público (modo aberto)
+async function getPublicToken(){
+  try {
+    const r = await fetch(`${CONFIG.BACKEND_URL}/public/token`, { method: 'POST' });
+    if (!r.ok) throw new Error('public token indisponível');
+    const d = await r.json();
+    if (d && d.token) {
+      store.set('icl:token', d.token);
+      store.set('icl:deadline', d.deadline_iso || '');
+      console.info('[Lumen] Token público obtido.');
+      return d.token;
+    }
+  } catch (e) {
+    console.warn('[Lumen] Falha ao obter token público:', e);
+  }
+  return null;
+}
+
+async function ensureToken(){
+  if (store.get('icl:token')) return true;
+  const t = await getPublicToken();
+  return !!t;
+}
+
+function downloadBlob(filename, blob){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  a.remove(); URL.revokeObjectURL(url);
+}
+
+async function downloadWithAuth(fileName){
+  try {
+    let r = await fetch(`${CONFIG.BACKEND_URL}/jornada/download/${fileName}`, { headers: { ...authHeaders() } });
+    if (r.status === 401 || r.status === 403) {
+      const ok = await ensureToken();
+      if (!ok) throw new Error('Sessão inválida e token público indisponível.');
+      r = await fetch(`${CONFIG.BACKEND_URL}/jornada/download/${fileName}`, { headers: { ...authHeaders() } });
+    }
+    if (!r.ok) throw new Error(`Falha no download (${r.status})`);
+    const blob = await r.blob();
+    downloadBlob(fileName, blob);
+  } catch (e) {
+    alert(e.message || 'Não foi possível baixar o arquivo.');
+  }
+}
+
+// Renderiza os botões de download (agora como <button> com fetch + header)
 function renderDownloadButtons(root) {
   const btnPanel = h('div', { class: 'mt-6 flex flex-col sm:flex-row gap-4' },
-    h('a', {
-      id: CONFIG.DOWNLOAD_BUTTON_FORM.slice(1), // Remove o #
+    h('button', {
+      id: CONFIG.DOWNLOAD_BUTTON_FORM.slice(1),
+      type: 'button',
       class: 'w-full sm:w-1/2 px-6 py-3 border border-gray-300 rounded-xl text-center text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors',
-      href: `${CONFIG.BACKEND_URL}/jornada/download/formulario.pdf`,
-      download: ''
     }, 'Baixar Formulário da Jornada'),
-    h('a', {
+    h('button', {
       id: CONFIG.DOWNLOAD_BUTTON_HQ.slice(1),
+      type: 'button',
       class: 'w-full sm:w-1/2 px-6 py-3 border border-gray-300 rounded-xl text-center text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors',
-      href: `${CONFIG.BACKEND_URL}/jornada/download/hq.pdf`,
-      download: ''
     }, 'Baixar HQ da Irmandade')
   );
 
+  btnPanel.addEventListener('click', (ev) => {
+    const t = ev.target;
+    if (!t) return;
+    if (t.id === CONFIG.DOWNLOAD_BUTTON_FORM.slice(1)) {
+      ev.preventDefault(); downloadWithAuth('formulario.pdf');
+    } else if (t.id === CONFIG.DOWNLOAD_BUTTON_HQ.slice(1)) {
+      ev.preventDefault(); downloadWithAuth('hq.pdf');
+    }
+  });
+
   root.appendChild(btnPanel);
 }
-
-/* FIM DAS NOVAS FUNÇÕES */
 
 /* Login */
 async function doLogin() {
   const input = pickPasswordInput();
   const btn = pickStartButton();
-  if (!input || !btn) {
-    console.error('[Lumen] Elementos de login não encontrados (senha/botão). Confira o HTML.');
-    alert('Não achei o campo de senha ou o botão Iniciar.');
+  if (!btn) {
+    console.error('[Lumen] Botão Iniciar não encontrado.');
+    alert('Não achei o botão Iniciar.');
     return;
   }
-  const pwd = (input.value||'').trim();
-  if (!pwd) { alert('Digite a senha.'); return; }
-  
-  // Chamada à nova função do olho mágico
-  // Se o botão não foi adicionado ainda, adiciona
-  if (!input.parentNode.querySelector('button')) {
-    addPasswordToggle(input);
-  }
 
+  if (input) addPasswordToggle(input);
+  const pwd = (input && input.value || '').trim();
   const original = btn.textContent; btn.disabled = true; btn.textContent = 'Validando…';
+
   try {
-    // CORREÇÃO AQUI: Mudando a URL e o nome da chave para 'senha'
-    const res = await fetch(`${CONFIG.BACKEND_URL}/validar-senha`, {
-      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ senha: pwd })
-    });
-    if (!res.ok) {
-      const e = await res.json().catch(()=>({})); throw new Error(e.detail || `Falha no auth (${res.status})`);
+    // 1) Se tiver senha, tenta /validar-senha
+    if (pwd) {
+      const res = await fetch(`${CONFIG.BACKEND_URL}/validar-senha`, {
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ senha: pwd })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        store.set('icl:token', data.token); store.set('icl:deadline', data.deadline_iso);
+        console.info('[Lumen] Login OK. Deadline:', data.deadline_iso);
+        await bootQuestions();
+        return;
+      }
+      console.warn('[Lumen] validar-senha falhou; tentando token público…');
     }
-    const data = await res.json();
-    store.set('icl:token', data.token); store.set('icl:deadline', data.deadline_iso);
-    console.info('[Lumen] Login OK. Deadline:', data.deadline_iso);
+
+    // 2) Sem senha (ou falhou), tenta /public/token
+    const t = await getPublicToken();
+    if (!t) throw new Error('Falha ao obter acesso. Tente novamente.');
     await bootQuestions();
   } catch (e) {
     console.error('[Lumen] Auth erro:', e);
-    alert(e.message || 'Falha ao validar senha');
+    alert(e.message || 'Falha ao validar acesso');
   } finally {
     btn.disabled = false; btn.textContent = original;
   }
 }
 document.addEventListener('click', ev => {
   const t = ev.target; if (!t) return;
-  if (t === pickStartButton() || t.closest('#btn-iniciar')) { ev.preventDefault(); doLogin(); }
+  const startBtn = pickStartButton();
+  if (startBtn && (t === startBtn || t.closest('#btn-iniciar'))) { ev.preventDefault(); doLogin(); }
 });
 
 /* Perguntas */
 async function fetchQuestions() {
-  const r = await fetch(`${CONFIG.BACKEND_URL}/jornada/questions`, { headers: { ...authHeaders() } });
-  if (r.status === 401 || r.status === 403) throw new Error('Sessão inválida/expirada');
+  let r = await fetch(`${CONFIG.BACKEND_URL}/jornada/questions`, { headers: { ...authHeaders() } });
+  if (r.status === 401 || r.status === 403) {
+    const ok = await ensureToken();
+    if (!ok) throw new Error('Sessão inválida/expirada');
+    r = await fetch(`${CONFIG.BACKEND_URL}/jornada/questions`, { headers: { ...authHeaders() } });
+  }
   if (!r.ok) throw new Error(`Falha ao obter perguntas (${r.status})`);
   return r.json();
 }
+
 function renderQuestions(root, payload){
   root.innerHTML=''; const form = h('form',{id:'form-jornada',class:'space-y-6'});
   let cur=null, sec=null;
@@ -191,6 +257,7 @@ function renderQuestions(root, payload){
   });
   root.appendChild(form);
 }
+
 async function bootQuestions(){
   const root = pickFormRoot();
   try {
@@ -199,6 +266,7 @@ async function bootQuestions(){
     console.info('[Lumen] Perguntas renderizadas:', payload.questions.length);
   } catch(e) {
     console.error('[Lumen] Erro ao carregar perguntas:', e);
+    alert('Não foi possível carregar as perguntas. Tente iniciar novamente.');
   }
 }
 
@@ -211,11 +279,16 @@ function collectAnswers(root=document){
     else { a[n]=el.value; }
   }); return a;
 }
+
 async function submitAnswers(){
   const root = pickFormRoot();
   const payload={answers:collectAnswers(root), meta:{tzOffsetMin:new Date().getTimezoneOffset(), ua:navigator.userAgent}};
-  const r= await fetch(`${CONFIG.BACKEND_URL}/jornada/submit`, {method:'POST', headers:{'Content-Type':'application/json', ...authHeaders()}, body:JSON.stringify(payload)});
-  if (r.status===401||r.status===403) { alert('Sessão expirada. Faça login novamente.'); return; }
+  let r = await fetch(`${CONFIG.BACKEND_URL}/jornada/submit`, {method:'POST', headers:{'Content-Type':'application/json', ...authHeaders()}, body:JSON.stringify(payload)});
+  if (r.status===401||r.status===403) {
+    const ok = await ensureToken();
+    if (!ok) { alert('Sessão expirada. Faça login novamente.'); return; }
+    r = await fetch(`${CONFIG.BACKEND_URL}/jornada/submit`, {method:'POST', headers:{'Content-Type':'application/json', ...authHeaders()}, body:JSON.stringify(payload)});
+  }
   if (!r.ok) { alert('Falha ao enviar.'); return; }
   const d= await r.json();
   const box = pickDevolutivaBox();
@@ -224,7 +297,7 @@ async function submitAnswers(){
     h('h3',{class:'text-xl font-semibold mb-2'},'Devolutiva do Lumen'),
     h('pre',{class:'whitespace-pre-wrap leading-relaxed'}, d.devolutiva || '—')
   ));
-  // Novo trecho: adiciona os botões de download após a devolutiva
+  // Botões de download autenticados
   renderDownloadButtons(box);
   box.scrollIntoView({behavior:'smooth',block:'start'});
 }
@@ -240,5 +313,5 @@ document.addEventListener('click', async ev=>{
   }
 });
 
-/* Boot automático se já houver token */
+/* Boot automático se já houver token (ou modo aberto com retry) */
 (async ()=>{ try { await bootQuestions(); } catch(_){} })();
