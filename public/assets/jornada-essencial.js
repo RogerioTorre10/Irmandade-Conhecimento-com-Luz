@@ -1,33 +1,28 @@
-/* jornada.js – v9.3 (wizard + countdown + dark + contador extra + “Apagar resposta”) */
+/* jornada.js – v9.6 (PDF on-the-fly via /jornada/pdf + wizard + dark + contador) */
 const CONFIG = {
-  BUILD: '2025-08-14-9.3',
+  BUILD: '2025-08-14-9.6',
   BACKEND_URL: 'https://lumen-backend-api.onrender.com',
-
   FORCE_LOGIN: true,
 
-  // Seletores
   PASSWORD_INPUT: '#senha-acesso',
   START_BUTTON: '#btn-iniciar',
   FORM_ROOT_SELECTOR: '#form-root',
   DEVOLUTIVA_SELECTOR: '#devolutiva',
 
-  // Rodapé do HTML
-  SEND_BUTTON_SELECTOR: '#btn-enviar-oficial',   // oculto até o fim do wizard
-  CLEAR_BUTTON_SELECTOR: '#btn-limpar-oficial',  // botão para limpar a resposta ATUAL
+  SEND_BUTTON_SELECTOR: '#btn-enviar-oficial',
+  CLEAR_BUTTON_SELECTOR: '#btn-limpar-oficial',
   START_TEXT: 'iniciar',
   SEND_TEXT: 'enviar respostas',
-  CLEAR_TEXT: 'apagar resposta',                 // <<< agora buscamos esse texto
+  CLEAR_TEXTS: ['apagar resposta', 'limpar resposta', 'limpar respostas'],
 
-  // Indicadores
   PROGRESS_SELECTOR: '#icl-progress',
   COUNTDOWN_SELECTOR: '#icl-countdown',
 
-  // Downloads (após a devolutiva)
   DOWNLOAD_BUTTON_FORM: '#btn-download-form',
   DOWNLOAD_BUTTON_HQ: '#btn-download-hq',
 };
 
-/* 0) Anti-cache */
+/* Anti-cache */
 (() => {
   try {
     const KEY = 'icl:build';
@@ -39,12 +34,11 @@ const CONFIG = {
   } catch (_) {}
 })();
 
-/* 1) Helpers/UI */
+/* Helpers */
 const store = {
   set(k, v){ sessionStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v)); },
   get(k){ const v = sessionStorage.getItem(k); try { return JSON.parse(v); } catch { return v; } },
   del(k){ sessionStorage.removeItem(k); },
-  has(k){ return sessionStorage.getItem(k) != null; }
 };
 function h(tag, attrs = {}, ...children) {
   const el = document.createElement(tag);
@@ -63,10 +57,10 @@ function pickPasswordInput(){ return document.querySelector(CONFIG.PASSWORD_INPU
 function pickStartButton(){ return document.querySelector(CONFIG.START_BUTTON) || byText(document, 'button', CONFIG.START_TEXT); }
 function pickSendButton(){ return document.querySelector(CONFIG.SEND_BUTTON_SELECTOR) || byText(document, 'button', CONFIG.SEND_TEXT); }
 function pickClearButton(){
-  // tenta por ID; se não, procura por texto "apagar resposta"
-  return document.querySelector(CONFIG.CLEAR_BUTTON_SELECTOR)
-      || byText(document, 'button', CONFIG.CLEAR_TEXT)
-      || byText(document, 'button', 'apagar resposta');
+  const byId = document.querySelector(CONFIG.CLEAR_BUTTON_SELECTOR);
+  if (byId) return byId;
+  for (const t of CONFIG.CLEAR_TEXTS) { const btn = byText(document, 'button', t); if (btn) return btn; }
+  return null;
 }
 function pickFormRoot(){
   return document.querySelector(CONFIG.FORM_ROOT_SELECTOR) || (() => {
@@ -100,14 +94,14 @@ function pickCountdown(){
 }
 function authHeaders(){ const t = store.get('icl:token'); return t ? { Authorization:`Bearer ${t}` } : {}; }
 
-/* 2) Estado do wizard */
+/* Estado */
 let QUESTIONS = [];
 let IDX = 0;
 let TOTAL = 0;
 let ANSWERS = {};
 let countdownTimer = null;
 
-/* 3) Estilos (dark + barra sticky) */
+/* Estilos */
 (function injectDarkStyle(){
   const css = `
   #form-root input[type="text"],
@@ -123,15 +117,11 @@ let countdownTimer = null;
   #form-root textarea::placeholder { color: #9ca3af; }
 
   #icl-progress {
-    position: sticky;
-    top: 0;
-    z-index: 30;
+    position: sticky; top: 0; z-index: 30;
     background: rgba(17,24,39,0.8);
     backdrop-filter: saturate(1.2) blur(4px);
     color: #fde68a;
-    padding: 8px 16px;
-    margin: 0 auto;
-    max-width: 48rem;
+    padding: 8px 16px; margin: 0 auto; max-width: 48rem;
     border-bottom: 1px solid rgba(253,230,138,0.25);
     border-radius: 0 0 .75rem .75rem;
   }
@@ -148,7 +138,7 @@ let countdownTimer = null;
   const style = document.createElement('style'); style.textContent = css; document.head.appendChild(style);
 })();
 
-/* 4) Login / Token */
+/* Login / Token */
 function addPasswordToggle(input) {
   const container = input.parentNode || input.closest('div') || input;
   container.style.position = 'relative';
@@ -175,26 +165,46 @@ async function getPublicToken(){
 }
 async function ensureToken(){ if (store.get('icl:token')) return true; return !!(await getPublicToken()); }
 
-/* 5) Downloads */
+/* Downloads */
 function downloadBlob(filename, blob){
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url; a.download = filename;
   document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
 }
-async function downloadWithAuth(fileName){
+async function downloadPDFGenerated(){
+  // usa as respostas atuais em memória
+  const payload = { answers: { ...ANSWERS }, meta: { tzOffsetMin: new Date().getTimezoneOffset(), ua: navigator.userAgent } };
   try {
-    let r = await fetch(`${CONFIG.BACKEND_URL}/jornada/download/${fileName}`, { headers: { ...authHeaders() } });
-    if (r.status === 404) { alert('Arquivo ainda não está disponível para download.'); return; }
+    let r = await fetch(`${CONFIG.BACKEND_URL}/jornada/pdf`, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', ...authHeaders() },
+      body: JSON.stringify(payload)
+    });
     if (r.status === 401 || r.status === 403) {
       const ok = await ensureToken();
-      if (!ok) throw new Error('Sessão inválida e token público indisponível.');
-      r = await fetch(`${CONFIG.BACKEND_URL}/jornada/download/${fileName}`, { headers: { ...authHeaders() } });
-      if (r.status === 404) { alert('Arquivo ainda não está disponível para download.'); return; }
+      if (!ok) throw new Error('Sessão inválida. Clique em Iniciar.');
+      r = await fetch(`${CONFIG.BACKEND_URL}/jornada/pdf`, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', ...authHeaders() },
+        body: JSON.stringify(payload)
+      });
     }
-    if (!r.ok) throw new Error(`Falha no download (${r.status})`);
+    if (!r.ok) throw new Error('Falha ao gerar o PDF.');
     const blob = await r.blob();
-    downloadBlob(fileName, blob);
-  } catch (e) { alert(e.message || 'Não foi possível baixar o arquivo.'); }
+    downloadBlob(`jornada_${Date.now()}.pdf`, blob);
+  } catch (e) { alert(e.message || 'Não foi possível gerar o PDF.'); }
+}
+async function downloadHQ(){
+  try {
+    let r = await fetch(`${CONFIG.BACKEND_URL}/jornada/download/hq.pdf`, { headers: { ...authHeaders() } });
+    if (r.status === 401 || r.status === 403) {
+      const ok = await ensureToken(); if (!ok) throw new Error('Sessão inválida.');
+      r = await fetch(`${CONFIG.BACKEND_URL}/jornada/download/hq.pdf`, { headers: { ...authHeaders() } });
+    }
+    if (!r.ok) { window.open(`${CONFIG.BACKEND_URL}/downloads/hq.pdf`, '_blank'); return; }
+    const blob = await r.blob();
+    downloadBlob('hq.pdf', blob);
+  } catch { window.open(`${CONFIG.BACKEND_URL}/downloads/hq.pdf`, '_blank'); }
 }
 function renderDownloadButtons(root) {
   const btnPanel = h('div', { class: 'mt-6 flex flex-col sm:flex-row gap-4' },
@@ -203,13 +213,13 @@ function renderDownloadButtons(root) {
   );
   btnPanel.addEventListener('click', (ev) => {
     const t = ev.target; if (!t) return;
-    if (t.id === CONFIG.DOWNLOAD_BUTTON_FORM.slice(1)) { ev.preventDefault(); downloadWithAuth('formulario.pdf'); }
-    else if (t.id === CONFIG.DOWNLOAD_BUTTON_HQ.slice(1)) { ev.preventDefault(); downloadWithAuth('hq.pdf'); }
+    if (t.id === CONFIG.DOWNLOAD_BUTTON_FORM.slice(1)) { ev.preventDefault(); downloadPDFGenerated(); }
+    else if (t.id === CONFIG.DOWNLOAD_BUTTON_HQ.slice(1)) { ev.preventDefault(); downloadHQ(); }
   });
   root.appendChild(btnPanel);
 }
 
-/* 6) Countdown 24h */
+/* Countdown */
 function startCountdown(){
   const el = pickCountdown();
   const iso = store.get('icl:deadline');
@@ -227,7 +237,7 @@ function startCountdown(){
   tick(); if (countdownTimer) clearInterval(countdownTimer); countdownTimer = setInterval(tick, 1000);
 }
 
-/* 7) API perguntas */
+/* API perguntas */
 async function fetchQuestions() {
   let r = await fetch(`${CONFIG.BACKEND_URL}/jornada/questions`, { headers: { ...authHeaders() } });
   if (r.status === 401 || r.status === 403) {
@@ -243,7 +253,7 @@ async function fetchQuestions() {
   return r.json();
 }
 
-/* 8) Wizard */
+/* Wizard */
 function answeredCount(){
   let count = 0;
   QUESTIONS.forEach(q => {
@@ -258,7 +268,6 @@ function updateProgressUI(){
   const bar = pickProgress();
   bar.textContent = `Pergunta ${IDX+1}/${TOTAL} • Respondidas ${answeredCount()}/${TOTAL}`;
 }
-
 function bindAndLoadValue(container, q){
   const apply = () => {
     if (q.kind === 'checkbox') {
@@ -272,7 +281,6 @@ function bindAndLoadValue(container, q){
       ANSWERS[q.id] = el ? el.value : '';
     }
     updateProgressUI();
-    // atualiza também o contador inline
     const inline = container.querySelector('[data-inline-progress]');
     if (inline) inline.textContent = `Pergunta ${IDX+1}/${TOTAL} • Respondidas ${answeredCount()}/${TOTAL}`;
   };
@@ -287,24 +295,21 @@ function bindAndLoadValue(container, q){
     const el = container.querySelector('#'+q.id); if (el) el.value = String(v);
   }
 }
+let QUESTIONS_CACHE = null; // opcional
 
 function renderOneQuestion(root){
   const q = QUESTIONS[IDX];
   root.innerHTML = '';
 
   const section = h('section',{class:'card p-6 space-y-4'});
-
-  // contador inline (além da barra sticky)
   section.appendChild(h('div',{ 'data-inline-progress':'1', class:'text-sm text-yellow-300' },
     `Pergunta ${IDX+1}/${TOTAL} • Respondidas ${answeredCount()}/${TOTAL}`));
-
   section.appendChild(h('h2',{class:'text-xl font-semibold text-gray-100'}, q.section || ''));
   section.appendChild(h('div',{class:'text-base font-medium text-gray-100'}, q.label));
-  if (q.help) section.appendChild(h('div',{class:'text-xs text-gray-300'}, q.help));
 
   const base={id:q.id,name:q.id,class:'mt-2 w-full'};
   let input;
-  if(q.kind==='textarea') input=h('textarea',{...base,rows:'3',placeholder:q.placeholder||''});
+  if(q.kind==='textarea') input=h('textarea',{...base,rows:'3',placeholder:q.placeholder||'Escreva livremente…'});
   else if(q.kind==='select') input=h('select',base, h('option',{value:''},'Selecione…'), ...(q.options||[]).map(o=>h('option',{value:o.value},o.label)));
   else if(q.kind==='radio') input=h('div',{class:'mt-1 flex flex-wrap gap-3'}, ...(q.options||[]).map(o=>h('label',{class:'inline-flex items-center gap-2 text-gray-100'}, h('input',{type:'radio',name:q.id,value:o.value}), o.label)));
   else if(q.kind==='checkbox') input=h('div',{class:'mt-1 flex flex-wrap gap-3'}, ...(q.options||[]).map(o=>h('label',{class:'inline-flex items-center gap-2 text-gray-100'}, h('input',{type:'checkbox',name:q.id,value:o.value}), o.label)));
@@ -341,7 +346,6 @@ function renderFinalStep(root){
   box.appendChild(actions);
   root.appendChild(box);
 
-  // Mostra o botão do rodapé apenas aqui (se existir no HTML)
   const footerSend = pickSendButton(); if (footerSend) footerSend.style.display = '';
 
   revisar.addEventListener('click', ()=>{ IDX = Math.max(0, TOTAL-1); renderOneQuestion(root); updateProgressUI(); });
@@ -351,7 +355,7 @@ function renderFinalStep(root){
   });
 }
 
-/* 9) Boot perguntas */
+/* Boot perguntas */
 async function bootQuestions(){
   const root = pickFormRoot();
   try {
@@ -361,13 +365,9 @@ async function bootQuestions(){
     ANSWERS = ANSWERS || {};
     QUESTIONS.forEach(q=>{ if (!(q.id in ANSWERS)) ANSWERS[q.id] = (q.kind==='checkbox') ? [] : ''; });
 
-    // Esconde o botão do rodapé até o final e garante texto do botão de limpar
     const footerSend = pickSendButton(); if (footerSend) footerSend.style.display = 'none';
-    const clearBtn = pickClearButton(); if (clearBtn) clearBtn.textContent = 'Apagar resposta';
 
     renderOneQuestion(root);
-
-    // cria/atualiza contador sticky já na primeira etapa
     pickProgress();
     updateProgressUI();
   } catch(e) {
@@ -376,7 +376,7 @@ async function bootQuestions(){
   }
 }
 
-/* 10) Coleta e envio */
+/* Submit + devolutiva */
 function collectAnswers(){ return { ...ANSWERS }; }
 async function submitAnswers(){
   const payload={answers:collectAnswers(), meta:{tzOffsetMin:new Date().getTimezoneOffset(), ua:navigator.userAgent}};
@@ -398,13 +398,12 @@ async function submitAnswers(){
   box.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-/* 11) Apagar apenas a resposta ATUAL */
+/* Limpar/APAGAR apenas a resposta ATUAL */
 function clearCurrentAnswer(){
   const q = QUESTIONS[IDX]; if (!q) return;
   ANSWERS[q.id] = (q.kind==='checkbox') ? [] : '';
   const root = pickFormRoot();
-  const section = root.querySelector('section');
-  if (!section) return;
+  const section = root.querySelector('section'); if (!section) return;
   if (q.kind==='checkbox') {
     section.querySelectorAll(`input[type="checkbox"][name="${q.id}"]`).forEach(el=> el.checked = false);
   } else if (q.kind==='radio') {
@@ -415,16 +414,14 @@ function clearCurrentAnswer(){
   updateProgressUI();
 }
 
-/* 12) Login */
+/* Login */
 async function doLogin() {
   const input = pickPasswordInput();
   const btn = pickStartButton();
   if (!btn) { alert('Não achei o botão Iniciar.'); return; }
-
   if (input) addPasswordToggle(input);
   const pwd = (input && input.value || '').trim();
   const original = btn.textContent; btn.disabled = true; btn.textContent = 'Validando…';
-
   try {
     if (pwd) {
       const res = await fetch(`${CONFIG.BACKEND_URL}/validar-senha`, {
@@ -445,7 +442,7 @@ async function doLogin() {
   } finally { btn.disabled = false; btn.textContent = original; }
 }
 
-/* 13) Eventos globais */
+/* Eventos globais */
 document.addEventListener('click', (ev)=>{
   const t = ev.target; if (!t) return;
 
@@ -453,10 +450,10 @@ document.addEventListener('click', (ev)=>{
   if (startBtn && (t===startBtn || t.closest('#btn-iniciar'))) { ev.preventDefault(); doLogin(); return; }
 
   const clearBtn = pickClearButton();
-  if (clearBtn && (t===clearBtn || t.closest('#btn-limpar-oficial'))) { ev.preventDefault(); clearCurrentAnswer(); return; }
+  const isClearClick =
+    (clearBtn && (t===clearBtn || (CONFIG.CLEAR_BUTTON_SELECTOR && t.closest?.(CONFIG.CLEAR_BUTTON_SELECTOR)))) ||
+    (t.tagName==='BUTTON' && CONFIG.CLEAR_TEXTS.some(txt=>t.textContent?.toLowerCase().includes(txt)));
+  if (isClearClick) { ev.preventDefault(); clearCurrentAnswer(); return; }
 });
 
-/* Ajusta label do botão se vier no HTML com outro texto */
-(() => { const c = pickClearButton(); if (c) c.textContent = 'Apagar resposta'; })();
-
-/* Sem boot automático pra não pular a tela de senha */
+/* sem boot automático pra não pular a tela de senha */
