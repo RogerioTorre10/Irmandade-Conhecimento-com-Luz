@@ -400,17 +400,40 @@ async function submitAnswers(){
 
 /* Limpar/APAGAR apenas a resposta ATUAL */
 function clearCurrentAnswer(){
-  const q = QUESTIONS[IDX]; if (!q) return;
-  ANSWERS[q.id] = (q.kind==='checkbox') ? [] : '';
+  const q = QUESTIONS[IDX];
+  if (!q) return;
+
+  // pega o elemento raiz da pergunta atual
   const root = pickFormRoot();
-  const section = root.querySelector('section'); if (!section) return;
-  if (q.kind==='checkbox') {
-    section.querySelectorAll(`input[type="checkbox"][name="${q.id}"]`).forEach(el=> el.checked = false);
-  } else if (q.kind==='radio') {
-    section.querySelectorAll(`input[type="radio"][name="${q.id}"]`).forEach(el=> el.checked = false);
-  } else {
-    const el = section.querySelector('#'+q.id); if (el) el.value = '';
+  const section = root.querySelector('section');
+  if (!section) return;
+
+  // checkbox
+  if (q.kind === 'checkbox') {
+    section.querySelectorAll(`input[type="checkbox"][name="${q.id}"]`).forEach(el => {
+      el.checked = false;
+      el.dispatchEvent(new Event('input', {bubbles:true}));
+    });
   }
+  // radio
+  else if (q.kind === 'radio') {
+    section.querySelectorAll(`input[type="radio"][name="${q.id}"]`).forEach(el => {
+      el.checked = false;
+      el.dispatchEvent(new Event('input', {bubbles:true}));
+    });
+  }
+  // texto, textarea, select...
+  else {
+    const el = section.querySelector(`#${q.id}`);
+    if (el) {
+      el.value = '';
+      el.dispatchEvent(new Event('input', {bubbles:true}));
+    }
+  }
+
+  // limpa no array de respostas também
+  ANSWERS[q.id] = (q.kind === 'checkbox') ? [] : '';
+
   updateProgressUI();
 }
 
