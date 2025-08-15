@@ -267,34 +267,45 @@ function renderOneQuestion(root){
     }
   });
 
-  // >>> APAGAR RESPOSTA — limpa somente este passo
-  clear.addEventListener('click', (e)=>{
-    e.preventDefault();
-    ANSWERS[q.id] = (q.kind === 'checkbox') ? [] : '';
+  // >>> APAGAR RESPOSTA – limpa somente este passo
+clear.addEventListener('click', (e) => {
+  e.preventDefault();
 
-    if (q.kind === 'checkbox') {
-      section.querySelectorAll(`input[type="checkbox"][name="${q.id}"]`).forEach(cb => {
-        cb.checked = false;
-        cb.dispatchEvent(new Event('input', {bubbles:true}));
-      });
-    } else if (q.kind === 'radio') {
-      section.querySelectorAll(`input[type="radio"][name="${q.id}"]`).forEach(r => {
-        r.checked = false;
-        r.dispatchEvent(new Event('input', {bubbles:true}));
-      });
-    } else if (q.kind === 'select') {
-      const el = section.querySelector('#'+q.id);
-      if (el) { el.value=''; el.dispatchEvent(new Event('change',{bubbles:true})); el.dispatchEvent(new Event('input',{bubbles:true})); }
-    } else {
-      const el = section.querySelector('#'+q.id);
-      if (el) { el.value=''; el.dispatchEvent(new Event('input',{bubbles:true})); }
-    }
+  const name = q.id;
+  const kind = (q.type || q.kind || '').toLowerCase();
 
-    updateProgressUI(root);
-  });
+  if (kind === 'checkbox' || kind === 'multi') {
+    // desmarca todos os checkboxes desta pergunta
+    section.querySelectorAll(`input[type="checkbox"][name="${name}"]`)
+      .forEach(ch => ch.checked = false);
+    ANSWERS[name] = [];
+  } else if (kind === 'radio' || kind === 'single') {
+    // desmarca todos os radios desta pergunta
+    section.querySelectorAll(`input[type="radio"][name="${name}"]`)
+      .forEach(r => r.checked = false);
+    ANSWERS[name] = '';
+  } else if (kind === 'select') {
+    const sel = section.querySelector(`select[name="${name}"]`);
+    if (sel) sel.selectedIndex = 0;
+    ANSWERS[name] = sel ? sel.value : '';
+  } else {
+    // text / textarea (ou genérico)
+    const field = section.querySelector(
+      `textarea[name="${name}"], input[name="${name}"]`
+    );
+    if (field) field.value = '';
+    ANSWERS[name] = '';
+  }
 
-  updateProgressUI(root);
-}
+  // salva e atualiza UI
+  if (typeof saveAnswers === 'function') saveAnswers(ANSWERS);
+  else localStorage.setItem('jornadaAnswers', JSON.stringify(ANSWERS));
+
+  if (typeof refresh === 'function') refresh();
+  else if (typeof updateProgress === 'function') updateProgress();
+
+  if (typeof toast === 'function') toast('Resposta apagada.', 'ok');
+});
 
 /* Final */
 function renderFinalStep(root){
