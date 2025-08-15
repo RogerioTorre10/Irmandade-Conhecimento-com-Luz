@@ -8,7 +8,367 @@
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
 
   <!-- Tailwind -->
+  <script src="https://cdn.tai<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jornada Essencial · Irmandade Conhecimento com Luz</title>
+  <meta name="description" content="Jornada Conhecimento com Luz — fé, ciência e propósito em uma viagem interior guiada pelo Lumen." />
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50:'#fff7ed',100:'#ffedd5',200:'#fed7aa',300:'#fdba74',400:'#fb923c',500:'#f59e0b',600:'#d97706',700:'#b45309',800:'#92400e',900:'#78350f' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-900 text-slate-100 antialiased">
+
+  <!-- Cabeçalho -->
+  <header class="sticky top-0 z-40 bg-slate-900/80 backdrop-blur border-b border-white/10">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="/assets/favicon.svg" class="h-7 w-7" alt="">
+        <span class="font-semibold tracking-wide">Irmandade Conhecimento com Luz</span>
+      </div>
+      <span class="text-sm text-slate-300">Jornada Essencial</span>
+    </div>
+  </header>
+
+  <!-- Conteúdo principal -->
+  <main id="app" class="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-8 pb-40">
+
+    <!-- Alertas -->
+    <div id="alert" class="hidden mb-4 rounded-xl border border-white/10 bg-slate-800/70 p-3 text-sm"></div>
+
+    <!-- Devolutiva -->
+    <section id="devolutiva"
+      class="relative rounded-2xl bg-slate-800/60 backdrop-blur p-6 shadow-xl ring-1 ring-white/10
+             max-h-[60vh] overflow-y-auto mb-8">
+      <div class="flex items-start justify-between">
+        <h2 class="text-xl font-semibold">Devolutiva do Lumen</h2>
+        <button id="toggle-devolutiva"
+          class="ml-4 text-xs px-3 py-1 rounded-lg bg-slate-700 hover:bg-slate-600">
+          Mostrar/Esconder
+        </button>
+      </div>
+
+      <div id="devolutiva-content" class="mt-4 leading-relaxed whitespace-pre-line">
+Irmão(ã) de luz, Amor e paz, recebo tua história com respeito e amor.
+Teu compromisso ecoa dentro da tua própria chama: Amor e paz.
+Recorda: fé sustenta, disciplina organiza, esperança ilumina. Cada gesto no
+Bem fortalece teu destino.
+
+Próximos passos práticos:
+• Respira e escreve um propósito simples para hoje.
+• Agradece por algo real.
+• Pratica um gesto de bondade ainda hoje.
+      </div>
+    </section>
+
+    <!-- Grid -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Coluna esquerda -->
+      <div class="rounded-2xl bg-slate-800/60 backdrop-blur p-6 shadow-xl ring-1 ring-white/10">
+        <label for="senha" class="block text-sm mb-2 text-slate-300">Senha de acesso</label>
+        <div class="relative">
+          <input id="senha" type="password" placeholder="Digite sua senha"
+                 class="w-full rounded-xl bg-slate-900/60 border border-white/10 px-4 py-3
+                        focus:outline-none focus:ring-2 focus:ring-primary-500 pr-10">
+          <button id="toggle-senha" type="button"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-300 text-sm">
+            👁️
+          </button>
+        </div>
+
+        <div class="mt-6 text-sm">
+          <div class="text-slate-300">Progresso</div>
+          <div id="progresso" class="mt-1">
+            Pergunta <span id="q-atual">—</span>/32 • Respondidas <span id="q-respondidas">—</span>/32
+          </div>
+        </div>
+      </div>
+
+      <!-- Coluna central -->
+      <div class="hidden lg:block"></div>
+
+      <!-- Coluna direita -->
+      <div class="rounded-2xl bg-slate-800/60 backdrop-blur p-6 shadow-xl ring-1 ring-white/10">
+        <h3 class="text-lg font-semibold">Finalizar</h3>
+        <p class="mt-2 text-sm text-slate-300">
+          Você chegou ao fim. Se quiser, pode voltar e revisar as respostas.
+        </p>
+        <p class="mt-3 text-sm">Respondidas <span id="respondidas-final">—</span>/32</p>
+
+        <div class="mt-6 flex items-center gap-3">
+          <button id="btn-voltar-inline"
+                  class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600">
+            Voltar
+          </button>
+          <button id="btn-enviar-inline"
+                  class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 font-medium">
+            Enviar respostas
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Action Bar fixa -->
+  <div id="action-bar"
+       class="fixed bottom-4 left-1/2 -translate-x-1/2
+              w-[95%] md:w-auto
+              rounded-2xl bg-slate-800/90 backdrop-blur
+              shadow-2xl ring-1 ring-white/10
+              px-4 py-3 flex items-center gap-3 z-30">
+    <button id="btn-voltar"
+            class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600">
+      Voltar
+    </button>
+    <button id="btn-enviar"
+            class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 font-medium">
+      Enviar respostas
+    </button>
+    <button id="btn-limpar"
+            class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600">
+      Limpar respostas
+    </button>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    // ================== CONFIG API ==================
+    const API_PRIMARY = 'https://conhecimento-com-luz-api.onrender.com';
+    const API_FALLBACK = 'https://lumen-backend-api.onrender.com'; // opcional, se tiver
+    let API = API_PRIMARY;
+
+    // ================== UI helpers ==================
+    const $ = (sel) => document.querySelector(sel);
+    function toast(msg, type='info') {
+      const el = $('#alert');
+      if (!el) return;
+      el.classList.remove('hidden');
+      el.classList.toggle('border-amber-400', type==='warn');
+      el.classList.toggle('border-emerald-400', type==='ok');
+      el.classList.toggle('border-red-400', type==='err');
+      el.textContent = msg;
+      setTimeout(() => el.classList.add('hidden'), 4000);
+    }
+
+    // ================== BACKEND helpers ==================
+    async function apiFetch(path, {method='GET', headers={}, body=null, timeout=20000} = {}) {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), timeout);
+      try {
+        const res = await fetch(API + path, { method, headers, body, signal: ctrl.signal });
+        clearTimeout(t);
+        return res;
+      } catch (e) {
+        // tenta fallback uma vez
+        if (API !== API_FALLBACK && API_FALLBACK) {
+          API = API_FALLBACK;
+          return fetch(API + path, { method, headers, body });
+        }
+        throw e;
+      }
+    }
+
+    async function wakeBackend() {
+      try {
+        const r = await apiFetch('/health');
+        if (r.ok) { toast('Servidor pronto.', 'ok'); return true; }
+        toast('Servidor respondeu, mas não OK.', 'warn');
+      } catch {
+        toast('Servidor dormindo/offline.', 'err');
+      }
+      return false;
+    }
+
+    // ================== CAPTURA DE DADOS ==================
+    function getStoredAnswers() {
+      const keys = ['answers', 'journeyAnswers', 'jornadaAnswers'];
+      for (const k of keys) {
+        const raw = localStorage.getItem(k);
+        if (raw) {
+          try { const obj = JSON.parse(raw); if (obj && typeof obj === 'object') return obj; } catch {}
+        }
+      }
+      return null;
+    }
+
+    function scrapeFormAnswers() {
+      const data = {};
+      // pega inputs/textarea/select com data-qid ou name
+      document.querySelectorAll('input, textarea, select').forEach(el => {
+        const key = el.getAttribute('data-qid') || el.name;
+        if (!key) return;
+        if (el.type === 'checkbox') {
+          if (!data[key]) data[key] = [];
+          if (el.checked) data[key].push(el.value ?? true);
+        } else if (el.type === 'radio') {
+          if (el.checked) data[key] = el.value;
+        } else {
+          data[key] = el.value;
+        }
+      });
+      return data;
+    }
+
+    function collectAnswers() {
+      return getStoredAnswers() || scrapeFormAnswers();
+    }
+
+    function countAnswered(obj) {
+      if (!obj) return 0;
+      return Object.values(obj).reduce((acc, v) => {
+        if (Array.isArray(v)) return acc + (v.length ? 1 : 0);
+        return acc + (v !== null && v !== undefined && String(v).trim() !== '' ? 1 : 0);
+      }, 0);
+    }
+
+    // ================== AÇÕES ==================
+    async function validarSenhaIfNeeded() {
+      const el = $('#senha');
+      if (!el) return true; // sem campo de senha, segue
+      const senha = el.value?.trim();
+      if (!senha) { toast('Digite a senha para continuar.', 'warn'); el.focus(); return false; }
+      const r = await apiFetch('/validar-senha', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ senha })
+      });
+      if (!r.ok) { toast('Senha inválida.', 'err'); return false; }
+      const j = await r.json();
+      // se a API emitir token/hmac, guarde
+      if (j?.token) localStorage.setItem('authToken', j.token);
+      return true;
+    }
+
+    async function submitJourney() {
+      if (!(await validarSenhaIfNeeded())) return;
+
+      const answers = collectAnswers();
+      const total = 32;
+      const answered = countAnswered(answers);
+      $('#q-atual').textContent = total;
+      $('#q-respondidas').textContent = answered;
+      $('#respondidas-final').textContent = answered;
+
+      if (answered < total) {
+        if (!confirm(`Você respondeu ${answered}/${total}. Deseja enviar mesmo assim?`)) return;
+      }
+
+      toast('Enviando respostas...', 'info');
+
+      const payload = {
+        answers,
+        meta: {
+          clientTime: new Date().toISOString(),
+          userAgent: navigator.userAgent
+        }
+      };
+
+      // inclui token se existir
+      const headers = { 'Content-Type': 'application/json' };
+      const token = localStorage.getItem('authToken');
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      // submit
+      const res = await apiFetch('/jornada/submit', {
+        method: 'POST', headers, body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        toast('Falha ao enviar respostas.', 'err');
+        return;
+      }
+
+      // tenta gerar/baixar PDF
+      toast('Gerando PDF...', 'info');
+      const pdfRes = await apiFetch('/jornada/pdf', { method: 'POST', headers });
+      if (!pdfRes.ok) { toast('PDF não gerado.', 'err'); return; }
+
+      const blob = await pdfRes.blob();
+      const url = URL.createObjectURL(blob);
+
+      // abre em nova aba e também força download
+      window.open(url, '_blank', 'noopener');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Jornada_Conhecimento_com_Luz_${Date.now()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+
+      toast('PDF pronto! Lembre-se: baixe e guarde agora.', 'ok');
+    }
+
+    function goToPreviousStep() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function clearAllAnswers() {
+      if (!confirm('Deseja realmente limpar todas as respostas?')) return;
+      try {
+        // limpa chaves conhecidas
+        ['answers','journeyAnswers','jornadaAnswers','authToken'].forEach(k => localStorage.removeItem(k));
+        // e campos do DOM
+        document.querySelectorAll('input, textarea, select').forEach(el=>{
+          if (el.type==='checkbox' || el.type==='radio') el.checked = false;
+          else el.value = '';
+        });
+        toast('Respostas limpas.', 'ok');
+        $('#q-respondidas').textContent = '0';
+        $('#respondidas-final').textContent = '0';
+      } catch {
+        toast('Não foi possível limpar.', 'err');
+      }
+    }
+
+    // ================== WIRING ==================
+    document.getElementById('toggle-senha')?.addEventListener('click', () => {
+      const input = document.getElementById('senha');
+      input.type = input.type === 'password' ? 'text' : 'password';
+    });
+
+    document.getElementById('toggle-devolutiva')?.addEventListener('click', () => {
+      const c = document.getElementById('devolutiva-content');
+      c.classList.toggle('hidden');
+    });
+
+    document.getElementById('btn-voltar')?.addEventListener('click', goToPreviousStep);
+    document.getElementById('btn-enviar')?.addEventListener('click', submitJourney);
+    document.getElementById('btn-limpar')?.addEventListener('click', clearAllAnswers);
+
+    document.getElementById('btn-voltar-inline')?.addEventListener('click', goToPreviousStep);
+    document.getElementById('btn-enviar-inline')?.addEventListener('click', submitJourney);
+
+    // ================== BOOT ==================
+    (async () => {
+      await wakeBackend();
+      // atualiza contadores a partir do que tiver salvo
+      const ans = collectAnswers();
+      const answered = countAnswered(ans);
+      $('#q-atual').textContent = '32';
+      $('#q-respondidas').textContent = String(answered);
+      $('#respondidas-final').textContent = String(answered);
+    })();
+  </script>
+
+</body>
+</html>
+lwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
