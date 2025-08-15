@@ -53,219 +53,264 @@
 
   <script>
     // ===== Config / rotas =====
-    const API_PRIMARY = 'https://conhecimento-com-luz-api.onrender.com';
-    const API_FALLBACK = 'https://lumen-backend-api.onrender.com';
-    let API = API_PRIMARY;
-    const FINAL_PAGE = '/jornada-final.html';
+    <script>
+  // ===== Config / rotas =====
+  const API_PRIMARY = 'https://conhecimento-com-luz-api.onrender.com';
+  const API_FALLBACK = 'https://lumen-backend-api.onrender.com';
+  let API = localStorage.getItem('apiBase') || API_PRIMARY;
+  const FINAL_PAGE = '/jornada-final.html';
 
-    // ===== Estado =====
-    let QUESTIONS = [];
-    let TOTAL = 32;
-    let STEP = 0;
+  // ===== Estado =====
+  let QUESTIONS = [];
+  let TOTAL = 32;
+  let STEP = 0;
 
-    // ===== Helpers =====
-    const $ = s => document.querySelector(s);
-    function toast(msg, type='info'){
-      const el=$('#alert'); if(!el) return;
-      el.classList.remove('hidden');
-      el.classList.toggle('border-amber-400', type==='warn');
-      el.classList.toggle('border-emerald-400', type==='ok');
-      el.classList.toggle('border-red-400', type==='err');
-      el.textContent=msg; setTimeout(()=>el.classList.add('hidden'), 3200);
-    }
-    function needAuth(){
-      const t = localStorage.getItem('authToken');
-      const started = localStorage.getItem('journeyStarted');
-      if(!t || !started){ location.href='/jornada-intro.html'; return true; }
-      return false;
-    }
-    function saveAnswers(obj){ localStorage.setItem('jornadaAnswers', JSON.stringify(obj||{})); }
-    function getAnswers(){ try{ return JSON.parse(localStorage.getItem('jornadaAnswers')||'{}'); }catch{return {}} }
-    function setAnswer(id, v){ const a=getAnswers(); a[id]=v; saveAnswers(a); refresh(); }
-    function isAnswered(id){
-      const v = getAnswers()[id];
-      return Array.isArray(v) ? v.length>0 : (v!==null && v!==undefined && String(v).trim()!=='');
-    }
-    function answeredCount(){
-      return Object.values(getAnswers()).reduce((acc,v)=>{
-        if(Array.isArray(v)) return acc+(v.length?1:0);
-        return acc+(v!==null && v!==undefined && String(v).trim()!==''?1:0);
-      },0);
-    }
-    function apiFetch(path, opts={}){
-      const {method='GET', headers={}, body=null} = opts;
-      return fetch(API+path,{method,headers,body}).catch(async e=>{
-        if(API!==API_FALLBACK && API_FALLBACK){ API=API_FALLBACK; return fetch(API+path,{method,headers,body}); }
-        throw e;
+  // ===== Helpers =====
+  const $ = s => document.querySelector(s);
+  function toast(msg, type='info'){
+    const el=$('#alert'); if(!el) return;
+    el.classList.remove('hidden');
+    el.classList.toggle('border-amber-400', type==='warn');
+    el.classList.toggle('border-emerald-400', type==='ok');
+    el.classList.toggle('border-red-400', type==='err');
+    el.textContent=msg; setTimeout(()=>el.classList.add('hidden'), 4000);
+  }
+  function needAuth(){
+    const t = localStorage.getItem('authToken');
+    const started = localStorage.getItem('journeyStarted');
+    if(!t || !started){ location.href='/jornada-intro.html'; return true; }
+    return false;
+  }
+  function saveAnswers(obj){ localStorage.setItem('jornadaAnswers', JSON.stringify(obj||{})); }
+  function getAnswers(){ try{ return JSON.parse(localStorage.getItem('jornadaAnswers')||'{}'); }catch{return {}} }
+  function setAnswer(id, v){ const a=getAnswers(); a[id]=v; saveAnswers(a); refresh(); }
+  function isAnswered(id){
+    const v = getAnswers()[id];
+    return Array.isArray(v) ? v.length>0 : (v!==null && v!==undefined && String(v).trim()!=='');
+  }
+  function answeredCount(){
+    return Object.values(getAnswers()).reduce((acc,v)=>{
+      if(Array.isArray(v)) return acc+(v.length?1:0);
+      return acc+(v!==null && v!==undefined && String(v).trim()!==''?1:0);
+    },0);
+  }
+  function apiFetchFull(base, path, opts={}){
+    const {method='GET', headers={}, body=null} = opts;
+    return fetch(base+path,{method,headers,body});
+  }
+
+  // ===== Render 1 pergunta =====
+  function normalize(list){
+    return list.map((q,i)=>({
+      id: q.id || q.qid || q.key || `q${i+1}`,
+      label: q.label || q.title || q.text || `Pergunta ${i+1}`,
+      type: (q.type || 'text').toLowerCase(),
+      options: q.options || q.choices || [],
+      required: q.required !== false
+    }));
+  }
+
+  function buildQuestion(q){
+    const id = q.id;
+    const wrap = document.createElement('div');
+
+    const small = document.createElement('div');
+    small.className='text-sm text-slate-300 mb-2';
+    small.textContent = `Pergunta ${STEP+1}/${TOTAL}`;
+    wrap.appendChild(small);
+
+    const h = document.createElement('label');
+    h.className='block mb-3 font-medium';
+    h.textContent = q.label + (q.required?' *':'');
+    wrap.appendChild(h);
+
+    const curr = getAnswers()[id];
+    const on = (e)=>{
+      if(e.target.type==='checkbox'){
+        const arr = Array.from(wrap.querySelectorAll('input[type="checkbox"]:checked')).map(x=>x.value);
+        setAnswer(id, arr);
+      } else if(e.target.type==='radio'){
+        const sel = wrap.querySelector('input[type="radio"]:checked');
+        setAnswer(id, sel?sel.value:'');
+      } else {
+        setAnswer(id, e.target.value);
+      }
+    };
+
+    if(q.type==='long_text' || q.type==='textarea'){
+      const ta = document.createElement('textarea'); ta.rows=5;
+      ta.className='w-full rounded-xl bg-slate-900/60 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500';
+      if(typeof curr==='string') ta.value=curr;
+      ta.addEventListener('input', on);
+      wrap.appendChild(ta);
+    } else if(q.type==='single' || q.type==='radio'){
+      const box=document.createElement('div'); box.className='space-y-2';
+      (q.options||[]).forEach(opt=>{
+        const lbl=document.createElement('label'); lbl.className='flex items-center gap-2';
+        const r=document.createElement('input'); r.type='radio'; r.name=id; r.value=String(opt.value??opt);
+        if(String(curr)===String(r.value)) r.checked=true;
+        r.addEventListener('change', on);
+        const t=document.createElement('span'); t.textContent=String(opt.label??opt);
+        lbl.appendChild(r); lbl.appendChild(t); box.appendChild(lbl);
       });
+      wrap.appendChild(box);
+    } else if(q.type==='multi' || q.type==='checkbox'){
+      const set=new Set(Array.isArray(curr)?curr.map(String):[]);
+      const box=document.createElement('div'); box.className='space-y-2';
+      (q.options||[]).forEach(opt=>{
+        const lbl=document.createElement('label'); lbl.className='flex items-center gap-2';
+        const c=document.createElement('input'); c.type='checkbox'; c.name=id; c.value=String(opt.value??opt);
+        if(set.has(String(c.value))) c.checked=true;
+        c.addEventListener('change', on);
+        const t=document.createElement('span'); t.textContent=String(opt.label??opt);
+        lbl.appendChild(c); lbl.appendChild(t); box.appendChild(lbl);
+      });
+      wrap.appendChild(box);
+    } else if(q.type==='select'){
+      const sel=document.createElement('select');
+      sel.className='w-full rounded-xl bg-slate-900/60 border border-white/10 px-3 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500';
+      (q.options||[]).forEach(opt=>{
+        const o=document.createElement('option'); o.value=String(opt.value??opt); o.textContent=String(opt.label??opt);
+        if(String(curr)===o.value) o.selected=true;
+        sel.appendChild(o);
+      });
+      sel.addEventListener('change', on);
+      wrap.appendChild(sel);
+    } else {
+      const inp=document.createElement('input'); inp.type='text';
+      inp.className='w-full rounded-xl bg-slate-900/60 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500';
+      if(typeof curr==='string') inp.value=curr;
+      inp.addEventListener('input', on);
+      wrap.appendChild(inp);
     }
+    return wrap;
+  }
 
-    // ===== Render 1 pergunta =====
-    function normalize(list){
-      return list.map((q,i)=>({
-        id: q.id || q.qid || q.key || `q${i+1}`,
-        label: q.label || q.title || q.text || `Pergunta ${i+1}`,
-        type: (q.type || 'text').toLowerCase(),
-        options: q.options || q.choices || [],
-        required: q.required !== false
-      }));
+  function showStep(i){
+    STEP = Math.max(0, Math.min(i, TOTAL-1));
+    const q = QUESTIONS[STEP];
+    const el = $('#pergunta');
+    el.innerHTML='';
+    el.appendChild(buildQuestion(q));
+    window.scrollTo({top: el.offsetTop - 80, behavior:'smooth'});
+    refresh();
+  }
+
+  function refresh(){
+    const done = answeredCount();
+    $('#q-atual').textContent = STEP+1;
+    $('#q-total').textContent = TOTAL;
+    $('#q-total-2').textContent = TOTAL;
+    $('#q-respondidas').textContent = done;
+
+    $('#btn-voltar').disabled = STEP<=0;
+    const answeredCurrent = isAnswered(QUESTIONS[STEP].id);
+    $('#btn-avancar').disabled = !answeredCurrent;
+
+    if(STEP===TOTAL-1 && answeredCurrent){
+      $('#btn-avancar').textContent = 'Finalizar';
+    } else {
+      $('#btn-avancar').textContent = 'Avançar';
     }
+  }
 
-    function buildQuestion(q){
-      const id = q.id;
-      const wrap = document.createElement('div');
+  // ===== Loader robusto =====
+  async function loadQuestions(){
+    const token = localStorage.getItem('authToken');
+    const commonHeaders = token ? {
+      'Authorization': `Bearer ${token}`,
+      'X-Auth-Token': token
+    } : {};
 
-      const small = document.createElement('div');
-      small.className='text-sm text-slate-300 mb-2';
-      small.textContent = `Pergunta ${STEP+1}/${TOTAL}`;
-      wrap.appendChild(small);
+    const bases = Array.from(new Set([
+      localStorage.getItem('apiBase'),
+      API_PRIMARY,
+      API_FALLBACK
+    ].filter(Boolean)));
 
-      const h = document.createElement('label');
-      h.className='block mb-3 font-medium';
-      h.textContent = q.label + (q.required?' *':'');
-      wrap.appendChild(h);
+    const paths = [
+      '/jornada/questions',
+      '/jornada/questions/',
+      '/questions',
+      '/api/jornada/questions',
+      '/api/questions'
+    ];
 
-      const curr = getAnswers()[id];
+    let lastError = '';
+    for (const base of bases) {
+      for (const path of paths) {
+        try {
+          const res = await apiFetchFull(base, path, { headers: commonHeaders });
+          if (res.status === 401) {
+            // sessão/token inválido
+            toast('Sessão expirada. Volte para a introdução e inicie novamente.', 'warn');
+            setTimeout(()=> location.href='/jornada-intro.html', 1200);
+            return;
+          }
+          if (!res.ok) { lastError = `${res.status} ${res.statusText} em ${base}${path}`; continue; }
+          const j = await res.json().catch(()=>null);
+          const list = j?.questions || j?.data || j?.items || j;
+          if (Array.isArray(list) && list.length) {
+            // guarda base funcional para as próximas chamadas
+            API = base;
+            localStorage.setItem('apiBase', base);
 
-      const on = (e)=>{
-        if(e.target.type==='checkbox'){
-          const arr = Array.from(wrap.querySelectorAll('input[type="checkbox"]:checked')).map(x=>x.value);
-          setAnswer(id, arr);
-        } else if(e.target.type==='radio'){
-          const sel = wrap.querySelector('input[type="radio"]:checked');
-          setAnswer(id, sel?sel.value:'');
-        } else {
-          setAnswer(id, e.target.value);
+            QUESTIONS = normalize(list);
+            TOTAL = QUESTIONS.length;
+            // retomar no primeiro não respondido
+            const idx = QUESTIONS.findIndex(q=>!isAnswered(q.id));
+            showStep(idx>=0? idx : 0);
+            return;
+          } else {
+            lastError = `Formato inesperado em ${base}${path}`;
+          }
+        } catch (e) {
+          lastError = `Falha de rede em ${base}${path}`;
         }
-      };
-
-      if(q.type==='long_text' || q.type==='textarea'){
-        const ta = document.createElement('textarea'); ta.rows=5;
-        ta.className='w-full rounded-xl bg-slate-900/60 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500';
-        if(typeof curr==='string') ta.value=curr;
-        ta.addEventListener('input', on);
-        wrap.appendChild(ta);
-      } else if(q.type==='single' || q.type==='radio'){
-        const box=document.createElement('div'); box.className='space-y-2';
-        (q.options||[]).forEach(opt=>{
-          const lbl=document.createElement('label'); lbl.className='flex items-center gap-2';
-          const r=document.createElement('input'); r.type='radio'; r.name=id; r.value=String(opt.value??opt);
-          if(String(curr)===String(r.value)) r.checked=true;
-          r.addEventListener('change', on);
-          const t=document.createElement('span'); t.textContent=String(opt.label??opt);
-          lbl.appendChild(r); lbl.appendChild(t); box.appendChild(lbl);
-        });
-        wrap.appendChild(box);
-      } else if(q.type==='multi' || q.type==='checkbox'){
-        const set=new Set(Array.isArray(curr)?curr.map(String):[]);
-        const box=document.createElement('div'); box.className='space-y-2';
-        (q.options||[]).forEach(opt=>{
-          const lbl=document.createElement('label'); lbl.className='flex items-center gap-2';
-          const c=document.createElement('input'); c.type='checkbox'; c.name=id; c.value=String(opt.value??opt);
-          if(set.has(String(c.value))) c.checked=true;
-          c.addEventListener('change', on);
-          const t=document.createElement('span'); t.textContent=String(opt.label??opt);
-          lbl.appendChild(c); lbl.appendChild(t); box.appendChild(lbl);
-        });
-        wrap.appendChild(box);
-      } else if(q.type==='select'){
-        const sel=document.createElement('select');
-        sel.className='w-full rounded-xl bg-slate-900/60 border border-white/10 px-3 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500';
-        (q.options||[]).forEach(opt=>{
-          const o=document.createElement('option'); o.value=String(opt.value??opt); o.textContent=String(opt.label??opt);
-          if(String(curr)===o.value) o.selected=true;
-          sel.appendChild(o);
-        });
-        sel.addEventListener('change', on);
-        wrap.appendChild(sel);
-      } else {
-        const inp=document.createElement('input'); inp.type='text';
-        inp.className='w-full rounded-xl bg-slate-900/60 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500';
-        if(typeof curr==='string') inp.value=curr;
-        inp.addEventListener('input', on);
-        wrap.appendChild(inp);
-      }
-      return wrap;
-    }
-
-    function showStep(i){
-      STEP = Math.max(0, Math.min(i, TOTAL-1));
-      const q = QUESTIONS[STEP];
-      const el = $('#pergunta');
-      el.innerHTML='';
-      el.appendChild(buildQuestion(q));
-      window.scrollTo({top: el.offsetTop - 80, behavior:'smooth'});
-      refresh();
-    }
-
-    function refresh(){
-      const done = answeredCount();
-      $('#q-atual').textContent = STEP+1;
-      $('#q-total').textContent = TOTAL;
-      $('#q-total-2').textContent = TOTAL;
-      $('#q-respondidas').textContent = done;
-
-      $('#btn-voltar').disabled = STEP<=0;
-      const answeredCurrent = isAnswered(QUESTIONS[STEP].id);
-      $('#btn-avancar').disabled = !answeredCurrent;
-
-      // Se última pergunta + respondidas completas => segue para final ao avançar
-      if(STEP===TOTAL-1 && answeredCurrent){
-        $('#btn-avancar').textContent = 'Finalizar';
-      } else {
-        $('#btn-avancar').textContent = 'Avançar';
       }
     }
 
-    // ===== Fluxo =====
-    async function loadQuestions(){
-      const headers={};
-      const t=localStorage.getItem('authToken'); if(t) headers['Authorization']='Bearer '+t;
-      const res = await apiFetch('/jornada/questions',{headers});
-      if(!res.ok){ toast('Não foi possível carregar as perguntas.','err'); return; }
-      const j = await res.json().catch(()=>[]);
-      const list = j?.questions || j?.data || j || [];
-      if(!Array.isArray(list) || !list.length){ toast('Perguntas vazias.','warn'); return; }
-      QUESTIONS = normalize(list);
-      TOTAL = QUESTIONS.length;
+    // Se chegou aqui, deu ruim
+    const el = $('#pergunta');
+    el.innerHTML = `
+      <div class="text-sm text-rose-300 mb-3">Não foi possível carregar as perguntas.</div>
+      <pre class="text-xs bg-slate-900/70 p-3 rounded-lg overflow-x-auto">${lastError}</pre>
+      <button id="retry" class="mt-3 px-4 py-2 rounded-xl bg-primary-600 hover:bg-primary-700">Tentar novamente</button>
+    `;
+    $('#retry')?.addEventListener('click', loadQuestions);
+  }
 
-      // retomar no primeiro não respondido
-      const ans = getAnswers();
-      const idx = QUESTIONS.findIndex(q=>!isAnswered(q.id));
-      showStep(idx>=0? idx : 0);
+  function goBack(){ if(STEP>0){ showStep(STEP-1); } }
+  function goNext(){
+    const id = QUESTIONS[STEP].id;
+    if(!isAnswered(id)){ toast('Responda esta pergunta para avançar.','warn'); return; }
+    if(STEP < TOTAL-1){ showStep(STEP+1); }
+    else {
+      localStorage.setItem('journeyComplete','1');
+      location.href = FINAL_PAGE;
     }
+  }
+  function clearAll(){
+    if(!confirm('Isto limpa apenas as respostas salvas neste dispositivo. Não apaga sua senha nem arquivos gerados. Deseja continuar?')) return;
+    localStorage.removeItem('jornadaAnswers');
+    toast('Respostas deste dispositivo foram limpas.','ok');
+    showStep(STEP);
+  }
 
-    function goBack(){ if(STEP>0){ showStep(STEP-1); } }
-    function goNext(){
-      const id = QUESTIONS[STEP].id;
-      if(!isAnswered(id)){ toast('Responda esta pergunta para avançar.','warn'); return; }
-      if(STEP < TOTAL-1){ showStep(STEP+1); }
-      else {
-        localStorage.setItem('journeyComplete','1');
-        location.href = FINAL_PAGE;
-      }
-    }
-    function clearAll(){
-      if(!confirm('Isto limpa apenas as respostas salvas neste dispositivo. Não apaga sua senha nem arquivos gerados. Deseja continuar?')) return;
-      localStorage.removeItem('jornadaAnswers');
-      toast('Respostas deste dispositivo foram limpas.','ok');
-      showStep(STEP);
-    }
+  // Boot
+  (async ()=>{
+    if(needAuth()) return;
+    await loadQuestions();
+  })();
 
-    // Boot
-    (async ()=>{
-      if(needAuth()) return;
-      await loadQuestions();
-    })();
-
-    // Eventos
-    $('#btn-voltar')?.addEventListener('click', goBack);
-    $('#btn-avancar')?.addEventListener('click', goNext);
-    $('#btn-apagar')?.addEventListener('click', clearAll);
-    document.addEventListener('keydown', (e)=>{
-      if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); goNext(); }
-      else if(e.key==='Enter' && e.shiftKey){ e.preventDefault(); goBack(); }
-    });
-  </script>
+  // Eventos
+  $('#btn-voltar')?.addEventListener('click', goBack);
+  $('#btn-avancar')?.addEventListener('click', goNext);
+  $('#btn-apagar')?.addEventListener('click', clearAll);
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); goNext(); }
+    else if(e.key==='Enter' && e.shiftKey){ e.preventDefault(); goBack(); }
+  });
+</script>
 </body>
 </html>
