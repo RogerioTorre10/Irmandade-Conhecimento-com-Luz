@@ -157,6 +157,24 @@
   }
 
   window.lucide && lucide.createIcons();
+  <script>
+  // Força todos os links diretos para a página de perguntas
+  // a irem para a INTRO (contrato + senha)
+  (function () {
+    var targets = new Set([
+      '/jornada-conhecimento-com-luz1.html',
+      'jornada-conhecimento-com-luz1.html',
+      './jornada-conhecimento-com-luz1.html'
+    ]);
+
+    document.querySelectorAll('a[href]').forEach(function (a) {
+      var href = a.getAttribute('href') || '';
+      var base = href.split('#')[0].split('?')[0]; // limpa âncoras e query
+      if (targets.has(base)) {
+        a.setAttribute('href', '/jornada-intro.html');
+      }
+    });
+  })();
 </script>
 </body>
 </html>
