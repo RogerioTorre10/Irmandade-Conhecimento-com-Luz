@@ -45,6 +45,19 @@ function h(tag, attrs = {}, ...children) {
   children.flat().forEach(c => el.appendChild(typeof c==='string' ? document.createTextNode(c) : c));
   return el;
 }
+// Esconde/ remove o botão "Limpar respostas" do rodapé (se existir)
+function hideFooterClear(){
+  // por ID conhecido
+  const byId = document.querySelector('#btn-limpar-oficial');
+  if (byId) byId.remove();
+
+  // por texto (case-insensitive)
+  const btns = Array.from(document.querySelectorAll('button'));
+  btns
+    .filter(b => (b.textContent || '').trim().toLowerCase() === 'limpar respostas')
+    .forEach(b => b.remove());
+}
+
 function byText(root, tag, textLike){
   const needle = (textLike || '').toLowerCase();
   return [...(root||document).querySelectorAll(tag)]
@@ -213,7 +226,15 @@ function renderOneQuestion(root){
   root.innerHTML='';
 
   const section = h('section',{class:'card p-6 space-y-4'});
+  
+ // ... (campos, navegação, etc.)
 
+  root.appendChild(section);       // <— já está no seu código
+
+  hideFooterClear();               // <— ADICIONE AQUI
+
+  updateProgressUI(root);          // <— isso permanece como já está
+}
   // contador inline
   section.appendChild(h('div',{ 'data-inline-progress':'1', class:'text-sm text-yellow-300' },
     `Pergunta ${IDX+1}/${TOTAL} • Respondidas ${answeredCount()}/${TOTAL}`));
@@ -248,7 +269,7 @@ function renderOneQuestion(root){
   prev.addEventListener('click', ()=>{ if (IDX>0) { IDX--; renderOneQuestion(root); updateProgressUI(root); window.scrollTo({top:0,behavior:'smooth'}); } });
   next.addEventListener('click', ()=>{ 
     if (IDX<TOTAL-1) { IDX++; renderOneQuestion(root); updateProgressUI(root); window.scrollTo({top:0,behavior:'smooth'}); } 
-    else { renderFinalStep(root); updateProgressUI(root); window.scrollTo({top:0,behavior:'smooth'}); }
+    else {hideFooterClear(); renderFinalStep(root); updateProgressUI(root); window.scrollTo({top:0,behavior:'smooth'}); }
   });
 
   // >>> APAGAR RESPOSTA — limpa somente este passo, sem tocar nos outros
