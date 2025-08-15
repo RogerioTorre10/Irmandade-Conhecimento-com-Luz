@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Finalização · Jornada Conhecimento com Luz</title>
+  <meta name="description" content="Conclusão da Jornada, acolhimento e geração de PDF/HQ." />
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme:{extend:{colors:{primary:{50:'#fff7ed',100:'#ffedd5',200:'#fed7aa',300:'#fdba74',400:'#fb923c',500:'#f59e0b',600:'#d97706',700:'#b45309',800:'#92400e',900:'#78350f'}}}} };
+  </script>
+  <style> .card{border:1px solid rgba(255,255,255,.08)} </style>
+</head>
+<body class="bg-slate-900 text-slate-100 antialiased">
+
+  <header class="sticky top-0 z-40 bg-slate-900/80 backdrop-blur border-b border-white/10">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="/assets/favicon.svg" class="h-7 w-7" alt="">
+        <span class="font-semibold tracking-wide">Irmandade Conhecimento com Luz</span>
+      </div>
+      <span class="text-sm text-slate-300">Conclusão</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 md:px-6 lg:px-8 py-8 pb-28">
+    <div id="alert" class="hidden mb-4 rounded-xl border card bg-slate-800/70 p-3 text-sm"></div>
+
+    <section class="rounded-2xl card bg-slate-800/60 backdrop-blur p-6 shadow-xl mb-6">
+      <h1 class="text-2xl font-semibold">Parabéns! Você finalizou a Jornada 🎉</h1>
+      <p class="mt-3 text-sm text-slate-300">
+        Agora você pode gerar seu <b>PDF</b> com as respostas e a devolutiva simbólica do Lumen.
+        Em seguida, você pode baixar a <b>HQ final (33 quadros)</b>.
+      </p>
+      <p class="mt-3 text-sm text-amber-300">Importante: baixe seus arquivos agora — após a entrega, os dados são apagados automaticamente.</p>
+      <p class="mt-3 text-sm">Respondidas: <span id="respondidas">0</span>/<span id="total">32</span></p>
+    </section>
+
+    <section class="rounded-2xl card bg-slate-800/60 backdrop-blur p-6 shadow-xl flex flex-wrap items-center gap-3">
+      <button id="btn-pdf" class="px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 font-medium">Gerar PDF</button>
+      <button id="btn-hq"  class="px-5 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 font-medium">Baixar HQ</button>
+      <a href="/jornada-intro.html" class="ml-auto text-sm underline text-slate-300">Voltar ao início</a>
+    </section>
+
+    <section class="rounded-2xl card bg-slate-800/60 backdrop-blur p-6 shadow-xl mt-6">
+      <h2 class="text-lg font-semibold">Acolhimento final</h2>
+      <p class="mt-2 text-sm leading-relaxed whitespace-pre-line">
+Que a tua chama jamais se apague.
+Se em algum momento ela vacilar, lembra: fé sustenta, disciplina organiza, esperança ilumina.
+Segue firme. O Bem te acompanha. PARA ALÉM. E SEMPRE!
+      </p>
+    </section>
+  </main>
+
+  <!-- Barra fixa simples -->
+  <div class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[95%] md:w-auto rounded-2xl bg-slate-800/90 backdrop-blur shadow-2xl ring-1 ring-white/10 px-4 py-3 flex items-center gap-3 z-30">
+    <button id="btn-limpar" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600">Limpar respostas (este dispositivo)</button>
+  </div>
+
+  <script>
+    // ===== Config =====
+    const API_PRIMARY = 'https://conhecimento-com-luz-api.onrender.com';
+    const API_FALLBACK = 'https://lumen-backend-api.onrender.com';
+    let API = API_PRIMARY;
+
+    // ===== Helpers =====
+    const $ = s => document.querySelector(s);
+    function toast(msg, type='info'){
+      const el=$('#alert'); if(!el) return;
+      el.classList.remove('hidden');
+      el.classList.toggle('border-amber-400', type==='warn');
+      el.classList.toggle('border-emerald-400', type==='ok');
+      el.classList.toggle('border-red-400', type==='err');
+      el.textContent=msg; setTimeout(()=>el.classList.add('hidden'), 3500);
+    }
+    function apiFetch(path, opts={}){
+      const {method='GET', headers={}, body=null} = opts;
+      return fetch(API+path,{method,headers,body}).catch(async e=>{
+        if(API!==API_FALLBACK && API_FALLBACK){ API=API_FALLBACK; return fetch(API+path,{method,headers,body}); }
+        throw e;
+      });
+    }
+    function getAnswers(){ try{return JSON.parse(localStorage.getItem('jornadaAnswers')||'{}');}catch{return {}} }
+    function countAnswered(o){ return Object.values(o).reduce((a,v)=>a+(Array.isArray(v)?(v.length?1:0): (v!==null && v!==undefined && String(v).trim()!==''?1:0)),0); }
+
+    function needAuth(){
+      const t = localStorage.getItem('authToken');
+      const started = localStorage.getItem('journeyStarted');
+      const complete = localStorage.getItem('journeyComplete');
+      if(!t || !started){ location.href='/jornada-intro.html'; return true; }
+      if(!complete){ location.href='/jornada-conhecimento-com-luz1.html'; return true; }
+      return false;
+    }
+
+    async function gerarPDF(){
+      const headers={'Content-Type':'application/json'};
+      const t=localStorage.getItem('authToken'); if(t) headers['Authorization']='Bearer '+t;
+
+      const payload={ answers:getAnswers(), meta:{clientTime:new Date().toISOString(), userAgent:navigator.userAgent} };
+      const res = await apiFetch('/jornada/submit',{method:'POST',headers,body:JSON.stringify(payload)});
+      if(!res.ok){ toast('Falha ao enviar respostas antes do PDF.', 'err'); return; }
+
+      toast('Gerando PDF...', 'info');
+      let pdf = await apiFetch('/jornada/pdf',{method:'POST',headers});
+      if(!pdf.ok) pdf = await apiFetch('/jornada/pdf',{method:'GET',headers});
+      if(!pdf.ok){ toast('PDF não gerado.', 'err'); return; }
+
+      const blob = await pdf.blob(); const url = URL.createObjectURL(blob);
+      window.open(url,'_blank','noopener');
+      const a=document.createElement('a'); a.href=url; a.download=`Jornada_Conhecimento_com_Luz_${Date.now()}.pdf`;
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000);
+      toast('PDF pronto! Baixe e guarde agora.', 'ok');
+    }
+
+    async function baixarHQ(){
+      // tenta alguns nomes comuns; ajuste conforme seu backend
+      const headers={}; const t=localStorage.getItem('authToken'); if(t) headers['Authorization']='Bearer '+t;
+      let res = await apiFetch('/jornada/download/hq.pdf',{headers});
+      if(!res.ok) res = await apiFetch('/jornada/download/hq.png',{headers});
+      if(!res.ok) res = await apiFetch('/jornada/download/hq',{headers});
+      if(!res.ok){ toast('HQ não disponível no momento.', 'warn'); return; }
+
+      const blob = await res.blob(); const url = URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download=`HQ_Conhecimento_com_Luz_${Date.now()}`;
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000);
+      toast('HQ pronta para download.', 'ok');
+    }
+
+    function clearLocal(){
+      if(!confirm('Isto limpa apenas as respostas deste dispositivo (não apaga seus arquivos). Deseja continuar?')) return;
+      localStorage.removeItem('jornadaAnswers');
+      localStorage.removeItem('journeyComplete');
+      toast('Respostas limpas neste dispositivo.', 'ok');
+    }
+
+    // Boot
+    (async ()=>{
+      if(needAuth()) return;
+      const ans = getAnswers(); const done = countAnswered(ans);
+      $('#respondidas').textContent = done; $('#total').textContent = '32';
+    })();
+
+    // Eventos
+    $('#btn-pdf')?.addEventListener('click', gerarPDF);
+    $('#btn-hq')?.addEventListener('click', baixarHQ);
+    $('#btn-limpar')?.addEventListener('click', clearLocal);
+  </script>
+</body>
+</html>
