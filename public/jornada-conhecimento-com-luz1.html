@@ -1,177 +1,178 @@
 <!doctype html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Jornada Conhecimento com Luz — Essencial</title>
-  <meta name="description" content="Jornada Conhecimento com Luz — Essencial. Responda com sinceridade e baixe seu PDF ao final.">
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jornada Essencial · Irmandade Conhecimento com Luz</title>
+  <meta name="description" content="Jornada Conhecimento com Luz — fé, ciência e propósito em uma viagem interior guiada pelo Lumen." />
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
 
-  <!-- Tailwind via CDN (garante estilo mesmo sem build) -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- (Opcional) Seu CSS adicional -->
-  <link rel="stylesheet" href="/assets/styles.css">
-
-  <!-- Ícones Lucide -->
-  <script defer src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74',
+              400: '#fb923c', 500: '#f59e0b', 600: '#d97706', 700: '#b45309',
+              800: '#92400e', 900: '#78350f'
+            }
+          }
+        }
+      }
+    }
+  </script>
 </head>
-<body class="bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 text-gray-100 antialiased selection:bg-yellow-500/30">
+<body class="bg-slate-900 text-slate-100 antialiased">
 
-<header class="fixed top-0 inset-x-0 z-50 backdrop-blur bg-gray-900/70 border-b border-white/10">
-  <nav class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
-    <a href="/index.html" class="flex items-center gap-2">
-      <img src="/assets/logo.svg" alt="Logo Irmandade" class="h-7 w-7">
-      <span class="font-bold text-white">Irmandade Conhecimento com Luz</span>
-    </a>
-    <span class="text-xs text-gray-300">Jornada Essencial</span>
-  </nav>
-</header>
-
-<main class="pt-24">
-  <!-- Aviso legal -->
-  <section class="max-w-3xl mx-auto px-4">
-    <div class="rounded-2xl border border-yellow-400/30 bg-yellow-400/10 p-4 text-sm text-yellow-200">
-      <p class="font-semibold mb-1">🛡️ Aviso Importante</p>
-      <ul class="list-disc pl-5 space-y-1">
-        <li>Suas respostas serão usadas apenas para gerar um PDF exclusivo.</li>
-        <li>O PDF <u>não</u> é enviado por e-mail — faça o download ao final.</li>
-        <li>Após o download, os dados são limpos deste dispositivo.</li>
-        <li>O acesso é protegido por senha (validade: 15 dias para iniciar e 24h para concluir após o início).</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- Container das perguntas -->
-  <section class="max-w-3xl mx-auto px-4 mt-8">
-    <div id="feedback" class="hidden rounded-xl p-4 mb-4 text-sm"></div>
-    <div id="area-jornada" class="hidden">
-      <h1 class="text-2xl font-extrabold tracking-wide mb-4">
-        Jornada Conhecimento com Luz — <span class="text-yellow-300">Essencial</span>
-      </h1>
-      <div id="lista-perguntas"></div>
-    </div>
-  </section>
-
-  <!-- Respiro antes do rodapé fixo -->
-  <div class="h-24"></div>
-</main>
-  
-<!-- Painel fixo (senha + ações) -->
-<div id="painel-controles"
-     class="fixed bottom-0 left-0 right-0 z-40 bg-gray-900/95 border-t border-white/10 backdrop-blur">
-  <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
-    <div class="flex items-center gap-3">
-      <label for="senha" class="text-sm text-gray-300">Senha de acesso</label>
-      <input id="senha" type="password" placeholder="Digite sua senha"
-             class="rounded-lg bg-gray-800 border border-white/10 px-3 py-2 text-sm w-56" />
-    </div>
-    <div class="flex gap-3">
-  <button id="btnIniciar"
-          class="px-4 py-2 rounded-xl bg-yellow-400 text-gray-900 font-semibold hover:bg-yellow-300">
-    Iniciar
-  </button>
-  <button id="btnLimpar"
-        title="Apaga TODAS as respostas desta página"
-        class="px-4 py-2 rounded-xl border border-yellow-400/50 text-yellow-300 hover:bg-yellow-400/10"
-        disabled>
-  Limpar respostas
-</button>
-  <button id="btnEnviar"
-          class="px-4 py-2 rounded-xl bg-yellow-400/60 text-gray-900 font-semibold"
-          disabled>
-    Enviar respostas
-  </button>
-</div>
-    
-<!-- Ajuste de espaço para o painel fixo -->
-<script>
-  (function padBottomForFooter() {
-    const painel = document.getElementById('painel-controles');
-    function ajusta() {
-      const h = painel?.getBoundingClientRect().height || 80;
-      document.body.style.paddingBottom = (h + 16) + 'px';
-    }
-    window.addEventListener('load', ajusta);
-    window.addEventListener('resize', ajusta);
-    setTimeout(ajusta, 0);
-  })();
-</script>
-  <script type="text/plain" id="jornada-inline-perguntas">
-  // === LISTA OFICIAL DE PERGUNTAS (32) ===
-  const PERGUNTAS = [
-    // BLOCO 1 – Reflexões da Alma e da Existência (10)
-    "Como você tem percebido sua própria vida até aqui?",
-    "E a vida das pessoas ao seu redor, como você a enxerga?",
-    "Como lida com seus traumas? Consegue falar sobre eles?",
-    "Você acredita que a verdade existe ou tudo é relativo? Explique.",
-    "O que significa a doença para você? Está enfrentando alguma? Fale livremente.",
-    "Há alguém que você gostaria de ter ao seu lado agora? Quem é essa pessoa e por que ela não está?",
-    "Qual é o seu maior vício? Por que você acha que ele surgiu? Já tentou vencê-lo?",
-    "Sente que tem outros vícios, mesmo que sutis ou emocionais? Quais?",
-    "Como você percebe a morte? Ela te assusta, conforta ou provoca curiosidade?",
-    "Você acredita em continuidade após a morte? O que imagina que exista?",
-
-    // BLOCO 2 – Raízes e Experiências de Vida (8)
-    "Com quem foi criado: ambos os pais biológicos, só um dos pais biológicos (divórcio ou morte), pais afetivos (adoção) ou parentes?",
-    "É filho único?",
-    "Quantos irmãos tem? É primogênito, do meio ou caçula?",
-    "Passou fome quando criança?",
-    "Nível de escolaridade e formação acadêmica.",
-    "Estado civil: solteiro, namorando, casado, divorciado, viúvo?",
-    "Tem alguma deficiência física?",
-    "Você já sofreu algum tipo de preconceito? Foi superado ou ainda interfere nas suas decisões?",
-
-    // BLOCO 3 – Futuro e Propósito (5)
-    "Quais são os seus maiores sonhos para o futuro?",
-    "O que você considera essencial para ter uma vida plena?",
-    "Se pudesse mudar algo na sociedade, o que mudaria?",
-    "Qual legado gostaria de deixar?",
-    "Se pudesse passar uma mensagem para o mundo inteiro agora, qual seria?",
-
-    // BLOCO 4 – Jornada Iluminada (9)
-    "Você se recorda da idade em que, pela primeira vez, percebeu que era alguém neste mundo?",
-    "Se encontrasse seu 'eu' de 10 anos atrás, o que diria?",
-    "O que significa fé para você?",
-    "Já teve alguma experiência que mudou sua forma de ver a vida?",
-    "Quais pessoas mais marcaram sua caminhada? Por quê?",
-    "Você acredita que tudo tem um propósito?",
-    "Se pudesse receber uma resposta direta de Deus agora, qual pergunta faria?",
-    "Que hábito você pode iniciar hoje que te aproximaria do seu propósito?",
-    "Qual é a decisão corajosa que você vem adiando e precisa tomar?"
-  ];
-
-  // Títulos por bloco (índices de início)
-  const BLOCO_TITULOS = {
-    0: "Reflexões da Alma e da Existência",
-    10: "Raízes e Experiências de Vida",
-    18: "Futuro e Propósito",
-    23: "Jornada Iluminada"
-  };
-
-  // Renderização
-  const lista = document.getElementById("lista-perguntas");
-  const parts = [];
-  PERGUNTAS.forEach((texto, i) => {
-    if (BLOCO_TITULOS[i]) {
-      parts.push(`
-        <h3 class="mt-10 mb-4 text-xl font-extrabold tracking-wide text-yellow-300">
-          ${BLOCO_TITULOS[i]}
-        </h3>
-      `);
-    }
-    parts.push(`
-      <div class="mb-6 rounded-2xl bg-white/5 p-4 border border-white/10">
-        <label class="block font-semibold mb-2 break-words">${i + 1}. ${texto}</label>
-        <textarea name="q${i + 1}" rows="4"
-          class="w-full min-h-[110px] rounded-xl bg-gray-900/60 border border-white/10 p-3"
-          placeholder="Escreva com sinceridade..."></textarea>
+  <!-- Cabeçalho -->
+  <header class="sticky top-0 z-40 bg-slate-900/80 backdrop-blur border-b border-white/10">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="/assets/favicon.svg" class="h-7 w-7" alt="">
+        <span class="font-semibold tracking-wide">Irmandade Conhecimento com Luz</span>
       </div>
-    `);
-  });
-  lista.innerHTML = parts.join("");
-</script>
-<script src="/assets/jornada-essencial.js?v=5" defer></script>
+      <span class="text-sm text-slate-300">Jornada Essencial</span>
+    </div>
+  </header>
+
+  <!-- Conteúdo principal -->
+  <main id="app" class="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-8 pb-40">
+
+    <!-- Devolutiva -->
+    <section id="devolutiva"
+      class="relative rounded-2xl bg-slate-800/60 backdrop-blur p-6 shadow-xl ring-1 ring-white/10
+             max-h-[60vh] overflow-y-auto mb-8">
+      <div class="flex items-start justify-between">
+        <h2 class="text-xl font-semibold">Devolutiva do Lumen</h2>
+        <button id="toggle-devolutiva"
+          class="ml-4 text-xs px-3 py-1 rounded-lg bg-slate-700 hover:bg-slate-600">
+          Mostrar/Esconder
+        </button>
+      </div>
+
+      <div id="devolutiva-content" class="mt-4 leading-relaxed whitespace-pre-line">
+Irmão(ã) de luz, Amor e paz, recebo tua história com respeito e amor.
+Teu compromisso ecoa dentro da tua própria chama: Amor e paz.
+Recorda: fé sustenta, disciplina organiza, esperança ilumina. Cada gesto no
+Bem fortalece teu destino.
+
+Próximos passos práticos:
+• Respira e escreve um propósito simples para hoje.
+• Agradece por algo real.
+• Pratica um gesto de bondade ainda hoje.
+      </div>
+    </section>
+
+    <!-- Grid -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Coluna esquerda -->
+      <div class="rounded-2xl bg-slate-800/60 backdrop-blur p-6 shadow-xl ring-1 ring-white/10">
+        <label for="senha" class="block text-sm mb-2 text-slate-300">Senha de acesso</label>
+        <div class="relative">
+          <input id="senha" type="password" placeholder="Digite sua senha"
+                 class="w-full rounded-xl bg-slate-900/60 border border-white/10 px-4 py-3
+                        focus:outline-none focus:ring-2 focus:ring-primary-500 pr-10">
+          <button id="toggle-senha" type="button"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-300 text-sm">
+            👁️
+          </button>
+        </div>
+        <div class="mt-6 text-sm">
+          <div class="text-slate-300">Progresso</div>
+          <div id="progresso" class="mt-1">
+            Pergunta <span id="q-atual">32</span>/32 • Respondidas <span id="q-respondidas">31</span>/32
+          </div>
+        </div>
+      </div>
+
+      <!-- Coluna central -->
+      <div class="hidden lg:block"></div>
+
+      <!-- Coluna direita -->
+      <div class="rounded-2xl bg-slate-800/60 backdrop-blur p-6 shadow-xl ring-1 ring-white/10">
+        <h3 class="text-lg font-semibold">Finalizar</h3>
+        <p class="mt-2 text-sm text-slate-300">
+          Você chegou ao fim. Se quiser, pode voltar e revisar as respostas.
+        </p>
+        <p class="mt-3 text-sm">Respondidas <span id="respondidas-final">31</span>/32</p>
+
+        <div class="mt-6 flex items-center gap-3">
+          <button id="btn-voltar-inline"
+                  class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600">
+            Voltar
+          </button>
+          <button id="btn-enviar-inline"
+                  class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 font-medium">
+            Enviar respostas
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Action Bar fixa -->
+  <div id="action-bar"
+       class="fixed bottom-4 left-1/2 -translate-x-1/2
+              w-[95%] md:w-auto
+              rounded-2xl bg-slate-800/90 backdrop-blur
+              shadow-2xl ring-1 ring-white/10
+              px-4 py-3 flex items-center gap-3 z-30">
+    <button id="btn-voltar"
+            class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600">
+      Voltar
+    </button>
+    <button id="btn-enviar"
+            class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 font-medium">
+      Enviar respostas
+    </button>
+    <button id="btn-limpar"
+            class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600">
+      Limpar respostas
+    </button>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    const hasFn = (name) => typeof window[name] === 'function';
+
+    // Alternar senha
+    document.getElementById('toggle-senha')?.addEventListener('click', () => {
+      const input = document.getElementById('senha');
+      input.type = input.type === 'password' ? 'text' : 'password';
+    });
+
+    // Mostrar/ocultar devolutiva
+    document.getElementById('toggle-devolutiva')?.addEventListener('click', () => {
+      const c = document.getElementById('devolutiva-content');
+      c.classList.toggle('hidden');
+    });
+
+    // Funções fallback
+    function __fallbackGoBack() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    async function __fallbackSubmit() { alert('Submeter jornada (PDJ).'); }
+    function __fallbackClear() {
+      if (confirm('Deseja realmente limpar todas as respostas?')) {
+        if (hasFn('clearAllAnswers')) { window.clearAllAnswers(); return; }
+        localStorage.clear(); location.reload();
+      }
+    }
+
+    // Handlers
+    const goBack = () => hasFn('goToPreviousStep') ? window.goToPreviousStep() : __fallbackGoBack();
+    const sendNow = () => hasFn('submitJourney') ? window.submitJourney() : __fallbackSubmit();
+    const clearAll = () => hasFn('clearAllAnswers') ? window.clearAllAnswers() : __fallbackClear();
+
+    document.getElementById('btn-voltar')?.addEventListener('click', goBack);
+    document.getElementById('btn-enviar')?.addEventListener('click', sendNow);
+    document.getElementById('btn-limpar')?.addEventListener('click', clearAll);
+
+    document.getElementById('btn-voltar-inline')?.addEventListener('click', goBack);
+    document.getElementById('btn-enviar-inline')?.addEventListener('click', sendNow);
+  </script>
+
 </body>
 </html>
-
