@@ -52,8 +52,6 @@
   </div>
 
   <script>
-    // ===== Config / rotas =====
-    <script>
   // ===== Config / rotas =====
   const API_PRIMARY = 'https://conhecimento-com-luz-api.onrender.com';
   const API_FALLBACK = 'https://lumen-backend-api.onrender.com';
@@ -78,13 +76,7 @@
   function mustStart() {
     const t = localStorage.getItem('authToken');
     const started = localStorage.getItem('journeyStarted');
-    if(!t || !started) {
-      // limpa resíduos e volta pra intro
-      localStorage.removeItem('jornadaAnswers');
-      localStorage.removeItem('journeyComplete');
-      location.replace('/jornada-intro.html');
-      return true;
-    }
+    if(!t || !started) { location.replace('/jornada-intro.html'); return true; }
     return false;
   }
   function saveAnswers(obj){ localStorage.setItem('jornadaAnswers', JSON.stringify(obj||{})); }
@@ -209,11 +201,10 @@
     }
   }
 
-  // ===== Loader robusto (com debug visível) =====
+  // ===== Loader com debug visível =====
   async function loadQuestions(){
     const token = localStorage.getItem('authToken');
     const headers = token ? { 'Authorization': `Bearer ${token}`, 'X-Auth-Token': token } : {};
-
     const bases = Array.from(new Set([ localStorage.getItem('apiBase'), API_PRIMARY, API_FALLBACK ].filter(Boolean)));
     const paths = ['/jornada/questions','/jornada/questions/','/questions','/api/jornada/questions','/api/questions'];
 
