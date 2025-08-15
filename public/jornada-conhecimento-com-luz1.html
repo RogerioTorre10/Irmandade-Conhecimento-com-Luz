@@ -6,18 +6,10 @@
   <title>Jornada Essencial · Irmandade Conhecimento com Luz</title>
   <meta name="description" content="Jornada Conhecimento com Luz — fé, ciência e propósito em uma viagem interior guiada pelo Lumen." />
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
-
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: {50:'#fff7ed',100:'#ffedd5',200:'#fed7aa',300:'#fdba74',400:'#fb923c',500:'#f59e0b',600:'#d97706',700:'#b45309',800:'#92400e',900:'#78350f'}
-          }
-        }
-      }
+      theme:{extend:{colors:{primary:{50:'#fff7ed',100:'#ffedd5',200:'#fed7aa',300:'#fdba74',400:'#fb923c',500:'#f59e0b',600:'#d97706',700:'#b45309',800:'#92400e',900:'#78350f'}}}}
     }
   </script>
 </head>
@@ -34,24 +26,38 @@
     </div>
   </header>
 
-  <!-- Conteúdo principal -->
-  <main id="app" class="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-8 pb-40">
+  <!-- Conteúdo -->
+  <main id="app" class="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-8 pb-44">
 
     <!-- Alertas -->
     <div id="alert" class="hidden mb-4 rounded-xl border border-white/10 bg-slate-800/70 p-3 text-sm"></div>
 
+    <!-- Aviso/Contrato (Tally) -->
+    <section class="rounded-2xl bg-slate-800/60 backdrop-blur p-6 shadow-xl ring-1 ring-white/10 mb-8">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold">🛡️ AVISO IMPORTANTE – LEIA ANTES DE INICIAR</h2>
+        <button id="toggle-aviso" class="text-xs px-3 py-1 rounded-lg bg-slate-700 hover:bg-slate-600">Mostrar/Esconder</button>
+      </div>
+      <div id="aviso-content" class="mt-3 text-sm leading-relaxed space-y-3">
+        <p>Esta é uma jornada pessoal, simbólica e inspiradora. Para proteger sua privacidade e garantir uma experiência ética, siga com atenção as orientações abaixo:</p>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>✅ Suas respostas não serão armazenadas após o término.</li>
+          <li>📄 Ao final da jornada, será gerado um PDF exclusivo com suas respostas e a devolutiva simbólica do Lumen.</li>
+          <li>⚠️ Este PDF não será enviado por e-mail. Você deverá baixá-lo imediatamente após a geração.</li>
+          <li>🔥 Após a entrega do PDF, todos os dados serão apagados automaticamente e sem possibilidade de recuperação.</li>
+          <li>🔒 O acesso à jornada será feito por senha individual, com prazo de: 15 dias para iniciar e 24 horas para concluir, após o primeiro acesso.</li>
+        </ul>
+        <p>Ao prosseguir, você declara estar ciente e de acordo com estas condições. Tudo aqui é feito com amor, ética e respeito pela sua história. 🙏✨</p>
+      </div>
+    </section>
+
     <!-- Devolutiva -->
-    <section id="devolutiva"
-      class="relative rounded-2xl bg-slate-800/60 backdrop-blur p-6 shadow-xl ring-1 ring-white/10
+    <section id="devolutiva" class="relative rounded-2xl bg-slate-800/60 backdrop-blur p-6 shadow-xl ring-1 ring-white/10
              max-h-[60vh] overflow-y-auto mb-8">
       <div class="flex items-start justify-between">
         <h2 class="text-xl font-semibold">Devolutiva do Lumen</h2>
-        <button id="toggle-devolutiva"
-          class="ml-4 text-xs px-3 py-1 rounded-lg bg-slate-700 hover:bg-slate-600">
-          Mostrar/Esconder
-        </button>
+        <button id="toggle-devolutiva" class="ml-4 text-xs px-3 py-1 rounded-lg bg-slate-700 hover:bg-slate-600">Mostrar/Esconder</button>
       </div>
-
       <div id="devolutiva-content" class="mt-4 leading-relaxed whitespace-pre-line">
 Irmão(ã) de luz, Amor e paz, recebo tua história com respeito e amor.
 Teu compromisso ecoa dentro da tua própria chama: Amor e paz.
@@ -65,10 +71,9 @@ Próximos passos práticos:
       </div>
     </section>
 
-    <!-- Grid -->
+    <!-- Grid: Senha + Finalizar -->
     <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-      <!-- Coluna esquerda (senha + iniciar + progresso) -->
+      <!-- Coluna esquerda -->
       <div class="rounded-2xl bg-slate-800/60 backdrop-blur p-6 shadow-xl ring-1 ring-white/10">
         <label for="senha" class="block text-sm mb-2 text-slate-300">Senha de acesso</label>
         <div class="relative">
@@ -76,82 +81,70 @@ Próximos passos práticos:
                  class="w-full rounded-xl bg-slate-900/60 border border-white/10 px-4 py-3
                         focus:outline-none focus:ring-2 focus:ring-primary-500 pr-10">
           <button id="toggle-senha" type="button"
-                  class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-300 text-sm">
-            👁️
-          </button>
+                  class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-300 text-sm">👁️</button>
         </div>
 
-        <button id="btn-iniciar"
-                class="mt-4 w-full px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-medium">
+        <button id="btn-iniciar" class="mt-4 w-full px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-medium">
           Iniciar
         </button>
 
         <div class="mt-6 text-sm">
           <div class="text-slate-300">Progresso</div>
           <div id="progresso" class="mt-1">
-            Pergunta <span id="q-atual">32</span>/32 • Respondidas <span id="q-respondidas">0</span>/32
+            Pergunta <span id="q-atual">0</span>/<span id="q-total">32</span> • Respondidas <span id="q-respondidas">0</span>/<span id="q-total-2">32</span>
           </div>
         </div>
       </div>
 
-      <!-- Coluna central (respiro / formulário fica acima na página real) -->
+      <!-- Coluna central -->
       <div class="hidden lg:block"></div>
 
-      <!-- Coluna direita (Finalizar - sem botões duplicados) -->
+      <!-- Coluna direita -->
       <div class="rounded-2xl bg-slate-800/60 backdrop-blur p-6 shadow-xl ring-1 ring-white/10">
         <h3 class="text-lg font-semibold">Finalizar</h3>
-        <p class="mt-2 text-sm text-slate-300">
-          Revise suas respostas antes de enviar. O envio só libera com <b>32/32</b> respondidas.
-        </p>
-        <p class="mt-3 text-sm">Respondidas <span id="respondidas-final">0</span>/32</p>
+        <p class="mt-2 text-sm text-slate-300">Revise suas respostas. O envio libera com <b><span id="need-total">32</span>/<span id="need-total-2">32</span></b> respondidas.</p>
+        <p class="mt-3 text-sm">Respondidas <span id="respondidas-final">0</span>/<span id="rf-total">32</span></p>
       </div>
     </section>
+
+    <!-- Perguntas (render dinâmico) -->
+    <section id="perguntas" class="mt-8 space-y-6"></section>
+
   </main>
 
   <!-- Action Bar fixa -->
-  <div id="action-bar"
-       class="fixed bottom-4 left-1/2 -translate-x-1/2
-              w-[95%] md:w-auto
-              rounded-2xl bg-slate-800/90 backdrop-blur
-              shadow-2xl ring-1 ring-white/10
+  <div id="action-bar" class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[95%] md:w-auto
+              rounded-2xl bg-slate-800/90 backdrop-blur shadow-2xl ring-1 ring-white/10
               px-4 py-3 flex items-center gap-3 z-30">
-    <button id="btn-voltar"
-            class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600">
-      Voltar
-    </button>
-    <button id="btn-enviar"
-            class="px-5 py-2 rounded-xl bg-amber-500/60 cursor-not-allowed opacity-60 font-medium"
-            disabled>
+    <button id="btn-voltar" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600">Voltar</button>
+    <button id="btn-enviar" class="px-5 py-2 rounded-xl bg-amber-500/60 cursor-not-allowed opacity-60 font-medium" disabled>
       Enviar respostas
     </button>
-    <button id="btn-limpar"
-            class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600">
-      Limpar respostas (todas)
+    <button id="btn-limpar" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600">
+      Limpar respostas (este dispositivo)
     </button>
   </div>
 
   <!-- Scripts -->
   <script>
-    // ================== CONFIG API ==================
+    // ====== CONFIG ======
     const API_PRIMARY = 'https://conhecimento-com-luz-api.onrender.com';
-    const API_FALLBACK = 'https://lumen-backend-api.onrender.com'; // opcional
+    const API_FALLBACK = 'https://lumen-backend-api.onrender.com';
     let API = API_PRIMARY;
-    const TOTAL = 32;
+    let TOTAL = 32;
 
-    // ================== UI helpers ==================
-    const $ = (sel) => document.querySelector(sel);
+    // ====== Helpers ======
+    const $ = s => document.querySelector(s);
+    const elPerguntas = $('#perguntas');
     function toast(msg, type='info') {
-      const el = $('#alert');
-      if (!el) return;
+      const el = $('#alert'); if(!el) return;
       el.classList.remove('hidden');
       el.classList.toggle('border-amber-400', type==='warn');
       el.classList.toggle('border-emerald-400', type==='ok');
       el.classList.toggle('border-red-400', type==='err');
-      el.textContent = msg;
-      setTimeout(() => el.classList.add('hidden'), 4000);
+      el.textContent = msg; setTimeout(()=>el.classList.add('hidden'), 4000);
     }
     function setEnabled(btn, on) {
-      if (!btn) return;
       btn.disabled = !on;
       btn.classList.toggle('cursor-not-allowed', !on);
       btn.classList.toggle('opacity-60', !on);
@@ -159,224 +152,236 @@ Próximos passos práticos:
       btn.classList.toggle('bg-amber-500', on);
       btn.classList.toggle('hover:bg-amber-600', on);
     }
-
-    // ================== BACKEND helpers ==================
-    async function apiFetch(path, {method='GET', headers={}, body=null, timeout=20000} = {}) {
-      const ctrl = new AbortController();
-      const t = setTimeout(() => ctrl.abort(), timeout);
-      try {
-        const res = await fetch(API + path, { method, headers, body, signal: ctrl.signal });
-        clearTimeout(t);
-        return res;
-      } catch (e) {
-        if (API !== API_FALLBACK && API_FALLBACK) {
-          API = API_FALLBACK;
-          return fetch(API + path, { method, headers, body });
-        }
-        throw e;
-      }
+    function saveAnswers(obj){ localStorage.setItem('jornadaAnswers', JSON.stringify(obj||{})); }
+    function getAnswers(){
+      const raw = localStorage.getItem('jornadaAnswers');
+      if(raw){ try{ return JSON.parse(raw);}catch{} }
+      return {};
+    }
+    function countAnswered(obj){
+      return Object.values(obj).reduce((a,v)=>{
+        if(Array.isArray(v)) return a + (v.length?1:0);
+        return a + (v!==null && v!==undefined && String(v).trim()!=='' ? 1 : 0);
+      },0);
+    }
+    function apiFetch(path, {method='GET', headers={}, body=null, timeout=20000}={}){
+      const ctrl = new AbortController(); const t=setTimeout(()=>ctrl.abort(),timeout);
+      return fetch(API+path,{method,headers,body,signal:ctrl.signal})
+        .catch(async e=>{
+          if(API!==API_FALLBACK && API_FALLBACK){ API=API_FALLBACK; return fetch(API+path,{method,headers,body}); }
+          throw e;
+        }).finally(()=>clearTimeout(t));
     }
 
-    async function wakeBackend() {
-      try {
-        const r = await apiFetch('/health');
-        if (r.ok) { toast('Servidor pronto.', 'ok'); return true; }
-        toast('Servidor respondeu, mas não OK.', 'warn');
-      } catch {
-        toast('Servidor dormindo/offline.', 'err');
+    // ====== Aviso / Devolutiva toggles ======
+    $('#toggle-aviso')?.addEventListener('click',()=>$('#aviso-content')?.classList.toggle('hidden'));
+    $('#toggle-devolutiva')?.addEventListener('click',()=>$('#devolutiva-content')?.classList.toggle('hidden'));
+    $('#toggle-senha')?.addEventListener('click',()=>{ const i=$('#senha'); i.type = i.type==='password'?'text':'password'; });
+
+    // ====== Renderizador de perguntas ======
+    function buildQuestion(q, idx){
+      const id = q.id || q.qid || q.key || 'q'+idx;
+      const label = q.label || q.title || q.text || `Pergunta ${idx+1}`;
+      const type = (q.type || 'text').toLowerCase();
+      const required = !!q.required;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'rounded-2xl bg-slate-800/60 backdrop-blur p-5 shadow ring-1 ring-white/10';
+      wrapper.dataset.qid = id;
+
+      const head = document.createElement('label');
+      head.className='block mb-3 font-medium';
+      head.textContent = label + (required?' *':'');
+      wrapper.appendChild(head);
+
+      const ans = getAnswers();
+      const val = ans[id];
+
+      function inputBase(el){
+        el.name = id; el.setAttribute('data-qid', id);
+        el.className = 'w-full rounded-xl bg-slate-900/60 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500';
+        if(val!==undefined && typeof val==='string') el.value = val;
+        el.addEventListener('input', syncNow);
+        return el;
       }
+
+      function syncNow(){
+        const a = getAnswers();
+        if(this.type==='checkbox'){
+          const arr = Array.from(wrapper.querySelectorAll('input[type="checkbox"]:checked')).map(e=>e.value);
+          a[id]=arr; saveAnswers(a); updateProgress();
+        } else if(this.type==='radio'){
+          const sel = wrapper.querySelector('input[type="radio"]:checked'); a[id]= sel? sel.value : '';
+          saveAnswers(a); updateProgress();
+        } else {
+          a[id]= this.value; saveAnswers(a); updateProgress();
+        }
+      }
+
+      if(type==='long_text' || type==='textarea'){
+        const ta = document.createElement('textarea'); ta.rows=4; inputBase(ta); wrapper.appendChild(ta);
+      } else if(type==='single' || type==='radio'){
+        const group = document.createElement('div'); group.className='space-y-2';
+        (q.options||[]).forEach(opt=>{
+          const idOpt = id+'_'+String(opt.value||opt).replace(/\s+/g,'_');
+          const lbl = document.createElement('label'); lbl.className='flex items-center gap-2';
+          const r = document.createElement('input'); r.type='radio'; r.name=id; r.value = String(opt.value??opt);
+          r.setAttribute('data-qid', id);
+          r.addEventListener('change', syncNow);
+          if(val!==undefined && String(val)===String(r.value)) r.checked=true;
+          const span=document.createElement('span'); span.textContent = String(opt.label??opt);
+          lbl.appendChild(r); lbl.appendChild(span); group.appendChild(lbl);
+        });
+        wrapper.appendChild(group);
+      } else if(type==='multi' || type==='checkbox'){
+        const group = document.createElement('div'); group.className='space-y-2';
+        const curr = Array.isArray(val)? new Set(val.map(String)): new Set();
+        (q.options||[]).forEach(opt=>{
+          const lbl = document.createElement('label'); lbl.className='flex items-center gap-2';
+          const c = document.createElement('input'); c.type='checkbox'; c.name=id; c.value=String(opt.value??opt);
+          c.setAttribute('data-qid', id);
+          if(curr.has(String(c.value))) c.checked=true;
+          c.addEventListener('change', syncNow);
+          const span=document.createElement('span'); span.textContent = String(opt.label??opt);
+          lbl.appendChild(c); lbl.appendChild(span); group.appendChild(lbl);
+        });
+        wrapper.appendChild(group);
+      } else if(type==='select'){
+        const sel=document.createElement('select'); sel.className='w-full rounded-xl bg-slate-900/60 border border-white/10 px-3 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500';
+        sel.name=id; sel.setAttribute('data-qid', id);
+        (q.options||[]).forEach(opt=>{
+          const o=document.createElement('option'); o.value=String(opt.value??opt); o.textContent=String(opt.label??opt);
+          if(val!==undefined && String(val)===o.value) o.selected=true; sel.appendChild(o);
+        });
+        sel.addEventListener('change', syncNow);
+        wrapper.appendChild(sel);
+      } else {
+        const inp = document.createElement('input'); inp.type='text'; inputBase(inp); wrapper.appendChild(inp);
+      }
+
+      return wrapper;
+    }
+
+    function renderQuestions(list){
+      elPerguntas.innerHTML='';
+      list.forEach((q,i)=> elPerguntas.appendChild(buildQuestion(q,i)) );
+      TOTAL = list.length || 32;
+      $('#q-total').textContent = TOTAL; $('#q-total-2').textContent = TOTAL;
+      $('#need-total').textContent = TOTAL; $('#need-total-2').textContent = TOTAL; $('#rf-total').textContent = TOTAL;
+      updateProgress();
+    }
+
+    function updateProgress(){
+      const ans = getAnswers();
+      const done = countAnswered(ans);
+      $('#q-respondidas').textContent = done;
+      $('#respondidas-final').textContent = done;
+      $('#q-atual').textContent = Math.min(done+1, TOTAL);
+      setEnabled($('#btn-enviar'), !!localStorage.getItem('journeyStarted') && done>=TOTAL);
+    }
+
+    function scrollToFirstMissing(){
+      const ans = getAnswers(); const keys = new Set(Object.keys(ans||{}));
+      let target=null;
+      document.querySelectorAll('#perguntas [data-qid]').forEach(el=>{
+        const k=el.getAttribute('data-qid');
+        const v=ans[k];
+        const ok = Array.isArray(v)? v.length>0 : (v!==null && v!==undefined && String(v).trim()!=='');
+        if(!ok && !target) target=el;
+      });
+      if(target){ target.scrollIntoView({behavior:'smooth',block:'center'}); target.classList.add('ring-2','ring-rose-500','ring-offset-2','ring-offset-slate-900'); setTimeout(()=>target.classList.remove('ring-2','ring-rose-500','ring-offset-2','ring-offset-slate-900'),3000); target.focus?.(); }
+    }
+
+    // ====== Backend / Fluxo ======
+    async function wakeBackend(){
+      try{ const r=await apiFetch('/health'); if(r.ok){ toast('Servidor pronto.','ok'); return true; } }catch{ toast('Servidor offline.','err'); }
       return false;
     }
 
-    // ================== CAPTURA DE DADOS ==================
-    function getStoredAnswers() {
-      for (const k of ['answers','journeyAnswers','jornadaAnswers']) {
-        const raw = localStorage.getItem(k);
-        if (raw) { try { const o = JSON.parse(raw); if (o && typeof o==='object') return o; } catch {} }
-      }
-      return null;
-    }
-
-    function scrapeFormAnswers() {
-      const data = {};
-      document.querySelectorAll('input, textarea, select').forEach(el => {
-        const key = el.getAttribute('data-qid') || el.name;
-        if (!key) return;
-        if (el.type === 'checkbox') {
-          if (!data[key]) data[key] = [];
-          if (el.checked) data[key].push(el.value ?? true);
-        } else if (el.type === 'radio') {
-          if (el.checked) data[key] = el.value;
-        } else {
-          data[key] = el.value;
-        }
-      });
-      return data;
-    }
-
-    function collectAnswers() {
-      return getStoredAnswers() || scrapeFormAnswers();
-    }
-
-    function countAnswered(obj) {
-      if (!obj) return 0;
-      return Object.values(obj).reduce((acc, v) => {
-        if (Array.isArray(v)) return acc + (v.length ? 1 : 0);
-        return acc + (v !== null && v !== undefined && String(v).trim() !== '' ? 1 : 0);
-      }, 0);
-    }
-
-    function scrollToFirstMissing(answers) {
-      // tenta localizar um campo vazio e focar
-      const set = new Set(Object.keys(answers || {}));
-      let target = null;
-      document.querySelectorAll('[data-qid], [name]').forEach(el => {
-        const key = el.getAttribute('data-qid') || el.name;
-        if (!key) return;
-        const has = set.has(key) && answers[key] !== '' && !(Array.isArray(answers[key]) && !answers[key].length);
-        if (!has && !target) target = el;
-      });
-      if (target) {
-        target.scrollIntoView({ behavior:'smooth', block:'center' });
-        target.classList.add('ring-2','ring-rose-500','ring-offset-2','ring-offset-slate-900');
-        setTimeout(()=> target.classList.remove('ring-2','ring-rose-500','ring-offset-2','ring-offset-slate-900'), 3000);
-        target.focus?.();
-      }
-    }
-
-    // ================== AUTENTICAÇÃO / INÍCIO ==================
-    async function validarSenha() {
-      const input = $('#senha');
-      const senha = input?.value?.trim();
-      if (!senha) { toast('Digite a senha para iniciar.', 'warn'); input?.focus(); return false; }
-      const r = await apiFetch('/validar-senha', {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ senha })
-      });
-      if (!r.ok) { toast('Senha inválida.', 'err'); return false; }
+    async function validarSenha(){
+      const senha = $('#senha')?.value?.trim();
+      if(!senha){ toast('Digite a senha para iniciar.','warn'); $('#senha')?.focus(); return null; }
+      const r = await apiFetch('/validar-senha',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha})});
+      if(!r.ok){ toast('Senha inválida.','err'); return null; }
       const j = await r.json().catch(()=>({}));
-      if (j?.token) localStorage.setItem('authToken', j.token);
+      if(j?.token) localStorage.setItem('authToken', j.token);
       localStorage.setItem('journeyStarted', String(Date.now()));
-      toast('Acesso liberado. Boa jornada!', 'ok');
-      setEnabled($('#btn-enviar'), true);
-      return true;
+      toast('Acesso liberado. Boa jornada!','ok');
+      return j;
     }
 
-    async function iniciar() {
-      await wakeBackend();
-      await validarSenha();
+    async function loadQuestions(){
+      const headers = {};
+      const t = localStorage.getItem('authToken'); if(t) headers['Authorization']='Bearer '+t;
+      const res = await apiFetch('/jornada/questions',{headers});
+      if(!res.ok){ toast('Não foi possível carregar as perguntas.','err'); return; }
+      const j = await res.json().catch(()=>[]);
+      const list = j?.questions || j?.data || j || [];
+      if(!Array.isArray(list) || !list.length){ toast('Perguntas vazias no servidor.','warn'); return; }
+      renderQuestions(list);
+      // restaura respostas visuais
+      const ans = getAnswers();
+      document.querySelectorAll('#perguntas [data-qid]').forEach(el=>{
+        const k=el.getAttribute('data-qid'); const v=ans[k];
+        if(v===undefined) return;
+        if(el.type==='checkbox'){ el.checked = Array.isArray(v) && v.includes(el.value); }
+        else if(el.type==='radio'){ el.checked = String(v)===String(el.value); }
+        else if(el.tagName==='SELECT'){ el.value = String(v); }
+        else { el.value = String(v); }
+      });
+      updateProgress();
     }
 
-    // ================== ENVIO / PDF ==================
-    async function submitJourney() {
-      // bloqueio se não iniciou
-      if (!localStorage.getItem('journeyStarted')) {
-        toast('Clique em INICIAR para liberar o envio.', 'warn');
-        $('#senha')?.focus();
-        return;
-      }
+    async function iniciar(){ await wakeBackend(); const ok = await validarSenha(); if(ok) { setEnabled($('#btn-enviar'), false); await loadQuestions(); } }
 
-      const answers = collectAnswers();
-      const answered = countAnswered(answers);
-      $('#q-respondidas').textContent = answered;
-      $('#respondidas-final').textContent = answered;
+    async function submitJourney(){
+      if(!localStorage.getItem('journeyStarted')){ toast('Clique em INICIAR para liberar o envio.','warn'); return; }
 
-      if (answered < TOTAL) {
-        toast(`Você precisa responder ${TOTAL}/${TOTAL} antes de enviar.`, 'warn');
-        scrollToFirstMissing(answers);
-        return;
-      }
+      const answers = getAnswers();
+      const done = countAnswered(answers);
+      if(done < TOTAL){ toast(`Responda ${TOTAL}/${TOTAL} antes de enviar.`, 'warn'); scrollToFirstMissing(); return; }
 
-      toast('Enviando respostas...', 'info');
+      toast('Enviando respostas...','info');
+      const headers = {'Content-Type':'application/json'};
+      const t=localStorage.getItem('authToken'); if(t) headers['Authorization']='Bearer '+t;
 
-      const headers = { 'Content-Type': 'application/json' };
-      const token = localStorage.getItem('authToken');
-      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const payload = { answers, meta:{clientTime:new Date().toISOString(), userAgent:navigator.userAgent} };
+      const res = await apiFetch('/jornada/submit',{method:'POST',headers,body:JSON.stringify(payload)});
+      if(!res.ok){ const tx=await res.text().catch(()=>res.statusText); toast(`Falha ao enviar: ${res.status} ${tx}`,'err'); return; }
 
-      const payload = {
-        answers,
-        meta: { clientTime:new Date().toISOString(), userAgent:navigator.userAgent }
-      };
+      toast('Gerando PDF...','info');
+      let pdf = await apiFetch('/jornada/pdf',{method:'POST', headers});
+      if(!pdf.ok) pdf = await apiFetch('/jornada/pdf',{method:'GET', headers});
+      if(!pdf.ok){ const tx=await pdf.text().catch(()=>pdf.statusText); toast(`PDF não gerado: ${pdf.status} ${tx}`,'err'); return; }
 
-      const res = await apiFetch('/jornada/submit', { method:'POST', headers, body: JSON.stringify(payload) });
-      if (!res.ok) {
-        const msg = await res.text().catch(()=> res.statusText);
-        toast(`Falha ao enviar: ${res.status} ${msg}`, 'err');
-        return;
-      }
-
-      toast('Gerando PDF...', 'info');
-
-      // tenta POST /jornada/pdf; se falhar, tenta GET /jornada/pdf e /jornada/download/pdf
-      let pdfRes = await apiFetch('/jornada/pdf', { method:'POST', headers });
-      if (!pdfRes.ok) {
-        pdfRes = await apiFetch('/jornada/pdf', { method:'GET', headers });
-      }
-      if (!pdfRes.ok) {
-        pdfRes = await apiFetch('/jornada/download/pdf', { method:'GET', headers });
-      }
-      if (!pdfRes.ok) {
-        const emsg = await pdfRes.text().catch(()=> pdfRes.statusText);
-        toast(`PDF não gerado: ${pdfRes.status} ${emsg}`, 'err');
-        return;
-      }
-
-      const blob = await pdfRes.blob();
-      const url = URL.createObjectURL(blob);
-
-      // abre e faz download
-      window.open(url, '_blank', 'noopener');
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `Jornada_Conhecimento_com_Luz_${Date.now()}.pdf`;
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(()=>URL.revokeObjectURL(url), 4000);
-
-      toast('PDF pronto! Baixe e guarde agora.', 'ok');
+      const blob = await pdf.blob(); const url = URL.createObjectURL(blob);
+      window.open(url,'_blank','noopener'); const a=document.createElement('a');
+      a.href=url; a.download=`Jornada_Conhecimento_com_Luz_${Date.now()}.pdf`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000);
+      toast('PDF pronto! Baixe e guarde agora.','ok');
     }
 
-    function goToPreviousStep() {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    function goBack(){ window.scrollTo({top:0,behavior:'smooth'}); }
+
+    function clearAll(){
+      if(!confirm('Isto limpa apenas as respostas salvas neste dispositivo. Não apaga sua senha, nem arquivos já gerados. Deseja continuar?')) return;
+      ['jornadaAnswers'].forEach(k=>localStorage.removeItem(k));
+      document.querySelectorAll('#perguntas input, #perguntas textarea, #perguntas select').forEach(el=>{
+        if(el.type==='checkbox'||el.type==='radio') el.checked=false; else el.value='';
+      });
+      updateProgress(); toast('Respostas deste dispositivo foram limpas.','ok');
     }
 
-    function clearAllAnswers() {
-      if (!confirm('Limpar TODAS as respostas desta jornada no dispositivo?')) return;
-      try {
-        // mantém token; limpa somente respostas e controle de início
-        ['answers','journeyAnswers','jornadaAnswers','journeyStarted'].forEach(k => localStorage.removeItem(k));
-        document.querySelectorAll('input, textarea, select').forEach(el=>{
-          if (el.type==='checkbox' || el.type==='radio') el.checked = false;
-          else el.value = '';
-        });
-        $('#q-respondidas').textContent = '0';
-        $('#respondidas-final').textContent = '0';
-        toast('Respostas limpas.', 'ok');
-      } catch { toast('Não foi possível limpar.', 'err'); }
-    }
-
-    // ================== WIRING ==================
-    $('#toggle-senha')?.addEventListener('click', () => {
-      const input = $('#senha');
-      input.type = input.type === 'password' ? 'text' : 'password';
-    });
-    $('#toggle-devolutiva')?.addEventListener('click', () => {
-      $('#devolutiva-content')?.classList.toggle('hidden');
-    });
-
+    // Wiring
     $('#btn-iniciar')?.addEventListener('click', iniciar);
-    $('#btn-voltar')?.addEventListener('click', goToPreviousStep);
+    $('#btn-voltar')?.addEventListener('click', goBack);
     $('#btn-enviar')?.addEventListener('click', submitJourney);
-    $('#btn-limpar')?.addEventListener('click', clearAllAnswers);
+    $('#btn-limpar')?.addEventListener('click', clearAll);
 
-    // ================== BOOT ==================
-    (async () => {
+    // Boot
+    (async ()=>{
       await wakeBackend();
-      // se já iniciou antes, libera envio
-      setEnabled($('#btn-enviar'), !!localStorage.getItem('journeyStarted'));
-      const ans = collectAnswers();
-      const answered = countAnswered(ans);
-      $('#q-respondidas').textContent = String(answered);
-      $('#respondidas-final').textContent = String(answered);
+      if(localStorage.getItem('journeyStarted')){ await loadQuestions(); setEnabled($('#btn-enviar'), countAnswered(getAnswers())>=TOTAL); }
+      updateProgress();
     })();
   </script>
 
