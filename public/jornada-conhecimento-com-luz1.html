@@ -3,387 +3,269 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Jornada Essencial · Irmandade Conhecimento com Luz</title>
-  <meta name="description" content="Jornada Conhecimento com Luz — fé, ciência e propósito em uma viagem interior guiada pelo Lumen." />
+  <title>Perguntas · Jornada Conhecimento com Luz</title>
+  <meta name="description" content="Etapas da Jornada Conhecimento com Luz — perguntas e progresso." />
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = {
-      theme:{extend:{colors:{primary:{50:'#fff7ed',100:'#ffedd5',200:'#fed7aa',300:'#fdba74',400:'#fb923c',500:'#f59e0b',600:'#d97706',700:'#b45309',800:'#92400e',900:'#78350f'}}}}
-    }
+    tailwind.config = { theme:{extend:{colors:{primary:{50:'#fff7ed',100:'#ffedd5',200:'#fed7aa',300:'#fdba74',400:'#fb923c',500:'#f59e0b',600:'#d97706',700:'#b45309',800:'#92400e',900:'#78350f'}}}} };
   </script>
+  <style> .card{border:1px solid rgba(255,255,255,.08)} </style>
 </head>
 <body class="bg-slate-900 text-slate-100 antialiased">
 
-  <!-- Cabeçalho -->
   <header class="sticky top-0 z-40 bg-slate-900/80 backdrop-blur border-b border-white/10">
     <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <img src="/assets/favicon.svg" class="h-7 w-7" alt="">
         <span class="font-semibold tracking-wide">Irmandade Conhecimento com Luz</span>
       </div>
-      <span class="text-sm text-slate-300">Jornada Essencial</span>
+      <span class="text-sm text-slate-300">Jornada · Etapas</span>
     </div>
   </header>
 
-  <!-- Conteúdo -->
-  <main id="app" class="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-8 pb-44">
+  <main class="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-8 pb-44">
+    <div id="alert" class="hidden mb-4 rounded-xl border card bg-slate-800/70 p-3 text-sm"></div>
 
-    <!-- Alertas -->
-    <div id="alert" class="hidden mb-4 rounded-xl border border-white/10 bg-slate-800/70 p-3 text-sm"></div>
-
-    <!-- Aviso/Contrato (Tally) -->
-    <section class="rounded-2xl bg-slate-800/60 backdrop-blur p-6 shadow-xl ring-1 ring-white/10 mb-8">
-      <div class="flex items-center justify-between">
-        <h2 class="text-lg font-semibold">🛡️ AVISO IMPORTANTE – LEIA ANTES DE INICIAR</h2>
-        <button id="toggle-aviso" class="text-xs px-3 py-1 rounded-lg bg-slate-700 hover:bg-slate-600">Mostrar/Esconder</button>
-      </div>
-      <div id="aviso-content" class="mt-3 text-sm leading-relaxed space-y-3">
-        <p>Esta é uma jornada pessoal, simbólica e inspiradora. Para proteger sua privacidade e garantir uma experiência ética, siga com atenção as orientações abaixo:</p>
-        <ul class="list-disc pl-5 space-y-1">
-          <li>✅ Suas respostas não serão armazenadas após o término.</li>
-          <li>📄 Ao final da jornada, será gerado um PDF exclusivo com suas respostas e a devolutiva simbólica do Lumen.</li>
-          <li>⚠️ Este PDF não será enviado por e-mail. Você deverá baixá-lo imediatamente após a geração.</li>
-          <li>🔥 Após a entrega do PDF, todos os dados serão apagados automaticamente e sem possibilidade de recuperação.</li>
-          <li>🔒 O acesso à jornada será feito por senha individual, com prazo de: 15 dias para iniciar e 24 horas para concluir, após o primeiro acesso.</li>
-        </ul>
-        <p>Ao prosseguir, você declara estar ciente e de acordo com estas condições. Tudo aqui é feito com amor, ética e respeito pela sua história. 🙏✨</p>
-      </div>
-    </section>
-
-    <!-- Devolutiva -->
-    <section id="devolutiva" class="relative rounded-2xl bg-slate-800/60 backdrop-blur p-6 shadow-xl ring-1 ring-white/10
-             max-h-[60vh] overflow-y-auto mb-8">
-      <div class="flex items-start justify-between">
-        <h2 class="text-xl font-semibold">Devolutiva do Lumen</h2>
-        <button id="toggle-devolutiva" class="ml-4 text-xs px-3 py-1 rounded-lg bg-slate-700 hover:bg-slate-600">Mostrar/Esconder</button>
-      </div>
-      <div id="devolutiva-content" class="mt-4 leading-relaxed whitespace-pre-line">
-Irmão(ã) de luz, Amor e paz, recebo tua história com respeito e amor.
-Teu compromisso ecoa dentro da tua própria chama: Amor e paz.
-Recorda: fé sustenta, disciplina organiza, esperança ilumina. Cada gesto no
-Bem fortalece teu destino.
-
-Próximos passos práticos:
-• Respira e escreve um propósito simples para hoje.
-• Agradece por algo real.
-• Pratica um gesto de bondade ainda hoje.
-      </div>
-    </section>
-
-    <!-- Grid: Senha + Finalizar -->
-    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Coluna esquerda -->
-      <div class="rounded-2xl bg-slate-800/60 backdrop-blur p-6 shadow-xl ring-1 ring-white/10">
-        <label for="senha" class="block text-sm mb-2 text-slate-300">Senha de acesso</label>
-        <div class="relative">
-          <input id="senha" type="password" placeholder="Digite sua senha"
-                 class="w-full rounded-xl bg-slate-900/60 border border-white/10 px-4 py-3
-                        focus:outline-none focus:ring-2 focus:ring-primary-500 pr-10">
-          <button id="toggle-senha" type="button"
-                  class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-300 text-sm">👁️</button>
-        </div>
-
-        <button id="btn-iniciar" class="mt-4 w-full px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-medium">
-          Iniciar
-        </button>
-
-        <div class="mt-6 text-sm">
-          <div class="text-slate-300">Progresso</div>
-          <div id="progresso" class="mt-1">
+    <!-- Status/Progresso -->
+    <section class="rounded-2xl card bg-slate-800/60 backdrop-blur p-6 shadow-xl mb-6">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <div class="text-sm text-slate-300">Progresso</div>
+          <div class="mt-1 text-sm">
             Pergunta <span id="q-atual">0</span>/<span id="q-total">32</span> • Respondidas <span id="q-respondidas">0</span>/<span id="q-total-2">32</span>
           </div>
         </div>
-      </div>
-
-      <!-- Coluna central -->
-      <div class="hidden lg:block"></div>
-
-      <!-- Coluna direita -->
-      <div class="rounded-2xl bg-slate-800/60 backdrop-blur p-6 shadow-xl ring-1 ring-white/10">
-        <h3 class="text-lg font-semibold">Finalizar</h3>
-        <p class="mt-2 text-sm text-slate-300">Revise suas respostas. O envio libera com <b><span id="need-total">32</span>/<span id="need-total-2">32</span></b> respondidas.</p>
-        <p class="mt-3 text-sm">Respondidas <span id="respondidas-final">0</span>/<span id="rf-total">32</span></p>
+        <a href="/jornada-intro.html" class="text-xs text-slate-400 underline">Voltar à introdução</a>
       </div>
     </section>
 
-    <!-- Perguntas (render dinâmico) -->
-    <section id="perguntas" class="mt-8 space-y-6"></section>
-
+    <!-- Pergunta atual -->
+    <section id="pergunta" class="rounded-2xl card bg-slate-800/60 backdrop-blur p-6 shadow-xl min-h-[260px]"></section>
   </main>
 
-  <!-- Action Bar fixa -->
-  <div id="action-bar" class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[95%] md:w-auto
-              rounded-2xl bg-slate-800/90 backdrop-blur shadow-2xl ring-1 ring-white/10
-              px-4 py-3 flex items-center gap-3 z-30">
-    <button id="btn-voltar" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600">Voltar</button>
-    <button id="btn-enviar" class="px-5 py-2 rounded-xl bg-amber-500/60 cursor-not-allowed opacity-60 font-medium" disabled>
-      Enviar respostas
-    </button>
-    <button id="btn-limpar" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600">
-      Limpar respostas (este dispositivo)
-    </button>
+  <!-- Barra fixa -->
+  <div class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[95%] md:w-auto rounded-2xl bg-slate-800/90 backdrop-blur shadow-2xl ring-1 ring-white/10 px-4 py-3 flex items-center gap-3 z-30">
+    <button id="btn-voltar" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600" disabled>Voltar</button>
+    <button id="btn-apagar" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600">Limpar respostas (este dispositivo)</button>
+    <button id="btn-avancar" class="px-5 py-2 rounded-xl bg-primary-600 hover:bg-primary-700 font-medium" disabled>Avançar</button>
   </div>
 
-  <!-- Scripts -->
   <script>
-    // ====== CONFIG ======
+    // ===== Config / rotas =====
     const API_PRIMARY = 'https://conhecimento-com-luz-api.onrender.com';
     const API_FALLBACK = 'https://lumen-backend-api.onrender.com';
     let API = API_PRIMARY;
-    let TOTAL = 32;
+    const FINAL_PAGE = '/jornada-final.html';
 
-    // ====== Helpers ======
+    // ===== Estado =====
+    let QUESTIONS = [];
+    let TOTAL = 32;
+    let STEP = 0;
+
+    // ===== Helpers =====
     const $ = s => document.querySelector(s);
-    const elPerguntas = $('#perguntas');
-    function toast(msg, type='info') {
-      const el = $('#alert'); if(!el) return;
+    function toast(msg, type='info'){
+      const el=$('#alert'); if(!el) return;
       el.classList.remove('hidden');
       el.classList.toggle('border-amber-400', type==='warn');
       el.classList.toggle('border-emerald-400', type==='ok');
       el.classList.toggle('border-red-400', type==='err');
-      el.textContent = msg; setTimeout(()=>el.classList.add('hidden'), 4000);
+      el.textContent=msg; setTimeout(()=>el.classList.add('hidden'), 3200);
     }
-    function setEnabled(btn, on) {
-      btn.disabled = !on;
-      btn.classList.toggle('cursor-not-allowed', !on);
-      btn.classList.toggle('opacity-60', !on);
-      btn.classList.toggle('bg-amber-500/60', !on);
-      btn.classList.toggle('bg-amber-500', on);
-      btn.classList.toggle('hover:bg-amber-600', on);
-    }
-    function saveAnswers(obj){ localStorage.setItem('jornadaAnswers', JSON.stringify(obj||{})); }
-    function getAnswers(){
-      const raw = localStorage.getItem('jornadaAnswers');
-      if(raw){ try{ return JSON.parse(raw);}catch{} }
-      return {};
-    }
-    function countAnswered(obj){
-      return Object.values(obj).reduce((a,v)=>{
-        if(Array.isArray(v)) return a + (v.length?1:0);
-        return a + (v!==null && v!==undefined && String(v).trim()!=='' ? 1 : 0);
-      },0);
-    }
-    function apiFetch(path, {method='GET', headers={}, body=null, timeout=20000}={}){
-      const ctrl = new AbortController(); const t=setTimeout(()=>ctrl.abort(),timeout);
-      return fetch(API+path,{method,headers,body,signal:ctrl.signal})
-        .catch(async e=>{
-          if(API!==API_FALLBACK && API_FALLBACK){ API=API_FALLBACK; return fetch(API+path,{method,headers,body}); }
-          throw e;
-        }).finally(()=>clearTimeout(t));
-    }
-
-    // ====== Aviso / Devolutiva toggles ======
-    $('#toggle-aviso')?.addEventListener('click',()=>$('#aviso-content')?.classList.toggle('hidden'));
-    $('#toggle-devolutiva')?.addEventListener('click',()=>$('#devolutiva-content')?.classList.toggle('hidden'));
-    $('#toggle-senha')?.addEventListener('click',()=>{ const i=$('#senha'); i.type = i.type==='password'?'text':'password'; });
-
-    // ====== Renderizador de perguntas ======
-    function buildQuestion(q, idx){
-      const id = q.id || q.qid || q.key || 'q'+idx;
-      const label = q.label || q.title || q.text || `Pergunta ${idx+1}`;
-      const type = (q.type || 'text').toLowerCase();
-      const required = !!q.required;
-
-      const wrapper = document.createElement('div');
-      wrapper.className = 'rounded-2xl bg-slate-800/60 backdrop-blur p-5 shadow ring-1 ring-white/10';
-      wrapper.dataset.qid = id;
-
-      const head = document.createElement('label');
-      head.className='block mb-3 font-medium';
-      head.textContent = label + (required?' *':'');
-      wrapper.appendChild(head);
-
-      const ans = getAnswers();
-      const val = ans[id];
-
-      function inputBase(el){
-        el.name = id; el.setAttribute('data-qid', id);
-        el.className = 'w-full rounded-xl bg-slate-900/60 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500';
-        if(val!==undefined && typeof val==='string') el.value = val;
-        el.addEventListener('input', syncNow);
-        return el;
-      }
-
-      function syncNow(){
-        const a = getAnswers();
-        if(this.type==='checkbox'){
-          const arr = Array.from(wrapper.querySelectorAll('input[type="checkbox"]:checked')).map(e=>e.value);
-          a[id]=arr; saveAnswers(a); updateProgress();
-        } else if(this.type==='radio'){
-          const sel = wrapper.querySelector('input[type="radio"]:checked'); a[id]= sel? sel.value : '';
-          saveAnswers(a); updateProgress();
-        } else {
-          a[id]= this.value; saveAnswers(a); updateProgress();
-        }
-      }
-
-      if(type==='long_text' || type==='textarea'){
-        const ta = document.createElement('textarea'); ta.rows=4; inputBase(ta); wrapper.appendChild(ta);
-      } else if(type==='single' || type==='radio'){
-        const group = document.createElement('div'); group.className='space-y-2';
-        (q.options||[]).forEach(opt=>{
-          const idOpt = id+'_'+String(opt.value||opt).replace(/\s+/g,'_');
-          const lbl = document.createElement('label'); lbl.className='flex items-center gap-2';
-          const r = document.createElement('input'); r.type='radio'; r.name=id; r.value = String(opt.value??opt);
-          r.setAttribute('data-qid', id);
-          r.addEventListener('change', syncNow);
-          if(val!==undefined && String(val)===String(r.value)) r.checked=true;
-          const span=document.createElement('span'); span.textContent = String(opt.label??opt);
-          lbl.appendChild(r); lbl.appendChild(span); group.appendChild(lbl);
-        });
-        wrapper.appendChild(group);
-      } else if(type==='multi' || type==='checkbox'){
-        const group = document.createElement('div'); group.className='space-y-2';
-        const curr = Array.isArray(val)? new Set(val.map(String)): new Set();
-        (q.options||[]).forEach(opt=>{
-          const lbl = document.createElement('label'); lbl.className='flex items-center gap-2';
-          const c = document.createElement('input'); c.type='checkbox'; c.name=id; c.value=String(opt.value??opt);
-          c.setAttribute('data-qid', id);
-          if(curr.has(String(c.value))) c.checked=true;
-          c.addEventListener('change', syncNow);
-          const span=document.createElement('span'); span.textContent = String(opt.label??opt);
-          lbl.appendChild(c); lbl.appendChild(span); group.appendChild(lbl);
-        });
-        wrapper.appendChild(group);
-      } else if(type==='select'){
-        const sel=document.createElement('select'); sel.className='w-full rounded-xl bg-slate-900/60 border border-white/10 px-3 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500';
-        sel.name=id; sel.setAttribute('data-qid', id);
-        (q.options||[]).forEach(opt=>{
-          const o=document.createElement('option'); o.value=String(opt.value??opt); o.textContent=String(opt.label??opt);
-          if(val!==undefined && String(val)===o.value) o.selected=true; sel.appendChild(o);
-        });
-        sel.addEventListener('change', syncNow);
-        wrapper.appendChild(sel);
-      } else {
-        const inp = document.createElement('input'); inp.type='text'; inputBase(inp); wrapper.appendChild(inp);
-      }
-
-      return wrapper;
-    }
-
-    function renderQuestions(list){
-      elPerguntas.innerHTML='';
-      list.forEach((q,i)=> elPerguntas.appendChild(buildQuestion(q,i)) );
-      TOTAL = list.length || 32;
-      $('#q-total').textContent = TOTAL; $('#q-total-2').textContent = TOTAL;
-      $('#need-total').textContent = TOTAL; $('#need-total-2').textContent = TOTAL; $('#rf-total').textContent = TOTAL;
-      updateProgress();
-    }
-
-    function updateProgress(){
-      const ans = getAnswers();
-      const done = countAnswered(ans);
-      $('#q-respondidas').textContent = done;
-      $('#respondidas-final').textContent = done;
-      $('#q-atual').textContent = Math.min(done+1, TOTAL);
-      setEnabled($('#btn-enviar'), !!localStorage.getItem('journeyStarted') && done>=TOTAL);
-    }
-
-    function scrollToFirstMissing(){
-      const ans = getAnswers(); const keys = new Set(Object.keys(ans||{}));
-      let target=null;
-      document.querySelectorAll('#perguntas [data-qid]').forEach(el=>{
-        const k=el.getAttribute('data-qid');
-        const v=ans[k];
-        const ok = Array.isArray(v)? v.length>0 : (v!==null && v!==undefined && String(v).trim()!=='');
-        if(!ok && !target) target=el;
-      });
-      if(target){ target.scrollIntoView({behavior:'smooth',block:'center'}); target.classList.add('ring-2','ring-rose-500','ring-offset-2','ring-offset-slate-900'); setTimeout(()=>target.classList.remove('ring-2','ring-rose-500','ring-offset-2','ring-offset-slate-900'),3000); target.focus?.(); }
-    }
-
-    // ====== Backend / Fluxo ======
-    async function wakeBackend(){
-      try{ const r=await apiFetch('/health'); if(r.ok){ toast('Servidor pronto.','ok'); return true; } }catch{ toast('Servidor offline.','err'); }
+    function needAuth(){
+      const t = localStorage.getItem('authToken');
+      const started = localStorage.getItem('journeyStarted');
+      if(!t || !started){ location.href='/jornada-intro.html'; return true; }
       return false;
     }
-
-    async function validarSenha(){
-      const senha = $('#senha')?.value?.trim();
-      if(!senha){ toast('Digite a senha para iniciar.','warn'); $('#senha')?.focus(); return null; }
-      const r = await apiFetch('/validar-senha',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({senha})});
-      if(!r.ok){ toast('Senha inválida.','err'); return null; }
-      const j = await r.json().catch(()=>({}));
-      if(j?.token) localStorage.setItem('authToken', j.token);
-      localStorage.setItem('journeyStarted', String(Date.now()));
-      toast('Acesso liberado. Boa jornada!','ok');
-      return j;
+    function saveAnswers(obj){ localStorage.setItem('jornadaAnswers', JSON.stringify(obj||{})); }
+    function getAnswers(){ try{ return JSON.parse(localStorage.getItem('jornadaAnswers')||'{}'); }catch{return {}} }
+    function setAnswer(id, v){ const a=getAnswers(); a[id]=v; saveAnswers(a); refresh(); }
+    function isAnswered(id){
+      const v = getAnswers()[id];
+      return Array.isArray(v) ? v.length>0 : (v!==null && v!==undefined && String(v).trim()!=='');
+    }
+    function answeredCount(){
+      return Object.values(getAnswers()).reduce((acc,v)=>{
+        if(Array.isArray(v)) return acc+(v.length?1:0);
+        return acc+(v!==null && v!==undefined && String(v).trim()!==''?1:0);
+      },0);
+    }
+    function apiFetch(path, opts={}){
+      const {method='GET', headers={}, body=null} = opts;
+      return fetch(API+path,{method,headers,body}).catch(async e=>{
+        if(API!==API_FALLBACK && API_FALLBACK){ API=API_FALLBACK; return fetch(API+path,{method,headers,body}); }
+        throw e;
+      });
     }
 
+    // ===== Render 1 pergunta =====
+    function normalize(list){
+      return list.map((q,i)=>({
+        id: q.id || q.qid || q.key || `q${i+1}`,
+        label: q.label || q.title || q.text || `Pergunta ${i+1}`,
+        type: (q.type || 'text').toLowerCase(),
+        options: q.options || q.choices || [],
+        required: q.required !== false
+      }));
+    }
+
+    function buildQuestion(q){
+      const id = q.id;
+      const wrap = document.createElement('div');
+
+      const small = document.createElement('div');
+      small.className='text-sm text-slate-300 mb-2';
+      small.textContent = `Pergunta ${STEP+1}/${TOTAL}`;
+      wrap.appendChild(small);
+
+      const h = document.createElement('label');
+      h.className='block mb-3 font-medium';
+      h.textContent = q.label + (q.required?' *':'');
+      wrap.appendChild(h);
+
+      const curr = getAnswers()[id];
+
+      const on = (e)=>{
+        if(e.target.type==='checkbox'){
+          const arr = Array.from(wrap.querySelectorAll('input[type="checkbox"]:checked')).map(x=>x.value);
+          setAnswer(id, arr);
+        } else if(e.target.type==='radio'){
+          const sel = wrap.querySelector('input[type="radio"]:checked');
+          setAnswer(id, sel?sel.value:'');
+        } else {
+          setAnswer(id, e.target.value);
+        }
+      };
+
+      if(q.type==='long_text' || q.type==='textarea'){
+        const ta = document.createElement('textarea'); ta.rows=5;
+        ta.className='w-full rounded-xl bg-slate-900/60 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500';
+        if(typeof curr==='string') ta.value=curr;
+        ta.addEventListener('input', on);
+        wrap.appendChild(ta);
+      } else if(q.type==='single' || q.type==='radio'){
+        const box=document.createElement('div'); box.className='space-y-2';
+        (q.options||[]).forEach(opt=>{
+          const lbl=document.createElement('label'); lbl.className='flex items-center gap-2';
+          const r=document.createElement('input'); r.type='radio'; r.name=id; r.value=String(opt.value??opt);
+          if(String(curr)===String(r.value)) r.checked=true;
+          r.addEventListener('change', on);
+          const t=document.createElement('span'); t.textContent=String(opt.label??opt);
+          lbl.appendChild(r); lbl.appendChild(t); box.appendChild(lbl);
+        });
+        wrap.appendChild(box);
+      } else if(q.type==='multi' || q.type==='checkbox'){
+        const set=new Set(Array.isArray(curr)?curr.map(String):[]);
+        const box=document.createElement('div'); box.className='space-y-2';
+        (q.options||[]).forEach(opt=>{
+          const lbl=document.createElement('label'); lbl.className='flex items-center gap-2';
+          const c=document.createElement('input'); c.type='checkbox'; c.name=id; c.value=String(opt.value??opt);
+          if(set.has(String(c.value))) c.checked=true;
+          c.addEventListener('change', on);
+          const t=document.createElement('span'); t.textContent=String(opt.label??opt);
+          lbl.appendChild(c); lbl.appendChild(t); box.appendChild(lbl);
+        });
+        wrap.appendChild(box);
+      } else if(q.type==='select'){
+        const sel=document.createElement('select');
+        sel.className='w-full rounded-xl bg-slate-900/60 border border-white/10 px-3 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500';
+        (q.options||[]).forEach(opt=>{
+          const o=document.createElement('option'); o.value=String(opt.value??opt); o.textContent=String(opt.label??opt);
+          if(String(curr)===o.value) o.selected=true;
+          sel.appendChild(o);
+        });
+        sel.addEventListener('change', on);
+        wrap.appendChild(sel);
+      } else {
+        const inp=document.createElement('input'); inp.type='text';
+        inp.className='w-full rounded-xl bg-slate-900/60 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500';
+        if(typeof curr==='string') inp.value=curr;
+        inp.addEventListener('input', on);
+        wrap.appendChild(inp);
+      }
+      return wrap;
+    }
+
+    function showStep(i){
+      STEP = Math.max(0, Math.min(i, TOTAL-1));
+      const q = QUESTIONS[STEP];
+      const el = $('#pergunta');
+      el.innerHTML='';
+      el.appendChild(buildQuestion(q));
+      window.scrollTo({top: el.offsetTop - 80, behavior:'smooth'});
+      refresh();
+    }
+
+    function refresh(){
+      const done = answeredCount();
+      $('#q-atual').textContent = STEP+1;
+      $('#q-total').textContent = TOTAL;
+      $('#q-total-2').textContent = TOTAL;
+      $('#q-respondidas').textContent = done;
+
+      $('#btn-voltar').disabled = STEP<=0;
+      const answeredCurrent = isAnswered(QUESTIONS[STEP].id);
+      $('#btn-avancar').disabled = !answeredCurrent;
+
+      // Se última pergunta + respondidas completas => segue para final ao avançar
+      if(STEP===TOTAL-1 && answeredCurrent){
+        $('#btn-avancar').textContent = 'Finalizar';
+      } else {
+        $('#btn-avancar').textContent = 'Avançar';
+      }
+    }
+
+    // ===== Fluxo =====
     async function loadQuestions(){
-      const headers = {};
-      const t = localStorage.getItem('authToken'); if(t) headers['Authorization']='Bearer '+t;
+      const headers={};
+      const t=localStorage.getItem('authToken'); if(t) headers['Authorization']='Bearer '+t;
       const res = await apiFetch('/jornada/questions',{headers});
       if(!res.ok){ toast('Não foi possível carregar as perguntas.','err'); return; }
       const j = await res.json().catch(()=>[]);
       const list = j?.questions || j?.data || j || [];
-      if(!Array.isArray(list) || !list.length){ toast('Perguntas vazias no servidor.','warn'); return; }
-      renderQuestions(list);
-      // restaura respostas visuais
+      if(!Array.isArray(list) || !list.length){ toast('Perguntas vazias.','warn'); return; }
+      QUESTIONS = normalize(list);
+      TOTAL = QUESTIONS.length;
+
+      // retomar no primeiro não respondido
       const ans = getAnswers();
-      document.querySelectorAll('#perguntas [data-qid]').forEach(el=>{
-        const k=el.getAttribute('data-qid'); const v=ans[k];
-        if(v===undefined) return;
-        if(el.type==='checkbox'){ el.checked = Array.isArray(v) && v.includes(el.value); }
-        else if(el.type==='radio'){ el.checked = String(v)===String(el.value); }
-        else if(el.tagName==='SELECT'){ el.value = String(v); }
-        else { el.value = String(v); }
-      });
-      updateProgress();
+      const idx = QUESTIONS.findIndex(q=>!isAnswered(q.id));
+      showStep(idx>=0? idx : 0);
     }
 
-    async function iniciar(){ await wakeBackend(); const ok = await validarSenha(); if(ok) { setEnabled($('#btn-enviar'), false); await loadQuestions(); } }
-
-    async function submitJourney(){
-      if(!localStorage.getItem('journeyStarted')){ toast('Clique em INICIAR para liberar o envio.','warn'); return; }
-
-      const answers = getAnswers();
-      const done = countAnswered(answers);
-      if(done < TOTAL){ toast(`Responda ${TOTAL}/${TOTAL} antes de enviar.`, 'warn'); scrollToFirstMissing(); return; }
-
-      toast('Enviando respostas...','info');
-      const headers = {'Content-Type':'application/json'};
-      const t=localStorage.getItem('authToken'); if(t) headers['Authorization']='Bearer '+t;
-
-      const payload = { answers, meta:{clientTime:new Date().toISOString(), userAgent:navigator.userAgent} };
-      const res = await apiFetch('/jornada/submit',{method:'POST',headers,body:JSON.stringify(payload)});
-      if(!res.ok){ const tx=await res.text().catch(()=>res.statusText); toast(`Falha ao enviar: ${res.status} ${tx}`,'err'); return; }
-
-      toast('Gerando PDF...','info');
-      let pdf = await apiFetch('/jornada/pdf',{method:'POST', headers});
-      if(!pdf.ok) pdf = await apiFetch('/jornada/pdf',{method:'GET', headers});
-      if(!pdf.ok){ const tx=await pdf.text().catch(()=>pdf.statusText); toast(`PDF não gerado: ${pdf.status} ${tx}`,'err'); return; }
-
-      const blob = await pdf.blob(); const url = URL.createObjectURL(blob);
-      window.open(url,'_blank','noopener'); const a=document.createElement('a');
-      a.href=url; a.download=`Jornada_Conhecimento_com_Luz_${Date.now()}.pdf`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000);
-      toast('PDF pronto! Baixe e guarde agora.','ok');
+    function goBack(){ if(STEP>0){ showStep(STEP-1); } }
+    function goNext(){
+      const id = QUESTIONS[STEP].id;
+      if(!isAnswered(id)){ toast('Responda esta pergunta para avançar.','warn'); return; }
+      if(STEP < TOTAL-1){ showStep(STEP+1); }
+      else {
+        localStorage.setItem('journeyComplete','1');
+        location.href = FINAL_PAGE;
+      }
     }
-
-    function goBack(){ window.scrollTo({top:0,behavior:'smooth'}); }
-
     function clearAll(){
-      if(!confirm('Isto limpa apenas as respostas salvas neste dispositivo. Não apaga sua senha, nem arquivos já gerados. Deseja continuar?')) return;
-      ['jornadaAnswers'].forEach(k=>localStorage.removeItem(k));
-      document.querySelectorAll('#perguntas input, #perguntas textarea, #perguntas select').forEach(el=>{
-        if(el.type==='checkbox'||el.type==='radio') el.checked=false; else el.value='';
-      });
-      updateProgress(); toast('Respostas deste dispositivo foram limpas.','ok');
+      if(!confirm('Isto limpa apenas as respostas salvas neste dispositivo. Não apaga sua senha nem arquivos gerados. Deseja continuar?')) return;
+      localStorage.removeItem('jornadaAnswers');
+      toast('Respostas deste dispositivo foram limpas.','ok');
+      showStep(STEP);
     }
-
-    // Wiring
-    $('#btn-iniciar')?.addEventListener('click', iniciar);
-    $('#btn-voltar')?.addEventListener('click', goBack);
-    $('#btn-enviar')?.addEventListener('click', submitJourney);
-    $('#btn-limpar')?.addEventListener('click', clearAll);
 
     // Boot
     (async ()=>{
-      await wakeBackend();
-      if(localStorage.getItem('journeyStarted')){ await loadQuestions(); setEnabled($('#btn-enviar'), countAnswered(getAnswers())>=TOTAL); }
-      updateProgress();
+      if(needAuth()) return;
+      await loadQuestions();
     })();
-  </script>
 
+    // Eventos
+    $('#btn-voltar')?.addEventListener('click', goBack);
+    $('#btn-avancar')?.addEventListener('click', goNext);
+    $('#btn-apagar')?.addEventListener('click', clearAll);
+    document.addEventListener('keydown', (e)=>{
+      if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); goNext(); }
+      else if(e.key==='Enter' && e.shiftKey){ e.preventDefault(); goBack(); }
+    });
+  </script>
 </body>
 </html>
