@@ -14,11 +14,7 @@
       theme: {
         extend: {
           colors: {
-            primary: {
-              50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74',
-              400: '#fb923c', 500: '#f59e0b', 600: '#d97706', 700: '#b45309',
-              800: '#92400e', 900: '#78350f'
-            }
+            primary: { 50:'#fff7ed',100:'#ffedd5',200:'#fed7aa',300:'#fdba74',400:'#fb923c',500:'#f59e0b',600:'#d97706',700:'#b45309',800:'#92400e',900:'#78350f' }
           }
         }
       }
@@ -40,6 +36,9 @@
 
   <!-- Conteúdo principal -->
   <main id="app" class="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-8 pb-40">
+
+    <!-- Alertas -->
+    <div id="alert" class="hidden mb-4 rounded-xl border border-white/10 bg-slate-800/70 p-3 text-sm"></div>
 
     <!-- Devolutiva -->
     <section id="devolutiva"
@@ -81,10 +80,11 @@ Próximos passos práticos:
             👁️
           </button>
         </div>
+
         <div class="mt-6 text-sm">
           <div class="text-slate-300">Progresso</div>
           <div id="progresso" class="mt-1">
-            Pergunta <span id="q-atual">32</span>/32 • Respondidas <span id="q-respondidas">31</span>/32
+            Pergunta <span id="q-atual">—</span>/32 • Respondidas <span id="q-respondidas">—</span>/32
           </div>
         </div>
       </div>
@@ -98,7 +98,7 @@ Próximos passos práticos:
         <p class="mt-2 text-sm text-slate-300">
           Você chegou ao fim. Se quiser, pode voltar e revisar as respostas.
         </p>
-        <p class="mt-3 text-sm">Respondidas <span id="respondidas-final">31</span>/32</p>
+        <p class="mt-3 text-sm">Respondidas <span id="respondidas-final">—</span>/32</p>
 
         <div class="mt-6 flex items-center gap-3">
           <button id="btn-voltar-inline"
@@ -137,41 +137,223 @@ Próximos passos práticos:
 
   <!-- Scripts -->
   <script>
-    const hasFn = (name) => typeof window[name] === 'function';
+    // ================== CONFIG API ==================
+    const API_PRIMARY = 'https://conhecimento-com-luz-api.onrender.com';
+    const API_FALLBACK = 'https://lumen-backend-api.onrender.com'; // opcional, se tiver
+    let API = API_PRIMARY;
 
-    // Alternar senha
+    // ================== UI helpers ==================
+    const $ = (sel) => document.querySelector(sel);
+    function toast(msg, type='info') {
+      const el = $('#alert');
+      if (!el) return;
+      el.classList.remove('hidden');
+      el.classList.toggle('border-amber-400', type==='warn');
+      el.classList.toggle('border-emerald-400', type==='ok');
+      el.classList.toggle('border-red-400', type==='err');
+      el.textContent = msg;
+      setTimeout(() => el.classList.add('hidden'), 4000);
+    }
+
+    // ================== BACKEND helpers ==================
+    async function apiFetch(path, {method='GET', headers={}, body=null, timeout=20000} = {}) {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), timeout);
+      try {
+        const res = await fetch(API + path, { method, headers, body, signal: ctrl.signal });
+        clearTimeout(t);
+        return res;
+      } catch (e) {
+        // tenta fallback uma vez
+        if (API !== API_FALLBACK && API_FALLBACK) {
+          API = API_FALLBACK;
+          return fetch(API + path, { method, headers, body });
+        }
+        throw e;
+      }
+    }
+
+    async function wakeBackend() {
+      try {
+        const r = await apiFetch('/health');
+        if (r.ok) { toast('Servidor pronto.', 'ok'); return true; }
+        toast('Servidor respondeu, mas não OK.', 'warn');
+      } catch {
+        toast('Servidor dormindo/offline.', 'err');
+      }
+      return false;
+    }
+
+    // ================== CAPTURA DE DADOS ==================
+    function getStoredAnswers() {
+      const keys = ['answers', 'journeyAnswers', 'jornadaAnswers'];
+      for (const k of keys) {
+        const raw = localStorage.getItem(k);
+        if (raw) {
+          try { const obj = JSON.parse(raw); if (obj && typeof obj === 'object') return obj; } catch {}
+        }
+      }
+      return null;
+    }
+
+    function scrapeFormAnswers() {
+      const data = {};
+      // pega inputs/textarea/select com data-qid ou name
+      document.querySelectorAll('input, textarea, select').forEach(el => {
+        const key = el.getAttribute('data-qid') || el.name;
+        if (!key) return;
+        if (el.type === 'checkbox') {
+          if (!data[key]) data[key] = [];
+          if (el.checked) data[key].push(el.value ?? true);
+        } else if (el.type === 'radio') {
+          if (el.checked) data[key] = el.value;
+        } else {
+          data[key] = el.value;
+        }
+      });
+      return data;
+    }
+
+    function collectAnswers() {
+      return getStoredAnswers() || scrapeFormAnswers();
+    }
+
+    function countAnswered(obj) {
+      if (!obj) return 0;
+      return Object.values(obj).reduce((acc, v) => {
+        if (Array.isArray(v)) return acc + (v.length ? 1 : 0);
+        return acc + (v !== null && v !== undefined && String(v).trim() !== '' ? 1 : 0);
+      }, 0);
+    }
+
+    // ================== AÇÕES ==================
+    async function validarSenhaIfNeeded() {
+      const el = $('#senha');
+      if (!el) return true; // sem campo de senha, segue
+      const senha = el.value?.trim();
+      if (!senha) { toast('Digite a senha para continuar.', 'warn'); el.focus(); return false; }
+      const r = await apiFetch('/validar-senha', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ senha })
+      });
+      if (!r.ok) { toast('Senha inválida.', 'err'); return false; }
+      const j = await r.json();
+      // se a API emitir token/hmac, guarde
+      if (j?.token) localStorage.setItem('authToken', j.token);
+      return true;
+    }
+
+    async function submitJourney() {
+      if (!(await validarSenhaIfNeeded())) return;
+
+      const answers = collectAnswers();
+      const total = 32;
+      const answered = countAnswered(answers);
+      $('#q-atual').textContent = total;
+      $('#q-respondidas').textContent = answered;
+      $('#respondidas-final').textContent = answered;
+
+      if (answered < total) {
+        if (!confirm(`Você respondeu ${answered}/${total}. Deseja enviar mesmo assim?`)) return;
+      }
+
+      toast('Enviando respostas...', 'info');
+
+      const payload = {
+        answers,
+        meta: {
+          clientTime: new Date().toISOString(),
+          userAgent: navigator.userAgent
+        }
+      };
+
+      // inclui token se existir
+      const headers = { 'Content-Type': 'application/json' };
+      const token = localStorage.getItem('authToken');
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      // submit
+      const res = await apiFetch('/jornada/submit', {
+        method: 'POST', headers, body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        toast('Falha ao enviar respostas.', 'err');
+        return;
+      }
+
+      // tenta gerar/baixar PDF
+      toast('Gerando PDF...', 'info');
+      const pdfRes = await apiFetch('/jornada/pdf', { method: 'POST', headers });
+      if (!pdfRes.ok) { toast('PDF não gerado.', 'err'); return; }
+
+      const blob = await pdfRes.blob();
+      const url = URL.createObjectURL(blob);
+
+      // abre em nova aba e também força download
+      window.open(url, '_blank', 'noopener');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Jornada_Conhecimento_com_Luz_${Date.now()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+
+      toast('PDF pronto! Lembre-se: baixe e guarde agora.', 'ok');
+    }
+
+    function goToPreviousStep() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function clearAllAnswers() {
+      if (!confirm('Deseja realmente limpar todas as respostas?')) return;
+      try {
+        // limpa chaves conhecidas
+        ['answers','journeyAnswers','jornadaAnswers','authToken'].forEach(k => localStorage.removeItem(k));
+        // e campos do DOM
+        document.querySelectorAll('input, textarea, select').forEach(el=>{
+          if (el.type==='checkbox' || el.type==='radio') el.checked = false;
+          else el.value = '';
+        });
+        toast('Respostas limpas.', 'ok');
+        $('#q-respondidas').textContent = '0';
+        $('#respondidas-final').textContent = '0';
+      } catch {
+        toast('Não foi possível limpar.', 'err');
+      }
+    }
+
+    // ================== WIRING ==================
     document.getElementById('toggle-senha')?.addEventListener('click', () => {
       const input = document.getElementById('senha');
       input.type = input.type === 'password' ? 'text' : 'password';
     });
 
-    // Mostrar/ocultar devolutiva
     document.getElementById('toggle-devolutiva')?.addEventListener('click', () => {
       const c = document.getElementById('devolutiva-content');
       c.classList.toggle('hidden');
     });
 
-    // Funções fallback
-    function __fallbackGoBack() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
-    async function __fallbackSubmit() { alert('Submeter jornada (PDJ).'); }
-    function __fallbackClear() {
-      if (confirm('Deseja realmente limpar todas as respostas?')) {
-        if (hasFn('clearAllAnswers')) { window.clearAllAnswers(); return; }
-        localStorage.clear(); location.reload();
-      }
-    }
+    document.getElementById('btn-voltar')?.addEventListener('click', goToPreviousStep);
+    document.getElementById('btn-enviar')?.addEventListener('click', submitJourney);
+    document.getElementById('btn-limpar')?.addEventListener('click', clearAllAnswers);
 
-    // Handlers
-    const goBack = () => hasFn('goToPreviousStep') ? window.goToPreviousStep() : __fallbackGoBack();
-    const sendNow = () => hasFn('submitJourney') ? window.submitJourney() : __fallbackSubmit();
-    const clearAll = () => hasFn('clearAllAnswers') ? window.clearAllAnswers() : __fallbackClear();
+    document.getElementById('btn-voltar-inline')?.addEventListener('click', goToPreviousStep);
+    document.getElementById('btn-enviar-inline')?.addEventListener('click', submitJourney);
 
-    document.getElementById('btn-voltar')?.addEventListener('click', goBack);
-    document.getElementById('btn-enviar')?.addEventListener('click', sendNow);
-    document.getElementById('btn-limpar')?.addEventListener('click', clearAll);
-
-    document.getElementById('btn-voltar-inline')?.addEventListener('click', goBack);
-    document.getElementById('btn-enviar-inline')?.addEventListener('click', sendNow);
+    // ================== BOOT ==================
+    (async () => {
+      await wakeBackend();
+      // atualiza contadores a partir do que tiver salvo
+      const ans = collectAnswers();
+      const answered = countAnswered(ans);
+      $('#q-atual').textContent = '32';
+      $('#q-respondidas').textContent = String(answered);
+      $('#respondidas-final').textContent = String(answered);
+    })();
   </script>
 
 </body>
