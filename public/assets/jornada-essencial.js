@@ -1,4 +1,4 @@
-/* jornada.js – v9.8 (PDF on-the-fly + wizard + dark + contador + “Apagar resposta” robusto) */
+ /* jornada.js – v9.8 (PDF on-the-fly + wizard + dark + contador + “Apagar resposta” robusto) */
 const CONFIG = {
   BUILD: '2025-08-14-9.8',
   BACKEND_URL: 'https://lumen-backend-api.onrender.com',
@@ -36,33 +36,33 @@ const CONFIG = {
 
 /* 1) Helpers/UI */
 const store = {
-  set(k, v){ sessionStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v)); },
-  get(k){ const v = sessionStorage.getItem(k); try { return JSON.parse(v); } catch { return v; } },
-  del(k){ sessionStorage.removeItem(k); },
+  set(k, v) { sessionStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v)); },
+  get(k) { const v = sessionStorage.getItem(k); try { return JSON.parse(v); } catch { return v; } },
+  del(k) { sessionStorage.removeItem(k); },
 };
 function h(tag, attrs = {}, ...children) {
   const el = document.createElement(tag);
-  for (const [k,v] of Object.entries(attrs||{})) {
-    if (k==='class') el.className=v; else if (k==='for') el.htmlFor=v; else el.setAttribute(k,v);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (k === 'class') el.className = v; else if (k === 'for') el.htmlFor = v; else el.setAttribute(k, v);
   }
-  children.flat().forEach(c => el.appendChild(typeof c==='string' ? document.createTextNode(c) : c));
+  children.flat().forEach(c => el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c));
   return el;
 }
-function byText(root, tag, textLike){
+function byText(root, tag, textLike) {
   const needle = (textLike || '').toLowerCase();
-  return [...(root||document).querySelectorAll(tag)]
-    .find(el => (el.textContent||'').trim().toLowerCase().includes(needle));
+  return [...(root || document).querySelectorAll(tag)]
+    .find(el => (el.textContent || '').trim().toLowerCase().includes(needle));
 }
-function pickPasswordInput(){ return document.querySelector(CONFIG.PASSWORD_INPUT) || document.querySelector('input[type="password"]'); }
-function pickStartButton(){ return document.querySelector(CONFIG.START_BUTTON) || byText(document, 'button', CONFIG.START_TEXT); }
-function pickSendButton(){ return document.querySelector(CONFIG.SEND_BUTTON_SELECTOR) || byText(document, 'button', CONFIG.SEND_TEXT); }
-function pickClearButton(){
+function pickPasswordInput() { return document.querySelector(CONFIG.PASSWORD_INPUT) || document.querySelector('input[type="password"]'); }
+function pickStartButton() { return document.querySelector(CONFIG.START_BUTTON) || byText(document, 'button', CONFIG.START_TEXT); }
+function pickSendButton() { return document.querySelector(CONFIG.SEND_BUTTON_SELECTOR) || byText(document, 'button', CONFIG.SEND_TEXT); }
+function pickClearButton() {
   const byId = document.querySelector(CONFIG.CLEAR_BUTTON_SELECTOR);
   if (byId) return byId;
   for (const t of CONFIG.CLEAR_TEXTS) { const btn = byText(document, 'button', t); if (btn) return btn; }
   return null;
 }
-function pickFormRoot(){
+function pickFormRoot() {
   return document.querySelector(CONFIG.FORM_ROOT_SELECTOR) || (() => {
     const panel = byText(document, 'button', CONFIG.START_TEXT)?.closest('div') || document.body;
     const div = document.createElement('div'); div.id = 'form-root'; div.className = 'max-w-3xl mx-auto px-4 py-6';
@@ -70,13 +70,13 @@ function pickFormRoot(){
     return div;
   })();
 }
-function pickDevolutivaBox(){
+function pickDevolutivaBox() {
   return document.querySelector(CONFIG.DEVOLUTIVA_SELECTOR) || (() => {
     const div = document.createElement('div'); div.id = 'devolutiva'; div.className = 'max-w-3xl mx-auto px-4 py-4';
     document.body.appendChild(div); return div;
   })();
 }
-function pickProgress(){
+function pickProgress() {
   return document.querySelector(CONFIG.PROGRESS_SELECTOR) || (() => {
     const bar = h('div', { id: 'icl-progress', class: 'max-w-3xl mx-auto py-2 text-base font-semibold' }, '');
     const root = pickFormRoot();
@@ -84,7 +84,7 @@ function pickProgress(){
     return bar;
   })();
 }
-function pickCountdown(){
+function pickCountdown() {
   return document.querySelector(CONFIG.COUNTDOWN_SELECTOR) || (() => {
     const row = h('div', { id: 'icl-countdown', class: 'max-w-3xl mx-auto px-4 pb-2 text-sm' }, '');
     const root = pickFormRoot();
@@ -92,7 +92,7 @@ function pickCountdown(){
     return row;
   })();
 }
-function authHeaders(){ const t = store.get('icl:token'); return t ? { Authorization:`Bearer ${t}` } : {}; }
+function authHeaders() { const t = store.get('icl:token'); return t ? { Authorization: Bearer ${t} } : {}; }
 
 /* 2) Estado */
 let QUESTIONS = [];
@@ -102,8 +102,8 @@ let ANSWERS = {};
 let countdownTimer = null;
 
 /* 3) Estilos */
-(function injectDarkStyle(){
-  const css = `
+(function injectDarkStyle() {
+  const css = 
   #form-root input[type="text"],
   #form-root textarea,
   #form-root select {
@@ -134,7 +134,7 @@ let countdownTimer = null;
   .btn-outline { border:1px solid #9ca3af; color:#e5e7eb; }
   .btn-outline:hover { background:#111827; }
   .card { background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); border-radius:1rem; }
-  `;
+  ;
   const style = document.createElement('style'); style.textContent = css; document.head.appendChild(style);
 })();
 
@@ -154,56 +154,56 @@ function addPasswordToggle(input) {
   });
   container.appendChild(toggleBtn);
 }
-async function getPublicToken(){
+async function getPublicToken() {
   try {
-    const r = await fetch(`${CONFIG.BACKEND_URL}/public/token`, { method: 'POST' });
+    const r = await fetch(${CONFIG.BACKEND_URL}/public/token, { method: 'POST' });
     if (!r.ok) throw new Error('public token indisponível');
     const d = await r.json();
     if (d && d.token) { store.set('icl:token', d.token); store.set('icl:deadline', d.deadline_iso || ''); return d.token; }
-  } catch(_) {}
+  } catch (_) {}
   return null;
 }
-async function ensureToken(){ if (store.get('icl:token')) return true; return !!(await getPublicToken()); }
+async function ensureToken() { if (store.get('icl:token')) return true; return !!(await getPublicToken()); }
 
 /* 5) Downloads */
-function downloadBlob(filename, blob){
+function downloadBlob(filename, blob) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url; a.download = filename;
   document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
 }
-async function downloadPDFGenerated(){
+async function downloadPDFGenerated() {
   const payload = { answers: { ...ANSWERS }, meta: { tzOffsetMin: new Date().getTimezoneOffset(), ua: navigator.userAgent } };
   try {
-    let r = await fetch(`${CONFIG.BACKEND_URL}/jornada/pdf`, {
+    let r = await fetch(${CONFIG.BACKEND_URL}/jornada/pdf, {
       method: 'POST',
-      headers: { 'Content-Type':'application/json', ...authHeaders() },
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify(payload)
     });
     if (r.status === 401 || r.status === 403) {
       const ok = await ensureToken();
       if (!ok) throw new Error('Sessão inválida. Clique em Iniciar.');
-      r = await fetch(`${CONFIG.BACKEND_URL}/jornada/pdf`, {
+      r = await fetch(${CONFIG.BACKEND_URL}/jornada/pdf, {
         method: 'POST',
-        headers: { 'Content-Type':'application/json', ...authHeaders() },
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
         body: JSON.stringify(payload)
       });
     }
     if (!r.ok) throw new Error('Falha ao gerar o PDF.');
     const blob = await r.blob();
-    downloadBlob(`jornada_${Date.now()}.pdf`, blob);
+    downloadBlob(jornada_${Date.now()}.pdf, blob);
   } catch (e) { alert(e.message || 'Não foi possível gerar o PDF.'); }
 }
-async function downloadHQ(){
+async function downloadHQ() {
   try {
-    let r = await fetch(`${CONFIG.BACKEND_URL}/jornada/download/hq.pdf`, { headers: { ...authHeaders() } });
+    let r = await fetch(${CONFIG.BACKEND_URL}/jornada/download/hq.pdf, { headers: { ...authHeaders() } });
     if (r.status === 401 || r.status === 403) {
       const ok = await ensureToken(); if (!ok) throw new Error('Sessão inválida.');
-      r = await fetch(`${CONFIG.BACKEND_URL}/jornada/download/hq.pdf`, { headers: { ...authHeaders() } });
+      r = await fetch(${CONFIG.BACKEND_URL}/jornada/download/hq.pdf, { headers: { ...authHeaders() } });
     }
-    if (!r.ok) { window.open(`${CONFIG.BACKEND_URL}/downloads/hq.pdf`, '_blank'); return; }
+    if (!r.ok) { window.open(${CONFIG.BACKEND_URL}/downloads/hq.pdf, '_blank'); return; }
     const blob = await r.blob();
     downloadBlob('hq.pdf', blob);
-  } catch { window.open(`${CONFIG.BACKEND_URL}/downloads/hq.pdf`, '_blank'); }
+  } catch { window.open(${CONFIG.BACKEND_URL}/downloads/hq.pdf, '_blank'); }
 }
 function renderDownloadButtons(root) {
   const btnPanel = h('div', { class: 'mt-6 flex flex-col sm:flex-row gap-4' },
@@ -219,41 +219,41 @@ function renderDownloadButtons(root) {
 }
 
 /* 6) Countdown */
-function startCountdown(){
+function startCountdown() {
   const el = pickCountdown();
   const iso = store.get('icl:deadline');
   if (!iso) { el.textContent = ''; return; }
-  const end = new Date(iso).getTime(); if (isNaN(end)) { el.textContent=''; return; }
-  function tick(){
+  const end = new Date(iso).getTime(); if (isNaN(end)) { el.textContent = ''; return; }
+  function tick() {
     const diff = end - Date.now();
     if (diff <= 0) { el.textContent = 'Sessão expirada. Clique em Iniciar novamente.'; if (countdownTimer) clearInterval(countdownTimer); return; }
-    const s = Math.floor(diff/1000);
-    const hh = String(Math.floor(s/3600)).padStart(2,'0');
-    const mm = String(Math.floor((s%3600)/60)).padStart(2,'0');
-    const ss = String(s%60).padStart(2,'0');
-    el.textContent = `Tempo restante: ${hh}:${mm}:${ss}`;
+    const s = Math.floor(diff / 1000);
+    const hh = String(Math.floor(s / 3600)).padStart(2, '0');
+    const mm = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
+    const ss = String(s % 60).padStart(2, '0');
+    el.textContent = Tempo restante: ${hh}:${mm}:${ss};
   }
   tick(); if (countdownTimer) clearInterval(countdownTimer); countdownTimer = setInterval(tick, 1000);
 }
 
 /* 7) API perguntas */
 async function fetchQuestions() {
-  let r = await fetch(`${CONFIG.BACKEND_URL}/jornada/questions`, { headers: { ...authHeaders() } });
+  let r = await fetch(${CONFIG.BACKEND_URL}/jornada/questions, { headers: { ...authHeaders() } });
   if (r.status === 401 || r.status === 403) {
     if (!CONFIG.FORCE_LOGIN) {
       const ok = await ensureToken();
       if (!ok) throw new Error('Sessão inválida/expirada');
-      r = await fetch(`${CONFIG.BACKEND_URL}/jornada/questions`, { headers: { ...authHeaders() } });
+      r = await fetch(${CONFIG.BACKEND_URL}/jornada/questions, { headers: { ...authHeaders() } });
     } else {
       throw new Error('Sessão inválida/expirada');
     }
   }
-  if (!r.ok) throw new Error(`Falha ao obter perguntas (${r.status})`);
+  if (!r.ok) throw new Error(Falha ao obter perguntas (${r.status}));
   return r.json();
 }
 
 /* 8) Wizard */
-function answeredCount(){
+function answeredCount() {
   let count = 0;
   QUESTIONS.forEach(q => {
     const v = ANSWERS[q.id];
@@ -263,145 +263,147 @@ function answeredCount(){
   });
   return count;
 }
-function updateProgressUI(){
+function updateProgressUI() {
   const bar = pickProgress();
-  bar.textContent = `Pergunta ${IDX+1}/${TOTAL} • Respondidas ${answeredCount()}/${TOTAL}`;
+  bar.textContent = Pergunta ${IDX + 1}/${TOTAL} • Respondidas ${answeredCount()}/${TOTAL};
 }
 
-function bindAndLoadValue(container, q){
+function bindAndLoadValue(container, q) {
   const apply = () => {
     if (q.kind === 'checkbox') {
-      const vals = [...container.querySelectorAll('input[type="checkbox"][name="'+q.id+'"]:checked')].map(el=>el.value||true);
+      const vals = [...container.querySelectorAll('input[type="checkbox"][name="' + q.id + '"]:checked')].map(el => el.value || true);
       ANSWERS[q.id] = vals;
     } else if (q.kind === 'radio') {
-      const r = container.querySelector('input[type="radio"][name="'+q.id+'"]:checked');
+      const r = container.querySelector('input[type="radio"][name="' + q.id + '"]:checked');
       ANSWERS[q.id] = r ? r.value : '';
     } else {
-      const el = container.querySelector('#'+q.id);
+      const el = container.querySelector('#' + q.id);
       ANSWERS[q.id] = el ? el.value : '';
     }
     updateProgressUI();
     const inline = container.querySelector('[data-inline-progress]');
-    if (inline) inline.textContent = `Pergunta ${IDX+1}/${TOTAL} • Respondidas ${answeredCount()}/${TOTAL}`;
+    if (inline) inline.textContent = Pergunta ${IDX + 1}/${TOTAL} • Respondidas ${answeredCount()}/${TOTAL};
   };
-  container.addEventListener('input', (ev)=>{ const t = ev.target; if (!t) return; if (t.name===q.id || t.id===q.id) apply(); }, true);
+  container.addEventListener('input', (ev) => { const t = ev.target; if (!t) return; if (t.name === q.id || t.id === q.id) apply(); }, true);
   const v = ANSWERS[q.id]; if (v == null) return;
   if (q.kind === 'checkbox') {
     const set = new Set(v || []);
-    container.querySelectorAll('input[type="checkbox"][name="'+q.id+'"]').forEach(el=>{ el.checked = set.has(el.value || true); });
+    container.querySelectorAll('input[type="checkbox"][name="' + q.id + '"]').forEach(el => { el.checked = set.has(el.value || true); });
   } else if (q.kind === 'radio') {
-    const r = container.querySelector('input[type="radio"][name="'+q.id+'"][value="'+v+'"]'); if (r) r.checked = true;
+    const r = container.querySelector('input[type="radio"][name="' + q.id + '"][value="' + v + '"]'); if (r) r.checked = true;
   } else {
-    const el = container.querySelector('#'+q.id); if (el) el.value = String(v);
+    const el = container.querySelector('#' + q.id); if (el) el.value = String(v);
   }
 }
 
-function renderOneQuestion(root){
+function renderOneQuestion(root) {
   const q = QUESTIONS[IDX];
   root.innerHTML = '';
 
-  const section = h('section',{class:'card p-6 space-y-4'});
+  const section = h('section', { class: 'card p-6 space-y-4' });
 
   // contador inline
-  section.appendChild(h('div',{ 'data-inline-progress':'1', class:'text-sm text-yellow-300' },
-    `Pergunta ${IDX+1}/${TOTAL} • Respondidas ${answeredCount()}/${TOTAL}`));
+  section.appendChild(h('div', { 'data-inline-progress': '1', class: 'text-sm text-yellow-300' },
+    Pergunta ${IDX + 1}/${TOTAL} • Respondidas ${answeredCount()}/${TOTAL}));
 
-  section.appendChild(h('h2',{class:'text-xl font-semibold text-gray-100'}, q.section || ''));
-  section.appendChild(h('div',{class:'text-base font-medium text-gray-100'}, q.label));
+  section.appendChild(h('h2', { class: 'text-xl font-semibold text-gray-100' }, q.section || ''));
+  section.appendChild(h('div', { class: 'text-base font-medium text-gray-100' }, q.label));
 
-  const base={id:q.id,name:q.id,class:'mt-2 w-full'};
+  const base = { id: q.id, name: q.id, class: 'mt-2 w-full' };
   let input;
-  if(q.kind==='textarea') input=h('textarea',{...base,rows:'3',placeholder:q.placeholder||'Escreva livremente…'});
-  else if(q.kind==='select') input=h('select',base, h('option',{value:''},'Selecione…'), ...(q.options||[]).map(o=>h('option',{value:o.value},o.label)));
-  else if(q.kind==='radio') input=h('div',{class:'mt-1 flex flex-wrap gap-3'}, ...(q.options||[]).map(o=>h('label',{class:'inline-flex items-center gap-2 text-gray-100'}, h('input',{type:'radio',name:q.id,value:o.value}), o.label)));
-  else if(q.kind==='checkbox') input=h('div',{class:'mt-1 flex flex-wrap gap-3'}, ...(q.options||[]).map(o=>h('label',{class:'inline-flex items-center gap-2 text-gray-100'}, h('input',{type:'checkbox',name:q.id,value:o.value}), o.label)));
-  else input=h('input',{...base,type:'text',placeholder:q.placeholder||''});
+  if (q.kind === 'textarea') input = h('textarea', { ...base, rows: '3', placeholder: q.placeholder || 'Escreva livremente…' });
+  else if (q.kind === 'select') input = h('select', base, h('option', { value: '' }, 'Selecione…'), ...(q.options || []).map(o => h('option', { value: o.value }, o.label)));
+  else if (q.kind === 'radio') input = h('div', { class: 'mt-1 flex flex-wrap gap-3' }, ...(q.options || []).map(o => h('label', { class: 'inline-flex items-center gap-2 text-gray-100' }, h('input', { type: 'radio', name: q.id, value: o.value }), o.label)));
+  else if (q.kind === 'checkbox') input = h('div', { class: 'mt-1 flex flex-wrap gap-3' }, ...(q.options || []).map(o => h('label', { class: 'inline-flex items-center gap-2 text-gray-100' }, h('input', { type: 'checkbox', name: q.id, value: o.value }), o.label)));
+  else input = h('input', { ...base, type: 'text', placeholder: q.placeholder || '' });
   section.appendChild(input);
 
-  const nav = h('div',{class:'mt-6 flex items-center justify-between gap-3 flex-wrap'});
-  const prev = h('button',{type:'button',class:'px-5 py-2 rounded-xl btn-gray'}, 'Anterior');
-  const nextText = (IDX === TOTAL-1) ? 'Ir para Enviar' : 'Próxima';
-  const next = h('button',{type:'button',class:'px-5 py-2 rounded-xl btn-yellow'}, nextText);
-  nav.appendChild(prev); nav.appendChild(next);
+  const nav = h('div', { class: 'mt-6 flex items-center justify-between gap-3 flex-wrap' });
+  const prev = h('button', { type: 'button', class: 'px-5 py-2 rounded-xl btn-gray' }, 'Anterior');
+  const nextText = (IDX === TOTAL - 1) ? 'Ir para Enviar' : 'Próxima';
+  const next = h('button', { type: 'button', class: 'px-5 py-2 rounded-xl btn-yellow' }, nextText);
+  const clear = h('button', { id: 'btn-limpar-oficial', type: 'button', class: 'px-5 py-2 rounded-xl btn-gray' }, 'Apagar resposta');
+  nav.appendChild(prev); nav.appendChild(clear); nav.appendChild(next);
   section.appendChild(nav);
   root.appendChild(section);
 
   bindAndLoadValue(section, q);
 
-  prev.addEventListener('click', ()=>{ if (IDX>0) { IDX--; renderOneQuestion(root); updateProgressUI(); window.scrollTo({top:0,behavior:'smooth'}); } });
-  next.addEventListener('click', ()=>{ if (IDX<TOTAL-1) { IDX++; renderOneQuestion(root); updateProgressUI(); window.scrollTo({top:0,behavior:'smooth'}); } else { renderFinalStep(root); updateProgressUI(); window.scrollTo({top:0,behavior:'smooth'}); } });
+  prev.addEventListener('click', () => { if (IDX > 0) { IDX--; renderOneQuestion(root); updateProgressUI(); window.scrollTo({ top: 0, behavior: 'smooth' }); } });
+  next.addEventListener('click', () => { if (IDX < TOTAL - 1) { IDX++; renderOneQuestion(root); updateProgressUI(); window.scrollTo({ top: 0, behavior: 'smooth' }); } else { renderFinalStep(root); updateProgressUI(); window.scrollTo({ top: 0, behavior: 'smooth' }); } });
+  clear.addEventListener('click', (e) => { e.preventDefault(); clearCurrentAnswer(); });
 
   updateProgressUI();
 }
 
-function renderFinalStep(root){
+function renderFinalStep(root) {
   root.innerHTML = '';
-  const box = h('section',{class:'card p-6 space-y-4'},
-    h('h2',{class:'text-xl font-semibold text-gray-100'}, 'Finalizar'),
-    h('p',{class:'text-gray-200'}, 'Você chegou ao fim. Se quiser, pode voltar e revisar as respostas.'),
-    h('div',{class:'text-sm text-gray-300'}, `Respondidas ${answeredCount()}/${TOTAL}`)
+  const box = h('section', { class: 'card p-6 space-y-4' },
+    h('h2', { class: 'text-xl font-semibold text-gray-100' }, 'Finalizar'),
+    h('p', { class: 'text-gray-200' }, 'Você chegou ao fim. Se quiser, pode voltar e revisar as respostas.'),
+    h('div', { class: 'text-sm text-gray-300' }, Respondidas ${answeredCount()}/${TOTAL})
   );
-  const actions = h('div',{class:'mt-4 flex items-center gap-3 flex-wrap'});
-  const revisar = h('button',{type:'button',class:'px-5 py-2 rounded-xl btn-gray'}, 'Voltar');
-  const enviar  = h('button',{id:'icl-send',type:'button',class:'px-5 py-2 rounded-xl btn-yellow'}, 'Enviar respostas');
+  const actions = h('div', { class: 'mt-4 flex items-center gap-3 flex-wrap' });
+  const revisar = h('button', { type: 'button', class: 'px-5 py-2 rounded-xl btn-gray' }, 'Voltar');
+  const enviar = h('button', { id: 'icl-send', type: 'button', class: 'px-5 py-2 rounded-xl btn-yellow' }, 'Enviar respostas');
   actions.appendChild(revisar); actions.appendChild(enviar);
   box.appendChild(actions);
   root.appendChild(box);
 
   const footerSend = pickSendButton(); if (footerSend) footerSend.style.display = '';
 
-  revisar.addEventListener('click', ()=>{ IDX = Math.max(0, TOTAL-1); renderOneQuestion(root); updateProgressUI(); });
-  enviar.addEventListener('click', async ()=>{
+  revisar.addEventListener('click', () => { IDX = Math.max(0, TOTAL - 1); renderOneQuestion(root); updateProgressUI(); });
+  enviar.addEventListener('click', async () => {
     const btn = enviar; const original = btn.textContent; btn.textContent = 'Enviando…'; btn.disabled = true;
     try { await submitAnswers(); } finally { btn.textContent = original; btn.disabled = false; }
   });
 }
 
 /* 9) Boot perguntas */
-async function bootQuestions(){
+async function bootQuestions() {
   const root = pickFormRoot();
   try {
     const payload = await fetchQuestions();
     QUESTIONS = payload.questions || [];
     TOTAL = QUESTIONS.length; IDX = 0;
     ANSWERS = ANSWERS || {};
-    QUESTIONS.forEach(q=>{ if (!(q.id in ANSWERS)) ANSWERS[q.id] = (q.kind==='checkbox') ? [] : ''; });
+    QUESTIONS.forEach(q => { if (!(q.id in ANSWERS)) ANSWERS[q.id] = (q.kind === 'checkbox') ? [] : ''; });
 
     const footerSend = pickSendButton(); if (footerSend) footerSend.style.display = 'none';
 
     renderOneQuestion(root);
     pickProgress();
     updateProgressUI();
-  } catch(e) {
+  } catch (e) {
     console.error('[Lumen] Erro ao carregar perguntas:', e);
     alert('Não foi possível carregar as perguntas. Clique em Iniciar novamente.');
   }
 }
 
 /* 10) Coleta e envio */
-function collectAnswers(){ return { ...ANSWERS }; }
-async function submitAnswers(){
-  const payload={answers:collectAnswers(), meta:{tzOffsetMin:new Date().getTimezoneOffset(), ua:navigator.userAgent}};
-  let r = await fetch(`${CONFIG.BACKEND_URL}/jornada/submit`, {method:'POST', headers:{'Content-Type':'application/json', ...authHeaders()}, body:JSON.stringify(payload)});
-  if (r.status===401||r.status===403) {
+function collectAnswers() { return { ...ANSWERS }; }
+async function submitAnswers() {
+  const payload = { answers: collectAnswers(), meta: { tzOffsetMin: new Date().getTimezoneOffset(), ua: navigator.userAgent } };
+  let r = await fetch(${CONFIG.BACKEND_URL}/jornada/submit, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(payload) });
+  if (r.status === 401 || r.status === 403) {
     const ok = await ensureToken();
     if (!ok) { alert('Sessão expirada. Clique em Iniciar novamente.'); return; }
-    r = await fetch(`${CONFIG.BACKEND_URL}/jornada/submit`, {method:'POST', headers:{'Content-Type':'application/json', ...authHeaders()}, body:JSON.stringify(payload)});
+    r = await fetch(${CONFIG.BACKEND_URL}/jornada/submit, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(payload) });
   }
   if (!r.ok) { alert('Falha ao enviar.'); return; }
-  const d= await r.json();
+  const d = await r.json();
   const box = pickDevolutivaBox();
-  box.innerHTML='';
-  box.appendChild(h('div',{class:'card p-6 prose max-w-none prose-invert'},
-    h('h3',{class:'text-xl font-semibold mb-2'},'Devolutiva do Lumen'),
-    h('pre',{class:'whitespace-pre-wrap leading-relaxed'}, d.devolutiva || '—')
+  box.innerHTML = '';
+  box.appendChild(h('div', { class: 'card p-6 prose max-w-none prose-invert' },
+    h('h3', { class: 'text-xl font-semibold mb-2' }, 'Devolutiva do Lumen'),
+    h('pre', { class: 'whitespace-pre-wrap leading-relaxed' }, d.devolutiva || '—')
   ));
   renderDownloadButtons(box);
-  box.scrollIntoView({behavior:'smooth',block:'start'});
+  box.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 /* 11) Limpar/APAGAR apenas a resposta ATUAL — robusto */
-function clearCurrentAnswer(){
+function clearCurrentAnswer() {
   // tenta achar o "cartão" da pergunta atual
   const root = pickFormRoot();
   let section =
@@ -412,7 +414,7 @@ function clearCurrentAnswer(){
 
   // coleta todos os campos editáveis da etapa
   const fields = [...section.querySelectorAll('textarea, input, select')]
-    .filter(el => !['button','submit','reset'].includes((el.type||'').toLowerCase()));
+    .filter(el => !['button', 'submit', 'reset'].includes((el.type || '').toLowerCase()));
 
   const clearedNames = new Set();
 
@@ -422,7 +424,7 @@ function clearCurrentAnswer(){
     if (!name) continue;
 
     if (type === 'checkbox' || type === 'radio') {
-      section.querySelectorAll(`input[type="${type}"][name="${name}"]`).forEach(i => {
+      section.querySelectorAll(input[type="${type}"][name="${name}"]).forEach(i => {
         i.checked = false;
         i.dispatchEvent(new Event('input', { bubbles: true }));
       });
@@ -441,7 +443,7 @@ function clearCurrentAnswer(){
 
   // sincroniza o objeto ANSWERS com os names realmente vistos na etapa
   for (const n of clearedNames) {
-    const anyCb = section.querySelector(`input[type="checkbox"][name="${n}"]`);
+    const anyCb = section.querySelector(input[type="checkbox"][name="${n}"]);
     ANSWERS[n] = anyCb ? [] : '';
   }
 
@@ -458,8 +460,8 @@ async function doLogin() {
   const original = btn.textContent; btn.disabled = true; btn.textContent = 'Validando…';
   try {
     if (pwd) {
-      const res = await fetch(`${CONFIG.BACKEND_URL}/validar-senha`, {
-        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ senha: pwd })
+      const res = await fetch(${CONFIG.BACKEND_URL}/validar-senha, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ senha: pwd })
       });
       if (res.ok) {
         const data = await res.json();
@@ -477,25 +479,25 @@ async function doLogin() {
 }
 
 /* 13) Eventos globais */
-document.addEventListener('click', (ev)=>{
+document.addEventListener('click', (ev) => {
   const t = ev.target; if (!t) return;
 
   const startBtn = pickStartButton();
-  if (startBtn && (t===startBtn || t.closest('#btn-iniciar'))) { ev.preventDefault(); doLogin(); return; }
+  if (startBtn && (t === startBtn || t.closest('#btn-iniciar'))) { ev.preventDefault(); doLogin(); return; }
 
   // limpar/apagar resposta atual — por ID, ou por texto do botão
   const clearBtn = pickClearButton();
   const isClearClick =
-    (clearBtn && (t===clearBtn || (CONFIG.CLEAR_BUTTON_SELECTOR && t.closest?.(CONFIG.CLEAR_BUTTON_SELECTOR)))) ||
-    (t.tagName==='BUTTON' && CONFIG.CLEAR_TEXTS.some(txt=>t.textContent?.toLowerCase().includes(txt)));
+    (clearBtn && (t === clearBtn || (CONFIG.CLEAR_BUTTON_SELECTOR && t.closest?.(CONFIG.CLEAR_BUTTON_SELECTOR)))) ||
+    (t.tagName === 'BUTTON' && CONFIG.CLEAR_TEXTS.some(txt => t.textContent?.toLowerCase().includes(txt)));
   if (isClearClick) { ev.preventDefault(); clearCurrentAnswer(); return; }
 });
 
 /* 14) Patch defensivo adicional: garante que o botão do rodapé sempre chame clearCurrentAnswer */
-(function patchApagarResposta(){
-  const VARIANTES = ['apagar resposta','limpar resposta','limpar respostas'];
+(function patchApagarResposta() {
+  const VARIANTES = ['apagar resposta', 'limpar resposta', 'limpar respostas'];
 
-  function normalizeClearBtn(){
+  function normalizeClearBtn() {
     let btn = document.querySelector('#btn-limpar-oficial');
     if (!btn) {
       btn = [...document.querySelectorAll('button')].find(b =>
@@ -503,11 +505,12 @@ document.addEventListener('click', (ev)=>{
       );
     }
     if (!btn) return;
-    try { btn.type = 'button'; } catch(_) {}
+    try { btn.type = 'button'; } catch (_) {}
     if (!/apagar/i.test(btn.textContent || '')) btn.textContent = 'Apagar resposta';
+    btn.addEventListener('click', (e) => { e.preventDefault(); clearCurrentAnswer(); });
   }
 
-  document.addEventListener('click', function(e){
+  document.addEventListener('click', function (e) {
     const btn = e.target.closest && e.target.closest('button');
     if (!btn) return;
     const label = (btn.textContent || '').toLowerCase();
