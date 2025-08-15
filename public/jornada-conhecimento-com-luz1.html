@@ -75,10 +75,16 @@
     el.classList.toggle('border-red-400', type==='err');
     el.textContent=msg; setTimeout(()=>el.classList.add('hidden'), 4000);
   }
-  function needAuth(){
+  function mustStart() {
     const t = localStorage.getItem('authToken');
     const started = localStorage.getItem('journeyStarted');
-    if(!t || !started){ location.href='/jornada-intro.html'; return true; }
+    if(!t || !started) {
+      // limpa resíduos e volta pra intro
+      localStorage.removeItem('jornadaAnswers');
+      localStorage.removeItem('journeyComplete');
+      location.replace('/jornada-intro.html');
+      return true;
+    }
     return false;
   }
   function saveAnswers(obj){ localStorage.setItem('jornadaAnswers', JSON.stringify(obj||{})); }
@@ -94,12 +100,12 @@
       return acc+(v!==null && v!==undefined && String(v).trim()!==''?1:0);
     },0);
   }
-  function apiFetchFull(base, path, opts={}){
+  function apiFetch(base, path, opts={}) {
     const {method='GET', headers={}, body=null} = opts;
     return fetch(base+path,{method,headers,body});
   }
 
-  // ===== Render 1 pergunta =====
+  // ===== Normalização/Render =====
   function normalize(list){
     return list.map((q,i)=>({
       id: q.id || q.qid || q.key || `q${i+1}`,
@@ -140,48 +146,37 @@
     if(q.type==='long_text' || q.type==='textarea'){
       const ta = document.createElement('textarea'); ta.rows=5;
       ta.className='w-full rounded-xl bg-slate-900/60 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500';
-      if(typeof curr==='string') ta.value=curr;
-      ta.addEventListener('input', on);
-      wrap.appendChild(ta);
+      if(typeof curr==='string') ta.value=curr; ta.addEventListener('input', on); wrap.appendChild(ta);
     } else if(q.type==='single' || q.type==='radio'){
       const box=document.createElement('div'); box.className='space-y-2';
       (q.options||[]).forEach(opt=>{
         const lbl=document.createElement('label'); lbl.className='flex items-center gap-2';
         const r=document.createElement('input'); r.type='radio'; r.name=id; r.value=String(opt.value??opt);
-        if(String(curr)===String(r.value)) r.checked=true;
-        r.addEventListener('change', on);
+        if(String(curr)===String(r.value)) r.checked=true; r.addEventListener('change', on);
         const t=document.createElement('span'); t.textContent=String(opt.label??opt);
         lbl.appendChild(r); lbl.appendChild(t); box.appendChild(lbl);
-      });
-      wrap.appendChild(box);
+      }); wrap.appendChild(box);
     } else if(q.type==='multi' || q.type==='checkbox'){
       const set=new Set(Array.isArray(curr)?curr.map(String):[]);
       const box=document.createElement('div'); box.className='space-y-2';
       (q.options||[]).forEach(opt=>{
         const lbl=document.createElement('label'); lbl.className='flex items-center gap-2';
         const c=document.createElement('input'); c.type='checkbox'; c.name=id; c.value=String(opt.value??opt);
-        if(set.has(String(c.value))) c.checked=true;
-        c.addEventListener('change', on);
+        if(set.has(String(c.value))) c.checked=true; c.addEventListener('change', on);
         const t=document.createElement('span'); t.textContent=String(opt.label??opt);
         lbl.appendChild(c); lbl.appendChild(t); box.appendChild(lbl);
-      });
-      wrap.appendChild(box);
+      }); wrap.appendChild(box);
     } else if(q.type==='select'){
       const sel=document.createElement('select');
       sel.className='w-full rounded-xl bg-slate-900/60 border border-white/10 px-3 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500';
       (q.options||[]).forEach(opt=>{
         const o=document.createElement('option'); o.value=String(opt.value??opt); o.textContent=String(opt.label??opt);
-        if(String(curr)===o.value) o.selected=true;
-        sel.appendChild(o);
-      });
-      sel.addEventListener('change', on);
-      wrap.appendChild(sel);
+        if(String(curr)===o.value) o.selected=true; sel.appendChild(o);
+      }); sel.addEventListener('change', on); wrap.appendChild(sel);
     } else {
       const inp=document.createElement('input'); inp.type='text';
       inp.className='w-full rounded-xl bg-slate-900/60 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500';
-      if(typeof curr==='string') inp.value=curr;
-      inp.addEventListener('input', on);
-      wrap.appendChild(inp);
+      if(typeof curr==='string') inp.value=curr; inp.addEventListener('input', on); wrap.appendChild(inp);
     }
     return wrap;
   }
@@ -214,70 +209,46 @@
     }
   }
 
-  // ===== Loader robusto =====
+  // ===== Loader robusto (com debug visível) =====
   async function loadQuestions(){
     const token = localStorage.getItem('authToken');
-    const commonHeaders = token ? {
-      'Authorization': `Bearer ${token}`,
-      'X-Auth-Token': token
-    } : {};
+    const headers = token ? { 'Authorization': `Bearer ${token}`, 'X-Auth-Token': token } : {};
 
-    const bases = Array.from(new Set([
-      localStorage.getItem('apiBase'),
-      API_PRIMARY,
-      API_FALLBACK
-    ].filter(Boolean)));
+    const bases = Array.from(new Set([ localStorage.getItem('apiBase'), API_PRIMARY, API_FALLBACK ].filter(Boolean)));
+    const paths = ['/jornada/questions','/jornada/questions/','/questions','/api/jornada/questions','/api/questions'];
 
-    const paths = [
-      '/jornada/questions',
-      '/jornada/questions/',
-      '/questions',
-      '/api/jornada/questions',
-      '/api/questions'
-    ];
+    const box = document.getElementById('pergunta');
+    box.innerHTML = `<div class="text-sm text-slate-300">Carregando perguntas…</div>`;
 
-    let lastError = '';
+    let last = '';
     for (const base of bases) {
-      for (const path of paths) {
+      for (const p of paths) {
         try {
-          const res = await apiFetchFull(base, path, { headers: commonHeaders });
-          if (res.status === 401) {
-            // sessão/token inválido
-            toast('Sessão expirada. Volte para a introdução e inicie novamente.', 'warn');
-            setTimeout(()=> location.href='/jornada-intro.html', 1200);
-            return;
-          }
-          if (!res.ok) { lastError = `${res.status} ${res.statusText} em ${base}${path}`; continue; }
+          const res = await apiFetch(base, p, { headers });
+          if (res.status === 401) { location.replace('/jornada-intro.html'); return; }
+          if (!res.ok) { last = `${res.status} ${res.statusText} em ${base}${p}`; continue; }
           const j = await res.json().catch(()=>null);
           const list = j?.questions || j?.data || j?.items || j;
           if (Array.isArray(list) && list.length) {
-            // guarda base funcional para as próximas chamadas
-            API = base;
-            localStorage.setItem('apiBase', base);
-
-            QUESTIONS = normalize(list);
-            TOTAL = QUESTIONS.length;
-            // retomar no primeiro não respondido
+            API = base; localStorage.setItem('apiBase', base);
+            QUESTIONS = normalize(list); TOTAL = QUESTIONS.length;
             const idx = QUESTIONS.findIndex(q=>!isAnswered(q.id));
             showStep(idx>=0? idx : 0);
             return;
-          } else {
-            lastError = `Formato inesperado em ${base}${path}`;
-          }
-        } catch (e) {
-          lastError = `Falha de rede em ${base}${path}`;
-        }
+          } else { last = `Formato inesperado em ${base}${p}`; }
+        } catch { last = `Falha de rede em ${base}${p}`; }
       }
     }
 
-    // Se chegou aqui, deu ruim
-    const el = $('#pergunta');
-    el.innerHTML = `
+    box.innerHTML = `
       <div class="text-sm text-rose-300 mb-3">Não foi possível carregar as perguntas.</div>
-      <pre class="text-xs bg-slate-900/70 p-3 rounded-lg overflow-x-auto">${lastError}</pre>
-      <button id="retry" class="mt-3 px-4 py-2 rounded-xl bg-primary-600 hover:bg-primary-700">Tentar novamente</button>
+      <pre class="text-xs bg-slate-900/70 p-3 rounded-lg overflow-x-auto">${last}</pre>
+      <div class="flex gap-2 mt-3">
+        <button id="retry" class="px-4 py-2 rounded-xl bg-primary-600 hover:bg-primary-700">Tentar novamente</button>
+        <a href="/jornada-intro.html" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600">Ir para a introdução</a>
+      </div>
     `;
-    $('#retry')?.addEventListener('click', loadQuestions);
+    document.getElementById('retry')?.addEventListener('click', loadQuestions);
   }
 
   function goBack(){ if(STEP>0){ showStep(STEP-1); } }
@@ -285,21 +256,16 @@
     const id = QUESTIONS[STEP].id;
     if(!isAnswered(id)){ toast('Responda esta pergunta para avançar.','warn'); return; }
     if(STEP < TOTAL-1){ showStep(STEP+1); }
-    else {
-      localStorage.setItem('journeyComplete','1');
-      location.href = FINAL_PAGE;
-    }
+    else { localStorage.setItem('journeyComplete','1'); location.href = FINAL_PAGE; }
   }
   function clearAll(){
     if(!confirm('Isto limpa apenas as respostas salvas neste dispositivo. Não apaga sua senha nem arquivos gerados. Deseja continuar?')) return;
-    localStorage.removeItem('jornadaAnswers');
-    toast('Respostas deste dispositivo foram limpas.','ok');
-    showStep(STEP);
+    localStorage.removeItem('jornadaAnswers'); toast('Respostas deste dispositivo foram limpas.','ok'); showStep(STEP);
   }
 
-  // Boot
+  // Boot (obriga passar pela intro)
   (async ()=>{
-    if(needAuth()) return;
+    if (mustStart()) return;
     await loadQuestions();
   })();
 
