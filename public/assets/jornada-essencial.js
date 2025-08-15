@@ -1,9 +1,9 @@
-/* jornada.js – v9 (estável) — wizard + contador + devolutiva + downloads + "Apagar resposta" seguro */
+/* jornada.js – v9.2 (estável) — wizard + contador + devolutiva + downloads + "Apagar resposta" local */
 const CONFIG = {
-  BUILD: '2025-08-14-9',
+  BUILD: '2025-08-14-9.2',
   BACKEND_URL: 'https://lumen-backend-api.onrender.com',
 
-  // Seletores/IDs opcionais do teu HTML (se não existir, o script acha por texto)
+  // Seletores/IDs opcionais do HTML (se não existir, o script acha por texto)
   PASSWORD_INPUT: '#senha-acesso',
   START_BUTTON: '#btn-iniciar',
   FORM_ROOT_SELECTOR: '#form-root',
@@ -19,7 +19,7 @@ const CONFIG = {
   DOWNLOAD_BUTTON_HQ: '#btn-download-hq',
 };
 
-/* 0) Anti-cache (garante que carrega esta versão) */
+/* 0) Anti-cache */
 (() => {
   try {
     const KEY = 'icl:build';
@@ -45,19 +45,6 @@ function h(tag, attrs = {}, ...children) {
   children.flat().forEach(c => el.appendChild(typeof c==='string' ? document.createTextNode(c) : c));
   return el;
 }
-// Esconde/ remove o botão "Limpar respostas" do rodapé (se existir)
-function hideFooterClear(){
-  // por ID conhecido
-  const byId = document.querySelector('#btn-limpar-oficial');
-  if (byId) byId.remove();
-
-  // por texto (case-insensitive)
-  const btns = Array.from(document.querySelectorAll('button'));
-  btns
-    .filter(b => (b.textContent || '').trim().toLowerCase() === 'limpar respostas')
-    .forEach(b => b.remove());
-}
-
 function byText(root, tag, textLike){
   const needle = (textLike || '').toLowerCase();
   return [...(root||document).querySelectorAll(tag)]
@@ -74,7 +61,6 @@ function pickSendButton(){
 }
 function pickFormRoot(){
   return document.querySelector(CONFIG.FORM_ROOT_SELECTOR) || (() => {
-    // se não existir #form-root, cria um container antes do painel de botões
     const panel = byText(document, 'button', CONFIG.START_TEXT)?.closest('div') || document.body;
     const div = document.createElement('div'); div.id = 'form-root'; div.className = 'max-w-3xl mx-auto px-4 py-6';
     panel.parentNode.insertBefore(div, panel);
@@ -87,7 +73,15 @@ function pickDevolutivaBox(){
     document.body.appendChild(div); return div;
   })();
 }
-function authHeaders(){ const t = store.get('icl:token'); return t ? { Authorization:`Bearer ${t}` } : {}; }
+// Remove o botão "Limpar respostas" do rodapé (quando existir)
+function hideFooterClear(){
+  const byId = document.querySelector('#btn-limpar-oficial');
+  if (byId) byId.remove();
+  const btns = Array.from(document.querySelectorAll('button'));
+  btns
+    .filter(b => (b.textContent || '').trim().toLowerCase() === 'limpar respostas')
+    .forEach(b => b.remove());
+}
 
 /* Estado */
 let QUESTIONS = [];
@@ -95,7 +89,7 @@ let TOTAL = 0;
 let IDX = 0;
 let ANSWERS = {};
 
-/* Estilinho dark pros campos (só reforço visual) */
+/* Estilo leve (dark) */
 (function injectStyle(){
   const css = `
   #form-root input[type="text"], #form-root textarea, #form-root select{
@@ -165,6 +159,7 @@ document.addEventListener('click', ev => {
 });
 
 /* API */
+function authHeaders(){ const t = store.get('icl:token'); return t ? { Authorization:`Bearer ${t}` } : {}; }
 async function fetchQuestions() {
   const r = await fetch(`${CONFIG.BACKEND_URL}/jornada/questions`, { headers: { ...authHeaders() } });
   if (r.status === 401 || r.status === 403) throw new Error('Sessão inválida/expirada');
@@ -192,7 +187,7 @@ function renderProgressBar(root){
 }
 function updateProgressUI(root){ renderProgressBar(root); }
 
-/* Render 1 pergunta (wizard) */
+/* Bind */
 function bindAndLoadValue(container, q){
   const apply = () => {
     if (q.kind === 'checkbox') {
@@ -221,20 +216,13 @@ function bindAndLoadValue(container, q){
   }
 }
 
+/* Render 1 pergunta */
 function renderOneQuestion(root){
   const q = QUESTIONS[IDX];
   root.innerHTML='';
 
   const section = h('section',{class:'card p-6 space-y-4'});
-  
- // ... (campos, navegação, etc.)
 
-  root.appendChild(section);       // <— já está no seu código
-
-  hideFooterClear();               // <— ADICIONE AQUI
-
-  updateProgressUI(root);          // <— isso permanece como já está
-}
   // contador inline
   section.appendChild(h('div',{ 'data-inline-progress':'1', class:'text-sm text-yellow-300' },
     `Pergunta ${IDX+1}/${TOTAL} • Respondidas ${answeredCount()}/${TOTAL}`));
@@ -251,7 +239,7 @@ function renderOneQuestion(root){
   else input=h('input',{...base,type:'text',placeholder:q.placeholder||''});
   section.appendChild(input);
 
-  // navegação + APAGAR resposta (botão local, sem listeners globais)
+  // navegação + APAGAR resposta (local)
   const nav = h('div',{class:'mt-6 flex items-center justify-between gap-3 flex-wrap'});
   const prev = h('button',{type:'button',class:'btn-gray'}, 'Anterior');
   const clear = h('button',{type:'button',class:'btn-gray'}, 'Apagar resposta');
@@ -262,23 +250,28 @@ function renderOneQuestion(root){
 
   root.appendChild(section);
 
-  // bind
+  // remove botão do rodapé (se existir)
+  hideFooterClear();
+
+  // bind valores
   bindAndLoadValue(section, q);
 
-  // listeners navegação
+  // listeners
   prev.addEventListener('click', ()=>{ if (IDX>0) { IDX--; renderOneQuestion(root); updateProgressUI(root); window.scrollTo({top:0,behavior:'smooth'}); } });
   next.addEventListener('click', ()=>{ 
-    if (IDX<TOTAL-1) { IDX++; renderOneQuestion(root); updateProgressUI(root); window.scrollTo({top:0,behavior:'smooth'}); } 
-    else {hideFooterClear(); renderFinalStep(root); updateProgressUI(root); window.scrollTo({top:0,behavior:'smooth'}); }
+    if (IDX<TOTAL-1) { 
+      IDX++; renderOneQuestion(root); updateProgressUI(root); window.scrollTo({top:0,behavior:'smooth'}); 
+    } else { 
+      hideFooterClear(); 
+      renderFinalStep(root); updateProgressUI(root); window.scrollTo({top:0,behavior:'smooth'}); 
+    }
   });
 
-  // >>> APAGAR RESPOSTA — limpa somente este passo, sem tocar nos outros
+  // >>> APAGAR RESPOSTA — limpa somente este passo
   clear.addEventListener('click', (e)=>{
     e.preventDefault();
-    // zera em ANSWERS
     ANSWERS[q.id] = (q.kind === 'checkbox') ? [] : '';
 
-    // zera no DOM + dispara input/change p/ manter contador correto
     if (q.kind === 'checkbox') {
       section.querySelectorAll(`input[type="checkbox"][name="${q.id}"]`).forEach(cb => {
         cb.checked = false;
@@ -303,6 +296,7 @@ function renderOneQuestion(root){
   updateProgressUI(root);
 }
 
+/* Final */
 function renderFinalStep(root){
   root.innerHTML = '';
   const box = h('section',{class:'card p-6 space-y-4'},
@@ -316,6 +310,9 @@ function renderFinalStep(root){
   actions.appendChild(revisar); actions.appendChild(enviar);
   box.appendChild(actions);
   root.appendChild(box);
+
+  // oculta qualquer botão do rodapé nesta tela
+  hideFooterClear();
 
   const footerSend = pickSendButton(); if (footerSend) footerSend.style.display = '';
 
@@ -336,7 +333,6 @@ async function bootQuestions(){
     ANSWERS = {};
     QUESTIONS.forEach(q=>{ ANSWERS[q.id] = (q.kind==='checkbox') ? [] : ''; });
 
-    // oculta o envio do rodapé enquanto está no wizard
     const footerSend = pickSendButton(); if (footerSend) footerSend.style.display = 'none';
 
     renderOneQuestion(root);
@@ -362,8 +358,6 @@ async function submitAnswers(){
     h('h3',{class:'text-xl font-semibold mb-2'},'Devolutiva do Lumen'),
     h('pre',{class:'whitespace-pre-wrap leading-relaxed'}, d.devolutiva || '—')
   ));
-
-  // Botões de download (estáticos, servidos pelo backend)
   const btnPanel = h('div', { class: 'mt-6 flex flex-col sm:flex-row gap-4' },
     h('a', {
       id: CONFIG.DOWNLOAD_BUTTON_FORM.slice(1),
@@ -379,9 +373,13 @@ async function submitAnswers(){
     }, 'Baixar HQ da Irmandade')
   );
   box.appendChild(btnPanel);
-
   box.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-/* Boot automático se já houver token */
-(async ()=>{ try { await bootQuestions(); } catch(_){} })();
+/* Boot automático */
+(async ()=>{ 
+  try { 
+    await bootQuestions(); 
+    hideFooterClear(); // remove o botão do rodapé ao carregar
+  } catch(_){} 
+})();
