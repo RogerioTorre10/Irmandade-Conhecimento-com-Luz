@@ -10,9 +10,10 @@
   <script>
     tailwind.config = { theme:{extend:{colors:{primary:{50:'#fff7ed',100:'#ffedd5',200:'#fed7aa',300:'#fdba74',400:'#fb923c',500:'#f59e0b',600:'#d97706',700:'#b45309',800:'#92400e',900:'#78350f'}}}} };
   </script>
-  <style> .card{border:1px solid rgba(255,255,255,.08)} </style>
+  <style>.card{border:1px solid rgba(255,255,255,.08)}</style>
 </head>
 <body class="bg-slate-900 text-slate-100 antialiased">
+  <!-- Cabeçalho -->
   <header class="sticky top-0 z-40 bg-slate-900/80 backdrop-blur border-b border-white/10">
     <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
@@ -23,6 +24,7 @@
     </div>
   </header>
 
+  <!-- Conteúdo -->
   <main class="max-w-4xl mx-auto px-4 md:px-6 lg:px-8 py-8">
     <div id="alert" class="hidden mb-4 rounded-xl border card bg-slate-800/70 p-3 text-sm"></div>
 
@@ -52,8 +54,10 @@
                class="w-full rounded-xl bg-slate-900/60 border border-white/10 px-4 py-3
                       focus:outline-none focus:ring-2 focus:ring-primary-500 pr-10">
         <button id="toggle-senha" type="button"
-                class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-300 text-sm">👁️</button>
+                class="absolute right-2 top-1/2 -translate-y-1/2 z-10 text-slate-300 text-sm"
+                aria-pressed="false" aria-label="Mostrar/ocultar senha">👁️</button>
       </div>
+
       <button id="btn-iniciar" class="w-full px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-medium">
         Iniciar Jornada
       </button>
@@ -61,6 +65,7 @@
     </section>
   </main>
 
+  <!-- Script -->
   <script>
     // ===== Config =====
     const API_PRIMARY = 'https://conhecimento-com-luz-api.onrender.com';
@@ -81,45 +86,66 @@
     function apiFetch(path, opts={}){
       const {method='GET', headers={}, body=null} = opts;
       return fetch(API+path, {method, headers, body}).catch(async e=>{
-        if(API!==API_FALLBACK && API_FALLBACK){ API=API_FALLBACK; return fetch(API+path, {method, headers, body});}
+        if(API!==API_FALLBACK && API_FALLBACK){
+          API = API_FALLBACK;
+          return fetch(API+path, {method, headers, body});
+        }
         throw e;
       });
     }
 
-    // ===== UI =====
-    $('#toggle-senha')?.addEventListener('click', ()=>{ const i=$('#senha'); i.type = i.type==='password'?'text':'password'; });
+    // ===== Olho mágico =====
+    function bindToggleSenha(){
+      const btn   = document.getElementById('toggle-senha');
+      const input = document.getElementById('senha');
+      if (!btn || !input) return;
 
-    <script>
-  // ... (o resto do script fica igual)
+      const set = (show) => {
+        input.type = show ? 'text' : 'password';
+        btn.setAttribute('aria-pressed', String(show));
+        btn.textContent = show ? '🙈' : '👁️';
+      };
 
-  async function iniciar(){
-    const senha = $('#senha')?.value?.trim();
-    if(!senha){ toast('Digite a senha para iniciar.', 'warn'); $('#senha')?.focus(); return; }
-    try{
-      const r = await apiFetch('/validar-senha', {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ senha })
-      });
-      if(!r.ok){ toast('Senha inválida.', 'err'); return; }
-      const j = await r.json().catch(()=>({}));
-      if(j?.token) localStorage.setItem('authToken', j.token);
-      localStorage.setItem('journeyStarted', String(Date.now()));
-
-      // 👉 NOVO: guarda a base de API que respondeu
-      localStorage.setItem('apiBase', API);
-
-      // limpa progresso antigo
-      localStorage.removeItem('jornadaAnswers');
-      localStorage.removeItem('journeyComplete');
-
-      toast('Acesso liberado. Boa jornada!', 'ok');
-      location.href = '/jornada-conhecimento-com-luz1.html';
-    }catch{
-      toast('Servidor indisponível. Tente novamente.', 'err');
+      btn.addEventListener('pointerdown', (e) => { e.preventDefault(); set(input.type === 'password'); });
+      btn.addEventListener('click',       (e) => { e.preventDefault(); set(input.type === 'password'); });
     }
-  }
-  // ...
-</script>
+    bindToggleSenha();
+
+    // ===== Fluxo de início =====
+    async function iniciar(){
+      const senha = $('#senha')?.value?.trim();
+      if(!senha){ toast('Digite a senha para iniciar.', 'warn'); $('#senha')?.focus(); return; }
+
+      try{
+        const r = await apiFetch('/validar-senha', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ senha })
+        });
+        if(!r.ok){ toast('Senha inválida.', 'err'); return; }
+
+        const j = await r.json().catch(()=>({}));
+        if(j?.token) localStorage.setItem('authToken', j.token);
+        localStorage.setItem('journeyStarted', String(Date.now()));
+
+        // guarda a base de API que respondeu (para as próximas páginas)
+        localStorage.setItem('apiBase', API);
+
+        // limpa progresso antigo
+        localStorage.removeItem('jornadaAnswers');
+        localStorage.removeItem('journeyComplete');
+
+        toast('Acesso liberado. Boa jornada!', 'ok');
+        location.href = NEXT_PAGE;
+      }catch{
+        toast('Servidor indisponível. Tente novamente.', 'err');
+      }
+    }
+
+    // Botão e Enter
+    $('#btn-iniciar')?.addEventListener('click', iniciar);
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter' && (document.activeElement?.id === 'senha')) iniciar();
+    });
+  </script>
 </body>
 </html>
-
