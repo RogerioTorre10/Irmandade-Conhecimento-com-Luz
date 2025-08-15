@@ -1,6 +1,6 @@
-/* jornada.js – v9.6 (PDF on-the-fly via /jornada/pdf + wizard + dark + contador) */
+/* jornada.js – v9.8 (PDF on-the-fly + wizard + dark + contador + “Apagar resposta” robusto) */
 const CONFIG = {
-  BUILD: '2025-08-14-9.6',
+  BUILD: '2025-08-14-9.8',
   BACKEND_URL: 'https://lumen-backend-api.onrender.com',
   FORCE_LOGIN: true,
 
@@ -22,7 +22,7 @@ const CONFIG = {
   DOWNLOAD_BUTTON_HQ: '#btn-download-hq',
 };
 
-/* Anti-cache */
+/* 0) Anti-cache */
 (() => {
   try {
     const KEY = 'icl:build';
@@ -34,7 +34,7 @@ const CONFIG = {
   } catch (_) {}
 })();
 
-/* Helpers */
+/* 1) Helpers/UI */
 const store = {
   set(k, v){ sessionStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v)); },
   get(k){ const v = sessionStorage.getItem(k); try { return JSON.parse(v); } catch { return v; } },
@@ -94,14 +94,14 @@ function pickCountdown(){
 }
 function authHeaders(){ const t = store.get('icl:token'); return t ? { Authorization:`Bearer ${t}` } : {}; }
 
-/* Estado */
+/* 2) Estado */
 let QUESTIONS = [];
 let IDX = 0;
 let TOTAL = 0;
 let ANSWERS = {};
 let countdownTimer = null;
 
-/* Estilos */
+/* 3) Estilos */
 (function injectDarkStyle(){
   const css = `
   #form-root input[type="text"],
@@ -138,7 +138,7 @@ let countdownTimer = null;
   const style = document.createElement('style'); style.textContent = css; document.head.appendChild(style);
 })();
 
-/* Login / Token */
+/* 4) Login / Token */
 function addPasswordToggle(input) {
   const container = input.parentNode || input.closest('div') || input;
   container.style.position = 'relative';
@@ -165,14 +165,13 @@ async function getPublicToken(){
 }
 async function ensureToken(){ if (store.get('icl:token')) return true; return !!(await getPublicToken()); }
 
-/* Downloads */
+/* 5) Downloads */
 function downloadBlob(filename, blob){
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url; a.download = filename;
   document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
 }
 async function downloadPDFGenerated(){
-  // usa as respostas atuais em memória
   const payload = { answers: { ...ANSWERS }, meta: { tzOffsetMin: new Date().getTimezoneOffset(), ua: navigator.userAgent } };
   try {
     let r = await fetch(`${CONFIG.BACKEND_URL}/jornada/pdf`, {
@@ -219,7 +218,7 @@ function renderDownloadButtons(root) {
   root.appendChild(btnPanel);
 }
 
-/* Countdown */
+/* 6) Countdown */
 function startCountdown(){
   const el = pickCountdown();
   const iso = store.get('icl:deadline');
@@ -237,7 +236,7 @@ function startCountdown(){
   tick(); if (countdownTimer) clearInterval(countdownTimer); countdownTimer = setInterval(tick, 1000);
 }
 
-/* API perguntas */
+/* 7) API perguntas */
 async function fetchQuestions() {
   let r = await fetch(`${CONFIG.BACKEND_URL}/jornada/questions`, { headers: { ...authHeaders() } });
   if (r.status === 401 || r.status === 403) {
@@ -253,7 +252,7 @@ async function fetchQuestions() {
   return r.json();
 }
 
-/* Wizard */
+/* 8) Wizard */
 function answeredCount(){
   let count = 0;
   QUESTIONS.forEach(q => {
@@ -268,6 +267,7 @@ function updateProgressUI(){
   const bar = pickProgress();
   bar.textContent = `Pergunta ${IDX+1}/${TOTAL} • Respondidas ${answeredCount()}/${TOTAL}`;
 }
+
 function bindAndLoadValue(container, q){
   const apply = () => {
     if (q.kind === 'checkbox') {
@@ -295,15 +295,17 @@ function bindAndLoadValue(container, q){
     const el = container.querySelector('#'+q.id); if (el) el.value = String(v);
   }
 }
-let QUESTIONS_CACHE = null; // opcional
 
 function renderOneQuestion(root){
   const q = QUESTIONS[IDX];
   root.innerHTML = '';
 
   const section = h('section',{class:'card p-6 space-y-4'});
+
+  // contador inline
   section.appendChild(h('div',{ 'data-inline-progress':'1', class:'text-sm text-yellow-300' },
     `Pergunta ${IDX+1}/${TOTAL} • Respondidas ${answeredCount()}/${TOTAL}`));
+
   section.appendChild(h('h2',{class:'text-xl font-semibold text-gray-100'}, q.section || ''));
   section.appendChild(h('div',{class:'text-base font-medium text-gray-100'}, q.label));
 
@@ -355,7 +357,7 @@ function renderFinalStep(root){
   });
 }
 
-/* Boot perguntas */
+/* 9) Boot perguntas */
 async function bootQuestions(){
   const root = pickFormRoot();
   try {
@@ -376,7 +378,7 @@ async function bootQuestions(){
   }
 }
 
-/* Submit + devolutiva */
+/* 10) Coleta e envio */
 function collectAnswers(){ return { ...ANSWERS }; }
 async function submitAnswers(){
   const payload={answers:collectAnswers(), meta:{tzOffsetMin:new Date().getTimezoneOffset(), ua:navigator.userAgent}};
@@ -398,59 +400,55 @@ async function submitAnswers(){
   box.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-/* Limpar/APAGAR apenas a resposta ATUAL */
+/* 11) Limpar/APAGAR apenas a resposta ATUAL — robusto */
 function clearCurrentAnswer(){
-  const q = QUESTIONS[IDX];
-  if (!q) return;
-
-  // pega o elemento raiz da pergunta atual
+  // tenta achar o "cartão" da pergunta atual
   const root = pickFormRoot();
-  const section = root.querySelector('section');
+  let section =
+    root.querySelector('section [data-inline-progress]')?.closest('section') ||
+    root.querySelector('#form-root section') ||
+    root.querySelector('section');
   if (!section) return;
 
-  // limpa no objeto de respostas
-  ANSWERS[q.id] = (q.kind === 'checkbox') ? [] : '';
+  // coleta todos os campos editáveis da etapa
+  const fields = [...section.querySelectorAll('textarea, input, select')]
+    .filter(el => !['button','submit','reset'].includes((el.type||'').toLowerCase()));
 
-  // limpa visualmente no DOM
-  if (q.kind === 'checkbox') {
-    section.querySelectorAll(`input[type="checkbox"][name="${q.id}"]`).forEach(cb => {
-      cb.checked = false;
-    });
-  } else if (q.kind === 'radio') {
-    section.querySelectorAll(`input[type="radio"][name="${q.id}"]`).forEach(r => {
-      r.checked = false;
-    });
-  } else {
-    const el = section.querySelector('#' + q.id);
-    if (el) el.value = '';
+  const clearedNames = new Set();
+
+  for (const el of fields) {
+    const type = (el.type || '').toLowerCase();
+    const name = el.name || el.id || '';
+    if (!name) continue;
+
+    if (type === 'checkbox' || type === 'radio') {
+      section.querySelectorAll(`input[type="${type}"][name="${name}"]`).forEach(i => {
+        i.checked = false;
+        i.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+      clearedNames.add(name);
+    } else if (el.tagName === 'SELECT') {
+      el.value = '';
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      clearedNames.add(name);
+    } else {
+      el.value = '';
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      clearedNames.add(name);
+    }
+  }
+
+  // sincroniza o objeto ANSWERS com os names realmente vistos na etapa
+  for (const n of clearedNames) {
+    const anyCb = section.querySelector(`input[type="checkbox"][name="${n}"]`);
+    ANSWERS[n] = anyCb ? [] : '';
   }
 
   updateProgressUI();
 }
 
-/* Liga o botão "Apagar resposta" */
-function wireClearButton(){
-  const textos = ['apagar resposta','limpar resposta','limpar respostas'];
-  let btn = document.querySelector('#btn-limpar-oficial');
-  if (!btn) {
-    btn = [...document.querySelectorAll('button')].find(b =>
-      textos.some(t => (b.textContent||'').toLowerCase().includes(t))
-    );
-  }
-  if (!btn || btn.dataset.iclWired === '1') return;
-
-  try { btn.type = 'button'; } catch(_) {}
-  btn.textContent = 'Apagar resposta';
-  btn.dataset.iclWired = '1';
-
-  btn.addEventListener('click', (ev) => {
-    ev.preventDefault();
-    ev.stopPropagation();
-    clearCurrentAnswer();
-  });
-}
-
-/* Login */
+/* 12) Login */
 async function doLogin() {
   const input = pickPasswordInput();
   const btn = pickStartButton();
@@ -478,26 +476,25 @@ async function doLogin() {
   } finally { btn.disabled = false; btn.textContent = original; }
 }
 
-/* Eventos globais */
+/* 13) Eventos globais */
 document.addEventListener('click', (ev)=>{
   const t = ev.target; if (!t) return;
 
   const startBtn = pickStartButton();
   if (startBtn && (t===startBtn || t.closest('#btn-iniciar'))) { ev.preventDefault(); doLogin(); return; }
 
+  // limpar/apagar resposta atual — por ID, ou por texto do botão
   const clearBtn = pickClearButton();
   const isClearClick =
     (clearBtn && (t===clearBtn || (CONFIG.CLEAR_BUTTON_SELECTOR && t.closest?.(CONFIG.CLEAR_BUTTON_SELECTOR)))) ||
     (t.tagName==='BUTTON' && CONFIG.CLEAR_TEXTS.some(txt=>t.textContent?.toLowerCase().includes(txt)));
   if (isClearClick) { ev.preventDefault(); clearCurrentAnswer(); return; }
 });
-/* === PATCH DEFINITIVO: botão "Apagar resposta" === */
-/* Cole no final do arquivo, após clearCurrentAnswer() */
 
+/* 14) Patch defensivo adicional: garante que o botão do rodapé sempre chame clearCurrentAnswer */
 (function patchApagarResposta(){
   const VARIANTES = ['apagar resposta','limpar resposta','limpar respostas'];
 
-  // 1) Normaliza o botão do rodapé (tipo e rótulo)
   function normalizeClearBtn(){
     let btn = document.querySelector('#btn-limpar-oficial');
     if (!btn) {
@@ -506,43 +503,24 @@ document.addEventListener('click', (ev)=>{
       );
     }
     if (!btn) return;
-
-    // evita comportamento nativo de "reset"
     try { btn.type = 'button'; } catch(_) {}
-    // rótulo padronizado
     if (!/apagar/i.test(btn.textContent || '')) btn.textContent = 'Apagar resposta';
   }
 
-  // 2) Delegação global: qualquer clique no botão ativa a limpeza da pergunta atual
   document.addEventListener('click', function(e){
     const btn = e.target.closest && e.target.closest('button');
     if (!btn) return;
-
     const label = (btn.textContent || '').toLowerCase();
     const isClear = btn.id === 'btn-limpar-oficial' || VARIANTES.some(t => label.includes(t));
-
-    if (isClear) {
-      e.preventDefault();
-      e.stopPropagation();
-      // chama a sua função que limpa SÓ a pergunta atual
-      if (typeof clearCurrentAnswer === 'function') {
-        clearCurrentAnswer();
-      }
-    }
+    if (isClear) { e.preventDefault(); e.stopPropagation(); clearCurrentAnswer(); }
   }, true);
 
-  // 3) Executa já na carga
   normalizeClearBtn();
-
-  // (Opcional) re-normaliza após pequenas mudanças de layout
-  // sem depender de alterar outras funções
   let once = false;
   const obs = new MutationObserver(() => {
-    if (once) return; // evita loops
+    if (once) return;
     once = true;
     setTimeout(() => { normalizeClearBtn(); once = false; }, 50);
   });
   obs.observe(document.documentElement, { childList: true, subtree: true });
 })();
-
-/* sem boot automático pra não pular a tela de senha */
