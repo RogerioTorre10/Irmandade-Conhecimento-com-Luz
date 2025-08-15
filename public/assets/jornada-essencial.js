@@ -491,5 +491,58 @@ document.addEventListener('click', (ev)=>{
     (t.tagName==='BUTTON' && CONFIG.CLEAR_TEXTS.some(txt=>t.textContent?.toLowerCase().includes(txt)));
   if (isClearClick) { ev.preventDefault(); clearCurrentAnswer(); return; }
 });
+/* === PATCH DEFINITIVO: botão "Apagar resposta" === */
+/* Cole no final do arquivo, após clearCurrentAnswer() */
+
+(function patchApagarResposta(){
+  const VARIANTES = ['apagar resposta','limpar resposta','limpar respostas'];
+
+  // 1) Normaliza o botão do rodapé (tipo e rótulo)
+  function normalizeClearBtn(){
+    let btn = document.querySelector('#btn-limpar-oficial');
+    if (!btn) {
+      btn = [...document.querySelectorAll('button')].find(b =>
+        VARIANTES.some(t => (b.textContent || '').toLowerCase().includes(t))
+      );
+    }
+    if (!btn) return;
+
+    // evita comportamento nativo de "reset"
+    try { btn.type = 'button'; } catch(_) {}
+    // rótulo padronizado
+    if (!/apagar/i.test(btn.textContent || '')) btn.textContent = 'Apagar resposta';
+  }
+
+  // 2) Delegação global: qualquer clique no botão ativa a limpeza da pergunta atual
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest && e.target.closest('button');
+    if (!btn) return;
+
+    const label = (btn.textContent || '').toLowerCase();
+    const isClear = btn.id === 'btn-limpar-oficial' || VARIANTES.some(t => label.includes(t));
+
+    if (isClear) {
+      e.preventDefault();
+      e.stopPropagation();
+      // chama a sua função que limpa SÓ a pergunta atual
+      if (typeof clearCurrentAnswer === 'function') {
+        clearCurrentAnswer();
+      }
+    }
+  }, true);
+
+  // 3) Executa já na carga
+  normalizeClearBtn();
+
+  // (Opcional) re-normaliza após pequenas mudanças de layout
+  // sem depender de alterar outras funções
+  let once = false;
+  const obs = new MutationObserver(() => {
+    if (once) return; // evita loops
+    once = true;
+    setTimeout(() => { normalizeClearBtn(); once = false; }, 50);
+  });
+  obs.observe(document.documentElement, { childList: true, subtree: true });
+})();
 
 /* sem boot automático pra não pular a tela de senha */
