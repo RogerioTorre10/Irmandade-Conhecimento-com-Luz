@@ -1,28 +1,25 @@
- /* jornada.js – v9.8 (PDF on-the-fly + wizard + dark + contador + “Apagar resposta” robusto) */
+/* jornada.js – v9 (estável) — wizard + contador + devolutiva + downloads + "Apagar resposta" seguro */
 const CONFIG = {
-  BUILD: '2025-08-14-9.8',
+  BUILD: '2025-08-14-9',
   BACKEND_URL: 'https://lumen-backend-api.onrender.com',
-  FORCE_LOGIN: true,
 
+  // Seletores/IDs opcionais do teu HTML (se não existir, o script acha por texto)
   PASSWORD_INPUT: '#senha-acesso',
   START_BUTTON: '#btn-iniciar',
   FORM_ROOT_SELECTOR: '#form-root',
   DEVOLUTIVA_SELECTOR: '#devolutiva',
-
   SEND_BUTTON_SELECTOR: '#btn-enviar-oficial',
-  CLEAR_BUTTON_SELECTOR: '#btn-limpar-oficial',
+
+  // Texto fallback
   START_TEXT: 'iniciar',
   SEND_TEXT: 'enviar respostas',
-  CLEAR_TEXTS: ['apagar resposta', 'limpar resposta', 'limpar respostas'],
 
-  PROGRESS_SELECTOR: '#icl-progress',
-  COUNTDOWN_SELECTOR: '#icl-countdown',
-
+  // Downloads (estáticos, servidos pelo backend com auth)
   DOWNLOAD_BUTTON_FORM: '#btn-download-form',
   DOWNLOAD_BUTTON_HQ: '#btn-download-hq',
 };
 
-/* 0) Anti-cache */
+/* 0) Anti-cache (garante que carrega esta versão) */
 (() => {
   try {
     const KEY = 'icl:build';
@@ -34,111 +31,79 @@ const CONFIG = {
   } catch (_) {}
 })();
 
-/* 1) Helpers/UI */
+/* Utils */
 const store = {
-  set(k, v) { sessionStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v)); },
-  get(k) { const v = sessionStorage.getItem(k); try { return JSON.parse(v); } catch { return v; } },
-  del(k) { sessionStorage.removeItem(k); },
+  set(k, v){ sessionStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v)); },
+  get(k){ const v = sessionStorage.getItem(k); try { return JSON.parse(v); } catch { return v; } },
+  del(k){ sessionStorage.removeItem(k); }
 };
 function h(tag, attrs = {}, ...children) {
   const el = document.createElement(tag);
-  for (const [k, v] of Object.entries(attrs || {})) {
-    if (k === 'class') el.className = v; else if (k === 'for') el.htmlFor = v; else el.setAttribute(k, v);
+  for (const [k,v] of Object.entries(attrs||{})) {
+    if (k==='class') el.className=v; else if (k==='for') el.htmlFor=v; else el.setAttribute(k,v);
   }
-  children.flat().forEach(c => el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c));
+  children.flat().forEach(c => el.appendChild(typeof c==='string' ? document.createTextNode(c) : c));
   return el;
 }
-function byText(root, tag, textLike) {
+function byText(root, tag, textLike){
   const needle = (textLike || '').toLowerCase();
-  return [...(root || document).querySelectorAll(tag)]
-    .find(el => (el.textContent || '').trim().toLowerCase().includes(needle));
+  return [...(root||document).querySelectorAll(tag)]
+    .find(el => (el.textContent||'').trim().toLowerCase().includes(needle));
 }
-function pickPasswordInput() { return document.querySelector(CONFIG.PASSWORD_INPUT) || document.querySelector('input[type="password"]'); }
-function pickStartButton() { return document.querySelector(CONFIG.START_BUTTON) || byText(document, 'button', CONFIG.START_TEXT); }
-function pickSendButton() { return document.querySelector(CONFIG.SEND_BUTTON_SELECTOR) || byText(document, 'button', CONFIG.SEND_TEXT); }
-function pickClearButton() {
-  const byId = document.querySelector(CONFIG.CLEAR_BUTTON_SELECTOR);
-  if (byId) return byId;
-  for (const t of CONFIG.CLEAR_TEXTS) { const btn = byText(document, 'button', t); if (btn) return btn; }
-  return null;
+function pickPasswordInput(){
+  return document.querySelector(CONFIG.PASSWORD_INPUT) || document.querySelector('input[type="password"]');
 }
-function pickFormRoot() {
+function pickStartButton(){
+  return document.querySelector(CONFIG.START_BUTTON) || byText(document, 'button', CONFIG.START_TEXT);
+}
+function pickSendButton(){
+  return document.querySelector(CONFIG.SEND_BUTTON_SELECTOR) || byText(document, 'button', CONFIG.SEND_TEXT);
+}
+function pickFormRoot(){
   return document.querySelector(CONFIG.FORM_ROOT_SELECTOR) || (() => {
+    // se não existir #form-root, cria um container antes do painel de botões
     const panel = byText(document, 'button', CONFIG.START_TEXT)?.closest('div') || document.body;
     const div = document.createElement('div'); div.id = 'form-root'; div.className = 'max-w-3xl mx-auto px-4 py-6';
     panel.parentNode.insertBefore(div, panel);
     return div;
   })();
 }
-function pickDevolutivaBox() {
+function pickDevolutivaBox(){
   return document.querySelector(CONFIG.DEVOLUTIVA_SELECTOR) || (() => {
     const div = document.createElement('div'); div.id = 'devolutiva'; div.className = 'max-w-3xl mx-auto px-4 py-4';
     document.body.appendChild(div); return div;
   })();
 }
-function pickProgress() {
-  return document.querySelector(CONFIG.PROGRESS_SELECTOR) || (() => {
-    const bar = h('div', { id: 'icl-progress', class: 'max-w-3xl mx-auto py-2 text-base font-semibold' }, '');
-    const root = pickFormRoot();
-    root.parentNode.insertBefore(bar, root);
-    return bar;
-  })();
-}
-function pickCountdown() {
-  return document.querySelector(CONFIG.COUNTDOWN_SELECTOR) || (() => {
-    const row = h('div', { id: 'icl-countdown', class: 'max-w-3xl mx-auto px-4 pb-2 text-sm' }, '');
-    const root = pickFormRoot();
-    root.parentNode.insertBefore(row, root);
-    return row;
-  })();
-}
-function authHeaders() { const t = store.get('icl:token'); return t ? { Authorization: Bearer ${t} } : {}; }
+function authHeaders(){ const t = store.get('icl:token'); return t ? { Authorization:`Bearer ${t}` } : {}; }
 
-/* 2) Estado */
+/* Estado */
 let QUESTIONS = [];
-let IDX = 0;
 let TOTAL = 0;
+let IDX = 0;
 let ANSWERS = {};
-let countdownTimer = null;
 
-/* 3) Estilos */
-(function injectDarkStyle() {
-  const css = 
-  #form-root input[type="text"],
-  #form-root textarea,
-  #form-root select {
-    background-color: rgba(255,255,255,0.05);
+/* Estilinho dark pros campos (só reforço visual) */
+(function injectStyle(){
+  const css = `
+  #form-root input[type="text"], #form-root textarea, #form-root select{
+    background: rgba(255,255,255,.06);
     color: #e5e7eb;
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 0.75rem;
-    padding: 0.5rem 0.75rem;
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 12px;
+    padding: .6rem .8rem;
   }
-  #form-root input::placeholder,
-  #form-root textarea::placeholder { color: #9ca3af; }
-
-  #icl-progress {
-    position: sticky; top: 0; z-index: 30;
-    background: rgba(17,24,39,0.8);
-    backdrop-filter: saturate(1.2) blur(4px);
-    color: #fde68a;
-    padding: 8px 16px; margin: 0 auto; max-width: 48rem;
-    border-bottom: 1px solid rgba(253,230,138,0.25);
-    border-radius: 0 0 .75rem .75rem;
-  }
-  #icl-countdown { color: #fcd34d; }
-
-  .btn-yellow { background:#fbbf24; color:#111827; }
-  .btn-yellow:hover { background:#f59e0b; }
-  .btn-gray { background:#374151; color:#e5e7eb; border:1px solid #4b5563; }
-  .btn-gray:hover { background:#4b5563; }
-  .btn-outline { border:1px solid #9ca3af; color:#e5e7eb; }
-  .btn-outline:hover { background:#111827; }
-  .card { background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); border-radius:1rem; }
-  ;
-  const style = document.createElement('style'); style.textContent = css; document.head.appendChild(style);
+  #form-root textarea::placeholder, #form-root input::placeholder { color:#9ca3af; }
+  .card{ background: rgba(17,24,39,.35); border:1px solid rgba(255,255,255,.08); border-radius: 16px; }
+  .btn-yellow{ background:#fbbf24; color:#111827; border-radius:12px; padding:.55rem 1.1rem; }
+  .btn-yellow:hover{ background:#f59e0b; }
+  .btn-gray{ background:#374151; color:#e5e7eb; border:1px solid #4b5563; border-radius:12px; padding:.55rem 1.1rem; }
+  .btn-gray:hover{ background:#4b5563; }
+  .progress{ color:#fde68a; }
+  `;
+  const s=document.createElement('style'); s.textContent=css; document.head.appendChild(s);
 })();
 
-/* 4) Login / Token */
+/* Login */
 function addPasswordToggle(input) {
   const container = input.parentNode || input.closest('div') || input;
   container.style.position = 'relative';
@@ -154,396 +119,248 @@ function addPasswordToggle(input) {
   });
   container.appendChild(toggleBtn);
 }
-async function getPublicToken() {
-  try {
-    const r = await fetch(${CONFIG.BACKEND_URL}/public/token, { method: 'POST' });
-    if (!r.ok) throw new Error('public token indisponível');
-    const d = await r.json();
-    if (d && d.token) { store.set('icl:token', d.token); store.set('icl:deadline', d.deadline_iso || ''); return d.token; }
-  } catch (_) {}
-  return null;
-}
-async function ensureToken() { if (store.get('icl:token')) return true; return !!(await getPublicToken()); }
 
-/* 5) Downloads */
-function downloadBlob(filename, blob) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = filename;
-  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-}
-async function downloadPDFGenerated() {
-  const payload = { answers: { ...ANSWERS }, meta: { tzOffsetMin: new Date().getTimezoneOffset(), ua: navigator.userAgent } };
-  try {
-    let r = await fetch(${CONFIG.BACKEND_URL}/jornada/pdf, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify(payload)
-    });
-    if (r.status === 401 || r.status === 403) {
-      const ok = await ensureToken();
-      if (!ok) throw new Error('Sessão inválida. Clique em Iniciar.');
-      r = await fetch(${CONFIG.BACKEND_URL}/jornada/pdf, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...authHeaders() },
-        body: JSON.stringify(payload)
-      });
-    }
-    if (!r.ok) throw new Error('Falha ao gerar o PDF.');
-    const blob = await r.blob();
-    downloadBlob(jornada_${Date.now()}.pdf, blob);
-  } catch (e) { alert(e.message || 'Não foi possível gerar o PDF.'); }
-}
-async function downloadHQ() {
-  try {
-    let r = await fetch(${CONFIG.BACKEND_URL}/jornada/download/hq.pdf, { headers: { ...authHeaders() } });
-    if (r.status === 401 || r.status === 403) {
-      const ok = await ensureToken(); if (!ok) throw new Error('Sessão inválida.');
-      r = await fetch(${CONFIG.BACKEND_URL}/jornada/download/hq.pdf, { headers: { ...authHeaders() } });
-    }
-    if (!r.ok) { window.open(${CONFIG.BACKEND_URL}/downloads/hq.pdf, '_blank'); return; }
-    const blob = await r.blob();
-    downloadBlob('hq.pdf', blob);
-  } catch { window.open(${CONFIG.BACKEND_URL}/downloads/hq.pdf, '_blank'); }
-}
-function renderDownloadButtons(root) {
-  const btnPanel = h('div', { class: 'mt-6 flex flex-col sm:flex-row gap-4' },
-    h('button', { id: CONFIG.DOWNLOAD_BUTTON_FORM.slice(1), type: 'button', class: 'w-full sm:w-1/2 px-6 py-3 rounded-xl btn-outline' }, 'Baixar Formulário da Jornada'),
-    h('button', { id: CONFIG.DOWNLOAD_BUTTON_HQ.slice(1), type: 'button', class: 'w-full sm:w-1/2 px-6 py-3 rounded-xl btn-outline' }, 'Baixar HQ da Irmandade')
-  );
-  btnPanel.addEventListener('click', (ev) => {
-    const t = ev.target; if (!t) return;
-    if (t.id === CONFIG.DOWNLOAD_BUTTON_FORM.slice(1)) { ev.preventDefault(); downloadPDFGenerated(); }
-    else if (t.id === CONFIG.DOWNLOAD_BUTTON_HQ.slice(1)) { ev.preventDefault(); downloadHQ(); }
-  });
-  root.appendChild(btnPanel);
-}
-
-/* 6) Countdown */
-function startCountdown() {
-  const el = pickCountdown();
-  const iso = store.get('icl:deadline');
-  if (!iso) { el.textContent = ''; return; }
-  const end = new Date(iso).getTime(); if (isNaN(end)) { el.textContent = ''; return; }
-  function tick() {
-    const diff = end - Date.now();
-    if (diff <= 0) { el.textContent = 'Sessão expirada. Clique em Iniciar novamente.'; if (countdownTimer) clearInterval(countdownTimer); return; }
-    const s = Math.floor(diff / 1000);
-    const hh = String(Math.floor(s / 3600)).padStart(2, '0');
-    const mm = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
-    const ss = String(s % 60).padStart(2, '0');
-    el.textContent = Tempo restante: ${hh}:${mm}:${ss};
-  }
-  tick(); if (countdownTimer) clearInterval(countdownTimer); countdownTimer = setInterval(tick, 1000);
-}
-
-/* 7) API perguntas */
-async function fetchQuestions() {
-  let r = await fetch(${CONFIG.BACKEND_URL}/jornada/questions, { headers: { ...authHeaders() } });
-  if (r.status === 401 || r.status === 403) {
-    if (!CONFIG.FORCE_LOGIN) {
-      const ok = await ensureToken();
-      if (!ok) throw new Error('Sessão inválida/expirada');
-      r = await fetch(${CONFIG.BACKEND_URL}/jornada/questions, { headers: { ...authHeaders() } });
-    } else {
-      throw new Error('Sessão inválida/expirada');
-    }
-  }
-  if (!r.ok) throw new Error(Falha ao obter perguntas (${r.status}));
-  return r.json();
-}
-
-/* 8) Wizard */
-function answeredCount() {
-  let count = 0;
-  QUESTIONS.forEach(q => {
-    const v = ANSWERS[q.id];
-    if (q.kind === 'checkbox') { if (Array.isArray(v) && v.length) count++; }
-    else if (q.kind === 'radio') { if (v) count++; }
-    else { if (v && String(v).trim() !== '') count++; }
-  });
-  return count;
-}
-function updateProgressUI() {
-  const bar = pickProgress();
-  bar.textContent = Pergunta ${IDX + 1}/${TOTAL} • Respondidas ${answeredCount()}/${TOTAL};
-}
-
-function bindAndLoadValue(container, q) {
-  const apply = () => {
-    if (q.kind === 'checkbox') {
-      const vals = [...container.querySelectorAll('input[type="checkbox"][name="' + q.id + '"]:checked')].map(el => el.value || true);
-      ANSWERS[q.id] = vals;
-    } else if (q.kind === 'radio') {
-      const r = container.querySelector('input[type="radio"][name="' + q.id + '"]:checked');
-      ANSWERS[q.id] = r ? r.value : '';
-    } else {
-      const el = container.querySelector('#' + q.id);
-      ANSWERS[q.id] = el ? el.value : '';
-    }
-    updateProgressUI();
-    const inline = container.querySelector('[data-inline-progress]');
-    if (inline) inline.textContent = Pergunta ${IDX + 1}/${TOTAL} • Respondidas ${answeredCount()}/${TOTAL};
-  };
-  container.addEventListener('input', (ev) => { const t = ev.target; if (!t) return; if (t.name === q.id || t.id === q.id) apply(); }, true);
-  const v = ANSWERS[q.id]; if (v == null) return;
-  if (q.kind === 'checkbox') {
-    const set = new Set(v || []);
-    container.querySelectorAll('input[type="checkbox"][name="' + q.id + '"]').forEach(el => { el.checked = set.has(el.value || true); });
-  } else if (q.kind === 'radio') {
-    const r = container.querySelector('input[type="radio"][name="' + q.id + '"][value="' + v + '"]'); if (r) r.checked = true;
-  } else {
-    const el = container.querySelector('#' + q.id); if (el) el.value = String(v);
-  }
-}
-
-function renderOneQuestion(root) {
-  const q = QUESTIONS[IDX];
-  root.innerHTML = '';
-
-  const section = h('section', { class: 'card p-6 space-y-4' });
-
-  // contador inline
-  section.appendChild(h('div', { 'data-inline-progress': '1', class: 'text-sm text-yellow-300' },
-    Pergunta ${IDX + 1}/${TOTAL} • Respondidas ${answeredCount()}/${TOTAL}));
-
-  section.appendChild(h('h2', { class: 'text-xl font-semibold text-gray-100' }, q.section || ''));
-  section.appendChild(h('div', { class: 'text-base font-medium text-gray-100' }, q.label));
-
-  const base = { id: q.id, name: q.id, class: 'mt-2 w-full' };
-  let input;
-  if (q.kind === 'textarea') input = h('textarea', { ...base, rows: '3', placeholder: q.placeholder || 'Escreva livremente…' });
-  else if (q.kind === 'select') input = h('select', base, h('option', { value: '' }, 'Selecione…'), ...(q.options || []).map(o => h('option', { value: o.value }, o.label)));
-  else if (q.kind === 'radio') input = h('div', { class: 'mt-1 flex flex-wrap gap-3' }, ...(q.options || []).map(o => h('label', { class: 'inline-flex items-center gap-2 text-gray-100' }, h('input', { type: 'radio', name: q.id, value: o.value }), o.label)));
-  else if (q.kind === 'checkbox') input = h('div', { class: 'mt-1 flex flex-wrap gap-3' }, ...(q.options || []).map(o => h('label', { class: 'inline-flex items-center gap-2 text-gray-100' }, h('input', { type: 'checkbox', name: q.id, value: o.value }), o.label)));
-  else input = h('input', { ...base, type: 'text', placeholder: q.placeholder || '' });
-  section.appendChild(input);
-
-  const nav = h('div', { class: 'mt-6 flex items-center justify-between gap-3 flex-wrap' });
-  const prev = h('button', { type: 'button', class: 'px-5 py-2 rounded-xl btn-gray' }, 'Anterior');
-  const nextText = (IDX === TOTAL - 1) ? 'Ir para Enviar' : 'Próxima';
-  const next = h('button', { type: 'button', class: 'px-5 py-2 rounded-xl btn-yellow' }, nextText);
-  const clear = h('button', { id: 'btn-limpar-oficial', type: 'button', class: 'px-5 py-2 rounded-xl btn-gray' }, 'Apagar resposta');
-  nav.appendChild(prev); nav.appendChild(clear); nav.appendChild(next);
-  section.appendChild(nav);
-  root.appendChild(section);
-
-  bindAndLoadValue(section, q);
-
-  prev.addEventListener('click', () => { if (IDX > 0) { IDX--; renderOneQuestion(root); updateProgressUI(); window.scrollTo({ top: 0, behavior: 'smooth' }); } });
-  next.addEventListener('click', () => { if (IDX < TOTAL - 1) { IDX++; renderOneQuestion(root); updateProgressUI(); window.scrollTo({ top: 0, behavior: 'smooth' }); } else { renderFinalStep(root); updateProgressUI(); window.scrollTo({ top: 0, behavior: 'smooth' }); } });
-  clear.addEventListener('click', (e) => { e.preventDefault(); clearCurrentAnswer(); });
-
-  updateProgressUI();
-}
-
-function renderFinalStep(root) {
-  root.innerHTML = '';
-  const box = h('section', { class: 'card p-6 space-y-4' },
-    h('h2', { class: 'text-xl font-semibold text-gray-100' }, 'Finalizar'),
-    h('p', { class: 'text-gray-200' }, 'Você chegou ao fim. Se quiser, pode voltar e revisar as respostas.'),
-    h('div', { class: 'text-sm text-gray-300' }, Respondidas ${answeredCount()}/${TOTAL})
-  );
-  const actions = h('div', { class: 'mt-4 flex items-center gap-3 flex-wrap' });
-  const revisar = h('button', { type: 'button', class: 'px-5 py-2 rounded-xl btn-gray' }, 'Voltar');
-  const enviar = h('button', { id: 'icl-send', type: 'button', class: 'px-5 py-2 rounded-xl btn-yellow' }, 'Enviar respostas');
-  actions.appendChild(revisar); actions.appendChild(enviar);
-  box.appendChild(actions);
-  root.appendChild(box);
-
-  const footerSend = pickSendButton(); if (footerSend) footerSend.style.display = '';
-
-  revisar.addEventListener('click', () => { IDX = Math.max(0, TOTAL - 1); renderOneQuestion(root); updateProgressUI(); });
-  enviar.addEventListener('click', async () => {
-    const btn = enviar; const original = btn.textContent; btn.textContent = 'Enviando…'; btn.disabled = true;
-    try { await submitAnswers(); } finally { btn.textContent = original; btn.disabled = false; }
-  });
-}
-
-/* 9) Boot perguntas */
-async function bootQuestions() {
-  const root = pickFormRoot();
-  try {
-    const payload = await fetchQuestions();
-    QUESTIONS = payload.questions || [];
-    TOTAL = QUESTIONS.length; IDX = 0;
-    ANSWERS = ANSWERS || {};
-    QUESTIONS.forEach(q => { if (!(q.id in ANSWERS)) ANSWERS[q.id] = (q.kind === 'checkbox') ? [] : ''; });
-
-    const footerSend = pickSendButton(); if (footerSend) footerSend.style.display = 'none';
-
-    renderOneQuestion(root);
-    pickProgress();
-    updateProgressUI();
-  } catch (e) {
-    console.error('[Lumen] Erro ao carregar perguntas:', e);
-    alert('Não foi possível carregar as perguntas. Clique em Iniciar novamente.');
-  }
-}
-
-/* 10) Coleta e envio */
-function collectAnswers() { return { ...ANSWERS }; }
-async function submitAnswers() {
-  const payload = { answers: collectAnswers(), meta: { tzOffsetMin: new Date().getTimezoneOffset(), ua: navigator.userAgent } };
-  let r = await fetch(${CONFIG.BACKEND_URL}/jornada/submit, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(payload) });
-  if (r.status === 401 || r.status === 403) {
-    const ok = await ensureToken();
-    if (!ok) { alert('Sessão expirada. Clique em Iniciar novamente.'); return; }
-    r = await fetch(${CONFIG.BACKEND_URL}/jornada/submit, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(payload) });
-  }
-  if (!r.ok) { alert('Falha ao enviar.'); return; }
-  const d = await r.json();
-  const box = pickDevolutivaBox();
-  box.innerHTML = '';
-  box.appendChild(h('div', { class: 'card p-6 prose max-w-none prose-invert' },
-    h('h3', { class: 'text-xl font-semibold mb-2' }, 'Devolutiva do Lumen'),
-    h('pre', { class: 'whitespace-pre-wrap leading-relaxed' }, d.devolutiva || '—')
-  ));
-  renderDownloadButtons(box);
-  box.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-/* 11) Limpar/APAGAR apenas a resposta ATUAL — robusto */
-function clearCurrentAnswer() {
-  // tenta achar o "cartão" da pergunta atual
-  const root = pickFormRoot();
-  let section =
-    root.querySelector('section [data-inline-progress]')?.closest('section') ||
-    root.querySelector('#form-root section') ||
-    root.querySelector('section');
-  if (!section) return;
-
-  // coleta todos os campos editáveis da etapa
-  const fields = [...section.querySelectorAll('textarea, input, select')]
-    .filter(el => !['button', 'submit', 'reset'].includes((el.type || '').toLowerCase()));
-
-  const clearedNames = new Set();
-
-  for (const el of fields) {
-    const type = (el.type || '').toLowerCase();
-    const name = el.name || el.id || '';
-    if (!name) continue;
-
-    if (type === 'checkbox' || type === 'radio') {
-      section.querySelectorAll(input[type="${type}"][name="${name}"]).forEach(i => {
-        i.checked = false;
-        i.dispatchEvent(new Event('input', { bubbles: true }));
-      });
-      clearedNames.add(name);
-    } else if (el.tagName === 'SELECT') {
-      el.value = '';
-      el.dispatchEvent(new Event('change', { bubbles: true }));
-      el.dispatchEvent(new Event('input', { bubbles: true }));
-      clearedNames.add(name);
-    } else {
-      el.value = '';
-      el.dispatchEvent(new Event('input', { bubbles: true }));
-      clearedNames.add(name);
-    }
-  }
-
-  // sincroniza o objeto ANSWERS com os names realmente vistos na etapa
-  for (const n of clearedNames) {
-    const anyCb = section.querySelector(input[type="checkbox"][name="${n}"]);
-    ANSWERS[n] = anyCb ? [] : '';
-  }
-
-  updateProgressUI();
-}
-
-/* 12) Login */
 async function doLogin() {
   const input = pickPasswordInput();
   const btn = pickStartButton();
   if (!btn) { alert('Não achei o botão Iniciar.'); return; }
   if (input) addPasswordToggle(input);
   const pwd = (input && input.value || '').trim();
+
   const original = btn.textContent; btn.disabled = true; btn.textContent = 'Validando…';
   try {
-    if (pwd) {
-      const res = await fetch(${CONFIG.BACKEND_URL}/validar-senha, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ senha: pwd })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        store.set('icl:token', data.token); store.set('icl:deadline', data.deadline_iso);
-        startCountdown(); await bootQuestions(); return;
-      }
+    const res = await fetch(`${CONFIG.BACKEND_URL}/validar-senha`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ senha: pwd || 'iniciar' })
+    });
+    if (!res.ok) {
+      const e = await res.json().catch(()=>({})); throw new Error(e.detail || `Falha no auth (${res.status})`);
     }
-    const t = await getPublicToken();
-    if (!t) throw new Error('Falha ao obter acesso. Tente novamente.');
-    startCountdown(); await bootQuestions();
+    const data = await res.json();
+    store.set('icl:token', data.token); store.set('icl:deadline', data.deadline_iso);
+    await bootQuestions();
   } catch (e) {
     console.error('[Lumen] Auth erro:', e);
-    alert(e.message || 'Falha ao validar acesso');
-  } finally { btn.disabled = false; btn.textContent = original; }
+    alert(e.message || 'Falha ao validar senha');
+  } finally {
+    btn.disabled = false; btn.textContent = original;
+  }
 }
-
-/* 13) Eventos globais — versão “à prova de TextNode” */
-function safeClosest(node, sel){
-  try { return (node && typeof node.closest === 'function') ? node.closest(sel) : null; }
-  catch(_) { return null; }
-}
-
-document.addEventListener('click', (ev)=>{
-  const t = ev.target || ev.srcElement;
-  if (!t) return;
-
-  // INICIAR
+document.addEventListener('click', ev => {
+  const t = ev.target; if (!t) return;
   const startBtn = pickStartButton();
-  const hitStart =
-    (startBtn && (t === startBtn || safeClosest(t, '#btn-iniciar'))) ||
-    (t.tagName === 'BUTTON' && (t.textContent||'').trim().toLowerCase() === CONFIG.START_TEXT);
-
-  if (hitStart) {
-    ev.preventDefault();
-    doLogin();
-    return;
-  }
-
-  // APAGAR / LIMPAR resposta (rodapé ou botão dentro do wizard)
-  const clearBtn = pickClearButton();
-  const hitClear =
-    (clearBtn && (t === clearBtn || safeClosest(t, CONFIG.CLEAR_BUTTON_SELECTOR))) ||
-    (t.tagName === 'BUTTON' && CONFIG.CLEAR_TEXTS.some(txt => (t.textContent||'').toLowerCase().includes(txt)));
-
-  if (hitClear) {
-    ev.preventDefault();
-    clearCurrentAnswer();
-    return;
-  }
+  if (startBtn && (t===startBtn || t.closest('#btn-iniciar'))) { ev.preventDefault(); doLogin(); }
 });
 
-/* 14) Patch defensivo adicional: garante que o botão do rodapé sempre chame clearCurrentAnswer */
-(function patchApagarResposta() {
-  const VARIANTES = ['apagar resposta', 'limpar resposta', 'limpar respostas'];
+/* API */
+async function fetchQuestions() {
+  const r = await fetch(`${CONFIG.BACKEND_URL}/jornada/questions`, { headers: { ...authHeaders() } });
+  if (r.status === 401 || r.status === 403) throw new Error('Sessão inválida/expirada');
+  if (!r.ok) throw new Error(`Falha ao obter perguntas (${r.status})`);
+  return r.json();
+}
 
-  function normalizeClearBtn() {
-    let btn = document.querySelector('#btn-limpar-oficial');
-    if (!btn) {
-      btn = [...document.querySelectorAll('button')].find(b =>
-        VARIANTES.some(t => (b.textContent || '').toLowerCase().includes(t))
-      );
-    }
-    if (!btn) return;
-    try { btn.type = 'button'; } catch (_) {}
-    if (!/apagar/i.test(btn.textContent || '')) btn.textContent = 'Apagar resposta';
-    btn.addEventListener('click', (e) => { e.preventDefault(); clearCurrentAnswer(); });
-  }
-
-  document.addEventListener('click', function (e) {
-    const btn = e.target.closest && e.target.closest('button');
-    if (!btn) return;
-    const label = (btn.textContent || '').toLowerCase();
-    const isClear = btn.id === 'btn-limpar-oficial' || VARIANTES.some(t => label.includes(t));
-    if (isClear) { e.preventDefault(); e.stopPropagation(); clearCurrentAnswer(); }
-  }, true);
-
-  normalizeClearBtn();
-  let once = false;
-  const obs = new MutationObserver(() => {
-    if (once) return;
-    once = true;
-    setTimeout(() => { normalizeClearBtn(); once = false; }, 50);
+/* Progresso */
+function answeredCount(){
+  let c=0;
+  QUESTIONS.forEach(q=>{
+    const v = ANSWERS[q.id];
+    if (q.kind==='checkbox'){ if (Array.isArray(v) && v.length) c++; }
+    else if (q.kind==='radio'){ if (v) c++; }
+    else { if (v && String(v).trim()!=='') c++; }
   });
-  obs.observe(document.documentElement, { childList: true, subtree: true });
-})();
+  return c;
+}
+function renderProgressBar(root){
+  const top = document.getElementById('icl-progress') || (() => {
+    const d = h('div',{id:'icl-progress',class:'progress max-w-3xl mx-auto py-2 text-base font-semibold'}); 
+    root.parentNode.insertBefore(d, root); return d;
+  })();
+  top.textContent = `Pergunta ${IDX+1}/${TOTAL} • Respondidas ${answeredCount()}/${TOTAL}`;
+}
+function updateProgressUI(root){ renderProgressBar(root); }
+
+/* Render 1 pergunta (wizard) */
+function bindAndLoadValue(container, q){
+  const apply = () => {
+    if (q.kind === 'checkbox') {
+      const vals = [...container.querySelectorAll('input[type="checkbox"][name="'+q.id+'"]:checked')].map(el=>el.value||true);
+      ANSWERS[q.id] = vals;
+    } else if (q.kind === 'radio') {
+      const r = container.querySelector('input[type="radio"][name="'+q.id+'"]:checked');
+      ANSWERS[q.id] = r ? r.value : '';
+    } else {
+      const el = container.querySelector('#'+q.id);
+      ANSWERS[q.id] = el ? el.value : '';
+    }
+    updateProgressUI(pickFormRoot());
+    const inline = container.querySelector('[data-inline-progress]');
+    if (inline) inline.textContent = `Pergunta ${IDX+1}/${TOTAL} • Respondidas ${answeredCount()}/${TOTAL}`;
+  };
+  container.addEventListener('input', (ev)=>{ const t = ev.target; if (!t) return; if (t.name===q.id || t.id===q.id) apply(); }, true);
+  const v = ANSWERS[q.id]; if (v == null) return;
+  if (q.kind === 'checkbox') {
+    const set = new Set(v || []);
+    container.querySelectorAll('input[type="checkbox"][name="'+q.id+'"]').forEach(el=>{ el.checked = set.has(el.value || true); });
+  } else if (q.kind === 'radio') {
+    const r = container.querySelector('input[type="radio"][name="'+q.id+'"][value="'+v+'"]'); if (r) r.checked = true;
+  } else {
+    const el = container.querySelector('#'+q.id); if (el) el.value = String(v);
+  }
+}
+
+function renderOneQuestion(root){
+  const q = QUESTIONS[IDX];
+  root.innerHTML='';
+
+  const section = h('section',{class:'card p-6 space-y-4'});
+
+  // contador inline
+  section.appendChild(h('div',{ 'data-inline-progress':'1', class:'text-sm text-yellow-300' },
+    `Pergunta ${IDX+1}/${TOTAL} • Respondidas ${answeredCount()}/${TOTAL}`));
+
+  if (q.section) section.appendChild(h('h2',{class:'text-xl font-semibold text-gray-100'}, q.section));
+  section.appendChild(h('div',{class:'text-base font-medium text-gray-100'}, q.label));
+
+  const base={id:q.id,name:q.id,class:'mt-2 w-full'};
+  let input;
+  if(q.kind==='textarea') input=h('textarea',{...base,rows:'3',placeholder:q.placeholder||'Escreva livremente…'});
+  else if(q.kind==='select') input=h('select',base, h('option',{value:''},'Selecione…'), ...(q.options||[]).map(o=>h('option',{value:o.value},o.label)));
+  else if(q.kind==='radio') input=h('div',{class:'mt-1 flex flex-wrap gap-3'}, ...(q.options||[]).map(o=>h('label',{class:'inline-flex items-center gap-2 text-gray-100'}, h('input',{type:'radio',name:q.id,value:o.value}), o.label)));
+  else if(q.kind==='checkbox') input=h('div',{class:'mt-1 flex flex-wrap gap-3'}, ...(q.options||[]).map(o=>h('label',{class:'inline-flex items-center gap-2 text-gray-100'}, h('input',{type:'checkbox',name:q.id,value:o.value}), o.label)));
+  else input=h('input',{...base,type:'text',placeholder:q.placeholder||''});
+  section.appendChild(input);
+
+  // navegação + APAGAR resposta (botão local, sem listeners globais)
+  const nav = h('div',{class:'mt-6 flex items-center justify-between gap-3 flex-wrap'});
+  const prev = h('button',{type:'button',class:'btn-gray'}, 'Anterior');
+  const clear = h('button',{type:'button',class:'btn-gray'}, 'Apagar resposta');
+  const nextText = (IDX === TOTAL-1) ? 'Ir para Enviar' : 'Próxima';
+  const next = h('button',{type:'button',class:'btn-yellow'}, nextText);
+  nav.appendChild(prev); nav.appendChild(clear); nav.appendChild(next);
+  section.appendChild(nav);
+
+  root.appendChild(section);
+
+  // bind
+  bindAndLoadValue(section, q);
+
+  // listeners navegação
+  prev.addEventListener('click', ()=>{ if (IDX>0) { IDX--; renderOneQuestion(root); updateProgressUI(root); window.scrollTo({top:0,behavior:'smooth'}); } });
+  next.addEventListener('click', ()=>{ 
+    if (IDX<TOTAL-1) { IDX++; renderOneQuestion(root); updateProgressUI(root); window.scrollTo({top:0,behavior:'smooth'}); } 
+    else { renderFinalStep(root); updateProgressUI(root); window.scrollTo({top:0,behavior:'smooth'}); }
+  });
+
+  // >>> APAGAR RESPOSTA — limpa somente este passo, sem tocar nos outros
+  clear.addEventListener('click', (e)=>{
+    e.preventDefault();
+    // zera em ANSWERS
+    ANSWERS[q.id] = (q.kind === 'checkbox') ? [] : '';
+
+    // zera no DOM + dispara input/change p/ manter contador correto
+    if (q.kind === 'checkbox') {
+      section.querySelectorAll(`input[type="checkbox"][name="${q.id}"]`).forEach(cb => {
+        cb.checked = false;
+        cb.dispatchEvent(new Event('input', {bubbles:true}));
+      });
+    } else if (q.kind === 'radio') {
+      section.querySelectorAll(`input[type="radio"][name="${q.id}"]`).forEach(r => {
+        r.checked = false;
+        r.dispatchEvent(new Event('input', {bubbles:true}));
+      });
+    } else if (q.kind === 'select') {
+      const el = section.querySelector('#'+q.id);
+      if (el) { el.value=''; el.dispatchEvent(new Event('change',{bubbles:true})); el.dispatchEvent(new Event('input',{bubbles:true})); }
+    } else {
+      const el = section.querySelector('#'+q.id);
+      if (el) { el.value=''; el.dispatchEvent(new Event('input',{bubbles:true})); }
+    }
+
+    updateProgressUI(root);
+  });
+
+  updateProgressUI(root);
+}
+
+function renderFinalStep(root){
+  root.innerHTML = '';
+  const box = h('section',{class:'card p-6 space-y-4'},
+    h('h2',{class:'text-xl font-semibold text-gray-100'}, 'Finalizar'),
+    h('p',{class:'text-gray-200'}, 'Você chegou ao fim. Se quiser, pode voltar e revisar as respostas.'),
+    h('div',{class:'text-sm text-gray-300'}, `Respondidas ${answeredCount()}/${TOTAL}`)
+  );
+  const actions = h('div',{class:'mt-4 flex items-center gap-3 flex-wrap'});
+  const revisar = h('button',{type:'button',class:'btn-gray'}, 'Voltar');
+  const enviar  = h('button',{id:'icl-send',type:'button',class:'btn-yellow'}, 'Enviar respostas');
+  actions.appendChild(revisar); actions.appendChild(enviar);
+  box.appendChild(actions);
+  root.appendChild(box);
+
+  const footerSend = pickSendButton(); if (footerSend) footerSend.style.display = '';
+
+  revisar.addEventListener('click', ()=>{ IDX = Math.max(0, TOTAL-1); renderOneQuestion(root); updateProgressUI(root); });
+  enviar.addEventListener('click', async ()=>{
+    const btn = enviar; const original = btn.textContent; btn.textContent = 'Enviando…'; btn.disabled = true;
+    try { await submitAnswers(); } finally { btn.textContent = original; btn.disabled = false; }
+  });
+}
+
+/* Boot */
+async function bootQuestions(){
+  const root = pickFormRoot();
+  try {
+    const payload = await fetchQuestions();
+    QUESTIONS = payload.questions || [];
+    TOTAL = QUESTIONS.length; IDX = 0;
+    ANSWERS = {};
+    QUESTIONS.forEach(q=>{ ANSWERS[q.id] = (q.kind==='checkbox') ? [] : ''; });
+
+    // oculta o envio do rodapé enquanto está no wizard
+    const footerSend = pickSendButton(); if (footerSend) footerSend.style.display = 'none';
+
+    renderOneQuestion(root);
+    updateProgressUI(root);
+  } catch(e) {
+    console.error('[Lumen] Erro ao carregar perguntas:', e);
+    alert('Não foi possível carregar as perguntas. Clique em Iniciar novamente.');
+  }
+}
+
+/* Coleta + envio + devolutiva + downloads */
+function collectAnswers(){ return { ...ANSWERS }; }
+
+async function submitAnswers(){
+  const payload={answers:collectAnswers(), meta:{tzOffsetMin:new Date().getTimezoneOffset(), ua:navigator.userAgent}};
+  const r= await fetch(`${CONFIG.BACKEND_URL}/jornada/submit`, {method:'POST', headers:{'Content-Type':'application/json', ...authHeaders()}, body:JSON.stringify(payload)});
+  if (r.status===401||r.status===403) { alert('Sessão expirada. Faça login novamente.'); return; }
+  if (!r.ok) { alert('Falha ao enviar.'); return; }
+  const d= await r.json();
+  const box = pickDevolutivaBox();
+  box.innerHTML='';
+  box.appendChild(h('div',{class:'card p-6 prose max-w-none prose-invert'},
+    h('h3',{class:'text-xl font-semibold mb-2'},'Devolutiva do Lumen'),
+    h('pre',{class:'whitespace-pre-wrap leading-relaxed'}, d.devolutiva || '—')
+  ));
+
+  // Botões de download (estáticos, servidos pelo backend)
+  const btnPanel = h('div', { class: 'mt-6 flex flex-col sm:flex-row gap-4' },
+    h('a', {
+      id: CONFIG.DOWNLOAD_BUTTON_FORM.slice(1),
+      class: 'w-full sm:w-1/2 px-6 py-3 border border-gray-300 rounded-xl text-center text-sm font-medium text-gray-200 hover:bg-gray-800 transition-colors',
+      href: `${CONFIG.BACKEND_URL}/jornada/download/formulario.pdf`,
+      download: ''
+    }, 'Baixar Formulário da Jornada'),
+    h('a', {
+      id: CONFIG.DOWNLOAD_BUTTON_HQ.slice(1),
+      class: 'w-full sm:w-1/2 px-6 py-3 border border-gray-300 rounded-xl text-center text-sm font-medium text-gray-200 hover:bg-gray-800 transition-colors',
+      href: `${CONFIG.BACKEND_URL}/jornada/download/hq.pdf`,
+      download: ''
+    }, 'Baixar HQ da Irmandade')
+  );
+  box.appendChild(btnPanel);
+
+  box.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* Boot automático se já houver token */
+(async ()=>{ try { await bootQuestions(); } catch(_){} })();
