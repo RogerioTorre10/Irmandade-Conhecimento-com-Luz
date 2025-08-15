@@ -478,19 +478,39 @@ async function doLogin() {
   } finally { btn.disabled = false; btn.textContent = original; }
 }
 
-/* 13) Eventos globais */
-document.addEventListener('click', (ev) => {
-  const t = ev.target; if (!t) return;
+/* 13) Eventos globais — versão “à prova de TextNode” */
+function safeClosest(node, sel){
+  try { return (node && typeof node.closest === 'function') ? node.closest(sel) : null; }
+  catch(_) { return null; }
+}
 
+document.addEventListener('click', (ev)=>{
+  const t = ev.target || ev.srcElement;
+  if (!t) return;
+
+  // INICIAR
   const startBtn = pickStartButton();
-  if (startBtn && (t === startBtn || t.closest('#btn-iniciar'))) { ev.preventDefault(); doLogin(); return; }
+  const hitStart =
+    (startBtn && (t === startBtn || safeClosest(t, '#btn-iniciar'))) ||
+    (t.tagName === 'BUTTON' && (t.textContent||'').trim().toLowerCase() === CONFIG.START_TEXT);
 
-  // limpar/apagar resposta atual — por ID, ou por texto do botão
+  if (hitStart) {
+    ev.preventDefault();
+    doLogin();
+    return;
+  }
+
+  // APAGAR / LIMPAR resposta (rodapé ou botão dentro do wizard)
   const clearBtn = pickClearButton();
-  const isClearClick =
-    (clearBtn && (t === clearBtn || (CONFIG.CLEAR_BUTTON_SELECTOR && t.closest?.(CONFIG.CLEAR_BUTTON_SELECTOR)))) ||
-    (t.tagName === 'BUTTON' && CONFIG.CLEAR_TEXTS.some(txt => t.textContent?.toLowerCase().includes(txt)));
-  if (isClearClick) { ev.preventDefault(); clearCurrentAnswer(); return; }
+  const hitClear =
+    (clearBtn && (t === clearBtn || safeClosest(t, CONFIG.CLEAR_BUTTON_SELECTOR))) ||
+    (t.tagName === 'BUTTON' && CONFIG.CLEAR_TEXTS.some(txt => (t.textContent||'').toLowerCase().includes(txt)));
+
+  if (hitClear) {
+    ev.preventDefault();
+    clearCurrentAnswer();
+    return;
+  }
 });
 
 /* 14) Patch defensivo adicional: garante que o botão do rodapé sempre chame clearCurrentAnswer */
