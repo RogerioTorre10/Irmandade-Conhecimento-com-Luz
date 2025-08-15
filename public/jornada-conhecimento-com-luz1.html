@@ -260,6 +260,23 @@
     if (mustStart()) return;
     await loadQuestions();
   })();
+    
+// === apaga apenas a resposta da pergunta atual ===
+function clearCurrent(){
+  if (!QUESTIONS?.length) return;
+  const id = QUESTIONS[STEP].id;
+  const a = getAnswers();
+  delete a[id];
+  saveAnswers(a);
+  showStep(STEP);              // re-renderiza a pergunta atual já vazia
+  toast('Resposta apagada.', 'ok');
+}
+
+// Eventos
+$('#btn-voltar')?.addEventListener('click', goBack);
+$('#btn-avancar')?.addEventListener('click', goNext);
+$('#btn-apagar')?.addEventListener('click', clearCurrent); // <-- aqui
+});
 
   // Eventos
   $('#btn-voltar')?.addEventListener('click', goBack);
