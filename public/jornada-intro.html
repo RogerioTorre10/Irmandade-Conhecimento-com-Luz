@@ -89,29 +89,37 @@
     // ===== UI =====
     $('#toggle-senha')?.addEventListener('click', ()=>{ const i=$('#senha'); i.type = i.type==='password'?'text':'password'; });
 
-    async function iniciar(){
-      const senha = $('#senha')?.value?.trim();
-      if(!senha){ toast('Digite a senha para iniciar.', 'warn'); $('#senha')?.focus(); return; }
-      try{
-        const r = await apiFetch('/validar-senha', {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ senha })
-        });
-        if(!r.ok){ toast('Senha inválida.', 'err'); return; }
-        const j = await r.json().catch(()=>({}));
-        if(j?.token) localStorage.setItem('authToken', j.token);
-        localStorage.setItem('journeyStarted', String(Date.now()));
-        // limpa progresso antigo
-        localStorage.removeItem('jornadaAnswers');
-        localStorage.removeItem('journeyComplete');
-        toast('Acesso liberado. Boa jornada!', 'ok');
-        location.href = NEXT_PAGE;
-      }catch{
-        toast('Servidor indisponível. Tente novamente.', 'err');
-      }
+    <script>
+  // ... (o resto do script fica igual)
+
+  async function iniciar(){
+    const senha = $('#senha')?.value?.trim();
+    if(!senha){ toast('Digite a senha para iniciar.', 'warn'); $('#senha')?.focus(); return; }
+    try{
+      const r = await apiFetch('/validar-senha', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ senha })
+      });
+      if(!r.ok){ toast('Senha inválida.', 'err'); return; }
+      const j = await r.json().catch(()=>({}));
+      if(j?.token) localStorage.setItem('authToken', j.token);
+      localStorage.setItem('journeyStarted', String(Date.now()));
+
+      // 👉 NOVO: guarda a base de API que respondeu
+      localStorage.setItem('apiBase', API);
+
+      // limpa progresso antigo
+      localStorage.removeItem('jornadaAnswers');
+      localStorage.removeItem('journeyComplete');
+
+      toast('Acesso liberado. Boa jornada!', 'ok');
+      location.href = '/jornada-conhecimento-com-luz1.html';
+    }catch{
+      toast('Servidor indisponível. Tente novamente.', 'err');
     }
-    $('#btn-iniciar')?.addEventListener('click', iniciar);
-  </script>
+  }
+  // ...
+</script>
 </body>
 </html>
 
