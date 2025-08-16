@@ -175,19 +175,43 @@
       }
     });
     <script>
-(function () {
-  var targets = ['jornada-conhecimento-com-luz1.html']; // detecta em qualquer forma/URL
-  function fixLinks(root) {
-    (root || document).querySelectorAll('a[href]').forEach(function (a) {
-      var href = (a.getAttribute('href') || '').toLowerCase();
-      if (targets.some(t => href.includes(t))) a.setAttribute('href', '/jornada-intro.html');
+(() => {
+  const INTRO = '/jornada-intro.html'; // se seu site estiver num subdiretório, use 'jornada-intro.html' (sem a barra)
+  const TARGETS = ['jornada-conhecimento-com-luz1.html']; // ajuste o nome se mudar
+
+  const normalize = (href) => {
+    if (!href) return '';
+    // tira hash/query, remove ./ e / iniciais e deixa minúsculo
+    const base = href.split('#')[0].split('?')[0];
+    return base.replace(/^(\.\/|\/)/, '').toLowerCase();
+  };
+
+  const shouldFix = (href) => {
+    const n = normalize(href);
+    // casa exatamente ou quando o href termina com …/arquivo.html
+    return TARGETS.some(t => n === t || n.endsWith('/' + t));
+  };
+
+  const fixLinks = (root = document) => {
+    root.querySelectorAll('a[href]').forEach(a => {
+      const href = a.getAttribute('href') || '';
+      // ignora links absolutos externos
+      if (/^https?:\/\//i.test(href)) return;
+      if (shouldFix(href)) a.setAttribute('href', INTRO);
     });
-  }
-  fixLinks(document);
-  new MutationObserver(m => m.forEach(x => x.addedNodes && x.addedNodes.forEach(n => n.nodeType===1 && fixLinks(n))))
-    .observe(document.documentElement, {childList:true, subtree:true});
+  };
+
+  // roda agora
+  fixLinks();
+
+  // e também para nós adicionados depois
+  const mo = new MutationObserver(muts => {
+    muts.forEach(m => m.addedNodes && m.addedNodes.forEach(n => {
+      if (n.nodeType === 1) fixLinks(n);
+    }));
+  });
+  mo.observe(document.documentElement, { childList: true, subtree: true });
 })();
-  
 </script>
 </body>
 </html>
