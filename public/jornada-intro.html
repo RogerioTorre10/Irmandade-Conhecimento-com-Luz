@@ -1,151 +1,116 @@
 <!doctype html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Início da Jornada · Irmandade Conhecimento com Luz</title>
-  <meta name="description" content="Avisos, termos e início da Jornada Conhecimento com Luz." />
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jornada · Introdução</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = { theme:{extend:{colors:{primary:{50:'#fff7ed',100:'#ffedd5',200:'#fed7aa',300:'#fdba74',400:'#fb923c',500:'#f59e0b',600:'#d97706',700:'#b45309',800:'#92400e',900:'#78350f'}}}} };
-  </script>
-  <style>.card{border:1px solid rgba(255,255,255,.08)}</style>
 </head>
-<body class="bg-slate-900 text-slate-100 antialiased">
-  <!-- Cabeçalho -->
-  <header class="sticky top-0 z-40 bg-slate-900/80 backdrop-blur border-b border-white/10">
-    <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <img src="/assets/favicon.svg" class="h-7 w-7" alt="">
-        <span class="font-semibold tracking-wide">Irmandade Conhecimento com Luz</span>
-      </div>
-      <span class="text-sm text-slate-300">Jornada Essencial</span>
+<body class="min-h-screen bg-slate-900 text-slate-100">
+  <header class="p-6 border-b border-slate-800">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <h1 class="text-xl font-semibold">Irmandade Conhecimento com Luz</h1>
+      <nav class="text-sm opacity-80">Jornada · Introdução</nav>
     </div>
   </header>
 
-  <!-- Conteúdo -->
-  <main class="max-w-4xl mx-auto px-4 md:px-6 lg:px-8 py-8">
-    <div id="alert" class="hidden mb-4 rounded-xl border card bg-slate-800/70 p-3 text-sm"></div>
+  <main class="max-w-3xl mx-auto p-6">
+    <!-- CONTRATO / TERMO -->
+    <section id="contrato" class="mt-6 bg-slate-800/60 border border-slate-700 rounded-2xl p-6 md:p-8">
+      <h2 class="text-2xl font-semibold mb-4">🛡️ AVISO IMPORTANTE – LEIA ANTES DE INICIAR</h2>
 
-    <!-- Avisos / Termos -->
-    <section class="rounded-2xl card bg-slate-800/60 backdrop-blur p-6 shadow-xl mb-6">
-      <h1 class="text-2xl font-semibold mb-3">🛡️ AVISO IMPORTANTE – LEIA ANTES DE INICIAR</h1>
-      <p class="text-sm leading-relaxed mb-3">
-        Esta é uma jornada pessoal, simbólica e inspiradora. Para proteger sua privacidade e garantir uma experiência ética, siga com atenção:
-      </p>
-      <ul class="list-disc pl-6 space-y-1 text-sm">
+      <p class="mb-4">Esta é uma jornada pessoal, simbólica e inspiradora.
+        Para proteger sua privacidade e garantir uma experiência ética, siga com atenção as orientações abaixo:</p>
+
+      <ul class="list-disc pl-6 space-y-2">
         <li>✅ Suas respostas não serão armazenadas após o término.</li>
-        <li>📄 Ao final, será gerado um PDF exclusivo com suas respostas e a devolutiva do Lumen.</li>
-        <li>⚠️ O PDF não é enviado por e-mail. Baixe-o imediatamente após a geração.</li>
-        <li>🔥 Após a entrega do PDF, todos os dados são apagados automaticamente.</li>
-        <li>🔒 Acesso por senha individual: <b>15 dias para iniciar</b> e <b>24 horas para concluir</b> após o primeiro acesso.</li>
+        <li>📄 Ao final da jornada, será gerado um PDF exclusivo com suas respostas e a devolutiva simbólica do Lumen.</li>
+        <li>⚠️ Este PDF não será enviado por e-mail. Você deverá baixá-lo imediatamente após a geração.</li>
+        <li>🔥 Após a entrega do PDF, todos os dados serão apagados automaticamente e sem possibilidade de recuperação.</li>
+        <li>🔒 O acesso à jornada será feito por senha individual, com prazo de:<br>
+          ⏳ 15 dias para iniciar • 🕓 24 horas para concluir, após o primeiro acesso.</li>
       </ul>
-      <p class="text-sm mt-3">
-        Ao prosseguir, você declara estar ciente e de acordo com estas condições. Tudo aqui é feito com amor, ética e respeito pela sua história. 🙏✨
-      </p>
-    </section>
 
-    <!-- Senha + Iniciar -->
-    <section class="rounded-2xl card bg-slate-800/60 backdrop-blur p-6 shadow-xl">
-      <label for="senha" class="block text-sm mb-2 text-slate-300">Senha de acesso</label>
-      <div class="relative mb-3">
-        <input id="senha" type="password" placeholder="Digite sua senha"
-               class="w-full rounded-xl bg-slate-900/60 border border-white/10 px-4 py-3
-                      focus:outline-none focus:ring-2 focus:ring-primary-500 pr-10">
-        <button id="toggle-senha" type="button"
-                class="absolute right-2 top-1/2 -translate-y-1/2 z-10 text-slate-300 text-sm"
-                aria-pressed="false" aria-label="Mostrar/ocultar senha">👁️</button>
+      <p class="mt-4">
+        Ao prosseguir, você declara estar ciente e de acordo com estas condições.
+        Tudo aqui é feito com amor, ética e respeito pela sua história. 🙏✨
+      </p>
+
+      <hr class="my-6 border-slate-700">
+
+      <h3 class="text-xl font-semibold mb-3">TERMO DE RESPONSABILIDADE E CONSENTIMENTO CONSCIENTE</h3>
+      <ol class="list-decimal pl-6 space-y-3">
+        <li><strong>Responsabilidade Pessoal:</strong> Todas as respostas fornecidas são de sua inteira responsabilidade.</li>
+        <li><strong>Caráter Não Terapêutico:</strong> Esta jornada não substitui tratamento psicológico, médico ou terapêutico.</li>
+        <li><strong>Respeito à Fé:</strong> Respeitamos todas as tradições, incentivando o diálogo interior com base na sua fé.</li>
+        <li><strong>Autonomia:</strong> Senha válida por <strong>15 dias</strong> para iniciar e, após o primeiro acesso, <strong>24 horas</strong> para concluir.</li>
+        <li><strong>Conduta com a IA Lumen:</strong> Interaja com respeito e cordialidade.</li>
+      </ol>
+
+      <!-- Consentimento -->
+      <div class="mt-6 flex items-start gap-3">
+        <input id="agree" type="checkbox" class="mt-1 h-5 w-5 rounded border-slate-600 bg-slate-700">
+        <label for="agree">Declaro que li e concordo com o Aviso e o Termo acima.</label>
       </div>
 
-      <button id="btn-iniciar" class="w-full px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-medium">
-        Iniciar Jornada
-      </button>
-      <p class="mt-3 text-xs text-slate-400">Ao clicar em “Iniciar Jornada”, você concorda com os termos acima.</p>
+      <!-- (Opcional) Senha simples -->
+      <div class="mt-4">
+        <label class="block text-sm mb-1">Senha de acesso</label>
+        <div class="flex gap-2">
+          <input id="senha" type="password" placeholder="Digite sua senha"
+                 class="flex-1 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700">
+          <button id="togglePwd" class="px-3 rounded-lg border border-slate-700">👁️</button>
+        </div>
+        <p class="text-xs opacity-70 mt-1">Dica: use a senha definida para o seu acesso (ex.: <em>iniciar</em> no ambiente de testes).</p>
+      </div>
+
+      <!-- Avançar -->
+      <div class="mt-6">
+        <button id="btnAvancar"
+                class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition">
+          Avançar
+        </button>
+      </div>
     </section>
   </main>
 
-  <!-- Script -->
   <script>
-    // ===== Config =====
-    const API_PRIMARY = 'https://conhecimento-com-luz-api.onrender.com';
-    const API_FALLBACK = 'https://lumen-backend-api.onrender.com';
-    let API = API_PRIMARY;
-    const NEXT_PAGE = '/jornada-conhecimento-com-luz1.html'; // página das perguntas
+  (() => {
+    // CONFIG
+    const DESTINO_PERGUNTAS = '/jornada-conhecimento-com-luz1.html';
+    const PASSWORD_REQUIRED = false;       // mude para true se quiser exigir senha
+    const PASSWORD_VALUE    = 'iniciar';   // valor esperado quando PASSWORD_REQUIRED = true
+    const FLAG = 'veio_da_intro';
 
-    // ===== Helpers =====
-    const $ = s => document.querySelector(s);
-    function toast(msg, type='info'){
-      const el=$('#alert'); if(!el) return;
-      el.classList.remove('hidden');
-      el.classList.toggle('border-amber-400', type==='warn');
-      el.classList.toggle('border-emerald-400', type==='ok');
-      el.classList.toggle('border-red-400', type==='err');
-      el.textContent=msg; setTimeout(()=>el.classList.add('hidden'), 3500);
-    }
-    function apiFetch(path, opts={}){
-      const {method='GET', headers={}, body=null} = opts;
-      return fetch(API+path, {method, headers, body}).catch(async e=>{
-        if(API!==API_FALLBACK && API_FALLBACK){
-          API = API_FALLBACK;
-          return fetch(API+path, {method, headers, body});
-        }
-        throw e;
-      });
-    }
+    const agree = document.getElementById('agree');
+    const btn   = document.getElementById('btnAvancar');
+    const pwd   = document.getElementById('senha');
+    const tgl   = document.getElementById('togglePwd');
 
-    // ===== Olho mágico =====
-    function bindToggleSenha(){
-      const btn   = document.getElementById('toggle-senha');
-      const input = document.getElementById('senha');
-      if (!btn || !input) return;
-
-      const set = (show) => {
-        input.type = show ? 'text' : 'password';
-        btn.setAttribute('aria-pressed', String(show));
-        btn.textContent = show ? '🙈' : '👁️';
-      };
-
-      btn.addEventListener('pointerdown', (e) => { e.preventDefault(); set(input.type === 'password'); });
-      btn.addEventListener('click',       (e) => { e.preventDefault(); set(input.type === 'password'); });
-    }
-    bindToggleSenha();
-
-    // ===== Fluxo de início =====
-    async function iniciar(){
-      const senha = $('#senha')?.value?.trim();
-      if(!senha){ toast('Digite a senha para iniciar.', 'warn'); $('#senha')?.focus(); return; }
-
-      try{
-        const r = await apiFetch('/validar-senha', {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ senha })
-        });
-        if(!r.ok){ toast('Senha inválida.', 'err'); return; }
-
-        const j = await r.json().catch(()=>({}));
-        if(j?.token) localStorage.setItem('authToken', j.token);
-        localStorage.setItem('journeyStarted', String(Date.now()));
-
-        // guarda a base de API que respondeu (para as próximas páginas)
-        localStorage.setItem('apiBase', API);
-
-        // limpa progresso antigo
-        localStorage.removeItem('jornadaAnswers');
-        localStorage.removeItem('journeyComplete');
-
-        toast('Acesso liberado. Boa jornada!', 'ok');
-        location.href = NEXT_PAGE;
-      }catch{
-        toast('Servidor indisponível. Tente novamente.', 'err');
-      }
-    }
-
-    // Botão e Enter
-    $('#btn-iniciar')?.addEventListener('click', iniciar);
-    document.addEventListener('keydown', (e)=>{
-      if(e.key === 'Enter' && (document.activeElement?.id === 'senha')) iniciar();
+    tgl.addEventListener('click', (e)=>{
+      e.preventDefault();
+      pwd.type = (pwd.type === 'password' ? 'text' : 'password');
     });
+
+    const updateBtn = () => {
+      const okConsent = !!agree.checked;
+      const okPwd = !PASSWORD_REQUIRED || (pwd.value.trim().toLowerCase() === PASSWORD_VALUE.toLowerCase());
+      btn.disabled = !(okConsent && okPwd);
+    };
+    agree.addEventListener('change', updateBtn);
+    pwd.addEventListener('input', updateBtn);
+    updateBtn();
+
+    btn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      if (btn.disabled) {
+        alert('Confirme o Termo e (se necessário) a senha.');
+        return;
+      }
+      sessionStorage.setItem(FLAG,'1');
+      location.href = DESTINO_PERGUNTAS;
+    });
+  })();
   </script>
 </body>
 </html>
