@@ -7,42 +7,113 @@
   <meta name="description" content="Fé, ciência, filosofia e tecnologia unidas para despertar e guiar.">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Animação suave da chama */
+    @keyframes flameFlicker {
+      0%   { transform: scale(1) translateY(0); filter: drop-shadow(0 0 6px rgba(255,160,64,.6)); opacity: .95; }
+      50%  { transform: scale(1.03) translateY(-1px); filter: drop-shadow(0 0 16px rgba(255,180,90,.9)); opacity: 1; }
+      100% { transform: scale(1) translateY(0); filter: drop-shadow(0 0 6px rgba(255,160,64,.6)); opacity: .95; }
+    }
+  </style>
 </head>
-<body class="min-h-screen bg-slate-900 text-slate-100">
-  <header class="p-6 border-b border-slate-800">
-    <div class="max-w-5xl mx-auto flex items-center justify-between">
-      <h1 class="text-xl font-semibold">Irmandade Conhecimento com Luz</h1>
-      <nav class="text-sm opacity-80">Jornada · Etapas</nav>
+<body class="min-h-screen bg-slate-950 text-slate-100 selection:bg-indigo-500/30">
+  <!-- Cabeçalho -->
+  <header class="p-6 border-b border-slate-800/70">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <!-- Ícone pequeno no header -->
+        <svg width="28" height="28" viewBox="0 0 100 100" aria-hidden="true">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="1" x2="1" y2="0">
+              <stop offset="0%" stop-color="#7c3aed"/>
+              <stop offset="100%" stop-color="#22d3ee"/>
+            </linearGradient>
+            <linearGradient id="fl" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0%" stop-color="#ff8a00"/>
+              <stop offset="60%" stop-color="#ffb300"/>
+              <stop offset="100%" stop-color="#fff4a3"/>
+            </linearGradient>
+          </defs>
+          <circle cx="50" cy="50" r="46" fill="none" stroke="url(#g1)" stroke-width="6"/>
+          <path d="M50 26c8 10 3 16-1 20-6 6-4 13 0 16 9-3 16-11 16-21 0-7-4-13-9-15 1 5-3 7-6 0z"
+                fill="url(#fl)"/>
+        </svg>
+        <a href="/" class="text-lg md:text-xl font-semibold hover:opacity-90">Irmandade Conhecimento com Luz</a>
+      </div>
+      <nav class="text-sm md:text-base opacity-80 space-x-4">
+        <a class="hover:underline" href="/jornada-intro.html">Jornada</a>
+        <a class="hover:underline" href="/missao-bit-vivo.html">Missão</a>
+      </nav>
     </div>
   </header>
 
-  <main class="max-w-5xl mx-auto p-6">
-    <section class="rounded-2xl border border-slate-800 p-8 bg-slate-800/40">
-      <h2 class="text-2xl font-bold mb-3">Bem-vindo(a) ✨</h2>
-      <p class="opacity-90 mb-6">Clique abaixo para iniciar sua jornada.</p>
+  <!-- Hero -->
+  <main class="max-w-6xl mx-auto p-6 md:p-10">
+    <section class="rounded-3xl border border-slate-800/70 bg-gradient-to-b from-slate-900/60 to-slate-900/20 p-8 md:p-12">
+      <div class="grid md:grid-cols-2 gap-10 items-center">
+        <!-- Símbolo grande com chama acesa -->
+        <div class="flex items-center justify-center">
+          <svg width="260" height="260" viewBox="0 0 100 100" role="img" aria-label="Símbolo da Irmandade: escudo com chama">
+            <defs>
+              <radialGradient id="ring" cx="50%" cy="50%" r="60%">
+                <stop offset="0%" stop-color="#0ea5e9"/>
+                <stop offset="100%" stop-color="#7c3aed"/>
+              </radialGradient>
+              <linearGradient id="flame" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0%" stop-color="#ff7a18"/>
+                <stop offset="55%" stop-color="#ffb62e"/>
+                <stop offset="100%" stop-color="#fff7c2"/>
+              </linearGradient>
+            </defs>
+            <!-- Anel/escudo -->
+            <circle cx="50" cy="50" r="44" fill="none" stroke="url(#ring)" stroke-width="6" opacity="0.95"/>
+            <circle cx="50" cy="50" r="36" fill="none" stroke="url(#ring)" stroke-width="1.5" opacity="0.35"/>
+            <!-- Chama -->
+            <g style="animation: flameFlicker 1.6s ease-in-out infinite">
+              <path d="M50 24c7 9 2 15-2 19-6 6-5 13-1 18 10-3 18-12 18-22 0-8-4-14-9-16 1 5-3 7-6 1z"
+                    fill="url(#flame)"/>
+              <path d="M50 50c3-2 5-5 5-8 3 3 3 9-5 13-6-3-4-7 0-10 0 2 1 4 0 5z" fill="#fff2b2" opacity="0.85"/>
+            </g>
+          </svg>
+        </div>
 
-      <!-- vai direto para a INTRO -->
-      <a href="/jornada-intro.html"
-         class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 transition">
-        Explorar Jornadas
-      </a>
+        <!-- Mensagem e botão -->
+        <div>
+          <h1 class="text-3xl md:text-4xl font-extrabold leading-tight">Bem-vindo(a) ✨</h1>
+          <p class="mt-4 text-slate-300">
+            Uma jornada viva de autoconhecimento com fé, ciência e verdade.
+            Nosso lema eterno é: <span class="font-semibold">Para além. E sempre!!</span>
+          </p>
+
+          <div class="mt-8 flex flex-wrap items-center gap-4">
+            <a href="/jornada-intro.html"
+               class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 transition">
+              Explorar Jornadas
+            </a>
+            <a href="/missao-bit-vivo.html"
+               class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl border border-slate-700 hover:bg-slate-800/60 transition">
+              Conheça a Missão
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-10 text-center opacity-80">
+      <p class="text-sm">© 2025 Irmandade Conhecimento com Luz — feito com amor, ética e respeito pela sua história.</p>
     </section>
   </main>
 
-  <!-- Zera a flag sempre que entrar na home -->
+  <!-- Ao entrar na home, zera a flag da intro -->
   <script>
-    sessionStorage.removeItem('veio_da_intro');
+    try { sessionStorage.removeItem('veio_da_intro'); } catch {}
   </script>
 
-  <!-- Guarda adicional: qualquer link para a jornada vira INTRO -->
+  <!-- Se algum link apontar direto para as páginas da jornada, manda para a INTRO -->
   <script>
   (() => {
     const INTRO = '/jornada-intro.html';
-    const TARGETS = [
-      'jornada-conhecimento-com-luz1.html',
-      'jornada-conhecimento-com-luz.html',
-      'jornada-conhecimento.html'
-    ];
+    const TARGETS = ['jornada-conhecimento-com-luz1.html','jornada-conhecimento-com-luz.html','jornada-conhecimento.html'];
     const norm = h => (h||'').split('#')[0].split('?')[0].replace(/^(\.\/|\/)/,'').toLowerCase();
     const should = h => { const n = norm(h); return TARGETS.some(t => n===t || n.endsWith('/'+t)); };
     const fix = (root=document) => root.querySelectorAll('a[href]').forEach(a=>{
