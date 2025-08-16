@@ -174,7 +174,20 @@
         a.setAttribute('href', '/jornada-intro.html');
       }
     });
-  })();
+    <script>
+(function () {
+  var targets = ['jornada-conhecimento-com-luz1.html']; // detecta em qualquer forma/URL
+  function fixLinks(root) {
+    (root || document).querySelectorAll('a[href]').forEach(function (a) {
+      var href = (a.getAttribute('href') || '').toLowerCase();
+      if (targets.some(t => href.includes(t))) a.setAttribute('href', '/jornada-intro.html');
+    });
+  }
+  fixLinks(document);
+  new MutationObserver(m => m.forEach(x => x.addedNodes && x.addedNodes.forEach(n => n.nodeType===1 && fixLinks(n))))
+    .observe(document.documentElement, {childList:true, subtree:true});
+})();
+  
 </script>
 </body>
 </html>
