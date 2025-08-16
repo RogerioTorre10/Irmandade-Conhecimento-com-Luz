@@ -1,310 +1,58 @@
 <!doctype html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8" />
-
-  <!-- Guard ANTECIPADO: sem token/started => Intro (evita flash e tela vazia) -->
-  <script>
-    (function () {
-      try {
-        if (!localStorage.getItem('authToken') || !localStorage.getItem('journeyStarted')) {
-          location.replace('/jornada-intro.html');
-        }
-      } catch (e) {
-        location.replace('/jornada-intro.html');
-      }
-    })();
-  </script>
-
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Perguntas · Jornada Conhecimento com Luz</title>
-  <meta name="description" content="Etapas da Jornada Conhecimento com Luz — perguntas e progresso." />
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jornada · Perguntas</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = { theme:{extend:{colors:{primary:{50:'#fff7ed',100:'#ffedd5',200:'#fed7aa',300:'#fdba74',400:'#fb923c',500:'#f59e0b',600:'#d97706',700:'#b45309',800:'#92400e',900:'#78350f'}}}} };
-  </script>
-  <style> .card{border:1px solid rgba(255,255,255,.08)} </style>
-</head>
-<body class="bg-slate-900 text-slate-100 antialiased">
 
-  <header class="sticky top-0 z-40 bg-slate-900/80 backdrop-blur border-b border-white/10">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <img src="/assets/favicon.svg" class="h-7 w-7" alt="">
-        <span class="font-semibold tracking-wide">Irmandade Conhecimento com Luz</span>
-      </div>
-      <span class="text-sm text-slate-300">Jornada · Etapas</span>
+  <!-- GUARDA: ninguém entra aqui sem passar pela Intro -->
+  <script>
+  (() => {
+    const INTRO = '/jornada-intro.html';
+    const veio  = sessionStorage.getItem('veio_da_intro') === '1';
+    if (!veio) location.replace(INTRO);
+  })();
+  </script>
+</head>
+<body class="min-h-screen bg-slate-900 text-slate-100">
+  <header class="p-6 border-b border-slate-800">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <h1 class="text-xl font-semibold">Irmandade Conhecimento com Luz</h1>
+      <nav class="text-sm opacity-80">Jornada · Etapas</nav>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-8 pb-44">
-    <div id="alert" class="hidden mb-4 rounded-xl border card bg-slate-800/70 p-3 text-sm"></div>
+  <main class="max-w-5xl mx-auto p-6">
+    <div class="rounded-2xl border border-slate-800 p-4 md:p-6 bg-slate-800/40 flex items-center justify-between">
+      <a id="voltarIntro" href="/jornada-intro.html" class="underline">Voltar à introdução</a>
+      <button id="btnRecomecar" class="text-sm underline">Recomeçar</button>
+    </div>
 
-    <!-- Status/Progresso -->
-    <section class="rounded-2xl card bg-slate-800/60 backdrop-blur p-6 shadow-xl mb-6 flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <div class="text-sm text-slate-300">Progresso</div>
-        <div class="mt-1 text-sm">
-          Pergunta <span id="q-atual">0</span>/<span id="q-total">32</span> • Respondidas <span id="q-respondidas">0</span>/<span id="q-total-2">32</span>
-        </div>
-      </div>
-      <div class="text-right text-xs">
-        <a href="/jornada-intro.html" class="underline text-slate-300">Voltar à introdução</a>
-        <a href="#" id="recomecar" class="underline text-slate-400 ml-3">Recomeçar</a>
-      </div>
+    <section id="app" class="mt-6">
+      <!-- Seu render de perguntas entra aqui (mantive vazio para não conflitar com sua lógica).
+           Se quiser, injete pelo jornada.js -->
     </section>
-
-    <!-- Pergunta atual -->
-    <section id="pergunta" class="rounded-2xl card bg-slate-800/60 backdrop-blur p-6 shadow-xl min-h-[260px]"></section>
   </main>
 
-  <!-- Barra fixa -->
-  <div class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[95%] md:w-auto rounded-2xl bg-slate-800/90 backdrop-blur shadow-2xl ring-1 ring-white/10 px-4 py-3 flex items-center gap-3 z-30">
-    <button id="btn-voltar" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600" disabled>Voltar</button>
-    <button id="btn-apagar" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600">Apagar resposta</button>
-    <button id="btn-avancar" class="px-5 py-2 rounded-xl bg-primary-600 hover:bg-primary-700 font-medium" disabled>Avançar</button>
-  </div>
-
+  <!-- Utilidades da Jornada (PDF, limpar, handlers dos botões) -->
+  <script src="/jornada.js"></script>
   <script>
-    // ===== Config / rotas =====
-    const API_PRIMARY = 'https://conhecimento-com-luz-api.onrender.com';
-    const API_FALLBACK = 'https://lumen-backend-api.onrender.com';
-    let API = localStorage.getItem('apiBase') || API_PRIMARY;
-    const FINAL_PAGE = '/jornada-final.html';
-
-    // ===== Estado =====
-    let QUESTIONS = [];
-    let TOTAL = 32;
-    let STEP = 0;
-
-    // ===== Helpers =====
-    const $ = s => document.querySelector(s);
-    function toast(msg, type='info'){
-      const el=$('#alert'); if(!el) return;
-      el.classList.remove('hidden');
-      el.classList.toggle('border-amber-400', type==='warn');
-      el.classList.toggle('border-emerald-400', type==='ok');
-      el.classList.toggle('border-red-400', type==='err');
-      el.textContent=msg; setTimeout(()=>el.classList.add('hidden'), 4000);
-    }
-    function mustStart() {
-      const t = localStorage.getItem('authToken');
-      const started = localStorage.getItem('journeyStarted');
-      if(!t || !started) { location.replace('/jornada-intro.html'); return true; }
-      return false;
-    }
-    function saveAnswers(obj){ localStorage.setItem('jornadaAnswers', JSON.stringify(obj||{})); }
-    function getAnswers(){ try{ return JSON.parse(localStorage.getItem('jornadaAnswers')||'{}'); }catch{return {}} }
-    function setAnswer(id, v){ const a=getAnswers(); a[id]=v; saveAnswers(a); refresh(); }
-    function isAnswered(id){
-      const v = getAnswers()[id];
-      return Array.isArray(v) ? v.length>0 : (v!==null && v!==undefined && String(v).trim()!=='');
-    }
-    function answeredCount(){
-      return Object.values(getAnswers()).reduce((acc,v)=>{
-        if(Array.isArray(v)) return acc+(v.length?1:0);
-        return acc+(v!==null && v!==undefined && String(v).trim()!==''?1:0);
-      },0);
-    }
-    function apiFetch(base, path, opts={}) {
-      const {method='GET', headers={}, body=null} = opts;
-      return fetch(base+path,{method,headers,body});
-    }
-
-    // ===== Normalização/Render =====
-    function normalize(list){
-      return list.map((q,i)=>({
-        id: q.id || q.qid || q.key || `q${i+1}`,
-        label: q.label || q.title || q.text || `Pergunta ${i+1}`,
-        type: (q.type || 'text').toLowerCase(),
-        options: q.options || q.choices || [],
-        required: q.required !== false
-      }));
-    }
-
-    function buildQuestion(q){
-      const id = q.id;
-      const wrap = document.createElement('div');
-
-      const small = document.createElement('div');
-      small.className='text-sm text-slate-300 mb-2';
-      small.textContent = `Pergunta ${STEP+1}/${TOTAL}`;
-      wrap.appendChild(small);
-
-      const h = document.createElement('label');
-      h.className='block mb-3 font-medium';
-      h.textContent = q.label + (q.required?' *':'');
-      wrap.appendChild(h);
-
-      const curr = getAnswers()[id];
-      const on = (e)=>{
-        if(e.target.type==='checkbox'){
-          const arr = Array.from(wrap.querySelectorAll('input[type="checkbox"]:checked')).map(x=>x.value);
-          setAnswer(id, arr);
-        } else if(e.target.type==='radio'){
-          const sel = wrap.querySelector('input[type="radio"]:checked');
-          setAnswer(id, sel?sel.value:'');
-        } else {
-          setAnswer(id, e.target.value);
-        }
-      };
-
-      if(q.type==='long_text' || q.type==='textarea'){
-        const ta = document.createElement('textarea'); ta.rows=5;
-        ta.className='w-full rounded-xl bg-slate-900/60 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500';
-        if(typeof curr==='string') ta.value=curr;
-        ta.addEventListener('input', on);
-        wrap.appendChild(ta);
-      } else if(q.type==='single' || q.type==='radio'){
-        const box=document.createElement('div'); box.className='space-y-2';
-        (q.options||[]).forEach(opt=>{
-          const lbl=document.createElement('label'); lbl.className='flex items-center gap-2';
-          const r=document.createElement('input'); r.type='radio'; r.name=id; r.value=String(opt.value??opt);
-          if(String(curr)===String(r.value)) r.checked=true;
-          r.addEventListener('change', on);
-          const t=document.createElement('span'); t.textContent=String(opt.label??opt);
-          lbl.appendChild(r); lbl.appendChild(t); box.appendChild(lbl);
-        });
-        wrap.appendChild(box);
-      } else if(q.type==='multi' || q.type==='checkbox'){
-        const set=new Set(Array.isArray(curr)?curr.map(String):[]);
-        const box=document.createElement('div'); box.className='space-y-2';
-        (q.options||[]).forEach(opt=>{
-          const lbl=document.createElement('label'); lbl.className='flex items-center gap-2';
-          const c=document.createElement('input'); c.type='checkbox'; c.name=id; c.value=String(opt.value??opt);
-          if(set.has(String(c.value))) c.checked=true;
-          c.addEventListener('change', on);
-          const t=document.createElement('span'); t.textContent=String(opt.label??opt);
-          lbl.appendChild(c); lbl.appendChild(t); box.appendChild(lbl);
-        });
-        wrap.appendChild(box);
-      } else if(q.type==='select'){
-        const sel=document.createElement('select');
-        sel.className='w-full rounded-xl bg-slate-900/60 border border-white/10 px-3 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500';
-        (q.options||[]).forEach(opt=>{
-          const o=document.createElement('option'); o.value=String(opt.value??opt); o.textContent=String(opt.label??opt);
-          if(String(curr)===o.value) o.selected=true;
-          sel.appendChild(o);
-        });
-        sel.addEventListener('change', on);
-        wrap.appendChild(sel);
-      } else {
-        const inp=document.createElement('input'); inp.type='text';
-        inp.className='w-full rounded-xl bg-slate-900/60 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500';
-        if(typeof curr==='string') inp.value=curr;
-        inp.addEventListener('input', on);
-        wrap.appendChild(inp);
-      }
-      return wrap;
-    }
-
-    function showStep(i){
-      STEP = Math.max(0, Math.min(i, TOTAL-1));
-      const q = QUESTIONS[STEP];
-      const el = $('#pergunta');
-      el.innerHTML='';
-      el.appendChild(buildQuestion(q));
-      window.scrollTo({top: el.offsetTop - 80, behavior:'smooth'});
-      refresh();
-    }
-
-    function refresh(){
-      const done = answeredCount();
-      $('#q-atual').textContent = STEP+1;
-      $('#q-total').textContent = TOTAL;
-      $('#q-total-2').textContent = TOTAL;
-      $('#q-respondidas').textContent = done;
-
-      $('#btn-voltar').disabled = STEP<=0;
-      const answeredCurrent = isAnswered(QUESTIONS[STEP].id);
-      $('#btn-avancar').disabled = !answeredCurrent;
-
-      if(STEP===TOTAL-1 && answeredCurrent){
-        $('#btn-avancar').textContent = 'Finalizar';
-      } else {
-        $('#btn-avancar').textContent = 'Avançar';
-      }
-    }
-
-    // ===== Loader robusto (debug visível) =====
-    async function loadQuestions(){
-      const token = localStorage.getItem('authToken');
-      const headers = token ? { 'Authorization': `Bearer ${token}`, 'X-Auth-Token': token } : {};
-      const bases = Array.from(new Set([ localStorage.getItem('apiBase'), API_PRIMARY, API_FALLBACK ].filter(Boolean)));
-      const paths = ['/jornada/questions','/jornada/questions/','/questions','/api/jornada/questions','/api/questions'];
-
-      const box = document.getElementById('pergunta');
-      box.innerHTML = `<div class="text-sm text-slate-300">Carregando perguntas…</div>`;
-
-      let last = '';
-      for (const base of bases) {
-        for (const p of paths) {
-          try {
-            const res = await apiFetch(base, p, { headers });
-            if (res.status === 401) { location.replace('/jornada-intro.html'); return; }
-            if (!res.ok) { last = `${res.status} ${res.statusText} em ${base}${p}`; continue; }
-            const j = await res.json().catch(()=>null);
-            const list = j?.questions || j?.data || j?.items || j;
-            if (Array.isArray(list) && list.length) {
-              API = base; localStorage.setItem('apiBase', base);
-              QUESTIONS = normalize(list); TOTAL = QUESTIONS.length;
-              const idx = QUESTIONS.findIndex(q=>!isAnswered(q.id));
-              showStep(idx>=0? idx : 0);
-              return;
-            } else { last = `Formato inesperado em ${base}${p}`; }
-          } catch { last = `Falha de rede em ${base}${p}`; }
-        }
-      }
-
-      box.innerHTML = `
-        <div class="text-sm text-rose-300 mb-3">Não foi possível carregar as perguntas.</div>
-        <pre class="text-xs bg-slate-900/70 p-3 rounded-lg overflow-x-auto">${last}</pre>
-        <div class="flex gap-2 mt-3">
-          <button id="retry" class="px-4 py-2 rounded-xl bg-primary-600 hover:bg-primary-700">Tentar novamente</button>
-          <a href="/jornada-intro.html" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600">Ir para a introdução</a>
-        </div>
-      `;
-      document.getElementById('retry')?.addEventListener('click', loadQuestions);
-    }
-
-    function goBack(){ if(STEP>0){ showStep(STEP-1); } }
-    function goNext(){
-      const id = QUESTIONS[STEP].id;
-      if(!isAnswered(id)){ toast('Responda esta pergunta para avançar.','warn'); return; }
-      if(STEP < TOTAL-1){ showStep(STEP+1); }
-      else { localStorage.setItem('journeyComplete','1'); location.href = FINAL_PAGE; }
-    }
-
-    // Apaga **apenas** a resposta da pergunta atual
-    function clearCurrent(){
-      if (!Array.isArray(QUESTIONS) || !QUESTIONS.length) return;
-      const id = QUESTIONS[STEP].id;
-      const a = getAnswers();
-      delete a[id];
-      saveAnswers(a);
-      showStep(STEP);                 // re-renderiza a atual
-      toast('Resposta apagada.', 'ok');
-    }
-
-    // Recomeçar (limpa tudo e volta à intro)
-    document.getElementById('recomecar')?.addEventListener('click', (e)=>{
+  // Garante UM único "Voltar à introdução" e comportamentos
+  (() => {
+    const INTRO = '/jornada-intro.html';
+    const links = Array.from(document.querySelectorAll('a,button')).filter(el => /voltar\s+à\s+introdução/i.test(el.textContent));
+    links.slice(1).forEach(el => el.remove());
+    const voltar = links[0] || document.getElementById('voltarIntro');
+    voltar?.addEventListener('click', (e)=> {
       e.preventDefault();
-      ['authToken','journeyStarted','jornadaAnswers','journeyComplete'].forEach(k => localStorage.removeItem(k));
-      location.href = '/jornada-intro.html';
+      sessionStorage.removeItem('veio_da_intro');
+      location.href = INTRO;
     });
-
-    // Boot
-    (async ()=>{
-      if (mustStart()) return;
-      await loadQuestions();
-    })();
-
-    // Eventos
-    $('#btn-voltar')?.addEventListener('click', goBack);
-    $('#btn-avancar')?.addEventListener('click', goNext);
-    $('#btn-apagar')?.addEventListener('click', clearCurrent);
-    // (sem atalhos de teclado para não interferir com textarea)
+    document.getElementById('btnRecomecar')?.addEventListener('click', () => {
+      window.JornadaUtil?.resetarTotal();
+    });
+  })();
   </script>
 </body>
 </html>
