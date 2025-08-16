@@ -30,28 +30,49 @@
     </div>
 
     <section id="app" class="mt-6">
-      <!-- Seu render de perguntas entra aqui (mantive vazio para não conflitar com sua lógica).
-           Se quiser, injete pelo jornada.js -->
+      <!-- As perguntas serão injetadas aqui -->
+      <div class="text-center opacity-70">Carregando perguntas…</div>
     </section>
   </main>
 
-  <!-- Utilidades da Jornada (PDF, limpar, handlers dos botões) -->
-  <script src="/assets/jornada.js?v=1"></script>
+  <!-- 1) Utilidades (PDF/reset) -->
+  <script src="/jornada.js?v=1"></script>
+
+  <!-- 2) SEU script das perguntas (ajuste o caminho se necessário) -->
+  <script src="/assets/jornada-essencial.js?v=1"></script>
+
+  <!-- 3) Inicialização: chama o renderer disponível -->
   <script>
-  // Garante UM único "Voltar à introdução" e comportamentos
   (() => {
-    const INTRO = '/jornada-intro.html';
+    const root = document.getElementById('app');
+
+    // Garantir UM "Voltar à introdução"
     const links = Array.from(document.querySelectorAll('a,button')).filter(el => /voltar\s+à\s+introdução/i.test(el.textContent));
     links.slice(1).forEach(el => el.remove());
     const voltar = links[0] || document.getElementById('voltarIntro');
     voltar?.addEventListener('click', (e)=> {
       e.preventDefault();
       sessionStorage.removeItem('veio_da_intro');
-      location.href = INTRO;
+      location.href = '/jornada-intro.html';
     });
     document.getElementById('btnRecomecar')?.addEventListener('click', () => {
       window.JornadaUtil?.resetarTotal();
     });
+
+    // Chama sua função de renderização, qualquer que seja o nome
+    if (window.JornadaEssencial?.render) {
+      window.JornadaEssencial.render(root);
+    } else if (window.renderJornadaEssencial) {
+      window.renderJornadaEssencial(root);
+    } else if (window.renderPerguntas) {
+      window.renderPerguntas(root);
+    } else {
+      root.innerHTML = `
+        <div class="rounded-xl border border-slate-800 bg-slate-800/40 p-6">
+          <p class="text-red-300">As perguntas não foram carregadas.</p>
+          <p class="text-sm opacity-70 mt-2">Verifique se <code>/assets/jornada-essencial.js</code> está no ar e exporta <code>JornadaEssencial.render(root)</code>.</p>
+        </div>`;
+    }
   })();
   </script>
 </body>
