@@ -74,43 +74,49 @@
     </section>
   </main>
 
-  <script>
-  (() => {
-    // CONFIG
-    const DESTINO_PERGUNTAS = '/jornada-conhecimento-com-luz1.html';
-    const PASSWORD_REQUIRED = false;       // mude para true se quiser exigir senha
-    const PASSWORD_VALUE    = 'iniciar';   // valor esperado quando PASSWORD_REQUIRED = true
-    const FLAG = 'veio_da_intro';
+ <script>
+(() => {
+  // ===== CONFIG =====
+  const FLAG = 'veio_da_intro';
+  const DESTINO_PERGUNTAS = '/jornada-conhecimento-com-luz1.html'; // ajuste se necessário
+  const PASSWORD_REQUIRED = false;      // mude para true se quiser exigir senha
+  const PASSWORD_VALUE    = 'iniciar';  // valor esperado quando exigir senha
 
-    const agree = document.getElementById('agree');
-    const btn   = document.getElementById('btnAvancar');
-    const pwd   = document.getElementById('senha');
-    const tgl   = document.getElementById('togglePwd');
+  // ===== ELEMENTOS =====
+  const agree = document.getElementById('agree');
+  const btn   = document.getElementById('btnIniciar') || document.getElementById('btnAvancar');
+  const pwd   = document.getElementById('senha');
+  const tgl   = document.getElementById('togglePwd');
 
-    tgl.addEventListener('click', (e)=>{
+  // Mostrar/ocultar senha (se existir)
+  tgl?.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (!pwd) return;
+    pwd.type = (pwd.type === 'password' ? 'text' : 'password');
+  });
+
+  // Habilita o botão somente quando termo + (senha se exigida) ok
+  function updateBtn() {
+    const okConsent = !!agree?.checked;
+    const okPwd = !PASSWORD_REQUIRED || (pwd?.value?.trim().toLowerCase() === PASSWORD_VALUE.toLowerCase());
+    if (btn) btn.disabled = !(okConsent && okPwd);
+  }
+  agree?.addEventListener('change', updateBtn);
+  pwd?.addEventListener('input', updateBtn);
+  updateBtn();
+
+  // Avançar
+  btn?.addEventListener('click', (e) => {
+    if (btn.disabled) {
       e.preventDefault();
-      pwd.type = (pwd.type === 'password' ? 'text' : 'password');
-    });
-
-    const updateBtn = () => {
-      const okConsent = !!agree.checked;
-      const okPwd = !PASSWORD_REQUIRED || (pwd.value.trim().toLowerCase() === PASSWORD_VALUE.toLowerCase());
-      btn.disabled = !(okConsent && okPwd);
-    };
-    agree.addEventListener('change', updateBtn);
-    pwd.addEventListener('input', updateBtn);
-    updateBtn();
-
-    btn.addEventListener('click', (e)=>{
-      e.preventDefault();
-      if (btn.disabled) {
-        alert('Confirme o Termo e (se necessário) a senha.');
-        return;
-      }
-      sessionStorage.setItem(FLAG,'1');
-      location.href = DESTINO_PERGUNTAS;
-    });
-  })();
-  </script>
+      alert('Confirme o Termo e (se necessário) a senha.');
+      return;
+    }
+    e.preventDefault();
+    sessionStorage.setItem(FLAG, '1');          // marca que passou pela intro
+    location.href = DESTINO_PERGUNTAS;          // vai para as perguntas
+  });
+})();
+</script>
 </body>
 </html>
