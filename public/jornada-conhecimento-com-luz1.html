@@ -43,37 +43,60 @@
 
   <!-- 3) Inicialização: chama o renderer disponível -->
   <script>
-  (() => {
-    const root = document.getElementById('app');
+  <!-- 3) Inicialização: controla "Voltar" e carrega as perguntas -->
+<script>
+(async () => {
+  const INTRO = '/jornada-intro.html';
+  const root  = document.getElementById('app');
 
-    // Garantir UM "Voltar à introdução"
-    const links = Array.from(document.querySelectorAll('a,button')).filter(el => /voltar\s+à\s+introdução/i.test(el.textContent));
-    links.slice(1).forEach(el => el.remove());
-    const voltar = links[0] || document.getElementById('voltarIntro');
-    voltar?.addEventListener('click', (e)=> {
-      e.preventDefault();
-      sessionStorage.removeItem('veio_da_intro');
-      location.href = '/jornada-intro.html';
-    });
-    document.getElementById('btnRecomecar')?.addEventListener('click', () => {
-      window.JornadaUtil?.resetarTotal();
-    });
+  // — manter só UM "Voltar à introdução" e dar função —
+  const links = Array.from(document.querySelectorAll('a,button'))
+    .filter(el => /voltar\s+à\s+introdução/i.test(el.textContent));
+  links.slice(1).forEach(el => el.remove());
+  const voltar = links[0] || document.getElementById('voltarIntro');
+  voltar?.addEventListener('click', (e) => {
+    e.preventDefault();
+    sessionStorage.removeItem('veio_da_intro');
+    location.href = INTRO;
+  });
 
-    // Chama sua função de renderização, qualquer que seja o nome
-    if (window.JornadaEssencial?.render) {
-      window.JornadaEssencial.render(root);
-    } else if (window.renderJornadaEssencial) {
-      window.renderJornadaEssencial(root);
-    } else if (window.renderPerguntas) {
-      window.renderPerguntas(root);
-    } else {
-      root.innerHTML = `
-        <div class="rounded-xl border border-slate-800 bg-slate-800/40 p-6">
-          <p class="text-red-300">As perguntas não foram carregadas.</p>
-          <p class="text-sm opacity-70 mt-2">Verifique se <code>/assets/jornada-essencial.js</code> está no ar e exporta <code>JornadaEssencial.render(root)</code>.</p>
-        </div>`;
-    }
-  })();
-  </script>
-</body>
-</html>
+  // — Recomeçar: limpa tudo e volta pra intro —
+  document.getElementById('btnRecomecar')?.addEventListener('click', () => {
+    window.JornadaUtil?.resetarTotal();
+  });
+
+  // — Carregar perguntas —
+  // 1) Se já veio como script global, usa direto
+  let render =
+    (window.JornadaEssencial && window.JornadaEssencial.render) ||
+    window.renderJornadaEssencial ||
+    window.renderPerguntas;
+
+  // 2) Senão, tenta como ES Module (import dinâmico)
+  if (typeof render !== 'function') {
+    try {
+      const mod = await import('/assets/jornada-essencial.js?v=1');
+      render =
+        (mod.JornadaEssencial && mod.JornadaEssencial.render) ||
+        mod.render ||
+        mod.default ||
+        mod.renderJornadaEssencial ||
+        mod.renderPerguntas;
+    } catch (_) { /* segue pro fallback */ }
+  }
+
+  // 3) Executa ou mostra ajuda
+  if (typeof render === 'function') {
+    render(root);
+  } else {
+    root.innerHTML = `
+      <div class="rounded-xl border border-slate-800 bg-slate-800/40 p-6">
+        <p class="text-red-300">As perguntas não foram carregadas.</p>
+        <p class="text-sm opacity-70 mt-2">
+          Confirme se <code>/assets/jornada-essencial.js</code> existe e expõe
+          <code>JornadaEssencial.render(root)</code>, ou <code>render(root)</code>.
+        </p>
+      </div>`;
+  }
+})();
+</script>
