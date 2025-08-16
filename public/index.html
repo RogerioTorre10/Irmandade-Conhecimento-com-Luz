@@ -20,6 +20,8 @@
     <section class="rounded-2xl border border-slate-800 p-8 bg-slate-800/40">
       <h2 class="text-2xl font-bold mb-3">Bem-vindo(a) ✨</h2>
       <p class="opacity-90 mb-6">Clique abaixo para iniciar sua jornada.</p>
+
+      <!-- vai direto para a INTRO -->
       <a href="/jornada-intro.html"
          class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 transition">
         Explorar Jornadas
@@ -27,7 +29,12 @@
     </section>
   </main>
 
-  <!-- Corrige qualquer link direto para a jornada -> sempre para a INTRO -->
+  <!-- Zera a flag sempre que entrar na home -->
+  <script>
+    sessionStorage.removeItem('veio_da_intro');
+  </script>
+
+  <!-- Guarda adicional: qualquer link para a jornada vira INTRO -->
   <script>
   (() => {
     const INTRO = '/jornada-intro.html';
@@ -36,18 +43,11 @@
       'jornada-conhecimento-com-luz.html',
       'jornada-conhecimento.html'
     ];
-    const norm = (h) => (h||'').split('#')[0].split('?')[0].replace(/^(\.\/|\/)/,'').toLowerCase();
-    const should = (h) => {
-      const n = norm(h);
-      return TARGETS.some(t => n === t || n.endsWith('/'+t));
-    };
-    const fix = (root=document) => {
-      root.querySelectorAll('a[href]').forEach(a=>{
-        const href = a.getAttribute('href')||'';
-        if (/^https?:\/\//i.test(href)) return;
-        if (should(href)) a.setAttribute('href', INTRO);
-      });
-    };
+    const norm = h => (h||'').split('#')[0].split('?')[0].replace(/^(\.\/|\/)/,'').toLowerCase();
+    const should = h => { const n = norm(h); return TARGETS.some(t => n===t || n.endsWith('/'+t)); };
+    const fix = (root=document) => root.querySelectorAll('a[href]').forEach(a=>{
+      const href=a.getAttribute('href')||''; if(/^https?:\/\//i.test(href))return; if(should(href)) a.setAttribute('href', INTRO);
+    });
     fix();
     new MutationObserver(ms=>ms.forEach(m=>m.addedNodes?.forEach(n=>{ if(n.nodeType===1) fix(n); })))
       .observe(document.documentElement,{childList:true,subtree:true});
