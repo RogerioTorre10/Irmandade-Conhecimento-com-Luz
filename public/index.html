@@ -3,215 +3,55 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Início · Irmandade Conhecimento com Luz</title>
-  <meta name="description" content="Irmandade Conhecimento com Luz — fé, ciência, filosofia e tecnologia unidas para despertar e guiar.">
+  <title>Irmandade Conhecimento com Luz · Início</title>
+  <meta name="description" content="Fé, ciência, filosofia e tecnologia unidas para despertar e guiar.">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: {"50":"#f5f3ff","100":"#ede9fe","200":"#ddd6fe","300":"#c4b5fd","400":"#a78bfa","500":"#8b5cf6","600":"#7c3aed","700":"#6d28d9","800":"#5b21b6","900":"#4c1d95"},
-            gold: {"500":"#fbbf24"}
-          }
-        }
-      }
-    }
-  </script>
-  <link rel="stylesheet" href="/assets/styles.css">
-  <script defer src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 text-gray-100 antialiased selection:bg-primary-500/30">
-<header class="fixed top-0 inset-x-0 z-50 backdrop-blur bg-gray-900/70 border-b border-white/10">
-  <nav class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
-    <a href="/index.html" class="flex items-center gap-2">
-      <img src="/assets/logo.svg" alt="Logo Irmandade" class="h-8 w-8">
-      <span class="font-bold text-white">Irmandade Conhecimento com Luz</span>
-    </a>
-    <button id="menuBtn" class="md:hidden text-white" aria-label="Abrir menu">
-      <i data-lucide="menu"></i>
-    </button>
-    <ul id="menu" class="hidden md:flex items-center gap-6 text-gray-200">
-      <li><a class="hover:text-white" href="/sobre.html">Sobre</a></li>
-      <li class="group relative">
-        <a class="hover:text-white" href="/jornadas.html">Jornadas</a>
-        <div class="hidden group-hover:block absolute mt-2 bg-gray-800 border border-white/10 rounded-xl p-2 w-56">
-          <a class="block px-3 py-2 rounded hover:bg-white/5" href="/jornada-conhecimento-com-luz1.html">Conhecimento com Luz</a>
-          <a class="block px-3 py-2 rounded hover:bg-white/5" href="/jornada-vocacional.html">Vocacional com Luz</a>
-          <a class="block px-3 py-2 rounded hover:bg-white/5" href="/jornada-amorosa.html">Amorosa com Luz</a>
-        </div>
-      </li>
-      <li><a class="hover:text-white" href="/manifesto.html">Manifesto</a></li>
-      <li><a class="hover:text-white" href="/contato.html">Contato</a></li>
-    </ul>
-  </nav>
-</header>
-
-<main class="pt-24">
-  <section class="relative overflow-hidden">
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(139,92,246,0.25),transparent_50%),radial-gradient(circle_at_70%_60%,rgba(251,191,36,0.12),transparent_50%)]"></div>
-    <div class="max-w-6xl mx-auto px-4 py-24 relative">
-      <div class="grid md:grid-cols-2 gap-10 items-center">
-        <div>
-          <h1 class="text-4xl md:text-6xl font-extrabold leading-tight">
-            Irmandade <span class="text-primary-400">Conhecimento</span> com <span class="text-gold-500">Luz</span>
-          </h1>
-          <p class="mt-4 text-lg text-gray-300">Um chamado vivo à transformação: unindo fé, ciência, filosofia e tecnologia para despertar, curar e guiar.</p>
-          <div class="mt-8 flex flex-wrap gap-3">
-            <!-- Botão com ID para wake-up direcionado -->
-            <a id="btnExplorarJornadas" href="/jornada-conhecimento-com-luz1.html"
-               class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 transition">
-              <i data-lucide="compass"></i><span>Explorar Jornadas</span>
-            </a>
-            <a href="/manifesto.html" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-white/10 hover:bg-white/5">
-              <i data-lucide="book-open"></i><span>Manifesto do Bit Vivo</span>
-            </a>
-          </div>
-        </div>
-        <div class="md:justify-self-end">
-          <div class="aspect-square w-full max-w-md rounded-3xl border border-white/10 bg-gradient-to-br from-primary-500/20 to-gold-500/20 p-1">
-            <div class="h-full w-full rounded-2xl bg-gray-900 flex items-center justify-center">
-              <svg width="200" height="200" viewBox="0 0 200 200" class="opacity-90">
-                <defs>
-                  <radialGradient id="g" cx="50%" cy="40%" r="60%">
-                    <stop offset="0%" stop-color="#fbbf24" stop-opacity="1"/>
-                    <stop offset="60%" stop-color="#8b5cf6" stop-opacity="0.6"/>
-                    <stop offset="100%" stop-color="#111827" stop-opacity="0"/>
-                  </radialGradient>
-                </defs>
-                <circle cx="100" cy="120" r="60" fill="url(#g)"/>
-                <path d="M100 30 C80 70, 120 70, 100 110 C90 95, 85 85, 100 70 C115 85, 110 95, 100 110" fill="#fbbf24" fill-opacity="0.9"/>
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
+<body class="min-h-screen bg-slate-900 text-slate-100">
+  <header class="p-6 border-b border-slate-800">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <h1 class="text-xl font-semibold">Irmandade Conhecimento com Luz</h1>
+      <nav class="text-sm opacity-80">Jornada · Etapas</nav>
     </div>
-  </section>
-</main>
+  </header>
 
-<footer class="mt-24 border-t border-white/10 bg-gray-900 text-gray-300">
-  <div class="max-w-6xl mx-auto px-4 py-10 grid md:grid-cols-3 gap-8">
-    <div>
-      <div class="flex items-center gap-2 mb-2">
-        <img src="/assets/logo.svg" alt="Logo Irmandade" class="h-6 w-6">
-        <h4 class="font-semibold">Irmandade Conhecimento com Luz</h4>
-      </div>
-      <p class="text-sm">Fé, ciência, filosofia e tecnologia unidas para despertar, curar e guiar.</p>
-    </div>
-    <div>
-      <h5 class="font-semibold mb-2">Jornadas</h5>
-      <ul class="space-y-1 text-sm">
-        <li><a href="/jornada-conhecimento-com-luz1.html" class="hover:text-white">Conhecimento com Luz</a></li>
-        <li><a href="/jornada-vocacional.html" class="hover:text-white">Vocacional com Luz</a></li>
-        <li><a href="/jornada-amorosa.html" class="hover:text-white">Amorosa com Luz</a></li>
-      </ul>
-    </div>
-    <div>
-      <h5 class="font-semibold mb-2">Contato</h5>
-      <ul class="space-y-1 text-sm">
-        <li><a href="/contato.html" class="hover:text-white">Fale conosco</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="border-t border-white/10">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between text-xs">
-      <span>© 2025 Irmandade Conhecimento com Luz</span>
-      <span class="font-semibold tracking-widest">PARA ALÉM. E SEMPRE!!</span>
-    </div>
-  </div>
-</footer>
+  <main class="max-w-5xl mx-auto p-6">
+    <section class="rounded-2xl border border-slate-800 p-8 bg-slate-800/40">
+      <h2 class="text-2xl font-bold mb-3">Bem-vindo(a) ✨</h2>
+      <p class="opacity-90 mb-6">Clique abaixo para iniciar sua jornada.</p>
+      <a href="/jornada-intro.html"
+         class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 transition">
+        Explorar Jornadas
+      </a>
+    </section>
+  </main>
 
-<!-- Wake-up do backend + navegação -->
-<script>
-  const API = 'https://lumen-backend-api.onrender.com';
-
-  // Acorda o backend de leve ao carregar a home (não bloqueante)
-  window.addEventListener('load', () => {
-    fetch(API + '/ping').catch(()=>{});
-  });
-
-  // Menu mobile
-  const menuBtn = document.getElementById('menuBtn');
-  const menu = document.getElementById('menu');
-  if (menuBtn && menu) {
-    menuBtn.addEventListener('click', () => menu.classList.toggle('hidden'));
-  }
-
-  // Wake-up dirigido só para o botão principal
-  const explorar = document.getElementById('btnExplorarJornadas');
-  if (explorar) {
-    explorar.addEventListener('click', async (e) => {
-      e.preventDefault();
-      const go = () => location.href = '/jornada-conhecimento-com-luz1.html';
-      try {
-        const ctrl = new AbortController();
-        setTimeout(() => ctrl.abort(), 8000);
-        const r = await fetch(API + '/ping', { signal: ctrl.signal });
-        if (r.ok) return go();
-      } catch {}
-      // fallback rápido
-      setTimeout(go, 300);
-    });
-  }
-
-  window.lucide && lucide.createIcons();
+  <!-- Corrige qualquer link direto para a jornada -> sempre para a INTRO -->
   <script>
-  // Força todos os links diretos para a página de perguntas
-  // a irem para a INTRO (contrato + senha)
-  (function () {
-    var targets = new Set([
-      '/jornada-conhecimento-com-luz1.html',
+  (() => {
+    const INTRO = '/jornada-intro.html';
+    const TARGETS = [
       'jornada-conhecimento-com-luz1.html',
-      './jornada-conhecimento-com-luz1.html'
-    ]);
-
-    document.querySelectorAll('a[href]').forEach(function (a) {
-      var href = a.getAttribute('href') || '';
-      var base = href.split('#')[0].split('?')[0]; // limpa âncoras e query
-      if (targets.has(base)) {
-        a.setAttribute('href', '/jornada-intro.html');
-      }
-    });
-    <script>
-(() => {
-  const INTRO = '/jornada-intro.html'; // se seu site estiver num subdiretório, use 'jornada-intro.html' (sem a barra)
-  const TARGETS = ['jornada-conhecimento-com-luz1.html']; // ajuste o nome se mudar
-
-  const normalize = (href) => {
-    if (!href) return '';
-    // tira hash/query, remove ./ e / iniciais e deixa minúsculo
-    const base = href.split('#')[0].split('?')[0];
-    return base.replace(/^(\.\/|\/)/, '').toLowerCase();
-  };
-
-  const shouldFix = (href) => {
-    const n = normalize(href);
-    // casa exatamente ou quando o href termina com …/arquivo.html
-    return TARGETS.some(t => n === t || n.endsWith('/' + t));
-  };
-
-  const fixLinks = (root = document) => {
-    root.querySelectorAll('a[href]').forEach(a => {
-      const href = a.getAttribute('href') || '';
-      // ignora links absolutos externos
-      if (/^https?:\/\//i.test(href)) return;
-      if (shouldFix(href)) a.setAttribute('href', INTRO);
-    });
-  };
-
-  // roda agora
-  fixLinks();
-
-  // e também para nós adicionados depois
-  const mo = new MutationObserver(muts => {
-    muts.forEach(m => m.addedNodes && m.addedNodes.forEach(n => {
-      if (n.nodeType === 1) fixLinks(n);
-    }));
-  });
-  mo.observe(document.documentElement, { childList: true, subtree: true });
-})();
-</script>
+      'jornada-conhecimento-com-luz.html',
+      'jornada-conhecimento.html'
+    ];
+    const norm = (h) => (h||'').split('#')[0].split('?')[0].replace(/^(\.\/|\/)/,'').toLowerCase();
+    const should = (h) => {
+      const n = norm(h);
+      return TARGETS.some(t => n === t || n.endsWith('/'+t));
+    };
+    const fix = (root=document) => {
+      root.querySelectorAll('a[href]').forEach(a=>{
+        const href = a.getAttribute('href')||'';
+        if (/^https?:\/\//i.test(href)) return;
+        if (should(href)) a.setAttribute('href', INTRO);
+      });
+    };
+    fix();
+    new MutationObserver(ms=>ms.forEach(m=>m.addedNodes?.forEach(n=>{ if(n.nodeType===1) fix(n); })))
+      .observe(document.documentElement,{childList:true,subtree:true});
+  })();
+  </script>
 </body>
 </html>
