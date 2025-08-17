@@ -31,22 +31,28 @@
 
       <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
         <a href="/jornada-conhecimento-com-luz1.html" class="px-5 py-3 rounded-xl border border-slate-700">Revisar respostas</a>
-        <button id="btnPdf" class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700" type="button">Baixar PDF</button>
-        <button id="btnHq"  class="px-5 py-3 rounded-xl bg-slate-700 hover:bg-slate-600"  type="button">Baixar HQ (imagem)</button>
+        <!-- ÚNICO BOTÃO -->
+        <button id="btnEntregar" class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700" type="button">
+          Baixar Entrega (PDF + HQ)
+        </button>
         <a id="btnHome" href="/" class="px-5 py-3 rounded-xl border border-slate-700">Voltar ao início</a>
       </div>
 
-      <p class="text-xs opacity-70 mt-4">Lembre-se: o PDF não é enviado por e-mail — faça o download agora.</p>
+      <p class="text-xs opacity-70 mt-4">
+        Dica: se estiver sem espaço no dispositivo, o PDF baixa mesmo assim; a HQ pode falhar. Nesse caso, apenas o PDF será entregue.
+      </p>
     </section>
   </main>
 
   <script>
-    /* =================== FALLBACKS =================== */
+    /* =================== UTIL/FALLBACKS =================== */
     const API_BASE = 'https://conhecimento-com-luz-api.onrender.com';
     const PDF_ENDPOINTS = ['/generate-pdf','/pdf','/api/pdf'];
     const ts = () => new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
     const nomePDF = () => `Jornada_${ts()}.pdf`;
     const nomeHQ  = () => `Jornada_HQ_${ts()}.png`;
+
+    const msg = (e) => (e && e.message) ? e.message : (typeof e === 'string' ? e : 'Erro inesperado');
 
     function _safeJSON(text, fb){ try{ return JSON.parse(text); } catch{ return fb; } }
     function _baixarBlob(blob){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=nomePDF(); document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),3000); }
@@ -111,7 +117,7 @@
       doc.save(nomePDF());
     }
 
-    /* ---------- PDF robusto (tenta remoto, cai para local) ----------- */
+    /* ---------- PDF robusto (tenta remoto; se falhar, local) ----------- */
     async function gerarPDFRobusto(p){
       try{
         if (window.JornadaUtil?.gerarPDF) { await window.JornadaUtil.gerarPDF(p); return; }
@@ -130,7 +136,7 @@
       }catch(e){ await gerarPDFLocal(p); }
     }
 
-    /* ---------- HQ robusto (sempre local) ----------- */
+    /* ---------- HQ robusto (leve + fallback) ----------- */
     function loadHtml2Canvas(){
       if (window.html2canvas) return Promise.resolve();
       return new Promise((resolve, reject)=>{
@@ -156,48 +162,62 @@
       return wrap;
     }
     async function gerarHQRobusto(p){
-      try{ if (window.JornadaUtil?.gerarHQ) return await window.JornadaUtil.gerarHQ(p); }catch{}
-      await loadHtml2Canvas();
-      const el = montarHQDOM(p || payload());
-      document.body.appendChild(el);
-      const canvas = await window.html2canvas(el,{backgroundColor:'#0f172a',scale:2,useCORS:true});
-      const url = canvas.toDataURL('image/png');
-      const a=document.createElement('a'); a.href=url; a.download=nomeHQ(); document.body.appendChild(a); a.click(); a.remove();
-      el.remove();
+      // tenta versão leve (JPEG + scale 1.5); se falhar, cai pra PNG + scale 1
+      try{
+        await loadHtml2Canvas();
+        const el = montarHQDOM(p || payload());
+        document.body.appendChild(el);
+        let canvas = await window.html2canvas(el,{backgroundColor:'#0f172a',scale:1.5,useCORS:true});
+        let url = canvas.toDataURL('image/jpeg', 0.92);
+        baixarArquivo(url, nomeHQ().replace('.png','.jpg'));
+        el.remove();
+      } catch (e1) {
+        try {
+          await loadHtml2Canvas();
+          const el2 = montarHQDOM(p || payload());
+          document.body.appendChild(el2);
+          let canvas2 = await window.html2canvas(el2,{backgroundColor:'#0f172a',scale:1,useCORS:true});
+          let url2 = canvas2.toDataURL('image/png');
+          baixarArquivo(url2, nomeHQ());
+          el2.remove();
+        } catch(e2){
+          throw e2;
+        }
+      }
+    }
+    function baixarArquivo(url, fname){
+      const a=document.createElement('a'); a.href=url; a.download=fname; document.body.appendChild(a); a.click(); a.remove();
     }
 
     /* ---------- limpeza + redirecionamento ----------- */
     function finalizarEVoltar(){
       try{ localStorage.removeItem('respostas_jornada'); }catch{}
       try{ sessionStorage.removeItem('veio_da_intro'); }catch{}
-      setTimeout(()=>{ location.href='/'; }, 1000); // dá 1s pro download iniciar
+      setTimeout(()=>{ location.href='/'; }, 1200); // dá ~1s para os downloads começarem
     }
 
-    /* ---------- botões ----------- */
-    const msg = (e) => (e && e.message) ? e.message : (typeof e === 'string' ? e : 'Erro inesperado');
+    /* ---------- único botão (PDF + HQ) ----------- */
+    const btn = document.getElementById('btnEntregar');
+    btn?.addEventListener('click', async (ev) => {
+      btn.disabled = true;
+      btn.classList.add('opacity-70','cursor-wait');
+      const texto = btn.textContent;
+      btn.textContent = 'Gerando entrega...';
 
-    document.getElementById('btnPdf')?.addEventListener('click', async (ev) => {
-      ev.currentTarget.blur();
-      try {
-        const p = payload();
-        await gerarPDFRobusto(p);
-        finalizarEVoltar();
-      } catch (e) {
-        alert('Não foi possível gerar o PDF agora. Tente novamente em alguns minutos.\n\n' + msg(e));
-        console.error(e);
-      }
-    });
+      const p = payload();
+      let pdfOK = false, hqOK = false;
 
-    document.getElementById('btnHq')?.addEventListener('click', async (ev) => {
-      ev.currentTarget.blur();
-      try {
-        const p = payload();
-        await gerarHQRobusto(p);
-        finalizarEVoltar();
-      } catch (e) {
-        alert('Não foi possível gerar a HQ agora.\n\n' + msg(e));
-        console.error(e);
-      }
+      try { await gerarPDFRobusto(p); pdfOK = true; } 
+      catch(e){ alert('PDF falhou, vamos tentar a imagem (HQ).\n\n'+msg(e)); }
+
+      try { await gerarHQRobusto(p); hqOK = true; } 
+      catch(e){ alert('HQ falhou.\n\n'+msg(e)); }
+
+      // Mesmo que a HQ falhe por memória/armazenamento, o PDF estando ok já encerra.
+      finalizarEVoltar();
+
+      // se quiser reabilitar o botão (em caso de debug local), descomente:
+      // btn.disabled = false; btn.classList.remove('opacity-70','cursor-wait'); btn.textContent = texto;
     });
   </script>
 </body>
