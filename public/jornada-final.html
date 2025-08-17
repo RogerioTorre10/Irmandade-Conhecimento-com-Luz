@@ -5,13 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Jornada · Finalização</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Pré-carrega o utilitário e garante execução após o parse -->
+  <link rel="preload" as="script" href="/jornada.js?v=5">
+  <script defer src="/jornada.js?v=5" onerror="window.__J_UTIL_ERR__=true"></script>
 </head>
 <body class="min-h-screen bg-slate-900 text-slate-100">
   <header class="p-6 border-b border-slate-800">
     <div class="max-w-5xl mx-auto flex items-center justify-between">
-     <span class="text-xl font-semibold opacity-90 select-none cursor-default">
-  Irmandade Conhecimento com Luz
-</span>
+      <span class="text-xl font-semibold opacity-90 select-none cursor-default">
+        Irmandade Conhecimento com Luz
+      </span>
       <nav class="text-sm opacity-80">Jornada · Final</nav>
     </div>
   </header>
@@ -24,31 +28,34 @@
       <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
         <a href="/jornada-conhecimento-com-luz1.html" class="px-5 py-3 rounded-xl border border-slate-700">Revisar respostas</a>
         <button id="btnPdf" class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700" type="button">Baixar PDF</button>
-        <button id="btnHq"  class="px-5 py-3 rounded-xl bg-slate-700 hover:bg-slate-600" type="button">Baixar HQ (imagem)</button>
+        <button id="btnHq"  class="px-5 py-3 rounded-xl bg-slate-700 hover:bg-slate-600"  type="button">Baixar HQ (imagem)</button>
       </div>
 
       <p class="text-xs opacity-70 mt-4">Lembre-se: o PDF não é enviado por e-mail — faça o download agora.</p>
     </section>
   </main>
 
-  <!-- utilidades -->
-  <script src="/jornada.js?v=4"></script>
-
   <script>
-    // garante que o utilitário está pronto; transforma erros em mensagens legíveis
+    // Carrega /jornada.js com cache-bust se necessário
     async function ensureUtil() {
-      if (window.JornadaUtil?.gerarPDF) return;
+      if (window.JornadaUtil?.gerarPDF) return true;
+
+      // 1) se o <script defer> falhou, tenta rebaixar com cache-bust
       await new Promise((resolve, reject) => {
         const s = document.createElement('script');
-        s.src = '/jornada.js?v=4';
-        s.onload = () => {
-          if (window.JornadaUtil?.gerarPDF) resolve();
-          else reject(new Error('jornada.js carregou, mas JornadaUtil não está disponível.'));
-        };
+        s.src = '/jornada.js?v=5&b=' + Date.now(); // força baixar
+        s.onload = resolve;
         s.onerror = () => reject(new Error('Falha ao baixar /jornada.js'));
         document.head.appendChild(s);
-      });
+      }).catch(err => { throw err; });
+
+      // 2) confere se o objeto apareceu
+      if (!window.JornadaUtil?.gerarPDF) {
+        throw new Error('jornada.js carregou, mas JornadaUtil não está disponível.');
+      }
+      return true;
     }
+
     const msg = (e) => (e && e.message) ? e.message : (typeof e === 'string' ? e : 'Erro inesperado');
 
     document.getElementById('btnPdf')?.addEventListener('click', async () => {
