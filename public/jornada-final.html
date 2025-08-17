@@ -22,26 +22,45 @@
       <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
         <a href="/jornada-conhecimento-com-luz1.html" class="px-5 py-3 rounded-xl border border-slate-700">Revisar respostas</a>
         <button id="btnPdf" class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700">Baixar PDF</button>
+        <button id="btnHq"  class="px-5 py-3 rounded-xl bg-slate-700 hover:bg-slate-600">Baixar HQ (imagem)</button>
       </div>
 
       <p class="text-xs opacity-70 mt-4">Lembre-se: o PDF não é enviado por e-mail — faça o download agora.</p>
     </section>
   </main>
 
-  <script src="/jornada.js?v=2"></script>
+  <!-- utilidades -->
+  <script src="/jornada.js?v=3"></script>
+  <!-- html2canvas será carregado dinamicamente por jornada.js quando gerar HQ -->
+
   <script>
+    async function ensureUtil() {
+      if (window.JornadaUtil?.gerarPDF) return;
+      await new Promise((resolve, reject) => {
+        const s=document.createElement('script');
+        s.src='/jornada.js?v=3'; s.onload=resolve; s.onerror=reject; document.body.appendChild(s);
+      });
+    }
+
     document.getElementById('btnPdf')?.addEventListener('click', async () => {
       try {
+        await ensureUtil();
         const payload = window.JornadaUtil?.coletarPayload() || {};
         await window.JornadaUtil.gerarPDF(payload);
       } catch (e) {
         alert('Não foi possível gerar o PDF agora. Tente novamente em alguns minutos.\n\n' + (e?.message || e));
       }
     });
-  </script>
 
-  <script>
-  (()=>{const INTRO='/jornada-intro.html',TARGETS=['jornada-conhecimento-com-luz1.html','jornada-conhecimento-com-luz.html','jornada-conhecimento.html'];const n=h=>(h||'').split('#')[0].split('?')[0].replace(/^(\.\/|\/)/,'').toLowerCase();const s=h=>{const x=n(h);return TARGETS.some(t=>x===t||x.endsWith('/'+t));};const f=(r=document)=>r.querySelectorAll('a[href]').forEach(a=>{const h=a.getAttribute('href')||'';if(/^https?:\/\//i.test(h))return;if(s(h))a.setAttribute('href',INTRO);});f();new MutationObserver(m=>m.forEach(y=>y.addedNodes?.forEach(z=>{if(z.nodeType===1)f(z);}))).observe(document.documentElement,{childList:true,subtree:true});})();
+    document.getElementById('btnHq')?.addEventListener('click', async () => {
+      try {
+        await ensureUtil();
+        const payload = window.JornadaUtil?.coletarPayload() || {};
+        await window.JornadaUtil.gerarHQ(payload);
+      } catch (e) {
+        alert('Não foi possível gerar a HQ agora.\n\n' + (e?.message || e));
+      }
+    });
   </script>
 </body>
 </html>
