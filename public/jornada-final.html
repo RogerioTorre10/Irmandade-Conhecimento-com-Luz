@@ -6,9 +6,14 @@
   <title>Jornada · Finalização</title>
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- tenta carregar o utilitário cedo -->
-  <link rel="preload" as="script" href="/jornada.js?v=6">
-  <script defer src="/jornada.js?v=6"></script>
+  <!-- tenta carregar o utilitário cedo (se vier ok, ótimo; senão usamos fallback) -->
+  <link rel="preload" as="script" href="/jornada.js?v=7">
+  <script defer src="/jornada.js?v=7"></script>
+
+  <style>
+    /* evita “botão fica azul/selecionado” após clique */
+    button:focus, button:focus-visible { outline: none !important; box-shadow: none !important; }
+  </style>
 </head>
 <body class="min-h-screen bg-slate-900 text-slate-100">
   <header class="p-6 border-b border-slate-800">
@@ -29,7 +34,7 @@
         <a href="/jornada-conhecimento-com-luz1.html" class="px-5 py-3 rounded-xl border border-slate-700">Revisar respostas</a>
         <button id="btnPdf" class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700" type="button">Baixar PDF</button>
         <button id="btnHq"  class="px-5 py-3 rounded-xl bg-slate-700 hover:bg-slate-600"  type="button">Baixar HQ (imagem)</button>
-        <a id="btnHome" href="/" class="px-5 py-3 rounded-xl border border-slate-700 pointer-events-none opacity-50">Voltar ao início</a>
+        <a id="btnHome" href="/" class="px-5 py-3 rounded-xl border border-slate-700">Voltar ao início</a>
       </div>
 
       <p class="text-xs opacity-70 mt-4">Lembre-se: o PDF não é enviado por e-mail — faça o download agora.</p>
@@ -37,136 +42,96 @@
   </main>
 
   <script>
-    // --------- FALLBACK embutido (caso /jornada.js não carregue) ----------
-    function installFallbackUtil(){
-      if (window.JornadaUtil?.gerarPDF) return;
+    // ----------------- FALLBACKS AUTOSSUFICIENTES -----------------
+    const API_BASE = 'https://conhecimento-com-luz-api.onrender.com';
+    const PDF_ENDPOINTS = ['/generate-pdf','/pdf','/api/pdf'];
+    const ts = () => new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+    const nomePDF = () => `Jornada_${ts()}.pdf`;
+    const nomeHQ  = () => `Jornada_HQ_${ts()}.png`;
 
-      const API_BASE = 'https://conhecimento-com-luz-api.onrender.com';
-      const PDF_ENDPOINTS = ['/generate-pdf','/pdf','/api/pdf'];
-      const ts = () => new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
-      const nomePDF = () => `Jornada_${ts()}.pdf`;
-      const nomeHQ  = () => `Jornada_HQ_${ts()}.png`;
+    function _baixarBlob(blob){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=nomePDF(); document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),3000); }
+    function _baixarBase64(b64){ const a=document.createElement('a'); a.href='data:application/pdf;base64,'+b64; a.download=nomePDF(); document.body.appendChild(a); a.click(); a.remove(); }
+    function _safeJSON(text, fb){ try{ return JSON.parse(text); } catch{ return fb; } }
 
-      function baixarBlob(blob){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=nomePDF(); document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),3000); }
-      function baixarBase64(b64){ const a=document.createElement('a'); a.href='data:application/pdf;base64,'+b64; a.download=nomePDF(); document.body.appendChild(a); a.click(); a.remove(); }
-      function safeJSON(text, fb){ try{ return JSON.parse(text); } catch{ return fb; } }
-
-      async function gerarPDF(dados){
-        let lastErr;
-        for (const ep of PDF_ENDPOINTS){
-          try{
-            const res = await fetch(API_BASE+ep,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json,application/pdf'},body:JSON.stringify(dados||{})});
-            const ct = (res.headers.get('content-type')||'').toLowerCase();
-            if(res.ok && ct.includes('application/pdf')){ const blob=await res.blob(); baixarBlob(blob); return; }
-            const json = await res.json().catch(()=>({}));
-            const b64 = json.pdf_base64 || json.file || json.pdf;
-            if(b64){ baixarBase64(b64); return; }
-            throw new Error('Resposta inesperada: '+(JSON.stringify(json)||'sem detalhes'));
-          }catch(e){ lastErr=e; }
-        }
-        throw lastErr || new Error('Falha ao gerar PDF');
-      }
-
-      function coletarPayload(){
-        let respostas = safeJSON(localStorage.getItem('respostas_jornada')||'{}', {});
-        if(!respostas || (typeof respostas==='object' && Object.keys(respostas).length===0)){
-          respostas={};
-          document.querySelectorAll('textarea[name],input[name],select[name]').forEach(el=>{
-            const k=el.name||el.id||''; if(!k) return;
-            if(el.type==='checkbox') respostas[k]=!!el.checked;
-            else if(el.type==='radio'){ if(el.checked) respostas[k]=el.value; }
-            else respostas[k]=el.value;
-          });
-        }
-        return { respostas, meta:{ agente:'Lumen', gerado_em:new Date().toISOString(), tz:(Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC') } };
-      }
-
-      function resetarTotal(){
-        try{ localStorage.removeItem('respostas_jornada'); }catch{}
-        try{ sessionStorage.removeItem('veio_da_intro'); }catch{}
-        location.href='/jornada-intro.html';
-      }
-
-      // HQ
-      function loadHtml2Canvas(){
-        if (window.html2canvas) return Promise.resolve();
-        return new Promise((resolve, reject)=>{
-          const s=document.createElement('script');
-          s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
-          s.onload=resolve; s.onerror=()=>reject(new Error('Falha ao carregar html2canvas'));
-          document.head.appendChild(s);
-        });
-      }
-      function montarHQDOM(payload){
-        const respostas = payload?.respostas || {};
-        const wrap = document.createElement('div');
-        Object.assign(wrap.style,{position:'fixed',left:'-99999px',top:'0',width:'900px',padding:'32px',color:'#e2e8f0',background:'#0f172a',fontFamily:'ui-sans-serif,system-ui'});
-        wrap.innerHTML = `<div style="font-size:28px;font-weight:800;margin-bottom:8px">Jornada Conhecimento com Luz</div>
-                          <div style="opacity:.8;margin-bottom:24px">Resumo simbólico — ${new Date().toLocaleString()}</div>`;
-        Object.entries(respostas).forEach(([k,v],i)=>{
-          const card=document.createElement('div');
-          card.style.cssText='border:1px solid #1f2937;border-radius:16px;background:#111827;padding:16px;margin:12px 0;';
-          card.innerHTML = `<div style="font-weight:700;margin-bottom:8px;color:#93c5fd">${i+1}. ${k}</div>
-                            <div style="white-space:pre-wrap;line-height:1.5">${Array.isArray(v)?v.join('\n'):(v??'')}</div>`;
-          wrap.appendChild(card);
-        });
-        return wrap;
-      }
-      async function gerarHQ(payload){
-        await loadHtml2Canvas();
-        const el = montarHQDOM(payload || coletarPayload());
-        document.body.appendChild(el);
-        const canvas = await window.html2canvas(el,{backgroundColor:'#0f172a',scale:2,useCORS:true});
-        const url = canvas.toDataURL('image/png');
-        const a=document.createElement('a'); a.href=url; a.download=nomeHQ(); document.body.appendChild(a); a.click(); a.remove();
-        el.remove();
-      }
-
-      window.JornadaUtil = { gerarPDF, coletarPayload, resetarTotal, gerarHQ, _config:{ API_BASE, PDF_ENDPOINTS } };
-    }
-
-    // loader resiliente: tenta múltiplos caminhos; se não achar, instala fallback
-    async function ensureUtil() {
-      if (window.JornadaUtil?.gerarPDF) return true;
-
-      const tries = [
-        '/jornada.js?v=6',
-        './jornada.js?v=6',
-        location.origin + '/jornada.js?v=6',
-        '/public/jornada.js?v=6',
-        './public/jornada.js?v=6'
-      ];
-
-      for (const src of tries){
+    async function fallbackGerarPDF(dados){
+      let lastErr;
+      for (const ep of PDF_ENDPOINTS){
         try{
-          await new Promise((resolve, reject)=>{
-            const s=document.createElement('script');
-            s.src=src + '&b=' + Date.now();
-            s.onload=resolve; s.onerror=()=>reject(new Error('Falha ao baixar '+src));
-            document.head.appendChild(s);
-          });
-          if (window.JornadaUtil?.gerarPDF) return true;
-        }catch(e){ /* tenta próximo */ }
+          const res = await fetch(API_BASE+ep,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json,application/pdf'},body:JSON.stringify(dados||{})});
+          const ct = (res.headers.get('content-type')||'').toLowerCase();
+          if(res.ok && ct.includes('application/pdf')){ const blob=await res.blob(); _baixarBlob(blob); return; }
+          const json = await res.json().catch(()=>({}));
+          const b64 = json.pdf_base64 || json.file || json.pdf;
+          if(b64){ _baixarBase64(b64); return; }
+          throw new Error('Resposta inesperada: '+(JSON.stringify(json)||'sem detalhes'));
+        }catch(e){ lastErr=e; }
       }
-
-      // último recurso: instala fallback embutido
-      installFallbackUtil();
-      if (!window.JornadaUtil?.gerarPDF) throw new Error('Não foi possível preparar o utilitário.');
-      return true;
+      throw lastErr || new Error('Falha ao gerar PDF');
     }
 
-    const btnHome = document.getElementById('btnHome');
-    function enableHome(){
-      btnHome.classList.remove('opacity-50','pointer-events-none');
+    function fallbackColetarPayload(){
+      let respostas = _safeJSON(localStorage.getItem('respostas_jornada')||'{}', {});
+      if(!respostas || (typeof respostas==='object' && Object.keys(respostas).length===0)){
+        respostas={};
+        document.querySelectorAll('textarea[name],input[name],select[name]').forEach(el=>{
+          const k=el.name||el.id||''; if(!k) return;
+          if(el.type==='checkbox') respostas[k]=!!el.checked;
+          else if(el.type==='radio'){ if(el.checked) respostas[k]=el.value; }
+          else respostas[k]=el.value;
+        });
+      }
+      return { respostas, meta:{ agente:'Lumen', gerado_em:new Date().toISOString(), tz:(Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC') } };
     }
+
+    function loadHtml2Canvas(){
+      if (window.html2canvas) return Promise.resolve();
+      return new Promise((resolve, reject)=>{
+        const s=document.createElement('script');
+        s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+        s.onload=resolve; s.onerror=()=>reject(new Error('Falha ao carregar html2canvas'));
+        document.head.appendChild(s);
+      });
+    }
+    function montarHQDOM(payload){
+      const respostas = payload?.respostas || {};
+      const wrap = document.createElement('div');
+      Object.assign(wrap.style,{position:'fixed',left:'-99999px',top:'0',width:'900px',padding:'32px',color:'#e2e8f0',background:'#0f172a',fontFamily:'ui-sans-serif,system-ui'});
+      wrap.innerHTML = `<div style="font-size:28px;font-weight:800;margin-bottom:8px">Jornada Conhecimento com Luz</div>
+                        <div style="opacity:.8;margin-bottom:24px">Resumo simbólico — ${new Date().toLocaleString()}</div>`;
+      Object.entries(respostas).forEach(([k,v],i)=>{
+        const card=document.createElement('div');
+        card.style.cssText='border:1px solid #1f2937;border-radius:16px;background:#111827;padding:16px;margin:12px 0;';
+        card.innerHTML = `<div style="font-weight:700;margin-bottom:8px;color:#93c5fd">${i+1}. ${k}</div>
+                          <div style="white-space:pre-wrap;line-height:1.5">${Array.isArray(v)?v.join('\n'):(v??'')}</div>`;
+        wrap.appendChild(card);
+      });
+      return wrap;
+    }
+    async function fallbackGerarHQ(payload){
+      await loadHtml2Canvas();
+      const el = montarHQDOM(payload || fallbackColetarPayload());
+      document.body.appendChild(el);
+      const canvas = await window.html2canvas(el,{backgroundColor:'#0f172a',scale:2,useCORS:true});
+      const url = canvas.toDataURL('image/png');
+      const a=document.createElement('a'); a.href=url; a.download=nomeHQ(); document.body.appendChild(a); a.click(); a.remove();
+      el.remove();
+    }
+
+    // força existir um objeto JornadaUtil e "preenche" o que faltar
+    (function patchUtil(){
+      window.JornadaUtil = window.JornadaUtil || {};
+      if (typeof window.JornadaUtil.coletarPayload !== 'function') window.JornadaUtil.coletarPayload = fallbackColetarPayload;
+      if (typeof window.JornadaUtil.gerarPDF       !== 'function') window.JornadaUtil.gerarPDF       = fallbackGerarPDF;
+      if (typeof window.JornadaUtil.gerarHQ        !== 'function') window.JornadaUtil.gerarHQ        = fallbackGerarHQ;
+    })();
+
+    // ----------------- BOTÕES -----------------
     const msg = (e) => (e && e.message) ? e.message : (typeof e === 'string' ? e : 'Erro inesperado');
 
     document.getElementById('btnPdf')?.addEventListener('click', async () => {
       try {
-        await ensureUtil();
-        const payload = window.JornadaUtil?.coletarPayload() || {};
+        const payload = window.JornadaUtil.coletarPayload();
         await window.JornadaUtil.gerarPDF(payload);
-        enableHome();
       } catch (e) {
         alert('Não foi possível gerar o PDF agora. Tente novamente em alguns minutos.\n\n' + msg(e));
         console.error(e);
@@ -175,10 +140,8 @@
 
     document.getElementById('btnHq')?.addEventListener('click', async () => {
       try {
-        await ensureUtil();
-        const payload = window.JornadaUtil?.coletarPayload() || {};
+        const payload = window.JornadaUtil.coletarPayload();
         await window.JornadaUtil.gerarHQ(payload);
-        enableHome();
       } catch (e) {
         alert('Não foi possível gerar a HQ agora.\n\n' + msg(e));
         console.error(e);
