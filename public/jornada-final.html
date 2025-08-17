@@ -6,7 +6,7 @@
   <title>Jornada · Finalização</title>
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- tenta carregar utilitário (se não vier, o fallback deste arquivo cobre) -->
+  <!-- util (se não carregar, o fallback cobre) -->
   <link rel="preload" as="script" href="/jornada.js?v=8">
   <script defer src="/jornada.js?v=8"></script>
 
@@ -41,7 +41,7 @@
   </main>
 
   <script>
-    // =================== FALLBACKS (PDF local e HQ) ===================
+    /* =================== FALLBACKS =================== */
     const API_BASE = 'https://conhecimento-com-luz-api.onrender.com';
     const PDF_ENDPOINTS = ['/generate-pdf','/pdf','/api/pdf'];
     const ts = () => new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
@@ -52,21 +52,24 @@
     function _baixarBlob(blob){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=nomePDF(); document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),3000); }
     function _baixarBase64(b64){ const a=document.createElement('a'); a.href='data:application/pdf;base64,'+b64; a.download=nomePDF(); document.body.appendChild(a); a.click(); a.remove(); }
 
-    function fallbackColetarPayload(){
-      let respostas = _safeJSON(localStorage.getItem('respostas_jornada')||'{}', {});
-      if(!respostas || (typeof respostas==='object' && Object.keys(respostas).length===0)){
-        respostas={};
-        document.querySelectorAll('textarea[name],input[name],select[name]').forEach(el=>{
-          const k=el.name||el.id||''; if(!k) return;
-          if(el.type==='checkbox') respostas[k]=!!el.checked;
-          else if(el.type==='radio'){ if(el.checked) respostas[k]=el.value; }
-          else respostas[k]=el.value;
-        });
-      }
-      return { respostas, meta:{ agente:'Lumen', gerado_em:new Date().toISOString(), tz:(Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC') } };
+    function payload(){
+      const fn = (window.JornadaUtil?.coletarPayload) || (() => {
+        let respostas = _safeJSON(localStorage.getItem('respostas_jornada')||'{}', {});
+        if(!respostas || (typeof respostas==='object' && Object.keys(respostas).length===0)){
+          respostas={};
+          document.querySelectorAll('textarea[name],input[name],select[name]').forEach(el=>{
+            const k=el.name||el.id||''; if(!k) return;
+            if(el.type==='checkbox') respostas[k]=!!el.checked;
+            else if(el.type==='radio'){ if(el.checked) respostas[k]=el.value; }
+            else respostas[k]=el.value;
+          });
+        }
+        return { respostas, meta:{ agente:'Lumen', gerado_em:new Date().toISOString(), tz:(Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC') } };
+      });
+      return fn();
     }
 
-    // --- jsPDF (para PDF local)
+    /* ---------- PDF local (jsPDF) ----------- */
     function loadJsPDF(){
       if (window.jspdf?.jsPDF) return Promise.resolve();
       return new Promise((resolve,reject)=>{
@@ -78,14 +81,13 @@
       });
     }
     function wrapText(doc, text, maxW){ return doc.splitTextToSize(String(text ?? ''), maxW); }
-    async function gerarPDFLocal(payload){
+    async function gerarPDFLocal(p){
       await loadJsPDF();
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ unit:'pt', format:'a4' });
       const pageW = doc.internal.pageSize.getWidth();
       const pageH = doc.internal.pageSize.getHeight();
-      const margin = 56;
-      const maxW = pageW - margin*2;
+      const margin = 56, maxW = pageW - margin*2;
       let y = margin;
 
       doc.setFont('Helvetica','bold'); doc.setFontSize(18);
@@ -93,16 +95,13 @@
       doc.setFont('Helvetica','normal'); doc.setFontSize(11);
       doc.text(`Gerado em: ${new Date().toLocaleString()}`, margin, y); y += 20;
 
-      const respostas = payload?.respostas || {};
-      const entries = Object.entries(respostas);
+      const entries = Object.entries(p?.respostas || {});
       entries.forEach(([k,v],idx)=>{
         if (y > pageH - margin - 60) { doc.addPage(); y = margin; }
         doc.setFont('Helvetica','bold'); doc.setFontSize(12);
         doc.text(`${idx+1}. ${k}`, margin, y); y += 14;
-
         doc.setFont('Helvetica','normal'); doc.setFontSize(11);
-        const lines = wrapText(doc, Array.isArray(v)? v.join('\n'): v, maxW);
-        lines.forEach(line => {
+        wrapText(doc, Array.isArray(v)? v.join('\n'): v, maxW).forEach(line=>{
           if (y > pageH - margin - 20) { doc.addPage(); y = margin; }
           doc.text(line, margin, y); y += 14;
         });
@@ -112,34 +111,26 @@
       doc.save(nomePDF());
     }
 
-    // --- tenta remoto; se falhar, cai no local
-    async function gerarPDFRobusto(payload){
+    /* ---------- PDF robusto (tenta remoto, cai para local) ----------- */
+    async function gerarPDFRobusto(p){
       try{
-        if (window.JornadaUtil?.gerarPDF){
-          await window.JornadaUtil.gerarPDF(payload); // v8 já cai no local internamente
-          return;
-        }
-        // sem util: tenta remoto manualmente
+        if (window.JornadaUtil?.gerarPDF) { await window.JornadaUtil.gerarPDF(p); return; }
         let last;
         for (const ep of PDF_ENDPOINTS){
           try{
-            const res = await fetch(API_BASE+ep,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json,application/pdf'},body:JSON.stringify(payload||{})});
+            const res = await fetch(API_BASE+ep,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json,application/pdf'},body:JSON.stringify(p||{})});
             const ct = (res.headers.get('content-type')||'').toLowerCase();
             if(res.ok && ct.includes('application/pdf')){ const blob=await res.blob(); _baixarBlob(blob); return; }
-            const json = await res.json().catch(()=>({}));
-            const b64 = json.pdf_base64 || json.file || json.pdf;
+            const json = await res.json().catch(()=>({})); const b64 = json.pdf_base64 || json.file || json.pdf;
             if(b64){ _baixarBase64(b64); return; }
             last = new Error('Resposta inesperada: '+(JSON.stringify(json)||'sem detalhes'));
           }catch(e){ last=e; }
         }
         if (last) throw last;
-      }catch(e){
-        // falhou remoto -> PDF local com jsPDF
-        await gerarPDFLocal(payload);
-      }
+      }catch(e){ await gerarPDFLocal(p); }
     }
 
-    // --- HQ (sempre local)
+    /* ---------- HQ robusto (sempre local) ----------- */
     function loadHtml2Canvas(){
       if (window.html2canvas) return Promise.resolve();
       return new Promise((resolve, reject)=>{
@@ -149,8 +140,8 @@
         document.head.appendChild(s);
       });
     }
-    function montarHQDOM(payload){
-      const respostas = payload?.respostas || {};
+    function montarHQDOM(p){
+      const respostas = p?.respostas || {};
       const wrap = document.createElement('div');
       Object.assign(wrap.style,{position:'fixed',left:'-99999px',top:'0',width:'900px',padding:'32px',color:'#e2e8f0',background:'#0f172a',fontFamily:'ui-sans-serif,system-ui'});
       wrap.innerHTML = `<div style="font-size:28px;font-weight:800;margin-bottom:8px">Jornada Conhecimento com Luz</div>
@@ -164,12 +155,10 @@
       });
       return wrap;
     }
-    async function gerarHQRobusto(payload){
-      try{
-        if (window.JornadaUtil?.gerarHQ) return await window.JornadaUtil.gerarHQ(payload);
-      }catch{/* cai no fallback abaixo */ }
+    async function gerarHQRobusto(p){
+      try{ if (window.JornadaUtil?.gerarHQ) return await window.JornadaUtil.gerarHQ(p); }catch{}
       await loadHtml2Canvas();
-      const el = montarHQDOM(payload || fallbackColetarPayload());
+      const el = montarHQDOM(p || payload());
       document.body.appendChild(el);
       const canvas = await window.html2canvas(el,{backgroundColor:'#0f172a',scale:2,useCORS:true});
       const url = canvas.toDataURL('image/png');
@@ -177,23 +166,34 @@
       el.remove();
     }
 
-    // =================== AÇÕES DOS BOTÕES ===================
+    /* ---------- limpeza + redirecionamento ----------- */
+    function finalizarEVoltar(){
+      try{ localStorage.removeItem('respostas_jornada'); }catch{}
+      try{ sessionStorage.removeItem('veio_da_intro'); }catch{}
+      setTimeout(()=>{ location.href='/'; }, 1000); // dá 1s pro download iniciar
+    }
+
+    /* ---------- botões ----------- */
     const msg = (e) => (e && e.message) ? e.message : (typeof e === 'string' ? e : 'Erro inesperado');
 
-    document.getElementById('btnPdf')?.addEventListener('click', async () => {
+    document.getElementById('btnPdf')?.addEventListener('click', async (ev) => {
+      ev.currentTarget.blur();
       try {
-        const payload = (window.JornadaUtil?.coletarPayload || fallbackColetarPayload)();
-        await gerarPDFRobusto(payload);
+        const p = payload();
+        await gerarPDFRobusto(p);
+        finalizarEVoltar();
       } catch (e) {
         alert('Não foi possível gerar o PDF agora. Tente novamente em alguns minutos.\n\n' + msg(e));
         console.error(e);
       }
     });
 
-    document.getElementById('btnHq')?.addEventListener('click', async () => {
+    document.getElementById('btnHq')?.addEventListener('click', async (ev) => {
+      ev.currentTarget.blur();
       try {
-        const payload = (window.JornadaUtil?.coletarPayload || fallbackColetarPayload)();
-        await gerarHQRobusto(payload);
+        const p = payload();
+        await gerarHQRobusto(p);
+        finalizarEVoltar();
       } catch (e) {
         alert('Não foi possível gerar a HQ agora.\n\n' + msg(e));
         console.error(e);
