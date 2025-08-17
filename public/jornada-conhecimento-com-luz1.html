@@ -51,7 +51,7 @@
     // Recomeçar
     document.getElementById('btnRecomecar')?.addEventListener('click', ()=> window.JornadaUtil?.resetarTotal());
 
-    // Importa módulo de perguntas
+    // Importa módulo de perguntas (ES module) – ajuste v se precisar furar cache
     const mod = await import('/assets/jornada-essencial.js?v=3');
 
     const render =
