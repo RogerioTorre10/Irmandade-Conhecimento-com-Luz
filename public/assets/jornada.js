@@ -1,4 +1,4 @@
-/* Jornada Conhecimento com Luz – utilidades globais (PDF, reset, payload)
+/* Jornada Conhecimento com Luz – utilidades globais (PDF, reset, payload, HQ)
    Coloque este arquivo em: public/jornada.js */
 (function () {
   'use strict';
@@ -8,9 +8,12 @@
 
   const ts = () => new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
   const nomePDF = () => `Jornada_${ts()}.pdf`;
+  const nomeHQ  = () => `Jornada_HQ_${ts()}.png`;
 
   function baixarBlob(blob){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=nomePDF(); document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),3000); }
   function baixarBase64(b64){ const a=document.createElement('a'); a.href='data:application/pdf;base64,'+b64; a.download=nomePDF(); document.body.appendChild(a); a.click(); a.remove(); }
+  function baixarDataURL(url, fname){ const a=document.createElement('a'); a.href=url; a.download=fname; document.body.appendChild(a); a.click(); a.remove(); }
+  function safeJSON(text, fb){ try{ return JSON.parse(text); } catch{ return fb; } }
 
   async function gerarPDF(dados){
     let lastErr;
@@ -27,8 +30,6 @@
     }
     throw lastErr || new Error('Falha ao gerar PDF');
   }
-
-  function safeJSON(text, fb){ try{ return JSON.parse(text); } catch{ return fb; } }
 
   function coletarPayload(){
     let respostas = safeJSON(localStorage.getItem('respostas_jornada')||'{}', {});
@@ -52,5 +53,55 @@
     location.href='/jornada-intro.html';
   }
 
-  window.JornadaUtil = { gerarPDF, coletarPayload, resetarTotal, _config:{API_BASE, PDF_ENDPOINTS} };
+  // -------- HQ (imagem longa) --------
+  function loadHtml2Canvas(){
+    if (window.html2canvas) return Promise.resolve();
+    return new Promise((resolve, reject)=>{
+      const s=document.createElement('script');
+      s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+      s.onload=resolve; s.onerror=reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  function montarHQDOM(payload){
+    const respostas = payload?.respostas || {};
+    const wrap = document.createElement('div');
+    Object.assign(wrap.style, {
+      position:'fixed', left:'-99999px', top:'0', width:'900px',
+      padding:'32px', color:'#e2e8f0', background:'#0f172a',
+      fontFamily:'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial'
+    });
+    const h = document.createElement('div');
+    h.innerHTML = `<div style="font-size:28px;font-weight:800;margin-bottom:8px">Jornada Conhecimento com Luz</div>
+                   <div style="opacity:.8;margin-bottom:24px">Resumo simbólico — ${new Date().toLocaleString()}</div>`;
+    wrap.appendChild(h);
+
+    Object.entries(respostas).forEach(([k,v],i)=>{
+      const card = document.createElement('div');
+      card.style.cssText = 'border:1px solid #1f2937;border-radius:16px;background:#111827;padding:16px;margin:12px 0;';
+      const titulo = document.createElement('div');
+      titulo.style.cssText='font-weight:700;margin-bottom:8px;color:#93c5fd';
+      titulo.textContent = `${i+1}. ${k}`;
+      const corpo = document.createElement('div');
+      corpo.style.cssText='white-space:pre-wrap;line-height:1.5';
+      corpo.textContent = Array.isArray(v) ? v.join('\n') : (v ?? '');
+      card.appendChild(titulo); card.appendChild(corpo);
+      wrap.appendChild(card);
+    });
+    return wrap;
+  }
+
+  async function gerarHQ(payload){
+    await loadHtml2Canvas();
+    const el = montarHQDOM(payload || coletarPayload());
+    document.body.appendChild(el);
+    const canvas = await window.html2canvas(el,{backgroundColor:'#0f172a',scale:2,useCORS:true});
+    const url = canvas.toDataURL('image/png');
+    baixarDataURL(url, nomeHQ());
+    el.remove();
+  }
+
+  // expõe
+  window.JornadaUtil = { gerarPDF, coletarPayload, resetarTotal, gerarHQ, _config:{API_BASE, PDF_ENDPOINTS} };
 })();
