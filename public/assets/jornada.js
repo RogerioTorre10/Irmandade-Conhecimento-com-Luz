@@ -1,4 +1,4 @@
-/* Jornada Conhecimento com Luz – utilidades globais (PDF, reset, payload, HQ) */
+/* Jornada Conhecimento com Luz – utilidades globais (PDF, reset, payload, HQ) – v8 */
 (function () {
   'use strict';
 
@@ -9,39 +9,12 @@
   const nomePDF = () => `Jornada_${ts()}.pdf`;
   const nomeHQ  = () => `Jornada_HQ_${ts()}.png`;
 
+  function safeJSON(text, fb){ try{ return JSON.parse(text); } catch{ return fb; } }
   function baixarBlob(blob){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=nomePDF(); document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),3000); }
   function baixarBase64(b64){ const a=document.createElement('a'); a.href='data:application/pdf;base64,'+b64; a.download=nomePDF(); document.body.appendChild(a); a.click(); a.remove(); }
   function baixarDataURL(url, fname){ const a=document.createElement('a'); a.href=url; a.download=fname; document.body.appendChild(a); a.click(); a.remove(); }
-  function safeJSON(text, fb){ try{ return JSON.parse(text); } catch{ return fb; } }
 
-  async function gerarPDF(dados){
-    let lastErr;
-    for (const ep of PDF_ENDPOINTS){
-      try{
-        const res = await fetch(API_BASE+ep,{
-          method:'POST',
-          headers:{'Content-Type':'application/json','Accept':'application/json,application/pdf'},
-          body:JSON.stringify(dados||{})
-        });
-        const ct = (res.headers.get('content-type')||'').toLowerCase();
-
-        if(res.ok && ct.includes('application/pdf')){
-          const blob=await res.blob(); baixarBlob(blob); return;
-        }
-
-        // tenta JSON (várias APIs retornam base64)
-        const json = await res.json().catch(()=>({}));
-        const b64 = json.pdf_base64 || json.file || json.pdf;
-        if(b64){ baixarBase64(b64); return; }
-
-        // erro com detalhe
-        const text = JSON.stringify(json) || await res.text().catch(()=>'(sem detalhes)');
-        throw new Error(`Resposta inesperada de ${ep}: ${text}`);
-      }catch(e){ lastErr=e; }
-    }
-    throw lastErr || new Error('Falha ao gerar PDF');
-  }
-
+  // ------------ coleta ------------
   function coletarPayload(){
     let respostas = safeJSON(localStorage.getItem('respostas_jornada')||'{}', {});
     if(!respostas || (typeof respostas==='object' && Object.keys(respostas).length===0)){
@@ -57,16 +30,85 @@
     return { respostas, meta:{ agente:'Lumen', gerado_em:new Date().toISOString(), tz:(Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC') } };
   }
 
-  function resetarTotal(){
-    document.querySelectorAll('input, textarea, select').forEach(el=>{
-      if(el.type==='checkbox'||el.type==='radio') el.checked=false; else el.value='';
-    });
-    try{ localStorage.removeItem('respostas_jornada'); }catch{}
-    try{ sessionStorage.removeItem('veio_da_intro'); }catch{}
-    location.href='/jornada-intro.html';
+  // ------------ PDF: remoto ------------
+  async function gerarPDFRemoto(dados){
+    let lastErr;
+    for (const ep of PDF_ENDPOINTS){
+      try{
+        const res = await fetch(API_BASE+ep,{
+          method:'POST',
+          headers:{'Content-Type':'application/json','Accept':'application/json,application/pdf'},
+          body:JSON.stringify(dados||{})
+        });
+        const ct = (res.headers.get('content-type')||'').toLowerCase();
+        if(res.ok && ct.includes('application/pdf')){ const blob=await res.blob(); baixarBlob(blob); return true; }
+        const json = await res.json().catch(()=>({}));
+        const b64 = json.pdf_base64 || json.file || json.pdf;
+        if(b64){ baixarBase64(b64); return true; }
+        lastErr = new Error(`Resposta inesperada de ${ep}: ${JSON.stringify(json)}`);
+      }catch(e){ lastErr=e; }
+    }
+    if (lastErr) throw lastErr;
+    throw new Error('Falha ao gerar PDF (remoto)');
   }
 
-  // -------- HQ (imagem longa) --------
+  // ------------ PDF: local (jsPDF) ------------
+  function loadJsPDF(){
+    if (window.jspdf?.jsPDF) return Promise.resolve();
+    return new Promise((resolve,reject)=>{
+      const s=document.createElement('script');
+      s.src='https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js';
+      s.onload=()=>window.jspdf?.jsPDF?resolve():reject(new Error('jsPDF não disponível'));
+      s.onerror=()=>reject(new Error('Falha ao carregar jsPDF'));
+      document.head.appendChild(s);
+    });
+  }
+  function wrapText(doc, text, maxW){ return doc.splitTextToSize(String(text ?? ''), maxW); }
+
+  async function gerarPDFLocal(payload){
+    await loadJsPDF();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit:'pt', format:'a4' });
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    const margin = 56;
+    const maxW = pageW - margin*2;
+    let y = margin;
+
+    doc.setFont('Helvetica','bold'); doc.setFontSize(18);
+    doc.text('Jornada Conhecimento com Luz', margin, y); y += 18;
+    doc.setFont('Helvetica','normal'); doc.setFontSize(11);
+    doc.text(`Gerado em: ${new Date().toLocaleString()}`, margin, y); y += 20;
+
+    const respostas = payload?.respostas || {};
+    const entries = Object.entries(respostas);
+    entries.forEach(([k,v],idx)=>{
+      if (y > pageH - margin - 60) { doc.addPage(); y = margin; }
+      doc.setFont('Helvetica','bold'); doc.setFontSize(12);
+      doc.text(`${idx+1}. ${k}`, margin, y); y += 14;
+
+      doc.setFont('Helvetica','normal'); doc.setFontSize(11);
+      const lines = wrapText(doc, Array.isArray(v)? v.join('\n'): v, maxW);
+      lines.forEach(line => {
+        if (y > pageH - margin - 20) { doc.addPage(); y = margin; }
+        doc.text(line, margin, y); y += 14;
+      });
+      y += 8;
+    });
+
+    doc.save(nomePDF());
+  }
+
+  async function gerarPDF(dados){
+    try {
+      await gerarPDFRemoto(dados);
+    } catch (e) {
+      // fallback local se a API falhar
+      await gerarPDFLocal(dados);
+    }
+  }
+
+  // ------------ HQ ------------
   function loadHtml2Canvas(){
     if (window.html2canvas) return Promise.resolve();
     return new Promise((resolve, reject)=>{
@@ -76,7 +118,6 @@
       document.head.appendChild(s);
     });
   }
-
   function montarHQDOM(payload){
     const respostas = payload?.respostas || {};
     const wrap = document.createElement('div');
@@ -104,15 +145,23 @@
     });
     return wrap;
   }
-
   async function gerarHQ(payload){
     await loadHtml2Canvas();
     const el = montarHQDOM(payload || coletarPayload());
     document.body.appendChild(el);
     const canvas = await window.html2canvas(el,{backgroundColor:'#0f172a',scale:2,useCORS:true});
     const url = canvas.toDataURL('image/png');
-    const a=document.createElement('a'); a.href=url; a.download=nomeHQ(); document.body.appendChild(a); a.click(); a.remove();
+    baixarDataURL(url, nomeHQ());
     el.remove();
+  }
+
+  function resetarTotal(){
+    document.querySelectorAll('input, textarea, select').forEach(el=>{
+      if(el.type==='checkbox'||el.type==='radio') el.checked=false; else el.value='';
+    });
+    try{ localStorage.removeItem('respostas_jornada'); }catch{}
+    try{ sessionStorage.removeItem('veio_da_intro'); }catch{}
+    location.href='/jornada-intro.html';
   }
 
   window.JornadaUtil = { gerarPDF, coletarPayload, resetarTotal, gerarHQ, _config:{API_BASE, PDF_ENDPOINTS} };
