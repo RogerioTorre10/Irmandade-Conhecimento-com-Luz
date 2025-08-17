@@ -1,5 +1,4 @@
-/* Jornada Conhecimento com Luz – utilidades globais (PDF, reset, payload, HQ)
-   Coloque este arquivo em: public/jornada.js */
+/* Jornada Conhecimento com Luz – utilidades globais (PDF, reset, payload, HQ) */
 (function () {
   'use strict';
 
@@ -19,13 +18,25 @@
     let lastErr;
     for (const ep of PDF_ENDPOINTS){
       try{
-        const res = await fetch(API_BASE+ep,{ method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json,application/pdf'}, body:JSON.stringify(dados||{}) });
+        const res = await fetch(API_BASE+ep,{
+          method:'POST',
+          headers:{'Content-Type':'application/json','Accept':'application/json,application/pdf'},
+          body:JSON.stringify(dados||{})
+        });
         const ct = (res.headers.get('content-type')||'').toLowerCase();
-        if(res.ok && ct.includes('application/pdf')){ const blob=await res.blob(); baixarBlob(blob); return; }
+
+        if(res.ok && ct.includes('application/pdf')){
+          const blob=await res.blob(); baixarBlob(blob); return;
+        }
+
+        // tenta JSON (várias APIs retornam base64)
         const json = await res.json().catch(()=>({}));
         const b64 = json.pdf_base64 || json.file || json.pdf;
         if(b64){ baixarBase64(b64); return; }
-        throw new Error(`Resposta inesperada de ${ep}`);
+
+        // erro com detalhe
+        const text = JSON.stringify(json) || await res.text().catch(()=>'(sem detalhes)');
+        throw new Error(`Resposta inesperada de ${ep}: ${text}`);
       }catch(e){ lastErr=e; }
     }
     throw lastErr || new Error('Falha ao gerar PDF');
@@ -47,7 +58,9 @@
   }
 
   function resetarTotal(){
-    document.querySelectorAll('input, textarea, select').forEach(el=>{ if(el.type==='checkbox'||el.type==='radio') el.checked=false; else el.value=''; });
+    document.querySelectorAll('input, textarea, select').forEach(el=>{
+      if(el.type==='checkbox'||el.type==='radio') el.checked=false; else el.value='';
+    });
     try{ localStorage.removeItem('respostas_jornada'); }catch{}
     try{ sessionStorage.removeItem('veio_da_intro'); }catch{}
     location.href='/jornada-intro.html';
@@ -59,7 +72,7 @@
     return new Promise((resolve, reject)=>{
       const s=document.createElement('script');
       s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
-      s.onload=resolve; s.onerror=reject;
+      s.onload=resolve; s.onerror=()=>reject(new Error('Falha ao carregar html2canvas'));
       document.head.appendChild(s);
     });
   }
@@ -98,10 +111,9 @@
     document.body.appendChild(el);
     const canvas = await window.html2canvas(el,{backgroundColor:'#0f172a',scale:2,useCORS:true});
     const url = canvas.toDataURL('image/png');
-    baixarDataURL(url, nomeHQ());
+    const a=document.createElement('a'); a.href=url; a.download=nomeHQ(); document.body.appendChild(a); a.click(); a.remove();
     el.remove();
   }
 
-  // expõe
   window.JornadaUtil = { gerarPDF, coletarPayload, resetarTotal, gerarHQ, _config:{API_BASE, PDF_ENDPOINTS} };
 })();
