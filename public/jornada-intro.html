@@ -9,35 +9,24 @@
 <body class="min-h-screen bg-slate-900 text-slate-100">
   <header class="p-6 border-b border-slate-800">
     <div class="max-w-5xl mx-auto flex items-center justify-between">
-      <h1 class="text-xl font-semibold">Irmandade Conhecimento com Luz</h1>
+      <a href="/" class="text-xl font-semibold hover:opacity-90">Irmandade Conhecimento com Luz</a>
       <nav class="text-sm opacity-80">Jornada · Introdução</nav>
     </div>
   </header>
 
   <main class="max-w-3xl mx-auto p-6">
-    <!-- CONTRATO / TERMO -->
     <section id="contrato" class="mt-6 bg-slate-800/60 border border-slate-700 rounded-2xl p-6 md:p-8">
       <h2 class="text-2xl font-semibold mb-4">🛡️ AVISO IMPORTANTE – LEIA ANTES DE INICIAR</h2>
-
-      <p class="mb-4">Esta é uma jornada pessoal, simbólica e inspiradora.
-        Para proteger sua privacidade e garantir uma experiência ética, siga com atenção as orientações abaixo:</p>
-
+      <p class="mb-4">Esta é uma jornada pessoal, simbólica e inspiradora. Para proteger sua privacidade e garantir uma experiência ética, siga com atenção as orientações abaixo:</p>
       <ul class="list-disc pl-6 space-y-2">
         <li>✅ Suas respostas não serão armazenadas após o término.</li>
         <li>📄 Ao final da jornada, será gerado um PDF exclusivo com suas respostas e a devolutiva simbólica do Lumen.</li>
         <li>⚠️ Este PDF não será enviado por e-mail. Você deverá baixá-lo imediatamente após a geração.</li>
         <li>🔥 Após a entrega do PDF, todos os dados serão apagados automaticamente e sem possibilidade de recuperação.</li>
-        <li>🔒 O acesso à jornada será feito por senha individual, com prazo de:<br>
-          ⏳ 15 dias para iniciar • 🕓 24 horas para concluir, após o primeiro acesso.</li>
+        <li>🔒 O acesso à jornada será feito por senha individual, com prazo de: ⏳ 15 dias para iniciar • 🕓 24 horas para concluir, após o primeiro acesso.</li>
       </ul>
-
-      <p class="mt-4">
-        Ao prosseguir, você declara estar ciente e de acordo com estas condições.
-        Tudo aqui é feito com amor, ética e respeito pela sua história. 🙏✨
-      </p>
-
+      <p class="mt-4">Ao prosseguir, você declara estar ciente e de acordo com estas condições. Tudo aqui é feito com amor, ética e respeito pela sua história. 🙏✨</p>
       <hr class="my-6 border-slate-700">
-
       <h3 class="text-xl font-semibold mb-3">TERMO DE RESPONSABILIDADE E CONSENTIMENTO CONSCIENTE</h3>
       <ol class="list-decimal pl-6 space-y-3">
         <li><strong>Responsabilidade Pessoal:</strong> Todas as respostas fornecidas são de sua inteira responsabilidade.</li>
@@ -47,13 +36,11 @@
         <li><strong>Conduta com a IA Lumen:</strong> Interaja com respeito e cordialidade.</li>
       </ol>
 
-      <!-- Consentimento -->
       <div class="mt-6 flex items-start gap-3">
         <input id="agree" type="checkbox" class="mt-1 h-5 w-5 rounded border-slate-600 bg-slate-700">
         <label for="agree">Declaro que li e concordo com o Aviso e o Termo acima.</label>
       </div>
 
-      <!-- (Opcional) Senha simples -->
       <div class="mt-4">
         <label class="block text-sm mb-1">Senha de acesso</label>
         <div class="flex gap-2">
@@ -64,7 +51,6 @@
         <p class="text-xs opacity-70 mt-1">Dica: use a senha definida para o seu acesso (ex.: <em>iniciar</em> no ambiente de testes).</p>
       </div>
 
-      <!-- Avançar -->
       <div class="mt-6">
         <button id="btnAvancar"
                 class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition">
@@ -74,49 +60,36 @@
     </section>
   </main>
 
- <script>
-(() => {
-  // ===== CONFIG =====
-  const FLAG = 'veio_da_intro';
-  const DESTINO_PERGUNTAS = '/jornada-conhecimento-com-luz1.html'; // ajuste se necessário
-  const PASSWORD_REQUIRED = false;      // mude para true se quiser exigir senha
-  const PASSWORD_VALUE    = 'iniciar';  // valor esperado quando exigir senha
+  <script>
+  (() => {
+    const FLAG = 'veio_da_intro';
+    const DESTINO_PERGUNTAS = '/jornada-conhecimento-com-luz1.html';
+    const PASSWORD_REQUIRED = false;
+    const PASSWORD_VALUE    = 'iniciar';
 
-  // ===== ELEMENTOS =====
-  const agree = document.getElementById('agree');
-  const btn   = document.getElementById('btnIniciar') || document.getElementById('btnAvancar');
-  const pwd   = document.getElementById('senha');
-  const tgl   = document.getElementById('togglePwd');
+    const agree = document.getElementById('agree');
+    const btn   = document.getElementById('btnAvancar');
+    const pwd   = document.getElementById('senha');
+    const tgl   = document.getElementById('togglePwd');
 
-  // Mostrar/ocultar senha (se existir)
-  tgl?.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (!pwd) return;
-    pwd.type = (pwd.type === 'password' ? 'text' : 'password');
-  });
+    tgl.addEventListener('click', (e)=>{ e.preventDefault(); pwd.type = (pwd.type==='password'?'text':'password'); });
 
-  // Habilita o botão somente quando termo + (senha se exigida) ok
-  function updateBtn() {
-    const okConsent = !!agree?.checked;
-    const okPwd = !PASSWORD_REQUIRED || (pwd?.value?.trim().toLowerCase() === PASSWORD_VALUE.toLowerCase());
-    if (btn) btn.disabled = !(okConsent && okPwd);
-  }
-  agree?.addEventListener('change', updateBtn);
-  pwd?.addEventListener('input', updateBtn);
-  updateBtn();
-
-  // Avançar
-  btn?.addEventListener('click', (e) => {
-    if (btn.disabled) {
-      e.preventDefault();
-      alert('Confirme o Termo e (se necessário) a senha.');
-      return;
+    function updateBtn(){
+      const okConsent = !!agree.checked;
+      const okPwd = !PASSWORD_REQUIRED || (pwd.value.trim().toLowerCase()===PASSWORD_VALUE.toLowerCase());
+      btn.disabled = !(okConsent && okPwd);
     }
-    e.preventDefault();
-    sessionStorage.setItem(FLAG, '1');          // marca que passou pela intro
-    location.href = DESTINO_PERGUNTAS;          // vai para as perguntas
-  });
-})();
-</script>
+    agree.addEventListener('change', updateBtn);
+    pwd.addEventListener('input', updateBtn);
+    updateBtn();
+
+    btn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      if (btn.disabled) { alert('Confirme o Termo e (se necessário) a senha.'); return; }
+      sessionStorage.setItem(FLAG,'1');
+      location.href = DESTINO_PERGUNTAS;
+    });
+  })();
+  </script>
 </body>
 </html>
