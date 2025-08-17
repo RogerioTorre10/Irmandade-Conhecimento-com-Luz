@@ -9,7 +9,7 @@
 <body class="min-h-screen bg-slate-900 text-slate-100">
   <header class="p-6 border-b border-slate-800">
     <div class="max-w-5xl mx-auto flex items-center justify-between">
-      <h1 class="text-xl font-semibold">Irmandade Conhecimento com Luz</h1>
+      <a href="/" class="text-xl font-semibold hover:opacity-90">Irmandade Conhecimento com Luz</a>
       <nav class="text-sm opacity-80">Jornada · Final</nav>
     </div>
   </header>
@@ -28,7 +28,7 @@
     </section>
   </main>
 
-  <script src="/assets/jornada.js?v=1"></script>
+  <script src="/jornada.js?v=2"></script>
   <script>
     document.getElementById('btnPdf')?.addEventListener('click', async () => {
       try {
@@ -40,19 +40,8 @@
     });
   </script>
 
-  <!-- Corrige links para sempre irem à intro -->
   <script>
-  (() => {
-    const INTRO = '/jornada-intro.html';
-    const TARGETS = ['jornada-conhecimento-com-luz1.html','jornada-conhecimento-com-luz.html','jornada-conhecimento.html'];
-    const n = h => (h||'').split('#')[0].split('?')[0].replace(/^(\.\/|\/)/,'').toLowerCase();
-    const s = h => { const x=n(h); return TARGETS.some(t=>x===t||x.endsWith('/'+t)); };
-    const f = (root=document)=>root.querySelectorAll('a[href]').forEach(a=>{
-      const href=a.getAttribute('href')||''; if(/^https?:\/\//i.test(href))return; if(s(href)) a.setAttribute('href',INTRO);
-    });
-    f(); new MutationObserver(ms=>ms.forEach(m=>m.addedNodes?.forEach(n0=>{ if(n0.nodeType===1) f(n0); })))
-      .observe(document.documentElement,{childList:true,subtree:true});
-  })();
+  (()=>{const INTRO='/jornada-intro.html',TARGETS=['jornada-conhecimento-com-luz1.html','jornada-conhecimento-com-luz.html','jornada-conhecimento.html'];const n=h=>(h||'').split('#')[0].split('?')[0].replace(/^(\.\/|\/)/,'').toLowerCase();const s=h=>{const x=n(h);return TARGETS.some(t=>x===t||x.endsWith('/'+t));};const f=(r=document)=>r.querySelectorAll('a[href]').forEach(a=>{const h=a.getAttribute('href')||'';if(/^https?:\/\//i.test(h))return;if(s(h))a.setAttribute('href',INTRO);});f();new MutationObserver(m=>m.forEach(y=>y.addedNodes?.forEach(z=>{if(z.nodeType===1)f(z);}))).observe(document.documentElement,{childList:true,subtree:true});})();
   </script>
 </body>
 </html>
