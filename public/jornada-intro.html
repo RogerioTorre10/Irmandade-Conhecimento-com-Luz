@@ -86,6 +86,7 @@
     btn.addEventListener('click', (e)=>{
       e.preventDefault();
       if (btn.disabled) { alert('Confirme o Termo e (se necessário) a senha.'); return; }
+      try { localStorage.removeItem('respostas_jornada'); } catch(e) {}
       sessionStorage.setItem(FLAG,'1');
       location.href = DESTINO_PERGUNTAS;
     });
