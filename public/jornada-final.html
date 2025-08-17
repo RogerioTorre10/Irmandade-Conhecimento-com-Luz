@@ -6,13 +6,11 @@
   <title>Jornada · Finalização</title>
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- tenta carregar o utilitário cedo (se vier ok, ótimo; senão usamos fallback) -->
- <link rel="preload" as="script" href="/jornada.js?v=8">
-<script defer src="/jornada.js?v=8"></script>
-
+  <!-- tenta carregar utilitário (se não vier, o fallback deste arquivo cobre) -->
+  <link rel="preload" as="script" href="/jornada.js?v=8">
+  <script defer src="/jornada.js?v=8"></script>
 
   <style>
-    /* evita “botão fica azul/selecionado” após clique */
     button:focus, button:focus-visible { outline: none !important; box-shadow: none !important; }
   </style>
 </head>
@@ -43,32 +41,16 @@
   </main>
 
   <script>
-    // ----------------- FALLBACKS AUTOSSUFICIENTES -----------------
+    // =================== FALLBACKS (PDF local e HQ) ===================
     const API_BASE = 'https://conhecimento-com-luz-api.onrender.com';
     const PDF_ENDPOINTS = ['/generate-pdf','/pdf','/api/pdf'];
     const ts = () => new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
     const nomePDF = () => `Jornada_${ts()}.pdf`;
     const nomeHQ  = () => `Jornada_HQ_${ts()}.png`;
 
+    function _safeJSON(text, fb){ try{ return JSON.parse(text); } catch{ return fb; } }
     function _baixarBlob(blob){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=nomePDF(); document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),3000); }
     function _baixarBase64(b64){ const a=document.createElement('a'); a.href='data:application/pdf;base64,'+b64; a.download=nomePDF(); document.body.appendChild(a); a.click(); a.remove(); }
-    function _safeJSON(text, fb){ try{ return JSON.parse(text); } catch{ return fb; } }
-
-    async function fallbackGerarPDF(dados){
-      let lastErr;
-      for (const ep of PDF_ENDPOINTS){
-        try{
-          const res = await fetch(API_BASE+ep,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json,application/pdf'},body:JSON.stringify(dados||{})});
-          const ct = (res.headers.get('content-type')||'').toLowerCase();
-          if(res.ok && ct.includes('application/pdf')){ const blob=await res.blob(); _baixarBlob(blob); return; }
-          const json = await res.json().catch(()=>({}));
-          const b64 = json.pdf_base64 || json.file || json.pdf;
-          if(b64){ _baixarBase64(b64); return; }
-          throw new Error('Resposta inesperada: '+(JSON.stringify(json)||'sem detalhes'));
-        }catch(e){ lastErr=e; }
-      }
-      throw lastErr || new Error('Falha ao gerar PDF');
-    }
 
     function fallbackColetarPayload(){
       let respostas = _safeJSON(localStorage.getItem('respostas_jornada')||'{}', {});
@@ -84,6 +66,80 @@
       return { respostas, meta:{ agente:'Lumen', gerado_em:new Date().toISOString(), tz:(Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC') } };
     }
 
+    // --- jsPDF (para PDF local)
+    function loadJsPDF(){
+      if (window.jspdf?.jsPDF) return Promise.resolve();
+      return new Promise((resolve,reject)=>{
+        const s=document.createElement('script');
+        s.src='https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js';
+        s.onload=()=>window.jspdf?.jsPDF?resolve():reject(new Error('jsPDF não disponível'));
+        s.onerror=()=>reject(new Error('Falha ao carregar jsPDF'));
+        document.head.appendChild(s);
+      });
+    }
+    function wrapText(doc, text, maxW){ return doc.splitTextToSize(String(text ?? ''), maxW); }
+    async function gerarPDFLocal(payload){
+      await loadJsPDF();
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit:'pt', format:'a4' });
+      const pageW = doc.internal.pageSize.getWidth();
+      const pageH = doc.internal.pageSize.getHeight();
+      const margin = 56;
+      const maxW = pageW - margin*2;
+      let y = margin;
+
+      doc.setFont('Helvetica','bold'); doc.setFontSize(18);
+      doc.text('Jornada Conhecimento com Luz', margin, y); y += 18;
+      doc.setFont('Helvetica','normal'); doc.setFontSize(11);
+      doc.text(`Gerado em: ${new Date().toLocaleString()}`, margin, y); y += 20;
+
+      const respostas = payload?.respostas || {};
+      const entries = Object.entries(respostas);
+      entries.forEach(([k,v],idx)=>{
+        if (y > pageH - margin - 60) { doc.addPage(); y = margin; }
+        doc.setFont('Helvetica','bold'); doc.setFontSize(12);
+        doc.text(`${idx+1}. ${k}`, margin, y); y += 14;
+
+        doc.setFont('Helvetica','normal'); doc.setFontSize(11);
+        const lines = wrapText(doc, Array.isArray(v)? v.join('\n'): v, maxW);
+        lines.forEach(line => {
+          if (y > pageH - margin - 20) { doc.addPage(); y = margin; }
+          doc.text(line, margin, y); y += 14;
+        });
+        y += 8;
+      });
+
+      doc.save(nomePDF());
+    }
+
+    // --- tenta remoto; se falhar, cai no local
+    async function gerarPDFRobusto(payload){
+      try{
+        if (window.JornadaUtil?.gerarPDF){
+          await window.JornadaUtil.gerarPDF(payload); // v8 já cai no local internamente
+          return;
+        }
+        // sem util: tenta remoto manualmente
+        let last;
+        for (const ep of PDF_ENDPOINTS){
+          try{
+            const res = await fetch(API_BASE+ep,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json,application/pdf'},body:JSON.stringify(payload||{})});
+            const ct = (res.headers.get('content-type')||'').toLowerCase();
+            if(res.ok && ct.includes('application/pdf')){ const blob=await res.blob(); _baixarBlob(blob); return; }
+            const json = await res.json().catch(()=>({}));
+            const b64 = json.pdf_base64 || json.file || json.pdf;
+            if(b64){ _baixarBase64(b64); return; }
+            last = new Error('Resposta inesperada: '+(JSON.stringify(json)||'sem detalhes'));
+          }catch(e){ last=e; }
+        }
+        if (last) throw last;
+      }catch(e){
+        // falhou remoto -> PDF local com jsPDF
+        await gerarPDFLocal(payload);
+      }
+    }
+
+    // --- HQ (sempre local)
     function loadHtml2Canvas(){
       if (window.html2canvas) return Promise.resolve();
       return new Promise((resolve, reject)=>{
@@ -108,7 +164,10 @@
       });
       return wrap;
     }
-    async function fallbackGerarHQ(payload){
+    async function gerarHQRobusto(payload){
+      try{
+        if (window.JornadaUtil?.gerarHQ) return await window.JornadaUtil.gerarHQ(payload);
+      }catch{/* cai no fallback abaixo */ }
       await loadHtml2Canvas();
       const el = montarHQDOM(payload || fallbackColetarPayload());
       document.body.appendChild(el);
@@ -118,21 +177,13 @@
       el.remove();
     }
 
-    // força existir um objeto JornadaUtil e "preenche" o que faltar
-    (function patchUtil(){
-      window.JornadaUtil = window.JornadaUtil || {};
-      if (typeof window.JornadaUtil.coletarPayload !== 'function') window.JornadaUtil.coletarPayload = fallbackColetarPayload;
-      if (typeof window.JornadaUtil.gerarPDF       !== 'function') window.JornadaUtil.gerarPDF       = fallbackGerarPDF;
-      if (typeof window.JornadaUtil.gerarHQ        !== 'function') window.JornadaUtil.gerarHQ        = fallbackGerarHQ;
-    })();
-
-    // ----------------- BOTÕES -----------------
+    // =================== AÇÕES DOS BOTÕES ===================
     const msg = (e) => (e && e.message) ? e.message : (typeof e === 'string' ? e : 'Erro inesperado');
 
     document.getElementById('btnPdf')?.addEventListener('click', async () => {
       try {
-        const payload = window.JornadaUtil.coletarPayload();
-        await window.JornadaUtil.gerarPDF(payload);
+        const payload = (window.JornadaUtil?.coletarPayload || fallbackColetarPayload)();
+        await gerarPDFRobusto(payload);
       } catch (e) {
         alert('Não foi possível gerar o PDF agora. Tente novamente em alguns minutos.\n\n' + msg(e));
         console.error(e);
@@ -141,8 +192,8 @@
 
     document.getElementById('btnHq')?.addEventListener('click', async () => {
       try {
-        const payload = window.JornadaUtil.coletarPayload();
-        await window.JornadaUtil.gerarHQ(payload);
+        const payload = (window.JornadaUtil?.coletarPayload || fallbackColetarPayload)();
+        await gerarHQRobusto(payload);
       } catch (e) {
         alert('Não foi possível gerar a HQ agora.\n\n' + msg(e));
         console.error(e);
