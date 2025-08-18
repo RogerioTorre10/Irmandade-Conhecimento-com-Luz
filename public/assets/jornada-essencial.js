@@ -94,3 +94,4 @@ if (typeof window !== 'undefined') {
   window.JornadaEssencial.render = window.JornadaEssencial.render || render;
 }
 export default render;
+
