@@ -12,12 +12,12 @@ function lerLocal() {
   try { return JSON.parse(localStorage.getItem('respostas_jornada') || '{}'); }
   catch { return {}; }
 }
-function gravarLocal(obj) { localStorage.setItem('respostas_jornada', JSON.stringify(obj)); }
-
-export function render(root) {
+function gravarLocal(obj) { try { localStorage.setItem('respostas_jornada', JSON.stringify(obj)); } catch {} }
+function render(root) {
   const respostas = lerLocal();
   let i = 0;
 
+  try { i = parseInt(sessionStorage.getItem('jornada.step') || '0', 10) || 0; } catch {}
   const el = document.createElement('div');
   el.className = 'rounded-xl border border-slate-800 bg-slate-800/40 p-6';
   root.innerHTML = '';
@@ -70,11 +70,10 @@ export function render(root) {
     ans?.addEventListener('input', () => autoSalvar());
 
     el.querySelector('#btnAvancar')?.addEventListener('click', () => {
-      autoSalvar();
-      if (i < PERGUNTAS.length - 1) {
-        i++; montarTela();
-      } else {
-        location.href = '/jornada-final.html';
+    const txt = (el.querySelector('#ans')?.value || '').trim();
+    if (!txt) { el.querySelector('#ans')?.classList.add('field-error'); el.querySelector('#ans')?.focus(); return; }
+    autoSalvar();
+      try { sessionStorage.setItem('jornada.step', String(i)); } catch {}
       }
     });
 
@@ -82,6 +81,8 @@ export function render(root) {
       if (i === 0) return;
       autoSalvar();
       i--; montarTela();
+      try { sessionStorage.setItem('jornada.step', String(i)); } catch {}
+
     });
   }
 
@@ -93,5 +94,5 @@ if (typeof window !== 'undefined') {
   window.JornadaEssencial = window.JornadaEssencial || {};
   window.JornadaEssencial.render = window.JornadaEssencial.render || render;
 }
-export default render;
+// (removido: export default) — compat com <script> clássico
 
