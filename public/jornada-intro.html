@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Jornada — Aviso & Início</title>
+  <meta name="robots" content="noindex, nofollow">
   <meta name="description" content="Aviso legal e início da Jornada Conhecimento com Luz.">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -24,7 +25,7 @@
 
         <ul class="list-disc pl-5 space-y-1">
           <li>Suas respostas não são armazenadas após a entrega.</li>
-          <li>O acesso é por senha, com prazo para iniciar (15 dias) e concluir (24h) após o primeiro acesso).</li>
+          <li>O acesso é por senha, com prazo para iniciar (15 dias) e concluir (24h) após o primeiro acesso.</li> concluir (24h) após o primeiro acesso).</li>
           <li>Ao prosseguir, você declara ciência e concordância com estas condições.</li>
         </ul>
       </div>
@@ -37,12 +38,15 @@
     </section>
   </main>
 
-  <script>
+    <script>
     // Ao clicar em iniciar: marca a sessão e vai para a jornada
     document.getElementById('btn-iniciar')?.addEventListener('click', () => {
-      sessionStorage.setItem('journey-started', '1');
-      // Se preferir outro nome/rota, altere aqui:
-      location.href = './jornada.html?start=1';
+      try {
+        sessionStorage.setItem('journey-started', '1');
+        sessionStorage.setItem('veio_da_intro', '1');
+      } catch {}
+      const alvo = '/jornada-conhecimento-com-luz1.html?start=1';
+      location.href = alvo;
     });
   </script>
 </body>
