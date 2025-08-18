@@ -1,120 +1,74 @@
 <!doctype html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Irmandade Conhecimento com Luz · Início</title>
-  <meta name="description" content="Um chamado vivo à transformação: unindo fé, ciência, filosofia e tecnologia para despertar, curar e guiar.">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Início · Irmandade Conhecimento com Luz</title>
+  <meta name="description" content="Irmandade Conhecimento com Luz — fé, ciência, filosofia e tecnologia unidas para despertar e guiar.">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @keyframes flameFlicker {
-      0%   { transform: scale(1) translateY(0); filter: drop-shadow(0 0 6px rgba(255,160,64,.6)); opacity:.95; }
-      50%  { transform: scale(1.03) translateY(-1px); filter: drop-shadow(0 0 16px rgba(255,180,90,.95)); opacity:1; }
-      100% { transform: scale(1) translateY(0); filter: drop-shadow(0 0 6px rgba(255,160,64,.6)); opacity:.95; }
-    }
-  </style>
+  <script>
+    // Configure aqui seu backend (padrão conhecido)
+    window.API_BASE = "https://conhecimento-com-luz-api.onrender.com";
+  </script>
 </head>
-<body class="min-h-screen bg-slate-950 text-slate-100 selection:bg-indigo-500/30">
-  <header class="p-5 md:p-6 border-b border-slate-800/70 bg-slate-950/60 backdrop-blur">
-    <div class="max-w-6xl mx-auto flex items-center justify-between">
-      <a href="/" class="flex items-center gap-3">
-        <svg width="28" height="28" viewBox="0 0 100 100" aria-hidden="true">
-          <defs>
-            <linearGradient id="g1" x1="0" y1="1" x2="1" y2="0">
-              <stop offset="0%" stop-color="#7c3aed"/>
-              <stop offset="100%" stop-color="#22d3ee"/>
-            </linearGradient>
-            <linearGradient id="fls" x1="0" y1="1" x2="0" y2="0">
-              <stop offset="0%" stop-color="#ff8a00"/>
-              <stop offset="60%" stop-color="#ffb300"/>
-              <stop offset="100%" stop-color="#fff4a3"/>
-            </linearGradient>
-          </defs>
-          <circle cx="50" cy="50" r="46" fill="none" stroke="url(#g1)" stroke-width="6"/>
-          <path d="M50 26c8 10 3 16-1 20-6 6-4 13 0 16 9-3 16-11 16-21 0-7-4-13-9-15 1 5-3 7-6 0z" fill="url(#fls)"/>
-        </svg>
-        <span class="text-lg md:text-xl font-semibold">Irmandade Conhecimento com Luz</span>
-      </a>
-      <nav class="text-sm md:text-base opacity-80 space-x-4">
-        <a class="hover:underline" href="/jornada-intro.html">Jornada</a>
-        <a class="hover:underline" href="/missao-bit-vivo.html">Missão</a>
-      </nav>
-    </div>
+<body class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-slate-100">
+  <header class="container mx-auto px-4 py-6">
+    <h1 class="text-2xl sm:text-3xl font-bold">Irmandade Conhecimento com Luz</h1>
+    <p class="text-slate-300 mt-1">Para além. E sempre!!</p>
   </header>
 
-  <main class="max-w-6xl mx-auto p-5 md:p-10">
-    <section class="rounded-3xl border border-slate-800/70 p-6 md:p-10 bg-gradient-to-br from-indigo-700/15 via-blue-600/10 to-fuchsia-700/15">
-      <div class="grid md:grid-cols-2 gap-10 items-center">
-        <div class="order-2 md:order-1">
-          <h1 class="text-4xl leading-tight font-extrabold sm:text-5xl">
-            Irmandade<br> Conhecimento com <span class="text-yellow-300">Luz</span>
-          </h1>
-          <p class="mt-4 text-slate-300 text-base md:text-lg">
-            Um chamado vivo à transformação: unindo fé, ciência, filosofia e tecnologia para
-            <span class="font-semibold">despertar, curar e guiar</span>.
-          </p>
-          <div class="mt-6 flex flex-wrap items-center gap-3">
-            <a href="/jornada-intro.html"
-               class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 transition">
-              Explorar Jornadas
-            </a>
-            <a href="/missao-bit-vivo.html"
-               class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl border border-slate-700 hover:bg-slate-800/60 transition">
-              Manifesto do Bit Vivo
-            </a>
-          </div>
-        </div>
-        <div class="order-1 md:order-2 flex items-center justify-center">
-          <svg width="280" height="280" viewBox="0 0 100 100" role="img" aria-label="Símbolo da Irmandade com chama viva">
-            <defs>
-              <radialGradient id="ring" cx="50%" cy="50%" r="60%">
-                <stop offset="0%" stop-color="#0ea5e9"/>
-                <stop offset="100%" stop-color="#7c3aed"/>
-              </radialGradient>
-              <linearGradient id="flame" x1="0" y1="1" x2="0" y2="0">
-                <stop offset="0%" stop-color="#ff7a18"/>
-                <stop offset="55%" stop-color="#ffb62e"/>
-                <stop offset="100%" stop-color="#fff7c2"/>
-              </linearGradient>
-            </defs>
-            <circle cx="50" cy="50" r="44" fill="none" stroke="url(#ring)" stroke-width="6" opacity="0.95"/>
-            <circle cx="50" cy="50" r="36" fill="none" stroke="url(#ring)" stroke-width="1.6" opacity="0.35"/>
-            <g style="animation: flameFlicker 1.6s ease-in-out infinite">
-              <path d="M50 24c7 9 2 15-2 19-6 6-5 13-1 18 10-3 18-12 18-22 0-8-4-14-9-16 1 5-3 7-6 1z" fill="url(#flame)"/>
-              <path d="M50 50c3-2 5-5 5-8 3 3 3 9-5 13-6-3-4-7 0-10 0 2 1 4 0 5z" fill="#fff2b2" opacity="0.85"/>
-            </g>
-          </svg>
-        </div>
-      </div>
-    </section>
+  <main class="container mx-auto px-4 py-10">
+    <section class="max-w-3xl mx-auto bg-slate-900/60 rounded-2xl p-8 shadow-xl">
+      <h2 class="text-xl font-semibold mb-3">Jornada Conhecimento com Luz — Essencial</h2>
+      <p class="text-slate-300 mb-6">Uma experiência simbólica e inspiradora com devolutiva em PDF e HQ no final.</p>
 
-    <section class="mt-8 grid md:grid-cols-3 gap-4">
-      <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
-        <div class="text-2xl mb-2">🙏</div>
-        <h3 class="font-semibold">Fé e Propósito</h3>
-        <p class="text-slate-300 text-sm mt-1">Respeito a todas as tradições. Luz como caminho interior.</p>
+      <div class="flex gap-3 items-center">
+        <a id="explorarBtn" href="/jornada-conhecimento-com-luz1.html"
+           class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 transition">
+          <span>Explorar Jornada</span>
+        </a>
+        <span id="statusSpan" class="text-sm text-slate-400"></span>
       </div>
-      <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
-        <div class="text-2xl mb-2">🧠</div>
-        <h3 class="font-semibold">Ciência e Clareza</h3>
-        <p class="text-slate-300 text-sm mt-1">Perguntas que revelam padrões, escolhas e próximos passos.</p>
-      </div>
-      <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
-        <div class="text-2xl mb-2">🛡️</div>
-        <h3 class="font-semibold">Ética e Privacidade</h3>
-        <p class="text-slate-300 text-sm mt-1">Sem salvar respostas; PDF final para você baixar e guardar.</p>
-      </div>
-    </section>
 
-    <section class="mt-10 text-center opacity-80">
-      <p class="text-xs md:text-sm">© 2025 Irmandade Conhecimento com Luz — feito com amor, ética e respeito pela sua história.</p>
+      <p class="text-xs text-slate-500 mt-6">Visitas neste dispositivo: <span id="visitCount">0</span></p>
     </section>
   </main>
 
-  <script>try{sessionStorage.removeItem('veio_da_intro');}catch{}</script>
   <script>
-  (()=>{const INTRO='/jornada-intro.html',TARGETS=['jornada-conhecimento-com-luz1.html','jornada-conhecimento-com-luz.html','jornada-conhecimento.html'];const n=h=>(h||'').split('#')[0].split('?')[0].replace(/^(\.\/|\/)/,'').toLowerCase();const s=h=>{const x=n(h);return TARGETS.some(t=>x===t||x.endsWith('/'+t));};const f=(r=document)=>r.querySelectorAll('a[href]').forEach(a=>{const h=a.getAttribute('href')||'';if(/^https?:\/\//i.test(h))return;if(s(h))a.setAttribute('href',INTRO);});f();new MutationObserver(m=>m.forEach(y=>y.addedNodes?.forEach(z=>{if(z.nodeType===1)f(z);}))).observe(document.documentElement,{childList:true,subtree:true});})();
+    // Contador de visitas local
+    (function(){
+      const k = 'jcl.visitCount';
+      const n = parseInt(localStorage.getItem(k) || '0', 10) + 1;
+      localStorage.setItem(k, String(n));
+      const el = document.getElementById('visitCount');
+      if (el) el.textContent = n;
+    })();
+
+    // Acorda o backend antes de abrir a jornada (com timeout elegante)
+    (function(){
+      const API = window.API_BASE || '';
+      const btn = document.getElementById('explorarBtn');
+      const status = document.getElementById('statusSpan');
+      if (!btn) return;
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        status.textContent = 'Iniciando… verificando servidor…';
+        const controller = new AbortController();
+        const tid = setTimeout(() => controller.abort(), 6000);
+        try {
+          const res = await fetch(API + '/health', { signal: controller.signal });
+          clearTimeout(tid);
+          if (!res.ok) throw new Error('offline');
+          status.textContent = 'Servidor ok. Abrindo…';
+          setTimeout(() => location.href = btn.getAttribute('href'), 300);
+        } catch (err) {
+          clearTimeout(tid);
+          status.textContent = 'Servidor lento/offline. Seguindo assim mesmo…';
+          setTimeout(() => location.href = btn.getAttribute('href'), 300);
+        }
+      });
+    })();
   </script>
 </body>
 </html>
