@@ -24,11 +24,11 @@
       <p class="text-slate-300 mb-6">Uma experiência simbólica e inspiradora com devolutiva em PDF e HQ no final.</p>
 
       <div class="flex gap-3 items-center">
-        <a id="explorarBtn" href="/jornada-conhecimento-com-luz1.html"
+        <a id="explorarBtn" href="jornada-conhecimento-com-luz1.html"
            class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 transition">
           <span>Explorar Jornada</span>
         </a>
-        <span id="statusSpan" class="text-sm text-slate-400"></span>
+        <span id="statusSpan" class="text-sm text-slate-400" role="status" aria-live="polite"></span>
       </div>
 
       <p class="text-xs text-slate-500 mt-6">Visitas neste dispositivo: <span id="visitCount">0</span></p>
@@ -49,6 +49,7 @@
     (function(){
       const API = window.API_BASE || '';
       const btn = document.getElementById('explorarBtn');
+      const target = btn ? btn.getAttribute('href') : '/jornada-conhecimento-com-luz1.html';
       const status = document.getElementById('statusSpan');
       if (!btn) return;
       btn.addEventListener('click', async (e) => {
@@ -61,11 +62,12 @@
           clearTimeout(tid);
           if (!res.ok) throw new Error('offline');
           status.textContent = 'Servidor ok. Abrindo…';
-          setTimeout(() => location.href = btn.getAttribute('href'), 300);
+          setTimeout(() => location.href = target, 300);
         } catch (err) {
           clearTimeout(tid);
           status.textContent = 'Servidor lento/offline. Seguindo assim mesmo…';
-          setTimeout(() => location.href = btn.getAttribute('href'), 300);
+          setTimeout(() => location.href = target, 300);
+
         }
       });
     })();
