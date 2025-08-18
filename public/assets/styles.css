@@ -1,0 +1,6 @@
+/* styles.css — Jornada Conhecimento com Luz (v10.1) */
+.hidden { display: none; }
+.field-error {
+  outline: 2px solid #ef4444 !important;
+  box-shadow: 0 0 0 2px #ef4444 inset !important;
+}
