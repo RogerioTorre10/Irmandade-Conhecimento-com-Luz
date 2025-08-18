@@ -1,10 +1,14 @@
-/* styles.css — Jornada Conhecimento com Luz (v10.1) */
+/* Complementa o Tailwind com pequenos ajustes */
+:root { color-scheme: dark; }
+
 .hidden { display: none; }
 
-.field-error {
-  outline: 2px solid #ef4444 !important;
-  box-shadow: 0 0 0 2px #ef4444 inset !important;
-}
+.input-base { background-color: rgb(15 23 42); border: 1px solid rgb(51 65 85); color: #e5e7eb; border-radius: 0.5rem; padding: 0.5rem 0.75rem; }
+.label { font-size: 0.9rem; color: #cbd5e1; margin-bottom: 0.25rem; display:block; }
 
-/* (opcional) toques de layout */
-body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+.field { display:flex; flex-direction:column; gap:0.25rem; }
+.help { font-size: 0.75rem; color:#94a3b8; }
+.err { color:#fda4af; font-size:0.85rem; }
+
+textarea.input-base { min-height: 120px; resize: vertical; }
+```
