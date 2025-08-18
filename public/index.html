@@ -56,9 +56,8 @@
         e.preventDefault();
         status.textContent = 'Iniciando… verificando servidor…';
         const controller = new AbortController();
-        const tid = setTimeout(() => controller.abort(), 6000);
-        try {
-          const res = await fetch(API + '/health', { signal: controller.signal });
+          const tid = setTimeout(() => controller.abort(), 1500);
+          const res = await fetch(`${(API||'').replace(/\/$/,'')}/health?t=${Date.now()}`, { cache: 'no-store', signal: controller.signal });
           clearTimeout(tid);
           if (!res.ok) throw new Error('offline');
           status.textContent = 'Servidor ok. Abrindo…';
