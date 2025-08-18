@@ -134,7 +134,7 @@
 
   // ===== DOWNLOAD =====
   async function downloadFile(url, filename){
-    const res = await fetch(url);
+    const res = await fetch(`${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Falha ao baixar: ' + (res.status||''));
     const blob = await res.blob();
     const a = document.createElement('a');
@@ -169,8 +169,9 @@
     try {
       const res = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+       cache: 'no-store',
+       body: JSON.stringify(payload)
       });
       if (!res.ok) throw new Error('Servidor respondeu com erro ' + res.status);
       const data = await res.json();
