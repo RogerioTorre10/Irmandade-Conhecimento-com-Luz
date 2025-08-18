@@ -126,4 +126,66 @@ function validateAll(){
   return ok;
 }
 
-$('.btn-next')?.addEventListener('click',()=>{ if(!validateStep()) return; currentStep=Math.min(currentStep+1, steps().length
+$('.btn-next')?.addEventListener('click',()=>{ if(!validateStep()) return; currentStep=Math.min(currentStep+1, steps().length-1); showStep(currentStep); });
+$('.btn-prev')?.addEventListener('click',()=>{ currentStep=Math.max(currentStep-1,0); showStep(currentStep); });
+$('#btn-ir-final')?.addEventListener('click',()=>{ if(!validateAll()) return; hide($('#tela-perguntas')); show($('#tela-final')); });
+$('#btn-revisar')?.addEventListener('click',()=>{ hide($('#tela-final')); show($('#tela-perguntas')); });
+$('#btn-voltar-home')?.addEventListener('click',()=>{ location.href='/'; });
+
+// Entrega garantida (PDF + HQ)
+async function baixarTudoGarantido(){
+  if(!validateAll()) return; // último guarda
+  const answers = collectAnswers();
+  const payload = { answers, meta: { ts: new Date().toISOString(), app: 'Jornada v10.1' } };
+
+  const names=CONFIG.DOWNLOAD_NAMES();
+  const pdfURL=CONFIG.API_BASE+CONFIG.ENDPOINTS.PDF;
+  const hqURL =CONFIG.API_BASE+CONFIG.ENDPOINTS.HQ;
+  const btn=$('#btn-baixar-tudo'); btn && (btn.disabled=true);
+
+  $('#status-lines') && ($('#status-lines').innerHTML='');
+  setStatus('Gerando PDF...');
+
+  try{
+    const pdfBlob = await withRetry(()=>postBlobJSON(pdfURL, payload), {retries:1, delay:700});
+    triggerDownload(pdfBlob, names.pdf);
+    setStatus('PDF baixado', true);
+  }catch(e){
+    setStatus('Falha ao gerar/baixar o PDF via JSON. Tentando fallback...', false);
+    try{
+      const b=await withRetry(()=>postBlob(pdfURL),{retries:1,delay:700});
+      triggerDownload(b,names.pdf);
+      setStatus('PDF baixado (fallback)', true);
+    }catch(e2){
+      setStatus('Não foi possível entregar o PDF.', false);
+      btn && (btn.disabled=false);
+      return;
+    }
+  }
+
+  setStatus('Gerando HQ (imagem)...');
+  try{
+    const hqBlob = await withRetry(()=>postBlobJSON(hqURL, payload), {retries:1, delay:700});
+    triggerDownload(hqBlob, names.hq);
+    setStatus('HQ baixada', true);
+  }catch(e){
+    setStatus('Falha ao gerar/baixar a HQ via JSON. Tentando fallback...', false);
+    try{
+      const b=await withRetry(()=>postBlob(hqURL),{retries:1,delay:700});
+      triggerDownload(b,names.hq);
+      setStatus('HQ baixada (fallback)', true);
+    }catch(e2){
+      setStatus('Não foi possível entregar a HQ agora. Tente novamente após liberar espaço/conexão.', false);
+      btn && (btn.disabled=false);
+      return;
+    }
+  }
+
+  setStatus('Entrega finalizada (PDF + HQ). Redirecionando...');
+  limparTudo();
+  setTimeout(()=>{ location.href='/'; }, 1200);
+}
+$('#btn-baixar-tudo')?.addEventListener('click', baixarTudoGarantido);
+
+// Init
+window.addEventListener('DOMContentLoaded',()=>{ mountIntro(); currentStep=0; showStep(currentStep); });
