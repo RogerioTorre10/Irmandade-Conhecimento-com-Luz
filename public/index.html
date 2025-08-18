@@ -47,7 +47,7 @@
 
     // Acorda o backend antes de abrir a jornada (com timeout elegante)
     (function(){
-      const API = window.API_BASE || '';
+      const API = (window.JORNADA_API_BASE || window.API_BASE || '');
       const btn = document.getElementById('explorarBtn');
       const target = btn ? btn.getAttribute('href') : '/jornada-conhecimento-com-luz1.html';
       const status = document.getElementById('statusSpan');
