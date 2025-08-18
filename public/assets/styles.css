@@ -3,7 +3,7 @@
 
 .hidden { display: none; }
 
-.input-base { background-color: rgb(15 23 42); border: 1px solid rgb(51 65 85); color: #e5e7eb; border-radius: 0.5rem; padding: 0.5rem 0.75rem; }
+.input-base { background-color: rgb(15 23 42); border: 1px solid rgb(51 65 85); color: #e5e7eb; border-radius: 0.5rem; padding: 0.5rem 0.75rem; width: 100%; }
 .label { font-size: 0.9rem; color: #cbd5e1; margin-bottom: 0.25rem; display:block; }
 
 .field { display:flex; flex-direction:column; gap:0.25rem; }
@@ -11,4 +11,6 @@
 .err { color:#fda4af; font-size:0.85rem; }
 
 textarea.input-base { min-height: 120px; resize: vertical; }
-```
+
+.input-base:focus { outline: 2px solid rgb(99 102 241); border-color: rgb(99 102 241); }
+button[disabled] { opacity: .6; cursor: not-allowed; }
