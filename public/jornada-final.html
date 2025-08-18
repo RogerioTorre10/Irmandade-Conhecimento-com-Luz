@@ -46,7 +46,7 @@
 
   <script>
     /* =================== UTIL/FALLBACKS =================== */
-    const API_BASE = 'https://conhecimento-com-luz-api.onrender.com';
+    const API_BASE = window.JORNADA_API_BASE || 'https://conhecimento-com-luz-api.onrender.com';
     const PDF_ENDPOINTS = ['/generate-pdf','/pdf','/api/pdf'];
     const ts = () => new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
     const nomePDF = () => `Jornada_${ts()}.pdf`;
