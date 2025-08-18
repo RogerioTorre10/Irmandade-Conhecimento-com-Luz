@@ -1,4 +1,4 @@
-* Jornada v10 (baseline restaurado)
+ * Jornada v10 (baseline restaurado)
  * - Intro com senha + olho mágico
  * - Render dinâmico das perguntas (QUESTIONS)
  * - Salvamento local por sessão
@@ -85,5 +85,171 @@
     return wrap;
   }
 
-  function renderQuest
-```
+  function renderQuestions(){
+    const holder = qs('#questionsContainer');
+    holder.innerHTML = '';
+    if (!QUESTIONS || !QUESTIONS.length){
+      holder.innerHTML = '<p class="text-slate-300">Sem perguntas carregadas. Verifique seu <code>questions.js</code>.</p>';
+      return;
+    }
+    QUESTIONS.forEach(q => holder.appendChild(createField(q)));
+  }
+
+  // ===== VALIDAÇÃO / COLETA =====
+  function validate(){
+    let ok = true;
+    (QUESTIONS||[]).forEach(q => {
+      if (!q.required) return;
+      const val = (localStorage.getItem(storageKey(q.id)) || '').trim();
+      const err = qs(`#err-${q.id}`);
+      if (!val){ ok = false; err && err.classList.remove('hidden'); }
+      else { err && err.classList.add('hidden'); }
+    });
+    return ok;
+  }
+
+  function collectAnswers(){
+    const obj = {};
+    (QUESTIONS||[]).forEach(q => {
+      obj[q.id] = (localStorage.getItem(storageKey(q.id)) || '').trim();
+    });
+    return obj;
+  }
+
+  // ===== UI HELPERS =====
+  function setStatus(t){ const el = qs('#statusBar'); if (el) el.textContent = t; }
+  function show(el){ el && el.classList.remove('hidden'); }
+  function hide(el){ el && el.classList.add('hidden'); }
+
+  // ===== DOWNLOAD =====
+  async function downloadFile(url, filename){
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Falha ao baixar: ' + (res.status||''));
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    const objectUrl = URL.createObjectURL(blob);
+    a.href = objectUrl;
+    a.download = filename || 'arquivo';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 2500);
+  }
+
+  // ===== SUBMISSÃO =====
+  async function submitAll(){
+    if (!validate()){
+      setStatus('Preencha os campos obrigatórios marcados com *');
+      return;
+    }
+    const payload = {
+      respostas: collectAnswers(),
+      metadata: {
+        sessionId: getSessionId(),
+        ts: new Date().toISOString(),
+        app: 'Jornada Conhecimento com Luz (baseline v10)'
+      }
+    };
+
+    const endpoint = API_BASE.replace(/\/$/,'') + ENDPOINT_PATH; // ex.: https://.../jornada/gerar
+
+    setStatus('Enviando… gerando seus arquivos (pode levar alguns segundos)…');
+    qs('#sendBtn')?.setAttribute('disabled','true');
+
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error('Servidor respondeu com erro ' + res.status);
+      const data = await res.json();
+      const pdfUrl = data?.pdf_url || data?.pdf || data?.links?.pdf;
+      const hqUrl  = data?.hq_url  || data?.hq  || data?.links?.hq;
+
+      if (!pdfUrl && !hqUrl){
+        throw new Error('Servidor não retornou links de download.');
+      }
+
+      // Baixa sequencialmente mostrando status
+      if (pdfUrl){
+        setStatus('Baixando PDF…');
+        await downloadFile(pdfUrl, 'Jornada-Conhecimento-com-Luz.pdf');
+      }
+      if (hqUrl){
+        setStatus('Baixando HQ…');
+        await downloadFile(hqUrl, 'Jornada-Conhecimento-com-Luz-HQ.pdf');
+      }
+
+      setStatus('PDF e HQ finalizados. Limpando dados…');
+      clearAllStorage();
+
+      // Mostra tela final bem simples
+      hide(qs('#questions-screen'));
+      show(qs('#final-screen'));
+      setStatus('Finalizado! Voltando ao início…');
+      setTimeout(() => {
+        // Redireciona para a principal
+        location.href = '/index.html';
+      }, 3000);
+
+    } catch (err){
+      console.error(err);
+      setStatus('Falha ao gerar/baixar. Verifique sua conexão ou espaço no dispositivo e tente novamente.');
+      qs('#sendBtn')?.removeAttribute('disabled');
+    }
+  }
+
+  // ===== INICIALIZAÇÃO =====
+  function attachEvents(){
+    // Olho mágico
+    qs('#toggleSenha')?.addEventListener('click', () => {
+      const f = qs('#senha'); if (!f) return;
+      f.type = (f.type === 'password') ? 'text' : 'password';
+    });
+
+    // Start
+    qs('#startBtn')?.addEventListener('click', () => {
+      const pwd = (qs('#senha')?.value || '').trim();
+      if (!ALLOWED_PASSWORDS.includes(pwd)){
+        qs('#introMsg').textContent = 'Senha inválida. Verifique e tente novamente.';
+        return;
+      }
+      // Libera perguntas
+      hide(qs('#intro-screen'));
+      show(qs('#questions-screen'));
+      setStatus('Respondendo…');
+      renderQuestions();
+    });
+
+    // Revisar
+    qs('#reviewBtnTop')?.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
+    qs('#reviewBtnFinal')?.addEventListener('click', () => {
+      hide(qs('#final-screen')); show(qs('#questions-screen'));
+      setStatus('Revendo respostas…');
+    });
+
+    // Limpar tudo
+    qs('#clearBtn')?.addEventListener('click', () => {
+      if (confirm('Tem certeza que deseja apagar TODAS as respostas?')){
+        clearAllStorage();
+        renderQuestions();
+        setStatus('Respostas apagadas.');
+      }
+    });
+
+    // Enviar (gerar PDF + HQ)
+    qs('#sendBtn')?.addEventListener('click', submitAll);
+  }
+
+  // Mostra intro sempre no primeiro acesso
+  function boot(){
+    show(qs('#intro-screen'));
+    hide(qs('#questions-screen'));
+    hide(qs('#final-screen'));
+    setStatus('Pronto.');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => { boot(); attachEvents(); });
+})();
+</script>
