@@ -255,4 +255,3 @@
 
   document.addEventListener('DOMContentLoaded', () => { boot(); attachEvents(); });
 })();
-</script>
