@@ -162,8 +162,7 @@
       }
     };
 
-    const endpoint = API_BASE.replace(/\/$/,'') + ENDPOINT_PATH; // ex.: https://.../jornada/gerar
-
+    const endpoint = `${API_BASE.replace(/\/$/,'')}/${ENDPOINT_PATH.replace(/^\//,'')}`; // garante 1 única barra
     setStatus('Enviando… gerando seus arquivos (pode levar alguns segundos)…');
     qs('#sendBtn')?.setAttribute('disabled','true');
 
@@ -254,11 +253,27 @@
   }
 
   // Mostra intro sempre no primeiro acesso
-  function boot(){
+ function boot(){
+  const params = new URLSearchParams(location.search);
+  const started =
+    params.get('start') === '1' ||
+    (typeof sessionStorage !== 'undefined' && (
+      sessionStorage.getItem('journey-started') === '1' ||
+      sessionStorage.getItem('veio_da_intro') === '1'
+    ));
+
+  if (started) {
+    hide(qs('#intro-screen'));
+    show(qs('#questions-screen'));
+    hide(qs('#final-screen'));
+    renderQuestions();
+    setStatus('Respondendo…');
+  } else {
     show(qs('#intro-screen'));
     hide(qs('#questions-screen'));
     hide(qs('#final-screen'));
     setStatus('Pronto.');
+  }
 
   document.addEventListener('DOMContentLoaded', () => { boot(); attachEvents(); });
 })();
