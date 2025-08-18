@@ -8,8 +8,8 @@
  *******************/
 
 (function(){
-  const API_BASE = (typeof window !== 'undefined' && window.API_BASE) ? window.API_BASE : 'https://conhecimento-com-luz-api.onrender.com';
-  const ENDPOINT_PATH = (typeof window !== 'undefined' && window.ENDPOINT_PATH) ? window.ENDPOINT_PATH : '/jornada/gerar';
+ const API_BASE = (typeof window !== 'undefined' && (window.JORNADA_API_BASE || window.API_BASE))  ? (window.JORNADA_API_BASE || window.API_BASE): 'https://conhecimento-com-luz-api.onrender.com';
+ const ENDPOINT_PATH = (typeof window !== 'undefined' && (window.JORNADA_ENDPOINT_PATH || window.ENDPOINT_PATH)) ? (window.JORNADA_ENDPOINT_PATH || window.ENDPOINT_PATH):'/jornada/gerar';
   const ALLOWED_PASSWORDS = ['iniciar','luzEterna']; // para testes
 
   const qs = (sel) => document.querySelector(sel);
