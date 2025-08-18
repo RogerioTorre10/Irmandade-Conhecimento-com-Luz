@@ -28,18 +28,22 @@
   function storageKey(qid){ return `${KEY_PREFIX}${getSessionId()}:${qid}`; }
 
   // Remove todas as chaves desta sessão E também metadados auxiliares
-  function clearAllStorage(){
-    const sid = getSessionId();
+    function clearAllStorage(){
+-   const sid = getSessionId();
++   const sid = getSessionId();
     const toRemove = [];
     for (let i=0;i<localStorage.length;i++){
       const k = localStorage.key(i);
       if (!k) continue;
       if (k.startsWith(`${KEY_PREFIX}${sid}:`) || k === SESSION_KEY){ toRemove.push(k); }
     }
-    toRemove.forEach(k => localStorage.removeItem(k));
+-   toRemove.forEach(k => localStorage.removeItem(k));
++   toRemove.forEach(k => { try { localStorage.removeItem(k); } catch {} });
     // recria nova sessão para começar do zero
-    localStorage.setItem(SESSION_KEY, newSessionId());
+-   localStorage.setItem(SESSION_KEY, newSessionId());
++   try { localStorage.setItem(SESSION_KEY, newSessionId()); } catch {}
   }
+
 
   // ===== RENDER DAS PERGUNTAS =====
   const QUESTIONS = (typeof window !== 'undefined' && window.QUESTIONS) ? window.QUESTIONS : [];
@@ -86,7 +90,7 @@
   }
 
   function renderQuestions(){
-    const holder = qs('#questionsContainer');
+    if (!holder) { console.warn('questionsContainer não encontrado'); return; }
     holder.innerHTML = '';
     if (!QUESTIONS || !QUESTIONS.length){
       holder.innerHTML = '<p class="text-slate-300">Sem perguntas carregadas. Verifique seu <code>questions.js</code>.</p>';
@@ -248,7 +252,6 @@
     hide(qs('#questions-screen'));
     hide(qs('#final-screen'));
     setStatus('Pronto.');
-  }
 
   document.addEventListener('DOMContentLoaded', () => { boot(); attachEvents(); });
 })();
