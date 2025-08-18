@@ -6,7 +6,7 @@
   <title>Jornada · Irmandade Conhecimento com Luz</title>
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/assets/styles.css">
   <script>
     window.API_BASE = window.API_BASE || "https://conhecimento-com-luz-api.onrender.com";
     window.ENDPOINT_PATH = "/jornada/gerar"; // ajuste aqui se seu backend usar outro caminho
@@ -66,7 +66,7 @@
   <!-- Rodapé fixo: ações globais -->
   <footer id="footerBar" class="fixed inset-x-0 bottom-0 bg-slate-900/80 backdrop-blur border-t border-slate-800">
     <div class="container mx-auto px-4 py-3 flex flex-col sm:flex-row gap-3 sm:gap-4 items-center justify-between">
-      <div class="text-xs text-slate-400" id="statusBar">Pronto.</div>
+      <div class="text-xs text-slate-400" id="statusBar" role="status" aria-live="polite">Pronto.</div>
       <div class="flex items-center gap-2">
         <button id="clearBtn" class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600">Limpar respostas</button>
         <button id="sendBtn" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 font-semibold">Gerar PDF + HQ</button>
@@ -74,7 +74,7 @@
     </div>
   </footer>
 
-  <script src="/questions.js"></script>
-  <script src="/jornada.js"></script>
+  <script src="/assets/questions.js"></script>
+  <script src="/assets/jornada.js"></script>
 </body>
 </html>
