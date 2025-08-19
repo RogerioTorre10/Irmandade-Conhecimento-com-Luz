@@ -10,13 +10,26 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body class="min-h-screen bg-slate-950 text-slate-100">
-  <main id="app" class="max-w-4xl mx-auto px-4 py-8"></main>
+<body class="min-h-screen text-slate-100">
+  <div class="pergaminho"><!-- abre pergaminho -->
 
-  <footer class="max-w-4xl mx-auto px-4 py-10 text-sm text-slate-400">
-    <a href="./" class="underline">Voltar ao início</a>
-  </footer>
+    <!-- Introdução -->
+    <section class="text-center mb-4">
+      <h1 class="text-3xl font-bold titulo-pergaminho">Jornada Conhecimento com Luz ✨</h1>
+      <p class="texto-pergaminho">Bem-vindo(a)! Responda com calma. Ao final, você poderá baixar o PDF e a HQ.</p>
+    </section>
 
+    <!-- Aqui o app renderiza as telas da jornada -->
+    <main id="app" class="max-w-4xl mx-auto px-4 py-8"></main>
+
+    <!-- Chama vibrante -->
+    <div class="chama">
+      <img src="https://i.imgur.com/qkdpN4q.gif" alt="chama vibrante">
+    </div>
+
+  </div><!-- fecha pergaminho -->
+
+  <!-- mantém o defer -->
   <script src="jornada.js" defer></script>
 </body>
 </html>
