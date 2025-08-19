@@ -98,6 +98,7 @@
   }
 
   function renderQuestions(){
+   const holder = qs('#questionsContainer');
     if (!holder) { console.warn('questionsContainer não encontrado'); return; }
     holder.innerHTML = '';
     if (!QUESTIONS || !QUESTIONS.length){
