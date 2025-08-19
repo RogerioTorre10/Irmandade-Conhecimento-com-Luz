@@ -116,11 +116,11 @@ function renderFormStep(){
       </div>
 
       <div class="flex flex-wrap gap-3 pt-2">
-        <button id="btnPrev" class="btn" style="background:#334155">Voltar</button>
-        <button id="btnClear" class="btn" style="background:#334155">Limpar</button>
-        <button id="btnNext" class="btn">${state.idx < total-1 ? 'Próxima' : 'Revisar'}</button>
-        <a href="./" class="btn" style="background:#334155">Sair</a>
-      </div>
+  <button id="btnPrev" class="btn" style="background:#334155">Voltar</button>
+  <button id="btnClear" class="btn" style="background:#334155">Limpar</button>
+  <button id="btnNext" class="btn">${state.idx < total-1 ? 'Próxima' : 'Revisar'}</button>
+  <button id="btnFinish" class="btn" style="background:#6b21a8">Finalizar</button>
+</div>
     </section>
   `;
 
@@ -148,6 +148,13 @@ function renderFormStep(){
       clearLocal(); state.idx=0; renderFormStep();
     }
   });
+   
+   // finalizar
+    $('#btnFinish').addEventListener('click', () => {
+  state.step = 'review';
+  render();
+});
+
 }
 
 // Revisão
