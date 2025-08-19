@@ -190,7 +190,7 @@
       }
       if (hqUrl){
         setStatus('Baixando HQ…');
-        await downloadFile(hqUrl, 'Jornada-Conhecimento-com-Luz-HQ.pdf');
+       await downloadFile(hqUrl, 'Jornada-Conhecimento-com-Luz-HQ.png');
       }
 
       setStatus('PDF e HQ finalizados. Limpando dados…');
