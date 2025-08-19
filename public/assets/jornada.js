@@ -75,7 +75,8 @@
     }
     input.id = q.id;
     input.name = q.id;
-
+    if (q.required) input.required = true;
+   
     // carrega salvo
     const saved = localStorage.getItem(storageKey(q.id));
     if (saved) input.value = saved;
@@ -194,6 +195,7 @@
 
       setStatus('PDF e HQ finalizados. Limpando dados…');
       clearAllStorage();
+     try { sessionStorage.removeItem('journey-started'); sessionStorage.removeItem('veio_da_intro'); } catch {}
 
       // Mostra tela final bem simples
       hide(qs('#questions-screen'));
