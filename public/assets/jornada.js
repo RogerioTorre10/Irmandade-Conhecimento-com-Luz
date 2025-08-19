@@ -152,7 +152,9 @@
   async function submitAll(){
     if (!validate()){
       setStatus('Preencha os campos obrigatórios marcados com *');
-      return;
+     const firstErr = document.querySelector('.err:not(.hidden)');
+if (firstErr) { const id = firstErr.id.replace(/^err-/, ''); const el = document.getElementById(id); el?.focus(); el?.scrollIntoView({behavior:'smooth', block:'center'}); }
+return;
     }
     const payload = {
       respostas: collectAnswers(),
