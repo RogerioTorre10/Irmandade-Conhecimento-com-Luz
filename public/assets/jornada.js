@@ -135,19 +135,26 @@
   function hide(el){ el && el.classList.add('hidden'); }
 
   // ===== DOWNLOAD =====
-  async function downloadFile(url, filename){
-    const res = await fetch(`${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`, { cache: 'no-store' });
-    if (!res.ok) throw new Error('Falha ao baixar: ' + (res.status||''));
+ async function downloadFile(url, filename){
+  const a = document.createElement('a');
+
+  // Se já for blob: ou data:, linkamos direto (não dá pra fazer fetch de blob:)
+  if (/^(blob:|data:)/i.test(url)) {
+    a.href = url;
+  } else {
+    const noCacheUrl = `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
+    const res = await fetch(noCacheUrl, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Falha ao baixar: ' + (res.status || ''));
     const blob = await res.blob();
-    const a = document.createElement('a');
-    const objectUrl = URL.createObjectURL(blob);
-    a.href = objectUrl;
-    a.download = filename || 'arquivo';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(objectUrl), 2500);
+    a.href = URL.createObjectURL(blob);
+    setTimeout(() => URL.revokeObjectURL(a.href), 2500);
   }
+
+  a.download = filename || 'arquivo';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
 
   // ===== SUBMISSÃO =====
   async function submitAll(){
