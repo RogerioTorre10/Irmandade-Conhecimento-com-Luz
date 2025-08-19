@@ -28,9 +28,15 @@
 
   function newSessionId(){ return 'S' + Math.random().toString(36).slice(2) + Date.now().toString(36); }
   function getSessionId(){
-    let s = localStorage.getItem(SESSION_KEY);
-    if (!s){ s = newSessionId(); localStorage.setItem(SESSION_KEY, s); }
-    return s;
+   try {
+     let s = localStorage.getItem(SESSION_KEY);
+     if (!s){ s = newSessionId(); localStorage.setItem(SESSION_KEY, s); }
+     return s;
+   } catch {
+     // fallback para navegação privada / quota
+     return 'S-' + Date.now().toString(36);
+   }
+
   }
   function storageKey(qid){ return `${KEY_PREFIX}${getSessionId()}:${qid}`; }
 
