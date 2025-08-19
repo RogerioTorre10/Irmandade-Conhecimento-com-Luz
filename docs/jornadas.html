@@ -1,20 +1,33 @@
 <!doctype html>
 <html lang="pt-br">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Jornada · Irmandade Conhecimento com Luz</title>
-<meta name="description" content="Jornada Conhecimento com Luz —
-Essencial.">
-<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="/styles.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jornada • Irmandade Conhecimento com Luz</title>
+  <meta name="description" content="Jornada pessoal simbólica — responda, revise e baixe seu PDF + HQ ao final.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body class="min-h-screen bg-slate-950 text-slate-100">
-<main id="app" class="max-w-4xl mx-auto px-4 py-8"></main>
-<footer class="max-w-4xl mx-auto px-4 py-10 text-sm text-slate-400">
-<a href="/" class="underline">Voltar ao início</a>
-</footer>
-<script src="/jornada.js"></script>
+
+<body class="min-h-screen text-slate-100">
+  <!-- Introdução em pergaminho vertical -->
+  <section class="perg-vert text-center mb-6">
+    <h1 class="text-3xl font-bold titulo-pergaminho">Jornada Conhecimento com Luz ✨</h1>
+    <p class="texto-pergaminho">
+      Bem-vindo(a)! Responda com calma. Ao final, você poderá baixar o <strong>PDF</strong> e a <strong>HQ</strong>.
+    </p>
+  </section>
+
+  <!-- App da jornada (telas renderizadas pelo jornada.js) -->
+  <main id="app" class="maxw px-4 py-6"></main>
+
+  <!-- Chama vibrante -->
+  <div class="chama">
+    <img src="assets/chama.svg" alt="Chama vibrante">
+  </div>
+
+  <!-- Lógica da Jornada -->
+  <script src="jornada.js" defer></script>
 </body>
 </html>
