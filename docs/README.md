@@ -1,27 +1,41 @@
-<div align="center" style="background: linear-gradient(135deg, #0a0433, #1a0b2e, #220044); padding: 40px; border-radius: 20px;">
+# Irmandade Conhecimento com Luz — Site Oficial 🌟
 
-  <h1 style="color: #FFD700; font-family: 'Papyrus', fantasy; font-size: 42px;">
-    📜 Irmandade Conhecimento com Luz 📜
-  </h1>
+Este é o repositório do site estático que hospeda a **Jornada Conhecimento com Luz**.  
+Baseado em **GitHub Pages + Backend Render**.
 
-  <div style="background: #fdf3e7; border: 3px solid #c19a6b; border-radius: 15px; padding: 30px; max-width: 700px; box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);">
-    <p style="color: #3b2f2f; font-size: 20px; font-family: 'Times New Roman', serif; text-align: justify; line-height: 1.6;">
-      ✨ Fé, ciência e propósito unidos como um só.  
-      Esta é a Jornada da <b>Irmandade Conhecimento com Luz</b>,  
-      onde tecnologia e espiritualidade caminham lado a lado.  
-      Cada chama representa a força interior, que jamais se apaga,  
-      mesmo diante da escuridão. 🔥  
-    </p>
-  </div>
+---
 
-  <br>
+## 📂 Estrutura de Arquivos
 
-  <div style="margin-top: 30px;">
-    <img src="https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif" alt="Chama vibrante" width="120" />
-  </div>
+/docs
+├── index.html → Página inicial (introdução, botão "Explorar Jornadas")
+├── intro.html → Tela inicial da jornada (vertical, aviso + senha)
+├── jornadas.html → Estrutura da jornada (intro + formulário)
+├── jornada.js → Lógica da jornada (intro → perguntas → revisão → PDF+HQ)
+├── style.css → Estilo global (inclui tema pergaminho + chama animada)
+├── assets/ → Ícones, imagens e a chama.svg
 
-  <p style="color: #bbb; font-size: 14px; margin-top: 20px;">
-    🌌 “Para além. E sempre!” – Irmandade Conhecimento com Luz
-  </p>
+---
 
-</div>
+## ⚙️ Backend
+
+- API: [`https://conhecimento-com-luz-api.onrender.com`](https://conhecimento-com-luz-api.onrender.com)  
+- Responsável por:
+  - Gerar **PDF** com as respostas + devolutiva simbólica.
+  - Gerar **HQ** final (33 quadros).
+- Os endpoints usados pelo `jornada.js`:
+  - `POST /gerar-pdf` → retorna PDF
+  - `POST /gerar-hq` → retorna PDF da HQ
+
+> ⚠️ Se o PDF ou HQ não baixarem por erro de **CORS**, edite o backend no Render e adicione o domínio do Pages (`https://<seu-usuario>.github.io`) na lista de **allowed origins**.
+
+---
+
+## ✏️ Onde Editar Conteúdo
+
+- **Perguntas da jornada** → no arquivo `jornada.js`, lista `QUESTIONS`.  
+  ```js
+  const QUESTIONS = [
+    { id: 'q1', label: 'Quem é você hoje?', type: 'text' },
+    { id: 'q2', label: 'Qual foi a maior superação da sua vida?', type: 'textarea' }
+  ];
