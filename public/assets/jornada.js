@@ -168,26 +168,45 @@
     qs('#sendBtn')?.setAttribute('disabled','true');
 
     try {
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-       cache: 'no-store',
-       body: JSON.stringify(payload)
-      });
-      if (!res.ok) throw new Error('Servidor respondeu com erro ' + res.status);
       const data = await res.json();
-      const pdfUrl = data?.pdf_url || data?.pdf || data?.links?.pdf;
-      const hqUrl  = data?.hq_url  || data?.hq  || data?.links?.hq;
 
-      if (!pdfUrl && !hqUrl){
-        throw new Error('Servidor não retornou links de download.');
-      }
+// detecta URL ou base64
+const pdfUrl = data?.pdf_url || data?.links?.pdf;
+const hqUrl  = data?.hq_url  || data?.links?.hq;
+const pdfB64 = data?.pdf_base64 || (typeof data?.pdf === 'string' && !/^https?:/i.test(data.pdf) ? data.pdf : null);
+const hqB64  = data?.hq_base64  || (typeof data?.hq  === 'string' && !/^https?:/i.test(data.hq)  ? data.hq  : null);
 
-      // Baixa sequencialmente mostrando status
-      if (pdfUrl){
-        setStatus('Baixando PDF…');
-        await downloadFile(pdfUrl, 'Jornada-Conhecimento-com-Luz.pdf');
-      }
+// helper p/ baixar base64
+const baixarBase64 = (b64, fname, mime) => {
+  const a = document.createElement('a');
+  a.href = `data:${mime};base64,${b64}`;
+  a.download = fname;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+};
+
+if (!pdfUrl && !hqUrl && !pdfB64 && !hqB64) {
+  throw new Error('Servidor não retornou links/arquivos para download.');
+}
+
+// Baixa sequencialmente mostrando status
+if (pdfUrl) {
+  setStatus('Baixando PDF…');
+  await downloadFile(pdfUrl, 'Jornada-Conhecimento-com-Luz.pdf');
+} else if (pdfB64) {
+  setStatus('Preparando PDF…');
+  baixarBase64(pdfB64, 'Jornada-Conhecimento-com-Luz.pdf', 'application/pdf');
+}
+
+if (hqUrl) {
+  setStatus('Baixando HQ…');
+  await downloadFile(hqUrl, 'Jornada-Conhecimento-com-Luz-HQ.png');
+} else if (hqB64) {
+  setStatus('Preparando HQ…');
+  baixarBase64(hqB64, 'Jornada-Conhecimento-com-Luz-HQ.png', 'image/png');
+}
+     
       if (hqUrl){
         setStatus('Baixando HQ…');
        await downloadFile(hqUrl, 'Jornada-Conhecimento-com-Luz-HQ.png');
