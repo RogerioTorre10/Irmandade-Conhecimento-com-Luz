@@ -10,6 +10,8 @@ body.home{
     radial-gradient(820px 420px at 85% -25%, rgba(168,85,247,.35), transparent 60%),
     linear-gradient(180deg, #0b1220 0%, #0a0f1f 100%);
   color:#e8eaff;
+  body { color: #e8eaff; }
+.small { color: #e6e9ff; }
 }
 .home .hero-card{
   background: rgba(15,23,42,.85);
@@ -66,6 +68,9 @@ body{ background: linear-gradient(135deg, #0a0433, #1a0b2e, #220044); min-height
   background-size: cover; background-repeat:no-repeat;
   border: 3px solid #c19a6b; border-radius:16px;
   padding:24px; color:#3b2f2f;
+#app .card, #app > section, .perg-vert, .perg-horiz {
+  color: #2b2620;
+}
 }
 
 /* ===== Inputs & botões dentro do pergaminho ===== */
@@ -82,6 +87,10 @@ button, .btn{
   padding:.65rem 1rem; cursor:pointer; transition:.2s ease;
 }
 button:hover, .btn:hover{ filter:brightness(1.07); transform: translateY(-1px); }
+button:focus-visible, .btn:focus-visible {
+  outline: 3px solid rgba(186, 230, 253, .55);
+  outline-offset: 2px;
+}
 
 /* ===== Barra de passos ===== */
 .stepbar{ display:flex; gap:8px; justify-content:center; margin:.25rem 0 1rem; }
