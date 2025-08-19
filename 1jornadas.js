@@ -1,10 +1,10 @@
  * Jornada v10 (baseline restaurado)
- * - Intro com senha + olho mágico
- * - Render dinâmico das perguntas (QUESTIONS)
- * - Salvamento local por sessão
- * - “Limpar respostas” realmente limpa TUDO
+ * - Intro com senha + olho mÃ¡gico
+ * - Render dinÃ¢mico das perguntas (QUESTIONS)
+ * - Salvamento local por sessÃ£o
+ * - â€œLimpar respostasâ€ realmente limpa TUDO
  * - Envio ao backend + download PDF & HQ com status
- * - Finalização: limpeza geral + retorno ao início
+ * - FinalizaÃ§Ã£o: limpeza geral + retorno ao inÃ­cio
  *******************/
 
 (function(){
@@ -17,13 +17,13 @@
  const ALLOWED_PASSWORDS =
   (typeof window !== 'undefined' && Array.isArray(window.JORNADA_ALLOWED_PASSWORDS) && window.JORNADA_ALLOWED_PASSWORDS.length)
     ? window.JORNADA_ALLOWED_PASSWORDS
-    : ['iniciar','luzEterna']; // padrão (testes)
+    : ['iniciar','luzEterna']; // padrÃ£o (testes)
 
   const qs = (sel) => document.querySelector(sel);
   const qsa = (sel) => Array.from(document.querySelectorAll(sel));
 
-  // ===== SESSÃO E STORAGE =====
-  const KEY_PREFIX = 'jcl:'; // tudo que for salvo começará com este prefixo
+  // ===== SESSÃƒO E STORAGE =====
+  const KEY_PREFIX = 'jcl:'; // tudo que for salvo comeÃ§arÃ¡ com este prefixo
   const SESSION_KEY = KEY_PREFIX + 'sessionId';
 
   function newSessionId(){ return 'S' + Math.random().toString(36).slice(2) + Date.now().toString(36); }
@@ -33,14 +33,14 @@
      if (!s){ s = newSessionId(); localStorage.setItem(SESSION_KEY, s); }
      return s;
    } catch {
-     // fallback para navegação privada / quota
+     // fallback para navegaÃ§Ã£o privada / quota
      return 'S-' + Date.now().toString(36);
    }
 
   }
   function storageKey(qid){ return `${KEY_PREFIX}${getSessionId()}:${qid}`; }
 
-  // Remove todas as chaves desta sessão E também metadados auxiliares
+  // Remove todas as chaves desta sessÃ£o E tambÃ©m metadados auxiliares
     function clearAllStorage(){
 -   const sid = getSessionId();
 +   const sid = getSessionId();
@@ -52,7 +52,7 @@
     }
 -   toRemove.forEach(k => localStorage.removeItem(k));
 +   toRemove.forEach(k => { try { localStorage.removeItem(k); } catch {} });
-    // recria nova sessão para começar do zero
+    // recria nova sessÃ£o para comeÃ§ar do zero
 -   localStorage.setItem(SESSION_KEY, newSessionId());
 +   try { localStorage.setItem(SESSION_KEY, newSessionId()); } catch {}
   }
@@ -97,7 +97,7 @@
     const err = document.createElement('div');
     err.className = 'err hidden';
     err.id = `err-${q.id}`;
-    err.textContent = 'Campo obrigatório';
+    err.textContent = 'Campo obrigatÃ³rio';
     wrap.appendChild(err);
 
     return wrap;
@@ -105,7 +105,7 @@
 
   function renderQuestions(){
    const holder = qs('#questionsContainer');
-    if (!holder) { console.warn('questionsContainer não encontrado'); return; }
+    if (!holder) { console.warn('questionsContainer nÃ£o encontrado'); return; }
     holder.innerHTML = '';
     if (!QUESTIONS || !QUESTIONS.length){
       holder.innerHTML = '<p class="text-slate-300">Sem perguntas carregadas. Verifique seu <code>questions.js</code>.</p>';
@@ -114,7 +114,7 @@
     QUESTIONS.forEach(q => holder.appendChild(createField(q)));
   }
 
-  // ===== VALIDAÇÃO / COLETA =====
+  // ===== VALIDAÃ‡ÃƒO / COLETA =====
   function validate(){
     let ok = true;
     (QUESTIONS||[]).forEach(q => {
@@ -144,7 +144,7 @@
  async function downloadFile(url, filename){
   const a = document.createElement('a');
 
-  // Se já for blob: ou data:, linkamos direto (não dá pra fazer fetch de blob:)
+  // Se jÃ¡ for blob: ou data:, linkamos direto (nÃ£o dÃ¡ pra fazer fetch de blob:)
   if (/^(blob:|data:)/i.test(url)) {
     a.href = url;
   } else {
@@ -162,10 +162,10 @@
   a.remove();
 }
 
-  // ===== SUBMISSÃO =====
+  // ===== SUBMISSÃƒO =====
   async function submitAll(){
     if (!validate()){
-      setStatus('Preencha os campos obrigatórios marcados com *');
+      setStatus('Preencha os campos obrigatÃ³rios marcados com *');
      const firstErr = document.querySelector('.err:not(.hidden)');
 if (firstErr) { const id = firstErr.id.replace(/^err-/, ''); const el = document.getElementById(id); el?.focus(); el?.scrollIntoView({behavior:'smooth', block:'center'}); }
 return;
@@ -179,20 +179,20 @@ return;
       }
     };
 
-    const endpoint = `${API_BASE.replace(/\/$/,'')}/${ENDPOINT_PATH.replace(/^\//,'')}`; // garante 1 única barra
-    setStatus('Enviando… gerando seus arquivos (pode levar alguns segundos)…');
+    const endpoint = `${API_BASE.replace(/\/$/,'')}/${ENDPOINT_PATH.replace(/^\//,'')}`; // garante 1 Ãºnica barra
+    setStatus('Enviandoâ€¦ gerando seus arquivos (pode levar alguns segundos)â€¦');
     qs('#sendBtn')?.setAttribute('disabled','true');
 
     try {
      const ct = (res.headers.get('content-type') || '').toLowerCase();
 if (res.ok && ct.includes('application/pdf')) {
-  setStatus('Baixando PDF…');
+  setStatus('Baixando PDFâ€¦');
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   await downloadFile(url, 'Jornada-Conhecimento-com-Luz.pdf');
   URL.revokeObjectURL(url);
-  setStatus('PDF recebido. Preparando HQ…');
-  // segue para a HQ normalmente (o bloco de JSON abaixo será pulado via return)
+  setStatus('PDF recebido. Preparando HQâ€¦');
+  // segue para a HQ normalmente (o bloco de JSON abaixo serÃ¡ pulado via return)
   return;
 }
      
@@ -215,39 +215,39 @@ const baixarBase64 = (b64, fname, mime) => {
 };
 
 if (!pdfUrl && !hqUrl && !pdfB64 && !hqB64) {
-  throw new Error('Servidor não retornou links/arquivos para download.');
+  throw new Error('Servidor nÃ£o retornou links/arquivos para download.');
 }
 
 // Baixa sequencialmente mostrando status
 if (pdfUrl) {
-  setStatus('Baixando PDF…');
+  setStatus('Baixando PDFâ€¦');
   await downloadFile(pdfUrl, 'Jornada-Conhecimento-com-Luz.pdf');
 } else if (pdfB64) {
-  setStatus('Preparando PDF…');
+  setStatus('Preparando PDFâ€¦');
   baixarBase64(pdfB64, 'Jornada-Conhecimento-com-Luz.pdf', 'application/pdf');
 }
 
 if (hqUrl) {
-  setStatus('Baixando HQ…');
+  setStatus('Baixando HQâ€¦');
   await downloadFile(hqUrl, 'Jornada-Conhecimento-com-Luz-HQ.png');
 } else if (hqB64) {
-  setStatus('Preparando HQ…');
+  setStatus('Preparando HQâ€¦');
   baixarBase64(hqB64, 'Jornada-Conhecimento-com-Luz-HQ.png', 'image/png');
 }
      
       if (hqUrl){
-        setStatus('Baixando HQ…');
+        setStatus('Baixando HQâ€¦');
        await downloadFile(hqUrl, 'Jornada-Conhecimento-com-Luz-HQ.png');
       }
 
-      setStatus('PDF e HQ finalizados. Limpando dados…');
+      setStatus('PDF e HQ finalizados. Limpando dadosâ€¦');
       clearAllStorage();
      try { sessionStorage.removeItem('journey-started'); sessionStorage.removeItem('veio_da_intro'); } catch {}
 
       // Mostra tela final bem simples
       hide(qs('#questions-screen'));
       show(qs('#final-screen'));
-      setStatus('Finalizado! Voltando ao início…');
+      setStatus('Finalizado! Voltando ao inÃ­cioâ€¦');
       setTimeout(() => {
         // Redireciona para a principal
         location.href = '/index.html';
@@ -255,14 +255,14 @@ if (hqUrl) {
 
     } catch (err){
       console.error(err);
-      setStatus('Falha ao gerar/baixar. Verifique sua conexão ou espaço no dispositivo e tente novamente.');
+      setStatus('Falha ao gerar/baixar. Verifique sua conexÃ£o ou espaÃ§o no dispositivo e tente novamente.');
       qs('#sendBtn')?.removeAttribute('disabled');
     }
   }
 
-  // ===== INICIALIZAÇÃO =====
+  // ===== INICIALIZAÃ‡ÃƒO =====
   function attachEvents(){
-    // Olho mágico
+    // Olho mÃ¡gico
     qs('#toggleSenha')?.addEventListener('click', () => {
       const f = qs('#senha'); if (!f) return;
       f.type = (f.type === 'password') ? 'text' : 'password';
@@ -275,7 +275,7 @@ if (hqUrl) {
     qs('#startBtn')?.addEventListener('click', () => {
       const pwd = (qs('#senha')?.value || '').trim();
       if (!ALLOWED_PASSWORDS.includes(pwd)){
-        qs('#introMsg').textContent = 'Senha inválida. Verifique e tente novamente.';
+        qs('#introMsg').textContent = 'Senha invÃ¡lida. Verifique e tente novamente.';
         return;
        try { sessionStorage.setItem('journey-started','1'); sessionStorage.setItem('veio_da_intro','1'); } catch {}
       }
@@ -283,7 +283,7 @@ if (hqUrl) {
       // Libera perguntas
       hide(qs('#intro-screen'));
       show(qs('#questions-screen'));
-      setStatus('Respondendo…');
+      setStatus('Respondendoâ€¦');
       renderQuestions();
     });
 
@@ -291,7 +291,7 @@ if (hqUrl) {
     qs('#reviewBtnTop')?.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
     qs('#reviewBtnFinal')?.addEventListener('click', () => {
       hide(qs('#final-screen')); show(qs('#questions-screen'));
-      setStatus('Revendo respostas…');
+      setStatus('Revendo respostasâ€¦');
     });
 
     // Limpar tudo
@@ -322,7 +322,7 @@ if (hqUrl) {
     show(qs('#questions-screen'));
     hide(qs('#final-screen'));
     renderQuestions();
-    setStatus('Respondendo…');
+    setStatus('Respondendoâ€¦');
   } else {
     show(qs('#intro-screen'));
     hide(qs('#questions-screen'));
