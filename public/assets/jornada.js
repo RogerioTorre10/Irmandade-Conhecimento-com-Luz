@@ -220,6 +220,9 @@
       const f = qs('#senha'); if (!f) return;
       f.type = (f.type === 'password') ? 'text' : 'password';
     });
+   qs('#senha')?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); qs('#startBtn')?.click(); }
+});
 
     // Start
     qs('#startBtn')?.addEventListener('click', () => {
@@ -227,7 +230,9 @@
       if (!ALLOWED_PASSWORDS.includes(pwd)){
         qs('#introMsg').textContent = 'Senha inválida. Verifique e tente novamente.';
         return;
+       try { sessionStorage.setItem('journey-started','1'); sessionStorage.setItem('veio_da_intro','1'); } catch {}
       }
+     
       // Libera perguntas
       hide(qs('#intro-screen'));
       show(qs('#questions-screen'));
