@@ -82,8 +82,8 @@
     if (saved) input.value = saved;
 
     input.addEventListener('input', () => {
-      localStorage.setItem(storageKey(q.id), input.value.trim());
-    });
+    try { localStorage.setItem(storageKey(q.id), input.value.trim()); } catch {}
+  });
 
     wrap.appendChild(label);
     wrap.appendChild(input);
