@@ -168,8 +168,20 @@
     qs('#sendBtn')?.setAttribute('disabled','true');
 
     try {
-      const data = await res.json();
-
+     const ct = (res.headers.get('content-type') || '').toLowerCase();
+if (res.ok && ct.includes('application/pdf')) {
+  setStatus('Baixando PDF…');
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  await downloadFile(url, 'Jornada-Conhecimento-com-Luz.pdf');
+  URL.revokeObjectURL(url);
+  setStatus('PDF recebido. Preparando HQ…');
+  // segue para a HQ normalmente (o bloco de JSON abaixo será pulado via return)
+  return;
+}
+     
+ const data = await res.json();
+     
 // detecta URL ou base64
 const pdfUrl = data?.pdf_url || data?.links?.pdf;
 const hqUrl  = data?.hq_url  || data?.links?.hq;
