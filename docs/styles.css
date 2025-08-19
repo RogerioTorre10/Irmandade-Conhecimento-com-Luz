@@ -98,6 +98,22 @@ body {
   border: 3px solid #c19a6b;            /* borda pergaminho */
   box-shadow: 0 10px 30px rgba(0,0,0,.45), 0 0 30px rgba(111,66,193,.25);
 }
+/* Fundo tipo pergaminho vertical */
+.perg-vert {
+  background: url("assets/perg-vert.png") no-repeat center top;
+  background-size: cover;
+  padding: 2rem;
+  border-radius: 16px;
+}
+
+/* Fundo tipo pergaminho horizontal */
+.perg-horiz {
+  background: url("assets/perg-horiz.png") no-repeat center center;
+  background-size: cover;
+  padding: 2rem;
+  border-radius: 16px;
+}
+
 
 /* Título dourado estilizado */
 .titulo-pergaminho {
