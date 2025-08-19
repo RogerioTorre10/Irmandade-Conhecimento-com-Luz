@@ -1,64 +1,45 @@
-/* styles.css — tema unificado (futurista na home + pergaminho nas jornadas) */
+/* styles.css — tema unificado (home futurista + jornada em pergaminho) */
 
-/* ===== Base ===== */
-html, body {
-  margin: 0;
-  padding: 0;
-}
+/* ===== Reset básico ===== */
+html, body { margin:0; padding:0; }
 
-/* ---- Home futurista (apenas quando o <body> tiver class="home") ---- */
+/* ===== Home futurista (apenas quando o <body> tiver class="home") ===== */
 body.home{
-  /* glows roxo/azul + fundo escuro */
   background:
     radial-gradient(600px 320px at 20% -10%, rgba(99,102,241,.40), transparent 60%),
     radial-gradient(820px 420px at 85% -25%, rgba(168,85,247,.35), transparent 60%),
     linear-gradient(180deg, #0b1220 0%, #0a0f1f 100%);
   color:#e8eaff;
 }
-
-/* cartão de destaque da home */
 .home .hero-card{
-  background: rgba(15,23,42,.85);                /* slate-900 com blur */
+  background: rgba(15,23,42,.85);
   border: 1px solid rgba(255,255,255,.08);
   backdrop-filter: blur(6px);
-  box-shadow:
-    0 20px 50px rgba(0,0,0,.55),
-    inset 0 0 0 1px rgba(255,255,255,.04);
+  box-shadow: 0 20px 50px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.04);
   border-radius: 18px;
 }
-
-/* botão principal da home */
 .home .btn-primary{
-  background:#5b5bd6;            /* roxo/azul */
+  background:#5b5bd6;
   color:#fff;
   padding:12px 18px;
   border-radius:14px;
   font-weight:600;
   transition:transform .2s ease, filter .2s ease;
-  text-decoration: none;
-  display:inline-flex;
-  align-items:center;
-  gap:.5rem;
+  text-decoration:none;
+  display:inline-flex; align-items:center; gap:.5rem;
 }
-.home .btn-primary:hover{
-  transform: translateY(-1px);
-  filter: brightness(1.08);
-}
+.home .btn-primary:hover{ transform: translateY(-1px); filter: brightness(1.08); }
 
-/* ===== Tema cósmico padrão (para demais páginas) ===== */
-body{
-  background: linear-gradient(135deg, #0a0433, #1a0b2e, #220044);
-  min-height: 100vh;
-}
+/* ===== Tema padrão (outras páginas) ===== */
+body{ background: linear-gradient(135deg, #0a0433, #1a0b2e, #220044); min-height:100vh; }
 
-/* ===== Tipografia de títulos/cores douradas ===== */
-.titulo-pergaminho { color: #FFD700; font-weight: 700; letter-spacing:.4px; }
-.texto-pergaminho  { color: #3b2f2f; line-height: 1.65; }
+/* ===== Tipografia util ===== */
+.titulo-pergaminho { color:#FFD700; font-weight:700; letter-spacing:.4px; }
+.texto-pergaminho  { color:#3b2f2f; line-height:1.65; }
+.small { font-size:.875rem; opacity:.9; }
 
 /* ===== Pergaminhos ===== */
-
-/* Pergaminho vertical: instruções/regras/introduções */
-.perg-vert {
+.perg-vert{
   background: url("assets/perg-vert.png") no-repeat center center;
   background-size: cover;
   padding: 2rem;
@@ -66,12 +47,9 @@ body{
   border: 3px solid #c19a6b;
   box-shadow: 0 10px 30px rgba(0,0,0,.35);
   color: #3b2f2f;
-  max-width: 980px;
-  margin: 24px auto;
+  max-width: 980px; margin:24px auto;
 }
-
-/* Pergaminho horizontal: blocos de perguntas e revisões */
-.perg-horiz {
+.perg-horiz{
   background: url("assets/perg-horiz.png") no-repeat center center;
   background-size: cover;
   padding: 2rem;
@@ -79,61 +57,45 @@ body{
   border: 3px solid #c19a6b;
   box-shadow: 0 10px 30px rgba(0,0,0,.35);
   color: #3b2f2f;
-  max-width: 980px;
-  margin: 16px auto;
+  max-width: 980px; margin:16px auto;
 }
 
-/* Aplicar “pele” de pergaminho horizontal aos blocos gerados pelo JS */
+/* “Veste” automática de pergaminho nos blocos gerados pelo JS */
 #app > section, #app .card{
   background-image: url("assets/perg-horiz.png");
-  background-size: cover;
-  background-repeat: no-repeat;
-  border: 3px solid #c19a6b;
-  border-radius: 16px;
-  padding: 24px;
-  color: #3b2f2f;
+  background-size: cover; background-repeat:no-repeat;
+  border: 3px solid #c19a6b; border-radius:16px;
+  padding:24px; color:#3b2f2f;
 }
 
-/* ===== Inputs e botões dentro do pergaminho ===== */
-input[type="text"], input[type="email"], textarea{
+/* ===== Inputs & botões dentro do pergaminho ===== */
+input[type="text"], input[type="password"], input[type="email"], textarea{
   background: rgba(255,255,255,.88);
-  border: 1px solid #d8c2a1;
-  color: #2b2620;
-  border-radius: 10px;
-  padding: .65rem .8rem;
-  width: 100%;
-  box-sizing: border-box;
+  border: 1px solid #d8c2a1; color:#2b2620;
+  border-radius:10px; padding:.65rem .8rem; width:100%; box-sizing:border-box;
 }
 input:focus, textarea:focus{
-  outline: none;
-  border-color: #b9905a;
-  box-shadow: 0 0 0 3px rgba(201,159,101,.22);
+  outline:none; border-color:#b9905a; box-shadow:0 0 0 3px rgba(201,159,101,.22);
 }
 button, .btn{
-  background: #8b5cf6;
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  padding: .65rem 1rem;
-  cursor: pointer;
+  background:#8b5cf6; color:#fff; border:none; border-radius:12px;
+  padding:.65rem 1rem; cursor:pointer; transition:.2s ease;
 }
-button:hover, .btn:hover{
-  filter: brightness(1.07);
-  transform: translateY(-1px);
-  transition: .2s ease;
-}
+button:hover, .btn:hover{ filter:brightness(1.07); transform: translateY(-1px); }
 
-/* ===== Chama vibrante (usa imagem local ou svg) ===== */
-.chama { display:flex; justify-content:center; margin:12px 0; }
+/* ===== Barra de passos ===== */
+.stepbar{ display:flex; gap:8px; justify-content:center; margin:.25rem 0 1rem; }
+.stepdot{ width:10px; height:10px; border-radius:999px; background:#c9a574; opacity:.35; }
+.stepdot.active{ opacity:1; box-shadow:0 0 0 3px rgba(201,154,107,.25); }
+
+/* ===== Chama vibrante (SVG local) ===== */
+.chama{ display:flex; justify-content:center; margin:12px 0; }
 .chama img, .chama svg{
   width:72px; height:72px;
   animation: chama-pulso 1.6s ease-in-out infinite;
   filter: drop-shadow(0 0 12px rgba(255,189,57,.8));
 }
-@keyframes chama-pulso{
-  0%,100%{ transform: translateY(0) scale(1); }
-  50%    { transform: translateY(-2px) scale(1.03); }
-}
+@keyframes chama-pulso{ 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-2px) scale(1.03)} }
 
-/* utilitário de largura confortável */
-.maxw { max-width: 980px; margin-inline: auto; }
+/* ===== Helpers ===== */
+.maxw{ max-width:980px; margin-inline:auto; }
