@@ -68,28 +68,33 @@ async function baixarTudo(){
 
     const payload = { answers: state.answers, meta: { version: state.version } };
 
-    // PDF
-    const pdfResp = await fetch(`${CONFIG.API_BASE}/gerar-pdf`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/pdf' },
-      body: JSON.stringify(payload)
-    });
-    if(!pdfResp.ok) throw new Error('Falha ao gerar PDF');
-    await baixarComoArquivo(await pdfResp.blob(), 'jornada.pdf');
+    // helper para fetch + validação
+    const baixa = async (url, nome) => {
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/pdf' },
+        body: JSON.stringify(payload)
+      });
+      if(!r.ok){
+        const t = await r.text().catch(()=> '');
+        throw new Error(`Falha em ${url} [${r.status}] ${t?.slice(0,200)}`);
+      }
+      const blob = await r.blob();
+      if(blob.type !== 'application/pdf'){
+        throw new Error(`Tipo inesperado de retorno em ${url}: ${blob.type}`);
+      }
+      baixarComoArquivo(blob, nome);
+    };
 
-    // HQ (hoje retorna PDF placeholder no backend)
-    const hqResp = await fetch(`${CONFIG.API_BASE}/gerar-hq`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/pdf' },
-      body: JSON.stringify(payload)
-    });
-    if(!hqResp.ok) throw new Error('Falha ao gerar HQ');
-    await baixarComoArquivo(await hqResp.blob(), 'jornada-hq.pdf');
+    await baixa(`${CONFIG.API_BASE}/gerar-pdf`, 'jornada.pdf');
+    await baixa(`${CONFIG.API_BASE}/gerar-hq`,  'jornada-hq.pdf');
 
     if(statusEl){ statusEl.textContent = 'Arquivos gerados com sucesso. 🙏'; }
   }catch(err){
     console.error(err);
-    if(statusEl){ statusEl.textContent = 'Não foi possível gerar os arquivos. Tente novamente.'; }
+    if(statusEl){
+      statusEl.textContent = 'Não foi possível gerar os arquivos. Tente novamente em alguns instantes.';
+    }
   }finally{
     if(btn){ btn.disabled = false; btn.textContent = 'Baixar PDF + HQ'; }
   }
@@ -178,6 +183,7 @@ function renderFormStep(){
 function renderReview(){
   loadLocal();
   const f = (k) => state.answers[k] || '';
+    // ...
   app.innerHTML = `
     <section class="pergaminho review-card">
       <h2 class="titulo-perg">Revise suas respostas</h2>
@@ -195,20 +201,16 @@ function renderReview(){
 
       <div class="actions" style="justify-content:flex-start">
         <button id="btnBack" class="btn">Voltar</button>
-        <button id="btnDownload" class="btn btn-primary">Baixar PDF + HQ</button>
-        <button id="btnFinish" class="btn">Finalizar</button>
+        <button id="btnFinish" class="btn btn-primary">Finalizar</button>
       </div>
     </section>
   `;
-
-  // mantém edição final
+  // mantém edição
   $('#r1').addEventListener('input', e=>{ state.answers['q1']=e.target.value; saveLocal(); });
   $('#r2').addEventListener('input', e=>{ state.answers['q2']=e.target.value; saveLocal(); });
   $('#r3').addEventListener('input', e=>{ state.answers['q3']=e.target.value; saveLocal(); });
 
-  // listeners
   $('#btnBack').addEventListener('click', ()=>{ state.step='form'; render(); });
-  $('#btnDownload').addEventListener('click', baixarTudo);
   $('#btnFinish').addEventListener('click', ()=>{ state.step='done'; render(); });
 }
 
@@ -219,7 +221,7 @@ function renderDone(){
       <p>Se quiser, você pode baixar agora seus arquivos ou voltar ao início.</p>
       <p id="status" class="muted small"></p>
       <div class="actions" style="justify-content:center">
-        <button id="btnDownload" class="btn">Baixar PDF + HQ</button>
+        <button id="btnDownload" class="btn btn-primary">Baixar PDF + HQ</button>
         <a class="btn" href="./">Voltar ao início</a>
       </div>
     </section>
