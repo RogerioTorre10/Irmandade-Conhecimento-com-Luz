@@ -1,64 +1,39 @@
 <!doctype html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Jornada • Irmandade Conhecimento com Luz</title>
-  <meta name="description" content="Jornada pessoal simbólica — responda, revise e baixe seu PDF + HQ ao final.">
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jornada Conhecimento com Luz</title>
+  <meta name="description" content="Responda com calma. No final, baixe o PDF e a HQ." />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
+<body>
+  <main class="container">
+    <!-- Header -->
+    <header class="card text-center">
+      <h1>Jornada Conhecimento com Luz <span class="spark">✨</span></h1>
+      <p class="muted">
+        Bem-vindo(a)! Responda com calma. Ao final, você poderá baixar o <strong>PDF</strong> e a <strong>HQ</strong>.
+      </p>
+    </header>
 
-<body class="min-h-screen text-slate-100">
-  <!-- Intro em pergaminho vertical -->
-  <section class="perg-vert text-center mb-6">
-    <h1 class="text-3xl font-bold titulo-pergaminho">Jornada Conhecimento com Luz ✨</h1>
-    <p class="texto-pergaminho">
-      Bem-vindo(a)! Responda com calma. Ao final, você poderá baixar o <strong>PDF</strong> e a <strong>HQ</strong>.
-    </p>
-  </section>
+    <!-- App -->
+    <section id="app" class="card space-y"></section>
 
-  <!-- App: telas geradas pelo JS -->
-  <main id="app" class="maxw px-4 py-6"></main>
+    <!-- chama decorativa -->
+    <div class="chama-wrap">
+      <div class="chama"></div>
+    </div>
 
-  <!-- Chama -->
-  <div class="chama" aria-hidden="true">
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="72" height="72">
-    <defs>
-      <radialGradient id="g" cx="32" cy="40" r="24">
-        <stop offset="0" stop-color="#ffd057"/>
-        <stop offset=".6" stop-color="#ff8a00"/>
-        <stop offset="1" stop-color="rgba(0,0,0,0)"/>
-      </radialGradient>
-      <linearGradient id="flame" x1="0" x2="0" y1="0" y2="1">
-        <stop offset="0" stop-color="#fff3a3"/>
-        <stop offset="1" stop-color="#ff8c2a"/>
-      </linearGradient>
-      <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="1.5"/>
-      </filter>
-    </defs>
-    <ellipse cx="32" cy="46" rx="12" ry="4" fill="url(#g)" opacity=".7">
-      <animate attributeName="opacity" values=".55;.8;.55" dur="1.6s" repeatCount="indefinite"/>
-    </ellipse>
-    <g transform="translate(0,2)">
-      <path d="M32 10 C38 18, 42 24, 36 30 C33 33, 31 36, 32 41 C28 38, 26 34, 28 30 C24 27, 25 21, 32 10 Z"
-            fill="url(#flame)">
-        <animate attributeName="d" dur="1.6s" repeatCount="indefinite"
-          values="M32 10 C38 18, 42 24, 36 30 C33 33, 31 36, 32 41 C28 38, 26 34, 28 30 C24 27, 25 21, 32 10 Z;
-                  M32 10 C36 18, 43 23, 35 30 C33 32, 30 36, 32 41 C28 39, 26 34, 29 30 C24 27, 26 21, 32 10 Z;
-                  M32 10 C38 18, 42 24, 36 30 C33 33, 31 36, 32 41 C28 38, 26 34, 28 30 C24 27, 25 21, 32 10 Z"/>
-      </path>
-      <path d="M32 20 C34 24, 35 27, 33 30 C32 31.5, 31 33, 32 36 C29.5 34, 29 31.5, 30 30 C28 28, 29 24, 32 20 Z"
-            fill="#fff3be" filter="url(#blur)" opacity=".9">
-        <animate attributeName="opacity" values=".7;1;.7" dur="1.6s" repeatCount="indefinite"/>
-      </path>
-    </g>
-  </svg>
-</div>
-
+    <footer class="foot small">
+      © <span id="year"></span> Irmandade Conhecimento com Luz. Para além. E sempre.
+    </footer>
+  </main>
 
   <script src="jornada.js" defer></script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
