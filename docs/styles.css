@@ -133,3 +133,27 @@ input::placeholder, textarea::placeholder {
   padding: 18px;
 }
 
+/* Tamanho e posição da chama grande da home */
+.hero-flame {
+  position: absolute;
+  left: 50%;
+  bottom: -30px;              /* ajusta a altura conforme o layout */
+  transform: translateX(-50%);
+  width: 140px;               /* aumenta/diminui conforme quiser */
+  height: 140px;
+  opacity: .9;
+  pointer-events: none;
+  filter: drop-shadow(0 10px 30px rgba(255,140,42,.25));
+}
+
+@media (min-width: 768px) {
+  .hero-flame { width: 180px; height: 180px; bottom: -36px; }
+}
+/* Chama principal maior */
+.chama-principal {
+  width: 120px;
+  height: 120px;
+  animation: chama-pulso 2s infinite;
+  margin: 0 auto;
+}
+
