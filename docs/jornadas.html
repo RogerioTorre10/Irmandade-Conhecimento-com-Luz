@@ -3,37 +3,21 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Jornada Conhecimento com Luz</title>
-  <meta name="description" content="Responda com calma. No final, baixe o PDF e a HQ." />
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="styles.css" />
+  <title>Jornada • Irmandade Conhecimento com Luz</title>
+  <meta name="description" content="Responda com calma. Ao final, baixe seu PDF e a HQ." />
+  <link rel="icon" href="assets/favicon.svg" />
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main class="container">
-    <!-- Header -->
     <header class="card text-center">
-      <h1>Jornada Conhecimento com Luz <span class="spark">✨</span></h1>
-      <p class="muted">
-        Bem-vindo(a)! Responda com calma. Ao final, você poderá baixar o <strong>PDF</strong> e a <strong>HQ</strong>.
-      </p>
+      <h1>Jornada Conhecimento com Luz ✨</h1>
+      <p class="muted">Bem-vindo(a)! Responda com calma. Ao final, você poderá baixar o <strong>PDF</strong> e a <strong>HQ</strong>.</p>
     </header>
 
-    <!-- App -->
-    <section id="app" class="card space-y"></section>
-
-    <!-- chama decorativa -->
-    <div class="chama-wrap">
-      <div class="chama"></div>
-    </div>
-
-    <footer class="foot small">
-      © <span id="year"></span> Irmandade Conhecimento com Luz. Para além. E sempre.
-    </footer>
+    <div id="app"></div>
   </main>
 
   <script src="jornada.js" defer></script>
-  <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
 </body>
 </html>
