@@ -1,26 +1,29 @@
-/* ===== Chama (vitrine) ===== */
+/* ===== Chama (vitrine) – única e no rodapé ===== */
+
 .chama-wrapper{
-  position:absolute; inset:auto 0 0 0; height:0;
+  position:absolute; left:0; right:0; bottom:0; height:0;
   pointer-events:none; z-index:0;
 }
 
-/* sempre ancorada NO RODAPÉ do card */
+/* Se por engano houver mais de um bloco .chama-wrapper no card,
+   mostramos apenas o ÚLTIMO (evita chama dupla). */
+.card > .chama-wrapper:not(:last-of-type){ display:none !important; }
+
 .chama{
   position:absolute;
-  bottom:-36px;                /* ↓ empurra para baixo para não ficar atrás do botão */
+  bottom:-40px;                 /* empurra para baixo para não encostar nos botões */
   --scale:1; --y:0px; --rot:0deg;
 }
 
-/* Grande — formato “gota” com ponta mais fina */
+/* Grande — ponta mais fina e formato estável */
 .chama-grande{
   left:50%;
   width:76px; height:118px;
   transform: translateX(-50%) translateY(var(--y)) scale(var(--scale)) rotate(var(--rot));
 
-  /* ponta mais fina usando clip-path elíptico deslocado */
-  clip-path: ellipse(30% 120% at 50% 125%);
+  /* ponta mais fina; ajuste o primeiro número (40%) para afinar/engrossar */
+  clip-path: ellipse(40% 66% at 50% 62%);
 
-  /* núcleo suave + corpo */
   background:
     radial-gradient(58% 70% at 50% 34%, rgba(255,255,255,.92) 0 16%, rgba(255,255,255,.52) 16% 32%, rgba(255,255,255,0) 33%),
     radial-gradient(70% 88% at 50% 66%, #ffd27a 0 42%, #ff9b4e 42% 74%, rgba(255,155,78,0) 75%);
@@ -31,17 +34,13 @@
   filter: saturate(1.22) brightness(1.05);
 }
 
-/* brilho externo (não deforma a forma) */
 .chama-grande::after{
   content:""; position:absolute; inset:-22% -26% -16% -26%; border-radius:inherit;
   background: radial-gradient(closest-side, rgba(255,171,64,.50), rgba(255,140,61,0) 70%);
   filter: blur(18px); opacity:.82; animation: glow 2.4s ease-in-out infinite;
 }
 
-/* pequena fica oculta no modo central (usamos só a inferior) */
-.chama-pequena{ display:none }
+/* Usaremos só a chama grande (inferior) */
+.chama-pequena{ display:none !important; }
 
 @keyframes glow { 0%{opacity:.72} 50%{opacity:.9} 100%{opacity:.7} }
-
-/* utilidade caso use .chama-center no HTML */
-.chama-center .chama-grande{ left:50% }
