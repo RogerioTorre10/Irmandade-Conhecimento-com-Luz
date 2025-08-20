@@ -7,7 +7,6 @@
   <meta name="description" content="Jornada essencial: perguntas profundas, devolutiva simbólica e PDF/HQ finais.">
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- CSS (estrutura atual: docs/css/) -->
   <link rel="stylesheet" href="css/styles-core.css">
   <link rel="stylesheet" href="css/styles-pergaminho.css">
   <link rel="stylesheet" href="css/styles-chama.css">
@@ -16,7 +15,7 @@
 <body class="bg-grad text-surface-100">
   <main class="container mx-auto px-4 py-8 max-w-4xl">
 
-    <!-- Seção: Introdução + Termo -->
+    <!-- INTRO + TERMO -->
     <section id="sec-intro" class="card mb-8">
       <div class="card-body pergaminho">
         <h1 class="text-2xl md:text-3xl font-extrabold mb-4">Jornada Conhecimento com Luz – Essencial 📘</h1>
@@ -41,20 +40,19 @@
           <span>Li e concordo com as orientações e o termo acima.</span>
         </label>
 
-        <div class="mt-6 flex gap-3">
+        <div class="mt-6">
           <button id="btnIniciar" class="btn-primary" disabled>Iniciar Jornada</button>
-          <button id="btnLimparTudoIntro" class="btn-secondary">Limpar respostas salvas</button>
         </div>
       </div>
 
-      <!-- Chamas decorativas -->
-      <div class="chama-wrapper">
+      <!-- Chama central apenas na intro -->
+      <div class="chama-wrapper chama-center">
         <div class="chama chama-grande" aria-hidden="true"></div>
         <div class="chama chama-pequena" aria-hidden="true"></div>
       </div>
     </section>
 
-    <!-- Seção: Wizard de Perguntas -->
+    <!-- WIZARD -->
     <section id="sec-wizard" class="card mb-8 hidden">
       <div class="card-body pergaminho">
         <header class="mb-6">
@@ -70,14 +68,14 @@
         <div class="mt-6 flex items-center justify-between gap-3">
           <button id="btnLimparAtual" class="btn-secondary">Limpar</button>
           <div class="flex gap-3">
-            <button id="btnVoltar" class="btn-tertiary">Voltar</button>
+            <button id="btnVoltar" class="btn-tertiary" disabled>Voltar</button>
             <button id="btnProxima" class="btn-primary">Próxima</button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Seção: Finalização -->
+    <!-- FINAL -->
     <section id="sec-final" class="card mb-8 hidden">
       <div class="card-body pergaminho text-center">
         <h2 class="text-2xl md:text-3xl font-extrabold mb-2">Parabéns! Você finalizou a jornada 🎉</h2>
@@ -93,7 +91,7 @@
     <footer class="text-center opacity-60 text-sm mt-10">Para além. E sempre.</footer>
   </main>
 
-  <!-- Scripts (estrutura atual: docs/js/) -->
+  <!-- SCRIPTS -->
   <script src="js/config.js"></script>
   <script src="js/state.js"></script>
   <script src="js/questions.js"></script>
@@ -101,8 +99,6 @@
   <script src="js/chama.js"></script>
   <script src="js/api.js"></script>
   <script src="js/main.js"></script>
-
-  <!-- Antigo (desative para evitar conflito) -->
   <!-- <script src="jornada.js"></script> -->
 </body>
 </html>
