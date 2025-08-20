@@ -3,49 +3,42 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Irmandade Conhecimento com Luz</title>
-  <meta name="description" content="Fé, ciência e filosofia em unidade. Uma jornada de autoconhecimento, vocação e amor." />
-  <link rel="icon" href="assets/favicon.svg" />
-  <link rel="stylesheet" href="styles.css">
+  <title>Início · Irmandade Conhecimento com Luz</title>
+  <meta name="description" content="Irmandade Conhecimento com Luz — fé, ciência, filosofia e tecnologia unidas para despertar e guiar." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/styles-core.css" />
 </head>
-<body class="home">
-  <main class="container">
-    <section class="card hero">
-      <h1 class="display">Irmandade Conhecimento com Luz</h1>
-      <p class="lead">
-        Fé, ciência e filosofia em unidade. Uma jornada de autoconhecimento, vocação e amor.
-        Explore, responda e receba a sua chama em forma de <strong>livro vivo</strong>.
-      </p>
+<body class="bg-grad text-surface-100">
+  <main class="container mx-auto px-4 py-12 max-w-4xl">
+    <header class="text-center mb-12">
+      <h1 class="text-3xl md:text-4xl font-extrabold">Irmandade Conhecimento com Luz</h1>
+      <p class="opacity-80 mt-2">Bem-vindo(a)! Clique abaixo para iniciar sua jornada essencial.</p>
+    </header>
 
-      <div class="actions">
-        <a class="btn btn-primary" href="jornadas.html">Explorar Jornadas</a>
-      </div>
-
-     <!-- Chama grande centralizada e animada -->
-        <div class="hero-flame-wrap" aria-hidden="true">
-          <div class="chama chama-big"></div>
-            </div>
-
-            <radialGradient id="g1" cx="50%" cy="35%" r="60%">
-              <stop offset="0%" stop-color="#fff6bf"/>
-              <stop offset="55%" stop-color="#ffb152"/>
-              <stop offset="100%" stop-color="#ff7a00"/>
-            </radialGradient>
-          </defs>
-          <path d="M60 10
-                   C 75 35, 95 55, 95 85
-                   C 95 115, 75 140, 60 148
-                   C 45 140, 25 115, 25 85
-                   C 25 55, 45 35, 60 10 Z"
-                fill="url(#g1)" />
-          <ellipse cx="60" cy="120" rx="32" ry="18" fill="url(#g1)" opacity=".12"/>
-        </svg>
-      </div>
-    </section>
-
-    <footer class="muted small center">
-      © 2025 Irmandade Conhecimento com Luz. Para além. E sempre.
-    </footer>
+    <div class="flex justify-center">
+      <a id="btnExplorar" href="jornadas.html" class="btn-primary inline-flex items-center gap-2">
+        <span>Explorar Jornadas</span>
+      </a>
+    </div>
   </main>
+
+  <!-- Acorda o backend antes de navegar (suave) -->
+  <script>
+    const API = 'https://conhecimento-com-luz-api.onrender.com';
+    const btn = document.getElementById('btnExplorar');
+    if (btn) {
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+          await Promise.race([
+            fetch(API + '/health', { method: 'GET' }),
+            new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 2500))
+          ]);
+        } catch(_) { /* continua mesmo se offline */ }
+        location.href = btn.getAttribute('href');
+      });
+    }
+  </script>
 </body>
 </html>
