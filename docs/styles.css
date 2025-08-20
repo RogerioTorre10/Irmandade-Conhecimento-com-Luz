@@ -51,12 +51,16 @@ strong{ color:#fff }
 .hero{ position:relative; overflow:visible; padding-bottom: 160px; }
 .hero .lead{ margin-bottom: 1.2rem; }
 
-/* ===== CHAMA GRANDE (home) ===== */
-.hero-flame-wrap{
-  position: relative;
-  display: grid;
-  place-items: center;
-  margin:
+/* Chama vibrante centralizada */
+.chama {
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;
+}
+.chama img {
+  width: 96px;
+  height: 96px;
+  image-rendering: -webkit-optimize-contrast;
 }
 @media (max-width: 767px){
   .hero-flame-wrap{ width: 190px; height: 190px; top: 70%; }
