@@ -5,24 +5,27 @@
   pointer-events:none; z-index:0;
 }
 
-/* Se por engano houver mais de um bloco .chama-wrapper no card,
-   mostramos apenas o ÚLTIMO (evita chama dupla). */
+/* Se houver mais de um bloco .chama-wrapper diretamente sob .card,
+   mostramos apenas o último (evita chama dupla por engano). */
 .card > .chama-wrapper:not(:last-of-type){ display:none !important; }
+
+/* Nunca renderizar chamas dentro do .card-body (evita chama no meio do card) */
+.card-body .chama-wrapper{ display:none !important; }
 
 .chama{
   position:absolute;
-  bottom:-40px;                 /* empurra para baixo para não encostar nos botões */
+  bottom:-18px;                /* visível em todas as páginas (ajuste fino aqui) */
   --scale:1; --y:0px; --rot:0deg;
 }
 
-/* Grande — ponta mais fina e formato estável */
+/* Grande — formato gota com ponta mais fina */
 .chama-grande{
   left:50%;
   width:76px; height:118px;
   transform: translateX(-50%) translateY(var(--y)) scale(var(--scale)) rotate(var(--rot));
 
-  /* ponta mais fina; ajuste o primeiro número (40%) para afinar/engrossar */
-  clip-path: ellipse(20% 120% at 50% 110%);
+  /* ponta mais fina — ajuste o 40% para afinar/engrossar */
+  clip-path: ellipse(10% 120% at 50% 110%);
 
   background:
     radial-gradient(58% 70% at 50% 34%, rgba(255,255,255,.92) 0 16%, rgba(255,255,255,.52) 16% 32%, rgba(255,255,255,0) 33%),
@@ -34,6 +37,16 @@
   filter: saturate(1.22) brightness(1.05);
 }
 
+.chama-grande::after{
+  content:""; position:absolute; inset:-22% -26% -16% -26%; border-radius:inherit;
+  background: radial-gradient(closest-side, rgba(255,171,64,.50), rgba(255,140,61,0) 70%);
+  filter: blur(18px); opacity:.82; animation: glow 2.4s ease-in-out infinite;
+}
+
+/* Usaremos só a chama grande (inferior) */
+.chama-pequena{ display:none !important; }
+
+@keyframes glow { 0%{opacity:.72} 50%{opacity:.9} 100%{opacity:.7} }
 .chama-grande::after{
   content:""; position:absolute; inset:-22% -26% -16% -26%; border-radius:inherit;
   background: radial-gradient(closest-side, rgba(255,171,64,.50), rgba(255,140,61,0) 70%);
