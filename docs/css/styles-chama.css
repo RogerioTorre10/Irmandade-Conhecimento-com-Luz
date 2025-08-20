@@ -1,24 +1,66 @@
-/* ===== Chamas — agora controladas por variável CSS (--scale) ===== */
+/* ===== Chamas: vibrantes, com brilho e núcleo, controladas por variáveis CSS ===== */
 .chama-wrapper{ position:absolute; inset:auto 0 0 0; height:0; pointer-events:none }
-.chama{ position:absolute; bottom:-22px; filter: blur(.3px) saturate(1.1); opacity:.9; --scale:1 }
+.chama{ position:absolute; bottom:-22px; --scale:1; --y:0px; --rot:0deg }
 
-/* Padrão (se não usar a variação central) */
+/* Desenho em camadas (núcleo + brilho externo) */
 .chama-grande{
-  left:16px; width:48px; height:76px;
-  background: radial-gradient(closest-side,#ffd27a,#ff8b3d 62%,transparent 65%);
-  border-radius:999px 999px 40% 40%;
-  transform: translateY(0) scale(var(--scale));
+  left:16px;
+  width:72px;               /* maior */
+  height:112px;             /* maior */
+  border-radius:999px 999px 46% 46%;
+  /* corpo */
+  background:
+    radial-gradient(circle at 50% 40%, #fff8d6 0 18%, rgba(255,255,255,.55) 18% 32%, transparent 33%),
+    radial-gradient(circle at 50% 65%, #ffd27a 0 35%, #ff9b4e 35% 64%, rgba(255,155,78,0) 65%);
+  /* brilho ao redor */
+  box-shadow:
+    0 0 24px rgba(255,170,64,.55),
+    0 0 64px rgba(255,140,61,.35),
+    0 0 120px rgba(255,140,61,.25);
+  filter: saturate(1.28) brightness(1.05);
+  transform: translateY(var(--y)) scale(var(--scale)) rotate(var(--rot));
 }
-.chama-pequena{
-  left:72px; width:22px; height:36px;
-  background: radial-gradient(closest-side,#ffe0a6,#ff9b4e 62%,transparent 65%);
-  border-radius:999px 999px 45% 45%;
-  transform: translateY(0) scale(var(--scale));
+.chama-grande::before,
+.chama-grande::after{
+  content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+}
+.chama-grande::before{ /* núcleo mais claro */
+  inset:20% 26% 28% 26%;
+  background: radial-gradient(circle at 50% 40%, #fffbe8 0, rgba(255,255,255,.85) 42%, rgba(255,255,255,0) 65%);
+  filter: blur(2px);
+  opacity:.95;
+  animation: corePulse 1.8s ease-in-out infinite;
+}
+.chama-grande::after{  /* glow suave externo */
+  inset:-20% -28% -12% -28%;
+  background: radial-gradient(closest-side, rgba(255,171,64,.55), rgba(255,140,61,0) 70%);
+  filter: blur(18px);
+  opacity:.8;
+  animation: glow 2.2s ease-in-out infinite;
 }
 
-/* Variante central — uma única chama */
+/* Pequena (se um dia usar fora do modo central) */
+.chama-pequena{
+  left:84px;
+  width:28px; height:46px;
+  border-radius:999px 999px 48% 48%;
+  background:
+    radial-gradient(circle at 50% 42%, #fff9dc 0 22%, rgba(255,255,255,.5) 22% 36%, transparent 37%),
+    radial-gradient(circle at 50% 68%, #ffe0a6 0 38%, #ff9b4e 38% 64%, rgba(255,155,78,0) 65%);
+  box-shadow:
+    0 0 16px rgba(255,170,64,.45),
+    0 0 44px rgba(255,140,61,.30);
+  filter: saturate(1.25) brightness(1.05);
+  transform: translateY(var(--y)) scale(var(--scale)) rotate(var(--rot));
+}
+
+/* Variante central: 1 chama só (home/intro) */
 .chama-center .chama-grande{
   left:50% !important;
-  transform: translateX(-50%) translateY(0) scale(var(--scale));
+  transform: translateX(-50%) translateY(var(--y)) scale(var(--scale)) rotate(var(--rot));
 }
 .chama-center .chama-pequena{ display:none !important; }
+
+/* Animações de brilho (não tocam em transform) */
+@keyframes corePulse{ 0%{opacity:.90} 50%{opacity:1} 100%{opacity:.88} }
+@keyframes glow{ 0%{opacity:.70} 50%{opacity:.85} 100%{opacity:.68} }
