@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Jornada Conhecimento com Luz — Essencial</title>
   <meta name="description" content="Jornada essencial: perguntas profundas, devolutiva simbólica e PDF/HQ finais.">
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <link rel="stylesheet" href="css/styles-core.css">
   <link rel="stylesheet" href="css/styles-pergaminho.css">
@@ -48,8 +45,8 @@
         </div>
       </div>
 
-      <!-- Chama central apenas na intro -->
-      <div class="chama-wrapper chama-center">
+      <!-- ÚNICA chama da INTRO (fora do .card-body) -->
+      <div class="chama-wrapper">
         <div class="chama chama-grande" aria-hidden="true"></div>
         <div class="chama chama-pequena" aria-hidden="true"></div>
       </div>
@@ -75,11 +72,12 @@
             <button id="btnProxima" class="btn-primary" disabled>Próxima</button>
           </div>
         </div>
-        <!-- Chama central da seção -->
-          <div class="chama-wrapper chama-center">
-            <div class="chama chama-grande" aria-hidden="true"></div>
-           <div class="chama chama-pequena" aria-hidden="true"></div>
-          </div>
+      </div>
+
+      <!-- ÚNICA chama do WIZARD (fora do .card-body) -->
+      <div class="chama-wrapper">
+        <div class="chama chama-grande" aria-hidden="true"></div>
+        <div class="chama chama-pequena" aria-hidden="true"></div>
       </div>
     </section>
 
@@ -94,13 +92,13 @@
           <button id="btnNovaJornada" class="btn-secondary">Voltar à página inicial</button>
         </div>
       </div>
-    </section>
 
-    <!-- Chama central da seção -->
-     <div class="chama-wrapper chama-center">
-       <div class="chama chama-grande" aria-hidden="true"></div>
-      <div class="chama chama-pequena" aria-hidden="true"></div>
-     </div>
+      <!-- ÚNICA chama do FINAL (fora do .card-body) -->
+      <div class="chama-wrapper">
+        <div class="chama chama-grande" aria-hidden="true"></div>
+        <div class="chama chama-pequena" aria-hidden="true"></div>
+      </div>
+    </section>
 
     <footer class="text-center opacity-60 text-sm mt-10">Para além. E sempre.</footer>
   </main>
