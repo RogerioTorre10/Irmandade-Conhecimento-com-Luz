@@ -41,9 +41,7 @@
 }
 
 /* Usaremos só a chama grande (inferior) */
-/* Se você quiser remover a chama pequena na página inicial */
-.home-page .chama-pequena {
-  display: none;
+ .chama-pequena{ display:none !important; }
 }
 
 @keyframes glow { 0%{opacity:.72} 50%{opacity:.9} 100%{opacity:.7} }
