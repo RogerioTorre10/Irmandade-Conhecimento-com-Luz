@@ -185,6 +185,70 @@ function renderReview(){
   $('#btnBack').addEventListener('click', ()=>{ state.step='form'; renderFormStep(); });
   $('#btnSend').addEventListener('click', sendAndDownload);
 }
+$('#btnBack').addEventListener('click', () => {
+  state.step = 'form';
+  render();
+});
+
+const baixarTudo = async () => {
+  try {
+    $('#btnDownload').disabled = true;
+    $('#btnDownload').textContent = 'Gerando...';
+
+    // monte seu payload
+    const payload = { answers: state.answers, meta: { version: state.version || '9.x' } };
+
+    // PDF
+    const pdfResp = await fetch(`${CONFIG.API_BASE}/gerar-pdf`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/pdf' },
+      body: JSON.stringify(payload)
+    });
+    if (!pdfResp.ok) throw new Error('Falha ao gerar PDF');
+    const pdfBlob = await pdfResp.blob();
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    const a1 = document.createElement('a');
+    a1.href = pdfUrl;
+    a1.download = 'jornada.pdf';
+    document.body.appendChild(a1);
+    a1.click();
+    a1.remove();
+    URL.revokeObjectURL(pdfUrl);
+
+    // HQ (placeholder PDF, por enquanto)
+    const hqResp = await fetch(`${CONFIG.API_BASE}/gerar-hq`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/pdf' },
+      body: JSON.stringify(payload)
+    });
+    if (!hqResp.ok) throw new Error('Falha ao gerar HQ');
+    const hqBlob = await hqResp.blob();
+    const hqUrl = URL.createObjectURL(hqBlob);
+    const a2 = document.createElement('a');
+    a2.href = hqUrl;
+    a2.download = 'jornada-hq.pdf';
+    document.body.appendChild(a2);
+    a2.click();
+    a2.remove();
+    URL.revokeObjectURL(hqUrl);
+
+    $('#status').textContent = 'Arquivos gerados com sucesso. Obrigado!';
+  } catch (e) {
+    $('#status').textContent = 'Não foi possível gerar os arquivos. Tente novamente.';
+    console.error(e);
+  } finally {
+    $('#btnDownload').disabled = false;
+    $('#btnDownload').textContent = 'Baixar PDF + HQ';
+  }
+};
+
+$('#btnDownload').addEventListener('click', baixarTudo);
+
+// “Finalizar” agora baixa e volta para home
+$('#btnFinish').addEventListener('click', async () => {
+  await baixarTudo();
+  window.location.href = './';
+});
 
 // Final
 function renderDone(){
