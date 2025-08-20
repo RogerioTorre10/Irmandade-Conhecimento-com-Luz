@@ -79,14 +79,25 @@ strong{ color:#fff }
 .btn-primary:hover{ background: var(--btn-h); }
 
 /* ===== Pergaminho ===== */
-.pergaminho{
-  max-width: 980px; margin: 20px auto; padding: 24px 22px;
-  border-radius: 16px; border: 1px solid var(--card-b);
-  background:
-    linear-gradient(#fff3, #fff0) top,
-    radial-gradient(1200px 520px at 50% -420px, rgba(255, 205, 130, .08), transparent 60%),
-    rgba(253,246,227,.06);
-  color:#f5f6ff;
+.pergaminho {
+  background: url('/assets/pergaminho.png') no-repeat center center;
+  background-size: cover;
+  padding: 60px 40px;     /* espaçamento interno */
+  margin: 20px auto;      /* espaço entre os blocos */
+  max-width: 800px;       /* largura controlada */
+  min-height: 400px;      /* altura mínima */
+  border-radius: 12px;    /* arredondar cantos se precisar */
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+  color: #3b2a1a;         /* cor de texto puxando para marrom */
+  font-family: "Times New Roman", serif;
+}
+
+.titulo-perg {
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #2d1c0f;
 }
 
 /* inputs / labels */
@@ -159,3 +170,72 @@ input::placeholder, textarea::placeholder{ color:#6b7280 }
 
 /* ===== Util ===== */
 .space-y{ display:grid; gap: 14px }
+
+/* ===== Pergaminho Vertical (intro) ===== */
+.perg-vert{
+  background: url('/docs/assets/perg-vert.png') center/cover no-repeat;
+  max-width: 900px;
+  margin: 24px auto 32px;
+  padding: 64px 48px;
+  color: #2d1c0f; /* marrom legível */
+  font-family: "Times New Roman", Georgia, serif;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+
+@media (max-width: 768px){
+  .perg-vert{
+    padding: 44px 22px;
+    margin: 16px 12px 28px;
+  }
+}
+
+.perg-title{
+  text-align:center;
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  margin-bottom: 16px;
+  color: #2a1a0d;
+  font-weight: 700;
+}
+
+.perg-sub{
+  margin-top: 18px;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  color: #3a2616;
+}
+
+.perg-list{
+  margin: 0 0 10px 18px;
+  padding: 0;
+}
+.perg-list li{ margin-bottom: 6px; }
+
+.perg-termo ul{
+  list-style: disc;
+  margin: 8px 0 0 22px;
+  padding: 0;
+}
+.perg-termo li{ margin: 6px 0; }
+
+.perg-actions{
+  display:flex;
+  gap:14px;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  margin-top: 16px;
+}
+
+.agree{
+  display:flex; gap:10px; align-items:center;
+  font-size:.98rem;
+  user-select:none;
+}
+.agree input{ transform: translateY(1px); }
+
+.perg-vert .btn{
+  padding:.7rem 1.05rem;
+  border-radius:12px;
+}
+
