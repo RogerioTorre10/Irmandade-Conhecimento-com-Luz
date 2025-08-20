@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   const { qs, showSection, setProgress, setPergunta } = window.UI || {};
   if(!qs || !window.JQUESTIONS || !window.JSTATE){
-    alert('Falha ao carregar scripts da jornada. Verifique se os arquivos em docs/js/* estão vinculados.');
+    alert('Falha ao carregar scripts da jornada. Verifique docs/js/*');
     return;
   }
 
@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // DOM
   const chkTermo   = qs('#chkTermo');
   const btnIniciar = qs('#btnIniciar');
-  const btnLimparTudoIntro = qs('#btnLimparTudoIntro');
 
   const btnLimparAtual = qs('#btnLimparAtual');
   const btnVoltar  = qs('#btnVoltar');
@@ -25,40 +24,52 @@ document.addEventListener('DOMContentLoaded', () => {
   let idx = Number(ST.get('idx', 0));
   let respostas = ST.get('respostas', {});
 
-  // Intro
+  // Helpers
+  function updateNavState(){
+    // trava o Voltar na primeira pergunta
+    if (btnVoltar) {
+      btnVoltar.disabled = (idx <= 0);
+    }
+    // trava Próxima se vazio
+    if (btnProxima) {
+      const empty = !(input.value || '').trim();
+      btnProxima.disabled = empty;
+    }
+  }
+
+  // INTRO
   if (chkTermo && btnIniciar) {
     const toggleStart = () => { btnIniciar.disabled = !chkTermo.checked; };
     toggleStart();
     chkTermo.addEventListener('change', toggleStart);
 
-    btnIniciar.addEventListener('click', (e) => {
-      if (btnIniciar.disabled) return; // segurança
+    btnIniciar.addEventListener('click', () => {
+      if (btnIniciar.disabled) return;
       idx = 0; ST.set('idx', idx);
       showWizard();
     });
   }
 
-  if (btnLimparTudoIntro) {
-    btnLimparTudoIntro.addEventListener('click', () => {
-      ST.clearAll(); respostas = {}; idx = 0; alert('Respostas limpas.');
-    });
-  }
+  // WIZARD
+  if (btnLimparAtual) btnLimparAtual.addEventListener('click', ()=>{ input.value=''; input.focus(); updateNavState(); });
 
-  // Wizard
-  if (btnLimparAtual) btnLimparAtual.addEventListener('click', ()=>{ input.value=''; input.focus(); });
   if (btnVoltar) btnVoltar.addEventListener('click', ()=>{
     if(idx>0){ idx--; ST.set('idx', idx); showWizard(); }
-    else{ showSection(document.getElementById('sec-intro')); }
+    // se idx==0, fica parado (travado)
   });
+
   if (btnProxima) btnProxima.addEventListener('click', ()=>{
+    const val = (input.value||'').trim();
+    if (!val) { input.focus(); return; } // não avança vazio
     salvarAtual();
     if(idx < QUESTIONS.length-1){ idx++; ST.set('idx', idx); showWizard(); }
     else{ showFinal(); }
   });
 
+  input && input.addEventListener('input', updateNavState);
+
   function salvarAtual(){
-    const q = QUESTIONS[idx];
-    if (!q) return;
+    const q = QUESTIONS[idx]; if(!q) return;
     respostas[q.id] = (input.value||'').trim();
     ST.set('respostas', respostas);
   }
@@ -68,15 +79,21 @@ document.addEventListener('DOMContentLoaded', () => {
     setPergunta(q); setProgress(idx, QUESTIONS.length);
     input.value = (respostas[q.id]||'');
     showSection(document.getElementById('sec-wizard'));
-    setTimeout(()=>input.focus(), 50);
+    setTimeout(()=>{ input.focus(); updateNavState(); }, 50);
   }
 
-  function showFinal(){ showSection(document.getElementById('sec-final')); }
+  function showFinal(){
+    showSection(document.getElementById('sec-final'));
+  }
 
   if (btnRevisar) btnRevisar.addEventListener('click', ()=>{ idx = 0; ST.set('idx', idx); showWizard(); });
 
   if (btnGerar) btnGerar.addEventListener('click', async ()=>{
-    salvarAtual();
+    const val = (input.value||'').trim();
+    if (document.getElementById('sec-wizard') && !document.getElementById('sec-wizard').classList.contains('hidden')) {
+      if (!val) { input.focus(); return; }
+      salvarAtual();
+    }
     const payload = { respostas, meta: { quando: new Date().toISOString() } };
     try{
       btnGerar.disabled = true; btnGerar.textContent = 'Gerando…';
@@ -92,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (btnNova) btnNova.addEventListener('click', ()=>{ ST.clearAll(); location.href = './'; });
 
-  // Boot — decide seção inicial
+  // Boot
   (function init(){
     const st = ST.load();
     if(st && st.respostas && Object.keys(st.respostas).length>0 && Number.isInteger(st.idx)){
