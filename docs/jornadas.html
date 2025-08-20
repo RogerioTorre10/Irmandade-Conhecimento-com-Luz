@@ -1,64 +1,108 @@
 <!doctype html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Jornada • Irmandade Conhecimento com Luz</title>
-  <meta name="description" content="Responda com calma. Ao final, baixe seu PDF e a HQ." />
-  <link rel="icon" href="assets/favicon.svg" />
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jornada Conhecimento com Luz — Essencial</title>
+  <meta name="description" content="Jornada essencial: perguntas profundas, devolutiva simbólica e PDF/HQ finais.">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- CSS (estrutura atual: docs/css/) -->
+  <link rel="stylesheet" href="css/styles-core.css">
+  <link rel="stylesheet" href="css/styles-pergaminho.css">
+  <link rel="stylesheet" href="css/styles-chama.css">
+  <link rel="stylesheet" href="css/styles-emojis.css">
 </head>
-<body>
-  
-  <section class="pergaminho">
-  <h2 class="titulo-perg">Pergunta 1</h2>
-  <p class="texto">Qual foi a sua maior descoberta até aqui?</p>
-  <textarea></textarea>
-</section>
+<body class="bg-grad text-surface-100">
+  <main class="container mx-auto px-4 py-8 max-w-4xl">
 
-  <main class="container">
-    <header class="card text-center">
-      <h1>Jornada Conhecimento com Luz ✨</h1>
-      <p class="muted">Bem-vindo(a)! Responda com calma. Ao final, você poderá baixar o <strong>PDF</strong> e a <strong>HQ</strong>.</p>
-    </header>
+    <!-- Seção: Introdução + Termo -->
+    <section id="sec-intro" class="card mb-8">
+      <div class="card-body pergaminho">
+        <h1 class="text-2xl md:text-3xl font-extrabold mb-4">Jornada Conhecimento com Luz – Essencial 📘</h1>
+        <ol class="list-decimal pl-6 space-y-2 opacity-90">
+          <li>Suas respostas não serão armazenadas após o término.</li>
+          <li>Ao final, será gerado um PDF exclusivo com sua devolutiva simbólica e a HQ.</li>
+          <li>O PDF/HQ <b>não</b> serão enviados por e-mail — faça o download imediato.</li>
+          <li>Após a entrega, todos os dados serão apagados automaticamente.</li>
+          <li>Acesso por senha individual com validade: 15 dias para iniciar; 24h para concluir.</li>
+        </ol>
 
-    <!-- INTRO: Orientações + Termo (pergaminho) -->
-<section id="intro-perg" class="perg-vert">
-  <h2 class="perg-title">Orientações da Jornada</h2>
+        <h2 class="mt-6 font-bold text-xl">Termo de Compromisso</h2>
+        <ul class="list-disc pl-6 space-y-1 mt-2 text-sm md:text-base opacity-90">
+          <li>Minhas respostas são de minha responsabilidade e expressão pessoal.</li>
+          <li>As respostas são usadas apenas para gerar minha devolutiva simbólica (PDF/HQ).</li>
+          <li>Não há armazenamento permanente de dados pessoais.</li>
+          <li>Conteúdo reflexivo e inspiracional (não substitui aconselhamento clínico/profissional).</li>
+        </ul>
 
-  <ol class="perg-list">
-    <li>Responda com calma. Você pode voltar e revisar antes de finalizar.</li>
-    <li>Não há resposta “certa”. Seja sincero(a) e direto(a) consigo mesmo(a).</li>
-    <li>Evite nomes e dados sensíveis. Esta jornada é pessoal e simbólica.</li>
-    <li>Ao final, você poderá <strong>baixar um PDF</strong> com a devolutiva e a <strong>HQ</strong>.</li>
-  </ol>
+        <label class="flex items-center gap-3 mt-6">
+          <input id="chkTermo" type="checkbox" class="accent-primary-500 w-5 h-5">
+          <span>Li e concordo com as orientações e o termo acima.</span>
+        </label>
 
-  <h3 class="perg-sub">Termo de Compromisso</h3>
-  <div class="perg-termo">
-    <p>
-      Eu, participante desta jornada, declaro estar ciente de que:
-    </p>
-    <ul>
-      <li>Minhas respostas são de minha responsabilidade e expressam minha experiência pessoal.</li>
-      <li>As respostas são usadas apenas para gerar minha devolutiva simbólica (PDF/HQ).</li>
-      <li>Não há armazenamento permanente de dados pessoais no sistema.</li>
-      <li>Este conteúdo tem caráter reflexivo e inspiracional (não substitui aconselhamento clínico/profissional).</li>
-    </ul>
-  </div>
+        <div class="mt-6 flex gap-3">
+          <button id="btnIniciar" class="btn-primary" disabled>Iniciar Jornada</button>
+          <button id="btnLimparTudoIntro" class="btn-secondary">Limpar respostas salvas</button>
+        </div>
+      </div>
 
-  <div class="perg-actions">
-    <label class="agree">
-      <input id="agree" type="checkbox" />
-      <span>Li e concordo com as orientações e o termo acima.</span>
-    </label>
+      <!-- Chamas decorativas -->
+      <div class="chama-wrapper">
+        <div class="chama chama-grande" aria-hidden="true"></div>
+        <div class="chama chama-pequena" aria-hidden="true"></div>
+      </div>
+    </section>
 
-    <button id="startJourney" class="btn btn-primary" disabled>Iniciar Jornada</button>
-  </div>
-</section>
+    <!-- Seção: Wizard de Perguntas -->
+    <section id="sec-wizard" class="card mb-8 hidden">
+      <div class="card-body pergaminho">
+        <header class="mb-6">
+          <p id="wizardEtapa" class="font-semibold opacity-80">
+            Pergunta <span id="etapaNum">1</span>/<span id="etapaTot">3</span>
+          </p>
+          <div class="progress"><div id="progressBar"></div></div>
+        </header>
 
-    <div id="app"></div>
+        <h2 id="perguntaTitulo" class="text-2xl font-extrabold mb-4"></h2>
+        <input id="respostaInput" type="text" class="input" placeholder="Digite sua resposta" />
+
+        <div class="mt-6 flex items-center justify-between gap-3">
+          <button id="btnLimparAtual" class="btn-secondary">Limpar</button>
+          <div class="flex gap-3">
+            <button id="btnVoltar" class="btn-tertiary">Voltar</button>
+            <button id="btnProxima" class="btn-primary">Próxima</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seção: Finalização -->
+    <section id="sec-final" class="card mb-8 hidden">
+      <div class="card-body pergaminho text-center">
+        <h2 class="text-2xl md:text-3xl font-extrabold mb-2">Parabéns! Você finalizou a jornada 🎉</h2>
+        <p class="opacity-90 mb-6">Revise se desejar e em seguida gere seu PDF e HQ. Lembre-se: o download é imediato.</p>
+        <div class="flex flex-wrap justify-center gap-3">
+          <button id="btnRevisar" class="btn-tertiary">Revisar respostas</button>
+          <button id="btnGerarPDFHQ" class="btn-primary">Baixar PDF + HQ</button>
+          <button id="btnNovaJornada" class="btn-secondary">Voltar à página inicial</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="text-center opacity-60 text-sm mt-10">Para além. E sempre.</footer>
   </main>
 
-  <script src="jornada.js" defer></script>
+  <!-- Scripts (estrutura atual: docs/js/) -->
+  <script src="js/config.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/questions.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/chama.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+
+  <!-- Antigo (desative para evitar conflito) -->
+  <!-- <script src="jornada.js"></script> -->
 </body>
 </html>
