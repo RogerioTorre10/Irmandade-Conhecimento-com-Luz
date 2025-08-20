@@ -38,4 +38,10 @@
   filter: blur(18px); opacity:.82; animation: glow 2.4s ease-in-out infinite;
 }
 
-/* pequena fica oc*
+/* pequena fica oculta no modo central (usamos só a inferior) */
+.chama-pequena{ display:none }
+
+@keyframes glow { 0%{opacity:.72} 50%{opacity:.9} 100%{opacity:.7} }
+
+/* utilidade caso use .chama-center no HTML */
+.chama-center .chama-grande{ left:50% }
