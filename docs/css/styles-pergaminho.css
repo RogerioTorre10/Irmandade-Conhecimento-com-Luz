@@ -1,1 +1,16 @@
+/* Pergaminho com textura de papel (fallback incluso) */
+.pergaminho{
+  position:relative;
+  background:
+    url('img/pergaminho.jpg') center/cover no-repeat,
+    linear-gradient(180deg, rgba(255,219,170,0.06), rgba(255,219,170,0.02));
+  border:1px dashed rgba(255,219,170,0.25);
+  border-radius:16px;
+}
+.pergaminho:before,.pergaminho:after{
+  content:""; position:absolute; left:0; right:0; height:16px; pointer-events:none;
+  background: radial-gradient(20px 20px at 20px 8px, rgba(255,219,170,.25), transparent 70%),
+              radial-gradient(20px 20px at calc(100% - 20px) 8px, rgba(255,219,170,.25), transparent 70%);
+}
+.pergaminho:before{ top:-8px } .pergaminho:after{ bottom:-8px }
 
