@@ -51,15 +51,19 @@ strong{ color:#fff }
 .hero{ position:relative; overflow:visible; padding-bottom: 160px; }
 .hero .lead{ margin-bottom: 1.2rem; }
 
-/* chama grande centralizada */
-.hero-flame{
-  position:absolute; left:50%; bottom:-110px; transform:translateX(-50%);
-  width: 200px; height: 200px; opacity:.95; pointer-events:none;
-  filter: drop-shadow(0 14px 40px rgba(255,140,42,.25));
+/* chama grande mais central e animada */
+.hero-flame-wrap{
+  position:absolute;
+  left:50%;
+  top: 68%;                    /* empurra mais ao centro da dobra */
+  transform: translate(-50%, -50%);
+  width: 220px; height: 220px;
+  pointer-events:none;
 }
 @media (max-width: 767px){
-  .hero-flame{ width:170px; height:170px; bottom:-95px; }
+  .hero-flame-wrap{ width: 190px; height: 190px; top: 70%; }
 }
+
 
 /* ===== Botões ===== */
 .btn{
