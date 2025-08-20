@@ -66,6 +66,63 @@
     document.body.appendChild(a); a.click();
     setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 1000);
   }
+// ... (seu código atual do api.js)
 
+async function gerarPDFLocal(respostas) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+
+  const margem = 48;
+  let y = margem;
+
+  // Título
+  doc.setFont("Times","Bold");
+  doc.setFontSize(18);
+  doc.text("Jornada — Devolutiva Simbólica (Versão Local)", margem, y);
+  y += 24;
+
+  doc.setFont("Times","Normal");
+  doc.setFontSize(11);
+  doc.setTextColor(90,90,90);
+  doc.text(`Gerado em: ${new Date().toLocaleString()}`, margem, y);
+  y += 24;
+
+  doc.setTextColor(0,0,0);
+  doc.setFontSize(13);
+
+  const wrap = (txt, maxWidth) => doc.splitTextToSize(txt, maxWidth);
+
+  Object.entries(respostas).forEach(([qid, val], i) => {
+    const titulo = `Pergunta ${i+1}`;
+    doc.setFont("Times","Bold");
+    doc.text(titulo, margem, y);
+    y += 16;
+
+    doc.setFont("Times","Normal");
+    const lines = wrap(String(val || "—"), 520);
+    lines.forEach(line => {
+      if (y > 780) { doc.addPage(); y = margem; }
+      doc.text(line, margem, y);
+      y += 16;
+    });
+    y += 8;
+    if (y > 780) { doc.addPage(); y = margem; }
+  });
+
+  doc.save("Jornada-Conhecimento-com-Luz-local.pdf");
+}
+
+// No FINAL do arquivo, ajuste a exportação para usar do front caso o backend falhe:
+window.API = {
+  async gerarPDFEHQ(payload){
+    try{
+      await gerarPDFEHQ(payload); // tenta backend (sua função existente)
+    } catch (e) {
+      alert("Servidor indisponível. Gerando PDF local de emergência…");
+      await gerarPDFLocal(payload.respostas);
+      // opcional: gerar uma 'HQ' local simples como um segundo PDF:
+      await gerarPDFLocal({ "HQ (local)": "Sua história simbólica será renderizada quando o servidor estiver online." });
+    }
+};
   window.API = { gerarPDFEHQ };
 })();
