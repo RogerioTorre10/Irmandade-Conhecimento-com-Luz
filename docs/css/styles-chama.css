@@ -1,30 +1,41 @@
-/* ===== Chama vibrante (vitrine) ===== */
-.chama-wrapper{ position:absolute; inset:auto 0 0 0; height:0; pointer-events:none; z-index:0 }
-.chama{ position:absolute; bottom:-24px; --scale:1; --y:0px; --rot:0deg }
+/* ===== Chama (vitrine) ===== */
+.chama-wrapper{
+  position:absolute; inset:auto 0 0 0; height:0;
+  pointer-events:none; z-index:0;
+}
 
-/* Grande — formato “gota” com topo suave */
+/* sempre ancorada NO RODAPÉ do card */
+.chama{
+  position:absolute;
+  bottom:-36px;                /* ↓ empurra para baixo para não ficar atrás do botão */
+  --scale:1; --y:0px; --rot:0deg;
+}
+
+/* Grande — formato “gota” com ponta mais fina */
 .chama-grande{
   left:50%;
-  width:74px; height:116px;
+  width:76px; height:118px;
   transform: translateX(-50%) translateY(var(--y)) scale(var(--scale)) rotate(var(--rot));
-  /* modelagem: clip-path dá a ponta, sem “teto reto” */
-  clip-path: ellipse(46% 68% at 50% 58%);
+
+  /* ponta mais fina usando clip-path elíptico deslocado */
+  clip-path: ellipse(40% 66% at 50% 62%);
+
+  /* núcleo suave + corpo */
   background:
-    radial-gradient(58% 70% at 50% 34%, rgba(255,255,255,.92) 0 18%, rgba(255,255,255,.55) 18% 34%, rgba(255,255,255,0) 35%),
+    radial-gradient(58% 70% at 50% 34%, rgba(255,255,255,.92) 0 16%, rgba(255,255,255,.52) 16% 32%, rgba(255,255,255,0) 33%),
     radial-gradient(70% 88% at 50% 66%, #ffd27a 0 42%, #ff9b4e 42% 74%, rgba(255,155,78,0) 75%);
-  box-shadow: 0 0 26px rgba(255,170,64,.55), 0 0 90px rgba(255,140,61,.30);
+
+  box-shadow:
+    0 0 28px rgba(255,170,64,.55),
+    0 0 90px rgba(255,140,61,.28);
   filter: saturate(1.22) brightness(1.05);
 }
+
+/* brilho externo (não deforma a forma) */
 .chama-grande::after{
-  content:""; position:absolute; inset:-24% -28% -18% -28%; border-radius:inherit;
+  content:""; position:absolute; inset:-22% -26% -16% -26%; border-radius:inherit;
   background: radial-gradient(closest-side, rgba(255,171,64,.50), rgba(255,140,61,0) 70%);
-  filter: blur(18px); opacity:.8; animation: glow 2.4s ease-in-out infinite;
+  filter: blur(18px); opacity:.82; animation: glow 2.4s ease-in-out infinite;
 }
 
-/* Pequena não usada quando central, mas mantida */
-.chama-pequena{ display:none }
-
-@keyframes glow{ 0%{opacity:.72} 50%{opacity:.9} 100%{opacity:.7} }
-
-/* Util para casos em que colocou .chama-center no HTML */
-.chama-center .chama-grande{ left:50% }
+/* pequena fica oc*
