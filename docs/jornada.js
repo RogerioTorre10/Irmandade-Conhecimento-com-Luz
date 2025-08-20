@@ -119,7 +119,6 @@ function renderFormStep(){
   <button id="btnPrev" class="btn" style="background:#334155">Voltar</button>
   <button id="btnClear" class="btn" style="background:#334155">Limpar</button>
   <button id="btnNext" class="btn">${state.idx < total-1 ? 'Próxima' : 'Revisar'}</button>
-  <button id="btnFinish" class="btn" style="background:#6b21a8">Finalizar</button>
 </div>
     </section>
   `;
@@ -143,11 +142,14 @@ function renderFormStep(){
   });
 
   // limpar
-  $('#btnClear').addEventListener('click', ()=>{
-    if(confirm('Tem certeza que deseja apagar TODAS as respostas?')){
-      clearLocal(); state.idx=0; renderFormStep();
-    }
-  });
+$('#btnClear').addEventListener('click', () => {
+  if (confirm('Tem certeza que deseja apagar TODAS as respostas?')) {
+    clearLocal();
+    state.idx = 0;
+    renderFormStep();
+  }
+});
+
    
    // finalizar
     $('#btnFinish').addEventListener('click', () => {
