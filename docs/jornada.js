@@ -58,13 +58,23 @@ function renderFormStep() {
   const value = state.answers[q.key] || '';
   const isText = q.type !== 'textarea';
 
+  function renderDone(){
   app.innerHTML = `
-    <section class="space-y">
-      <div class="pergaminho">
-        <div class="progress-dots">
-          ${Array.from({length: total}).map((_,i) =>
-            `<span class="dot ${i===state.idx?'active':''}"></span>`).join('')}
-        </div>
+    <section class="card text-center">
+      <h2>Jornada concluída ✨</h2>
+      <p>Se quiser, você pode baixar agora seus arquivos ou voltar ao início.</p>
+      <p id="status" class="muted small"></p>
+      <div class="actions" style="justify-content:center">
+        <button id="btnDownload" class="btn">Baixar PDF + HQ</button>
+        <a class="btn" href="./">Voltar ao início</a>
+      </div>
+    </section>
+  `;
+  $('#btnDownload').addEventListener('click', baixarTudo);
+}
+        
+        <div class="progress-count">Pergunta ${state.idx + 1}/${total}</div>
+        <div class="progress"><span style="width:${((state.idx + 1) / total) * 100}%"></span></div>
 
         <h2 class="titulo-perg">${q.id}</h2>
 
@@ -217,10 +227,11 @@ function renderReview() {
 
   $('#btnDownload').addEventListener('click', baixarTudo);
 
-  // Finalizar: baixa e volta à home
-  $('#btnFinish').addEventListener('click', async () => {
-    await baixarTudo();
-    window.location.href = './';
+ // Finalizar: NÃO gera mais automaticamente, só conclui
+$('#btnFinish').addEventListener('click', () => {
+  state.step = 'done';
+  render();
+});
   });
 }
 
