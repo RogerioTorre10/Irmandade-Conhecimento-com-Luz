@@ -40,10 +40,10 @@
 }
 
 /* Central = 1 chama só (home/intro/wizard) */
-.chama-center .chama-grande{
-  left:50% !important;
-  transform: translateX(-50%) translateY(var(--y)) scale(var(--scale)) rotate(var(--rot));
-}
-.chama-center .chama-pequena{ display:none !important; }
+<!-- Chama central também no wizard -->
+<div class="chama-wrapper chama-center">
+  <div class="chama chama-grande" aria-hidden="true"></div>
+  <div class="chama chama-pequena" aria-hidden="true"></div>
+</div>
 
 @keyframes glow{ 0%{opacity:.72} 50%{opacity:.9} 100%{opacity:.7} }
