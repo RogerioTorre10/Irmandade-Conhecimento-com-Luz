@@ -18,7 +18,7 @@
   transform: translateX(-50%) translateY(var(--y)) scale(var(--scale)) rotate(var(--rot));
 
   /* ponta mais fina usando clip-path elíptico deslocado */
-  clip-path: ellipse(10% 16% at 10% 12%);
+  clip-path: ellipse(100% 16% at 10% 12%);
 
   /* núcleo suave + corpo */
   background:
