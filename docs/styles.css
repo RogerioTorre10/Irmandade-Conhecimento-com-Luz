@@ -1,165 +1,128 @@
-/* =============== Base ================= */
 :root{
-  --bg1:#0b0f1e;         /* roxo-azulado bem escuro */
-  --bg2:#1a1030;         /* roxo */
-  --card:#0f1224;
-  --card-border: rgba(255,255,255,.12);
-  --txt:#e6e9ff;
-  --muted:#aab0d4;
-  --brand:#ffd045;       /* dourado */
-  --btn:#6d28d9;         /* roxo botão */
+  --bg-1: #0c0f1a;
+  --bg-2: #0f1230;
+  --card: rgba(16,19,36,.92);
+  --card-b: rgba(255,215,164,.35);
+  --txt: #e6ecff;
+  --muted: #aab2d6;
+  --primary: #7c3aed;             /* roxo */
+  --primary-2: #9f67ff;
+  --gold: #ffd54a;                 /* títulos dourados */
+  --btn: #6d28d9;
+  --btn-h: #7c3aed;
+  --border: rgba(255, 223, 169, .35);
 }
 
-*{ box-sizing:border-box; }
-html,body{ margin:0; padding:0; }
+/* ===== Base ===== */
+*{ box-sizing: border-box }
+html,body{ height:100% }
 body{
-  min-height:100vh;
-  color:var(--txt);
+  margin:0; color:var(--txt);
   background:
-    radial-gradient(800px 320px at 20% -10%, rgba(99,102,241,.48), transparent 60%),
-    radial-gradient(820px 420px at 85% -25%, rgba(168,85,247,.35), transparent 60%),
-    linear-gradient(138deg, #0b1228 0%, #0f1830 60%, #0f1633 100%);
-  font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    radial-gradient(650px 320px at 20% -10%, rgba(99,102,241,.40), transparent 60%),
+    radial-gradient(480px 260px at 85% -5%, rgba(168,85,247,.35), transparent 60%),
+    linear-gradient(135deg, #0a0d22, #0d1433 55%, #0b1027 100%);
+  font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
 }
+a{ color: var(--primary-2); text-decoration:none }
+a:hover{ text-decoration: underline }
+strong{ color:#fff }
 
-.container{
-  width:min(980px, calc(100% - 32px));
-  margin: 24px auto 56px;
-  position:relative;
-}
-
-h1,h2,h3{ margin:0 0 .5rem; line-height:1.2; }
-h1{ font-size: 2.2rem; color:var(--brand); font-weight:800; text-align:center; }
-h2{ font-size: 1.4rem; color:var(--brand); font-weight:700; }
-.text-center{ text-align:center; }
-.lead{ color:#dfe3ff; margin:.5rem auto 1.2rem; max-width:60ch; text-align:center; }
-.muted{ color:var(--muted); }
-.small{ font-size:.9rem; }
+/* ===== Layout ===== */
+.container{ width:min(1050px, 94%); margin: 32px auto 96px auto; }
+.center{ text-align:center }
+.small{ font-size:.925rem }
+.muted{ color: var(--muted) }
 
 .card{
-  background: rgba(255,255,255,.04);
-  border: 1px solid var(--card-border);
-  border-radius: 16px;
-  padding: 22px;
-  box-shadow: 0 30px 80px rgba(0,0,0,.35);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 26px 22px;
+  box-shadow: 0 16px 70px rgba(12, 10, 30, .55) inset, 0 12px 60px rgba(35, 13, 110, .20);
 }
-.space-y > * + *{ margin-top: 1rem; }
+.text-center{ text-align:center }
 
-.btn{
-  display:inline-flex; align-items:center; justify-content:center;
-  gap:.5rem; padding:.70rem 1.1rem;
-  border-radius: 12px; border: none;
-  background: #485bff; color:#fff; font-weight:600;
-  cursor:pointer; transition:.2s;
-}
-.btn:hover{ filter:brightness(1.08); transform: translateY(-1px); }
-.btn:disabled{ opacity:.6; cursor:not-allowed; }
-.btn-primary{ background: var(--btn); }
-a.btn{ text-decoration:none; }
+/* ===== Home ===== */
+.display{ font-size: clamp(2rem, 2vw + 1.6rem, 3rem); color: var(--gold); margin: 0 0 .7rem 0; }
+.lead{ color: #ccd3ff; max-width: 780px; margin: 0 auto 1rem; }
+.actions{ display: flex; gap: .8rem; align-items:center; margin-top: .8rem }
 
-/* Footer */
-.foot{ margin-top:36px; text-align:center; color:var(--muted); }
+.hero{ position:relative; overflow:visible; padding-bottom: 160px; }
+.hero .lead{ margin-bottom: 1.2rem; }
 
-/* =============== Home Hero =============== */
-.hero{ 
-  position:relative; 
-  overflow:visible; 
-  padding-bottom: 160px;   /* dá espaço para a chama ficar mais abaixo */
-}
-.hero .lead{ margin-bottom: 1.4rem; }
-
-/* chama grande da home (mais ao centro/baixo) */
+/* chama grande centralizada */
 .hero-flame{
-  position:absolute; 
-  left:50%; 
-  bottom:-110px;           /* empurra para baixo */
-  transform:translateX(-50%);
-  width: 200px; 
-  height:200px; 
-  opacity:.95; 
-  pointer-events:none;
+  position:absolute; left:50%; bottom:-110px; transform:translateX(-50%);
+  width: 200px; height: 200px; opacity:.95; pointer-events:none;
   filter: drop-shadow(0 14px 40px rgba(255,140,42,.25));
 }
 @media (max-width: 767px){
   .hero-flame{ width:170px; height:170px; bottom:-95px; }
 }
 
-/* =============== Pergaminho / Form =============== */
+/* ===== Botões ===== */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+  height: 42px; padding: 0 18px;
+  background: #353b5a; color:#eaeaff; border: none;
+  border-radius: 12px; cursor:pointer; transition: .2s ease;
+}
+.btn:hover{ filter: brightness(1.05); transform: translateY(-1px); }
+.btn-primary{ background: var(--btn); }
+.btn-primary:hover{ background: var(--btn-h); }
+
+/* ===== Pergaminho ===== */
 .pergaminho{
-  background:#fbf6e7;
-  color:#2b2629;                    /* texto escuro para ótima leitura */
-  border: 3px solid #d1b58a;
-  border-radius: 16px;
-  padding: 22px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.08), inset 0 0 20px rgba(0,0,0,.05);
+  max-width: 980px; margin: 20px auto; padding: 24px 22px;
+  border-radius: 16px; border: 1px solid var(--card-b);
+  background:
+    linear-gradient(#fff3, #fff0) top,
+    radial-gradient(1200px 520px at 50% -420px, rgba(255, 205, 130, .08), transparent 60%),
+    rgba(253,246,227,.06);
+  color:#f5f6ff;
 }
 
-/* títulos e labels dentro do pergaminho */
-.titulo-perg{ color:#7a4b00; }
-.form-label, label, .pergunta-label, .review h2, .review h3{ color:#2b2629; font-weight:600; }
-
-/* inputs muito legíveis no pergaminho */
-.input{
-  width:100%; padding:.8rem .9rem;
-  border:1px solid rgba(0,0,0,.13);
-  border-radius:10px;
-  background:#fff; color:#111827;
+/* inputs / labels */
+.form-label, label, .pergunta-label, .review h2, .review h3 { color: #f5f6ff; }
+input[type="text"], textarea, .review input, .review textarea{
+  background: #e6e8f3; color: #111; border: 1px solid rgba(0,0,0,.12);
+  border-radius: 12px; padding: 13px 12px; width: 100%;
 }
-.textarea{ min-height:140px; resize:vertical; }
-.input[readonly]{ opacity:.9; }
+input::placeholder, textarea::placeholder{ color:#6b7280 }
 
-/* Barra de passos */
-.progress-dots{ display:flex; gap:.5rem; margin:-.2rem 0 .8rem; }
-.dot{
-  width:10px; height:10px; border-radius:999px;
-  background:#d1d5db;
-}
-.dot.active{ background:#7c3aed; box-shadow: 0 0 0 4px rgba(124,58,237,.18); }
-
-/* Botões em linha */
-.actions{ display:flex; flex-wrap:wrap; gap:.6rem; margin-top: .8rem; }
-
-/* card de revisão */
+/* review card destacado */
 .review-card{
   background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 16px;
-  padding: 22px;
+  border: 1px solid rgba(255, 223, 169, .6);
+  border-radius: 14px; padding: 18px;
 }
 
-/* =============== Chama pequena (pág. jornadas) =============== */
+/* ===== Chama pequena (pág. jornada) ===== */
 .chama-wrap{ display:flex; justify-content:center; margin-top: 24px; }
-.chama{
-  width:30px; height:46px; position:relative;
+.chama{ width:30px; height:46px; position:relative;
   filter: drop-shadow(0 6px 18px rgba(255,185,80,.35));
   animation: chama-pulso 1.8s infinite ease-in-out;
 }
 .chama::before{
   content:""; position:absolute; inset:0;
-  /* gota (teardrop): borda assimétrica + rotação */
   background: radial-gradient(40% 50% at 50% 30%, #fff6bf 0%, #ffb152 55%, #ff7a00 100%);
-  border-radius: 60% 60% 60% 0;     /* canto inferior direito mais agudo */
-  transform: rotate(45deg) scale(1,1.22);
+  border-radius: 60% 60% 60% 0; transform: rotate(45deg) scale(1,1.22);
 }
 .chama::after{
-  content:""; position:absolute; 
-  width:42%; height:42%; left:32%; top:18%;
+  content:""; position:absolute; width:42%; height:42%; left:32%; top:18%;
   background: radial-gradient(circle, #fff8d6 0%, rgba(255,255,255,0) 70%);
   border-radius:50%; filter: blur(1px); opacity:.85;
 }
 @keyframes chama-pulso{
-  0%,100%{ transform: translateY(0) scale(1); }
-  50%{ transform: translateY(-2px) scale(1.05); }
-}
-/* =============== Progresso da jornada =============== */
-.progress-count{
-  font-weight:700; color:#7a4b00; margin: .2rem 0 .4rem;
-}
-.progress{
-  height: 6px; background: rgba(124,58,237,.18);
-  border-radius: 999px; overflow: hidden; margin-bottom: .8rem;
-}
-.progress > span{
-  display:block; height:100%; background: #7c3aed; width: 0%;
+  0%,100%{ transform: translateY(0) scale(1) }
+  50%{ transform: translateY(-2px) scale(1.05) }
 }
 
+/* ===== Progresso ===== */
+.progress-count{ font-weight:700; color:#7a4b00; margin:.2rem 0 .4rem }
+.progress{ height:6px; background: rgba(124,58,237,.18); border-radius:999px; overflow:hidden; margin-bottom:.8rem }
+.progress>span{ display:block; height:100%; background:#7c3aed; width:0% }
+
+/* ===== Util ===== */
+.space-y{ display:grid; gap: 14px }
