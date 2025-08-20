@@ -8,19 +8,30 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/styles-core.css" />
+  <link rel="stylesheet" href="css/styles-chama.css" />
 </head>
 <body class="bg-grad text-surface-100">
   <main class="container mx-auto px-4 py-12 max-w-4xl">
-    <header class="text-center mb-12">
-      <h1 class="text-3xl md:text-4xl font-extrabold">Irmandade Conhecimento com Luz</h1>
-      <p class="opacity-80 mt-2">Bem-vindo(a)! Clique abaixo para iniciar sua jornada essencial.</p>
-    </header>
 
-    <div class="flex justify-center">
-      <a id="btnExplorar" href="jornadas.html" class="btn-primary inline-flex items-center gap-2">
-        <span>Explorar Jornadas</span>
-      </a>
-    </div>
+    <section class="card">
+      <div class="card-body text-center">
+        <h1 class="text-3xl md:text-4xl font-extrabold">Irmandade Conhecimento com Luz</h1>
+        <p class="opacity-80 mt-2">Bem-vindo(a)! Clique abaixo para iniciar sua jornada essencial.</p>
+
+        <div class="mt-8 flex justify-center">
+          <a id="btnExplorar" href="jornadas.html" class="btn-primary inline-flex items-center gap-2">
+            <span>Explorar Jornadas</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Chamas decorativas (homepage) -->
+      <div class="chama-wrapper">
+        <div class="chama chama-grande" aria-hidden="true"></div>
+        <div class="chama chama-pequena" aria-hidden="true"></div>
+      </div>
+    </section>
+
   </main>
 
   <!-- Acorda o backend antes de navegar (suave) -->
