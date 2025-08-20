@@ -1,49 +1,30 @@
-/* ===== Chama vibrante (apenas vitrine) ===== */
+/* ===== Chama vibrante (vitrine) ===== */
 .chama-wrapper{ position:absolute; inset:auto 0 0 0; height:0; pointer-events:none; z-index:0 }
-.chama{ position:absolute; bottom:-22px; --scale:1; --y:0px; --rot:0deg; }
+.chama{ position:absolute; bottom:-24px; --scale:1; --y:0px; --rot:0deg }
 
-/* Grande — forma elíptica, núcleo suave e brilho */
+/* Grande — formato “gota” com topo suave */
 .chama-grande{
-  left:16px;
-  width:78px;             /* grande e esguia */
-  height:120px;
-  /* raio elíptico para dar “gota” */
-  border-radius: 999px / 85%;
+  left:50%;
+  width:74px; height:116px;
+  transform: translateX(-50%) translateY(var(--y)) scale(var(--scale)) rotate(var(--rot));
+  /* modelagem: clip-path dá a ponta, sem “teto reto” */
+  clip-path: ellipse(46% 68% at 50% 58%);
   background:
-    /* núcleo claro (suave, sem círculo duro) */
-    radial-gradient(60% 72% at 50% 38%, rgba(255,255,255,.92) 0 18%, rgba(255,255,255,.55) 18% 32%, rgba(255,255,255,0) 33%),
-    /* corpo laranja */
-    radial-gradient(70% 85% at 50% 65%, #ffd27a 0 42%, #ff9b4e 42% 72%, rgba(255,155,78,0) 73%);
-  box-shadow:
-    0 0 26px rgba(255,170,64,.55),
-    0 0 90px rgba(255,140,61,.30);
+    radial-gradient(58% 70% at 50% 34%, rgba(255,255,255,.92) 0 18%, rgba(255,255,255,.55) 18% 34%, rgba(255,255,255,0) 35%),
+    radial-gradient(70% 88% at 50% 66%, #ffd27a 0 42%, #ff9b4e 42% 74%, rgba(255,155,78,0) 75%);
+  box-shadow: 0 0 26px rgba(255,170,64,.55), 0 0 90px rgba(255,140,61,.30);
   filter: saturate(1.22) brightness(1.05);
-  transform: translateY(var(--y)) scale(var(--scale)) rotate(var(--rot));
 }
-/* brilho envolvente (suave) */
 .chama-grande::after{
-  content:""; position:absolute; inset:-24% -28% -18% -28%; border-radius:inherit; pointer-events:none;
+  content:""; position:absolute; inset:-24% -28% -18% -28%; border-radius:inherit;
   background: radial-gradient(closest-side, rgba(255,171,64,.50), rgba(255,140,61,0) 70%);
-  filter: blur(18px); opacity:.8;
-  animation: glow 2.4s ease-in-out infinite;
+  filter: blur(18px); opacity:.8; animation: glow 2.4s ease-in-out infinite;
 }
 
-/* Pequena (não usada no modo central, mas mantém estética) */
-.chama-pequena{
-  left:90px; width:30px; height:50px; border-radius:999px/85%;
-  background:
-    radial-gradient(58% 70% at 50% 40%, rgba(255,255,255,.9) 0 22%, rgba(255,255,255,.5) 22% 36%, transparent 37%),
-    radial-gradient(68% 82% at 50% 66%, #ffe0a6 0 40%, #ff9b4e 40% 66%, rgba(255,155,78,0) 67%);
-  box-shadow: 0 0 18px rgba(255,170,64,.45), 0 0 48px rgba(255,140,61,.28);
-  filter: saturate(1.2) brightness(1.05);
-  transform: translateY(var(--y)) scale(var(--scale)) rotate(var(--rot));
-}
-
-/* Central = 1 chama só (home/intro/wizard) */
-<!-- Chama central também no wizard -->
-<div class="chama-wrapper chama-center">
-  <div class="chama chama-grande" aria-hidden="true"></div>
-  <div class="chama chama-pequena" aria-hidden="true"></div>
-</div>
+/* Pequena não usada quando central, mas mantida */
+.chama-pequena{ display:none }
 
 @keyframes glow{ 0%{opacity:.72} 50%{opacity:.9} 100%{opacity:.7} }
+
+/* Util para casos em que colocou .chama-center no HTML */
+.chama-center .chama-grande{ left:50% }
