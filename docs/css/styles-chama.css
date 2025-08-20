@@ -1,29 +1,24 @@
+/* ===== Chamas — agora controladas por variável CSS (--scale) ===== */
 .chama-wrapper{ position:absolute; inset:auto 0 0 0; height:0; pointer-events:none }
-.chama{ position:absolute; bottom:-22px; filter: blur(.3px) saturate(1.1); opacity:.9 }
+.chama{ position:absolute; bottom:-22px; filter: blur(.3px) saturate(1.1); opacity:.9; --scale:1 }
 
-/* padrão (se usar) */
+/* Padrão (se não usar a variação central) */
 .chama-grande{
-  left:16px; width:42px; height:66px;
+  left:16px; width:48px; height:76px;
   background: radial-gradient(closest-side,#ffd27a,#ff8b3d 62%,transparent 65%);
-  border-radius:999px 999px 40% 40%; animation: chamaPulse 1.6s ease-in-out infinite
+  border-radius:999px 999px 40% 40%;
+  transform: translateY(0) scale(var(--scale));
 }
 .chama-pequena{
   left:72px; width:22px; height:36px;
   background: radial-gradient(closest-side,#ffe0a6,#ff9b4e 62%,transparent 65%);
-  border-radius:999px 999px 45% 45%; animation: chamaPulseSmall 1.2s ease-in-out infinite; transform-origin:50% 80%
+  border-radius:999px 999px 45% 45%;
+  transform: translateY(0) scale(var(--scale));
 }
 
-/* Variante central: uma chama (sem duplicar) */
+/* Variante central — uma única chama */
 .chama-center .chama-grande{
-  left:50%; transform:translateX(-50%); width:48px; height:76px;
+  left:50% !important;
+  transform: translateX(-50%) translateY(0) scale(var(--scale));
 }
-.chama-center .chama-pequena{ display:none; }
-
-@keyframes chamaPulse{
-  0%{transform:translateY(0) scale(1)}35%{transform:translateY(-2px) scale(1.03) skewX(-1.2deg)}
-  70%{transform:translateY(1px) scale(.98) skewX(.8deg)}100%{transform:translateY(0) scale(1)}
-}
-@keyframes chamaPulseSmall{
-  0%{transform:translateY(0) scale(1)}40%{transform:translateY(-1px) scale(1.05)}
-  80%{transform:translateY(.6px) scale(.97)}100%{transform:translateY(0) scale(1)}
-}
+.chama-center .chama-pequena{ display:none !important; }
