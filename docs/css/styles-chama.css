@@ -41,7 +41,11 @@
 }
 
 /* Usaremos só a chama grande (inferior) */
- .chama-pequena{ display:none !important; }
-}
+ /* Mostra só a ÚLTIMA chama diretamente sob o .card  */
+.card > .chama-wrapper:not(:last-of-type){ display:none !important; }
+
+/* Nunca renderizar chamas colocadas dentro do .card-body */
+.card-body .chama-wrapper{ display:none !important; }
+
 
 @keyframes glow { 0%{opacity:.72} 50%{opacity:.9} 100%{opacity:.7} }
