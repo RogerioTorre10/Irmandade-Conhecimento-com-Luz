@@ -116,6 +116,42 @@ function renderFormStep() {
 }
 
 // Review
+async function baixarTudo(){
+  const statusEl = document.querySelector('#status');
+  const btn = document.querySelector('#btnDownload');
+  try{
+    if(btn){ btn.disabled = true; btn.textContent = 'Gerando...'; }
+    if(statusEl){ statusEl.textContent = ''; }
+
+    const payload = { answers: state.answers, meta: { version: state.version } };
+
+    // PDF
+    const pdfResp = await fetch(`${CONFIG.API_BASE}/gerar-pdf`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/pdf' },
+      body: JSON.stringify(payload)
+    });
+    if(!pdfResp.ok) throw new Error('Falha ao gerar PDF');
+    await baixarComoArquivo(await pdfResp.blob(), 'jornada.pdf');
+
+    // HQ (no backend atual retorna PDF placeholder)
+    const hqResp = await fetch(`${CONFIG.API_BASE}/gerar-hq`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/pdf' },
+      body: JSON.stringify(payload)
+    });
+    if(!hqResp.ok) throw new Error('Falha ao gerar HQ');
+    await baixarComoArquivo(await hqResp.blob(), 'jornada-hq.pdf');
+
+    if(statusEl){ statusEl.textContent = 'Arquivos gerados com sucesso. 🙏'; }
+  }catch(err){
+    console.error(err);
+    if(statusEl){ statusEl.textContent = 'Não foi possível gerar os arquivos. Tente novamente.'; }
+  }finally{
+    if(btn){ btn.disabled = false; btn.textContent = 'Baixar PDF + HQ'; }
+  }
+}
+
 function renderReview() {
   loadLocal();
   app.innerHTML = `
