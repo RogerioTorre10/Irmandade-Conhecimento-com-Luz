@@ -61,17 +61,27 @@ a.btn{ text-decoration:none; }
 .foot{ margin-top:36px; text-align:center; color:var(--muted); }
 
 /* =============== Home Hero =============== */
-.hero{ position:relative; overflow:visible; }
+.hero{ 
+  position:relative; 
+  overflow:visible; 
+  padding-bottom: 160px;   /* dá espaço para a chama ficar mais abaixo */
+}
 .hero .lead{ margin-bottom: 1.4rem; }
 
-/* chama grande da home */
+/* chama grande da home (mais ao centro/baixo) */
 .hero-flame{
-  position:absolute; left:50%; bottom:-36px; transform:translateX(-50%);
-  width: 170px; height:170px; opacity:.95; pointer-events:none;
+  position:absolute; 
+  left:50%; 
+  bottom:-110px;           /* empurra para baixo */
+  transform:translateX(-50%);
+  width: 200px; 
+  height:200px; 
+  opacity:.95; 
+  pointer-events:none;
   filter: drop-shadow(0 14px 40px rgba(255,140,42,.25));
 }
-@media (min-width: 768px){
-  .hero-flame{ width: 200px; height:200px; bottom:-40px; }
+@media (max-width: 767px){
+  .hero-flame{ width:170px; height:170px; bottom:-95px; }
 }
 
 /* =============== Pergaminho / Form =============== */
@@ -120,16 +130,36 @@ a.btn{ text-decoration:none; }
 /* =============== Chama pequena (pág. jornadas) =============== */
 .chama-wrap{ display:flex; justify-content:center; margin-top: 24px; }
 .chama{
-  width:26px; height:38px; position:relative; filter: drop-shadow(0 6px 18px rgba(255,185,80,.35));
+  width:30px; height:46px; position:relative;
+  filter: drop-shadow(0 6px 18px rgba(255,185,80,.35));
   animation: chama-pulso 1.8s infinite ease-in-out;
 }
 .chama::before{
-  content:""; position:absolute; inset:0; border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
-  background: radial-gradient(45% 55% at 50% 35%, #fff6bf, #ff9c2a 60%, #ff7a00 100%);
+  content:""; position:absolute; inset:0;
+  /* gota (teardrop): borda assimétrica + rotação */
+  background: radial-gradient(40% 50% at 50% 30%, #fff6bf 0%, #ffb152 55%, #ff7a00 100%);
+  border-radius: 60% 60% 60% 0;     /* canto inferior direito mais agudo */
+  transform: rotate(45deg) scale(1,1.22);
 }
-
-/* pulso */
+.chama::after{
+  content:""; position:absolute; 
+  width:42%; height:42%; left:32%; top:18%;
+  background: radial-gradient(circle, #fff8d6 0%, rgba(255,255,255,0) 70%);
+  border-radius:50%; filter: blur(1px); opacity:.85;
+}
 @keyframes chama-pulso{
   0%,100%{ transform: translateY(0) scale(1); }
   50%{ transform: translateY(-2px) scale(1.05); }
 }
+/* =============== Progresso da jornada =============== */
+.progress-count{
+  font-weight:700; color:#7a4b00; margin: .2rem 0 .4rem;
+}
+.progress{
+  height: 6px; background: rgba(124,58,237,.18);
+  border-radius: 999px; overflow: hidden; margin-bottom: .8rem;
+}
+.progress > span{
+  display:block; height:100%; background: #7c3aed; width: 0%;
+}
+
