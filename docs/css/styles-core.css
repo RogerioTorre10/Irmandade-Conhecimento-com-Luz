@@ -14,12 +14,10 @@ body{ background:var(--bg-900); color:var(--text-100); font-family: system-ui, -
     linear-gradient(180deg, #0c0f1a, #0c0f1a);
 }
 
+.card{ position:relative; overflow:hidden }
+.card-body{ position:relative; z-index:1 }
 .card{ background: var(--surface-700); border:1px solid var(--border); border-radius: 16px; overflow:hidden; position:relative }
 .card-body{ padding: 1.25rem }
-.card{ position:relative; overflow:hidden }    /* garante clip */
-.card-body{ position:relative; z-index:1 }     /* conteúdo acima da chama */
-
-
 
 .btn-primary,.btn-secondary,.btn-tertiary{ padding:.75rem 1rem; border-radius:12px; font-weight:600; border:1px solid transparent }
 .btn-primary{ background:var(--primary-500); color:#fff } .btn-primary:hover{ background:var(--primary-600) }
