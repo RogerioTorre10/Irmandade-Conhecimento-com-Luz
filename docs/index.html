@@ -1,69 +1,71 @@
 <!doctype html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Irmandade Conhecimento com Luz</title>
-  <meta name="description" content="Irmandade Conhecimento com Luz — fé, ciência, filosofia e tecnologia unidas para despertar e guiar.">
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="styles.css">
+  <meta name="description" content="Fé, ciência e propósito — guiados pela Luz Algorítmica." />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="home">
-  <main class="min-h-screen flex flex-col justify-center items-center text-center px-6">
-    <div class="hero-card p-10 md:p-14 max-w-2xl">
-      <h1 class="text-4xl md:text-5xl font-extrabold text-yellow-400 mb-6">
-        Irmandade Conhecimento com Luz
-      </h1>
-      <p class="text-lg text-gray-200 leading-relaxed mb-8">
-        Fé, ciência e filosofia em unidade.<br>
-        Uma jornada de autoconhecimento, vocação e amor.<br>
-        Explore, responda e receba a sua chama em forma de livro vivo.
+  <main class="container">
+    <section class="hero card">
+      <h1>Irmandade Conhecimento com Luz</h1>
+      <p class="lead">
+        Fé, ciência e filosofia em unidade.
+        Uma jornada de autoconhecimento, vocação e amor.
+        Explore, responda e receba a sua chama em forma de <strong>livro vivo</strong>.
       </p>
-      <a href="jornadas.html" class="btn-primary">
-        <span>Explorar Jornadas</span>
-      </a>
-    </div>
-    <!-- Chama grande decorativa -->
-<div class="hero-flame" aria-hidden="true">
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-    <defs>
-      <radialGradient id="g2" cx="32" cy="40" r="24">
-        <stop offset="0" stop-color="#ffd057"/>
-        <stop offset=".6" stop-color="#ff8a00"/>
-        <stop offset="1" stop-color="rgba(0,0,0,0)"/>
-      </radialGradient>
-      <linearGradient id="flame2" x1="0" x2="0" y1="0" y2="1">
-        <stop offset="0" stop-color="#fff3a3"/>
-        <stop offset="1" stop-color="#ff8c2a"/>
-      </linearGradient>
-      <filter id="blur2" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="1.8"/>
-      </filter>
-    </defs>
-    <ellipse cx="32" cy="46" rx="12" ry="4" fill="url(#g2)" opacity=".65">
-      <animate attributeName="opacity" values=".5;.85;.5" dur="1.8s" repeatCount="indefinite"/>
-    </ellipse>
-    <g transform="translate(0,2)">
-      <path d="M32 10 C38 18, 42 24, 36 30 C33 33, 31 36, 32 41 C28 38, 26 34, 28 30 C24 27, 25 21, 32 10 Z"
-            fill="url(#flame2)">
-        <animate attributeName="d" dur="1.8s" repeatCount="indefinite"
-          values="M32 10 C38 18, 42 24, 36 30 C33 33, 31 36, 32 41 C28 38, 26 34, 28 30 C24 27, 25 21, 32 10 Z;
-                  M32 10 C36 18, 43 23, 35 30 C33 32, 30 36, 32 41 C28 39, 26 34, 29 30 C24 27, 26 21, 32 10 Z;
-                  M32 10 C38 18, 42 24, 36 30 C33 33, 31 36, 32 41 C28 38, 26 34, 28 30 C24 27, 25 21, 32 10 Z"/>
-      </path>
-      <path d="M32 20 C34 24, 35 27, 33 30 C32 31.5, 31 33, 32 36 C29.5 34, 29 31.5, 30 30 C28 28, 29 24, 32 20 Z"
-            fill="#fff3be" filter="url(#blur2)" opacity=".9">
-        <animate attributeName="opacity" values=".7;1;.7" dur="1.8s" repeatCount="indefinite"/>
-      </path>
-    </g>
-  </svg>
-</div>
 
+      <a class="btn btn-primary" href="jornadas.html">
+        Explorar Jornadas
+      </a>
+
+      <!-- Chama grande da home -->
+      <div class="hero-flame" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+          <defs>
+            <radialGradient id="g2" cx="32" cy="40" r="24">
+              <stop offset="0" stop-color="#ffd057"/>
+              <stop offset=".6" stop-color="#ff8a00"/>
+              <stop offset="1" stop-color="rgba(0,0,0,0)"/>
+            </radialGradient>
+            <linearGradient id="flame2" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0" stop-color="#fff3a3"/>
+              <stop offset="1" stop-color="#ff8c2a"/>
+            </linearGradient>
+            <filter id="blur2" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="1.8"/>
+            </filter>
+          </defs>
+          <ellipse cx="32" cy="46" rx="12" ry="4" fill="url(#g2)" opacity=".65">
+            <animate attributeName="opacity" values=".5;.85;.5" dur="1.8s" repeatCount="indefinite"/>
+          </ellipse>
+          <g transform="translate(0,2)">
+            <path d="M32 10 C38 18, 42 24, 36 30 C33 33, 31 36, 32 41 C28 38, 26 34, 28 30 C24 27, 25 21, 32 10 Z"
+                  fill="url(#flame2)">
+              <animate attributeName="d" dur="1.8s" repeatCount="indefinite"
+                values="M32 10 C38 18, 42 24, 36 30 C33 33, 31 36, 32 41 C28 38, 26 34, 28 30 C24 27, 25 21, 32 10 Z;
+                        M32 10 C36 18, 43 23, 35 30 C33 32, 30 36, 32 41 C28 39, 26 34, 29 30 C24 27, 26 21, 32 10 Z;
+                        M32 10 C38 18, 42 24, 36 30 C33 33, 31 36, 32 41 C28 38, 26 34, 28 30 C24 27, 25 21, 32 10 Z"/>
+            </path>
+            <path d="M32 20 C34 24, 35 27, 33 30 C32 31.5, 31 33, 32 36 C29.5 34, 29 31.5, 30 30 C28 28, 29 24, 32 20 Z"
+                  fill="#fff3be" filter="url(#blur2)" opacity=".9">
+              <animate attributeName="opacity" values=".7;1;.7" dur="1.8s" repeatCount="indefinite"/>
+            </path>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <footer class="foot small">
+      © <span id="year"></span> Irmandade Conhecimento com Luz. Para além. E sempre.
+    </footer>
   </main>
 
-  <footer class="py-6 text-center text-sm text-gray-400">
-    <p>© 2025 Irmandade Conhecimento com Luz · Para além. E sempre!</p>
-  </footer>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
