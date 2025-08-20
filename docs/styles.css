@@ -51,21 +51,16 @@ strong{ color:#fff }
 .hero{ position:relative; overflow:visible; padding-bottom: 160px; }
 .hero .lead{ margin-bottom: 1.2rem; }
 
-/* chama grande mais central e animada */
-.hero-flame-wrap{
-  position:absolute;
-  left:50%;
-  top: 68%;                    /* empurra mais ao centro da dobra */
-  transform: translate(-50%, -50%);
-  width: 220px; height: 220px;
-  pointer-events:none;
+/* chama grande centralizada */
+.hero-flame{
+  position:absolute; left:50%; bottom:-110px; transform:translateX(-50%);
+  width: 200px; height: 200px; opacity:.95; pointer-events:none;
+  filter: drop-shadow(0 14px 40px rgba(255,140,42,.25));
 }
 @media (max-width: 767px){
   .hero-flame-wrap{ width: 190px; height: 190px; top: 70%; }
   .hero{ padding-bottom: 220px; } /* antes era 160px; a chama está mais central */
-
 }
-
 
 /* ===== Botões ===== */
 .btn{
@@ -171,13 +166,14 @@ input::placeholder, textarea::placeholder{ color:#6b7280 }
 /* ===== Util ===== */
 .space-y{ display:grid; gap: 14px }
 
-/* ===== Pergaminho Vertical (intro) ===== */
+/* ===== Pergaminho Vertical (intro/termo) ===== */
 .perg-vert{
-  background: url('/docs/assets/perg-vert.png') center/cover no-repeat;
+  /* ATENÇÃO: caminho relativo a /docs */
+  background: url('assets/perg-vert.png') center/cover no-repeat;
   max-width: 900px;
   margin: 24px auto 32px;
   padding: 64px 48px;
-  color: #2d1c0f; /* marrom legível */
+  color: #2d1c0f;
   font-family: "Times New Roman", Georgia, serif;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0,0,0,.35);
@@ -190,52 +186,17 @@ input::placeholder, textarea::placeholder{ color:#6b7280 }
   }
 }
 
-.perg-title{
-  text-align:center;
-  font-size: clamp(1.4rem, 2.4vw, 2rem);
-  margin-bottom: 16px;
-  color: #2a1a0d;
-  font-weight: 700;
-}
+/* Conteúdo do pergaminho mais organizado */
+.perg-title{ text-align:center; font-size: clamp(1.4rem, 2.4vw, 2rem); margin-bottom: 12px; color:#2a1a0d; font-weight:700; }
+.perg-sub{ margin: 14px 0 6px; color:#3a2616; }
+.perg-list{ margin: 0 0 8px 18px; padding:0; }
+.perg-list li{ margin-bottom:6px; }
+.perg-termo ul{ list-style:disc; margin:8px 0 0 22px; padding:0; }
+.perg-termo li{ margin:6px 0; }
 
-.perg-sub{
-  margin-top: 18px;
-  margin-bottom: 8px;
-  font-size: 1.1rem;
-  color: #3a2616;
-}
-
-.perg-list{
-  margin: 0 0 10px 18px;
-  padding: 0;
-}
-.perg-list li{ margin-bottom: 6px; }
-
-.perg-termo ul{
-  list-style: disc;
-  margin: 8px 0 0 22px;
-  padding: 0;
-}
-.perg-termo li{ margin: 6px 0; }
-
-.perg-actions{
-  display:flex;
-  gap:14px;
-  align-items:center;
-  justify-content:space-between;
-  flex-wrap:wrap;
-  margin-top: 16px;
-}
-
-.agree{
-  display:flex; gap:10px; align-items:center;
-  font-size:.98rem;
-  user-select:none;
-}
+.perg-actions{ display:flex; gap:14px; align-items:center; justify-content:space-between; flex-wrap:wrap; margin-top: 14px; }
+.agree{ display:flex; gap:10px; align-items:center; user-select:none; }
 .agree input{ transform: translateY(1px); }
-
-.perg-vert .btn{
-  padding:.7rem 1.05rem;
-  border-radius:12px;
+.perg-vert .btn{ padding:.7rem 1.05rem; border-radius:12px; }
 }
 
