@@ -25,16 +25,16 @@
         </div>
       </div>
 
-      <!-- Chamas decorativas (homepage) -->
-      <div class="chama-wrapper">
+      <!-- Chama central (uma única) -->
+      <div class="chama-wrapper chama-center">
         <div class="chama chama-grande" aria-hidden="true"></div>
+        <!-- pequena oculta em chama-center -->
         <div class="chama chama-pequena" aria-hidden="true"></div>
       </div>
     </section>
 
   </main>
 
-  <!-- Acorda o backend antes de navegar (suave) -->
   <script>
     const API = 'https://conhecimento-com-luz-api.onrender.com';
     const btn = document.getElementById('btnExplorar');
@@ -46,7 +46,7 @@
             fetch(API + '/health', { method: 'GET' }),
             new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 2500))
           ]);
-        } catch(_) { /* continua mesmo se offline */ }
+        } catch(_) {}
         location.href = btn.getAttribute('href');
       });
     }
