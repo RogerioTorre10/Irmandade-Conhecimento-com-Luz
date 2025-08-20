@@ -108,3 +108,28 @@ button:focus-visible, .btn:focus-visible {
 
 /* ===== Helpers ===== */
 .maxw{ max-width:980px; margin-inline:auto; }
+
+/* Labels e textos no fundo escuro — mais legíveis */
+.form-label, label, .pergunta-label, .review h2, .review h3 {
+  color: #f5f6ff;
+}
+
+/* Inputs mais claros com texto escuro (melhor leitura) */
+input[type="text"], textarea, .review input, .review textarea {
+  background: #eceef6;
+  color: #111827;
+  border: 1px solid rgba(0,0,0,.12);
+}
+
+input::placeholder, textarea::placeholder {
+  color: #6b7280;
+}
+
+/* Caixa de revisão (card) com contraste suave */
+.review-card {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  padding: 18px;
+}
+
