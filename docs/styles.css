@@ -51,11 +51,12 @@ strong{ color:#fff }
 .hero{ position:relative; overflow:visible; padding-bottom: 160px; }
 .hero .lead{ margin-bottom: 1.2rem; }
 
-/* chama grande centralizada */
-.hero-flame{
-  position:absolute; left:50%; bottom:-110px; transform:translateX(-50%);
-  width: 200px; height: 200px; opacity:.95; pointer-events:none;
-  filter: drop-shadow(0 14px 40px rgba(255,140,42,.25));
+/* ===== CHAMA GRANDE (home) ===== */
+.hero-flame-wrap{
+  position: relative;
+  display: grid;
+  place-items: center;
+  margin:
 }
 @media (max-width: 767px){
   .hero-flame-wrap{ width: 190px; height: 190px; top: 70%; }
