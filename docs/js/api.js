@@ -1,128 +1,83 @@
 (function(){
   const { API_BASE, PDF_ENDPOINT, HQ_ENDPOINT } = window.JORNADA_CFG;
 
-  async function ping(){
-    try{
-      await Promise.race([
-        fetch(API_BASE + '/health', { method:'GET' }),
-        new Promise((_, r) => setTimeout(()=>r(new Error('timeout')), 4000))
-      ]);
-    }catch(_){}
-  }
-
-  async function toBlobOrDownload(resp, fallbackName){
-    const ct = (resp.headers.get('content-type') || '').toLowerCase();
-    if (ct.includes('application/pdf')) {
-      const blob = await resp.blob(); baixar(blob, fallbackName); return;
-    }
-    const text = await resp.text();
-    try{
-      const json = JSON.parse(text);
-      if (json?.url){
-        const a = document.createElement('a'); a.href = json.url; a.download = fallbackName;
-        document.body.appendChild(a); a.click(); a.remove(); return;
-      }
-      const b64 = json?.file || json?.pdf_base64;
-      if (b64){
-        const a = document.createElement('a');
-        a.href = 'data:application/pdf;base64,' + b64;
-        a.download = fallbackName; document.body.appendChild(a); a.click(); a.remove(); return;
-      }
-      throw new Error('JSON sem url/base64');
-    }catch{
-      throw new Error(`Resposta inesperada (${resp.status}): ${text.slice(0,180)}`);
-    }
-  }
-
   async function gerarPDFEHQ(payload){
-    await ping();
-
-    const headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/pdf, application/json, */*'
-    };
-
-    const [pdfResp, hqResp] = await Promise.all([
-      fetch(API_BASE + PDF_ENDPOINT, { method:'POST', headers, body: JSON.stringify(payload) }),
-      fetch(API_BASE + HQ_ENDPOINT,  { method:'POST', headers, body: JSON.stringify(payload) }),
-    ]);
-
-    if(!pdfResp.ok){
-      const t = await pdfResp.text().catch(()=>String(pdfResp.status));
-      throw new Error(`PDF falhou (${pdfResp.status}): ${t.slice(0,180)}`);
+    try {
+      // tenta backend primeiro
+      const headers = { 'Content-Type':'application/json', 'Accept':'application/pdf, application/json' };
+      const [pdfResp, hqResp] = await Promise.all([
+        fetch(API_BASE + PDF_ENDPOINT, { method:'POST', headers, body: JSON.stringify(payload) }),
+        fetch(API_BASE + HQ_ENDPOINT,  { method:'POST', headers, body: JSON.stringify(payload) }),
+      ]);
+      if(!pdfResp.ok || !hqResp.ok) throw new Error('backend');
+      await baixarResp(pdfResp, 'Jornada-Conhecimento-com-Luz.pdf');
+      await baixarResp(hqResp,  'Jornada-Conhecimento-com-Luz-HQ.pdf');
+    } catch (e) {
+      // fallback local
+      gerarLocal(payload);
     }
-    if(!hqResp.ok){
-      const t = await hqResp.text().catch(()=>String(hqResp.status));
-      throw new Error(`HQ falhou (${hqResp.status}): ${t.slice(0,180)}`);
-    }
+  }
 
-    await toBlobOrDownload(pdfResp, 'Jornada-Conhecimento-com-Luz.pdf');
-    await toBlobOrDownload(hqResp,  'Jornada-Conhecimento-com-Luz-HQ.pdf');
+  async function baixarResp(resp, nome){
+    const ct = (resp.headers.get('content-type')||'').toLowerCase();
+    if (ct.includes('application/pdf')) {
+      const blob = await resp.blob();
+      baixar(blob, nome); return;
+    }
+    const txt = await resp.text();
+    try {
+      const j = JSON.parse(txt);
+      if (j.url) { link(j.url, nome); return; }
+      const b64 = j.file || j.pdf_base64;
+      if (b64) { link('data:application/pdf;base64,'+b64, nome); return; }
+    } catch(_) {}
+    throw new Error('formato inesperado');
+  }
+
+  function gerarLocal({ respostas={}, meta={} }){
+    const { jsPDF } = window.jspdf || {};
+    if (!jsPDF) { alert('PDF local indisponível.'); return; }
+
+    // PDF da devolutiva
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    const margin = 48;
+    let y = margin;
+
+    doc.setFont('helvetica','bold'); doc.setFontSize(18);
+    doc.text('Jornada — Devolutiva Simbólica', margin, y); y += 20;
+    doc.setFont('helvetica','normal'); doc.setFontSize(11);
+    doc.text(`Gerado em: ${(new Date(meta.quando || Date.now())).toLocaleString('pt-BR')}`, margin, y); y += 18;
+
+    Object.entries(respostas).forEach(([id,val],i)=>{
+      y += 16;
+      doc.setFont('helvetica','bold'); doc.setFontSize(12);
+      doc.text(`${i+1}. ${id}`, margin, y); y += 14;
+      doc.setFont('helvetica','normal'); doc.setFontSize(12);
+      const split = doc.splitTextToSize(val || '-', 515);
+      split.forEach(line => { if (y > 780) { doc.addPage(); y = margin; } doc.text(line, margin, y); y += 14; });
+    });
+
+    // salva PDF 1
+    doc.save('Jornada-Conhecimento-com-Luz.pdf');
+
+    // PDF simples da “HQ” (placeholder)
+    const hq = new jsPDF({ unit:'pt', format:'a4' });
+    hq.setFont('helvetica','bold'); hq.setFontSize(22);
+    hq.text('HQ Simbólica', margin, 80);
+    hq.setFont('helvetica','normal'); hq.setFontSize(13);
+    hq.text('Versão local (fallback). Quando o backend estiver ativo, a HQ completa será baixada automaticamente.', margin, 110);
+    hq.save('Jornada-Conhecimento-com-Luz-HQ.pdf');
   }
 
   function baixar(blob, filename){
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = filename;
-    document.body.appendChild(a); a.click();
-    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 1000);
+    link(url, filename);
+    setTimeout(()=>URL.revokeObjectURL(url), 1500);
   }
-// ... (seu código atual do api.js)
+  function link(url, filename){
+    const a = document.createElement('a'); a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
 
-async function gerarPDFLocal(respostas) {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: "pt", format: "a4" });
-
-  const margem = 48;
-  let y = margem;
-
-  // Título
-  doc.setFont("Times","Bold");
-  doc.setFontSize(18);
-  doc.text("Jornada — Devolutiva Simbólica (Versão Local)", margem, y);
-  y += 24;
-
-  doc.setFont("Times","Normal");
-  doc.setFontSize(11);
-  doc.setTextColor(90,90,90);
-  doc.text(`Gerado em: ${new Date().toLocaleString()}`, margem, y);
-  y += 24;
-
-  doc.setTextColor(0,0,0);
-  doc.setFontSize(13);
-
-  const wrap = (txt, maxWidth) => doc.splitTextToSize(txt, maxWidth);
-
-  Object.entries(respostas).forEach(([qid, val], i) => {
-    const titulo = `Pergunta ${i+1}`;
-    doc.setFont("Times","Bold");
-    doc.text(titulo, margem, y);
-    y += 16;
-
-    doc.setFont("Times","Normal");
-    const lines = wrap(String(val || "—"), 520);
-    lines.forEach(line => {
-      if (y > 780) { doc.addPage(); y = margem; }
-      doc.text(line, margem, y);
-      y += 16;
-    });
-    y += 8;
-    if (y > 780) { doc.addPage(); y = margem; }
-  });
-
-  doc.save("Jornada-Conhecimento-com-Luz-local.pdf");
-}
-
-// No FINAL do arquivo, ajuste a exportação para usar do front caso o backend falhe:
-window.API = {
-  async gerarPDFEHQ(payload){
-    try{
-      await gerarPDFEHQ(payload); // tenta backend (sua função existente)
-    } catch (e) {
-      alert("Servidor indisponível. Gerando PDF local de emergência…");
-      await gerarPDFLocal(payload.respostas);
-      // opcional: gerar uma 'HQ' local simples como um segundo PDF:
-      await gerarPDFLocal({ "HQ (local)": "Sua história simbólica será renderizada quando o servidor estiver online." });
-    }
-};
   window.API = { gerarPDFEHQ };
 })();
