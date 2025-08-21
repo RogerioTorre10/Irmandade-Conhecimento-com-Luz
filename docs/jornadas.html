@@ -16,17 +16,23 @@
   <main class="container mx-auto px-4 py-8 max-w-4xl">
 
     <!-- 🔐 AUTENTICAÇÃO (senha fixa de teste) -->
-    <section id="sec-auth" class="card mb-8 hidden" style="display:none">
-      <div class="card-body text-center pergaminho">
-        <h1 class="text-2xl md:text-3xl font-extrabold mb-2">Acessar Jornada</h1>
-        <p class="opacity-80">Digite a senha para iniciar sua jornada.</p>
+   <section id="sec-auth" class="card mb-8 hidden" style="display:none">
+  <!-- Olho decorativo NÃO necessário aqui -->
+  <div class="card-body text-center pergaminho">
+    <h1 class="text-2xl md:text-3xl font-extrabold mb-2">Acessar Jornada</h1>
+    <p class="opacity-80">Digite a senha para iniciar sua jornada.</p>
 
-        <div class="mt-6 mx-auto max-w-sm">
-          <input id="senhaInput" type="password" class="input text-center" placeholder="Senha de acesso" />
-          <p id="authError" class="mt-2 text-sm text-red-400 hidden">Senha incorreta. Tente novamente.</p>
-          <button id="btnEntrar" class="btn-primary mt-4 w-full">Entrar</button>
-        </div>
-      </div>
+    <div class="mt-6 mx-auto max-w-sm relative">
+      <!-- input com espaço à direita para o botão-olho -->
+      <input id="senhaInput" type="password" class="input text-center pr-12" placeholder="Senha de acesso" />
+
+      <!-- Olho mágico: mostrar/ocultar senha -->
+      <button id="btnToggleSenha" type="button" class="btn-eye" aria-label="Mostrar senha" title="Mostrar senha"></button>
+
+      <p id="authError" class="mt-2 text-sm text-red-400 hidden">Senha incorreta. Tente novamente.</p>
+      <button id="btnEntrar" class="btn-primary mt-4 w-full">Entrar</button>
+    </div>
+  </div>
 
       <!-- Chama única no rodapé do card -->
       <div class="chama-wrapper">
