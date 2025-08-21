@@ -46,3 +46,6 @@ body{ background:var(--bg-900); color:var(--text-100); font-family: system-ui, -
 .text-center{ text-align:center } .font-extrabold{ font-weight:800 }
 .container{ max-width: 960px }
 
+.hidden{ display:none !important; }
+#sec-auth.hidden{ display:none !important; }
+
