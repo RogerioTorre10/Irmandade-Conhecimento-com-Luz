@@ -27,15 +27,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // blindagem caso alguma classe/estilo conflite
     secAuth.style.display = 'none';
   }
-  function showOnly(sectionEl){
-    // fallback robusto caso UI.showSection não oculte tudo
-    document.querySelectorAll('main > section').forEach(s=>{
-      s.classList.add('hidden');
-      s.setAttribute('aria-hidden','true');
-    });
-    sectionEl.classList.remove('hidden');
-    sectionEl.removeAttribute('aria-hidden');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+ function showOnly(sectionEl){
+  // esconde todas as sections
+  document.querySelectorAll('main > section').forEach(s=>{
+    s.classList.add('hidden');
+    s.setAttribute('aria-hidden','true');
+    s.style.display = 'none';            // garante oculto
+  });
+  // mostra só a section desejada
+  sectionEl.classList.remove('hidden');
+  sectionEl.removeAttribute('aria-hidden');
+  sectionEl.style.display = '';          // <-- remove inline display:none
+  window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
   function bindAuth(){
