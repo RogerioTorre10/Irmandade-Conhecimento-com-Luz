@@ -112,7 +112,7 @@ if (btnToggleSenha && inputSenha) {
   // DOM — Final
   const btnRevisar = qs('#btnRevisar');
   const btnGerar   = qs('#btnGerarPDFHQ');
- 
+  const btnNova    = qs('#btnNovaJornada');
   let idx = Number(ST.get('idx', 0));
   let respostas = ST.get('respostas', {});
 
