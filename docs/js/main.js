@@ -5,40 +5,43 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  const QUESTIONS = window.JQUESTIONS;
-  const ST = window.JSTATE;
+  // ======== AUTH ========
+  // Sempre exigir senha por sessão: usa sessionStorage (não persiste após fechar a aba)
+  const AUTH_KEY  = 'jornada_auth_session';
+  const AUTH_PASS = (window.JORNADA_CFG?.PASSWORD || 'iniciar').toLowerCase();
 
-  // 🔐 Auth (senha fixa de teste)
+  // Remove flags antigas que faziam pular a senha entre visitas
+  try { localStorage.removeItem('jornada_auth'); } catch(_) {}
+
   const secAuth    = document.getElementById('sec-auth');
   const secIntro   = document.getElementById('sec-intro');
   const inputSenha = qs('#senhaInput');
   const btnEntrar  = qs('#btnEntrar');
   const authError  = qs('#authError');
-  const AUTH_PASS  = (window.JORNADA_CFG?.PASSWORD || 'iniciar').toLowerCase();
 
-  // Helpers de auth
-  function isAuthed(){
-    return ST.get('auth', false) === true || localStorage.getItem('jornada_auth') === 'ok';
-  }
+  function isAuthed(){ return sessionStorage.getItem(AUTH_KEY) === 'ok'; }
+  function setAuthed(){ sessionStorage.setItem(AUTH_KEY, 'ok'); }
+  function clearAuth(){ sessionStorage.removeItem(AUTH_KEY); }
+
   function hideAuth(){
     if (!secAuth) return;
     secAuth.classList.add('hidden');
     secAuth.setAttribute('aria-hidden','true');
-    // blindagem caso alguma classe/estilo conflite
     secAuth.style.display = 'none';
   }
- function showOnly(sectionEl){
-  // esconde todas as sections
-  document.querySelectorAll('main > section').forEach(s=>{
-    s.classList.add('hidden');
-    s.setAttribute('aria-hidden','true');
-    s.style.display = 'none';            // garante oculto
-  });
-  // mostra só a section desejada
-  sectionEl.classList.remove('hidden');
-  sectionEl.removeAttribute('aria-hidden');
-  sectionEl.style.display = '';          // <-- remove inline display:none
-  window.scrollTo({ top: 0, behavior: 'instant' });
+
+  function showOnly(sectionEl){
+    // Esconde todas as sections e limpa display inline
+    document.querySelectorAll('main > section').forEach(s=>{
+      s.classList.add('hidden');
+      s.setAttribute('aria-hidden','true');
+      s.style.display = 'none';
+    });
+    // Mostra só a desejada
+    sectionEl.classList.remove('hidden');
+    sectionEl.removeAttribute('aria-hidden');
+    sectionEl.style.display = '';
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
   function bindAuth(){
@@ -46,8 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnEntrar.addEventListener('click', () => {
       const val = (inputSenha.value || '').trim().toLowerCase();
       if(val === AUTH_PASS){
-        ST.set('auth', true);
-        localStorage.setItem('jornada_auth', 'ok');
+        setAuthed();
         authError && authError.classList.add('hidden');
         hideAuth();
         showOnly(secIntro);
@@ -61,6 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   bindAuth();
+
+  // ======== ESTADO / PERGUNTAS ========
+  const QUESTIONS = window.JQUESTIONS;
+  const ST = window.JSTATE;
 
   // DOM — Intro
   const chkTermo   = qs('#chkTermo');
@@ -80,7 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let idx = Number(ST.get('idx', 0));
   let respostas = ST.get('respostas', {});
 
-  // Navegação/validação
   function updateNavState(){
     if (btnVoltar)  btnVoltar.disabled  = (idx <= 0);
     if (btnProxima) btnProxima.disabled = !((input.value || '').trim());
@@ -156,18 +161,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }finally{
       btnGerar.disabled = false; btnGerar.textContent = 'Baixar PDF + HQ';
       ST.clearAll();
+      clearAuth(); // encerra a sessão de teste ao concluir
     }
   });
 
   if (btnNova) btnNova.addEventListener('click', ()=>{
     ST.clearAll();
+    clearAuth();                       // voltar à home exige senha de novo
     hideAuth();
-    localStorage.setItem('jornada_auth','ok'); // mantém logado durante o teste
-    showOnly(secIntro);
+    showOnly(secIntro);                // se ficar na mesma página
   });
 
-  // Boot
+  // ======== Boot ========
   (function init(){
+    // Se quiser forçar logout via URL, acesse ?logout=1
+    if (new URLSearchParams(location.search).get('logout') === '1') clearAuth();
+
     if(!isAuthed()){
       showOnly(secAuth);
       return;
