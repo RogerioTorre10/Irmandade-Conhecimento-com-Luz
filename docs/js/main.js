@@ -61,6 +61,37 @@ document.addEventListener('DOMContentLoaded', () => {
     inputSenha.addEventListener('keypress', (e) => {
       if(e.key === 'Enter') btnEntrar.click();
     });
+    // Olho mágico (mostrar/ocultar senha)
+const btnToggleSenha = document.getElementById('btnToggleSenha');
+if (btnToggleSenha && inputSenha) {
+  let visible = false;
+  const eye = `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>`;
+  const eyeOff = `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M3 3l18 18M10.6 10.6a3 3 0 1 0 4.24 4.24M9.88 4.26A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a17.8 17.8 0 0 1-3.22 4.03M6.11 6.11A17.63 17.63 0 0 0 1 12s4 8 11 8a10.9 10.9 0 0 0 5.89-1.61"/>
+    </svg>`;
+
+  function renderEye(){
+    btnToggleSenha.innerHTML = visible ? eyeOff : eye;
+    btnToggleSenha.setAttribute('aria-label', visible ? 'Ocultar senha' : 'Mostrar senha');
+    btnToggleSenha.setAttribute('title',      visible ? 'Ocultar senha' : 'Mostrar senha');
+    inputSenha.type = visible ? 'text' : 'password';
+  }
+  renderEye();
+
+  btnToggleSenha.addEventListener('click', ()=>{
+    visible = !visible; renderEye(); inputSenha.focus();
+  });
+  // evita roubar foco ao segurar o mouse
+  btnToggleSenha.addEventListener('mousedown', e => e.preventDefault());
+}
+
   }
   bindAuth();
 
