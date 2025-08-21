@@ -37,8 +37,14 @@ body{ background:var(--bg-900); color:var(--text-100); font-family: system-ui, -
 .input{ width:100%; padding:.9rem 1rem; border-radius:12px; background:var(--bg-800); border:1px solid var(--border); color:var(--text-100) }
 .input:focus{ outline:2px solid var(--primary-500) }
 
-.progress{ height:6px; background:#2b3553; border-radius:999px; overflow:hidden }
-.progress>div{ height:100%; width:0%; background:var(--accent-amber); transition:width .25s ease }
+/* Barra de progresso */
+.progress{ height:6px; background:#2b3553; border-radius:999px; overflow:hidden; }
+.progress>div{ height:100%; width:0%; background:var(--accent-amber); transition: width .35s ease; }
+
+/* Utilidades */
+.hidden{ display:none !important; }
+/* opcional, reforça o ocultamento da tela de senha */
+#sec-auth.hidden{ display:none !important; }
 
 .hidden{ display:none!important }
 .opacity-80{ opacity:.8 } .opacity-90{ opacity:.9 }
@@ -46,6 +52,4 @@ body{ background:var(--bg-900); color:var(--text-100); font-family: system-ui, -
 .text-center{ text-align:center } .font-extrabold{ font-weight:800 }
 .container{ max-width: 960px }
 
-.hidden{ display:none !important; }
-#sec-auth.hidden{ display:none !important; }
 
