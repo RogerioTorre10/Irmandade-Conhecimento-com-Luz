@@ -8,15 +8,48 @@ document.addEventListener('DOMContentLoaded', () => {
   const QUESTIONS = window.JQUESTIONS;
   const ST = window.JSTATE;
 
-  // DOM
+  // 🔐 Auth (senha fixa de teste)
+  const secAuth    = document.getElementById('sec-auth');
+  const secIntro   = document.getElementById('sec-intro');
+  const inputSenha = qs('#senhaInput');
+  const btnEntrar  = qs('#btnEntrar');
+  const authError  = qs('#authError');
+  const AUTH_PASS  = (window.JORNADA_CFG?.PASSWORD || 'iniciar').toLowerCase();
+
+  function isAuthed(){
+    return ST.get('auth', false) === true || localStorage.getItem('jornada_auth') === 'ok';
+  }
+  function bindAuth(){
+    if(!btnEntrar || !inputSenha) return;
+    btnEntrar.addEventListener('click', () => {
+      const val = (inputSenha.value || '').trim().toLowerCase();
+      if(val === AUTH_PASS){
+        ST.set('auth', true);
+        localStorage.setItem('jornada_auth', 'ok');
+        authError && authError.classList.add('hidden');
+        showSection(secIntro);
+      }else{
+        authError && authError.classList.remove('hidden');
+        inputSenha.focus();
+      }
+    });
+    inputSenha.addEventListener('keypress', (e) => {
+      if(e.key === 'Enter') btnEntrar.click();
+    });
+  }
+  bindAuth();
+
+  // DOM — Intro
   const chkTermo   = qs('#chkTermo');
   const btnIniciar = qs('#btnIniciar');
 
+  // DOM — Wizard
   const btnLimparAtual = qs('#btnLimparAtual');
   const btnVoltar  = qs('#btnVoltar');
   const btnProxima = qs('#btnProxima');
   const input      = qs('#respostaInput');
 
+  // DOM — Final
   const btnRevisar = qs('#btnRevisar');
   const btnGerar   = qs('#btnGerarPDFHQ');
   const btnNova    = qs('#btnNovaJornada');
@@ -26,15 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Helpers
   function updateNavState(){
-    // trava o Voltar na primeira pergunta
-    if (btnVoltar) {
-      btnVoltar.disabled = (idx <= 0);
-    }
-    // trava Próxima se vazio
-    if (btnProxima) {
-      const empty = !(input.value || '').trim();
-      btnProxima.disabled = empty;
-    }
+    if (btnVoltar)  btnVoltar.disabled  = (idx <= 0);
+    if (btnProxima) btnProxima.disabled = !((input.value || '').trim());
   }
 
   // INTRO
@@ -55,12 +81,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (btnVoltar) btnVoltar.addEventListener('click', ()=>{
     if(idx>0){ idx--; ST.set('idx', idx); showWizard(); }
-    // se idx==0, fica parado (travado)
   });
 
   if (btnProxima) btnProxima.addEventListener('click', ()=>{
     const val = (input.value||'').trim();
-    if (!val) { input.focus(); return; } // não avança vazio
+    if (!val) { input.focus(); return; }
     salvarAtual();
     if(idx < QUESTIONS.length-1){ idx++; ST.set('idx', idx); showWizard(); }
     else{ showFinal(); }
@@ -82,9 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(()=>{ input.focus(); updateNavState(); }, 50);
   }
 
-  function showFinal(){
-    showSection(document.getElementById('sec-final'));
-  }
+  function showFinal(){ showSection(document.getElementById('sec-final')); }
 
   if (btnRevisar) btnRevisar.addEventListener('click', ()=>{ idx = 0; ST.set('idx', idx); showWizard(); });
 
@@ -109,14 +132,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (btnNova) btnNova.addEventListener('click', ()=>{ ST.clearAll(); location.href = './'; });
 
-  // Boot
+  // Boot — decide qual seção exibir primeiro
   (function init(){
+    if(!isAuthed()){ showSection(secAuth); return; }
     const st = ST.load();
     if(st && st.respostas && Object.keys(st.respostas).length>0 && Number.isInteger(st.idx)){
       idx = Math.max(0, Math.min(QUESTIONS.length-1, st.idx));
       respostas = st.respostas; showWizard();
     } else {
-      showSection(document.getElementById('sec-intro'));
+      showSection(secIntro);
     }
   })();
 });
