@@ -1,0 +1,139 @@
+/* =========================================================
+   styles-pergaminho.css
+   Estrutura:
+     - Base (.pergaminho) com fallback “papel”
+     - Horizontal (.pergaminho-h)
+     - Vertical   (.pergaminho-v)
+     - Tipografia e utilitários
+     - Responsividade + correções de contraste
+   Local do arquivo:  /docs/css/styles-pergaminho.css
+   Imagens esperadas: /docs/assets/pergaminho.png
+                      /docs/assets/perg-vert.png
+   ========================================================= */
+
+/* ===== BASE: carta com fundo de pergaminho + fallback ===== */
+.pergaminho {
+  position: relative;
+
+  /* Camada 1: imagem (se existir)  |  Camada 2/3: texturas fallback */
+  background:
+    url("../assets/pergaminho.png") center/cover no-repeat,
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 233, 180, .35) 0%, rgba(0, 0, 0, 0) 70%),
+    repeating-linear-gradient(0deg,
+      rgba(255, 255, 255, 0.05) 0px, rgba(255, 255, 255, 0.05) 2px,
+      rgba(0, 0, 0, 0.03) 2px, rgba(0, 0, 0, 0.03) 4px);
+
+  /* Moldura e leitura */
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.45);
+  padding: 40px;
+  margin: 24px auto;
+  max-width: 860px;
+  min-height: 420px;
+
+  /* Tipografia base para área clara do pergaminho */
+  font-family: "Times New Roman", Georgia, serif;
+  color: #2b1d0e;
+  line-height: 1.65;
+}
+
+/* Remover quaisquer pseudo‐enfeites legados */
+.pergaminho::before,
+.pergaminho::after { display: none !important; }
+
+/* ===== VARIANTES: usa imagens específicas ===== */
+.pergaminho-h {
+  background:
+    url("../assets/pergaminho.png") center/cover no-repeat,
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 233, 180, .35) 0%, rgba(0, 0, 0, 0) 70%),
+    repeating-linear-gradient(0deg,
+      rgba(255, 255, 255, 0.05) 0px, rgba(255, 255, 255, 0.05) 2px,
+      rgba(0, 0, 0, 0.03) 2px, rgba(0, 0, 0, 0.03) 4px);
+}
+
+.pergaminho-v {
+  background:
+    url("../assets/perg-vert.png") center/cover no-repeat,
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 233, 180, .35) 0%, rgba(0, 0, 0, 0) 70%),
+    repeating-linear-gradient(0deg,
+      rgba(255, 255, 255, 0.05) 0px, rgba(255, 255, 255, 0.05) 2px,
+      rgba(0, 0, 0, 0.03) 2px, rgba(0, 0, 0, 0.03) 4px);
+
+  max-width: 640px;      /* vertical costuma ser mais estreito */
+  min-height: 780px;
+  padding: 32px;
+}
+
+/* ===== TIPOGRAFIA DENTRO DO CARTÃO ===== */
+.pergaminho h1, .pergaminho h2, .pergaminho h3 {
+  color: #3a1f0a;
+  margin: 0 0 12px 0;
+  line-height: 1.2;
+}
+
+.pergaminho h1 { font-size: 2rem;   }
+.pergaminho h2 { font-size: 1.5rem; }
+.pergaminho h3 { font-size: 1.25rem;}
+
+.pergaminho p,
+.pergaminho li {
+  color: #2b1d0e;
+  font-size: 1rem;
+}
+
+.pergaminho .muted { color: #5a4534; }
+
+/* Utilitários de espaçamento */
+.pergaminho .mt-0 { margin-top: 0; }
+.pergaminho .mb-0 { margin-bottom: 0; }
+.pergaminho .mt-2 { margin-top: .5rem; }
+.pergaminho .mb-2 { margin-bottom: .5rem; }
+.pergaminho .mt-3 { margin-top: .75rem; }
+.pergaminho .mb-3 { margin-bottom: .75rem; }
+.pergaminho .mt-4 { margin-top: 1rem; }
+.pergaminho .mb-4 { margin-bottom: 1rem; }
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+  .pergaminho {
+    padding: 24px;
+    margin: 16px;
+    max-width: 100%;
+    min-height: 360px;
+  }
+  .pergaminho-v {
+    min-height: 640px;
+  }
+  .pergaminho h1 { font-size: 1.6rem; }
+  .pergaminho h2 { font-size: 1.3rem; }
+}
+
+/* ===== CORREÇÃO DE CONTRASTE
+   Em algumas páginas havia opacidade/filtros escurecendo tudo.
+   Garantimos que dentro do pergaminho não haja perda de contraste. */
+.pergaminho, .pergaminho * {
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+/* ===== CASO USE LINKS/BOTÕES DENTRO ===== */
+.pergaminho a {
+  color: #6a3b16;
+  text-decoration: underline;
+}
+.pergaminho a:hover { color: #8c4b1c; }
+
+/* ===== SE QUISER UM “HEADER” E “FOOTER” DENTRO DO CARTÃO ===== */
+.pergaminho .header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+  border-bottom: 1px dashed rgba(0,0,0,.15);
+  padding-bottom: 10px;
+}
+.pergaminho .footer {
+  margin-top: 16px;
+  border-top: 1px dashed rgba(0,0,0,.15);
+  padding-top: 10px;
+  font-size: .95rem;
+  color: #5a4534;
+}
