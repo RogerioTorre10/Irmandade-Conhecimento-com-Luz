@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jornada · Pergaminho Rasgado</title>
+  <meta name="description" content="Jornada guiada com devolutiva simbólica e PDF/HQ ao final." />
+
+  <!-- Favicon (ajustado para ../) -->
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml" />
+
+  <!-- (Opcional) Tailwind CDN só se você usa classes do Tailwind no HTML -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- CSS base e tema do pergaminho (paths ajustados para ../assets/...) -->
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <link rel="stylesheet" href="../assets/css/styles-pergaminho-rasgado.css" />
+
+  <script>
+    /* Base da API em produção */
+    window.API_BASE = "https://lumen-backend-api.onrender.com/api";
+  </script>
+</head>
+<body class="min-h-screen bg-slate-900 text-slate-100">
+  <main class="container">
+    <!-- Intro -->
+    <section id="sec-intro" class="section parchment-wrap-rough">
+      <div class="parchment-rough">
+        <div class="parchment-inner-rough">
+          <a href="../index.html" class="underline">Voltar ao início</a>
+          <h1 class="parchment-title-rough">Jornada Conhecimento com Luz — Essencial</h1>
+          <p class="parchment-text-rough">
+            Bem-vindo(a)! Responda com calma. Ao final, você poderá gerar seu PDF e HQ.
+          </p>
+          <div class="parchment-actions-rough mt-3">
+            <button id="btnIniciar" class="btn btn-primary">Iniciar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Wizard -->
+    <section id="sec-wizard" class="section parchment-wrap-rough hidden" aria-hidden="true">
+      <div class="parchment-rough">
+        <div class="parchment-inner-rough">
+          <div class="parchment-progress-rough mb-3">
+            <div id="q-progress" class="bar" style="width:0%"></div>
+          </div>
+
+          <div id="q-status" class="parchment-text-rough">Pergunta 0/0</div>
+          <h2 id="q-title" class="parchment-title-rough">Pergunta</h2>
+          <p id="q-text" class="parchment-text-rough">...</p>
+
+          <textarea id="q-input" data-qid="" class="parchment-input-rough" rows="5" placeholder="Escreva aqui..."></textarea>
+
+          <div class="parchment-actions-rough mt-3">
+            <button id="btnVoltar" class="btn">Voltar</button>
+            <button id="btnLimpar" class="btn">Limpar</button>
+            <span style="flex:1"></span>
+            <button id="btnProxima" class="btn btn-primary">Próxima</button>
+          </div>
+
+          <div class="mt-3">
+            <button id="btnFinalizar" class="btn btn-primary">Finalizar Jornada</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final -->
+    <section id="sec-final" class="section parchment-wrap-rough hidden" aria-hidden="true">
+      <div class="parchment-rough">
+        <div class="parchment-inner-rough">
+          <h2 class="parchment-title-rough">Parabéns! Você finalizou a jornada 🎉</h2>
+          <p class="parchment-text-rough">Revise se quiser e depois gere seu PDF e HQ.</p>
+          <div class="parchment-actions-rough mt-3">
+            <button id="btnRevisar" class="btn">Revisar</button>
+            <button id="btnLimparRespostas" class="btn">Limpar respostas</button>
+            <span style="flex:1"></span>
+            <button id="btnBaixarPDFHQ" class="btn btn-primary">Baixar PDF e HQ</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Scripts JS (ordem e paths ajustados) -->
+  <script defer src="../assets/js/questions.js"></script>
+  <script defer src="../assets/js/state.js"></script>
+  <script defer src="../assets/js/main.js"></script>
+  <script defer src="../assets/js/jornada.js"></script>
+</body>
+</html>
