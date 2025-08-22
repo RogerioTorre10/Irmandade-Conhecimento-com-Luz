@@ -18,7 +18,7 @@
     <!-- 🔐 AUTENTICAÇÃO (senha fixa de teste) -->
    <section id="sec-auth" class="card mb-8 hidden" style="display:none">
   <!-- Olho decorativo NÃO necessário aqui -->
-  <div class="card-body text-center pergaminho">
+  <div class="card-body text-center pergaminho pergaminho-h">
     <h1 class="text-2xl md:text-3xl font-extrabold mb-2">Acessar Jornada</h1>
     <p class="opacity-80">Digite a senha para iniciar sua jornada.</p>
 
@@ -43,7 +43,7 @@
 
     <!-- INTRO + TERMO -->
     <section id="sec-intro" class="card mb-8 hidden">
-      <div class="card-body pergaminho">
+      <div class="card-body pergaminho pergaminho-h">
         <h1 class="text-2xl md:text-3xl font-extrabold mb-4">Jornada Conhecimento com Luz – Essencial 📘</h1>
         <ol class="list-decimal pl-6 space-y-2 opacity-90">
           <li>Suas respostas não serão armazenadas após o término.</li>
@@ -80,7 +80,7 @@
 
     <!-- WIZARD -->
     <section id="sec-wizard" class="card mb-8 hidden">
-      <div class="card-body pergaminho">
+      <div class="card-body pergaminho pergaminho-v">
         <header class="mb-6">
           <p id="wizardEtapa" class="font-semibold opacity-80">
             Pergunta <span id="etapaNum">1</span>/<span id="etapaTot">3</span>
@@ -108,25 +108,42 @@
     </section>
 
     <!-- FINAL -->
-   <section id="sec-final" class="card mb-8 hidden">
-  <div class="card-body pergaminho text-center">
+<section id="sec-final" class="card mb-8 hidden">
+  <div class="card-body pergaminho pergaminho-h text-center">
     <h2 class="text-2xl md:text-3xl font-extrabold mb-2">Parabéns! Você finalizou a jornada 🎉</h2>
     <p class="opacity-90 mb-6">Agora você pode gerar seu PDF e HQ com todas as respostas e reflexões.</p>
 
     <div class="flex flex-wrap justify-center gap-2">
-      <button id="btn-download-all" class="btn btn-primary">Baixar PDF e HQ</button>
+      <button id="btn-download-all" type="button" class="btn btn-primary">Baixar PDF e HQ</button>
     </div>
+  </div>
+
+  <!-- Chama única no rodapé do card -->
+  <div class="chama-wrapper">
+    <div class="chama chama-grande" aria-hidden="true"></div>
+    <div class="chama chama-pequena" aria-hidden="true"></div>
   </div>
 </section>
 
 <script>
-  document.getElementById('btn-download-all')?.addEventListener('click', async () => {
+  // Não deixe o botão submeter nada / redirecionar
+  document.getElementById('btn-download-all')?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     const respostas = JSON.parse(localStorage.getItem('jornada_respostas') || '[]');
     const perfil    = JSON.parse(localStorage.getItem('jornada_perfil') || '{}');
+
+    if (!respostas.length) {
+      alert('Complete a jornada antes de baixar o PDF.');
+      return;
+    }
+
+    // usa seu helper já existente
     await window.JORNADA_DOWNLOAD({ respostas, perfil });
   });
 </script>
-         
+    
       <!-- Chama única no rodapé do card -->
       <div class="chama-wrapper">
         <div class="chama chama-grande" aria-hidden="true"></div>
