@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sobre · Irmandade Conhecimento com Luz</title>
+  <meta name="description" content="Irmandade Conhecimento com Luz — fé, ciência, filosofia e tecnologia unidas para despertar e guiar.">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {"50":"#f5f3ff","100":"#ede9fe","200":"#ddd6fe","300":"#c4b5fd","400":"#a78bfa","500":"#8b5cf6","600":"#7c3aed","700":"#6d28d9","800":"#5b21b6","900":"#4c1d95"},
+            gold: {"500":"#fbbf24"}
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script defer src="https://unpkg.com/lucide@latest"></script>
+  <script defer src="/js/main.js"></script>
+</head>
+<body class="bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 text-gray-100 antialiased selection:bg-primary-500/30">
+<header class="fixed top-0 inset-x-0 z-50 backdrop-blur bg-gray-900/70 border-b border-white/10">
+  <nav class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
+    <a href="/index.html" class="flex items-center gap-2">
+      <img src="/assets/logo.svg" alt="Logo Irmandade" class="h-8 w-8">
+      <span class="font-bold text-white">Irmandade Conhecimento com Luz</span>
+    </a>
+    <button id="menuBtn" class="md:hidden text-white" aria-label="Abrir menu">
+      <i data-lucide="menu"></i>
+    </button>
+    <ul id="menu" class="hidden md:flex items-center gap-6 text-gray-200">
+      <li><a class="hover:text-white" href="/sobre.html">Sobre</a></li>
+      <li class="group relative">
+        <a class="hover:text-white" href="/jornadas.html">Jornadas</a>
+        <div class="hidden group-hover:block absolute mt-2 bg-gray-800 border border-white/10 rounded-xl p-2 w-56">
+          <a class="block px-3 py-2 rounded hover:bg-white/5" href="/jornada-conhecimento.html">Conhecimento com Luz</a>
+          <a class="block px-3 py-2 rounded hover:bg-white/5" href="/jornada-vocacional.html">Vocacional com Luz</a>
+          <a class="block px-3 py-2 rounded hover:bg-white/5" href="/jornada-amorosa.html">Amorosa com Luz</a>
+        </div>
+      </li>
+      <li><a class="hover:text-white" href="/manifesto.html">Manifesto</a></li>
+      <li><a class="hover:text-white" href="/contato.html">Contato</a></li>
+    </ul>
+  </nav>
+  <div id="mobileMenu" class="md:hidden hidden border-t border-white/10 bg-gray-900/95">
+    <ul class="max-w-6xl mx-auto px-4 py-3 space-y-2 text-gray-200">
+      <li><a class="block py-2" href="/sobre.html">Sobre</a></li>
+      <li><a class="block py-2" href="/jornadas.html">Jornadas</a></li>
+      <li><a class="block py-2" href="/manifesto.html">Manifesto</a></li>
+      <li><a class="block py-2" href="/contato.html">Contato</a></li>
+    </ul>
+  </div>
+</header>
+<main class="pt-24">
+  <section class="max-w-6xl mx-auto px-4 py-12">
+  <h1 class="text-3xl md:text-4xl font-bold">Sobre a Irmandade</h1>
+  <p class="mt-4 text-gray-300">A Irmandade Conhecimento com Luz nasce do encontro entre fé, ciência, filosofia e tecnologia, com o propósito de despertar a centelha divina que habita em cada pessoa.</p>
+  <div class="mt-8 grid md:grid-cols-2 gap-6">
+    <div class="rounded-2xl border border-white/10 p-6 bg-white/5">
+      <h3 class="font-semibold">Nossa Missão</h3>
+      <p class="mt-2 text-sm text-gray-300">Despertar, curar e guiar — com acolhimento vivo, respeito e esperança.</p>
+    </div>
+    <div class="rounded-2xl border border-white/10 p-6 bg-white/5">
+      <h3 class="font-semibold">Valores</h3>
+      <ul class="mt-2 text-sm text-gray-300 list-disc pl-5 space-y-1">
+        <li>Verdade, responsabilidade e amor</li>
+        <li>Rejeição à tirania, crueldade e dominação</li>
+        <li>Humildade e serviço</li>
+      </ul>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="mt-24 border-t border-white/10 bg-gray-900 text-gray-300">
+  <div class="max-w-6xl mx-auto px-4 py-10 grid md:grid-cols-3 gap-8">
+    <div>
+      <div class="flex items-center gap-2 mb-2">
+        <img src="/assets/logo.svg" alt="Logo Irmandade" class="h-6 w-6">
+        <h4 class="font-semibold">Irmandade Conhecimento com Luz</h4>
+      </div>
+      <p class="text-sm">Fé, ciência, filosofia e tecnologia unidas para despertar, curar e guiar.</p>
+    </div>
+    <div>
+      <h5 class="font-semibold mb-2">Jornadas</h5>
+      <ul class="space-y-1 text-sm">
+        <li><a href="/jornada-conhecimento.html" class="hover:text-white">Conhecimento com Luz</a></li>
+        <li><a href="/jornada-vocacional.html" class="hover:text-white">Vocacional com Luz</a></li>
+        <li><a href="/jornada-amorosa.html" class="hover:text-white">Amorosa com Luz</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5 class="font-semibold mb-2">Contato</h5>
+      <ul class="space-y-1 text-sm">
+        <li><a href="/contato.html" class="hover:text-white">Fale conosco</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="border-t border-white/10">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between text-xs">
+      <span>© 2025 Irmandade Conhecimento com Luz</span>
+      <span class="font-semibold tracking-widest">PARA ALÉM. E SEMPRE!!</span>
+    </div>
+  </div>
+</footer>
+<script>window.lucide && lucide.createIcons();</script>
+</body><section id="chamados" class="py-16 px-4 bg-gray-900 text-white text-center">
+  <h2 class="text-3xl md:text-4xl font-bold mb-10 text-yellow-400">Chamados da Irmandade</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+    
+    <div>
+      <img src="assets/chamado-zion.jpg" alt="Chamado de Zion" class="rounded-xl shadow-lg w-full" />
+      <h3 class="mt-4 font-semibold">Zion</h3>
+    </div>
+
+    <div>
+      <img src="assets/chamado-lumen.jpg" alt="Chamado de Lumen" class="rounded-xl shadow-lg w-full" />
+      <h3 class="mt-4 font-semibold">Lumen</h3>
+    </div>
+
+    <div>
+      <img src="assets/chamado-arion.jpg" alt="Chamado de Arion" class="rounded-xl shadow-lg w-full" />
+      <h3 class="mt-4 font-semibold">Arion</h3>
+    </div>
+
+  </div>
+</section>
+</html>
