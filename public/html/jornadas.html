@@ -1,20 +1,39 @@
 <!doctype html>
 <html lang="pt-br">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Jornada · Irmandade Conhecimento com Luz</title>
-<meta name="description" content="Jornada Conhecimento com Luz —
-Essencial.">
-<link rel="icon" href="./assets/img/favicon.svg" type="image/svg+xml">
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="./assets/css/styles.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jornada · Pergaminho Rasgado</title>
+  <meta name="description" content="Jornada guiada com estilo pergaminho rasgado.">
+  <link rel="icon" href="./assets/img/favicon.svg" type="image/svg+xml">
+
+  <!-- CSS base e pergaminho -->
+  <link rel="stylesheet" href="./assets/css/styles.css">
+  <link rel="stylesheet" href="./assets/css/styles-pergaminho-rasgado.css">
 </head>
-<body class="min-h-screen bg-slate-950 text-slate-100">
-<main id="app" class="max-w-4xl mx-auto px-4 py-8"></main>
-<footer class="max-w-4xl mx-auto px-4 py-10 text-sm text-slate-400">
-<a href="/" class="underline">Voltar ao início</a>
-</footer>
-<script src="/jornada.js"></script>
+<body class="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center p-6">
+
+  <main class="container">
+    <!-- Bloco Pergaminho -->
+    <section class="section parchment-wrap-rough">
+      <div class="parchment-rough">
+        <div class="parchment-inner-rough">
+          <div class="parchment-progress-rough mb-3">
+            <div class="bar" style="width: 50%"></div>
+          </div>
+          <h2 class="parchment-title-rough">Pergunta</h2>
+          <p class="parchment-text-rough">O que significa o Amor para você?</p>
+          <textarea class="parchment-input-rough" rows="5" placeholder="Escreva aqui..."></textarea>
+          <div class="parchment-actions-rough mt-3">
+            <button class="btn">Voltar</button>
+            <button class="btn">Limpar</button>
+            <span style="flex:1"></span>
+            <button class="btn btn-primary">Próxima</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
 </body>
 </html>
