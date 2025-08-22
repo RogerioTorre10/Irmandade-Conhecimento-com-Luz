@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jornada — Aviso & Início</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Aviso legal e início da Jornada Conhecimento com Luz.">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100">
+  <main class="max-w-3xl mx-auto p-6">
+    <section>
+      <h1 class="text-3xl font-semibold mb-4">Jornada Conhecimento com Luz — Essencial</h1>
+
+      <div class="space-y-4 text-sm opacity-90">
+        <p><strong>Importante:</strong> Ao final, <strong>PDF e HQ</strong> serão gerados e
+          <strong>enviados ao seu dispositivo</strong> para download imediato. <strong>Não haverá backup</strong>
+          nem recuperação posterior. Garanta que seu dispositivo tenha <strong>espaço livre suficiente</strong>
+          antes de iniciar.</p>
+
+        <ul class="list-disc pl-5 space-y-1">
+          <li>Suas respostas não são armazenadas após a entrega.</li>
+          <li>O acesso é por senha, com prazo para iniciar (15 dias) e concluir (24h) após o primeiro acesso.</li> concluir (24h) após o primeiro acesso).</li>
+          <li>Ao prosseguir, você declara ciência e concordância com estas condições.</li>
+        </ul>
+      </div>
+
+      <div class="mt-6">
+        <button id="btn-iniciar" class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white">
+          Iniciar Jornada
+        </button>
+      </div>
+    </section>
+  </main>
+
+    <script>
+    // Ao clicar em iniciar: marca a sessão e vai para a jornada
+    document.getElementById('btn-iniciar')?.addEventListener('click', () => {
+      try {
+        sessionStorage.setItem('journey-started', '1');
+        sessionStorage.setItem('veio_da_intro', '1');
+      } catch {}
+      const alvo = '/jornada-conhecimento-com-luz1.html?start=1';
+      location.href = alvo;
+    });
+  </script>
+</body>
+</html>
