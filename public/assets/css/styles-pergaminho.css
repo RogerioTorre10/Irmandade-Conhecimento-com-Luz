@@ -1,139 +1,114 @@
-/* =========================================================
-   styles-pergaminho.css
-   Estrutura:
-     - Base (.pergaminho) com fallback “papel”
-     - Horizontal (.pergaminho-h)
-     - Vertical   (.pergaminho-v)
-     - Tipografia e utilitários
-     - Responsividade + correções de contraste
-   Local do arquivo:  /assets/css/styles-pergaminho.css
-   Imagens esperadas: /assets/css/styles-pergaminho.png
-                      /assets/css/styles-perg-vert.png
-   ========================================================= */
+/* ===========================================
+   styles-pergaminho.css — moldura de pergaminho
+   Estrutura: public/assets/css/styles-pergaminho.css
+   ATENÇÃO: ajuste a imagem conforme o nome no seu repo:
+   Ex.: ../img/pergaminho-vert.png   ou   ../img/pergaminho.png
+   =========================================== */
 
-/* ===== BASE: carta com fundo de pergaminho + fallback ===== */
-.pergaminho {
+/* Contêiner que dá o “clima” de pergaminho ao bloco inteiro */
+.parchment-wrap{
   position: relative;
-
-  /* Camada 1: imagem (se existir)  |  Camada 2/3: texturas fallback */
+  padding: clamp(14px, 3vw, 24px);
+  border-radius: 18px;
   background:
-    url("../assets/css/styles-pergaminho.png") center/cover no-repeat,
-    radial-gradient(120% 90% at 50% 0%, rgba(255, 233, 180, .35) 0%, rgba(0, 0, 0, 0) 70%),
-    repeating-linear-gradient(0deg,
-      rgba(255, 255, 255, 0.05) 0px, rgba(255, 255, 255, 0.05) 2px,
-      rgba(0, 0, 0, 0.03) 2px, rgba(0, 0, 0, 0.03) 4px);
-
-  /* Moldura e leitura */
-  border-radius: 12px;
-  box-shadow: 0 10px 24px rgba(0,0,0,.45);
-  padding: 40px;
-  margin: 24px auto;
-  max-width: 860px;
-  min-height: 420px;
-
-  /* Tipografia base para área clara do pergaminho */
-  font-family: "Times New Roman", Georgia, serif;
-  color: #2b1d0e;
-  line-height: 1.65;
+    radial-gradient(600px 300px at 10% 0%, rgba(250,204,21,.08), transparent 60%),
+    radial-gradient(500px 300px at 90% 100%, rgba(249,115,22,.06), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  border: 1px solid rgba(250,204,21,.15);
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
 }
 
-/* Remover quaisquer pseudo‐enfeites legados */
-.pergaminho::before,
-.pergaminho::after { display: none !important; }
-
-/* ===== VARIANTES: usa imagens específicas ===== */
-.pergaminho-h {
-  background:
-    url("../assets/pergaminho.png") center/cover no-repeat,
-    radial-gradient(120% 90% at 50% 0%, rgba(255, 233, 180, .35) 0%, rgba(0, 0, 0, 0) 70%),
-    repeating-linear-gradient(0deg,
-      rgba(255, 255, 255, 0.05) 0px, rgba(255, 255, 255, 0.05) 2px,
-      rgba(0, 0, 0, 0.03) 2px, rgba(0, 0, 0, 0.03) 4px);
+/* O pergaminho em si (imagem de fundo) */
+.parchment{
+  position: relative;
+  border-radius: 18px;
+  border: 1px solid rgba(0,0,0,.25);
+  background-color: #3b2f2f; /* fallback quente atrás do PNG */
+  background-image: url("../img/pergaminho-vert.png"); /* <- troque o nome se for diferente */
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px rgba(0,0,0,.45);
+  padding: clamp(18px, 3.5vw, 30px);
 }
 
-.pergaminho-v {
-  background:
-    url("../assets/perg-vert.png") center/cover no-repeat,
-    radial-gradient(120% 90% at 50% 0%, rgba(255, 233, 180, .35) 0%, rgba(0, 0, 0, 0) 70%),
-    repeating-linear-gradient(0deg,
-      rgba(255, 255, 255, 0.05) 0px, rgba(255, 255, 255, 0.05) 2px,
-      rgba(0, 0, 0, 0.03) 2px, rgba(0, 0, 0, 0.03) 4px);
-
-  max-width: 640px;      /* vertical costuma ser mais estreito */
-  min-height: 780px;
-  padding: 32px;
+/* Camada interna para legibilidade do texto sobre o pergaminho */
+.parchment-inner{
+  background: linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.15));
+  border-radius: 14px;
+  padding: clamp(14px, 3vw, 22px);
+  color: #fef9c3; /* amarelo papel */
+  text-shadow: 0 1px 0 rgba(0,0,0,.45);
 }
 
-/* ===== TIPOGRAFIA DENTRO DO CARTÃO ===== */
-.pergaminho h1, .pergaminho h2, .pergaminho h3 {
-  color: #3a1f0a;
-  margin: 0 0 12px 0;
-  line-height: 1.2;
+/* Título no estilo medieval suave */
+.parchment-title{
+  font-family: "Goudy Old Style", "Times New Roman", Georgia, serif;
+  letter-spacing: .5px;
+  color: #fde68a;
+  text-shadow: 0 2px 0 rgba(0,0,0,.5);
+  font-size: clamp(22px, 3.2vw, 28px);
+  margin: 0 0 10px;
 }
 
-.pergaminho h1 { font-size: 2rem;   }
-.pergaminho h2 { font-size: 1.5rem; }
-.pergaminho h3 { font-size: 1.25rem;}
-
-.pergaminho p,
-.pergaminho li {
-  color: #2b1d0e;
-  font-size: 1rem;
+/* Texto do enunciado */
+.parchment-text{
+  color: #fff8dc;
+  opacity: .95;
+  margin: 6px 0 12px;
 }
 
-.pergaminho .muted { color: #5a4534; }
-
-/* Utilitários de espaçamento */
-.pergaminho .mt-0 { margin-top: 0; }
-.pergaminho .mb-0 { margin-bottom: 0; }
-.pergaminho .mt-2 { margin-top: .5rem; }
-.pergaminho .mb-2 { margin-bottom: .5rem; }
-.pergaminho .mt-3 { margin-top: .75rem; }
-.pergaminho .mb-3 { margin-bottom: .75rem; }
-.pergaminho .mt-4 { margin-top: 1rem; }
-.pergaminho .mb-4 { margin-bottom: 1rem; }
-
-/* ===== RESPONSIVIDADE ===== */
-@media (max-width: 768px) {
-  .pergaminho {
-    padding: 24px;
-    margin: 16px;
-    max-width: 100%;
-    min-height: 360px;
-  }
-  .pergaminho-v {
-    min-height: 640px;
-  }
-  .pergaminho h1 { font-size: 1.6rem; }
-  .pergaminho h2 { font-size: 1.3rem; }
+/* Campo de resposta dentro do pergaminho */
+.parchment-input{
+  width: 100%;
+  background: rgba(0,0,0,.35);
+  color: #fff8dc;
+  border: 1px solid rgba(253, 230, 138, .35);
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+.parchment-input:focus{
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(253, 230, 138, .28);
 }
 
-/* ===== CORREÇÃO DE CONTRASTE
-   Em algumas páginas havia opacidade/filtros escurecendo tudo.
-   Garantimos que dentro do pergaminho não haja perda de contraste. */
-.pergaminho, .pergaminho * {
-  opacity: 1 !important;
-  filter: none !important;
+/* Barra de progresso “dourada” */
+.parchment-progress{
+  width: 100%; height: 6px; border-radius: 999px; background: rgba(253, 230, 138, .22); overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.25);
+}
+.parchment-progress > .bar{
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, #fbbf24, #f59e0b);
+  border-radius: inherit; transition: width .25s ease;
 }
 
-/* ===== CASO USE LINKS/BOTÕES DENTRO ===== */
-.pergaminho a {
-  color: #6a3b16;
-  text-decoration: underline;
+/* Botões combinando com o pergaminho */
+.parchment-actions .btn{
+  border-color: rgba(253, 230, 138, .35);
+  background: linear-gradient(180deg, rgba(17,24,39,.85), rgba(2,6,23,.85));
+  color: #fff8dc;
 }
-.pergaminho a:hover { color: #8c4b1c; }
+.parchment-actions .btn-primary{
+  background: linear-gradient(180deg, #f59e0b, #d97706);
+  border-color: rgba(245, 158, 11, .45);
+  color: #1f2937;
+}
+.parchment-actions .btn-primary:hover{
+  background: linear-gradient(180deg, #d97706, #b45309);
+}
 
-/* ===== SE QUISER UM “HEADER” E “FOOTER” DENTRO DO CARTÃO ===== */
-.pergaminho .header {
-  display: flex; align-items: center; gap: 10px;
-  margin-bottom: 16px;
-  border-bottom: 1px dashed rgba(0,0,0,.15);
-  padding-bottom: 10px;
+/* Responsivo */
+@media (max-width: 720px){
+  .parchment{ padding: 16px; }
+  .parchment-inner{ padding: 12px; }
 }
-.pergaminho .footer {
-  margin-top: 16px;
-  border-top: 1px dashed rgba(0,0,0,.15);
-  padding-top: 10px;
-  font-size: .95rem;
-  color: #5a4534;
+
+/* Efeito sutil de entrada */
+.parchment, .parchment-inner{ animation: parchmentFade .28s ease both; }
+@keyframes parchmentFade{
+  from{ opacity: 0; transform: translateY(6px) }
+  to{ opacity: 1; transform: translateY(0) }
 }
