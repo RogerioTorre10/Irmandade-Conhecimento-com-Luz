@@ -6,9 +6,9 @@
      - Vertical   (.pergaminho-v)
      - Tipografia e utilitários
      - Responsividade + correções de contraste
-   Local do arquivo:  /docs/css/styles-pergaminho.css
-   Imagens esperadas: /docs/assets/pergaminho.png
-                      /docs/assets/perg-vert.png
+   Local do arquivo:  /assets/css/styles-pergaminho.css
+   Imagens esperadas: /assets/css/styles-pergaminho.png
+                      /assets/css/styles-perg-vert.png
    ========================================================= */
 
 /* ===== BASE: carta com fundo de pergaminho + fallback ===== */
@@ -17,7 +17,7 @@
 
   /* Camada 1: imagem (se existir)  |  Camada 2/3: texturas fallback */
   background:
-    url("../assets/pergaminho.png") center/cover no-repeat,
+    url("../assets/css/styles-pergaminho.png") center/cover no-repeat,
     radial-gradient(120% 90% at 50% 0%, rgba(255, 233, 180, .35) 0%, rgba(0, 0, 0, 0) 70%),
     repeating-linear-gradient(0deg,
       rgba(255, 255, 255, 0.05) 0px, rgba(255, 255, 255, 0.05) 2px,
