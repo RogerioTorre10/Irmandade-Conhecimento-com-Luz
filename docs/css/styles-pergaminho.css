@@ -2,7 +2,7 @@
 .pergaminho{
   position:relative;
   background:
-    url('img/pergaminho.jpg') center/cover no-repeat,
+    url('assets/pergaminho.png') center/cover no-repeat,
     /* Fallback textura "papel" sem imagem */
     repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0 2px, rgba(0,0,0,0.03) 2px 4px),
     radial-gradient(120% 80% at 50% 0%, rgba(255,219,170,0.10), rgba(255,219,170,0.02));
@@ -14,7 +14,7 @@
 .pergaminho:before, .pergaminho:after { display:none !important; }
 
 .pergaminho {
-  background: url('/assets/pergaminho.png') no-repeat center center;
+  background: url('assets/pergaminho.png') no-repeat center center;
   background-size: cover;
   padding: 60px 40px;     /* espaçamento interno */
   margin: 20px auto;      /* espaço entre os blocos */
@@ -37,7 +37,7 @@
 
 /* ===== Pergaminho Vertical (intro) ===== */
 .perg-vert{
-  background: url('/docs/assets/perg-vert.png') center/cover no-repeat;
+  background: url('assets/perg-vert.png') center/cover no-repeat;
   max-width: 900px;
   margin: 24px auto 32px;
   padding: 64px 48px;
