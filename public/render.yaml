@@ -1,0 +1,10 @@
+# render.yaml – estático, sem build, deploy manual
+services:
+- type: static
+name: Irmandade-Conhecimento-com-Luz-1
+env: static
+buildCommand: "" # sem build
+staticPublishPath: . # publica a raiz do repo (onde está o
+index.html)
+autoDeploy: false # evita gastar minutos com cada commit
+pullRequestPreviewsEnabled: false
