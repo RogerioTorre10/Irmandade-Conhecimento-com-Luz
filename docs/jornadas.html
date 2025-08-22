@@ -154,13 +154,13 @@
     <footer class="text-center opacity-60 text-sm mt-10">Para além. E sempre.</footer>
   </main>
 
-  <!-- SCRIPTS -->
-  <script src="js/config.js"></script>
-  <script src="js/state.js"></script>
-  <script src="js/questions.js"></script>
-  <script src="js/ui.js"></script>
-  <script src="js/chama.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/main.js"></script>
+  <!-- SCRIPTS (ordem importa!) -->
+<script defer src="js/config.js"></script>    <!-- define window.JORNADA_CFG -->
+<script defer src="js/state.js"></script>     <!-- define window.JSTATE e window.ST (shim) -->
+<script defer src="js/questions.js"></script> <!-- define window.QUESTIONS -->
+<script defer src="js/ui.js"></script>        <!-- define window.UI -->
+<script defer src="js/chama.js"></script>     <!-- efeitos visuais -->
+<script defer src="js/api.js"></script>       <!-- define window.JORNADA_DOWNLOAD -->
+<script defer src="js/main.js"></script>      <!-- usa tudo acima -->
 </body>
 </html>
