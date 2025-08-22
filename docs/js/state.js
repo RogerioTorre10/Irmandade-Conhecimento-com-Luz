@@ -3,7 +3,10 @@
   const S = {};
 
   S.load = () => { try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }catch(_){ return {}; } };
-  S.save = (data) => localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  S.save = (data) => localStorage.setItem('jornada_respostas', JSON.stringify([
+  "Minha resposta 1", "Minha resposta 2", "Minha resposta 3"
+]));
+  S.save = (data) =>localStorage.setItem('jornada_perfil', JSON.stringify({ nome: "Rogério", jornada: "Essencial" }));
   S.clearAll = () => localStorage.removeItem(STORAGE_KEY);
 
   S.get = (k, fallback) => (S.load()[k] ?? fallback);
