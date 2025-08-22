@@ -130,7 +130,7 @@
     if (pdfok) {
       localStorage.clear();
       sessionStorage.clear();
-      alert('PDF (e HQ, se disponível) finalizados! Voltando ao início.');
+      alert('PDF e HQ, (Observe Memória disponível) finalizados! Volta ao início.');
       location.replace('/index.html');
     } else {
       alert('Não foi possível gerar o PDF agora. Tente novamente em instantes.');
