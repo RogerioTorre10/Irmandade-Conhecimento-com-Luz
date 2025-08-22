@@ -1,35 +1,76 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 64 64">
+  <!-- =========================================================
+       SPRITE DE ASSETS — PERGAMINHOS + CHAMA ANIMADA
+       Coloque este arquivo como docs/assets/assets.svg
+       Requer que existam:
+         docs/assets/pergaminho.png
+         docs/assets/perg-vert.png
+       ========================================================= -->
+
   <defs>
+    <!-- ======== Gradientes e filtro da chama (como no seu arquivo) ======== -->
     <radialGradient id="g" cx="32" cy="40" r="24">
       <stop offset="0" stop-color="#ffd057"/>
       <stop offset=".6" stop-color="#ff8a00"/>
       <stop offset="1" stop-color="rgba(0,0,0,0)"/>
     </radialGradient>
+
     <linearGradient id="flame" x1="0" x2="0" y1="0" y2="1">
       <stop offset="0" stop-color="#fff3a3"/>
       <stop offset="1" stop-color="#ff8c2a"/>
     </linearGradient>
+
     <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="1.5"/>
     </filter>
+
+    <!-- ======== Símbolos: Chama animada ======== -->
+    <symbol id="flame-anim" viewBox="0 0 64 64">
+      <ellipse cx="32" cy="46" rx="12" ry="4" fill="url(#g)" opacity=".7">
+        <animate attributeName="opacity" values=".55;.8;.55" dur="1.6s" repeatCount="indefinite"/>
+      </ellipse>
+      <g transform="translate(0,2)">
+        <path d="M32 10 C38 18, 42 24, 36 30 C33 33, 31 36, 32 41 C28 38, 26 34, 28 30 C24 27, 25 21, 32 10 Z"
+              fill="url(#flame)">
+          <animate attributeName="d" dur="1.6s" repeatCount="indefinite"
+            values="M32 10 C38 18, 42 24, 36 30 C33 33, 31 36, 32 41 C28 38, 26 34, 28 30 C24 27, 25 21, 32 10 Z;
+                    M32 10 C36 18, 43 23, 35 30 C33 32, 30 36, 32 41 C28 39, 26 34, 29 30 C24 27, 26 21, 32 10 Z;
+                    M32 10 C38 18, 42 24, 36 30 C33 33, 31 36, 32 41 C28 38, 26 34, 28 30 C24 27, 25 21, 32 10 Z"/>
+        </path>
+        <path d="M32 20 C34 24, 35 27, 33 30 C32 31.5, 31 33, 32 36 C29.5 34, 29 31.5, 30 30 C28 28, 29 24, 32 20 Z"
+              fill="#fff3be" filter="url(#blur)" opacity=".9">
+          <animate attributeName="opacity" values=".7;1;.7" dur="1.6s" repeatCount="indefinite"/>
+        </path>
+      </g>
+    </symbol>
+
+    <!-- ======== Símbolos: Pergaminhos ======== -->
+
+    <!-- Pergaminho Horizontal -->
+    <symbol id="perg-h" viewBox="0 0 1400 920">
+      <!-- Fundo neutro (fallback) para caso a imagem não carregue -->
+      <rect width="1400" height="920" fill="#f8efd6"/>
+      <!-- Imagem raster do pergaminho -->
+      <image x="0" y="0" width="1400" height="920"
+             preserveAspectRatio="xMidYMid slice"
+             xlink:href="pergaminho.png" href="pergaminho.png"/>
+      <!-- Área interna segura (opcional, para guias) -->
+      <!-- <rect x="100" y="100" width="1200" height="720" fill="none" stroke="rgba(0,0,0,.1)"/> -->
+    </symbol>
+
+    <!-- Pergaminho Vertical -->
+    <symbol id="perg-v" viewBox="0 0 900 1400">
+      <rect width="900" height="1400" fill="#f8efd6"/>
+      <image x="0" y="0" width="900" height="1400"
+             preserveAspectRatio="xMidYMid slice"
+             xlink:href="perg-vert.png" href="perg-vert.png"/>
+      <!-- <rect x="80" y="120" width="740" height="1160" fill="none" stroke="rgba(0,0,0,.1)"/> -->
+    </symbol>
   </defs>
 
-  <ellipse cx="32" cy="46" rx="12" ry="4" fill="url(#g)" opacity=".7">
-    <animate attributeName="opacity" values=".55;.8;.55" dur="1.6s" repeatCount="indefinite"/>
-  </ellipse>
-
-  <g transform="translate(0,2)">
-    <path d="M32 10 C38 18, 42 24, 36 30 C33 33, 31 36, 32 41 C28 38, 26 34, 28 30 C24 27, 25 21, 32 10 Z"
-          fill="url(#flame)">
-      <animate attributeName="d" dur="1.6s" repeatCount="indefinite"
-        values="M32 10 C38 18, 42 24, 36 30 C33 33, 31 36, 32 41 C28 38, 26 34, 28 30 C24 27, 25 21, 32 10 Z;
-                M32 10 C36 18, 43 23, 35 30 C33 32, 30 36, 32 41 C28 39, 26 34, 29 30 C24 27, 26 21, 32 10 Z;
-                M32 10 C38 18, 42 24, 36 30 C33 33, 31 36, 32 41 C28 38, 26 34, 28 30 C24 27, 25 21, 32 10 Z"/>
-    </path>
-
-    <path d="M32 20 C34 24, 35 27, 33 30 C32 31.5, 31 33, 32 36 C29.5 34, 29 31.5, 30 30 C28 28, 29 24, 32 20 Z"
-          fill="#fff3be" filter="url(#blur)" opacity=".9">
-      <animate attributeName="opacity" values=".7;1;.7" dur="1.6s" repeatCount="indefinite"/>
-    </path>
-  </g>
+  <!-- Nada é desenhado aqui por padrão; este arquivo é um "sprite".
+       Use <use href="assets/assets.svg#perg-h"> na sua página. -->
 </svg>
