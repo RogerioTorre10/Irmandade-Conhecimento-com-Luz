@@ -51,6 +51,38 @@ function loadLocal() {
       }
       if (raw) localStorage.setItem(CONFIG.STORAGE_KEY, raw);
     }
+    // Estado simples
+const STATE_KEY = "jornada_state_v1";
+const loadState = () => { try { return JSON.parse(localStorage.getItem(STATE_KEY) || "{}"); } catch { return {}; } };
+const saveState = (s) => localStorage.setItem(STATE_KEY, JSON.stringify(s));
+
+document.addEventListener("DOMContentLoaded", () => {
+  const st = loadState();
+
+  // Se ainda não começou, força mostrar a intro
+  if (!st.started) {
+    showIntro();
+  } else {
+    showWizard();
+  }
+});
+
+function showIntro() {
+  document.getElementById("intro")?.removeAttribute("hidden");
+  document.getElementById("wizard")?.setAttribute("hidden", "hidden");
+}
+
+function showWizard() {
+  document.getElementById("wizard")?.removeAttribute("hidden");
+  document.getElementById("intro")?.setAttribute("hidden", "hidden");
+}
+
+document.getElementById("btn-iniciar")?.addEventListener("click", () => {
+  const st = loadState();
+  st.started = true;
+  saveState(st);
+  showWizard();
+});
     state.answers = raw ? JSON.parse(raw) : {};
   } catch { state.answers = {}; }
 }
