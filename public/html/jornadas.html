@@ -1,101 +1,144 @@
-<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
-<link rel="stylesheet" href="assets/css/styles.css" />
-<link rel="stylesheet" href="assets/css/styles-pergaminho-rasgado.css" />
 <!doctype html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Jornada · Pergaminho Rasgado</title>
-  <meta name="description" content="Jornada guiada com devolutiva simbólica e PDF/HQ ao final." />
+  <title>Jornada Conhecimento com Luz – Essencial</title>
+  <meta name="description" content="Jornada Conhecimento com Luz — uma viagem interior com fé, ciência e luz." />
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
 
-  <!-- Favicon (ajustado para ../) -->
-  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
-
-  <!-- (Opcional) Tailwind CDN só se você usa classes do Tailwind no HTML -->
+  <!-- Tailwind via CDN (opcional; pode remover se não usar) -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- CSS base e tema do pergaminho (paths ajustados para ../assets/...) -->
-  <link rel="stylesheet" href="assets/css/styles.css" />
-  <link rel="stylesheet" href="assets/css/styles-pergaminho-rasgado.css" />
-
-  <script>
-    /* Base da API em produção */
-    window.API_BASE = "https://lumen-backend-api.onrender.com/api";
-  </script>
+  <!-- Seu CSS -->
+  <link rel="stylesheet" href="/assets/styles.css" />
 </head>
-<body class="min-h-screen bg-slate-900 text-slate-100">
-  <main class="container">
-    <!-- Intro -->
-    <section id="sec-intro" class="section parchment-wrap-rough">
-      <div class="parchment-rough">
-        <div class="parchment-inner-rough">
-          <a href="../index.html" class="underline">Voltar ao início</a>
-          <h1 class="parchment-title-rough">Jornada Conhecimento com Luz — Essencial</h1>
-          <p class="parchment-text-rough">
-            Bem-vindo(a)! Responda com calma. Ao final, você poderá gerar seu PDF e HQ.
-          </p>
-          <div class="parchment-actions-rough mt-3">
-            <button id="btnIniciar" class="btn btn-primary">Iniciar</button>
-          </div>
+<body class="bg-slate-100 text-slate-900">
+
+  <!-- INTRO (pergaminho vertical) -->
+  <section id="intro" class="wrap-perga perga-vert">
+    <div class="inner-perga">
+      <header class="text-center space-y-2 mb-6">
+        <h1 class="text-2xl sm:text-3xl font-bold">Jornada Conhecimento com Luz · Essencial</h1>
+        <p class="opacity-80">Seja bem-vindo(a)! Respire, foque e siga no seu tempo.</p>
+      </header>
+
+      <article class="prose max-w-none">
+        <h2>🛡️ AVISO IMPORTANTE – LEIA ANTES DE INICIAR</h2>
+        <ul>
+          <li>Suas respostas <strong>não</strong> serão armazenadas após o término.</li>
+          <li>Ao final, será gerado um <strong>PDF</strong> com a devolutiva simbólica e sua HQ.</li>
+          <li>Você deverá baixar imediatamente; depois tudo é apagado automaticamente.</li>
+          <li>Acesso por senha individual: <strong>15 dias</strong> para iniciar e <strong>24h</strong> para concluir após o primeiro acesso.</li>
+        </ul>
+      </article>
+
+      <div class="mt-6 flex items-center justify-center">
+        <button id="btn-iniciar"
+                class="px-6 py-3 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition">
+          Iniciar Jornada
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- WIZARD (perguntas em passos) – pergaminho horizontal -->
+  <section id="wizard" class="wrap-perga perga-horiz" hidden>
+    <div class="inner-perga">
+      <header class="mb-4">
+        <h2 class="text-xl sm:text-2xl font-semibold">Perguntas · Viagem Interior</h2>
+        <p class="text-sm opacity-70">Responda com sinceridade. Você pode voltar e revisar.</p>
+      </header>
+
+      <!-- Passos: cada .step é uma "página" -->
+      <div id="steps" class="space-y-6">
+        <div class="step" data-step="1">
+          <label class="block font-medium mb-1">1) Quem é você hoje, em uma frase?</label>
+          <input type="text" class="w-full border rounded-lg p-3" placeholder="Escreva aqui..." />
+        </div>
+
+        <div class="step" data-step="2" hidden>
+          <label class="block font-medium mb-1">2) Qual lembrança de superação quer honrar nesta jornada?</label>
+          <textarea class="w-full border rounded-lg p-3" rows="4" placeholder="Conte um pouco..."></textarea>
+        </div>
+
+        <div class="step" data-step="3" hidden>
+          <label class="block font-medium mb-1">3) O que você deseja acender em si (uma virtude/força)?</label>
+          <input type="text" class="w-full border rounded-lg p-3" placeholder="Ex.: coragem, fé, disciplina..." />
         </div>
       </div>
-    </section>
 
-    <!-- Wizard -->
-    <section id="sec-wizard" class="section parchment-wrap-rough hidden" aria-hidden="true">
-      <div class="parchment-rough">
-        <div class="parchment-inner-rough">
-          <div class="parchment-progress-rough mb-3">
-            <div id="q-progress" class="bar" style="width:0%"></div>
-          </div>
+      <!-- Navegação -->
+      <div class="flex flex-wrap gap-3 justify-between mt-6">
+        <button id="btn-prev" type="button"
+                class="px-5 py-2 rounded-xl bg-gray-200 hover:bg-gray-300 transition">
+          Voltar
+        </button>
 
-          <div id="q-status" class="parchment-text-rough">Pergunta 0/0</div>
-          <h2 id="q-title" class="parchment-title-rough">Pergunta</h2>
-          <p id="q-text" class="parchment-text-rough">...</p>
+        <div class="flex gap-3 ml-auto">
+          <button id="btn-clear-all" type="button"
+                  class="px-5 py-2 rounded-xl bg-red-500 text-white hover:bg-red-600 transition">
+            Limpar Respostas
+          </button>
 
-          <textarea id="q-input" data-qid="" class="parchment-input-rough" rows="5" placeholder="Escreva aqui..."></textarea>
+          <button id="btn-review" type="button"
+                  class="px-5 py-2 rounded-xl bg-yellow-500 text-white hover:bg-yellow-600 transition">
+            Revisar
+          </button>
 
-          <div class="parchment-actions-rough mt-3">
-            <button id="btnVoltar" class="btn">Voltar</button>
-            <button id="btnLimpar" class="btn">Limpar</button>
-            <span style="flex:1"></span>
-            <button id="btnProxima" class="btn btn-primary">Próxima</button>
-          </div>
-
-          <div class="mt-3">
-            <button id="btnFinalizar" class="btn btn-primary">Finalizar Jornada</button>
-          </div>
+          <button id="btn-next" type="button"
+                  class="px-5 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition">
+            Avançar
+          </button>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Final -->
-    <section id="sec-final" class="section parchment-wrap-rough hidden" aria-hidden="true">
-      <div class="parchment-rough">
-        <div class="parchment-inner-rough">
-          <h2 class="parchment-title-rough">Parabéns! Você finalizou a jornada 🎉</h2>
-          <p class="parchment-text-rough">Revise se quiser e depois gere seu PDF e HQ.</p>
-          <div class="parchment-actions-rough mt-3">
-            <button id="btnRevisar" class="btn">Revisar</button>
-            <button id="btnLimparRespostas" class="btn">Limpar respostas</button>
-            <span style="flex:1"></span>
-            <button id="btnBaixarPDFHQ" class="btn btn-primary">Baixar PDF e HQ</button>
-          </div>
-        </div>
+  <!-- REVIEW -->
+  <section id="review" class="wrap-perga perga-horiz" hidden>
+    <div class="inner-perga">
+      <h2 class="text-xl sm:text-2xl font-semibold mb-4">Revisar Respostas</h2>
+      <div id="review-list" class="space-y-4"></div>
+
+      <div class="flex gap-3 justify-between mt-6">
+        <button id="btn-voltar-wizard" type="button"
+                class="px-5 py-2 rounded-xl bg-gray-200 hover:bg-gray-300 transition">
+          Voltar às Perguntas
+        </button>
+
+        <button id="btn-finalizar" type="button"
+                class="px-5 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition">
+          Finalizar Jornada
+        </button>
       </div>
-    </section>
-  </main>
+    </div>
+  </section>
 
-  <!-- Scripts JS (ordem e paths ajustados) -->
-  <script defer src="assets/js/questions.js"></script>
-  <script defer src="assets/js/state.js"></script>
-  <script defer src="assets/js/main.js"></script>
-  <script defer src="assets/js/jornada.js"></script>
+  <!-- FINAL -->
+  <section id="final" class="wrap-perga perga-vert" hidden>
+    <div class="inner-perga text-center">
+      <h2 class="text-xl sm:text-2xl font-semibold">Parabéns! Você concluiu a Jornada ✨</h2>
+      <p class="mt-2 opacity-80">Agora gere seus arquivos. Após a entrega, você será redirecionado(a) para a Home.</p>
 
-  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="assets/css/styles.css" />
-  <link rel="stylesheet" href="assets/css/styles-pergaminho-rasgado.css" />
+      <div class="mt-6">
+        <button id="btn-baixar-tudo"
+                class="px-6 py-3 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition">
+          Baixar PDF + HQ
+        </button>
+        <div id="status-download" class="mt-3 text-sm opacity-80"></div>
+      </div>
 
+      <div class="mt-6">
+        <a href="/" class="text-sm underline opacity-70">Ir para a página inicial</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="text-center text-xs py-6 opacity-70">
+    PARA ALÉM. E SEMPRE!!
+  </footer>
+
+  <script src="/js/jornada.js"></script>
 </body>
 </html>
