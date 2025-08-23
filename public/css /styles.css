@@ -1,65 +1,31 @@
-/* ====== Base ====== */
-:root{
-  --bg:#0b0f17; --fg:#e9e9ee; --muted:#9aa3b2;
-  --pri:#6b5cff; --pri-2:#5344ff; --card:#121825; --paper:#f4e2b8;
+/* Pergaminhos */
+.perga-vert {
+  background-image: url("/assets/perg-vert.png"); /* ajuste o caminho se seu arquivo estiver em /docs/assets/ */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
-*{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji"}
-a{color:inherit;text-decoration:none}
-
-/* Layout */
-.container{max-width:980px;margin:0 auto;padding:24px}
-.topbar{margin:8px 0 24px}
-.topbar h1{margin:0 0 4px;font-size:28px}
-.muted{color:var(--muted)}
-.center{text-align:center}
-
-/* Cards & Buttons */
-.card{background:var(--card);border:1px solid #1b2233;border-radius:20px;padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-.btn{display:inline-flex;align-items:center;gap:.5rem;border:1px solid #2a3350;border-radius:12px;padding:.6rem 1rem;background:#182035;cursor:pointer}
-.btn:hover{filter:brightness(1.1)}
-.btn-primary{background:var(--pri);border-color:var(--pri-2)}
-
-/* Moldura do pergaminho */
-.pergaminho-frame{position:relative}
-.pergaminho-img{width:100%;height:auto;display:block;user-select:none;pointer-events:none;filter:drop-shadow(0 18px 32px rgba(0,0,0,.35))}
-.pergaminho-layer{position:absolute;inset:0;padding:34px 36px 40px;overflow:auto}
-
-/* Exemplo: fundo com pergaminho horizontal */
-.bg-pergaminho-horiz{
-  background: url('/assets/img/pergaminho-rasgado-horiz.png') no-repeat center/cover;
+.perga-horiz {
+  background-image: url("/assets/perg-horiz.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-/* Exemplo: fundo com pergaminho vertical */
-.bg-pergaminho-vert{
-  background: url('/assets/img/pergaminho-rasgado-vert.png') no-repeat center/cover;
+/* Contêiner com respiro mobile */
+.wrap-perga {
+  min-height: 100dvh;
+  padding: 16px;
+  display: grid;
+  place-items: center;
 }
-
-/* Componentes da Jornada */
-.pergaminho{background:rgba(0,0,0,.08);border:1px dashed rgba(255,255,255,.08);border-radius:14px;padding:18px}
-.space-y > *+*{margin-top:16px}
-.titulo-perg{margin:0 0 6px;text-align:center}
-.pergunta-label{margin:0 0 8px}
-.progress{height:8px;background:#29344f;border-radius:999px;overflow:hidden}
-.progress > span{display:block;height:100%}
-
-/* Inputs */
-input, textarea{width:100%;border:1px solid #2b3858;background:#0f1524;color:var(--fg);border-radius:12px;padding:.65rem .8rem}
-textarea{resize:vertical}
-.form-label{display:block;margin:.35rem 0 .25rem}
-
-/* Ações */
-.actions{display:flex;gap:.5rem;flex-wrap:wrap}
-.chama-wrap{display:flex;justify-content:center}
-.chama{width:22px;height:32px;border-radius:999px;background:radial-gradient(ellipse at 50% 65%, #ffd08a 0%, #ff7a00 55%, #ff3c00 100%);animation:osc 1.2s ease-in-out infinite alternate;filter:blur(.25px) drop-shadow(0 0 12px rgba(255,120,0,.5))}
-@keyframes osc{to{transform:translateY(-2px) scale(1.04)}}
-
-/* Review/Done cards */
-.review-card{background:rgba(0,0,0,.12);border:1px solid #29334a;border-radius:16px;padding:16px}
-.small{font-size:.9rem}
-
-/* Responsivo */
-@media (max-width:640px){
-  .pergaminho-layer{padding:18px 14px 20px}
+.inner-perga {
+  width: min(960px, 100%);
+  backdrop-filter: blur(2px);
+  background: rgba(255,255,255,0.75);
+  border-radius: 16px;
+  padding: 20px;
+}
+@media (min-width: 640px) {
+  .inner-perga { padding: 28px; border-radius: 20px; }
 }
