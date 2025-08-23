@@ -1,32 +1,15 @@
-import express from "express";
-import compression from "compression";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const express = require("express");
+const path = require("path");
 const app = express();
-const port = process.env.PORT || 10000;
+const PORT = process.env.PORT || 3000;
 
-app.use(compression());
-app.use(
-  express.static(path.join(__dirname, "public"), {
-    maxAge: "1y",
-    etag: true,
-    immutable: true,
-  })
-);
+// serve a pasta public (ou docs se você escolheu docs/)
+app.use(express.static(path.join(__dirname, "public")));
 
-// Rotas conhecidas (fallback para index.html se precisar)
 app.get("*", (req, res) => {
-  const known = ["/", "/index.html", "/sobre.html", "/jornadas.html", "/jornada-conhecimento.html", "/jornada-vocacional.html", "/jornada-amorosa.html", "/manifesto.html", "/contato.html"];
-  if (known.includes(req.path)) {
-    res.sendFile(path.join(__dirname, "public", req.path === "/" ? "index.html" : req.path.slice(1)));
-  } else {
-    res.status(404).sendFile(path.join(__dirname, "public", "index.html"));
-  }
+  res.sendFile(path.join(__dirname, "public/index.html"));
 });
 
-app.listen(port, "0.0.0.0", () => {
-  console.log(`Servidor da Irmandade no ar na porta ${port}`);
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
 });
