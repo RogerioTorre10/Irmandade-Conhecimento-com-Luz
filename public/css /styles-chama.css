@@ -1,0 +1,41 @@
+/* ===== Chama (vitrine) – única e no rodapé ===== */
+.chama-wrapper{
+  position:absolute; left:0; right:0; bottom:0; height:0;
+  pointer-events:none; z-index:0;
+}
+
+/* Se houver mais de um bloco sob .card, mostra só o último */
+.card > .chama-wrapper:not(:last-of-type){ display:none !important; }
+/* Nunca renderizar chamas dentro do .card-body */
+.card-body .chama-wrapper{ display:none !important; }
+
+.chama{
+  position:absolute;
+  bottom:-48px;               /* ↓ mais baixa para não invadir os botões */
+  --scale:1; --y:0px; --rot:0deg;
+}
+
+/* Grande — formato gota com ponta mais fina */
+.chama-grande{
+  left:50%;
+  width:76px; height:118px;
+  transform: translateX(-50%) translateY(var(--y)) scale(var(--scale)) rotate(var(--rot));
+  clip-path: ellipse(05% 250% at 30% 170%); /* ponta um pouco mais fina */
+
+  background:
+    radial-gradient(58% 70% at 50% 34%, rgba(255,255,255,.92) 0 16%, rgba(255,255,255,.52) 16% 32%, rgba(255,255,255,0) 33%),
+    radial-gradient(70% 88% at 50% 66%, #ffd27a 0 42%, #ff9b4e 42% 74%, rgba(255,155,78,0) 75%);
+
+  box-shadow: 0 0 28px rgba(255,170,64,.55), 0 0 90px rgba(255,140,61,.28);
+  filter: saturate(1.22) brightness(1.05);
+}
+.chama-grande::after{
+  content:""; position:absolute; inset:-22% -26% -16% -26%; border-radius:inherit;
+  background: radial-gradient(closest-side, rgba(255,171,64,.50), rgba(255,140,61,0) 70%);
+  filter: blur(18px); opacity:.82; animation: glow 2.4s ease-in-out infinite;
+}
+
+/* Usaremos só a chama grande (inferior) */
+.chama-pequena{ display:none !important; }
+
+@keyframes glow { 0%{opacity:.72} 50%{opacity:.9} 100%{opacity:.7} }
