@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Jornada Conhecimento com Luz – Essencial</title>
   <meta name="description" content="Jornada Conhecimento com Luz — uma viagem interior com fé, ciência e luz." />
+  <meta name="theme-color" content="#111827" />
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
 
   <!-- Tailwind via CDN -->
@@ -16,12 +17,23 @@
   <link rel="stylesheet" href="/css/pergaminho.css" />
   <link rel="stylesheet" href="/css/chama.css" />
   <link rel="stylesheet" href="/css/emojes.css" />
+
+  <style>
+    h1,h2,h3 { letter-spacing: -0.01em; }
+    .lead { font-size: clamp(1.05rem, 2.8vw, 1.25rem); opacity:.85; }
+  </style>
 </head>
 <body class="bg-slate-100 text-slate-900">
+  <!-- topo fixo simples -->
+  <header class="w-full py-3 px-5 flex items-center gap-3 bg-slate-900 text-white">
+    <img src="/assets/logo.svg" alt="Irmandade Conhecimento com Luz" width="24" height="24" />
+    <strong class="text-sm sm:text-base">Irmandade Conhecimento com Luz</strong>
+    <a href="/" class="ml-auto text-xs underline opacity-80 hover:opacity-100">Início</a>
+  </header>
 
   <!-- INTRO (pergaminho vertical) -->
   <section id="intro" class="wrap-perga perga-vert">
-    <div class="inner-perga">
+    <div class="inner-perga fade-in">
       <header class="text-center space-y-2 mb-6">
         <h1 class="text-2xl sm:text-3xl font-bold">Jornada Conhecimento com Luz · Essencial</h1>
         <p class="opacity-80">Seja bem-vindo(a)! Respire, foque e siga no seu tempo.</p>
@@ -46,9 +58,9 @@
     </div>
   </section>
 
-  <!-- WIZARD (perguntas em passos) – pergaminho horizontal -->
+  <!-- WIZARD (perguntas) – pergaminho horizontal -->
   <section id="wizard" class="wrap-perga perga-horiz" hidden>
-    <div class="inner-perga">
+    <div class="inner-perga fade-in">
       <header class="mb-4">
         <h2 class="text-xl sm:text-2xl font-semibold">Perguntas · Viagem Interior</h2>
         <p class="text-sm opacity-70">Responda com sinceridade. Você pode voltar e revisar.</p>
@@ -101,7 +113,7 @@
 
   <!-- REVIEW -->
   <section id="review" class="wrap-perga perga-horiz" hidden>
-    <div class="inner-perga">
+    <div class="inner-perga fade-in">
       <h2 class="text-xl sm:text-2xl font-semibold mb-4">Revisar Respostas</h2>
       <div id="review-list" class="space-y-4"></div>
 
@@ -121,7 +133,7 @@
 
   <!-- FINAL -->
   <section id="final" class="wrap-perga perga-vert" hidden>
-    <div class="inner-perga text-center">
+    <div class="inner-perga text-center fade-in">
       <h2 class="text-xl sm:text-2xl font-semibold">Parabéns! Você concluiu a Jornada ✨</h2>
       <p class="mt-2 opacity-80">Agora gere seus arquivos. Após a entrega, você será redirecionado(a) para a Home.</p>
 
