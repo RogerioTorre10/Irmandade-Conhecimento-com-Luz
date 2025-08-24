@@ -1,12 +1,12 @@
 /* ===== Pergaminhos ===== */
 .perga-vert {
-  background-image: url("/assets/perg-vert.png");
+  background-image: url("/assets/img/pergaminho-rasgado-vert.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 .perga-horiz {
-  background-image: url("/assets/perg-horiz.png");
+  background-image: url("/assets/pergaminho-rasgado-hoiz.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
