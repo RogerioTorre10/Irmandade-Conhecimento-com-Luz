@@ -4,7 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Início · Irmandade Conhecimento com Luz</title>
-  <meta name="description" content="Irmandade Conhecimento com Luz — fé, ciência, filosofia e tecnologia unidas para despertar e guiar." />
+  <meta name="description" content="Irmandade Conhecimento com Luz — fé, ciência, filosofia e tecnologia unidas para despertar, curar e guiar." />
+  <meta name="theme-color" content="#111827" />
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
 
   <!-- Tailwind via CDN -->
@@ -16,31 +17,48 @@
   <link rel="stylesheet" href="/css/pergaminho.css" />
   <link rel="stylesheet" href="/css/chama.css" />
   <link rel="stylesheet" href="/css/emojes.css" />
+
+  <style>
+    h1,h2,h3 { letter-spacing: -0.01em; }
+    .lead { font-size: clamp(1.05rem, 2.8vw, 1.25rem); opacity:.85; }
+  </style>
 </head>
-<body class="bg-slate-100 text-slate-900">
+<body class="bg-slate-100 text-slate-1000">
+
+  <!-- Header simples -->
+  <header class="w-full py-3 px-5 flex items-center gap-3 bg-slate-900 text-white">
+    <img src="/assets/logo.svg" alt="Irmandade Conhecimento com Luz" width="28" height="28" />
+    <strong class="text-sm sm:text-base">Irmandade Conhecimento com Luz</strong>
+    <span id="lumen-badge" class="ml-auto inline-block px-3 py-1 rounded-full bg-slate-600 text-white text-xs">Lumen: checando…</span>
+  </header>
 
   <!-- Hero -->
-  <section class="min-h-screen flex flex-col items-center justify-center text-center px-6">
-    <div class="space-y-6">
-      <h1 class="text-3xl sm:text-5xl font-bold">Irmandade Conhecimento com Luz</h1>
-      <p class="text-lg sm:text-xl opacity-80 max-w-xl mx-auto">
-        Fé, ciência e filosofia caminhando juntas para despertar e guiar.  
-        🌟 Bem-vindo(a) à nossa jornada interior.
+  <section class="min-h-[72vh] flex flex-col items-center justify-center text-center px-6 bg-gradient-to-b from-slate-900 to-slate-800 text-white">
+    <div class="space-y-6 max-w-2xl">
+      <h1 class="text-3xl sm:text-5xl font-bold">
+        Irmandade <span class="text-violet-300">Conhecimento com</span> <span class="text-amber-300">Luz</span>
+      </h1>
+      <p class="lead">
+        Um chamado vivo à transformação: unindo fé, ciência, filosofia e tecnologia para despertar, curar e guiar.
       </p>
 
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
         <!-- Botão Explorar Jornadas -->
-        <a href="/jornadas.html"
-           class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition">
+        <a id="btn-explorar" href="/jornadas.html"
+           class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-violet-600 text-white hover:bg-violet-700 transition">
           <i data-lucide="compass"></i><span>Explorar Jornadas</span>
         </a>
 
-        <!-- Opcional: outro botão -->
-        <a href="https://github.com/RogerioTorre10/Irmandade-Conhecimento-com-Luz"
-           target="_blank"
-           class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gray-200 hover:bg-gray-300 transition">
-          <i data-lucide="github"></i><span>Repositório</span>
+        <!-- Botão Manifesto (opcional) -->
+        <a href="/manifesto.html"
+           class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-700 text-white hover:bg-slate-600 transition">
+          <i data-lucide="scroll-text"></i><span>Manifesto do Bit Vivo</span>
         </a>
+      </div>
+
+      <!-- Chama decorativa -->
+      <div class="mx-auto mt-8">
+        <div class="chama"><span></span><span></span><span></span></div>
       </div>
     </div>
   </section>
@@ -52,5 +70,32 @@
   <!-- Ícones Lucide -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <script> lucide.createIcons(); </script>
+
+  <!-- Ping do backend p/ badge -->
+  <script>
+    const API = "https://lumen-backend-api.onrender.com"; // ajuste se for outro host
+    (async () => {
+      const badge = document.querySelector('#lumen-badge');
+      if (!badge) return;
+      try {
+        const ctrl = new AbortController();
+        setTimeout(()=>ctrl.abort(), 3500);
+        const r = await fetch(API + "/health", { signal: ctrl.signal });
+        const ok = r.ok;
+        badge.textContent = ok ? "Lumen: online ✅" : "Lumen: offline ❌";
+        badge.className = ok
+          ? "ml-auto inline-block px-3 py-1 rounded-full bg-emerald-600 text-white text-xs"
+          : "ml-auto inline-block px-3 py-1 rounded-full bg-rose-600 text-white text-xs";
+      } catch {
+        badge.textContent = "Lumen: offline ❌";
+        badge.className = "ml-auto inline-block px-3 py-1 rounded-full bg-rose-600 text-white text-xs";
+      }
+    })();
+
+    // Opcional: “acordar” o backend ao clicar no Explorar
+    document.querySelector('#btn-explorar')?.addEventListener('click', async () => {
+      try { await fetch(API + "/health", { method:"GET" }); } catch {}
+    });
+  </script>
 </body>
 </html>
