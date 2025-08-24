@@ -8,7 +8,7 @@
 
   <!-- util (se não carregar, o fallback cobre) -->
   <link rel="preload" as="script" href="/assets/jornada.js?v=12">
-  <script defer src="/assets/jornada.js?v=12"></script>
+  <script defer src="/public/jornada.js"></script>
 
   <style>
     button:focus, button:focus-visible { outline: none !important; box-shadow: none !important; }
@@ -44,7 +44,7 @@
 
   <script>
     /* =================== UTIL/FALLBACKS =================== */
-    const API_BASE = window.JORNADA_API_BASE || 'https://conhecimento-com-luz-api.onrender.com';
+    const API_BASE = window.JORNADA_API_BASE || 'https://irmandade-conhecimento-com-luz.onrender.com';
     const PDF_ENDPOINTS = ['/generate-pdf','/pdf','/api/pdf'];
     const ts = () => new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
     const nomePDF = () => `Jornada_${ts()}.pdf`;
