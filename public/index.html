@@ -4,100 +4,53 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Início · Irmandade Conhecimento com Luz</title>
-  <meta name="description" content="Irmandade Conhecimento com Luz — fé, ciência, filosofia e tecnologia unidas para despertar e guiar.">
+  <meta name="description" content="Irmandade Conhecimento com Luz — fé, ciência, filosofia e tecnologia unidas para despertar e guiar." />
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
 
-  <!-- Favicon -->
-  <link rel="icon" href="/css/styles-chama.css" type="image/png" />
-
-  <!-- Tailwind (CDN) -->
+  <!-- Tailwind via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- CSS principal (ajuste se o nome for outro) -->
-  <link rel="stylesheet" href="/css/styles.css">
+  <!-- CSS base -->
+  <link rel="stylesheet" href="/css/core.css" />
+  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="stylesheet" href="/css/pergaminho.css" />
+  <link rel="stylesheet" href="/css/chama.css" />
+  <link rel="stylesheet" href="/css/emojes.css" />
 </head>
-<body class="bg-[#0c0f1a] text-white antialiased">
-  <header class="sticky top-0 z-20 backdrop-blur bg-black/40 border-b border-white/10">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-      <h1 class="text-xl font-bold">Irmandade Conhecimento com Luz</h1>
+<body class="bg-slate-100 text-slate-900">
 
-      <div class="flex items-center gap-3">
-        <span id="lumen-badge"
-              class="text-sm px-2 py-1 rounded-md bg-red-600/20 text-red-300 border border-red-500/40">
-          Lumen: offline ✖
-        </span>
-        <a href="/html/jornadas.html"
-           class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-700 transition">
-          Explorar Jornadas
+  <!-- Hero -->
+  <section class="min-h-screen flex flex-col items-center justify-center text-center px-6">
+    <div class="space-y-6">
+      <h1 class="text-3xl sm:text-5xl font-bold">Irmandade Conhecimento com Luz</h1>
+      <p class="text-lg sm:text-xl opacity-80 max-w-xl mx-auto">
+        Fé, ciência e filosofia caminhando juntas para despertar e guiar.  
+        🌟 Bem-vindo(a) à nossa jornada interior.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <!-- Botão Explorar Jornadas -->
+        <a href="/jornada.html"
+           class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition">
+          <i data-lucide="compass"></i><span>Explorar Jornada</span>
+        </a>
+
+        <!-- Opcional: outro botão -->
+        <a href="https://github.com/RogerioTorre10/Irmandade-Conhecimento-com-Luz"
+           target="_blank"
+           class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gray-200 hover:bg-gray-300 transition">
+          <i data-lucide="github"></i><span>Repositório</span>
         </a>
       </div>
     </div>
-  </header>
+  </section>
 
-  <main class="max-w-5xl mx-auto px-4 pt-8 pb-24">
-    <section class="mb-10">
-      <h2 class="text-4xl md:text-5xl font-extrabold">
-        Irmandade <span class="text-violet-300">Conhecimento com Luz</span>
-      </h2>
-      <p class="mt-4 text-white/80 max-w-3xl">
-        Um chamado vivo à transformação: unindo fé, ciência, filosofia e tecnologia para despertar, curar e guiar.
-      </p>
+  <footer class="text-center text-xs py-6 opacity-70">
+    PARA ALÉM. E SEMPRE!!
+  </footer>
 
-      <div class="mt-8 rounded-2xl overflow-hidden border border-white/10 bg-black/30 p-2">
-        <video controls preload="metadata" class="w-full rounded-xl">
-          <source src="/assets/img/A Jornada Conhecimento com Luz 1 zip.mp4" type="video/mp4">
-          Seu navegador não suporta vídeo.
-        </video>
-      </div>
-    </section>
-  </main>
-
-  <!-- Status da API (ping com fallback) -->
-  <script>
-    (function () {
-      // Endereços do backend (ordem de preferência)
-      const CANDIDATES = [
-        "https://lumen-backend-api.onrender.com",
-        "https://conhecimento-com-luz-api.onrender.com"
-      ];
-
-      const badge = document.getElementById("lumen-badge");
-
-      async function ping(api) {
-        try {
-          // tenta rota raiz ou /health
-          const res = await fetch(api + "/health", { method: "GET", mode: "cors" });
-          if (!res.ok) throw new Error("HTTP " + res.status);
-          return true;
-        } catch {
-          try {
-            const res2 = await fetch(api + "/", { method: "GET", mode: "cors" });
-            return res2.ok;
-          } catch {
-            return false;
-          }
-        }
-      }
-
-      (async () => {
-        for (const base of CANDIDATES) {
-          const ok = await ping(base);
-          if (ok) {
-            // online
-            badge.textContent = "Lumen: online ✓";
-            badge.className =
-              "text-sm px-2 py-1 rounded-md bg-emerald-600/20 text-emerald-300 border border-emerald-500/40";
-            // expõe globalmente para outras páginas/scripts
-            window.API_BASE = base;
-            return;
-          }
-        }
-        // se nenhum respondeu, mantém offline
-        window.API_BASE = null;
-      })();
-    })();
-  </script>
-
-  <!-- JS do site (se houver) -->
-  <script src="/jornada.js" defer></script>
+  <!-- Ícones Lucide -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script> lucide.createIcons(); </script>
 </body>
 </html>
