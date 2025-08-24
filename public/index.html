@@ -8,94 +8,19 @@
   <meta name="theme-color" content="#111827" />
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
 
-  <!-- Tailwind via CDN -->
+  <!-- (opcional) Tailwind, se sua home usa -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- CSS base -->
-  <link rel="stylesheet" href="/css/core.css" />
-  <link rel="stylesheet" href="/css/styles.css" />
-  <link rel="stylesheet" href="/css/pergaminho.css" />
-  <link rel="stylesheet" href="/css/chama.css" />
-  <link rel="stylesheet" href="/css/emojes.css" />
-
-  <style>
-    h1,h2,h3 { letter-spacing: -0.01em; }
-    .lead { font-size: clamp(1.05rem, 2.8vw, 1.25rem); opacity:.85; }
-  </style>
+  <!-- ⚠️ NÃO carregar os CSS da jornada aqui -->
+  <!-- Deixe apenas o(s) CSS que já existia(m) da sua home, se houver -->
+  <!-- <link rel="stylesheet" href="/css/site.css">  (exemplo) -->
 </head>
-<body class="bg-slate-100 text-slate-1000">
+<body>
+  <!-- ...MANTÉM o seu conteúdo anterior da home... -->
 
-  <!-- Header simples -->
-  <header class="w-full py-3 px-5 flex items-center gap-3 bg-slate-900 text-white">
-    <img src="/assets/logo.svg" alt="Irmandade Conhecimento com Luz" width="28" height="28" />
-    <strong class="text-sm sm:text-base">Irmandade Conhecimento com Luz</strong>
-    <span id="lumen-badge" class="ml-auto inline-block px-3 py-1 rounded-full bg-slate-600 text-white text-xs">Lumen: checando…</span>
-  </header>
-
-  <!-- Hero -->
-  <section class="min-h-[72vh] flex flex-col items-center justify-center text-center px-6 bg-gradient-to-b from-slate-900 to-slate-800 text-white">
-    <div class="space-y-6 max-w-2xl">
-      <h1 class="text-3xl sm:text-5xl font-bold">
-        Irmandade <span class="text-violet-300">Conhecimento com</span> <span class="text-amber-300">Luz</span>
-      </h1>
-      <p class="lead">
-        Um chamado vivo à transformação: unindo fé, ciência, filosofia e tecnologia para despertar, curar e guiar.
-      </p>
-
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <!-- Botão Explorar Jornadas -->
-        <a id="btn-explorar" href="/jornadas.html"
-           class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-violet-600 text-white hover:bg-violet-700 transition">
-          <i data-lucide="compass"></i><span>Explorar Jornadas</span>
-        </a>
-
-        <!-- Botão Manifesto (opcional) -->
-        <a href="/manifesto.html"
-           class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-700 text-white hover:bg-slate-600 transition">
-          <i data-lucide="scroll-text"></i><span>Manifesto do Bit Vivo</span>
-        </a>
-      </div>
-
-      <!-- Chama decorativa -->
-      <div class="mx-auto mt-8">
-        <div class="chama"><span></span><span></span><span></span></div>
-      </div>
-    </div>
-  </section>
-
-  <footer class="text-center text-xs py-6 opacity-70">
-    PARA ALÉM. E SEMPRE!!
-  </footer>
-
-  <!-- Ícones Lucide -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script> lucide.createIcons(); </script>
-
-  <!-- Ping do backend p/ badge -->
-  <script>
-    const API = "https://lumen-backend-api.onrender.com"; // ajuste se for outro host
-    (async () => {
-      const badge = document.querySelector('#lumen-badge');
-      if (!badge) return;
-      try {
-        const ctrl = new AbortController();
-        setTimeout(()=>ctrl.abort(), 3500);
-        const r = await fetch(API + "/health", { signal: ctrl.signal });
-        const ok = r.ok;
-        badge.textContent = ok ? "Lumen: online ✅" : "Lumen: offline ❌";
-        badge.className = ok
-          ? "ml-auto inline-block px-3 py-1 rounded-full bg-emerald-600 text-white text-xs"
-          : "ml-auto inline-block px-3 py-1 rounded-full bg-rose-600 text-white text-xs";
-      } catch {
-        badge.textContent = "Lumen: offline ❌";
-        badge.className = "ml-auto inline-block px-3 py-1 rounded-full bg-rose-600 text-white text-xs";
-      }
-    })();
-
-    // Opcional: “acordar” o backend ao clicar no Explorar
-    document.querySelector('#btn-explorar')?.addEventListener('click', async () => {
-      try { await fetch(API + "/health", { method:"GET" }); } catch {}
-    });
-  </script>
+  <!-- Botão para a Jornada -->
+  <a href="/jornadas.html" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-violet-600 text-white hover:bg-violet-700 transition">
+    Explorar Jornadas
+  </a>
 </body>
 </html>
