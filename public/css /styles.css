@@ -1,37 +1,96 @@
-/* ===== Pergaminhos ===== */
-.perga-vert {
-  background-image: url("/assets/img/pergaminho-rasgado-vert.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-.perga-horiz {
-  background-image: url("/assets/pergaminho-rasgado-hoiz.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+/* ===== Fontes medievais (Google Fonts) ===== */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=MedievalSharp&display=swap');
+
+:root{
+  --perg-bg: #f4e7c6;
+  --perg-edge: #d5c59a;
+  --perg-ink: #2a1e12;
+  --violet: #7c3aed;
 }
 
-/* ===== Containers ===== */
-.wrap-perga {
-  min-height: 100dvh;
-  padding: 16px;
-  display: grid;
-  place-items: center;
+/* Títulos com cara medieval */
+.titulo-medieval{
+  font-family: "Cinzel", serif;
+  font-weight: 800;
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+  letter-spacing: .5px;
+  color: var(--perg-ink);
+  margin-bottom: .6rem;
 }
-.inner-perga {
-  width: min(960px, 100%);
-  backdrop-filter: blur(2px);
-  background: rgba(255, 255, 255, 0.78);
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
-}
-@media (min-width: 640px) {
-  .inner-perga { padding: 28px; border-radius: 20px; }
+.subtitulo-medieval{
+  font-family: "Cinzel", serif;
+  font-weight: 600;
+  font-size: clamp(1.2rem, 2vw, 1.4rem);
+  color: var(--perg-ink);
+  margin-bottom: .4rem;
 }
 
-/* ===== Tipografia básica (sem Tailwind) – opcional ===== */
-body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; }
-.prose h2 { font-size: 1.125rem; margin: 0.5rem 0; }
-.prose ul { margin-left: 1rem; list-style: disc; }
+/* Corpo do pergaminho com textura suave (CSS puro) */
+.pergaminho{
+  background: radial-gradient(120% 100% at 50% 0%, #fff7df 0%, var(--perg-bg) 55%, #eadbb4 100%);
+  border: 1px solid var(--perg-edge);
+  box-shadow: 0 10px 30px rgba(0,0,0,.25), inset 0 0 20px rgba(0,0,0,.06);
+  border-radius: 18px;
+  padding: 1.2rem;
+  color: var(--perg-ink);
+  position: relative;
+  overflow: hidden;
+}
+/* bordas “enroladas” finas */
+.pergaminho:before, .pergaminho:after{
+  content:"";
+  position:absolute; inset:auto 0 0 0;
+  height:8px;
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,.15), transparent);
+  opacity:.3;
+}
+
+/* Texto do pergaminho */
+.texto-pergaminho{
+  font-family: "MedievalSharp", cursive;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--perg-ink);
+}
+
+/* Campos com estética vintage */
+.label-perg{
+  display:block;
+  font-family: "Cinzel", serif;
+  font-size:.95rem;
+  margin:.6rem 0 .25rem;
+  color: var(--perg-ink);
+}
+.input-perg{
+  width:100%;
+  padding:.65rem .8rem;
+  border:1px solid var(--perg-edge);
+  border-radius:12px;
+  background:#fff8e8;
+  color:#1b130b;
+  outline:none;
+  transition:border .2s, box-shadow .2s;
+}
+.input-perg:focus{
+  border-color:#bfae84;
+  box-shadow:0 0 0 3px rgba(191,174,132,.25);
+}
+
+/* Botão medieval */
+.btn-medieval{
+  appearance:none;
+  font-family: "Cinzel", serif;
+  background: linear-gradient(180deg, #9b67ff, #6d28d9);
+  color:white;
+  border:none;
+  border-radius:14px;
+  padding:.7rem 1.1rem;
+  cursor:pointer;
+  box-shadow:0 8px 22px rgba(124,58,237,.35);
+  transition:transform .08s ease, filter .2s ease;
+}
+.btn-medieval:hover{ filter:brightness(1.07); }
+.btn-medieval:active{ transform:translateY(1px); }
+
+/* Vídeo responsivo bonito */
+video{ outline:none; }
