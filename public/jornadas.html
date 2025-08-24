@@ -4,27 +4,73 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Jornada Conhecimento com Luz – Essencial</title>
-  <meta name="description" content="Jornada Conhecimento com Luz — uma viagem interior com fé, ciência e luz." />
+  <meta name="description" content="Jornada Conhecimento com Luz — viagem interior com fé, ciência e luz." />
   <meta name="theme-color" content="#111827" />
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
 
-  <!-- Tailwind via CDN -->
+  <!-- Tailwind (pode manter) -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="/css/core.css" />
-  <link rel="stylesheet" href="/css/styles.css" />
-  <link rel="stylesheet" href="/css/pergaminho.css" />
-  <link rel="stylesheet" href="/css/chama.css" />
-  <link rel="stylesheet" href="/css/emojes.css" />
-
+  <!-- ⚠️ Nada global. Estilos da Jornada ficam AQUI, escopados -->
   <style>
-    h1,h2,h3 { letter-spacing: -0.01em; }
-    .lead { font-size: clamp(1.05rem, 2.8vw, 1.25rem); opacity:.85; }
+    /* ===== Escopo da Jornada ===== */
+    #jornada { background: #f1f5f9; color: #0f172a; min-height: 100vh; }
+
+    /* Containers e tipografia (escopo) */
+    #jornada .wrap-perga{
+      min-height: 100dvh;
+      padding: 16px;
+      display: grid;
+      place-items: center;
+    }
+    #jornada .inner-perga{
+      width: min(960px, 100%);
+      background: rgba(255,255,255,0.82);
+      backdrop-filter: blur(2px);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 28px rgba(0,0,0,.12);
+    }
+    @media (min-width:640px){
+      #jornada .inner-perga{ padding:28px; border-radius:20px; }
+    }
+
+    #jornada .prose h2 { font-size:1.125rem; margin:.5rem 0; }
+    #jornada .prose ul { margin-left:1rem; list-style:disc; }
+    #jornada [hidden]{ display:none !important; }
+
+    /* Pergaminhos (apontando para /assets/) */
+    #jornada .perga-vert{
+      background-image: url("/assets/perg-vert.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: #e7c089; /* fallback */
+    }
+    #jornada .perga-horiz{
+      background-image: url("/assets/perg-horiz.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: #e7c089; /* fallback */
+    }
+
+    /* Cartão revisão */
+    #jornada .card{
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:12px;
+      background:#fff;
+      padding:12px;
+    }
+
+    /* Animação leve */
+    #jornada .fade-in{ animation:fade .35s ease; }
+    @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-900">
-  <!-- topo fixo simples -->
+<body>
+<main id="jornada">
+  <!-- topo -->
   <header class="w-full py-3 px-5 flex items-center gap-3 bg-slate-900 text-white">
     <img src="/assets/logo.svg" alt="Irmandade Conhecimento com Luz" width="24" height="24" />
     <strong class="text-sm sm:text-base">Irmandade Conhecimento com Luz</strong>
@@ -154,8 +200,9 @@
   <footer class="text-center text-xs py-6 opacity-70">
     PARA ALÉM. E SEMPRE!!
   </footer>
+</main>
 
-  <!-- JS -->
-  <script src="/jornada.js"></script>
+<!-- JS da Jornada -->
+<script src="/jornada.js"></script>
 </body>
 </html>
