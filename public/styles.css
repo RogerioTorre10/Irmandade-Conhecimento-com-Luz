@@ -17,3 +17,14 @@ hr{border:0;border-top:1px solid rgba(255,255,255,.15);margin:16px 0}
 .footer-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
 .small{font-size:.875rem;opacity:.9}
 .badge{display:inline-block;padding:4px 8px;border-radius:999px;background:rgba(106,167,255,.15);color:var(--primary);font-weight:600}
+
+/* Olho mágico da senha */
+.senha-wrap{position:relative;display:flex;align-items:center}
+.senha-wrap .input{padding-right:42px}
+.senha-eye{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  width:28px;height:28px;border:0;background:transparent;color:var(--muted);
+  display:flex;align-items:center;justify-content:center;cursor:pointer
+}
+.senha-eye:hover{color:var(--fg)}
+.senha-eye svg{width:20px;height:20px}
