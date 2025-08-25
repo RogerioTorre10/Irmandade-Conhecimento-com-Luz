@@ -53,11 +53,7 @@ function onIndex(){}
 function onJornadas(){}
 
 function onJornadaEssencial(){
-  const root = document.getElementById("app");
-  if(!root) return;
-
   const st = Object.assign({ step:"senha", respostas:{}, idx:0 }, S.load());
-  render();
 
   function statusByStep(step){
     return ({
@@ -67,6 +63,19 @@ function onJornadaEssencial(){
       final: "Parabéns! Você concluiu a jornada"
     })[step] || "";
   }
+
+  function render(){
+    setStatus(statusByStep(st.step));
+    if (st.step === "senha")    return renderSenha();
+    if (st.step === "intro")    return renderIntro();
+    if (st.step === "perguntas")return renderPerguntas();
+    if (st.step === "final")    return renderFinal();
+  }
+
+  // …(seu renderSenha/renderIntro/renderPerguntas/renderFinal/tentarGerar ficam aqui)…
+
+  render(); // ← chama no fim
+}
 
   function render(){
     setStatus(statusByStep(st.step));
