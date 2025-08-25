@@ -91,6 +91,32 @@ function onJornadaEssencial(){
         </div>
       </section>
     `);
+     const eyeSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
+  <circle cx="12" cy="12" r="3.5"></circle>
+</svg>`;
+const eyeOffSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a20.64 20.64 0 0 1 5.06-5.94"></path>
+  <path d="M1 1l22 22"></path>
+  <path d="M14.12 14.12A3.5 3.5 0 0 1 9.88 9.88"></path>
+</svg>`;
+
+const inputSenha = view.querySelector("#senha");
+const btnEye = view.querySelector("#toggleSenha");
+let visivel = false;
+
+function atualizarOlho(){
+  inputSenha.type = visivel ? "text" : "password";
+  btnEye.innerHTML = visivel ? eyeOffSVG : eyeSVG;
+  btnEye.setAttribute("aria-pressed", visivel ? "true" : "false");
+}
+btnEye.addEventListener("click", ()=>{
+  visivel = !visivel;
+  atualizarOlho();
+  inputSenha.focus();
+});
+atualizarOlho();
+
     view.querySelector("#btnIniciar").addEventListener("click", ()=>{
       const v = (view.querySelector("#senha").value||"").trim().toLowerCase();
       if(v === JORNADA_CFG.SENHA_FIXA){ st.step="intro"; S.save(st); render(); }
