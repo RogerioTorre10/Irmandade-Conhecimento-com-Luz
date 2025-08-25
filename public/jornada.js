@@ -83,9 +83,11 @@ function onJornadaEssencial(){
         <h2 class="center">Acesso</h2>
         <p class="small center">Use a senha para começar (para testes: <span class="badge">${JORNADA_CFG.SENHA_FIXA}</span>).</p>
         <label for="senha">Senha</label>
-        <input id="senha" class="input" type="password" autocomplete="off" placeholder="Digite a senha">
-        <div class="footer-actions">
-          <button class="btn primary" id="btnIniciar">Iniciar</button>
+       <div class="senha-wrap">
+     <input id="senha" class="input" type="password" autocomplete="off" placeholder="Digite a senha">
+   <button type="button" class="senha-eye" id="toggleSenha" aria-label="Mostrar/ocultar senha" title="Mostrar/ocultar senha">
+   <!-- ícone é renderizado via JS -->
+  </button>
         </div>
       </section>
     `);
