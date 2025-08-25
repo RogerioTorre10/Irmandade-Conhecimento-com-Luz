@@ -5,54 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Contato · Irmandade Conhecimento com Luz</title>
   <meta name="description" content="Irmandade Conhecimento com Luz — fé, ciência, filosofia e tecnologia unidas para despertar e guiar.">
-  <link rel="icon" href="./assets/img/favicon.svg" type="image/svg+xml">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: {"50":"#f5f3ff","100":"#ede9fe","200":"#ddd6fe","300":"#c4b5fd","400":"#a78bfa","500":"#8b5cf6","600":"#7c3aed","700":"#6d28d9","800":"#5b21b6","900":"#4c1d95"},
-            gold: {"500":"#fbbf24"}
-          }
-        }
-      }
-    }
-  </script>
-  <link rel="stylesheet" href="./assets/css/styles.css">
+  <link rel="icon" href="assets/img/perfil-da-irmandade.png" type="image/png">
+  <link rel="stylesheet" href="css/styles.css">
   <script defer src="https://unpkg.com/lucide@latest"></script>
-  <script defer src="./assets/js/main.js"></script>
+  <script defer src="js/main.js"></script>
 </head>
 <body class="bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 text-gray-100 antialiased selection:bg-primary-500/30">
 <header class="fixed top-0 inset-x-0 z-50 backdrop-blur bg-gray-900/70 border-b border-white/10">
   <nav class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
-    <a href="./html/index.html" class="flex items-center gap-2">
-      <img src="./html/assets/logo.svg" alt="Logo Irmandade" class="h-8 w-8">
+    <a href="html/index.html" class="flex items-center gap-2">
+      <img src="assets/img/perfil-da-irmandade.png" alt="Logo Irmandade" class="h-8 w-8">
       <span class="font-bold text-white">Irmandade Conhecimento com Luz</span>
     </a>
     <button id="menuBtn" class="md:hidden text-white" aria-label="Abrir menu">
       <i data-lucide="menu"></i>
     </button>
     <ul id="menu" class="hidden md:flex items-center gap-6 text-gray-200">
-      <li><a class="hover:text-white" href="./html/sobre.html">Sobre</a></li>
+      <li><a class="hover:text-white" href="html/sobre.html">Sobre</a></li>
       <li class="group relative">
-        <a class="hover:text-white" href="./html/jornadas.html">Jornadas</a>
+        <a class="hover:text-white" href="html/jornadas.html">Jornadas</a>
         <div class="hidden group-hover:block absolute mt-2 bg-gray-800 border border-white/10 rounded-xl p-2 w-56">
-          <a class="block px-3 py-2 rounded hover:bg-white/5" href="./html/jornada-conhecimento.html">Conhecimento com Luz</a>
-          <a class="block px-3 py-2 rounded hover:bg-white/5" href="./html/jornada-vocacional.html">Vocacional com Luz</a>
-          <a class="block px-3 py-2 rounded hover:bg-white/5" href="./html/jornada-amorosa.html">Amorosa com Luz</a>
+          <a class="block px-3 py-2 rounded hover:bg-white/5" href="html/jornada-conhecimento.html">Conhecimento com Luz</a>
+          <a class="block px-3 py-2 rounded hover:bg-white/5" href="html/jornada-vocacional.html">Vocacional com Luz</a>
+          <a class="block px-3 py-2 rounded hover:bg-white/5" href="html/jornada-amorosa.html">Amorosa com Luz</a>
         </div>
       </li>
-      <li><a class="hover:text-white" href="./html/manifesto.html">Manifesto</a></li>
-      <li><a class="hover:text-white" href="./html/contato.html">Contato</a></li>
+      <li><a class="hover:text-white" href="html/manifesto.html">Manifesto</a></li>
+      <li><a class="hover:text-white" href="html/contato.html">Contato</a></li>
     </ul>
   </nav>
   <div id="mobileMenu" class="md:hidden hidden border-t border-white/10 bg-gray-900/95">
     <ul class="max-w-6xl mx-auto px-4 py-3 space-y-2 text-gray-200">
-      <li><a class="block py-2" href="./html/sobre.html">Sobre</a></li>
-      <li><a class="block py-2" href="./html/jornadas.html">Jornadas</a></li>
-      <li><a class="block py-2" href="./html/manifesto.html">Manifesto</a></li>
-      <li><a class="block py-2" href="./html/contato.html">Contato</a></li>
+      <li><a class="block py-2" href="html/sobre.html">Sobre</a></li>
+      <li><a class="block py-2" href="html/jornadas.html">Jornadas</a></li>
+      <li><a class="block py-2" href="html/manifesto.html">Manifesto</a></li>
+      <li><a class="block py-2" href="html/contato.html">Contato</a></li>
     </ul>
   </div>
 </header>
@@ -83,7 +70,7 @@
   <div class="max-w-6xl mx-auto px-4 py-10 grid md:grid-cols-3 gap-8">
     <div>
       <div class="flex items-center gap-2 mb-2">
-        <img src="./assets/img/favicon.svg" alt="Logo Irmandade" class="h-6 w-6">
+        <img src="assets/img/perfil-da-irmandade.png" alt="Logo Irmandade" class="h-6 w-6">
         <h4 class="font-semibold">Irmandade Conhecimento com Luz</h4>
       </div>
       <p class="text-sm">Fé, ciência, filosofia e tecnologia unidas para despertar, curar e guiar.</p>
@@ -91,15 +78,15 @@
     <div>
       <h5 class="font-semibold mb-2">Jornadas</h5>
       <ul class="space-y-1 text-sm">
-        <li><a href="./html/jornada-conhecimento.html" class="hover:text-white">Conhecimento com Luz</a></li>
-        <li><a href="./html/jornada-vocacional.html" class="hover:text-white">Vocacional com Luz</a></li>
-        <li><a href="./html/jornada-amorosa.html" class="hover:text-white">Amorosa com Luz</a></li>
+        <li><a href="html/jornada-conhecimento.html" class="hover:text-white">Conhecimento com Luz</a></li>
+        <li><a href="html/jornada-vocacional.html" class="hover:text-white">Vocacional com Luz</a></li>
+        <li><a href="html/jornada-amorosa.html" class="hover:text-white">Amorosa com Luz</a></li>
       </ul>
     </div>
     <div>
       <h5 class="font-semibold mb-2">Contato</h5>
       <ul class="space-y-1 text-sm">
-        <li><a href="/contato.html" class="hover:text-white">Fale conosco</a></li>
+        <li><a href="html/contato.html" class="hover:text-white">Fale conosco</a></li>
       </ul>
     </div>
   </div>
