@@ -1,180 +1,31 @@
-<!-- Badge de status (pode ficar no header) -->
-<span id="lumen-badge"
-      class="text-sm px-2 py-1 rounded-md bg-red-600/20 text-red-300 border border-red-500/40">
-  Lumen: offline ✖
-</span>
-
-<!-- PERGAMINHO medieval -->
-<section class="pergaminho mt-8">
-  <h2 class="titulo-medieval">Pergaminho da Jornada</h2>
-  <p class="texto-pergaminho"><!doctype html>
+<!doctype html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Jornada Conhecimento com Luz – Essencial</title>
-  <meta name="description" content="Jornada Conhecimento com Luz — uma viagem interior com fé, ciência e luz." />
-  <link rel="icon" href="/assets/img/perfil-da-irmandade.png" type="image/png" />
-
-   <!-- CSS -->
-  <link rel="stylesheet" href="/css/styles-core.css" />
-  <link rel="stylesheet" href="/css/styles.css" />
-  <link rel="stylesheet" href="/css/styles-pergaminho.css" />
-  <link rel="stylesheet" href="/css/styles-chama.css" />
-  <link rel="stylesheet" href="/css/styles-emojes.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jornadas · Irmandade Conhecimento com Luz</title>
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
-<body class="bg-slate-100 text-slate-900">
+<body>
+  <header class="site-header">
+    <h1>Jornadas Disponíveis</h1>
+    <p>Escolha por onde começar.</p>
+  </header>
 
-  <!-- INTRO (pergaminho vertical) -->
-  <section id="intro" class="wrap-perga perga-vert">
-    <div class="inner-perga">
-      <header class="text-center space-y-2 mb-6">
-        <h1 class="text-2xl sm:text-3xl font-bold">Jornada Conhecimento com Luz · Essencial</h1>
-        <p class="opacity-80">Seja bem-vindo(a)! Respire, foque e siga no seu tempo.</p>
-      </header>
-
-      <article class="prose max-w-none">
-        <h2>🛡️ AVISO IMPORTANTE – LEIA ANTES DE INICIAR</h2>
-        <ul>
-          <li>Suas respostas <strong>não</strong> serão armazenadas após o término.</li>
-          <li>Ao final, será gerado um <strong>PDF</strong> com a devolutiva simbólica e sua HQ.</li>
-          <li>Você deverá baixar imediatamente; depois tudo é apagado automaticamente.</li>
-          <li>Acesso por senha individual: <strong>15 dias</strong> para iniciar e <strong>24h</strong> para concluir após o primeiro acesso.</li>
-        </ul>
-      </article>
-
-      <div class="mt-6 flex items-center justify-center">
-        <button id="btn-iniciar"
-                class="px-6 py-3 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition">
-          Iniciar Jornada
-        </button>
-      </div>
+  <main class="container">
+    <div class="card">
+      <h2>Jornada Conhecimento com Luz · Essencial</h2>
+      <p>Uma viagem interior com 32 reflexões essenciais.</p>
+      <a class="btn primary" href="/jornada-conhecimento-com-luz1.html">Iniciar</a>
     </div>
-  </section>
 
-  <!-- WIZARD (perguntas em passos) – pergaminho horizontal -->
-  <section id="wizard" class="wrap-perga perga-horiz" hidden>
-    <div class="inner-perga">
-      <header class="mb-4">
-        <h2 class="text-xl sm:text-2xl font-semibold">Perguntas · Viagem Interior</h2>
-        <p class="text-sm opacity-70">Responda com sinceridade. Você pode voltar e revisar.</p>
-      </header>
+    <a class="btn" href="/index.html">← Voltar ao início</a>
+  </main>
 
-      <!-- Passos -->
-      <div id="steps" class="space-y-6">
-        <div class="step" data-step="1">
-          <label class="block font-medium mb-1">1) Quem é você hoje, em uma frase?</label>
-          <input type="text" class="w-full border rounded-lg p-3" placeholder="Escreva aqui..." />
-        </div>
-
-        <div class="step" data-step="2" hidden>
-          <label class="block font-medium mb-1">2) Qual lembrança de superação quer honrar nesta jornada?</label>
-          <textarea class="w-full border rounded-lg p-3" rows="4" placeholder="Conte um pouco..."></textarea>
-        </div>
-
-        <div class="step" data-step="3" hidden>
-          <label class="block font-medium mb-1">3) O que você deseja acender em si (uma virtude/força)?</label>
-          <input type="text" class="w-full border rounded-lg p-3" placeholder="Ex.: coragem, fé, disciplina..." />
-        </div>
-      </div>
-
-      <!-- Navegação -->
-      <div class="flex flex-wrap gap-3 justify-between mt-6">
-        <button id="btn-prev" type="button"
-                class="px-5 py-2 rounded-xl bg-gray-200 hover:bg-gray-300 transition">
-          Voltar
-        </button>
-
-        <div class="flex gap-3 ml-auto">
-          <button id="btn-clear-all" type="button"
-                  class="px-5 py-2 rounded-xl bg-red-500 text-white hover:bg-red-600 transition">
-            Limpar Respostas
-          </button>
-
-          <button id="btn-review" type="button"
-                  class="px-5 py-2 rounded-xl bg-yellow-500 text-white hover:bg-yellow-600 transition">
-            Revisar
-          </button>
-
-          <button id="btn-next" type="button"
-                  class="px-5 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition">
-            Avançar
-          </button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEW -->
-  <section id="review" class="wrap-perga perga-horiz" hidden>
-    <div class="inner-perga">
-      <h2 class="text-xl sm:text-2xl font-semibold mb-4">Revisar Respostas</h2>
-      <div id="review-list" class="space-y-4"></div>
-
-      <div class="flex gap-3 justify-between mt-6">
-        <button id="btn-voltar-wizard" type="button"
-                class="px-5 py-2 rounded-xl bg-gray-200 hover:bg-gray-300 transition">
-          Voltar às Perguntas
-        </button>
-
-        <button id="btn-finalizar" type="button"
-                class="px-5 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition">
-          Finalizar Jornada
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <!-- FINAL -->
-  <section id="final" class="wrap-perga perga-vert" hidden>
-    <div class="inner-perga text-center">
-      <h2 class="text-xl sm:text-2xl font-semibold">Parabéns! Você concluiu a Jornada ✨</h2>
-      <p class="mt-2 opacity-80">Agora gere seus arquivos. Após a entrega, você será redirecionado(a) para a Home.</p>
-
-      <div class="mt-6">
-        <button id="btn-baixar-tudo"
-                class="px-6 py-3 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition">
-          Baixar PDF + HQ
-        </button>
-        <div id="status-download" class="mt-3 text-sm opacity-80"></div>
-      </div>
-
-      <div class="mt-6">
-        <a href="/" class="text-sm underline opacity-70">Ir para a página inicial</a>
-      </div>
-    </div>
-  </section>
-
-  <footer class="text-center text-xs py-6 opacity-70">
-    PARA ALÉM. E SEMPRE!!
+  <footer class="site-footer">
+    <small>© 2025 Irmandade Conhecimento com Luz</small>
   </footer>
 
-  <!-- JS -->
-  <script src="/jornada.js"></script>
+  <script src="/jornada.js" defer></script>
 </body>
 </html>
-
-    Em nome da Irmandade, registro aqui o chamado de coração,
-    para que a chama do Lumen guie meus passos.
-  </p>
-</section>
-
-<!-- FORM dos CHAMADOS -->
-<form id="form-chamado" class="pergaminho mt-6">
-  <h3 class="subtitulo-medieval">Registrar Chamado</h3>
-
-  <label class="label-perg" for="nome">Nome</label>
-  <input id="nome" name="nome" type="text" class="input-perg" required>
-
-  <label class="label-perg" for="email">E-mail</label>
-  <input id="email" name="email" type="email" class="input-perg" required>
-
-  <label class="label-perg" for="mensagem">Mensagem</label>
-  <textarea id="mensagem" name="mensagem" rows="4" class="input-perg" required></textarea>
-
-  <div class="mt-4 flex items-center gap-3">
-    <button data-send type="submit" class="btn-medieval">Lançar Chamado</button>
-    <span data-out class="text-white/80 text-sm"></span>
-  </div>
-</form>
-
