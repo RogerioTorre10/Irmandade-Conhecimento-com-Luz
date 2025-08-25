@@ -1,4 +1,4 @@
-/* jornada.js — VERSÃO ESTÁVEL: 1.1 (print fallback)
+/* jornada.js — VERSÃO ESTÁVEL: 1.1 (revisado)
    Estrutura (public/):
    ├─ index.html
    ├─ jornadas.html
@@ -21,13 +21,15 @@ const S = {
     try { return JSON.parse(localStorage.getItem(JORNADA_CFG.STORAGE_KEY) || "{}"); }
     catch(_) { return {}; }
   },
-  save(data) {
-    localStorage.setItem(JORNADA_CFG.STORAGE_KEY, JSON.stringify(data || {}));
-  },
+  save(data) { localStorage.setItem(JORNADA_CFG.STORAGE_KEY, JSON.stringify(data || {})); },
   clear() { localStorage.removeItem(JORNADA_CFG.STORAGE_KEY); }
 };
 
 // ===== HELPERS ===============================================================
+const Root = {
+  get(id="app"){ return document.getElementById(id); },
+  clear(id="app"){ const el=this.get(id); if(!el) return null; el.innerHTML=""; return el; }
+};
 function el(html){ const d=document.createElement("div"); d.innerHTML=html.trim(); return d.firstElementChild; }
 function downloadBlob(blob, filename){
   const url = URL.createObjectURL(blob);
@@ -66,126 +68,106 @@ function onJornadaEssencial(){
 
   function render(){
     setStatus(statusByStep(st.step));
-    if (st.step === "senha")    return renderSenha();
-    if (st.step === "intro")    return renderIntro();
-    if (st.step === "perguntas")return renderPerguntas();
-    if (st.step === "final")    return renderFinal();
+    if(st.step==="senha")      return renderSenha();
+    if(st.step==="intro")      return renderIntro();
+    if(st.step==="perguntas")  return renderPerguntas();
+    if(st.step==="final")      return renderFinal();
   }
 
-  // …(seu renderSenha/renderIntro/renderPerguntas/renderFinal/tentarGerar ficam aqui)…
+  function renderSenha(){
+    const root = Root.clear(); if(!root) return;
 
-  render(); // ← chama no fim
-}
+    const v = el(`
+      <section class="card">
+        <h2 class="center">Acesso</h2>
+        <p class="small center">
+          Use a senha para começar (para testes:
+          <span class="badge">${JORNADA_CFG.SENHA_FIXA}</span>).
+        </p>
 
-  function render(){
-    setStatus(statusByStep(st.step));
-    if(st.step==="senha") return renderSenha();
-    if(st.step==="intro") return renderIntro();
-    if(st.step==="perguntas") return renderPerguntas();
-    if(st.step==="final") return renderFinal();
-  }
+        <label for="senha">Senha</label>
+        <div class="senha-wrap">
+          <input id="senha" class="input" type="password" autocomplete="off" placeholder="Digite a senha">
+          <button type="button" class="senha-eye" id="toggleSenha"
+                  aria-label="Mostrar/ocultar senha" title="Mostrar/ocultar senha"></button>
+        </div>
 
- function renderSenha(){
-  root.innerHTML = "";
+        <div class="footer-actions">
+          <button class="btn primary" id="btnIniciar">Iniciar</button>
+        </div>
+      </section>
+    `);
 
-  // HTML TODO dentro de UM template literal (entre crases)
-  const v = el(`
-    <section class="card">
-      <h2 class="center">Acesso</h2>
-      <p class="small center">
-        Use a senha para começar (para testes:
-        <span class="badge">${JORNADA_CFG.SENHA_FIXA}</span>).
-      </p>
+    // Olho mágico (mostrar/ocultar senha)
+    const eyeSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
+      <circle cx="12" cy="12" r="3.5"></circle>
+    </svg>`;
+    const eyeOffSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a20.64 20.64 0 0 1 5.06-5.94"></path>
+      <path d="M1 1l22 22"></path>
+      <path d="M14.12 14.12A3.5 3.5 0 0 1 9.88 9.88"></path>
+    </svg>`;
+    const inputSenha = v.querySelector("#senha");
+    const btnEye     = v.querySelector("#toggleSenha");
+    let visivel = false;
+    function atualizarOlho(){
+      if(!inputSenha || !btnEye) return;
+      inputSenha.type = visivel ? "text" : "password";
+      btnEye.innerHTML = visivel ? eyeOffSVG : eyeSVG;
+      btnEye.setAttribute("aria-pressed", visivel ? "true" : "false");
+    }
+    if(btnEye && inputSenha){
+      btnEye.addEventListener("click", ()=>{ visivel = !visivel; atualizarOlho(); inputSenha.focus(); });
+      btnEye.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); btnEye.click(); }});
+      atualizarOlho();
+    }
 
-      <label for="senha">Senha</label>
-      <div class="senha-wrap">
-        <input id="senha" class="input" type="password" autocomplete="off"
-               placeholder="Digite a senha">
-        <button type="button" class="senha-eye" id="toggleSenha"
-                aria-label="Mostrar/ocultar senha" title="Mostrar/ocultar senha"></button>
-      </div>
-
-      <div class="footer-actions">
-        <button class="btn primary" id="btnIniciar">Iniciar</button>
-      </div>
-    </section>
-  `);
-
-  // ===== Olho mágico =====
-  const eyeSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
-    <circle cx="12" cy="12" r="3.5"></circle>
-  </svg>`;
-  const eyeOffSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a20.64 20.64 0 0 1 5.06-5.94"></path>
-    <path d="M1 1l22 22"></path>
-    <path d="M14.12 14.12A3.5 3.5 0 0 1 9.88 9.88"></path>
-  </svg>`;
-
-  const inputSenha = v.querySelector("#senha");
-  const btnEye     = v.querySelector("#toggleSenha");
-  let visivel = false;
-
-  function atualizarOlho(){
-    if (!inputSenha || !btnEye) return;
-    inputSenha.type = visivel ? "text" : "password";
-    btnEye.innerHTML = visivel ? eyeOffSVG : eyeSVG;
-    btnEye.setAttribute("aria-pressed", visivel ? "true" : "false");
-  }
-  if (btnEye && inputSenha){
-    btnEye.addEventListener("click", ()=>{ visivel = !visivel; atualizarOlho(); inputSenha.focus(); });
-    btnEye.addEventListener("keydown",(e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); btnEye.click(); }});
-    atualizarOlho();
-  }
-
-  // Botão iniciar (igual ao original)
-  v.querySelector("#btnIniciar").addEventListener("click", ()=>{
-    const x = (v.querySelector("#senha").value || "").trim().toLowerCase();
-    if (x === JORNADA_CFG.SENHA_FIXA){ st.step = "intro"; S.save(st); render(); }
-    else { alert("Senha inválida. Tente novamente."); }
-  });
-
-  root.appendChild(v);
-}
-
-    view.querySelector("#btnIniciar").addEventListener("click", ()=>{
-      const v = (view.querySelector("#senha").value||"").trim().toLowerCase();
-      if(v === JORNADA_CFG.SENHA_FIXA){ st.step="intro"; S.save(st); render(); }
+    v.querySelector("#btnIniciar").addEventListener("click", ()=>{
+      const x = (v.querySelector("#senha").value||"").trim().toLowerCase();
+      if(x === JORNADA_CFG.SENHA_FIXA){ st.step="intro"; S.save(st); render(); }
       else { alert("Senha inválida. Tente novamente."); }
     });
-    root.appendChild(view);
+
+    root.appendChild(v);
   }
 
   function renderIntro(){
-    root.innerHTML = "";
-    const view = el(`
+    const root = Root.clear(); if(!root) return;
+
+    const v = el(`
       <section class="card pergaminho">
         <h2 class="center">Bem-vindo(a) à Jornada Essencial</h2>
-        <p class="info">Aqui você encontrará 32 reflexões para iluminar sua história, raízes e propósito. Responda com sinceridade. Você poderá revisar antes de concluir.</p>
+        <p class="info">Aqui você encontrará 32 reflexões para iluminar sua história, raízes e propósito.
+        Responda com sinceridade. Você poderá revisar antes de concluir.</p>
         <div class="footer-actions">
           <button class="btn" id="btnVoltarSenha">Voltar</button>
           <button class="btn primary" id="btnComecar">Começar</button>
         </div>
       </section>
     `);
-    view.querySelector("#btnVoltarSenha").addEventListener("click", ()=>{ st.step="senha"; S.save(st); render(); });
-    view.querySelector("#btnComecar").addEventListener("click", ()=>{ st.step="perguntas"; st.idx=0; S.save(st); render(); });
-    root.appendChild(view);
+
+    v.querySelector("#btnVoltarSenha").addEventListener("click", ()=>{ st.step="senha"; S.save(st); render(); });
+    v.querySelector("#btnComecar").addEventListener("click", ()=>{ st.step="perguntas"; st.idx=0; S.save(st); render(); });
+
+    root.appendChild(v);
   }
 
-  // Placeholder de perguntas (substitua pela lista real quando quiser)
+  // Perguntas placeholder (substitua pela lista oficial quando quiser)
   const PERGUNTAS = Array.from({length: 8}).map((_,i)=> ({
     id: "q"+(i+1),
     texto: `Pergunta ${i+1}: escreva sua reflexão com liberdade.`
   }));
+  window.__JORNADA_TOTAL = PERGUNTAS.length;
 
   function renderPerguntas(){
-    root.innerHTML = "";
+    const root = Root.clear(); if(!root) return;
+
     const idx = Math.max(0, Math.min(st.idx||0, PERGUNTAS.length-1));
     const q = PERGUNTAS[idx];
     const val = (st.respostas[q.id]||"");
 
-    const view = el(`
+    const v = el(`
       <section class="card">
         <div class="small">Questão ${idx+1} de ${PERGUNTAS.length}</div>
         <h3>${q.texto}</h3>
@@ -200,24 +182,24 @@ function onJornadaEssencial(){
       </section>
     `);
 
-    const ta = view.querySelector("#resp");
+    const ta = v.querySelector("#resp");
     ta.value = val;
     ta.addEventListener("input", ()=>{
       st.respostas[q.id] = ta.value;
       S.save(st);
     });
 
-    view.querySelector("#btnIntro").addEventListener("click", ()=>{ st.step="intro"; S.save(st); render(); });
-    view.querySelector("#btnLimpar").addEventListener("click", ()=>{
+    v.querySelector("#btnIntro").addEventListener("click", ()=>{ st.step="intro"; S.save(st); render(); });
+    v.querySelector("#btnLimpar").addEventListener("click", ()=>{
       if(confirm("Tem certeza que deseja apagar TODAS as respostas?")){
         st.respostas = {}; st.idx = 0; S.save(st); render();
       }
     });
-    view.querySelector("#btnVoltar").addEventListener("click", ()=>{
+    v.querySelector("#btnVoltar").addEventListener("click", ()=>{
       if(idx>0){ st.idx = idx-1; S.save(st); render(); }
     });
-    view.querySelector("#btnAvancar").addEventListener("click", ()=>{
-      const respAtual = (view.querySelector("#resp").value || "").trim();
+    v.querySelector("#btnAvancar").addEventListener("click", ()=>{
+      const respAtual = (v.querySelector("#resp").value || "").trim();
       if(!respAtual){
         alert("Por favor, preencha a resposta antes de avançar.");
         return;
@@ -229,14 +211,15 @@ function onJornadaEssencial(){
       else { st.step="final"; S.save(st); render(); }
     });
 
-    root.appendChild(view);
+    root.appendChild(v);
   }
 
   function renderFinal(){
-    root.innerHTML = "";
+    const root = Root.clear(); if(!root) return;
+
     const respostas = st.respostas || {};
 
-    const view = el(`
+    const v = el(`
       <section class="card pergaminho">
         <h2 class="center">Parabéns! Você finalizou a Jornada.</h2>
         <p class="center small">Você pode revisar, baixar o PDF/HQ e retornar ao início.</p>
@@ -250,9 +233,10 @@ function onJornadaEssencial(){
       </section>
     `);
 
-    view.querySelector("#btnRevisar").addEventListener("click", ()=>{ st.step="perguntas"; st.idx=0; S.save(st); render(); });
-    view.querySelector("#btnPrincipal").addEventListener("click", ()=>{ S.clear(); location.href = "/index.html"; });
-    view.querySelector("#btnPDF").addEventListener("click", async ()=>{
+    v.querySelector("#btnRevisar").addEventListener("click", ()=>{ st.step="perguntas"; st.idx=0; S.save(st); render(); });
+    v.querySelector("#btnPrincipal").addEventListener("click", ()=>{ S.clear(); location.href = "/index.html"; });
+
+    v.querySelector("#btnPDF").addEventListener("click", async ()=>{
       try{
         setStatus("Gerando PDF...");
         const r = await tentarGerar("PDF", respostas);
@@ -260,25 +244,22 @@ function onJornadaEssencial(){
         else setStatus("Janela de impressão aberta. Use 'Salvar como PDF'.");
         setStatus("PDF pronto!");
       }catch(err){
-        console.error(err);
-        alert("Falha ao gerar PDF.");
-        setStatus("");
+        console.error(err); alert("Falha ao gerar PDF."); setStatus("");
       }
     });
-    view.querySelector("#btnHQ").addEventListener("click", async ()=>{
+
+    v.querySelector("#btnHQ").addEventListener("click", async ()=>{
       try{
         setStatus("Gerando HQ...");
         const r = await tentarGerar("HQ", respostas);
         if(r.kind==="blob") downloadBlob(r.blob, r.name || "jornada-essencial-hq.txt");
         setStatus("HQ pronta!");
       }catch(err){
-        console.error(err);
-        alert("Falha ao gerar HQ.");
-        setStatus("");
+        console.error(err); alert("Falha ao gerar HQ."); setStatus("");
       }
     });
 
-    root.appendChild(view);
+    root.appendChild(v);
   }
 
   // ===== GERADOR (API ou FALLBACK) ==========================================
@@ -309,20 +290,19 @@ function onJornadaEssencial(){
         `<h3>${i+1}. ${escapeHtml(k)}</h3><p>${escapeHtml(v)}</p>`
       ).join("");
 
-      const html = `<!doctype html><html><head><meta charset="utf-8">
-        <title>Jornada Essencial — PDF</title>
+      const html = `<!doctype html><html><head><meta charset="utf-8"><title>Jornada Essencial — PDF</title>
         <style>
           body{font-family:Arial,system-ui;margin:40px;line-height:1.5}
           h1{font-size:22px;margin:0 0 12px}
           h3{font-size:16px;margin:16px 0 6px}
           p{margin:0 0 8px;white-space:pre-wrap}
-        </style></head><body>
+        </style>
+      </head><body>
         <h1>Jornada Essencial — PDF (teste)</h1>
         <div>${respostasHtml || "<p><em>Sem respostas preenchidas.</em></p>"}</div>
-        </body></html>`;
+      </body></html>`;
 
       w.document.open(); w.document.write(html); w.document.close();
-      // alguns bloqueadores podem impedir; peça para liberar popups se necessário
       w.focus(); setTimeout(()=> w.print(), 400);
       return { kind:"printed" };
     } else {
@@ -330,6 +310,10 @@ function onJornadaEssencial(){
       return { kind:"blob", blob: txt, name: "jornada-essencial-hq.txt" };
     }
   }
+
+  // chama o primeiro render no fim
+  render();
+}
 
 // ===== BOOT =================================================================
 document.addEventListener("DOMContentLoaded", () => {
