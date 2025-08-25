@@ -76,56 +76,68 @@ function onJornadaEssencial(){
     if(st.step==="final") return renderFinal();
   }
 
-  function renderSenha(){
-    root.innerHTML = "";
-    const v = el(`
-  <section class="card">
-    <h2 class="center">Acesso</h2>
-    <p class="small center">
-      Use a senha para começar (para testes: <span class="badge">${JORNADA_CFG.SENHA_FIXA}</span>).
-    </p>
+ function renderSenha(){
+  root.innerHTML = "";
 
-    <label for="senha">Senha</label>
-    <div class="senha-wrap">
-      <input id="senha" class="input" type="password" autocomplete="off" placeholder="Digite a senha">
-      <button type="button" class="senha-eye" id="toggleSenha"
-              aria-label="Mostrar/ocultar senha" title="Mostrar/ocultar senha"></button>
-    </div>
+  // HTML TODO dentro de UM template literal (entre crases)
+  const v = el(`
+    <section class="card">
+      <h2 class="center">Acesso</h2>
+      <p class="small center">
+        Use a senha para começar (para testes:
+        <span class="badge">${JORNADA_CFG.SENHA_FIXA}</span>).
+      </p>
 
-    <div class="footer-actions">
-      <button class="btn primary" id="btnIniciar">Iniciar</button>
-    </div>
-  </section>
-`);
+      <label for="senha">Senha</label>
+      <div class="senha-wrap">
+        <input id="senha" class="input" type="password" autocomplete="off"
+               placeholder="Digite a senha">
+        <button type="button" class="senha-eye" id="toggleSenha"
+                aria-label="Mostrar/ocultar senha" title="Mostrar/ocultar senha"></button>
+      </div>
 
-        </div>
-      </section>
-    `);
-     const eyeSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
-  <circle cx="12" cy="12" r="3.5"></circle>
-</svg>`;
-const eyeOffSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a20.64 20.64 0 0 1 5.06-5.94"></path>
-  <path d="M1 1l22 22"></path>
-  <path d="M14.12 14.12A3.5 3.5 0 0 1 9.88 9.88"></path>
-</svg>`;
+      <div class="footer-actions">
+        <button class="btn primary" id="btnIniciar">Iniciar</button>
+      </div>
+    </section>
+  `);
 
-const inputSenha = view.querySelector("#senha");
-const btnEye = view.querySelector("#toggleSenha");
-let visivel = false;
+  // ===== Olho mágico =====
+  const eyeSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
+    <circle cx="12" cy="12" r="3.5"></circle>
+  </svg>`;
+  const eyeOffSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a20.64 20.64 0 0 1 5.06-5.94"></path>
+    <path d="M1 1l22 22"></path>
+    <path d="M14.12 14.12A3.5 3.5 0 0 1 9.88 9.88"></path>
+  </svg>`;
 
-function atualizarOlho(){
-  inputSenha.type = visivel ? "text" : "password";
-  btnEye.innerHTML = visivel ? eyeOffSVG : eyeSVG;
-  btnEye.setAttribute("aria-pressed", visivel ? "true" : "false");
+  const inputSenha = v.querySelector("#senha");
+  const btnEye     = v.querySelector("#toggleSenha");
+  let visivel = false;
+
+  function atualizarOlho(){
+    if (!inputSenha || !btnEye) return;
+    inputSenha.type = visivel ? "text" : "password";
+    btnEye.innerHTML = visivel ? eyeOffSVG : eyeSVG;
+    btnEye.setAttribute("aria-pressed", visivel ? "true" : "false");
+  }
+  if (btnEye && inputSenha){
+    btnEye.addEventListener("click", ()=>{ visivel = !visivel; atualizarOlho(); inputSenha.focus(); });
+    btnEye.addEventListener("keydown",(e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); btnEye.click(); }});
+    atualizarOlho();
+  }
+
+  // Botão iniciar (igual ao original)
+  v.querySelector("#btnIniciar").addEventListener("click", ()=>{
+    const x = (v.querySelector("#senha").value || "").trim().toLowerCase();
+    if (x === JORNADA_CFG.SENHA_FIXA){ st.step = "intro"; S.save(st); render(); }
+    else { alert("Senha inválida. Tente novamente."); }
+  });
+
+  root.appendChild(v);
 }
-btnEye.addEventListener("click", ()=>{
-  visivel = !visivel;
-  atualizarOlho();
-  inputSenha.focus();
-});
-atualizarOlho();
 
     view.querySelector("#btnIniciar").addEventListener("click", ()=>{
       const v = (view.querySelector("#senha").value||"").trim().toLowerCase();
