@@ -3,68 +3,74 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Jornada · Pergaminho Rasgado</title>
-  <meta name="description" content="Jornada guiada com estilo pergaminho rasgado.">
+  <title>Jornada · Pergaminho</title>
+  <meta name="description" content="Jornada guiada com estilo pergaminho.">
 
   <!-- Favicon -->
   <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml" />
 
-  <!-- CSS base + pergaminho (sem duplicações) -->
+  <!-- CSS base + pergaminho -->
   <link rel="stylesheet" href="../styles.css" />
-  <link rel="stylesheet" href="../css/styles-pergaminho-rasgado.css" />
+  <link rel="stylesheet" href="../css/styles-pergaminho.css" />
+
+  <!-- Garantia do background (remova se já existir no seu styles-pergaminho.css) -->
+  <style>
+    .pergaminho{ position:relative; padding:24px 20px; background:transparent; border:0; box-shadow:none; }
+    @media (min-width:768px){ .pergaminho{ padding:40px 48px; } }
+    .pergaminho::before{
+      content:""; position:absolute; inset:0; z-index:0;
+      background-repeat:no-repeat; background-position:center; background-size:100% 100%;
+      border-radius: var(--radius, 16px); opacity:.98;
+      filter: drop-shadow(0 12px 32px rgba(0,0,0,.45));
+    }
+    /* Caminhos relativos a ESTE HTML */
+    .pergaminho-v::before{ background-image:url("../assets/img/pergaminho-rasgado-vert.png"); }
+    .pergaminho-h::before{ background-image:url("../assets/img/pergaminho-rasgado-horiz.png"); }
+    /* conteúdo acima da textura */
+    .pergaminho > *{ position:relative; z-index:1; }
+  </style>
 </head>
 
 <body>
   <header class="site-header">
-    <h1>Jornada (versão rasgado)</h1>
-    <p>Prévia do layout com pergaminho. Esta página é isolada do fluxo estável.</p>
+    <h1>Jornada (página de teste)</h1>
+    <p>Layout com pergaminho isolado do fluxo estável.</p>
   </header>
 
   <main class="container">
-    <!-- WIZARD (perguntas) — normalmente pergaminho horizontal -->
-    <section id="sec-wizard" class="section parchment-wrap-rough">
-      <div class="parchment-rough">
-        <div class="parchment-inner-rough">
+    <!-- WIZARD (perguntas) → pergaminho HORIZONTAL -->
+    <section id="sec-wizard" class="card pergaminho pergaminho-h">
+      <div class="small" id="q-status">Pergunta 0/0</div>
+      <h2 id="q-title">Pergunta</h2>
+      <p id="q-text">...</p>
 
-          <div class="parchment-progress-rough mb-3">
-            <div id="q-progress" class="bar" style="width:0%"></div>
-          </div>
+      <div class="mb-3" style="height:8px; background:rgba(255,255,255,.12); border-radius:999px; overflow:hidden;">
+        <div id="q-progress" style="height:100%; width:0%; background:rgba(255,255,255,.35);"></div>
+      </div>
 
-          <div id="q-status" class="parchment-text-rough">Pergunta 0/0</div>
-          <h2 id="q-title" class="parchment-title-rough">Pergunta</h2>
-          <p id="q-text" class="parchment-text-rough">...</p>
+      <textarea id="q-input" data-qid="" class="input" rows="5" placeholder="Escreva aqui..."></textarea>
 
-          <textarea id="q-input" data-qid="" class="parchment-input-rough" rows="5" placeholder="Escreva aqui..."></textarea>
+      <div class="footer-actions" style="margin-top:12px;">
+        <button id="btnVoltar" class="btn">Voltar</button>
+        <button id="btnLimpar" class="btn">Limpar</button>
+        <span style="flex:1"></span>
+        <button id="btnProxima" class="btn primary">Próxima</button>
+      </div>
 
-          <div class="parchment-actions-rough mt-3">
-            <button id="btnVoltar" class="btn">Voltar</button>
-            <button id="btnLimpar" class="btn">Limpar</button>
-            <span style="flex:1"></span>
-            <button id="btnProxima" class="btn btn-primary">Próxima</button>
-          </div>
-
-          <div class="mt-3">
-            <button id="btnFinalizar" class="btn btn-primary">Finalizar Jornada</button>
-          </div>
-
-        </div>
+      <div style="margin-top:12px;">
+        <button id="btnFinalizar" class="btn primary">Finalizar Jornada</button>
       </div>
     </section>
 
-    <!-- FINAL — pergaminho vertical -->
-    <section id="sec-final" class="section parchment-wrap-rough hidden" aria-hidden="true">
-      <div class="parchment-rough">
-        <div class="parchment-inner-rough">
-          <h2 class="parchment-title-rough">Parabéns! Você finalizou a jornada 🎉</h2>
-          <p class="parchment-text-rough">Revise se quiser e depois gere seu PDF e HQ.</p>
-
-          <div class="parchment-actions-rough mt-3">
-            <button id="btnRevisar" class="btn">Revisar</button>
-            <button id="btnLimparRespostas" class="btn">Limpar respostas</button>
-            <span style="flex:1"></span>
-            <button id="btnBaixarPDFHQ" class="btn btn-primary">Baixar PDF e HQ</button>
-          </div>
-        </div>
+    <!-- FINAL → pergaminho VERTICAL -->
+    <section id="sec-final" class="card pergaminho pergaminho-v hidden" aria-hidden="true">
+      <h2>Parabéns! Você finalizou a jornada 🎉</h2>
+      <p>Revise se quiser e depois gere seu PDF e HQ.</p>
+      <div class="footer-actions" style="margin-top:12px;">
+        <button id="btnRevisar" class="btn">Revisar</button>
+        <button id="btnLimparRespostas" class="btn">Limpar respostas</button>
+        <span style="flex:1"></span>
+        <button id="btnBaixarPDFHQ" class="btn primary">Baixar PDF e HQ</button>
       </div>
     </section>
   </main>
