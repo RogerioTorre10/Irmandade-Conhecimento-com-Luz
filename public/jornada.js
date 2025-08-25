@@ -321,7 +321,6 @@ function onJornadaEssencial(){
       return { kind:"blob", blob: txt, name: "jornada-essencial-hq.txt" };
     }
   }
-}
 
 // ===== BOOT =================================================================
 document.addEventListener("DOMContentLoaded", () => {
