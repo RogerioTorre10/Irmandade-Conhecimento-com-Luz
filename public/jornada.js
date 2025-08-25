@@ -10,7 +10,7 @@
      └─ /css/styles.css
    Regras:
    - Sem Tailwind CDN
-   - Referências absolutas: /jornada.js, /css/styles.css, /assets/img/...
+   - Referências absolutas: /jornada.js, /styles.css, /assets/img/...
 */
 // ==== CONFIG ================================================================
 const JORNADA_CFG = {
