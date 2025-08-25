@@ -15,7 +15,7 @@
 // ==== CONFIG ================================================================
 const JORNADA_CFG = {
   STORAGE_KEY: "jornada-essencial-v1",
-  API_BASE: "https://conhecimento-com-luz-api.onrender.com",
+  API_BASE: "", // vazio => pula chamadas e usa fallback
   ENDPOINTS: { PDF: "/jornada/essencial/pdf", HQ: "/jornada/essencial/hq" },
   SENHA_FIXA: "iniciar"
 };
