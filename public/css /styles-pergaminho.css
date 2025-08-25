@@ -15,6 +15,18 @@
   border: 1px solid rgba(250,204,21,.15);
   box-shadow: 0 12px 36px rgba(0,0,0,.45);
 }
+/* Tema épico: escopo só quando <body class="epic"> */
+.epic{
+  font-family: 'Cardo', serif;            /* corpo legível e clássico */
+}
+.epic h1, .epic h2, .epic h3,
+.epic .parchment-title-rough,
+.epic .site-header h1{
+  font-family: 'Cinzel', serif;           /* títulos épicos */
+  letter-spacing: .02em;
+}
+.epic .motto, .epic .small { font-variant: small-caps;
+}
 
 /* Pergaminho rasgado */
 .parchment-rough {
