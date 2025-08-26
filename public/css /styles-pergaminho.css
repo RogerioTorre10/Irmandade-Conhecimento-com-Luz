@@ -3,6 +3,9 @@
    Estrutura: public/css/styles-pergaminho-rasgado.css
    =========================================== */
 
+.pergaminho-h::before{ background-image:url("../assets/img/pergaminho-rasgado-horiz.png"); }
+.pergaminho-v::before{ background-image:url("../assets/img/pergaminho-rasgado-vert.png"); }
+
 /* Envoltório */
 .parchment-wrap-rough {
   position: relative;
@@ -131,3 +134,4 @@
   from { opacity: 0; transform: translateY(8px) }
   to { opacity: 1; transform: translateY(0) }
 }
+
