@@ -136,17 +136,20 @@ function onJornadaEssencial(){
     const root = Root.clear(); if(!root) return;
 
     const v = el(`
-      <section class="card pergaminho">
-        <h2 class="center">Bem-vindo(a) à Jornada Essencial</h2>
-        <p class="info">Aqui você encontrará 32 reflexões para iluminar sua história, raízes e propósito.
-        Responda com sinceridade. Você poderá revisar antes de concluir.</p>
-        <div class="footer-actions">
-          <button class="btn" id="btnVoltarSenha">Voltar</button>
-          <button class="btn primary" id="btnComecar">Começar</button>
-        </div>
-      </section>
-    `);
-
+  <section class="card pergaminho pergaminho-h">
+    <div class="small">Questão ${idx+1} de ${PERGUNTAS.length}</div>
+    <h3>${q.texto}</h3>
+    <label for="resp">Sua resposta</label>
+    <textarea id="resp" rows="6" class="input" placeholder="Escreva aqui..."></textarea>
+    <div class="footer-actions">
+      <button class="btn" id="btnIntro">Instruções</button>
+      <button class="btn" id="btnLimpar">Apagar respostas</button>
+      <span style="flex:1"></span>
+      <button class="btn" id="btnVoltar" ${idx===0?"disabled":""}>Voltar</button>
+      <button class="btn primary" id="btnAvancar">${idx===PERGUNTAS.length-1? "Finalizar" : "Avançar"}</button>
+    </div>
+  </section>
+`);
     v.querySelector("#btnVoltarSenha").addEventListener("click", ()=>{ st.step="senha"; S.save(st); render(); });
     v.querySelector("#btnComecar").addEventListener("click", ()=>{ st.step="perguntas"; st.idx=0; S.save(st); render(); });
 
@@ -168,19 +171,19 @@ function onJornadaEssencial(){
     const val = (st.respostas[q.id]||"");
 
     const v = el(`
-      <section class="card">
-        <div class="small">Questão ${idx+1} de ${PERGUNTAS.length}</div>
-        <h3>${q.texto}</h3>
-        <label for="resp">Sua resposta</label>
-        <textarea id="resp" rows="6" class="input" placeholder="Escreva aqui..."></textarea>
-        <div class="footer-actions">
-          <button class="btn" id="btnIntro">Instruções</button>
-          <button class="btn" id="btnLimpar">Apagar respostas</button>
-          <button class="btn" id="btnVoltar" ${idx===0?"disabled":""}>Voltar</button>
-          <button class="btn primary" id="btnAvancar">${idx===PERGUNTAS.length-1? "Finalizar" : "Avançar"}</button>
-        </div>
-      </section>
-    `);
+  <section class="card pergaminho pergaminho-v">
+    <h2 class="center">Parabéns! Você finalizou a Jornada.</h2>
+    <p class="center small">Você pode revisar, baixar o PDF/HQ e retornar ao início.</p>
+    <hr>
+    <div class="footer-actions">
+      <button class="btn" id="btnRevisar">Revisar respostas</button>
+      <button class="btn" id="btnPDF">Baixar PDF</button>
+      <button class="btn" id="btnHQ">Baixar HQ (teste)</button>
+      <button class="btn primary" id="btnPrincipal">Concluir</button>
+    </div>
+  </section>
+`);
+
 
     const ta = v.querySelector("#resp");
     ta.value = val;
