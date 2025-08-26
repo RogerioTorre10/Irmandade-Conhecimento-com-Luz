@@ -132,29 +132,49 @@ function onJornadaEssencial(){
     root.appendChild(v);
   }
 
-  function renderIntro(){
-    const root = Root.clear(); if(!root) return;
+  function renderPerguntas(){
+  const root = document.getElementById("app");
+  if (!root) return;
+  root.innerHTML = "";
 
-    const v = el(`
-  <section class="card pergaminho pergaminho-h">
-    <div class="small">Questão ${idx+1} de ${PERGUNTAS.length}</div>
-    <h3>${q.texto}</h3>
-    <label for="resp">Sua resposta</label>
-    <textarea id="resp" rows="6" class="input" placeholder="Escreva aqui..."></textarea>
-    <div class="footer-actions">
-      <button class="btn" id="btnIntro">Instruções</button>
-      <button class="btn" id="btnLimpar">Apagar respostas</button>
-      <span style="flex:1"></span>
-      <button class="btn" id="btnVoltar" ${idx===0?"disabled":""}>Voltar</button>
-      <button class="btn primary" id="btnAvancar">${idx===PERGUNTAS.length-1? "Finalizar" : "Avançar"}</button>
-    </div>
-  </section>
-`);
-    v.querySelector("#btnVoltarSenha").addEventListener("click", ()=>{ st.step="senha"; S.save(st); render(); });
-    v.querySelector("#btnComecar").addEventListener("click", ()=>{ st.step="perguntas"; st.idx=0; S.save(st); render(); });
+  const idx   = Math.max(0, Number(st?.idx || 0));
+  const list  = Array.isArray(PERGUNTAS) ? PERGUNTAS : [];
+  const total = list.length;
+  const q     = list[idx] || { id: idx, texto: "…" };
 
-    root.appendChild(v);
-  }
+  const v = el(`
+    <section class="card pergaminho pergaminho-h">
+      <div class="small">Questão ${Math.min(idx+1, total)} de ${total || "?"}</div>
+      <h3>${q.texto || ""}</h3>
+      <label for="resp">Sua resposta</label>
+      <textarea id="resp" rows="6" class="input" placeholder="Escreva aqui..."></textarea>
+      <div class="footer-actions">
+        <button class="btn" id="btnIntro">Instruções</button>
+        <button class="btn" id="btnLimpar">Apagar respostas</button>
+        <span style="flex:1"></span>
+        <button class="btn" id="btnVoltar" ${idx===0?"disabled":""}>Voltar</button>
+        <button class="btn primary" id="btnAvancar">${idx===total-1?"Finalizar":"Avançar"}</button>
+      </div>
+    </section>
+  `);
+
+  // preencher com o que já tinha
+  const respEl = v.querySelector("#resp");
+  const key = (q.id ?? idx);
+  respEl.value = st?.respostas?.[key] || "";
+
+  // ações
+  v.querySelector("#btnIntro").addEventListener("click", ()=>{ st.step="intro"; S.save(st); render(); });
+  v.querySelector("#btnLimpar").addEventListener("click", ()=>{ st.respostas={}; st.idx=0; S.save(st); render(); });
+  v.querySelector("#btnVoltar").addEventListener("click", ()=>{ if(idx>0){ st.idx=idx-1; S.save(st); render(); }});
+  v.querySelector("#btnAvancar").addEventListener("click", ()=>{
+    (st.respostas ||= {})[key] = respEl.value.trim();
+    if (idx >= total-1) st.step = "final"; else st.idx = idx+1;
+    S.save(st); render();
+  });
+
+  root.appendChild(v);
+}
 
   // Perguntas placeholder (substitua pela lista oficial quando quiser)
   const PERGUNTAS = Array.from({length: 8}).map((_,i)=> ({
