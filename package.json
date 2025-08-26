@@ -4,8 +4,8 @@
   "version": "1.0.0",
   "engines": { "node": ">=18" },
   "scripts": {
-    "start": "node server.js",
-    "build": "echo \"frontend estático em /public\""
+    "build": "cp -r public/* ./build && echo \"Frontend estático em /build\"",
+    "start": "node server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
