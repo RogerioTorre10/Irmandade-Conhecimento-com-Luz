@@ -3,107 +3,68 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Jornada · Pergaminho</title>
-  <meta name="description" content="Jornada guiada com estilo pergaminho.">
+  <title>Jornada · Pergaminho (rasgado)</title>
+  <meta name="description" content="Página de teste do layout com pergaminho. Isolada do fluxo principal.">
 
   <!-- Favicon -->
-  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
 
-  <!-- CSS base + pergaminho -->
-  <link rel="stylesheet" href="../styles.css" />
-  <link rel="stylesheet" href="../css/styles-pergaminho.css" />
-  
- <!-- Fontes para o tema épico (títulos = Cinzel, texto = Cardo) -->
- <link rel="preconnect" href="https://fonts.googleapis.com">
- <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
- <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <!-- CSS base do site + tema de pergaminho -->
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/css/styles-pergaminho.css" />
 
+  <!-- Fonte Cardo (SIL OFL 1.1) aplicada só nesta página -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <style>
-  /* aplica só nesta página */
-  .epic{ font-family:'Cardo', serif; }
-  .epic h1,.epic h2,.epic h3,
-  .epic .parchment-title-rough,
-  .epic .site-header h1{
-    font-family:'Cinzel', serif;
-    letter-spacing:.02em;
-  }
-  .epic .motto,.epic .small{ font-variant:small-caps; }
-</style>
+    /* Escopo de tipografia apenas nesta página */
+    .epic { font-family: 'Cardo', Georgia, 'Times New Roman', serif; line-height: 1.55; }
+    .epic h1, .epic h2, .epic h3 { font-weight: 700; letter-spacing: .02em; font-variant: small-caps; }
 
-  <!-- Garantia do background (remova se já existir no seu styles-pergaminho.css) -->
-  <style>
-    .pergaminho{ position:relative; padding:24px 20px; background:transparent; border:0; box-shadow:none; }
-    @media (min-width:768px){ .pergaminho{ padding:40px 48px; } }
+    /* Garantia do pergaminho (ok manter mesmo tendo styles-pergaminho.css) */
+    .card.pergaminho{background:transparent;border:0;box-shadow:none;position:relative}
+    .pergaminho{position:relative;padding:24px 20px}
+    @media (min-width:768px){.pergaminho{padding:40px 48px}}
     .pergaminho::before{
       content:""; position:absolute; inset:0; z-index:0;
       background-repeat:no-repeat; background-position:center; background-size:100% 100%;
-      border-radius: var(--radius, 16px); opacity:.98;
-      filter: drop-shadow(0 12px 32px rgba(0,0,0,.45));
+      border-radius:16px; opacity:.98; filter:drop-shadow(0 12px 32px rgba(0,0,0,.45));
     }
-    /* Caminhos relativos a ESTE HTML */
-    .pergaminho-v::before{ background-image:url("../assets/img/pergaminho-rasgado-vert.png"); }
-    .pergaminho-h::before{ background-image:url("../assets/img/pergaminho-rasgado-horiz.png"); }
-    /* conteúdo acima da textura */
     .pergaminho > *{ position:relative; z-index:1; }
+
+    /* MAPEAMENTO CORRETO das texturas (caminhos absolutos) */
+    .pergaminho-h::before{ background-image:url("/assets/img/pergaminho-rasgado-horiz.png"); }
+    .pergaminho-v::before{ background-image:url("/assets/img/pergaminho-rasgado-vert.png"); }
   </style>
 </head>
 
-<body>
-  <body class="epic">
-   <header class="site-header">
-    <h1>Jornada (página de teste)</h1>
-    <p>Layout com pergaminho isolado do fluxo estável.</p>
+<body class="epic">
+  <header class="site-header">
+    <h1>Jornada (página de testes)</h1>
+    <p>Visual de pergaminho aplicado aqui, sem afetar o restante do site.</p>
   </header>
 
   <main class="container">
-    <!-- WIZARD (perguntas) → pergaminho HORIZONTAL -->
-    <section id="sec-wizard" class="card pergaminho pergaminho-h">
-      <div class="small" id="q-status">Pergunta 0/0</div>
-      <h2 id="q-title">Pergunta</h2>
-      <p id="q-text">...</p>
-
-      <div class="mb-3" style="height:8px; background:rgba(255,255,255,.12); border-radius:999px; overflow:hidden;">
-        <div id="q-progress" style="height:100%; width:0%; background:rgba(255,255,255,.35);"></div>
-      </div>
-
-      <textarea id="q-input" data-qid="" class="input" rows="5" placeholder="Escreva aqui..."></textarea>
-
-      <div class="footer-actions" style="margin-top:12px;">
-        <button id="btnVoltar" class="btn">Voltar</button>
-        <button id="btnLimpar" class="btn">Limpar</button>
-        <span style="flex:1"></span>
-        <button id="btnProxima" class="btn primary">Próxima</button>
-      </div>
-
-      <div style="margin-top:12px;">
-        <button id="btnFinalizar" class="btn primary">Finalizar Jornada</button>
-      </div>
-    </section>
-
-    <!-- FINAL → pergaminho VERTICAL -->
-    <section id="sec-final" class="card pergaminho pergaminho-v hidden" aria-hidden="true">
-      <h2>Parabéns! Você finalizou a jornada 🎉</h2>
-      <p>Revise se quiser e depois gere seu PDF e HQ.</p>
-      <div class="footer-actions" style="margin-top:12px;">
-        <button id="btnRevisar" class="btn">Revisar</button>
-        <button id="btnLimparRespostas" class="btn">Limpar respostas</button>
-        <span style="flex:1"></span>
-        <button id="btnBaixarPDFHQ" class="btn primary">Baixar PDF e HQ</button>
-      </div>
-    </section>
+    <!-- O motor estável renderiza toda a jornada dentro deste #app -->
+    <div id="app"></div>
   </main>
 
   <footer class="site-footer">
     <small>© 2025 Irmandade Conhecimento com Luz</small>
   </footer>
 
-  <!-- Scripts DO WIZARD (ordem correta). Não carregue jornada.js aqui. -->
-  <script defer src="../js/questions.js"></script>
-  <script defer src="../js/state.js"></script>
-  <script defer src="../js/main.js"></script>
+  <!-- Somente o motor estável (sem arquivos do wizard) -->
+  <script defer src="/jornada.js"></script>
+  <script>
+    // Força a jornada essencial nesta página isolada
+    document.addEventListener('DOMContentLoaded', () => {
+      try { onJornadaEssencial(); } catch (e) { console.error('Falha ao iniciar jornada:', e); }
+    });
+  </script>
 
   <noscript>
-    <p style="text-align:center; padding:12px">Esta página requer JavaScript para funcionar.</p>
+    <p style="text-align:center; padding:12px">Ative o JavaScript para usar esta página.</p>
   </noscript>
 </body>
 </html>
