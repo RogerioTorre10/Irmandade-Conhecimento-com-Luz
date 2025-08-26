@@ -18,6 +18,18 @@
  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
+  <style>
+  /* aplica só nesta página */
+  .epic{ font-family:'Cardo', serif; }
+  .epic h1,.epic h2,.epic h3,
+  .epic .parchment-title-rough,
+  .epic .site-header h1{
+    font-family:'Cinzel', serif;
+    letter-spacing:.02em;
+  }
+  .epic .motto,.epic .small{ font-variant:small-caps; }
+</style>
+
   <!-- Garantia do background (remova se já existir no seu styles-pergaminho.css) -->
   <style>
     .pergaminho{ position:relative; padding:24px 20px; background:transparent; border:0; box-shadow:none; }
@@ -37,7 +49,8 @@
 </head>
 
 <body>
-  <header class="site-header">
+  <body class="epic">
+   <header class="site-header">
     <h1>Jornada (página de teste)</h1>
     <p>Layout com pergaminho isolado do fluxo estável.</p>
   </header>
