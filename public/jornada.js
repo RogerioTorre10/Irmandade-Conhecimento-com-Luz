@@ -1,350 +1,218 @@
-/* jornada.js — VERSÃO ESTÁVEL: 1.1 (revisado)
-   Estrutura (public/):
-   ├─ index.html
-   ├─ jornadas.html
-   ├─ jornada-conhecimento-com-luz1.html
-   ├─ jornada.js
-   ├─ styles.css
-   └─ assets/...
-*/
-const JORNADA_CFG = {
-  STORAGE_KEY: "jornada-essencial-v1",
-  API_BASE: "", // deixe vazio enquanto a API não tiver CORS
-  ENDPOINTS: { PDF: "/jornada/essencial/pdf", HQ: "/jornada/essencial/hq" },
-  SENHA_FIXA: "iniciar"
-};
-window.JORNADA_CFG = JORNADA_CFG;
+/* ================================
+   jornada.js — VERSÃO: 1.0 (25-08-2025)
+   Base Zion + ajustes Lumen
+   ================================ */
 
-// ===== STATE (localStorage) ==================================================
+window.JORNADA_CFG = {
+  STORAGE_KEY: "jornada_essencial_v1",
+  // >>> Defina aqui sua API (produção)
+  API_BASE: "https://conhecimento-com-luz-api.onrender.com",
+  // <<< Se quiser forçar sem backend (estático), deixe vazio "" e o botão de gerar alerta o usuário
+};
+
+// ---------------- State ----------------
 const S = {
+  state: {
+    step: "intro",            // "intro" | "perguntas" | "final"
+    respostas: {}             // índice -> texto
+  },
   load() {
     try { return JSON.parse(localStorage.getItem(JORNADA_CFG.STORAGE_KEY) || "{}"); }
-    catch(_) { return {}; }
+    catch { return {}; }
   },
-  save(data) { localStorage.setItem(JORNADA_CFG.STORAGE_KEY, JSON.stringify(data || {})); },
-  clear() { localStorage.removeItem(JORNADA_CFG.STORAGE_KEY); }
+  save(data) {
+    localStorage.setItem(JORNADA_CFG.STORAGE_KEY, JSON.stringify(data || {}));
+  }
 };
 
-// ===== HELPERS ===============================================================
-const Root = {
-  get(id="app"){ return document.getElementById(id); },
-  clear(id="app"){ const el=this.get(id); if(!el) return null; el.innerHTML=""; return el; }
-};
-function el(html){ const d=document.createElement("div"); d.innerHTML=html.trim(); return d.firstElementChild; }
-function downloadBlob(blob, filename){
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url; a.download = filename;
-  document.body.appendChild(a); a.click();
-  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 800);
+// (Opcional) perguntas globais de fallback — substitua pelas reais se vierem de outro arquivo
+window.JORNADA_PERGUNTAS = window.JORNADA_PERGUNTAS || [
+  { titulo: "Pergunta 1: Reflita sobre isso..." },
+  { titulo: "Pergunta 2: E agora?" }
+];
+
+// ---------------- Utils ----------------
+function el(html) {
+  const d = document.createElement("div");
+  d.innerHTML = html.trim();
+  return d.firstElementChild;
 }
-async function postBinary(url, payload){
-  const resp = await fetch(url, {
-    method:"POST",
-    headers:{ "Content-Type":"application/json", "Accept":"application/pdf, application/zip, application/octet-stream" },
-    body: JSON.stringify(payload||{})
+
+// ---- Helpers de network (PDF/ZIP) ----
+async function postBinary(url, payload) {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/pdf, application/zip, application/octet-stream"
+    },
+    body: JSON.stringify(payload || {})
   });
-  if(!resp.ok) throw new Error("API HTTP " + resp.status);
-  return await resp.blob();
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Falha ${res.status} ${res.statusText} :: ${text}`);
+  }
+  return await res.blob();
 }
-function setStatus(msg){ const s=document.getElementById("status"); if(s) s.textContent = msg || ""; }
-function escapeHtml(s){ return (s||"").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
-// ===== PÁGINAS ===============================================================
-function onIndex(){}
-function onJornadas(){}
+function downloadBlob(blob, filename) {
+  const a = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 
-function onJornadaEssencial(){
-  const st = Object.assign({ step:"senha", respostas:{}, idx:0 }, S.load());
-
-  function statusByStep(step){
-    return ({
-      senha: "Digite a senha para iniciar",
-      intro: "Boas-vindas e instruções",
-      perguntas: "Responda às reflexões com calma",
-      final: "Parabéns! Você concluiu a jornada"
-    })[step] || "";
-  }
-
-  function render(){
-    setStatus(statusByStep(st.step));
-    if(st.step==="senha")      return renderSenha();
-    if(st.step==="intro")      return renderIntro();
-    if(st.step==="perguntas")  return renderPerguntas();
-    if(st.step==="final")      return renderFinal();
-  }
-
-  function renderSenha(){
-    const root = Root.clear(); if(!root) return;
-
-    const v = el(`
-      <section class="card">
-        <h2 class="center">Acesso</h2>
-        <p class="small center">
-          Use a senha para começar (para testes:
-          <span class="badge">${JORNADA_CFG.SENHA_FIXA}</span>).
-        </p>
-
-        <label for="senha">Senha</label>
-        <div class="senha-wrap">
-          <input id="senha" class="input" type="password" autocomplete="off" placeholder="Digite a senha">
-          <button type="button" class="senha-eye" id="toggleSenha"
-                  aria-label="Mostrar/ocultar senha" title="Mostrar/ocultar senha"></button>
-        </div>
-
-        <div class="footer-actions">
-          <button class="btn primary" id="btnIniciar">Iniciar</button>
-        </div>
-      </section>
-    `);
-
-    // Olho mágico (mostrar/ocultar senha)
-    const eyeSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
-      <circle cx="12" cy="12" r="3.5"></circle>
-    </svg>`;
-    const eyeOffSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a20.64 20.64 0 0 1 5.06-5.94"></path>
-      <path d="M1 1l22 22"></path>
-      <path d="M14.12 14.12A3.5 3.5 0 0 1 9.88 9.88"></path>
-    </svg>`;
-    const inputSenha = v.querySelector("#senha");
-    const btnEye     = v.querySelector("#toggleSenha");
-    let visivel = false;
-    function atualizarOlho(){
-      if(!inputSenha || !btnEye) return;
-      inputSenha.type = visivel ? "text" : "password";
-      btnEye.innerHTML = visivel ? eyeOffSVG : eyeSVG;
-      btnEye.setAttribute("aria-pressed", visivel ? "true" : "false");
-    }
-    if(btnEye && inputSenha){
-      btnEye.addEventListener("click", ()=>{ visivel = !visivel; atualizarOlho(); inputSenha.focus(); });
-      btnEye.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); btnEye.click(); }});
-      atualizarOlho();
-    }
-
-    v.querySelector("#btnIniciar").addEventListener("click", ()=>{
-      const x = (v.querySelector("#senha").value||"").trim().toLowerCase();
-      if(x === JORNADA_CFG.SENHA_FIXA){ st.step="intro"; S.save(st); render(); }
-      else { alert("Senha inválida. Tente novamente."); }
-    });
-
-    root.appendChild(v);
-  }
-
-  function renderPerguntas(){
+// ---------------- Controller ----------------
+function render() {
   const root = document.getElementById("app");
   if (!root) return;
-  root.innerHTML = "";
 
-  const idx   = Math.max(0, Number(st?.idx || 0));
-  const list  = Array.isArray(PERGUNTAS) ? PERGUNTAS : [];
-  const total = list.length;
-  const q     = list[idx] || { id: idx, texto: "…" };
+  if (S.state.step === "intro") {
+    root.replaceChildren(renderIntro());
+  } else if (S.state.step === "perguntas") {
+    root.replaceChildren(renderPerguntas());
+  } else {
+    root.replaceChildren(renderFinal());
+  }
+}
 
-  const v = el(`
-    <section class="card pergaminho pergaminho-h">
-      <div class="small">Questão ${Math.min(idx+1, total)} de ${total || "?"}</div>
-      <h3>${q.texto || ""}</h3>
-      <label for="resp">Sua resposta</label>
-      <textarea id="resp" rows="6" class="input" placeholder="Escreva aqui..."></textarea>
-      <div class="footer-actions">
-        <button class="btn" id="btnIntro">Instruções</button>
-        <button class="btn" id="btnLimpar">Apagar respostas</button>
-        <span style="flex:1"></span>
-        <button class="btn" id="btnVoltar" ${idx===0?"disabled":""}>Voltar</button>
-        <button class="btn primary" id="btnAvancar">${idx===total-1?"Finalizar":"Avançar"}</button>
+// ================= RENDER: INTRO (pergaminho vertical) =================
+function renderIntro() {
+  const section = el(`
+    <section class="card pergaminho pergaminho-v">
+      <h1 class="titulo">Jornada Essencial</h1>
+      <p class="mb-4">Boas-vindas e instruções</p>
+      <div class="acoes mt-6 flex gap-2">
+        <button id="btnIniciar" class="btn primario">Iniciar</button>
+        <button id="btnVoltar" class="btn secundario">← Voltar</button>
       </div>
     </section>
   `);
 
-  // preencher com o que já tinha
-  const respEl = v.querySelector("#resp");
-  const key = (q.id ?? idx);
-  respEl.value = st?.respostas?.[key] || "";
-
-  // ações
-  v.querySelector("#btnIntro").addEventListener("click", ()=>{ st.step="intro"; S.save(st); render(); });
-  v.querySelector("#btnLimpar").addEventListener("click", ()=>{ st.respostas={}; st.idx=0; S.save(st); render(); });
-  v.querySelector("#btnVoltar").addEventListener("click", ()=>{ if(idx>0){ st.idx=idx-1; S.save(st); render(); }});
-  v.querySelector("#btnAvancar").addEventListener("click", ()=>{
-    (st.respostas ||= {})[key] = respEl.value.trim();
-    if (idx >= total-1) st.step = "final"; else st.idx = idx+1;
-    S.save(st); render();
+  // Intro -> Perguntas
+  section.querySelector("#btnIniciar").addEventListener("click", () => {
+    S.state.step = "perguntas";
+    S.save(S.state);
+    render();
   });
 
-  root.appendChild(v);
+  // Voltar para a página de jornadas (caso exista)
+  section.querySelector("#btnVoltar").addEventListener("click", () => {
+    window.location.href = "/jornadas.html";
+  });
+
+  return section;
 }
 
-  // Perguntas placeholder (substitua pela lista oficial quando quiser)
-  const PERGUNTAS = Array.from({length: 8}).map((_,i)=> ({
-    id: "q"+(i+1),
-    texto: `Pergunta ${i+1}: escreva sua reflexão com liberdade.`
-  }));
-  window.__JORNADA_TOTAL = PERGUNTAS.length;
+// ============ RENDER: PERGUNTAS (pergaminho horizontal) ==============
+function renderPerguntas() {
+  const perguntas = window.JORNADA_PERGUNTAS || [];
+  const section = el(`
+    <section class="card pergaminho pergaminho-h">
+      <h2 class="mb-4">Responda com calma</h2>
+      <div id="listaPerguntas" class="flex flex-col gap-4"></div>
+      <div class="acoes mt-6 flex gap-2">
+        <button id="btnFinalizar" class="btn primario">Finalizar</button>
+        <button id="btnVoltarIntro" class="btn secundario">← Instruções</button>
+      </div>
+    </section>
+  `);
 
-  function renderPerguntas(){
-    const root = Root.clear(); if(!root) return;
+  const cont = section.querySelector("#listaPerguntas");
 
-    const idx = Math.max(0, Math.min(st.idx||0, PERGUNTAS.length-1));
-    const q = PERGUNTAS[idx];
-    const val = (st.respostas[q.id]||"");
+  // Render seguro SEM 'idx' global — usamos o índice local do forEach
+  perguntas.forEach((q, index) => {
+    const item = el(`
+      <div class="pergunta">
+        <label class="block font-semibold mb-1">${q.titulo || "Pergunta"}</label>
+        <textarea class="caixa w-full" rows="3" data-index="${index}"></textarea>
+      </div>
+    `);
+    cont.appendChild(item);
+  });
 
-    const v = el(`
-  <section class="card pergaminho pergaminho-v">
-    <h2 class="center">Parabéns! Você finalizou a Jornada.</h2>
-    <p class="center small">Você pode revisar, baixar o PDF/HQ e retornar ao início.</p>
-    <hr>
-    <div class="footer-actions">
-      <button class="btn" id="btnRevisar">Revisar respostas</button>
-      <button class="btn" id="btnPDF">Baixar PDF</button>
-      <button class="btn" id="btnHQ">Baixar HQ (teste)</button>
-      <button class="btn primary" id="btnPrincipal">Concluir</button>
-    </div>
-  </section>
-`);
-
-
-    const ta = v.querySelector("#resp");
-    ta.value = val;
-    ta.addEventListener("input", ()=>{
-      st.respostas[q.id] = ta.value;
-      S.save(st);
+  // Carrega e persiste respostas em tempo real
+  section.querySelectorAll("textarea").forEach(ta => {
+    const index = ta.dataset.index;
+    ta.value = (S.state.respostas && S.state.respostas[index]) || "";
+    ta.addEventListener("input", () => {
+      if (!S.state.respostas) S.state.respostas = {};
+      S.state.respostas[index] = ta.value;
+      S.save(S.state);
     });
+  });
 
-    v.querySelector("#btnIntro").addEventListener("click", ()=>{ st.step="intro"; S.save(st); render(); });
-    v.querySelector("#btnLimpar").addEventListener("click", ()=>{
-      if(confirm("Tem certeza que deseja apagar TODAS as respostas?")){
-        st.respostas = {}; st.idx = 0; S.save(st); render();
-      }
-    });
-    v.querySelector("#btnVoltar").addEventListener("click", ()=>{
-      if(idx>0){ st.idx = idx-1; S.save(st); render(); }
-    });
-    v.querySelector("#btnAvancar").addEventListener("click", ()=>{
-      const respAtual = (v.querySelector("#resp").value || "").trim();
-      if(!respAtual){
-        alert("Por favor, preencha a resposta antes de avançar.");
+  // Perguntas -> Final
+  section.querySelector("#btnFinalizar").addEventListener("click", () => {
+    S.state.step = "final";
+    S.save(S.state);
+    render();
+  });
+
+  // Voltar para Intro
+  section.querySelector("#btnVoltarIntro").addEventListener("click", () => {
+    S.state.step = "intro";
+    S.save(S.state);
+    render();
+  });
+
+  return section;
+}
+
+// ================= RENDER: FINAL (pergaminho vertical) ================
+function renderFinal() {
+  const section = el(`
+    <section class="card pergaminho pergaminho-v">
+      <h2 class="mb-2">Parabéns! Você finalizou a jornada.</h2>
+      <p class="mb-4">Revise ou gere seus arquivos.</p>
+      <div class="acoes mt-6 flex gap-2">
+        <button id="btnGerarPDF" class="btn primario">Baixar PDF</button>
+        <button id="btnRevisar" class="btn secundario">← Revisar</button>
+      </div>
+    </section>
+  `);
+
+  // Gerar PDF (usa corpo JSON com { respostas, kind })
+  section.querySelector("#btnGerarPDF").addEventListener("click", async () => {
+    try {
+      const base = (JORNADA_CFG.API_BASE || "").replace(/\/+$/, "");
+      if (!base) {
+        alert("Backend não configurado. Defina JORNADA_CFG.API_BASE para gerar o PDF.");
         return;
       }
-      st.respostas[q.id] = respAtual;
-      S.save(st);
+      const url = `${base}/generate`;
+      const payload = { respostas: S.state.respostas || {}, kind: "pdf" };
+      const blob = await postBinary(url, payload);
+      downloadBlob(blob, "jornada-essencial.pdf");
 
-      if(idx < PERGUNTAS.length-1){ st.idx = idx+1; S.save(st); render(); }
-      else { st.step="final"; S.save(st); render(); }
-    });
-
-    root.appendChild(v);
-  }
-
-  function renderFinal(){
-    const root = Root.clear(); if(!root) return;
-
-    const respostas = st.respostas || {};
-
-    const v = el(`
-      <section class="card pergaminho">
-        <h2 class="center">Parabéns! Você finalizou a Jornada.</h2>
-        <p class="center small">Você pode revisar, baixar o PDF/HQ e retornar ao início.</p>
-        <hr>
-        <div class="footer-actions">
-          <button class="btn" id="btnRevisar">Revisar respostas</button>
-          <button class="btn" id="btnPDF">Baixar PDF</button>
-          <button class="btn" id="btnHQ">Baixar HQ (teste)</button>
-          <button class="btn primary" id="btnPrincipal">Concluir</button>
-        </div>
-      </section>
-    `);
-
-    v.querySelector("#btnRevisar").addEventListener("click", ()=>{ st.step="perguntas"; st.idx=0; S.save(st); render(); });
-    v.querySelector("#btnPrincipal").addEventListener("click", ()=>{ S.clear(); location.href = "/index.html"; });
-
-    v.querySelector("#btnPDF").addEventListener("click", async ()=>{
-      try{
-        setStatus("Gerando PDF...");
-        const r = await tentarGerar("PDF", respostas);
-        if(r.kind==="blob") downloadBlob(r.blob, r.name || "jornada-essencial.pdf");
-        else setStatus("Janela de impressão aberta. Use 'Salvar como PDF'.");
-        setStatus("PDF pronto!");
-      }catch(err){
-        console.error(err); alert("Falha ao gerar PDF."); setStatus("");
-      }
-    });
-
-    v.querySelector("#btnHQ").addEventListener("click", async ()=>{
-      try{
-        setStatus("Gerando HQ...");
-        const r = await tentarGerar("HQ", respostas);
-        if(r.kind==="blob") downloadBlob(r.blob, r.name || "jornada-essencial-hq.txt");
-        setStatus("HQ pronta!");
-      }catch(err){
-        console.error(err); alert("Falha ao gerar HQ."); setStatus("");
-      }
-    });
-
-    root.appendChild(v);
-  }
-
-  // ===== GERADOR (API ou FALLBACK) ==========================================
-  async function tentarGerar(tipo, respostas){
-    const payload = { respostas, meta:{ versao:"1.1", quando:new Date().toISOString() } };
-
-    if(!!JORNADA_CFG.API_BASE){
-      try{
-        const ep = (tipo==="PDF") ? JORNADA_CFG.ENDPOINTS.PDF : JORNADA_CFG.ENDPOINTS.HQ;
-        const blob = await postBinary(JORNADA_CFG.API_BASE + ep, payload);
-        return { kind:"blob", blob, name: (tipo==="PDF" ? "jornada-essencial.pdf" : "jornada-essencial-hq.zip") };
-      }catch(e){
-        console.warn("Falhou API, usando fallback local", e);
-        const msg = String(e?.message || "");
-        if (/CORS|Failed to fetch|preflight/i.test(msg)) {
-          alert("Erro de CORS: libere o acesso para " + location.origin + " no backend (ou deixe API_BASE vazio para usar modo offline).");
-        } else {
-          alert("Falha ao gerar " + tipo + ". Tente novamente.");
-        }
-        // segue para fallback
-      }
+      // Após baixar, voltar para a principal (ajuste se quiser manter na final)
+      window.location.href = "/index.html";
+    } catch (e) {
+      console.error("Falha ao gerar PDF:", e);
+      alert("Não foi possível gerar o PDF agora. Tente novamente.");
     }
+  });
 
-    // === FALLBACK 100% FRONTEND ===
-    if (tipo === "PDF") {
-      const w = window.open("", "_blank");
-      const respostasHtml = Object.entries(respostas||{}).map(([k,v],i)=>
-        `<h3>${i+1}. ${escapeHtml(k)}</h3><p>${escapeHtml(v)}</p>`
-      ).join("");
+  // Revisar (volta para perguntas)
+  section.querySelector("#btnRevisar").addEventListener("click", () => {
+    S.state.step = "perguntas";
+    S.save(S.state);
+    render();
+  });
 
-      const html = `<!doctype html><html><head><meta charset="utf-8"><title>Jornada Essencial — PDF</title>
-        <style>
-          body{font-family:Arial,system-ui;margin:40px;line-height:1.5}
-          h1{font-size:22px;margin:0 0 12px}
-          h3{font-size:16px;margin:16px 0 6px}
-          p{margin:0 0 8px;white-space:pre-wrap}
-        </style>
-      </head><body>
-        <h1>Jornada Essencial — PDF (teste)</h1>
-        <div>${respostasHtml || "<p><em>Sem respostas preenchidas.</em></p>"}</div>
-      </body></html>`;
-
-      w.document.open(); w.document.write(html); w.document.close();
-      w.focus(); setTimeout(()=> w.print(), 400);
-      return { kind:"printed" };
-    } else {
-      const txt = new Blob(["HQ (teste): gere via API quando habilitar CORS."], { type:"text/plain" });
-      return { kind:"blob", blob: txt, name: "jornada-essencial-hq.txt" };
-    }
-  }
-
-  // chama o primeiro render no fim
-  render();
+  return section;
 }
 
-// ===== BOOT =================================================================
+// ---------------- Bootstrap ----------------
 document.addEventListener("DOMContentLoaded", () => {
-  const p = location.pathname;
   try {
-    if (p.endsWith("/index.html") || p === "/") onIndex();
-    else if (p.endsWith("/jornadas.html")) onJornadas();
-    else if (p.endsWith("/jornada-conhecimento-com-luz1.html")) onJornadaEssencial();
+    Object.assign(S.state, S.load());
+    if (!S.state.respostas) S.state.respostas = {};
+    render();
   } catch (e) {
     console.error("Erro ao iniciar a página:", e);
   }
