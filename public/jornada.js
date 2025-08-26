@@ -5,9 +5,7 @@
 
 window.JORNADA_CFG = {
   STORAGE_KEY: "jornada_essencial_v1",
-  // >>> Defina aqui sua API (produção)
-  API_BASE: "https://conhecimento-com-luz-api.onrender.com",
-  // <<< Se quiser forçar sem backend (estático), deixe vazio "" e o botão de gerar alerta o usuário
+  API_BASE: "https://conhecimento-com-luz-api.onrender.com"
 };
 
 // ---------------- State ----------------
