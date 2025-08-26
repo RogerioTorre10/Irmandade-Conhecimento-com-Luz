@@ -28,3 +28,17 @@ hr{border:0;border-top:1px solid rgba(255,255,255,.15);margin:16px 0}
 }
 .senha-eye:hover{color:var(--fg)}
 .senha-eye svg{width:20px;height:20px}
+
+/* Use a classe .epic pra limitar o escopo; troque <body> por <body class="epic"> */
+.epic{ font-family: 'Cardo', Georgia, 'Times New Roman', serif; }
+
+/* Títulos também em Cardo (com um toque de “epic”) */
+.epic h1, .epic h2, .epic h3{
+  font-weight: 700;            /* usa o peso 700 importado */
+  letter-spacing: .02em;
+  font-variant: small-caps;    /* opcional: look medieval sem trocar fonte */
+}
+
+/* Texto corrido confortável */
+.epic { line-height: 1.55; }
+
