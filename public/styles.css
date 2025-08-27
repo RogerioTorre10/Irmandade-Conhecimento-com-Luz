@@ -109,7 +109,7 @@ p {
 /* Defina razões de aspecto (pode ajustar depois se quiser) */
 :root{
   --pergV-ratio: 2 / 3;   /* vertical ~ “mais alto que largo” */
-  --pergH-ratio: 14 / 11;  /* horizontal widescreen */
+  --pergH-ratio: 2 / 3;  /* horizontal widescreen */
 }
 
 /* ⚠️ caminhos corretos, como combinado */
