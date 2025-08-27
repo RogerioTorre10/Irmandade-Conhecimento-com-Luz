@@ -85,8 +85,8 @@
      try {
     JORNADA_TYPO?.typeAll("#jornada-conteudo", {
       force: true,        // ignora "reduce motion"
-      speed: 28,       // mais lento (antes era ~20-22)
-      maxTotalMs: 6000 // até 6s por tela (mais suave)
+      speed: 34,       // mais lento (antes era ~20-22)
+      maxTotalMs: 7500 // até 6s por tela (mais suave)
     });
   } catch (e) { console.warn(e); }
 });
@@ -110,8 +110,8 @@
      try {
     JORNADA_TYPO?.typeAll("#jornada-conteudo", {
       force: true,        // ignora "reduce motion"
-      speed: 28,       // mais lento (antes era ~20-22)
-      maxTotalMs: 6000 // até 6s por tela (mais suave)
+      speed: 34,       // mais lento (antes era ~20-22)
+      maxTotalMs: 7500 // até 6s por tela (mais suave)
     });
   } catch (e) { console.warn(e); }
 });
@@ -144,8 +144,8 @@
       try {
       JORNADA_TYPO?.typeAll("#jornada-conteudo", {
       force: true,        // ignora "reduce motion"
-      speed: 22,       
-      maxTotalMs: 3500 
+      speed: 28,       
+      maxTotalMs: 5000 
     });
   } catch (e) { console.warn(e); }
 });
@@ -168,8 +168,8 @@
      try {
      JORNADA_TYPO?.typeAll("#jornada-conteudo", {
       force: true,        // ignora "reduce motion"
-      speed: 28,       // mais lento (antes era ~20-22)
-      maxTotalMs: 6000 // até 6s por tela (mais suave)
+      speed: 34,       // mais lento (antes era ~20-22)
+      maxTotalMs: 7500 // até 6s por tela (mais suave)
     });
   } catch (e) { console.warn(e); }
 });
