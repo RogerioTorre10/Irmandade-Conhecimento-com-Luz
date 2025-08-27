@@ -18,12 +18,16 @@
   );
    
 // ---------- utilitários ----------
-   function activateJornada() { 
-   document.body.classList.add("jornada-active"); 
-   window.scrollTo(0,0);
+   function activateJornada() {
+  document.body.classList.add("jornada-active");
+  const jc = document.getElementById("jornada-canvas");
+  if (jc) jc.style.display = "block"; // desfaz o inline "display:none"
+  window.scrollTo(0, 0);
 }
-  function deactivateJornada() { 
-  document.body.classList.remove("jornada-active"); 
+ function deactivateJornada() {
+  document.body.classList.remove("jornada-active");
+  const jc = document.getElementById("jornada-canvas");
+  if (jc) jc.style.display = "none"; // re-oculta quando sair da jornada
 }
 
   // ---------- utilidades ----------
