@@ -59,119 +59,110 @@
     return { root, content };
   }
 
-  // ------- Alternância do pergaminho -------
-  function setPergaminho(mode /* 'v' | 'h' */) {
-    const { root } = ensureCanvas();
-    root.classList.remove("pergaminho-v", "pergaminho-h");
-    // injeta o background via classes + fallback inline (caso CSS ainda não esteja carregado)
-    if (mode === "v") {
-      root.classList.add("pergaminho-v");
-      root.style.backgroundImage = `url("${CFG.PERGAMINHO_VERT}")`;
-    } else if (mode === "h") {
-      root.classList.add("pergaminho-h");
-      root.style.backgroundImage = `url("${CFG.PERGAMINHO_HORIZ}")`;
+  // 1) setPergaminho: força altura e cover via JS também
+function setPergaminho(mode /* 'v' | 'h' */) {
+  const { root } = ensureCanvas();
+  root.classList.remove("pergaminho-v", "pergaminho-h");
+  if (mode === "v") root.classList.add("pergaminho-v");
+  if (mode === "h") root.classList.add("pergaminho-h");
+
+  // Fallback inline (se o CSS demorar a carregar)
+  root.style.backgroundRepeat = "no-repeat";
+  root.style.backgroundPosition = "center";
+  root.style.backgroundSize = "cover";   // <— garante que não fique “metade”
+  root.style.minHeight = "82vh";
+}
+
+// 2) renderHome (vertical)
+function renderHome() {
+  setPergaminho("v");
+  const { content } = ensureCanvas();
+  content.innerHTML = `
+    <h1 class="text-2xl md:text-3xl font-bold mb-2">Irmandade Conhecimento com Luz</h1>
+    <p class="mb-4 opacity-90">Bem-vindo! Clique para iniciar a Jornada Essencial.</p>
+    <div class="flex gap-2">
+      <button id="btn-ir-intro" class="px-4 py-2 rounded bg-blue-600 text-white">Ir para Introdução</button>
+    </div>
+  `;
+  document.getElementById("btn-ir-intro")?.addEventListener("click", renderIntro);
+}
+
+// 3) renderIntro (vertical)
+function renderIntro() {
+  setPergaminho("v");
+  const { content } = ensureCanvas();
+  content.innerHTML = `
+    <h2 class="text-xl md:text-2xl font-semibold mb-3">Introdução</h2>
+    <p class="mb-3">Orientações e Termo de Responsabilidade da Jornada.</p>
+    <div class="flex gap-2">
+      <button id="btn-iniciar" class="px-4 py-2 rounded bg-green-600 text-white">Iniciar</button>
+      <button id="btn-voltar-home" class="px-3 py-2 rounded bg-gray-700 text-white">Voltar ao Início</button>
+    </div>
+  `;
+  // Evita travar se HOOKS onStart lançar erro
+  document.getElementById("btn-iniciar")?.addEventListener("click", () => {
+    try { HOOKS.onStart?.(); } catch (e) { console.warn(e); }
+    renderPerguntas(); // abre perguntas mesmo que hook falhe
+  });
+  document.getElementById("btn-voltar-home")?.addEventListener("click", renderHome);
+}
+
+// 4) renderPerguntas (horizontal)
+function renderPerguntas() {
+  setPergaminho("h");
+  const { content } = ensureCanvas();
+  content.innerHTML = `
+    <h2 class="text-xl md:text-2xl font-semibold mb-3">Perguntas</h2>
+    <form id="form-perguntas" class="grid gap-3">
+      <label class="grid gap-1">
+        <span class="font-medium">1) Quem é você neste momento da jornada?</span>
+        <input name="q1" class="px-3 py-2 rounded border border-gray-300 bg-white/80" placeholder="Escreva aqui..." />
+      </label>
+      <label class="grid gap-1">
+        <span class="font-medium">2) Qual é sua maior força hoje?</span>
+        <input name="q2" class="px-3 py-2 rounded border border-gray-300 bg-white/80" placeholder="Escreva aqui..." />
+      </label>
+    </form>
+    <div class="mt-4 flex flex-wrap gap-2">
+      <button id="btn-voltar-intro" class="px-3 py-2 rounded bg-gray-700 text-white">Voltar à Introdução</button>
+      <button id="btn-finalizar" class="px-4 py-2 rounded bg-purple-700 text-white">Finalizar</button>
+    </div>
+  `;
+  document.getElementById("btn-voltar-intro")?.addEventListener("click", renderIntro);
+  document.getElementById("btn-finalizar")?.addEventListener("click", async () => {
+    try { await HOOKS.onFinalize?.(); } catch (e) { console.warn(e); }
+    renderFinal();
+  });
+}
+
+// 5) renderFinal (vertical + status e volta)
+function renderFinal() {
+  setPergaminho("v");
+  const { content } = ensureCanvas();
+  content.innerHTML = `
+    <h2 class="text-xl md:text-2xl font-semibold mb-3">Conclusão da Jornada</h2>
+    <p class="mb-4">Respire. Seu caminho foi registrado com coragem e verdade.</p>
+    <div class="flex gap-2">
+      <button id="btn-baixar" class="px-4 py-2 rounded bg-indigo-700 text-white">Baixar PDF + HQ</button>
+      <button id="btn-voltar-home" class="px-3 py-2 rounded bg-gray-700 text-white">Voltar ao Início</button>
+    </div>
+    <p id="status-download" class="mt-3 text-sm opacity-80"></p>
+  `;
+  document.getElementById("btn-baixar")?.addEventListener("click", async () => {
+    const status = document.getElementById("status-download");
+    try {
+      status.textContent = "Gerando seus arquivos…";
+      await HOOKS.onDownload?.();
+      status.textContent = "PDF e HQ finalizados!";
+      setTimeout(renderHome, 800); // volta pra Home
+    } catch (e) {
+      console.error(e);
+      status.textContent = "Falha ao gerar. Tente novamente.";
     }
-    root.style.backgroundRepeat = "no-repeat";
-    root.style.backgroundPosition = "center";
-    root.style.backgroundSize = "contain";
-  }
+  });
+  document.getElementById("btn-voltar-home")?.addEventListener("click", renderHome);
+}
 
-  // ------- Renderizações -------
-  function renderHome() {
-    setPergaminho("v");
-    const { content } = ensureCanvas();
-    content.innerHTML = `
-      <h1 class="text-2xl md:text-3xl font-bold mb-2">Irmandade Conhecimento com Luz</h1>
-      <p class="mb-4 opacity-90">Bem-vindo! Clique para iniciar a Jornada Essencial.</p>
-      <div class="flex gap-2">
-        <button id="btn-ir-intro" class="px-4 py-2 rounded bg-blue-600 text-white">Ir para Introdução</button>
-      </div>
-    `;
-    document.getElementById("btn-ir-intro")?.addEventListener("click", renderIntro);
-  }
-
-  function renderIntro() {
-    setPergaminho("v");
-    const { content } = ensureCanvas();
-    content.innerHTML = `
-      <h2 class="text-xl md:text-2xl font-semibold mb-3">Introdução</h2>
-      <p class="mb-3">Orientações e Termo de Responsabilidade da Jornada.</p>
-      <ul class="list-disc pl-5 mb-4 opacity-90">
-        <li>Reservar um tempo tranquilo.</li>
-        <li>Respostas sinceras e pessoais.</li>
-        <li>Ao finalizar, você poderá baixar seu PDF e HQ.</li>
-      </ul>
-      <div class="flex gap-2">
-        <button id="btn-iniciar" class="px-4 py-2 rounded bg-green-600 text-white">Iniciar</button>
-        <button id="btn-voltar-home" class="px-3 py-2 rounded bg-gray-700 text-white">Voltar ao Início</button>
-      </div>
-    `;
-    document.getElementById("btn-iniciar")?.addEventListener("click", () => {
-      try { HOOKS.onStart(); } catch (e) { console.warn(e); }
-      renderPerguntas();
-    });
-    document.getElementById("btn-voltar-home")?.addEventListener("click", renderHome);
-  }
-
-  function renderPerguntas() {
-    setPergaminho("h");
-    const { content } = ensureCanvas();
-    // OBS: o formulário aqui é exemplo; o CORE pode substituir via HOOKS/templating
-    content.innerHTML = `
-      <h2 class="text-xl md:text-2xl font-semibold mb-3">Perguntas</h2>
-      <form id="form-perguntas" class="grid gap-3">
-        <label class="grid gap-1">
-          <span class="font-medium">1) Quem é você neste momento da jornada?</span>
-          <input name="q1" class="px-3 py-2 rounded border border-gray-300 bg-white/80" placeholder="Escreva aqui..." />
-        </label>
-        <label class="grid gap-1">
-          <span class="font-medium">2) Qual é sua maior força hoje?</span>
-          <input name="q2" class="px-3 py-2 rounded border border-gray-300 bg-white/80" placeholder="Escreva aqui..." />
-        </label>
-        <label class="grid gap-1">
-          <span class="font-medium">3) O que você precisa curar/superar?</span>
-          <input name="q3" class="px-3 py-2 rounded border border-gray-300 bg-white/80" placeholder="Escreva aqui..." />
-        </label>
-      </form>
-      <div class="mt-4 flex flex-wrap gap-2">
-        <button id="btn-voltar-intro" class="px-3 py-2 rounded bg-gray-700 text-white">Voltar à Introdução</button>
-        <button id="btn-finalizar" class="px-4 py-2 rounded bg-purple-700 text-white">Finalizar</button>
-      </div>
-    `;
-    document.getElementById("btn-voltar-intro")?.addEventListener("click", renderIntro);
-    document.getElementById("btn-finalizar")?.addEventListener("click", async () => {
-      try { await HOOKS.onFinalize(); } catch (e) { console.warn(e); }
-      renderFinal();
-    });
-  }
-
-  function renderFinal() {
-    setPergaminho("v");
-    const { content } = ensureCanvas();
-    content.innerHTML = `
-      <h2 class="text-xl md:text-2xl font-semibold mb-3">Finalização</h2>
-      <p class="mb-4">Parabéns! Agora você pode baixar seu PDF e sua HQ. Em seguida retornaremos à página inicial.</p>
-      <div class="flex gap-2">
-        <button id="btn-baixar" class="px-4 py-2 rounded bg-indigo-700 text-white">Baixar PDF + HQ</button>
-        <button id="btn-voltar-home" class="px-3 py-2 rounded bg-gray-700 text-white">Voltar ao Início</button>
-      </div>
-      <p id="status-download" class="mt-3 text-sm opacity-80"></p>
-    `;
-    document.getElementById("btn-baixar")?.addEventListener("click", async () => {
-      const status = document.getElementById("status-download");
-      try {
-        status.textContent = "Gerando seus arquivos…";
-        await HOOKS.onDownload(); // o CORE/BOOTSTRAP implementa a comunicação com a API
-        status.textContent = "PDF e HQ finalizados!";
-        // após concluir, voltar para Home
-        setTimeout(renderHome, 700);
-      } catch (e) {
-        console.error(e);
-        status.textContent = "Houve um problema ao gerar os arquivos. Tente novamente.";
-      }
-    });
-    document.getElementById("btn-voltar-home")?.addEventListener("click", renderHome);
-  }
 
   // ------- Montagem & API pública -------
   function mount({ startAt } = {}) {
