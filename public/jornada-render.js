@@ -68,7 +68,16 @@
         <button id="btn-ir-intro" class="px-4 py-2 rounded btn-primary">Ir para Introdução</button>
       </div>
      `;
-      try { JORNADA_TYPO?.typeAll("#jornada-conteudo"); } catch(e){}
+     requestAnimationFrame(() => {
+     try {
+    JORNADA_TYPO?.typeAll("#jornada-conteudo", {
+      force: true,        // ignora "reduce motion"
+      speed: 20,          // ajuste fino
+      maxTotalMs: 4000    // orçamento por tela
+    });
+  } catch (e) { console.warn(e); }
+});
+
      
     document.getElementById("btn-ir-intro")?.addEventListener("click", renderIntro);
   }
@@ -84,7 +93,15 @@
         <button id="btn-voltar-home" class="px-3 py-2 rounded btn-secondary">Voltar ao Início</button>
       </div>
      `;
-      try { JORNADA_TYPO?.typeAll("#jornada-conteudo"); } catch(e){}
+     requestAnimationFrame(() => {
+     try {
+    JORNADA_TYPO?.typeAll("#jornada-conteudo", {
+      force: true,        // ignora "reduce motion"
+      speed: 20,          // ajuste fino
+      maxTotalMs: 4000    // orçamento por tela
+    });
+  } catch (e) { console.warn(e); }
+});
      
     document.getElementById("btn-iniciar")?.addEventListener("click", renderPerguntas);
     document.getElementById("btn-voltar-home")?.addEventListener("click", renderHome);
@@ -110,7 +127,15 @@
         <button id="btn-finalizar" class="px-4 py-2 rounded btn-primary">Finalizar</button>
       </div>
       `;
-      try { JORNADA_TYPO?.typeAll("#jornada-conteudo"); } catch(e){}
+      requestAnimationFrame(() => {
+      try {
+      JORNADA_TYPO?.typeAll("#jornada-conteudo", {
+      force: true,        // ignora "reduce motion"
+      speed: 20,          // ajuste fino
+      maxTotalMs: 4000    // orçamento por tela
+    });
+  } catch (e) { console.warn(e); }
+});
      
     document.getElementById("btn-voltar-intro")?.addEventListener("click", renderIntro);
     document.getElementById("btn-finalizar")?.addEventListener("click", renderFinal);
@@ -126,7 +151,15 @@
         <button id="btn-voltar-home" class="px-3 py-2 rounded btn-secondary">Voltar ao Início</button>
       </div>
       `;
-      try { JORNADA_TYPO?.typeAll("#jornada-conteudo"); } catch(e){}
+     requestAnimationFrame(() => {
+     try {
+     JORNADA_TYPO?.typeAll("#jornada-conteudo", {
+      force: true,        // ignora "reduce motion"
+      speed: 20,          // ajuste fino
+      maxTotalMs: 4000    // orçamento por tela
+    });
+  } catch (e) { console.warn(e); }
+});
      
     document.getElementById("btn-voltar-home")?.addEventListener("click", renderHome);
   }
