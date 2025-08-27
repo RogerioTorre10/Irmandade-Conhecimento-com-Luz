@@ -68,3 +68,9 @@ export function downloadBlob(blob, filename) {
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+
+// Expor no namespace global
+  window.JORNADA_UTILS = {
+    saveLocal, loadLocal, clearLocal
+  };
+})();
