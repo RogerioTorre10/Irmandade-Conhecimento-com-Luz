@@ -33,6 +33,47 @@ hr{border:0;border-top:1px solid rgba(255,255,255,.15);margin:16px 0}
 .epic{ font-family: 'Cardo', Georgia, 'Times New Roman', serif; }
 
 /* Títulos também em Cardo (com um toque de “epic”) */
+
+/* --- Cardo --- */
+@font-face{
+  font-family: 'Cardo';
+  src: url('/assets/fonts/Cardo-Regular.woff2') format('woff2'),
+       url('/assets/fonts/Cardo-Regular.ttf') format('truetype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face{
+  font-family: 'Cardo';
+  src: url('/assets/fonts/Cardo-Bold.woff2') format('woff2'),
+       url('/assets/fonts/Cardo-Bold.ttf') format('truetype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face{
+  font-family: 'Cardo';
+  src: url('/assets/fonts/Cardo-Italic.woff2') format('woff2'),
+       url('/assets/fonts/Cardo-Italic.ttf') format('truetype');
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+html, body { font-family: 'Cardo', serif; }
+
+/* --- Pergaminhos --- */
+.pergaminho { padding: 1.25rem; border-radius: 14px; background-size: cover; background-position: center; }
+.pergaminho-v { background-image: url('/assets/img/perg-vert.png'); }
+.pergaminho-h { background-image: url('/assets/img/perg-horiz.png'); }
+.title { font-weight: 700; letter-spacing: .2px; }
+
+/* --- Inputs e botões --- */
+.q-card { background: rgba(255,255,255,0.85); padding: 12px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+.q-input { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ddd; outline: none; }
+.btn { padding: 10px 14px; border-radius: 999px; border: 1px solid #c9c9c9; background:#f5f5f5; cursor:pointer; }
+.btn:hover { filter: brightness(.98); }
+.btn-primary { background:#111827; color:#fff; border-color:#111827; }
+
+/* --- Lumen datilografando --- */
+.lumen-typing { white-space: pre-wrap; position: relative; }
+.lumen-typing::after { content: \"▌\"; margin-left: 2px; opacity: .75; animation: lumenBlink 1s steps(2, end) infinite; }
+.lumen-typing.typing-done::after { content: \"\"; animation: none; }
+@keyframes lumenBlink { 50% { opacity: 0; } }
+
 .epic h1, .epic h2, .epic h3{
   font-weight: 700;            /* usa o peso 700 importado */
   letter-spacing: .02em;
