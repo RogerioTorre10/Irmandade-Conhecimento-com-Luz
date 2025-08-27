@@ -26,7 +26,6 @@
   document.body.classList.remove("jornada-active"); 
 }
 
-
   // ---------- utilidades ----------
   function elCanvas() { return document.getElementById(CFG.CANVAS_ID); }
   function elContent() { return document.getElementById(CFG.CONTENT_ID); }
@@ -82,8 +81,8 @@
      try {
     JORNADA_TYPO?.typeAll("#jornada-conteudo", {
       force: true,        // ignora "reduce motion"
-      speed: 20,          // ajuste fino
-      maxTotalMs: 4000    // orçamento por tela
+      speed: 28,       // mais lento (antes era ~20-22)
+      maxTotalMs: 6000 // até 6s por tela (mais suave)
     });
   } catch (e) { console.warn(e); }
 });
@@ -107,8 +106,8 @@
      try {
     JORNADA_TYPO?.typeAll("#jornada-conteudo", {
       force: true,        // ignora "reduce motion"
-      speed: 20,          // ajuste fino
-      maxTotalMs: 4000    // orçamento por tela
+      speed: 28,       // mais lento (antes era ~20-22)
+      maxTotalMs: 6000 // até 6s por tela (mais suave)
     });
   } catch (e) { console.warn(e); }
 });
@@ -141,8 +140,8 @@
       try {
       JORNADA_TYPO?.typeAll("#jornada-conteudo", {
       force: true,        // ignora "reduce motion"
-      speed: 20,          // ajuste fino
-      maxTotalMs: 4000    // orçamento por tela
+      speed: 22,       
+      maxTotalMs: 3500 
     });
   } catch (e) { console.warn(e); }
 });
@@ -165,8 +164,8 @@
      try {
      JORNADA_TYPO?.typeAll("#jornada-conteudo", {
       force: true,        // ignora "reduce motion"
-      speed: 20,          // ajuste fino
-      maxTotalMs: 4000    // orçamento por tela
+      speed: 28,       // mais lento (antes era ~20-22)
+      maxTotalMs: 6000 // até 6s por tela (mais suave)
     });
   } catch (e) { console.warn(e); }
 });
@@ -177,10 +176,11 @@
   // ---------- API pública ----------
   function mount({ startAt } = {}) {
     ensureCanvas();
-    const first = startAt || CFG.START;
-    if (first === "intro") return renderIntro();
-    return renderHome();
-  }
+    activateJornada();   // <-- força o modo jornada
+  if (startAt === "intro") renderIntro();
+  else if (startAt === "perguntas") renderPerguntas();
+  else renderHome();
+}
 
   // expõe no window (necessário pro bootstrap)
   window.JORNADA_RENDER = {
