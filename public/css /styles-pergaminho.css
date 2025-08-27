@@ -3,8 +3,8 @@
    Estrutura: public/css/styles-pergaminho-rasgado.css
    =========================================== */
 
-.pergaminho-h::before{ background-image:url("/assets/img/pergaminho-rasgado-horiz.png"); }
-.pergaminho-v::before{ background-image:url("/assets/img/pergaminho-rasgado-vert.png"); }
+.pergaminho-h::before{ background-image:url("assets/img/pergaminho-rasgado-horiz.png"); }
+.pergaminho-v::before{ background-image:url("assets/img/pergaminho-rasgado-vert.png"); }
 
 /* Envoltório */
 .parchment-wrap-rough {
@@ -35,8 +35,8 @@
 .parchment-rough {
   position: relative;
   background-color: #3b2f2f;
-  background-image: url("/assets/img/pergaminho-rasgado-horiz.png"); /* PNG com borda irregular transparente */
-  background-image: url("/assets/img/pergaminho-rasgado-vert.png"); /* PNG com borda irregular transparente */
+  background-image: url("assets/img/pergaminho-rasgado-horiz.png"); /* PNG com borda irregular transparente */
+  background-image: url("assets/img/pergaminho-rasgado-vert.png"); /* PNG com borda irregular transparente */
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
