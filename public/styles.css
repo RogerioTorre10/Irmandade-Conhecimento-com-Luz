@@ -89,20 +89,16 @@ p {
 }
 
 /* ===== Pergaminho (encaixe perfeito) ===== */
-.pergaminho{
+.pergaminho{  
   position: relative;
-  margin: 0 auto;
   width: min(1100px, 96vw);
-
-  /* sem padding aqui para a imagem encostar no topo/rodapé/laterais */
-  padding: 0;
+  margin: 12px auto;
+  padding: 0;                 /* nada aqui pra não aparecer borda escura */
   border-radius: 18px;
-  overflow: hidden;            /* corta qualquer sobra escura do container */
-
-  /* imagem ocupa 100% sem crop */
+  overflow: hidden;           /* corta qualquer sobra */
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 100% 100%;
+  background-size: 100% 100%; /* ocupa tudo SEM crop */
 }
 
 /* razões exatas das suas imagens */
@@ -111,14 +107,20 @@ p {
   --pergH-ratio: 3 / 2;   /* 1536x1024 */
 }
 
+/* VERTICAL: defino a ALTURA pela tela e a LARGURA vem da razão */
 .pergaminho-v{
   background-image: url("/assets/img/pergaminho-rasgado-vert.png");
-  aspect-ratio: var(--pergV-ratio);
+  height: 92vh;                              /* ocupa a tela quase toda */
+  width: calc(92vh * var(--pergV-ratio));    /* W = H * (W/H) */
+  max-width: 96vw;                           /* não passa da largura da tela */
 }
 
+/* HORIZONTAL: defino a LARGURA pela tela e a ALTURA vem da razão */
 .pergaminho-h{
   background-image: url("/assets/img/pergaminho-rasgado-horiz.png");
-  aspect-ratio: var(--pergH-ratio);
+  width: 96vw;                               /* ocupa quase toda a largura */
+  height: calc(96vw / var(--pergH-ratio));   /* H = W / (W/H) */
+  max-height: 82vh;                          /* evita “duas páginas” */
 }
 
 /* o “respiro” agora fica no conteúdo */
@@ -127,8 +129,18 @@ p {
   line-height: 1.55;
 }
 
+/* Mobile: reduz um pouco pra caber sem scroll vertical extra */
 @media (max-width: 640px){
-  .pergaminho{ width: 98vw; }
+  .pergaminho-v{
+    height: 88vh;
+    width: calc(88vh * var(--pergV-ratio));
+    max-width: 96vw;
+  }
+  .pergaminho-h{
+    width: 98vw;
+    height: calc(98vw / var(--pergH-ratio));
+    max-height: 78vh;
+  }
   .pergaminho .conteudo-pergaminho{ padding: 14px; }
 }
 
