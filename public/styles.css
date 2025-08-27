@@ -88,34 +88,32 @@ p {
   margin-bottom: 1rem;
 }
 
-/* ===== Pergaminho (encaixe perfeito sem cortar rasgos) ===== */
+/* ===== Pergaminho (encaixe perfeito) ===== */
 .pergaminho{
   position: relative;
   margin: 0 auto;
-  /* largura controlada e limite de altura da tela */
   width: min(1100px, 96vw);
-  max-height: 88vh;
 
-  /* ✨ chave para NÃO cortar nada e encostar em cima/baixo */
+  /* sem padding aqui para a imagem encostar no topo/rodapé/laterais */
+  padding: 0;
+  border-radius: 18px;
+  overflow: hidden;            /* corta qualquer sobra escura do container */
+
+  /* imagem ocupa 100% sem crop */
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 100% 100%; /* preenche sem crop (mantém rasgos visíveis) */
-
-  border-radius: 18px;      /* borda arredondada do card preto, não do papel */
-  padding: clamp(12px, 3vw, 28px);
-  display:flex;flex-direction:column;gap:12px;
+  background-size: 100% 100%;
 }
 
-/* Defina razões de aspecto (pode ajustar depois se quiser) */
+/* razões exatas das suas imagens */
 :root{
-  --pergV-ratio: 2 / 3;   /* vertical ~ “mais alto que largo” */
-  --pergH-ratio: 2 / 3;  /* horizontal widescreen */
+  --pergV-ratio: 2 / 3;   /* 1024x1536 */
+  --pergH-ratio: 3 / 2;   /* 1536x1024 */
 }
 
-/* ⚠️ caminhos corretos, como combinado */
 .pergaminho-v{
   background-image: url("/assets/img/pergaminho-rasgado-vert.png");
-  aspect-ratio: var(--pergV-ratio);   /* garante que os rasgos laterais apareçam */
+  aspect-ratio: var(--pergV-ratio);
 }
 
 .pergaminho-h{
@@ -123,15 +121,15 @@ p {
   aspect-ratio: var(--pergH-ratio);
 }
 
-/* conteúdo acima do papel + “respiro” para não encostar nos rasgos */
+/* o “respiro” agora fica no conteúdo */
 .pergaminho .conteudo-pergaminho{
+  padding: clamp(12px, 3vw, 28px);
   line-height: 1.55;
-  padding: clamp(6px, 1.5vw, 16px);
 }
 
-/* Mobile: deixa usar quase a tela toda mantendo os rasgos */
 @media (max-width: 640px){
-  .pergaminho{ width: 98vw; max-height: 92vh; }
+  .pergaminho{ width: 98vw; }
+  .pergaminho .conteudo-pergaminho{ padding: 14px; }
 }
 
 /* ===============================
