@@ -34,63 +34,140 @@ hr{border:0;border-top:1px solid rgba(255,255,255,.15);margin:16px 0}
 
 /* Títulos também em Cardo (com um toque de “epic”) */
 
-/* --- Cardo --- */
-@font-face{
-  font-family:"Cardo";
-  src:url("/assets/fonts/Cardo-Regular.woff2") format("woff2"),
-      url("/assets/fonts/Cardo-Regular.ttf") format("truetype");
-  font-weight:400;font-style:normal;font-display:swap;
-}
-@font-face{
-  font-family:"Cardo";
-  src:url("/assets/fonts/Cardo-Bold.woff2") format("woff2"),
-      url("/assets/fonts/Cardo-Bold.ttf") format("truetype");
-  font-weight:700;font-style:normal;font-display:swap;
-}
-html, body { font-family:"Cardo", Georgia, "Times New Roman", serif; }
+/* ===============================
+   Fonte Cardo (local, TTF)
+   =============================== */
+@font-face {
+  font-family: 'Cardo';
+  src: url('/assets/fonts/Cardo-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
-/* ===== Pergaminho base ===== */
+@font-face {
+  font-family: 'Cardo';
+  src: url('/assets/fonts/Cardo-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cardo';
+  src: url('/assets/fonts/Cardo-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ===============================
+   Reset e base
+   =============================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Cardo', Georgia, 'Times New Roman', serif;
+  background-color: #0f172a; /* azul escuro */
+  color: #f1f5f9;
+  line-height: 1.5;
+}
+
+h1, h2, h3 {
+  font-family: 'Cardo', Georgia, serif;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+/* ===============================
+   Pergaminho (V e H)
+   =============================== */
 .pergaminho {
   position: relative;
   border-radius: 18px;
   margin: 0 auto;
   width: min(1200px, 98%);
-  min-height: 82vh;            /* ↑ maior para não “cortar” o fundo */
+  min-height: 82vh;
   padding: clamp(12px, 3vw, 28px);
 
   background-repeat: no-repeat;
   background-position: center;
-  background-size: cover;      /* ↑ cobre toda a área (evita “metade”) */
+  background-size: cover;
 
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-/* Variantes de imagem (garanta que os arquivos existem nessas rotas) */
-.pergaminho-v { background-image: url("/assets/img/perg-vert.png"); }
-.pergaminho-h { background-image: url("/assets/img/perg-horiz.png"); }
+/* Variantes */
+.pergaminho-v {
+  background-image: url("/assets/img/pergaminho-rasgado-vert.png");
+}
+.pergaminho-h {
+  background-image: url("/assets/img/pergaminho-rasgado-horiz.png");
+}
 
-/* Conteúdo em cima do pergaminho */
+/* Conteúdo sobre o pergaminho */
 .pergaminho .conteudo-pergaminho {
   line-height: 1.55;
 }
 
 /* Mobile */
 @media (max-width: 640px) {
-  .pergaminho { 
-    min-height: 88vh;          /* ↑ ainda mais alto no mobile */
+  .pergaminho {
+    min-height: 88vh;
     padding: 14px;
   }
 }
 
-/* --- Inputs e botões --- */
-.q-card { background: rgba(255,255,255,0.85); padding: 12px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
-.q-input { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ddd; outline: none; }
-.btn { padding: 10px 14px; border-radius: 999px; border: 1px solid #c9c9c9; background:#f5f5f5; cursor:pointer; }
-.btn:hover { filter: brightness(.98); }
-.btn-primary { background:#111827; color:#fff; border-color:#111827; }
+/* ===============================
+   Botões
+   =============================== */
+button, .btn {
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: background 0.3s, transform 0.2s;
+}
+
+button:hover, .btn:hover {
+  transform: scale(1.03);
+}
+
+.btn-primary {
+  background-color: #2563eb; /* azul */
+  color: white;
+}
+.btn-secondary {
+  background-color: #475569; /* cinza */
+  color: white;
+}
+.btn-danger {
+  background-color: #dc2626; /* vermelho */
+  color: white;
+}
+
+/* ===============================
+   Footer
+   =============================== */
+footer {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
 
 /* --- Lumen datilografando --- */
 .lumen-typing { white-space: pre-wrap; position: relative; }
