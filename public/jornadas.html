@@ -7,19 +7,30 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <header class="site-header">
-    <h1>Jornadas Disponíveis</h1>
-    <p>Escolha por onde começar.</p>
-  </header>
+ <body>
+  <!-- Casca estática da página -->
+  <main id="page-shell">
+    <header class="site-header">
+      <h1>Jornadas Disponíveis</h1>
+      <p>Escolha por onde começar.</p>
+    </header>
 
-  <main class="container">
-    <div class="card">
-      <h2>Jornada Conhecimento com Luz · Essencial</h2>
-      <p>Uma viagem interior com 32 reflexões essenciais.</p>
-      <a class="btn primary" href="/jornada-conhecimento-com-luz1.html">Iniciar</a>
+    <div class="container">
+      <div class="card">
+        <h2>Jornada Conhecimento com Luz - Essencial</h2>
+        <p>Uma viagem interior com 32 reflexões essenciais.</p>
+        <a class="btn primary" href="/jornada-conhecimento-com-luz1.html">Iniciar</a>
+      </div>
     </div>
+  </main>
 
-    <a class="btn" href="/index.html">← Voltar ao início</a>
+  <!-- Canvas dinâmico da Jornada (inicia vazio) -->
+  <section id="jornada-canvas" class="card pergaminho" style="display:none;">
+    <div id="jornada-conteudo" class="conteudo-pergaminho"></div>
+  </section>
+</body>
+
+  <a class="btn" href="/index.html">← Voltar ao início</a>
   </main>
 
   <footer class="site-footer">
