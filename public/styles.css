@@ -55,11 +55,40 @@ hr{border:0;border-top:1px solid rgba(255,255,255,.15);margin:16px 0}
 }
 html, body { font-family: 'Cardo', serif; }
 
-/* --- Pergaminhos --- */
-.pergaminho { padding: 1.25rem; border-radius: 14px; background-size: cover; background-position: center; }
-.pergaminho-v { background-image: url('/assets/img/pergaminho-rasgado-vert.png'); }
-.pergaminho-h { background-image: url('/assets/img/pergaminho-rasgado-horiz.png'); }
-.title { font-weight: 700; letter-spacing: .2px; }
+/* ===== Pergaminho base ===== */
+.pergaminho {
+  position: relative;
+  border-radius: 18px;
+  margin: 0 auto;
+  width: min(1200px, 98%);
+  min-height: 82vh;            /* ↑ maior para não “cortar” o fundo */
+  padding: clamp(12px, 3vw, 28px);
+
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;      /* ↑ cobre toda a área (evita “metade”) */
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Variantes de imagem (garanta que os arquivos existem nessas rotas) */
+.pergaminho-v { background-image: url("/assets/img/perg-vert.png"); }
+.pergaminho-h { background-image: url("/assets/img/perg-horiz.png"); }
+
+/* Conteúdo em cima do pergaminho */
+.pergaminho .conteudo-pergaminho {
+  line-height: 1.55;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .pergaminho { 
+    min-height: 88vh;          /* ↑ ainda mais alto no mobile */
+    padding: 14px;
+  }
+}
 
 /* --- Inputs e botões --- */
 .q-card { background: rgba(255,255,255,0.85); padding: 12px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
