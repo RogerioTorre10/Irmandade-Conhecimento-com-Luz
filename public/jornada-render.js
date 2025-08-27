@@ -67,8 +67,9 @@
       <div class="flex gap-2">
         <button id="btn-ir-intro" class="px-4 py-2 rounded btn-primary">Ir para Introdução</button>
       </div>
+     `;
       try { JORNADA_TYPO?.typeAll("#jornada-conteudo"); } catch(e){}
-    `;
+     
     document.getElementById("btn-ir-intro")?.addEventListener("click", renderIntro);
   }
 
@@ -107,8 +108,9 @@
         <button id="btn-voltar-intro" class="px-3 py-2 rounded btn-secondary">Voltar à Introdução</button>
         <button id="btn-finalizar" class="px-4 py-2 rounded btn-primary">Finalizar</button>
       </div>
+      `;
       try { JORNADA_TYPO?.typeAll("#jornada-conteudo"); } catch(e){}
-    `;
+     
     document.getElementById("btn-voltar-intro")?.addEventListener("click", renderIntro);
     document.getElementById("btn-finalizar")?.addEventListener("click", renderFinal);
   }
