@@ -1,6 +1,11 @@
 // jornada-utils.js
 import { apiBases } from "./jornada-core.js";
 
+// coloque aqui suas funções utilitárias
+  function saveLocal(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+  function loadLocal(key){ try{ return JSON.parse(localStorage.getItem(key)||"{}"); }catch(_){ return {}; } }
+  function clearLocal(key){ localStorage.removeItem(key); }
+
 export function el(html) {
   const d = document.createElement("div");
   d.innerHTML = html.trim();
