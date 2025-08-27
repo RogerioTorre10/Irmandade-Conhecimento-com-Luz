@@ -177,4 +177,4 @@ function renderFinal() {
     renderPerguntas,
     renderFinal,
   };
-})();
+}
