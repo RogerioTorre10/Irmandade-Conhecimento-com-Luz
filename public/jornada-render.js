@@ -83,8 +83,9 @@
         <button id="btn-iniciar" class="px-4 py-2 rounded btn-primary">Iniciar</button>
         <button id="btn-voltar-home" class="px-3 py-2 rounded btn-secondary">Voltar ao Início</button>
       </div>
+     `;
       try { JORNADA_TYPO?.typeAll("#jornada-conteudo"); } catch(e){}
-    `;
+     
     document.getElementById("btn-iniciar")?.addEventListener("click", renderPerguntas);
     document.getElementById("btn-voltar-home")?.addEventListener("click", renderHome);
   }
@@ -124,8 +125,9 @@
       <div class="flex gap-2">
         <button id="btn-voltar-home" class="px-3 py-2 rounded btn-secondary">Voltar ao Início</button>
       </div>
+      `;
       try { JORNADA_TYPO?.typeAll("#jornada-conteudo"); } catch(e){}
-    `;
+     
     document.getElementById("btn-voltar-home")?.addEventListener("click", renderHome);
   }
 
