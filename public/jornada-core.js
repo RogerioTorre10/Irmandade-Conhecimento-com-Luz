@@ -72,3 +72,8 @@ export function buildPayload(state) {
     answers: state.respostas || {}
   };
 }
+
+window.JORNADA_CORE = {
+    iniciarFluxo, salvarRespostas, baixarArquivos
+  };
+})();
