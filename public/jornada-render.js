@@ -67,6 +67,7 @@
       <div class="flex gap-2">
         <button id="btn-ir-intro" class="px-4 py-2 rounded btn-primary">Ir para Introdução</button>
       </div>
+      try { JORNADA_TYPO?.typeAll("#jornada-conteudo"); } catch(e){}
     `;
     document.getElementById("btn-ir-intro")?.addEventListener("click", renderIntro);
   }
@@ -81,6 +82,7 @@
         <button id="btn-iniciar" class="px-4 py-2 rounded btn-primary">Iniciar</button>
         <button id="btn-voltar-home" class="px-3 py-2 rounded btn-secondary">Voltar ao Início</button>
       </div>
+      try { JORNADA_TYPO?.typeAll("#jornada-conteudo"); } catch(e){}
     `;
     document.getElementById("btn-iniciar")?.addEventListener("click", renderPerguntas);
     document.getElementById("btn-voltar-home")?.addEventListener("click", renderHome);
@@ -105,6 +107,7 @@
         <button id="btn-voltar-intro" class="px-3 py-2 rounded btn-secondary">Voltar à Introdução</button>
         <button id="btn-finalizar" class="px-4 py-2 rounded btn-primary">Finalizar</button>
       </div>
+      try { JORNADA_TYPO?.typeAll("#jornada-conteudo"); } catch(e){}
     `;
     document.getElementById("btn-voltar-intro")?.addEventListener("click", renderIntro);
     document.getElementById("btn-finalizar")?.addEventListener("click", renderFinal);
@@ -119,6 +122,7 @@
       <div class="flex gap-2">
         <button id="btn-voltar-home" class="px-3 py-2 rounded btn-secondary">Voltar ao Início</button>
       </div>
+      try { JORNADA_TYPO?.typeAll("#jornada-conteudo"); } catch(e){}
     `;
     document.getElementById("btn-voltar-home")?.addEventListener("click", renderHome);
   }
