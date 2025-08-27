@@ -57,8 +57,8 @@ html, body { font-family: 'Cardo', serif; }
 
 /* --- Pergaminhos --- */
 .pergaminho { padding: 1.25rem; border-radius: 14px; background-size: cover; background-position: center; }
-.pergaminho-v { background-image: url('/assets/img/perg-vert.png'); }
-.pergaminho-h { background-image: url('/assets/img/perg-horiz.png'); }
+.pergaminho-v { background-image: url('/assets/img/pergaminho-rasgado-vert.png'); }
+.pergaminho-h { background-image: url('/assets/img/pergaminho-rasgado-horiz.png'); }
 .title { font-weight: 700; letter-spacing: .2px; }
 
 /* --- Inputs e botões --- */
