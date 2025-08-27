@@ -2,7 +2,16 @@
 // Config central + estado + helpers de API
 
 const APP = (typeof window !== "undefined" && window.APP_CONFIG) ? window.APP_CONFIG : {};
+const U = window.JORNADA_UTILS || {};
 
+  function iniciarFluxo(){ /* ... sua lógica ... */ }
+  function salvarRespostas(){ /* ... sua lógica ... */ }
+  async function baixarArquivos(){ /* ... sua lógica ... */ }
+
+  window.JORNADA_CORE = {
+    iniciarFluxo, salvarRespostas, baixarArquivos
+  };
+})();
 export const JORNADA_CFG = {
   STORAGE_KEY: APP.STORAGE_KEY || "jornada_essencial_v1",
   API_BASE: (APP.API_BASE || "https://lumen-backend-api.onrender.com/api").replace(/\/+$/, ""),
