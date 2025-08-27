@@ -40,51 +40,39 @@
   }
 
   // Garante que exista <section id="jornada-canvas"><div id="jornada-conteudo"></div></section>
-  function ensureCanvas() {
-    let root = elCanvas();
-    if (!root) {
-      root = document.createElement("section");
-      root.id = CFG.CANVAS_ID;
-      root.className = "card pergaminho"; // classe base, variantes V/H entram por JS
-      document.body.appendChild(root);
-    }
-    let content = elContent();
-    if (!content) {
-      content = document.createElement("div");
-      content.id = CFG.CONTENT_ID;
-      content.className = "conteudo-pergaminho";
-      root.innerHTML = "";
-      root.appendChild(content);
-    }
-    return { root, content };
+  // === COLAR NO /public/jornada-render.js ===
+
+// garante container padrão caso não exista no HTML
+function ensureCanvas() {
+  let root = document.getElementById("jornada-canvas");
+  if (!root) {
+    root = document.createElement("section");
+    root.id = "jornada-canvas";
+    root.className = "card pergaminho";
+    document.body.appendChild(root);
   }
-
-  // 1) setPergaminho: força altura e cover via JS também
-function setPergaminho(mode /* 'v' | 'h' */) {
-  const { root } = ensureCanvas();
-  root.classList.remove("pergaminho-v", "pergaminho-h");
-  if (mode === "v") root.classList.add("pergaminho-v");
-  if (mode === "h") root.classList.add("pergaminho-h");
-
-  // Fallback inline (se o CSS demorar a carregar)
-  root.style.backgroundRepeat = "no-repeat";
-  root.style.backgroundPosition = "center";
-  root.style.backgroundSize = "cover";   // <— garante que não fique “metade”
-  root.style.minHeight = "82vh";
+  let content = document.getElementById("jornada-conteudo");
+  if (!content) {
+    content = document.createElement("div");
+    content.id = "jornada-conteudo";
+    content.className = "conteudo-pergaminho";
+    root.innerHTML = "";
+    root.appendChild(content);
+  }
+  return { root, content };
 }
 
-// 2) renderHome (vertical)
-function renderHome() {
-  setPergaminho("v");
-  const { content } = ensureCanvas();
-  content.innerHTML = `
-    <h1 class="text-2xl md:text-3xl font-bold mb-2">Irmandade Conhecimento com Luz</h1>
-    <p class="mb-4 opacity-90">Bem-vindo! Clique para iniciar a Jornada Essencial.</p>
-    <div class="flex gap-2">
-      <button id="btn-ir-intro" class="px-4 py-2 rounded bg-blue-600 text-white">Ir para Introdução</button>
-    </div>
-  `;
-  document.getElementById("btn-ir-intro")?.addEventListener("click", renderIntro);
+// alterna o tipo de pergaminho
+function setPergaminho(mode /* 'v' | 'h' */) {
+  const { root } = ensureCanvas();
+  root.classList.remove("pergaminho-v","pergaminho-h");
+  if (mode === "v") root.classList.add("pergaminho-v");
+  if (mode === "h") root.classList.add("pergaminho-h");
+  // fallback inline (se o CSS ainda não carregou)
+  root.style.backgroundRepeat = "no-repeat";
+  root.style.backgroundPosition = "center";
+  root.style.backgroundSize = "cover";
+  root.style.minHeight = "82vh";
 }
 
 // 3) renderIntro (vertical)
