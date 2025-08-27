@@ -38,14 +38,16 @@ hr{border:0;border-top:1px solid rgba(255,255,255,.15);margin:16px 0}
    Jornada dinâmica
    ======================== */
 
-/* Quando a jornada estiver ativa, esconde a casca estática */
-body.jornada-active #page-shell { 
-  display: none; 
+/* Jornada ativa: some com o layout estático */
+body.jornada-active #page-shell,
+body.jornada-active header.site-header,
+body.jornada-active footer.site-footer {
+  display: none !important;
 }
 
-/* Garante que o canvas fique visível ocupando a página */
-body.jornada-active #jornada-canvas { 
-  display: block; 
+/* Jornada ativa: canvas visível */
+body.jornada-active #jornada-canvas {
+  display: block !important;
 }
 
 /* ===============================
