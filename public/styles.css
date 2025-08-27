@@ -47,11 +47,7 @@ hr{border:0;border-top:1px solid rgba(255,255,255,.15);margin:16px 0}
       url("/assets/fonts/Cardo-Bold.ttf") format("truetype");
   font-weight:700;font-style:normal;font-display:swap;
 }
-/* Fonte padrão do site */
-:root { --font-base: "Cardo", Georgia, "Times New Roman", serif; }
-
-html, body {
-  font-family: var(--font-base);
+html, body { font-family:"Cardo", Georgia, "Times New Roman", serif; }
 }
 
 /* ===== Pergaminho base ===== */
