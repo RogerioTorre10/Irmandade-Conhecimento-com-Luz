@@ -16,6 +16,16 @@
     },
     window.JORNADA_CFG || {}
   );
+   
+// ---------- utilitários ----------
+   function activateJornada() { 
+   document.body.classList.add("jornada-active"); 
+   window.scrollTo(0,0);
+}
+  function deactivateJornada() { 
+  document.body.classList.remove("jornada-active"); 
+}
+
 
   // ---------- utilidades ----------
   function elCanvas() { return document.getElementById(CFG.CANVAS_ID); }
