@@ -4,10 +4,10 @@
    ============================================ */
 ;(function () {
   const DEFAULTS = {
-    speed: 28,             // ms por caractere
+    speed: 34,             // ms por caractere
     cursor: true,          // mostra cursor ▌
-    maxNodeChars: 600,     // acima disso preenche instantâneo (evita textos longos demais)
-    maxTotalMs: 6000,      // duração máxima por tela (~5s)
+    maxNodeChars: 750,     // acima disso preenche instantâneo (evita textos longos demais)
+    maxTotalMs: 7500,      // duração máxima por tela (~5s)
     selectors: [
       "h1","h2","h3","h4",
       "p","li","blockquote","figcaption",
