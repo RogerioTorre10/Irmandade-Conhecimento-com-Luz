@@ -90,8 +90,6 @@ p {
 
 /* ===== Pergaminho (encaixe perfeito) ===== */
 .pergaminho{  
-  position: relative;
-  width: min(1100px, 96vw);
   margin: 12px auto;
   padding: 0;                 /* nada aqui pra não aparecer borda escura */
   border-radius: 18px;
