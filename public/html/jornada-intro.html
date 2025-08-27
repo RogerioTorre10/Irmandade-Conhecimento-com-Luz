@@ -41,11 +41,31 @@
           </div>
         </section>
 
+        JORNADA_AUTH.init({
+         formSelector: "#form-senha",
+          inputSelector: "#senha-input",
+          eyeSelector: "#senha-eye",
+         countdownSelector: "#senha-countdown",
+        onGranted: () => { /* ex.: avançar para perguntas */ }
+    });
+
+
       </div>
     </div>
   </main>
 
-  <!-- Script da jornada (não há botões aqui; é seguro manter o include) -->
-  <script src="/jornada.js"></script>
+ <!-- Scripts da Jornada -->
+<script src="/jornada-utils.js"></script>
+<script src="/jornada-core.js"></script>
+
+<!-- Novos módulos -->
+<script src="/jornada-auth.js"></script>
+<script src="/jornada-paper-qa.js"></script>
+<script src="/jornada-typing-font.js"></script>
+
+<!-- Renderização e bootstrap -->
+<script src="/jornada-render.js"></script>
+<script src="/jornada-bootstrap.js"></script>
 </body>
 </html>
+
