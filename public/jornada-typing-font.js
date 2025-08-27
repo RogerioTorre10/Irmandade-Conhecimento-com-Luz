@@ -51,7 +51,7 @@
     if (!root) return;
 
     // Se o usuário prefere menos movimento, apenas “apareça”
-    if (prefersReduced()) return;
+    if (!cfg.force && prefersReduced()) return;
 
     // Coleta elementos-alvo na ordem visual
     const nodes = Array.from(root.querySelectorAll(cfg.selectors.join(",")));
