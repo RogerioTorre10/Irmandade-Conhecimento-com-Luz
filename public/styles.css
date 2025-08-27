@@ -34,6 +34,20 @@ hr{border:0;border-top:1px solid rgba(255,255,255,.15);margin:16px 0}
 
 /* Títulos também em Cardo (com um toque de “epic”) */
 
+/* ========================
+   Jornada dinâmica
+   ======================== */
+
+/* Quando a jornada estiver ativa, esconde a casca estática */
+body.jornada-active #page-shell { 
+  display: none; 
+}
+
+/* Garante que o canvas fique visível ocupando a página */
+body.jornada-active #jornada-canvas { 
+  display: block; 
+}
+
 /* ===============================
    Fonte Cardo (local, TTF)
    =============================== */
