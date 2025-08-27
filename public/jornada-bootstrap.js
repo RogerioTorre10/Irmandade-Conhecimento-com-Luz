@@ -1,8 +1,15 @@
+/* ============================================
+   /public/jornada-bootstrap.js
+   Inicialização simples (sem módulos)
+   Requer que JORNADA_RENDER já exista
+   ============================================ */
 document.addEventListener("DOMContentLoaded", () => {
-  JORNADA_RENDER.setHooks({
-    onStart: () => JORNADA_CORE?.iniciarFluxo?.(),
-    onFinalize: () => JORNADA_CORE?.salvarRespostas?.(),
-    onDownload: () => JORNADA_CORE?.baixarArquivos?.(), // sua chamada de API
-  });
-  JORNADA_RENDER.mount({ startAt: "home" }); // ou "intro"
+  // garante que o render carregou
+  if (!window.JORNADA_RENDER) {
+    console.error("JORNADA_RENDER não está carregado. Verifique a ordem dos <script>.");
+    return;
+  }
+
+  // ponto de entrada — pode trocar para { startAt: "intro" } se preferir
+  window.JORNADA_RENDER.mount({ startAt: "home" });
 });
