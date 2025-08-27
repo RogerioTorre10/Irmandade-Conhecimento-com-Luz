@@ -1,81 +1,67 @@
-// jornada-utils.js
-import { apiBases } from "./jornada-core.js";
-
-// coloque aqui suas funções utilitárias
-  function saveLocal(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
-  function loadLocal(key){ try{ return JSON.parse(localStorage.getItem(key)||"{}"); }catch(_){ return {}; } }
-  function clearLocal(key){ localStorage.removeItem(key); }
-
-export function el(html) {
-  const d = document.createElement("div");
-  d.innerHTML = html.trim();
-  return d.firstElementChild;
-}
-
-export const $ = (sel, root = document) => root.querySelector(sel);
-
-export function typewriter(node, text, opts = {}) {
-  const speed  = opts.speed ?? 28;
-  const jitter = opts.jitter ?? 14;
-  const delay  = opts.initialDelay ?? 100;
-  const done   = opts.done;
-  if (!node) return;
-  node.classList.add("lumen-typing");
-  node.textContent = "";
-  let i = 0;
-  function tick(){
-    if (i < text.length){
-      node.textContent += text[i++];
-      const d = speed + (jitter ? Math.floor(Math.random()*jitter) : 0);
-      setTimeout(tick, d);
-    } else {
-      node.classList.add("typing-done");
-      if (typeof done === "function") done();
-    }
+/* ============================================
+   jornada-utils.js  (IIFE – sem import/export)
+   Helpers gerais da Jornada
+   Expondo: window.JORNADA_UTILS
+   ============================================ */
+;(function () {
+  // ----------------- LocalStorage -----------------
+  function saveLocal(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
   }
-  setTimeout(tick, delay);
-}
-
-// fetch com fallback (com/sem /api)
-export async function fetchWithApiFallback(path, init) {
-  const bases = apiBases();
-  let lastErr;
-  for (const b of bases) {
-    const url = b.replace(/\/+$/, "") + "/" + String(path).replace(/^\/+/, "");
-    try {
-      const res = await fetch(url, init);
-      if (res.ok) return res;
-      lastErr = new Error(`HTTP_${res.status}`);
-    } catch (e) { lastErr = e; }
+  function loadLocal(key) {
+    try { return JSON.parse(localStorage.getItem(key) || "{}"); }
+    catch (_) { return {}; }
   }
-  throw lastErr || new Error("all_endpoints_failed");
-}
+  function clearLocal(key) {
+    localStorage.removeItem(key);
+  }
 
-export async function postBinary(path, payload) {
-  const res = await fetchWithApiFallback(path, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Accept": "application/pdf, application/zip, application/octet-stream"
-    },
-    body: JSON.stringify(payload || {})
-  });
-  return await res.blob();
-}
+  // ----------------- DOM helpers ------------------
+  function el(html) {
+    const d = document.createElement("div");
+    d.innerHTML = (html || "").trim();
+    return d.firstElementChild;
+  }
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-export function downloadBlob(blob, filename) {
-  const a = document.createElement("a");
-  const url = URL.createObjectURL(blob);
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
+  // ----------------- Fetch helpers ----------------
+  // Lê base de API de window.APP_CONFIG.API_BASE, com fallback
+  function getApiBase() {
+    const cfg = (typeof window !== "undefined" && window.APP_CONFIG) ? window.APP_CONFIG : {};
+    return cfg.API_BASE || "https://conhecimento-com-luz-api.onrender.com";
+  }
 
-// Expor no namespace global
+  async function apiGet(path, opts = {}) {
+    const url = getApiBase() + path;
+    const res = await fetch(url, {
+      method: "GET",
+      headers: { Accept: "application/json" },
+      ...opts,
+    });
+    if (!res.ok) throw new Error(`GET ${url} -> ${res.status}`);
+    return res.headers.get("content-type")?.includes("application/json") ? res.json() : res.text();
+  }
+
+  async function apiPost(path, body = {}, opts = {}) {
+    const url = getApiBase() + path;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json, application/pdf" },
+      body: JSON.stringify(body),
+      ...opts,
+    });
+    if (!res.ok) throw new Error(`POST ${url} -> ${res.status}`);
+    const ct = res.headers.get("content-type") || "";
+    if (ct.includes("application/json")) return res.json();
+    if (ct.includes("application/pdf")) return res.blob();
+    return res.text();
+  }
+
+  // --------------- Exporta no namespace ----------
   window.JORNADA_UTILS = {
-    saveLocal, loadLocal, clearLocal
+    saveLocal, loadLocal, clearLocal,
+    el, $, $$,
+    apiGet, apiPost, getApiBase,
   };
 })();
