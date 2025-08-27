@@ -1,221 +1,201 @@
-// jornada-render.js
-import { el, $, typewriter, postBinary, downloadBlob } from "./jornada-utils.js";
-import { S, JORNADA_PERGUNTAS, JORNADA_CFG, buildPayload } from "./jornada-core.js";
+/* ============================================
+   jornada-render.js  —  Render & Pergaminhos
+   Irmandade Conhecimento com Luz
+   --------------------------------------------
+   Responsável por:
+   • Alternar pergaminho vertical/horizontal
+   • Renderizar Home, Intro, Perguntas, Final
+   • Expor hooks para o CORE/BOOTSTRAP
+   ============================================ */
 
-function getRoot() {
-  return document.getElementById("app") ||
-         document.getElementById("jornada-root") ||
-         document.getElementById("jornadaApp") ||
-         document.querySelector("main") ||
-         document.body;
-}
+;(function () {
+  // ------- Configuração & Defaults -------
+  const CFG = (window.JORNADA_CFG = Object.assign(
+    {
+      CANVAS_ID: "jornada-canvas",
+      CONTENT_ID: "jornada-conteudo",
+      PERGAMINHO_VERT: "/assets/img/perg-vert.png",
+      PERGAMINHO_HORIZ: "/assets/img/perg-horiz.png",
+      START_SCREEN: "home", // 'home' | 'intro'
+    },
+    window.JORNADA_CFG || {}
+  ));
 
-export function render() {
-  const root = getRoot();
-  if (!root) return;
+  // ------- Estado local de hooks (injetados pelo CORE/BOOTSTRAP) -------
+  // onStart(): chamado quando clicar "Iniciar" na Intro
+  // onFinalize(): chamado ao clicar "Finalizar" nas Perguntas
+  // onDownload(): chamado ao clicar "Baixar PDF + HQ" na Final
+  const HOOKS = {
+    onStart: () => {},
+    onFinalize: () => {},
+    onDownload: async () => {},
+  };
 
-  // senha gate
-  if (!S.state.auth) {
-    root.replaceChildren(renderSenha());
-    return;
+  // ------- Utilidades internas -------
+  function elCanvas() {
+    return document.getElementById(CFG.CANVAS_ID);
+  }
+  function elContent() {
+    return document.getElementById(CFG.CONTENT_ID);
   }
 
-  if (S.state.step === "intro") {
-    root.replaceChildren(renderIntro());
-  } else if (S.state.step === "perguntas") {
-    root.replaceChildren(renderPerguntasWizard());
-  } else {
-    root.replaceChildren(renderFinal());
-  }
-}
-
-/* ====== SENHA (pergaminho-v) com olho mágico ====== */
-export function renderSenha() {
-  const section = el(`
-    <section class="card pergaminho pergaminho-v" style="max-width: 760px; margin-inline:auto;">
-      <h1 class="title">Acesso à Jornada</h1>
-      <p id="msgSenha" class="mt-2 lumen-typing"></p>
-      <div class="mt-4" style="display:flex;gap:.5rem;align-items:center;">
-        <input type="password" id="inpSenha" class="q-input" placeholder="Senha (ex.: iniciar)" style="max-width:260px;">
-        <button id="btnEye" class="btn" title="Mostrar/ocultar">👁️</button>
-        <button id="btnEntrar" class="btn btn-primary">Entrar</button>
-      </div>
-      <div id="senhaErro" class="mt-3" style="color:#b91c1c;font-size:.9rem;"></div>
-    </section>
-  `);
-
-  typewriter($("#msgSenha", section), "Digite a senha para iniciar.");
-
-  const inp = $("#inpSenha", section);
-  const eye = $("#btnEye", section);
-  const btn = $("#btnEntrar", section);
-  const err = $("#senhaErro", section);
-
-  eye.addEventListener("click", () => {
-    inp.type = (inp.type === "password" ? "text" : "password");
-  });
-  inp.addEventListener("keydown", (e)=>{ if (e.key === "Enter") btn.click(); });
-
-  btn.addEventListener("click", () => {
-    const val = (inp.value || "").trim();
-    if (val.toLowerCase() === JORNADA_CFG.PASS.toLowerCase()) {
-      S.state.auth = true;
-      S.state.step = "intro";
-      S.state.qIndex = 0;
-      S.state.respostas = S.state.respostas || {};
-      S.save(S.state);
-      render();
-    } else {
-      err.textContent = "Senha inválida. Tente novamente.";
+  // Garante que exista <section id="jornada-canvas"><div id="jornada-conteudo"></div></section>
+  function ensureCanvas() {
+    let root = elCanvas();
+    if (!root) {
+      root = document.createElement("section");
+      root.id = CFG.CANVAS_ID;
+      root.className = "card pergaminho"; // classe base, variantes V/H entram por JS
+      document.body.appendChild(root);
     }
-  });
-
-  return section;
-}
-
-/* ====== INTRO (pergaminho-v) ====== */
-export function renderIntro() {
-  const section = el(`
-    <section class="card pergaminho pergaminho-v" style="max-width: 760px; margin-inline:auto;">
-      <h1 class="title">Jornada Conhecimento com Luz – Essencial</h1>
-      <p id="introMsg" class="mt-2 lumen-typing" role="status" aria-live="polite"></p>
-      <div class="mt-6 flex gap-2">
-        <button id="btnIniciar" class="btn btn-primary">Iniciar</button>
-      </div>
-    </section>
-  `);
-
-  typewriter($("#introMsg", section),
-    "Olá, eu sou o Lumen. Estou com você. Quando quiser, clique em Iniciar e vamos atravessar esta jornada juntos.",
-    { speed: 28, jitter: 16, initialDelay: 120 }
-  );
-
-  $("#btnIniciar", section).addEventListener("click", () => {
-    S.state.step = "perguntas";
-    S.state.qIndex = 0;
-    S.state.respostas = S.state.respostas || {};
-    S.save(S.state);
-    render();
-  });
-
-  return section;
-}
-
-/* ====== PERGUNTAS PASSO-A-PASSO (pergaminho-h) ====== */
-export function renderPerguntasWizard() {
-  const qs = JORNADA_PERGUNTAS;
-  const i = Math.max(0, Math.min(S.state.qIndex || 0, qs.length - 1));
-  const q = qs[i];
-
-  const section = el(`
-    <section class="card pergaminho pergaminho-h" style="max-width: 900px; margin-inline:auto;">
-      <div class="flex items-center justify-between">
-        <h2 class="title">Pergunta ${i+1} de ${qs.length}</h2>
-        <div class="w-40 h-2 bg-white/60 rounded-full overflow-hidden">
-          <div id="prog" class="h-2 bg-black" style="width:${Math.round(((i+1)/qs.length)*100)}%"></div>
-        </div>
-      </div>
-
-      <p id="enunciado" class="mt-4 lumen-typing"></p>
-
-      <div class="q-card mt-3">
-        <textarea id="resposta" class="q-input" rows="4" placeholder="Escreva aqui sua resposta..."></textarea>
-        <div class="flex items-center justify-between mt-2">
-          <span class="text-xs opacity-70">Dica: você pode limpar apenas esta resposta.</span>
-          <button id="btnClearOne" class="btn">Apagar esta resposta</button>
-        </div>
-      </div>
-
-      <div class="mt-6 flex gap-2">
-        <button id="btnProx" class="btn btn-primary">${i === qs.length - 1 ? "Concluir" : "Avançar"}</button>
-      </div>
-    </section>
-  `);
-
-  // datilografar enunciado
-  typewriter($("#enunciado", section), q.titulo, { speed: 26, jitter: 12, initialDelay: 40 });
-
-  // preencher / salvar
-  const ta = $("#resposta", section);
-  ta.value = (S.state.respostas && S.state.respostas[q.id]) || "";
-  ta.addEventListener("input", () => {
-    S.state.respostas = S.state.respostas || {};
-    S.state.respostas[q.id] = ta.value;
-    S.save(S.state);
-  });
-
-  // apagar só esta
-  $("#btnClearOne", section).addEventListener("click", () => {
-    S.state.respostas = S.state.respostas || {};
-    S.state.respostas[q.id] = "";
-    S.save(S.state);
-    ta.value = "";
-    ta.focus();
-  });
-
-  // avançar / concluir
-  $("#btnProx", section).addEventListener("click", () => {
-    S.state.respostas = S.state.respostas || {};
-    S.state.respostas[q.id] = ta.value;
-    if (i === qs.length - 1) {
-      S.state.step = "final";
-    } else {
-      S.state.qIndex = i + 1;
+    let content = elContent();
+    if (!content) {
+      content = document.createElement("div");
+      content.id = CFG.CONTENT_ID;
+      content.className = "conteudo-pergaminho";
+      root.innerHTML = "";
+      root.appendChild(content);
     }
-    S.save(S.state);
-    render();
-  });
-
-  // acessibilidade
-  setTimeout(() => { try { ta.focus(); } catch(_){} }, 50);
-
-  return section;
-}
-
-/* ====== FINAL (pergaminho-v) — só Baixar PDF + HQ ====== */
-export function renderFinal() {
-  const section = el(`
-    <section class="card pergaminho pergaminho-v" style="max-width: 760px; margin-inline:auto;">
-      <h2 class="title">Conclusão da Jornada</h2>
-      <p id="finalMsg" class="mt-2 lumen-typing"></p>
-
-      <details class="mt-4">
-        <summary>Ver resumo das respostas</summary>
-        <pre id="resumo" class="mt-2 text-xs"></pre>
-      </details>
-
-      <div class="mt-6 flex gap-2">
-        <button id="btnBaixar" class="btn btn-primary">Baixar PDF + HQ</button>
-      </div>
-      <div id="status-msg" class="mt-4 text-sm opacity-80" role="status" aria-live="polite"></div>
-    </section>
-  `);
-
-  typewriter($("#finalMsg", section), "Respire novamente. Seu caminho foi registrado com coragem e verdade.");
-  $("#resumo", section).textContent = JSON.stringify(S.state.respostas || {}, null, 2);
-
-  $("#btnBaixar", section).addEventListener("click", async () => {
-    try {
-      const payload = buildPayload(S.state);
-      setStatus("Gerando arquivos… aguarde.");
-      const pdf = await postBinary("jornada/pdf", payload);
-      downloadBlob(pdf, "jornada.pdf");
-      setStatus("PDF ok. Gerando HQ…");
-      const hq = await postBinary("jornada/hq", payload);
-      downloadBlob(hq, "jornada-hq.zip");
-      setStatus("PDF e HQ finalizados! Redirecionando…");
-      setTimeout(() => { window.location.href = "/index.html"; }, 1200);
-    } catch (e) {
-      setStatus("Falha ao gerar algum arquivo. Tente novamente.");
-      console.error(e);
-    }
-  });
-
-  function setStatus(t) {
-    const box = $("#status-msg", section);
-    box.classList.remove("lumen-typing","typing-done");
-    typewriter(box, t, { speed: 22, jitter: 10, initialDelay: 40 });
+    return { root, content };
   }
 
-  return section;
-}
+  // ------- Alternância do pergaminho -------
+  function setPergaminho(mode /* 'v' | 'h' */) {
+    const { root } = ensureCanvas();
+    root.classList.remove("pergaminho-v", "pergaminho-h");
+    // injeta o background via classes + fallback inline (caso CSS ainda não esteja carregado)
+    if (mode === "v") {
+      root.classList.add("pergaminho-v");
+      root.style.backgroundImage = `url("${CFG.PERGAMINHO_VERT}")`;
+    } else if (mode === "h") {
+      root.classList.add("pergaminho-h");
+      root.style.backgroundImage = `url("${CFG.PERGAMINHO_HORIZ}")`;
+    }
+    root.style.backgroundRepeat = "no-repeat";
+    root.style.backgroundPosition = "center";
+    root.style.backgroundSize = "contain";
+  }
+
+  // ------- Renderizações -------
+  function renderHome() {
+    setPergaminho("v");
+    const { content } = ensureCanvas();
+    content.innerHTML = `
+      <h1 class="text-2xl md:text-3xl font-bold mb-2">Irmandade Conhecimento com Luz</h1>
+      <p class="mb-4 opacity-90">Bem-vindo! Clique para iniciar a Jornada Essencial.</p>
+      <div class="flex gap-2">
+        <button id="btn-ir-intro" class="px-4 py-2 rounded bg-blue-600 text-white">Ir para Introdução</button>
+      </div>
+    `;
+    document.getElementById("btn-ir-intro")?.addEventListener("click", renderIntro);
+  }
+
+  function renderIntro() {
+    setPergaminho("v");
+    const { content } = ensureCanvas();
+    content.innerHTML = `
+      <h2 class="text-xl md:text-2xl font-semibold mb-3">Introdução</h2>
+      <p class="mb-3">Orientações e Termo de Responsabilidade da Jornada.</p>
+      <ul class="list-disc pl-5 mb-4 opacity-90">
+        <li>Reservar um tempo tranquilo.</li>
+        <li>Respostas sinceras e pessoais.</li>
+        <li>Ao finalizar, você poderá baixar seu PDF e HQ.</li>
+      </ul>
+      <div class="flex gap-2">
+        <button id="btn-iniciar" class="px-4 py-2 rounded bg-green-600 text-white">Iniciar</button>
+        <button id="btn-voltar-home" class="px-3 py-2 rounded bg-gray-700 text-white">Voltar ao Início</button>
+      </div>
+    `;
+    document.getElementById("btn-iniciar")?.addEventListener("click", () => {
+      try { HOOKS.onStart(); } catch (e) { console.warn(e); }
+      renderPerguntas();
+    });
+    document.getElementById("btn-voltar-home")?.addEventListener("click", renderHome);
+  }
+
+  function renderPerguntas() {
+    setPergaminho("h");
+    const { content } = ensureCanvas();
+    // OBS: o formulário aqui é exemplo; o CORE pode substituir via HOOKS/templating
+    content.innerHTML = `
+      <h2 class="text-xl md:text-2xl font-semibold mb-3">Perguntas</h2>
+      <form id="form-perguntas" class="grid gap-3">
+        <label class="grid gap-1">
+          <span class="font-medium">1) Quem é você neste momento da jornada?</span>
+          <input name="q1" class="px-3 py-2 rounded border border-gray-300 bg-white/80" placeholder="Escreva aqui..." />
+        </label>
+        <label class="grid gap-1">
+          <span class="font-medium">2) Qual é sua maior força hoje?</span>
+          <input name="q2" class="px-3 py-2 rounded border border-gray-300 bg-white/80" placeholder="Escreva aqui..." />
+        </label>
+        <label class="grid gap-1">
+          <span class="font-medium">3) O que você precisa curar/superar?</span>
+          <input name="q3" class="px-3 py-2 rounded border border-gray-300 bg-white/80" placeholder="Escreva aqui..." />
+        </label>
+      </form>
+      <div class="mt-4 flex flex-wrap gap-2">
+        <button id="btn-voltar-intro" class="px-3 py-2 rounded bg-gray-700 text-white">Voltar à Introdução</button>
+        <button id="btn-finalizar" class="px-4 py-2 rounded bg-purple-700 text-white">Finalizar</button>
+      </div>
+    `;
+    document.getElementById("btn-voltar-intro")?.addEventListener("click", renderIntro);
+    document.getElementById("btn-finalizar")?.addEventListener("click", async () => {
+      try { await HOOKS.onFinalize(); } catch (e) { console.warn(e); }
+      renderFinal();
+    });
+  }
+
+  function renderFinal() {
+    setPergaminho("v");
+    const { content } = ensureCanvas();
+    content.innerHTML = `
+      <h2 class="text-xl md:text-2xl font-semibold mb-3">Finalização</h2>
+      <p class="mb-4">Parabéns! Agora você pode baixar seu PDF e sua HQ. Em seguida retornaremos à página inicial.</p>
+      <div class="flex gap-2">
+        <button id="btn-baixar" class="px-4 py-2 rounded bg-indigo-700 text-white">Baixar PDF + HQ</button>
+        <button id="btn-voltar-home" class="px-3 py-2 rounded bg-gray-700 text-white">Voltar ao Início</button>
+      </div>
+      <p id="status-download" class="mt-3 text-sm opacity-80"></p>
+    `;
+    document.getElementById("btn-baixar")?.addEventListener("click", async () => {
+      const status = document.getElementById("status-download");
+      try {
+        status.textContent = "Gerando seus arquivos…";
+        await HOOKS.onDownload(); // o CORE/BOOTSTRAP implementa a comunicação com a API
+        status.textContent = "PDF e HQ finalizados!";
+        // após concluir, voltar para Home
+        setTimeout(renderHome, 700);
+      } catch (e) {
+        console.error(e);
+        status.textContent = "Houve um problema ao gerar os arquivos. Tente novamente.";
+      }
+    });
+    document.getElementById("btn-voltar-home")?.addEventListener("click", renderHome);
+  }
+
+  // ------- Montagem & API pública -------
+  function mount({ startAt } = {}) {
+    ensureCanvas();
+    const first = startAt || CFG.START_SCREEN;
+    if (first === "intro") return renderIntro();
+    return renderHome();
+  }
+
+  function setHooks(hooks) {
+    if (!hooks || typeof hooks !== "object") return;
+    if (typeof hooks.onStart === "function") HOOKS.onStart = hooks.onStart;
+    if (typeof hooks.onFinalize === "function") HOOKS.onFinalize = hooks.onFinalize;
+    if (typeof hooks.onDownload === "function") HOOKS.onDownload = hooks.onDownload;
+  }
+
+  // Exporta para o mundo
+  window.JORNADA_RENDER = {
+    mount,
+    setHooks,
+    setPergaminho,
+    renderHome,
+    renderIntro,
+    renderPerguntas,
+    renderFinal,
+  };
+})();
