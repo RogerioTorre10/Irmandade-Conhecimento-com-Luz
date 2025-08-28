@@ -168,67 +168,71 @@ function goHome() { window.location.assign(HOME_PATH); }
     form.appendChild(row);
   });
 
-  // progresso
-  const fill  = content.querySelector("#jprog-fill");
-  const pctEl = content.querySelector("#jprog-pct");
-  const cntEl = content.querySelector("#jprog-count");
+    // progresso local
+  const localFill  = content.querySelector("#jprog-fill");
+  const localPctEl = content.querySelector("#jprog-pct");
+  const localCntEl = content.querySelector("#jprog-count");
 
-  function updateProgress(){
-    const done = QUESTIONS.countAnswered();
-    const pct  = totalQ ? Math.round((done/totalQ)*100) : 0;
-    fill.style.width = pct + "%";
-    pctEl.textContent = pct + "%";
-    cntEl.textContent = `${done}/${totalQ}`;
+  function updateLocalProgress(){
+    const done  = QUESTIONS.countAnswered();
+    const total = QUESTIONS.totalQuestions();
+    const pct   = total ? Math.round((done/total)*100) : 0;
+    if (localFill)  localFill.style.width = pct + "%";
+    if (localPctEl) localPctEl.textContent = pct + "%";
+    if (localCntEl) localCntEl.textContent = `${done}/${total}`;
   }
 
-  form.addEventListener("input", (e)=>{
-    const ta = e.target.closest("textarea"); if(!ta) return;
+  // salvar + atualizar
+  content.querySelector("#form-perguntas").addEventListener("input", (e)=>{
+    const ta = e.target.closest("textarea"); if (!ta) return;
     QUESTIONS.setAnswer(ta.dataset.key, ta.value);
-    updateProgress();
+    updateLocalProgress();
+    updateGlobalProgress?.();
   });
 
-  // totalPerguntas = 50, sendo 5 blocos de 10
-const totalPerguntas = 50;
-const feitas = (blockIndex * 10); // + número de perguntas já passadas
-const pct = Math.round((feitas / totalPerguntas) * 100);
+  updateLocalProgress();
+  updateGlobalProgress?.();
 
-// Atualiza badge
-const badge = document.getElementById("progress-badge");
-if (badge) badge.textContent = `${pct}% concluído`;
+  // ====== NAVEGAÇÃO APENAS PRA FRENTE + VÍDEO ======
+  function playTransitionVideoForBlock(nextIndex, callback) {
+    const overlay = document.getElementById("video-overlay");
+    const video   = document.getElementById("transition-video");
+    if (!overlay || !video) return callback?.();
 
-// Atualiza barra
-const barFill = document.getElementById("progress-bar-fill"); // <- nome novo
-if (barFill) barFill.style.width = `${pct}%`;
+    // nomeie seus vídeos como /assets/img/transicao-2.mp4, -3.mp4, ...
+    const src = `/assets/img/transicao-${nextIndex}.mp4`;
+    video.src = src;
+    overlay.classList.remove("hidden");
 
-  // navegação
-  // Botão anterior
-content.querySelector("#btn-prev")?.addEventListener("click", (ev)=>{
-  ev.preventDefault();
-  if (blockIndex > 0) {
-    playTransitionVideoForBlock(blockIndex, ()=> {
-      renderPerguntas(blockIndex-1);
+    video.onended = () => {
+      overlay.classList.add("hidden");
+      callback?.();
+    };
+    video.play().catch(() => {
+      overlay.classList.add("hidden");
+      callback?.();
     });
-  } else {
-    renderIntro();
   }
-});
 
-// Botão próximo
-content.querySelector("#btn-next")?.addEventListener("click", (ev)=>{
-  ev.preventDefault();
-  if (blockIndex < QUESTIONS.totalBlocks()-1) {
-    playTransitionVideoForBlock(blockIndex+1, ()=> {
-      renderPerguntas(blockIndex+1);
-    });
-  } else {
-    renderAcolhimento();
-  }
-});
+  // Botão PRÓXIMO (sem voltar)
+  content.querySelector("#btn-next")?.addEventListener("click", (ev)=>{
+    ev.preventDefault();
+    const lastIndex = QUESTIONS.totalBlocks() - 1;
+    if (blockIndex < lastIndex) {
+      const nextIdx = blockIndex + 1;
+      playTransitionVideoForBlock(nextIdx, ()=> renderPerguntas(nextIdx));
+    } else {
+      // chegou ao fim dos blocos
+      renderAcolhimento();
+    }
+  });
 
-  // datilografia (um pouco mais ágil aqui)
+  // datilografia
   requestAnimationFrame(()=>{ try{
-    JORNADA_TYPO?.typeAll("#jornada-conteudo", { force:true, speed:28, maxTotalMs:5000 });
+    JORNADA_TYPO?.typeAll("#jornada-conteudo",{ force:true, speed:28, maxTotalMs:5000 });
   }catch(e){} });
+} // <-- FECHA a função renderPerguntas (sem ')' sobrando)
+
          
  function renderFinal() {
   setPergaminho("v");
