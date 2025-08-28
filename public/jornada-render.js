@@ -120,40 +120,88 @@
     document.getElementById("btn-voltar-home")?.addEventListener("click", renderHome);
   }
 
-  function renderPerguntas() {
-    setPergaminho("h");
-    const { content } = ensureCanvas();
-    content.innerHTML = `
-      <h2 class="text-xl md:text-2xl font-semibold mb-3">Perguntas</h2>
-      <form id="form-perguntas" class="grid gap-3">
-        <label class="grid gap-1">
-          <span class="font-medium">1) Quem é você neste momento da jornada?</span>
-          <input name="q1" class="px-3 py-2 rounded border border-gray-300 bg-white/80" placeholder="Escreva aqui..." />
-        </label>
-        <label class="grid gap-1">
-          <span class="font-medium">2) Qual é sua maior força hoje?</span>
-          <input name="q2" class="px-3 py-2 rounded border border-gray-300 bg-white/80" placeholder="Escreva aqui..." />
-        </label>
-      </form>
-      <div class="mt-4 flex flex-wrap gap-2">
-        <button id="btn-voltar-intro" class="px-3 py-2 rounded btn-secondary">Voltar à Introdução</button>
-        <button id="btn-finalizar" class="px-4 py-2 rounded btn-primary">Finalizar</button>
+ function renderPerguntas(blockIndex = 0) {
+  setPergaminho("h");
+  const { content } = ensureCanvas();
+
+  const bloc = QUESTIONS.BLOCS[blockIndex];
+  if (!bloc) return renderFinal();
+
+  const totalBlocks = QUESTIONS.totalBlocks();
+  const totalQ = QUESTIONS.totalQuestions();
+
+  content.innerHTML = `
+    <h2 class="text-xl md:text-2xl font-semibold mb-1">${bloc.title}</h2>
+
+    <div class="j-progress">
+      <div class="j-progress__bar"><div class="j-progress__fill" id="jprog-fill"></div></div>
+      <div class="j-progress__meta">
+        <span><b id="jprog-pct">0%</b> — <span id="jprog-count">0/${totalQ}</span> respondidas</span>
+        <span>Bloco ${blockIndex+1}/${totalBlocks}</span>
       </div>
-      `;
-      requestAnimationFrame(() => {
-      try {
-      JORNADA_TYPO?.typeAll("#jornada-conteudo", {
-      force: true,        // ignora "reduce motion"
-      speed: 28,       
-      maxTotalMs: 5000 
-    });
-  } catch (e) { console.warn(e); }
-});
-     
-    document.getElementById("btn-voltar-intro")?.addEventListener("click", renderIntro);
-    document.getElementById("btn-finalizar")?.addEventListener("click", renderFinal);
+    </div>
+
+    <form id="form-perguntas" class="grid gap-3"></form>
+
+    <div class="mt-4 flex flex-wrap gap-2">
+      <button id="btn-prev" class="px-3 py-2 rounded btn-secondary">◀ Voltar</button>
+      <button id="btn-next" class="px-4 py-2 rounded btn-primary">Avançar ▶</button>
+    </div>
+  `;
+
+  // monta as questões do bloco
+  const form = content.querySelector("#form-perguntas");
+  bloc.items.forEach((texto, qi) => {
+    const key = QUESTIONS.keyFor(blockIndex, qi);
+    const value = QUESTIONS.getAnswer(key);
+    const row = document.createElement("label");
+    row.className = "grid gap-1";
+    row.innerHTML = `
+      <span class="font-medium">${qi+1}) ${texto}</span>
+      <textarea rows="2" data-key="${key}" class="px-3 py-2 rounded border border-gray-300 bg-white/85"
+        placeholder="Escreva aqui...">${value}</textarea>
+    `;
+    form.appendChild(row);
+  });
+
+  // progresso
+  const fill  = content.querySelector("#jprog-fill");
+  const pctEl = content.querySelector("#jprog-pct");
+  const cntEl = content.querySelector("#jprog-count");
+
+  function updateProgress(){
+    const done = QUESTIONS.countAnswered();
+    const pct  = totalQ ? Math.round((done/totalQ)*100) : 0;
+    fill.style.width = pct + "%";
+    pctEl.textContent = pct + "%";
+    cntEl.textContent = `${done}/${totalQ}`;
   }
 
+  form.addEventListener("input", (e)=>{
+    const ta = e.target.closest("textarea"); if(!ta) return;
+    QUESTIONS.setAnswer(ta.dataset.key, ta.value);
+    updateProgress();
+  });
+
+  updateProgress();
+
+  // navegação
+  content.querySelector("#btn-prev")?.addEventListener("click", (ev)=>{
+    ev.preventDefault();
+    if (blockIndex > 0) renderPerguntas(blockIndex-1); else renderIntro();
+  });
+
+  content.querySelector("#btn-next")?.addEventListener("click", (ev)=>{
+    ev.preventDefault();
+    if (blockIndex < totalBlocks-1) renderPerguntas(blockIndex+1);
+    else renderAcolhimento(); // depois do último bloco
+  });
+
+  // datilografia (um pouco mais ágil aqui)
+  requestAnimationFrame(()=>{ try{
+    JORNADA_TYPO?.typeAll("#jornada-conteudo", { force:true, speed:28, maxTotalMs:5000 });
+  }catch(e){} });
+         
   function renderFinal() {
     setPergaminho("v");
     const { content } = ensureCanvas();
