@@ -7,8 +7,8 @@
     {
       CANVAS_ID: "jornada-canvas",
       CONTENT_ID: "jornada-conteudo",
-      PERGAMINHO_VERT: "/assets/img/perg-vert.png",
-      PERGAMINHO_HORIZ: "/assets/img/perg-horiz.png",
+      PERGAMINHO_VERT: "/assets/img/pergaminho-rasgado-vert.png",
+      PERGAMINHO_HORIZ: "/assets/img/pergaminho-rasgado-horiz.png",
     },
     window.JORNADA_CFG || {}
   );
