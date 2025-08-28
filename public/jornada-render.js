@@ -201,16 +201,29 @@ const barFill = document.getElementById("progress-bar-fill"); // <- nome novo
 if (barFill) barFill.style.width = `${pct}%`;
 
   // navegação
-  content.querySelector("#btn-prev")?.addEventListener("click", (ev)=>{
-    ev.preventDefault();
-    if (blockIndex > 0) renderPerguntas(blockIndex-1); else renderIntro();
-  });
+  // Botão anterior
+content.querySelector("#btn-prev")?.addEventListener("click", (ev)=>{
+  ev.preventDefault();
+  if (blockIndex > 0) {
+    playTransitionVideoForBlock(blockIndex, ()=> {
+      renderPerguntas(blockIndex-1);
+    });
+  } else {
+    renderIntro();
+  }
+});
 
-  content.querySelector("#btn-next")?.addEventListener("click", (ev)=>{
-    ev.preventDefault();
-    if (blockIndex < totalBlocks-1) renderPerguntas(blockIndex+1);
-    else renderAcolhimento(); // depois do último bloco
-  });
+// Botão próximo
+content.querySelector("#btn-next")?.addEventListener("click", (ev)=>{
+  ev.preventDefault();
+  if (blockIndex < QUESTIONS.totalBlocks()-1) {
+    playTransitionVideoForBlock(blockIndex+1, ()=> {
+      renderPerguntas(blockIndex+1);
+    });
+  } else {
+    renderAcolhimento();
+  }
+});
 
   // datilografia (um pouco mais ágil aqui)
   requestAnimationFrame(()=>{ try{
