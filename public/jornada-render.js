@@ -16,6 +16,11 @@
     },
     window.JORNADA_CFG || {}
   );
+   // Para redirecionar à página inicial do site.
+// Se sua home estiver num subcaminho (ex.: /irmandade/), troque HOME_PATH.
+const HOME_PATH = "/";
+function goHome() { window.location.assign(HOME_PATH); }
+
    
 // ---------- utilitários ----------
    function activateJornada() {
@@ -201,28 +206,56 @@
     JORNADA_TYPO?.typeAll("#jornada-conteudo", { force:true, speed:28, maxTotalMs:5000 });
   }catch(e){} });
          
-  function renderFinal() {
-    setPergaminho("v");
-    const { content } = ensureCanvas();
-    content.innerHTML = `
-      <h2 class="text-xl md:text-2xl font-semibold mb-3">Conclusão da Jornada</h2>
-      <p class="mb-4">Respire. Seu caminho foi registrado com coragem e verdade.</p>
-      <div class="flex gap-2">
-        <button id="btn-voltar-home" class="px-3 py-2 rounded btn-secondary">Voltar ao Início</button>
-      </div>
-      `;
-     requestAnimationFrame(() => {
-     try {
-     JORNADA_TYPO?.typeAll("#jornada-conteudo", {
-      force: true,        // ignora "reduce motion"
-      speed: 34,       // mais lento (antes era ~20-22)
-      maxTotalMs: 7500 // até 6s por tela (mais suave)
-    });
-  } catch (e) { console.warn(e); }
-});
-     
-    document.getElementById("btn-voltar-home")?.addEventListener("click", renderHome);
-  }
+ function renderFinal() {
+  setPergaminho("v");
+  const { content } = ensureCanvas();
+  content.innerHTML = `
+    <h2 class="text-xl md:text-2xl font-semibold mb-3">Conclusão da Jornada</h2>
+    <p class="mb-4">Respire. Seu caminho foi registrado com coragem e verdade.</p>
+
+    <div class="flex gap-2 mb-3">
+      <button id="btn-download" class="px-4 py-2 rounded btn-primary">
+        Baixar PDF + HQ
+      </button>
+
+      <!-- backup direto para a home, caso o usuário queira pular o download -->
+      <a id="link-home" class="btn btn-secondary px-3 py-2 rounded" href="/">Voltar ao início</a>
+    </div>
+
+    <small class="opacity-80">Após concluir o download você será levado(a) para a página inicial.</small>
+  `;
+
+  // efeito de datilografia (mais suave na final)
+  requestAnimationFrame(() => {
+    try {
+      JORNADA_TYPO?.typeAll("#jornada-conteudo", { force: true, speed: 28, maxTotalMs: 6000 });
+    } catch (e) {}
+  });
+
+  // handler do botão de download
+  const btn = document.getElementById("btn-download");
+  btn?.addEventListener("click", async () => {
+    btn.disabled = true;
+    btn.textContent = "Preparando arquivos...";
+
+    // tenta usar sua função real, se existir. Senão, faz um "aguarde" curto.
+    const baixar = (window.JORNADA_CORE && window.JORNADA_CORE.baixarArquivos)
+      ? window.JORNADA_CORE.baixarArquivos
+      : () => new Promise(r => setTimeout(r, 1200));
+
+    try {
+      await baixar();                 // << aqui acontece seu download real
+      // dica UX: confirma visualmente
+      btn.textContent = "Downloads prontos!";
+    } catch (e) {
+      console.warn("Falha ao gerar arquivos:", e);
+      // segue para home mesmo assim
+    } finally {
+      // leva direto para a home
+      goHome();
+    }
+  });
+}
 
   // ---------- API pública ----------
   function mount({ startAt } = {}) {
