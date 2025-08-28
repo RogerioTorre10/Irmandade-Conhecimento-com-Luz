@@ -89,3 +89,15 @@
     countAnswered,
   };
 })();
+
+<script src="/jornada-utils.js"></script>
+<script src="/jornada-core.js"></script>
+
+<script src="/jornada-auth.js"></script>
+<script src="/questions.js"></script>
+
+<script src="/jornada-typing-font.js"></script>
+<script src="/jornada-render.js"></script>
+<script src="/jornada-bootstrap.js"></script>
+
+
