@@ -3,73 +3,101 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Jornada Essencial · Irmandade Conhecimento com Luz</title>
+  <title>Jornada • Irmandade Conhecimento com Luz</title>
+
+  <!-- estilos principais do site -->
   <link rel="stylesheet" href="/styles.css">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 </head>
 <body>
-  <header class="site-header">
-    <h1>Jornada Essencial</h1>
-    <p id="status"></p>
-  </header>
 
-  <!-- /public/jornada-conhecimento-com-luz1.html -->
-<div class="flex justify-end">
-  <nav class="lang-switch" aria-label="Escolher idioma">
-    <button class="lang-btn" data-lang="pt">PT</button>
-    <button class="lang-btn" data-lang="en">EN</button>
-    <button class="lang-btn" data-lang="es">ES</button>
-  </nav>
-</div>
+  <!-- ===== Casca estática (some quando a jornada ativa) ===== -->
+  <main id="page-shell" class="container">
+    <header class="site-header">
+      <h1>Jornada Essencial</h1>
+      <p id="status">Orientações e Termo de Responsabilidade da Jornada.</p>
+    </header>
 
+    <div class="container">
+      <a class="btn btn-primary" href="#intro">Ir para Introdução</a>
+      <a class="btn" href="/jornadas.html">← Voltar</a>
+    </div>
 
-  <main class="container">
-    <div id="app"></div>
-    <a class="btn" href="/jornadas.html">← Voltar</a>
+    <footer class="site-footer">
+      <small>© 2025 Irmandade Conhecimento com Luz</small>
+    </footer>
   </main>
 
-  <!-- Canvas dinâmico da Jornada -->
-<section id="jornada-canvas" class="card pergaminho" style="display:none;">
+  <!-- ===== Canvas dinâmico da Jornada (pergaminho + conteúdo) ===== -->
+  <section id="jornada-canvas" class="card pergaminho" style="display:none;">
+    <!-- badge no topo direito -->
+    <div class="progress-badge" id="jprog-pct">0% concluído</div>
 
-  <!-- badge no canto superior direito -->
-  <div class="progress-badge" id="jprog-pct">0% concluído</div>
+    <!-- barra de progresso -->
+    <div class="progress-bar">
+      <div class="progress-bar-fill" id="jprog-fill"></div>
+    </div>
 
-  <!-- barra de progresso -->
-  <div class="progress-bar">
-    <div class="progress-bar-fill" id="jprog-fill"></div>
-  </div>
+    <!-- onde as telas (intro/perguntas/final) serão injetadas -->
+    <div id="jornada-conteudo" class="conteudo-pergaminho"></div>
+  </section>
 
-  <!-- contador no canto inferior -->
-  <div id="jprog-count" class="progress-count">0/0</div>
+  <!-- ==========================================================
+       SCRIPTS — A ORDEM IMPORTA!
+       ========================================================== -->
 
-  <!-- conteúdo digitado -->
-  <div id="jornada-conteudo" class="conteudo-pergaminho"></div>
-</section>
-  
-  <footer class="site-footer">
-    <small>© 2025 Irmandade Conhecimento com Luz</small>
-  </footer>
+  <!-- Núcleo / utilidades -->
+  <script src="/jornada-utils.js"></script>
+  <script src="/jornada-core.js"></script>
 
-  <!-- /public/jornada-conhecimento-com-luz1.html -->
-<script src="/i18n/i18n.js"></script>
+  <!-- Módulos -->
+  <script src="/jornada-auth.js"></script>
 
-<!-- ===== Núcleo (deve vir primeiro) ===== -->
-<script src="/jornada-utils.js"></script>
-<script src="/jornada-core.js"></script>
+  <!-- PERGUNTAS (deve vir ANTES do render/bootstrap) -->
+  <script src="/jornada-paper-qa.js"></script>
 
-<!-- ===== Módulos opcionais/temáticos ===== -->
-<!-- Gate de senha + olho mágico -->
-<script src="/jornada-auth.js"></script>
+  <!-- Datilografia (opcional, se estiver usando) -->
+  <script src="/jornada-typing-font.js"></script>
 
-<!-- Pergaminho + perguntas (V/H) -->
-<script src="/jornada-paper-qa.js"></script>
+  <!-- Renderização + bootstrap da jornada -->
+  <script src="/jornada-render.js"></script>
+  <script src="/jornada-bootstrap.js"></script>
 
-<!-- Tipografia + datilografia (disponível para o render usar) -->
-<script src="/jornada-typing-font.js"></script>
+  <!-- Kickoff: liga a jornada ao abrir a página / rota via hash -->
+  <script>
+    (function () {
+      // Se existir um ativador dedicado, use; senão, garante classe no body
+      if (typeof window.activateJornada === 'function') {
+        try { window.activateJornada(); } catch (e) { document.body.classList.add('jornada-active'); }
+      } else {
+        document.body.classList.add('jornada-active');
+      }
 
-<!-- ===== Camada de renderização e bootstrap ===== -->
-<script src="/jornada-render.js"></script>
-<script src="/navigation.js"></script>
-<script src="/jornada-bootstrap.js"></script>
+      // Rota pela âncora: #intro | #perguntas | #final
+      const route = (location.hash || '#intro').slice(1);
+
+      // Se houver um mount() (alguns boots criam), prefira usar:
+      if (typeof window.mount === 'function') {
+        window.mount({ startAt: route });
+        return;
+      }
+
+      // Fallback direto usando a API pública do render
+      if (!window.JORNADA_RENDER) {
+        console.error('JORNADA_RENDER não disponível. Confira a ORDEM dos scripts.');
+        return;
+      }
+
+      if (route === 'intro') {
+        JORNADA_RENDER.renderIntro();
+      } else if (route === 'perguntas') {
+        JORNADA_RENDER.renderPerguntas(0);
+      } else if (route === 'final') {
+        JORNADA_RENDER.renderFinal();
+      } else {
+        JORNADA_RENDER.renderIntro();
+      }
+    })();
+  </script>
 </body>
 </html>
-
