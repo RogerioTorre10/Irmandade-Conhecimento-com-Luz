@@ -228,7 +228,7 @@ function goHome() { window.location.assign(HOME_PATH); }
   // efeito de datilografia (mais suave na final)
   requestAnimationFrame(() => {
     try {
-      JORNADA_TYPO?.typeAll("#jornada-conteudo", { force: true, speed: 28, maxTotalMs: 6000 });
+      JORNADA_TYPO?.typeAll("#jornada-conteudo", { force: true, speed: 34, maxTotalMs: 7500 });
     } catch (e) {}
   });
 
