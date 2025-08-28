@@ -240,5 +240,12 @@ footer {
 }
 .j-progress__meta b { font-weight: 700; }
 
+/* ====== Progresso do questionário ====== */
+.j-progress{ margin:6px 0 14px; }
+.j-progress__bar{ width:100%; height:10px; border-radius:999px; background:rgba(255,255,255,.14); overflow:hidden; }
+.j-progress__fill{ height:100%; width:0%; transition:width .25s ease; background:linear-gradient(90deg,#f59e0b,#fde68a); }
+.j-progress__meta{ margin-top:6px; font-size:.95rem; opacity:.9; display:flex; justify-content:space-between; gap:8px; }
+
+
 
 
