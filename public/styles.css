@@ -275,6 +275,67 @@ footer {
   background: linear-gradient(90deg, #ffcf70, #ff8c00);
   transition: width 0.5s ease-out;
 }
+/* ============ ManufacturingConsent (títulos, botões e textos gerais) ============ */
+@font-face{
+  font-family: 'ManufacturingConsent';
+  src: url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Global: tudo usa ManufacturingConsent por padrão */
+body{
+  font-family: 'ManufacturingConsent', Georgia, 'Times New Roman', serif;
+}
+
+/* Títulos e subtítulos (garantia explícita) */
+h1, h2, h3, h4, .site-header h1, .card h2 {
+  font-family: 'ManufacturingConsent', Georgia, 'Times New Roman', serif;
+}
+
+/* Botões (nomes nos botões) */
+.btn, .btn-primary, .btn-secondary {
+  font-family: 'ManufacturingConsent', Georgia, 'Times New Roman', serif;
+  letter-spacing: .3px;
+}
+
+/* ====== ÁREA DE PERGUNTAS: manter Cardo ====== */
+/* Títulos “Perguntas” continuam ManufacturingConsent (padrão do body).
+   Apenas o enunciado e os campos ficam em Cardo. */
+
+/* Enunciados das perguntas (o texto “1) …”) */
+#jornada-conteudo form label span,
+#form-perguntas label span {
+  font-family: 'Cardo', Georgia, 'Times New Roman', serif;
+}
+
+/* Campos de resposta */
+#jornada-conteudo textarea,
+#jornada-conteudo input[type="text"],
+#jornada-conteudo input[type="email"],
+#jornada-conteudo input[type="number"],
+#form-perguntas textarea,
+#form-perguntas input[type="text"],
+#form-perguntas input[type="email"],
+#form-perguntas input[type="number"]{
+  font-family: 'Cardo', Georgia, 'Times New Roman', serif;
+}
+
+/* Meta/progresso local do bloco: números legíveis em Cardo */
+.j-progress, .j-progress__meta, .j-progress__meta span {
+  font-family: 'Cardo', Georgia, 'Times New Roman', serif;
+}
+
+/* Acolhimento (campo grande final) em Cardo */
+#acolh {
+  font-family: 'Cardo', Georgia, 'Times New Roman', serif;
+}
+
+/* Badge e contadores globais no pergaminho continuam ManufacturingConsent */
+.progress-badge, #jprog-count {
+  font-family: 'ManufacturingConsent', Georgia, 'Times New Roman', serif;
+}
 
 
 
