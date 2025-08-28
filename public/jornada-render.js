@@ -90,7 +90,7 @@ function goHome() { window.location.assign(HOME_PATH); }
      try {
     JORNADA_TYPO?.typeAll("#jornada-conteudo", {
       force: true,        // ignora "reduce motion"
-      speed: 34,       // mais lento (antes era ~20-22)
+      speed: 20,       // mais lento (antes era ~20-22)
       maxTotalMs: 7500 // até 6s por tela (mais suave)
     });
   } catch (e) { console.warn(e); }
@@ -114,7 +114,7 @@ function goHome() { window.location.assign(HOME_PATH); }
      try {
     JORNADA_TYPO?.typeAll("#jornada-conteudo", {
       force: true,        // ignora "reduce motion"
-      speed: 34,       // mais lento (antes era ~20-22)
+      speed: 20,       // mais lento (antes era ~20-22)
       maxTotalMs: 7500 // até 6s por tela (mais suave)
     });
   } catch (e) { console.warn(e); }
@@ -256,7 +256,7 @@ function goHome() { window.location.assign(HOME_PATH); }
   // efeito de datilografia (mais suave na final)
   requestAnimationFrame(() => {
     try {
-      JORNADA_TYPO?.typeAll("#jornada-conteudo", { force: true, speed: 34, maxTotalMs: 7500 });
+      JORNADA_TYPO?.typeAll("#jornada-conteudo", { force: true, speed: 20, maxTotalMs: 7500 });
     } catch (e) {}
   });
 
