@@ -148,8 +148,7 @@ function goHome() { window.location.assign(HOME_PATH); }
     <form id="form-perguntas" class="grid gap-3"></form>
 
     <div class="mt-4 flex flex-wrap gap-2">
-      <button id="btn-prev" class="px-3 py-2 rounded btn-secondary">◀ Voltar</button>
-      <button id="btn-next" class="px-4 py-2 rounded btn-primary">Avançar ▶</button>
+    <button id="btn-next" class="px-4 py-2 rounded btn-primary">Avançar ▶</button>
     </div>
   `;
 
@@ -247,9 +246,11 @@ function goHome() { window.location.assign(HOME_PATH); }
       </button>
 
       <!-- backup direto para a home, caso o usuário queira pular o download -->
-      <a id="link-home" class="btn btn-secondary px-3 py-2 rounded" href="/">Voltar ao início</a>
+      <a id="link-home"
+   class="btn btn-secondary px-3 py-2 rounded"
+   href="/jornadas.html"           <!-- fallback se JS falhar -->
+   data-nav="home">← Voltar ao início</a>
     </div>
-
     <small class="opacity-80">Após concluir o download você será levado(a) para a página inicial.</small>
   `;
 
