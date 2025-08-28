@@ -336,6 +336,52 @@ h1, h2, h3, h4, .site-header h1, .card h2 {
 .progress-badge, #jprog-count {
   font-family: 'ManufacturingConsent', Georgia, 'Times New Roman', serif;
 }
+/* ==========================
+   Tipografia Épica
+   ========================== */
+
+/* Títulos e subtítulos */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'ManufacturingConsent', 'Georgia', serif;
+  letter-spacing: 1px;       /* dá o ar manuscrito */
+  text-transform: none;      /* mantém natural */
+}
+
+/* Botões */
+button, .btn {
+  font-family: 'ManufacturingConsent', 'Georgia', serif;
+  font-weight: normal;
+  letter-spacing: 0.5px;
+}
+
+/* Badge e elementos épicos */
+.progress-badge {
+  font-family: 'ManufacturingConsent', 'Georgia', serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+}
+
+/* Perguntas e respostas continuam no Cardo */
+label, textarea, input, .pergunta, .resposta {
+  font-family: 'Cardo', serif;
+}
+/* ==========================
+   Menus e navegação da Home
+   ========================== */
+
+/* Links principais da home */
+nav a, 
+a.btn, 
+.site-header h1, 
+.site-header p {
+  font-family: 'ManufacturingConsent', 'Georgia', serif;
+  letter-spacing: 0.5px;
+}
+
+/* Links menores (como "Repositório") */
+a {
+  font-family: 'ManufacturingConsent', 'Georgia', serif;
+}
 
 
 
