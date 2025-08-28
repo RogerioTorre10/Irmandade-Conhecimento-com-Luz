@@ -123,112 +123,59 @@ function goHome() { window.location.assign(HOME_PATH); }
     document.getElementById("btn-iniciar")?.addEventListener("click", renderPerguntas);
   }
 
- function renderPerguntas(blockIndex = 0) {
+function renderPerguntas(blockIndex = 0) {
+  // mostra pergaminho na horizontal
   setPergaminho("h");
   const { content } = ensureCanvas();
 
-  const bloc = QUESTIONS.BLOCS[blockIndex];
-  if (!bloc) return renderFinal();
+  // 5 perguntas de teste (edite à vontade)
+  const PERGUNTAS = [
+    { name: "q1", label: "Quem é você neste momento da jornada?" },
+    { name: "q2", label: "Qual é sua maior força hoje?" },
+    { name: "q3", label: "O que você precisa curar/superar?" },
+    { name: "q4", label: "Qual foi um pequeno ato de amor com você hoje?" },
+    { name: "q5", label: "Qual a próxima pequena ação que você se compromete?" }
+  ];
 
-  const totalBlocks = QUESTIONS.totalBlocks();
-  const totalQ = QUESTIONS.totalQuestions();
-
-  content.innerHTML = `
-    <h2 class="text-xl md:text-2xl font-semibold mb-1">${bloc.title}</h2>
-
-    <div class="j-progress">
-      <div class="j-progress__bar"><div class="j-progress__fill" id="jprog-fill"></div></div>
-      <div class="j-progress__meta">
-        <span><b id="jprog-pct">0%</b> — <span id="jprog-count">0/${totalQ}</span> respondidas</span>
-        <span>Bloco ${blockIndex+1}/${totalBlocks}</span>
-      </div>
-    </div>
-
-    <form id="form-perguntas" class="grid gap-3"></form>
-
-    <div class="mt-4 flex flex-wrap gap-2">
-    <button id="btn-next" class="px-4 py-2 rounded btn-primary">Avançar ▶</button>
-    </div>
-  `;
-
-  // monta as questões do bloco
-  const form = content.querySelector("#form-perguntas");
-  bloc.items.forEach((texto, qi) => {
-    const key = QUESTIONS.keyFor(blockIndex, qi);
-    const value = QUESTIONS.getAnswer(key);
-    const row = document.createElement("label");
-    row.className = "grid gap-1";
-    row.innerHTML = `
-      <span class="font-medium">${qi+1}) ${texto}</span>
-      <textarea rows="2" data-key="${key}" class="px-3 py-2 rounded border border-gray-300 bg-white/85"
-        placeholder="Escreva aqui...">${value}</textarea>
-    `;
-    form.appendChild(row);
-  });
-
-    // progresso local
-  const localFill  = content.querySelector("#jprog-fill");
-  const localPctEl = content.querySelector("#jprog-pct");
-  const localCntEl = content.querySelector("#jprog-count");
-
-  function updateLocalProgress(){
-    const done  = QUESTIONS.countAnswered();
-    const total = QUESTIONS.totalQuestions();
-    const pct   = total ? Math.round((done/total)*100) : 0;
-    if (localFill)  localFill.style.width = pct + "%";
-    if (localPctEl) localPctEl.textContent = pct + "%";
-    if (localCntEl) localCntEl.textContent = `${done}/${total}`;
-  }
-
-  // salvar + atualizar
-  content.querySelector("#form-perguntas").addEventListener("input", (e)=>{
-    const ta = e.target.closest("textarea"); if (!ta) return;
-    QUESTIONS.setAnswer(ta.dataset.key, ta.value);
-    updateLocalProgress();
-    updateGlobalProgress?.();
-  });
-
-  updateLocalProgress();
-  updateGlobalProgress?.();
-
-  // ====== NAVEGAÇÃO APENAS PRA FRENTE + VÍDEO ======
-  function playTransitionVideoForBlock(nextIndex, callback) {
-    const overlay = document.getElementById("video-overlay");
-    const video   = document.getElementById("transition-video");
-    if (!overlay || !video) return callback?.();
-
-    // nomeie seus vídeos como /assets/img/transicao-2.mp4, -3.mp4, ...
-    const src = `/assets/img/transicao-${nextIndex}.mp4`;
-    video.src = src;
-    overlay.classList.remove("hidden");
-
-    video.onended = () => {
-      overlay.classList.add("hidden");
-      callback?.();
-    };
-    video.play().catch(() => {
-      overlay.classList.add("hidden");
-      callback?.();
-    });
-  }
-
-  // Botão PRÓXIMO (sem voltar)
-  content.querySelector("#btn-next")?.addEventListener("click", (ev)=>{
-    ev.preventDefault();
-    const lastIndex = QUESTIONS.totalBlocks() - 1;
-    if (blockIndex < lastIndex) {
-      const nextIdx = blockIndex + 1;
-      playTransitionVideoForBlock(nextIdx, ()=> renderPerguntas(nextIdx));
-    } else {
-      // chegou ao fim dos blocos
-      renderAcolhimento();
+  // Renderiza o formulário no #jornada-conteudo
+  JORNADA_QA.mount(
+    undefined,            // usa #jornada-conteudo por padrão
+    PERGUNTAS,
+    {
+      onBack() {
+        // sem "voltar" entre blocos: volta pra introdução
+        renderIntro();
+      },
+      onFinish() {
+        // salva e vai pra tela final
+        try { salvarRespostas?.(); } catch(e){}
+        renderFinal();
+      }
     }
-  });
+  );
 
-  // datilografia
-  requestAnimationFrame(()=>{ try{
-    JORNADA_TYPO?.typeAll("#jornada-conteudo",{ force:true, speed:28, maxTotalMs:5000 });
-  }catch(e){} });
+  // --- progresso simples (badge e barra) ---
+  const inputs = content.querySelectorAll('#form-perguntas input, #form-perguntas textarea');
+  function updateProg() {
+    const total = inputs.length || 1;
+    const feitas = [...inputs].filter(i => i.value.trim().length > 0).length;
+    const pct = Math.round((feitas / total) * 100);
+
+    const progBadge = document.getElementById('jprog-pct');
+    if (progBadge) progBadge.textContent = `${pct}% concluído`;
+
+    const progFill = document.getElementById('jprog-fill');
+    if (progFill) progFill.style.width = `${pct}%`;
+  }
+  inputs.forEach(i => i.addEventListener('input', updateProg));
+  updateProg();
+
+  // datilografia mais lenta no conteúdo (se estiver usando)
+  try {
+    requestAnimationFrame(() => {
+      JORNADA_TYPO?.typeAll("#jornada-conteudo", { force:true, speed:36, maxTotalMs:7500 });
+    });
+  } catch {}
 } // <-- FECHA a função renderPerguntas (sem ')' sobrando)
 
          
