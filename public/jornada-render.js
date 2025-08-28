@@ -121,7 +121,6 @@ function goHome() { window.location.assign(HOME_PATH); }
 });
      
     document.getElementById("btn-iniciar")?.addEventListener("click", renderPerguntas);
-    document.getElementById("btn-voltar-home")?.addEventListener("click", renderHome);
   }
 
  function renderPerguntas(blockIndex = 0) {
