@@ -90,7 +90,6 @@
     });
   } catch (e) { console.warn(e); }
 });
-
      
     document.getElementById("btn-ir-intro")?.addEventListener("click", renderIntro);
   }
