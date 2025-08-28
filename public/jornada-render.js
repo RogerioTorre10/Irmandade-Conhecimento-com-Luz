@@ -287,3 +287,27 @@ if (barFill) barFill.style.width = `${pct}%`;
     renderFinal,
   };
 })();
+
+function playTransitionVideoForBlock(nextIndex, callback) {
+  const overlay = document.getElementById("video-overlay");
+  const video = document.getElementById("transition-video");
+  if (!overlay || !video) return callback?.();
+
+  // monta o caminho do vídeo baseado no próximo bloco
+  const src = `/assets/img/transicao-${nextIndex}.mp4`;  
+  video.src = src;
+  overlay.classList.remove("hidden");
+
+  video.onended = () => {
+    overlay.classList.add("hidden");
+    callback?.();
+  };
+
+  video.play().catch(() => {
+    // fallback se autoplay não rolar
+    overlay.classList.add("hidden");
+    callback?.();
+  });
+}
+
+
