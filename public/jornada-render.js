@@ -1,192 +1,289 @@
 /* ============================================
-   jornada-auth.js — Gate de Senha + Olho + Expiração
-   Expondo: window.JORNADA_AUTH
+   /public/jornada-render.js
+   Render + Pergaminho (V/H) — IIFE, sem import/export
+   Expõe: window.JORNADA_RENDER
    ============================================ */
 ;(function () {
-  // ===== Config =====
-  // Você pode injetar via window.JORNADA_CFG os campos abaixo.
-  // Suporte a:
-  //  - ACCESS_CODE + ISSUED_AT (um único código)
-  //  - OU codeProvider(code) -> { issuedAt }  (consulta assíncrona/síncrona ao gerador)
+  // Config leve (pode vir de window.JORNADA_CFG, se existir)
   const CFG = Object.assign(
     {
-      STORAGE_KEY: "jornada_auth",
-      ACCESS_CODE: (window.JORNADA_CFG && window.JORNADA_CFG.ACCESS_CODE) || "IRMANDADE",
-      ISSUED_AT:   (window.JORNADA_CFG && window.JORNADA_CFG.ISSUED_AT)   || null, // ms
-      // Janela para iniciar a jornada (a partir da emissão do código)
-      START_DAYS:  (window.JORNADA_CFG && window.JORNADA_CFG.START_DAYS)  || 15,
-      // Prazo de conclusão após o uso do código
-      FINISH_HOURS:(window.JORNADA_CFG && window.JORNADA_CFG.FINISH_HOURS)|| 24,
-      // Opcional: função do gerador. Recebe o 'code' e deve retornar:
-      //   { issuedAt: <timestamp ms> }  ou  null/undefined se inválido.
-      // Pode ser síncrona ou retornar Promise.
-      codeProvider: (window.JORNADA_CFG && window.JORNADA_CFG.codeProvider) || null,
+      CANVAS_ID: "jornada-canvas",
+      CONTENT_ID: "jornada-conteudo",
+      // ⚠️ Caminhos corrigidos conforme sua memória:
+      PERG_V: "/assets/img/pergaminho-rasgado-vert.png",
+      PERG_H: "/assets/img/pergaminho-rasgado-horiz.png",
+      START: "home", // "home" | "intro"
     },
     window.JORNADA_CFG || {}
   );
+   // Para redirecionar à página inicial do site.
+// Se sua home estiver num subcaminho (ex.: /irmandade/), troque HOME_PATH.
+const HOME_PATH = "/";
+function goHome() { window.location.assign(HOME_PATH); }
 
-  // ===== Store =====
-  const S = {
-    load() {
-      try { return JSON.parse(localStorage.getItem(CFG.STORAGE_KEY) || "{}"); }
-      catch { return {}; }
-    },
-    save(v) { localStorage.setItem(CFG.STORAGE_KEY, JSON.stringify(v || {})); },
-    clear() { localStorage.removeItem(CFG.STORAGE_KEY); }
-  };
+   
+// ---------- utilitários ----------
+   function activateJornada() {
+  document.body.classList.add("jornada-active");
+  const jc = document.getElementById("jornada-canvas");
+  if (jc) jc.style.display = "block"; // desfaz o inline "display:none"
+  window.scrollTo(0, 0);
+}
+ function deactivateJornada() {
+  document.body.classList.remove("jornada-active");
+  const jc = document.getElementById("jornada-canvas");
+  if (jc) jc.style.display = "none"; // re-oculta quando sair da jornada
+}
 
-  // ===== Helpers =====
-  const now = () => Date.now();
-  const ms   = (h) => h * 3600 * 1000;
-  const msd  = (d) => d * 24   * 3600 * 1000;
+  // ---------- utilidades ----------
+  function elCanvas() { return document.getElementById(CFG.CANVAS_ID); }
+  function elContent() { return document.getElementById(CFG.CONTENT_ID); }
 
-  function formatCountdown(msLeft) {
-    if (msLeft == null) return "";
-    const s = Math.floor(msLeft / 1000);
-    const h = Math.floor(s / 3600);
-    const m = Math.floor((s % 3600) / 60);
-    const ss = s % 60;
-    return `${h}h ${m}m ${ss}s`;
-  }
-
-  // ===== Regras =====
-  // 1) Janela de início (15 dias a partir da emissão)
-  function isStartWindowOpen(issuedAt) {
-    if (!issuedAt) return true; // sem controle → permite
-    const lim = Number(issuedAt) + msd(CFG.START_DAYS || 15);
-    return now() <= lim;
-  }
-
-  // 2) Prazo de conclusão (24h a partir do 'grant')
-  function grantedTimeLeftMs() {
-    const st = S.load();
-    if (!st.deadline_at) return null;
-    return Math.max(0, st.deadline_at - now());
-  }
-
-  function isGrantedActive() {
-    const left = grantedTimeLeftMs();
-    return left != null && left > 0;
-  }
-
-  function markGranted(issuedAt) {
-    const st = S.load();
-    st.granted_at  = now();
-    st.deadline_at = st.granted_at + ms(CFG.FINISH_HOURS || 24);
-    st.issued_at   = issuedAt || st.issued_at || null;
-    S.save(st);
-  }
-
-  // (opcional) marca conclusão — útil se quiser bloquear reuso após finalizar
-  function markCompleted() {
-    const st = S.load();
-    st.completed_at = now();
-    S.save(st);
-  }
-
-  // ===== Validação do código =====
-  // Suporta 2 modos:
-  //  (A) Código fixo via ACCESS_CODE + ISSUED_AT
-  //  (B) Código vindo do gerador: CFG.codeProvider(code) -> {issuedAt}
-  async function validateAndResolveIssuedAt(codeInput) {
-    const code = String(codeInput || "").trim();
-
-    // Se houver provider, ele manda no jogo:
-    if (typeof CFG.codeProvider === "function") {
-      const info = await Promise.resolve(CFG.codeProvider(code));
-      // info = { issuedAt: <ms> } se válido, ou null/undefined se inválido
-      if (!info || !info.issuedAt) return { ok:false, reason:"invalid" };
-      if (!isStartWindowOpen(info.issuedAt)) return { ok:false, reason:"start_expired" };
-      return { ok:true, issuedAt: Number(info.issuedAt) };
+  function ensureCanvas() {
+    let root = elCanvas();
+    if (!root) {
+      root = document.createElement("section");
+      root.id = CFG.CANVAS_ID;
+      root.className = "card pergaminho";
+      document.body.appendChild(root);
     }
-
-    // Sem provider: comparação direta + janela com ISSUED_AT do CFG
-    const ok = code.toUpperCase() === String(CFG.ACCESS_CODE).trim().toUpperCase();
-    if (!ok) return { ok:false, reason:"invalid" };
-    const issuedAt = Number(CFG.ISSUED_AT) || null;
-    if (issuedAt && !isStartWindowOpen(issuedAt)) return { ok:false, reason:"start_expired" };
-    return { ok:true, issuedAt };
+    let content = elContent();
+    if (!content) {
+      content = document.createElement("div");
+      content.id = CFG.CONTENT_ID;
+      content.className = "conteudo-pergaminho";
+      root.innerHTML = "";
+      root.appendChild(content);
+    }
+    return { root, content };
   }
 
-  // ===== UI (olho mágico) =====
-  function bindEyeToggle(inputEl, eyeEl) {
-    if (!inputEl || !eyeEl) return;
-    let show = false;
-    const update = () => {
-      inputEl.type = show ? "text" : "password";
-      eyeEl.setAttribute("aria-pressed", show ? "true" : "false");
-      eyeEl.textContent = show ? "🙈" : "👁️";
-    };
-    eyeEl.addEventListener("click", (e) => { e.preventDefault(); show = !show; update(); });
-    update();
-  }
-
-  // ===== API =====
-  async function init(opts = {}) {
-    const {
-      formSelector       = "#form-senha",
-      inputSelector      = "#senha-input",
-      eyeSelector        = "#senha-eye",
-      countdownSelector  = "#senha-countdown",
-      onGranted          = () => {},
-      onError            = (reason) => {  // "invalid" | "start_expired" | "expired"
-        if (reason === "invalid") alert("Senha incorreta.");
-        else if (reason === "start_expired") alert("Este código expirou (janela de 15 dias).");
-        else if (reason === "expired") alert("Seu acesso expirou (24h). Solicite um novo código.");
-      },
-    } = opts;
-
-    const form      = document.querySelector(formSelector);
-    const input     = document.querySelector(inputSelector);
-    const eye       = document.querySelector(eyeSelector);
-    const countdown = document.querySelector(countdownSelector);
-    if (!form || !input) return;
-
-    bindEyeToggle(input, eye);
-
-    // Se já tem grant anterior, verifica prazo (24h)
-    if (isGrantedActive()) {
-      // mostra count-down e permite seguir
-      startTick(countdown);
-      onGranted();   // já liberado dentro da janela
-      return;
+  function setPergaminho(mode /* 'v' | 'h' */) {
+    const { root } = ensureCanvas();
+    root.classList.remove("pergaminho-v", "pergaminho-h");
+    if (mode === "v") {
+      root.classList.add("pergaminho-v");
+      root.style.backgroundImage = `url("${CFG.PERG_V}")`;
     } else {
-      // Se estava expirado, limpa para recomeçar
-      const st = S.load();
-      if (st.deadline_at && grantedTimeLeftMs() === 0) onError("expired");
+      root.classList.add("pergaminho-h");
+      root.style.backgroundImage = `url("${CFG.PERG_H}")`;
     }
+    // fallback para garantir preenchimento
+    root.style.backgroundRepeat = "no-repeat";
+    root.style.backgroundPosition = "center";
+    root.style.backgroundSize = "cover";
+    root.style.minHeight = "82vh";
+  }
 
-    // form submit → valida + concede
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const code = input.value;
-      const res  = await validateAndResolveIssuedAt(code);
-      if (!res.ok) { onError(res.reason); return; }
-      // dentro da janela de 15 dias → concede e inicia 24h
-      markGranted(res.issuedAt);
-      startTick(countdown);
-      onGranted();
+  // ---------- telas ----------
+  function renderHome() {
+    setPergaminho("v");
+    const { content } = ensureCanvas();
+    content.innerHTML = `
+      <h1 class="text-2xl md:text-3xl font-bold mb-2">Irmandade Conhecimento com Luz</h1>
+      <p class="mb-4 opacity-90">Bem-vindo(a)! Clique para iniciar a Jornada Essencial.</p>
+      <div class="flex gap-2">
+        <button id="btn-ir-intro" class="px-4 py-2 rounded btn-primary">Ir para Introdução</button>
+      </div>
+     `;
+     requestAnimationFrame(() => {
+     try {
+    JORNADA_TYPO?.typeAll("#jornada-conteudo", {
+      force: true,        // ignora "reduce motion"
+      speed: 34,       // mais lento (antes era ~20-22)
+      maxTotalMs: 7500 // até 6s por tela (mais suave)
     });
+  } catch (e) { console.warn(e); }
+});
+     
+    document.getElementById("btn-ir-intro")?.addEventListener("click", renderIntro);
   }
 
-  function startTick(countdownEl) {
-    if (!countdownEl) return;
-    const tick = () => {
-      const left = grantedTimeLeftMs();
-      countdownEl.textContent = left != null ? `Tempo restante: ${formatCountdown(left)}` : "";
-      if (left != null && left > 0) requestAnimationFrame(tick);
-    };
-    tick();
+  function renderIntro() {
+    setPergaminho("v");
+    const { content } = ensureCanvas();
+    content.innerHTML = `
+      <h2 class="text-xl md:text-2xl font-semibold mb-3">Introdução</h2>
+      <p class="mb-3">Orientações e Termo de Responsabilidade da Jornada.</p>
+      <div class="flex gap-2">
+        <button id="btn-iniciar" class="px-4 py-2 rounded btn-primary">Iniciar</button>
+        <button id="btn-voltar-home" class="px-3 py-2 rounded btn-secondary">Voltar ao Início</button>
+      </div>
+     `;
+     requestAnimationFrame(() => {
+     try {
+    JORNADA_TYPO?.typeAll("#jornada-conteudo", {
+      force: true,        // ignora "reduce motion"
+      speed: 34,       // mais lento (antes era ~20-22)
+      maxTotalMs: 7500 // até 6s por tela (mais suave)
+    });
+  } catch (e) { console.warn(e); }
+});
+     
+    document.getElementById("btn-iniciar")?.addEventListener("click", renderPerguntas);
+    document.getElementById("btn-voltar-home")?.addEventListener("click", renderHome);
   }
 
-  // utilidades públicas
-  window.JORNADA_AUTH = {
-    init,
-    clear: S.clear,
-    timeLeftMs: grantedTimeLeftMs,
-    formatCountdown,
-    isStartWindowOpen,
-    isGrantedActive,
-    markCompleted,          // chame ao concluir a jornada
+ function renderPerguntas(blockIndex = 0) {
+  setPergaminho("h");
+  const { content } = ensureCanvas();
+
+  const bloc = QUESTIONS.BLOCS[blockIndex];
+  if (!bloc) return renderFinal();
+
+  const totalBlocks = QUESTIONS.totalBlocks();
+  const totalQ = QUESTIONS.totalQuestions();
+
+  content.innerHTML = `
+    <h2 class="text-xl md:text-2xl font-semibold mb-1">${bloc.title}</h2>
+
+    <div class="j-progress">
+      <div class="j-progress__bar"><div class="j-progress__fill" id="jprog-fill"></div></div>
+      <div class="j-progress__meta">
+        <span><b id="jprog-pct">0%</b> — <span id="jprog-count">0/${totalQ}</span> respondidas</span>
+        <span>Bloco ${blockIndex+1}/${totalBlocks}</span>
+      </div>
+    </div>
+
+    <form id="form-perguntas" class="grid gap-3"></form>
+
+    <div class="mt-4 flex flex-wrap gap-2">
+      <button id="btn-prev" class="px-3 py-2 rounded btn-secondary">◀ Voltar</button>
+      <button id="btn-next" class="px-4 py-2 rounded btn-primary">Avançar ▶</button>
+    </div>
+  `;
+
+  // monta as questões do bloco
+  const form = content.querySelector("#form-perguntas");
+  bloc.items.forEach((texto, qi) => {
+    const key = QUESTIONS.keyFor(blockIndex, qi);
+    const value = QUESTIONS.getAnswer(key);
+    const row = document.createElement("label");
+    row.className = "grid gap-1";
+    row.innerHTML = `
+      <span class="font-medium">${qi+1}) ${texto}</span>
+      <textarea rows="2" data-key="${key}" class="px-3 py-2 rounded border border-gray-300 bg-white/85"
+        placeholder="Escreva aqui...">${value}</textarea>
+    `;
+    form.appendChild(row);
+  });
+
+  // progresso
+  const fill  = content.querySelector("#jprog-fill");
+  const pctEl = content.querySelector("#jprog-pct");
+  const cntEl = content.querySelector("#jprog-count");
+
+  function updateProgress(){
+    const done = QUESTIONS.countAnswered();
+    const pct  = totalQ ? Math.round((done/totalQ)*100) : 0;
+    fill.style.width = pct + "%";
+    pctEl.textContent = pct + "%";
+    cntEl.textContent = `${done}/${totalQ}`;
+  }
+
+  form.addEventListener("input", (e)=>{
+    const ta = e.target.closest("textarea"); if(!ta) return;
+    QUESTIONS.setAnswer(ta.dataset.key, ta.value);
+    updateProgress();
+  });
+
+  // totalPerguntas = 50, sendo 5 blocos de 10
+const totalPerguntas = 50;
+const feitas = (blockIndex * 10); // + número de perguntas já passadas
+const pct = Math.round((feitas / totalPerguntas) * 100);
+
+// Atualiza badge
+const badge = document.getElementById("progress-badge");
+if (badge) badge.textContent = `${pct}% concluído`;
+
+// Atualiza barra
+const barFill = document.getElementById("progress-bar-fill"); // <- nome novo
+if (barFill) barFill.style.width = `${pct}%`;
+
+  // navegação
+  content.querySelector("#btn-prev")?.addEventListener("click", (ev)=>{
+    ev.preventDefault();
+    if (blockIndex > 0) renderPerguntas(blockIndex-1); else renderIntro();
+  });
+
+  content.querySelector("#btn-next")?.addEventListener("click", (ev)=>{
+    ev.preventDefault();
+    if (blockIndex < totalBlocks-1) renderPerguntas(blockIndex+1);
+    else renderAcolhimento(); // depois do último bloco
+  });
+
+  // datilografia (um pouco mais ágil aqui)
+  requestAnimationFrame(()=>{ try{
+    JORNADA_TYPO?.typeAll("#jornada-conteudo", { force:true, speed:28, maxTotalMs:5000 });
+  }catch(e){} });
+         
+ function renderFinal() {
+  setPergaminho("v");
+  const { content } = ensureCanvas();
+  content.innerHTML = `
+    <h2 class="text-xl md:text-2xl font-semibold mb-3">Conclusão da Jornada</h2>
+    <p class="mb-4">Respire. Seu caminho foi registrado com coragem e verdade.</p>
+
+    <div class="flex gap-2 mb-3">
+      <button id="btn-download" class="px-4 py-2 rounded btn-primary">
+        Baixar PDF + HQ
+      </button>
+
+      <!-- backup direto para a home, caso o usuário queira pular o download -->
+      <a id="link-home" class="btn btn-secondary px-3 py-2 rounded" href="/">Voltar ao início</a>
+    </div>
+
+    <small class="opacity-80">Após concluir o download você será levado(a) para a página inicial.</small>
+  `;
+
+  // efeito de datilografia (mais suave na final)
+  requestAnimationFrame(() => {
+    try {
+      JORNADA_TYPO?.typeAll("#jornada-conteudo", { force: true, speed: 34, maxTotalMs: 7500 });
+    } catch (e) {}
+  });
+
+  // handler do botão de download
+  const btn = document.getElementById("btn-download");
+  btn?.addEventListener("click", async () => {
+    btn.disabled = true;
+    btn.textContent = "Preparando arquivos...";
+
+    // tenta usar sua função real, se existir. Senão, faz um "aguarde" curto.
+    const baixar = (window.JORNADA_CORE && window.JORNADA_CORE.baixarArquivos)
+      ? window.JORNADA_CORE.baixarArquivos
+      : () => new Promise(r => setTimeout(r, 1200));
+
+    try {
+      await baixar();                 // << aqui acontece seu download real
+      // dica UX: confirma visualmente
+      btn.textContent = "Downloads prontos!";
+    } catch (e) {
+      console.warn("Falha ao gerar arquivos:", e);
+      // segue para home mesmo assim
+    } finally {
+      // leva direto para a home
+      goHome();
+    }
+  });
+}
+
+  // ---------- API pública ----------
+  function mount({ startAt } = {}) {
+    ensureCanvas();
+    activateJornada();   // <-- força o modo jornada
+  if (startAt === "intro") renderIntro();
+  else if (startAt === "perguntas") renderPerguntas();
+  else renderHome();
+}
+
+  // expõe no window (necessário pro bootstrap)
+  window.JORNADA_RENDER = {
+    mount,
+    setPergaminho,
+    renderHome,
+    renderIntro,
+    renderPerguntas,
+    renderFinal,
   };
 })();
