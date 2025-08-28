@@ -187,7 +187,18 @@ function goHome() { window.location.assign(HOME_PATH); }
     updateProgress();
   });
 
-  updateProgress();
+  // totalPerguntas = 50, sendo 5 blocos de 10
+const totalPerguntas = 50;
+const feitas = (blockIndex * 10); // + número de perguntas já passadas
+const pct = Math.round((feitas / totalPerguntas) * 100);
+
+// Atualiza badge
+const badge = document.getElementById("progress-badge");
+if (badge) badge.textContent = `${pct}% concluído`;
+
+// Atualiza barra
+const fill = document.getElementById("progress-bar-fill");
+if (fill) fill.style.width = `${pct}%`;
 
   // navegação
   content.querySelector("#btn-prev")?.addEventListener("click", (ev)=>{
