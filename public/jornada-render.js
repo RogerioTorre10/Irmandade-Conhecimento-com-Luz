@@ -197,8 +197,8 @@ const badge = document.getElementById("progress-badge");
 if (badge) badge.textContent = `${pct}% concluído`;
 
 // Atualiza barra
-const fill = document.getElementById("progress-bar-fill");
-if (fill) fill.style.width = `${pct}%`;
+const barFill = document.getElementById("progress-bar-fill"); // <- nome novo
+if (barFill) barFill.style.width = `${pct}%`;
 
   // navegação
   content.querySelector("#btn-prev")?.addEventListener("click", (ev)=>{
