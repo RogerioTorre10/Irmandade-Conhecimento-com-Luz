@@ -1,5 +1,5 @@
 /* ============================================
-   jornada-paper-qa.js — Pergaminho + Perguntas
+   jornada-paper-qa.js — Pergaminho + Perguntas (TESTE 5)
    Expondo: window.JORNADA_PAPER, window.JORNADA_QA
    ============================================ */
 ;(function () {
@@ -51,10 +51,13 @@
     root.style.minHeight = "82vh";
   }
 
+  // >>> AQUI: 5 PERGUNTAS DE TESTE <<<
   const DEFAULT_QUESTIONS = [
     { name: "q1", label: "Quem é você neste momento da jornada?" },
     { name: "q2", label: "Qual é sua maior força hoje?" },
-    { name: "q3", label: "O que você precisa curar/superar?" },
+    { name: "q3", label: "O que você precisa curar ou superar?" },
+    { name: "q4", label: "Qual foi um pequeno ato de coragem recente?" },
+    { name: "q5", label: "O que você quer semear nos próximos 7 dias?" },
   ];
 
   function buildForm(questions = DEFAULT_QUESTIONS) {
@@ -81,8 +84,16 @@
         <button id="qa-finish" class="px-4 py-2 rounded bg-purple-700 text-white">Finalizar</button>
       </div>
     `;
-    document.getElementById("qa-back")?.addEventListener("click", () => onBack && onBack());
-    document.getElementById("qa-finish")?.addEventListener("click", () => onFinish && onFinish());
+
+    // evita submit/refresh
+    document.getElementById("qa-back")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      onBack && onBack();
+    });
+    document.getElementById("qa-finish")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      onFinish && onFinish();
+    });
   }
 
   window.JORNADA_PAPER = { set, ensureCanvas };
