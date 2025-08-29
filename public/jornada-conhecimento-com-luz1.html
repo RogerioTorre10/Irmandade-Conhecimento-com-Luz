@@ -58,32 +58,27 @@
     <div id="jornada-conteudo" class="conteudo-pergaminho"></div>
   </section>
 
+  <!-- ===== A Chama te chama ===== -->
+<link rel="stylesheet" href="/css/chama.css">
+<script defer src="/jornada-chama.js"></script>
   <!-- ==========================================================
        SCRIPTS — A ORDEM IMPORTA!
        ========================================================== -->
 
-  <!-- Núcleo / utilidades -->
-  <script src="/jornada-utils.js"></script>
-  <script src="/jornada-core.js"></script>
+ <!-- Núcleo -->
+<script defer src="/jornada-utils.js"></script>
+<script defer src="/jornada-core.js"></script>
 
-  <!-- Módulos -->
-  <script src="/jornada-auth.js"></script>
+<!-- Módulos -->
+<script defer src="/jornada-auth.js"></script>
+<script defer src="/jornada-chama.js"></script>
+<script defer src="/jornada-paper-qa.js"></script>
+<script defer src="/jornada-typing-font.js"></script>
+<script defer src="/i18n/i18n.js"></script>
 
-  <!-- Internacionalização (não interfere, pode ficar aqui) -->
-<script src="/i18n/i18n.js"></script>
-
-  <!-- ===== A Chama te chama ===== -->
-<script src="/jornada-chama.js"></script>
-
-  <!-- PERGUNTAS (deve vir ANTES do render/bootstrap) -->
-  <script src="/jornada-paper-qa.js"></script>
-
-  <!-- Datilografia (opcional, se estiver usando) -->
-  <script src="/jornada-typing-font.js"></script>
-
-  <!-- Renderização + bootstrap da jornada -->
-  <script src="/jornada-render.js"></script>
-  <script src="/jornada-bootstrap.js"></script>
+<!-- Render e bootstrap -->
+<script defer src="/jornada-render.js"></script>
+<script defer src="/jornada-bootstrap.js"></script>
 
   <!-- Kickoff: liga a jornada ao abrir a página / rota via hash -->
   <script>
@@ -121,8 +116,5 @@
       }
     })();
   </script>
-  <!-- ===== A Chama te chama ===== -->
-<link rel="stylesheet" href="/css/chama.css">
-<script defer src="/jornada-chama.js"></script>
-</body>
+  </body>
 </html>
