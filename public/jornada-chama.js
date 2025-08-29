@@ -42,7 +42,10 @@
     mql.addEventListener("change", e => mql.matches ? stop() : start());
   };
   brilho();
+
+  // Exporta a função globalmente
+  window.criarChama = criarChama; // Adiciona diretamente ao window para acesso global
 })();
 
-// export global
-window.JORNADA_CHAMA = { criarChama };
+// Para compatibilidade, mantém o namespace JORNADA_CHAMA
+window.JORNADA_CHAMA = { criarChama: window.criarChama };
