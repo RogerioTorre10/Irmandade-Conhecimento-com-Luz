@@ -1,6 +1,21 @@
 // Chama da Irmandade – injeta e dimensiona automaticamente
-(function () {
-  const SRC = "/assets/img/chama.gif"; // troque aqui se a sua arte tiver outro nome
+(function(){
+  function criaChama(sm=false){
+    const d = document.createElement("div");
+    d.className = sm ? "chama chama-sm" : "chama";
+    d.innerHTML = "<span></span><span></span><span></span>";
+    return d;
+  }
+
+  // Exemplo: adiciona chama grande no header
+  window.addEventListener("DOMContentLoaded", ()=>{
+    const header = document.querySelector("header") || document.body;
+    header.appendChild(criaChama(false));
+  });
+
+  // exporta global
+  window.JORNADA_CHAMA = { criaChama };
+})();
 
   // Evita duplicar se já existe
   if (document.getElementById("chama-container")) return;
