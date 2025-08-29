@@ -27,6 +27,7 @@
     <div class="chama">
       <span></span><span></span><span></span>
     </div>
+   <div class="chama chama-sm"><span></span><span></span><span></span></div>
    
   <a class="btn btn-primary" href="/jornadas.html">Explorar Jornadas</a>
   <a class="btn btn-link" href="https://github.com/RogerioTorre10/Irmandade-Conhecimento-com-Luz" target="_blank">Repositório</a>
@@ -36,10 +37,7 @@
   <footer class="site-footer">
     <small>© 2025 Irmandade Conhecimento com Luz</small>
   </footer>
-
-  <!-- /public/index.html -->
-<script src="/i18n/i18n.js"></script>
-
+ 
  <!-- ===== Núcleo (deve vir primeiro) ===== -->
 <script src="/jornada-utils.js"></script>
 <script src="/jornada-core.js"></script>
@@ -47,20 +45,23 @@
 <!-- ===== Módulos opcionais/temáticos ===== -->
 <!-- Gate de senha + olho mágico -->
 <script src="/jornada-auth.js"></script>
-
+  
+<!-- ===== A Chama te chama ===== -->
+<link rel="stylesheet" href="/css/chama.css">
+<script defer src="/jornada-chama.js"></script>
+  
 <!-- Pergaminho + perguntas (V/H) -->
 <script src="/jornada-paper-qa.js"></script>
 
 <!-- Tipografia + datilografia (disponível para o render usar) -->
 <script src="/jornada-typing-font.js"></script>
 
+   <!-- /public/index.html -->
+<script src="/i18n/i18n.js"></script>
+
 <!-- ===== Camada de renderização e bootstrap ===== -->
 <script src="/jornada-render.js"></script>
 <script src="/jornada-bootstrap.js"></script>
-  
-<!-- ===== A Chama te chama ===== -->
-<link rel="stylesheet" href="/css/chama.css">
-<script defer src="/jornada-chama.js"></script>
-</body>
+  </body>
 </html>
 
