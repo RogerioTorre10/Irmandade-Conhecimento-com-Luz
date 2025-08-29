@@ -1,39 +1,29 @@
-/* ----- Chama Viva ----- */
-#chama-container{
-  position: fixed;
-  bottom: 18px;
-  right: 18px;
-  z-index: 9999;
-  pointer-events: none;   /* não bloqueia cliques em nada da página */
+/* ===========================
+   CHAMA — versão CSS (opcional, caso não use imagem)
+   Para usar: <div class="chama"><span></span><span></span><span></span></div>
+   =========================== */
+.chama{
+  position:relative;
+  width:56px; height:80px;
+  filter: drop-shadow(0 6px 14px rgba(255,140,0,.35));
+}
+.chama span{
+  position:absolute; inset:auto 0 0 0; margin:auto;
+  width:56px; height:80px; border-radius:40px 40px 22px 22px;
+  background: radial-gradient(50% 60% at 50% 30%, #fff7cc 0%, #ffd166 35%, #ff8c00 70%, transparent 100%);
+  animation: flame .9s infinite ease-in-out alternate;
+  mix-blend-mode: screen;
+}
+.chama span:nth-child(2){ width:42px; height:60px; left:7px; right:7px; animation-delay:.15s; }
+.chama span:nth-child(3){ width:28px; height:42px; left:14px; right:14px; animation-delay:.3s; }
+
+@keyframes flame{
+  0%{ transform: translateY(2px) scale(0.98); opacity:.95; }
+  100%{ transform: translateY(-4px) scale(1.02); opacity:1; }
 }
 
-#chama{
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  filter:
-    drop-shadow(0 0 10px #ffdf80)
-    drop-shadow(0 0 22px #ffb347);
-  animation: pulse 3.2s ease-in-out infinite, flicker 9s linear infinite;
-}
-
-/* Tamanhos */
-#chama-container.chama--lg { width: 140px; height: 140px; }
-#chama-container.chama--sm { width: 80px;  height: 80px;  }
-
-/* Animações (vibração + “vida”) */
-@keyframes pulse {
-  0%   { transform: scale(1);   opacity: .92; }
-  50%  { transform: scale(1.14); opacity: 1;   }
-  100% { transform: scale(1);   opacity: .92; }
-}
-@keyframes flicker {
-  0%   { filter: drop-shadow(0 0 10px #ffd56b) drop-shadow(0 0 22px #ff9a3c); }
-  50%  { filter: drop-shadow(0 0 14px #ffe28a) drop-shadow(0 0 30px #ffb347); }
-  100% { filter: drop-shadow(0 0 10px #ffd56b) drop-shadow(0 0 22px #ff9a3c); }
-}
-
-/* Acessibilidade: respeita pessoas que preferem menos movimento */
-@media (prefers-reduced-motion: reduce) {
-  #chama { animation: none; }
-}
+/* Chama menor */
+.chama-sm{ width:36px; height:52px; }
+.chama-sm span{ width:36px; height:52px; }
+.chama-sm span:nth-child(2){ width:26px; height:38px; left:5px; right:5px; }
+.chama-sm span:nth-child(3){ width:18px; height:26px; left:9px; right:9px; }
