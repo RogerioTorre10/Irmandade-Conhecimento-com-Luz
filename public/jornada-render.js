@@ -138,21 +138,18 @@ function renderPerguntas(blockIndex = 0) {
   ];
 
   // Renderiza o formulário no #jornada-conteudo
-  JORNADA_QA.mount(
-    undefined,            // usa #jornada-conteudo por padrão
-    PERGUNTAS,
-    {
-      onBack() {
-        // sem "voltar" entre blocos: volta pra introdução
-        renderIntro();
-      },
-      onFinish() {
-        // salva e vai pra tela final
-        try { salvarRespostas?.(); } catch(e){}
-        renderFinal();
-      }
+ function renderPerguntas() {
+  JORNADA_QA.mount(undefined, undefined, {
+    onBack() {
+      console.log("voltar");
+      renderIntro(); // ou tela anterior
+    },
+    onFinish() {
+      console.log("finalizar");
+      renderFinal(); // manda para tela final
     }
-  );
+  });
+}
 
   // --- progresso simples (badge e barra) ---
   const inputs = content.querySelectorAll('#form-perguntas input, #form-perguntas textarea');
