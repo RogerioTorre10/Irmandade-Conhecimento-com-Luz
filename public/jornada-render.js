@@ -177,7 +177,7 @@ function renderPerguntas() {
     requestAnimationFrame(() => {
       JORNADA_TYPO?.typeAll("#jornada-conteudo", { force:true, speed:36, maxTotalMs:7500 });
     });
-  } catch {}
+  } catch{}
 } // <-- FECHA a função renderPerguntas (sem ')' sobrando)
 
          
