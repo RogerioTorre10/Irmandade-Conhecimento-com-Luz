@@ -2,28 +2,79 @@
    CHAMA — versão CSS (opcional, caso não use imagem)
    Para usar: <div class="chama"><span></span><span></span><span></span></div>
    =========================== */
-.chama{
-  position:relative;
-  width:56px; height:80px;
-  filter: drop-shadow(0 6px 14px rgba(255,140,0,.35));
+.chama {
+  position: relative;
+  --chama-width: 56px;
+  --chama-height: 80px;
+  width: var(--chama-width);
+  height: var(--chama-height);
+  filter: drop-shadow(0 6px 14px rgba(255, 140, 0, 0.35));
 }
-.chama span{
-  position:absolute; inset:auto 0 0 0; margin:auto;
-  width:56px; height:80px; border-radius:40px 40px 22px 22px;
+
+.chama span {
+  position: absolute;
+  inset: auto 0 0 0;
+  margin: auto;
+  width: var(--chama-width);
+  height: var(--chama-height);
+  border-radius: 40px 40px 22px 22px;
   background: radial-gradient(50% 60% at 50% 30%, #fff7cc 0%, #ffd166 35%, #ff8c00 70%, transparent 100%);
-  animation: flame .9s infinite ease-in-out alternate;
+  animation: flame 0.9s infinite ease-in-out alternate, tremble 0.3s infinite ease-in-out;
   mix-blend-mode: screen;
 }
-.chama span:nth-child(2){ width:42px; height:60px; left:7px; right:7px; animation-delay:.15s; }
-.chama span:nth-child(3){ width:28px; height:42px; left:14px; right:14px; animation-delay:.3s; }
 
-@keyframes flame{
-  0%{ transform: translateY(2px) scale(0.98); opacity:.95; }
-  100%{ transform: translateY(-4px) scale(1.02); opacity:1; }
+.chama span:nth-child(2) {
+  width: 42px;
+  height: 60px;
+  left: 7px;
+  right: 7px;
+  animation-delay: 0.15s, 0.1s;
+}
+
+.chama span:nth-child(3) {
+  width: 28px;
+  height: 42px;
+  left: 14px;
+  right: 14px;
+  animation-delay: 0.3s, 0.2s;
+}
+
+@keyframes flame {
+  0% { transform: translateY(2px) scale(0.98); opacity: 0.95; }
+  100% { transform: translateY(-4px) scale(1.02); opacity: 1; }
+}
+
+@keyframes tremble {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(0.5deg); }
+  50% { transform: rotate(-0.5deg); }
+  75% { transform: rotate(0.3deg); }
+  100% { transform: rotate(0deg); }
 }
 
 /* Chama menor */
-.chama-sm{ width:36px; height:52px; }
-.chama-sm span{ width:36px; height:52px; }
-.chama-sm span:nth-child(2){ width:26px; height:38px; left:5px; right:5px; }
-.chama-sm span:nth-child(3){ width:18px; height:26px; left:9px; right:9px; }
+.chama-sm {
+  --chama-width: 36px;
+  --chama-height: 52px;
+  width: var(--chama-width);
+  height: var(--chama-height);
+}
+
+.chama-sm span {
+  width: var(--chama-width);
+  height: var(--chama-height);
+}
+
+.chama-sm span:nth-child(2) {
+  width: 26px;
+  height: 38px;
+  left: 5px;
+  right: 5px;
+}
+
+.chama-sm span:nth-child(3) {
+  width: 18px;
+  height: 26px;
+  left: 9px;
+  right: 9px;
+}
