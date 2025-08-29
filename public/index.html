@@ -13,61 +13,43 @@
 
   <!-- Fallback automático se os CSS retornarem 503/HTML -->
   <script>
-  (function(){
-    // CSS crítico mínimo da página
-    const CSS_BASE = `
-      :root{--bg:#0d1420;--fg:#e6eefc;--card:#111a2a;--stroke:#3a4a6a;--brand:#1f2d4a}
-      *{box-sizing:border-box}
-      html,body{height:100%}
-      body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,Segoe UI,Roboto,Arial,sans-serif}
-      .container{max-width:960px;margin:0 auto;padding:24px}
-      .btn{display:inline-block;padding:.6rem 1rem;border-radius:.5rem;border:1px solid var(--stroke);text-decoration:none}
-      .btn-primary{background:var(--brand);color:#fff}
-      header.site-header,footer.site-footer{padding:16px 24px}
-      .motto{opacity:.8;margin-top:.5rem}
-    `;
-    // CSS da chama
-    const CSS_CHAMA = `
-      .chama{position:relative;width:56px;height:80px;filter:drop-shadow(0 6px 14px rgba(255,140,0,.35))}
-      .chama span{position:absolute;inset:auto 0 0 0;margin:auto;width:56px;height:80px;border-radius:40px 40px 22px 22px;
-        background:radial-gradient(50% 60% at 50% 30%,#fff7cc 0%,#ffd166 35%,#ff8c00 70%,rgba(255,140,0,0) 100%);animation:flame 1.5s ease-in-out infinite}
-      .chama span:nth-child(2){width:40px;height:60px;bottom:8px;opacity:.85;filter:blur(.6px)}
-      .chama span:nth-child(3){width:22px;height:34px;bottom:18px;opacity:.9;
-        background:radial-gradient(50% 60% at 50% 30%,#fff 0%,#ffd166 40%,rgba(255,140,0,.5) 85%,rgba(255,140,0,0) 100%)}
-      @keyframes flame{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.02)}100%{transform:translateY(0) scale(1)}}
-    `;
+(function(){
+  const CSS_BASE = `/* ... mantém o mesmo que já está ... */`;
+  const CSS_CHAMA = `/* ... mantém o mesmo que já está ... */`;
 
-    function inlineFallback(id, cssText){
-      // evita duplicar
-      if(document.querySelector('style[data-fallback="'+id+'"]')) return;
-      const style = document.createElement('style');
-      style.setAttribute('data-fallback', id);
-      style.textContent = cssText;
-      document.head.appendChild(style);
-      console.warn('CSS fallback inlined for', id);
-    }
+  function inlineFallback(id, cssText){
+    if(document.querySelector('style[data-fallback="'+id+'"]')) return;
+    const style = document.createElement('style');
+    style.setAttribute('data-fallback', id);
+    style.textContent = cssText;
+    document.head.appendChild(style);
+    console.warn('CSS fallback inlined for', id);
+  }
 
-    function checkAndFallback(linkId, cssText){
-      const link = document.getElementById(linkId);
-      if(!link) return;
-      // Plano A: testar via fetch (mesma origem)
-      const url = link.href;
-      const timeout = new Promise((_,rej)=>setTimeout(()=>rej(new Error('css timeout')), 1200));
-      Promise.race([ fetch(url, {cache:'no-store'}) , timeout ])
-        .then(res=>{
-          if(!res || !res.ok) throw new Error('css not ok');
-          const ct = (res.headers.get('content-type')||'').toLowerCase();
-          if(!ct.includes('text/css')) throw new Error('bad mime '+ct);
-          // ok: deixa o <link> carregar normalmente
-        })
-        .catch(()=> inlineFallback(linkId, cssText));
-    }
+  function checkAndFallback(linkId, cssText){
+    const link = document.getElementById(linkId);
+    if(!link) return;
+    const url = link.href;
+    const timeout = new Promise((_,rej)=>setTimeout(()=>rej(new Error('css timeout')), 1200));
+    Promise.race([ fetch(url, {cache:'no-store'}) , timeout ])
+      .then(res=>{
+        if(!res || !res.ok) throw new Error('css not ok');
+        const ct = (res.headers.get('content-type')||'').toLowerCase();
+        if(!ct.includes('text/css')) throw new Error('bad mime '+ct);
+        // ok → deixa o link
+      })
+      .catch(()=>{
+        // injeta fallback e remove o <link> para não gerar "Refused to apply style..."
+        inlineFallback(linkId, cssText);
+        try { link.remove(); } catch(_){ link.setAttribute('disabled',''); }
+      });
+  }
 
-    // dispara cedo no head
-    checkAndFallback('link-styles', CSS_BASE);
-    checkAndFallback('link-chama',  CSS_CHAMA);
-  })();
-  </script>
+  checkAndFallback('link-styles', CSS_BASE);
+  checkAndFallback('link-chama',  CSS_CHAMA);
+})();
+</script>
+
 </head>
 <body>
   <header class="site-header">
