@@ -120,35 +120,40 @@ function goHome() { window.location.assign(HOME_PATH); }
   } catch (e) { console.warn(e); }
 });
      
-    document.getElementById("btn-iniciar")?.addEventListener("click", renderPerguntas);
-  }
+    // depois de preencher o innerHTML da intro:
+document.getElementById("btn-iniciar")?.addEventListener("click", (ev) => {
+  ev.preventDefault();
+  renderPerguntas();
+});
 
-function renderPerguntas(blockIndex = 0) {
-  // mostra pergaminho na horizontal
-  setPergaminho("h");
-  const { content } = ensureCanvas();
+function renderPerguntas() {
+  // garante pergaminho horizontal e conteúdo
+  try { JORNADA_PAPER.set("h"); } catch(e){}
 
-  // 5 perguntas de teste (edite à vontade)
+  // monta as perguntas mínimas (ou use as do DEFAULT_QUESTIONS do módulo)
   const PERGUNTAS = [
     { name: "q1", label: "Quem é você neste momento da jornada?" },
     { name: "q2", label: "Qual é sua maior força hoje?" },
     { name: "q3", label: "O que você precisa curar/superar?" },
-    { name: "q4", label: "Qual foi um pequeno ato de amor com você hoje?" },
-    { name: "q5", label: "Qual a próxima pequena ação que você se compromete?" }
+    { name: "q4", label: "Qual foi um pequeno ato de amor seu hoje?" },
+    { name: "q5", label: "O que você quer agradecer agora?" },
   ];
 
-  // Renderiza o formulário no #jornada-conteudo
- function renderPerguntas() {
-  JORNADA_QA.mount(undefined, undefined, {
-    onBack() {
-      console.log("voltar");
-      renderIntro(); // ou tela anterior
-    },
-    onFinish() {
-      console.log("finalizar");
-      renderFinal(); // manda para tela final
+  // monta o formulário + botões Voltar/Finalizar
+  JORNADA_QA.mount(
+    /* containerId */ undefined,
+    /* questions   */ PERGUNTAS,
+    {
+      onBack() {
+        // se não quer voltar no meio, pode remover este botão lá no QA
+        renderIntro();
+      },
+      onFinish() {
+        // aqui já segue para a tela final
+        renderFinal();
+      }
     }
-  });
+  );
 }
 
   // --- progresso simples (badge e barra) ---
