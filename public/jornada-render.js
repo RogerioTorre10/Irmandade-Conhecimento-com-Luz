@@ -279,6 +279,7 @@ try {
       .forEach(el => window.JORNADA_MICRO.attach(el));
   }
 } catch (_) {}
+  try { window.JORNADA_TYPE?.run?.(getRoot()); } catch(_) {}
 
   function renderFinal() {
     setPergaminho('v');
@@ -301,7 +302,8 @@ try {
       renderIntro();
     });
   }
-
+try { window.JORNADA_TYPE?.run?.(getRoot()); } catch(_) {}
+  
   /* ==========================
      EXPORTAÇÕES & BOOT
      ========================== */
