@@ -56,6 +56,36 @@
     } catch (e) { LOG("auth init skipped", e); }
   }
 
+  // ------- Idiomas (PT/EN/ES) -----------------------------------------
+   <script defer>
+(function(){
+  const LANG_KEY = 'JORNADA_LANG';
+
+  function setLang(lang){
+    localStorage.setItem(LANG_KEY, lang);
+    window.LANG = lang;
+
+    // Se seu i18n expõe perguntas por idioma, injete aqui:
+    // Ex.: window.I18N.questionsFor(lang) => [{name,label}, ...]
+    if (window.I18N?.questionsFor) {
+      window.DEFAULT_QUESTIONS = window.I18N.questionsFor(lang);
+    }
+
+    // Reabre na intro para aplicar textos
+    window.JORNADA_RENDER?.renderIntro?.();
+  }
+
+  // estado inicial
+  const saved = localStorage.getItem(LANG_KEY) || 'pt';
+  if (!window.LANG) setLang(saved);
+
+  // botões PT/EN/ES
+  document.querySelectorAll('.lang-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=> setLang(btn.dataset.lang));
+  });
+})();
+</script>
+
   // ------- Roteador (hash) -------------------------------------------
   function initNavigation(){
     try {
