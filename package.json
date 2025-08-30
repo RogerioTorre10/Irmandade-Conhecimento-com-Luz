@@ -4,7 +4,6 @@
   "version": "1.0.0",
   "engines": { "node": ">=18" },
   "scripts": {
-    "build": "cp -r public/* ./build && echo \"Frontend estático em /build\"",
     "start": "node server.js"
   },
   "dependencies": {
