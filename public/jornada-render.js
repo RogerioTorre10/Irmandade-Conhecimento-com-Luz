@@ -241,7 +241,9 @@
 
     // monta
     mount(root, wrap);
-
+    
+try { window.JORNADA_TYPE?.run?.(getRoot()); } catch(_) {}
+    
     // progresso
     const pct = Math.round(((Wizard.idx + 1) / Wizard.total) * 100);
     const fill = $('#jprog', wrap);
