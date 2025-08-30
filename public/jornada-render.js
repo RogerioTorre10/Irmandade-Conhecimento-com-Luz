@@ -243,8 +243,18 @@
     // monta
     mount(root, wrap);
     
-try { window.JORNADA_TYPE?.run?.(getRoot()); } catch(_) {}
-    
+   // datilografia do título da pergunta (uma vez por tela)
+try {
+  if (wrap && !wrap.dataset.typed) {        // evita rodar 2x
+    window.JORNADA_TYPE?.run?.(wrap, {
+      selector: '.q-label',
+      speed: 18,
+      delay: 100
+    });
+    wrap.dataset.typed = '1';
+  }
+} catch (_){}
+
     // progresso
     const pct = Math.round(((Wizard.idx + 1) / Wizard.total) * 100);
     const fill = $('#jprog', wrap);
@@ -254,58 +264,68 @@ try { window.JORNADA_TYPE?.run?.(getRoot()); } catch(_) {}
   /* =====================
      TELAS: INTRO / FINAL
      ===================== */
-  function renderIntro() {
-    setPergaminho('v');
-    const html = `
-      <section class="card pergaminho pergaminho-v">
-        <h2 class="text-xl font-semibold mb-2">Bem-vindo à Jornada</h2>
-        <p class="mb-3">Respire. Quando estiver pronto, clique em Iniciar.</p>
-        <div id="flame" class="mb-3"></div>
-        <button id="btn-iniciar" class="btn">Começar</button>
-      </section>
-    `;
-    const root = getRoot();
-    mount(root, html);
-    try { global.JORNADA_CHAMA?.makeChama?.('#flame'); } catch (_) {}
-    const btn = $('#btn-iniciar', root);
-    if (btn) btn.addEventListener('click', () => {
-      Wizard.idx = 0;
-      Wizard.respostas = {};
-      saveState();
-      renderPerguntas();
-    });
-  }
-  // depois de mount(root, form);
-try {
-  if (window.JORNADA_MICRO?.attach) {
-    Array.from(root.querySelectorAll('textarea'))
-      .forEach(el => window.JORNADA_MICRO.attach(el));
-  }
-} catch (_) {}
-  try { window.JORNADA_TYPE?.run?.(getRoot()); } catch(_) {}
+ function renderIntro() {
+  setPergaminho('v');
 
-  function renderFinal() {
-    setPergaminho('v');
-    const html = `
-      <section class="card pergaminho pergaminho-v">
-        <h2 class="text-xl font-semibold mb-2">Conclusão da Jornada</h2>
-        <p class="mb-3">Seu caminho foi registrado com coragem e verdade.</p>
-        <div class="wizard-actions">
-          <button id="btn-voltar" class="btn">Voltar ao início</button>
-        </div>
-      </section>
-    `;
-    const root = getRoot();
-    mount(root, html);
-    const btn = $('#btn-voltar', root);
-    if (btn) btn.addEventListener('click', () => {
-      // limpa índice mas mantém respostas salvas (se quiser limpar tudo, zere Wizard.respostas aqui)
-      Wizard.idx = 0;
-      saveState();
-      renderIntro();
-    });
-  }
-try { window.JORNADA_TYPE?.run?.(getRoot()); } catch(_) {}
+  const html = `
+    <section class="card pergaminho pergaminho-v">
+      <h2 class="text-xl font-semibold mb-2" data-type="Bem-vindo à Jornada"></h2>
+      <p class="mb-3" data-type="Respire. Quando estiver pronto, clique em Iniciar."></p>
+      <div id="flame" class="mb-3"></div>
+      <button id="btn-iniciar" class="btn">Começar</button>
+    </section>
+  `;
+
+  const root = getRoot();
+  mount(root, html);
+
+  // chama
+  try { window.JORNADA_CHAMA?.makeChama?.('#flame'); } catch (_) {}
+
+  // datilografia (apenas elementos com [data-type] dentro desta seção)
+  try {
+    const sec = root.querySelector('section.card');
+    window.JORNADA_TYPE?.run?.(sec, { selector: '[data-type]', speed: 18, delay: 80 });
+  } catch(_) {}
+
+  const btn = $('#btn-iniciar', root);
+  if (btn) btn.addEventListener('click', () => {
+    Wizard.idx = 0;
+    Wizard.respostas = {};
+    saveState();
+    renderPerguntas();
+  });
+}
+function renderFinal() {
+  setPergaminho('v');
+
+  const html = `
+    <section class="card pergaminho pergaminho-v">
+      <h2 class="text-xl font-semibold mb-2" data-type="Conclusão da Jornada"></h2>
+      <p class="mb-3" data-type="Seu caminho foi registrado com coragem e verdade."></p>
+      <div class="wizard-actions">
+        <button id="btn-voltar" class="btn">Voltar ao início</button>
+      </div>
+    </section>
+  `;
+
+  const root = getRoot();
+  mount(root, html);
+
+  // datilografia da final
+  try {
+    const sec = root.querySelector('section.card');
+    window.JORNADA_TYPE?.run?.(sec, { selector: '[data-type]', speed: 18, delay: 60 });
+  } catch(_) {}
+
+  const btn = $('#btn-voltar', root);
+  if (btn) btn.addEventListener('click', () => {
+    Wizard.idx = 0; // se quiser, zere também Wizard.respostas = {};
+    saveState();
+    renderIntro();
+  });
+}
+
   
   /* ==========================
      EXPORTAÇÕES & BOOT
