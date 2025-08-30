@@ -155,3 +155,48 @@ ready(() => {
   }
 });
 
+// /public/jornada-bootstrap.js
+(function () {
+  // Namespace global
+  window.JORNADA = window.JORNADA || {};
+
+  // DOM pronto
+  function ready(fn) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fn);
+    } else {
+      fn();
+    }
+  }
+
+  ready(() => {
+    const ns = window.JORNADA;
+
+    // Botão "Começar" da primeira tela
+    const btn = document.getElementById('btnComecar');
+    if (btn) {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (typeof ns.renderIntro === 'function') {
+          ns.renderIntro();
+        } else if (typeof ns.renderPerguntas === 'function') {
+          ns.renderPerguntas(0);
+        } else {
+          console.warn('[JORNADA] renderIntro/renderPerguntas não encontrados.');
+        }
+      });
+    } else {
+      // tudo bem se não existir na home — só loga
+      console.info('[JORNADA] #btnComecar não está na página inicial.');
+    }
+
+    // Caso abra direto com hash (#intro / #perguntas), respeita
+    if (location.hash === '#intro' && typeof ns.renderIntro === 'function') {
+      ns.renderIntro();
+    } else if (location.hash === '#perguntas' && typeof ns.renderPerguntas === 'function') {
+      ns.renderPerguntas(0);
+    }
+  });
+})();
+
+
