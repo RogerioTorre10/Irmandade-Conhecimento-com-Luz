@@ -11,29 +11,15 @@
 
   <button id="btnComecar" class="btn btn-primary">Iniciar Jornada</button>
 
+  <!-- Render mãe + variantes -->
+  <script defer src="/jornada-render-master.js"></script>
+  <script defer src="/jornada-render-plus.js"></script>
+  <script defer src="/jornada-render-junior.js"></script>
+
+  <!-- Hub das jornadas -->
   <script defer src="/jornadamaster.js"></script>
+
+  <!-- Bootstrap -->
   <script defer src="/jornada-bootstrap.js"></script>
-
-  <footer style="opacity:.6; font-size:.85rem; margin-top:2rem; text-align:center">
-  <span id="envTag"></span>
-</footer>
-
-<script>
-  document.getElementById('envTag').textContent =
-    `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
-</script>
-  
-<!-- Render mãe + variantes -->
-<script defer src="/jornada-render-master.js"></script>
-<script defer src="/jornada-render-plus.js"></script>
-<script defer src="/jornada-render-junior.js"></script>
-
-<!-- Hub das jornadas -->
-<script defer src="/jornadamaster.js"></script>
-
-<!-- Bootstrap (inicializa) -->
-<script defer src="/jornada-bootstrap.js"></script>  
-
 </body>
 </html>
-
