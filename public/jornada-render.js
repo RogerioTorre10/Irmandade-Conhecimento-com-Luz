@@ -325,6 +325,96 @@ function renderFinal() {
     renderIntro();
   });
 }
+// --- Intro ---
+ns.renderIntro = async function renderIntro() {
+  if (location.hash !== '#intro') history.replaceState(null, '', '#intro');
+
+  const introSection = qs('#intro');
+  if (introSection) {
+    showSection('intro');
+    wireIntroButtons();
+    return;
+  }
+
+  // Carrega intro.html se não existir
+  const app = qs('#app') || qs('main') || document.body;
+  try {
+    const res = await fetch('/html/intro.html', { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const html = await res.text();
+
+    const section = document.createElement('section');
+    section.id = 'intro';
+    section.className = 'card pergaminho pergaminho-v';
+    section.innerHTML = html;
+
+    qsa('section.card').forEach(s => s.classList.add('hidden'));
+    app.appendChild(section);
+
+    wireIntroButtons();
+  } catch (err) {
+    console.error('[JORNADA] Erro ao carregar intro.html:', err);
+  }
+};
+
+function wireIntroButtons() {
+  const goBtn = qs('#btnIniciarPerguntas') || qs('[data-action="iniciar-perguntas"]');
+  if (goBtn) {
+    goBtn.onclick = (e) => {
+      e.preventDefault();
+      if (typeof ns.renderPerguntas === 'function') {
+        ns.renderPerguntas(0);
+      }
+    };
+  }
+}
+
+// --- Perguntas ---
+ns.renderPerguntas = function renderPerguntas(startIndex = 0) {
+  if (location.hash !== '#perguntas') history.replaceState(null, '', '#perguntas');
+
+  const sec = qs('#perguntas');
+  if (sec) {
+    showSection('perguntas');
+    initPerguntasUI(startIndex);
+    return;
+  }
+
+  const app = qs('#app') || qs('main') || document.body;
+
+  const section = document.createElement('section');
+  section.id = 'perguntas';
+  section.className = 'card pergaminho pergaminho-h';
+  section.innerHTML = `
+    <header>
+      <h2>Perguntas</h2>
+    </header>
+    <div id="blocoPerguntas"></div>
+    <div class="acoes">
+      <button id="btnVoltarIntro">Voltar</button>
+      <button id="btnProxima">Próxima</button>
+    </div>
+  `;
+
+  qsa('section.card').forEach(s => s.classList.add('hidden'));
+  app.appendChild(section);
+
+  initPerguntasUI(startIndex);
+};
+
+function initPerguntasUI(i) {
+  const btnVoltar = qs('#btnVoltarIntro');
+  if (btnVoltar) btnVoltar.onclick = (e) => {
+    e.preventDefault();
+    if (typeof ns.renderIntro === 'function') ns.renderIntro();
+  };
+
+  const btnNext = qs('#btnProxima');
+  if (btnNext) btnNext.onclick = (e) => {
+    e.preventDefault();
+    console.log('[JORNADA] Próxima pergunta a partir do índice', i);
+  };
+}
 
   
   /* ==========================
