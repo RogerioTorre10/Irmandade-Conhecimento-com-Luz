@@ -128,3 +128,13 @@
   });
 
 })(window);
+
+<footer style="opacity:.6; font-size:.85rem; margin-top:2rem; text-align:center">
+  <span id="envTag"></span>
+</footer>
+
+<script>
+  document.getElementById('envTag').textContent =
+    `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
+</script>
+
