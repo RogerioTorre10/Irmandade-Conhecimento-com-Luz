@@ -272,6 +272,13 @@
       renderPerguntas();
     });
   }
+  // depois de mount(root, form);
+try {
+  if (window.JORNADA_MICRO?.attach) {
+    Array.from(root.querySelectorAll('textarea'))
+      .forEach(el => window.JORNADA_MICRO.attach(el));
+  }
+} catch (_) {}
 
   function renderFinal() {
     setPergaminho('v');
