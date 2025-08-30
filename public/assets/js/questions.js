@@ -147,14 +147,23 @@
   };
 })();
 
-<script src="/jornada-utils.js"></script>
-<script src="/jornada-core.js"></script>
+ <!-- Núcleo -->
+<script defer src="/jornada-utils.js"></script>
+<script defer src="/jornada-core.js"></script>
 
-<script src="/jornada-auth.js"></script>
-<script src="/questions.js"></script>
+<!-- Módulos -->
+<script defer src="/jornada-auth.js"></script>
+<script defer src="/jornada-chama.js"></script>
+<script defer src="/jornada-paper-qa.js"></script>
+<script defer src="/jornada-typing-font.js"></script>
+<script defer src="/i18n/i18n.js"></script>
+<script defer src="/jornada-micro.js"></script>  
+<script defer src="/jornada-typing.js"></script>
 
-<script src="/jornada-typing-font.js"></script>
-<script src="/jornada-render.js"></script>
-<script src="/jornada-bootstrap.js"></script>
+<!-- Render e bootstrap -->
+<script defer src="/jornada-render.js"></script>
+<script defer src="/jornada-bootstrap.js"></script>
+  </body>
+</html>
 
 
