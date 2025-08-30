@@ -76,3 +76,15 @@ function setPergunta(index, total, perguntas) {
 // ===== Export ESM + compat global =====
 export const UI = { qs, qsa, showSection, setProgress, setPergunta, toast, fadeOutIn, mountGlobalHandlers };
 if (typeof window !== 'undefined') window.UI = UI;
+
+// /public/js/ui.js
+(function (ns) {
+  // ... seu código atual (showSection, setProgress, etc.)
+
+  // Exponha o que outros módulos precisam:
+  ns.showSection  = typeof showSection  === 'function' ? showSection  : ns.showSection;
+  ns.setProgress  = typeof setProgress  === 'function' ? setProgress  : ns.setProgress;
+  ns.qs           = (sel, root=document) => root.querySelector(sel);
+  ns.qsa          = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+})(window.JORNADA = window.JORNADA || {});
+
