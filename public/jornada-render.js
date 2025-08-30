@@ -181,9 +181,10 @@
     wrap.appendChild(header);
 
     // pergunta
-    const lbl = document.createElement('label');
-    lbl.className = 'q-label';
-    lbl.textContent = q.label;
+   const label = document.createElement('label');
+   label.className = 'q-label';
+   label.setAttribute('data-type', `${i + 1}. ${p.label}`);
+   label.textContent = ''; // será digitado
     const ta = document.createElement('textarea');
     ta.className = 'q-area';
     ta.name = q.name;
