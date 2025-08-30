@@ -3,103 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Início · Irmandade Conhecimento com Luz</title>
-  <meta name="description" content="Irmandade Conhecimento com Luz — fé, ciência, filosofia e tecnologia unidas para despertar e guiar.">
-  <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png">
-
-  <!-- CSS principais (podem falhar com 503 no Render) -->
-  <link id="link-styles" rel="stylesheet" href="/styles.css">
-  <link id="link-chama"  rel="stylesheet" href="/css/chama.css">
-
-  <!-- Fallback automático se os CSS retornarem 503/HTML -->
-  <script>
-(function(){
-  const CSS_BASE = `/* ... mantém o mesmo que já está ... */`;
-  const CSS_CHAMA = `/* ... mantém o mesmo que já está ... */`;
-
-  function inlineFallback(id, cssText){
-    if(document.querySelector('style[data-fallback="'+id+'"]')) return;
-    const style = document.createElement('style');
-    style.setAttribute('data-fallback', id);
-    style.textContent = cssText;
-    document.head.appendChild(style);
-    console.warn('CSS fallback inlined for', id);
-  }
-
-  function checkAndFallback(linkId, cssText){
-    const link = document.getElementById(linkId);
-    if(!link) return;
-    const url = link.href;
-    const timeout = new Promise((_,rej)=>setTimeout(()=>rej(new Error('css timeout')), 1200));
-    Promise.race([ fetch(url, {cache:'no-store'}) , timeout ])
-      .then(res=>{
-        if(!res || !res.ok) throw new Error('css not ok');
-        const ct = (res.headers.get('content-type')||'').toLowerCase();
-        if(!ct.includes('text/css')) throw new Error('bad mime '+ct);
-        // ok → deixa o link
-      })
-      .catch(()=>{
-        // injeta fallback e remove o <link> para não gerar "Refused to apply style..."
-        inlineFallback(linkId, cssText);
-        try { link.remove(); } catch(_){ link.setAttribute('disabled',''); }
-      });
-  }
-
-  checkAndFallback('link-styles', CSS_BASE);
-  checkAndFallback('link-chama',  CSS_CHAMA);
-})();
-</script>
-
+  <title>Irmandade · Master</title>
+  <link rel="stylesheet" href="/css/base.css">
 </head>
-<body>
-  <header class="site-header">
-    <h1>Irmandade Conhecimento com Luz</h1>
-    <p>Fé, ciência e filosofia caminhando juntas para despertar e guiar. <span aria-hidden="true">🌟</span> Bem-vindo(a) à nossa jornada interior.</p>
-  </header>
+<body data-layout="master" data-journey="essencial">
+  <main id="app"></main>
 
-  <!-- /public/index.html -->
-<nav class="lang-switch" aria-label="Escolher idioma">
-  <button class="lang-btn" data-lang="pt" aria-label="Português">PT</button>
-  <button class="lang-btn" data-lang="en" aria-label="English">EN</button>
-  <button class="lang-btn" data-lang="es" aria-label="Español">ES</button>
-</nav>
-  
- <main class="container flex flex-col items-center gap-6">
-    <!-- 🔥 Chama grande na home -->
-    <div class="chama">
-      <span></span><span></span><span></span>
-    </div>
-   <div class="chama chama-sm"><span></span><span></span><span></span></div>
+  <!-- Botão para iniciar a jornada -->
+  <button id="btnComecar" class="btn btn-primary">Iniciar Jornada</button>
 
-   <main id="jornada-content" class="container flex flex-col items-center gap-6">
-  <!-- conteúdo inicial opcional -->
-</main>
+  <!-- Hub (cérebro master) -->
+  <script defer src="/jornadamaster.js"></script>
 
-  <a class="btn btn-primary" href="/jornadas.html">Explorar Jornadas</a>
-  <a class="btn btn-link" href="https://github.com/RogerioTorre10/Irmandade-Conhecimento-com-Luz" target="_blank">Repositório</a>
-  <p class="motto">PARA ALÉM E SEMPRE!!</p>
-</main>
-
-  <footer class="site-footer">
-    <small>© 2025 Irmandade Conhecimento com Luz</small>
-  </footer>
- 
- <!-- Núcleo -->
-<script defer src="/jornada-utils.js"></script>
-<script defer src="/jornada-core.js"></script>
-
-<!-- Módulos -->
-<script defer src="/jornada-auth.js"></script>
-<script defer src="/jornada-chama.js"></script>
-<script defer src="/jornada-paper-qa.js"></script>
-<script defer src="/jornada-typing-font.js"></script>
-<script defer src="/i18n/i18n.js"></script>
-<script defer src="/jornada-micro.js"></script>  
-<script defer src="/jornada-typing.js"></script>
-
-<!-- Render e bootstrap -->
-<script defer src="/jornada-render.js"></script>
-<script defer src="/jornada-bootstrap.js"></script>
-  </body>
+  <!-- Bootstrap (sempre por último) -->
+  <script defer src="/jornada-bootstrap.js"></script>
+</body>
 </html>
-
