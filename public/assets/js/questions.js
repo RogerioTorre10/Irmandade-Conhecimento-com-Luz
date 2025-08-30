@@ -74,6 +74,63 @@
     return answered;
   }
 
+   // /public/js/questions.js
+(function (ns) {
+  const { qs, qsa, showSection } = ns;
+
+  // Adapte este render à sua estrutura atual
+  ns.renderPerguntas = function renderPerguntas(startIndex = 0) {
+    // Se já existir a section #perguntas no DOM:
+    const sec = qs('#perguntas');
+    if (sec) {
+      showSection('perguntas');
+      // aqui você pode inicializar estado, bind de botões etc.
+      initPerguntasUI(startIndex);
+      return;
+    }
+
+    // Caso você gere perguntas dinamicamente, faça aqui:
+    const app = qs('#app') || qs('main') || document.body;
+
+    const section = document.createElement('section');
+    section.id = 'perguntas';
+    section.className = 'card pergaminho pergaminho-h';
+    section.innerHTML = `
+      <header class="titulo">
+        <h2>Perguntas</h2>
+        <p class="sub">Etapa de reflexão</p>
+      </header>
+      <div id="blocoPerguntas"></div>
+      <div class="acoes">
+        <button id="btnVoltarIntro">Voltar</button>
+        <button id="btnProxima">Próxima</button>
+      </div>
+    `;
+
+    qsa('section.card').forEach(s => s.classList.add('hidden'));
+    app.appendChild(section);
+
+    initPerguntasUI(startIndex);
+  };
+
+  function initPerguntasUI(i) {
+    // Exemplos de listeners básicos
+    const btnVoltar = qs('#btnVoltarIntro');
+    if (btnVoltar) btnVoltar.onclick = (e) => {
+      e.preventDefault();
+      if (typeof ns.renderIntro === 'function') ns.renderIntro();
+    };
+
+    const btnNext = qs('#btnProxima');
+    if (btnNext) btnNext.onclick = (e) => {
+      e.preventDefault();
+      // aqui você coloca sua lógica de avançar pergunta
+      // por enquanto, só loga:
+      console.log('[JORNADA] Próxima a partir do índice', i);
+    };
+  }
+})(window.JORNADA = window.JORNADA || {});
+
   window.QUESTIONS = {
     BLOCS,
     ACOLHIMENTO,
