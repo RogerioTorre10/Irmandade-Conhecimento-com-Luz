@@ -36,29 +36,21 @@
     </div>
   </main>
 
-  <!-- Utils e Core -->
-<script src="/jornada-utils.js"></script>
-<script src="/jornada-core.js"></script>
+ <!-- Núcleo -->
+<script defer src="/jornada-utils.js"></script>
+<script defer src="/jornada-core.js"></script>
 
-<!-- Autenticação -->
-<script src="/jornada-auth.js"></script>
+<!-- Módulos -->
+<script defer src="/jornada-auth.js"></script>
+<script defer src="/jornada-chama.js"></script>
+<script defer src="/jornada-paper-qa.js"></script>
+<script defer src="/jornada-typing-font.js"></script>
+<script defer src="/i18n/i18n.js"></script>
+<script defer src="/jornada-micro.js"></script>  
+<script defer src="/jornada-typing.js"></script>
 
-<!-- Internacionalização (não interfere, pode ficar aqui) -->
-<script src="/i18n/i18n.js"></script>
-
-  <!-- ===== A Chama te chama ===== -->
-<script src="/jornada-chama.js"></script>
-
-<!-- Perguntas (antes do render/bootstrap) -->
-<script src="/jornada-paper-qa.js"></script>
-
-<!-- Tipografia / efeitos -->
-<script src="/jornada-typing-font.js"></script>
-
-<!-- Render principal -->
-<script src="/jornada-render.js"></script>
-
-<!-- Bootstrap (inicializador final) -->
-<script src="/jornada-bootstrap.js"></script>
-</body>
+<!-- Render e bootstrap -->
+<script defer src="/jornada-render.js"></script>
+<script defer src="/jornada-bootstrap.js"></script>
+  </body>
 </html>
