@@ -123,3 +123,35 @@
   // API pública (se precisar re-inicializar após hot-swap)
   window.JORNADA_BOOTSTRAP = { init };
 })();
+
+// Hook para disparar assim que o DOM estiver pronto
+function ready(fn) {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', fn);
+  } else {
+    fn();
+  }
+}
+
+ready(() => {
+  const ns = window.JORNADA || {};
+
+  // Botão "Começar"
+  const btn = document.getElementById('btnComecar');
+  if (btn) {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      if (typeof ns.renderIntro === 'function') {
+        ns.renderIntro();
+      } else if (typeof ns.renderPerguntas === 'function') {
+        ns.renderPerguntas(0);
+      } else {
+        console.warn('[JORNADA] Nenhum módulo de render encontrado.');
+      }
+    });
+  } else {
+    console.warn('[JORNADA] Botão #btnComecar não encontrado no DOM.');
+  }
+});
+
