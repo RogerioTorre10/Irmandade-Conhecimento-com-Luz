@@ -50,4 +50,14 @@
     API_BASE: API_BASE_NORM,
     API_URL_NO_API
   };
+  
+    // ===== ALIAS LEGADO: para scripts que ainda leem JORNADA_CFG =====
+  window.JORNADA_CFG = Object.assign(
+    {
+      STORAGE_KEY: window.APP_CONFIG.STORAGE_KEY,
+      ESSENCIAL: true,                   // <- chave que o bootstrap verifica
+      API_BASE: window.APP_CONFIG.API_BASE
+    },
+    window.JORNADA_CFG || {}
+  );  
 })();
