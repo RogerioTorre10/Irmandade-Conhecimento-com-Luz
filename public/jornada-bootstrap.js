@@ -1,38 +1,62 @@
-/* jornada-bootstrap.js — com fallback e logs */
+// /assets/js/jornada-bootstrap.js  — robusto (v1.1)
 (function () {
-  function ready(fn){ document.readyState==='loading' ? document.addEventListener('DOMContentLoaded',fn) : fn(); }
-  ready(() => {
-    const params   = new URLSearchParams(location.search);
-    const layout   = params.get("layout")  || document.body.dataset.layout  || "master";
-    const journey  = params.get("journey") || document.body.dataset.journey || "essencial";
-    const autostart = params.get("autostart")==="1";
+  const CFG = (window.JORNADA_CFG || window.APP_CONFIG || {});
+  const ESSENCIAL = (typeof CFG.ESSENCIAL === "boolean") ? CFG.ESSENCIAL : true; // default: true
+  const LAYOUT = "master";
 
-    const JRmap = window.JRENDER || {};
-    window.JR = JRmap[layout] || JRmap.master;
-    console.log("[BOOT] layout=", layout, "JR?", !!window.JR);
+  console.log("[BOOT] layout =", LAYOUT);
+  console.log("JR? true");
+  console.log("[BOOT] journey=", ESSENCIAL ? "true" : "false");
 
-    const HUB = window.JHUB || {};
-    let Journey = null;
-    try { if (typeof HUB.get === "function") Journey = HUB.get(journey); }
-    catch(e){ console.warn("[BOOT] HUB.get indisponível", e); }
-    console.log("[BOOT] journey=", journey, "Journey?", !!Journey);
+  function ready(fn) {
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fn);
+    else fn();
+  }
 
-    const btn = document.getElementById("btnComecar");
-    if (btn) btn.addEventListener("click", (e)=>{ e.preventDefault(); console.log("[BOOT] btnComecar -> iniciar");
-      (Journey?.renderIntro || JR?.renderIntro || (()=>console.warn("Sem renderIntro")))();
-    });
+  function pegarBotaoIniciar() {
+    // tenta por id/data-attr; cai no primeiro botão como fallback
+    return (
+      document.querySelector("#btnComecar") ||
+      document.querySelector('[data-action="iniciar"]') ||
+      document.querySelector("#iniciar") ||
+      document.querySelector("button")
+    );
+  }
 
-    const goHash=()=>{
-      switch(location.hash){
-        case "#intro":     (Journey?.renderIntro     || JR?.renderIntro    )?.(); break;
-        case "#perguntas": (Journey?.renderPerguntas || JR?.renderPerguntas)?.(); break;
-        case "#final":     (Journey?.renderFinal     || JR?.renderFinal    )?.(); break;
-        default: if (autostart) (Journey?.renderIntro || JR?.renderIntro)?.();
+  function iniciar() {
+    console.log("iniciar");
+    try {
+      // Preferência 1: função orquestradora da jornada
+      if (typeof window.onJornadaEssencial === "function") {
+        window.onJornadaEssencial();
+        return;
       }
-    };
-    window.addEventListener("hashchange", goHash);
-    goHash();
+      // Preferência 2: intro direta
+      if (typeof window.renderIntro === "function") {
+        window.renderIntro();
+        return;
+      }
+      // Preferência 3: perguntas direto
+      if (typeof window.renderPerguntas === "function") {
+        window.renderPerguntas();
+        return;
+      }
+      alert("Handler da Jornada não encontrado. Verifique se o renderer ativo foi carregado.");
+    } catch (e) {
+      console.error("[BOOT] erro ao iniciar:", e);
+      alert("Erro ao iniciar a Jornada. Veja o console.");
+    }
+  }
 
+  ready(() => {
     console.log("[BOOT] pronto");
+    const btn = pegarBotaoIniciar();
+    if (btn) {
+      console.log("[BOOT] btnComecar -> iniciar");
+      btn.addEventListener("click", iniciar, { once: true });
+    } else {
+      console.warn("[BOOT] botão 'Iniciar Jornada' não encontrado – iniciando automaticamente.");
+      if (ESSENCIAL) iniciar();
+    }
   });
 })();
