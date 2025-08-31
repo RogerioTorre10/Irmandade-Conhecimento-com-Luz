@@ -1,5 +1,5 @@
-// /public/assets/js/config.js — compat + módulos (v1.0)
-// Mantém variáveis antigas e fornece window.APP_CONFIG para os módulos novos.
+// /assets/js/config.js — compat + módulos (v1.1)
+// Mantém variáveis antigas e fornece window.APP_CONFIG e window.JORNADA_CFG
 
 (function () {
   // >>> Ajuste AQUI se seu backend mudar <<<
@@ -50,8 +50,8 @@
     API_BASE: API_BASE_NORM,
     API_URL_NO_API
   };
-  
-    // ===== ALIAS LEGADO: para scripts que ainda leem JORNADA_CFG =====
+
+  // ===== ALIAS LEGADO: para scripts que ainda leem JORNADA_CFG =====
   window.JORNADA_CFG = Object.assign(
     {
       STORAGE_KEY: window.APP_CONFIG.STORAGE_KEY,
@@ -59,5 +59,5 @@
       API_BASE: window.APP_CONFIG.API_BASE
     },
     window.JORNADA_CFG || {}
-  );  
+  );
 })();
