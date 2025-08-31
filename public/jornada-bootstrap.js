@@ -1,62 +1,63 @@
-// /assets/js/jornada-bootstrap.js  — robusto (v1.1)
+// /assets/js/config.js — compat + módulos (v1.1)
+// Mantém variáveis antigas e fornece window.APP_CONFIG e window.JORNADA_CFG
+
 (function () {
-  const CFG = (window.JORNADA_CFG || window.APP_CONFIG || {});
-  const ESSENCIAL = (typeof CFG.ESSENCIAL === "boolean") ? CFG.ESSENCIAL : true; // default: true
-  const LAYOUT = "master";
+  // >>> Ajuste AQUI se seu backend mudar <<<
+  const DEFAULT_API_BASE = "https://lumen-backend-api.onrender.com/api"; // com /api
+  const DEFAULT_STORAGE_KEY = "jornada_essencial_v1";
+  const DEFAULT_PASS = "iniciar";
 
-  console.log("[BOOT] layout =", LAYOUT);
-  console.log("JR? true");
-  console.log("[BOOT] journey=", ESSENCIAL ? "true" : "false");
-
-  function ready(fn) {
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fn);
-    else fn();
+  // Normaliza removendo "/" do final
+  function normalizeBase(u) {
+    return String(u || "").replace(/\/+$/, "");
   }
 
-  function pegarBotaoIniciar() {
-    // tenta por id/data-attr; cai no primeiro botão como fallback
-    return (
-      document.querySelector("#btnComecar") ||
-      document.querySelector('[data-action="iniciar"]') ||
-      document.querySelector("#iniciar") ||
-      document.querySelector("button")
-    );
-  }
+  // Preferir valor já definido na página; senão usar o default
+  const baseFromPage =
+    (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || DEFAULT_API_BASE;
 
-  function iniciar() {
-    console.log("iniciar");
-    try {
-      // Preferência 1: função orquestradora da jornada
-      if (typeof window.onJornadaEssencial === "function") {
-        window.onJornadaEssencial();
-        return;
-      }
-      // Preferência 2: intro direta
-      if (typeof window.renderIntro === "function") {
-        window.renderIntro();
-        return;
-      }
-      // Preferência 3: perguntas direto
-      if (typeof window.renderPerguntas === "function") {
-        window.renderPerguntas();
-        return;
-      }
-      alert("Handler da Jornada não encontrado. Verifique se o renderer ativo foi carregado.");
-    } catch (e) {
-      console.error("[BOOT] erro ao iniciar:", e);
-      alert("Erro ao iniciar a Jornada. Veja o console.");
-    }
-  }
+  const API_BASE_NORM = normalizeBase(baseFromPage); // ex.: https://.../api
+  const API_URL_NO_API = API_BASE_NORM.replace(/\/api$/, ""); // ex.: https://... (sem /api)
 
-  ready(() => {
-    console.log("[BOOT] pronto");
-    const btn = pegarBotaoIniciar();
-    if (btn) {
-      console.log("[BOOT] btnComecar -> iniciar");
-      btn.addEventListener("click", iniciar, { once: true });
-    } else {
-      console.warn("[BOOT] botão 'Iniciar Jornada' não encontrado – iniciando automaticamente.");
-      if (ESSENCIAL) iniciar();
-    }
-  });
+  // ===== NOVO: objeto central para os módulos =====
+  window.APP_CONFIG = Object.assign(
+    {
+      ENV: "prod",
+      API_BASE: API_BASE_NORM,          // usado pelos módulos; fallback com/sem /api é feito no código
+      STORAGE_KEY: DEFAULT_STORAGE_KEY, // chave do localStorage
+      PASS: DEFAULT_PASS,               // senha da jornada
+    },
+    window.APP_CONFIG || {}
+  );
+
+  // ===== LEGADO: manter variáveis antigas vivas =====
+  // Base SEM /api para código antigo que espera raiz do host
+  window.API_URL = window.API_URL || API_URL_NO_API;
+
+  // Endpoints antigos (ajuste se seu backend usar outros caminhos)
+  window.TOKEN_VALIDATION_ENDPOINT =
+    window.TOKEN_VALIDATION_ENDPOINT || "/validate-token";
+  window.JOURNEY_START_ENDPOINT =
+    window.JOURNEY_START_ENDPOINT || "/start-journey";
+
+  // Nomes dedicados à Jornada (usados por trechos antigos)
+  window.JORNADA_API_BASE = window.JORNADA_API_BASE || API_BASE_NORM; // pode ficar com /api
+  window.JORNADA_ENDPOINT_PATH =
+    window.JORNADA_ENDPOINT_PATH || "/jornada"; // módulos chamam /jornada/pdf e /jornada/hq
+
+  // (Opcional) expõe bases úteis para debug
+  window.__API_DEBUG__ = {
+    API_BASE: API_BASE_NORM,
+    API_URL_NO_API
+  };
+
+  // ===== ALIAS LEGADO: para scripts que ainda leem JORNADA_CFG =====
+  window.JORNADA_CFG = Object.assign(
+    {
+      STORAGE_KEY: window.APP_CONFIG.STORAGE_KEY,
+      ESSENCIAL: true,                   // <- chave que o bootstrap verifica
+      API_BASE: window.APP_CONFIG.API_BASE
+    },
+    window.JORNADA_CFG || {}
+  );
 })();
