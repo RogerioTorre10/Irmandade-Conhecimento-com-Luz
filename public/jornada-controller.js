@@ -60,6 +60,43 @@
     return await res.blob();
   }
 
+    // --- Overlay de vídeo para transições ---
+  function ensureVideoOverlay() {
+    if (document.getElementById("jr-video-ovl")) return;
+    const wrap = document.createElement("div");
+    wrap.id = "jr-video-ovl";
+    wrap.style.cssText = `
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(0,0,0,.85); z-index:9999; padding:0;
+    `;
+    wrap.innerHTML = `
+      <video id="jr-video" playsinline webkit-playsinline controls style="max-width:92vw;max-height:86vh;outline:none;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.5)"></video>
+    `;
+    document.body.appendChild(wrap);
+  }
+
+  function playVideoOverlay(src) {
+    return new Promise((resolve) => {
+      if (!src) return resolve(); // sem vídeo → segue
+      ensureVideoOverlay();
+      const ovl = document.getElementById("jr-video-ovl");
+      const vid = document.getElementById("jr-video");
+      vid.src = src;
+      ovl.style.display = "flex";
+      const done = () => {
+        vid.pause(); vid.removeAttribute("src"); vid.load();
+        ovl.style.display = "none";
+        vid.removeEventListener("ended", done);
+        vid.removeEventListener("error", done);
+        resolve();
+      };
+      vid.addEventListener("ended", done);
+      vid.addEventListener("error", done);
+      // auto-play (mobile pode exigir interação prévia; temos o clique do botão)
+      vid.play().catch(() => { /* se não tocar, o usuário pode dar play manual */ });
+    });
+  }
+
   // --- Perguntas (fonte) ---
   // Preferência: window.JORNADA_QA (seus módulos reais). Fallback: perguntas demo.
   function getQuestions() {
@@ -72,86 +109,149 @@
   }
 
   // --- Render: Intro ---
-  function renderIntro() {
+    function renderIntro() {
     const el = root();
+    const blocks = Array.isArray(window.JORNADA_BLOCKS) ? window.JORNADA_BLOCKS : null;
+    const total = blocks ? blocks.length : 1;
     el.innerHTML = `
       <section class="card pergaminho pergaminho-v">
         <h1 class="title">Irmandade Conhecimento com Luz</h1>
-        <p class="muted">Bem-vindo(a) à <strong>Jornada Essencial</strong> — responda com sinceridade e ao final gere sua devolutiva (PDF) e a HQ com 33 quadros.</p>
+        <p class="muted">Bem-vindo(a) à <strong>Jornada Essencial</strong> em <strong>${total}</strong> blocos. Assista às transições e siga o fluxo com serenidade. </p>
         <div style="margin-top:16px">
-          <button id="jr_go" class="btn">Avançar</button>
+          <button id="jr_go" class="btn">Começar</button>
           <button id="jr_home" class="btn" style="background:#6b7280">Página inicial</button>
         </div>
       </section>
     `;
     const go = document.getElementById("jr_go");
     const home = document.getElementById("jr_home");
-    if (go) go.onclick = renderPerguntas;
+    if (go) go.onclick = () => renderPerguntas(0);  // começa no bloco 0
     if (home) home.onclick = () => location.assign("/");
   }
 
-  // --- Render: Perguntas + navegação final ---
-  function renderPerguntas() {
-    const qas = getQuestions();
-    const state = S.load();
-    const el = root();
 
-    const fields = qas.map(q => {
-      const val = (state.answers && state.answers[q.id]) || "";
+  // --- Render: Perguntas + navegação final ---
+   function renderPerguntas(blockIndex = 0) {
+    const blocks = Array.isArray(window.JORNADA_BLOCKS) ? window.JORNADA_BLOCKS : null;
+
+    // Se não houver blocos, cai no modo antigo (JORNADA_QA completo)
+    if (!blocks) {
+      return renderPerguntasFlat();
+    }
+
+    const b = blocks[blockIndex];
+    const total = blocks.length;
+    const state = S.load();
+    state.blockIndex = blockIndex;
+    S.save(state);
+
+    const el = root();
+    const fields = (b.questions || []).map(q => {
+      const v = (state.answers && state.answers[q.id]) || "";
       if (q.type === "textarea") {
         return `
           <div style="margin:14px 0">
             <label>${q.label}</label>
-            <textarea data-qid="${q.id}" rows="3" style="width:100%;margin-top:6px">${val}</textarea>
+            <textarea data-qid="${q.id}" rows="3" style="width:100%;margin-top:6px">${v}</textarea>
           </div>
         `;
       }
       return `
         <div style="margin:14px 0">
           <label>${q.label}</label>
-          <input data-qid="${q.id}" type="text" value="${String(val)}" style="width:100%;margin-top:6px"/>
+          <input data-qid="${q.id}" type="text" value="${String(v)}" style="width:100%;margin-top:6px"/>
         </div>
       `;
     }).join("");
 
     el.innerHTML = `
       <section class="card pergaminho pergaminho-h">
-        <h2 class="title">Perguntas — Bloco Essencial</h2>
+        <div class="muted" style="margin-bottom:8px">Bloco ${blockIndex + 1} / ${total} — <strong>${b.title}</strong></div>
         ${fields}
         <div style="margin-top:16px">
           <button id="jr_save" class="btn">Salvar respostas</button>
-          <button id="jr_final" class="btn">Finalizar e Gerar</button>
-          <button id="jr_back" class="btn" style="background:#6b7280">Voltar</button>
+          ${blockIndex > 0 ? `<button id="jr_prev" class="btn" style="background:#6b7280">Bloco anterior</button>` : ``}
+          ${blockIndex < total - 1
+            ? `<button id="jr_next" class="btn">Próximo bloco</button>`
+            : `<button id="jr_final" class="btn">Finalizar e Gerar</button>`
+          }
         </div>
-        <p class="muted" style="margin-top:10px">Suas respostas ficam salvas localmente enquanto estiver nesta jornada.</p>
       </section>
     `;
 
-    // handlers
-    const $ = (sel) => Array.from(el.querySelectorAll(sel));
-    function collect() {
-      const answers = {};
+    const $ = (sel, scope = el) => Array.from(scope.querySelectorAll(sel));
+    const collect = () => {
+      const answers = Object.assign({}, state.answers || {});
       $('[data-qid]').forEach(n => { answers[n.getAttribute('data-qid')] = n.value || ""; });
       return answers;
-    }
+    };
 
     const btnSave = document.getElementById("jr_save");
-    const btnFinal = document.getElementById("jr_final");
-    const btnBack = document.getElementById("jr_back");
-
     if (btnSave) btnSave.onclick = () => {
       const answers = collect();
-      S.save({ answers, ts: Date.now() });
+      S.save({ ...S.load(), answers, ts: Date.now(), blockIndex });
       alert("Respostas salvas (local).");
     };
 
-    if (btnFinal) btnFinal.onclick = async () => {
+    const btnPrev = document.getElementById("jr_prev");
+    if (btnPrev) btnPrev.onclick = () => {
       const answers = collect();
-      S.save({ answers, ts: Date.now() });
-      await gerarDevolutivas(answers);
+      S.save({ ...S.load(), answers, ts: Date.now(), blockIndex: blockIndex - 1 });
+      renderPerguntas(blockIndex - 1);
     };
 
-    if (btnBack) btnBack.onclick = renderIntro;
+    const btnNext = document.getElementById("jr_next");
+    if (btnNext) btnNext.onclick = async () => {
+      const answers = collect();
+      S.save({ ...S.load(), answers, ts: Date.now(), blockIndex: blockIndex + 1 });
+      // toca vídeo de transição deste bloco (se houver) e avança
+      await playVideoOverlay(b.video_after || "");
+      renderPerguntas(blockIndex + 1);
+    };
+
+    const btnFinal = document.getElementById("jr_final");
+    if (btnFinal) btnFinal.onclick = async () => {
+      const answers = collect();
+      S.save({ ...S.load(), answers, ts: Date.now(), blockIndex });
+      // vídeo final (opcional) antes de gerar PDF/HQ
+      if (window.JORNADA_FINAL_VIDEO) {
+        await playVideoOverlay(window.JORNADA_FINAL_VIDEO);
+      }
+      await gerarDevolutivas(answers);
+    };
+  }
+
+  // modo antigo (sem blocos): usa window.JORNADA_QA completo
+  function renderPerguntasFlat() {
+    const qas = Array.isArray(window.JORNADA_QA) ? window.JORNADA_QA : [];
+    const state = S.load();
+    const el = root();
+    const fields = qas.map(q => {
+      const val = (state.answers && state.answers[q.id]) || "";
+      return `
+        <div style="margin:14px 0">
+          <label>${q.label}</label>
+          <textarea data-qid="${q.id}" rows="3" style="width:100%;margin-top:6px">${val}</textarea>
+        </div>`;
+    }).join("");
+
+    el.innerHTML = `
+      <section class="card pergaminho pergaminho-h">
+        <h2 class="title">Perguntas — Essencial</h2>
+        ${fields}
+        <div style="margin-top:16px">
+          <button id="jr_final" class="btn">Finalizar e Gerar</button>
+        </div>
+      </section>
+    `;
+    const btnFinal = document.getElementById("jr_final");
+    if (btnFinal) btnFinal.onclick = async () => {
+      const answers = {};
+      el.querySelectorAll('[data-qid]').forEach(n => answers[n.getAttribute('data-qid')] = n.value || "");
+      S.save({ answers, ts: Date.now() });
+      if (window.JORNADA_FINAL_VIDEO) await playVideoOverlay(window.JORNADA_FINAL_VIDEO);
+      await gerarDevolutivas(answers);
+    };
   }
 
   // --- Fluxo final: gerar PDF e HQ em paralelo, avisar e voltar ao início ---
