@@ -42,3 +42,15 @@
   root.JRENDER = root.JRENDER || {};
   root.JRENDER.master = MasterAPI;
 })(window);
+
+// Alias para o bootstrap encontrar
+window.onJornadaEssencial = function () {
+  if (typeof renderIntro === "function") {
+    renderIntro();
+  } else if (typeof renderPerguntas === "function") {
+    renderPerguntas();
+  } else {
+    console.error("Nenhum renderer disponível.");
+  }
+};
+
