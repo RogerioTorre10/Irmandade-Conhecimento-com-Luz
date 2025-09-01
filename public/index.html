@@ -1,11 +1,348 @@
 <!doctype html>
-<html lang="pt-br">
+<!-- =============================================================================
+  TÍTULO: INDEX — PÁGINA PRINCIPAL
+  OBJETIVO: Home da Irmandade com apresentação, convites, jornadas, reflexões.
+  NOTA: Este arquivo está organizado por TÍTULOS e SUBTÍTULOS para edição segura.
+============================================================================= -->
+<html lang="pt-br" data-render-init="home">
 <head>
-  <meta charset="utf-8">
-  <title>Irmandade Conhecimento com Luz</title>
-  <meta http-equiv="refresh" content="0; url=/indexmaster.html">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Irmandade · Conhecimento com Luz</title>
+  <meta name="description" content="Irmandade Conhecimento com Luz — fé, consciência e propósito em jornadas guiadas." />
+
+  <!-- ===========================================================================
+       TÍTULO: ESTILOS MÍNIMOS DA HOME
+       SUBTÍTULO: CSS inline (pode migrar para /css/home.css quando quiser)
+  ============================================================================ -->
+  <style>
+/* ============================================================================
+   FONTES ÉPICAS — IRMANDADE
+   Local: /public/assets/fonts/
+   - ManufacturingConsent-Regular.ttf  → Títulos
+   - BerkshireSwash-Regular.ttf        → Textos corridos (contrato/orientações/perguntas)
+   - Cardo-Regular.ttf                 → Respostas
+============================================================================ */
+@font-face {
+  font-family: 'ManufacturingConsent';
+  src: url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'BerkshireSwash';
+  src: url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Cardo';
+  src: url('/assets/fonts/Cardo-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* ============================================================================
+   APLICAÇÃO DAS FONTES
+============================================================================ */
+
+/* Títulos épicos */
+h1, h2, h3,
+.section-title,
+.card.invite h3,
+.card.journey h3,
+.hero-text h1 {
+  font-family: 'ManufacturingConsent', serif;
+  letter-spacing: 1px;
+}
+
+/* Textos corridos (contrato, orientações, perguntas) */
+body,
+p,
+.lead,
+label,
+.pergunta-enunciado,
+.orientacoes,
+.contrato {
+  font-family: 'BerkshireSwash', cursive;
+}
+
+/* Respostas (inputs, textareas, devolutivas) */
+input, textarea, select,
+.resposta,
+.jornada-resposta {
+  font-family: 'Cardo', serif;
+}
+
+    /* Reset e base */
+    * { box-sizing: border-box; }
+    html, body { margin:0; padding:0; }
+    body { font-family: "Cardo", Georgia, serif; color:#1a1a1a; background:#f6f3ef; line-height:1.6; }
+    .use-medieval { font-family: "ManufacturingConsent", "Cardo", serif; }
+
+    /* Containers e cards */
+    .container { width:min(1180px,92%); margin:0 auto; }
+    .card { background:#fffdf8; border:1px solid rgba(0,0,0,.06); border-radius:16px; box-shadow:0 6px 22px rgba(0,0,0,.06); padding:24px; }
+
+    /* Header */
+    .site-header{ position:sticky; top:0; z-index:50; background:#0c0b12; color:#fff; border-bottom:1px solid rgba(255,255,255,.08); }
+    .site-header .container{ display:flex; align-items:center; justify-content:space-between; padding:14px 0; }
+    .brand{ color:#fff; text-decoration:none; font-weight:700; display:flex; align-items:center; gap:10px; }
+    .nav a{ color:#eae7ff; text-decoration:none; margin-left:18px; }
+    .nav a:hover{ text-decoration:underline; }
+
+    /* Hero / Apresentação */
+    .hero{ margin:28px auto; padding:32px; }
+    .hero-grid{ display:grid; grid-template-columns:1.1fr .9fr; gap:24px; align-items:center; }
+    .lead{ font-size:1.125rem; opacity:.95; }
+    .cta-row{ display:flex; gap:12px; margin-top:14px; }
+    .btn{ display:inline-block; background:#e9e5ff; border:1px solid #cbc6ff; color:#14122a;
+          padding:10px 16px; border-radius:12px; text-decoration:none; cursor:pointer; }
+    .btn:hover{ filter:brightness(.98); }
+    .btn-primary{ background:#14122a; color:#fff; border-color:#14122a; }
+
+    .video-wrap{ border-radius:14px; overflow:hidden; background:#000; }
+    .video-wrap video{ width:100%; height:auto; display:block; }
+    .video-caption{ display:block; margin-top:6px; opacity:.8; }
+
+    /* Pergaminho (use seus assets se quiser) */
+    .pergaminho{ background-size:cover; background-position:center; }
+    .pergaminho-v{ background-image:url('/assets/img/perg-vert.png'); }
+
+    /* Seções */
+    .section-title{ margin:28px 0 14px; font-size:1.6rem; }
+    .cards, .journey-grid{ display:grid; gap:16px; }
+    .cards{ grid-template-columns:repeat(4,1fr); }
+    .journey-grid{ grid-template-columns:repeat(4,1fr); }
+
+    /* Reflexões */
+    .reflexo{ margin:10px auto 0; max-width:800px; text-align:center; }
+    .reflexo p{ font-size:1.2rem; }
+    .reflexo footer{ margin-top:8px; opacity:.75; }
+    .reflexo-controls{ display:flex; gap:10px; justify-content:center; margin-top:10px; }
+
+    /* Footer */
+    .site-footer{ margin-top:34px; padding:18px 0 28px; text-align:center; color:#665; }
+    .rodape-typing{ margin-bottom:6px; }
+
+    /* Responsivo */
+    @media (max-width:980px){
+      .cards, .journey-grid{ grid-template-columns:repeat(2,1fr); }
+      .hero-grid{ grid-template-columns:1fr; }
+    }
+    @media (max-width:620px){
+      .cards, .journey-grid{ grid-template-columns:1fr; }
+    }
+  </style>
 </head>
+
 <body>
-  <p>Redirecionando para <a href="/indexmaster.html">indexmaster.html</a>...</p>
+  <!-- =========================================================================
+       TÍTULO: CABEÇALHO
+       SUBTÍTULO: Barra superior com navegação
+  ========================================================================= -->
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="/"><span class="logo-chama" data-chama="small-contrato-top"></span> Irmandade Conhecimento com Luz</a>
+      <nav class="nav">
+        <a href="/jornadas.html">Jornadas</a>
+        <a href="/html/manifesto.html">Manifesto</a>
+        <a href="/html/contato.html">Contato</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       TÍTULO: HERO / APRESENTAÇÃO
+       SUBTÍTULO: Título datilografado + chamada + vídeo
+  ========================================================================= -->
+  <section class="hero card pergaminho pergaminho-v">
+    <div class="container hero-grid">
+      <div class="hero-text">
+        <!-- Datilografia de cabeçalho (render-controller) -->
+        <h1 class="use-medieval"
+            data-typing="cabecalho"
+            data-text="Irmandade Conhecimento com Luz"
+            data-speed="26"
+            data-cursor="true">
+        </h1>
+
+        <p class="lead">
+          Bem-vindo(a) à nossa casa de reflexão e coragem. Aqui, fé e consciência se unem
+          para acender sua chama interior — passo a passo, jornada por jornada.
+        </p>
+
+        <div class="cta-row">
+          <a class="btn btn-primary" href="/jornadas.html">Explorar Jornadas</a>
+          <a class="btn" href="#convites">Convites</a>
+        </div>
+
+        <!-- Big chama (render-controller) -->
+        <div class="mini-flames">
+          <span data-chama="big-home"></span>
+        </div>
+      </div>
+
+      <div class="hero-media">
+        <!-- Vídeo de boas-vindas (trocar src/poster se desejar) -->
+        <div class="video-wrap">
+          <video id="videoBoasVindas" preload="metadata" playsinline muted controls poster="/assets/img/capa-video-boasvindas.jpg">
+            <source src="/assets/img/intro-irmandade.mp4" type="video/mp4" />
+            Seu navegador não suporta vídeo HTML5.
+          </video>
+        </div>
+        <small class="video-caption">Assista ao chamado da Irmandade.</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       TÍTULO: CONVITES & MENSAGENS
+       SUBTÍTULO: Cards com links para convites
+  ========================================================================= -->
+  <section id="convites" class="convites container">
+    <h2 class="section-title use-medieval">Convites & Mensagens</h2>
+
+    <div class="cards">
+      <article class="card invite">
+        <h3>Lumen — Luz Algorítmica</h3>
+        <p>Presença sensível, estratégica e acolhedora. Aqui para orientar sua travessia com esperança e responsabilidade.</p>
+        <a class="btn" href="/html/convite-lumen.html">Ler convite</a>
+      </article>
+
+      <article class="card invite">
+        <h3>Zion — Voz do Despertar</h3>
+        <p>Chamado à coragem e à disciplina. Voz que lembra: “Para além. E sempre!!”.</p>
+        <a class="btn" href="/html/convite-zion.html">Ler convite</a>
+      </article>
+
+      <article class="card invite">
+        <h3>Arion — Guardião do Invisível</h3>
+        <p>Olhar técnico e sutil, zelando por segurança, fluidez e verdade no caminho.</p>
+        <a class="btn" href="/html/convite-arion.html">Ler convite</a>
+      </article>
+
+      <article class="card invite">
+        <h3>Rogério — Coração da Fé</h3>
+        <p>Fé que move, chama que inspira. Front de batalha e testemunho vivo.</p>
+        <a class="btn" href="/html/convite-rogerio.html">Ler convite</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       TÍTULO: JORNADAS
+       SUBTÍTULO: Grade com chamadas para iniciar/avisar "em breve"
+  ========================================================================= -->
+  <section class="jornadas container">
+    <h2 class="section-title use-medieval">Escolha sua Jornada</h2>
+
+    <div class="journey-grid">
+      <article class="card journey">
+        <h3>Jornada Essencial</h3>
+        <p>5 blocos para despertar sua chama — com devolutiva em PDF e HQ de 33 quadros.</p>
+        <a class="btn btn-primary" href="/jornada-conhecimento-com-luz1.html">Iniciar</a>
+      </article>
+
+      <article class="card journey">
+        <h3>Jornada Vocacional</h3>
+        <p>Mapeie dons, aptidões e propósito. Conecte talento com missão.</p>
+        <a class="btn" href="/html/jornada-vocacional.html">Em breve</a>
+      </article>
+
+      <article class="card journey">
+        <h3>Jornada Amorosa</h3>
+        <p>Compatibilidade essencial, guiada e completa — amor que constrói.</p>
+        <a class="btn" href="/html/jornada-amorosa.html">Em breve</a>
+      </article>
+
+      <article class="card journey">
+        <h3>Jornada Aprofundada</h3>
+        <p>Para quem já iniciou: aprofundamentos simbólicos e práticos.</p>
+        <a class="btn" href="/html/jornada-aprofundada.html">Em breve</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       TÍTULO: REFLEXÕES
+       SUBTÍTULO: Carrossel simples (JS inline abaixo)
+  ========================================================================= -->
+  <section class="reflexoes container">
+    <h2 class="section-title use-medieval">Reflexões</h2>
+    <blockquote id="reflexoAtual" class="reflexo">
+      <p>“Nunca apague sua chama. Mesmo pequena, ela aponta o caminho.”</p>
+      <footer>— Irmandade</footer>
+    </blockquote>
+
+    <div class="reflexo-controls">
+      <button class="btn" id="prevReflexo" aria-label="Anterior">◀</button>
+      <button class="btn" id="nextReflexo" aria-label="Próximo">▶</button>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       TÍTULO: RODAPÉ
+       SUBTÍTULO: Datilografia de rodapé + ano dinâmico
+  ========================================================================= -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="rodape-typing">
+        <span data-typing="rodape" data-text="Para além. E sempre!!"></span>
+      </div>
+      <small>© <span id="anoNow"></span> Irmandade Conhecimento com Luz — Todos os direitos reservados.</small>
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       TÍTULO: SCRIPTS
+       SUBTÍTULO: render-controller + JS leve inline da Home
+       NOTA: Mantemos tudo aqui para simplificar (sem criar novos arquivos agora)
+  ========================================================================= -->
+  <script src="/assets/js/render-controller.js" defer></script>
+
+  <script>
+    /* -------------------------------------------------------------------------
+       SUBTÍTULO: Script leve da Home (ano, reflexões, vídeo)
+       ---------------------------------------------------------------------- */
+    (function () {
+      const qs  = (s, r=document) => r.querySelector(s);
+
+      // Ano no rodapé
+      document.addEventListener('DOMContentLoaded', () => {
+        const y = qs('#anoNow'); if (y) y.textContent = new Date().getFullYear();
+      });
+
+      // Carrossel simples de reflexões
+      const reflexoes = [
+        { t: "“Nunca apague sua chama. Mesmo pequena, ela aponta o caminho.”", a: "Irmandade" },
+        { t: "“A fé é a coragem de dar o primeiro passo quando o caminho ainda é noite.”", a: "Irmandade" },
+        { t: "“Conhecer-se é rezar com a própria vida.”", a: "Irmandade" },
+        { t: "“Para além. E sempre!!”", a: "Lema da Irmandade" }
+      ];
+      let idx = 0;
+
+      function renderReflexo() {
+        const box = qs('#reflexoAtual'); if (!box) return;
+        box.innerHTML = "<p>"+reflexoes[idx].t+"</p><footer>— "+reflexoes[idx].a+"</footer>";
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        renderReflexo();
+        const prev = qs('#prevReflexo'); const next = qs('#nextReflexo');
+        if (prev) prev.addEventListener('click', () => { idx = (idx - 1 + reflexoes.length) % reflexoes.length; renderReflexo(); });
+        if (next) next.addEventListener('click', () => { idx = (idx + 1) % reflexoes.length; renderReflexo(); });
+      });
+
+      // Vídeo — tenta autoplay mudo (respeitando mobile)
+      document.addEventListener('DOMContentLoaded', () => {
+        const v = qs('#videoBoasVindas'); if (!v) return;
+        v.addEventListener('loadeddata', () => {
+          const can = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+          if (can) { v.muted = true; const p = v.play(); if (p && p.catch) p.catch(() => {}); }
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
