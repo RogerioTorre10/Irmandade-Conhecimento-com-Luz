@@ -493,5 +493,23 @@ input, textarea, select,
       });
     })();
   </script>
+  <script>
+  (function(){
+    function typeWriter(el, text, speed, showCursor){
+      if (!el) return;
+      el.textContent = '';
+      if (showCursor) el.classList.add('lumen-typing');
+      let i=0; (function step(){ if(i<text.length){ el.textContent+=text.charAt(i++); setTimeout(step, speed); } else { el.classList.add('typing-done'); } })();
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('[data-typing]').forEach(el => {
+        const t   = el.getAttribute('data-text') || el.textContent || '';
+        const spd = parseInt(el.getAttribute('data-speed') || '26', 10);
+        const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
+        typeWriter(el, t, spd, cur);
+      });
+    });
+  })();
+</script>
 </body>
 </html>
