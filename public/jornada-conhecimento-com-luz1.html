@@ -122,6 +122,17 @@
 
 <!-- Repita a mesma estrutura para os blocos 3, 4 e 5 -->
 
+  <!-- =============================================================================
+     TÍTULO: OVERLAY DE VÍDEO DE TRANSIÇÃO
+     SUBTÍTULO: abre entre os blocos; botão para pular
+============================================================================= -->
+<div id="videoOverlay" class="video-overlay hidden">
+  <video id="videoTransicao" playsinline preload="metadata" controls
+         style="max-width:90vw; max-height:80vh; background:#000"></video>
+  <button id="skipVideo" class="btn btn-secondary"
+          style="position:absolute; top:14px; right:14px">Pular vídeo</button>
+</div>
+
   <!-- =========================================================================
        TÍTULO: CHAMAS
        SUBTÍTULO: Scripts visuais de efeito da chama
