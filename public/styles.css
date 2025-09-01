@@ -247,3 +247,15 @@ nav a, a.btn, .site-header p { letter-spacing:.5px; }
   cursor:pointer;
 }
 .lang-btn:hover { background:rgba(255,255,255,.1); }
+
+/* =============================================================================
+   TÍTULO: VISIBILIDADE DAS PERGUNTAS
+   SUBTÍTULO: Mostra 1 pergunta por vez dentro do bloco
+============================================================================= */
+.j-bloco { display: none; }          /* todos os blocos começam ocultos (JS mostra o atual) */
+.j-pergunta { display: none; }       /* todas perguntas ocultas (JS mostra a atual) */
+
+/* Overlay de vídeo (já tem, reforço aqui caso precise) */
+.video-overlay { position:fixed; inset:0; background:rgba(0,0,0,.85); display:flex; align-items:center; justify-content:center; z-index:9999; }
+.video-overlay.hidden { display:none; }
+
