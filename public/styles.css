@@ -229,3 +229,14 @@ nav a, a.btn, .site-header p { letter-spacing:.5px; }
 .video-overlay { position:fixed; inset:0; background:rgba(0,0,0,.85); display:flex; align-items:center; justify-content:center; z-index:9999; }
 .video-overlay.hidden { display:none; }
 
+/* ==== HOME (escopado) ==== */
+.home .hero        { /* regras da faixa inicial da home */ }
+.home .card.invite { /* cards de convites da home */ }
+.home nav a        { /* links do topo da home se precisar */ }
+
+/* ==== JORNADA (escopado) ==== */
+.jornada #jornada-canvas.pergaminho { /* pergaminho da jornada */ }
+.jornada .j-progress { /* progresso Local */ }
+.jornada .footer-actions .btn { /* botões Voltar/Próxima */ }
+
+
