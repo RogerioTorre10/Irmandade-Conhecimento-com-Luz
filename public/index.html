@@ -40,13 +40,114 @@
   src: url('/assets/fonts/Cardo-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
-}
-
-/* ============================================================================
+}    
+/* ===========================================================================
    APLICAÇÃO DAS FONTES
-============================================================================ */
+   =========================================================================== */
+<!-- =========================================================================
+     TÍTULO: SCRIPTS DA HOME (inline)
+     SUBTÍTULO: fontes, datilografia, mini-chamas, reflexões, vídeo
+============================================================================= -->
+<script>
+/* ===========================================================================
+   TÍTULO: FONTES (fallback)
+   SUBTÍTULO: garante @font-face caso o CSS não carregue por algum motivo
+=========================================================================== */
+(function ensureFonts(){
+  if (document.getElementById('font-medieval-face')) return;
+  const style = document.createElement('style');
+  style.id = 'font-medieval-face';
+  style.textContent = `
+    @font-face{ font-family:'ManufacturingConsent'; src:url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype'); font-weight:400; font-style:normal; font-display:swap; }
+    @font-face{ font-family:'BerkshireSwash'; src:url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype'); font-weight:400; font-style:normal; font-display:swap; }
+    @font-face{ font-family:'Cardo'; src:url('/assets/fonts/Cardo-Regular.ttf') format('truetype'); font-weight:400; font-style:normal; font-display:swap; }
+  `;
+  document.head.appendChild(style);
+})();
 
-/* Títulos épicos */
+/* ===========================================================================
+   TÍTULO: EFEITO DATILOGRAFIA
+   SUBTÍTULO: elementos [data-typing] com data-text / data-speed / data-cursor
+=========================================================================== */
+(function typing(){
+  function typeWriter(el, text, speed, showCursor){
+    el.textContent = '';
+    if (showCursor) el.classList.add('lumen-typing');
+    let i = 0;
+    (function step(){
+      if (i < text.length) { el.textContent += text.charAt(i++); setTimeout(step, speed); }
+      else { el.classList.add('typing-done'); }
+    })();
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-typing]').forEach(el => {
+      const t = el.getAttribute('data-text') || el.textContent || '';
+      const spd = parseInt(el.getAttribute('data-speed') || '26', 10);
+      const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
+      typeWriter(el, t, spd, cur);
+    });
+  });
+})();
+
+/* ===========================================================================
+   TÍTULO: EFEITO CHAMA
+   SUBTÍTULO: placeholders [data-chama] → .chama .chama-{variant}
+=========================================================================== */
+(function chamas(){
+  function renderChama(el, variant){
+    const wrap = document.createElement('div');
+    wrap.className = `chama chama-${variant}`;
+    wrap.innerHTML = '<span></span><span></span><span></span>';
+    el.replaceWith(wrap);
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-chama]').forEach(el => {
+      renderChama(el, el.getAttribute('data-chama') || 'big-home');
+    });
+  });
+})();
+
+/* ===========================================================================
+   TÍTULO: UTILIDADES DA HOME
+   SUBTÍTULO: ano no rodapé, carrossel de reflexões e vídeo
+=========================================================================== */
+(function homeUtils(){
+  const $ = s => document.querySelector(s);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const y = $('#anoNow'); if (y) y.textContent = new Date().getFullYear();
+
+    const reflexoes = [
+      { t: "“Nunca apague sua chama. Mesmo pequena, ela aponta o caminho.”", a: "Irmandade" },
+      { t: "“A fé é a coragem de dar o primeiro passo quando o caminho ainda é noite.”", a: "Irmandade" },
+      { t: "“Conhecer-se é rezar com a própria vida.”", a: "Irmandade" },
+      { t: "“Para além. E sempre!!”", a: "Lema da Irmandade" }
+    ];
+    let idx = 0;
+    function renderReflexo(){
+      const box = $('#reflexoAtual'); if (!box) return;
+      box.innerHTML = "<p>"+reflexoes[idx].t+"</p><footer>— "+reflexoes[idx].a+"</footer>";
+    }
+    renderReflexo();
+    const prev = $('#prevReflexo'); const next = $('#nextReflexo');
+    if (prev) prev.addEventListener('click', () => { idx = (idx - 1 + reflexoes.length) % reflexoes.length; renderReflexo(); });
+    if (next) next.addEventListener('click', () => { idx = (idx + 1) % reflexoes.length; renderReflexo(); });
+
+    const v = $('#videoBoasVindas'); 
+    if (v) {
+      v.addEventListener('loadeddata', () => {
+        if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+          v.muted = true; const p = v.play(); if (p && p.catch) p.catch(()=>{});
+        }
+      });
+    }
+  });
+})();
+</script>
+    
+/* ===============================
+   TÍTULOS ÉPICOS
+   =============================== */
 h1, h2, h3,
 .section-title,
 .card.invite h3,
@@ -55,6 +156,48 @@ h1, h2, h3,
   font-family: 'ManufacturingConsent', serif;
   letter-spacing: 1px;
 }
+
+/* ===============================
+   TEXTOS CORRIDOS
+   SUBTÍTULO: contratos, orientações, perguntas
+   =============================== */
+p,
+section,
+.card p,
+#contrato,
+#orientacoes,
+#perguntas,
+.text-body {
+  font-family: 'BerkshireSwash', cursive;
+  line-height: 1.6;
+}
+
+/* ===============================
+   RESPOSTAS / CAMPOS
+   =============================== */
+textarea,
+input[type="text"],
+input[type="email"],
+input[type="number"],
+.resposta,
+#acolh {
+  font-family: 'Cardo', serif;
+  font-size: 1rem;
+}
+
+/* ===============================
+   BOTÕES E BADGES
+   =============================== */
+button,
+.btn,
+.btn-primary,
+.btn-secondary,
+.progress-badge {
+  font-family: 'ManufacturingConsent', serif;
+  font-weight: normal;
+  letter-spacing: 0.5px;
+}
+
 
 /* Textos corridos (contrato, orientações, perguntas) */
 body,
