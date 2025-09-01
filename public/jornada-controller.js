@@ -59,6 +59,59 @@
     }
     return await res.blob();
   }
+  // --------- TYPING (usa módulo se houver; senão, fallback) ----------
+  const ENABLE_TYPIST = true;        // <-- liga/desliga rápido
+  const DEFAULT_SPEED = 22;          // caracteres/step
+  const CARET_HTML = '<span class="jr-caret">|</span>';
+
+  // hook para módulo externo (seu jornada-typing.js)
+  function externalType(el, text, speed) {
+    // exemplos de APIs comuns — use o que existir:
+    if (window.JornadaTyping?.type) return window.JornadaTyping.type(el, text, speed);
+    if (window.JR_TYPE?.type)      return window.JR_TYPE.type(el, text, speed);
+    return null; // sem módulo → deixa o fallback assumir
+  }
+
+  function typeText(el, text, speed = DEFAULT_SPEED) {
+    if (!ENABLE_TYPIST || !el) { el && (el.innerHTML = text); return; }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.innerHTML = text; return;
+    }
+    // tenta módulo externo
+    const used = externalType(el, text, speed);
+    if (used) return;
+
+    // fallback minimalista
+    el.innerHTML = ""; 
+    const caret = document.createElement("span");
+    caret.className = "jr-caret";
+    caret.textContent = "|";
+    el.appendChild(caret);
+
+    let i = 0;
+    function tick() {
+      const next = text.slice(0, i++);
+      el.childNodes[0] && el.childNodes[0].nodeType === 3
+        ? (el.childNodes[0].textContent = next)
+        : el.insertBefore(document.createTextNode(next), caret);
+      if (i <= text.length) requestAnimationFrame(tick);
+      else caret.remove();
+    }
+    // inicia com nó de texto vazio antes do caret
+    el.insertBefore(document.createTextNode(""), caret);
+    requestAnimationFrame(tick);
+  }
+
+  // estilinho do cursor (opcional)
+  (function ensureTypingCSS(){
+    if (document.getElementById("jr-typing-css")) return;
+    const s = document.createElement("style"); s.id = "jr-typing-css";
+    s.textContent = `
+      .jr-caret{display:inline-block;margin-left:2px;animation:jrblink 1s steps(2,end) infinite}
+      @keyframes jrblink{0%{opacity:1}50%{opacity:0}100%{opacity:1}}
+    `;
+    document.head.appendChild(s);
+  })(); 
 
   // --------- OVERLAY DE VÍDEO (TRANSIÇÕES) ----------
   function ensureVideoOverlay() {
