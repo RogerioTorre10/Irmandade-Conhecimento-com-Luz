@@ -70,23 +70,30 @@
  <!-- Config primeiro -->
 <script defer src="/config.js"></script>
       
-   <!-- Núcleo -->
+   <!-- Config -->
+<script defer src="/config.js"></script>
+
+<!-- Núcleo -->
 <script defer src="/jornada-utils.js"></script>
 <script defer src="/jornada-core.js"></script>
 
-<!-- Módulos -->      
+<!-- Módulos -->
 <script defer src="/jornada-auth.js"></script>
 <script defer src="/jornada-chama.js"></script>
 <script defer src="/jornada-paper-qa.js"></script>
 <script defer src="/jornada-typing-font.js"></script>
 <script defer src="/i18n/i18n.js"></script>
-<script defer src="/jornada-micro.js"></script>  
+<script defer src="/jornada-micro.js"></script>
 <script defer src="/jornada-typing.js"></script>
 
-<!-- Orquestrador + Renderer + Bootstrap -->
-<script defer src="/jornada-paper-qa.js"></script>         <!-- define JORNADA_BLOCKS (e opcional FINAL_VIDEO) -->
-<script defer src="/jornada-controller.js"></script>        <!-- este arquivo -->
-<script defer src="/jornada-render-master.js"></script>     <!-- expõe onJornadaEssencial delegando pro controller -->
-<script defer src="/jornada-bootstrap.js"></script>         <!-- liga o botão Iniciar -->
+<!-- Controller -->
+<script defer src="/jornada-controller.js"></script>
+
+<!-- RENDER UNIFICADO (substitui master/plus/junior anteriores) -->
+<script defer src="/jornada-render.js"></script>
+
+<!-- Bootstrap -->
+<script defer src="/jornada-bootstrap.js"></script>
+
   </body>
 </html>
