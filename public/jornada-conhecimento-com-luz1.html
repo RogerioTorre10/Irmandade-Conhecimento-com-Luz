@@ -62,21 +62,27 @@
 
   <!-- =============================================================================
      TÍTULO: CANVAS DINÂMICO DA JORNADA
-     SUBTÍTULO: Progresso + Controles + Blocos de perguntas
+     SUBTÍTULO: Pergaminho + Progresso + Controles + Blocos
 ============================================================================= -->
 
-<!-- badge no topo direito -->
+<!-- badge topo -->
 <div class="progress-badge" id="jprog-pct">0% concluído</div>
 
 <!-- barra de progresso global -->
 <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
 
-<!-- (opcional) onde o render coloca textos de intro/final -->
-<div id="jornada-conteudo" class="conteudo-pergaminho"></div>
+<!-- intro/final (se usados pelo render) -->
+<div id="jornada-conteudo" class="conteudo-pergaminho">
+  <!-- Exemplo de texto com DATILOGRAFIA na intro (opcional): -->
+  <p id="introTyping"
+     data-typing
+     data-text="Respire. Esta jornada é sua. Um passo de cada vez."
+     data-speed="26"
+     data-cursor="true"></p>
+</div>
 
 <!-- =========================
-     TÍTULO: PROGRESSO LOCAL
-     SUBTÍTULO: do bloco atual
+     TÍTULO: PROGRESSO LOCAL DO BLOCO
 ========================= -->
 <div class="j-progress" style="margin-top:12px">
   <div class="j-progress__bar"><div class="j-progress__fill"></div></div>
@@ -85,7 +91,6 @@
 
 <!-- =========================
      TÍTULO: CONTROLES
-     SUBTÍTULO: navegação entre perguntas
 ========================= -->
 <div class="footer-actions" style="margin:10px 0 16px">
   <button id="btnPrev" class="btn btn-secondary">Voltar</button>
@@ -94,7 +99,7 @@
 
 <!-- =========================
      TÍTULO: BLOCO 1
-     SUBTÍTULO: data-video toca ao concluir o bloco
+     SUBTÍTULO: defina 5 perguntas; vídeo toca ao concluir o bloco
 ========================= -->
 <section class="j-bloco" data-bloco="0" data-video="/assets/video/transicao-1.mp4">
   <div class="j-pergunta" data-pergunta="0">
@@ -105,22 +110,47 @@
     <label class="pergunta-enunciado"><b>Pergunta 2:</b> O que você mais busca nesta caminhada?</label>
     <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
   </div>
-  <!-- adicione as perguntas 3, 4, 5 -->
+  <div class="j-pergunta" data-pergunta="2">
+    <label class="pergunta-enunciado"><b>Pergunta 3:</b> Qual virtude deseja cultivar?</label>
+    <textarea rows="4" class="input"></textarea>
+  </div>
+  <div class="j-pergunta" data-pergunta="3">
+    <label class="pergunta-enunciado"><b>Pergunta 4:</b> Que peso você precisa largar?</label>
+    <textarea rows="4" class="input"></textarea>
+  </div>
+  <div class="j-pergunta" data-pergunta="4">
+    <label class="pergunta-enunciado"><b>Pergunta 5:</b> Quem te inspira nesta caminhada?</label>
+    <textarea rows="4" class="input"></textarea>
+  </div>
 </section>
 
 <!-- =========================
      TÍTULO: BLOCO 2
-     SUBTÍTULO: ajuste perguntas e vídeo
 ========================= -->
 <section class="j-bloco" data-bloco="1" data-video="/assets/video/transicao-2.mp4">
   <div class="j-pergunta" data-pergunta="0">
-    <label class="pergunta-enunciado"><b>Pergunta 1:</b> (texto do bloco 2)</label>
+    <label class="pergunta-enunciado"><b>Pergunta 1:</b> O que significa fé pra você hoje?</label>
     <textarea rows="4" class="input"></textarea>
   </div>
-  <!-- …até a 5ª pergunta -->
+  <div class="j-pergunta" data-pergunta="1">
+    <label class="pergunta-enunciado"><b>Pergunta 2:</b> Onde você percebe luz no cotidiano?</label>
+    <textarea rows="4" class="input"></textarea>
+  </div>
+  <div class="j-pergunta" data-pergunta="2">
+    <label class="pergunta-enunciado"><b>Pergunta 3:</b> Qual hábito novo você quer firmar?</label>
+    <textarea rows="4" class="input"></textarea>
+  </div>
+  <div class="j-pergunta" data-pergunta="3">
+    <label class="pergunta-enunciado"><b>Pergunta 4:</b> Qual cuidado com o próximo você deseja praticar?</label>
+    <textarea rows="4" class="input"></textarea>
+  </div>
+  <div class="j-pergunta" data-pergunta="4">
+    <label class="pergunta-enunciado"><b>Pergunta 5:</b> Uma gratidão de hoje:</label>
+    <textarea rows="4" class="input"></textarea>
+  </div>
 </section>
 
-<!-- Repita a mesma estrutura para os blocos 3, 4 e 5 -->
+<!-- Repita para BLOCO 3 / 4 / 5, cada um com data-video="/assets/video/transicao-3.mp4" etc. -->
 
   <!-- =============================================================================
      TÍTULO: OVERLAY DE VÍDEO DE TRANSIÇÃO
