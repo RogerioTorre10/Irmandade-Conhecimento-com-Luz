@@ -322,12 +322,10 @@ function renderPerguntas(blockIndex = 0) {
 
     const btnFinal = document.getElementById("jr_final");
     if (btnFinal) btnFinal.onclick = async () => {
-      const answers = {};
-      el.querySelectorAll('[data-qid]').forEach(n => answers[n.getAttribute('data-qid')] = n.value || "");
-      S.save({ answers, ts: Date.now() });
-      if (g.JORNADA_FINAL_VIDEO) await playVideoOverlay(g.JORNADA_FINAL_VIDEO);
-      await gerarDevolutivas(answers);
-    };
+  const answers = collect();
+  S.save({ ...S.load(), answers, ts: Date.now(), blockIndex });
+  await renderAcolhimentoFinal(answers);
+};
   }
 
   // --------- FINALIZAÇÃO: GERA PDF + HQ ----------
@@ -349,6 +347,54 @@ function renderPerguntas(blockIndex = 0) {
         postJSONForBlob(EP_PDF, payload).then(b => downloadBlob(b, "Jornada-Com-Luz.pdf")),
         postJSONForBlob(EP_HQ,  payload).then(b => downloadBlob(b, "Jornada-Com-Luz-HQ.pdf")),
       ];
+      // --------- RENDER: ACOLHIMENTO FINAL (desktop vs mobile) ----------
+async function renderAcolhimentoFinal(answers, opts = {}) {
+  const el = root();
+
+  // Detecta telas pequenas (ajuste o breakpoint se quiser)
+  const isMobile =
+    window.innerWidth <= 480 ||
+    window.matchMedia?.("(max-width: 480px)")?.matches;
+
+  // Mensagens
+  const longMsg =
+    "Parabéns por concluir sua Jornada! 🌟\n" +
+    "Cada resposta é uma chama viva no caminho da Luz.\n" +
+    "Respire fundo, receba este acolhimento...\n" +
+    "e prepare-se para a entrega final com fé e coragem. ⚔🔥";
+
+  const shortMsg =
+    "Parabéns pela Jornada! 🌟\n" +
+    "Receba este acolhimento e vamos à entrega final. ⚔🔥";
+
+  const msg = (opts.message || (isMobile ? shortMsg : longMsg));
+
+  // Velocidade estimada p/ datilografia (ms por caractere)
+  const msPerChar = Number(opts.msPerChar) || (isMobile ? 35 : 50);
+  const estDuration = Math.max(800, msg.length * msPerChar);
+
+  el.innerHTML = `
+    <section class="card pergaminho pergaminho-v">
+      <h2 class="title">Mensagem de Acolhimento</h2>
+      <p id="jr_acolhimento" class="muted" style="min-height:60px;white-space:pre-line"></p>
+    </section>
+  `;
+
+  // Datilografa a mensagem (usa módulo externo se houver; senão fallback do controller)
+  typeText(document.getElementById("jr_acolhimento"), msg);
+
+  // Espera terminar (estimativa simples, confiável o bastante para UX)
+  await new Promise(res => setTimeout(res, estDuration));
+
+  // Toca vídeo final (se definido)
+  if (window.JORNADA_FINAL_VIDEO) {
+    await playVideoOverlay(window.JORNADA_FINAL_VIDEO);
+  }
+
+  // Gera PDF/HQ
+  await gerarDevolutivas(answers);
+}
+
       await Promise.allSettled(tasks);
       S.clear();
       alert("PDF e HQ finalizados. Voltando para a página inicial.");
