@@ -23,6 +23,222 @@
     ensureClass(el, cls) { if (el && !el.classList.contains(cls)) el.classList.add(cls); }
   };
 
+   /* =============================================================================
+   TÍTULO: JORNADA CONTROLLER
+   SUBTÍTULO: Fluxo de perguntas 1-a-1 por bloco + vídeo de transição entre blocos
+   CAMINHO: /public/assets/js/jornada-controller.js
+============================================================================= */
+(function () {
+  const JC = (window.JC = window.JC || {});
+
+  /* ===========================================================================
+     TÍTULO: ESTADO
+     SUBTÍTULO: Índices atuais e coleta leve de respostas
+  ============================================================================ */
+  const state = {
+    blocoIndex: 0,
+    perguntaIndex: 0,
+    respostas: {}, // { "b0-q0": "texto", ... }
+  };
+
+  /* ===========================================================================
+     TÍTULO: SELETORES BASE
+     SUBTÍTULO: Estrutura esperada no HTML (ver seção 2)
+  ============================================================================ */
+  const S = {
+    root:    () => document.getElementById('jornada-canvas'),
+    blocos:  () => Array.from(document.querySelectorAll('[data-bloco]')),
+    blocoAtivo: () => S.blocos()[state.blocoIndex],
+    perguntasDoBloco: (blocoEl) => Array.from(blocoEl.querySelectorAll('[data-pergunta]')),
+    btnPrev: () => document.getElementById('btnPrev'),
+    btnNext: () => document.getElementById('btnNext'),
+    meta:    () => document.getElementById('j-meta'),
+    progressFill: () => document.querySelector('.j-progress__fill'),
+
+    overlay: () => document.getElementById('videoOverlay'),
+    video:   () => document.getElementById('videoTransicao'),
+    skip:    () => document.getElementById('skipVideo'),
+  };
+
+  /* ===========================================================================
+     TÍTULO: HELPERS
+     SUBTÍTULO: Utilitários simples
+  ============================================================================ */
+  const U = {
+    clamp(n, min, max){ return Math.max(min, Math.min(max, n)); },
+    hide(el){ if (el) el.style.display = 'none'; },
+    show(el, disp='block'){ if (el) el.style.display = disp; },
+    txt(el){ return el ? el.textContent.trim() : ''; },
+    val(el){ return el ? (el.value ?? '').trim() : ''; },
+    setProgress(cur, total){
+      const pct = total > 0 ? Math.round((cur / total) * 100) : 0;
+      if (S.progressFill()) S.progressFill().style.width = pct + '%';
+      if (S.meta()) S.meta().innerHTML = `<b>${cur}</b> / ${total} (${pct}%)`;
+    },
+    keyFor(b,q){ return `b${b}-q${q}`; },
+  };
+
+  /* ===========================================================================
+     TÍTULO: RENDERIZAÇÃO
+     SUBTÍTULO: Mostra 1 pergunta por vez; bloco por vez
+  ============================================================================ */
+  function render() {
+    const blocos = S.blocos();
+    if (!blocos.length) return;
+
+    // Oculta todos os blocos
+    blocos.forEach(b => U.hide(b));
+
+    // Mostra bloco atual
+    const bloco = S.blocoAtivo();
+    U.show(bloco);
+
+    // Oculta todas as perguntas deste bloco
+    const perguntas = S.perguntasDoBloco(bloco);
+    perguntas.forEach(p => U.hide(p));
+
+    // Mostra a pergunta atual do bloco
+    const qEl = perguntas[state.perguntaIndex];
+    U.show(qEl);
+
+    // Atualiza meta/progresso (progresso local do bloco)
+    U.setProgress(state.perguntaIndex + 1, perguntas.length);
+
+    // Botões prev/next
+    if (S.btnPrev()) S.btnPrev().disabled = state.perguntaIndex === 0 && state.blocoIndex === 0;
+    if (S.btnNext()) S.btnNext().textContent =
+      state.perguntaIndex === perguntas.length - 1
+        ? (state.blocoIndex === blocos.length - 1 ? 'Finalizar' : 'Concluir bloco ➜')
+        : 'Próxima';
+  }
+
+  /* ===========================================================================
+     TÍTULO: NAVEGAÇÃO ENTRE PERGUNTAS
+     SUBTÍTULO: Próxima / Anterior (com salvamento simples)
+  ============================================================================ */
+  function next() {
+    const bloco = S.blocoAtivo();
+    const perguntas = S.perguntasDoBloco(bloco);
+
+    // Salva resposta atual (se houver input/textarea)
+    saveCurrentAnswer();
+
+    if (state.perguntaIndex < perguntas.length - 1) {
+      state.perguntaIndex++;
+      render();
+      return;
+    }
+
+    // Terminou o bloco → toca vídeo de transição (se houver), depois avança bloco
+    const videoSrc = bloco.getAttribute('data-video') || '';
+    if (state.blocoIndex < S.blocos().length - 1) {
+      playTransition(videoSrc, () => {
+        state.blocoIndex++;
+        state.perguntaIndex = 0;
+        render();
+      });
+    } else {
+      // Último bloco: finalize
+      finalize();
+    }
+  }
+
+  function prev() {
+    if (state.perguntaIndex > 0) {
+      state.perguntaIndex--;
+      render();
+      return;
+    }
+    // Volta bloco se possível
+    if (state.blocoIndex > 0) {
+      state.blocoIndex--;
+      const perguntas = S.perguntasDoBloco(S.blocoAtivo());
+      state.perguntaIndex = Math.max(0, perguntas.length - 1);
+      render();
+    }
+  }
+
+  function saveCurrentAnswer() {
+    const bloco = S.blocoAtivo();
+    const perguntas = S.perguntasDoBloco(bloco);
+    const qEl = perguntas[state.perguntaIndex];
+    if (!qEl) return;
+
+    const input = qEl.querySelector('textarea, input[type="text"], input[type="email"], input[type="number"]');
+    if (input) {
+      state.respostas[ U.keyFor(state.blocoIndex, state.perguntaIndex) ] = U.val(input);
+    }
+  }
+
+  /* ===========================================================================
+     TÍTULO: VÍDEO DE TRANSIÇÃO
+     SUBTÍTULO: Overlay com skip e fallback seguro
+  ============================================================================ */
+  function playTransition(src, onEnd) {
+    if (!src) return onEnd?.(); // sem vídeo → segue
+
+    const overlay = S.overlay(), video = S.video(), skip = S.skip();
+    if (!overlay || !video) return onEnd?.();
+
+    video.pause();
+    video.removeAttribute('src'); video.load();
+
+    video.src = src;
+    overlay.classList.remove('hidden');
+
+    const cleanup = () => {
+      video.pause();
+      overlay.classList.add('hidden');
+      video.removeAttribute('src'); video.load();
+      onEnd?.();
+    };
+
+    video.onended = cleanup;
+    video.onerror = cleanup;
+    if (skip) skip.onclick = cleanup;
+
+    // tentativa de autoplay mudo
+    video.muted = true;
+    const p = video.play();
+    if (p && p.catch) p.catch(() => {/* usuário dá play ou usa skip */});
+  }
+
+  /* ===========================================================================
+     TÍTULO: FINALIZAÇÃO
+     SUBTÍTULO: Chame backend ou mostre resumo
+  ============================================================================ */
+  function finalize() {
+    // Salva última resposta
+    saveCurrentAnswer();
+
+    // Aqui você pode enviar para backend ou mostrar resumo
+    console.log('[JORNADA] Finalizado. Respostas:', state.respostas);
+
+    // Exemplo simples: mostrar um alerta e rolar para o topo
+    alert('Jornada concluída! Gratidão pela confiança.');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ===========================================================================
+     TÍTULO: INICIALIZAÇÃO
+     SUBTÍTULO: Liga eventos e faz primeiro render
+  ============================================================================ */
+  JC.init = function initJornada() {
+    const root = S.root();
+    if (!root) return;
+
+    if (S.btnNext()) S.btnNext().addEventListener('click', next);
+    if (S.btnPrev()) S.btnPrev().addEventListener('click', prev);
+
+    render();
+  };
+
+  // Auto-init opcional
+  document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('jornada-canvas')) JC.init();
+  });
+})();
+
   /* ==========================================================================
      ⚙️ CONFIGURAÇÃO (SELETORES E ASSETS)
      ========================================================================== */
