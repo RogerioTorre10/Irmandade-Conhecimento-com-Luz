@@ -1,13 +1,17 @@
+/* =============================================================================
+   TÍTULO: VARIÁVEIS E RESET BÁSICO
+   SUBTÍTULO: Cores, raios e box-sizing global
+============================================================================= */
 :root { --bg:#0b1020; --fg:#eef2ff; --muted:#aab4d4; --primary:#6aa7ff; --card:#121832; --card-2:#0e1428; --radius:16px; }
 *{box-sizing:border-box}
 html,body{height:100%}
 
 /* =============================================================================
-   FONTES ÉPICAS — IRMANDADE
-   /public/assets/fonts/
-   - ManufacturingConsent-Regular.ttf  → TÍTULOS
+   TÍTULO: FONTES ÉPICAS — IRMANDADE
+   SUBTÍTULO: @font-face (caminhos em /public/assets/fonts)
+   - ManufacturingConsent-Regular.ttf  → TÍTULOS e BOTÕES
    - BerkshireSwash-Regular.ttf        → TEXTO CORRIDO (contrato/orientações/perguntas)
-   - Cardo-Regular.ttf                 → RESPOSTAS (inputs, textarea, devolutivas)
+   - Cardo-Regular/Bold/Italic.ttf     → RESPOSTAS (inputs, textarea, devolutivas)
 ============================================================================= */
 @font-face{
   font-family:'ManufacturingConsent';
@@ -36,14 +40,12 @@ html,body{height:100%}
 }
 
 /* =============================================================================
-   BASE TIPOGRÁFICA
-   - Body usa BerkshireSwash (texto corrido)
-   - Títulos sobrescrevem para ManufacturingConsent
-   - Respostas sobrescrevem para Cardo
+   TÍTULO: BASE TIPOGRÁFICA
+   SUBTÍTULO: Body, títulos épicos e áreas de respostas
 ============================================================================= */
 body{
   margin:0;
-  font-family:'BerkshireSwash', cursive;
+  font-family:'BerkshireSwash', cursive; /* texto corrido por padrão */
   background:var(--bg);
   color:var(--fg);
   line-height:1.5;
@@ -63,17 +65,17 @@ h1,h2,h3,h4,h5,h6,
   font-weight:400;
 }
 
-/* ENUNCIADOS (permanece BerkshireSwash por herança do body) */
+/* ENUNCIADOS/ORIENTAÇÕES/CONTRATO (herdam BerkshireSwash do body) */
 label,
 .pergunta-enunciado,
 .texto-guia,
 .orientacoes,
 .contrato,
-p { /* reforço explícito para garantir herança correta */
+p{
   font-family:'BerkshireSwash', cursive;
 }
 
-/* RESPOSTAS DO USUÁRIO */
+/* RESPOSTAS DO USUÁRIO (inputs, textareas, devolutivas) */
 input, textarea, select,
 .resposta,
 .jornada-resposta,
@@ -90,35 +92,25 @@ input, textarea, select,
   font-family:'Cardo', serif;
 }
 
-/* Botões: pode manter Berkshire (herdado) ou usar ManufacturingConsent.
-   Se quiser épico nos botões, descomente abaixo: */
-/*
-button, .btn, .btn-primary, .btn-secondary, .btn-danger {
-  font-family:'ManufacturingConsent', serif;
-  letter-spacing:.5px;
-}
-*/
-
 /* =============================================================================
-   SEU ESTILO ORIGINAL (mantido e harmonizado)
+   TÍTULO: ESTRUTURA GERAL
+   SUBTÍTULO: Header, container, cartões e badges
 ============================================================================= */
 .site-header,.site-footer{padding:24px 16px;text-align:center}
 .container{max-width:920px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:16px}
 .motto{opacity:.8;margin-top:8px;text-align:center;letter-spacing:.1em}
 .card{background:linear-gradient(180deg,var(--card),var(--card-2));padding:20px;border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,0,0,.35)}
-.btn{display:inline-block;padding:12px 18px;border-radius:10px;border:1px solid rgba(255,255,255,.15);text-decoration:none;color:var(--fg);background:transparent;cursor:pointer}
-.btn:hover{background:rgba(255,255,255,.06)}
-.btn.primary{background:var(--primary);border-color:transparent;color:#071122;font-weight:600}
-.btn.link{background:transparent;color:var(--primary);border-color:rgba(106,167,255,.35)}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:rgba(106,167,255,.15);color:var(--primary);font-weight:600}
+.small{font-size:.875rem;opacity:.9}
+hr{border:0;border-top:1px solid rgba(255,255,255,.15);margin:16px 0}
+
+/* =============================================================================
+   TÍTULO: CAMPOS E SENHA
+   SUBTÍTULO: Inputs padrão e "olho" para revelar senha
+============================================================================= */
 .input, textarea{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:#0c1330;color:var(--fg)}
 label{font-weight:600;margin:6px 0 4px;display:block}
-hr{border:0;border-top:1px solid rgba(255,255,255,.15);margin:16px 0}
-.pergaminho{background:rgba(255,255,255,.04);padding:16px;border-radius:var(--radius);border:1px dashed rgba(255,255,255,.12)}
-.footer-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
-.small{font-size:.875rem;opacity:.9}
-.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:rgba(106,167,255,.15);color:var(--primary);font-weight:600}
 
-/* Olho mágico da senha */
 .senha-wrap{position:relative;display:flex;align-items:center}
 .senha-wrap .input{padding-right:42px}
 .senha-eye{
@@ -129,13 +121,19 @@ hr{border:0;border-top:1px solid rgba(255,255,255,.15);margin:16px 0}
 .senha-eye:hover{color:var(--fg)}
 .senha-eye svg{width:20px;height:20px}
 
-/* --- Jornada dinâmica --- */
+/* =============================================================================
+   TÍTULO: JORNADA DINÂMICA
+   SUBTÍTULO: Mostrar/ocultar canvas da jornada
+============================================================================= */
 body.jornada-active #page-shell,
 body.jornada-active header.site-header,
 body.jornada-active footer.site-footer { display:none !important; }
 body.jornada-active #jornada-canvas { display:block !important; }
 
-/* ===== Pergaminho (encaixe perfeito) ===== */
+/* =============================================================================
+   TÍTULO: PERGAMINHO
+   SUBTÍTULO: Encaixe perfeito vertical/horizontal
+============================================================================= */
 .pergaminho{  
   margin:12px auto;
   padding:0;
@@ -166,21 +164,36 @@ body.jornada-active #jornada-canvas { display:block !important; }
   .pergaminho .conteudo-pergaminho{ padding:14px; }
 }
 
-/* Botões */
+/* =============================================================================
+   TÍTULO: BOTÕES ÉPICOS
+   SUBTÍTULO: Tipografia ManufacturingConsent + interações
+============================================================================= */
 button, .btn {
-  cursor:pointer; border:none; border-radius:6px;
-  padding:.6rem 1.2rem; font-size:1rem;
+  font-family:'ManufacturingConsent', serif; /* 👑 épico nos botões */
+  cursor:pointer;
+  border:none;
+  border-radius:6px;
+  padding:.6rem 1.2rem;
+  font-size:1rem;
+  letter-spacing:.5px;
   transition:background .3s, transform .2s;
 }
-button:hover, .btn:hover { transform:scale(1.03); }
-.btn-primary{ background-color:#2563eb; color:#fff; }
-.btn-secondary{ background-color:#475569; color:#fff; }
-.btn-danger{ background-color:#dc2626; color:#fff; }
+.btn{display:inline-block;border:1px solid rgba(255,255,255,.15);color:var(--fg);background:transparent}
+.btn:hover, button:hover{ transform:scale(1.03); background:rgba(255,255,255,.06); }
+.btn-primary{ background-color:#2563eb; color:#fff; border-color:transparent; }
+.btn-secondary{ background-color:#475569; color:#fff; border-color:transparent; }
+.btn-danger{ background-color:#dc2626; color:#fff; border-color:transparent; }
 
-/* Footer */
+/* =============================================================================
+   TÍTULO: RODAPÉ
+   SUBTÍTULO: Texto discreto
+============================================================================= */
 footer { text-align:center; margin-top:2rem; font-size:.85rem; opacity:.8; }
 
-/* Datilografia */
+/* =============================================================================
+   TÍTULO: EFEITO DATILOGRAFIA
+   SUBTÍTULO: Cursor e animação
+============================================================================= */
 .lumen-typing { white-space:pre-wrap; position:relative; }
 .lumen-typing::after { content:"▌"; margin-left:2px; opacity:.75; animation:lumenBlink 1s steps(2,end) infinite; }
 .lumen-typing.typing-done::after { content:""; animation:none; }
@@ -188,44 +201,49 @@ footer { text-align:center; margin-top:2rem; font-size:.85rem; opacity:.8; }
 .tty-cursor { opacity:.6; animation:ttyblink 1s steps(1,end) infinite; }
 @keyframes ttyblink { 50% { opacity:0; } }
 
-/* Texto corrido confortável */
-.epic { line-height:1.55; }
-
-/* Progresso da Jornada */
+/* =============================================================================
+   TÍTULO: PROGRESSO DA JORNADA
+   SUBTÍTULO: Barra, preenchimento e meta
+============================================================================= */
 .j-progress { margin:6px 0 14px; }
-.j-progress__bar { width:100%; height:10px; border-radius:999px; background:rgba(255,255,255,.15); overflow:hidden; }
-.j-progress__fill { height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#fde68a); transition:width .25s ease; }
-.j-progress__meta { margin-top:6px; font-size:.95rem; opacity:.9; }
-.j-progress__meta b { font-weight:700; }
-
-/* Duplicatas consolidadas */
-.j-progress{ margin:6px 0 14px; }
-.j-progress__bar{ width:100%; height:10px; border-radius:999px; background:rgba(255,255,255,.14); overflow:hidden; }
+.j-progress__bar { width:100%; height:10px; border-radius:999px; background:rgba(255,255,255,.14); overflow:hidden; }
 .j-progress__fill{ height:100%; width:0%; transition:width .25s ease; background:linear-gradient(90deg,#f59e0b,#fde68a); }
 .j-progress__meta{ margin-top:6px; font-size:.95rem; opacity:.9; display:flex; justify-content:space-between; gap:8px; }
+.j-progress__meta b { font-weight:700; }
 
 .progress-badge {
   position:absolute; top:8px; right:16px;
   background:rgba(0,0,0,0.7); color:#fff;
   font-size:.9rem; padding:4px 8px; border-radius:8px;
-  font-family:'Cardo', serif; /* legibilidade para números/percentuais */
+  font-family:'Cardo', serif; /* legível para números/percentuais */
   z-index:10;
 }
 .progress-bar { width:100%; height:8px; background:rgba(255,255,255,0.2); border-radius:4px; overflow:hidden; margin:10px 0; }
 .progress-bar-fill { height:100%; width:0; background:linear-gradient(90deg,#ffcf70,#ff8c00); transition:width .5s ease-out; }
 
-/* Navegação/links (mantém Berkshire por padrão do body) */
+/* =============================================================================
+   TÍTULO: NAVEGAÇÃO/LINKS
+   SUBTÍTULO: Ajustes finos; tipografia herda do body (Berkshire)
+============================================================================= */
 nav a, a.btn, .site-header p { letter-spacing:.5px; }
 
-/* Vídeo overlay (se usado) */
+/* =============================================================================
+   TÍTULO: VÍDEO OVERLAY
+   SUBTÍTULO: Player full-screen opcional
+============================================================================= */
 .video-overlay { position:fixed; inset:0; background:#000; display:flex; justify-content:center; align-items:center; z-index:9999; }
 .video-overlay.hidden { display:none; }
 .video-player { max-width:100%; max-height:100%; }
 
-/* Seletor de idioma */
+/* =============================================================================
+   TÍTULO: SELETOR DE IDIOMA
+   SUBTÍTULO: Botões de idioma
+============================================================================= */
 .lang-switch { display:flex; gap:6px; align-items:center; }
 .lang-btn {
+  font-family:'ManufacturingConsent', serif;
   font-size:.85rem; padding:.25rem .5rem; border-radius:.5rem;
-  border:1px solid rgba(255,255,255,.2); background:transparent; color:#e8ecf4; cursor:pointer;
+  border:1px solid rgba(255,255,255,.2); background:transparent; color:#e8ecf4;
+  cursor:pointer;
 }
 .lang-btn:hover { background:rgba(255,255,255,.1); }
