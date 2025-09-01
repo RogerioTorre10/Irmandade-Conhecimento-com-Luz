@@ -1,7 +1,107 @@
 :root { --bg:#0b1020; --fg:#eef2ff; --muted:#aab4d4; --primary:#6aa7ff; --card:#121832; --card-2:#0e1428; --radius:16px; }
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--fg);line-height:1.5}
+
+/* =============================================================================
+   FONTES ÉPICAS — IRMANDADE
+   /public/assets/fonts/
+   - ManufacturingConsent-Regular.ttf  → TÍTULOS
+   - BerkshireSwash-Regular.ttf        → TEXTO CORRIDO (contrato/orientações/perguntas)
+   - Cardo-Regular.ttf                 → RESPOSTAS (inputs, textarea, devolutivas)
+============================================================================= */
+@font-face{
+  font-family:'ManufacturingConsent';
+  src:url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');
+  font-weight:400; font-style:normal; font-display:swap;
+}
+@font-face{
+  font-family:'BerkshireSwash';
+  src:url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');
+  font-weight:400; font-style:normal; font-display:swap;
+}
+@font-face{
+  font-family:'Cardo';
+  src:url('/assets/fonts/Cardo-Regular.ttf') format('truetype');
+  font-weight:400; font-style:normal; font-display:swap;
+}
+@font-face{
+  font-family:'Cardo';
+  src:url('/assets/fonts/Cardo-Italic.ttf') format('truetype');
+  font-weight:400; font-style:italic; font-display:swap;
+}
+@font-face{
+  font-family:'Cardo';
+  src:url('/assets/fonts/Cardo-Bold.ttf') format('truetype');
+  font-weight:700; font-style:normal; font-display:swap;
+}
+
+/* =============================================================================
+   BASE TIPOGRÁFICA
+   - Body usa BerkshireSwash (texto corrido)
+   - Títulos sobrescrevem para ManufacturingConsent
+   - Respostas sobrescrevem para Cardo
+============================================================================= */
+body{
+  margin:0;
+  font-family:'BerkshireSwash', cursive;
+  background:var(--bg);
+  color:var(--fg);
+  line-height:1.5;
+}
+
+/* TÍTULOS ÉPICOS */
+h1,h2,h3,h4,h5,h6,
+.site-header h1,
+.card h2,
+.section-title,
+.bloco-titulo,
+.card-pergunta h3,
+.jornada-header h1{
+  font-family:'ManufacturingConsent', serif;
+  letter-spacing:1px;
+  text-transform:none;
+  font-weight:400;
+}
+
+/* ENUNCIADOS (permanece BerkshireSwash por herança do body) */
+label,
+.pergunta-enunciado,
+.texto-guia,
+.orientacoes,
+.contrato,
+p { /* reforço explícito para garantir herança correta */
+  font-family:'BerkshireSwash', cursive;
+}
+
+/* RESPOSTAS DO USUÁRIO */
+input, textarea, select,
+.resposta,
+.jornada-resposta,
+.devolutiva,
+#acolh,
+#jornada-conteudo textarea,
+#jornada-conteudo input[type="text"],
+#jornada-conteudo input[type="email"],
+#jornada-conteudo input[type="number"],
+#form-perguntas textarea,
+#form-perguntas input[type="text"],
+#form-perguntas input[type="email"],
+#form-perguntas input[type="number"]{
+  font-family:'Cardo', serif;
+}
+
+/* Botões: pode manter Berkshire (herdado) ou usar ManufacturingConsent.
+   Se quiser épico nos botões, descomente abaixo: */
+/*
+button, .btn, .btn-primary, .btn-secondary, .btn-danger {
+  font-family:'ManufacturingConsent', serif;
+  letter-spacing:.5px;
+}
+*/
+
+/* =============================================================================
+   SEU ESTILO ORIGINAL (mantido e harmonizado)
+============================================================================= */
 .site-header,.site-footer{padding:24px 16px;text-align:center}
 .container{max-width:920px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:16px}
 .motto{opacity:.8;margin-top:8px;text-align:center;letter-spacing:.1em}
@@ -29,378 +129,103 @@ hr{border:0;border-top:1px solid rgba(255,255,255,.15);margin:16px 0}
 .senha-eye:hover{color:var(--fg)}
 .senha-eye svg{width:20px;height:20px}
 
-/* Use a classe .epic pra limitar o escopo; troque <body> por <body class="epic"> */
-.epic{ font-family: 'Cardo', Georgia, 'Times New Roman', serif; }
-
-/* Títulos também em Cardo (com um toque de “epic”) */
-
-/* ========================
-   Jornada dinâmica
-   ======================== */
-
-/* Jornada ativa: some com o layout estático */
+/* --- Jornada dinâmica --- */
 body.jornada-active #page-shell,
 body.jornada-active header.site-header,
-body.jornada-active footer.site-footer {
-  display: none !important;
-}
-
-/* Jornada ativa: canvas visível */
-body.jornada-active #jornada-canvas {
-  display: block !important;
-}
-
-/* ===============================
-   Fonte Cardo (local, TTF)
-   =============================== */
-@font-face {
-  font-family: 'Cardo';
-  src: url('/assets/fonts/Cardo-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Cardo';
-  src: url('/assets/fonts/Cardo-Italic.ttf') format('truetype');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Cardo';
-  src: url('/assets/fonts/Cardo-Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* ===============================
-   Reset e base
-   =============================== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html, body {
-  height: 100%;
-  font-family: 'Cardo', Georgia, 'Times New Roman', serif;
-  background-color: #0f172a; /* azul escuro */
-  color: #f1f5f9;
-  line-height: 1.5;
-}
-
-h1, h2, h3 {
-  font-family: 'Cardo', Georgia, serif;
-  font-weight: 700;
-  color: #f8fafc;
-}
-
-p {
-  margin-bottom: 1rem;
-}
+body.jornada-active footer.site-footer { display:none !important; }
+body.jornada-active #jornada-canvas { display:block !important; }
 
 /* ===== Pergaminho (encaixe perfeito) ===== */
 .pergaminho{  
-  margin: 12px auto;
-  padding: 0;                 /* nada aqui pra não aparecer borda escura */
-  border-radius: 18px;
-  overflow: hidden;           /* corta qualquer sobra */
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 100% 100%; /* ocupa tudo SEM crop */
+  margin:12px auto;
+  padding:0;
+  border-radius:18px;
+  overflow:hidden;
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:100% 100%;
 }
-
-/* razões exatas das suas imagens */
-:root{
-  --pergV-ratio: 2 / 3;   /* 1024x1536 */
-  --pergH-ratio: 3 / 2;   /* 1536x1024 */
-}
-
-/* VERTICAL: defino a ALTURA pela tela e a LARGURA vem da razão */
+:root{ --pergV-ratio:2 / 3; /* 1024x1536 */ --pergH-ratio:3 / 2; /* 1536x1024 */ }
 .pergaminho-v{
-  background-image: url("/assets/img/pergaminho-rasgado-vert.png");
-  height: 92vh;                              /* ocupa a tela quase toda */
-  width: calc(92vh * var(--pergV-ratio));    /* W = H * (W/H) */
-  max-width: 96vw;                           /* não passa da largura da tela */
+  background-image:url("/assets/img/pergaminho-rasgado-vert.png");
+  height:92vh; width:calc(92vh * var(--pergV-ratio));
+  max-width:96vw;
 }
-
-/* HORIZONTAL: defino a LARGURA pela tela e a ALTURA vem da razão */
 .pergaminho-h{
-  background-image: url("/assets/img/pergaminho-rasgado-horiz.png");
-  width: 96vw;                               /* ocupa quase toda a largura */
-  height: calc(96vw / var(--pergH-ratio));   /* H = W / (W/H) */
-  max-height: 82vh;                          /* evita “duas páginas” */
+  background-image:url("/assets/img/pergaminho-rasgado-horiz.png");
+  width:96vw; height:calc(96vw / var(--pergH-ratio));
+  max-height:82vh;
 }
-
-/* o “respiro” agora fica no conteúdo */
 .pergaminho .conteudo-pergaminho{
-  padding: clamp(12px, 3vw, 28px);
-  line-height: 1.55;
+  padding:clamp(12px, 3vw, 28px);
+  line-height:1.55;
+}
+@media (max-width:640px){
+  .pergaminho-v{ height:88vh; width:calc(88vh * var(--pergV-ratio)); max-width:96vw; }
+  .pergaminho-h{ width:98vw; height:calc(98vw / var(--pergH-ratio)); max-height:78vh; }
+  .pergaminho .conteudo-pergaminho{ padding:14px; }
 }
 
-/* Mobile: reduz um pouco pra caber sem scroll vertical extra */
-@media (max-width: 640px){
-  .pergaminho-v{
-    height: 88vh;
-    width: calc(88vh * var(--pergV-ratio));
-    max-width: 96vw;
-  }
-  .pergaminho-h{
-    width: 98vw;
-    height: calc(98vw / var(--pergH-ratio));
-    max-height: 78vh;
-  }
-  .pergaminho .conteudo-pergaminho{ padding: 14px; }
-}
-
-/* ===============================
-   Botões
-   =============================== */
+/* Botões */
 button, .btn {
-  cursor: pointer;
-  border: none;
-  border-radius: 6px;
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  font-family: inherit;
-  transition: background 0.3s, transform 0.2s;
+  cursor:pointer; border:none; border-radius:6px;
+  padding:.6rem 1.2rem; font-size:1rem;
+  transition:background .3s, transform .2s;
 }
+button:hover, .btn:hover { transform:scale(1.03); }
+.btn-primary{ background-color:#2563eb; color:#fff; }
+.btn-secondary{ background-color:#475569; color:#fff; }
+.btn-danger{ background-color:#dc2626; color:#fff; }
 
-button:hover, .btn:hover {
-  transform: scale(1.03);
-}
+/* Footer */
+footer { text-align:center; margin-top:2rem; font-size:.85rem; opacity:.8; }
 
-.btn-primary {
-  background-color: #2563eb; /* azul */
-  color: white;
-}
-.btn-secondary {
-  background-color: #475569; /* cinza */
-  color: white;
-}
-.btn-danger {
-  background-color: #dc2626; /* vermelho */
-  color: white;
-}
-
-/* ===============================
-   Footer
-   =============================== */
-footer {
-  text-align: center;
-  margin-top: 2rem;
-  font-size: 0.85rem;
-  opacity: 0.8;
-}
-
-/* --- Lumen datilografando --- */
-.lumen-typing { white-space: pre-wrap; position: relative; }
-.lumen-typing::after { content: \"▌\"; margin-left: 2px; opacity: .75; animation: lumenBlink 1s steps(2, end) infinite; }
-.lumen-typing.typing-done::after { content: \"\"; animation: none; }
-@keyframes lumenBlink { 50% { opacity: 0; } }
-.tty-cursor { opacity:.6; animation: ttyblink 1s steps(1,end) infinite; }
+/* Datilografia */
+.lumen-typing { white-space:pre-wrap; position:relative; }
+.lumen-typing::after { content:"▌"; margin-left:2px; opacity:.75; animation:lumenBlink 1s steps(2,end) infinite; }
+.lumen-typing.typing-done::after { content:""; animation:none; }
+@keyframes lumenBlink { 50% { opacity:0; } }
+.tty-cursor { opacity:.6; animation:ttyblink 1s steps(1,end) infinite; }
 @keyframes ttyblink { 50% { opacity:0; } }
 
-
-.epic h1, .epic h2, .epic h3{
-  font-weight: 700;            /* usa o peso 700 importado */
-  letter-spacing: .02em;
-  font-variant: small-caps;    /* opcional: look medieval sem trocar fonte */
-}
-
 /* Texto corrido confortável */
-.epic { line-height: 1.55; }
+.epic { line-height:1.55; }
 
 /* Progresso da Jornada */
-.j-progress {
-  margin: 6px 0 14px;
-}
-.j-progress__bar {
-  width: 100%;
-  height: 10px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.15);
-  overflow: hidden;
-}
-.j-progress__fill {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #f59e0b, #fde68a);
-  transition: width .25s ease;
-}
-.j-progress__meta {
-  margin-top: 6px;
-  font-size: .95rem;
-  opacity: .9;
-}
-.j-progress__meta b { font-weight: 700; }
+.j-progress { margin:6px 0 14px; }
+.j-progress__bar { width:100%; height:10px; border-radius:999px; background:rgba(255,255,255,.15); overflow:hidden; }
+.j-progress__fill { height:100%; width:0%; background:linear-gradient(90deg,#f59e0b,#fde68a); transition:width .25s ease; }
+.j-progress__meta { margin-top:6px; font-size:.95rem; opacity:.9; }
+.j-progress__meta b { font-weight:700; }
 
-/* ====== Progresso do questionário ====== */
+/* Duplicatas consolidadas */
 .j-progress{ margin:6px 0 14px; }
 .j-progress__bar{ width:100%; height:10px; border-radius:999px; background:rgba(255,255,255,.14); overflow:hidden; }
 .j-progress__fill{ height:100%; width:0%; transition:width .25s ease; background:linear-gradient(90deg,#f59e0b,#fde68a); }
 .j-progress__meta{ margin-top:6px; font-size:.95rem; opacity:.9; display:flex; justify-content:space-between; gap:8px; }
 
-/* styles.css */
 .progress-badge {
-  position: absolute;
-  top: 8px;
-  right: 16px;
-  background: rgba(0,0,0,0.7);
-  color: #fff;
-  font-size: 0.9rem;
-  padding: 4px 8px;
-  border-radius: 8px;
-  font-family: 'Cardo', serif;
-  z-index: 10;
+  position:absolute; top:8px; right:16px;
+  background:rgba(0,0,0,0.7); color:#fff;
+  font-size:.9rem; padding:4px 8px; border-radius:8px;
+  font-family:'Cardo', serif; /* legibilidade para números/percentuais */
+  z-index:10;
 }
-/* styles.css */
-.progress-bar {
-  width: 100%;
-  height: 8px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 4px;
-  overflow: hidden;
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-.progress-bar-fill {
-  height: 100%;
-  width: 0;
-  background: linear-gradient(90deg, #ffcf70, #ff8c00);
-  transition: width 0.5s ease-out;
-}
-/* ============ ManufacturingConsent (títulos, botões e textos gerais) ============ */
-@font-face{
-  font-family: 'ManufacturingConsent';
-  src: url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
+.progress-bar { width:100%; height:8px; background:rgba(255,255,255,0.2); border-radius:4px; overflow:hidden; margin:10px 0; }
+.progress-bar-fill { height:100%; width:0; background:linear-gradient(90deg,#ffcf70,#ff8c00); transition:width .5s ease-out; }
 
-/* Global: tudo usa ManufacturingConsent por padrão */
-body{
-  font-family: 'ManufacturingConsent', Georgia, 'Times New Roman', serif;
-}
+/* Navegação/links (mantém Berkshire por padrão do body) */
+nav a, a.btn, .site-header p { letter-spacing:.5px; }
 
-/* Títulos e subtítulos (garantia explícita) */
-h1, h2, h3, h4, .site-header h1, .card h2 {
-  font-family: 'ManufacturingConsent', Georgia, 'Times New Roman', serif;
-}
-
-/* Botões (nomes nos botões) */
-.btn, .btn-primary, .btn-secondary {
-  font-family: 'ManufacturingConsent', Georgia, 'Times New Roman', serif;
-  letter-spacing: .3px;
-}
-
-/* ====== ÁREA DE PERGUNTAS: manter Cardo ====== */
-/* Títulos “Perguntas” continuam ManufacturingConsent (padrão do body).
-   Apenas o enunciado e os campos ficam em Cardo. */
-
-/* Enunciados das perguntas (o texto “1) …”) */
-#jornada-conteudo form label span,
-#form-perguntas label span {
-  font-family: 'Cardo', Georgia, 'Times New Roman', serif;
-}
-
-/* Campos de resposta */
-#jornada-conteudo textarea,
-#jornada-conteudo input[type="text"],
-#jornada-conteudo input[type="email"],
-#jornada-conteudo input[type="number"],
-#form-perguntas textarea,
-#form-perguntas input[type="text"],
-#form-perguntas input[type="email"],
-#form-perguntas input[type="number"]{
-  font-family: 'Cardo', Georgia, 'Times New Roman', serif;
-}
-
-/* Meta/progresso local do bloco: números legíveis em Cardo */
-.j-progress, .j-progress__meta, .j-progress__meta span {
-  font-family: 'Cardo', Georgia, 'Times New Roman', serif;
-}
-
-/* Acolhimento (campo grande final) em Cardo */
-#acolh {
-  font-family: 'Cardo', Georgia, 'Times New Roman', serif;
-}
-
-/* Badge e contadores globais no pergaminho continuam ManufacturingConsent */
-.progress-badge, #jprog-count {
-  font-family: 'ManufacturingConsent', Georgia, 'Times New Roman', serif;
-}
-/* ==========================
-   Tipografia Épica
-   ========================== */
-
-/* Títulos e subtítulos */
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'ManufacturingConsent', 'Georgia', serif;
-  letter-spacing: 1px;       /* dá o ar manuscrito */
-  text-transform: none;      /* mantém natural */
-}
-
-/* Botões */
-button, .btn {
-  font-family: 'ManufacturingConsent', 'Georgia', serif;
-  font-weight: normal;
-  letter-spacing: 0.5px;
-}
-
-/* Badge e elementos épicos */
-.progress-badge {
-  font-family: 'ManufacturingConsent', 'Georgia', serif;
-  font-size: 0.9rem;
-  letter-spacing: 0.5px;
-}
-
-/* Perguntas e respostas continuam no Cardo */
-label, textarea, input, .pergunta, .resposta {
-  font-family: 'Cardo', serif;
-}
-/* ==========================
-   Menus e navegação da Home
-   ========================== */
-
-/* Links principais da home */
-nav a, 
-a.btn, 
-.site-header h1, 
-.site-header p {
-  font-family: 'ManufacturingConsent', 'Georgia', serif;
-  letter-spacing: 0.5px;
-}
-
-/* Links menores (como "Repositório") */
-a {
-  font-family: 'ManufacturingConsent', 'Georgia', serif;
-}
-.video-overlay {
-  position: fixed; inset: 0;
-  background: #000;
-  display: flex; justify-content: center; align-items: center;
-  z-index: 9999;
-}
-.video-overlay.hidden { display: none; }
-.video-player { max-width: 100%; max-height: 100%; }
+/* Vídeo overlay (se usado) */
+.video-overlay { position:fixed; inset:0; background:#000; display:flex; justify-content:center; align-items:center; z-index:9999; }
+.video-overlay.hidden { display:none; }
+.video-player { max-width:100%; max-height:100%; }
 
 /* Seletor de idioma */
 .lang-switch { display:flex; gap:6px; align-items:center; }
 .lang-btn {
-  font-family: 'ManufacturingConsent', Georgia, serif;
-  font-size: .85rem; padding: .25rem .5rem; border-radius: .5rem;
-  border: 1px solid rgba(255,255,255,.2); background: transparent; color: #e8ecf4;
-  cursor: pointer;
+  font-size:.85rem; padding:.25rem .5rem; border-radius:.5rem;
+  border:1px solid rgba(255,255,255,.2); background:transparent; color:#e8ecf4; cursor:pointer;
 }
-.lang-btn:hover { background: rgba(255,255,255,.1); }
-
-
-
-
+.lang-btn:hover { background:rgba(255,255,255,.1); }
