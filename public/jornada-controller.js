@@ -161,40 +161,41 @@
     return Array.isArray(g.JORNADA_QA) ? g.JORNADA_QA : [];
   }
 
-  // --------- RENDER: INTRO ----------
-  function renderIntro() {
-    const el = root();
-    const blocks = hasBlocks() ? g.JORNADA_BLOCKS : null;
-    const total = blocks ? blocks.length : 1;
+  // --------- RENDER: INTRO (com datilografia) ----------
+function renderIntro() {
+  const el = root();
+  const blocks = hasBlocks() ? window.JORNADA_BLOCKS : null;
+  const total  = blocks ? blocks.length : 1;
 
-    el.innerHTML = `
-      <section class="card pergaminho pergaminho-v">
-        <h1 class="title">Irmandade Conhecimento com Luz</h1>
-        <p id="jr_intro_text" class="muted"></p>
-          Bem-vindo(a) à <strong>Jornada Essencial</strong>${blocks ? ` em <strong>${total}</strong> blocos` : ""}.
-          Responda com sinceridade. Ao final, você poderá baixar sua <strong>Devolutiva (PDF)</strong> e a <strong>HQ (33 quadros)</strong>.
-        </p>
-        <div style="margin-top:16px">
-          <button id="jr_go" class="btn">Começar</button>
-          <button id="jr_home" class="btn" style="background:#6b7280">Página inicial</button>
-        </div>
-      </section>
-    `;
-    const introTxt = `Bem-vindo(a) à Jornada Essencial${hasBlocks() ? ` em ${ (g.JORNADA_BLOCKS||[]).length } blocos` : ""}.
-    Responda com sinceridade. Ao final, você poderá baixar sua Devolutiva (PDF) e a HQ (33 quadros).`;
-    typeText(document.getElementById("jr_intro_text"), introTxt);
+  el.innerHTML = `
+    <section class="card pergaminho pergaminho-v">
+      <h1 class="title">Irmandade Conhecimento com Luz</h1>
+      <p id="jr_intro_text" class="muted"></p>
+      <div style="margin-top:16px">
+        <button id="jr_go" class="btn">Começar</button>
+        <button id="jr_home" class="btn" style="background:#6b7280">Página inicial</button>
+      </div>
+    </section>
+  `;
 
-    const go = document.getElementById("jr_go");
-    const home = document.getElementById("jr_home");
-    if (go) go.onclick = () => {
-      if (hasBlocks()) renderPerguntas(0);
-      else renderPerguntasFlat();
-    };
-    if (home) home.onclick = () => location.assign("/");
-  }
+  // texto que será datilografado
+  const introTxt =
+    `Bem-vindo(a) à Jornada Essencial${blocks ? ` em ${total} blocos` : ""}. ` +
+    `Siga com serenidade. Ao final, você poderá baixar sua Devolutiva (PDF) ` +
+    `e a HQ com 33 quadros.`;
 
-  // --------- RENDER: PERGUNTAS (POR BLOCO) ----------
-  // --------- RENDER: PERGUNTAS (POR BLOCO) ---------
+  // dispara a datilografia (usa módulo externo se existir; senão, fallback interno)
+  const p = document.getElementById("jr_intro_text");
+  typeText(p, introTxt);
+
+  // ações
+  const go   = document.getElementById("jr_go");
+  const home = document.getElementById("jr_home");
+  if (go)   go.onclick   = () => { blocks ? renderPerguntas(0) : renderPerguntasFlat(); };
+  if (home) home.onclick = () => location.assign("/");
+}
+
+    // --------- RENDER: PERGUNTAS (POR BLOCO) ---------
 function renderPerguntas(blockIndex = 0) {
   // se não houver blocos definidos, usa o fluxo flat
   if (!hasBlocks()) return renderPerguntasFlat();
