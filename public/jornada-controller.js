@@ -170,7 +170,7 @@
     el.innerHTML = `
       <section class="card pergaminho pergaminho-v">
         <h1 class="title">Irmandade Conhecimento com Luz</h1>
-        <p class="muted">
+        <p id="jr_intro_text" class="muted"></p>
           Bem-vindo(a) à <strong>Jornada Essencial</strong>${blocks ? ` em <strong>${total}</strong> blocos` : ""}.
           Responda com sinceridade. Ao final, você poderá baixar sua <strong>Devolutiva (PDF)</strong> e a <strong>HQ (33 quadros)</strong>.
         </p>
@@ -180,6 +180,10 @@
         </div>
       </section>
     `;
+    const introTxt = `Bem-vindo(a) à Jornada Essencial${hasBlocks() ? ` em ${ (g.JORNADA_BLOCKS||[]).length } blocos` : ""}.
+    Responda com sinceridade. Ao final, você poderá baixar sua Devolutiva (PDF) e a HQ (33 quadros).`;
+    typeText(document.getElementById("jr_intro_text"), introTxt);
+
     const go = document.getElementById("jr_go");
     const home = document.getElementById("jr_home");
     if (go) go.onclick = () => {
