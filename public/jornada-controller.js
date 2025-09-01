@@ -233,7 +233,32 @@
     style.id = MARK_ID;
     style.textContent = css;
     document.head.appendChild(style);
-  })();
+  })
+/* ============================================================================
+   FONTES ÉPICAS — JORNADA
+   Local: /public/assets/fonts/
+   - ManufacturingConsent-Regular.ttf  → Títulos
+   - BerkshireSwash-Regular.ttf        → Textos corridos (contrato/orientações/perguntas)
+   - Cardo-Regular.ttf                 → Respostas
+============================================================================ */
+@font-face {
+  font-family: 'ManufacturingConsent';
+  src: url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'BerkshireSwash';
+  src: url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Cardo';
+  src: url('/assets/fonts/Cardo-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}();
 
   /* ==========================================================================
      🏁 AUTO-BOOT (opcional)
