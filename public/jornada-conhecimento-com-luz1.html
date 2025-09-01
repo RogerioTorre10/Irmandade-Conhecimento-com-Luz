@@ -60,22 +60,67 @@
     </footer>
   </main>
 
-  <!-- =========================================================================
-       TÍTULO: CANVAS DINÂMICO DA JORNADA
-       SUBTÍTULO: Onde o JS injeta intro, perguntas e final
-  ========================================================================= -->
-  <section id="jornada-canvas" class="card pergaminho" style="display:none;">
-    <!-- badge no topo direito -->
-    <div class="progress-badge" id="jprog-pct">0% concluído</div>
+  <!-- =============================================================================
+     TÍTULO: CANVAS DINÂMICO DA JORNADA
+     SUBTÍTULO: Progresso + Controles + Blocos de perguntas
+============================================================================= -->
 
-    <!-- barra de progresso -->
-    <div class="progress-bar">
-      <div class="progress-bar-fill" id="jprog-fill"></div>
-    </div>
+<!-- badge no topo direito -->
+<div class="progress-badge" id="jprog-pct">0% concluído</div>
 
-    <!-- onde as telas (intro/perguntas/final) serão injetadas -->
-    <div id="jornada-conteudo" class="conteudo-pergaminho"></div>
-  </section>
+<!-- barra de progresso global -->
+<div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
+
+<!-- (opcional) onde o render coloca textos de intro/final -->
+<div id="jornada-conteudo" class="conteudo-pergaminho"></div>
+
+<!-- =========================
+     TÍTULO: PROGRESSO LOCAL
+     SUBTÍTULO: do bloco atual
+========================= -->
+<div class="j-progress" style="margin-top:12px">
+  <div class="j-progress__bar"><div class="j-progress__fill"></div></div>
+  <div class="j-progress__meta" id="j-meta"></div>
+</div>
+
+<!-- =========================
+     TÍTULO: CONTROLES
+     SUBTÍTULO: navegação entre perguntas
+========================= -->
+<div class="footer-actions" style="margin:10px 0 16px">
+  <button id="btnPrev" class="btn btn-secondary">Voltar</button>
+  <button id="btnNext" class="btn btn-primary">Próxima</button>
+</div>
+
+<!-- =========================
+     TÍTULO: BLOCO 1
+     SUBTÍTULO: data-video toca ao concluir o bloco
+========================= -->
+<section class="j-bloco" data-bloco="0" data-video="/assets/video/transicao-1.mp4">
+  <div class="j-pergunta" data-pergunta="0">
+    <label class="pergunta-enunciado"><b>Pergunta 1:</b> Quem é você neste momento da vida?</label>
+    <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
+  </div>
+  <div class="j-pergunta" data-pergunta="1">
+    <label class="pergunta-enunciado"><b>Pergunta 2:</b> O que você mais busca nesta caminhada?</label>
+    <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
+  </div>
+  <!-- adicione as perguntas 3, 4, 5 -->
+</section>
+
+<!-- =========================
+     TÍTULO: BLOCO 2
+     SUBTÍTULO: ajuste perguntas e vídeo
+========================= -->
+<section class="j-bloco" data-bloco="1" data-video="/assets/video/transicao-2.mp4">
+  <div class="j-pergunta" data-pergunta="0">
+    <label class="pergunta-enunciado"><b>Pergunta 1:</b> (texto do bloco 2)</label>
+    <textarea rows="4" class="input"></textarea>
+  </div>
+  <!-- …até a 5ª pergunta -->
+</section>
+
+<!-- Repita a mesma estrutura para os blocos 3, 4 e 5 -->
 
   <!-- =========================================================================
        TÍTULO: CHAMAS
