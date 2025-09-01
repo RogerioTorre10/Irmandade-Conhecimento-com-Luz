@@ -61,7 +61,7 @@ window.JORNADA_BLOCKS = [
   {
     id: "reflexoes",
     title: "Reflexões da Alma e da Existência",
-    video_after: "/assets/img/intro-transicao.mp4", // opcional; deixe "" se não tiver
+    video_after: "/filme-1-entrando-na-jornada.mp4",
     questions: [
       { id: "existencia_primeira_memoria", label: "Você se recorda da idade em que, pela primeira vez, percebeu que era alguém neste mundo?", type: "textarea" },
       { id: "sentido_vida", label: "Qual é o sentido da vida para você neste momento?", type: "textarea" },
@@ -72,7 +72,7 @@ window.JORNADA_BLOCKS = [
   {
     id: "raizes",
     title: "Raízes e Experiências de Vida",
-    video_after: "/assets/img/transicao-raizes.mp4",
+    video_after: "/filme-2-dentro-da-jornada.mp4",
     questions: [
       { id: "infancia", label: "Que lembrança da infância mais marcou sua vida?", type: "textarea" },
       { id: "familia", label: "Qual o papel da família na sua jornada?", type: "textarea" },
@@ -83,7 +83,7 @@ window.JORNADA_BLOCKS = [
   {
     id: "caminho",
     title: "Caminho Pessoal",
-    video_after: "/assets/img/transicao-caminho.mp4",
+    video_after: "/filme-3-traumas-na-jornada.mp4",
     questions: [
       { id: "proposito", label: "Qual propósito guia as suas escolhas hoje?", type: "textarea" },
       { id: "talentos", label: "Quais são seus maiores talentos ou dons?", type: "textarea" },
@@ -94,7 +94,7 @@ window.JORNADA_BLOCKS = [
   {
     id: "futuro",
     title: "Futuro e Inspiração",
-    video_after: "/assets/img/transicao-futuro.mp4",
+    video_after: "/filme-4-aproximando-do-final.mp4",
     questions: [
       { id: "sonhos", label: "Quais são seus maiores sonhos?", type: "textarea" },
       { id: "medos", label: "Que medos você gostaria de vencer?", type: "textarea" },
@@ -105,8 +105,7 @@ window.JORNADA_BLOCKS = [
   {
     id: "sintese",
     title: "Síntese e Entrega",
-    // último bloco não precisa de video_after (vamos direto para gerar PDF/HQ)
-    video_after: "",
+    video_after: "/filme-5-fim-da-jornada.mp4",
     questions: [
       { id: "essencia_hoje", label: "Quem é você hoje, em uma frase de verdade?", type: "textarea" },
       { id: "passo_fe", label: "Qual será seu próximo passo de fé e coragem?", type: "textarea" }
@@ -114,8 +113,8 @@ window.JORNADA_BLOCKS = [
   }
 ];
 
-// (Opcional) Vídeo final antes de gerar PDF/HQ:
-window.JORNADA_FINAL_VIDEO = "/assets/img/transicao-final.mp4"; // ou "" para desativar
+// Vídeo final (opcional antes de gerar PDF/HQ)
+window.JORNADA_FINAL_VIDEO = "/filme-5-fim-da-jornada.mp4";
 
   function buildForm(questions = DEFAULT_QUESTIONS) {
     return `
