@@ -90,27 +90,31 @@
        NOTA: A ordem é importante!
   ========================================================================= -->
 
-  <!-- Config -->
-  <script defer src="/config.js"></script>
+ <!-- Config -->
+<script defer src="/config.js"></script>
 
-  <!-- Núcleo -->
-  <script defer src="/jornada-utils.js"></script>
-  <script defer src="/jornada-core.js"></script>
+<!-- Núcleo -->
+<script defer src="/jornada-utils.js"></script>
+<script defer src="/jornada-core.js"></script>
 
-  <!-- Módulos -->
-  <script defer src="/jornada-auth.js"></script>
-  <script defer src="/jornada-chama.js"></script>
-  <script defer src="/jornada-paper-qa.js"></script>
-  <script defer src="/jornada-typing-font.js"></script>
-  <script defer src="/i18n/i18n.js"></script>
-  <script defer src="/jornada-micro.js"></script>
-  <script defer src="/jornada-typing.js"></script>
+<!-- Módulos -->
+<script defer src="/jornada-auth.js"></script>
+<script defer src="/jornada-chama.js"></script>
+<script defer src="/jornada-paper-qa.js"></script>
+<script defer src="/jornada-typing-font.js"></script>
+<script defer src="/i18n/i18n.js"></script>
+<script defer src="/jornada-micro.js"></script>
+<script defer src="/jornada-typing.js"></script>
 
-  <!-- Orquestrador + Renderer + Bootstrap -->
-  <script defer src="/jornada-paper-qa.js"></script>         <!-- define JORNADA_BLOCKS -->
-  <script defer src="/jornada-controller.js"></script>        <!-- controla fluxo -->
-  <script defer src="/jornada-render-master.js"></script>     <!-- expõe API pública -->
-  <script defer src="/jornada-bootstrap.js"></script>         <!-- liga botão iniciar -->
+<!-- Controller -->
+<script defer src="/jornada-controller.js"></script>
+
+<!-- RENDER UNIFICADO (substitui master/plus/junior anteriores) -->
+<script defer src="/jornada-render.js"></script>
+
+<!-- Bootstrap -->
+<script defer src="/jornada-bootstrap.js"></script>
+
 
   <!-- =========================================================================
        TÍTULO: BOOTSTRAP
