@@ -194,90 +194,106 @@
   }
 
   // --------- RENDER: PERGUNTAS (POR BLOCO) ----------
-  function renderPerguntas(blockIndex = 0) {
-    if (!hasBlocks()) return renderPerguntasFlat();
+  // --------- RENDER: PERGUNTAS (POR BLOCO) ---------
+function renderPerguntas(blockIndex = 0) {
+  // se não houver blocos definidos, usa o fluxo flat
+  if (!hasBlocks()) return renderPerguntasFlat();
 
-    const blocks = g.JORNADA_BLOCKS;
-    const b = blocks[blockIndex];
-    const total = blocks.length;
+  const blocks = window.JORNADA_BLOCKS;
+  const b = blocks[blockIndex];
+  const total = blocks.length;
 
-    const state = S.load();
-    state.blockIndex = blockIndex;
-    S.save(state);
+  // estado
+  const state = S.load();
+  state.blockIndex = blockIndex;
+  S.save(state);
 
-    const el = root();
-    const fields = (b.questions || []).map(q => {
-      const v = (state.answers && state.answers[q.id]) || "";
-      if (q.type === "textarea") {
-        return `
-          <div style="margin:14px 0">
-            <label>${q.label}</label>
-            <textarea data-qid="${q.id}" rows="3" style="width:100%;margin-top:6px">${v}</textarea>
-          </div>
-        `;
-      }
+  const el = root();
+
+  // campos do bloco
+  const fields = (b.questions || []).map(q => {
+    const v = (state.answers && state.answers[q.id]) || "";
+    if ((q.type || "textarea") === "textarea") {
       return `
         <div style="margin:14px 0">
           <label>${q.label}</label>
-          <input data-qid="${q.id}" type="text" value="${String(v)}" style="width:100%;margin-top:6px"/>
+          <textarea data-qid="${q.id}" rows="3" style="width:100%;margin-top:6px">${v}</textarea>
         </div>
       `;
-    }).join("");
-
-    el.innerHTML = `
-      <section class="card pergaminho pergaminho-h">
-        <div class="muted" style="margin-bottom:8px">
-          Bloco ${blockIndex + 1} / ${total} — <strong>${b.title}</strong>
-        </div>
-        ${fields}
-        <div style="margin-top:16px">
-          <button id="jr_save" class="btn">Salvar respostas</button>
-          ${blockIndex > 0 ? `<button id="jr_prev" class="btn" style="background:#6b7280">Bloco anterior</button>` : ``}
-          ${blockIndex < total - 1
-            ? `<button id="jr_next" class="btn">Próximo bloco</button>`
-            : `<button id="jr_final" class="btn">Finalizar e Gerar</button>`
-          }
-        </div>
-      </section>
+    }
+    return `
+      <div style="margin:14px 0">
+        <label>${q.label}</label>
+        <input data-qid="${q.id}" type="text" value="${String(v)}" style="width:100%;margin-top:6px"/>
+      </div>
     `;
+  }).join("");
 
-    const $ = (sel, scope = el) => Array.from(scope.querySelectorAll(sel));
-    const collect = () => {
-      const answers = Object.assign({}, (S.load().answers || {}));
-      $('[data-qid]').forEach(n => { answers[n.getAttribute('data-qid')] = n.value || ""; });
-      return answers;
-    };
+  // UI do bloco (título com alvo para datilografia)
+  el.innerHTML = `
+    <section class="card pergaminho pergaminho-h">
+      <div class="muted" style="margin-bottom:8px">
+        Bloco ${blockIndex + 1} / ${total} — <strong id="jr_block_title"></strong>
+      </div>
+      ${fields}
+      <div style="margin-top:16px">
+        <button id="jr_save" class="btn">Salvar respostas</button>
+        ${blockIndex > 0 ? `<button id="jr_prev" class="btn" style="background:#6b7280">Bloco anterior</button>` : ``}
+        ${blockIndex < total - 1
+          ? `<button id="jr_next" class="btn">Próximo bloco</button>`
+          : `<button id="jr_final" class="btn">Finalizar e Gerar</button>`
+        }
+      </div>
+    </section>
+  `;
 
-    const btnSave = document.getElementById("jr_save");
-    if (btnSave) btnSave.onclick = () => {
-      const answers = collect();
-      S.save({ ...S.load(), answers, ts: Date.now(), blockIndex });
-      alert("Respostas salvas (local).");
-    };
+  // datilografar o título
+  typeText(document.getElementById("jr_block_title"), b.title);
 
-    const btnPrev = document.getElementById("jr_prev");
-    if (btnPrev) btnPrev.onclick = () => {
-      const answers = collect();
-      S.save({ ...S.load(), answers, ts: Date.now(), blockIndex: blockIndex - 1 });
-      renderPerguntas(blockIndex - 1);
-    };
+  // helpers locais
+  const $ = (sel, scope = el) => Array.from(scope.querySelectorAll(sel));
+  const collect = () => {
+    const answers = Object.assign({}, (S.load().answers || {}));
+    $('[data-qid]').forEach(n => { answers[n.getAttribute('data-qid')] = n.value || ""; });
+    return answers;
+  };
 
-    const btnNext = document.getElementById("jr_next");
-    if (btnNext) btnNext.onclick = async () => {
-      const answers = collect();
-      S.save({ ...S.load(), answers, ts: Date.now(), blockIndex: blockIndex + 1 });
-      await playVideoOverlay(b.video_after || "");
-      renderPerguntas(blockIndex + 1);
-    };
+  // ações
+  const btnSave  = document.getElementById("jr_save");
+  const btnPrev  = document.getElementById("jr_prev");
+  const btnNext  = document.getElementById("jr_next");
+  const btnFinal = document.getElementById("jr_final");
 
-    const btnFinal = document.getElementById("jr_final");
-    if (btnFinal) btnFinal.onclick = async () => {
-      const answers = collect();
-      S.save({ ...S.load(), answers, ts: Date.now(), blockIndex });
-      if (g.JORNADA_FINAL_VIDEO) await playVideoOverlay(g.JORNADA_FINAL_VIDEO);
-      await gerarDevolutivas(answers);
-    };
-  }
+  if (btnSave) btnSave.onclick = () => {
+    const answers = collect();
+    S.save({ ...S.load(), answers, ts: Date.now(), blockIndex });
+    alert("Respostas salvas (local).");
+  };
+
+  if (btnPrev) btnPrev.onclick = () => {
+    const answers = collect();
+    S.save({ ...S.load(), answers, ts: Date.now(), blockIndex: blockIndex - 1 });
+    renderPerguntas(blockIndex - 1);
+  };
+
+  if (btnNext) btnNext.onclick = async () => {
+    const answers = collect();
+    S.save({ ...S.load(), answers, ts: Date.now(), blockIndex: blockIndex + 1 });
+    // toca vídeo de transição deste bloco (se houver)
+    await playVideoOverlay(b.video_after || "");
+    renderPerguntas(blockIndex + 1);
+  };
+
+  if (btnFinal) btnFinal.onclick = async () => {
+    const answers = collect();
+    S.save({ ...S.load(), answers, ts: Date.now(), blockIndex });
+    // vídeo final opcional antes de gerar PDF/HQ
+    if (window.JORNADA_FINAL_VIDEO) {
+      await playVideoOverlay(window.JORNADA_FINAL_VIDEO);
+    }
+    await gerarDevolutivas(answers);
+  };
+}
 
   // --------- RENDER: PERGUNTAS (PLANO ÚNICO / LEGADO) ----------
   function renderPerguntasFlat() {
