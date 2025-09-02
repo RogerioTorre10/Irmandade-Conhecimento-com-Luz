@@ -78,3 +78,27 @@
   left: 9px;
   right: 9px;
 }
+/* Chama triste (para emoções sofridas) */
+.chama-sofrida {
+  --chama-width: 28px;
+  --chama-height: 40px;
+  filter: drop-shadow(0 4px 8px rgba(255, 140, 0, 0.1));
+}
+
+.chama-sofrida span {
+  opacity: 0.6;
+  animation: flame 1.5s infinite ease-in-out alternate, tremble 0.5s infinite ease-in-out;
+}
+
+/* Chama vibrante (para emoções de superação) */
+.chama-alegre {
+  --chama-width: 64px;
+  --chama-height: 92px;
+  filter: drop-shadow(0 8px 20px rgba(255, 140, 0, 0.5));
+}
+
+.chama-alegre span {
+  animation: flame 0.7s infinite ease-in-out alternate, tremble 0.2s infinite ease-in-out;
+  background: radial-gradient(50% 60% at 50% 30%, #fff7e0 0%, #ffd97f 35%, #ffb74c 70%, transparent 100%);
+}
+
