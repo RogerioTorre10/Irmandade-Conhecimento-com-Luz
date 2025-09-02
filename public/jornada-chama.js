@@ -43,9 +43,21 @@
   };
   brilho();
 
-  // Exporta a função globalmente
-  window.criarChama = criarChama; // Adiciona diretamente ao window para acesso global
-})();
+  // NOVO: Função para ajustar o estilo da chama via JavaScript
+function ajustarChama(sentimento) {
+  const chama = document.getElementById("chama-container");
+  if (!chama) return;
 
-// Para compatibilidade, mantém o namespace JORNADA_CHAMA
-window.JORNADA_CHAMA = { criarChama: window.criarChama };
+  // Limpa as classes de estado anteriores
+  chama.classList.remove("chama-sofrida", "chama-alegre");
+
+  // Adiciona a nova classe
+  if (sentimento === "sofrida") {
+    chama.classList.add("chama-sofrida");
+  } else if (sentimento === "alegre") {
+    chama.classList.add("chama-alegre");
+  }
+}
+// Exporta a função para que outros scripts possam usá-la
+window.JORNADA_CHAMA.ajustar = ajustarChama;
+})();
