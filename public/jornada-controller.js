@@ -104,10 +104,15 @@ window.JORNADA_ENTRAR_BLOCO = (i, qtdPerguntas) => {
     const atual = perguntas[state.perguntaIndex];
     U.show(atual);
 
-    // NOVO: Chama o efeito de datilografia para a pergunta atual
-    if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
-        window.JORNADA_TYPE.run(atual);
-    }
+   // NOVO: Chama o efeito de datilografia e pergaminho na pergunta atual
+    if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
+        window.JORNADA_TYPE.run(atual);
+    }
+    
+    if (window.JORNADA_PAPER && typeof window.JORNADA_PAPER.set === 'function') {
+        // Assume que você quer o pergaminho vertical
+        window.JORNADA_PAPER.set('v');
+    }
 
   // Atualiza badge de blocos (topo) e barra interna (0%)
   JORNADA_UI.setProgressoBlocos(i, J.totalBlocos);
