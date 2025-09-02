@@ -99,6 +99,15 @@ window.JORNADA_ENTRAR_BLOCO = (i, qtdPerguntas) => {
   J.blocoAtual = i;
   J.perguntasNoBloco = qtdPerguntas;
   J.idxPerguntaNoBloco = 0;
+   
+   // Mostra a pergunta atual
+    const atual = perguntas[state.perguntaIndex];
+    U.show(atual);
+
+    // NOVO: Chama o efeito de datilografia para a pergunta atual
+    if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
+        window.JORNADA_TYPE.run(atual);
+    }
 
   // Atualiza badge de blocos (topo) e barra interna (0%)
   JORNADA_UI.setProgressoBlocos(i, J.totalBlocos);
