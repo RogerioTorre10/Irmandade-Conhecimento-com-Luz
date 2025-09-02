@@ -92,6 +92,83 @@
     const root = S.root();
     if (!root) return;
 
+ // ================================================================
+// CONTROLE DE PROGRESSO POR BLOCOS E PERGUNTAS
+// ================================================================
+window.JORNADA_ENTRAR_BLOCO = (i, qtdPerguntas) => {
+  J.blocoAtual = i;
+  J.perguntasNoBloco = qtdPerguntas;
+  J.idxPerguntaNoBloco = 0;
+
+  // Atualiza badge de blocos (topo) e barra interna (0%)
+  JORNADA_UI.setProgressoBlocos(i, J.totalBlocos);
+  JORNADA_UI.setProgressoPerguntas(0);
+};
+
+window.JORNADA_AVANCAR_PERGUNTA = () => {
+  if (J.idxPerguntaNoBloco < J.perguntasNoBloco) {
+    J.idxPerguntaNoBloco++;
+  }
+  const pct = Math.round(
+    (J.idxPerguntaNoBloco / Math.max(1, J.perguntasNoBloco)) * 100
+  );
+  JORNADA_UI.setProgressoPerguntas(pct);
+};
+// ================================================================
+// FINALIZAÇÃO: gera PDF + HQ e volta para a homepage
+// Requer: window.JORNADA_CFG.API_BASE apontando para seu backend
+//         backend responde { pdf_url, hq_url } (ajuste os nomes se preciso)
+// ================================================================
+(function () {
+  const API = (window.JORNADA_CFG && window.JORNADA_CFG.API_BASE) || "";
+
+  async function baixarArquivo(url, filename) {
+    const r = await fetch(url, { credentials: "include" });
+    if (!r.ok) throw new Error(`Download falhou: ${r.status}`);
+    const blob = await r.blob();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    URL.revokeObjectURL(a.href);
+    a.remove();
+  }
+
+  // payloadRespostas: objeto com tudo que você já guarda (ex.: window.JORNADA_STATE.respostas)
+  async function finalizarJornada(payloadRespostas) {
+    try {
+      if (!API) throw new Error("API_BASE ausente em JORNADA_CFG");
+
+      const resp = await fetch(`${API}/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payloadRespostas || {}),
+      });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+
+      // ajuste os nomes se seu backend retornar chaves diferentes
+      const pdfUrl = data.pdf_url || data.pdf || data.pdfLink;
+      const hqUrl  = data.hq_url  || data.hq  || data.hqLink;
+
+      if (pdfUrl) await baixarArquivo(pdfUrl, "Jornada-Conhecimento-com-Luz.pdf");
+      if (hqUrl)  await baixarArquivo(hqUrl,  "Jornada-HQ.zip");
+
+      // redireciona para a homepage
+      window.location.href = "/index.html";
+    } catch (err) {
+      console.error("Erro ao finalizar:", err);
+      alert("Não foi possível gerar os arquivos agora. Tente novamente em instantes.");
+    }
+  }
+
+  // Exponha globalmente para ser usado no renderFinal() ou onde preferir
+  window.JORNADA_FINALIZAR = finalizarJornada;
+})();
+
+
     const blocos = S.blocos();
     if (!blocos.length) return;
 
