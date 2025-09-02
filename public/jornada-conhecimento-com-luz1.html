@@ -254,19 +254,42 @@
 </style>
 
  <script defer src="/config.js"></script>
-
 <script defer src="/jornada-utils.js"></script>
+<script defer src="/jornada-core.js"></script>
+
 <script defer src="/jornada-auth.js"></script>
 <script defer src="/jornada-chama.js"></script>
 <script defer src="/jornada-paper-qa.js"></script>
+<script defer src="/jornada-typing-font.js"></script>
+<script defer src="/i18n/i18n.js"></script>
+<script defer src="/jornada-micro.js"></script>
 <script defer src="/jornada-typing.js"></script>
 
-<script defer src="/jornada-core.js"></script>
 <script defer src="/jornada-controller.js"></script>
-
 <script defer src="/jornada-render.js"></script>
-
 <script defer src="/jornada-bootstrap.js"></script>
+
+<!-- Boot robusto: só roda quando o renderer está pronto -->
+<script>
+(function () {
+  function boot() {
+    if (window.JORNADA_RENDER?.renderIntro) {
+      document.body.classList.add('jornada-active');
+      const route = (location.hash || '#intro').slice(1);
+      if (route === 'perguntas') JORNADA_RENDER.renderPerguntas(0);
+      else if (route === 'final') JORNADA_RENDER.renderFinal();
+      else JORNADA_RENDER.renderIntro();
+      return true;
+    }
+    return false;
+  }
+  if (!boot()) {
+    let tries = 0; const timer = setInterval(() => {
+      if (boot() || ++tries > 40) clearInterval(timer); // 4s
+    }, 100);
+  }
+})();
+</script>
 
 </body>
 </html>
