@@ -58,6 +58,9 @@ function ajustarChama(sentimento) {
     chama.classList.add("chama-alegre");
   }
 }
-// Exporta a função para que outros scripts possam usá-la
-window.JORNADA_CHAMA.ajustar = ajustarChama;
+// Exporta as funções globalmente
+window.JORNADA_CHAMA = {
+  criarChama: criarChama,
+  ajustar: ajustarChama,
+};
 })();
