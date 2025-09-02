@@ -250,5 +250,46 @@
     document.getElementById('envTag').textContent =
       `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
   </script>
+  <script>
+/* ==== DATILOGRAFIA (auto em conteúdo injetado) ==== */
+(function(){
+  function typeWriter(el, text, speed, showCursor){
+    if (!el) return;
+    el.textContent = '';
+    if (showCursor) el.classList.add('lumen-typing');
+    let i = 0;
+    (function step(){
+      if (i < text.length){ el.textContent += text.charAt(i++); setTimeout(step, speed); }
+      else { el.classList.add('typing-done'); }
+    })();
+  }
+  function runTyping(root){
+    (root || document).querySelectorAll('[data-typing]').forEach(el=>{
+      if (el.dataset._typed) return;
+      const t   = el.getAttribute('data-text') || el.textContent || '';
+      const spd = parseInt(el.getAttribute('data-speed') || '26', 10);
+      const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
+      el.dataset._typed = '1';
+      typeWriter(el, t, spd, cur);
+    });
+  }
+  document.addEventListener('DOMContentLoaded', ()=>runTyping(document));
+
+  // observa o #jornada-conteudo para intro/final injetados
+  const target = document.getElementById('jornada-conteudo');
+  if (target) {
+    const obs = new MutationObserver(muts => muts.forEach(m=>runTyping(m.target)));
+    obs.observe(target, { childList:true, subtree:true });
+  }
+})();
+</script>
+
+<!-- Estilos do cursor (se ainda não tiver) -->
+<style>
+.lumen-typing{ white-space:pre-wrap; position:relative; }
+.lumen-typing::after{ content:"▌"; margin-left:2px; opacity:.75; animation:lumenBlink 1s steps(2,end) infinite; }
+.lumen-typing.typing-done::after{ content:""; animation:none; }
+@keyframes lumenBlink{ 50%{ opacity:0; } }
+</style>
 </body>
 </html>
