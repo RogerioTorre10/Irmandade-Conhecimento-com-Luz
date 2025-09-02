@@ -1,7 +1,7 @@
 /* =============================================================================
    TÍTULO: JORNADA CONTROLLER (v1.2)
    SUBTÍTULO: Fluxo pergunta-a-pergunta por bloco + vídeo de transição + coleta leve
-   CAMINHO: /public/assets/js/jornada-controller.js
+   CAMINHO: /public/jornada-controller.js
    COMPATIBILIDADE: independe de frameworks; usa apenas DOM nativo
 ============================================================================= */
 (function () {
@@ -278,3 +278,35 @@
   JC.prev = goPrev;
   JC.render = render;
 })();
+
+ /* ===========================================================================
+     TÍTULO: CHAMA
+     SUBTÍTULO: ESTADO MÍNIMO + CHAMADAS
+  =========================================================================== */
+  (function(){
+  const UI = window.JORNADA_UI;
+  const J  = window.JORNADA_STATE = window.JORNADA_STATE || {
+    blocoAtual: 0,          // 0..4 (5 blocos)
+    totalBlocos: 5,
+    idxPerguntaNoBloco: 0,  // 0..(perguntasNoBloco-1)
+    perguntasNoBloco: 5
+  };
+
+  function atualizarProgresso(){
+    UI.setProgressoBlocos(J.blocoAtual, J.totalBlocos);
+    const pct = Math.round((J.idxPerguntaNoBloco / Math.max(1,J.perguntasNoBloco)) * 100);
+    UI.setProgressoPerguntas(pct);
+  }
+
+  // Exponha para quem renderiza perguntas/blocos:
+  window.JORNADA_ENTRAR_BLOCO = (i, qtdPerguntas)=>{
+    J.blocoAtual = i; J.perguntasNoBloco = qtdPerguntas; J.idxPerguntaNoBloco = 0; atualizarProgresso();
+  };
+  window.JORNADA_AVANCAR_PERGUNTA = ()=>{
+    if (J.idxPerguntaNoBloco < J.perguntasNoBloco) J.idxPerguntaNoBloco++;
+    atualizarProgresso();
+  };
+
+  document.addEventListener('DOMContentLoaded', atualizarProgresso);
+})();
+
