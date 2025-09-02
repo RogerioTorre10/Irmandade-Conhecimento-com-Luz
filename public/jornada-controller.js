@@ -119,6 +119,7 @@ window.JORNADA_AVANCAR_PERGUNTA = () => {
 // Requer: window.JORNADA_CFG.API_BASE apontando para seu backend
 //         backend responde { pdf_url, hq_url } (ajuste os nomes se preciso)
 // ================================================================
+// ========================= FINALIZAÇÃO GLOBAL =========================
 (function () {
   const API = (window.JORNADA_CFG && window.JORNADA_CFG.API_BASE) || "";
 
@@ -135,10 +136,10 @@ window.JORNADA_AVANCAR_PERGUNTA = () => {
     a.remove();
   }
 
-  // payloadRespostas: objeto com tudo que você já guarda (ex.: window.JORNADA_STATE.respostas)
   async function finalizarJornada(payloadRespostas) {
     try {
       if (!API) throw new Error("API_BASE ausente em JORNADA_CFG");
+      console.log('[FINALIZAR] POST =>', `${API}/generate`, payloadRespostas);
 
       const resp = await fetch(`${API}/generate`, {
         method: "POST",
@@ -146,27 +147,28 @@ window.JORNADA_AVANCAR_PERGUNTA = () => {
         credentials: "include",
         body: JSON.stringify(payloadRespostas || {}),
       });
+      console.log('[FINALIZAR] HTTP', resp.status);
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-      const data = await resp.json();
 
-      // ajuste os nomes se seu backend retornar chaves diferentes
+      const data = await resp.json();
+      console.log('[FINALIZAR] payload', data);
+
       const pdfUrl = data.pdf_url || data.pdf || data.pdfLink;
       const hqUrl  = data.hq_url  || data.hq  || data.hqLink;
 
       if (pdfUrl) await baixarArquivo(pdfUrl, "Jornada-Conhecimento-com-Luz.pdf");
       if (hqUrl)  await baixarArquivo(hqUrl,  "Jornada-HQ.zip");
 
-      // redireciona para a homepage
       window.location.href = "/index.html";
     } catch (err) {
-      console.error("Erro ao finalizar:", err);
+      console.error("[FINALIZAR] erro:", err);
       alert("Não foi possível gerar os arquivos agora. Tente novamente em instantes.");
     }
   }
 
-  // Exponha globalmente para ser usado no renderFinal() ou onde preferir
   window.JORNADA_FINALIZAR = finalizarJornada;
 })();
+
 
 
     const blocos = S.blocos();
