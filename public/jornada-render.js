@@ -100,15 +100,7 @@
       console.log('[FINALIZAR] clique btn, respostas=', respostas);
       JORNADA_FINALIZAR(respostas);
     });
-  }
-
-  return sec;
-}
-
-    });
-  }
-  // -------------------------------------------
-
+  } 
   return sec;
    }
 
