@@ -51,6 +51,25 @@
       await typeNode(n, text, speed, delay);
     }
   }
+   
+ // chama manualmente quando renderizar uma pergunta 
+function typeIt(el, text, speed=24){
+  if(!el || !text) return;
+  el.textContent = '';
+  let i = 0;
+  const tick = () => {
+    if(i < text.length){
+      el.textContent += text.charAt(i++);
+      requestAnimationFrame(tick);
+    }
+  };
+  requestAnimationFrame(tick);
+}
+
+// adiciona no objeto global também
+global.JORNADA_TYPE = { run, typeIt };
 
   global.JORNADA_TYPE = { run };
 })(window);
+
+
