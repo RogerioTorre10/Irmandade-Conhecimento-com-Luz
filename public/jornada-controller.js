@@ -310,3 +310,28 @@
   document.addEventListener('DOMContentLoaded', atualizarProgresso);
 })();
 
+(function(){
+  const API = (window.JORNADA_CFG && window.JORNADA_CFG.API_BASE) || '';
+
+  async function baixar(url, filename){
+    const r = await fetch(url); if(!r.ok) throw new Error('Download falhou');
+    const blob = await r.blob(); const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a);
+    a.click(); URL.revokeObjectURL(a.href); a.remove();
+  }
+
+  window.JORNADA_FINALIZAR = async function(payload){
+    try{
+      const r = await fetch(`${API}/generate`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const { pdf_url, hq_url } = await r.json();
+      if (pdf_url) await baixar(pdf_url, 'Jornada-Conhecimento-com-Luz.pdf');
+      if (hq_url) await baixar(hq_url,   'Jornada-HQ.zip');
+      setTimeout(()=>{ window.location.href = '/index.html'; }, 800);
+    }catch(e){
+      console.error(e); alert('Falha ao gerar arquivos. Tente novamente.');
+    }
+  };
+})();
+
+
