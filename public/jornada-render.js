@@ -125,11 +125,21 @@
         sec?.classList?.add("layout-plus");
         return sec;
       },
-      async renderPerguntas(file = "jornadas_olhomagico.html") {
-        const sec = await base.renderPerguntas(file);
-        sec?.classList?.add("layout-plus");
-        return sec;
-      },
+     async renderPerguntas(file = "jornadas_barraonctador.html") {
+  const sec = await base.renderPerguntas(file);
+  sec.classList.add("layout-junior");
+
+  // --- APLICA DATILOGRAFIA NAS PERGUNTAS ---
+  const T = window.JORNADA_TYPE;
+  const h = sec.querySelector('.pergunta__titulo');
+  const p = sec.querySelector('.pergunta__apoio');
+
+  if (T && h) T.typeIt(h, h.textContent, 24);
+  if (T && p) T.typeIt(p, p.textContent, 18);
+  // -----------------------------------------
+
+  return sec;
+},
       async renderFinal() {
         const sec = await base.renderFinal();
         sec?.classList?.add("layout-plus");
