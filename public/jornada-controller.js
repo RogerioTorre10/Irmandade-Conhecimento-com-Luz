@@ -249,6 +249,16 @@ window.JORNADA_AVANCAR_PERGUNTA = () => {
 
     // salva a atual
     saveCurrentAnswer();
+     
+     // NOVO: Analisa a última resposta e ajusta a chama
+      const bloco = S.blocoAtivo();
+      const perguntas = S.perguntasDo(bloco);
+      const qEl = perguntas[state.perguntaIndex];
+      const input = U.getAnswerEl(qEl);
+      if (input && window.JORNADA_CHAMA && typeof window.JORNADA_CHAMA.ajustar === 'function') {
+      const sentimento = analiseSentimento(U.getVal(input));
+      window.JORNADA_CHAMA.ajustar(sentimento);
+}
 
     // ainda há perguntas neste bloco
     if (state.perguntaIndex < perguntas.length - 1) {
