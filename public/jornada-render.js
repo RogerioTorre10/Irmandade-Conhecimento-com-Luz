@@ -77,20 +77,33 @@
       return sec;
     },
 
-    async renderFinal() {
-      if (g.JornadaCtrl && typeof g.JornadaCtrl.renderFinal === "function") {
-        return g.JornadaCtrl.renderFinal();
-      }
-      // Fallback mínimo
-      const sec = document.createElement("section");
-      sec.className = "card pergaminho";
-      sec.innerHTML = `
-        <h2 class="title">Finalização</h2>
-        <p class="muted">Renderer Master (fallback). Obrigado por participar.</p>
-      `;
-      document.getElementById("jornada-conteudo")?.appendChild(sec);
-      return sec;
-    },
+   async renderFinal() {
+  if (g.JornadaCtrl && typeof g.JornadaCtrl.renderFinal === "function") {
+    return g.JornadaCtrl.renderFinal();
+  }
+
+  // fallback mínimo
+  const sec = document.createElement("section");
+  sec.className = "card pergaminho";
+  sec.innerHTML = `
+    <h2 class="title">Finalização</h2>
+    <p class="muted">Renderer Master (fallback). Obrigado por participar.</p>
+    <button id="btnFinalizar" class="btn btn-primary">Concluir Jornada</button>
+  `;
+  document.getElementById("jornada-conteudo").appendChild(sec);
+
+  // --- dispara PDF + HQ + redirecionamento ---
+  const btn = sec.querySelector("#btnFinalizar");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const respostas = (window.JORNADA_STATE && window.JORNADA_STATE.respostas) || {};
+      JORNADA_FINALIZAR(respostas);
+    });
+  }
+  // -------------------------------------------
+
+  return sec;
+   }
 
     start() {
       // Se existir um controlador oficial, deixa ele conduzir o fluxo
