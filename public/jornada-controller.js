@@ -113,16 +113,17 @@ window.JORNADA_ENTRAR_BLOCO = (i, qtdPerguntas) => {
   J.blocoAtual = i;
   J.perguntasNoBloco = qtdPerguntas;
   J.idxPerguntaNoBloco = 0;
-   
+// Atualiza badge de blocos (topo) e barra interna (0%)
+  JORNADA_UI.setProgressoBlocos(i, J.totalBlocos);
+  JORNADA_UI.setProgressoPerguntas(0);
+};
    // Mostra a pergunta atual
     const atual = perguntas[state.perguntaIndex];
     U.show(atual);
-
    // NOVO: Chama o efeito de datilografia e pergaminho na pergunta atual
     if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
         window.JORNADA_TYPE.run(atual);
-    }
-    
+    }    
     if (window.JORNADA_PAPER && typeof window.JORNADA_PAPER.set === 'function') {
         // Assume que você quer o pergaminho vertical
         window.JORNADA_PAPER.set('v');
@@ -132,7 +133,6 @@ window.JORNADA_ENTRAR_BLOCO = (i, qtdPerguntas) => {
   JORNADA_UI.setProgressoBlocos(i, J.totalBlocos);
   JORNADA_UI.setProgressoPerguntas(0);
 };
-
 window.JORNADA_AVANCAR_PERGUNTA = () => {
   if (J.idxPerguntaNoBloco < J.perguntasNoBloco) {
     J.idxPerguntaNoBloco++;
