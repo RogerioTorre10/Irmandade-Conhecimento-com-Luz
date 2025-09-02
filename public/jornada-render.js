@@ -82,7 +82,7 @@
     return g.JornadaCtrl.renderFinal();
   }
 
-  // fallback mínimo
+  // fallback mínimo com botão
   const sec = document.createElement("section");
   sec.className = "card pergaminho";
   sec.innerHTML = `
@@ -92,12 +92,19 @@
   `;
   document.getElementById("jornada-conteudo").appendChild(sec);
 
-  // --- dispara PDF + HQ + redirecionamento ---
+  // listener do botão
   const btn = sec.querySelector("#btnFinalizar");
   if (btn) {
     btn.addEventListener("click", () => {
       const respostas = (window.JORNADA_STATE && window.JORNADA_STATE.respostas) || {};
+      console.log('[FINALIZAR] clique btn, respostas=', respostas);
       JORNADA_FINALIZAR(respostas);
+    });
+  }
+
+  return sec;
+}
+
     });
   }
   // -------------------------------------------
