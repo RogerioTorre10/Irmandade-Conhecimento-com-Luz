@@ -54,7 +54,7 @@
     key(b, q) { return `b${b}-q${q}`; },
     getAnswerEl(qEl) {
       return qEl?.querySelector?.('textarea, input[type="text"], input[type="email"], input[type="number"], input[type="search"]') || null;
-    },
+    },        
     getVal(el) { return (el && (el.value ?? '')).trim(); },
     setProgress(cur, total) {
       const pct = total ? Math.round((cur / total) * 100) : 0;
@@ -64,6 +64,20 @@
       if (meta) meta.innerHTML = `<b>${cur}</b> / ${total} (${pct}%)`;
     },
   };
+   // Utilitários de análise de sentimento
+const analiseSentimento = (texto) => {
+  const textoNormalizado = texto.toLowerCase();
+  const palavrasTristes = ["dor", "perda", "sofrimento", "tristeza", "medo", "desafio"];
+  const palavrasAlegres = ["alegria", "superação", "esperança", "coragem", "gratidão", "amor"];
+
+  for (const palavra of palavrasTristes) {
+    if (textoNormalizado.includes(palavra)) return "sofrida";
+  }
+  for (const palavra of palavrasAlegres) {
+    if (textoNormalizado.includes(palavra)) return "alegre";
+  }
+  return "neutra"; // Para respostas que não se encaixam
+};
 
   /* ===========================================================================
      TÍTULO: PERSISTÊNCIA LEVE
