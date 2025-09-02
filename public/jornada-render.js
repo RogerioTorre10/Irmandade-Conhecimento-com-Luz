@@ -102,7 +102,7 @@
     });
   } 
   return sec;
-   }
+   },
 
     start() {
       // Se existir um controlador oficial, deixa ele conduzir o fluxo
