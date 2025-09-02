@@ -166,42 +166,9 @@
        TÍTULO: CHAMAS
        SUBTÍTULO: Scripts visuais de efeito da chama
   ========================================================================= -->
-  <link rel="stylesheet" href="/css/chama.css">
-  <script defer src="/jornada-chama.js"></script>
+  <link rel="stylesheet" href="/css/chama.css"> 
 
-  <!-- =========================================================================
-       TÍTULO: SCRIPTS PRINCIPAIS
-       SUBTÍTULO: Configuração + módulos + orquestradores
-       NOTA: A ordem é importante!
-  ========================================================================= -->
-
- <!-- Config -->
-<script defer src="/config.js"></script>
-
-<!-- Núcleo -->
-<script defer src="/jornada-utils.js"></script>
-<script defer src="/jornada-core.js"></script>
-
-<!-- Módulos -->
-<script defer src="/jornada-auth.js"></script>
-<script defer src="/jornada-chama.js"></script>
-<script defer src="/jornada-paper-qa.js"></script>
-<script defer src="/jornada-typing-font.js"></script>
-<script defer src="/i18n/i18n.js"></script>
-<script defer src="/jornada-micro.js"></script>
-<script defer src="/jornada-typing.js"></script>
-
-<!-- Controller -->
-<script defer src="/jornada-controller.js"></script>
-
-<!-- RENDER UNIFICADO (substitui master/plus/junior anteriores) -->
-<script defer src="/jornada-render.js"></script>
-
-<!-- Bootstrap -->
-<script defer src="/jornada-bootstrap.js"></script>
-
-
-  <!-- =========================================================================
+   <!-- =========================================================================
        TÍTULO: BOOTSTRAP
        SUBTÍTULO: Ativa jornada e roteia intro/perguntas/final
   ========================================================================= -->
@@ -291,5 +258,41 @@
 .lumen-typing.typing-done::after{ content:""; animation:none; }
 @keyframes lumenBlink{ 50%{ opacity:0; } }
 </style>
+
+  <!-- =========================================================================
+              efeito da chama
+  ========================================================================= -->
+  <script defer src="/jornada-chama.js"></script>
+  
+   <!-- =========================================================================
+       TÍTULO: SCRIPTS PRINCIPAIS
+       SUBTÍTULO: Configuração + módulos + orquestradores
+       NOTA: A ordem é importante!
+  ========================================================================= -->
+ <!-- Config -->
+<script defer src="/config.js"></script>
+
+<!-- Núcleo -->
+<script defer src="/jornada-utils.js"></script>
+<script defer src="/jornada-core.js"></script>
+
+<!-- Módulos -->
+<script defer src="/jornada-auth.js"></script>
+<script defer src="/jornada-chama.js"></script>
+<script defer src="/jornada-paper-qa.js"></script>
+<script defer src="/jornada-typing-font.js"></script>
+<script defer src="/i18n/i18n.js"></script>
+<script defer src="/jornada-micro.js"></script>
+<script defer src="/jornada-typing.js"></script>
+
+<!-- Controller -->
+<script defer src="/jornada-controller.js"></script>
+
+<!-- RENDER UNIFICADO (substitui master/plus/junior anteriores) -->
+<script defer src="/jornada-render.js"></script>
+
+<!-- Bootstrap -->
+<script defer src="/jornada-bootstrap.js"></script>
+
 </body>
 </html>
