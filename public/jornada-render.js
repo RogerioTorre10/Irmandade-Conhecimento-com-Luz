@@ -149,10 +149,45 @@
 
   if (T && h) T.typeIt(h, h.textContent, 24);
   if (T && p) T.typeIt(p, p.textContent, 18);
-  // -----------------------------------------
+  // =================== PROGRESSO (BLOCOS + PERGUNTAS) ===================
+try {
+  const UI = window.JORNADA_UI || {};
+  const J  = window.JORNADA_STATE || {};
 
+  // 1) Badge do topo (por bloco) — usa J.blocoAtual/J.totalBlocos se existir
+  if (UI.setProgressoBlocos && typeof J.blocoAtual === 'number' && typeof J.totalBlocos === 'number') {
+    UI.setProgressoBlocos(J.blocoAtual, J.totalBlocos);
+  }
+
+  // 2) Barra interna (perguntas dentro do bloco)
+  if (UI.setProgressoPerguntas) {
+    // tenta pegar do estado; se não houver, estima pela DOM desse 'sec'
+    const totalPerguntas =
+      Math.max(
+        1,
+        J.perguntasNoBloco ||
+        sec.querySelectorAll('[data-role="pergunta"], .pergunta').length ||
+        5
+      );
+
+    const idxPergunta =
+      Math.max(
+        0,
+        Math.min(
+          totalPerguntas,
+          (J.idxPerguntaNoBloco ?? 0)
+        )
+      );
+
+    const pct = Math.round((idxPergunta / totalPerguntas) * 100);
+    UI.setProgressoPerguntas(pct);
+  }
+} catch (e) {
+  console.warn('Progresso (renderPerguntas) falhou:', e);
+}
   return sec;
 },
+       
       async renderFinal() {
         const sec = await base.renderFinal();
         sec?.classList?.add("layout-plus");
