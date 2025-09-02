@@ -44,3 +44,18 @@
     STATE,
   };
 })();
+
+// --- Progresso Unificado ---
+window.JORNADA_UI = Object.assign(window.JORNADA_UI || {}, {
+  setProgressoBlocos(blocoIdx0, totalBlocos) {
+    const el = document.getElementById('badgeProgressoBlocos');
+    if (!el || !totalBlocos) return;
+    const pct = Math.round(((blocoIdx0 + 1) / totalBlocos) * 100);
+    el.textContent = `${pct}% concluído`;
+  },
+  setProgressoPerguntas(percent) {
+    const bar = document.getElementById('progressBar');
+    if (bar) bar.style.width = `${Math.max(0, Math.min(100, percent|0))}%`;
+  }
+});
+
