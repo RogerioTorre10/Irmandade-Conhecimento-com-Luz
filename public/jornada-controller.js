@@ -251,7 +251,6 @@ window.JORNADA_AVANCAR_PERGUNTA = () => {
     saveCurrentAnswer();
      
      // NOVO: Analisa a última resposta e ajusta a chama
-      const perguntas = S.perguntasDo(bloco);
       const qEl = perguntas[state.perguntaIndex];
       const input = U.getAnswerEl(qEl);
       if (input && window.JORNADA_CHAMA && typeof window.JORNADA_CHAMA.ajustar === 'function') {
