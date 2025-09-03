@@ -260,12 +260,14 @@ function goNext() {
      SUBTÍTULO: Liga eventos e faz o primeiro render
   =========================================================================== */
   JC.init = function initJornada() {
-    const root = S.root();
-    if (!root) return;
-    const prevBtn = S.btnPrev();
-    const nextBtn = S.btnNext();
-    if (nextBtn) nextBtn.addEventListener('click', goNext);
-    if (prevBtn) prevBtn.addEventListener('click', goPrev);
+     const root = S.root();
+     if (!root) return;
++    // garante que o canvas fique visível (o HTML começa com display:none)
++    U.show(root, 'block');
+     const prevBtn = S.btnPrev();
+     const nextBtn = S.btnNext();
+     if (nextBtn) nextBtn.addEventListener('click', goNext);
+     if (prevBtn) prevBtn.addEventListener('click', goPrev);
     // tenta restaurar respostas antigas (opcional)
     try {
       const stash = localStorage.getItem('JORNADA_RESPOSTAS');
