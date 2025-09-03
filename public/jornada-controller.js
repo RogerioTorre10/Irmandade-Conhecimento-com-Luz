@@ -1,266 +1,451 @@
-/* ==================================================
-   RENDER CONTROLLER — Irmandade Conhecimento com Luz
-   Estrutura modular, com títulos e subtítulos claros
-   Colar em: /public/assets/js/render-controller.js
-   Requisitos: ui.js, state.js, config.js, journey.js (ou jornada-controller.js)
-   ================================================== */
-
-// ✅ Proteção contra vazamento de script (init único)
+/* =============================================================================
+   TÍTULO: JORNADA CONTROLLER (v1.2)
+   SUBTÍTULO: Fluxo pergunta-a-pergunta por bloco + vídeo de transição + coleta leve
+   CAMINHO: /public/jornada-controller.js
+   COMPATIBILIDADE: independe de frameworks; usa apenas DOM nativo
+============================================================================= */
 (function () {
-  if (window.__RENDER_CTRL_INIT__) return; // evita múltiplas inicializações
-  window.__RENDER_CTRL_INIT__ = true;
+  'use strict';
 
-  // -------------------- Núcleo / Utilidades --------------------
-  const $ = (sel, root = document) => root.querySelector(sel);
-  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
-  const on = (el, ev, fn, opts) => el && el.addEventListener(ev, fn, opts);
+  /* ===========================================================================
+     TÍTULO: NAMESPACE
+     SUBTÍTULO: Expõe uma API pequena no window para depuração
+  =========================================================================== */
+  const JC = (window.JC = window.JC || {});
 
-  const CFG = window.JORNADA_CFG || {};
-  const UI  = window.JORNADA_UI  || {};
-  const ST  = window.JORNADA_STATE || {};
-
-  // Canal para cancelar listeners em navegações
-  let abortCtrl = new AbortController();
-  const resetAbort = () => { abortCtrl.abort(); abortCtrl = new AbortController(); };
-
-  // ===================== 1) EFEITO DATILOGRAFIA =====================
-  // 1.1 Cabeçalho — "texto de cabeçalho"
-  const TypingHeader = (() => {
-    let timer = null;
-    function type(el, text, speed = 28) {
-      if (!el) return;
-      clearInterval(timer);
-      el.textContent = "";
-      let i = 0;
-      timer = setInterval(() => {
-        el.textContent += text.charAt(i++);
-        if (i >= text.length) clearInterval(timer);
-      }, speed);
-    }
-    return { run: (sel, text, speed) => type($(sel), text, speed) };
-  })();
-
-  // 1.2 Rodapé — "texto de rodapé"
-  const TypingFooter = (() => {
-    let timer = null;
-    function type(el, text, speed = 22) {
-      if (!el) return;
-      clearInterval(timer);
-      el.textContent = "";
-      let i = 0;
-      timer = setInterval(() => {
-        el.textContent += text.charAt(i++);
-        if (i >= text.length) clearInterval(timer);
-      }, speed);
-    }
-    return { run: (sel, text, speed) => type($(sel), text, speed) };
-  })();
-
-  // 1.3 Perguntas — "texto de perguntas"
-  const TypingQuestion = (() => {
-    function typeInto(el, text, speed = 26) {
-      if (!el) return;
-      el.innerHTML = ""; // importante: usa innerHTML só aqui
-      const span = document.createElement('span');
-      el.appendChild(span);
-      let i = 0;
-      const id = setInterval(() => {
-        span.textContent += text.charAt(i++);
-        if (i >= text.length) clearInterval(id);
-      }, speed);
-    }
-    return { run: (sel, text, speed) => typeInto($(sel), text, speed) };
-  })();
-
-  // ===================== 2) EFEITO CHAMA =====================
-  // 2.1 Big Chama — página principal do site
-  const FlameBigHome = (() => {
-    return {
-      mount: (sel = '#bigFlameHome') => {
-        const el = $(sel);
-        if (!el) return;
-        el.classList.add('chama','chama--big');
-        // Se usar CSS puro de chama, garantir spans:
-        if (!el.querySelector('span')) {
-          el.innerHTML = '<span></span><span></span><span></span>';
-        }
-      }
-    };
-  })();
-
-  // 2.2 Chama pequena — topo da página "Contrato"
-  const FlameSmallContratoTop = (() => ({
-    mount: (sel = '#flameContratoTop') => {
-      const el = $(sel); if (!el) return;
-      el.classList.add('chama','chama--sm');
-      if (!el.querySelector('span')) el.innerHTML = '<span></span><span></span><span></span>';
-    }
-  }))();
-
-  // 2.3 Chama pequena — parte inferior das Perguntas
-  const FlameSmallPerguntasBottom = (() => ({
-    mount: (sel = '#flamePerguntasBottom') => {
-      const el = $(sel); if (!el) return;
-      el.classList.add('chama','chama--sm');
-      if (!el.querySelector('span')) el.innerHTML = '<span></span><span></span><span></span>';
-    }
-  }))();
-
-  // ===================== 3) PERGAMINHO =====================
-  // 3.1 Vertical — início, intro, final
-  const PergaminhoV = {
-    apply: (section) => section && section.classList.add('pergaminho','pergaminho-v')
-  };
-  // 3.2 Horizontal — perguntas e respostas
-  const PergaminhoH = {
-    apply: (section) => section && section.classList.add('pergaminho','pergaminho-h')
+  /* ===========================================================================
+     TÍTULO: ESTADO
+     SUBTÍTULO: Índices atuais de bloco/pergunta e armazenamento simples
+  =========================================================================== */
+  const state = {
+    blocoIndex: 0,
+    perguntaIndex: 0,
+    respostas: Object.create(null), // { 'b0-q0': 'texto' }
   };
 
-  // ===================== 4) BARRA DE PROGRESSO =====================
-  // Suporta dois modos: por-bloque (0..N) e por-pergunta (0..totalPerguntas)
-  const Progress = (() => {
-    let totalBlocks = 5;    // ajustar conforme config
-    let totalPergs  = 32;   // ajustar conforme config
+  /* ===========================================================================
+     TÍTULO: SELETORES
+     SUBTÍTULO: Ganchos de DOM usados pelo controller
+  =========================================================================== */
+  const S = {
+    root: () => document.getElementById('jornada-canvas'),
+    blocos: () => Array.from(document.querySelectorAll('.j-bloco,[data-bloco]')),
+    blocoAtivo: () => S.blocos()[state.blocoIndex],
+    perguntasDo: (blocoEl) => Array.from(blocoEl.querySelectorAll('.j-pergunta,[data-pergunta]')),
+    btnPrev: () => document.getElementById('btnPrev'),
+    btnNext: () => document.getElementById('btnNext'),
+    meta: () => document.getElementById('j-meta'),
+    progressFill: () => document.querySelector('.j-progress__fill'),
 
-    function setBar(percent) {
-      UI.setProgress ? UI.setProgress(percent) : ( $('#progressBar') && ($('#progressBar').style.width = `${percent}%`) );
-      const label = $('#progressLabel');
-      if (label) label.textContent = `${Math.round(percent)}%`;
+    // Overlay de vídeo
+    overlay: () => document.getElementById('videoOverlay'),
+    video: () => document.getElementById('videoTransicao'),
+    skip: () => document.getElementById('skipVideo'),
+  };
+
+  /* ===========================================================================
+     TÍTULO: UTILIDADES
+     SUBTÍTULO: Helpers para DOM, progresso e chaves
+  =========================================================================== */
+  const U = {
+    show(el, disp = 'block') { if (el) el.style.display = disp; },
+    hide(el) { if (el) el.style.display = 'none'; },
+    clamp(n, a, b) { return Math.max(a, Math.min(b, n)); },
+    key(b, q) { return `b${b}-q${q}`; },
+    getAnswerEl(qEl) {
+      return qEl?.querySelector?.('textarea, input[type="text"], input[type="email"], input[type="number"], input[type="search"]') || null;
+    },        
+    getVal(el) { return (el && (el.value ?? '')).trim(); },
+    setProgress(cur, total) {
+      const pct = total ? Math.round((cur / total) * 100) : 0;
+      const bar = S.progressFill();
+      const meta = S.meta();
+      if (bar) bar.style.width = pct + '%';
+      if (meta) meta.innerHTML = `<b>${cur}</b> / ${total} (${pct}%)`;
+    },
+  };
+   // Utilitários de análise de sentimento
+const analiseSentimento = (texto) => {
+  const textoNormalizado = texto.toLowerCase();
+  const palavrasTristes = ["dor", "perda", "sofrimento", "tristeza", "medo", "desafio"];
+  const palavrasAlegres = ["alegria", "superação", "esperança", "coragem", "gratidão", "amor"];
+
+  for (const palavra of palavrasTristes) {
+    if (textoNormalizado.includes(palavra)) return "sofrida";
+  }
+  for (const palavra of palavrasAlegres) {
+    if (textoNormalizado.includes(palavra)) return "alegre";
+  }
+  return "neutra"; // Para respostas que não se encaixam
+};
+
+  /* ===========================================================================
+     TÍTULO: PERSISTÊNCIA LEVE
+     SUBTÍTULO: Salva/recupera respostas em memória e/ou localStorage
+  =========================================================================== */
+  function saveCurrentAnswer() {
+    const bloco = S.blocoAtivo();
+    if (!bloco) return;
+    const perguntas = S.perguntasDo(bloco);
+    const qEl = perguntas[state.perguntaIndex];
+    if (!qEl) return;
+
+    const input = U.getAnswerEl(qEl);
+    if (input) {
+      const k = U.key(state.blocoIndex, state.perguntaIndex);
+      state.respostas[k] = U.getVal(input);
+      try { localStorage.setItem('JORNADA_RESPOSTAS', JSON.stringify(state.respostas)); } catch {}
     }
-
-    return {
-      setup: (cfg = {}) => { totalBlocks = cfg.totalBlocks ?? totalBlocks; totalPergs = cfg.totalPerguntas ?? totalPergs; },
-      byBlock: (currentIndex /* 0-based */) => {
-        const percent = Math.max(0, Math.min(100, ((currentIndex + 1) / totalBlocks) * 100));
-        setBar(percent);
-      },
-      byPergunta: (current /* 1-based */) => {
-        const percent = Math.max(0, Math.min(100, (current / totalPergs) * 100));
-        setBar(percent);
-      }
-    };
-  })();
-
-  // ===================== 5) VÍDEOS ENTRE BLOCOS (5 blocos) =====================
-  // Exibe mp4 ao transitar de um bloco ao próximo
-  const BlockVideos = (() => {
-    const vids = CFG.BLOCK_VIDEOS || [];
-    function play(index) {
-      const src = vids[index];
-      const el = $('#blockVideo');
-      if (!el || !src) return Promise.resolve();
-      return new Promise((resolve) => {
-        el.src = src; el.classList.remove('hidden');
-        el.onended = () => { el.classList.add('hidden'); resolve(); };
-        el.play().catch(() => resolve());
-      });
-    }
-    return { play };
-  })();
-
-  // ===================== 6) DOWNLOAD (PDF e HQ) =====================
-  const Downloader = (() => {
-    async function get(url) {
-      const r = await fetch(url, { credentials: 'include' });
-      if (!r.ok) throw new Error(`Falha ao baixar: ${r.status}`);
-      const blob = await r.blob();
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = url.split('/').pop();
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    }
-    return {
-      pdf: () => get(CFG.API_PDF_URL),
-      hq:  () => get(CFG.API_HQ_URL)
-    };
-  })();
-
-  // ===================== 7) NAVEGAÇÃO (home → intro → perguntas → final) =====================
-  const Nav = (() => {
-    function show(id) { UI.showSection ? UI.showSection(id) : switchSection(id); }
-    function switchSection(id) {
-      $$('.card').forEach(sec => sec.classList.toggle('hidden', sec.id !== id));
-    }
-    function goHome () { show('home');  applyFrame('v'); }
-    function goIntro () { show('intro'); applyFrame('v'); }
-    function goPergs() { show('perguntas'); applyFrame('h'); }
-    function goFinal () { show('final'); applyFrame('v'); }
-
-    function applyFrame(type) {
-      const sec = $('#app section.card:not(.hidden)');
-      if (!sec) return;
-      sec.classList.remove('pergaminho','pergaminho-v','pergaminho-h');
-      (type === 'v' ? PergaminhoV : PergaminhoH).apply(sec);
-    }
-
-    return { goHome, goIntro, goPergs, goFinal };
-  })();
-
-  // ===================== 8) BOTÕES (limpeza de duplicados) =====================
-  const Buttons = (() => {
-    function bind() {
-      resetAbort();
-      const sig = { signal: abortCtrl.signal };
-
-      on($('#btnExplorar1'), 'click', () => Nav.goIntro(), sig);
-      on($('#btnExplorar2'), 'click', () => {
-        // Removido/ocultado conforme solicitação para evitar página estática com 2 perguntas
-        const b = $('#btnExplorar2'); if (b) b.classList.add('hidden');
-        Nav.goIntro();
-      }, sig);
-      on($('#btnIniciar'), 'click', () => Nav.goPergs(), sig);
-
-      on($('#btnBaixarPDF'), 'click', () => Downloader.pdf(), sig);
-      on($('#btnBaixarHQ'),  'click', () => Downloader.hq(),  sig);
-      on($('#btnVoltarHome'),'click', () => Nav.goHome(), sig);
-    }
-    return { bind };
-  })();
-
-  // ===================== 9) CONFIGURAÇÃO DE ENDPOINTS/API =====================
-  // Ajuste aqui para evitar 404 e CORS (usa apenas domínios válidos)
-  (function configureAPI(){
-    const ORIGENS_OK = CFG.ALLOWED_ORIGINS || [
-      'https://irmandade-conhecimento-com-luz.onrender.com',
-      'https://irmandade-conhecimento-com-luz-1.onrender.com',
-      'http://localhost:3000'
-    ];
-    // Exemplo: window.fetch será usado normalmente; apenas garanta CFG.API_* corretos
-    // CFG.API_PDF_URL, CFG.API_HQ_URL devem apontar para o serviço válido
-  })();
-
-  // ===================== 10) INICIALIZAÇÃO =====================
-  async function init() {
-    // Tipografia dinâmica
-    TypingHeader.run('#typingHeader', CFG.TYPING_HEADER || 'Irmandade Conhecimento com Luz');
-    TypingFooter.run('#typingFooter', CFG.TYPING_FOOTER || 'Para além. E sempre!!');
-
-    // Efeito chama
-    FlameBigHome.mount('#bigFlameHome');
-    FlameSmallContratoTop.mount('#flameContratoTop');
-    FlameSmallPerguntasBottom.mount('#flamePerguntasBottom');
-
-    // Progresso
-    Progress.setup({ totalBlocks: CFG.TOTAL_BLOCKS || 5, totalPerguntas: CFG.TOTAL_PERGUNTAS || 32 });
-    Progress.byBlock(0); // inicia em 1º bloco
-
-    // Botões
-    Buttons.bind();
-
-    // Página inicial
-    Nav.goHome();
   }
 
-  // Expor um pequeno gateway para outros módulos (jornada-controller) atualizarem a barra
-  window.RENDER_CTRL = {
-    progressByBlock: (i) => Progress.byBlock(i),
-    progressByPergunta: (n) => Progress.byPergunta(n),
-    playBlockVideo: (i) => BlockVideos.play(i),
-    go: { home: () => Nav.goHome(), intro: () => Nav.goIntro(), pergs: () => Nav.goPergs(), final: () => Nav.goFinal() },
+  /* ===========================================================================
+     TÍTULO: RENDERIZAÇÃO
+     SUBTÍTULO: Exibe apenas 1 pergunta do bloco atual
+  =========================================================================== */
+  function render() {
+    const root = S.root();
+    if (!root) return;
+
+ // ================================================================
+// CONTROLE DE PROGRESSO POR BLOCOS E PERGUNTAS
+// ================================================================
+window.JORNADA_ENTRAR_BLOCO = (i, qtdPerguntas) => {
+  J.blocoAtual = i;
+  J.perguntasNoBloco = qtdPerguntas;
+  J.idxPerguntaNoBloco = 0;
+// Atualiza badge de blocos (topo) e barra interna (0%)
+  JORNADA_UI.setProgressoBlocos(i, J.totalBlocos);
+  JORNADA_UI.setProgressoPerguntas(0);
+};
+   // Mostra a pergunta atual
+    const atual = perguntas[state.perguntaIndex];
+    U.show(atual);
+   // NOVO: Chama o efeito de datilografia e pergaminho na pergunta atual
+    if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
+        window.JORNADA_TYPE.run(atual);
+    }    
+    if (window.JORNADA_PAPER && typeof window.JORNADA_PAPER.set === 'function') {
+        // Assume que você quer o pergaminho vertical
+        window.JORNADA_PAPER.set('v');
+    }
+
+  // Atualiza badge de blocos (topo) e barra interna (0%)
+  JORNADA_UI.setProgressoBlocos(i, J.totalBlocos);
+  JORNADA_UI.setProgressoPerguntas(0);
+};
+window.JORNADA_AVANCAR_PERGUNTA = () => {
+  if (J.idxPerguntaNoBloco < J.perguntasNoBloco) {
+    J.idxPerguntaNoBloco++;
+  }
+  const pct = Math.round(
+    (J.idxPerguntaNoBloco / Math.max(1, J.perguntasNoBloco)) * 100
+  );
+  JORNADA_UI.setProgressoPerguntas(pct);
+};
+// ================================================================
+// FINALIZAÇÃO: gera PDF + HQ e volta para a homepage
+// Requer: window.JORNADA_CFG.API_BASE apontando para seu backend
+//         backend responde { pdf_url, hq_url } (ajuste os nomes se preciso)
+// ================================================================
+// ========================= FINALIZAÇÃO GLOBAL =========================
+(function () {
+  const API = (window.JORNADA_CFG && window.JORNADA_CFG.API_BASE) || "";
+
+  async function baixarArquivo(url, filename) {
+    const r = await fetch(url, { credentials: "include" });
+    if (!r.ok) throw new Error(`Download falhou: ${r.status}`);
+    const blob = await r.blob();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    URL.revokeObjectURL(a.href);
+    a.remove();
+  }
+
+  async function finalizarJornada(payloadRespostas) {
+    try {
+      if (!API) throw new Error("API_BASE ausente em JORNADA_CFG");
+      console.log('[FINALIZAR] POST =>', `${API}/generate`, payloadRespostas);
+
+      const resp = await fetch(`${API}/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payloadRespostas || {}),
+      });
+      console.log('[FINALIZAR] HTTP', resp.status);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+      const data = await resp.json();
+      console.log('[FINALIZAR] payload', data);
+
+      const pdfUrl = data.pdf_url || data.pdf || data.pdfLink;
+      const hqUrl  = data.hq_url  || data.hq  || data.hqLink;
+
+      if (pdfUrl) await baixarArquivo(pdfUrl, "Jornada-Conhecimento-com-Luz.pdf");
+      if (hqUrl)  await baixarArquivo(hqUrl,  "Jornada-HQ.zip");
+
+      window.location.href = "/index.html";
+    } catch (err) {
+      console.error("[FINALIZAR] erro:", err);
+      alert("Não foi possível gerar os arquivos agora. Tente novamente em instantes.");
+    }
+  }
+
+  window.JORNADA_FINALIZAR = finalizarJornada;
+})();
+
+
+
+    const blocos = S.blocos();
+    if (!blocos.length) return;
+
+    // Esconde todos os blocos
+    blocos.forEach(U.hide);
+
+    // Mostra bloco atual
+    const bloco = S.blocoAtivo();
+    U.show(bloco);
+
+    // Esconde todas as perguntas deste bloco
+    const perguntas = S.perguntasDo(bloco);
+    perguntas.forEach(U.hide);
+
+    // Mantém índice válido
+    state.perguntaIndex = U.clamp(state.perguntaIndex, 0, Math.max(0, perguntas.length - 1));
+
+    // Mostra a pergunta atual
+    const atual = perguntas[state.perguntaIndex];
+    U.show(atual);
+
+    // Progresso local do bloco
+    U.setProgress(state.perguntaIndex + 1, perguntas.length);
+
+    // Botões
+    const prev = S.btnPrev();
+    const next = S.btnNext();
+    if (prev) prev.disabled = (state.blocoIndex === 0 && state.perguntaIndex === 0);
+
+    if (next) {
+      const ultimaPergunta = state.perguntaIndex === perguntas.length - 1;
+      const ultimoBloco = state.blocoIndex === blocos.length - 1;
+      next.textContent = ultimaPergunta ? (ultimoBloco ? 'Finalizar' : 'Concluir bloco ➜') : 'Próxima';
+    }
+
+    // Foco amigável no campo da pergunta
+    const input = U.getAnswerEl(atual);
+    if (input) try { input.focus({ preventScroll: true }); } catch {}
+  }
+
+  /* ===========================================================================
+     TÍTULO: NAVEGAÇÃO
+     SUBTÍTULO: Próxima / Anterior (com salvamento)
+  =========================================================================== */
+  function goNext() {
+    const bloco = S.blocoAtivo();
+    const perguntas = S.perguntasDo(bloco);
+
+    // salva a atual
+    saveCurrentAnswer();
+     
+     // NOVO: Analisa a última resposta e ajusta a chama
+      const qEl = perguntas[state.perguntaIndex];
+      const input = U.getAnswerEl(qEl);
+      if (input && window.JORNADA_CHAMA && typeof window.JORNADA_CHAMA.ajustar === 'function') {
+      const sentimento = analiseSentimento(U.getVal(input));
+      window.JORNADA_CHAMA.ajustar(sentimento);
+}
+
+    // ainda há perguntas neste bloco
+    if (state.perguntaIndex < perguntas.length - 1) {
+      state.perguntaIndex++;
+      render();
+      return;
+    }
+
+    // terminou perguntas deste bloco → vídeo de transição (se houver)
+    const videoSrc = bloco.getAttribute('data-video') || '';
+    const haProximoBloco = state.blocoIndex < S.blocos().length - 1;
+
+    if (haProximoBloco) {
+      playTransition(videoSrc, () => {
+        state.blocoIndex++;
+        state.perguntaIndex = 0;
+        render();
+      });
+    } else {
+      finalize();
+    }
+  }
+
+  function goPrev() {
+    // volta pergunta
+    if (state.perguntaIndex > 0) {
+      state.perguntaIndex--;
+      render();
+      return;
+    }
+    // volta bloco anterior (última pergunta)
+    if (state.blocoIndex > 0) {
+      state.blocoIndex--;
+      const perguntas = S.perguntasDo(S.blocoAtivo());
+      state.perguntaIndex = Math.max(0, perguntas.length - 1);
+      render();
+    }
+  }
+
+  /* ===========================================================================
+     TÍTULO: VÍDEO DE TRANSIÇÃO
+     SUBTÍTULO: Overlay com skip e fallbacks defensivos
+  =========================================================================== */
+  function playTransition(src, onEnd) {
+    const overlay = S.overlay();
+    const video = S.video();
+    const skip = S.skip();
+
+    // Sem overlay ou sem vídeo → segue
+    if (!overlay || !video || !src) {
+      onEnd && onEnd();
+      return;
+    }
+
+    // Preparar player
+    try {
+      video.pause();
+      video.removeAttribute('src'); video.load();
+    } catch {}
+
+    video.src = src;
+    overlay.classList.remove('hidden');
+
+    const cleanup = () => {
+      try { video.pause(); } catch {}
+      overlay.classList.add('hidden');
+      try { video.removeAttribute('src'); video.load(); } catch {}
+      onEnd && onEnd();
+    };
+
+    video.onended = cleanup;
+    video.onerror = cleanup;
+    if (skip) skip.onclick = cleanup;
+
+    // tentativa de autoplay mudo
+    try {
+      video.muted = true;
+      const p = video.play();
+      if (p && p.catch) p.catch(() => {/* usuário poderá clicar play/skip */});
+    } catch {
+      // se der erro, mantém overlay visível e usuário pode clicar play
+    }
+  }
+
+  /* ===========================================================================
+     TÍTULO: FINALIZAÇÃO
+     SUBTÍTULO: Gatilho de conclusão (envio/alerta/resumo)
+  =========================================================================== */
+  function finalize() {
+    // salva última resposta
+    saveCurrentAnswer();
+
+    // aqui você pode enviar para backend
+    console.log('[JORNADA] Finalizado. Respostas:', state.respostas);
+
+    alert('Jornada concluída! Gratidão pela confiança.');
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
+  }
+
+  /* ===========================================================================
+     TÍTULO: INICIALIZAÇÃO
+     SUBTÍTULO: Liga eventos e faz o primeiro render
+  =========================================================================== */
+  JC.init = function initJornada() {
+    const root = S.root();
+    if (!root) return;
+
+    const prevBtn = S.btnPrev();
+    const nextBtn = S.btnNext();
+
+    if (nextBtn) nextBtn.addEventListener('click', goNext);
+    if (prevBtn) prevBtn.addEventListener('click', goPrev);
+
+    // tenta restaurar respostas antigas (opcional)
+    try {
+      const stash = localStorage.getItem('JORNADA_RESPOSTAS');
+      if (stash) state.respostas = JSON.parse(stash) || state.respostas;
+    } catch {}
+
+    render();
   };
 
-  // Start
-  document.addEventListener('DOMContentLoaded', init, { once: true });
+  // Auto-init se o canvas existir
+  document.addEventListener('DOMContentLoaded', () => {
+    if (S.root()) JC.init();
+  });
+
+  /* ===========================================================================
+     TÍTULO: API PÚBLICA (OPCIONAL)
+     SUBTÍTULO: Métodos acessíveis via window.JC
+  =========================================================================== */
+  JC._state = state;
+  JC.next = goNext;
+  JC.prev = goPrev;
+  JC.render = render;
 })();
+
+ /* ===========================================================================
+     TÍTULO: CHAMA
+     SUBTÍTULO: ESTADO MÍNIMO + CHAMADAS
+  =========================================================================== */
+  (function(){
+  const UI = window.JORNADA_UI;
+  const J  = window.JORNADA_STATE = window.JORNADA_STATE || {
+    blocoAtual: 0,          // 0..4 (5 blocos)
+    totalBlocos: 5,
+    idxPerguntaNoBloco: 0,  // 0..(perguntasNoBloco-1)
+    perguntasNoBloco: 5
+  };
+
+  function atualizarProgresso(){
+    UI.setProgressoBlocos(J.blocoAtual, J.totalBlocos);
+    const pct = Math.round((J.idxPerguntaNoBloco / Math.max(1,J.perguntasNoBloco)) * 100);
+    UI.setProgressoPerguntas(pct);
+  }
+
+  // Exponha para quem renderiza perguntas/blocos:
+  window.JORNADA_ENTRAR_BLOCO = (i, qtdPerguntas)=>{
+    J.blocoAtual = i; J.perguntasNoBloco = qtdPerguntas; J.idxPerguntaNoBloco = 0; atualizarProgresso();
+  };
+  window.JORNADA_AVANCAR_PERGUNTA = ()=>{
+    if (J.idxPerguntaNoBloco < J.perguntasNoBloco) J.idxPerguntaNoBloco++;
+    atualizarProgresso();
+  };
+
+  document.addEventListener('DOMContentLoaded', atualizarProgresso);
+})();
+
+(function(){
+  const API = (window.JORNADA_CFG && window.JORNADA_CFG.API_BASE) || '';
+
+  async function baixar(url, filename){
+    const r = await fetch(url); if(!r.ok) throw new Error('Download falhou');
+    const blob = await r.blob(); const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a);
+    a.click(); URL.revokeObjectURL(a.href); a.remove();
+  }
+
+  window.JORNADA_FINALIZAR = async function(payload){
+    try{
+      const r = await fetch(`${API}/generate`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const { pdf_url, hq_url } = await r.json();
+      if (pdf_url) await baixar(pdf_url, 'Jornada-Conhecimento-com-Luz.pdf');
+      if (hq_url) await baixar(hq_url,   'Jornada-HQ.zip');
+      setTimeout(()=>{ window.location.href = '/index.html'; }, 800);
+    }catch(e){
+      console.error(e); alert('Falha ao gerar arquivos. Tente novamente.');
+    }
+  };
+})();
+
