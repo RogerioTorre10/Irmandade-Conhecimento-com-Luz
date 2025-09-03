@@ -109,20 +109,19 @@ const analiseSentimento = (texto) => {
  // ================================================================
 // CONTROLE DE PROGRESSO POR BLOCOS E PERGUNTAS
 // ================================================================
-  window.JORNADA_ENTRAR_BLOCO = (i, qtdPerguntas) => {
-     J.blocoAtual = i;
-     J.perguntasNoBloco = qtdPerguntas;
-     J.idxPerguntaNoBloco = 0;
-    
-    // NADA DEVE SER MOSTRADO AQUI.
-    // Apenas atualiza as informações do bloco.
-    JORNADA_UI.setProgressoBlocos(i, J.totalBlocos);
-    JORNADA_UI.setProgressoPerguntas(0);
+ window.JORNADA_ENTRAR_BLOCO = (i, qtdPerguntas) => {
+  J.blocoAtual = i;
+  J.perguntasNoBloco = qtdPerguntas;
+  J.idxPerguntaNoBloco = 0;
+// NADA DEVE SER MOSTRADO AQUI.
+// Apenas atualiza as informações do bloco.
+  JORNADA_UI.setProgressoBlocos(i, J.totalBlocos);
+  JORNADA_UI.setProgressoPerguntas(0);
 };
-     // Mostra a pergunta atual
+        // Mostra a pergunta atual
     const atual = perguntas[state.perguntaIndex];
     U.show(atual);
-   // NOVO: Chama o efeito de datilografia e pergaminho na pergunta atual
+  // O CÓDIGO QUE ATIVA OS EFEITOS
     if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
         window.JORNADA_TYPE.run(atual);
     }    
