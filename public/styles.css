@@ -152,21 +152,35 @@ body.jornada-active #jornada-canvas { display:block !important; }
 }
 
 /* ===== VERTICAL (intro/final) ===== */
-.pergaminho-v{
-  background-image: url("/assets/img/pergaminho-rasgado-vert.png");
-  aspect-ratio: var(--perg-v-ratio);
+.card.pergaminho-v {
+  background: url("/assets/img/pergaminho-rasgado-vert.png") no-repeat center center !important;
+  background-size: 100% 100% !important;
+  background-color: transparent !important;
+
+  aspect-ratio: 2 / 3;
   height: 92vh;
   max-width: 96vw;
+  margin-inline: auto;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
 }
 
 /* ===== HORIZONTAL (perguntas) ===== */
-.pergaminho-h{
-  background-image: url("/assets/img/pergaminho-rasgado-horiz.png");
-  aspect-ratio: var(--perg-h-ratio);
-  width: 96vw;
-  max-height: 82vh;
-  height: auto; /* deixa a altura derivar do aspect-ratio */
+.card.pergaminho-h {
+  background: url("/assets/img/pergaminho-rasgado-horiz.png") no-repeat center center !important;
+  background-size: 100% 100% !important;
+  background-color: transparent !important;
+
+  width: min(96vw, 1100px);
+  min-height: 70vh;
+  aspect-ratio: 3 / 2;
+  margin-inline: auto;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
 }
+
 
 /* Conteúdo interno do pergaminho */
 .conteudo-pergaminho{
