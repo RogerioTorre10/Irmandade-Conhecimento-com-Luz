@@ -109,7 +109,6 @@ const analiseSentimento = (texto) => {
  // ================================================================
 // CONTROLE DE PROGRESSO POR BLOCOS E PERGUNTAS
 // ================================================================
-window.JORNADA_ENTRAR_BLOCO = (i, qtdPerguntas) => {
      // Mostra a pergunta atual
     const atual = perguntas[state.perguntaIndex];
     U.show(atual);
