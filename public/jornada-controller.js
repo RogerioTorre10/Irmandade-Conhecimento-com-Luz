@@ -121,17 +121,17 @@
     U.show(atual);
 
     // ATIVA OS EFEITOS
-+    if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
-+      window.JORNADA_TYPE.run(atual);
-+    }
-+    // === PERGAMINHO (V/H) por atributo do bloco ===
-+    if (window.JORNADA_PAPER && typeof window.JORNADA_PAPER.set === 'function') {
-+      let modo = 'v';
-+      if (bloco.hasAttribute('data-pergaminho-h')) modo = 'h';
-+      else if (bloco.hasAttribute('data-pergaminho-v')) modo = 'v';
-+      else modo = bloco.getAttribute('data-pergaminho') || 'v';
-+      window.JORNADA_PAPER.set(modo);
-+    }
+    if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
+      window.JORNADA_TYPE.run(atual);
+    }
+    // === PERGAMINHO (V/H) por atributo do bloco ===
+    if (window.JORNADA_PAPER && typeof window.JORNADA_PAPER.set === 'function') {
+      let modo = 'v';
+      if (bloco.hasAttribute('data-pergaminho-h')) modo = 'h';
+      else if (bloco.hasAttribute('data-pergaminho-v')) modo = 'v';
+      else modo = bloco.getAttribute('data-pergaminho') || 'v';
+      window.JORNADA_PAPER.set(modo);
+    }
    
     // Progresso local do bloco
     U.setProgress(state.perguntaIndex + 1, perguntas.length);
