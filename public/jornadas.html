@@ -11,13 +11,12 @@
  <body>
   <!-- Casca estática da página -->
   <main id="page-shell">
-    <header class="site-header">
-      <h1>Jornadas Disponíveis</h1>
-      <p>Escolha por onde começar.</p>
-       <header class="site-header">
-    <h1>Irmandade Conhecimento com Luz</h1>
-    <p>Fé, ciência e filosofia caminhando juntas para despertar e guiar. 🌟</p>
-  </header>  
++    <header class="site-header">
++      <h1>Jornadas Disponíveis</h1>
++      <p>Escolha por onde começar.</p>
++      <h2>Irmandade Conhecimento com Luz</h2>
++      <p>Fé, ciência e filosofia caminhando juntas para despertar e guiar. 🌟</p>
++    </header
 
     <!-- /public/jornadas.html -->
 <nav class="lang-switch" aria-label="Escolher idioma">
@@ -25,16 +24,14 @@
   <button class="lang-btn" data-lang="en">EN</button>
   <button class="lang-btn" data-lang="es">ES</button>
 </nav>
-<main class="container">
+<section class="container">
   <!-- 🔥 Chama grande na home -->
-  <div class="chama">
-   <span></span><span></span><span></span>
-  </div>
+  <div class="chama"><span></span><span></span><span></span></div>
 
-    <a class="btn btn-primary" href="/jornadas.html">Explorar Jornadas</a>
-  </main>
+     <a class="btn btn-primary" href="/jornadas.html">Explorar Jornadas</a>
+  </section>
       
-   <main id="app" class="container">
+   <section id="app" class="container">
   <div class="card">
     <h2>Jornada Conhecimento com Luz - Essencial</h2>
     <p>Uma viagem interior com 32 reflexões essenciais.</p>
@@ -44,11 +41,10 @@
 
     <!-- Mantém o Voltar com link normal -->
     <a class="btn" href="/">Voltar ao início</a>
-  </div>
-</div>
-  </main>
-
-      <section class="jornada-perguntas">
+ </div>
+  </section>
+    
+ <section class="jornada-perguntas">
   <header>
     <h2>📝 Perguntas da Jornada</h2>
   </header>
@@ -78,11 +74,11 @@
    <div id="video-overlay" class="video-overlay hidden">
   <video id="transition-video" class="video-player" playsinline></video>
 </div>
-</body>
 
-   <footer class="site-footer">
+  <footer class="site-footer">
     <small>© 2025 Irmandade Conhecimento com Luz</small>
   </footer>
+</main>
       
 <!-- Boot robusto: só roda quando o renderer está pronto -->
 <script>
@@ -105,7 +101,7 @@
   }
 })();
 </script>
-  </body>
+</body>
 </html>
 
 
