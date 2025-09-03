@@ -154,7 +154,27 @@ window.JORNADA_FINAL_VIDEO = "/filme-5-fim-da-jornada.mp4";
       onFinish && onFinish();
     });
   }
+/* ===== [03-PERGAMINHO] paper controller ===== */
+function ensureCanvas () {
+  let el = document.getElementById('jornada-canvas');
+  if (!el) {
+    el = document.createElement('section');
+    el.id = 'jornada-canvas';
+    el.className = 'card pergaminho';
+    document.body.appendChild(el);
+  }
+  el.style.display = 'block';
+  el.classList.add('pergaminho');
+  return el;
+}
 
-  window.JORNADA_PAPER = { set, ensureCanvas };
-  window.JORNADA_QA = { buildForm, mount };
+function set (mode) {
+  const el = ensureCanvas();
+  el.classList.remove('pergaminho-v', 'pergaminho-h');
+  el.classList.add(mode === 'h' ? 'pergaminho-h' : 'pergaminho-v');
+}
+
+/* mantém isso! */
+window.JORNADA_PAPER = { set, ensureCanvas };
+window.JORNADA_QA = { buildForm, mount };
 })();
