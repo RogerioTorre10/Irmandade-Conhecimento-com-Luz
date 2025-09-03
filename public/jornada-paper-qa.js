@@ -35,21 +35,24 @@
     return { root, content };
   }
 
-  function set(mode /* 'v' | 'h' */) {
-    const { root } = ensureCanvas();
-    root.classList.remove("pergaminho-v", "pergaminho-h");
-    if (mode === "v") {
-      root.classList.add("pergaminho-v");
-      root.style.backgroundImage = `url("${CFG.PERGAMINHO_VERT}")`;
-    } else {
-      root.classList.add("pergaminho-h");
-      root.style.backgroundImage = `url("${CFG.PERGAMINHO_HORIZ}")`;
-    }
-    root.style.backgroundRepeat = "no-repeat";
-    root.style.backgroundPosition = "center";
-    root.style.backgroundSize = "cover";
-    root.style.minHeight = "82vh";
-  }
+function set(mode /* 'v' | 'h' */) {
+  const { root } = ensureCanvas();
+  root.classList.remove("pergaminho-v", "pergaminho-h");
+
+  if (mode === "v") {
+    root.classList.add("pergaminho-v");
+  } else if (mode === "h") {
+    root.classList.add("pergaminho-h");
+  }
+
+  // NOVO: Define a URL da imagem diretamente no estilo do elemento
+  const imageUrl = (mode === "v") ? CFG.PERGAMINHO_VERT : CFG.PERGAMINHO_HORIZ;
+  root.style.backgroundImage = `url("${imageUrl}")`;
+  root.style.backgroundRepeat = "no-repeat";
+  root.style.backgroundPosition = "center";
+  root.style.backgroundSize = "cover";
+  root.style.minHeight = "82vh";
+}
 
 /* ===== BLOCOS OFICIAIS + VÍDEOS DE TRANSIÇÃO =====
    Cada bloco tem:
