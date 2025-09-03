@@ -50,7 +50,7 @@
       }
       // Fallback mínimo
       const sec = document.createElement("section");
-      sec.className = "card pergaminho";
+      sec.className = "card pergaminho pergaminho-v";  // intro sempre vertical
       sec.innerHTML = `
         <h2 class="title">Bem-vindo(a) à Jornada</h2>
         <p class="muted">Renderer Master (fallback). Verifique se JornadaCtrl está carregado.</p>
@@ -68,7 +68,7 @@
       }
       // Fallback mínimo
       const sec = document.createElement("section");
-      sec.className = "card pergaminho";
+      sec.className = "card pergaminho pergaminho-h";  // perguntas sempre horizontal
       sec.innerHTML = `
         <h2 class="title">Perguntas</h2>
         <p class="muted">Renderer Master (fallback). Impossível carregar perguntas sem JornadaCtrl.</p>
@@ -84,7 +84,7 @@
 
   // fallback mínimo com botão
   const sec = document.createElement("section");
-  sec.className = "card pergaminho";
+  sec.className = "card pergaminho pergaminho-v";  // final sempre vertical
   sec.innerHTML = `
     <h2 class="title">Finalização</h2>
     <p class="muted">Renderer Master (fallback). Obrigado por participar.</p>
