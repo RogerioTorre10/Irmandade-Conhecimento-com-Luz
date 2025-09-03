@@ -41,14 +41,7 @@
   font-weight: normal;
   font-style: normal;
 }    
-/* ===========================================================================
-   APLICAÇÃO DAS FONTES
-   =========================================================================== */
-<!-- =========================================================================
-     TÍTULO: SCRIPTS DA HOME (inline)
-     SUBTÍTULO: fontes, datilografia, mini-chamas, reflexões, vídeo
-============================================================================= -->
-<script>
+
 /* ===========================================================================
    TÍTULO: FONTES (fallback)
    SUBTÍTULO: garante @font-face caso o CSS não carregue por algum motivo
@@ -518,6 +511,22 @@ input, textarea, select,
       });
     });
   })();
+</script>
+  <script>
+/* ===== [02-CHAMA] renderer: converte placeholders [data-chama] em .chama ===== */
+(function(){
+  function renderChama(el, variant){
+    const wrap = document.createElement('div');
+    wrap.className = `chama ${variant ? ('chama-' + variant) : ''}`.trim();
+    wrap.innerHTML = '<span></span><span></span><span></span>';
+    el.replaceWith(wrap);
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-chama]').forEach(el => {
+      renderChama(el, el.getAttribute('data-chama') || '');
+    });
+  });
+})();
 </script>
 </body>
 </html>
