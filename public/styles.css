@@ -280,3 +280,26 @@ nav a, a.btn, .site-header p { letter-spacing:.5px; }
 .jornada .j-progress { /* progresso Local */ }
 .jornada .footer-actions .btn { /* botões Voltar/Próxima */ }
 
+/* ===========================
+   CHAMA (CSS puro)
+   =========================== */
+.chama{
+  position:relative; width:56px; height:80px;
+  filter: drop-shadow(0 6px 14px rgba(255,140,0,.35));
+  z-index: 2;
+}
+.chama span{
+  position:absolute; inset:auto 0 0 0; margin:auto;
+  width:56px; height:80px; border-radius:40px 40px 22px 22px;
+  background: radial-gradient(50% 60% at 50% 30%, #fff7cc 0%, #ffd166 35%, #ff8c00 70%, transparent 100%);
+  animation: chamaFlicker 1.8s ease-in-out infinite;
+}
+.chama span:nth-child(2){ width:36px; height:52px; bottom:14px; opacity:.85; filter: blur(.3px); }
+.chama span:nth-child(3){ width:18px; height:26px; bottom:28px; opacity:.9; }
+
+@keyframes chamaFlicker{
+  0%,100%{ transform: translateY(0) scale(1); opacity:1; }
+  50%{ transform: translateY(-2px) scale(1.03); opacity:.95; }
+}
+
+
