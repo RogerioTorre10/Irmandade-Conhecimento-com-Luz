@@ -135,20 +135,43 @@ body.jornada-active #jornada-canvas { display:block !important; }
    SUBTÍTULO: fundo vertical/horizontal sem cortar
 ============================================================================= */
 /* ==== PERGAMINHO ==== */
+/* ===== RATIOS GLOBAIS ===== */
+:root{
+  --perg-v-ratio: 2/3;  /* vertical */
+  --perg-h-ratio: 3/2;  /* horizontal */
+}
+
+/* ===== BASE DO PERGAMINHO (comum) ===== */
 .pergaminho{
-  margin:12px auto; padding:0; border-radius:18px; overflow:hidden;
-  background-repeat:no-repeat; background-position:center; background-size:100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  margin: 0 auto;
+  padding: clamp(12px, 3vw, 28px);
+  border-radius: 8px;
 }
-:root{ --pergV-ratio: 2/3; --pergH-ratio: 3/2; }
+
+/* ===== VERTICAL (intro/final) ===== */
 .pergaminho-v{
-  background-image:url("/assets/img/pergaminho-rasgado-vert.png");
-  height:92vh; width:calc(92vh * var(--pergV-ratio)); max-width:96vw;
+  background-image: url("/assets/img/pergaminho-rasgado-vert.png");
+  aspect-ratio: var(--perg-v-ratio);
+  height: 92vh;
+  max-width: 96vw;
 }
+
+/* ===== HORIZONTAL (perguntas) ===== */
 .pergaminho-h{
-  background-image:url("/assets/img/pergaminho-rasgado-horiz.png");
-  width:96vw; height:calc(96vw / var(--pergH-ratio)); max-height:82vh;
+  background-image: url("/assets/img/pergaminho-rasgado-horiz.png");
+  aspect-ratio: var(--perg-h-ratio);
+  width: 96vw;
+  max-height: 82vh;
+  height: auto; /* deixa a altura derivar do aspect-ratio */
 }
-.conteudo-pergaminho{ padding:clamp(12px,3vw,28px); line-height:1.55; }
+
+/* Conteúdo interno do pergaminho */
+.conteudo-pergaminho{
+  line-height: 1.55;
+}
 
 /* Escopo só na página de jornada */
 .jornada #jornada-canvas.pergaminho{ display:block; }
