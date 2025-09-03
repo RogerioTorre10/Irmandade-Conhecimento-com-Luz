@@ -145,29 +145,7 @@
     const input = U.getAnswerEl(atual);
     if (input) try { input.focus({ preventScroll: true }); } catch {}
   }
-    <div class="pergaminho-frame v">
-  <img src="/assets/img/pergaminho-rasgado-vert.png" alt="Pergaminho" class="pergaminho-img" aria-hidden="true">
-
-  <div class="pergaminho-layer">
-    <!-- chama média na intro -->
-    <div class="chama chama-md">
-      <span></span><span></span><span></span>
-    </div>
-
-    <section id="intro" class="intro-bloco">
-      <h1>Bem-vindo(a) à Jornada Essencial</h1>
-      <p id="intro-typing"
-         data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Aqui, fé e consciência se unem para acender sua chama interior — passo a passo, jornada por jornada.">
-      </p>
-
-      <!-- Termo (se tiver) -->
-      <div class="termo">
-        <h2>Termo de Responsabilidade e Consentimento</h2>
-        <p>Ao iniciar, você concorda em participar de forma consciente…</p>
-      </div>
-    </section>
-  </div>
-</div>
+    
 
  /* ===========================================================================
     TÍTULO: NAVEGAÇÃO
