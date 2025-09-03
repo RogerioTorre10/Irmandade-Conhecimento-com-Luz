@@ -51,24 +51,25 @@
 
   <div class="pergunta">
     <p><strong>Pergunta 1:</strong> Quem é você neste momento da vida?</p>
-    <textarea placeholder="Digite sua resposta..."></textarea>
+    <textarea id="mock-q1" placeholder="Digite sua resposta..."></textarea>
   </div>
 
-  <div class="pergunta">
+ <div class="pergunta">
     <p><strong>Pergunta 2:</strong> O que você mais busca nesta caminhada?</p>
-    <textarea placeholder="Digite sua resposta..."></textarea>
+    <textarea id="mock-q2" placeholder="Digite sua resposta..."></textarea>
   </div>
 
   <footer>
-    <button id="btnVoltarIntro">⏪ Voltar à Intro</button>
-    <button id="btnProxima">⏩ Próxima</button>
+    <button id="btnVoltarIntro" data-action="prev">⏪ Voltar à Intro</button>
+    <button id="btnProxima" data-action="next">⏩ Próxima</button>
   </footer>
 </section>
 
 
   <!-- Canvas dinâmico da Jornada (inicia vazio) -->
-  <section id="jornada-canvas" class="card pergaminho" style="display:none;">
-    <div id="jornada-conteudo" class="conteudo-pergaminho"></div>
+  <div id="videoOverlay" class="video-overlay hidden">
+  <video id="videoTransicao" class="video-player" playsinline></video>
+ </div>
    </section>
 
    <div id="video-overlay" class="video-overlay hidden">
