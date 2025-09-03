@@ -146,11 +146,11 @@
     if (input) try { input.focus({ preventScroll: true }); } catch {}
   }
 
-  /* ===========================================================================
-     TÍTULO: NAVEGAÇÃO
-     SUBTÍTULO: Próxima / Anterior (com salvamento)
+ /* ===========================================================================
+    TÍTULO: NAVEGAÇÃO
+    SUBTÍTULO: Próxima / Anterior (com salvamento)
   =========================================================================== */
-  function goNext() {
+function goNext() {
     const bloco = S.blocoAtivo();
     const perguntas = S.perguntasDo(bloco);
 
@@ -184,8 +184,8 @@
     } else {
       finalize();
     }
-  }
-
+}
+    
   function goPrev() {
     // volta pergunta
     if (state.perguntaIndex > 0) {
