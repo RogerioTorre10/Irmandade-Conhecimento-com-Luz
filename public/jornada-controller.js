@@ -110,14 +110,7 @@ const analiseSentimento = (texto) => {
 // CONTROLE DE PROGRESSO POR BLOCOS E PERGUNTAS
 // ================================================================
 window.JORNADA_ENTRAR_BLOCO = (i, qtdPerguntas) => {
-  J.blocoAtual = i;
-  J.perguntasNoBloco = qtdPerguntas;
-  J.idxPerguntaNoBloco = 0;
-// Atualiza badge de blocos (topo) e barra interna (0%)
-  JORNADA_UI.setProgressoBlocos(i, J.totalBlocos);
-  JORNADA_UI.setProgressoPerguntas(0);
-};
-   // Mostra a pergunta atual
+     // Mostra a pergunta atual
     const atual = perguntas[state.perguntaIndex];
     U.show(atual);
    // NOVO: Chama o efeito de datilografia e pergaminho na pergunta atual
