@@ -28,8 +28,8 @@
     const css = `
       .card{max-width:900px;margin:24px auto;padding:20px;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.12);background:#fff}
       .pergaminho{background:#f6efe0;}
-      .pergaminho-v{background-image:url('/assets/img/pergaminho-vertical.png');background-size:cover;background-position:center;}
-      .pergaminho-h{background-image:url('/assets/img/pergaminho-horizontal.png');background-size:cover;background-position:center;}
+      .pergaminho-v{background-image:url('/assets/img/pergaminho-vert.png');background-size:cover;background-position:center;}
+      .pergaminho-h{background-image:url('/assets/img/pergaminho-horiz.png');background-size:cover;background-position:center;}
       .btn{display:inline-block;padding:.7rem 1.2rem;border-radius:10px;border:0;background:#1f2937;color:#fff;font-weight:600;cursor:pointer}
       .btn + .btn{margin-left:.5rem}
       .title{font-size:1.6rem;margin:0 0 .5rem 0}
