@@ -48,10 +48,10 @@
 
     <!-- Sub-main para conter o canvas -->
     <main class="container">
-      <section id="jornada-canvas" class="card pergaminho" style="display:none;">
-        <div class="progress-badge" id="jprog-pct">0% concluído</div>
-        <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
+      <section id="jornada-canvas" class="card" style="display:none;">        
         <div id="jornada-conteudo" class="conteudo-pergaminho"></div>
+        <div class="progress-badge" id="jprog-pct">…</div>
+        <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
       </section>
     </main>
 
@@ -100,8 +100,8 @@
      TÍTULO: CONTROLES
 ========================= -->
 <div class="footer-actions" style="margin:10px 0 16px">
-  <button id="btnPrev" class="btn btn-secondary">Voltar</button>
-  <button id="btnNext" class="btn btn-primary">Próxima</button>
+  <button id="btnPrev" class="btn btn-secondary" data-action="prev">Voltar</button>
+  <button id="btnNext" class="btn btn-primary"  data-action="next">Próxima</button>
 </div>
 
 <!-- =========================
@@ -134,7 +134,7 @@
 <!-- =========================
      TÍTULO: BLOCO 2
 ========================= -->
-<section class="j-bloco" data-bloco="2" data-video="/assets/img/filme-2-dentro-da-jornada.mp4"data-pergaminho-h>>
+<section class="j-bloco" data-bloco="1" data-video="/assets/img/filme-2-dentro-da-jornada.mp4"data-pergaminho-h>>
   <div class="j-pergunta" data-pergunta="0">
     <label class="pergunta-enunciado"><b>Pergunta 1:</b> O que significa fé pra você hoje?</label>
     <textarea rows="4" class="input"></textarea>
