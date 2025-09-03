@@ -145,6 +145,7 @@
     const input = U.getAnswerEl(atual);
     if (input) try { input.focus({ preventScroll: true }); } catch {}
   }
+    
 
  /* ===========================================================================
     TÍTULO: NAVEGAÇÃO
