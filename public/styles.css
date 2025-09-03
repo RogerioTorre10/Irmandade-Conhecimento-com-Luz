@@ -135,7 +135,6 @@ body.jornada-active #jornada-canvas { display:block !important; }
    SUBTÍTULO: fundo vertical/horizontal sem cortar
 ============================================================================= */
 /* ==== PERGAMINHO ==== */
-/* ===== RATIOS GLOBAIS ===== */
 :root{
   --perg-v-ratio: 2/3;  /* vertical */
   --perg-h-ratio: 3/2;  /* horizontal */
@@ -180,7 +179,6 @@ body.jornada-active #jornada-canvas { display:block !important; }
   position: relative;
   overflow: hidden;
 }
-
 
 /* Conteúdo interno do pergaminho */
 .conteudo-pergaminho{
@@ -318,42 +316,4 @@ nav a, a.btn, .site-header p { letter-spacing:.5px; }
   margin: 0 auto;
 }
 .chama span { animation: chamaFlicker 2.2s ease-in-out infinite; }
-
-/* ===== FRAME DO PERGAMINHO (imagem + layer) ===== */
-.pergaminho-frame{
-  position: relative;
-  width: min(96vw, 1100px);
-  margin: 0 auto;
-  /* se tiver .card com fundo, zera aqui dentro: */
-  background: transparent !important;
-}
-.pergaminho-img{
-  display: block;
-  width: 100%;
-  height: auto;
-  user-select: none;
-  pointer-events: none;
-}
-.pergaminho-layer{
-  position: absolute; inset: 0;
-  padding: clamp(12px, 3vw, 28px);
-  overflow: auto; /* rola se o texto crescer */
-}
-
-/* Modos: vertical (intro/final) e horizontal (perguntas) */
-.pergaminho-frame.v .pergaminho-img{
-  content: url('/assets/img/pergaminho-rasgado-vert.png');
-  aspect-ratio: 2 / 3;
-}
-.pergaminho-frame.h .pergaminho-img{
-  content: url('/assets/img/pergaminho-rasgado-horiz.png');
-  aspect-ratio: 3 / 2;
-}
-
-/* Opcional: deixa .card transparente dentro do frame */
-.pergaminho-frame .card{ background: transparent !important; }
-
-/* Espaçamento opcional para uma chama no topo da layer */
-.pergaminho-layer .chama{ margin-bottom: 8px; }
-
 
