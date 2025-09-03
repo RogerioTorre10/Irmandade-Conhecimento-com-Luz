@@ -301,5 +301,23 @@ nav a, a.btn, .site-header p { letter-spacing:.5px; }
   0%,100%{ transform: translateY(0) scale(1); opacity:1; }
   50%{ transform: translateY(-2px) scale(1.03); opacity:.95; }
 }
+/* Variação pequena da chama (header) */
+.chama-sm {
+  transform: scale(0.6); /* reduz o tamanho */
+  margin-right: 8px;     /* dá espaço antes do título */
+}
+/* Médio (padrão: intro/perguntas) */
+.chama-md {
+  transform: scale(1);
+  margin: 0 auto;
+}
+
+/* Grande (final/homepage, impacto) */
+.chama-lg {
+  transform: scale(1.4);
+  margin: 0 auto;
+}
+.chama span { animation: chamaFlicker 2.2s ease-in-out infinite; }
+
 
 
