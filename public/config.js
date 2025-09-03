@@ -27,6 +27,28 @@
       STORAGE_KEY: DEFAULT_STORAGE_KEY, // chave do localStorage
       PASS: DEFAULT_PASS,               // senha da jornada
     },
+
+    window.JORNADA_CFG = {
+  TOTAL_BLOCKS: 5,
+  TOTAL_PERGUNTAS: 32,
+  TYPING_HEADER: "Irmandade Conhecimento com Luz",
+  TYPING_FOOTER: "Para além. E sempre!!",
+  BLOCK_VIDEOS: [
+    "/assets/img/A-Jornada-Conhecimento-com-Luz1-zip.mp4",
+    "/assets/img/Bloco-2.mp4",
+    "/assets/img/Bloco-3.mp4",
+    "/assets/img/Bloco-4.mp4",
+    "/assets/img/Bloco-5.mp4"
+  ],
+  API_PDF_URL: "https://SEU_BACKEND/pdf",
+  API_HQ_URL: "https://SEU_BACKEND/hq",
+  ALLOWED_ORIGINS: [
+    "https://irmandade-conhecimento-com-luz.onrender.com",
+    "https://irmandade-conhecimento-com-luz-1.onrender.com",
+    "http://localhost:3000"
+  ]
+};
+
     window.APP_CONFIG || {}
   );
 
