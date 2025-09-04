@@ -139,12 +139,14 @@
     // Mostra a pergunta atual
     const atual = perguntas[state.perguntaIndex];
     U.show(atual);
-    // Garante que a caixa de resposta (textarea/input) apareça
-    const input = U.getAnswerEl(atual);
-    if (input) {
-    input.style.display = "block"; // força mostrar
-    try { input.focus({ preventScroll: true }); } catch {}
-    }
+     // Garante que a caixa de resposta apareça e receba foco
++    const input = U.getAnswerEl(atual);
++    if (input) {
++      input.removeAttribute?.('hidden');
++      input.style.display = 'block';
++      input.style.visibility = 'visible';
++      try { input.focus({ preventScroll: true }); } catch {}
++    }
       
     // ATIVA OS EFEITOS
     if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
