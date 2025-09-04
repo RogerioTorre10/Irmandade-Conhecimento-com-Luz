@@ -33,7 +33,7 @@
     blocoAtivo: () => S.blocos()[state.blocoIndex],
     perguntasDo: (blocoEl) => Array.from(blocoEl.querySelectorAll('.j-pergunta,[data-pergunta]')),
     btnPrev: () => document.getElementById('btnPrev') || document.querySelector('[data-action="prev"]'),
-+   btnNext: () => document.getElementById('btnNext') || document.querySelector('[data-action="next"]'),
+    btnNext: () => document.getElementById('btnNext') || document.querySelector('[data-action="next"]'),
     meta: () => document.getElementById('j-meta'),
     progressFill: () => document.querySelector('.j-progress__fill'),
     // Overlay de vídeo
@@ -140,13 +140,13 @@
     const atual = perguntas[state.perguntaIndex];
     U.show(atual);
      // Garante que a caixa de resposta apareça e receba foco
-+    const input = U.getAnswerEl(atual);
-+    if (input) {
-+      input.removeAttribute?.('hidden');
-+      input.style.display = 'block';
-+      input.style.visibility = 'visible';
-+      try { input.focus({ preventScroll: true }); } catch {}
-+    }
+    const input = U.getAnswerEl(atual);
+    if (input) {
+      input.removeAttribute?.('hidden');
+      input.style.display = 'block';
+      input.style.visibility = 'visible';
+      try { input.focus({ preventScroll: true }); } catch {}
+    }
       
     // ATIVA OS EFEITOS
     if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
@@ -213,9 +213,9 @@ function goNext() {
     } else {
       finalize();
     }
-}
+  }
     
-  function goPrev() {
+    function goPrev() {
     // volta pergunta
     if (state.perguntaIndex > 0) {
       state.perguntaIndex--;
@@ -234,8 +234,8 @@ function goNext() {
   /* ===========================================================================
      TÍTULO: VÍDEO DE TRANSIÇÃO
      SUBTÍTULO: Overlay com skip e fallbacks defensivos
-  =========================================================================== */
-  function playTransition(src, onEnd) {
+   =========================================================================== */
+   function playTransition(src, onEnd) {
     const overlay = S.overlay();
     const video = S.video();
     const skip = S.skip();
@@ -269,28 +269,28 @@ function goNext() {
       const p = video.play();
       if (p && p.catch) p.catch(() => {});
     } catch {}
-  }
+   }
 
-  /* ===========================================================================
+   /* ===========================================================================
      TÍTULO: FINALIZAÇÃO
      SUBTÍTULO: Gatilho de conclusão (envio/alerta/resumo)
-  =========================================================================== */
-  function finalize() {
+    =========================================================================== */
+   function finalize() {
     // salva última resposta
     saveCurrentAnswer();
     console.log('[JORNADA] Finalizado. Respostas:', state.respostas);
     alert('Jornada concluída! Gratidão pela confiança.');
     try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
-  }
+   }
 
-  /* ===========================================================================
+   /* ===========================================================================
      TÍTULO: INICIALIZAÇÃO
      SUBTÍTULO: Liga eventos e faz o primeiro render
-  =========================================================================== */
-  JC.init = function initJornada() {
+    =========================================================================== */
+   JC.init = function initJornada() {
      const root = S.root();
      if (!root) return;
- // Aplica pergaminho por rota (#intro/#perguntas/#final)
+   // Aplica pergaminho por rota (#intro/#perguntas/#final)
      applyPergaminhoByRoute();
      U.show(root, 'block');
      const prevBtn = S.btnPrev();
@@ -298,12 +298,12 @@ function goNext() {
      if (nextBtn) nextBtn.addEventListener('click', goNext);
      if (prevBtn) prevBtn.addEventListener('click', goPrev);
      // Delegação (fallback): captura cliques em qualquer botão com data-action
-+    document.addEventListener('click', (ev) => {
-+    const n = ev.target.closest?.('[data-action="next"]');
-+    const p = ev.target.closest?.('[data-action="prev"]');
-+    if (n) { ev.preventDefault(); goNext(); }
-+    if (p) { ev.preventDefault(); goPrev(); }
-+    });
+     document.addEventListener('click', (ev) => {
+     const n = ev.target.closest?.('[data-action="next"]');
+     const p = ev.target.closest?.('[data-action="prev"]');
+     if (n) { ev.preventDefault(); goNext(); }
+     if (p) { ev.preventDefault(); goPrev(); }
+     });
     // tenta restaurar respostas antigas (opcional)
     try {
       const stash = localStorage.getItem('JORNADA_RESPOSTAS');
@@ -311,19 +311,19 @@ function goNext() {
     } catch {}
     // O render inicial
     render();
-  };
+   };
 
-  // Auto-init se o canvas existir
-  document.addEventListener('DOMContentLoaded', () => {
+   // Auto-init se o canvas existir
+   document.addEventListener('DOMContentLoaded', () => {
     if (S.root()) JC.init();
-  });
+   });
   
-  /* ===========================================================================
+   /* ===========================================================================
      TÍTULO: API PÚBLICA (OPCIONAL)
      SUBTÍTULO: Métodos acessíveis via window.JC
-  =========================================================================== */
-  JC._state = state;
-  JC.next = goNext;
-  JC.prev = goPrev;
-  JC.render = render;
-})();
+    =========================================================================== */
+   JC._state = state;
+   JC.next = goNext;
+   JC.prev = goPrev;
+   JC.render = render;
+   })();
