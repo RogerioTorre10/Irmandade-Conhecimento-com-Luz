@@ -288,11 +288,10 @@
   }
   if (!boot()) {
     let tries = 0; const timer = setInterval(() => {
-      if (boot() || ++tries > 40) clearInterval(timer); // 4s
+      if (boot() || ++tries > 80) clearInterval(timer); // 4s
     }, 100);
   }
 })();
 </script>
-
 </body>
 </html>
