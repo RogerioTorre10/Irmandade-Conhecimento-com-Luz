@@ -120,6 +120,12 @@ function applyPergaminhoByBloco(blocoEl) {
 function render() {
   const root = S.root();
   if (!root) return;
+    
+  // controla a intro: mostra só se a rota for #intro
+  const isIntroRoute = (location.hash || '#intro').slice(1) === 'intro';
+  document.querySelectorAll('[data-intro]').forEach(el => {
+    el.style.display = isIntroRoute ? '' : 'none';
+  });    
 
   // mostra o canvas principal
   U.show(root, 'block');
