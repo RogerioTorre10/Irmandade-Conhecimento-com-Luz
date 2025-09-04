@@ -1,117 +1,130 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Irmandade Conhecimento com Luz</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jornadas · Irmandade Conhecimento com Luz</title>
 
   <!-- Estilos globais -->
-  <link rel="stylesheet" href="/styles.css" />
-  <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png" />
-  <link rel="stylesheet" href="/css/chama.css" />
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png">
+  <link rel="stylesheet" href="/css/chama.css">
 
-  <!-- CSS mínimo da página (apenas o que é específico da home) -->
+  <!-- CSS mínimo desta página (catálogo) -->
   <style>
-    /* ===== BASE DA PÁGINA (home) ===== */
-    body { margin: 0; background: #f9f9f9; color: #333; }
+    body { margin: 0; font-family: Arial, sans-serif; background: #f9f9f9; color: #333; }
 
-    /* [01-HEADER] ------------------------------------------------------------ */
     .site-header {
-      display: flex; align-items: center; gap: 12px;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
       padding: 16px; background: #1f2937; color: #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,.1);
+      box-shadow: 0 2px 4px rgba(0,0,0,.1); text-align: center;
     }
 
-    /* [03-PERGAMINHO] hero usa classes globais: .pergaminho .pergaminho-v */
-    .hero {
-      max-width: 980px; margin: 24px auto; padding: 32px;
-      border-radius: 14px; box-shadow: 0 8px 28px rgba(0,0,0,.12);
+    .lang-switch { display: flex; gap: 8px; justify-content: center; padding: 12px; }
+    .lang-btn {
+      padding: 8px 16px; border-radius: 8px; border: 1px solid #fff;
+      background: #374151; color: #fff; cursor: pointer; transition: background .3s;
     }
-    .hero-content { position: relative; z-index: 2; padding: 4px; }
+    .lang-btn:hover { background: #4b5563; }
 
-    /* [04-DATILOGRAFIA] (cursor já é estilizado em styles.css; reforço local) */
-    .lumen-typing { white-space: pre-wrap; position: relative; }
-    .lumen-typing::after { content: "▌"; margin-left: 2px; opacity: .75; animation: lumenBlink 1s steps(2,end) infinite; }
-    .lumen-typing.typing-done::after { content: ""; animation: none; }
-    @keyframes lumenBlink { 50%{ opacity:0; } }
+    .container { max-width: 900px; margin: 24px auto; padding: 0 16px; }
+    .card {
+      background: #f6efe0 !important; border-radius: 14px; box-shadow: 0 8px 28px rgba(0,0,0,.12);
+      padding: 32px; position: relative; z-index: 1;
+    }
+    .pergaminho-v {
+      background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important;
+      background-size: cover !important; background-position: center !important; min-height: 52vh !important;
+    }
+    .card-content { background: transparent !important; position: relative; z-index: 2; padding: 20px; }
 
-    /* [BOTÕES] — visual simples e consistente */
     .btn {
-      display: inline-block; padding: 12px 20px; border-radius: 10px; border: 0;
+      display: inline-block; padding: 12px 24px; border-radius: 10px; border: 0;
       background: #1f2937; color: #fff; font-weight: 600; text-decoration: none;
       transition: transform .15s ease, filter .2s ease;
     }
     .btn:hover { transform: translateY(-1px); filter: brightness(.95); }
+    .btn-primary { background: #6b21a8; }
+    .btn-primary:hover { background: #7c3aed; }
     .btn + .btn { margin-left: 12px; }
 
-    /* Títulos */
-    .title   { font-size: 2rem; margin: 0 0 12px 0; color: #1f2937; }
-    .subtitle{ font-size: 1.1rem; opacity: .9; margin: 0 0 20px 0; }
+    .jornada-perguntas { margin-top: 32px; }
+    .footer-actions { display: flex; gap: 12px; justify-content: center; margin-top: 24px; }
 
-    /* Rodapé */
-    .site-footer { text-align: center; padding: 16px; opacity: .7; font-size: .9rem; }
+    /* Datilografia (reforço local) */
+    .lumen-typing { white-space: pre-wrap; position: relative; }
+    .lumen-typing::after { content: "▌"; margin-left: 2px; opacity: .75; animation: lumenBlink 1s steps(2, end) infinite; }
+    .lumen-typing.typing-done::after { content: ""; animation: none; }
+    @keyframes lumenBlink { 50% { opacity: 0; } }
 
-    /* Responsivo */
-    @media (max-width: 600px){
-      .hero { margin: 16px; padding: 22px; }
-      .title { font-size: 1.6rem; }
-      .btn { padding: 10px 16px; font-size: .95rem; }
+    .site-footer { text-align: center; padding: 16px; opacity: .6; font-size: .85rem; }
+
+    @media (max-width: 600px) {
+      .card { margin: 16px; padding: 20px; }
+      .site-header h1 { font-size: 1.6rem; }
+      .btn { padding: 10px 16px; font-size: .9rem; }
     }
   </style>
 </head>
 
-<body class="home">
-  <!-- [01-HEADER] topo com chama pequena (CSS da chama vem de /css/chama.css) -->
-  <header class="site-header">
-    <div class="chama chama-sm">
-      <span></span><span></span><span></span>
-    </div>
-    <h1>Irmandade Conhecimento com Luz</h1>
-  </header>
+<body>
+  <main id="page-shell">
+    <header class="site-header">
+      <!-- Chama grande (CSS em /css/chama.css) -->
+      <div class="chama chama-lg">
+        <span></span><span></span><span></span>
+      </div>
 
-  <!-- [03-PERGAMINHO] seção hero com pergaminho VERTICAL -->
-  <main>
-    <section class="hero card pergaminho pergaminho-v">
-      <div class="hero-content">
-        <h2 class="title"
-            data-typing
-            data-text="Bem-vindo(a) à Irmandade"
-            data-speed="40"
-            data-cursor="true"></h2>
+      <h1 data-typing data-text="Jornadas Disponíveis" data-speed="40" data-cursor="true"></h1>
+      <p  data-typing data-text="Escolha por onde começar sua transformação." data-speed="30" data-cursor="true"></p>
 
-        <p class="subtitle"
-           data-typing
-           data-text="Uma jornada de reflexão, fé e coragem para acender sua chama interior."
-           data-speed="30"
-           data-cursor="true"></p>
+      <h2>Irmandade Conhecimento com Luz</h2>
+      <p>Fé, ciência e filosofia caminhando juntas para despertar e guiar. 🌟</p>
+    </header>
 
-        <div class="actions">
-          <a href="/jornada-conhecimento-com-luz1.html#intro" class="btn btn-primary">Iniciar Jornada Essencial</a>
-          <a href="/jornadas.html" class="btn">Ver Todas as Jornadas</a>
+    <!-- Idiomas -->
+    <nav class="lang-switch" aria-label="Escolher idioma">
+      <button class="lang-btn" data-lang="pt">PT</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="es">ES</button>
+    </nav>
+
+    <!-- Card da Jornada Essencial (pergaminho vertical na vitrine) -->
+    <section class="container">
+      <div class="card pergaminho pergaminho-v">
+        <div class="card-content">
+          <h2 data-typing data-text="Jornada Conhecimento com Luz — Essencial" data-speed="40" data-cursor="true"></h2>
+          <p>Uma viagem interior com 32 reflexões essenciais.</p>
+          <div class="actions">
+            <a id="btnComecar" class="btn btn-primary" href="/jornada-conhecimento-com-luz1.html#intro">Iniciar Jornada</a>
+            <a class="btn" href="/">Voltar ao Início</a>
+          </div>
         </div>
       </div>
     </section>
+
+    <!-- (Opcional) Mais jornadas futuramente... -->
+
+    <footer class="site-footer">
+      <small>© 2025 Irmandade Conhecimento com Luz</small>
+    </footer>
   </main>
 
-  <footer class="site-footer">
-    <small>© 2025 Irmandade Conhecimento com Luz</small>
-  </footer>
-
-  <!-- [04-DATILOGRAFIA] só no primeiro bloco da home -->
+  <!-- Datilografia leve (apenas nesta página) -->
   <script>
     (function () {
-      function typeWriter(el, text, speed, showCursor){
+      function typeWriter(el, text, speed, showCursor) {
         if (!el) return;
         el.textContent = '';
         if (showCursor) el.classList.add('lumen-typing');
         let i = 0;
-        (function step(){
+        (function step() {
           if (i < text.length) { el.textContent += text.charAt(i++); setTimeout(step, speed); }
           else { el.classList.add('typing-done'); }
         })();
       }
-      function runTyping(root){
-        (root || document).querySelectorAll('[data-typing]').forEach(el=>{
+      function runTyping(root) {
+        (root || document).querySelectorAll('[data-typing]').forEach(el => {
           if (el.dataset._typed) return;
           const t = el.getAttribute('data-text') || el.textContent || '';
           const spd = parseInt(el.getAttribute('data-speed') || '26', 10);
@@ -120,11 +133,11 @@
           typeWriter(el, t, spd, cur);
         });
       }
-      document.addEventListener('DOMContentLoaded', ()=> runTyping(document));
+      document.addEventListener('DOMContentLoaded', () => runTyping(document));
     })();
   </script>
 
-  <!-- Scripts globais (opcionais na home; manter se você já usa) -->
+  <!-- Somente scripts leves/seguros nesta página de catálogo -->
   <script defer src="/config.js"></script>
   <script defer src="/i18n/i18n.js"></script>
   <script defer src="/jornada-micro.js"></script>
