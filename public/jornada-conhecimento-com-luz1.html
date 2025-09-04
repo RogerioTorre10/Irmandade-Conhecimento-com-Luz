@@ -1,343 +1,140 @@
 <!doctype html>
-<!-- =============================================================================
-  TÍTULO: JORNADA ESSENCIAL
-  SUBTÍTULO: Página principal da jornada "Conhecimento com Luz"
-============================================================================= -->
 <html lang="pt-br">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Jornada • Irmandade Conhecimento com Luz</title>
-
-  <!-- ===========================================================================
-       TÍTULO: ESTILOS E ÍCONES
-       SUBTÍTULO: CSS principal + ícone + efeitos de chama
-  ============================================================================ -->
   <link rel="stylesheet" href="/styles.css">
   <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png">
   <link rel="stylesheet" href="/css/chama.css">
-  </head>
+  <style>
+    .pergaminho { background: #f6efe0 !important; }
+    .pergaminho-v {
+      background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important;
+      background-size: cover !important;
+      background-position: center !important;
+      min-height: 82vh !important;
+    }
+    .pergaminho-h {
+      background-image: url('/assets/img/pergaminho-rasgado-horiz.png') !important;
+      background-size: cover !important;
+      background-position: center !important;
+      min-height: 82vh !important;
+    }
+    #jornada-canvas {
+      position: relative;
+      z-index: 1;
+      background: transparent !important;
+    }
+    #jornada-conteudo {
+      background: transparent !important;
+      position: relative;
+      z-index: 2;
+      padding: 20px;
+    }
+    .j-bloco {
+      background: transparent !important;
+      padding: 20px;
+    }
+  </style>
+</head>
 
 <body data-layout="master" data-journey="essencial">
-  <!-- =========================================================================
-       TÍTULO: CABEÇALHO FIXO
-       SUBTÍTULO: Chama pequena + título da jornada
-  ========================================================================= -->
   <header class="site-header flex items-center gap-3">
-    <!-- 🔥 Chama pequena no topo -->
     <div class="chama chama-sm">
       <span></span><span></span><span></span>
     </div>
     <h1>Jornada Essencial</h1>
   </header>
 
-  <!-- =========================================================================
-       TÍTULO: SHELL ESTÁTICO
-       SUBTÍTULO: Mostra orientações iniciais e termo antes da jornada
-  ========================================================================= -->
   <main id="page-shell" class="container">
     <header class="site-header">
       <h1>Jornada Essencial</h1>
       <p id="status">Orientações e Termo de Responsabilidade da Jornada.</p>
     </header>
-
     <div class="container">
       <a class="btn btn-primary" href="#intro">Ir para Introdução</a>
       <a class="btn" href="/jornadas.html">← Voltar</a>
     </div>
-
-    <!-- Sub-main para conter o canvas -->
     <main class="container">
-      <section id="jornada-canvas" class="card" style="display:none;">        
+      <section id="jornada-canvas" class="card pergaminho pergaminho-v">
         <div id="jornada-conteudo" class="conteudo-pergaminho"></div>
-        </section>
+      </section>
     </main>
-
     <footer class="site-footer">
       <small>© 2025 Irmandade Conhecimento com Luz</small>
     </footer>
   </main>
 
-  <!-- =============================================================================
-     TÍTULO: CANVAS DINÂMICO DA JORNADA
-     SUBTÍTULO: Pergaminho + Progresso + Controles + Blocos
-============================================================================= -->
+  <div class="progress-badge" id="jprog-pct">0% concluído</div>
+  <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
 
-<!-- badge topo -->
-<div class="progress-badge" id="jprog-pct">0% concluído</div>
+  <div id="jornada-conteudo-intro" class="conteudo-pergaminho">
+    <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
+    <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Aqui, fé e consciência se unem para acender sua chama interior — passo a passo, jornada por jornada." data-speed="50" data-cursor="true"></p>
+  </div>
 
-<!-- barra de progresso global -->
-<div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
+  <div class="j-progress" style="margin-top:12px">
+    <div class="j-progress__bar"><div class="j-progress__fill"></div></div>
+    <div class="j-progress__meta" id="j-meta"></div>
+  </div>
 
-<!-- intro/final (se usados pelo render) -->
-<!-- Conteúdo será injetado dinamicamente no #jornada-conteudo -->
-<!-- Exemplo de texto com DATILOGRAFIA na intro (opcional): -->
-<p data-typing
-   data-text="Respire. Esta jornada é sua. Um passo de cada vez."
-   data-speed="40"
-   data-cursor="true"></p>
-<p data-typing
-   data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Aqui, fé e consciência se unem para acender sua chama interior — passo a passo, jornada por jornada."
-   data-speed="50"
-   data-cursor="true"></p>
+  <div class="footer-actions" style="margin:10px 0 16px">
+    <button id="btnPrev" class="btn btn-secondary" data-action="prev">Voltar</button>
+    <button id="btnNext" class="btn btn-primary" data-action="next">Próxima</button>
+  </div>
 
-<!-- =========================
-     TÍTULO: PROGRESSO LOCAL DO BLOCO
-========================= -->
-<div class="j-progress" style="margin-top:12px">
-  <div class="j-progress__bar"><div class="j-progress__fill"></div></div>
-  <div class="j-progress__meta" id="j-meta"></div>
-</div>
-
-<!-- =========================
-     TÍTULO: CONTROLES
-========================= -->
-<div class="footer-actions" style="margin:10px 0 16px">
-  <button id="btnPrev" class="btn btn-secondary" data-action="prev">Voltar</button>
-  <button id="btnNext" class="btn btn-primary"  data-action="next">Próxima</button>
-</div>
-
-  <!-- ===== SELFIE COM A IRMANDADE (intro) =================================== -->
-<section id="selfie-join" class="card pergaminho pergaminho-v" style="margin-top:16px;">
-  <div class="conteudo-pergaminho">
-    <h2 style="margin-top:0;">Entre na Irmandade ✨</h2>
-    <p>Faça uma foto agora ou envie da galeria. Ajuste e gere sua imagem “4 + você”.</p>
-
-    <div class="selfie-row">
-      <div class="selfie-left">
-        <label class="btn btn-primary" for="selfieInput">📸 Tirar/Enviar foto</label>
-        <input id="selfieInput" type="file" accept="image/*" capture="environment" style="display:none" />
-
-        <div class="selfie-controls">
-          <label>Zoom
-            <input id="selfieScale" type="range" min="0.6" max="2.0" step="0.01" value="1">
-          </label>
-          <label>Horizontal
-            <input id="selfieOffsetX" type="range" min="-300" max="300" step="1" value="0">
-          </label>
-          <label>Vertical
-            <input id="selfieOffsetY" type="range" min="-300" max="300" step="1" value="0">
-          </label>
-          <small class="muted">Dica: mova os controles para alinhar seu rosto no espaço livre da imagem.</small>
-        </div>
-
-        <div class="selfie-actions">
-          <button id="btnRenderSelfie" class="btn">✨ Gerar minha imagem</button>
-          <a id="btnDownloadSelfie" class="btn btn-secondary" download="irmandade-mais-eu.png" href="#">⬇️ Baixar</a>
-        </div>
-      </div>
-
-      <div class="selfie-right">
-        <canvas id="selfieCanvas" width="1200" height="800" style="width:100%;height:auto;background:#000;border-radius:12px;"></canvas>
-        <small class="muted">Pré-visualização</small>
-      </div>
+  <section class="j-bloco" data-bloco="0" data-video="/assets/img/filme-1-entrando-na-jornada.mp4" data-pergaminho-h>
+    <div class="j-pergunta" data-pergunta="0">
+      <label class="pergunta-enunciado" data-type="Pergunta 1: Quem é você neste momento da vida?"><b>Pergunta 1:</b> Quem é você neste momento da vida?</label>
+      <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
     </div>
+    <div class="j-pergunta" data-pergunta="1">
+      <label class="pergunta-enunciado" data-type="Pergunta 2: O que te move hoje?"><b>Pergunta 2:</b> O que te move hoje?</label>
+      <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
+    </div>
+    <div class="j-pergunta" data-pergunta="2">
+      <label class="pergunta-enunciado" data-type="Pergunta 3: Qual é o seu maior sonho agora?"><b>Pergunta 3:</b> Qual é o seu maior sonho agora?</label>
+      <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
+    </div>
+    <div class="j-pergunta" data-pergunta="3">
+      <label class="pergunta-enunciado" data-type="Pergunta 4: O que te desafia hoje?"><b>Pergunta 4:</b> O que te desafia hoje?</label>
+      <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
+    </div>
+    <div class="j-pergunta" data-pergunta="4">
+      <label class="pergunta-enunciado" data-type="Pergunta 5: Como você se vê em um ano?"><b>Pergunta 5:</b> Como você se vê em um ano?</label>
+      <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
+    </div>
+  </section>
+
+  <section class="j-bloco" data-bloco="1" data-video="/assets/img/filme-2-dentro-da-jornada.mp4" data-pergaminho-h>
+    <div class="j-pergunta" data-pergunta="0">
+      <label class="pergunta-enunciado"><b>Pergunta 1:</b> O que significa fé pra você hoje?</label>
+      <textarea rows="4" class="input"></textarea>
+    </div>
+    <div class="j-pergunta" data-pergunta="1">
+      <label class="pergunta-enunciado"><b>Pergunta 2:</b> Onde você percebe luz no cotidiano?</label>
+      <textarea rows="4" class="input"></textarea>
+    </div>
+    <div class="j-pergunta" data-pergunta="2">
+      <label class="pergunta-enunciado"><b>Pergunta 3:</b> Qual hábito novo você quer firmar?</label>
+      <textarea rows="4" class="input"></textarea>
+    </div>
+    <div class="j-pergunta" data-pergunta="3">
+      <label class="pergunta-enunciado"><b>Pergunta 4:</b> Qual cuidado com o próximo você deseja praticar?</label>
+      <textarea rows="4" class="input"></textarea>
+    </div>
+    <div class="j-pergunta" data-pergunta="4">
+      <label class="pergunta-enunciado"><b>Pergunta 5:</b> Uma gratidão de hoje:</label>
+      <textarea rows="4" class="input"></textarea>
+    </div>
+  </section>
+
+  <div id="videoOverlay" class="video-overlay hidden">
+    <video id="videoTransicao" playsinline preload="metadata" controls style="max-width:90vw; max-height:80vh; background:#000"></video>
+    <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
   </div>
-</section>
 
-<style>
-  .selfie-row{
-    display:grid; grid-template-columns: 1fr 1.3fr; gap:16px; align-items:start;
-  }
-  .selfie-left .selfie-controls{ display:flex; flex-direction:column; gap:10px; margin:12px 0; }
-  .selfie-left label{ display:flex; flex-direction:column; gap:6px; font-weight:600; }
-  .selfie-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
-  @media (max-width: 860px){
-    .selfie-row{ grid-template-columns: 1fr; }
-  }
-</style>
-
-<script>
-(function(){
-  // ===== Ajuste aqui se seus arquivos tiverem outro caminho/nome =====
-  const BG_URL     = "/assets/img/irmandade-quarteto-bg.png";   // 4 pessoas, espaço vago
-  const GLOW_URL   = "/assets/img/moldura-brilho.png";          // opcional (circular com transparência)
-  // Posição/tamanho do "buraco" para o rosto (em pixels do canvas 1200x800)
-  const FACE_X = 820;   // centro do círculo (x)
-  const FACE_Y = 410;   // centro do círculo (y)
-  const FACE_R = 150;   // raio do recorte (círculo)
-
-  const $ = (sel)=>document.querySelector(sel);
-  const input   = $("#selfieInput");
-  const cv      = $("#selfieCanvas");
-  const ctx     = cv.getContext("2d");
-  const rScale  = $("#selfieScale");
-  const rX      = $("#selfieOffsetX");
-  const rY      = $("#selfieOffsetY");
-  const btnGo   = $("#btnRenderSelfie");
-  const aDown   = $("#btnDownloadSelfie");
-
-  const bgImg   = new Image(); bgImg.crossOrigin = "anonymous"; bgImg.src = BG_URL;
-  const glowImg = new Image(); glowImg.crossOrigin = "anonymous"; glowImg.src = GLOW_URL;
-  let userImg   = null; // Image()
-
-  // estado de ajuste
-  const st = {
-    scale: parseFloat(rScale.value),
-    offX:  parseInt(rX.value,10),
-    offY:  parseInt(rY.value,10),
-  };
-
-  // util: desenha tudo
-  function renderAll(){
-    // fundo (bg)
-    ctx.clearRect(0,0,cv.width,cv.height);
-    if (bgImg.complete) ctx.drawImage(bgImg, 0, 0, cv.width, cv.height);
-
-    // rosto (se existir)
-    if (userImg){
-      ctx.save();
-      // cria máscara circular
-      ctx.beginPath();
-      ctx.arc(FACE_X, FACE_Y, FACE_R, 0, Math.PI*2);
-      ctx.closePath();
-      ctx.clip();
-
-      // desenha a foto ajustada
-      const scale = st.scale || 1;
-      // centraliza a foto no círculo com offsets
-      // tamanho "base" da foto será 2*R (diâmetro), multiplicado pelo zoom
-      const drawW = FACE_R*2*scale;
-      const drawH = FACE_R*2*scale;
-      const dx = FACE_X - drawW/2 + st.offX;
-      const dy = FACE_Y - drawH/2 + st.offY;
-      ctx.drawImage(userImg, dx, dy, drawW, drawH);
-
-      ctx.restore();
-    }
-
-    // brilho/moldura (opcional)
-    if (glowImg && glowImg.complete){
-      ctx.drawImage(glowImg, FACE_X - FACE_R*1.2, FACE_Y - FACE_R*1.2, FACE_R*2.4, FACE_R*2.4);
-    }
-  }
-
-  function loadFromLocal(){
-    try{
-      const saved = localStorage.getItem("IRMANDADE_SELFIE_DATAURL");
-      if (!saved) return;
-      const img = new Image();
-      img.onload = ()=>{ userImg = img; renderAll(); };
-      img.src = saved;
-    }catch(e){}
-  }
-
-  // listeners
-  input.addEventListener("change", (ev)=>{
-    const f = ev.target.files && ev.target.files[0];
-    if (!f) return;
-    const reader = new FileReader();
-    reader.onload = (e)=>{
-      const img = new Image();
-      img.onload = ()=>{
-        userImg = img;
-        // guarda original no localStorage (limite ~5MB prático)
-        try{ localStorage.setItem("IRMANDADE_SELFIE_DATAURL", e.target.result); }catch(_){}
-        renderAll();
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(f);
-  });
-
-  [rScale, rX, rY].forEach(el=>{
-    el.addEventListener("input", ()=>{
-      st.scale = parseFloat(rScale.value);
-      st.offX  = parseInt(rX.value,10);
-      st.offY  = parseInt(rY.value,10);
-      renderAll();
-    });
-  });
-
-  btnGo.addEventListener("click", ()=>{
-    // força re-render e prepara download
-    renderAll();
-    const url = cv.toDataURL("image/png");
-    aDown.href = url;
-    // também salva a imagem final caso queira mostrar depois na jornada
-    try{ localStorage.setItem("IRMANDADE_SELFIE_FINAL", url); }catch(_){}
-  });
-
-  // quando assets de fundo carregarem, redesenha
-  bgImg.onload = renderAll;
-  glowImg.onload = renderAll;
-
-  // tenta recuperar selfie anterior
-  loadFromLocal();
-})();
-</script>
-
-
-<!-- =========================
-     TÍTULO: BLOCO 1
-     SUBTÍTULO: defina 5 perguntas; vídeo toca ao concluir o bloco
-========================= -->
-<section class="j-bloco" data-bloco="0" data-video="/assets/img/filme-1-entrando-na-jornada.mp4" data-pergaminho-h>
-  <div class="j-pergunta" data-pergunta="0">
-    <label class="pergunta-enunciado" data-type="Pergunta 1: Quem é você neste momento da vida?"><b>Pergunta 1:</b> Quem é você neste momento da vida?</label>
-    <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
-</div>
- <div class="j-pergunta" data-pergunta="1">
-    <label class="pergunta-enunciado" data-type="Pergunta 2: Quem é você neste momento da vida?"><b>Pergunta 1:</b> Quem é você neste momento da vida?</label>
-    <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
-</div>
-  <div class="j-pergunta" data-pergunta="2">
-    <label class="pergunta-enunciado" data-type="Pergunta 3: Quem é você neste momento da vida?"><b>Pergunta 1:</b> Quem é você neste momento da vida?</label>
-    <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
-</div>
- <div class="j-pergunta" data-pergunta="3">
-    <label class="pergunta-enunciado" data-type="Pergunta 4: Quem é você neste momento da vida?"><b>Pergunta 1:</b> Quem é você neste momento da vida?</label>
-    <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
-</div>
- <div class="j-pergunta" data-pergunta="4">
-    <label class="pergunta-enunciado" data-type="Pergunta 5: Quem é você neste momento da vida?"><b>Pergunta 1:</b> Quem é você neste momento da vida?</label>
-    <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
-</div>
-</section>
-
-<!-- =========================
-     TÍTULO: BLOCO 2
-========================= -->
-<section class="j-bloco" data-bloco="1" data-video="/assets/img/filme-2-dentro-da-jornada.mp4"data-pergaminho-h>>
-  <div class="j-pergunta" data-pergunta="0">
-    <label class="pergunta-enunciado"><b>Pergunta 1:</b> O que significa fé pra você hoje?</label>
-    <textarea rows="4" class="input"></textarea>
-  </div>
-  <div class="j-pergunta" data-pergunta="1">
-    <label class="pergunta-enunciado"><b>Pergunta 2:</b> Onde você percebe luz no cotidiano?</label>
-    <textarea rows="4" class="input"></textarea>
-  </div>
-  <div class="j-pergunta" data-pergunta="2">
-    <label class="pergunta-enunciado"><b>Pergunta 3:</b> Qual hábito novo você quer firmar?</label>
-    <textarea rows="4" class="input"></textarea>
-  </div>
-  <div class="j-pergunta" data-pergunta="3">
-    <label class="pergunta-enunciado"><b>Pergunta 4:</b> Qual cuidado com o próximo você deseja praticar?</label>
-    <textarea rows="4" class="input"></textarea>
-  </div>
-  <div class="j-pergunta" data-pergunta="4">
-    <label class="pergunta-enunciado"><b>Pergunta 5:</b> Uma gratidão de hoje:</label>
-    <textarea rows="4" class="input"></textarea>
-  </div>
-</section>
-
-<!-- Repita para BLOCO 3 / 4 / 5, cada um com data-video="/assets/video/transicao-3.mp4" etc. -->
-
-  <!-- =============================================================================
-     TÍTULO: OVERLAY DE VÍDEO DE TRANSIÇÃO
-     SUBTÍTULO: abre entre os blocos; botão para pular
-============================================================================= -->
-<div id="videoOverlay" class="video-overlay hidden">
-  <video id="videoTransicao" playsinline preload="metadata" controls
-         style="max-width:90vw; max-height:80vh; background:#000"></video>
-  <button id="skipVideo" class="btn btn-secondary"
-          style="position:absolute; top:14px; right:14px">Pular vídeo</button>
-</div>
-  
-   <!-- =========================================================================
-       TÍTULO: BOOTSTRAP
-       SUBTÍTULO: Ativa jornada e roteia intro/perguntas/final
-  ========================================================================= -->
   <script>
     (function () {
       if (typeof window.activateJornada === 'function') {
@@ -371,142 +168,84 @@
     })();
   </script>
 
-  <!-- =========================================================================
-       TÍTULO: FOOTER AMBIENTE
-       SUBTÍTULO: Mostra layout/journey/path
-  ========================================================================= -->
- <footer style="opacity:.6; font-size:.85rem; margin-top:2rem; text-align:center">
+  <footer style="opacity:.6; font-size:.85rem; margin-top:2rem; text-align:center">
     <span id="envTag"></span>
   </footer>
-
   <script>
     document.getElementById('envTag').textContent =
       `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
   </script>
   <script>
-/* ==== DATILOGRAFIA (auto em conteúdo injetado) ==== */
-(function(){
-  function typeWriter(el, text, speed, showCursor){
-    if (!el) return;
-    el.textContent = '';
-    if (showCursor) el.classList.add('lumen-typing');
-    let i = 0;
-    (function step(){
-      if (i < text.length){ el.textContent += text.charAt(i++); setTimeout(step, speed); }
-      else { el.classList.add('typing-done'); }
-    })();
-  }
-  function runTyping(root){
-    (root || document).querySelectorAll('[data-typing]').forEach(el=>{
-      if (el.dataset._typed) return;
-      const t   = el.getAttribute('data-text') || el.textContent || '';
-      const spd = parseInt(el.getAttribute('data-speed') || '26', 10);
-      const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
-      el.dataset._typed = '1';
-      typeWriter(el, t, spd, cur);
-    });
-  }
-  document.addEventListener('DOMContentLoaded', ()=>runTyping(document));
-
-  // observa o #jornada-conteudo para intro/final injetados
-  const target = document.getElementById('jornada-conteudo');
-  if (target) {
-    const obs = new MutationObserver(muts => muts.forEach(m=>runTyping(m.target)));
-    obs.observe(target, { childList:true, subtree:true });
-  }
-})();
-</script>
-  <!-- FINALIZAÇÃO DA JORNADA -->
-<section id="jornada-final" class="card pergaminho pergaminho-v" style="margin-top:24px; display:none;">
-  <div class="conteudo-pergaminho">
-    <h2>Conclusão da Jornada ✨</h2>
-    <p>Gratidão por caminhar conosco! Você agora faz parte da Irmandade. 🌟</p>
-
-    <!-- Espaço da foto do usuário -->
-    <div class="selfie-final" style="text-align:center; margin-top:20px;">
-      <img id="minhaFotoFinal" 
-           alt="Minha foto com a Irmandade"
-           style="max-width:80%; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.3)" />
-    </div>
-
-    <p style="margin-top:12px;"><small>Sua imagem foi unida à Irmandade. 🙏</small></p>
-  </div>
-</section>
-
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const url = localStorage.getItem("IRMANDADE_SELFIE");
-    if (url) {
-      document.querySelector("#minhaFotoFinal").src = url;
-      document.getElementById("jornada-final").style.display = "block";
-    }
-  });
-</script>
-
-<!-- Estilos do cursor (se ainda não tiver) -->
-<style>
-.lumen-typing{ white-space:pre-wrap; position:relative; }
-.lumen-typing::after{ content:"▌"; margin-left:2px; opacity:.75; animation:lumenBlink 1s steps(2,end) infinite; }
-.lumen-typing.typing-done::after{ content:""; animation:none; }
-@keyframes lumenBlink{ 50%{ opacity:0; } }
-</style>
-  <!-- Boot robusto: só roda quando o renderer está pronto -->
-<script>
-  <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    if (!window.JORNADA_RENDER) {
-      console.error('[FALLBACK] JORNADA_RENDER não inicializado. Forçando recarregamento.');
-      const script = document.createElement('script');
-      script.src = '/jornada-render.js';
-      document.body.appendChild(script);
-    }
-  });
-</script>
-
- <script defer src="/config.js"></script>
-<script defer src="/jornada-utils.js"></script>
-<script defer src="/jornada-core.js"></script>
-<script defer src="/jornada-auth.js"></script>
-<script defer src="/jornada-chama.js"></script>
-<script defer src="/jornada-paper-qa.js"></script>
-<script defer src="/jornada-typing-font.js"></script>
-<script defer src="/i18n/i18n.js"></script>
-<script defer src="/jornada-micro.js"></script>
-<script defer src="/jornada-typing.js"></script>
-
-<!-- Controller antes ou depois do render funciona, mas o BOOT precisa do render pronto -->
-<script defer src="/jornada-controller.js"></script>
-<script defer src="/jornada-render.js"></script>
-
-<!-- Boot SEMPRE por último -->
-<script defer src="/jornada-bootstrap.js"></script>
- 
-(function () {
-  function safeBoot() {
-    if (window.JORNADA_RENDER && typeof window.JORNADA_RENDER.renderIntro === 'function') {
-      document.body.classList.add('jornada-active');
-      const route = (location.hash || '#intro').slice(1);
-      if (route === 'perguntas') {
-        window.JORNADA_RENDER.renderPerguntas(0);
-        window.JORNADA_PAPER?.set?.('h');
-      } else if (route === 'final') {
-        window.JORNADA_RENDER.renderFinal();
-        window.JORNADA_PAPER?.set?.('v');
-      } else {
-        window.JORNADA_RENDER.renderIntro();
-        window.JORNADA_PAPER?.set?.('v');
+    (function(){
+      function typeWriter(el, text, speed, showCursor){
+        if (!el) return;
+        el.textContent = '';
+        if (showCursor) el.classList.add('lumen-typing');
+        let i = 0;
+        (function step(){
+          if (i < text.length){ el.textContent += text.charAt(i++); setTimeout(step, speed); }
+          else { el.classList.add('typing-done'); }
+        })();
       }
-      return true;
-    }
-    return false;
-  }
-  if (!safeBoot()) {
-    let tries = 0;
-    const timer = setInterval(() => {
-      if (safeBoot() || ++tries > 50) clearInterval(timer); // tenta ~5s
-    }, 100);
-  }
-})();
-</script>
+      function runTyping(root){
+        (root || document).querySelectorAll('[data-typing]').forEach(el=>{
+          if (el.dataset._typed) return;
+          const t = el.getAttribute('data-text') || el.textContent || '';
+          const spd = parseInt(el.getAttribute('data-speed') || '26', 10);
+          const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
+          el.dataset._typed = '1';
+          typeWriter(el, t, spd, cur);
+        });
+      }
+      document.addEventListener('DOMContentLoaded', ()=>runTyping(document));
+      const target = document.getElementById('jornada-conteudo');
+      if (target) {
+        const obs = new MutationObserver(muts => {
+          console.log('Mudanças em #jornada-conteudo:', muts);
+          muts.forEach(m => runTyping(m.target));
+        });
+        obs.observe(target, { childList: true, subtree: true });
+      }
+    })();
+  </script>
+  <style>
+    .lumen-typing { white-space: pre-wrap; position: relative; }
+    .lumen-typing::after { content: "▌"; margin-left: 2px; opacity: .75; animation: lumenBlink 1s steps(2, end) infinite; }
+    .lumen-typing.typing-done::after { content: ""; animation: none; }
+    @keyframes lumenBlink { 50% { opacity: 0; } }
+  </style>
+  <script defer src="/config.js"></script>
+  <script defer src="/jornada-utils.js"></script>
+  <script defer src="/jornada-core.js"></script>
+  <script defer src="/jornada-auth.js"></script>
+  <script defer src="/jornada-chama.js"></script>
+  <script defer src="/jornada-paper-qa.js"></script>
+  <script defer src="/jornada-typing-font.js"></script>
+  <script defer src="/i18n/i18n.js"></script>
+  <script defer src="/jornada-micro.js"></script>
+  <script defer src="/jornada-typing.js"></script>
+  <script defer src="/jornada-controller.js"></script>
+  <script defer src="/jornada-render.js"></script>
+  <script defer src="/jornada-bootstrap.js"></script>
+  <script>
+    (function () {
+      function boot() {
+        if (window.JORNADA_RENDER?.renderIntro) {
+          document.body.classList.add('jornada-active');
+          const route = (location.hash || '#intro').slice(1);
+          if (route === 'perguntas') JORNADA_RENDER.renderPerguntas(0);
+          else if (route === 'final') JORNADA_RENDER.renderFinal();
+          else JORNADA_RENDER.renderIntro();
+          return true;
+        }
+        return false;
+      }
+      if (!boot()) {
+        let tries = 0; const timer = setInterval(() => {
+          if (boot() || ++tries > 40) clearInterval(timer);
+        }, 100);
+      }
+    })();
+  </script>
 </body>
 </html>
