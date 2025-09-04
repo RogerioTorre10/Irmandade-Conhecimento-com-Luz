@@ -57,32 +57,42 @@
       <a class="btn" href="/jornadas.html">← Voltar</a>
     </div>
 
-    <!-- === CANVAS DA JORNADA (pergaminho fica AQUI) ====================== -->
-    <main class="container">
-      <section id="jornada-canvas" class="card pergaminho pergaminho-v">
-        <!-- badge e barra de progresso globais (topo do canvas) -->
-        <div class="progress-badge" id="jprog-pct">0% concluído</div>
-        <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
+   <!-- === CANVAS DA JORNADA (pergaminho fica AQUI) ====================== -->
+<main class="container">
+  <section id="jornada-canvas" class="card pergaminho pergaminho-v" aria-live="polite">
+    <!-- badge e barra de progresso globais (topo do canvas) -->
+    <div class="progress-badge" id="jprog-pct">0% concluído</div>
+    <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
 
-        <!-- conteúdo dinâmico/estático da jornada -->
-        <div id="jornada-conteudo" class="conteudo-pergaminho">
-          <!-- INTRO (vertical, com datilografia) -->
-          <div id="jornada-conteudo-intro">
-            <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
-            <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Aqui, fé e consciência se unem para acender sua chama interior — passo a passo, jornada por jornada." data-speed="50" data-cursor="true"></p>
-          </div>
+    <!-- conteúdo dinâmico/estático da jornada -->
+    <div id="jornada-conteudo" class="conteudo-pergaminho">
 
-          <!-- PROGRESSO local do bloco -->
-          <div class="j-progress" style="margin-top:12px">
-            <div class="j-progress__bar"><div class="j-progress__fill"></div></div>
-            <div class="j-progress__meta" id="j-meta"></div>
-          </div>
+      <!-- INTRO (vertical, com datilografia) -->
+      <div data-intro>
+        <p data-typing
+           data-text="Respire. Esta jornada é sua. Um passo de cada vez."
+           data-speed="40" data-cursor="true"></p>
 
-          <!-- CONTROLES -->
-          <div class="footer-actions" style="margin:10px 0 16px">
-            <button id="btnPrev" class="btn btn-secondary" data-action="prev">Voltar</button>
-            <button id="btnNext" class="btn btn-primary" data-action="next">Próxima</button>
-          </div>
+        <p data-typing
+           data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Aqui, fé e consciência se unem para acender sua chama interior — passo a passo, jornada por jornada."
+           data-speed="50" data-cursor="true"></p>
+      </div>
+
+      <!-- PROGRESSO local do bloco -->
+      <div class="j-progress" style="margin-top:12px">
+        <div class="j-progress__bar"><div class="j-progress__fill"></div></div>
+        <div class="j-progress__meta" id="j-meta"></div>
+      </div>
+
+      <!-- CONTROLES -->
+      <div class="footer-actions" style="margin:10px 0 16px">
+        <button id="btnPrev" class="btn btn-secondary" data-action="prev">Voltar</button>
+        <button id="btnNext" class="btn btn-primary" data-action="next">Próxima</button>
+      </div>
+
+    </div><!-- /#jornada-conteudo -->
+  </section>
+</main>
 
           <!-- ======= BLOCOS DE PERGUNTAS (agora DENTRO do canvas) ======= -->
 
