@@ -65,6 +65,9 @@
       background-position: center !important;
       min-height: 82vh !important;
     }
+    .pergaminho-h.fallback {
+      background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important; /* Fallback */
+    }
     .conteudo-pergaminho {
       background: transparent !important;
       position: relative;
@@ -339,32 +342,41 @@
         obs.observe(target, { childList: true, subtree: true });
       }
 
+      // Verificação de imagem
+      function checkImage(url, fallbackUrl) {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve(url);
+          img.onerror = () => resolve(fallbackUrl);
+          img.src = url;
+        });
+      }
+
       // Boot robusto
-      function boot() {
+      async function boot() {
         if (window.JORNADA_RENDER?.renderIntro) {
           document.body.classList.add('jornada-active');
           const route = (location.hash || '#intro').slice(1);
           console.log('Rota detectada:', route); // Depuração
+          const canvas = document.getElementById('jornada-canvas');
           if (route === 'perguntas') {
             window.JORNADA_RENDER.renderPerguntas(0);
-            if (window.JORNADA_PAPER?.set) {
-              window.JORNADA_PAPER.set('h');
-              console.log('[JORNADA_PAPER] Pergaminho horizontal aplicado');
-            } else {
-              console.warn('[JORNADA_PAPER] set não disponível');
+            const bgImage = await checkImage('/assets/img/pergaminho-rasgado-horiz.png', '/assets/img/pergaminho-rasgado-vert.png');
+            canvas.className = 'card pergaminho pergaminho-h';
+            if (bgImage !== canvas.style.backgroundImage) {
+              canvas.style.backgroundImage = `url('${bgImage}')`;
             }
+            console.log('[JORNADA_PAPER] Pergaminho horizontal aplicado, imagem:', bgImage);
           } else if (route === 'final') {
             window.JORNADA_RENDER.renderFinal();
-            if (window.JORNADA_PAPER?.set) {
-              window.JORNADA_PAPER.set('v');
-              console.log('[JORNADA_PAPER] Pergaminho vertical aplicado (final)');
-            }
+            canvas.className = 'card pergaminho pergaminho-v';
+            canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
+            console.log('[JORNADA_PAPER] Pergaminho vertical aplicado (final)');
           } else {
             window.JORNADA_RENDER.renderIntro();
-            if (window.JORNADA_PAPER?.set) {
-              window.JORNADA_PAPER.set('v');
-              console.log('[JORNADA_PAPER] Pergaminho vertical aplicado (intro)');
-            }
+            canvas.className = 'card pergaminho pergaminho-v';
+            canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
+            console.log('[JORNADA_PAPER] Pergaminho vertical aplicado (intro)');
           }
           return true;
         }
