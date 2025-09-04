@@ -450,6 +450,18 @@
 .lumen-typing.typing-done::after{ content:""; animation:none; }
 @keyframes lumenBlink{ 50%{ opacity:0; } }
 </style>
+  <!-- Boot robusto: só roda quando o renderer está pronto -->
+<script>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!window.JORNADA_RENDER) {
+      console.error('[FALLBACK] JORNADA_RENDER não inicializado. Forçando recarregamento.');
+      const script = document.createElement('script');
+      script.src = '/jornada-render.js';
+      document.body.appendChild(script);
+    }
+  });
+</script>
 
  <script defer src="/config.js"></script>
 <script defer src="/jornada-utils.js"></script>
@@ -468,20 +480,7 @@
 
 <!-- Boot SEMPRE por último -->
 <script defer src="/jornada-bootstrap.js"></script>
-
-<!-- Boot robusto: só roda quando o renderer está pronto -->
-<script>
-  <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    if (!window.JORNADA_RENDER) {
-      console.error('[FALLBACK] JORNADA_RENDER não inicializado. Forçando recarregamento.');
-      const script = document.createElement('script');
-      script.src = '/jornada-render.js';
-      document.body.appendChild(script);
-    }
-  });
-</script>
-  
+ 
 (function () {
   function safeBoot() {
     if (window.JORNADA_RENDER && typeof window.JORNADA_RENDER.renderIntro === 'function') {
