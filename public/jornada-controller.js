@@ -94,230 +94,212 @@
     }
   }
 
-  /* ===========================================================================
-     TÍTULO: RENDERIZAÇÃO
-     SUBTÍTULO: Exibe apenas 1 pergunta do bloco atual
-  =========================================================================== */
-      // ===== [03-PERGAMINHO] helpers =====
-  function applyPergaminhoByRoute() {
-    if (!window.JORNADA_PAPER || typeof window.JORNADA_PAPER.set !== 'function') return;
-    const route = (location.hash || '#intro').slice(1);
-    if (route === 'intro' || route === 'final') {
-      window.JORNADA_PAPER.set('v');   // intro/final sempre vertical
-    }
-    // Em 'perguntas', quem decide é o bloco atual
+ /* =============================================================================
+   TÍTULO: RENDERIZAÇÃO
+   SUBTÍTULO: Exibe apenas 1 pergunta do bloco atual
+============================================================================= */
+
+// ===== [03-PERGAMINHO] helpers =====
+function applyPergaminhoByRoute() {
+  if (!window.JORNADA_PAPER || typeof window.JORNADA_PAPER.set !== 'function') return;
+  const route = (location.hash || '#intro').slice(1);
+  if (route === 'intro' || route === 'final') {
+    window.JORNADA_PAPER.set('v'); // intro/final sempre vertical
+  }
+}
+function applyPergaminhoByBloco(blocoEl) {
+  if (!window.JORNADA_PAPER || typeof window.JORNADA_PAPER.set !== 'function') return;
+  if (!blocoEl) return;
+  let modo = 'v';
+  if (blocoEl.hasAttribute('data-pergaminho-h')) modo = 'h';
+  else if (blocoEl.hasAttribute('data-pergaminho-v')) modo = 'v';
+  else modo = blocoEl.getAttribute('data-pergaminho') || 'h'; // padrão perguntas = H
+  window.JORNADA_PAPER.set(modo);
+}
+
+function render() {
+  const root = S.root();
+  if (!root) return;
+
+  // mostra o canvas principal
+  U.show(root, 'block');
+
+  const blocos = S.blocos();
+  if (!blocos.length) return;
+
+  // esconde tudo e mostra o bloco atual
+  blocos.forEach(U.hide);
+  const bloco = S.blocoAtivo();
+  U.show(bloco);
+
+  // esconde perguntas do bloco e mostra só a atual
+  const perguntas = S.perguntasDo(bloco);
+  perguntas.forEach(U.hide);
+  state.perguntaIndex = U.clamp(state.perguntaIndex, 0, Math.max(0, perguntas.length - 1));
+  const atual = perguntas[state.perguntaIndex];
+  U.show(atual);
+
+  // garante caixa de resposta visível e com foco
+  const input = U.getAnswerEl(atual);
+  if (input) {
+    input.removeAttribute?.('hidden');
+    input.style.display = 'block';
+    input.style.visibility = 'visible';
+    try { input.focus({ preventScroll: true }); } catch {}
   }
 
-  function applyPergaminhoByBloco(blocoEl) {
-    if (!window.JORNADA_PAPER || typeof window.JORNADA_PAPER.set !== 'function') return;
-    if (!blocoEl) return;
-    let modo = 'v';
-    if (blocoEl.hasAttribute('data-pergaminho-h')) modo = 'h';
-    else if (blocoEl.hasAttribute('data-pergaminho-v')) modo = 'v';
-    else modo = blocoEl.getAttribute('data-pergaminho') || 'h'; // padrão perguntas = horizontal
-    window.JORNADA_PAPER.set(modo);
+  // efeitos e pergaminho (H/V) por bloco
+  if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
+    window.JORNADA_TYPE.run(atual);
   }
+  applyPergaminhoByBloco(bloco);
 
-  function render() {
-    const root = S.root();
-    if (!root) return;
-    const blocos = S.blocos();
-    if (!blocos.length) return;
+  // progresso local
+  U.setProgress(state.perguntaIndex + 1, perguntas.length);
 
-    // Esconde todos os blocos
-    blocos.forEach(U.hide);
-    // Mostra bloco atual
-    const bloco = S.blocoAtivo();
-    U.show(bloco);
+  // botões
+  const prev = S.btnPrev();
+  const next = S.btnNext();
+  if (prev) prev.disabled = (state.blocoIndex === 0 && state.perguntaIndex === 0);
 
-    // Esconde todas as perguntas deste bloco
-    const perguntas = S.perguntasDo(bloco);
-    perguntas.forEach(U.hide);
-    // Mantém índice válido
-    state.perguntaIndex = U.clamp(state.perguntaIndex, 0, Math.max(0, perguntas.length - 1));
+  if (next) {
+    const ultimaPergunta = state.perguntaIndex === perguntas.length - 1;
+    const ultimoBloco = state.blocoIndex === blocos.length - 1;
+    next.textContent = ultimaPergunta ? (ultimoBloco ? 'Finalizar' : 'Concluir bloco ➜') : 'Próxima';
+  }
+}
 
-    // Mostra a pergunta atual
-    const atual = perguntas[state.perguntaIndex];
-    U.show(atual);
-     // Garante que a caixa de resposta apareça e receba foco
-    const input = U.getAnswerEl(atual);
-    if (input) {
-      input.removeAttribute?.('hidden');
-      input.style.display = 'block';
-      input.style.visibility = 'visible';
-      try { input.focus({ preventScroll: true }); } catch {}
-    }
-      
-    // ATIVA OS EFEITOS
-    if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
-      window.JORNADA_TYPE.run(atual);
-    }
-     // === PERGAMINHO (V/H) decididos pelo bloco atual ===
-    applyPergaminhoByBloco(bloco);
-    }
-   
-    // Progresso local do bloco
-    U.setProgress(state.perguntaIndex + 1, perguntas.length);
+// ===== NAVEGAÇÃO =====
+function saveCurrentAnswer() {
+  const bloco = S.blocoAtivo();
+  if (!bloco) return;
+  const perguntas = S.perguntasDo(bloco);
+  const qEl = perguntas[state.perguntaIndex];
+  if (!qEl) return;
+  const input = U.getAnswerEl(qEl);
+  if (input) {
+    const k = U.key(state.blocoIndex, state.perguntaIndex);
+    state.respostas[k] = U.getVal(input);
+    try { localStorage.setItem('JORNADA_RESPOSTAS', JSON.stringify(state.respostas)); } catch {}
+  }
+}
 
-    // Botões
-    const prev = S.btnPrev();
-    const next = S.btnNext();
-    if (prev) prev.disabled = (state.blocoIndex === 0 && state.perguntaIndex === 0);
-
-    if (next) {
-      const ultimaPergunta = state.perguntaIndex === perguntas.length - 1;
-      const ultimoBloco = state.blocoIndex === blocos.length - 1;
-      next.textContent = ultimaPergunta ? (ultimoBloco ? 'Finalizar' : 'Concluir bloco ➜') : 'Próxima';
-    }
-    // Foco amigável no campo da pergunta
-    const input = U.getAnswerEl(atual);
-    if (input) try { input.focus({ preventScroll: true }); } catch {}
-  }
-    
-
- /* ===========================================================================
-    TÍTULO: NAVEGAÇÃO
-    SUBTÍTULO: Próxima / Anterior (com salvamento)
-  =========================================================================== */
 function goNext() {
-    const bloco = S.blocoAtivo();
-    const perguntas = S.perguntasDo(bloco);
+  const bloco = S.blocoAtivo();
+  const perguntas = S.perguntasDo(bloco);
 
-    // Analisa e ajusta a chama antes de salvar
-    const qEl = perguntas[state.perguntaIndex];
-    const input = U.getAnswerEl(qEl);
-    if (input && window.JORNADA_CHAMA && typeof window.JORNADA_CHAMA.ajustar === 'function') {
-      const sentimento = U.analiseSentimento(U.getVal(input));
-      window.JORNADA_CHAMA.ajustar(sentimento);
-    }
+  // salva
+  saveCurrentAnswer();
 
-    // salva a atual
-    saveCurrentAnswer();
-    
-    // ainda há perguntas neste bloco
-    if (state.perguntaIndex < perguntas.length - 1) {
-      state.perguntaIndex++;
-      render();
-      return;
-    }
-    // terminou perguntas deste bloco → vídeo de transição (se houver)
-    const videoSrc = bloco.getAttribute('data-video') || '';
-    const haProximoBloco = state.blocoIndex < S.blocos().length - 1;
-
-    if (haProximoBloco) {
-      playTransition(videoSrc, () => {
-        state.blocoIndex++;
-        state.perguntaIndex = 0;
-        render();
-      });
-    } else {
-      finalize();
-    }
+  // próxima pergunta
+  if (state.perguntaIndex < perguntas.length - 1) {
+    state.perguntaIndex++;
+    render();
+    return;
   }
-    
-    function goPrev() {
-    // volta pergunta
-    if (state.perguntaIndex > 0) {
-      state.perguntaIndex--;
-      render();
-      return;
-    }
-    // volta bloco anterior (última pergunta)
-    if (state.blocoIndex > 0) {
-      state.blocoIndex--;
-      const perguntas = S.perguntasDo(S.blocoAtivo());
-      state.perguntaIndex = Math.max(0, perguntas.length - 1);
-      render();
-    }
-  }
 
-  /* ===========================================================================
-     TÍTULO: VÍDEO DE TRANSIÇÃO
-     SUBTÍTULO: Overlay com skip e fallbacks defensivos
-   =========================================================================== */
-   function playTransition(src, onEnd) {
-    const overlay = S.overlay();
-    const video = S.video();
-    const skip = S.skip();
-    // Sem overlay ou sem vídeo → segue
-    if (!overlay || !video || !src) {
-      onEnd && onEnd();
-      return;
-    }
-    // Preparar player
-    try {
-      video.pause();
-      video.removeAttribute('src'); video.load();
-    } catch {}
-    video.src = src;
-    overlay.classList.remove('hidden');
+  // vídeo de transição e próximo bloco
+  const videoSrc = bloco.getAttribute('data-video') || '';
+  const haProximoBloco = state.blocoIndex < S.blocos().length - 1;
 
-    const cleanup = () => {
-      try { video.pause(); } catch {}
-      overlay.classList.add('hidden');
-      try { video.removeAttribute('src'); video.load(); } catch {}
-      onEnd && onEnd();
-    };
+  if (haProximoBloco) {
+    playTransition(videoSrc, () => {
+      state.blocoIndex++;
+      state.perguntaIndex = 0;
+      render();
+    });
+  } else {
+    finalize();
+  }
+}
 
-    video.onended = cleanup;
-    video.onerror = cleanup;
-    if (skip) skip.onclick = cleanup;
+function goPrev() {
+  if (state.perguntaIndex > 0) {
+    state.perguntaIndex--;
+    render();
+    return;
+  }
+  if (state.blocoIndex > 0) {
+    state.blocoIndex--;
+    const perguntas = S.perguntasDo(S.blocoAtivo());
+    state.perguntaIndex = Math.max(0, perguntas.length - 1);
+    render();
+  }
+}
 
-    // tentativa de autoplay mudo
-    try {
-      video.muted = true;
-      const p = video.play();
-      if (p && p.catch) p.catch(() => {});
-    } catch {}
-   }
+// ===== VÍDEO DE TRANSIÇÃO =====
+function playTransition(src, onEnd) {
+  const overlay = S.overlay();
+  const video = S.video();
+  const skip = S.skip();
+  if (!overlay || !video || !src) { onEnd && onEnd(); return; }
 
-   /* ===========================================================================
-     TÍTULO: FINALIZAÇÃO
-     SUBTÍTULO: Gatilho de conclusão (envio/alerta/resumo)
-    =========================================================================== */
-   function finalize() {
-    // salva última resposta
-    saveCurrentAnswer();
-    console.log('[JORNADA] Finalizado. Respostas:', state.respostas);
-    alert('Jornada concluída! Gratidão pela confiança.');
-    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
-   }
+  try { video.pause(); video.removeAttribute('src'); video.load(); } catch {}
+  video.src = src;
+  overlay.classList.remove('hidden');
 
-   /* ===========================================================================
-     TÍTULO: INICIALIZAÇÃO
-     SUBTÍTULO: Liga eventos e faz o primeiro render
-    =========================================================================== */
-   JC.init = function initJornada() {
-     const root = S.root();
-     if (!root) return;
-   // Aplica pergaminho por rota (#intro/#perguntas/#final)
-     applyPergaminhoByRoute();
-     U.show(root, 'block');
-     const prevBtn = S.btnPrev();
-     const nextBtn = S.btnNext();
-     if (nextBtn) nextBtn.addEventListener('click', goNext);
-     if (prevBtn) prevBtn.addEventListener('click', goPrev);
-     // Delegação (fallback): captura cliques em qualquer botão com data-action
-     document.addEventListener('click', (ev) => {
-     const n = ev.target.closest?.('[data-action="next"]');
-     const p = ev.target.closest?.('[data-action="prev"]');
-     if (n) { ev.preventDefault(); goNext(); }
-     if (p) { ev.preventDefault(); goPrev(); }
-     });
-    // tenta restaurar respostas antigas (opcional)
-    try {
-      const stash = localStorage.getItem('JORNADA_RESPOSTAS');
-      if (stash) state.respostas = JSON.parse(stash) || state.respostas;
-    } catch {}
-    // O render inicial
-    render();
-   };
+  const cleanup = () => {
+    try { video.pause(); } catch {}
+    overlay.classList.add('hidden');
+    try { video.removeAttribute('src'); video.load(); } catch {}
+    onEnd && onEnd();
+  };
 
-   // Auto-init se o canvas existir
-   document.addEventListener('DOMContentLoaded', () => {
-    if (S.root()) JC.init();
-   });
-  
+  video.onended = cleanup;
+  video.onerror = cleanup;
+  if (skip) skip.onclick = cleanup;
+
+  try {
+    video.muted = true;
+    const p = video.play();
+    if (p && p.catch) p.catch(() => {});
+  } catch {}
+}
+
+// ===== FINALIZAÇÃO =====
+function finalize() {
+  saveCurrentAnswer();
+  console.log('[JORNADA] Finalizado. Respostas:', state.respostas);
+  alert('Jornada concluída! Gratidão pela confiança.');
+  try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
+}
+
+// ===== INIT =====
+JC.init = function initJornada() {
+  const root = S.root();
+  if (!root) return;
+
+  // rota intro/final = vertical
+  applyPergaminhoByRoute();
+
+  const prevBtn = S.btnPrev();
+  const nextBtn = S.btnNext();
+  if (nextBtn) nextBtn.addEventListener('click', goNext);
+  if (prevBtn) prevBtn.addEventListener('click', goPrev);
+
+  // fallback por delegação
+  document.addEventListener('click', (ev) => {
+    const n = ev.target.closest?.('[data-action="next"]');
+    const p = ev.target.closest?.('[data-action="prev"]');
+    if (n) { ev.preventDefault(); goNext(); }
+    if (p) { ev.preventDefault(); goPrev(); }
+  });
+
+  // restaura stash (opcional)
+  try {
+    const stash = localStorage.getItem('JORNADA_RESPOSTAS');
+    if (stash) state.respostas = JSON.parse(stash) || state.respostas;
+  } catch {}
+
+  render();
+};
+
+// auto-init
+document.addEventListener('DOMContentLoaded', () => {
+  if (S.root()) JC.init();
+  window.addEventListener('hashchange', applyPergaminhoByRoute);
+});
+ 
    /* ===========================================================================
      TÍTULO: API PÚBLICA (OPCIONAL)
      SUBTÍTULO: Métodos acessíveis via window.JC
