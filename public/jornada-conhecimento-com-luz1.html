@@ -97,6 +97,177 @@
   <button id="btnNext" class="btn btn-primary"  data-action="next">Próxima</button>
 </div>
 
+  <!-- ===== SELFIE COM A IRMANDADE (intro) =================================== -->
+<section id="selfie-join" class="card pergaminho pergaminho-v" style="margin-top:16px;">
+  <div class="conteudo-pergaminho">
+    <h2 style="margin-top:0;">Entre na Irmandade ✨</h2>
+    <p>Faça uma foto agora ou envie da galeria. Ajuste e gere sua imagem “4 + você”.</p>
+
+    <div class="selfie-row">
+      <div class="selfie-left">
+        <label class="btn btn-primary" for="selfieInput">📸 Tirar/Enviar foto</label>
+        <input id="selfieInput" type="file" accept="image/*" capture="environment" style="display:none" />
+
+        <div class="selfie-controls">
+          <label>Zoom
+            <input id="selfieScale" type="range" min="0.6" max="2.0" step="0.01" value="1">
+          </label>
+          <label>Horizontal
+            <input id="selfieOffsetX" type="range" min="-300" max="300" step="1" value="0">
+          </label>
+          <label>Vertical
+            <input id="selfieOffsetY" type="range" min="-300" max="300" step="1" value="0">
+          </label>
+          <small class="muted">Dica: mova os controles para alinhar seu rosto no espaço livre da imagem.</small>
+        </div>
+
+        <div class="selfie-actions">
+          <button id="btnRenderSelfie" class="btn">✨ Gerar minha imagem</button>
+          <a id="btnDownloadSelfie" class="btn btn-secondary" download="irmandade-mais-eu.png" href="#">⬇️ Baixar</a>
+        </div>
+      </div>
+
+      <div class="selfie-right">
+        <canvas id="selfieCanvas" width="1200" height="800" style="width:100%;height:auto;background:#000;border-radius:12px;"></canvas>
+        <small class="muted">Pré-visualização</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .selfie-row{
+    display:grid; grid-template-columns: 1fr 1.3fr; gap:16px; align-items:start;
+  }
+  .selfie-left .selfie-controls{ display:flex; flex-direction:column; gap:10px; margin:12px 0; }
+  .selfie-left label{ display:flex; flex-direction:column; gap:6px; font-weight:600; }
+  .selfie-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
+  @media (max-width: 860px){
+    .selfie-row{ grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+(function(){
+  // ===== Ajuste aqui se seus arquivos tiverem outro caminho/nome =====
+  const BG_URL     = "/assets/img/irmandade-quarteto-bg.png";   // 4 pessoas, espaço vago
+  const GLOW_URL   = "/assets/img/moldura-brilho.png";          // opcional (circular com transparência)
+  // Posição/tamanho do "buraco" para o rosto (em pixels do canvas 1200x800)
+  const FACE_X = 820;   // centro do círculo (x)
+  const FACE_Y = 410;   // centro do círculo (y)
+  const FACE_R = 150;   // raio do recorte (círculo)
+
+  const $ = (sel)=>document.querySelector(sel);
+  const input   = $("#selfieInput");
+  const cv      = $("#selfieCanvas");
+  const ctx     = cv.getContext("2d");
+  const rScale  = $("#selfieScale");
+  const rX      = $("#selfieOffsetX");
+  const rY      = $("#selfieOffsetY");
+  const btnGo   = $("#btnRenderSelfie");
+  const aDown   = $("#btnDownloadSelfie");
+
+  const bgImg   = new Image(); bgImg.crossOrigin = "anonymous"; bgImg.src = BG_URL;
+  const glowImg = new Image(); glowImg.crossOrigin = "anonymous"; glowImg.src = GLOW_URL;
+  let userImg   = null; // Image()
+
+  // estado de ajuste
+  const st = {
+    scale: parseFloat(rScale.value),
+    offX:  parseInt(rX.value,10),
+    offY:  parseInt(rY.value,10),
+  };
+
+  // util: desenha tudo
+  function renderAll(){
+    // fundo (bg)
+    ctx.clearRect(0,0,cv.width,cv.height);
+    if (bgImg.complete) ctx.drawImage(bgImg, 0, 0, cv.width, cv.height);
+
+    // rosto (se existir)
+    if (userImg){
+      ctx.save();
+      // cria máscara circular
+      ctx.beginPath();
+      ctx.arc(FACE_X, FACE_Y, FACE_R, 0, Math.PI*2);
+      ctx.closePath();
+      ctx.clip();
+
+      // desenha a foto ajustada
+      const scale = st.scale || 1;
+      // centraliza a foto no círculo com offsets
+      // tamanho "base" da foto será 2*R (diâmetro), multiplicado pelo zoom
+      const drawW = FACE_R*2*scale;
+      const drawH = FACE_R*2*scale;
+      const dx = FACE_X - drawW/2 + st.offX;
+      const dy = FACE_Y - drawH/2 + st.offY;
+      ctx.drawImage(userImg, dx, dy, drawW, drawH);
+
+      ctx.restore();
+    }
+
+    // brilho/moldura (opcional)
+    if (glowImg && glowImg.complete){
+      ctx.drawImage(glowImg, FACE_X - FACE_R*1.2, FACE_Y - FACE_R*1.2, FACE_R*2.4, FACE_R*2.4);
+    }
+  }
+
+  function loadFromLocal(){
+    try{
+      const saved = localStorage.getItem("IRMANDADE_SELFIE_DATAURL");
+      if (!saved) return;
+      const img = new Image();
+      img.onload = ()=>{ userImg = img; renderAll(); };
+      img.src = saved;
+    }catch(e){}
+  }
+
+  // listeners
+  input.addEventListener("change", (ev)=>{
+    const f = ev.target.files && ev.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = (e)=>{
+      const img = new Image();
+      img.onload = ()=>{
+        userImg = img;
+        // guarda original no localStorage (limite ~5MB prático)
+        try{ localStorage.setItem("IRMANDADE_SELFIE_DATAURL", e.target.result); }catch(_){}
+        renderAll();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(f);
+  });
+
+  [rScale, rX, rY].forEach(el=>{
+    el.addEventListener("input", ()=>{
+      st.scale = parseFloat(rScale.value);
+      st.offX  = parseInt(rX.value,10);
+      st.offY  = parseInt(rY.value,10);
+      renderAll();
+    });
+  });
+
+  btnGo.addEventListener("click", ()=>{
+    // força re-render e prepara download
+    renderAll();
+    const url = cv.toDataURL("image/png");
+    aDown.href = url;
+    // também salva a imagem final caso queira mostrar depois na jornada
+    try{ localStorage.setItem("IRMANDADE_SELFIE_FINAL", url); }catch(_){}
+  });
+
+  // quando assets de fundo carregarem, redesenha
+  bgImg.onload = renderAll;
+  glowImg.onload = renderAll;
+
+  // tenta recuperar selfie anterior
+  loadFromLocal();
+})();
+</script>
+
+
 <!-- =========================
      TÍTULO: BLOCO 1
      SUBTÍTULO: defina 5 perguntas; vídeo toca ao concluir o bloco
