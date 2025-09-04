@@ -5,7 +5,17 @@
   COMPATIBILIDADE: independe de frameworks; usa apenas DOM nativo
 ============================================================================= */
 (function () {
-  'use strict';
+  'use strict';
+
+  // [debug] carregou o arquivo
+  console.log("[load] jornada-controller.js iniciado");
+
+  /* ============================================================
+     TÍTULO: NAMESPACE
+     SUBTÍTULO: Expõe uma API pequena no window para depuração
+  ============================================================ */
+  const JC = (window.JC = window.JC || {});
+
 
   /* ===========================================================================
      TÍTULO: NAMESPACE
