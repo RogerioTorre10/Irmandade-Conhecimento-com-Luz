@@ -275,20 +275,28 @@
 <!-- Boot robusto: só roda quando o renderer está pronto -->
 <script>
 (function () {
-  function boot() {
-    if (window.JORNADA_RENDER?.renderIntro) {
+  function safeBoot() {
+    if (window.JORNADA_RENDER && typeof window.JORNADA_RENDER.renderIntro === 'function') {
       document.body.classList.add('jornada-active');
       const route = (location.hash || '#intro').slice(1);
-      if (route === 'perguntas') JORNADA_RENDER.renderPerguntas(0);
-      else if (route === 'final') JORNADA_RENDER.renderFinal();
-      else JORNADA_RENDER.renderIntro();
+      if (route === 'perguntas') {
+        window.JORNADA_RENDER.renderPerguntas(0);
+        window.JORNADA_PAPER?.set?.('h');
+      } else if (route === 'final') {
+        window.JORNADA_RENDER.renderFinal();
+        window.JORNADA_PAPER?.set?.('v');
+      } else {
+        window.JORNADA_RENDER.renderIntro();
+        window.JORNADA_PAPER?.set?.('v');
+      }
       return true;
     }
     return false;
   }
-  if (!boot()) {
-    let tries = 0; const timer = setInterval(() => {
-      if (boot() || ++tries > 80) clearInterval(timer); // 4s
+  if (!safeBoot()) {
+    let tries = 0;
+    const timer = setInterval(() => {
+      if (safeBoot() || ++tries > 50) clearInterval(timer); // tenta ~5s
     }, 100);
   }
 })();
