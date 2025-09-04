@@ -1,108 +1,145 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Jornadas · Irmandade Conhecimento com Luz</title>
+
+  <!-- Estilos globais -->
   <link rel="stylesheet" href="/styles.css">
-  <link rel="stylesheet" href="/css/chama.css"> <!-- 🔥 estilo da chama -->
+  <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png">
+  <link rel="stylesheet" href="/css/chama.css">
+
+  <!-- CSS mínimo desta página (catálogo) -->
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #f9f9f9; color: #333; }
+
+    .site-header {
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      padding: 16px; background: #1f2937; color: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,.1); text-align: center;
+    }
+
+    .lang-switch { display: flex; gap: 8px; justify-content: center; padding: 12px; }
+    .lang-btn {
+      padding: 8px 16px; border-radius: 8px; border: 1px solid #fff;
+      background: #374151; color: #fff; cursor: pointer; transition: background .3s;
+    }
+    .lang-btn:hover { background: #4b5563; }
+
+    .container { max-width: 900px; margin: 24px auto; padding: 0 16px; }
+    .card {
+      background: #f6efe0 !important; border-radius: 14px; box-shadow: 0 8px 28px rgba(0,0,0,.12);
+      padding: 32px; position: relative; z-index: 1;
+    }
+    .pergaminho-v {
+      background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important;
+      background-size: cover !important; background-position: center !important; min-height: 52vh !important;
+    }
+    .card-content { background: transparent !important; position: relative; z-index: 2; padding: 20px; }
+
+    .btn {
+      display: inline-block; padding: 12px 24px; border-radius: 10px; border: 0;
+      background: #1f2937; color: #fff; font-weight: 600; text-decoration: none;
+      transition: transform .15s ease, filter .2s ease;
+    }
+    .btn:hover { transform: translateY(-1px); filter: brightness(.95); }
+    .btn-primary { background: #6b21a8; }
+    .btn-primary:hover { background: #7c3aed; }
+    .btn + .btn { margin-left: 12px; }
+
+    .jornada-perguntas { margin-top: 32px; }
+    .footer-actions { display: flex; gap: 12px; justify-content: center; margin-top: 24px; }
+
+    /* Datilografia (reforço local) */
+    .lumen-typing { white-space: pre-wrap; position: relative; }
+    .lumen-typing::after { content: "▌"; margin-left: 2px; opacity: .75; animation: lumenBlink 1s steps(2, end) infinite; }
+    .lumen-typing.typing-done::after { content: ""; animation: none; }
+    @keyframes lumenBlink { 50% { opacity: 0; } }
+
+    .site-footer { text-align: center; padding: 16px; opacity: .6; font-size: .85rem; }
+
+    @media (max-width: 600px) {
+      .card { margin: 16px; padding: 20px; }
+      .site-header h1 { font-size: 1.6rem; }
+      .btn { padding: 10px 16px; font-size: .9rem; }
+    }
+  </style>
 </head>
 
- <body>
-  <!-- Casca estática da página -->
+<body>
   <main id="page-shell">
-     <header class="site-header">
-       <h1>Jornadas Disponíveis</h1>
-       <p>Escolha por onde começar.</p>
-       <h2>Irmandade Conhecimento com Luz</h2>
-       <p>Fé, ciência e filosofia caminhando juntas para despertar e guiar. 🌟</p>
-     </header
+    <header class="site-header">
+      <!-- Chama grande (CSS em /css/chama.css) -->
+      <div class="chama chama-lg">
+        <span></span><span></span><span></span>
+      </div>
 
-    <!-- /public/jornadas.html -->
- <nav class="lang-switch" aria-label="Escolher idioma">
-  <button class="lang-btn" data-lang="pt">PT</button>
-  <button class="lang-btn" data-lang="en">EN</button>
-  <button class="lang-btn" data-lang="es">ES</button>
- </nav>
- <section class="container">
-  <!-- 🔥 Chama grande na home -->
-  <div class="chama"><span></span><span></span><span></span></div>
+      <h1 data-typing data-text="Jornadas Disponíveis" data-speed="40" data-cursor="true"></h1>
+      <p  data-typing data-text="Escolha por onde começar sua transformação." data-speed="30" data-cursor="true"></p>
 
-     <a class="btn btn-primary" href="/jornadas.html">Explorar Jornadas</a>
-  </section>
-      
-   <section id="app" class="container">
-  <div class="card">
-    <h2>Jornada Conhecimento com Luz - Essencial</h2>
-    <p>Uma viagem interior com 32 reflexões essenciais.</p>
+      <h2>Irmandade Conhecimento com Luz</h2>
+      <p>Fé, ciência e filosofia caminhando juntas para despertar e guiar. 🌟</p>
+    </header>
 
-    <!-- Botão SPA que o JS vai capturar -->
-    <button id="btnComecar" class="btn btn-primary">Iniciar Jornada</button>
+    <!-- Idiomas -->
+    <nav class="lang-switch" aria-label="Escolher idioma">
+      <button class="lang-btn" data-lang="pt">PT</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="es">ES</button>
+    </nav>
 
-    <!-- Mantém o Voltar com link normal -->
-    <a class="btn" href="/">Voltar ao início</a>
-  </div>
-  </section>
-    
-  <section class="jornada-perguntas">
-   <header>
-    <h2>📝 Perguntas da Jornada</h2>
-   </header>
+    <!-- Card da Jornada Essencial (pergaminho vertical na vitrine) -->
+    <section class="container">
+      <div class="card pergaminho pergaminho-v">
+        <div class="card-content">
+          <h2 data-typing data-text="Jornada Conhecimento com Luz — Essencial" data-speed="40" data-cursor="true"></h2>
+          <p>Uma viagem interior com 32 reflexões essenciais.</p>
+          <div class="actions">
+            <a id="btnComecar" class="btn btn-primary" href="/jornada-conhecimento-com-luz1.html#intro">Iniciar Jornada</a>
+            <a class="btn" href="/">Voltar ao Início</a>
+          </div>
+        </div>
+      </div>
+    </section>
 
-   <div class="pergunta">
-    <p><strong>Pergunta 1:</strong> Quem é você neste momento da vida?</p>
-    <textarea id="mock-q1" placeholder="Digite sua resposta..."></textarea>
-  </div>
+    <!-- (Opcional) Mais jornadas futuramente... -->
 
- <div class="pergunta">
-    <p><strong>Pergunta 2:</strong> O que você mais busca nesta caminhada?</p>
-    <textarea id="mock-q2" placeholder="Digite sua resposta..."></textarea>
-  </div>
+    <footer class="site-footer">
+      <small>© 2025 Irmandade Conhecimento com Luz</small>
+    </footer>
+  </main>
 
-  <footer>
-    <button id="btnVoltarIntro" data-action="prev">⏪ Voltar à Intro</button>
-    <button id="btnProxima" data-action="next">⏩ Próxima</button>
-  </footer>
-</section>
+  <!-- Datilografia leve (apenas nesta página) -->
+  <script>
+    (function () {
+      function typeWriter(el, text, speed, showCursor) {
+        if (!el) return;
+        el.textContent = '';
+        if (showCursor) el.classList.add('lumen-typing');
+        let i = 0;
+        (function step() {
+          if (i < text.length) { el.textContent += text.charAt(i++); setTimeout(step, speed); }
+          else { el.classList.add('typing-done'); }
+        })();
+      }
+      function runTyping(root) {
+        (root || document).querySelectorAll('[data-typing]').forEach(el => {
+          if (el.dataset._typed) return;
+          const t = el.getAttribute('data-text') || el.textContent || '';
+          const spd = parseInt(el.getAttribute('data-speed') || '26', 10);
+          const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
+          el.dataset._typed = '1';
+          typeWriter(el, t, spd, cur);
+        });
+      }
+      document.addEventListener('DOMContentLoaded', () => runTyping(document));
+    })();
+  </script>
 
-
-  <!-- Canvas dinâmico da Jornada (inicia vazio) -->
-  <div id="videoOverlay" class="video-overlay hidden">
-  <video id="videoTransicao" class="video-player" playsinline></video>
- </div>
-   </section>
-
-   <div id="video-overlay" class="video-overlay hidden">
-  <video id="transition-video" class="video-player" playsinline></video>
-</div>
-
-  <footer class="site-footer">
-    <small>© 2025 Irmandade Conhecimento com Luz</small>
-  </footer>
-</main>
-      
-<!-- Boot robusto: só roda quando o renderer está pronto -->
-<script>
-(function () {
-  function boot() {
-    if (window.JORNADA_RENDER?.renderIntro) {
-      document.body.classList.add('jornada-active');
-      const route = (location.hash || '#intro').slice(1);
-      if (route === 'perguntas') JORNADA_RENDER.renderPerguntas(0);
-      else if (route === 'final') JORNADA_RENDER.renderFinal();
-      else JORNADA_RENDER.renderIntro();
-      return true;
-    }
-    return false;
-  }
-  if (!boot()) {
-    let tries = 0; const timer = setInterval(() => {
-      if (boot() || ++tries > 40) clearInterval(timer); // 4s
-    }, 100);
-  }
-})();
-</script>
+  <!-- Somente scripts leves/seguros nesta página de catálogo -->
+  <script defer src="/config.js"></script>
+  <script defer src="/i18n/i18n.js"></script>
+  <script defer src="/jornada-micro.js"></script>
 </body>
 </html>
-
-
