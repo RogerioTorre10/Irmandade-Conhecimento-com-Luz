@@ -282,8 +282,9 @@ function goNext() {
   JC.init = function initJornada() {
      const root = S.root();
      if (!root) return;
-+    // garante que o canvas fique visível (o HTML começa com display:none)
-+    U.show(root, 'block');
+ // Aplica pergaminho por rota (#intro/#perguntas/#final)
+     applyPergaminhoByRoute();
+     U.show(root, 'block');
      const prevBtn = S.btnPrev();
      const nextBtn = S.btnNext();
      if (nextBtn) nextBtn.addEventListener('click', goNext);
