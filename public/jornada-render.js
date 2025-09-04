@@ -41,11 +41,12 @@
     }
   }
 
-  const MasterAPI = {
-    async renderIntro() {
-      // intro → papel vertical
-      setPaper('v');
-
+  async renderIntro() {
+  console.log("[renderer] renderIntro()");
+  // intro → papel vertical
+  setPaper('v');
+}
+  
       // Se existe o controller, deixa ele orquestrar
       if (g.JC && typeof g.JC.render === "function") {
         console.log('[MasterAPI] Delegando renderIntro para JC.render');
@@ -68,8 +69,7 @@
     },
 
     async renderPerguntas(fileOrIndex = 0) {
-      // perguntas → papel horizontal (default), controller pode sobrescrever por bloco
-      setPaper('h');
+    console.log("[renderer] renderPerguntas()", fileOrIndex);
 
       if (g.JC && typeof g.JC.render === "function") {
         console.log('[MasterAPI] Delegando renderPerguntas para JC.render');
@@ -89,8 +89,7 @@
     },
 
     async renderFinal() {
-      // final → papel vertical
-      setPaper('v');
+  console.log("[renderer] renderFinal()");
 
       if (g.JC && typeof g.JC.render === "function") {
         console.log('[MasterAPI] Delegando renderFinal para JC.render');
@@ -119,6 +118,7 @@
     },
 
     start() {
+      console.log("[renderer] start()");   // novo log de debug
       // garante papel coerente ao iniciar conforme rota
       const route = (location.hash || '#intro').slice(1);
       if (route === 'perguntas') setPaper('h'); else setPaper('v');
