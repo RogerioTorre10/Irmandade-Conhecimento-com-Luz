@@ -257,7 +257,6 @@
  <script defer src="/config.js"></script>
 <script defer src="/jornada-utils.js"></script>
 <script defer src="/jornada-core.js"></script>
-
 <script defer src="/jornada-auth.js"></script>
 <script defer src="/jornada-chama.js"></script>
 <script defer src="/jornada-paper-qa.js"></script>
@@ -266,8 +265,11 @@
 <script defer src="/jornada-micro.js"></script>
 <script defer src="/jornada-typing.js"></script>
 
+<!-- Controller antes ou depois do render funciona, mas o BOOT precisa do render pronto -->
 <script defer src="/jornada-controller.js"></script>
 <script defer src="/jornada-render.js"></script>
+
+<!-- Boot SEMPRE por último -->
 <script defer src="/jornada-bootstrap.js"></script>
 
 <!-- Boot robusto: só roda quando o renderer está pronto -->
