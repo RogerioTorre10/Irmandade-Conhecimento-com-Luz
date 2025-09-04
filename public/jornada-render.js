@@ -1,19 +1,3 @@
-/* =============================================================================
-   TÍTULO: RENDER UNIFICADO
-   SUBTÍTULO: Master + Plus + Junior no mesmo arquivo
-   LOCALIZAÇÃO DOS MÓDULOS NESTE ARQUIVO
-     === RENDER MASTER ===
-       - Subtítulo: Base CSS mínimo
-       - Subtítulo: MasterAPI (renderIntro/renderPerguntas/renderFinal/start)
-       - Subtítulo: Export do módulo master
-     === RENDER PLUS ===
-       - Subtítulo: PlusAPI (herda do Master e adiciona .layout-plus)
-     === RENDER JUNIOR ===
-       - Subtítulo: JuniorAPI (herda do Master, remove vídeos pesados)
-     === SELETOR DE VARIANTE ===
-       - Subtítulo: Escolha pelo body[data-layout] e exposição da API pública
-============================================================================= */
-
 (function () {
   const g = window;
 
@@ -22,18 +6,17 @@
      SUBTÍTULO: Base CSS mínimo (opcional) + API master
   =========================================================================== */
 
-  // Subtítulo: Base CSS mínimo (mantém apenas se você quiser um fallback visual)
   function ensureBaseCSS() {
     if (document.getElementById("jr-base-css")) return;
     const css = `
-      .card{max-width:900px;margin:24px auto;padding:20px;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.12);background:#fff}
-      .pergaminho{background:#f6efe0;}
-      .pergaminho-v{background-image:url('/assets/img/pergaminho-vert.png');background-size:cover;background-position:center;}
-      .pergaminho-h{background-image:url('/assets/img/pergaminho-horiz.png');background-size:cover;background-position:center;}
-      .btn{display:inline-block;padding:.7rem 1.2rem;border-radius:10px;border:0;background:#1f2937;color:#fff;font-weight:600;cursor:pointer}
-      .btn + .btn{margin-left:.5rem}
-      .title{font-size:1.6rem;margin:0 0 .5rem 0}
-      .muted{opacity:.75}
+      .card { max-width: 900px; margin: 24px auto; padding: 20px; border-radius: 14px; box-shadow: 0 8px 28px rgba(0,0,0,.12); background: #fff; }
+      .pergaminho { background: #f6efe0; }
+      .pergaminho-v { background-image: url('/assets/img/pergaminho-rasgado-vert.png'); background-size: cover; background-position: center; }
+      .pergaminho-h { background-image: url('/assets/img/pergaminho-rasgado-horiz.png'); background-size: cover; background-position: center; }
+      .btn { display: inline-block; padding: .7rem 1.2rem; border-radius: 10px; border: 0; background: #1f2937; color: #fff; font-weight: 600; cursor: pointer; }
+      .btn + .btn { margin-left: .5rem; }
+      .title { font-size: 1.6rem; margin: 0 0 .5rem 0; }
+      .muted { opacity: .75; }
     `;
     const style = document.createElement("style");
     style.id = "jr-base-css";
@@ -42,84 +25,112 @@
   }
   ensureBaseCSS();
 
-  // Subtítulo: MasterAPI — delega para JornadaCtrl quando disponível
+  // helper leve para forçar papel sem depender do controller
+  function setPaper(mode) {
+    if (g.JORNADA_PAPER && typeof g.JORNADA_PAPER.set === 'function') {
+      try { g.JORNADA_PAPER.set(mode); } catch {}
+    } else {
+      // fallback defensivo: aplica a classe no #jornada-canvas, se existir
+      const canvas = document.getElementById('jornada-canvas');
+      if (canvas) {
+        canvas.classList.remove('pergaminho-v', 'pergaminho-h');
+        canvas.classList.add(mode === 'h' ? 'pergaminho-h' : 'pergaminho-v');
+      }
+    }
+  }
+
   const MasterAPI = {
     async renderIntro() {
-      if (g.JornadaCtrl && typeof g.JornadaCtrl.renderIntro === "function") {
-        return g.JornadaCtrl.renderIntro();
+      // intro → papel vertical
+      setPaper('v');
+
+      // Se existe o controller, deixa ele orquestrar
+      if (g.JC && typeof g.JC.render === "function") {
+        console.log('[MasterAPI] Delegando renderIntro para JC.render');
+        return g.JC.render();
       }
-      // Fallback mínimo
+
+      console.warn('[MasterAPI] Fallback: JC.render não disponível');
       const sec = document.createElement("section");
-      sec.className = "card pergaminho pergaminho-v";  // intro sempre vertical
+      sec.className = "card pergaminho pergaminho-v";
       sec.innerHTML = `
         <h2 class="title">Bem-vindo(a) à Jornada</h2>
-        <p class="muted">Renderer Master (fallback). Verifique se JornadaCtrl está carregado.</p>
+        <p class="muted">Renderer Master (fallback). Verifique se jornada-controller.js está carregado.</p>
         <div class="actions">
           <button class="btn" onclick="window.JORNADA_RENDER && window.JORNADA_RENDER.renderPerguntas(0)">Começar</button>
         </div>
       `;
-      document.getElementById("jornada-conteudo")?.appendChild(sec);
+      const target = document.getElementById("jornada-conteudo");
+      if (target) target.appendChild(sec);
       return sec;
     },
 
     async renderPerguntas(fileOrIndex = 0) {
-      if (g.JornadaCtrl && typeof g.JornadaCtrl.renderPerguntas === "function") {
-        return g.JornadaCtrl.renderPerguntas(fileOrIndex);
+      // perguntas → papel horizontal (default), controller pode sobrescrever por bloco
+      setPaper('h');
+
+      if (g.JC && typeof g.JC.render === "function") {
+        console.log('[MasterAPI] Delegando renderPerguntas para JC.render');
+        return g.JC.render();
       }
-      // Fallback mínimo
+
+      console.warn('[MasterAPI] Fallback: JC.render não disponível');
       const sec = document.createElement("section");
-      sec.className = "card pergaminho pergaminho-h";  // perguntas sempre horizontal
+      sec.className = "card pergaminho pergaminho-h";
       sec.innerHTML = `
         <h2 class="title">Perguntas</h2>
-        <p class="muted">Renderer Master (fallback). Impossível carregar perguntas sem JornadaCtrl.</p>
+        <p class="muted">Renderer Master (fallback). Impossível carregar perguntas sem jornada-controller.js.</p>
       `;
-      document.getElementById("jornada-conteudo")?.appendChild(sec);
+      const target = document.getElementById("jornada-conteudo");
+      if (target) target.appendChild(sec);
       return sec;
     },
 
-   async renderFinal() {
-  if (g.JornadaCtrl && typeof g.JornadaCtrl.renderFinal === "function") {
-    return g.JornadaCtrl.renderFinal();
-  }
+    async renderFinal() {
+      // final → papel vertical
+      setPaper('v');
 
-  // fallback mínimo com botão
-  const sec = document.createElement("section");
-  sec.className = "card pergaminho pergaminho-v";  // final sempre vertical
-  sec.innerHTML = `
-    <h2 class="title">Finalização</h2>
-    <p class="muted">Renderer Master (fallback). Obrigado por participar.</p>
-    <button id="btnFinalizar" class="btn btn-primary">Concluir Jornada</button>
-  `;
-  document.getElementById("jornada-conteudo").appendChild(sec);
+      if (g.JC && typeof g.JC.render === "function") {
+        console.log('[MasterAPI] Delegando renderFinal para JC.render');
+        return g.JC.render();
+      }
 
-  // listener do botão
-  const btn = sec.querySelector("#btnFinalizar");
-  if (btn) {
-    btn.addEventListener("click", () => {
-      const respostas = (window.JORNADA_STATE && window.JORNADA_STATE.respostas) || {};
-      console.log('[FINALIZAR] clique btn, respostas=', respostas);
-      JORNADA_FINALIZAR(respostas);
-    });
-  } 
-  return sec;
-   },
+      console.warn('[MasterAPI] Fallback: JC.render não disponível');
+      const sec = document.createElement("section");
+      sec.className = "card pergaminho pergaminho-v";
+      sec.innerHTML = `
+        <h2 class="title">Finalização</h2>
+        <p class="muted">Renderer Master (fallback). Obrigado por participar.</p>
+        <button id="btnFinalizar" class="btn btn-primary">Concluir Jornada</button>
+      `;
+      const target = document.getElementById("jornada-conteudo");
+      if (target) target.appendChild(sec);
+      const btn = sec.querySelector("#btnFinalizar");
+      if (btn) {
+        btn.addEventListener("click", () => {
+          const respostas = (window.JORNADA_STATE && window.JORNADA_STATE.respostas) || {};
+          console.log('[FINALIZAR] clique btn, respostas=', respostas);
+          if (window.JORNADA_FINALIZAR) JORNADA_FINALIZAR(respostas);
+        });
+      }
+      return sec;
+    },
 
     start() {
-      // Se existir um controlador oficial, deixa ele conduzir o fluxo
-      if (g.JornadaCtrl && typeof g.JornadaCtrl.start === "function") {
-        g.JornadaCtrl.start();
+      // garante papel coerente ao iniciar conforme rota
+      const route = (location.hash || '#intro').slice(1);
+      if (route === 'perguntas') setPaper('h'); else setPaper('v');
+
+      if (g.JC && typeof g.JC.init === "function") {
+        console.log('[MasterAPI] Iniciando com JC.init');
+        g.JC.init();
         return;
       }
-      // Fallback: abre a intro
-      if (typeof g.renderIntro === "function") {
-        g.renderIntro();
-        return;
-      }
-      alert("Nenhum renderer disponível.");
+      console.warn('[MasterAPI] Fallback: JC.init não disponível');
+      this.renderIntro();
     },
   };
 
-  // Subtítulo: Export do módulo master
   g.JRENDER = g.JRENDER || {};
   g.JRENDER.master = MasterAPI;
 
@@ -137,56 +148,37 @@
         sec?.classList?.add("layout-plus");
         return sec;
       },
-     async renderPerguntas(file = "jornadas_barraonctador.html") {
-  const sec = await base.renderPerguntas(file);
-  sec.classList.add("layout-junior");
+      async renderPerguntas(fileOrIndex = 0) {
+        const sec = await base.renderPerguntas(fileOrIndex);
+        sec?.classList?.add("layout-plus");
 
-  // --- APLICA DATILOGRAFIA NAS PERGUNTAS ---
-  const T = window.JORNADA_TYPE;
-  const h = sec.querySelector('.pergunta__titulo');
-  const p = sec.querySelector('.pergunta__apoio');
+        // datilografia opcional (se existir JORNADA_TYPE e os seletores)
+        const T = window.JORNADA_TYPE;
+        const h = sec.querySelector?.('.pergunta__titulo');
+        const p = sec.querySelector?.('.pergunta__apoio');
+        if (T && h) T.typeIt(h, h.textContent, 24);
+        if (T && p) T.typeIt(p, p.textContent, 18);
 
-  if (T && h) T.typeIt(h, h.textContent, 24);
-  if (T && p) T.typeIt(p, p.textContent, 18);
-  // =================== PROGRESSO (BLOCOS + PERGUNTAS) ===================
-try {
-  const UI = window.JORNADA_UI || {};
-  const J  = window.JORNADA_STATE || {};
-
-  // 1) Badge do topo (por bloco) — usa J.blocoAtual/J.totalBlocos se existir
-  if (UI.setProgressoBlocos && typeof J.blocoAtual === 'number' && typeof J.totalBlocos === 'number') {
-    UI.setProgressoBlocos(J.blocoAtual, J.totalBlocos);
-  }
-
-  // 2) Barra interna (perguntas dentro do bloco)
-  if (UI.setProgressoPerguntas) {
-    // tenta pegar do estado; se não houver, estima pela DOM desse 'sec'
-    const totalPerguntas =
-      Math.max(
-        1,
-        J.perguntasNoBloco ||
-        sec.querySelectorAll('[data-role="pergunta"], .pergunta').length ||
-        5
-      );
-
-    const idxPergunta =
-      Math.max(
-        0,
-        Math.min(
-          totalPerguntas,
-          (J.idxPerguntaNoBloco ?? 0)
-        )
-      );
-
-    const pct = Math.round((idxPergunta / totalPerguntas) * 100);
-    UI.setProgressoPerguntas(pct);
-  }
-} catch (e) {
-  console.warn('Progresso (renderPerguntas) falhou:', e);
-}
-  return sec;
-},
-       
+        // progresso opcional (defensivo)
+        try {
+          const UI = window.JORNADA_UI || {};
+          const J  = window.JORNADA_STATE || {};
+          if (UI.setProgressoBlocos && typeof J.blocoAtual === 'number' && typeof J.totalBlocos === 'number') {
+            UI.setProgressoBlocos(J.blocoAtual, J.totalBlocos);
+          }
+          if (UI.setProgressoPerguntas) {
+            const totalPerguntas =
+              Math.max(1, J.perguntasNoBloco || sec.querySelectorAll?.('[data-role="pergunta"], .pergunta').length || 5);
+            const idxPergunta =
+              Math.max(0, Math.min(totalPerguntas, (J.idxPerguntaNoBloco ?? 0)));
+            const pct = Math.round((idxPergunta / totalPerguntas) * 100);
+            UI.setProgressoPerguntas(pct);
+          }
+        } catch (e) {
+          console.warn('Progresso (renderPerguntas) falhou:', e);
+        }
+        return sec;
+      },
       async renderFinal() {
         const sec = await base.renderFinal();
         sec?.classList?.add("layout-plus");
@@ -209,12 +201,11 @@ try {
       async renderIntro() {
         const sec = await base.renderIntro();
         sec?.classList?.add("layout-junior");
-        // Simplificação: remove vídeos pesados na intro
         sec?.querySelectorAll?.("video").forEach(v => v.remove());
         return sec;
       },
-      async renderPerguntas(file = "jornadas_barracontador.html") {
-        const sec = await base.renderPerguntas(file);
+      async renderPerguntas(fileOrIndex = 0) {
+        const sec = await base.renderPerguntas(fileOrIndex);
         sec?.classList?.add("layout-junior");
         return sec;
       },
@@ -241,17 +232,15 @@ try {
     };
     const api = map[key] || g.JRENDER.master;
 
-    // API pública esperada pelo restante do código
-    g.JORNADA_RENDER   = api;
-    g.onJornadaEssencial = typeof api.start === "function" ? api.start : () => g.JornadaCtrl?.start?.();
-    g.renderIntro      = (...a) => api.renderIntro?.(...a);
-    g.renderPerguntas  = (...a) => api.renderPerguntas?.(...a);
-    g.renderFinal      = (...a) => api.renderFinal?.(...a);
+    g.JORNADA_RENDER     = api;
+    g.onJornadaEssencial = typeof api.start === "function" ? api.start : () => g.JC?.init?.();
+    g.renderIntro        = (...a) => api.renderIntro?.(...a);
+    g.renderPerguntas    = (...a) => api.renderPerguntas?.(...a);
+    g.renderFinal        = (...a) => api.renderFinal?.(...a);
 
     console.log(`[Renderer] ativo: ${key}`);
   }
 
-  // Seleciona assim que possível
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", selectVariant);
   } else {
