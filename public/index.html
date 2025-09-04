@@ -1,252 +1,187 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Jornada • Irmandade Conhecimento com Luz</title>
-
-  <!-- CSS globais -->
+  <title>Irmandade Conhecimento com Luz</title>
   <link rel="stylesheet" href="/styles.css">
   <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png">
   <link rel="stylesheet" href="/css/chama.css">
-
-  <!-- CSS mínimo local (somente reforços) -->
   <style>
-    /* pergaminho usa as classes globais .pergaminho, .pergaminho-v, .pergaminho-h */
-    .pergaminho { background: #f6efe0 !important; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      color: #333;
+    }
+    .site-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      background: #1f2937;
+      color: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .chama.chama-sm {
+      display: inline-flex;
+      gap: 4px;
+    }
+    .chama.chama-sm span {
+      width: 6px;
+      height: 12px;
+      background: #ff4500;
+      border-radius: 2px;
+      animation: flicker 1.5s infinite;
+    }
+    .chama.chama-sm span:nth-child(2) { animation-delay: 0.2s; }
+    .chama.chama-sm span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes flicker {
+      0%, 100% { transform: scaleY(1); opacity: 1; }
+      50% { transform: scaleY(1.2); opacity: 0.8; }
+    }
+    .hero {
+      max-width: 900px;
+      margin: 24px auto;
+      padding: 32px;
+      border-radius: 14px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+      background: #f6efe0 !important;
+    }
     .pergaminho-v {
       background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important;
       background-size: cover !important;
       background-position: center !important;
       min-height: 82vh !important;
+      position: relative;
+      z-index: 1;
     }
-    .pergaminho-h {
-      background-image: url('/assets/img/pergaminho-rasgado-horiz.png') !important;
-      background-size: cover !important;
-      background-position: center !important;
-      min-height: 82vh !important;
+    .hero-content {
+      background: transparent !important;
+      position: relative;
+      z-index: 2;
+      padding: 20px;
     }
-
-    /* canvas e conteúdo interno */
-    #jornada-canvas { position: relative; z-index: 1; background: transparent !important; }
-    #jornada-conteudo { background: transparent !important; position: relative; z-index: 2; padding: 20px; }
-
-    /* cada bloco/pergunta mantém fundo transparente (o pergaminho fica no canvas) */
-    .j-bloco { background: transparent !important; padding: 8px 0; }
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: 0;
+      background: #1f2937;
+      color: #fff;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .btn:hover {
+      background: #374151;
+      transform: scale(1.05);
+    }
+    .btn + .btn {
+      margin-left: 12px;
+    }
+    .title {
+      font-size: 2rem;
+      margin: 0 0 16px 0;
+      color: #1f2937;
+    }
+    .subtitle {
+      font-size: 1.2rem;
+      opacity: 0.8;
+      margin: 0 0 24px 0;
+    }
+    .lumen-typing {
+      white-space: pre-wrap;
+      position: relative;
+    }
+    .lumen-typing::after {
+      content: "▌";
+      margin-left: 2px;
+      opacity: 0.75;
+      animation: lumenBlink 1s steps(2, end) infinite;
+    }
+    .lumen-typing.typing-done::after {
+      content: "";
+      animation: none;
+    }
+    @keyframes lumenBlink {
+      50% { opacity: 0; }
+    }
+    .site-footer {
+      text-align: center;
+      padding: 16px;
+      opacity: 0.6;
+      font-size: 0.85rem;
+    }
+    @media (max-width: 600px) {
+      .hero {
+        margin: 16px;
+        padding: 20px;
+      }
+      .title {
+        font-size: 1.6rem;
+      }
+      .btn {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+      }
+    }
   </style>
 </head>
 
-<body data-layout="master" data-journey="essencial">
-  <!-- HEADER fixo com chama pequena -->
-  <header class="site-header flex items-center gap-3">
+<body>
+  <header class="site-header">
     <div class="chama chama-sm">
       <span></span><span></span><span></span>
     </div>
-    <h1>Jornada Essencial</h1>
+    <h1>Irmandade Conhecimento com Luz</h1>
   </header>
 
-  <!-- Shell estático (fica oculto quando a jornada ativa, mas deixo por compat) -->
-  <main id="page-shell" class="container">
-    <header class="site-header">
-      <h1>Jornada Essencial</h1>
-      <p id="status">Orientações e Termo de Responsabilidade da Jornada.</p>
-    </header>
-
-    <div class="container">
-      <a class="btn btn-primary" href="#intro">Ir para Introdução</a>
-      <a class="btn" href="/jornadas.html">← Voltar</a>
-    </div>
-
-   <!-- === CANVAS DA JORNADA (pergaminho fica AQUI) ====================== -->
-<main class="container">
-  <section id="jornada-canvas" class="card pergaminho pergaminho-v" aria-live="polite">
-    <!-- badge e barra de progresso globais (topo do canvas) -->
-    <div class="progress-badge" id="jprog-pct">0% concluído</div>
-    <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
-
-    <!-- conteúdo dinâmico/estático da jornada -->
-    <div id="jornada-conteudo" class="conteudo-pergaminho">
-
-      <!-- INTRO (vertical, com datilografia) -->
-      <div data-intro>
-        <p data-typing
-           data-text="Respire. Esta jornada é sua. Um passo de cada vez."
-           data-speed="40" data-cursor="true"></p>
-
-        <p data-typing
-           data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Aqui, fé e consciência se unem para acender sua chama interior — passo a passo, jornada por jornada."
-           data-speed="50" data-cursor="true"></p>
+  <main>
+    <section class="hero card pergaminho pergaminho-v">
+      <div class="hero-content">
+        <h2 class="title" data-typing data-text="Bem-vindo(a) à Irmandade" data-speed="40" data-cursor="true"></h2>
+        <p class="subtitle" data-typing data-text="Uma jornada de reflexão, fé e coragem para acender sua chama interior." data-speed="30" data-cursor="true"></p>
+        <div class="actions">
+          <a href="/jornada-conhecimento-com-luz1.html#intro" class="btn btn-primary">Iniciar Jornada Essencial</a>
+          <a href="/jornadas.html" class="btn">Ver Todas as Jornadas</a>
+        </div>
       </div>
-
-      <!-- PROGRESSO local do bloco -->
-      <div class="j-progress" style="margin-top:12px">
-        <div class="j-progress__bar"><div class="j-progress__fill"></div></div>
-        <div class="j-progress__meta" id="j-meta"></div>
-      </div>
-
-      <!-- CONTROLES -->
-      <div class="footer-actions" style="margin:10px 0 16px">
-        <button id="btnPrev" class="btn btn-secondary" data-action="prev">Voltar</button>
-        <button id="btnNext" class="btn btn-primary" data-action="next">Próxima</button>
-      </div>
-
-    </div><!-- /#jornada-conteudo -->
-  </section>
-</main>
-
-          <!-- ======= BLOCOS DE PERGUNTAS (agora DENTRO do canvas) ======= -->
-
-          <!-- BLOCO 0 (pergaminho H) -->
-          <section class="j-bloco" data-bloco="0"
-                   data-video="/assets/img/filme-1-entrando-na-jornada.mp4"
-                   data-pergaminho-h>
-            <div class="j-pergunta" data-pergunta="0">
-              <label class="pergunta-enunciado" data-type="Pergunta 1: Quem é você neste momento da vida?"><b>Pergunta 1:</b> Quem é você neste momento da vida?</label>
-              <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
-            </div>
-            <div class="j-pergunta" data-pergunta="1">
-              <label class="pergunta-enunciado" data-type="Pergunta 2: O que te move hoje?"><b>Pergunta 2:</b> O que te move hoje?</label>
-              <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
-            </div>
-            <div class="j-pergunta" data-pergunta="2">
-              <label class="pergunta-enunciado" data-type="Pergunta 3: Qual é o seu maior sonho agora?"><b>Pergunta 3:</b> Qual é o seu maior sonho agora?</label>
-              <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
-            </div>
-            <div class="j-pergunta" data-pergunta="3">
-              <label class="pergunta-enunciado" data-type="Pergunta 4: O que te desafia hoje?"><b>Pergunta 4:</b> O que te desafia hoje?</label>
-              <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
-            </div>
-            <div class="j-pergunta" data-pergunta="4">
-              <label class="pergunta-enunciado" data-type="Pergunta 5: Como você se vê em um ano?"><b>Pergunta 5:</b> Como você se vê em um ano?</label>
-              <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
-            </div>
-          </section>
-
-          <!-- BLOCO 1 (pergaminho H) -->
-          <section class="j-bloco" data-bloco="1"
-                   data-video="/assets/img/filme-2-dentro-da-jornada.mp4"
-                   data-pergaminho-h>
-            <div class="j-pergunta" data-pergunta="0">
-              <label class="pergunta-enunciado"><b>Pergunta 1:</b> O que significa fé pra você hoje?</label>
-              <textarea rows="4" class="input"></textarea>
-            </div>
-            <div class="j-pergunta" data-pergunta="1">
-              <label class="pergunta-enunciado"><b>Pergunta 2:</b> Onde você percebe luz no cotidiano?</label>
-              <textarea rows="4" class="input"></textarea>
-            </div>
-            <div class="j-pergunta" data-pergunta="2">
-              <label class="pergunta-enunciado"><b>Pergunta 3:</b> Qual hábito novo você quer firmar?</label>
-              <textarea rows="4" class="input"></textarea>
-            </div>
-            <div class="j-pergunta" data-pergunta="3">
-              <label class="pergunta-enunciado"><b>Pergunta 4:</b> Qual cuidado com o próximo você deseja praticar?</label>
-              <textarea rows="4" class="input"></textarea>
-            </div>
-            <div class="j-pergunta" data-pergunta="4">
-              <label class="pergunta-enunciado"><b>Pergunta 5:</b> Uma gratidão de hoje:</label>
-              <textarea rows="4" class="input"></textarea>
-            </div>
-          </section>
-
-        </div> <!-- /#jornada-conteudo -->
-      </section>
-    </main>
-
-    <footer class="site-footer">
-      <small>© 2025 Irmandade Conhecimento com Luz</small>
-    </footer>
+    </section>
   </main>
 
-  <!-- OVERLAY de VÍDEO de transição -->
-  <div id="videoOverlay" class="video-overlay hidden">
-    <video id="videoTransicao" playsinline preload="metadata" controls
-           style="max-width:90vw; max-height:80vh; background:#000"></video>
-    <button id="skipVideo" class="btn btn-secondary"
-            style="position:absolute; top:14px; right:14px">Pular vídeo</button>
-  </div>
+  <footer class="site-footer">
+    <small>© 2025 Irmandade Conhecimento com Luz</small>
+  </footer>
 
-  <!-- Boot simples (mantido) -->
   <script>
     (function () {
-      if (typeof window.activateJornada === 'function') {
-        try { window.activateJornada(); } 
-        catch (e) { document.body.classList.add('jornada-active'); }
-      } else {
-        document.body.classList.add('jornada-active');
-      }
-
-      const route = (location.hash || '#intro').slice(1);
-
-      if (typeof window.mount === 'function') {
-        window.mount({ startAt: route });
-        return;
-      }
-
-      if (!window.JORNADA_RENDER) {
-        console.error('JORNADA_RENDER não disponível. Confira a ORDEM dos scripts.');
-        return;
-      }
-
-      if (route === 'intro') {
-        JORNADA_RENDER.renderIntro();
-      } else if (route === 'perguntas') {
-        JORNADA_RENDER.renderPerguntas(0);
-      } else if (route === 'final') {
-        JORNADA_RENDER.renderFinal();
-      } else {
-        JORNADA_RENDER.renderIntro();
-      }
-    })();
-  </script>
-
-  <!-- Footer ambiente (debug) -->
-  <footer style="opacity:.6; font-size:.85rem; margin-top:2rem; text-align:center">
-    <span id="envTag"></span>
-  </footer>
-  <script>
-    document.getElementById('envTag').textContent =
-      `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
-  </script>
-
-  <!-- Datilografia auto em elementos data-typing (intro e eventuais finais) -->
-  <script>
-    (function(){
-      function typeWriter(el, text, speed, showCursor){
+      function typeWriter(el, text, speed, showCursor) {
         if (!el) return;
         el.textContent = '';
         if (showCursor) el.classList.add('lumen-typing');
         let i = 0;
-        (function step(){
-          if (i < text.length){ el.textContent += text.charAt(i++); setTimeout(step, speed); }
-          else { el.classList.add('typing-done'); }
+        (function step() {
+          if (i < text.length) {
+            el.textContent += text.charAt(i++);
+            setTimeout(step, speed);
+          } else {
+            el.classList.add('typing-done');
+          }
         })();
       }
-      function runTyping(root){
-        (root || document).querySelectorAll('[data-typing]').forEach(el=>{
+      function runTyping(root) {
+        (root || document).querySelectorAll('[data-typing]').forEach(el => {
           if (el.dataset._typed) return;
-          const t   = el.getAttribute('data-text') || el.textContent || '';
+          const t = el.getAttribute('data-text') || el.textContent || '';
           const spd = parseInt(el.getAttribute('data-speed') || '26', 10);
           const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
           el.dataset._typed = '1';
           typeWriter(el, t, spd, cur);
         });
       }
-      document.addEventListener('DOMContentLoaded', ()=>runTyping(document));
-
-      // observa mutações apenas no #jornada-conteudo (intro/final renderizados)
-      const target = document.getElementById('jornada-conteudo');
-      if (target) {
-        const obs = new MutationObserver(muts => muts.forEach(m => runTyping(m.target)));
-        obs.observe(target, { childList: true, subtree: true });
-      }
+      document.addEventListener('DOMContentLoaded', () => runTyping(document));
     })();
-  </script>
-  <style>
-    .lumen-typing { white-space: pre-wrap; position: relative; }
-    .lumen-typing::after { content: "▌"; margin-left: 2px; opacity: .75; animation: lumenBlink 1s steps(2, end) infinite; }
-    .lumen-typing.typing-done::after { content: ""; animation: none; }
-    @keyframes lumenBlink { 50% { opacity: 0; } }
-  </style>
- </script>
+  </script>  
 </body>
 </html>
