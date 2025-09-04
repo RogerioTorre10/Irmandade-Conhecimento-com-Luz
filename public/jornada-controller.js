@@ -271,19 +271,18 @@ function finalize() {
 }
 
 // ===== INIT =====
-JC.init = function initJornada() {
+JC.init = function initJornada () {
+  // evita múltiplas inits
+  if (JC._inited) return;
+  JC._inited = true;
+
   const root = S.root();
   if (!root) return;
 
-  // rota intro/final = vertical
+  // rota intro/final = vertical; demais = horizontal
   applyPergaminhoByRoute();
 
-  const prevBtn = S.btnPrev();
-  const nextBtn = S.btnNext();
-  if (nextBtn) nextBtn.addEventListener('click', goNext);
-  if (prevBtn) prevBtn.addEventListener('click', goPrev);
-
-  // fallback por delegação
+  // === delegação global para next/prev ===
   document.addEventListener('click', (ev) => {
     const n = ev.target.closest?.('[data-action="next"]');
     const p = ev.target.closest?.('[data-action="prev"]');
@@ -303,6 +302,7 @@ JC.init = function initJornada() {
 // auto-init
 document.addEventListener('DOMContentLoaded', () => {
   if (S.root()) JC.init();
+  // atualiza pergaminho ao mudar hash (#intro/#perguntas/#final)
   window.addEventListener('hashchange', applyPergaminhoByRoute);
 });
  
