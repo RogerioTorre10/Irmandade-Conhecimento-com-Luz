@@ -3,168 +3,280 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Jornada • Irmandade Conhecimento com Luz</title>
-
-  <!-- Estilos globais -->
+  <title>Jornadas · Irmandade Conhecimento com Luz</title>
   <link rel="stylesheet" href="/styles.css">
   <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png">
   <link rel="stylesheet" href="/css/chama.css">
-
-  <!-- CSS mínimo local (sem brigar com styles.css) -->
   <style>
-    body { margin:0; font-family:Arial, sans-serif; background:#f9f9f9; color:#333; }
-
-    .site-header { display:flex; align-items:center; gap:12px; padding:16px;
-      background:#1f2937; color:#fff; box-shadow:0 2px 4px rgba(0,0,0,.1); }
-
-    .chama.chama-sm { display:inline-flex; gap:4px; }
-    .chama.chama-sm span{ width:6px; height:12px; background:#ff4500; border-radius:2px; animation:flicker 1.5s infinite; }
-    .chama.chama-sm span:nth-child(2){ animation-delay:.2s } .chama.chama-sm span:nth-child(3){ animation-delay:.4s }
-    @keyframes flicker { 0%,100%{ transform:scaleY(1); opacity:1 } 50%{ transform:scaleY(1.2); opacity:.8 } }
-
-    .container{ max-width:900px; margin:24px auto; padding:0 16px; }
-
-    .card{
-      background:#f6efe0 !important; border-radius:14px; box-shadow:0 8px 28px rgba(0,0,0,.12);
-      padding:32px; position:relative; z-index:1;
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      color: #333;
     }
-
-    /* Pergaminhos */
-    .pergaminho-v{
-      background-image:url('/assets/img/pergaminho-rasgado-vert.png') !important;
-      background-size:cover !important; background-position:center !important; min-height:82vh !important;
+    .site-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      background: #1f2937;
+      color: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      text-align: center;
     }
-    .pergaminho-h{
-      background-image:url('/assets/img/pergaminho-rasgado-horiz.png') !important;
-      background-size:cover !important; background-position:center !important; min-height:82vh !important;
+    .chama {
+      display: inline-flex;
+      gap: 8px;
+      margin: 16px 0;
     }
-
-    .conteudo-pergaminho{ background:transparent !important; position:relative; z-index:2; padding:20px; }
-
-    .btn{ display:inline-block; padding:12px 24px; border-radius:10px; border:0; background:#1f2937; color:#fff; font-weight:600; text-decoration:none;
-      transition:background .3s ease, transform .2s ease; }
-    .btn:hover{ background:#374151; transform:scale(1.05) }
-    .btn-primary{ background:#6b21a8 } .btn-primary:hover{ background:#7c3aed }
-    .btn-secondary{ background:#4b5563 } .btn-secondary:hover{ background:#6b7280 }
-    .btn + .btn{ margin-left:12px }
-
-    /* Progresso */
-    .progress-badge{ position:fixed; top:16px; right:16px; padding:8px 16px; background:#6b21a8; color:#fff; border-radius:8px; font-size:.9rem; }
-    .progress-bar{ width:100%; height:8px; background:#e5e7eb; border-radius:4px; margin-top:12px; }
-    .progress-bar-fill{ height:100%; background:#6b21a8; border-radius:4px; transition:width .3s ease; }
-
-    .j-progress{ margin-top:12px }
-    .j-progress__bar{ width:100%; height:6px; background:#e5e7eb; border-radius:4px }
-    .j-progress__fill{ height:100%; background:#1f2937; border-radius:4px; transition:width .3s ease }
-    .j-progress__meta{ text-align:center; margin-top:8px; font-size:.9rem }
-
-    /* Perguntas */
-    .j-bloco{ display:none; background:transparent !important; }
-    .j-pergunta{ margin-bottom:24px }
-    .pergunta-enunciado{ font-weight:600; margin-bottom:8px; display:block }
-    .j-pergunta textarea{ width:100%; padding:12px; border-radius:8px; border:1px solid #d1d5db; background:rgba(255,255,255,.85); resize:vertical; min-height:100px; }
-
-    /* Datilografia local */
-    .lumen-typing{ white-space:pre-wrap; position:relative; }
-    .lumen-typing::after{ content:"▌"; margin-left:2px; opacity:.75; animation:lumenBlink 1s steps(2,end) infinite; }
-    .lumen-typing.typing-done::after{ content:""; animation:none; }
-    @keyframes lumenBlink{ 50%{ opacity:0 } }
-
-    /* Overlay de vídeo */
-    #videoOverlay{ position:fixed; inset:0; background:rgba(0,0,0,.8); display:flex; justify-content:center; align-items:center; z-index:1000; }
-    #videoOverlay.hidden{ display:none }
-    .video-player{ max-width:90vw; max-height:80vh; background:#000 }
-
-    .site-footer{ text-align:center; padding:16px; opacity:.6; font-size:.85rem }
-
-    @media (max-width:600px){
-      .card{ margin:16px; padding:20px }
-      .site-header h1{ font-size:1.6rem }
-      .btn{ padding:10px 16px; font-size:.9rem }
-      .chama.chama-sm span{ width:4px; height:8px }
-      .progress-badge{ top:8px; right:8px; padding:6px 12px; font-size:.8rem }
+    .chama span {
+      width: 12px;
+      height: 24px;
+      background: #ff4500;
+      border-radius: 3px;
+      animation: flicker 1.5s infinite;
+    }
+    .chama span:nth-child(2) { animation-delay: 0.2s; }
+    .chama span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes flicker {
+      0%, 100% { transform: scaleY(1); opacity: 1; }
+      50% { transform: scaleY(1.2); opacity: 0.8; }
+    }
+    .lang-switch {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      padding: 12px;
+    }
+    .lang-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid #fff;
+      background: #374151;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .lang-btn:hover {
+      background: #4b5563;
+    }
+    .container {
+      max-width: 900px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+    .card {
+      background: #f6efe0 !important;
+      border-radius: 14px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+      padding: 32px;
+      position: relative;
+      z-index: 1;
+    }
+    .pergaminho-v {
+      background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important;
+      background-size: cover !important;
+      background-position: center !important;
+      min-height: 82vh !important;
+    }
+    .card-content {
+      background: transparent !important;
+      position: relative;
+      z-index: 2;
+      padding: 20px;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: 0;
+      background: #1f2937;
+      color: #fff;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .btn:hover {
+      background: #374151;
+      transform: scale(1.05);
+    }
+    .btn-primary {
+      background: #6b21a8;
+    }
+    .btn-primary:hover {
+      background: #7c3aed;
+    }
+    .btn + .btn {
+      margin-left: 12px;
+    }
+    .jornada-perguntas {
+      margin-top: 32px;
+    }
+    .jornada-perguntas h2 {
+      font-size: 1.8rem;
+      margin-bottom: 16px;
+      color: #1f2937;
+    }
+    .pergunta {
+      margin-bottom: 24px;
+    }
+    .pergunta p {
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .pergunta textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: rgba(255, 255, 255, 0.8);
+      resize: vertical;
+      min-height: 100px;
+    }
+    .footer-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 24px;
+    }
+    .lumen-typing {
+      white-space: pre-wrap;
+      position: relative;
+    }
+    .lumen-typing::after {
+      content: "▌";
+      margin-left: 2px;
+      opacity: 0.75;
+      animation: lumenBlink 1s steps(2, end) infinite;
+    }
+    .lumen-typing.typing-done::after {
+      content: "";
+      animation: none;
+    }
+    @keyframes lumenBlink {
+      50% { opacity: 0; }
+    }
+    #jornada-canvas {
+      display: none;
+    }
+    #videoOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    #videoOverlay.hidden {
+      display: none;
+    }
+    .video-player {
+      max-width: 90vw;
+      max-height: 80vh;
+      background: #000;
+    }
+    .site-footer {
+      text-align: center;
+      padding: 16px;
+      opacity: 0.6;
+      font-size: 0.85rem;
+    }
+    @media (max-width: 600px) {
+      .card {
+        margin: 16px;
+        padding: 20px;
+      }
+      .site-header h1 {
+        font-size: 1.6rem;
+      }
+      .btn {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+      }
+      .chama span {
+        width: 8px;
+        height: 16px;
+      }
     }
   </style>
 </head>
 
-<body data-layout="master" data-journey="essencial">
-  <!-- [01-HEADER] -->
-  <header class="site-header">
-    <div class="chama chama-sm"><span></span><span></span><span></span></div>
-    <h1>Jornada Essencial</h1>
-  </header>
-
-  <!-- Shell estático (mostrado antes de ativar jornada) -->
-  <main id="page-shell" class="container">
-    <header class="site-header" style="margin-top:8px">
-      <h1 data-typing data-text="Jornada Essencial" data-speed="40" data-cursor="true"></h1>
-      <p  data-typing data-text="Orientações e Termo de Responsabilidade da Jornada." data-speed="30" data-cursor="true"></p>
+<body>
+  <main id="page-shell">
+    <header class="site-header">
+      <div class="chama">
+        <span></span><span></span><span></span>
+      </div>
+      <h1 data-typing data-text="Jornadas Disponíveis" data-speed="40" data-cursor="true"></h1>
+      <p data-typing data-text="Escolha por onde começar sua transformação." data-speed="30" data-cursor="true"></p>
+      <h2>Irmandade Conhecimento com Luz</h2>
+      <p>Fé, ciência e filosofia caminhando juntas para despertar e guiar. 🌟</p>
     </header>
 
-    <div class="container">
-      <a class="btn btn-primary" href="#intro">Ir para Introdução</a>
-      <a class="btn btn-secondary" href="/jornadas.html">← Voltar</a>
-    </div>
+    <nav class="lang-switch" aria-label="Escolher idioma">
+      <button class="lang-btn" data-lang="pt">PT</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="es">ES</button>
+    </nav>
 
-    <!-- [03-PERGAMINHO] intro vertical -->
-    <main class="container">
-      <section id="jornada-canvas" class="card pergaminho pergaminho-v">
-        <div id="jornada-conteudo" class="conteudo-pergaminho"></div>
-      </section>
-    </main>
+    <section class="container">
+      <div class="card pergaminho pergaminho-v">
+        <div class="card-content">
+          <h2 data-typing data-text="Jornada Conhecimento com Luz - Essencial" data-speed="40" data-cursor="true"></h2>
+          <p>Uma viagem interior com 32 reflexões essenciais.</p>
+          <div class="actions">
+            <button id="btnComecar" class="btn btn-primary">Iniciar Jornada</button>
+            <a class="btn" href="/">Voltar ao Início</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="jornada-perguntas container">
+      <header>
+        <h2 data-typing data-text="📝 Perguntas da Jornada" data-speed="40" data-cursor="true"></h2>
+      </header>
+      <div id="jornada-conteudo"></div>
+      <div class="footer-actions">
+        <button id="btnVoltarIntro" data-action="prev" class="btn">⏪ Voltar à Intro</button>
+        <button id="btnProxima" data-action="next" class="btn btn-primary">⏩ Próxima</button>
+      </div>
+    </section>
+
+    <section id="jornada-canvas" class="card pergaminho">
+      <div id="jornada-conteudo" class="conteudo-pergaminho"></div>
+    </section>
+
+    <div id="videoOverlay" class="video-overlay hidden">
+      <video id="videoTransicao" class="video-player" playsinline preload="metadata" controls></video>
+      <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
+    </div>
 
     <footer class="site-footer">
       <small>© 2025 Irmandade Conhecimento com Luz</small>
     </footer>
   </main>
 
-  <!-- [09-PROGRESSO] -->
-  <div class="progress-badge" id="jprog-pct">0% concluído</div>
-  <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
-
-  <!-- [04-DATILOGRAFIA] intro copy -->
-  <div id="jornada-conteudo-intro" class="conteudo-pergaminho">
-    <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
-    <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Aqui, fé e consciência se unem para acender sua chama interior — passo a passo, jornada por jornada." data-speed="50" data-cursor="true"></p>
-  </div>
-
-  <!-- [06-NAVEGAÇÃO] -->
-  <div class="j-progress">
-    <div class="j-progress__bar"><div class="j-progress__fill"></div></div>
-    <div class="j-progress__meta" id="j-meta"></div>
-  </div>
-
-  <div class="footer-actions">
-    <button id="btnPrev" class="btn btn-secondary" data-action="prev">Voltar</button>
-    <button id="btnNext" class="btn btn-primary"   data-action="next">Próxima</button>
-  </div>
-
-  <!-- [07-VIDEOS] overlay de transição -->
-  <div id="videoOverlay" class="video-overlay hidden">
-    <video id="videoTransicao" class="video-player" playsinline preload="metadata" controls></video>
-    <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
-  </div>
-
-  <!-- Rodapé de ambiente -->
-  <footer style="opacity:.6; font-size:.85rem; margin-top:2rem; text-align:center">
-    <span id="envTag"></span>
-  </footer>
-  <script>
-    document.getElementById('envTag').textContent =
-      `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
-  </script>
-
-  <!-- [04-DATILOGRAFIA] engine local + observer -->
   <script>
     (function () {
+      // Datilografia
       function typeWriter(el, text, speed, showCursor) {
         if (!el) return;
         el.textContent = '';
         if (showCursor) el.classList.add('lumen-typing');
         let i = 0;
         (function step() {
-          if (i < text.length) { el.textContent += text.charAt(i++); setTimeout(step, speed); }
-          else { el.classList.add('typing-done'); }
+          if (i < text.length) {
+            el.textContent += text.charAt(i++);
+            setTimeout(step, speed);
+          } else {
+            el.classList.add('typing-done');
+          }
         })();
       }
       function runTyping(root) {
@@ -179,36 +291,48 @@
       }
       document.addEventListener('DOMContentLoaded', () => runTyping(document));
 
-      // Observa conteúdo injetado para datilografar só na intro/final
-      const target = document.getElementById('jornada-conteudo');
-      if (target) {
-        const obs = new MutationObserver(muts => muts.forEach(m => runTyping(m.target)));
-        obs.observe(target, { childList:true, subtree:true });
+      // Carregar perguntas dinamicamente do JORNADA_BLOCKS
+      function loadPreviewQuestions() {
+        if (!window.JORNADA_BLOCKS || !window.JORNADA_QA) return;
+        const content = document.getElementById('jornada-conteudo');
+        if (!content) return;
+        // Pegar apenas as duas primeiras perguntas do primeiro bloco
+        const questions = window.JORNADA_BLOCKS[0]?.questions.slice(0, 2) || [];
+        content.innerHTML = window.JORNADA_QA.buildForm(questions);
       }
 
-      // Boot leve – deixa o fluxo com o Renderer + Controller
+      // Boot robusto
       function boot() {
         if (window.JORNADA_RENDER?.renderIntro) {
           document.body.classList.add('jornada-active');
           const route = (location.hash || '#intro').slice(1);
           if (route === 'perguntas') {
-            window.JORNADA_RENDER.renderPerguntas(0);
-            window.JORNADA_PAPER?.set?.('h'); // perguntas = horizontal
+            JORNADA_RENDER.renderPerguntas(0);
+            window.JORNADA_PAPER?.set?.('h');
           } else if (route === 'final') {
-            window.JORNADA_RENDER.renderFinal();
-            window.JORNADA_PAPER?.set?.('v'); // final = vertical
+            JORNADA_RENDER.renderFinal();
+            window.JORNADA_PAPER?.set?.('v');
           } else {
-            window.JORNADA_RENDER.renderIntro();
-            window.JORNADA_PAPER?.set?.('v'); // intro = vertical
+            JORNADA_RENDER.renderIntro();
+            window.JORNADA_PAPER?.set?.('v');
           }
+          loadPreviewQuestions();
           return true;
         }
         return false;
       }
       if (!boot()) {
-        let tries = 0; const timer = setInterval(() => { if (boot() || ++tries > 40) clearInterval(timer); }, 100);
+        let tries = 0;
+        const timer = setInterval(() => {
+          if (boot() || ++tries > 40) clearInterval(timer);
+        }, 100);
       }
+
+      // Botão Iniciar Jornada
+      document.getElementById('btnComecar')?.addEventListener('click', () => {
+        window.location.href = '/jornada-conhecimento-com-luz1.html#intro';
+      });
     })();
-  </script> 
-</body>
+  </script>
+  </body>
 </html>
