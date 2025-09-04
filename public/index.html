@@ -237,29 +237,6 @@
     .lumen-typing.typing-done::after { content: ""; animation: none; }
     @keyframes lumenBlink { 50% { opacity: 0; } }
   </style>
-
- 
-
-  <!-- Boot robusto (garante render mesmo com carga lenta) -->
-  <script>
-    (function () {
-      function boot() {
-        if (window.JORNADA_RENDER?.renderIntro) {
-          document.body.classList.add('jornada-active');
-          const route = (location.hash || '#intro').slice(1);
-          if (route === 'perguntas') JORNADA_RENDER.renderPerguntas(0);
-          else if (route === 'final') JORNADA_RENDER.renderFinal();
-          else JORNADA_RENDER.renderIntro();
-          return true;
-        }
-        return false;
-      }
-      if (!boot()) {
-        let tries = 0; const timer = setInterval(() => {
-          if (boot() || ++tries > 40) clearInterval(timer); // 4s
-        }, 100);
-      }
-    })();
-  </script>
+ </script>
 </body>
 </html>
