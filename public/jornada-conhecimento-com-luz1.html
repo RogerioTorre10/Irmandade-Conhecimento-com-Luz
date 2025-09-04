@@ -416,6 +416,32 @@
   }
 })();
 </script>
+  <!-- FINALIZAÇÃO DA JORNADA -->
+<section id="jornada-final" class="card pergaminho pergaminho-v" style="margin-top:24px; display:none;">
+  <div class="conteudo-pergaminho">
+    <h2>Conclusão da Jornada ✨</h2>
+    <p>Gratidão por caminhar conosco! Você agora faz parte da Irmandade. 🌟</p>
+
+    <!-- Espaço da foto do usuário -->
+    <div class="selfie-final" style="text-align:center; margin-top:20px;">
+      <img id="minhaFotoFinal" 
+           alt="Minha foto com a Irmandade"
+           style="max-width:80%; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.3)" />
+    </div>
+
+    <p style="margin-top:12px;"><small>Sua imagem foi unida à Irmandade. 🙏</small></p>
+  </div>
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const url = localStorage.getItem("IRMANDADE_SELFIE");
+    if (url) {
+      document.querySelector("#minhaFotoFinal").src = url;
+      document.getElementById("jornada-final").style.display = "block";
+    }
+  });
+</script>
 
 <!-- Estilos do cursor (se ainda não tiver) -->
 <style>
