@@ -173,6 +173,41 @@ function set (mode) {
   el.classList.remove('pergaminho-v', 'pergaminho-h');
   el.classList.add(mode === 'h' ? 'pergaminho-h' : 'pergaminho-v');
 }
+ /* =============================================================================
+   TÍTULO: JORNADA PAPER
+   SUBTÍTULO: Controla fundo do pergaminho (vertical ou horizontal)
+============================================================================= */
+(function () {
+  function set(modo = 'v') {
+    const canvas = document.getElementById('jornada-canvas');
+    if (!canvas) return;
+
+    // Remove classes antigas
+    canvas.classList.remove('pergaminho-v', 'pergaminho-h');
+
+    // Aplica a classe correta
+    if (modo === 'h') {
+      canvas.classList.add('pergaminho-h');
+    } else {
+      canvas.classList.add('pergaminho-v');
+    }
+  }
+
+  function ensureCanvas() {
+    let canvas = document.getElementById('jornada-canvas');
+    if (!canvas) {
+      canvas = document.createElement('section');
+      canvas.id = 'jornada-canvas';
+      canvas.className = 'card pergaminho pergaminho-v'; // padrão vertical
+      document.body.appendChild(canvas);
+    }
+    return canvas;
+  }
+
+  // Exporta no escopo global
+  window.JORNADA_PAPER = { set, ensureCanvas };
+})();
+  
 
 /* mantém isso! */
 window.JORNADA_PAPER = { set, ensureCanvas };
