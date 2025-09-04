@@ -130,6 +130,8 @@ function applyPergaminhoByBloco(blocoEl) {
 function render() {
   const root = S.root();
   if (!root) return;
+  
+  window.JORNADA_ENTRAR_BLOCO = (i, qtdPerguntas) => {
     
   // controla a intro: mostra só se a rota for #intro
   const isIntroRoute = (location.hash || '#intro').slice(1) === 'intro';
