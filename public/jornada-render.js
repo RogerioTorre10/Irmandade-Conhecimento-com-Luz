@@ -1,5 +1,7 @@
 (function () {
   const g = window;
+  
+  console.log("[load] jornada-render.js");
 
   /* ===========================================================================
      === RENDER MASTER =========================================================
@@ -239,6 +241,8 @@
     g.renderFinal        = (...a) => api.renderFinal?.(...a);
 
     console.log(`[Renderer] ativo: ${key}`);
+    console.log("[renderer] variante ativa:", (document.body?.dataset?.layout || "master"), 
+            "| JORNADA_RENDER set?", !!g.JORNADA_RENDER);
   }
 
   if (document.readyState === "loading") {
