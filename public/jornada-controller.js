@@ -32,8 +32,8 @@
     blocos: () => Array.from(document.querySelectorAll('.j-bloco,[data-bloco]')),
     blocoAtivo: () => S.blocos()[state.blocoIndex],
     perguntasDo: (blocoEl) => Array.from(blocoEl.querySelectorAll('.j-pergunta,[data-pergunta]')),
-    btnPrev: () => document.getElementById('btnPrev'),
-    btnNext: () => document.getElementById('btnNext'),
+    btnPrev: () => document.getElementById('btnPrev') || document.querySelector('[data-action="prev"]'),
++   btnNext: () => document.getElementById('btnNext') || document.querySelector('[data-action="next"]'),
     meta: () => document.getElementById('j-meta'),
     progressFill: () => document.querySelector('.j-progress__fill'),
     // Overlay de vídeo
@@ -295,6 +295,13 @@ function goNext() {
      const nextBtn = S.btnNext();
      if (nextBtn) nextBtn.addEventListener('click', goNext);
      if (prevBtn) prevBtn.addEventListener('click', goPrev);
+     // Delegação (fallback): captura cliques em qualquer botão com data-action
++    document.addEventListener('click', (ev) => {
++    const n = ev.target.closest?.('[data-action="next"]');
++    const p = ev.target.closest?.('[data-action="prev"]');
++    if (n) { ev.preventDefault(); goNext(); }
++    if (p) { ev.preventDefault(); goPrev(); }
++    });
     // tenta restaurar respostas antigas (opcional)
     try {
       const stash = localStorage.getItem('JORNADA_RESPOSTAS');
