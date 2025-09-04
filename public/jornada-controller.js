@@ -98,6 +98,26 @@
      TÍTULO: RENDERIZAÇÃO
      SUBTÍTULO: Exibe apenas 1 pergunta do bloco atual
   =========================================================================== */
+      // ===== [03-PERGAMINHO] helpers =====
+  function applyPergaminhoByRoute() {
+    if (!window.JORNADA_PAPER || typeof window.JORNADA_PAPER.set !== 'function') return;
+    const route = (location.hash || '#intro').slice(1);
+    if (route === 'intro' || route === 'final') {
+      window.JORNADA_PAPER.set('v');   // intro/final sempre vertical
+    }
+    // Em 'perguntas', quem decide é o bloco atual
+  }
+
+  function applyPergaminhoByBloco(blocoEl) {
+    if (!window.JORNADA_PAPER || typeof window.JORNADA_PAPER.set !== 'function') return;
+    if (!blocoEl) return;
+    let modo = 'v';
+    if (blocoEl.hasAttribute('data-pergaminho-h')) modo = 'h';
+    else if (blocoEl.hasAttribute('data-pergaminho-v')) modo = 'v';
+    else modo = blocoEl.getAttribute('data-pergaminho') || 'h'; // padrão perguntas = horizontal
+    window.JORNADA_PAPER.set(modo);
+  }
+
   function render() {
     const root = S.root();
     if (!root) return;
