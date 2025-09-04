@@ -471,6 +471,17 @@
 
 <!-- Boot robusto: só roda quando o renderer está pronto -->
 <script>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!window.JORNADA_RENDER) {
+      console.error('[FALLBACK] JORNADA_RENDER não inicializado. Forçando recarregamento.');
+      const script = document.createElement('script');
+      script.src = '/jornada-render.js';
+      document.body.appendChild(script);
+    }
+  });
+</script>
+  
 (function () {
   function safeBoot() {
     if (window.JORNADA_RENDER && typeof window.JORNADA_RENDER.renderIntro === 'function') {
