@@ -113,7 +113,6 @@
       color: #fff;
       border-radius: 8px;
       font-size: 0.9rem;
-      z-index: 900;
     }
     .progress-bar {
       width: 100%;
@@ -121,7 +120,6 @@
       background: #e5e7eb;
       border-radius: 4px;
       margin-top: 12px;
-      z-index: 900;
     }
     .progress-bar-fill {
       height: 100%;
@@ -131,7 +129,6 @@
     }
     .j-progress {
       margin-top: 12px;
-      z-index: 900;
     }
     .j-progress__bar {
       width: 100%;
@@ -155,7 +152,6 @@
       gap: 12px;
       justify-content: center;
       margin: 16px 0;
-      z-index: 900;
     }
     .lumen-typing {
       white-space: pre-wrap;
@@ -359,7 +355,7 @@
         });
       }
 
-      // Boot robusto
+      // Boot robusto com visibilidade controlada
       async function boot() {
         if (window.JORNADA_RENDER?.renderIntro) {
           document.body.classList.add('jornada-active');
@@ -380,23 +376,27 @@
             window.JORNADA_RENDER.renderPerguntas(0);
             const bgImage = await checkImage('/assets/img/pergaminho-rasgado-horiz.png', '/assets/img/pergaminho-rasgado-vert.png');
             canvas.className = 'card pergaminho pergaminho-h';
-            canvas.style.backgroundImage = `url('${bgImage}')`;
+            if (bgImage !== canvas.style.backgroundImage) {
+              canvas.style.backgroundImage = `url('${bgImage}')`;
+            }
             [progressBadge, progressBar, jProgress, footerActions].forEach(el => el?.classList.remove('hidden'));
+            canvas.classList.remove('hidden');
             console.log('[JORNADA_PAPER] Pergaminho horizontal aplicado, imagem:', bgImage);
           } else if (route === 'final') {
             window.JORNADA_RENDER.renderFinal();
             canvas.className = 'card pergaminho pergaminho-v';
             canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
             introContent.classList.remove('hidden');
+            canvas.classList.remove('hidden');
             console.log('[JORNADA_PAPER] Pergaminho vertical aplicado (final)');
           } else {
             window.JORNADA_RENDER.renderIntro();
             canvas.className = 'card pergaminho pergaminho-v';
             canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
             introContent.classList.remove('hidden');
+            canvas.classList.remove('hidden');
             console.log('[JORNADA_PAPER] Pergaminho vertical aplicado (intro)');
           }
-          canvas.classList.remove('hidden');
           return true;
         }
         return false;
