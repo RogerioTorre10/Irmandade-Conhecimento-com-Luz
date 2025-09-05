@@ -9,23 +9,15 @@
   <style>
     body { margin: 0; font-family: Arial, sans-serif; background: #f9f9f9; color: #333; }
     .site-header { display: flex; align-items: center; gap: 12px; padding: 16px; background: #1f2937; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .chama {
-      display: block; /* Única chama */
-      position: relative;
-      overflow: hidden;
-    }
+    .chama { display: block; position: relative; overflow: hidden; }
     .chama span {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(to top, #ff4500 0%, #ff8c00 40%, rgba(255, 69, 0, 0) 100%); /* Gordinha na base, afina no topo */
-      clip-path: polygon(50% 100%, 80% 60%, 70% 40%, 60% 20%, 50% 0%, 40% 20%, 30% 40%, 20% 60%); /* Topo pontiagudo */
-      animation: flicker 1.5s infinite;
-      border-radius: 2px;
+      position: absolute; bottom: 0; width: 100%; height: 100%;
+      background: linear-gradient(to top, #ff4500 0%, #ff8c00 40%, rgba(255, 69, 0, 0) 100%);
+      clip-path: polygon(50% 100%, 80% 60%, 70% 40%, 60% 20%, 50% 0%, 40% 20%, 30% 40%, 20% 60%);
+      animation: flicker 1.5s infinite; border-radius: 2px;
     }
-    .chama.chama-lg span { width: 32px; height: 80px; } /* Chama grande na intro e final */
-    .chama.chama-md span { width: 20px; height: 48px; } /* Chama menor nas perguntas, maior que a atual */
+    .chama.chama-lg span { width: 32px; height: 80px; }
+    .chama.chama-md-intermediario span { width: 24px; height: 60px; } /* Maior que md original */
     .chama.chama-weak span { opacity: 0.5; animation: flicker-weak 2s infinite; }
     .chama.chama-strong span { animation: flicker-strong 1s infinite; }
     @keyframes flicker { 0%, 100% { transform: scaleY(1); opacity: 1; } 50% { transform: scaleY(1.2); opacity: 0.8; } }
@@ -69,7 +61,7 @@
     .password-input { position: relative; }
     .password-input input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; }
     .password-toggle { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; }
-    @media (max-width: 600px) { .card { margin: 16px; padding: 20px; } .site-header h1 { font-size: 1.6rem; } .btn { padding: 10px 16px; font-size: 0.9rem; } .chama.chama-lg span { width: 24px; height: 64px; } .chama.chama-md span { width: 16px; height: 40px; } .progress-badge { top: 8px; right: 8px; padding: 6px 12px; font-size: 0.8rem; } }
+    @media (max-width: 600px) { .card { margin: 16px; padding: 20px; } .site-header h1 { font-size: 1.6rem; } .btn { padding: 10px 16px; font-size: 0.9rem; } .chama.chama-lg span { width: 24px; height: 64px; } .chama.chama-md-intermediario span { width: 18px; height: 48px; } .progress-badge { top: 8px; right: 8px; padding: 6px 12px; font-size: 0.8rem; } }
   </style>
 </head>
 <body data-layout="master" data-journey="essencial">
@@ -89,11 +81,11 @@
           <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
           <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Aqui, fé e consciência se unem para acender sua chama interior — passo a passo, jornada por jornada." data-speed="50" data-cursor="true"></p>
           <div class="footer-actions">
-            <button id="btnIniciar" class="btn btn-primary">Iniciar</button>
+            <button id="btnIniciar" class="btn btn-primary" data-action="start">Iniciar</button>
           </div>
         </div>
         <div id="section-perguntas" class="j-section hidden">
-          <div class="chama chama-md" id="chama-perguntas">
+          <div class="chama chama-md-intermediario" id="chama-perguntas">
             <span></span>
           </div>
           <div id="perguntas-container" class="j-bloco"></div>
@@ -184,36 +176,6 @@
     document.addEventListener('DOMContentLoaded', () => {
       console.log('DOM carregado, inicializando...');
       showSection('section-intro');
-      const btnIniciar = document.getElementById('btnIniciar');
-      if (btnIniciar) {
-        btnIniciar.addEventListener('click', () => {
-          console.log('Botão Iniciar clicado!');
-          if (window.JORNADA_BLOCKS && window.JORNADA_QA && window.JORNADA_PAPER) {
-            showSection('section-perguntas');
-            loadDynamicBlocks();
-          } else {
-            console.error('Dependências (JORNADA_BLOCKS, JORNADA_QA ou JORNADA_PAPER) não carregadas!');
-          }
-        });
-      } else {
-        console.error('Botão #btnIniciar não encontrado no DOM!');
-      }
-      document.getElementById('btnPrevPerguntas')?.addEventListener('click', () => {
-        showSection('section-intro');
-      });
-      document.getElementById('btnNextPerguntas')?.addEventListener('click', () => {
-        showSection('section-final');
-      });
-      document.getElementById('btnRestart')?.addEventListener('click', () => {
-        showSection('section-intro');
-      });
-      document.addEventListener('input', (e) => {
-        if (e.target.tagName === 'TEXTAREA') {
-          const text = e.target.value;
-          const score = analyzeSentiment(text);
-          updateChama(score);
-        }
-      });
     });
 
     function toggleSenha() {
@@ -352,23 +314,6 @@
         if (boot() || ++tries > 40) clearInterval(timer);
       }, 100);
     }
-
-    // Força inicialização manual do botão
-    window.addEventListener('load', () => {
-      const btnIniciar = document.getElementById('btnIniciar');
-      if (btnIniciar && !btnIniciar._eventAttached) {
-        btnIniciar._eventAttached = true;
-        btnIniciar.addEventListener('click', () => {
-          console.log('Botão Iniciar clicado no load!');
-          if (window.JORNADA_BLOCKS && window.JORNADA_QA && window.JORNADA_PAPER) {
-            showSection('section-perguntas');
-            loadDynamicBlocks();
-          } else {
-            console.error('Dependências não carregadas no load!');
-          }
-        });
-      }
-    });
   </script>
   <script defer src="/config.js"></script>
   <script defer src="/jornada-utils.js"></script>
