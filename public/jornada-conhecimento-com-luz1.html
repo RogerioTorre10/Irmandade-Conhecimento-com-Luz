@@ -9,13 +9,19 @@
   <style>
     body { margin: 0; font-family: Arial, sans-serif; background: #f9f9f9; color: #333; }
     .site-header { display: flex; align-items: center; gap: 12px; padding: 16px; background: #1f2937; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .chama { display: inline-flex; gap: 4px; }
-    .chama span { background: #ff4500; animation: flicker 1.5s infinite; border-radius: 2px; } /* Volta a bordas leves */
-    .chama.chama-sm span { width: 6px; height: 12px; }
-    .chama.chama-md span { width: 10px; height: 20px; }
-    .chama.chama-lg span { width: 16px; height: 32px; }
-    .chama.chama-weak span { background: #ff4500; opacity: 0.5; animation: flicker-weak 2s infinite; }
-    .chama.chama-strong span { background: #ff4500; animation: flicker-strong 1s infinite; }
+    .chama { display: flex; gap: 0; align-items: center; }
+    .chama span {
+      background: linear-gradient(to top, #ff4500 0%, #ff8c00 50%, rgba(255, 69, 0, 0) 100%); /* Gordinha na base, fininha no topo */
+      animation: flicker 1.5s infinite;
+      border-radius: 2px;
+      clip-path: polygon(50% 0%, 70% 20%, 60% 60%, 40% 60%, 30% 20%); /* Forma cônica */
+      margin: 0;
+    }
+    .chama.chama-sm span { width: 12px; height: 24px; }
+    .chama.chama-md span { width: 18px; height: 40px; }
+    .chama.chama-lg span { width: 24px; height: 64px; }
+    .chama.chama-weak span { opacity: 0.5; animation: flicker-weak 2s infinite; }
+    .chama.chama-strong span { animation: flicker-strong 1s infinite; }
     .chama span:nth-child(2) { animation-delay: 0.2s; }
     .chama span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes flicker { 0%, 100% { transform: scaleY(1); opacity: 1; } 50% { transform: scaleY(1.2); opacity: 0.8; } }
@@ -172,13 +178,17 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM carregado, inicializando...');
       showSection('section-intro');
       const btnIniciar = document.getElementById('btnIniciar');
       if (btnIniciar) {
         btnIniciar.addEventListener('click', () => {
+          console.log('Botão Iniciar clicado!');
           showSection('section-perguntas');
           loadDynamicBlocks();
         });
+      } else {
+        console.error('Botão #btnIniciar não encontrado no DOM!');
       }
       document.getElementById('btnPrevPerguntas')?.addEventListener('click', () => {
         showSection('section-intro');
@@ -224,9 +234,15 @@
     }
 
     function loadDynamicBlocks() {
-      if (!window.JORNADA_BLOCKS || !window.JORNADA_QA) return;
+      if (!window.JORNADA_BLOCKS || !window.JORNADA_QA) {
+        console.error('JORNADA_BLOCKS ou JORNADA_QA não disponíveis!');
+        return;
+      }
       const content = document.getElementById('perguntas-container');
-      if (!content) return;
+      if (!content) {
+        console.error('Container #perguntas-container não encontrado!');
+        return;
+      }
       content.innerHTML = '';
       window.JORNADA_BLOCKS.forEach((block, idx) => {
         const bloco = document.createElement('section');
@@ -246,7 +262,10 @@
         content.appendChild(bloco);
       });
       const firstBloco = document.querySelector('.j-bloco');
-      if (firstBloco) firstBloco.style.display = 'block';
+      if (firstBloco) {
+        firstBloco.style.display = 'block';
+        console.log('Primeiro bloco carregado com sucesso!');
+      }
     }
 
     function typeWriter(el, text, speed, showCursor) {
