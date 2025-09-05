@@ -9,8 +9,8 @@
   'use strict';
 
   const TAG = '[BOOT]';
-  const log   = (...a) => console.log(TAG, ...a);
-  const warn  = (...a) => console.warn(TAG, ...a);
+  const log = (...a) => console.log(TAG, ...a);
+  const warn = (...a) => console.warn(TAG, ...a);
   const error = (...a) => console.error(TAG, ...a);
 
   function routeFromHash() {
@@ -51,8 +51,8 @@
       return true;
     }
 
-    if (!window.JORNADA_RENDER || !window.JC) {
-      warn('JORNADA_RENDER ou JC não disponível ainda. Aguardando…');
+    if (!window.JORNADA_RENDER || !window.JC || !window.JC._state) {
+      warn('JORNADA_RENDER, JC ou estado não disponível ainda. Aguardando…');
       return false;
     }
 
@@ -89,7 +89,7 @@
       } else {
         warn('JC.init não disponível, inicialização manual pendente');
       }
-    }, 100); // Atraso pra garantir dependências
+    }, 200); // Aumentei o atraso pra 200ms
     log('inicialização concluída.');
     return true;
   }
