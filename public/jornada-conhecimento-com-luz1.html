@@ -18,12 +18,51 @@
     }
     .chama.chama-lg span { width: 32px; height: 80px; }
     .chama.chama-md-intermediario span { width: 24px; height: 60px; }
+    .chama.chama-weak span { opacity: 0.5; animation: flicker-weak 2s infinite; }
+    .chama.chama-strong span { animation: flicker-strong 1s infinite; }
+    @keyframes flicker { 0%, 100% { transform: scaleY(1); opacity: 1; } 50% { transform: scaleY(1.2); opacity: 0.8; } }
+    @keyframes flicker-weak { 0%, 100% { transform: scaleY(0.8); opacity: 0.6; } 50% { transform: scaleY(1); opacity: 0.4; } }
+    @keyframes flicker-strong { 0%, 100% { transform: scaleY(1.5); opacity: 1; } 50% { transform: scaleY(1.8); opacity: 0.9; } }
     .container { max-width: 900px; margin: 24px auto; padding: 0 16px; }
-    .card { background: #f6efe0; padding: 32px; }
+    .card { background: #f6efe0 !important; border-radius: 14px; box-shadow: 0 8px 28px rgba(0,0,0,0.12); padding: 32px; position: relative; z-index: 1; }
+    .pergaminho-v { background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important; background-size: cover !important; background-position: center !important; min-height: 82vh !important; }
+    .pergaminho-h { background-image: url('/assets/img/pergaminho-rasgado-horiz.png') !important; background-size: cover !important; background-position: center !important; min-height: 82vh !important; }
+    .conteudo-pergaminho { background: transparent !important; position: relative; z-index: 2; padding: 20px; height: 100%; }
+    .j-section { height: 100%; }
+    .btn { display: inline-block; padding: 12px 24px; border-radius: 10px; border: 0; background: #1f2937; color: #fff; font-weight: 600; text-decoration: none; transition: background 0.3s ease, transform 0.2s ease; }
+    .btn:hover { background: #374151; transform: scale(1.05); }
+    .btn-primary { background: #6b21a8; }
+    .btn-primary:hover { background: #7c3aed; }
+    .btn-secondary { background: #4b5563; }
+    .btn-secondary:hover { background: #6b7280; }
+    .btn + .btn { margin-left: 12px; }
+    .progress-badge { position: fixed; top: 16px; right: 16px; padding: 8px 16px; background: #6b21a8; color: #fff; border-radius: 8px; font-size: 0.9rem; }
+    .progress-bar { width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; margin-top: 12px; }
+    .progress-bar-fill { height: 100%; background: #6b21a8; border-radius: 4px; transition: width 0.3s ease; }
+    .j-progress { margin-top: 12px; }
+    .j-progress__bar { width: 100%; height: 6px; background: #e5e7eb; border-radius: 4px; }
+    .j-progress__fill { height: 100%; background: #1f2937; border-radius: 4px; transition: width 0.3s ease; }
+    .j-progress__meta { text-align: center; margin-top: 8px; font-size: 0.9rem; }
+    .footer-actions { display: flex; gap: 12px; justify-content: center; margin: 16px 0; }
+    .lumen-typing { white-space: pre-wrap; position: relative; }
+    .lumen-typing::after { content: "▌"; margin-left: 2px; opacity: 0.75; animation: lumenBlink 1s steps(2, end) infinite; }
+    .lumen-typing.typing-done::after { content: ""; animation: none; }
+    @keyframes lumenBlink { 50% { opacity: 0; } }
+    .j-bloco { background: transparent !important; }
     .j-pergunta { margin-bottom: 24px; display: none; }
     .j-pergunta.active { display: block; }
-    #videoOverlay { display: none; }
-    @keyframes flicker { 0%, 100% { transform: scaleY(1); opacity: 1; } 50% { transform: scaleY(1.2); opacity: 0.8; } }
+    .pergunta-enunciado { font-weight: 600; margin-bottom: 8px; display: block; }
+    .j-pergunta textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; background: rgba(255, 255, 255, 0.8); resize: vertical; min-height: 100px; }
+    #videoOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+    #videoOverlay.hidden { display: none; }
+    .video-player { max-width: 90vw; max-height: 80vh; background: #000; }
+    .site-footer { text-align: center; padding: 16px; opacity: 0.6; font-size: 0.85rem; }
+    .hidden { display: none; }
+    .password-form { margin-top: 20px; text-align: center; }
+    .password-input { position: relative; }
+    .password-input input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; }
+    .password-toggle { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; }
+    @media (max-width: 600px) { .card { margin: 16px; padding: 20px; } .site-header h1 { font-size: 1.6rem; } .btn { padding: 10px 16px; font-size: 0.9rem; } .chama.chama-lg span { width: 24px; height: 64px; } .chama.chama-md-intermediario span { width: 18px; height: 48px; } .progress-badge { top: 8px; right: 8px; padding: 6px 12px; font-size: 0.8rem; } }
   </style>
 </head>
 <body data-layout="master" data-journey="essencial">
@@ -34,7 +73,7 @@
     <h1>Jornada Essencial</h1>
   </header>
   <main id="page-shell" class="container">
-    <section id="jornada-canvas" class="card">
+    <section id="jornada-canvas" class="card pergaminho pergaminho-v">
       <div id="jornada-conteudo" class="conteudo-pergaminho">
         <div id="section-intro" class="j-section">
           <div class="chama chama-lg">
@@ -91,15 +130,30 @@
   </div>
   <div id="envTag"></div>
 
-  <!-- Fallback inline se os scripts externos falharem -->
-  <script>
-    document.getElementById('envTag').textContent = `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
-    const positiveWords = ['feliz', 'alegria', 'amor'];
-    const negativeWords = ['triste', 'dor', 'raiva'];
+  <!-- Índice das Funções -->
+  <h2>Índice das Funções</h2>
+  <ul>
+    <li><a href="#analyzeSentiment">analyzeSentiment - Analisa o sentimento do texto</a></li>
+    <li><a href="#updateChama">updateChama - Atualiza o estado da chama</a></li>
+    <li><a href="#showSection">showSection - Exibe uma seção específica</a></li>
+    <li><a href="#updateCanvasBackground">updateCanvasBackground - Atualiza o fundo do canvas</a></li>
+    <li><a href="#loadDynamicBlocks">loadDynamicBlocks - Carrega blocos dinâmicos de perguntas</a></li>
+    <li><a href="#typeWriter">typeWriter - Efeito de digitação</a></li>
+    <li><a href="#runTyping">runTyping - Executa o efeito de digitação em elementos</a></li>
+    <li><a href="#checkImage">checkImage - Verifica a disponibilidade de uma imagem</a></li>
+    <li><a href="#boot">boot - Inicializa a jornada</a></li>
+    <li><a href="#toggleSenha">toggleSenha - Alterna visibilidade da senha</a></li>
+    <li><a href="#ativarSenha">ativarSenha - Ativa a senha</a></li>
+  </ul>
 
+  <script>
+    // analyzeSentiment - Analisa o sentimento do texto
+    <a id="analyzeSentiment"></a>
     function analyzeSentiment(text) {
       const words = text.toLowerCase().split(/\s+/);
       let posCount = 0, negCount = 0;
+      const positiveWords = window.JORNADA_CFG?.positiveWords || ['feliz', 'alegria', 'amor'];
+      const negativeWords = window.JORNADA_CFG?.negativeWords || ['triste', 'dor', 'raiva'];
       words.forEach(word => {
         if (positiveWords.includes(word)) posCount++;
         if (negativeWords.includes(word)) negCount++;
@@ -107,6 +161,8 @@
       return posCount > negCount ? "alegre" : (negCount > posCount ? "sofrida" : "neutra");
     }
 
+    // updateChama - Atualiza o estado da chama
+    <a id="updateChama"></a>
     function updateChama(score) {
       const chama = document.getElementById('chama-perguntas');
       if (chama) {
@@ -116,6 +172,8 @@
       }
     }
 
+    // showSection - Exibe uma seção específica
+    <a id="showSection"></a>
     function showSection(sectionId) {
       const sections = document.querySelectorAll('.j-section');
       sections.forEach(section => section.classList.add('hidden'));
@@ -124,6 +182,8 @@
       updateCanvasBackground(sectionId);
     }
 
+    // updateCanvasBackground - Atualiza o fundo do canvas
+    <a id="updateCanvasBackground"></a>
     function updateCanvasBackground(sectionId) {
       const canvas = document.getElementById('jornada-canvas');
       if (canvas) {
@@ -132,27 +192,135 @@
       }
     }
 
+    // loadDynamicBlocks - Carrega blocos dinâmicos de perguntas
+    <a id="loadDynamicBlocks"></a>
     function loadDynamicBlocks() {
       const content = document.getElementById('perguntas-container');
-      if (content) content.innerHTML = '<div class="j-pergunta active"><label class="pergunta-enunciado">Teste</label><textarea rows="4" placeholder="Digite sua resposta..."></textarea></div>';
-      console.log('Blocos carregados como fallback!');
+      if (content && window.JORNADA_BLOCKS && window.JORNADA_QA) {
+        content.innerHTML = '';
+        window.JORNADA_BLOCKS.forEach((block, idx) => {
+          const bloco = document.createElement('section');
+          bloco.className = 'j-bloco';
+          bloco.dataset.bloco = idx;
+          bloco.dataset.video = block.video_after || '';
+          block.questions.forEach((q, qIdx) => {
+            const pergunta = document.createElement('div');
+            pergunta.className = 'j-pergunta';
+            pergunta.dataset.pergunta = qIdx;
+            pergunta.innerHTML = `
+              <label class="pergunta-enunciado"><b>Pergunta ${qIdx + 1}:</b> ${q.label}</label>
+              <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
+            `;
+            bloco.appendChild(pergunta);
+          });
+          content.appendChild(bloco);
+        });
+        const firstBloco = document.querySelector('.j-bloco');
+        if (firstBloco) firstBloco.style.display = 'block';
+        console.log('Blocos carregados!');
+      } else {
+        console.error('JORNADA_BLOCKS ou JORNADA_QA não disponíveis!');
+        content.innerHTML = '<div class="j-pergunta active"><label class="pergunta-enunciado">Teste</label><textarea rows="4" placeholder="Digite sua resposta..."></textarea></div>';
+      }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      showSection('section-intro');
-      loadDynamicBlocks();
-    });
+    // typeWriter - Efeito de digitação
+    <a id="typeWriter"></a>
+    function typeWriter(el, text, speed, showCursor) {
+      if (!el) return;
+      el.textContent = '';
+      if (showCursor) el.classList.add('lumen-typing');
+      let i = 0;
+      (function step() {
+        if (i < text.length) {
+          el.textContent += text.charAt(i++);
+          setTimeout(step, speed);
+        } else {
+          el.classList.add('typing-done');
+        }
+      })();
+    }
 
+    // runTyping - Executa o efeito de digitação em elementos
+    <a id="runTyping"></a>
+    function runTyping(root) {
+      (root || document).querySelectorAll('[data-typing]').forEach(el => {
+        if (el.dataset._typed) return;
+        const t = el.getAttribute('data-text') || el.textContent || '';
+        const spd = parseInt(el.getAttribute('data-speed') || '26', 10);
+        const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
+        el.dataset._typed = '1';
+        typeWriter(el, t, spd, cur);
+      });
+    }
+
+    // checkImage - Verifica a disponibilidade de uma imagem
+    <a id="checkImage"></a>
+    async function checkImage(url, fallbackUrl) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(url);
+        img.onerror = () => resolve(fallbackUrl);
+        img.src = url;
+      });
+    }
+
+    // boot - Inicializa a jornada
+    <a id="boot"></a>
+    async function boot() {
+      if (window.JORNADA_RENDER?.renderIntro) {
+        document.body.classList.add('jornada-active');
+        const route = (location.hash || '#intro').slice(1);
+        const canvas = document.getElementById('jornada-canvas');
+        if (canvas) {
+          if (route === 'perguntas') {
+            window.JORNADA_RENDER.renderPerguntas(0);
+            const bgImage = await checkImage('/assets/img/pergaminho-rasgado-horiz.png', '/assets/img/pergaminho-rasgado-vert.png');
+            canvas.className = 'card pergaminho pergaminho-h';
+            canvas.style.backgroundImage = `url('${bgImage}')`;
+          } else if (route === 'final') {
+            window.JORNADA_RENDER.renderFinal();
+            canvas.className = 'card pergaminho pergaminho-v';
+            canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
+          } else {
+            window.JORNADA_RENDER.renderIntro();
+            canvas.className = 'card pergaminho pergaminho-v';
+            canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
+          }
+        }
+        return true;
+      }
+      return false;
+    }
+
+    if (!boot()) {
+      let tries = 0;
+      const timer = setInterval(() => {
+        if (boot() || ++tries > 40) clearInterval(timer);
+      }, 100);
+    }
+
+    // toggleSenha - Alterna visibilidade da senha
+    <a id="toggleSenha"></a>
     function toggleSenha() {
       const input = document.getElementById('senha');
       if (input) input.type = input.type === 'password' ? 'text' : 'password';
     }
 
+    // ativarSenha - Ativa a senha
+    <a id="ativarSenha"></a>
     function ativarSenha() {
       const senha = document.getElementById('senha')?.value || '';
       if (senha === 'iniciar') alert('Senha ativada!');
       else alert('Senha incorreta. Tente novamente.');
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('envTag').textContent = `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
+      showSection('section-intro');
+      loadDynamicBlocks();
+      runTyping(document);
+    });
   </script>
   <script defer src="/public/config.js" onerror="console.error('Falha ao carregar config.js, usando fallback inline');"></script>
   <script defer src="/public/jornada-utils.js" onerror="console.error('Falha ao carregar jornada-utils.js, usando fallback inline');"></script>
