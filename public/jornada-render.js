@@ -1,40 +1,67 @@
 (function () {
-  const g = window;
-  
-  console.log("[load] jornada-render.js");
+  'use strict';
 
-  function ensureBaseCSS() {
-    if (document.getElementById("jr-base-css")) return;
-    const css = `
-      .card { max-width: 900px; margin: 24px auto; padding: 20px; border-radius: 14px; box-shadow: 0 8px 28px rgba(0,0,0,.12); background: #fff; }
-      .pergaminho { background: #f6efe0; }
-      .pergaminho-v { background-image: url('/assets/img/pergaminho-rasgado-vert.png'); background-size: cover; background-position: center; }
-      .pergaminho-h { background-image: url('/assets/img/pergaminho-rasgado-horiz.png'); background-size: cover; background-position: center; }
-      .btn { display: inline-block; padding: .7rem 1.2rem; border-radius: 10px; border: 0; background: #1f2937; color: #fff; font-weight: 600; cursor: pointer; }
-      .btn + .btn { margin-left: .5rem; }
-      .title { font-size: 1.6rem; margin: 0 0 .5rem 0; }
-      .muted { opacity: .75; }
-    `;
-    const style = document.createElement("style");
-    style.id = "jr-base-css";
-    style.textContent = css;
-    document.head.appendChild(style);
-  }
-  ensureBaseCSS();
+  const JR = (window.JORNADA_RENDER = window.JORNADA_RENDER || {});
 
-  function setPaper(mode) {
-    if (g.JORNADA_PAPER && typeof g.JORNADA_PAPER.set === 'function') {
-      try { g.JORNADA_PAPER.set(mode); } catch {}
-    } else {
+  function renderIntro() {
+    console.log('[JORNADA_RENDER] Renderizando intro');
+    const section = document.getElementById('section-intro');
+    if (section) {
+      section.classList.remove('hidden');
       const canvas = document.getElementById('jornada-canvas');
       if (canvas) {
-        canvas.classList.remove('pergaminho-v', 'pergaminho-h');
-        canvas.classList.add(mode === 'h' ? 'pergaminho-h' : 'pergaminho-v');
+        canvas.className = 'card pergaminho pergaminho-v';
+        canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
       }
     }
   }
 
-  const MasterAPI = {
+  function renderPerguntas(blocoIndex = 0) {
+    console.log('[JORNADA_RENDER] Renderizando perguntas, bloco:', blocoIndex);
+    const section = document.getElementById('section-perguntas');
+    if (section) {
+      section.classList.remove('hidden');
+      const canvas = document.getElementById('jornada-canvas');
+      if (canvas) {
+        canvas.className = 'card pergaminho pergaminho-h';
+        canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-horiz.png)';
+      }
+      const perguntasContainer = document.getElementById('perguntas-container');
+      if (perguntasContainer) {
+        const blocos = Array.from(perguntasContainer.querySelectorAll('.j-bloco'));
+        if (blocos[blocoIndex]) {
+          blocos.forEach(b => b.style.display = 'none');
+          blocos[blocoIndex].style.display = 'block';
+          const perguntas = Array.from(blocos[blocoIndex].querySelectorAll('.j-pergunta'));
+          if (perguntas.length) {
+            perguntas.forEach(p => p.classList.remove('active'));
+            perguntas[0].classList.add('active'); // Exibe a primeira pergunta por padrão
+          }
+        }
+      }
+    }
+  }
+
+  function renderFinal() {
+    console.log('[JORNADA_RENDER] Renderizando final');
+    const section = document.getElementById('section-final');
+    if (section) {
+      section.classList.remove('hidden');
+      const canvas = document.getElementById('jornada-canvas');
+      if (canvas) {
+        canvas.className = 'card pergaminho pergaminho-v';
+        canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
+      }
+    }
+  }
+
+  JR.renderIntro = renderIntro;
+  JR.renderPerguntas = renderPerguntas;
+  JR.renderFinal = renderFinal;
+
+  console.log('[JORNADA_RENDER] Módulo carregado');
+})();
+<!-- Grok xAI - Uhuuuuuuu! 🚀 -->  const MasterAPI = {
     async renderIntro() {
       console.log("[renderer] renderIntro()");
       setPaper('v');
