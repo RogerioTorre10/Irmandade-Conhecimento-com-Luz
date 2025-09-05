@@ -23,22 +23,49 @@
       color: #fff;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    .chama.chama-sm {
+    .chama {
       display: inline-flex;
       gap: 4px;
     }
-    .chama.chama-sm span {
-      width: 6px;
-      height: 12px;
+    .chama span {
       background: #ff4500;
       border-radius: 2px;
       animation: flicker 1.5s infinite;
     }
-    .chama.chama-sm span:nth-child(2) { animation-delay: 0.2s; }
-    .chama.chama-sm span:nth-child(3) { animation-delay: 0.4s; }
+    .chama.chama-sm span {
+      width: 6px;
+      height: 12px;
+    }
+    .chama.chama-md span {
+      width: 10px;
+      height: 20px;
+    }
+    .chama.chama-lg span {
+      width: 16px;
+      height: 32px;
+    }
+    .chama.chama-weak span {
+      background: #ff4500;
+      opacity: 0.5;
+      animation: flicker-weak 2s infinite;
+    }
+    .chama.chama-strong span {
+      background: #ff4500;
+      animation: flicker-strong 1s infinite;
+    }
+    .chama span:nth-child(2) { animation-delay: 0.2s; }
+    .chama span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes flicker {
       0%, 100% { transform: scaleY(1); opacity: 1; }
       50% { transform: scaleY(1.2); opacity: 0.8; }
+    }
+    @keyframes flicker-weak {
+      0%, 100% { transform: scaleY(0.8); opacity: 0.6; }
+      50% { transform: scaleY(1); opacity: 0.4; }
+    }
+    @keyframes flicker-strong {
+      0%, 100% { transform: scaleY(1.5); opacity: 1; }
+      50% { transform: scaleY(1.8); opacity: 0.9; }
     }
     .container {
       max-width: 900px;
@@ -73,6 +100,10 @@
       position: relative;
       z-index: 2;
       padding: 20px;
+      height: 100%;
+    }
+    .j-section {
+      height: 100%;
     }
     .btn {
       display: inline-block;
@@ -171,7 +202,6 @@
       50% { opacity: 0; }
     }
     .j-bloco {
-      display: none;
       background: transparent !important;
     }
     .j-pergunta {
@@ -217,6 +247,29 @@
       opacity: 0.6;
       font-size: 0.85rem;
     }
+    .hidden {
+      display: none;
+    }
+    .password-form {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .password-input {
+      position: relative;
+    }
+    .password-input input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+    }
+    .password-toggle {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+    }
     @media (max-width: 600px) {
       .card {
         margin: 16px;
@@ -229,7 +282,7 @@
         padding: 10px 16px;
         font-size: 0.9rem;
       }
-      .chama.chama-sm span {
+      .chama span {
         width: 4px;
         height: 8px;
       }
@@ -258,7 +311,51 @@
     </div>
 
     <section id="jornada-canvas" class="card pergaminho pergaminho-v">
-      <div id="jornada-conteudo" class="conteudo-pergaminho"></div>
+      <div id="jornada-conteudo" class="conteudo-pergaminho">
+        <!-- Seção de Introdução -->
+        <div id="section-intro" class="j-section">
+          <div class="chama chama-lg" id="chama-intro">
+            <span></span><span></span><span></span>
+          </div>
+          <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
+          <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Aqui, fé e consciência se unem para acender sua chama interior — passo a passo, jornada por jornada." data-speed="50" data-cursor="true"></p>
+          <div class="footer-actions">
+            <button id="btnNextIntro" class="btn btn-primary" data-action="next">Próxima</button>
+          </div>
+        </div>
+
+        <!-- Seção de Perguntas -->
+        <div id="section-perguntas" class="j-section hidden">
+          <div class="chama chama-md" id="chama-perguntas">
+            <span></span><span></span><span></span>
+          </div>
+          <div id="perguntas-container" class="j-bloco"></div>
+          <div class="footer-actions">
+            <button id="btnPrevPerguntas" class="btn btn-secondary" data-action="prev">Voltar</button>
+            <button id="btnNextPerguntas" class="btn btn-primary" data-action="next">Próxima</button>
+          </div>
+        </div>
+
+        <!-- Seção Final -->
+        <div id="section-final" class="j-section hidden">
+          <div class="chama chama-lg" id="chama-final">
+            <span></span><span></span><span></span>
+          </div>
+          <p data-typing data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40" data-cursor="true"></p>
+          <div class="password-form">
+            <h3>Ative sua Senha</h3>
+            <div class="password-input">
+              <input type="password" id="senha" placeholder="Digite sua senha...">
+              <span class="password-toggle" onclick="toggleSenha()">👁️</span>
+            </div>
+            <button class="btn btn-primary" onclick="ativarSenha()">Ativar</button>
+          </div>
+          <div class="footer-actions">
+            <button id="btnRestart" class="btn btn-secondary" data-action="restart">Reiniciar</button>
+            <a href="/jornadas.html" class="btn btn-primary">Voltar às Jornadas</a>
+          </div>
+        </div>
+      </div>
     </section>
 
     <footer class="site-footer">
@@ -268,33 +365,6 @@
 
   <div class="progress-badge" id="jprog-pct">0% concluído</div>
   <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
-
-  <!-- Seção de Introdução -->
-  <div id="jornada-conteudo-intro" class="conteudo-pergaminho hidden">
-    <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
-    <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Aqui, fé e consciência se unem para acender sua chama interior — passo a passo, jornada por jornada." data-speed="50" data-cursor="true"></p>
-    <div class="footer-actions">
-      <button id="btnNextIntro" class="btn btn-primary" data-action="next">Próxima</button>
-    </div>
-  </div>
-
-  <!-- Seção de Perguntas -->
-  <div id="jornada-conteudo-perguntas" class="conteudo-pergaminho hidden">
-    <div id="perguntas-container" class="j-bloco"></div>
-    <div class="footer-actions">
-      <button id="btnPrevPerguntas" class="btn btn-secondary" data-action="prev">Voltar</button>
-      <button id="btnNextPerguntas" class="btn btn-primary" data-action="next">Próxima</button>
-    </div>
-  </div>
-
-  <!-- Seção Final -->
-  <div id="jornada-conteudo-final" class="conteudo-pergaminho hidden">
-    <p data-typing data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40" data-cursor="true"></p>
-    <div class="footer-actions">
-      <button id="btnRestart" class="btn btn-secondary" data-action="restart">Reiniciar</button>
-      <a href="/jornadas.html" class="btn btn-primary">Voltar às Jornadas</a>
-    </div>
-  </div>
 
   <div class="j-progress">
     <div class="j-progress__bar"><div class="j-progress__fill"></div></div>
@@ -314,13 +384,36 @@
     document.getElementById('envTag').textContent =
       `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
 
+    // Listas de palavras para sentiment (simples contagem)
+    const positiveWords = ['abencoado', 'abencoar', 'abertura', 'abnegacao', 'abraco', 'abrigo', 'absoluto', 'abundancia', 'acao', 'aceitacao', 'aceitar', 'acessivel', 'aclamacao', 'aclamado', 'aconchegante', 'aconchegar', 'aconchego', 'acreditar', 'adaptabilidade', 'adaptavel', 'adequado', 'admiracao', 'admiravel', 'adoracao', 'adorar', 'adoravel', 'afabilidade', 'afavel', 'afirmacao', 'afirmativo', 'agilidade', 'agradar', 'agradavel', 'agradecer', 'agradecimento', 'ajuda', 'ajudar', 'alcancar', 'alegre', 'alegria', 'alicerce', 'alma', 'altruismo', 'altruista', 'amabilidade', 'amar', 'amavel', 'amigo', 'amizade', 'amor', 'amoroso', 'amor-proprio', 'animacao', 'apaixonado', 'aplaudir', 'aplauso', 'apoiar', 'apoio', 'apreciado', 'apreciar', 'aprender', 'aprendizagem', 'aprovacao', 'arte', 'assertividade', 'assertivo', 'astucia', 'astucioso', 'atencao', 'atencioso', 'atitude', 'ativo', 'atracao', 'auspicioso', 'autenticidade', 'autentico', 'autoconfianca', 'autoestima', 'autonomia', 'autonomo', 'aventura', 'balanceado', 'batalhador', 'batalhar', 'beijar', 'beijo', 'beldade', 'beleza', 'belo', 'bem-disposto', 'bem-educado', 'bem-estar', 'bem-humorado', 'bem-vindo', 'bencao', 'bendito', 'beneficencia', 'beneficente', 'beneficio', 'benefico', 'benemerito', 'benevolencia', 'benevolente', 'benfeitor', 'benignidade', 'benzer', 'bom', 'bonanca', 'bondade', 'bondoso', 'bonito', 'bravura', 'brilhante', 'brilhar', 'brilho', 'brincadeira', 'brincalhao', 'brincar', 'brio', 'brioso', 'calma', 'calor', 'camaradagem', 'capacidade', 'caridade', 'carinho', 'carinhoso', 'carismatico', 'caritativo', 'cativar', 'cavalheiro', 'ceder', 'celebracao', 'celestial', 'centrado', 'certeza', 'certo', 'ceu', 'civilidade', 'civilizado', 'clarividencia', 'claro', 'clemencia', 'coerente', 'colaboracao', 'colaborar', 'comemorar', 'compaixao', 'companheirismo', 'companheiro', 'companhia', 'compassivo', 'competencia', 'competente', 'compreender', 'compreensao', 'comprometimento', 'comunhao', 'comunicacao', 'comunidade', 'concentracao', 'concordar', 'conectar', 'conexao', 'confiabilidade', 'confianca', 'confiante', 'confiavel', 'confortavel', 'conforto', 'congruencia', 'conhecimento', 'conquista', 'conquistar', 'consciencia', 'consciente', 'conseguir', 'consideracao', 'consolacao', 'consolo', 'construir', 'construtivo', 'contentamento', 'contente', 'continuidade', 'contribuicao', 'contribuir', 'contributo', 'conviccao', 'cooperacao', 'cooperar', 'coracao', 'coragem', 'corajoso', 'cordial', 'cordialidade', 'cortes', 'cortesia', 'credibilidade', 'crenca', 'crescer', 'crescimento', 'criar', 'criatividade', 'criativo', 'cuidado', 'cuidadoso', 'cuidar', 'cultivar', 'cultura', 'cumpridor', 'cura', 'curiosidade', 'decencia', 'decente', 'decoro', 'dedicacao', 'dedicado', 'deferencia', 'delicadeza', 'delicado', 'delicia', 'delicioso', 'denodo', 'desafio', 'descansar', 'descoberta', 'desejavel', 'desejo', 'desenvoltura', 'desenvolver', 'desenvolvimento', 'deslumbrado', 'deslumbrar', 'destemido', 'destino', 'determinacao', 'determinado', 'deus', 'dever', 'devotado', 'dignidade', 'digno', 'diligencia', 'diligente', 'dinamismo', 'direcao', 'dirigir', 'disciplina', 'disciplinado', 'discrecao', 'disponibilidade', 'disponivel', 'disposicao', 'disposto', 'diversao', 'diversidade', 'divertido', 'divinal', 'divino', 'docilidade', 'educacao', 'educado', 'educar', 'eficacia', 'eficiencia', 'eficiente', 'elegancia', 'elevacao', 'elevado', 'elevar', 'elogio', 'eloquencia', 'emancipacao', 'emancipado', 'embelezar'];
+    const negativeWords = ['agressivo', 'ansioso', 'antipatico', 'antissocial', 'apatico', 'apressado', 'arrogante', 'atrevido', 'autoritario', 'avarento', 'birrento', 'bisbilhoteiro', 'bruto', 'calculista', 'casmurro', 'chato', 'cinico', 'ciumento', 'colerico', 'comodista', 'covarde', 'critico', 'cruel', 'debochado', 'depressivo', 'desafiador', 'desbocado', 'descarado', 'descomedido', 'desconfiado', 'descortes', 'desequilibrado', 'desleal', 'desleixado', 'desmazelado', 'desmotivado', 'desobediente', 'desonesto', 'desordeiro', 'despotico', 'desumano', 'discriminador', 'dissimulado', 'distraido', 'egoista', 'estourado', 'estressado', 'exigente', 'falso', 'fingido', 'fraco', 'frio', 'frivolo', 'futil', 'ganancioso', 'grosseiro', 'grosso', 'hipocrita', 'ignorante', 'impaciente', 'impertinente', 'impetuoso', 'impiedoso', 'imponderado', 'impostor', 'imprudente', 'impulsivo', 'incompetente', 'inconstante', 'inconveniente', 'incorreto', 'indeciso', 'indecoroso', 'indelicado', 'indiferente', 'infiel', 'inflexivel', 'injusto', 'inseguro', 'insensato', 'insincero', 'instavel', 'insuportavel', 'interesseiro', 'intolerante', 'intransigente', 'irracional', 'irascivel', 'irrequieto', 'irresponsavel', 'irritadico', 'malandro', 'maldoso', 'malicioso', 'malvado', 'mandao', 'manhoso', 'maquiavelico', 'medroso', 'mentiroso', 'mesquinho', 'narcisista', 'negligente', 'nervoso', 'neurotico', 'obcecado', 'odioso', 'oportunista', 'orgulhoso', 'pedante', 'pessimista', 'pe-frio', 'possessivo', 'precipitado', 'preconceituoso', 'preguiçoso', 'prepotente', 'presunçoso', 'problematico', 'quezilento', 'rancoroso', 'relapso', 'rigoroso', 'rabugento', 'rude', 'sarcastico', 'sedentario', 'teimoso', 'timido', 'tirano', 'traicoeiro', 'traidor', 'trapaceiro', 'tendencioso', 'trocista', 'vagabundo', 'vaidoso', 'vulneravel', 'vigarista', 'xenofobo'];
+
+    // Função simples de sentiment
+    function analyzeSentiment(text) {
+      const words = text.toLowerCase().split(/\s+/);
+      let posCount = 0, negCount = 0;
+      words.forEach(word => {
+        if (positiveWords.includes(word)) posCount++;
+        if (negativeWords.includes(word)) negCount++;
+      });
+      return posCount - negCount;
+    }
+
+    // Atualizar chama baseada em sentiment
+    function updateChama(score) {
+      const chama = document.getElementById('chama-perguntas');
+      chama.classList.remove('chama-weak', 'chama-strong');
+      if (score < 0) {
+        chama.classList.add('chama-weak');
+      } else if (score > 0) {
+        chama.classList.add('chama-strong');
+      }
+    }
+
     // Gerenciamento de Navegação
     function showSection(sectionId) {
-      const sections = ['jornada-conteudo-intro', 'jornada-conteudo-perguntas', 'jornada-conteudo-final'];
-      sections.forEach(id => {
-        const section = document.getElementById(id.replace('jornada-conteudo-', ''));
-        if (section) section.classList.add('hidden');
-      });
+      const sections = document.querySelectorAll('.j-section');
+      sections.forEach(section => section.classList.add('hidden'));
       const activeSection = document.getElementById(sectionId);
       if (activeSection) activeSection.classList.remove('hidden');
       updateCanvasBackground(sectionId);
@@ -328,7 +421,7 @@
 
     function updateCanvasBackground(sectionId) {
       const canvas = document.getElementById('jornada-canvas');
-      if (sectionId === 'jornada-conteudo-perguntas') {
+      if (sectionId === 'section-perguntas') {
         canvas.className = 'card pergaminho pergaminho-h';
       } else {
         canvas.className = 'card pergaminho pergaminho-v';
@@ -337,26 +430,47 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       // Mostrar introdução inicial
-      showSection('jornada-conteudo-intro');
+      showSection('section-intro');
 
       // Eventos de navegação
       document.getElementById('btnNextIntro').addEventListener('click', () => {
-        showSection('jornada-conteudo-perguntas');
+        showSection('section-perguntas');
         loadDynamicBlocks();
       });
 
       document.getElementById('btnPrevPerguntas').addEventListener('click', () => {
-        showSection('jornada-conteudo-intro');
+        showSection('section-intro');
       });
 
       document.getElementById('btnNextPerguntas').addEventListener('click', () => {
-        showSection('jornada-conteudo-final');
+        showSection('section-final');
       });
 
       document.getElementById('btnRestart').addEventListener('click', () => {
-        showSection('jornada-conteudo-intro');
+        showSection('section-intro');
+      });
+
+      // Reativa chama em respostas
+      document.addEventListener('input', (e) => {
+        if (e.target.tagName === 'TEXTAREA') {
+          const text = e.target.value;
+          const score = analyzeSentiment(text);
+          updateChama(score);
+        }
       });
     });
+
+    // Toggle senha
+    function toggleSenha() {
+      const input = document.getElementById('senha');
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    // Função placeholder para ativar senha (ajuste com auth.js)
+    function ativarSenha() {
+      const senha = document.getElementById('senha').value;
+      alert(`Senha ativada: ${senha}`); // Substitua por lógica real
+    }
 
     // Carregar blocos dinamicamente
     function loadDynamicBlocks() {
@@ -375,13 +489,15 @@
           pergunta.className = 'j-pergunta';
           pergunta.dataset.pergunta = qIdx;
           pergunta.innerHTML = `
-            <label class="pergunta-enunciado" data-type="Pergunta ${qIdx + 1}: ${q.label}"><b>Pergunta ${qIdx + 1}:</b> ${q.label}</label>
+            <label class="pergunta-enunciado"><b>Pergunta ${qIdx + 1}:</b> ${q.label}</label>
             <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
           `;
           bloco.appendChild(pergunta);
         });
         content.appendChild(bloco);
       });
+      // Mostrar primeiro bloco
+      document.querySelector('.j-bloco').style.display = 'block';
     }
 
     // Datilografia
