@@ -9,7 +9,11 @@
   <style>
     body { margin: 0; font-family: Arial, sans-serif; background: #f9f9f9; color: #333; }
     .site-header { display: flex; align-items: center; gap: 12px; padding: 16px; background: #1f2937; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .chama { display: block; position: relative; overflow: hidden; }
+    .chama {
+      display: block; /* Única chama */
+      position: relative;
+      overflow: hidden;
+    }
     .chama span {
       position: absolute; bottom: 0; width: 100%; height: 100%;
       background: linear-gradient(to top, #ff4500 0%, #ff8c00 40%, rgba(255, 69, 0, 0) 100%);
@@ -17,7 +21,7 @@
       animation: flicker 1.5s infinite; border-radius: 2px;
     }
     .chama.chama-lg span { width: 32px; height: 80px; }
-    .chama.chama-md-intermediario span { width: 24px; height: 60px; } /* Maior que md original */
+    .chama.chama-md-intermediario span { width: 24px; height: 60px; }
     .chama.chama-weak span { opacity: 0.5; animation: flicker-weak 2s infinite; }
     .chama.chama-strong span { animation: flicker-strong 1s infinite; }
     @keyframes flicker { 0%, 100% { transform: scaleY(1); opacity: 1; } 50% { transform: scaleY(1.2); opacity: 0.8; } }
@@ -66,7 +70,7 @@
 </head>
 <body data-layout="master" data-journey="essencial">
   <header class="site-header">
-    <div class="chama chama-lg">
+    <div class="chama chama-lg" id="chama-header">
       <span></span>
     </div>
     <h1>Jornada Essencial</h1>
