@@ -305,14 +305,9 @@
   </header>
 
   <main id="page-shell" class="container">
-    <div class="container">
-      <a class="btn btn-primary" href="#intro">Ir para Introdução</a>
-      <a class="btn btn-secondary" href="/jornadas.html">← Voltar</a>
-    </div>
-
     <section id="jornada-canvas" class="card pergaminho pergaminho-v">
       <div id="jornada-conteudo" class="conteudo-pergaminho">
-        <!-- Seção de Introdução -->
+        <!-- Seção de Introdução com Botão de Início -->
         <div id="section-intro" class="j-section">
           <div class="chama chama-lg" id="chama-intro">
             <span></span><span></span><span></span>
@@ -320,7 +315,7 @@
           <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
           <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Aqui, fé e consciência se unem para acender sua chama interior — passo a passo, jornada por jornada." data-speed="50" data-cursor="true"></p>
           <div class="footer-actions">
-            <button id="btnNextIntro" class="btn btn-primary" data-action="next">Próxima</button>
+            <button id="btnStartJourney" class="btn btn-primary">Iniciar Jornada</button>
           </div>
         </div>
 
@@ -352,7 +347,6 @@
           </div>
           <div class="footer-actions">
             <button id="btnRestart" class="btn btn-secondary" data-action="restart">Reiniciar</button>
-            <a href="/jornadas.html" class="btn btn-primary">Voltar às Jornadas</a>
           </div>
         </div>
       </div>
@@ -432,12 +426,13 @@
       // Mostrar introdução inicial
       showSection('section-intro');
 
-      // Eventos de navegação
-      document.getElementById('btnNextIntro').addEventListener('click', () => {
+      // Botão para iniciar a jornada
+      document.getElementById('btnStartJourney').addEventListener('click', () => {
         showSection('section-perguntas');
         loadDynamicBlocks();
       });
 
+      // Eventos de navegação
       document.getElementById('btnPrevPerguntas').addEventListener('click', () => {
         showSection('section-intro');
       });
