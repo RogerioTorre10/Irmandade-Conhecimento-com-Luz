@@ -128,11 +128,12 @@
     <video id="videoTransicao" class="video-player" playsinline preload="metadata" controls></video>
     <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
   </div>
-  <div id="envTag"></div> /* Adicionado pra resolver null error */
+  <div id="envTag"></div>
 
   <script>
-    const positiveWords = window.JORNADA_CFG.positiveWords;
-    const negativeWords = window.JORNADA_CFG.negativeWords;
+    document.getElementById('envTag').textContent = `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
+    const positiveWords = window.JORNADA_CFG.positiveWords || [];
+    const negativeWords = window.JORNADA_CFG.negativeWords || [];
 
     function analyzeSentiment(text) {
       const words = text.toLowerCase().split(/\s+/);
@@ -190,16 +191,24 @@
     function ativarSenha() {
       const senha = document.getElementById('senha')?.value || '';
       if (senha === 'iniciar') {
-        window.JORNADA_AUTH.init({
-          inputSelector: '#senha',
-          eyeSelector: '.password-toggle',
-          onGranted: () => {
-            window.JORNADA_DOWNLOAD(window.JC._state.respostas).then(() => {
-              alert('Senha ativada! Arquivos gerados.');
-              location.replace('/index.html');
-            }).catch(() => alert('Erro ao gerar arquivos.'));
-          }
-        });
+        if (window.JORNADA_AUTH?.init) {
+          window.JORNADA_AUTH.init({
+            inputSelector: '#senha',
+            eyeSelector: '.password-toggle',
+            onGranted: () => {
+              if (window.JORNADA_DOWNLOAD) {
+                window.JORNADA_DOWNLOAD(window.JC._state.respostas).then(() => {
+                  alert('Senha ativada! Arquivos gerados.');
+                  location.replace('/index.html');
+                }).catch(() => alert('Erro ao gerar arquivos.'));
+              } else {
+                console.error('JORNADA_DOWNLOAD não disponível!');
+              }
+            }
+          });
+        } else {
+          console.error('JORNADA_AUTH não disponível!');
+        }
       } else {
         alert('Senha incorreta. Tente novamente.');
       }
@@ -233,8 +242,12 @@
         });
         content.appendChild(bloco);
       });
-      window.JC.render(); // Chama render pra exibir a primeira pergunta
-      console.log('Blocos carregados e render chamado!');
+      if (window.JC?.render) {
+        window.JC.render();
+        console.log('Blocos carregados e render chamado!');
+      } else {
+        console.error('JC.render não disponível!');
+      }
     }
 
     function typeWriter(el, text, speed, showCursor) {
@@ -314,16 +327,16 @@
       }, 100);
     }
   </script>
-  <script defer src="/config.js"></script>
-  <script defer src="/jornada-utils.js"></script>
-  <script defer src="/jornada-core.js"></script>
-  <script defer src="/jornada-auth.js"></script>
-  <script defer src="/jornada-chama.js"></script>
-  <script defer src="/jornada-paper-qa.js"></script>
-  <script defer src="/jornada-typing.js"></script>
-  <script defer src="/jornada-controller.js"></script>
-  <script defer src="/jornada-render.js"></script>
-  <script defer src="/jornada-bootstrap.js"></script>
-  <script defer src="/jornada-micro.js"></script>
-  <script defer src="/api.js"></script>
+  <script defer src="/public/config.js"></script>
+  <script defer src="/public/jornada-utils.js"></script>
+  <script defer src="/public/jornada-core.js"></script>
+  <script defer src="/public/jornada-auth.js"></script>
+  <script defer src="/public/jornada-chama.js"></script>
+  <script defer src="/public/jornada-paper-qa.js"></script>
+  <script defer src="/public/jornada-typing.js"></script>
+  <script defer src="/public/jornada-controller.js"></script>
+  <script defer src="/public/jornada-render.js"></script>
+  <script defer src="/public/jornada-bootstrap.js"></script>
+  <script defer src="/public/jornada-micro.js"></script>
+  <script defer src="/public/api.js"></script>
   <!-- Grok xAI - Uhuuuuuuu! 🚀 -->
