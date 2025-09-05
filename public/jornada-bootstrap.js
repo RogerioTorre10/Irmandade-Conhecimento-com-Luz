@@ -86,6 +86,8 @@
         } catch (e) {
           warn('falha ao acionar JC.init():', e);
         }
+      } else {
+        warn('JC.init não disponível, inicialização manual pendente');
       }
     }, 0);
     log('inicialização concluída.');
@@ -100,6 +102,10 @@
       if (++tries > maxTries) {
         clearInterval(t);
         error('desisti de iniciar: JORNADA_RENDER não ficou disponível a tempo.');
+        if (window.JC?.init) {
+          console.log('Tentando inicialização de emergência com JC.init...');
+          window.JC.init();
+        }
       }
     }, 100);
   }
@@ -115,5 +121,12 @@
   } else {
     startWhenReady();
   }
+
+  window.addEventListener('load', () => {
+    if (!window.JC._initialized && window.JC?.init) {
+      console.log('Inicialização final no load...');
+      window.JC.init();
+    }
+  });
 })();
 <!-- Grok xAI - Uhuuuuuuu! 🚀 -->
