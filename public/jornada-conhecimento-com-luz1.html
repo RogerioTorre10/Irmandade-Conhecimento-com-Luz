@@ -10,10 +10,10 @@
     body { margin: 0; font-family: Arial, sans-serif; background: #f9f9f9; color: #333; }
     .site-header { display: flex; align-items: center; gap: 12px; padding: 16px; background: #1f2937; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     .chama { display: inline-flex; gap: 4px; }
-    .chama span { background: #ff4500; animation: flicker 1.5s infinite; border-radius: 0; } /* Retangular, sem bordas arredondadas */
-    .chama.chama-sm span { width: 8px; height: 16px; }
-    .chama.chama-md span { width: 12px; height: 24px; }
-    .chama.chama-lg span { width: 20px; height: 32px; }
+    .chama span { background: #ff4500; animation: flicker 1.5s infinite; border-radius: 2px; } /* Volta a bordas leves */
+    .chama.chama-sm span { width: 6px; height: 12px; }
+    .chama.chama-md span { width: 10px; height: 20px; }
+    .chama.chama-lg span { width: 16px; height: 32px; }
     .chama.chama-weak span { background: #ff4500; opacity: 0.5; animation: flicker-weak 2s infinite; }
     .chama.chama-strong span { background: #ff4500; animation: flicker-strong 1s infinite; }
     .chama span:nth-child(2) { animation-delay: 0.2s; }
@@ -142,11 +142,13 @@
 
     function updateChama(score) {
       const chama = document.getElementById('chama-perguntas');
-      chama.classList.remove('chama-weak', 'chama-strong');
-      if (score === "sofrida") {
-        chama.classList.add('chama-weak');
-      } else if (score === "alegre") {
-        chama.classList.add('chama-strong');
+      if (chama) {
+        chama.classList.remove('chama-weak', 'chama-strong');
+        if (score === "sofrida") {
+          chama.classList.add('chama-weak');
+        } else if (score === "alegre") {
+          chama.classList.add('chama-strong');
+        }
       }
     }
 
@@ -160,26 +162,31 @@
 
     function updateCanvasBackground(sectionId) {
       const canvas = document.getElementById('jornada-canvas');
-      if (sectionId === 'section-perguntas') {
-        canvas.className = 'card pergaminho pergaminho-h';
-      } else {
-        canvas.className = 'card pergaminho pergaminho-v';
+      if (canvas) {
+        if (sectionId === 'section-perguntas') {
+          canvas.className = 'card pergaminho pergaminho-h';
+        } else {
+          canvas.className = 'card pergaminho pergaminho-v';
+        }
       }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       showSection('section-intro');
-      document.getElementById('btnIniciar').addEventListener('click', () => {
-        showSection('section-perguntas');
-        loadDynamicBlocks();
-      });
-      document.getElementById('btnPrevPerguntas').addEventListener('click', () => {
+      const btnIniciar = document.getElementById('btnIniciar');
+      if (btnIniciar) {
+        btnIniciar.addEventListener('click', () => {
+          showSection('section-perguntas');
+          loadDynamicBlocks();
+        });
+      }
+      document.getElementById('btnPrevPerguntas')?.addEventListener('click', () => {
         showSection('section-intro');
       });
-      document.getElementById('btnNextPerguntas').addEventListener('click', () => {
+      document.getElementById('btnNextPerguntas')?.addEventListener('click', () => {
         showSection('section-final');
       });
-      document.getElementById('btnRestart').addEventListener('click', () => {
+      document.getElementById('btnRestart')?.addEventListener('click', () => {
         showSection('section-intro');
       });
       document.addEventListener('input', (e) => {
@@ -193,11 +200,13 @@
 
     function toggleSenha() {
       const input = document.getElementById('senha');
-      input.type = input.type === 'password' ? 'text' : 'password';
+      if (input) {
+        input.type = input.type === 'password' ? 'text' : 'password';
+      }
     }
 
     function ativarSenha() {
-      const senha = document.getElementById('senha').value;
+      const senha = document.getElementById('senha')?.value || '';
       if (senha === 'iniciar') {
         window.JORNADA_AUTH.init({
           inputSelector: '#senha',
@@ -236,7 +245,8 @@
         });
         content.appendChild(bloco);
       });
-      document.querySelector('.j-bloco').style.display = 'block';
+      const firstBloco = document.querySelector('.j-bloco');
+      if (firstBloco) firstBloco.style.display = 'block';
     }
 
     function typeWriter(el, text, speed, showCursor) {
@@ -288,19 +298,21 @@
         document.body.classList.add('jornada-active');
         const route = (location.hash || '#intro').slice(1);
         const canvas = document.getElementById('jornada-canvas');
-        if (route === 'perguntas') {
-          window.JORNADA_RENDER.renderPerguntas(0);
-          const bgImage = await checkImage('/assets/img/pergaminho-rasgado-horiz.png', '/assets/img/pergaminho-rasgado-vert.png');
-          canvas.className = 'card pergaminho pergaminho-h';
-          canvas.style.backgroundImage = `url('${bgImage}')`;
-        } else if (route === 'final') {
-          window.JORNADA_RENDER.renderFinal();
-          canvas.className = 'card pergaminho pergaminho-v';
-          canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
-        } else {
-          window.JORNADA_RENDER.renderIntro();
-          canvas.className = 'card pergaminho pergaminho-v';
-          canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
+        if (canvas) {
+          if (route === 'perguntas') {
+            window.JORNADA_RENDER.renderPerguntas(0);
+            const bgImage = await checkImage('/assets/img/pergaminho-rasgado-horiz.png', '/assets/img/pergaminho-rasgado-vert.png');
+            canvas.className = 'card pergaminho pergaminho-h';
+            canvas.style.backgroundImage = `url('${bgImage}')`;
+          } else if (route === 'final') {
+            window.JORNADA_RENDER.renderFinal();
+            canvas.className = 'card pergaminho pergaminho-v';
+            canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
+          } else {
+            window.JORNADA_RENDER.renderIntro();
+            canvas.className = 'card pergaminho pergaminho-v';
+            canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
+          }
         }
         return true;
       }
