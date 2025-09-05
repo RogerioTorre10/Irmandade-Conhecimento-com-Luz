@@ -28,7 +28,7 @@
       position: relative;
       overflow: hidden;
       z-index: 40;
-      visibility: visible; /* Garantir visibilidade */
+      visibility: visible;
     }
     .chama span {
       position: absolute;
@@ -139,7 +139,7 @@
       border-radius: 8px;
       font-size: 0.9rem;
       z-index: 900;
-      visibility: visible; /* Garantir visibilidade */
+      visibility: visible;
     }
     .progress-bar {
       width: 100%;
@@ -211,7 +211,7 @@
       margin-bottom: 24px;
       display: none;
       z-index: 60;
-      position: relative; /* Garantir posicionamento correto */
+      position: relative;
     }
     .j-pergunta.active {
       display: block;
@@ -390,9 +390,10 @@
       const chama = document.getElementById('chama-perguntas');
       if (chama) {
         chama.classList.remove('chama-weak', 'chama-strong');
+        chama.style.display = 'block'; // Garantir que a chama seja exibida
         if (score === "sofrida") chama.classList.add('chama-weak');
         else if (score === "alegre") chama.classList.add('chama-strong');
-        console.log('Chama atualizada para:', score); // Depuração
+        console.log('Chama atualizada para:', score);
       } else {
         console.error('Elemento chama-perguntas não encontrado!');
       }
@@ -411,7 +412,7 @@
       if (badge) badge.textContent = `${Math.round(progresso)}% concluído`;
       if (jFill) jFill.style.width = `${progresso}%`;
       if (jMeta) jMeta.textContent = `Respondidas: ${respondidas} de ${perguntas.length}`;
-      console.log('Progresso atualizado:', progresso); // Depuração
+      console.log('Progresso atualizado:', progresso);
     }
 
     // saveAnswers - Salva respostas no localStorage
@@ -440,9 +441,9 @@
       if (activeSection) activeSection.classList.remove('hidden');
       updateCanvasBackground(sectionId);
       if (sectionId === 'section-perguntas') {
-        updateProgress(); // Atualizar progresso ao entrar na seção de perguntas
+        updateProgress();
         const perguntas = document.querySelectorAll('.j-pergunta');
-        if (perguntas.length) runTyping(perguntas[0]); // Aplicar datilografia na primeira pergunta
+        if (perguntas.length) runTyping(perguntas[0]);
       }
     }
 
@@ -489,7 +490,7 @@
           const firstPergunta = firstBloco.querySelector('.j-pergunta');
           if (firstPergunta) {
             firstPergunta.classList.add('active');
-            runTyping(firstPergunta); // Aplicar datilografia na primeira pergunta
+            runTyping(firstPergunta);
           }
           loadAnswers();
         }
@@ -590,7 +591,7 @@
         const perguntas = document.querySelectorAll('.j-pergunta');
         if (perguntas.length) {
           perguntas[0].classList.add('active');
-          runTyping(perguntas[0]); // Aplicar datilografia na primeira pergunta
+          runTyping(perguntas[0]);
         } else {
           console.error('Nenhuma pergunta encontrada após loadDynamicBlocks!');
         }
@@ -598,7 +599,7 @@
         document.querySelector('.progress-bar').classList.remove('hidden');
         document.querySelector('.j-progress').classList.remove('hidden');
         document.querySelector('.footer-actions').classList.remove('hidden');
-        updateProgress(); // Inicializar progresso
+        updateProgress();
         console.log('Jornada iniciada com sucesso!');
       } else {
         alert('Senha incorreta. Tente novamente.');
@@ -705,7 +706,7 @@
       console.log('[JORNADA] Finalizado. Respostas:', respostas);
       alert('Jornada concluída!');
       localStorage.removeItem('jornada_respostas');
-      setTimeout(() => location.replace('/index.html'), 1000);
+      window.location.href = '/index.html'; // Forçar redirecionamento
     }
 
     // initJornada - Inicializa o controlador da jornada
@@ -764,27 +765,26 @@
         const obs = new MutationObserver(muts => {
           muts.forEach(m => {
             runTyping(m.target);
-            if (m.target.id === 'perguntas-container') updateProgress(); // Atualizar progresso ao carregar perguntas
+            if (m.target.id === 'perguntas-container') updateProgress();
           });
         });
         obs.observe(target, { childList: true, subtree: true });
       }
     });
 
-    // Referências externas (mantidas para evitar 404, mas não necessárias)
-  </script>
-  <script defer src="/config.js" onerror="console.error('Falha ao carregar config.js, usando fallback inline');"></script>
-  <script defer src="/jornada-utils.js" onerror="console.error('Falha ao carregar jornada-utils.js, usando fallback inline');"></script>
-  <script defer src="/jornada-core.js" onerror="console.error('Falha ao carregar jornada-core.js, usando fallback inline');"></script>
-  <script defer src="/jornada-auth.js" onerror="console.error('Falha ao carregar jornada-auth.js, usando fallback inline');"></script>
-  <script defer src="/jornada-chama.js" onerror="console.error('Falha ao carregar jornada-chama.js, usando fallback inline');"></script>
-  <script defer src="/jornada-paper-qa.js" onerror="console.error('Falha ao carregar jornada-paper-qa.js, usando fallback inline');"></script>
-  <script defer src="/jornada-typing.js" onerror="console.error('Falha ao carregar jornada-typing.js, usando fallback inline');"></script>
-  <script defer src="/jornada-controller.js" onerror="console.error('Falha ao carregar jornada-controller.js, usando fallback inline');"></script>
-  <script defer src="/jornada-render.js" onerror="console.error('Falha ao carregar jornada-render.js, usando fallback inline');"></script>
-  <script defer src="/jornada-bootstrap.js" onerror="console.error('Falha ao carregar jornada-bootstrap.js, usando fallback inline');"></script>
-  <script defer src="/jornada-micro.js" onerror="console.error('Falha ao carregar jornada-micro.js, usando fallback inline');"></script>
-  <script defer src="/i18n/i18n.js" onerror="console.error('Falha ao carregar i18n.js, usando fallback inline');"></script>
-  <script defer src="/api.js" onerror="console.error('Falha ao carregar api.js, usando fallback inline');"></script>
+    // Referências externas (desativadas temporariamente para evitar interferência)
+    <!-- <script defer src="/config.js" onerror="console.error('Falha ao carregar config.js, usando fallback inline');"></script>
+    <script defer src="/jornada-utils.js" onerror="console.error('Falha ao carregar jornada-utils.js, usando fallback inline');"></script>
+    <script defer src="/jornada-core.js" onerror="console.error('Falha ao carregar jornada-core.js, usando fallback inline');"></script>
+    <script defer src="/jornada-auth.js" onerror="console.error('Falha ao carregar jornada-auth.js, usando fallback inline');"></script>
+    <script defer src="/jornada-chama.js" onerror="console.error('Falha ao carregar jornada-chama.js, usando fallback inline');"></script>
+    <script defer src="/jornada-paper-qa.js" onerror="console.error('Falha ao carregar jornada-paper-qa.js, usando fallback inline');"></script>
+    <script defer src="/jornada-typing.js" onerror="console.error('Falha ao carregar jornada-typing.js, usando fallback inline');"></script>
+    <script defer src="/jornada-controller.js" onerror="console.error('Falha ao carregar jornada-controller.js, usando fallback inline');"></script>
+    <script defer src="/jornada-render.js" onerror="console.error('Falha ao carregar jornada-render.js, usando fallback inline');"></script>
+    <script defer src="/jornada-bootstrap.js" onerror="console.error('Falha ao carregar jornada-bootstrap.js, usando fallback inline');"></script>
+    <script defer src="/jornada-micro.js" onerror="console.error('Falha ao carregar jornada-micro.js, usando fallback inline');"></script>
+    <script defer src="/i18n/i18n.js" onerror="console.error('Falha ao carregar i18n.js, usando fallback inline');"></script>
+    <script defer src="/api.js" onerror="console.error('Falha ao carregar api.js, usando fallback inline');"></script> -->
 </body>
 </html>
