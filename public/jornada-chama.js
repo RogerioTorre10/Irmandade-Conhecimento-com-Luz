@@ -2,7 +2,7 @@
 (function () {
   function criarChama() {
     const d = document.createElement("div");
-    d.className = "chama-container";
+    d.className = "chama";
     d.innerHTML = `<span></span>`; // Única chama
     return d;
   }
@@ -25,13 +25,14 @@
     const chamaPerguntas = document.getElementById("chama-perguntas");
     const chamaFinal = document.getElementById("chama-final");
 
-    // Garante que cada chama tenha um único <span>
     [chamaHeader, chamaPerguntas, chamaFinal].forEach(chamaEl => {
       if (chamaEl && !chamaEl.querySelector('span')) {
-        chamaEl.innerHTML = criarChama().innerHTML;
-        if (chamaEl === chamaHeader) chamaEl.className = "chama chama-lg";
-        else if (chamaEl === chamaPerguntas) chamaEl.className = "chama chama-md-intermediario";
-        else if (chamaEl === chamaFinal) chamaEl.className = "chama chama-lg";
+        const novaChama = criarChama();
+        if (chamaEl === chamaHeader) novaChama.className = "chama chama-lg";
+        else if (chamaEl === chamaPerguntas) novaChama.className = "chama chama-md-intermediario";
+        else if (chamaEl === chamaFinal) novaChama.className = "chama chama-lg";
+        chamaEl.innerHTML = '';
+        chamaEl.appendChild(novaChama);
       }
     });
 
