@@ -5,11 +5,11 @@
 ;(function () {
   const CFG = Object.assign(
     {
-      ACCESS_CODE: (window.JORNADA_CFG && window.JORNADA_CFG.ACCESS_CODE) || "IRMANDADE",
+      ACCESS_CODE: (window.JORNADA_CFG && window.JORNADA_CFG.PASS) || "IRMANDADE",
       STORAGE_KEY: "jornada_auth",
-      FINISH_HOURS: 24,   // prazo após liberar
-      START_DAYS: null,   // ex.: 15 (janela pra começar)
-      ISSUED_AT: null,    // timestamp ms
+      FINISH_HOURS: 24,
+      START_DAYS: null,
+      ISSUED_AT: null,
     },
     window.JORNADA_CFG || {}
   );
@@ -68,8 +68,8 @@
   function init(opts = {}) {
     const {
       formSelector = "#form-senha",
-      inputSelector = "#senha-input",
-      eyeSelector = "#senha-eye",
+      inputSelector = "#senha",
+      eyeSelector = ".password-toggle",
       countdownSelector = "#senha-countdown",
       onGranted = () => {}
     } = opts;
@@ -115,4 +115,5 @@
     timeLeftMs,
     formatCountdown,
   };
-})(); // <-- só UM fechamento
+})();
+<!-- Grok xAI - Uhuuuuuuu! 🚀 -->
