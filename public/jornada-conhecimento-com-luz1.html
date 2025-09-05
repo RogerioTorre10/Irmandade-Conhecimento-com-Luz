@@ -323,7 +323,7 @@
             <div class="chama chama-md-intermediario" id="chama-perguntas">
               <span></span>
             </div>
-            <div id="perguntas-container" class="j-bloco"></div>
+            <div id="perguntas-container"></div>
             <div class="footer-actions">
               <button id="btnPrevPerguntas" class="btn btn-secondary" data-action="prev">Voltar</button>
               <button id="btnNextPerguntas" class="btn btn-primary" data-action="next">Próxima</button>
@@ -469,7 +469,7 @@
           });
           content.appendChild(bloco);
         });
-        const firstBloco = document.querySelector('.j-bloco');
+        const firstBloco = content.querySelector('.j-bloco');
         if (firstBloco) {
           firstBloco.style.display = 'block';
           const firstPergunta = firstBloco.querySelector('.j-pergunta');
@@ -600,8 +600,9 @@
         if (nextBlocoIndex < blocos.length) {
           blocos.forEach(b => b.style.display = 'none');
           blocos[nextBlocoIndex].style.display = 'block';
-          blocos[nextBlocoIndex].querySelector('.j-pergunta').classList.add('active');
-          playTransition(blocos[nextBlocoIndex].dataset.video || '', () => {});
+          const nextPergunta = blocos[nextBlocoIndex].querySelector('.j-pergunta');
+          if (nextPergunta) nextPergunta.classList.add('active');
+          playTransition(blocos[currentBloco.dataset.bloco].video_after || '', () => {});
         } else {
           showSection('section-final');
           updateProgress();
