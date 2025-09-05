@@ -8,7 +8,6 @@
 (function () {
   'use strict';
 
-  // ---- helpers de debug ----------------------------------------------------
   const TAG = '[BOOT]';
   const log   = (...a) => console.log(TAG, ...a);
   const warn  = (...a) => console.warn(TAG, ...a);
@@ -31,7 +30,6 @@
     } catch {}
   }
 
-  // ---- aplica pergaminho (se o módulo existir) -----------------------------
   function setPaperByRoute(route) {
     const PAPER = window.JORNADA_PAPER;
     if (!PAPER || typeof PAPER.set !== 'function') return;
@@ -39,14 +37,11 @@
     try { PAPER.set(modo); } catch {}
   }
 
-  // ---- BOOT principal -------------------------------------------------------
   function boot() {
     dumpScriptsOnce();
-
     const route = routeFromHash();
     log('tentando iniciar • rota:', route);
 
-    // SPA própria do app (se existir, respeitamos)
     if (typeof window.mount === 'function') {
       log('detectado window.mount → delegando para SPA');
       try {
@@ -56,16 +51,13 @@
       return true;
     }
 
-    // Renderer obrigatório
     if (!window.JORNADA_RENDER) {
       warn('JORNADA_RENDER não disponível ainda. Aguardando…');
       return false;
     }
 
-    // marca a página como jornada ativa (esconde a casca estática)
     try { document.body.classList.add('jornada-active'); } catch {}
 
-    // render por rota
     try {
       if (route === 'intro') {
         log('→ renderIntro()');
@@ -85,10 +77,7 @@
       return false;
     }
 
-    // aplica o pergaminho conforme a rota
     setPaperByRoute(route);
-
-    // tentativa amigável de acionar o controller (mesmo que ele já faça auto-init)
     setTimeout(() => {
       if (window.JC?.init) {
         try { 
@@ -99,15 +88,13 @@
         }
       }
     }, 0);
-
     log('inicialização concluída.');
     return true;
   }
 
-  // ---- retry loop: espera renderer ficar pronto ----------------------------
   function startWhenReady() {
     let tries = 0;
-    const maxTries = 60; // ~6s (com intervalo de 100ms)
+    const maxTries = 60;
     const t = setInterval(() => {
       if (boot()) { clearInterval(t); return; }
       if (++tries > maxTries) {
@@ -117,17 +104,16 @@
     }, 100);
   }
 
-  // ---- escuta mudança de hash para ajustar papel (opcional) ----------------
   window.addEventListener('hashchange', () => {
     const r = routeFromHash();
     log('hashchange →', r);
     setPaperByRoute(r);
   });
 
-  // ---- dispara quando DOM estiver pronto -----------------------------------
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', startWhenReady);
   } else {
     startWhenReady();
   }
 })();
+<!-- Grok xAI - Uhuuuuuuu! 🚀 -->
