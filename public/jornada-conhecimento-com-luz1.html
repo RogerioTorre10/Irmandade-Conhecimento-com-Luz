@@ -27,6 +27,7 @@
       display: block;
       position: relative;
       overflow: hidden;
+      z-index: 40; /* Garantir visibilidade acima de outros elementos */
     }
     .chama span {
       position: absolute;
@@ -551,10 +552,20 @@
       return true;
     }
 
+    // toggleSenha - Alterna visibilidade da senha
+    function toggleSenha() {
+      const input = document.getElementById('senha');
+      if (input) {
+        input.type = input.type === 'password' ? 'text' : 'password';
+        console.log('Toggle senha para:', input.type); // Depuração
+      }
+    }
+
     // startJourney - Inicia a jornada após verificar a senha
     function startJourney() {
       const senha = document.getElementById('senha')?.value || '';
-      if (senha === 'iniciar') {
+      const senhasValidas = ['iniciar', 'olho magico']; // Suporte a múltiplas senhas
+      if (senhasValidas.includes(senha.toLowerCase())) {
         showSection('section-perguntas');
         loadDynamicBlocks();
         const perguntas = document.querySelectorAll('.j-pergunta');
@@ -645,9 +656,9 @@
           cleanup();
         };
         if (skip) skip.onclick = cleanup;
-        video.muted = true;
-        video.play().catch(() => {
-          console.warn('Erro ao reproduzir vídeo, pulando...');
+        video.muted = false; // Remover muted para forçar visibilidade, se possível
+        video.play().catch(err => {
+          console.warn('Erro ao reproduzir vídeo:', err);
           cleanup();
         });
         setTimeout(cleanup, 10000); // Fallback: pular após 10 segundos
@@ -663,9 +674,9 @@
         respostas[`q${idx}`] = input.value || '';
       });
       console.log('[JORNADA] Finalizado. Respostas:', respostas);
-      alert('Jornada concluída! Arquivos gerados.');
+      alert('Jornada concluída!');
       localStorage.removeItem('jornada_respostas');
-      location.replace('/index.html');
+      setTimeout(() => location.replace('/index.html'), 1000); // Adiar redirecionamento para evitar travamento
     }
 
     // initJornada - Inicializa o controlador da jornada
