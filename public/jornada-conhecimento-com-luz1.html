@@ -9,11 +9,7 @@
   <style>
     body { margin: 0; font-family: Arial, sans-serif; background: #f9f9f9; color: #333; }
     .site-header { display: flex; align-items: center; gap: 12px; padding: 16px; background: #1f2937; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .chama {
-      display: block; /* Única chama */
-      position: relative;
-      overflow: hidden;
-    }
+    .chama { display: block; position: relative; overflow: hidden; }
     .chama span {
       position: absolute; bottom: 0; width: 100%; height: 100%;
       background: linear-gradient(to top, #ff4500 0%, #ff8c00 40%, rgba(255, 69, 0, 0) 100%);
@@ -132,8 +128,9 @@
     <video id="videoTransicao" class="video-player" playsinline preload="metadata" controls></video>
     <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
   </div>
+  <div id="envTag"></div> /* Adicionado pra resolver null error */
+
   <script>
-    document.getElementById('envTag').textContent = `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
     const positiveWords = window.JORNADA_CFG.positiveWords;
     const negativeWords = window.JORNADA_CFG.negativeWords;
 
