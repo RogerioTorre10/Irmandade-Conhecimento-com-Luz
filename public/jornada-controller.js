@@ -109,16 +109,18 @@
     const bloco = S.blocoAtivo();
     U.show(bloco);
     const perguntas = S.perguntasDo(bloco);
-    perguntas.forEach(U.hide);
+    perguntas.forEach(q => q.classList.remove('active')); // Remove active de todas
     state.perguntaIndex = U.clamp(state.perguntaIndex, 0, Math.max(0, perguntas.length - 1));
     const atual = perguntas[state.perguntaIndex];
-    U.show(atual);
-    const input = U.getAnswerEl(atual);
-    if (input) {
-      input.removeAttribute?.('hidden');
-      input.style.display = 'block';
-      input.style.visibility = 'visible';
-      try { input.focus({ preventScroll: true }); } catch {}
+    if (atual) {
+      atual.classList.add('active'); // Mostra só a pergunta atual
+      const input = U.getAnswerEl(atual);
+      if (input) {
+        input.removeAttribute?.('hidden');
+        input.style.display = 'block';
+        input.style.visibility = 'visible';
+        try { input.focus({ preventScroll: true }); } catch {}
+      }
     }
     if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
       window.JORNADA_TYPE.run(atual);
@@ -176,7 +178,9 @@
     if (window.JORNADA_BLOCKS && window.JORNADA_QA && window.JORNADA_PAPER) {
       showSection('section-perguntas');
       loadDynamicBlocks();
-      render(); // Garante a renderização após iniciar
+      state.blocoIndex = 0;
+      state.perguntaIndex = 0;
+      render(); // Inicia com a primeira pergunta
     } else {
       console.error('Dependências não carregadas para iniciar:', { JORNADA_BLOCKS: !!window.JORNADA_BLOCKS, JORNADA_QA: !!window.JORNADA_QA, JORNADA_PAPER: !!window.JORNADA_PAPER });
     }
