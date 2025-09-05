@@ -91,7 +91,7 @@
       z-index: 20;
       padding: 20px;
       min-height: 100%;
-      overflow: visible; /* Garantir que o conteúdo não seja cortado */
+      overflow: visible;
     }
     .j-section {
       height: 100%;
@@ -200,12 +200,12 @@
     .j-bloco {
       background: transparent !important;
       display: none;
-      z-index: 50; /* Aumentar para sobrepor outros elementos */
+      z-index: 50;
     }
     .j-pergunta {
       margin-bottom: 24px;
       display: none;
-      z-index: 60; /* Garantir que fique acima do fundo e da chama */
+      z-index: 60;
     }
     .j-pergunta.active {
       display: block;
@@ -314,14 +314,19 @@
               <span></span>
             </div>
             <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
-            <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Aqui, fé e consciência se unem para acender sua chama interior — passo a passo, jornada por jornada." data-speed="50" data-cursor="true"></p>
-            <div class="footer-actions">
-              <button id="btnIniciar" class="btn btn-primary" data-action="start">Iniciar</button>
+            <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Antes de começar, ative sua senha." data-speed="50" data-cursor="true"></p>
+            <div class="password-form">
+              <h3>Ative sua Senha</h3>
+              <div class="password-input">
+                <input type="password" id="senha" placeholder="Digite sua senha...">
+                <span class="password-toggle" onclick="toggleSenha()">👁️</span>
+              </div>
+              <button class="btn btn-primary" onclick="startJourney()">Ativar e Iniciar</button>
             </div>
           </div>
           <div id="section-perguntas" class="j-section hidden">
-            <div class="chama chama-md-intermediario" id="chama-perguntas">
-              <span></span>
+            <div class="chama chama-sm" id="chama-perguntas">
+              <span></span><span></span><span></span>
             </div>
             <div id="perguntas-container"></div>
             <div class="footer-actions">
@@ -330,18 +335,10 @@
             </div>
           </div>
           <div id="section-final" class="j-section hidden">
-            <div class="chama chama-lg" id="chama-final">
+            <div class="chama chama-lg">
               <span></span>
             </div>
             <p data-typing data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40" data-cursor="true"></p>
-            <div class="password-form">
-              <h3>Ative sua Senha</h3>
-              <div class="password-input">
-                <input type="password" id="senha" placeholder="Digite sua senha...">
-                <span class="password-toggle" onclick="toggleSenha()">👁️</span>
-              </div>
-              <button class="btn btn-primary" onclick="ativarSenha()">Ativar</button>
-            </div>
             <div class="footer-actions">
               <button id="btnRestart" class="btn btn-secondary" data-action="restart">Reiniciar</button>
             </div>
@@ -554,34 +551,26 @@
       return true;
     }
 
-    // toggleSenha - Alterna visibilidade da senha
-    function toggleSenha() {
-      const input = document.getElementById('senha');
-      if (input) input.type = input.type === 'password' ? 'text' : 'password';
-    }
-
-    // ativarSenha - Ativa a senha
-    function ativarSenha() {
-      const senha = document.getElementById('senha')?.value || '';
-      if (senha === 'iniciar') alert('Senha ativada!');
-      else alert('Senha incorreta. Tente novamente.');
-    }
-
-    // startJourney - Inicia a jornada
+    // startJourney - Inicia a jornada após verificar a senha
     function startJourney() {
-      showSection('section-perguntas');
-      loadDynamicBlocks(); // Garantir que os blocos sejam carregados aqui
-      const perguntas = document.querySelectorAll('.j-pergunta');
-      if (perguntas.length) {
-        perguntas[0].classList.add('active');
+      const senha = document.getElementById('senha')?.value || '';
+      if (senha === 'iniciar') {
+        showSection('section-perguntas');
+        loadDynamicBlocks();
+        const perguntas = document.querySelectorAll('.j-pergunta');
+        if (perguntas.length) {
+          perguntas[0].classList.add('active');
+        } else {
+          console.error('Nenhuma pergunta encontrada após loadDynamicBlocks!');
+        }
+        document.querySelector('.progress-badge').classList.remove('hidden');
+        document.querySelector('.progress-bar').classList.remove('hidden');
+        document.querySelector('.j-progress').classList.remove('hidden');
+        document.querySelector('.footer-actions').classList.remove('hidden');
+        console.log('Jornada iniciada com sucesso!');
       } else {
-        console.error('Nenhuma pergunta encontrada após loadDynamicBlocks!');
+        alert('Senha incorreta. Tente novamente.');
       }
-      document.querySelector('.progress-badge').classList.remove('hidden');
-      document.querySelector('.progress-bar').classList.remove('hidden');
-      document.querySelector('.j-progress').classList.remove('hidden');
-      document.querySelector('.footer-actions').classList.remove('hidden');
-      console.log('Jornada iniciada com sucesso!');
     }
 
     // goNext - Avança para a próxima pergunta ou bloco
