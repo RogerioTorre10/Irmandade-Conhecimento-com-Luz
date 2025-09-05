@@ -6,296 +6,62 @@
   <title>Jornada • Irmandade Conhecimento com Luz</title>
   <link rel="stylesheet" href="/styles.css">
   <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png">
-  <link rel="stylesheet" href="/css/chama.css">
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      color: #333;
-    }
-    .site-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 16px;
-      background: #1f2937;
-      color: #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .chama {
-      display: inline-flex;
-      gap: 4px;
-    }
-    .chama span {
-      background: #ff4500;
-      border-radius: 2px;
-      animation: flicker 1.5s infinite;
-    }
-    .chama.chama-sm span {
-      width: 6px;
-      height: 12px;
-    }
-    .chama.chama-md span {
-      width: 10px;
-      height: 20px;
-    }
-    .chama.chama-lg span {
-      width: 16px;
-      height: 32px;
-    }
-    .chama.chama-weak span {
-      background: #ff4500;
-      opacity: 0.5;
-      animation: flicker-weak 2s infinite;
-    }
-    .chama.chama-strong span {
-      background: #ff4500;
-      animation: flicker-strong 1s infinite;
-    }
+    body { margin: 0; font-family: Arial, sans-serif; background: #f9f9f9; color: #333; }
+    .site-header { display: flex; align-items: center; gap: 12px; padding: 16px; background: #1f2937; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .chama { display: inline-flex; gap: 4px; }
+    .chama span { background: #ff4500; border-radius: 2px; animation: flicker 1.5s infinite; }
+    .chama.chama-sm span { width: 6px; height: 12px; }
+    .chama.chama-md span { width: 10px; height: 20px; }
+    .chama.chama-lg span { width: 16px; height: 32px; }
+    .chama.chama-weak span { background: #ff4500; opacity: 0.5; animation: flicker-weak 2s infinite; }
+    .chama.chama-strong span { background: #ff4500; animation: flicker-strong 1s infinite; }
     .chama span:nth-child(2) { animation-delay: 0.2s; }
     .chama span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes flicker {
-      0%, 100% { transform: scaleY(1); opacity: 1; }
-      50% { transform: scaleY(1.2); opacity: 0.8; }
-    }
-    @keyframes flicker-weak {
-      0%, 100% { transform: scaleY(0.8); opacity: 0.6; }
-      50% { transform: scaleY(1); opacity: 0.4; }
-    }
-    @keyframes flicker-strong {
-      0%, 100% { transform: scaleY(1.5); opacity: 1; }
-      50% { transform: scaleY(1.8); opacity: 0.9; }
-    }
-    .container {
-      max-width: 900px;
-      margin: 24px auto;
-      padding: 0 16px;
-    }
-    .card {
-      background: #f6efe0 !important;
-      border-radius: 14px;
-      box-shadow: 0 8px 28px rgba(0,0,0,0.12);
-      padding: 32px;
-      position: relative;
-      z-index: 1;
-    }
-    .pergaminho-v {
-      background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important;
-      background-size: cover !important;
-      background-position: center !important;
-      min-height: 82vh !important;
-    }
-    .pergaminho-h {
-      background-image: url('/assets/img/pergaminho-rasgado-horiz.png') !important;
-      background-size: cover !important;
-      background-position: center !important;
-      min-height: 82vh !important;
-    }
-    .pergaminho-h.fallback {
-      background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important;
-    }
-    .conteudo-pergaminho {
-      background: transparent !important;
-      position: relative;
-      z-index: 2;
-      padding: 20px;
-      height: 100%;
-    }
-    .j-section {
-      height: 100%;
-    }
-    .btn {
-      display: inline-block;
-      padding: 12px 24px;
-      border-radius: 10px;
-      border: 0;
-      background: #1f2937;
-      color: #fff;
-      font-weight: 600;
-      text-decoration: none;
-      transition: background 0.3s ease, transform 0.2s ease;
-    }
-    .btn:hover {
-      background: #374151;
-      transform: scale(1.05);
-    }
-    .btn-primary {
-      background: #6b21a8;
-    }
-    .btn-primary:hover {
-      background: #7c3aed;
-    }
-    .btn-secondary {
-      background: #4b5563;
-    }
-    .btn-secondary:hover {
-      background: #6b7280;
-    }
-    .btn + .btn {
-      margin-left: 12px;
-    }
-    .progress-badge {
-      position: fixed;
-      top: 16px;
-      right: 16px;
-      padding: 8px 16px;
-      background: #6b21a8;
-      color: #fff;
-      border-radius: 8px;
-      font-size: 0.9rem;
-    }
-    .progress-bar {
-      width: 100%;
-      height: 8px;
-      background: #e5e7eb;
-      border-radius: 4px;
-      margin-top: 12px;
-    }
-    .progress-bar-fill {
-      height: 100%;
-      background: #6b21a8;
-      border-radius: 4px;
-      transition: width 0.3s ease;
-    }
-    .j-progress {
-      margin-top: 12px;
-    }
-    .j-progress__bar {
-      width: 100%;
-      height: 6px;
-      background: #e5e7eb;
-      border-radius: 4px;
-    }
-    .j-progress__fill {
-      height: 100%;
-      background: #1f2937;
-      border-radius: 4px;
-      transition: width 0.3s ease;
-    }
-    .j-progress__meta {
-      text-align: center;
-      margin-top: 8px;
-      font-size: 0.9rem;
-    }
-    .footer-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      margin: 16px 0;
-    }
-    .lumen-typing {
-      white-space: pre-wrap;
-      position: relative;
-    }
-    .lumen-typing::after {
-      content: "▌";
-      margin-left: 2px;
-      opacity: 0.75;
-      animation: lumenBlink 1s steps(2, end) infinite;
-    }
-    .lumen-typing.typing-done::after {
-      content: "";
-      animation: none;
-    }
-    @keyframes lumenBlink {
-      50% { opacity: 0; }
-    }
-    .j-bloco {
-      background: transparent !important;
-    }
-    .j-pergunta {
-      margin-bottom: 24px;
-    }
-    .pergunta-enunciado {
-      font-weight: 600;
-      margin-bottom: 8px;
-      display: block;
-    }
-    .j-pergunta textarea {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #d1d5db;
-      background: rgba(255, 255, 255, 0.8);
-      resize: vertical;
-      min-height: 100px;
-    }
-    #videoOverlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.8);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    #videoOverlay.hidden {
-      display: none;
-    }
-    .video-player {
-      max-width: 90vw;
-      max-height: 80vh;
-      background: #000;
-    }
-    .site-footer {
-      text-align: center;
-      padding: 16px;
-      opacity: 0.6;
-      font-size: 0.85rem;
-    }
-    .hidden {
-      display: none;
-    }
-    .password-form {
-      margin-top: 20px;
-      text-align: center;
-    }
-    .password-input {
-      position: relative;
-    }
-    .password-input input {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #d1d5db;
-    }
-    .password-toggle {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-    }
-    @media (max-width: 600px) {
-      .card {
-        margin: 16px;
-        padding: 20px;
-      }
-      .site-header h1 {
-        font-size: 1.6rem;
-      }
-      .btn {
-        padding: 10px 16px;
-        font-size: 0.9rem;
-      }
-      .chama span {
-        width: 4px;
-        height: 8px;
-      }
-      .progress-badge {
-        top: 8px;
-        right: 8px;
-        padding: 6px 12px;
-        font-size: 0.8rem;
-      }
-    }
+    @keyframes flicker { 0%, 100% { transform: scaleY(1); opacity: 1; } 50% { transform: scaleY(1.2); opacity: 0.8; } }
+    @keyframes flicker-weak { 0%, 100% { transform: scaleY(0.8); opacity: 0.6; } 50% { transform: scaleY(1); opacity: 0.4; } }
+    @keyframes flicker-strong { 0%, 100% { transform: scaleY(1.5); opacity: 1; } 50% { transform: scaleY(1.8); opacity: 0.9; } }
+    .container { max-width: 900px; margin: 24px auto; padding: 0 16px; }
+    .card { background: #f6efe0 !important; border-radius: 14px; box-shadow: 0 8px 28px rgba(0,0,0,0.12); padding: 32px; position: relative; z-index: 1; }
+    .pergaminho-v { background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important; background-size: cover !important; background-position: center !important; min-height: 82vh !important; }
+    .pergaminho-h { background-image: url('/assets/img/pergaminho-rasgado-horiz.png') !important; background-size: cover !important; background-position: center !important; min-height: 82vh !important; }
+    .conteudo-pergaminho { background: transparent !important; position: relative; z-index: 2; padding: 20px; height: 100%; }
+    .j-section { height: 100%; }
+    .btn { display: inline-block; padding: 12px 24px; border-radius: 10px; border: 0; background: #1f2937; color: #fff; font-weight: 600; text-decoration: none; transition: background 0.3s ease, transform 0.2s ease; }
+    .btn:hover { background: #374151; transform: scale(1.05); }
+    .btn-primary { background: #6b21a8; }
+    .btn-primary:hover { background: #7c3aed; }
+    .btn-secondary { background: #4b5563; }
+    .btn-secondary:hover { background: #6b7280; }
+    .btn + .btn { margin-left: 12px; }
+    .progress-badge { position: fixed; top: 16px; right: 16px; padding: 8px 16px; background: #6b21a8; color: #fff; border-radius: 8px; font-size: 0.9rem; }
+    .progress-bar { width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; margin-top: 12px; }
+    .progress-bar-fill { height: 100%; background: #6b21a8; border-radius: 4px; transition: width 0.3s ease; }
+    .j-progress { margin-top: 12px; }
+    .j-progress__bar { width: 100%; height: 6px; background: #e5e7eb; border-radius: 4px; }
+    .j-progress__fill { height: 100%; background: #1f2937; border-radius: 4px; transition: width 0.3s ease; }
+    .j-progress__meta { text-align: center; margin-top: 8px; font-size: 0.9rem; }
+    .footer-actions { display: flex; gap: 12px; justify-content: center; margin: 16px 0; }
+    .lumen-typing { white-space: pre-wrap; position: relative; }
+    .lumen-typing::after { content: "▌"; margin-left: 2px; opacity: 0.75; animation: lumenBlink 1s steps(2, end) infinite; }
+    .lumen-typing.typing-done::after { content: ""; animation: none; }
+    @keyframes lumenBlink { 50% { opacity: 0; } }
+    .j-bloco { background: transparent !important; }
+    .j-pergunta { margin-bottom: 24px; }
+    .pergunta-enunciado { font-weight: 600; margin-bottom: 8px; display: block; }
+    .j-pergunta textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; background: rgba(255, 255, 255, 0.8); resize: vertical; min-height: 100px; }
+    #videoOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+    #videoOverlay.hidden { display: none; }
+    .video-player { max-width: 90vw; max-height: 80vh; background: #000; }
+    .site-footer { text-align: center; padding: 16px; opacity: 0.6; font-size: 0.85rem; }
+    .hidden { display: none; }
+    .password-form { margin-top: 20px; text-align: center; }
+    .password-input { position: relative; }
+    .password-input input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; }
+    .password-toggle { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; }
+    @media (max-width: 600px) { .card { margin: 16px; padding: 20px; } .site-header h1 { font-size: 1.6rem; } .btn { padding: 10px 16px; font-size: 0.9rem; } .chama span { width: 4px; height: 8px; } .progress-badge { top: 8px; right: 8px; padding: 6px 12px; font-size: 0.8rem; } }
   </style>
 </head>
-
 <body data-layout="master" data-journey="essencial">
   <header class="site-header">
     <div class="chama chama-sm">
@@ -303,11 +69,9 @@
     </div>
     <h1>Jornada Essencial</h1>
   </header>
-
   <main id="page-shell" class="container">
     <section id="jornada-canvas" class="card pergaminho pergaminho-v">
       <div id="jornada-conteudo" class="conteudo-pergaminho">
-        <!-- Seção de Introdução com Botão de Início -->
         <div id="section-intro" class="j-section">
           <div class="chama chama-lg" id="chama-intro">
             <span></span><span></span><span></span>
@@ -318,8 +82,6 @@
             <button id="btnStartJourney" class="btn btn-primary">Iniciar Jornada</button>
           </div>
         </div>
-
-        <!-- Seção de Perguntas -->
         <div id="section-perguntas" class="j-section hidden">
           <div class="chama chama-md" id="chama-perguntas">
             <span></span><span></span><span></span>
@@ -330,8 +92,6 @@
             <button id="btnNextPerguntas" class="btn btn-primary" data-action="next">Próxima</button>
           </div>
         </div>
-
-        <!-- Seção Final -->
         <div id="section-final" class="j-section hidden">
           <div class="chama chama-lg" id="chama-final">
             <span></span><span></span><span></span>
@@ -351,38 +111,25 @@
         </div>
       </div>
     </section>
-
     <footer class="site-footer">
       <small>© 2025 Irmandade Conhecimento com Luz</small>
     </footer>
   </main>
-
   <div class="progress-badge" id="jprog-pct">0% concluído</div>
   <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
-
   <div class="j-progress">
     <div class="j-progress__bar"><div class="j-progress__fill"></div></div>
     <div class="j-progress__meta" id="j-meta"></div>
   </div>
-
   <div id="videoOverlay" class="video-overlay hidden">
     <video id="videoTransicao" class="video-player" playsinline preload="metadata" controls></video>
     <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
   </div>
-
-  <footer style="opacity:.6; font-size:.85rem; margin-top:2rem; text-align:center">
-    <span id="envTag"></span>
-  </footer>
-
   <script>
-    document.getElementById('envTag').textContent =
-      `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
-
-    // Listas de palavras para sentiment (simples contagem)
+    document.getElementById('envTag').textContent = `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
     const positiveWords = ['abencoado', 'abencoar', 'abertura', 'abnegacao', 'abraco', 'abrigo', 'absoluto', 'abundancia', 'acao', 'aceitacao', 'aceitar', 'acessivel', 'aclamacao', 'aclamado', 'aconchegante', 'aconchegar', 'aconchego', 'acreditar', 'adaptabilidade', 'adaptavel', 'adequado', 'admiracao', 'admiravel', 'adoracao', 'adorar', 'adoravel', 'afabilidade', 'afavel', 'afirmacao', 'afirmativo', 'agilidade', 'agradar', 'agradavel', 'agradecer', 'agradecimento', 'ajuda', 'ajudar', 'alcancar', 'alegre', 'alegria', 'alicerce', 'alma', 'altruismo', 'altruista', 'amabilidade', 'amar', 'amavel', 'amigo', 'amizade', 'amor', 'amoroso', 'amor-proprio', 'animacao', 'apaixonado', 'aplaudir', 'aplauso', 'apoiar', 'apoio', 'apreciado', 'apreciar', 'aprender', 'aprendizagem', 'aprovacao', 'arte', 'assertividade', 'assertivo', 'astucia', 'astucioso', 'atencao', 'atencioso', 'atitude', 'ativo', 'atracao', 'auspicioso', 'autenticidade', 'autentico', 'autoconfianca', 'autoestima', 'autonomia', 'autonomo', 'aventura', 'balanceado', 'batalhador', 'batalhar', 'beijar', 'beijo', 'beldade', 'beleza', 'belo', 'bem-disposto', 'bem-educado', 'bem-estar', 'bem-humorado', 'bem-vindo', 'bencao', 'bendito', 'beneficencia', 'beneficente', 'beneficio', 'benefico', 'benemerito', 'benevolencia', 'benevolente', 'benfeitor', 'benignidade', 'benzer', 'bom', 'bonanca', 'bondade', 'bondoso', 'bonito', 'bravura', 'brilhante', 'brilhar', 'brilho', 'brincadeira', 'brincalhao', 'brincar', 'brio', 'brioso', 'calma', 'calor', 'camaradagem', 'capacidade', 'caridade', 'carinho', 'carinhoso', 'carismatico', 'caritativo', 'cativar', 'cavalheiro', 'ceder', 'celebracao', 'celestial', 'centrado', 'certeza', 'certo', 'ceu', 'civilidade', 'civilizado', 'clarividencia', 'claro', 'clemencia', 'coerente', 'colaboracao', 'colaborar', 'comemorar', 'compaixao', 'companheirismo', 'companheiro', 'companhia', 'compassivo', 'competencia', 'competente', 'compreender', 'compreensao', 'comprometimento', 'comunhao', 'comunicacao', 'comunidade', 'concentracao', 'concordar', 'conectar', 'conexao', 'confiabilidade', 'confianca', 'confiante', 'confiavel', 'confortavel', 'conforto', 'congruencia', 'conhecimento', 'conquista', 'conquistar', 'consciencia', 'consciente', 'conseguir', 'consideracao', 'consolacao', 'consolo', 'construir', 'construtivo', 'contentamento', 'contente', 'continuidade', 'contribuicao', 'contribuir', 'contributo', 'conviccao', 'cooperacao', 'cooperar', 'coracao', 'coragem', 'corajoso', 'cordial', 'cordialidade', 'cortes', 'cortesia', 'credibilidade', 'crenca', 'crescer', 'crescimento', 'criar', 'criatividade', 'criativo', 'cuidado', 'cuidadoso', 'cuidar', 'cultivar', 'cultura', 'cumpridor', 'cura', 'curiosidade', 'decencia', 'decente', 'decoro', 'dedicacao', 'dedicado', 'deferencia', 'delicadeza', 'delicado', 'delicia', 'delicioso', 'denodo', 'desafio', 'descansar', 'descoberta', 'desejavel', 'desejo', 'desenvoltura', 'desenvolver', 'desenvolvimento', 'deslumbrado', 'deslumbrar', 'destemido', 'destino', 'determinacao', 'determinado', 'deus', 'dever', 'devotado', 'dignidade', 'digno', 'diligencia', 'diligente', 'dinamismo', 'direcao', 'dirigir', 'disciplina', 'disciplinado', 'discrecao', 'disponibilidade', 'disponivel', 'disposicao', 'disposto', 'diversao', 'diversidade', 'divertido', 'divinal', 'divino', 'docilidade', 'educacao', 'educado', 'educar', 'eficacia', 'eficiencia', 'eficiente', 'elegancia', 'elevacao', 'elevado', 'elevar', 'elogio', 'eloquencia', 'emancipacao', 'emancipado', 'embelezar'];
     const negativeWords = ['agressivo', 'ansioso', 'antipatico', 'antissocial', 'apatico', 'apressado', 'arrogante', 'atrevido', 'autoritario', 'avarento', 'birrento', 'bisbilhoteiro', 'bruto', 'calculista', 'casmurro', 'chato', 'cinico', 'ciumento', 'colerico', 'comodista', 'covarde', 'critico', 'cruel', 'debochado', 'depressivo', 'desafiador', 'desbocado', 'descarado', 'descomedido', 'desconfiado', 'descortes', 'desequilibrado', 'desleal', 'desleixado', 'desmazelado', 'desmotivado', 'desobediente', 'desonesto', 'desordeiro', 'despotico', 'desumano', 'discriminador', 'dissimulado', 'distraido', 'egoista', 'estourado', 'estressado', 'exigente', 'falso', 'fingido', 'fraco', 'frio', 'frivolo', 'futil', 'ganancioso', 'grosseiro', 'grosso', 'hipocrita', 'ignorante', 'impaciente', 'impertinente', 'impetuoso', 'impiedoso', 'imponderado', 'impostor', 'imprudente', 'impulsivo', 'incompetente', 'inconstante', 'inconveniente', 'incorreto', 'indeciso', 'indecoroso', 'indelicado', 'indiferente', 'infiel', 'inflexivel', 'injusto', 'inseguro', 'insensato', 'insincero', 'instavel', 'insuportavel', 'interesseiro', 'intolerante', 'intransigente', 'irracional', 'irascivel', 'irrequieto', 'irresponsavel', 'irritadico', 'malandro', 'maldoso', 'malicioso', 'malvado', 'mandao', 'manhoso', 'maquiavelico', 'medroso', 'mentiroso', 'mesquinho', 'narcisista', 'negligente', 'nervoso', 'neurotico', 'obcecado', 'odioso', 'oportunista', 'orgulhoso', 'pedante', 'pessimista', 'pe-frio', 'possessivo', 'precipitado', 'preconceituoso', 'preguiçoso', 'prepotente', 'presunçoso', 'problematico', 'quezilento', 'rancoroso', 'relapso', 'rigoroso', 'rabugento', 'rude', 'sarcastico', 'sedentario', 'teimoso', 'timido', 'tirano', 'traicoeiro', 'traidor', 'trapaceiro', 'tendencioso', 'trocista', 'vagabundo', 'vaidoso', 'vulneravel', 'vigarista', 'xenofobo'];
 
-    // Função simples de sentiment
     function analyzeSentiment(text) {
       const words = text.toLowerCase().split(/\s+/);
       let posCount = 0, negCount = 0;
@@ -390,21 +137,19 @@
         if (positiveWords.includes(word)) posCount++;
         if (negativeWords.includes(word)) negCount++;
       });
-      return posCount - negCount;
+      return posCount > negCount ? "alegre" : (negCount > posCount ? "sofrida" : "neutra");
     }
 
-    // Atualizar chama baseada em sentiment
     function updateChama(score) {
       const chama = document.getElementById('chama-perguntas');
       chama.classList.remove('chama-weak', 'chama-strong');
-      if (score < 0) {
+      if (score === "sofrida") {
         chama.classList.add('chama-weak');
-      } else if (score > 0) {
+      } else if (score === "alegre") {
         chama.classList.add('chama-strong');
       }
     }
 
-    // Gerenciamento de Navegação
     function showSection(sectionId) {
       const sections = document.querySelectorAll('.j-section');
       sections.forEach(section => section.classList.add('hidden'));
@@ -423,29 +168,20 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      // Mostrar introdução inicial
       showSection('section-intro');
-
-      // Botão para iniciar a jornada
       document.getElementById('btnStartJourney').addEventListener('click', () => {
         showSection('section-perguntas');
         loadDynamicBlocks();
       });
-
-      // Eventos de navegação
       document.getElementById('btnPrevPerguntas').addEventListener('click', () => {
         showSection('section-intro');
       });
-
       document.getElementById('btnNextPerguntas').addEventListener('click', () => {
         showSection('section-final');
       });
-
       document.getElementById('btnRestart').addEventListener('click', () => {
         showSection('section-intro');
       });
-
-      // Reativa chama em respostas
       document.addEventListener('input', (e) => {
         if (e.target.tagName === 'TEXTAREA') {
           const text = e.target.value;
@@ -455,19 +191,23 @@
       });
     });
 
-    // Toggle senha
     function toggleSenha() {
       const input = document.getElementById('senha');
       input.type = input.type === 'password' ? 'text' : 'password';
     }
 
-    // Função placeholder para ativar senha (ajuste com auth.js)
     function ativarSenha() {
       const senha = document.getElementById('senha').value;
-      alert(`Senha ativada: ${senha}`); // Substitua por lógica real
+      if (senha === 'IRMANDADE') {
+        window.JORNADA_DOWNLOAD(state.respostas).then(() => {
+          alert('Senha ativada! Arquivos gerados.');
+          location.replace('/index.html');
+        }).catch(() => alert('Senha incorreta ou erro ao gerar arquivos.'));
+      } else {
+        alert('Senha incorreta. Tente novamente.');
+      }
     }
 
-    // Carregar blocos dinamicamente
     function loadDynamicBlocks() {
       if (!window.JORNADA_BLOCKS || !window.JORNADA_QA) return;
       const content = document.getElementById('perguntas-container');
@@ -478,7 +218,6 @@
         bloco.className = 'j-bloco';
         bloco.dataset.bloco = idx;
         bloco.dataset.video = block.video_after || '';
-        bloco.dataset.pergaminhoH = '';
         block.questions.forEach((q, qIdx) => {
           const pergunta = document.createElement('div');
           pergunta.className = 'j-pergunta';
@@ -491,11 +230,9 @@
         });
         content.appendChild(bloco);
       });
-      // Mostrar primeiro bloco
       document.querySelector('.j-bloco').style.display = 'block';
     }
 
-    // Datilografia
     function typeWriter(el, text, speed, showCursor) {
       if (!el) return;
       el.textContent = '';
@@ -531,7 +268,6 @@
       obs.observe(target, { childList: true, subtree: true });
     }
 
-    // Verificação de imagem
     async function checkImage(url, fallbackUrl) {
       return new Promise((resolve) => {
         const img = new Image();
@@ -541,7 +277,6 @@
       });
     }
 
-    // Boot robusto
     async function boot() {
       if (window.JORNADA_RENDER?.renderIntro) {
         document.body.classList.add('jornada-active');
@@ -573,19 +308,16 @@
       }, 100);
     }
   </script>
-
   <script defer src="/config.js"></script>
   <script defer src="/jornada-utils.js"></script>
   <script defer src="/jornada-core.js"></script>
   <script defer src="/jornada-auth.js"></script>
   <script defer src="/jornada-chama.js"></script>
   <script defer src="/jornada-paper-qa.js"></script>
-  <script defer src="/jornada-typing-font.js"></script>
-  <script defer src="/i18n/i18n.js"></script>
-  <script defer src="/jornada-micro.js"></script>
   <script defer src="/jornada-typing.js"></script>
   <script defer src="/jornada-controller.js"></script>
   <script defer src="/jornada-render.js"></script>
   <script defer src="/jornada-bootstrap.js"></script>
-</body>
-</html>
+  <script defer src="/jornada-micro.js"></script>
+  <script defer src="/api.js"></script>
+  <!-- Grok xAI - Uhuuuuuuu! 🚀 -->
