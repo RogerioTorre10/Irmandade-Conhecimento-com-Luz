@@ -107,8 +107,12 @@
     }
     blocos.forEach(U.hide);
     const bloco = S.blocoAtivo();
-    U.show(bloco);
+    if (bloco) U.show(bloco);
     const perguntas = S.perguntasDo(bloco);
+    if (!perguntas.length) {
+      console.warn('Nenhuma pergunta encontrada no bloco ativo');
+      return;
+    }
     perguntas.forEach(q => q.classList.remove('active')); // Remove active de todas
     state.perguntaIndex = U.clamp(state.perguntaIndex, 0, Math.max(0, perguntas.length - 1));
     const atual = perguntas[state.perguntaIndex];
@@ -121,6 +125,8 @@
         input.style.visibility = 'visible';
         try { input.focus({ preventScroll: true }); } catch {}
       }
+    } else {
+      console.error('Pergunta atual não encontrada no índice:', state.perguntaIndex);
     }
     if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
       window.JORNADA_TYPE.run(atual);
@@ -134,6 +140,7 @@
       const ultimaPergunta = state.perguntaIndex === perguntas.length - 1;
       const ultimoBloco = state.blocoIndex === blocos.length - 1;
       next.textContent = ultimaPergunta ? (ultimoBloco ? 'Finalizar' : 'Concluir bloco ➜') : 'Próxima';
+      next.disabled = false; // Garante que o botão não fique travado
     }
   }
 
@@ -174,13 +181,14 @@
   }
 
   function startJourney() {
-    console.log('Iniciando jornada...');
+    console.log('Iniciando jornada... Verificando dependências:', { JORNADA_BLOCKS: !!window.JORNADA_BLOCKS, JORNADA_QA: !!window.JORNADA_QA, JORNADA_PAPER: !!window.JORNADA_PAPER });
     if (window.JORNADA_BLOCKS && window.JORNADA_QA && window.JORNADA_PAPER) {
       showSection('section-perguntas');
       loadDynamicBlocks();
       state.blocoIndex = 0;
       state.perguntaIndex = 0;
-      render(); // Inicia com a primeira pergunta
+      render(); // Garante a primeira pergunta
+      console.log('Jornada iniciada com sucesso, exibindo primeira pergunta');
     } else {
       console.error('Dependências não carregadas para iniciar:', { JORNADA_BLOCKS: !!window.JORNADA_BLOCKS, JORNADA_QA: !!window.JORNADA_QA, JORNADA_PAPER: !!window.JORNADA_PAPER });
     }
