@@ -1,8 +1,8 @@
 // Chama de Imersão - injeta e dimensões automaticamente
 (function () {
-  function criarChama() {
+  function criarChama(classe) {
     const d = document.createElement("div");
-    d.className = "chama";
+    d.className = `chama ${classe || 'chama-lg'}`;
     d.innerHTML = `<span></span>`; // Única chama
     return d;
   }
@@ -27,12 +27,10 @@
 
     [chamaHeader, chamaPerguntas, chamaFinal].forEach(chamaEl => {
       if (chamaEl && !chamaEl.querySelector('span')) {
-        const novaChama = criarChama();
-        if (chamaEl === chamaHeader) novaChama.className = "chama chama-lg";
-        else if (chamaEl === chamaPerguntas) novaChama.className = "chama chama-md-intermediario";
-        else if (chamaEl === chamaFinal) novaChama.className = "chama chama-lg";
         chamaEl.innerHTML = '';
+        const novaChama = criarChama(chamaEl.id === 'chama-perguntas' ? 'chama-md-intermediario' : 'chama-lg');
         chamaEl.appendChild(novaChama);
+        console.log(`Chama inicializada em ${chamaEl.id || 'header'}`);
       }
     });
 
@@ -56,7 +54,7 @@
     };
 
     [chamaHeader, chamaPerguntas, chamaFinal].forEach(chamaEl => {
-      if (chamaEl) brilho(chamaEl);
+      if (chamaEl && chamaEl.querySelector('span')) brilho(chamaEl.querySelector('span').parentElement);
     });
   }
 
