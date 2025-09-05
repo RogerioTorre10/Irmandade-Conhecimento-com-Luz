@@ -176,8 +176,9 @@
     if (window.JORNADA_BLOCKS && window.JORNADA_QA && window.JORNADA_PAPER) {
       showSection('section-perguntas');
       loadDynamicBlocks();
+      render(); // Garante a renderização após iniciar
     } else {
-      console.error('Dependências não carregadas para iniciar!');
+      console.error('Dependências não carregadas para iniciar:', { JORNADA_BLOCKS: !!window.JORNADA_BLOCKS, JORNADA_QA: !!window.JORNADA_QA, JORNADA_PAPER: !!window.JORNADA_PAPER });
     }
   }
 
@@ -229,6 +230,8 @@
     if (startBtn) {
       startBtn.addEventListener('click', startJourney);
       console.log('Botão Iniciar inicializado em JC.init');
+    } else {
+      console.error('Botão #btnIniciar não encontrado no DOM durante JC.init!');
     }
     const prevBtn = S.btnPrev();
     const nextBtn = S.btnNext();
@@ -252,7 +255,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     if (S.root()) JC.init();
     window.addEventListener('load', () => {
-      if (!window.JC._initialized) {
+      if (!window.JC._initialized && window.JC?.init) {
         console.log('Forçando inicialização no load...');
         JC.init();
         window.JC._initialized = true;
