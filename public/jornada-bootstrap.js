@@ -51,8 +51,8 @@
       return true;
     }
 
-    if (!window.JORNADA_RENDER) {
-      warn('JORNADA_RENDER não disponível ainda. Aguardando…');
+    if (!window.JORNADA_RENDER || !window.JC) {
+      warn('JORNADA_RENDER ou JC não disponível ainda. Aguardando…');
       return false;
     }
 
@@ -89,7 +89,7 @@
       } else {
         warn('JC.init não disponível, inicialização manual pendente');
       }
-    }, 0);
+    }, 100); // Atraso pra garantir dependências
     log('inicialização concluída.');
     return true;
   }
@@ -101,12 +101,10 @@
       if (boot()) { clearInterval(t); return; }
       if (++tries > maxTries) {
         clearInterval(t);
-        error('desisti de iniciar: JORNADA_RENDER não ficou disponível a tempo.');
+        error('desisti de iniciar: JORNADA_RENDER ou JC não ficou disponível a tempo.');
         if (window.JC?.init) {
           console.log('Tentando inicialização de emergência com JC.init...');
           window.JC.init();
-        } else {
-          console.error('Nenhuma inicialização disponível como fallback!');
         }
       }
     }, 100);
@@ -129,8 +127,6 @@
       console.log('Inicialização final no load...');
       window.JC.init();
       window.JC._initialized = true;
-    } else if (!window.JC._initialized) {
-      console.error('JC.init não disponível no load!');
     }
   });
 })();
