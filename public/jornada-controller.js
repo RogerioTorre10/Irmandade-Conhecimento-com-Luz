@@ -13,8 +13,9 @@
     blocos: () => Array.from(document.querySelectorAll('.j-bloco,[data-bloco]')),
     blocoAtivo: () => S.blocos()[state.blocoIndex],
     perguntasDo: (blocoEl) => Array.from(blocoEl.querySelectorAll('.j-pergunta,[data-pergunta]')),
-    btnPrev: () => document.getElementById('btnPrev') || document.querySelector('[data-action="prev"]'),
-    btnNext: () => document.getElementById('btnNext') || document.querySelector('[data-action="next"]'),
+    btnPrev: () => document.getElementById('btnPrevPerguntas') || document.querySelector('[data-action="prev"]'),
+    btnNext: () => document.getElementById('btnNextPerguntas') || document.querySelector('[data-action="next"]'),
+    btnStart: () => document.getElementById('btnIniciar') || document.querySelector('[data-action="start"]'),
     meta: () => document.getElementById('j-meta'),
     progressFill: () => document.querySelector('.j-progress__fill'),
     overlay: () => document.getElementById('videoOverlay'),
@@ -36,7 +37,7 @@
       if (bar) bar.style.width = pct + '%';
       if (meta) meta.innerHTML = `<b>${cur}</b> / ${total} (${pct}%)`;
     },
-    analiseSentimento(texto) {
+    analiseSentiment(texto) {
       const textoNormalizado = texto.toLowerCase().split(/\s+/);
       let posCount = 0, negCount = 0;
       textoNormalizado.forEach(word => {
@@ -170,6 +171,16 @@
     }
   }
 
+  function startJourney() {
+    console.log('Iniciando jornada...');
+    if (window.JORNADA_BLOCKS && window.JORNADA_QA && window.JORNADA_PAPER) {
+      showSection('section-perguntas');
+      loadDynamicBlocks();
+    } else {
+      console.error('Dependências não carregadas para iniciar!');
+    }
+  }
+
   function playTransition(src, onEnd) {
     const overlay = S.overlay();
     const video = S.video();
@@ -214,6 +225,11 @@
       return;
     }
     applyPergaminhoByRoute();
+    const startBtn = S.btnStart();
+    if (startBtn) {
+      startBtn.addEventListener('click', startJourney);
+      console.log('Botão Iniciar inicializado em JC.init');
+    }
     const prevBtn = S.btnPrev();
     const nextBtn = S.btnNext();
     if (nextBtn) nextBtn.addEventListener('click', goNext);
@@ -221,8 +237,10 @@
     document.addEventListener('click', (ev) => {
       const n = ev.target.closest?.('[data-action="next"]');
       const p = ev.target.closest?.('[data-action="prev"]');
+      const s = ev.target.closest?.('[data-action="start"]');
       if (n) { ev.preventDefault(); goNext(); }
       if (p) { ev.preventDefault(); goPrev(); }
+      if (s) { ev.preventDefault(); startJourney(); }
     });
     try {
       const stash = localStorage.getItem('JORNADA_RESPOSTAS');
@@ -233,6 +251,13 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     if (S.root()) JC.init();
+    window.addEventListener('load', () => {
+      if (!window.JC._initialized) {
+        console.log('Forçando inicialização no load...');
+        JC.init();
+        window.JC._initialized = true;
+      }
+    });
     window.addEventListener('hashchange', applyPergaminhoByRoute);
   });
 
@@ -240,5 +265,10 @@
   JC.next = goNext;
   JC.prev = goPrev;
   JC.render = render;
+  JC.start = startJourney;
+
+  // Funções expostas globalmente para depuração
+  window.showSection = showSection;
+  window.loadDynamicBlocks = loadDynamicBlocks;
 })();
 <!-- Grok xAI - Uhuuuuuuu! 🚀 -->
