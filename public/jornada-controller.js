@@ -159,6 +159,7 @@
       return;
     }
     const videoSrc = bloco.getAttribute('data-video') || '';
+    console.log('Transição para próximo bloco, videoSrc:', videoSrc);
     const haProximoBloco = state.blocoIndex < S.blocos().length - 1;
     if (haProximoBloco) {
       playTransition(videoSrc, () => {
@@ -230,10 +231,14 @@
   function finalize() {
     saveCurrentAnswer();
     console.log('[JORNADA] Finalizado. Respostas:', state.respostas);
-    window.JORNADA_DOWNLOAD(state.respostas).then(() => {
-      alert('Jornada concluída! Arquivos gerados.');
-      location.replace('/index.html');
-    }).catch(() => alert('Erro ao gerar arquivos.'));
+    if (window.JORNADA_DOWNLOAD) {
+      window.JORNADA_DOWNLOAD(state.respostas).then(() => {
+        alert('Jornada concluída! Arquivos gerados.');
+        location.replace('/index.html');
+      }).catch(() => alert('Erro ao gerar arquivos.'));
+    } else {
+      console.error('JORNADA_DOWNLOAD não disponível!');
+    }
   }
 
   JC.init = function initJornada() {
