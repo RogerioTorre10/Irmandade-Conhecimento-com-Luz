@@ -3,11 +3,6 @@
   
   console.log("[load] jornada-render.js");
 
-  /* ===========================================================================
-     === RENDER MASTER =========================================================
-     SUBTÍTULO: Base CSS mínimo (opcional) + API master
-  =========================================================================== */
-
   function ensureBaseCSS() {
     if (document.getElementById("jr-base-css")) return;
     const css = `
@@ -27,12 +22,10 @@
   }
   ensureBaseCSS();
 
-  // helper leve para forçar papel sem depender do controller
   function setPaper(mode) {
     if (g.JORNADA_PAPER && typeof g.JORNADA_PAPER.set === 'function') {
       try { g.JORNADA_PAPER.set(mode); } catch {}
     } else {
-      // fallback defensivo: aplica a classe no #jornada-canvas, se existir
       const canvas = document.getElementById('jornada-canvas');
       if (canvas) {
         canvas.classList.remove('pergaminho-v', 'pergaminho-h');
@@ -41,18 +34,14 @@
     }
   }
 
-  async renderIntro() {
-  console.log("[renderer] renderIntro()");
-  // intro → papel vertical
-  setPaper('v');
-}
-  
-      // Se existe o controller, deixa ele orquestrar
+  const MasterAPI = {
+    async renderIntro() {
+      console.log("[renderer] renderIntro()");
+      setPaper('v');
       if (g.JC && typeof g.JC.render === "function") {
         console.log('[MasterAPI] Delegando renderIntro para JC.render');
         return g.JC.render();
       }
-
       console.warn('[MasterAPI] Fallback: JC.render não disponível');
       const sec = document.createElement("section");
       sec.className = "card pergaminho pergaminho-v";
@@ -69,13 +58,12 @@
     },
 
     async renderPerguntas(fileOrIndex = 0) {
-    console.log("[renderer] renderPerguntas()", fileOrIndex);
-
+      console.log("[renderer] renderPerguntas()", fileOrIndex);
+      setPaper('h');
       if (g.JC && typeof g.JC.render === "function") {
         console.log('[MasterAPI] Delegando renderPerguntas para JC.render');
         return g.JC.render();
       }
-
       console.warn('[MasterAPI] Fallback: JC.render não disponível');
       const sec = document.createElement("section");
       sec.className = "card pergaminho pergaminho-h";
@@ -89,13 +77,12 @@
     },
 
     async renderFinal() {
-  console.log("[renderer] renderFinal()");
-
+      console.log("[renderer] renderFinal()");
+      setPaper('v');
       if (g.JC && typeof g.JC.render === "function") {
         console.log('[MasterAPI] Delegando renderFinal para JC.render');
         return g.JC.render();
       }
-
       console.warn('[MasterAPI] Fallback: JC.render não disponível');
       const sec = document.createElement("section");
       sec.className = "card pergaminho pergaminho-v";
@@ -109,20 +96,21 @@
       const btn = sec.querySelector("#btnFinalizar");
       if (btn) {
         btn.addEventListener("click", () => {
-          const respostas = (window.JORNADA_STATE && window.JORNADA_STATE.respostas) || {};
+          const respostas = (window.JC && window.JC._state && window.JC._state.respostas) || {};
           console.log('[FINALIZAR] clique btn, respostas=', respostas);
-          if (window.JORNADA_FINALIZAR) JORNADA_FINALIZAR(respostas);
+          window.JORNADA_DOWNLOAD(respostas).then(() => {
+            alert('Jornada concluída! Arquivos gerados.');
+            location.replace('/index.html');
+          }).catch(() => alert('Erro ao gerar arquivos.'));
         });
       }
       return sec;
     },
 
     start() {
-      console.log("[renderer] start()");   // novo log de debug
-      // garante papel coerente ao iniciar conforme rota
+      console.log("[renderer] start()");
       const route = (location.hash || '#intro').slice(1);
       if (route === 'perguntas') setPaper('h'); else setPaper('v');
-
       if (g.JC && typeof g.JC.init === "function") {
         console.log('[MasterAPI] Iniciando com JC.init');
         g.JC.init();
@@ -133,16 +121,8 @@
     },
   };
 
-  g.JRENDER = g.JRENDER || {};
-  g.JRENDER.master = MasterAPI;
-
-  /* ===========================================================================
-     === RENDER PLUS ===========================================================
-     SUBTÍTULO: Variante Plus (herda do Master e aplica classe de layout)
-  =========================================================================== */
   (function (root) {
     const base = (root.JRENDER && root.JRENDER.master) || MasterAPI;
-
     const PlusAPI = {
       ...base,
       async renderIntro() {
@@ -153,26 +133,20 @@
       async renderPerguntas(fileOrIndex = 0) {
         const sec = await base.renderPerguntas(fileOrIndex);
         sec?.classList?.add("layout-plus");
-
-        // datilografia opcional (se existir JORNADA_TYPE e os seletores)
         const T = window.JORNADA_TYPE;
         const h = sec.querySelector?.('.pergunta__titulo');
         const p = sec.querySelector?.('.pergunta__apoio');
         if (T && h) T.typeIt(h, h.textContent, 24);
         if (T && p) T.typeIt(p, p.textContent, 18);
-
-        // progresso opcional (defensivo)
         try {
           const UI = window.JORNADA_UI || {};
-          const J  = window.JORNADA_STATE || {};
-          if (UI.setProgressoBlocos && typeof J.blocoAtual === 'number' && typeof J.totalBlocos === 'number') {
-            UI.setProgressoBlocos(J.blocoAtual, J.totalBlocos);
+          const J = window.JC && window.JC._state || {};
+          if (UI.setProgressoBlocos && typeof J.blocoIndex === 'number' && typeof window.JORNADA_CFG.TOTAL_BLOCKS === 'number') {
+            UI.setProgressoBlocos(J.blocoIndex, window.JORNADA_CFG.TOTAL_BLOCKS);
           }
           if (UI.setProgressoPerguntas) {
-            const totalPerguntas =
-              Math.max(1, J.perguntasNoBloco || sec.querySelectorAll?.('[data-role="pergunta"], .pergunta').length || 5);
-            const idxPergunta =
-              Math.max(0, Math.min(totalPerguntas, (J.idxPerguntaNoBloco ?? 0)));
+            const totalPerguntas = Math.max(1, J.perguntasDo && J.perguntasDo(J.blocoAtivo()).length || 5);
+            const idxPergunta = Math.max(0, Math.min(totalPerguntas, (J.perguntaIndex ?? 0)));
             const pct = Math.round((idxPergunta / totalPerguntas) * 100);
             UI.setProgressoPerguntas(pct);
           }
@@ -187,17 +161,11 @@
         return sec;
       },
     };
-
     root.JRENDER.plus = PlusAPI;
   })(g);
 
-  /* ===========================================================================
-     === RENDER JUNIOR =========================================================
-     SUBTÍTULO: Variante Junior (leve — remove vídeos pesados)
-  =========================================================================== */
   (function (root) {
     const base = (root.JRENDER && root.JRENDER.master) || MasterAPI;
-
     const JuniorAPI = {
       ...base,
       async renderIntro() {
@@ -217,14 +185,9 @@
         return sec;
       },
     };
-
     root.JRENDER.junior = JuniorAPI;
   })(g);
 
-  /* ===========================================================================
-     === SELETOR DE VARIANTE ===================================================
-     SUBTÍTULO: Escolha via body[data-layout] e exposição da API pública
-  =========================================================================== */
   function selectVariant() {
     const key = (document.body?.dataset?.layout || "master").toLowerCase();
     const map = {
@@ -233,16 +196,13 @@
       junior: g.JRENDER.junior || g.JRENDER.master,
     };
     const api = map[key] || g.JRENDER.master;
-
     g.JORNADA_RENDER     = api;
     g.onJornadaEssencial = typeof api.start === "function" ? api.start : () => g.JC?.init?.();
     g.renderIntro        = (...a) => api.renderIntro?.(...a);
     g.renderPerguntas    = (...a) => api.renderPerguntas?.(...a);
     g.renderFinal        = (...a) => api.renderFinal?.(...a);
-
     console.log(`[Renderer] ativo: ${key}`);
-    console.log("[renderer] variante ativa:", (document.body?.dataset?.layout || "master"), 
-            "| JORNADA_RENDER set?", !!g.JORNADA_RENDER);
+    console.log("[renderer] variante ativa:", (document.body?.dataset?.layout || "master"), "| JORNADA_RENDER set?", !!g.JORNADA_RENDER);
   }
 
   if (document.readyState === "loading") {
@@ -251,3 +211,4 @@
     selectVariant();
   }
 })();
+<!-- Grok xAI - Uhuuuuuuu! 🚀 -->
