@@ -4,12 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Jornada • Irmandade Conhecimento com Luz</title>
-  <link rel="stylesheet" href="/public/styles.css" onerror="this.onerror=null; this.href='/fallback-styles.css'; console.warn('Fallback CSS ativado por erro 502 em styles.css');">
   <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png">
   <style>
     body { margin: 0; font-family: Arial, sans-serif; background: #f9f9f9; color: #333; }
     .site-header { display: flex; align-items: center; gap: 12px; padding: 16px; background: #1f2937; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .chama { display: block; position: relative; overflow: hidden; }
+    .chama {
+      display: block; /* Única chama */
+      position: relative;
+      overflow: hidden;
+    }
     .chama span {
       position: absolute; bottom: 0; width: 100%; height: 100%;
       background: linear-gradient(to top, #ff4500 0%, #ff8c00 40%, rgba(255, 69, 0, 0) 100%);
@@ -67,7 +70,7 @@
 </head>
 <body data-layout="master" data-journey="essencial">
   <header class="site-header">
-    <div class="chama chama-lg">
+    <div class="chama chama-lg" id="chama-header">
       <span></span>
     </div>
     <h1>Jornada Essencial</h1>
@@ -144,6 +147,13 @@
     <li><a href="#boot">boot - Inicializa a jornada</a></li>
     <li><a href="#toggleSenha">toggleSenha - Alterna visibilidade da senha</a></li>
     <li><a href="#ativarSenha">ativarSenha - Ativa a senha</a></li>
+    <li><a href="#startJourney">startJourney - Inicia a jornada</a></li>
+    <li><a href="#goNext">goNext - Avança para a próxima pergunta ou bloco</a></li>
+    <li><a href="#goPrev">goPrev - Volta para a pergunta ou bloco anterior</a></li>
+    <li><a href="#playTransition">playTransition - Reproduz vídeo de transição</a></li>
+    <li><a href="#finalize">finalize - Finaliza a jornada</a></li>
+    <li><a href="#initJornada">initJornada - Inicializa o controlador da jornada</a></li>
+    <li><a href="#defineJORNADABLOCKS">defineJORNADABLOCKS - Define os blocos e perguntas da jornada</a></li>
   </ul>
 
   <script>
@@ -152,8 +162,8 @@
     function analyzeSentiment(text) {
       const words = text.toLowerCase().split(/\s+/);
       let posCount = 0, negCount = 0;
-      const positiveWords = window.JORNADA_CFG?.positiveWords || ['feliz', 'alegria', 'amor'];
-      const negativeWords = window.JORNADA_CFG?.negativeWords || ['triste', 'dor', 'raiva'];
+      const positiveWords = ['feliz', 'alegria', 'amor'];
+      const negativeWords = ['triste', 'dor', 'raiva'];
       words.forEach(word => {
         if (positiveWords.includes(word)) posCount++;
         if (negativeWords.includes(word)) negCount++;
@@ -187,8 +197,11 @@
     function updateCanvasBackground(sectionId) {
       const canvas = document.getElementById('jornada-canvas');
       if (canvas) {
-        if (sectionId === 'section-perguntas') canvas.className = 'card pergaminho pergaminho-h';
-        else canvas.className = 'card pergaminho pergaminho-v';
+        if (sectionId === 'section-perguntas') {
+          canvas.className = 'card pergaminho pergaminho-h';
+        } else {
+          canvas.className = 'card pergaminho pergaminho-v';
+        }
       }
     }
 
@@ -196,7 +209,7 @@
     <a id="loadDynamicBlocks"></a>
     function loadDynamicBlocks() {
       const content = document.getElementById('perguntas-container');
-      if (content && window.JORNADA_BLOCKS && window.JORNADA_QA) {
+      if (content) {
         content.innerHTML = '';
         window.JORNADA_BLOCKS.forEach((block, idx) => {
           const bloco = document.createElement('section');
@@ -218,9 +231,6 @@
         const firstBloco = document.querySelector('.j-bloco');
         if (firstBloco) firstBloco.style.display = 'block';
         console.log('Blocos carregados!');
-      } else {
-        console.error('JORNADA_BLOCKS ou JORNADA_QA não disponíveis!');
-        content.innerHTML = '<div class="j-pergunta active"><label class="pergunta-enunciado">Teste</label><textarea rows="4" placeholder="Digite sua resposta..."></textarea></div>';
       }
     }
 
@@ -268,29 +278,26 @@
     // boot - Inicializa a jornada
     <a id="boot"></a>
     async function boot() {
-      if (window.JORNADA_RENDER?.renderIntro) {
-        document.body.classList.add('jornada-active');
-        const route = (location.hash || '#intro').slice(1);
-        const canvas = document.getElementById('jornada-canvas');
-        if (canvas) {
-          if (route === 'perguntas') {
-            window.JORNADA_RENDER.renderPerguntas(0);
-            const bgImage = await checkImage('/assets/img/pergaminho-rasgado-horiz.png', '/assets/img/pergaminho-rasgado-vert.png');
-            canvas.className = 'card pergaminho pergaminho-h';
-            canvas.style.backgroundImage = `url('${bgImage}')`;
-          } else if (route === 'final') {
-            window.JORNADA_RENDER.renderFinal();
-            canvas.className = 'card pergaminho pergaminho-v';
-            canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
-          } else {
-            window.JORNADA_RENDER.renderIntro();
-            canvas.className = 'card pergaminho pergaminho-v';
-            canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
-          }
+      document.body.classList.add('jornada-active');
+      const route = (location.hash || '#intro').slice(1);
+      const canvas = document.getElementById('jornada-canvas');
+      if (canvas) {
+        if (route === 'perguntas') {
+          renderPerguntas(0);
+          const bgImage = await checkImage('/assets/img/pergaminho-rasgado-horiz.png', '/assets/img/pergaminho-rasgado-vert.png');
+          canvas.className = 'card pergaminho pergaminho-h';
+          canvas.style.backgroundImage = `url('${bgImage}')`;
+        } else if (route === 'final') {
+          renderFinal();
+          canvas.className = 'card pergaminho pergaminho-v';
+          canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
+        } else {
+          renderIntro();
+          canvas.className = 'card pergaminho pergaminho-v';
+          canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
         }
-        return true;
       }
-      return false;
+      return true;
     }
 
     if (!boot()) {
@@ -315,11 +322,152 @@
       else alert('Senha incorreta. Tente novamente.');
     }
 
+    // startJourney - Inicia a jornada
+    <a id="startJourney"></a>
+    function startJourney() {
+      showSection('section-perguntas');
+      loadDynamicBlocks();
+      const perguntas = document.querySelectorAll('.j-pergunta');
+      if (perguntas.length) perguntas[0].classList.add('active');
+      console.log('Jornada iniciada com sucesso!');
+    }
+
+    // goNext - Avança para a próxima pergunta ou bloco
+    <a id="goNext"></a>
+    function goNext() {
+      const perguntas = document.querySelectorAll('.j-pergunta');
+      const current = document.querySelector('.j-pergunta.active');
+      if (current) current.classList.remove('active');
+      const nextIndex = Array.from(perguntas).indexOf(current) + 1;
+      if (nextIndex < perguntas.length) {
+        perguntas[nextIndex].classList.add('active');
+      } else {
+        const blocos = document.querySelectorAll('.j-bloco');
+        const currentBloco = current.closest('.j-bloco');
+        const nextBlocoIndex = Array.from(blocos).indexOf(currentBloco) + 1;
+        if (nextBlocoIndex < blocos.length) {
+          blocos.forEach(b => b.style.display = 'none');
+          blocos[nextBlocoIndex].style.display = 'block';
+          blocos[nextBlocoIndex].querySelector('.j-pergunta').classList.add('active');
+          playTransition(blocos[nextBlocoIndex].dataset.video || '', () => {});
+        } else {
+          showSection('section-final');
+        }
+      }
+    }
+
+    // goPrev - Volta para a pergunta ou bloco anterior
+    <a id="goPrev"></a>
+    function goPrev() {
+      const perguntas = document.querySelectorAll('.j-pergunta');
+      const current = document.querySelector('.j-pergunta.active');
+      if (current) current.classList.remove('active');
+      const prevIndex = Array.from(perguntas).indexOf(current) - 1;
+      if (prevIndex >= 0) {
+        perguntas[prevIndex].classList.add('active');
+      } else {
+        const blocos = document.querySelectorAll('.j-bloco');
+        const currentBloco = current.closest('.j-bloco');
+        const prevBlocoIndex = Array.from(blocos).indexOf(currentBloco) - 1;
+        if (prevBlocoIndex >= 0) {
+          blocos.forEach(b => b.style.display = 'none');
+          blocos[prevBlocoIndex].style.display = 'block';
+          const lastPergunta = Array.from(blocos[prevBlocoIndex].querySelectorAll('.j-pergunta')).pop();
+          if (lastPergunta) lastPergunta.classList.add('active');
+        } else {
+          showSection('section-intro');
+        }
+      }
+    }
+
+    // playTransition - Reproduz vídeo de transição
+    <a id="playTransition"></a>
+    function playTransition(src, onEnd) {
+      const overlay = document.getElementById('videoOverlay');
+      const video = document.getElementById('videoTransicao');
+      const skip = document.getElementById('skipVideo');
+      if (overlay && video && src) {
+        video.src = src;
+        overlay.classList.remove('hidden');
+        const cleanup = () => {
+          video.pause();
+          overlay.classList.add('hidden');
+          video.removeAttribute('src');
+          video.load();
+          onEnd && onEnd();
+        };
+        video.onended = cleanup;
+        video.onerror = cleanup;
+        if (skip) skip.onclick = cleanup;
+        video.muted = true;
+        video.play().catch(() => {});
+      }
+    }
+
+    // finalize - Finaliza a jornada
+    <a id="finalize"></a>
+    function finalize() {
+      const respostas = {};
+      document.querySelectorAll('.j-pergunta.active textarea').forEach((input, idx) => {
+        respostas[`q${idx}`] = input.value || '';
+      });
+      console.log('[JORNADA] Finalizado. Respostas:', respostas);
+      alert('Jornada concluída! Arquivos gerados.');
+      location.replace('/index.html');
+    }
+
+    // initJornada - Inicializa o controlador da jornada
+    <a id="initJornada"></a>
+    function initJornada() {
+      const startBtn = document.getElementById('btnIniciar');
+      if (startBtn) startBtn.addEventListener('click', startJourney);
+      const prevBtn = document.getElementById('btnPrevPerguntas');
+      const nextBtn = document.getElementById('btnNextPerguntas');
+      if (nextBtn) nextBtn.addEventListener('click', goNext);
+      if (prevBtn) prevBtn.addEventListener('click', goPrev);
+      document.addEventListener('click', (ev) => {
+        const n = ev.target.closest('[data-action="next"]');
+        const p = ev.target.closest('[data-action="prev"]');
+        const s = ev.target.closest('[data-action="start"]');
+        if (n) goNext();
+        if (p) goPrev();
+        if (s) startJourney();
+      });
+      console.log('Controlador da jornada inicializado!');
+    }
+
+    // defineJORNADABLOCKS - Define os blocos e perguntas da jornada
+    <a id="defineJORNADABLOCKS"></a>
+    (function() {
+      window.JORNADA_BLOCKS = [
+        {
+          questions: [
+            { label: 'Qual é o seu maior sonho?' },
+            { label: 'O que te inspira no dia a dia?' }
+          ],
+          video_after: '/assets/video/transicao1.mp4'
+        },
+        {
+          questions: [
+            { label: 'Como você enfrenta desafios?' },
+            { label: 'Qual é sua maior conquista?' }
+          ],
+          video_after: '/assets/video/transicao2.mp4'
+        }
+      ];
+      window.JORNADA_QA = {
+        positiveWords: ['feliz', 'alegria', 'amor'],
+        negativeWords: ['triste', 'dor', 'raiva']
+      };
+      console.log('JORNADA_BLOCKS e JORNADA_QA definidos como fallback!');
+    })();
+
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('envTag').textContent = `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
       showSection('section-intro');
       loadDynamicBlocks();
       runTyping(document);
+      initJornada();
     });
   </script>
   <script defer src="/public/config.js" onerror="console.error('Falha ao carregar config.js, usando fallback inline');"></script>
@@ -334,4 +482,5 @@
   <script defer src="/public/jornada-bootstrap.js" onerror="console.error('Falha ao carregar jornada-bootstrap.js, usando fallback inline');"></script>
   <script defer src="/public/jornada-micro.js" onerror="console.error('Falha ao carregar jornada-micro.js, usando fallback inline');"></script>
   <script defer src="/public/api.js" onerror="console.error('Falha ao carregar api.js, usando fallback inline');"></script>
-  <!-- Grok xAI - Uhuuuuuuu! 🚀 -->
+  <!-- Grok xAI - Uhuuuuuuu! 🚀 -->  
+ 
