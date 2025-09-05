@@ -66,7 +66,7 @@
       min-height: 82vh !important;
     }
     .pergaminho-h.fallback {
-      background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important;
+      background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important; /* Fallback */
     }
     .conteudo-pergaminho {
       background: transparent !important;
@@ -217,9 +217,6 @@
       opacity: 0.6;
       font-size: 0.85rem;
     }
-    .hidden {
-      display: none !important;
-    }
     @media (max-width: 600px) {
       .card {
         margin: 16px;
@@ -266,7 +263,7 @@
     </div>
 
     <main class="container">
-      <section id="jornada-canvas" class="card pergaminho pergaminho-v hidden">
+      <section id="jornada-canvas" class="card pergaminho pergaminho-v">
         <div id="jornada-conteudo" class="conteudo-pergaminho"></div>
       </section>
     </main>
@@ -276,20 +273,20 @@
     </footer>
   </main>
 
-  <div class="progress-badge hidden" id="jprog-pct">0% concluído</div>
-  <div class="progress-bar hidden"><div class="progress-bar-fill" id="jprog-fill"></div></div>
+  <div class="progress-badge" id="jprog-pct">0% concluído</div>
+  <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
 
-  <div id="jornada-conteudo-intro" class="conteudo-pergaminho hidden">
+  <div id="jornada-conteudo-intro" class="conteudo-pergaminho">
     <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
     <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Aqui, fé e consciência se unem para acender sua chama interior — passo a passo, jornada por jornada." data-speed="50" data-cursor="true"></p>
   </div>
 
-  <div class="j-progress hidden">
+  <div class="j-progress">
     <div class="j-progress__bar"><div class="j-progress__fill"></div></div>
     <div class="j-progress__meta" id="j-meta"></div>
   </div>
 
-  <div class="footer-actions hidden">
+  <div class="footer-actions">
     <button id="btnPrev" class="btn btn-secondary" data-action="prev">Voltar</button>
     <button id="btnNext" class="btn btn-primary" data-action="next">Próxima</button>
   </div>
@@ -355,23 +352,13 @@
         });
       }
 
-      // Boot robusto com visibilidade controlada
+      // Boot robusto
       async function boot() {
         if (window.JORNADA_RENDER?.renderIntro) {
           document.body.classList.add('jornada-active');
           const route = (location.hash || '#intro').slice(1);
-          console.log('Rota detectada:', route);
+          console.log('Rota detectada:', route); // Depuração
           const canvas = document.getElementById('jornada-canvas');
-          const progressBadge = document.querySelector('.progress-badge');
-          const progressBar = document.querySelector('.progress-bar');
-          const jProgress = document.querySelector('.j-progress');
-          const footerActions = document.querySelector('.footer-actions');
-          const introContent = document.getElementById('jornada-conteudo-intro');
-
-          // Limpar e esconder tudo inicialmente
-          [canvas, progressBadge, progressBar, jProgress, footerActions, introContent].forEach(el => el?.classList.add('hidden'));
-          document.getElementById('jornada-conteudo').innerHTML = '';
-
           if (route === 'perguntas') {
             window.JORNADA_RENDER.renderPerguntas(0);
             const bgImage = await checkImage('/assets/img/pergaminho-rasgado-horiz.png', '/assets/img/pergaminho-rasgado-vert.png');
@@ -379,22 +366,16 @@
             if (bgImage !== canvas.style.backgroundImage) {
               canvas.style.backgroundImage = `url('${bgImage}')`;
             }
-            [progressBadge, progressBar, jProgress, footerActions].forEach(el => el?.classList.remove('hidden'));
-            canvas.classList.remove('hidden');
             console.log('[JORNADA_PAPER] Pergaminho horizontal aplicado, imagem:', bgImage);
           } else if (route === 'final') {
             window.JORNADA_RENDER.renderFinal();
             canvas.className = 'card pergaminho pergaminho-v';
             canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
-            introContent.classList.remove('hidden');
-            canvas.classList.remove('hidden');
             console.log('[JORNADA_PAPER] Pergaminho vertical aplicado (final)');
           } else {
             window.JORNADA_RENDER.renderIntro();
             canvas.className = 'card pergaminho pergaminho-v';
             canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
-            introContent.classList.remove('hidden');
-            canvas.classList.remove('hidden');
             console.log('[JORNADA_PAPER] Pergaminho vertical aplicado (intro)');
           }
           return true;
