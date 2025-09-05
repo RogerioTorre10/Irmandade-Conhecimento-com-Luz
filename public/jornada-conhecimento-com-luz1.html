@@ -91,6 +91,7 @@
       z-index: 20;
       padding: 20px;
       min-height: 100%;
+      overflow: visible; /* Garantir que o conteúdo não seja cortado */
     }
     .j-section {
       height: 100%;
@@ -199,10 +200,12 @@
     .j-bloco {
       background: transparent !important;
       display: none;
+      z-index: 50; /* Aumentar para sobrepor outros elementos */
     }
     .j-pergunta {
       margin-bottom: 24px;
       display: none;
+      z-index: 60; /* Garantir que fique acima do fundo e da chama */
     }
     .j-pergunta.active {
       display: block;
@@ -393,7 +396,7 @@
     function updateProgress() {
       const perguntas = document.querySelectorAll('.j-pergunta');
       const respondidas = Array.from(perguntas).filter(p => p.querySelector('textarea').value.trim() !== '').length;
-      const progresso = (respondidas / perguntas.length) * 100;
+      const progresso = (respondidas / perguntas.length) * 100 || 0;
       const fill = document.getElementById('jprog-fill');
       const badge = document.getElementById('jprog-pct');
       const jFill = document.querySelector('.j-progress__fill');
@@ -469,10 +472,13 @@
         const firstBloco = document.querySelector('.j-bloco');
         if (firstBloco) {
           firstBloco.style.display = 'block';
-          firstBloco.querySelector('.j-pergunta').classList.add('active');
+          const firstPergunta = firstBloco.querySelector('.j-pergunta');
+          if (firstPergunta) firstPergunta.classList.add('active');
+          loadAnswers();
         }
-        loadAnswers();
         console.log('Blocos carregados!');
+      } else {
+        console.error('Erro: #perguntas-container ou JORNADA_BLOCKS não encontrado!');
       }
     }
 
@@ -564,9 +570,13 @@
     // startJourney - Inicia a jornada
     function startJourney() {
       showSection('section-perguntas');
-      loadDynamicBlocks();
+      loadDynamicBlocks(); // Garantir que os blocos sejam carregados aqui
       const perguntas = document.querySelectorAll('.j-pergunta');
-      if (perguntas.length) perguntas[0].classList.add('active');
+      if (perguntas.length) {
+        perguntas[0].classList.add('active');
+      } else {
+        console.error('Nenhuma pergunta encontrada após loadDynamicBlocks!');
+      }
       document.querySelector('.progress-badge').classList.remove('hidden');
       document.querySelector('.progress-bar').classList.remove('hidden');
       document.querySelector('.j-progress').classList.remove('hidden');
@@ -729,19 +739,19 @@
     });
 
     // Referências externas (mantidas para evitar 404, mas não necessárias)
-    </script>
-    <script defer src="/config.js" onerror="console.error('Falha ao carregar config.js, usando fallback inline');"></script>
-    <script defer src="/jornada-utils.js" onerror="console.error('Falha ao carregar jornada-utils.js, usando fallback inline');"></script>
-    <script defer src="/jornada-core.js" onerror="console.error('Falha ao carregar jornada-core.js, usando fallback inline');"></script>
-    <script defer src="/jornada-auth.js" onerror="console.error('Falha ao carregar jornada-auth.js, usando fallback inline');"></script>
-    <script defer src="/jornada-chama.js" onerror="console.error('Falha ao carregar jornada-chama.js, usando fallback inline');"></script>
-    <script defer src="/jornada-paper-qa.js" onerror="console.error('Falha ao carregar jornada-paper-qa.js, usando fallback inline');"></script>
-    <script defer src="/jornada-typing.js" onerror="console.error('Falha ao carregar jornada-typing.js, usando fallback inline');"></script>
-    <script defer src="/jornada-controller.js" onerror="console.error('Falha ao carregar jornada-controller.js, usando fallback inline');"></script>
-    <script defer src="/jornada-render.js" onerror="console.error('Falha ao carregar jornada-render.js, usando fallback inline');"></script>
-    <script defer src="/jornada-bootstrap.js" onerror="console.error('Falha ao carregar jornada-bootstrap.js, usando fallback inline');"></script>
-    <script defer src="/jornada-micro.js" onerror="console.error('Falha ao carregar jornada-micro.js, usando fallback inline');"></script>
-    <script defer src="/i18n/i18n.js" onerror="console.error('Falha ao carregar i18n.js, usando fallback inline');"></script>
-    <script defer src="/api.js" onerror="console.error('Falha ao carregar api.js, usando fallback inline');"></script>
+  </script>
+  <script defer src="/config.js" onerror="console.error('Falha ao carregar config.js, usando fallback inline');"></script>
+  <script defer src="/jornada-utils.js" onerror="console.error('Falha ao carregar jornada-utils.js, usando fallback inline');"></script>
+  <script defer src="/jornada-core.js" onerror="console.error('Falha ao carregar jornada-core.js, usando fallback inline');"></script>
+  <script defer src="/jornada-auth.js" onerror="console.error('Falha ao carregar jornada-auth.js, usando fallback inline');"></script>
+  <script defer src="/jornada-chama.js" onerror="console.error('Falha ao carregar jornada-chama.js, usando fallback inline');"></script>
+  <script defer src="/jornada-paper-qa.js" onerror="console.error('Falha ao carregar jornada-paper-qa.js, usando fallback inline');"></script>
+  <script defer src="/jornada-typing.js" onerror="console.error('Falha ao carregar jornada-typing.js, usando fallback inline');"></script>
+  <script defer src="/jornada-controller.js" onerror="console.error('Falha ao carregar jornada-controller.js, usando fallback inline');"></script>
+  <script defer src="/jornada-render.js" onerror="console.error('Falha ao carregar jornada-render.js, usando fallback inline');"></script>
+  <script defer src="/jornada-bootstrap.js" onerror="console.error('Falha ao carregar jornada-bootstrap.js, usando fallback inline');"></script>
+  <script defer src="/jornada-micro.js" onerror="console.error('Falha ao carregar jornada-micro.js, usando fallback inline');"></script>
+  <script defer src="/i18n/i18n.js" onerror="console.error('Falha ao carregar i18n.js, usando fallback inline');"></script>
+  <script defer src="/api.js" onerror="console.error('Falha ao carregar api.js, usando fallback inline');"></script>
 </body>
 </html>
