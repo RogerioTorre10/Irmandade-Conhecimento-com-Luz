@@ -27,9 +27,7 @@
     hide(el) { if (el) el.style.display = 'none'; },
     clamp(n, a, b) { return Math.max(a, Math.min(b, n)); },
     key(b, q) { return `b${b}-q${q}`; },
-    getAnswerEl(qEl) {
-      return qEl?.querySelector?.('textarea, input[type="text"], input[type="email"], input[type="number"], input[type="search"]') || null;
-    },
+    getAnswerEl(qEl) { return qEl?.querySelector?.('textarea, input[type="text"], input[type="email"], input[type="number"], input[type="search"]') || null; },
     getVal(el) { return (el && (el.value ?? '')).trim(); },
     setProgress(cur, total) {
       const pct = total ? Math.round((cur / total) * 100) : 0;
@@ -38,17 +36,14 @@
       if (bar) bar.style.width = pct + '%';
       if (meta) meta.innerHTML = `<b>${cur}</b> / ${total} (${pct}%)`;
     },
-    analiseSentimento: (texto) => {
-      const textoNormalizado = texto.toLowerCase();
-      const palavrasTristes = ["dor", "perda", "sofrimento", "tristeza", "medo", "desafio"];
-      const palavrasAlegres = ["alegria", "superação", "esperança", "coragem", "gratidão", "amor"];
-      for (const palavra of palavrasTristes) {
-        if (textoNormalizado.includes(palavra)) return "sofrida";
-      }
-      for (const palavra of palavrasAlegres) {
-        if (textoNormalizado.includes(palavra)) return "alegre";
-      }
-      return "neutra";
+    analiseSentimento(texto) {
+      const textoNormalizado = texto.toLowerCase().split(/\s+/);
+      let posCount = 0, negCount = 0;
+      textoNormalizado.forEach(word => {
+        if (window.JORNADA_CFG.positiveWords.includes(word)) posCount++;
+        if (window.JORNADA_CFG.negativeWords.includes(word)) negCount++;
+      });
+      return posCount > negCount ? "alegre" : (negCount > posCount ? "sofrida" : "neutra");
     }
   };
 
@@ -103,24 +98,20 @@
       console.warn('Root #jornada-canvas não encontrado');
       return;
     }
-
     U.show(root, 'block');
     const blocos = S.blocos();
     if (!blocos.length) {
       console.warn('Nenhum bloco encontrado');
       return;
     }
-
     blocos.forEach(U.hide);
     const bloco = S.blocoAtivo();
     U.show(bloco);
-
     const perguntas = S.perguntasDo(bloco);
     perguntas.forEach(U.hide);
     state.perguntaIndex = U.clamp(state.perguntaIndex, 0, Math.max(0, perguntas.length - 1));
     const atual = perguntas[state.perguntaIndex];
     U.show(atual);
-
     const input = U.getAnswerEl(atual);
     if (input) {
       input.removeAttribute?.('hidden');
@@ -128,17 +119,14 @@
       input.style.visibility = 'visible';
       try { input.focus({ preventScroll: true }); } catch {}
     }
-
     if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
       window.JORNADA_TYPE.run(atual);
     }
     applyPergaminhoByBloco(bloco);
     U.setProgress(state.perguntaIndex + 1, perguntas.length);
-
     const prev = S.btnPrev();
     const next = S.btnNext();
     if (prev) prev.disabled = (state.blocoIndex === 0 && state.perguntaIndex === 0);
-
     if (next) {
       const ultimaPergunta = state.perguntaIndex === perguntas.length - 1;
       const ultimoBloco = state.blocoIndex === blocos.length - 1;
@@ -149,18 +137,14 @@
   function goNext() {
     const bloco = S.blocoAtivo();
     const perguntas = S.perguntasDo(bloco);
-
     saveCurrentAnswer();
-
     if (state.perguntaIndex < perguntas.length - 1) {
       state.perguntaIndex++;
       render();
       return;
     }
-
     const videoSrc = bloco.getAttribute('data-video') || '';
     const haProximoBloco = state.blocoIndex < S.blocos().length - 1;
-
     if (haProximoBloco) {
       playTransition(videoSrc, () => {
         state.blocoIndex++;
@@ -195,22 +179,18 @@
       onEnd && onEnd();
       return;
     }
-
     try { video.pause(); video.removeAttribute('src'); video.load(); } catch {}
     video.src = src;
     overlay.classList.remove('hidden');
-
     const cleanup = () => {
       try { video.pause(); } catch {}
       overlay.classList.add('hidden');
       try { video.removeAttribute('src'); video.load(); } catch {}
       onEnd && onEnd();
     };
-
     video.onended = cleanup;
     video.onerror = cleanup;
     if (skip) skip.onclick = cleanup;
-
     try {
       video.muted = true;
       const p = video.play();
@@ -221,8 +201,10 @@
   function finalize() {
     saveCurrentAnswer();
     console.log('[JORNADA] Finalizado. Respostas:', state.respostas);
-    alert('Jornada concluída! Gratidão pela confiança.');
-    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
+    window.JORNADA_DOWNLOAD(state.respostas).then(() => {
+      alert('Jornada concluída! Arquivos gerados.');
+      location.replace('/index.html');
+    }).catch(() => alert('Erro ao gerar arquivos.'));
   }
 
   JC.init = function initJornada() {
@@ -231,25 +213,21 @@
       console.warn('Root #jornada-canvas não encontrado para inicialização');
       return;
     }
-
     applyPergaminhoByRoute();
     const prevBtn = S.btnPrev();
     const nextBtn = S.btnNext();
     if (nextBtn) nextBtn.addEventListener('click', goNext);
     if (prevBtn) prevBtn.addEventListener('click', goPrev);
-
     document.addEventListener('click', (ev) => {
       const n = ev.target.closest?.('[data-action="next"]');
       const p = ev.target.closest?.('[data-action="prev"]');
       if (n) { ev.preventDefault(); goNext(); }
       if (p) { ev.preventDefault(); goPrev(); }
     });
-
     try {
       const stash = localStorage.getItem('JORNADA_RESPOSTAS');
       if (stash) state.respostas = JSON.parse(stash) || state.respostas;
     } catch {}
-
     render();
   };
 
@@ -263,3 +241,4 @@
   JC.prev = goPrev;
   JC.render = render;
 })();
+<!-- Grok xAI - Uhuuuuuuu! 🚀 -->
