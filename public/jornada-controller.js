@@ -102,15 +102,19 @@
     U.show(root, 'block');
     const blocos = S.blocos();
     if (!blocos.length) {
-      console.warn('Nenhum bloco encontrado');
+      console.error('Nenhum bloco encontrado após loadDynamicBlocks!');
       return;
     }
     blocos.forEach(U.hide);
     const bloco = S.blocoAtivo();
     if (bloco) U.show(bloco);
+    else {
+      console.error('Bloco ativo não encontrado no índice:', state.blocoIndex);
+      return;
+    }
     const perguntas = S.perguntasDo(bloco);
     if (!perguntas.length) {
-      console.warn('Nenhuma pergunta encontrada no bloco ativo');
+      console.error('Nenhuma pergunta encontrada no bloco ativo:', bloco);
       return;
     }
     perguntas.forEach(q => q.classList.remove('active')); // Remove active de todas
@@ -118,12 +122,13 @@
     const atual = perguntas[state.perguntaIndex];
     if (atual) {
       atual.classList.add('active'); // Mostra só a pergunta atual
+      console.log('Exibindo pergunta:', state.perguntaIndex + 1, 'de', perguntas.length);
       const input = U.getAnswerEl(atual);
       if (input) {
         input.removeAttribute?.('hidden');
         input.style.display = 'block';
         input.style.visibility = 'visible';
-        try { input.focus({ preventScroll: true }); } catch {}
+        try { input.focus({ preventScroll: true }); } catch (e) { console.warn('Erro ao focar input:', e); }
       }
     } else {
       console.error('Pergunta atual não encontrada no índice:', state.perguntaIndex);
