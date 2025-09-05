@@ -21,32 +21,19 @@
   }
 
   function initChama() {
-    const chamaHeader = document.getElementById("chama-header");
+    const chamaHeader = document.querySelector('.site-header .chama');
     const chamaPerguntas = document.getElementById("chama-perguntas");
     const chamaFinal = document.getElementById("chama-final");
 
-    if (chamaHeader && !chamaHeader.querySelector('span')) {
-      chamaHeader.innerHTML = criarChama().innerHTML;
-      chamaHeader.className = "chama chama-lg"; // Força chama-lg no cabeçalho
-    }
-    if (chamaPerguntas && !chamaPerguntas.querySelector('span')) {
-      chamaPerguntas.innerHTML = criarChama().innerHTML;
-      chamaPerguntas.className = "chama chama-md-intermediario"; // Ajusta pra perguntas
-    }
-    if (chamaFinal && !chamaFinal.querySelector('span')) {
-      chamaFinal.innerHTML = criarChama().innerHTML;
-      chamaFinal.className = "chama chama-lg"; // Chama-lg na final
-    }
-
-    const path = location.pathname || "/";
-    const isHome = path === "/" || path.endsWith("/index.html") || path.endsWith("/public/") || path.endsWith("/public");
-    const d = document.createElement("div");
-    d.id = "chama-container";
-    d.className = isHome ? "chama chama-lg" : "chama chama-md-intermediario";
-    d.setAttribute("aria-hidden", "true");
-    if (!document.getElementById("chama-container")) {
-      document.body.appendChild(d);
-    }
+    // Garante que cada chama tenha um único <span>
+    [chamaHeader, chamaPerguntas, chamaFinal].forEach(chamaEl => {
+      if (chamaEl && !chamaEl.querySelector('span')) {
+        chamaEl.innerHTML = criarChama().innerHTML;
+        if (chamaEl === chamaHeader) chamaEl.className = "chama chama-lg";
+        else if (chamaEl === chamaPerguntas) chamaEl.className = "chama chama-md-intermediario";
+        else if (chamaEl === chamaFinal) chamaEl.className = "chama chama-lg";
+      }
+    });
 
     let t;
     const brilho = (chamaEl) => {
@@ -67,7 +54,7 @@
       })();
     };
 
-    [chamaHeader, chamaPerguntas, chamaFinal, document.getElementById("chama-container")].forEach(chamaEl => {
+    [chamaHeader, chamaPerguntas, chamaFinal].forEach(chamaEl => {
       if (chamaEl) brilho(chamaEl);
     });
   }
