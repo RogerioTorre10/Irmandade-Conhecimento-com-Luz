@@ -53,8 +53,7 @@
     .lumen-typing.typing-done::after { content: ""; animation: none; }
     @keyframes lumenBlink { 50% { opacity: 0; } }
     .j-bloco { background: transparent !important; }
-    .j-pergunta { margin-bottom: 24px; display: none; } /* Inicialmente oculto */
-    .j-pergunta.active { display: block; } /* Só uma visível por vez */
+    .j-pergunta { margin-bottom: 24px; }
     .pergunta-enunciado { font-weight: 600; margin-bottom: 8px; display: block; }
     .j-pergunta textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; background: rgba(255, 255, 255, 0.8); resize: vertical; min-height: 100px; }
     #videoOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
@@ -71,7 +70,7 @@
 </head>
 <body data-layout="master" data-journey="essencial">
   <header class="site-header">
-    <div class="chama chama-lg" id="chama-header">
+    <div class="chama chama-lg">
       <span></span>
     </div>
     <h1>Jornada Essencial</h1>
@@ -236,7 +235,9 @@
         });
         content.appendChild(bloco);
       });
-      // Não exibe nada ainda, deixa pra render()
+      // Agora, chame render() pra mostrar uma pergunta por vez
+      window.JC.render();
+      console.log('Blocos carregados e render chamado!');
     }
 
     function typeWriter(el, text, speed, showCursor) {
