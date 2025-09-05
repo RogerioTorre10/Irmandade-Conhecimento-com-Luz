@@ -105,6 +105,8 @@
         if (window.JC?.init) {
           console.log('Tentando inicialização de emergência com JC.init...');
           window.JC.init();
+        } else {
+          console.error('Nenhuma inicialização disponível como fallback!');
         }
       }
     }, 100);
@@ -126,6 +128,9 @@
     if (!window.JC._initialized && window.JC?.init) {
       console.log('Inicialização final no load...');
       window.JC.init();
+      window.JC._initialized = true;
+    } else if (!window.JC._initialized) {
+      console.error('JC.init não disponível no load!');
     }
   });
 })();
