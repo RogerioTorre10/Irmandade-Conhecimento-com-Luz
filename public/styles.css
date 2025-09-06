@@ -179,13 +179,19 @@ body.jornada-active #jornada-canvas { display:block !important; }
 .chama.chama-viva span { animation: flicker-strong 0.85s infinite; filter: drop-shadow(0 0 12px rgba(255,140,0,.55)); }
 .chama.chama-pulse span { animation: flicker-strong 0.6s infinite; }
 
-.chama.chama-md span { width: 22px; height: 54px; } /* tamanho médio padrão */
-.chama.chama-lg span { width: 36px; height: 88px; } /* maiorzinha e vibrante */
+/* Tamanho do container da chama (fundamental para aparecer) */
+.chama { width: 24px; height: 60px; }           /* base */
+.chama.chama-md { width: 22px; height: 54px; }  /* média (perguntas) */
+.chama.chama-lg { width: 36px; height: 88px; }  /* grande (intro/final/hero) */
 
 @media (max-width: 600px) {
-  .chama.chama-md span { width: 18px; height: 44px; }
-  .chama.chama-lg span { width: 28px; height: 72px; }
+  .chama { width: 20px; height: 50px; }
+  .chama.chama-md { width: 18px; height: 44px; }
+  .chama.chama-lg { width: 28px; height: 72px; }
+
+   #chama-perguntas { margin: 6px 0 10px; }
 }
+
 
 /* Posicionadores utilitários */
 .chama-fixed-top {
