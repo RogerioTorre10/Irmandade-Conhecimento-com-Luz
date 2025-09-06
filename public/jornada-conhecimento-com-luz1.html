@@ -927,6 +927,8 @@
         const visible = document.querySelector('.j-section:not(.hidden)');
         if (visible) JORNADA_CHAMA.ensureHeroFlame(visible.id);
       });
+      const btnStart = document.querySelector('[data-action="start"]');
+      if (btnStart) btnStart.addEventListener('click', e => { e.preventDefault(); startJourney(); });
      const bola = document.getElementById('chama-bola');
      if (bola && !bola.hasAttribute('data-intensidade')) {
      bola.setAttribute('data-intensidade', 'media');
