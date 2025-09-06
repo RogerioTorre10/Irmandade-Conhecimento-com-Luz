@@ -583,11 +583,16 @@
       document.querySelectorAll('.j-pergunta textarea').forEach((input, idx) => { respostas[`q${idx}`] = input.value || ''; });
       localStorage.setItem('jornada_respostas', JSON.stringify(respostas));
     }
-    function loadAnswers() {
-      const respostas = JSON.parse(localStorage.getItem('jornada_respostas') || '{}');
-      document.querySelectorAll('.j-pergunta textarea').forEach((input, idx) => { input.value = respostas[`q${idx}`] || ''; });
-      updateProgress();
-    }
+    function loadAnswers(){
+  try{
+    const respostas = JSON.parse(localStorage.getItem('jornada_respostas') || '{}');
+    document.querySelectorAll('.j-pergunta textarea').forEach((input,idx)=>{
+      input.value = respostas[`q${idx}`] || '';
+    });
+  }catch(e){ console.warn('Falha ao carregar respostas:', e); }
+  updateProgress();
+}
+
 
     /* =========================
        ROTEAMENTO & RENDER
