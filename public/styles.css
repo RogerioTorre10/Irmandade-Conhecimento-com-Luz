@@ -275,3 +275,27 @@ nav a, a.btn, .site-header p { letter-spacing:.5px; }
 .jornada #jornada-canvas.pergaminho { /* pergaminho da jornada */ }
 .jornada .j-progress { /* progresso Local */ }
 .jornada .footer-actions .btn { /* botões Voltar/Próxima */ }
+
+/* flamejar mais vivo nas línguas da chama */
+.chama-viva .lingua{ animation-name: lingua, linguaJitter; }
+@keyframes linguaJitter{
+  0%,100% { transform: translateX(-50%) scaleY(1) skewX(0deg); }
+  20%     { transform: translateX(-50%) scaleY(1.03) skewX(.4deg) translateX(var(--jitter,0px)); }
+  50%     { transform: translateX(-50%) scaleY(1.08) skewX(1deg)   translateX(var(--jitter,0px)); }
+  80%     { transform: translateX(-50%) scaleY(1.02) skewX(.2deg) translateX(var(--jitter,0px)); }
+}
+/* flamejar mais vivo nas línguas da chama */
+.chama-viva .lingua {
+  animation-name: lingua, linguaJitter; /* junta jitter com a animação principal */
+  animation-duration: 1.2s, 3s;         /* dura mais tempo o jitter */
+  animation-iteration-count: infinite, infinite;
+  animation-timing-function: ease-in-out, ease-in-out;
+}
+/* brilho respira um pouco mais */
+.chama-viva .brilho{ animation: aura var(--pulso) infinite ease-in-out, brilhoJitter 2.2s infinite ease-in-out; }
+@keyframes brilhoJitter{ 0%,100%{filter: blur(12px)} 50%{filter: blur(14px)} }
+
+/* posição do herói no topo (caso falte) */
+.chama-fixed-hero{ position:absolute; top:-8px; left:-8px; z-index:60 }
+
+
