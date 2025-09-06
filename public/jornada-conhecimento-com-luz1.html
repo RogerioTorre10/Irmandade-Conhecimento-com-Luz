@@ -60,7 +60,7 @@
       position:absolute; left:50%; bottom:0; transform:translateX(-50%);
       width: var(--largura);
       height: var(--altura);
-      border-radius: 30% 30% 10% 10%; /* Ponta aguda, base mais fina */
+      clip-path: polygon(50% 0%, 80% 40%, 100% 70%, 75% 100%, 25% 100%, 0% 70%, 20% 40%); /* Ponta aguda superior, gordinha meio, magra base */
       background:
         radial-gradient(60% 60% at 50% 25%,
           hsla(var(--hue),var(--satur),98%,1) 0%,
@@ -70,7 +70,7 @@
       mix-blend-mode: screen;
       filter: blur(0.8px);
       animation: linguaVibrant 1.1s infinite ease-out;
-      transform-origin: 50% 20%; /* Ajuste pra gordinho no meio */
+      transform-origin: 50% 100%; /* Ajuste pra gordinho no meio */
       opacity: var(--op);
     }
     .chama-viva .lingua:nth-child(2) {
@@ -180,8 +180,8 @@
     .j-bloco { background:transparent!important; display:none; z-index:50 }
     .j-pergunta { margin-bottom:24px; display:none; z-index:60; position:relative }
     .j-pergunta.active { display:block }
-    .pergunta-enunciado { font-family: "MedievalSharp", Arial, sans-serif; font-weight:600; margin-bottom:8px; display:block }
-    .j-pergunta textarea { font-family: "MedievalSharp", Arial, sans-serif; width:100%; padding:12px; border-radius:8px; border:1px solid #d1d5db; background:rgba(255,255,255,.8); resize:vertical; min-height:100px }
+    .pergunta-enunciado { font-weight:600; margin-bottom:8px; display:block }
+    .j-pergunta textarea { width:100%; padding:12px; border-radius:8px; border:1px solid #d1d5db; background:rgba(255,255,255,.8); resize:vertical; min-height:100px }
 
     #videoOverlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.8); display:flex; justify-content:center; align-items:center; z-index:2000 }
     #videoOverlay.hidden { display:none }
@@ -230,13 +230,7 @@
         <div id="jornada-conteudo" class="conteudo-pergaminho">
           <!-- INTRO -->
           <div id="section-intro" class="j-section">
-            <div id="chama-intro" class="chama-viva chama-lg chama-strong chama-viva chama-fixed-hero">
-              <div class="brasa"></div>
-              <div class="lingua"></div>
-              <div class="lingua"></div>
-              <div class="lingua"></div>
-              <div class="brilho"></div>
-            </div>
+            <div class="chama chama-lg chama-strong chama-viva chama-fixed-hero"><span></span></div>
             <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
             <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Antes de começar, ative sua senha." data-speed="50" data-cursor="true"></p>
 
@@ -252,13 +246,7 @@
 
           <!-- PERGUNTAS -->
           <div id="section-perguntas" class="j-section hidden">
-            <div id="chama-perguntas" class="chama-viva chama-md">
-              <div class="brasa"></div>
-              <div class="lingua"></div>
-              <div class="lingua"></div>
-              <div class="lingua"></div>
-              <div class="brilho"></div>
-            </div>
+            <div class="chama chama-md" id="chama-perguntas"><span></span></div>
             <div id="perguntas-container"></div>
             <div class="footer-actions">
               <button id="btnPrevPerguntas" class="btn btn-secondary" data-action="prev">Voltar</button>
@@ -268,13 +256,7 @@
 
           <!-- FINAL -->
           <div id="section-final" class="j-section hidden">
-            <div id="chama-final" class="chama-viva chama-lg chama-strong chama-viva chama-fixed-hero">
-              <div class="brasa"></div>
-              <div class="lingua"></div>
-              <div class="lingua"></div>
-              <div class="lingua"></div>
-              <div class="brilho"></div>
-            </div>
+            <div class="chama chama-lg chama-strong chama-viva chama-fixed-hero"><span></span></div>
             <p data-typing data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40" data-cursor="true"></p>
             <div class="footer-actions">
               <button id="btnRestart" class="btn btn-secondary" data-action="restart">Reiniciar</button>
@@ -583,7 +565,6 @@
       const current = document.querySelector('.j-pergunta.active');
       if (current) current.classList.remove('active');
       const nextIndex = Array.from(perguntas).indexOf(current) + 1;
-      console.log('NextIndex:', nextIndex, 'Total perguntas:', perguntas.length); // Depuração
       if (nextIndex < perguntas.length) {
         perguntas[nextIndex].classList.add('active');
         runTyping(perguntas[nextIndex]);
@@ -592,7 +573,6 @@
         const blocos = document.querySelectorAll('.j-bloco');
         const currentBloco = current?.closest('.j-bloco');
         const nextBlocoIndex = Array.from(blocos).indexOf(currentBloco) + 1;
-        console.log('NextBlocoIndex:', nextBlocoIndex, 'Total blocos:', blocos.length); // Depuração
         if (nextBlocoIndex < blocos.length) {
           blocos.forEach(b => b.style.display = 'none');
           blocos[nextBlocoIndex].style.display = 'block';
@@ -786,7 +766,7 @@
 
       boot().then(() => {
         const visible = document.querySelector('.j-section:not(.hidden)');
-        if (visible && window.JORNADA_CHAMA) window.JORNADA_CHAMA.ensureHeroFlame(visible.id);
+        if (visible) ensureHeroFlame(visible.id);
       });
 
       // observar mudanças de conteúdo
