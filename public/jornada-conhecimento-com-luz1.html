@@ -389,8 +389,9 @@
     function updateChama(score) {
       const chama = document.getElementById('chama-perguntas');
       if (chama) {
+        chama.style.display = 'block';
+        chama.style.visibility = 'visible';
         chama.classList.remove('chama-weak', 'chama-strong');
-        chama.style.display = 'block'; // Garantir que a chama seja exibida
         if (score === "sofrida") chama.classList.add('chama-weak');
         else if (score === "alegre") chama.classList.add('chama-strong');
         console.log('Chama atualizada para:', score);
@@ -578,12 +579,20 @@
       if (input) {
         input.type = input.type === 'password' ? 'text' : 'password';
         console.log('Toggle senha para:', input.type);
+      } else {
+        console.error('Campo senha não encontrado!');
       }
     }
 
     // startJourney - Inicia a jornada após verificar a senha
     function startJourney() {
-      const senha = document.getElementById('senha')?.value || '';
+      const senhaInput = document.getElementById('senha');
+      if (!senhaInput) {
+        console.error('Campo senha não encontrado!');
+        alert('Erro: Campo de senha não carregou. Recarregue a página.');
+        return;
+      }
+      const senha = senhaInput.value || '';
       const senhasValidas = ['iniciar', 'olho magico'];
       if (senhasValidas.includes(senha.toLowerCase())) {
         showSection('section-perguntas');
@@ -614,7 +623,7 @@
       const nextIndex = Array.from(perguntas).indexOf(current) + 1;
       if (nextIndex < perguntas.length) {
         perguntas[nextIndex].classList.add('active');
-        runTyping(perguntas[nextIndex]); // Aplicar datilografia na próxima pergunta
+        runTyping(perguntas[nextIndex]);
         updateProgress();
       } else {
         const blocos = document.querySelectorAll('.j-bloco');
@@ -626,7 +635,7 @@
           const nextPergunta = blocos[nextBlocoIndex].querySelector('.j-pergunta');
           if (nextPergunta) {
             nextPergunta.classList.add('active');
-            runTyping(nextPergunta); // Aplicar datilografia na primeira pergunta do novo bloco
+            runTyping(nextPergunta);
           }
           playTransition(blocos[currentBloco.dataset.bloco].video_after || '', () => {});
         } else {
@@ -644,7 +653,7 @@
       const prevIndex = Array.from(perguntas).indexOf(current) - 1;
       if (prevIndex >= 0) {
         perguntas[prevIndex].classList.add('active');
-        runTyping(perguntas[prevIndex]); // Aplicar datilografia na pergunta anterior
+        runTyping(perguntas[prevIndex]);
         updateProgress();
       } else {
         const blocos = document.querySelectorAll('.j-bloco');
@@ -656,7 +665,7 @@
           const lastPergunta = Array.from(blocos[prevBlocoIndex].querySelectorAll('.j-pergunta')).pop();
           if (lastPergunta) {
             lastPergunta.classList.add('active');
-            runTyping(lastPergunta); // Aplicar datilografia na última pergunta do bloco anterior
+            runTyping(lastPergunta);
           }
         } else {
           showSection('section-intro');
@@ -772,7 +781,7 @@
       }
     });
 
-    // Referências externas (desativadas temporariamente para evitar interferência)
+    // Referências externas desativadas temporariamente
     <!-- <script defer src="/config.js" onerror="console.error('Falha ao carregar config.js, usando fallback inline');"></script>
     <script defer src="/jornada-utils.js" onerror="console.error('Falha ao carregar jornada-utils.js, usando fallback inline');"></script>
     <script defer src="/jornada-core.js" onerror="console.error('Falha ao carregar jornada-core.js, usando fallback inline');"></script>
