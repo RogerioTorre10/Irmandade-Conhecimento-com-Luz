@@ -467,6 +467,9 @@ function highlightKeywords(textarea) {
 
     // loadAnswers - Carrega respostas do localStorage
     function loadAnswers() {
+      // já atualiza chama conforme primeira pergunta (se houver texto)
+      const firstTa = content.querySelector('.j-bloco .j-pergunta textarea');
+      if (firstTa) handleInput(firstTa);
       const respostas = JSON.parse(localStorage.getItem('jornada_respostas') || '{}');
       document.querySelectorAll('.j-pergunta textarea').forEach((input, idx) => {
         input.value = respostas[`q${idx}`] || '';
