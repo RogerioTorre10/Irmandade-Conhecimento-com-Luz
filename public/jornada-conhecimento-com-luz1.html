@@ -922,6 +922,10 @@
         const visible = document.querySelector('.j-section:not(.hidden)');
         if (visible) JORNADA_CHAMA.ensureHeroFlame(visible.id);
       });
+     const bola = document.getElementById('chama-bola');
+     if (bola && !bola.hasAttribute('data-intensidade')) {
+     bola.setAttribute('data-intensidade', 'media');
+     }
       const target = document.getElementById('jornada-conteudo');
       if (target) {
         const obs = new MutationObserver(muts => {
