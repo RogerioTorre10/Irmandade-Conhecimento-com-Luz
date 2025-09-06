@@ -5,10 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Jornada • Irmandade Conhecimento com Luz</title>
   <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
 
   <style>
     /* ===== BASE ===== */
-    body { margin:0; font-family: Arial, sans-serif; background:#f9f9f9; color:#333; }
+    body { margin:0; font-family: "MedievalSharp", Arial, sans-serif; background:#f9f9f9; color:#333; }
     .site-header { display:flex; align-items:center; gap:12px; padding:16px; background:#1f2937; color:#fff; box-shadow:0 2px 4px rgba(0,0,0,.1); position:relative; z-index:1000 }
     .container { max-width:900px; margin:24px auto; padding:0 16px }
     .card { background:#f6efe0!important; border-radius:14px; box-shadow:0 8px 28px rgba(0,0,0,.12); padding:32px; position:relative; z-index:10 }
@@ -179,8 +180,8 @@
     .j-bloco { background:transparent!important; display:none; z-index:50 }
     .j-pergunta { margin-bottom:24px; display:none; z-index:60; position:relative }
     .j-pergunta.active { display:block }
-    .pergunta-enunciado { font-weight:600; margin-bottom:8px; display:block }
-    .j-pergunta textarea { width:100%; padding:12px; border-radius:8px; border:1px solid #d1d5db; background:rgba(255,255,255,.8); resize:vertical; min-height:100px }
+    .pergunta-enunciado { font-family: "MedievalSharp", Arial, sans-serif; font-weight:600; margin-bottom:8px; display:block }
+    .j-pergunta textarea { font-family: "MedievalSharp", Arial, sans-serif; width:100%; padding:12px; border-radius:8px; border:1px solid #d1d5db; background:rgba(255,255,255,.8); resize:vertical; min-height:100px }
 
     #videoOverlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.8); display:flex; justify-content:center; align-items:center; z-index:2000 }
     #videoOverlay.hidden { display:none }
@@ -582,6 +583,7 @@
       const current = document.querySelector('.j-pergunta.active');
       if (current) current.classList.remove('active');
       const nextIndex = Array.from(perguntas).indexOf(current) + 1;
+      console.log('NextIndex:', nextIndex, 'Total perguntas:', perguntas.length); // Depuração
       if (nextIndex < perguntas.length) {
         perguntas[nextIndex].classList.add('active');
         runTyping(perguntas[nextIndex]);
@@ -590,6 +592,7 @@
         const blocos = document.querySelectorAll('.j-bloco');
         const currentBloco = current?.closest('.j-bloco');
         const nextBlocoIndex = Array.from(blocos).indexOf(currentBloco) + 1;
+        console.log('NextBlocoIndex:', nextBlocoIndex, 'Total blocos:', blocos.length); // Depuração
         if (nextBlocoIndex < blocos.length) {
           blocos.forEach(b => b.style.display = 'none');
           blocos[nextBlocoIndex].style.display = 'block';
