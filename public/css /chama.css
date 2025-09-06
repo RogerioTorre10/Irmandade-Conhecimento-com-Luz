@@ -215,4 +215,14 @@
   opacity: 1;
   animation-duration: 1s;
 }
+/* =============================
+   Guia Espiritual - Posição fixa
+   ============================= */
+#guia-espiritual {
+  position: fixed;
+  right: 20px;       /* canto direito */
+  bottom: 20px;         /* sempre visível no topo */
+  z-index: 9999;     /* acima de tudo */
+  pointer-events: none; /* não interfere em cliques */
+}
 
