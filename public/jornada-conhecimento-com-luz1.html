@@ -648,31 +648,34 @@ function highlightKeywords(textarea) {
     }
 
     // startJourney - Inicia a jornada após verificar a senha
-    function startJourney() {
-      const senha = document.getElementById('senha')?.value || '';
-      const senhasValidas = ['iniciar', 'olho magico'];
-      if (senhasValidas.includes(senha.toLowerCase())) {
-        showSection('section-perguntas');
-        loadDynamicBlocks();
-        const perguntas = document.querySelectorAll('.j-pergunta');
-        if (perguntas.length) {
-          perguntas[0].classList.add('active');
-          runTyping(perguntas[0]); // Aplicar datilografia na primeira pergunta
-          const firstTa = document.querySelector('.j-pergunta.active textarea');
-        if (firstTa) handleInput(firstTa);
-        } else {
-          console.error('Nenhuma pergunta encontrada após loadDynamicBlocks!');
-        }
-        document.querySelector('.progress-badge').classList.remove('hidden');
-        document.querySelector('.progress-bar').classList.remove('hidden');
-        document.querySelector('.j-progress').classList.remove('hidden');
-        document.querySelector('.footer-actions').classList.remove('hidden');
-        updateProgress(); // Inicializar progresso
-        console.log('Jornada iniciada com sucesso!');
-      } else {
-        alert('Senha incorreta. Tente novamente.');
-      }
+   function startJourney() {
+  const senha = document.getElementById('senha')?.value || '';
+  const senhasValidas = ['iniciar', 'olho magico', 'olho mágico']; // aceita com e sem acento
+  if (senhasValidas.includes(senha.toLowerCase())) {
+    showSection('section-perguntas');
+    loadDynamicBlocks();
+
+    const perguntas = document.querySelectorAll('.j-pergunta');
+    if (perguntas.length) {
+      perguntas[0].classList.add('active');
+      runTyping(perguntas[0]);
+      const firstTa = document.querySelector('.j-pergunta.active textarea');
+      if (firstTa) handleInput(firstTa);
+    } else {
+      console.error('Nenhuma pergunta encontrada após loadDynamicBlocks!');
     }
+
+    document.querySelector('.progress-badge')?.classList.remove('hidden');
+    document.querySelector('.progress-bar')?.classList.remove('hidden');
+    document.querySelector('.j-progress')?.classList.remove('hidden');
+    document.querySelector('.footer-actions')?.classList.remove('hidden');
+
+    updateProgress();
+    console.log('Jornada iniciada com sucesso!');
+  } else {
+    alert('Senha incorreta. Tente novamente.');
+  }
+}
 
     // goNext - Avança para a próxima pergunta ou bloco
     function goNext() {
