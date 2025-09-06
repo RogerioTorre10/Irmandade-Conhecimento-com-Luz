@@ -658,6 +658,8 @@ function highlightKeywords(textarea) {
         if (perguntas.length) {
           perguntas[0].classList.add('active');
           runTyping(perguntas[0]); // Aplicar datilografia na primeira pergunta
+          const firstTa = document.querySelector('.j-pergunta.active textarea');
+        if (firstTa) handleInput(firstTa);
         } else {
           console.error('Nenhuma pergunta encontrada após loadDynamicBlocks!');
         }
