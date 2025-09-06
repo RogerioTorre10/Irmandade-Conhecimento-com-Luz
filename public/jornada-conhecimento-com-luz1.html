@@ -523,9 +523,9 @@
         console.log('Chama', targetId, 'atualizada para:', modo);
       },
       updateChamaFromText: function(text, targetId = 'chama-perguntas') {
-        const score = analyzeSentiment(text);
-        updateChama(score, targetId);
-        return { score, intensidade: (score <= -2) ? 'fraca' : (score >= 2) ? 'forte' : 'media' };
+      const score = analyzeSentiment(text);
+      this.updateChama(score, targetId);
+      return { score, intensidade: (score <= -2) ? 'fraca' : (score >= 2) ? 'forte' : 'media' };
       },
       setChamaIntensidade: function(target, modo) {
         const el = typeof target === 'string' ? document.getElementById(target) : target;
@@ -726,35 +726,61 @@
         }
       }
     }
-    function goPrev() {
-      const perguntas = document.querySelectorAll('.j-pergunta');
-      const current = document.querySelector('.j-pergunta.active');
-      if (current) current.classList.remove('active');
-      const prevIndex = Array.from(perguntas).indexOf(current) - 1;
-      if (prevIndex >= 0) {
-        perguntas[prevIndex].classList.add('active');
-        runTyping(perguntas[prevIndex]);
-        updateProgress();
-      } else {
-        const blocos = document.querySelectorAll('.j-bloco');
-        const currentBloco = current?.closest('.j-bloco');
-        const prevBlocoIndex = Array.from(blocos).indexOf(currentBloco) - 1;
-        if (prevBlocoIndex >= 0) {
-          blocos.forEach(b => b.style.display = 'none');
-          blocos[prevBlocoIndex].style.display = 'block';
-          const lastPergunta = Array.from(blocos[prevBlocoIndex].querySelectorAll('.j-pergunta')).pop();
-          if (lastPergunta) {
-            lastPergunta.classList.add('active');
-            runTyping(lastPergunta);
-          } else {
-            console.error('Nenhuma última pergunta encontrada no bloco anterior!');
-          }
-        } else {
-          showSection('section-intro');
-        }
-        updateProgress();
-      }
+  function goNext(){
+  const perguntas = document.querySelectorAll('.j-pergunta');
+  const current   = document.querySelector('.j-pergunta.active');
+
+  if (current) current.classList.remove('active');
+  const idxAtual = Array.from(perguntas).indexOf(current);
+  const idxProx  = idxAtual + 1;
+
+  // 1) Tentar ir para a próxima pergunta no MESMO bloco
+  if (idxProx < perguntas.length) {
+    const prox = perguntas[idxProx];
+    const blocoAtual = current ? current.closest('.j-bloco') : null;
+    const blocoProx  = prox.closest('.j-bloco');
+    if (blocoAtual && blocoProx === blocoAtual) {
+      prox.classList.add('active');
+      runTyping(prox);
+      updateProgress();
+      return;
     }
+  }
+
+  // 2) Acabou o bloco → preparar próximo bloco
+  const blocos = document.querySelectorAll('.j-bloco');
+  const blocoAtual = current ? current.closest('.j-bloco') : null;
+  const idxBlocoAtual = blocoAtual ? Array.from(blocos).indexOf(blocoAtual) : -1;
+  const idxBlocoProx  = idxBlocoAtual + 1;
+
+  const abrirProximoBloco = () => {
+    if (idxBlocoProx < blocos.length) {
+      blocos.forEach(b => b.style.display = 'none');
+      const bProx = blocos[idxBlocoProx];
+      bProx.style.display = 'block';
+      const proxPerg = bProx.querySelector('.j-pergunta');
+      if (proxPerg) {
+        proxPerg.classList.add('active');
+        runTyping(proxPerg);
+      }
+      updateProgress();
+    } else {
+      showSection('section-final');
+      updateProgress();
+    }
+  };
+
+  // 3) Tocar VÍDEO do bloco que acabou (se houver)
+  if (idxBlocoAtual >= 0) {
+    const videoSrc = blocos[idxBlocoAtual].dataset.video || '';
+    if (videoSrc) {
+      playTransition(videoSrc, abrirProximoBloco);
+      return;
+    }
+  }
+  // 4) Sem vídeo → segue
+  abrirProximoBloco();
+}
 
     function playTransition(src, onEnd) {
       const overlay = document.getElementById('videoOverlay');
