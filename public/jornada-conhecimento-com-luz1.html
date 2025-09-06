@@ -408,49 +408,37 @@
       console.log('Controlador da jornada inicializado!');
     }
 
-    async function boot(){
-      document.body.classList.add('jornada-active');
-      const route=(location.hash||'#intro').slice(1);
-      const canvas=document.getElementById('jornada-canvas');
-      const progressBadge=document.querySelector('.progress-badge');
-      const progressBar=document.querySelector('.progress-bar');
-      const jProgress=document.querySelector('.j-progress');
-      const footerActions=document.querySelector('.footer-actions');
+    // Reestruturação do boot para simplificar o carregamento
+function boot() {
+  document.body.classList.add('jornada-active');
+  
+  // Sempre começa na seção de introdução
+  showSection('section-intro');
+  
+  // Tenta carregar os blocos (para evitar erro no console, mesmo se não usados de imediato)
+  try {
+    loadDynamicBlocks();
+  } catch(e) {
+    console.warn("Aviso: 'loadDynamicBlocks' falhou na inicialização. Isso é esperado antes da senha ser ativada.");
+  }
+}
 
-      if(canvas){
-        if(route==='perguntas'){
-          showSection('section-perguntas'); loadDynamicBlocks();
-          [progressBadge,progressBar,jProgress,footerActions].forEach(el=>el?.classList.remove('hidden'));
-        } else if(route==='final'){
-          showSection('section-final'); [progressBadge,progressBar,jProgress].forEach(el=>el?.classList.remove('hidden'));
-        } else { showSection('section-intro'); }
-      }
-      runTyping(document); return true;
-    }
-
-   // Inicialização
+// Inicialização da página
 document.addEventListener('DOMContentLoaded', () => {
-  initJornada();
+  initJornada();
+  boot();
 
-  boot().then(() => {
-    const visible = document.querySelector('.j-section:not(.hidden)');
-    if (window.JORNADA_CHAMA && visible) {
-      window.JORNADA_CHAMA.ensureHeroFlame(visible.id);
-    }
-  });
-
-  const target = document.getElementById('jornada-conteudo');
-  if (target) {
-    const obs = new MutationObserver(muts => {
-      muts.forEach(m => {
-        runTyping(m.target);
-        if (m.target.id === 'perguntas-container') updateProgress();
-      });
-    });
-    obs.observe(target, { childList: true, subtree: true });
-  }
+  const target = document.getElementById('jornada-conteudo');
+  if (target) {
+    const obs = new MutationObserver(muts => {
+      muts.forEach(m => {
+        runTyping(m.target);
+        if (m.target.id === 'perguntas-container') updateProgress();
+      });
+    });
+    obs.observe(target, { childList: true, subtree: true });
+  }
 });
-    
     // BRIDGE GLOBAL para scripts externos (como jornada-controller.js)
     window.JC = window.JC || {};
     window.toggleSenha  = toggleSenha;
