@@ -925,29 +925,45 @@ document.querySelectorAll('#chama-intro, #chama-perguntas, #chama-final, #chama-
 
     // Inicialização
     document.addEventListener('DOMContentLoaded', () => {
-      runTyping(document);
-      initJornada();
-      boot().then(() => {
-        const visible = document.querySelector('.j-section:not(.hidden)');
-        if (visible) JORNADA_CHAMA.ensureHeroFlame(visible.id);
+  // listeners explícitos
+  const btnStart = document.querySelector('[data-action="start"]');
+  if (btnStart) btnStart.addEventListener('click', e => { e.preventDefault(); startJourney(); });
+
+  // inicialização padrão
+  runTyping(document);
+  initJornada();
+
+  boot().then(() => {
+    const visible = document.querySelector('.j-section:not(.hidden)');
+    if (visible && window.JORNADA_CHAMA) window.JORNADA_CHAMA.ensureHeroFlame(visible.id);
+  });
+
+  // observar mudanças de conteúdo
+  const target = document.getElementById('jornada-conteudo');
+  if (target) {
+    const obs = new MutationObserver(muts => {
+      muts.forEach(m => {
+        runTyping(m.target);
+        if (m.target.id === 'perguntas-container') updateProgress();
       });
-      const btnStart = document.querySelector('[data-action="start"]');
-      if (btnStart) btnStart.addEventListener('click', e => { e.preventDefault(); startJourney(); });
-     const bola = document.getElementById('chama-bola');
-     if (bola && !bola.hasAttribute('data-intensidade')) {
-     bola.setAttribute('data-intensidade', 'media');
-     }
-      const target = document.getElementById('jornada-conteudo');
-      if (target) {
-        const obs = new MutationObserver(muts => {
-          muts.forEach(m => {
-            runTyping(m.target);
-            if (m.target.id === 'perguntas-container') updateProgress();
-          });
-        });
-        obs.observe(target, { childList: true, subtree: true });
-      }
     });
+    obs.observe(target, { childList: true, subtree: true });
+  }
+
+  // intensidade default da chama-bola (se faltar)
+  const bola = document.getElementById('chama-bola');
+  if (bola && !bola.hasAttribute('data-intensidade')) {
+    bola.setAttribute('data-intensidade','media');
+  }
+
+  // micro-jitter (flamejar orgânico)
+  document.querySelectorAll('#chama-intro, #chama-perguntas, #chama-final, #chama-bola').forEach(f=>{
+    f.style.setProperty('--jitter', `${(Math.random()*2-1).toFixed(2)}px`);
+    f.querySelectorAll('.lingua').forEach((n,i)=>{
+      n.style.animationDelay = `${i*0.07 + Math.random()*0.08}s`;
+    });
+  });
+});
 
     // BRIDGE GLOBAL para scripts externos
     window.JC = window.JC || {};
