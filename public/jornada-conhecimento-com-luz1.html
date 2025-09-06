@@ -481,12 +481,33 @@ function highlightKeywords(textarea) {
       const activeSection = document.getElementById(sectionId);
       if (activeSection) activeSection.classList.remove('hidden');
       updateCanvasBackground(sectionId);
+      ensureHeroFlame(sectionId);
       if (sectionId === 'section-perguntas') {
         updateProgress(); // Atualizar progresso ao entrar na seção de perguntas
         const perguntas = document.querySelectorAll('.j-pergunta');
         if (perguntas.length) runTyping(perguntas[0]); // Aplicar datilografia na primeira pergunta
       }
     }
+
+    function ensureHeroFlame(sectionId) {
+  const canvas = document.getElementById('jornada-canvas');
+  if (!canvas) return;
+
+  let hero = document.getElementById('chama-hero');
+  const mustShow = (sectionId === 'section-intro' || sectionId === 'section-final');
+
+  if (mustShow) {
+    if (!hero) {
+      hero = document.createElement('div');
+      hero.id = 'chama-hero';
+      hero.className = 'chama chama-lg chama-strong chama-viva chama-fixed-top';
+      hero.innerHTML = '<span></span>';
+      canvas.appendChild(hero);
+    }
+  } else if (hero) {
+    hero.remove();
+  }
+}
 
     // updateCanvasBackground - Atualiza o fundo do canvas
     async function updateCanvasBackground(sectionId) {
