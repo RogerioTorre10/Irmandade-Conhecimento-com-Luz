@@ -95,7 +95,15 @@
     if (finalChama)   finalChama.style.visibility   = (sectionId === 'section-final')      ? 'visible' : 'hidden';
     if (perguntasEl)  perguntasEl.style.visibility  = (sectionId === 'section-perguntas')  ? 'visible' : 'hidden';
   }
+   // ===== Controle da Bola de Chama =====
+    function setChamaBola(intensidade, targetId='chama-bola'){
+    const el = document.getElementById(targetId);
+    if (!el) return;
+    el.classList.remove('fraca','media','forte');
+    el.classList.add(intensidade);
+  }
 
+  
   // ===== Auto-init leve (se existe #chama-perguntas monta no DOM) =====
   document.addEventListener('DOMContentLoaded', () => {
     const el = document.getElementById('chama-perguntas');
@@ -109,6 +117,7 @@
     updateChamaFromText,      // (texto[, targetId]) -> {score,intensidade}
     setChamaIntensidade,      // (elOrId, 'fraca'|'media'|'forte')
     ensureHeroFlame           // (sectionId)
+    setChamaBola             // controla intensidade da bola de fogo
   };
 })();
 
