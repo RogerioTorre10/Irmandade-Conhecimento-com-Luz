@@ -182,19 +182,7 @@
     document.getElementById('envTag').textContent =
       `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
 
-    /* =========================
-       EMOÇÃO E DATILOGRAFIA
-    ==========================*/
-    const EMO = {
-      POS:{'feliz':2,'alegria':2,'amor':3,'sucesso':2,'esperança':3,'paz':2,'fé':3,'gratidão':2,'vitória':3,'superação':3,'luz':2,'deus':3,'coragem':2,'força':2,'confiança':2,'propósito':3},
-      NEG:{'triste':-2,'dor':-3,'raiva':-2,'medo':-2,'frustracao':-2,'frustração':-2,'decepcao':-2,'decepção':-2,'perda':-3,'culpa':-2,'ansiedade':-2,'solidao':-2,'solidão':-2,'desespero':-3,'cansaco':-2,'cansaço':-2,'fracasso':-2,'trauma':-3,'duvida':-2,'dúvida':-2}
-    };
-    function analyzeSentiment(text){
-      let score=0;
-      const tokens=(text||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').split(/\s+/);
-      for(const t of tokens){ if(EMO.POS[t]!=null) score+=EMO.POS[t]; if(EMO.NEG[t]!=null) score+=EMO.NEG[t]; }
-      return score;
-    }
+    // Funções de Datilografia e Controle
     function typeWriter(el,text,speed,showCursor){
       if(!el) return;
       el.textContent=''; if(showCursor) el.classList.add('lumen-typing');
@@ -210,32 +198,13 @@
       });
     }
 
-    /* =========================
-       CHAMA
-    ==========================*/
-    function updateChama(scoreNum){
-      const chama = document.getElementById('chama-perguntas');
-      if (!chama) return;
-      chama.classList.remove('chama-weak', 'chama-strong', 'chama-pulse');
-      chama.classList.add('chama', 'chama-md');
-      if (scoreNum <= -2) {
-        chama.classList.add('chama-weak');
-      } else if (scoreNum >= 2) {
-        chama.classList.add('chama-strong', 'chama-pulse');
+    function handleInput(textarea){ 
+      if (window.JORNADA_CHAMA) {
+        const score = window.JORNADA_CHAMA.analyzeSentiment(textarea.value);
+        window.JORNADA_CHAMA.updateChama(score);
       }
-      clearTimeout(chama._pulse_t);
-      if (scoreNum >= 2) {
-        chama._pulse_t = setTimeout(() => chama.classList.remove('chama-pulse'), 700);
-      }
-    }
-    
-    function ensureHeroFlame(sectionId) {
-      const introChama = document.querySelector('#section-intro .chama');
-      const finalChama = document.querySelector('#section-final .chama');
-      const perguntasChama = document.querySelector('#chama-perguntas');
-      if (introChama) introChama.style.visibility = (sectionId === 'section-intro') ? 'visible' : 'hidden';
-      if (finalChama) finalChama.style.visibility = (sectionId === 'section-final') ? 'visible' : 'hidden';
-      if (perguntasChama) perguntasChama.style.visibility = (sectionId === 'section-perguntas') ? 'visible' : 'hidden';
+      saveAnswers(); 
+      updateProgress(); 
     }
 
     /* =========================
@@ -284,7 +253,8 @@
     function showSection(sectionId){
       document.querySelectorAll('.j-section').forEach(s=>s.classList.add('hidden'));
       const active=document.getElementById(sectionId); if(active) active.classList.remove('hidden');
-      updateCanvasBackground(sectionId); ensureHeroFlame(sectionId);
+      updateCanvasBackground(sectionId); 
+      if (window.JORNADA_CHAMA) window.JORNADA_CHAMA.ensureHeroFlame(sectionId);
       if(sectionId==='section-perguntas'){
         updateProgress();
         const perguntas=document.querySelectorAll('.j-pergunta'); if(perguntas.length) runTyping(perguntas[0]);
@@ -325,7 +295,6 @@
     /* =========================
        CONTROLES
     ==========================*/
-    function handleInput(textarea){ const score=analyzeSentiment(textarea.value); updateChama(score); saveAnswers(); updateProgress(); }
     function toggleSenha(){ const input=document.getElementById('senha'); if(input){ input.type=(input.type==='password'?'text':'password'); } }
 
     function goNext(){
@@ -415,7 +384,6 @@
         { questions:[{label:'Qual é o seu maior sonho?'},{label:'O que te inspira no dia a dia?'}], video_after:'/assets/video/transicao1.mp4' },
         { questions:[{label:'Como você enfrenta desafios?'},{label:'Qual é sua maior conquista?'}], video_after:'/assets/video/transicao2.mp4' }
       ];
-      window.JORNADA_QA={ positiveWords:Object.keys(EMO.POS), negativeWords:Object.keys(EMO.NEG) };
       console.log('JORNADA_BLOCKS/QA (fallback) definidos!');
     })();
 
@@ -466,7 +434,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   boot().then(() => {
     const visible = document.querySelector('.j-section:not(.hidden)');
-    if (visible) ensureHeroFlame(visible.id);
+    if (window.JORNADA_CHAMA && visible) {
+      window.JORNADA_CHAMA.ensureHeroFlame(visible.id);
+    }
   });
 
   const target = document.getElementById('jornada-conteudo');
@@ -477,7 +447,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (m.target.id === 'perguntas-container') updateProgress();
       });
     });
-    window.ensureHeroFlame = ensureHeroFlame;
     obs.observe(target, { childList: true, subtree: true });
   }
 });
@@ -496,7 +465,6 @@ document.addEventListener('DOMContentLoaded', () => {
   <script defer src="/jornada-utils.js" onerror="console.error('Falha ao carregar jornada-utils.js, usando fallback inline');"></script>
   <script defer src="/jornada-core.js" onerror="console.error('Falha ao carregar jornada-core.js, usando fallback inline');"></script>
   <script defer src="/jornada-auth.js" onerror="console.error('Falha ao carregar jornada-auth.js, usando fallback inline');"></script>
-  <script defer src="/jornada-chama.js" onerror="console.error('Falha ao carregar jornada-chama.js, usando fallback inline');"></script>
   <script defer src="/jornada-paper-qa.js" onerror="console.error('Falha ao carregar jornada-paper-qa.js, usando fallback inline');"></script>
   <script defer src="/jornada-typing.js" onerror="console.error('Falha ao carregar jornada-typing.js, usando fallback inline');"></script>
   <script defer src="/jornada-controller.js" onerror="console.error('Falha ao carregar jornada-controller.js, usando fallback inline');"></script>
@@ -505,5 +473,6 @@ document.addEventListener('DOMContentLoaded', () => {
   <script defer src="/jornada-micro.js" onerror="console.error('Falha ao carregar jornada-micro.js, usando fallback inline');"></script>
   <script defer src="/i18n/i18n.js" onerror="console.error('Falha ao carregar i18n.js, usando fallback inline');"></script>
   <script defer src="/api.js" onerror="console.error('Falha ao carregar api.js, usando fallback inline');"></script>
+    <script defer src="/jornada-chama.js" onerror="console.error('Falha ao carregar jornada-chama.js');"></script>
 </body>
 </html>
