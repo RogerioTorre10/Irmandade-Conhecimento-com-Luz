@@ -662,8 +662,8 @@ function highlightKeywords(textarea) {
     if (perguntas.length) {
       perguntas[0].classList.add('active');
       runTyping(perguntas[0]);
-      const firstTa = document.querySelector('.j-pergunta.active textarea');
-      if (firstTa) handleInput(firstTa);
+     const firstTa = document.querySelector('.j-pergunta.active textarea');
+     if (firstTa) handleInput(firstTa);
     } else {
       console.error('Nenhuma pergunta encontrada após loadDynamicBlocks!');
     }
