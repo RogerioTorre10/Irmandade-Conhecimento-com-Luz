@@ -1,0 +1,244 @@
+/* =============================================================================
+   TÍTULO: VARIÁVEIS E RESET BÁSICO
+   SUBTÍTULO: Cores, raios e box-sizing global
+============================================================================= */
+:root { --bg:#0b1020; --fg:#eef2ff; --muted:#aab4d4; --primary:#6aa7ff; --card:#121832; --card-2:#0e1428; --radius:16px; }
+*{box-sizing:border-box}
+html,body{height:100%}
+
+/* =============================================================================
+   TÍTULO: FONTES ÉPICAS — IRMANDADE
+   SUBTÍTULO: @font-face (caminhos em /public/assets/fonts)
+   - ManufacturingConsent-Regular.ttf  → TÍTULOS e BOTÕES
+   - BerkshireSwash-Regular.ttf        → TEXTO CORRIDO (contrato/orientações/perguntas)
+   - Cardo-Regular/Bold/Italic.ttf     → RESPOSTAS (inputs, textarea, devolutivas)
+============================================================================= */
+@font-face{
+  font-family:'ManufacturingConsent';
+  src:url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');
+  font-weight:400; font-style:normal; font-display:swap;
+}
+@font-face{
+  font-family:'BerkshireSwash';
+  src:url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');
+  font-weight:400; font-style:normal; font-display:swap;
+}
+@font-face{
+  font-family:'Cardo';
+  src:url('/assets/fonts/Cardo-Regular.ttf') format('truetype');
+  font-weight:400; font-style:normal; font-display:swap;
+}
+@font-face{
+  font-family:'Cardo';
+  src:url('/assets/fonts/Cardo-Italic.ttf') format('truetype');
+  font-weight:400; font-style:italic; font-display:swap;
+}
+@font-face{
+  font-family:'Cardo';
+  src:url('/assets/fonts/Cardo-Bold.ttf') format('truetype');
+  font-weight:700; font-style:normal; font-display:swap;
+}
+
+/* =============================================================================
+   TÍTULO: BASE TIPOGRÁFICA
+   SUBTÍTULO: Body, títulos épicos e áreas de respostas
+============================================================================= */
+body{
+  margin:0;
+  font-family:'BerkshireSwash', cursive; /* texto corrido por padrão */
+  background:var(--bg);
+  color:var(--fg);
+  line-height:1.5;
+}
+
+/* TÍTULOS ÉPICOS */
+h1,h2,h3,h4,h5,h6,
+.site-header h1,
+.card h2,
+.section-title,
+.bloco-titulo,
+.card-pergunta h3,
+.jornada-header h1{
+  font-family:'ManufacturingConsent', serif;
+  letter-spacing:1px;
+  text-transform:none;
+  font-weight:400;
+}
+
+/* ENUNCIADOS/ORIENTAÇÕES/CONTRATO (herdam BerkshireSwash do body) */
+label,
+.pergunta-enunciado,
+.texto-guia,
+.orientacoes,
+.contrato,
+p{
+  font-family:'BerkshireSwash', cursive;
+}
+
+/* RESPOSTAS DO USUÁRIO (inputs, textareas, devolutivas) */
+input, textarea, select,
+.resposta,
+.jornada-resposta,
+.devolutiva,
+#acolh,
+#jornada-conteudo textarea,
+#jornada-conteudo input[type="text"],
+#jornada-conteudo input[type="email"],
+#jornada-conteudo input[type="number"],
+#form-perguntas textarea,
+#form-perguntas input[type="text"],
+#form-perguntas input[type="email"],
+#form-perguntas input[type="number"]{
+  font-family:'Cardo', serif;
+}
+
+/* =============================================================================
+   TÍTULO: ESTRUTURA GERAL
+   SUBTÍTULO: Header, container, cartões e badges
+============================================================================= */
+.site-header,.site-footer{padding:24px 16px;text-align:center}
+.container{max-width:920px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:16px}
+.motto{opacity:.8;margin-top:8px;text-align:center;letter-spacing:.1em}
+.card{background:linear-gradient(180deg,var(--card),var(--card-2));padding:20px;border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:rgba(106,167,255,.15);color:var(--primary);font-weight:600}
+.small{font-size:.875rem;opacity:.9}
+hr{border:0;border-top:1px solid rgba(255,255,255,.15);margin:16px 0}
+
+/* =============================================================================
+   TÍTULO: CAMPOS E SENHA
+   SUBTÍTULO: Inputs padrão e "olho" para revelar senha
+============================================================================= */
+.input, textarea{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:#0c1330;color:var(--fg)}
+label{font-weight:600;margin:6px 0 4px;display:block}
+
+.senha-wrap{position:relative;display:flex;align-items:center}
+.senha-wrap .input{padding-right:42px}
+.senha-eye{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  width:28px;height:28px;border:0;background:transparent;color:var(--muted);
+  display:flex;align-items:center;justify-content:center;cursor:pointer
+}
+.senha-eye:hover{color:var(--fg)}
+.senha-eye svg{width:20px;height:20px}
+
+/* =============================================================================
+   TÍTULO: JORNADA DINÂMICA
+   SUBTÍTULO: Mostrar/ocultar canvas da jornada
+============================================================================= */
+body.jornada-active #page-shell,
+body.jornada-active header.site-header,
+body.jornada-active footer.site-footer { display:none !important; }
+body.jornada-active #jornada-canvas { display:block !important; }
+
+/* =============================================================================
+   TÍTULO: PERGAMINHO
+   SUBTÍTULO: fundo vertical/horizontal sem cortar
+============================================================================= */
+/* ==== PERGAMINHO ==== */
+.pergaminho{
+  margin:12px auto; padding:0; border-radius:18px; overflow:hidden;
+  background-repeat:no-repeat; background-position:center; background-size:100% 100%;
+}
+:root{ --pergV-ratio: 2/3; --pergH-ratio: 3/2; }
+.pergaminho-v{
+  background-image:url("/assets/img/pergaminho-rasgado-vert.png");
+  height:92vh; width:calc(92vh * var(--pergV-ratio)); max-width:96vw;
+}
+.pergaminho-h{
+  background-image:url("/assets/img/pergaminho-rasgado-horiz.png");
+  width:96vw; height:calc(96vw / var(--pergH-ratio)); max-height:82vh;
+}
+.conteudo-pergaminho{ padding:clamp(12px,3vw,28px); line-height:1.55; }
+
+/* Escopo só na página de jornada */
+.jornada #jornada-canvas.pergaminho{ display:block; }
+
+/* =============================================================================
+   TÍTULO: VISIBILIDADE DE BLOCO E PERGUNTA
+   SUBTÍTULO: controlado pelo jornada-controller.js
+============================================================================= */
+.j-bloco{ display:none; }
+.j-pergunta{ display:none; }
+
+/* =============================================================================
+   TÍTULO: OVERLAY VÍDEO
+============================================================================= */
+.video-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.85);
+  display:flex; align-items:center; justify-content:center; z-index:9999; }
+.video-overlay.hidden{ display:none; }
+
+/* =============================================================================
+   TÍTULO: DATILOGRAFIA
+============================================================================= */
+.lumen-typing { white-space: pre-wrap; position: relative; }
+.lumen-typing::after { content: "▌"; margin-left: 2px; opacity: .75; animation: lumenBlink 1s steps(2, end) infinite; }
+.lumen-typing.typing-done::after { content: ""; animation: none; }
+@keyframes lumenBlink { 50% { opacity: 0; } }
+
+/* =============================================================================
+   TÍTULO: PROGRESSO DA JORNADA
+   SUBTÍTULO: Barra, preenchimento e meta
+============================================================================= */
+.j-progress { margin:6px 0 14px; }
+.j-progress__bar { width:100%; height:10px; border-radius:999px; background:rgba(255,255,255,.14); overflow:hidden; }
+.j-progress__fill{ height:100%; width:0%; transition:width .25s ease; background:linear-gradient(90deg,#f59e0b,#fde68a); }
+.j-progress__meta{ margin-top:6px; font-size:.95rem; opacity:.9; display:flex; justify-content:space-between; gap:8px; }
+.j-progress__meta b { font-weight:700; }
+
+.progress-badge {
+  position:absolute; top:8px; right:16px;
+  background:rgba(0,0,0,0.7); color:#fff;
+  font-size:.9rem; padding:4px 8px; border-radius:8px;
+  font-family:'Cardo', serif; /* legível para números/percentuais */
+  z-index:10;
+}
+.progress-bar { width:100%; height:8px; background:rgba(255,255,255,0.2); border-radius:4px; overflow:hidden; margin:10px 0; }
+.progress-bar-fill { height:100%; width:0; background:linear-gradient(90deg,#ffcf70,#ff8c00); transition:width .5s ease-out; }
+
+/* =============================================================================
+   TÍTULO: NAVEGAÇÃO/LINKS
+   SUBTÍTULO: Ajustes finos; tipografia herda do body (Berkshire)
+============================================================================= */
+nav a, a.btn, .site-header p { letter-spacing:.5px; }
+
+/* =============================================================================
+   TÍTULO: VÍDEO OVERLAY
+   SUBTÍTULO: Player full-screen opcional
+============================================================================= */
+.video-overlay { position:fixed; inset:0; background:#000; display:flex; justify-content:center; align-items:center; z-index:9999; }
+.video-overlay.hidden { display:none; }
+.video-player { max-width:100%; max-height:100%; }
+
+/* =============================================================================
+   TÍTULO: SELETOR DE IDIOMA
+   SUBTÍTULO: Botões de idioma
+============================================================================= */
+.lang-switch { display:flex; gap:6px; align-items:center; }
+.lang-btn {
+  font-family:'ManufacturingConsent', serif;
+  font-size:.85rem; padding:.25rem .5rem; border-radius:.5rem;
+  border:1px solid rgba(255,255,255,.2); background:transparent; color:#e8ecf4;
+  cursor:pointer;
+}
+.lang-btn:hover { background:rgba(255,255,255,.1); }
+
+/* =============================================================================
+   TÍTULO: VISIBILIDADE DAS PERGUNTAS
+   SUBTÍTULO: Mostra 1 pergunta por vez dentro do bloco
+============================================================================= */
+.j-bloco { display: none; }          /* todos os blocos começam ocultos (JS mostra o atual) */
+.j-pergunta { display: none; }       /* todas perguntas ocultas (JS mostra a atual) */
+
+/* Overlay de vídeo (já tem, reforço aqui caso precise) */
+.video-overlay { position:fixed; inset:0; background:rgba(0,0,0,.85); display:flex; align-items:center; justify-content:center; z-index:9999; }
+.video-overlay.hidden { display:none; }
+
+/* ==== HOME (escopado) ==== */
+.home .hero        { /* regras da faixa inicial da home */ }
+.home .card.invite { /* cards de convites da home */ }
+.home nav a        { /* links do topo da home se precisar */ }
+
+/* ==== JORNADA (escopado) ==== */
+.jornada #jornada-canvas.pergaminho { /* pergaminho da jornada */ }
+.jornada .j-progress { /* progresso Local */ }
+.jornada .footer-actions .btn { /* botões Voltar/Próxima */ }
