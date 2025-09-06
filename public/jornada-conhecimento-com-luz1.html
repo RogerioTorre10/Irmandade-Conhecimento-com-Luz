@@ -845,9 +845,12 @@ function highlightKeywords(textarea) {
         obs.observe(target, { childList: true, subtree: true });
       }
     });
-
+    // 👉 Exportar funções para o global (corrige os onclick do HTML)
+    window.toggleSenha  = toggleSenha;
+    window.startJourney = startJourney;
+    window.showSection  = showSection;    
+ </script>
     // Referências externas (mantidas para evitar 404, mas não necessárias)
-  </script>
   <script defer src="/config.js" onerror="console.error('Falha ao carregar config.js, usando fallback inline');"></script>
   <script defer src="/jornada-utils.js" onerror="console.error('Falha ao carregar jornada-utils.js, usando fallback inline');"></script>
   <script defer src="/jornada-core.js" onerror="console.error('Falha ao carregar jornada-core.js, usando fallback inline');"></script>
