@@ -323,12 +323,7 @@
       if (sectionId === 'section-perguntas') {
         updateProgress();
         const perguntas = document.querySelectorAll('.j-pergunta');
-        if (perguntas.length) {
-          perguntas[0].classList.add('active'); // Garantir que a primeira pergunta seja exibida
-          runTyping(perguntas[0]);
-        } else {
-          console.error('Nenhuma pergunta encontrada em section-perguntas!');
-        }
+        if (perguntas.length) runTyping(perguntas[0]);
       }
     }
 
@@ -362,12 +357,8 @@
             runTyping(firstPergunta);
             const firstTa = firstPergunta.querySelector('textarea');
             if (firstTa) handleInput(firstTa);
-          } else {
-            console.error('Nenhuma primeira pergunta encontrada no primeiro bloco!');
           }
           loadAnswers();
-        } else {
-          console.error('Nenhum bloco encontrado após loadDynamicBlocks!');
         }
         console.log('Blocos carregados!');
       } else {
@@ -423,8 +414,6 @@
           if (nextPergunta) {
             nextPergunta.classList.add('active');
             runTyping(nextPergunta);
-          } else {
-            console.error('Nenhuma próxima pergunta encontrada no bloco seguinte!');
           }
           playTransition(blocos[currentBloco.dataset.bloco].video_after || '', () => {});
         } else {
@@ -453,8 +442,6 @@
           if (lastPergunta) {
             lastPergunta.classList.add('active');
             runTyping(lastPergunta);
-          } else {
-            console.error('Nenhuma última pergunta encontrada no bloco anterior!');
           }
         } else {
           showSection('section-intro');
@@ -470,7 +457,6 @@
       if (overlay && video && src) {
         video.src = src;
         overlay.classList.remove('hidden');
-        video.controls = true; // Forçar controles para interação
         const cleanup = () => {
           video.pause();
           overlay.classList.add('hidden');
@@ -481,18 +467,16 @@
         video.onended = cleanup;
         video.onerror = () => {
           console.warn('Vídeo não carregou:', src);
-          alert('Erro ao carregar vídeo de transição. Verifique o caminho ou conexão.');
           cleanup();
         };
         if (skip) skip.onclick = cleanup;
+        video.muted = false;
         video.play().catch(err => {
           console.warn('Erro ao reproduzir vídeo:', err);
-          alert('O vídeo não pode ser reproduzido automaticamente. Clique em "Play" nos controles.');
           cleanup();
         });
         setTimeout(cleanup, 10000);
       } else {
-        console.warn('Vídeo ou overlay não encontrado para:', src);
         onEnd && onEnd();
       }
     }
