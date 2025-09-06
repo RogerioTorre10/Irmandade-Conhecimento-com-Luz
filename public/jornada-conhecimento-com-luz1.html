@@ -23,132 +23,116 @@
     .chama-viva {
       --altura: 90px;          /* altura base da chama */
       --largura: 60px;         /* largura base */
-      --pulso: 1.8s;           /* velocidade do pulso */
-      --glow: 16px;            /* intensidade do brilho */
-      --hue: 32;               /* matiz laranja (0=vermelho, 60=amarelo) */
-      --satur: 95%;
-      --light: 58%;
-      --op: .95;
+      --pulso: 1.5s;           /* velocidade do pulso mais rápida */
+      --glow: 24px;            /* brilho mais intenso */
+      --hue: 20;               /* matiz mais vermelho pra vibrância */
+      --satur: 100%;           /* saturação máxima */
+      --light: 55%;            /* luz ajustada pra intensidade */
+      --op: 1;                 /* opacidade total */
 
       position: relative;
       width: var(--largura);
-      height: calc(var(--altura) + 26px); /* 26px do recipiente */
+      height: var(--altura);   /* Removido o vasinho, só a chama */
       display: inline-block;
-      filter: drop-shadow(0 0 var(--glow) hsla(var(--hue),var(--satur),60%,.65));
+      filter: drop-shadow(0 0 var(--glow) hsla(var(--hue),var(--satur),60%,.75)); /* Brilho mais forte */
       z-index: 40; /* Garantir visibilidade */
-    }
-
-    /* Recipiente (vaso) */
-    .chama-viva::after {
-      content:"";
-      position:absolute; left:50%; bottom:0; transform:translateX(-50%);
-      width: calc(var(--largura) * 1.25);
-      height: 26px;
-      background:
-        radial-gradient(120% 100% at 50% 0%,
-          rgba(0,0,0,.15) 0%,
-          rgba(0,0,0,.25) 55%,
-          rgba(0,0,0,.35) 100%);
-      border-radius: 0 0 18px 18px;
-      box-shadow:
-        inset 0 6px 10px rgba(255,255,255,.12),
-        inset 0 -6px 10px rgba(0,0,0,.35);
     }
 
     /* Brasa (base) */
     .chama-viva .brasa {
-      position:absolute; left:50%; bottom:18px; transform:translateX(-50%);
+      position:absolute; left:50%; bottom:0; transform:translateX(-50%);
       width: calc(var(--largura) * .9);
       height: 16px;
       border-radius: 50%;
       background:
         radial-gradient(circle at 50% 40%,
-          hsla(var(--hue),var(--satur),95%,.9) 0%,
-          hsla(var(--hue),var(--satur),70%,.8) 35%,
+          hsla(var(--hue),var(--satur),95%,.95) 0%,
+          hsla(var(--hue),var(--satur),75%,.9) 35%,
           hsla(var(--hue),var(--satur),40%,.0) 70%);
-      filter: blur(1.5px);
+      filter: blur(2px); /* Mais difusão pra vibrância */
       animation: brasaPulse var(--pulso) infinite ease-in-out;
       opacity: var(--op);
     }
 
     /* Línguas da chama (3 camadas) */
     .chama-viva .lingua {
-      position:absolute; left:50%; bottom:18px; transform:translateX(-50%);
+      position:absolute; left:50%; bottom:0; transform:translateX(-50%);
       width: var(--largura);
       height: var(--altura);
-      border-radius: 44% 44% 30% 30%; /* Base larga, topo fino */
+      border-radius: 40% 40% 20% 20%; /* Base estreita, topo mais fino */
       background:
-        radial-gradient(60% 60% at 50% 28%,
+        radial-gradient(60% 60% at 50% 25%,
           hsla(var(--hue),var(--satur),98%,1) 0%,
-          hsla(var(--hue),var(--satur),70%,.95) 35%,
-          hsla(calc(var(--hue) - 8),calc(var(--satur) - 15%),50%,.85) 65%,
-          transparent 82%);
+          hsla(var(--hue),var(--satur),75%,.98) 30%,
+          hsla(calc(var(--hue) - 10),calc(var(--satur) - 20%),50%,.9) 60%,
+          transparent 80%);
       mix-blend-mode: screen;
-      filter: blur(0.6px);
-      animation: lingua 1.2s infinite ease-in-out;
+      filter: blur(0.8px); /* Suave aumento pra vibrância */
+      animation: linguaVibrant 1.1s infinite ease-out; /* Animação mais dinâmica */
       transform-origin: 50% 100%;
       opacity: var(--op);
     }
     .chama-viva .lingua:nth-child(2) {
       width: calc(var(--largura) * .78);
-      height: calc(var(--altura) * .88);
-      animation-duration: 1.5s;
-      animation-delay:.05s;
+      height: calc(var(--altura) * .85);
+      animation-duration: 1.3s;
+      animation-delay: 0.05s;
     }
     .chama-viva .lingua:nth-child(3) {
-      width: calc(var(--largura) * .62);
-      height: calc(var(--altura) * .76);
-      animation-duration: 1.8s;
-      animation-delay:.12s;
+      width: calc(var(--largura) * .65);
+      height: calc(var(--altura) * .75);
+      animation-duration: 1.5s;
+      animation-delay: 0.1s;
     }
 
     /* Brilho / aura */
     .chama-viva .brilho {
-      position:absolute; left:50%; bottom:16px; transform:translateX(-50%);
-      width: calc(var(--largura) * 1.3);
-      height: calc(var(--altura) * 1.1);
+      position:absolute; left:50%; bottom:0; transform:translateX(-50%);
+      width: calc(var(--largura) * 1.5); /* Aura mais ampla */
+      height: calc(var(--altura) * 1.3);
       background: radial-gradient(circle,
-        hsla(var(--hue),var(--satur),70%,.35) 0%,
-        transparent 65%);
-      filter: blur(12px);
+        hsla(var(--hue),var(--satur),70%,.5) 0%,
+        hsla(var(--hue),var(--satur),50%,.3) 50%,
+        transparent 70%);
+      filter: blur(15px); /* Brilho mais difuso */
       pointer-events:none;
       mix-blend-mode: screen;
-      animation: aura var(--pulso) infinite ease-in-out;
-      opacity: .6;
+      animation: auraVibrant var(--pulso) infinite ease-in-out;
+      opacity: 0.8;
     }
 
     /* Pico breve quando intensidade = forte */
     .chama-viva.chama-pico .lingua {
       animation-timing-function: ease-out;
-      transform: translateX(-50%) scaleY(1.1) skewX(1.6deg);
+      transform: translateX(-50%) scaleY(1.2) skewX(2deg); /* Mais vibrante no pico */
     }
 
-    /* Animações */
-    @keyframes lingua {
+    /* Animações ajustadas pra vibrância */
+    @keyframes linguaVibrant {
       0%,100% { transform: translateX(-50%) scaleY(1) skewX(0deg); }
-      50% { transform: translateX(-50%) scaleY(1.06) skewX(1.2deg); }
+      50% { transform: translateX(-50%) scaleY(1.15) skewX(1.8deg); } /* Movimento mais amplo */
     }
     @keyframes brasaPulse {
-      0%,100% { transform:translateX(-50%) scale(1); opacity:.7; }
-      50% { transform:translateX(-50%) scale(1.05); opacity:1; }
+      0%,100% { transform:translateX(-50%) scale(1); opacity:.8; }
+      50% { transform:translateX(-50%) scale(1.1); opacity:1; }
     }
-    @keyframes aura {
-      0%,100% { opacity:.5; }
-      50% { opacity:.8; }
+    @keyframes auraVibrant {
+      0%,100% { opacity:0.6; }
+      50% { opacity:1; } /* Pico mais brilhante */
     }
 
     /* ===== Modos emocionais ===== */
     .chama-viva[data-intensidade="fraca"] {
-      --altura: 70px; --largura: 52px; --pulso: 2.8s; --glow: 8px;
-      --hue: 40; --satur: 80%; --light: 65%; --op: .65;
+      --altura: 70px; --largura: 50px; --pulso: 2.5s; --glow: 12px;
+      --hue: 35; --satur: 85%; --light: 60%; --op: 0.7;
     }
     .chama-viva[data-intensidade="media"] {
-      --altura: 90px; --largura: 60px; --pulso: 1.8s; --glow: 16px;
-      --hue: 32; --satur: 95%; --light: 58%; --op: .95;
+      --altura: 90px; --largura: 60px; --pulso: 1.5s; --glow: 24px;
+      --hue: 20; --satur: 100%; --light: 55%; --op: 1;
     }
     .chama-viva[data-intensidade="forte"] {
-      --altura: 110px; --largura: 66px; --pulso: 1.1s; --glow: 26px;
-      --hue: 20; --satur: 100%; --light: 52%; --op: 1;
+      --altura: 110px; --largura: 70px; --pulso: 1s; --glow: 30px;
+      --hue: 15; --satur: 100%; --light: 50%; --op: 1;
     }
 
     /* Respeitar preferências do usuário */
@@ -157,123 +141,6 @@
         animation: none !important;
       }
     }
-
-    /* ===== CHAMA FLAMEJANTE (antiga bola) ===== */
-    #chama-bola {
-      --altura: 80px;          /* altura base da chama */
-      --largura: 40px;         /* largura reduzida pra base estreita */
-      --pulso: 1.6s;           /* velocidade do pulso */
-      --glow: 20px;            /* intensidade do brilho */
-      --hue: 28;               /* matiz laranja */
-      --satur: 90%;
-      --light: 60%;
-      --op: .9;
-
-      position: relative;
-      width: var(--largura);
-      height: var(--altura);
-      display: inline-block;
-      filter: drop-shadow(0 0 var(--glow) hsla(var(--hue),var(--satur),60%,.65));
-      z-index: 40;
-    }
-
-    /* Recipiente (vaso) */
-    #chama-bola::after {
-      content:"";
-      position:absolute; left:50%; bottom:0; transform:translateX(-50%);
-      width: calc(var(--largura) * 1.2);
-      height: 20px;
-      background:
-        radial-gradient(120% 100% at 50% 0%,
-          rgba(0,0,0,.15) 0%,
-          rgba(0,0,0,.25) 55%,
-          rgba(0,0,0,.35) 100%);
-      border-radius: 0 0 12px 12px;
-      box-shadow:
-        inset 0 4px 8px rgba(255,255,255,.12),
-        inset 0 -4px 8px rgba(0,0,0,.35);
-    }
-
-    /* Brasa (base) */
-    #chama-bola .brasa {
-      position:absolute; left:50%; bottom:15px; transform:translateX(-50%);
-      width: calc(var(--largura) * .85);
-      height: 12px;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 50% 40%,
-          hsla(var(--hue),var(--satur),95%,.9) 0%,
-          hsla(var(--hue),var(--satur),70%,.8) 35%,
-          hsla(var(--hue),var(--satur),40%,.0) 70%);
-      filter: blur(1px);
-      animation: brasaPulse var(--pulso) infinite ease-in-out;
-      opacity: var(--op);
-    }
-
-    /* Línguas da chama (3 camadas) */
-    #chama-bola .lingua {
-      position:absolute; left:50%; bottom:15px; transform:translateX(-50%);
-      width: var(--largura);
-      height: calc(var(--altura) * 0.8); /* Alongada pra efeito flamejante */
-      border-radius: 40% 40% 20% 20%; /* Base estreita, topo mais fino */
-      background:
-        radial-gradient(60% 60% at 50% 30%,
-          hsla(var(--hue),var(--satur),98%,1) 0%,
-          hsla(var(--hue),var(--satur),70%,.95) 35%,
-          hsla(calc(var(--hue) - 10),calc(var(--satur) - 20%),50%,.85) 65%,
-          transparent 80%);
-      mix-blend-mode: screen;
-      filter: blur(0.5px);
-      animation: linguaFlame 1.2s infinite ease-in-out;
-      transform-origin: 50% 100%;
-      opacity: var(--op);
-    }
-    #chama-bola .lingua:nth-child(2) {
-      width: calc(var(--largura) * 0.75);
-      height: calc(var(--altura) * 0.7);
-      animation-duration: 1.5s;
-      animation-delay: 0.05s;
-    }
-    #chama-bola .lingua:nth-child(3) {
-      width: calc(var(--largura) * 0.6);
-      height: calc(var(--altura) * 0.6);
-      animation-duration: 1.8s;
-      animation-delay: 0.1s;
-    }
-
-    /* Brilho / aura */
-    #chama-bola .brilho {
-      position:absolute; left:50%; bottom:14px; transform:translateX(-50%);
-      width: calc(var(--largura) * 1.4);
-      height: calc(var(--altura) * 1.2);
-      background: radial-gradient(circle,
-        hsla(var(--hue),var(--satur),70%,.35) 0%,
-        transparent 65%);
-      filter: blur(10px);
-      pointer-events:none;
-      mix-blend-mode: screen;
-      animation: auraFlame var(--pulso) infinite ease-in-out;
-      opacity: 0.7;
-    }
-
-    /* Animações personalizadas pra chama flamejante */
-    @keyframes linguaFlame {
-      0%,100% { transform: translateX(-50%) scaleY(1) skewX(0deg); }
-      50% { transform: translateX(-50%) scaleY(1.1) skewX(1.5deg); }
-    }
-    @keyframes brasaPulse {
-      0%,100% { transform:translateX(-50%) scale(1); opacity:.7; }
-      50% { transform:translateX(-50%) scale(1.05); opacity:1; }
-    }
-    @keyframes auraFlame {
-      0%,100% { opacity:0.5; }
-      50% { opacity:0.9; }
-    }
-
-    /* Intensidades emocionais pra chama */
-    #chama-bola.fraca { --altura: 60px; --largura: 35px; --pulso: 2.5s; --glow: 10px; --hue: 40; --satur: 80%; --light: 65%; --op: 0.6; }
-    #chama-bola.media { --altura: 80px; --largura: 40px; --pulso: 1.6s; --glow: 20px; --hue: 28; --satur: 90%; --light: 60%; --op: 0.9; }
-    #chama-bola.forte { --altura: 100px; --largura: 45px; --pulso: 1.1s; --glow: 30px; --hue: 20; --satur: 100%; --light: 55%; --op: 1; }
 
     /* ===== GUIA ESPIRITUAL ===== */
     #guia-espiritual {
@@ -436,16 +303,16 @@
     <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
   </div>
 
- <!-- GUIA ESPIRITUAL: chama flamejante livre -->
-<div id="guia-espiritual">
-  <div id="chama-bola" class="chama-viva">
-    <div class="brasa"></div>
-    <div class="lingua"></div>
-    <div class="lingua"></div>
-    <div class="lingua"></div>
-    <div class="brilho"></div>
+  <!-- GUIA ESPIRITUAL: chama flamejante livre -->
+  <div id="guia-espiritual">
+    <div id="chama-bola" class="chama-viva" style="position: fixed; bottom: 20px; right: 20px;">
+      <div class="brasa"></div>
+      <div class="lingua"></div>
+      <div class="lingua"></div>
+      <div class="lingua"></div>
+      <div class="brilho"></div>
+    </div>
   </div>
-</div>
 
   <script>
     // Tag ambiente
@@ -523,9 +390,9 @@
         console.log('Chama', targetId, 'atualizada para:', modo);
       },
       updateChamaFromText: function(text, targetId = 'chama-perguntas') {
-      const score = analyzeSentiment(text);
-      this.updateChama(score, targetId);
-      return { score, intensidade: (score <= -2) ? 'fraca' : (score >= 2) ? 'forte' : 'media' };
+        const score = analyzeSentiment(text);
+        this.updateChama(score, targetId);
+        return { score, intensidade: (score <= -2) ? 'fraca' : (score >= 2) ? 'forte' : 'media' };
       },
       setChamaIntensidade: function(target, modo) {
         const el = typeof target === 'string' ? document.getElementById(target) : target;
@@ -562,16 +429,15 @@
     window.JORNADA_CHAMA = JORNADA_CHAMA;
 
     // micro-variação para cada chama
-document.querySelectorAll('#chama-intro, #chama-perguntas, #chama-final, #chama-bola')
-  .forEach(f => {
-    // jitter horizontal sutil
-    f.style.setProperty('--jitter', `${(Math.random() * 2 - 1).toFixed(2)}px`);
-    // delays ligeiramente diferentes
-    f.querySelectorAll('.lingua').forEach((n, i) => {
-      n.style.animationDelay = `${i * 0.07 + Math.random() * 0.08}s`;
-    });
-  });
-
+    document.querySelectorAll('#chama-intro, #chama-perguntas, #chama-final, #chama-bola')
+      .forEach(f => {
+        // jitter horizontal sutil
+        f.style.setProperty('--jitter', `${(Math.random() * 2 - 1).toFixed(2)}px`);
+        // delays ligeiramente diferentes
+        f.querySelectorAll('.lingua').forEach((n, i) => {
+          n.style.animationDelay = `${i * 0.07 + Math.random() * 0.08}s`;
+        });
+      });
 
     /* =========================
        PROGRESSO & STORAGE
@@ -595,17 +461,15 @@ document.querySelectorAll('#chama-intro, #chama-perguntas, #chama-final, #chama-
       document.querySelectorAll('.j-pergunta textarea').forEach((input, idx) => { respostas[`q${idx}`] = input.value || ''; });
       localStorage.setItem('jornada_respostas', JSON.stringify(respostas));
     }
-    function loadAnswers(){
-  try{
-    const respostas = JSON.parse(localStorage.getItem('jornada_respostas') || '{}');
-    document.querySelectorAll('.j-pergunta textarea').forEach((input,idx)=>{
-      input.value = respostas[`q${idx}`] || '';
-    });
-  }catch(e){ console.warn('Falha ao carregar respostas:', e); }
-  updateProgress();
-}
-
-
+    function loadAnswers() {
+      try {
+        const respostas = JSON.parse(localStorage.getItem('jornada_respostas') || '{}');
+        document.querySelectorAll('.j-pergunta textarea').forEach((input, idx) => {
+          input.value = respostas[`q${idx}`] || '';
+        });
+      } catch (e) { console.warn('Falha ao carregar respostas:', e); }
+      updateProgress();
+    }
 
     /* =========================
        ROTEAMENTO & RENDER
@@ -744,53 +608,35 @@ document.querySelectorAll('#chama-intro, #chama-perguntas, #chama-final, #chama-
         }
       }
     }
-  function goNext(){
-  const perguntas = document.querySelectorAll('.j-pergunta');
-  const current   = document.querySelector('.j-pergunta.active');
-
-  if (current) current.classList.remove('active');
-  const idxAtual = Array.from(perguntas).indexOf(current);
-  const idxProx  = idxAtual + 1;
-
-  // próxima pergunta no MESMO bloco?
-  if (idxProx < perguntas.length) {
-    const prox = perguntas[idxProx];
-    const blocoAtual = current ? current.closest('.j-bloco') : null;
-    const blocoProx  = prox.closest('.j-bloco');
-    if (blocoAtual && blocoProx === blocoAtual) {
-      prox.classList.add('active');
-      runTyping(prox);
-      updateProgress();
-      return;
+    function goPrev() {
+      const perguntas = document.querySelectorAll('.j-pergunta');
+      const current = document.querySelector('.j-pergunta.active');
+      if (current) current.classList.remove('active');
+      const prevIndex = Array.from(perguntas).indexOf(current) - 1;
+      if (prevIndex >= 0) {
+        perguntas[prevIndex].classList.add('active');
+        runTyping(perguntas[prevIndex]);
+        updateProgress();
+      } else {
+        const blocos = document.querySelectorAll('.j-bloco');
+        const currentBloco = current?.closest('.j-bloco');
+        const prevBlocoIndex = Array.from(blocos).indexOf(currentBloco) - 1;
+        if (prevBlocoIndex >= 0) {
+          blocos.forEach(b => b.style.display = 'none');
+          blocos[prevBlocoIndex].style.display = 'block';
+          const lastPergunta = Array.from(blocos[prevBlocoIndex].querySelectorAll('.j-pergunta')).pop();
+          if (lastPergunta) {
+            lastPergunta.classList.add('active');
+            runTyping(lastPergunta);
+          } else {
+            console.error('Nenhuma última pergunta encontrada no bloco anterior!');
+          }
+        } else {
+          showSection('section-intro');
+        }
+        updateProgress();
+      }
     }
-  }
-
-  // encerrou o bloco atual → toca vídeo do bloco que terminou
-  const blocos = document.querySelectorAll('.j-bloco');
-  const blocoAtual = current ? current.closest('.j-bloco') : null;
-  const idxBlocoAtual = blocoAtual ? Array.from(blocos).indexOf(blocoAtual) : -1;
-  const idxBlocoProx  = idxBlocoAtual + 1;
-
-  const abrirProximo = () => {
-    if (idxBlocoProx < blocos.length) {
-      blocos.forEach(b => b.style.display = 'none');
-      const bProx = blocos[idxBlocoProx];
-      bProx.style.display = 'block';
-      const p0 = bProx.querySelector('.j-pergunta');
-      if (p0){ p0.classList.add('active'); runTyping(p0); }
-      updateProgress();
-    } else {
-      showSection('section-final');
-      updateProgress();
-    }
-  };
-
-  if (idxBlocoAtual >= 0) {
-    const videoSrc = blocos[idxBlocoAtual].dataset.video || '';
-    if (videoSrc){ playTransition(videoSrc, abrirProximo); return; }
-  }
-  abrirProximo();
-}
 
     function playTransition(src, onEnd) {
       const overlay = document.getElementById('videoOverlay');
@@ -926,45 +772,45 @@ document.querySelectorAll('#chama-intro, #chama-perguntas, #chama-final, #chama-
 
     // Inicialização
     document.addEventListener('DOMContentLoaded', () => {
-  // listeners explícitos
-  const btnStart = document.querySelector('[data-action="start"]');
-  if (btnStart) btnStart.addEventListener('click', e => { e.preventDefault(); startJourney(); });
+      // listeners explícitos
+      const btnStart = document.querySelector('[data-action="start"]');
+      if (btnStart) btnStart.addEventListener('click', e => { e.preventDefault(); startJourney(); });
 
-  // inicialização padrão
-  runTyping(document);
-  initJornada();
+      // inicialização padrão
+      runTyping(document);
+      initJornada();
 
-  boot().then(() => {
-    const visible = document.querySelector('.j-section:not(.hidden)');
-    if (visible && window.JORNADA_CHAMA) window.JORNADA_CHAMA.ensureHeroFlame(visible.id);
-  });
+      boot().then(() => {
+        const visible = document.querySelector('.j-section:not(.hidden)');
+        if (visible && window.JORNADA_CHAMA) window.JORNADA_CHAMA.ensureHeroFlame(visible.id);
+      });
 
-  // observar mudanças de conteúdo
-  const target = document.getElementById('jornada-conteudo');
-  if (target) {
-    const obs = new MutationObserver(muts => {
-      muts.forEach(m => {
-        runTyping(m.target);
-        if (m.target.id === 'perguntas-container') updateProgress();
+      // observar mudanças de conteúdo
+      const target = document.getElementById('jornada-conteudo');
+      if (target) {
+        const obs = new MutationObserver(muts => {
+          muts.forEach(m => {
+            runTyping(m.target);
+            if (m.target.id === 'perguntas-container') updateProgress();
+          });
+        });
+        obs.observe(target, { childList: true, subtree: true });
+      }
+
+      // intensidade default da chama-bola (se faltar)
+      const bola = document.getElementById('chama-bola');
+      if (bola && !bola.hasAttribute('data-intensidade')) {
+        bola.setAttribute('data-intensidade', 'media');
+      }
+
+      // micro-jitter (flamejar orgânico)
+      document.querySelectorAll('#chama-intro, #chama-perguntas, #chama-final, #chama-bola').forEach(f => {
+        f.style.setProperty('--jitter', `${(Math.random() * 2 - 1).toFixed(2)}px`);
+        f.querySelectorAll('.lingua').forEach((n, i) => {
+          n.style.animationDelay = `${i * 0.07 + Math.random() * 0.08}s`;
+        });
       });
     });
-    obs.observe(target, { childList: true, subtree: true });
-  }
-
-  // intensidade default da chama-bola (se faltar)
-  const bola = document.getElementById('chama-bola');
-  if (bola && !bola.hasAttribute('data-intensidade')) {
-    bola.setAttribute('data-intensidade','media');
-  }
-
-  // micro-jitter (flamejar orgânico)
-  document.querySelectorAll('#chama-intro, #chama-perguntas, #chama-final, #chama-bola').forEach(f=>{
-    f.style.setProperty('--jitter', `${(Math.random()*2-1).toFixed(2)}px`);
-    f.querySelectorAll('.lingua').forEach((n,i)=>{
-      n.style.animationDelay = `${i*0.07 + Math.random()*0.08}s`;
-    });
-  });
-});
 
     // BRIDGE GLOBAL para scripts externos
     window.JC = window.JC || {};
