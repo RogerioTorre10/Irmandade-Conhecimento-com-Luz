@@ -793,14 +793,18 @@ function highlightKeywords(textarea) {
       if (nextBtn) nextBtn.addEventListener('click', goNext);
       if (prevBtn) prevBtn.addEventListener('click', goPrev);
       if (restartBtn) restartBtn.addEventListener('click', () => location.reload());
-      document.addEventListener('click', (ev) => {
-        const n = ev.target.closest('[data-action="next"]');
-        const p = ev.target.closest('[data-action="prev"]');
-        const s = ev.target.closest('[data-action="start"]');
-        if (n) goNext();
-        if (p) goPrev();
-        if (s) startJourney();
-      });
+     document.addEventListener('click', (ev) => {
+     const n  = ev.target.closest('[data-action="next"]');
+     const p  = ev.target.closest('[data-action="prev"]');
+     const s  = ev.target.closest('[data-action="start"]');
+     const tp = ev.target.closest('[data-action="toggle-password"], .password-toggle');
+
+     if (n)  { ev.preventDefault(); goNext(); }
+     if (p)  { ev.preventDefault(); goPrev(); }
+     if (s)  { ev.preventDefault(); startJourney(); }
+     if (tp) { ev.preventDefault(); toggleSenha(); }
+   });
+
       console.log('Controlador da jornada inicializado!');
     }
 
