@@ -542,13 +542,14 @@ function highlightKeywords(textarea) {
     }
 
     // handleInput - Analisa sentimento e atualiza progresso
-    function handleInput(textarea) {
-      const text = textarea.value;
-      const sentiment = analyzeSentiment(text);
-      updateChama(sentiment);
-      saveAnswers();
-      updateProgress();
-    }
+   function handleInput(textarea) {
+  const score = analyzeSentiment(textarea.value);
+  updateChama(score);
+  highlightKeywords(textarea);
+  saveAnswers();
+  updateProgress();
+}
+
 
     // typeWriter - Efeito de datilografia
     function typeWriter(el, text, speed, showCursor) {
