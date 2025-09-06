@@ -133,7 +133,7 @@
               <h3>Ative sua Senha</h3>
               <div class="password-input">
                 <input type="password" id="senha" placeholder="Digite sua senha...">
-                                <span class="password-toggle" data-action="toggle-password">👁️</span>
+                <span class="password-toggle" data-action="toggle-password">👁️</span>
               </div>
               <button class="btn btn-primary" data-action="start">Ativar e Iniciar</button>
             </div>
@@ -408,6 +408,16 @@
         updateProgress(); console.log('Jornada iniciada com sucesso!');
       } else { alert('Senha incorreta. Tente novamente.'); }
     }
+    
+    // Corrigindo a ordem para que os blocos sejam definidos antes de serem carregados
+    (function defineFallback(){
+      window.JORNADA_BLOCKS=[
+        { questions:[{label:'Qual é o seu maior sonho?'},{label:'O que te inspira no dia a dia?'}], video_after:'/assets/video/transicao1.mp4' },
+        { questions:[{label:'Como você enfrenta desafios?'},{label:'Qual é sua maior conquista?'}], video_after:'/assets/video/transicao2.mp4' }
+      ];
+      window.JORNADA_QA={ positiveWords:Object.keys(EMO.POS), negativeWords:Object.keys(EMO.NEG) };
+      console.log('JORNADA_BLOCKS/QA (fallback) definidos!');
+    })();
 
     function initJornada(){
       const prevBtn=document.getElementById('btnPrevPerguntas');
@@ -417,7 +427,6 @@
       if(prevBtn) prevBtn.addEventListener('click', goPrev);
       if(restartBtn) restartBtn.addEventListener('click', ()=>location.reload());
 
-      // Delegação de cliques (sem onclick no HTML)
       document.addEventListener('click',(ev)=>{
         const n = ev.target.closest('[data-action="next"]');
         const p = ev.target.closest('[data-action="prev"]');
@@ -428,18 +437,8 @@
         if(s){ev.preventDefault();startJourney();}
         if(tp){ev.preventDefault();toggleSenha();}
       });
-
       console.log('Controlador da jornada inicializado!');
     }
-
-    (function defineFallback(){
-      window.JORNADA_BLOCKS=[
-        { questions:[{label:'Qual é o seu maior sonho?'},{label:'O que te inspira no dia a dia?'}], video_after:'/assets/video/transicao1.mp4' },
-        { questions:[{label:'Como você enfrenta desafios?'},{label:'Qual é sua maior conquista?'}], video_after:'/assets/video/transicao2.mp4' }
-      ];
-      window.JORNADA_QA={ positiveWords:Object.keys(EMO.POS), negativeWords:Object.keys(EMO.NEG) };
-      console.log('JORNADA_BLOCKS/QA (fallback) definidos!');
-    })();
 
     async function boot(){
       document.body.classList.add('jornada-active');
@@ -463,11 +462,9 @@
 
    // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
-  runTyping(document);
   initJornada();
 
   boot().then(() => {
-    // ativa o hero conforme a seção visível agora
     const visible = document.querySelector('.j-section:not(.hidden)');
     if (visible) ensureHeroFlame(visible.id);
   });
@@ -480,9 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (m.target.id === 'perguntas-container') updateProgress();
       });
     });
-
     window.ensureHeroFlame = ensureHeroFlame;
-    
     obs.observe(target, { childList: true, subtree: true });
   }
 });
