@@ -135,3 +135,84 @@
     animation: none !important;
   }
 }
+/* =======================================================
+   BOLA DE CHAMA VIVA — estilo esfera incandescente
+   Pode ser usada em paralelo à chama tradicional
+   ======================================================= */
+
+#chama-bola {
+  --size: 80px;             /* tamanho base da bola */
+  --glow: 22px;             /* brilho externo */
+  --color1: #fff7cc;        /* centro (quase branco/amarelo) */
+  --color2: #ffd166;        /* amarelo */
+  --color3: #ff8c00;        /* laranja forte */
+  --color4: transparent;    /* transição para transparente */
+
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%,
+    var(--color1) 0%,
+    var(--color2) 35%,
+    var(--color3) 65%,
+    var(--color4) 100%);
+  filter: drop-shadow(0 0 var(--glow) rgba(255,140,0,.65));
+  animation: bolaPulse 1.6s infinite ease-in-out;
+  margin: 20px auto;
+}
+
+/* Aura (brilho externo) */
+#chama-bola::after {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(255,180,50,0.4) 0%,
+    transparent 70%);
+  filter: blur(12px);
+  animation: auraPulse 2.2s infinite ease-in-out;
+}
+
+/* =======================
+   Animações principais
+   ======================= */
+@keyframes bolaPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: .9;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+@keyframes auraPulse {
+  0%, 100% { opacity: .4; }
+  50% { opacity: .8; }
+}
+
+/* =======================
+   Intensidades emocionais
+   ======================= */
+#chama-bola.fraca {
+  --size: 60px;
+  --glow: 10px;
+  opacity: 0.6;
+  animation-duration: 2.5s;
+}
+#chama-bola.media {
+  --size: 80px;
+  --glow: 22px;
+  opacity: 0.9;
+  animation-duration: 1.6s;
+}
+#chama-bola.forte {
+  --size: 100px;
+  --glow: 36px;
+  opacity: 1;
+  animation-duration: 1s;
+}
+
