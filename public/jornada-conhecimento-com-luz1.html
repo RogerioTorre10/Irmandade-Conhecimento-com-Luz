@@ -5,12 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Jornada • Irmandade Conhecimento com Luz</title>
   <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png">
-  <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
-
   <style>
+    @font-face {
+      font-family: 'ManufacturingConsent';
+      src: url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');
+    }
+    @font-face {
+      font-family: 'BerkshireSwash';
+      src: url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');
+    }
+    @font-face {
+      font-family: 'CardoBold';
+      src: url('/assets/fonts/Cardo-Bold.ttf') format('truetype');
+    }
+
     /* ===== BASE ===== */
-    body { margin:0; font-family: "MedievalSharp", Arial, sans-serif; background:#f9f9f9; color:#333; }
-    .site-header { display:flex; align-items:center; gap:12px; padding:16px; background:#1f2937; color:#fff; box-shadow:0 2px 4px rgba(0,0,0,.1); position:relative; z-index:1000 }
+    body { margin:0; font-family: "ManufacturingConsent", "BerkshireSwash", Arial, sans-serif; background:#f9f9f9; color:#333; }
+    .site-header { display:flex; align-items:center; gap:12px; padding:16px; background:#1f2937; color:#fff; box-shadow:0 2px 4px rgba(0,0,0,.1); position:relative; z-index:1000; font-family: "BerkshireSwash", Arial, sans-serif; }
     .container { max-width:900px; margin:24px auto; padding:0 16px }
     .card { background:#f6efe0!important; border-radius:14px; box-shadow:0 8px 28px rgba(0,0,0,.12); padding:32px; position:relative; z-index:10 }
 
@@ -180,8 +191,8 @@
     .j-bloco { background:transparent!important; display:none; z-index:50 }
     .j-pergunta { margin-bottom:24px; display:none; z-index:60; position:relative }
     .j-pergunta.active { display:block }
-    .pergunta-enunciado { font-weight:600; margin-bottom:8px; display:block }
-    .j-pergunta textarea { width:100%; padding:12px; border-radius:8px; border:1px solid #d1d5db; background:rgba(255,255,255,.8); resize:vertical; min-height:100px }
+    .pergunta-enunciado { font-family: "CardoBold", "MedievalSharp", Arial, sans-serif; font-weight:600; margin-bottom:8px; display:block }
+    .j-pergunta textarea { font-family: "CardoBold", "MedievalSharp", Arial, sans-serif; width:100%; padding:12px; border-radius:8px; border:1px solid #d1d5db; background:rgba(255,255,255,.8); resize:vertical; min-height:100px }
 
     #videoOverlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.8); display:flex; justify-content:center; align-items:center; z-index:2000 }
     #videoOverlay.hidden { display:none }
@@ -215,7 +226,13 @@
 
 <body data-layout="master" data-journey="essencial">
   <header class="site-header">
-    <div class="chama chama-sm"><span></span><span></span><span></span></div>
+    <div class="chama-viva chama-lg chama-strong chama-fixed-hero" id="chama-intro">
+      <div class="brasa"></div>
+      <div class="lingua"></div>
+      <div class="lingua"></div>
+      <div class="lingua"></div>
+      <div class="brilho"></div>
+    </div>
     <h1>Jornada Essencial</h1>
   </header>
 
@@ -230,7 +247,13 @@
         <div id="jornada-conteudo" class="conteudo-pergaminho">
           <!-- INTRO -->
           <div id="section-intro" class="j-section">
-            <div class="chama chama-lg chama-strong chama-viva chama-fixed-hero"><span></span></div>
+            <div class="chama-viva chama-lg chama-strong chama-fixed-hero" id="chama-intro">
+              <div class="brasa"></div>
+              <div class="lingua"></div>
+              <div class="lingua"></div>
+              <div class="lingua"></div>
+              <div class="brilho"></div>
+            </div>
             <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
             <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Antes de começar, ative sua senha." data-speed="50" data-cursor="true"></p>
 
@@ -246,7 +269,13 @@
 
           <!-- PERGUNTAS -->
           <div id="section-perguntas" class="j-section hidden">
-            <div class="chama chama-md" id="chama-perguntas"><span></span></div>
+            <div class="chama-viva chama-md" id="chama-perguntas">
+              <div class="brasa"></div>
+              <div class="lingua"></div>
+              <div class="lingua"></div>
+              <div class="lingua"></div>
+              <div class="brilho"></div>
+            </div>
             <div id="perguntas-container"></div>
             <div class="footer-actions">
               <button id="btnPrevPerguntas" class="btn btn-secondary" data-action="prev">Voltar</button>
@@ -256,7 +285,13 @@
 
           <!-- FINAL -->
           <div id="section-final" class="j-section hidden">
-            <div class="chama chama-lg chama-strong chama-viva chama-fixed-hero"><span></span></div>
+            <div class="chama-viva chama-lg chama-strong chama-fixed-hero" id="chama-final">
+              <div class="brasa"></div>
+              <div class="lingua"></div>
+              <div class="lingua"></div>
+              <div class="lingua"></div>
+              <div class="brilho"></div>
+            </div>
             <p data-typing data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40" data-cursor="true"></p>
             <div class="footer-actions">
               <button id="btnRestart" class="btn btn-secondary" data-action="restart">Reiniciar</button>
@@ -565,6 +600,7 @@
       const current = document.querySelector('.j-pergunta.active');
       if (current) current.classList.remove('active');
       const nextIndex = Array.from(perguntas).indexOf(current) + 1;
+      console.log('NextIndex:', nextIndex, 'Total perguntas:', perguntas.length); // Depuração
       if (nextIndex < perguntas.length) {
         perguntas[nextIndex].classList.add('active');
         runTyping(perguntas[nextIndex]);
@@ -573,6 +609,7 @@
         const blocos = document.querySelectorAll('.j-bloco');
         const currentBloco = current?.closest('.j-bloco');
         const nextBlocoIndex = Array.from(blocos).indexOf(currentBloco) + 1;
+        console.log('NextBlocoIndex:', nextBlocoIndex, 'Total blocos:', blocos.length); // Depuração
         if (nextBlocoIndex < blocos.length) {
           blocos.forEach(b => b.style.display = 'none');
           blocos[nextBlocoIndex].style.display = 'block';
