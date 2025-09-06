@@ -584,7 +584,7 @@
       localStorage.setItem('jornada_respostas', JSON.stringify(respostas));
     }
     function loadAnswers() {
-      const respostas = JSON.parse(localStorage.getElementById('jornada_respostas') || '{}');
+      const respostas = JSON.parse(localStorage.getItem('jornada_respostas') || '{}');
       document.querySelectorAll('.j-pergunta textarea').forEach((input, idx) => { input.value = respostas[`q${idx}`] || ''; });
       updateProgress();
     }
