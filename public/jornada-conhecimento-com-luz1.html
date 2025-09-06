@@ -401,23 +401,26 @@ function analyzeSentiment(text) {
 function updateChama(scoreNum) {
   const chama = document.getElementById('chama-perguntas');
   if (!chama) return;
-
-  // limpar estados
   chama.classList.remove('chama-weak','chama-strong','chama-pulse','chama-viva','chama-md-intermediario');
-  chama.classList.add('chama','chama-md'); // garante tamanho médio como base
+  chama.classList.add('chama','chama-md');
 
-  // thresholds simples (ajuste fino se quiser)
   if (scoreNum <= -2) { chama.classList.add('chama-weak'); }
   else if (scoreNum >= 2) { chama.classList.add('chama-strong','chama-pulse'); }
-  else { /* neutra: só chama-md */ }
 
-  // “soco” emocional nas palavras fortes recentes
-  // aplica um pulso curto quando palavras-chaves aparecem
   chama.classList.add('chama-pulse');
   clearTimeout(chama._pulse_t);
   chama._pulse_t = setTimeout(() => chama.classList.remove('chama-pulse'), 700);
 }
+
+function handleInput(textarea) {
+  const score = analyzeSentiment(textarea.value);
+  updateChama(score);
+  // highlightKeywords(textarea); // deixe comentado se não quiser o espelho visual
+  saveAnswers();
+  updateProgress();
+}
     }
+    
 // highlightKeywords - envolve palavras marcantes com <span class="mark-emocao">
 function highlightKeywords(textarea) {
   const wrap = textarea._mirror || document.createElement('div');
