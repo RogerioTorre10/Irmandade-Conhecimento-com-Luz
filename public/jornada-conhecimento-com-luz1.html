@@ -116,9 +116,9 @@
     <h1>Jornada Essencial</h1>
   </header>
   
-  <!-- GUIA ESPIRITUAL: Bola de Chama Viva -->
+ <!-- GUIA ESPIRITUAL: Bola de Chama Viva -->
 <div id="guia-espiritual">
-  <div id="chama-bola" class="media"></div>
+  <div id="chama-bola" data-intensidade="media"></div>
 </div>
   
   <main id="page-shell" class="container">
@@ -131,7 +131,7 @@
         <div id="jornada-conteudo" class="conteudo-pergaminho">
           <!-- INTRO -->
           <div id="section-intro" class="j-section">
-            <div class="chama chama-lg chama-strong chama-viva"></div>
+            <div id="chama-intro"></div>
             <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
             <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Antes de começar, ative sua senha." data-speed="50" data-cursor="true"></p>
 
@@ -148,7 +148,7 @@
 
           <!-- PERGUNTAS -->
           <div id="section-perguntas" class="j-section hidden">
-            <div class="chama chama-md" id="chama-perguntas"></div>
+            <div id="chama-perguntas"></div>
             <div id="perguntas-container"></div>
             <div class="footer-actions">
               <button id="btnPrevPerguntas" class="btn btn-secondary" data-action="prev">Voltar</button>
@@ -158,7 +158,7 @@
 
           <!-- FINAL -->
           <div id="section-final" class="j-section hidden">
-            <div class="chama chama-lg chama-strong chama-viva"></div>
+            <div id="chama-final"></div>
             <p data-typing data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40" data-cursor="true"></p>
             <div class="footer-actions">
               <button id="btnRestart" class="btn btn-secondary" data-action="restart">Reiniciar</button>
@@ -516,6 +516,6 @@ document.addEventListener('DOMContentLoaded', () => {
   <script defer src="/jornada-micro.js" onerror="console.error('Falha ao carregar jornada-micro.js, usando fallback inline');"></script>
   <script defer src="/i18n/i18n.js" onerror="console.error('Falha ao carregar i18n.js, usando fallback inline');"></script>
   <script defer src="/api.js" onerror="console.error('Falha ao carregar api.js, usando fallback inline');"></script>
-  <script src="/jornada-chama.js" defer></script>
+  <script defer src="/jornada-chama.js"></script>
 </body>
 </html>
