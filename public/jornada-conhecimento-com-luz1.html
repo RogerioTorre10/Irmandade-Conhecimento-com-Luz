@@ -461,23 +461,32 @@
       runTyping(document); return true;
     }
 
-    // Inicialização
-    document.addEventListener('DOMContentLoaded', () => {
-      runTyping(document);
-      initJornada();
-      boot();
-      const target=document.getElementById('jornada-conteudo');
-      if(target){
-        const obs=new MutationObserver(muts=>{
-          muts.forEach(m=>{
-            runTyping(m.target);
-            if(m.target.id==='perguntas-container') updateProgress();
-          });
-        });
-        obs.observe(target,{childList:true,subtree:true});
-      }
+   // Inicialização
+document.addEventListener('DOMContentLoaded', () => {
+  runTyping(document);
+  initJornada();
+
+  boot().then(() => {
+    // ativa o hero conforme a seção visível agora
+    const visible = document.querySelector('.j-section:not(.hidden)');
+    if (visible) ensureHeroFlame(visible.id);
+  });
+
+  const target = document.getElementById('jornada-conteudo');
+  if (target) {
+    const obs = new MutationObserver(muts => {
+      muts.forEach(m => {
+        runTyping(m.target);
+        if (m.target.id === 'perguntas-container') updateProgress();
+      });
     });
 
+    window.ensureHeroFlame = ensureHeroFlame;
+    
+    obs.observe(target, { childList: true, subtree: true });
+  }
+});
+    
     // BRIDGE GLOBAL para scripts externos (como jornada-controller.js)
     window.JC = window.JC || {};
     window.toggleSenha  = toggleSenha;
