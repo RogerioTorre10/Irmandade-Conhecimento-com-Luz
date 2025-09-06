@@ -561,6 +561,18 @@
     };
     window.JORNADA_CHAMA = JORNADA_CHAMA;
 
+    // micro-variação para cada chama
+document.querySelectorAll('#chama-intro, #chama-perguntas, #chama-final, #chama-bola')
+  .forEach(f => {
+    // jitter horizontal sutil
+    f.style.setProperty('--jitter', `${(Math.random() * 2 - 1).toFixed(2)}px`);
+    // delays ligeiramente diferentes
+    f.querySelectorAll('.lingua').forEach((n, i) => {
+      n.style.animationDelay = `${i * 0.07 + Math.random() * 0.08}s`;
+    });
+  });
+
+
     /* =========================
        PROGRESSO & STORAGE
     ==========================*/
@@ -739,7 +751,7 @@
   const idxAtual = Array.from(perguntas).indexOf(current);
   const idxProx  = idxAtual + 1;
 
-  // 1) Tentar ir para a próxima pergunta no MESMO bloco
+  // próxima pergunta no MESMO bloco?
   if (idxProx < perguntas.length) {
     const prox = perguntas[idxProx];
     const blocoAtual = current ? current.closest('.j-bloco') : null;
@@ -752,22 +764,19 @@
     }
   }
 
-  // 2) Acabou o bloco → preparar próximo bloco
+  // encerrou o bloco atual → toca vídeo do bloco que terminou
   const blocos = document.querySelectorAll('.j-bloco');
   const blocoAtual = current ? current.closest('.j-bloco') : null;
   const idxBlocoAtual = blocoAtual ? Array.from(blocos).indexOf(blocoAtual) : -1;
   const idxBlocoProx  = idxBlocoAtual + 1;
 
-  const abrirProximoBloco = () => {
+  const abrirProximo = () => {
     if (idxBlocoProx < blocos.length) {
       blocos.forEach(b => b.style.display = 'none');
       const bProx = blocos[idxBlocoProx];
       bProx.style.display = 'block';
-      const proxPerg = bProx.querySelector('.j-pergunta');
-      if (proxPerg) {
-        proxPerg.classList.add('active');
-        runTyping(proxPerg);
-      }
+      const p0 = bProx.querySelector('.j-pergunta');
+      if (p0){ p0.classList.add('active'); runTyping(p0); }
       updateProgress();
     } else {
       showSection('section-final');
@@ -775,16 +784,11 @@
     }
   };
 
-  // 3) Tocar VÍDEO do bloco que acabou (se houver)
   if (idxBlocoAtual >= 0) {
     const videoSrc = blocos[idxBlocoAtual].dataset.video || '';
-    if (videoSrc) {
-      playTransition(videoSrc, abrirProximoBloco);
-      return;
-    }
+    if (videoSrc){ playTransition(videoSrc, abrirProximo); return; }
   }
-  // 4) Sem vídeo → segue
-  abrirProximoBloco();
+  abrirProximo();
 }
 
     function playTransition(src, onEnd) {
