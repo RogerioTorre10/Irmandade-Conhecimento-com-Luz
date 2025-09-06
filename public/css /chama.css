@@ -225,4 +225,9 @@
   z-index: 9999;     /* acima de tudo */
   pointer-events: none; /* não interfere em cliques */
 }
+/* Remove o vaso do guia espiritual */
+#guia-espiritual::after,
+#chama-bola::after {
+  display: none !important;
+}
 
