@@ -175,6 +175,33 @@ body.jornada-active #jornada-canvas { display:block !important; }
 .lumen-typing.typing-done::after { content: ""; animation: none; }
 @keyframes lumenBlink { 50% { opacity: 0; } }
 
+/* === CHAMA — estados emocionais finos === */
+.chama.chama-viva span { animation: flicker-strong 0.85s infinite; filter: drop-shadow(0 0 12px rgba(255,140,0,.55)); }
+.chama.chama-pulse span { animation: flicker-strong 0.6s infinite; }
+
+.chama.chama-md span { width: 22px; height: 54px; } /* tamanho médio padrão */
+.chama.chama-lg span { width: 36px; height: 88px; } /* maiorzinha e vibrante */
+
+@media (max-width: 600px) {
+  .chama.chama-md span { width: 18px; height: 44px; }
+  .chama.chama-lg span { width: 28px; height: 72px; }
+}
+
+/* Posicionadores utilitários */
+.chama-fixed-top {
+  position: absolute; top: 10px; right: 14px; z-index: 60;
+}
+.chama-fixed-hero {
+  position: absolute; top: -8px; left: -8px; z-index: 60;
+}
+
+/* Destaque de palavra significativa */
+.mark-emocao {
+  background: linear-gradient(90deg, rgba(255,196,0,.35), rgba(255,140,0,.2));
+  border-radius: 4px; padding: 0 2px;
+}
+
+
 /* =============================================================================
    TÍTULO: PROGRESSO DA JORNADA
    SUBTÍTULO: Barra, preenchimento e meta
