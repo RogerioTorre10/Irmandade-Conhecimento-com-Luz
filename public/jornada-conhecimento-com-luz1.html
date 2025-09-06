@@ -372,18 +372,30 @@
     document.getElementById('envTag').textContent = 
       `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
 
-    // analyzeSentiment - Analisa o sentimento do texto
-    function analyzeSentiment(text) {
-      const words = text.toLowerCase().split(/\s+/);
-      let score = 0;
-      const positiveWords = ['feliz', 'alegria', 'amor', 'sucesso', 'esperança', 'paz'];
-      const negativeWords = ['triste', 'dor', 'raiva', 'medo', 'frustração', 'decepção'];
-      words.forEach(word => {
-        if (positiveWords.includes(word)) score += 1;
-        if (negativeWords.includes(word)) score -= 1;
-      });
-      return score > 0 ? "alegre" : score < 0 ? "sofrida" : "neutra";
-    }
+    // analyzeSentiment - Analisa sentimento por pesos e detecta palavras-chave
+const EMO = {
+  POS: {
+    'feliz':2,'alegria':2,'amor':3,'sucesso':2,'esperança':3,'paz':2,
+    'fé':3,'gratidão':2,'vitória':3,'superação':3,'luz':2,'deus':3,
+    'coragem':2,'força':2,'confiança':2,'propósito':3
+  },
+  NEG: {
+    'triste':-2,'dor':-3,'raiva':-2,'medo':-2,'frustração':-2,'decepção':-2,
+    'perda':-3,'culpa':-2,'ansiedade':-2,'solidão':-2,'desespero':-3,'cansaço':-2,
+    'fracasso':-2,'trauma':-3,'duvida':-2,'dúvida':-2
+  }
+};
+
+function analyzeSentiment(text) {
+  let score = 0;
+  const tokens = (text || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').split(/\s+/);
+  for (const t of tokens) {
+    if (EMO.POS[t] != null) score += EMO.POS[t];
+    if (EMO.NEG[t] != null) score += EMO.NEG[t];
+  }
+  return score; // devolve número (negativo, zero, positivo)
+}
+
 
     // updateChama - Atualiza o estado da chama
     function updateChama(score) {
