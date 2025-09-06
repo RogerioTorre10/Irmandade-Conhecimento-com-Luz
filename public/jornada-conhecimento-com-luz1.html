@@ -35,7 +35,7 @@
       height: calc(var(--altura) + 26px); /* 26px do recipiente */
       display: inline-block;
       filter: drop-shadow(0 0 var(--glow) hsla(var(--hue),var(--satur),60%,.65));
-      z-index: 40; /* Garantir que fique acima de outros elementos */
+      z-index: 40; /* Garantir visibilidade */
     }
 
     /* Recipiente (vaso) */
@@ -296,7 +296,13 @@
         <div id="jornada-conteudo" class="conteudo-pergaminho">
           <!-- INTRO -->
           <div id="section-intro" class="j-section">
-            <div id="chama-intro" class="chama-viva chama-lg chama-strong chama-viva chama-fixed-hero"></div>
+            <div id="chama-intro" class="chama-viva chama-lg chama-strong chama-viva chama-fixed-hero">
+              <div class="brasa"></div>
+              <div class="lingua"></div>
+              <div class="lingua"></div>
+              <div class="lingua"></div>
+              <div class="brilho"></div>
+            </div>
             <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
             <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Antes de começar, ative sua senha." data-speed="50" data-cursor="true"></p>
 
@@ -312,7 +318,13 @@
 
           <!-- PERGUNTAS -->
           <div id="section-perguntas" class="j-section hidden">
-            <div id="chama-perguntas" class="chama-viva chama-md"></div>
+            <div id="chama-perguntas" class="chama-viva chama-md">
+              <div class="brasa"></div>
+              <div class="lingua"></div>
+              <div class="lingua"></div>
+              <div class="lingua"></div>
+              <div class="brilho"></div>
+            </div>
             <div id="perguntas-container"></div>
             <div class="footer-actions">
               <button id="btnPrevPerguntas" class="btn btn-secondary" data-action="prev">Voltar</button>
@@ -322,7 +334,13 @@
 
           <!-- FINAL -->
           <div id="section-final" class="j-section hidden">
-            <div id="chama-final" class="chama-viva chama-lg chama-strong chama-viva chama-fixed-hero"></div>
+            <div id="chama-final" class="chama-viva chama-lg chama-strong chama-viva chama-fixed-hero">
+              <div class="brasa"></div>
+              <div class="lingua"></div>
+              <div class="lingua"></div>
+              <div class="lingua"></div>
+              <div class="brilho"></div>
+            </div>
             <p data-typing data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40" data-cursor="true"></p>
             <div class="footer-actions">
               <button id="btnRestart" class="btn btn-secondary" data-action="restart">Reiniciar</button>
@@ -416,10 +434,21 @@
         el.classList.add('chama-viva');
         const modo = (scoreNum <= -2) ? 'fraca' : (scoreNum >= 2) ? 'forte' : 'media';
         el.setAttribute('data-intensidade', modo);
+        if (!el.querySelector('.brasa')) {
+          el.innerHTML = `
+            <div class="brasa"></div>
+            <div class="lingua"></div>
+            <div class="lingua"></div>
+            <div class="lingua"></div>
+            <div class="brilho"></div>
+          `;
+        }
         if (modo === 'forte') {
           el.classList.add('chama-pico');
           clearTimeout(el._pulse_t);
           el._pulse_t = setTimeout(() => el.classList.remove('chama-pico'), 700);
+        } else {
+          el.classList.remove('chama-pico');
         }
         const bola = document.getElementById('chama-bola');
         if (bola) bola.classList.remove('fraca', 'media', 'forte').add(modo);
@@ -435,6 +464,15 @@
         if (!el) return;
         el.classList.add('chama-viva');
         el.setAttribute('data-intensidade', modo);
+        if (!el.querySelector('.brasa')) {
+          el.innerHTML = `
+            <div class="brasa"></div>
+            <div class="lingua"></div>
+            <div class="lingua"></div>
+            <div class="lingua"></div>
+            <div class="brilho"></div>
+          `;
+        }
       },
       ensureHeroFlame: function(sectionId) {
         const introChama = document.getElementById('chama-intro');
@@ -611,7 +649,8 @@
           } else {
             console.error('Nenhuma próxima pergunta encontrada no bloco seguinte!');
           }
-          playTransition(blocos[currentBloco.dataset.bloco].video_after || '', () => {});
+          const videoSrc = blocos[nextBlocoIndex].dataset.video || '';
+          if (videoSrc) playTransition(videoSrc, () => {});
         } else {
           showSection('section-final');
           updateProgress();
