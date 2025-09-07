@@ -1301,18 +1301,25 @@
       } else {
         console.error('Checkbox ou botão Iniciar não encontrados:', { chkTermo, btnIniciar });
       }
-      const btnEntrar = document.getElementById('btnEntrar');
-      if (btnEntrar) btnEntrar.addEventListener('click', debounce(startJourney, 300));
-      JORNADA_NAV.init();
-      try {
-        const stash = JSTATE.get('respostas', {});
-        if (stash) state.respostas = stash;
-        const auth = JSTATE.get('auth', '');
-        if (auth !== 'ok') JORNADA_NAV.goIntro(false);
-        else {
-          state.blocoIndex = parseInt(sessionStorage.getItem('jornada.block') || '0', 10) || 0;
-          JORNADA_NAV.goPerguntas(state.blocoIndex);
-        }
+      <script>
+  if (btnIniciar) {
+    btnIniciar.replaceWith(btnIniciar.cloneNode(true)); // evita múltiplos binds
+    const _btnIniciar = document.getElementById('btnIniciar');
+    _btnIniciar.addEventListener('click', debounce(() => {
+      const v = window.JORNADA_VIDEOS.before_b1;
+      if (v) {
+        playTransition(v, () => {
+          sessionStorage.setItem('jornada.block', '0');
+          JORNADA_NAV.goPerguntas(0);
+        });
+      } else {
+        sessionStorage.setItem('jornada.block', '0');
+        JORNADA_NAV.goPerguntas(0);
+      }
+    }, 300));
+  }
+</script>
+
       } catch (e) {
         console.error('Erro ao inicializar estado:', e);
       }
