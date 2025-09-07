@@ -142,8 +142,8 @@
 
   <main id="page-shell" class="container">
     <div class="container">
-      <a class="btn btn-primary" href="#sec-intro">Ir para Introdução</a>
-      <a class="btn btn-secondary" href="/jornadas.html">← Voltar</a>
+      <a class="btn btn-primary" href="#sec-intro" data-nav="intro">Ir para Introdução</a>
+      <a class="btn btn-secondary" href="/jornadas.html" data-nav="home">← Voltar</a>
     </div>
 
     <div class="section-container">
@@ -165,7 +165,7 @@
                 <input type="password" id="senha" class="input" placeholder="Digite sua senha...">
                 <span class="senha-eye password-toggle" data-action="toggle-password">👁️</span>
               </div>
-              <button id="btnEntrar" class="btn btn-primary" data-action="start">Entrar</button>
+              <button id="btnEntrar" class="btn btn-primary" data-nav="intro">Entrar</button>
               <div id="authError" class="hidden text-red-500 mt-2">Senha incorreta.</div>
             </div>
           </div>
@@ -183,7 +183,7 @@
             <p data-typing data-text="Aceite os termos para iniciar." data-speed="50" data-cursor="true"></p>
             <div class="password-form">
               <label><input type="checkbox" id="chkTermo"> Concordo com os termos</label>
-              <button id="btnIniciar" class="btn btn-primary" disabled>Iniciar</button>
+              <button id="btnIniciar" class="btn btn-primary" disabled data-nav="perguntas">Iniciar</button>
             </div>
           </div>
 
@@ -199,8 +199,8 @@
             <div id="perguntas-container"></div>
             <div class="footer-actions">
               <button id="btnLimparAtual" class="btn btn-secondary">Limpar</button>
-              <button id="btnVoltar" class="btn btn-secondary" data-action="prev">Voltar</button>
-              <button id="btnProxima" class="btn btn-primary" data-action="next">Próxima</button>
+              <button id="btnVoltar" class="btn btn-secondary" data-nav="perguntas-prev" data-idx="0">Voltar</button>
+              <button id="btnProxima" class="btn btn-primary" data-nav="perguntas-next" data-idx="0">Próxima</button>
             </div>
           </div>
 
@@ -215,9 +215,9 @@
             </div>
             <p data-typing data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40" data-cursor="true"></p>
             <div class="footer-actions">
-              <button id="btnRevisar" class="btn btn-secondary">Revisar</button>
+              <button id="btnRevisar" class="btn btn-secondary" data-nav="perguntas">Revisar</button>
               <button id="btnGerarPDFHQ" class="btn btn-primary">Baixar PDF + HQ</button>
-              <button id="btnNovaJornada" class="btn btn-secondary">Nova Jornada</button>
+              <button id="btnNovaJornada" class="btn btn-secondary" data-nav="home">Nova Jornada</button>
             </div>
           </div>
         </div>
@@ -551,6 +551,71 @@
     }
 
     /* =========================
+       NAVEGAÇÃO
+    ==========================*/
+    const JORNADA_NAV = {
+      routes: {
+        intro: "sec-intro",
+        perguntas: "sec-wizard",
+        final: "sec-final",
+        home: "home",
+      },
+      renderFromHash: function() {
+        const raw = (location.hash || "").replace(/^#/, "");
+        if (!raw) return this.goIntro(false);
+
+        const [route, param] = raw.split(":");
+        switch (route) {
+          case this.routes.intro: activateJornada(); return renderIntro();
+          case this.routes.perguntas: activateJornada(); return renderPerguntas(Number(param || 0) || 0);
+          case this.routes.final: activateJornada(); return renderFinal();
+          case this.routes.home: deactivateJornada(); return this.goHome(true);
+          default: return this.goIntro(false);
+        }
+      },
+      goIntro: function(push = true) { if (push) location.hash = "#" + this.routes.intro; else { location.replace("#" + this.routes.intro); renderIntro(); } },
+      goPerguntas: function(index = 0) { location.hash = `#${this.routes.perguntas}:${index}`; },
+      goFinal: function() { location.hash = "#" + this.routes.final; },
+      goHome: function(replaceOnly = false) {
+        const url = "/jornadas.html";
+        if (replaceOnly) location.replace(url); else window.location.href = url;
+      },
+      nextBlock: function(currIndex) {
+        if (currIndex < PERGUNTAS.length - 1) return this.goPerguntas(currIndex + 1);
+        return this.goFinal();
+      },
+      prevBlock: function(currIndex) {
+        if (currIndex > 0) return this.goPerguntas(currIndex - 1);
+        return this.goIntro();
+      },
+      onClick: function(e) {
+        const a = e.target.closest("[data-nav]");
+        if (!a) return;
+        const nav = a.getAttribute("data-nav");
+        if (!nav) return;
+        e.preventDefault();
+
+        switch (nav) {
+          case "home": return this.goHome();
+          case "intro": return this.goIntro();
+          case "final": return this.goFinal();
+          case "perguntas-next": return this.nextBlock(Number(a.dataset.idx || 0));
+          case "perguntas-prev": return this.prevBlock(Number(a.dataset.idx || 0));
+          case "perguntas": return this.goPerguntas(Number(a.dataset.idx || 0));
+        }
+      },
+      init: function() {
+        window.addEventListener("hashchange", () => this.renderFromHash());
+        document.addEventListener("click", (e) => this.onClick(e));
+        this.renderFromHash(); // primeira carga
+      }
+    };
+    window.JORNADA_NAV = JORNADA_NAV;
+
+    function activateJornada() { document.body.classList.add('jornada-active'); }
+    function deactivateJornada() { document.body.classList.remove('jornada-active'); }
+
+    /* =========================
        ROTEAMENTO, RENDER E CONTROLE
     ==========================*/
     function updateCanvasBackground(sectionId) {
@@ -604,95 +669,79 @@
       }
       const respostas = JSTATE.get('respostas', {});
       let i = parseInt(sessionStorage.getItem('jornada.step') || '0', 10) || 0;
-      if (!window.JORNADA_BLOCKS || !Array.isArray(window.JORNADA_BLOCKS) || window.JORNADA_BLOCKS.length === 0) {
-        console.error('Erro: JORNADA_BLOCKS não definido, forçando uso de PERGUNTAS como único bloco...');
-        window.JORNADA_BLOCKS = [{ questions: PERGUNTAS.map(q => ({ label: q })) }];
-      }
-      console.log('Conteúdo de JORNADA_BLOCKS após fallback:', window.JORNADA_BLOCKS);
+      if (i >= PERGUNTAS.length) i = PERGUNTAS.length - 1;
       content.innerHTML = '';
-      window.JORNADA_BLOCKS.forEach((block, idx) => {
-        if (!block.questions || !Array.isArray(block.questions)) {
-          console.warn(`Bloco ${idx} inválido: sem perguntas ou perguntas não é um array`);
-          return;
-        }
-        const bloco = document.createElement('section');
-        bloco.className = 'j-bloco';
-        bloco.dataset.bloco = idx;
-        bloco.dataset.video = block.video_after || '';
-        bloco.style.display = idx === 0 ? 'block' : 'none';
-        block.questions.forEach((q, qIdx) => {
-          if (!q.label) {
-            console.warn(`Pergunta ${qIdx} no bloco ${idx} inválida: sem label`);
+      const bloco = document.createElement('section');
+      bloco.className = 'j-bloco';
+      bloco.dataset.bloco = 0;
+      PERGUNTAS.forEach((q, qIdx) => {
+        const pergunta = document.createElement('div');
+        pergunta.className = 'j-pergunta';
+        pergunta.dataset.pergunta = qIdx;
+        const name = `q${qIdx + 1}`;
+        const val = respostas[name] || '';
+        pergunta.innerHTML = `
+          <div class="mb-4">
+            <div class="flex justify-between text-xs opacity-70">
+              <span>Etapa ${qIdx + 1}/${PERGUNTAS.length}</span><span>${Math.round(((qIdx + 1) / PERGUNTAS.length) * 100)}%</span>
+            </div>
+            <div class="h-2 bg-slate-700/50 rounded-full mt-1">
+              <div class="h-2 bg-indigo-500 rounded-full" style="width:${Math.round(((qIdx + 1) / PERGUNTAS.length) * 100)}%"></div>
+            </div>
+          </div>
+          <h2 class="text-xl font-semibold mb-4">Jornada Essencial</h2>
+          <div class="mb-2 font-medium">${qIdx + 1}. ${q}</div>
+          <textarea id="ans-${qIdx}" name="${name}" rows="6" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg p-3" oninput="handleInput(this)">${val}</textarea>
+          <div class="mt-6 flex flex-wrap items-center gap-3">
+            <button id="btnVoltar-${qIdx}" class="px-4 py-2 rounded-lg border border-slate-700 ${qIdx === 0 ? 'opacity-40 cursor-not-allowed' : ''}" data-nav="perguntas-prev" data-idx="${qIdx}">Voltar</button>
+            <button id="btnAvancar-${qIdx}" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 ${qIdx === PERGUNTAS.length - 1 ? 'Finalizar' : 'Avançar'}" data-nav="perguntas-next" data-idx="${qIdx}"></button>
+          </div>
+          <p class="text-xs opacity-70 mt-3">Suas respostas permanecem somente no seu navegador até a geração do PDF.</p>
+        `;
+        bloco.appendChild(pergunta);
+
+        // Adicionar eventos
+        const ans = pergunta.querySelector(`#ans-${qIdx}`);
+        ans?.addEventListener('input', () => {
+          const name = `q${qIdx + 1}`;
+          const v = ans.value || '';
+          const respostas = JSTATE.get('respostas', {});
+          respostas[name] = v;
+          JSTATE.set('respostas', respostas);
+        });
+
+        const btnAvancar = pergunta.querySelector(`#btnAvancar-${qIdx}`);
+        btnAvancar?.addEventListener('click', () => {
+          const txt = (ans.value || '').trim();
+          if (!txt) {
+            ans.classList.add('field-error');
+            ans.focus();
             return;
           }
-          const pergunta = document.createElement('div');
-          pergunta.className = 'j-pergunta';
-          pergunta.dataset.pergunta = qIdx;
-          const name = `q${qIdx + 1}`;
-          const val = respostas[name] || '';
-          pergunta.innerHTML = `
-            <div class="mb-4">
-              <div class="flex justify-between text-xs opacity-70">
-                <span>Etapa ${qIdx + 1}/${PERGUNTAS.length}</span><span>${Math.round(((qIdx + 1) / PERGUNTAS.length) * 100)}%</span>
-              </div>
-              <div class="h-2 bg-slate-700/50 rounded-full mt-1">
-                <div class="h-2 bg-indigo-500 rounded-full" style="width:${Math.round(((qIdx + 1) / PERGUNTAS.length) * 100)}%"></div>
-              </div>
-            </div>
-            <h2 class="text-xl font-semibold mb-4">Jornada Essencial</h2>
-            <div class="mb-2 font-medium">${qIdx + 1}. ${q.label}</div>
-            <textarea id="ans-${qIdx}" name="${name}" rows="6" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg p-3" oninput="handleInput(this)">${val}</textarea>
-            <div class="mt-6 flex flex-wrap items-center gap-3">
-              <button id="btnVoltar-${qIdx}" class="px-4 py-2 rounded-lg border border-slate-700 ${qIdx === 0 ? 'opacity-40 cursor-not-allowed' : ''}">Voltar</button>
-              <button id="btnAvancar-${qIdx}" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 ${qIdx === PERGUNTAS.length - 1 ? 'Finalizar' : 'Avançar'}"></button>
-            </div>
-            <p class="text-xs opacity-70 mt-3">Suas respostas permanecem somente no seu navegador até a geração do PDF.</p>
-          `;
-          bloco.appendChild(pergunta);
-
-          // Adicionar eventos
-          const ans = pergunta.querySelector(`#ans-${qIdx}`);
-          ans?.addEventListener('input', () => {
-            const name = `q${qIdx + 1}`;
-            const v = ans.value || '';
-            const respostas = JSTATE.get('respostas', {});
-            respostas[name] = v;
-            JSTATE.set('respostas', respostas);
-          });
-
-          const btnAvancar = pergunta.querySelector(`#btnAvancar-${qIdx}`);
-          btnAvancar?.addEventListener('click', () => {
-            const txt = (ans.value || '').trim();
-            if (!txt) {
-              ans.classList.add('field-error');
-              ans.focus();
-              return;
-            }
-            ans.classList.remove('field-error');
-            saveAnswers();
-            if (qIdx < PERGUNTAS.length - 1) {
-              i = qIdx + 1;
-              sessionStorage.setItem('jornada.step', String(i));
-              loadDynamicBlocks();
-            } else {
-              showSection('sec-final');
-            }
-          });
-
-          const btnVoltar = pergunta.querySelector(`#btnVoltar-${qIdx}`);
-          btnVoltar?.addEventListener('click', () => {
-            if (qIdx > 0) {
-              i = qIdx - 1;
-              sessionStorage.setItem('jornada.step', String(i));
-              loadDynamicBlocks();
-            }
-          });
+          ans.classList.remove('field-error');
+          saveAnswers();
+          if (qIdx < PERGUNTAS.length - 1) {
+            i = qIdx + 1;
+            sessionStorage.setItem('jornada.step', String(i));
+            JORNADA_NAV.goPerguntas(i);
+          } else {
+            JORNADA_NAV.goFinal();
+          }
         });
-        content.appendChild(bloco);
-        console.log(`Bloco ${idx} criado com ${block.questions.length} perguntas`);
+
+        const btnVoltar = pergunta.querySelector(`#btnVoltar-${qIdx}`);
+        btnVoltar?.addEventListener('click', () => {
+          if (qIdx > 0) {
+            i = qIdx - 1;
+            sessionStorage.setItem('jornada.step', String(i));
+            JORNADA_NAV.goPerguntas(i);
+          }
+        });
       });
+      content.appendChild(bloco);
       const firstBloco = content.querySelector('.j-bloco');
       if (firstBloco) {
+        firstBloco.style.display = 'block';
         const firstPergunta = firstBloco.querySelector('.j-pergunta');
         if (firstPergunta) {
           firstPergunta.classList.add('active');
@@ -870,7 +919,7 @@
         render();
         return;
       }
-      showSection('sec-final');
+      JORNADA_NAV.goFinal();
     }
 
     function goPrev() {
@@ -892,7 +941,7 @@
       const senhasValidas = ['iniciar', 'olho magico', 'olho mágico'];
       if (senhasValidas.includes(senha.toLowerCase())) {
         JSTATE.set('auth', 'ok');
-        showSection('sec-intro');
+        JORNADA_NAV.goIntro();
         console.log('Autenticação bem-sucedida, exibindo introdução');
       } else {
         alert('Senha incorreta. Tente novamente.');
@@ -946,7 +995,7 @@
         JSTATE.clearAll();
         sessionStorage.removeItem('jornada.step');
         alert('Jornada concluída! Arquivo gerado localmente.');
-        location.replace('/index.html');
+        JORNADA_NAV.goHome();
       } else {
         alert('Não foi possível gerar o PDF agora. Tente novamente.');
       }
@@ -998,13 +1047,7 @@
       if (startBtn) {
         startBtn.addEventListener('click', startJourney);
         console.log('Botão Iniciar inicializado em JC.init');
-      } else {
-        console.error('Botão #btnIniciar não encontrado no DOM durante JC.init!');
       }
-      const prevBtn = S.btnPrev();
-      const nextBtn = S.btnNext();
-      if (nextBtn) nextBtn.addEventListener('click', goNext);
-      if (prevBtn) prevBtn.addEventListener('click', goPrev);
       const chkTermo = document.getElementById('chkTermo');
       const btnIniciar = document.getElementById('btnIniciar');
       if (chkTermo && btnIniciar) {
@@ -1014,24 +1057,17 @@
       }
       const btnEntrar = document.getElementById('btnEntrar');
       if (btnEntrar) btnEntrar.addEventListener('click', startJourney);
-      document.addEventListener('click', (e) => {
-        const n = e.target.closest?.('[data-action="next"]');
-        const p = e.target.closest?.('[data-action="prev"]');
-        const s = e.target.closest?.('[data-action="start"]');
-        if (n) { e.preventDefault(); goNext(); }
-        if (p) { e.preventDefault(); goPrev(); }
-        if (s) { e.preventDefault(); startJourney(); }
-      });
+      JORNADA_NAV.init();
       try {
         const stash = JSTATE.get('respostas', {});
         if (stash) state.respostas = stash;
         const auth = JSTATE.get('auth', '');
-        if (auth !== 'ok') showSection('sec-auth');
+        if (auth !== 'ok') JORNADA_NAV.goIntro(false);
         else if (state.respostas && Object.keys(state.respostas).length > 0) {
           state.perguntaIndex = parseInt(sessionStorage.getItem('jornada.step') || '0', 10) || 0;
-          showSection('sec-wizard');
+          JORNADA_NAV.goPerguntas(state.perguntaIndex);
         } else {
-          showSection('sec-intro');
+          JORNADA_NAV.goIntro(false);
         }
       } catch {}
       render();
@@ -1091,4 +1127,97 @@
             log('acionando JC.init() (reforço)');
             window.JC.init();
           } catch (e) {
-            warn('falha ao acionar JC.init():',
+            warn('falha ao acionar JC.init():', e);
+          }
+        }
+      }, 200);
+      log('inicialização concluída.');
+    }
+
+    function startWhenReady() {
+      let tries = 0;
+      const maxTries = 60;
+      const t = setInterval(() => {
+        if (boot()) { clearInterval(t); return; }
+        if (++tries > maxTries) {
+          clearInterval(t);
+          error('desisti de iniciar: inicialização não completou a tempo.');
+          if (window.JC?.init) {
+            console.log('Tentando inicialização de emergência com JC.init...');
+            window.JC.init();
+          }
+        }
+      }, 100);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', startWhenReady);
+    } else {
+      startWhenReady();
+    }
+
+    window.addEventListener('load', () => {
+      if (!window.JC._initialized && window.JC?.init) {
+        console.log('Inicialização final no load...');
+        window.JC.init();
+        window.JC._initialized = true;
+      }
+    });
+
+    function renderIntro() {
+      console.log('[JORNADA_RENDER] Renderizando intro');
+      const section = document.getElementById('sec-intro');
+      if (section) {
+        section.classList.remove('hidden');
+        const canvas = document.getElementById('jornada-canvas');
+        if (canvas) {
+          canvas.className = 'card pergaminho pergaminho-v';
+          canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
+        }
+      }
+    }
+
+    function renderPerguntas(index = 0) {
+      console.log('[JORNADA_RENDER] Renderizando perguntas, índice:', index);
+      const section = document.getElementById('sec-wizard');
+      if (section) {
+        section.classList.remove('hidden');
+        const canvas = document.getElementById('jornada-canvas');
+        if (canvas) {
+          canvas.className = 'card pergaminho pergaminho-h';
+          canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-horiz.png)';
+        }
+        loadDynamicBlocks();
+        const perguntas = document.querySelectorAll('.j-pergunta');
+        if (perguntas.length > index) {
+          perguntas.forEach(p => p.classList.remove('active'));
+          perguntas[index].classList.add('active');
+          runTyping(perguntas[index]);
+          const input = perguntas[index].querySelector('textarea');
+          if (input) input.focus();
+          UI.setPergunta(index, PERGUNTAS.length, PERGUNTAS);
+        } else {
+          console.warn('Índice de pergunta fora do alcance:', index);
+        }
+      }
+    }
+
+    function renderFinal() {
+      console.log('[JORNADA_RENDER] Renderizando final');
+      const section = document.getElementById('sec-final');
+      if (section) {
+        section.classList.remove('hidden');
+        const canvas = document.getElementById('jornada-canvas');
+        if (canvas) {
+          canvas.className = 'card pergaminho pergaminho-v';
+          canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
+        }
+      }
+    }
+
+    // Funções globais expostas
+    window.showSection = showSection;
+    window.loadDynamicBlocks = loadDynamicBlocks;
+    window.JC = JC;
+    window.JORNADA_RENDER = { renderIntro, renderPerguntas, renderFinal };
+  </script>
