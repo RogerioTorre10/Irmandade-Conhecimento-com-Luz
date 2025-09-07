@@ -623,7 +623,7 @@
           } else {
             console.error('Nenhuma próxima pergunta encontrada no bloco seguinte!');
           }
-          const videoSrc = blocos[currentBloco.dataset.bloco].video_after || '';
+          const videoSrc = currentBloco ? currentBloco.dataset.video || '' : '';
           if (videoSrc) playTransition(videoSrc, () => {});
         } else {
           showSection('section-final');
