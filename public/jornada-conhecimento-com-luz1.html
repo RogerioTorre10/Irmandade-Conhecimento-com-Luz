@@ -910,53 +910,61 @@
         }, 100);
       }
     }
-    function loadDynamicBlocks() {
-      const content = document.getElementById('jornada-conteudo');
-      if (!content) {
-        console.error('Erro: #jornada-conteudo não encontrado no DOM!');
-        return;
-      }
-      const respostas = JSTATE.get('respostas', {});
-      let blocoIdx = parseInt(sessionStorage.getItem('jornada.block') || '0', 10) || 0;
-      if (blocoIdx >= window.JORNADA_BLOCKS.length) blocoIdx = window.JORNADA_BLOCKS.length - 1;
-      content.innerHTML = '';
-      window.JORNADA_BLOCKS.forEach((block, idx) => {
-        const bloco = document.createElement('section');
-        bloco.className = 'j-bloco';
-        bloco.dataset.bloco = idx;
-        bloco.dataset.video = block.video_after || '';
-        bloco.style.display = idx === blocoIdx ? 'block' : 'none';
-        JORNADA_QA.mount('jornada-conteudo', block.questions, {
-          onBack: () => {
-            if (idx > 0) {
-              blocoIdx--;
-              sessionStorage.setItem('jornada.block', String(blocoIdx));
-              loadDynamicBlocks();
-            } else {
-              JORNADA_NAV.goIntro();
-            }
-          },
-          onFinish: () => {
-            if (idx < window.JORNADA_BLOCKS.length - 1) {
-              blocoIdx++;
-              sessionStorage.setItem('jornada.block', String(blocoIdx));
-              playTransition(block.video_after, () => loadDynamicBlocks());
-            } else {
-              JORNADA_NAV.goFinal();
-            }
+   <script>
+  function loadDynamicBlocks() {
+    const content = document.getElementById('jornada-conteudo');
+    if (!content) { console.error('Erro: #jornada-conteudo não encontrado no DOM!'); return; }
+
+    let blocoIdx = parseInt(sessionStorage.getItem('jornada.block') || '0', 10) || 0;
+    if (blocoIdx >= window.JORNADA_BLOCKS.length) blocoIdx = window.JORNADA_BLOCKS.length - 1;
+
+    content.innerHTML = '';
+
+    window.JORNADA_BLOCKS.forEach((block, idx) => {
+      const bloco = document.createElement('section');
+      bloco.className = 'j-bloco';
+      bloco.dataset.bloco = idx;
+      if (block.pergaminho) bloco.setAttribute('data-pergaminho', block.pergaminho);
+      bloco.style.display = (idx === blocoIdx) ? 'block' : 'none';
+      content.appendChild(bloco);
+
+      window.JORNADA_QA.mount(bloco, block.questions, {
+        onBack: () => {
+          if (idx > 0) {
+            sessionStorage.setItem('jornada.block', String(idx - 1));
+            loadDynamicBlocks();
+          } else {
+            JORNADA_NAV.goIntro();
           }
-        });
-        content.appendChild(bloco);
-        console.log(`Bloco ${idx} criado com ${block.questions.length} perguntas`);
+        },
+        onFinish: () => {
+          const next = idx + 1;
+          const hasNext = next < window.JORNADA_BLOCKS.length;
+          if (hasNext) {
+            const beforeVideo = window.JORNADA_VIDEOS[`before_b${next+1}`] || null;
+            if (beforeVideo) {
+              playTransition(beforeVideo, () => {
+                sessionStorage.setItem('jornada.block', String(next));
+                loadDynamicBlocks();
+              });
+            } else {
+              sessionStorage.setItem('jornada.block', String(next));
+              loadDynamicBlocks();
+            }
+          } else {
+            playTransition(window.JORNADA_VIDEOS.final, () => {
+              JORNADA_NAV.goFinal();
+            });
+          }
+        }
       });
-      const firstBloco = content.querySelector('.j-bloco');
-      if (firstBloco) {
-        loadAnswers();
-      } else {
-        console.error('Nenhum bloco criado após loadDynamicBlocks!');
-      }
-      console.log('Blocos carregados com sucesso!');
-    }
+    });
+
+    loadAnswers();
+    updateProgress();
+  }
+</script>
+
     const JC = (window.JC = window.JC || {});
     const state = {
       blocoIndex: parseInt(sessionStorage.getItem('jornada.block') || '0', 10) || 0,
