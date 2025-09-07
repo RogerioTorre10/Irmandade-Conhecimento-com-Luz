@@ -68,8 +68,8 @@
     .lumen-typing::after { content: "▌"; margin-left: 2px; opacity: .75; animation: lumenBlink 1s steps(2, end) infinite; }
     .lumen-typing.typing-done::after { content: ""; animation: none; }
     @keyframes lumenBlink { 50% { opacity: 0; } }
-    .chama-viva { width: 60px; height: 120px; background: linear-gradient(to top, #ff4500, #ffa500); clip-path: polygon(20% 100%, 50% 0%, 80% 100%); position: relative; filter: drop-shadow(0 0 12px rgba(255, 140, 0, 0.55)); }
-    .chama-viva .lingua { background: linear-gradient(to top, #ff8c00, #ffd700); clip-path: polygon(30% 100%, 50% 0%, 70% 100%); animation: linguaJitter 3s infinite ease-in-out; }
+    .chama-viva { width: 60px; height: 120px; background: linear-gradient(to top, #ff4500, #ffa500); clip-path: polygon(20% 100%, 30% 70%, 50% 0%, 70% 70%, 80% 100%); position: relative; filter: drop-shadow(0 0 12px rgba(255, 140, 0, 0.55)); animation: tremble 0.1s infinite; }
+    .chama-viva .lingua { background: linear-gradient(to top, #ff8c00, #ffd700); clip-path: polygon(30% 100%, 40% 70%, 50% 0%, 60% 70%, 70% 100%); animation: linguaJitter 3s infinite ease-in-out; }
     .chama-viva .brilho { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255, 215, 0, 0.5), transparent); filter: blur(14px); animation: brilhoJitter 2.2s infinite ease-in-out; }
     .chama.chama-md { width: 32px; height: 64px; }
     .chama.chama-lg { width: 48px; height: 96px; }
@@ -79,6 +79,7 @@
       .chama-viva.chama-lg { width: 48px; height: 96px; }
       #chama-perguntas { margin: 6px 0 10px; }
     }
+    @keyframes tremble { 0% { transform: translateY(0); } 50% { transform: translateY(-2px); } 100% { transform: translateY(0); } }
     @keyframes linguaJitter { 0%, 100% { transform: translateX(-50%) scaleY(1) skewX(0deg); } 20% { transform: translateX(-50%) scaleY(1.05) skewX(0.5deg) translateX(var(--jitter, 0px)); } 50% { transform: translateX(-50%) scaleY(1.1) skewX(1.2deg) translateX(var(--jitter, 0px)); } 80% { transform: translateX(-50%) scaleY(1.03) skewX(0.3deg) translateX(var(--jitter, 0px)); } }
     @keyframes brilhoJitter { 0%, 100% { filter: blur(12px); } 50% { filter: blur(14px); } }
     .chama-fixed-top { position: absolute; top: 10px; right: 14px; z-index: 60; }
@@ -264,13 +265,12 @@
       POS: {'feliz':2,'alegria':2,'amor':3,'sucesso':2,'esperança':3,'paz':2,'fé':3,'gratidão':2,'vitória':3,'superação':3,'luz':2,'deus':3,'coragem':2,'força':2,'confiança':2,'propósito':3},
       NEG: {'triste':-2,'dor':-3,'raiva':-2,'medo':-2,'frustracao':-2,'frustração':-2,'decepcao':-2,'decepção':-2,'perda':-3,'culpa':-2,'ansiedade':-2,'solidao':-2,'solidão':-2,'desespero':-3,'cansaco':-2,'cansaço':-2,'fracasso':-2,'trauma':-3,'duvida':-2,'dúvida':-2}
     };
-    // Garantir que JORNADA_BLOCKS exista
     window.JORNADA_BLOCKS = window.JORNADA_BLOCKS || [
-      { id: "b1", title: "Bloco 1 — Raízes", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 1}`) },
-      { id: "b2", title: "Bloco 2 — Caminho", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 11}`) },
-      { id: "b3", title: "Bloco 3 — Encontros", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 21}`) },
-      { id: "b4", title: "Bloco 4 — Virtudes", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 31}`) },
-      { id: "b5", title: "Bloco 5 — Síntese", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 41}`) }
+      { id: "b1", title: "Bloco 1 — Raízes", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 1}`), video_after: "" },
+      { id: "b2", title: "Bloco 2 — Caminho", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 11}`), video_after: "" },
+      { id: "b3", title: "Bloco 3 — Encontros", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 21}`), video_after: "" },
+      { id: "b4", title: "Bloco 4 — Virtudes", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 31}`), video_after: "" },
+      { id: "b5", title: "Bloco 5 — Síntese", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 41}`), video_after: "" }
     ];
     const PERGUNTAS = [
       'Quem é você hoje?',
@@ -440,10 +440,6 @@
     const JORNADA_PAPER = {
       set: function(mode /* 'v' | 'h' */) {
         const root = document.getElementById('jornada-canvas');
-        if (!root) {
-          console.error('Root #jornada-canvas não encontrado!');
-          return;
-        }
         root.classList.remove("pergaminho-v", "pergaminho-h");
         if (mode === "v") {
           root.classList.add("pergaminho-v");
@@ -481,13 +477,7 @@
     window.JORNADA_PAPER = JORNADA_PAPER;
     // Questions
     const QUESTIONS = {
-      BLOCS: window.JORNADA_BLOCKS || [
-        { id: "b1", title: "Bloco 1 — Raízes", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 1}`) },
-        { id: "b2", title: "Bloco 2 — Caminho", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 11}`) },
-        { id: "b3", title: "Bloco 3 — Encontros", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 21}`) },
-        { id: "b4", title: "Bloco 4 — Virtudes", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 31}`) },
-        { id: "b5", title: "Bloco 5 — Síntese", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 41}`) }
-      ],
+      BLOCS: window.JORNADA_BLOCKS,
       ACOLHIMENTO: { id: "acolhimento", title: "Acolhimento do Lumen", items: ["Deixe aqui uma palavra ao seu Eu do Futuro."] },
       totalBlocks: function() { return this.BLOCS.length; },
       totalQuestions: function() {
@@ -812,25 +802,14 @@
           console.warn(`Bloco ${block.title} não tem perguntas definidas!`, block);
           block.questions = ['Pergunta padrão']; // Fallback temporário
         }
-        JORNADA_QA.mount('jornada-conteudo', block.questions, {
-          onBack: () => {
-            if (idx > 0) {
-              blocoIdx--;
-              sessionStorage.setItem('jornada.block', String(blocoIdx));
-              loadDynamicBlocks();
-            } else {
-              JORNADA_NAV.goIntro();
-            }
-          },
-          onFinish: () => {
-            if (idx < window.JORNADA_BLOCKS.length - 1) {
-              blocoIdx++;
-              sessionStorage.setItem('jornada.block', String(blocoIdx));
-              playTransition(block.video_after, () => loadDynamicBlocks());
-            } else {
-              JORNADA_NAV.goFinal();
-            }
-          }
+        const blocoTitulo = U.el(`<h2 class="bloco-titulo">${block.title}</h2>`);
+        bloco.appendChild(blocoTitulo);
+        block.questions.forEach((q, qi) => {
+          const pergunta = U.el(`<div class="j-pergunta" data-pergunta="${qi}">
+            <h3 class="pergunta-enunciado">${q}</h3>
+            <textarea name="q${qi}" placeholder="Sua resposta..." rows="4"></textarea>
+          </div>`);
+          bloco.appendChild(pergunta);
         });
         content.appendChild(bloco);
         console.log(`Bloco ${idx} criado com ${block.questions.length} perguntas`);
@@ -856,7 +835,7 @@
       perguntasDo: (blocoEl) => Array.from(blocoEl.querySelectorAll('.j-pergunta,[data-pergunta]')),
       btnPrev: () => document.getElementById('btnVoltar') || document.querySelector('[data-action="prev"]'),
       btnNext: () => document.getElementById('btnProxima') || document.querySelector('[data-action="next"]'),
-      btnStart: () => document.getElementById('btnIniciar') || document.querySelector('[data-action="start"]'),
+      btnStart: () => document.getElementById('btnIniciar') || document.querySelector('[data-nav="perguntas"]'),
       meta: () => document.getElementById('j-meta'),
       progressFill: () => document.querySelector('.j-progress__fill'),
       overlay: () => document.getElementById('videoOverlay'),
@@ -928,7 +907,6 @@
       const blocos = S.blocos();
       if (!blocos.length) {
         console.error('Nenhum bloco encontrado após loadDynamicBlocks!');
-        UI.toast('Erro: Blocos da jornada não carregados. Verifique os dados.');
         return;
       }
       blocos.forEach(U.hide);
@@ -1277,4 +1255,6 @@
     window.JORNADA_RENDER.renderPerguntas = renderPerguntas;
     window.JORNADA_RENDER.renderFinal = renderFinal;
     window.showSection = showSection;
-    window.loadDynamicBlocks = load
+    window.loadDynamicBlocks = loadDynamicBlocks;
+    window.JC = JC;
+  </script>
