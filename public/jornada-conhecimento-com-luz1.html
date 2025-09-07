@@ -20,7 +20,7 @@
     }
 
     /* ===== BASE ===== */
-    body { margin:0; font-family: "ManufacturingConsent", "BerkshireSwash", Arial, sans-serif; background:#f9f9f9; color:#333; }
+    body { margin:0; font-family: "ManufacturingConsent", "BerkshireSwash", Arial, sans-serif; background:#f9f9f9; color:#333; font-size: 16px; }
     .site-header { display:flex; align-items:center; gap:12px; padding:16px; background:#1f2937; color:#fff; box-shadow:0 2px 4px rgba(0,0,0,.1); position:relative; z-index:1000; font-family: "BerkshireSwash", Arial, sans-serif; }
     .container { max-width:900px; margin:24px auto; padding:0 16px }
     .card { background:#f6efe0!important; border-radius:14px; box-shadow:0 8px 28px rgba(0,0,0,.12); padding:32px; position:relative; z-index:10 }
@@ -164,7 +164,7 @@
     }
 
     /* ===== UI ===== */
-    .btn { display:inline-block; padding:12px 24px; border-radius:10px; border:0; background:#1f2937; color:#fff; font-weight:600; text-decoration:none; transition:background .3s ease, transform .2s ease; z-index:30 }
+    .btn { display:inline-block; padding:12px 24px; border-radius:10px; border:0; background:#1f2937; color:#fff; font-weight:600; text-decoration:none; transition:background .3s ease, transform .2s ease; z-index:30; font-family: "BerkshireSwash", Arial, sans-serif; font-size: 16px; }
     .btn:hover { background:#374151; transform:scale(1.05) }
     .btn-primary { background:#6b21a8 }
     .btn-primary:hover { background:#7c3aed }
@@ -172,36 +172,37 @@
     .btn-secondary:hover { background:#6b7280 }
     .btn + .btn { margin-left:12px }
 
-    .progress-badge { position:fixed; top:16px; right:16px; padding:8px 16px; background:#6b21a8; color:#fff; border-radius:8px; font-size:.9rem; z-index:900; visibility:visible }
+    .progress-badge { position:fixed; top:16px; right:16px; padding:8px 16px; background:#6b21a8; color:#fff; border-radius:8px; font-size: 16px; z-index:900; visibility:visible }
     .progress-bar { width:100%; height:8px; background:#e5e7eb; border-radius:4px; margin-top:12px; z-index:900; visibility:visible }
     .progress-bar-fill { height:100%; background:#6b21a8; border-radius:4px; transition:width .3s ease }
     .j-progress { margin-top:12px; z-index:900; visibility:visible }
     .j-progress__bar { width:100%; height:6px; background:#e5e7eb; border-radius:4px }
     .j-progress__fill { height:100%; background:#1f2937; border-radius:4px; transition:width .3s ease }
-    .j-progress__meta { text-align:center; margin-top:8px; font-size:.9rem }
+    .j-progress__meta { text-align:center; margin-top:8px; font-size: 16px }
 
     .footer-actions { display:flex; gap:12px; justify-content:center; margin:16px 0; z-index:900 }
 
-    .lumen-typing { white-space:pre-wrap; position:relative }
+    .lumen-typing { white-space:pre-wrap; position:relative; font-size: 16px }
     .lumen-typing::after { content:"▌"; margin-left:2px; opacity:.75; animation:lumenBlink 1s steps(2,end) infinite }
     .lumen-typing.typing-done::after { content:""; animation:none }
     @keyframes lumenBlink { 50% { opacity:0 } }
 
-    .j-section { height:100% }
+    .j-section { height:100%; font-size: 16px }
     .j-bloco { background:transparent!important; display:none; z-index:50 }
     .j-pergunta { margin-bottom:24px; display:none; z-index:60; position:relative }
     .j-pergunta.active { display:block }
-    .pergunta-enunciado { font-family: "CardoBold", "MedievalSharp", Arial, sans-serif; font-weight:600; margin-bottom:8px; display:block }
-    .j-pergunta textarea { font-family: "CardoBold", "MedievalSharp", Arial, sans-serif; width:100%; padding:12px; border-radius:8px; border:1px solid #d1d5db; background:rgba(255,255,255,.8); resize:vertical; min-height:100px }
+    .pergunta-enunciado { font-family: "CardoBold", "MedievalSharp", Arial, sans-serif; font-weight:600; margin-bottom:8px; display:block; font-size: 20px; } /* Título maior */
+    .j-pergunta textarea { font-family: "CardoBold", "MedievalSharp", Arial, sans-serif; width:100%; padding:12px; border-radius:8px; border:1px solid #d1d5db; background:rgba(255,255,255,.8); resize:vertical; min-height:100px; font-size: 16px }
 
     #videoOverlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.8); display:flex; justify-content:center; align-items:center; z-index:2000 }
     #videoOverlay.hidden { display:none }
     .video-player { max-width:90vw; max-height:80vh; background:#000 }
+    #skipVideo { font-family: "BerkshireSwash", Arial, sans-serif; font-size: 16px; }
 
-    .site-footer { text-align:center; padding:16px; opacity:.6; font-size:.85rem; z-index:10 }
-    .password-form { margin-top:20px; text-align:center }
+    .site-footer { text-align:center; padding:16px; opacity:.6; font-size: 16px; z-index:10 }
+    .password-form { margin-top:20px; text-align:center; font-size: 16px }
     .password-input { position:relative }
-    .password-input input { width:100%; padding:12px; border-radius:8px; border:1px solid #d1d5db }
+    .password-input input { width:100%; padding:12px; border-radius:8px; border:1px solid #d1d5db; font-size: 16px }
     .password-toggle { position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer }
 
     .section-container { position:relative; min-height:85vh }
@@ -209,16 +210,19 @@
 
     @media (max-width:600px) {
       .card { margin:16px; padding:20px }
-      .site-header h1 { font-size:1.6rem }
-      .btn { padding:10px 16px; font-size:.9rem }
+      .site-header h1 { font-size: 18px }
+      .btn { padding:10px 16px; font-size: 14px }
       .chama-viva.chama-md { --largura: 45px; --altura: 70px; }
       .chama-viva.chama-lg { --largura: 60px; --altura: 90px; }
-      .progress-badge { top:8px; right:8px; padding:6px 12px; font-size:.8rem }
+      .progress-badge { top:8px; right:8px; padding:6px 12px; font-size: 14px }
+      .pergunta-enunciado { font-size: 18px; }
     }
     @media (max-width:400px) {
       .chama-viva.chama-lg { --largura: 50px; --altura: 80px; }
-      .btn { padding:8px 12px; font-size:.8rem }
+      .btn { padding:8px 12px; font-size: 12px }
       .card { padding:16px }
+      .progress-badge { font-size: 12px }
+      .pergunta-enunciado { font-size: 16px; }
     }
   </style>
 </head>
@@ -317,7 +321,7 @@
   <!-- OVERLAY VIDEO -->
   <div id="videoOverlay" class="video-overlay hidden">
     <video id="videoTransicao" class="video-player" playsinline preload="metadata" controls></video>
-    <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
+    <button id="skipVideo" class="btn btn-secondary">Pular vídeo</button>
   </div>
 
   <!-- GUIA ESPIRITUAL: chama flamejante livre -->
@@ -619,7 +623,7 @@
           } else {
             console.error('Nenhuma próxima pergunta encontrada no bloco seguinte!');
           }
-          const videoSrc = blocos[nextBlocoIndex].dataset.video || '';
+          const videoSrc = blocos[currentBloco.dataset.bloco].dataset.video || '';
           if (videoSrc) playTransition(videoSrc, () => {});
         } else {
           showSection('section-final');
