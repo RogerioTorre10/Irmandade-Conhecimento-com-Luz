@@ -4,13 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Jornada • Irmandade Conhecimento com Luz</title>
-  <meta name="description" content="Irmandade Conhecimento com Luz — fé, ciência, filosofia e tecnologia unidas para despertar e guiar.">
   <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png">
   <style>
-    :root { --bg:#0b1020; --fg:#eef2ff; --muted:#aab4d4; --primary:#8b5cf6; --gold:#fbbf24; --card:#121832; --card-2:#0e1428; --radius:16px; }
+    :root { --bg:#0b1020; --fg:#eef2ff; --muted:#aab4d4; --primary:#6aa7ff; --card:#121832; --card-2:#0e1428; --radius:16px; }
     *{box-sizing:border-box}
     html,body{height:100%}
-
     @font-face{
       font-family:'ManufacturingConsent';
       src:url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');
@@ -36,10 +34,8 @@
       src:url('/assets/fonts/Cardo-Bold.ttf') format('truetype');
       font-weight:700; font-style:normal; font-display:swap;
     }
-
-    body{margin:0;font-family:'BerkshireSwash',cursive;background:var(--bg);color:var(--fg);line-height:1.5;font-size:16px;}
-    h1,h2,h3,h4,h5,h6,.site-header h1,.card h2,.section-title,.bloco-titulo,.card-pergunta h3,.jornada-header h1{font-family:'ManufacturingConsent',serif;letter-spacing:1px;text-transform:none;font-weight:400;font-size:20px;}
-    h2.sub{font-size:18px;}
+    body{margin:0;font-family:'BerkshireSwash',cursive;background:var(--bg);color:var(--fg);line-height:1.5;}
+    h1,h2,h3,h4,h5,h6,.site-header h1,.card h2,.section-title,.bloco-titulo,.card-pergunta h3,.jornada-header h1{font-family:'ManufacturingConsent',serif;letter-spacing:1px;text-transform:none;font-weight:400;}
     label,.pergunta-enunciado,.texto-guia,.orientacoes,.contrato,p{font-family:'BerkshireSwash',cursive;}
     input,textarea,select,.resposta,.jornada-resposta,.devolutiva,#acolh,#jornada-conteudo textarea,#jornada-conteudo input[type="text"],#jornada-conteudo input[type="email"],#jornada-conteudo input[type="number"],#form-perguntas textarea,#form-perguntas input[type="text"],#form-perguntas input[type="email"],#form-perguntas input[type="number"]{font-family:'Cardo',serif;}
     .site-header,.site-footer{padding:24px 16px;text-align:center}
@@ -58,11 +54,11 @@
     .senha-eye svg{width:20px;height:20px}
     body.jornada-active #page-shell,body.jornada-active header.site-header,body.jornada-active footer.site-footer {display:none !important;}
     body.jornada-active #jornada-canvas {display:block !important;}
-    .pergaminho{margin:12px auto;padding:0;border-radius:18px;overflow:hidden;background-repeat:no-repeat;background-position:center;background-size:cover;}
+    .pergaminho{position:relative;z-index:1;margin:12px auto;padding:0;border-radius:18px;overflow:auto;background-repeat:no-repeat;background-position:center;background-size:100% 100%;}
     :root{--pergV-ratio: 2/3; --pergH-ratio: 3/2;}
-    .pergaminho-v{height:92vh;width:calc(92vh * var(--pergV-ratio));max-width:96vw;min-height:82vh;}
-    .pergaminho-h{width:96vw;height:calc(96vw / var(--pergH-ratio));max-height:82vh;}
-    .conteudo-pergaminho{padding:clamp(12px,3vw,28px);line-height:1.55;}
+    .pergaminho-v{background-image:url("/assets/img/pergaminho-rasgado-vert.png");height:92vh;width:calc(92vh * var(--pergV-ratio));max-width:96vw;min-height:400px;}
+    .pergaminho-h{background-image:url("/assets/img/pergaminho-rasgado-horiz.png");width:96vw;height:calc(96vw / var(--pergH-ratio));max-height:82vh;min-height:300px;}
+    .conteudo-pergaminho{position:relative;z-index:2;padding:clamp(12px,3vw,28px);line-height:1.55;}
     .jornada #jornada-canvas.pergaminho{display:block;}
     .j-bloco{display:none;}
     .j-pergunta{display:none;}
@@ -72,36 +68,31 @@
     .lumen-typing::after { content: "▌"; margin-left: 2px; opacity: .75; animation: lumenBlink 1s steps(2, end) infinite; }
     .lumen-typing.typing-done::after { content: ""; animation: none; }
     @keyframes lumenBlink { 50% { opacity: 0; } }
-    .chama.chama-viva span { animation: flicker-strong 0.85s infinite; filter: drop-shadow(0 0 12px rgba(255,140,0,.55)); }
-    .chama.chama-pulse span { animation: flicker-strong 0.6s infinite; }
-    .chama { width: 36px; height: 88px; position: relative; }
-    .chama .brasa { width: 100%; height: 20%; background: radial-gradient(circle, #ff4500 0%, #ff8c00 100%); border-radius: 50% 50% 0 0; }
-    .chama .lingua { position: absolute; left: 50%; transform: translateX(-50%); background: linear-gradient(to top, #ff8c00, #ffd700); border-radius: 50%; }
-    .chama .lingua:nth-child(2) { width: 60%; height: 30%; top: 10%; animation-delay: 0s; }
-    .chama .lingua:nth-child(3) { width: 50%; height: 25%; top: 25%; animation-delay: 0.07s; }
-    .chama .lingua:nth-child(4) { width: 40%; height: 20%; top: 40%; animation-delay: 0.14s; }
-    .chama .brilho { position: absolute; top: -10px; left: -10px; width: 120%; height: 120%; background: radial-gradient(circle, rgba(255,165,0,0.3) 0%, transparent 70%); border-radius: 50%; animation: aura 1.5s infinite ease-in-out; }
-    @keyframes flicker-strong { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-    @keyframes aura { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.2); opacity: 0.2; } }
+    .chama-viva { width: 60px; height: 120px; background: linear-gradient(to top, #ff4500, #ffa500); clip-path: polygon(20% 100%, 50% 0%, 80% 100%); position: relative; filter: drop-shadow(0 0 12px rgba(255, 140, 0, 0.55)); }
+    .chama-viva .lingua { background: linear-gradient(to top, #ff8c00, #ffd700); clip-path: polygon(30% 100%, 50% 0%, 70% 100%); animation: linguaJitter 3s infinite ease-in-out; }
+    .chama-viva .brilho { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255, 215, 0, 0.5), transparent); filter: blur(14px); animation: brilhoJitter 2.2s infinite ease-in-out; }
+    .chama.chama-md { width: 32px; height: 64px; }
+    .chama.chama-lg { width: 48px; height: 96px; }
     @media (max-width: 600px) {
-      .chama { width: 28px; height: 72px; }
-      .chama .lingua:nth-child(2) { width: 50%; height: 25%; }
-      .chama .lingua:nth-child(3) { width: 40%; height: 20%; }
-      .chama .lingua:nth-child(4) { width: 30%; height: 15%; }
+      .chama-viva { width: 40px; height: 80px; }
+      .chama-viva.chama-md { width: 32px; height: 64px; }
+      .chama-viva.chama-lg { width: 48px; height: 96px; }
       #chama-perguntas { margin: 6px 0 10px; }
     }
+    @keyframes linguaJitter { 0%, 100% { transform: translateX(-50%) scaleY(1) skewX(0deg); } 20% { transform: translateX(-50%) scaleY(1.05) skewX(0.5deg) translateX(var(--jitter, 0px)); } 50% { transform: translateX(-50%) scaleY(1.1) skewX(1.2deg) translateX(var(--jitter, 0px)); } 80% { transform: translateX(-50%) scaleY(1.03) skewX(0.3deg) translateX(var(--jitter, 0px)); } }
+    @keyframes brilhoJitter { 0%, 100% { filter: blur(12px); } 50% { filter: blur(14px); } }
     .chama-fixed-top { position: absolute; top: 10px; right: 14px; z-index: 60; }
     .chama-fixed-hero { position: absolute; top: -8px; left: -8px; z-index: 60; }
     .mark-emocao { background: linear-gradient(90deg, rgba(255,196,0,.35), rgba(255,140,0,.2)); border-radius: 4px; padding: 0 2px; }
     .j-progress { margin:6px 0 14px; }
     .j-progress__bar { width:100%; height:10px; border-radius:999px; background:rgba(255,255,255,.14); overflow:hidden; }
-    .j-progress__fill{ height:100%; width:0%; transition:width .25s ease; background:linear-gradient(90deg,#f59e0b,#fde68a); }
-    .j-progress__meta{ margin-top:6px; font-size:.95rem; opacity:.9; display:flex; justify-content:space-between; gap:8px; }
+    .j-progress__fill { height:100%; width:0%; transition:width .25s ease; background:linear-gradient(90deg,#f59e0b,#fde68a); }
+    .j-progress__meta { margin-top:6px; font-size:.95rem; opacity:.9; display:flex; justify-content:space-between; gap:8px; }
     .j-progress__meta b { font-weight:700; }
     .progress-badge { position:absolute; top:8px; right:16px; background:rgba(0,0,0,0.7); color:#fff; font-size:.9rem; padding:4px 8px; border-radius:8px; font-family:'Cardo', serif; z-index:10; }
     .progress-bar { width:100%; height:8px; background:rgba(255,255,255,0.2); border-radius:4px; overflow:hidden; margin:10px 0; }
     .progress-bar-fill { height:100%; width:0; background:linear-gradient(90deg,#ffcf70,#ff8c00); transition:width .5s ease-out; }
-    nav a, a.btn, .site-header p { letter-spacing:.5px; }
+    nav a, a.btn, .site-header p { letter-spacing:.5px; font-family:'BerkshireSwash',cursive; }
     .video-overlay { position:fixed; inset:0; background:#000; display:flex; justify-content:center; align-items:center; z-index:9999; }
     .video-overlay.hidden { display:none; }
     .video-player { max-width:100%; max-height:100%; }
@@ -110,66 +101,37 @@
     .lang-btn:hover { background:rgba(255,255,255,.1); }
     .j-bloco { display: none; }
     .j-pergunta { display: none; }
-    .video-overlay { position:fixed; inset:0; background:rgba(0,0,0,.85); display:flex; align-items:center; justify-content:center; z-index:9999; }
-    .video-overlay.hidden { display:none; }
-    .jornada #jornada-canvas.pergaminho { }
     .jornada .j-progress { }
-    .jornada .footer-actions .btn { }
-    .chama-viva .lingua{ animation-name: lingua, linguaJitter; }
-    @keyframes linguaJitter{ 0%,100% { transform: translateX(-50%) scaleY(1) skewX(0deg); } 20% { transform: translateX(-50%) scaleY(1.03) skewX(.4deg) translateX(var(--jitter,0px)); } 50% { transform: translateX(-50%) scaleY(1.08) skewX(1deg) translateX(var(--jitter,0px)); } 80% { transform: translateX(-50%) scaleY(1.02) skewX(.2deg) translateX(var(--jitter,0px)); } }
+    .jornada .footer-actions .btn { font-family:'BerkshireSwash',cursive; }
     .chama-viva .lingua { animation-name: lingua, linguaJitter; animation-duration: 1.2s, 3s; animation-iteration-count: infinite, infinite; animation-timing-function: ease-in-out, ease-in-out; }
-    .chama-viva .brilho{ animation: aura var(--pulso) infinite ease-in-out, brilhoJitter 2.2s infinite ease-in-out; }
-    @keyframes brilhoJitter{ 0%,100%{filter: blur(12px)} 50%{filter: blur(14px)} }
-    .chama-fixed-hero{ position:absolute; top:-8px; left:-8px; z-index:60 }
-
-    /* Forçar visibilidade temporária para debug */
-    #sec-wizard .j-bloco,
-    #sec-wizard .j-pergunta {
-      opacity: 1 !important;
-      visibility: visible !important;
-      display: block !important;
-    }
-    /* Fallback para imagens */
+    .chama-fixed-hero { position:absolute; top:-8px; left:-8px; z-index:60 }
     .pergaminho-v { background-image: url('/assets/img/pergaminho-rasgado-vert.png'); }
-    .pergaminho-v:empty { background-color: #f6efe0; } /* Cor de fallback se imagem falhar */
+    .pergaminho-v:empty { background-color: #f6efe0; }
     .pergaminho-h { background-image: url('/assets/img/pergaminho-rasgado-horiz.png'); }
-    .pergaminho-h:empty { background-color: #f6efe0; } /* Cor de fallback se imagem falhar */
+    .pergaminho-h:empty { background-color: #f6efe0; }
     .field-error { border-color: #ef4444; }
     .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: #fff; padding: 10px 20px; border-radius: 5px; opacity: 0; transition: opacity 0.3s; }
     .toast.show { opacity: 1; }
-    .typing-caret, .tty-cursor { display: inline-block; width: 0.6ch; margin-left: 2px; animation: blink 1s step-end infinite; }
+    .typing-caret { display: inline-block; width: 0.6ch; margin-left: 2px; animation: blink 1s step-end infinite; }
     @keyframes blink { 50% { opacity: 0; } }
-    .mic-btn{position:absolute;right:8px;bottom:8px;width:36px;height:36px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.28);color:#fff;
-      display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px}
-    .mic-btn[disabled]{opacity:.4;cursor:not-allowed}
-    .mic-btn.rec{box-shadow:0 0 0 3px rgba(255,0,0,.25);animation:micpulse 1s ease-in-out infinite}
-    @keyframes micpulse{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
-    .has-mic{padding-right:44px !important}
   </style>
 </head>
-
 <body data-layout="master" data-journey="essencial">
-  <header class="site-header fixed top-0 inset-x-0 z-50 backdrop-blur bg-gray-900/70 border-b border-white/10">
-    <nav class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
-      <a href="/index.html" class="flex items-center gap-2">
-        <img src="/assets/img/perfil-da-irmandade.png" alt="Logo Irmandade" class="h-8 w-8">
-        <span class="font-bold text-white" data-i18n="site.title">Irmandade Conhecimento com Luz</span>
-      </a>
-      <div class="lang-switch">
-        <button class="lang-btn" data-lang="pt">PT</button>
-        <button class="lang-btn" data-lang="en">EN</button>
-        <button class="lang-btn" data-lang="es">ES</button>
-      </div>
-    </nav>
-  </header>
-
-  <main id="page-shell" class="container pt-24">
-    <div class="container">
-      <a class="btn btn-primary" href="#sec-intro" data-nav="intro" data-i18n="intro.title">Ir para Introdução</a>
-      <a class="btn btn-secondary" href="/jornadas.html" data-nav="home" data-i18n="back_home">← Voltar ao início</a>
+  <header class="site-header">
+    <div class="chama-viva chama-lg chama-strong chama-fixed-hero Tony" id="chama-intro">
+      <div class="brasa"></div>
+      <div class="lingua"></div>
+      <div class="lingua"></div>
+      <div class="lingua"></div>
+      <div class="brilho"></div>
     </div>
-
+    <h1>Jornada Essencial</h1>
+  </header>
+  <main id="page-shell" class="container">
+    <div class="container">
+      <a class="btn btn-primary" href="#sec-intro" data-nav="intro">Ir para Introdução</a>
+      <a class="btn btn-secondary" href="/jornadas.html" data-nav="home">← Voltar</a>
+    </div>
     <div class="section-container">
       <section id="jornada-canvas" class="card pergaminho pergaminho-v">
         <div id="jornada-conteudo" class="conteudo-pergaminho">
@@ -182,18 +144,17 @@
               <div class="lingua"></div>
               <div class="brilho"></div>
             </div>
-            <p data-typing data-i18n="intro.start" data-speed="50">Bem-vindo(a) à Jornada Essencial. Por favor, insira a senha para começar.</p>
+            <p data-typing data-text="Bem-vindo(a) à Jornada Essencial. Por favor, insira a senha para começar." data-speed="50"></p>
             <div class="password-form">
-              <h3 data-i18n="intro.title">Ative sua Senha</h3>
+              <h3>Ative sua Senha</h3>
               <div class="senha-wrap">
-                <input type="password" id="senha" class="input" placeholder="Digite sua senha..." data-i18n-placeholder="intro.start">
+                <input type="password" id="senha" class="input" placeholder="Digite sua senha...">
                 <span class="senha-eye password-toggle" data-action="toggle-password">👁️</span>
               </div>
-              <button id="btnEntrar" class="btn btn-primary" data-nav="intro" data-i18n="intro.start">Entrar</button>
-              <div id="authError" class="hidden text-red-500 mt-2" data-i18n="intro.start">Senha incorreta.</div>
+              <button id="btnEntrar" class="btn btn-primary" data-nav="intro">Entrar</button>
+              <div id="authError" class="hidden text-red-500 mt-2">Senha incorreta.</div>
             </div>
           </div>
-
           <!-- INTRO -->
           <div id="sec-intro" class="j-section hidden">
             <div class="chama-viva chama-lg chama-strong chama-fixed-hero" id="chama-intro">
@@ -203,18 +164,17 @@
               <div class="lingua"></div>
               <div class="brilho"></div>
             </div>
-            <h1 data-i18n="intro.title">Bem-vindo(a) à Jornada Essencial</h1>
-            <p data-typing data-i18n="intro.start" data-speed="40">Esta é uma experiência de reflexão profunda, simbólica e acolhedora. Leia com atenção o Termo de Responsabilidade e siga quando estiver pronto(a).</p>
+            <h1>Bem-vindo(a) à Jornada Essencial</h1>
+            <p data-typing data-text="Esta é uma experiência de reflexão profunda, simbólica e acolhedora. Leia com atenção o Termo de Responsabilidade e siga quando estiver pronto(a)." data-speed="40"></p>
             <div class="termo">
-              <h2 data-i18n="intro.title">Termo de Responsabilidade e Consentimento</h2>
-              <p data-typing data-i18n="intro.start" data-speed="50">Ao iniciar, você concorda em participar de forma consciente, sabendo que este material é de autoconhecimento e não substitui apoio médico ou psicológico.</p>
+              <h2>Termo de Responsabilidade e Consentimento</h2>
+              <p data-typing data-text="Ao iniciar, você concorda em participar de forma consciente, sabendo que este material é de autoconhecimento e não substitui apoio médico ou psicológico." data-speed="50"></p>
             </div>
             <div class="password-form">
-              <label><input type="checkbox" id="chkTermo"> <span data-i18n="intro.start">Concordo com os termos</span></label>
-              <button id="btnIniciar" class="btn btn-primary" disabled data-nav="perguntas" data-i18n="intro.start">Iniciar</button>
+              <label><input type="checkbox" id="chkTermo"> Concordo com os termos</label>
+              <button id="btnIniciar" class="btn btn-primary" disabled data-nav="perguntas">Iniciar</button>
             </div>
           </div>
-
           <!-- PERGUNTAS (WIZARD) -->
           <div id="sec-wizard" class="j-section hidden">
             <div class="chama-viva chama-md" id="chama-perguntas">
@@ -226,16 +186,11 @@
             </div>
             <div id="perguntas-container"></div>
             <div class="footer-actions">
-              <button id="btnLimparAtual" class="btn btn-secondary" data-i18n="intro.start">Limpar</button>
-              <button id="btnVoltar" class="btn btn-secondary" data-nav="perguntas-prev" data-idx="0" data-i18n="back_home">Voltar</button>
-              <button id="btnProxima" class="btn btn-primary" data-nav="perguntas-next" data-idx="0" data-i18n="next">Próxima</button>
-            </div>
-            <!-- Barra de progresso -->
-            <div id="progressContainer" style="background:#333; border-radius:8px; overflow:hidden; height:12px; margin:10px 0;">
-              <div id="progressBar" style="background:#4caf50; width:0%; height:100%; transition:width .4s;"></div>
+              <button id="btnLimparAtual" class="btn btn-secondary">Limpar</button>
+              <button id="btnVoltar" class="btn btn-secondary" data-nav="perguntas-prev" data-idx="0">Voltar</button>
+              <button id="btnProxima" class="btn btn-primary" data-nav="perguntas-next" data-idx="0">Próxima</button>
             </div>
           </div>
-
           <!-- FINAL -->
           <div id="sec-final" class="j-section hidden">
             <div class="chama-viva chama-lg chama-strong chama-fixed-hero" id="chama-final">
@@ -245,23 +200,21 @@
               <div class="lingua"></div>
               <div class="brilho"></div>
             </div>
-            <p data-typing data-i18n="final.title" data-speed="40">Parabéns por completar esta jornada! Que sua chama interior continue a brilhar.</p>
+            <p data-typing data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40"></p>
             <div class="footer-actions">
-              <button id="btnRevisar" class="btn btn-secondary" data-nav="perguntas" data-i18n="questions.title">Revisar</button>
-              <button id="btnGerarPDFHQ" class="btn btn-primary" data-i18n="final.back_home">Baixar PDF + HQ</button>
-              <button id="btnNovaJornada" class="btn btn-secondary" data-nav="home" data-i18n="final.back_home">Nova Jornada</button>
+              <button id="btnRevisar" class="btn btn-secondary" data-nav="perguntas">Revisar</button>
+              <button id="btnGerarPDFHQ" class="btn btn-primary">Baixar PDF + HQ</button>
+              <button id="btnNovaJornada" class="btn btn-secondary" data-nav="home">Nova Jornada</button>
             </div>
           </div>
         </div>
       </section>
     </div>
-
     <footer class="site-footer">
       <small>© 2025 Irmandade Conhecimento com Luz</small>
       <div id="envTag"></div>
     </footer>
   </main>
-
   <!-- PROGRESS -->
   <div class="progress-badge" id="jprog-pct">0% concluído</div>
   <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
@@ -269,13 +222,11 @@
     <div class="j-progress__bar"><div class="j-progress__fill"></div></div>
     <div class="j-progress__meta" id="j-meta"></div>
   </div>
-
   <!-- OVERLAY VIDEO -->
   <div id="videoOverlay" class="video-overlay hidden">
     <video id="videoTransicao" class="video-player" playsinline preload="metadata" controls></video>
-    <button id="skipVideo" class="btn btn-secondary" data-i18n="tts.stop">Pular vídeo</button>
+    <button id="skipVideo" class="btn btn-secondary">Pular vídeo</button>
   </div>
-
   <!-- GUIA ESPIRITUAL: chama flamejante livre -->
   <div id="guia-espiritual">
     <div id="chama-bola" class="chama-viva" style="position: fixed; bottom: 20px; right: 20px;">
@@ -286,15 +237,13 @@
       <div class="brilho"></div>
     </div>
   </div>
-
   <!-- Scripts inline consolidado -->
   <script>
     // Tag ambiente
     document.getElementById('envTag').textContent =
       `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
-
     // Configuração local
-    const setupConfig = () => {
+    (function setupConfig() {
       const wantLocal = location.hostname === "localhost" || location.search.includes("useLocalApi=1");
       if (wantLocal) {
         window.APP_CONFIG = Object.assign(window.APP_CONFIG || {}, {
@@ -309,308 +258,69 @@
         });
         console.log("config.prod.js aplicado: API_BASE = https://conhecimento-com-luz-api.onrender.com");
       }
-    };
-    setupConfig();
-
+    })();
     // Definições iniciais
     const EMO = {
       POS: {'feliz':2,'alegria':2,'amor':3,'sucesso':2,'esperança':3,'paz':2,'fé':3,'gratidão':2,'vitória':3,'superação':3,'luz':2,'deus':3,'coragem':2,'força':2,'confiança':2,'propósito':3},
       NEG: {'triste':-2,'dor':-3,'raiva':-2,'medo':-2,'frustracao':-2,'frustração':-2,'decepcao':-2,'decepção':-2,'perda':-3,'culpa':-2,'ansiedade':-2,'solidao':-2,'solidão':-2,'desespero':-3,'cansaco':-2,'cansaço':-2,'fracasso':-2,'trauma':-3,'duvida':-2,'dúvida':-2}
     };
-
-    const JORNADA_BLOCKS = [
-      { id: "reflexoes", title: "Reflexões da Alma e da Existência", video_after: "/assets/img/filme-1-entrando-na-jornada.mp4", questions: [
-        { id: "existencia_primeira_memoria", label: "Você se recorda da idade em que, pela primeira vez, percebeu que era alguém neste mundo?", type: "textarea" },
-        { id: "sentido_vida", label: "Qual é o sentido da vida para você neste momento?", type: "textarea" },
-        { id: "forca_interior", label: "De onde você tira forças quando tudo parece difícil?", type: "textarea" },
-        { id: "legado", label: "Que marca você gostaria de deixar no mundo?", type: "textarea" }
-      ]},
-      { id: "raizes", title: "Raízes e Experiências de Vida", video_after: "/assets/img/filme-2-dentro-da-jornada.mp4", questions: [
-        { id: "infancia", label: "Que lembrança da infância mais marcou sua vida?", type: "textarea" },
-        { id: "familia", label: "Qual o papel da família na sua jornada?", type: "textarea" },
-        { id: "dor", label: "Qual foi a maior dor ou perda que moldou quem você é hoje?", type: "textarea" },
-        { id: "superacao", label: "Qual a maior superação da sua vida?", type: "textarea" }
-      ]},
-      { id: "caminho", title: "Caminho Pessoal", video_after: "/assets/img/filme-3-traumas-na-jornada.mp4", questions: [
-        { id: "proposito", label: "Qual propósito guia as suas escolhas hoje?", type: "textarea" },
-        { id: "talentos", label: "Quais são seus maiores talentos ou dons?", type: "textarea" },
-        { id: "relacionamentos", label: "O que você mais valoriza em um relacionamento humano?", type: "textarea" },
-        { id: "espiritualidade", label: "O que a espiritualidade significa para você?", type: "textarea" }
-      ]},
-      { id: "futuro", title: "Futuro e Inspiração", video_after: "/assets/img/filme-4-aproximando-do-final.mp4", questions: [
-        { id: "sonhos", label: "Quais são seus maiores sonhos?", type: "textarea" },
-        { id: "medos", label: "Que medos você gostaria de vencer?", type: "textarea" },
-        { id: "mudanca", label: "Se pudesse mudar algo no mundo, o que mudaria?", type: "textarea" },
-        { id: "mensagem", label: "Se pudesse deixar uma mensagem eterna, qual seria?", type: "textarea" }
-      ]},
-      { id: "sintese", title: "Síntese e Entrega", video_after: "/assets/img/filme-5-fim-da-jornada.mp4", questions: [
-        { id: "essencia_hoje", label: "Quem é você hoje, em uma frase de verdade?", type: "textarea" },
-        { id: "passo_fe", label: "Qual será seu próximo passo de fé e coragem?", type: "textarea" }
-      ]}
+    const PERGUNTAS = [
+      'Quem é você hoje?',
+      'O que a Luz te pede agora?',
+      'Qual é o próximo passo concreto?',
+      'Qual verdade você precisa admitir para seguir?',
+      'O que precisa ser curado neste momento?'
     ];
-
-    const JORNADA_FINAL_VIDEO = "/assets/img/filme-5-fim-da-jornada.mp4";
-
-    // JORNADA_TYPE (jornada-typing.js + jornada-typing-font.js)
+    // JORNADA_TYPE (jornada-typing.js)
     (function ensureStyle() {
       if (document.getElementById('typing-style')) return;
       const st = document.createElement('style');
       st.id = 'typing-style';
       st.textContent = `
-        .typing-caret, .tty-cursor { display: inline-block; width: 0.6ch; margin-left: 2px; animation: blink 1s step-end infinite; }
+        .typing-caret { display: inline-block; width: 0.6ch; margin-left: 2px; animation: blink 1s step-end infinite; }
         @keyframes blink { 50% { opacity: 0; } }
       `;
       document.head.appendChild(st);
     })();
-    const JORNADA_TYPO = {
-      typeAll: async function(containerSelector = "#jornada-conteudo", opts = {}) {
-        const cfg = Object.assign({
-          speed: 34,
-          cursor: true,
-          maxNodeChars: 750,
-          maxTotalMs: 7500,
-          selectors: ["h1","h2","h3","h4","p","li","blockquote","figcaption","label",".lead",".subtitle",".cta"]
-        }, opts);
-        const root = typeof containerSelector === "string" ? document.querySelector(containerSelector) : containerSelector;
-        if (!root || (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches && !cfg.force)) return;
-
-        const nodes = Array.from(root.querySelectorAll(cfg.selectors.join(",")));
-        const totalChars = nodes.reduce((n, el) => n + (el.textContent || "").trim().length, 0);
-        const estMs = totalChars * cfg.speed;
-        const factor = estMs > cfg.maxTotalMs ? (cfg.maxTotalMs / estMs) : 1;
-        const speed = Math.max(8, Math.round(cfg.speed / factor));
-
-        for (const el of nodes) {
-          const original = (el.getAttribute("data-tty-text") || el.textContent || "").trim();
-          const text = original || el.textContent.trim();
-          el.setAttribute("data-tty-text", text);
-          if (text.length === 0 || text.length > cfg.maxNodeChars) {
-            el.textContent = text;
-            continue;
-          }
-          await typeOne(el, text, speed, cfg.cursor);
+    const JORNADA_TYPE = {
+      run: async function(root, opts = {}) {
+        const scope = (typeof root === 'string') ? document.querySelector(root) : (root || document);
+        const selector = opts.selector || '[data-type]';
+        const speed = Number(opts.speed ?? 18);
+        const delay = Number(opts.delay ?? 0);
+        const nodes = Array.from(scope.querySelectorAll(selector));
+        for (const n of nodes) {
+          const text = n.getAttribute('data-type') ?? n.textContent ?? '';
+          await typeNode(n, text, speed, delay);
         }
       },
-      typeText: function(target, text, speed = 34, withCursor = true) {
-        const el = typeof target === "string" ? document.querySelector(target) : target;
-        if (!el) return;
-        return typeOne(el, text ?? el.textContent ?? "", speed, withCursor);
-      }
-    };
-    async function typeOne(el, text, speed, withCursor) {
-      return new Promise(resolve => {
-        el.textContent = "";
+      typeIt: function(el, text, speed = 24) {
+        if (!el || !text) return;
+        el.textContent = '';
         let i = 0;
-        let cursor = withCursor ? document.createElement("span") : null;
-        if (cursor) {
-          cursor.className = "tty-cursor";
-          cursor.textContent = "▌";
-          el.appendChild(cursor);
-        }
-        const step = () => {
+        const tick = () => {
           if (i < text.length) {
-            el.insertBefore(document.createTextNode(text[i++]), cursor || null);
-            setTimeout(step, speed);
-          } else {
-            if (cursor) cursor.remove();
-            resolve();
+            el.textContent += text.charAt(i++);
+            requestAnimationFrame(tick);
           }
         };
-        step();
-      });
+        requestAnimationFrame(tick);
+      }
+    };
+    async function typeNode(node, full, speed, delay) {
+      const caret = document.createElement('span');
+      caret.className = 'typing-caret';
+      caret.textContent = '|';
+      node.textContent = '';
+      node.appendChild(caret);
+      if (delay) await new Promise(r => setTimeout(r, delay));
+      for (let i = 0; i < full.length; i++) {
+        caret.before(document.createTextNode(full[i]));
+        await new Promise(r => setTimeout(r, speed));
+      }
+      caret.remove();
     }
-    window.JORNADA_TYPO = JORNADA_TYPO;
-
-    // JORNADA_MICRO (jornada-micro.js)
-    (function ensureStyle() {
-      if (document.getElementById('mic-style')) return;
-      const st = document.createElement('style');
-      st.id = 'mic-style';
-      st.textContent = `
-        .mic-btn{position:absolute;right:8px;bottom:8px;width:36px;height:36px;border-radius:999px;
-          border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.28);color:#fff;
-          display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px}
-        .mic-btn[disabled]{opacity:.4;cursor:not-allowed}
-        .mic-btn.rec{box-shadow:0 0 0 3px rgba(255,0,0,.25);animation:micpulse 1s ease-in-out infinite}
-        @keyframes micpulse{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
-        .has-mic{padding-right:44px !important}
-      `;
-      document.head.appendChild(st);
-    })();
-    const JORNADA_MICRO = {
-      attach: function(el, opts = {}) {
-        const ta = (typeof el === 'string') ? document.querySelector(el) : el;
-        if (!ta) return;
-        const mode = opts.mode || 'append';
-        const host = ta.parentElement || ta;
-        host.style.position = host.style.position || 'relative';
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'mic-btn';
-        btn.title = 'Falar (Ctrl+M)';
-        btn.innerHTML = '🎤';
-        host.appendChild(btn);
-        ta.classList.add('has-mic');
-
-        if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
-          btn.disabled = true;
-          btn.title = 'Reconhecimento de voz não suportado neste navegador';
-          return;
-        }
-
-        let rec = null, listening = false;
-        function buildRecognizer() {
-          const r = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-          r.lang = opts.lang || detectLang();
-          r.interimResults = true;
-          r.continuous = false;
-          r.onresult = (e) => {
-            let finalTxt = '';
-            for (let i = e.resultIndex; i < e.results.length; i++) {
-              const res = e.results[i];
-              finalTxt += res[0].transcript;
-              if (res.isFinal) {
-                const prev = ta.value.trim();
-                ta.value = (mode === 'replace') ? finalTxt.trim() : (prev ? (prev + ' ' + finalTxt.trim()) : finalTxt.trim());
-                finalTxt = '';
-                ta.dispatchEvent(new Event('input', { bubbles: true }));
-              }
-            }
-          };
-          r.onerror = () => { listening = false; btn.classList.remove('rec'); };
-          r.onend = () => {
-            listening = false; btn.classList.remove('rec');
-            if (opts.autoRestart && btn.dataset.hold === '1') {
-              try { r.start(); listening = true; btn.classList.add('rec'); } catch {}
-            }
-          };
-          return r;
-        }
-        function toggle() {
-          try {
-            if (!rec) rec = buildRecognizer();
-            rec.lang = opts.lang || detectLang();
-            if (listening) {
-              rec.stop(); listening = false; btn.classList.remove('rec');
-            } else {
-              rec.start(); listening = true; btn.classList.add('rec');
-            }
-          } catch {}
-        }
-        function detectLang() {
-          const l = (window.LANG || localStorage.getItem('JORNADA_LANG') || 'pt').toLowerCase();
-          return l.startsWith('en') ? 'en-US' : l.startsWith('es') ? 'es-ES' : 'pt-BR';
-        }
-        btn.addEventListener('click', toggle);
-        ta.addEventListener('keydown', (e) => {
-          if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'm') {
-            e.preventDefault();
-            toggle();
-          }
-        });
-        return { start: () => { if (!rec) rec = buildRecognizer(); rec.start(); listening = true; btn.classList.add('rec'); },
-                 stop:  () => { if (rec && listening) rec.stop(); } };
-      }
-    };
-    window.JORNADA_MICRO = JORNADA_MICRO;
-
-    // I18N (i18n.js)
-    const I18N = {
-      lang: 'pt',
-      dict: {
-        "pt": {
-          "lang_name": "Português",
-          "site.title": "Irmandade Conhecimento com Luz",
-          "home.explore": "Explorar Jornadas",
-          "home.repo": "Repositório",
-          "journeys.available": "Jornadas Disponíveis",
-          "intro.title": "Introdução",
-          "intro.start": "Iniciar",
-          "questions.title": "Perguntas",
-          "next": "Avançar ▶",
-          "back_home": "← Voltar ao início",
-          "final.title": "Conclusão da Jornada",
-          "final.back_home": "Voltar ao início",
-          "tts.read": "Ouvir esta seção",
-          "tts.stop": "Parar leitura"
-        },
-        "en": {
-          "lang_name": "English",
-          "site.title": "Brotherhood Knowledge with Light",
-          "home.explore": "Explore Journeys",
-          "home.repo": "Repository",
-          "journeys.available": "Available Journeys",
-          "intro.title": "Introduction",
-          "intro.start": "Start",
-          "questions.title": "Questions",
-          "next": "Next ▶",
-          "back_home": "← Back to home",
-          "final.title": "Journey Conclusion",
-          "final.back_home": "Back to home",
-          "tts.read": "Listen to this section",
-          "tts.stop": "Stop reading"
-        },
-        "es": {
-          "lang_name": "Español",
-          "site.title": "Hermandad Conocimiento con Luz",
-          "home.explore": "Explorar Jornadas",
-          "home.repo": "Repositorio",
-          "journeys.available": "Jornadas Disponibles",
-          "intro.title": "Introducción",
-          "intro.start": "Iniciar",
-          "questions.title": "Preguntas",
-          "next": "Avanzar ▶",
-          "back_home": "← Volver al inicio",
-          "final.title": "Conclusión de la Jornada",
-          "final.back_home": "Volver al inicio",
-          "tts.read": "Escuchar esta sección",
-          "tts.stop": "Detener lectura"
-        }
-      },
-      ready: true,
-      init: function() {
-        let lang = localStorage.getItem('i18n_lang') || (navigator.language || "pt").slice(0,2).toLowerCase();
-        if (!['pt', 'en', 'es'].includes(lang)) lang = 'pt';
-        this.setLang(lang, false);
-        this.autobind();
-        this.apply();
-      },
-      setLang: function(lang, applyAfter = true) {
-        this.dict = this.dict[lang] || this.dict['pt'];
-        this.lang = lang;
-        localStorage.setItem('i18n_lang', lang);
-        document.documentElement.setAttribute("lang", lang);
-        if (applyAfter) this.apply();
-      },
-      t: function(key, fallback) {
-        return this.dict[key] != null ? this.dict[key] : (fallback ?? key);
-      },
-      apply: function(root = document) {
-        if (!this.ready) return;
-        root.querySelectorAll("[data-i18n]").forEach(el => {
-          const key = el.getAttribute("data-i18n");
-          el.textContent = this.t(key, el.textContent.trim());
-        });
-        root.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
-          const key = el.getAttribute("data-i18n-placeholder");
-          el.setAttribute("placeholder", this.t(key, el.getAttribute("placeholder") || ""));
-        });
-        const siteTitle = this.t("site.title", document.title);
-        if (siteTitle) document.title = siteTitle;
-      },
-      autobind: function() {
-        document.addEventListener("click", (ev) => {
-          const btn = ev.target.closest("[data-lang]");
-          if (!btn) return;
-          ev.preventDefault();
-          const lang = btn.getAttribute("data-lang");
-          this.setLang(lang);
-        });
-      }
-    };
-    window.I18N = I18N;
-    document.addEventListener("DOMContentLoaded", () => I18N.init());
-
+    window.JORNADA_TYPE = JORNADA_TYPE;
     // Utils
     const JORNADA_UTILS = {
       saveLocal: (key, value) => localStorage.setItem(key, JSON.stringify(value)),
@@ -628,22 +338,50 @@
       getApiBase: () => window.APP_CONFIG?.API_BASE || "https://conhecimento-com-luz-api.onrender.com",
       apiGet: async (path, opts = {}) => {
         const url = JORNADA_UTILS.getApiBase() + path;
-        const res = await fetch(url, { method: "GET", headers: { Accept: "application/json" }, ...opts });
-        if (!res.ok) throw new Error(`GET ${url} -> ${res.status}`);
-        return res.headers.get("content-type")?.includes("application/json") ? res.json() : res.text();
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        try {
+          const res = await fetch(url, {
+            method: "GET",
+            headers: { Accept: "application/json" },
+            signal: controller.signal,
+            ...opts
+          });
+          clearTimeout(timeoutId);
+          if (!res.ok) throw new Error(`GET ${url} -> ${res.status}`);
+          return res.headers.get("content-type")?.includes("application/json") ? res.json() : res.text();
+        } catch (e) {
+          console.error('Erro na API GET:', e);
+          UI.toast('Erro ao conectar com o servidor. Tente novamente.');
+          throw e;
+        }
       },
       apiPost: async (path, body = {}, opts = {}) => {
         const url = JORNADA_UTILS.getApiBase() + path;
-        const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json, application/pdf" }, body: JSON.stringify(body), ...opts });
-        if (!res.ok) throw new Error(`POST ${url} -> ${res.status}`);
-        const ct = res.headers.get("content-type") || "";
-        if (ct.includes("application/json")) return res.json();
-        if (ct.includes("application/pdf")) return res.blob();
-        return res.text();
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        try {
+          const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Accept: "application/json, application/pdf" },
+            body: JSON.stringify(body),
+            signal: controller.signal,
+            ...opts
+          });
+          clearTimeout(timeoutId);
+          if (!res.ok) throw new Error(`POST ${url} -> ${res.status}`);
+          const ct = res.headers.get("content-type") || "";
+          if (ct.includes("application/json")) return res.json();
+          if (ct.includes("application/pdf")) return res.blob();
+          return res.text();
+        } catch (e) {
+          console.error('Erro na API POST:', e);
+          UI.toast('Erro ao enviar dados. Tente novamente.');
+          throw e;
+        }
       }
     };
     window.JORNADA_UTILS = JORNADA_UTILS;
-
     // Core
     const JORNADA_CORE = {
       iniciarFluxo: function() { JORNADA_CORE.STATE.respostas = {}; },
@@ -654,16 +392,46 @@
         JORNADA_UTILS.saveLocal("jornada_respostas", JORNADA_CORE.STATE.respostas);
       },
       baixarArquivos: async function(payload = {}) {
-        return await JORNADA_UTILS.apiPost('/download', payload);
+        try {
+          return await JORNADA_UTILS.apiPost('/download', payload);
+        } catch (e) {
+          console.error('Erro ao baixar arquivos:', e);
+          UI.toast('Erro ao gerar PDF. Tente novamente.');
+          throw e;
+        }
       },
       STATE: { respostas: {} }
     };
     window.JORNADA_CORE = JORNADA_CORE;
-
+    window.JORNADA_UI = Object.assign(window.JORNADA_UI || {}, {
+      setProgressoBlocos: function(blocoIdx0, totalBlocos) {
+        const el = document.getElementById('badgeProgressoBlocos');
+        if (!el || !totalBlocos) return;
+        const pct = Math.round(((blocoIdx0 + 1) / totalBlocos) * 100);
+        el.textContent = `${pct}% concluído`;
+      },
+      setProgressoPerguntas: function(percent) {
+        const bar = document.getElementById('progressBar');
+        if (bar) bar.style.width = `${Math.max(0, Math.min(100, percent | 0))}%`;
+      }
+    });
+    // State
+    const JSTATE = {
+      load: () => JORNADA_UTILS.loadLocal('jornada_state'),
+      save: (data) => JORNADA_UTILS.saveLocal('jornada_state', data),
+      clearAll: () => JORNADA_UTILS.clearLocal('jornada_state'),
+      get: (k, fallback) => JSTATE.load()[k] ?? fallback,
+      set: (k, v) => {
+        const st = JSTATE.load();
+        st[k] = v;
+        JSTATE.save(st);
+      }
+    };
+    window.JSTATE = JSTATE;
     // Paper
     const JORNADA_PAPER = {
       set: function(mode /* 'v' | 'h' */) {
-        const root = document.getElementById('jornada-canvas');
+        const root = document.getElementBy impediment: none;
         root.classList.remove("pergaminho-v", "pergaminho-h");
         if (mode === "v") {
           root.classList.add("pergaminho-v");
@@ -699,14 +467,19 @@
       }
     };
     window.JORNADA_PAPER = JORNADA_PAPER;
-
     // Questions
     const QUESTIONS = {
-      BLOCS: JORNADA_BLOCKS,
+      BLOCS: window.JORNADA_BLOCKS || [
+        { id: "b1", title: "Bloco 1 — Raízes", items: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 1}`) },
+        { id: "b2", title: "Bloco 2 — Caminho", items: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 11}`) },
+        { id: "b3", title: "Bloco 3 — Encontros", items: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 21}`) },
+        { id: "b4", title: "Bloco 4 — Virtudes", items: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 31}`) },
+        { id: "b5", title: "Bloco 5 — Síntese", items: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 41}`) }
+      ],
       ACOLHIMENTO: { id: "acolhimento", title: "Acolhimento do Lumen", items: ["Deixe aqui uma palavra ao seu Eu do Futuro."] },
       totalBlocks: function() { return this.BLOCS.length; },
       totalQuestions: function() {
-        return this.BLOCS.reduce((n, b) => n + b.questions.length, 0) + this.ACOLHIMENTO.items.length;
+        return this.BLOCS.reduce((n, b) => n + b.items.length, 0) + this.ACOLHIMENTO.items.length;
       },
       getBlock: function(i) { return this.BLOCS[i] || null; },
       getAcolhimento: function() { return this.ACOLHIMENTO; },
@@ -723,7 +496,7 @@
         const all = this.getAnswerMap();
         let answered = 0;
         this.BLOCS.forEach((b, bi) => {
-          b.questions.forEach((_, qi) => {
+          b.items.forEach((_, qi) => {
             if ((all[this.blockKey(bi, qi)] || "").trim().length > 0) answered++;
           });
         });
@@ -732,7 +505,6 @@
       }
     };
     window.QUESTIONS = QUESTIONS;
-
     // UI
     const UI = {
       qs: (sel, root = document) => root.querySelector(sel),
@@ -755,14 +527,12 @@
         const titulo = UI.qs('#perguntaTitulo');
         const etapaNum = UI.qs('#etapaNum');
         const etapaTot = UI.qs('#etapaTot');
-
         if (etapaTot) etapaTot.textContent = String(total || (perguntas?.length || 0));
         if (etapaNum) etapaNum.textContent = String((index ?? 0) + 1);
-
         if (titulo) {
           if (Array.isArray(perguntas)) {
             const item = perguntas[index] ?? '';
-            const texto = typeof item === 'string' ? item : (item?.label || item?.texto || '');
+            const texto = typeof item === 'string' ? item : (item?.titulo || item?.texto || '');
             titulo.textContent = texto || 'Pergunta';
           } else {
             titulo.textContent = 'Pergunta';
@@ -795,10 +565,7 @@
       }
     };
     window.UI = UI;
-
-    /* =========================
-       EMOÇÃO E DATILOGRAFIA
-    ==========================*/
+    // EMOÇÃO E DATILOGRAFIA
     function analyzeSentiment(text) {
       let score = 0;
       const tokens = (text || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').split(/\s+/);
@@ -808,10 +575,7 @@
       }
       return score;
     }
-
-    /* =========================
-       CHAMA
-    ==========================*/
+    // CHAMA
     const JORNADA_CHAMA = {
       analyzeSentiment: analyzeSentiment,
       updateChama: function(scoreNum, targetId = 'chama-perguntas') {
@@ -876,7 +640,6 @@
       }
     };
     window.JORNADA_CHAMA = JORNADA_CHAMA;
-
     // micro-variação para cada chama
     document.querySelectorAll('#chama-intro, #chama-perguntas, #chama-final, #chama-bola')
       .forEach(f => {
@@ -885,31 +648,26 @@
           n.style.animationDelay = `${i * 0.07 + Math.random() * 0.08}s`;
         });
       });
-
-    /* =========================
-       PROGRESSO & STORAGE
-    ==========================*/
+    // PROGRESSO & STORAGE
     function updateProgress() {
-      const perguntas = document.querySelectorAll('.j-pergunta textarea');
-      const respondidas = Array.from(perguntas).filter(p => p.value.trim() !== '').length;
-      const total = document.querySelectorAll('.j-pergunta textarea').length;
-      const progresso = (respondidas / (total || 1)) * 100;
+      const perguntas = document.querySelectorAll('.j-pergunta');
+      const respondidas = Array.from(perguntas).filter(p => p.querySelector('textarea').value.trim() !== '').length;
+      const progresso = (respondidas / (perguntas.length || 1)) * 100;
       const fill = document.getElementById('jprog-fill');
       const badge = document.getElementById('jprog-pct');
       const jFill = document.querySelector('.j-progress__fill');
       const jMeta = document.getElementById('j-meta');
-      const progressBar = document.getElementById('progressBar');
       if (fill) fill.style.width = `${progresso}%`;
       if (badge) badge.textContent = `${Math.round(progresso)}% concluído`;
       if (jFill) jFill.style.width = `${progresso}%`;
-      if (jMeta) jMeta.textContent = `Respondidas: ${respondidas} de ${total}`;
-      if (progressBar) progressBar.style.width = `${progresso}%`;
+      if (jMeta) jMeta.textContent = `Respondidas: ${respondidas} de ${perguntas.length}`;
       console.log('Progresso atualizado:', progresso);
     }
     function saveAnswers() {
       const respostas = {};
-      document.querySelectorAll('.j-pergunta textarea').forEach((input) => {
-        respostas[input.name] = input.value || '';
+      document.querySelectorAll('.j-pergunta textarea').forEach((input, idx) => {
+        const name = input.name || `q${idx + 1}`;
+        respostas[name] = input.value || '';
       });
       JSTATE.set('respostas', respostas);
       JORNADA_CORE.salvarRespostas(respostas);
@@ -917,16 +675,14 @@
     function loadAnswers() {
       try {
         const respostas = JSTATE.get('respostas', {});
-        document.querySelectorAll('.j-pergunta textarea').forEach((input) => {
-          input.value = respostas[input.name] || '';
+        document.querySelectorAll('.j-pergunta textarea').forEach((input, idx) => {
+          const name = input.name || `q${idx + 1}`;
+          input.value = respostas[name] || '';
         });
       } catch (e) { console.warn('Falha ao carregar respostas:', e); }
       updateProgress();
     }
-
-    /* =========================
-       NAVEGAÇÃO
-    ==========================*/
+    // NAVEGAÇÃO
     const JORNADA_NAV = {
       routes: {
         intro: "sec-intro",
@@ -937,7 +693,6 @@
       renderFromHash: function() {
         const raw = (location.hash || "").replace(/^#/, "");
         if (!raw) return this.goIntro(false);
-
         const [route, param] = raw.split(":");
         switch (route) {
           case this.routes.intro: activateJornada(); return renderIntro();
@@ -955,7 +710,7 @@
         if (replaceOnly) location.replace(url); else window.location.href = url;
       },
       nextBlock: function(currIndex) {
-        if (currIndex < JORNADA_BLOCKS.length - 1) return this.goPerguntas(currIndex + 1);
+        if (currIndex < window.JORNADA_BLOCKS.length - 1) return this.goPerguntas(currIndex + 1);
         return this.goFinal();
       },
       prevBlock: function(currIndex) {
@@ -968,7 +723,6 @@
         const nav = a.getAttribute("data-nav");
         if (!nav) return;
         e.preventDefault();
-
         switch (nav) {
           case "home": return this.goHome();
           case "intro": return this.goIntro();
@@ -981,17 +735,13 @@
       init: function() {
         window.addEventListener("hashchange", () => this.renderFromHash());
         document.addEventListener("click", (e) => this.onClick(e));
-        this.renderFromHash(); // primeira carga
+        this.renderFromHash();
       }
     };
     window.JORNADA_NAV = JORNADA_NAV;
-
     function activateJornada() { document.body.classList.add('jornada-active'); }
     function deactivateJornada() { document.body.classList.remove('jornada-active'); }
-
-    /* =========================
-       ROTEAMENTO, RENDER E CONTROLE
-    ==========================*/
+    // ROTEAMENTO, RENDER E CONTROLE
     function updateCanvasBackground(sectionId) {
       JORNADA_PAPER.set(sectionId === 'sec-wizard' ? 'h' : 'v');
     }
@@ -1007,7 +757,7 @@
         loadDynamicBlocks();
         setTimeout(() => {
           updateProgress();
-          const perguntas = document.querySelectorAll('.j-pergunta textarea');
+          const perguntas = document.querySelectorAll('.j-pergunta');
           console.log('Perguntas encontradas no DOM após loadDynamicBlocks:', perguntas.length);
           if (perguntas.length) {
             const firstBloco = document.querySelector('.j-bloco');
@@ -1015,18 +765,16 @@
               firstBloco.style.display = 'block';
               console.log('Primeiro bloco ativado:', firstBloco);
             }
-            console.log('Primeira pergunta ativa:', perguntas[0].parentElement);
-            perguntas[0].parentElement.classList.add('active');
-            JORNADA_TYPE.run(perguntas[0].parentElement, { selector: '.pergunta-enunciado', speed: 40 });
-            JORNADA_MICRO.attach(perguntas[0]);
-            perguntas[0].focus();
+            console.log('Primeira pergunta ativa:', perguntas[0]);
+            perguntas[0].classList.add('active');
+            JORNADA_TYPE.run(perguntas[0], { selector: '.pergunta-enunciado', speed: 40 });
+            perguntas[0].querySelector('textarea').focus();
           } else {
-            console.error('Nenhuma pergunta encontrada em sec-wizard após loadDynamicBlocks! Verifique JORNADA_BLOCKS:', JORNADA_BLOCKS);
+            console.error('Nenhuma pergunta encontrada em sec-wizard após loadDynamicBlocks! Verifique JORNADA_BLOCKS:', window.JORNADA_BLOCKS);
           }
         }, 100);
       }
     }
-
     function loadDynamicBlocks() {
       const content = document.getElementById('jornada-conteudo');
       if (!content) {
@@ -1035,18 +783,468 @@
       }
       const respostas = JSTATE.get('respostas', {});
       let blocoIdx = parseInt(sessionStorage.getItem('jornada.block') || '0', 10) || 0;
-      if (blocoIdx >= JORNADA_BLOCKS.length) blocoIdx = JORNADA_BLOCKS.length - 1;
+      if (blocoIdx >= window.JORNADA_BLOCKS.length) blocoIdx = window.JORNADA_BLOCKS.length - 1;
       content.innerHTML = '';
-      JORNADA_BLOCKS.forEach((block, idx) => {
+      window.JORNADA_BLOCKS.forEach((block, idx) => {
         const bloco = document.createElement('section');
         bloco.className = 'j-bloco';
         bloco.dataset.bloco = idx;
         bloco.dataset.video = block.video_after || '';
         bloco.style.display = idx === blocoIdx ? 'block' : 'none';
-        const html = `
-          <h2 class="text-xl md:text-2xl font-semibold mb-3" data-i18n="questions.title">${block.title}</h2>
-          <form id="form-perguntas-${idx}" class="grid gap-3">
-            ${block.questions.map(q => `
-              <label class="grid gap-1">
-                <span class="pergunta-enunciado font-medium" data-i18n="questions.title">${q.label}</span>
-                <textarea name="${q.id}" class="px-
+        JORNADA_QA.mount('jornada-conteudo', block.questions, {
+          onBack: () => {
+            if (idx > 0) {
+              blocoIdx--;
+              sessionStorage.setItem('jornada.block', String(blocoIdx));
+              loadDynamicBlocks();
+            } else {
+              JORNADA_NAV.goIntro();
+            }
+          },
+          onFinish: () => {
+            if (idx < window.JORNADA_BLOCKS.length - 1) {
+              blocoIdx++;
+              sessionStorage.setItem('jornada.block', String(blocoIdx));
+              playTransition(block.video_after, () => loadDynamicBlocks());
+            } else {
+              JORNADA_NAV.goFinal();
+            }
+          }
+        });
+        content.appendChild(bloco);
+        console.log(`Bloco ${idx} criado com ${block.questions.length} perguntas`);
+      });
+      const firstBloco = content.querySelector('.j-bloco');
+      if (firstBloco) {
+        loadAnswers();
+      } else {
+        console.error('Nenhum bloco criado após loadDynamicBlocks!');
+      }
+      console.log('Blocos carregados com sucesso!');
+    }
+    const JC = (window.JC = window.JC || {});
+    const state = {
+      blocoIndex: parseInt(sessionStorage.getItem('jornada.block') || '0', 10) || 0,
+      perguntaIndex: 0,
+      respostas: JSTATE.get('respostas', {}),
+    };
+    const S = {
+      root: () => document.getElementById('jornada-canvas'),
+      blocos: () => Array.from(document.querySelectorAll('.j-bloco,[data-bloco]')),
+      blocoAtivo: () => S.blocos()[state.blocoIndex],
+      perguntasDo: (blocoEl) => Array.from(blocoEl.querySelectorAll('.j-pergunta,[data-pergunta]')),
+      btnPrev: () => document.getElementById('btnVoltar') || document.querySelector('[data-action="prev"]'),
+      btnNext: () => document.getElementById('btnProxima') || document.querySelector('[data-action="next"]'),
+      btnStart: () => document.getElementById('btnIniciar') || document.querySelector('[data-action="start"]'),
+      meta: () => document.getElementById('j-meta'),
+      progressFill: () => document.querySelector('.j-progress__fill'),
+      overlay: () => document.getElementById('videoOverlay'),
+      video: () => document.getElementById('videoTransicao'),
+      skip: () => document.getElementById('skipVideo'),
+    };
+    const U = {
+      show(el, disp = 'block') { if (el) el.style.display = disp; },
+      hide(el) { if (el) el.style.display = 'none'; },
+      clamp(n, a, b) { return Math.max(a, Math.min(b, n)); },
+      key(b, q) { return `b${b}-q${q}`; },
+      getAnswerEl(qEl) { return qEl?.querySelector?.('textarea, input[type="text"], input[type="email"], input[type="number"], input[type="search"]') || null; },
+      getVal(el) { return (el && (el.value ?? '')).trim(); },
+      setProgress(cur, total) {
+        const pct = total ? Math.round((cur / total) * 100) : 0;
+        const bar = S.progressFill();
+        const meta = S.meta();
+        if (bar) bar.style.width = pct + '%';
+        if (meta) meta.innerHTML = `<b>${cur}</b> / ${total} (${pct}%)`;
+      },
+      analiseSentiment(texto) {
+        const textoNormalizado = texto.toLowerCase().split(/\s+/);
+        let posCount = 0, negCount = 0;
+        textoNormalizado.forEach(word => {
+          if (window.JORNADA_QA.positiveWords.includes(word)) posCount++;
+          if (window.JORNADA_QA.negativeWords.includes(word)) negCount++;
+        });
+        return posCount > negCount ? "alegre" : (negCount > posCount ? "sofrida" : "neutra");
+      }
+    };
+    function saveCurrentAnswer() {
+      const bloco = S.blocoAtivo();
+      if (!bloco) return;
+      const perguntas = S.perguntasDo(bloco);
+      const qEl = perguntas[state.perguntaIndex];
+      if (!qEl) return;
+      const input = U.getAnswerEl(qEl);
+      if (input) {
+        const k = U.key(state.blocoIndex, state.perguntaIndex);
+        state.respostas[k] = U.getVal(input);
+        JSTATE.set('respostas', state.respostas);
+        QUESTIONS.setAnswer(k, U.getVal(input));
+      }
+    }
+    function applyPergaminhoByRoute() {
+      const route = (location.hash || '#sec-intro').slice(1);
+      console.log('[JORNADA_CONTROLLER] Aplicando pergaminho por rota:', route);
+      JORNADA_PAPER.set(route === 'sec-wizard' ? 'h' : 'v');
+    }
+    function applyPergaminhoByBloco(blocoEl) {
+      if (!blocoEl) {
+        console.warn('Bloco não encontrado para aplicar pergaminho');
+        return;
+      }
+      let modo = 'h';
+      if (blocoEl.hasAttribute('data-pergaminho-h')) modo = 'h';
+      else if (blocoEl.hasAttribute('data-pergaminho-v')) modo = 'v';
+      else modo = blocoEl.getAttribute('data-pergaminho') || 'h';
+      console.log('[JORNADA_CONTROLLER] Aplicando pergaminho para bloco:', modo, blocoEl);
+      JORNADA_PAPER.set(modo);
+    }
+    function render() {
+      const root = S.root();
+      if (!root) {
+        console.warn('Root #jornada-canvas não encontrado');
+        return;
+      }
+      U.show(root, 'block');
+      const blocos = S.blocos();
+      if (!blocos.length) {
+        console.error('Nenhum bloco encontrado após loadDynamicBlocks!');
+        return;
+      }
+      blocos.forEach(U.hide);
+      const bloco = S.blocoAtivo();
+      if (bloco) U.show(bloco);
+      else {
+        console.error('Bloco ativo não encontrado no índice:', state.blocoIndex);
+        return;
+      }
+      const perguntas = S.perguntasDo(bloco);
+      if (!perguntas.length) {
+        console.error('Nenhuma pergunta encontrada no bloco ativo:', bloco);
+        return;
+      }
+      perguntas.forEach(q => q.classList.remove('active'));
+      state.perguntaIndex = U.clamp(state.perguntaIndex, 0, Math.max(0, perguntas.length - 1));
+      const atual = perguntas[state.perguntaIndex];
+      if (atual) {
+        atual.classList.add('active');
+        console.log('Exibindo pergunta:', state.perguntaIndex + 1, 'de', perguntas.length);
+        const input = U.getAnswerEl(atual);
+        if (input) {
+          input.removeAttribute?.('hidden');
+          input.style.display = 'block';
+          input.style.visibility = 'visible';
+          try { input.focus({ preventScroll: true }); } catch (e) { console.warn('Erro ao focar input:', e); }
+        }
+      } else {
+        console.error('Pergunta atual não encontrada no índice:', state.perguntaIndex);
+      }
+      runTyping(atual);
+      applyPergaminhoByBloco(bloco);
+      U.setProgress(state.perguntaIndex + 1, perguntas.length);
+      const prev = S.btnPrev();
+      const next = S.btnNext();
+      if (prev) prev.disabled = (state.perguntaIndex === 0);
+      if (next) {
+        const ultimaPergunta = state.perguntaIndex === perguntas.length - 1;
+        next.textContent = ultimaPergunta ? 'Finalizar' : 'Próxima';
+        next.disabled = !U.getVal(UI.qs(`#ans-${state.perguntaIndex}`));
+      }
+    }
+    function goNext() {
+      const bloco = S.blocoAtivo();
+      const perguntas = S.perguntasDo(bloco);
+      saveCurrentAnswer();
+      if (state.perguntaIndex < perguntas.length - 1) {
+        state.perguntaIndex++;
+        sessionStorage.setItem('jornada.step', String(state.perguntaIndex));
+        render();
+        return;
+      }
+      JORNADA_NAV.nextBlock(state.blocoIndex);
+    }
+    function goPrev() {
+      if (state.perguntaIndex > 0) {
+        state.perguntaIndex--;
+        sessionStorage.setItem('jornada.step', String(state.perguntaIndex));
+        render();
+      } else {
+        JORNADA_NAV.prevBlock(state.blocoIndex);
+      }
+    }
+    function debounce(fn, ms) {
+      let timeout;
+      return (...args) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => fn(...args), ms);
+      };
+    }
+    function startJourney() {
+      const senhaInput = document.getElementById('senha');
+      if (!senhaInput) {
+        console.error('Campo senha não encontrado!');
+        UI.toast('Erro: Campo de senha não carregou. Recarregue a página.');
+        return;
+      }
+      const senha = senhaInput.value.trim().toLowerCase();
+      const senhasValidas = ['iniciar', 'olho magico', 'olho mágico'];
+      if (senhasValidas.includes(senha)) {
+        JSTATE.set('auth', 'ok');
+        JORNADA_NAV.goIntro();
+        console.log('Autenticação bem-sucedida, exibindo introdução');
+      } else {
+        UI.toast('Senha incorreta. Tente novamente.');
+        document.getElementById('authError').classList.remove('hidden');
+      }
+    }
+    function playTransition(src, onEnd) {
+      const overlay = S.overlay();
+      const video = S.video();
+      const skip = S.skip();
+      if (!overlay || !video || !src) {
+        console.warn('Overlay, vídeo ou src não disponível:', { overlay, video, src });
+        UI.toast('Vídeo não disponível. Continuando...');
+        onEnd && onEnd();
+        return;
+      }
+      console.log('Tentando carregar vídeo:', src);
+      try { video.pause(); video.removeAttribute('src'); video.load(); } catch {}
+      video.src = src;
+      overlay.classList.remove('hidden');
+      const cleanup = () => {
+        try { video.pause(); } catch {}
+        overlay.classList.add('hidden');
+        try { video.removeAttribute('src'); video.load(); } catch {}
+        onEnd && onEnd();
+      };
+      video.onended = cleanup;
+      video.onerror = () => {
+        console.warn('Vídeo não carregou:', src);
+        UI.toast('Vídeo não disponível. Continuando...');
+        cleanup();
+      };
+      if (skip) skip.onclick = cleanup;
+      try {
+        video.muted = true;
+        const p = video.play();
+        if (p && p.catch) p.catch(() => {});
+      } catch {}
+    }
+    function finalize() {
+      saveCurrentAnswer();
+      console.log('[JORNADA] Finalizado. Respostas:', state.respostas);
+      const payload = { respostas: state.respostas, meta: { quando: new Date().toISOString() } };
+      JORNADA_CORE.baixarArquivos(payload).then(blob => {
+        if (blob) {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `Jornada-Essencial_${stamp()}.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+        }
+        JSTATE.clearAll();
+        sessionStorage.removeItem('jornada.step');
+        sessionStorage.removeItem('jornada.block');
+        UI.toast('Jornada concluída! Arquivo gerado localmente.');
+        JORNADA_NAV.goHome();
+      }).catch(err => {
+        UI.toast('Não foi possível gerar o PDF agora. Tente novamente.');
+        console.error(err);
+      });
+    }
+    function handleInput(textarea) {
+      console.log('Input detectado em:', textarea.placeholder);
+      const score = analyzeSentiment(textarea.value);
+      JORNADA_CHAMA.updateChama(score);
+      saveAnswers();
+      updateProgress();
+      const qIdx = parseInt(textarea.id.replace('ans-', ''), 10);
+      const btnAvancar = document.getElementById(`btnAvancar-${qIdx}`);
+      if (btnAvancar) btnAvancar.disabled = !textarea.value.trim();
+    }
+    function toggleSenha() {
+      const input = document.getElementById('senha');
+      if (input) {
+        input.type = input.type === 'password' ? 'text' : 'password';
+        console.log('Toggle senha para:', input.type);
+      } else {
+        console.error('Campo senha não encontrado!');
+      }
+    }
+    function stamp() {
+      const d = new Date(), p = n => String(n).padStart(2,'0');
+      return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}_${p(d.getHours())}-${p(d.getMinutes())}-${p(d.getSeconds())}`;
+    }
+    // Inicialização
+    window.JORNADA_RENDER = window.JORNADA_RENDER || {};
+    JC.init = function initJornada() {
+      console.log('Inicializando Jornada...');
+      const root = S.root();
+      if (!root) {
+        console.error('Root #jornada-canvas não encontrado!');
+        UI.toast('Erro: Canvas não carregado. Recarregue a página.');
+        return;
+      }
+      applyPergaminhoByRoute();
+      const startBtn = S.btnStart();
+      if (startBtn) {
+        startBtn.addEventListener('click', debounce(startJourney, 300));
+        console.log('Botão Iniciar inicializado');
+      } else {
+        console.error('Botão Iniciar não encontrado!');
+      }
+      const chkTermo = document.getElementById('chkTermo');
+      const btnIniciar = document.getElementById('btnIniciar');
+      if (chkTermo && btnIniciar) {
+        const toggleStart = () => { btnIniciar.disabled = !chkTermo.checked; };
+        toggleStart();
+        chkTermo.addEventListener('change', toggleStart);
+      } else {
+        console.error('Checkbox ou botão Iniciar não encontrados:', { chkTermo, btnIniciar });
+      }
+      const btnEntrar = document.getElementById('btnEntrar');
+      if (btnEntrar) btnEntrar.addEventListener('click', debounce(startJourney, 300));
+      JORNADA_NAV.init();
+      try {
+        const stash = JSTATE.get('respostas', {});
+        if (stash) state.respostas = stash;
+        const auth = JSTATE.get('auth', '');
+        if (auth !== 'ok') JORNADA_NAV.goIntro(false);
+        else {
+          state.blocoIndex = parseInt(sessionStorage.getItem('jornada.block') || '0', 10) || 0;
+          JORNADA_NAV.goPerguntas(state.blocoIndex);
+        }
+      } catch (e) {
+        console.error('Erro ao inicializar estado:', e);
+      }
+      render();
+    };
+    const TAG = '[BOOT]';
+    const log = (...a) => console.log(TAG, ...a);
+    const warn = (...a) => console.warn(TAG, ...a);
+    const error = (...a) => console.error(TAG, ...a);
+    function routeFromHash() {
+      return (location.hash || '#sec-intro').slice(1);
+    }
+    function dumpScriptsOnce() {
+      if (dumpScriptsOnce._done) return;
+      dumpScriptsOnce._done = true;
+      try {
+        const items = Array.from(document.scripts || []).map(s => ({
+          defer: !!s.defer,
+          src: s.src || '(inline)',
+        }));
+        log('scripts carregados (ordem):');
+        console.table(items);
+      } catch {}
+    }
+    function boot() {
+      dumpScriptsOnce();
+      const route = routeFromHash();
+      log('tentando iniciar • rota:', route);
+      try { document.body.classList.add('jornada-active'); } catch {}
+      try {
+        if (route === 'sec-intro') {
+          log('→ renderIntro()');
+          renderIntro();
+        } else if (route === 'sec-wizard') {
+          log('→ renderPerguntas(0)');
+          renderPerguntas(0);
+        } else if (route === 'sec-final') {
+          log('→ renderFinal()');
+          renderFinal();
+        } else {
+          log('→ rota desconhecida, caindo na intro');
+          renderIntro();
+        }
+      } catch (e) {
+        error('falha ao chamar renderer:', e);
+        UI.toast('Erro ao renderizar página. Recarregue.');
+      }
+      applyPergaminhoByRoute();
+      setTimeout(() => {
+        if (window.JC?.init) {
+          try {
+            log('acionando JC.init() (reforço)');
+            window.JC.init();
+          } catch (e) {
+            warn('falha ao acionar JC.init():', e);
+          }
+        }
+      }, 200);
+      log('inicialização concluída.');
+    }
+    function startWhenReady() {
+      let tries = 0;
+      const maxTries = 60;
+      const t = setInterval(() => {
+        if (boot()) { clearInterval(t); return; }
+        if (++tries > maxTries) {
+          clearInterval(t);
+          error('desisti de iniciar: inicialização não completou a tempo.');
+          if (window.JC?.init) {
+            console.log('Tentando inicialização de emergência com JC.init...');
+            window.JC.init();
+          }
+        }
+      }, 100);
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', startWhenReady);
+    } else {
+      startWhenReady();
+    }
+    window.addEventListener('load', () => {
+      if (!window.JC._initialized && window.JC?.init) {
+        console.log('Inicialização final no load...');
+        window.JC.init();
+        window.JC._initialized = true;
+      }
+    });
+    function renderIntro() {
+      console.log('[JORNADA_RENDER] Renderizando intro');
+      const section = document.getElementById('sec-intro');
+      if (section) {
+        section.classList.remove('hidden');
+        JORNADA_PAPER.set('v');
+      }
+    }
+    function renderPerguntas(index = 0) {
+      console.log('[JORNADA_RENDER] Renderizando perguntas, índice:', index);
+      const section = document.getElementById('sec-wizard');
+      if (section) {
+        section.classList.remove('hidden');
+        JORNADA_PAPER.set('h');
+        loadDynamicBlocks();
+        const perguntas = document.querySelectorAll('.j-pergunta');
+        if (perguntas.length > index) {
+          perguntas.forEach(p => p.classList.remove('active'));
+          perguntas[index].classList.add('active');
+          JORNADA_TYPE.run(perguntas[index], { selector: '.pergunta-enunciado', speed: 40 });
+          const input = perguntas[index].querySelector('textarea');
+          if (input) input.focus();
+          UI.setPergunta(index, window.JORNADA_BLOCKS[state.blocoIndex].questions.length, window.JORNADA_BLOCKS[state.blocoIndex].questions);
+        } else {
+          console.warn('Índice de pergunta fora do alcance:', index);
+        }
+      }
+    }
+    function renderFinal() {
+      console.log('[JORNADA_RENDER] Renderizando final');
+      const section = document.getElementById('sec-final');
+      if (section) {
+        section.classList.remove('hidden');
+        JORNADA_PAPER.set('v');
+        playTransition(window.JORNADA_FINAL_VIDEO);
+      }
+    }
+    window.JORNADA_RENDER.renderIntro = renderIntro;
+    window.JORNADA_RENDER.renderPerguntas = renderPerguntas;
+    window.JORNADA_RENDER.renderFinal = renderFinal;
+    window.showSection = showSection;
+    window.loadDynamicBlocks = loadDynamicBlocks;
+    window.JC = JC;
+  </script>
+</body>
+</html>
