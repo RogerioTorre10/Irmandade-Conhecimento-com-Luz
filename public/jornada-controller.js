@@ -15,7 +15,7 @@
     perguntasDo: (blocoEl) => Array.from(blocoEl.querySelectorAll('.j-pergunta,[data-pergunta]')),
     btnPrev: () => document.getElementById('btnPrevPerguntas') || document.querySelector('[data-action="prev"]'),
     btnNext: () => document.getElementById('btnNextPerguntas') || document.querySelector('[data-action="next"]'),
-    btnStart: () => document.getElementById('btnIniciar') || document.querySelector('[data-action="start"]'),
+    btnStart: () => document.querySelector('[data-action="start"]'), // Substitui document.getElementById('btnIniciar'),
     meta: () => document.getElementById('j-meta'),
     progressFill: () => document.querySelector('.j-progress__fill'),
     overlay: () => document.getElementById('videoOverlay'),
