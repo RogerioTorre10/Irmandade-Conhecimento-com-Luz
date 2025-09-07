@@ -202,6 +202,7 @@
     .j-pergunta.active {
       display: block !important; /* Garantir que a pergunta ativa seja visível */
       opacity: 1 !important;
+      transition: opacity 0.3s ease; /* Suavizar aparição */
     }
     .pergunta-enunciado { font-family: "CardoBold", "MedievalSharp", Arial, sans-serif; font-weight:600; margin-bottom:8px; display:block; font-size: 20px; } /* Título maior */
     .j-pergunta textarea { font-family: "CardoBold", "MedievalSharp", Arial, sans-serif; width:100%; padding:12px; border-radius:8px; border:1px solid #d1d5db; background:rgba(255,255,255,.8); resize:vertical; min-height:100px; font-size: 16px }
@@ -221,10 +222,23 @@
     .hidden { display:none!important }
 
     /* Forçar visibilidade temporária */
+    #section-perguntas {
+      position: relative;
+      min-height: 85vh;
+      overflow: visible !important; /* Garantir que nada fique oculto */
+    }
+
     #section-perguntas .j-bloco,
     #section-perguntas .j-pergunta {
       opacity: 1 !important;
       visibility: visible !important;
+      position: relative;
+      z-index: 60; /* Acima de outros elementos */
+    }
+
+    #perguntas-container {
+      position: relative;
+      z-index: 61; /* Garantir que fique acima do fundo */
     }
 
     @media (max-width:600px) {
@@ -548,6 +562,7 @@
             }
             perguntas[0].classList.add('active');
             runTyping(perguntas[0]);
+            perguntas[0].querySelector('textarea').focus(); // Forçar foco
           } else {
             console.error('Nenhuma pergunta encontrada em section-perguntas após loadDynamicBlocks!');
           }
@@ -666,9 +681,14 @@
       } else {
         // Fim do bloco, verificar vídeo de transição
         const videoSrc = currentBloco ? currentBloco.dataset.video || '' : '';
+        const transitionMsg = document.createElement('p');
+        transitionMsg.textContent = 'Transição em andamento...';
+        transitionMsg.style.cssText = 'color: #fff; background: #6b21a8; padding: 10px; border-radius: 5px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;';
+        document.querySelector('#section-perguntas').appendChild(transitionMsg);
         if (videoSrc && currentBlocoIndex + 1 < blocos.length) {
           // Tocar vídeo antes de avançar para o próximo bloco
           playTransition(videoSrc, () => {
+            transitionMsg.remove();
             blocos.forEach(b => b.style.display = 'none');
             const nextBloco = blocos[currentBlocoIndex + 1];
             nextBloco.style.display = 'block';
@@ -684,10 +704,12 @@
         } else {
           // Último bloco ou sem vídeo, ir para a seção final
           if (currentBlocoIndex + 1 >= blocos.length) {
+            transitionMsg.remove();
             showSection('section-final');
             updateProgress();
           } else {
             // Avançar para o próximo bloco sem vídeo
+            transitionMsg.remove();
             blocos.forEach(b => b.style.display = 'none');
             const nextBloco = blocos[currentBlocoIndex + 1];
             nextBloco.style.display = 'block';
@@ -832,92 +854,4 @@
     async function boot() {
       document.body.classList.add('jornada-active');
       const route = (location.hash || '#intro').slice(1);
-      const canvas = document.getElementById('jornada-canvas');
-      const progressBadge = document.querySelector('.progress-badge');
-      const progressBar = document.querySelector('.progress-bar');
-      const jProgress = document.querySelector('.j-progress');
-      const footerActions = document.querySelector('.footer-actions');
-
-      if (canvas) {
-        if (route === 'perguntas') {
-          showSection('section-perguntas'); // loadDynamicBlocks() já é chamado aqui
-          [progressBadge, progressBar, jProgress, footerActions].forEach(el => el?.classList.remove('hidden'));
-        } else if (route === 'final') {
-          showSection('section-final');
-          [progressBadge, progressBar, jProgress].forEach(el => el?.classList.remove('hidden'));
-        } else {
-          showSection('section-intro');
-        }
-      }
-      runTyping(document);
-      return true;
-    }
-
-    // Inicialização
-    document.addEventListener('DOMContentLoaded', () => {
-      // listeners explícitos
-      const btnStart = document.querySelector('[data-action="start"]');
-      if (btnStart) btnStart.addEventListener('click', e => { e.preventDefault(); startJourney(); });
-
-      // inicialização padrão
-      runTyping(document);
-      initJornada();
-
-      boot().then(() => {
-        const visible = document.querySelector('.j-section:not(.hidden)');
-        if (visible) JORNADA_CHAMA.ensureHeroFlame(visible.id);
-      });
-
-      // observar mudanças de conteúdo
-      const target = document.getElementById('jornada-conteudo');
-      if (target) {
-        const obs = new MutationObserver(muts => {
-          muts.forEach(m => {
-            runTyping(m.target);
-            if (m.target.id === 'perguntas-container') updateProgress();
-          });
-        });
-        obs.observe(target, { childList: true, subtree: true });
-      }
-
-      // intensidade default da chama-bola (se faltar)
-      const bola = document.getElementById('chama-bola');
-      if (bola && !bola.hasAttribute('data-intensidade')) {
-        bola.setAttribute('data-intensidade', 'media');
-      }
-
-      // micro-jitter (flamejar orgânico)
-      document.querySelectorAll('#chama-intro, #chama-perguntas, #chama-final, #chama-bola').forEach(f => {
-        f.style.setProperty('--jitter', `${(Math.random() * 2 - 1).toFixed(2)}px`);
-        f.querySelectorAll('.lingua').forEach((n, i) => {
-          n.style.animationDelay = `${i * 0.07 + Math.random() * 0.08}s`;
-        });
-      });
-    });
-
-    // BRIDGE GLOBAL para scripts externos
-    window.JC = window.JC || {};
-    window.toggleSenha = toggleSenha;
-    window.startJourney = startJourney;
-    window.showSection = showSection;
-    window.JC.toggleSenha = toggleSenha;
-    window.JC.startJourney = startJourney;
-    window.JC.showSection = showSection;
-  </script>
-
-  <!-- Referências externas desativadas temporariamente -->
-  <!-- <script defer src="/config.js" onerror="console.error('Falha ao carregar config.js, usando fallback inline');"></script>
-  <script defer src="/jornada-utils.js" onerror="console.error('Falha ao carregar jornada-utils.js, usando fallback inline');"></script>
-  <script defer src="/jornada-core.js" onerror="console.error('Falha ao carregar jornada-core.js, usando fallback inline');"></script>
-  <script defer src="/jornada-auth.js" onerror="console.error('Falha ao carregar jornada-auth.js, usando fallback inline');"></script>
-  <script defer src="/jornada-chama.js" onerror="console.error('Falha ao carregar jornada-chama.js, usando fallback inline');"></script>
-  <script defer src="/jornada-paper-qa.js" onerror="console.error('Falha ao carregar jornada-paper-qa.js, usando fallback inline');"></script>
-  <script defer src="/jornada-typing.js" onerror="console.error('Falha ao carregar jornada-typing.js, usando fallback inline');"></script>
-  <script defer src="/jornada-controller.js" onerror="console.error('Falha ao carregar jornada-controller.js, usando fallback inline');"></script>
-  <script defer src="/jornada-render.js" onerror="console.error('Falha ao carregar jornada-render.js, usando fallback inline');"></script>
-  <script defer src="/jornada-bootstrap.js" onerror="console.error('Falha ao carregar jornada-bootstrap.js, usando fallback inline');"></script>
-  <script defer src="/jornada-micro.js" onerror="console.error('Falha ao carregar jornada-micro.js, usando fallback inline');"></script>
-  <script defer src="/i18n/i18n.js" onerror="console.error('Falha ao carregar i18n.js, usando fallback inline');"></script>
-  <script defer src="/api.js" onerror="console.error('Falha ao carregar api.js, usando fallback inline');"></script> -->
-</body>
-</html>
+      const canvas = document.getElementById('jornada
