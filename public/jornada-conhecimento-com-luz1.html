@@ -264,6 +264,14 @@
       POS: {'feliz':2,'alegria':2,'amor':3,'sucesso':2,'esperança':3,'paz':2,'fé':3,'gratidão':2,'vitória':3,'superação':3,'luz':2,'deus':3,'coragem':2,'força':2,'confiança':2,'propósito':3},
       NEG: {'triste':-2,'dor':-3,'raiva':-2,'medo':-2,'frustracao':-2,'frustração':-2,'decepcao':-2,'decepção':-2,'perda':-3,'culpa':-2,'ansiedade':-2,'solidao':-2,'solidão':-2,'desespero':-3,'cansaco':-2,'cansaço':-2,'fracasso':-2,'trauma':-3,'duvida':-2,'dúvida':-2}
     };
+    // Garantir que JORNADA_BLOCKS exista
+    window.JORNADA_BLOCKS = window.JORNADA_BLOCKS || [
+      { id: "b1", title: "Bloco 1 — Raízes", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 1}`) },
+      { id: "b2", title: "Bloco 2 — Caminho", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 11}`) },
+      { id: "b3", title: "Bloco 3 — Encontros", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 21}`) },
+      { id: "b4", title: "Bloco 4 — Virtudes", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 31}`) },
+      { id: "b5", title: "Bloco 5 — Síntese", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 41}`) }
+    ];
     const PERGUNTAS = [
       'Quem é você hoje?',
       'O que a Luz te pede agora?',
@@ -432,6 +440,10 @@
     const JORNADA_PAPER = {
       set: function(mode /* 'v' | 'h' */) {
         const root = document.getElementById('jornada-canvas');
+        if (!root) {
+          console.error('Root #jornada-canvas não encontrado!');
+          return;
+        }
         root.classList.remove("pergaminho-v", "pergaminho-h");
         if (mode === "v") {
           root.classList.add("pergaminho-v");
@@ -470,16 +482,16 @@
     // Questions
     const QUESTIONS = {
       BLOCS: window.JORNADA_BLOCKS || [
-        { id: "b1", title: "Bloco 1 — Raízes", items: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 1}`) },
-        { id: "b2", title: "Bloco 2 — Caminho", items: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 11}`) },
-        { id: "b3", title: "Bloco 3 — Encontros", items: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 21}`) },
-        { id: "b4", title: "Bloco 4 — Virtudes", items: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 31}`) },
-        { id: "b5", title: "Bloco 5 — Síntese", items: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 41}`) }
+        { id: "b1", title: "Bloco 1 — Raízes", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 1}`) },
+        { id: "b2", title: "Bloco 2 — Caminho", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 11}`) },
+        { id: "b3", title: "Bloco 3 — Encontros", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 21}`) },
+        { id: "b4", title: "Bloco 4 — Virtudes", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 31}`) },
+        { id: "b5", title: "Bloco 5 — Síntese", questions: new Array(10).fill(0).map((_, i) => `Pergunta ${i + 41}`) }
       ],
       ACOLHIMENTO: { id: "acolhimento", title: "Acolhimento do Lumen", items: ["Deixe aqui uma palavra ao seu Eu do Futuro."] },
       totalBlocks: function() { return this.BLOCS.length; },
       totalQuestions: function() {
-        return this.BLOCS.reduce((n, b) => n + b.items.length, 0) + this.ACOLHIMENTO.items.length;
+        return this.BLOCS.reduce((n, b) => n + b.questions.length, 0) + this.ACOLHIMENTO.items.length;
       },
       getBlock: function(i) { return this.BLOCS[i] || null; },
       getAcolhimento: function() { return this.ACOLHIMENTO; },
@@ -496,7 +508,7 @@
         const all = this.getAnswerMap();
         let answered = 0;
         this.BLOCS.forEach((b, bi) => {
-          b.items.forEach((_, qi) => {
+          b.questions.forEach((_, qi) => {
             if ((all[this.blockKey(bi, qi)] || "").trim().length > 0) answered++;
           });
         });
@@ -733,7 +745,7 @@
         }
       },
       init: function() {
-        window.addEventListener("hashchange", () => this.renderFromHash());
+        window.addEventListener("hashchange", () => this.renderFromHash(), { once: true });
         document.addEventListener("click", (e) => this.onClick(e));
         this.renderFromHash();
       }
@@ -785,12 +797,21 @@
       let blocoIdx = parseInt(sessionStorage.getItem('jornada.block') || '0', 10) || 0;
       if (blocoIdx >= window.JORNADA_BLOCKS.length) blocoIdx = window.JORNADA_BLOCKS.length - 1;
       content.innerHTML = '';
+      if (!window.JORNADA_BLOCKS || window.JORNADA_BLOCKS.length === 0) {
+        console.error('JORNADA_BLOCKS não está definido ou está vazio!');
+        UI.toast('Erro: Blocos da jornada não carregados. Recarregue ou verifique os dados.');
+        return;
+      }
       window.JORNADA_BLOCKS.forEach((block, idx) => {
         const bloco = document.createElement('section');
         bloco.className = 'j-bloco';
         bloco.dataset.bloco = idx;
         bloco.dataset.video = block.video_after || '';
         bloco.style.display = idx === blocoIdx ? 'block' : 'none';
+        if (!block.questions || block.questions.length === 0) {
+          console.warn(`Bloco ${block.title} não tem perguntas definidas!`, block);
+          block.questions = ['Pergunta padrão']; // Fallback temporário
+        }
         JORNADA_QA.mount('jornada-conteudo', block.questions, {
           onBack: () => {
             if (idx > 0) {
@@ -907,6 +928,7 @@
       const blocos = S.blocos();
       if (!blocos.length) {
         console.error('Nenhum bloco encontrado após loadDynamicBlocks!');
+        UI.toast('Erro: Blocos da jornada não carregados. Verifique os dados.');
         return;
       }
       blocos.forEach(U.hide);
@@ -1164,10 +1186,11 @@
       }
       applyPergaminhoByRoute();
       setTimeout(() => {
-        if (window.JC?.init) {
+        if (window.JC?.init && !window.JC._initialized) {
           try {
             log('acionando JC.init() (reforço)');
             window.JC.init();
+            window.JC._initialized = true;
           } catch (e) {
             warn('falha ao acionar JC.init():', e);
           }
@@ -1179,13 +1202,17 @@
       let tries = 0;
       const maxTries = 60;
       const t = setInterval(() => {
-        if (boot()) { clearInterval(t); return; }
+        if (boot() || tries >= maxTries) {
+          clearInterval(t);
+          return;
+        }
         if (++tries > maxTries) {
           clearInterval(t);
           error('desisti de iniciar: inicialização não completou a tempo.');
-          if (window.JC?.init) {
+          if (window.JC?.init && !window.JC._initialized) {
             console.log('Tentando inicialização de emergência com JC.init...');
             window.JC.init();
+            window.JC._initialized = true;
           }
         }
       }, 100);
@@ -1208,6 +1235,8 @@
       if (section) {
         section.classList.remove('hidden');
         JORNADA_PAPER.set('v');
+      } else {
+        console.error('Seção #sec-intro não encontrada!');
       }
     }
     function renderPerguntas(index = 0) {
@@ -1228,6 +1257,8 @@
         } else {
           console.warn('Índice de pergunta fora do alcance:', index);
         }
+      } else {
+        console.error('Seção #sec-wizard não encontrada!');
       }
     }
     function renderFinal() {
@@ -1237,14 +1268,13 @@
         section.classList.remove('hidden');
         JORNADA_PAPER.set('v');
         playTransition(window.JORNADA_FINAL_VIDEO);
+      } else {
+        console.error('Seção #sec-final não encontrada!');
       }
     }
+    window.JORNADA_RENDER = window.JORNADA_RENDER || {};
     window.JORNADA_RENDER.renderIntro = renderIntro;
     window.JORNADA_RENDER.renderPerguntas = renderPerguntas;
     window.JORNADA_RENDER.renderFinal = renderFinal;
     window.showSection = showSection;
-    window.loadDynamicBlocks = loadDynamicBlocks;
-    window.JC = JC;
-  </script>
-</body>
-</html>
+    window.loadDynamicBlocks = load
