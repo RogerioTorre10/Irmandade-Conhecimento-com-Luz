@@ -1193,39 +1193,41 @@
         document.getElementById('authError').classList.remove('hidden');
       }
     }
-    function playTransition(src, onEnd) {
-      const overlay = S.overlay();
-      const video = S.video();
-      const skip = S.skip();
-      if (!overlay || !video || !src) {
-        console.warn('Overlay, vídeo ou src não disponível:', { overlay, video, src });
-        UI.toast('Vídeo não disponível. Continuando...');
-        onEnd && onEnd();
-        return;
-      }
-      console.log('Tentando carregar vídeo:', src);
-      try { video.pause(); video.removeAttribute('src'); video.load(); } catch {}
-      video.src = src;
-      overlay.classList.remove('hidden');
-      const cleanup = () => {
-        try { video.pause(); } catch {}
-        overlay.classList.add('hidden');
-        try { video.removeAttribute('src'); video.load(); } catch {}
-        onEnd && onEnd();
-      };
-      video.onended = cleanup;
-      video.onerror = () => {
-        console.warn('Vídeo não carregou:', src);
-        UI.toast('Vídeo não disponível. Continuando...');
-        cleanup();
-      };
-      if (skip) skip.onclick = cleanup;
-      try {
-        video.muted = true;
-        const p = video.play();
-        if (p && p.catch) p.catch(() => {});
-      } catch {}
+   <script>
+  function playTransition(src, onEnd) {
+    const overlay = document.getElementById('videoOverlay');
+    const video   = document.getElementById('videoTransicao');
+    const skip    = document.getElementById('skipVideo');
+
+    if (!overlay || !video || !src) {
+      console.warn('Overlay, vídeo ou src não disponível:', { overlay, video, src });
+      onEnd && onEnd();
+      return;
     }
+    try { video.pause(); video.removeAttribute('src'); video.load(); } catch {}
+
+    video.src = src;
+    overlay.classList.remove('hidden');
+
+    const cleanup = () => {
+      try { video.pause(); } catch {}
+      overlay.classList.add('hidden');
+      try { video.removeAttribute('src'); video.load(); } catch {}
+      onEnd && onEnd();
+    };
+
+    video.onended = cleanup;
+    video.onerror = () => { console.warn('Vídeo não carregou:', src); cleanup(); };
+    if (skip) skip.onclick = cleanup;
+
+    try {
+      video.muted = true;
+      const p = video.play();
+      if (p && p.catch) p.catch(() => {});
+    } catch {}
+  }
+</script>
+
     function finalize() {
       saveCurrentAnswer();
       console.log('[JORNADA] Finalizado. Respostas:', state.respostas);
