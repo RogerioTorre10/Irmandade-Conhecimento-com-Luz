@@ -871,6 +871,59 @@
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', boot);
     } else {
-      boot();
+      boot();        
     }
-</script>
+       window.addEventListener('load', () => {
+      if (!window.JC._initialized && window.JC?.init) {
+        console.log('Inicialização final no load...');
+        window.JC.init();
+        window.JC._initialized = true;
+      }
+    });
+    function renderIntro() {
+      console.log('[JORNADA_RENDER] Renderizando intro');
+      const section = document.getElementById('sec-intro');
+      if (section) {
+        section.classList.remove('hidden');
+        JORNADA_PAPER.set('v');
+      }
+    }
+    function renderPerguntas(index = 0) {
+      console.log('[JORNADA_RENDER] Renderizando perguntas, índice:', index);
+      const section = document.getElementById('sec-wizard');
+      if (section) {
+        section.classList.remove('hidden');
+        JORNADA_PAPER.set('h');
+        loadDynamicBlocks();
+        const perguntas = document.querySelectorAll('.j-pergunta');
+        if (perguntas.length > index) {
+          perguntas.forEach(p => p.classList.remove('active'));
+          perguntas[index].classList.add('active');
+          JORNADA_TYPE.run(perguntas[index], { selector: '.pergunta-enunciado', speed: 40 });
+          const input = perguntas[index].querySelector('textarea');
+          if (input) input.focus();
+          UI.setPergunta(index, window.JORNADA_BLOCKS[state.blocoIndex].questions.length, window.JORNADA_BLOCKS[state.blocoIndex].questions);
+        } else {
+          console.warn('Índice de pergunta fora do alcance:', index);
+        }
+      }
+    }
+    function renderFinal() {
+      console.log('[JORNADA_RENDER] Renderizando final');
+      const section = document.getElementById('sec-final');
+      if (section) {
+        section.classList.remove('hidden');
+        JORNADA_PAPER.set('v');
+        playTransition(window.JORNADA_FINAL_VIDEO);
+      }
+    }
+    window.JORNADA_RENDER.renderIntro = renderIntro;
+    window.JORNADA_RENDER.renderPerguntas = renderPerguntas;
+    window.JORNADA_RENDER.renderFinal = renderFinal;
+    window.showSection = showSection;
+    window.loadDynamicBlocks = loadDynamicBlocks;
+    window.JC = JC;
+  </script>
+</body>
+</html>
+
