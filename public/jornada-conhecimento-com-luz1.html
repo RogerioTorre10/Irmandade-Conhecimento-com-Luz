@@ -516,59 +516,75 @@
       updateCanvasBackground(sectionId);
       JORNADA_CHAMA.ensureHeroFlame(sectionId);
       if (sectionId === 'section-perguntas') {
-        updateProgress();
-        const perguntas = document.querySelectorAll('.j-pergunta');
-        if (perguntas.length) {
-          perguntas[0].classList.add('active');
-          runTyping(perguntas[0]);
-        } else {
-          console.error('Nenhuma pergunta encontrada em section-perguntas!');
-        }
+        loadDynamicBlocks(); // Carregar blocos
+        setTimeout(() => { // Aguardar DOM ser atualizado
+          updateProgress();
+          const perguntas = document.querySelectorAll('.j-pergunta');
+          if (perguntas.length) {
+            perguntas[0].classList.add('active');
+            runTyping(perguntas[0]);
+          } else {
+            console.error('Nenhuma pergunta encontrada em section-perguntas após loadDynamicBlocks!');
+          }
+        }, 0); // Atraso mínimo para forçar atualização do DOM
       }
     }
 
     function loadDynamicBlocks() {
       const content = document.getElementById('perguntas-container');
-      if (content && window.JORNADA_BLOCKS) {
-        content.innerHTML = '';
-        window.JORNADA_BLOCKS.forEach((block, idx) => {
-          const bloco = document.createElement('section');
-          bloco.className = 'j-bloco';
-          bloco.dataset.bloco = idx;
-          bloco.dataset.video = block.video_after || '';
-          bloco.style.display = 'none'; // Garantir que blocos começam escondidos
-          block.questions.forEach((q, qIdx) => {
-            const pergunta = document.createElement('div');
-            pergunta.className = 'j-pergunta';
-            pergunta.dataset.pergunta = qIdx;
-            pergunta.innerHTML = `
-              <label class="pergunta-enunciado" data-typing data-text="<b>Pergunta ${qIdx + 1}:</b> ${q.label}" data-speed="40" data-cursor="true"></label>
-              <textarea rows="4" class="input" placeholder="Digite sua resposta..." oninput="handleInput(this)"></textarea>
-            `;
-            bloco.appendChild(pergunta);
-          });
-          content.appendChild(bloco);
-        });
-        const firstBloco = content.querySelector('.j-bloco');
-        if (firstBloco) {
-          firstBloco.style.display = 'block';
-          const firstPergunta = firstBloco.querySelector('.j-pergunta');
-          if (firstPergunta) {
-            firstPergunta.classList.add('active');
-            runTyping(firstPergunta);
-            const firstTa = firstPergunta.querySelector('textarea');
-            if (firstTa) handleInput(firstTa);
-          } else {
-            console.error('Nenhuma primeira pergunta encontrada no primeiro bloco!');
-          }
-          loadAnswers();
-        } else {
-          console.error('Nenhum bloco encontrado após loadDynamicBlocks!');
-        }
-        console.log('Blocos carregados!');
-      } else {
-        console.error('Erro: #perguntas-container ou JORNADA_BLOCKS não encontrado!');
+      if (!content) {
+        console.error('Erro: #perguntas-container não encontrado no DOM!');
+        return;
       }
+      if (!window.JORNADA_BLOCKS || !Array.isArray(window.JORNADA_BLOCKS) || window.JORNADA_BLOCKS.length === 0) {
+        console.error('Erro: JORNADA_BLOCKS não definido, não é um array, ou está vazio!');
+        return;
+      }
+      console.log('Conteúdo de JORNADA_BLOCKS:', window.JORNADA_BLOCKS); // Log para depuração
+      content.innerHTML = '';
+      window.JORNADA_BLOCKS.forEach((block, idx) => {
+        if (!block.questions || !Array.isArray(block.questions)) {
+          console.warn(`Bloco ${idx} inválido: sem perguntas ou perguntas não é um array`);
+          return;
+        }
+        const bloco = document.createElement('section');
+        bloco.className = 'j-bloco';
+        bloco.dataset.bloco = idx;
+        bloco.dataset.video = block.video_after || '';
+        bloco.style.display = 'none'; // Garantir que blocos começam escondidos
+        block.questions.forEach((q, qIdx) => {
+          if (!q.label) {
+            console.warn(`Pergunta ${qIdx} no bloco ${idx} inválida: sem label`);
+            return;
+          }
+          const pergunta = document.createElement('div');
+          pergunta.className = 'j-pergunta';
+          pergunta.dataset.pergunta = qIdx;
+          pergunta.innerHTML = `
+            <label class="pergunta-enunciado" data-typing data-text="<b>Pergunta ${qIdx + 1}:</b> ${q.label}" data-speed="40" data-cursor="true"></label>
+            <textarea rows="4" class="input" placeholder="Digite sua resposta..." oninput="handleInput(this)"></textarea>
+          `;
+          bloco.appendChild(pergunta);
+        });
+        content.appendChild(bloco);
+      });
+      const firstBloco = content.querySelector('.j-bloco');
+      if (firstBloco) {
+        firstBloco.style.display = 'block';
+        const firstPergunta = firstBloco.querySelector('.j-pergunta');
+        if (firstPergunta) {
+          firstPergunta.classList.add('active');
+          runTyping(firstPergunta);
+          const firstTa = firstPergunta.querySelector('textarea');
+          if (firstTa) handleInput(firstTa);
+        } else {
+          console.error('Nenhuma primeira pergunta encontrada no primeiro bloco!');
+        }
+        loadAnswers();
+      } else {
+        console.error('Nenhum bloco criado após loadDynamicBlocks!');
+      }
+      console.log('Blocos carregados com sucesso!');
     }
 
     function checkImage(url, fallbackUrl) {
@@ -709,13 +725,14 @@
         video.onended = cleanup;
         video.onerror = () => {
           console.warn('Vídeo não carregou:', src);
-          alert('Erro ao carregar vídeo de transição. Verifique o caminho ou conexão.');
-          cleanup();
+          alert('Erro ao carregar vídeo de transição. Verifique o caminho ou conexão. A transição prosseguirá.');
+          cleanup(); // Prosseguir mesmo com erro
         };
         if (skip) skip.onclick = cleanup;
         video.play().catch(err => {
           console.warn('Erro ao reproduzir vídeo:', err);
-          alert('O vídeo não pode ser reproduzido automaticamente. Clique em "Play" nos controles ou pule o vídeo.');
+          alert('O vídeo não pode ser reproduzido. A transição prosseguirá.');
+          cleanup(); // Prosseguir mesmo com erro
         });
       } else {
         console.warn('Vídeo ou overlay não encontrado para:', src);
@@ -742,22 +759,11 @@
       const senha = senhaInput.value || '';
       const senhasValidas = ['iniciar', 'olho magico', 'olho mágico'];
       if (senhasValidas.includes(senha.toLowerCase())) {
-        showSection('section-perguntas');
-        loadDynamicBlocks();
-        const perguntas = document.querySelectorAll('.j-pergunta');
-        if (perguntas.length) {
-          perguntas[0].classList.add('active');
-          runTyping(perguntas[0]);
-          const firstTa = perguntas[0].querySelector('textarea');
-          if (firstTa) handleInput(firstTa);
-        } else {
-          console.error('Nenhuma pergunta encontrada após loadDynamicBlocks!');
-        }
+        showSection('section-perguntas'); // loadDynamicBlocks() já é chamado aqui
         document.querySelector('.progress-badge')?.classList.remove('hidden');
         document.querySelector('.progress-bar')?.classList.remove('hidden');
         document.querySelector('.j-progress')?.classList.remove('hidden');
         document.querySelector('.footer-actions')?.classList.remove('hidden');
-        updateProgress();
         console.log('Jornada iniciada com sucesso!');
       } else {
         alert('Senha incorreta. Tente novamente.');
@@ -807,8 +813,7 @@
 
       if (canvas) {
         if (route === 'perguntas') {
-          showSection('section-perguntas');
-          loadDynamicBlocks();
+          showSection('section-perguntas'); // loadDynamicBlocks() já é chamado aqui
           [progressBadge, progressBar, jProgress, footerActions].forEach(el => el?.classList.remove('hidden'));
         } else if (route === 'final') {
           showSection('section-final');
