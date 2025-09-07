@@ -536,6 +536,7 @@
           bloco.className = 'j-bloco';
           bloco.dataset.bloco = idx;
           bloco.dataset.video = block.video_after || '';
+          bloco.style.display = 'none'; // Garantir que blocos começam escondidos
           block.questions.forEach((q, qIdx) => {
             const pergunta = document.createElement('div');
             pergunta.className = 'j-pergunta';
@@ -601,33 +602,61 @@
     function goNext() {
       const perguntas = document.querySelectorAll('.j-pergunta');
       const current = document.querySelector('.j-pergunta.active');
-      if (current) current.classList.remove('active');
-      const nextIndex = Array.from(perguntas).indexOf(current) + 1;
-      console.log('NextIndex:', nextIndex, 'Total perguntas:', perguntas.length); // Depuração
-      if (nextIndex < perguntas.length) {
-        perguntas[nextIndex].classList.add('active');
-        runTyping(perguntas[nextIndex]);
+      if (!current) {
+        console.error('Nenhuma pergunta ativa encontrada!');
+        return;
+      }
+      current.classList.remove('active');
+      const currentBloco = current.closest('.j-bloco');
+      const blocos = document.querySelectorAll('.j-bloco');
+      const currentBlocoIndex = Array.from(blocos).indexOf(currentBloco);
+      const perguntasNoBloco = currentBloco.querySelectorAll('.j-pergunta');
+      const currentPerguntaIndex = Array.from(perguntasNoBloco).indexOf(current);
+      console.log('CurrentBlocoIndex:', currentBlocoIndex, 'CurrentPerguntaIndex:', currentPerguntaIndex, 'Perguntas no bloco:', perguntasNoBloco.length);
+
+      if (currentPerguntaIndex + 1 < perguntasNoBloco.length) {
+        // Avançar para a próxima pergunta no mesmo bloco
+        const nextPergunta = perguntasNoBloco[currentPerguntaIndex + 1];
+        nextPergunta.classList.add('active');
+        runTyping(nextPergunta);
         updateProgress();
       } else {
-        const blocos = document.querySelectorAll('.j-bloco');
-        const currentBloco = current?.closest('.j-bloco');
-        const nextBlocoIndex = Array.from(blocos).indexOf(currentBloco) + 1;
-        console.log('NextBlocoIndex:', nextBlocoIndex, 'Total blocos:', blocos.length); // Depuração
-        if (nextBlocoIndex < blocos.length) {
-          blocos.forEach(b => b.style.display = 'none');
-          blocos[nextBlocoIndex].style.display = 'block';
-          const nextPergunta = blocos[nextBlocoIndex].querySelector('.j-pergunta');
-          if (nextPergunta) {
-            nextPergunta.classList.add('active');
-            runTyping(nextPergunta);
-          } else {
-            console.error('Nenhuma próxima pergunta encontrada no bloco seguinte!');
-          }
-          const videoSrc = currentBloco ? currentBloco.dataset.video || '' : '';
-          if (videoSrc) playTransition(videoSrc, () => {});
+        // Fim do bloco, verificar vídeo de transição
+        const videoSrc = currentBloco ? currentBloco.dataset.video || '' : '';
+        if (videoSrc && currentBlocoIndex + 1 < blocos.length) {
+          // Tocar vídeo antes de avançar para o próximo bloco
+          playTransition(videoSrc, () => {
+            blocos.forEach(b => b.style.display = 'none');
+            const nextBloco = blocos[currentBlocoIndex + 1];
+            nextBloco.style.display = 'block';
+            const nextPergunta = nextBloco.querySelector('.j-pergunta');
+            if (nextPergunta) {
+              nextPergunta.classList.add('active');
+              runTyping(nextPergunta);
+            } else {
+              console.error('Nenhuma pergunta encontrada no próximo bloco!');
+            }
+            updateProgress();
+          });
         } else {
-          showSection('section-final');
-          updateProgress();
+          // Último bloco ou sem vídeo, ir para a seção final
+          if (currentBlocoIndex + 1 >= blocos.length) {
+            showSection('section-final');
+            updateProgress();
+          } else {
+            // Avançar para o próximo bloco sem vídeo
+            blocos.forEach(b => b.style.display = 'none');
+            const nextBloco = blocos[currentBlocoIndex + 1];
+            nextBloco.style.display = 'block';
+            const nextPergunta = nextBloco.querySelector('.j-pergunta');
+            if (nextPergunta) {
+              nextPergunta.classList.add('active');
+              runTyping(nextPergunta);
+            } else {
+              console.error('Nenhuma pergunta encontrada no próximo bloco!');
+            }
+            updateProgress();
+          }
         }
       }
     }
@@ -686,10 +715,8 @@
         if (skip) skip.onclick = cleanup;
         video.play().catch(err => {
           console.warn('Erro ao reproduzir vídeo:', err);
-          alert('O vídeo não pode ser reproduzido automaticamente. Clique em "Play" nos controles.');
-          cleanup();
+          alert('O vídeo não pode ser reproduzido automaticamente. Clique em "Play" nos controles ou pule o vídeo.');
         });
-        setTimeout(cleanup, 10000);
       } else {
         console.warn('Vídeo ou overlay não encontrado para:', src);
         onEnd && onEnd();
@@ -806,7 +833,7 @@
 
       boot().then(() => {
         const visible = document.querySelector('.j-section:not(.hidden)');
-        if (visible) ensureHeroFlame(visible.id);
+        if (visible) JORNADA_CHAMA.ensureHeroFlame(visible.id);
       });
 
       // observar mudanças de conteúdo
