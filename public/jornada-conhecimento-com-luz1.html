@@ -6,7 +6,6 @@
   <title>Jornada • Irmandade Conhecimento com Luz</title>
   <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png">
   <style>
-    /* [Conteúdo de styles.css omitido por brevidade, copie do artefato anterior] */
     :root { --bg:#0b1020; --fg:#eef2ff; --muted:#aab4d4; --primary:#6aa7ff; --card:#121832; --card-2:#0e1428; --radius:16px; }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -121,6 +120,11 @@
       visibility: visible !important;
       display: block !important;
     }
+    /* Fallback para imagens */
+    .pergaminho-v { background-image: url('/assets/img/pergaminho-rasgado-vert.png'); }
+    .pergaminho-v:empty { background-color: #f6efe0; } /* Cor de fallback se imagem falhar */
+    .pergaminho-h { background-image: url('/assets/img/pergaminho-rasgado-horiz.png'); }
+    .pergaminho-h:empty { background-color: #f6efe0; } /* Cor de fallback se imagem falhar */
   </style>
 </head>
 
@@ -232,11 +236,21 @@
     </div>
   </div>
 
-  <!-- Scripts inline com todos os módulos -->
+  <!-- Scripts inline consolidado -->
   <script>
     // Tag ambiente
     document.getElementById('envTag').textContent =
       `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
+
+    // Fallback inicial
+    (function defineFallback() {
+      window.JORNADA_BLOCKS = [
+        { questions: [{ label: 'Qual é o seu maior sonho?' }, { label: 'O que te inspira no dia a dia?' }], video_after: '/assets/video/transicao1.mp4' },
+        { questions: [{ label: 'Como você enfrenta desafios?' }, { label: 'Qual é sua maior conquista?' }], video_after: '/assets/video/transicao2.mp4' }
+      ];
+      window.JORNADA_QA = { positiveWords: Object.keys(EMO.POS), negativeWords: Object.keys(EMO.NEG) };
+      console.log('JORNADA_BLOCKS/QA (fallback) definidos com sucesso:', window.JORNADA_BLOCKS);
+    })();
 
     /* =========================
        EMOÇÃO E DATILOGRAFIA
@@ -389,7 +403,7 @@
     }
 
     /* =========================
-       ROTEAMENTO & RENDER
+       ROTEAMENTO, RENDER E CONTROLE
     ==========================*/
     function updateCanvasBackground(sectionId) {
       const canvas = document.getElementById('jornada-canvas');
@@ -430,7 +444,7 @@
           } else {
             console.error('Nenhuma pergunta encontrada em section-perguntas após loadDynamicBlocks! Verifique JORNADA_BLOCKS:', window.JORNADA_BLOCKS);
           }
-        }, 100); // Aumentei o atraso para 100ms
+        }, 100);
       }
     }
 
@@ -441,10 +455,13 @@
         return;
       }
       if (!window.JORNADA_BLOCKS || !Array.isArray(window.JORNADA_BLOCKS) || window.JORNADA_BLOCKS.length === 0) {
-        console.error('Erro: JORNADA_BLOCKS não definido, não é um array, ou está vazio!');
-        return;
+        console.error('Erro: JORNADA_BLOCKS não definido, não é um array, ou está vazio! Forçando fallback...');
+        window.JORNADA_BLOCKS = [
+          { questions: [{ label: 'Qual é o seu maior sonho?' }, { label: 'O que te inspira no dia a dia?' }], video_after: '/assets/video/transicao1.mp4' },
+          { questions: [{ label: 'Como você enfrenta desafios?' }, { label: 'Qual é sua maior conquista?' }], video_after: '/assets/video/transicao2.mp4' }
+        ];
       }
-      console.log('Conteúdo de JORNADA_BLOCKS:', window.JORNADA_BLOCKS);
+      console.log('Conteúdo de JORNADA_BLOCKS após fallback:', window.JORNADA_BLOCKS);
       content.innerHTML = '';
       window.JORNADA_BLOCKS.forEach((block, idx) => {
         if (!block.questions || !Array.isArray(block.questions)) {
@@ -492,689 +509,488 @@
       console.log('Blocos carregados com sucesso!');
     }
 
-    /* =========================
-       CONTROLLER
-    ==========================*/
-    (function () {
-      'use strict';
+    const JC = (window.JC = window.JC || {});
+    const state = {
+      blocoIndex: 0,
+      perguntaIndex: 0,
+      respostas: Object.create(null),
+    };
 
-      const JC = (window.JC = window.JC || {});
-      const state = {
-        blocoIndex: 0,
-        perguntaIndex: 0,
-        respostas: Object.create(null),
-      };
+    const S = {
+      root: () => document.getElementById('jornada-canvas'),
+      blocos: () => Array.from(document.querySelectorAll('.j-bloco,[data-bloco]')),
+      blocoAtivo: () => S.blocos()[state.blocoIndex],
+      perguntasDo: (blocoEl) => Array.from(blocoEl.querySelectorAll('.j-pergunta,[data-pergunta]')),
+      btnPrev: () => document.getElementById('btnPrevPerguntas') || document.querySelector('[data-action="prev"]'),
+      btnNext: () => document.getElementById('btnNextPerguntas') || document.querySelector('[data-action="next"]'),
+      btnStart: () => document.getElementById('btnIniciar') || document.querySelector('[data-action="start"]'),
+      meta: () => document.getElementById('j-meta'),
+      progressFill: () => document.querySelector('.j-progress__fill'),
+      overlay: () => document.getElementById('videoOverlay'),
+      video: () => document.getElementById('videoTransicao'),
+      skip: () => document.getElementById('skipVideo'),
+    };
 
-      const S = {
-        root: () => document.getElementById('jornada-canvas'),
-        blocos: () => Array.from(document.querySelectorAll('.j-bloco,[data-bloco]')),
-        blocoAtivo: () => S.blocos()[state.blocoIndex],
-        perguntasDo: (blocoEl) => Array.from(blocoEl.querySelectorAll('.j-pergunta,[data-pergunta]')),
-        btnPrev: () => document.getElementById('btnPrevPerguntas') || document.querySelector('[data-action="prev"]'),
-        btnNext: () => document.getElementById('btnNextPerguntas') || document.querySelector('[data-action="next"]'),
-        btnStart: () => document.getElementById('btnIniciar') || document.querySelector('[data-action="start"]'),
-        meta: () => document.getElementById('j-meta'),
-        progressFill: () => document.querySelector('.j-progress__fill'),
-        overlay: () => document.getElementById('videoOverlay'),
-        video: () => document.getElementById('videoTransicao'),
-        skip: () => document.getElementById('skipVideo'),
-      };
-
-      const U = {
-        show(el, disp = 'block') { if (el) el.style.display = disp; },
-        hide(el) { if (el) el.style.display = 'none'; },
-        clamp(n, a, b) { return Math.max(a, Math.min(b, n)); },
-        key(b, q) { return `b${b}-q${q}`; },
-        getAnswerEl(qEl) { return qEl?.querySelector?.('textarea, input[type="text"], input[type="email"], input[type="number"], input[type="search"]') || null; },
-        getVal(el) { return (el && (el.value ?? '')).trim(); },
-        setProgress(cur, total) {
-          const pct = total ? Math.round((cur / total) * 100) : 0;
-          const bar = S.progressFill();
-          const meta = S.meta();
-          if (bar) bar.style.width = pct + '%';
-          if (meta) meta.innerHTML = `<b>${cur}</b> / ${total} (${pct}%)`;
-        },
-        analiseSentiment(texto) {
-          const textoNormalizado = texto.toLowerCase().split(/\s+/);
-          let posCount = 0, negCount = 0;
-          textoNormalizado.forEach(word => {
-            if (window.JORNADA_CFG.positiveWords.includes(word)) posCount++;
-            if (window.JORNADA_CFG.negativeWords.includes(word)) negCount++;
-          });
-          return posCount > negCount ? "alegre" : (negCount > posCount ? "sofrida" : "neutra");
-        }
-      };
-
-      function saveCurrentAnswer() {
-        const bloco = S.blocoAtivo();
-        if (!bloco) return;
-        const perguntas = S.perguntasDo(bloco);
-        const qEl = perguntas[state.perguntaIndex];
-        if (!qEl) return;
-        const input = U.getAnswerEl(qEl);
-        if (input) {
-          const k = U.key(state.blocoIndex, state.perguntaIndex);
-          state.respostas[k] = U.getVal(input);
-          try { localStorage.setItem('JORNADA_RESPOSTAS', JSON.stringify(state.respostas)); } catch {}
-        }
+    const U = {
+      show(el, disp = 'block') { if (el) el.style.display = disp; },
+      hide(el) { if (el) el.style.display = 'none'; },
+      clamp(n, a, b) { return Math.max(a, Math.min(b, n)); },
+      key(b, q) { return `b${b}-q${q}`; },
+      getAnswerEl(qEl) { return qEl?.querySelector?.('textarea, input[type="text"], input[type="email"], input[type="number"], input[type="search"]') || null; },
+      getVal(el) { return (el && (el.value ?? '')).trim(); },
+      setProgress(cur, total) {
+        const pct = total ? Math.round((cur / total) * 100) : 0;
+        const bar = S.progressFill();
+        const meta = S.meta();
+        if (bar) bar.style.width = pct + '%';
+        if (meta) meta.innerHTML = `<b>${cur}</b> / ${total} (${pct}%)`;
+      },
+      analiseSentiment(texto) {
+        const textoNormalizado = texto.toLowerCase().split(/\s+/);
+        let posCount = 0, negCount = 0;
+        textoNormalizado.forEach(word => {
+          if (window.JORNADA_QA.positiveWords.includes(word)) posCount++;
+          if (window.JORNADA_QA.negativeWords.includes(word)) negCount++;
+        });
+        return posCount > negCount ? "alegre" : (negCount > posCount ? "sofrida" : "neutra");
       }
+    };
 
-      function applyPergaminhoByRoute() {
-        if (!window.JORNADA_PAPER || typeof window.JORNADA_PAPER.set !== 'function') {
-          console.warn('JORNADA_PAPER não disponível para aplicar pergaminho por rota');
-          return;
-        }
-        const route = (location.hash || '#intro').slice(1);
-        console.log('[JORNADA_CONTROLLER] Aplicando pergaminho por rota:', route);
+    function saveCurrentAnswer() {
+      const bloco = S.blocoAtivo();
+      if (!bloco) return;
+      const perguntas = S.perguntasDo(bloco);
+      const qEl = perguntas[state.perguntaIndex];
+      if (!qEl) return;
+      const input = U.getAnswerEl(qEl);
+      if (input) {
+        const k = U.key(state.blocoIndex, state.perguntaIndex);
+        state.respostas[k] = U.getVal(input);
+        try { localStorage.setItem('JORNADA_RESPOSTAS', JSON.stringify(state.respostas)); } catch {}
+      }
+    }
+
+    function applyPergaminhoByRoute() {
+      const route = (location.hash || '#intro').slice(1);
+      console.log('[JORNADA_CONTROLLER] Aplicando pergaminho por rota:', route);
+      const canvas = document.getElementById('jornada-canvas');
+      if (canvas) {
         if (route === 'intro' || route === 'final') {
-          window.JORNADA_PAPER.set('v');
+          canvas.className = 'card pergaminho pergaminho-v';
+          canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
         } else {
-          window.JORNADA_PAPER.set('h');
+          canvas.className = 'card pergaminho pergaminho-h';
+          canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-horiz.png)';
         }
       }
+    }
 
-      function applyPergaminhoByBloco(blocoEl) {
-        if (!window.JORNADA_PAPER || typeof window.JORNADA_PAPER.set !== 'function') {
-          console.warn('JORNADA_PAPER não disponível para aplicar pergaminho por bloco');
-          return;
-        }
-        if (!blocoEl) {
-          console.warn('Bloco não encontrado para aplicar pergaminho');
-          return;
-        }
-        let modo = 'h';
-        if (blocoEl.hasAttribute('data-pergaminho-h')) modo = 'h';
-        else if (blocoEl.hasAttribute('data-pergaminho-v')) modo = 'v';
-        else modo = blocoEl.getAttribute('data-pergaminho') || 'h';
-        console.log('[JORNADA_CONTROLLER] Aplicando pergaminho para bloco:', modo, blocoEl);
-        window.JORNADA_PAPER.set(modo);
+    function applyPergaminhoByBloco(blocoEl) {
+      if (!blocoEl) {
+        console.warn('Bloco não encontrado para aplicar pergaminho');
+        return;
       }
-
-      function render() {
-        const root = S.root();
-        if (!root) {
-          console.warn('Root #jornada-canvas não encontrado');
-          return;
-        }
-        U.show(root, 'block');
-        const blocos = S.blocos();
-        if (!blocos.length) {
-          console.error('Nenhum bloco encontrado após loadDynamicBlocks!');
-          return;
-        }
-        blocos.forEach(U.hide);
-        const bloco = S.blocoAtivo();
-        if (bloco) U.show(bloco);
-        else {
-          console.error('Bloco ativo não encontrado no índice:', state.blocoIndex);
-          return;
-        }
-        const perguntas = S.perguntasDo(bloco);
-        if (!perguntas.length) {
-          console.error('Nenhuma pergunta encontrada no bloco ativo:', bloco);
-          return;
-        }
-        perguntas.forEach(q => q.classList.remove('active')); // Remove active de todas
-        state.perguntaIndex = U.clamp(state.perguntaIndex, 0, Math.max(0, perguntas.length - 1));
-        const atual = perguntas[state.perguntaIndex];
-        if (atual) {
-          atual.classList.add('active'); // Mostra só a pergunta atual
-          console.log('Exibindo pergunta:', state.perguntaIndex + 1, 'de', perguntas.length);
-          const input = U.getAnswerEl(atual);
-          if (input) {
-            input.removeAttribute?.('hidden');
-            input.style.display = 'block';
-            input.style.visibility = 'visible';
-            try { input.focus({ preventScroll: true }); } catch (e) { console.warn('Erro ao focar input:', e); }
-          }
+      let modo = 'h';
+      if (blocoEl.hasAttribute('data-pergaminho-h')) modo = 'h';
+      else if (blocoEl.hasAttribute('data-pergaminho-v')) modo = 'v';
+      else modo = blocoEl.getAttribute('data-pergaminho') || 'h';
+      console.log('[JORNADA_CONTROLLER] Aplicando pergaminho para bloco:', modo, blocoEl);
+      const canvas = document.getElementById('jornada-canvas');
+      if (canvas) {
+        if (modo === 'v') {
+          canvas.className = 'card pergaminho pergaminho-v';
+          canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
         } else {
-          console.error('Pergunta atual não encontrada no índice:', state.perguntaIndex);
-        }
-        if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
-          window.JORNADA_TYPE.run(atual);
-        }
-        applyPergaminhoByBloco(bloco);
-        U.setProgress(state.perguntaIndex + 1, perguntas.length);
-        const prev = S.btnPrev();
-        const next = S.btnNext();
-        if (prev) prev.disabled = (state.blocoIndex === 0 && state.perguntaIndex === 0);
-        if (next) {
-          const ultimaPergunta = state.perguntaIndex === perguntas.length - 1;
-          const ultimoBloco = state.blocoIndex === blocos.length - 1;
-          next.textContent = ultimaPergunta ? (ultimoBloco ? 'Finalizar' : 'Concluir bloco ➜') : 'Próxima';
-          next.disabled = false; // Garante que o botão não fique travado
+          canvas.className = 'card pergaminho pergaminho-h';
+          canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-horiz.png)';
         }
       }
+    }
 
-      function goNext() {
-        const bloco = S.blocoAtivo();
-        const perguntas = S.perguntasDo(bloco);
-        saveCurrentAnswer();
-        if (state.perguntaIndex < perguntas.length - 1) {
-          state.perguntaIndex++;
-          render();
-          return;
-        }
-        const videoSrc = bloco.getAttribute('data-video') || '';
-        console.log('Transição para próximo bloco, videoSrc:', videoSrc);
-        const haProximoBloco = state.blocoIndex < S.blocos().length - 1;
-        if (haProximoBloco) {
-          playTransition(videoSrc, () => {
-            state.blocoIndex++;
-            state.perguntaIndex = 0;
-            render();
-          });
-        } else {
-          finalize();
-        }
+    function render() {
+      const root = S.root();
+      if (!root) {
+        console.warn('Root #jornada-canvas não encontrado');
+        return;
       }
-
-      function goPrev() {
-        if (state.perguntaIndex > 0) {
-          state.perguntaIndex--;
-          render();
-          return;
-        }
-        if (state.blocoIndex > 0) {
-          state.blocoIndex--;
-          const perguntas = S.perguntasDo(S.blocoAtivo());
-          state.perguntaIndex = Math.max(0, perguntas.length - 1);
-          render();
-        }
+      U.show(root, 'block');
+      const blocos = S.blocos();
+      if (!blocos.length) {
+        console.error('Nenhum bloco encontrado após loadDynamicBlocks!');
+        return;
       }
-
-      function startJourney() {
-        console.log('Iniciando jornada... Verificando dependências:', { JORNADA_BLOCKS: !!window.JORNADA_BLOCKS, JORNADA_QA: !!window.JORNADA_QA, JORNADA_PAPER: !!window.JORNADA_PAPER });
-        if (window.JORNADA_BLOCKS && window.JORNADA_QA && window.JORNADA_PAPER) {
-          showSection('section-perguntas');
-          loadDynamicBlocks();
-          state.blocoIndex = 0;
-          state.perguntaIndex = 0;
-          render(); // Garante a primeira pergunta
-          console.log('Jornada iniciada com sucesso, exibindo primeira pergunta');
-        } else {
-          console.error('Dependências não carregadas para iniciar:', { JORNADA_BLOCKS: !!window.JORNADA_BLOCKS, JORNADA_QA: !!window.JORNADA_QA, JORNADA_PAPER: !!window.JORNADA_PAPER });
-        }
+      blocos.forEach(U.hide);
+      const bloco = S.blocoAtivo();
+      if (bloco) U.show(bloco);
+      else {
+        console.error('Bloco ativo não encontrado no índice:', state.blocoIndex);
+        return;
       }
-
-      function playTransition(src, onEnd) {
-        const overlay = S.overlay();
-        const video = S.video();
-        const skip = S.skip();
-        if (!overlay || !video || !src) {
-          console.warn('Overlay, vídeo ou src não disponível:', { overlay, video, src });
-          onEnd && onEnd();
-          return;
-        }
-        try { video.pause(); video.removeAttribute('src'); video.load(); } catch {}
-        video.src = src;
-        overlay.classList.remove('hidden');
-        const cleanup = () => {
-          try { video.pause(); } catch {}
-          overlay.classList.add('hidden');
-          try { video.removeAttribute('src'); video.load(); } catch {}
-          onEnd && onEnd();
-        };
-        video.onended = cleanup;
-        video.onerror = cleanup;
-        if (skip) skip.onclick = cleanup;
-        try {
-          video.muted = true;
-          const p = video.play();
-          if (p && p.catch) p.catch(() => {});
-        } catch {}
+      const perguntas = S.perguntasDo(bloco);
+      if (!perguntas.length) {
+        console.error('Nenhuma pergunta encontrada no bloco ativo:', bloco);
+        return;
       }
-
-      function finalize() {
-        saveCurrentAnswer();
-        console.log('[JORNADA] Finalizado. Respostas:', state.respostas);
-        if (window.JORNADA_DOWNLOAD) {
-          window.JORNADA_DOWNLOAD(state.respostas).then(() => {
-            alert('Jornada concluída! Arquivos gerados.');
-            location.replace('/index.html');
-          }).catch(() => alert('Erro ao gerar arquivos.'));
-        } else {
-          console.error('JORNADA_DOWNLOAD não disponível!');
+      perguntas.forEach(q => q.classList.remove('active')); // Remove active de todas
+      state.perguntaIndex = U.clamp(state.perguntaIndex, 0, Math.max(0, perguntas.length - 1));
+      const atual = perguntas[state.perguntaIndex];
+      if (atual) {
+        atual.classList.add('active'); // Mostra só a pergunta atual
+        console.log('Exibindo pergunta:', state.perguntaIndex + 1, 'de', perguntas.length);
+        const input = U.getAnswerEl(atual);
+        if (input) {
+          input.removeAttribute?.('hidden');
+          input.style.display = 'block';
+          input.style.visibility = 'visible';
+          try { input.focus({ preventScroll: true }); } catch (e) { console.warn('Erro ao focar input:', e); }
         }
-      }
-
-      JC.init = function initJornada() {
-        const root = S.root();
-        if (!root) {
-          console.warn('Root #jornada-canvas não encontrado para inicialização');
-          return;
-        }
-        applyPergaminhoByRoute();
-        const startBtn = S.btnStart();
-        if (startBtn) {
-          startBtn.addEventListener('click', startJourney);
-          console.log('Botão Iniciar inicializado em JC.init');
-        } else {
-          console.error('Botão #btnIniciar não encontrado no DOM durante JC.init!');
-        }
-        const prevBtn = S.btnPrev();
-        const nextBtn = S.btnNext();
-        if (nextBtn) nextBtn.addEventListener('click', goNext);
-        if (prevBtn) prevBtn.addEventListener('click', goPrev);
-        document.addEventListener('click', (ev) => {
-          const n = ev.target.closest?.('[data-action="next"]');
-          const p = ev.target.closest?.('[data-action="prev"]');
-          const s = ev.target.closest?.('[data-action="start"]');
-          if (n) { ev.preventDefault(); goNext(); }
-          if (p) { ev.preventDefault(); goPrev(); }
-          if (s) { ev.preventDefault(); startJourney(); }
-        });
-        try {
-          const stash = localStorage.getItem('JORNADA_RESPOSTAS');
-          if (stash) state.respostas = JSON.parse(stash) || state.respostas;
-        } catch {}
-        render();
-      };
-
-      document.addEventListener('DOMContentLoaded', () => {
-        if (S.root()) JC.init();
-        window.addEventListener('load', () => {
-          if (!window.JC._initialized && window.JC?.init) {
-            console.log('Forçando inicialização no load...');
-            JC.init();
-            window.JC._initialized = true;
-          }
-        });
-        window.addEventListener('hashchange', applyPergaminhoByRoute);
-      });
-
-      JC._state = state;
-      JC.next = goNext;
-      JC.prev = goPrev;
-      JC.render = render;
-      JC.start = startJourney;
-
-      // Funções expostas globalmente para depuração
-      window.showSection = showSection;
-      window.loadDynamicBlocks = loadDynamicBlocks;
-    })();
-
-    /* =========================
-       RENDER
-    ==========================*/
-    (function () {
-      'use strict';
-
-      const JR = (window.JORNADA_RENDER = window.JORNADA_RENDER || {});
-
-      function renderIntro() {
-        console.log('[JORNADA_RENDER] Renderizando intro');
-        const section = document.getElementById('section-intro');
-        if (section) {
-          section.classList.remove('hidden');
-          const canvas = document.getElementById('jornada-canvas');
-          if (canvas) {
-            canvas.className = 'card pergaminho pergaminho-v';
-            canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
-          }
-        }
-      }
-
-      function renderPerguntas(blocoIndex = 0) {
-        console.log('[JORNADA_RENDER] Renderizando perguntas, bloco:', blocoIndex);
-        const section = document.getElementById('section-perguntas');
-        if (section) {
-          section.classList.remove('hidden');
-          const canvas = document.getElementById('jornada-canvas');
-          if (canvas) {
-            canvas.className = 'card pergaminho pergaminho-h';
-            canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-horiz.png)';
-          }
-          const perguntasContainer = document.getElementById('perguntas-container');
-          if (perguntasContainer) {
-            const blocos = Array.from(perguntasContainer.querySelectorAll('.j-bloco'));
-            if (blocos[blocoIndex]) {
-              blocos.forEach(b => b.style.display = 'none');
-              blocos[blocoIndex].style.display = 'block';
-              const perguntas = Array.from(blocos[blocoIndex].querySelectorAll('.j-pergunta'));
-              if (perguntas.length) {
-                perguntas.forEach(p => p.classList.remove('active'));
-                perguntas[0].classList.add('active'); // Exibe a primeira pergunta
-                console.log('Exibindo pergunta inicial do bloco:', blocoIndex);
-              } else {
-                console.warn('Nenhuma pergunta encontrada no bloco:', blocoIndex);
-              }
-            } else {
-              console.error('Bloco não encontrado no índice:', blocoIndex);
-            }
-          }
-        }
-      }
-
-      function renderFinal() {
-        console.log('[JORNADA_RENDER] Renderizando final');
-        const section = document.getElementById('section-final');
-        if (section) {
-          section.classList.remove('hidden');
-          const canvas = document.getElementById('jornada-canvas');
-          if (canvas) {
-            canvas.className = 'card pergaminho pergaminho-v';
-            canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
-          }
-        }
-      }
-
-      JR.renderIntro = renderIntro;
-      JR.renderPerguntas = renderPerguntas;
-      JR.renderFinal = renderFinal;
-
-      console.log('[JORNADA_RENDER] Módulo carregado');
-    })();
-
-    /* =========================
-       BOOTSTRAP
-    ==========================*/
-    (function () {
-      'use strict';
-
-      const TAG = '[BOOT]';
-      const log = (...a) => console.log(TAG, ...a);
-      const warn = (...a) => console.warn(TAG, ...a);
-      const error = (...a) => console.error(TAG, ...a);
-
-      function routeFromHash() {
-        return (location.hash || '#intro').slice(1);
-      }
-
-      function dumpScriptsOnce() {
-        if (dumpScriptsOnce._done) return;
-        dumpScriptsOnce._done = true;
-        try {
-          const items = Array.from(document.scripts || []).map(s => ({
-            defer: !!s.defer,
-            src: s.src || '(inline)',
-          }));
-          log('scripts carregados (ordem):');
-          console.table(items);
-        } catch {}
-      }
-
-      function setPaperByRoute(route) {
-        const PAPER = window.JORNADA_PAPER;
-        if (!PAPER || typeof PAPER.set !== 'function') return;
-        const modo = (route === 'intro' || route === 'final') ? 'v' : 'h';
-        try { PAPER.set(modo); } catch {}
-      }
-
-      function boot() {
-        dumpScriptsOnce();
-        const route = routeFromHash();
-        log('tentando iniciar • rota:', route);
-
-        if (typeof window.mount === 'function') {
-          log('detectado window.mount → delegando para SPA');
-          try {
-            window.mount({ startAt: route });
-            setPaperByRoute(route);
-          } catch (e) { error('falha no mount()', e); }
-          return true;
-        }
-
-        if (!window.JORNADA_RENDER || !window.JC || !window.JC._state) {
-          warn('JORNADA_RENDER, JC ou estado não disponível ainda. Aguardando…');
-          return false;
-        }
-
-        try { document.body.classList.add('jornada-active'); } catch {}
-
-        try {
-          if (route === 'intro') {
-            log('→ renderIntro()');
-            window.JORNADA_RENDER.renderIntro();
-          } else if (route === 'perguntas') {
-            log('→ renderPerguntas(0)');
-            window.JORNADA_RENDER.renderPerguntas(0);
-          } else if (route === 'final') {
-            log('→ renderFinal()');
-            window.JORNADA_RENDER.renderFinal();
-          } else {
-            log('→ rota desconhecida, caindo na intro');
-            window.JORNADA_RENDER.renderIntro();
-          }
-        } catch (e) {
-          error('falha ao chamar renderer:', e);
-          return false;
-        }
-
-        setPaperByRoute(route);
-        setTimeout(() => {
-          if (window.JC?.init) {
-            try { 
-              log('acionando JC.init() (reforço)');
-              window.JC.init();
-            } catch (e) {
-              warn('falha ao acionar JC.init():', e);
-            }
-          } else {
-            warn('JC.init não disponível, inicialização manual pendente');
-          }
-        }, 200);
-        log('inicialização concluída.');
-        return true;
-      }
-
-      function startWhenReady() {
-        let tries = 0;
-        const maxTries = 60;
-        const t = setInterval(() => {
-          if (boot()) { clearInterval(t); return; }
-          if (++tries > maxTries) {
-            clearInterval(t);
-            error('desisti de iniciar: JORNADA_RENDER ou JC não ficou disponível a tempo.');
-            if (window.JC?.init) {
-              console.log('Tentando inicialização de emergência com JC.init...');
-              window.JC.init();
-            }
-          }
-        }, 100);
-      }
-
-      window.addEventListener('hashchange', () => {
-        const r = routeFromHash();
-        log('hashchange →', r);
-        setPaperByRoute(r);
-      });
-
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', startWhenReady);
       } else {
-        startWhenReady();
+        console.error('Pergunta atual não encontrada no índice:', state.perguntaIndex);
       }
-
-      window.addEventListener('load', () => {
-        if (!window.JC._initialized && window.JC?.init) {
-          console.log('Inicialização final no load...');
-          window.JC.init();
-          window.JC._initialized = true;
-        }
-      });
-    })();
-
-    /* =========================
-       API
-    ==========================*/
-    (function () {
-      // Endpoints
-      const API_PRIMARY  = 'https://lumen-backend-v3w2.onrender.com';
-      const API_FALLBACK = 'https://conhecimento-com-luz-api.onrender.com';
-      const PDF_ENDPOINT = '/api/jornada/pdf';
-      const HQ_ENDPOINT  = '/api/jornada/hq';
-
-      let API_BASE = API_PRIMARY; // será confirmado por health()
-
-      // util: baixar blob com nome de arquivo
-      async function baixarArquivo(blob, nome) {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = nome;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
+      runTyping(atual);
+      applyPergaminhoByBloco(bloco);
+      U.setProgress(state.perguntaIndex + 1, perguntas.length);
+      const prev = S.btnPrev();
+      const next = S.btnNext();
+      if (prev) prev.disabled = (state.blocoIndex === 0 && state.perguntaIndex === 0);
+      if (next) {
+        const ultimaPergunta = state.perguntaIndex === perguntas.length - 1;
+        const ultimoBloco = state.blocoIndex === blocos.length - 1;
+        next.textContent = ultimaPergunta ? (ultimoBloco ? 'Finalizar' : 'Concluir bloco ➜') : 'Próxima';
+        next.disabled = false; // Garante que o botão não fique travado
       }
+    }
 
-      // timestamp para nomes
-      function stamp() {
-        const d = new Date(), p = n => String(n).padStart(2,'0');
-        return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}_${p(d.getHours())}-${p(d.getMinutes())}-${p(d.getSeconds())}`;
+    function goNext() {
+      const bloco = S.blocoAtivo();
+      const perguntas = S.perguntasDo(bloco);
+      saveCurrentAnswer();
+      if (state.perguntaIndex < perguntas.length - 1) {
+        state.perguntaIndex++;
+        render();
+        return;
       }
-
-      // escolhe a melhor base (primária -> fallback)
-      async function escolherBase() {
-        for (const base of [API_PRIMARY, API_FALLBACK]) {
-          try {
-            const r = await fetch(`${base}/health`, { method: 'GET' });
-            if (r.ok) { API_BASE = base; return base; }
-          } catch {}
-        }
-        // se nenhuma respondeu ok, mantemos a primária (evita quebrar)
-        API_BASE = API_PRIMARY;
-        return API_BASE;
+      const videoSrc = bloco.getAttribute('data-video') || '';
+      console.log('Transição para próximo bloco, videoSrc:', videoSrc);
+      const haProximoBloco = state.blocoIndex < S.blocos().length - 1;
+      if (haProximoBloco) {
+        playTransition(videoSrc, () => {
+          state.blocoIndex++;
+          state.perguntaIndex = 0;
+          render();
+        });
+      } else {
+        finalize();
       }
+    }
 
-      // === fluxo principal: gera PDF e HQ ===
-      async function gerarPDFEHQ(payload) {
-        await escolherBase(); // define API_BASE logo de cara
-
-        const headers = {
-          'Content-Type': 'application/json',
-          'Accept': 'application/pdf, application/json'
-        };
-
-        let pdfok = false;
-
-        // 1) PDF
-        try {
-          const pdfResp = await fetch(API_BASE + PDF_ENDPOINT, {
-            method: 'POST', headers, body: JSON.stringify(payload)
-          });
-          if (!pdfResp.ok) throw new Error(String(pdfResp.status));
-          const pdfBlob = await pdfResp.blob();
-          await baixarArquivo(pdfBlob, `Jornada-Conhecimento-com-Luz_${stamp()}.pdf`);
-          pdfok = true;
-        } catch (e) {
-          // tenta fallback *somente se ainda não estamos nele*
-          if (API_BASE !== API_FALLBACK) {
-            try {
-              API_BASE = API_FALLBACK;
-              const pdfResp2 = await fetch(API_BASE + PDF_ENDPOINT, {
-                method: 'POST', headers, body: JSON.stringify(payload)
-              });
-              if (!pdfResp2.ok) throw new Error(String(pdfResp2.status));
-              const pdfBlob2 = await pdfResp2.blob();
-              await baixarArquivo(pdfBlob2, `Jornada-Conhecimento-com-Luz_${stamp()}.pdf`);
-              pdfok = true;
-            } catch (e2) {
-              console.error('PDF falhou na primária e no fallback:', e, e2);
-            }
-          } else {
-            console.error('PDF falhou no fallback:', e);
-          }
-        }
-
-        // 2) HQ (só tenta se quiser gerar; aqui tentamos sempre, independentemente do PDF ter dado certo)
-        try {
-          const hqResp = await fetch(API_BASE + HQ_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json',
-                       'Accept': 'application/zip, image/webp, image/png, application/pdf, application/octet-stream' },
-            body: JSON.stringify(payload)
-          });
-          if (!hqResp.ok) throw new Error(String(hqResp.status));
-
-          const ct = (hqResp.headers.get('content-type') || '').toLowerCase();
-          const ext = ct.includes('zip') ? 'zip'
-                   : ct.includes('webp') ? 'webp'
-                   : ct.includes('png') ? 'png'
-                   : ct.includes('pdf') ? 'pdf'
-                   : 'bin';
-          const hqBlob = await hqResp.blob();
-          await baixarArquivo(hqBlob, `Jornada_HQ_${stamp()}.${ext}`);
-        } catch (e) {
-          // tenta fallback se ainda não estivermos nele
-          if (API_BASE !== API_FALLBACK) {
-            try {
-              API_BASE = API_FALLBACK;
-              const hqResp2 = await fetch(API_BASE + HQ_ENDPOINT, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json',
-                           'Accept': 'application/zip, image/webp, image/png, application/pdf, application/octet-stream' },
-                body: JSON.stringify(payload)
-              });
-              if (hqResp2.ok) {
-                const ct2 = (hqResp2.headers.get('content-type') || '').toLowerCase();
-                const ext2 = ct2.includes('zip') ? 'zip'
-                          : ct2.includes('webp') ? 'webp'
-                          : ct2.includes('png') ? 'png'
-                          : ct2.includes('pdf') ? 'pdf'
-                          : 'bin';
-                const hqBlob2 = await hqResp2.blob();
-                await baixarArquivo(hqBlob2, `Jornada_HQ_${stamp()}.${ext2}`);
-              } else {
-                console.warn('HQ não retornou OK no fallback:', hqResp2.status);
-              }
-            } catch (e2) {
-              console.warn('HQ falhou na primária e no fallback:', e, e2);
-            }
-          } else {
-            console.warn('HQ falhou no fallback:', e);
-          }
-        }
-
-        // 3) limpeza e retorno à Home (se pelo menos o PDF baixou)
-        if (pdfok) {
-          localStorage.clear();
-          sessionStorage.clear();
-          alert('PDF e HQ, (Observe Memória disponível) finalizados! Volta ao início.');
-          location.replace('/index.html');
-        } else {
-          alert('Não foi possível gerar o PDF agora. Tente novamente em instantes.');
-        }
+    function goPrev() {
+      if (state.perguntaIndex > 0) {
+        state.perguntaIndex--;
+        render();
+        return;
       }
+      if (state.blocoIndex > 0) {
+        state.blocoIndex--;
+        const perguntas = S.perguntasDo(S.blocoAtivo());
+        state.perguntaIndex = Math.max(0, perguntas.length - 1);
+        render();
+      }
+    }
 
-      // expõe função global para seu botão final chamar
-      window.JORNADA_DOWNLOAD = gerarPDFEHQ;
-    })();
+    function startJourney() {
+      const senhaInput = document.getElementById('senha');
+      if (!senhaInput) {
+        console.error('Campo senha não encontrado!');
+        alert('Erro: Campo de senha não carregou. Recarregue a página.');
+        return;
+      }
+      const senha = senhaInput.value || '';
+      const senhasValidas = ['iniciar', 'olho magico', 'olho mágico'];
+      if (senhasValidas.includes(senha.toLowerCase())) {
+        showSection('section-perguntas');
+        state.blocoIndex = 0;
+        state.perguntaIndex = 0;
+        render();
+        console.log('Jornada iniciada com sucesso, exibindo primeira pergunta');
+      } else {
+        alert('Senha incorreta. Tente novamente.');
+      }
+    }
 
-    /* =========================
-       PAPER QA (placeholder)
-    ==========================*/
-    (function () {
-      window.JORNADA_PAPER = {
-        set: function(modo) {
-          const canvas = document.getElementById('jornada-canvas');
-          if (canvas) {
-            if (modo === 'v') {
-              canvas.className = 'card pergaminho pergaminho-v';
-              canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
-            } else {
-              canvas.className = 'card pergaminho pergaminho-h';
-              canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-horiz.png)';
-            }
-          }
-        }
+    function playTransition(src, onEnd) {
+      const overlay = S.overlay();
+      const video = S.video();
+      const skip = S.skip();
+      if (!overlay || !video || !src) {
+        console.warn('Overlay, vídeo ou src não disponível:', { overlay, video, src });
+        onEnd && onEnd();
+        return;
+      }
+      try { video.pause(); video.removeAttribute('src'); video.load(); } catch {}
+      video.src = src;
+      overlay.classList.remove('hidden');
+      const cleanup = () => {
+        try { video.pause(); } catch {}
+        overlay.classList.add('hidden');
+        try { video.removeAttribute('src'); video.load(); } catch {}
+        onEnd && onEnd();
       };
-    })();
-  </script>
+      video.onended = cleanup;
+      video.onerror = () => {
+        console.warn('Vídeo não carregou:', src, 'Ignorando transição.');
+        cleanup();
+      };
+      if (skip) skip.onclick = cleanup;
+      try {
+        video.muted = true;
+        const p = video.play();
+        if (p && p.catch) p.catch(() => {});
+      } catch {}
+    }
 
-  <!-- Referências externas desativadas temporariamente -->
-  <!--
-  <script defer src="/config.js" onerror="console.error('Falha ao carregar config.js, usando fallback inline');"></script>
-  <script defer src="/jornada-utils.js" onerror="console.error('Falha ao carregar jornada-utils.js, usando fallback inline');"></script>
-  <script defer src="/jornada-core.js" onerror="console.error('Falha ao carregar jornada-core.js, usando fallback inline');"></script>
-  <script defer src="/jornada-auth.js" onerror="console.error('Falha ao carregar jornada-auth.js, usando fallback inline');"></script>
-  <script defer src="/jornada-chama.js" onerror="console.error('Falha ao carregar jornada-chama.js, usando fallback inline');"></script>
-  <script defer src="/jornada-paper-qa.js" onerror="console.error('Falha ao carregar jornada-paper-qa.js, usando fallback inline');"></script>
-  <script defer src="/jornada-typing.js" onerror="console.error('Falha ao carregar jornada-typing.js, usando fallback inline');"></script>
-  <script defer src="/jornada-controller.js" onerror="console.error('Falha ao carregar jornada-controller.js, usando fallback inline');"></script>
-  <script defer src="/jornada-render.js" onerror="console.error('Falha ao carregar jornada-render.js, usando fallback inline');"></script>
-  <script defer src="/jornada-bootstrap.js" onerror="console.error('Falha ao carregar jornada-bootstrap.js, usando fallback inline');"></script>
-  <script defer src="/jornada-micro.js" onerror="console.error('Falha ao carregar jornada-micro.js, usando fallback inline');"></script>
-  <script defer src="/i18n/i18n.js" onerror="console.error('Falha ao carregar i18n.js, usando fallback inline');"></script>
-  <script defer src="/api.js" onerror="console.error('Falha ao carregar api.js, usando fallback inline');"></script>
-  -->
+    function finalize() {
+      saveCurrentAnswer();
+      console.log('[JORNADA] Finalizado. Respostas:', state.respostas);
+      const headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/pdf, application/json'
+      };
+      let pdfok = false;
+
+      // Simulação local (sem backend)
+      const payload = state.respostas;
+      const pdfBlob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/pdf' });
+      baixarArquivo(pdfBlob, `Jornada-Conhecimento-com-Luz_${stamp()}.pdf`);
+      pdfok = true;
+
+      // Limpeza e retorno
+      if (pdfok) {
+        localStorage.clear();
+        sessionStorage.clear();
+        alert('Jornada concluída! Arquivo gerado localmente.');
+        location.replace('/index.html');
+      } else {
+        alert('Não foi possível gerar o PDF agora. Tente novamente.');
+      }
+    }
+
+    function handleInput(textarea) {
+      console.log('Input detectado em:', textarea.placeholder);
+      const score = analyzeSentiment(textarea.value);
+      JORNADA_CHAMA.updateChama(score);
+      saveAnswers();
+      updateProgress();
+    }
+    function toggleSenha() {
+      const input = document.getElementById('senha');
+      if (input) {
+        input.type = input.type === 'password' ? 'text' : 'password';
+        console.log('Toggle senha para:', input.type);
+      } else {
+        console.error('Campo senha não encontrado!');
+      }
+    }
+
+    function baixarArquivo(blob, nome) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = nome;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function stamp() {
+      const d = new Date(), p = n => String(n).padStart(2,'0');
+      return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}_${p(d.getHours())}-${p(d.getMinutes())}-${p(d.getSeconds())}`;
+    }
+
+    JC.init = function initJornada() {
+      const root = S.root();
+      if (!root) {
+        console.warn('Root #jornada-canvas não encontrado para inicialização');
+        return;
+      }
+      applyPergaminhoByRoute();
+      const startBtn = S.btnStart();
+      if (startBtn) {
+        startBtn.addEventListener('click', startJourney);
+        console.log('Botão Iniciar inicializado em JC.init');
+      } else {
+        console.error('Botão #btnIniciar não encontrado no DOM durante JC.init!');
+      }
+      const prevBtn = S.btnPrev();
+      const nextBtn = S.btnNext();
+      if (nextBtn) nextBtn.addEventListener('click', goNext);
+      if (prevBtn) prevBtn.addEventListener('click', goPrev);
+      document.addEventListener('click', (ev) => {
+        const n = ev.target.closest?.('[data-action="next"]');
+        const p = ev.target.closest?.('[data-action="prev"]');
+        const s = ev.target.closest?.('[data-action="start"]');
+        if (n) { ev.preventDefault(); goNext(); }
+        if (p) { ev.preventDefault(); goPrev(); }
+        if (s) { ev.preventDefault(); startJourney(); }
+      });
+      try {
+        const stash = localStorage.getItem('JORNADA_RESPOSTAS');
+        if (stash) state.respostas = JSON.parse(stash) || state.respostas;
+      } catch {}
+      render();
+    };
+
+    const TAG = '[BOOT]';
+    const log = (...a) => console.log(TAG, ...a);
+    const warn = (...a) => console.warn(TAG, ...a);
+    const error = (...a) => console.error(TAG, ...a);
+
+    function routeFromHash() {
+      return (location.hash || '#intro').slice(1);
+    }
+
+    function dumpScriptsOnce() {
+      if (dumpScriptsOnce._done) return;
+      dumpScriptsOnce._done = true;
+      try {
+        const items = Array.from(document.scripts || []).map(s => ({
+          defer: !!s.defer,
+          src: s.src || '(inline)',
+        }));
+        log('scripts carregados (ordem):');
+        console.table(items);
+      } catch {}
+    }
+
+    function boot() {
+      dumpScriptsOnce();
+      const route = routeFromHash();
+      log('tentando iniciar • rota:', route);
+
+      try { document.body.classList.add('jornada-active'); } catch {}
+
+      try {
+        if (route === 'intro') {
+          log('→ renderIntro()');
+          renderIntro();
+        } else if (route === 'perguntas') {
+          log('→ renderPerguntas(0)');
+          renderPerguntas(0);
+        } else if (route === 'final') {
+          log('→ renderFinal()');
+          renderFinal();
+        } else {
+          log('→ rota desconhecida, caindo na intro');
+          renderIntro();
+        }
+      } catch (e) {
+        error('falha ao chamar renderer:', e);
+      }
+
+      applyPergaminhoByRoute();
+      setTimeout(() => {
+        if (window.JC?.init) {
+          try { 
+            log('acionando JC.init() (reforço)');
+            window.JC.init();
+          } catch (e) {
+            warn('falha ao acionar JC.init():', e);
+          }
+        }
+      }, 200);
+      log('inicialização concluída.');
+    }
+
+    function startWhenReady() {
+      let tries = 0;
+      const maxTries = 60;
+      const t = setInterval(() => {
+        if (boot()) { clearInterval(t); return; }
+        if (++tries > maxTries) {
+          clearInterval(t);
+          error('desisti de iniciar: inicialização não completou a tempo.');
+          if (window.JC?.init) {
+            console.log('Tentando inicialização de emergência com JC.init...');
+            window.JC.init();
+          }
+        }
+      }, 100);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', startWhenReady);
+    } else {
+      startWhenReady();
+    }
+
+    window.addEventListener('load', () => {
+      if (!window.JC._initialized && window.JC?.init) {
+        console.log('Inicialização final no load...');
+        window.JC.init();
+        window.JC._initialized = true;
+      }
+    });
+
+    function renderIntro() {
+      console.log('[JORNADA_RENDER] Renderizando intro');
+      const section = document.getElementById('section-intro');
+      if (section) {
+        section.classList.remove('hidden');
+        const canvas = document.getElementById('jornada-canvas');
+        if (canvas) {
+          canvas.className = 'card pergaminho pergaminho-v';
+          canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
+        }
+      }
+    }
+
+    function renderPerguntas(blocoIndex = 0) {
+      console.log('[JORNADA_RENDER] Renderizando perguntas, bloco:', blocoIndex);
+      const section = document.getElementById('section-perguntas');
+      if (section) {
+        section.classList.remove('hidden');
+        const canvas = document.getElementById('jornada-canvas');
+        if (canvas) {
+          canvas.className = 'card pergaminho pergaminho-h';
+          canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-horiz.png)';
+        }
+        const perguntasContainer = document.getElementById('perguntas-container');
+        if (perguntasContainer) {
+          const blocos = Array.from(perguntasContainer.querySelectorAll('.j-bloco'));
+          if (blocos[blocoIndex]) {
+            blocos.forEach(b => b.style.display = 'none');
+            blocos[blocoIndex].style.display = 'block';
+            const perguntas = Array.from(blocos[blocoIndex].querySelectorAll('.j-pergunta'));
+            if (perguntas.length) {
+              perguntas.forEach(p => p.classList.remove('active'));
+              perguntas[0].classList.add('active'); // Exibe a primeira pergunta
+              console.log('Exibindo pergunta inicial do bloco:', blocoIndex);
+            } else {
+              console.warn('Nenhuma pergunta encontrada no bloco:', blocoIndex);
+            }
+          } else {
+            console.error('Bloco não encontrado no índice:', blocoIndex);
+          }
+        }
+      }
+    }
+
+    function renderFinal() {
+      console.log('[JORNADA_RENDER] Renderizando final');
+      const section = document.getElementById('section-final');
+      if (section) {
+        section.classList.remove('hidden');
+        const canvas = document.getElementById('jornada-canvas');
+        if (canvas) {
+          canvas.className = 'card pergaminho pergaminho-v';
+          canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
+        }
+      }
+    }
+
+    // Funções globais expostas
+    window.showSection = showSection;
+    window.loadDynamicBlocks = loadDynamicBlocks;
+    window.JC = JC;
+    window.JORNADA_RENDER = { renderIntro, renderPerguntas, renderFinal };
+  </script>
