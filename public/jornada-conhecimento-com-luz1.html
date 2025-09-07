@@ -188,9 +188,20 @@
     @keyframes lumenBlink { 50% { opacity:0 } }
 
     .j-section { height:100%; font-size: 16px }
-    .j-bloco { background:transparent!important; display:none; z-index:50 }
-    .j-pergunta { margin-bottom:24px; display:none; z-index:60; position:relative }
-    .j-pergunta.active { display:block }
+    .j-bloco {
+      background: transparent !important;
+      display: none; /* Mantém o comportamento padrão, mas será sobrescrito pelo active */
+      z-index: 50;
+    }
+    .j-pergunta {
+      margin-bottom: 24px;
+      display: none; /* Mantém o comportamento padrão, mas será sobrescrito pelo .active */
+      z-index: 60;
+      position: relative;
+    }
+    .j-pergunta.active {
+      display: block; /* Garante que a pergunta ativa seja visível */
+    }
     .pergunta-enunciado { font-family: "CardoBold", "MedievalSharp", Arial, sans-serif; font-weight:600; margin-bottom:8px; display:block; font-size: 20px; } /* Título maior */
     .j-pergunta textarea { font-family: "CardoBold", "MedievalSharp", Arial, sans-serif; width:100%; padding:12px; border-radius:8px; border:1px solid #d1d5db; background:rgba(255,255,255,.8); resize:vertical; min-height:100px; font-size: 16px }
 
@@ -520,7 +531,10 @@
         setTimeout(() => { // Aguardar DOM ser atualizado
           updateProgress();
           const perguntas = document.querySelectorAll('.j-pergunta');
+          console.log('Perguntas encontradas no DOM:', perguntas.length); // Log para depuração
           if (perguntas.length) {
+            const firstBloco = document.querySelector('.j-bloco');
+            if (firstBloco) firstBloco.style.display = 'block'; // Garantir visibilidade do primeiro bloco
             perguntas[0].classList.add('active');
             runTyping(perguntas[0]);
           } else {
@@ -567,6 +581,7 @@
           bloco.appendChild(pergunta);
         });
         content.appendChild(bloco);
+        console.log(`Bloco ${idx} criado com ${block.questions.length} perguntas`); // Log para cada bloco
       });
       const firstBloco = content.querySelector('.j-bloco');
       if (firstBloco) {
