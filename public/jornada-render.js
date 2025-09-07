@@ -15,6 +15,18 @@
       }
     }
   }
+  function updateCanvasBackground(sectionId) {
+  const canvas = document.getElementById('jornada-canvas');
+  if (canvas) {
+    if (sectionId === 'section-perguntas') {
+      canvas.className = 'card pergaminho pergaminho-h';
+      canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-horiz.png)';
+    } else {
+      canvas.className = 'card pergaminho pergaminho-v';
+      canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
+    }
+  }
+}
 
   function renderPerguntas(blocoIndex = 0) {
     console.log('[JORNADA_RENDER] Renderizando perguntas, bloco:', blocoIndex);
