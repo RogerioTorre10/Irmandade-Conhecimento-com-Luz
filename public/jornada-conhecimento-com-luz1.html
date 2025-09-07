@@ -299,7 +299,7 @@
                 <input type="password" id="senha" placeholder="Digite sua senha...">
                 <span class="password-toggle" data-action="toggle-password">👁️</span>
               </div>
-              <button class="btn btn-primary" data-action="start">Ativar e Iniciar</button>
+              <button id="btnIniciar" class="btn btn-primary" data-action="start">Ativar e Iniciar</button>
             </div>
           </div>
 
@@ -368,7 +368,7 @@
     </div>
   </div>
 
-  <!-- Scripts inline restaurados -->
+  <!-- Scripts inline com controller e render -->
   <script>
     // Tag ambiente
     document.getElementById('envTag').textContent =
@@ -531,10 +531,8 @@
       const canvas = document.getElementById('jornada-canvas');
       if (canvas) {
         if (sectionId === 'section-perguntas') {
-          checkImage('/assets/img/pergaminho-rasgado-horiz.png', '/assets/img/pergaminho-rasgado-vert.png').then(bg => {
-            canvas.className = `card pergaminho pergaminho-h${bg.includes('vert') ? ' fallback' : ''}`;
-            canvas.style.backgroundImage = `url('${bg}')`;
-          });
+          canvas.className = 'card pergaminho pergaminho-h';
+          canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-horiz.png)';
         } else {
           canvas.className = 'card pergaminho pergaminho-v';
           canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
@@ -546,7 +544,9 @@
       const active = document.getElementById(sectionId);
       if (active) active.classList.remove('hidden');
       updateCanvasBackground(sectionId);
-      JORNADA_CHAMA.ensureHeroFlame(sectionId);
+      if (window.JORNADA_CHAMA && typeof window.JORNADA_CHAMA.ensureHeroFlame === 'function') {
+        window.JORNADA_CHAMA.ensureHeroFlame(sectionId);
+      }
       if (sectionId === 'section-perguntas') {
         loadDynamicBlocks();
         setTimeout(() => {
@@ -623,15 +623,6 @@
         console.error('Nenhum bloco criado após loadDynamicBlocks!');
       }
       console.log('Blocos carregados com sucesso!');
-    }
-
-    function checkImage(url, fallbackUrl) {
-      return new Promise(resolve => {
-        const img = new Image();
-        img.onload = () => resolve(url);
-        img.onerror = () => resolve(fallbackUrl);
-        img.src = url;
-      });
     }
 
     /* =========================
@@ -801,27 +792,142 @@
       const senhasValidas = ['iniciar', 'olho magico', 'olho mágico'];
       if (senhasValidas.includes(senha.toLowerCase())) {
         showSection('section-perguntas');
-        document.querySelector('.progress-badge')?.classList.remove('hidden');
-        document.querySelector('.progress-bar')?.classList.remove('hidden');
-        document.querySelector('.j-progress')?.classList.remove('hidden');
-        document.querySelector('.footer-actions')?.classList.remove('hidden');
-        console.log('Jornada iniciada com sucesso!');
+        loadDynamicBlocks();
+        state.blocoIndex = 0;
+        state.perguntaIndex = 0;
+        render(); // Garante a primeira pergunta
+        console.log('Jornada iniciada com sucesso, exibindo primeira pergunta');
       } else {
         alert('Senha incorreta. Tente novamente.');
       }
     }
 
     function initJornada() {
-      const prevBtn = document.getElementById('btnPrevPerguntas');
-      const nextBtn = document.getElementById('btnNextPerguntas');
-      const restartBtn = document.getElementById('btnRestart');
+      const root = document.getElementById('jornada-canvas');
+      if (!root) {
+        console.warn('Root #jornada-canvas não encontrado para inicialização');
+        return;
+      }
+      applyPergaminhoByRoute();
+      const startBtn = document.getElementById('btnIniciar') || document.querySelector('[data-action="start"]');
+      if (startBtn) {
+        startBtn.addEventListener('click', startJourney);
+        console.log('Botão Iniciar inicializado em JC.init');
+      } else {
+        console.error('Botão #btnIniciar não encontrado no DOM durante JC.init!');
+      }
+      const prevBtn = document.getElementById('btnPrevPerguntas') || document.querySelector('[data-action="prev"]');
+      const nextBtn = document.getElementById('btnNextPerguntas') || document.querySelector('[data-action="next"]');
       if (nextBtn) nextBtn.addEventListener('click', goNext);
       if (prevBtn) prevBtn.addEventListener('click', goPrev);
-      if (restartBtn) restartBtn.addEventListener('click', () => location.reload());
-
       document.addEventListener('click', (ev) => {
         const n = ev.target.closest('[data-action="next"]');
         const p = ev.target.closest('[data-action="prev"]');
         const s = ev.target.closest('[data-action="start"]');
-        const tp = ev.target.closest('[data-action="toggle-password"], .password-toggle');
-        if
+        if (n) { ev.preventDefault(); goNext(); }
+        if (p) { ev.preventDefault(); goPrev(); }
+        if (s) { ev.preventDefault(); startJourney(); }
+      });
+      try {
+        const stash = localStorage.getItem('JORNADA_RESPOSTAS');
+        if (stash) state.respostas = JSON.parse(stash) || state.respostas;
+      } catch {}
+      render();
+    }
+
+    (function defineFallback() {
+      window.JORNADA_BLOCKS = [
+        { questions: [{ label: 'Qual é o seu maior sonho?' }, { label: 'O que te inspira no dia a dia?' }], video_after: '/assets/video/transicao1.mp4' },
+        { questions: [{ label: 'Como você enfrenta desafios?' }, { label: 'Qual é sua maior conquista?' }], video_after: '/assets/video/transicao2.mp4' }
+      ];
+      window.JORNADA_QA = { positiveWords: Object.keys(EMO.POS), negativeWords: Object.keys(EMO.NEG) };
+      console.log('JORNADA_BLOCKS/QA (fallback) definidos!');
+    })();
+
+    async function boot() {
+      document.body.classList.add('jornada-active');
+      const route = (location.hash || '#intro').slice(1);
+      const canvas = document.getElementById('jornada-canvas');
+      const progressBadge = document.querySelector('.progress-badge');
+      const progressBar = document.querySelector('.progress-bar');
+      const jProgress = document.querySelector('.j-progress');
+      const footerActions = document.querySelector('.footer-actions');
+
+      if (canvas) {
+        if (route === 'perguntas') {
+          showSection('section-perguntas');
+          [progressBadge, progressBar, jProgress, footerActions].forEach(el => el?.classList.remove('hidden'));
+        } else if (route === 'final') {
+          showSection('section-final');
+          [progressBadge, progressBar, jProgress].forEach(el => el?.classList.remove('hidden'));
+        } else {
+          showSection('section-intro');
+        }
+      }
+      runTyping(document);
+      return true;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const btnStart = document.querySelector('[data-action="start"]');
+      if (btnStart) btnStart.addEventListener('click', e => { e.preventDefault(); startJourney(); });
+
+      runTyping(document);
+      initJornada();
+
+      boot().then(() => {
+        const visible = document.querySelector('.j-section:not(.hidden)');
+        if (visible) JORNADA_CHAMA.ensureHeroFlame(visible.id);
+      });
+
+      const target = document.getElementById('jornada-conteudo');
+      if (target) {
+        const obs = new MutationObserver(muts => {
+          muts.forEach(m => {
+            runTyping(m.target);
+            if (m.target.id === 'perguntas-container') updateProgress();
+          });
+        });
+        obs.observe(target, { childList: true, subtree: true });
+      }
+
+      const bola = document.getElementById('chama-bola');
+      if (bola && !bola.hasAttribute('data-intensidade')) {
+        bola.setAttribute('data-intensidade', 'media');
+      }
+
+      document.querySelectorAll('#chama-intro, #chama-perguntas, #chama-final, #chama-bola').forEach(f => {
+        f.style.setProperty('--jitter', `${(Math.random() * 2 - 1).toFixed(2)}px`);
+        f.querySelectorAll('.lingua').forEach((n, i) => {
+          n.style.animationDelay = `${i * 0.07 + Math.random() * 0.08}s`;
+        });
+      });
+    });
+
+    window.JC = window.JC || {};
+    window.toggleSenha = toggleSenha;
+    window.startJourney = startJourney;
+    window.showSection = showSection;
+    window.loadDynamicBlocks = loadDynamicBlocks;
+    window.JC.toggleSenha = toggleSenha;
+    window.JC.startJourney = startJourney;
+    window.JC.showSection = showSection;
+    window.JC.loadDynamicBlocks = loadDynamicBlocks;
+  </script>
+
+  <!-- Referências externas desativadas temporariamente -->
+  <!--
+  <script defer src="/config.js" onerror="console.error('Falha ao carregar config.js, usando fallback inline');"></script>
+  <script defer src="/jornada-utils.js" onerror="console.error('Falha ao carregar jornada-utils.js, usando fallback inline');"></script>
+  <script defer src="/jornada-core.js" onerror="console.error('Falha ao carregar jornada-core.js, usando fallback inline');"></script>
+  <script defer src="/jornada-auth.js" onerror="console.error('Falha ao carregar jornada-auth.js, usando fallback inline');"></script>
+  <script defer src="/jornada-chama.js" onerror="console.error('Falha ao carregar jornada-chama.js, usando fallback inline');"></script>
+  <script defer src="/jornada-paper-qa.js" onerror="console.error('Falha ao carregar jornada-paper-qa.js, usando fallback inline');"></script>
+  <script defer src="/jornada-typing.js" onerror="console.error('Falha ao carregar jornada-typing.js, usando fallback inline');"></script>
+  <script defer src="/jornada-controller.js" onerror="console.error('Falha ao carregar jornada-controller.js, usando fallback inline');"></script>
+  <script defer src="/jornada-render.js" onerror="console.error('Falha ao carregar jornada-render.js, usando fallback inline');"></script>
+  <script defer src="/jornada-bootstrap.js" onerror="console.error('Falha ao carregar jornada-bootstrap.js, usando fallback inline');"></script>
+  <script defer src="/jornada-micro.js" onerror="console.error('Falha ao carregar jornada-micro.js, usando fallback inline');"></script>
+  <script defer src="/i18n/i18n.js" onerror="console.error('Falha ao carregar i18n.js, usando fallback inline');"></script>
+  <script defer src="/api.js" onerror="console.error('Falha ao carregar api.js, usando fallback inline');"></script>
+  -->
