@@ -23,6 +23,23 @@ html,body{height:100%}
   src:url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');
   font-weight:400; font-style:normal; font-display:swap;
 }
+/* Progress inline (dentro de #section-perguntas) */
+#section-perguntas .progress-inline{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin:10px 0 14px;
+}
+
+/* O selo de % deixa de ser fixo e vai junto da barra */
+.progress-badge.inline{
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  align-self: flex-end;
+  margin-bottom: 4px;
+}
+
 @font-face{
   font-family:'Cardo';
   src:url('/assets/fonts/Cardo-Regular.ttf') format('truetype');
@@ -298,4 +315,20 @@ nav a, a.btn, .site-header p { letter-spacing:.5px; }
 /* posição do herói no topo (caso falte) */
 .chama-fixed-hero{ position:absolute; top:-8px; left:-8px; z-index:60 }
 
+/* Progress inline (dentro de #section-perguntas) */
+#section-perguntas .progress-inline{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin:10px 0 14px;
+}
+
+/* O selo de % deixa de ser fixo e vai junto da barra */
+.progress-badge.inline{
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  align-self: flex-end;
+  margin-bottom: 4px;
+}
 
