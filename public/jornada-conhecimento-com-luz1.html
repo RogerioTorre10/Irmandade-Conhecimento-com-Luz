@@ -757,49 +757,88 @@
     window.JC.startJourney = startJourney;
     window.JC.showSection  = showSection;
     window.JC.Chama = window.JORNADA_CHAMA;
-    /* === FILME 0 antes de iniciar a jornada (intercepta o clique 1x) ======= */
-(function filme0OnStartClick(){
-  // Ajuste o caminho conforme seu servidor:
-  const FILME0_URL = '/public/assets/img/filme-0-ao-encontro-da-jornada.mp4';
-  // Se seus assets são servidos sem /public, use:
-  // const FILME0_URL = '/assets/img/filme-0-ao-encontro-da-jornada.mp4';
+    
+   /***** =================== VÍDEOS DA JORNADA =================== *****/
 
-  // Garantias mínimas
+// Ajuste este prefixo se necessário:
+const VIDEO_BASE = '/assets/img/';
+
+// Mapa de vídeos
+window.JORNADA_VIDEOS = {
+  intro: VIDEO_BASE + 'filme-0-ao-encontro-da-jornada.mp4',      // FILME 0
+  afterBlocks: {
+    0: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',           // após Bloco 1
+    1: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'              // após Bloco 2
+  },
+  final: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'               // FILME FINAL
+};
+
+/***** ====== Preenche fallback dos blocos + vídeo final, sem HTML ====== *****/
+(function ensureBlocksAndFinal(){
+  // Se já existe JORNADA_BLOCKS carregado por outro script, só garantimos video_after
+  window.JORNADA_BLOCKS = window.JORNADA_BLOCKS || [
+    {
+      title: 'Bloco 1 — Raízes',
+      questions: [
+        'Quem é você hoje?',
+        'O que a Luz te pede agora?'
+      ],
+      video_after: window.JORNADA_VIDEOS.afterBlocks[0]
+    },
+    {
+      title: 'Bloco 2 — Caminho',
+      questions: [
+        'Qual verdade você precisa admitir para seguir?',
+        'O que precisa ser curado neste momento?'
+      ],
+      video_after: window.JORNADA_VIDEOS.afterBlocks[1]
+    }
+  ];
+
+  // Se algum bloco não tem video_after, completa a partir do mapa
+  window.JORNADA_BLOCKS.forEach(function(block, idx){
+    if (!block.video_after && window.JORNADA_VIDEOS.afterBlocks[idx]){
+      block.video_after = window.JORNADA_VIDEOS.afterBlocks[idx];
+    }
+  });
+
+  // Vídeo final (usado pelo seu goNext / fluxo ao terminar)
+  window.JORNADA_FINAL_VIDEO = window.JORNADA_FINAL_VIDEO || window.JORNADA_VIDEOS.final;
+})();
+
+/***** ====== Filme 0: intercepta o PRIMEIRO clique em "Ativar e Iniciar" ====== *****/
+/* Isso NÃO altera a função de senha nem showSection.
+   Apenas pausa o 1º clique, toca o filme e, ao terminar, chama startJourney normalmente. */
+(function filme0OnStartClick(){
   if (typeof window.playTransition !== 'function') {
-    console.warn('[Filme0] playTransition indisponível.');
-    return;
-  }
-  if (typeof window.startJourney !== 'function') {
-    console.warn('[Filme0] startJourney não está disponível ainda.');
+    console.warn('[Filme0] playTransition indisponível, não vou interceptar.');
     return;
   }
 
   let interceptado = false;
 
-  // Captura o 1º clique no botão de start SEM alterar a função original
   document.addEventListener('click', function onClickStart(ev){
-    // procura o botão/ícone com data-action="start"
     const btn = ev.target.closest('[data-action="start"]');
     if (!btn || interceptado) return;
 
-    // Intercepta APENAS UMA VEZ
-    interceptado = true;
+    interceptado = true;          // só uma vez
     ev.preventDefault();
     ev.stopPropagation();
 
-    // Roda o filme-0 e, ao terminar (ou pular), chama o startJourney original
     try {
-      playTransition(FILME0_URL, () => {
-        try { window.startJourney(); }      // segue o fluxo normal
+      playTransition(window.JORNADA_VIDEOS.intro, function(){
+        // depois do vídeo, segue o fluxo normal chamando a função já existente
+        try { window.startJourney(); }
         catch(e){ console.error('[Filme0] erro ao chamar startJourney:', e); }
       });
     } catch (e) {
       console.error('[Filme0] falha ao iniciar vídeo:', e);
-      // Fallback: se der erro, inicia normalmente
+      // fallback: inicia direto se o vídeo der erro
       try { window.startJourney(); } catch(_) {}
     }
-  }, true); // <-- CAPTURA (true) garante que intercepta antes dos outros handlers
+  }, true); // captura: garante que pegamos antes de outros handlers
 })();
+
     <script>
       
   <!-- Referências externas (mantidas para evitar 404, mas não necessárias) -->
