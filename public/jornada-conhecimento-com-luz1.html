@@ -656,10 +656,10 @@
     function startJourney(){
       const senha=document.getElementById('senha')?.value || '';
       const senhasValidas=['iniciar','olho magico','olho mágico'];
-      if(senhasValidas.includes(senha.toLowerCase())){
-      const filme0 = '/assets/img/filme-0-ao-encontro-da-jornada.mp4';   
-      const iniciarPerguntas = () => {   
+      if(senhasValidas.includes(senha.toLowerCase())){      
         (window.showSection||showSection)('section-perguntas');
+       const filme0 = '/assets/img/filme-0-ao-encontro-da-jornada.mp4';   
+       const iniciarPerguntas = () => {    
         loadDynamicBlocks();
         const perguntas=document.querySelectorAll('.j-pergunta');
         if(perguntas.length){
@@ -671,7 +671,8 @@
         document.querySelector('.j-progress')?.classList.remove('hidden');
         document.querySelector('.footer-actions')?.classList.remove('hidden');
         updateProgress(); console.log('Jornada iniciada com sucesso!');
-      } else { alert('Senha incorreta. Tente novamente.'); }
+        playTransition(filme0, iniciarPerguntas);
+       } else { alert('Senha incorreta. Tente novamente.'); }
     }
 
     function initJornada(){
