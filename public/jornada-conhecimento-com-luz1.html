@@ -1,3 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jornada • Irmandade Conhecimento com Luz</title>
+  <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png">
+  <style>
+    :root { --bg:#0b1020; --fg:#eef2ff; --muted:#aab4d4; --primary:#6aa7ff; --card:#121832; --card-2:#0e1428; --radius:16px; }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    @font-face{
+      font-family:'ManufacturingConsent';
+      src:url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');
+      font-weight:400; font-style:normal; font-display:swap;
+    }
+    @font-face{
+      font-family:'BerkshireSwash';
+      src:url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');
+      font-weight:400; font-style:normal; font-display:swap;
+    }
+    @font-face{
+      font-family:'Cardo';
+      src:url('/assets/fonts/Cardo-Regular.ttf') format('truetype');
+      font-weight:400; font-style:normal; font-display:swap;
+    }
+    @font-face{
+      font-family:'Cardo';
+      src:url('/assets/fonts/Cardo-Italic.ttf') format('truetype');
+      font-weight:400; font-style:italic; font-display:swap;
+    }
+    @font-face{
+      font-family:'Cardo';
+      src:url('/assets/fonts/Cardo-Bold.ttf') format('truetype');
+      font-weight:700; font-style:normal; font-display:swap;
+    }
+    body{margin:0;font-family:'BerkshireSwash',cursive;background:var(--bg);color:var(--fg);line-height:1.5;}
+    h1,h2,h3,h4,h5,h6,.site-header h1,.card h2,.section-title,.bloco-titulo,.card-pergunta h3,.jornada-header h1{font-family:'ManufacturingConsent',serif;letter-spacing:1px;text-transform:none;font-weight:400;}
+    label,.pergunta-enunciado,.texto-guia,.orientacoes,.contrato,p{font-family:'BerkshireSwash',cursive;}
+    input,textarea,select,.resposta,.jornada-resposta,.devolutiva,#acolh,#jornada-conteudo textarea,#jornada-conteudo input[type="text"],#jornada-conteudo input[type="email"],#jornada-conteudo input[type="number"],#form-perguntas textarea,#form-perguntas input[type="text"],#form-perguntas input[type="email"],#form-perguntas input[type="number"]{font-family:'Cardo',serif;}
+    .site-header,.site-footer{padding:24px 16px;text-align:center}
+    .container{max-width:920px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:16px}
+    .motto{opacity:.8;margin-top:8px;text-align:center;letter-spacing:.1em}
+    .card{background:linear-gradient(180deg,var(--card),var(--card-2));padding:20px;border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .badge{display:inline-block;padding:4px 8px;border-radius:999px;background:rgba(106,167,255,.15);color:var(--primary);font-weight:600}
+    .small{font-size:.875rem;opacity:.9}
+    hr{border:0;border-top:1px solid rgba(255,255,255,.15);margin:16px 0}
+    .input, textarea{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:#0c1330;color:var(--fg)}
+    label{font-weight:600;margin:6px 0 4px;display:block}
+    .senha-wrap{position:relative;display:flex;align-items:center}
+    .senha-wrap .input{padding-right:42px}
+    .senha-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:28px;height:28px;border:0;background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer}
+    .senha-eye:hover{color:var(--fg)}
+    .senha-eye svg{width:20px;height:20px}
+    body.jornada-active #page-shell,body.jornada-active header.site-header,body.jornada-active footer.site-footer {display:none !important;}
+    body.jornada-active #jornada-canvas {display:block !important;}
+    .pergaminho{position:relative;z-index:1;margin:12px auto;padding:0;border-radius:18px;overflow:auto;background-repeat:no-repeat;background-position:center;background-size:100% 100%;}
+    :root{--pergV-ratio: 2/3; --pergH-ratio: 3/2;}
+    .pergaminho-v{background-image:url("/assets/img/pergaminho-rasgado-vert.png");height:92vh;width:calc(92vh * var(--pergV-ratio));max-width:96vw;min-height:400px;}
+    .pergaminho-h{background-image:url("/assets/img/pergaminho-rasgado-horiz.png");width:96vw;height:calc(96vw / var(--pergH-ratio));max-height:82vh;min-height:300px;}
+    .conteudo-pergaminho{position:relative;z-index:2;padding:clamp(12px,3vw,28px);line-height:1.55;}
+    .jornada #jornada-canvas.pergaminho{display:block;}
+    .j-bloco{display:none;}
+    .j-pergunta{display:none;}
+    .video-overlay{position:fixed; inset:0; background:rgba(0,0,0,.85);display:flex; align-items:center; justify-content:center; z-index:9999;}
+    .video-overlay.hidden{display:none;}
+    .lumen-typing { white-space: pre-wrap; position: relative; }
+    .lumen-typing::after { content: "▌"; margin-left: 2px; opacity: .75; animation: lumenBlink 1s steps(2, end) infinite; }
+    .lumen-typing.typing-done::after { content: ""; animation: none; }
+    @keyframes lumenBlink { 50% { opacity: 0; } }
+    .chama-viva { width: 60px; height: 120px; background: linear-gradient(to top, #ff4500, #ffa500); clip-path: polygon(20% 100%, 50% 0%, 80% 100%); position: relative; filter: drop-shadow(0 0 12px rgba(255, 140, 0, 0.55)); }
+    .chama-viva .lingua { background: linear-gradient(to top, #ff8c00, #ffd700); clip-path: polygon(30% 100%, 50% 0%, 70% 100%); animation: linguaJitter 3s infinite ease-in-out; }
+    .chama-viva .brilho { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255, 215, 0, 0.5), transparent); filter: blur(14px); animation: brilhoJitter 2.2s infinite ease-in-out; }
+    .chama.chama-md { width: 32px; height: 64px; }
+    .chama.chama-lg { width: 48px; height: 96px; }
+    @media (max-width: 600px) {
+      .chama-viva { width: 40px; height: 80px; }
+      .chama-viva.chama-md { width: 32px; height: 64px; }
+      .chama-viva.chama-lg { width: 48px; height: 96px; }
+      #chama-perguntas { margin: 6px 0 10px; }
+    }
+    @keyframes linguaJitter { 0%, 100% { transform: translateX(-50%) scaleY(1) skewX(0deg); } 20% { transform: translateX(-50%) scaleY(1.05) skewX(0.5deg) translateX(var(--jitter, 0px)); } 50% { transform: translateX(-50%) scaleY(1.1) skewX(1.2deg) translateX(var(--jitter, 0px)); } 80% { transform: translateX(-50%) scaleY(1.03) skewX(0.3deg) translateX(var(--jitter, 0px)); } }
+    @keyframes brilhoJitter { 0%, 100% { filter: blur(12px); } 50% { filter: blur(14px); } }
+    .chama-fixed-top { position: absolute; top: 10px; right: 14px; z-index: 60; }
+    .chama-fixed-hero { position: absolute; top: -8px; left: -8px; z-index: 60; }
+    .mark-emocao { background: linear-gradient(90deg, rgba(255,196,0,.35), rgba(255,140,0,.2)); border-radius: 4px; padding: 0 2px; }
+    .j-progress { margin:6px 0 14px; }
+    .j-progress__bar { width:100%; height:10px; border-radius:999px; background:rgba(255,255,255,.14); overflow:hidden; }
+    .j-progress__fill { height:100%; width:0%; transition:width .25s ease; background:linear-gradient(90deg,#f59e0b,#fde68a); }
+    .j-progress__meta { margin-top:6px; font-size:.95rem; opacity:.9; display:flex; justify-content:space-between; gap:8px; }
+    .j-progress__meta b { font-weight:700; }
+    .progress-badge { position:absolute; top:8px; right:16px; background:rgba(0,0,0,0.7); color:#fff; font-size:.9rem; padding:4px 8px; border-radius:8px; font-family:'Cardo', serif; z-index:10; }
+    .progress-bar { width:100%; height:8px; background:rgba(255,255,255,0.2); border-radius:4px; overflow:hidden; margin:10px 0; }
+    .progress-bar-fill { height:100%; width:0; background:linear-gradient(90deg,#ffcf70,#ff8c00); transition:width .5s ease-out; }
+    nav a, a.btn, .site-header p { letter-spacing:.5px; font-family:'BerkshireSwash',cursive; }
+    .video-overlay { position:fixed; inset:0; background:#000; display:flex; justify-content:center; align-items:center; z-index:9999; }
+    .video-overlay.hidden { display:none; }
+    .video-player { max-width:100%; max-height:100%; }
+    .lang-switch { display:flex; gap:6px; align-items:center; }
+    .lang-btn { font-family:'ManufacturingConsent', serif; font-size:.85rem; padding:.25rem .5rem; border-radius:.5rem; border:1px solid rgba(255,255,255,.2); background:transparent; color:#e8ecf4; cursor:pointer; }
+    .lang-btn:hover { background:rgba(255,255,255,.1); }
+    .j-bloco { display: none; }
+    .j-pergunta { display: none; }
+    .jornada .j-progress { }
+    .jornada .footer-actions .btn { font-family:'BerkshireSwash',cursive; }
+    .chama-viva .lingua { animation-name: lingua, linguaJitter; animation-duration: 1.2s, 3s; animation-iteration-count: infinite, infinite; animation-timing-function: ease-in-out, ease-in-out; }
+    .chama-fixed-hero { position:absolute; top:-8px; left:-8px; z-index:60 }
+    .pergaminho-v { background-image: url('/assets/img/pergaminho-rasgado-vert.png'); }
+    .pergaminho-v:empty { background-color: #f6efe0; }
+    .pergaminho-h { background-image: url('/assets/img/pergaminho-rasgado-horiz.png'); }
+    .pergaminho-h:empty { background-color: #f6efe0; }
+    .field-error { border-color: #ef4444; }
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: #fff; padding: 10px 20px; border-radius: 5px; opacity: 0; transition: opacity 0.3s; }
+    .toast.show { opacity: 1; }
+    .typing-caret { display: inline-block; width: 0.6ch; margin-left: 2px; animation: blink 1s step-end infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+  </style>
+</head>
+<body data-layout="master" data-journey="essencial">
+  <header class="site-header">
+    <div class="chama-viva chama-lg chama-strong chama-fixed-hero Tony" id="chama-intro">
+      <div class="brasa"></div>
+      <div class="lingua"></div>
+      <div class="lingua"></div>
+      <div class="lingua"></div>
+      <div class="brilho"></div>
+    </div>
+    <h1>Jornada Essencial</h1>
+  </header>
+  <main id="page-shell" class="container">
+    <div class="container">
+      <a class="btn btn-primary" href="#sec-intro" data-nav="intro">Ir para Introdução</a>
+      <a class="btn btn-secondary" href="/jornadas.html" data-nav="home">← Voltar</a>
+    </div>
+    <div class="section-container">
+      <section id="jornada-canvas" class="card pergaminho pergaminho-v">
+        <div id="jornada-conteudo" class="conteudo-pergaminho">
+          <!-- AUTENTICAÇÃO -->
+          <div id="sec-auth" class="j-section">
+            <div class="chama-viva chama-lg chama-strong chama-fixed-hero" id="chama-auth">
+              <div class="brasa"></div>
+              <div class="lingua"></div>
+              <div class="lingua"></div>
+              <div class="lingua"></div>
+              <div class="brilho"></div>
+            </div>
+            <p data-typing data-text="Bem-vindo(a) à Jornada Essencial. Por favor, insira a senha para começar." data-speed="50"></p>
+            <div class="password-form">
+              <h3>Ative sua Senha</h3>
+              <div class="senha-wrap">
+                <input type="password" id="senha" class="input" placeholder="Digite sua senha...">
+                <span class="senha-eye password-toggle" data-action="toggle-password">👁️</span>
+              </div>
+              <button id="btnEntrar" class="btn btn-primary" data-nav="intro">Entrar</button>
+              <div id="authError" class="hidden text-red-500 mt-2">Senha incorreta.</div>
+            </div>
+          </div>
+          <!-- INTRO -->
+          <div id="sec-intro" class="j-section hidden">
+            <div class="chama-viva chama-lg chama-strong chama-fixed-hero" id="chama-intro">
+              <div class="brasa"></div>
+              <div class="lingua"></div>
+              <div class="lingua"></div>
+              <div class="lingua"></div>
+              <div class="brilho"></div>
+            </div>
+            <h1>Bem-vindo(a) à Jornada Essencial</h1>
+            <p data-typing data-text="Esta é uma experiência de reflexão profunda, simbólica e acolhedora. Leia com atenção o Termo de Responsabilidade e siga quando estiver pronto(a)." data-speed="40"></p>
+            <div class="termo">
+              <h2>Termo de Responsabilidade e Consentimento</h2>
+              <p data-typing data-text="Ao iniciar, você concorda em participar de forma consciente, sabendo que este material é de autoconhecimento e não substitui apoio médico ou psicológico." data-speed="50"></p>
+            </div>
+            <div class="password-form">
+              <label><input type="checkbox" id="chkTermo"> Concordo com os termos</label>
+              <button id="btnIniciar" class="btn btn-primary" disabled data-nav="perguntas">Iniciar</button>
+            </div>
+          </div>
+          <!-- PERGUNTAS (WIZARD) -->
+          <div id="sec-wizard" class="j-section hidden">
+            <div class="chama-viva chama-md" id="chama-perguntas">
+              <div class="brasa"></div>
+              <div class="lingua"></div>
+              <div class="lingua"></div>
+              <div class="lingua"></div>
+              <div class="brilho"></div>
+            </div>
+            <div id="perguntas-container"></div>
+            <div class="footer-actions">
+              <button id="btnLimparAtual" class="btn btn-secondary">Limpar</button>
+              <button id="btnVoltar" class="btn btn-secondary" data-nav="perguntas-prev" data-idx="0">Voltar</button>
+              <button id="btnProxima" class="btn btn-primary" data-nav="perguntas-next" data-idx="0">Próxima</button>
+            </div>
+          </div>
+          <!-- FINAL -->
+          <div id="sec-final" class="j-section hidden">
+            <div class="chama-viva chama-lg chama-strong chama-fixed-hero" id="chama-final">
+              <div class="brasa"></div>
+              <div class="lingua"></div>
+              <div class="lingua"></div>
+              <div class="lingua"></div>
+              <div class="brilho"></div>
+            </div>
+            <p data-typing data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40"></p>
+            <div class="footer-actions">
+              <button id="btnRevisar" class="btn btn-secondary" data-nav="perguntas">Revisar</button>
+              <button id="btnGerarPDFHQ" class="btn btn-primary">Baixar PDF + HQ</button>
+              <button id="btnNovaJornada" class="btn btn-secondary" data-nav="home">Nova Jornada</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <footer class="site-footer">
+      <small>© 2025 Irmandade Conhecimento com Luz</small>
+      <div id="envTag"></div>
+    </footer>
+  </main>
+  <!-- PROGRESS -->
+  <div class="progress-badge" id="jprog-pct">0% concluído</div>
+  <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
+  <div class="j-progress">
+    <div class="j-progress__bar"><div class="j-progress__fill"></div></div>
+    <div class="j-progress__meta" id="j-meta"></div>
+  </div>
+  <!-- OVERLAY VIDEO -->
+  <div id="videoOverlay" class="video-overlay hidden">
+    <video id="videoTransicao" class="video-player" playsinline preload="metadata" controls></video>
+    <button id="skipVideo" class="btn btn-secondary">Pular vídeo</button>
+  </div>
+  <!-- [INSERIR APÓS const PERGUNTAS = [...]] -->
+<script>
+  window.JORNADA_VIDEOS = {
+    before_b1: "/assets/img/filme-1-entrando-na-jornada.mp4",
+    before_b2: "/assets/img/filme-2-dentro-da-jornada.mp4",
+    before_b3: "/assets/img/filme-3-traumas-na-jornada.mp4",
+    before_b4: "/assets/img/filme-4-aproximando-do-final.mp4",
+    before_b5: null,
+    final:     "/assets/img/filme-5-fim-da-jornada.mp4"
+  };
+  window.JORNADA_FINAL_VIDEO = window.JORNADA_VIDEOS.final;
+</script>
+  <!-- GUIA ESPIRITUAL: chama flamejante livre -->
+  <div id="guia-espiritual">
+    <div id="chama-bola" class="chama-viva" style="position: fixed; bottom: 20px; right: 20px;">
+      <div class="brasa"></div>
+      <div class="lingua"></div>
+      <div class="lingua"></div>
+      <div class="lingua"></div>
+      <div class="brilho"></div>
+    </div>
+  </div>
+  <!-- Scripts inline consolidado -->
 <script>
     // Tag ambiente
     document.getElementById('envTag').textContent =
