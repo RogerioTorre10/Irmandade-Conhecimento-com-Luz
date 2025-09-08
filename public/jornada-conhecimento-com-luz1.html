@@ -9,6 +9,7 @@
   <style>
     /* ===== BASE ===== */
     body { margin:0; font-family: Arial, sans-serif; background:#f9f9f9; color:#333; }
+    @font-face { font-family: 'BerkshireSwash'; src: url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype'); }
     .site-header{display:flex;align-items:center;gap:12px;padding:16px;background:#1f2937;color:#fff;box-shadow:0 2px 4px rgba(0,0,0,.1);position:relative;z-index:1000}
     .container{max-width:900px;margin:24px auto;padding:0 16px}
     .card{background:#f6efe0!important;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.12);padding:32px;position:relative;z-index:10}
@@ -38,13 +39,16 @@
     .chama-fixed-top{position:absolute;top:10px;right:14px;z-index:60}
     .chama-fixed-hero{position:absolute;top:-8px;left:-8px;z-index:60}
 
-    /* ===== CHAMA VIVA (do arquivo 2) ===== */
+    /* ===== CHAMA VIVA ===== */
     .chama-viva { width: 48px; height: 96px; background: linear-gradient(to top, #ff4500, #ffa500); clip-path: polygon(20% 100%, 50% 0%, 80% 100%); position: relative; filter: drop-shadow(0 0 12px rgba(255, 140, 0, 0.55)); border-radius: 12px; }
     .chama-viva .brasa { position:absolute; bottom:0; left:0; right:0; height:40%; background: radial-gradient(ellipse at 50% 100%, rgba(255,140,0,.6), rgba(255,69,0,.2), transparent 70%); filter: blur(4px); }
     .chama-viva .lingua { position:absolute; bottom:0; left:50%; transform: translateX(-50%); width: 40%; height: 85%; background: linear-gradient(to top, #ff8c00, #ffd700); clip-path: polygon(30% 100%, 50% 0%, 70% 100%); animation: linguaJitter 3s infinite ease-in-out; }
     .chama-viva .brilho { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255, 215, 0, 0.5), transparent); filter: blur(14px); animation: brilhoJitter 2.2s infinite ease-in-out; }
     .chama-viva.chama-md { width: 32px; height: 64px; }
     .chama-viva.chama-lg { width: 60px; height: 120px; }
+    .chama-viva[data-intensidade="fraca"] { opacity: 0.5; transform: scale(0.8); }
+    .chama-viva[data-intensidade="forte"] { transform: scale(1.2); filter: drop-shadow(0 0 16px rgba(255, 140, 0, 0.7)); }
+    .chama-viva[data-intensidade="media"] { transform: scale(1); opacity: 1; }
     @keyframes linguaJitter { 0%, 100% { transform: translateX(-50%) scaleY(1) skewX(0deg); } 20% { transform: translateX(-50%) scaleY(1.05) skewX(.5deg) translateX(var(--jitter, 0px)); } 50% { transform: translateX(-50%) scaleY(1.1) skewX(1.2deg) translateX(var(--jitter, 0px)); } 80% { transform: translateX(-50%) scaleY(1.03) skewX(.3deg) translateX(var(--jitter, 0px)); } }
     @keyframes brilhoJitter { 0%, 100% { filter: blur(12px); } 50% { filter: blur(14px); } }
 
@@ -56,7 +60,7 @@
     @keyframes flicker-strong{0%,100%{transform:scaleY(1.5);opacity:1}50%{transform:scaleY(1.8);opacity:.9}}
 
     /* ===== UI ===== */
-    .btn{display:inline-block;padding:12px 24px;border-radius:10px;border:0;background:#1f2937;color:#fff;font-weight:600;text-decoration:none;transition:background .3s ease, transform .2s ease;z-index:30}
+    .btn{display:inline-block;padding:12px 24px;border-radius:10px;border:0;background:#1f2937;color:#fff;font-family:'BerkshireSwash',cursive;font-weight:600;font-size:18px;text-decoration:none;transition:background .3s ease,transform .2s ease;z-index:30}
     .btn:hover{background:#374151;transform:scale(1.05)}
     .btn-primary{background:#6b21a8}
     .btn-primary:hover{background:#7c3aed}
@@ -64,13 +68,13 @@
     .btn-secondary:hover{background:#6b7280}
     .btn + .btn{margin-left:12px}
 
-    .progress-badge{position:fixed;top:16px;right:16px;padding:8px 16px;background:#6b21a8;color:#fff;border-radius:8px;font-size:.9rem;z-index:900;visibility:visible}
+    .progress-badge{position:fixed;top:16px;right:16px;padding:8px 16px;background:#6b21a8;color:#fff;border-radius:8px;font-size:.9rem;font-family:'BerkshireSwash',cursive;z-index:900;visibility:visible}
     .progress-bar{width:100%;height:8px;background:#e5e7eb;border-radius:4px;margin-top:12px;z-index:900;visibility:visible}
     .progress-bar-fill{height:100%;background:#6b21a8;border-radius:4px;transition:width .3s ease}
     .j-progress{margin-top:12px;z-index:900;visibility:visible}
     .j-progress__bar{width:100%;height:6px;background:#e5e7eb;border-radius:4px}
     .j-progress__fill{height:100%;background:#1f2937;border-radius:4px;transition:width .3s ease}
-    .j-progress__meta{text-align:center;margin-top:8px;font-size:.9rem}
+    .j-progress__meta{text-align:center;margin-top:8px;font-size:.9rem;font-family:'BerkshireSwash',cursive}
 
     .footer-actions{display:flex;gap:12px;justify-content:center;margin:16px 0;z-index:900}
 
@@ -100,7 +104,7 @@
     .hidden{display:none!important}
 
     /* Bola/guia da chama flutuante */
-    #guia-espiritual{position:fixed;bottom:20px;right:20px;z-index:1200}
+    #guia-espiritual{position:fixed;bottom:20px;left:20px;z-index:1200}
   </style>
 </head>
 
@@ -108,12 +112,15 @@
   <header class="site-header">
     <div class="chama chama-sm"><span></span><span></span><span></span></div>
     <h1>Jornada Essencial</h1>
+    <div class="chama-viva chama-md chama-fixed-top" id="chama-top">
+      <div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>
+    </div>
   </header>
 
   <main id="page-shell" class="container">
     <div class="container">
       <a class="btn btn-primary" href="#intro">Ir para Introdução</a>
-      <a class="btn btn-secondary" href="/jornadas.html">← Voltar</a>
+      <a class="btn btn-secondary" href="/jornadas.html">Retornar à Homepage</a>
     </div>
 
     <div class="section-container">
@@ -121,17 +128,32 @@
         <div id="jornada-conteudo" class="conteudo-pergaminho">
           <!-- INTRO -->
           <div id="section-intro" class="j-section">
-            <!-- Hero será injetado pela API de chama -->
+            <div class="chama-viva chama-lg chama-fixed-hero" id="chama-hero">
+              <div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>
+            </div>
             <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
             <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Antes de começar, ative sua senha." data-speed="50" data-cursor="true"></p>
-
             <div class="password-form">
               <h3>Ative sua Senha</h3>
               <div class="password-input">
                 <input type="password" id="senha" placeholder="Digite sua senha...">
                 <span class="password-toggle" data-action="toggle-password">👁️</span>
               </div>
-              <button class="btn btn-primary" data-action="start">Ativar e Iniciar</button>
+              <button class="btn btn-primary" data-action="start">Iniciar</button>
+            </div>
+          </div>
+
+          <!-- ORIENTAÇÕES E CONTRATO -->
+          <div id="section-orientations" class="j-section hidden">
+            <div class="chama-viva chama-lg chama-fixed-hero" id="chama-hero-orientations">
+              <div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>
+            </div>
+            <h2>Orientações e Contrato</h2>
+            <p>Leia atentamente as orientações antes de prosseguir com a jornada.</p>
+            <p>Ao continuar, você concorda com os termos da Irmandade Conhecimento com Luz.</p>
+            <div class="footer-actions">
+              <button class="btn btn-primary" data-action="start-journey">Avançar</button>
+              <button class="btn btn-secondary" data-action="home">Retornar à Homepage</button>
             </div>
           </div>
 
@@ -141,16 +163,19 @@
             <div id="perguntas-container"></div>
             <div class="footer-actions">
               <button id="btnPrevPerguntas" class="btn btn-secondary" data-action="prev">Voltar</button>
-              <button id="btnNextPerguntas" class="btn btn-primary" data-action="next">Próxima</button>
+              <button id="btnNextPerguntas" class="btn btn-primary" data-action="next">Avançar</button>
             </div>
           </div>
 
           <!-- FINAL -->
           <div id="section-final" class="j-section hidden">
-            <!-- Hero será injetado pela API de chama -->
+            <div class="chama-viva chama-lg chama-fixed-hero" id="chama-hero-final">
+              <div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>
+            </div>
             <p data-typing data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40" data-cursor="true"></p>
             <div class="footer-actions">
-              <button id="btnRestart" class="btn btn-secondary" data-action="restart">Reiniciar</button>
+              <button class="btn btn-primary" data-action="print">Imprimir PDF/HQ</button>
+              <button class="btn btn-secondary" data-action="home">Retornar à Homepage</button>
             </div>
           </div>
         </div>
@@ -168,23 +193,18 @@
   <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
   <div class="j-progress">
     <div class="j-progress__bar"><div class="j-progress__fill"></div></div>
-    <div class="j-progress__meta" id="j-meta"></div>
+    <div class="j-progress__meta" id="j-meta">0/10</div>
   </div>
 
   <!-- OVERLAY VIDEO -->
   <div id="videoOverlay" class="video-overlay hidden">
     <video id="videoTransicao" class="video-player" playsinline preload="metadata" controls></video>
-    <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
   </div>
 
   <!-- GUIA ESPIRITUAL: chama flamejante livre -->
   <div id="guia-espiritual">
     <div id="chama-bola" class="chama-viva chama-md">
-      <div class="brasa"></div>
-      <div class="lingua"></div>
-      <div class="lingua"></div>
-      <div class="lingua"></div>
-      <div class="brilho"></div>
+      <div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>
     </div>
   </div>
 
@@ -222,41 +242,39 @@
     }
 
     /* =========================
-       CHAMA — API unificada (traz do arquivo 2)
+       CHAMA — API unificada
     ==========================*/
     window.JORNADA_CHAMA = {
       updateChama(scoreNum, targetId='chama-perguntas'){
         const el=document.getElementById(targetId); if(!el) return;
-        // se ainda for a chama simples, converte para estrutura viva
+        const topFlame=document.getElementById('chama-top');
+        const bottomFlame=document.getElementById('chama-bola');
         if(!el.classList.contains('chama-viva')){
           el.classList.add('chama-viva');
           el.innerHTML = '<div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>';
         }
         const modo = (scoreNum <= -2) ? 'fraca' : (scoreNum >= 2) ? 'forte' : 'media';
         el.dataset.intensidade = modo;
-        // efeito pico
+        if(topFlame) topFlame.dataset.intensidade = modo;
+        if(bottomFlame) bottomFlame.dataset.intensidade = modo;
         el.classList.add('chama-pico');
         clearTimeout(el._pulse_t);
         el._pulse_t=setTimeout(()=>el.classList.remove('chama-pico'),700);
-        // guia flutuante acompanha
-        const bola=document.getElementById('chama-bola');
-        if(bola){ bola.classList.add('chama-viva'); bola.dataset.intensidade=modo; }
       },
       ensureHeroFlame(sectionId){
         const canvas=document.getElementById('jornada-canvas'); if(!canvas) return;
-        let hero=document.getElementById('chama-hero');
-        const show=(sectionId==='section-intro'||sectionId==='section-final');
+        let hero=document.getElementById(`chama-hero${sectionId==='section-intro'?'':sectionId==='section-orientations'?'-orientations':sectionId==='section-final'?'-final':''}`);
+        const show=(sectionId==='section-intro'||sectionId==='section-orientations'||sectionId==='section-final');
         if(show){
           if(!hero){
-            hero=document.createElement('div'); hero.id='chama-hero';
-            hero.className='chama-viva chama-lg chama-strong chama-fixed-top';
+            hero=document.createElement('div'); hero.id=`chama-hero${sectionId==='section-intro'?'':sectionId==='section-orientations'?'-orientations':sectionId==='section-final'?'-final':''}`;
+            hero.className='chama-viva chama-lg chama-fixed-hero';
             hero.innerHTML='<div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>';
             canvas.appendChild(hero);
           }
         } else if(hero){ hero.remove(); }
       }
     };
-    // compat: mapear funções antigas
     function updateChama(score){ window.JORNADA_CHAMA.updateChama(score); }
     function ensureHeroFlame(sectionId){ window.JORNADA_CHAMA.ensureHeroFlame(sectionId); }
 
@@ -265,8 +283,9 @@
     ==========================*/
     function updateProgress(){
       const perguntas=document.querySelectorAll('.j-pergunta');
+      const totalPerguntas=10;
       const respondidas=Array.from(perguntas).filter(p=>p.querySelector('textarea').value.trim()!=='').length;
-      const progresso=(respondidas/(perguntas.length||1))*100;
+      const progresso=(respondidas/totalPerguntas)*100;
       const fill=document.getElementById('jprog-fill');
       const badge=document.getElementById('jprog-pct');
       const jFill=document.querySelector('.j-progress__fill');
@@ -274,7 +293,7 @@
       if(fill) fill.style.width=`${progresso}%`;
       if(badge) badge.textContent=`${Math.round(progresso)}% concluído`;
       if(jFill) jFill.style.width=`${progresso}%`;
-      if(jMeta) jMeta.textContent=`Respondidas: ${respondidas} de ${perguntas.length}`;
+      if(jMeta) jMeta.textContent=`${respondidas}/10`;
     }
     function saveAnswers(){
       const respostas={}; document.querySelectorAll('.j-pergunta textarea').forEach((input,idx)=>{ respostas[`q${idx}`]=input.value||''; });
@@ -318,7 +337,7 @@
       if(content && window.JORNADA_BLOCKS){
         content.innerHTML='';
         window.JORNADA_BLOCKS.forEach((block,idx)=>{
-          const bloco=document.createElement('section'); bloco.className='j-bloco'; bloco.dataset.bloco=idx; bloco.dataset.video=block.video_after||'';
+          const bloco=document.createElement('section'); bloco.className='j-bloco'; bloco.dataset.bloco=idx; bloco.dataset.video=block.video_before||'';
           block.questions.forEach((q,qIdx)=>{
             const pergunta=document.createElement('div'); pergunta.className='j-pergunta'; pergunta.dataset.pergunta=qIdx;
             const label = (typeof q === 'string') ? q : (q.label || q.text || '');
@@ -328,7 +347,15 @@
           });
           content.appendChild(bloco);
         });
-        const firstBloco=content.querySelector('.j-bloco'); if(firstBloco){ firstBloco.style.display='block';
+        const firstBloco=content.querySelector('.j-bloco'); if(firstBloco && firstBloco.dataset.video){
+          playTransition(firstBloco.dataset.video,()=>{
+            firstBloco.style.display='block';
+            const firstPergunta=firstBloco.querySelector('.j-pergunta'); if(firstPergunta){ firstPergunta.classList.add('active'); runTyping(firstPergunta); }
+            loadAnswers();
+            const firstTa=content.querySelector('.j-bloco .j-pergunta textarea'); if(firstTa) handleInput(firstTa);
+          });
+        } else if(firstBloco){
+          firstBloco.style.display='block';
           const firstPergunta=firstBloco.querySelector('.j-pergunta'); if(firstPergunta){ firstPergunta.classList.add('active'); runTyping(firstPergunta); }
           loadAnswers();
           const firstTa=content.querySelector('.j-bloco .j-pergunta textarea'); if(firstTa) handleInput(firstTa);
@@ -348,8 +375,12 @@
     /* =========================
        CONTROLES
     ==========================*/
-    function handleInput(textarea){ const score=analyzeSentiment(textarea.value); updateChama(score); saveAnswers(); updateProgress(); }
-    function toggleSenha(){ const input=document.getElementById('senha'); if(input){ input.type=(input.type==='password'?'text':'password'); } }
+    function handleInput(textarea){
+      const score=analyzeSentiment(textarea.value); window.JORNADA_CHAMA.updateChama(score); saveAnswers(); updateProgress();
+    }
+    function toggleSenha(){
+      const input=document.getElementById('senha'); if(input){ input.type=(input.type==='password'?'text':'password'); }
+    }
 
     function goNext(){
       const perguntas=document.querySelectorAll('.j-pergunta');
@@ -362,514 +393,21 @@
         const blocos=document.querySelectorAll('.j-bloco');
         const currentBloco=current?.closest('.j-bloco'); const nextBlocoIndex=Array.from(blocos).indexOf(currentBloco)+1;
         if(nextBlocoIndex<blocos.length){
-          const currentIdx = Number(currentBloco.dataset.bloco||0);
-          const videoSrc = (window.JORNADA_BLOCKS[currentIdx]?.video_after)||'';
-          blocos.forEach(b=>b.style.display='none'); blocos[nextBlocoIndex].style.display='block';
-          const nextPergunta=blocos[nextBlocoIndex].querySelector('.j-pergunta');
-          const proceed = ()=>{ if(nextPergunta){ nextPergunta.classList.add('active'); runTyping(nextPergunta); } };
-          if(videoSrc) playTransition(videoSrc, proceed); else proceed();
-        } else { if(window.JORNADA_FINAL_VIDEO) playTransition(window.JORNADA_FINAL_VIDEO, ()=>showSection('section-final')); else { showSection('section-final'); } updateProgress(); }
-      }
-    }
-    function goPrev(){
-      const perguntas=document.querySelectorAll('.j-pergunta');
-      const current=document.querySelector('.j-pergunta.active');
-      if(current) current.classList.remove('active');
-      const prevIndex=Array.from(perguntas).indexOf(current)-1;
-      if(prevIndex>=0){
-        perguntas[prevIndex].classList.add('active'); runTyping(perguntas[prevIndex]); updateProgress();
-      } else {
-        const blocos=document.querySelectorAll('.j-bloco');
-        const currentBloco=current?.closest('.j-bloco'); const prevBlocoIndex=Array.from(blocos).indexOf(currentBloco)-1;
-        if(prevBlocoIndex>=0){
-          blocos.forEach(b=>b.style.display='none'); blocos[prevBlocoIndex].style.display='block';
-          const lastPergunta=Array.from(blocos[prevBlocoIndex].querySelectorAll('.j-pergunta')).pop();
-          if(lastPergunta){ lastPergunta.classList.add('active'); runTyping(lastPergunta); }
-        } else { showSection('section-intro'); }
-        updateProgress();
-      }
-    }
-
-    function playTransition(src,onEnd){
-      const overlay=document.getElementById('videoOverlay');
-      const video=document.getElementById('videoTransicao');
-      const skip=document.getElementById('skipVideo');
-      if(overlay && video && src){
-        video.src=src; overlay.classList.remove('hidden');
-        const cleanup=()=>{ try{video.pause();}catch(e){} overlay.classList.add('hidden'); video.removeAttribute('src'); video.load(); onEnd&&onEnd(); };
-        video.onended=cleanup;
-        video.onerror=()=>{ console.warn('Vídeo não carregou:',src); cleanup(); };
-        if(skip) skip.onclick=cleanup;
-        video.muted=false;
-        video.play().catch(err=>{ console.warn('Erro ao reproduzir vídeo:',err); cleanup(); });
-        setTimeout(cleanup,12000);
-      } else { onEnd&&onEnd(); }
-    }
-
-    function finalize(){
-      const respostas={}; document.querySelectorAll('.j-pergunta textarea').forEach((input,idx)=>{ respostas[`q${idx}`]=input.value||''; });
-      console.log('[JORNADA] Finalizado. Respostas:', respostas);
-      alert('Jornada concluída!'); localStorage.removeItem('jornada_respostas');
-      setTimeout(()=>location.replace('/index.html'),1000);
-    }
-
-    function startJourney(){
-      const senha=document.getElementById('senha')?.value || '';
-      const senhasValidas=['iniciar','olho magico','olho mágico'];
-      if(senhasValidas.includes(senha.toLowerCase())){
-        (window.showSection||showSection)('section-perguntas');
-        loadDynamicBlocks();
-        const perguntas=document.querySelectorAll('.j-pergunta');
-        if(perguntas.length){
-          perguntas[0].classList.add('active'); runTyping(perguntas[0]);
-          const firstTa=document.querySelector('.j-pergunta.active textarea'); if(firstTa) handleInput(firstTa);
-        } else { console.error('Nenhuma pergunta encontrada após loadDynamicBlocks!'); }
-        document.querySelector('.progress-badge')?.classList.remove('hidden');
-        document.querySelector('.progress-bar')?.classList.remove('hidden');
-        document.querySelector('.j-progress')?.classList.remove('hidden');
-        document.querySelector('.footer-actions')?.classList.remove('hidden');
-        updateProgress(); console.log('Jornada iniciada com sucesso!');
-      } else { alert('Senha incorreta. Tente novamente.'); }
-    }
-
-    function initJornada(){
-      const prevBtn=document.getElementById('btnPrevPerguntas');
-      const nextBtn=document.getElementById('btnNextPerguntas');
-      const restartBtn=document.getElementById('btnRestart');
-      if(nextBtn) nextBtn.addEventListener('click', goNext);
-      if(prevBtn) prevBtn.addEventListener('click', goPrev);
-      if(restartBtn) restartBtn.addEventListener('click', ()=>location.reload());
-
-      // Delegação de cliques (sem onclick no HTML)
-      document.addEventListener('click',(ev)=>{
-        const n = ev.target.closest('[data-action="next"]');
-        const p = ev.target.closest('[data-action="prev"]');
-        const s = ev.target.closest('[data-action="start"]');
-        const tp= ev.target.closest('[data-action="toggle-password"], .password-toggle');
-        if(n){ev.preventDefault();goNext();}
-        if(p){ev.preventDefault();goPrev();}
-        if(s){ev.preventDefault();startJourney();}
-        if(tp){ev.preventDefault();toggleSenha();}
-      });
-
-      console.log('Controlador da jornada inicializado!');
-    }
-
-    // Fallback/blocos + vídeos padronizados
-    (function defineFallback(){
-      window.JORNADA_BLOCKS=[
-        { title:'Bloco 1 — Raízes', questions:[ 'Quem é você hoje?', 'O que a Luz te pede agora?' ], video_after:'/assets/img/filme-1-entrando-na-jornada.mp4' },
-        { title:'Bloco 2 — Caminho', questions:[ 'Qual verdade você precisa admitir para seguir?', 'O que precisa ser curado neste momento?' ], video_after:'/assets/img/filme-2-dentro-da-jornada.mp4' }
-      ];
-      window.JORNADA_FINAL_VIDEO='/assets/img/filme-5-fim-da-jornada.mp4';
-      console.log('JORNADA_BLOCKS (fallback) prontos.');
-    })();
-
-    async function boot(){
-      document.body.classList.add('jornada-active');
-      const route=(location.hash||'#intro').slice(1);
-      const canvas=document.getElementById('jornada-canvas');
-      const progressBadge=document.querySelector('.progress-badge');
-      const progressBar=document.querySelector('.progress-bar');
-      const jProgress=document.querySelector('.j-progress');
-      const footerActions=document.querySelector('.footer-actions');
-
-      if(canvas){
-        if(route==='perguntas'){
-          showSection('section-perguntas'); loadDynamicBlocks();
-          [progressBadge,progressBar,jProgress,footerActions].forEach(el=>el?.classList.remove('hidden'));
-        } else if(route==='final'){
-          showSection('section-final'); [progressBadge,progressBar,jProgress].forEach(el=>el?.classList.remove('hidden'));
-        } else { showSection('section-intro'); }
-      }
-      runTyping(document); return true;
-    }
-
-    // Inicialização
-    document.addEventListener('DOMContentLoaded', () => {
-      runTyping(document);
-      initJornada();
-
-      boot().then(() => {
-        const visible = document.querySelector('.j-section:not(.hidden)');
-        if (visible) ensureHeroFlame(visible.id);
-      });
-
-      const target = document.getElementById('jornada-conteudo');
-      if (target) {
-        const obs = new MutationObserver(muts => {
-          muts.forEach(m => {
-            runTyping(m.target);
-            if (m.target.id === 'perguntas-container') updateProgress();
-          });
-        });
-        window.ensureHeroFlame = ensureHeroFlame;
-        obs.observe(target, { childList: true, subtree: true });
-      }
-    });
-
-    // Ponte global
-    window.JC = window.JC || {};
-    window.toggleSenha  = toggleSenha;
-    window.startJourney = startJourney;
-    window.showSection  = showSection;
-    window.JC.toggleSenha  = toggleSenha;
-    window.JC.startJourney = startJourney;
-    window.JC.showSection  = showSection;
-    window.JC.Chama = window.JORNADA_CHAMA;
-  </script>
-
-  <!-- Referências externas (mantidas para evitar 404, mas não necessárias) -->
-  <script defer src="/config.js" onerror="console.error('Falha ao carregar config.js, usando fallback inline');"></script>
-  <script defer src="/jornada-utils.js" onerror="console.error('Falha ao carregar jornada-utils.js, usando fallback inline');"></script>
-  <script defer src="/jornada-core.js" onerror="console.error('Falha ao carregar jornada-core.js, usando fallback inline');"></script>
-  <script defer src="/jornada-auth.js" onerror="console.error('Falha ao carregar jornada-auth.js, usando fallback inline');"></script>
-  <script defer src="/jornada-chama.js" onerror="console.error('Falha ao carregar jornada-chama.js, usando fallback inline');"></script>
-  <script defer src="/jornada-paper-qa.js" onerror="console.error('Falha ao carregar jornada-paper-qa.js, usando fallback inline');"></script>
-  <script defer src="/jornada-typing.js" onerror="console.error('Falha ao carregar jornada-typing.js, usando fallback inline');"></script>
-  <script defer src="/jornada-controller.js" onerror="console.error('Falha ao carregar jornada-controller.js, usando fallback inline');"></script>
-  <script defer src="/jornada-render.js" onerror="console.error('Falha ao carregar jornada-render.js, usando fallback inline');"></script>
-  <script defer src="/jornada-bootstrap.js" onerror="console.error('Falha ao carregar jornada-bootstrap.js, usando fallback inline');"></script>
-  <script defer src="/jornada-micro.js" onerror="console.error('Falha ao carregar jornada-micro.js, usando fallback inline');"></script>
-  <script defer src="/i18n/i18n.js" onerror="console.error('Falha ao carregar i18n.js, usando fallback inline');"></script>
-  <script defer src="/api.js" onerror="console.error('Falha ao carregar api.js, usando fallback inline');"></script>
-</body>
-</html>
-    .chama.chama-lg span{width:36px;height:88px}
-    .chama-fixed-top{position:absolute;top:10px;right:14px;z-index:60}
-    .chama-fixed-hero{position:absolute;top:-8px;left:-8px;z-index:60}
-
-    /* ===== CHAMA VIVA (do arquivo 2) ===== */
-    .chama-viva { width: 48px; height: 96px; background: linear-gradient(to top, #ff4500, #ffa500); clip-path: polygon(20% 100%, 50% 0%, 80% 100%); position: relative; filter: drop-shadow(0 0 12px rgba(255, 140, 0, 0.55)); border-radius: 12px; }
-    .chama-viva .brasa { position:absolute; bottom:0; left:0; right:0; height:40%; background: radial-gradient(ellipse at 50% 100%, rgba(255,140,0,.6), rgba(255,69,0,.2), transparent 70%); filter: blur(4px); }
-    .chama-viva .lingua { position:absolute; bottom:0; left:50%; transform: translateX(-50%); width: 40%; height: 85%; background: linear-gradient(to top, #ff8c00, #ffd700); clip-path: polygon(30% 100%, 50% 0%, 70% 100%); animation: linguaJitter 3s infinite ease-in-out; }
-    .chama-viva .brilho { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255, 215, 0, 0.5), transparent); filter: blur(14px); animation: brilhoJitter 2.2s infinite ease-in-out; }
-    .chama-viva.chama-md { width: 32px; height: 64px; }
-    .chama-viva.chama-lg { width: 60px; height: 120px; }
-    @keyframes linguaJitter { 0%, 100% { transform: translateX(-50%) scaleY(1) skewX(0deg); } 20% { transform: translateX(-50%) scaleY(1.05) skewX(.5deg) translateX(var(--jitter, 0px)); } 50% { transform: translateX(-50%) scaleY(1.1) skewX(1.2deg) translateX(var(--jitter, 0px)); } 80% { transform: translateX(-50%) scaleY(1.03) skewX(.3deg) translateX(var(--jitter, 0px)); } }
-    @keyframes brilhoJitter { 0%, 100% { filter: blur(12px); } 50% { filter: blur(14px); } }
-
-    /* Destaque palavras */
-    .mark-emocao{background:linear-gradient(90deg,rgba(255,196,0,.35),rgba(255,140,0,.2));border-radius:4px;padding:0 2px}
-
-    @keyframes flicker{0%,100%{transform:scaleY(1);opacity:1}50%{transform:scaleY(1.2);opacity:.8}}
-    @keyframes flicker-weak{0%,100%{transform:scaleY(.8);opacity:.6}50%{transform:scaleY(1);opacity:.4}}
-    @keyframes flicker-strong{0%,100%{transform:scaleY(1.5);opacity:1}50%{transform:scaleY(1.8);opacity:.9}}
-
-    /* ===== UI ===== */
-    .btn{display:inline-block;padding:12px 24px;border-radius:10px;border:0;background:#1f2937;color:#fff;font-weight:600;text-decoration:none;transition:background .3s ease, transform .2s ease;z-index:30}
-    .btn:hover{background:#374151;transform:scale(1.05)}
-    .btn-primary{background:#6b21a8}
-    .btn-primary:hover{background:#7c3aed}
-    .btn-secondary{background:#4b5563}
-    .btn-secondary:hover{background:#6b7280}
-    .btn + .btn{margin-left:12px}
-
-    .progress-badge{position:fixed;top:16px;right:16px;padding:8px 16px;background:#6b21a8;color:#fff;border-radius:8px;font-size:.9rem;z-index:900;visibility:visible}
-    .progress-bar{width:100%;height:8px;background:#e5e7eb;border-radius:4px;margin-top:12px;z-index:900;visibility:visible}
-    .progress-bar-fill{height:100%;background:#6b21a8;border-radius:4px;transition:width .3s ease}
-    .j-progress{margin-top:12px;z-index:900;visibility:visible}
-    .j-progress__bar{width:100%;height:6px;background:#e5e7eb;border-radius:4px}
-    .j-progress__fill{height:100%;background:#1f2937;border-radius:4px;transition:width .3s ease}
-    .j-progress__meta{text-align:center;margin-top:8px;font-size:.9rem}
-
-    .footer-actions{display:flex;gap:12px;justify-content:center;margin:16px 0;z-index:900}
-
-    .lumen-typing{white-space:pre-wrap;position:relative}
-    .lumen-typing::after{content:"▌";margin-left:2px;opacity:.75;animation:lumenBlink 1s steps(2,end) infinite}
-    .lumen-typing.typing-done::after{content:"";animation:none}
-    @keyframes lumenBlink{50%{opacity:0}}
-
-    .j-section{height:100%}
-    .j-bloco{background:transparent!important;display:none;z-index:50}
-    .j-pergunta{margin-bottom:24px;display:none;z-index:60;position:relative}
-    .j-pergunta.active{display:block}
-    .pergunta-enunciado{font-weight:600;margin-bottom:8px;display:block}
-    .j-pergunta textarea{width:100%;padding:12px;border-radius:8px;border:1px solid #d1d5db;background:rgba(255,255,255,.8);resize:vertical;min-height:100px}
-
-    #videoOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);display:flex;justify-content:center;align-items:center;z-index:2000}
-    #videoOverlay.hidden{display:none}
-    .video-player{max-width:90vw;max-height:80vh;background:#000}
-
-    .site-footer{text-align:center;padding:16px;opacity:.6;font-size:.85rem;z-index:10}
-    .password-form{margin-top:20px;text-align:center}
-    .password-input{position:relative}
-    .password-input input{width:100%;padding:12px;border-radius:8px;border:1px solid #d1d5db}
-    .password-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer}
-
-    .section-container{position:relative;min-height:85vh}
-    .hidden{display:none!important}
-
-    /* Bola/guia da chama flutuante */
-    #guia-espiritual{position:fixed;bottom:20px;right:20px;z-index:1200}
-  </style>
-</head>
-
-<body data-layout="master" data-journey="essencial">
-  <header class="site-header">
-    <div class="chama chama-sm"><span></span><span></span><span></span></div>
-    <h1>Jornada Essencial</h1>
-  </header>
-
-  <main id="page-shell" class="container">
-    <div class="container">
-      <a class="btn btn-primary" href="#intro">Ir para Introdução</a>
-      <a class="btn btn-secondary" href="/jornadas.html">← Voltar</a>
-    </div>
-
-    <div class="section-container">
-      <section id="jornada-canvas" class="card pergaminho pergaminho-v">
-        <div id="jornada-conteudo" class="conteudo-pergaminho">
-          <!-- INTRO -->
-          <div id="section-intro" class="j-section">
-            <!-- Hero será injetado pela API de chama -->
-            <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
-            <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Antes de começar, ative sua senha." data-speed="50" data-cursor="true"></p>
-
-            <div class="password-form">
-              <h3>Ative sua Senha</h3>
-              <div class="password-input">
-                <input type="password" id="senha" placeholder="Digite sua senha...">
-                <span class="password-toggle" data-action="toggle-password">👁️</span>
-              </div>
-              <button class="btn btn-primary" data-action="start">Ativar e Iniciar</button>
-            </div>
-          </div>
-
-          <!-- PERGUNTAS -->
-          <div id="section-perguntas" class="j-section hidden">
-            <div class="chama chama-md" id="chama-perguntas"><span></span></div>
-            <div id="perguntas-container"></div>
-            <div class="footer-actions">
-              <button id="btnPrevPerguntas" class="btn btn-secondary" data-action="prev">Voltar</button>
-              <button id="btnNextPerguntas" class="btn btn-primary" data-action="next">Próxima</button>
-            </div>
-          </div>
-
-          <!-- FINAL -->
-          <div id="section-final" class="j-section hidden">
-            <!-- Hero será injetado pela API de chama -->
-            <p data-typing data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40" data-cursor="true"></p>
-            <div class="footer-actions">
-              <button id="btnRestart" class="btn btn-secondary" data-action="restart">Reiniciar</button>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <footer class="site-footer">
-      <small>© 2025 Irmandade Conhecimento com Luz</small>
-      <div id="envTag"></div>
-    </footer>
-  </main>
-
-  <!-- PROGRESS -->
-  <div class="progress-badge" id="jprog-pct">0% concluído</div>
-  <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
-  <div class="j-progress">
-    <div class="j-progress__bar"><div class="j-progress__fill"></div></div>
-    <div class="j-progress__meta" id="j-meta"></div>
-  </div>
-
-  <!-- OVERLAY VIDEO -->
-  <div id="videoOverlay" class="video-overlay hidden">
-    <video id="videoTransicao" class="video-player" playsinline preload="metadata" controls></video>
-    <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
-  </div>
-
-  <!-- GUIA ESPIRITUAL: chama flamejante livre -->
-  <div id="guia-espiritual">
-    <div id="chama-bola" class="chama-viva chama-md">
-      <div class="brasa"></div>
-      <div class="lingua"></div>
-      <div class="lingua"></div>
-      <div class="lingua"></div>
-      <div class="brilho"></div>
-    </div>
-  </div>
-
-  <script>
-    // Tag ambiente
-    document.getElementById('envTag').textContent =
-      `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
-
-    /* =========================
-       EMOÇÃO & DATILOGRAFIA
-    ==========================*/
-    const EMO = {
-      POS:{'feliz':2,'alegria':2,'amor':3,'sucesso':2,'esperança':3,'paz':2,'fé':3,'gratidão':2,'vitória':3,'superação':3,'luz':2,'deus':3,'coragem':2,'força':2,'confiança':2,'propósito':3},
-      NEG:{'triste':-2,'dor':-3,'raiva':-2,'medo':-2,'frustracao':-2,'frustração':-2,'decepcao':-2,'decepção':-2,'perda':-3,'culpa':-2,'ansiedade':-2,'solidao':-2,'solidão':-2,'desespero':-3,'cansaco':-2,'cansaço':-2,'fracasso':-2,'trauma':-3,'duvida':-2,'dúvida':-2}
-    };
-    function analyzeSentiment(text){
-      let score=0;
-      const tokens=(text||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').split(/\s+/);
-      for(const t of tokens){ if(EMO.POS[t]!=null) score+=EMO.POS[t]; if(EMO.NEG[t]!=null) score+=EMO.NEG[t]; }
-      return score;
-    }
-    function typeWriter(el,text,speed,showCursor){
-      if(!el) return;
-      el.textContent=''; if(showCursor) el.classList.add('lumen-typing');
-      let i=0;(function step(){ if(i<text.length){ el.textContent+=text.charAt(i++); setTimeout(step,speed);} else{ el.classList.add('typing-done'); } })();
-    }
-    function runTyping(root){
-      (root||document).querySelectorAll('[data-typing]').forEach(el=>{
-        if(el.dataset._typed) return;
-        const t=el.getAttribute('data-text')||el.textContent||'';
-        const spd=parseInt(el.getAttribute('data-speed')||'26',10);
-        const cur=String(el.getAttribute('data-cursor')||'true')==='true';
-        el.dataset._typed='1'; typeWriter(el,t,spd,cur);
-      });
-    }
-
-    /* =========================
-       CHAMA — API unificada (traz do arquivo 2)
-    ==========================*/
-    window.JORNADA_CHAMA = {
-      updateChama(scoreNum, targetId='chama-perguntas'){
-        const el=document.getElementById(targetId); if(!el) return;
-        // se ainda for a chama simples, converte para estrutura viva
-        if(!el.classList.contains('chama-viva')){
-          el.classList.add('chama-viva');
-          el.innerHTML = '<div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>';
-        }
-        const modo = (scoreNum <= -2) ? 'fraca' : (scoreNum >= 2) ? 'forte' : 'media';
-        el.dataset.intensidade = modo;
-        // efeito pico
-        el.classList.add('chama-pico');
-        clearTimeout(el._pulse_t);
-        el._pulse_t=setTimeout(()=>el.classList.remove('chama-pico'),700);
-        // guia flutuante acompanha
-        const bola=document.getElementById('chama-bola');
-        if(bola){ bola.classList.add('chama-viva'); bola.dataset.intensidade=modo; }
-      },
-      ensureHeroFlame(sectionId){
-        const canvas=document.getElementById('jornada-canvas'); if(!canvas) return;
-        let hero=document.getElementById('chama-hero');
-        const show=(sectionId==='section-intro'||sectionId==='section-final');
-        if(show){
-          if(!hero){
-            hero=document.createElement('div'); hero.id='chama-hero';
-            hero.className='chama-viva chama-lg chama-strong chama-fixed-top';
-            hero.innerHTML='<div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>';
-            canvas.appendChild(hero);
+          const videoSrc = (window.JORNADA_BLOCKS[nextBlocoIndex]?.video_before)||'';
+          blocos.forEach(b=>b.style.display='none');
+          if(videoSrc) playTransition(videoSrc,()=>{
+            blocos[nextBlocoIndex].style.display='block';
+            const nextPergunta=blocos[nextBlocoIndex].querySelector('.j-pergunta');
+            if(nextPergunta){ nextPergunta.classList.add('active'); runTyping(nextPergunta); }
+          }); else {
+            blocos[nextBlocoIndex].style.display='block';
+            const nextPergunta=blocos[nextBlocoIndex].querySelector('.j-pergunta');
+            if(nextPergunta){ nextPergunta.classList.add('active'); runTyping(nextPergunta); }
           }
-        } else if(hero){ hero.remove(); }
-      }
-    };
-    // compat: mapear funções antigas
-    function updateChama(score){ window.JORNADA_CHAMA.updateChama(score); }
-    function ensureHeroFlame(sectionId){ window.JORNADA_CHAMA.ensureHeroFlame(sectionId); }
-
-    /* =========================
-       PROGRESSO & STORAGE
-    ==========================*/
-    function updateProgress(){
-      const perguntas=document.querySelectorAll('.j-pergunta');
-      const respondidas=Array.from(perguntas).filter(p=>p.querySelector('textarea').value.trim()!=='').length;
-      const progresso=(respondidas/(perguntas.length||1))*100;
-      const fill=document.getElementById('jprog-fill');
-      const badge=document.getElementById('jprog-pct');
-      const jFill=document.querySelector('.j-progress__fill');
-      const jMeta=document.getElementById('j-meta');
-      if(fill) fill.style.width=`${progresso}%`;
-      if(badge) badge.textContent=`${Math.round(progresso)}% concluído`;
-      if(jFill) jFill.style.width=`${progresso}%`;
-      if(jMeta) jMeta.textContent=`Respondidas: ${respondidas} de ${perguntas.length}`;
-    }
-    function saveAnswers(){
-      const respostas={}; document.querySelectorAll('.j-pergunta textarea').forEach((input,idx)=>{ respostas[`q${idx}`]=input.value||''; });
-      localStorage.setItem('jornada_respostas',JSON.stringify(respostas));
-    }
-    function loadAnswers(){
-      const respostas=JSON.parse(localStorage.getItem('jornada_respostas')||'{}');
-      document.querySelectorAll('.j-pergunta textarea').forEach((input,idx)=>{ input.value=respostas[`q${idx}`]||''; });
-      updateProgress();
-    }
-
-    /* =========================
-       ROTEAMENTO & RENDER
-    ==========================*/
-    function updateCanvasBackground(sectionId){
-      const canvas=document.getElementById('jornada-canvas');
-      if(canvas){
-        if(sectionId==='section-perguntas'){
-          checkImage('/assets/img/pergaminho-rasgado-horiz.png','/assets/img/pergaminho-rasgado-vert.png').then(bg=>{
-            canvas.className=`card pergaminho pergaminho-h${bg.includes('vert')?' fallback':''}`;
-            canvas.style.backgroundImage=`url('${bg}')`;
-          });
         } else {
-          canvas.className='card pergaminho pergaminho-v';
-          canvas.style.backgroundImage='url(/assets/img/pergaminho-rasgado-vert.png)';
+          if(window.JORNADA_FINAL_VIDEO) playTransition(window.JORNADA_FINAL_VIDEO,()=>showSection('section-final')); else showSection('section-final');
+          updateProgress();
         }
-      }
-    }
-    function showSection(sectionId){
-      document.querySelectorAll('.j-section').forEach(s=>s.classList.add('hidden'));
-      const active=document.getElementById(sectionId); if(active) active.classList.remove('hidden');
-      updateCanvasBackground(sectionId); ensureHeroFlame(sectionId);
-      if(sectionId==='section-perguntas'){
-        updateProgress();
-        const perguntas=document.querySelectorAll('.j-pergunta'); if(perguntas.length) runTyping(perguntas[0]);
-      }
-    }
-
-    function loadDynamicBlocks(){
-      const content=document.getElementById('perguntas-container');
-      if(content && window.JORNADA_BLOCKS){
-        content.innerHTML='';
-        window.JORNADA_BLOCKS.forEach((block,idx)=>{
-          const bloco=document.createElement('section'); bloco.className='j-bloco'; bloco.dataset.bloco=idx; bloco.dataset.video=block.video_after||'';
-          block.questions.forEach((q,qIdx)=>{
-            const pergunta=document.createElement('div'); pergunta.className='j-pergunta'; pergunta.dataset.pergunta=qIdx;
-            const label = (typeof q === 'string') ? q : (q.label || q.text || '');
-            pergunta.innerHTML=`<label class="pergunta-enunciado" data-typing data-text="<b>Pergunta ${qIdx+1}:</b> ${label}" data-speed="40" data-cursor="true"></label>
-              <textarea rows="4" class="input" placeholder="Digite sua resposta..." oninput="handleInput(this)"></textarea>`;
-            bloco.appendChild(pergunta);
-          });
-          content.appendChild(bloco);
-        });
-        const firstBloco=content.querySelector('.j-bloco'); if(firstBloco){ firstBloco.style.display='block';
-          const firstPergunta=firstBloco.querySelector('.j-pergunta'); if(firstPergunta){ firstPergunta.classList.add('active'); runTyping(firstPergunta); }
-          loadAnswers();
-          const firstTa=content.querySelector('.j-bloco .j-pergunta textarea'); if(firstTa) handleInput(firstTa);
-        }
-        console.log('Blocos carregados!');
-      } else {
-        console.error('Erro: #perguntas-container ou JORNADA_BLOCKS não encontrado!');
-      }
-    }
-
-    function checkImage(url,fallbackUrl){
-      return new Promise(resolve=>{
-        const img=new Image(); img.onload=()=>resolve(url); img.onerror=()=>resolve(fallbackUrl); img.src=url;
-      });
-    }
-
-    /* =========================
-       CONTROLES
-    ==========================*/
-    function handleInput(textarea){ const score=analyzeSentiment(textarea.value); updateChama(score); saveAnswers(); updateProgress(); }
-    function toggleSenha(){ const input=document.getElementById('senha'); if(input){ input.type=(input.type==='password'?'text':'password'); } }
-
-    function goNext(){
-      const perguntas=document.querySelectorAll('.j-pergunta');
-      const current=document.querySelector('.j-pergunta.active');
-      if(current) current.classList.remove('active');
-      const nextIndex=Array.from(perguntas).indexOf(current)+1;
-      if(nextIndex<perguntas.length){
-        perguntas[nextIndex].classList.add('active'); runTyping(perguntas[nextIndex]); updateProgress();
-      } else {
-        const blocos=document.querySelectorAll('.j-bloco');
-        const currentBloco=current?.closest('.j-bloco'); const nextBlocoIndex=Array.from(blocos).indexOf(currentBloco)+1;
-        if(nextBlocoIndex<blocos.length){
-          const currentIdx = Number(currentBloco.dataset.bloco||0);
-          const videoSrc = (window.JORNADA_BLOCKS[currentIdx]?.video_after)||'';
-          blocos.forEach(b=>b.style.display='none'); blocos[nextBlocoIndex].style.display='block';
-          const nextPergunta=blocos[nextBlocoIndex].querySelector('.j-pergunta');
-          const proceed = ()=>{ if(nextPergunta){ nextPergunta.classList.add('active'); runTyping(nextPergunta); } };
-          if(videoSrc) playTransition(videoSrc, proceed); else proceed();
-        } else { if(window.JORNADA_FINAL_VIDEO) playTransition(window.JORNADA_FINAL_VIDEO, ()=>showSection('section-final')); else { showSection('section-final'); } updateProgress(); }
       }
     }
     function goPrev(){
@@ -886,7 +424,7 @@
           blocos.forEach(b=>b.style.display='none'); blocos[prevBlocoIndex].style.display='block';
           const lastPergunta=Array.from(blocos[prevBlocoIndex].querySelectorAll('.j-pergunta')).pop();
           if(lastPergunta){ lastPergunta.classList.add('active'); runTyping(lastPergunta); }
-        } else { showSection('section-intro'); }
+        } else { showSection('section-orientations'); }
         updateProgress();
       }
     }
@@ -894,13 +432,11 @@
     function playTransition(src,onEnd){
       const overlay=document.getElementById('videoOverlay');
       const video=document.getElementById('videoTransicao');
-      const skip=document.getElementById('skipVideo');
       if(overlay && video && src){
         video.src=src; overlay.classList.remove('hidden');
         const cleanup=()=>{ try{video.pause();}catch(e){} overlay.classList.add('hidden'); video.removeAttribute('src'); video.load(); onEnd&&onEnd(); };
         video.onended=cleanup;
         video.onerror=()=>{ console.warn('Vídeo não carregou:',src); cleanup(); };
-        if(skip) skip.onclick=cleanup;
         video.muted=false;
         video.play().catch(err=>{ console.warn('Erro ao reproduzir vídeo:',err); cleanup(); });
         setTimeout(cleanup,12000);
@@ -910,46 +446,57 @@
     function finalize(){
       const respostas={}; document.querySelectorAll('.j-pergunta textarea').forEach((input,idx)=>{ respostas[`q${idx}`]=input.value||''; });
       console.log('[JORNADA] Finalizado. Respostas:', respostas);
-      alert('Jornada concluída!'); localStorage.removeItem('jornada_respostas');
-      setTimeout(()=>location.replace('/index.html'),1000);
+      const pdfContent = Object.values(respostas).join('\n\n');
+      const pdfBlob = new Blob([pdfContent], { type: 'text/plain' });
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.download = 'jornada-conhecimento-com-luz.pdf';
+      link.click();
+      URL.revokeObjectURL(pdfUrl);
+      localStorage.removeItem('jornada_respostas');
+      showSection('section-final');
     }
 
     function startJourney(){
       const senha=document.getElementById('senha')?.value || '';
       const senhasValidas=['iniciar','olho magico','olho mágico'];
       if(senhasValidas.includes(senha.toLowerCase())){
-        (window.showSection||showSection)('section-perguntas');
-        loadDynamicBlocks();
-        const perguntas=document.querySelectorAll('.j-pergunta');
-        if(perguntas.length){
-          perguntas[0].classList.add('active'); runTyping(perguntas[0]);
-          const firstTa=document.querySelector('.j-pergunta.active textarea'); if(firstTa) handleInput(firstTa);
-        } else { console.error('Nenhuma pergunta encontrada após loadDynamicBlocks!'); }
-        document.querySelector('.progress-badge')?.classList.remove('hidden');
-        document.querySelector('.progress-bar')?.classList.remove('hidden');
-        document.querySelector('.j-progress')?.classList.remove('hidden');
-        document.querySelector('.footer-actions')?.classList.remove('hidden');
-        updateProgress(); console.log('Jornada iniciada com sucesso!');
+        showSection('section-orientations');
       } else { alert('Senha incorreta. Tente novamente.'); }
+    }
+
+    function startJourneyAfterOrientations(){
+      showSection('section-perguntas');
+      loadDynamicBlocks();
+      document.querySelector('.progress-badge')?.classList.remove('hidden');
+      document.querySelector('.progress-bar')?.classList.remove('hidden');
+      document.querySelector('.j-progress')?.classList.remove('hidden');
+      document.querySelector('.footer-actions')?.classList.remove('hidden');
+      updateProgress();
+      console.log('Jornada iniciada com sucesso!');
     }
 
     function initJornada(){
       const prevBtn=document.getElementById('btnPrevPerguntas');
       const nextBtn=document.getElementById('btnNextPerguntas');
-      const restartBtn=document.getElementById('btnRestart');
       if(nextBtn) nextBtn.addEventListener('click', goNext);
       if(prevBtn) prevBtn.addEventListener('click', goPrev);
-      if(restartBtn) restartBtn.addEventListener('click', ()=>location.reload());
 
-      // Delegação de cliques (sem onclick no HTML)
       document.addEventListener('click',(ev)=>{
         const n = ev.target.closest('[data-action="next"]');
         const p = ev.target.closest('[data-action="prev"]');
         const s = ev.target.closest('[data-action="start"]');
+        const t = ev.target.closest('[data-action="start-journey"]');
+        const h = ev.target.closest('[data-action="home"]');
+        const pr = ev.target.closest('[data-action="print"]');
         const tp= ev.target.closest('[data-action="toggle-password"], .password-toggle');
         if(n){ev.preventDefault();goNext();}
         if(p){ev.preventDefault();goPrev();}
         if(s){ev.preventDefault();startJourney();}
+        if(t){ev.preventDefault();startJourneyAfterOrientations();}
+        if(h){ev.preventDefault();location.href='/jornadas.html';}
+        if(pr){ev.preventDefault();finalize();}
         if(tp){ev.preventDefault();toggleSenha();}
       });
 
@@ -959,10 +506,12 @@
     // Fallback/blocos + vídeos padronizados
     (function defineFallback(){
       window.JORNADA_BLOCKS=[
-        { title:'Bloco 1 — Raízes', questions:[ 'Quem é você hoje?', 'O que a Luz te pede agora?' ], video_after:'/assets/img/filme-1-entrando-na-jornada.mp4' },
-        { title:'Bloco 2 — Caminho', questions:[ 'Qual verdade você precisa admitir para seguir?', 'O que precisa ser curado neste momento?' ], video_after:'/assets/img/filme-2-dentro-da-jornada.mp4' }
+        { title:'Bloco 1 — Raízes', questions:[ 'Quem é você hoje?', 'O que a Luz te pede agora?' ], video_before:'/assets/img/filme-1-entrando-na-jornada.mp4' },
+        { title:'Bloco 2 — Caminho', questions:[ 'Qual verdade você precisa admitir para seguir?', 'O que precisa ser curado neste momento?' ], video_before:'/assets/img/filme-2-dentro-da-jornada.mp4' },
+        { title:'Bloco 3 — Propósito', questions:[ 'Qual é o seu maior propósito?', 'Como você pode servir à Luz?' ], video_before:'/assets/img/filme-3-proposito.mp4' },
+        { title:'Bloco 4 — Transformação', questions:[ 'O que você precisa deixar para trás?', 'O que está nascendo em você?' ], video_before:'/assets/img/filme-4-transformacao.mp4' },
+        { title:'Bloco 5 — Conclusão', questions:[ 'O que você aprendeu nesta jornada?', 'Como você levará a Luz adiante?' ], video_before:'/assets/img/filme-5-fim-da-jornada.mp4' }
       ];
-      window.JORNADA_FINAL_VIDEO='/assets/img/filme-5-fim-da-jornada.mp4';
       console.log('JORNADA_BLOCKS (fallback) prontos.');
     })();
 
@@ -981,6 +530,8 @@
           [progressBadge,progressBar,jProgress,footerActions].forEach(el=>el?.classList.remove('hidden'));
         } else if(route==='final'){
           showSection('section-final'); [progressBadge,progressBar,jProgress].forEach(el=>el?.classList.remove('hidden'));
+        } else if(route==='orientations'){
+          showSection('section-orientations');
         } else { showSection('section-intro'); }
       }
       runTyping(document); return true;
@@ -1019,6 +570,5 @@
     window.JC.showSection  = showSection;
     window.JC.Chama = window.JORNADA_CHAMA;
   </script>
-  <!-- Single-file build: sem dependências externas -->
 </body>
 </html>
