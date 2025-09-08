@@ -20,41 +20,32 @@
     .pergaminho-h.fallback{background-image:url('/assets/img/pergaminho-rasgado-vert.png')!important}
     .conteudo-pergaminho{background:transparent!important;position:relative;z-index:20;padding:20px;min-height:100%;overflow:visible}
 
-    /* ===== CHAMA VIVA (de chama.css) ===== */
+    /* ===== CHAMA VIVA ATUALIZADA (forma de vela: apontada no topo, gordinha no meio, estreita na base, sem recipiente) ===== */
     .chama-viva{
       --altura: 90px; --largura: 60px; --pulso: 1.8s; --glow: 16px;
       --hue: 32; --satur: 95%; --light: 58%; --op: .95;
       position: relative;
       width: var(--largura);
       height: var(--altura);
-      border-radius: 50% 50% 20% 20%;
+      clip-path: polygon(40% 100%, 60% 100%, 50% 0%);
       background: linear-gradient(to top, #ffff00 0%, #ff8c00 40%, #ff4500 100%);
       filter: drop-shadow(0 0 var(--glow) hsla(var(--hue),var(--satur),60%,.65));
     }
-    .chama-viva::after{
-      content:"";
-      position:absolute; left:50%; bottom:0; transform:translateX(-50%);
-      width: calc(var(--largura) * 1.25);
-      height: 26px;
-      background: radial-gradient(120% 100% at 50% 0%, rgba(0,0,0,.15) 0%, rgba(0,0,0,.25) 55%, rgba(0,0,0,.35) 100%);
-      border-radius: 0 0 18px 18px;
-      box-shadow: inset 0 6px 10px rgba(255,255,255,.12), inset 0 -6px 10px rgba(0,0,0,.35);
-    }
     .chama-viva .brasa{
-      position:absolute; left:50%; bottom:18px; transform:translateX(-50%);
-      width: calc(var(--largura) * .9);
+      position:absolute; left:50%; bottom:0; transform:translateX(-50%);
+      width: calc(var(--largura) * .8);
       height: 16px;
       border-radius: 50%;
-      background: radial-gradient(circle at 50% 40%, hsla(var(--hue),var(--satur),95%,.9) 0%, hsla(var(--hue),var(--satur),70%,.8) 35%, hsla(var(--hue),var(--satur),40%,.0) 70%);
+      background: radial-gradient(circle at 50% 50%, hsla(var(--hue),var(--satur),95%,.9) 0%, hsla(var(--hue),var(--satur),70%,.8) 35%, hsla(var(--hue),var(--satur),40%,.0) 70%);
       filter: blur(1.5px);
       animation: brasaPulse var(--pulso) infinite ease-in-out;
       opacity: var(--op);
     }
     .chama-viva .lingua{
-      position:absolute; left:50%; bottom:18px; transform:translateX(-50%);
+      position:absolute; left:50%; bottom:0; transform:translateX(-50%);
       width: var(--largura);
       height: var(--altura);
-      border-radius: 44% 44% 30% 30%;
+      clip-path: polygon(40% 100%, 60% 100%, 50% 0%);
       background: radial-gradient(60% 60% at 50% 28%, hsla(var(--hue),var(--satur),98%,1) 0%, hsla(var(--hue),var(--satur),70%,.95) 35%, hsla(calc(var(--hue) - 8),calc(var(--satur) - 15%),50%,.85) 65%, transparent 82%);
       mix-blend-mode: screen;
       filter: blur(0.6px);
@@ -75,7 +66,7 @@
       animation-delay:.12s;
     }
     .chama-viva .brilho{
-      position:absolute; left:50%; bottom:16px; transform:translateX(-50%);
+      position:absolute; left:50%; bottom:0; transform:translateX(-50%);
       width: calc(var(--largura) * 1.3);
       height: calc(var(--altura) * 1.1);
       background: radial-gradient(circle, hsla(var(--hue),var(--satur),70%,.35) 0%, transparent 65%);
@@ -101,21 +92,49 @@
     @keyframes moveFlame{0%,100%{transform:rotate(-2deg);}50%{transform:rotate(2deg);}}
     @keyframes enlargeFlame{0%,100%{height:var(--altura);}50%{height:calc(var(--altura) * 1.2);}}
     @media (prefers-reduced-motion:reduce){.chama-viva .lingua,.chama-viva .brasa,.chama-viva .brilho,.chama-viva.vibrante{animation:none!important;}}
+    .chama-viva::after { display: none !important; } /* Remover recipiente */
 
-    /* ===== BOLA DE CHAMA (de chama.css) ===== */
+    /* ===== BOLA DE CHAMA ATUALIZADA (menor, com chamas flamejantes altas) ===== */
     #chama-bola{
-      --size:80px; --glow:22px; --color1:#fff7cc; --color2:#ffd166; --color3:#ff8c00; --color4:transparent;
+      --size: 50px; --glow: 22px; --color1:#fff7cc; --color2:#ffd166; --color3:#ff8c00; --color4:transparent;
       position:relative; width:var(--size); height:var(--size); border-radius:50%;
       background:radial-gradient(circle at 50% 50%,var(--color1) 0%,var(--color2) 35%,var(--color3) 65%,var(--color4) 100%);
       filter:drop-shadow(0 0 var(--glow) rgba(255,140,0,.65));
       animation:bolaPulse 1.6s infinite ease-in-out;
     }
-    #chama-bola::after{content:"";position:absolute;inset:-20%;border-radius:50%;background:radial-gradient(circle,rgba(255,180,50,0.4) 0%,transparent 70%);filter:blur(12px);animation:auraPulse 2.2s infinite ease-in-out;}
-    #chama-bola.fraca{--size:60px;--glow:10px;opacity:0.6;animation-duration:2.5s;}
-    #chama-bola.media{--size:80px;--glow:22px;opacity:0.9;animation-duration:1.6s;}
-    #chama-bola.forte{--size:100px;--glow:36px;opacity:1;animation-duration:1s;}
+    #chama-bola .lingua{
+      position:absolute; left:50%; bottom:50%; transform:translateX(-50%);
+      width: calc(var(--size) * 0.4);
+      height: calc(var(--size) * 1.8); /* Altas flamejantes */
+      background: linear-gradient(to top, #ff8c00, #ffd700);
+      clip-path: polygon(30% 100%, 50% 0%, 70% 100%);
+      animation: linguaJitter 3s infinite ease-in-out;
+    }
+    #chama-bola .lingua:nth-child(2){
+      width: calc(var(--size) * 0.3);
+      height: calc(var(--size) * 1.6);
+      animation-delay: 0.2s;
+    }
+    #chama-bola .lingua:nth-child(3){
+      width: calc(var(--size) * 0.2);
+      height: calc(var(--size) * 1.4);
+      animation-delay: 0.4s;
+    }
+    #chama-bola::after {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,180,50,0.4) 0%, transparent 70%);
+      filter: blur(12px);
+      animation: auraPulse 2.2s infinite ease-in-out;
+    }
+    #chama-bola.fraca{--size:40px;--glow:10px;opacity:0.6;animation-duration:2.5s;}
+    #chama-bola.media{--size:50px;--glow:22px;opacity:0.9;animation-duration:1.6s;}
+    #chama-bola.forte{--size:60px;--glow:36px;opacity:1;animation-duration:1s;}
     @keyframes bolaPulse{0%,100%{transform:scale(1);opacity:.9;}50%{transform:scale(1.15);opacity:1;}}
     @keyframes auraPulse{0%,100%{opacity:.4;}50%{opacity:.8;}}
+    @keyframes linguaJitter { 0%, 100% { transform: translateX(-50%) scaleY(1) skewX(0deg); } 20% { transform: translateX(-50%) scaleY(1.05) skewX(.5deg); } 50% { transform: translateX(-50%) scaleY(1.1) skewX(1.2deg); } 80% { transform: translateX(-50%) scaleY(1.03) skewX(.3deg); } }
     #guia-espiritual{position:fixed;left:20px;bottom:20px;z-index:9999;pointer-events:none;}
     #guia-espiritual::after,#chama-bola::after{display:none!important;}
 
@@ -126,7 +145,7 @@
     .btn-primary:hover{background:#7c3aed}
     .btn-secondary{background:#4b5563}
     .btn-secondary:hover{background:#6b7280}
-    .btn+.btn{margin-left:12px}
+    .btn + .btn{margin-left:12px}
 
     .progress-badge{position:fixed;top:16px;right:16px;padding:8px 16px;background:#6b21a8;color:#fff;border-radius:8px;font-size:.9rem;font-family:'BerkshireSwash',cursive;z-index:900;visibility:visible}
     .progress-bar{width:100%;height:8px;background:#e5e7eb;border-radius:4px;margin-top:12px;z-index:900;visibility:visible}
@@ -273,7 +292,7 @@
     // Tag ambiente
     document.getElementById('envTag').textContent = `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
 
-    // ESTADO (de jornada-controller.js)
+    // ESTADO
     const JC = { _state: { blocoIndex: 0, perguntaIndex: 0, respostas: Object.create(null) } };
     const S = {
       root: () => document.getElementById('jornada-canvas'),
@@ -293,7 +312,7 @@
       hide: (el) => { if (el) el.style.display = 'none'; },
       clamp: (n, a, b) => Math.max(a, Math.min(b, n)),
       key: (b, q) => `b${b}-q${q}`,
-      getAnswerEl: (qEl) => qEl?.querySelector?.('textarea, input[type="text"], input[type="email"], input[type="number"], input[type="search"]') || null,
+      getAnswerEl: (qEl) => qEl?.querySelector('textarea, input[type="text"], input[type="email"], input[type="number"], input[type="search"]') || null,
       getVal: (el) => (el && (el.value ?? '')).trim(),
       setProgress: (cur, total) => {
         const pct = total ? Math.round((cur / total) * 100) : 0;
@@ -398,7 +417,7 @@
     }
     window.JORNADA_CHAMA = { analyzeSentiment, updateChama, updateChamaFromText, setChamaIntensidade, ensureHeroFlame, setChamaBola };
 
-    // RENDER (de jornada-render.js)
+    // RENDER
     function renderIntro() {
       console.log('[JORNADA_RENDER] Renderizando intro');
       const section = document.getElementById('section-intro');
@@ -454,7 +473,7 @@
       }
     }
 
-    // CONTROLES (de jornada-controller.js)
+    // CONTROLES
     function saveCurrentAnswer() {
       const bloco = S.blocoAtivo();
       if (!bloco) return;
@@ -502,7 +521,6 @@
         console.log('Exibindo pergunta:', JC._state.perguntaIndex + 1, 'de', perguntas.length);
         const input = U.getAnswerEl(atual);
         if (input) {
-          input.removeAttribute?.('hidden');
           input.style.display = 'block';
           input.style.visibility = 'visible';
           try { input.focus({ preventScroll: true }); } catch (e) { console.warn('Erro ao focar input:', e); }
@@ -531,7 +549,7 @@
         render();
         return;
       }
-      const videoSrc = window.JORNADA_BLOCKS[JC._state.blocoIndex + 1]?.video_before || '';
+      const videoSrc = window.JORNADA_BLOCKS[JC._state.blocoIndex]?.video_before || '';
       console.log('Transição para próximo bloco, videoSrc:', videoSrc);
       const haProximoBloco = JC._state.blocoIndex < S.blocos().length - 1;
       if (haProximoBloco) {
@@ -571,21 +589,21 @@
       updateCanvasBackground(sectionId);
       window.JORNADA_CHAMA.ensureHeroFlame(sectionId);
       if (sectionId === 'section-perguntas') {
-        loadDynamicBlocks();
-        setTimeout(() => {
-          const perguntas = document.querySelectorAll('.j-pergunta');
-          if (perguntas.length) {
-            const firstBloco = document.querySelector('.j-bloco');
-            if (firstBloco) firstBloco.style.display = 'block';
-            perguntas[0].classList.add('active');
-            runTyping(perguntas[0]);
-          }
-        }, 0);
+        if (document.getElementById('perguntas-container').innerHTML === '') {
+          loadDynamicBlocks();
+        }
+        const blocos = S.blocos();
+        if (blocos.length) {
+          JC._state.blocoIndex = 0;
+          JC._state.perguntaIndex = 0;
+          render();
+        }
       }
     }
     function loadDynamicBlocks() {
       const content = document.getElementById('perguntas-container');
       if (!content) { console.error('Erro: #perguntas-container não encontrado no DOM!'); return; }
+      if (content.innerHTML !== '') { console.log('Blocos já carregados, skipping.'); return; }
       window.JORNADA_BLOCKS = [
         { title: 'Bloco 1 — Raízes', questions: [{ label: 'Quem é você hoje?' }, { label: 'O que a Luz te pede agora?' }], video_before: '/assets/img/filme-1-entrando-na-jornada.mp4' },
         { title: 'Bloco 2 — Caminho', questions: [{ label: 'Qual verdade você precisa admitir para seguir?' }, { label: 'O que precisa ser curado neste momento?' }], video_before: '/assets/img/filme-2-dentro-da-jornada.mp4' },
@@ -677,7 +695,6 @@
     }
     function startJourneyAfterOrientations() {
       showSection('section-perguntas');
-      loadDynamicBlocks();
       JC._state.blocoIndex = 0;
       JC._state.perguntaIndex = 0;
       render();
@@ -709,7 +726,7 @@
       } catch {}
     }
 
-    // BOOTSTRAP (de jornada-bootstrap.js)
+    // BOOTSTRAP
     function routeFromHash() { return (location.hash || '#intro').slice(1); }
     function boot() {
       document.body.classList.add('jornada-active');
