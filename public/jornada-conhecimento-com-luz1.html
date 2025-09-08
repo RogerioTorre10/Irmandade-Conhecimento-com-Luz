@@ -19,7 +19,7 @@
     .pergaminho-h.fallback{background-image:url('/assets/img/pergaminho-rasgado-vert.png')!important}
     .conteudo-pergaminho{background:transparent!important;position:relative;z-index:20;padding:20px;min-height:100%;overflow:visible}
 
-    /* ===== CHAMA ===== */
+    /* ===== CHAMA (estilo original + estilo viva) ===== */
     .chama{display:block;position:relative;overflow:hidden;z-index:40;visibility:visible}
     .chama span{position:absolute;bottom:0;width:100%;height:100%;
       background:linear-gradient(to top,#ff4500 0%,#ff8c00 40%,rgba(255,69,0,0) 100%);
@@ -31,15 +31,22 @@
     .chama.chama-sm span:nth-child(3){animation-delay:.4s}
     .chama.chama-weak span{opacity:.5;animation:flicker-weak 2s infinite}
     .chama.chama-strong span{animation:flicker-strong 1s infinite}
-
-    /* Turbines e tamanhos */
     .chama.chama-viva span{animation:flicker-strong .85s infinite;filter:drop-shadow(0 0 12px rgba(255,140,0,.55))}
     .chama.chama-pulse span{animation:flicker-strong .6s infinite}
     .chama.chama-md span{width:22px;height:54px}
     .chama.chama-lg span{width:36px;height:88px}
-
     .chama-fixed-top{position:absolute;top:10px;right:14px;z-index:60}
     .chama-fixed-hero{position:absolute;top:-8px;left:-8px;z-index:60}
+
+    /* ===== CHAMA VIVA (do arquivo 2) ===== */
+    .chama-viva { width: 48px; height: 96px; background: linear-gradient(to top, #ff4500, #ffa500); clip-path: polygon(20% 100%, 50% 0%, 80% 100%); position: relative; filter: drop-shadow(0 0 12px rgba(255, 140, 0, 0.55)); border-radius: 12px; }
+    .chama-viva .brasa { position:absolute; bottom:0; left:0; right:0; height:40%; background: radial-gradient(ellipse at 50% 100%, rgba(255,140,0,.6), rgba(255,69,0,.2), transparent 70%); filter: blur(4px); }
+    .chama-viva .lingua { position:absolute; bottom:0; left:50%; transform: translateX(-50%); width: 40%; height: 85%; background: linear-gradient(to top, #ff8c00, #ffd700); clip-path: polygon(30% 100%, 50% 0%, 70% 100%); animation: linguaJitter 3s infinite ease-in-out; }
+    .chama-viva .brilho { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255, 215, 0, 0.5), transparent); filter: blur(14px); animation: brilhoJitter 2.2s infinite ease-in-out; }
+    .chama-viva.chama-md { width: 32px; height: 64px; }
+    .chama-viva.chama-lg { width: 60px; height: 120px; }
+    @keyframes linguaJitter { 0%, 100% { transform: translateX(-50%) scaleY(1) skewX(0deg); } 20% { transform: translateX(-50%) scaleY(1.05) skewX(.5deg) translateX(var(--jitter, 0px)); } 50% { transform: translateX(-50%) scaleY(1.1) skewX(1.2deg) translateX(var(--jitter, 0px)); } 80% { transform: translateX(-50%) scaleY(1.03) skewX(.3deg) translateX(var(--jitter, 0px)); } }
+    @keyframes brilhoJitter { 0%, 100% { filter: blur(12px); } 50% { filter: blur(14px); } }
 
     /* Destaque palavras */
     .mark-emocao{background:linear-gradient(90deg,rgba(255,196,0,.35),rgba(255,140,0,.2));border-radius:4px;padding:0 2px}
@@ -92,20 +99,8 @@
     .section-container{position:relative;min-height:85vh}
     .hidden{display:none!important}
 
-    @media (max-width:600px){
-      .card{margin:16px;padding:20px}
-      .site-header h1{font-size:1.6rem}
-      .btn{padding:10px 16px;font-size:.9rem}
-      .chama.chama-md span{width:18px;height:44px}
-      .chama.chama-lg span{width:28px;height:72px}
-      .chama.chama-sm span{width:4px;height:8px}
-      .progress-badge{top:8px;right:8px;padding:6px 12px;font-size:.8rem}
-    }
-    @media (max-width:400px){
-      .chama.chama-lg span{width:20px;height:50px}
-      .btn{padding:8px 12px;font-size:.8rem}
-      .card{padding:16px}
-    }
+    /* Bola/guia da chama flutuante */
+    #guia-espiritual{position:fixed;bottom:20px;right:20px;z-index:1200}
   </style>
 </head>
 
@@ -126,7 +121,7 @@
         <div id="jornada-conteudo" class="conteudo-pergaminho">
           <!-- INTRO -->
           <div id="section-intro" class="j-section">
-            <div class="chama chama-lg chama-strong chama-viva"><span></span></div>
+            <!-- Hero será injetado pela API de chama -->
             <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
             <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Antes de começar, ative sua senha." data-speed="50" data-cursor="true"></p>
 
@@ -134,7 +129,6 @@
               <h3>Ative sua Senha</h3>
               <div class="password-input">
                 <input type="password" id="senha" placeholder="Digite sua senha...">
-                <!-- sem onclick; usamos delegação -->
                 <span class="password-toggle" data-action="toggle-password">👁️</span>
               </div>
               <button class="btn btn-primary" data-action="start">Ativar e Iniciar</button>
@@ -153,7 +147,7 @@
 
           <!-- FINAL -->
           <div id="section-final" class="j-section hidden">
-            <div class="chama chama-lg chama-strong chama-viva"><span></span></div>
+            <!-- Hero será injetado pela API de chama -->
             <p data-typing data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40" data-cursor="true"></p>
             <div class="footer-actions">
               <button id="btnRestart" class="btn btn-secondary" data-action="restart">Reiniciar</button>
@@ -183,13 +177,24 @@
     <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
   </div>
 
+  <!-- GUIA ESPIRITUAL: chama flamejante livre -->
+  <div id="guia-espiritual">
+    <div id="chama-bola" class="chama-viva chama-md">
+      <div class="brasa"></div>
+      <div class="lingua"></div>
+      <div class="lingua"></div>
+      <div class="lingua"></div>
+      <div class="brilho"></div>
+    </div>
+  </div>
+
   <script>
     // Tag ambiente
     document.getElementById('envTag').textContent =
       `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
 
     /* =========================
-       EMOÇÃO E DATILOGRAFIA
+       EMOÇÃO & DATILOGRAFIA
     ==========================*/
     const EMO = {
       POS:{'feliz':2,'alegria':2,'amor':3,'sucesso':2,'esperança':3,'paz':2,'fé':3,'gratidão':2,'vitória':3,'superação':3,'luz':2,'deus':3,'coragem':2,'força':2,'confiança':2,'propósito':3},
@@ -217,26 +222,43 @@
     }
 
     /* =========================
-       CHAMA
+       CHAMA — API unificada (traz do arquivo 2)
     ==========================*/
-    function updateChama(scoreNum){
-      const chama=document.getElementById('chama-perguntas'); if(!chama) return;
-      chama.classList.remove('chama-weak','chama-strong','chama-pulse','chama-viva','chama-md-intermediario');
-      chama.classList.add('chama','chama-md');
-      if(scoreNum<=-2){chama.classList.add('chama-weak');}
-      else if(scoreNum>=2){chama.classList.add('chama-strong','chama-pulse');}
-      chama.classList.add('chama-pulse');
-      clearTimeout(chama._pulse_t); chama._pulse_t=setTimeout(()=>chama.classList.remove('chama-pulse'),700);
-    }
-    function ensureHeroFlame(sectionId){
-      const canvas=document.getElementById('jornada-canvas'); if(!canvas) return;
-      let hero=document.getElementById('chama-hero');
-      const mustShow=(sectionId==='section-intro'||sectionId==='section-final');
-      if(mustShow){
-        if(!hero){ hero=document.createElement('div'); hero.id='chama-hero';
-          hero.className='chama chama-lg chama-strong chama-viva chama-fixed-top'; hero.innerHTML='<span></span>'; canvas.appendChild(hero); }
-      } else if(hero){ hero.remove(); }
-    }
+    window.JORNADA_CHAMA = {
+      updateChama(scoreNum, targetId='chama-perguntas'){
+        const el=document.getElementById(targetId); if(!el) return;
+        // se ainda for a chama simples, converte para estrutura viva
+        if(!el.classList.contains('chama-viva')){
+          el.classList.add('chama-viva');
+          el.innerHTML = '<div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>';
+        }
+        const modo = (scoreNum <= -2) ? 'fraca' : (scoreNum >= 2) ? 'forte' : 'media';
+        el.dataset.intensidade = modo;
+        // efeito pico
+        el.classList.add('chama-pico');
+        clearTimeout(el._pulse_t);
+        el._pulse_t=setTimeout(()=>el.classList.remove('chama-pico'),700);
+        // guia flutuante acompanha
+        const bola=document.getElementById('chama-bola');
+        if(bola){ bola.classList.add('chama-viva'); bola.dataset.intensidade=modo; }
+      },
+      ensureHeroFlame(sectionId){
+        const canvas=document.getElementById('jornada-canvas'); if(!canvas) return;
+        let hero=document.getElementById('chama-hero');
+        const show=(sectionId==='section-intro'||sectionId==='section-final');
+        if(show){
+          if(!hero){
+            hero=document.createElement('div'); hero.id='chama-hero';
+            hero.className='chama-viva chama-lg chama-strong chama-fixed-top';
+            hero.innerHTML='<div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>';
+            canvas.appendChild(hero);
+          }
+        } else if(hero){ hero.remove(); }
+      }
+    };
+    // compat: mapear funções antigas
+    function updateChama(score){ window.JORNADA_CHAMA.updateChama(score); }
+    function ensureHeroFlame(sectionId){ window.JORNADA_CHAMA.ensureHeroFlame(sectionId); }
 
     /* =========================
        PROGRESSO & STORAGE
@@ -299,7 +321,8 @@
           const bloco=document.createElement('section'); bloco.className='j-bloco'; bloco.dataset.bloco=idx; bloco.dataset.video=block.video_after||'';
           block.questions.forEach((q,qIdx)=>{
             const pergunta=document.createElement('div'); pergunta.className='j-pergunta'; pergunta.dataset.pergunta=qIdx;
-            pergunta.innerHTML=`<label class="pergunta-enunciado" data-typing data-text="<b>Pergunta ${qIdx+1}:</b> ${q.label}" data-speed="40" data-cursor="true"></label>
+            const label = (typeof q === 'string') ? q : (q.label || q.text || '');
+            pergunta.innerHTML=`<label class="pergunta-enunciado" data-typing data-text="<b>Pergunta ${qIdx+1}:</b> ${label}" data-speed="40" data-cursor="true"></label>
               <textarea rows="4" class="input" placeholder="Digite sua resposta..." oninput="handleInput(this)"></textarea>`;
             bloco.appendChild(pergunta);
           });
@@ -339,11 +362,13 @@
         const blocos=document.querySelectorAll('.j-bloco');
         const currentBloco=current?.closest('.j-bloco'); const nextBlocoIndex=Array.from(blocos).indexOf(currentBloco)+1;
         if(nextBlocoIndex<blocos.length){
+          const currentIdx = Number(currentBloco.dataset.bloco||0);
+          const videoSrc = (window.JORNADA_BLOCKS[currentIdx]?.video_after)||'';
           blocos.forEach(b=>b.style.display='none'); blocos[nextBlocoIndex].style.display='block';
           const nextPergunta=blocos[nextBlocoIndex].querySelector('.j-pergunta');
-          if(nextPergunta){ nextPergunta.classList.add('active'); runTyping(nextPergunta); }
-          playTransition(blocos[currentBloco.dataset.bloco].video_after||'',()=>{});
-        } else { showSection('section-final'); updateProgress(); }
+          const proceed = ()=>{ if(nextPergunta){ nextPergunta.classList.add('active'); runTyping(nextPergunta); } };
+          if(videoSrc) playTransition(videoSrc, proceed); else proceed();
+        } else { if(window.JORNADA_FINAL_VIDEO) playTransition(window.JORNADA_FINAL_VIDEO, ()=>showSection('section-final')); else { showSection('section-final'); } updateProgress(); }
       }
     }
     function goPrev(){
@@ -371,13 +396,13 @@
       const skip=document.getElementById('skipVideo');
       if(overlay && video && src){
         video.src=src; overlay.classList.remove('hidden');
-        const cleanup=()=>{ video.pause(); overlay.classList.add('hidden'); video.removeAttribute('src'); video.load(); onEnd&&onEnd(); };
+        const cleanup=()=>{ try{video.pause();}catch(e){} overlay.classList.add('hidden'); video.removeAttribute('src'); video.load(); onEnd&&onEnd(); };
         video.onended=cleanup;
         video.onerror=()=>{ console.warn('Vídeo não carregou:',src); cleanup(); };
         if(skip) skip.onclick=cleanup;
         video.muted=false;
         video.play().catch(err=>{ console.warn('Erro ao reproduzir vídeo:',err); cleanup(); });
-        setTimeout(cleanup,10000);
+        setTimeout(cleanup,12000);
       } else { onEnd&&onEnd(); }
     }
 
@@ -394,13 +419,11 @@
       if(senhasValidas.includes(senha.toLowerCase())){
         (window.showSection||showSection)('section-perguntas');
         loadDynamicBlocks();
-
         const perguntas=document.querySelectorAll('.j-pergunta');
         if(perguntas.length){
           perguntas[0].classList.add('active'); runTyping(perguntas[0]);
           const firstTa=document.querySelector('.j-pergunta.active textarea'); if(firstTa) handleInput(firstTa);
         } else { console.error('Nenhuma pergunta encontrada após loadDynamicBlocks!'); }
-
         document.querySelector('.progress-badge')?.classList.remove('hidden');
         document.querySelector('.progress-bar')?.classList.remove('hidden');
         document.querySelector('.j-progress')?.classList.remove('hidden');
@@ -432,13 +455,14 @@
       console.log('Controlador da jornada inicializado!');
     }
 
+    // Fallback/blocos + vídeos padronizados
     (function defineFallback(){
       window.JORNADA_BLOCKS=[
-        { questions:[{label:'Qual é o seu maior sonho?'},{label:'O que te inspira no dia a dia?'}], video_after:'/assets/video/transicao1.mp4' },
-        { questions:[{label:'Como você enfrenta desafios?'},{label:'Qual é sua maior conquista?'}], video_after:'/assets/video/transicao2.mp4' }
+        { title:'Bloco 1 — Raízes', questions:[ 'Quem é você hoje?', 'O que a Luz te pede agora?' ], video_after:'/assets/img/filme-1-entrando-na-jornada.mp4' },
+        { title:'Bloco 2 — Caminho', questions:[ 'Qual verdade você precisa admitir para seguir?', 'O que precisa ser curado neste momento?' ], video_after:'/assets/img/filme-2-dentro-da-jornada.mp4' }
       ];
-      window.JORNADA_QA={ positiveWords:Object.keys(EMO.POS), negativeWords:Object.keys(EMO.NEG) };
-      console.log('JORNADA_BLOCKS/QA (fallback) definidos!');
+      window.JORNADA_FINAL_VIDEO='/assets/img/filme-5-fim-da-jornada.mp4';
+      console.log('JORNADA_BLOCKS (fallback) prontos.');
     })();
 
     async function boot(){
@@ -461,33 +485,30 @@
       runTyping(document); return true;
     }
 
-   // Inicialização
-document.addEventListener('DOMContentLoaded', () => {
-  runTyping(document);
-  initJornada();
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+      runTyping(document);
+      initJornada();
 
-  boot().then(() => {
-    // ativa o hero conforme a seção visível agora
-    const visible = document.querySelector('.j-section:not(.hidden)');
-    if (visible) ensureHeroFlame(visible.id);
-  });
-
-  const target = document.getElementById('jornada-conteudo');
-  if (target) {
-    const obs = new MutationObserver(muts => {
-      muts.forEach(m => {
-        runTyping(m.target);
-        if (m.target.id === 'perguntas-container') updateProgress();
+      boot().then(() => {
+        const visible = document.querySelector('.j-section:not(.hidden)');
+        if (visible) ensureHeroFlame(visible.id);
       });
+
+      const target = document.getElementById('jornada-conteudo');
+      if (target) {
+        const obs = new MutationObserver(muts => {
+          muts.forEach(m => {
+            runTyping(m.target);
+            if (m.target.id === 'perguntas-container') updateProgress();
+          });
+        });
+        window.ensureHeroFlame = ensureHeroFlame;
+        obs.observe(target, { childList: true, subtree: true });
+      }
     });
 
-    window.ensureHeroFlame = ensureHeroFlame;
-    
-    obs.observe(target, { childList: true, subtree: true });
-  }
-});
-    
-    // BRIDGE GLOBAL para scripts externos (como jornada-controller.js)
+    // Ponte global
     window.JC = window.JC || {};
     window.toggleSenha  = toggleSenha;
     window.startJourney = startJourney;
@@ -495,6 +516,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.JC.toggleSenha  = toggleSenha;
     window.JC.startJourney = startJourney;
     window.JC.showSection  = showSection;
+    window.JC.Chama = window.JORNADA_CHAMA;
   </script>
 
   <!-- Referências externas (mantidas para evitar 404, mas não necessárias) -->
