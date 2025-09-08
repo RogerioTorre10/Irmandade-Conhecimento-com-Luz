@@ -169,12 +169,14 @@
       --light: 60%;
       --op: .9;
 
-      position: relative;
+      position: fixed;
+      top: 20px;
+      right: 20px; /* Posicionada no canto superior direito */
       width: var(--largura);
       height: var(--altura);
       display: inline-block;
       filter: drop-shadow(0 0 var(--glow) hsla(var(--hue),var(--satur),60%,.65));
-      z-index: 40;
+      z-index: 9999;
     }
 
     /* Recipiente (vaso) */
@@ -275,13 +277,12 @@
     #chama-bola.media { --altura: 80px; --largura: 40px; --pulso: 1.6s; --glow: 20px; --hue: 28; --satur: 90%; --light: 60%; --op: 0.9; }
     #chama-bola.forte { --altura: 100px; --largura: 45px; --pulso: 1.1s; --glow: 30px; --hue: 20; --satur: 100%; --light: 55%; --op: 1; }
 
-    /* ===== GUIA ESPIRITUAL ===== */
-    #guia-espiritual {
+    /* ===== CHAMA INFERIOR AJUSTADA ===== */
+    #chama-vibrante-inferior {
       position: fixed;
       right: 20px;
       bottom: 20px;
       z-index: 9999;
-      pointer-events: none;
     }
 
     /* ===== UI ===== */
@@ -446,6 +447,9 @@
   </div>
   <div id="guia-espiritual"></div>
 
+  <!-- CHAMA INFERIOR -->
+  <div id="chama-vibrante-inferior" class="chama-viva"></div>
+
   <script>
     // Tag ambiente
     document.getElementById('envTag').textContent =
@@ -514,10 +518,15 @@
           el.classList.remove('chama-pico');
         }
         const bola = document.getElementById('chama-bola');
+        const chamaInferior = document.getElementById('chama-vibrante-inferior');
         if (bola) {
           bola.classList.remove('fraca', 'media', 'forte');
           bola.classList.add(modo);
           bola.setAttribute('data-intensidade', modo); // Sincronizar intensidade
+        }
+        if (chamaInferior) {
+          chamaInferior.classList.add('chama-viva');
+          chamaInferior.setAttribute('data-intensidade', modo);
         }
         console.log('Chama', targetId, 'atualizada para:', modo);
       },
@@ -636,8 +645,9 @@
             const pergunta = document.createElement('div');
             pergunta.className = 'j-pergunta';
             pergunta.dataset.pergunta = qIdx;
+            const label = (typeof q === 'string') ? q : (q.label || q.text || '');
             pergunta.innerHTML = `
-              <label class="pergunta-enunciado" data-typing data-text="<b>Pergunta ${qIdx + 1}:</b> ${q.label}" data-speed="40" data-cursor="true"></label>
+              <label class="pergunta-enunciado" data-typing data-text="<b>Pergunta ${qIdx + 1}:</b> ${label}" data-speed="40" data-cursor="true"></label>
               <textarea rows="4" class="input" placeholder="Digite sua resposta..." oninput="handleInput(this)"></textarea>
             `;
             bloco.appendChild(pergunta);
@@ -708,23 +718,33 @@
         const currentBloco = current?.closest('.j-bloco');
         const nextBlocoIndex = Array.from(blocos).indexOf(currentBloco) + 1;
         if (nextBlocoIndex < blocos.length) {
+          const currentIdx = Number(currentBloco?.dataset.bloco || 0);
+          const videoSrc = (window.JORNADA_BLOCKS[currentIdx]?.video_after) || '';
           blocos.forEach(b => b.style.display = 'none');
           blocos[nextBlocoIndex].style.display = 'block';
           const nextPergunta = blocos[nextBlocoIndex].querySelector('.j-pergunta');
-          if (nextPergunta) {
-            nextPergunta.classList.add('active');
-            runTyping(nextPergunta);
+          const proceed = () => {
+            if (nextPergunta) {
+              nextPergunta.classList.add('active');
+              runTyping(nextPergunta);
+            }
+          };
+          if (videoSrc) {
+            playTransition(videoSrc, proceed);
           } else {
-            console.error('Nenhuma próxima pergunta encontrada no bloco seguinte!');
+            proceed();
           }
-          const videoSrc = blocos[nextBlocoIndex].dataset.video || '';
-          if (videoSrc) playTransition(videoSrc, () => {});
         } else {
-          showSection('section-final');
+          if (window.JORNADA_FINAL_VIDEO) {
+            playTransition(window.JORNADA_FINAL_VIDEO, () => showSection('section-final'));
+          } else {
+            showSection('section-final');
+          }
           updateProgress();
         }
       }
     }
+
     function goPrev() {
       const perguntas = document.querySelectorAll('.j-pergunta');
       const current = document.querySelector('.j-pergunta.active');
@@ -745,8 +765,6 @@
           if (lastPergunta) {
             lastPergunta.classList.add('active');
             runTyping(lastPergunta);
-          } else {
-            console.error('Nenhuma última pergunta encontrada no bloco anterior!');
           }
         } else {
           showSection('section-intro');
@@ -764,7 +782,7 @@
         overlay.classList.remove('hidden');
         video.controls = true;
         const cleanup = () => {
-          video.pause();
+          try { video.pause(); } catch (e) {}
           overlay.classList.add('hidden');
           video.removeAttribute('src');
           video.load();
@@ -773,18 +791,16 @@
         video.onended = cleanup;
         video.onerror = () => {
           console.warn('Vídeo não carregou:', src);
-          alert('Erro ao carregar vídeo de transição. Verifique o caminho ou conexão.');
           cleanup();
         };
         if (skip) skip.onclick = cleanup;
+        video.muted = false;
         video.play().catch(err => {
           console.warn('Erro ao reproduzir vídeo:', err);
-          alert('O vídeo não pode ser reproduzido automaticamente. Clique em "Play" nos controles.');
           cleanup();
         });
-        setTimeout(cleanup, 10000);
+        setTimeout(cleanup, 12000);
       } else {
-        console.warn('Vídeo ou overlay não encontrado para:', src);
         onEnd && onEnd();
       }
     }
@@ -795,17 +811,11 @@
       console.log('[JORNADA] Finalizado. Respostas:', respostas);
       alert('Jornada concluída!');
       localStorage.removeItem('jornada_respostas');
-      setTimeout(() => window.location.href = '/index.html', 1000);
+      setTimeout(() => location.replace('/index.html'), 1000);
     }
 
     function startJourney() {
-      const senhaInput = document.getElementById('senha');
-      if (!senhaInput) {
-        console.error('Campo senha não encontrado!');
-        alert('Erro: Campo de senha não carregou. Recarregue a página.');
-        return;
-      }
-      const senha = senhaInput.value || '';
+      const senha = document.getElementById('senha')?.value || '';
       const senhasValidas = ['iniciar', 'olho magico', 'olho mágico'];
       if (senhasValidas.includes(senha.toLowerCase())) {
         showSection('section-perguntas');
@@ -814,7 +824,7 @@
         if (perguntas.length) {
           perguntas[0].classList.add('active');
           runTyping(perguntas[0]);
-          const firstTa = perguntas[0].querySelector('textarea');
+          const firstTa = document.querySelector('.j-pergunta.active textarea');
           if (firstTa) handleInput(firstTa);
         } else {
           console.error('Nenhuma pergunta encontrada após loadDynamicBlocks!');
@@ -846,90 +856,4 @@
         const tp = ev.target.closest('[data-action="toggle-password"], .password-toggle');
         if (n) { ev.preventDefault(); goNext(); }
         if (p) { ev.preventDefault(); goPrev(); }
-        if (s) { ev.preventDefault(); startJourney(); }
-        if (tp) { ev.preventDefault(); toggleSenha(); }
-      });
-
-      console.log('Controlador da jornada inicializado!');
-    }
-
-    (function defineFallback() {
-      window.JORNADA_BLOCKS = [
-        { questions: [{ label: 'Qual é o seu maior sonho?' }, { label: 'O que te inspira no dia a dia?' }], video_after: '/assets/video/transicao1.mp4' },
-        { questions: [{ label: 'Como você enfrenta desafios?' }, { label: 'Qual é sua maior conquista?' }], video_after: '/assets/video/transicao2.mp4' }
-      ];
-      window.JORNADA_QA = { positiveWords: Object.keys(EMO.POS), negativeWords: Object.keys(EMO.NEG) };
-      console.log('JORNADA_BLOCKS/QA (fallback) definidos!');
-    })();
-
-    async function boot() {
-      document.body.classList.add('jornada-active');
-      const route = (location.hash || '#intro').slice(1);
-      const canvas = document.getElementById('jornada-canvas');
-      const progressBadge = document.querySelector('.progress-badge');
-      const progressBar = document.querySelector('.progress-bar');
-      const jProgress = document.querySelector('.j-progress');
-      const footerActions = document.querySelector('.footer-actions');
-
-      if (canvas) {
-        if (route === 'perguntas') {
-          showSection('section-perguntas');
-          loadDynamicBlocks();
-          [progressBadge, progressBar, jProgress, footerActions].forEach(el => el?.classList.remove('hidden'));
-        } else if (route === 'final') {
-          showSection('section-final');
-          [progressBadge, progressBar, jProgress].forEach(el => el?.classList.remove('hidden'));
-        } else {
-          showSection('section-intro');
-        }
-      }
-      runTyping(document);
-      return true;
-    }
-
-    // Inicialização
-    document.addEventListener('DOMContentLoaded', () => {
-      runTyping(document);
-      initJornada();
-      boot().then(() => {
-        const visible = document.querySelector('.j-section:not(.hidden)');
-        if (visible) JORNADA_CHAMA.ensureHeroFlame(visible.id);
-      });
-      const target = document.getElementById('jornada-conteudo');
-      if (target) {
-        const obs = new MutationObserver(muts => {
-          muts.forEach(m => {
-            runTyping(m.target);
-            if (m.target.id === 'perguntas-container') updateProgress();
-          });
-        });
-        obs.observe(target, { childList: true, subtree: true });
-      }
-    });
-
-    // BRIDGE GLOBAL para scripts externos
-    window.JC = window.JC || {};
-    window.toggleSenha = toggleSenha;
-    window.startJourney = startJourney;
-    window.showSection = showSection;
-    window.JC.toggleSenha = toggleSenha;
-    window.JC.startJourney = startJourney;
-    window.JC.showSection = showSection;
-  </script>
-
-  <!-- Referências externas desativadas temporariamente -->
-  <!-- <script defer src="/config.js" onerror="console.error('Falha ao carregar config.js, usando fallback inline');"></script>
-  <script defer src="/jornada-utils.js" onerror="console.error('Falha ao carregar jornada-utils.js, usando fallback inline');"></script>
-  <script defer src="/jornada-core.js" onerror="console.error('Falha ao carregar jornada-core.js, usando fallback inline');"></script>
-  <script defer src="/jornada-auth.js" onerror="console.error('Falha ao carregar jornada-auth.js, usando fallback inline');"></script>
-  <script defer src="/jornada-chama.js" onerror="console.error('Falha ao carregar jornada-chama.js, usando fallback inline');"></script>
-  <script defer src="/jornada-paper-qa.js" onerror="console.error('Falha ao carregar jornada-paper-qa.js, usando fallback inline');"></script>
-  <script defer src="/jornada-typing.js" onerror="console.error('Falha ao carregar jornada-typing.js, usando fallback inline');"></script>
-  <script defer src="/jornada-controller.js" onerror="console.error('Falha ao carregar jornada-controller.js, usando fallback inline');"></script>
-  <script defer src="/jornada-render.js" onerror="console.error('Falha ao carregar jornada-render.js, usando fallback inline');"></script>
-  <script defer src="/jornada-bootstrap.js" onerror="console.error('Falha ao carregar jornada-bootstrap.js, usando fallback inline');"></script>
-  <script defer src="/jornada-micro.js" onerror="console.error('Falha ao carregar jornada-micro.js, usando fallback inline');"></script>
-  <script defer src="/i18n/i18n.js" onerror="console.error('Falha ao carregar i18n.js, usando fallback inline');"></script>
-  <script defer src="/api.js" onerror="console.error('Falha ao carregar api.js, usando fallback inline');"></script> -->
-</body>
-</html>
+        if
