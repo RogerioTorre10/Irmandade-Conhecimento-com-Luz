@@ -841,8 +841,63 @@ window.JORNADA_VIDEOS = {
 
   console.log('[Filme0] hook instalado.');
 })(); // <-- NÃO REMOVER
-
   </script>
+  <script>
+;(() => {
+  if (typeof window.playTransition !== 'function') {
+    console.warn('[PatchVideo] playTransition não encontrado.');
+    return;
+  }
+
+  const ORIG = window.playTransition;
+
+  function overlayVisivel(){
+    const ov = document.getElementById('videoOverlay');
+    return ov && !ov.classList.contains('hidden');
+  }
+
+  function silenciarDuranteVideo(){
+    const origAlert   = window.alert;
+    const origConfirm = window.confirm;
+    const origPrompt  = window.prompt;
+
+    window.alert = function(msg){
+      if (overlayVisivel()) { console.warn('[alert suprimido durante vídeo]:', msg); return; }
+      return origAlert(msg);
+    };
+    window.confirm = function(msg){
+      if (overlayVisivel()) { console.warn('[confirm suprimido durante vídeo]:', msg); return false; }
+      return origConfirm(msg);
+    };
+    window.prompt = function(msg, def){
+      if (overlayVisivel()) { console.warn('[prompt suprimido durante vídeo]:', msg); return null; }
+      return origPrompt(msg, def);
+    };
+
+    return () => {
+      window.alert   = origAlert;
+      window.confirm = origConfirm;
+      window.prompt  = origPrompt;
+    };
+  }
+
+  // Wrapper: só silencia no vídeo FINAL
+  window.playTransition = function(src, onEnd){
+    const isFinal = (window.JORNADA_FINAL_VIDEO && src === window.JORNADA_FINAL_VIDEO);
+    let restore = null;
+
+    if (isFinal) restore = silenciarDuranteVideo();
+
+    ORIG(src, function(){
+      try { if (restore) restore(); } catch(e){}
+      try { onEnd && onEnd(); } catch(e){}
+    });
+
+    // Failsafe: restaura em 20s mesmo se algo der errado
+    if (isFinal) setTimeout(() => { try { restore && restore(); } catch(_){} }, 20000);
+  };
+})();
+</script>
       
   <!-- Referências externas (mantidas para evitar 404, mas não necessárias) -->
   <script defer src="/config.js" onerror="console.error('Falha ao carregar config.js, usando fallback inline');"></script>
