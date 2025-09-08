@@ -770,38 +770,57 @@ window.JORNADA_VIDEOS = {
   final: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
 };
 
-// === Garantir video_after dos blocos e vídeo final (sem HTML, sem side-effects)
+// === Garantir video_after + normalizar perguntas (strings -> {label}) ===
 (function ensureBlocksAndFinal(){
-  // Mantém seus blocos se já existirem; caso contrário, cria fallback simples
-  window.JORNADA_BLOCKS = window.JORNADA_BLOCKS || [
+  // Fallback se não vier nada de fora
+  var fallback = [
     {
       title: 'Bloco 1 — Raízes',
       questions: [
-        'Quem é você hoje?',
-        'O que a Luz te pede agora?'
+        { label: 'Quem é você hoje?' },
+        { label: 'O que a Luz te pede agora?' }
       ],
       video_after: window.JORNADA_VIDEOS.afterBlocks[0]
     },
     {
       title: 'Bloco 2 — Caminho',
       questions: [
-        'Qual verdade você precisa admitir para seguir?',
-        'O que precisa ser curado neste momento?'
+        { label: 'Qual verdade você precisa admitir para seguir?' },
+        { label: 'O que precisa ser curado neste momento?' }
       ],
       video_after: window.JORNADA_VIDEOS.afterBlocks[1]
     }
   ];
 
-  // Se algum bloco não tiver video_after, completa a partir do mapa
-  window.JORNADA_BLOCKS.forEach(function(block, idx){
-    if (!block.video_after && window.JORNADA_VIDEOS.afterBlocks[idx]){
-      block.video_after = window.JORNADA_VIDEOS.afterBlocks[idx];
-    }
+  // Usa os blocos existentes OU o fallback acima
+  var blocks = window.JORNADA_BLOCKS || fallback;
+
+  // Normaliza perguntas e completa video_after quando faltar
+  window.JORNADA_BLOCKS = blocks.map(function(block, idx){
+    var qs = (block.questions || []).map(function(q){
+      if (typeof q === 'string') return { label: q };
+      if (q && typeof q === 'object') {
+        if ('label' in q) return { label: q.label || '' };
+        if ('text'  in q) return { label: q.text  || '' };
+      }
+      return { label: String(q || '') };
+    });
+
+    return Object.assign({}, block, {
+      questions: qs,
+      video_after: block.video_after || (window.JORNADA_VIDEOS && window.JORNADA_VIDEOS.afterBlocks
+                    ? window.JORNADA_VIDEOS.afterBlocks[idx] : undefined)
+    });
   });
 
-  // Vídeo final
-  window.JORNADA_FINAL_VIDEO = window.JORNADA_FINAL_VIDEO || window.JORNADA_VIDEOS.final;
+  // Vídeo final garantido
+  if (!window.JORNADA_FINAL_VIDEO && window.JORNADA_VIDEOS && window.JORNADA_VIDEOS.final){
+    window.JORNADA_FINAL_VIDEO = window.JORNADA_VIDEOS.final;
+  }
+
+  console.log('JORNADA_BLOCKS normalizados:', window.JORNADA_BLOCKS);
 })();
+
 
 // === FILME 0: tocar 1x antes de iniciar (intercepta o 1º clique em [data-action="start"])
 ;(() => {
