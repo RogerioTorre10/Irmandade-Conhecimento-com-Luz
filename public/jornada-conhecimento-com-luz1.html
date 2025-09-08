@@ -757,6 +757,39 @@
     window.JC.startJourney = startJourney;
     window.JC.showSection  = showSection;
     window.JC.Chama = window.JORNADA_CHAMA;
+    <script>
+// === Filme 0 na PRIMEIRA entrada de "section-perguntas" ==================
+// Caminho do vídeo inicial
+const FILME0_URL = '/assets/img/filme-0-ao-encontro-da-jornada.mp4';
+// (se seu servidor exige /public, troque para: '/public/assets/img/filme-0-ao-encontro-da-jornada.mp4')
+
+(function filme0Gate(){
+  if (!window.showSection || !window.playTransition) {
+    console.warn('[Filme0] showSection/playTransition não disponíveis.');
+    return;
+  }
+  if (window.__filme0_wrapped__) return; // evita duplicar
+  window.__filme0_wrapped__ = true;
+
+  let jaTocou = false;
+  const _showSectionOriginal = window.showSection;
+
+  window.showSection = function(sectionId){
+    if (sectionId === 'section-perguntas' && !jaTocou) {
+      jaTocou = true;
+      try {
+        playTransition(FILME0_URL, () => _showSectionOriginal.call(this, sectionId));
+      } catch (e) {
+        console.error('[Filme0] erro ao tocar vídeo:', e);
+        return _showSectionOriginal.call(this, sectionId); // fallback
+      }
+      return;
+    }
+    return _showSectionOriginal.call(this, sectionId);
+  };
+})();
+</script>
+
   </script>
 
   <!-- Referências externas (mantidas para evitar 404, mas não necessárias) -->
