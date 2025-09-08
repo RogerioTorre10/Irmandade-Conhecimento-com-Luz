@@ -20,44 +20,37 @@
     .pergaminho-h.fallback{background-image:url('/assets/img/pergaminho-rasgado-vert.png')!important}
     .conteudo-pergaminho{background:transparent!important;position:relative;z-index:20;padding:20px;min-height:100%;overflow:visible}
 
-    /* ===== CHAMA (estilo original + estilo viva) ===== */
-    .chama{display:block;position:relative;overflow:hidden;z-index:40;visibility:visible}
-    .chama span{position:absolute;bottom:0;width:100%;height:100%;
-      background:linear-gradient(to top,#ff4500 0%,#ff8c00 40%,rgba(255,69,0,0) 100%);
-      clip-path: polygon(50% 100%, 80% 60%, 70% 40%, 60% 20%, 50% 0%, 40% 20%, 30% 40%, 20% 60%);
-      animation: flicker 1.5s infinite;border-radius:2px}
-    .chama.chama-sm{display:inline-flex;gap:4px}
-    .chama.chama-sm span{width:6px;height:12px;background:#ff4500;animation:flicker 1.5s infinite}
-    .chama.chama-sm span:nth-child(2){animation-delay:.2s}
-    .chama.chama-sm span:nth-child(3){animation-delay:.4s}
-    .chama.chama-weak span{opacity:.5;animation:flicker-weak 2s infinite}
-    .chama.chama-strong span{animation:flicker-strong 1s infinite}
-    .chama.chama-viva span{animation:flicker-strong .85s infinite;filter:drop-shadow(0 0 12px rgba(255,140,0,.55))}
-    .chama.chama-pulse span{animation:flicker-strong .6s infinite}
-    .chama.chama-md span{width:22px;height:54px}
-    .chama.chama-lg span{width:36px;height:88px}
-    .chama-fixed-top{position:absolute;top:10px;right:14px;z-index:60}
-    .chama-fixed-hero{position:absolute;top:-8px;left:-8px;z-index:60}
-
-    /* ===== CHAMA VIVA ===== */
-    .chama-viva { width: 48px; height: 96px; background: linear-gradient(to top, #ff4500, #ffa500); clip-path: polygon(20% 100%, 50% 0%, 80% 100%); position: relative; filter: drop-shadow(0 0 12px rgba(255, 140, 0, 0.55)); border-radius: 12px; }
+    /* ===== CHAMA VIVA ATUALIZADA (mais vibrante, como vela real, sem triângulo) ===== */
+    .chama-viva { 
+      width: 48px; height: 96px; 
+      border-radius: 50% 50% 20% 20%; 
+      background: linear-gradient(to top, #ffff00 0%, #ff8c00 40%, #ff4500 100%);
+      position: relative; 
+      filter: drop-shadow(0 0 12px rgba(255, 140, 0, 0.55)); 
+    }
+    .chama-viva:before {
+      content: '';
+      position: absolute;
+      width: 100%; height: 100%;
+      border-radius: 50% 50% 20% 20%;
+      box-shadow: 0 0 15px 0 rgba(247, 93, 0, .4), 0 -6px 4px 0 rgba(247, 128, 0, .7);
+    }
     .chama-viva .brasa { position:absolute; bottom:0; left:0; right:0; height:40%; background: radial-gradient(ellipse at 50% 100%, rgba(255,140,0,.6), rgba(255,69,0,.2), transparent 70%); filter: blur(4px); }
-    .chama-viva .lingua { position:absolute; bottom:0; left:50%; transform: translateX(-50%); width: 40%; height: 85%; background: linear-gradient(to top, #ff8c00, #ffd700); clip-path: polygon(30% 100%, 50% 0%, 70% 100%); animation: linguaJitter 3s infinite ease-in-out; }
+    .chama-viva .lingua { position:absolute; bottom:0; left:50%; transform: translateX(-50%); width: 40%; height: 85%; background: linear-gradient(to top, #ff8c00, #ffd700); border-radius: 50% 50% 20% 20%; animation: linguaJitter 3s infinite ease-in-out; }
     .chama-viva .brilho { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255, 215, 0, 0.5), transparent); filter: blur(14px); animation: brilhoJitter 2.2s infinite ease-in-out; }
+    .chama-viva.vibrante { animation: moveFlame 6s linear infinite, enlargeFlame 5s linear infinite; }
     .chama-viva.chama-md { width: 32px; height: 64px; }
     .chama-viva.chama-lg { width: 60px; height: 120px; }
-    .chama-viva[data-intensidade="fraca"] { opacity: 0.5; transform: scale(0.8); }
-    .chama-viva[data-intensidade="forte"] { transform: scale(1.2); filter: drop-shadow(0 0 16px rgba(255, 140, 0, 0.7)); }
-    .chama-viva[data-intensidade="media"] { transform: scale(1); opacity: 1; }
-    @keyframes linguaJitter { 0%, 100% { transform: translateX(-50%) scaleY(1) skewX(0deg); } 20% { transform: translateX(-50%) scaleY(1.05) skewX(.5deg) translateX(var(--jitter, 0px)); } 50% { transform: translateX(-50%) scaleY(1.1) skewX(1.2deg) translateX(var(--jitter, 0px)); } 80% { transform: translateX(-50%) scaleY(1.03) skewX(.3deg) translateX(var(--jitter, 0px)); } }
+    .chama-viva[data-intensidade="fraca"] { opacity: 0.5; transform: scale(0.8); animation: none; } /* Sem vivo extra */
+    .chama-viva[data-intensidade="forte"] { transform: scale(1.2); filter: drop-shadow(0 0 16px rgba(255, 140, 0, 0.7)); animation: none; } /* Sem vivo extra */
+    .chama-viva[data-intensidade="media"] { transform: scale(1); opacity: 1; animation: none; } /* Sem vivo extra */
+    @keyframes moveFlame { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+    @keyframes enlargeFlame { 0%, 100% { height: 100%; } 50% { height: 120%; } }
+    @keyframes linguaJitter { 0%, 100% { transform: translateX(-50%) scaleY(1) skewX(0deg); } 20% { transform: translateX(-50%) scaleY(1.05) skewX(.5deg); } 50% { transform: translateX(-50%) scaleY(1.1) skewX(1.2deg); } 80% { transform: translateX(-50%) scaleY(1.03) skewX(.3deg); } }
     @keyframes brilhoJitter { 0%, 100% { filter: blur(12px); } 50% { filter: blur(14px); } }
 
-    /* Destaque palavras */
+    /* Outras estilos mantidos */
     .mark-emocao{background:linear-gradient(90deg,rgba(255,196,0,.35),rgba(255,140,0,.2));border-radius:4px;padding:0 2px}
-
-    @keyframes flicker{0%,100%{transform:scaleY(1);opacity:1}50%{transform:scaleY(1.2);opacity:.8}}
-    @keyframes flicker-weak{0%,100%{transform:scaleY(.8);opacity:.6}50%{transform:scaleY(1);opacity:.4}}
-    @keyframes flicker-strong{0%,100%{transform:scaleY(1.5);opacity:1}50%{transform:scaleY(1.8);opacity:.9}}
 
     /* ===== UI ===== */
     .btn{display:inline-block;padding:12px 24px;border-radius:10px;border:0;background:#1f2937;color:#fff;font-family:'BerkshireSwash',cursive;font-weight:600;font-size:18px;text-decoration:none;transition:background .3s ease,transform .2s ease;z-index:30}
@@ -128,7 +121,7 @@
         <div id="jornada-conteudo" class="conteudo-pergaminho">
           <!-- INTRO -->
           <div id="section-intro" class="j-section">
-            <div class="chama-viva chama-lg chama-fixed-hero" id="chama-hero">
+            <div class="chama-viva chama-lg vibrante chama-fixed-hero" id="chama-hero">
               <div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>
             </div>
             <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
@@ -145,7 +138,7 @@
 
           <!-- ORIENTAÇÕES E CONTRATO -->
           <div id="section-orientations" class="j-section hidden">
-            <div class="chama-viva chama-lg chama-fixed-hero" id="chama-hero-orientations">
+            <div class="chama-viva chama-lg vibrante chama-fixed-hero" id="chama-hero-orientations">
               <div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>
             </div>
             <h2>Orientações e Contrato</h2>
@@ -159,17 +152,19 @@
 
           <!-- PERGUNTAS -->
           <div id="section-perguntas" class="j-section hidden">
-            <div class="chama chama-md" id="chama-perguntas"><span></span></div>
+            <div class="chama-viva chama-md" id="chama-perguntas">
+              <div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>
+            </div>
             <div id="perguntas-container"></div>
             <div class="footer-actions">
-              <button id="btnPrevPerguntas" class="btn btn-secondary" data-action="prev">Voltar</button>
-              <button id="btnNextPerguntas" class="btn btn-primary" data-action="next">Avançar</button>
+              <button class="btn btn-secondary" data-action="prev">Voltar</button>
+              <button class="btn btn-primary" data-action="next">Avançar</button>
             </div>
           </div>
 
           <!-- FINAL -->
           <div id="section-final" class="j-section hidden">
-            <div class="chama-viva chama-lg chama-fixed-hero" id="chama-hero-final">
+            <div class="chama-viva chama-lg vibrante chama-fixed-hero" id="chama-hero-final">
               <div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>
             </div>
             <p data-typing data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40" data-cursor="true"></p>
@@ -210,15 +205,12 @@
 
   <script>
     // Tag ambiente
-    document.getElementById('envTag').textContent =
-      `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
+    document.getElementById('envTag').textContent = `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/public`;
 
-    /* =========================
-       EMOÇÃO & DATILOGRAFIA
-    ==========================*/
+    // EMOÇÃO & DATILOGRAFIA
     const EMO = {
-      POS:{'feliz':2,'alegria':2,'amor':3,'sucesso':2,'esperança':3,'paz':2,'fé':3,'gratidão':2,'vitória':3,'superação':3,'luz':2,'deus':3,'coragem':2,'força':2,'confiança':2,'propósito':3},
-      NEG:{'triste':-2,'dor':-3,'raiva':-2,'medo':-2,'frustracao':-2,'frustração':-2,'decepcao':-2,'decepção':-2,'perda':-3,'culpa':-2,'ansiedade':-2,'solidao':-2,'solidão':-2,'desespero':-3,'cansaco':-2,'cansaço':-2,'fracasso':-2,'trauma':-3,'duvida':-2,'dúvida':-2}
+      POS: {'feliz':2,'alegria':2,'amor':3,'sucesso':2,'esperança':3,'paz':2,'fé':3,'gratidão':2,'vitória':3,'superação':3,'luz':2,'deus':3,'coragem':2,'força':2,'confiança':2,'propósito':3},
+      NEG: {'triste':-2,'dor':-3,'raiva':-2,'medo':-2,'frustracao':-2,'frustração':-2,'decepcao':-2,'decepção':-2,'perda':-3,'culpa':-2,'ansiedade':-2,'solidao':-2,'solidão':-2,'desespero':-3,'cansaco':-2,'cansaço':-2,'fracasso':-2,'trauma':-3,'duvida':-2,'dúvida':-2}
     };
     function analyzeSentiment(text){
       let score=0;
@@ -241,9 +233,7 @@
       });
     }
 
-    /* =========================
-       CHAMA — API unificada
-    ==========================*/
+    // CHAMA API
     window.JORNADA_CHAMA = {
       updateChama(scoreNum, targetId='chama-perguntas'){
         const el=document.getElementById(targetId); if(!el) return;
@@ -268,7 +258,7 @@
         if(show){
           if(!hero){
             hero=document.createElement('div'); hero.id=`chama-hero${sectionId==='section-intro'?'':sectionId==='section-orientations'?'-orientations':sectionId==='section-final'?'-final':''}`;
-            hero.className='chama-viva chama-lg chama-fixed-hero';
+            hero.className='chama-viva chama-lg vibrante chama-fixed-hero';
             hero.innerHTML='<div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>';
             canvas.appendChild(hero);
           }
@@ -278,9 +268,7 @@
     function updateChama(score){ window.JORNADA_CHAMA.updateChama(score); }
     function ensureHeroFlame(sectionId){ window.JORNADA_CHAMA.ensureHeroFlame(sectionId); }
 
-    /* =========================
-       PROGRESSO & STORAGE
-    ==========================*/
+    // PROGRESSO & STORAGE
     function updateProgress(){
       const perguntas=document.querySelectorAll('.j-pergunta');
       const totalPerguntas=10;
@@ -305,9 +293,7 @@
       updateProgress();
     }
 
-    /* =========================
-       ROTEAMENTO & RENDER
-    ==========================*/
+    // ROTEAMENTO & RENDER
     function updateCanvasBackground(sectionId){
       const canvas=document.getElementById('jornada-canvas');
       if(canvas){
@@ -334,7 +320,17 @@
 
     function loadDynamicBlocks(){
       const content=document.getElementById('perguntas-container');
-      if(content && window.JORNADA_BLOCKS){
+      if(content){
+        if(!window.JORNADA_BLOCKS || window.JORNADA_BLOCKS.length === 0) {
+          // Garantir fallback se não definido
+          window.JORNADA_BLOCKS = [
+            { title:'Bloco 1 — Raízes', questions:[ 'Quem é você hoje?', 'O que a Luz te pede agora?' ], video_before:'/assets/img/filme-1-entrando-na-jornada.mp4' },
+            { title:'Bloco 2 — Caminho', questions:[ 'Qual verdade você precisa admitir para seguir?', 'O que precisa ser curado neste momento?' ], video_before:'/assets/img/filme-2-dentro-da-jornada.mp4' },
+            { title:'Bloco 3 — Propósito', questions:[ 'Qual é o seu maior propósito?', 'Como você pode servir à Luz?' ], video_before:'/assets/img/filme-3-proposito.mp4' },
+            { title:'Bloco 4 — Transformação', questions:[ 'O que você precisa deixar para trás?', 'O que está nascendo em você?' ], video_before:'/assets/img/filme-4-transformacao.mp4' },
+            { title:'Bloco 5 — Conclusão', questions:[ 'O que você aprendeu nesta jornada?', 'Como você levará a Luz adiante?' ], video_before:'/assets/img/filme-5-fim-da-jornada.mp4' }
+          ];
+        }
         content.innerHTML='';
         window.JORNADA_BLOCKS.forEach((block,idx)=>{
           const bloco=document.createElement('section'); bloco.className='j-bloco'; bloco.dataset.bloco=idx; bloco.dataset.video=block.video_before||'';
@@ -347,22 +343,18 @@
           });
           content.appendChild(bloco);
         });
-        const firstBloco=content.querySelector('.j-bloco'); if(firstBloco && firstBloco.dataset.video){
-          playTransition(firstBloco.dataset.video,()=>{
+        const firstBloco=content.querySelector('.j-bloco'); if(firstBloco){ 
+          const videoSrc = firstBloco.dataset.video;
+          const proceed = () => {
             firstBloco.style.display='block';
             const firstPergunta=firstBloco.querySelector('.j-pergunta'); if(firstPergunta){ firstPergunta.classList.add('active'); runTyping(firstPergunta); }
             loadAnswers();
             const firstTa=content.querySelector('.j-bloco .j-pergunta textarea'); if(firstTa) handleInput(firstTa);
-          });
-        } else if(firstBloco){
-          firstBloco.style.display='block';
-          const firstPergunta=firstBloco.querySelector('.j-pergunta'); if(firstPergunta){ firstPergunta.classList.add('active'); runTyping(firstPergunta); }
-          loadAnswers();
-          const firstTa=content.querySelector('.j-bloco .j-pergunta textarea'); if(firstTa) handleInput(firstTa);
+          };
+          if(videoSrc) playTransition(videoSrc, proceed); else proceed();
         }
-        console.log('Blocos carregados!');
       } else {
-        console.error('Erro: #perguntas-container ou JORNADA_BLOCKS não encontrado!');
+        console.error('Erro: #perguntas-container não encontrado!');
       }
     }
 
@@ -372,15 +364,9 @@
       });
     }
 
-    /* =========================
-       CONTROLES
-    ==========================*/
-    function handleInput(textarea){
-      const score=analyzeSentiment(textarea.value); window.JORNADA_CHAMA.updateChama(score); saveAnswers(); updateProgress();
-    }
-    function toggleSenha(){
-      const input=document.getElementById('senha'); if(input){ input.type=(input.type==='password'?'text':'password'); }
-    }
+    // CONTROLES
+    function handleInput(textarea){ const score=analyzeSentiment(textarea.value); window.JORNADA_CHAMA.updateChama(score); saveAnswers(); updateProgress(); }
+    function toggleSenha(){ const input=document.getElementById('senha'); if(input){ input.type=(input.type==='password'?'text':'password'); } }
 
     function goNext(){
       const perguntas=document.querySelectorAll('.j-pergunta');
@@ -393,20 +379,16 @@
         const blocos=document.querySelectorAll('.j-bloco');
         const currentBloco=current?.closest('.j-bloco'); const nextBlocoIndex=Array.from(blocos).indexOf(currentBloco)+1;
         if(nextBlocoIndex<blocos.length){
-          const videoSrc = (window.JORNADA_BLOCKS[nextBlocoIndex]?.video_before)||'';
+          const videoSrc = window.JORNADA_BLOCKS[nextBlocoIndex].video_before || '';
           blocos.forEach(b=>b.style.display='none');
-          if(videoSrc) playTransition(videoSrc,()=>{
+          const proceed = () => {
             blocos[nextBlocoIndex].style.display='block';
             const nextPergunta=blocos[nextBlocoIndex].querySelector('.j-pergunta');
             if(nextPergunta){ nextPergunta.classList.add('active'); runTyping(nextPergunta); }
-          }); else {
-            blocos[nextBlocoIndex].style.display='block';
-            const nextPergunta=blocos[nextBlocoIndex].querySelector('.j-pergunta');
-            if(nextPergunta){ nextPergunta.classList.add('active'); runTyping(nextPergunta); }
-          }
+          };
+          if(videoSrc) playTransition(videoSrc, proceed); else proceed();
         } else {
-          if(window.JORNADA_FINAL_VIDEO) playTransition(window.JORNADA_FINAL_VIDEO,()=>showSection('section-final')); else showSection('section-final');
-          updateProgress();
+          showSection('section-final'); updateProgress();
         }
       }
     }
@@ -446,7 +428,7 @@
     function finalize(){
       const respostas={}; document.querySelectorAll('.j-pergunta textarea').forEach((input,idx)=>{ respostas[`q${idx}`]=input.value||''; });
       console.log('[JORNADA] Finalizado. Respostas:', respostas);
-      const pdfContent = Object.values(respostas).join('\n\n');
+      const pdfContent = Object.entries(respostas).map(([key, value]) => `${key}: ${value}`).join('\n\n');
       const pdfBlob = new Blob([pdfContent], { type: 'text/plain' });
       const pdfUrl = URL.createObjectURL(pdfBlob);
       const link = document.createElement('a');
@@ -478,11 +460,6 @@
     }
 
     function initJornada(){
-      const prevBtn=document.getElementById('btnPrevPerguntas');
-      const nextBtn=document.getElementById('btnNextPerguntas');
-      if(nextBtn) nextBtn.addEventListener('click', goNext);
-      if(prevBtn) prevBtn.addEventListener('click', goPrev);
-
       document.addEventListener('click',(ev)=>{
         const n = ev.target.closest('[data-action="next"]');
         const p = ev.target.closest('[data-action="prev"]');
@@ -499,41 +476,25 @@
         if(pr){ev.preventDefault();finalize();}
         if(tp){ev.preventDefault();toggleSenha();}
       });
-
       console.log('Controlador da jornada inicializado!');
     }
-
-    // Fallback/blocos + vídeos padronizados
-    (function defineFallback(){
-      window.JORNADA_BLOCKS=[
-        { title:'Bloco 1 — Raízes', questions:[ 'Quem é você hoje?', 'O que a Luz te pede agora?' ], video_before:'/assets/img/filme-1-entrando-na-jornada.mp4' },
-        { title:'Bloco 2 — Caminho', questions:[ 'Qual verdade você precisa admitir para seguir?', 'O que precisa ser curado neste momento?' ], video_before:'/assets/img/filme-2-dentro-da-jornada.mp4' },
-        { title:'Bloco 3 — Propósito', questions:[ 'Qual é o seu maior propósito?', 'Como você pode servir à Luz?' ], video_before:'/assets/img/filme-3-proposito.mp4' },
-        { title:'Bloco 4 — Transformação', questions:[ 'O que você precisa deixar para trás?', 'O que está nascendo em você?' ], video_before:'/assets/img/filme-4-transformacao.mp4' },
-        { title:'Bloco 5 — Conclusão', questions:[ 'O que você aprendeu nesta jornada?', 'Como você levará a Luz adiante?' ], video_before:'/assets/img/filme-5-fim-da-jornada.mp4' }
-      ];
-      console.log('JORNADA_BLOCKS (fallback) prontos.');
-    })();
 
     async function boot(){
       document.body.classList.add('jornada-active');
       const route=(location.hash||'#intro').slice(1);
-      const canvas=document.getElementById('jornada-canvas');
       const progressBadge=document.querySelector('.progress-badge');
       const progressBar=document.querySelector('.progress-bar');
       const jProgress=document.querySelector('.j-progress');
       const footerActions=document.querySelector('.footer-actions');
 
-      if(canvas){
-        if(route==='perguntas'){
-          showSection('section-perguntas'); loadDynamicBlocks();
-          [progressBadge,progressBar,jProgress,footerActions].forEach(el=>el?.classList.remove('hidden'));
-        } else if(route==='final'){
-          showSection('section-final'); [progressBadge,progressBar,jProgress].forEach(el=>el?.classList.remove('hidden'));
-        } else if(route==='orientations'){
-          showSection('section-orientations');
-        } else { showSection('section-intro'); }
-      }
+      if(route==='perguntas'){
+        showSection('section-perguntas'); loadDynamicBlocks();
+        [progressBadge,progressBar,jProgress,footerActions].forEach(el=>el?.classList.remove('hidden'));
+      } else if(route==='final'){
+        showSection('section-final'); [progressBadge,progressBar,jProgress].forEach(el=>el?.classList.remove('hidden'));
+      } else if(route==='orientations'){
+        showSection('section-orientations');
+      } else { showSection('section-intro'); }
       runTyping(document); return true;
     }
 
@@ -541,7 +502,6 @@
     document.addEventListener('DOMContentLoaded', () => {
       runTyping(document);
       initJornada();
-
       boot().then(() => {
         const visible = document.querySelector('.j-section:not(.hidden)');
         if (visible) ensureHeroFlame(visible.id);
@@ -555,7 +515,6 @@
             if (m.target.id === 'perguntas-container') updateProgress();
           });
         });
-        window.ensureHeroFlame = ensureHeroFlame;
         obs.observe(target, { childList: true, subtree: true });
       }
     });
