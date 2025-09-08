@@ -757,54 +757,51 @@
     window.JC.startJourney = startJourney;
     window.JC.showSection  = showSection;
     window.JC.Chama = window.JORNADA_CHAMA;
-    <script>
-
-/* === FILME 0: tocar 1x quando "section-perguntas" ficar visível =========
-   NÃO criar <script> aqui — este bloco já está dentro do <script> principal. */
-
-(function filme0Once(){
-  // Ajuste o caminho conforme sua estrutura de arquivos:
+    /* === FILME 0 antes de iniciar a jornada (intercepta o clique 1x) ======= */
+(function filme0OnStartClick(){
+  // Ajuste o caminho conforme seu servidor:
   const FILME0_URL = '/public/assets/img/filme-0-ao-encontro-da-jornada.mp4';
-  // Se seus assets são servidos sem /public, troque para:
+  // Se seus assets são servidos sem /public, use:
   // const FILME0_URL = '/assets/img/filme-0-ao-encontro-da-jornada.mp4';
 
-  // Garantia: precisamos da função que já existe no seu código
+  // Garantias mínimas
   if (typeof window.playTransition !== 'function') {
-    console.warn('[Filme0] playTransition indisponível no momento.');
+    console.warn('[Filme0] playTransition indisponível.');
+    return;
+  }
+  if (typeof window.startJourney !== 'function') {
+    console.warn('[Filme0] startJourney não está disponível ainda.');
     return;
   }
 
-  let jaRodou = false;
+  let interceptado = false;
 
-  function tentarRodarFilme0(){
-    if (jaRodou) return;
-    const sec = document.getElementById('section-perguntas');
-    if (!sec) return;
+  // Captura o 1º clique no botão de start SEM alterar a função original
+  document.addEventListener('click', function onClickStart(ev){
+    // procura o botão/ícone com data-action="start"
+    const btn = ev.target.closest('[data-action="start"]');
+    if (!btn || interceptado) return;
 
-    // A 1ª vez que a seção estiver visível, roda o filme
-    if (!sec.classList.contains('hidden')) {
-      jaRodou = true;
-      sec.classList.add('hidden');               // re-esconde temporariamente
-      try {
-        playTransition(FILME0_URL, () => {       // toca vídeo
-          sec.classList.remove('hidden');        // mostra de novo quando terminar/pular
-        });
-      } catch (e) {
-        console.error('[Filme0] erro ao iniciar vídeo:', e);
-        sec.classList.remove('hidden');          // fallback: garante visibilidade
-      }
+    // Intercepta APENAS UMA VEZ
+    interceptado = true;
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    // Roda o filme-0 e, ao terminar (ou pular), chama o startJourney original
+    try {
+      playTransition(FILME0_URL, () => {
+        try { window.startJourney(); }      // segue o fluxo normal
+        catch(e){ console.error('[Filme0] erro ao chamar startJourney:', e); }
+      });
+    } catch (e) {
+      console.error('[Filme0] falha ao iniciar vídeo:', e);
+      // Fallback: se der erro, inicia normalmente
+      try { window.startJourney(); } catch(_) {}
     }
-  }
-
-  // Observa mudanças de classe/DOM que revelam as perguntas
-  const root = document.getElementById('jornada-conteudo') || document.body;
-  const obs = new MutationObserver(() => { tentarRodarFilme0(); });
-  obs.observe(root, { childList:true, subtree:true, attributes:true, attributeFilter:['class'] });
-
-  // Caso a rota já abra em #perguntas
-  setTimeout(tentarRodarFilme0, 0);
+  }, true); // <-- CAPTURA (true) garante que intercepta antes dos outros handlers
 })();
-
+    <script>
+      
   <!-- Referências externas (mantidas para evitar 404, mas não necessárias) -->
   <script defer src="/config.js" onerror="console.error('Falha ao carregar config.js, usando fallback inline');"></script>
   <script defer src="/jornada-utils.js" onerror="console.error('Falha ao carregar jornada-utils.js, usando fallback inline');"></script>
