@@ -1,7 +1,7 @@
 /* Move barra + selo % + meta para dentro de #section-perguntas */
 (function(){
   // 'above' = acima das perguntas (após a chama) | 'below' = abaixo das respostas
-  var POS = 'above';
+  var POS = 'below';
 
   function relocateProgress(){
     var sec   = document.getElementById('section-perguntas');
