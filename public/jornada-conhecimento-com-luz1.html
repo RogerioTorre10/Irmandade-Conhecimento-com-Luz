@@ -38,12 +38,12 @@
     .chama-fixed-top{position:absolute;top:10px;right:14px;z-index:60}
     .chama-fixed-hero{position:absolute;top:-8px;left:-8px;z-index:60}
 
-    /* ===== CHAMA VIVA AJUSTADA (forma de chama de vela, mais gordinha no meio, base ovulada, vibração intensificada) ===== */
+    /* ===== CHAMA VIVA AJUSTADA (forma de vela com base arredondada, menos aguda) ===== */
     .chama-viva { 
       --altura: 90px; 
-      --largura: 50px; /* Aumentada para ficar mais gordinha */
-      --pulso: 1.2s; /* Aumentada intensidade da vibração */
-      --glow: 20px; /* Brilho mais intenso */
+      --largura: 50px; 
+      --pulso: 1.2s; 
+      --glow: 20px; 
       --hue: 32; 
       --satur: 95%; 
       --light: 58%; 
@@ -52,27 +52,27 @@
       width: var(--largura);
       height: calc(var(--altura) + 26px);
       display: inline-block;
-      filter: drop-shadow(0 0 var(--glow) hsla(var(--hue),var(--satur),60%,.75)); /* Brilho mais forte */
-      clip-path: polygon(50% 100%, 70% 70%, 65% 50%, 60% 30%, 50% 10%, 40% 30%, 35% 50%, 30% 70%); /* Mais gordinha no meio, base ovulada */
+      filter: drop-shadow(0 0 var(--glow) hsla(var(--hue),var(--satur),60%,.75));
+      clip-path: polygon(40% 100%, 60% 100%, 70% 70%, 65% 50%, 60% 30%, 50% 10%, 40% 30%, 35% 50%, 30% 70%); /* Base arredondada com pontos em 40% e 60% na base */
       background: linear-gradient(to top, #ff4500, #ffa500);
       border-radius: 12px;
     }
     .chama-viva .brasa { 
-      position:absolute; bottom:0; left:0; right:0; height:45%; /* Base ligeiramente ovulada */
+      position:absolute; bottom:0; left:0; right:0; height:45%; 
       background: radial-gradient(ellipse at 50% 100%, rgba(255,140,0,.7), rgba(255,69,0,.3), transparent 70%); 
-      filter: blur(5px); /* Suavização na base */
-      border-radius: 50% 50% 30% 30%; /* Base ovulada */
+      filter: blur(5px); 
+      border-radius: 50% 50% 40% 40%; /* Base mais arredondada */
     }
     .chama-viva .lingua { 
-      position:absolute; bottom:0; left:50%; transform: translateX(-50%); width: 50%; height: 90%; /* Mais gordinha */
+      position:absolute; bottom:0; left:50%; transform: translateX(-50%); width: 50%; height: 90%; 
       background: linear-gradient(to top, #ff8c00, #ffd700); 
-      clip-path: polygon(35% 100%, 50% 0%, 65% 100%); /* Ajuste para acompanhar a forma gordinha */
-      animation: linguaJitter 1.2s infinite ease-in-out; /* Vibração mais rápida */
+      clip-path: polygon(35% 100%, 50% 0%, 65% 100%); 
+      animation: linguaJitter 1.2s infinite ease-in-out; 
     }
     .chama-viva .brilho { 
       position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-      background: radial-gradient(circle, rgba(255, 215, 0, 0.6), transparent); /* Brilho mais intenso */
-      filter: blur(16px); animation: brilhoJitter 1.5s infinite ease-in-out; /* Vibração mais intensa */
+      background: radial-gradient(circle, rgba(255, 215, 0, 0.6), transparent); 
+      filter: blur(16px); animation: brilhoJitter 1.5s infinite ease-in-out; 
     }
     .chama-viva.chama-md { width: 40px; height: 74px; }
     .chama-viva.chama-lg { width: 70px; height: 140px; }
@@ -84,9 +84,9 @@
     }
     @keyframes brilhoJitter { 0%, 100% { filter: blur(14px); } 50% { filter: blur(18px); } }
 
-    /* ===== BOLA FLAMEJANTE AJUSTADA (bola de fogo pequena com chamas flamejantes) ===== */
+    /* ===== BOLA FLAMEJANTE AJUSTADA (esfera envolvida por chamas, sem ponta aguda) ===== */
     #chama-bola-superior {
-      --size: 50px; /* Pequena */
+      --size: 50px; 
       --glow: 18px;
       --color1: #fff7cc;
       --color2: #ffd166;
@@ -104,33 +104,41 @@
       filter: drop-shadow(0 0 var(--glow) rgba(255,140,0,.75));
       animation: bolaPulse 1.2s infinite ease-in-out;
     }
-    #chama-bola-superior::before { /* Chamas flamejantes saindo da bola */
+    #chama-bola-superior::before { /* Chama envolvendo a bola - superior */
       content: "";
       position: absolute;
-      top: -25%; left: 50%; transform: translateX(-50%);
-      width: 50%; height: 60%;
+      top: -20%; left: 20%; 
+      width: 60%; height: 50%;
       background: linear-gradient(to top, #ff8c00, #ffd700, rgba(255, 215, 0, 0.5));
       clip-path: polygon(30% 100%, 50% 0%, 70% 100%);
       animation: linguaJitter 1.2s infinite ease-in-out;
       filter: blur(3px);
     }
-    #chama-bola-superior::after {
+    #chama-bola-superior::after { /* Chama envolvendo a bola - lateral */
       content: "";
       position: absolute;
-      inset: -20%;
-      border-radius: 50%;
-      background: radial-gradient(circle,
-        rgba(255,180,50,0.5) 0%,
-        transparent 70%);
-      filter: blur(14px);
-      animation: auraPulse 1.5s infinite ease-in-out;
+      bottom: -20%; right: 20%; 
+      width: 60%; height: 50%;
+      background: linear-gradient(to top, #ff8c00, #ffd700, rgba(255, 215, 0, 0.5));
+      clip-path: polygon(30% 100%, 50% 0%, 70% 100%);
+      animation: linguaJitter 1.3s infinite ease-in-out reverse;
+      filter: blur(3px);
+    }
+    #chama-bola-superior .lingua-extra { /* Chama adicional para envolver */
+      position: absolute;
+      left: -20%; bottom: 20%;
+      width: 60%; height: 50%;
+      background: linear-gradient(to top, #ff8c00, #ffd700, rgba(255, 215, 0, 0.5));
+      clip-path: polygon(30% 100%, 50% 0%, 70% 100%);
+      animation: linguaJitter 1.4s infinite ease-in-out;
+      filter: blur(3px);
     }
 
-    /* ===== CHAMA VIBRANTE INFERIOR (ajustada com vibração intensificada) ===== */
+    /* ===== CHAMA VIBRANTE INFERIOR (ajustada com base arredondada) ===== */
     #chama-vibrante-inferior {
       --altura: 64px; 
       --largura: 40px; 
-      --pulso: 1.2s; /* Vibração mais intensa */
+      --pulso: 1.2s; 
       --glow: 20px; 
       --hue: 32; 
       --satur: 95%; 
@@ -140,14 +148,14 @@
       width: var(--largura);
       height: calc(var(--altura) + 26px);
       filter: drop-shadow(0 0 var(--glow) hsla(var(--hue),var(--satur),60%,.75));
-      clip-path: polygon(50% 100%, 70% 70%, 65% 50%, 60% 30%, 50% 10%, 40% 30%, 35% 50%, 30% 70%); /* Forma gordinha e ovulada */
+      clip-path: polygon(40% 100%, 60% 100%, 70% 70%, 65% 50%, 60% 30%, 50% 10%, 40% 30%, 35% 50%, 30% 70%);
       background: linear-gradient(to top, #ff4500, #ffa500);
     }
     #chama-vibrante-inferior .brasa { 
       position:absolute; bottom:0; left:0; right:0; height:45%; 
       background: radial-gradient(ellipse at 50% 100%, rgba(255,140,0,.7), rgba(255,69,0,.3), transparent 70%); 
       filter: blur(5px); 
-      border-radius: 50% 50% 30% 30%; 
+      border-radius: 50% 50% 40% 40%; 
     }
     #chama-vibrante-inferior .lingua { 
       position:absolute; bottom:0; left:50%; transform: translateX(-50%); width: 50%; height: 90%; 
@@ -231,8 +239,10 @@
     .section-container{position:relative;min-height:85vh}
     .hidden{display:none!important}
 
-    /* Guia espiritual superior e inferior */
-    #guia-espiritual-superior{position:fixed;top:20px;right:20px;z-index:1200}
+    /* Guia espiritual superior esquerdo: só chama pulsante */
+    #guia-espiritual-superior-esquerdo{position:fixed;top:20px;left:20px;z-index:1200}
+    /* Guia espiritual superior direito: esfera flamejante envolvida por chamas */
+    #guia-espiritual-superior-direito{position:fixed;top:20px;right:20px;z-index:1200}
     #guia-espiritual-inferior{position:fixed;bottom:20px;right:20px;z-index:1200}
   </style>
 </head>
@@ -311,9 +321,9 @@
     <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
   </div>
 
-  <!-- GUIA ESPIRITUAL SUPERIOR: bola flamejante pequena no canto superior -->
-  <div id="guia-espiritual-superior">
-    <div id="chama-bola-superior">
+  <!-- GUIA ESPIRITUAL SUPERIOR ESQUERDO: chama pulsante -->
+  <div id="guia-espiritual-superior-esquerdo">
+    <div id="chama-pulsante-esquerda" class="chama-viva chama-md">
       <div class="brasa"></div>
       <div class="lingua"></div>
       <div class="lingua"></div>
@@ -322,9 +332,21 @@
     </div>
   </div>
 
+  <!-- GUIA ESPIRITUAL SUPERIOR DIREITO: esfera flamejante envolvida por chamas -->
+  <div id="guia-espiritual-superior-direito">
+    <div id="chama-bola-superior">
+      <div class="brasa"></div>
+      <div class="lingua"></div>
+      <div class="lingua"></div>
+      <div class="lingua"></div>
+      <div class="brilho"></div>
+      <div class="lingua-extra"></div> <!-- Chama adicional para envolver -->
+    </div>
+  </div>
+
   <!-- GUIA ESPIRITUAL INFERIOR: chama vibrante média no canto inferior -->
   <div id="guia-espiritual-inferior">
-    <div id="chama-vibrante-inferior">
+    <div id="chama-vibrante-inferior" class="chama-viva chama-md">
       <div class="brasa"></div>
       <div class="lingua"></div>
       <div class="lingua"></div>
@@ -383,12 +405,17 @@
         el.classList.add('chama-pico');
         clearTimeout(el._pulse_t);
         el._pulse_t=setTimeout(()=>el.classList.remove('chama-pico'),700);
-        // guia superior (bola) e inferior (chama) acompanham
-        const bolaSuperior=document.getElementById('chama-bola-superior');
+        // guia superior esquerdo (chama), superior direito (bola), inferior (chama) acompanham
+        const chamaEsquerda=document.getElementById('chama-pulsante-esquerda');
+        const bolaDireita=document.getElementById('chama-bola-superior');
         const chamaInferior=document.getElementById('chama-vibrante-inferior');
-        if(bolaSuperior){ 
-          bolaSuperior.classList.remove('fraca', 'media', 'forte'); 
-          bolaSuperior.classList.add(modo); 
+        if(chamaEsquerda){ 
+          chamaEsquerda.classList.add('chama-viva'); 
+          chamaEsquerda.dataset.intensidade=modo; 
+        }
+        if(bolaDireita){ 
+          bolaDireita.classList.remove('fraca', 'media', 'forte'); 
+          bolaDireita.classList.add(modo); 
         }
         if(chamaInferior){ 
           chamaInferior.classList.add('chama-viva'); 
