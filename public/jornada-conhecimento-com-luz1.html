@@ -659,8 +659,6 @@
       if(senhasValidas.includes(senha.toLowerCase())){      
         (window.showSection||showSection)('section-perguntas');        
         loadDynamicBlocks();
-        const filme0 = '/assets/img/filme-0-ao-encontro-da-jornada.mp4';   
-        const iniciarPerguntas = () => { 
         const perguntas=document.querySelectorAll('.j-pergunta');
         if(perguntas.length){
           perguntas[0].classList.add('active'); runTyping(perguntas[0]);
@@ -671,8 +669,7 @@
         document.querySelector('.j-progress')?.classList.remove('hidden');
         document.querySelector('.footer-actions')?.classList.remove('hidden');
         updateProgress(); console.log('Jornada iniciada com sucesso!');
-        playTransition(filme0, iniciarPerguntas);
-       } else { alert('Senha incorreta. Tente novamente.'); }
+      } else { alert('Senha incorreta. Tente novamente.'); }
     }
 
     function initJornada(){
