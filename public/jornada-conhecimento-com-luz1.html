@@ -78,102 +78,185 @@
     .chama-fixed-top{position:absolute;top:10px;right:14px;z-index:60}
     .chama-fixed-hero{position:absolute;top:-8px;left:-8px;z-index:60}
 
-    /* ===== CHAMA VIVA — valores de formato do 2º arquivo (SEM vaso) ===== */
-    .chama-viva{
-      /* variáveis base */
-      --altura: 90px;
-      --largura: 60px;
-      --pulso: 1.8s;
-      --glow: 16px;
-      --hue: 32;
-      --satur: 95%;
-      --light: 58%;
-      --op: .95;
+    /* === CHAMA DE VELA — formato refinado (sem vaso) ======================= */
+/* base com variáveis */
+.chama-viva{
+  --altura: 90px;
+  --largura: 60px;
+  --pulso: 1.7s;
+  --glow: 18px;
+  --hue: 28;       /* laranja-ouro */
+  --satur: 96%;
+  --light: 58%;
+  --op: .98;
 
-      position: relative;
-      width: var(--largura);
-      height: var(--altura);
-      display: inline-block;
-      filter: drop-shadow(0 0 var(--glow) hsla(var(--hue),var(--satur),60%,.65));
-      z-index: 40;
-    }
-    /* mapeia tamanhos usados no HTML original */
-    .chama-viva.chama-md{ --largura:32px; --altura:64px; }
-    .chama-viva.chama-lg{ --largura:60px; --altura:120px; }
+  position: relative;
+  width: var(--largura);
+  height: var(--altura);
+  display: inline-block;
+  filter: drop-shadow(0 0 var(--glow) hsla(var(--hue),var(--satur),60%,.70));
+  z-index: 40;
+}
 
-    /* Brasa (base) */
-    .chama-viva .brasa{
-      position:absolute; left:50%; bottom:0; transform:translateX(-50%);
-      width: calc(var(--largura) * .9);
-      height: 14px;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 50% 40%,
-          hsla(var(--hue),var(--satur),95%,.9) 0%,
-          hsla(var(--hue),var(--satur),70%,.8) 35%,
-          hsla(var(--hue),var(--satur),40%,.0) 70%);
-      filter: blur(1.2px);
-      animation: brasaPulse var(--pulso) infinite ease-in-out;
-      opacity: var(--op);
-    }
+/* tamanhos populares que você já usa */
+.chama-viva.chama-md{ --largura:32px; --altura:64px; }
+.chama-viva.chama-lg{ --largura:60px; --altura:120px; }
 
-    /* Línguas (3 camadas) */
-    .chama-viva .lingua{
-      position:absolute; left:50%; bottom:0; transform:translateX(-50%);
-      width: var(--largura); height: var(--altura);
-      border-radius:44% 44% 30% 30%;
-      background:
-        radial-gradient(60% 60% at 50% 28%,
-          hsla(var(--hue),var(--satur),98%,1) 0%,
-          hsla(var(--hue),var(--satur),70%,.95) 35%,
-          hsla(calc(var(--hue) - 8),calc(var(--satur) - 15%),50%,.85) 65%,
-          transparent 82%);
-      mix-blend-mode: screen;
-      filter: blur(0.6px);
-      animation: lingua 1.2s infinite ease-in-out;
-      transform-origin: 50% 100%;
-      opacity: var(--op);
-    }
-    .chama-viva .lingua:nth-child(2){
-      width: calc(var(--largura) * .78);
-      height: calc(var(--altura) * .88);
-      animation-duration:1.5s; animation-delay:.05s;
-    }
-    .chama-viva .lingua:nth-child(3){
-      width: calc(var(--largura) * .62);
-      height: calc(var(--altura) * .76);
-      animation-duration:1.8s; animation-delay:.12s;
-    }
+/* brasa (base) */
+.chama-viva .brasa{
+  position:absolute; left:50%; bottom:2px; transform:translateX(-50%);
+  width: calc(var(--largura) * .86);
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%,
+    hsla(var(--hue),var(--satur),95%,.95) 0%,
+    hsla(var(--hue),var(--satur),70%,.85) 35%,
+    transparent 72%);
+  filter: blur(1px);
+  animation: brasaPulse var(--pulso) ease-in-out infinite;
+  opacity: var(--op);
+}
 
-    /* Brilho / aura */
-    .chama-viva .brilho{
-      position:absolute; left:50%; bottom:0; transform:translateX(-50%);
-      width: calc(var(--largura) * 1.3);
-      height: calc(var(--altura) * 1.1);
-      background: radial-gradient(circle, hsla(var(--hue),var(--satur),70%,.35) 0%, transparent 65%);
-      filter: blur(12px); pointer-events:none; mix-blend-mode: screen;
-      animation: aura var(--pulso) infinite ease-in-out;
-      opacity:.6;
-    }
+/* línguas — formato “gota” com ponta afiada */
+.chama-viva .lingua{
+  position:absolute; left:50%; bottom:2px; transform:translateX(-50%);
+  width: calc(var(--largura) * .96);
+  height: calc(var(--altura) * .98);
 
-    /* Pico breve quando intensidade = forte */
-    .chama-viva.chama-pico .lingua{
-      animation-timing-function: ease-out;
-      transform: translateX(-50%) scaleY(1.1) skewX(1.6deg);
-    }
+  /* gota/vela: topo estreito, base arredondada (usa raio elíptico) */
+  border-radius: 62% 62% 20% 20% / 94% 94% 16% 16%;
 
-    /* Animações (novo conjunto) */
-    @keyframes lingua{
-      0%,100%{ transform: translateX(-50%) scaleY(1) skewX(0deg); }
-      50%{ transform: translateX(-50%) scaleY(1.06) skewX(1.2deg); }
-    }
-    @keyframes brasaPulse{
-      0%,100%{ transform:translateX(-50%) scale(1); opacity:.7; }
-      50%{ transform:translateX(-50%) scale(1.05); opacity:1; }
-    }
-    @keyframes aura{
-      0%,100%{ opacity:.5; } 50%{ opacity:.8; }
-    }
+  /* cor e volume (duas camadas) */
+  background:
+    radial-gradient(48% 58% at 50% 18%,
+      hsla(var(--hue),var(--satur),98%,1) 0%,
+      hsla(var(--hue),var(--satur),78%,.98) 32%,
+      transparent 68%),
+    radial-gradient(110% 140% at 50% 72%,
+      hsla(calc(var(--hue) - 8),calc(var(--satur) - 12%),50%,.85) 0%,
+      transparent 72%);
+
+  mix-blend-mode: screen;
+  filter: blur(.45px);
+  transform-origin: 50% 100%;
+  animation: velaWaver 1.6s ease-in-out infinite;
+  opacity: var(--op);
+
+  /* afia a ponta com máscara (suporta webkit/modernos) */
+  -webkit-mask: radial-gradient(58% 92% at 50% 6%, #000 70%, transparent 74%);
+          mask: radial-gradient(58% 92% at 50% 6%, #000 70%, transparent 74%);
+}
+
+/* “filete” quente na ponta para parecer vela */
+.chama-viva .lingua::after{
+  content:"";
+  position:absolute; left:50%; top:5%;
+  transform:translateX(-50%);
+  width: 16%; height: 38%;
+  background: radial-gradient(50% 60% at 50% 40%, rgba(255,255,255,.95), rgba(255,255,255,0));
+  filter: blur(1px);
+  opacity:.95; pointer-events:none;
+}
+
+/* camadas internas menores (dão profundidade) */
+.chama-viva .lingua:nth-child(2){
+  width: calc(var(--largura) * .76);
+  height: calc(var(--altura) * .86);
+  animation-duration: 1.9s; animation-delay: .05s;
+  filter: blur(.35px);
+}
+.chama-viva .lingua:nth-child(3){
+  width: calc(var(--largura) * .60);
+  height: calc(var(--altura) * .74);
+  animation-duration: 2.2s; animation-delay: .10s;
+  filter: blur(.3px);
+}
+
+/* brilho/aura ao redor */
+.chama-viva .brilho{
+  position:absolute; left:50%; bottom:0; transform:translateX(-50%);
+  width: calc(var(--largura) * 1.28);
+  height: calc(var(--altura) * 1.06);
+  background: radial-gradient(circle,
+    hsla(var(--hue),var(--satur),72%,.36) 0%,
+    transparent 64%);
+  filter: blur(12px);
+  mix-blend-mode: screen;
+  animation: aura var(--pulso) ease-in-out infinite;
+  opacity:.62; pointer-events:none;
+}
+
+/* pico breve (quando “forte”) */
+.chama-viva.chama-pico .lingua{
+  animation-timing-function: ease-out;
+  transform: translateX(-50%) scaleY(1.12) skewX(1.4deg);
+}
+
+/* intensidades emocionais */
+.chama-viva[data-intensidade="fraca"]{
+  --altura: 72px; --largura: 50px; --pulso: 2.6s; --glow: 10px;
+  --hue: 36; --satur: 86%; --light: 66%; --op: .70;
+}
+.chama-viva[data-intensidade="media"]{
+  --altura: 94px; --largura: 60px; --pulso: 1.7s; --glow: 18px;
+  --hue: 28; --satur: 96%; --light: 58%; --op: .98;
+}
+.chama-viva[data-intensidade="forte"]{
+  --altura: 112px; --largura: 66px; --pulso: 1.1s; --glow: 28px;
+  --hue: 20; --satur: 100%; --light: 52%; --op: 1;
+}
+
+/* guia (#chama-bola) com o mesmo “corte” na ponta */
+#chama-bola{
+  --altura: 84px; --largura: 40px; --pulso:1.5s; --glow:22px; --hue:28; --satur:94%; --light:60%; --op:.95;
+  position: relative; width:var(--largura); height:var(--altura); display:inline-block;
+  filter: drop-shadow(0 0 var(--glow) hsla(var(--hue),var(--satur),60%,.70));
+}
+#chama-bola .brasa{ /* igual à de cima, ajustada ao tamanho */
+  position:absolute; left:50%; bottom:2px; transform:translateX(-50%);
+  width: calc(var(--largura) * .84); height: 10px; border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%,
+    hsla(var(--hue),var(--satur),95%,.95) 0%,
+    hsla(var(--hue),var(--satur),70%,.85) 35%,
+    transparent 72%);
+  filter: blur(.9px); animation: brasaPulse var(--pulso) ease-in-out infinite; opacity:var(--op);
+}
+#chama-bola .lingua{
+  position:absolute; left:50%; bottom:2px; transform:translateX(-50%);
+  width: var(--largura); height: calc(var(--altura) * .86);
+  border-radius: 60% 60% 18% 18% / 92% 92% 14% 14%;
+  background:
+    radial-gradient(48% 58% at 50% 18%, rgba(255,255,255,.98) 0%, rgba(255,214,120,.96) 32%, transparent 68%),
+    radial-gradient(110% 140% at 50% 72%, rgba(255,140,0,.85) 0%, transparent 72%);
+  mix-blend-mode: screen; filter: blur(.45px);
+  animation: velaWaver 1.6s ease-in-out infinite; transform-origin:50% 100%; opacity:var(--op);
+  -webkit-mask: radial-gradient(58% 92% at 50% 6%, #000 70%, transparent 74%);
+          mask: radial-gradient(58% 92% at 50% 6%, #000 70%, transparent 74%);
+}
+#chama-bola .lingua:nth-child(2){ width: calc(var(--largura)*.76); height: calc(var(--altura)*.72); animation-duration:1.9s; animation-delay:.05s; }
+#chama-bola .lingua:nth-child(3){ width: calc(var(--largura)*.60); height: calc(var(--altura)*.60); animation-duration:2.2s; animation-delay:.10s; }
+#chama-bola .brilho{
+  position:absolute; left:50%; bottom:0; transform:translateX(-50%);
+  width: calc(var(--largura) * 1.36); height: calc(var(--altura) * 1.18);
+  background: radial-gradient(circle, hsla(var(--hue),var(--satur),72%,.36) 0%, transparent 64%);
+  filter: blur(11px); mix-blend-mode: screen; animation: aura var(--pulso) ease-in-out infinite; opacity:.66;
+}
+
+/* animações */
+@keyframes velaWaver{
+  0%,100% { transform: translateX(-50%) scaleY(1.00) skewX(0deg); }
+  25%     { transform: translateX(calc(-50% + .6px)) scaleY(1.04) skewX(.6deg); }
+  50%     { transform: translateX(-50%) scaleY(1.08) skewX(1.2deg); }
+  75%     { transform: translateX(calc(-50% - .5px)) scaleY(1.03) skewX(.4deg); }
+}
+@keyframes brasaPulse{
+  0%,100% { transform:translateX(-50%) scale(1);   opacity:.70; }
+  50%     { transform:translateX(-50%) scale(1.06); opacity:1;   }
+}
+@keyframes aura{
+  0%,100% { opacity:.50; } 50% { opacity:.82; }
+}
+/* ====================================================================== */
 
     /* Intensidades emocionais (por data-atributo) */
     .chama-viva[data-intensidade="fraca"]{
