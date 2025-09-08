@@ -758,39 +758,52 @@
     window.JC.showSection  = showSection;
     window.JC.Chama = window.JORNADA_CHAMA;
     <script>
-// === Filme 0 na PRIMEIRA entrada de "section-perguntas" ==================
-// Caminho do vídeo inicial
-const FILME0_URL = '/assets/img/filme-0-ao-encontro-da-jornada.mp4';
-// (se seu servidor exige /public, troque para: '/public/assets/img/filme-0-ao-encontro-da-jornada.mp4')
 
-(function filme0Gate(){
-  if (!window.showSection || !window.playTransition) {
-    console.warn('[Filme0] showSection/playTransition não disponíveis.');
+/* === FILME 0: tocar 1x quando "section-perguntas" ficar visível =========
+   NÃO criar <script> aqui — este bloco já está dentro do <script> principal. */
+
+(function filme0Once(){
+  // Ajuste o caminho conforme sua estrutura de arquivos:
+  const FILME0_URL = '/public/assets/img/filme-0-ao-encontro-da-jornada.mp4';
+  // Se seus assets são servidos sem /public, troque para:
+  // const FILME0_URL = '/assets/img/filme-0-ao-encontro-da-jornada.mp4';
+
+  // Garantia: precisamos da função que já existe no seu código
+  if (typeof window.playTransition !== 'function') {
+    console.warn('[Filme0] playTransition indisponível no momento.');
     return;
   }
-  if (window.__filme0_wrapped__) return; // evita duplicar
-  window.__filme0_wrapped__ = true;
 
-  let jaTocou = false;
-  const _showSectionOriginal = window.showSection;
+  let jaRodou = false;
 
-  window.showSection = function(sectionId){
-    if (sectionId === 'section-perguntas' && !jaTocou) {
-      jaTocou = true;
+  function tentarRodarFilme0(){
+    if (jaRodou) return;
+    const sec = document.getElementById('section-perguntas');
+    if (!sec) return;
+
+    // A 1ª vez que a seção estiver visível, roda o filme
+    if (!sec.classList.contains('hidden')) {
+      jaRodou = true;
+      sec.classList.add('hidden');               // re-esconde temporariamente
       try {
-        playTransition(FILME0_URL, () => _showSectionOriginal.call(this, sectionId));
+        playTransition(FILME0_URL, () => {       // toca vídeo
+          sec.classList.remove('hidden');        // mostra de novo quando terminar/pular
+        });
       } catch (e) {
-        console.error('[Filme0] erro ao tocar vídeo:', e);
-        return _showSectionOriginal.call(this, sectionId); // fallback
+        console.error('[Filme0] erro ao iniciar vídeo:', e);
+        sec.classList.remove('hidden');          // fallback: garante visibilidade
       }
-      return;
     }
-    return _showSectionOriginal.call(this, sectionId);
-  };
-})();
-</script>
+  }
 
-  </script>
+  // Observa mudanças de classe/DOM que revelam as perguntas
+  const root = document.getElementById('jornada-conteudo') || document.body;
+  const obs = new MutationObserver(() => { tentarRodarFilme0(); });
+  obs.observe(root, { childList:true, subtree:true, attributes:true, attributeFilter:['class'] });
+
+  // Caso a rota já abra em #perguntas
+  setTimeout(tentarRodarFilme0, 0);
+})();
 
   <!-- Referências externas (mantidas para evitar 404, mas não necessárias) -->
   <script defer src="/config.js" onerror="console.error('Falha ao carregar config.js, usando fallback inline');"></script>
