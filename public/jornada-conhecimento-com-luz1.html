@@ -452,68 +452,92 @@ function ensureHeroFlame(sectionId){ window.JORNADA_CHAMA.ensureHeroFlame(sectio
     }
   }
 
-  function playTransition(src,onEnd){
-  const overlay=document.getElementById('videoOverlay');
-  const video=document.getElementById('videoTransicao');
-  const skip=document.getElementById('skipVideo');
+ /* ===== Reprodutor único no overlay (robusto) ===== */
+(function(){
+  const overlay = document.getElementById('videoOverlay');
+  const video   = document.getElementById('videoTransicao');
+  const skip    = document.getElementById('skipVideo');
+  if(!overlay || !video) return;
 
-  if(!(overlay && video && src)){ onEnd && onEnd(); return; }
+  function showOverlay(src, onEnd){
+    window.__playingTransition = true;
 
-  const cleanup = () => {
-    try{ video.pause(); }catch(_){}
-    overlay.classList.add('hidden');
-    video.removeAttribute('src'); video.load();
-    document.body.style.overflow = '';          // libera scroll
-    window.__playingTransition = false;
-    try{ onEnd && onEnd(); }catch(_){}
-  };
+    // mostra overlay acima de tudo e trava scroll
+    overlay.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
 
-  document.body.style.overflow = 'hidden';      // trava scroll
-  window.__playingTransition = true;
+    // prepara player
+    video.removeAttribute('src');
+    video.load();
+    video.src = src;
+    video.currentTime = 0;
+    video.controls = true;
 
-  video.src = src;
-  overlay.classList.remove('hidden');
+    // limpeza padrão
+    const cleanup = () => {
+      try { video.pause(); } catch(e){}
+      video.onloadedmetadata = video.onended = video.onerror = null;
+      overlay.classList.add('hidden');
+      document.body.style.overflow = '';
+      video.removeAttribute('src'); video.load();
+      window.__playingTransition = false;
+    };
 
-  video.onended = cleanup;
-  video.onerror = () => { console.warn('Vídeo não carregou:', src); cleanup(); };
-  if (skip) skip.onclick = cleanup;
+    const done = () => { cleanup(); try{ onEnd && onEnd(); }catch(e){} };
 
-  video.muted = false;
-  video.play().catch(err => { console.warn('Erro ao reproduzir vídeo:', err); cleanup(); });
+    // se meta não vier, ainda assim garantimos failsafe
+    let failSafe = setTimeout(done, 15000);
 
-  // failsafe: se algo travar, garante saída
-  setTimeout(() => { if (!overlay.classList.contains('hidden')) cleanup(); }, 30000);
-}
-// Trava a rota por 1.5s depois do VÍDEO FINAL e força exibir o final
-(() => {
-  if (typeof window.showSection !== 'function' || typeof window.playTransition !== 'function') return;
+    video.onloadedmetadata = () => {
+      clearTimeout(failSafe);
+      // duraçao conhecida -> failsafe = duração + 1.5s (cap 30s)
+      const dur = (isFinite(video.duration)&&video.duration>0) ? video.duration : 10;
+      failSafe = setTimeout(done, Math.min(30000, (dur+1.5)*1000));
+      try { video.play().catch(()=>{}); } catch(_) {}
+    };
 
-  const _origShow = window.showSection;
+    video.onended  = done;
+    video.onerror  = done;
+    if (skip) skip.onclick = done;
+
+    // caso onloadedmetadata nunca dispare
+    failSafe = setTimeout(done, 15000);
+  }
+
+  // expõe no global
+  window.playTransition = showOverlay;
+})();
+
+/* ===== Proteção do FINAL (não deixa voltar para intro) ===== */
+(function(){
+  if (typeof window.playTransition !== 'function' || typeof window.showSection !== 'function') return;
+
   const _origPlay = window.playTransition;
-  let LOCK_UNTIL = 0;
+  const _origShow = window.showSection;
+  let LOCK_UNTIL = 0;          // período de proteção após o vídeo final (ms)
 
+  // showSection respeita lock do final
   window.showSection = function(id){
-    const locked = Date.now() < LOCK_UNTIL;
-    if (locked && id !== 'section-final') {
-      console.warn('[FinalLock] Ignorando troca de seção durante lock:', id);
+    if (Date.now() < LOCK_UNTIL && id !== 'section-final') {
+      console.warn('[FinalLock] Ignorando troca para', id);
       return;
     }
     return _origShow.apply(this, arguments);
   };
 
-  window.playTransition = function(src, cb){
+  // quando for o vídeo final, força rota #final e liga o lock
+  window.playTransition = function(src, onEnd){
     const isFinal = (window.JORNADA_FINAL_VIDEO && src === window.JORNADA_FINAL_VIDEO);
     return _origPlay(src, function(){
-      if (isFinal) {
-        try { location.hash = '#final'; } catch(_){}
-        LOCK_UNTIL = Date.now() + 1500;
-        try { _origShow('section-final'); } catch(_){}
+      if (isFinal){
+        try { location.hash = '#final'; } catch(_) {}
+        LOCK_UNTIL = Date.now() + 1500;    // 1.5s protegidos
+        try { _origShow('section-final'); } catch(_) {}
       }
-      cb && cb();
+      try { onEnd && onEnd(); } catch(_) {}
     });
   };
 })();
-
 
   function finalize(){
     const respostas={}; document.querySelectorAll('.j-pergunta textarea').forEach((input,idx)=>{ respostas[`q${idx}`]=input.value||''; });
