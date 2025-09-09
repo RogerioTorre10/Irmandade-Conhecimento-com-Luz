@@ -19,9 +19,31 @@ html,body{height:100%}
   font-weight:400; font-style:normal; font-display:swap;
 }
 @font-face{
-  font-family:'BerkshireSwash';
-  src:url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');
-  font-weight:400; font-style:normal; font-display:swap;
+  font-family:"BerkshireSwash";
+  src: url("/public/assets/fonts/berkshireswash-regular.woff2") format("woff2"),
+       url("/public/assets/fonts/berkshireswash-regular.woff")  format("woff"),
+       url("/public/assets/fonts/berkshireswash-regular.ttf")   format("truetype");
+  font-weight:400; 
+  font-style:normal; 
+  font-display:swap;
+}
+/* Força Berkshire nos elementos-chave */
+html, body { 
+  font-family:"BerkshireSwash", cursive !important;
+  font-synthesis-weight: none;
+  font-synthesis-style: none;
+}
+
+.site-header h1,
+h1,h2,h3,h4,h5,h6,
+.btn, .btn * {
+  font-family:"BerkshireSwash", cursive !important;
+  letter-spacing:.2px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+
 }
 /* Progress inline (dentro de #section-perguntas) */
 #section-perguntas .progress-inline{
