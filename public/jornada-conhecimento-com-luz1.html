@@ -509,34 +509,59 @@
     /* =========================
        VÍDEO (overlay)
     ==========================*/
-    function playTransition(src,onEnd){
-      const overlay=document.getElementById('videoOverlay');
-      const video=document.getElementById('videoTransicao');
-      const skip=document.getElementById('skipVideo');
-      if(!(overlay && video && src)){ onEnd&&onEnd(); return; }
+  function playTransition(src, onEnd){
+  const overlay = document.getElementById('videoOverlay');
+  const video   = document.getElementById('videoTransicao');
+  const skip    = document.getElementById('skipVideo');
 
-      window.__playingTransition = true;
-      video.src=src;
-      overlay.classList.remove('hidden');
+  if (!overlay || !video || !src) { onEnd && onEnd(); return; }
 
-      const cleanup = () => {
-        try{ video.pause(); }catch(_){}
-        overlay.classList.add('hidden');
-        video.removeAttribute('src'); video.load();
-        window.__playingTransition = false;
-        try{ onEnd && onEnd(); }catch(_){}
-      };
+  overlay.classList.remove('hidden');
 
-      video.onended = cleanup;
-      video.onerror = () => { console.warn('Vídeo não carregou:', src); cleanup(); };
-      if(skip) skip.onclick = cleanup;
+  // reset
+  video.pause?.();
+  video.removeAttribute('src');
+  video.load();
 
-      video.muted=false;
-      video.play().catch(err=>{ console.warn('Erro ao reproduzir vídeo:', err); cleanup(); });
+  // garantir visibilidade e compat
+  video.controls = true;
+  video.muted    = false;
+  video.playsInline = true;
+  video.setAttribute('playsinline','');
+  video.setAttribute('webkit-playsinline','');
+  video.style.background = '#000';       // se vier só áudio, ainda aparece um retângulo preto
 
-      // failsafe
-      setTimeout(cleanup, 15000);
+  let ended = false;
+  const cleanup = () => {
+    if (ended) return; ended = true;
+    try { video.pause(); } catch(_) {}
+    overlay.classList.add('hidden');
+    video.removeAttribute('src');
+    video.load();
+    try { onEnd && onEnd(); } catch(_) {}
+  };
+
+  video.onerror   = cleanup;
+  video.onended   = cleanup;
+  if (skip) skip.onclick = cleanup;
+
+  video.onloadedmetadata = () => {
+    // Se o arquivo vier com trilha só de áudio (videoWidth=0), ainda mostramos o quadro
+    if (!video.videoWidth || !video.videoHeight) {
+      console.warn('[Vídeo] Parece conter apenas áudio; mantendo fundo preto.');
     }
+    video.play().catch(err => {
+      console.warn('[Vídeo] play() falhou:', err);
+      cleanup();
+    });
+  };
+
+  video.src = src;
+
+  // fail-safe se o onended não disparar
+  setTimeout(cleanup, 20000);
+}
+
     window.playTransition = playTransition;
 
     function finalize(){
