@@ -531,4 +531,60 @@ html, body, button, .btn, input, select, textarea,
 .btn, .btn-primary, .btn-secondary, button {
   font-family: 'ManufacturingConsent' !important;
 }
+/* === FONTES (usar arquivos .ttf da pasta /assets/fonts/) === */
+@font-face{
+  font-family: 'ManufacturingConsent';
+  src: url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face{
+  font-family: 'BerkshireSwash';
+  src: local('Berkshire Swash Regular'),
+       url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face{
+  font-family: 'Cardo';
+  src: local('Cardo Regular'),
+       url('/assets/fonts/Cardo-Regular.ttf') format('truetype');
+  font-display: swap;
+}
+
+/* === PADRÃO DO SITE: ManufacturingConsent em TODO o texto === */
+html, body {
+  font-family: 'ManufacturingConsent', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+}
+
+/* Botões e títulos continuam herdando ManufacturingConsent */
+button, .btn, .btn-primary, .btn-secondary, h1,h2,h3,h4,h5,h6 {
+  font-family: 'ManufacturingConsent', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif !important;
+  letter-spacing: .25px;
+}
+
+/* === ENUNCIADOS DAS PERGUNTAS: Berkshire ===
+   Ajuste os seletores abaixo se seus nomes forem diferentes */
+#perguntas-container .pergunta .enunciado,
+#perguntas-container label,
+.j-pergunta .enunciado,
+.perguntas-enunciado {
+  font-family: 'BerkshireSwash', cursive !important;
+  font-weight: 400;
+  letter-spacing: .5px;
+}
+
+/* === RESPOSTAS (inputs/textarea): Cardo === */
+#perguntas-container input[type="text"],
+#perguntas-container input[type="search"],
+#perguntas-container input[type="email"],
+#perguntas-container input[type="password"],
+#perguntas-container textarea,
+.perguntas-resposta,
+.campo-resposta {
+  font-family: 'Cardo', Georgia, 'Times New Roman', serif !important;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* Se você tinha setado Berkshire no body antes, isto sobrescreve. */
+
 
