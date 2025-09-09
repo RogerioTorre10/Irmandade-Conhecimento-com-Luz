@@ -266,20 +266,31 @@
       const cur=String(el.getAttribute('data-cursor')||'true')==='true';
       el.dataset._typed='1'; typeWriter(el,t,spd,cur);
     });
+  } 
+ /* ===== Garante chamas (título e perguntas) ===== */
+(function(){
+  // Cabeçalho (ícone do título)
+  const H = document.getElementById('chama-header');
+  if (H && !H.querySelector('.halo')){
+    H.classList.add('chama-icone');
+    H.innerHTML = '<div class="halo"></div><div class="gota"></div><div class="brasa"></div>';
   }
 
-  /* ========================= CHAMA – API ========================= */
- function ensureChamaIcon(el){
-  if (!el) return null;
-  el.classList.remove('chama-viva');
-  el.classList.add('chama-icone');
-  if (!el.querySelector('.halo')) {
-    el.innerHTML = '<div class="halo"></div><div class="gota"></div><div class="brasa"></div>';
-  }
-  return el;
-}
+  // Assim que a seção de perguntas aparecer, inicializa a chama-viva
+  const ensurePerguntasFlame = () => {
+    const el = document.getElementById('chama-perguntas');
+    if (!el) return;
+    // usa a API para montar a estrutura viva imediatamente (score neutro)
+    if (window.JORNADA_CHAMA && typeof window.JORNADA_CHAMA.updateChama === 'function'){
+      window.JORNADA_CHAMA.updateChama(0, 'chama-perguntas');
+    }
+  };
 
-window.JORNADA_CHAMA = window.JORNADA_CHAMA || {};
+  // tenta agora e também observa mudanças de DOM
+  ensurePerguntasFlame();
+  const mo = new MutationObserver(ensurePerguntasFlame);
+  mo.observe(document.body, {childList:true, subtree:true});
+})();
 
 window.JORNADA_CHAMA.updateChama = function(scoreNum, targetId='chama-perguntas'){
   const el = (typeof targetId === 'string') ? document.getElementById(targetId) : targetId;
