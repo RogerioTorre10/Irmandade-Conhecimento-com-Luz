@@ -269,14 +269,10 @@
   }
 
   /* ========================= CHAMA – API ========================= */
-  window.JORNADA_CHAMA = {
-    updateChama(scoreNum, targetId='chama-perguntas'){
-   function ensureChamaIcon(el){
+ function ensureChamaIcon(el){
   if (!el) return null;
-  // se veio da versão "viva", limpa pra evitar conflito de CSS
   el.classList.remove('chama-viva');
   el.classList.add('chama-icone');
-
   if (!el.querySelector('.halo')) {
     el.innerHTML = '<div class="halo"></div><div class="gota"></div><div class="brasa"></div>';
   }
@@ -285,28 +281,27 @@
 
 window.JORNADA_CHAMA = window.JORNADA_CHAMA || {};
 
-// Atualiza a chama de acordo com o score (usa a chama-icone)
-window.JORNADA_CHAMA.updateChama = function updateChamaTitulo(scoreNum, targetId='chama-perguntas'){
+window.JORNADA_CHAMA.updateChama = function(scoreNum, targetId='chama-perguntas'){
   const el = (typeof targetId === 'string') ? document.getElementById(targetId) : targetId;
   if (!el) return;
 
+  // chama do tipo-ícone (a do título/hero)
   ensureChamaIcon(el);
 
-  // intensidade baseada no score
+  // intensidade por sentimento
   const modo = (scoreNum <= -2) ? 'fraca' : (scoreNum >= 2) ? 'forte' : 'media';
   el.dataset.intensidade = modo;
 
-  // pequeno "pico" de animação
+  // “pico” curto
   el.classList.add('chama-pico');
   clearTimeout(el._pulse_t);
   el._pulse_t = setTimeout(() => el.classList.remove('chama-pico'), 700);
 
-  // sincroniza o guia/flutuante se existir
+  // guia acompanha
   const guia = document.getElementById('chama-bola');
   if (guia) guia.dataset.intensidade = modo;
 };
 
-// Garante a chama-icone "hero" no canvas no intro/final
 window.JORNADA_CHAMA.ensureHeroFlame = function(sectionId){
   const canvas = document.getElementById('jornada-canvas');
   if (!canvas) return;
@@ -331,7 +326,7 @@ window.JORNADA_CHAMA.ensureHeroFlame = function(sectionId){
   }
 };
 
-// aliases compatíveis com o resto do código
+// aliases se o restante do código chamar funções antigas
 function updateChama(score, targetId){ window.JORNADA_CHAMA.updateChama(score, targetId); }
 function ensureHeroFlame(sectionId){ window.JORNADA_CHAMA.ensureHeroFlame(sectionId); }
 
