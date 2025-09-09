@@ -68,6 +68,16 @@ body{
   line-height:1.5;
 }
 
+/* Botões com a Berkshire já carregada no @font-face */
+.btn,
+.btn *{
+  font-family: "BerkshireSwash", ui-sans-serif, system-ui, Arial, sans-serif !important;
+  font-weight: 400;
+  letter-spacing: .2px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
 /* TÍTULOS ÉPICOS */
 h1,h2,h3,h4,h5,h6,
 .site-header h1,
