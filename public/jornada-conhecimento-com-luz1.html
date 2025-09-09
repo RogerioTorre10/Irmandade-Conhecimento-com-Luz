@@ -869,9 +869,11 @@ window.JORNADA_VIDEOS = {
   }
 
   function silenciarDuranteVideo(){
-    const origAlert   = window.alert;
-    const origConfirm = window.confirm;
-    const origPrompt  = window.prompt;
+  const A = window.alert, C = window.confirm, P = window.prompt;
+  window.alert = function(m){ if(overlayVisivel()){ console.warn('[alert suprimido durante vídeo]', m); return; } return A(m); };
+  window.confirm = function(m){ if(overlayVisivel()){ console.warn('[confirm suprimido durante vídeo]', m); return false; } return C(m); };
+  window.prompt = function(m,d){ if(overlayVisivel()){ console.warn('[prompt suprimido durante vídeo]', m); return null; } return P(m,d); };
+})();
 
     window.alert = function(msg){
       if (overlayVisivel()) { console.warn('[alert suprimido durante vídeo]:', msg); return; }
