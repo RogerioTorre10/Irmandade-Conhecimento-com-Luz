@@ -422,58 +422,52 @@
   const current = document.querySelector('.j-pergunta.active');
   if(!current) return;
 
-  const currentBloco = current.closest('.j-bloco');
-  const perguntasDoBloco = Array.from(currentBloco.querySelectorAll('.j-pergunta'));
-  const idx = perguntasDoBloco.indexOf(current);
+  const bloco = current.closest('.j-bloco');
+  const perguntas = Array.from(bloco.querySelectorAll('.j-pergunta'));
+  const i = perguntas.indexOf(current);
 
-  // sai da atual
+  // sai da pergunta atual
   current.classList.remove('active');
 
-  // ainda há pergunta no MESMO bloco → só vai pra próxima
-  if (idx + 1 < perguntasDoBloco.length) {
-    const prox = perguntasDoBloco[idx + 1];
+  // ainda tem pergunta neste bloco
+  if (i + 1 < perguntas.length) {
+    const prox = perguntas[i + 1];
     prox.classList.add('active');
     runTyping(prox);
     updateProgress();
     return;
   }
 
-  // acabou o bloco → toca vídeo do bloco e troca de bloco
-  const blocos = Array.from(document.querySelectorAll('.j-bloco'));
-  const blocoIdx = blocos.indexOf(currentBloco);
+  // acabou o bloco → prepara transição
+  const blocoIdx = parseInt(bloco.dataset.bloco || '0', 10);
   const videoSrc = (window.JORNADA_BLOCKS[blocoIdx]?.video_after) || '';
 
-  const irProProximoBloco = () => {
-    const proxBloco = blocos[blocoIdx + 1];
-
-    // se existe próximo bloco
+  const abrirProximoBloco = () => {
+    const proxBloco = document.querySelector('.j-bloco[data-bloco="' + (blocoIdx + 1) + '"]');
     if (proxBloco) {
-      blocos.forEach((b,i)=> b.style.display = (i === blocoIdx + 1) ? 'block' : 'none');
-      const proxPerg = proxBloco.querySelector('.j-pergunta');
-      if (proxPerg) {
-        proxPerg.classList.add('active');
-        runTyping(proxPerg);
-      }
+      document.querySelectorAll('.j-bloco').forEach(b => b.style.display = 'none');
+      proxBloco.style.display = 'block';
+      const p0 = proxBloco.querySelector('.j-pergunta');
+      if (p0){ p0.classList.add('active'); runTyping(p0); }
       updateProgress();
       return;
     }
-
-    // acabou TUDO → vídeo final e página final
+    // não existe próximo bloco → final
     if (window.JORNADA_FINAL_VIDEO) {
-      playTransition(window.JORNADA_FINAL_VIDEO, ()=> showSection('section-final'));
+      playTransition(window.JORNADA_FINAL_VIDEO, () => showSection('section-final'));
     } else {
       showSection('section-final');
     }
     updateProgress();
   };
 
-  // toca vídeo do bloco (se houver) antes de mudar
-  if (blocoIdx + 1 < blocos.length) {
-    if (videoSrc) playTransition(videoSrc, irProProximoBloco);
-    else irProProximoBloco();
+  // se existe próximo bloco, toca vídeo do bloco; senão, finaliza
+  const existeProx = !!document.querySelector('.j-bloco[data-bloco="' + (blocoIdx + 1) + '"]');
+  if (existeProx) {
+    if (videoSrc) playTransition(videoSrc, abrirProximoBloco);
+    else abrirProximoBloco();
   } else {
-    // último bloco (sem próximo)
-    irProProximoBloco();
+    abrirProximoBloco();
   }
 }
 
@@ -481,36 +475,32 @@
   const current = document.querySelector('.j-pergunta.active');
   if(!current) return;
 
-  const currentBloco = current.closest('.j-bloco');
-  const perguntasDoBloco = Array.from(currentBloco.querySelectorAll('.j-pergunta'));
-  const idx = perguntasDoBloco.indexOf(current);
+  const bloco = current.closest('.j-bloco');
+  const perguntas = Array.from(bloco.querySelectorAll('.j-pergunta'));
+  const i = perguntas.indexOf(current);
 
   current.classList.remove('active');
 
-  // ainda há pergunta anterior no MESMO bloco
-  if (idx - 1 >= 0) {
-    const prev = perguntasDoBloco[idx - 1];
+  // ainda tem pergunta anterior neste bloco
+  if (i - 1 >= 0) {
+    const prev = perguntas[i - 1];
     prev.classList.add('active');
     runTyping(prev);
     updateProgress();
     return;
   }
 
-  // voltar para o BLOCO anterior
-  const blocos = Array.from(document.querySelectorAll('.j-bloco'));
-  const blocoIdx = blocos.indexOf(currentBloco);
-  const prevBloco = blocos[blocoIdx - 1];
+  // voltar para o bloco anterior
+  const blocoIdx = parseInt(bloco.dataset.bloco || '0', 10);
+  const prevBloco = document.querySelector('.j-bloco[data-bloco="' + (blocoIdx - 1) + '"]');
 
   if (prevBloco) {
-    blocos.forEach((b,i)=> b.style.display = (i === blocoIdx - 1) ? 'block' : 'none');
-    const ultimaPerg = Array.from(prevBloco.querySelectorAll('.j-pergunta')).pop();
-    if (ultimaPerg) {
-      ultimaPerg.classList.add('active');
-      runTyping(ultimaPerg);
-    }
+    document.querySelectorAll('.j-bloco').forEach(b => b.style.display = 'none');
+    prevBloco.style.display = 'block';
+    const ultima = Array.from(prevBloco.querySelectorAll('.j-pergunta')).pop();
+    if (ultima){ ultima.classList.add('active'); runTyping(ultima); }
     updateProgress();
   } else {
-    // já estava no primeiro bloco → volta para intro
     showSection('section-intro');
   }
 }
@@ -588,16 +578,16 @@
         if(ta) handleInput(ta);
       });
 
-      document.addEventListener('click',(ev)=>{
-  const aNext   = ev.target.closest('[data-action="next"]');
-  const aPrev   = ev.target.closest('[data-action="prev"]');
-  const aStart  = ev.target.closest('[data-action="start"]');
-  const aToggle = ev.target.closest('[data-action="toggle-password"], .password-toggle');
-  const aRestart= ev.target.closest('[data-action="restart"]');
+     document.addEventListener('click',(ev)=>{
+  const aNext    = ev.target.closest('[data-action="next"]');
+  const aPrev    = ev.target.closest('[data-action="prev"]');
+  const aStart   = ev.target.closest('[data-action="start"]');
+  const aToggle  = ev.target.closest('[data-action="toggle-password"], .password-toggle');
+  const aRestart = ev.target.closest('[data-action="restart"]');
 
   if(aNext){ ev.preventDefault(); goNext(); }
   if(aPrev){ ev.preventDefault(); goPrev(); }
-  if(aStart){ /* filme 0 intercepta se senha ok */ startJourney(); }
+  if(aStart){ /* filme 0 intercepta se senha válida */ startJourney(); }
   if(aToggle){ ev.preventDefault(); toggleSenha(); }
   if(aRestart){ ev.preventDefault(); location.reload(); }
 });
@@ -687,29 +677,47 @@
         });
       };
     })();
+    
+<script>
+  // === FILME 0 — roda antes de iniciar, só com senha válida, e apenas 1x
+(function hookFilme0(){
+  if (hookFilme0._bound) return; hookFilme0._bound = true;
 
-    /* ===== Filme 0: só se senha válida ===== */
-    (function hookFilme0(){
-      if(typeof window.playTransition!=='function' || typeof window.startJourney!=='function') return;
-      let jaRodou = false;
-      document.addEventListener('click', function(ev){
-        const btn = ev.target.closest('[data-action="start"]');
-        if(!btn || jaRodou) return;
+  const SENHAS_VALIDAS = ['iniciar','olho magico','olho mágico'];
 
-        const senha=(document.getElementById('senha')?.value||'').trim().toLowerCase();
-        const ok=['iniciar','olho magico','olho mágico'].includes(senha);
-        if(!ok) return; // deixa o startJourney avisar senha incorreta
+  document.addEventListener('click', function onClick(ev){
+    const btn = ev.target.closest('[data-action="start"]');
+    if (!btn) return;
 
-        ev.preventDefault(); ev.stopPropagation();
-        jaRodou = true;
+    const senhaEl = document.getElementById('senha');
+    const senhaVal = (senhaEl && senhaEl.value || '').trim().toLowerCase();
 
-        const intro = window.JORNADA_VIDEOS?.intro;
-        if(!intro){ try{ startJourney(); }catch(_){ } return; }
-        window.playTransition(intro, ()=>{ try{ startJourney(); }catch(_){} });
-      }, true);
-    })();
+    // senha inválida → deixa o fluxo normal (startJourney vai alertar)
+    if (!SENHAS_VALIDAS.includes(senhaVal)) return;
 
-    /* ===== Boot ===== */
+    // só intercepta uma vez
+    if (hookFilme0._ran) return;
+    hookFilme0._ran = true;
+
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    try {
+      const introSrc = window.JORNADA_VIDEOS && window.JORNADA_VIDEOS.intro;
+      if (introSrc) {
+        playTransition(introSrc, () => { try { startJourney(); } catch(e){ console.error(e); } });
+      } else {
+        startJourney();
+      }
+    } catch (e) {
+      console.warn('[Filme0] fallback sem vídeo:', e);
+      try { startJourney(); } catch(_) {}
+    }
+  }, true); // capture: intercepta antes dos outros
+})();
+</script>
+  
+  /* ===== Boot ===== */
     function boot(){
       const route=(location.hash||'#intro').slice(1);
       if(route==='perguntas'){ showSection('section-perguntas'); loadDynamicBlocks(); }
