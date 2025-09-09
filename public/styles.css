@@ -16,7 +16,7 @@ html,body{height:100%}
 @font-face{
   font-family:'ManufacturingConsent';
   src:url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');
-  font-weight:400; font-style:normal; font-display:swap;
+  font-weight:400; font-style:normal; font-display:swap;   
 }
 @font-face{
   font-family:"BerkshireSwash";
@@ -42,7 +42,6 @@ h1,h2,h3,h4,h5,h6,
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-
 
 }
 /* Progress inline (dentro de #section-perguntas) */
@@ -89,16 +88,37 @@ body{
   color:var(--fg);
   line-height:1.5;
 }
+/* =====Mapa de fontes por área===== */
 
-/* Botões com a Berkshire já carregada no @font-face */
-.btn,
-.btn *{
-  font-family: "BerkshireSwash", ui-sans-serif, system-ui, Arial, sans-serif !important;
-  font-weight: 400;
-  letter-spacing: .2px;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+/* 1) Base do site: tudo em ManufacturingConsent */
+html, body {
+  font-family: 'ManufacturingConsent', ui-sans-serif, system-ui, -apple-system,
+               "Segoe UI", Roboto, Arial, sans-serif;
 }
+
+/* 2) Perguntas (títulos/enunciados) em Berkshire Swash */
+#section-perguntas .pergunta-enunciado,
+#section-perguntas .pergunta-enunciado b,
+#section-perguntas h2,
+#section-perguntas h3 {
+  font-family: "Berkshire Swash", cursive;
+  letter-spacing: .2px;
+}
+
+/* 3) Respostas (inputs/textarea) em Cardo */
+#section-perguntas textarea,
+#section-perguntas input[type="text"],
+#section-perguntas input[type="password"],
+#section-perguntas input[type="email"],
+.password-input input {
+  font-family: "Cardo", Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Botões, header, etc. herdam a fonte base (ManufacturingConsent) */
+.btn { font-family: inherit; }
+
 
 /* TÍTULOS ÉPICOS */
 h1,h2,h3,h4,h5,h6,
