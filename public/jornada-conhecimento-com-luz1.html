@@ -577,6 +577,15 @@
         const ta = ev.target.closest('.j-pergunta textarea');
         if(ta) handleInput(ta);
       });
+      /* Reiniciar na página final */
+document.addEventListener('click', (ev) => {
+  const rst = ev.target.closest('#btnRestart,[data-action="restart"]');
+  if (!rst) return;
+  ev.preventDefault();
+  try { localStorage.removeItem('jornada_respostas'); } catch(_){}
+  location.hash = '#intro';
+  location.reload();
+});
 
      document.addEventListener('click',(ev)=>{
   const aNext    = ev.target.closest('[data-action="next"]');
