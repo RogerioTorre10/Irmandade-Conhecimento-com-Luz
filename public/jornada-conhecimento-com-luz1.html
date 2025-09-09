@@ -419,57 +419,102 @@
     }
 
     function goNext(){
-      const perguntas=document.querySelectorAll('.j-pergunta');
-      const current=document.querySelector('.j-pergunta.active');
-      if(current) current.classList.remove('active');
-      const nextIndex=Array.from(perguntas).indexOf(current)+1;
+  const current = document.querySelector('.j-pergunta.active');
+  if(!current) return;
 
-      if(nextIndex<perguntas.length){
-        perguntas[nextIndex].classList.add('active'); runTyping(perguntas[nextIndex]); updateProgress();
-        return;
+  const currentBloco = current.closest('.j-bloco');
+  const perguntasDoBloco = Array.from(currentBloco.querySelectorAll('.j-pergunta'));
+  const idx = perguntasDoBloco.indexOf(current);
+
+  // sai da atual
+  current.classList.remove('active');
+
+  // ainda há pergunta no MESMO bloco → só vai pra próxima
+  if (idx + 1 < perguntasDoBloco.length) {
+    const prox = perguntasDoBloco[idx + 1];
+    prox.classList.add('active');
+    runTyping(prox);
+    updateProgress();
+    return;
+  }
+
+  // acabou o bloco → toca vídeo do bloco e troca de bloco
+  const blocos = Array.from(document.querySelectorAll('.j-bloco'));
+  const blocoIdx = blocos.indexOf(currentBloco);
+  const videoSrc = (window.JORNADA_BLOCKS[blocoIdx]?.video_after) || '';
+
+  const irProProximoBloco = () => {
+    const proxBloco = blocos[blocoIdx + 1];
+
+    // se existe próximo bloco
+    if (proxBloco) {
+      blocos.forEach((b,i)=> b.style.display = (i === blocoIdx + 1) ? 'block' : 'none');
+      const proxPerg = proxBloco.querySelector('.j-pergunta');
+      if (proxPerg) {
+        proxPerg.classList.add('active');
+        runTyping(proxPerg);
       }
-
-      // próximo bloco ou final
-      const blocos=document.querySelectorAll('.j-bloco');
-      const currentBloco=current?.closest('.j-bloco');
-      const nextBlocoIndex=Array.from(blocos).indexOf(currentBloco)+1;
-
-      if(nextBlocoIndex<blocos.length){
-        const currentIdx = Number(currentBloco?.dataset.bloco||0);
-        const videoSrc = (window.JORNADA_BLOCKS[currentIdx]?.video_after)||'';
-        blocos.forEach(b=>b.style.display='none'); blocos[nextBlocoIndex].style.display='block';
-        const nextPergunta=blocos[nextBlocoIndex].querySelector('.j-pergunta');
-        const proceed = ()=>{ if(nextPergunta){ nextPergunta.classList.add('active'); runTyping(nextPergunta); updateProgress(); } };
-        if(videoSrc) playTransition(videoSrc, proceed); else proceed();
-      } else {
-        if(window.JORNADA_FINAL_VIDEO) playTransition(window.JORNADA_FINAL_VIDEO, ()=>showSection('section-final'));
-        else showSection('section-final');
-        updateProgress();
-      }
+      updateProgress();
+      return;
     }
+
+    // acabou TUDO → vídeo final e página final
+    if (window.JORNADA_FINAL_VIDEO) {
+      playTransition(window.JORNADA_FINAL_VIDEO, ()=> showSection('section-final'));
+    } else {
+      showSection('section-final');
+    }
+    updateProgress();
+  };
+
+  // toca vídeo do bloco (se houver) antes de mudar
+  if (blocoIdx + 1 < blocos.length) {
+    if (videoSrc) playTransition(videoSrc, irProProximoBloco);
+    else irProProximoBloco();
+  } else {
+    // último bloco (sem próximo)
+    irProProximoBloco();
+  }
+}
+
     function goPrev(){
-      const perguntas=document.querySelectorAll('.j-pergunta');
-      const current=document.querySelector('.j-pergunta.active');
-      if(current) current.classList.remove('active');
-      const prevIndex=Array.from(perguntas).indexOf(current)-1;
+  const current = document.querySelector('.j-pergunta.active');
+  if(!current) return;
 
-      if(prevIndex>=0){
-        perguntas[prevIndex].classList.add('active'); runTyping(perguntas[prevIndex]); updateProgress();
-        return;
-      }
+  const currentBloco = current.closest('.j-bloco');
+  const perguntasDoBloco = Array.from(currentBloco.querySelectorAll('.j-pergunta'));
+  const idx = perguntasDoBloco.indexOf(current);
 
-      const blocos=document.querySelectorAll('.j-bloco');
-      const currentBloco=current?.closest('.j-bloco');
-      const prevBlocoIndex=Array.from(blocos).indexOf(currentBloco)-1;
+  current.classList.remove('active');
 
-      if(prevBlocoIndex>=0){
-        blocos.forEach(b=>b.style.display='none'); blocos[prevBlocoIndex].style.display='block';
-        const lastPergunta=Array.from(blocos[prevBlocoIndex].querySelectorAll('.j-pergunta')).pop();
-        if(lastPergunta){ lastPergunta.classList.add('active'); runTyping(lastPergunta); updateProgress(); }
-      } else {
-        showSection('section-intro');
-      }
+  // ainda há pergunta anterior no MESMO bloco
+  if (idx - 1 >= 0) {
+    const prev = perguntasDoBloco[idx - 1];
+    prev.classList.add('active');
+    runTyping(prev);
+    updateProgress();
+    return;
+  }
+
+  // voltar para o BLOCO anterior
+  const blocos = Array.from(document.querySelectorAll('.j-bloco'));
+  const blocoIdx = blocos.indexOf(currentBloco);
+  const prevBloco = blocos[blocoIdx - 1];
+
+  if (prevBloco) {
+    blocos.forEach((b,i)=> b.style.display = (i === blocoIdx - 1) ? 'block' : 'none');
+    const ultimaPerg = Array.from(prevBloco.querySelectorAll('.j-pergunta')).pop();
+    if (ultimaPerg) {
+      ultimaPerg.classList.add('active');
+      runTyping(ultimaPerg);
     }
+    updateProgress();
+  } else {
+    // já estava no primeiro bloco → volta para intro
+    showSection('section-intro');
+  }
+}
+
 
     /* =========================
        VÍDEO (overlay)
