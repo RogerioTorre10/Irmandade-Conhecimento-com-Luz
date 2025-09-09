@@ -396,92 +396,53 @@ nav a, a.btn, .site-header p { letter-spacing:.5px; }
   align-self: flex-end;
   margin-bottom: 4px;
 }
-/* ===== CHAMA DO CABEÇALHO (estilo do print) ===== */
+/* ===== Chama-icone (a do título) — reutilizável */
 .chama-icone{
-  /* presets */
-  --h: 56px;         /* altura */
-  --w: 34px;         /* largura */
-  --hue: 28;         /* matiz laranja */
-  --pulso: 1.6s;     /* velocidade */
   position: relative;
-  width: var(--w);
-  height: var(--h);
-  display:inline-block;
-  filter: drop-shadow(0 0 14px hsla(var(--hue),90%,60%,.65));
-  margin-right:12px; /* espaçamento do título */
+  width: 24px; height: 36px;
+  filter: drop-shadow(0 0 14px rgba(255,196,0,.75));
 }
-
-/* “gota” principal da chama */
+.chama-icone .halo{
+  position:absolute; left:50%; bottom:2px; transform:translateX(-50%);
+  width: 86%; height: 88%;
+  border-radius: 62% 62% 28% 28% / 88% 88% 22% 22%;
+  background: radial-gradient(ellipse at 50% 30%,
+    #fff 0%, #ffe7b0 38%, rgba(255,170,30,.95) 60%, rgba(255,140,0,0) 78%);
+  animation: flameSway 1.8s ease-in-out infinite;
+}
 .chama-icone .gota{
   position:absolute; left:50%; bottom:6px; transform:translateX(-50%);
-  width:100%; height:100%;
-  background:
-    radial-gradient(60% 90% at 50% 18%,
-      hsla(var(--hue),95%,98%,1) 0%,
-      hsla(var(--hue),95%,76%,.95) 38%,
-      hsla(var(--hue),90%,52%,.85) 70%,
-      transparent 82%);
-  /* formato de lágrima/vela */
-  clip-path: polygon(
-    50% 0%, 60% 10%, 69% 23%, 75% 38%, 78% 54%,
-    76% 67%, 70% 79%, 60% 90%, 50% 100%,
-    40% 90%, 30% 79%, 24% 67%, 22% 54%,
-    25% 38%, 31% 23%, 40% 10%
-  );
-  border-radius: 46% 46% 32% 32%;
-  mix-blend-mode: screen;
-  filter: blur(.4px);
-  animation: chamaHeader  var(--pulso) infinite ease-in-out;
+  width: 66%; height: 68%;
+  border-radius: 60% 60% 26% 26% / 86% 86% 18% 18%;
+  background: radial-gradient(ellipse at 50% 35%,
+    rgba(255,255,255,.98) 0%, rgba(255,225,150,.95) 45%,
+    rgba(255,165,50,.85) 66%, rgba(255,140,0,0) 82%);
 }
-
-/* halo/brilho */
-.chama-icone .halo{
-  position:absolute; left:50%; bottom:4px; transform:translateX(-50%);
-  width:128%; height:116%;
-  background: radial-gradient(circle, hsla(var(--hue),90%,70%,.35), transparent 65%);
-  filter: blur(12px);
-  mix-blend-mode: screen;
-  pointer-events:none;
-  animation: haloHeader var(--pulso) infinite ease-in-out;
-}
-
-/* brasa na base */
 .chama-icone .brasa{
   position:absolute; left:50%; bottom:0; transform:translateX(-50%);
-  width: 62%; height: 12px; border-radius:50%;
-  background: radial-gradient(circle at 50% 30%,
-    hsla(var(--hue),95%,92%,.9) 0%,
-    hsla(var(--hue),85%,60%,.6) 60%,
-    transparent 75%);
-  filter: blur(1px);
-  animation: brasaHeader var(--pulso) infinite ease-in-out;
+  width: 70%; height: 8px; border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%,
+    rgba(255,255,255,.95) 0%, rgba(255,205,120,.85) 42%, rgba(255,140,0,0) 72%);
+  animation: brasaPulse 1.7s ease-in-out infinite;
+}
+/* tamanhos */
+.chama-icone.chama-sm{ width:16px; height:24px; }
+.chama-icone.chama-md{ width:22px; height:34px; }
+.chama-icone.chama-lg{ width:30px; height:48px; }
+/* intensidade visual */
+.chama-icone[data-intensidade="fraca"]{  filter: drop-shadow(0 0 8px  rgba(255,196,0,.45)); }
+.chama-icone[data-intensidade="media"]{  filter: drop-shadow(0 0 14px rgba(255,196,0,.75)); }
+.chama-icone[data-intensidade="forte"]{  filter: drop-shadow(0 0 20px rgba(255,196,0,.95)); }
+
+@keyframes flameSway{
+  0%,100%{ transform:translateX(-50%) scaleY(1) }
+  50%{    transform:translateX(-51%) scaleY(1.06) }
+}
+@keyframes brasaPulse{
+  0%,100%{ transform:translateX(-50%) scale(1);   opacity:.75; }
+  50%    { transform:translateX(-50%) scale(1.06); opacity:1;   }
 }
 
-/* intensidades (opcional via data-intensidade) */
-.chama-icone[data-intensidade="fraca"]{
-  --h: 48px; --w: 30px; --pulso: 2.4s;
-  filter: drop-shadow(0 0 8px hsla(var(--hue),90%,60%,.45));
-}
-.chama-icone[data-intensidade="media"]{
-  --h: 56px; --w: 34px; --pulso: 1.6s;
-}
-.chama-icone[data-intensidade="forte"]{
-  --h: 62px; --w: 38px; --pulso: 1.1s;
-  filter: drop-shadow(0 0 18px hsla(var(--hue),100%,60%,.8));
-}
-
-/* animações */
-@keyframes chamaHeader{
-  0%,100% { transform: translateX(-50%) scaleY(1)   skewX(0deg);  }
-  50%     { transform: translateX(-50%) scaleY(1.08) skewX(1.2deg);}
-}
-@keyframes haloHeader{
-  0%,100%{ opacity:.55 } 50%{ opacity:.85 }
-}
-@keyframes brasaHeader{
-  0%,100%{ transform:translateX(-50%) scale(1);   opacity:.75 }
-  50%    { transform:translateX(-50%) scale(1.06); opacity:1   }
-}
 /* ===== FONTES PADRÃO x EXCEÇÕES ===== */
 
 /* 1) Padrão do site inteiro */
