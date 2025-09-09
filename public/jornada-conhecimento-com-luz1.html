@@ -767,6 +767,41 @@ document.addEventListener('click', (ev) => {
     H.innerHTML = '<div class="halo"></div><div class="gota"></div><div class="brasa"></div>';
   }
 })();
+  
+/* ===== Filme 0 garantido antes das perguntas (senha válida) ===== */
+(function wrapStartWithIntro(){
+  if (window.__wrapStartWithIntro) return;  // idempotente
+  window.__wrapStartWithIntro = true;
+
+  // senha válida?
+  function senhaOk(){
+    const s = (document.getElementById('senha')?.value || '').trim().toLowerCase();
+    return ['iniciar','olho magico','olho mágico'].includes(s);
+  }
+
+  const _start = window.startJourney;                // original
+  const intro  = (window.JORNADA_VIDEOS && window.JORNADA_VIDEOS.intro) || '';
+
+  // substitui por um wrapper
+  window.startJourney = function(){
+    // deixe o startJourney original exibir "senha incorreta" quando não bate
+    if (!senhaOk()) return _start.apply(this, arguments);
+
+    // se não há intro ou já tocou, segue normal
+    if (!intro || window.__introPlayed) return _start.apply(this, arguments);
+
+    // senha ok + intro disponível → toca primeiro
+    window.__introPlayed = true;
+    try {
+      playTransition(intro, () => {
+        try { _start.apply(this, arguments); } catch(_) {}
+      });
+    } catch(_) {
+      // fallback total
+      try { _start.apply(this, arguments); } catch(_) {}
+    }
+  };
+})();
 
       // ponte global
       window.toggleSenha = toggleSenha;
