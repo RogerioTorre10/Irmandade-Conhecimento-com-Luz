@@ -20,9 +20,7 @@ html,body{height:100%}
 }
 @font-face{
   font-family:"BerkshireSwash";
-  src: url("/public/assets/fonts/berkshireswash-regular.woff2") format("woff2"),
-       url("/public/assets/fonts/berkshireswash-regular.woff")  format("woff"),
-       url("/public/assets/fonts/berkshireswash-regular.ttf")   format("truetype");
+  src:url("/public/assets/fonts/berkshireswash-regular.ttf")   format("truetype");
   font-weight:400; 
   font-style:normal; 
   font-display:swap;
@@ -501,5 +499,36 @@ button, input, select, textarea {
 .j-pergunta input[type="text"]::placeholder {
   font-family: 'Cardo', Georgia, 'Times New Roman', serif !important;
   opacity: .75;
+}
+/* 2.3.1. Base: toda a UI em ManufacturingConsent */
+html, body, button, .btn, input, select, textarea,
+.site-header, .section-container, #jornada-conteudo, #perguntas-container {
+  font-family: 'ManufacturingConsent', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* 2.3.2. Perguntas (títulos/enunciados) em Berkshire */
+#perguntas-container h3,
+#perguntas-container .pergunta-titulo,
+#perguntas-container .pergunta .enunciado,
+.j-pergunta .titulo,
+#chama-perguntas { /* se existir */
+  font-family: 'BerkshireSwash', cursive !important;
+}
+
+/* 2.3.3. Respostas (inputs/textarea) em Cardo */
+#perguntas-container input[type="text"],
+#perguntas-container input[type="email"],
+#perguntas-container input[type="number"],
+#perguntas-container textarea,
+#perguntas-container .campo-resposta,
+#perguntas-container .resposta {
+  font-family: 'Cardo', Georgia, serif !important;
+}
+
+/* (opcional) Botões seguem a base ManufacturingConsent */
+.btn, .btn-primary, .btn-secondary, button {
+  font-family: 'ManufacturingConsent' !important;
 }
 
