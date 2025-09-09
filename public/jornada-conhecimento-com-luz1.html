@@ -749,13 +749,15 @@ document.addEventListener('click', (ev) => {
         obs.observe(target,{childList:true,subtree:true});
       }
 
-      // inicia chama do header (idempotente)
-      (function initChamaHeader(){
-        const H = document.getElementById('chama-header');
-        if(!H || H.dataset.bound==='1') return;
-        H.dataset.bound = '1';
-        if(!H.querySelector('.halo')) H.innerHTML = '<div class="halo"></div><div class="gota"></div><div class="brasa"></div>';
-      })();
+     /* Chama do header (título) sempre montada */
+(function ensureHeaderFlame(){
+  const H = document.getElementById('chama-header');
+  if (!H) return;
+  H.classList.add('chama-icone');
+  if (!H.querySelector('.halo')) {
+    H.innerHTML = '<div class="halo"></div><div class="gota"></div><div class="brasa"></div>';
+  }
+})();
 
       // ponte global
       window.toggleSenha = toggleSenha;
