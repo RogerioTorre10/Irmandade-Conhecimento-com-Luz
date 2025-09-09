@@ -756,6 +756,21 @@
     window.JC.showSection  = showSection;
     window.JC.Chama = window.JORNADA_CHAMA;
     
+ // === CHAMA DO HEADER ==================================================
+(function initChamaHeader(){
+  const H = document.getElementById('chama-header');
+  if (!H) return;
+  // se já estiver preenchido, não faz nada
+  if (H.dataset.bound === '1') return;
+  H.dataset.bound = '1';
+
+  // Garante a estrutura da chama (se algo limpou o HTML)
+  if (!H.querySelector('.halo')) {
+    H.innerHTML = '<div class="halo"></div><div class="gota"></div><div class="brasa"></div>';
+  }
+})();
+
+    
  // === VÍDEOS DA JORNADA ====================================================
 const VIDEO_BASE = '/assets/img/'; // se seus arquivos exigirem /public, troque para '/public/assets/img/'
 
