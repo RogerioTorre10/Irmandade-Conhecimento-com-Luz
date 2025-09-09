@@ -449,4 +449,37 @@ nav a, a.btn, .site-header p { letter-spacing:.5px; }
   0%,100%{ transform:translateX(-50%) scale(1);   opacity:.75 }
   50%    { transform:translateX(-50%) scale(1.06); opacity:1   }
 }
+/* ===== FONTES PADRÃO x EXCEÇÕES ===== */
+
+/* 1) Padrão do site inteiro */
+html, body,
+button, input, select, textarea {
+  font-family: 'ManufacturingConsent', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !important;
+  font-weight: 400;
+}
+
+/* 2) Somente os enunciados (perguntas) em Berkshire */
+.j-pergunta .pergunta-enunciado,
+.j-pergunta .pergunta-enunciado *,
+.j-pergunta .lumen-typing.pergunta-enunciado {
+  font-family: 'BerkshireSwash', cursive !important;
+  font-weight: 400 !important;
+  letter-spacing: .2px;
+}
+
+/* 3) Campos de resposta em Cardo */
+.j-pergunta textarea,
+.j-pergunta input[type="text"],
+.j-pergunta .input {
+  font-family: 'Cardo', Georgia, 'Times New Roman', serif !important;
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+
+/* Placeholder dos campos também em Cardo */
+.j-pergunta textarea::placeholder,
+.j-pergunta input[type="text"]::placeholder {
+  font-family: 'Cardo', Georgia, 'Times New Roman', serif !important;
+  opacity: .75;
+}
 
