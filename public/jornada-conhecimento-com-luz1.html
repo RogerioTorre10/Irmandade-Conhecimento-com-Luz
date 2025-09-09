@@ -873,7 +873,7 @@ window.JORNADA_VIDEOS = {
 
   console.log('[Filme0] hook instalado.');
 })(); // <-- NÃO REMOVER
-  </script>
+  <script>
   <script>
 ;(() => {
   if (typeof window.playTransition !== 'function') {
@@ -965,6 +965,48 @@ window.JORNADA_VIDEOS = {
       try { onEnd && onEnd(); } catch(_) {}
     });
   };
+})();
+<script>
+  <script>
+/* Silencia alert/confirm/prompt durante transições de vídeo */
+(function () {
+  function overlayVisivel() {
+    const ov = document.getElementById('videoOverlay');
+    return !!(ov && !ov.classList.contains('hidden'));
+  }
+  function emTransicao() {
+    return !!(window.__playingTransition || overlayVisivel());
+  }
+
+  const _alert  = window.alert;
+  const _confirm= window.confirm;
+  const _prompt = window.prompt;
+
+  window.alert = function (m) {
+    if (emTransicao()) { console.warn('[silenced alert]', m); return; }
+    return _alert(m);
+  };
+  window.confirm = function (m) {
+    if (emTransicao()) { console.warn('[silenced confirm]', m); return true; }
+    return _confirm(m);
+  };
+  window.prompt = function (m, d) {
+    if (emTransicao()) { console.warn('[silenced prompt]', m); return d || ''; }
+    return _prompt(m, d);
+  };
+
+  /* Marca/desmarca flag ao redor do playTransition já existente */
+  if (typeof window.playTransition === 'function') {
+    const _playTransition = window.playTransition;
+    window.playTransition = function (src, onEnd) {
+      window.__playingTransition = true;
+      const _done = function () {
+        try { onEnd && onEnd(); } finally { window.__playingTransition = false; }
+      };
+      try { return _playTransition.call(this, src, _done); }
+      catch (e) { window.__playingTransition = false; throw e; }
+    };
+  }
 })();
 <script>
 <script>
