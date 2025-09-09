@@ -707,42 +707,32 @@ document.addEventListener('click', (ev) => {
     })();
     
   // === FILME 0 — roda antes de iniciar, só com senha válida, e apenas 1x
-(function hookFilme0(){
-  if (hookFilme0._bound) return; hookFilme0._bound = true;
+ (function hookFilme0(){
+  if (typeof window.playTransition !== 'function' || typeof window.startJourney !== 'function') return;
 
-  const SENHAS_VALIDAS = ['iniciar','olho magico','olho mágico'];
-
-  document.addEventListener('click', function onClick(ev){
+  let jaRodou = false;
+  document.addEventListener('click', function(ev){
     const btn = ev.target.closest('[data-action="start"]');
-    if (!btn) return;
+    if (!btn || jaRodou) return;
 
-    const senhaEl = document.getElementById('senha');
-    const senhaVal = (senhaEl && senhaEl.value || '').trim().toLowerCase();
+    const senha = (document.getElementById('senha')?.value || '').trim().toLowerCase();
+    const ok = ['iniciar','olho magico','olho mágico'].includes(senha);
+    if (!ok) return; // deixa o startJourney avisar a senha errada
 
-    // senha inválida → deixa o fluxo normal (startJourney vai alertar)
-    if (!SENHAS_VALIDAS.includes(senhaVal)) return;
+    ev.preventDefault(); ev.stopPropagation();
+    jaRodou = true;
 
-    // só intercepta uma vez
-    if (hookFilme0._ran) return;
-    hookFilme0._ran = true;
-
-    ev.preventDefault();
-    ev.stopPropagation();
+    const intro = (window.JORNADA_VIDEOS && window.JORNADA_VIDEOS.intro) || '';
+    if (!intro) { try { startJourney(); } catch(_) {} return; }
 
     try {
-      const introSrc = window.JORNADA_VIDEOS && window.JORNADA_VIDEOS.intro;
-      if (introSrc) {
-        playTransition(introSrc, () => { try { startJourney(); } catch(e){ console.error(e); } });
-      } else {
-        startJourney();
-      }
-    } catch (e) {
-      console.warn('[Filme0] fallback sem vídeo:', e);
+      playTransition(intro, () => { try { startJourney(); } catch(_) {} });
+    } catch(_) {
       try { startJourney(); } catch(_) {}
     }
-  }, true); // capture: intercepta antes dos outros
+  }, true);
 })();
-  
+    
   /* ===== Boot ===== */
     function boot(){
       const route=(location.hash||'#intro').slice(1);
