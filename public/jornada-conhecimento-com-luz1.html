@@ -271,35 +271,69 @@
   /* ========================= CHAMA – API ========================= */
   window.JORNADA_CHAMA = {
     updateChama(scoreNum, targetId='chama-perguntas'){
-      const el=document.getElementById(targetId); if(!el) return;
-      if(!el.classList.contains('chama-viva')){
-        el.classList.add('chama-viva');
-        el.innerHTML = '<div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>';
-      }
-      const modo = (scoreNum <= -2) ? 'fraca' : (scoreNum >= 2) ? 'forte' : 'media';
-      el.dataset.intensidade = modo;
-      el.classList.add('chama-pico');
-      clearTimeout(el._pulse_t);
-      el._pulse_t=setTimeout(()=>el.classList.remove('chama-pico'),700);
-      const bola=document.getElementById('chama-bola');
-      if(bola){ bola.classList.add('chama-viva'); bola.dataset.intensidade=modo; }
-    },
-    ensureHeroFlame(sectionId){
-      const canvas=document.getElementById('jornada-canvas'); if(!canvas) return;
-      let hero=document.getElementById('chama-hero');
-      const show=(sectionId==='section-intro'||sectionId==='section-final');
-      if(show){
-        if(!hero){
-          hero=document.createElement('div'); hero.id='chama-hero';
-          hero.className='chama-viva chama-lg chama-strong chama-fixed-top';
-          hero.innerHTML='<div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>';
-          canvas.appendChild(hero);
-        }
-      } else if(hero){ hero.remove(); }
+   function ensureChamaIcon(el){
+  if (!el) return null;
+  // se veio da versão "viva", limpa pra evitar conflito de CSS
+  el.classList.remove('chama-viva');
+  el.classList.add('chama-icone');
+
+  if (!el.querySelector('.halo')) {
+    el.innerHTML = '<div class="halo"></div><div class="gota"></div><div class="brasa"></div>';
+  }
+  return el;
+}
+
+window.JORNADA_CHAMA = window.JORNADA_CHAMA || {};
+
+// Atualiza a chama de acordo com o score (usa a chama-icone)
+window.JORNADA_CHAMA.updateChama = function updateChamaTitulo(scoreNum, targetId='chama-perguntas'){
+  const el = (typeof targetId === 'string') ? document.getElementById(targetId) : targetId;
+  if (!el) return;
+
+  ensureChamaIcon(el);
+
+  // intensidade baseada no score
+  const modo = (scoreNum <= -2) ? 'fraca' : (scoreNum >= 2) ? 'forte' : 'media';
+  el.dataset.intensidade = modo;
+
+  // pequeno "pico" de animação
+  el.classList.add('chama-pico');
+  clearTimeout(el._pulse_t);
+  el._pulse_t = setTimeout(() => el.classList.remove('chama-pico'), 700);
+
+  // sincroniza o guia/flutuante se existir
+  const guia = document.getElementById('chama-bola');
+  if (guia) guia.dataset.intensidade = modo;
+};
+
+// Garante a chama-icone "hero" no canvas no intro/final
+window.JORNADA_CHAMA.ensureHeroFlame = function(sectionId){
+  const canvas = document.getElementById('jornada-canvas');
+  if (!canvas) return;
+
+  const show = (sectionId === 'section-intro' || sectionId === 'section-final');
+  let hero = document.getElementById('chama-hero');
+
+  if (show){
+    if (!hero){
+      hero = document.createElement('div');
+      hero.id = 'chama-hero';
+      hero.className = 'chama-icone chama-lg chama-fixed-top';
+      hero.innerHTML = '<div class="halo"></div><div class="gota"></div><div class="brasa"></div>';
+      hero.dataset.intensidade = 'media';
+      canvas.appendChild(hero);
+    } else {
+      ensureChamaIcon(hero);
+      if (!hero.dataset.intensidade) hero.dataset.intensidade = 'media';
     }
-  };
-  function updateChama(score){ window.JORNADA_CHAMA.updateChama(score); }
-  function ensureHeroFlame(sectionId){ window.JORNADA_CHAMA.ensureHeroFlame(sectionId); }
+  } else if (hero){
+    hero.remove();
+  }
+};
+
+// aliases compatíveis com o resto do código
+function updateChama(score, targetId){ window.JORNADA_CHAMA.updateChama(score, targetId); }
+function ensureHeroFlame(sectionId){ window.JORNADA_CHAMA.ensureHeroFlame(sectionId); }
 
   /* ========================= PROGRESSO & STORAGE ========================= */
   function updateProgress(){
