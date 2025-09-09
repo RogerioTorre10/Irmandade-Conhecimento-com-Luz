@@ -863,30 +863,27 @@ window.JORNADA_VIDEOS = {
 
   const ORIG = window.playTransition;
 
+ /* Silencia alert/confirm/prompt enquanto o overlay do vídeo estiver visível */
+(function(){
   function overlayVisivel(){
     const ov = document.getElementById('videoOverlay');
     return ov && !ov.classList.contains('hidden');
   }
-
-  function silenciarDuranteVideo(){
   const A = window.alert, C = window.confirm, P = window.prompt;
-  window.alert = function(m){ if(overlayVisivel()){ console.warn('[alert suprimido durante vídeo]', m); return; } return A(m); };
-  window.confirm = function(m){ if(overlayVisivel()){ console.warn('[confirm suprimido durante vídeo]', m); return false; } return C(m); };
-  window.prompt = function(m,d){ if(overlayVisivel()){ console.warn('[prompt suprimido durante vídeo]', m); return null; } return P(m,d); };
-})();
 
-    window.alert = function(msg){
-      if (overlayVisivel()) { console.warn('[alert suprimido durante vídeo]:', msg); return; }
-      return origAlert(msg);
-    };
-    window.confirm = function(msg){
-      if (overlayVisivel()) { console.warn('[confirm suprimido durante vídeo]:', msg); return false; }
-      return origConfirm(msg);
-    };
-    window.prompt = function(msg, def){
-      if (overlayVisivel()) { console.warn('[prompt suprimido durante vídeo]:', msg); return null; }
-      return origPrompt(msg, def);
-    };
+  window.alert = function(msg){
+    if (overlayVisivel()){ console.warn('[alert suprimido durante vídeo]', msg); return; }
+    return A(msg);
+  };
+  window.confirm = function(msg){
+    if (overlayVisivel()){ console.warn('[confirm suprimido durante vídeo]', msg); return false; }
+    return C(msg);
+  };
+  window.prompt = function(msg, def){
+    if (overlayVisivel()){ console.warn('[prompt suprimido durante vídeo]', msg); return null; }
+    return P(msg, def);
+  };
+})();
 
     return () => {
       window.alert   = origAlert;
