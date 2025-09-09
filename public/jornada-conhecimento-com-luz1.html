@@ -418,94 +418,88 @@
       input.type = (input.type==='password' ? 'text' : 'password');
     }
 
-    function goNext(){
+  function goNext(){
   const current = document.querySelector('.j-pergunta.active');
-  if(!current) return;
+  if (!current) return;
 
   const bloco = current.closest('.j-bloco');
-  const perguntas = Array.from(bloco.querySelectorAll('.j-pergunta'));
-  const i = perguntas.indexOf(current);
+  const perguntasDoBloco = Array.from(bloco.querySelectorAll('.j-pergunta'));
+  const i = perguntasDoBloco.indexOf(current);
 
-  // sai da pergunta atual
+  // avança dentro do mesmo bloco
   current.classList.remove('active');
-
-  // ainda tem pergunta neste bloco
-  if (i + 1 < perguntas.length) {
-    const prox = perguntas[i + 1];
+  if (i + 1 < perguntasDoBloco.length) {
+    const prox = perguntasDoBloco[i + 1];
     prox.classList.add('active');
     runTyping(prox);
     updateProgress();
     return;
   }
 
-  // acabou o bloco → prepara transição
-  const blocoIdx = parseInt(bloco.dataset.bloco || '0', 10);
-  const videoSrc = (window.JORNADA_BLOCKS[blocoIdx]?.video_after) || '';
+  // terminou o bloco → toca video_after (se houver) e só então mostra o próximo bloco
+  const blocos = Array.from(document.querySelectorAll('.j-bloco'));
+  const idxBloco = blocos.indexOf(bloco);
+  const temProx = idxBloco + 1 < blocos.length;
 
-  const abrirProximoBloco = () => {
-    const proxBloco = document.querySelector('.j-bloco[data-bloco="' + (blocoIdx + 1) + '"]');
-    if (proxBloco) {
-      document.querySelectorAll('.j-bloco').forEach(b => b.style.display = 'none');
+  const irAdiante = () => {
+    if (temProx) {
+      blocos.forEach(b => b.style.display = 'none');
+      const proxBloco = blocos[idxBloco + 1];
       proxBloco.style.display = 'block';
-      const p0 = proxBloco.querySelector('.j-pergunta');
-      if (p0){ p0.classList.add('active'); runTyping(p0); }
+      const primeira = proxBloco.querySelector('.j-pergunta');
+      if (primeira) { primeira.classList.add('active'); runTyping(primeira); }
       updateProgress();
-      return;
-    }
-    // não existe próximo bloco → final
-    if (window.JORNADA_FINAL_VIDEO) {
-      playTransition(window.JORNADA_FINAL_VIDEO, () => showSection('section-final'));
     } else {
-      showSection('section-final');
+      // acabou tudo → vídeo final (se existir) e página final
+      if (window.JORNADA_FINAL_VIDEO) {
+        playTransition(window.JORNADA_FINAL_VIDEO, () => showSection('section-final'));
+      } else {
+        showSection('section-final');
+      }
+      updateProgress();
     }
-    updateProgress();
   };
 
-  // se existe próximo bloco, toca vídeo do bloco; senão, finaliza
-  const existeProx = !!document.querySelector('.j-bloco[data-bloco="' + (blocoIdx + 1) + '"]');
-  if (existeProx) {
-    if (videoSrc) playTransition(videoSrc, abrirProximoBloco);
-    else abrirProximoBloco();
-  } else {
-    abrirProximoBloco();
-  }
+  const idx = Number(bloco.dataset.bloco || idxBloco);
+  const src = (window.JORNADA_BLOCKS[idx] && window.JORNADA_BLOCKS[idx].video_after) || '';
+  if (src) playTransition(src, irAdiante); else irAdiante();
 }
 
-    function goPrev(){
+function goPrev(){
   const current = document.querySelector('.j-pergunta.active');
-  if(!current) return;
+  if (!current) return;
 
   const bloco = current.closest('.j-bloco');
-  const perguntas = Array.from(bloco.querySelectorAll('.j-pergunta'));
-  const i = perguntas.indexOf(current);
+  const perguntasDoBloco = Array.from(bloco.querySelectorAll('.j-pergunta'));
+  const i = perguntasDoBloco.indexOf(current);
 
   current.classList.remove('active');
 
-  // ainda tem pergunta anterior neste bloco
+  // volta dentro do bloco
   if (i - 1 >= 0) {
-    const prev = perguntas[i - 1];
+    const prev = perguntasDoBloco[i - 1];
     prev.classList.add('active');
     runTyping(prev);
     updateProgress();
     return;
   }
 
-  // voltar para o bloco anterior
-  const blocoIdx = parseInt(bloco.dataset.bloco || '0', 10);
-  const prevBloco = document.querySelector('.j-bloco[data-bloco="' + (blocoIdx - 1) + '"]');
+  // volta ao bloco anterior
+  const blocos = Array.from(document.querySelectorAll('.j-bloco'));
+  const idxBloco = blocos.indexOf(bloco);
+  const temAnterior = idxBloco - 1 >= 0;
 
-  if (prevBloco) {
-    document.querySelectorAll('.j-bloco').forEach(b => b.style.display = 'none');
-    prevBloco.style.display = 'block';
-    const ultima = Array.from(prevBloco.querySelectorAll('.j-pergunta')).pop();
-    if (ultima){ ultima.classList.add('active'); runTyping(ultima); }
+  if (temAnterior) {
+    blocos.forEach(b => b.style.display = 'none');
+    const ant = blocos[idxBloco - 1];
+    ant.style.display = 'block';
+    const ultima = ant.querySelector('.j-pergunta:last-child');
+    if (ultima) { ultima.classList.add('active'); runTyping(ultima); }
     updateProgress();
   } else {
     showSection('section-intro');
   }
 }
-
-
     /* =========================
        VÍDEO (overlay)
     ==========================*/
