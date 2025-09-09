@@ -916,6 +916,45 @@ window.JORNADA_VIDEOS = {
     if (isFinal) setTimeout(() => { try { restore && restore(); } catch(_){} }, 20000);
   };
 })();
+    <script>
+;(() => {
+  if (typeof window.showSection !== 'function' || typeof window.playTransition !== 'function') {
+    console.warn('[FinalLock] showSection/playTransition indisponível.');
+    return;
+  }
+
+  // 1) Wrap de showSection: respeita um lock temporário para a página final
+  const _origShow = window.showSection;
+  const LOCK_MS = 1500;           // tempo de proteção após o vídeo final (1.5s)
+  let ROUTE_LOCK_UNTIL = 0;
+
+  window.showSection = function(sectionId){
+    const locked = Date.now() < ROUTE_LOCK_UNTIL;
+    // Se estamos protegendo o final, ignore tentativas de trocar para outra seção
+    if (locked && sectionId !== 'section-final') {
+      console.warn('[FinalLock] Ignorando troca de seção durante lock:', sectionId);
+      return;
+    }
+    return _origShow.apply(this, arguments);
+  };
+
+  // 2) Wrap de playTransition: quando for o vídeo final, fixa hash e ativa lock
+  const _origPlay = window.playTransition;
+  window.playTransition = function(src, onEnd){
+    const isFinal = (window.JORNADA_FINAL_VIDEO && src === window.JORNADA_FINAL_VIDEO);
+
+    return _origPlay(src, function(){
+      if (isFinal) {
+        // fixa rota e mostra final imediatamente
+        try { location.hash = '#final'; } catch(_) {}
+        ROUTE_LOCK_UNTIL = Date.now() + LOCK_MS;
+        try { _origShow('section-final'); } catch(_) {}
+      }
+      try { onEnd && onEnd(); } catch(_) {}
+    });
+  };
+})();
+</script>
 </script>
       
   <!-- Referências externas (mantidas para evitar 404, mas não necessárias) -->
