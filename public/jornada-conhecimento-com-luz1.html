@@ -637,16 +637,54 @@ function ensureHeroFlame(sectionId){ window.JORNADA_CHAMA.ensureHeroFlame(sectio
 
   // FILME 0 — toca 1x antes de iniciar
   (function hookFilme0(){
-    if (typeof window.playTransition !== 'function') return;
-    let once = false;
-    document.addEventListener('click', function onClickStart(ev){
-      const btn = ev.target.closest('[data-action="start"]');
-      if (!btn || once) return;
-      once = true; ev.preventDefault(); ev.stopPropagation();
-      playTransition(window.JORNADA_VIDEOS.intro, () => { try{ startJourney(); }catch(e){ console.error(e); } });
-    }, true);
-    console.log('[Filme0] hook instalado.');
-  })();
+  <script>
+/* FILME 0: só roda se a senha estiver OK; do contrário não toca nada */
+(function hookFilme0(){
+  if (typeof window.playTransition !== 'function') {
+    console.warn('[Filme0] playTransition indisponível.');
+    return;
+  }
+  if (typeof window.startJourney !== 'function') {
+    console.warn('[Filme0] startJourney indisponível.');
+    return;
+  }
+
+  let jaRodou = false;
+
+  document.addEventListener('click', function onStart(ev){
+    const btn = ev.target.closest('[data-action="start"]');
+    if (!btn) return;
+
+    // valida senha
+    const senhaEl = document.getElementById('senha');
+    const v = (senhaEl?.value || '').trim().toLowerCase();
+    const ok = ['iniciar','olho magico','olho mágico'].includes(v);
+
+    if (!ok) return;           // senha inválida → deixa o fluxo normal avisar
+
+    if (jaRodou) return;       // garante 1x
+    jaRodou = true;
+
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    try {
+      const src = (window.JORNADA_VIDEOS && window.JORNADA_VIDEOS.intro)
+                || '/assets/img/filme-0-ao-encontro-da-jornada.mp4';
+
+      playTransition(src, () => {
+        try { window.startJourney(); }
+        catch (e) { console.error('[Filme0] startJourney falhou:', e); }
+      });
+    } catch (e) {
+      console.error('[Filme0] falha ao iniciar vídeo 0:', e);
+      try { window.startJourney(); } catch (_) {}
+    }
+  }, true); // CAPTURA: intercepta antes de outros handlers
+
+  console.log('[Filme0] hook instalado.');
+})();
+</script>
 
   // Silenciar alert/confirm/prompt enquanto vídeo estiver visível
   (function silenceDialogsDuringVideo(){
@@ -701,21 +739,5 @@ function ensureHeroFlame(sectionId){ window.JORNADA_CHAMA.ensureHeroFlame(sectio
   window.JC.showSection  = showSection;
   window.JC.Chama = window.JORNADA_CHAMA;
   </script>
-
-  <!-- Referências externas (mantidas para evitar 404, mas não necessárias) -->
-  <script defer src="/config.js" onerror="console.error('Falha ao carregar config.js, usando fallback inline');"></script>
-  <script defer src="/jornada-utils.js" onerror="console.error('Falha ao carregar jornada-utils.js, usando fallback inline');"></script>
-  <script defer src="/jornada-core.js" onerror="console.error('Falha ao carregar jornada-core.js, usando fallback inline');"></script>
-  <script defer src="/jornada-auth.js" onerror="console.error('Falha ao carregar jornada-auth.js, usando fallback inline');"></script>
-  <script defer src="/jornada-chama.js" onerror="console.error('Falha ao carregar jornada-chama.js, usando fallback inline');"></script>
-  <script defer src="/jornada-paper-qa.js" onerror="console.error('Falha ao carregar jornada-paper-qa.js, usando fallback inline');"></script>
-  <script defer src="/jornada-typing.js" onerror="console.error('Falha ao carregar jornada-typing.js, usando fallback inline');"></script>
-  <script defer src="/jornada-controller.js" onerror="console.error('Falha ao carregar jornada-controller.js, usando fallback inline');"></script>
-  <script defer src="/jornada-progress-inline.js" onerror="console.error('Falha ao carregar jornada-progress-inline.js, usando fallback inline');"></script>
-  <script defer src="/jornada-render.js" onerror="console.error('Falha ao carregar jornada-render.js, usando fallback inline');"></script>
-  <script defer src="/jornada-bootstrap.js" onerror="console.error('Falha ao carregar jornada-bootstrap.js, usando fallback inline');"></script>
-  <script defer src="/jornada-micro.js" onerror="console.error('Falha ao carregar jornada-micro.js, usando fallback inline');"></script>
-  <script defer src="/i18n/i18n.js" onerror="console.error('Falha ao carregar i18n.js, usando fallback inline');"></script>
-  <script defer src="/api.js" onerror="console.error('Falha ao carregar api.js, usando fallback inline');"></script>
 </body>
 </html>
