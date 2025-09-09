@@ -424,23 +424,67 @@
   }
 
   function playTransition(src,onEnd){
-    const overlay=document.getElementById('videoOverlay');
-    const video=document.getElementById('videoTransicao');
-    const skip=document.getElementById('skipVideo');
-    if(overlay && video && src){
-      video.src=src; overlay.classList.remove('hidden');
-      const cleanup=()=>{ try{video.pause();}catch(e){} overlay.classList.add('hidden'); video.removeAttribute('src'); video.load(); onEnd&&onEnd(); };
-      video.onended=cleanup;
-      video.onerror=()=>{ console.warn('Vídeo não carregou:',src); cleanup(); };
-      if(skip) skip.onclick=cleanup;
-      video.muted=false;
-      // flag de transição (usada para silenciar alerts)
-      window.__playingTransition = true;
-      video.play().catch(err=>{ console.warn('Erro ao reproduzir vídeo:',err); cleanup(); }).finally(()=>{});
-      // failsafe
-      setTimeout(()=>{ window.__playingTransition=false; }, 20000);
-    } else { onEnd&&onEnd(); }
-  }
+  const overlay=document.getElementById('videoOverlay');
+  const video=document.getElementById('videoTransicao');
+  const skip=document.getElementById('skipVideo');
+
+  if(!(overlay && video && src)){ onEnd && onEnd(); return; }
+
+  const cleanup = () => {
+    try{ video.pause(); }catch(_){}
+    overlay.classList.add('hidden');
+    video.removeAttribute('src'); video.load();
+    document.body.style.overflow = '';          // libera scroll
+    window.__playingTransition = false;
+    try{ onEnd && onEnd(); }catch(_){}
+  };
+
+  document.body.style.overflow = 'hidden';      // trava scroll
+  window.__playingTransition = true;
+
+  video.src = src;
+  overlay.classList.remove('hidden');
+
+  video.onended = cleanup;
+  video.onerror = () => { console.warn('Vídeo não carregou:', src); cleanup(); };
+  if (skip) skip.onclick = cleanup;
+
+  video.muted = false;
+  video.play().catch(err => { console.warn('Erro ao reproduzir vídeo:', err); cleanup(); });
+
+  // failsafe: se algo travar, garante saída
+  setTimeout(() => { if (!overlay.classList.contains('hidden')) cleanup(); }, 30000);
+}
+// Trava a rota por 1.5s depois do VÍDEO FINAL e força exibir o final
+(() => {
+  if (typeof window.showSection !== 'function' || typeof window.playTransition !== 'function') return;
+
+  const _origShow = window.showSection;
+  const _origPlay = window.playTransition;
+  let LOCK_UNTIL = 0;
+
+  window.showSection = function(id){
+    const locked = Date.now() < LOCK_UNTIL;
+    if (locked && id !== 'section-final') {
+      console.warn('[FinalLock] Ignorando troca de seção durante lock:', id);
+      return;
+    }
+    return _origShow.apply(this, arguments);
+  };
+
+  window.playTransition = function(src, cb){
+    const isFinal = (window.JORNADA_FINAL_VIDEO && src === window.JORNADA_FINAL_VIDEO);
+    return _origPlay(src, function(){
+      if (isFinal) {
+        try { location.hash = '#final'; } catch(_){}
+        LOCK_UNTIL = Date.now() + 1500;
+        try { _origShow('section-final'); } catch(_){}
+      }
+      cb && cb();
+    });
+  };
+})();
+
 
   function finalize(){
     const respostas={}; document.querySelectorAll('.j-pergunta textarea').forEach((input,idx)=>{ respostas[`q${idx}`]=input.value||''; });
