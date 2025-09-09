@@ -589,16 +589,18 @@
       });
 
       document.addEventListener('click',(ev)=>{
-        const aNext = ev.target.closest('[data-action="next"]');
-        const aPrev = ev.target.closest('[data-action="prev"]');
-        const aStart= ev.target.closest('[data-action="start"]');
-        const aToggle= ev.target.closest('[data-action="toggle-password"], .password-toggle');
+  const aNext   = ev.target.closest('[data-action="next"]');
+  const aPrev   = ev.target.closest('[data-action="prev"]');
+  const aStart  = ev.target.closest('[data-action="start"]');
+  const aToggle = ev.target.closest('[data-action="toggle-password"], .password-toggle');
+  const aRestart= ev.target.closest('[data-action="restart"]');
 
-        if(aNext){ ev.preventDefault(); goNext(); }
-        if(aPrev){ ev.preventDefault(); goPrev(); }
-        if(aStart){ /* interceptado pelo filme 0 se válido */ startJourney(); }
-        if(aToggle){ ev.preventDefault(); toggleSenha(); }
-      });
+  if(aNext){ ev.preventDefault(); goNext(); }
+  if(aPrev){ ev.preventDefault(); goPrev(); }
+  if(aStart){ /* filme 0 intercepta se senha ok */ startJourney(); }
+  if(aToggle){ ev.preventDefault(); toggleSenha(); }
+  if(aRestart){ ev.preventDefault(); location.reload(); }
+});
 
       console.log('Controlador da jornada inicializado!');
     }
