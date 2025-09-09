@@ -330,9 +330,24 @@ nav a, a.btn, .site-header p { letter-spacing:.5px; }
 .j-pergunta { display: none; }       /* todas perguntas ocultas (JS mostra a atual) */
 
 /* Overlay de vídeo (já tem, reforço aqui caso precise) */
-.video-overlay { position:fixed; inset:0; background:rgba(0,0,0,.85); display:flex; align-items:center; justify-content:center; z-index:9999; }
-.video-overlay.hidden { display:none; }
-
+#videoOverlay{
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,.85);
+  display: none;            /* hidden por padrão */
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;            /* bem acima de tudo */
+}
+#videoOverlay:not(.hidden){ display:flex; }  /* quando remover .hidden, vira flex */
+.video-player{
+  display:block;
+  width: min(900px, 92vw);
+  max-height: 75vh;
+  background:#000;
+}
 /* ==== HOME (escopado) ==== */
 .home .hero        { /* regras da faixa inicial da home */ }
 .home .card.invite { /* cards de convites da home */ }
