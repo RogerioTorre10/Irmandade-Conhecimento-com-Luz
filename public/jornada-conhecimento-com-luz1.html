@@ -6,7 +6,7 @@
   <title>Jornada • Irmandade Conhecimento com Luz</title>
   <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png" />
 
-  <!-- Fonts: Google para Berkshire/Cardo (evita OTS do .ttf local) -->
+  <!-- Fonts: Google para Berkshire/Cardo -->
   <link href="https://fonts.googleapis.com/css2?family=Berkshire+Swash&family=Cardo:wght@400;700&display=swap" rel="stylesheet" />
 
   <!-- ManufacturingConsent local -->
@@ -27,7 +27,7 @@
     }
 
     :root {
-      --bg: #1a1a1a; /* Fundo escuro para destacar a chama */
+      --bg: #1a1a1a;
       --ink: #f9f9f3;
       --ink-soft: #ccc;
       --brand: #6b21a8;
@@ -67,63 +67,63 @@
       text-shadow: 0 0 10px hsla(28, 96%, 60%, .7);
       margin: 0;
     }
-    /* Comentário: Estilo base da chama-vela, ajustado para formato de vela (base larga, meio gordinho, ponta fina) */
+    /* Comentário: Estilo base da chama-vela, ajustado para formato de vela com base larga e topo afunilado */
     .chama-vela {
-      --altura: 90px; --largura: 60px; --pulso: 1.5s; --glow: 15px; --hue: 28; --satur: 96%; --light: 58%; --op: .98;
+      --altura: 90px; --largura: 60px; --pulso: 1.4s; --glow: 15px; --hue: 28; --satur: 96%; --light: 58%; --op: .98;
       position: relative; width: var(--largura); height: var(--altura); display: inline-block;
-      filter: drop-shadow(0 0 var(--glow) hsla(var(--hue), var(--satur), 60%, .70));
+      filter: drop-shadow(0 0 var(--glow) hsla(var(--hue), var(--satur), 60%, .75));
     }
-    /* Comentário: Ajustes para tamanhos diferentes das chamas */
-    .chama-vela.chama-md { --largura: 80px; --altura: 180px } /* Tamanho médio, usado na chama inferior */
-    .chama-vela.chama-lg { --largura: 60px; --altura: 120px } /* Tamanho grande, usado no cabeçalho */
-    /* Comentário: Estilo da brasa, base da chama com gradiente suave */
+    /* Comentário: Tamanhos para chamas média (inferior) e grande (cabeçalho) */
+    .chama-vela.chama-md { --largura: 80px; --altura: 180px }
+    .chama-vela.chama-lg { --largura: 60px; --altura: 120px }
+    /* Comentário: Brasas com base mais larga e ovulada */
     .chama-vela .brasa {
-      position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: calc(var(--largura) * 1.0); height: 14px;
-      border-radius: 50% 50% 40% 40%; /* Base mais ovulada */
+      position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: calc(var(--largura) * 1.2); height: 16px;
+      border-radius: 50% 50% 40% 40%; /* Base ovulada */
       background: radial-gradient(circle at 50% 40%, hsla(var(--hue), var(--satur), 95%, .95) 0%, hsla(var(--hue), var(--satur), 70%, .85) 50%, transparent 80%);
       filter: blur(2px); animation: brasaPulse var(--pulso) ease-in-out infinite; opacity: var(--op)
     }
-    /* Comentário: Estilo da língua da chama, com formato de vela e gradiente vibrante */
+    /* Comentário: Língua da chama com formato de vela, topo mais fino e gradiente vibrante */
     .chama-vela .lingua {
       position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: calc(var(--largura) * 1.0); height: calc(var(--altura) * 1.0);
-      border-radius: 50% 50% 10% 10%; /* Topo afunilado para ponta fina */
+      border-radius: 50% 50% 8% 8%; /* Topo ainda mais afunilado */
       background: radial-gradient(
         ellipse at center,
-        rgba(255, 147, 41, 0.9) 0%, /* Centro vibrante */
-        rgba(255, 69, 0, 0.7) 50%, /* Meio gordinho */
-        rgba(139, 0, 0, 0.3) 70%, /* Escurecimento na borda */
+        rgba(255, 165, 0, 0.95) 0%, /* Centro mais vibrante */
+        rgba(255, 69, 0, 0.75) 50%, /* Meio gordinho */
+        rgba(200, 20, 20, 0.3) 70%, /* Borda escura e vibrante */
         transparent 100%
       );
-      mix-blend-mode: screen; filter: blur(1px); transform-origin: 50% 100%; animation: velaWaver 1.5s ease-in-out infinite; opacity: var(--op);
-      -webkit-mask: radial-gradient(60% 90% at 50% 8%, #000 70%, transparent 74%);
-      mask: radial-gradient(60% 90% at 50% 8%, #000 70%, transparent 74%)
+      mix-blend-mode: screen; filter: blur(1.2px); transform-origin: 50% 100%; animation: velaWaver 1.4s ease-in-out infinite; opacity: var(--op);
+      -webkit-mask: radial-gradient(60% 90% at 50% 6%, #000 68%, transparent 72%);
+      mask: radial-gradient(60% 90% at 50% 6%, #000 68%, transparent 72%)
     }
-    /* Comentário: Ajustes nas línguas internas para camadas da chama */
-    .chama-vela .lingua:nth-child(2) { width: calc(var(--largura) * .80); height: calc(var(--altura) * .90); animation-duration: 1.8s; animation-delay: .05s; filter: blur(.8px) }
-    .chama-vela .lingua:nth-child(3) { width: calc(var(--largura) * .65); height: calc(var(--altura) * .80); animation-duration: 2.1s; animation-delay: .10s; filter: blur(.6px) }
-    /* Comentário: Brilho externo da chama, com efeito de luz suave */
+    /* Comentário: Camadas internas da chama para profundidade */
+    .chama-vela .lingua:nth-child(2) { width: calc(var(--largura) * .85); height: calc(var(--altura) * .92); animation-duration: 1.7s; animation-delay: .06s; filter: blur(1px) }
+    .chama-vela .lingua:nth-child(3) { width: calc(var(--largura) * .70); height: calc(var(--altura) * .82); animation-duration: 2.0s; animation-delay: .12s; filter: blur(.8px) }
+    /* Comentário: Brilho com maior difusão para vibração */
     .chama-vela .brilho {
-      position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: calc(var(--largura) * 1.4); height: calc(var(--altura) * 1.2);
-      background: radial-gradient(circle, hsla(var(--hue), var(--satur), 72%, .40) 0%, transparent 70%); filter: blur(15px); mix-blend-mode: screen; animation: aura var(--pulso) ease-in-out infinite; opacity: .70; pointer-events: none
+      position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: calc(var(--largura) * 1.5); height: calc(var(--altura) * 1.3);
+      background: radial-gradient(circle, hsla(var(--hue), var(--satur), 72%, .45) 0%, transparent 70%); filter: blur(18px); mix-blend-mode: screen; animation: aura var(--pulso) ease-in-out infinite; opacity: .75; pointer-events: none
     }
-    /* Comentário: Ajustes de intensidade da chama (fraca, média, forte) */
-    .chama-vela.fraca { --altura: 70px; --largura: 50px; --pulso: 2.0s; --glow: 10px; --hue: 36; --satur: 86%; --light: 66%; --op: .70 }
-    .chama-vela.media { --altura: 90px; --largura: 60px; --pulso: 1.5s; --glow: 15px; --hue: 28; --satur: 96%; --light: 58%; --op: .98 }
-    .chama-vela.forte { --altura: 110px; --largura: 70px; --pulso: 1.0s; --glow: 20px; --hue: 20; --satur: 100%; --light: 52%; --op: 1 }
-    /* Comentário: Posicionamento da chama inferior no canto inferior direito */
+    /* Comentário: Intensidades da chama (fraca, média, forte) */
+    .chama-vela.fraca { --altura: 70px; --largura: 50px; --pulso: 1.8s; --glow: 10px; --hue: 36; --satur: 86%; --light: 66%; --op: .70 }
+    .chama-vela.media { --altura: 90px; --largura: 60px; --pulso: 1.4s; --glow: 15px; --hue: 28; --satur: 96%; --light: 58%; --op: .98 }
+    .chama-vela.forte { --altura: 110px; --largura: 70px; --pulso: 0.9s; --glow: 20px; --hue: 20; --satur: 100%; --light: 52%; --op: 1 }
+    /* Comentário: Posicionamento da chama inferior */
     .flame-corner { position: fixed; z-index: 1200; pointer-events: none }
-    .flame-bottom-right { bottom: 20px; right: 20px } /* Ajustado para canto inferior direito */
-    /* Comentário: Chama do cabeçalho com tamanho específico */
+    .flame-bottom-right { bottom: 20px; right: 20px }
+    /* Comentário: Chama do cabeçalho */
     #chama-header .chama-vela { --largura: 60px; --altura: 120px }
-    /* Comentário: Animações da chama */
+    /* Comentário: Animações com mais vibração */
     @keyframes velaWaver { 
       0%, 100% { transform: translateX(-50%) scaleY(1.00) skewX(0deg) }
-      25% { transform: translateX(calc(-50% + .8px)) scaleY(1.05) skewX(.8deg) }
-      50% { transform: translateX(-50%) scaleY(1.10) skewX(1.4deg) }
-      75% { transform: translateX(calc(-50% - .7px)) scaleY(1.04) skewX(.6deg) }
+      25% { transform: translateX(calc(-50% + 1px)) scaleY(1.08) skewX(1deg) }
+      50% { transform: translateX(-50%) scaleY(1.15) skewX(1.8deg) }
+      75% { transform: translateX(calc(-50% - 0.8px)) scaleY(1.06) skewX(0.8deg) }
     }
-    @keyframes brasaPulse { 0%, 100% { transform: translateX(-50%) scale(1); opacity: .75 } 50% { transform: translateX(-50%) scale(1.08); opacity: 1 } }
-    @keyframes aura { 0%, 100% { opacity: .60 } 50% { opacity: .85 } }
+    @keyframes brasaPulse { 0%, 100% { transform: translateX(-50%) scale(1); opacity: .80 } 50% { transform: translateX(-50%) scale(1.10); opacity: 1 } }
+    @keyframes aura { 0%, 100% { opacity: .65 } 50% { opacity: .90 } }
     @media (prefers-reduced-motion: reduce) {
       .chama-vela .lingua, .chama-vela .brasa, .chama-vela .brilho { animation: none !important }
     }
@@ -751,7 +751,7 @@
       video.pause();
       video.removeAttribute('src');
       video.load();
-      video.currentTime = 0; // Forçar início do vídeo após load
+      video.currentTime = 0;
 
       video.controls = true;
       video.muted = false;
@@ -791,28 +791,27 @@
         if (!video.videoWidth || !video.videoHeight) {
           console.warn('[Vídeo] Apenas áudio detectado:', src);
           video.classList.add('hidden');
-          favicon.classList.remove('hidden');
-          setTimeout(cleanup, 5000);
+          fallback.classList.remove('hidden');
         }
-        video.currentTime = 0; // Reforçar início
-        if (video.readyState >= 1) { // HAVE_METADATA
+        video.currentTime = 0;
+        if (video.readyState >= 1) {
           setTimeout(() => {
             console.log('[Vídeo] Iniciando reprodução:', src, 'Tempo atual:', video.currentTime);
             video.play().catch(err => {
               console.error('[Vídeo] Falha ao reproduzir:', err);
               video.classList.add('hidden');
-              favicon.classList.remove('hidden');
+              fallback.classList.remove('hidden');
               setTimeout(cleanup, 5000);
             });
-          }, 500); // Aumentado pra 500ms
+          }, 500);
         } else {
           console.warn('[Vídeo] readyState insuficiente:', video.readyState);
           setTimeout(() => cleanup(), 5000);
         }
       };
 
-      video.src = src + '?t=' + Date.now(); // Evitar cache
-      setTimeout(cleanup, 120000); // Timeout de 120s para vídeos longos
+      video.src = src + '?t=' + Date.now();
+      setTimeout(cleanup, 120000);
     }
 
     window.playTransition = playTransition;
@@ -875,7 +874,7 @@
     }
 
     function proceedToQuestions() {
-      isTransitioning = false; // Resetar antes de carregar perguntas
+      isTransitioning = false;
       console.log('[proceedToQuestions] Resetando isTransitioning:', isTransitioning);
       showSection('section-perguntas');
       loadDynamicBlocks();
