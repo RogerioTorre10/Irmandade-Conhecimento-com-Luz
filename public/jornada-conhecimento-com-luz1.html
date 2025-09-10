@@ -254,7 +254,7 @@
   <!-- OVERLAY VIDEO -->
   <div id="videoOverlay" class="hidden">
     <video id="videoTransicao" class="video-player" playsinline preload="metadata" controls></video>
-    <div id="videoFallback" class="video-fallback hidden">Áudio da jornada em reprodução. Para ver o vídeo, use o formato H.264 MP4.</div>
+    <div id="videoFallback" class="video-fallback hidden">Áudio da jornada em reprodução. Para ver o vídeo, converta para o formato H.264 MP4 (use FFmpeg: ffmpeg -i input.mp4 -c:v libx264 -c:a aac output.mp4).</div>
     <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
   </div>
 
@@ -606,12 +606,10 @@
         console.log('[goNext] Tentando tocar vídeo do bloco', idxBloco, ':', src);
         playTransition(src, () => {
           irAdiante();
-          isTransitioning = false;
         });
       } else {
         console.warn('[goNext] Nenhum vídeo associado ao bloco', idxBloco);
         irAdiante();
-        isTransitioning = false;
       }
     }
 
@@ -717,6 +715,7 @@
       const cleanup = () => {
         if (ended) return;
         ended = true;
+        isTransitioning = false;
         window.__playingTransition = false;
         video.pause();
         overlay.classList.add('hidden');
@@ -725,21 +724,21 @@
         video.removeAttribute('src');
         video.load();
         console.log('[playTransition] Transição concluída para:', src);
-        isTransitioning = false;
-        setTimeout(() => onEnd && onEnd(), 100); // Pequeno delay pra evitar conflitos
+        onEnd && onEnd();
       };
 
       video.onerror = () => {
         console.error('[Vídeo] Erro ao carregar:', src);
         video.classList.add('hidden');
         fallback.classList.remove('hidden');
-        alert('Não foi possível carregar o vídeo: ' + src + '. Use o formato H.264 MP4.');
+        alert('Não foi possível carregar o vídeo: ' + src + '. Converta para H.264 MP4 (ex.: ffmpeg -i input.mp4 -c:v libx264 -c:a aac output.mp4).');
         setTimeout(cleanup, 5000);
       };
       video.onended = cleanup;
       if (skip) skip.onclick = cleanup;
 
       video.onloadedmetadata = () => {
+        console.log('[Vídeo] Metadados carregados:', src, 'Dimensões:', video.videoWidth, 'x', video.videoHeight);
         if (!video.videoWidth || !video.videoHeight) {
           console.warn('[Vídeo] Apenas áudio detectado:', src);
           video.classList.add('hidden');
