@@ -164,7 +164,7 @@
     #videoOverlay { position: fixed; inset: 0; background: rgba(0,0,0,.85); display: flex; justify-content: center; align-items: center; z-index: 2000 }
     #videoOverlay.hidden { display: none }
     .video-player { max-width: 90vw; max-height: 80vh; background: #000 }
-    .video-fallback { max-width: 90vw; max-height: 80vh; background: url('/assets/img/pergaminho-rasgado-vert.png') center/cover no-repeat; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem; text-align: center; padding: 20px }
+    .video-fallback { max-width: 90vw; max-height: 80vh; background: url('/assets/img/perfil-da-irmandade.png') center/cover no-repeat; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem; text-align: center; padding: 20px; font-family: "Berkshire Swash", cursive; }
 
     .site-footer { text-align: center; padding: 14px; color: #555; font-size: .85rem }
     .password-form { margin-top: 16px; text-align: center }
@@ -254,7 +254,7 @@
   <!-- OVERLAY VIDEO -->
   <div id="videoOverlay" class="hidden">
     <video id="videoTransicao" class="video-player" playsinline preload="metadata" controls></video>
-    <div id="videoFallback" class="video-fallback hidden">Não foi possível carregar o vídeo. Verifique se o arquivo existe no servidor (/assets/img/) e está no formato H.264 MP4.</div>
+    <div id="videoFallback" class="video-fallback hidden">Áudio da jornada em reprodução. Para ver o vídeo, use o formato H.264 MP4.</div>
     <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
   </div>
 
@@ -683,6 +683,7 @@
         return;
       }
       isTransitioning = true;
+      console.log('[playTransition] Iniciando transição para:', src);
 
       const overlay = document.getElementById('videoOverlay');
       const video = document.getElementById('videoTransicao');
@@ -691,9 +692,9 @@
 
       if (!overlay || !video || !fallback || !src) {
         console.warn('[playTransition] Falta overlay, vídeo, fallback ou src:', { overlay, video, fallback, src });
-        alert('Erro ao carregar o vídeo. Verifique se o arquivo existe no servidor.');
-        onEnd && onEnd();
+        alert('Erro ao carregar o vídeo. Verifique o arquivo no servidor.');
         isTransitioning = false;
+        onEnd && onEnd();
         return;
       }
 
@@ -723,15 +724,16 @@
         fallback.classList.add('hidden');
         video.removeAttribute('src');
         video.load();
-        onEnd && onEnd();
+        console.log('[playTransition] Transição concluída para:', src);
         isTransitioning = false;
+        setTimeout(() => onEnd && onEnd(), 100); // Pequeno delay pra evitar conflitos
       };
 
       video.onerror = () => {
         console.error('[Vídeo] Erro ao carregar:', src);
         video.classList.add('hidden');
         fallback.classList.remove('hidden');
-        alert('Não foi possível carregar o vídeo: ' + src + '. Verifique o servidor e o formato (H.264 MP4).');
+        alert('Não foi possível carregar o vídeo: ' + src + '. Use o formato H.264 MP4.');
         setTimeout(cleanup, 5000);
       };
       video.onended = cleanup;
@@ -837,7 +839,10 @@
       });
 
       document.addEventListener('click', (ev) => {
-        if (isTransitioning) return;
+        if (isTransitioning) {
+          console.warn('[initJornada] Clique ignorado, em transição');
+          return;
+        }
         const aNext = ev.target.closest('[data-action="next"]');
         const aPrev = ev.target.closest('[data-action="prev"]');
         const aStart = ev.target.closest('[data-action="start"]');
