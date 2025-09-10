@@ -254,7 +254,7 @@
   <!-- OVERLAY VIDEO -->
   <div id="videoOverlay" class="hidden">
     <video id="videoTransicao" class="video-player" playsinline preload="metadata" controls></video>
-    <div id="videoFallback" class="video-fallback hidden">Áudio em reprodução. Se necessário, verifique o formato do vídeo (recomenda-se H.264 MP4).</div>
+    <div id="videoFallback" class="video-fallback hidden">Não foi possível carregar o vídeo. Verifique se o arquivo existe no servidor (/assets/img/) e está no formato H.264 MP4.</div>
     <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
   </div>
 
@@ -407,7 +407,10 @@
       return new Promise(resolve => {
         const img = new Image();
         img.onload = () => resolve(url);
-        img.onerror = () => resolve(fallbackUrl);
+        img.onerror = () => {
+          console.warn('[checkImage] Imagem não encontrada:', url, 'Usando fallback:', fallbackUrl);
+          resolve(fallbackUrl);
+        };
         img.src = url;
       });
     }
@@ -485,7 +488,7 @@
       const firstTa = content.querySelector('.j-bloco .j-pergunta textarea');
       if (firstTa) handleInput(firstTa);
 
-      console.log('Blocos carregados!');
+      console.log('Blocos carregados! Total de blocos:', blocks.length);
     }
 
     /* =========================
@@ -536,6 +539,12 @@
       }
 
       const bloco = current.closest('.j-bloco');
+      if (!bloco) {
+        console.error('[goNext] Bloco não encontrado para pergunta ativa!');
+        isTransitioning = false;
+        return;
+      }
+
       const perguntasDoBloco = Array.from(bloco.querySelectorAll('.j-pergunta'));
       const i = perguntasDoBloco.indexOf(current);
 
@@ -555,12 +564,17 @@
       const idxBloco = parseInt(bloco.dataset.bloco, 10);
       const temProx = idxBloco + 1 < blocos.length;
 
-      console.log('[goNext] Bloco atual:', idxBloco, 'Tem próximo?', temProx);
+      console.log('[goNext] Bloco atual:', idxBloco, 'Tem próximo?', temProx, 'Total de blocos:', blocos.length);
 
       const irAdiante = () => {
         if (temProx) {
           blocos.forEach(b => b.style.display = 'none');
           const proxBloco = blocos[idxBloco + 1];
+          if (!proxBloco) {
+            console.error('[goNext] Próximo bloco não encontrado para índice:', idxBloco + 1);
+            isTransitioning = false;
+            return;
+          }
           proxBloco.style.display = 'block';
           const primeira = proxBloco.querySelector('.j-pergunta');
           if (primeira) {
@@ -616,6 +630,12 @@
       }
 
       const bloco = current.closest('.j-bloco');
+      if (!bloco) {
+        console.error('[goPrev] Bloco não encontrado para pergunta ativa!');
+        isTransitioning = false;
+        return;
+      }
+
       const perguntasDoBloco = Array.from(bloco.querySelectorAll('.j-pergunta'));
       const i = perguntasDoBloco.indexOf(current);
 
@@ -657,21 +677,6 @@
     /* =========================
        VÍDEO (overlay)
     ========================== */
-    function checkVideoExists(src) {
-      return new Promise(resolve => {
-        const video = document.createElement('video');
-        video.onerror = () => {
-          console.warn('[checkVideoExists] Vídeo não encontrado:', src);
-          resolve(false);
-        };
-        video.onloadedmetadata = () => {
-          console.log('[checkVideoExists] Vídeo encontrado:', src);
-          resolve(true);
-        };
-        video.src = src;
-      });
-    }
-
     function playTransition(src, onEnd) {
       if (isTransitioning) {
         console.warn('[playTransition] Já em transição, ignorando:', src);
@@ -686,6 +691,7 @@
 
       if (!overlay || !video || !fallback || !src) {
         console.warn('[playTransition] Falta overlay, vídeo, fallback ou src:', { overlay, video, fallback, src });
+        alert('Erro ao carregar o vídeo. Verifique se o arquivo existe no servidor.');
         onEnd && onEnd();
         isTransitioning = false;
         return;
@@ -725,7 +731,8 @@
         console.error('[Vídeo] Erro ao carregar:', src);
         video.classList.add('hidden');
         fallback.classList.remove('hidden');
-        setTimeout(cleanup, 5000); // 5s para mostrar mensagem de fallback
+        alert('Não foi possível carregar o vídeo: ' + src + '. Verifique o servidor e o formato (H.264 MP4).');
+        setTimeout(cleanup, 5000);
       };
       video.onended = cleanup;
       if (skip) skip.onclick = cleanup;
@@ -745,7 +752,7 @@
       };
 
       video.src = src;
-      setTimeout(cleanup, 90000); // Timeout de 90s para vídeos longos
+      setTimeout(cleanup, 120000); // Timeout de 120s para vídeos longos
     }
 
     window.playTransition = playTransition;
