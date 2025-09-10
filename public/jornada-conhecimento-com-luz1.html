@@ -164,6 +164,7 @@
     #videoOverlay { position: fixed; inset: 0; background: rgba(0,0,0,.85); display: flex; justify-content: center; align-items: center; z-index: 2000 }
     #videoOverlay.hidden { display: none }
     .video-player { max-width: 90vw; max-height: 80vh; background: #000 }
+    .video-fallback { max-width: 90vw; max-height: 80vh; background: url('/assets/img/pergaminho-rasgado-vert.png') center/cover no-repeat; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem; text-align: center; padding: 20px }
 
     .site-footer { text-align: center; padding: 14px; color: #555; font-size: .85rem }
     .password-form { margin-top: 16px; text-align: center }
@@ -253,6 +254,7 @@
   <!-- OVERLAY VIDEO -->
   <div id="videoOverlay" class="hidden">
     <video id="videoTransicao" class="video-player" playsinline preload="metadata" controls></video>
+    <div id="videoFallback" class="video-fallback hidden">Áudio em reprodução. Se necessário, verifique o formato do vídeo (recomenda-se H.264 MP4).</div>
     <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
   </div>
 
@@ -437,9 +439,13 @@
 
     function loadDynamicBlocks() {
       const content = document.getElementById('perguntas-container');
-      if (!content) return;
+      if (!content) {
+        console.error('[loadDynamicBlocks] Container de perguntas não encontrado!');
+        return;
+      }
 
       const blocks = window.JORNADA_BLOCKS || [];
+      console.log('[loadDynamicBlocks] Carregando blocos:', blocks);
       content.innerHTML = '';
 
       blocks.forEach((block, idx) => {
@@ -471,6 +477,8 @@
           firstPergunta.classList.add('active');
           runTyping(firstPergunta);
         }
+      } else {
+        console.error('[loadDynamicBlocks] Nenhum bloco carregado!');
       }
 
       loadAnswers();
@@ -514,11 +522,15 @@
 
     let isTransitioning = false;
     function goNext() {
-      if (isTransitioning) return;
+      if (isTransitioning) {
+        console.warn('[goNext] Já em transição, ignorando.');
+        return;
+      }
       isTransitioning = true;
 
       const current = document.querySelector('.j-pergunta.active');
       if (!current) {
+        console.error('[goNext] Nenhuma pergunta ativa encontrada!');
         isTransitioning = false;
         return;
       }
@@ -526,6 +538,8 @@
       const bloco = current.closest('.j-bloco');
       const perguntasDoBloco = Array.from(bloco.querySelectorAll('.j-pergunta'));
       const i = perguntasDoBloco.indexOf(current);
+
+      console.log('[goNext] Pergunta atual:', i + 1, 'de', perguntasDoBloco.length, 'no bloco', bloco.dataset.bloco);
 
       current.classList.remove('active');
       if (i + 1 < perguntasDoBloco.length) {
@@ -538,8 +552,10 @@
       }
 
       const blocos = Array.from(document.querySelectorAll('.j-bloco'));
-      const idxBloco = blocos.indexOf(bloco);
+      const idxBloco = parseInt(bloco.dataset.bloco, 10);
       const temProx = idxBloco + 1 < blocos.length;
+
+      console.log('[goNext] Bloco atual:', idxBloco, 'Tem próximo?', temProx);
 
       const irAdiante = () => {
         if (temProx) {
@@ -550,8 +566,11 @@
           if (primeira) {
             primeira.classList.add('active');
             runTyping(primeira);
+          } else {
+            console.error('[goNext] Nenhuma pergunta encontrada no bloco', idxBloco + 1);
           }
           updateProgress();
+          isTransitioning = false;
         } else {
           if (window.JORNADA_FINAL_VIDEO) {
             console.log('[goNext] Tentando tocar Filme 5:', window.JORNADA_FINAL_VIDEO);
@@ -560,6 +579,7 @@
               isTransitioning = false;
             });
           } else {
+            console.warn('[goNext] Nenhum Filme 5 definido, indo para página final');
             showSection('section-final');
             isTransitioning = false;
           }
@@ -567,26 +587,30 @@
         }
       };
 
-      const idx = Number(bloco.dataset.bloco || idxBloco);
-      const src = (window.JORNADA_BLOCKS[idx] && window.JORNADA_BLOCKS[idx].video_after) || '';
+      const src = (window.JORNADA_BLOCKS[idxBloco] && window.JORNADA_BLOCKS[idxBloco].video_after) || '';
       if (src) {
-        console.log('[goNext] Tentando tocar vídeo do bloco', idx, ':', src);
+        console.log('[goNext] Tentando tocar vídeo do bloco', idxBloco, ':', src);
         playTransition(src, () => {
           irAdiante();
           isTransitioning = false;
         });
       } else {
+        console.warn('[goNext] Nenhum vídeo associado ao bloco', idxBloco);
         irAdiante();
         isTransitioning = false;
       }
     }
 
     function goPrev() {
-      if (isTransitioning) return;
+      if (isTransitioning) {
+        console.warn('[goPrev] Já em transição, ignorando.');
+        return;
+      }
       isTransitioning = true;
 
       const current = document.querySelector('.j-pergunta.active');
       if (!current) {
+        console.error('[goPrev] Nenhuma pergunta ativa encontrada!');
         isTransitioning = false;
         return;
       }
@@ -594,6 +618,8 @@
       const bloco = current.closest('.j-bloco');
       const perguntasDoBloco = Array.from(bloco.querySelectorAll('.j-pergunta'));
       const i = perguntasDoBloco.indexOf(current);
+
+      console.log('[goPrev] Pergunta atual:', i + 1, 'de', perguntasDoBloco.length, 'no bloco', bloco.dataset.bloco);
 
       current.classList.remove('active');
 
@@ -607,8 +633,10 @@
       }
 
       const blocos = Array.from(document.querySelectorAll('.j-bloco'));
-      const idxBloco = blocos.indexOf(bloco);
+      const idxBloco = parseInt(bloco.dataset.bloco, 10);
       const temAnterior = idxBloco - 1 >= 0;
+
+      console.log('[goPrev] Bloco atual:', idxBloco, 'Tem anterior?', temAnterior);
 
       if (temAnterior) {
         blocos.forEach(b => b.style.display = 'none');
@@ -653,10 +681,11 @@
 
       const overlay = document.getElementById('videoOverlay');
       const video = document.getElementById('videoTransicao');
+      const fallback = document.getElementById('videoFallback');
       const skip = document.getElementById('skipVideo');
 
-      if (!overlay || !video || !src) {
-        console.warn('[playTransition] Falta overlay, vídeo ou src:', { overlay, video, src });
+      if (!overlay || !video || !fallback || !src) {
+        console.warn('[playTransition] Falta overlay, vídeo, fallback ou src:', { overlay, video, fallback, src });
         onEnd && onEnd();
         isTransitioning = false;
         return;
@@ -664,6 +693,8 @@
 
       window.__playingTransition = true;
       overlay.classList.remove('hidden');
+      video.classList.remove('hidden');
+      fallback.classList.add('hidden');
       video.pause();
       video.removeAttribute('src');
       video.load();
@@ -682,6 +713,8 @@
         window.__playingTransition = false;
         video.pause();
         overlay.classList.add('hidden');
+        video.classList.add('hidden');
+        fallback.classList.add('hidden');
         video.removeAttribute('src');
         video.load();
         onEnd && onEnd();
@@ -690,7 +723,9 @@
 
       video.onerror = () => {
         console.error('[Vídeo] Erro ao carregar:', src);
-        cleanup();
+        video.classList.add('hidden');
+        fallback.classList.remove('hidden');
+        setTimeout(cleanup, 5000); // 5s para mostrar mensagem de fallback
       };
       video.onended = cleanup;
       if (skip) skip.onclick = cleanup;
@@ -698,15 +733,19 @@
       video.onloadedmetadata = () => {
         if (!video.videoWidth || !video.videoHeight) {
           console.warn('[Vídeo] Apenas áudio detectado:', src);
+          video.classList.add('hidden');
+          fallback.classList.remove('hidden');
         }
         video.play().catch(err => {
           console.error('[Vídeo] Falha ao reproduzir:', err);
-          cleanup();
+          video.classList.add('hidden');
+          fallback.classList.remove('hidden');
+          setTimeout(cleanup, 5000);
         });
       };
 
       video.src = src;
-      setTimeout(cleanup, 60000); // Timeout aumentado para 60s
+      setTimeout(cleanup, 90000); // Timeout de 90s para vídeos longos
     }
 
     window.playTransition = playTransition;
@@ -746,7 +785,6 @@
       setTimeout(() => location.replace('/index.html'), 1200);
     }
 
-    /* ===== Filme 0 garantido antes das perguntas (senha válida) ===== */
     function startJourney() {
       const senha = (document.getElementById('senha')?.value || '').trim().toLowerCase();
       if (!['iniciar', 'olho magico', 'olho mágico'].includes(senha)) {
