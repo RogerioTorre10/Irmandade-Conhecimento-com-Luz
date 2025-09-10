@@ -527,12 +527,13 @@
     let lastClickTime = 0;
     function goNext() {
       const now = Date.now();
-      if (isTransitioning || now - lastClickTime < 500) {
-        console.warn('[goNext] Já em transição ou clique muito rápido, ignorando.');
+      if (isTransitioning || now - lastClickTime < 300) {
+        console.warn('[goNext] Já em transição ou clique muito rápido, ignorando. isTransitioning:', isTransitioning, 'Tempo desde último clique:', now - lastClickTime);
         return;
       }
       isTransitioning = true;
       lastClickTime = now;
+      console.log('[goNext] Iniciando goNext, isTransitioning:', isTransitioning);
 
       const current = document.querySelector('.j-pergunta.active');
       if (!current) {
@@ -560,6 +561,7 @@
         runTyping(prox);
         updateProgress();
         isTransitioning = false;
+        console.log('[goNext] Avançando para próxima pergunta:', i + 2);
         return;
       }
 
@@ -588,6 +590,7 @@
           }
           updateProgress();
           isTransitioning = false;
+          console.log('[goNext] Avançando para bloco:', idxBloco + 1);
         } else {
           if (window.JORNADA_FINAL_VIDEO) {
             console.log('[goNext] Tentando tocar Filme 5:', window.JORNADA_FINAL_VIDEO);
@@ -601,6 +604,7 @@
             isTransitioning = false;
           }
           updateProgress();
+          console.log('[goNext] Indo para página final');
         }
       };
 
@@ -618,12 +622,13 @@
 
     function goPrev() {
       const now = Date.now();
-      if (isTransitioning || now - lastClickTime < 500) {
-        console.warn('[goPrev] Já em transição ou clique muito rápido, ignorando.');
+      if (isTransitioning || now - lastClickTime < 300) {
+        console.warn('[goPrev] Já em transição ou clique muito rápido, ignorando. isTransitioning:', isTransitioning, 'Tempo desde último clique:', now - lastClickTime);
         return;
       }
       isTransitioning = true;
       lastClickTime = now;
+      console.log('[goPrev] Iniciando goPrev, isTransitioning:', isTransitioning);
 
       const current = document.querySelector('.j-pergunta.active');
       if (!current) {
@@ -652,6 +657,7 @@
         runTyping(prev);
         updateProgress();
         isTransitioning = false;
+        console.log('[goPrev] Voltando para pergunta:', i);
         return;
       }
 
@@ -671,10 +677,13 @@
           runTyping(ultima);
         }
         updateProgress();
+        isTransitioning = false;
+        console.log('[goPrev] Voltando para bloco:', idxBloco - 1);
       } else {
         showSection('section-intro');
+        isTransitioning = false;
+        console.log('[goPrev] Voltando para introdução');
       }
-      isTransitioning = false;
     }
 
     /* =========================
@@ -743,7 +752,7 @@
       if (skip) skip.onclick = cleanup;
 
       video.onloadedmetadata = () => {
-        console.log('[Vídeo] Metadados carregados:', src, 'Dimensões:', video.videoWidth, 'x', video.videoHeight);
+        console.log('[Vídeo] Metadados carregados:', src, 'Dimensões:', video.videoWidth, 'x', video.videoHeight, 'Tempo inicial:', video.currentTime);
         if (!video.videoWidth || !video.videoHeight) {
           console.warn('[Vídeo] Apenas áudio detectado:', src);
           video.classList.add('hidden');
@@ -757,10 +766,10 @@
             fallback.classList.remove('hidden');
             setTimeout(cleanup, 5000);
           });
-        }, 100); // Delay de 100ms pra garantir carregamento
+        }, 200); // Delay de 200ms pra garantir carregamento
       };
 
-      video.src = src;
+      video.src = src + '?t=' + Date.now(); // Evitar cache
       setTimeout(cleanup, 120000); // Timeout de 120s para vídeos longos
     }
 
@@ -824,6 +833,8 @@
     }
 
     function proceedToQuestions() {
+      isTransitioning = false; // Resetar antes de carregar perguntas
+      console.log('[proceedToQuestions] Resetando isTransitioning:', isTransitioning);
       showSection('section-perguntas');
       loadDynamicBlocks();
       const perguntas = document.querySelectorAll('.j-pergunta');
@@ -847,8 +858,8 @@
 
       document.addEventListener('click', (ev) => {
         const now = Date.now();
-        if (isTransitioning || now - lastClickTime < 500) {
-          console.warn('[initJornada] Clique ignorado, em transição ou muito rápido');
+        if (isTransitioning || now - lastClickTime < 300) {
+          console.warn('[initJornada] Clique ignorado, em transição ou muito rápido. isTransitioning:', isTransitioning, 'Tempo desde último clique:', now - lastClickTime);
           return;
         }
         lastClickTime = now;
