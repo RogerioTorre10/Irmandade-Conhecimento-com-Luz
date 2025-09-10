@@ -524,15 +524,12 @@
     }
 
     let isTransitioning = false;
-    let lastClickTime = 0;
     function goNext() {
-      const now = Date.now();
-      if (isTransitioning || now - lastClickTime < 300) {
-        console.warn('[goNext] Já em transição ou clique muito rápido, ignorando. isTransitioning:', isTransitioning, 'Tempo desde último clique:', now - lastClickTime);
+      if (isTransitioning) {
+        console.warn('[goNext] Já em transição, ignorando. isTransitioning:', isTransitioning);
         return;
       }
       isTransitioning = true;
-      lastClickTime = now;
       console.log('[goNext] Iniciando goNext, isTransitioning:', isTransitioning);
 
       const current = document.querySelector('.j-pergunta.active');
@@ -621,13 +618,11 @@
     }
 
     function goPrev() {
-      const now = Date.now();
-      if (isTransitioning || now - lastClickTime < 300) {
-        console.warn('[goPrev] Já em transição ou clique muito rápido, ignorando. isTransitioning:', isTransitioning, 'Tempo desde último clique:', now - lastClickTime);
+      if (isTransitioning) {
+        console.warn('[goPrev] Já em transição, ignorando. isTransitioning:', isTransitioning);
         return;
       }
       isTransitioning = true;
-      lastClickTime = now;
       console.log('[goPrev] Iniciando goPrev, isTransitioning:', isTransitioning);
 
       const current = document.querySelector('.j-pergunta.active');
@@ -760,6 +755,7 @@
         }
         video.currentTime = 0; // Forçar início do vídeo
         setTimeout(() => {
+          console.log('[Vídeo] Iniciando reprodução:', src, 'Tempo atual:', video.currentTime);
           video.play().catch(err => {
             console.error('[Vídeo] Falha ao reproduzir:', err);
             video.classList.add('hidden');
@@ -857,12 +853,10 @@
       });
 
       document.addEventListener('click', (ev) => {
-        const now = Date.now();
-        if (isTransitioning || now - lastClickTime < 300) {
-          console.warn('[initJornada] Clique ignorado, em transição ou muito rápido. isTransitioning:', isTransitioning, 'Tempo desde último clique:', now - lastClickTime);
+        if (isTransitioning) {
+          console.warn('[initJornada] Clique ignorado, em transição. isTransitioning:', isTransitioning);
           return;
         }
-        lastClickTime = now;
 
         const aNext = ev.target.closest('[data-action="next"]');
         const aPrev = ev.target.closest('[data-action="prev"]');
@@ -870,6 +864,8 @@
         const aToggle = ev.target.closest('[data-action="toggle-password"], .password-toggle');
         const aRestart = ev.target.closest('[data-action="restart"]');
         const btnPDF = ev.target.closest('[data-action="generate-pdf"]');
+
+        console.log('[initJornada] Clique detectado:', { aNext, aPrev, aStart, aToggle, aRestart, btnPDF });
 
         if (aNext) { ev.preventDefault(); goNext(); }
         if (aPrev) { ev.preventDefault(); goPrev(); }
