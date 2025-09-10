@@ -67,49 +67,48 @@
       text-shadow: 0 0 10px hsla(28, 96%, 60%, .7);
       margin: 0;
     }
-    /* Comentário: Estilo base da chama-vela, ajustado para formato de vela com base larga e topo afunilado */
+    /* Comentário: Estilo base da chama-vela, ajustado para formato de vela com base larga e topo muito afunilado */
     .chama-vela {
-      --altura: 90px; --largura: 60px; --pulso: 1.4s; --glow: 15px; --hue: 28; --satur: 96%; --light: 58%; --op: .98;
+      --altura: 90px; --largura: 60px; --pulso: 1.3s; --glow: 16px; --hue: 28; --satur: 96%; --light: 58%; --op: .98;
       position: relative; width: var(--largura); height: var(--altura); display: inline-block;
       filter: drop-shadow(0 0 var(--glow) hsla(var(--hue), var(--satur), 60%, .75));
     }
     /* Comentário: Tamanhos para chamas média (inferior) e grande (cabeçalho) */
     .chama-vela.chama-md { --largura: 80px; --altura: 180px }
     .chama-vela.chama-lg { --largura: 60px; --altura: 120px }
-    /* Comentário: Brasas com base mais larga e ovulada */
+    /* Comentário: Brasas com base ainda mais larga e ovulada */
     .chama-vela .brasa {
-      position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: calc(var(--largura) * 1.2); height: 16px;
+      position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: calc(var(--largura) * 1.3); height: 18px;
       border-radius: 50% 50% 40% 40%; /* Base ovulada */
       background: radial-gradient(circle at 50% 40%, hsla(var(--hue), var(--satur), 95%, .95) 0%, hsla(var(--hue), var(--satur), 70%, .85) 50%, transparent 80%);
       filter: blur(2px); animation: brasaPulse var(--pulso) ease-in-out infinite; opacity: var(--op)
     }
-    /* Comentário: Língua da chama com formato de vela, topo mais fino e gradiente vibrante */
+    /* Comentário: Língua da chama com formato de vela, topo super fino e gradiente mais vibrante */
     .chama-vela .lingua {
       position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: calc(var(--largura) * 1.0); height: calc(var(--altura) * 1.0);
-      border-radius: 50% 50% 8% 8%; /* Topo ainda mais afunilado */
+      border-radius: 50% 50% 6% 6%; /* Topo ainda mais afunilado */
       background: radial-gradient(
         ellipse at center,
-        rgba(255, 165, 0, 0.95) 0%, /* Centro mais vibrante */
+        rgba(255, 180, 0, 0.95) 0%, /* Centro ultra vibrante */
         rgba(255, 69, 0, 0.75) 50%, /* Meio gordinho */
-        rgba(200, 20, 20, 0.3) 70%, /* Borda escura e vibrante */
+        rgba(220, 20, 20, 0.3) 70%, /* Borda escura e vibrante */
         transparent 100%
       );
-      mix-blend-mode: screen; filter: blur(1.2px); transform-origin: 50% 100%; animation: velaWaver 1.4s ease-in-out infinite; opacity: var(--op);
-      -webkit-mask: radial-gradient(60% 90% at 50% 6%, #000 68%, transparent 72%);
-      mask: radial-gradient(60% 90% at 50% 6%, #000 68%, transparent 72%)
+      mix-blend-mode: screen; filter: blur(1.3px); transform-origin: 50% 100%; animation: velaWaver 1.3s ease-in-out infinite; opacity: var(--op);
+      -webkit-mask: radial-gradient(60% 90% at 50% 5%, #000 66%, transparent 70%)
     }
     /* Comentário: Camadas internas da chama para profundidade */
-    .chama-vela .lingua:nth-child(2) { width: calc(var(--largura) * .85); height: calc(var(--altura) * .92); animation-duration: 1.7s; animation-delay: .06s; filter: blur(1px) }
-    .chama-vela .lingua:nth-child(3) { width: calc(var(--largura) * .70); height: calc(var(--altura) * .82); animation-duration: 2.0s; animation-delay: .12s; filter: blur(.8px) }
+    .chama-vela .lingua:nth-child(2) { width: calc(var(--largura) * .90); height: calc(var(--altura) * .94); animation-duration: 1.6s; animation-delay: .07s; filter: blur(1.1px) }
+    .chama-vela .lingua:nth-child(3) { width: calc(var(--largura) * .75); height: calc(var(--altura) * .84); animation-duration: 1.9s; animation-delay: .14s; filter: blur(.9px) }
     /* Comentário: Brilho com maior difusão para vibração */
     .chama-vela .brilho {
-      position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: calc(var(--largura) * 1.5); height: calc(var(--altura) * 1.3);
-      background: radial-gradient(circle, hsla(var(--hue), var(--satur), 72%, .45) 0%, transparent 70%); filter: blur(18px); mix-blend-mode: screen; animation: aura var(--pulso) ease-in-out infinite; opacity: .75; pointer-events: none
+      position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: calc(var(--largura) * 1.6); height: calc(var(--altura) * 1.4);
+      background: radial-gradient(circle, hsla(var(--hue), var(--satur), 72%, .50) 0%, transparent 70%); filter: blur(18px); mix-blend-mode: screen; animation: aura var(--pulso) ease-in-out infinite; opacity: .80; pointer-events: none
     }
     /* Comentário: Intensidades da chama (fraca, média, forte) */
-    .chama-vela.fraca { --altura: 70px; --largura: 50px; --pulso: 1.8s; --glow: 10px; --hue: 36; --satur: 86%; --light: 66%; --op: .70 }
-    .chama-vela.media { --altura: 90px; --largura: 60px; --pulso: 1.4s; --glow: 15px; --hue: 28; --satur: 96%; --light: 58%; --op: .98 }
-    .chama-vela.forte { --altura: 110px; --largura: 70px; --pulso: 0.9s; --glow: 20px; --hue: 20; --satur: 100%; --light: 52%; --op: 1 }
+    .chama-vela.fraca { --altura: 70px; --largura: 50px; --pulso: 1.7s; --glow: 10px; --hue: 36; --satur: 86%; --light: 66%; --op: .70 }
+    .chama-vela.media { --altura: 90px; --largura: 60px; --pulso: 1.3s; --glow: 16px; --hue: 28; --satur: 96%; --light: 58%; --op: .98 }
+    .chama-vela.forte { --altura: 110px; --largura: 70px; --pulso: 0.8s; --glow: 22px; --hue: 20; --satur: 100%; --light: 52%; --op: 1 }
     /* Comentário: Posicionamento da chama inferior */
     .flame-corner { position: fixed; z-index: 1200; pointer-events: none }
     .flame-bottom-right { bottom: 20px; right: 20px }
@@ -118,14 +117,26 @@
     /* Comentário: Animações com mais vibração */
     @keyframes velaWaver { 
       0%, 100% { transform: translateX(-50%) scaleY(1.00) skewX(0deg) }
-      25% { transform: translateX(calc(-50% + 1px)) scaleY(1.08) skewX(1deg) }
-      50% { transform: translateX(-50%) scaleY(1.15) skewX(1.8deg) }
-      75% { transform: translateX(calc(-50% - 0.8px)) scaleY(1.06) skewX(0.8deg) }
+      25% { transform: translateX(calc(-50% + 1.2px)) scaleY(1.10) skewX(1.2deg) }
+      50% { transform: translateX(-50%) scaleY(1.18) skewX(2deg) }
+      75% { transform: translateX(calc(-50% - 1px)) scaleY(1.08) skewX(1deg) }
     }
-    @keyframes brasaPulse { 0%, 100% { transform: translateX(-50%) scale(1); opacity: .80 } 50% { transform: translateX(-50%) scale(1.10); opacity: 1 } }
-    @keyframes aura { 0%, 100% { opacity: .65 } 50% { opacity: .90 } }
+    @keyframes brasaPulse { 0%, 100% { transform: translateX(-50%) scale(1); opacity: .85 } 50% { transform: translateX(-50%) scale(1.12); opacity: 1 } }
+    @keyframes aura { 0%, 100% { opacity: .70 } 50% { opacity: .95 } }
     @media (prefers-reduced-motion: reduce) {
       .chama-vela .lingua, .chama-vela .brasa, .chama-vela .brilho { animation: none !important }
+    }
+
+    /* ===== SELFIE COM A IRMANDADE ===== */
+    .selfie-row {
+      display: grid; grid-template-columns: 1fr 1.3fr; gap: 16px; align-items: start;
+    }
+    .selfie-left .selfie-controls { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
+    .selfie-left label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; }
+    .selfie-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+    .muted { color: var(--ink-soft); font-size: 0.9rem; }
+    @media (max-width: 860px) {
+      .selfie-row { grid-template-columns: 1fr; }
     }
 
     /* ===== PERGAMINHO ===== */
@@ -236,6 +247,44 @@
           </div>
         </div>
 
+        <!-- SELFIE COM A IRMANDADE -->
+        <section id="selfie-join" class="card pergaminho pergaminho-v" style="margin-top:16px;">
+          <div class="conteudo-pergaminho">
+            <h2 style="margin-top:0;">Entre na Irmandade ✨</h2>
+            <p>Faça uma foto agora ou envie da galeria. Ajuste e gere sua imagem “4 + você”.</p>
+
+            <div class="selfie-row">
+              <div class="selfie-left">
+                <label class="btn btn-primary" for="selfieInput">📸 Tirar/Enviar foto</label>
+                <input id="selfieInput" type="file" accept="image/*" capture="environment" style="display:none" />
+
+                <div class="selfie-controls">
+                  <label>Zoom
+                    <input id="selfieScale" type="range" min="0.6" max="2.0" step="0.01" value="1">
+                  </label>
+                  <label>Horizontal
+                    <input id="selfieOffsetX" type="range" min="-300" max="300" step="1" value="0">
+                  </label>
+                  <label>Vertical
+                    <input id="selfieOffsetY" type="range" min="-300" max="300" step="1" value="0">
+                  </label>
+                  <small class="muted">Dica: mova os controles para alinhar seu rosto no espaço livre da imagem.</small>
+                </div>
+
+                <div class="selfie-actions">
+                  <button id="btnRenderSelfie" class="btn">✨ Gerar minha imagem</button>
+                  <a id="btnDownloadSelfie" class="btn btn-secondary" download="irmandade-mais-eu.png" href="#">⬇️ Baixar</a>
+                </div>
+              </div>
+
+              <div class="selfie-right">
+                <canvas id="selfieCanvas" width="1200" height="800" style="width:100%;height:auto;background:#000;border-radius:12px;"></canvas>
+                <small class="muted">Pré-visualização</small>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- PERGUNTAS -->
         <div id="section-perguntas" class="j-section hidden">
           <div id="chama-perguntas" class="chama-icone chama-fixed-hero media" aria-hidden="true">
@@ -265,6 +314,11 @@
         <!-- FINAL -->
         <div id="section-final" class="j-section hidden">
           <p data-typing data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40" data-cursor="true"></p>
+          <!-- Comentário: Espaço para a foto do usuário na finalização -->
+          <div class="selfie-final" style="text-align:center; margin-top:20px;">
+            <img id="minhaFotoFinal" alt="Minha foto com a Irmandade" style="max-width:80%; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.3)" />
+          </div>
+          <p style="margin-top:12px;"><small>Sua imagem foi unida à Irmandade. 🙏</small></p>
           <div class="footer-actions">
             <button id="btnGeneratePDF" class="btn btn-primary" data-action="generate-pdf">Gerar PDF/HQ</button>
             <button id="btnRestart" class="btn btn-secondary" data-action="restart">Reiniciar</button>
@@ -413,6 +467,115 @@
     function ensureHeroFlame(sectionId) { window.JORNADA_CHAMA.ensureHeroFlame(sectionId); }
 
     /* =========================
+       SELFIE COM A IRMANDADE
+    ========================== */
+    (function() {
+      const BG_URL = "/assets/img/irmandade-quarteto-bg.png";
+      const GLOW_URL = "/assets/img/moldura-brilho.png";
+      const FACE_X = 820;
+      const FACE_Y = 410;
+      const FACE_R = 150;
+
+      const $ = (sel) => document.querySelector(sel);
+      const input = $("#selfieInput");
+      const cv = $("#selfieCanvas");
+      const ctx = cv.getContext("2d");
+      const rScale = $("#selfieScale");
+      const rX = $("#selfieOffsetX");
+      const rY = $("#selfieOffsetY");
+      const btnGo = $("#btnRenderSelfie");
+      const aDown = $("#btnDownloadSelfie");
+
+      const bgImg = new Image(); bgImg.crossOrigin = "anonymous"; bgImg.src = BG_URL;
+      const glowImg = new Image(); glowImg.crossOrigin = "anonymous"; glowImg.src = GLOW_URL;
+      let userImg = null;
+
+      const st = {
+        scale: parseFloat(rScale?.value || 1),
+        offX: parseInt(rX?.value || 0, 10),
+        offY: parseInt(rY?.value || 0, 10),
+      };
+
+      function renderAll() {
+        ctx.clearRect(0, 0, cv.width, cv.height);
+        if (bgImg.complete) ctx.drawImage(bgImg, 0, 0, cv.width, cv.height);
+
+        if (userImg) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(FACE_X, FACE_Y, FACE_R, 0, Math.PI * 2);
+          ctx.closePath();
+          ctx.clip();
+
+          const scale = st.scale || 1;
+          const drawW = FACE_R * 2 * scale;
+          const drawH = FACE_R * 2 * scale;
+          const dx = FACE_X - drawW / 2 + st.offX;
+          const dy = FACE_Y - drawH / 2 + st.offY;
+          ctx.drawImage(userImg, dx, dy, drawW, drawH);
+
+          ctx.restore();
+        }
+
+        if (glowImg && glowImg.complete) {
+          ctx.drawImage(glowImg, FACE_X - FACE_R * 1.2, FACE_Y - FACE_R * 1.2, FACE_R * 2.4, FACE_R * 2.4);
+        }
+      }
+
+      function loadFromLocal() {
+        try {
+          const saved = localStorage.getItem("IRMANDADE_SELFIE_FINAL");
+          if (!saved) return;
+          const img = new Image();
+          img.onload = () => { userImg = img; renderAll(); };
+          img.src = saved;
+        } catch (e) {}
+      }
+
+      if (input) {
+        input.addEventListener("change", (ev) => {
+          const f = ev.target.files && ev.target.files[0];
+          if (!f) return;
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+              userImg = img;
+              try { localStorage.setItem("IRMANDADE_SELFIE_FINAL", e.target.result); } catch (_) {}
+              renderAll();
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(f);
+        });
+      }
+
+      [rScale, rX, rY].forEach(el => {
+        if (el) {
+          el.addEventListener("input", () => {
+            st.scale = parseFloat(rScale.value);
+            st.offX = parseInt(rX.value, 10);
+            st.offY = parseInt(rY.value, 10);
+            renderAll();
+          });
+        }
+      });
+
+      if (btnGo) {
+        btnGo.addEventListener("click", () => {
+          renderAll();
+          const url = cv.toDataURL("image/png");
+          aDown.href = url;
+          try { localStorage.setItem("IRMANDADE_SELFIE_FINAL", url); } catch (_) {}
+        });
+      }
+
+      bgImg.onload = renderAll;
+      glowImg.onload = renderAll;
+      loadFromLocal();
+    })();
+
+    /* =========================
        PROGRESSO & STORAGE
     ========================== */
     function updateProgress() {
@@ -482,6 +645,13 @@
         updateProgress();
         const perguntas = document.querySelectorAll('.j-pergunta');
         if (perguntas.length) runTyping(perguntas[0]);
+      }
+      if (sectionId === 'section-final') {
+        const url = localStorage.getItem("IRMANDADE_SELFIE_FINAL");
+        if (url) {
+          document.querySelector("#minhaFotoFinal").src = url;
+          document.getElementById("section-final").style.display = "block";
+        }
       }
     }
 
@@ -930,8 +1100,8 @@
       afterBlocks: {
         0: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
         1: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
-        2: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
-        3: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
+        2: VIDEO_BASE + 'filme-3-trumas-na-jornada.mp4',
+        3: VIDEO_BASE + 'filme-4-aproximando-no-final.mp4'
       },
       final: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
     };
