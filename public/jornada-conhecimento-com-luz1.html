@@ -55,45 +55,45 @@
     .chama-icone { position: relative; width: 36px; height: 72px; display: flex; align-items: flex-end }
     .chama-icone > * { position: static }
     .chama-vela {
-      --altura: 90px; --largura: 60px; --pulso: 1.7s; --glow: 18px; --hue: 28; --satur: 96%; --light: 58%; --op: .98;
+      --altura: 100px; --largura: 70px; --pulso: 1.7s; --glow: 20px; --hue: 25; --satur: 90%; --light: 60%; --op: .98; /* Ajustado pra laranja-avermelhado */
       position: relative; width: var(--largura); height: var(--altura); display: inline-block;
       filter: drop-shadow(0 0 var(--glow) hsla(var(--hue), var(--satur), 60%, .70));
     }
-    .chama-vela.chama-md { --largura: 32px; --altura: 64px }
-    .chama-vela.chama-lg { --largura: 60px; --altura: 120px }
+    .chama-vela.chama-md { --largura: 40px; --altura: 80px }
+    .chama-vela.chama-lg { --largura: 70px; --altura: 140px }
     .chama-vela .brasa {
-      position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: calc(var(--largura) * .86); height: 12px;
+      position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: calc(var(--largura) * .90); height: 15px;
       border-radius: 50%; background: radial-gradient(circle at 50% 40%, hsla(var(--hue), var(--satur), 95%, .95) 0%, hsla(var(--hue), var(--satur), 70%, .85) 35%, transparent 72%);
       filter: blur(1px); animation: brasaPulse var(--pulso) ease-in-out infinite; opacity: var(--op)
     }
     .chama-vela .lingua {
-      position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: calc(var(--largura) * .96); height: calc(var(--altura) * .98);
-      border-radius: 62% 62% 20% 20% / 94% 94% 16% 16%;
-      background: radial-gradient(48% 58% at 50% 18%, hsla(var(--hue), var(--satur), 98%, 1) 0%, hsla(var(--hue), var(--satur), 78%, .98) 32%, transparent 68%),
-                  radial-gradient(110% 140% at 50% 72%, hsla(calc(var(--hue) - 8), calc(var(--satur) - 12%), 50%, .85) 0%, transparent 72%);
-      mix-blend-mode: screen; filter: blur(.45px); transform-origin: 50% 100%; animation: velaWaver 1.6s ease-in-out infinite; opacity: var(--op);
-      -webkit-mask: radial-gradient(58% 92% at 50% 6%, #000 70%, transparent 74%);
-      mask: radial-gradient(58% 92% at 50% 6%, #000 70%, transparent 74%)
+      position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: calc(var(--largura) * .95); height: calc(var(--altura) * .95);
+      border-radius: 70% 70% 25% 25% / 95% 95% 20% 20%; /* Ajustado pra base larga e topo agudo */
+      background: radial-gradient(50% 60% at 50% 20%, hsla(var(--hue), var(--satur), 95%, 1) 0%, hsla(var(--hue), var(--satur), 80%, .98) 30%, hsla(var(--hue), var(--satur), 50%, .85) 70%, transparent 90%),
+                  radial-gradient(120% 150% at 50% 80%, hsla(calc(var(--hue) - 10), calc(var(--satur) - 10%), 40%, .75) 0%, transparent 80%);
+      mix-blend-mode: screen; filter: blur(.5px); transform-origin: 50% 100%; animation: velaWaver 1.6s ease-in-out infinite; opacity: var(--op);
+      -webkit-mask: radial-gradient(60% 90% at 50% 10%, #000 70%, transparent 75%);
+      mask: radial-gradient(60% 90% at 50% 10%, #000 70%, transparent 75%)
     }
     .chama-vela .lingua::after {
-      content: ""; position: absolute; left: 50%; top: 5%; transform: translateX(-50%); width: 16%; height: 38%;
-      background: radial-gradient(50% 60% at 50% 40%, rgba(255,255,255,.95), rgba(255,255,255,0)); filter: blur(1px); opacity: .95; pointer-events: none
+      content: ""; position: absolute; left: 50%; top: 5%; transform: translateX(-50%); width: 18%; height: 40%;
+      background: radial-gradient(50% 60% at 50% 40%, rgba(255,255,255,.95), rgba(255,255,255,0)); filter: blur(1.2px); opacity: .95; pointer-events: none
     }
-    .chama-vela .lingua:nth-child(2) { width: calc(var(--largura) * .76); height: calc(var(--altura) * .86); animation-duration: 1.9s; animation-delay: .05s; filter: blur(.35px) }
-    .chama-vela .lingua:nth-child(3) { width: calc(var(--largura) * .60); height: calc(var(--altura) * .74); animation-duration: 2.2s; animation-delay: .10s; filter: blur(.3px) }
+    .chama-vela .lingua:nth-child(2) { width: calc(var(--largura) * .80); height: calc(var(--altura) * .85); animation-duration: 1.9s; animation-delay: .05s; filter: blur(.4px) }
+    .chama-vela .lingua:nth-child(3) { width: calc(var(--largura) * .65); height: calc(var(--altura) * .75); animation-duration: 2.2s; animation-delay: .10s; filter: blur(.35px) }
     .chama-vela .brilho {
-      position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: calc(var(--largura) * 1.28); height: calc(var(--altura) * 1.06);
-      background: radial-gradient(circle, hsla(var(--hue), var(--satur), 72%, .36) 0%, transparent 64%); filter: blur(12px); mix-blend-mode: screen;
-      animation: aura var(--pulso) ease-in-out infinite; opacity: .62; pointer-events: none
+      position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: calc(var(--largura) * 1.3); height: calc(var(--altura) * 1.1);
+      background: radial-gradient(circle, hsla(var(--hue), calc(var(--satur) + 10%), 75%, .40) 0%, transparent 70%); /* Brilho laranja claro */
+      filter: blur(15px); mix-blend-mode: screen; animation: aura var(--pulso) ease-in-out infinite; opacity: .65; pointer-events: none
     }
-    .chama-vela.pico .lingua { animation-timing-function: ease-out; transform: translateX(-50%) scaleY(1.12) skewX(1.4deg) }
-    .chama-vela.fraca { --altura: 72px; --largura: 50px; --pulso: 2.6s; --glow: 10px; --hue: 36; --satur: 86%; --light: 66%; --op: .70 }
-    .chama-vela.media { --altura: 94px; --largura: 60px; --pulso: 1.7s; --glow: 18px; --hue: 28; --satur: 96%; --light: 58%; --op: .98 }
-    .chama-vela.forte { --altura: 112px; --largura: 66px; --pulso: 1.1s; --glow: 28px; --hue: 20; --satur: 100%; --light: 52%; --op: 1 }
+    .chama-vela.pico .lingua { animation-timing-function: ease-out; transform: translateX(-50%) scaleY(1.15) skewX(1.5deg) }
+    .chama-vela.fraca { --altura: 80px; --largura: 60px; --pulso: 2.6s; --glow: 12px; --hue: 30; --satur: 85%; --light: 65%; --op: .70 }
+    .chama-vela.media { --altura: 100px; --largura: 70px; --pulso: 1.7s; --glow: 20px; --hue: 25; --satur: 90%; --light: 60%; --op: .98 }
+    .chama-vela.forte { --altura: 120px; --largura: 80px; --pulso: 1.1s; --glow: 30px; --hue: 20; --satur: 95%; --light: 55%; --op: 1 }
     .flame-corner { position: fixed; z-index: 1200; pointer-events: none }
     .flame-top-right { top: 14px; right: 14px }
     .flame-bottom-left { bottom: 14px; left: 14px }
-    #chama-header .chama-vela { --largura: 34px; --altura: 68px }
+    #chama-header .chama-vela { --largura: 40px; --altura: 80px }
     @keyframes velaWaver {
       0%, 100% { transform: translateX(-50%) scaleY(1.00) skewX(0deg) }
       25% { transform: translateX(calc(-50% + .6px)) scaleY(1.04) skewX(.6deg) }
@@ -101,7 +101,7 @@
       75% { transform: translateX(calc(-50% - .5px)) scaleY(1.03) skewX(.4deg) }
     }
     @keyframes brasaPulse { 0%, 100% { transform: translateX(-50%) scale(1); opacity: .70 } 50% { transform: translateX(-50%) scale(1.06); opacity: 1 } }
-    @keyframes aura { 0%, 100% { opacity: .50 } 50% { opacity: .82 } }
+    @keyframes aura { 0%, 100% { opacity: .50 } 50% { opacity: .80 } }
     @media (prefers-reduced-motion: reduce) {
       .chama-vela .lingua, .chama-vela .brasa, .chama-vela .brilho { animation: none !important }
     }
