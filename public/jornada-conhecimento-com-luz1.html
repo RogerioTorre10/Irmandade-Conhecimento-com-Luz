@@ -253,7 +253,7 @@
 
   <!-- OVERLAY VIDEO -->
   <div id="videoOverlay" class="hidden">
-    <video id="videoTransicao" class="video-player" playsinline preload="metadata" controls></video>
+    <video id="videoTransicao" class="video-player" playsinline controls></video>
     <div id="videoFallback" class="video-fallback hidden">Áudio da jornada em reprodução. Para ver o vídeo, converta para o formato H.264 MP4 (use FFmpeg: ffmpeg -i input.mp4 -c:v libx264 -c:a aac output.mp4).</div>
     <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
   </div>
@@ -524,12 +524,15 @@
     }
 
     let isTransitioning = false;
+    let lastClickTime = 0;
     function goNext() {
-      if (isTransitioning) {
-        console.warn('[goNext] Já em transição, ignorando.');
+      const now = Date.now();
+      if (isTransitioning || now - lastClickTime < 500) {
+        console.warn('[goNext] Já em transição ou clique muito rápido, ignorando.');
         return;
       }
       isTransitioning = true;
+      lastClickTime = now;
 
       const current = document.querySelector('.j-pergunta.active');
       if (!current) {
@@ -614,11 +617,13 @@
     }
 
     function goPrev() {
-      if (isTransitioning) {
-        console.warn('[goPrev] Já em transição, ignorando.');
+      const now = Date.now();
+      if (isTransitioning || now - lastClickTime < 500) {
+        console.warn('[goPrev] Já em transição ou clique muito rápido, ignorando.');
         return;
       }
       isTransitioning = true;
+      lastClickTime = now;
 
       const current = document.querySelector('.j-pergunta.active');
       if (!current) {
@@ -744,12 +749,15 @@
           video.classList.add('hidden');
           fallback.classList.remove('hidden');
         }
-        video.play().catch(err => {
-          console.error('[Vídeo] Falha ao reproduzir:', err);
-          video.classList.add('hidden');
-          fallback.classList.remove('hidden');
-          setTimeout(cleanup, 5000);
-        });
+        video.currentTime = 0; // Forçar início do vídeo
+        setTimeout(() => {
+          video.play().catch(err => {
+            console.error('[Vídeo] Falha ao reproduzir:', err);
+            video.classList.add('hidden');
+            fallback.classList.remove('hidden');
+            setTimeout(cleanup, 5000);
+          });
+        }, 100); // Delay de 100ms pra garantir carregamento
       };
 
       video.src = src;
@@ -838,10 +846,13 @@
       });
 
       document.addEventListener('click', (ev) => {
-        if (isTransitioning) {
-          console.warn('[initJornada] Clique ignorado, em transição');
+        const now = Date.now();
+        if (isTransitioning || now - lastClickTime < 500) {
+          console.warn('[initJornada] Clique ignorado, em transição ou muito rápido');
           return;
         }
+        lastClickTime = now;
+
         const aNext = ev.target.closest('[data-action="next"]');
         const aPrev = ev.target.closest('[data-action="prev"]');
         const aStart = ev.target.closest('[data-action="start"]');
