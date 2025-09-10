@@ -7,7 +7,193 @@
   <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png" />
 
   <!-- Fonts: Google para Berkshire/Cardo (evita OTS do .ttf local) -->
-  <link href="https://fonts.googleapis.com/css2?family=Berkshire+Swash&family=Cardo:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googlea// Global state
+let currentBlock = 0;
+let currentQuestion = 0;
+let isTransitioning = false;
+let videoElement = null;
+let blocks = [];
+let totalBlocks = 0;
+
+// Sample block data (replace with your actual data)
+const blockData = [
+    {
+        video: '/assets/img/filme-0-ao-encontro-da-jornada.mp4',
+        questions: [
+            { id: 1, text: 'Question 1 for Block 0' },
+            { id: 2, text: 'Question 2 for Block 0' }
+        ]
+    },
+    {
+        video: '/assets/img/filme-1-entrando-na-jornada.mp4',
+        questions: [
+            { id: 1, text: 'Question 1 for Block 1' },
+            { id: 2, text: 'Question 2 for Block 1' }
+        ]
+    },
+    // Add more blocks as needed
+];
+
+// Initialize the journey
+function initJornada() {
+    console.log('[initJornada] Controlador da jornada inicializado!');
+    videoElement = document.getElementById('journeyVideo');
+    loadDynamicBlocks();
+    setupEventListeners();
+}
+
+// Load dynamic blocks
+function loadDynamicBlocks() {
+    blocks = blockData; // Replace with actual data fetching if needed
+    totalBlocks = blocks.length;
+    console.log('[loadDynamicBlocks] Carregando blocos:', blocks);
+    console.log('[loadDynamicBlocks] Blocos carregados! Total de blocos:', totalBlocks);
+}
+
+// Set up event listeners with debouncing
+function setupEventListeners() {
+    const btnNext = document.getElementById('btnNextPerguntas');
+    if (btnNext) {
+        btnNext.addEventListener('click', debounce(handleClick, 300));
+    }
+    console.log('[initJornada] Event listeners configurados.');
+}
+
+// Debounce function to prevent multiple rapid clicks
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Handle click events
+function handleClick(event) {
+    const target = {
+        aNext: event.target.closest('#btnNextPerguntas'),
+        aPrev: event.target.closest('#btnPrevPerguntas'),
+        aStart: event.target.closest('#btnStart'),
+        aToggle: event.target.closest('#btnToggle'),
+        aRestart: event.target.closest('#btnRestart')
+    };
+    console.log('[initJornada] Clique detectado:', target);
+
+    if (isTransitioning && target.aNext) {
+        console.log('[initJornada] Clique ignorado, em transição. isTransitioning:', isTransitioning);
+        return;
+    }
+
+    if (target.aNext) {
+        goNext();
+    } else if (target.aStart) {
+        startJourney();
+    }
+}
+
+// Start the journey
+function startJourney() {
+    console.log('[startJourney] Iniciando jornada, Filme 0:', blocks[0].video);
+    playTransition(blocks[0].video).then(() => {
+        console.log('[startJourney] Filme 0 concluído, prosseguindo para perguntas');
+        proceedToQuestions();
+    });
+}
+
+// Play video transition
+async function playTransition(videoSrc) {
+    if (isTransitioning) {
+        console.log('[playTransition] Já em transição, ignorando:', videoSrc);
+        return;
+    }
+
+    isTransitioning = true;
+    console.log('[playTransition] Iniciando transição para:', videoSrc);
+
+    try {
+        if (videoElement) {
+            videoElement.src = videoSrc;
+            videoElement.load();
+
+            // Wait for metadata to load
+            await new Promise((resolve) => {
+                videoElement.onloadedmetadata = () => {
+                    console.log('[Vídeo] Metadados carregados:', videoSrc, 'Dimensões:', videoElement.videoWidth, 'x', videoElement.videoHeight, 'Tempo inicial:', videoElement.currentTime);
+                    resolve();
+                };
+            });
+
+            // Play the video
+            console.log('[Vídeo] Iniciando reprodução:', videoSrc, 'Tempo atual:', videoElement.currentTime);
+            await videoElement.play();
+
+            // Wait for video to end
+            await new Promise((resolve) => {
+                videoElement.onended = () => {
+                    console.log('[playTransition] Transição concluída para:', videoSrc);
+                    resolve();
+                };
+            });
+        }
+    } catch (error) {
+        console.error('[playTransition] Erro durante a transição:', error);
+    } finally {
+        isTransitioning = false;
+        console.log('[playTransition] Resetando isTransitioning:', isTransitioning);
+    }
+}
+
+// Proceed to questions
+function proceedToQuestions() {
+    isTransitioning = false;
+    console.log('[proceedToQuestions] Resetando isTransitioning:', isTransitioning);
+    displayQuestion(currentBlock, currentQuestion);
+}
+
+// Display question (placeholder for UI rendering)
+function displayQuestion(blockIndex, questionIndex) {
+    const question = blocks[blockIndex].questions[questionIndex];
+    console.log(`[displayQuestion] Exibindo pergunta ${questionIndex + 1} de ${blocks[blockIndex].questions.length} no bloco ${blockIndex}: ${question.text}`);
+    // Add your UI rendering logic here
+}
+
+// Navigate to the next step
+function goNext() {
+    console.log('[goNext] Iniciando goNext, isTransitioning:', isTransitioning);
+    if (isTransitioning) return;
+
+    const currentBlockQuestions = blocks[currentBlock].questions;
+    console.log(`[goNext] Pergunta atual: ${currentQuestion + 1} de ${currentBlockQuestions.length} no bloco ${currentBlock}`);
+
+    if (currentQuestion < currentBlockQuestions.length - 1) {
+        currentQuestion++;
+        console.log('[goNext] Avançando para próxima pergunta:', currentQuestion + 1);
+        displayQuestion(currentBlock, currentQuestion);
+    } else {
+        console.log('[goNext] Bloco atual:', currentBlock, 'Tem próximo?', currentBlock < totalBlocks - 1, 'Total de blocos:', totalBlocks);
+        if (currentBlock < totalBlocks - 1) {
+            currentBlock++;
+            currentQuestion = 0;
+            console.log('[goNext] Tentando tocar vídeo do bloco', currentBlock, ':', blocks[currentBlock].video);
+            playTransition(blocks[currentBlock].video).then(() => {
+                proceedToQuestions();
+            });
+        } else {
+            console.log('[goNext] Jornada concluída!');
+            // Handle journey completion
+        }
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', () => {
+    initJornada();
+    console.log('[Jornada] Jornada iniciada com sucesso!');
+});pis.com/css2?family=Berkshire+Swash&family=Cardo:wght@400;700&display=swap" rel="stylesheet" />
 
   <!-- ManufacturingConsent local -->
   <link rel="preload" href="/assets/fonts/ManufacturingConsent-Regular.ttf" as="font" type="font/ttf" crossorigin />
