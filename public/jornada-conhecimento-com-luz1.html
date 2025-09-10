@@ -125,6 +125,7 @@
     .btn-secondary { background: #4b5563 }
     .btn-secondary:hover { background: #6b7280 }
     .btn + .btn { margin-left: 10px }
+    .btn:disabled { background: #6b7280; cursor: not-allowed; transform: none }
 
     /* Progresso */
     .progress-badge { position: fixed; top: 16px; right: 16px; padding: 8px 16px; background: var(--brand); color: #fff; border-radius: 8px; font-size: .9rem; z-index: 900 }
@@ -511,9 +512,16 @@
       input.type = (input.type === 'password' ? 'text' : 'password');
     }
 
+    let isTransitioning = false;
     function goNext() {
+      if (isTransitioning) return;
+      isTransitioning = true;
+
       const current = document.querySelector('.j-pergunta.active');
-      if (!current) return;
+      if (!current) {
+        isTransitioning = false;
+        return;
+      }
 
       const bloco = current.closest('.j-bloco');
       const perguntasDoBloco = Array.from(bloco.querySelectorAll('.j-pergunta'));
@@ -525,6 +533,7 @@
         prox.classList.add('active');
         runTyping(prox);
         updateProgress();
+        isTransitioning = false;
         return;
       }
 
@@ -545,9 +554,14 @@
           updateProgress();
         } else {
           if (window.JORNADA_FINAL_VIDEO) {
-            playTransition(window.JORNADA_FINAL_VIDEO, () => showSection('section-final'));
+            console.log('[goNext] Tentando tocar Filme 5:', window.JORNADA_FINAL_VIDEO);
+            playTransition(window.JORNADA_FINAL_VIDEO, () => {
+              showSection('section-final');
+              isTransitioning = false;
+            });
           } else {
             showSection('section-final');
+            isTransitioning = false;
           }
           updateProgress();
         }
@@ -555,12 +569,27 @@
 
       const idx = Number(bloco.dataset.bloco || idxBloco);
       const src = (window.JORNADA_BLOCKS[idx] && window.JORNADA_BLOCKS[idx].video_after) || '';
-      if (src) playTransition(src, irAdiante); else irAdiante();
+      if (src) {
+        console.log('[goNext] Tentando tocar vídeo do bloco', idx, ':', src);
+        playTransition(src, () => {
+          irAdiante();
+          isTransitioning = false;
+        });
+      } else {
+        irAdiante();
+        isTransitioning = false;
+      }
     }
 
     function goPrev() {
+      if (isTransitioning) return;
+      isTransitioning = true;
+
       const current = document.querySelector('.j-pergunta.active');
-      if (!current) return;
+      if (!current) {
+        isTransitioning = false;
+        return;
+      }
 
       const bloco = current.closest('.j-bloco');
       const perguntasDoBloco = Array.from(bloco.querySelectorAll('.j-pergunta'));
@@ -573,6 +602,7 @@
         prev.classList.add('active');
         runTyping(prev);
         updateProgress();
+        isTransitioning = false;
         return;
       }
 
@@ -593,6 +623,7 @@
       } else {
         showSection('section-intro');
       }
+      isTransitioning = false;
     }
 
     /* =========================
@@ -601,69 +632,81 @@
     function checkVideoExists(src) {
       return new Promise(resolve => {
         const video = document.createElement('video');
-        video.onerror = () => resolve(false);
-        video.onloadedmetadata = () => resolve(true);
+        video.onerror = () => {
+          console.warn('[checkVideoExists] Vídeo não encontrado:', src);
+          resolve(false);
+        };
+        video.onloadedmetadata = () => {
+          console.log('[checkVideoExists] Vídeo encontrado:', src);
+          resolve(true);
+        };
         video.src = src;
       });
     }
 
     function playTransition(src, onEnd) {
+      if (isTransitioning) {
+        console.warn('[playTransition] Já em transição, ignorando:', src);
+        return;
+      }
+      isTransitioning = true;
+
       const overlay = document.getElementById('videoOverlay');
       const video = document.getElementById('videoTransicao');
       const skip = document.getElementById('skipVideo');
 
-      checkVideoExists(src).then(exists => {
-        if (!exists || !overlay || !video || !src) {
-          console.warn('[playTransition] Vídeo não encontrado ou falta overlay/vídeo/src:', { exists, overlay, video, src });
-          onEnd && onEnd();
-          return;
-        }
+      if (!overlay || !video || !src) {
+        console.warn('[playTransition] Falta overlay, vídeo ou src:', { overlay, video, src });
+        onEnd && onEnd();
+        isTransitioning = false;
+        return;
+      }
 
-        window.__playingTransition = true;
-        overlay.classList.remove('hidden');
+      window.__playingTransition = true;
+      overlay.classList.remove('hidden');
+      video.pause();
+      video.removeAttribute('src');
+      video.load();
+
+      video.controls = true;
+      video.muted = false;
+      video.playsInline = true;
+      video.setAttribute('playsinline', '');
+      video.setAttribute('webkit-playsinline', '');
+      video.style.background = '#000';
+
+      let ended = false;
+      const cleanup = () => {
+        if (ended) return;
+        ended = true;
+        window.__playingTransition = false;
         video.pause();
+        overlay.classList.add('hidden');
         video.removeAttribute('src');
         video.load();
+        onEnd && onEnd();
+        isTransitioning = false;
+      };
 
-        video.controls = true;
-        video.muted = false;
-        video.playsInline = true;
-        video.setAttribute('playsinline', '');
-        video.setAttribute('webkit-playsinline', '');
-        video.style.background = '#000';
+      video.onerror = () => {
+        console.error('[Vídeo] Erro ao carregar:', src);
+        cleanup();
+      };
+      video.onended = cleanup;
+      if (skip) skip.onclick = cleanup;
 
-        let ended = false;
-        const cleanup = () => {
-          if (ended) return;
-          ended = true;
-          window.__playingTransition = false;
-          video.pause();
-          overlay.classList.add('hidden');
-          video.removeAttribute('src');
-          video.load();
-          onEnd && onEnd();
-        };
-
-        video.onerror = () => {
-          console.error('[Vídeo] Erro ao carregar:', src);
+      video.onloadedmetadata = () => {
+        if (!video.videoWidth || !video.videoHeight) {
+          console.warn('[Vídeo] Apenas áudio detectado:', src);
+        }
+        video.play().catch(err => {
+          console.error('[Vídeo] Falha ao reproduzir:', err);
           cleanup();
-        };
-        video.onended = cleanup;
-        if (skip) skip.onclick = cleanup;
+        });
+      };
 
-        video.onloadedmetadata = () => {
-          if (!video.videoWidth || !video.videoHeight) {
-            console.warn('[Vídeo] Apenas áudio detectado:', src);
-          }
-          video.play().catch(err => {
-            console.error('[Vídeo] Falha ao reproduzir:', err);
-            cleanup();
-          });
-        };
-
-        video.src = src;
-        setTimeout(cleanup, 30000);
-      });
+      video.src = src;
+      setTimeout(cleanup, 60000); // Timeout aumentado para 60s
     }
 
     window.playTransition = playTransition;
@@ -704,37 +747,29 @@
     }
 
     /* ===== Filme 0 garantido antes das perguntas (senha válida) ===== */
-    (function wrapStartWithIntro() {
-      if (window.__wrapStartWithIntro) return;
-      window.__wrapStartWithIntro = true;
-
-      const _start = window.startJourney;
-      const intro = window.JORNADA_VIDEOS?.intro || '';
-
-      window.startJourney = function() {
-        const senha = (document.getElementById('senha')?.value || '').trim().toLowerCase();
-        if (!['iniciar', 'olho magico', 'olho mágico'].includes(senha)) {
-          alert('Senha incorreta. Tente novamente.');
-          return;
-        }
-
-        if (!intro || window.__introPlayed) {
-          _start.apply(this, arguments);
-          return;
-        }
-
-        window.__introPlayed = true;
-        playTransition(intro, () => {
-          try {
-            _start.apply(this, arguments);
-          } catch (e) {
-            console.error('[Filme 0] Erro ao iniciar jornada:', e);
-          }
-        });
-      };
-    })();
-
     function startJourney() {
+      const senha = (document.getElementById('senha')?.value || '').trim().toLowerCase();
+      if (!['iniciar', 'olho magico', 'olho mágico'].includes(senha)) {
+        alert('Senha incorreta. Tente novamente.');
+        return;
+      }
+
+      const intro = window.JORNADA_VIDEOS?.intro || '';
+      console.log('[startJourney] Iniciando jornada, Filme 0:', intro);
+
+      if (!intro || window.__introPlayed) {
+        proceedToQuestions();
+        return;
+      }
+
+      window.__introPlayed = true;
+      playTransition(intro, () => {
+        console.log('[startJourney] Filme 0 concluído, prosseguindo para perguntas');
+        proceedToQuestions();
+      });
+    }
+
+    function proceedToQuestions() {
       showSection('section-perguntas');
       loadDynamicBlocks();
       const perguntas = document.querySelectorAll('.j-pergunta');
@@ -757,6 +792,7 @@
       });
 
       document.addEventListener('click', (ev) => {
+        if (isTransitioning) return;
         const aNext = ev.target.closest('[data-action="next"]');
         const aPrev = ev.target.closest('[data-action="prev"]');
         const aStart = ev.target.closest('[data-action="start"]');
@@ -770,7 +806,7 @@
         if (aToggle) { ev.preventDefault(); toggleSenha(); }
         if (aRestart) { ev.preventDefault(); localStorage.removeItem('jornada_respostas'); location.hash = '#intro'; location.reload(); }
         if (btnPDF) { ev.preventDefault(); generatePDF(); }
-      });
+      }, { capture: true });
 
       console.log('Controlador da jornada inicializado!');
     }
