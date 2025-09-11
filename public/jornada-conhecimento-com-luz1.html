@@ -67,9 +67,9 @@
       text-shadow: 0 0 10px hsla(28, 96%, 60%, .7);
       margin: 0;
     }
-    /* Comentário: Estilo base da chama-vela, ajustado para formato de vela com base larga e topo muito afunilado */
+    /* Comentário: Estilo base da chama-vela, ajustado para formato de vela com base larga e topo super afunilado */
     .chama-vela {
-      --altura: 90px; --largura: 60px; --pulso: 1.3s; --glow: 16px; --hue: 28; --satur: 96%; --light: 58%; --op: .98;
+      --altura: 90px; --largura: 60px; --pulso: 1.2s; --glow: 16px; --hue: 28; --satur: 96%; --light: 58%; --op: .98;
       position: relative; width: var(--largura); height: var(--altura); display: inline-block;
       filter: drop-shadow(0 0 var(--glow) hsla(var(--hue), var(--satur), 60%, .75));
     }
@@ -78,51 +78,52 @@
     .chama-vela.chama-lg { --largura: 60px; --altura: 120px }
     /* Comentário: Brasas com base ainda mais larga e ovulada */
     .chama-vela .brasa {
-      position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: calc(var(--largura) * 1.3); height: 18px;
+      position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: calc(var(--largura) * 1.4); height: 20px;
       border-radius: 50% 50% 40% 40%; /* Base ovulada */
       background: radial-gradient(circle at 50% 40%, hsla(var(--hue), var(--satur), 95%, .95) 0%, hsla(var(--hue), var(--satur), 70%, .85) 50%, transparent 80%);
       filter: blur(2px); animation: brasaPulse var(--pulso) ease-in-out infinite; opacity: var(--op)
     }
-    /* Comentário: Língua da chama com formato de vela, topo super fino e gradiente mais vibrante */
+    /* Comentário: Língua da chama com formato de vela, topo ultra fino e gradiente vibrante */
     .chama-vela .lingua {
       position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: calc(var(--largura) * 1.0); height: calc(var(--altura) * 1.0);
-      border-radius: 50% 50% 6% 6%; /* Topo ainda mais afunilado */
+      border-radius: 50% 50% 4% 4%; /* Topo super afunilado */
       background: radial-gradient(
         ellipse at center,
-        rgba(255, 180, 0, 0.95) 0%, /* Centro ultra vibrante */
+        rgba(255, 190, 0, 0.95) 0%, /* Centro ultra vibrante */
         rgba(255, 69, 0, 0.75) 50%, /* Meio gordinho */
-        rgba(220, 20, 20, 0.3) 70%, /* Borda escura e vibrante */
+        rgba(230, 10, 10, 0.3) 70%, /* Borda escura e vibrante */
         transparent 100%
       );
-      mix-blend-mode: screen; filter: blur(1.3px); transform-origin: 50% 100%; animation: velaWaver 1.3s ease-in-out infinite; opacity: var(--op);
-      -webkit-mask: radial-gradient(60% 90% at 50% 5%, #000 66%, transparent 70%)
+      mix-blend-mode: screen; filter: blur(1.4px); transform-origin: 50% 100%; animation: velaWaver 1.2s ease-in-out infinite; opacity: var(--op);
+      -webkit-mask: radial-gradient(60% 90% at 50% 4%, #000 65%, transparent 69%)
     }
     /* Comentário: Camadas internas da chama para profundidade */
-    .chama-vela .lingua:nth-child(2) { width: calc(var(--largura) * .90); height: calc(var(--altura) * .94); animation-duration: 1.6s; animation-delay: .07s; filter: blur(1.1px) }
-    .chama-vela .lingua:nth-child(3) { width: calc(var(--largura) * .75); height: calc(var(--altura) * .84); animation-duration: 1.9s; animation-delay: .14s; filter: blur(.9px) }
+    .chama-vela .lingua:nth-child(2) { width: calc(var(--largura) * .92); height: calc(var(--altura) * .95); animation-duration: 1.5s; animation-delay: .08s; filter: blur(1.2px) }
+    .chama-vela .lingua:nth-child(3) { width: calc(var(--largura) * .78); height: calc(var(--altura) * .85); animation-duration: 1.8s; animation-delay: .15s; filter: blur(1px) }
     /* Comentário: Brilho com maior difusão para vibração */
     .chama-vela .brilho {
-      position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: calc(var(--largura) * 1.6); height: calc(var(--altura) * 1.4);
-      background: radial-gradient(circle, hsla(var(--hue), var(--satur), 72%, .50) 0%, transparent 70%); filter: blur(18px); mix-blend-mode: screen; animation: aura var(--pulso) ease-in-out infinite; opacity: .80; pointer-events: none
+      position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: calc(var(--largura) * 1.7); height: calc(var(--altura) * 1.5);
+      background: radial-gradient(circle, hsla(var(--hue), var(--satur), 72%, .55) 0%, transparent 70%); filter: blur(18px); mix-blend-mode: screen Stuart
+System: screen; animation: aura var(--pulso) ease-in-out infinite; opacity: .85; pointer-events: none
     }
     /* Comentário: Intensidades da chama (fraca, média, forte) */
-    .chama-vela.fraca { --altura: 70px; --largura: 50px; --pulso: 1.7s; --glow: 10px; --hue: 36; --satur: 86%; --light: 66%; --op: .70 }
-    .chama-vela.media { --altura: 90px; --largura: 60px; --pulso: 1.3s; --glow: 16px; --hue: 28; --satur: 96%; --light: 58%; --op: .98 }
-    .chama-vela.forte { --altura: 110px; --largura: 70px; --pulso: 0.8s; --glow: 22px; --hue: 20; --satur: 100%; --light: 52%; --op: 1 }
+    .chama-vela.fraca { --altura: 70px; --largura: 50px; --pulso: 1.6s; --glow: 10px; --hue: 36; --satur: 86%; --light: 66%; --op: .70 }
+    .chama-vela.media { --altura: 90px; --largura: 60px; --pulso: 1.2s; --glow: 16px; --hue: 28; --satur: 96%; --light: 58%; --op: .98 }
+    .chama-vela.forte { --altura: 110px; --largura: 70px; --pulso: 0.7s; --glow: 22px; --hue: 20; --satur: 100%; --light: 52%; --op: 1 }
     /* Comentário: Posicionamento da chama inferior */
     .flame-corner { position: fixed; z-index: 1200; pointer-events: none }
     .flame-bottom-right { bottom: 20px; right: 20px }
     /* Comentário: Chama do cabeçalho */
     #chama-header .chama-vela { --largura: 60px; --altura: 120px }
-    /* Comentário: Animações com mais vibração */
+    /* Comentário: Animações com vibração intensa */
     @keyframes velaWaver { 
       0%, 100% { transform: translateX(-50%) scaleY(1.00) skewX(0deg) }
-      25% { transform: translateX(calc(-50% + 1.2px)) scaleY(1.10) skewX(1.2deg) }
-      50% { transform: translateX(-50%) scaleY(1.18) skewX(2deg) }
-      75% { transform: translateX(calc(-50% - 1px)) scaleY(1.08) skewX(1deg) }
+      25% { transform: translateX(calc(-50% + 1.4px)) scaleY(1.12) skewX(1.4deg) }
+      50% { transform: translateX(-50%) scaleY(1.20) skewX(2.2deg) }
+      75% { transform: translateX(calc(-50% - 1.2px)) scaleY(1.10) skewX(1.2deg) }
     }
-    @keyframes brasaPulse { 0%, 100% { transform: translateX(-50%) scale(1); opacity: .85 } 50% { transform: translateX(-50%) scale(1.12); opacity: 1 } }
-    @keyframes aura { 0%, 100% { opacity: .70 } 50% { opacity: .95 } }
+    @keyframes brasaPulse { 0%, 100% { transform: translateX(-50%) scale(1); opacity: .85 } 50% { transform: translateX(-50%) scale(1.14); opacity: 1 } }
+    @keyframes aura { 0%, 100% { opacity: .75 } 50% { opacity: 1 } }
     @media (prefers-reduced-motion: reduce) {
       .chama-vela .lingua, .chama-vela .brasa, .chama-vela .brilho { animation: none !important }
     }
@@ -248,10 +249,10 @@
         </div>
 
         <!-- SELFIE COM A IRMANDADE -->
-        <section id="selfie-join" class="card pergaminho pergaminho-v" style="margin-top:16px;">
+        <div id="section-selfie" class="j-section hidden">
           <div class="conteudo-pergaminho">
             <h2 style="margin-top:0;">Entre na Irmandade ✨</h2>
-            <p>Faça uma foto agora ou envie da galeria. Ajuste e gere sua imagem “4 + você”.</p>
+            <p>Faça uma foto agora ou envie da galeria. Ajuste e gere sua imagem “4 + você”. Ou pule para começar a jornada.</p>
 
             <div class="selfie-row">
               <div class="selfie-left">
@@ -274,6 +275,7 @@
                 <div class="selfie-actions">
                   <button id="btnRenderSelfie" class="btn">✨ Gerar minha imagem</button>
                   <a id="btnDownloadSelfie" class="btn btn-secondary" download="irmandade-mais-eu.png" href="#">⬇️ Baixar</a>
+                  <button id="btnSkipSelfie" class="btn btn-secondary" data-action="skip-selfie">Pular</button>
                 </div>
               </div>
 
@@ -283,7 +285,7 @@
               </div>
             </div>
           </div>
-        </section>
+        </div>
 
         <!-- PERGUNTAS -->
         <div id="section-perguntas" class="j-section hidden">
@@ -451,7 +453,7 @@
       const canvas = document.getElementById('jornada-canvas');
       if (!canvas) return;
       let hero = document.getElementById('chama-hero');
-      const show = (sectionId === 'section-intro' || sectionId === 'section-final');
+      const show = (sectionId === 'section-intro' || sectionId === 'section-final' || sectionId === 'section-selfie');
       if (show) {
         if (!hero) {
           hero = makeFlame('chama-vela chama-lg');
@@ -567,6 +569,7 @@
           const url = cv.toDataURL("image/png");
           aDown.href = url;
           try { localStorage.setItem("IRMANDADE_SELFIE_FINAL", url); } catch (_) {}
+          proceedAfterSelfie();
         });
       }
 
@@ -738,6 +741,24 @@
       input.type = (input.type === 'password' ? 'text' : 'password');
     }
 
+    function proceedAfterSelfie() {
+      isTransitioning = false;
+      console.log('[proceedAfterSelfie] Resetando isTransitioning:', isTransitioning);
+      const intro = window.JORNADA_VIDEOS?.intro || '';
+      console.log('[proceedAfterSelfie] Iniciando filme 0:', intro);
+
+      if (!intro || window.__introPlayed) {
+        proceedToQuestions();
+        return;
+      }
+
+      window.__introPlayed = true;
+      playTransition(intro, () => {
+        console.log('[proceedAfterSelfie] Filme 0 concluído, prosseguindo para perguntas');
+        proceedToQuestions();
+      });
+    }
+
     let isTransitioning = false;
     function goNext() {
       if (isTransitioning) {
@@ -890,9 +911,9 @@
         isTransitioning = false;
         console.log('[goPrev] Voltando para bloco:', idxBloco - 1);
       } else {
-        showSection('section-intro');
+        showSection('section-selfie');
         isTransitioning = false;
-        console.log('[goPrev] Voltando para introdução');
+        console.log('[goPrev] Voltando para selfie');
       }
     }
 
@@ -1028,19 +1049,8 @@
         return;
       }
 
-      const intro = window.JORNADA_VIDEOS?.intro || '';
-      console.log('[startJourney] Iniciando jornada, Filme 0:', intro);
-
-      if (!intro || window.__introPlayed) {
-        proceedToQuestions();
-        return;
-      }
-
-      window.__introPlayed = true;
-      playTransition(intro, () => {
-        console.log('[startJourney] Filme 0 concluído, prosseguindo para perguntas');
-        proceedToQuestions();
-      });
+      console.log('[startJourney] Senha validada, indo para selfie');
+      showSection('section-selfie');
     }
 
     function proceedToQuestions() {
@@ -1079,8 +1089,9 @@
         const aToggle = ev.target.closest('[data-action="toggle-password"], .password-toggle');
         const aRestart = ev.target.closest('[data-action="restart"]');
         const btnPDF = ev.target.closest('[data-action="generate-pdf"]');
+        const btnSkipSelfie = ev.target.closest('[data-action="skip-selfie"]');
 
-        console.log('[initJornada] Clique detectado:', { aNext, aPrev, aStart, aToggle, aRestart, btnPDF });
+        console.log('[initJornada] Clique detectado:', { aNext, aPrev, aStart, aToggle, aRestart, btnPDF, btnSkipSelfie });
 
         if (aNext) { ev.preventDefault(); goNext(); }
         if (aPrev) { ev.preventDefault(); goPrev(); }
@@ -1088,6 +1099,7 @@
         if (aToggle) { ev.preventDefault(); toggleSenha(); }
         if (aRestart) { ev.preventDefault(); localStorage.removeItem('jornada_respostas'); location.hash = '#intro'; location.reload(); }
         if (btnPDF) { ev.preventDefault(); generatePDF(); }
+        if (btnSkipSelfie) { ev.preventDefault(); proceedAfterSelfie(); }
       }, { capture: true });
 
       console.log('Controlador da jornada inicializado!');
@@ -1100,8 +1112,8 @@
       afterBlocks: {
         0: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
         1: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
-        2: VIDEO_BASE + 'filme-3-trumas-na-jornada.mp4',
-        3: VIDEO_BASE + 'filme-4-aproximando-no-final.mp4'
+        2: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
+        3: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
       },
       final: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
     };
@@ -1183,6 +1195,7 @@
       const route = (location.hash || '#intro').slice(1);
       if (route === 'perguntas') { showSection('section-perguntas'); loadDynamicBlocks(); }
       else if (route === 'final') { showSection('section-final'); }
+      else if (route === 'selfie') { showSection('section-selfie'); }
       else { showSection('section-intro'); }
       runTyping(document);
     }
@@ -1208,6 +1221,7 @@
     window.toggleSenha = toggleSenha;
     window.startJourney = startJourney;
     window.showSection = showSection;
+    window.proceedAfterSelfie = proceedAfterSelfie;
   })();
   </script>
 </body>
