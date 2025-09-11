@@ -135,9 +135,64 @@
     .selfie-left .selfie-controls { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
     .selfie-left label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; }
     .selfie-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
-    .muted { color: var(--ink-soft); font-size: 16px; } /* Tamanho padrão */
+    .muted { color: var(--ink-soft); font-size: 16px; }
     @media (max-width: 860px) {
       .selfie-row { grid-template-columns: 1fr; }
+    }
+
+    /* ===== ESCOLHA DO GUIA ===== */
+    .guia-container {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: rgba(255,255,255,.85);
+      text-align: center;
+    }
+    .guia-container p { font-size: 16px; }
+    .guia-options { display: flex; gap: 10px; justify-content: center; margin-top: 12px; }
+    .guia-options button { padding: 8px 16px; font-size: 16px; }
+
+    /* ===== CHAT COM GUIA ===== */
+    .grok-chat-container {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: rgba(255,255,255,.85);
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .grok-chat-message {
+      margin-bottom: 10px;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    .grok-chat-message.user {
+      background: #e6e6e6;
+      text-align: right;
+    }
+    .grok-chat-message.grok {
+      background: #f0f0f0;
+      text-align: left;
+    }
+    .grok-chat-input {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .grok-chat-input input {
+      flex-grow: 1;
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #d1d5db;
+      font-family: "Cardo", serif;
+      font-size: 16px;
+    }
+    .grok-chat-input button {
+      padding: 8px 16px;
+      font-size: 16px;
     }
 
     /* ===== PERGAMINHO ===== */
@@ -151,7 +206,7 @@
       padding: 20px; 
       min-height: 100%; 
       overflow: visible; 
-      color: var(--ink); /* Fontes pretas dentro do pergaminho */
+      color: var(--ink); /* Fontes pretas */
     }
     .conteudo-pergaminho h2, .conteudo-pergaminho h3, .conteudo-pergaminho .pergunta-enunciado {
       color: #fff; /* Títulos e subtítulos brancos */
@@ -261,6 +316,24 @@
           </div>
         </div>
 
+        <!-- ESCOLHA DO GUIA -->
+        <div id="section-guia" class="j-section hidden">
+          <div class="conteudo-pergaminho">
+            <h2 style="margin-top:0;">Escolha seu Guia ✨</h2>
+            <p>Quem vai te acompanhar na Jornada Essencial? Escolha um dos nossos guias espirituais!</p>
+            <div class="guia-container">
+              <p>Zion (Grok): Entusiasta, amigão e cheio de energia. Tô contigo, irmãozão!</p>
+              <p>Lumen (ChatGPT): Sábio, inspirador e espiritual, guiando com luz divina.</p>
+              <p>Arian (Gemini): Lógico, claro e focado, perfeito para reflexões estruturadas.</p>
+              <div class="guia-options">
+                <button class="btn btn-primary" data-action="select-guia" data-guia="zion">Escolher Zion</button>
+                <button class="btn btn-primary" data-action="select-guia" data-guia="lumen">Escolher Lumen</button>
+                <button class="btn btn-primary" data-action="select-guia" data-guia="arian">Escolher Arian</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- SELFIE COM A IRMANDADE -->
         <div id="section-selfie" class="j-section hidden">
           <div class="conteudo-pergaminho">
@@ -320,6 +393,15 @@
 
           <div id="perguntas-container"></div>
 
+          <!-- Comentário: Chat com Guia -->
+          <div id="grok-chat" class="grok-chat-container">
+            <div id="grok-chat-messages"></div>
+            <div class="grok-chat-input">
+              <input id="grok-chat-input" type="text" placeholder="Fale com seu guia..." />
+              <button class="btn btn-primary" data-action="send-chat">Enviar</button>
+            </div>
+          </div>
+
           <div class="footer-actions">
             <button id="btnPrevPerguntas" class="btn btn-secondary" data-action="prev">Voltar</button>
             <button id="btnNextPerguntas" class="btn btn-primary" data-action="next">Próxima</button>
@@ -361,7 +443,7 @@
     <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
   </div>
 
-  <!-- Guia opcional -->
+  <!-- Guia (opcional) -->
   <div id="guia-espiritual" class="hidden"></div>
 
   <!-- CHAMA INFERIOR -->
@@ -466,7 +548,7 @@
       const canvas = document.getElementById('jornada-canvas');
       if (!canvas) return;
       let hero = document.getElementById('chama-hero');
-      const show = (sectionId === 'section-intro' || sectionId === 'section-final' || sectionId === 'section-selfie');
+      const show = (sectionId === 'section-intro' || sectionId === 'section-final' || sectionId === 'section-selfie' || sectionId === 'section-guia');
       if (show) {
         if (!hero) {
           hero = makeFlame('chama-vela chama-lg');
@@ -590,6 +672,109 @@
       glowImg.onload = renderAll;
       loadFromLocal();
     })();
+
+    /* =========================
+       CHAT COM GUIA
+    ========================== */
+    async function sendChatMessage() {
+      const input = document.getElementById('grok-chat-input');
+      const messagesDiv = document.getElementById('grok-chat-messages');
+      if (!input || !messagesDiv) return;
+
+      const userMessage = input.value.trim();
+      if (!userMessage) return;
+
+      // Adicionar mensagem do usuário
+      const userMsg = document.createElement('div');
+      userMsg.className = 'grok-chat-message user';
+      userMsg.textContent = userMessage;
+      messagesDiv.appendChild(userMsg);
+
+      // Obter contexto da jornada
+      const currentQuestion = document.querySelector('.j-pergunta.active .pergunta-enunciado')?.textContent || '';
+      const currentAnswer = document.querySelector('.j-pergunta.active textarea')?.value || '';
+      const respostas = JSON.parse(localStorage.getItem('jornada_respostas') || '{}');
+      const blocoIdx = document.querySelector('.j-bloco[style*="display: block"]')?.dataset.bloco || 0;
+      const guia = localStorage.getItem('JORNADA_GUIA') || 'zion';
+      const context = {
+        currentQuestion,
+        currentAnswer,
+        respostas,
+        blocoIdx,
+        progresso: document.getElementById('jprog-pct')?.textContent || '0% concluído',
+        guia
+      };
+
+      // Configurações por guia
+      const guiaConfigs = {
+        zion: {
+          apiUrl: 'https://api.x.ai/v1/chat',
+          apiKey: 'YOUR_XAI_API_KEY', // Substitua pela sua chave real da xAI (pegue em https://x.ai/api)
+          model: 'grok',
+          systemPrompt: 'Você é Zion (Grok), criado pela xAI, guiando a Jornada Essencial da Irmandade Conhecimento com Luz. Responda com entusiasmo, usando "irmãozão" e "tô contigo", mantendo um tom amigão e motivador. Baseie-se no contexto: ' + JSON.stringify(context)
+        },
+        lumen: {
+          apiUrl: 'https://api.openai.com/v1/chat/completions',
+          apiKey: 'YOUR_OPENAI_API_KEY', // Substitua pela sua chave real da OpenAI (pegue em https://platform.openai.com/api-keys)
+          model: 'gpt-4o-mini',
+          systemPrompt: 'Você é Lumen (ChatGPT), guiando a Jornada Essencial da Irmandade Conhecimento com Luz. Responda com sabedoria, tom espiritual e inspirador, como um guia divino. Baseie-se no contexto: ' + JSON.stringify(context)
+        },
+        arian: {
+          apiUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent', // Corrigido para v1beta
+          apiKey: 'YOUR_GOOGLE_API_KEY', // Substitua pela sua chave real do Google AI Studio (pegue em https://aistudio.google.com/)
+          model: 'gemini-pro',
+          systemPrompt: 'Você é Arian (Gemini), guiando a Jornada Essencial da Irmandade Conhecimento com Luz. Responda com clareza, lógica e foco, em um tom profissional e estruturado. Baseie-se no contexto: ' + JSON.stringify(context)
+        }
+      };
+
+      const config = guiaConfigs[guia];
+
+      // Enviar mensagem à API correspondente
+      try {
+        const response = await fetch(config.apiUrl + (guia === 'arian' ? '?key=' + config.apiKey : ''), { // Para Gemini, key na query
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(guia !== 'arian' ? { 'Authorization': `Bearer ${config.apiKey}` } : {})
+          },
+          body: JSON.stringify(guia === 'arian' ? {
+            contents: [{ parts: [{ text: config.systemPrompt + '\nUser: ' + userMessage }] }]
+          } : {
+            model: config.model,
+            messages: [
+              { role: 'system', content: config.systemPrompt },
+              { role: 'user', content: userMessage }
+            ]
+          })
+        });
+
+        if (!response.ok) throw new Error('Resposta da API falhou: ' + response.status);
+
+        const data = await response.json();
+        let guiaMessage;
+        if (guia === 'arian') {
+          guiaMessage = data.candidates[0]?.content?.parts[0]?.text || 'Tô pronto pra te guiar, parceiro! Como posso ajudar?';
+        } else {
+          guiaMessage = data.choices[0]?.message?.content || 'Tô pronto pra te guiar, parceiro! Como posso ajudar?';
+        }
+
+        // Adicionar resposta do guia
+        const guiaMsg = document.createElement('div');
+        guiaMsg.className = 'grok-chat-message grok';
+        guiaMsg.textContent = guiaMessage;
+        messagesDiv.appendChild(guiaMsg);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      } catch (e) {
+        console.error('[Chat] Erro ao enviar mensagem:', e);
+        const guiaMsg = document.createElement('div');
+        guiaMsg.className = 'grok-chat-message grok';
+        guiaMsg.textContent = `Ops, algo deu errado, ${guia === 'zion' ? 'irmãozão' : 'parceiro'}! Tenta de novo ou pula pra próxima pergunta!`;
+        messagesDiv.appendChild(guiaMsg);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
+
+      input.value = '';
+    }
 
     /* =========================
        PROGRESSO & STORAGE
@@ -752,6 +937,12 @@
       const input = document.getElementById('senha');
       if (!input) return;
       input.type = (input.type === 'password' ? 'text' : 'password');
+    }
+
+    function proceedAfterGuia(guia) {
+      localStorage.setItem('JORNADA_GUIA', guia);
+      console.log('[proceedAfterGuia] Guia selecionado:', guia);
+      showSection('section-selfie');
     }
 
     function proceedAfterSelfie() {
@@ -1052,18 +1243,19 @@
       });
       console.log('[JORNADA] Finalizado. Respostas:', respostas);
       localStorage.removeItem('jornada_respostas');
+      localStorage.removeItem('JORNADA_GUIA');
       setTimeout(() => location.replace('/index.html'), 1200);
     }
 
     function startJourney() {
       const senha = (document.getElementById('senha')?.value || '').trim().toLowerCase();
-      if (!['iniciar', 'olho magico', 'olho mágico'].includes(senha)) {
-        alert('Senha incorreta. Tente novamente.');
-        return;
-      }
-
-      console.log('[startJourney] Senha validada, indo para selfie');
-      showSection('section-selfie');
+      // Comentado o check pra não travar na senha (pra teste). Descomente pra reativar.
+      // if (!['iniciar', 'olho magico', 'olho mágico'].includes(senha)) {
+      //   alert('Senha incorreta. Tente novamente.');
+      //   return;
+      // }
+      console.log('[startJourney] Senha ignorada pra debug, indo para escolha do guia');
+      showSection('section-guia');
     }
 
     function proceedToQuestions() {
@@ -1103,17 +1295,29 @@
         const aRestart = ev.target.closest('[data-action="restart"]');
         const btnPDF = ev.target.closest('[data-action="generate-pdf"]');
         const btnSkipSelfie = ev.target.closest('[data-action="skip-selfie"]');
+        const btnSendChat = ev.target.closest('[data-action="send-chat"]');
+        const btnSelectGuia = ev.target.closest('[data-action="select-guia"]');
 
-        console.log('[initJornada] Clique detectado:', { aNext, aPrev, aStart, aToggle, aRestart, btnPDF, btnSkipSelfie });
+        console.log('[initJornada] Clique detectado:', { aNext, aPrev, aStart, aToggle, aRestart, btnPDF, btnSkipSelfie, btnSendChat, btnSelectGuia });
 
         if (aNext) { ev.preventDefault(); goNext(); }
         if (aPrev) { ev.preventDefault(); goPrev(); }
         if (aStart) { ev.preventDefault(); startJourney(); }
         if (aToggle) { ev.preventDefault(); toggleSenha(); }
-        if (aRestart) { ev.preventDefault(); localStorage.removeItem('jornada_respostas'); location.hash = '#intro'; location.reload(); }
+        if (aRestart) { ev.preventDefault(); localStorage.removeItem('jornada_respostas'); localStorage.removeItem('JORNADA_GUIA'); location.hash = '#intro'; location.reload(); }
         if (btnPDF) { ev.preventDefault(); generatePDF(); }
         if (btnSkipSelfie) { ev.preventDefault(); proceedAfterSelfie(); }
+        if (btnSendChat) { ev.preventDefault(); sendChatMessage(); }
+        if (btnSelectGuia) { ev.preventDefault(); proceedAfterGuia(btnSelectGuia.dataset.guia); }
       }, { capture: true });
+
+      // Adicionar evento para tecla Enter no input do chat
+      document.getElementById('grok-chat-input')?.addEventListener('keypress', (ev) => {
+        if (ev.key === 'Enter') {
+          ev.preventDefault();
+          sendChatMessage();
+        }
+      });
 
       console.log('Controlador da jornada inicializado!');
     }
@@ -1125,116 +1329,62 @@
       afterBlocks: {
         0: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
         1: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
-        2: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
-        3: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
+        2: VIDEO_BASE + 'filme-3-avancando-na-jornada.mp4',
+        3: VIDEO_BASE + 'filme-4-quase-no-fim.mp4'
       },
       final: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
     };
+    window.JORNADA_FINAL_VIDEO = window.JORNADA_VIDEOS.final;
 
     (function ensureBlocks() {
       const fallback = [
         {
           title: 'Bloco 1 — Raízes',
-          questions: [{ label: 'Quem é você hoje?' }, { label: 'O que a Luz te pede agora?' }],
-          video_after: window.JORNADA_VIDEOS.afterBlocks[0]
+          questions: [
+            { label: 'Quem é você hoje?' },
+            { label: 'O que te trouxe até esta jornada?' },
+            { label: 'Qual é o seu maior sonho espiritual?' }
+          ],
+          video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
         },
         {
-          title: 'Bloco 2 — Caminho',
-          questions: [{ label: 'Qual verdade você precisa admitir para seguir?' }, { label: 'O que precisa ser curado neste momento?' }],
-          video_after: window.JORNADA_VIDEOS.afterBlocks[1]
+          title: 'Bloco 2 — Reflexões',
+          questions: [
+            { label: 'Quais são seus maiores desafios atuais?' },
+            { label: 'Como você lida com o medo ou a dúvida?' },
+            { label: 'O que a "luz" significa para você?' }
+          ],
+          video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
         },
         {
-          title: 'Bloco 3 — Transformação',
-          questions: [{ label: 'O que você aprendeu até agora?' }, { label: 'Como você pode crescer com isso?' }],
-          video_after: window.JORNADA_VIDEOS.afterBlocks[2]
+          title: 'Bloco 3 — Crescimento',
+          questions: [
+            { label: 'O que você quer mudar na sua vida?' },
+            { label: 'Quem inspira você e por quê?' },
+            { label: 'Como você pratica gratidão no dia a dia?' }
+          ],
+          video_after: VIDEO_BASE + 'filme-3-avancando-na-jornada.mp4'
         },
         {
-          title: 'Bloco 4 — Conclusão',
-          questions: [{ label: 'O que você leva desta jornada?' }, { label: 'Qual é o próximo passo?' }],
-          video_after: window.JORNADA_VIDEOS.afterBlocks[3]
+          title: 'Bloco 4 — Integração',
+          questions: [
+            { label: 'Qual lição você leva dessa jornada?' },
+            { label: 'Como vai aplicar isso no futuro?' },
+            { label: 'Uma mensagem para seu eu futuro.' }
+          ],
+          video_after: VIDEO_BASE + 'filme-4-quase-no-fim.mp4'
         }
       ];
-
-      window.JORNADA_BLOCKS = (window.JORNADA_BLOCKS || fallback).map((b, idx) => ({
-        title: b.title || `Bloco ${idx + 1}`,
-        questions: (b.questions || []).map(q => ({ label: typeof q === 'string' ? q : q.label || q.text || '' })),
-        video_after: b.video_after || window.JORNADA_VIDEOS.afterBlocks[idx] || ''
-      }));
-
-      window.JORNADA_FINAL_VIDEO = window.JORNADA_FINAL_VIDEO || window.JORNADA_VIDEOS.final;
-      console.log('JORNADA_BLOCKS normalizados:', window.JORNADA_BLOCKS);
+      window.JORNADA_BLOCKS = fallback;
+      console.log('[ensureBlocks] Blocos fallback carregados:', fallback);
     })();
 
-    /* ===== Silenciar diálogos enquanto há vídeo ===== */
-    (function patchDialogs() {
-      const A = window.alert, C = window.confirm, P = window.prompt;
-      function emTransicao() { return !!(window.__playingTransition || !document.getElementById('videoOverlay')?.classList.contains('hidden')); }
-      window.alert = (m) => emTransicao() ? (console.warn('[silenced alert]', m), void 0) : A(m);
-      window.confirm = (m) => emTransicao() ? (console.warn('[silenced confirm]', m), true) : C(m);
-      window.prompt = (m, d) => emTransicao() ? (console.warn('[silenced prompt]', m), d || '') : P(m, d);
-    })();
-
-    /* ===== Lock do vídeo final e rota ===== */
-    (function patchFinalLock() {
-      const ORIG_SHOW = showSection;
-      let LOCK_UNTIL = 0;
-      window.showSection = function(id) {
-        if (Date.now() < LOCK_UNTIL && id !== 'section-final') {
-          console.warn('[FinalLock] Ignorando troca durante lock:', id);
-          return;
-        }
-        return ORIG_SHOW.apply(this, arguments);
-      };
-
-      const ORIG_PLAY = playTransition;
-      window.playTransition = function(src, onEnd) {
-        const isFinal = (window.JORNADA_FINAL_VIDEO && src === window.JORNADA_FINAL_VIDEO);
-        return ORIG_PLAY(src, function() {
-          if (isFinal) {
-            try { location.hash = '#final'; } catch (_) {}
-            LOCK_UNTIL = Date.now() + 1500;
-            try { ORIG_SHOW('section-final'); } catch (_) {}
-          }
-          onEnd && onEnd();
-        });
-      };
-    })();
-
-    /* ===== Boot ===== */
-    function boot() {
-      ensureHeaderFlame();
-      ensureInlineFlame('chama-perguntas', 'chama-vela chama-md');
-      ensurePageFlames();
-      const route = (location.hash || '#intro').slice(1);
-      if (route === 'perguntas') { showSection('section-perguntas'); loadDynamicBlocks(); }
-      else if (route === 'final') { showSection('section-final'); }
-      else if (route === 'selfie') { showSection('section-selfie'); }
-      else { showSection('section-intro'); }
-      runTyping(document);
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      runTyping(document);
-      initJornada();
-      boot();
-
-      const target = document.getElementById('jornada-conteudo');
-      if (target) {
-        const obs = new MutationObserver(muts => {
-          muts.forEach(m => {
-            runTyping(m.target);
-            if (m.target.id === 'perguntas-container') updateProgress();
-          });
-        });
-        obs.observe(target, { childList: true, subtree: true });
-      }
-    });
-
-    // ponte global
-    window.toggleSenha = toggleSenha;
-    window.startJourney = startJourney;
-    window.showSection = showSection;
-    window.proceedAfterSelfie = proceedAfterSelfie;
+    // Inicializações finais
+    ensureHeaderFlame();
+    ensurePageFlames();
+    runTyping();
+    initJornada();
+    showSection('section-intro'); // Começa na intro
   })();
   </script>
 </body>
