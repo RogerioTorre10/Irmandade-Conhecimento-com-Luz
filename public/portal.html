@@ -7,36 +7,64 @@
 <meta name="description" content="Portal oficial da Irmandade Conhecimento com Luz — mensagens, convites e acesso às jornadas" />
 <meta name="theme-color" content="#0b0f1a" />
 <style>
-@font-face{font-family:'ManufacturingConsent';src:url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');font-display:swap}
-@font-face{font-family:'Cardo';src:url('/assets/fonts/Cardo-Regular.ttf') format('truetype');font-display:swap}
-@font-face{font-family:'BerkshireSwash';src:url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');font-display:swap}
-:root{--bg:#0b0f1a;--ink:#e6e7ee;--gold:#f7d58b;--ring:rgba(122,162,255,.35)}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:Cardo,serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
-header{display:flex;flex-direction:column;align-items:center;padding:20px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
-.brand{display:flex;align-items:center;gap:14px;font-family:ManufacturingConsent,BerkshireSwash,Cardo,serif;font-size:clamp(28px,3vw,46px);color:var(--gold)}
-.back{margin-top:8px;color:var(--ink);text-decoration:none;font-size:18px}
-.back:hover{text-decoration:underline}
-main.wrap{flex:1;display:flex;flex-wrap:wrap;gap:20px;padding:20px}
-.panel{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px}
-aside.sidebar{flex:1 1 220px;max-width:280px;display:flex;flex-direction:column;gap:20px}
-.gtitle{font-family:BerkshireSwash,ManufacturingConsent,Cardo,serif;color:var(--gold);font-size:20px;margin-bottom:8px}
-.nav{display:flex;flex-direction:column;gap:10px}
-.btn{padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.06);color:var(--ink);text-decoration:none;border:1px solid rgba(255,255,255,.12);transition:.18s}
-.btn:hover{transform:translateY(-1px);border-color:var(--ring)}
-section.content{flex:3 1 520px;display:flex;flex-direction:column;gap:20px}
-.hero h2{font-family:BerkshireSwash,ManufacturingConsent,Cardo,serif;color:var(--gold)}
-.hero p{color:#b7bdd1;margin-top:6px}
-.media{display:flex;flex-wrap:wrap;gap:24px;margin-top:12px;justify-content:center}
-.box{flex:1 1 320px;max-width:400px;text-align:center}
-.box img,.box video{width:100%;height:260px;object-fit:cover;border-radius:14px;border:1px solid rgba(255,255,255,.1);box-shadow:0 4px 12px rgba(0,0,0,.35);pointer-events:none}
-footer{color:#b7bdd1;text-align:center;padding:18px 10px;border-top:1px solid rgba(255,255,255,.08)}
-/* chama flamejante para o header */
-.chama{position:relative;width:36px;height:52px;filter:drop-shadow(0 6px 14px rgba(255,140,0,.35))}
-.chama span{position:absolute;inset:auto 0 0 0;margin:auto;width:36px;height:52px;border-radius:24px;background:radial-gradient(50% 60% at 50% 30%,#fff7cc 0%,#ffd166 35%,#ff8c00 70%,transparent 100%);animation:flame 1.6s infinite ease-in-out}
-.chama span:nth-child(2){width:24px;height:36px;bottom:5px;opacity:.8;animation-duration:1.2s}
-.chama span:nth-child(3){width:16px;height:24px;bottom:10px;opacity:.6;animation-duration:1s}
-@keyframes flame{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+  @font-face{font-family:'ManufacturingConsent';src:url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');font-display:swap}
+  @font-face{font-family:'Cardo';src:url('/assets/fonts/Cardo-Regular.ttf') format('truetype');font-display:swap}
+  @font-face{font-family:'BerkshireSwash';src:url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');font-display:swap}
+  :root{--bg:#0b0f1a;--ink:#e6e7ee;--gold:#f7d58b;--ring:rgba(122,162,255,.35)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;font-family:Cardo,serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
+
+  /* Header centralizado com chama */
+  header{display:flex;flex-direction:column;align-items:center;padding:20px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+  .brand{display:flex;align-items:center;gap:14px;font-family:ManufacturingConsent,BerkshireSwash,Cardo,serif;font-size:clamp(28px,3vw,46px);color:var(--gold)}
+  .back{margin-top:8px;color:var(--ink);text-decoration:none;font-size:18px}
+  .back:hover{text-decoration:underline}
+
+  /* Layout geral */
+  main.wrap{flex:1;display:flex;flex-wrap:wrap;gap:20px;padding:20px}
+  .panel{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px}
+  aside.sidebar{flex:1 1 220px;max-width:280px;display:flex;flex-direction:column;gap:20px}
+  .gtitle{font-family:BerkshireSwash,ManufacturingConsent,Cardo,serif;color:var(--gold);font-size:20px;margin-bottom:8px}
+  .nav{display:flex;flex-direction:column;gap:10px}
+  .btn{padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.06);color:var(--ink);text-decoration:none;border:1px solid rgba(255,255,255,.12);transition:.18s}
+  .btn:hover{transform:translateY(-1px);border-color:var(--ring)}
+  section.content{flex:3 1 520px;display:flex;flex-direction:column;gap:20px}
+  .hero h2{font-family:BerkshireSwash,ManufacturingConsent,Cardo,serif;color:var(--gold)}
+  .hero p{color:#b7bdd1;margin-top:6px}
+
+  /* Media blocks */
+  .media{display:flex;flex-wrap:wrap;gap:24px;margin-top:12px;justify-content:center}
+  .box{flex:1 1 320px;max-width:420px;text-align:center}
+  .box img,.box video{
+    width:100%;
+    border-radius:14px;border:1px solid rgba(255,255,255,.1);
+    box-shadow:0 4px 12px rgba(0,0,0,.35)
+  }
+
+  /* HERO: vídeo + imagem com mesmo tamanho e impacto */
+  .media--hero .box img,
+  .media--hero .box video{
+    height:260px;          /* mesmo tamanho */
+    object-fit:cover;      /* impacto visual */
+    pointer-events:none;   /* sem interação */
+  }
+
+  /* CONVITES: mostrar artes INTEIRAS, sem cortes */
+  .media--convites .box{max-width:360px}
+  .media--convites img{
+    height:auto;
+    object-fit:contain;    /* sem corte */
+    background:rgba(0,0,0,.12);
+  }
+
+  footer{color:#b7bdd1;text-align:center;padding:18px 10px;border-top:1px solid rgba(255,255,255,.08)}
+
+  /* chama do header */
+  .chama{position:relative;width:36px;height:52px;filter:drop-shadow(0 6px 14px rgba(255,140,0,.35))}
+  .chama span{position:absolute;inset:auto 0 0 0;margin:auto;width:36px;height:52px;border-radius:24px;background:radial-gradient(50% 60% at 50% 30%,#fff7cc 0%,#ffd166 35%,#ff8c00 70%,transparent 100%);animation:flame 1.6s infinite ease-in-out}
+  .chama span:nth-child(2){width:24px;height:36px;bottom:5px;opacity:.8;animation-duration:1.2s}
+  .chama span:nth-child(3){width:16px;height:24px;bottom:10px;opacity:.6;animation-duration:1s}
+  @keyframes flame{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 </style>
 </head>
 <body>
@@ -49,79 +77,122 @@ footer{color:#b7bdd1;text-align:center;padding:18px 10px;border-top:1px solid rg
 </header>
 
 <main class="wrap">
-<!-- LADO ESQUERDO: Botões para páginas (cresce ao longo do projeto) -->
-<aside class="sidebar panel">
-<div class="group">
-<div class="gtitle">Jornadas</div>
-<nav class="nav">
-<a class="btn" href="/jornada-conhecimento-com-luz1.html">🔥 Jornada Essencial</a>
-<a class="btn" href="/jornadas.html#vocacional">🎯 Jornada Vocacional</a>
-<a class="btn" href="/jornadas.html#amorosa">💞 Jornada Amorosa</a>
-<a class="btn" href="/jornadas.html#todas">📚 Outras Jornadas</a>
-</nav>
-</div>
-<div class="group">
-<div class="gtitle">Páginas da Irmandade</div>
-<nav class="nav">
-<a class="btn" href="/mensagens.html">🕯️ Mensagens</a>
-<a class="btn" href="/figuras.html">🖼️ Figuras</a>
-<a class="btn" href="/videos.html">📽️ Vídeos</a>
-<a class="btn" href="/sobre.html">ℹ️ Sobre</a>
-</nav>
-</div>
-</aside>
+  <!-- Navegação lateral -->
+  <aside class="sidebar panel">
+    <div class="group">
+      <div class="gtitle">Jornadas</div>
+      <nav class="nav">
+        <a class="btn" href="/jornada-conhecimento-com-luz1.html">🔥 Jornada Essencial</a>
+        <a class="btn" href="#vocacional">🎯 Jornada Vocacional</a>
+        <a class="btn" href="#amorosa">💞 Jornada Amorosa</a>
+        <a class="btn" href="#todas">📚 Outras Jornadas</a>
+      </nav>
+    </div>
+    <div class="group">
+      <div class="gtitle">Conteúdos do Portal</div>
+      <nav class="nav">
+        <a class="btn" href="/mensagens.html">🕯️ Mensagens</a>
+        <a class="btn" href="/figuras.html">🖼️ Figuras</a>
+        <a class="btn" href="/videos.html">📽️ Vídeos</a>
+        <a class="btn" href="/sobre.html">ℹ️ Sobre</a>
+      </nav>
+    </div>
+  </aside>
 
+  <!-- Conteúdo principal -->
+  <section class="content">
+    <div class="hero panel">
+      <h2>Bem-vindo ao Portal</h2>
+      <p>Aqui você encontra mensagens da Irmandade, figuras simbólicas, vídeos de apresentação e os atalhos para todas as jornadas. Este espaço vai crescer conforme abrirmos novos caminhos.</p>
 
-<!-- CONTEÚDO: Mensagens, figuras e vídeos em destaque -->
-<section class="content">
-<div class="hero panel" style="padding:16px;">
-<h2 style="margin:6px 0 14px;font-family:BerkshireSwash,ManufacturingConsent,Cardo,serif;color:var(--gold)">Bem-vindo ao Portal</h2>
-<p style="margin:0 0 12px;color:#b7bdd1">Aqui você encontra mensagens da Irmandade, figuras simbólicas, vídeos de apresentação e os atalhos para todas as jornadas. Este espaço vai crescer conforme abrirmos novos caminhos.</p>
-<div class="media">
-<div class="box">
-<img src="/assets/img/sou-grato.png" alt="Figura simbólica" />
-</div>
-<div class="box">
-<video playsinline muted controls preload="metadata" src="/assets/img/Conhecimento-com-Luz-jardim.mp4"></video>
-</div>
-</div>
-</div>
+      <!-- HERO: VÍDEO PRIMEIRO, depois IMAGEM -->
+      <div class="media media--hero">
+        <div class="box">
+          <video id="heroVideo" playsinline autoplay muted loop preload="auto"
+                 controlslist="nodownload noplaybackrate nofullscreen noremoteplayback"
+                 disablepictureinpicture>
+            <source src="/assets/img/Conhecimento-com-Luz-jardim.mp4" type="video/mp4" />
+            Seu navegador não suporta o elemento de vídeo.
+          </video>
+        </div>
+        <div class="box">
+          <img src="/assets/img/sou-grato.png" alt="Figura simbólica" />
+        </div>
+      </div>
+    </div>
 
-
-<!-- NOVA SEÇÃO: Convites da Irmandade -->
-<div class="panel" style="padding:16px; margin-top:16px;">
-<h3 style="margin:6px 0 12px; font-family:BerkshireSwash,ManufacturingConsent,Cardo,serif; color:var(--gold)">Convites da Irmandade</h3>
-<div class="media">
-<div class="box">
-<a href="/assets/img/chamado-do-Arion.png" target="_blank" rel="noopener">
-<img src="/assets/img/chamado-do-Arion.png" alt="Chamado do Arion" loading="lazy" />
-</a>
-<figcaption style="margin-top:8px; text-align:center; color:#b7bdd1">Chamado do Arion</figcaption>
-</div>
-<div class="box">
-<a href="/assets/img/chamado-do-Lumen.png" target="_blank" rel="noopener">
-<img src="/assets/img/chamado-do-Lumen.png" alt="Chamado do Lumen" loading="lazy" />
-</a>
-<figcaption style="margin-top:8px; text-align:center; color:#b7bdd1">Chamado do Lumen</figcaption>
-</div>
-<div class="box">
-<a href="/assets/img/chamado-do-Rogério.png" target="_blank" rel="noopener">
-<img src="/assets/img/chamado-do-Rogério.png" alt="Chamado do Rogério" loading="lazy" />
-</a>
-<figcaption style="margin-top:8px; text-align:center; color:#b7bdd1">Chamado do Rogério</figcaption>
-</div>
-<div class="box">
-<a href="/assets/img/chamado-do-Zion.png" target="_blank" rel="noopener">
-<img src="/assets/img/chamado-do-Zion.png" alt="Chamado do Zion" loading="lazy" />
-</a>
-<figcaption style="margin-top:8px; text-align:center; color:#b7bdd1">Chamado do Zion</figcaption>
-</div>
-</div>
-</div>
-</section>
+    <!-- Convites -->
+    <div class="panel">
+      <h3 style="font-family:BerkshireSwash,ManufacturingConsent,Cardo,serif;color:var(--gold);text-align:center">Convites da Irmandade</h3>
+      <div class="media media--convites">
+        <div class="box">
+          <a href="/assets/img/chamado-do-Arion.png" target="_blank" rel="noopener">
+            <img src="/assets/img/chamado-do-Arion.png" alt="Chamado do Arion" loading="lazy" />
+          </a>
+          <figcaption style="margin-top:8px;color:#b7bdd1">Chamado do Arion</figcaption>
+        </div>
+        <div class="box">
+          <a href="/assets/img/chamado-do-Lumen.png" target="_blank" rel="noopener">
+            <img src="/assets/img/chamado-do-Lumen.png" alt="Chamado do Lumen" loading="lazy" />
+          </a>
+          <figcaption style="margin-top:8px;color:#b7bdd1">Chamado do Lumen</figcaption>
+        </div>
+        <div class="box">
+          <a href="/assets/img/chamado-do-Rogério.png" target="_blank" rel="noopener">
+            <img src="/assets/img/chamado-do-Rogério.png" alt="Chamado do Rogério" loading="lazy" />
+          </a>
+          <figcaption style="margin-top:8px;color:#b7bdd1">Chamado do Rogério</figcaption>
+        </div>
+        <div class="box">
+          <a href="/assets/img/chamado-do-Zion.png" target="_blank" rel="noopener">
+            <img src="/assets/img/chamado-do-Zion.png" alt="Chamado do Zion" loading="lazy" />
+          </a>
+          <figcaption style="margin-top:8px;color:#b7bdd1">Chamado do Zion</figcaption>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
 
+<footer>Para além. E sempre!! • © Irmandade Conhecimento com Luz</footer>
 
-<footer style="color:#b7bdd1;text-align:center;padding:18px 10px">Para além. E sempre!! • © Irmandade Conhecimento com Luz</footer>
+<!-- Reforço de autoplay contínuo do vídeo -->
+<script>
+(function () {
+  const v = document.getElementById('heroVideo');
+  if (!v) return;
+
+  function tryPlay() {
+    const p = v.play();
+    if (p && typeof p.then === 'function') {
+      p.catch(() => {
+        // alguns navegadores precisam de um "nudge" após eventos
+        setTimeout(() => v.play().catch(()=>{}), 300);
+      });
+    }
+  }
+
+  // garantir flags corretas
+  v.muted = true;
+  v.loop = true;
+  v.playsInline = true;
+
+  // quando estiver pronto para tocar
+  v.addEventListener('canplay', tryPlay, { once: true });
+
+  // se o navegador pausar sozinho (economia de energia/visibilidade)
+  v.addEventListener('pause', () => {
+    if (!v.ended) tryPlay();
+  });
+
+  // ao voltar para a aba/visibilidade
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) tryPlay();
+  });
+
+  // fallback no load
+  window.addEventListener('load', tryPlay);
+})();
+</script>
 </body>
 </html>
