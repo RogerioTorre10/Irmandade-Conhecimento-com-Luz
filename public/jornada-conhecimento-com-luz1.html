@@ -27,9 +27,9 @@
     }
 
     :root {
-      --bg: #1a1a1a;
-      --ink: #f9f9f3;
-      --ink-soft: #ccc;
+      --bg: #1a1a1a; /* Fundo escuro */
+      --ink: #000; /* Fontes pretas */
+      --ink-soft: #555; /* Tom suave para textos menores */
       --brand: #6b21a8;
       --brand-2: #7c3aed;
       --panel: #f6efe0;
@@ -40,9 +40,9 @@
     body {
       margin: 0;
       color: var(--ink);
-      background: var(--bg);
+      background: var(--bg); /* Fundo escuro garantido */
       font-family: "ManufacturingConsent", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-      font-size: 16px;
+      font-size: 16px; /* Tamanho padrão da fonte */
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
@@ -55,33 +55,34 @@
     .site-header {
       display: flex;
       align-items: center;
+      justify-content: center; /* Centraliza o título */
       padding: 16px;
       background: transparent;
     }
-    .chama-icone { position: relative; width: 36px; height: 72px; display: flex; align-items: flex-end; margin-right: 12px }
+    .chama-icone { position: relative; width: 18px; height: 36px; display: flex; align-items: flex-end; margin-right: 12px }
     .chama-icone > * { position: static }
     .site-header h1 {
       font-family: "Berkshire Swash", cursive;
       font-size: 28px;
-      color: #fff;
+      color: #fff; /* Título permanece branco */
       text-shadow: 0 0 10px hsla(28, 96%, 60%, .7);
       margin: 0;
     }
-    /* Comentário: Estilo base da chama-vela, ajustado para formato de vela com base larga e topo super afunilado */
+    /* Comentário: Estilo base da chama-vela, tamanho reduzido pela metade, formato de vela */
     .chama-vela {
-      --altura: 90px; --largura: 60px; --pulso: 1.2s; --glow: 16px; --hue: 28; --satur: 96%; --light: 58%; --op: .98;
+      --altura: 45px; --largura: 30px; --pulso: 1.2s; --glow: 8px; --hue: 28; --satur: 96%; --light: 58%; --op: .98;
       position: relative; width: var(--largura); height: var(--altura); display: inline-block;
       filter: drop-shadow(0 0 var(--glow) hsla(var(--hue), var(--satur), 60%, .75));
     }
-    /* Comentário: Tamanhos para chamas média (inferior) e grande (cabeçalho) */
-    .chama-vela.chama-md { --largura: 80px; --altura: 180px }
-    .chama-vela.chama-lg { --largura: 60px; --altura: 120px }
-    /* Comentário: Brasas com base ainda mais larga e ovulada */
+    /* Comentário: Tamanhos para chamas média (inferior) e grande (cabeçalho), reduzidos pela metade */
+    .chama-vela.chama-md { --largura: 40px; --altura: 90px }
+    .chama-vela.chama-lg { --largura: 30px; --altura: 60px }
+    /* Comentário: Brasas com base larga e ovulada */
     .chama-vela .brasa {
-      position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: calc(var(--largura) * 1.4); height: 20px;
-      border-radius: 50% 50% 40% 40%; /* Base ovulada */
+      position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: calc(var(--largura) * 1.4); height: 10px;
+      border-radius: 50% 50% 40% 40%;
       background: radial-gradient(circle at 50% 40%, hsla(var(--hue), var(--satur), 95%, .95) 0%, hsla(var(--hue), var(--satur), 70%, .85) 50%, transparent 80%);
-      filter: blur(2px); animation: brasaPulse var(--pulso) ease-in-out infinite; opacity: var(--op)
+      filter: blur(1px); animation: brasaPulse var(--pulso) ease-in-out infinite; opacity: var(--op)
     }
     /* Comentário: Língua da chama com formato de vela, topo ultra fino e gradiente vibrante */
     .chama-vela .lingua {
@@ -94,33 +95,32 @@
         rgba(230, 10, 10, 0.3) 70%, /* Borda escura e vibrante */
         transparent 100%
       );
-      mix-blend-mode: screen; filter: blur(1.4px); transform-origin: 50% 100%; animation: velaWaver 1.2s ease-in-out infinite; opacity: var(--op);
+      mix-blend-mode: screen; filter: blur(0.7px); transform-origin: 50% 100%; animation: velaWaver 1.2s ease-in-out infinite; opacity: var(--op);
       -webkit-mask: radial-gradient(60% 90% at 50% 4%, #000 65%, transparent 69%)
     }
     /* Comentário: Camadas internas da chama para profundidade */
-    .chama-vela .lingua:nth-child(2) { width: calc(var(--largura) * .92); height: calc(var(--altura) * .95); animation-duration: 1.5s; animation-delay: .08s; filter: blur(1.2px) }
-    .chama-vela .lingua:nth-child(3) { width: calc(var(--largura) * .78); height: calc(var(--altura) * .85); animation-duration: 1.8s; animation-delay: .15s; filter: blur(1px) }
-    /* Comentário: Brilho com maior difusão para vibração */
+    .chama-vela .lingua:nth-child(2) { width: calc(var(--largura) * .92); height: calc(var(--altura) * .95); animation-duration: 1.5s; animation-delay: .08s; filter: blur(0.6px) }
+    .chama-vela .lingua:nth-child(3) { width: calc(var(--largura) * .78); height: calc(var(--altura) * .85); animation-duration: 1.8s; animation-delay: .15s; filter: blur(0.5px) }
+    /* Comentário: Brilho com difusão ajustada para tamanho menor */
     .chama-vela .brilho {
       position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: calc(var(--largura) * 1.7); height: calc(var(--altura) * 1.5);
-      background: radial-gradient(circle, hsla(var(--hue), var(--satur), 72%, .55) 0%, transparent 70%); filter: blur(18px); mix-blend-mode: screen Stuart
-System: screen; animation: aura var(--pulso) ease-in-out infinite; opacity: .85; pointer-events: none
+      background: radial-gradient(circle, hsla(var(--hue), var(--satur), 72%, .55) 0%, transparent 70%); filter: blur(9px); mix-blend-mode: screen; animation: aura var(--pulso) ease-in-out infinite; opacity: .85; pointer-events: none
     }
-    /* Comentário: Intensidades da chama (fraca, média, forte) */
-    .chama-vela.fraca { --altura: 70px; --largura: 50px; --pulso: 1.6s; --glow: 10px; --hue: 36; --satur: 86%; --light: 66%; --op: .70 }
-    .chama-vela.media { --altura: 90px; --largura: 60px; --pulso: 1.2s; --glow: 16px; --hue: 28; --satur: 96%; --light: 58%; --op: .98 }
-    .chama-vela.forte { --altura: 110px; --largura: 70px; --pulso: 0.7s; --glow: 22px; --hue: 20; --satur: 100%; --light: 52%; --op: 1 }
+    /* Comentário: Intensidades da chama (fraca, média, forte), tamanhos reduzidos */
+    .chama-vela.fraca { --altura: 35px; --largura: 25px; --pulso: 1.6s; --glow: 5px; --hue: 36; --satur: 86%; --light: 66%; --op: .70 }
+    .chama-vela.media { --altura: 45px; --largura: 30px; --pulso: 1.2s; --glow: 8px; --hue: 28; --satur: 96%; --light: 58%; --op: .98 }
+    .chama-vela.forte { --altura: 55px; --largura: 35px; --pulso: 0.7s; --glow: 11px; --hue: 20; --satur: 100%; --light: 52%; --op: 1 }
     /* Comentário: Posicionamento da chama inferior */
     .flame-corner { position: fixed; z-index: 1200; pointer-events: none }
     .flame-bottom-right { bottom: 20px; right: 20px }
     /* Comentário: Chama do cabeçalho */
-    #chama-header .chama-vela { --largura: 60px; --altura: 120px }
+    #chama-header .chama-vela { --largura: 30px; --altura: 60px }
     /* Comentário: Animações com vibração intensa */
     @keyframes velaWaver { 
       0%, 100% { transform: translateX(-50%) scaleY(1.00) skewX(0deg) }
-      25% { transform: translateX(calc(-50% + 1.4px)) scaleY(1.12) skewX(1.4deg) }
+      25% { transform: translateX(calc(-50% + 0.7px)) scaleY(1.12) skewX(1.4deg) }
       50% { transform: translateX(-50%) scaleY(1.20) skewX(2.2deg) }
-      75% { transform: translateX(calc(-50% - 1.2px)) scaleY(1.10) skewX(1.2deg) }
+      75% { transform: translateX(calc(-50% - 0.6px)) scaleY(1.10) skewX(1.2deg) }
     }
     @keyframes brasaPulse { 0%, 100% { transform: translateX(-50%) scale(1); opacity: .85 } 50% { transform: translateX(-50%) scale(1.14); opacity: 1 } }
     @keyframes aura { 0%, 100% { opacity: .75 } 50% { opacity: 1 } }
@@ -135,7 +135,7 @@ System: screen; animation: aura var(--pulso) ease-in-out infinite; opacity: .85;
     .selfie-left .selfie-controls { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
     .selfie-left label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; }
     .selfie-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
-    .muted { color: var(--ink-soft); font-size: 0.9rem; }
+    .muted { color: var(--ink-soft); font-size: 16px; } /* Tamanho padrão */
     @media (max-width: 860px) {
       .selfie-row { grid-template-columns: 1fr; }
     }
@@ -144,7 +144,20 @@ System: screen; animation: aura var(--pulso) ease-in-out infinite; opacity: .85;
     .pergaminho-v { background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important; background-size: cover !important; background-position: center !important; min-height: 82vh !important }
     .pergaminho-h { background-image: url('/assets/img/pergaminho-rasgado-horiz.png') !important; background-size: cover !important; background-position: center !important; min-height: 82vh !important }
     .pergaminho-h.fallback { background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important }
-    .conteudo-pergaminho { background: transparent !important; position: relative; z-index: 10; padding: 20px; min-height: 100%; overflow: visible }
+    .conteudo-pergaminho { 
+      background: transparent !important; 
+      position: relative; 
+      z-index: 10; 
+      padding: 20px; 
+      min-height: 100%; 
+      overflow: visible; 
+      color: var(--ink); /* Fontes pretas dentro do pergaminho */
+    }
+    .conteudo-pergaminho h2, .conteudo-pergaminho h3, .conteudo-pergaminho .pergunta-enunciado {
+      color: #fff; /* Títulos e subtítulos brancos */
+      text-shadow: 0 0 10px hsla(28, 96%, 60%, .7);
+    }
+    .conteudo-pergaminho p, .conteudo-pergaminho small { font-size: 16px; } /* Tamanho padrão para textos */
 
     /* ===== UI ===== */
     .btn {
@@ -162,13 +175,13 @@ System: screen; animation: aura var(--pulso) ease-in-out infinite; opacity: .85;
     .btn:disabled { background: #6b7280; cursor: not-allowed; transform: none }
 
     /* Progresso */
-    .progress-badge { position: fixed; top: 16px; right: 16px; padding: 8px 16px; background: var(--brand); color: #fff; border-radius: 8px; font-size: .9rem; z-index: 900 }
+    .progress-badge { position: fixed; top: 16px; right: 16px; padding: 8px 16px; background: var(--brand); color: #fff; border-radius: 8px; font-size: 16px; z-index: 900 }
     .progress-bar { width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; margin-top: 12px }
     .progress-bar-fill { height: 100%; background: var(--brand); border-radius: 4px; transition: width .25s ease }
     .j-progress { margin: 8px 0 16px }
     .j-progress__bar { width: 100%; height: 6px; background: #e5e7eb; border-radius: 4px }
     .j-progress__fill { height: 100%; background: #1f2937; border-radius: 4px; transition: width .25s ease }
-    .j-progress__meta { text-align: center; margin-top: 8px; font-size: .9rem; color: var(--ink-soft) }
+    .j-progress__meta { text-align: center; margin-top: 8px; font-size: 16px; color: var(--ink-soft) }
 
     .footer-actions { display: flex; gap: 12px; justify-content: center; margin: 18px 0 }
 
@@ -186,7 +199,7 @@ System: screen; animation: aura var(--pulso) ease-in-out infinite; opacity: .85;
     .pergunta-enunciado {
       display: block; margin-bottom: 6px;
       font-family: "Berkshire Swash", cursive;
-      font-size: 20px; color: var(--ink);
+      font-size: 20px; color: #fff; /* Subtítulos brancos */
     }
     .j-pergunta textarea {
       width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db;
@@ -198,12 +211,12 @@ System: screen; animation: aura var(--pulso) ease-in-out infinite; opacity: .85;
     #videoOverlay { position: fixed; inset: 0; background: rgba(0,0,0,.85); display: flex; justify-content: center; align-items: center; z-index: 2000 }
     #videoOverlay.hidden { display: none }
     .video-player { max-width: 90vw; max-height: 80vh; background: #000 }
-    .video-fallback { max-width: 90vw; max-height: 80vh; background: url('/assets/img/perfil-da-irmandade.png') center/cover no-repeat; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem; text-align: center; padding: 20px; font-family: "Berkshire Swash", cursive; }
+    .video-fallback { max-width: 90vw; max-height: 80vh; background: url('/assets/img/perfil-da-irmandade.png') center/cover no-repeat; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; text-align: center; padding: 20px; font-family: "Berkshire Swash", cursive; }
 
-    .site-footer { text-align: center; padding: 14px; color: #555; font-size: .85rem }
+    .site-footer { text-align: center; padding: 14px; color: var(--ink-soft); font-size: 16px; }
     .password-form { margin-top: 16px; text-align: center }
     .password-input { position: relative }
-    .password-input input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; font-family: "Cardo", serif }
+    .password-input input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; font-family: "Cardo", serif; font-size: 16px; }
     .password-toggle { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer }
 
     .section-container { position: relative; min-height: 85vh }
@@ -332,7 +345,7 @@ System: screen; animation: aura var(--pulso) ease-in-out infinite; opacity: .85;
 
   <footer class="site-footer">
     <small>© 2025 Irmandade Conhecimento com Luz</small>
-    <div id="envTag" style="margin-top:6px;opacity:.6;font-size:.8rem"></div>
+    <div id="envTag" style="margin-top:6px;opacity:.6;font-size:16px;"></div>
   </footer>
 
   <!-- PROGRESS (badge/topo + barra global) -->
@@ -703,7 +716,7 @@ System: screen; animation: aura var(--pulso) ease-in-out infinite; opacity: .85;
       }
 
       loadAnswers();
-      const firstTa = content.querySelector('.j-bloco .j-pergunta textarea');
+      const firstTa = document.querySelector('.j-bloco .j-pergunta textarea');
       if (firstTa) handleInput(firstTa);
 
       console.log('Blocos carregados! Total de blocos:', blocks.length);
