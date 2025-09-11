@@ -1,38 +1,4 @@
-<!doctype html>
 <html lang="pt-br">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Portal • Irmandade Conhecimento com Luz</title>
-<meta name="description" content="Portal interno da Irmandade" />
-<style>
-@font-face{font-family:'ManufacturingConsent';src:url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');font-display:swap}
-@font-face{font-family:'Cardo';src:url('/assets/fonts/Cardo-Regular.ttf') format('truetype');font-display:swap}
-@font-face{font-family:'BerkshireSwash';src:url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');font-display:swap}
-:root{--bg:#0b0f1a;--bg2:#12172a;--ink:#e6e7ee;--ink2:#b7bdd1;--gold:#f7d58b;--ring:rgba(122,162,255,.35);--radius:20px}
-*{box-sizing:border-box} html,body{height:100%}
-body{margin:0;background:radial-gradient(1200px 800px at 80% -10%,#1b2350 0%,#0d1230 35%,var(--bg) 70%) fixed;color:var(--ink);font-family:Cardo,serif;display:flex;flex-direction:column;min-height:100vh}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 22px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
-.brand{display:flex;align-items:center;gap:12px;font-family:ManufacturingConsent,BerkshireSwash,Cardo,serif;color:var(--gold);font-size:clamp(26px,2.6vw,42px)}
-.back{color:var(--ink);text-decoration:none;border:1px solid rgba(255,255,255,.12);padding:8px 12px;border-radius:12px;background:rgba(255,255,255,.05)}
-.wrap{display:grid;grid-template-columns:320px 1fr;gap:22px;max-width:1280px;width:100%;margin:24px auto;padding:0 20px;flex:1}
-.panel{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);box-shadow:0 10px 28px rgba(0,0,0,.3)}
-.sidebar{padding:16px;position:sticky;top:90px;align-self:start}
-.group{margin-bottom:14px}
-.gtitle{color:var(--ink2);font-weight:700;margin:4px 4px 10px}
-.nav{display:flex;flex-direction:column;gap:10px}
-.btn{display:flex;align-items:center;justify-content:center;padding:12px 14px;border-radius:14px;background:var(--bg2);color:var(--ink);text-decoration:none;border:1px solid rgba(255,255,255,.08)}
-.btn:hover{transform:translateY(-1px);border-color:var(--ring)}
-.content{padding:18px}
-.hero{display:grid;gap:16px}
-.media{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.media .box{padding:10px;border-radius:16px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03)}
-.media img,.media video{width:100%;height:auto;border-radius:12px;display:block}
-@media(max-width:980px){.wrap{grid-template-columns:1fr}.media{grid-template-columns:1fr}}
-</style>
-</head>
-<body>
-<header class="topbar">
 <div class="brand">Irmandade • Portal</div>
 <a class="back" href="/index.html">⬅️ Voltar ao cartão</a>
 </header>
@@ -73,6 +39,38 @@ body{margin:0;background:radial-gradient(1200px 800px at 80% -10%,#1b2350 0%,#0d
 </div>
 <div class="box">
 <video playsinline muted controls preload="metadata" src="/assets/img/filme-0-inicio-da-jornada_web.mp4"></video>
+</div>
+</div>
+</div>
+
+
+<!-- NOVA SEÇÃO: Convites da Irmandade -->
+<div class="panel" style="padding:16px; margin-top:16px;">
+<h3 style="margin:6px 0 12px; font-family:BerkshireSwash,ManufacturingConsent,Cardo,serif; color:var(--gold)">Convites da Irmandade</h3>
+<div class="media">
+<div class="box">
+<a href="/assets/img/chamado-do-Arion.png" target="_blank" rel="noopener">
+<img src="/assets/img/chamado-do-Arion.png" alt="Chamado do Arion" loading="lazy" />
+</a>
+<figcaption style="margin-top:8px; text-align:center; color:#b7bdd1">Chamado do Arion</figcaption>
+</div>
+<div class="box">
+<a href="/assets/img/chamado-do-Lumen.png" target="_blank" rel="noopener">
+<img src="/assets/img/chamado-do-Lumen.png" alt="Chamado do Lumen" loading="lazy" />
+</a>
+<figcaption style="margin-top:8px; text-align:center; color:#b7bdd1">Chamado do Lumen</figcaption>
+</div>
+<div class="box">
+<a href="/assets/img/chamado-do-Rogério.png" target="_blank" rel="noopener">
+<img src="/assets/img/chamado-do-Rogério.png" alt="Chamado do Rogério" loading="lazy" />
+</a>
+<figcaption style="margin-top:8px; text-align:center; color:#b7bdd1">Chamado do Rogério</figcaption>
+</div>
+<div class="box">
+<a href="/assets/img/chamado-do-Zion.png" target="_blank" rel="noopener">
+<img src="/assets/img/chamado-do-Zion.png" alt="Chamado do Zion" loading="lazy" />
+</a>
+<figcaption style="margin-top:8px; text-align:center; color:#b7bdd1">Chamado do Zion</figcaption>
 </div>
 </div>
 </div>
