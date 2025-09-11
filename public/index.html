@@ -1,83 +1,47 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Irmandade Conhecimento com Luz</title>
-  <link rel="stylesheet" href="/styles.css">
-  <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png">
+  <meta name="description" content="Irmandade Conhecimento com Luz — Portal de entrada" />
+  <meta name="theme-color" content="#0b0f1a" />
   <style>
-    body { margin: 0; font-family: Arial, sans-serif; background: #f9f9f9; color: #333; }
-    .site-header { display: flex; align-items: center; gap: 12px; padding: 16px; background: #1f2937; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .chama.chama-sm { display: inline-flex; gap: 4px; }
-    .chama.chama-sm span { width: 6px; height: 12px; background: #ff4500; border-radius: 2px; animation: flicker 1.5s infinite; }
-    .chama.chama-sm span:nth-child(2) { animation-delay: 0.2s; }
-    .chama.chama-sm span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes flicker { 0%, 100% { transform: scaleY(1); opacity: 1; } 50% { transform: scaleY(1.2); opacity: 0.8; } }
-    .hero { max-width: 900px; margin: 24px auto; padding: 32px; border-radius: 14px; box-shadow: 0 8px 28px rgba(0,0,0,0.12); background: #f6efe0 !important; }
-    .pergaminho-v { background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important; background-size: cover !important; background-position: center !important; min-height: 82vh !important; position: relative; z-index: 1; }
-    .hero-content { background: transparent !important; position: relative; z-index: 2; padding: 20px; }
-    .btn { display: inline-block; padding: 12px 24px; border-radius: 10px; border: 0; background: #1f2937; color: #fff; font-weight: 600; text-decoration: none; transition: background 0.3s ease, transform 0.2s ease; }
-    .btn:hover { background: #374151; transform: scale(1.05); }
-    .btn + .btn { margin-left: 12px; }
-    .title { font-size: 2rem; margin: 0 0 16px 0; color: #1f2937; }
-    .subtitle { font-size: 1.2rem; opacity: 0.8; margin: 0 0 24px 0; }
-    .lumen-typing { white-space: pre-wrap; position: relative; }
-    .lumen-typing::after { content: "▌"; margin-left: 2px; opacity: 0.75; animation: lumenBlink 1s steps(2, end) infinite; }
-    .lumen-typing.typing-done::after { content: ""; animation: none; }
-    @keyframes lumenBlink { 50% { opacity: 0; } }
-    .site-footer { text-align: center; padding: 16px; opacity: 0.6; font-size: 0.85rem; }
-    @media (max-width: 600px) { .hero { margin: 16px; padding: 20px; } .title { font-size: 1.6rem; } .btn { padding: 10px 16px; font-size: 0.9rem; } }
+    @font-face{font-family:'ManufacturingConsent';src:url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');font-display:swap}
+    @font-face{font-family:'Cardo';src:url('/assets/fonts/Cardo-Regular.ttf') format('truetype');font-display:swap}
+    @font-face{font-family:'BerkshireSwash';src:url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');font-display:swap}
+    :root{--bg:#0b0f1a;--ink:#e6e7ee;--gold:#f7d58b;--ring:rgba(122,162,255,.35)}
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;background:radial-gradient(1200px 800px at 80% -10%,#1b2350 0%,#0d1230 35%,var(--bg) 70%) fixed;color:var(--ink);font-family:Cardo,serif;display:flex;flex-direction:column;min-height:100vh}
+    .topbar{display:flex;align-items:center;gap:14px;padding:18px 22px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+    .brand{display:flex;align-items:center;gap:12px;font-family:ManufacturingConsent,BerkshireSwash,Cardo,serif;color:var(--gold);font-size:clamp(28px,3.2vw,48px)}
+    .chama{position:relative;width:28px;height:40px;filter:drop-shadow(0 6px 14px rgba(255,140,0,.35))}
+    .chama span{position:absolute;inset:auto 0 0 0;margin:auto;width:28px;height:40px;border-radius:20px;background:radial-gradient(50% 60% at 50% 30%,#fff7cc 0%,#ffd166 35%,#ff8c00 70%,transparent 100%);animation:flame 1.6s infinite ease-in-out}
+    .chama span:nth-child(2){width:18px;height:28px;bottom:4px;opacity:.8;animation-duration:1.2s}
+    .chama span:nth-child(3){width:12px;height:20px;bottom:9px;opacity:.6;animation-duration:1s}
+    @keyframes flame{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+    .hero{display:grid;place-items:center;gap:24px;flex:1;padding:30px}
+    .hero img{max-width:min(94%,860px);height:auto;border-radius:20px;border:1px solid rgba(255,255,255,.1);box-shadow:0 8px 20px rgba(0,0,0,.35)}
+    .cta{display:inline-flex;align-items:center;gap:10px;padding:14px 18px;border-radius:14px;background:rgba(255,255,255,.06);color:var(--ink);text-decoration:none;border:1px solid rgba(255,255,255,.12);transition:.18s;font-weight:700}
+    .cta:hover{transform:translateY(-1px);border-color:var(--ring)}
+    footer{color:#b7bdd1;text-align:center;padding:18px 10px}
   </style>
 </head>
 <body>
-  <header class="site-header">
-    <div class="chama chama-sm">
-      <span></span><span></span><span></span>
+  <header class="topbar">
+    <div class="brand">
+      <div class="chama" aria-hidden="true"><span></span><span></span><span></span></div>
+      Irmandade Conhecimento com Luz
     </div>
-    <h1>Irmandade Conhecimento com Luz</h1>
   </header>
-  <main>
-    <section class="hero card pergaminho pergaminho-v">
-      <div class="hero-content">
-        <h2 class="title" data-typing data-text="Bem-vindo(a) à Irmandade" data-speed="40" data-cursor="true"></h2>
-        <p class="subtitle" data-typing data-text="Uma jornada de reflexão, fé e coragem para acender sua chama interior." data-speed="30" data-cursor="true"></p>
-        <div class="actions">
-          <a href="/jornada-conhecimento-com-luz1.html#intro" class="btn btn-primary">Iniciar Jornada Essencial</a>
-        </div>
-      </div>
-    </section>
+
+  <main class="hero">
+    <!-- Imagem de boas-vindas (troque o src se quiser outra arte) -->
+    <img src="/assets/img/perfil-da-irmandade.png" alt="Cartão de visita da Irmandade" />
+    <!-- ÚNICO botão: leva ao portal do site -->
+    <a class="cta" href="/jornada.html" rel="nofollow">✨ Entrar no site</a>
   </main>
-  <footer class="site-footer">
-    <small>© 2025 Irmandade Conhecimento com Luz</small>
-  </footer>
-  <script>
-    (function () {
-      function typeWriter(el, text, speed, showCursor) {
-        if (!el) return;
-        el.textContent = '';
-        if (showCursor) el.classList.add('lumen-typing');
-        let i = 0;
-        (function step() {
-          if (i < text.length) {
-            el.textContent += text.charAt(i++);
-            setTimeout(step, speed);
-          } else {
-            el.classList.add('typing-done');
-          }
-        })();
-      }
-      function runTyping(root) {
-        (root || document).querySelectorAll('[data-typing]').forEach(el => {
-          if (el.dataset._typed) return;
-          const t = el.getAttribute('data-text') || el.textContent || '';
-          const spd = parseInt(el.getAttribute('data-speed') || '26', 10);
-          const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
-          el.dataset._typed = '1';
-          typeWriter(el, t, spd, cur);
-        });
-      }
-      document.addEventListener('DOMContentLoaded', () => runTyping(document));
-    })();
-  </script>
-  <!-- Grok xAI - Uhuuuuuuu! 🚀 -->
+
+  <footer>Para além. E sempre!! • © Irmandade Conhecimento com Luz</footer>
+</body>
+</html>
