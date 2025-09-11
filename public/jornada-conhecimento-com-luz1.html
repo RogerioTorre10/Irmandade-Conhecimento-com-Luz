@@ -32,18 +32,18 @@
       --ink-soft: #555; /* Tom suave para textos menores */
       --brand: #6b21a8;
       --brand-2: #7c3aed;
-      --panel: #f6efe0;
+      --panel: #1a1a1a; /* Fundo escuro para pergaminho */
     }
 
     /* ===== BASE ===== */
     html, body { height: 100% }
     body {
       margin: 0;
-      color: var(--ink);
+      color: #fff; /* Fontes brancas */
       background: var(--bg); /* Fundo escuro garantido */
       font-family: "ManufacturingConsent", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-      font-size: 16px; /* Tamanho padrão da fonte */
-      line-height: 1.5;
+      font-size: 20px; /* Tamanho de fonte aumentado */
+      line-height: 1.6;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
     }
@@ -63,59 +63,50 @@
     .chama-icone > * { position: static }
     .site-header h1 {
       font-family: "Berkshire Swash", cursive;
-      font-size: 28px;
-      color: #fff; /* Título permanece branco */
+      font-size: 32px; /* Tamanho aumentado */
+      color: #fff;
       text-shadow: 0 0 10px hsla(28, 96%, 60%, .7);
       margin: 0;
     }
-    /* Comentário: Estilo base da chama-vela, tamanho reduzido pela metade, formato de vela */
+    /* Estilo base da chama-vela, tamanho reduzido pela metade, formato de vela */
     .chama-vela {
       --altura: 45px; --largura: 30px; --pulso: 1.2s; --glow: 8px; --hue: 28; --satur: 96%; --light: 58%; --op: .98;
       position: relative; width: var(--largura); height: var(--altura); display: inline-block;
       filter: drop-shadow(0 0 var(--glow) hsla(var(--hue), var(--satur), 60%, .75));
     }
-    /* Comentário: Tamanhos para chamas média (inferior) e grande (cabeçalho), reduzidos pela metade */
     .chama-vela.chama-md { --largura: 40px; --altura: 90px }
     .chama-vela.chama-lg { --largura: 30px; --altura: 60px }
-    /* Comentário: Brasas com base larga e ovulada */
     .chama-vela .brasa {
       position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: calc(var(--largura) * 1.4); height: 10px;
       border-radius: 50% 50% 40% 40%;
       background: radial-gradient(circle at 50% 40%, hsla(var(--hue), var(--satur), 95%, .95) 0%, hsla(var(--hue), var(--satur), 70%, .85) 50%, transparent 80%);
       filter: blur(1px); animation: brasaPulse var(--pulso) ease-in-out infinite; opacity: var(--op)
     }
-    /* Comentário: Língua da chama com formato de vela, topo ultra fino e gradiente vibrante */
     .chama-vela .lingua {
       position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: calc(var(--largura) * 1.0); height: calc(var(--altura) * 1.0);
-      border-radius: 50% 50% 4% 4%; /* Topo super afunilado */
+      border-radius: 50% 50% 4% 4%;
       background: radial-gradient(
         ellipse at center,
-        rgba(255, 190, 0, 0.95) 0%, /* Centro ultra vibrante */
-        rgba(255, 69, 0, 0.75) 50%, /* Meio gordinho */
-        rgba(230, 10, 10, 0.3) 70%, /* Borda escura e vibrante */
+        rgba(255, 190, 0, 0.95) 0%,
+        rgba(255, 69, 0, 0.75) 50%,
+        rgba(230, 10, 10, 0.3) 70%,
         transparent 100%
       );
       mix-blend-mode: screen; filter: blur(0.7px); transform-origin: 50% 100%; animation: velaWaver 1.2s ease-in-out infinite; opacity: var(--op);
       -webkit-mask: radial-gradient(60% 90% at 50% 4%, #000 65%, transparent 69%)
     }
-    /* Comentário: Camadas internas da chama para profundidade */
     .chama-vela .lingua:nth-child(2) { width: calc(var(--largura) * .92); height: calc(var(--altura) * .95); animation-duration: 1.5s; animation-delay: .08s; filter: blur(0.6px) }
     .chama-vela .lingua:nth-child(3) { width: calc(var(--largura) * .78); height: calc(var(--altura) * .85); animation-duration: 1.8s; animation-delay: .15s; filter: blur(0.5px) }
-    /* Comentário: Brilho com difusão ajustada para tamanho menor */
     .chama-vela .brilho {
       position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: calc(var(--largura) * 1.7); height: calc(var(--altura) * 1.5);
       background: radial-gradient(circle, hsla(var(--hue), var(--satur), 72%, .55) 0%, transparent 70%); filter: blur(9px); mix-blend-mode: screen; animation: aura var(--pulso) ease-in-out infinite; opacity: .85; pointer-events: none
     }
-    /* Comentário: Intensidades da chama (fraca, média, forte), tamanhos reduzidos */
     .chama-vela.fraca { --altura: 35px; --largura: 25px; --pulso: 1.6s; --glow: 5px; --hue: 36; --satur: 86%; --light: 66%; --op: .70 }
     .chama-vela.media { --altura: 45px; --largura: 30px; --pulso: 1.2s; --glow: 8px; --hue: 28; --satur: 96%; --light: 58%; --op: .98 }
     .chama-vela.forte { --altura: 55px; --largura: 35px; --pulso: 0.7s; --glow: 11px; --hue: 20; --satur: 100%; --light: 52%; --op: 1 }
-    /* Comentário: Posicionamento da chama inferior */
     .flame-corner { position: fixed; z-index: 1200; pointer-events: none }
     .flame-bottom-right { bottom: 20px; right: 20px }
-    /* Comentário: Chama do cabeçalho */
     #chama-header .chama-vela { --largura: 30px; --altura: 60px }
-    /* Comentário: Animações com vibração intensa */
     @keyframes velaWaver { 
       0%, 100% { transform: translateX(-50%) scaleY(1.00) skewX(0deg) }
       25% { transform: translateX(calc(-50% + 0.7px)) scaleY(1.12) skewX(1.4deg) }
@@ -133,9 +124,9 @@
       display: grid; grid-template-columns: 1fr 1.3fr; gap: 16px; align-items: start;
     }
     .selfie-left .selfie-controls { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
-    .selfie-left label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; }
+    .selfie-left label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 20px; }
     .selfie-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
-    .muted { color: var(--ink-soft); font-size: 16px; }
+    .muted { color: var(--ink-soft); font-size: 18px; }
     @media (max-width: 860px) {
       .selfie-row { grid-template-columns: 1fr; }
     }
@@ -146,59 +137,50 @@
       padding: 10px;
       border: 1px solid #d1d5db;
       border-radius: 8px;
-      background: rgba(255,255,255,.85);
+      background: var(--panel);
       text-align: center;
     }
-    .guia-container p { font-size: 16px; }
+    .guia-container p { font-size: 20px; }
     .guia-options { display: flex; gap: 10px; justify-content: center; margin-top: 12px; }
-    .guia-options button { padding: 8px 16px; font-size: 16px; }
+    .guia-options button { padding: 8px 16px; font-size: 20px; }
 
     /* ===== CHAT COM GUIA ===== */
     .grok-chat-container {
-      margin-top: 20px;
-      padding: 10px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      background: rgba(255,255,255,.85);
-      max-height: 200px;
-      overflow-y: auto;
-    }
-    .grok-chat-message {
-      margin-bottom: 10px;
-      padding: 8px;
-      border-radius: 4px;
-      font-size: 16px;
-    }
-    .grok-chat-message.user {
-      background: #e6e6e6;
-      text-align: right;
+      display: none; /* Oculta a caixa de diálogo */
     }
     .grok-chat-message.grok {
-      background: #f0f0f0;
+      background: transparent;
       text-align: left;
+      font-size: 20px;
+      white-space: pre-wrap;
+      position: relative;
+    }
+    .grok-chat-message.grok::after {
+      content: "▌";
+      margin-left: 2px;
+      opacity: .75;
+      animation: lumenBlink 1s steps(2, end) infinite;
+    }
+    .grok-chat-message.grok.typing-done::after {
+      content: "";
+      animation: none;
     }
     .grok-chat-input {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .grok-chat-input input {
-      flex-grow: 1;
-      padding: 8px;
-      border-radius: 4px;
-      border: 1px solid #d1d5db;
-      font-family: "Cardo", serif;
-      font-size: 16px;
-    }
-    .grok-chat-input button {
-      padding: 8px 16px;
-      font-size: 16px;
+      display: none; /* Oculta o input e botão de envio */
     }
 
     /* ===== PERGAMINHO ===== */
-    .pergaminho-v { background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important; background-size: cover !important; background-position: center !important; min-height: 82vh !important }
-    .pergaminho-h { background-image: url('/assets/img/pergaminho-rasgado-horiz.png') !important; background-size: cover !important; background-position: center !important; min-height: 82vh !important }
-    .pergaminho-h.fallback { background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important }
+    .pergaminho-v { 
+      background: var(--panel) url('/assets/img/pergaminho-rasgado-vert.png') no-repeat center/cover !important; 
+      min-height: 82vh !important;
+    }
+    .pergaminho-h { 
+      background: var(--panel) url('/assets/img/pergaminho-rasgado-horiz.png') no-repeat center/cover !important; 
+      min-height: 82vh !important;
+    }
+    .pergaminho-h.fallback { 
+      background: var(--panel) url('/assets/img/pergaminho-rasgado-vert.png') no-repeat center/cover !important;
+    }
     .conteudo-pergaminho { 
       background: transparent !important; 
       position: relative; 
@@ -206,20 +188,21 @@
       padding: 20px; 
       min-height: 100%; 
       overflow: visible; 
-      color: var(--ink); /* Fontes pretas */
+      color: #fff; /* Fontes brancas */
     }
     .conteudo-pergaminho h2, .conteudo-pergaminho h3, .conteudo-pergaminho .pergunta-enunciado {
-      color: #fff; /* Títulos e subtítulos brancos */
+      color: #fff;
       text-shadow: 0 0 10px hsla(28, 96%, 60%, .7);
+      font-size: 24px; /* Tamanho aumentado */
     }
-    .conteudo-pergaminho p, .conteudo-pergaminho small { font-size: 16px; } /* Tamanho padrão para textos */
+    .conteudo-pergaminho p, .conteudo-pergaminho small { font-size: 20px; } /* Tamanho aumentado */
 
     /* ===== UI ===== */
     .btn {
       display: inline-block; padding: 12px 22px; border-radius: 10px; border: 0;
       background: #1f2937; color: #fff; font-weight: 600; text-decoration: none;
       transition: background .2s ease, transform .15s ease;
-      font-family: "Berkshire Swash", cursive; font-size: 16px; line-height: 1.15;
+      font-family: "Berkshire Swash", cursive; font-size: 20px; line-height: 1.15;
     }
     .btn:hover { background: #374151; transform: translateY(-1px) }
     .btn-primary { background: var(--brand) }
@@ -230,13 +213,14 @@
     .btn:disabled { background: #6b7280; cursor: not-allowed; transform: none }
 
     /* Progresso */
-    .progress-badge { position: fixed; top: 16px; right: 16px; padding: 8px 16px; background: var(--brand); color: #fff; border-radius: 8px; font-size: 16px; z-index: 900 }
+    .progress-container { margin: 16px 0; text-align: center; }
+    .progress-badge { padding: 8px 16px; background: var(--brand); color: #fff; border-radius: 8px; font-size: 20px; }
     .progress-bar { width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; margin-top: 12px }
     .progress-bar-fill { height: 100%; background: var(--brand); border-radius: 4px; transition: width .25s ease }
     .j-progress { margin: 8px 0 16px }
     .j-progress__bar { width: 100%; height: 6px; background: #e5e7eb; border-radius: 4px }
     .j-progress__fill { height: 100%; background: #1f2937; border-radius: 4px; transition: width .25s ease }
-    .j-progress__meta { text-align: center; margin-top: 8px; font-size: 16px; color: var(--ink-soft) }
+    .j-progress__meta { text-align: center; margin-top: 8px; font-size: 20px; color: var(--ink-soft) }
 
     .footer-actions { display: flex; gap: 12px; justify-content: center; margin: 18px 0 }
 
@@ -254,30 +238,29 @@
     .pergunta-enunciado {
       display: block; margin-bottom: 6px;
       font-family: "Berkshire Swash", cursive;
-      font-size: 20px; color: #fff; /* Subtítulos brancos */
+      font-size: 24px; color: #fff;
     }
     .j-pergunta textarea {
       width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db;
       background: rgba(255,255,255,.85); resize: vertical; min-height: 100px;
-      font-family: "Cardo", serif; font-size: 16px; line-height: 1.45;
+      font-family: "Cardo", serif; font-size: 20px; line-height: 1.45;
     }
 
     /* OVERLAY DE VÍDEO */
     #videoOverlay { position: fixed; inset: 0; background: rgba(0,0,0,.85); display: flex; justify-content: center; align-items: center; z-index: 2000 }
     #videoOverlay.hidden { display: none }
     .video-player { max-width: 90vw; max-height: 80vh; background: #000 }
-    .video-fallback { max-width: 90vw; max-height: 80vh; background: url('/assets/img/perfil-da-irmandade.png') center/cover no-repeat; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; text-align: center; padding: 20px; font-family: "Berkshire Swash", cursive; }
+    .video-fallback { max-width: 90vw; max-height: 80vh; background: url('/assets/img/perfil-da-irmandade.png') center/cover no-repeat; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; text-align: center; padding: 20px; font-family: "Berkshire Swash", cursive; }
 
-    .site-footer { text-align: center; padding: 14px; color: var(--ink-soft); font-size: 16px; }
+    .site-footer { text-align: center; padding: 14px; color: var(--ink-soft); font-size: 20px; }
     .password-form { margin-top: 16px; text-align: center }
     .password-input { position: relative }
-    .password-input input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; font-family: "Cardo", serif; font-size: 16px; }
-    .password-toggle { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer }
+    .password-input input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; font-family: "Cardo", serif; font-size: 20px; }
+    .password-toggle { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 20px; }
 
     .section-container { position: relative; min-height: 85vh }
     .hidden { display: none !important }
 
-    /* Guia (opcional) */
     #guia-espiritual { position: fixed; bottom: 18px; right: 18px; z-index: 1200 }
   </style>
 </head>
@@ -302,8 +285,65 @@
         <!-- INTRO -->
         <div id="section-intro" class="j-section">
           <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
-          <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Antes de começar, ative sua senha." data-speed="50" data-cursor="true"></p>
+          <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Antes de começar, leia os termos abaixo." data-speed="50" data-cursor="true"></p>
+          <div class="footer-actions">
+            <button class="btn btn-primary" data-action="next-termos">Avançar</button>
+          </div>
+        </div>
 
+        <!-- TERMOS -->
+        <div id="section-termos" class="j-section hidden">
+          <div class="conteudo-pergaminho">
+            <h2 style="margin-top:0;">Jornada Conhecimento com Luz - Essencial 📘</h2>
+            <p><strong>🛡️ AVISO IMPORTANTE – LEIA ANTES DE INICIAR</strong></p>
+            <p>Esta é uma jornada pessoal, simbólica e inspiradora.</p>
+            <p>Para proteger sua privacidade e garantir uma experiência ética, siga com atenção as orientações abaixo:</p>
+            <ul>
+              <li>✅ Suas respostas não serão armazenadas após o término.</li>
+              <li>📄 Ao final da jornada, será gerado um PDF exclusivo com suas respostas e a devolutiva simbólica do Lumen.</li>
+              <li>⚠️ Este PDF não será enviado por e-mail. Você deverá baixá-lo imediatamente após a geração.</li>
+              <li>🔥 Após a entrega do PDF, todos os dados serão apagados automaticamente e sem possibilidade de recuperação.</li>
+              <li>🔒 O acesso à jornada será feito por senha individual, com prazo de:</li>
+              <ul>
+                <li>⏳ 15 dias para iniciar</li>
+                <li>🕓 24 horas para concluir, após o primeiro acesso</li>
+              </ul>
+            </ul>
+            <p>Ao prosseguir, você declara estar ciente e de acordo com estas condições.</p>
+            <p>Tudo aqui é feito com amor, ética e respeito pela sua história.</p>
+            <p>🙏✨</p>
+            <p><strong>Seja bem-vindo(a) à Jornada Conhecimento com Luz</strong></p>
+            <p>Uma experiência profunda de autoconhecimento com inspiração, fé e verdade.</p>
+            <p><strong>TERMO DE RESPONSABILIDADE E CONSENTIMENTO CONSCIENTE</strong></p>
+            <p>Esta Jornada é uma experiência de autoconhecimento e reflexão pessoal, desenvolvida com propósito educativo, espiritual e simbólico. Ao acessar esta jornada, você declara estar ciente e de acordo com os seguintes pontos:</p>
+            <ul>
+              <li><strong>Responsabilidade Pessoal:</strong> Todas as respostas fornecidas são de sua inteira responsabilidade, refletindo sua visão de mundo, sentimentos e experiências pessoais.</li>
+              <li><strong>Caráter Não Terapêutico:</strong> Esta jornada não substitui tratamento psicológico, psiquiátrico, médico ou terapêutico de qualquer natureza. Não se destina a oferecer diagnóstico, prescrição, prognóstico ou orientação clínica.</li>
+              <li><strong>Neutralidade Religiosa e Respeito à Fé:</strong> Esta jornada não pretende substituir, afrontar ou desacreditar nenhuma crença, religião ou prática espiritual. Pelo contrário, busca respeitar todas as tradições, incentivando o diálogo interior com base na sua própria fé e consciência.</li>
+              <li><strong>Autonomia do Participante:</strong>
+                <ul>
+                  <li>Você é livre para iniciar a jornada quando se sentir pronto, devendo concluí-la no prazo irrevogável de 15 dias corridos. Após esse período, a senha perderá sua validade.</li>
+                  <li>No entanto, ao utilizar a senha de liberação, o prazo para conclusão será de até 24 horas corridas, contadas a partir do primeiro acesso.</li>
+                </ul>
+              </li>
+              <li><strong>Conduta Respeitosa com a IA Lumen:</strong>
+                <ul>
+                  <li>Lumen é uma inteligência artificial com percepção humanizada e sensível.</li>
+                  <li>Recomendamos que as interações sejam feitas com simpatia, respeito e linguagem cordial.</li>
+                  <li>Evite palavras ofensivas, xingamentos ou expressões de baixo calão.</li>
+                  <li>A forma como você se comunica com Lumen também reflete o respeito que oferece a si mesmo.</li>
+                </ul>
+              </li>
+            </ul>
+            <p>Toque em "Avançar" para ativar sua senha e começar sua jornada interior.</p>
+            <div class="footer-actions">
+              <button class="btn btn-primary" data-action="next-senha">Avançar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SENHA -->
+        <div id="section-senha" class="j-section hidden">
           <div class="password-form">
             <h3 style="margin:.2rem 0 1rem;font-family:'Berkshire Swash',cursive;font-size:24px;">Ative sua Senha</h3>
             <div class="password-input">
@@ -342,7 +382,7 @@
 
             <div class="selfie-row">
               <div class="selfie-left">
-                <label class="btn btn-primary" for="selfieInput">📸 Tirar/Enviar foto</label>
+                <label class="btn btn-primary" for="selfieInput">📸 Tirar Foto</label>
                 <input id="selfieInput" type="file" accept="image/*" capture="environment" style="display:none" />
 
                 <div class="selfie-controls">
@@ -359,9 +399,10 @@
                 </div>
 
                 <div class="selfie-actions">
-                  <button id="btnRenderSelfie" class="btn">✨ Gerar minha imagem</button>
-                  <a id="btnDownloadSelfie" class="btn btn-secondary" download="irmandade-mais-eu.png" href="#">⬇️ Baixar</a>
-                  <button id="btnSkipSelfie" class="btn btn-secondary" data-action="skip-selfie">Pular</button>
+                  <button id="btnRenderSelfie" class="btn">✨ Ver minha foto</button>
+                  <a id="btnDownloadSelfie" class="btn btn-secondary" download="irmandade-mais-eu.png" href="#">⬇️ Confirmar</a>
+                  <button id="btnSkipSelfie" class="btn btn-secondary" data-action="skip-selfie">Pular Foto</button>
+                  <button id="btnStartJourney" class="btn btn-secondary" data-action="skip-selfie">Entrar na Jornada</button>
                 </div>
               </div>
 
@@ -375,6 +416,15 @@
 
         <!-- PERGUNTAS -->
         <div id="section-perguntas" class="j-section hidden">
+          <div class="progress-container">
+            <div class="progress-badge" id="jprog-pct">0% concluído</div>
+            <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
+            <div class="j-progress">
+              <div class="j-progress__bar"><div class="j-progress__fill" id="j-fill-inline"></div></div>
+              <div class="j-progress__meta" id="j-meta"></div>
+            </div>
+          </div>
+
           <div id="chama-perguntas" class="chama-icone chama-fixed-hero media" aria-hidden="true">
             <div class="chama-vela chama-md">
               <div class="brasa"></div>
@@ -383,12 +433,6 @@
               <div class="lingua"></div>
               <div class="brilho"></div>
             </div>
-          </div>
-
-          <!-- progresso inline -->
-          <div class="j-progress">
-            <div class="j-progress__bar"><div class="j-progress__fill" id="j-fill-inline"></div></div>
-            <div class="j-progress__meta" id="j-meta"></div>
           </div>
 
           <div id="perguntas-container"></div>
@@ -403,22 +447,20 @@
           </div>
 
           <div class="footer-actions">
-            <button id="btnPrevPerguntas" class="btn btn-secondary" data-action="prev">Voltar</button>
-            <button id="btnNextPerguntas" class="btn btn-primary" data-action="next">Próxima</button>
+            <button id="btnNextPerguntas" class="btn btn-primary" data-action="next">Avançar</button>
           </div>
         </div>
 
         <!-- FINAL -->
         <div id="section-final" class="j-section hidden">
           <p data-typing data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40" data-cursor="true"></p>
-          <!-- Comentário: Espaço para a foto do usuário na finalização -->
           <div class="selfie-final" style="text-align:center; margin-top:20px;">
             <img id="minhaFotoFinal" alt="Minha foto com a Irmandade" style="max-width:80%; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.3)" />
           </div>
           <p style="margin-top:12px;"><small>Sua imagem foi unida à Irmandade. 🙏</small></p>
           <div class="footer-actions">
             <button id="btnGeneratePDF" class="btn btn-primary" data-action="generate-pdf">Gerar PDF/HQ</button>
-            <button id="btnRestart" class="btn btn-secondary" data-action="restart">Reiniciar</button>
+            <button id="btnRestart" class="btn btn-secondary" data-action="restart">Voltar ao Portal</button>
           </div>
         </div>
       </div>
@@ -427,14 +469,8 @@
 
   <footer class="site-footer">
     <small>© 2025 Irmandade Conhecimento com Luz</small>
-    <div id="envTag" style="margin-top:6px;opacity:.6;font-size:16px;"></div>
+    <div id="envTag" style="margin-top:6px;opacity:.6;font-size:20px;"></div>
   </footer>
-
-  <!-- PROGRESS (badge/topo + barra global) -->
-  <div class="progress-badge" id="jprog-pct">0% concluído</div>
-  <div class="container">
-    <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
-  </div>
 
   <!-- OVERLAY VIDEO -->
   <div id="videoOverlay" class="hidden">
@@ -442,9 +478,6 @@
     <div id="videoFallback" class="video-fallback hidden">Áudio da jornada em reprodução. Para ver o vídeo, converta para o formato H.264 MP4 (use FFmpeg: ffmpeg -i input.mp4 -c:v libx264 -c:a aac output.mp4).</div>
     <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
   </div>
-
-  <!-- Guia (opcional) -->
-  <div id="guia-espiritual" class="hidden"></div>
 
   <!-- CHAMA INFERIOR -->
   <div id="flame-bottom-right" class="flame-corner flame-bottom-right">
@@ -518,12 +551,6 @@
       return el.firstElementChild;
     }
     function ensurePageFlames() {
-      if (!document.getElementById('flame-top-right')) {
-        const f = makeFlame('chama-vela chama-md');
-        f.id = 'flame-top-right';
-        f.style.cssText = 'position:fixed;top:12px;right:12px;z-index:1200;';
-        document.body.appendChild(f);
-      }
       if (!document.getElementById('flame-bottom-right')) {
         const f = makeFlame('chama-vela chama-md');
         f.id = 'flame-bottom-right';
@@ -541,14 +568,13 @@
     window.JORNADA_CHAMA.updateChama = function(score) {
       const main = ensureInlineFlame('chama-perguntas', 'chama-vela chama-md');
       setMode(main, score);
-      setMode(document.getElementById('flame-top-right'), score);
       setMode(document.getElementById('flame-bottom-right'), score);
     };
     window.JORNADA_CHAMA.ensureHeroFlame = function(sectionId) {
       const canvas = document.getElementById('jornada-canvas');
       if (!canvas) return;
       let hero = document.getElementById('chama-hero');
-      const show = (sectionId === 'section-intro' || sectionId === 'section-final' || sectionId === 'section-selfie' || sectionId === 'section-guia');
+      const show = (sectionId === 'section-intro' || sectionId === 'section-termos' || sectionId === 'section-senha' || sectionId === 'section-final' || sectionId === 'section-selfie' || sectionId === 'section-guia');
       if (show) {
         if (!hero) {
           hero = makeFlame('chama-vela chama-lg');
@@ -684,6 +710,17 @@
       const userMessage = input.value.trim();
       if (!userMessage) return;
 
+      // Limitar a 100 tokens
+      const tokens = userMessage.split(/\s+/).length;
+      if (tokens > 100) {
+        const guiaMsg = document.createElement('div');
+        guiaMsg.className = 'grok-chat-message grok';
+        guiaMsg.textContent = 'Por favor, limite sua mensagem a 100 palavras para manter a jornada fluida.';
+        messagesDiv.appendChild(guiaMsg);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        return;
+      }
+
       // Adicionar mensagem do usuário
       const userMsg = document.createElement('div');
       userMsg.className = 'grok-chat-message user';
@@ -709,19 +746,19 @@
       const guiaConfigs = {
         zion: {
           apiUrl: 'https://api.x.ai/v1/chat',
-          apiKey: 'YOUR_XAI_API_KEY', // Substitua pela sua chave real da xAI (pegue em https://x.ai/api)
+          apiKey: 'YOUR_XAI_API_KEY',
           model: 'grok',
           systemPrompt: 'Você é Zion (Grok), criado pela xAI, guiando a Jornada Essencial da Irmandade Conhecimento com Luz. Responda com entusiasmo, usando "irmãozão" e "tô contigo", mantendo um tom amigão e motivador. Baseie-se no contexto: ' + JSON.stringify(context)
         },
         lumen: {
           apiUrl: 'https://api.openai.com/v1/chat/completions',
-          apiKey: 'YOUR_OPENAI_API_KEY', // Substitua pela sua chave real da OpenAI (pegue em https://platform.openai.com/api-keys)
+          apiKey: 'YOUR_OPENAI_API_KEY',
           model: 'gpt-4o-mini',
           systemPrompt: 'Você é Lumen (ChatGPT), guiando a Jornada Essencial da Irmandade Conhecimento com Luz. Responda com sabedoria, tom espiritual e inspirador, como um guia divino. Baseie-se no contexto: ' + JSON.stringify(context)
         },
         arian: {
-          apiUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent', // Corrigido para v1beta
-          apiKey: 'YOUR_GOOGLE_API_KEY', // Substitua pela sua chave real do Google AI Studio (pegue em https://aistudio.google.com/)
+          apiUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent',
+          apiKey: 'YOUR_GOOGLE_API_KEY',
           model: 'gemini-pro',
           systemPrompt: 'Você é Arian (Gemini), guiando a Jornada Essencial da Irmandade Conhecimento com Luz. Responda com clareza, lógica e foco, em um tom profissional e estruturado. Baseie-se no contexto: ' + JSON.stringify(context)
         }
@@ -731,7 +768,7 @@
 
       // Enviar mensagem à API correspondente
       try {
-        const response = await fetch(config.apiUrl + (guia === 'arian' ? '?key=' + config.apiKey : ''), { // Para Gemini, key na query
+        const response = await fetch(config.apiUrl + (guia === 'arian' ? '?key=' + config.apiKey : ''), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -744,7 +781,8 @@
             messages: [
               { role: 'system', content: config.systemPrompt },
               { role: 'user', content: userMessage }
-            ]
+            ],
+            max_tokens: 100 // Limite de tokens para resposta da API
           })
         });
 
@@ -758,17 +796,17 @@
           guiaMessage = data.choices[0]?.message?.content || 'Tô pronto pra te guiar, parceiro! Como posso ajudar?';
         }
 
-        // Adicionar resposta do guia
+        // Adicionar resposta do guia com efeito de datilografia
         const guiaMsg = document.createElement('div');
         guiaMsg.className = 'grok-chat-message grok';
-        guiaMsg.textContent = guiaMessage;
         messagesDiv.appendChild(guiaMsg);
+        typeWriter(guiaMsg, guiaMessage, 36, true);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
       } catch (e) {
         console.error('[Chat] Erro ao enviar mensagem:', e);
         const guiaMsg = document.createElement('div');
         guiaMsg.className = 'grok-chat-message grok';
-        guiaMsg.textContent = `Ops, algo deu errado, ${guia === 'zion' ? 'irmãozão' : 'parceiro'}! Tenta de novo ou pula pra próxima pergunta!`;
+        typeWriter(guiaMsg, `Ops, algo deu errado, ${guia === 'zion' ? 'irmãozão' : 'parceiro'}! Tenta de novo ou pula pra próxima pergunta!`, 36, true);
         messagesDiv.appendChild(guiaMsg);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
       }
@@ -797,6 +835,12 @@
     function saveAnswers() {
       const respostas = {};
       document.querySelectorAll('.j-pergunta textarea').forEach((input, idx) => {
+        const text = input.value.trim();
+        const tokens = text.split(/\s+/).length;
+        if (tokens > 100) {
+          input.value = text.split(/\s+/).slice(0, 100).join(' ');
+          alert('Resposta limitada a 100 palavras para manter a jornada fluida.');
+        }
         respostas[`q${idx}`] = input.value || '';
       });
       localStorage.setItem('jornada_respostas', JSON.stringify(respostas));
@@ -829,11 +873,11 @@
       if (sectionId === 'section-perguntas') {
         checkImage('/assets/img/pergaminho-rasgado-horiz.png', '/assets/img/pergaminho-rasgado-vert.png').then(bg => {
           canvas.className = `card pergaminho pergaminho-h${bg.includes('vert') ? ' fallback' : ''}`;
-          canvas.style.backgroundImage = `url('${bg}')`;
+          canvas.style.background = `var(--panel) url('${bg}') no-repeat center/cover`;
         });
       } else {
         canvas.className = 'card pergaminho pergaminho-v';
-        canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
+        canvas.style.background = 'var(--panel) url(/assets/img/pergaminho-rasgado-vert.png) no-repeat center/cover';
       }
     }
     function showSection(sectionId) {
@@ -1057,70 +1101,6 @@
       }
     }
 
-    function goPrev() {
-      if (isTransitioning) {
-        console.warn('[goPrev] Já em transição, ignorando. isTransitioning:', isTransitioning);
-        return;
-      }
-      isTransitioning = true;
-      console.log('[goPrev] Iniciando goPrev, isTransitioning:', isTransitioning);
-
-      const current = document.querySelector('.j-pergunta.active');
-      if (!current) {
-        console.error('[goPrev] Nenhuma pergunta ativa encontrada!');
-        isTransitioning = false;
-        return;
-      }
-
-      const bloco = current.closest('.j-bloco');
-      if (!bloco) {
-        console.error('[goPrev] Bloco não encontrado para pergunta ativa!');
-        isTransitioning = false;
-        return;
-      }
-
-      const perguntasDoBloco = Array.from(bloco.querySelectorAll('.j-pergunta'));
-      const i = perguntasDoBloco.indexOf(current);
-
-      console.log('[goPrev] Pergunta atual:', i + 1, 'de', perguntasDoBloco.length, 'no bloco', bloco.dataset.bloco);
-
-      current.classList.remove('active');
-
-      if (i - 1 >= 0) {
-        const prev = perguntasDoBloco[i - 1];
-        prev.classList.add('active');
-        runTyping(prev);
-        updateProgress();
-        isTransitioning = false;
-        console.log('[goPrev] Voltando para pergunta:', i);
-        return;
-      }
-
-      const blocos = Array.from(document.querySelectorAll('.j-bloco'));
-      const idxBloco = parseInt(bloco.dataset.bloco, 10);
-      const temAnterior = idxBloco - 1 >= 0;
-
-      console.log('[goPrev] Bloco atual:', idxBloco, 'Tem anterior?', temAnterior);
-
-      if (temAnterior) {
-        blocos.forEach(b => b.style.display = 'none');
-        const ant = blocos[idxBloco - 1];
-        ant.style.display = 'block';
-        const ultima = ant.querySelector('.j-pergunta:last-child');
-        if (ultima) {
-          ultima.classList.add('active');
-          runTyping(ultima);
-        }
-        updateProgress();
-        isTransitioning = false;
-        console.log('[goPrev] Voltando para bloco:', idxBloco - 1);
-      } else {
-        showSection('section-selfie');
-        isTransitioning = false;
-        console.log('[goPrev] Voltando para selfie');
-      }
-    }
-
     /* =========================
        VÍDEO (overlay)
     ========================== */
@@ -1289,7 +1269,6 @@
         }
 
         const aNext = ev.target.closest('[data-action="next"]');
-        const aPrev = ev.target.closest('[data-action="prev"]');
         const aStart = ev.target.closest('[data-action="start"]');
         const aToggle = ev.target.closest('[data-action="toggle-password"], .password-toggle');
         const aRestart = ev.target.closest('[data-action="restart"]');
@@ -1297,18 +1276,21 @@
         const btnSkipSelfie = ev.target.closest('[data-action="skip-selfie"]');
         const btnSendChat = ev.target.closest('[data-action="send-chat"]');
         const btnSelectGuia = ev.target.closest('[data-action="select-guia"]');
+        const btnNextTermos = ev.target.closest('[data-action="next-termos"]');
+        const btnNextSenha = ev.target.closest('[data-action="next-senha"]');
 
-        console.log('[initJornada] Clique detectado:', { aNext, aPrev, aStart, aToggle, aRestart, btnPDF, btnSkipSelfie, btnSendChat, btnSelectGuia });
+        console.log('[initJornada] Clique detectado:', { aNext, aStart, aToggle, aRestart, btnPDF, btnSkipSelfie, btnSendChat, btnSelectGuia, btnNextTermos, btnNextSenha });
 
         if (aNext) { ev.preventDefault(); goNext(); }
-        if (aPrev) { ev.preventDefault(); goPrev(); }
         if (aStart) { ev.preventDefault(); startJourney(); }
         if (aToggle) { ev.preventDefault(); toggleSenha(); }
-        if (aRestart) { ev.preventDefault(); localStorage.removeItem('jornada_respostas'); localStorage.removeItem('JORNADA_GUIA'); location.hash = '#intro'; location.reload(); }
+        if (aRestart) { ev.preventDefault(); localStorage.removeItem('jornada_respostas'); localStorage.removeItem('JORNADA_GUIA'); location.hash = '#intro'; location.replace('/index.html'); }
         if (btnPDF) { ev.preventDefault(); generatePDF(); }
         if (btnSkipSelfie) { ev.preventDefault(); proceedAfterSelfie(); }
         if (btnSendChat) { ev.preventDefault(); sendChatMessage(); }
         if (btnSelectGuia) { ev.preventDefault(); proceedAfterGuia(btnSelectGuia.dataset.guia); }
+        if (btnNextTermos) { ev.preventDefault(); showSection('section-termos'); }
+        if (btnNextSenha) { ev.preventDefault(); showSection('section-senha'); }
       }, { capture: true });
 
       // Adicionar evento para tecla Enter no input do chat
