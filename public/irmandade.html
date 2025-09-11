@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Irmandade Conhecimento com Luz</title>
+  <meta name="description" content="Irmandade Conhecimento com Luz — Portal da Irmandade" />
+
+  <!-- FONTES LOCAIS (incluindo BerkshireSwash) -->
+  <style>
+    @font-face {
+      font-family: 'ManufacturingConsent';
+      src: url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');
+      font-weight: normal; font-style: normal; font-display: swap;
+    }
+    @font-face {
+      font-family: 'Cardo';
+      src: url('/assets/fonts/Cardo-Regular.ttf') format('truetype');
+      font-weight: 400; font-style: normal; font-display: swap;
+    }
+    @font-face {
+      font-family: 'Cardo';
+      src: url('/assets/fonts/Cardo-Bold.ttf') format('truetype');
+      font-weight: 700; font-style: normal; font-display: swap;
+    }
+    @font-face {
+      font-family: 'BerkshireSwash';
+      src: url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');
+      font-weight: normal; font-style: normal; font-display: swap;
+    }
+    :root{
+      --bg:#0b0f1a;
+      --bg-2:#12172a;
+      --ink:#e6e7ee;
+      --ink-dim:#b7bdd1;
+      --gold:#f7d58b;
+      --cta:#7aa2ff;
+      --ring: rgba(122,162,255,.35);
+      --shadow: 0 10px 30px rgba(0,0,0,.3);
+      --radius: 20px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background: radial-gradient(1200px 800px at 80% -10%, #1b2350 0%, #0d1230 35%, var(--bg) 70%) fixed;
+      color:var(--ink); font-family: Cardo, Georgia, 'Times New Roman', serif;
+      display:flex; flex-direction:column; min-height:100vh;
+    }
+
+    /* TOPBAR */
+    .topbar{
+      display:flex; align-items:center; gap:16px;
+      padding:18px 24px; background: linear-gradient(180deg, rgba(255,255,255,.04), transparent);
+      position:sticky; top:0; z-index:30; backdrop-filter: blur(6px);
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .brand{
+      display:flex; align-items:center; gap:14px;
+      font-family: ManufacturingConsent, BerkshireSwash, Cardo, serif;
+      font-size: clamp(28px, 3.2vw, 48px);
+      letter-spacing:.5px; color:var(--gold);
+      text-shadow: 0 2px 10px rgba(247,213,139,.25);
+    }
+
+    /* CHAMA (pequena ao lado do nome) */
+    .chama{
+      position:relative; width:24px; height:34px; filter: drop-shadow(0 6px 14px rgba(255,140,0,.35));
+      flex:0 0 auto;
+    }
+    .chama span{ position:absolute; inset:auto 0 0 0; margin:auto; width:24px; height:34px; border-radius:18px 18px 14px 14px; background:
+      radial-gradient(50% 60% at 50% 30%, #fff7cc 0%, #ffd166 35%, #ff8c00 70%, transparent 100%);
+      animation: flame 1.6s infinite ease-in-out;
+    }
+    .chama span:nth-child(2){ width:16px; height:26px; bottom:4px; opacity:.85; animation-duration:1.2s }
+    .chama span:nth-child(3){ width:10px; height:18px; bottom:9px; opacity:.7;  animation-duration:1s }
+    @keyframes flame{
+      0%,100%{ transform: translateY(0) scale(1); opacity:.9 }
+      50%{ transform: translateY(-3px) scale(1.03); opacity:1 }
+    }
+
+    /* LAYOUT */
+    .shell{ display:grid; grid-template-columns: 280px 1fr; gap:26px; width:100%; max-width:1400px; margin:24px auto; padding:0 22px; flex:1 }
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border:1px solid rgba(255,255,255,.08); border-radius: var(--radius); box-shadow: var(--shadow);
+    }
+
+    /* MENU LATERAL */
+    .sidebar{ padding:18px; position:sticky; top:94px; align-self:start }
+    .groupTitle{ font-weight:700; letter-spacing:.6px; color:var(--ink-dim); margin:2px 2px 10px }
+    .nav{ display:flex; flex-direction:column; gap:10px }
+    .btn{
+      display:flex; align-items:center; justify-content:center;
+      padding:12px 14px; border-radius:14px; background:var(--bg-2);
+      color:var(--ink); text-decoration:none; border:1px solid rgba(255,255,255,.06);
+      transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,.35); border-color: var(--ring) }
+    .btn.outline{ background: transparent }
+
+    /* CONTEÚDO */
+    .content{ padding:18px 18px 26px }
+    .hero{ display:grid; place-items:center; min-height:62vh; padding:14px }
+    .hero img{ max-width: min(96%, 820px); width:100%; height:auto; border-radius:20px; border:1px solid rgba(255,255,255,.08); box-shadow: var(--shadow) }
+
+    /* PÁGINAS (home / jornadas) */
+    .pages{ position:relative }
+    .page{ display:none }
+    .page.active{ display:block }
+
+    /* GRID DE JORNADAS */
+    .grid{ display:grid; grid-template-columns: repeat(2, minmax(180px,1fr)); gap:14px }
+    .card{
+      padding:16px; border-radius:16px; background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.08); text-align:center
+    }
+    .card h3{ margin:10px 0 6px; font-weight:700 }
+    .muted{ color:var(--ink-dim); font-size:.95rem }
+
+    /* RODAPÉ */
+    footer{ color:var(--ink-dim); text-align:center; padding:18px 10px; font-size:.95rem; opacity:.9 }
+
+    /* RESPONSIVO */
+    @media (max-width: 980px){ .shell{ grid-template-columns: 1fr } .sidebar{ position:relative; top:auto } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand" aria-label="Irmandade Conhecimento com Luz">
+      <div class="chama" title="Chama da Irmandade" aria-hidden="true"><span></span><span></span><span></span></div>
+      <span>Irmandade Conhecimento com Luz</span>
+    </div>
+  </header>
+
+  <main class="shell">
+    <aside class="sidebar panel">
+      <div class="groupTitle">Navegação</div>
+      <nav class="nav">
+        <a class="btn" data-go="#home">🏰 Início</a>
+        <a class="btn outline" data-go="#jornadas">🛡️ Jornadas</a>
+        <a class="btn" href="/index.html">🌌 Portal Principal</a>
+        <a class="btn" href="/jornadas.html">📜 Página das Jornadas</a>
+        <a class="btn" href="/jornada-conhecimento-com-luz1.html">🔥 Jornada Essencial</a>
+      </nav>
+    </aside>
+
+    <section class="content pages">
+      <div id="home" class="page active">
+        <div class="hero panel">
+          <img id="heroImage" src="/assets/img/irmandade-hero.png" alt="Irmandade — Imagem central" />
+        </div>
+      </div>
+
+      <div id="jornadas" class="page">
+        <div class="panel" style="padding:18px;">
+          <h2 style="margin:6px 0 16px; font-family: BerkshireSwash, ManufacturingConsent, Cardo, serif; color:var(--gold); letter-spacing:.5px;">Jornadas com Luz</h2>
+          <div class="grid">
+            <a class="card btn" href="/jornada-conhecimento-com-luz1.html">
+              <div>
+                <h3>🔥 Jornada Essencial</h3>
+                <div class="muted">Reflexões fundamentais e a chama interior</div>
+              </div>
+            </a>
+            <a class="card btn outline" href="/jornadas.html#vocacional">
+              <div>
+                <h3>🎯 Jornada Vocacional</h3>
+                <div class="muted">Talentos, direção e propósito</div>
+              </div>
+            </a>
+            <a class="card btn outline" href="/jornadas.html#amorosa">
+              <div>
+                <h3>💞 Jornada Amorosa</h3>
+                <div class="muted">Encontro de almas e alquimia do amor</div>
+              </div>
+            </a>
+            <a class="card btn outline" href="/jornadas.html#essenciais">
+              <div>
+                <h3>📚 Outras Jornadas</h3>
+                <div class="muted">Expansões e caminhos futuros</div>
+              </div>
+            </a>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn" id="btnVoltar">⬅️ Voltar</button>
+            <a class="btn outline" data-go="#home">🏰 Ir para Início</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Para além. E sempre!! • © Irmandade Conhecimento com Luz</span>
+  </footer>
+
+  <script>
+    const pages = document.querySelectorAll('.page');
+    const links = document.querySelectorAll('[data-go]');
+    const btnVoltar = document.getElementById('btnVoltar');
+    function show(hash){
+      const target = (hash || '#home');
+      pages.forEach(p => p.classList.remove('active'));
+      const el = document.querySelector(target);
+      if(el){ el.classList.add('active'); window.location.hash = target; }
+    }
+    function handleNav(e){ e.preventDefault(); const to = this.getAttribute('data-go'); show(to); }
+    links.forEach(a => a.addEventListener('click', handleNav));
+    if(btnVoltar){ btnVoltar.addEventListener('click', () => { if(history.length > 1) history.back(); else show('#home'); }); }
+    window.addEventListener('DOMContentLoaded', () => { const h = window.location.hash || '#home'; show(h); });
+  </script>
+</body>
+</html>
