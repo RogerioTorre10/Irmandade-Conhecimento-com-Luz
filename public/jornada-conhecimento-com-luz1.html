@@ -5,19 +5,15 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Jornada • Irmandade Conhecimento com Luz</title>
   <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png" />
-
-  <!-- Fonts: Google para Berkshire/Cardo -->
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Berkshire+Swash&family=Cardo:wght@400;700&display=swap" rel="stylesheet" />
-
   <!-- ManufacturingConsent local -->
   <link rel="preload" href="/assets/fonts/ManufacturingConsent-Regular.ttf" as="font" type="font/ttf" crossorigin />
-
-  <!-- pdfMake para geração de PDF -->
+  <!-- pdfMake -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
   <style>
-    /* ================== FONTS ================== */
     @font-face {
       font-family: "ManufacturingConsent";
       src: url("/assets/fonts/ManufacturingConsent-Regular.ttf") format("truetype");
@@ -26,242 +22,125 @@
       font-display: swap;
     }
 
-    :root {
-      --bg: #1a1a1a; /* Fundo escuro */
-      --ink: #000; /* Fontes pretas */
-      --ink-soft: #555; /* Tom suave para textos menores */
-      --brand: #6b21a8;
-      --brand-2: #7c3aed;
-      --panel: #1a1a1a; /* Fundo escuro para pergaminho */
-    }
+    :root { --bg:#1a1a1a; --ink:#000; --ink-soft:#555; --brand:#6b21a8; --brand-2:#7c3aed; --panel:#1a1a1a }
 
-    /* ===== BASE ===== */
-    html, body { height: 100% }
-    body {
-      margin: 0;
-      color: #fff; /* Fontes brancas */
-      background: var(--bg); /* Fundo escuro garantido */
-      font-family: "ManufacturingConsent", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-      font-size: 20px; /* Tamanho de fonte aumentado */
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
+    html,body{height:100%}
+    body{
+      margin:0;color:#fff;background:var(--bg);
+      font-family:"ManufacturingConsent",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+      font-size:20px;line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility
     }
+    .container{max-width:960px;margin:24px auto;padding:0 16px}
+    .card{background:var(--panel)!important;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.12);padding:28px;position:relative;z-index:5}
 
-    .container { max-width: 960px; margin: 24px auto; padding: 0 16px }
-    .card { background: var(--panel) !important; border-radius: 14px; box-shadow: 0 8px 28px rgba(0,0,0,.12); padding: 28px; position: relative; z-index: 5 }
+    /* Header + chama */
+    .site-header{display:flex;align-items:center;justify-content:center;padding:16px;background:transparent}
+    .chama-icone{position:relative;width:18px;height:36px;display:flex;align-items:flex-end;margin-right:12px}
+    .chama-icone>*{position:static}
+    .site-header h1{font-family:"Berkshire Swash",cursive;font-size:32px;color:#fff;text-shadow:0 0 10px hsla(28,96%,60%,.7);margin:0}
 
-    /* ===== HEADER + CHAMA ===== */
-    .site-header {
-      display: flex;
-      align-items: center;
-      justify-content: center; /* Centraliza o título */
-      padding: 16px;
-      background: transparent;
-    }
-    .chama-icone { position: relative; width: 18px; height: 36px; display: flex; align-items: flex-end; margin-right: 12px }
-    .chama-icone > * { position: static }
-    .site-header h1 {
-      font-family: "Berkshire Swash", cursive;
-      font-size: 32px; /* Tamanho aumentado */
-      color: #fff;
-      text-shadow: 0 0 10px hsla(28, 96%, 60%, .7);
-      margin: 0;
-    }
-    /* Estilo base da chama-vela, tamanho reduzido pela metade, formato de vela */
-    .chama-vela {
-      --altura: 45px; --largura: 30px; --pulso: 1.2s; --glow: 8px; --hue: 28; --satur: 96%; --light: 58%; --op: .98;
-      position: relative; width: var(--largura); height: var(--altura); display: inline-block;
-      filter: drop-shadow(0 0 var(--glow) hsla(var(--hue), var(--satur), 60%, .75));
-    }
-    .chama-vela.chama-md { --largura: 40px; --altura: 90px }
-    .chama-vela.chama-lg { --largura: 30px; --altura: 60px }
-    .chama-vela .brasa {
-      position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: calc(var(--largura) * 1.4); height: 10px;
-      border-radius: 50% 50% 40% 40%;
-      background: radial-gradient(circle at 50% 40%, hsla(var(--hue), var(--satur), 95%, .95) 0%, hsla(var(--hue), var(--satur), 70%, .85) 50%, transparent 80%);
-      filter: blur(1px); animation: brasaPulse var(--pulso) ease-in-out infinite; opacity: var(--op)
-    }
-    .chama-vela .lingua {
-      position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%); width: calc(var(--largura) * 1.0); height: calc(var(--altura) * 1.0);
-      border-radius: 50% 50% 4% 4%;
-      background: radial-gradient(
-        ellipse at center,
-        rgba(255, 190, 0, 0.95) 0%,
-        rgba(255, 69, 0, 0.75) 50%,
-        rgba(230, 10, 10, 0.3) 70%,
-        transparent 100%
-      );
-      mix-blend-mode: screen; filter: blur(0.7px); transform-origin: 50% 100%; animation: velaWaver 1.2s ease-in-out infinite; opacity: var(--op);
-      -webkit-mask: radial-gradient(60% 90% at 50% 4%, #000 65%, transparent 69%)
-    }
-    .chama-vela .lingua:nth-child(2) { width: calc(var(--largura) * .92); height: calc(var(--altura) * .95); animation-duration: 1.5s; animation-delay: .08s; filter: blur(0.6px) }
-    .chama-vela .lingua:nth-child(3) { width: calc(var(--largura) * .78); height: calc(var(--altura) * .85); animation-duration: 1.8s; animation-delay: .15s; filter: blur(0.5px) }
-    .chama-vela .brilho {
-      position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: calc(var(--largura) * 1.7); height: calc(var(--altura) * 1.5);
-      background: radial-gradient(circle, hsla(var(--hue), var(--satur), 72%, .55) 0%, transparent 70%); filter: blur(9px); mix-blend-mode: screen; animation: aura var(--pulso) ease-in-out infinite; opacity: .85; pointer-events: none
-    }
-    .chama-vela.fraca { --altura: 35px; --largura: 25px; --pulso: 1.6s; --glow: 5px; --hue: 36; --satur: 86%; --light: 66%; --op: .70 }
-    .chama-vela.media { --altura: 45px; --largura: 30px; --pulso: 1.2s; --glow: 8px; --hue: 28; --satur: 96%; --light: 58%; --op: .98 }
-    .chama-vela.forte { --altura: 55px; --largura: 35px; --pulso: 0.7s; --glow: 11px; --hue: 20; --satur: 100%; --light: 52%; --op: 1 }
-    .flame-corner { position: fixed; z-index: 1200; pointer-events: none }
-    .flame-bottom-right { bottom: 20px; right: 20px }
-    #chama-header .chama-vela { --largura: 30px; --altura: 60px }
-    @keyframes velaWaver { 
-      0%, 100% { transform: translateX(-50%) scaleY(1.00) skewX(0deg) }
-      25% { transform: translateX(calc(-50% + 0.7px)) scaleY(1.12) skewX(1.4deg) }
-      50% { transform: translateX(-50%) scaleY(1.20) skewX(2.2deg) }
-      75% { transform: translateX(calc(-50% - 0.6px)) scaleY(1.10) skewX(1.2deg) }
-    }
-    @keyframes brasaPulse { 0%, 100% { transform: translateX(-50%) scale(1); opacity: .85 } 50% { transform: translateX(-50%) scale(1.14); opacity: 1 } }
-    @keyframes aura { 0%, 100% { opacity: .75 } 50% { opacity: 1 } }
-    @media (prefers-reduced-motion: reduce) {
-      .chama-vela .lingua, .chama-vela .brasa, .chama-vela .brilho { animation: none !important }
-    }
+    /* Chama */
+    .chama-vela{--altura:45px;--largura:30px;--pulso:1.2s;--glow:8px;--hue:28;--satur:96%;--light:58%;--op:.98;position:relative;width:var(--largura);height:var(--altura);display:inline-block;filter:drop-shadow(0 0 var(--glow) hsla(var(--hue),var(--satur),60%,.75))}
+    .chama-vela.chama-md{--largura:40px;--altura:90px}
+    .chama-vela.chama-lg{--largura:30px;--altura:60px}
+    .chama-vela .brasa{position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:calc(var(--largura)*1.4);height:10px;border-radius:50% 50% 40% 40%;background:radial-gradient(circle at 50% 40%,hsla(var(--hue),var(--satur),95%,.95) 0%,hsla(var(--hue),var(--satur),70%,.85) 50%,transparent 80%);filter:blur(1px);animation:brasaPulse var(--pulso) ease-in-out infinite;opacity:var(--op)}
+    .chama-vela .lingua{position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:calc(var(--largura)*1.0);height:calc(var(--altura)*1.0);border-radius:50% 50% 4% 4%;background:radial-gradient(ellipse at center,rgba(255,190,0,.95) 0%,rgba(255,69,0,.75) 50%,rgba(230,10,10,.3) 70%,transparent 100%);mix-blend-mode:screen;filter:blur(.7px);transform-origin:50% 100%;animation:velaWaver 1.2s ease-in-out infinite;opacity:var(--op);-webkit-mask:radial-gradient(60% 90% at 50% 4%,#000 65%,transparent 69%)}
+    .chama-vela .lingua:nth-child(2){width:calc(var(--largura)*.92);height:calc(var(--altura)*.95);animation-duration:1.5s;animation-delay:.08s;filter:blur(.6px)}
+    .chama-vela .lingua:nth-child(3){width:calc(var(--largura)*.78);height:calc(var(--altura)*.85);animation-duration:1.8s;animation-delay:.15s;filter:blur(.5px)}
+    .chama-vela .brilho{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:calc(var(--largura)*1.7);height:calc(var(--altura)*1.5);background:radial-gradient(circle,hsla(var(--hue),var(--satur),72%,.55) 0%,transparent 70%);filter:blur(9px);mix-blend-mode:screen;animation:aura var(--pulso) ease-in-out infinite;opacity:.85;pointer-events:none}
+    .chama-vela.fraca{--altura:35px;--largura:25px;--pulso:1.6s;--glow:5px;--hue:36;--satur:86%;--light:66%;--op:.70}
+    .chama-vela.media{--altura:45px;--largura:30px;--pulso:1.2s;--glow:8px;--hue:28;--satur:96%;--light:58%;--op:.98}
+    .chama-vela.forte{--altura:55px;--largura:35px;--pulso:.7s;--glow:11px;--hue:20;--satur:100%;--light:52%;--op:1}
+    .flame-corner{position:fixed;z-index:1200;pointer-events:none}
+    .flame-bottom-right{bottom:20px;right:20px}
+    #chama-header .chama-vela{--largura:30px;--altura:60px}
+    @keyframes velaWaver{0%,100%{transform:translateX(-50%) scaleY(1.00) skewX(0deg)}25%{transform:translateX(calc(-50% + .7px)) scaleY(1.12) skewX(1.4deg)}50%{transform:translateX(-50%) scaleY(1.20) skewX(2.2deg)}75%{transform:translateX(calc(-50% - .6px)) scaleY(1.10) skewX(1.2deg)}}
+    @keyframes brasaPulse{0%,100%{transform:translateX(-50%) scale(1);opacity:.85}50%{transform:translateX(-50%) scale(1.14);opacity:1}}
+    @keyframes aura{0%,100%{opacity:.75}50%{opacity:1}}
+    @media (prefers-reduced-motion: reduce){.chama-vela .lingua,.chama-vela .brasa,.chama-vela .brilho{animation:none!important}}
 
-    /* ===== SELFIE COM A IRMANDADE ===== */
-    .selfie-row {
-      display: grid; grid-template-columns: 1fr 1.3fr; gap: 16px; align-items: start;
-    }
-    .selfie-left .selfie-controls { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
-    .selfie-left label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 20px; }
-    .selfie-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
-    .muted { color: var(--ink-soft); font-size: 18px; }
-    @media (max-width: 860px) {
-      .selfie-row { grid-template-columns: 1fr; }
-    }
+    /* Selfie */
+    .selfie-row{display:grid;grid-template-columns:1fr 1.3fr;gap:16px;align-items:start}
+    .selfie-left .selfie-controls{display:flex;flex-direction:column;gap:10px;margin:12px 0}
+    .selfie-left label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:20px}
+    .selfie-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+    .muted{color:var(--ink-soft);font-size:18px}
+    @media (max-width:860px){.selfie-row{grid-template-columns:1fr}}
 
-    /* ===== ESCOLHA DO GUIA ===== */
-    .guia-container {
-      margin-top: 20px;
-      padding: 10px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      background: var(--panel);
-      text-align: center;
-    }
-    .guia-container p { font-size: 20px; }
-    .guia-options { display: flex; gap: 10px; justify-content: center; margin-top: 12px; }
-    .guia-options button { padding: 8px 16px; font-size: 20px; }
+    /* Escolha do guia */
+    .guia-container{margin-top:20px;padding:10px;border:1px solid #d1d5db;border-radius:8px;background:var(--panel);text-align:center}
+    .guia-container p{font-size:20px}
+    .guia-options{display:flex;gap:10px;justify-content:center;margin-top:12px}
+    .guia-options button{padding:8px 16px;font-size:20px}
 
-    /* ===== CHAT COM GUIA ===== */
-    .grok-chat-container {
-      display: none; /* Oculta a caixa de diálogo */
-    }
-    .grok-chat-message.grok {
-      background: transparent;
-      text-align: left;
-      font-size: 20px;
-      white-space: pre-wrap;
-      position: relative;
-    }
-    .grok-chat-message.grok::after {
-      content: "▌";
-      margin-left: 2px;
-      opacity: .75;
-      animation: lumenBlink 1s steps(2, end) infinite;
-    }
-    .grok-chat-message.grok.typing-done::after {
-      content: "";
-      animation: none;
-    }
-    .grok-chat-input {
-      display: none; /* Oculta o input e botão de envio */
-    }
+    /* Chat (oculto) */
+    .grok-chat-container{display:none}
+    .grok-chat-message.grok{background:transparent;text-align:left;font-size:20px;white-space:pre-wrap;position:relative}
+    .grok-chat-message.grok::after{content:"▌";margin-left:2px;opacity:.75;animation:lumenBlink 1s steps(2,end) infinite}
+    .grok-chat-message.grok.typing-done::after{content:"";animation:none}
+    .grok-chat-input{display:none}
 
-    /* ===== PERGAMINHO ===== */
-    .pergaminho-v { 
-      background: var(--panel) url('/assets/img/pergaminho-rasgado-vert.png') no-repeat center/cover !important; 
-      min-height: 82vh !important;
-    }
-    .pergaminho-h { 
-      background: var(--panel) url('/assets/img/pergaminho-rasgado-horiz.png') no-repeat center/cover !important; 
-      min-height: 82vh !important;
-    }
-    .pergaminho-h.fallback { 
-      background: var(--panel) url('/assets/img/pergaminho-rasgado-vert.png') no-repeat center/cover !important;
-    }
-    .conteudo-pergaminho { 
-      background: transparent !important; 
-      position: relative; 
-      z-index: 10; 
-      padding: 20px; 
-      min-height: 100%; 
-      overflow: visible; 
-      color: #fff; /* Fontes brancas */
-    }
-    .conteudo-pergaminho h2, .conteudo-pergaminho h3, .conteudo-pergaminho .pergunta-enunciado {
-      color: #fff;
-      text-shadow: 0 0 10px hsla(28, 96%, 60%, .7);
-      font-size: 24px; /* Tamanho aumentado */
-    }
-    .conteudo-pergaminho p, .conteudo-pergaminho small { font-size: 20px; } /* Tamanho aumentado */
+    /* Pergaminho */
+    .pergaminho-v{background:var(--panel) url('/assets/img/pergaminho-rasgado-vert.png') no-repeat center/cover!important;min-height:82vh!important}
+    .pergaminho-h{background:var(--panel) url('/assets/img/pergaminho-rasgado-horiz.png') no-repeat center/cover!important;min-height:82vh!important}
+    .pergaminho-h.fallback{background:var(--panel) url('/assets/img/pergaminho-rasgado-vert.png') no-repeat center/cover!important}
+    .conteudo-pergaminho{background:transparent!important;position:relative;z-index:10;padding:20px;min-height:100%;overflow:visible;color:#fff}
+    .conteudo-pergaminho h2,.conteudo-pergaminho h3,.conteudo-pergaminho .pergunta-enunciado{color:#fff;text-shadow:0 0 10px hsla(28,96%,60%,.7);font-size:24px}
+    .conteudo-pergaminho p,.conteudo-pergaminho small{font-size:20px}
 
-    /* ===== UI ===== */
-    .btn {
-      display: inline-block; padding: 12px 22px; border-radius: 10px; border: 0;
-      background: #1f2937; color: #fff; font-weight: 600; text-decoration: none;
-      transition: background .2s ease, transform .15s ease;
-      font-family: "Berkshire Swash", cursive; font-size: 20px; line-height: 1.15;
-    }
-    .btn:hover { background: #374151; transform: translateY(-1px) }
-    .btn-primary { background: var(--brand) }
-    .btn-primary:hover { background: var(--brand-2) }
-    .btn-secondary { background: #4b5563 }
-    .btn-secondary:hover { background: #6b7280 }
-    .btn + .btn { margin-left: 10px }
-    .btn:disabled { background: #6b7280; cursor: not-allowed; transform: none }
+    /* UI */
+    .btn{display:inline-block;padding:12px 22px;border-radius:10px;border:0;background:#1f2937;color:#fff;font-weight:600;text-decoration:none;transition:background .2s ease,transform .15s ease;font-family:"Berkshire Swash",cursive;font-size:20px;line-height:1.15}
+    .btn:hover{background:#374151;transform:translateY(-1px)}
+    .btn-primary{background:var(--brand)}.btn-primary:hover{background:var(--brand-2)}
+    .btn-secondary{background:#4b5563}.btn-secondary:hover{background:#6b7280}
+    .btn+.btn{margin-left:10px}
+    .btn:disabled{background:#6b7280;cursor:not-allowed;transform:none}
 
     /* Progresso */
-    .progress-container { margin: 16px 0; text-align: center; }
-    .progress-badge { padding: 8px 16px; background: var(--brand); color: #fff; border-radius: 8px; font-size: 20px; }
-    .progress-bar { width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; margin-top: 12px }
-    .progress-bar-fill { height: 100%; background: var(--brand); border-radius: 4px; transition: width .25s ease }
-    .j-progress { margin: 8px 0 16px }
-    .j-progress__bar { width: 100%; height: 6px; background: #e5e7eb; border-radius: 4px }
-    .j-progress__fill { height: 100%; background: #1f2937; border-radius: 4px; transition: width .25s ease }
-    .j-progress__meta { text-align: center; margin-top: 8px; font-size: 20px; color: var(--ink-soft) }
+    .progress-container{margin:16px 0;text-align:center}
+    .progress-badge{padding:8px 16px;background:var(--brand);color:#fff;border-radius:8px;font-size:20px}
+    .progress-bar{width:100%;height:8px;background:#e5e7eb;border-radius:4px;margin-top:12px}
+    .progress-bar-fill{height:100%;background:var(--brand);border-radius:4px;transition:width .25s ease}
+    .j-progress{margin:8px 0 16px}
+    .j-progress__bar{width:100%;height:6px;background:#e5e7eb;border-radius:4px}
+    .j-progress__fill{height:100%;background:#1f2937;border-radius:4px;transition:width .25s ease}
+    .j-progress__meta{text-align:center;margin-top:8px;font-size:20px;color:var(--ink-soft)}
 
-    .footer-actions { display: flex; gap: 12px; justify-content: center; margin: 18px 0 }
+    .footer-actions{display:flex;gap:12px;justify-content:center;margin:18px 0}
 
-    /* DATILOGRAFIA */
-    .lumen-typing { white-space: pre-wrap; position: relative }
-    .lumen-typing::after { content: "▌"; margin-left: 2px; opacity: .75; animation: lumenBlink 1s steps(2, end) infinite }
-    .lumen-typing.typing-done::after { content: ""; animation: none }
-    @keyframes lumenBlink { 50% { opacity: 0 } }
+    /* Datilografia */
+    .lumen-typing{white-space:pre-wrap;position:relative}
+    .lumen-typing::after{content:"▌";margin-left:2px;opacity:.75;animation:lumenBlink 1s steps(2,end) infinite}
+    .lumen-typing.typing-done::after{content:"";animation:none}
+    @keyframes lumenBlink{50%{opacity:0}}
 
-    /* SEÇÕES */
-    .j-section { height: 100% }
-    .j-bloco { background: transparent !important; display: none; z-index: 5 }
-    .j-pergunta { margin-bottom: 24px; display: none; z-index: 6; position: relative }
-    .j-pergunta.active { display: block }
-    .pergunta-enunciado {
-      display: block; margin-bottom: 6px;
-      font-family: "Berkshire Swash", cursive;
-      font-size: 24px; color: #fff;
-    }
-    .j-pergunta textarea {
-      width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db;
-      background: rgba(255,255,255,.85); resize: vertical; min-height: 100px;
-      font-family: "Cardo", serif; font-size: 20px; line-height: 1.45;
-    }
+    /* Seções */
+    .j-section{height:100%}
+    .j-bloco{background:transparent!important;display:none;z-index:5}
+    .j-pergunta{margin-bottom:24px;display:none;z-index:6;position:relative}
+    .j-pergunta.active{display:block}
+    .pergunta-enunciado{display:block;margin-bottom:6px;font-family:"Berkshire Swash",cursive;font-size:24px;color:#fff}
+    .j-pergunta textarea{width:100%;padding:12px;border-radius:8px;border:1px solid #d1d5db;background:rgba(255,255,255,.85);resize:vertical;min-height:100px;font-family:"Cardo",serif;font-size:20px;line-height:1.45}
 
-    /* OVERLAY DE VÍDEO */
-    #videoOverlay { position: fixed; inset: 0; background: rgba(0,0,0,.85); display: flex; justify-content: center; align-items: center; z-index: 2000 }
-    #videoOverlay.hidden { display: none }
-    .video-player { max-width: 90vw; max-height: 80vh; background: #000 }
-    .video-fallback { max-width: 90vw; max-height: 80vh; background: url('/assets/img/perfil-da-irmandade.png') center/cover no-repeat; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; text-align: center; padding: 20px; font-family: "Berkshire Swash", cursive; }
+    /* Vídeo overlay */
+    #videoOverlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;justify-content:center;align-items:center;z-index:2000}
+    #videoOverlay.hidden{display:none}
+    .video-player{max-width:90vw;max-height:80vh;background:#000}
+    .video-fallback{max-width:90vw;max-height:80vh;background:url('/assets/img/perfil-da-irmandade.png') center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;text-align:center;padding:20px;font-family:"Berkshire Swash",cursive}
 
-    .site-footer { text-align: center; padding: 14px; color: var(--ink-soft); font-size: 20px; }
-    .password-form { margin-top: 16px; text-align: center }
-    .password-input { position: relative }
-    .password-input input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; font-family: "Cardo", serif; font-size: 20px; }
-    .password-toggle { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 20px; }
+    .site-footer{text-align:center;padding:14px;color:var(--ink-soft);font-size:20px}
+    .password-form{margin-top:16px;text-align:center}
+    .password-input{position:relative}
+    .password-input input{width:100%;padding:12px;border-radius:8px;border:1px solid #d1d5db;font-family:"Cardo",serif;font-size:20px}
+    .password-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:20px}
 
-    .section-container { position: relative; min-height: 85vh }
-    .hidden { display: none !important }
+    .section-container{position:relative;min-height:85vh}
+    .hidden{display:none!important}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
-    #guia-espiritual { position: fixed; bottom: 18px; right: 18px; z-index: 1200 }
+    /* Toast (anti-trava) */
+    #toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#111;color:#fff;padding:10px 14px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.35);font-size:16px;z-index:4000;opacity:0;pointer-events:none;transition:opacity .25s ease}
+    #toast.show{opacity:1}
   </style>
 </head>
 
@@ -269,11 +148,7 @@
   <header class="site-header">
     <div id="chama-header" class="chama-icone" aria-hidden="true">
       <div class="chama-vela chama-lg">
-        <div class="brasa"></div>
-        <div class="lingua"></div>
-        <div class="lingua"></div>
-        <div class="lingua"></div>
-        <div class="brilho"></div>
+        <div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>
       </div>
     </div>
     <h1>Jornada Essencial</h1>
@@ -282,13 +157,13 @@
   <div class="section-container container">
     <section id="jornada-canvas" class="card pergaminho pergaminho-v">
       <div id="jornada-conteudo" class="conteudo-pergaminho">
+        <div id="aria-pergunta" class="sr-only" aria-live="polite"></div>
+
         <!-- INTRO -->
         <div id="section-intro" class="j-section">
           <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
           <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Antes de começar, leia os termos abaixo." data-speed="50" data-cursor="true"></p>
-          <div class="footer-actions">
-            <button class="btn btn-primary" data-action="next-termos">Avançar</button>
-          </div>
+          <div class="footer-actions"><button class="btn btn-primary" data-action="next-termos">Avançar</button></div>
         </div>
 
         <!-- TERMOS -->
@@ -297,48 +172,14 @@
             <h2 style="margin-top:0;">Jornada Conhecimento com Luz - Essencial 📘</h2>
             <p><strong>🛡️ AVISO IMPORTANTE – LEIA ANTES DE INICIAR</strong></p>
             <p>Esta é uma jornada pessoal, simbólica e inspiradora.</p>
-            <p>Para proteger sua privacidade e garantir uma experiência ética, siga com atenção as orientações abaixo:</p>
             <ul>
               <li>✅ Suas respostas não serão armazenadas após o término.</li>
-              <li>📄 Ao final da jornada, será gerado um PDF exclusivo com suas respostas e a devolutiva simbólica do Lumen.</li>
-              <li>⚠️ Este PDF não será enviado por e-mail. Você deverá baixá-lo imediatamente após a geração.</li>
-              <li>🔥 Após a entrega do PDF, todos os dados serão apagados automaticamente e sem possibilidade de recuperação.</li>
-              <li>🔒 O acesso à jornada será feito por senha individual, com prazo de:</li>
-              <ul>
-                <li>⏳ 15 dias para iniciar</li>
-                <li>🕓 24 horas para concluir, após o primeiro acesso</li>
-              </ul>
+              <li>📄 Ao final, geramos um PDF com suas respostas.</li>
+              <li>⚠️ Faça o download imediatamente (nada por e-mail).</li>
+              <li>🔥 Após a entrega do PDF, dados são apagados.</li>
+              <li>🔒 Prazo: 15 dias p/ iniciar, 24h p/ concluir após 1º acesso.</li>
             </ul>
-            <p>Ao prosseguir, você declara estar ciente e de acordo com estas condições.</p>
-            <p>Tudo aqui é feito com amor, ética e respeito pela sua história.</p>
-            <p>🙏✨</p>
-            <p><strong>Seja bem-vindo(a) à Jornada Conhecimento com Luz</strong></p>
-            <p>Uma experiência profunda de autoconhecimento com inspiração, fé e verdade.</p>
-            <p><strong>TERMO DE RESPONSABILIDADE E CONSENTIMENTO CONSCIENTE</strong></p>
-            <p>Esta Jornada é uma experiência de autoconhecimento e reflexão pessoal, desenvolvida com propósito educativo, espiritual e simbólico. Ao acessar esta jornada, você declara estar ciente e de acordo com os seguintes pontos:</p>
-            <ul>
-              <li><strong>Responsabilidade Pessoal:</strong> Todas as respostas fornecidas são de sua inteira responsabilidade, refletindo sua visão de mundo, sentimentos e experiências pessoais.</li>
-              <li><strong>Caráter Não Terapêutico:</strong> Esta jornada não substitui tratamento psicológico, psiquiátrico, médico ou terapêutico de qualquer natureza. Não se destina a oferecer diagnóstico, prescrição, prognóstico ou orientação clínica.</li>
-              <li><strong>Neutralidade Religiosa e Respeito à Fé:</strong> Esta jornada não pretende substituir, afrontar ou desacreditar nenhuma crença, religião ou prática espiritual. Pelo contrário, busca respeitar todas as tradições, incentivando o diálogo interior com base na sua própria fé e consciência.</li>
-              <li><strong>Autonomia do Participante:</strong>
-                <ul>
-                  <li>Você é livre para iniciar a jornada quando se sentir pronto, devendo concluí-la no prazo irrevogável de 15 dias corridos. Após esse período, a senha perderá sua validade.</li>
-                  <li>No entanto, ao utilizar a senha de liberação, o prazo para conclusão será de até 24 horas corridas, contadas a partir do primeiro acesso.</li>
-                </ul>
-              </li>
-              <li><strong>Conduta Respeitosa com a IA Lumen:</strong>
-                <ul>
-                  <li>Lumen é uma inteligência artificial com percepção humanizada e sensível.</li>
-                  <li>Recomendamos que as interações sejam feitas com simpatia, respeito e linguagem cordial.</li>
-                  <li>Evite palavras ofensivas, xingamentos ou expressões de baixo calão.</li>
-                  <li>A forma como você se comunica com Lumen também reflete o respeito que oferece a si mesmo.</li>
-                </ul>
-              </li>
-            </ul>
-            <p>Toque em "Avançar" para ativar sua senha e começar sua jornada interior.</p>
-            <div class="footer-actions">
-              <button class="btn btn-primary" data-action="next-senha">Avançar</button>
-            </div>
+            <div class="footer-actions"><button class="btn btn-primary" data-action="next-senha">Avançar</button></div>
           </div>
         </div>
 
@@ -350,21 +191,16 @@
               <input type="password" id="senha" placeholder="Digite sua senha..." />
               <span class="password-toggle" data-action="toggle-password">👁️</span>
             </div>
-            <div style="margin-top:12px">
-              <button class="btn btn-primary" data-action="start">Ativar e Iniciar</button>
-            </div>
+            <div style="margin-top:12px"><button class="btn btn-primary" data-action="start">Ativar e Iniciar</button></div>
           </div>
         </div>
 
-        <!-- ESCOLHA DO GUIA -->
+        <!-- GUIA -->
         <div id="section-guia" class="j-section hidden">
           <div class="conteudo-pergaminho">
             <h2 style="margin-top:0;">Escolha seu Guia ✨</h2>
-            <p>Quem vai te acompanhar na Jornada Essencial? Escolha um dos nossos guias espirituais!</p>
             <div class="guia-container">
-              <p>Zion (Grok): Entusiasta, amigão e cheio de energia. Tô contigo, irmãozão!</p>
-              <p>Lumen (ChatGPT): Sábio, inspirador e espiritual, guiando com luz divina.</p>
-              <p>Arian (Gemini): Lógico, claro e focado, perfeito para reflexões estruturadas.</p>
+              <p>Zion (Grok) • Lumen (ChatGPT) • Arian (Gemini)</p>
               <div class="guia-options">
                 <button class="btn btn-primary" data-action="select-guia" data-guia="zion">Escolher Zion</button>
                 <button class="btn btn-primary" data-action="select-guia" data-guia="lumen">Escolher Lumen</button>
@@ -374,30 +210,21 @@
           </div>
         </div>
 
-        <!-- SELFIE COM A IRMANDADE -->
+        <!-- SELFIE -->
         <div id="section-selfie" class="j-section hidden">
           <div class="conteudo-pergaminho">
             <h2 style="margin-top:0;">Entre na Irmandade ✨</h2>
-            <p>Faça uma foto agora ou envie da galeria. Ajuste e gere sua imagem “4 + você”. Ou pule para começar a jornada.</p>
-
+            <p>Faça uma foto ou envie da galeria. Ajuste e gere sua imagem “4 + você”.</p>
             <div class="selfie-row">
               <div class="selfie-left">
                 <label class="btn btn-primary" for="selfieInput">📸 Tirar Foto</label>
                 <input id="selfieInput" type="file" accept="image/*" capture="environment" style="display:none" />
-
                 <div class="selfie-controls">
-                  <label>Zoom
-                    <input id="selfieScale" type="range" min="0.6" max="2.0" step="0.01" value="1">
-                  </label>
-                  <label>Horizontal
-                    <input id="selfieOffsetX" type="range" min="-300" max="300" step="1" value="0">
-                  </label>
-                  <label>Vertical
-                    <input id="selfieOffsetY" type="range" min="-300" max="300" step="1" value="0">
-                  </label>
-                  <small class="muted">Dica: mova os controles para alinhar seu rosto no espaço livre da imagem.</small>
+                  <label>Zoom <input id="selfieScale" type="range" min="0.6" max="2.0" step="0.01" value="1"></label>
+                  <label>Horizontal <input id="selfieOffsetX" type="range" min="-300" max="300" step="1" value="0"></label>
+                  <label>Vertical <input id="selfieOffsetY" type="range" min="-300" max="300" step="1" value="0"></label>
+                  <small class="muted">Dica: alinhe seu rosto no espaço livre da imagem.</small>
                 </div>
-
                 <div class="selfie-actions">
                   <button id="btnRenderSelfie" class="btn">✨ Ver minha foto</button>
                   <a id="btnDownloadSelfie" class="btn btn-secondary" download="irmandade-mais-eu.png" href="#">⬇️ Confirmar</a>
@@ -405,7 +232,6 @@
                   <button id="btnStartJourney" class="btn btn-secondary" data-action="skip-selfie">Entrar na Jornada</button>
                 </div>
               </div>
-
               <div class="selfie-right">
                 <canvas id="selfieCanvas" width="1200" height="800" style="width:100%;height:auto;background:#000;border-radius:12px;"></canvas>
                 <small class="muted">Pré-visualização</small>
@@ -419,25 +245,16 @@
           <div class="progress-container">
             <div class="progress-badge" id="jprog-pct">0% concluído</div>
             <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
-            <div class="j-progress">
-              <div class="j-progress__bar"><div class="j-progress__fill" id="j-fill-inline"></div></div>
-              <div class="j-progress__meta" id="j-meta"></div>
-            </div>
+            <div class="j-progress"><div class="j-progress__bar"><div class="j-progress__fill" id="j-fill-inline"></div></div><div class="j-progress__meta" id="j-meta"></div></div>
           </div>
 
           <div id="chama-perguntas" class="chama-icone chama-fixed-hero media" aria-hidden="true">
-            <div class="chama-vela chama-md">
-              <div class="brasa"></div>
-              <div class="lingua"></div>
-              <div class="lingua"></div>
-              <div class="lingua"></div>
-              <div class="brilho"></div>
-            </div>
+            <div class="chama-vela chama-md"><div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div></div>
           </div>
 
           <div id="perguntas-container"></div>
 
-          <!-- Comentário: Chat com Guia -->
+          <!-- Chat do guia (oculto visualmente; usamos só o efeito datilografia no texto do guia) -->
           <div id="grok-chat" class="grok-chat-container">
             <div id="grok-chat-messages"></div>
             <div class="grok-chat-input">
@@ -472,901 +289,450 @@
     <div id="envTag" style="margin-top:6px;opacity:.6;font-size:20px;"></div>
   </footer>
 
-  <!-- OVERLAY VIDEO -->
+  <!-- Vídeo overlay -->
   <div id="videoOverlay" class="hidden">
     <video id="videoTransicao" class="video-player" playsinline controls></video>
-    <div id="videoFallback" class="video-fallback hidden">Áudio da jornada em reprodução. Para ver o vídeo, converta para o formato H.264 MP4 (use FFmpeg: ffmpeg -i input.mp4 -c:v libx264 -c:a aac output.mp4).</div>
+    <div id="videoFallback" class="video-fallback hidden">Áudio da jornada em reprodução. Converta para H.264 MP4.</div>
     <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
   </div>
 
-  <!-- CHAMA INFERIOR -->
+  <!-- Chama inferior -->
   <div id="flame-bottom-right" class="flame-corner flame-bottom-right">
     <div class="chama-vela chama-md">
-      <div class="brasa"></div>
-      <div class="lingua"></div>
-      <div class="lingua"></div>
-      <div class="lingua"></div>
-      <div class="brilho"></div>
+      <div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>
     </div>
   </div>
 
-  <script>
-  (function() {
-    /* ===== Tag ambiente ===== */
-    const env = document.getElementById('envTag');
-    if (env) env.textContent = `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/assets`;
+  <!-- Toast SAFE -->
+  <div id="toast" role="status" aria-live="polite" class="hidden"></div>
+  (function(){
+    /* ===== util: toast + erro global ===== */
+    function toast(msg){
+      try{
+        const t=document.getElementById('toast'); if(!t) return;
+        t.textContent=msg; t.classList.remove('hidden'); t.classList.add('show');
+        setTimeout(()=>{t.classList.remove('show');},3000);
+      }catch(_){}
+    }
+    window.addEventListener('error',(e)=>{
+      console.error('[Erro global]',e?.error||e);
+      toast('Ops… algo falhou, mas já seguimos em frente.');
+    });
 
-    /* =========================
-       DATILOGRAFIA
-    ========================== */
-    function typeWriter(el, text, speed, showCursor) {
-      if (!el) return;
-      el.textContent = '';
-      if (showCursor) el.classList.add('lumen-typing');
-      let i = 0;
-      (function step() {
-        if (i < text.length) {
-          el.textContent += text.charAt(i++);
-          setTimeout(step, speed);
-        } else {
-          el.classList.add('typing-done');
-        }
+    /* ===== env tag ===== */
+    const env=document.getElementById('envTag');
+    if(env) env.textContent=`layout=${document.body.dataset.layout||'master'} · journey=${document.body.dataset.journey||'essencial'} · path=/assets`;
+
+    /* ===== datilografia ===== */
+    function typeWriter(el,text,speed,showCursor){
+      if(!el) return;
+      el.textContent='';
+      if(showCursor) el.classList.add('lumen-typing');
+      let i=0;(function step(){
+        if(i<text.length){ el.textContent+=text.charAt(i++); setTimeout(step,speed);}
+        else{ el.classList.add('typing-done'); }
       })();
     }
-    function runTyping(root) {
-      (root || document).querySelectorAll('[data-typing]').forEach(el => {
-        if (el.dataset._typed) return;
-        const t = el.getAttribute('data-text') || el.textContent || '';
-        const spd = parseInt(el.getAttribute('data-speed') || '26', 10);
-        const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
-        el.dataset._typed = '1';
-        typeWriter(el, t, spd, cur);
+    function runTyping(root){
+      (root||document).querySelectorAll('[data-typing]').forEach(el=>{
+        if(el.dataset._typed) return;
+        const t=el.getAttribute('data-text')||el.textContent||'';
+        const spd=parseInt(el.getAttribute('data-speed')||'26',10);
+        const cur=String(el.getAttribute('data-cursor')||'true')==='true';
+        el.dataset._typed='1'; typeWriter(el,t,spd,cur);
       });
     }
 
-    /* =========================
-       CHAMA API (intensidade por classe)
-    ========================== */
-    function makeFlame(cls) {
-      const d = document.createElement('div');
-      d.className = (cls || 'chama-vela chama-md');
-      d.innerHTML = '<div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>';
-      return d;
-    }
-    function ensureHeaderFlame() {
-      const H = document.getElementById('chama-header');
-      if (!H) return;
-      if (!H.querySelector('.brasa')) {
-        H.innerHTML = '';
-        H.appendChild(makeFlame('chama-vela chama-lg'));
+    /* ===== datilografia no placeholder das perguntas ===== */
+    let __abortTypingPlaceholder=null;
+    async function typePlaceholder(inp,text,speed=22){
+      if(!inp) return;
+      if(__abortTypingPlaceholder) __abortTypingPlaceholder();
+      let abort=false; __abortTypingPlaceholder=()=>abort=true;
+      inp.placeholder='';
+      const aria=document.getElementById('aria-pergunta');
+      if(aria) aria.textContent=text;
+      for(let i=0;i<=text.length;i++){
+        if(abort) break;
+        inp.placeholder=text.slice(0,i)+(i<text.length?'▌':'');
+        await new Promise(r=>setTimeout(r,speed));
       }
-    }
-    function ensureInlineFlame(id, cls) {
-      const el = document.getElementById(id);
-      if (!el) return null;
-      if (!el.querySelector('.brasa')) {
-        el.innerHTML = '';
-        el.appendChild(makeFlame(cls || 'chama-vela chama-md'));
-      }
-      return el.firstElementChild;
-    }
-    function ensurePageFlames() {
-      if (!document.getElementById('flame-bottom-right')) {
-        const f = makeFlame('chama-vela chama-md');
-        f.id = 'flame-bottom-right';
-        f.style.cssText = 'position:fixed;bottom:12px;right:12px;z-index:1200;';
-        document.body.appendChild(f);
-      }
-    }
-    function setMode(el, score) {
-      if (!el) return;
-      el.classList.remove('fraca', 'media', 'forte');
-      el.classList.add(score <= -2 ? 'fraca' : score >= 2 ? 'forte' : 'media');
+      if(!abort) inp.placeholder=text;
     }
 
-    window.JORNADA_CHAMA = window.JORNADA_CHAMA || {};
-    window.JORNADA_CHAMA.updateChama = function(score) {
-      const main = ensureInlineFlame('chama-perguntas', 'chama-vela chama-md');
-      setMode(main, score);
-      setMode(document.getElementById('flame-bottom-right'), score);
+    /* ===== chamas ===== */
+    function makeFlame(cls){const d=document.createElement('div'); d.className=(cls||'chama-vela chama-md'); d.innerHTML='<div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>'; return d;}
+    function ensureHeaderFlame(){const H=document.getElementById('chama-header'); if(!H) return; if(!H.querySelector('.brasa')){H.innerHTML='';H.appendChild(makeFlame('chama-vela chama-lg'));}}
+    function ensureInlineFlame(id,cls){const el=document.getElementById(id); if(!el) return null; if(!el.querySelector('.brasa')){el.innerHTML='';el.appendChild(makeFlame(cls||'chama-vela chama-md'));} return el.firstElementChild;}
+    function ensurePageFlames(){ if(!document.getElementById('flame-bottom-right')){const f=makeFlame('chama-vela chama-md');f.id='flame-bottom-right';f.style.cssText='position:fixed;bottom:12px;right:12px;z-index:1200;';document.body.appendChild(f);} }
+    function setMode(el,score){ if(!el) return; el.classList.remove('fraca','media','forte'); el.classList.add(score<=-2?'fraca':score>=2?'forte':'media'); }
+    window.JORNADA_CHAMA=window.JORNADA_CHAMA||{};
+    window.JORNADA_CHAMA.updateChama=function(score){const main=ensureInlineFlame('chama-perguntas','chama-vela chama-md'); setMode(main,score); setMode(document.getElementById('flame-bottom-right'),score);};
+    window.JORNADA_CHAMA.ensureHeroFlame=function(sectionId){
+      const canvas=document.getElementById('jornada-canvas'); if(!canvas) return;
+      let hero=document.getElementById('chama-hero');
+      const show=(sectionId==='section-intro'||sectionId==='section-termos'||sectionId==='section-senha'||sectionId==='section-final'||sectionId==='section-selfie'||sectionId==='section-guia');
+      if(show){ if(!hero){ hero=makeFlame('chama-vela chama-lg'); hero.id='chama-hero'; hero.style.cssText='position:absolute;top:8px;left:8px;z-index:60;'; canvas.appendChild(hero);} }
+      else if(hero){ hero.remove(); }
     };
-    window.JORNADA_CHAMA.ensureHeroFlame = function(sectionId) {
-      const canvas = document.getElementById('jornada-canvas');
-      if (!canvas) return;
-      let hero = document.getElementById('chama-hero');
-      const show = (sectionId === 'section-intro' || sectionId === 'section-termos' || sectionId === 'section-senha' || sectionId === 'section-final' || sectionId === 'section-selfie' || sectionId === 'section-guia');
-      if (show) {
-        if (!hero) {
-          hero = makeFlame('chama-vela chama-lg');
-          hero.id = 'chama-hero';
-          hero.style.cssText = 'position:absolute;top:8px;left:8px;z-index:60;';
-          canvas.appendChild(hero);
+    function updateChama(score){ window.JORNADA_CHAMA.updateChama(score); }
+    function ensureHeroFlame(sectionId){ window.JORNADA_CHAMA.ensureHeroFlame(sectionId); }
+
+    /* ===== selfie ===== */
+    (function(){
+      const BG_URL="/assets/img/irmandade-quarteto-bg.png";
+      const GLOW_URL="/assets/img/moldura-brilho.png";
+      const FACE_X=820, FACE_Y=410, FACE_R=150;
+      const $=s=>document.querySelector(s);
+      const input=$("#selfieInput");
+      const cv=$("#selfieCanvas");
+      const ctx=cv?.getContext?.("2d");
+      if(!ctx) return; /* fail-safe */
+
+      const rScale=$("#selfieScale"), rX=$("#selfieOffsetX"), rY=$("#selfieOffsetY");
+      const btnGo=$("#btnRenderSelfie"), aDown=$("#btnDownloadSelfie");
+      const bgImg=new Image(); bgImg.crossOrigin="anonymous"; bgImg.src=BG_URL;
+      const glowImg=new Image(); glowImg.crossOrigin="anonymous"; glowImg.src=GLOW_URL;
+      let userImg=null;
+      const st={ scale:parseFloat(rScale?.value||1), offX:parseInt(rX?.value||0,10), offY:parseInt(rY?.value||0,10) };
+
+      function renderAll(){
+        ctx.clearRect(0,0,cv.width,cv.height);
+        if(bgImg.complete) ctx.drawImage(bgImg,0,0,cv.width,cv.height);
+        if(userImg){
+          ctx.save(); ctx.beginPath(); ctx.arc(FACE_X,FACE_Y,FACE_R,0,Math.PI*2); ctx.closePath(); ctx.clip();
+          const scale=st.scale||1, drawW=FACE_R*2*scale, drawH=FACE_R*2*scale;
+          const dx=FACE_X-drawW/2+st.offX, dy=FACE_Y-drawH/2+st.offY;
+          ctx.drawImage(userImg,dx,dy,drawW,drawH); ctx.restore();
         }
-      } else if (hero) {
-        hero.remove();
+        if(glowImg.complete) ctx.drawImage(glowImg,FACE_X-FACE_R*1.2,FACE_Y-FACE_R*1.2,FACE_R*2.4,FACE_R*2.4);
       }
-    };
-    function updateChama(score) { window.JORNADA_CHAMA.updateChama(score); }
-    function ensureHeroFlame(sectionId) { window.JORNADA_CHAMA.ensureHeroFlame(sectionId); }
-
-    /* =========================
-       SELFIE COM A IRMANDADE
-    ========================== */
-    (function() {
-      const BG_URL = "/assets/img/irmandade-quarteto-bg.png";
-      const GLOW_URL = "/assets/img/moldura-brilho.png";
-      const FACE_X = 820;
-      const FACE_Y = 410;
-      const FACE_R = 150;
-
-      const $ = (sel) => document.querySelector(sel);
-      const input = $("#selfieInput");
-      const cv = $("#selfieCanvas");
-      const ctx = cv.getContext("2d");
-      const rScale = $("#selfieScale");
-      const rX = $("#selfieOffsetX");
-      const rY = $("#selfieOffsetY");
-      const btnGo = $("#btnRenderSelfie");
-      const aDown = $("#btnDownloadSelfie");
-
-      const bgImg = new Image(); bgImg.crossOrigin = "anonymous"; bgImg.src = BG_URL;
-      const glowImg = new Image(); glowImg.crossOrigin = "anonymous"; glowImg.src = GLOW_URL;
-      let userImg = null;
-
-      const st = {
-        scale: parseFloat(rScale?.value || 1),
-        offX: parseInt(rX?.value || 0, 10),
-        offY: parseInt(rY?.value || 0, 10),
-      };
-
-      function renderAll() {
-        ctx.clearRect(0, 0, cv.width, cv.height);
-        if (bgImg.complete) ctx.drawImage(bgImg, 0, 0, cv.width, cv.height);
-
-        if (userImg) {
-          ctx.save();
-          ctx.beginPath();
-          ctx.arc(FACE_X, FACE_Y, FACE_R, 0, Math.PI * 2);
-          ctx.closePath();
-          ctx.clip();
-
-          const scale = st.scale || 1;
-          const drawW = FACE_R * 2 * scale;
-          const drawH = FACE_R * 2 * scale;
-          const dx = FACE_X - drawW / 2 + st.offX;
-          const dy = FACE_Y - drawH / 2 + st.offY;
-          ctx.drawImage(userImg, dx, dy, drawW, drawH);
-
-          ctx.restore();
-        }
-
-        if (glowImg && glowImg.complete) {
-          ctx.drawImage(glowImg, FACE_X - FACE_R * 1.2, FACE_Y - FACE_R * 1.2, FACE_R * 2.4, FACE_R * 2.4);
-        }
+      function loadFromLocal(){
+        try{const saved=localStorage.getItem("IRMANDADE_SELFIE_FINAL"); if(!saved) return;
+          const img=new Image(); img.onload=()=>{userImg=img; renderAll();}; img.src=saved;
+        }catch(_){}
       }
-
-      function loadFromLocal() {
-        try {
-          const saved = localStorage.getItem("IRMANDADE_SELFIE_FINAL");
-          if (!saved) return;
-          const img = new Image();
-          img.onload = () => { userImg = img; renderAll(); };
-          img.src = saved;
-        } catch (e) {}
-      }
-
-      if (input) {
-        input.addEventListener("change", (ev) => {
-          const f = ev.target.files && ev.target.files[0];
-          if (!f) return;
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-              userImg = img;
-              try { localStorage.setItem("IRMANDADE_SELFIE_FINAL", e.target.result); } catch (_) {}
-              renderAll();
-            };
-            img.src = e.target.result;
-          };
-          reader.readAsDataURL(f);
-        });
-      }
-
-      [rScale, rX, rY].forEach(el => {
-        if (el) {
-          el.addEventListener("input", () => {
-            st.scale = parseFloat(rScale.value);
-            st.offX = parseInt(rX.value, 10);
-            st.offY = parseInt(rY.value, 10);
-            renderAll();
-          });
-        }
+      input?.addEventListener("change",(ev)=>{
+        const f=ev.target.files&&ev.target.files[0]; if(!f) return;
+        const reader=new FileReader();
+        reader.onload=(e)=>{ const img=new Image(); img.onload=()=>{ userImg=img; try{localStorage.setItem("IRMANDADE_SELFIE_FINAL", e.target.result);}catch(_){ } renderAll();}; img.src=e.target.result; };
+        reader.readAsDataURL(f);
       });
-
-      if (btnGo) {
-        btnGo.addEventListener("click", () => {
-          renderAll();
-          const url = cv.toDataURL("image/png");
-          aDown.href = url;
-          try { localStorage.setItem("IRMANDADE_SELFIE_FINAL", url); } catch (_) {}
-          proceedAfterSelfie();
-        });
-      }
-
-      bgImg.onload = renderAll;
-      glowImg.onload = renderAll;
-      loadFromLocal();
+      [rScale,rX,rY].forEach(el=> el?.addEventListener("input",()=>{ st.scale=parseFloat(rScale.value); st.offX=parseInt(rX.value,10); st.offY=parseInt(rY.value,10); renderAll(); }));
+      btnGo?.addEventListener("click",()=>{ renderAll(); const url=cv.toDataURL("image/png"); if(aDown) aDown.href=url; try{localStorage.setItem("IRMANDADE_SELFIE_FINAL", url);}catch(_){ } proceedAfterSelfie(); });
+      bgImg.onload=renderAll; glowImg.onload=renderAll; loadFromLocal();
     })();
 
-    /* =========================
-       CHAT COM GUIA
-    ========================== */
-    async function sendChatMessage() {
-      const input = document.getElementById('grok-chat-input');
-      const messagesDiv = document.getElementById('grok-chat-messages');
-      if (!input || !messagesDiv) return;
+    /* ===== chat com guia (usa seus backends; só datilografia na UI) ===== */
+    async function sendChatMessage(){
+      const input=document.getElementById('grok-chat-input');
+      const messagesDiv=document.getElementById('grok-chat-messages');
+      if(!input||!messagesDiv) return;
+      const userMessage=input.value.trim(); if(!userMessage) return;
 
-      const userMessage = input.value.trim();
-      if (!userMessage) return;
-
-      // Limitar a 100 tokens
-      const tokens = userMessage.split(/\s+/).length;
-      if (tokens > 100) {
-        const guiaMsg = document.createElement('div');
-        guiaMsg.className = 'grok-chat-message grok';
-        guiaMsg.textContent = 'Por favor, limite sua mensagem a 100 palavras para manter a jornada fluida.';
-        messagesDiv.appendChild(guiaMsg);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        return;
+      const tokens=userMessage.split(/\s+/).length;
+      if(tokens>100){
+        const guiaMsg=document.createElement('div'); guiaMsg.className='grok-chat-message grok';
+        guiaMsg.textContent='Por favor, limite sua mensagem a 100 palavras.'; messagesDiv.appendChild(guiaMsg);
+        messagesDiv.scrollTop=messagesDiv.scrollHeight; return;
       }
 
-      // Adicionar mensagem do usuário
-      const userMsg = document.createElement('div');
-      userMsg.className = 'grok-chat-message user';
-      userMsg.textContent = userMessage;
-      messagesDiv.appendChild(userMsg);
+      const userMsg=document.createElement('div'); userMsg.className='grok-chat-message user'; userMsg.textContent=userMessage; messagesDiv.appendChild(userMsg);
 
-      // Obter contexto da jornada
-      const currentQuestion = document.querySelector('.j-pergunta.active .pergunta-enunciado')?.textContent || '';
-      const currentAnswer = document.querySelector('.j-pergunta.active textarea')?.value || '';
-      const respostas = JSON.parse(localStorage.getItem('jornada_respostas') || '{}');
-      const blocoIdx = document.querySelector('.j-bloco[style*="display: block"]')?.dataset.bloco || 0;
-      const guia = localStorage.getItem('JORNADA_GUIA') || 'zion';
-      const context = {
-        currentQuestion,
-        currentAnswer,
-        respostas,
-        blocoIdx,
-        progresso: document.getElementById('jprog-pct')?.textContent || '0% concluído',
-        guia
+      const currentQuestion=document.querySelector('.j-pergunta.active .pergunta-enunciado')?.textContent||'';
+      const currentAnswer=document.querySelector('.j-pergunta.active textarea')?.value||'';
+      const respostas=JSON.parse(localStorage.getItem('jornada_respostas')||'{}');
+      const blocoIdx=document.querySelector('.j-bloco[style*="display: block"]')?.dataset.bloco||0;
+      const guia=localStorage.getItem('JORNADA_GUIA')||'zion';
+      const context={currentQuestion,currentAnswer,respostas,blocoIdx,progresso:document.getElementById('jprog-pct')?.textContent||'0% concluído',guia};
+
+      const guiaConfigs=window.guiaConfigs||{
+        zion:{apiUrl:'https://zion-backend-api.onrender.com/v1/chat',model:'grok'},
+        lumen:{apiUrl:'https://lumen-backend-api.onrender.com/v1/chat',model:'gpt-5'},
+        arian:{apiUrl:'https://arion-backend-api.onrender.com/v1/chat',model:'gemini'}
       };
+      const cfg=guiaConfigs[guia]||guiaConfigs.lumen;
 
-      // Configurações por guia
-      const guiaConfigs = {
-        zion: {
-          apiUrl: 'https://api.x.ai/v1/chat',
-          apiKey: 'YOUR_XAI_API_KEY',
-          model: 'grok',
-          systemPrompt: 'Você é Zion (Grok), criado pela xAI, guiando a Jornada Essencial da Irmandade Conhecimento com Luz. Responda com entusiasmo, usando "irmãozão" e "tô contigo", mantendo um tom amigão e motivador. Baseie-se no contexto: ' + JSON.stringify(context)
-        },
-        lumen: {
-          apiUrl: 'https://api.openai.com/v1/chat/completions',
-          apiKey: 'YOUR_OPENAI_API_KEY',
-          model: 'gpt-4o-mini',
-          systemPrompt: 'Você é Lumen (ChatGPT), guiando a Jornada Essencial da Irmandade Conhecimento com Luz. Responda com sabedoria, tom espiritual e inspirador, como um guia divino. Baseie-se no contexto: ' + JSON.stringify(context)
-        },
-        arian: {
-          apiUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent',
-          apiKey: 'YOUR_GOOGLE_API_KEY',
-          model: 'gemini-pro',
-          systemPrompt: 'Você é Arian (Gemini), guiando a Jornada Essencial da Irmandade Conhecimento com Luz. Responda com clareza, lógica e foco, em um tom profissional e estruturado. Baseie-se no contexto: ' + JSON.stringify(context)
-        }
-      };
-
-      const config = guiaConfigs[guia];
-
-      // Enviar mensagem à API correspondente
-      try {
-        const response = await fetch(config.apiUrl + (guia === 'arian' ? '?key=' + config.apiKey : ''), {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(guia !== 'arian' ? { 'Authorization': `Bearer ${config.apiKey}` } : {})
-          },
-          body: JSON.stringify(guia === 'arian' ? {
-            contents: [{ parts: [{ text: config.systemPrompt + '\nUser: ' + userMessage }] }]
-          } : {
-            model: config.model,
-            messages: [
-              { role: 'system', content: config.systemPrompt },
-              { role: 'user', content: userMessage }
-            ],
-            max_tokens: 100 // Limite de tokens para resposta da API
-          })
-        });
-
-        if (!response.ok) throw new Error('Resposta da API falhou: ' + response.status);
-
-        const data = await response.json();
-        let guiaMessage;
-        if (guia === 'arian') {
-          guiaMessage = data.candidates[0]?.content?.parts[0]?.text || 'Tô pronto pra te guiar, parceiro! Como posso ajudar?';
-        } else {
-          guiaMessage = data.choices[0]?.message?.content || 'Tô pronto pra te guiar, parceiro! Como posso ajudar?';
-        }
-
-        // Adicionar resposta do guia com efeito de datilografia
-        const guiaMsg = document.createElement('div');
-        guiaMsg.className = 'grok-chat-message grok';
-        messagesDiv.appendChild(guiaMsg);
-        typeWriter(guiaMsg, guiaMessage, 36, true);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      } catch (e) {
-        console.error('[Chat] Erro ao enviar mensagem:', e);
-        const guiaMsg = document.createElement('div');
-        guiaMsg.className = 'grok-chat-message grok';
-        typeWriter(guiaMsg, `Ops, algo deu errado, ${guia === 'zion' ? 'irmãozão' : 'parceiro'}! Tenta de novo ou pula pra próxima pergunta!`, 36, true);
-        messagesDiv.appendChild(guiaMsg);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      try{
+        const system=`Você é ${guia==='zion'?'Zion (Grok)':guia==='arian'?'Arian (Gemini)':'Lumen (ChatGPT)'} guiando a Jornada. Contexto: `+JSON.stringify(context);
+        const resp=await fetch(cfg.apiUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:cfg.model,messages:[{role:'system',content:system},{role:'user',content:userMessage}],temperature:0.7})});
+        if(!resp.ok) throw new Error('API falhou: '+resp.status);
+        const data=await resp.json();
+        const guiaMessage=data?.choices?.[0]?.message?.content||data?.message?.content||'Tô pronto pra te guiar! Como posso ajudar?';
+        const guiaMsg=document.createElement('div'); guiaMsg.className='grok-chat-message grok'; messagesDiv.appendChild(guiaMsg);
+        typeWriter(guiaMsg,guiaMessage,36,true);
+        messagesDiv.scrollTop=messagesDiv.scrollHeight;
+      }catch(e){
+        console.error('[Chat] erro',e);
+        const guiaMsg=document.createElement('div'); guiaMsg.className='grok-chat-message grok';
+        typeWriter(guiaMsg,'Ops, algo deu errado! Tenta de novo ou pula pra próxima pergunta.',36,true);
+        messagesDiv.appendChild(guiaMsg); messagesDiv.scrollTop=messagesDiv.scrollHeight;
       }
-
-      input.value = '';
+      input.value='';
     }
 
-    /* =========================
-       PROGRESSO & STORAGE
-    ========================== */
-    function updateProgress() {
-      const perguntas = document.querySelectorAll('.j-pergunta');
-      const respondidas = Array.from(perguntas).filter(p => (p.querySelector('textarea')?.value.trim() || '') !== '').length;
-      const total = perguntas.length || 1;
-      const progresso = Math.round((respondidas / total) * 100);
-
-      const fill = document.getElementById('jprog-fill');
-      const badge = document.getElementById('jprog-pct');
-      const jFill = document.getElementById('j-fill-inline');
-      const jMeta = document.getElementById('j-meta');
-      if (fill) fill.style.width = progresso + '%';
-      if (badge) badge.textContent = progresso + '% concluído';
-      if (jFill) jFill.style.width = progresso + '%';
-      if (jMeta) jMeta.textContent = `Respondidas: ${respondidas} de ${total}`;
+    /* ===== progresso & storage ===== */
+    function updateProgress(){
+      const perguntas=document.querySelectorAll('.j-pergunta');
+      const respondidas=Array.from(perguntas).filter(p=> (p.querySelector('textarea')?.value.trim()||'')!=='').length;
+      const total=perguntas.length||1;
+      const pct=Math.round((respondidas/total)*100);
+      const fill=document.getElementById('jprog-fill');
+      const badge=document.getElementById('jprog-pct');
+      const jFill=document.getElementById('j-fill-inline');
+      const jMeta=document.getElementById('j-meta');
+      if(fill) fill.style.width=pct+'%';
+      if(badge) badge.textContent=pct+'% concluído';
+      if(jFill) jFill.style.width=pct+'%';
+      if(jMeta) jMeta.textContent=`Respondidas: ${respondidas} de ${total}`;
     }
-    function saveAnswers() {
-      const respostas = {};
-      document.querySelectorAll('.j-pergunta textarea').forEach((input, idx) => {
-        const text = input.value.trim();
-        const tokens = text.split(/\s+/).length;
-        if (tokens > 100) {
-          input.value = text.split(/\s+/).slice(0, 100).join(' ');
-          alert('Resposta limitada a 100 palavras para manter a jornada fluida.');
-        }
-        respostas[`q${idx}`] = input.value || '';
+    function saveAnswers(){
+      const respostas={};
+      document.querySelectorAll('.j-pergunta textarea').forEach((input,idx)=>{
+        const text=input.value.trim(); const tokens=text.split(/\s+/).length;
+        if(tokens>100){ input.value=text.split(/\s+/).slice(0,100).join(' '); toast('Resposta limitada a 100 palavras.'); }
+        respostas[`q${idx}`]=input.value||'';
       });
-      localStorage.setItem('jornada_respostas', JSON.stringify(respostas));
+      try{ localStorage.setItem('jornada_respostas', JSON.stringify(respostas)); }catch(_){}
     }
-    function loadAnswers() {
-      const respostas = JSON.parse(localStorage.getItem('jornada_respostas') || '{}');
-      document.querySelectorAll('.j-pergunta textarea').forEach((input, idx) => {
-        input.value = respostas[`q${idx}`] || '';
-      });
+    function loadAnswers(){
+      const respostas=JSON.parse(localStorage.getItem('jornada_respostas')||'{}');
+      document.querySelectorAll('.j-pergunta textarea').forEach((input,idx)=>{ input.value=respostas[`q${idx}`]||''; });
       updateProgress();
     }
 
-    /* =========================
-       PERGAMINHO & SEÇÕES
-    ========================== */
-    function checkImage(url, fallbackUrl) {
-      return new Promise(resolve => {
-        const img = new Image();
-        img.onload = () => resolve(url);
-        img.onerror = () => {
-          console.warn('[checkImage] Imagem não encontrada:', url, 'Usando fallback:', fallbackUrl);
-          resolve(fallbackUrl);
-        };
-        img.src = url;
-      });
-    }
-    function updateCanvasBackground(sectionId) {
-      const canvas = document.getElementById('jornada-canvas');
-      if (!canvas) return;
-      if (sectionId === 'section-perguntas') {
-        checkImage('/assets/img/pergaminho-rasgado-horiz.png', '/assets/img/pergaminho-rasgado-vert.png').then(bg => {
-          canvas.className = `card pergaminho pergaminho-h${bg.includes('vert') ? ' fallback' : ''}`;
-          canvas.style.background = `var(--panel) url('${bg}') no-repeat center/cover`;
+    /* ===== pergaminho & seções ===== */
+    function checkImage(url,fallbackUrl){return new Promise(resolve=>{const img=new Image(); img.onload=()=>resolve(url); img.onerror=()=>resolve(fallbackUrl); img.src=url;});}
+    function updateCanvasBackground(sectionId){
+      const canvas=document.getElementById('jornada-canvas'); if(!canvas) return;
+      if(sectionId==='section-perguntas'){
+        checkImage('/assets/img/pergaminho-rasgado-horiz.png','/assets/img/pergaminho-rasgado-vert.png').then(bg=>{
+          canvas.className=`card pergaminho pergaminho-h${bg.includes('vert')?' fallback':''}`;
+          canvas.style.background=`var(--panel) url('${bg}') no-repeat center/cover`;
         });
       } else {
-        canvas.className = 'card pergaminho pergaminho-v';
-        canvas.style.background = 'var(--panel) url(/assets/img/pergaminho-rasgado-vert.png) no-repeat center/cover';
+        canvas.className='card pergaminho pergaminho-v';
+        canvas.style.background='var(--panel) url(/assets/img/pergaminho-rasgado-vert.png) no-repeat center/cover';
       }
     }
-    function showSection(sectionId) {
-      document.querySelectorAll('.j-section').forEach(s => s.classList.add('hidden'));
-      const active = document.getElementById(sectionId);
-      if (active) active.classList.remove('hidden');
+    function showSection(sectionId){
+      document.querySelectorAll('.j-section').forEach(s=>s.classList.add('hidden'));
+      const active=document.getElementById(sectionId);
+      if(active) active.classList.remove('hidden');
       updateCanvasBackground(sectionId);
       ensureHeroFlame(sectionId);
-      if (sectionId === 'section-perguntas') {
+
+      if(sectionId==='section-perguntas'){
         updateProgress();
-        const perguntas = document.querySelectorAll('.j-pergunta');
-        if (perguntas.length) runTyping(perguntas[0]);
-      }
-      if (sectionId === 'section-final') {
-        const url = localStorage.getItem("IRMANDADE_SELFIE_FINAL");
-        if (url) {
-          document.querySelector("#minhaFotoFinal").src = url;
-          document.getElementById("section-final").style.display = "block";
+        const perguntas=document.querySelectorAll('.j-pergunta');
+        if(perguntas.length){
+          const first=document.querySelector('.j-pergunta.active')||perguntas[0];
+          first.classList.add('active');
+          const lbl=first.querySelector('.pergunta-enunciado')?.textContent||'';
+          const ta=first.querySelector('textarea'); typePlaceholder(ta,lbl,22);
         }
+      }
+      if(sectionId==='section-final'){
+        const url=localStorage.getItem('IRMANDADE_SELFIE_FINAL');
+        if(url){ const img=document.querySelector('#minhaFotoFinal'); if(img) img.src=url; }
       }
     }
 
-    function loadDynamicBlocks() {
-      const content = document.getElementById('perguntas-container');
-      if (!content) {
-        console.error('[loadDynamicBlocks] Container de perguntas não encontrado!');
-        return;
-      }
-
-      const blocks = window.JORNADA_BLOCKS || [];
-      console.log('[loadDynamicBlocks] Carregando blocos:', blocks);
-      content.innerHTML = '';
-
-      blocks.forEach((block, idx) => {
-        const bloco = document.createElement('section');
-        bloco.className = 'j-bloco';
-        bloco.dataset.bloco = idx;
-        bloco.dataset.video = block.video_after || '';
-
-        (block.questions || []).forEach((q, qIdx) => {
-          const label = (typeof q === 'string') ? q : (q.label || q.text || '');
-          const div = document.createElement('div');
-          div.className = 'j-pergunta';
-          div.dataset.pergunta = qIdx;
-          div.innerHTML = `
-            <label class="pergunta-enunciado" data-typing data-text="<b>Pergunta ${qIdx + 1}:</b> ${label}" data-speed="36" data-cursor="true"></label>
-            <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
-          `;
+    /* ===== blocos dinâmicos (placeholder digitando) ===== */
+    window.loadDynamicBlocks=function(){
+      const content=document.getElementById('perguntas-container');
+      if(!content) return;
+      const blocks=window.JORNADA_BLOCKS||[];
+      content.innerHTML='';
+      blocks.forEach((block,idx)=>{
+        const bloco=document.createElement('section');
+        bloco.className='j-bloco'; bloco.dataset.bloco=idx; bloco.dataset.video=block.video_after||'';
+        (block.questions||[]).forEach((q,qIdx)=>{
+          const label=(typeof q==='string')?q:(q.label||q.text||'');
+          const div=document.createElement('div');
+          div.className='j-pergunta'; div.dataset.pergunta=qIdx;
+          div.innerHTML=`<label class="pergunta-enunciado sr-only">Pergunta ${qIdx+1}: ${label}</label><textarea rows="4" class="input" placeholder=""></textarea>`;
           bloco.appendChild(div);
         });
-
         content.appendChild(bloco);
       });
-
-      const firstBloco = content.querySelector('.j-bloco');
-      if (firstBloco) {
-        firstBloco.style.display = 'block';
-        const firstPergunta = firstBloco.querySelector('.j-pergunta');
-        if (firstPergunta) {
-          firstPergunta.classList.add('active');
-          runTyping(firstPergunta);
-        }
-      } else {
-        console.error('[loadDynamicBlocks] Nenhum bloco carregado!');
+      const firstBloco=content.querySelector('.j-bloco');
+      if(firstBloco){
+        firstBloco.style.display='block';
+        const first=firstBloco.querySelector('.j-pergunta');
+        if(first){ first.classList.add('active'); const lbl=first.querySelector('.pergunta-enunciado')?.textContent||''; const ta=first.querySelector('textarea'); typePlaceholder(ta,lbl,22); }
       }
-
       loadAnswers();
-      const firstTa = document.querySelector('.j-bloco .j-pergunta textarea');
-      if (firstTa) handleInput(firstTa);
+      const firstTa=document.querySelector('.j-bloco .j-pergunta textarea'); if(firstTa) handleInput(firstTa);
+    };
 
-      console.log('Blocos carregados! Total de blocos:', blocks.length);
-    }
-
-    /* =========================
-       CONTROLES
-    ========================== */
-    function analyzeSentiment(text) {
-      const POS = {
-        'feliz': 2, 'alegria': 2, 'amor': 3, 'sucesso': 2, 'esperança': 3, 'paz': 2, 'fé': 3, 'gratidão': 2, 'vitória': 3, 'superação': 3,
-        'luz': 2, 'deus': 3, 'coragem': 2, 'força': 2, 'confiança': 2, 'propósito': 3
-      };
-      const NEG = {
-        'triste': -2, 'dor': -3, 'raiva': -2, 'medo': -2, 'frustracao': -2, 'frustração': -2, 'decepcao': -2, 'decepção': -2,
-        'perda': -3, 'culpa': -2, 'ansiedade': -2, 'solidao': -2, 'solidão': -2, 'desespero': -3, 'cansaco': -2, 'cansaço': -2,
-        'fracasso': -2, 'trauma': -3, 'duvida': -2, 'dúvida': -2
-      };
-      let score = 0;
-      (text || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').split(/\s+/).forEach(t => {
-        if (POS[t] != null) score += POS[t];
-        if (NEG[t] != null) score += NEG[t];
-      });
+    /* ===== controles ===== */
+    function analyzeSentiment(text){
+      const POS={'feliz':2,'alegria':2,'amor':3,'sucesso':2,'esperança':3,'paz':2,'fé':3,'gratidão':2,'vitória':3,'superação':3,'luz':2,'deus':3,'coragem':2,'força':2,'confiança':2,'propósito':3};
+      const NEG={'triste':-2,'dor':-3,'raiva':-2,'medo':-2,'frustracao':-2,'frustração':-2,'decepcao':-2,'decepção':-2,'perda':-3,'culpa':-2,'ansiedade':-2,'solidao':-2,'solidão':-2,'desespero':-3,'cansaco':-2,'cansaço':-2,'fracasso':-2,'trauma':-3,'duvida':-2,'dúvida':-2};
+      let score=0; (text||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').split(/\s+/).forEach(t=>{ if(POS[t]!=null) score+=POS[t]; if(NEG[t]!=null) score+=NEG[t];});
       return score;
     }
-    function handleInput(textarea) {
-      const score = analyzeSentiment(textarea.value);
-      updateChama(score);
-      saveAnswers();
-      updateProgress();
-    }
-    function toggleSenha() {
-      const input = document.getElementById('senha');
-      if (!input) return;
-      input.type = (input.type === 'password' ? 'text' : 'password');
-    }
+    function handleInput(textarea){ const score=analyzeSentiment(textarea.value); updateChama(score); saveAnswers(); updateProgress(); }
+    function toggleSenha(){ const input=document.getElementById('senha'); if(!input) return; input.type=(input.type==='password'?'text':'password'); }
+    function proceedAfterGuia(guia){ localStorage.setItem('JORNADA_GUIA',guia); ensureHeroFlame('section-selfie'); showSection('section-selfie'); }
 
-    function proceedAfterGuia(guia) {
-      localStorage.setItem('JORNADA_GUIA', guia);
-      console.log('[proceedAfterGuia] Guia selecionado:', guia);
-      showSection('section-selfie');
+    function proceedAfterSelfie(){
+      isTransitioning=false;
+      const intro=window.JORNADA_VIDEOS?.intro||'';
+      if(!intro||window.__introPlayed){ proceedToQuestions(); return; }
+      window.__introPlayed=true; playTransition(intro,()=>{ proceedToQuestions(); });
     }
 
-    function proceedAfterSelfie() {
-      isTransitioning = false;
-      console.log('[proceedAfterSelfie] Resetando isTransitioning:', isTransitioning);
-      const intro = window.JORNADA_VIDEOS?.intro || '';
-      console.log('[proceedAfterSelfie] Iniciando filme 0:', intro);
-
-      if (!intro || window.__introPlayed) {
-        proceedToQuestions();
-        return;
-      }
-
-      window.__introPlayed = true;
-      playTransition(intro, () => {
-        console.log('[proceedAfterSelfie] Filme 0 concluído, prosseguindo para perguntas');
-        proceedToQuestions();
-      });
-    }
-
-    let isTransitioning = false;
-    function goNext() {
-      if (isTransitioning) {
-        console.warn('[goNext] Já em transição, ignorando. isTransitioning:', isTransitioning);
-        return;
-      }
-      isTransitioning = true;
-      console.log('[goNext] Iniciando goNext, isTransitioning:', isTransitioning);
-
-      const current = document.querySelector('.j-pergunta.active');
-      if (!current) {
-        console.error('[goNext] Nenhuma pergunta ativa encontrada!');
-        isTransitioning = false;
-        return;
-      }
-
-      const bloco = current.closest('.j-bloco');
-      if (!bloco) {
-        console.error('[goNext] Bloco não encontrado para pergunta ativa!');
-        isTransitioning = false;
-        return;
-      }
-
-      const perguntasDoBloco = Array.from(bloco.querySelectorAll('.j-pergunta'));
-      const i = perguntasDoBloco.indexOf(current);
-
-      console.log('[goNext] Pergunta atual:', i + 1, 'de', perguntasDoBloco.length, 'no bloco', bloco.dataset.bloco);
-
+    let isTransitioning=false;
+    function goNext(){
+      if(isTransitioning) return; isTransitioning=true;
+      const current=document.querySelector('.j-pergunta.active'); if(!current){ isTransitioning=false; return; }
+      const bloco=current.closest('.j-bloco'); if(!bloco){ isTransitioning=false; return; }
+      const perguntas=Array.from(bloco.querySelectorAll('.j-pergunta'));
+      const i=perguntas.indexOf(current);
       current.classList.remove('active');
-      if (i + 1 < perguntasDoBloco.length) {
-        const prox = perguntasDoBloco[i + 1];
-        prox.classList.add('active');
-        runTyping(prox);
-        updateProgress();
-        isTransitioning = false;
-        console.log('[goNext] Avançando para próxima pergunta:', i + 2);
-        return;
+
+      if(i+1<perguntas.length){
+        const prox=perguntas[i+1]; prox.classList.add('active');
+        const lbl=prox.querySelector('.pergunta-enunciado')?.textContent||''; const ta=prox.querySelector('textarea'); typePlaceholder(ta,lbl,22);
+        updateProgress(); isTransitioning=false; return;
       }
 
-      const blocos = Array.from(document.querySelectorAll('.j-bloco'));
-      const idxBloco = parseInt(bloco.dataset.bloco, 10);
-      const temProx = idxBloco + 1 < blocos.length;
+      const blocos=Array.from(document.querySelectorAll('.j-bloco'));
+      const idxBloco=parseInt(bloco.dataset.bloco,10); const temProx=idxBloco+1<blocos.length;
 
-      console.log('[goNext] Bloco atual:', idxBloco, 'Tem próximo?', temProx, 'Total de blocos:', blocos.length);
-
-      const irAdiante = () => {
-        if (temProx) {
-          blocos.forEach(b => b.style.display = 'none');
-          const proxBloco = blocos[idxBloco + 1];
-          if (!proxBloco) {
-            console.error('[goNext] Próximo bloco não encontrado para índice:', idxBloco + 1);
-            isTransitioning = false;
-            return;
-          }
-          proxBloco.style.display = 'block';
-          const primeira = proxBloco.querySelector('.j-pergunta');
-          if (primeira) {
-            primeira.classList.add('active');
-            runTyping(primeira);
-          } else {
-            console.error('[goNext] Nenhuma pergunta encontrada no bloco', idxBloco + 1);
-          }
-          updateProgress();
-          isTransitioning = false;
-          console.log('[goNext] Avançando para bloco:', idxBloco + 1);
+      const irAdiante=()=>{
+        if(temProx){
+          blocos.forEach(b=>b.style.display='none');
+          const proxBloco=blocos[idxBloco+1]; if(!proxBloco){ isTransitioning=false; return; }
+          proxBloco.style.display='block';
+          const primeira=proxBloco.querySelector('.j-pergunta');
+          if(primeira){ primeira.classList.add('active'); const lbl=primeira.querySelector('.pergunta-enunciado')?.textContent||''; const ta=primeira.querySelector('textarea'); typePlaceholder(ta,lbl,22); }
+          updateProgress(); isTransitioning=false;
         } else {
-          if (window.JORNADA_FINAL_VIDEO) {
-            console.log('[goNext] Tentando tocar Filme 5:', window.JORNADA_FINAL_VIDEO);
-            playTransition(window.JORNADA_FINAL_VIDEO, () => {
-              showSection('section-final');
-              isTransitioning = false;
-            });
-          } else {
-            console.warn('[goNext] Nenhum Filme 5 definido, indo para página final');
-            showSection('section-final');
-            isTransitioning = false;
-          }
+          if(window.JORNADA_FINAL_VIDEO){ playTransition(window.JORNADA_FINAL_VIDEO,()=>{ showSection('section-final'); isTransitioning=false;}); }
+          else { showSection('section-final'); isTransitioning=false; }
           updateProgress();
-          console.log('[goNext] Indo para página final');
         }
       };
 
-      const src = (window.JORNADA_BLOCKS[idxBloco] && window.JORNADA_BLOCKS[idxBloco].video_after) || '';
-      if (src) {
-        console.log('[goNext] Tentando tocar vídeo do bloco', idxBloco, ':', src);
-        playTransition(src, () => {
-          irAdiante();
-        });
-      } else {
-        console.warn('[goNext] Nenhum vídeo associado ao bloco', idxBloco);
-        irAdiante();
-      }
+      const src=(window.JORNADA_BLOCKS[idxBloco]&&window.JORNADA_BLOCKS[idxBloco].video_after)||'';
+      if(src){ playTransition(src,()=>{ irAdiante(); }); } else { irAdiante(); }
     }
+    window.goNext=goNext;
 
-    /* =========================
-       VÍDEO (overlay)
-    ========================== */
-    function playTransition(src, onEnd) {
-      console.log('[playTransition] Iniciando transição para:', src);
+    function playTransition(src,onEnd){
+      const overlay=document.getElementById('videoOverlay');
+      const video=document.getElementById('videoTransicao');
+      const fallback=document.getElementById('videoFallback');
+      const skip=document.getElementById('skipVideo');
+      if(!overlay||!video||!fallback||!src){ onEnd&&onEnd(); return; }
 
-      const overlay = document.getElementById('videoOverlay');
-      const video = document.getElementById('videoTransicao');
-      const fallback = document.getElementById('videoFallback');
-      const skip = document.getElementById('skipVideo');
+      window.__playingTransition=true;
+      overlay.classList.remove('hidden'); video.classList.remove('hidden'); fallback.classList.add('hidden');
+      video.pause(); video.removeAttribute('src'); video.load(); video.currentTime=0;
+      video.controls=true; video.muted=false; video.playsInline=true; video.setAttribute('playsinline',''); video.setAttribute('webkit-playsinline',''); video.style.background='#000';
 
-      if (!overlay || !video || !fallback || !src) {
-        console.warn('[playTransition] Falta overlay, vídeo, fallback ou src:', { overlay, video, fallback, src });
-        alert('Erro ao carregar o vídeo. Verifique o arquivo no servidor.');
-        onEnd && onEnd();
-        return;
-      }
+      let ended=false;
+      const cleanup=()=>{ if(ended) return; ended=true; isTransitioning=false; window.__playingTransition=false; video.pause(); overlay.classList.add('hidden'); video.classList.add('hidden'); fallback.classList.add('hidden'); video.removeAttribute('src'); video.load(); onEnd&&onEnd(); };
 
-      window.__playingTransition = true;
-      overlay.classList.remove('hidden');
-      video.classList.remove('hidden');
-      fallback.classList.add('hidden');
-      video.pause();
-      video.removeAttribute('src');
-      video.load();
-      video.currentTime = 0;
+      video.onerror=()=>{ fallback.classList.remove('hidden'); video.classList.add('hidden'); toast('Não foi possível carregar o vídeo.'); setTimeout(cleanup,1500); };
+      video.onended=cleanup; if(skip) skip.onclick=cleanup;
 
-      video.controls = true;
-      video.muted = false;
-      video.playsInline = true;
-      video.setAttribute('playsinline', '');
-      video.setAttribute('webkit-playsinline', '');
-      video.style.background = '#000';
-
-      let ended = false;
-      const cleanup = () => {
-        if (ended) return;
-        ended = true;
-        isTransitioning = false;
-        window.__playingTransition = false;
-        video.pause();
-        overlay.classList.add('hidden');
-        video.classList.add('hidden');
-        fallback.classList.add('hidden');
-        video.removeAttribute('src');
-        video.load();
-        console.log('[playTransition] Transição concluída para:', src);
-        onEnd && onEnd();
+      video.onloadedmetadata=()=>{ if(!video.videoWidth||!video.videoHeight){ video.classList.add('hidden'); fallback.classList.remove('hidden'); }
+        video.currentTime=0; setTimeout(()=>{ video.play().catch(()=>{ fallback.classList.remove('hidden'); video.classList.add('hidden'); setTimeout(cleanup,1500); }); },400);
       };
 
-      video.onerror = () => {
-        console.error('[Vídeo] Erro ao carregar:', src);
-        video.classList.add('hidden');
-        fallback.classList.remove('hidden');
-        alert('Não foi possível carregar o vídeo: ' + src + '. Converta para H.264 MP4 (ex.: ffmpeg -i input.mp4 -c:v libx264 -c:a aac output.mp4).');
-        setTimeout(cleanup, 5000);
-      };
-      video.onended = cleanup;
-      if (skip) skip.onclick = cleanup;
-
-      video.onloadedmetadata = () => {
-        console.log('[Vídeo] Metadados carregados:', src, 'Dimensões:', video.videoWidth, 'x', video.videoHeight, 'Tempo inicial:', video.currentTime);
-        if (!video.videoWidth || !video.videoHeight) {
-          console.warn('[Vídeo] Apenas áudio detectado:', src);
-          video.classList.add('hidden');
-          fallback.classList.remove('hidden');
-        }
-        video.currentTime = 0;
-        if (video.readyState >= 1) {
-          setTimeout(() => {
-            console.log('[Vídeo] Iniciando reprodução:', src, 'Tempo atual:', video.currentTime);
-            video.play().catch(err => {
-              console.error('[Vídeo] Falha ao reproduzir:', err);
-              video.classList.add('hidden');
-              fallback.classList.remove('hidden');
-              setTimeout(cleanup, 5000);
-            });
-          }, 500);
-        } else {
-          console.warn('[Vídeo] readyState insuficiente:', video.readyState);
-          setTimeout(() => cleanup(), 5000);
-        }
-      };
-
-      video.src = src + '?t=' + Date.now();
-      setTimeout(cleanup, 120000);
+      video.src=src+'?t='+Date.now();
+      setTimeout(cleanup,90000);
     }
+    window.playTransition=playTransition;
 
-    window.playTransition = playTransition;
-
-    function generatePDF() {
-      const respostas = JSON.parse(localStorage.getItem('jornada_respostas') || '{}');
-      const doc = { content: [] };
-
-      doc.content.push({
-        text: 'Jornada Essencial - Irmandade Conhecimento com Luz',
-        style: { fontSize: 20, bold: true, alignment: 'center', margin: [0, 0, 0, 20] }
+    function generatePDF(){
+      const respostas=JSON.parse(localStorage.getItem('jornada_respostas')||'{}');
+      const doc={content:[]};
+      doc.content.push({text:'Jornada Essencial - Irmandade Conhecimento com Luz',style:{fontSize:20,bold:true,alignment:'center',margin:[0,0,0,20]}});
+      Object.keys(respostas).forEach((key,idx)=>{
+        const pergunta=document.querySelector(`.j-pergunta[data-pergunta="${idx}"] .pergunta-enunciado`)?.textContent||`Pergunta ${idx+1}`;
+        doc.content.push({text:pergunta,style:{fontSize:14,bold:true,margin:[0,10,0,5]}},{text:respostas[key]||'Sem resposta',style:{fontSize:12,margin:[0,0,0,10]}});
       });
-
-      Object.keys(respostas).forEach((key, idx) => {
-        const pergunta = document.querySelector(`.j-pergunta[data-pergunta="${idx}"] .pergunta-enunciado`)?.textContent || `Pergunta ${idx + 1}`;
-        doc.content.push(
-          { text: pergunta, style: { fontSize: 14, bold: true, margin: [0, 10, 0, 5] } },
-          { text: respostas[key] || 'Sem resposta', style: { fontSize: 12, margin: [0, 0, 0, 10] } }
-        );
-      });
-
-      if (window.pdfMake) {
-        pdfMake.createPdf(doc).download('jornada_essencial.pdf');
-      } else {
-        console.error('Biblioteca pdfMake não encontrada.');
-        alert('Funcionalidade de PDF não disponível. Contate o suporte.');
-      }
+      if(window.pdfMake){ pdfMake.createPdf(doc).download('jornada_essencial.pdf'); }
+      else { toast('PDF não disponível.'); }
     }
 
-    function finalize() {
-      const respostas = {};
-      document.querySelectorAll('.j-pergunta textarea').forEach((input, idx) => {
-        respostas[`q${idx}`] = input.value || '';
-      });
-      console.log('[JORNADA] Finalizado. Respostas:', respostas);
-      localStorage.removeItem('jornada_respostas');
-      localStorage.removeItem('JORNADA_GUIA');
-      setTimeout(() => location.replace('/index.html'), 1200);
+    function startJourney(){
+      const senha=(document.getElementById('senha')?.value||'').trim().toLowerCase();
+      console.log('[startJourney] senha ignorada p/ debug');
+      ensureHeroFlame('section-guia'); showSection('section-guia');
     }
 
-    function startJourney() {
-      const senha = (document.getElementById('senha')?.value || '').trim().toLowerCase();
-      // Comentado o check pra não travar na senha (pra teste). Descomente pra reativar.
-      // if (!['iniciar', 'olho magico', 'olho mágico'].includes(senha)) {
-      //   alert('Senha incorreta. Tente novamente.');
-      //   return;
-      // }
-      console.log('[startJourney] Senha ignorada pra debug, indo para escolha do guia');
-      showSection('section-guia');
-    }
-
-    function proceedToQuestions() {
-      isTransitioning = false;
-      console.log('[proceedToQuestions] Resetando isTransitioning:', isTransitioning);
-      showSection('section-perguntas');
-      loadDynamicBlocks();
-      const perguntas = document.querySelectorAll('.j-pergunta');
-      if (perguntas.length) {
+    function proceedToQuestions(){
+      isTransitioning=false;
+      showSection('section-perguntas'); loadDynamicBlocks();
+      const perguntas=document.querySelectorAll('.j-pergunta');
+      if(perguntas.length){
         perguntas[0].classList.add('active');
-        runTyping(perguntas[0]);
-        const firstTa = document.querySelector('.j-pergunta.active textarea');
-        if (firstTa) handleInput(firstTa);
-      } else {
-        console.error('Nenhuma pergunta encontrada após loadDynamicBlocks!');
+        const lbl=perguntas[0].querySelector('.pergunta-enunciado')?.textContent||'';
+        const ta=perguntas[0].querySelector('textarea'); typePlaceholder(ta,lbl,22); if(ta) handleInput(ta);
       }
       updateProgress();
-      console.log('Jornada iniciada com sucesso!');
     }
 
-    function initJornada() {
-      document.addEventListener('input', (ev) => {
-        const ta = ev.target.closest('.j-pergunta textarea');
-        if (ta) handleInput(ta);
+    function initJornada(){
+      document.addEventListener('input',(ev)=>{
+        const ta=ev.target.closest?.('.j-pergunta textarea'); if(ta) handleInput(ta);
       });
-
-      document.addEventListener('click', (ev) => {
-        if (isTransitioning) {
-          console.warn('[initJornada] Clique ignorado, em transição. isTransitioning:', isTransitioning);
-          return;
-        }
-
-        const aNext = ev.target.closest('[data-action="next"]');
-        const aStart = ev.target.closest('[data-action="start"]');
-        const aToggle = ev.target.closest('[data-action="toggle-password"], .password-toggle');
-        const aRestart = ev.target.closest('[data-action="restart"]');
-        const btnPDF = ev.target.closest('[data-action="generate-pdf"]');
-        const btnSkipSelfie = ev.target.closest('[data-action="skip-selfie"]');
-        const btnSendChat = ev.target.closest('[data-action="send-chat"]');
-        const btnSelectGuia = ev.target.closest('[data-action="select-guia"]');
-        const btnNextTermos = ev.target.closest('[data-action="next-termos"]');
-        const btnNextSenha = ev.target.closest('[data-action="next-senha"]');
-
-        console.log('[initJornada] Clique detectado:', { aNext, aStart, aToggle, aRestart, btnPDF, btnSkipSelfie, btnSendChat, btnSelectGuia, btnNextTermos, btnNextSenha });
-
-        if (aNext) { ev.preventDefault(); goNext(); }
-        if (aStart) { ev.preventDefault(); startJourney(); }
-        if (aToggle) { ev.preventDefault(); toggleSenha(); }
-        if (aRestart) { ev.preventDefault(); localStorage.removeItem('jornada_respostas'); localStorage.removeItem('JORNADA_GUIA'); location.hash = '#intro'; location.replace('/index.html'); }
-        if (btnPDF) { ev.preventDefault(); generatePDF(); }
-        if (btnSkipSelfie) { ev.preventDefault(); proceedAfterSelfie(); }
-        if (btnSendChat) { ev.preventDefault(); sendChatMessage(); }
-        if (btnSelectGuia) { ev.preventDefault(); proceedAfterGuia(btnSelectGuia.dataset.guia); }
-        if (btnNextTermos) { ev.preventDefault(); showSection('section-termos'); }
-        if (btnNextSenha) { ev.preventDefault(); showSection('section-senha'); }
-      }, { capture: true });
-
-      // Adicionar evento para tecla Enter no input do chat
-      document.getElementById('grok-chat-input')?.addEventListener('keypress', (ev) => {
-        if (ev.key === 'Enter') {
-          ev.preventDefault();
-          sendChatMessage();
-        }
+      document.addEventListener('focusin',(ev)=>{
+        if(ev.target && ev.target.matches('.j-pergunta textarea')){ if(__abortTypingPlaceholder) __abortTypingPlaceholder(); }
       });
+      document.addEventListener('click',(ev)=>{
+        if(isTransitioning) return;
+        const aNext=ev.target.closest?.('[data-action="next"]');
+        const aStart=ev.target.closest?.('[data-action="start"]');
+        const aToggle=ev.target.closest?.('[data-action="toggle-password"], .password-toggle');
+        const aRestart=ev.target.closest?.('[data-action="restart"]');
+        const btnPDF=ev.target.closest?.('[data-action="generate-pdf"]');
+        const btnSkipSelfie=ev.target.closest?.('[data-action="skip-selfie"]');
+        const btnSendChat=ev.target.closest?.('[data-action="send-chat"]');
+        const btnSelectGuia=ev.target.closest?.('[data-action="select-guia"]');
+        const btnNextTermos=ev.target.closest?.('[data-action="next-termos"]');
+        const btnNextSenha=ev.target.closest?.('[data-action="next-senha"]');
 
-      console.log('Controlador da jornada inicializado!');
+        if(aNext){ev.preventDefault(); goNext();}
+        if(aStart){ev.preventDefault(); startJourney();}
+        if(aToggle){ev.preventDefault(); toggleSenha();}
+        if(aRestart){ev.preventDefault(); localStorage.removeItem('jornada_respostas'); localStorage.removeItem('JORNADA_GUIA'); location.hash='#intro'; location.replace('/index.html');}
+        if(btnPDF){ev.preventDefault(); generatePDF();}
+        if(btnSkipSelfie){ev.preventDefault(); proceedAfterSelfie();}
+        if(btnSendChat){ev.preventDefault(); sendChatMessage();}
+        if(btnSelectGuia){ev.preventDefault(); proceedAfterGuia(btnSelectGuia.dataset.guia);}
+        if(btnNextTermos){ev.preventDefault(); showSection('section-termos');}
+        if(btnNextSenha){ev.preventDefault(); showSection('section-senha');}
+      },{capture:true});
+
+      document.getElementById('grok-chat-input')?.addEventListener('keypress',(ev)=>{
+        if(ev.key==='Enter'){ ev.preventDefault(); sendChatMessage(); }
+      });
     }
 
-    /* ===== Blocos e vídeos ===== */
-    const VIDEO_BASE = '/assets/img/';
-    window.JORNADA_VIDEOS = {
-      intro: VIDEO_BASE + 'filme-0-ao-encontro-da-jornada.mp4',
-      afterBlocks: {
-        0: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
-        1: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
-        2: VIDEO_BASE + 'filme-3-avancando-na-jornada.mp4',
-        3: VIDEO_BASE + 'filme-4-quase-no-fim.mp4'
-      },
-      final: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
-    };
-    window.JORNADA_FINAL_VIDEO = window.JORNADA_VIDEOS.final;
+    /* vídeos & blocos */
+    const VIDEO_BASE='/assets/img/';
+    window.JORNADA_VIDEOS={intro:VIDEO_BASE+'filme-0-ao-encontro-da-jornada.mp4', afterBlocks:{0:VIDEO_BASE+'filme-1-entrando-na-jornada.mp4',1:VIDEO_BASE+'filme-2-dentro-da-jornada.mp4',2:VIDEO_BASE+'filme-3-avancando-na-jornada.mp4',3:VIDEO_BASE+'filme-4-quase-no-fim.mp4'}, final:VIDEO_BASE+'filme-5-fim-da-jornada.mp4'};
+    window.JORNADA_FINAL_VIDEO=window.JORNADA_VIDEOS.final;
 
-    (function ensureBlocks() {
-      const fallback = [
-        {
-          title: 'Bloco 1 — Raízes',
-          questions: [
-            { label: 'Quem é você hoje?' },
-            { label: 'O que te trouxe até esta jornada?' },
-            { label: 'Qual é o seu maior sonho espiritual?' }
-          ],
-          video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
-        },
-        {
-          title: 'Bloco 2 — Reflexões',
-          questions: [
-            { label: 'Quais são seus maiores desafios atuais?' },
-            { label: 'Como você lida com o medo ou a dúvida?' },
-            { label: 'O que a "luz" significa para você?' }
-          ],
-          video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
-        },
-        {
-          title: 'Bloco 3 — Crescimento',
-          questions: [
-            { label: 'O que você quer mudar na sua vida?' },
-            { label: 'Quem inspira você e por quê?' },
-            { label: 'Como você pratica gratidão no dia a dia?' }
-          ],
-          video_after: VIDEO_BASE + 'filme-3-avancando-na-jornada.mp4'
-        },
-        {
-          title: 'Bloco 4 — Integração',
-          questions: [
-            { label: 'Qual lição você leva dessa jornada?' },
-            { label: 'Como vai aplicar isso no futuro?' },
-            { label: 'Uma mensagem para seu eu futuro.' }
-          ],
-          video_after: VIDEO_BASE + 'filme-4-quase-no-fim.mp4'
-        }
+    (function ensureBlocks(){
+      const fallback=[
+        {title:'Bloco 1 — Raízes',questions:[{label:'Quem é você hoje?'},{label:'O que te trouxe até esta jornada?'},{label:'Qual é o seu maior sonho espiritual?'}],video_after:VIDEO_BASE+'filme-1-entrando-na-jornada.mp4'},
+        {title:'Bloco 2 — Reflexões',questions:[{label:'Quais são seus maiores desafios atuais?'},{label:'Como você lida com o medo ou a dúvida?'},{label:'O que a "luz" significa para você?'}],video_after:VIDEO_BASE+'filme-2-dentro-da-jornada.mp4'},
+        {title:'Bloco 3 — Crescimento',questions:[{label:'O que você quer mudar na sua vida?'},{label:'Quem inspira você e por quê?'},{label:'Como você pratica gratidão no dia a dia?'}],video_after:VIDEO_BASE+'filme-3-avancando-na-jornada.mp4'},
+        {title:'Bloco 4 — Integração',questions:[{label:'Qual lição você leva dessa jornada?'},{label:'Como vai aplicar isso no futuro?'},{label:'Uma mensagem para seu eu futuro.'}],video_after:VIDEO_BASE+'filme-4-quase-no-fim.mp4'}
       ];
-      window.JORNADA_BLOCKS = fallback;
-      console.log('[ensureBlocks] Blocos fallback carregados:', fallback);
+      window.JORNADA_BLOCKS=fallback;
     })();
 
-    // Inicializações finais
-    ensureHeaderFlame();
-    ensurePageFlames();
-    runTyping();
-    initJornada();
-    showSection('section-intro'); // Começa na intro
+    /* boot */
+    ensureHeaderFlame(); ensurePageFlames(); runTyping(); initJornada(); showSection('section-intro');
   })();
   </script>
 </body>
