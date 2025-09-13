@@ -10,20 +10,35 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
   <style>
-    /* util */
+    /* ===== THEME / LAYOUT (voltando ao pergaminho) ===== */
+    :root{ --bg:#1a1a1a; --panel:#1a1a1a; --brand:#6b21a8; --brand-2:#7c3aed; }
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;}
+    .container{max-width:960px;margin:24px auto;padding:0 16px}
+    .card{background:var(--panel)!important;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.12);padding:28px;position:relative;z-index:5}
+    /* Pergaminho */
+    .pergaminho-v{background:var(--panel) url('/assets/img/pergaminho-rasgado-vert.png') no-repeat center/cover!important;min-height:82vh!important}
+    .conteudo-pergaminho{background:transparent!important;position:relative;z-index:10;padding:20px;color:#fff}
+
+    /* ===== HEADER + CHAMA ===== */
+    .site-header{display:flex;align-items:center;justify-content:center;padding:16px;background:transparent}
+    .site-header h1{font-family:'Berkshire Swash',cursive;font-size:32px;color:#fff;text-shadow:0 0 10px hsla(28,96%,60%,.7);margin:0}
+    .chama-icone{position:relative;width:18px;height:36px;display:flex;align-items:flex-end;margin-right:12px}
+    .chama-vela{--altura:45px;--largura:30px;--pulso:1.2s;--hue:28;--satur:96%;position:relative;width:var(--largura);height:var(--altura);display:inline-block;filter:drop-shadow(0 0 8px hsla(var(--hue),var(--satur),60%,.75))}
+    .chama-vela .brasa{position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:calc(var(--largura)*1.4);height:10px;border-radius:50% 50% 40% 40%;background:radial-gradient(circle at 50% 40%, hsla(var(--hue),var(--satur),95%,.95) 0%, hsla(var(--hue),var(--satur),70%,.85) 50%, transparent 80%);animation:brasa 1.2s ease-in-out infinite}
+    .chama-vela .lingua{position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:calc(var(--largura)*1.0);height:calc(var(--altura)*1.0);border-radius:50% 50% 4% 4%;background:radial-gradient(ellipse at center, rgba(255,190,0,.95) 0%, rgba(255,69,0,.75) 50%, rgba(230,10,10,.3) 70%, transparent 100%);mix-blend-mode:screen;filter:blur(.7px);transform-origin:50% 100%;animation:vela 1.2s ease-in-out infinite}
+    .chama-vela .lingua:nth-child(3){width:calc(var(--largura)*.92);height:calc(var(--altura)*.95);animation-duration:1.5s}
+    .chama-vela .lingua:nth-child(4){width:calc(var(--largura)*.78);height:calc(var(--altura)*.85);animation-duration:1.8s}
+    .chama-vela .brilho{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:calc(var(--largura)*1.7);height:calc(var(--altura)*1.5);background:radial-gradient(circle, hsla(var(--hue),var(--satur),72%,.55) 0%, transparent 70%);filter:blur(9px);mix-blend-mode:screen;pointer-events:none}
+    @keyframes vela{0%,100%{transform:translateX(-50%) scaleY(1)}25%{transform:translateX(calc(-50% + .7px)) scaleY(1.12)}50%{transform:translateX(-50%) scaleY(1.2)}75%{transform:translateX(calc(-50% - .6px)) scaleY(1.1)}}
+    @keyframes brasa{0%,100%{opacity:.85}50%{opacity:1}}
+    .flame-corner{position:fixed;z-index:1200;pointer-events:none}
+    .flame-bottom-right{bottom:20px;right:20px}
+
+    /* ===== Topbar idioma (pedra antiga) ===== */
     .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
     .hidden{display:none!important}
     .j-section{padding:16px}
-
-    /* Perguntas visíveis e contraste para teste das chamas */
-    .pergunta-enunciado{display:block;margin:10px 0 6px;font-weight:700;color:#fff}
-    .j-pergunta{display:none}
-    .j-pergunta.active{display:block}
-    textarea.input{width:100%;padding:14px;border-radius:10px;border:1px solid #7c3aed;background:#000;color:#fff;resize:vertical;min-height:110px}
-    textarea.input::placeholder{color:#9ca3af}
-    .devolutiva{margin-top:8px;padding:10px;border-left:3px solid #7c3aed;background:rgba(124,58,237,.08);color:#fff;border-radius:8px}
-
-    /* Barra topo e botões de idioma estilo pedra antiga */
     .topbar{position:sticky;top:0;z-index:1200;display:flex;gap:12px;align-items:center;justify-content:flex-start;background:#111;color:#fff;padding:8px 12px;border-bottom:1px solid #333}
     .lang-group{display:flex;gap:8px}
     .lang-pill{position:relative;background:#2b2b2b;color:#eaeaea;border:1px solid #5a4a32;border-radius:10px;padding:6px 10px;min-width:56px;font-weight:700;letter-spacing:.5px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 2px 0 #3a2f21, 0 6px 12px rgba(0,0,0,.35)}
@@ -31,7 +46,15 @@
     .lang-pill::before{content:"";position:absolute;inset:-2px;border-radius:12px;background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(0,0,0,.18));pointer-events:none}
     .tts-pill{background:#1f2937;color:#fff;border:1px solid #374151;border-radius:10px;padding:6px 10px}
 
-    /* Contrato com Berkshire Swash */
+    /* ===== Perguntas (contraste p/ chamas) ===== */
+    .pergunta-enunciado{display:block;margin:10px 0 6px;font-weight:700;color:#fff}
+    .j-pergunta{display:none}
+    .j-pergunta.active{display:block}
+    textarea.input{width:100%;padding:14px;border-radius:10px;border:1px solid #7c3aed;background:#000;color:#fff;resize:vertical;min-height:110px}
+    textarea.input::placeholder{color:#9ca3af}
+    .devolutiva{margin-top:8px;padding:10px;border-left:3px solid #7c3aed;background:rgba(124,58,237,.08);color:#fff;border-radius:8px}
+
+    /* Contrato Berkshire */
     #section-termos .conteudo-pergaminho,
     #section-termos2 .conteudo-pergaminho{font-family:'Berkshire Swash',cursive;font-size:20px;line-height:1.6;color:#fff}
   </style>
@@ -46,7 +69,22 @@
     <button id="ttsToggle" aria-pressed="false" class="tts-pill">🔊 Ler perguntas</button>
   </div>
   <!-- Seções iniciais -->
-  <section id="section-intro" class="j-section">
+  <header class="site-header">
+    <div class="chama-icone" aria-hidden="true">
+      <div class="chama-vela">
+        <div class="brasa"></div>
+        <div class="lingua"></div>
+        <div class="lingua"></div>
+        <div class="lingua"></div>
+        <div class="brilho"></div>
+      </div>
+    </div>
+    <h1>Jornada Essencial</h1>
+  </header>
+  <div class="section-container container">
+    <section id="jornada-canvas" class="card pergaminho pergaminho-v">
+      <div id="jornada-conteudo" class="conteudo-pergaminho">
+        <section id="section-intro" class="j-section">
     <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
     <div class="footer-actions">
       <button class="btn btn-primary" data-action="next-termos">Avançar</button>
@@ -98,6 +136,20 @@
       <button class="btn btn-primary" data-action="next">Avançar</button>
     </div>
   </section>
+      </div> <!-- conteudo-pergaminho -->
+    </section> <!-- jornada-canvas -->
+  </div> <!-- section-container -->
+
+  <!-- Chama inferior fixa -->
+  <div class="flame-corner flame-bottom-right">
+    <div class="chama-vela">
+      <div class="brasa"></div>
+      <div class="lingua"></div>
+      <div class="lingua"></div>
+      <div class="lingua"></div>
+      <div class="brilho"></div>
+    </div>
+  </div>
 
   <script>
   (function(){
