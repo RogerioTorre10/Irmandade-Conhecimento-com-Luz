@@ -24,7 +24,7 @@
 
     :root { --bg:#1a1a1a; --ink:#000; --ink-soft:#555; --brand:#6b21a8; --brand-2:#7c3aed; --panel:#1a1a1a }
 
-    html,body{height:100%}
+    html,body{height:100%;box-sizing:border-box}
     body{
       margin:0;color:#fff;background:var(--bg);
       font-family:"ManufacturingConsent",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
@@ -62,20 +62,27 @@
     /* Selfie */
     .selfie-row{display:grid;grid-template-columns:1fr 1.3fr;gap:16px;align-items:start}
     .selfie-left .selfie-controls{display:flex;flex-direction:column;gap:10px;margin:12px 0}
-    .selfie-left label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:20px}
+    .selfie-left label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:18px}
     .selfie-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
-    .muted{color:var(--ink-soft);font-size:18px}
-    @media (max-width:860px){.selfie-row{grid-template-columns:1fr}}
+    .muted{color:var(--ink-soft);font-size:16px}
+    .selfie-right{position:relative}
+    #selfieCanvas{width:100%;height:auto;border-radius:12px;background:#000}
+    .selfie-error{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:18px;text-align:center;padding:10px;background:rgba(0,0,0,0.7);border-radius:8px;display:none}
+    @media (max-width:860px){
+      .selfie-row{grid-template-columns:1fr}
+      .selfie-right{max-width:100%;margin-top:16px}
+      #selfieCanvas{max-height:400px}
+    }
 
     /* Escolha do guia */
     .guia-container{margin-top:20px;padding:10px;border:1px solid #d1d5db;border-radius:8px;background:var(--panel);text-align:center}
-    .guia-container p{font-size:20px}
+    .guia-container p{font-size:18px}
     .guia-options{display:flex;gap:10px;justify-content:center;margin-top:12px}
-    .guia-options button{padding:8px 16px;font-size:20px}
+    .guia-options button{padding:8px 16px;font-size:18px}
 
     /* Chat */
     .grok-chat-container{display:none}
-    .grok-chat-message.grok{background:transparent;text-align:left;font-size:20px;white-space:pre-wrap;position:relative}
+    .grok-chat-message.grok{background:transparent;text-align:left;font-size:18px;white-space:pre-wrap;position:relative}
     .grok-chat-message.grok::after{content:"▌";margin-left:2px;opacity:.75;animation:lumenBlink 1s steps(2,end) infinite}
     .grok-chat-message.grok.typing-done::after{content:"";animation:none}
     .grok-chat-input{display:none}
@@ -84,9 +91,15 @@
     .pergaminho-v{background:var(--panel) url('/assets/img/pergaminho-rasgado-vert.png') no-repeat center/cover!important;min-height:82vh!important}
     .pergaminho-h{background:var(--panel) url('/assets/img/pergaminho-rasgado-horiz.png') no-repeat center/cover!important;min-height:82vh!important}
     .pergaminho-h.fallback{background:var(--panel) url('/assets/img/pergaminho-rasgado-vert.png') no-repeat center/cover!important}
-    .conteudo-pergaminho{background:transparent!important;position:relative;z-index:10;padding:20px;min-height:100%;overflow:visible;color:#fff}
+    .conteudo-pergaminho{background:transparent!important;position:relative;z-index:10;padding:20px;min-height:100%;overflow:visible;color:#fff;box-sizing:border-box;max-width:100%}
     .conteudo-pergaminho h2,.conteudo-pergaminho h3,.conteudo-pergaminho .pergunta-enunciado{color:#fff;text-shadow:0 0 10px hsla(28,96%,60%,.7);font-size:24px}
-    .conteudo-pergaminho p,.conteudo-pergaminho small{font-size:20px}
+    .conteudo-pergaminho p,.conteudo-pergaminho small{font-size:18px}
+    @media (max-width:600px){
+      .conteudo-pergaminho{padding:16px}
+      .conteudo-pergaminho h2,.conteudo-pergaminho h3{font-size:20px}
+      .conteudo-pergaminho p,.conteudo-pergaminho li,.conteudo-pergaminho small{font-size:16px;line-height:1.5}
+      .conteudo-pergaminho ul{padding-left:20px}
+    }
 
     /* UI */
     .btn {
@@ -99,7 +112,7 @@
       text-decoration: none;
       transition: background 0.2s ease, transform 0.15s ease;
       font-family: "Berkshire Swash", cursive;
-      font-size: 20px;
+      font-size: 18px;
       line-height: 1.15;
       background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
       background-blend-mode: overlay;
@@ -121,13 +134,13 @@
 
     /* Progresso */
     .progress-container{margin:16px 0;text-align:center}
-    .progress-badge{padding:8px 16px;background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;background-blend-mode: overlay;color:#fff;border-radius:8px;font-size:20px;border: 3px solid #4a4a4a;box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);text-shadow: 1px 1px 3px rgba(0,0,0,0.7);}
+    .progress-badge{padding:8px 16px;background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;background-blend-mode: overlay;color:#fff;border-radius:8px;font-size:18px;border: 3px solid #4a4a4a;box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);text-shadow: 1px 1px 3px rgba(0,0,0,0.7);}
     .progress-bar{width:100%;height:8px;background:#e5e7eb;border-radius:4px;margin-top:12px}
     .progress-bar-fill{height:100%;background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;background-blend-mode: overlay;border-radius:4px;transition:width .25s ease}
     .j-progress{margin:8px 0 16px}
     .j-progress__bar{width:100%;height:6px;background:#e5e7eb;border-radius:4px}
     .j-progress__fill{height:100%;background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;background-blend-mode: overlay;border-radius:4px;transition:width .25s ease}
-    .j-progress__meta{text-align:center;margin-top:8px;font-size:20px;color:var(--ink-soft)}
+    .j-progress__meta{text-align:center;margin-top:8px;font-size:18px;color:var(--ink-soft)}
 
     .footer-actions{display:flex;gap:12px;justify-content:center;margin:18px 0}
 
@@ -142,12 +155,12 @@
     .j-bloco{background:transparent!important;display:none;z-index:5}
     .j-pergunta{margin-bottom:24px;display:none;z-index:6;position:relative}
     .j-pergunta.active{display:block}
-    .pergunta-enunciado{display:block;margin-bottom:6px;font-family:"Berkshire Swash",cursive;font-size:24px;color:#fff}
-    .j-pergunta textarea{width:100%;padding:12px;border-radius:8px;border:1px solid #d1d5db;background:rgba(255,255,255,.85);resize:vertical;min-height:100px;font-family:"Cardo",serif;font-size:20px;line-height:1.45}
+    .pergunta-enunciado{display:block;margin-bottom:6px;font-family:"Berkshire Swash",cursive;font-size:22px;color:#fff}
+    .j-pergunta textarea{width:100%;padding:12px;border-radius:8px;border:1px solid #d1d5db;background:rgba(255,255,255,.85);resize:vertical;min-height:100px;font-family:"Cardo",serif;font-size:18px;line-height:1.45}
 
     /* Acessibilidade: Microfone e Áudio */
     .accessibility-controls { display: flex; gap: 10px; margin-top: 8px; }
-    .btn-mic, .btn-audio { padding: 8px 16px; font-size: 18px; background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover; background-blend-mode: overlay; border: 3px solid #4a4a4a; border-radius: 8px; cursor: pointer; color: #fff; box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6); text-shadow: 1px 1px 3px rgba(0,0,0,0.7); }
+    .btn-mic, .btn-audio { padding: 8px 16px; font-size: 16px; background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover; background-blend-mode: overlay; border: 3px solid #4a4a4a; border-radius: 8px; cursor: pointer; color: #fff; box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6); text-shadow: 1px 1px 3px rgba(0,0,0,0.7); }
     .btn-mic:hover, .btn-audio:hover { background: linear-gradient(to bottom, #b0b0b0, #909090), url('/assets/img/textura-de-pedra.jpg') center/cover; background-blend-mode: overlay; }
     .btn-mic.recording { background: linear-gradient(to bottom, #ff6666, #cc3333), url('/assets/img/textura-de-pedra.jpg') center/cover; background-blend-mode: overlay; }
 
@@ -158,14 +171,17 @@
     /* Vídeo overlay */
     #videoOverlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,.95);display:flex;justify-content:center;align-items:center;z-index:2000}
     #videoOverlay.hidden{display:none}
-    .video-player{width:100vw;height:100vh;object-fit:contain;background:#000;transform: rotate(0deg)}
-    .video-fallback{width:100vw;height:100vh;background:url('/assets/img/perfil-da-irmandade.png') center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;text-align:center;padding:20px;font-family:"Berkshire Swash",cursive}
+    .video-player{width:100vw;height:100vh;object-fit:contain;background:#000;transform:rotate(0deg)}
+    @media (orientation: portrait){
+      .video-player{width:100vw;height:100%;max-height:100vh;object-fit:contain}
+    }
+    .video-fallback{width:100vw;height:100vh;background:url('/assets/img/perfil-da-irmandade.png') center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;text-align:center;padding:20px;font-family:"Berkshire Swash",cursive}
 
-    .site-footer{text-align:center;padding:14px;color:var(--ink-soft);font-size:20px}
+    .site-footer{text-align:center;padding:14px;color:var(--ink-soft);font-size:18px}
     .password-form{margin-top:16px;text-align:center}
     .password-input{position:relative}
-    .password-input input{width:100%;padding:12px;border-radius:8px;border:1px solid #d1d5db;font-family:"Cardo",serif;font-size:20px}
-    .password-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:20px}
+    .password-input input{width:100%;padding:12px;border-radius:8px;border:1px solid #d1d5db;font-family:"Cardo",serif;font-size:18px}
+    .password-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px}
 
     .section-container{position:relative;min-height:85vh}
     .hidden{display:none!important}
@@ -263,7 +279,7 @@
         <!-- SENHA -->
         <div id="section-senha" class="j-section hidden">
           <div class="password-form">
-            <h3 style="margin:.2rem 0 1rem;font-family:'Berkshire Swash',cursive;font-size:24px;">Ative sua Senha</h3>
+            <h3 style="margin:.2rem 0 1rem;font-family:'Berkshire Swash',cursive;font-size:22px;">Ative sua Senha</h3>
             <div class="password-input">
               <input type="password" id="senha" placeholder="Digite sua senha..." />
               <span class="password-toggle" data-action="toggle-password">👁️</span>
@@ -310,7 +326,8 @@
                 </div>
               </div>
               <div class="selfie-right">
-                <canvas id="selfieCanvas" width="1200" height="800" style="width:100%;height:auto;background:#000;border-radius:12px;"></canvas>
+                <canvas id="selfieCanvas" width="1200" height="800"></canvas>
+                <div id="selfieError" class="selfie-error">Erro ao carregar a pré-visualização. Tente novamente ou pule.</div>
                 <small class="muted">Pré-visualização</small>
               </div>
             </div>
@@ -363,7 +380,7 @@
 
   <footer class="site-footer">
     <small>© 2025 Irmandade Conhecimento com Luz</small>
-    <div id="envTag" style="margin-top:6px;opacity:.6;font-size:20px;"></div>
+    <div id="envTag" style="margin-top:6px;opacity:.6;font-size:18px;"></div>
   </footer>
 
   <!-- Vídeo overlay -->
@@ -525,7 +542,11 @@
         const input=$("#selfieInput");
         const cv=$("#selfieCanvas");
         const ctx=cv?.getContext?.("2d");
-        if(!ctx) return;
+        const errorDiv=$("#selfieError");
+        if(!ctx) {
+          if(errorDiv) errorDiv.style.display='block';
+          return toast('Erro: Canvas não suportado no seu navegador.');
+        }
 
         const rScale=$("#selfieScale"), rX=$("#selfieOffsetX"), rY=$("#selfieOffsetY");
         const btnGo=$("#btnRenderSelfie"), btnDown=$("#btnDownloadSelfie");
@@ -536,8 +557,16 @@
 
         function renderAll(){
           ctx.clearRect(0,0,cv.width,cv.height);
-          if(bgImg.complete) ctx.drawImage(bgImg,0,0,cv.width,cv.height);
-          if(userImg){
+          if(bgImg.complete && bgImg.naturalWidth) {
+            ctx.drawImage(bgImg,0,0,cv.width,cv.height);
+          } else {
+            ctx.fillStyle='#000';
+            ctx.fillRect(0,0,cv.width,cv.height);
+            if(errorDiv) errorDiv.style.display='block';
+            toast('Erro ao carregar a imagem de fundo.');
+            return;
+          }
+          if(userImg && userImg.complete && userImg.naturalWidth){
             ctx.save();
             ctx.beginPath();
             ctx.arc(FACE_X,FACE_Y,FACE_R,0,Math.PI*2);
@@ -548,16 +577,32 @@
             ctx.drawImage(userImg,dx,dy,drawW,drawH);
             ctx.restore();
           }
-          if(glowImg.complete) ctx.drawImage(glowImg,FACE_X-FACE_R*1.2,FACE_Y-FACE_R*1.2,FACE_R*2.4,FACE_R*2.4);
+          if(glowImg.complete && glowImg.naturalWidth) {
+            ctx.drawImage(glowImg,FACE_X-FACE_R*1.2,FACE_Y-FACE_R*1.2,FACE_R*2.4,FACE_R*2.4);
+          } else {
+            if(errorDiv) errorDiv.style.display='block';
+            toast('Erro ao carregar a moldura de brilho.');
+          }
         }
         function loadFromLocal(){
           try{
             const saved=localStorage.getItem("IRMANDADE_SELFIE_FINAL");
             if(!saved) return;
             const img=new Image();
-            img.onload=()=>{userImg=img; renderAll();};
+            img.onload=()=>{
+              userImg=img;
+              renderAll();
+              if(errorDiv) errorDiv.style.display='none';
+            };
+            img.onerror=()=>{
+              if(errorDiv) errorDiv.style.display='block';
+              toast('Erro ao carregar a selfie salva.');
+            };
             img.src=saved;
-          }catch(_){}
+          }catch(_){
+            if(errorDiv) errorDiv.style.display='block';
+            toast('Erro ao acessar o armazenamento local.');
+          }
         }
         function downloadSelfie(){
           const url=localStorage.getItem("IRMANDADE_SELFIE_FINAL");
@@ -577,8 +622,18 @@
             const img=new Image();
             img.onload=()=>{
               userImg=img;
-              try{localStorage.setItem("IRMANDADE_SELFIE_FINAL", e.target.result);}catch(_){}
-              renderAll();
+              try{
+                localStorage.setItem("IRMANDADE_SELFIE_FINAL", e.target.result);
+                renderAll();
+                if(errorDiv) errorDiv.style.display='none';
+              }catch(_){
+                if(errorDiv) errorDiv.style.display='block';
+                toast('Erro ao salvar a selfie.');
+              }
+            };
+            img.onerror=()=>{
+              if(errorDiv) errorDiv.style.display='block';
+              toast('Erro ao carregar a imagem selecionada.');
             };
             img.src=e.target.result;
           };
@@ -593,12 +648,32 @@
         btnGo?.addEventListener("click",()=>{
           renderAll();
           const url=cv.toDataURL("image/png");
-          try{localStorage.setItem("IRMANDADE_SELFIE_FINAL", url);}catch(_){}
-          proceedAfterSelfie();
+          try{
+            localStorage.setItem("IRMANDADE_SELFIE_FINAL", url);
+            if(errorDiv) errorDiv.style.display='none';
+            proceedAfterSelfie();
+          }catch(_){
+            if(errorDiv) errorDiv.style.display='block';
+            toast('Erro ao salvar a pré-visualização.');
+          }
         });
         btnDown?.addEventListener("click",()=>{downloadSelfie();});
-        bgImg.onload=renderAll;
-        glowImg.onload=renderAll;
+        bgImg.onload=()=>{
+          renderAll();
+          if(errorDiv) errorDiv.style.display='none';
+        };
+        bgImg.onerror=()=>{
+          if(errorDiv) errorDiv.style.display='block';
+          toast('Erro ao carregar a imagem de fundo.');
+        };
+        glowImg.onload=()=>{
+          renderAll();
+          if(errorDiv) errorDiv.style.display='none';
+        };
+        glowImg.onerror=()=>{
+          if(errorDiv) errorDiv.style.display='block';
+          toast('Erro ao carregar a moldura de brilho.');
+        };
         loadFromLocal();
       })();
 
@@ -999,6 +1074,29 @@
       }
       window.playTransition=playTransition;
 
+      /* ===== controle de orientação de vídeo ===== */
+      function lockVideoOrientation(){
+        const video=document.getElementById('videoTransicao');
+        if(!video) return;
+        video.addEventListener('webkitbeginfullscreen', (e) => {
+          e.preventDefault();
+          video.exitFullscreen?.();
+        });
+        video.addEventListener('fullscreenchange', () => {
+          if(document.fullscreenElement === video){
+            document.exitFullscreen?.();
+          }
+        });
+        window.addEventListener('orientationchange', () => {
+          video.style.transform='rotate(0deg)';
+        });
+        if(window.matchMedia('(orientation: portrait)').matches){
+          video.style.width='100vw';
+          video.style.height='auto';
+          video.style.maxHeight='100vh';
+        }
+      }
+
       function generatePDF(){
         const respostas=JSON.parse(localStorage.getItem('jornada_respostas')||'{}');
         const doc={content:[]};
@@ -1180,8 +1278,8 @@
         afterBlocks:{
           0:VIDEO_BASE+'filme-1-entrando-na-jornada.mp4',
           1:VIDEO_BASE+'filme-2-dentro-da-jornada.mp4',
-          2:VIDEO_BASE+'filme-3-avancando-na-jornada.mp4',
-          3:VIDEO_BASE+'filme-4-quase-no-fim.mp4'
+          2:VIDEO_BASE+'filme-3-traumas-na-jornada.mp4',
+          3:VIDEO_BASE+'filme-4-aproximando-do-final.mp4'
         },
         final:VIDEO_BASE+'filme-5-fim-da-jornada.mp4'
       };
