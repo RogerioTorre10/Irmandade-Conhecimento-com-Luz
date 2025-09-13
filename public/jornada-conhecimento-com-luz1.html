@@ -8,16 +8,6 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Berkshire+Swash&family=Cardo:wght@400;700&display=swap" rel="stylesheet" />
   <!-- ManufacturingConsent local -->
-  <link rel="preload" href="/ass<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Jornada • Irmandade Conhecimento com Luz</title>
-  <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png" />
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Berkshire+Swash&family=Cardo:wght@400;700&display=swap" rel="stylesheet" />
-  <!-- ManufacturingConsent local -->
   <link rel="preload" href="/assets/fonts/ManufacturingConsent-Regular.ttf" as="font" type="font/ttf" crossorigin />
   <!-- pdfMake -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
@@ -32,7 +22,7 @@
       font-display: swap;
     }
 
-    :root { --bg:#1a1a1a; --ink:#000; --ink-soft:#555; --brand:#6b21a8; --brand-2:#7c3aed; --panel:#1a1a1a }
+    :root { --bg:#1a1a1a; --ink:#000; --ink-soft:#555; --panel:#1a1a1a }
 
     html,body{height:100%;box-sizing:border-box}
     body{
@@ -76,12 +66,21 @@
     .selfie-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
     .muted{color:var(--ink-soft);font-size:16px}
     .selfie-right{position:relative}
-    #selfieCanvas{width:100%;height:auto;border-radius:12px;background:#000}
-    .selfie-error{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:18px;text-align:center;padding:10px;background:rgba(0,0,0,0.7);border-radius:8px;display:none}
+    .guide-card{position:relative;width:100%;max-width:600px;margin:0 auto}
+    .guide-bg{width:100%;height:auto;border-radius:12px}
+    .flame-layer{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;transition:opacity 0.5s}
+    .flame-svg{position:absolute;top:40%;left:50%;width:40%;height:60%;transform:translate(-50%,-6%)}
+    .guide-name{position:absolute;top:2%;left:50%;transform:translateX(-50%);color:#f7d37a;font-family:"Cardo",serif;font-size:2.5rem;font-weight:bold;text-align:center}
+    .user-name{position:absolute;bottom:2%;left:50%;transform:translateX(-50%);color:#f7d37a;font-family:"Cardo",serif;font-size:2rem;font-weight:bold;text-align:center}
+    .controls{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+    #selfieError{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:18px;text-align:center;padding:10px;background:rgba(0,0,0,0.7);border-radius:8px;display:none}
     @media (max-width:860px){
       .selfie-row{grid-template-columns:1fr}
       .selfie-right{max-width:100%;margin-top:16px}
-      #selfieCanvas{max-height:400px}
+      .guide-card{max-width:100%}
+      .flame-svg{top:40%;width:50%;height:50%}
+      .guide-name{font-size:1.8rem}
+      .user-name{font-size:1.5rem}
     }
 
     /* Escolha do guia */
@@ -317,26 +316,48 @@
         <div id="section-selfie" class="j-section hidden">
           <div class="conteudo-pergaminho">
             <h2 style="margin-top:0;">Entre na Irmandade ✨</h2>
-            <p>Faça uma foto ou envie da galeria. Ajuste e gere sua imagem “4 + você”.</p>
+            <p>Faça uma foto ou envie da galeria. Ajuste e gere sua imagem com seu guia.</p>
             <div class="selfie-row">
               <div class="selfie-left">
                 <label class="btn" for="selfieInput">📸 Tirar Foto</label>
-                <input id="selfieInput" type="file" accept="image/*" capture="environment" style="display:none" />
+                <input id="selfieInput" type="file" accept="image/*" capture="user" style="display:none" />
                 <div class="selfie-controls">
+                  <label>Nome <input id="nameInput" type="text" placeholder="Digite seu nome"></label>
                   <label>Zoom <input id="selfieScale" type="range" min="0.6" max="2.0" step="0.01" value="1"></label>
                   <label>Horizontal <input id="selfieOffsetX" type="range" min="-300" max="300" step="1" value="0"></label>
                   <label>Vertical <input id="selfieOffsetY" type="range" min="-300" max="300" step="1" value="0"></label>
-                  <small class="muted">Dica: alinhe seu rosto no espaço livre da imagem.</small>
+                  <small class="muted">Dica: alinhe seu rosto na chama ao lado do guia.</small>
                 </div>
                 <div class="selfie-actions">
-                  <button id="btnRenderSelfie" class="btn">✨ Ver minha foto</button>
-                  <button id="btnDownloadSelfie" class="btn">⬇️ Confirmar</button>
+                  <button id="previewBtn" class="btn">✨ Ver Prévia</button>
+                  <button id="captureBtn" class="btn">⬇️ Confirmar e Baixar</button>
                   <button id="btnSkipSelfie" class="btn" data-action="skip-selfie">Pular Foto</button>
                   <button id="btnStartJourney" class="btn" data-action="skip-selfie">Entrar na Jornada</button>
                 </div>
               </div>
               <div class="selfie-right">
-                <canvas id="selfieCanvas" width="1200" height="800"></canvas>
+                <section id="card-guide" class="guide-card" data-guide="ZION" aria-label="Guia">
+                  <img class="guide-bg" id="guideBg" src="/assets/img/irmandade-quarteto-bg-zion.png" alt="Guia Background">
+                  <div class="flame-layer" aria-hidden="true">
+                    <svg class="flame-svg" viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
+                      <defs>
+                        <clipPath id="flameClip">
+                          <path d="M50,20 C42,35 34,45 33,58 C32,73 41,82 50,92 C59,82 68,73 67,58 C66,45 58,35 50,20 Z" />
+                        </clipPath>
+                        <radialGradient id="flameGlow" cx="50%" cy="70%" r="55%">
+                          <stop offset="0%" stop-color="rgba(255, 224, 130, 1)"/>
+                          <stop offset="55%" stop-color="rgba(255, 180, 0, 0.9)"/>
+                          <stop offset="100%" stop-color="rgba(255, 180, 0, 0)"/>
+                        </radialGradient>
+                      </defs>
+                      <image id="selfieImage" href="" x="15" y="35" width="70" height="90" clip-path="url(#flameClip)" preserveAspectRatio="xMidYMid slice" />
+                      <ellipse cx="50" cy="95" rx="28" ry="40" fill="url(#flameGlow)"></ellipse>
+                      <path d="M50,20 C42,35 34,45 33,58 C32,73 41,82 50,92 C59,82 68,73 67,58 C66,45 58,35 50,20 Z" fill="none" stroke="rgba(255,200,0,.85)" stroke-width="1.6"/>
+                    </svg>
+                  </div>
+                  <div class="guide-name" id="guideNameSlot"></div>
+                  <div class="user-name" id="userNameSlot">NOME</div>
+                </section>
                 <div id="selfieError" class="selfie-error">Erro ao carregar a pré-visualização. Tente novamente ou pule.</div>
                 <small class="muted">Pré-visualização</small>
               </div>
@@ -545,37 +566,32 @@
 
       /* ===== selfie ===== */
       (function(){
-        const GLOW_URL="/assets/img/moldura-brilho.png";
-        const FACE_X=820, FACE_Y=410, FACE_R=150;
         const $=s=>document.querySelector(s);
-        const input=$("#selfieInput");
-        const cv=$("#selfieCanvas");
-        const ctx=cv?.getContext?.("2d");
+        const card=$("#card-guide");
+        const guideNameEl=$("#guideNameSlot");
+        const userNameEl=$("#userNameSlot");
+        const flameLayer=$("#card-guide .flame-layer");
+        const selfieImg=$("#selfieImage");
+        const bgImg=$("#guideBg");
+        const nameInput=$("#nameInput");
+        const fileInput=$("#selfieInput");
+        const previewBtn=$("#previewBtn");
+        const captureBtn=$("#captureBtn");
         const errorDiv=$("#selfieError");
-        if(!ctx) {
-          if(errorDiv) errorDiv.style.display='block';
-          return toast('Erro: Canvas não suportado no seu navegador.');
-        }
 
-        const rScale=$("#selfieScale"), rX=$("#selfieOffsetX"), rY=$("#selfieOffsetY");
-        const btnGo=$("#btnRenderSelfie"), btnDown=$("#btnDownloadSelfie");
-        const glowImg=new Image(); glowImg.crossOrigin="anonymous"; glowImg.src=GLOW_URL;
-        let userImg=null;
-        let bgImg=null;
-        const st={ scale:parseFloat(rScale?.value||1), offX:parseInt(rX?.value||0,10), offY:parseInt(rY?.value||0,10) };
+        let selfieURL='';
 
         function getBgUrl(){
           const guia=localStorage.getItem('JORNADA_GUIA')||'zion';
+          card.dataset.guide=guia.toUpperCase();
+          guideNameEl.textContent=guia.toUpperCase();
           return `/assets/img/irmandade-quarteto-bg-${guia}.png`;
         }
 
         function loadBg(){
           const bgUrl=getBgUrl();
-          bgImg=new Image();
-          bgImg.crossOrigin="anonymous";
           bgImg.src=bgUrl;
           bgImg.onload=()=>{
-            renderAll();
             if(errorDiv) errorDiv.style.display='none';
           };
           bgImg.onerror=()=>{
@@ -584,119 +600,121 @@
           };
         }
 
-        function renderAll(){
-          ctx.clearRect(0,0,cv.width,cv.height);
-          if(bgImg && bgImg.complete && bgImg.naturalWidth) {
-            ctx.drawImage(bgImg,0,0,cv.width,cv.height);
-          } else {
-            ctx.fillStyle='#000';
-            ctx.fillRect(0,0,cv.width,cv.height);
+        nameInput.addEventListener('input',()=>{
+          userNameEl.textContent=nameInput.value.trim().toUpperCase()||'NOME';
+        });
+
+        fileInput.addEventListener('change',()=>{
+          const f=fileInput.files?.[0];
+          if(!f) return;
+          if(selfieURL) URL.revokeObjectURL(selfieURL);
+          selfieURL=URL.createObjectURL(f);
+          selfieImg.setAttribute('href',selfieURL);
+          if(errorDiv) errorDiv.style.display='none';
+        });
+
+        previewBtn.addEventListener('click',async()=>{
+          if(!selfieImg.getAttribute('href')){
+            toast('Selecione uma selfie antes.');
+            return;
+          }
+          flameLayer.style.opacity=1;
+        });
+
+        captureBtn.addEventListener('click',async()=>{
+          if(!selfieImg.getAttribute('href')){
+            toast('Selecione uma selfie antes.');
+            return;
+          }
+          flameLayer.style.opacity=1;
+          await new Promise(r=>requestAnimationFrame(r));
+
+          const canvas=document.createElement('canvas');
+          const rect=card.getBoundingClientRect();
+          const scale=window.devicePixelRatio||1;
+          canvas.width=Math.round(rect.width*scale);
+          canvas.height=Math.round(rect.height*scale);
+          const ctx=canvas.getContext('2d');
+
+          const load=(src)=>new Promise((res,rej)=>{
+            const im=new Image();
+            im.crossOrigin='anonymous';
+            im.onload=()=>res(im);
+            im.onerror=rej;
+            im.src=src;
+          });
+
+          const bg=await load(bgImg.currentSrc||bgImg.src).catch(()=>{
             if(errorDiv) errorDiv.style.display='block';
             toast('Erro ao carregar a imagem de fundo.');
             return;
-          }
-          if(userImg && userImg.complete && userImg.naturalWidth){
-            ctx.save();
+          });
+          ctx.drawImage(bg,0,0,canvas.width,canvas.height);
+
+          const W=canvas.width,H=canvas.height;
+          const fw=0.40*W,fh=0.60*H,fx=(W-fw)/2,fy=(H-fh)/2+0.06*H;
+
+          const grad=ctx.createRadialGradient(fx+fw/2,fy+fh*0.65,fh*0.02,fx+fw/2,fy+fh*0.65,fh*0.55);
+          grad.addColorStop(0,'rgba(255,224,130,1)');
+          grad.addColorStop(0.55,'rgba(255,180,0,0.9)');
+          grad.addColorStop(1,'rgba(255,180,0,0)');
+          ctx.fillStyle=grad;
+          ctx.beginPath(); ctx.ellipse(fx+fw/2,fy+fh*0.65,fw*0.35,fh*0.45,0,0,Math.PI*2); ctx.fill();
+
+          function flamePath(ctx,x,y,w,h){
             ctx.beginPath();
-            ctx.arc(FACE_X,FACE_Y,FACE_R,0,Math.PI*2);
-            ctx.closePath();
-            ctx.clip();
-            const scale=st.scale||1, drawW=FACE_R*2*scale, drawH=FACE_R*2*scale;
-            const dx=FACE_X-drawW/2+st.offX, dy=FACE_Y-drawH/2+st.offY;
-            ctx.drawImage(userImg,dx,dy,drawW,drawH);
-            ctx.restore();
+            ctx.moveTo(x+0.50*w,y+0.133*h);
+            ctx.bezierCurveTo(x+0.42*w,y+0.233*h,x+0.34*w,y+0.300*h,x+0.33*w,y+0.387*h);
+            ctx.bezierCurveTo(x+0.32*w,y+0.487*h,x+0.41*w,y+0.547*h,x+0.50*w,y+0.613*h);
+            ctx.bezierCurveTo(x+0.59*w,y+0.547*h,x+0.68*w,y+0.487*h,x+0.67*w,y+0.387*h);
+            ctx.bezierCurveTo(x+0.66*w,y+0.300*h,x+0.58*w,y+0.233*h,x+0.50*w,y+0.133*h);
           }
-          if(glowImg.complete && glowImg.naturalWidth) {
-            ctx.drawImage(glowImg,FACE_X-FACE_R*1.2,FACE_Y-FACE_R*1.2,FACE_R*2.4,FACE_R*2.4);
-          } else {
+
+          ctx.save();
+          flamePath(ctx,fx,fy,fw,fh);
+          ctx.clip();
+
+          const selfie=await load(selfieImg.getAttribute('href')).catch(()=>{
             if(errorDiv) errorDiv.style.display='block';
-            toast('Erro ao carregar a moldura de brilho.');
-          }
-        }
-        function loadFromLocal(){
+            toast('Erro ao carregar a selfie.');
+            return;
+          });
+          const coverRatio=Math.max(fw/selfie.width,fh/selfie.height);
+          const sw=selfie.width*coverRatio;
+          const sh=selfie.height*coverRatio;
+          const sx=fx+(fw-sw)/2;
+          const sy=fy+(fh-sh)/2;
+          ctx.drawImage(selfie,sx,sy,sw,sh);
+          ctx.restore();
+
+          ctx.strokeStyle='rgba(255,200,0,.85)';
+          ctx.lineWidth=Math.max(1.2,W*0.0022);
+          flamePath(ctx,fx,fy,fw,fh);
+          ctx.stroke();
+
+          ctx.fillStyle='#f7d37a';
+          ctx.textAlign='center';
+          ctx.font=`bold ${Math.round(W*0.075)}px Cardo, serif`;
+          ctx.fillText(card.dataset.guide,W/2,H*0.09);
+          const userName=(nameInput.value.trim()||'NOME').toUpperCase();
+          ctx.font=`bold ${Math.round(W*0.068)}px Cardo, serif`;
+          ctx.fillText(userName,W/2,H*0.95);
+
+          const dataURL=canvas.toDataURL('image/png');
           try{
-            const saved=localStorage.getItem("IRMANDADE_SELFIE_FINAL");
-            if(!saved) return;
-            const img=new Image();
-            img.onload=()=>{
-              userImg=img;
-              renderAll();
-              if(errorDiv) errorDiv.style.display='none';
-            };
-            img.onerror=()=>{
-              if(errorDiv) errorDiv.style.display='block';
-              toast('Erro ao carregar a selfie salva.');
-            };
-            img.src=saved;
-          }catch(_){
-            if(errorDiv) errorDiv.style.display='block';
-            toast('Erro ao acessar o armazenamento local.');
-          }
-        }
-        function downloadSelfie(){
-          const url=localStorage.getItem("IRMANDADE_SELFIE_FINAL");
-          if(!url) return toast('Renderize a foto primeiro.');
-          const a=document.createElement('a');
-          a.href=url;
-          a.download="irmandade-mais-eu.png";
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        }
-        input?.addEventListener("change",(ev)=>{
-          const f=ev.target.files&&ev.target.files[0];
-          if(!f) return;
-          const reader=new FileReader();
-          reader.onload=(e)=>{
-            const img=new Image();
-            img.onload=()=>{
-              userImg=img;
-              try{
-                localStorage.setItem("IRMANDADE_SELFIE_FINAL", e.target.result);
-                renderAll();
-                if(errorDiv) errorDiv.style.display='none';
-              }catch(_){
-                if(errorDiv) errorDiv.style.display='block';
-                toast('Erro ao salvar a selfie.');
-              }
-            };
-            img.onerror=()=>{
-              if(errorDiv) errorDiv.style.display='block';
-              toast('Erro ao carregar a imagem selecionada.');
-            };
-            img.src=e.target.result;
-          };
-          reader.readAsDataURL(f);
-        });
-        [rScale,rX,rY].forEach(el=> el?.addEventListener("input",()=>{
-          st.scale=parseFloat(rScale.value);
-          st.offX=parseInt(rX.value,10);
-          st.offY=parseInt(rY.value,10);
-          renderAll();
-        }));
-        btnGo?.addEventListener("click",()=>{
-          renderAll();
-          const url=cv.toDataURL("image/png");
-          try{
-            localStorage.setItem("IRMANDADE_SELFIE_FINAL", url);
+            localStorage.setItem('IRMANDADE_SELFIE_FINAL',dataURL);
+            const a=document.createElement('a');
+            a.href=dataURL;
+            a.download=`jornada-${card.dataset.guide.toLowerCase()}-${Date.now()}.png`;
+            a.click();
             if(errorDiv) errorDiv.style.display='none';
-            proceedAfterSelfie();
           }catch(_){
             if(errorDiv) errorDiv.style.display='block';
-            toast('Erro ao salvar a pré-visualização.');
+            toast('Erro ao salvar ou baixar a imagem.');
           }
         });
-        btnDown?.addEventListener("click",()=>{downloadSelfie();});
-        glowImg.onload=()=>{
-          renderAll();
-          if(errorDiv) errorDiv.style.display='none';
-        };
-        glowImg.onerror=()=>{
-          if(errorDiv) errorDiv.style.display='block';
-          toast('Erro ao carregar a moldura de brilho.');
-        };
+
         loadBg();
-        loadFromLocal();
       })();
 
       /* ===== chat com guia ===== */
@@ -942,6 +960,12 @@
         localStorage.setItem('JORNADA_GUIA',guia);
         ensureHeroFlame('section-selfie');
         showSection('section-selfie');
+        const card=document.getElementById('card-guide');
+        const bgImg=document.getElementById('guideBg');
+        const guideNameEl=document.getElementById('guideNameSlot');
+        card.dataset.guide=guia.toUpperCase();
+        guideNameEl.textContent=guia.toUpperCase();
+        bgImg.src=`/assets/img/irmandade-quarteto-bg-${guia}.png`;
       }
       function proceedAfterSelfie(){
         isTransitioning=false;
