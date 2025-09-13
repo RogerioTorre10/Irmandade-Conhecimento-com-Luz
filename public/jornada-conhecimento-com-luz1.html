@@ -365,6 +365,7 @@ function showSection(id){
   document.addEventListener('input',ev=>{ if(ev.target.closest('.j-pergunta textarea')) updateProgress(); });
 })();
 </script>
+<script> 
   (function(){
   const BG_URL = "/assets/img/irmandade-quarteto-bg.png";
   const GLOW_URL = "/assets/img/moldura-brilho.png";
@@ -396,7 +397,6 @@ function showSection(id){
   bg.onload=render; glow.onload=render;
 })();
 
-<script>
 // ===== Acessibilidade, perguntas visíveis, microfone e TTS =====
 (function(){
   /* Estado de idioma e TTS */
