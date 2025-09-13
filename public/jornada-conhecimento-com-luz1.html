@@ -223,6 +223,7 @@
       <div class="brilho"></div>
     </div>
   </div>
+  <script> 
   function setPergaminho(sectionId){
   const canvas = document.getElementById('jornada-canvas');
   if(!canvas) return;
@@ -237,9 +238,7 @@ function showSection(id){
   const el=document.getElementById(id); if(el) el.classList.remove('hidden');
   setPergaminho(id);
 }
-
-
-  <script>
+ 
   (function(){
     /* restaura exibição permanente da pergunta acima da caixa */
     window.loadDynamicBlocks=function(){
