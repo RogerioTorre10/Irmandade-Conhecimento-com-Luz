@@ -584,5 +584,54 @@ button, .btn, .btn-primary, .btn-secondary, h1,h2,h3,h4,h5,h6 {
 .site-header{ z-index: 1000; }
 .card{ z-index: 10; }
 
+.guide-card{
+  position:relative; width: min(720px, 92vw); aspect-ratio: 2/3;
+  margin: 24px auto; border-radius: 16px; overflow:hidden;
+  background:#0f3b2f; box-shadow: 0 20px 60px rgba(0,0,0,.45);
+}
+
+.guide-bg{
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+}
+
+.flame-layer{
+  position:absolute; inset:0;
+  display:grid; place-items:center;
+  opacity:0; transition: opacity 900ms ease-in-out;
+  pointer-events:none;
+}
+
+/* Tamanho e posição da chama (55–65% da altura / 35–45% da largura) */
+.flame-svg{
+  width: 40%; height: 60%;
+  /* posiciona mais ao centro-baixo do tórax */
+  transform: translateY(6%);
+  filter: drop-shadow(0 8px 28px rgba(255,180,0,.45));
+}
+
+.guide-name{
+  position:absolute; top:3.5%; left:0; right:0; text-align:center;
+  font-family: "Cardo", serif; font-weight:700; letter-spacing:.06em;
+  font-size: clamp(28px, 5vw, 56px); color:#f7d37a; text-shadow:0 2px 8px rgba(0,0,0,.4);
+}
+
+.user-name{
+  position:absolute; bottom:4.5%; left:0; right:0; text-align:center;
+  font-family:"Cardo", serif; font-weight:700; letter-spacing:.06em;
+  font-size: clamp(26px, 4.6vw, 52px); color:#f6cf6a; text-shadow:0 2px 8px rgba(0,0,0,.4);
+}
+
+/* Controles (só para teste) */
+.controls{
+  position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
+  display:flex; gap:.5rem; align-items:center; flex-wrap:wrap;
+  padding:.5rem .75rem; border-radius:12px; background:rgba(0,0,0,.25);
+  backdrop-filter: blur(4px);
+}
+.controls input, .controls button{
+  font: 500 14px/1.2 system-ui, sans-serif; padding:.55rem .7rem; border-radius:10px; border:0;
+}
+.controls button{ cursor:pointer; }
+
 
 
