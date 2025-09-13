@@ -17,13 +17,19 @@
 
     /* Perguntas visíveis e contraste para teste das chamas */
     .pergunta-enunciado{display:block;margin:10px 0 6px;font-weight:700;color:#fff}
+    .j-pergunta{display:none}
+    .j-pergunta.active{display:block}
     textarea.input{width:100%;padding:14px;border-radius:10px;border:1px solid #7c3aed;background:#000;color:#fff;resize:vertical;min-height:110px}
     textarea.input::placeholder{color:#9ca3af}
     .devolutiva{margin-top:8px;padding:10px;border-left:3px solid #7c3aed;background:rgba(124,58,237,.08);color:#fff;border-radius:8px}
 
-    /* Barra de idioma/acessibilidade */
-    .topbar{position:sticky;top:0;z-index:1200;display:flex;gap:12px;align-items:center;background:#111;color:#fff;padding:8px 12px;border-bottom:1px solid #333}
-    .topbar select,.topbar button{background:#1f2937;color:#fff;border:1px solid #374151;border-radius:8px;padding:6px 10px}
+    /* Barra topo e botões de idioma estilo pedra antiga */
+    .topbar{position:sticky;top:0;z-index:1200;display:flex;gap:12px;align-items:center;justify-content:flex-start;background:#111;color:#fff;padding:8px 12px;border-bottom:1px solid #333}
+    .lang-group{display:flex;gap:8px}
+    .lang-pill{position:relative;background:#2b2b2b;color:#eaeaea;border:1px solid #5a4a32;border-radius:10px;padding:6px 10px;min-width:56px;font-weight:700;letter-spacing:.5px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 2px 0 #3a2f21, 0 6px 12px rgba(0,0,0,.35)}
+    .lang-pill[aria-pressed="true"]{background:#4b3b24;color:#fff;border-color:#886b44;box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 2px 0 #4d3c28, 0 6px 14px rgba(0,0,0,.45)}
+    .lang-pill::before{content:"";position:absolute;inset:-2px;border-radius:12px;background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(0,0,0,.18));pointer-events:none}
+    .tts-pill{background:#1f2937;color:#fff;border:1px solid #374151;border-radius:10px;padding:6px 10px}
 
     /* Contrato com Berkshire Swash */
     #section-termos .conteudo-pergaminho,
@@ -32,13 +38,12 @@
 </head>
 <body$1>
   <div class="topbar">
-    <label for="idiomaSelect">Idioma:</label>
-    <select id="idiomaSelect">
-      <option value="pt-BR" selected>Português (Brasil)</option>
-      <option value="en-US">English</option>
-      <option value="es-ES">Español</option>
-    </select>
-    <button id="ttsToggle" aria-pressed="false">🔊 Ler perguntas</button>
+    <div class="lang-group" role="group" aria-label="Escolher idioma">
+      <button class="lang-pill" data-lang="pt-BR" aria-pressed="true">BRA</button>
+      <button class="lang-pill" data-lang="en-US" aria-pressed="false">USA</button>
+      <button class="lang-pill" data-lang="es-ES" aria-pressed="false">ES</button>
+    </div>
+    <button id="ttsToggle" aria-pressed="false" class="tts-pill">🔊 Ler perguntas</button>
   </div>
   <!-- Seções iniciais -->
   <section id="section-intro" class="j-section">
@@ -207,6 +212,14 @@
   window.JTTS_ON = false;
   langSel?.addEventListener('change', ()=>{ window.JLANG = langSel.value; });
   ttsBtn?.addEventListener('click',()=>{ window.JTTS_ON=!window.JTTS_ON; ttsBtn.setAttribute('aria-pressed', String(window.JTTS_ON)); ttsBtn.textContent = (window.JTTS_ON? '🔊 Lendo perguntas' : '🔇 Ler perguntas'); });
+
+  // Botões de idioma (BRA/USA/ES) — estilo pedra
+  document.querySelectorAll('.lang-pill').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const lang = btn.dataset.lang; window.JLANG = lang;
+      document.querySelectorAll('.lang-pill').forEach(b=>b.setAttribute('aria-pressed', String(b===btn)));
+    });
+  }); ttsBtn.textContent = (window.JTTS_ON? '🔊 Lendo perguntas' : '🔇 Ler perguntas'); });
 
   function speak(text){
     try{ if(!window.JTTS_ON) return; const u = new SpeechSynthesisUtterance(text); u.lang = window.JLANG||'pt-BR'; window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);}catch(_){/* sem suporte */}
