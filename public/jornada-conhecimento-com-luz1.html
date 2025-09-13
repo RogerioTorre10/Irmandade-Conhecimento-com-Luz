@@ -10,54 +10,57 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
   <style>
-    /* ===== THEME / LAYOUT (voltando ao pergaminho) ===== */
-    :root{ --bg:#1a1a1a; --panel:#1a1a1a; --brand:#6b21a8; --brand-2:#7c3aed; }
-    html,body{height:100%}
-    body{margin:0;background:var(--bg);color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;}
-    .container{max-width:960px;margin:24px auto;padding:0 16px}
-    .card{background:var(--panel)!important;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.12);padding:28px;position:relative;z-index:5}
-    /* Pergaminho */
-    .pergaminho-v{background:var(--panel) url('/assets/img/pergaminho-rasgado-vert.png') no-repeat center/cover!important;min-height:82vh!important}
-    .conteudo-pergaminho{background:transparent!important;position:relative;z-index:10;padding:20px;color:#fff}
+  :root{ --bg:#1a1a1a; --panel:#1a1a1a; --brand:#6b21a8; --brand-2:#7c3aed }
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+  .container{max-width:960px;margin:24px auto;padding:0 16px}
+  .card{background:var(--panel)!important;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.12);padding:28px;position:relative;z-index:5}
 
-    /* ===== HEADER + CHAMA ===== */
-    .site-header{display:flex;align-items:center;justify-content:center;padding:16px;background:transparent}
-    .site-header h1{font-family:'Berkshire Swash',cursive;font-size:32px;color:#fff;text-shadow:0 0 10px hsla(28,96%,60%,.7);margin:0}
-    .chama-icone{position:relative;width:18px;height:36px;display:flex;align-items:flex-end;margin-right:12px}
-    .chama-vela{--altura:45px;--largura:30px;--pulso:1.2s;--hue:28;--satur:96%;position:relative;width:var(--largura);height:var(--altura);display:inline-block;filter:drop-shadow(0 0 8px hsla(var(--hue),var(--satur),60%,.75))}
-    .chama-vela .brasa{position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:calc(var(--largura)*1.4);height:10px;border-radius:50% 50% 40% 40%;background:radial-gradient(circle at 50% 40%, hsla(var(--hue),var(--satur),95%,.95) 0%, hsla(var(--hue),var(--satur),70%,.85) 50%, transparent 80%);animation:brasa 1.2s ease-in-out infinite}
-    .chama-vela .lingua{position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:calc(var(--largura)*1.0);height:calc(var(--altura)*1.0);border-radius:50% 50% 4% 4%;background:radial-gradient(ellipse at center, rgba(255,190,0,.95) 0%, rgba(255,69,0,.75) 50%, rgba(230,10,10,.3) 70%, transparent 100%);mix-blend-mode:screen;filter:blur(.7px);transform-origin:50% 100%;animation:vela 1.2s ease-in-out infinite}
-    .chama-vela .lingua:nth-child(3){width:calc(var(--largura)*.92);height:calc(var(--altura)*.95);animation-duration:1.5s}
-    .chama-vela .lingua:nth-child(4){width:calc(var(--largura)*.78);height:calc(var(--altura)*.85);animation-duration:1.8s}
-    .chama-vela .brilho{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:calc(var(--largura)*1.7);height:calc(var(--altura)*1.5);background:radial-gradient(circle, hsla(var(--hue),var(--satur),72%,.55) 0%, transparent 70%);filter:blur(9px);mix-blend-mode:screen;pointer-events:none}
-    @keyframes vela{0%,100%{transform:translateX(-50%) scaleY(1)}25%{transform:translateX(calc(-50% + .7px)) scaleY(1.12)}50%{transform:translateX(-50%) scaleY(1.2)}75%{transform:translateX(calc(-50% - .6px)) scaleY(1.1)}}
-    @keyframes brasa{0%,100%{opacity:.85}50%{opacity:1}}
-    .flame-corner{position:fixed;z-index:1200;pointer-events:none}
-    .flame-bottom-right{bottom:20px;right:20px}
+  /* Pergaminho V/H */
+  .pergaminho-v{background:var(--panel) url('/assets/img/pergaminho-rasgado-vert.png') no-repeat center/cover!important;min-height:82vh!important}
+  .pergaminho-h{background:var(--panel) url('/assets/img/pergaminho-rasgado-horiz.png') no-repeat center/cover!important;min-height:82vh!important}
+  .pergaminho-h.fallback{background:var(--panel) url('/assets/img/pergaminho-rasgado-vert.png') no-repeat center/cover!important}
+  .conteudo-pergaminho{background:transparent!important;position:relative;z-index:10;padding:20px;color:#fff}
 
-    /* ===== Topbar idioma (pedra antiga) ===== */
-    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-    .hidden{display:none!important}
-    .j-section{padding:16px}
-    .topbar{position:sticky;top:0;z-index:1200;display:flex;gap:12px;align-items:center;justify-content:flex-start;background:#111;color:#fff;padding:8px 12px;border-bottom:1px solid #333}
-    .lang-group{display:flex;gap:8px}
-    .lang-pill{position:relative;background:#2b2b2b;color:#eaeaea;border:1px solid #5a4a32;border-radius:10px;padding:6px 10px;min-width:56px;font-weight:700;letter-spacing:.5px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 2px 0 #3a2f21, 0 6px 12px rgba(0,0,0,.35)}
-    .lang-pill[aria-pressed="true"]{background:#4b3b24;color:#fff;border-color:#886b44;box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 2px 0 #4d3c28, 0 6px 14px rgba(0,0,0,.45)}
-    .lang-pill::before{content:"";position:absolute;inset:-2px;border-radius:12px;background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(0,0,0,.18));pointer-events:none}
-    .tts-pill{background:#1f2937;color:#fff;border:1px solid #374151;border-radius:10px;padding:6px 10px}
+  /* Header + chama */
+  .site-header{display:flex;align-items:center;justify-content:center;padding:16px}
+  .site-header h1{font-family:'Berkshire Swash',cursive;font-size:32px;color:#fff;text-shadow:0 0 10px hsla(28,96%,60%,.7);margin:0}
+  .chama-icone{position:relative;width:18px;height:36px;display:flex;align-items:flex-end;margin-right:12px}
+  .chama-vela{--altura:45px;--largura:30px;--pulso:1.2s;--hue:28;--satur:96%;position:relative;width:var(--largura);height:var(--altura);display:inline-block;filter:drop-shadow(0 0 8px hsla(var(--hue),var(--satur),60%,.75))}
+  .chama-vela .brasa{position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:calc(var(--largura)*1.4);height:10px;border-radius:50% 50% 40% 40%;background:radial-gradient(circle at 50% 40%, hsla(var(--hue),var(--satur),95%,.95) 0%, hsla(var(--hue),var(--satur),70%,.85) 50%, transparent 80%);animation:brasa 1.2s ease-in-out infinite}
+  .chama-vela .lingua{position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:calc(var(--largura)*1.0);height:calc(var(--altura)*1.0);border-radius:50% 50% 4% 4%;background:radial-gradient(ellipse at center, rgba(255,190,0,.95) 0%, rgba(255,69,0,.75) 50%, rgba(230,10,10,.3) 70%, transparent 100%);mix-blend-mode:screen;filter:blur(.7px);transform-origin:50% 100%;animation:vela 1.2s ease-in-out infinite}
+  .chama-vela .lingua:nth-child(3){width:calc(var(--largura)*.92);height:calc(var(--altura)*.95);animation-duration:1.5s}
+  .chama-vela .lingua:nth-child(4){width:calc(var(--largura)*.78);height:calc(var(--altura)*.85);animation-duration:1.8s}
+  .chama-vela .brilho{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:calc(var(--largura)*1.7);height:calc(var(--altura)*1.5);background:radial-gradient(circle, hsla(var(--hue),var(--satur),72%,.55) 0%, transparent 70%);filter:blur(9px);mix-blend-mode:screen;pointer-events:none}
+  @keyframes vela{0%,100%{transform:translateX(-50%) scaleY(1)}25%{transform:translateX(calc(-50% + .7px)) scaleY(1.12)}50%{transform:translateX(-50%) scaleY(1.2)}75%{transform:translateX(calc(-50% - .6px)) scaleY(1.1)}}
+  @keyframes brasa{0%,100%{opacity:.85}50%{opacity:1}}
+  .flame-corner{position:fixed;z-index:1200;pointer-events:none}
+  .flame-bottom-right{bottom:20px;right:20px}
 
-    /* ===== Perguntas (contraste p/ chamas) ===== */
-    .pergunta-enunciado{display:block;margin:10px 0 6px;font-weight:700;color:#fff}
-    .j-pergunta{display:none}
-    .j-pergunta.active{display:block}
-    textarea.input{width:100%;padding:14px;border-radius:10px;border:1px solid #7c3aed;background:#000;color:#fff;resize:vertical;min-height:110px}
-    textarea.input::placeholder{color:#9ca3af}
-    .devolutiva{margin-top:8px;padding:10px;border-left:3px solid #7c3aed;background:rgba(124,58,237,.08);color:#fff;border-radius:8px}
+  /* Topbar idioma (pedra) */
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  .hidden{display:none!important}
+  .j-section{padding:16px}
+  .topbar{position:sticky;top:0;z-index:1200;display:flex;gap:12px;align-items:center;justify-content:flex-start;background:#111;color:#fff;padding:8px 12px;border-bottom:1px solid #333}
+  .lang-group{display:flex;gap:8px}
+  .lang-pill{position:relative;background:#2b2b2b;color:#eaeaea;border:1px solid #5a4a32;border-radius:10px;padding:6px 10px;min-width:56px;font-weight:700;letter-spacing:.5px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 2px 0 #3a2f21,0 6px 12px rgba(0,0,0,.35)}
+  .lang-pill[aria-pressed="true"]{background:#4b3b24;color:#fff;border-color:#886b44;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 2px 0 #4d3c28,0 6px 14px rgba(0,0,0,.45)}
+  .lang-pill::before{content:"";position:absolute;inset:-2px;border-radius:12px;background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(0,0,0,.18));pointer-events:none}
+  .tts-pill{background:#1f2937;color:#fff;border:1px solid #374151;border-radius:10px;padding:6px 10px}
 
-    /* Contrato Berkshire */
-    #section-termos .conteudo-pergaminho,
-    #section-termos2 .conteudo-pergaminho{font-family:'Berkshire Swash',cursive;font-size:20px;line-height:1.6;color:#fff}
-  </style>
+  /* Perguntas (contraste p/ chamas) */
+  .pergunta-enunciado{display:block;margin:10px 0 6px;font-weight:700;color:#fff}
+  .j-pergunta{display:none}
+  .j-pergunta.active{display:block}
+  textarea.input{width:100%;padding:14px;border-radius:10px;border:1px solid #7c3aed;background:#000;color:#fff;resize:vertical;min-height:110px}
+  textarea.input::placeholder{color:#9ca3af}
+  .devolutiva{margin-top:8px;padding:10px;border-left:3px solid #7c3aed;background:rgba(124,58,237,.08);color:#fff;border-radius:8px}
+
+  /* Contrato Berkshire */
+  #section-termos .conteudo-pergaminho,
+  #section-termos2 .conteudo-pergaminho{font-family:'Berkshire Swash',cursive;font-size:20px;line-height:1.6;color:#fff}
+</style>
+
 </head>
 <body$1>
   <div class="topbar">
@@ -136,6 +139,76 @@
       <button class="btn btn-primary" data-action="next">Avançar</button>
     </div>
   </section>
+        <!-- SENHA -->
+<section id="section-senha" class="j-section hidden">
+  <div class="password-form" style="text-align:center">
+    <h3 style="margin:.2rem 0 1rem;font-family:'Berkshire Swash',cursive;font-size:24px;">Ative sua Senha</h3>
+    <div class="password-input" style="position:relative;max-width:420px;margin:0 auto;">
+      <input type="password" id="senha" placeholder="Digite sua senha..." style="width:100%;padding:12px;border-radius:8px;border:1px solid #d1d5db" />
+      <button class="btn btn-secondary" data-action="toggle-password" style="position:absolute;right:6px;top:6px">👁️</button>
+    </div>
+    <div style="margin-top:12px"><button class="btn btn-primary" data-action="start">Ativar e Iniciar</button></div>
+  </div>
+</section>
+
+<!-- GUIA -->
+<section id="section-guia" class="j-section hidden">
+  <div class="conteudo-pergaminho">
+    <h2 style="margin-top:0;">Escolha seu Guia ✨</h2>
+    <p>Quem vai te acompanhar na Jornada Essencial?</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+      <button class="btn btn-primary" data-action="select-guia" data-guia="zion">Escolher Zion</button>
+      <button class="btn btn-primary" data-action="select-guia" data-guia="lumen">Escolher Lumen</button>
+      <button class="btn btn-primary" data-action="select-guia" data-guia="arian">Escolher Arian</button>
+    </div>
+  </div>
+</section>
+
+<!-- SELFIE -->
+<section id="section-selfie" class="j-section hidden">
+  <div class="conteudo-pergaminho">
+    <h2 style="margin-top:0;">Entre na Irmandade ✨</h2>
+    <p>Envie uma foto e posicione seu rosto. Você pode pular esta etapa.</p>
+    <div class="selfie-row" style="display:grid;grid-template-columns:1fr 1.3fr;gap:16px;align-items:start;">
+      <div class="selfie-left">
+        <label class="btn btn-primary" for="selfieInput">📸 Tirar/Enviar Foto</label>
+        <input id="selfieInput" type="file" accept="image/*" capture="environment" style="display:none" />
+        <div class="selfie-controls" style="display:flex;flex-direction:column;gap:10px;margin:12px 0;">
+          <label>Zoom <input id="selfieScale" type="range" min="0.6" max="2.0" step="0.01" value="1"></label>
+          <label>Horizontal <input id="selfieOffsetX" type="range" min="-300" max="300" step="1" value="0"></label>
+          <label>Vertical <input id="selfieOffsetY" type="range" min="-300" max="300" step="1" value="0"></label>
+        </div>
+        <div class="selfie-actions" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;">
+          <button id="btnRenderSelfie" class="btn">✨ Ver minha foto</button>
+          <a id="btnDownloadSelfie" class="btn btn-secondary" download="irmandade-mais-eu.png" href="#">⬇️ Confirmar</a>
+          <button id="btnSkipSelfie" class="btn btn-secondary" data-action="skip-selfie">Pular Foto</button>
+          <button id="btnStartJourney" class="btn btn-secondary" data-action="skip-selfie">Entrar na Jornada</button>
+        </div>
+      </div>
+      <div class="selfie-right">
+        <canvas id="selfieCanvas" width="1200" height="800" style="width:100%;height:auto;background:#000;border-radius:12px;"></canvas>
+        <small class="muted">Pré-visualização</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL -->
+<section id="section-final" class="j-section hidden">
+  <p data-typing data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40" data-cursor="true"></p>
+  <div class="selfie-final" style="text-align:center; margin-top:20px;">
+    <img id="minhaFotoFinal" alt="Minha foto com a Irmandade" style="max-width:80%; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.3)" />
+  </div>
+  <div class="footer-actions"><button class="btn btn-primary" data-action="restart">Voltar ao Portal</button></div>
+</section>
+
+<!-- OVERLAY VÍDEO -->
+<div id="videoOverlay" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;justify-content:center;align-items:center;z-index:2000">
+  <video id="videoTransicao" class="video-player" playsinline controls style="max-width:90vw;max-height:80vh;background:#000"></video>
+  <div id="videoFallback" class="video-fallback hidden" style="max-width:90vw;max-height:80vh;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;text-align:center;padding:20px;font-family:'Berkshire Swash',cursive;">Áudio em reprodução. Converta para MP4 H.264 se quiser ver vídeo.</div>
+  <button id="skipVideo" class="btn btn-secondary" style="position:absolute;top:14px;right:14px">Pular</button>
+</div>
+
       </div> <!-- conteudo-pergaminho -->
     </section> <!-- jornada-canvas -->
   </div> <!-- section-container -->
@@ -150,6 +223,21 @@
       <div class="brilho"></div>
     </div>
   </div>
+  function setPergaminho(sectionId){
+  const canvas = document.getElementById('jornada-canvas');
+  if(!canvas) return;
+  if(sectionId==='section-perguntas'){
+    canvas.className = 'card pergaminho pergaminho-h';
+  }else{
+    canvas.className = 'card pergaminho pergaminho-v';
+  }
+}
+function showSection(id){
+  document.querySelectorAll('.j-section').forEach(s=>s.classList.add('hidden'));
+  const el=document.getElementById(id); if(el) el.classList.remove('hidden');
+  setPergaminho(id);
+}
+
 
   <script>
   (function(){
@@ -220,40 +308,94 @@
   }
 
   document.addEventListener('click',ev=>{
-    if(ev.target.closest('[data-action="next-termos"]')){
-      ev.preventDefault();
-      document.getElementById('section-intro')?.classList.add('hidden');
-      document.getElementById('section-termos')?.classList.remove('hidden');
+  if(ev.target.closest('[data-action="next-termos"]')){ev.preventDefault();showSection('section-termos');}
+  if(ev.target.closest('[data-action="next-termos2"]')){ev.preventDefault();showSection('section-termos2');}
+  if(ev.target.closest('[data-action="next-senha"]')){ev.preventDefault();showSection('section-senha');}
+
+  if(ev.target.closest('[data-action="toggle-password"]')){ev.preventDefault();
+    const i=document.getElementById('senha'); if(i) i.type=(i.type==='password'?'text':'password');
+  }
+
+  if(ev.target.closest('[data-action="start"]')){ev.preventDefault(); showSection('section-guia');}
+
+  if(ev.target.closest('[data-action="select-guia"]')){ev.preventDefault();
+    localStorage.setItem('JORNADA_GUIA', ev.target.dataset.guia||'zion');
+    showSection('section-selfie');
+  }
+
+  if(ev.target.closest('[data-action="skip-selfie"]')){ev.preventDefault();
+    showSection('section-perguntas');
+    if(typeof window.loadDynamicBlocks==='function') window.loadDynamicBlocks();
+  }
+
+  if(ev.target.closest('[data-action="restart"]')){ev.preventDefault(); location.replace('/index.html');}
+
+  // Navegação pergunta → pergunta → bloco
+  if(ev.target.closest('[data-action="next"]')){
+    ev.preventDefault();
+    const current = document.querySelector('.j-pergunta.active');
+    if(!current){ const first=document.querySelector('.j-pergunta'); if(first){ first.classList.add('active'); } return; }
+    const bloco = current.closest('.j-bloco');
+    const perguntas=[...bloco.querySelectorAll('.j-pergunta')];
+    const idx=perguntas.indexOf(current);
+    current.classList.remove('active');
+    if(idx+1<perguntas.length){
+      perguntas[idx+1].classList.add('active'); updateProgress(); return;
     }
-    if(ev.target.closest('[data-action="next-termos2"]')){
-      ev.preventDefault();
-      document.getElementById('section-termos')?.classList.add('hidden');
-      document.getElementById('section-termos2')?.classList.remove('hidden');
+    const blocos=[...document.querySelectorAll('.j-bloco')];
+    const bi=blocos.indexOf(bloco);
+    if(bi+1<blocos.length){
+      blocos.forEach(b=>b.style.display='none');
+      const nb=blocos[bi+1]; nb.style.display='block';
+      const first=nb.querySelector('.j-pergunta'); if(first) first.classList.add('active');
+      updateProgress();
+    }else{
+      showSection('section-final');
     }
-    if(ev.target.closest('[data-action="next-senha"]')){
-      ev.preventDefault();
-      document.getElementById('section-termos2')?.classList.add('hidden');
-      document.getElementById('section-perguntas')?.classList.remove('hidden');
-      if(typeof window.loadDynamicBlocks==='function') window.loadDynamicBlocks();
-    }
-    if(ev.target.closest('[data-action="next"]')){
-      ev.preventDefault();
-      const current = document.querySelector('.j-pergunta.active');
-      if(!current){ const first=document.querySelector('.j-pergunta'); if(first) first.classList.add('active'); return; }
-      const bloco = current.closest('.j-bloco');
-      const perguntas=[...bloco.querySelectorAll('.j-pergunta')];
-      const idx=perguntas.indexOf(current);
-      current.classList.remove('active');
-      if(idx+1<perguntas.length){ perguntas[idx+1].classList.add('active'); updateProgress(); return; }
-      const blocos=[...document.querySelectorAll('.j-bloco')];
-      const bi=blocos.indexOf(bloco);
-      if(bi+1<blocos.length){ blocos.forEach(b=>b.style.display='none'); const nb=blocos[bi+1]; nb.style.display='block'; const first=nb.querySelector('.j-pergunta'); if(first){ first.classList.add('active'); } updateProgress(); }
-    }
-  });
+  }
+
+  // Voz por pergunta
+  const mic = ev.target.closest('.mic-btn');
+  if(mic){ ev.preventDefault(); const ta = mic.closest('.j-pergunta').querySelector('textarea'); if(ta) startDictation(ta); }
+  const spk = ev.target.closest('.speak-btn');
+  if(spk){ ev.preventDefault(); const text = spk.closest('.j-pergunta').querySelector('.pergunta-enunciado')?.textContent||''; speak(text); }
+});
+
 
   document.addEventListener('input',ev=>{ if(ev.target.closest('.j-pergunta textarea')) updateProgress(); });
 })();
 </script>
+  (function(){
+  const BG_URL = "/assets/img/irmandade-quarteto-bg.png";
+  const GLOW_URL = "/assets/img/moldura-brilho.png";
+  const FACE_X = 820, FACE_Y = 410, FACE_R = 150;
+  const $ = (s)=>document.querySelector(s);
+  const input=$("#selfieInput"), cv=$("#selfieCanvas");
+  if(!cv) return;
+  const ctx=cv.getContext("2d");
+  const rScale=$("#selfieScale"), rX=$("#selfieOffsetX"), rY=$("#selfieOffsetY");
+  const btnGo=$("#btnRenderSelfie"), aDown=$("#btnDownloadSelfie");
+  const bg=new Image(); bg.crossOrigin="anonymous"; bg.src=BG_URL;
+  const glow=new Image(); glow.crossOrigin="anonymous"; glow.src=GLOW_URL;
+  let img=null, st={scale:1,offX:0,offY:0};
+
+  function render(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    if(bg.complete) ctx.drawImage(bg,0,0,cv.width,cv.height);
+    if(img){
+      ctx.save(); ctx.beginPath(); ctx.arc(FACE_X,FACE_Y,FACE_R,0,Math.PI*2); ctx.clip();
+      const w=FACE_R*2*st.scale, h=w;
+      ctx.drawImage(img, FACE_X-w/2+st.offX, FACE_Y-h/2+st.offY, w, h);
+      ctx.restore();
+    }
+    if(glow.complete) ctx.drawImage(glow, FACE_X-FACE_R*1.2, FACE_Y-FACE_R*1.2, FACE_R*2.4, FACE_R*2.4);
+  }
+  [rScale,rX,rY].forEach(el=>el&&el.addEventListener('input',()=>{st.scale=parseFloat(rScale.value);st.offX=parseInt(rX.value,10);st.offY=parseInt(rY.value,10);render();}));
+  input&&input.addEventListener('change',(e)=>{const f=e.target.files?.[0]; if(!f)return; const r=new FileReader(); r.onload=ev=>{img=new Image(); img.onload=render; img.src=ev.target.result}; r.readAsDataURL(f);});
+  btnGo&&btnGo.addEventListener('click',()=>{render(); const url=cv.toDataURL('image/png'); aDown.href=url; localStorage.setItem('IRMANDADE_SELFIE_FINAL',url); });
+  bg.onload=render; glow.onload=render;
+})();
+
 <script>
 // ===== Acessibilidade, perguntas visíveis, microfone e TTS =====
 (function(){
@@ -389,12 +531,12 @@
 
   document.addEventListener('input',ev=>{ if(ev.target.closest('.j-pergunta textarea')) updateProgress(); });
 
+  
   // (Opcional) Fullscreen para vídeos — se existir um <video> no documento
   document.addEventListener('click',ev=>{
-    const v = ev.target.closest('video'); if(!v) return;
-    if(document.fullscreenElement) return; // já está em FS
-    if(v.requestFullscreen){ v.requestFullscreen().catch(()=>{}); }
-  }, {capture:true});
+  const v = ev.target.closest('video'); if(!v) return;
+  if(!document.fullscreenElement) v.requestFullscreen?.();
+},{capture:true});
 })();
 </script>
 </body>
