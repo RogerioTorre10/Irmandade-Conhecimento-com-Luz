@@ -323,9 +323,9 @@
                 <input id="selfieInput" type="file" accept="image/*" capture="user" style="display:none" />
                 <div class="selfie-controls">
                   <label>Nome <input id="nameInput" type="text" placeholder="Digite seu nome"></label>
-                  <label>Zoom <input id="selfieScale" type="range" min="0.6" max="2.0" step="0.01" value="1"></label>
-                  <label>Horizontal <input id="selfieOffsetX" type="range" min="-300" max="300" step="1" value="0"></label>
-                  <label>Vertical <input id="selfieOffsetY" type="range" min="-300" max="300" step="1" value="0"></label>
+                  <label>Zoom <input id="selfieScale" type="range" min="0.8" max="2.5" step="0.01" value="1"></label>
+                  <label>Horizontal <input id="selfieOffsetX" type="range" min="-50" max="50" step="1" value="0"></label>
+                  <label>Vertical <input id="selfieOffsetY" type="range" min="-50" max="50" step="1" value="0"></label>
                   <small class="muted">Dica: alinhe seu rosto na chama ao lado do guia.</small>
                 </div>
                 <div class="selfie-actions">
@@ -402,6 +402,7 @@
           <p style="margin-top:12px;"><small>Sua imagem foi unida à Irmandade. 🙏</small></p>
           <div class="footer-actions">
             <button id="btnGeneratePDF" class="btn" data-action="generate-pdf">Gerar PDF/HQ</button>
+            <button class="btn" data-action="download-selfie">Baixar Imagem</button>
             <button id="btnRestart" class="btn" data-action="restart">Voltar ao Portal</button>
           </div>
         </div>
@@ -578,6 +579,9 @@
         const previewBtn=$("#previewBtn");
         const captureBtn=$("#captureBtn");
         const errorDiv=$("#selfieError");
+        const scaleInput = $("#selfieScale");
+        const offsetXInput = $("#selfieOffsetX");
+        const offsetYInput = $("#selfieOffsetY");
 
         let selfieURL='';
 
@@ -600,9 +604,27 @@
           };
         }
 
+        function updatePreview(){
+          const scale = parseFloat(scaleInput.value);
+          const ox = parseFloat(offsetXInput.value);
+          const oy = parseFloat(offsetYInput.value);
+          const baseX = 15 + ox;
+          const baseY = 35 + oy;
+          const baseW = 70 * scale;
+          const baseH = 90 * scale;
+          selfieImg.setAttribute('x', baseX);
+          selfieImg.setAttribute('y', baseY);
+          selfieImg.setAttribute('width', baseW);
+          selfieImg.setAttribute('height', baseH);
+        }
+
         nameInput.addEventListener('input',()=>{
           userNameEl.textContent=nameInput.value.trim().toUpperCase()||'NOME';
         });
+
+        scaleInput.addEventListener('input', updatePreview);
+        offsetXInput.addEventListener('input', updatePreview);
+        offsetYInput.addEventListener('input', updatePreview);
 
         fileInput.addEventListener('change',()=>{
           const f=fileInput.files?.[0];
@@ -618,6 +640,7 @@
             toast('Selecione uma selfie antes.');
             return;
           }
+          updatePreview();
           flameLayer.style.opacity=1;
         });
 
@@ -626,6 +649,7 @@
             toast('Selecione uma selfie antes.');
             return;
           }
+          updatePreview();
           flameLayer.style.opacity=1;
           await new Promise(r=>requestAnimationFrame(r));
 
@@ -679,12 +703,20 @@
             toast('Erro ao carregar a selfie.');
             return;
           });
-          const coverRatio=Math.max(fw/selfie.width,fh/selfie.height);
-          const sw=selfie.width*coverRatio;
-          const sh=selfie.height*coverRatio;
-          const sx=fx+(fw-sw)/2;
-          const sy=fy+(fh-sh)/2;
-          ctx.drawImage(selfie,sx,sy,sw,sh);
+
+          const selfieScaleVal = parseFloat(scaleInput.value);
+          const ox = parseFloat(offsetXInput.value);
+          const oy = parseFloat(offsetYInput.value);
+          const svgScaleX = fw / 100;
+          const svgScaleY = fh / 150;
+
+          let coverRatio = Math.max(fw / selfie.width, fh / selfie.height) * selfieScaleVal;
+          let sw = selfie.width * coverRatio;
+          let sh = selfie.height * coverRatio;
+          let sx = fx + (fw - sw)/2 + ox * svgScaleX;
+          let sy = fy + (fh - sh)/2 + oy * svgScaleY;
+
+          ctx.drawImage(selfie, sx, sy, sw, sh);
           ctx.restore();
 
           ctx.strokeStyle='rgba(255,200,0,.85)';
@@ -858,7 +890,9 @@
             first.classList.add('active');
             const lbl=first.querySelector('.pergunta-enunciado')?.textContent||'';
             const ta=first.querySelector('textarea');
-            typePlaceholder(ta,lbl,22);
+            ta.placeholder = "Digite sua resposta...";
+            const aria=document.getElementById('aria-pergunta');
+            if(aria) aria.textContent = lbl;
           }
         }
         if(sectionId==='section-final'){
@@ -906,7 +940,6 @@
           });
 
           content.appendChild(bloco);
-          runTyping(bloco);
         });
 
         const firstBloco = content.querySelector('.j-bloco');
@@ -1001,7 +1034,10 @@
           prox.classList.add('active');
           const lbl=prox.querySelector('.pergunta-enunciado')?.textContent||'';
           const ta=prox.querySelector('textarea');
-          typePlaceholder(ta,lbl,22);
+          ta.placeholder = "Digite sua resposta...";
+          const aria=document.getElementById('aria-pergunta');
+          if(aria) aria.textContent = lbl;
+          runTyping(prox);
           updateProgress();
           isTransitioning=false;
           return;
@@ -1025,7 +1061,10 @@
               primeira.classList.add('active');
               const lbl=primeira.querySelector('.pergunta-enunciado')?.textContent||'';
               const ta=primeira.querySelector('textarea');
-              typePlaceholder(ta,lbl,22);
+              ta.placeholder = "Digite sua resposta...";
+              const aria=document.getElementById('aria-pergunta');
+              if(aria) aria.textContent = lbl;
+              runTyping(primeira);
             }
             updateProgress();
             isTransitioning=false;
@@ -1177,7 +1216,9 @@
           perguntas[0].classList.add('active');
           const lbl=perguntas[0].querySelector('.pergunta-enunciado')?.textContent||'';
           const ta=perguntas[0].querySelector('textarea');
-          typePlaceholder(ta,lbl,22);
+          ta.placeholder = "Digite sua resposta...";
+          const aria=document.getElementById('aria-pergunta');
+          if(aria) aria.textContent = lbl;
           if(ta) handleInput(ta);
         }
         updateProgress();
@@ -1279,6 +1320,7 @@
           const aToggle=ev.target.closest?.('[data-action="toggle-password"], .password-toggle');
           const aRestart=ev.target.closest?.('[data-action="restart"]');
           const btnPDF=ev.target.closest?.('[data-action="generate-pdf"]');
+          const btnDownloadSelfie=ev.target.closest?.('[data-action="download-selfie"]');
           const btnSkipSelfie=ev.target.closest?.('[data-action="skip-selfie"]');
           const btnSendChat=ev.target.closest?.('[data-action="send-chat"]');
           const btnSelectGuia=ev.target.closest?.('[data-action="select-guia"]');
@@ -1292,6 +1334,18 @@
           if(aToggle){ev.preventDefault(); toggleSenha();}
           if(aRestart){ev.preventDefault(); localStorage.removeItem('jornada_respostas'); localStorage.removeItem('JORNADA_GUIA'); location.hash='#intro'; location.replace('/index.html');}
           if(btnPDF){ev.preventDefault(); generatePDF();}
+          if(btnDownloadSelfie){
+            ev.preventDefault();
+            const dataURL = localStorage.getItem('IRMANDADE_SELFIE_FINAL');
+            if (dataURL) {
+              const a = document.createElement('a');
+              a.href = dataURL;
+              a.download = 'jornada-selfie.png';
+              a.click();
+            } else {
+              toast('Nenhuma imagem disponível para download.');
+            }
+          }
           if(btnSkipSelfie){ev.preventDefault(); proceedAfterSelfie();}
           if(btnSendChat){ev.preventDefault(); sendChatMessage();}
           if(btnSelectGuia){ev.preventDefault(); proceedAfterGuia(btnSelectGuia.dataset.guia);}
@@ -1367,3 +1421,4 @@
     })();
   </script>
 </body>
+</html>
