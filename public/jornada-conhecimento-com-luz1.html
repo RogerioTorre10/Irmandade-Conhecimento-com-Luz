@@ -399,6 +399,71 @@
     if(v.requestFullscreen){ v.requestFullscreen().catch(()=>{}); }
   }, {capture:true});
 })();
+  <!-- OVERLAY VÍDEO -->
+<div id="videoOverlay" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;justify-content:center;align-items:center;z-index:2000">
+  <video id="videoTransicao" playsinline controls style="max-width:90vw;max-height:80vh;background:#000"></video>
+  <button id="skipVideo" class="btn btn-secondary" style="position:absolute;top:14px;right:14px">Pular</button>
+</div>
+<script>
+(function(){
+  // Arquivos de exemplo (troque pelos seus)
+  window.JORNADA_VIDEOS = {
+    intro: '/assets/img/filme-0-ao-encontro-da-jornada.mp4',
+    afterBlocks: {
+      0: '/assets/img/filme-1-entrando-na-jornada.mp4',
+      1: '/assets/img/filme-2-dentro-da-jornada.mp4',
+      2: '/assets/img/filme-3-avancando-na-jornada.mp4',
+      3: '/assets/img/filme-4-quase-no-fim.mp4'
+    },
+    final: '/assets/img/filme-5-fim-da-jornada.mp4'
+  };
+
+  function playTransition(src, onEnd){
+    const overlay=document.getElementById('videoOverlay');
+    const video=document.getElementById('videoTransicao');
+    const skip=document.getElementById('skipVideo');
+    if(!overlay||!video||!src){ onEnd&&onEnd(); return; }
+    overlay.classList.remove('hidden');
+    video.src = src + '?t=' + Date.now();
+    const cleanup=()=>{ video.pause(); video.removeAttribute('src'); overlay.classList.add('hidden'); onEnd&&onEnd(); };
+    video.onended = cleanup; skip.onclick = cleanup;
+    video.play().catch(()=>{ cleanup(); });
+  }
+
+  // Chame quando for entrar nas perguntas (intro)
+  document.addEventListener('click', ev=>{
+    if(ev.target.closest('[data-action="next-senha"]')){
+      const vid = window.JORNADA_VIDEOS?.intro;
+      if(vid) setTimeout(()=>playTransition(vid, ()=>{}), 50);
+    }
+  });
+
+  // Tocar ao mudar de bloco (costura com o seu "next")
+  const origNextHandler = document.onclick;
+  document.addEventListener('click', ev=>{
+    if(!ev.target.closest('[data-action="next"]')) return;
+    const current = document.querySelector('.j-pergunta.active');
+    if(!current) return;
+    const bloco = current.closest('.j-bloco');
+    const blocos=[...document.querySelectorAll('.j-bloco')];
+    const bi=blocos.indexOf(bloco);
+    // se estiver indo para o próximo bloco, toca o vídeo daquele bloco
+    const perguntas=[...bloco.querySelectorAll('.j-pergunta')];
+    const idx=perguntas.indexOf(current);
+    if(idx === perguntas.length - 1){
+      const src = window.JORNADA_VIDEOS?.afterBlocks?.[bi];
+      if(src) setTimeout(()=>playTransition(src, ()=>{}), 50);
+    }
+  });
+
+  // Fullscreen no clique do vídeo
+  document.addEventListener('click', e=>{
+    const v=e.target.closest('video'); if(!v) return;
+    if(!document.fullscreenElement) v.requestFullscreen?.();
+  }, {capture:true});
+})();
+</script>
+
 </script>
 </body>
 </html>
