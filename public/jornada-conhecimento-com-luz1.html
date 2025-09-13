@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Jornada • Irmandade Conhecimento com Luz</title>
   <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png" />
   <!-- Google Fonts -->
@@ -116,33 +116,17 @@
       transform: translateY(-2px);
       box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 8px 16px rgba(0,0,0,0.7);
     }
-    .btn-primary {
-      background: linear-gradient(to bottom, #6b21a8, #4c1a7a), url('/assets/img/textura-de-pedra.jpg') center/cover;
-      background-blend-mode: overlay;
-    }
-    .btn-primary:hover {
-      background: linear-gradient(to bottom, #7c3aed, #5d2bb8), url('/assets/img/textura-de-pedra.jpg') center/cover;
-      background-blend-mode: overlay;
-    }
-    .btn-secondary {
-      background: linear-gradient(to bottom, #4b5563, #3a434f), url('/assets/img/textura-de-pedra.jpg') center/cover;
-      background-blend-mode: overlay;
-    }
-    .btn-secondary:hover {
-      background: linear-gradient(to bottom, #6b7280, #5a616e), url('/assets/img/textura-de-pedra.jpg') center/cover;
-      background-blend-mode: overlay;
-    }
     .btn+.btn{margin-left:10px}
     .btn:disabled{background:#6b7280;cursor:not-allowed;transform:none}
 
     /* Progresso */
     .progress-container{margin:16px 0;text-align:center}
-    .progress-badge{padding:8px 16px;background:var(--brand);color:#fff;border-radius:8px;font-size:20px}
+    .progress-badge{padding:8px 16px;background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;background-blend-mode: overlay;color:#fff;border-radius:8px;font-size:20px;border: 3px solid #4a4a4a;box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);text-shadow: 1px 1px 3px rgba(0,0,0,0.7);}
     .progress-bar{width:100%;height:8px;background:#e5e7eb;border-radius:4px;margin-top:12px}
-    .progress-bar-fill{height:100%;background:var(--brand);border-radius:4px;transition:width .25s ease}
+    .progress-bar-fill{height:100%;background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;background-blend-mode: overlay;border-radius:4px;transition:width .25s ease}
     .j-progress{margin:8px 0 16px}
     .j-progress__bar{width:100%;height:6px;background:#e5e7eb;border-radius:4px}
-    .j-progress__fill{height:100%;background:#1f2937;border-radius:4px;transition:width .25s ease}
+    .j-progress__fill{height:100%;background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;background-blend-mode: overlay;border-radius:4px;transition:width .25s ease}
     .j-progress__meta{text-align:center;margin-top:8px;font-size:20px;color:var(--ink-soft)}
 
     .footer-actions{display:flex;gap:12px;justify-content:center;margin:18px 0}
@@ -163,9 +147,9 @@
 
     /* Acessibilidade: Microfone e Áudio */
     .accessibility-controls { display: flex; gap: 10px; margin-top: 8px; }
-    .btn-mic, .btn-audio { padding: 8px 16px; font-size: 18px; background: #4b5563; border-radius: 8px; cursor: pointer; }
-    .btn-mic:hover, .btn-audio:hover { background: #6b7280; }
-    .btn-mic.recording { background: #ff0000; }
+    .btn-mic, .btn-audio { padding: 8px 16px; font-size: 18px; background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover; background-blend-mode: overlay; border: 3px solid #4a4a4a; border-radius: 8px; cursor: pointer; color: #fff; box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6); text-shadow: 1px 1px 3px rgba(0,0,0,0.7); }
+    .btn-mic:hover, .btn-audio:hover { background: linear-gradient(to bottom, #b0b0b0, #909090), url('/assets/img/textura-de-pedra.jpg') center/cover; background-blend-mode: overlay; }
+    .btn-mic.recording { background: linear-gradient(to bottom, #ff6666, #cc3333), url('/assets/img/textura-de-pedra.jpg') center/cover; background-blend-mode: overlay; }
 
     /* Seletor de Idioma */
     .language-selector { position: absolute; top: 10px; right: 10px; z-index: 100; }
@@ -174,7 +158,7 @@
     /* Vídeo overlay */
     #videoOverlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,.95);display:flex;justify-content:center;align-items:center;z-index:2000}
     #videoOverlay.hidden{display:none}
-    .video-player{width:100vw;height:100vh;object-fit:contain;background:#000}
+    .video-player{width:100vw;height:100vh;object-fit:contain;background:#000;transform: rotate(0deg)}
     .video-fallback{width:100vw;height:100vh;background:url('/assets/img/perfil-da-irmandade.png') center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;text-align:center;padding:20px;font-family:"Berkshire Swash",cursive}
 
     .site-footer{text-align:center;padding:14px;color:var(--ink-soft);font-size:20px}
@@ -221,7 +205,7 @@
         <div id="section-intro" class="j-section">
           <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
           <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Antes de começar, leia os termos abaixo." data-speed="50" data-cursor="true"></p>
-          <div class="footer-actions"><button class="btn btn-primary" data-action="next-termos">Avançar</button></div>
+          <div class="footer-actions"><button class="btn" data-action="next-termos">Avançar</button></div>
         </div>
 
         <!-- TERMOS -->
@@ -243,7 +227,7 @@
                 </ul>
               </ul>
               <div class="footer-actions">
-                <button class="btn btn-primary" data-action="termos-next">Próxima página</button>
+                <button class="btn" data-action="termos-next">Próxima página</button>
               </div>
             </div>
             <div id="termos-pg2" class="hidden">
@@ -269,8 +253,8 @@
                 <li><strong>Concordância:</strong> Ao prosseguir, você declara estar ciente e de acordo com todas as condições descritas.</li>
               </ul>
               <div class="footer-actions">
-                <button class="btn btn-secondary" data-action="termos-prev">Voltar</button>
-                <button class="btn btn-primary" data-action="next-senha">Aceito e quero continuar</button>
+                <button class="btn" data-action="termos-prev">Voltar</button>
+                <button class="btn" data-action="next-senha">Aceito e quero continuar</button>
               </div>
             </div>
           </div>
@@ -284,7 +268,7 @@
               <input type="password" id="senha" placeholder="Digite sua senha..." />
               <span class="password-toggle" data-action="toggle-password">👁️</span>
             </div>
-            <div style="margin-top:12px"><button class="btn btn-primary" data-action="start">Ativar e Iniciar</button></div>
+            <div style="margin-top:12px"><button class="btn" data-action="start">Ativar e Iniciar</button></div>
           </div>
         </div>
 
@@ -295,9 +279,9 @@
             <div class="guia-container">
               <p>Zion (Grok) • Lumen (ChatGPT) • Arian (Gemini)</p>
               <div class="guia-options">
-                <button class="btn btn-primary" data-action="select-guia" data-guia="zion">Escolher Zion</button>
-                <button class="btn btn-primary" data-action="select-guia" data-guia="lumen">Escolher Lumen</button>
-                <button class="btn btn-primary" data-action="select-guia" data-guia="arian">Escolher Arian</button>
+                <button class="btn" data-action="select-guia" data-guia="zion">Escolher Zion</button>
+                <button class="btn" data-action="select-guia" data-guia="lumen">Escolher Lumen</button>
+                <button class="btn" data-action="select-guia" data-guia="arian">Escolher Arian</button>
               </div>
             </div>
           </div>
@@ -310,7 +294,7 @@
             <p>Faça uma foto ou envie da galeria. Ajuste e gere sua imagem “4 + você”.</p>
             <div class="selfie-row">
               <div class="selfie-left">
-                <label class="btn btn-primary" for="selfieInput">📸 Tirar Foto</label>
+                <label class="btn" for="selfieInput">📸 Tirar Foto</label>
                 <input id="selfieInput" type="file" accept="image/*" capture="environment" style="display:none" />
                 <div class="selfie-controls">
                   <label>Zoom <input id="selfieScale" type="range" min="0.6" max="2.0" step="0.01" value="1"></label>
@@ -320,9 +304,9 @@
                 </div>
                 <div class="selfie-actions">
                   <button id="btnRenderSelfie" class="btn">✨ Ver minha foto</button>
-                  <button id="btnDownloadSelfie" class="btn btn-secondary">⬇️ Confirmar</button>
-                  <button id="btnSkipSelfie" class="btn btn-secondary" data-action="skip-selfie">Pular Foto</button>
-                  <button id="btnStartJourney" class="btn btn-secondary" data-action="skip-selfie">Entrar na Jornada</button>
+                  <button id="btnDownloadSelfie" class="btn">⬇️ Confirmar</button>
+                  <button id="btnSkipSelfie" class="btn" data-action="skip-selfie">Pular Foto</button>
+                  <button id="btnStartJourney" class="btn" data-action="skip-selfie">Entrar na Jornada</button>
                 </div>
               </div>
               <div class="selfie-right">
@@ -352,12 +336,12 @@
             <div id="grok-chat-messages"></div>
             <div class="grok-chat-input">
               <input id="grok-chat-input" type="text" placeholder="Fale com seu guia..." />
-              <button class="btn btn-primary" data-action="send-chat">Enviar</button>
+              <button class="btn" data-action="send-chat">Enviar</button>
             </div>
           </div>
 
           <div class="footer-actions">
-            <button id="btnNextPerguntas" class="btn btn-primary" data-action="next">Avançar</button>
+            <button id="btnNextPerguntas" class="btn" data-action="next">Avançar</button>
           </div>
         </div>
 
@@ -369,8 +353,8 @@
           </div>
           <p style="margin-top:12px;"><small>Sua imagem foi unida à Irmandade. 🙏</small></p>
           <div class="footer-actions">
-            <button id="btnGeneratePDF" class="btn btn-primary" data-action="generate-pdf">Gerar PDF/HQ</button>
-            <button id="btnRestart" class="btn btn-secondary" data-action="restart">Voltar ao Portal</button>
+            <button id="btnGeneratePDF" class="btn" data-action="generate-pdf">Gerar PDF/HQ</button>
+            <button id="btnRestart" class="btn" data-action="restart">Voltar ao Portal</button>
           </div>
         </div>
       </div>
@@ -386,7 +370,7 @@
   <div id="videoOverlay" class="hidden">
     <video id="videoTransicao" class="video-player" playsinline controls></video>
     <div id="videoFallback" class="video-fallback hidden">Áudio da jornada em reprodução. Converta para H.264 MP4.</div>
-    <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
+    <button id="skipVideo" class="btn" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
   </div>
 
   <!-- Chama inferior -->
@@ -1007,9 +991,6 @@
               video.classList.add('hidden');
               setTimeout(cleanup,1500);
             });
-            if(video.requestFullscreen){
-              video.requestFullscreen().catch(()=>{});
-            }
           },400);
         };
 
