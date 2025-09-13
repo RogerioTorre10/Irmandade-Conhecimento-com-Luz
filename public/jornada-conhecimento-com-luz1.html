@@ -162,8 +162,8 @@
     /* Vídeo overlay */
     #videoOverlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;justify-content:center;align-items:center;z-index:2000}
     #videoOverlay.hidden{display:none}
-    .video-player{max-width:90vw;max-height:80vh;background:#000}
-    .video-fallback{max-width:90vw;max-height:80vh;background:url('/assets/img/perfil-da-irmandade.png') center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;text-align:center;padding:20px;font-family:"Berkshire Swash",cursive}
+    .video-player{width:100vw;height:100vh;object-fit:contain;background:#000}
+    .video-fallback{width:100vw;height:100vh;background:url('/assets/img/perfil-da-irmandade.png') center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;text-align:center;padding:20px;font-family:"Berkshire Swash",cursive}
 
     .site-footer{text-align:center;padding:14px;color:var(--ink-soft);font-size:20px}
     .password-form{margin-top:16px;text-align:center}
@@ -273,7 +273,7 @@
                 </div>
                 <div class="selfie-actions">
                   <button id="btnRenderSelfie" class="btn">✨ Ver minha foto</button>
-                  <a id="btnDownloadSelfie" class="btn btn-secondary" download="irmandade-mais-eu.png" href="#">⬇️ Confirmar</a>
+                  <button id="btnDownloadSelfie" class="btn btn-secondary">⬇️ Confirmar</button>
                   <button id="btnSkipSelfie" class="btn btn-secondary" data-action="skip-selfie">Pular Foto</button>
                   <button id="btnStartJourney" class="btn btn-secondary" data-action="skip-selfie">Entrar na Jornada</button>
                 </div>
@@ -437,7 +437,7 @@
       if(!ctx) return; /* fail-safe */
 
       const rScale=$("#selfieScale"), rX=$("#selfieOffsetX"), rY=$("#selfieOffsetY");
-      const btnGo=$("#btnRenderSelfie"), aDown=$("#btnDownloadSelfie");
+      const btnGo=$("#btnRenderSelfie"), btnDown=$("#btnDownloadSelfie");
       const bgImg=new Image(); bgImg.crossOrigin="anonymous"; bgImg.src=BG_URL;
       const glowImg=new Image(); glowImg.crossOrigin="anonymous"; glowImg.src=GLOW_URL;
       let userImg=null;
@@ -459,6 +459,12 @@
           const img=new Image(); img.onload=()=>{userImg=img; renderAll();}; img.src=saved;
         }catch(_){}
       }
+      function downloadSelfie(){
+        const url=localStorage.getItem("IRMANDADE_SELFIE_FINAL");
+        if(!url) return toast('Renderize a foto primeiro.');
+        const a=document.createElement('a'); a.href=url; a.download="irmandade-mais-eu.png";
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      }
       input?.addEventListener("change",(ev)=>{
         const f=ev.target.files&&ev.target.files[0]; if(!f) return;
         const reader=new FileReader();
@@ -466,7 +472,8 @@
         reader.readAsDataURL(f);
       });
       [rScale,rX,rY].forEach(el=> el?.addEventListener("input",()=>{ st.scale=parseFloat(rScale.value); st.offX=parseInt(rX.value,10); st.offY=parseInt(rY.value,10); renderAll(); }));
-      btnGo?.addEventListener("click",()=>{ renderAll(); const url=cv.toDataURL("image/png"); if(aDown) aDown.href=url; try{localStorage.setItem("IRMANDADE_SELFIE_FINAL", url);}catch(_){ } proceedAfterSelfie(); });
+      btnGo?.addEventListener("click",()=>{ renderAll(); const url=cv.toDataURL("image/png"); try{localStorage.setItem("IRMANDADE_SELFIE_FINAL", url);}catch(_){ } proceedAfterSelfie(); });
+      btnDown?.addEventListener("click",()=>{downloadSelfie();});
       bgImg.onload=renderAll; glowImg.onload=renderAll; loadFromLocal();
     })();
 
@@ -608,7 +615,7 @@
       // PERGUNTA VISÍVEL + efeito de datilografia
       const enunciado =
         `<label class="pergunta-enunciado" ` +
-        `data-typing data-text="<b>Pergunta ${qIdx + 1}:</b> ${label}" ` +
+        `data-typing data-text="Pergunta ${qIdx + 1}: ${label}" ` +
         `data-speed="36" data-cursor="true"></label>`;
 
       div.innerHTML = enunciado +
@@ -622,6 +629,7 @@
     });
 
     content.appendChild(bloco);
+    runTyping(bloco); // Adiciona typing para todas as perguntas no bloco
   });
 
   const firstBloco = content.querySelector('.j-bloco');
@@ -765,6 +773,7 @@
     /* ===== Acessibilidade: Microfone e Áudio ===== */
     let recognition = null;
     let currentLang = 'pt-BR';
+    let isRecognizing = false;
 
     function initAccessibility() {
       if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
@@ -777,17 +786,19 @@
       }
 
       document.addEventListener('click', (ev) => {
+        if (!ev.target) return;
         const btnMic = ev.target.closest('[data-action="start-mic"]');
         const btnAudio = ev.target.closest('[data-action="read-question"]');
         if (btnMic) {
           ev.preventDefault();
-          const ta = btnMic.closest('.j-pergunta').querySelector('textarea');
-          startRecognition(ta, btnMic);
+          const ta = btnMic.closest('.j-pergunta')?.querySelector('textarea');
+          if (ta) startRecognition(ta, btnMic);
         }
         if (btnAudio) {
           ev.preventDefault();
-          const label = btnMic.closest('.j-pergunta').querySelector('.pergunta-enunciado').textContent;
-          readAloud(label);
+          const enunciado = btnAudio.closest('.j-pergunta')?.querySelector('.pergunta-enunciado');
+          const text = enunciado?.textContent || '';
+          readAloud(text);
         }
       });
 
@@ -798,13 +809,18 @@
           currentLang = ev.target.value;
           if (recognition) recognition.lang = currentLang;
           toast(`Idioma alterado para ${currentLang}`);
+          updateBlocks();
+          if (!document.getElementById('section-perguntas').classList.contains('hidden')) {
+            loadDynamicBlocks();
+          }
           // Aqui você pode adicionar lógica para traduzir textos da página se necessário
         });
       }
     }
 
     function startRecognition(textarea, btn) {
-      if (!recognition) return;
+      if (!recognition || isRecognizing) return;
+      isRecognizing = true;
       btn.classList.add('recording');
       btn.textContent = 'Gravando...';
       recognition.onresult = (event) => {
@@ -814,6 +830,7 @@
         updateProgress();
       };
       recognition.onend = () => {
+        isRecognizing = false;
         btn.classList.remove('recording');
         btn.textContent = '🎤 Falar Resposta';
       };
@@ -842,7 +859,7 @@
         if(ev.target && ev.target.matches('.j-pergunta textarea')){ if(__abortTypingPlaceholder) __abortTypingPlaceholder(); }
       });
       document.addEventListener('click',(ev)=>{
-        if(isTransitioning) return;
+        if(isTransitioning || !ev.target) return;
         const aNext=ev.target.closest?.('[data-action="next"]');
         const aStart=ev.target.closest?.('[data-action="start"]');
         const aToggle=ev.target.closest?.('[data-action="toggle-password"], .password-toggle');
@@ -876,18 +893,33 @@
     window.JORNADA_VIDEOS={intro:VIDEO_BASE+'filme-0-ao-encontro-da-jornada.mp4', afterBlocks:{0:VIDEO_BASE+'filme-1-entrando-na-jornada.mp4',1:VIDEO_BASE+'filme-2-dentro-da-jornada.mp4',2:VIDEO_BASE+'filme-3-avancando-na-jornada.mp4',3:VIDEO_BASE+'filme-4-quase-no-fim.mp4'}, final:VIDEO_BASE+'filme-5-fim-da-jornada.mp4'};
     window.JORNADA_FINAL_VIDEO=window.JORNADA_VIDEOS.final;
 
-    (function ensureBlocks(){
-      const fallback=[
+    const blockTranslations = {
+      'pt-BR': [
         {title:'Bloco 1 — Raízes',questions:[{label:'Quem é você hoje?'},{label:'O que te trouxe até esta jornada?'},{label:'Qual é o seu maior sonho espiritual?'}],video_after:VIDEO_BASE+'filme-1-entrando-na-jornada.mp4'},
         {title:'Bloco 2 — Reflexões',questions:[{label:'Quais são seus maiores desafios atuais?'},{label:'Como você lida com o medo ou a dúvida?'},{label:'O que a "luz" significa para você?'}],video_after:VIDEO_BASE+'filme-2-dentro-da-jornada.mp4'},
         {title:'Bloco 3 — Crescimento',questions:[{label:'O que você quer mudar na sua vida?'},{label:'Quem inspira você e por quê?'},{label:'Como você pratica gratidão no dia a dia?'}],video_after:VIDEO_BASE+'filme-3-avancando-na-jornada.mp4'},
         {title:'Bloco 4 — Integração',questions:[{label:'Qual lição você leva dessa jornada?'},{label:'Como vai aplicar isso no futuro?'},{label:'Uma mensagem para seu eu futuro.'}],video_after:VIDEO_BASE+'filme-4-quase-no-fim.mp4'}
-      ];
-      window.JORNADA_BLOCKS=fallback;
-    })();
+      ],
+      'en-US': [
+        {title:'Block 1 — Roots',questions:[{label:'Who are you today?'},{label:'What brought you to this journey?'},{label:'What is your greatest spiritual dream?'}],video_after:VIDEO_BASE+'filme-1-entrando-na-jornada.mp4'},
+        {title:'Block 2 — Reflections',questions:[{label:'What are your biggest current challenges?'},{label:'How do you deal with fear or doubt?'},{label:'What does "light" mean to you?'}],video_after:VIDEO_BASE+'filme-2-dentro-da-jornada.mp4'},
+        {title:'Block 3 — Growth',questions:[{label:'What do you want to change in your life?'},{label:'Who inspires you and why?'},{label:'How do you practice gratitude in your daily life?'}],video_after:VIDEO_BASE+'filme-3-avancando-na-jornada.mp4'},
+        {title:'Block 4 — Integration',questions:[{label:'What lesson do you take from this journey?'},{label:'How will you apply this in the future?'},{label:'A message to your future self.'}],video_after:VIDEO_BASE+'filme-4-quase-no-fim.mp4'}
+      ],
+      'es-ES': [
+        {title:'Bloque 1 — Raíces',questions:[{label:'¿Quién eres hoy?'},{label:'¿Qué te trajo a este viaje?'},{label:'¿Cuál es tu mayor sueño espiritual?'}],video_after:VIDEO_BASE+'filme-1-entrando-na-jornada.mp4'},
+        {title:'Bloque 2 — Reflexiones',questions:[{label:'¿Cuáles son tus mayores desafíos actuales?'},{label:'¿Cómo lidias con el miedo o la duda?'},{label:'¿Qué significa la "luz" para ti?'}],video_after:VIDEO_BASE+'filme-2-dentro-da-jornada.mp4'},
+        {title:'Bloque 3 — Crecimiento',questions:[{label:'¿Qué quieres cambiar en tu vida?'},{label:'¿Quién te inspira y por qué?'},{label:'¿Cómo practicas la gratitud en el día a día?'}],video_after:VIDEO_BASE+'filme-3-avancando-na-jornada.mp4'},
+        {title:'Bloque 4 — Integración',questions:[{label:'¿Qué lección te llevas de este viaje?'},{label:'¿Cómo lo aplicarás en el futuro?'},{label:'Un mensaje para tu yo futuro.'}],video_after:VIDEO_BASE+'filme-4-quase-no-fim.mp4'}
+      ]
+    };
+
+    function updateBlocks(){
+      window.JORNADA_BLOCKS = blockTranslations[currentLang] || blockTranslations['pt-BR'];
+    }
 
     /* boot */
-    ensureHeaderFlame(); ensurePageFlames(); runTyping(); initJornada(); showSection('section-intro');
+    ensureHeaderFlame(); ensurePageFlames(); runTyping(); initJornada(); showSection('section-intro'); updateBlocks();
   })();
 
   function rebuildTermos(){
