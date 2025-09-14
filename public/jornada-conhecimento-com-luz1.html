@@ -402,7 +402,6 @@
                   <button id="previewBtn" class="btn">✨ Ver Prévia</button>
                   <button id="captureBtn" class="btn">⬇️ Confirmar e Baixar</button>
                   <button id="btnSkipSelfie" class="btn" data-action="skip-selfie">Pular Foto</button>
-                  <button id="btnStartJourney" class="btn" data-action="skip-selfie">Entrar na Jornada</button>
                 </div>
               </div>
               <div class="selfie-right">
@@ -470,7 +469,7 @@
           <div class="selfie-final" style="text-align:center; margin-top:20px;">
             <img id="minhaFotoFinal" alt="Minha foto com a Irmandade" style="max-width:80%; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.3)" />
           </div>
-          <p style="margin-top:12px;"><small data-typing data-text="Sua imagem foi unida à Irmandade. 🙏" data-speed="50" data-cursor="true"></small></p>
+          <p style="margin-top:12px;"><small data-typing data-text="Sua imagem foi unida à Irmandade." data-speed="50" data-cursor="true"></small></p>
           <div class="footer-actions">
             <button id="btnGeneratePDF" class="btn" data-action="generate-pdf">Gerar PDF/HQ</button>
             <button class="btn" data-action="download-selfie">Baixar Imagem</button>
@@ -537,21 +536,22 @@
             setTimeout(step, speed);
           } else {
             el.classList.add('typing-done');
+            el.dataset.typed = '1';
             const nextEl = el.nextElementSibling;
-            if(nextEl && nextEl.hasAttribute('data-typing') && !nextEl.dataset._typed) {
+            if(nextEl && nextEl.hasAttribute('data-typing') && !nextEl.dataset.typed) {
               runTyping(nextEl);
             }
           }
         })();
       }
       function runTyping(root) {
-        const elements = (root || document).querySelectorAll('[data-typing]:not([data._typed])');
+        const elements = (root || document).querySelectorAll('[data-typing]:not([data-typed])');
         if(elements.length > 0) {
           const firstEl = elements[0];
           const t = firstEl.getAttribute('data-text') || firstEl.textContent || '';
           const spd = parseInt(firstEl.getAttribute('data-speed') || '26', 10);
           const cur = String(firstEl.getAttribute('data-cursor') || 'true') === 'true';
-          firstEl.dataset._typed = '1';
+          firstEl.dataset.typed = '1';
           typeWriter(firstEl, t, spd, cur);
           if(!window.isMuted && !firstEl.closest('textarea')) readAloud(t, (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
         }
