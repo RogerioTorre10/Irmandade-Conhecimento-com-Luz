@@ -37,7 +37,7 @@
       font-display: swap;
     }
 
-    :root { --bg:#1a1a1a; --ink:#000; --ink-soft:#555; --panel:#1a1a1a }
+    :root { --bg: #1a1a1a; --ink: #000; --ink-soft: #555; --panel: #1a1a1a }
 
     html, body { height: 100%; box-sizing: border-box }
     body {
@@ -46,7 +46,7 @@
       font-size: 22px; line-height: 1.6; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
     }
     .container { max-width: 960px; margin: 24px auto; padding: 0 16px }
-    .card { background: var(--panel)!important; border-radius: 14px; box-shadow: 0 8px 28px rgba(0,0,0,.12); padding: 28px; position: relative; z-index: 5 }
+    .card { background: var(--panel) !important; border-radius: 14px; box-shadow: 0 8px 28px rgba(0,0,0,.12); padding: 28px; position: relative; z-index: 5 }
 
     /* Header + chama */
     .site-header { display: flex; align-items: center; justify-content: center; padding: 16px; background: transparent }
@@ -105,6 +105,11 @@
       font-family: "Cardo", serif; font-weight: 700; letter-spacing: .06em;
       font-size: clamp(32px, 5.5vw, 60px); color: #f7d37a; text-shadow: 0 2px 8px rgba(0,0,0,.4);
     }
+    .client-name {
+      position: absolute; bottom: 3.5%; left: 0; right: 0; text-align: center;
+      font-family: "Cardo", serif; font-weight: 700; letter-spacing: .06em;
+      font-size: clamp(48px, 8vw, 80px); color: #f7d37a; text-shadow: 0 2px 8px rgba(0,0,0,.4);
+    }
     .controls {
       position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%);
       display: flex; gap: .5rem; align-items: center; flex-wrap: wrap;
@@ -122,6 +127,7 @@
       .guide-card { max-width: 100% }
       .flame-svg { width: 60%; height: 60% }
       .guide-name { font-size: clamp(24px, 4vw, 40px) }
+      .client-name { font-size: clamp(36px, 6vw, 60px) }
     }
 
     /* Escolha do guia */
@@ -139,8 +145,7 @@
     .grok-chat-message.grok::after { content: "▌"; margin-left: 2px; opacity: .75; animation: lumenBlink 1s steps(2,end) infinite }
     .grok-chat-message.grok.typing-done::after { content: ""; animation: none }
     .grok-chat-input { display: none }
-    .devolutiva-container { margin-top: 16px; padding: 16px; border-radius: 8px; background: #000; color: #fff; font-family: "Cardo", serif; font-size: 20px }
-    .devolutiva-container p { margin: 0; color: #fff }
+    .devolutiva-text { margin-top: 16px; font-family: "Cardo", serif; font-size: 20px; color: #fff }
 
     /* Pergaminho */
     .pergaminho-v { background: var(--panel) url('/assets/img/pergaminho-rasgado-vert.png') no-repeat center/cover !important; min-height: 82vh !important }
@@ -199,7 +204,7 @@
     .j-progress__fill { height: 100%; background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover; background-blend-mode: overlay; border-radius: 4px; transition: width .25s ease }
     .j-progress__meta { text-align: center; margin-top: 8px; font-size: 20px; color: var(--ink-soft); font-family: "BerkshireSwash", cursive }
 
-    .footer-actions { display: flex; gap: 12px; justify-content: center; margin: 18px 0 }
+    .footer-actions { display: flex; gap: 12px; justify-content: center; margin: 32px 0 }
 
     /* Datilografia */
     .lumen-typing { white-space: pre-wrap; position: relative }
@@ -280,8 +285,7 @@
           <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
           <div class="footer-actions"><button class="btn" data-action="next-termos">Avançar</button></div>
         </div>
-
-        <!-- TERMOS -->
+<!-- TERMOS -->
         <div id="section-termos" class="j-section hidden">
           <div class="conteudo-pergaminho">
             <h2 style="margin-top:0;">Jornada Conhecimento com Luz - Essencial 📘</h2>
@@ -336,7 +340,7 @@
                   <li data-typing data-text="Mantenha linguagem cordial; evite ofensas e xingamentos." data-speed="50" data-cursor="true"></li>
                   <li data-typing data-text="A forma de se comunicar com Lumen reflete o respeito por si mesmo(a)." data-speed="50" data-cursor="true"></li>
                 </ul>
-              </ul>
+              </div>
               <div class="footer-actions">
                 <button class="btn" data-action="termos-prev3">Voltar</button>
                 <button class="btn" data-action="termos-next4">Próxima página</button>
@@ -431,6 +435,7 @@
                     </svg>
                   </div>
                   <div class="guide-name" id="guideNameSlot"></div>
+                  <div class="client-name" id="clientNameSlot"></div>
                 </section>
                 <div id="selfieError" class="selfie-error">Erro ao carregar a pré-visualização. Tente novamente ou pule.</div>
                 <small class="muted" data-typing data-text="Pré-visualização" data-speed="50" data-cursor="true"></small>
@@ -463,13 +468,13 @@
           </div>
 
           <div class="footer-actions">
-            <button id="btnSpeakAnswer" class="btn" data-action="speak-answer">🔊 Falar Resposta</button>
-            <button id="btnNextPerguntas" class="btn" data-action="next">Avançar</button>
+            <button id="btnSpeakAnswer" class="btn" data-action="speak-answer">🎤 Falar Resposta</button>
             <button id="btnClearAnswer" class="btn" data-action="clear-answer">🗑️ Apagar Resposta</button>
+            <button id="btnNextPerguntas" class="btn" data-action="next">➡️ Avançar</button>
+            <button id="btnMute" class="btn" data-action="mute">🔇 Silenciar</button>
           </div>
         </div>
-
-        <!-- FINAL -->
+<!-- FINAL -->
         <div id="section-final" class="j-section hidden">
           <p data-typing data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40" data-cursor="true"></p>
           <div class="selfie-final" style="text-align:center; margin-top:20px;">
@@ -511,15 +516,15 @@
   <script>
     (function(){
       /* ===== util: toast + erro global ===== */
-      function toast(msg){
-        try{
+      function toast(msg) {
+        try {
           const t = document.getElementById('toast');
           if(!t) return;
           t.textContent = msg;
           t.classList.remove('hidden');
           t.classList.add('show');
           setTimeout(() => { t.classList.remove('show'); }, 3000);
-        } catch(_){}
+        } catch(_) {}
       }
       window.addEventListener('error', (e) => {
         console.error('[Erro global]', e?.error || e);
@@ -553,6 +558,7 @@
           const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
           el.dataset._typed = '1';
           typeWriter(el, t, spd, cur);
+          if(!window.isMuted && !el.closest('textarea')) readAloud(t, (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
         });
       }
 
@@ -665,11 +671,10 @@
         const $ = s => document.querySelector(s);
         const card = $("#card-guide");
         const guideNameEl = $("#guideNameSlot");
+        const clientNameEl = $("#clientNameSlot");
         const flameLayer = $("#card-guide .flame-layer");
         const selfieImg = $("#selfieImage");
         const bgImg = $("#guideBg");
-        const nameInput = $("#nameInput");
-        const guiaNameInput = $("#guiaNameInput");
         const fileInput = $("#selfieInput");
         const previewBtn = $("#previewBtn");
         const captureBtn = $("#captureBtn");
@@ -708,9 +713,11 @@
           const baseW = 70 * scale;
           const baseH = 90 * scale;
           selfieImg.setAttribute('x', baseX);
-          selfieImg.setAttribute('y', baseY);
+          selfi
+eImg.setAttribute('y', baseY);
           selfieImg.setAttribute('width', baseW);
           selfieImg.setAttribute('height', baseH);
+          clientNameEl.textContent = localStorage.getItem('JORNADA_NOME')?.toUpperCase() || '';
         }
 
         scaleInput.addEventListener('input', updatePreview);
@@ -822,7 +829,11 @@
           ctx.textAlign = 'center';
           ctx.font = `bold ${Math.round(W * 0.075)}px Cardo, serif`;
           ctx.textBaseline = 'top';
-          ctx.fillText(localStorage.getItem('JORNADA_NOME')?.toUpperCase() || card.dataset.guide, W / 2, H * 0.035);
+          ctx.fillText(card.dataset.guide, W / 2, H * 0.035);
+
+          ctx.font = `bold ${Math.round(W * 0.11)}px Cardo, serif`;
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(localStorage.getItem('JORNADA_NOME')?.toUpperCase() || '', W / 2, H * 0.965);
 
           const dataURL = canvas.toDataURL('image/png');
           try {
@@ -896,14 +907,14 @@
           guiaMsg.className = 'grok-chat-message grok';
           messagesDiv.appendChild(guiaMsg);
           typeWriter(guiaMsg, guiaMessage, 36, true);
-          readAloud(guiaMessage, cfg.voice);
+          if(!window.isMuted) readAloud(guiaMessage, cfg.voice);
           messagesDiv.scrollTop = messagesDiv.scrollHeight;
         } catch(e) {
           console.error('[Chat] erro', e);
           const guiaMsg = document.createElement('div');
           guiaMsg.className = 'grok-chat-message grok';
           typeWriter(guiaMsg, 'Ops, algo deu errado! Tenta de novo ou pula pra próxima pergunta.', 36, true);
-          readAloud('Ops, algo deu errado! Tenta de novo ou pula pra próxima pergunta.', cfg.voice);
+          if(!window.isMuted) readAloud('Ops, algo deu errado! Tenta de novo ou pula pra próxima pergunta.', cfg.voice);
           messagesDiv.appendChild(guiaMsg);
           messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
@@ -935,12 +946,12 @@
           if(!resp.ok) throw new Error('API falhou: ' + resp.status);
           const data = await resp.json();
           const devolutiva = data?.choices?.[0]?.message?.content || data?.message?.content || 'Obrigado por compartilhar. Sua reflexão ilumina o caminho.';
-          readAloud(devolutiva, cfg.voice);
+          if(!window.isMuted) readAloud(devolutiva, cfg.voice);
           return devolutiva;
         } catch(e) {
           console.error('[Devolutiva] erro', e);
           const errorMsg = 'Ops, algo deu errado ao gerar a devolutiva. Continue sua jornada!';
-          readAloud(errorMsg, cfg.voice);
+          if(!window.isMuted) readAloud(errorMsg, cfg.voice);
           return errorMsg;
         }
       }
@@ -1024,10 +1035,10 @@
             ta.placeholder = "Digite sua resposta...";
             const aria = document.getElementById('aria-pergunta');
             if(aria) aria.textContent = lbl;
-            readAloud(lbl, (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
+            if(!window.isMuted) readAloud(lbl, (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
           }
         }
-       if(sectionId === 'section-final') {
+        if(sectionId === 'section-final') {
           const url = localStorage.getItem('IRMANDADE_SELFIE_FINAL');
           if(url) {
             const img = document.querySelector('#minhaFotoFinal');
@@ -1039,6 +1050,7 @@
           const storedName = localStorage.getItem('JORNADA_NOME') || '';
           if(guiaNameInput && storedName) guiaNameInput.value = storedName.toUpperCase();
         }
+        runTyping(active);
       }
 
       /* ===== blocos dinâmicos ===== */
@@ -1068,12 +1080,8 @@
 
             div.innerHTML = enunciado +
               `\n<textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>` +
-              `<div class="devolutiva-container" style="display:none;"><p data-typing data-speed="36" data-cursor="true"></p></div>` +
-              `<div class="accessibility-controls">` +
-              `<button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>` +
-              `<button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>` +
-              `<button class="btn-clear" data-action="clear-answer">🗑️ Apagar Resposta</button>` +
-              `</div>`;
+              `<p class="devolutiva-text" style="display:none;" data-typing data-speed="36" data-cursor="true"></p>` +
+              `<div class="accessibility-controls"></div>`;
 
             bloco.appendChild(div);
           });
@@ -1127,17 +1135,16 @@
         saveAnswers();
         updateProgress();
         const perguntaDiv = textarea.closest('.j-pergunta');
-        const devolutivaDiv = perguntaDiv.querySelector('.devolutiva-container');
-        const devolutivaP = devolutivaDiv.querySelector('p');
-        if(textarea.value.trim() && devolutivaDiv) {
-          devolutivaDiv.style.display = 'block';
+        const devolutivaP = perguntaDiv.querySelector('.devolutiva-text');
+        if(textarea.value.trim() && devolutivaP) {
+          devolutivaP.style.display = 'block';
           const pergunta = perguntaDiv.querySelector('.pergunta-enunciado')?.textContent || '';
           const resposta = textarea.value;
           const guia = localStorage.getItem('JORNADA_GUIA') || 'zion';
           const devolutiva = await fetchDevolutiva(pergunta, resposta, guia);
           typeDevolutiva(devolutivaP, devolutiva, 36);
         } else {
-          devolutivaDiv.style.display = 'none';
+          devolutivaP.style.display = 'none';
         }
       }
       function toggleSenha() {
@@ -1159,8 +1166,10 @@
         const card = document.getElementById('card-guide');
         const bgImg = document.getElementById('guideBg');
         const guideNameEl = document.getElementById('guideNameSlot');
+        const clientNameEl = document.getElementById('clientNameSlot');
         card.dataset.guide = guia.toUpperCase();
-        guideNameEl.textContent = guiaNameInput.value.toUpperCase();
+        guideNameEl.textContent = guia.toUpperCase();
+        clientNameEl.textContent = guiaNameInput.value.toUpperCase();
         bgImg.src = `/assets/img/irmandade-quarteto-bg-${guia}.png`;
       }
       function proceedAfterSelfie() {
@@ -1324,7 +1333,6 @@
       }
       window.playTransition = playTransition;
 
-      /* ===== controle de orientação de vídeo ===== */
       function lockVideoOrientation() {
         const video = document.getElementById('videoTransicao');
         if(!video) return;
@@ -1409,19 +1417,12 @@
         document.addEventListener('click', (ev) => {
           if(!ev.target) return;
           const btnMic = ev.target.closest('[data-action="start-mic"]');
-          const btnAudio = ev.target.closest('[data-action="read-question"]');
           const btnClear = ev.target.closest('[data-action="clear-answer"]');
           const btnMute = ev.target.closest('[data-action="mute"]');
           if(btnMic) {
             ev.preventDefault();
             const ta = btnMic.closest('.j-pergunta')?.querySelector('textarea');
             if(ta) startRecognition(ta, btnMic);
-          }
-          if(btnAudio) {
-            ev.preventDefault();
-            const enunciado = btnAudio.closest('.j-pergunta')?.querySelector('.pergunta-enunciado');
-            const text = enunciado?.textContent || '';
-            if(!window.isMuted) readAloud(text, (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
           }
           if(btnClear) {
             ev.preventDefault();
@@ -1526,7 +1527,7 @@
           if(aNext) { ev.preventDefault(); goNext(); }
           if(aStart) { ev.preventDefault(); startJourney(); }
           if(aToggle) { ev.preventDefault(); toggleSenha(); }
-          if(aRestart) { ev.preventDefault(); localStorage.removeItem('jornada_respostas'); localStorage.removeItem('JORNADA_GUIA'); location.hash = '#intro'; location.replace('/index.html'); }
+          if(aRestart) { ev.preventDefault(); localStorage.removeItem('jornada_respostas'); localStorage.removeItem('JORNADA_GUIA'); localStorage.removeItem('JORNADA_NOME'); location.hash = '#intro'; location.replace('/index.html'); }
           if(btnPDF) { ev.preventDefault(); generatePDF(); }
           if(btnDownloadSelfie) {
             ev.preventDefault();
@@ -1549,36 +1550,43 @@
             ev.preventDefault();
             document.getElementById('termos-pg1')?.classList.add('hidden');
             document.getElementById('termos-pg2')?.classList.remove('hidden');
+            runTyping(document.getElementById('termos-pg2'));
           }
           if(btnTermosNext2) {
             ev.preventDefault();
             document.getElementById('termos-pg2')?.classList.add('hidden');
             document.getElementById('termos-pg3')?.classList.remove('hidden');
+            runTyping(document.getElementById('termos-pg3'));
           }
           if(btnTermosNext3) {
             ev.preventDefault();
             document.getElementById('termos-pg3')?.classList.add('hidden');
             document.getElementById('termos-pg4')?.classList.remove('hidden');
+            runTyping(document.getElementById('termos-pg4'));
           }
           if(btnTermosNext4) {
             ev.preventDefault();
             document.getElementById('termos-pg4')?.classList.add('hidden');
             document.getElementById('termos-pg5')?.classList.remove('hidden');
+            runTyping(document.getElementById('termos-pg5'));
           }
           if(btnTermosPrev2) {
             ev.preventDefault();
             document.getElementById('termos-pg2')?.classList.add('hidden');
             document.getElementById('termos-pg1')?.classList.remove('hidden');
+            runTyping(document.getElementById('termos-pg1'));
           }
           if(btnTermosPrev3) {
             ev.preventDefault();
             document.getElementById('termos-pg3')?.classList.add('hidden');
             document.getElementById('termos-pg2')?.classList.remove('hidden');
+            runTyping(document.getElementById('termos-pg2'));
           }
           if(btnTermosPrev4) {
             ev.preventDefault();
             document.getElementById('termos-pg4')?.classList.add('hidden');
             document.getElementById('termos-pg3')?.classList.remove('hidden');
+            runTyping(document.getElementById('termos-pg3'));
           }
         }, { capture: true });
 
