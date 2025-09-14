@@ -936,7 +936,8 @@
               ],
               temperature: 0.7
             })
-       if(!resp.ok) throw new Error('API falhou: ' + resp.status);
+          });
+          if(!resp.ok) throw new Error('API falhou: ' + resp.status);
           const data = await resp.json();
           const devolutiva = data?.choices?.[0]?.message?.content || data?.message?.content || 'Obrigado por compartilhar. Sua reflexão ilumina o caminho.';
           if(!window.isMuted) readAloud(devolutiva, cfg.voice);
@@ -950,28 +951,28 @@
       }
 
       /* ===== progresso & storage ===== */
-     function updateProgress() {
-  const perguntas = document.querySelectorAll('.j-pergunta');
-  const respondidas = Array.from(perguntas).filter(p => (p.querySelector('textarea')?.value.trim() || '') !== '').length;
-  const total = perguntas.length || 1;
-  const pct = Math.round((respondidas / total) * 100);
-  const fill = document.getElementById('jprog-fill');
-  const badge = document.getElementById('jprog-pct');
-  const jFill = document.getElementById('j-fill-inline');
-  const jMeta = document.getElementById('j-meta');
-  if (fill) {
-    fill.style.width = `${pct}%`;
-  }
-  if (badge) {
-    badge.textContent = `${pct}% concluído`;
-  }
-  if (jFill) {
-    jFill.style.width = `${pct}%`;
-  }
-  if (jMeta) {
-    jMeta.textContent = `Respondidas: ${respondidas} de ${total}`;
-  }
-}
+      function updateProgress() {
+        const perguntas = document.querySelectorAll('.j-pergunta');
+        const respondidas = Array.from(perguntas).filter(p => (p.querySelector('textarea')?.value.trim() || '') !== '').length;
+        const total = perguntas.length || 1;
+        const pct = Math.round((respondidas / total) * 100);
+        const fill = document.getElementById('jprog-fill');
+        const badge = document.getElementById('jprog-pct');
+        const jFill = document.getElementById('j-fill-inline');
+        const jMeta = document.getElementById('j-meta');
+        if(fill) {
+          fill.style.width = `${pct}%`;
+        }
+        if(badge) {
+          badge.textContent = `${pct}% concluído`;
+        }
+        if(jFill) {
+          jFill.style.width = `${pct}%`;
+        }
+        if(jMeta) {
+          jMeta.textContent = `Respondidas: ${respondidas} de ${total}`;
+        }
+      }
       function saveAnswers() {
         const respostas = {};
         document.querySelectorAll('.j-pergunta textarea').forEach((input, idx) => {
@@ -1093,8 +1094,8 @@
 
             div.innerHTML = enunciado +
               `\n<textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>` +
-              `<p class="devolutiva-text" style="display:none;" data-typing data-speed="36" data-cursor="true"></p>` +
-              `<div class="accessibility-controls"></div>`;
+              `\n<p class="devolutiva-text" style="display:none;" data-typing data-speed="36" data-cursor="true"></p>` +
+              `\n<div class="accessibility-controls"></div>`;
 
             bloco.appendChild(div);
           });
@@ -1130,7 +1131,7 @@
         });
         return score;
       }
-      async function handleInput(textarea) {
+      function handleInput(textarea) {
         const score = analyzeSentiment(textarea.value);
         updateChama(score);
         saveAnswers();
