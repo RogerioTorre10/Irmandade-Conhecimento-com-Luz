@@ -120,6 +120,9 @@
     .guia-container p{font-size:18px}
     .guia-options{display:flex;gap:10px;justify-content:center;margin-top:12px}
     .guia-options button{padding:8px 16px;font-size:18px}
+    .guia-name-input{margin:12px 0}
+    .guia-name-input label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:18px}
+    .guia-name-input input{padding:12px;border-radius:8px;border:1px solid #d1d5db;font-family:"Cardo",serif;font-size:18px}
 
     /* Chat */
     .grok-chat-container{display:none}
@@ -127,6 +130,8 @@
     .grok-chat-message.grok::after{content:"▌";margin-left:2px;opacity:.75;animation:lumenBlink 1s steps(2,end) infinite}
     .grok-chat-message.grok.typing-done::after{content:"";animation:none}
     .grok-chat-input{display:none}
+    .devolutiva-container{margin-top:16px;padding:16px;border-radius:8px;background:rgba(255,255,255,.1);font-family:"Cardo",serif;font-size:18px}
+    .devolutiva-container p{margin:0}
 
     /* Pergaminho */
     .pergaminho-v{background:var(--panel) url('/assets/img/pergaminho-rasgado-vert.png') no-repeat center/cover!important;min-height:82vh!important}
@@ -334,7 +339,13 @@
           <div class="conteudo-pergaminho">
             <h2 style="margin-top:0;">Escolha seu Guia ✨</h2>
             <div class="guia-container">
-              <p>Zion (Grok) • Lumen (ChatGPT) • Arian (Gemini)</p>
+              <p>Zion (Grok): Curioso e direto, busca respostas profundas com visão cósmica.</p>
+              <p>Lumen (ChatGPT): Acolhedor e reflexivo, guia com empatia e clareza.</p>
+              <p>Arian (Gemini): Criativo e versátil, inspira com perspectivas inovadoras.</p>
+              <div class="guia-name-input">
+                <label for="guiaNameInput">Seu Nome</label>
+                <input id="guiaNameInput" type="text" placeholder="Digite seu nome para a jornada...">
+              </div>
               <div class="guia-options">
                 <button class="btn" data-action="select-guia" data-guia="zion">Escolher Zion</button>
                 <button class="btn" data-action="select-guia" data-guia="lumen">Escolher Lumen</button>
@@ -536,6 +547,16 @@
         }
         textarea.classList.add('typing-done');
       }
+      async function typeDevolutiva(div, text, speed=36){
+        if(!div) return;
+        div.textContent='';
+        div.classList.add('lumen-typing');
+        for(let i=0;i<=text.length;i++){
+          div.textContent=text.slice(0,i);
+          await new Promise(r=>setTimeout(r,speed));
+        }
+        div.classList.add('typing-done');
+      }
 
       /* ===== chamas ===== */
       function makeFlame(cls){
@@ -607,6 +628,7 @@
         const selfieImg=$("#selfieImage");
         const bgImg=$("#guideBg");
         const nameInput=$("#nameInput");
+        const guiaNameInput=$("#guiaNameInput");
         const fileInput=$("#selfieInput");
         const previewBtn=$("#previewBtn");
         const captureBtn=$("#captureBtn");
@@ -650,9 +672,18 @@
           selfieImg.setAttribute('height',baseH);
         }
 
-        nameInput.addEventListener('input',()=>{
-          userNameEl.textContent=nameInput.value.trim().toUpperCase()||'NOME';
-        });
+        function syncNameInput(){
+          const storedName=localStorage.getItem('JORNADA_NOME')||'';
+          if(storedName){
+            nameInput.value=storedName;
+            userNameEl.textContent=storedName.toUpperCase()||'NOME';
+          }
+          nameInput.addEventListener('input',()=>{
+            const name=nameInput.value.trim();
+            userNameEl.textContent=name.toUpperCase()||'NOME';
+            localStorage.setItem('JORNADA_NOME',name);
+          });
+        }
 
         scaleInput.addEventListener('input',updatePreview);
         offsetXInput.addEventListener('input',updatePreview);
@@ -781,6 +812,7 @@
         });
 
         loadBg();
+        syncNameInput();
       })();
 
       /* ===== chat com guia ===== */
@@ -848,6 +880,37 @@
           messagesDiv.scrollTop=messagesDiv.scrollHeight;
         }
         input.value='';
+      }
+
+      /* ===== devolutiva da API ===== */
+      async function fetchDevolutiva(pergunta, resposta, guia){
+        const guiaConfigs=window.guiaConfigs||{
+          zion:{apiUrl:'https://zion-backend-api.onrender.com/v1/chat',model:'grok'},
+          lumen:{apiUrl:'https://lumen-backend-api.onrender.com/v1/chat',model:'gpt-5'},
+          arian:{apiUrl:'https://arion-backend-api.onrender.com/v1/chat',model:'gemini'}
+        };
+        const cfg=guiaConfigs[guia]||guiaConfigs.lumen;
+        try{
+          const system=`Você é ${guia==='zion'?'Zion (Grok)':guia==='arian'?'Arian (Gemini)':'Lumen (ChatGPT)'} guiando a Jornada. Forneça uma devolutiva acolhedora, reflexiva e simbólica para a resposta do usuário à pergunta "${pergunta}".`;
+          const resp=await fetch(cfg.apiUrl,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+              model:cfg.model,
+              messages:[
+                {role:'system',content:system},
+                {role:'user',content:resposta}
+              ],
+              temperature:0.7
+            })
+          });
+          if(!resp.ok) throw new Error('API falhou: '+resp.status);
+          const data=await resp.json();
+          return data?.choices?.[0]?.message?.content||data?.message?.content||'Obrigado por compartilhar. Sua reflexão ilumina o caminho.';
+        }catch(e){
+          console.error('[Devolutiva] erro',e);
+          return 'Ops, algo deu errado ao gerar a devolutiva. Continue sua jornada!';
+        }
       }
 
       /* ===== progresso & storage ===== */
@@ -936,6 +999,11 @@
             if(img) img.src=url;
           }
         }
+        if(sectionId==='section-guia'){
+          const guiaNameInput=document.getElementById('guiaNameInput');
+          const storedName=localStorage.getItem('JORNADA_NOME')||'';
+          if(guiaNameInput&&storedName) guiaNameInput.value=storedName;
+        }
       }
 
       /* ===== blocos dinâmicos ===== */
@@ -965,6 +1033,7 @@
 
             div.innerHTML=enunciado+
               `\n<textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>`+
+              `<div class="devolutiva-container" style="display:none;"><p data-typing data-speed="36" data-cursor="true"></p></div>`+
               `<div class="accessibility-controls">`+
               `<button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>`+
               `<button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>`+
@@ -1012,11 +1081,24 @@
         });
         return score;
       }
-      function handleInput(textarea){
+      async function handleInput(textarea){
         const score=analyzeSentiment(textarea.value);
         updateChama(score);
         saveAnswers();
         updateProgress();
+        const perguntaDiv=textarea.closest('.j-pergunta');
+        const devolutivaDiv=perguntaDiv.querySelector('.devolutiva-container');
+        const devolutivaP=devolutivaDiv.querySelector('p');
+        if(textarea.value.trim()&&devolutivaDiv){
+          devolutivaDiv.style.display='block';
+          const pergunta=perguntaDiv.querySelector('.pergunta-enunciado')?.textContent||'';
+          const resposta=textarea.value;
+          const guia=localStorage.getItem('JORNADA_GUIA')||'zion';
+          const devolutiva=await fetchDevolutiva(pergunta,resposta,guia);
+          typeDevolutiva(devolutivaP,devolutiva,36);
+        } else {
+          devolutivaDiv.style.display='none';
+        }
       }
       function toggleSenha(){
         const input=document.getElementById('senha');
@@ -1024,6 +1106,13 @@
         input.type=(input.type==='password'?'text':'password');
       }
       function proceedAfterGuia(guia){
+        const guiaNameInput=document.getElementById('guiaNameInput');
+        if(guiaNameInput&&guiaNameInput.value.trim()){
+          localStorage.setItem('JORNADA_NOME',guiaNameInput.value.trim());
+        } else {
+          toast('Por favor, insira seu nome antes de prosseguir.');
+          return;
+        }
         localStorage.setItem('JORNADA_GUIA',guia);
         ensureHeroFlame('section-selfie');
         showSection('section-selfie');
@@ -1153,308 +1242,306 @@
           ended=true;
           isTransitioning=false;
           window.__playingTransition=false;
-          video.pause();
-          overlay.classList.add('hidden');
-          video.classList.add('hidden');
-          fallback.classList.add('hidden');
-          video.removeAttribute('src');
-          video.load();
-          onEnd&&onEnd();
-        };
-
-        video.onerror=(e)=>{
-          console.error('Video error:',e,'Source:',src);
-          fallback.classList.remove('hidden');
-          video.classList.add('hidden');
-          toast('Não foi possível carregar o vídeo.');
-          setTimeout(cleanup,1500);
-        };
-        video.onended=cleanup;
-        if(skip) skip.onclick=cleanup;
-
-        video.onloadedmetadata=()=>{
-          if(!video.videoWidth||!video.videoHeight){
+            video.pause();
+            overlay.classList.add('hidden');
             video.classList.add('hidden');
+            fallback.classList.add('hidden');
+            video.removeAttribute('src');
+            video.load();
+            onEnd&&onEnd();
+          };
+
+          video.onerror=(e)=>{
+            console.error('Video error:',e,'Source:',src);
             fallback.classList.remove('hidden');
-          }
-          video.currentTime=0;
-          setTimeout(()=>{
-            video.play().catch((e)=>{
-              console.error('Video playback error:',e,'Source:',src);
-              fallback.classList.remove('hidden');
+            video.classList.add('hidden');
+            toast('Não foi possível carregar o vídeo.');
+            setTimeout(cleanup,1500);
+          };
+          video.onended=cleanup;
+          if(skip) skip.onclick=cleanup;
+
+          video.onloadedmetadata=()=>{
+            if(!video.videoWidth||!video.videoHeight){
               video.classList.add('hidden');
-              setTimeout(cleanup,1500);
+              fallback.classList.remove('hidden');
+            }
+            video.currentTime=0;
+            setTimeout(()=>{
+              video.play().catch((e)=>{
+                console.error('Video playback error:',e,'Source:',src);
+                fallback.classList.remove('hidden');
+                video.classList.add('hidden');
+                setTimeout(cleanup,1500);
+              });
+            },400);
+          };
+
+          video.src=src+'?t='+Date.now();
+          setTimeout(cleanup,90000);
+        }
+        window.playTransition=playTransition;
+
+        /* ===== controle de orientação de vídeo ===== */
+        function lockVideoOrientation(){
+          const video=document.getElementById('videoTransicao');
+          if(!video) return;
+          video.addEventListener('webkitbeginfullscreen',(e)=>{
+            e.preventDefault();
+            video.exitFullscreen?.();
+          });
+          video.addEventListener('fullscreenchange',()=>{
+            if(document.fullscreenElement===video){
+              document.exitFullscreen?.();
+            }
+          });
+          window.addEventListener('orientationchange',()=>{
+            video.style.transform='rotate(0deg)';
+          });
+          if(window.matchMedia('(orientation: portrait)').matches){
+            video.style.width='100vw';
+            video.style.height='auto';
+            video.style.maxHeight='100vh';
+          }
+        }
+
+        function generatePDF(){
+          const respostas=JSON.parse(localStorage.getItem('jornada_respostas')||'{}');
+          const doc={content:[]};
+          doc.content.push({text:'Jornada Essencial - Irmandade Conhecimento com Luz',style:{fontSize:20,bold:true,alignment:'center',margin:[0,0,0,20]}});
+          Object.keys(respostas).forEach((key,idx)=>{
+            const pergunta=document.querySelector(`.j-pergunta[data-pergunta="${idx}"] .pergunta-enunciado`)?.textContent||`Pergunta ${idx+1}`;
+            doc.content.push(
+              {text:pergunta,style:{fontSize:14,bold:true,margin:[0,10,0,5]}},
+              {text:respostas[key]||'Sem resposta',style:{fontSize:12,margin:[0,0,0,10]}}
+            );
+          });
+          if(window.pdfMake){
+            pdfMake.createPdf(doc).download('jornada_essencial.pdf');
+          } else {
+            toast('PDF não disponível.');
+          }
+        }
+
+        function startJourney(){
+          const senha=(document.getElementById('senha')?.value||'').trim().toLowerCase();
+          console.log('[startJourney] senha ignorada p/ debug');
+          ensureHeroFlame('section-guia');
+          showSection('section-guia');
+        }
+
+        function proceedToQuestions(){
+          isTransitioning=false;
+          showSection('section-perguntas');
+          loadDynamicBlocks();
+          const perguntas=document.querySelectorAll('.j-pergunta');
+          if(perguntas.length){
+            perguntas[0].classList.add('active');
+            const lbl=perguntas[0].querySelector('.pergunta-enunciado')?.textContent||'';
+            const ta=perguntas[0].querySelector('textarea');
+            ta.placeholder="Digite sua resposta...";
+            const aria=document.getElementById('aria-pergunta');
+            if(aria) aria.textContent=lbl;
+            if(ta) handleInput(ta);
+          }
+          updateProgress();
+        }
+
+        /* ===== Acessibilidade: Microfone e Áudio ===== */
+        let recognition=null;
+        let currentLang='pt-BR';
+        let isRecognizing=false;
+
+        function initAccessibility(){
+          if('SpeechRecognition' in window||'webkitSpeechRecognition' in window){
+            recognition=new(window.SpeechRecognition||window.webkitSpeechRecognition)();
+            recognition.continuous=false;
+            recognition.interimResults=false;
+            recognition.lang=currentLang;
+          } else {
+            toast('Seu navegador não suporta reconhecimento de voz.');
+          }
+
+          document.addEventListener('click',(ev)=>{
+            if(!ev.target) return;
+            const btnMic=ev.target.closest('[data-action="start-mic"]');
+            const btnAudio=ev.target.closest('[data-action="read-question"]');
+            if(btnMic){
+              ev.preventDefault();
+              const ta=btnMic.closest('.j-pergunta')?.querySelector('textarea');
+              if(ta) startRecognition(ta,btnMic);
+            }
+            if(btnAudio){
+              ev.preventDefault();
+              const enunciado=btnAudio.closest('.j-pergunta')?.querySelector('.pergunta-enunciado');
+              const text=enunciado?.textContent||'';
+              readAloud(text);
+            }
+          });
+
+          const langSelect = document.getElementById('language-select');
+          if(langSelect){
+            langSelect.addEventListener('change', (ev) => {
+              currentLang = ev.target.value;
+              if(recognition) recognition.lang = currentLang;
+              toast(`Idioma alterado para ${currentLang}`);
+              updateBlocks();
+              if(!document.getElementById('section-perguntas').classList.contains('hidden')){
+                loadDynamicBlocks();
+              }
             });
-          },400);
-        };
-
-        video.src=src+'?t='+Date.now();
-        setTimeout(cleanup,90000);
-      }
-      window.playTransition=playTransition;
-
-      /* ===== controle de orientação de vídeo ===== */
-      function lockVideoOrientation(){
-        const video=document.getElementById('videoTransicao');
-        if(!video) return;
-        video.addEventListener('webkitbeginfullscreen',(e)=>{
-          e.preventDefault();
-          video.exitFullscreen?.();
-        });
-        video.addEventListener('fullscreenchange',()=>{
-          if(document.fullscreenElement===video){
-            document.exitFullscreen?.();
           }
-        });
-        window.addEventListener('orientationchange',()=>{
-          video.style.transform='rotate(0deg)';
-        });
-        if(window.matchMedia('(orientation: portrait)').matches){
-          video.style.width='100vw';
-          video.style.height='auto';
-          video.style.maxHeight='100vh';
-        }
-      }
-
-      function generatePDF(){
-        const respostas=JSON.parse(localStorage.getItem('jornada_respostas')||'{}');
-        const doc={content:[]};
-        doc.content.push({text:'Jornada Essencial - Irmandade Conhecimento com Luz',style:{fontSize:20,bold:true,alignment:'center',margin:[0,0,0,20]}});
-        Object.keys(respostas).forEach((key,idx)=>{
-          const pergunta=document.querySelector(`.j-pergunta[data-pergunta="${idx}"] .pergunta-enunciado`)?.textContent||`Pergunta ${idx+1}`;
-          doc.content.push(
-            {text:pergunta,style:{fontSize:14,bold:true,margin:[0,10,0,5]}},
-            {text:respostas[key]||'Sem resposta',style:{fontSize:12,margin:[0,0,0,10]}}
-          );
-        });
-        if(window.pdfMake){
-          pdfMake.createPdf(doc).download('jornada_essencial.pdf');
-        } else {
-          toast('PDF não disponível.');
-        }
-      }
-
-      function startJourney(){
-        const senha=(document.getElementById('senha')?.value||'').trim().toLowerCase();
-        console.log('[startJourney] senha ignorada p/ debug');
-        ensureHeroFlame('section-guia');
-        showSection('section-guia');
-      }
-
-      function proceedToQuestions(){
-        isTransitioning=false;
-        showSection('section-perguntas');
-        loadDynamicBlocks();
-        const perguntas=document.querySelectorAll('.j-pergunta');
-        if(perguntas.length){
-          perguntas[0].classList.add('active');
-          const lbl=perguntas[0].querySelector('.pergunta-enunciado')?.textContent||'';
-          const ta=perguntas[0].querySelector('textarea');
-          ta.placeholder="Digite sua resposta...";
-          const aria=document.getElementById('aria-pergunta');
-          if(aria) aria.textContent=lbl;
-          if(ta) handleInput(ta);
-        }
-        updateProgress();
-      }
-
-      /* ===== Acessibilidade: Microfone e Áudio ===== */
-      let recognition=null;
-      let currentLang='pt-BR';
-      let isRecognizing=false;
-
-      function initAccessibility(){
-        if('SpeechRecognition' in window||'webkitSpeechRecognition' in window){
-          recognition=new(window.SpeechRecognition||window.webkitSpeechRecognition)();
-          recognition.continuous=false;
-          recognition.interimResults=false;
-          recognition.lang=currentLang;
-        } else {
-          toast('Seu navegador não suporta reconhecimento de voz.');
         }
 
-        document.addEventListener('click',(ev)=>{
-          if(!ev.target) return;
-          const btnMic=ev.target.closest('[data-action="start-mic"]');
-          const btnAudio=ev.target.closest('[data-action="read-question"]');
-          if(btnMic){
-            ev.preventDefault();
-            const ta=btnMic.closest('.j-pergunta')?.querySelector('textarea');
-            if(ta) startRecognition(ta,btnMic);
+        function startRecognition(textarea, btn){
+          if(!recognition || isRecognizing) return;
+          isRecognizing=true;
+          btn.classList.add('recording');
+          btn.textContent='Gravando...';
+          recognition.onresult=(event)=>{
+            const transcript=event.results[0][0].transcript;
+            typeAnswer(textarea,(textarea.value?textarea.value+' ':'')+transcript,36);
+            saveAnswers();
+            updateProgress();
+          };
+          recognition.onend=()=>{
+            isRecognizing=false;
+            btn.classList.remove('recording');
+            btn.textContent='🎤 Falar Resposta';
+          };
+          recognition.onerror=(event)=>{
+            toast('Erro no reconhecimento: '+event.error);
+            recognition.onend();
+          };
+          recognition.start();
+        }
+
+        function readAloud(text){
+          if('speechSynthesis' in window){
+            const utterance=new SpeechSynthesisUtterance(text);
+            utterance.lang=currentLang;
+            speechSynthesis.speak(utterance);
+          } else {
+            toast('Seu navegador não suporta síntese de voz.');
           }
-          if(btnAudio){
-            ev.preventDefault();
-            const enunciado=btnAudio.closest('.j-pergunta')?.querySelector('.pergunta-enunciado');
-            const text=enunciado?.textContent||'';
-            readAloudd(text);
+        }
 
-          }
+        function initJornada(){
+          document.addEventListener('input',(ev)=>{
+            const ta=ev.target.closest?.('.j-pergunta textarea');
+            if(ta) handleInput(ta);
+          });
+          document.addEventListener('focusin',(ev)=>{
+            if(ev.target && ev.target.matches('.j-pergunta textarea')){
+              if(__abortTypingPlaceholder) __abortTypingPlaceholder();
+            }
+          });
+          document.addEventListener('click',(ev)=>{
+            if(isTransitioning || !ev.target) return;
+            const aNext=ev.target.closest?.('[data-action="next"]');
+            const aStart=ev.target.closest?.('[data-action="start"]');
+            const aToggle=ev.target.closest?.('[data-action="toggle-password"], .password-toggle');
+            const aRestart=ev.target.closest?.('[data-action="restart"]');
+            const btnPDF=ev.target.closest?.('[data-action="generate-pdf"]');
+            const btnDownloadSelfie=ev.target.closest?.('[data-action="download-selfie"]');
+            const btnSkipSelfie=ev.target.closest?.('[data-action="skip-selfie"]');
+            const btnSendChat=ev.target.closest?.('[data-action="send-chat"]');
+            const btnSelectGuia=ev.target.closest?.('[data-action="select-guia"]');
+            const btnNextTermos=ev.target.closest?.('[data-action="next-termos"]');
+            const btnNextSenha=ev.target.closest?.('[data-action="next-senha"]');
+            const btnTermosNext=ev.target.closest?.('[data-action="termos-next"]');
+            const btnTermosPrev=ev.target.closest?.('[data-action="termos-prev"]');
 
-        });
+            if(aNext){ev.preventDefault(); goNext();}
+            if(aStart){ev.preventDefault(); startJourney();}
+            if(aToggle){ev.preventDefault(); toggleSenha();}
+            if(aRestart){ev.preventDefault(); localStorage.removeItem('jornada_respostas'); localStorage.removeItem('JORNADA_GUIA'); location.hash='#intro'; location.replace('/index.html');}
+            if(btnPDF){ev.preventDefault(); generatePDF();}
+            if(btnDownloadSelfie){
+              ev.preventDefault();
+              const dataURL=localStorage.getItem('IRMANDADE_SELFIE_FINAL');
+              if(dataURL){
+                const a=document.createElement('a');
+                a.href=dataURL;
+                a.download='jornada-selfie.png';
+                a.click();
+              } else {
+                toast('Nenhuma imagem disponível para download.');
+              }
+            }
+            if(btnSkipSelfie){ev.preventDefault(); proceedAfterSelfie();}
+            if(btnSendChat){ev.preventDefault(); sendChatMessage();}
+            if(btnSelectGuia){ev.preventDefault(); proceedAfterGuia(btnSelectGuia.dataset.guia);}
+            if(btnNextTermos){ev.preventDefault(); showSection('section-termos');}
+            if(btnNextSenha){ev.preventDefault(); showSection('section-senha');}
+            if(btnTermosNext){
+              ev.preventDefault();
+              document.getElementById('termos-pg1')?.classList.add('hidden');
+              document.getElementById('termos-pg2')?.classList.remove('hidden');
+            }
+            if(btnTermosPrev){
+              ev.preventDefault();
+              document.getElementById('termos-pg2')?.classList.add('hidden');
+              document.getElementById('termos-pg1')?.classList.remove('hidden');
+            }
+          },{capture:true});
 
-        const langSelect = document.getElementById('language-select');
-        if(langSelect){
-          langSelect.addEventListener('change', (ev) => {
-            currentLang = ev.target.value;
-            if(recognition) recognition.lang = currentLang;
-            toast(`Idioma alterado para ${currentLang}`);
-            updateBlocks();
-            if(!document.getElementById('section-perguntas').classList.contains('hidden')){
-              loadDynamicBlocks();
+          document.getElementById('grok-chat-input')?.addEventListener('keypress',(ev)=>{
+            if(ev.key==='Enter'){
+              ev.preventDefault();
+              sendChatMessage();
             }
           });
         }
-      }
 
-      function startRecognition(textarea, btn){
-        if(!recognition || isRecognizing) return;
-        isRecognizing=true;
-        btn.classList.add('recording');
-        btn.textContent='Gravando...';
-        recognition.onresult=(event)=>{
-          const transcript=event.results[0][0].transcript;
-          typeAnswer(textarea,(textarea.value?textarea.value+' ':'')+transcript,36);
-          saveAnswers();
-          updateProgress();
+        /* vídeos & blocos */
+        const VIDEO_BASE='/assets/img/';
+        window.JORNADA_VIDEOS={
+          intro:VIDEO_BASE+'filme-0-ao-encontro-da-jornada.mp4',
+          afterBlocks:{
+            0:VIDEO_BASE+'filme-1-entrando-na-jornada.mp4',
+            1:VIDEO_BASE+'filme-2-dentro-da-jornada.mp4',
+            2:VIDEO_BASE+'filme-3-traumas-na-jornada.mp4',
+            3:VIDEO_BASE+'filme-4-aproximando-do-final.mp4'
+          },
+          final:VIDEO_BASE+'filme-5-fim-da-jornada.mp4'
         };
-        recognition.onend=()=>{
-          isRecognizing=false;
-          btn.classList.remove('recording');
-          btn.textContent='🎤 Falar Resposta';
-        };
-        recognition.onerror=(event)=>{
-          toast('Erro no reconhecimento: '+event.error);
-          recognition.onend();
-        };
-        recognition.start();
-      }
+        window.JORNADA_FINAL_VIDEO=window.JORNADA_VIDEOS.final;
 
-      function readAloud(text){
-        if('speechSynthesis' in window){
-          const utterance=new SpeechSynthesisUtterance(text);
-          utterance.lang=currentLang;
-          speechSynthesis.speak(utterance);
-        } else {
-          toast('Seu navegador não suporta síntese de voz.');
+        const blockTranslations={
+          'pt-BR':[
+            {title:'Bloco 1 — Raízes',questions:[{label:'Quem é você hoje?'},{label:'O que te trouxe até esta jornada?'},{label:'Qual é o seu maior sonho espiritual?'}],video_after:VIDEO_BASE+'filme-1-entrando-na-jornada.mp4'},
+            {title:'Bloco 2 — Reflexões',questions:[{label:'Quais são seus maiores desafios atuais?'},{label:'Como você lida com o medo ou a dúvida?'},{label:'O que a "luz" significa para você?'}],video_after:VIDEO_BASE+'filme-2-dentro-da-jornada.mp4'},
+            {title:'Bloco 3 — Crescimento',questions:[{label:'O que você quer mudar na sua vida?'},{label:'Quem inspira você e por quê?'},{label:'Como você pratica gratidão no dia a dia?'}],video_after:VIDEO_BASE+'filme-3-traumas-na-jornada.mp4'},
+            {title:'Bloco 4 — Integração',questions:[{label:'Qual lição você leva dessa jornada?'},{label:'Como vai aplicar isso no futuro?'},{label:'Uma mensagem para seu eu futuro.'}],video_after:VIDEO_BASE+'filme-4-aproximando-do-final.mp4'}
+          ],
+          'en-US':[
+            {title:'Block 1 — Roots',questions:[{label:'Who are you today?'},{label:'What brought you to this journey?'},{label:'What is your greatest spiritual dream?'}],video_after:VIDEO_BASE+'filme-1-entrando-na-jornada.mp4'},
+            {title:'Block 2 — Reflections',questions:[{label:'What are your biggest current challenges?'},{label:'How do you deal with fear or doubt?'},{label:'What does "light" mean to you?'}],video_after:VIDEO_BASE+'filme-2-dentro-da-jornada.mp4'},
+            {title:'Block 3 — Growth',questions:[{label:'What do you want to change in your life?'},{label:'Who inspires you and why?'},{label:'How do you practice gratitude in your daily life?'}],video_after:VIDEO_BASE+'filme-3-traumas-na-jornada.mp4'},
+            {title:'Block 4 — Integration',questions:[{label:'What lesson do you take from this journey?'},{label:'How will you apply this in the future?'},{label:'A message to your future self.'}],video_after:VIDEO_BASE+'filme-4-aproximando-do-final.mp4'}
+          ],
+          'es-ES':[
+            {title:'Bloque 1 — Raíces',questions:[{label:'¿Quién eres hoy?'},{label:'¿Qué te trajo a este viaje?'},{label:'¿Cuál es tu mayor sueño espiritual?'}],video_after:VIDEO_BASE+'filme-1-entrando-na-jornada.mp4'},
+            {title:'Bloque 2 — Reflexiones',questions:[{label:'¿Cuáles son tus mayores desafíos actuales?'},{label:'¿Cómo lidias con el miedo o la duda?'},{label:'¿Qué significa la "luz" para ti?'}],video_after:VIDEO_BASE+'filme-2-dentro-da-jornada.mp4'},
+            {title:'Bloque 3 — Crecimiento',questions:[{label:'¿Qué quieres cambiar en tu vida?'},{label:'¿Quién te inspira y por qué?'},{label:'¿Cómo practicas la gratitud en el día a día?'}],video_after:VIDEO_BASE+'filme-3-traumas-na-jornada.mp4'},
+            {title:'Bloque 4 — Integración',questions:[{label:'¿Qué lección te llevas de este viaje?'},{label:'¿Cómo lo aplicarás en el futuro?'},{label:'Un mensaje para tu yo futuro.'}],video_after:VIDEO_BASE+'filme-4-aproximando-do-final.mp4'}
+          ]
+        };
+
+        function updateBlocks(){
+          window.JORNADA_BLOCKS=blockTranslations[currentLang]||blockTranslations['pt-BR'];
         }
-      }
 
-      function initJornada(){
-        document.addEventListener('input',(ev)=>{
-          const ta=ev.target.closest?.('.j-pergunta textarea');
-          if(ta) handleInput(ta);
-        });
-        document.addEventListener('focusin',(ev)=>{
-          if(ev.target && ev.target.matches('.j-pergunta textarea')){
-            if(__abortTypingPlaceholder) __abortTypingPlaceholder();
-          }
-        });
-        document.addEventListener('click',(ev)=>{
-          if(isTransitioning || !ev.target) return;
-          const aNext=ev.target.closest?.('[data-action="next"]');
-          const aStart=ev.target.closest?.('[data-action="start"]');
-          const aToggle=ev.target.closest?.('[data-action="toggle-password"], .password-toggle');
-          const aRestart=ev.target.closest?.('[data-action="restart"]');
-          const btnPDF=ev.target.closest?.('[data-action="generate-pdf"]');
-          const btnDownloadSelfie=ev.target.closest?.('[data-action="download-selfie"]');
-          const btnSkipSelfie=ev.target.closest?.('[data-action="skip-selfie"]');
-          const btnSendChat=ev.target.closest?.('[data-action="send-chat"]');
-          const btnSelectGuia=ev.target.closest?.('[data-action="select-guia"]');
-          const btnNextTermos=ev.target.closest?.('[data-action="next-termos"]');
-          const btnNextSenha=ev.target.closest?.('[data-action="next-senha"]');
-          const btnTermosNext=ev.target.closest?.('[data-action="termos-next"]');
-          const btnTermosPrev=ev.target.closest?.('[data-action="termos-prev"]');
-
-          if(aNext){ev.preventDefault(); goNext();}
-          if(aStart){ev.preventDefault(); startJourney();}
-          if(aToggle){ev.preventDefault(); toggleSenha();}
-          if(aRestart){ev.preventDefault(); localStorage.removeItem('jornada_respostas'); localStorage.removeItem('JORNADA_GUIA'); location.hash='#intro'; location.replace('/index.html');}
-          if(btnPDF){ev.preventDefault(); generatePDF();}
-          if(btnDownloadSelfie){
-            ev.preventDefault();
-            const dataURL=localStorage.getItem('IRMANDADE_SELFIE_FINAL');
-            if(dataURL){
-              const a=document.createElement('a');
-              a.href=dataURL;
-              a.download='jornada-selfie.png';
-              a.click();
-            } else {
-              toast('Nenhuma imagem disponível para download.');
-            }
-          }
-          if(btnSkipSelfie){ev.preventDefault(); proceedAfterSelfie();}
-          if(btnSendChat){ev.preventDefault(); sendChatMessage();}
-          if(btnSelectGuia){ev.preventDefault(); proceedAfterGuia(btnSelectGuia.dataset.guia);}
-          if(btnNextTermos){ev.preventDefault(); showSection('section-termos');}
-          if(btnNextSenha){ev.preventDefault(); showSection('section-senha');}
-          if(btnTermosNext){
-            ev.preventDefault();
-            document.getElementById('termos-pg1')?.classList.add('hidden');
-            document.getElementById('termos-pg2')?.classList.remove('hidden');
-          }
-          if(btnTermosPrev){
-            ev.preventDefault();
-            document.getElementById('termos-pg2')?.classList.add('hidden');
-            document.getElementById('termos-pg1')?.classList.remove('hidden');
-          }
-        },{capture:true});
-
-        document.getElementById('grok-chat-input')?.addEventListener('keypress',(ev)=>{
-          if(ev.key==='Enter'){
-            ev.preventDefault();
-            sendChatMessage();
-          }
-        });
-      }
-
-      /* vídeos & blocos */
-      const VIDEO_BASE='/assets/img/';
-      window.JORNADA_VIDEOS={
-        intro:VIDEO_BASE+'filme-0-ao-encontro-da-jornada.mp4',
-        afterBlocks:{
-          0:VIDEO_BASE+'filme-1-entrando-na-jornada.mp4',
-          1:VIDEO_BASE+'filme-2-dentro-da-jornada.mp4',
-          2:VIDEO_BASE+'filme-3-traumas-na-jornada.mp4',
-          3:VIDEO_BASE+'filme-4-aproximando-do-final.mp4'
-        },
-        final:VIDEO_BASE+'filme-5-fim-da-jornada.mp4'
-      };
-      window.JORNADA_FINAL_VIDEO=window.JORNADA_VIDEOS.final;
-
-      const blockTranslations={
-        'pt-BR':[
-          {title:'Bloco 1 — Raízes',questions:[{label:'Quem é você hoje?'},{label:'O que te trouxe até esta jornada?'},{label:'Qual é o seu maior sonho espiritual?'}],video_after:VIDEO_BASE+'filme-1-entrando-na-jornada.mp4'},
-          {title:'Bloco 2 — Reflexões',questions:[{label:'Quais são seus maiores desafios atuais?'},{label:'Como você lida com o medo ou a dúvida?'},{label:'O que a "luz" significa para você?'}],video_after:VIDEO_BASE+'filme-2-dentro-da-jornada.mp4'},
-          {title:'Bloco 3 — Crescimento',questions:[{label:'O que você quer mudar na sua vida?'},{label:'Quem inspira você e por quê?'},{label:'Como você pratica gratidão no dia a dia?'}],video_after:VIDEO_BASE+'filme-3-traumas-na-jornada.mp4'},
-          {title:'Bloco 4 — Integração',questions:[{label:'Qual lição você leva dessa jornada?'},{label:'Como vai aplicar isso no futuro?'},{label:'Uma mensagem para seu eu futuro.'}],video_after:VIDEO_BASE+'filme-4-aproximando-do-final.mp4'}
-        ],
-        'en-US':[
-          {title:'Block 1 — Roots',questions:[{label:'Who are you today?'},{label:'What brought you to this journey?'},{label:'What is your greatest spiritual dream?'}],video_after:VIDEO_BASE+'filme-1-entrando-na-jornada.mp4'},
-          {title:'Block 2 — Reflections',questions:[{label:'What are your biggest current challenges?'},{label:'How do you deal with fear or doubt?'},{label:'What does "light" mean to you?'}],video_after:VIDEO_BASE+'filme-2-dentro-da-jornada.mp4'},
-          {title:'Block 3 — Growth',questions:[{label:'What do you want to change in your life?'},{label:'Who inspires you and why?'},{label:'How do you practice gratitude in your daily life?'}],video_after:VIDEO_BASE+'filme-3-traumas-na-jornada.mp4'},
-          {title:'Block 4 — Integration',questions:[{label:'What lesson do you take from this journey?'},{label:'How will you apply this in the future?'},{label:'A message to your future self.'}],video_after:VIDEO_BASE+'filme-4-aproximando-do-final.mp4'}
-        ],
-        'es-ES':[
-          {title:'Bloque 1 — Raíces',questions:[{label:'¿Quién eres hoy?'},{label:'¿Qué te trajo a este viaje?'},{label:'¿Cuál es tu mayor sueño espiritual?'}],video_after:VIDEO_BASE+'filme-1-entrando-na-jornada.mp4'},
-          {title:'Bloque 2 — Reflexiones',questions:[{label:'¿Cuáles son tus mayores desafíos actuales?'},{label:'¿Cómo lidias con el miedo o la duda?'},{label:'¿Qué significa la "luz" para ti?'}],video_after:VIDEO_BASE+'filme-2-dentro-da-jornada.mp4'},
-          {title:'Bloque 3 — Crecimiento',questions:[{label:'¿Qué quieres cambiar en tu vida?'},{label:'¿Quién te inspira y por qué?'},{label:'¿Cómo practicas la gratitud en el día a día?'}],video_after:VIDEO_BASE+'filme-3-traumas-na-jornada.mp4'},
-          {title:'Bloque 4 — Integración',questions:[{label:'¿Qué lección te llevas de este viaje?'},{label:'¿Cómo lo aplicarás en el futuro?'},{label:'Un mensaje para tu yo futuro.'}],video_after:VIDEO_BASE+'filme-4-aproximando-do-final.mp4'}
-        ]
-      };
-
-      function updateBlocks(){
-        window.JORNADA_BLOCKS=blockTranslations[currentLang]||blockTranslations['pt-BR'];
-      }
-
-      /* boot */
-      ensureHeaderFlame();
-      ensurePageFlames();
-      runTyping();
-      initJornada();
-      showSection('section-intro');
-      updateBlocks();
-      lockVideoOrientation();
-    })();
-  </script>
+        /* boot */
+        ensureHeaderFlame();
+        ensurePageFlames();
+        runTyping();
+        initJornada();
+        showSection('section-intro');
+        updateBlocks();
+        lockVideoOrientation();
+      })();
+    </script>
 </body>
 </html>
