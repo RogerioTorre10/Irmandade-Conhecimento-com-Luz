@@ -62,7 +62,7 @@
     /* Selfie */
     .selfie-row{display:grid;grid-template-columns:1fr 1.3fr;gap:16px;align-items:start}
     .selfie-left .selfie-controls{display:flex;flex-direction:column;gap:10px;margin:12px 0}
-    .selfie-left label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:18px}
+    .selfie-left label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:18px;color:#fff;background:#000;padding:12px;border-radius:8px}
     .selfie-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
     .muted{color:var(--ink-soft);font-size:16px}
     .selfie-right{position:relative}
@@ -81,19 +81,14 @@
       pointer-events:none;
     }
     .flame-svg{
-      width: 40%; height: 60%;
-      transform: translateY(6%);
+      width: 48%; height: 72%;
+      transform: translateY(30%);
       filter: drop-shadow(0 8px 28px rgba(255,180,0,.45));
     }
     .guide-name{
       position:absolute; top:3.5%; left:0; right:0; text-align:center;
       font-family: "Cardo", serif; font-weight:700; letter-spacing:.06em;
       font-size: clamp(28px, 5vw, 56px); color:#f7d37a; text-shadow:0 2px 8px rgba(0,0,0,.4);
-    }
-    .user-name{
-      position:absolute; bottom:4.5%; left:0; right:0; text-align:center;
-      font-family:"Cardo", serif; font-weight:700; letter-spacing:.06em;
-      font-size: clamp(26px, 4.6vw, 52px); color:#f6cf6a; text-shadow:0 2px 8px rgba(0,0,0,.4);
     }
     .controls{
       position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
@@ -105,33 +100,32 @@
       font: 500 14px/1.2 system-ui, sans-serif; padding:.55rem .7rem; border-radius:10px; border:0;
     }
     .controls button{ cursor:pointer; }
-    #selfieError{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:18px;text-align:center;padding:10px;background:rgba(0,0,0,0.7);border-radius:8px;display:none}
+    #selfieError{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:18px;text-align:center;padding:10px;background:#000;border-radius:8px;display:none}
     @media (max-width:860px){
       .selfie-row{grid-template-columns:1fr}
       .selfie-right{max-width:100%;margin-top:16px}
       .guide-card{max-width:100%}
-      .flame-svg{width:50%;height:50%}
+      .flame-svg{width:60%;height:60%}
       .guide-name{font-size: clamp(20px, 4vw, 36px)}
-      .user-name{font-size: clamp(18px, 3.6vw, 32px)}
     }
 
     /* Escolha do guia */
-    .guia-container{margin-top:20px;padding:10px;border:1px solid #d1d5db;border-radius:8px;background:var(--panel);text-align:center}
-    .guia-container p{font-size:18px}
+    .guia-container{margin-top:20px;padding:10px;border:1px solid #d1d5db;border-radius:8px;background:#000;color:#fff;text-align:center}
+    .guia-container p{font-size:18px;color:#fff}
     .guia-options{display:flex;gap:10px;justify-content:center;margin-top:12px}
     .guia-options button{padding:8px 16px;font-size:18px}
     .guia-name-input{margin:12px 0}
-    .guia-name-input label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:18px}
+    .guia-name-input label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:18px;color:#fff;background:#000;padding:12px;border-radius:8px}
     .guia-name-input input{padding:12px;border-radius:8px;border:1px solid #d1d5db;font-family:"Cardo",serif;font-size:18px}
 
     /* Chat */
-    .grok-chat-container{display:none}
-    .grok-chat-message.grok{background:transparent;text-align:left;font-size:18px;white-space:pre-wrap;position:relative}
+    .grok-chat-container{display:none;background:#000;color:#fff;padding:16px;border-radius:8px}
+    .grok-chat-message.grok{background:transparent;text-align:left;font-size:18px;white-space:pre-wrap;position:relative;color:#fff}
     .grok-chat-message.grok::after{content:"▌";margin-left:2px;opacity:.75;animation:lumenBlink 1s steps(2,end) infinite}
     .grok-chat-message.grok.typing-done::after{content:"";animation:none}
     .grok-chat-input{display:none}
-    .devolutiva-container{margin-top:16px;padding:16px;border-radius:8px;background:rgba(255,255,255,.1);font-family:"Cardo",serif;font-size:18px}
-    .devolutiva-container p{margin:0}
+    .devolutiva-container{margin-top:16px;padding:16px;border-radius:8px;background:#000;color:#fff;font-family:"Cardo",serif;font-size:18px}
+    .devolutiva-container p{margin:0;color:#fff}
 
     /* Pergaminho */
     .pergaminho-v{background:var(--panel) url('/assets/img/pergaminho-rasgado-vert.png') no-repeat center/cover!important;min-height:82vh!important}
@@ -139,11 +133,11 @@
     .pergaminho-h.fallback{background:var(--panel) url('/assets/img/pergaminho-rasgado-vert.png') no-repeat center/cover!important}
     .conteudo-pergaminho{background:transparent!important;position:relative;z-index:10;padding:20px;min-height:100%;overflow:visible;color:#fff;box-sizing:border-box;max-width:100%}
     .conteudo-pergaminho h2,.conteudo-pergaminho h3,.conteudo-pergaminho .pergunta-enunciado{color:#fff;text-shadow:0 0 10px hsla(28,96%,60%,.7);font-size:24px}
-    .conteudo-pergaminho p,.conteudo-pergaminho small{font-size:18px}
+    .conteudo-pergaminho p,.conteudo-pergaminho small{font-size:18px;color:#fff}
     @media (max-width:600px){
       .conteudo-pergaminho{padding:16px}
       .conteudo-pergaminho h2,.conteudo-pergaminho h3{font-size:20px}
-      .conteudo-pergaminho p,.conteudo-pergaminho li,.conteudo-pergaminho small{font-size:16px;line-height:1.5}
+      .conteudo-pergaminho p,.conteudo-pergaminho li,.conteudo-pergaminho small{font-size:16px;line-height:1.5;color:#fff}
       .conteudo-pergaminho ul{padding-left:20px}
     }
 
@@ -202,7 +196,7 @@
     .j-pergunta{margin-bottom:24px;display:none;z-index:6;position:relative}
     .j-pergunta.active{display:block}
     .pergunta-enunciado{display:block;margin-bottom:6px;font-family:"Berkshire Swash",cursive;font-size:22px;color:#fff}
-    .j-pergunta textarea{width:100%;padding:12px;border-radius:8px;border:1px solid #d1d5db;background:rgba(255,255,255,.85);resize:vertical;min-height:100px;font-family:"Cardo",serif;font-size:18px;line-height:1.45}
+    .j-pergunta textarea{width:100%;padding:12px;border-radius:8px;border:1px solid #d1d5db;background:#000;color:#fff;resize:vertical;min-height:100px;font-family:"Cardo",serif;font-size:18px;line-height:1.45}
 
     /* Acessibilidade: Microfone e Áudio */
     .accessibility-controls { display: flex; gap: 10px; margin-top: 8px; }
@@ -212,10 +206,10 @@
 
     /* Seletor de Idioma */
     .language-selector { position: absolute; top: 10px; right: 10px; z-index: 100; }
-    .language-selector select { padding: 8px; font-size: 16px; border-radius: 8px; }
+    .language-selector select { padding: 8px; font-size: 16px; border-radius: 8px; background:#000;color:#fff }
 
     /* Vídeo overlay */
-    #videoOverlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,.95);display:flex;justify-content:center;align-items:center;z-index:2000}
+    #videoOverlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;display:flex;justify-content:center;align-items:center;z-index:2000}
     #videoOverlay.hidden{display:none}
     .video-player{width:100vw;height:100vh;object-fit:contain;background:#000;transform:rotate(0deg)}
     @media (orientation: portrait){
@@ -226,8 +220,8 @@
     .site-footer{text-align:center;padding:14px;color:var(--ink-soft);font-size:18px}
     .password-form{margin-top:16px;text-align:center}
     .password-input{position:relative}
-    .password-input input{width:100%;padding:12px;border-radius:8px;border:1px solid #d1d5db;font-family:"Cardo",serif;font-size:18px}
-    .password-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px}
+    .password-input input{width:100%;padding:12px;border-radius:8px;border:1px solid #d1d5db;font-family:"Cardo",serif;font-size:18px;background:#000;color:#fff}
+    .password-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;color:#fff}
 
     .section-container{position:relative;min-height:85vh}
     .hidden{display:none!important}
@@ -365,7 +359,6 @@
                 <label class="btn" for="selfieInput">📸 Tirar Foto</label>
                 <input id="selfieInput" type="file" accept="image/*" capture="user" style="display:none" />
                 <div class="selfie-controls">
-                  <label>Nome <input id="nameInput" type="text" placeholder="Digite seu nome"></label>
                   <label>Zoom <input id="selfieScale" type="range" min="0.8" max="2.5" step="0.01" value="1"></label>
                   <label>Horizontal <input id="selfieOffsetX" type="range" min="-50" max="50" step="1" value="0"></label>
                   <label>Vertical <input id="selfieOffsetY" type="range" min="-50" max="50" step="1" value="0"></label>
@@ -399,7 +392,6 @@
                     </svg>
                   </div>
                   <div class="guide-name" id="guideNameSlot"></div>
-                  <div class="user-name" id="userNameSlot">NOME</div>
                 </section>
                 <div id="selfieError" class="selfie-error">Erro ao carregar a pré-visualização. Tente novamente ou pule.</div>
                 <small class="muted">Pré-visualização</small>
@@ -623,7 +615,6 @@
         const $=s=>document.querySelector(s);
         const card=$("#card-guide");
         const guideNameEl=$("#guideNameSlot");
-        const userNameEl=$("#userNameSlot");
         const flameLayer=$("#card-guide .flame-layer");
         const selfieImg=$("#selfieImage");
         const bgImg=$("#guideBg");
@@ -668,21 +659,9 @@
           const baseH=90*scale;
           selfieImg.setAttribute('x',baseX);
           selfieImg.setAttribute('y',baseY);
-          selfieImg.setAttribute('width',baseW);
+          selfi
+eImg.setAttribute('width',baseW);
           selfieImg.setAttribute('height',baseH);
-        }
-
-        function syncNameInput(){
-          const storedName=localStorage.getItem('JORNADA_NOME')||'';
-          if(storedName){
-            nameInput.value=storedName;
-            userNameEl.textContent=storedName.toUpperCase()||'NOME';
-          }
-          nameInput.addEventListener('input',()=>{
-            const name=nameInput.value.trim();
-            userNameEl.textContent=name.toUpperCase()||'NOME';
-            localStorage.setItem('JORNADA_NOME',name);
-          });
         }
 
         scaleInput.addEventListener('input',updatePreview);
@@ -740,7 +719,7 @@
           ctx.drawImage(bg,0,0,canvas.width,canvas.height);
 
           const W=canvas.width,H=canvas.height;
-          const fw=0.40*W,fh=0.60*H,fx=(W-fw)/2,fy=(H-fh)/2+0.06*H;
+          const fw=0.48*W,fh=0.72*H,fx=(W-fw)/2,fy=(H-fh)/2+0.30*H;
 
           const grad=ctx.createRadialGradient(fx+fw/2,fy+fh*0.65,fh*0.02,fx+fw/2,fy+fh*0.65,fh*0.55);
           grad.addColorStop(0,'rgba(255,224,130,1)');
@@ -793,9 +772,6 @@
           ctx.font=`bold ${Math.round(W*0.075)}px Cardo, serif`;
           ctx.textBaseline='top';
           ctx.fillText(card.dataset.guide,W/2,H*0.035);
-          const userName=(nameInput.value.trim()||'NOME').toUpperCase();
-          ctx.font=`bold ${Math.round(W*0.068)}px Cardo, serif`;
-          ctx.fillText(userName,W/2,H*0.955);
 
           const dataURL=canvas.toDataURL('image/png');
           try{
@@ -812,7 +788,6 @@
         });
 
         loadBg();
-        syncNameInput();
       })();
 
       /* ===== chat com guia ===== */
@@ -1282,7 +1257,7 @@
         }
         window.playTransition=playTransition;
 
-        /* ===== controle de orientação de vídeo ===== */
+               /* ===== controle de orientação de vídeo ===== */
         function lockVideoOrientation(){
           const video=document.getElementById('videoTransicao');
           if(!video) return;
