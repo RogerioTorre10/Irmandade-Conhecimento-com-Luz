@@ -365,7 +365,7 @@
         <!-- GUIA -->
         <div id="section-guia" class="j-section hidden">
           <div class="conteudo-pergaminho">
-            <h2 style="margin-top:0;">Escolha seu Guia ✨</h2>
+            <h2 style="margin-top:0;">Escolha seu Guia</h2>
             <div class="guia-container">
               <p data-typing data-text="Zion (Grok): Curioso e direto, busca respostas profundas com visão cósmica." data-speed="50" data-cursor="true"></p>
               <p data-typing data-text="Lumen (ChatGPT): Acolhedor e reflexivo, guia com empatia e clareza." data-speed="50" data-cursor="true"></p>
@@ -386,11 +386,11 @@
         <!-- SELFIE -->
         <div id="section-selfie" class="j-section hidden">
           <div class="conteudo-pergaminho">
-            <h2 style="margin-top:0;">Entre na Irmandade ✨</h2>
+            <h2 style="margin-top:0;">Entre na Irmandade</h2>
             <p data-typing data-text="Faça uma foto ou envie da galeria. Ajuste e gere sua imagem com seu guia." data-speed="50" data-cursor="true"></p>
             <div class="selfie-row">
               <div class="selfie-left">
-                <label class="btn" for="selfieInput">📸 Tirar Foto</label>
+                <label class="btn" for="selfieInput">Tirar Foto</label>
                 <input id="selfieInput" type="file" accept="image/*" capture="user" style="display:none" />
                 <div class="selfie-controls">
                   <label>Zoom <input id="selfieScale" type="range" min="0.8" max="2.5" step="0.01" value="1"></label>
@@ -399,9 +399,9 @@
                   <small class="muted" data-typing data-text="Dica: alinhe seu rosto na chama ao lado do guia." data-speed="50" data-cursor="true"></small>
                 </div>
                 <div class="selfie-actions">
-                  <button id="previewBtn" class="btn">✨ Ver Prévia</button>
-                  <button id="captureBtn" class="btn">⬇️ Confirmar e Baixar</button>
-                  <button id="btnSkipSelfie" class="btn" data-action="skip-selfie">Pular Foto</button>
+                  <button id="previewBtn" class="btn">Ver Prévia</button>
+                  <button id="captureBtn" class="btn">Confirmar e Baixar</button>
+                  <button id="btnSkipSelfie" class="btn" data-action="skip-selfie">Pular Foto/Iniciar</button>
                 </div>
               </div>
               <div class="selfie-right">
@@ -539,7 +539,7 @@
             el.dataset.typed = '1';
             const nextEl = el.nextElementSibling;
             if(nextEl && nextEl.hasAttribute('data-typing') && !nextEl.dataset.typed) {
-              runTyping(nextEl);
+              typeWriter(nextEl, nextEl.getAttribute('data-text') || nextEl.textContent || '', parseInt(nextEl.getAttribute('data-speed') || '26', 10), String(nextEl.getAttribute('data-cursor') || 'true') === 'true');
             }
           }
         })();
@@ -551,7 +551,6 @@
           const t = firstEl.getAttribute('data-text') || firstEl.textContent || '';
           const spd = parseInt(firstEl.getAttribute('data-speed') || '26', 10);
           const cur = String(firstEl.getAttribute('data-cursor') || 'true') === 'true';
-          firstEl.dataset.typed = '1';
           typeWriter(firstEl, t, spd, cur);
           if(!window.isMuted && !firstEl.closest('textarea')) readAloud(t, (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
         }
@@ -721,7 +720,7 @@
           if(!f) return;
           if(selfieURL) URL.revokeObjectURL(selfieURL);
           selfieURL = URL.createObjectURL(f);
-          selfieImg.setAttribute('href', selfieURL);
+          selfieImg.setAttribute('href', selfi eURL);
           if(errorDiv) errorDiv.style.display = 'none';
           updatePreview();
         });
@@ -1097,6 +1096,17 @@
         if(firstTa && typeof handleInput === 'function') handleInput(firstTa);
         initAccessibility();
       };
+
+      (function() {
+        const prevGoNext = window.goNext;
+        window.goNext = function() {
+          if(typeof prevGoNext === 'function') prevGoNext();
+          const active = document.querySelector('.j-pergunta.active');
+          if(active && window.runTyping) window.runTyping(active);
+          const lbl = active?.querySelector('.pergunta-enunciado')?.textContent || '';
+          if(!window.isMuted && lbl) readAloud(lbl, (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
+        };
+      })();
 
       /* ===== controles ===== */
       function analyzeSentiment(text) {
@@ -1596,7 +1606,7 @@
         ],
         'es-ES': [
           { title: 'Bloque 1 — Raíces', questions: [{ label: '¿Quién eres hoy?' }, { label: '¿Qué te trajo a este viaje?' }, { label: '¿Cuál es tu mayor sueño espiritual?' }], video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4' },
-          { title: 'Bloque 2 — Reflexiones', questions: [{ label: '¿Cuáles son tus mayores desafíos actuales?' }, { label: '¿Cómo lidias con el miedo o la duda?' }, { label: '¿Qué significa la "luz" para ti?' }], video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4' },
+          { title: 'Bloque 2 — Reflexiones', questions: [{ label: '¿Cuáles son tus mayores desafíos actuales?' }, { label: '¿Cómo lidias con el miedo o la dúvida?' }, { label: '¿Qué significa la "luz" para ti?' }], video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4' },
           { title: 'Bloque 3 — Crecimiento', questions: [{ label: '¿Qué quieres cambiar en tu vida?' }, { label: '¿Quién te inspira y por qué?' }, { label: '¿Cómo practicas la gratitud en el día a día?' }], video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4' },
           { title: 'Bloque 4 — Integración', questions: [{ label: '¿Qué lección te llevas de este viaje?' }, { label: '¿Cómo lo aplicarás en el futuro?' }, { label: 'Un mensaje para tu yo futuro.' }], video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4' }
         ]
@@ -1609,7 +1619,6 @@
       /* boot */
       ensureHeaderFlame();
       ensurePageFlames();
-      runTyping(document.getElementById('section-intro'));
       initJornada();
       showSection('section-intro');
       updateBlocks();
