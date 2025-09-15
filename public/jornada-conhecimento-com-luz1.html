@@ -915,124 +915,96 @@
         input.value = '';
       }
 
-            /* ===== devolutiva da API ===== */
-      async function fetchDevolutiva(pergunta, resposta, guia, maxRetries = 3, retryDelay = 1000) {
-        const guiaConfigs = window.guiaConfigs || {
-          zion: { apiUrl: 'https://zion-backend-api.onrender.com/v1/chat', model: 'grok', voice: 'male' },
-          lumen: { apiUrl: 'https://lumen-backend-api.onrender.com/v1/chat', model: 'gpt-5', voice: 'female' },
-          arian: { apiUrl: 'https://arion-backend-api.onrender.com/v1/chat', model: 'gemini', voice: 'female' }
-        };
-        const cfg = guiaConfigs[guia] || guiaConfigs.lumen;
+           <script>
+// ---- util: remove duplicações de letras e espaços ----
+function dedupe(s=''){
+  return s
+    .normalize('NFC')
+    .replace(/([\p{L}\p{N}])\1+/gu, '$1')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
 
-        for (let attempt = 1; attempt <= maxRetries; attempt++) {
-          try {
-            const system = `Você é ${guia === 'zion' ? 'Zion (Grok)' : guia === 'arian' ? 'Arian (Gemini)' : 'Lumen (ChatGPT)'} guiando a Jornada. Forneça uma devolutiva acolhedora, reflexiva e simbólica para a resposta do usuário à pergunta "${pergunta}".`;
-            console.log(`[Devolutiva] Tentativa ${attempt} para pergunta: "${pergunta}"`);
-            const resp = await fetch(cfg.apiUrl, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                model: cfg.model,
-                messages: [
-                  { role: 'system', content: system },
-                  { role: 'user', content: resposta }
-                ],
-                temperature: 0.7
-              })
-            });
-           
-     
-            // --- evita aplicar o datilógrafo duas vezes no mesmo elemento
-            function typeTextOnce(el, text, speed=24){
-          if (el.dataset.typerApplied === '1') return;
-          el.dataset.typerApplied = '1';
-          el.textContent = '';
-          let i = 0;
-          const timer = setInterval(()=>{
-          el.textContent += text[i] || '';
-          i++;
-          if (i >= text.length) clearInterval(timer);
-          }, speed);
-        }
+// ---- rotas candidatas p/ fallback ----
+const CHAT_PATHS = [
+  '/v1/chat',
+  '/v1/chat/completions',
+  '/v1/completions',
+  '/chat',
+  '/chat/completions'
+];
 
-      // --- dedupe seguro: remove duplicações de letras/números e espaços extras (preserva "..." e "!!")
-          function dedupe(str=''){
-          return str
-          .normalize('NFC')
-          .replace(/([\p{L}\p{N}])\1+/gu, '$1')
-          .replace(/\s{2,}/g, ' ')
-          .trim();
-      }
+// ---- bases e modelos padrão (caso não venham via window.guiaConfigs) ----
+const GUIDE_BASES = {
+  lumen: 'https://lumen-backend-api.onrender.com',
+  zion:  'https://zion-backend-api.onrender.com',
+  arian: 'https://arion-backend-api.onrender.com'
+};
+const GUIDE_MODELS = {
+  lumen: 'gpt-5',
+  zion:  'grok',
+  arian: 'gemini'
+};
 
-      // --- tentativa com fallback em múltiplos endpoints (resolve 404 rápido)
-         async function fetchDevolutivaChat(payload, base='https://lumen-backend-api.onrender.com'){
-         const candidates = [
-         '/v1/chat',
-         '/v1/chat/completions',
-         '/v1/completions',
-         '/chat',
-         '/chat/completions'
-      ];
-      let lastErr;
-      for (const path of candidates) {
+/* ===== devolutiva da API ===== */
+async function fetchDevolutiva(pergunta, resposta, guia, maxRetries = 3, retryDelay = 1000) {
+  const g = (guia || 'lumen').toLowerCase();
+
+  // pega config do global (se existir) ou defaults
+  const cfgWin = (window.guiaConfigs && window.guiaConfigs[g]) || {};
+  const rawBase = cfgWin.apiUrlBase || cfgWin.apiUrl || GUIDE_BASES[g] || GUIDE_BASES.lumen;
+
+  // se veio um apiUrl já com /v1/chat etc, removo o sufixo p/ usar fallback
+  const base = (rawBase || '').replace(/\/(v1\/chat|v1\/chat\/completions|v1\/completions|chat|chat\/completions)\/?$/,'');
+  const model = cfgWin.model || GUIDE_MODELS[g] || GUIDE_MODELS.lumen;
+
+  const quem = g === 'zion' ? 'Zion (Grok)' : (g === 'arian' ? 'Arian (Gemini)' : 'Lumen (ChatGPT)');
+  const payload = {
+    model,
+    messages: [
+      { role: 'system', content: `Você é ${quem} guiando a Jornada. Forneça uma devolutiva acolhedora, reflexiva e simbólica.` },
+      { role: 'user',   content: `Pergunta: ${dedupe(pergunta)}\nResposta: ${resposta ?? '(vazia)'}` }
+    ],
+    temperature: 0.7,
+    meta: { guia: g.toUpperCase() }
+  };
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    console.log(`[Devolutiva] Tentativa ${attempt} para pergunta: "${dedupe(pergunta)}"`);
+    for (const path of CHAT_PATHS) {
       try {
-      const r = await fetch(base + path, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(payload),
-        mode: 'cors',
-        credentials: 'omit'
-      });
-      if (r.ok) return await r.json();
-      lastErr = new Error(`HTTP ${r.status} @ ${path}`);
-      if (r.status !== 404) break; // só tenta próximo se for 404
-    } catch(e){ lastErr = e; }
-    }
-      throw lastErr || new Error('Falha ao chamar chat');
-    }
-
-      // --- uso (exemplo): limpar pergunta antes de enviar
-      async function pedirDevolutiva(pergunta, respostaDoUsuario, guia='LUMEN'){
-      const perguntaLimpa = dedupe(pergunta);
-      const payload = {
-      model: 'gpt-5',
-      messages: [
-      { role: 'system', content: `Você é Lumen guiando a Jornada. Seja acolhedor, simbólico e breve.` },
-      { role: 'user', content: `Pergunta: ${perguntaLimpa}\nResposta: ${respostaDoUsuario || '(vazia)'}` }
-       ],
-       temperature: 0.7,
-       meta: { guia }
-      };
-      const data = await fetchDevolutivaChat(payload);
-      // adapte conforme seu backend retornar {content: "..."} ou {choices:[{message:{content}}]}
-      const txt = data?.content
-           || data?.choices?.[0]?.message?.content
-           || 'Senti sua chama, siga em frente com fé.';
-      return txt;
-     }
-
-            if (!resp.ok) {
-              throw new Error(`API falhou: ${resp.status} (${resp.statusText})`);
-            }
-
-            const data = await resp.json();
-            const devolutiva = data?.choices?.[0]?.message?.content || data?.message?.content || 'Obrigado por compartilhar. Sua reflexão ilumina o caminho.';
-            console.log('[Devolutiva] Sucesso:', devolutiva);
-            if (!window.isMuted) readAloud(devolutiva, cfg.voice);
-            return devolutiva;
-          } catch (e) {
-            console.error(`[Devolutiva] Tentativa ${attempt} falhou:`, e.message);
-            if (attempt === maxRetries) {
-              const errorMsg = `Não consegui conectar ao guia ${guia}. O endpoint "${cfg.apiUrl}" retornou erro ${e.message}. Continue sua jornada!`;
-              console.error('[Devolutiva] Todas as tentativas falharam');
-              toast(errorMsg);
-              if (!window.isMuted) readAloud(errorMsg, cfg.voice);
-              return errorMsg;
-            }
-            await new Promise(resolve => setTimeout(resolve, retryDelay));
-          }
+        const r = await fetch(`${base}${path}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          mode: 'cors',
+          credentials: 'omit'
+        });
+        if (r.ok) {
+          const data = await r.json();
+          const devolutiva = data?.content
+            || data?.choices?.[0]?.message?.content
+            || 'Obrigado por compartilhar. Sua reflexão ilumina o caminho.';
+          console.log('[Devolutiva] Sucesso:', devolutiva);
+          if (!window.isMuted) readAloud(devolutiva, (cfgWin.voice || 'female'));
+          return devolutiva;
+        }
+        if (r.status !== 404) throw new Error(`HTTP ${r.status} @ ${path}`);
+      } catch (e) {
+        // segue tentando próximas rotas/tentativas
+        if (attempt === maxRetries && path === CHAT_PATHS[CHAT_PATHS.length-1]) {
+          console.error('[Devolutiva] falhou:', e);
+          const msg = `Não consegui conectar ao guia ${g}. Tente novamente em instantes.`;
+          toast(msg);
+          if (!window.isMuted) readAloud(msg, (cfgWin.voice || 'female'));
+          return msg;
         }
       }
+    }
+    await new Promise(res => setTimeout(res, retryDelay));
+  }
+}
+</script>
 
       /* ===== progresso & storage ===== */
       function updateProgress() {
