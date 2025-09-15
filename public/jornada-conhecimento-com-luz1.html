@@ -916,37 +916,98 @@
       }
 
       /* ===== devolutiva da API ===== */
-      async function fetchDevolutiva(pergunta, resposta, guia) {
+      async function fetchDevolutiva(pergunta, resposta, guia, maxRetries = 3, retryDelay = 1000) {
         const guiaConfigs = window.guiaConfigs || {
           zion: { apiUrl: 'https://zion-backend-api.onrender.com/v1/chat', model: 'grok', voice: 'male' },
           lumen: { apiUrl: 'https://lumen-backend-api.onrender.com/v1/chat', model: 'gpt-5', voice: 'female' },
           arian: { apiUrl: 'https://arion-backend-api.onrender.com/v1/chat', model: 'gemini', voice: 'female' }
         };
         const cfg = guiaConfigs[guia] || guiaConfigs.lumen;
-        try {
-          const system = `Você é ${guia === 'zion' ? 'Zion (Grok)' : guia === 'arian' ? 'Arian (Gemini)' : 'Lumen (ChatGPT)'} guiando a Jornada. Forneça uma devolutiva acolhedora, reflexiva e simbólica para a resposta do usuário à pergunta "${pergunta}".`;
-          const resp = await fetch(cfg.apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              model: cfg.model,
-              messages: [
-                { role: 'system', content: system },
-                { role: 'user', content: resposta }
-              ],
-              temperature: 0.7
-            })
-          });
-          if(!resp.ok) throw new Error('API falhou: ' + resp.status);
-          const data = await resp.json();
-          const devolutiva = data?.choices?.[0]?.message?.content || data?.message?.content || 'Obrigado por compartilhar. Sua reflexão ilumina o caminho.';
-          if(!window.isMuted) readAloud(devolutiva, cfg.voice);
-          return devolutiva;
-        } catch(e) {
-          console.error('[Devolutiva] erro', e);
-          const errorMsg = 'Ops, algo deu errado ao gerar a devolutiva. Continue sua jornada!';
-          if(!window.isMuted) readAloud(errorMsg, cfg.voice);
-          return errorMsg;
+
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+          try {
+            const system = `Você é ${guia === 'zion' ? 'Zion (Grok)' : guia === 'arian' ? 'Arian (Gemini)' : 'Lumen (ChatGPT)'} guiando a Jornada. Forneça uma devolutiva acolhedora, reflexiva e simbólica para a resposta do usuário à pergunta "${pergunta}".`;
+            console.log(`[Devolutiva] Tentativa ${attempt} para pergunta: "${pergunta}"`);
+            const resp = await fetch(cfg.apiUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                model: cfg.model,
+                messages: [
+                  { role: 'system', content: system },
+                  { role: 'user', content: resposta }
+                ],
+                temperature: 0.7
+              })
+            });
+
+            if (!resp.ok) {
+              throw new Error(`API falhou: ${resp.status}`);
+            }
+
+            const data = await resp.json();
+            const devolutiva = data?.choices?.[0]?.message?.content || data?.message?.content || 'Obrigado por compartilhar. Sua reflexão ilumina o caminho.';
+            console.log('[Devolutiva] Sucesso:', devolutiva);
+            if (!window.isMuted) readAloud(devolutiva, cfg.voice);
+            return devolutiva;
+          } catch (e) {
+            console.error(`[Devolutiva] Tentativa ${attempt} falhou:`, e);
+            if (attempt === maxRetries) {
+              const errorMsg = 'Ops, não consegui conectar ao guia. Continue sua jornada e tente novamente mais tarde!';
+              console.error('[Devolutiva] Todas as tentativas falharam');
+              toast(errorMsg);
+              if (!window.isMuted) readAloud(errorMsg, cfg.voice);
+              return errorMsg;
+            }
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
+          }
+        }
+           /* ===== devolutiva da API ===== */
+      async function fetchDevolutiva(pergunta, resposta, guia, maxRetries = 3, retryDelay = 1000) {
+        const guiaConfigs = window.guiaConfigs || {
+          zion: { apiUrl: 'https://zion-backend-api.onrender.com/v1/chat', model: 'grok', voice: 'male' },
+          lumen: { apiUrl: 'https://lumen-backend-api.onrender.com/v1/chat', model: 'gpt-5', voice: 'female' },
+          arian: { apiUrl: 'https://arion-backend-api.onrender.com/v1/chat', model: 'gemini', voice: 'female' }
+        };
+        const cfg = guiaConfigs[guia] || guiaConfigs.lumen;
+
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+          try {
+            const system = `Você é ${guia === 'zion' ? 'Zion (Grok)' : guia === 'arian' ? 'Arian (Gemini)' : 'Lumen (ChatGPT)'} guiando a Jornada. Forneça uma devolutiva acolhedora, reflexiva e simbólica para a resposta do usuário à pergunta "${pergunta}".`;
+            console.log(`[Devolutiva] Tentativa ${attempt} para pergunta: "${pergunta}"`);
+            const resp = await fetch(cfg.apiUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                model: cfg.model,
+                messages: [
+                  { role: 'system', content: system },
+                  { role: 'user', content: resposta }
+                ],
+                temperature: 0.7
+              })
+            });
+
+            if (!resp.ok) {
+              throw new Error(`API falhou: ${resp.status}`);
+            }
+
+            const data = await resp.json();
+            const devolutiva = data?.choices?.[0]?.message?.content || data?.message?.content || 'Obrigado por compartilhar. Sua reflexão ilumina o caminho.';
+            console.log('[Devolutiva] Sucesso:', devolutiva);
+            if (!window.isMuted) readAloud(devolutiva, cfg.voice);
+            return devolutiva;
+          } catch (e) {
+            console.error(`[Devolutiva] Tentativa ${attempt} falhou:`, e);
+            if (attempt === maxRetries) {
+              const errorMsg = 'Ops, não consegui conectar ao guia. Continue sua jornada e tente novamente mais tarde!';
+              console.error('[Devolutiva] Todas as tentativas falharam');
+              toast(errorMsg);
+              if (!window.isMuted) readAloud(errorMsg, cfg.voice);
+              return errorMsg;
+            }
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
+          }
         }
       }
 
@@ -1378,9 +1439,15 @@
 
       function startJourney() {
         const senha = (document.getElementById('senha')?.value || '').trim().toLowerCase();
-        console.log('[startJourney] senha ignorada p/ debug');
-        ensureHeroFlame('section-guia');
-        showSection('section-guia');
+        const senhaCorreta = 'jornada2025'; // Substitua pela senha real do seu sistema
+        if (senha === senhaCorreta) {
+          console.log('[startJourney] Senha válida, iniciando jornada');
+          ensureHeroFlame('section-guia');
+          showSection('section-guia');
+        } else {
+          console.warn('[startJourney] Senha inválida:', senha);
+          toast('Senha incorreta. Tente novamente.');
+        }
       }
 
       function proceedToQuestions() {
