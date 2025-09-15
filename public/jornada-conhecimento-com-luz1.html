@@ -569,7 +569,7 @@
 
   /* ===== datilografia ===== */
   function typeWriter(el, text, speed, showCursor) {
-    if(!el || el.dataset.typed) return Promise.resolve(); // Evita re-tipagem
+    if(!el || el.dataset.typed) return Promise.resolve();
     el.textContent = '';
     if(showCursor) el.classList.add('lumen-typing');
     let i = 0;
@@ -596,7 +596,7 @@
       const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
       await typeWriter(el, t, spd, cur);
       if(!window.isMuted && !el.closest('textarea')) {
-        await new Promise(r => setTimeout(r, 500)); // Pausa para sincronizar TTS
+        await new Promise(r => setTimeout(r, 500));
         readAloud(t, (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
       }
     }
@@ -756,10 +756,10 @@
       const baseW = 70 * scale;
       const baseH = 90 * scale;
       selfieImg.setAttribute('x', baseX);
-      selfieuImg.setAttribute('y', baseY);
-      selfieuImg.setAttribute('width', baseW);
-      selfieuImg.setAttribute('height', baseH);
-      selfieuInFlame.style.transform = `scale(${scale}) translate(${ox}px, ${oy}px)`;
+      selfieImg.setAttribute('y', baseY);
+      selfieImg.setAttribute('width', baseW);
+      selfieImg.setAttribute('height', baseH);
+      selfieInFlame.style.transform = `scale(${scale}) translate(${ox}px, ${oy}px)`;
       clientNameEl.textContent = localStorage.getItem('JORNADA_NOME')?.toUpperCase() || '';
       clientNameFinal.textContent = localStorage.getItem('JORNADA_NOME')?.toUpperCase() || '';
     }
@@ -773,8 +773,8 @@
       if(!f) return;
       if(selfieURL) URL.revokeObjectURL(selfieURL);
       selfieURL = URL.createObjectURL(f);
-      selfieuImg.setAttribute('href', selfieuURL);
-      selfieuInFlame.src = selfieuURL;
+      selfieImg.setAttribute('href', selfieURL);
+      selfieInFlame.src = selfieURL;
       if(errorDiv) errorDiv.style.display = 'none';
       updatePreview();
     });
@@ -837,7 +837,7 @@
         ctx.bezierCurveTo(x + 0.42 * w, y + 0.233 * h, x + 0.34 * w, y + 0.300 * h, x + 0.33 * w, y + 0.387 * h);
         ctx.bezierCurveTo(x + 0.32 * w, y + 0.487 * h, x + 0.41 * w, y + 0.547 * h, x + 0.50 * w, y + 0.613 * h);
         ctx.bezierCurveTo(x + 0.59 * w, y + 0.547 * h, x + 0.68 * w, y + 0.487 * h, x + 0.67 * w, y + 0.387 * h);
-        ctx.bezierCurveTo(x + 0.66 * w, y + 0.300 * h, x + 0.58 * w, y + 0.233 * h, x + 0.50 * w, y + 0.133 * h);
+        ctx.bezierCurveTo(x + 0.66 * w, y + 0.233 * h, x + 0.58 * w, y + 0.233 * h, x + 0.50 * w, y + 0.133 * h);
       }
 
       ctx.save();
@@ -879,7 +879,7 @@
       const dataURL = canvas.toDataURL('image/png');
       try {
         localStorage.setItem('IRMANDADE_SELFIE_FINAL', dataURL);
-        selfieuInFlame.src = dataURL;
+        selfieInFlame.src = dataURL;
         const a = document.createElement('a');
         a.href = dataURL;
         a.download = `jornada-${card.dataset.guide.toLowerCase()}-${Date.now()}.png`;
@@ -955,24 +955,25 @@
       console.error('[Chat] erro', e);
       const guiaMsg = document.createElement('div');
       guiaMsg.className = 'grok-chat-message grok';
-      await typeWriter(guiaMsg, 'Ops, algo deu errado! Tenta de novo ou pula pra próxima pergunta.', 36, true);
-      if(!window.isMuted) readAloud('Ops, algo deu errado! Tenta de novo ou pula pra próxima pergunta.', cfg.voice);
+      await typeWriter(guiaMsg, 'Ops, não consegui me conectar ao guia. Tenta novamente ou pula pra próxima pergunta.', 36, true);
+      if(!window.isMuted) readAloud('Ops, não consegui me conectar ao guia. Tenta novamente ou pula pra próxima pergunta.', cfg.voice);
       messagesDiv.appendChild(guiaMsg);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
     input.value = '';
   }
 
-  // ---- util: remove duplicações de letras e espaços ----
+  /* ===== util: remove duplicações de letras e espaços ===== */
   function dedupe(s='') {
     return s
       .normalize('NFC')
       .replace(/([\p{L}\p{N}])\1+/gu, '$1')
       .replace(/\s{2,}/g, ' ')
+      .replace(/[:?]+/g, '') // Remove duplicatas de ":" e "?"
       .trim();
   }
 
-  // ---- rotas candidatas p/ fallback ----
+  /* ===== rotas candidatas p/ fallback ===== */
   const CHAT_PATHS = [
     '/v1/chat',
     '/v1/chat/completions',
@@ -981,7 +982,7 @@
     '/chat/completions'
   ];
 
-  // ---- bases e modelos padrão (caso não venham via window.guiaConfigs) ----
+  /* ===== bases e modelos padrão ===== */
   const GUIDE_BASES = {
     lumen: 'https://lumen-backend-api.onrender.com',
     zion:  'https://zion-backend-api.onrender.com',
@@ -996,7 +997,6 @@
   /* ===== devolutiva da API ===== */
   async function fetchDevolutiva(pergunta, resposta, guia, maxRetries = 3, retryDelay = 1000) {
     const g = (guia || 'lumen').toLowerCase();
-
     const cfgWin = (window.guiaConfigs && window.guiaConfigs[g]) || {};
     const rawBase = cfgWin.apiUrlBase || cfgWin.apiUrl || GUIDE_BASES[g] || GUIDE_BASES.lumen;
     const base = (rawBase || '').replace(/\/(v1\/chat|v1\/chat\/completions|v1\/completions|chat|chat\/completions)\/?$/,'');
@@ -1033,9 +1033,10 @@
           }
           if (r.status !== 404) throw new Error(`HTTP ${r.status} @ ${path}`);
         } catch (e) {
+          console.error('[Devolutiva] Erro na tentativa:', e);
           if (attempt === maxRetries && path === CHAT_PATHS[CHAT_PATHS.length-1]) {
             console.error('[Devolutiva] falhou:', e);
-            const msg = `Não consegui conectar ao guia ${g}. Tente novamente em instantes.`;
+            const msg = `Não consegui conectar ao guia ${g}. Verifique sua conexão ou tente novamente mais tarde.`;
             toast(msg);
             if (!window.isMuted) readAloud(msg, (cfgWin.voice || 'female'));
             return msg;
@@ -1112,6 +1113,7 @@
   }
 
   function showSection(sectionId) {
+    console.log('[showSection] Exibindo seção:', sectionId);
     document.querySelectorAll('.j-section').forEach(s => {
       s.classList.add('hidden');
       s.querySelectorAll('[data-typing]').forEach(el => {
@@ -1121,7 +1123,13 @@
       });
     });
     const active = document.getElementById(sectionId);
-    if(active) active.classList.remove('hidden');
+    if(active) {
+      active.classList.remove('hidden');
+      console.log('[showSection] Seção ativa:', active.id);
+    } else {
+      console.error('[showSection] Seção não encontrada:', sectionId);
+      toast('Erro ao carregar a seção. Tente novamente.');
+    }
     updateCanvasBackground(sectionId);
     ensureHeroFlame(sectionId);
 
@@ -1293,15 +1301,20 @@
 
   let isTransitioning = false;
   function goNext() {
-    if(isTransitioning) return;
+    if(isTransitioning) {
+      console.warn('[goNext] Transição bloqueada por isTransitioning');
+      return;
+    }
     isTransitioning = true;
     const current = document.querySelector('.j-pergunta.active');
     if(!current) {
+      console.error('[goNext] Nenhuma pergunta ativa encontrada');
       isTransitioning = false;
       return;
     }
     const bloco = current.closest('.j-bloco');
     if(!bloco) {
+      console.error('[goNext] Nenhum bloco encontrado');
       isTransitioning = false;
       return;
     }
@@ -1334,6 +1347,7 @@
         blocos.forEach(b => b.style.display = 'none');
         const proxBloco = blocos[idxBloco + 1];
         if(!proxBloco) {
+          console.error('[goNext] Próximo bloco não encontrado');
           isTransitioning = false;
           return;
         }
@@ -1376,6 +1390,7 @@
     const fallback = document.getElementById('videoFallback');
     const skip = document.getElementById('skipVideo');
     if(!overlay || !video || !fallback || !src) {
+      console.error('[playTransition] Elementos ou src ausentes');
       onEnd && onEnd();
       return;
     }
@@ -1533,6 +1548,7 @@
       const btnMic = ev.target.closest('[data-action="start-mic"]');
       const btnClear = ev.target.closest('[data-action="clear-answer"]');
       const btnMute = ev.target.closest('[data-action="mute"]');
+      const btnNextTermos = ev.target.closest('[data-action="next-termos"]');
       if(btnMic) {
         ev.preventDefault();
         const ta = btnMic.closest('.j-pergunta')?.querySelector('textarea');
@@ -1556,6 +1572,14 @@
         btnMute.classList.toggle('muted', window.isMuted);
         toast(window.isMuted ? 'Som silenciado.' : 'Som ativado.');
         if(window.isMuted) speechSynthesis.cancel();
+        return true;
+      }
+      if(btnNextTermos) {
+        ev.preventDefault();
+        console.log('[initAccessibility] Botão Avançar clicado');
+        isTransitioning = false; // Reset para garantir transição
+        showSection('section-termos');
+        runTyping(document.getElementById('termos-pg1'));
         return true;
       }
       return false;
@@ -1671,7 +1695,11 @@
       return true;
     }, { capture: true });
     document.addEventListener('click', (ev) => {
-      if(isTransitioning || !ev.target) return false;
+      if(isTransitioning || !ev.target) {
+        console.warn('[click] Bloqueado por isTransitioning ou target nulo');
+        return false;
+      }
+      console.log('[click] Evento de clique disparado', ev.target);
       const aNext = ev.target.closest?.('[data-action="next"]');
       const aStart = ev.target.closest?.('[data-action="start"]');
       const aToggle = ev.target.closest?.('[data-action="toggle-password"], .password-toggle');
@@ -1690,21 +1718,25 @@
 
       if(aNext) { 
         ev.preventDefault(); 
+        console.log('[click] Botão Next clicado');
         goNext(); 
         return true;
       }
       if(aStart) { 
         ev.preventDefault(); 
+        console.log('[click] Botão Start clicado');
         startJourney(); 
         return true;
       }
       if(aToggle) { 
         ev.preventDefault(); 
+        console.log('[click] Botão Toggle Senha clicado');
         toggleSenha(); 
         return true;
       }
       if(aRestart) { 
         ev.preventDefault(); 
+        console.log('[click] Botão Restart clicado');
         localStorage.removeItem('jornada_respostas'); 
         localStorage.removeItem('JORNADA_GUIA'); 
         localStorage.removeItem('JORNADA_NOME'); 
@@ -1714,11 +1746,13 @@
       }
       if(btnPDF) { 
         ev.preventDefault(); 
+        console.log('[click] Botão Gerar PDF clicado');
         generatePDF(); 
         return true;
       }
       if(btnDownloadSelfie) {
         ev.preventDefault();
+        console.log('[click] Botão Download Selfie clicado');
         const dataURL = localStorage.getItem('IRMANDADE_SELFIE_FINAL');
         if(dataURL) {
           const a = document.createElement('a');
@@ -1732,33 +1766,40 @@
       }
       if(btnSkipSelfie) { 
         ev.preventDefault(); 
+        console.log('[click] Botão Pular Selfie clicado');
         proceedAfterSelfie(); 
         return true;
       }
       if(btnSendChat) { 
         ev.preventDefault(); 
+        console.log('[click] Botão Enviar Chat clicado');
         sendChatMessage(); 
         return true;
       }
       if(btnSelectGuia) { 
         ev.preventDefault(); 
+        console.log('[click] Botão Selecionar Guia clicado:', btnSelectGuia.dataset.guia);
         proceedAfterGuia(btnSelectGuia.dataset.guia); 
         return true;
       }
-      if(btnNextTermos) { 
+      if(btnNextTermos) {
         ev.preventDefault();
-        showSection('section-termos'); 
+        console.log('[click] Botão Avançar Termos clicado');
+        isTransitioning = false; // Reset para garantir transição
+        showSection('section-termos');
         runTyping(document.getElementById('termos-pg1'));
         return true;
       }
       if(btnNextSenha) { 
         ev.preventDefault(); 
+        console.log('[click] Botão Próxima Senha clicado');
         showSection('section-senha'); 
         runTyping(document.getElementById('section-senha'));
         return true;
       }
       if(btnTermosNext) {
         ev.preventDefault();
+        console.log('[click] Botão Próxima Página Termos 1 clicado');
         document.getElementById('termos-pg1')?.classList.add('hidden');
         document.getElementById('termos-pg2')?.classList.remove('hidden');
         runTyping(document.getElementById('termos-pg2'));
@@ -1766,6 +1807,7 @@
       }
       if(btnTermosNext2) {
         ev.preventDefault();
+        console.log('[click] Botão Próxima Página Termos 2 clicado');
         document.getElementById('termos-pg2')?.classList.add('hidden');
         document.getElementById('termos-pg3')?.classList.remove('hidden');
         runTyping(document.getElementById('termos-pg3'));
@@ -1773,6 +1815,7 @@
       }
       if(btnTermosNext3) {
         ev.preventDefault();
+        console.log('[click] Botão Próxima Página Termos 3 clicado');
         document.getElementById('termos-pg3')?.classList.add('hidden');
         document.getElementById('termos-pg4')?.classList.remove('hidden');
         runTyping(document.getElementById('termos-pg4'));
@@ -1780,6 +1823,7 @@
       }
       if(btnTermosNext4) {
         ev.preventDefault();
+        console.log('[click] Botão Próxima Página Termos 4 clicado');
         document.getElementById('termos-pg4')?.classList.add('hidden');
         document.getElementById('termos-pg5')?.classList.remove('hidden');
         runTyping(document.getElementById('termos-pg5'));
@@ -1791,6 +1835,7 @@
     document.getElementById('grok-chat-input')?.addEventListener('keypress', (ev) => {
       if(ev.key === 'Enter') {
         ev.preventDefault();
+        console.log('[keypress] Enter no chat input');
         sendChatMessage();
         return true;
       }
