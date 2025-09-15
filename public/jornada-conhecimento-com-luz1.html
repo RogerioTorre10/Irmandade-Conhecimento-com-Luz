@@ -1600,6 +1600,73 @@ async function fetchDevolutiva(pergunta, resposta, guia, maxRetries = 3, retryDe
         utterance.voice = selectedVoice;
         speechSynthesis.speak(utterance);
       }
+      // === [TYPER + TTS SINCRONIZADOS] ===
+(function(){
+  if (window.__typer) { try { window.__typer.stop(); } catch(_){} }
+
+  const synth = window.speechSynthesis;
+
+  function cancelSpeech() {
+    try { synth.cancel(); } catch(_) {}
+  }
+
+  class Typer {
+    constructor(el, opts={}){
+      this.el = el;
+      this.speed = opts.speed || 28; // caracteres por segundo
+      this._timer = null;
+      this._running = false;
+      this._voice = opts.voice || null;
+      this._rate  = opts.rate  || 1;
+      this._pitch = opts.pitch || 1;
+    }
+    typeAndSpeak(text){
+      this.stop();
+      this.el.textContent = '';
+      cancelSpeech();
+
+      const chars = [...text];
+      let i = 0, buffer = '';
+
+      const tick = () => {
+        if (i >= chars.length){ this.stop(); return; }
+        const ch = chars[i++];
+        this.el.textContent += ch;
+        buffer += ch;
+
+        // quando chega em um ponto natural, fala o trecho recém digitado
+        if (/\s|[.?!,;]/.test(ch) && buffer.trim().length >= 4){
+          const utter = new SpeechSynthesisUtterance(buffer);
+          if (this._voice) utter.voice = this._voice;
+          utter.rate  = this._rate;
+          utter.pitch = this._pitch;
+          synth.speak(utter);
+          buffer = '';
+        }
+        this._timer = setTimeout(tick, 1000/this.speed);
+      };
+
+      this._running = true;
+      tick();
+    }
+    stop(){
+      if (!this._running) return;
+      clearTimeout(this._timer);
+      this._timer = null;
+      this._running = false;
+      cancelSpeech();
+    }
+  }
+
+  window.__typer = {
+    instance: null,
+    play(el, text, opts={}){
+      if (!this.instance) this.instance = new Typer(el, opts);
+      this.instance.typeAndSpeak(text);
+    },
+    stop(){ if (this.instance) this.instance.stop(); }
+  };
+})();
 
       function initJornada() {
         document.addEventListener('input', (ev) => {
