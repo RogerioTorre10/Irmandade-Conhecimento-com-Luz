@@ -123,6 +123,34 @@
       .flame-svg { width: 60%; height: 60% }
       .client-name { font-size: clamp(36px, 6vw, 60px) }
     }
+    /* === SELFIE DENTRO DA CHAMA (MÁSCARA) === */
+.flame-frame{
+  position: relative;
+  width: min(92vw, 720px);
+  aspect-ratio: 3/4;           /* mantém proporção do card */
+  margin: 24px auto;
+}
+    
+.flame-mask{
+  position: absolute; inset: 0;
+  pointer-events: none;        /* não bloqueia botões */
+  -webkit-mask-image: url('/assets/img/chama-mask.png');
+  mask-image: url('/assets/img/chama-mask.png');
+  -webkit-mask-size: contain;  mask-size: contain;
+  -webkit-mask-position: center; mask-position: center;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  overflow: hidden;
+}
+
+.flame-mask img{
+  width: 100%; height: 100%;
+  object-fit: cover;           /* cobre sem cortar rosto */
+  object-position: center;
+  transform: translateZ(0);
+}
+
+/* se você ainda desenha a chama via SVG, esconda para não duplicar */
+.flame-svg{ display:none; }
 
     /* Escolha do guia */
     .guia-container { margin-top: 20px; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; background: #000; color: #fff; text-align: center }
