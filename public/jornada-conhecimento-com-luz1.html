@@ -124,33 +124,42 @@
       .client-name { font-size: clamp(36px, 6vw, 60px) }
     }
     /* === SELFIE DENTRO DA CHAMA (MÁSCARA) === */
-.flame-frame{
-  position: relative;
-  width: min(92vw, 720px);
-  aspect-ratio: 3/4;           /* mantém proporção do card */
-  margin: 24px auto;
-}
-    
-.flame-mask{
-  position: absolute; inset: 0;
-  pointer-events: none;        /* não bloqueia botões */
-  -webkit-mask-image: url('/assets/img/chama-mask.png');
-  mask-image: url('/assets/img/chama-mask.png');
-  -webkit-mask-size: contain;  mask-size: contain;
-  -webkit-mask-position: center; mask-position: center;
-  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
-  overflow: hidden;
-}
-
-.flame-mask img{
-  width: 100%; height: 100%;
-  object-fit: cover;           /* cobre sem cortar rosto */
-  object-position: center;
-  transform: translateZ(0);
-}
-
-/* se você ainda desenha a chama via SVG, esconda para não duplicar */
-.flame-svg{ display:none; }
+    .flame-frame {
+      position: relative;
+      width: min(720px, 92vw);
+      aspect-ratio: 3/4;
+      margin: 24px auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .flame-mask {
+      position: absolute;
+      width: 48%;
+      height: 72%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -20%);
+      pointer-events: none;
+      -webkit-mask-image: url('/assets/img/chama-mask.png');
+      mask-image: url('/assets/img/chama-mask.png');
+      -webkit-mask-size: contain;
+      mask-size: contain;
+      -webkit-mask-position: center;
+      mask-position: center;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      overflow: hidden;
+    }
+    .flame-mask img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transform: translateZ(0);
+    }
+    /* Esconder SVG para não duplicar */
+    .flame-svg { display: none; }
 
     /* Escolha do guia */
     .guia-container { margin-top: 20px; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; background: #000; color: #fff; text-align: center }
@@ -434,7 +443,7 @@
               </div>
               <div class="selfie-right">
                 <section id="card-guide" class="guide-card" data-guide="ZION" aria-label="Guia">
-                  <img class="guide-bg" id="guideBg" src="/assets/img/irmandade-quarteto-bg-zion.png" alt="Guia Background">
+                  <img class="guide-bg" id="guideBg" src="/assets/img/irmandade-quarteto-bg-zion.jpeg" alt="Guia Background">
                   <div class="flame-layer" aria-hidden="true">
                     <svg class="flame-svg" viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
                       <defs>
@@ -496,10 +505,11 @@
           <p data-typing data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40" data-cursor="true"></p>
          <div class="selfie-final" style="text-align:center; margin-top:20px;">
   <div class="flame-frame" id="selfieResult">
-    <img id="resultBackground" src="/assets/img/resultado-fundo-zion.png" alt="">
+    <img id="resultBackground" src="/assets/img/irmandade-quarteto-bg-zion.jpeg" alt="Guia Background">
     <div class="flame-mask">
       <img id="selfieInFlame" alt="Selfie na chama">
     </div>
+    <div class="client-name" id="clientNameSlotFinal"></div>
   </div>
 </div>
 
@@ -560,33 +570,38 @@
 
       /* ===== datilografia ===== */
       function typeWriter(el, text, speed, showCursor) {
-        if(!el) return;
+        if(!el) return Promise.resolve();
         el.textContent = '';
         if(showCursor) el.classList.add('lumen-typing');
         let i = 0;
-        (function step() {
-          if(i < text.length) {
-            el.textContent += text.charAt(i++);
-            setTimeout(step, speed);
-          } else {
-            el.classList.add('typing-done');
-            el.dataset.typed = '1';
-            const parent = el.closest('.j-section, [id^="termos-pg"]');
-            const elements = parent.querySelectorAll('[data-typing]:not([data-typed])');
-            if(elements.length > 0) {
-              const nextEl = elements[0];
-              const t = nextEl.getAttribute('data-text') || nextEl.textContent || '';
-              const spd = parseInt(nextEl.getAttribute('data-speed') || '26', 10);
-              const cur = String(nextEl.getAttribute('data-cursor') || 'true') === 'true';
-              setTimeout(() => typeWriter(nextEl, t, spd, cur), 500);
+        return new Promise(resolve => {
+          function step() {
+            if(i < text.length) {
+              el.textContent += text.charAt(i++);
+              setTimeout(step, speed);
+            } else {
+              el.classList.add('typing-done');
+              el.dataset.typed = '1';
+              const parent = el.closest('.j-section, [id^="termos-pg"]');
+              const elements = parent.querySelectorAll('[data-typing]:not([data-typed])');
+              if(elements.length > 0) {
+                const nextEl = elements[0];
+                const t = nextEl.getAttribute('data-text') || nextEl.textContent || '';
+                const spd = parseInt(nextEl.getAttribute('data-speed') || '26', 10);
+                const cur = String(nextEl.getAttribute('data-cursor') || 'true') === 'true';
+                setTimeout(() => typeWriter(nextEl, t, spd, cur).then(resolve), 500);
+              } else {
+                if(!window.isMuted && !el.closest('textarea')) readAloud(text, (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
+                resolve();
+              }
             }
-            if(!window.isMuted && !el.closest('textarea')) readAloud(text, (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
           }
-        })();
+          step();
+        });
       }
       function runTyping(root) {
         if(!root || root.classList.contains('hidden')) return;
-        const elements = root.querySelectorAll('[data-typing]:not([data-typed])');
+        const elements = Array.from(root.querySelectorAll('[data-typing]:not([data-typed])'));
         if(elements.length > 0) {
           const firstEl = elements[0];
           const t = firstEl.getAttribute('data-text') || firstEl.textContent || '';
@@ -634,28 +649,7 @@
         div.classList.add('typing-done');
         if(!window.isMuted) readAloud(text, (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
       }
-     
-// Função para exibir a pergunta atual com datilografia + TTS
-function showQuestion(index) {
-  // supondo que você tenha um array com todas as perguntas
-  const pergunta = perguntas[index];     // ajuste se seu array tiver outro nome
-  const alvo = document.querySelector('#perguntaAtual');
-  const resposta = document.querySelector('#resposta');
 
-  if (!pergunta || !alvo) return;
-
-  // limpa campo de resposta e texto antigo
-  alvo.textContent = '';
-  if (resposta) resposta.value = '';
-
-  // inicia tipagem + leitura sincronizadas
-  try { window.__typer.stop(); } catch(_) {}
-  window.__typer.play(alvo, pergunta.texto, { speed:28, rate:1.02, pitch:1 });
-
-  // se precisar salvar o índice atual:
-  window.jornadaState = window.jornadaState || {};
-  window.jornadaState.currentIndex = index;
-}
       /* ===== chamas ===== */
       function makeFlame(cls) {
         const d = document.createElement('div');
@@ -727,9 +721,12 @@ function showQuestion(index) {
         const $ = s => document.querySelector(s);
         const card = $("#card-guide");
         const clientNameEl = $("#clientNameSlot");
+        const clientNameFinal = $("#clientNameSlotFinal");
         const flameLayer = $("#card-guide .flame-layer");
         const selfieImg = $("#selfieImage");
         const bgImg = $("#guideBg");
+        const resultBg = $("#resultBackground");
+        const selfieInFlame = $("#selfieInFlame");
         const fileInput = $("#selfieInput");
         const previewBtn = $("#previewBtn");
         const captureBtn = $("#captureBtn");
@@ -743,12 +740,13 @@ function showQuestion(index) {
         function getBgUrl() {
           const guia = localStorage.getItem('JORNADA_GUIA') || 'zion';
           card.dataset.guide = guia.toUpperCase();
-          return `/assets/img/irmandade-quarteto-bg-${guia}.png`;
+          return `/assets/img/irmandade-quarteto-bg-${guia}.jpeg`;
         }
 
         function loadBg() {
           const bgUrl = getBgUrl();
           bgImg.src = bgUrl;
+          resultBg.src = bgUrl;
           bgImg.onload = () => {
             if(errorDiv) errorDiv.style.display = 'none';
           };
@@ -770,7 +768,9 @@ function showQuestion(index) {
           selfieImg.setAttribute('y', baseY);
           selfieImg.setAttribute('width', baseW);
           selfieImg.setAttribute('height', baseH);
+          selfieInFlame.style.transform = `scale(${scale}) translate(${ox}px, ${oy}px)`;
           clientNameEl.textContent = localStorage.getItem('JORNADA_NOME')?.toUpperCase() || '';
+          clientNameFinal.textContent = localStorage.getItem('JORNADA_NOME')?.toUpperCase() || '';
         }
 
         scaleInput.addEventListener('input', updatePreview);
@@ -783,6 +783,7 @@ function showQuestion(index) {
           if(selfieURL) URL.revokeObjectURL(selfieURL);
           selfieURL = URL.createObjectURL(f);
           selfieImg.setAttribute('href', selfieURL);
+          selfieInFlame.src = selfieURL;
           if(errorDiv) errorDiv.style.display = 'none';
           updatePreview();
         });
@@ -828,7 +829,7 @@ function showQuestion(index) {
           ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
           const W = canvas.width, H = canvas.height;
-          const fw = 0.48 * W, fh = 0.72 * H, fx = (W - fw) / 2, fy = (H - fh) / 2 + 0.30 * H;
+          const fw = 0.48 * W, fh = 0.72 * H, fx = (W - fw) / 2, fy = (H - fh) / 2 + 0.20 * H;
 
           const grad = ctx.createRadialGradient(fx + fw / 2, fy + fh * 0.65, fh * 0.02, fx + fw / 2, fy + fh * 0.65, fh * 0.55);
           grad.addColorStop(0, 'rgba(255,224,130,1)');
@@ -887,6 +888,7 @@ function showQuestion(index) {
           const dataURL = canvas.toDataURL('image/png');
           try {
             localStorage.setItem('IRMANDADE_SELFIE_FINAL', dataURL);
+            selfieInFlame.src = dataURL;
             const a = document.createElement('a');
             a.href = dataURL;
             a.download = `jornada-${card.dataset.guide.toLowerCase()}-${Date.now()}.png`;
@@ -955,109 +957,108 @@ function showQuestion(index) {
           const guiaMsg = document.createElement('div');
           guiaMsg.className = 'grok-chat-message grok';
           messagesDiv.appendChild(guiaMsg);
-          typeWriter(guiaMsg, guiaMessage, 36, true);
+          await typeWriter(guiaMsg, guiaMessage, 36, true);
           if(!window.isMuted) readAloud(guiaMessage, cfg.voice);
           messagesDiv.scrollTop = messagesDiv.scrollHeight;
         } catch(e) {
           console.error('[Chat] erro', e);
           const guiaMsg = document.createElement('div');
           guiaMsg.className = 'grok-chat-message grok';
-          typeWriter(guiaMsg, 'Ops, algo deu errado! Tenta de novo ou pula pra próxima pergunta.', 36, true);
+          await typeWriter(guiaMsg, 'Ops, algo deu errado! Tenta de novo ou pula pra próxima pergunta.', 36, true);
           if(!window.isMuted) readAloud('Ops, algo deu errado! Tenta de novo ou pula pra próxima pergunta.', cfg.voice);
           messagesDiv.appendChild(guiaMsg);
           messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
         input.value = '';
       }
-           
-// ---- util: remove duplicações de letras e espaços ----
-function dedupe(s=''){
-  return s
-    .normalize('NFC')
-    .replace(/([\p{L}\p{N}])\1+/gu, '$1')
-    .replace(/\s{2,}/g, ' ')
-    .trim();
-}
 
-// ---- rotas candidatas p/ fallback ----
-const CHAT_PATHS = [
-  '/v1/chat',
-  '/v1/chat/completions',
-  '/v1/completions',
-  '/chat',
-  '/chat/completions'
-];
+      // ---- util: remove duplicações de letras e espaços ----
+      function dedupe(s='') {
+        return s
+          .normalize('NFC')
+          .replace(/([\p{L}\p{N}])\1+/gu, '$1')
+          .replace(/\s{2,}/g, ' ')
+          .trim();
+      }
 
-// ---- bases e modelos padrão (caso não venham via window.guiaConfigs) ----
-const GUIDE_BASES = {
-  lumen: 'https://lumen-backend-api.onrender.com',
-  zion:  'https://zion-backend-api.onrender.com',
-  arian: 'https://arion-backend-api.onrender.com'
-};
-const GUIDE_MODELS = {
-  lumen: 'gpt-5',
-  zion:  'grok',
-  arian: 'gemini'
-};
+      // ---- rotas candidatas p/ fallback ----
+      const CHAT_PATHS = [
+        '/v1/chat',
+        '/v1/chat/completions',
+        '/v1/completions',
+        '/chat',
+        '/chat/completions'
+      ];
 
-/* ===== devolutiva da API ===== */
-async function fetchDevolutiva(pergunta, resposta, guia, maxRetries = 3, retryDelay = 1000) {
-  const g = (guia || 'lumen').toLowerCase();
+      // ---- bases e modelos padrão (caso não venham via window.guiaConfigs) ----
+      const GUIDE_BASES = {
+        lumen: 'https://lumen-backend-api.onrender.com',
+        zion:  'https://zion-backend-api.onrender.com',
+        arian: 'https://arion-backend-api.onrender.com'
+      };
+      const GUIDE_MODELS = {
+        lumen: 'gpt-5',
+        zion:  'grok',
+        arian: 'gemini'
+      };
 
-  // pega config do global (se existir) ou defaults
-  const cfgWin = (window.guiaConfigs && window.guiaConfigs[g]) || {};
-  const rawBase = cfgWin.apiUrlBase || cfgWin.apiUrl || GUIDE_BASES[g] || GUIDE_BASES.lumen;
+      /* ===== devolutiva da API ===== */
+      async function fetchDevolutiva(pergunta, resposta, guia, maxRetries = 3, retryDelay = 1000) {
+        const g = (guia || 'lumen').toLowerCase();
 
-  // se veio um apiUrl já com /v1/chat etc, removo o sufixo p/ usar fallback
-  const base = (rawBase || '').replace(/\/(v1\/chat|v1\/chat\/completions|v1\/completions|chat|chat\/completions)\/?$/,'');
-  const model = cfgWin.model || GUIDE_MODELS[g] || GUIDE_MODELS.lumen;
+        // pega config do global (se existir) ou defaults
+        const cfgWin = (window.guiaConfigs && window.guiaConfigs[g]) || {};
+        const rawBase = cfgWin.apiUrlBase || cfgWin.apiUrl || GUIDE_BASES[g] || GUIDE_BASES.lumen;
 
-  const quem = g === 'zion' ? 'Zion (Grok)' : (g === 'arian' ? 'Arian (Gemini)' : 'Lumen (ChatGPT)');
-  const payload = {
-    model,
-    messages: [
-      { role: 'system', content: `Você é ${quem} guiando a Jornada. Forneça uma devolutiva acolhedora, reflexiva e simbólica.` },
-      { role: 'user',   content: `Pergunta: ${dedupe(pergunta)}\nResposta: ${resposta ?? '(vazia)'}` }
-    ],
-    temperature: 0.7,
-    meta: { guia: g.toUpperCase() }
-  };
+        // se veio um apiUrl já com /v1/chat etc, removo o sufixo p/ usar fallback
+        const base = (rawBase || '').replace(/\/(v1\/chat|v1\/chat\/completions|v1\/completions|chat|chat\/completions)\/?$/,'');
+        const model = cfgWin.model || GUIDE_MODELS[g] || GUIDE_MODELS.lumen;
 
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    console.log(`[Devolutiva] Tentativa ${attempt} para pergunta: "${dedupe(pergunta)}"`);
-    for (const path of CHAT_PATHS) {
-      try {
-        const r = await fetch(`${base}${path}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-          mode: 'cors',
-          credentials: 'omit'
-        });
-        if (r.ok) {
-          const data = await r.json();
-          const devolutiva = data?.content
-            || data?.choices?.[0]?.message?.content
-            || 'Obrigado por compartilhar. Sua reflexão ilumina o caminho.';
-          console.log('[Devolutiva] Sucesso:', devolutiva);
-          if (!window.isMuted) readAloud(devolutiva, (cfgWin.voice || 'female'));
-          return devolutiva;
-        }
-        if (r.status !== 404) throw new Error(`HTTP ${r.status} @ ${path}`);
-      } catch (e) {
-        // segue tentando próximas rotas/tentativas
-        if (attempt === maxRetries && path === CHAT_PATHS[CHAT_PATHS.length-1]) {
-          console.error('[Devolutiva] falhou:', e);
-          const msg = `Não consegui conectar ao guia ${g}. Tente novamente em instantes.`;
-          toast(msg);
-          if (!window.isMuted) readAloud(msg, (cfgWin.voice || 'female'));
-          return msg;
+        const quem = g === 'zion' ? 'Zion (Grok)' : (g === 'arian' ? 'Arian (Gemini)' : 'Lumen (ChatGPT)');
+        const payload = {
+          model,
+          messages: [
+            { role: 'system', content: `Você é ${quem} guiando a Jornada. Forneça uma devolutiva acolhedora, reflexiva e simbólica.` },
+            { role: 'user',   content: `Pergunta: ${dedupe(pergunta)}\nResposta: ${resposta ?? '(vazia)'}` }
+          ],
+          temperature: 0.7,
+          meta: { guia: g.toUpperCase() }
+        };
+
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+          console.log(`[Devolutiva] Tentativa ${attempt} para pergunta: "${dedupe(pergunta)}"`);
+          for (const path of CHAT_PATHS) {
+            try {
+              const r = await fetch(`${base}${path}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                mode: 'cors',
+                credentials: 'omit'
+              });
+              if (r.ok) {
+                const data = await r.json();
+                const devolutiva = data?.content
+                  || data?.choices?.[0]?.message?.content
+                  || 'Obrigado por compartilhar. Sua reflexão ilumina o caminho.';
+                console.log('[Devolutiva] Sucesso:', devolutiva);
+                if (!window.isMuted) readAloud(devolutiva, (cfgWin.voice || 'female'));
+                return devolutiva;
+              }
+              if (r.status !== 404) throw new Error(`HTTP ${r.status} @ ${path}`);
+            } catch (e) {
+              if (attempt === maxRetries && path === CHAT_PATHS[CHAT_PATHS.length-1]) {
+                console.error('[Devolutiva] falhou:', e);
+                const msg = `Não consegui conectar ao guia ${g}. Tente novamente em instantes.`;
+                toast(msg);
+                if (!window.isMuted) readAloud(msg, (cfgWin.voice || 'female'));
+                               return msg;
+              }
+            }
+            await new Promise(res => setTimeout(res, retryDelay));
+          }
         }
       }
-    }
-    await new Promise(res => setTimeout(res, retryDelay));
-  }
-}
 
       /* ===== progresso & storage ===== */
       function updateProgress() {
@@ -1163,8 +1164,10 @@ async function fetchDevolutiva(pergunta, resposta, guia, maxRetries = 3, retryDe
         if(sectionId === 'section-final') {
           const url = localStorage.getItem('IRMANDADE_SELFIE_FINAL');
           if(url) {
-            const img = document.querySelector('#minhaFotoFinal');
+            const img = document.querySelector('#selfieInFlame');
             if(img) img.src = url;
+            const clientNameFinal = document.querySelector('#clientNameSlotFinal');
+            if(clientNameFinal) clientNameFinal.textContent = localStorage.getItem('JORNADA_NOME')?.toUpperCase() || '';
           }
           runTyping(active);
         }
@@ -1196,8 +1199,7 @@ async function fetchDevolutiva(pergunta, resposta, guia, maxRetries = 3, retryDe
 
           (block.questions || []).forEach((q, qIdx) => {
             const label = typeof q === 'string' ? q : (q.label || q.text || '');
-            // Corrigir caracteres duplicados
-            const cleanLabel = label.replace(/(.)\1/g, '$1').replace(/\s{2,}/g, ' ').trim();
+            const cleanLabel = dedupe(label);
             const div = document.createElement('div');
             div.className = 'j-pergunta';
             div.dataset.pergunta = qIdx;
@@ -1264,7 +1266,7 @@ async function fetchDevolutiva(pergunta, resposta, guia, maxRetries = 3, retryDe
           lastDevolutivaText = resposta;
           const guia = localStorage.getItem('JORNADA_GUIA') || 'zion';
           const devolutiva = await fetchDevolutiva(pergunta, resposta, guia);
-          typeDevolutiva(devolutivaP, devolutiva, 36);
+          await typeDevolutiva(devolutivaP, devolutiva, 36);
         } else if(!textarea.value.trim() && devolutivaP) {
           devolutivaP.style.display = 'none';
         }
@@ -1289,10 +1291,15 @@ async function fetchDevolutiva(pergunta, resposta, guia, maxRetries = 3, retryDe
         showSection('section-selfie');
         const card = document.getElementById('card-guide');
         const bgImg = document.getElementById('guideBg');
+        const resultBg = document.getElementById('resultBackground');
         const clientNameEl = document.getElementById('clientNameSlot');
+        const clientNameFinal = document.getElementById('clientNameSlotFinal');
         card.dataset.guide = guia.toUpperCase();
         clientNameEl.textContent = guiaNameInput.value.toUpperCase();
-        bgImg.src = `/assets/img/irmandade-quarteto-bg-${guia}.png`;
+        clientNameFinal.textContent = guiaNameInput.value.toUpperCase();
+        const bgUrl = `/assets/img/irmandade-quarteto-bg-${guia}.jpeg`;
+        bgImg.src = bgUrl;
+        resultBg.src = bgUrl;
       }
 
       function proceedAfterSelfie() {
@@ -1626,197 +1633,6 @@ async function fetchDevolutiva(pergunta, resposta, guia, maxRetries = 3, retryDe
                            voices.find(v => v.lang === currentLang) || voices[0];
         utterance.voice = selectedVoice;
         speechSynthesis.speak(utterance);
-      }
-      // === [TYPER + TTS SINCRONIZADOS] ===
-(function(){
-  if (window.__typer) { try { window.__typer.stop(); } catch(_){} }
-
-  const synth = window.speechSynthesis;
-
-  function cancelSpeech() {
-    try { synth.cancel(); } catch(_) {}
-  }
-
-  class Typer {
-    constructor(el, opts={}){
-      this.el = el;
-      this.speed = opts.speed || 28; // caracteres por segundo
-      this._timer = null;
-      this._running = false;
-      this._voice = opts.voice || null;
-      this._rate  = opts.rate  || 1;
-      this._pitch = opts.pitch || 1;
-    }
-    typeAndSpeak(text){
-      this.stop();
-      this.el.textContent = '';
-      cancelSpeech();
-
-      const chars = [...text];
-      let i = 0, buffer = '';
-
-      const tick = () => {
-        if (i >= chars.length){ this.stop(); return; }
-        const ch = chars[i++];
-        this.el.textContent += ch;
-        buffer += ch;
-
-        // quando chega em um ponto natural, fala o trecho recém digitado
-        if (/\s|[.?!,;]/.test(ch) && buffer.trim().length >= 4){
-          const utter = new SpeechSynthesisUtterance(buffer);
-          if (this._voice) utter.voice = this._voice;
-          utter.rate  = this._rate;
-          utter.pitch = this._pitch;
-          synth.speak(utter);
-          buffer = '';
-        }
-        this._timer = setTimeout(tick, 1000/this.speed);
-      };
-
-      this._running = true;
-      tick();
-    }
-    stop(){
-      if (!this._running) return;
-      clearTimeout(this._timer);
-      this._timer = null;
-      this._running = false;
-      cancelSpeech();
-    }
-  }
-
-  window.__typer = {
-    instance: null,
-    play(el, text, opts={}){
-      if (!this.instance) this.instance = new Typer(el, opts);
-      this.instance.typeAndSpeak(text);
-    },
-    stop(){ if (this.instance) this.instance.stop(); }
-  };
-})();
-
-      function initJornada() {
-        document.addEventListener('input', (ev) => {
-          const ta = ev.target.closest?.('.j-pergunta textarea');
-          if(ta) handleInput(ta);
-        });
-        document.addEventListener('focusin', (ev) => {
-          if(ev.target && ev.target.matches('.j-pergunta textarea')) {
-            if(__abortTypingPlaceholder) __abortTypingPlaceholder();
-          }
-        });
-        document.addEventListener('click', (ev) => {
-          if(isTransitioning || !ev.target) return;
-          const aNext = ev.target.closest?.('[data-action="next"]');
-          const aStart = ev.target.closest?.('[data-action="start"]');
-          const aToggle = ev.target.closest?.('[data-action="toggle-password"], .password-toggle');
-          const aRestart = ev.target.closest?.('[data-action="restart"]');
-          const btnPDF = ev.target.closest?.('[data-action="generate-pdf"]');
-          const btnDownloadSelfie = ev.target.closest?.('[data-action="download-selfie"]');
-          const btnSkipSelfie = ev.target.closest?.('[data-action="skip-selfie"]');
-          const btnSendChat = ev.target.closest?.('[data-action="send-chat"]');
-          const btnSelectGuia = ev.target.closest?.('[data-action="select-guia"]');
-          const btnNextTermos = ev.target.closest?.('[data-action="next-termos"]');
-          const btnNextSenha = ev.target.closest?.('[data-action="next-senha"]');
-          const btnTermosNext = ev.target.closest?.('[data-action="termos-next"]');
-          const btnTermosNext2 = ev.target.closest?.('[data-action="termos-next2"]');
-          const btnTermosNext3 = ev.target.closest?.('[data-action="termos-next3"]');
-          const btnTermosNext4 = ev.target.closest?.('[data-action="termos-next4"]');
-
-          if(aNext) { 
-            ev.preventDefault(); 
-            goNext(); 
-          }
-          if(aStart) { 
-            ev.preventDefault(); 
-            startJourney(); 
-          }
-          if(aToggle) { 
-            ev.preventDefault(); 
-            toggleSenha(); 
-          }
-          if(aRestart) { 
-            ev.preventDefault(); 
-            localStorage.removeItem('jornada_respostas'); 
-            localStorage.removeItem('JORNADA_GUIA'); 
-            localStorage.removeItem('JORNADA_NOME'); 
-            location.hash = '#intro'; 
-            location.replace('/index.html'); 
-          }
-          if(btnPDF) { 
-            ev.preventDefault(); 
-            generatePDF(); 
-          }
-          if(btnDownloadSelfie) {
-            ev.preventDefault();
-            const dataURL = localStorage.getItem('IRMANDADE_SELFIE_FINAL');
-            if(dataURL) {
-              const a = document.createElement('a');
-              a.href = dataURL;
-              a.download = 'jornada-selfie.png';
-              a.click();
-            } else {
-              toast('Nenhuma imagem disponível para download.');
-            }
-          }
-          if(btnSkipSelfie) { 
-            ev.preventDefault(); 
-            proceedAfterSelfie(); 
-          }
-          if(btnSendChat) { 
-            ev.preventDefault(); 
-            sendChatMessage(); 
-          }
-          if(btnSelectGuia) { 
-            ev.preventDefault(); 
-            proceedAfterGuia(btnSelectGuia.dataset.guia); 
-          }
-          if(btnNextTermos) { 
-            ev.preventDefault(); 
-            showSection('section-termos'); 
-            runTyping(document.getElementById('termos-pg1'));
-          }
-          if(btnNextSenha) { 
-            ev.preventDefault(); 
-            showSection('section-senha'); 
-            runTyping(document.getElementById('section-senha'));
-          }
-          if(btnTermosNext) {
-            ev.preventDefault();
-            document.getElementById('termos-pg1')?.classList.add('hidden');
-            document.getElementById('termos-pg2')?.classList.remove('hidden');
-            runTyping(document.getElementById('termos-pg2'));
-          }
-          if(btnTermosNext2) {
-            ev.preventDefault();
-            document.getElementById('termos-pg2')?.classList.add('hidden');
-            document.getElementById('termos-pg3')?.classList.remove('hidden');
-            runTyping(document.getElementById('termos-pg3'));
-          }
-          if(btnTermosNext3) {
-            ev.preventDefault();
-            document.getElementById('termos-pg3')?.classList.add('hidden');
-            document.getElementById('termos-pg4')?.classList.remove('hidden');
-            runTyping(document.getElementById('termos-pg4'));
-          }
-          if(btnTermosNext4) {
-            ev.preventDefault();
-            document.getElementById('termos-pg4')?.classList.add('hidden');
-            document.getElementById('termos-pg5')?.classList.remove('hidden');
-            runTyping(document.getElementById('termos-pg5'));
-          }
-        }, { capture: true });
-
-        document.getElementById('grok-chat-input')?.addEventListener('keypress', (ev) => {
-          if(ev.key === 'Enter') {
-            ev.preventDefault();
-            sendChatMessage();
-          }
-        });
-
-        document.getElementById('guiaNameInput')?.addEventListener('input', (ev) => {
-          ev.target.value = ev.target.value.toUpperCase();
-        });
       }
 
       /* vídeos & blocos */
