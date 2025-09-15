@@ -940,6 +940,76 @@
                 temperature: 0.7
               })
             });
+           
+     
+            // --- evita aplicar o datilógrafo duas vezes no mesmo elemento
+            function typeTextOnce(el, text, speed=24){
+          if (el.dataset.typerApplied === '1') return;
+          el.dataset.typerApplied = '1';
+          el.textContent = '';
+          let i = 0;
+          const timer = setInterval(()=>{
+          el.textContent += text[i] || '';
+          i++;
+          if (i >= text.length) clearInterval(timer);
+          }, speed);
+        }
+
+      // --- dedupe seguro: remove duplicações de letras/números e espaços extras (preserva "..." e "!!")
+          function dedupe(str=''){
+          return str
+          .normalize('NFC')
+          .replace(/([\p{L}\p{N}])\1+/gu, '$1')
+          .replace(/\s{2,}/g, ' ')
+          .trim();
+      }
+
+      // --- tentativa com fallback em múltiplos endpoints (resolve 404 rápido)
+         async function fetchDevolutivaChat(payload, base='https://lumen-backend-api.onrender.com'){
+         const candidates = [
+         '/v1/chat',
+         '/v1/chat/completions',
+         '/v1/completions',
+         '/chat',
+         '/chat/completions'
+      ];
+      let lastErr;
+      for (const path of candidates) {
+      try {
+      const r = await fetch(base + path, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload),
+        mode: 'cors',
+        credentials: 'omit'
+      });
+      if (r.ok) return await r.json();
+      lastErr = new Error(`HTTP ${r.status} @ ${path}`);
+      if (r.status !== 404) break; // só tenta próximo se for 404
+    } catch(e){ lastErr = e; }
+    }
+      throw lastErr || new Error('Falha ao chamar chat');
+    }
+
+      // --- uso (exemplo): limpar pergunta antes de enviar
+      async function pedirDevolutiva(pergunta, respostaDoUsuario, guia='LUMEN'){
+      const perguntaLimpa = dedupe(pergunta);
+      const payload = {
+      model: 'gpt-5',
+      messages: [
+      { role: 'system', content: `Você é Lumen guiando a Jornada. Seja acolhedor, simbólico e breve.` },
+      { role: 'user', content: `Pergunta: ${perguntaLimpa}\nResposta: ${respostaDoUsuario || '(vazia)'}` }
+       ],
+       temperature: 0.7,
+       meta: { guia }
+      };
+      const data = await fetchDevolutivaChat(payload);
+      // adapte conforme seu backend retornar {content: "..."} ou {choices:[{message:{content}}]}
+      const txt = data?.content
+           || data?.choices?.[0]?.message?.content
+           || 'Senti sua chama, siga em frente com fé.';
+      return txt;
+     }
 
             if (!resp.ok) {
               throw new Error(`API falhou: ${resp.status} (${resp.statusText})`);
