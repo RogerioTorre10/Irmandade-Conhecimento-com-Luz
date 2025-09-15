@@ -634,7 +634,28 @@
         div.classList.add('typing-done');
         if(!window.isMuted) readAloud(text, (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
       }
+     
+// Função para exibir a pergunta atual com datilografia + TTS
+function showQuestion(index) {
+  // supondo que você tenha um array com todas as perguntas
+  const pergunta = perguntas[index];     // ajuste se seu array tiver outro nome
+  const alvo = document.querySelector('#perguntaAtual');
+  const resposta = document.querySelector('#resposta');
 
+  if (!pergunta || !alvo) return;
+
+  // limpa campo de resposta e texto antigo
+  alvo.textContent = '';
+  if (resposta) resposta.value = '';
+
+  // inicia tipagem + leitura sincronizadas
+  try { window.__typer.stop(); } catch(_) {}
+  window.__typer.play(alvo, pergunta.texto, { speed:28, rate:1.02, pitch:1 });
+
+  // se precisar salvar o índice atual:
+  window.jornadaState = window.jornadaState || {};
+  window.jornadaState.currentIndex = index;
+}
       /* ===== chamas ===== */
       function makeFlame(cls) {
         const d = document.createElement('div');
