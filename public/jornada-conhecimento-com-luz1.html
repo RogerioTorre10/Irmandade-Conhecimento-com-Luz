@@ -591,61 +591,67 @@
     }
   }
 
-  /* ===== datilografia no placeholder e respostas ===== */
-  let __abortTypingPlaceholder = null;
-  async function typePlaceholder(inp, text, speed = 22) {
-    if(!inp) return;
-    if(__abortTypingPlaceholder) __abortTypingPlaceholder();
-    let abort = false;
-    __abortTypingPlaceholder = () => abort = true;
-    inp.placeholder = '';
-    const aria = document.getElementById('aria-pergunta');
-    if(aria) aria.textContent = text;
-    for(let i = 0; i <= text.length; i++) {
-      if(abort) break;
-      inp.placeholder = text.slice(0, i) + (i < text.length ? '▌' : '');
-      await new Promise(r => setTimeout(r, speed));
-    }
-    if(!abort) inp.placeholder = text;
-  }
-  async function typeAnswer(textarea, text, speed = 36) {
-    if(!textarea) return;
-    textarea.value = '';
-    textarea.classList.add('lumen-typing');
-    for(let i = 0; i <= text.length; i++) {
-      textarea.value = text.slice(0, i);
-      await new Promise(r => setTimeout(r, speed));
-    }
-    textarea.classList.remove('lumen-typing');
-    textarea.classList.add('typing-done');
-  }
-  async function typeDevolutiva(div, text, speed = 36) {
-    if(!div) return;
-    div.textContent = '';
-    div.classList.add('lumen-typing');
-    for(let i = 0; i <= text.length; i++) {
-      div.textContent = text.slice(0, i);
-      await new Promise(r => setTimeout(r, speed));
-    }
-    div.classList.add('typing-done');
-    if(!window.isMuted) readAloud(text, (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
-  }
+ (function(){
+  /* ===== datilografia no placeholder e respostas ===== */
+  let __abortTypingPlaceholder = null;
+  async function typePlaceholder(inp, text, speed = 60) {
+    if(!inp) return;
+    if(__abortTypingPlaceholder) __abortTypingPlaceholder();
+    let abort = false;
+    __abortTypingPlaceholder = () => abort = true;
+    inp.placeholder = '';
+    const aria = document.getElementById('aria-pergunta');
+    if(aria) aria.textContent = text;
+    for(let i = 0; i <= text.length; i++) {
+      if(abort) break;
+      inp.placeholder = text.slice(0, i) + (i < text.length ? '▌' : '');
+      await new Promise(r => setTimeout(r, speed));
+    }
+    if(!abort) inp.placeholder = text;
+  }
+  async function typeAnswer(textarea, text, speed = 60) {
+    if(!textarea) return;
+    textarea.value = '';
+    textarea.classList.add('lumen-typing');
+    for(let i = 0; i <= text.length; i++) {
+      textarea.value = text.slice(0, i);
+      await new Promise(r => setTimeout(r, speed));
+    }
+    textarea.classList.remove('lumen-typing');
+    textarea.classList.add('typing-done');
+  }
+  async function typeDevolutiva(div, text, speed = 60) {
+    if(!div) return;
+    div.textContent = '';
+    div.classList.add('lumen-typing');
+    for(let i = 0; i <= text.length; i++) {
+      div.textContent = text.slice(0, i);
+      await new Promise(r => setTimeout(r, speed));
+    }
+    div.classList.add('typing-done');
+    if(!window.isMuted) readAloud(text, (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
+  }
+})(); // Fechamento correto do IIFE
 
-  /* ===== chamas ===== */
-  function makeFlame(cls) {
-    const d = document.createElement('div');
-    d.className = (cls || 'chama-vela chama-md');
-    d.innerHTML = '<div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>';
-    return d;
-  }
-  function ensureHeaderFlame() {
-    const H = document.getElementById('chama-header');
-    if(!H) return;
-    if(!H.querySelector('.brasa')) {
-      H.innerHTML = '';
-      H.appendChild(makeFlame('chama-vela chama-lg'));
-    }
-  }
+(function(){
+  /* ===== chamas ===== */
+  function makeFlame(cls) {
+    const d = document.createElement('div');
+    d.className = (cls || 'chama-vela chama-md');
+    d.innerHTML = '<div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>';
+    return d;
+  }
+  function ensureHeaderFlame() {
+    const H = document.getElementById('chama-header');
+    if(!H) return;
+    if(!H.querySelector('.brasa')) {
+      H.innerHTML = '';
+      H.appendChild(makeFlame('chama-vela chama-lg'));
+    }
+  }
+  window.ensureHeaderFlame = ensureHeaderFlame; // Expor globalmente
+  // ... resto do IIFE "chamas" ...
+})();
   function ensureInlineFlame(id, cls) {
     const el = document.getElementById(id);
     if(!el) return null;
