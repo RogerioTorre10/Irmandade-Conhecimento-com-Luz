@@ -593,9 +593,9 @@ function typeWriter(el, text, speed, showCursor) {
         highlight.style.width = `${ctx.measureText(el.textContent).width}px`;
 
         if(char === ' ' || i === text.length) {
-          if(!window.isMuted && !el.closest('textarea')) {
-            readAloud(currentWord.trim(), (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
-          }
+         if(!window.isMuted && !el.closest('textarea')) {
+  await readAloud(currentWord.trim(), (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
+}
           currentWord = '';
         }
         setTimeout(step, speed);
@@ -1724,17 +1724,26 @@ async function runTyping(root) {
     recognition.start();
   }
 
-  function readAloud(text, voiceGender) {
-    if(window.isMuted || !('speechSynthesis' in window)) return;
+ // ===== leitura com sinal de término =====
+function readAloud(text, voiceGender) {
+  if (window.isMuted || !('speechSynthesis' in window)) return Promise.resolve();
+  return new Promise(resolve => {
     speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = currentLang;
+
     const voices = speechSynthesis.getVoices();
-    let selectedVoice = voices.find(v => v.lang === currentLang && v.name.includes(voiceGender === 'male' ? 'Male' : 'Female')) ||
-                       voices.find(v => v.lang === currentLang) || voices[0];
+    let selectedVoice =
+      voices.find(v => v.lang === currentLang && v.name.includes(voiceGender === 'male' ? 'Male' : 'Female')) ||
+      voices.find(v => v.lang === currentLang) || voices[0];
     utterance.voice = selectedVoice;
+
+    utterance.onend = resolve;      // 🔑 avisa quando terminar
+    utterance.onerror = resolve;    // em caso de erro, segue
     speechSynthesis.speak(utterance);
-  }
+  });
+}
+
 
   /* vídeos & blocos */
   const VIDEO_BASE = '/assets/img/';
