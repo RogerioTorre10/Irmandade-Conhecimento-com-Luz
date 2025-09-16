@@ -557,10 +557,15 @@
 
   /* ===== datilografia ===== */
   function typeWriter(el, text, speed, showCursor) {
-    if(!el) return Promise.resolve();
-    // Limpa o elemento e remove caracteres especiais indesejados
-    el.textContent = '';
-    const highlight = el.querySelector('.highlight') || document.createElement('div');
+  if(!el) return Promise.resolve();
+  // se já está digitando, não inicia outro ciclo
+  if (el.dataset.typing === '1') return Promise.resolve();
+
+  el.dataset.typing = '1'; // trava
+  // Limpa o elemento e remove caracteres especiais indesejados
+  el.textContent = '';
+  const highlight = el.querySelector('.highlight') || document.createElement('div');
+
     if(!el.querySelector('.highlight')) {
       highlight.className = 'highlight';
       el.prepend(highlight);
