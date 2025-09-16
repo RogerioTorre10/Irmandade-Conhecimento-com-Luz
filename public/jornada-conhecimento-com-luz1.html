@@ -616,27 +616,46 @@ function typeWriter(el, text, speed, showCursor) {
   });
 }
 
+// ===== runTyping sequencial (com lock) =====
+window.__typingLock = window.__typingLock || false;
+
 async function runTyping(root) {
-  if(!root || root.classList.contains('hidden')) return;
-  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  if (!root || root.classList.contains('hidden')) return;
 
-  const elements = Array.from(root.querySelectorAll('[data-typing]'));
-  for (const el of elements) {
-    // respeita trava/estado
-    if (el.dataset.typing === '1' || el.dataset.typed === '1') continue;
+  // evita múltiplas execuções concorrentes do runTyping
+  if (window.__typingLock) return;
+  window.__typingLock = true;
 
-    el.textContent = ''; // Garante que o texto inicial esteja limpo
-    const highlight = el.querySelector('.highlight');
-    if(highlight) highlight.style.width = '0';
+  try {
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
 
-    const t = dedupe(el.getAttribute('data-text') || el.textContent || '');
-    const spd = parseInt(el.getAttribute('data-speed') || '100', 10);
-    const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
+    // pega apenas elementos visíveis e ainda não tipados, na ordem do DOM
+    const elements = Array
+      .from(root.querySelectorAll('[data-typing]'))
+      .filter(el => !el.dataset.typed && el.offsetParent !== null);
 
-    await typeWriter(el, t, spd, cur);
-    // (typed é setado dentro do typeWriter)
+    for (const el of elements) {
+      if (el.dataset.typing === '1' || el.dataset.typed === '1') continue;
+
+      // limpa estado visual
+      el.textContent = '';
+      const highlight = el.querySelector('.highlight');
+      if (highlight) highlight.style.width = '0';
+
+      // velocidade mais lenta para sincronizar com a leitura (era 100)
+      const speed = parseInt(el.getAttribute('data-speed') || '140', 10);
+      const showCursor = String(el.getAttribute('data-cursor') || 'true') === 'true';
+      const text = dedupe(el.getAttribute('data-text') || el.textContent || '');
+
+      // digita UM por vez (espera terminar para ir ao próximo)
+      await typeWriter(el, text, speed, showCursor);
+      // (el.dataset.typed é marcado dentro do typeWriter)
+    }
+  } finally {
+    window.__typingLock = false;
   }
 }
+
 
   /* ===== datilografia no placeholder e respostas ===== */
   let __abortTypingPlaceholder = null;
