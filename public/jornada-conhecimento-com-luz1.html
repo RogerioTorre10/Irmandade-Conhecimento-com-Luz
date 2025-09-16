@@ -1172,6 +1172,8 @@ async function runTyping(root) {
         delete el.dataset.typed;
         const highlight = el.querySelector('.highlight');
         if(highlight) highlight.style.width = '0';
+        // ✅ garante que não fique preso em 'typing' ao trocar a seção
+        el.dataset.typing = '0';
       });
     });
     const active = document.getElementById(sectionId);
