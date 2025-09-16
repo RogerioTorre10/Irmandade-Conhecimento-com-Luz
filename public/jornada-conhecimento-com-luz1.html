@@ -570,8 +570,8 @@
       function step() {
         if(i < text.length) {
           const char = text.charAt(i++);
-          currentWord += char;
           el.textContent += char;
+          currentWord += char;
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
           ctx.font = window.getComputedStyle(el).font;
@@ -591,7 +591,7 @@
         }
       }
       if(showCursor) el.classList.add('lumen-typing');
-      step();
+      setTimeout(step, 0);
     });
   }
   async function runTyping(root) {
@@ -768,7 +768,7 @@
       selfieImg.setAttribute('x', baseX);
       selfieImg.setAttribute('y', baseY);
       selfieImg.setAttribute('width', baseW);
-      selfieImg.setAttribute('height', baseH);
+      selfieImg.setAttribute('height', baseH);      
       selfieInFlame.style.transform = `scale(${scale}) translate(${ox}px, ${oy}px)`;
       clientNameEl.textContent = localStorage.getItem('JORNADA_NOME')?.toUpperCase() || '';
       clientNameFinal.textContent = localStorage.getItem('JORNADA_NOME')?.toUpperCase() || '';
@@ -975,11 +975,23 @@
 
   /* ===== util: remove duplicações de letras e espaços, mantendo a integridade de ss, rr, etc. ===== */
   function dedupe(s='') {
-    return s
-      .normalize('NFC')
-      .replace(/\s{2,}/g, ' ')
-      .replace(/([^a-zA-Z0-9])\1+/g, '$1')
-      .trim();
+    if (!s) return '';
+    let result = s.normalize('NFC').trim();
+    // Remove duplicações de caracteres não alfanuméricos e espaços
+    result = result.replace(/\s+/g, ' ').replace(/([^a-zA-Z0-9])\1+/g, '$1');
+    // Garante que palavras com letras duplas (ex.: "ss", "rr") não sejam afetadas
+    let words = result.split(' ');
+    let cleanedWords = [];
+    for (let word of words) {
+      let cleanedWord = '';
+      for (let i = 0; i < word.length; i++) {
+        if (i === 0 || word[i] !== word[i-1] || !/[a-zA-Z]/.test(word[i])) {
+          cleanedWord += word[i];
+        }
+      }
+      cleanedWords.push(cleanedWord);
+    }
+    return cleanedWords.join(' ').trim();
   }
 
   /* ===== rotas candidatas p/ fallback ===== */
@@ -1139,6 +1151,7 @@
     if(active) {
       active.classList.remove('hidden');
       console.log('[showSection] Seção ativa:', active.id);
+      runTyping(active);
     } else {
       console.error('[showSection] Seção não encontrada:', sectionId);
       toast('Erro ao carregar a seção. Tente novamente.');
@@ -1187,7 +1200,11 @@
   /* ===== blocos dinâmicos ===== */
   window.loadDynamicBlocks = function() {
     const content = document.getElementById('perguntas-container');
-    if(!content) return;
+    if(!content) {
+      console.error('[loadDynamicBlocks] Contêiner de perguntas não encontrado');
+      toast('Erro ao carregar as perguntas. Tente novamente.');
+      return;
+    }
 
     const blocks = window.JORNADA_BLOCKS || [];
     content.innerHTML = '';
@@ -1873,7 +1890,7 @@
     }, { capture: true });
 
     document.getElementById('guiaNameInput')?.addEventListener('input', (ev) => {
-      ev.target.value = ev.target.value.toUpperCase();
+      ev.target.value = dedupe(ev.target.value).toUpperCase();
       return true;
     }, { capture: true });
   }
