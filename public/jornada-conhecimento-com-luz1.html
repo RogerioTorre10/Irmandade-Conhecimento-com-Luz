@@ -532,6 +532,7 @@
   </div>
 
     <div id="toast" role="status" aria-live="polite" class="hidden"></div>
+  
 <script>
 (function(){
   /* ===== util: toast + erro global ===== */
@@ -564,16 +565,23 @@
       el.prepend(highlight);
     }
     let i = 0;
+    let currentWord = '';
     return new Promise(resolve => {
       function step() {
-        if(i === 0 && showCursor) el.classList.add('lumen-typing'); // Adiciona cursor apenas ao iniciar
         if(i < text.length) {
-          el.textContent += text.charAt(i++);
-          // Calcula largura precisa usando canvas para sincronia
+          const char = text.charAt(i++);
+          currentWord += char;
+          el.textContent += char;
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
           ctx.font = window.getComputedStyle(el).font;
           highlight.style.width = `${ctx.measureText(el.textContent).width}px`;
+          if(char === ' ' || i === text.length) {
+            if(!window.isMuted && !el.closest('textarea')) {
+              readAloud(currentWord.trim(), (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
+            }
+            currentWord = '';
+          }
           setTimeout(step, speed);
         } else {
           el.classList.add('typing-done');
@@ -582,32 +590,30 @@
           resolve();
         }
       }
-      setTimeout(step, 0);
+      if(showCursor) el.classList.add('lumen-typing');
+      step();
     });
   }
   async function runTyping(root) {
     if(!root || root.classList.contains('hidden')) return;
-    // Cancela qualquer leitura ou animação anterior
     if(window.speechSynthesis) window.speechSynthesis.cancel();
     const elements = Array.from(root.querySelectorAll('[data-typing]'));
     for (const el of elements) {
       if (el.dataset.typed) continue;
-      el.textContent = ''; // Limpa antes de iniciar
-      const t = dedupe(el.getAttribute('data-text') || '');
-      const spd = parseInt(el.getAttribute('data-speed') || '50', 10); // Aumentada para 50ms para melhor sincronia
+      el.textContent = '';
+      const highlight = el.querySelector('.highlight');
+      if(highlight) highlight.style.width = '0';
+      const t = dedupe(el.getAttribute('data-text') || el.textContent || '');
+      const spd = parseInt(el.getAttribute('data-speed') || '60', 10);
       const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
       await typeWriter(el, t, spd, cur);
       el.dataset.typed = '1';
-      if(!window.isMuted && !el.closest('textarea')) {
-        await new Promise(r => setTimeout(r, 500));
-        readAloud(t, (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
-      }
     }
   }
 
   /* ===== datilografia no placeholder e respostas ===== */
   let __abortTypingPlaceholder = null;
-  async function typePlaceholder(inp, text, speed = 50) { // Aumentada para melhor sincronia
+  async function typePlaceholder(inp, text, speed = 60) {
     if(!inp) return;
     if(__abortTypingPlaceholder) __abortTypingPlaceholder();
     let abort = false;
@@ -622,7 +628,7 @@
     }
     if(!abort) inp.placeholder = text;
   }
-  async function typeAnswer(textarea, text, speed = 50) { // Aumentada para melhor sincronia
+  async function typeAnswer(textarea, text, speed = 60) {
     if(!textarea) return;
     textarea.value = '';
     textarea.classList.add('lumen-typing');
@@ -633,7 +639,7 @@
     textarea.classList.remove('lumen-typing');
     textarea.classList.add('typing-done');
   }
-  async function typeDevolutiva(div, text, speed = 50) { // Aumentada para melhor sincronia
+  async function typeDevolutiva(div, text, speed = 60) {
     if(!div) return;
     div.textContent = '';
     div.classList.add('lumen-typing');
@@ -952,14 +958,14 @@
       const guiaMsg = document.createElement('div');
       guiaMsg.className = 'grok-chat-message grok';
       messagesDiv.appendChild(guiaMsg);
-      await typeWriter(guiaMsg, guiaMessage, 50, true); // Ajustado para 50ms
+      await typeWriter(guiaMsg, guiaMessage, 60, true);
       if(!window.isMuted) readAloud(guiaMessage, cfg.voice);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
     } catch(e) {
       console.error('[Chat] erro', e);
       const guiaMsg = document.createElement('div');
       guiaMsg.className = 'grok-chat-message grok';
-      await typeWriter(guiaMsg, 'Ops, não consegui me conectar ao guia. Tenta novamente ou pula pra próxima pergunta.', 50, true);
+      await typeWriter(guiaMsg, 'Ops, não consegui me conectar ao guia. Tenta novamente ou pula pra próxima pergunta.', 60, true);
       if(!window.isMuted) readAloud('Ops, não consegui me conectar ao guia. Tenta novamente ou pula pra próxima pergunta.', cfg.voice);
       messagesDiv.appendChild(guiaMsg);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -972,7 +978,7 @@
     return s
       .normalize('NFC')
       .replace(/\s{2,}/g, ' ')
-      .replace(/([^\p{L}\p{N}])\1+/gu, '$1')
+      .replace(/([^a-zA-Z0-9])\1+/g, '$1')
       .trim();
   }
 
@@ -1002,7 +1008,7 @@
     const g = (guia || 'lumen').toLowerCase();
     const cfgWin = (window.guiaConfigs && window.guiaConfigs[g]) || {};
     const rawBase = cfgWin.apiUrlBase || cfgWin.apiUrl || GUIDE_BASES[g] || GUIDE_BASES.lumen;
-    const base = (rawBase || '').replace(/\/(v1\/chat|v1\/chat\/completions|v1/completions|chat|chat/completions)\/?$/,'');
+    const base = (rawBase || '').replace(/\/(v1\/chat|v1\/chat\/completions|v1\/completions|chat|chat\/completions)\/?$/,'');
     const model = cfgWin.model || GUIDE_MODELS[g] || GUIDE_MODELS.lumen;
 
     const quem = g === 'zion' ? 'Zion (Grok)' : (g === 'arian' ? 'Arian (Gemini)' : 'Lumen (ChatGPT)');
@@ -1118,7 +1124,6 @@
 
   function showSection(sectionId) {
     console.log('[showSection] Exibindo seção:', sectionId);
-    // Cancela qualquer leitura ou animação anterior
     if(window.speechSynthesis) window.speechSynthesis.cancel();
     document.querySelectorAll('.j-section').forEach(s => {
       s.classList.add('hidden');
@@ -1154,7 +1159,6 @@
         if(aria) aria.textContent = lbl;
         runTyping(first);
       } else {
-        // Força o carregamento dos blocos se não houver perguntas
         loadDynamicBlocks();
       }
     }
@@ -1177,9 +1181,6 @@
     if(sectionId === 'section-termos') {
       const pg1 = document.getElementById('termos-pg1');
       if(pg1 && !pg1.classList.contains('hidden')) runTyping(pg1);
-    }
-    if(sectionId === 'section-intro') {
-      runTyping(active); // Garante que a primeira frase seja exibida
     }
   }
 
@@ -1207,11 +1208,11 @@
         const enunciado = `
           <label class="pergunta-enunciado" 
             data-typing data-text="Pergunta ${qIdx + 1}: ${cleanLabel}" 
-            data-speed="50" data-cursor="true"></label>`; // Ajustado para 50ms
+            data-speed="60" data-cursor="true"></label>`;
 
         div.innerHTML = enunciado +
           `\n<textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>` +
-          `\n<p class="devolutiva-text" style="display:none;" data-typing data-speed="50" data-cursor="true"></p>` +
+          `\n<p class="devolutiva-text" style="display:none;" data-typing data-speed="60" data-cursor="true"></p>` +
           `\n<div class="accessibility-controls"></div>`;
 
         bloco.appendChild(div);
@@ -1269,7 +1270,7 @@
       lastDevolutivaText = resposta;
       const guia = localStorage.getItem('JORNADA_GUIA') || 'zion';
       const devolutiva = await fetchDevolutiva(pergunta, resposta, guia);
-      await typeDevolutiva(devolutivaP, devolutiva, 50); // Ajustado para 50ms
+      await typeDevolutiva(devolutivaP, devolutiva, 60);
     } else if(!textarea.value.trim() && devolutivaP) {
       devolutivaP.style.display = 'none';
       devolutivaP.textContent = '';
@@ -1345,7 +1346,7 @@
       prox.classList.add('active');
       const lbl = prox.querySelector('.pergunta-enunciado')?.textContent || '';
       const ta = prox.querySelector('textarea');
-      typeAnswer(ta, ta.value || '', 50); // Ajustado para 50ms
+      typeAnswer(ta, ta.value || '', 60);
       const aria = document.getElementById('aria-pergunta');
       if(aria) aria.textContent = lbl;
       runTyping(prox);
@@ -1537,10 +1538,9 @@
       ta.placeholder = "Digite sua resposta...";
       const aria = document.getElementById('aria-pergunta');
       if(aria) aria.textContent = lbl;
-      if(ta) typeAnswer(ta, ta.value || '', 50);
+      if(ta) typeAnswer(ta, ta.value || '', 60);
       runTyping(perguntas[0]);
     }
-    updateProgress();
   }
 
   /* ===== Acessibilidade: Microfone e Áudio ===== */
@@ -1642,7 +1642,7 @@
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       textarea.value = (textarea.value ? textarea.value + ' ' : '') + transcript;
-      typeAnswer(textarea, textarea.value, 50);
+      typeAnswer(textarea, textarea.value, 60);
       saveAnswers();
       updateProgress();
       handleDevolutiva(textarea);
