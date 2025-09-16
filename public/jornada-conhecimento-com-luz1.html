@@ -556,7 +556,7 @@
   const env = document.getElementById('envTag');
   if(env) env.textContent = `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/assets`;
 
-  /* ===== datilografia ===== */
+/* ===== datilografia ===== */
 async function typeWriter(el, text, speed, showCursor) {
   if (!el) return Promise.resolve();
   if (el.dataset.typing === '1' || el.dataset.typed === '1') return Promise.resolve();
@@ -616,6 +616,7 @@ async function typeWriter(el, text, speed, showCursor) {
   });
 }
 window.typeWriter = typeWriter;
+
 /* ===== datilografia + runTyping (WRAPPED & SAFE) ===== */
 void function DTYPE_WRAP() {
   // pega referência global sem usar 'window' no início
@@ -1241,47 +1242,80 @@ void function DTYPE_WRAP() {
     }
   }
 
-  function showSection(sectionId) {
-    console.log('[showSection] Exibindo seção:', sectionId);
-    if(window.speechSynthesis) window.speechSynthesis.cancel();
-    document.querySelectorAll('.j-section').forEach(s => {
-      s.classList.add('hidden');
-      s.querySelectorAll('[data-typing]').forEach(el => {
-        el.textContent = '';
-        el.classList.remove('lumen-typing', 'typing-done');
-        delete el.dataset.typed;
-        const highlight = el.querySelector('.highlight');
-        if(highlight) highlight.style.width = '0';
-      });
-    });
-    const active = document.getElementById(sectionId);
-    if(active) {
-      active.classList.remove('hidden');
-      console.log('[showSection] Seção ativa:', active.id);
-      runTyping(active);
-    } else {
-      console.error('[showSection] Seção não encontrada:', sectionId);
-      toast('Erro ao carregar a seção. Tente novamente.');
-    }
-    updateCanvasBackground(sectionId);
-    ensureHeroFlame(sectionId);
+// ===== showSection seguro =====
+function showSection(sectionId) {
+  console.log('[showSection] Exibindo seção:', sectionId);
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
 
-    if(sectionId === 'section-perguntas') {
-      updateProgress();
-      const perguntas = document.querySelectorAll('.j-pergunta');
-      if(perguntas.length) {
-        const first = document.querySelector('.j-pergunta.active') || perguntas[0];
-        first.classList.add('active');
-        const lbl = first.querySelector('.pergunta-enunciado')?.textContent || '';
-        const ta = first.querySelector('textarea');
-        ta.placeholder = "Digite sua resposta...";
-        const aria = document.getElementById('aria-pergunta');
-        if(aria) aria.textContent = lbl;
-        runTyping(first);
-      } else {
-        loadDynamicBlocks();
-      }
+  // esconde e reseta tudo
+  document.querySelectorAll('.j-section').forEach(s => {
+    s.classList.add('hidden');
+    s.querySelectorAll('[data-typing]').forEach(el => {
+      el.textContent = '';
+      el.classList.remove('lumen-typing', 'typing-done');
+      el.dataset.typing = '0';     // garante reset da trava
+      delete el.dataset.typed;
+      const highlight = el.querySelector('.highlight');
+      if (highlight) highlight.style.width = '0';
+    });
+  });
+
+  const active = document.getElementById(sectionId);
+  if (!active) {
+    console.error('[showSection] Seção não encontrada:', sectionId);
+    toast('Erro ao carregar a seção. Tente novamente.');
+    return;
+  }
+
+  // exibe seção alvo e roda datilografia sequencial
+  active.classList.remove('hidden');
+  console.log('[showSection] Seção ativa:', active.id);
+  runTyping(active);
+
+  updateCanvasBackground(sectionId);
+  ensureHeroFlame(sectionId);
+
+  // blocos específicos
+  if (sectionId === 'section-perguntas') {
+    updateProgress();
+    const perguntas = document.querySelectorAll('.j-pergunta');
+    if (perguntas.length) {
+      const first = document.querySelector('.j-pergunta.active') || perguntas[0];
+      first.classList.add('active');
+      const lbl = first.querySelector('.pergunta-enunciado')?.textContent || '';
+      const ta = first.querySelector('textarea');
+      ta.placeholder = 'Digite sua resposta...';
+      const aria = document.getElementById('aria-pergunta');
+      if (aria) aria.textContent = lbl;
+      // não chama runTyping de novo — já foi chamado para a seção
+    } else {
+      loadDynamicBlocks();
     }
+  }
+
+  if (sectionId === 'section-final') {
+    const url = localStorage.getItem('IRMANDADE_SELFIE_FINAL');
+    if (url) {
+      const img = document.querySelector('#selfieInFlame');
+      if (img) img.src = url;
+      const clientNameFinal = document.querySelector('#clientNameSlotFinal');
+      if (clientNameFinal) clientNameFinal.textContent =
+        localStorage.getItem('JORNADA_NOME')?.toUpperCase() || '';
+    }
+  }
+
+  if (sectionId === 'section-guia') {
+    const guiaNameInput = document.getElementById('guiaNameInput');
+    const storedName = localStorage.getItem('JORNADA_NOME') || '';
+    if (guiaNameInput && storedName) guiaNameInput.value = storedName.toUpperCase();
+  }
+
+  if (sectionId === 'section-termos') {
+    const pg1 = document.getElementById('termos-pg1');
+    if (pg1 && !pg1.classList.contains('hidden')) runTyping(pg1);
+  }
+}
+
     if(sectionId === 'section-final') {
       const url = localStorage.getItem('IRMANDADE_SELFIE_FINAL');
       if(url) {
@@ -1783,17 +1817,26 @@ void function DTYPE_WRAP() {
     recognition.start();
   }
 
-  function readAloud(text, voiceGender) {
-    if(window.isMuted || !('speechSynthesis' in window)) return;
+ // ===== leitura com sinal de término =====
+function readAloud(text, voiceGender) {
+  if (window.isMuted || !('speechSynthesis' in window)) return Promise.resolve();
+  return new Promise(resolve => {
     speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = currentLang;
+
     const voices = speechSynthesis.getVoices();
-    let selectedVoice = voices.find(v => v.lang === currentLang && v.name.includes(voiceGender === 'male' ? 'Male' : 'Female')) ||
-                       voices.find(v => v.lang === currentLang) || voices[0];
+    let selectedVoice =
+      voices.find(v => v.lang === currentLang && v.name.includes(voiceGender === 'male' ? 'Male' : 'Female')) ||
+      voices.find(v => v.lang === currentLang) || voices[0];
     utterance.voice = selectedVoice;
+
+    utterance.onend = resolve;      // 🔑 avisa quando terminar
+    utterance.onerror = resolve;    // em caso de erro, segue
     speechSynthesis.speak(utterance);
-  }
+  });
+}
+
 
   /* vídeos & blocos */
   const VIDEO_BASE = '/assets/img/';
