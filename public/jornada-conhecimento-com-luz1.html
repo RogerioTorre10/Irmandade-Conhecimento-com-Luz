@@ -558,18 +558,25 @@
   /* ===== datilografia ===== */
   function typeWriter(el, text, speed, showCursor) {
     if(!el) return Promise.resolve();
-    el.textContent = ''; // Limpa explicitamente para evitar duplicação
+    // Limpa o elemento e remove caracteres especiais indesejados
+    el.textContent = '';
     const highlight = el.querySelector('.highlight') || document.createElement('div');
     if(!el.querySelector('.highlight')) {
       highlight.className = 'highlight';
       el.prepend(highlight);
     }
+    // Remove chaves, colchetes e outros caracteres especiais antes de processar
+    text = text.replace(/[{}[\]]/g, '').trim();
     let i = 0;
     let currentWord = '';
     return new Promise(resolve => {
       function step() {
         if(i < text.length) {
           const char = text.charAt(i++);
+          // Verifica se o caractere anterior é igual, evitando duplicação
+          if (i > 1 && char === text.charAt(i-2) && /[a-zA-Z]/.test(char)) {
+            return setTimeout(step, speed); // Pula duplicação de letras
+          }
           el.textContent += char;
           currentWord += char;
           const canvas = document.createElement('canvas');
@@ -600,17 +607,16 @@
     const elements = Array.from(root.querySelectorAll('[data-typing]'));
     for (const el of elements) {
       if (el.dataset.typed) continue;
-      el.textContent = '';
+      el.textContent = ''; // Garante que o texto inicial esteja limpo
       const highlight = el.querySelector('.highlight');
       if(highlight) highlight.style.width = '0';
       const t = dedupe(el.getAttribute('data-text') || el.textContent || '');
-      const spd = parseInt(el.getAttribute('data-speed') || '60', 10);
+      const spd = parseInt(el.getAttribute('data-speed') || '100', 10); // Aumentado para 100ms
       const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
       await typeWriter(el, t, spd, cur);
       el.dataset.typed = '1';
     }
   }
-
   /* ===== datilografia no placeholder e respostas ===== */
   let __abortTypingPlaceholder = null;
   async function typePlaceholder(inp, text, speed = 60) {
