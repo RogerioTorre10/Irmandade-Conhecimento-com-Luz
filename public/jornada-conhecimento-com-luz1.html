@@ -616,8 +616,10 @@ function typeWriter(el, text, speed, showCursor) {
   });
 }
 
-// ===== runTyping sequencial (com lock) =====
+// ===== runTyping sequencial (velocidade padrão configurável) =====
 window.__typingLock = window.__typingLock || false;
+
+const DEFAULT_SPEED = 140; // 👉 mude aqui para acelerar ou desacelerar toda a jornada
 
 async function runTyping(root) {
   if (!root || root.classList.contains('hidden')) return;
@@ -642,8 +644,8 @@ async function runTyping(root) {
       const highlight = el.querySelector('.highlight');
       if (highlight) highlight.style.width = '0';
 
-      // velocidade mais lenta para sincronizar com a leitura (era 100)
-      const speed = parseInt(el.getAttribute('data-speed') || '140', 10);
+      // usa data-speed se definido, senão aplica DEFAULT_SPEED
+      const speed = parseInt(el.getAttribute('data-speed') || DEFAULT_SPEED, 10);
       const showCursor = String(el.getAttribute('data-cursor') || 'true') === 'true';
       const text = dedupe(el.getAttribute('data-text') || el.textContent || '');
 
@@ -655,7 +657,6 @@ async function runTyping(root) {
     window.__typingLock = false;
   }
 }
-
 
   /* ===== datilografia no placeholder e respostas ===== */
   let __abortTypingPlaceholder = null;
