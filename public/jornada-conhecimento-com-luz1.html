@@ -579,31 +579,38 @@ function typeWriter(el, text, speed, showCursor) {
   let currentWord = '';
 
   return new Promise(resolve => {
-    function step() {
-      if(i < text.length) {
+    // 🔧 agora é async para podermos usar await readAloud(...)
+    async function step() {
+      if (i < text.length) {
         const char = text.charAt(i++);
 
-        // ⛔️ Removido o anti-duplicação bugado (i-2)
+        // escreve
         el.textContent += char;
         currentWord += char;
 
+        // atualiza highlight
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         ctx.font = window.getComputedStyle(el).font;
         highlight.style.width = `${ctx.measureText(el.textContent).width}px`;
 
-        if(char === ' ' || i === text.length) {
-         if(!window.isMuted && !el.closest('textarea')) {
-  await readAloud(currentWord.trim(), (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
-}
+        // quando termina uma palavra (ou o texto), fala e aguarda terminar
+        if (char === ' ' || i === text.length) {
+          if (!window.isMuted && !el.closest('textarea')) {
+            await readAloud(
+              currentWord.trim(),
+              (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female')
+            );
+          }
           currentWord = '';
         }
-        setTimeout(step, speed);
+
+        setTimeout(() => { step(); }, speed);
       } else {
         el.classList.add('typing-done');
         el.classList.remove('lumen-typing');
         highlight.style.width = '0';
-       
+
         // ✅ marca finalizado e libera a trava
         el.dataset.typed = '1';
         el.dataset.typing = '0';
@@ -611,10 +618,12 @@ function typeWriter(el, text, speed, showCursor) {
         resolve();
       }
     }
-    if(showCursor) el.classList.add('lumen-typing');
-    setTimeout(step, 0);
+
+    if (showCursor) el.classList.add('lumen-typing');
+    setTimeout(() => { step(); }, 0);
   });
 }
+
 
 // ===== runTyping sequencial (velocidade padrão configurável) =====
 window.__typingLock = window.__typingLock || false;
