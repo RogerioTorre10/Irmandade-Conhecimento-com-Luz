@@ -555,73 +555,89 @@
   const env = document.getElementById('envTag');
   if(env) env.textContent = `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/assets`;
 
-  /* ===== datilografia ===== */
-  function typeWriter(el, text, speed, showCursor) {
+/* ===== datilografia ===== */
+function typeWriter(el, text, speed, showCursor) {
   if(!el) return Promise.resolve();
-  // se já está digitando, não inicia outro ciclo
-  if (el.dataset.typing === '1') return Promise.resolve();
 
-  el.dataset.typing = '1'; // trava
+  // trava: se já estiver digitando ou já digitou, não inicia outro ciclo
+  if (el.dataset.typing === '1' || el.dataset.typed === '1') return Promise.resolve();
+
+  // marca início
+  el.dataset.typing = '1';
+
   // Limpa o elemento e remove caracteres especiais indesejados
   el.textContent = '';
   const highlight = el.querySelector('.highlight') || document.createElement('div');
+  if(!el.querySelector('.highlight')) {
+    highlight.className = 'highlight';
+    el.prepend(highlight);
+  }
 
-    if(!el.querySelector('.highlight')) {
-      highlight.className = 'highlight';
-      el.prepend(highlight);
-    }
-    // Remove chaves, colchetes e outros caracteres especiais antes de processar
-    text = text.replace(/[{}[\]]/g, '').trim();
-    let i = 0;
-    let currentWord = '';
-    return new Promise(resolve => {
-      function step() {
-        if(i < text.length) {
-          const char = text.charAt(i++);
-          // Verifica se o caractere anterior é igual, evitando duplicação
-          if (i > 1 && char === text.charAt(i-2) && /[a-zA-Z]/.test(char)) {
-            return setTimeout(step, speed); // Pula duplicação de letras
+  // Remove chaves, colchetes e outros caracteres especiais antes de processar
+  text = text.replace(/[{}[\]]/g, '').trim();
+  let i = 0;
+  let currentWord = '';
+
+  return new Promise(resolve => {
+    function step() {
+      if(i < text.length) {
+        const char = text.charAt(i++);
+
+        // ⛔️ Removido o anti-duplicação bugado (i-2)
+        el.textContent += char;
+        currentWord += char;
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.font = window.getComputedStyle(el).font;
+        highlight.style.width = `${ctx.measureText(el.textContent).width}px`;
+
+        if(char === ' ' || i === text.length) {
+          if(!window.isMuted && !el.closest('textarea')) {
+            readAloud(currentWord.trim(), (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
           }
-          el.textContent += char;
-          currentWord += char;
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          ctx.font = window.getComputedStyle(el).font;
-          highlight.style.width = `${ctx.measureText(el.textContent).width}px`;
-          if(char === ' ' || i === text.length) {
-            if(!window.isMuted && !el.closest('textarea')) {
-              readAloud(currentWord.trim(), (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
-            }
-            currentWord = '';
-          }
-          setTimeout(step, speed);
-        } else {
-          el.classList.add('typing-done');
-          el.classList.remove('lumen-typing');
-          highlight.style.width = '0';
-          resolve();
+          currentWord = '';
         }
+        setTimeout(step, speed);
+      } else {
+        el.classList.add('typing-done');
+        el.classList.remove('lumen-typing');
+        highlight.style.width = '0';
+
+        // ✅ marca finalizado e libera a trava
+        el.dataset.typed = '1';
+        el.dataset.typing = '0';
+
+        resolve();
       }
-      if(showCursor) el.classList.add('lumen-typing');
-      setTimeout(step, 0);
-    });
-  }
-  async function runTyping(root) {
-    if(!root || root.classList.contains('hidden')) return;
-    if(window.speechSynthesis) window.speechSynthesis.cancel();
-    const elements = Array.from(root.querySelectorAll('[data-typing]'));
-    for (const el of elements) {
-      if (el.dataset.typed) continue;
-      el.textContent = ''; // Garante que o texto inicial esteja limpo
-      const highlight = el.querySelector('.highlight');
-      if(highlight) highlight.style.width = '0';
-      const t = dedupe(el.getAttribute('data-text') || el.textContent || '');
-      const spd = parseInt(el.getAttribute('data-speed') || '100', 10); // Aumentado para 100ms
-      const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
-      await typeWriter(el, t, spd, cur);
-      el.dataset.typed = '1';
     }
+    if(showCursor) el.classList.add('lumen-typing');
+    setTimeout(step, 0);
+  });
+}
+
+async function runTyping(root) {
+  if(!root || root.classList.contains('hidden')) return;
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
+
+  const elements = Array.from(root.querySelectorAll('[data-typing]'));
+  for (const el of elements) {
+    // respeita trava/estado
+    if (el.dataset.typing === '1' || el.dataset.typed === '1') continue;
+
+    el.textContent = ''; // Garante que o texto inicial esteja limpo
+    const highlight = el.querySelector('.highlight');
+    if(highlight) highlight.style.width = '0';
+
+    const t = dedupe(el.getAttribute('data-text') || el.textContent || '');
+    const spd = parseInt(el.getAttribute('data-speed') || '100', 10);
+    const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
+
+    await typeWriter(el, t, spd, cur);
+    // (typed é setado dentro do typeWriter)
   }
+}
+
   /* ===== datilografia no placeholder e respostas ===== */
   let __abortTypingPlaceholder = null;
   async function typePlaceholder(inp, text, speed = 60) {
