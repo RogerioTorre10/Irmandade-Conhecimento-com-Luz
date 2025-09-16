@@ -717,7 +717,7 @@
     textarea.classList.remove('lumen-typing');
     textarea.classList.add('typing-done');
   }
-  async function typeDevolutiva(div, text, speed = 60) {
+    async function typeDevolutiva(div, text, speed = 60) {
     if(!div) return;
     div.textContent = '';
     div.classList.add('lumen-typing');
@@ -728,8 +728,8 @@
     div.classList.add('typing-done');
     if(!window.isMuted) readAloud(text, (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
   }
-})();
-    
+})(); // Fechamento correto do IIFE que contém typePlaceholder, typeAnswer e typeDevolutiva
+
 (function(){
   /* ===== chamas ===== */
   function makeFlame(cls) {
@@ -746,8 +746,9 @@
       H.appendChild(makeFlame('chama-vela chama-lg'));
     }
   }
-  window.ensureHeaderFlame = ensureHeaderFlame; // Expor a função globalmente
-  })();
+  window.ensureHeaderFlame = ensureHeaderFlame; // Expor globalmente para evitar "not defined"
+  // ... resto do IIFE "chamas" ...
+})();
     
   function ensureInlineFlame(id, cls) {
     const el = document.getElementById(id);
