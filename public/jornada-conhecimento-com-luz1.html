@@ -556,74 +556,65 @@
   if(env) env.textContent = `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/assets`;
 
 /* ===== datilografia ===== */
-function typeWriter(el, text, speed, showCursor) {
-  if(!el) return Promise.resolve();
-
-  // trava: se já estiver digitando ou já digitou, não inicia outro ciclo
+async function typeWriter(el, text, speed, showCursor) {
+  if (!el) return Promise.resolve();
   if (el.dataset.typing === '1' || el.dataset.typed === '1') return Promise.resolve();
 
-  // marca início
   el.dataset.typing = '1';
-
-  // Limpa o elemento e remove caracteres especiais indesejados
   el.textContent = '';
   const highlight = el.querySelector('.highlight') || document.createElement('div');
-  if(!el.querySelector('.highlight')) {
+  if (!el.querySelector('.highlight')) {
     highlight.className = 'highlight';
     el.prepend(highlight);
   }
 
-  // Remove chaves, colchetes e outros caracteres especiais antes de processar
-  text = text.replace(/[{}[\]]/g, '').trim();
-  let i = 0;
-  let currentWord = '';
+  text = (text || '').replace(/[{}[\]]/g, '').trim();
+  let i = 0, currentWord = '';
+  const punctuationPauses = { ',': 300, '.': 500, '!': 500, '?': 500 }; // Pausas em ms para pontuações
 
   return new Promise(resolve => {
-    // 🔧 agora é async para podermos usar await readAloud(...)
     async function step() {
       if (i < text.length) {
         const char = text.charAt(i++);
-
-        // escreve
         el.textContent += char;
         currentWord += char;
 
-        // atualiza highlight
+        // Atualiza o highlight
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        ctx.font = window.getComputedStyle(el).font;
+        ctx.font = getComputedStyle(el).font;
         highlight.style.width = `${ctx.measureText(el.textContent).width}px`;
 
-        // quando termina uma palavra (ou o texto), fala e aguarda terminar
-        if (char === ' ' || i === text.length) {
-          if (!window.isMuted && !el.closest('textarea')) {
-            await readAloud(
-              currentWord.trim(),
-              (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female')
-            );
+        // Verifica se é uma palavra completa ou pontuação
+        if (char === ' ' || i === text.length || punctuationPauses[char]) {
+          if (!window.isMuted && !el.closest('textarea') && currentWord.trim()) {
+            await readAloud(currentWord.trim(), localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female');
           }
           currentWord = '';
-        }
 
-        setTimeout(() => { step(); }, speed);
+          // Ajusta o tempo para a próxima iteração com base na pontuação
+          const pause = punctuationPauses[char] || 0;
+          const nextDelay = speed + pause; // Adiciona pausa extra para pontuações
+          setTimeout(step, nextDelay);
+        } else {
+          // Ajusta o tempo dinamicamente com base no tamanho da palavra
+          const dynamicSpeed = Math.max(speed, 50 + currentWord.length * 10); // Exemplo: mais caracteres, mais tempo
+          setTimeout(step, dynamicSpeed);
+        }
       } else {
         el.classList.add('typing-done');
         el.classList.remove('lumen-typing');
         highlight.style.width = '0';
-
-        // ✅ marca finalizado e libera a trava
         el.dataset.typed = '1';
         el.dataset.typing = '0';
-
         resolve();
       }
     }
-
     if (showCursor) el.classList.add('lumen-typing');
-    setTimeout(() => { step(); }, 0);
+    setTimeout(step, 0);
   });
 }
-
+window.typeWriter = typeWriter;
 
 /* ===== datilografia + runTyping (WRAPPED & SAFE) ===== */
 void function DTYPE_WRAP() {
