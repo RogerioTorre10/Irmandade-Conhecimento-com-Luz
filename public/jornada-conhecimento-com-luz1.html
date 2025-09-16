@@ -564,13 +564,12 @@
       el.prepend(highlight);
     }
     let i = 0;
-    let animationAborted = false;
     return new Promise(resolve => {
       function step() {
-        if(animationAborted) return resolve();
-        if(i === 0 && showCursor) el.classList.add('lumen-typing');
+        if(i === 0 && showCursor) el.classList.add('lumen-typing'); // Adiciona cursor apenas ao iniciar
         if(i < text.length) {
           el.textContent += text.charAt(i++);
+          // Calcula largura precisa usando canvas para sincronia
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
           ctx.font = window.getComputedStyle(el).font;
@@ -588,16 +587,14 @@
   }
   async function runTyping(root) {
     if(!root || root.classList.contains('hidden')) return;
+    // Cancela qualquer leitura ou animação anterior
     if(window.speechSynthesis) window.speechSynthesis.cancel();
     const elements = Array.from(root.querySelectorAll('[data-typing]'));
     for (const el of elements) {
       if (el.dataset.typed) continue;
-      el.textContent = '';
-      el.classList.remove('lumen-typing', 'typing-done');
-      const highlight = el.querySelector('.highlight');
-      if(highlight) highlight.style.width = '0';
+      el.textContent = ''; // Limpa antes de iniciar
       const t = dedupe(el.getAttribute('data-text') || '');
-      const spd = parseInt(el.getAttribute('data-speed') || '60', 10); // Ajustado para 60ms
+      const spd = parseInt(el.getAttribute('data-speed') || '50', 10); // Aumentada para 50ms para melhor sincronia
       const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
       await typeWriter(el, t, spd, cur);
       el.dataset.typed = '1';
@@ -610,7 +607,7 @@
 
   /* ===== datilografia no placeholder e respostas ===== */
   let __abortTypingPlaceholder = null;
-  async function typePlaceholder(inp, text, speed = 60) {
+  async function typePlaceholder(inp, text, speed = 50) { // Aumentada para melhor sincronia
     if(!inp) return;
     if(__abortTypingPlaceholder) __abortTypingPlaceholder();
     let abort = false;
@@ -625,7 +622,7 @@
     }
     if(!abort) inp.placeholder = text;
   }
-  async function typeAnswer(textarea, text, speed = 60) {
+  async function typeAnswer(textarea, text, speed = 50) { // Aumentada para melhor sincronia
     if(!textarea) return;
     textarea.value = '';
     textarea.classList.add('lumen-typing');
@@ -636,7 +633,7 @@
     textarea.classList.remove('lumen-typing');
     textarea.classList.add('typing-done');
   }
-  async function typeDevolutiva(div, text, speed = 60) {
+  async function typeDevolutiva(div, text, speed = 50) { // Aumentada para melhor sincronia
     if(!div) return;
     div.textContent = '';
     div.classList.add('lumen-typing');
@@ -955,14 +952,14 @@
       const guiaMsg = document.createElement('div');
       guiaMsg.className = 'grok-chat-message grok';
       messagesDiv.appendChild(guiaMsg);
-      await typeWriter(guiaMsg, guiaMessage, 60, true);
+      await typeWriter(guiaMsg, guiaMessage, 50, true); // Ajustado para 50ms
       if(!window.isMuted) readAloud(guiaMessage, cfg.voice);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
     } catch(e) {
       console.error('[Chat] erro', e);
       const guiaMsg = document.createElement('div');
       guiaMsg.className = 'grok-chat-message grok';
-      await typeWriter(guiaMsg, 'Ops, não consegui me conectar ao guia. Tenta novamente ou pula pra próxima pergunta.', 60, true);
+      await typeWriter(guiaMsg, 'Ops, não consegui me conectar ao guia. Tenta novamente ou pula pra próxima pergunta.', 50, true);
       if(!window.isMuted) readAloud('Ops, não consegui me conectar ao guia. Tenta novamente ou pula pra próxima pergunta.', cfg.voice);
       messagesDiv.appendChild(guiaMsg);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -975,7 +972,7 @@
     return s
       .normalize('NFC')
       .replace(/\s{2,}/g, ' ')
-      .replace(/([^a-zA-Z0-9])\1+/g, '$1')
+      .replace(/([^\p{L}\p{N}])\1+/gu, '$1')
       .trim();
   }
 
@@ -1005,7 +1002,7 @@
     const g = (guia || 'lumen').toLowerCase();
     const cfgWin = (window.guiaConfigs && window.guiaConfigs[g]) || {};
     const rawBase = cfgWin.apiUrlBase || cfgWin.apiUrl || GUIDE_BASES[g] || GUIDE_BASES.lumen;
-    const base = (rawBase || '').replace(/\/(v1\/chat|v1\/chat\/completions|v1\/completions|chat|chat\/completions)\/?$/,'');
+    const base = (rawBase || '').replace(/\/(v1\/chat|v1\/chat\/completions|v1/completions|chat|chat/completions)\/?$/,'');
     const model = cfgWin.model || GUIDE_MODELS[g] || GUIDE_MODELS.lumen;
 
     const quem = g === 'zion' ? 'Zion (Grok)' : (g === 'arian' ? 'Arian (Gemini)' : 'Lumen (ChatGPT)');
@@ -1121,6 +1118,7 @@
 
   function showSection(sectionId) {
     console.log('[showSection] Exibindo seção:', sectionId);
+    // Cancela qualquer leitura ou animação anterior
     if(window.speechSynthesis) window.speechSynthesis.cancel();
     document.querySelectorAll('.j-section').forEach(s => {
       s.classList.add('hidden');
@@ -1136,7 +1134,6 @@
     if(active) {
       active.classList.remove('hidden');
       console.log('[showSection] Seção ativa:', active.id);
-      runTyping(active); // Garante que a datilografia seja iniciada
     } else {
       console.error('[showSection] Seção não encontrada:', sectionId);
       toast('Erro ao carregar a seção. Tente novamente.');
@@ -1157,6 +1154,7 @@
         if(aria) aria.textContent = lbl;
         runTyping(first);
       } else {
+        // Força o carregamento dos blocos se não houver perguntas
         loadDynamicBlocks();
       }
     }
@@ -1180,16 +1178,15 @@
       const pg1 = document.getElementById('termos-pg1');
       if(pg1 && !pg1.classList.contains('hidden')) runTyping(pg1);
     }
+    if(sectionId === 'section-intro') {
+      runTyping(active); // Garante que a primeira frase seja exibida
+    }
   }
 
   /* ===== blocos dinâmicos ===== */
   window.loadDynamicBlocks = function() {
     const content = document.getElementById('perguntas-container');
-    if(!content) {
-      console.error('[loadDynamicBlocks] Contêiner de perguntas não encontrado');
-      toast('Erro ao carregar as perguntas. Tente novamente.');
-      return;
-    }
+    if(!content) return;
 
     const blocks = window.JORNADA_BLOCKS || [];
     content.innerHTML = '';
@@ -1210,11 +1207,11 @@
         const enunciado = `
           <label class="pergunta-enunciado" 
             data-typing data-text="Pergunta ${qIdx + 1}: ${cleanLabel}" 
-            data-speed="60" data-cursor="true"></label>`;
+            data-speed="50" data-cursor="true"></label>`; // Ajustado para 50ms
 
         div.innerHTML = enunciado +
           `\n<textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>` +
-          `\n<p class="devolutiva-text" style="display:none;" data-typing data-speed="60" data-cursor="true"></p>` +
+          `\n<p class="devolutiva-text" style="display:none;" data-typing data-speed="50" data-cursor="true"></p>` +
           `\n<div class="accessibility-controls"></div>`;
 
         bloco.appendChild(div);
@@ -1272,7 +1269,7 @@
       lastDevolutivaText = resposta;
       const guia = localStorage.getItem('JORNADA_GUIA') || 'zion';
       const devolutiva = await fetchDevolutiva(pergunta, resposta, guia);
-      await typeDevolutiva(devolutivaP, devolutiva, 60);
+      await typeDevolutiva(devolutivaP, devolutiva, 50); // Ajustado para 50ms
     } else if(!textarea.value.trim() && devolutivaP) {
       devolutivaP.style.display = 'none';
       devolutivaP.textContent = '';
@@ -1348,7 +1345,7 @@
       prox.classList.add('active');
       const lbl = prox.querySelector('.pergunta-enunciado')?.textContent || '';
       const ta = prox.querySelector('textarea');
-      typeAnswer(ta, ta.value || '', 60);
+      typeAnswer(ta, ta.value || '', 50); // Ajustado para 50ms
       const aria = document.getElementById('aria-pergunta');
       if(aria) aria.textContent = lbl;
       runTyping(prox);
@@ -1540,9 +1537,10 @@
       ta.placeholder = "Digite sua resposta...";
       const aria = document.getElementById('aria-pergunta');
       if(aria) aria.textContent = lbl;
-      if(ta) typeAnswer(ta, ta.value || '', 60);
+      if(ta) typeAnswer(ta, ta.value || '', 50);
       runTyping(perguntas[0]);
     }
+    updateProgress();
   }
 
   /* ===== Acessibilidade: Microfone e Áudio ===== */
@@ -1603,6 +1601,7 @@
         console.log('[initAccessibility] Botão Avançar clicado');
         isTransitioning = false;
         showSection('section-termos');
+        runTyping(document.getElementById('termos-pg1'));
         return true;
       }
       return false;
@@ -1643,7 +1642,7 @@
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       textarea.value = (textarea.value ? textarea.value + ' ' : '') + transcript;
-      typeAnswer(textarea, textarea.value, 60);
+      typeAnswer(textarea, textarea.value, 50);
       saveAnswers();
       updateProgress();
       handleDevolutiva(textarea);
@@ -1818,6 +1817,7 @@
         console.log('[click] Botão Avançar Termos clicado');
         isTransitioning = false;
         showSection('section-termos');
+        runTyping(document.getElementById('termos-pg1'));
         return true;
       }
       if(btnNextSenha) {
@@ -1891,5 +1891,6 @@
 </script>
 </body>
 </html>
+
 
 
