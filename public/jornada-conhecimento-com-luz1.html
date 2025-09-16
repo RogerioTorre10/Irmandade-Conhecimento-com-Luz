@@ -1806,6 +1806,8 @@
         console.warn('[click] Bloqueado por isTransitioning ou target nulo');
         return false;
       }
+      console.log('toast definido:', typeof window.toast);
+      console.log('ensureHeaderFlame definido:', typeof window.ensureHeaderFlame);
       console.log('[click] Evento de clique disparado', ev.target);
       const aNext = ev.target.closest?.('[data-action="next"]');
       const aStart = ev.target.closest?.('[data-action="start"]');
