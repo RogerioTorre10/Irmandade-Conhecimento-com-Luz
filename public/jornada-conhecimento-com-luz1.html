@@ -1180,49 +1180,80 @@ async function runTyping(root) {
     }
   }
 
-  function showSection(sectionId) {
-    console.log('[showSection] Exibindo seção:', sectionId);
-    if(window.speechSynthesis) window.speechSynthesis.cancel();
-    document.querySelectorAll('.j-section').forEach(s => {
-      s.classList.add('hidden');
-      s.querySelectorAll('[data-typing]').forEach(el => {
-        el.textContent = '';
-        el.classList.remove('lumen-typing', 'typing-done');
-        delete el.dataset.typed;
-        const highlight = el.querySelector('.highlight');
-        if(highlight) highlight.style.width = '0';
-        // ✅ garante que não fique preso em 'typing' ao trocar a seção
-        el.dataset.typing = '0';
-      });
-    });
-    const active = document.getElementById(sectionId);
-    if(active) {
-      active.classList.remove('hidden');
-      console.log('[showSection] Seção ativa:', active.id);
-      runTyping(active);
-    } else {
-      console.error('[showSection] Seção não encontrada:', sectionId);
-      toast('Erro ao carregar a seção. Tente novamente.');
-    }
-    updateCanvasBackground(sectionId);
-    ensureHeroFlame(sectionId);
+// ===== showSection seguro =====
+function showSection(sectionId) {
+  console.log('[showSection] Exibindo seção:', sectionId);
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
 
-    if(sectionId === 'section-perguntas') {
-      updateProgress();
-      const perguntas = document.querySelectorAll('.j-pergunta');
-      if(perguntas.length) {
-        const first = document.querySelector('.j-pergunta.active') || perguntas[0];
-        first.classList.add('active');
-        const lbl = first.querySelector('.pergunta-enunciado')?.textContent || '';
-        const ta = first.querySelector('textarea');
-        ta.placeholder = "Digite sua resposta...";
-        const aria = document.getElementById('aria-pergunta');
-        if(aria) aria.textContent = lbl;
-        runTyping(first);
-      } else {
-        loadDynamicBlocks();
-      }
+  // esconde e reseta tudo
+  document.querySelectorAll('.j-section').forEach(s => {
+    s.classList.add('hidden');
+    s.querySelectorAll('[data-typing]').forEach(el => {
+      el.textContent = '';
+      el.classList.remove('lumen-typing', 'typing-done');
+      el.dataset.typing = '0';     // garante reset da trava
+      delete el.dataset.typed;
+      const highlight = el.querySelector('.highlight');
+      if (highlight) highlight.style.width = '0';
+    });
+  });
+
+  const active = document.getElementById(sectionId);
+  if (!active) {
+    console.error('[showSection] Seção não encontrada:', sectionId);
+    toast('Erro ao carregar a seção. Tente novamente.');
+    return;
+  }
+
+  // exibe seção alvo e roda datilografia sequencial
+  active.classList.remove('hidden');
+  console.log('[showSection] Seção ativa:', active.id);
+  runTyping(active);
+
+  updateCanvasBackground(sectionId);
+  ensureHeroFlame(sectionId);
+
+  // blocos específicos
+  if (sectionId === 'section-perguntas') {
+    updateProgress();
+    const perguntas = document.querySelectorAll('.j-pergunta');
+    if (perguntas.length) {
+      const first = document.querySelector('.j-pergunta.active') || perguntas[0];
+      first.classList.add('active');
+      const lbl = first.querySelector('.pergunta-enunciado')?.textContent || '';
+      const ta = first.querySelector('textarea');
+      ta.placeholder = 'Digite sua resposta...';
+      const aria = document.getElementById('aria-pergunta');
+      if (aria) aria.textContent = lbl;
+      // não chama runTyping de novo — já foi chamado para a seção
+    } else {
+      loadDynamicBlocks();
     }
+  }
+
+  if (sectionId === 'section-final') {
+    const url = localStorage.getItem('IRMANDADE_SELFIE_FINAL');
+    if (url) {
+      const img = document.querySelector('#selfieInFlame');
+      if (img) img.src = url;
+      const clientNameFinal = document.querySelector('#clientNameSlotFinal');
+      if (clientNameFinal) clientNameFinal.textContent =
+        localStorage.getItem('JORNADA_NOME')?.toUpperCase() || '';
+    }
+  }
+
+  if (sectionId === 'section-guia') {
+    const guiaNameInput = document.getElementById('guiaNameInput');
+    const storedName = localStorage.getItem('JORNADA_NOME') || '';
+    if (guiaNameInput && storedName) guiaNameInput.value = storedName.toUpperCase();
+  }
+
+  if (sectionId === 'section-termos') {
+    const pg1 = document.getElementById('termos-pg1');
+    if (pg1 && !pg1.classList.contains('hidden')) runTyping(pg1);
+  }
+}
+
     if(sectionId === 'section-final') {
       const url = localStorage.getItem('IRMANDADE_SELFIE_FINAL');
       if(url) {
