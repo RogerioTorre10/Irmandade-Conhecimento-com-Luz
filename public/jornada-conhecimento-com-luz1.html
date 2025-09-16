@@ -534,243 +534,1537 @@
     <div id="toast" role="status" aria-live="polite" class="hidden"></div>
   
 <script>
-/* SAFE SENTINEL */;void 0;
-;(function(){
-  'use strict';
-
-  /* ===== util: toast + erro global (stub seguro) ===== */
-  function toast(msg){ try{
-    const t=document.getElementById('toast'); if(!t) return;
-    t.textContent=msg; t.classList.remove('hidden'); t.classList.add('show');
-    setTimeout(()=>{ t.classList.remove('show'); },3000);
-  }catch(_){} }
-  window.addEventListener('error', (e)=>{
-    console.error('[Erro global]', e?.error||e);
+(function(){
+  /* ===== util: toast + erro global ===== */
+  function toast(msg) {
+    try {
+      const t = document.getElementById('toast');
+      if(!t) return;
+      t.textContent = msg;
+      t.classList.remove('hidden');
+      t.classList.add('show');
+      setTimeout(() => { t.classList.remove('show'); }, 3000);
+    } catch(_) {}
+  }
+  window.addEventListener('error', (e) => {
+    console.error('[Erro global]', e?.error || e);
     toast('Ops… algo falhou, mas já seguimos em frente.');
   });
 
   /* ===== env tag ===== */
-  const env=document.getElementById('envTag');
-  if(env){ env.textContent=`layout=${document.body.dataset.layout||'master'} · journey=${document.body.dataset.journey||'essencial'} · path=/assets`; }
+  const env = document.getElementById('envTag');
+  if(env) env.textContent = `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/assets`;
 
-  /* ===== dedupe ===== */
-  function dedupe(s=''){
-    if(!s) return '';
-    let result=s.normalize('NFC').trim();
-    result=result.replace(/\s+/g,' ').replace(/([^a-zA-Z0-9])\1+/g,'$1');
-    const words=result.split(' ');
-    const out=[];
-    for(let w of words){
-      let c=''; for(let i=0;i<w.length;i++){
-        if(i===0 || w[i]!==w[i-1] || !/[a-zA-Z]/.test(w[i])) c+=w[i];
+/* ===== datilografia ===== */
+function typeWriter(el, text, speed, showCursor) {
+  if(!el) return Promise.resolve();
+
+  // trava: se já estiver digitando ou já digitou, não inicia outro ciclo
+  if (el.dataset.typing === '1' || el.dataset.typed === '1') return Promise.resolve();
+
+  // marca início
+  el.dataset.typing = '1';
+
+  // Limpa o elemento e remove caracteres especiais indesejados
+  el.textContent = '';
+  const highlight = el.querySelector('.highlight') || document.createElement('div');
+  if(!el.querySelector('.highlight')) {
+    highlight.className = 'highlight';
+    el.prepend(highlight);
+  }
+
+  // Remove chaves, colchetes e outros caracteres especiais antes de processar
+  text = text.replace(/[{}[\]]/g, '').trim();
+  let i = 0;
+  let currentWord = '';
+
+  return new Promise(resolve => {
+    // 🔧 agora é async para podermos usar await readAloud(...)
+    async function step() {
+      if (i < text.length) {
+        const char = text.charAt(i++);
+
+        // escreve
+        el.textContent += char;
+        currentWord += char;
+
+        // atualiza highlight
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.font = window.getComputedStyle(el).font;
+        highlight.style.width = `${ctx.measureText(el.textContent).width}px`;
+
+        // quando termina uma palavra (ou o texto), fala e aguarda terminar
+        if (char === ' ' || i === text.length) {
+          if (!window.isMuted && !el.closest('textarea')) {
+            await readAloud(
+              currentWord.trim(),
+              (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female')
+            );
+          }
+          currentWord = '';
+        }
+
+        setTimeout(() => { step(); }, speed);
+      } else {
+        el.classList.add('typing-done');
+        el.classList.remove('lumen-typing');
+        highlight.style.width = '0';
+
+        // ✅ marca finalizado e libera a trava
+        el.dataset.typed = '1';
+        el.dataset.typing = '0';
+
+        resolve();
       }
-      out.push(c);
     }
-    return out.join(' ').trim();
-  }
-  window.dedupe = dedupe;
 
-  /* ===== leitura com sinal de término ===== */
-  let currentLang='pt-BR';
-  function readAloud(text, voiceGender){
-    if(window.isMuted || !('speechSynthesis' in window)) return Promise.resolve();
-    return new Promise(resolve=>{
-      speechSynthesis.cancel();
-      const u=new SpeechSynthesisUtterance(text);
-      u.lang=currentLang;
-      const voices=speechSynthesis.getVoices();
-      let v=voices.find(v=>v.lang===currentLang && v.name.includes(voiceGender==='male'?'Male':'Female'))
-           || voices.find(v=>v.lang===currentLang) || voices[0];
-      u.voice=v; u.onend=resolve; u.onerror=resolve;
-      speechSynthesis.speak(u);
-    });
-  }
-  window.readAloud = readAloud;
+    if (showCursor) el.classList.add('lumen-typing');
+    setTimeout(() => { step(); }, 0);
+  });
+}
 
-  /* ===== stubs seguros para funções externas usadas no fluxo ===== */
-  function updateCanvasBackground(sectionId){
-    // se você já tem uma versão completa, esta será sobrescrita; senão, evita erro
-    const canvas=document.getElementById('jornada-canvas');
-    if(!canvas) return;
-    if(sectionId==='section-perguntas'){
-      canvas.className='card pergaminho pergaminho-h';
-      canvas.style.background='var(--panel) url(/assets/img/pergaminho-rasgado-horiz.png) no-repeat center/cover';
-    } else {
-      canvas.className='card pergaminho pergaminho-v';
-      canvas.style.background='var(--panel) url(/assets/img/pergaminho-rasgado-vert.png) no-repeat center/cover';
-    }
-  }
-  function ensureHeroFlame(){/* noop seguro */}
-  function ensureHeaderFlame(){/* noop seguro */}
-  function ensurePageFlames(){/* noop seguro */}
-  window.isMuted = !!window.isMuted;
 
-  /* ===== datilografia + runTyping (sequencial, com lock) ===== */
-  const G = (typeof window!=='undefined'? window : globalThis);
-  if (G.__typingLock == null) G.__typingLock = false;
-  if (G.__DEFAULT_SPEED_TYPING == null) G.__DEFAULT_SPEED_TYPING = 140;
-  const DEFAULT_SPEED = G.__DEFAULT_SPEED_TYPING;
+/* ===== datilografia + runTyping (WRAPPED & SAFE) ===== */
+void function DTYPE_WRAP() {
+  // pega referência global sem usar 'window' no início
+  const g = (typeof window !== 'undefined' ? window : globalThis);
 
-  function typeWriter(el, text, speed, showCursor){
-    if(!el) return Promise.resolve();
-    if(el.dataset.typing==='1' || el.dataset.typed==='1') return Promise.resolve();
+  // lock global e velocidade default (sem colisão de nomes)
+  if (g.__typingLock == null) g.__typingLock = false;
+  if (g.__DEFAULT_SPEED_TYPING == null) g.__DEFAULT_SPEED_TYPING = 140;
+  const DEFAULT_SPEED = g.__DEFAULT_SPEED_TYPING;
 
-    el.dataset.typing='1';
-    el.textContent='';
+  g.typeWriter = function typeWriter(el, text, speed, showCursor) {
+    if (!el) return Promise.resolve();
+
+    // trava: se já estiver digitando ou já digitou, não inicia outro ciclo
+    if (el.dataset.typing === '1' || el.dataset.typed === '1') return Promise.resolve();
+
+    el.dataset.typing = '1'; // marca início
+    el.textContent = '';
     const highlight = el.querySelector('.highlight') || document.createElement('div');
-    if(!el.querySelector('.highlight')){
-      highlight.className='highlight';
+    if (!el.querySelector('.highlight')) {
+      highlight.className = 'highlight';
       el.prepend(highlight);
     }
 
-    text = (text||'').replace(/[{}[\]]/g,'').trim();
-    let i=0, currentWord='';
+    // remove chaves, colchetes e outros caracteres especiais
+    text = (text || '').replace(/[{}[\]]/g, '').trim();
+    let i = 0;
+    let currentWord = '';
 
-    return new Promise(resolve=>{
-      async function step(){
-        if(i < text.length){
-          const char=text.charAt(i++);
+    return new Promise(resolve => {
+      async function step() {
+        if (i < text.length) {
+          const char = text.charAt(i++);
           el.textContent += char;
           currentWord += char;
 
-          const canvas=document.createElement('canvas');
-          const ctx=canvas.getContext('2d');
-          ctx.font = getComputedStyle(el).font;
+          // atualiza highlight
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          ctx.font = g.getComputedStyle(el).font;
           highlight.style.width = `${ctx.measureText(el.textContent).width}px`;
 
-          if(char===' ' || i===text.length){
-            if(!window.isMuted && !el.closest('textarea')){
-              await readAloud(currentWord.trim(), (localStorage.getItem('JORNADA_GUIA')==='zion'?'male':'female'));
+          // fala quando conclui palavra/frase
+          if (char === ' ' || i === text.length) {
+            if (!g.isMuted && !el.closest('textarea')) {
+              await g.readAloud(
+                currentWord.trim(),
+                (g.localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female')
+              );
             }
-            currentWord='';
+            currentWord = '';
           }
+
           setTimeout(step, speed);
         } else {
           el.classList.add('typing-done');
           el.classList.remove('lumen-typing');
-          highlight.style.width='0';
-          el.dataset.typed='1';
-          el.dataset.typing='0';
+          highlight.style.width = '0';
+
+          // libera trava
+          el.dataset.typed = '1';
+          el.dataset.typing = '0';
+
           resolve();
         }
       }
-      if(showCursor) el.classList.add('lumen-typing');
-      setTimeout(step,0);
+      if (showCursor) el.classList.add('lumen-typing');
+      setTimeout(step, 0);
     });
-  }
-  window.typeWriter = typeWriter;
+  };
 
-  async function runTyping(root){
-    if(!root || root.classList.contains('hidden')) return;
-    if(G.__typingLock) return; G.__typingLock = true;
-    try{
-      if(window.speechSynthesis) window.speechSynthesis.cancel();
-      const elements = Array.from(root.querySelectorAll('[data-typing]'))
+  g.runTyping = async function runTyping(root) {
+    if (!root || root.classList.contains('hidden')) return;
+    if (g.__typingLock) return;
+    g.__typingLock = true;
+
+    try {
+      if (g.speechSynthesis) g.speechSynthesis.cancel();
+
+      const elements = Array
+        .from(root.querySelectorAll('[data-typing]'))
         .filter(el => !el.dataset.typed && el.offsetParent !== null);
 
-      for(const el of elements){
-        if(el.dataset.typing==='1' || el.dataset.typed==='1') continue;
+      for (const el of elements) {
+        if (el.dataset.typing === '1' || el.dataset.typed === '1') continue;
 
-        el.textContent='';
-        const highlight=el.querySelector('.highlight');
-        if(highlight) highlight.style.width='0';
+        el.textContent = '';
+        const highlight = el.querySelector('.highlight');
+        if (highlight) highlight.style.width = '0';
 
         const speed = parseInt(el.getAttribute('data-speed') || DEFAULT_SPEED, 10);
-        const showCursor = String(el.getAttribute('data-cursor') || 'true')==='true';
-        const text = dedupe(el.getAttribute('data-text') || el.textContent || '');
-        await typeWriter(el, text, speed, showCursor);
+        const showCursor = String(el.getAttribute('data-cursor') || 'true') === 'true';
+        const text = g.dedupe(el.getAttribute('data-text') || el.textContent || '');
+
+        await g.typeWriter(el, text, speed, showCursor);
       }
     } finally {
-      G.__typingLock = false;
+      g.__typingLock = false;
+    }
+  };
+}();
+
+  /* ===== datilografia no placeholder e respostas ===== */
+  let __abortTypingPlaceholder = null;
+  async function typePlaceholder(inp, text, speed = 60) {
+    if(!inp) return;
+    if(__abortTypingPlaceholder) __abortTypingPlaceholder();
+    let abort = false;
+    __abortTypingPlaceholder = () => abort = true;
+    inp.placeholder = '';
+    const aria = document.getElementById('aria-pergunta');
+    if(aria) aria.textContent = text;
+    for(let i = 0; i <= text.length; i++) {
+      if(abort) break;
+      inp.placeholder = text.slice(0, i) + (i < text.length ? '▌' : '');
+      await new Promise(r => setTimeout(r, speed));
+    }
+    if(!abort) inp.placeholder = text;
+  }
+  async function typeAnswer(textarea, text, speed = 60) {
+    if(!textarea) return;
+    textarea.value = '';
+    textarea.classList.add('lumen-typing');
+    for(let i = 0; i <= text.length; i++) {
+      textarea.value = text.slice(0, i);
+      await new Promise(r => setTimeout(r, speed));
+    }
+    textarea.classList.remove('lumen-typing');
+    textarea.classList.add('typing-done');
+  }
+  async function typeDevolutiva(div, text, speed = 60) {
+    if(!div) return;
+    div.textContent = '';
+    div.classList.add('lumen-typing');
+    for(let i = 0; i <= text.length; i++) {
+      div.textContent = text.slice(0, i);
+      await new Promise(r => setTimeout(r, speed));
+    }
+    div.classList.add('typing-done');
+    if(!window.isMuted) readAloud(text, (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
+  }
+
+  /* ===== chamas ===== */
+  function makeFlame(cls) {
+    const d = document.createElement('div');
+    d.className = (cls || 'chama-vela chama-md');
+    d.innerHTML = '<div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>';
+    return d;
+  }
+  function ensureHeaderFlame() {
+    const H = document.getElementById('chama-header');
+    if(!H) return;
+    if(!H.querySelector('.brasa')) {
+      H.innerHTML = '';
+      H.appendChild(makeFlame('chama-vela chama-lg'));
     }
   }
-  window.runTyping = runTyping;
+  function ensureInlineFlame(id, cls) {
+    const el = document.getElementById(id);
+    if(!el) return null;
+    if(!el.querySelector('.brasa')) {
+      el.innerHTML = '';
+      el.appendChild(makeFlame(cls || 'chama-vela chama-md'));
+    }
+    return el.firstElementChild;
+  }
+  function ensurePageFlames() {
+    if(!document.getElementById('flame-bottom-right')) {
+      const f = makeFlame('chama-vela chama-md');
+      f.id = 'flame-bottom-right';
+      f.style.cssText = 'position:fixed;bottom:12px;right:12px;z-index:1200;';
+      document.body.appendChild(f);
+    }
+  }
+  function setMode(el, score) {
+    if(!el) return;
+    el.classList.remove('fraca', 'media', 'forte');
+    el.classList.add(score <= -2 ? 'fraca' : score >= 2 ? 'forte' : 'media');
+  }
+  window.JORNADA_CHAMA = window.JORNADA_CHAMA || {};
+  window.JORNADA_CHAMA.updateChama = function(score) {
+    const main = ensureInlineFlame('chama-perguntas', 'chama-vela chama-md');
+    setMode(main, score);
+    setMode(document.getElementById('flame-bottom-right'), score);
+  };
+  window.JORNADA_CHAMA.ensureHeroFlame = function(sectionId) {
+    const canvas = document.getElementById('jornada-canvas');
+    if(!canvas) return;
+    let hero = document.getElementById('chama-hero');
+    const show = (sectionId === 'section-intro' || sectionId === 'section-termos' || sectionId === 'section-senha' || sectionId === 'section-final' || sectionId === 'section-selfie' || sectionId === 'section-guia');
+    if(show) {
+      if(!hero) {
+        hero = makeFlame('chama-vela chama-lg');
+        hero.id = 'chama-hero';
+        hero.style.cssText = 'position:absolute;top:8px;left:8px;z-index:60;';
+        canvas.appendChild(hero);
+      }
+    } else if(hero) {
+      hero.remove();
+    }
+  };
+  function updateChama(score) {
+    window.JORNADA_CHAMA.updateChama(score);
+  }
+  function ensureHeroFlame(sectionId) {
+    window.JORNADA_CHAMA.ensureHeroFlame(sectionId);
+  }
 
-  /* ===== showSection seguro ===== */
-  function showSection(sectionId){
-    console.log('[showSection] Exibindo seção:', sectionId);
-    if(window.speechSynthesis) window.speechSynthesis.cancel();
+  /* ===== selfie ===== */
+  (function() {
+    const $ = s => document.querySelector(s);
+    const card = $("#card-guide");
+    const clientNameEl = $("#clientNameSlot");
+    const clientNameFinal = $("#clientNameSlotFinal");
+    const flameLayer = $("#card-guide .flame-layer");
+    const selfieImg = $("#selfieImage");
+    const bgImg = $("#guideBg");
+    const resultBg = $("#resultBackground");
+    const selfieInFlame = $("#selfieInFlame");
+    const fileInput = $("#selfieInput");
+    const previewBtn = $("#previewBtn");
+    const captureBtn = $("#captureBtn");
+    const errorDiv = $("#selfieError");
+    const scaleInput = $("#selfieScale");
+    const offsetXInput = $("#selfieOffsetX");
+    const offsetYInput = $("#selfieOffsetY");
 
-    // esconde e reseta tudo
-    document.querySelectorAll('.j-section').forEach(s=>{
-      s.classList.add('hidden');
-      s.querySelectorAll('[data-typing]').forEach(el=>{
-        el.textContent='';
-        el.classList.remove('lumen-typing','typing-done');
-        el.dataset.typing='0';
-        delete el.dataset.typed;
-        const h=el.querySelector('.highlight'); if(h) h.style.width='0';
-      });
+    let selfieURL = '';
+
+    function getBgUrl() {
+      const guia = localStorage.getItem('JORNADA_GUIA') || 'zion';
+      card.dataset.guide = guia.toUpperCase();
+      return `/assets/img/irmandade-quarteto-bg-${guia}.jpeg`;
+    }
+
+    function loadBg() {
+      const bgUrl = getBgUrl();
+      bgImg.src = bgUrl;
+      resultBg.src = bgUrl;
+      bgImg.onload = () => {
+        if(errorDiv) errorDiv.style.display = 'none';
+      };
+      bgImg.onerror = () => {
+        if(errorDiv) errorDiv.style.display = 'block';
+        toast('Erro ao carregar a imagem de fundo do guia.');
+      };
+    }
+
+    function updatePreview() {
+      const scale = parseFloat(scaleInput.value);
+      const ox = parseFloat(offsetXInput.value);
+      const oy = parseFloat(offsetYInput.value);
+      const baseX = 15 + ox;
+      const baseY = 35 + oy;
+      const baseW = 70 * scale;
+      const baseH = 90 * scale;
+      selfieImg.setAttribute('x', baseX);
+      selfieImg.setAttribute('y', baseY);
+      selfieImg.setAttribute('width', baseW);
+      selfieImg.setAttribute('height', baseH);      
+      selfieInFlame.style.transform = `scale(${scale}) translate(${ox}px, ${oy}px)`;
+      clientNameEl.textContent = localStorage.getItem('JORNADA_NOME')?.toUpperCase() || '';
+      clientNameFinal.textContent = localStorage.getItem('JORNADA_NOME')?.toUpperCase() || '';
+    }
+
+    scaleInput.addEventListener('input', updatePreview);
+    offsetXInput.addEventListener('input', updatePreview);
+    offsetYInput.addEventListener('input', updatePreview);
+
+    fileInput.addEventListener('change', () => {
+      const f = fileInput.files?.[0];
+      if(!f) return;
+      if(selfieURL) URL.revokeObjectURL(selfieURL);
+      selfieURL = URL.createObjectURL(f);
+      selfieImg.setAttribute('href', selfieURL);
+      selfieInFlame.src = selfieURL;
+      if(errorDiv) errorDiv.style.display = 'none';
+      updatePreview();
     });
 
-    const active=document.getElementById(sectionId);
-    if(!active){
-      console.error('[showSection] Seção não encontrada:', sectionId);
-      toast('Erro ao carregar a seção. Tente novamente.');
+    previewBtn.addEventListener('click', async () => {
+      if(!selfieImg.getAttribute('href')) {
+        toast('Selecione uma selfie antes.');
+        return;
+      }
+      updatePreview();
+      flameLayer.style.opacity = 1;
+    });
+
+    captureBtn.addEventListener('click', async () => {
+      if(!selfieImg.getAttribute('href')) {
+        toast('Selecione uma selfie antes.');
+        return;
+      }
+      updatePreview();
+      flameLayer.style.opacity = 1;
+      await new Promise(r => requestAnimationFrame(r));
+
+      const canvas = document.createElement('canvas');
+      const rect = card.getBoundingClientRect();
+      const scale = window.devicePixelRatio || 1;
+      canvas.width = Math.round(rect.width * scale);
+      canvas.height = Math.round(rect.height * scale);
+      const ctx = canvas.getContext('2d');
+
+      const load = (src) => new Promise((res, rej) => {
+        const im = new Image();
+        im.crossOrigin = 'anonymous';
+        im.onload = () => res(im);
+        im.onerror = rej;
+        im.src = src;
+      });
+
+      const bg = await load(bgImg.currentSrc || bgImg.src).catch(() => {
+        if(errorDiv) errorDiv.style.display = 'block';
+        toast('Erro ao carregar a imagem de fundo.');
+        return;
+      });
+      ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
+
+      const W = canvas.width, H = canvas.height;
+      const fw = 0.48 * W, fh = 0.72 * H, fx = (W - fw) / 2, fy = (H - fh) / 2 + 0.20 * H;
+
+      const grad = ctx.createRadialGradient(fx + fw / 2, fy + fh * 0.65, fh * 0.02, fx + fw / 2, fy + fh * 0.65, fh * 0.55);
+      grad.addColorStop(0, 'rgba(255,224,130,1)');
+      grad.addColorStop(0.55, 'rgba(255,180,0,0.9)');
+      grad.addColorStop(1, 'rgba(255,180,0,0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.ellipse(fx + fw / 2, fy + fh * 0.65, fw * 0.35, fh * 0.45, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      function flamePath(ctx, x, y, w, h) {
+        ctx.beginPath();
+        ctx.moveTo(x + 0.50 * w, y + 0.133 * h);
+        ctx.bezierCurveTo(x + 0.42 * w, y + 0.233 * h, x + 0.34 * w, y + 0.300 * h, x + 0.33 * w, y + 0.387 * h);
+        ctx.bezierCurveTo(x + 0.32 * w, y + 0.487 * h, x + 0.41 * w, y + 0.547 * h, x + 0.50 * w, y + 0.613 * h);
+        ctx.bezierCurveTo(x + 0.59 * w, y + 0.547 * h, x + 0.68 * w, y + 0.487 * h, x + 0.67 * w, y + 0.387 * h);
+        ctx.bezierCurveTo(x + 0.66 * w, y + 0.233 * h, x + 0.58 * w, y + 0.233 * h, x + 0.50 * w, y + 0.133 * h);
+      }
+
+      ctx.save();
+      flamePath(ctx, fx, fy, fw, fh);
+      ctx.clip();
+
+      const selfie = await load(selfieImg.getAttribute('href')).catch(() => {
+        if(errorDiv) errorDiv.style.display = 'block';
+        toast('Erro ao carregar a selfie.');
+        return;
+      });
+
+      const selfieScaleVal = parseFloat(scaleInput.value);
+      const ox = parseFloat(offsetXInput.value);
+      const oy = parseFloat(offsetYInput.value);
+      const svgScaleX = fw / 100;
+      const svgScaleY = fh / 150;
+
+      let coverRatio = Math.max(fw / selfie.width, fh / selfie.height) * selfieScaleVal;
+      let sw = selfie.width * coverRatio;
+      let sh = selfie.height * coverRatio;
+      let sx = fx + (fw - sw) / 2 + ox * svgScaleX;
+      let sy = fy + (fh - sh) / 2 + oy * svgScaleY;
+
+      ctx.drawImage(selfie, sx, sy, sw, sh);
+      ctx.restore();
+
+      ctx.strokeStyle = 'rgba(255,200,0,.85)';
+      ctx.lineWidth = Math.max(1.2, W * 0.0022);
+      flamePath(ctx, fx, fy, fw, fh);
+      ctx.stroke();
+
+      ctx.fillStyle = '#f7d37a';
+      ctx.textAlign = 'center';
+      ctx.font = `bold ${Math.round(W * 0.11)}px Cardo, serif`;
+      ctx.textBaseline = 'bottom';
+      ctx.fillText(localStorage.getItem('JORNADA_NOME')?.toUpperCase() || '', W / 2, H * 0.965);
+
+      const dataURL = canvas.toDataURL('image/png');
+      try {
+        localStorage.setItem('IRMANDADE_SELFIE_FINAL', dataURL);
+        selfieInFlame.src = dataURL;
+        const a = document.createElement('a');
+        a.href = dataURL;
+        a.download = `jornada-${card.dataset.guide.toLowerCase()}-${Date.now()}.png`;
+        a.click();
+        if(errorDiv) errorDiv.style.display = 'none';
+      } catch(_) {
+        if(errorDiv) errorDiv.style.display = 'block';
+        toast('Erro ao salvar ou baixar a imagem.');
+      }
+    });
+
+    loadBg();
+  })();
+
+  /* ===== chat com guia ===== */
+  async function sendChatMessage() {
+    const input = document.getElementById('grok-chat-input');
+    const messagesDiv = document.getElementById('grok-chat-messages');
+    if(!input || !messagesDiv) return;
+    const userMessage = input.value.trim();
+    if(!userMessage) return;
+
+    const tokens = userMessage.split(/\s+/).length;
+    if(tokens > 100) {
+      const guiaMsg = document.createElement('div');
+      guiaMsg.className = 'grok-chat-message grok';
+      guiaMsg.textContent = 'Por favor, limite sua mensagem a 100 palavras.';
+      messagesDiv.appendChild(guiaMsg);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
       return;
     }
 
-    active.classList.remove('hidden');
-    console.log('[showSection] Seção ativa:', active.id);
-    runTyping(active);
+    const userMsg = document.createElement('div');
+    userMsg.className = 'grok-chat-message user';
+    userMsg.textContent = userMessage;
+    messagesDiv.appendChild(userMsg);
 
-    updateCanvasBackground(sectionId);
-    ensureHeroFlame(sectionId);
+    const currentQuestion = document.querySelector('.j-pergunta.active .pergunta-enunciado')?.textContent || '';
+    const currentAnswer = document.querySelector('.j-pergunta.active textarea')?.value || '';
+    const respostas = JSON.parse(localStorage.getItem('jornada_respostas') || '{}');
+    const blocoIdx = document.querySelector('.j-bloco[style*="display: block"]')?.dataset.bloco || 0;
+    const guia = localStorage.getItem('JORNADA_GUIA') || 'zion';
+    const context = { currentQuestion, currentAnswer, respostas, blocoIdx, progresso: document.getElementById('jprog-pct')?.textContent || '0% concluído', guia };
 
-    if(sectionId==='section-perguntas'){
-      const perguntas=document.querySelectorAll('.j-pergunta');
-      if(perguntas.length){
-        const first=document.querySelector('.j-pergunta.active') || perguntas[0];
-        first.classList.add('active');
-        const lbl=first.querySelector('.pergunta-enunciado')?.textContent || '';
-        const ta=first.querySelector('textarea');
-        if(ta) ta.placeholder='Digite sua resposta...';
-        const aria=document.getElementById('aria-pergunta');
-        if(aria) aria.textContent=lbl;
-      } else if(typeof window.loadDynamicBlocks==='function'){
-        window.loadDynamicBlocks();
+    const guiaConfigs = window.guiaConfigs || {
+      zion: { apiUrl: 'https://lumen-backend-api.onrender.com/v1/chat', model: 'grok', voice: 'male' },
+      lumen: { apiUrl: 'https://lumen-backend-api.onrender.com/v1/chat', model: 'gpt-5', voice: 'female' },
+      arian: { apiUrl: 'https://lumen-backend-api.onrender.com/v1/chat', model: 'gemini', voice: 'female' }
+    };
+    const cfg = guiaConfigs[guia] || guiaConfigs.lumen;
+
+    try {
+      const system = `Você é ${guia === 'zion' ? 'Zion (Grok)' : guia === 'arian' ? 'Arian (Gemini)' : 'Lumen (ChatGPT)'} guiando a Jornada. Contexto: ` + JSON.stringify(context);
+      const resp = await fetch(cfg.apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: cfg.model,
+          messages: [{ role: 'system', content: system }, { role: 'user', content: userMessage }],
+          temperature: 0.7
+        })
+      });
+      if(!resp.ok) throw new Error('API falhou: ' + resp.status);
+      const data = await resp.json();
+      const guiaMessage = data?.choices?.[0]?.message?.content || data?.message?.content || 'Tô pronto pra te guiar! Como posso ajudar?';
+      const guiaMsg = document.createElement('div');
+      guiaMsg.className = 'grok-chat-message grok';
+      messagesDiv.appendChild(guiaMsg);
+      await typeWriter(guiaMsg, guiaMessage, 60, true);
+      if(!window.isMuted) readAloud(guiaMessage, cfg.voice);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    } catch(e) {
+      console.error('[Chat] erro', e);
+      const guiaMsg = document.createElement('div');
+      guiaMsg.className = 'grok-chat-message grok';
+      await typeWriter(guiaMsg, 'Ops, não consegui me conectar ao guia. Tenta novamente ou pula pra próxima pergunta.', 60, true);
+      if(!window.isMuted) readAloud('Ops, não consegui me conectar ao guia. Tenta novamente ou pula pra próxima pergunta.', cfg.voice);
+      messagesDiv.appendChild(guiaMsg);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+    input.value = '';
+  }
+
+  /* ===== util: remove duplicações de letras e espaços, mantendo a integridade de ss, rr, etc. ===== */
+  function dedupe(s='') {
+    if (!s) return '';
+    let result = s.normalize('NFC').trim();
+    // Remove duplicações de caracteres não alfanuméricos e espaços
+    result = result.replace(/\s+/g, ' ').replace(/([^a-zA-Z0-9])\1+/g, '$1');
+    // Garante que palavras com letras duplas (ex.: "ss", "rr") não sejam afetadas
+    let words = result.split(' ');
+    let cleanedWords = [];
+    for (let word of words) {
+      let cleanedWord = '';
+      for (let i = 0; i < word.length; i++) {
+        if (i === 0 || word[i] !== word[i-1] || !/[a-zA-Z]/.test(word[i])) {
+          cleanedWord += word[i];
+        }
       }
+      cleanedWords.push(cleanedWord);
     }
+    return cleanedWords.join(' ').trim();
+  }
 
-    if(sectionId==='section-final'){
-      const url=localStorage.getItem('IRMANDADE_SELFIE_FINAL');
-      if(url){
-        const img=document.querySelector('#selfieInFlame'); if(img) img.src=url;
-        const name=document.querySelector('#clientNameSlotFinal');
-        if(name) name.textContent=(localStorage.getItem('JORNADA_NOME')||'').toUpperCase();
+  /* ===== rotas candidatas p/ fallback ===== */
+  const CHAT_PATHS = [
+    '/v1/chat',
+    '/v1/chat/completions',
+    '/v1/completions',
+    '/chat',
+    '/chat/completions'
+  ];
+
+  /* ===== bases e modelos padrão ===== */
+  const GUIDE_BASES = {
+    lumen: 'https://lumen-backend-api.onrender.com',
+    zion:  'https://lumen-backend-api.onrender.com',
+    arian: 'https://lumen-backend-api.onrender.com'
+  };
+  const GUIDE_MODELS = {
+    lumen: 'gpt-5',
+    zion:  'grok',
+    arian: 'gemini'
+  };
+
+  /* ===== devolutiva da API ===== */
+  async function fetchDevolutiva(pergunta, resposta, guia, maxRetries = 3, retryDelay = 1000) {
+    const g = (guia || 'lumen').toLowerCase();
+    const cfgWin = (window.guiaConfigs && window.guiaConfigs[g]) || {};
+    const rawBase = cfgWin.apiUrlBase || cfgWin.apiUrl || GUIDE_BASES[g] || GUIDE_BASES.lumen;
+    const base = (rawBase || '').replace(/\/(v1\/chat|v1\/chat\/completions|v1\/completions|chat|chat\/completions)\/?$/,'');
+    const model = cfgWin.model || GUIDE_MODELS[g] || GUIDE_MODELS.lumen;
+
+    const quem = g === 'zion' ? 'Zion (Grok)' : (g === 'arian' ? 'Arian (Gemini)' : 'Lumen (ChatGPT)');
+    const payload = {
+      model,
+      messages: [
+        { role: 'system', content: `Você é ${quem} guiando a Jornada. Forneça uma devolutiva acolhedora, reflexiva e simbólica.` },
+        { role: 'user', content: `Pergunta: ${dedupe(pergunta)}\nResposta: ${resposta ?? '(vazia)'}` }
+      ],
+      temperature: 0.7,
+      meta: { guia: g.toUpperCase() }
+    };
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      console.log(`[Devolutiva] Tentativa ${attempt} para pergunta: "${dedupe(pergunta)}"`);
+      for (const path of CHAT_PATHS) {
+        try {
+          const r = await fetch(`${base}${path}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            mode: 'cors',
+            credentials: 'omit'
+          });
+          if (r.ok) {
+            const data = await r.json();
+            const devolutiva = data?.content || data?.choices?.[0]?.message?.content || 'Obrigado por compartilhar. Sua reflexão ilumina o caminho.';
+            console.log('[Devolutiva] Sucesso:', devolutiva);
+            return devolutiva;
+          }
+          if (r.status !== 404) throw new Error(`HTTP ${r.status} @ ${path}`);
+        } catch (e) {
+          console.error('[Devolutiva] Erro na tentativa:', e);
+          if (attempt === maxRetries && path === CHAT_PATHS[CHAT_PATHS.length-1]) {
+            console.error('[Devolutiva] falhou:', e);
+            const msg = `Não consegui conectar ao guia ${g}. Verifique sua conexão ou tente novamente mais tarde.`;
+            toast(msg);
+            if (!window.isMuted) readAloud(msg, (cfgWin.voice || 'female'));
+            return msg;
+          }
+        }
       }
+      await new Promise(res => setTimeout(res, retryDelay));
     }
+  }
 
-    if(sectionId==='section-guia'){
-      const guiaNameInput=document.getElementById('guiaNameInput');
-      const storedName=localStorage.getItem('JORNADA_NOME')||'';
-      if(guiaNameInput && storedName) guiaNameInput.value=storedName.toUpperCase();
+  /* ===== progresso & storage ===== */
+  function updateProgress() {
+    const perguntas = document.querySelectorAll('.j-pergunta');
+    const respondidas = Array.from(perguntas).filter(p => (p.querySelector('textarea')?.value.trim() || '') !== '').length;
+    const total = perguntas.length || 1;
+    const pct = Math.round((respondidas / total) * 100);
+    const fill = document.getElementById('jprog-fill');
+    const badge = document.getElementById('jprog-pct');
+    const jFill = document.getElementById('j-fill-inline');
+    const jMeta = document.getElementById('j-meta');
+    if(fill) fill.style.width = `${pct}%`;
+    if(badge) badge.textContent = `${pct}% concluído`;
+    if(jFill) jFill.style.width = `${pct}%`;
+    if(jMeta) jMeta.textContent = `Respondidas: ${respondidas} de ${total}`;
+  }
+
+  function saveAnswers() {
+    const respostas = {};
+    document.querySelectorAll('.j-pergunta textarea').forEach((input, idx) => {
+      const text = input.value.trim();
+      const tokens = text.split(/\s+/).length;
+      if(tokens > 100) {
+        input.value = text.split(/\s+/).slice(0, 100).join(' ');
+        toast('Resposta limitada a 100 palavras.');
+      }
+      respostas[`q${idx}`] = input.value || '';
+    });
+    try {
+      localStorage.setItem('jornada_respostas', JSON.stringify(respostas));
+    } catch(_) {}
+  }
+
+  function loadAnswers() {
+    const respostas = JSON.parse(localStorage.getItem('jornada_respostas') || '{}');
+    document.querySelectorAll('.j-pergunta textarea').forEach((input, idx) => {
+      const savedText = respostas[`q${idx}`] || '';
+      if(savedText) {
+        input.value = savedText;
+      }
+    });
+    updateProgress();
+  }
+
+  /* ===== pergaminho & seções ===== */
+  function checkImage(url, fallbackUrl) {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => resolve(url);
+      img.onerror = () => resolve(fallbackUrl);
+      img.src = url;
+    });
+  }
+
+  function updateCanvasBackground(sectionId) {
+    const canvas = document.getElementById('jornada-canvas');
+    if(!canvas) return;
+    if(sectionId === 'section-perguntas') {
+      checkImage('/assets/img/pergaminho-rasgado-horiz.png', '/assets/img/pergaminho-rasgado-vert.png').then(bg => {
+        canvas.className = `card pergaminho pergaminho-h${bg.includes('vert') ? ' fallback' : ''}`;
+        canvas.style.background = `var(--panel) url('${bg}') no-repeat center/cover`;
+      });
+    } else {
+      canvas.className = 'card pergaminho pergaminho-v';
+      canvas.style.background = 'var(--panel) url(/assets/img/pergaminho-rasgado-vert.png) no-repeat center/cover';
     }
+  }
 
-    if(sectionId==='section-termos'){
-      const pg1=document.getElementById('termos-pg1');
+// ===== showSection seguro =====
+function showSection(sectionId) {
+  console.log('[showSection] Exibindo seção:', sectionId);
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+
+  // esconde e reseta tudo
+  document.querySelectorAll('.j-section').forEach(s => {
+    s.classList.add('hidden');
+    s.querySelectorAll('[data-typing]').forEach(el => {
+      el.textContent = '';
+      el.classList.remove('lumen-typing', 'typing-done');
+      el.dataset.typing = '0';     // garante reset da trava
+      delete el.dataset.typed;
+      const highlight = el.querySelector('.highlight');
+      if (highlight) highlight.style.width = '0';
+    });
+  });
+
+  const active = document.getElementById(sectionId);
+  if (!active) {
+    console.error('[showSection] Seção não encontrada:', sectionId);
+    toast('Erro ao carregar a seção. Tente novamente.');
+    return;
+  }
+
+  // exibe seção alvo e roda datilografia sequencial
+  active.classList.remove('hidden');
+  console.log('[showSection] Seção ativa:', active.id);
+  runTyping(active);
+
+  updateCanvasBackground(sectionId);
+  ensureHeroFlame(sectionId);
+
+  // blocos específicos
+  if (sectionId === 'section-perguntas') {
+    updateProgress();
+    const perguntas = document.querySelectorAll('.j-pergunta');
+    if (perguntas.length) {
+      const first = document.querySelector('.j-pergunta.active') || perguntas[0];
+      first.classList.add('active');
+      const lbl = first.querySelector('.pergunta-enunciado')?.textContent || '';
+      const ta = first.querySelector('textarea');
+      ta.placeholder = 'Digite sua resposta...';
+      const aria = document.getElementById('aria-pergunta');
+      if (aria) aria.textContent = lbl;
+      // não chama runTyping de novo — já foi chamado para a seção
+    } else {
+      loadDynamicBlocks();
+    }
+  }
+
+  if (sectionId === 'section-final') {
+    const url = localStorage.getItem('IRMANDADE_SELFIE_FINAL');
+    if (url) {
+      const img = document.querySelector('#selfieInFlame');
+      if (img) img.src = url;
+      const clientNameFinal = document.querySelector('#clientNameSlotFinal');
+      if (clientNameFinal) clientNameFinal.textContent =
+        localStorage.getItem('JORNADA_NOME')?.toUpperCase() || '';
+    }
+  }
+
+  if (sectionId === 'section-guia') {
+    const guiaNameInput = document.getElementById('guiaNameInput');
+    const storedName = localStorage.getItem('JORNADA_NOME') || '';
+    if (guiaNameInput && storedName) guiaNameInput.value = storedName.toUpperCase();
+  }
+
+  if (sectionId === 'section-termos') {
+    const pg1 = document.getElementById('termos-pg1');
+    if (pg1 && !pg1.classList.contains('hidden')) runTyping(pg1);
+  }
+}
+
+    if(sectionId === 'section-final') {
+      const url = localStorage.getItem('IRMANDADE_SELFIE_FINAL');
+      if(url) {
+        const img = document.querySelector('#selfieInFlame');
+        if(img) img.src = url;
+        const clientNameFinal = document.querySelector('#clientNameSlotFinal');
+        if(clientNameFinal) clientNameFinal.textContent = localStorage.getItem('JORNADA_NOME')?.toUpperCase() || '';
+      }
+      runTyping(active);
+    }
+    if(sectionId === 'section-guia') {
+      const guiaNameInput = document.getElementById('guiaNameInput');
+      const storedName = localStorage.getItem('JORNADA_NOME') || '';
+      if(guiaNameInput && storedName) guiaNameInput.value = storedName.toUpperCase();
+      runTyping(active);
+    }
+    if(sectionId === 'section-termos') {
+      const pg1 = document.getElementById('termos-pg1');
       if(pg1 && !pg1.classList.contains('hidden')) runTyping(pg1);
     }
   }
-  window.showSection = showSection;
 
-  /* ===== init básico ===== */
-  console.log('[Boot] Iniciando script seguro');
+  /* ===== blocos dinâmicos ===== */
+  window.loadDynamicBlocks = function() {
+    const content = document.getElementById('perguntas-container');
+    if(!content) {
+      console.error('[loadDynamicBlocks] Contêiner de perguntas não encontrado');
+      toast('Erro ao carregar as perguntas. Tente novamente.');
+      return;
+    }
+
+    const blocks = window.JORNADA_BLOCKS || [];
+    content.innerHTML = '';
+
+    blocks.forEach((block, bIdx) => {
+      const bloco = document.createElement('section');
+      bloco.className = 'j-bloco';
+      bloco.dataset.bloco = bIdx;
+      bloco.dataset.video = block.video_after || '';
+
+      (block.questions || []).forEach((q, qIdx) => {
+        const label = typeof q === 'string' ? q : (q.label || q.text || '');
+        const cleanLabel = dedupe(label);
+        const div = document.createElement('div');
+        div.className = 'j-pergunta';
+        div.dataset.pergunta = qIdx;
+
+        const enunciado = `
+          <label class="pergunta-enunciado" 
+            data-typing data-text="Pergunta ${qIdx + 1}: ${cleanLabel}" 
+            data-speed="60" data-cursor="true"></label>`;
+
+        div.innerHTML = enunciado +
+          `\n<textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>` +
+          `\n<p class="devolutiva-text" style="display:none;" data-typing data-speed="60" data-cursor="true"></p>` +
+          `\n<div class="accessibility-controls"></div>`;
+
+        bloco.appendChild(div);
+      });
+
+      content.appendChild(bloco);
+    });
+
+    const firstBloco = content.querySelector('.j-bloco');
+    if(firstBloco) {
+      firstBloco.style.display = 'block';
+      const first = firstBloco.querySelector('.j-pergunta');
+      if(first) {
+        first.classList.add('active');
+        runTyping(first);
+      }
+    } else {
+      console.error('[loadDynamicBlocks] Nenhum bloco criado');
+      toast('Erro ao carregar as perguntas. Tente novamente.');
+    }
+
+    if(typeof loadAnswers === 'function') loadAnswers();
+    const firstTa = document.querySelector('.j-bloco .j-pergunta textarea');
+    if(firstTa && typeof handleInput === 'function') handleInput(firstTa);
+    initAccessibility();
+  };
+
+  /* ===== controles ===== */
+  let lastDevolutivaText = '';
+  function analyzeSentiment(text) {
+    const POS = {'feliz': 2, 'alegria': 2, 'amor': 3, 'sucesso': 2, 'esperança': 3, 'paz': 2, 'fé': 3, 'gratidão': 2, 'vitória': 3, 'superação': 3, 'luz': 2, 'deus': 3, 'coragem': 2, 'força': 2, 'confiança': 2, 'propósito': 3};
+    const NEG = {'triste': -2, 'dor': -3, 'raiva': -2, 'medo': -2, 'frustracao': -2, 'frustração': -2, 'decepcao': -2, 'decepção': -2, 'perda': -3, 'culpa': -2, 'ansiedade': -2, 'solidao': -2, 'solidão': -2, 'desespero': -3, 'cansaco': -2, 'cansaço': -2, 'fracasso': -2, 'trauma': -3, 'duvida': -2, 'dúvida': -2};
+    let score = 0;
+    (text || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').split(/\s+/).forEach(t => {
+      if(POS[t] != null) score += POS[t];
+      if(NEG[t] != null) score += NEG[t];
+    });
+    return score;
+  }
+
+  function handleInput(textarea) {
+    const score = analyzeSentiment(textarea.value);
+    updateChama(score);
+    saveAnswers();
+    updateProgress();
+  }
+
+  async function handleDevolutiva(textarea) {
+    const perguntaDiv = textarea.closest('.j-pergunta');
+    const devolutivaP = perguntaDiv.querySelector('.devolutiva-text');
+    if(textarea.value.trim() && devolutivaP && textarea.value !== lastDevolutivaText) {
+      devolutivaP.style.display = 'block';
+      const pergunta = perguntaDiv.querySelector('.pergunta-enunciado')?.textContent || '';
+      const resposta = textarea.value;
+      lastDevolutivaText = resposta;
+      const guia = localStorage.getItem('JORNADA_GUIA') || 'zion';
+      const devolutiva = await fetchDevolutiva(pergunta, resposta, guia);
+      await typeDevolutiva(devolutivaP, devolutiva, 60);
+    } else if(!textarea.value.trim() && devolutivaP) {
+      devolutivaP.style.display = 'none';
+      devolutivaP.textContent = '';
+    }
+  }
+
+  function toggleSenha() {
+    const input = document.getElementById('senha');
+    if(!input) return;
+    input.type = (input.type === 'password' ? 'text' : 'password');
+  }
+
+  function proceedAfterGuia(guia) {
+    const guiaNameInput = document.getElementById('guiaNameInput');
+    if(guiaNameInput && guiaNameInput.value.trim()) {
+      localStorage.setItem('JORNADA_NOME', guiaNameInput.value.trim().toUpperCase());
+    } else {
+      toast('Por favor, insira seu nome antes de prosseguir.');
+      return;
+    }
+    localStorage.setItem('JORNADA_GUIA', guia);
+    ensureHeroFlame('section-selfie');
+    showSection('section-selfie');
+    const card = document.getElementById('card-guide');
+    const bgImg = document.getElementById('guideBg');
+    const resultBg = document.getElementById('resultBackground');
+    const clientNameEl = document.getElementById('clientNameSlot');
+    const clientNameFinal = document.getElementById('clientNameSlotFinal');
+    card.dataset.guide = guia.toUpperCase();
+    clientNameEl.textContent = guiaNameInput.value.toUpperCase();
+    clientNameFinal.textContent = guiaNameInput.value.toUpperCase();
+    const bgUrl = `/assets/img/irmandade-quarteto-bg-${guia}.jpeg`;
+    bgImg.src = bgUrl;
+    resultBg.src = bgUrl;
+  }
+
+  function proceedAfterSelfie() {
+    isTransitioning = false;
+    const intro = window.JORNADA_VIDEOS?.intro || '';
+    if(!intro || window.__introPlayed) {
+      proceedToQuestions();
+      return;
+    }
+    window.__introPlayed = true;
+    playTransition(intro, () => { proceedToQuestions(); });
+  }
+
+  let isTransitioning = false;
+  async function goNext() {
+    if(isTransitioning) {
+      console.warn('[goNext] Transição bloqueada por isTransitioning');
+      return;
+    }
+    isTransitioning = true;
+    const current = document.querySelector('.j-pergunta.active');
+    if(!current) {
+      console.error('[goNext] Nenhuma pergunta ativa encontrada');
+      isTransitioning = false;
+      return;
+    }
+    const ta = current.querySelector('textarea');
+    if(ta) {
+      await handleDevolutiva(ta);
+    }
+    
+    current.classList.remove('active');
+
+    const perguntas = Array.from(current.closest('.j-bloco').querySelectorAll('.j-pergunta'));
+    const i = perguntas.indexOf(current);
+
+    if(i + 1 < perguntas.length) {
+      const prox = perguntas[i + 1];
+      prox.classList.add('active');
+      const lbl = prox.querySelector('.pergunta-enunciado')?.textContent || '';
+      const ta = prox.querySelector('textarea');
+      typeAnswer(ta, ta.value || '', 60);
+      const aria = document.getElementById('aria-pergunta');
+      if(aria) aria.textContent = lbl;
+      runTyping(prox);
+      updateProgress();
+      isTransitioning = false;
+      return;
+    }
+
+    const blocos = Array.from(document.querySelectorAll('.j-bloco'));
+    const idxBloco = parseInt(current.closest('.j-bloco').dataset.bloco, 10);
+    const temProx = idxBloco + 1 < blocos.length;
+
+    const irAdiante = () => {
+      if(temProx) {
+        blocos.forEach(b => b.style.display = 'none');
+        const proxBloco = blocos[idxBloco + 1];
+        if(!proxBloco) {
+          console.error('[goNext] Próximo bloco não encontrado');
+          isTransitioning = false;
+          return;
+        }
+        proxBloco.style.display = 'block';
+        const primeira = proxBloco.querySelector('.j-pergunta');
+        if(primeira) {
+          primeira.classList.add('active');
+          const lbl = primeira.querySelector('.pergunta-enunciado')?.textContent || '';
+          const ta = primeira.querySelector('textarea');
+          ta.placeholder = "Digite sua resposta...";
+          const aria = document.getElementById('aria-pergunta');
+          if(aria) aria.textContent = lbl;
+          runTyping(primeira);
+        }
+        updateProgress();
+        isTransitioning = false;
+      } else {
+        if(window.JORNADA_FINAL_VIDEO) {
+          playTransition(window.JORNADA_FINAL_VIDEO, () => { showSection('section-final'); isTransitioning = false; });
+        } else {
+          showSection('section-final');
+          isTransitioning = false;
+        }
+        updateProgress();
+      }
+    };
+
+    const src = (window.JORNADA_BLOCKS[idxBloco] && window.JORNADA_BLOCKS[idxBloco].video_after) || '';
+    if(src) {
+      playTransition(src, () => { irAdiante(); });
+    } else {
+      irAdiante();
+    }
+  }
+  window.goNext = goNext;
+
+  function playTransition(src, onEnd) {
+    const overlay = document.getElementById('videoOverlay');
+    const video = document.getElementById('videoTransicao');
+    const fallback = document.getElementById('videoFallback');
+    const skip = document.getElementById('skipVideo');
+    if(!overlay || !video || !fallback || !src) {
+      console.error('[playTransition] Elementos ou src ausentes');
+      onEnd && onEnd();
+      return;
+    }
+
+    window.__playingTransition = true;
+    overlay.classList.remove('hidden');
+    video.classList.remove('hidden');
+    fallback.classList.add('hidden');
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+    video.currentTime = 0;
+    video.controls = true;
+    video.muted = false;
+    video.playsInline = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+    video.style.background = '#000';
+
+    let ended = false;
+    const cleanup = () => {
+      if(ended) return;
+      ended = true;
+      isTransitioning = false;
+      window.__playingTransition = false;
+      video.pause();
+      overlay.classList.add('hidden');
+      video.classList.add('hidden');
+      fallback.classList.add('hidden');
+      video.removeAttribute('src');
+      video.load();
+      onEnd && onEnd();
+    };
+
+    video.onerror = (e) => {
+      console.error('Video error:', e, 'Source:', src);
+      fallback.classList.remove('hidden');
+      video.classList.add('hidden');
+      toast('Não foi possível carregar o vídeo.');
+      setTimeout(cleanup, 1500);
+    };
+    video.onended = cleanup;
+    if(skip) skip.onclick = cleanup;
+
+    video.onloadedmetadata = () => {
+      if(!video.videoWidth || !video.videoHeight) {
+        video.classList.add('hidden');
+        fallback.classList.remove('hidden');
+      }
+      video.currentTime = 0;
+      setTimeout(() => {
+        video.play().catch((e) => {
+          console.error('Video playback error:', e, 'Source:', src);
+          fallback.classList.remove('hidden');
+          video.classList.add('hidden');
+          setTimeout(cleanup, 1500);
+        });
+      }, 400);
+    };
+
+    video.src = src + '?t=' + Date.now();
+    setTimeout(cleanup, 90000);
+  }
+  window.playTransition = playTransition;
+
+  function lockVideoOrientation() {
+    const video = document.getElementById('videoTransicao');
+    if(!video) return;
+    video.addEventListener('webkitbeginfullscreen', (e) => {
+      e.preventDefault();
+      video.exitFullscreen?.();
+    });
+    video.addEventListener('fullscreenchange', () => {
+      if(document.fullscreenElement === video) {
+        document.exitFullscreen?.();
+      }
+    });
+    window.addEventListener('orientationchange', () => {
+      video.style.transform = 'rotate(0deg)';
+    });
+    if(window.matchMedia('(orientation: portrait)').matches) {
+      video.style.width = '100vw';
+      video.style.height = 'auto';
+      video.style.maxHeight = '100vh';
+    }
+  }
+
+  function generatePDF() {
+    const respostas = JSON.parse(localStorage.getItem('jornada_respostas') || '{}');
+    const doc = { content: [] };
+    doc.content.push({ text: 'Jornada Essencial - Irmandade Conhecimento com Luz', style: { fontSize: 20, bold: true, alignment: 'center', margin: [0, 0, 0, 20] } });
+    Object.keys(respostas).forEach((key, idx) => {
+      const pergunta = document.querySelector(`.j-pergunta[data-pergunta="${idx}"] .pergunta-enunciado`)?.textContent || `Pergunta ${idx + 1}`;
+      doc.content.push(
+        { text: pergunta, style: { fontSize: 14, bold: true, margin: [0, 10, 0, 5] } },
+        { text: respostas[key] || 'Sem resposta', style: { fontSize: 12, margin: [0, 0, 0, 10] } }
+      );
+    });
+    if(window.pdfMake) {
+      pdfMake.createPdf(doc).download('jornada_essencial.pdf');
+    } else {
+      toast('PDF não disponível.');
+    }
+  }
+
+  function startJourney() {
+    const senha = (document.getElementById('senha')?.value || '').trim().toLowerCase();
+    const senhaCorreta = 'jornada2025';
+    if (senha === senhaCorreta) {
+      console.log('[startJourney] Senha válida, iniciando jornada');
+      ensureHeroFlame('section-guia');
+      showSection('section-guia');
+    } else {
+      console.warn('[startJourney] Senha inválida:', senha);
+      toast('Senha incorreta. Tente novamente.');
+    }
+  }
+
+  function proceedToQuestions() {
+    isTransitioning = false;
+    showSection('section-perguntas');
+    loadDynamicBlocks();
+    const perguntas = document.querySelectorAll('.j-pergunta');
+    if(perguntas.length) {
+      perguntas[0].classList.add('active');
+      const lbl = perguntas[0].querySelector('.pergunta-enunciado')?.textContent || '';
+      const ta = perguntas[0].querySelector('textarea');
+      ta.placeholder = "Digite sua resposta...";
+      const aria = document.getElementById('aria-pergunta');
+      if(aria) aria.textContent = lbl;
+      if(ta) typeAnswer(ta, ta.value || '', 60);
+      runTyping(perguntas[0]);
+    }
+  }
+
+  /* ===== Acessibilidade: Microfone e Áudio ===== */
+  let recognition = null;
+  let currentLang = 'pt-BR';
+  let isRecognizing = false;
+  window.isMuted = false;
+
+  function initAccessibility() {
+    if('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+      recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = currentLang;
+    } else {
+      toast('Seu navegador não suporta reconhecimento de voz.');
+    }
+
+    document.addEventListener('click', (ev) => {
+      if(!ev.target) return false;
+      const btnMic = ev.target.closest('[data-action="start-mic"]');
+      const btnClear = ev.target.closest('[data-action="clear-answer"]');
+      const btnMute = ev.target.closest('[data-action="mute"]');
+      const btnNextTermos = ev.target.closest('[data-action="next-termos"]');
+      if(btnMic) {
+        ev.preventDefault();
+        const ta = btnMic.closest('.j-pergunta')?.querySelector('textarea');
+        if(ta) startRecognition(ta, btnMic);
+        return true;
+      }
+      if(btnClear) {
+        ev.preventDefault();
+        const ta = btnClear.closest('.j-pergunta')?.querySelector('textarea');
+        if(ta) {
+          ta.value = '';
+          ta.classList.remove('lumen-typing', 'typing-done');
+          const devolutivaP = ta.closest('.j-pergunta').querySelector('.devolutiva-text');
+          if (devolutivaP) {
+            devolutivaP.style.display = 'none';
+            devolutivaP.textContent = '';
+          }
+          handleInput(ta);
+          toast('Resposta apagada.');
+        }
+        return true;
+      }
+      if(btnMute) {
+        ev.preventDefault();
+        window.isMuted = !window.isMuted;
+        btnMute.textContent = window.isMuted ? '🔊 Ativar Som' : '🔇 Silenciar';
+        btnMute.classList.toggle('muted', window.isMuted);
+        toast(window.isMuted ? 'Som silenciado.' : 'Som ativado.');
+        if(window.isMuted) speechSynthesis.cancel();
+        return true;
+      }
+      if(btnNextTermos) {
+        ev.preventDefault();
+        console.log('[initAccessibility] Botão Avançar clicado');
+        isTransitioning = false;
+        showSection('section-termos');
+        runTyping(document.getElementById('termos-pg1'));
+        return true;
+      }
+      return false;
+    }, { capture: true });
+
+    document.addEventListener('blur', (ev) => {
+      if(ev.target && ev.target.matches('.j-pergunta textarea')) {
+        handleDevolutiva(ev.target);
+      }
+    }, true);
+
+    document.addEventListener('keydown', (ev) => {
+      if(ev.key === 'Escape' && !document.querySelector('.j-section:not(.hidden)')) {
+        console.log('[keydown] Escape pressionado, retornando ao início');
+        showSection('section-intro');
+      }
+    });
+
+    const langSelect = document.getElementById('language-select');
+    if(langSelect) {
+      langSelect.addEventListener('change', (ev) => {
+        currentLang = ev.target.value;
+        if(recognition) recognition.lang = currentLang;
+        toast(`Idioma alterado para ${currentLang}`);
+        updateBlocks();
+        if(!document.getElementById('section-perguntas').classList.contains('hidden')) {
+          loadDynamicBlocks();
+        }
+      });
+    }
+  }
+
+  function startRecognition(textarea, btn) {
+    if(!recognition || isRecognizing) return;
+    isRecognizing = true;
+    btn.classList.add('recording');
+    btn.textContent = 'Gravando...';
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      textarea.value = (textarea.value ? textarea.value + ' ' : '') + transcript;
+      typeAnswer(textarea, textarea.value, 60);
+      saveAnswers();
+      updateProgress();
+      handleDevolutiva(textarea);
+    };
+    recognition.onend = () => {
+      isRecognizing = false;
+      btn.classList.remove('recording');
+      btn.textContent = '🎤 Falar Resposta';
+    };
+    recognition.onerror = (event) => {
+      toast('Erro no reconhecimento: ' + event.error);
+      recognition.onend();
+    };
+    recognition.start();
+  }
+
+ // ===== leitura com sinal de término =====
+function readAloud(text, voiceGender) {
+  if (window.isMuted || !('speechSynthesis' in window)) return Promise.resolve();
+  return new Promise(resolve => {
+    speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = currentLang;
+
+    const voices = speechSynthesis.getVoices();
+    let selectedVoice =
+      voices.find(v => v.lang === currentLang && v.name.includes(voiceGender === 'male' ? 'Male' : 'Female')) ||
+      voices.find(v => v.lang === currentLang) || voices[0];
+    utterance.voice = selectedVoice;
+
+    utterance.onend = resolve;      // 🔑 avisa quando terminar
+    utterance.onerror = resolve;    // em caso de erro, segue
+    speechSynthesis.speak(utterance);
+  });
+}
+
+
+  /* vídeos & blocos */
+  const VIDEO_BASE = '/assets/img/';
+  window.JORNADA_VIDEOS = {
+    intro: VIDEO_BASE + 'filme-0-ao-encontro-da-jornada.mp4',
+    afterBlocks: {
+      0: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
+      1: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
+      2: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
+      3: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
+    },
+    final: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
+  };
+  window.JORNADA_FINAL_VIDEO = window.JORNADA_VIDEOS.final;
+
+  const blockTranslations = {
+    'pt-BR': [
+      { title: 'Bloco 1 — Raízes', questions: [{ label: 'Quem é você hoje?' }, { label: 'O que te trouxe até esta jornada?' }, { label: 'Qual é o seu maior sonho espiritual?' }], video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4' },
+      { title: 'Bloco 2 — Reflexões', questions: [{ label: 'Quais são seus maiores desafios atuais?' }, { label: 'Como você lida com o medo ou a dúvida?' }, { label: 'O que a "luz" significa para você?' }], video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4' },
+      { title: 'Bloco 3 — Crescimento', questions: [{ label: 'O que você quer mudar na sua vida?' }, { label: 'Quem inspira você e por quê?' }, { label: 'Como você pratica gratidão no dia a dia?' }], video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4' },
+      { title: 'Bloco 4 — Integração', questions: [{ label: 'Qual lição você leva dessa jornada?' }, { label: 'Como vai aplicar isso no futuro?' }, { label: 'Uma mensagem para seu eu futuro.' }], video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4' }
+    ],
+    'en-US': [
+      { title: 'Block 1 — Roots', questions: [{ label: 'Who are you today?' }, { label: 'What brought you to this journey?' }, { label: 'What is your greatest spiritual dream?' }], video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4' },
+      { title: 'Block 2 — Reflections', questions: [{ label: 'What are your biggest current challenges?' }, { label: 'How do you deal with fear or doubt?' }, { label: 'What does "light" mean to you?' }], video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4' },
+      { title: 'Block 3 — Growth', questions: [{ label: 'What do you want to change in your life?' }, { label: 'Who inspires you and why?' }, { label: 'How do you practice gratitude in your daily life?' }], video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4' },
+      { title: 'Block 4 — Integration', questions: [{ label: 'What lesson do you take from this journey?' }, { label: 'How will you apply this in the future?' }, { label: 'A message to your future self.' }], video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4' }
+    ],
+    'es-ES': [
+      { title: 'Bloque 1 — Raíces', questions: [{ label: '¿Quién eres hoy?' }, { label: '¿Qué te trajo a este viaje?' }, { label: '¿Cuál es tu mayor sueño espiritual?' }], video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4' },
+      { title: 'Bloque 2 — Reflexiones', questions: [{ label: '¿Cuáles son tus mayores desafíos actuales?' }, { label: '¿Cómo lidias con el miedo o la duda?' }, { label: '¿Qué significa la "luz" para ti?' }], video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4' },
+      { title: 'Bloque 3 — Crecimiento', questions: [{ label: '¿Qué quieres cambiar en tu vida?' }, { label: '¿Quién te inspira y por qué?' }, { label: '¿Cómo practicas la gratitud en el día a día?' }], video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4' },
+      { title: 'Bloque 4 — Integración', questions: [{ label: '¿Qué lección te llevas de este viaje?' }, { label: '¿Cómo lo aplicarás en el futuro?' }, { label: 'Un mensaje para tu yo futuro.' }], video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4' }
+    ]
+  };
+
+  function updateBlocks() {
+    window.JORNADA_BLOCKS = blockTranslations[currentLang] || blockTranslations['pt-BR'];
+  }
+
+  /* ===== inicialização da jornada ===== */
+  function initJornada() {
+    console.log('[initJornada] Inicializando jornada');
+    document.addEventListener('input', (ev) => {
+      const ta = ev.target.closest?.('.j-pergunta textarea');
+      if(ta) handleInput(ta);
+      return true;
+    }, { capture: true });
+    document.addEventListener('focusin', (ev) => {
+      if(ev.target && ev.target.matches('.j-pergunta textarea')) {
+        if(__abortTypingPlaceholder) __abortTypingPlaceholder();
+      }
+      return true;
+    }, { capture: true });
+    document.addEventListener('click', (ev) => {
+      if(isTransitioning || !ev.target) {
+        console.warn('[click] Bloqueado por isTransitioning ou target nulo');
+        return false;
+      }
+      console.log('[click] Evento de clique disparado', ev.target);
+      const aNext = ev.target.closest?.('[data-action="next"]');
+      const aStart = ev.target.closest?.('[data-action="start"]');
+      const aToggle = ev.target.closest?.('[data-action="toggle-password"], .password-toggle');
+      const aRestart = ev.target.closest?.('[data-action="restart"]');
+      const btnPDF = ev.target.closest?.('[data-action="generate-pdf"]');
+      const btnDownloadSelfie = ev.target.closest?.('[data-action="download-selfie"]');
+      const btnSkipSelfie = ev.target.closest?.('[data-action="skip-selfie"]');
+      const btnSendChat = ev.target.closest?.('[data-action="send-chat"]');
+      const btnSelectGuia = ev.target.closest?.('[data-action="select-guia"]');
+      const btnNextTermos = ev.target.closest?.('[data-action="next-termos"]');
+      const btnNextSenha = ev.target.closest?.('[data-action="next-senha"]');
+      const btnTermosNext = ev.target.closest?.('[data-action="termos-next"]');
+      const btnTermosNext2 = ev.target.closest?.('[data-action="termos-next2"]');
+      const btnTermosNext3 = ev.target.closest?.('[data-action="termos-next3"]');
+      const btnTermosNext4 = ev.target.closest?.('[data-action="termos-next4"]');
+
+      if(aNext) { 
+        ev.preventDefault(); 
+        console.log('[click] Botão Next clicado');
+        goNext(); 
+        return true;
+      }
+      if(aStart) { 
+        ev.preventDefault(); 
+        console.log('[click] Botão Start clicado');
+        startJourney(); 
+        return true;
+      }
+      if(aToggle) { 
+        ev.preventDefault(); 
+        console.log('[click] Botão Toggle Senha clicado');
+        toggleSenha(); 
+        return true;
+      }
+      if(aRestart) { 
+        ev.preventDefault(); 
+        console.log('[click] Botão Restart clicado');
+        localStorage.removeItem('jornada_respostas'); 
+        localStorage.removeItem('JORNADA_GUIA'); 
+        localStorage.removeItem('JORNADA_NOME'); 
+        location.hash = '#intro'; 
+        location.replace('/index.html'); 
+        return true;
+      }
+      if(btnPDF) { 
+        ev.preventDefault(); 
+        console.log('[click] Botão Gerar PDF clicado');
+        generatePDF(); 
+        return true;
+      }
+      if(btnDownloadSelfie) {
+        ev.preventDefault();
+        console.log('[click] Botão Download Selfie clicado');
+        const dataURL = localStorage.getItem('IRMANDADE_SELFIE_FINAL');
+        if(dataURL) {
+          const a = document.createElement('a');
+          a.href = dataURL;
+          a.download = 'jornada-selfie.png';
+          a.click();
+        } else {
+          toast('Nenhuma imagem disponível para download.');
+        }
+        return true;
+      }
+      if(btnSkipSelfie) { 
+        ev.preventDefault(); 
+        console.log('[click] Botão Pular Selfie clicado');
+        proceedAfterSelfie(); 
+        return true;
+      }
+      if(btnSendChat) { 
+        ev.preventDefault(); 
+        console.log('[click] Botão Enviar Chat clicado');
+        sendChatMessage(); 
+        return true;
+      }
+      if(btnSelectGuia) { 
+        ev.preventDefault(); 
+        console.log('[click] Botão Selecionar Guia clicado:', btnSelectGuia.dataset.guia);
+        proceedAfterGuia(btnSelectGuia.dataset.guia); 
+        return true;
+      }
+      if(btnNextTermos) {
+        ev.preventDefault();
+        console.log('[click] Botão Avançar Termos clicado');
+        isTransitioning = false;
+        showSection('section-termos');
+        runTyping(document.getElementById('termos-pg1'));
+        return true;
+      }
+      if(btnNextSenha) {
+        ev.preventDefault();
+        console.log('[click] Botão Próxima Senha clicado');
+        showSection('section-senha');
+        runTyping(document.getElementById('section-senha'));
+        return true;
+      }
+      if(btnTermosNext) {
+        ev.preventDefault();
+        console.log('[click] Botão Próxima Página Termos 1 clicado');
+        document.getElementById('termos-pg1')?.classList.add('hidden');
+        document.getElementById('termos-pg2')?.classList.remove('hidden');
+        runTyping(document.getElementById('termos-pg2'));
+        return true;
+      }
+      if(btnTermosNext2) {
+        ev.preventDefault();
+        console.log('[click] Botão Próxima Página Termos 2 clicado');
+        document.getElementById('termos-pg2')?.classList.add('hidden');
+        document.getElementById('termos-pg3')?.classList.remove('hidden');
+        runTyping(document.getElementById('termos-pg3'));
+        return true;
+      }
+      if(btnTermosNext3) {
+        ev.preventDefault();
+        console.log('[click] Botão Próxima Página Termos 3 clicado');
+        document.getElementById('termos-pg3')?.classList.add('hidden');
+        document.getElementById('termos-pg4')?.classList.remove('hidden');
+        runTyping(document.getElementById('termos-pg4'));
+        return true;
+      }
+      if(btnTermosNext4) {
+        ev.preventDefault();
+        console.log('[click] Botão Próxima Página Termos 4 clicado');
+        document.getElementById('termos-pg4')?.classList.add('hidden');
+        document.getElementById('termos-pg5')?.classList.remove('hidden');
+        runTyping(document.getElementById('termos-pg5'));
+        return true;
+      }
+      return false;
+    }, { capture: true });
+
+    document.getElementById('grok-chat-input')?.addEventListener('keypress', (ev) => {
+      if(ev.key === 'Enter') {
+        ev.preventDefault();
+        console.log('[keypress] Enter no chat input');
+        sendChatMessage();
+        return true;
+      }
+      return false;
+    }, { capture: true });
+
+    document.getElementById('guiaNameInput')?.addEventListener('input', (ev) => {
+      ev.target.value = dedupe(ev.target.value).toUpperCase();
+      return true;
+    }, { capture: true });
+  }
+
+  /* boot */
+  console.log('[Boot] Iniciando script');
   ensureHeaderFlame();
   ensurePageFlames();
-
-  // se quiser começar pela intro, mantém:
-  if(typeof window.speechSynthesis!=='undefined'){
-    speechSynthesis.onvoiceschanged = ()=>{};
-  }
-
-  // garanta uma primeira seção (ajuste se o seu fluxo for outro)
-  if(document.getElementById('section-intro')){
-    showSection('section-intro');
-  }
+  initJornada();
+  showSection('section-intro');
+  updateBlocks();
+  lockVideoOrientation();
+  speechSynthesis.onvoiceschanged = () => {};
 })();
 </script>
 </body>
-
+</html>
 
 
