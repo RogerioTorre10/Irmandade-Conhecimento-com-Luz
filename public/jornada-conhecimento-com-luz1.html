@@ -689,6 +689,7 @@
     }
   };
 
+(function(){
   /* ===== datilografia no placeholder e respostas ===== */
   let __abortTypingPlaceholder = null;
   async function typePlaceholder(inp, text, speed = 60) {
@@ -717,7 +718,7 @@
     textarea.classList.remove('lumen-typing');
     textarea.classList.add('typing-done');
   }
-    async function typeDevolutiva(div, text, speed = 60) {
+  async function typeDevolutiva(div, text, speed = 60) {
     if(!div) return;
     div.textContent = '';
     div.classList.add('lumen-typing');
@@ -728,7 +729,7 @@
     div.classList.add('typing-done');
     if(!window.isMuted) readAloud(text, (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female'));
   }
-})(); // Fechamento correto do IIFE que contém typePlaceholder, typeAnswer e typeDevolutiva
+})(); // Fechamento correto do IIFE
 
 (function(){
   /* ===== chamas ===== */
@@ -746,7 +747,7 @@
       H.appendChild(makeFlame('chama-vela chama-lg'));
     }
   }
-  window.ensureHeaderFlame = ensureHeaderFlame; // Expor globalmente para evitar "not defined"
+  window.ensureHeaderFlame = ensureHeaderFlame; // Expor globalmente
   // ... resto do IIFE "chamas" ...
 })();
     
