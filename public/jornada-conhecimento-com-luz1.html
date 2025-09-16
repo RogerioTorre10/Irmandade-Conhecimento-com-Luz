@@ -532,7 +532,8 @@
   </div>
 
     <div id="toast" role="status" aria-live="polite" class="hidden"></div>
-    <script>
+  
+  <script>
 (function(){
   /* ===== util: toast + erro global ===== */
   function toast(msg) {
@@ -558,34 +559,45 @@
   function typeWriter(el, text, speed, showCursor) {
     if(!el) return Promise.resolve();
     el.textContent = ''; // Limpa explicitamente para evitar duplicação
-    if(showCursor) el.classList.add('lumen-typing');
-    let i = 0;
     const highlight = el.querySelector('.highlight') || document.createElement('div');
     if(!el.querySelector('.highlight')) {
       highlight.className = 'highlight';
       el.prepend(highlight);
     }
+    if(showCursor) el.classList.add('lumen-typing');
+    let i = 0;
     return new Promise(resolve => {
       function step() {
         if(i < text.length) {
           el.textContent += text.charAt(i++);
-          highlight.style.width = `${el.offsetWidth}px`; // Sincroniza highlight com cada letra
+          // Calcula a largura do texto atual para sincronizar o highlight
+          const tempSpan = document.createElement('span');
+          tempSpan.style.visibility = 'hidden';
+          tempSpan.style.position = 'absolute';
+          tempSpan.style.whiteSpace = 'pre';
+          tempSpan.textContent = el.textContent;
+          el.appendChild(tempSpan);
+          highlight.style.width = `${tempSpan.offsetWidth}px`;
+          el.removeChild(tempSpan);
           setTimeout(step, speed);
         } else {
           el.classList.add('typing-done');
-          highlight.style.width = '0'; // Reseta highlight no final
+          el.classList.remove('lumen-typing');
+          highlight.style.width = '0';
           resolve();
         }
       }
-      step();
+      setTimeout(step, 0); // Garante que o cursor só aparece ao iniciar
     });
   }
   async function runTyping(root) {
     if(!root || root.classList.contains('hidden')) return;
+    // Cancela qualquer leitura anterior
+    if(window.speechSynthesis) window.speechSynthesis.cancel();
     const elements = Array.from(root.querySelectorAll('[data-typing]'));
     for (const el of elements) {
       if (el.dataset.typed) continue;
-      el.textContent = ''; // Limpa novamente para evitar sobreposição
+      el.textContent = ''; // Limpa antes de iniciar
       const t = dedupe(el.getAttribute('data-text') || '');
       const spd = parseInt(el.getAttribute('data-speed') || '26', 10);
       const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
@@ -922,9 +934,9 @@
     const context = { currentQuestion, currentAnswer, respostas, blocoIdx, progresso: document.getElementById('jprog-pct')?.textContent || '0% concluído', guia };
 
     const guiaConfigs = window.guiaConfigs || {
-      zion: { apiUrl: 'https://zion-backend-api.onrender.com/v1/chat', model: 'grok', voice: 'male' },
+      zion: { apiUrl: 'https://lumen-backend-api.onrender.com/v1/chat', model: 'grok', voice: 'male' },
       lumen: { apiUrl: 'https://lumen-backend-api.onrender.com/v1/chat', model: 'gpt-5', voice: 'female' },
-      arian: { apiUrl: 'https://arian-backend-api.onrender.com/v1/chat', model: 'gemini', voice: 'female' }
+      arian: { apiUrl: 'https://lumen-backend-api.onrender.com/v1/chat', model: 'gemini', voice: 'female' }
     };
     const cfg = guiaConfigs[guia] || guiaConfigs.lumen;
 
@@ -981,8 +993,8 @@
   /* ===== bases e modelos padrão ===== */
   const GUIDE_BASES = {
     lumen: 'https://lumen-backend-api.onrender.com',
-    zion:  'https://zion-backend-api.onrender.com',
-    arian: 'https://arian-backend-api.onrender.com'
+    zion:  'https://lumen-backend-api.onrender.com',
+    arian: 'https://lumen-backend-api.onrender.com'
   };
   const GUIDE_MODELS = {
     lumen: 'gpt-5',
@@ -1111,12 +1123,16 @@
 
   function showSection(sectionId) {
     console.log('[showSection] Exibindo seção:', sectionId);
+    // Cancela qualquer leitura ou animação anterior
+    if(window.speechSynthesis) window.speechSynthesis.cancel();
     document.querySelectorAll('.j-section').forEach(s => {
       s.classList.add('hidden');
       s.querySelectorAll('[data-typing]').forEach(el => {
         el.textContent = '';
         el.classList.remove('lumen-typing', 'typing-done');
         delete el.dataset.typed;
+        const highlight = el.querySelector('.highlight');
+        if(highlight) highlight.style.width = '0';
       });
     });
     const active = document.getElementById(sectionId);
@@ -1142,6 +1158,9 @@
         const aria = document.getElementById('aria-pergunta');
         if(aria) aria.textContent = lbl;
         runTyping(first);
+      } else {
+        // Força o carregamento dos blocos se não houver perguntas
+        loadDynamicBlocks();
       }
     }
     if(sectionId === 'section-final') {
@@ -1163,6 +1182,9 @@
     if(sectionId === 'section-termos') {
       const pg1 = document.getElementById('termos-pg1');
       if(pg1 && !pg1.classList.contains('hidden')) runTyping(pg1);
+    }
+    if(sectionId === 'section-intro') {
+      runTyping(active); // Garante que a primeira frase seja exibida
     }
   }
 
@@ -1211,6 +1233,9 @@
         first.classList.add('active');
         runTyping(first);
       }
+    } else {
+      console.error('[loadDynamicBlocks] Nenhum bloco criado');
+      toast('Erro ao carregar as perguntas. Tente novamente.');
     }
 
     if(typeof loadAnswers === 'function') loadAnswers();
@@ -1579,7 +1604,7 @@
       if(btnNextTermos) {
         ev.preventDefault();
         console.log('[initAccessibility] Botão Avançar clicado');
-        isTransitioning = false; // Reset para garantir transição
+        isTransitioning = false;
         showSection('section-termos');
         runTyping(document.getElementById('termos-pg1'));
         return true;
@@ -1592,6 +1617,13 @@
         handleDevolutiva(ev.target);
       }
     }, true);
+
+    document.addEventListener('keydown', (ev) => {
+      if(ev.key === 'Escape' && !document.querySelector('.j-section:not(.hidden)')) {
+        console.log('[keydown] Escape pressionado, retornando ao início');
+        showSection('section-intro');
+      }
+    });
 
     const langSelect = document.getElementById('language-select');
     if(langSelect) {
@@ -1788,15 +1820,15 @@
       if(btnNextTermos) {
         ev.preventDefault();
         console.log('[click] Botão Avançar Termos clicado');
-        isTransitioning = false; // Reset para garantir transição
+        isTransitioning = false;
         showSection('section-termos');
         runTyping(document.getElementById('termos-pg1'));
         return true;
       }
-      if(btnNextSenha) { 
-        ev.preventDefault(); 
+      if(btnNextSenha) {
+        ev.preventDefault();
         console.log('[click] Botão Próxima Senha clicado');
-        showSection('section-senha'); 
+        showSection('section-senha');
         runTyping(document.getElementById('section-senha'));
         return true;
       }
@@ -1861,6 +1893,9 @@
   lockVideoOrientation();
   speechSynthesis.onvoiceschanged = () => {};
 })();
+</script>
+</body>
+</html>
 </script>
 </body>
 </html>
