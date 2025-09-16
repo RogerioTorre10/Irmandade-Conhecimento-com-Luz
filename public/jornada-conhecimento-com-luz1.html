@@ -972,7 +972,7 @@
     return s
       .normalize('NFC')
       .replace(/\s{2,}/g, ' ')
-      .replace(/([^\p{L}\p{N}])\1+/gu, '$1')
+      .replace(/([^a-zA-Z0-9]])\1+/gu, '$1')
       .trim();
   }
 
