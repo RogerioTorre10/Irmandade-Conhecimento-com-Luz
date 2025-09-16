@@ -625,101 +625,107 @@ function typeWriter(el, text, speed, showCursor) {
 }
 
 
-/* ===== datilografia + runTyping final ===== */
-;window.__typingLock = window.__typingLock || false;
-const DEFAULT_SPEED = 140; // ajuste global de velocidade
+/* ===== datilografia + runTyping (WRAPPED & SAFE) ===== */
+void function DTYPE_WRAP() {
+  // pega referência global sem usar 'window' no início
+  const g = (typeof window !== 'undefined' ? window : globalThis);
 
-function typeWriter(el, text, speed, showCursor) {
-  if (!el) return Promise.resolve();
+  // lock global e velocidade default (sem colisão de nomes)
+  if (g.__typingLock == null) g.__typingLock = false;
+  if (g.__DEFAULT_SPEED_TYPING == null) g.__DEFAULT_SPEED_TYPING = 140;
+  const DEFAULT_SPEED = g.__DEFAULT_SPEED_TYPING;
 
-  // trava: se já estiver digitando ou já digitou, não inicia outro ciclo
-  if (el.dataset.typing === '1' || el.dataset.typed === '1') return Promise.resolve();
+  g.typeWriter = function typeWriter(el, text, speed, showCursor) {
+    if (!el) return Promise.resolve();
 
-  el.dataset.typing = '1'; // marca início
-  el.textContent = '';
-  const highlight = el.querySelector('.highlight') || document.createElement('div');
-  if (!el.querySelector('.highlight')) {
-    highlight.className = 'highlight';
-    el.prepend(highlight);
-  }
+    // trava: se já estiver digitando ou já digitou, não inicia outro ciclo
+    if (el.dataset.typing === '1' || el.dataset.typed === '1') return Promise.resolve();
 
-  // remove chaves, colchetes e outros caracteres especiais
-  text = text.replace(/[{}[\]]/g, '').trim();
-  let i = 0;
-  let currentWord = '';
+    el.dataset.typing = '1'; // marca início
+    el.textContent = '';
+    const highlight = el.querySelector('.highlight') || document.createElement('div');
+    if (!el.querySelector('.highlight')) {
+      highlight.className = 'highlight';
+      el.prepend(highlight);
+    }
 
-  return new Promise(resolve => {
-    async function step() {
-      if (i < text.length) {
-        const char = text.charAt(i++);
-        el.textContent += char;
-        currentWord += char;
+    // remove chaves, colchetes e outros caracteres especiais
+    text = (text || '').replace(/[{}[\]]/g, '').trim();
+    let i = 0;
+    let currentWord = '';
 
-        // atualiza highlight
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        ctx.font = window.getComputedStyle(el).font;
-        highlight.style.width = `${ctx.measureText(el.textContent).width}px`;
+    return new Promise(resolve => {
+      async function step() {
+        if (i < text.length) {
+          const char = text.charAt(i++);
+          el.textContent += char;
+          currentWord += char;
 
-        // fala palavra quando termina
-        if (char === ' ' || i === text.length) {
-          if (!window.isMuted && !el.closest('textarea')) {
-            await readAloud(
-              currentWord.trim(),
-              (localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female')
-            );
+          // atualiza highlight
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          ctx.font = g.getComputedStyle(el).font;
+          highlight.style.width = `${ctx.measureText(el.textContent).width}px`;
+
+          // fala quando conclui palavra/frase
+          if (char === ' ' || i === text.length) {
+            if (!g.isMuted && !el.closest('textarea')) {
+              await g.readAloud(
+                currentWord.trim(),
+                (g.localStorage.getItem('JORNADA_GUIA') === 'zion' ? 'male' : 'female')
+              );
+            }
+            currentWord = '';
           }
-          currentWord = '';
+
+          setTimeout(step, speed);
+        } else {
+          el.classList.add('typing-done');
+          el.classList.remove('lumen-typing');
+          highlight.style.width = '0';
+
+          // libera trava
+          el.dataset.typed = '1';
+          el.dataset.typing = '0';
+
+          resolve();
         }
-
-        setTimeout(step, speed);
-      } else {
-        el.classList.add('typing-done');
-        el.classList.remove('lumen-typing');
-        highlight.style.width = '0';
-
-        // libera trava
-        el.dataset.typed = '1';
-        el.dataset.typing = '0';
-
-        resolve();
       }
+      if (showCursor) el.classList.add('lumen-typing');
+      setTimeout(step, 0);
+    });
+  };
+
+  g.runTyping = async function runTyping(root) {
+    if (!root || root.classList.contains('hidden')) return;
+    if (g.__typingLock) return;
+    g.__typingLock = true;
+
+    try {
+      if (g.speechSynthesis) g.speechSynthesis.cancel();
+
+      const elements = Array
+        .from(root.querySelectorAll('[data-typing]'))
+        .filter(el => !el.dataset.typed && el.offsetParent !== null);
+
+      for (const el of elements) {
+        if (el.dataset.typing === '1' || el.dataset.typed === '1') continue;
+
+        el.textContent = '';
+        const highlight = el.querySelector('.highlight');
+        if (highlight) highlight.style.width = '0';
+
+        const speed = parseInt(el.getAttribute('data-speed') || DEFAULT_SPEED, 10);
+        const showCursor = String(el.getAttribute('data-cursor') || 'true') === 'true';
+        const text = g.dedupe(el.getAttribute('data-text') || el.textContent || '');
+
+        await g.typeWriter(el, text, speed, showCursor);
+      }
+    } finally {
+      g.__typingLock = false;
     }
-    if (showCursor) el.classList.add('lumen-typing');
-    setTimeout(step, 0);
-  });
-}
-
-async function runTyping(root) {
-  if (!root || root.classList.contains('hidden')) return;
-
-  if (window.__typingLock) return;
-  window.__typingLock = true;
-
-  try {
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
-
-    const elements = Array
-      .from(root.querySelectorAll('[data-typing]'))
-      .filter(el => !el.dataset.typed && el.offsetParent !== null);
-
-    for (const el of elements) {
-      if (el.dataset.typing === '1' || el.dataset.typed === '1') continue;
-
-      el.textContent = '';
-      const highlight = el.querySelector('.highlight');
-      if (highlight) highlight.style.width = '0';
-
-      const speed = parseInt(el.getAttribute('data-speed') || DEFAULT_SPEED, 10);
-      const showCursor = String(el.getAttribute('data-cursor') || 'true') === 'true';
-      const text = dedupe(el.getAttribute('data-text') || el.textContent || '');
-
-      await typeWriter(el, text, speed, showCursor);
-    }
-  } finally {
-    window.__typingLock = false;
-  }
-}
+  };
+}();
 
   /* ===== datilografia no placeholder e respostas ===== */
   let __abortTypingPlaceholder = null;
