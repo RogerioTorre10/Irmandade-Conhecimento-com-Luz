@@ -1600,7 +1600,138 @@
 
 })();
 
+/* === SCRIPT GUIA+NOME: cliques robustos + placeholder do nome + fluxo === */
+(function(){
+  'use strict';
+  const q=(s,r=document)=>r.querySelector(s);
+  const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
 
+  /* ---------- util ---------- */
+  function has(id){
+    return !!( q('#'+id) || q(`[data-section="${id.replace('section-','')}"]`) || q(`.${id}`) );
+  }
+  function show(id){
+    if (typeof window.showSection==='function') return showSection(id);
+    const secs=qa('.j-section'); secs.forEach(s=>s.classList.add('hidden'));
+    const tgt = q('#'+id) || q(`[data-section="${id.replace('section-','')}"]`) || q(`.${id}`);
+    if (tgt) tgt.classList.remove('hidden');
+  }
+  function openQuestions(){
+    if (typeof window.openQuestions==='function') return window.openQuestions();
+    if (typeof window.showSection==='function') showSection('section-perguntas'); else show('section-perguntas');
+    requestAnimationFrame(()=>setTimeout(()=>{
+      const sec = q('#section-perguntas'); if(!sec) return;
+      let vis = sec.querySelector('.j-bloco[style*="display: block"]');
+      const blocks = qa('.j-bloco', sec);
+      if(!vis && blocks.length){ blocks.forEach((b,i)=> b.style.display = i===0 ? 'block' : 'none'); vis = blocks[0]; }
+      const active = sec.querySelector('.j-pergunta.active');
+      if(!active && vis){
+        const first = vis.querySelector('.j-pergunta');
+        if(first){
+          first.classList.add('active');
+          const aria = q('#aria-pergunta');
+          const lbl  = first.querySelector('.pergunta-enunciado')?.textContent || '';
+          if(aria) aria.textContent = lbl;
+        }
+      }
+      if (typeof window.runTyping==='function') runTyping(vis || sec);
+    },0));
+  }
+
+  /* ---------- Normalização do guia ---------- */
+  function normGuide(s=''){
+    s = String(s).toLowerCase();
+    if (s.includes('lumen')) return 'lumen';
+    if (s.includes('zion'))  return 'zion';
+    if (s.includes('arion') || s.includes('arian')) return 'arion';
+    return 'lumen';
+  }
+
+  /* ---------- Ativa tela de guia (botões + nome) ---------- */
+  function wireGuideSection(){
+    const sec = q('#section-guia') || q('[data-section="guia"]') || q('.section-guia');
+    if(!sec) return;
+
+    // 1) Nome: placeholder / mensagem
+    const nameInput = q('#guiaNameInput, [data-role="nome"], input[name="nome"], input[placeholder*="nome" i]', sec)
+                   || q('input', sec);
+    if (nameInput) {
+      if (!nameInput.placeholder || !nameInput.placeholder.trim()){
+        nameInput.placeholder = 'Digite seu nome';
+      }
+      nameInput.setAttribute('aria-label','Digite seu nome');
+    }
+    const nameMsg = q('#guiaNamePrompt, [data-role="guia-prompt"]', sec);
+    if (nameMsg && !nameMsg.textContent.trim()){
+      nameMsg.textContent = 'Digite seu nome';
+    }
+
+    // 2) Botões do guia — cobre várias formas de marcar
+    const btns = qa('[data-action="choose-guide"], [data-guide], .choose-guide, .btn-guia, .card-guia, [data-guide-id], #btnLumen, #btnZion, #btnArion', sec);
+    btns.forEach(btn=>{
+      btn.setAttribute('tabindex','0');
+      btn.style.pointerEvents = 'auto';
+      btn.style.cursor = 'pointer';
+      btn.addEventListener('click', onChoose);
+      btn.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); onChoose(e); }});
+    });
+
+    // 3) Se havia overlay bloqueando clique, desarma
+    const shields = qa('.click-shield, .overlay, [data-overlay]', sec);
+    shields.forEach(s=>{ s.style.pointerEvents = 'none'; });
+
+    function onChoose(ev){
+      const el = ev.currentTarget;
+      const guess = el.getAttribute('data-guide')
+                   || el.getAttribute('data-guide-id')
+                   || el.dataset?.value
+                   || el.id
+                   || el.getAttribute('aria-label')
+                   || el.getAttribute('alt')
+                   || el.textContent;
+      const guia = normGuide(guess);
+      try{ localStorage.setItem('JORNADA_GUIA', guia); }catch(_){}
+
+      // marca visual
+      btns.forEach(n=>n.classList.remove('active'));
+      el.classList.add('active');
+
+      // segue o fluxo: Selfie -> Perguntas
+      if (has('section-selfie')) {
+        if (typeof window.showSection==='function') showSection('section-selfie'); else show('section-selfie');
+        requestAnimationFrame(()=>setTimeout(()=>{
+          const s = q('#section-selfie') || q('[data-section="selfie"]') || q('.section-selfie');
+          if (s && typeof window.runTyping==='function') runTyping(s);
+        },0));
+      } else {
+        openQuestions();
+      }
+    }
+  }
+
+  // roda ao entrar na seção de guia
+  const _showSection = window.showSection;
+  window.showSection = function patchedShowSection(id){
+    if (typeof _showSection === 'function') _showSection(id);
+    else {
+      // fallback de exibição
+      const secs=qa('.j-section'); secs.forEach(s=>s.classList.add('hidden'));
+      (q('#'+id) || q(`[data-section="${id.replace('section-','')}"]`) || q(`.${id}`))?.classList.remove('hidden');
+    }
+    if (id==='section-guia') {
+      requestAnimationFrame(()=>setTimeout(wireGuideSection,0));
+    }
+  };
+
+  // garante também via DOMContentLoaded e via mutação
+  document.addEventListener('DOMContentLoaded', ()=>{ if (has('section-guia')) wireGuideSection(); });
+
+  // se já estamos no guia agora, ativa imediatamente
+  if ( (q('#section-guia') || q('[data-section="guia"]') || q('.section-guia')) && 
+       !(q('#section-guia')||q('[data-section="guia"]')||q('.section-guia')).classList?.contains('hidden') ){
+    wireGuideSection();
+  }
+})();
 
       // iniciar a jornada (valida senha)
       var btnStart = ev.target.closest ? ev.target.closest('[data-action="start"]') : null;
