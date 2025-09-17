@@ -586,6 +586,76 @@
       u.voice=v; u.onend=resolve; u.onerror=resolve;
       speechSynthesis.speak(u);
     });
+  
+/* === Perguntas com datilografia + TTS (usa seu typeWriter) === */
+(function(){
+  // config padrão (respeita JORNADA e mute)
+  window.JORNADA = window.JORNADA || {};
+  JORNADA.fullTypingMode = (JORNADA.fullTypingMode !== false); // ligado por padrão
+  JORNADA.typing = Object.assign({ charDelay: 18, caret: false }, (JORNADA.typing||{}));
+  JORNADA.tts = Object.assign({ enabled: true, lang: 'pt-BR', rate: 1.03, pitch: 1.0, voiceName: '' }, (JORNADA.tts||{}));
+
+  function isSpeechAvailable(){
+    return 'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance !== 'undefined';
+  }
+  async function speak(text){
+    if (!JORNADA.tts.enabled || window.isMuted) return;
+    if (!isSpeechAvailable()) return;
+
+    await new Promise(r=>{
+      const v = speechSynthesis.getVoices();
+      if (v && v.length) return r();
+      speechSynthesis.onvoiceschanged = ()=>r();
+      setTimeout(()=>r(), 300);
+    });
+
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang  = JORNADA.tts.lang || 'pt-BR';
+    u.rate  = +JORNADA.tts.rate || 1.0;
+    u.pitch = +JORNADA.tts.pitch || 1.0;
+    if (JORNADA.tts.voiceName){
+      const v = speechSynthesis.getVoices().find(v=>v.name === JORNADA.tts.voiceName);
+      if (v) u.voice = v;
+    }
+    return new Promise(res=>{
+      u.onend = ()=>res();
+      u.onerror = ()=>res(); // não travar
+      try { speechSynthesis.speak(u); } catch(e){ res(); }
+    });
+  }
+
+  function lockNext(){
+    const btn = document.querySelector('[data-action="next"], [data-action="avancar"]');
+    if (btn){ btn.disabled = true; btn.setAttribute('aria-busy','true'); }
+  }
+  function unlockNext(){
+    const btn = document.querySelector('[data-action="next"], [data-action="avancar"]');
+    if (btn){ btn.disabled = false; btn.removeAttribute('aria-busy'); }
+  }
+
+  // Wrapper principal para PERGUNTAS
+  window.typeAndReadQuestion = async function(pergunta, el){
+    if (!el){ return; }
+    if (!JORNADA.fullTypingMode){
+      el.textContent = (pergunta||'');
+      unlockNext();
+      return;
+    }
+    lockNext();
+
+    // usa SEU typeWriter (respeita data-attrs existentes)
+    try {
+      // parâmetros: (el, text, speed, showCursor?) — adapte se seu typeWriter usa assinatura diferente
+      await typeWriter(el, pergunta||'', JORNADA.typing.charDelay, !!JORNADA.typing.caret);
+    } catch(e){
+      // fallback sem travar
+      el.textContent = (pergunta||'');
+    }
+
+    await speak(pergunta||'');
+    unlockNext();
+  };
+})();
   }
   window.readAloud = readAloud;
 
