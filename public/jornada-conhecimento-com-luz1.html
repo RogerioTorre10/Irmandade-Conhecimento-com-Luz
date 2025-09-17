@@ -672,33 +672,37 @@
   async function runTyping(root){
     if(!root || root.classList.contains('hidden')) return;
     if(G.__typingLock) return; G.__typingLock = true;
-    try{
-      if(window.speechSynthesis) window.speechSynthesis.cancel();
-      const elements = Array.from(root.querySelectorAll('[data-typing]'))
-        .filter(el => !el.dataset.typed && el.offsetParent !== null);
+    try {
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
 
-      for(const el of elements){
-        if(el.dataset.typing==='1' || el.dataset.typed==='1') continue;
+  const elements = Array
+    .from(root.querySelectorAll('[data-typing]'))
+    .filter(el => !el.dataset.typed && el.offsetParent !== null);
 
-       // capture o texto ANTES de limpar
-const rawText = el.getAttribute('data-text') || el.textContent || '';
-const text = dedupe(rawText);
+  for (const el of elements) {
+    if (el.dataset.typing === '1' || el.dataset.typed === '1') continue;
 
-// limpar estado visual só depois de capturar
-el.textContent = '';
-const highlight = el.querySelector('.highlight');
-if (highlight) highlight.style.width = '0';
+    // capture antes de limpar
+    const rawText = el.getAttribute('data-text') || el.textContent || '';
+    const text = dedupe(rawText);
 
-const speed = parseInt(el.getAttribute('data-speed') || DEFAULT_SPEED, 10);
-const showCursor = String(el.getAttribute('data-cursor') || 'true') === 'true';
+    el.textContent = '';
+    const highlight = el.querySelector('.highlight');
+    if (highlight) highlight.style.width = '0';
 
-await typeWriter(el, text, speed, showCursor);
+    const speed = parseInt(el.getAttribute('data-speed') || DEFAULT_SPEED, 10);
+    const showCursor = String(el.getAttribute('data-cursor') || 'true') === 'true';
 
-    } finally {
-      G.__typingLock = false;
-    }
+    await typeWriter(el, text, speed, showCursor);
   }
-  window.runTyping = runTyping;
+} catch(e) {
+  console.error('[runTyping] erro:', e);
+  toast('Erro durante a datilografia.');
+} finally {
+  G.__typingLock = false;
+}
+window.runTyping = runTyping;
+
 
   /* ===== showSection seguro ===== */
   function showSection(sectionId){
