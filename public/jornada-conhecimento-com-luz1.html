@@ -615,6 +615,9 @@
   function typeWriter(el, text, speed, showCursor){
     if(!el) return Promise.resolve();
     if(el.dataset.typing==='1' || el.dataset.typed==='1') return Promise.resolve();
+    // pausas configuráveis
+    const PUNCT_PAUSE = parseInt(el.getAttribute('data-pause') || '220', 10); // pausa após . , ; : ! ? …
+    const BREAK_PAUSE = parseInt(el.getAttribute('data-break') || '320', 10); // pausa após \n
 
     el.dataset.typing='1';
     el.textContent='';
@@ -645,7 +648,12 @@
             }
             currentWord='';
           }
-          setTimeout(step, speed);
+          // pausa extra quando a tecla atual é pontuação ou quebra de linha
+          const isPunct = /[.,;:!?…]/.test(char);
+          const isBreak = (char === '\n');
+          const extra = isBreak ? BREAK_PAUSE : (isPunct ? PUNCT_PAUSE : 0);
+          setTimeout(step, speed + extra);
+
         } else {
           el.classList.add('typing-done');
           el.classList.remove('lumen-typing');
