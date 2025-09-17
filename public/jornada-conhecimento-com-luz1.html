@@ -697,17 +697,32 @@ await typeWriter(el, text, speed, showCursor);
     console.log('[showSection] Exibindo seção:', sectionId);
     if(window.speechSynthesis) window.speechSynthesis.cancel();
 
-    // esconde e reseta tudo
-    document.querySelectorAll('.j-section').forEach(s=>{
-      s.classList.add('hidden');
-      s.querySelectorAll('[data-typing]').forEach(el=>{
-        el.textContent='';
-        el.classList.remove('lumen-typing','typing-done');
-        el.dataset.typing='0';
-        delete el.dataset.typed;
-        const h=el.querySelector('.highlight'); if(h) h.style.width='0';
-      });
-    });
+    // esconde e reseta tudo (substituir bloco atual)
+document.querySelectorAll('.j-section').forEach(s => {
+  s.classList.add('hidden');
+
+  // reseta apenas elementos de datilografia dentro da seção
+  s.querySelectorAll('[data-typing]').forEach(el => {
+    // aborta qualquer estado de digitação
+    el.classList.remove('lumen-typing', 'typing-done');
+    el.dataset.typing = '0';
+    delete el.dataset.typed;
+
+    // preserva o conteúdo para a próxima execução
+    const keepText = el.getAttribute('data-text') || el.textContent || '';
+
+    // limpa visual e highlight
+    el.textContent = '';
+    const h = el.querySelector('.highlight');
+    if (h) h.style.width = '0';
+
+    // se não havia data-text, regrava para não perder conteúdo
+    if (!el.hasAttribute('data-text') && keepText) {
+      el.setAttribute('data-text', keepText);
+    }
+  });
+});
+
 
     const active=document.getElementById(sectionId);
     if(!active){
