@@ -789,104 +789,133 @@
     }
   }
   window.showSection = showSection;
- /* ===== Avançar: navegação entre perguntas/blocos ===== */
-let __isTransitioning = false;
+/* ===== Avançar: robusto e independente (SUBSTITUI o anterior) ===== */
+(function(){
+  let __isTransitioning = false;
 
-function goNext() {
-  if (__isTransitioning) return;
-  __isTransitioning = true;
+  function ensureFirstQuestion() {
+    const sec = document.getElementById('section-perguntas');
+    if (!sec) return false;
 
-  try {
-    // seção de perguntas visível
-    const perguntasSection = document.getElementById('section-perguntas');
-    if (!perguntasSection || perguntasSection.classList.contains('hidden')) {
-      // se não estamos em perguntas, tenta ir para perguntas
-      if (document.getElementById('section-perguntas')) {
-        showSection('section-perguntas');
-      }
-      return;
+    // garante um bloco visível
+    let vis = sec.querySelector('.j-bloco[style*="display: block"]');
+    const blocks = Array.from(sec.querySelectorAll('.j-bloco'));
+    if (!vis && blocks.length) {
+      blocks.forEach((b, i) => b.style.display = i === 0 ? 'block' : 'none');
+      vis = blocks[0];
     }
 
-    // pergunta ativa atual
-    const current = perguntasSection.querySelector('.j-pergunta.active');
-    const bloco = current ? current.closest('.j-bloco') : perguntasSection.querySelector('.j-bloco[style*="display: block"]') || perguntasSection.querySelector('.j-bloco');
-
-    if (!bloco) {
-      console.warn('[goNext] Nenhum bloco encontrado; abrindo perguntas');
-      showSection('section-perguntas');
-      return;
-    }
-
-    const perguntas = Array.from(bloco.querySelectorAll('.j-pergunta'));
-    // se não há pergunta ativa, ativa a primeira
-    if (!current) {
-      const first = perguntas[0];
+    // ativa a primeira pergunta, se nenhuma ativa
+    const activeQ = sec.querySelector('.j-pergunta.active');
+    if (!activeQ && vis) {
+      const first = vis.querySelector('.j-pergunta');
       if (first) {
         first.classList.add('active');
         const lbl = first.querySelector('.pergunta-enunciado')?.textContent || '';
         const aria = document.getElementById('aria-pergunta'); if (aria) aria.textContent = lbl;
-        runTyping(first);
+        runTyping(vis);
+        return true;
       }
-      return;
     }
-
-    // índice da pergunta atual
-    const i = perguntas.indexOf(current);
-    current.classList.remove('active');
-
-    // próxima pergunta no mesmo bloco
-    if (i >= 0 && i + 1 < perguntas.length) {
-      const prox = perguntas[i + 1];
-      prox.classList.add('active');
-
-      // atualiza aria e placeholder
-      const lbl = prox.querySelector('.pergunta-enunciado')?.textContent || '';
-      const ta = prox.querySelector('textarea');
-      if (ta) ta.placeholder = 'Digite sua resposta...';
-      const aria = document.getElementById('aria-pergunta'); if (aria) aria.textContent = lbl;
-
-      // datilografia apenas no novo container
-      runTyping(prox);
-      return;
-    }
-
-    // acabou o bloco: vai para o próximo bloco
-    const blocos = Array.from(perguntasSection.querySelectorAll('.j-bloco'));
-    const idxBloco = blocos.indexOf(bloco);
-    const temProx = idxBloco >= 0 && idxBloco + 1 < blocos.length;
-
-    if (temProx) {
-      // esconde todos e mostra só o próximo
-      blocos.forEach(b => b.style.display = 'none');
-      const proxBloco = blocos[idxBloco + 1];
-      proxBloco.style.display = 'block';
-
-      const firstPerg = proxBloco.querySelector('.j-pergunta');
-      if (firstPerg) {
-        firstPerg.classList.add('active');
-        const lbl = firstPerg.querySelector('.pergunta-enunciado')?.textContent || '';
-        const ta = firstPerg.querySelector('textarea'); if (ta) ta.placeholder = 'Digite sua resposta...';
-        const aria = document.getElementById('aria-pergunta'); if (aria) aria.textContent = lbl;
-        runTyping(proxBloco); // roda datilografia do bloco
-      }
-    } else {
-      // acabou tudo: vai para a seção final
-      showSection('section-final');
-    }
-  } finally {
-    // libera rapidamente para cliques subsequentes
-    setTimeout(() => { __isTransitioning = false; }, 150);
+    return !!activeQ;
   }
-}
-window.goNext = goNext;
 
-// delegação de clique para botões com data-action="next"
-document.addEventListener('click', function (ev) {
-  const btnNext = ev.target.closest?.('[data-action="next"]');
-  if (!btnNext) return;
-  ev.preventDefault();
-  goNext();
-}, { capture: true });
+  function goNext() {
+    if (__isTransitioning) return;
+    __isTransitioning = true;
+
+    try {
+      const sec = document.getElementById('section-perguntas');
+
+      // se não estamos em perguntas, abre perguntas e prepara primeira
+      if (!sec || sec.classList.contains('hidden')) {
+        if (sec) {
+          showSection('section-perguntas');
+          requestAnimationFrame(() => setTimeout(() => { ensureFirstQuestion(); }, 0));
+        }
+        return;
+      }
+
+      if (!ensureFirstQuestion()) return;
+
+      // bloco e perguntas correntes
+      const bloco = sec.querySelector('.j-bloco[style*="display: block"]') || sec.querySelector('.j-bloco');
+      const perguntas = bloco ? Array.from(bloco.querySelectorAll('.j-pergunta')) : [];
+      const current = bloco ? bloco.querySelector('.j-pergunta.active') : null;
+
+      if (!bloco || perguntas.length === 0) return;
+
+      if (!current) {
+        perguntas[0].classList.add('active');
+        runTyping(bloco);
+        return;
+      }
+
+      const i = perguntas.indexOf(current);
+      current.classList.remove('active');
+
+      // próxima pergunta no mesmo bloco
+      if (i >= 0 && i + 1 < perguntas.length) {
+        const prox = perguntas[i + 1];
+        prox.classList.add('active');
+        const lbl = prox.querySelector('.pergunta-enunciado')?.textContent || '';
+        const aria = document.getElementById('aria-pergunta'); if (aria) aria.textContent = lbl;
+        runTyping(prox);
+        return;
+      }
+
+      // próximo bloco
+      const allBlocks = Array.from(sec.querySelectorAll('.j-bloco'));
+      const idx = allBlocks.indexOf(bloco);
+      if (idx >= 0 && idx + 1 < allBlocks.length) {
+        allBlocks.forEach(b => b.style.display = 'none');
+        const nextBlock = allBlocks[idx + 1];
+        nextBlock.style.display = 'block';
+        const first = nextBlock.querySelector('.j-pergunta');
+        if (first) {
+          first.classList.add('active');
+          const lbl = first.querySelector('.pergunta-enunciado')?.textContent || '';
+          const aria = document.getElementById('aria-pergunta'); if (aria) aria.textContent = lbl;
+          runTyping(nextBlock);
+        }
+        return;
+      }
+
+      // acabou tudo
+      showSection('section-final');
+    } finally {
+      setTimeout(() => { __isTransitioning = false; }, 150);
+    }
+  }
+  window.goNext = goNext;
+
+  // Delegação de clique para vários "avançar"
+  document.addEventListener('click', function (ev) {
+    const qNext = ev.target.closest && ev.target.closest('[data-action="next"]');
+    if (qNext) { ev.preventDefault(); goNext(); return; }
+
+    const toTermos = ev.target.closest && ev.target.closest('[data-action="next-termos"]');
+    if (toTermos) { ev.preventDefault(); showSection('section-termos'); return; }
+
+    const termosNext = ev.target.closest && ev.target.closest('[data-action="termos-next"], [data-action="termos-next2"], [data-action="termos-next3"], [data-action="termos-next4"]');
+    if (termosNext) {
+      ev.preventDefault();
+      const pages = ['termos-pg1','termos-pg2','termos-pg3','termos-pg4','termos-pg5'];
+      const visId = pages.find(id => {
+        const el = document.getElementById(id);
+        return el && !el.classList.contains('hidden');
+      });
+      const idx = pages.indexOf(visId);
+      if (idx >= 0 && idx + 1 < pages.length) {
+        const cur = document.getElementById(pages[idx]);
+        const nxt = document.getElementById(pages[idx + 1]);
+        if (cur) cur.classList.add('hidden');
+        if (nxt) { nxt.classList.remove('hidden'); runTyping(nxt); }
+      }
+      return;
+    }
+  }, true);
+})();
 
   /* ===== Boot ===== */
   console.log('[Boot] Iniciando script seguro');
