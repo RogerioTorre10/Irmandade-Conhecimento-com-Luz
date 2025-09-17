@@ -1750,7 +1750,179 @@
       }
     }, true);
   })();
-  
+ 
+/* === GUIA FIX v3 — clique robusto + logs + anti-overlay === */
+(function(){
+  'use strict';
+  const q=(s,r=document)=>r.querySelector(s);
+  const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
+
+  function secGuia(){
+    return q('#section-guia') || q('[data-section="guia"]') || q('.section-guia') || null;
+  }
+
+  function log(...a){ try{ console.log('[GUIA]', ...a);}catch(_){} }
+
+  // normaliza nome do guia
+  function normGuide(x=''){
+    const s=String(x).toLowerCase();
+    if (s.includes('lumen')) return 'lumen';
+    if (s.includes('zion'))  return 'zion';
+    if (s.includes('arion') || s.includes('arian')) return 'arion';
+    return '';
+  }
+
+  // tenta inferir o guia a partir de um elemento
+  function inferGuideFrom(el){
+    if (!el) return '';
+    const attrs = [
+      el.getAttribute('data-guide'),
+      el.getAttribute('data-guide-id'),
+      el.dataset?.guide,
+      el.dataset?.value,
+      el.id,
+      el.getAttribute('aria-label'),
+      el.getAttribute('alt'),
+      el.title,
+      el.textContent
+    ].filter(Boolean);
+
+    for (const v of attrs){
+      const g = normGuide(v);
+      if (g) return g;
+    }
+
+    // tentativa com src de img
+    if (el.tagName === 'IMG' && el.src){
+      const src = el.src.toLowerCase();
+      if (src.includes('lumen')) return 'lumen';
+      if (src.includes('zion'))  return 'zion';
+      if (src.includes('arion') || src.includes('arian')) return 'arion';
+    }
+
+    return '';
+  }
+
+  // aplica acessibilidade e estilos de clique aos possíveis botões
+  function enhanceButtons(){
+    const root = secGuia(); if (!root) return;
+    const candidates = qa(`
+      [data-action="choose-guide"],
+      [data-guide],
+      [data-guide-id],
+      .choose-guide,
+      .btn-guia,
+      .card-guia,
+      #btnLumen, #btnZion, #btnArion,
+      img[alt*="Lumen" i],
+      img[alt*="Zion" i],
+      img[alt*="Arion" i]
+    `, root);
+
+    candidates.forEach(el=>{
+      if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex','0');
+      el.style.cursor = 'pointer';
+      el.style.pointerEvents = 'auto';
+      // se não tiver data-guide mas dá pra inferir, marque
+      if (!el.getAttribute('data-guide')) {
+        const g = inferGuideFrom(el);
+        if (g) el.setAttribute('data-guide', g);
+      }
+    });
+
+    // remove qualquer overlay que bloqueie clique
+    qa('.click-shield, .overlay, [data-overlay]', root).forEach(ov=>{
+      ov.style.pointerEvents = 'none';
+      ov.style.opacity = ov.style.opacity || '1';
+    });
+
+    log('Botões candidatos:', candidates.length);
+  }
+
+  // abre selfie ou perguntas
+  function goNextAfterGuide(){
+    const hasSelfie = !!( q('#section-selfie') || q('[data-section="selfie"]') || q('.section-selfie') );
+    if (hasSelfie){
+      if (typeof window.showSection==='function') showSection('section-selfie');
+      else {
+        document.querySelectorAll('.j-section').forEach(s=>s.classList.add('hidden'));
+        (q('#section-selfie')||q('[data-section="selfie"]')||q('.section-selfie'))?.classList.remove('hidden');
+      }
+      requestAnimationFrame(()=>setTimeout(()=>{
+        const s = q('#section-selfie') || q('[data-section="selfie"]') || q('.section-selfie');
+        if (s && typeof window.runTyping==='function') runTyping(s);
+      },0));
+    } else if (typeof window.openQuestions==='function'){
+      openQuestions();
+    } else if (typeof window.showSection==='function'){
+      showSection('section-perguntas');
+    }
+  }
+
+  // handler central de escolha
+  function choose(el){
+    const guia = inferGuideFrom(el);
+    log('Clique em guia — elemento:', el, '→ inferido:', guia || '(vazio)');
+    if (!guia){
+      console.warn('[GUIA] Não consegui inferir o guia a partir do elemento clicado.');
+      return;
+    }
+    try{ localStorage.setItem('JORNADA_GUIA', guia); }catch(_){}
+    // marca visual
+    const root = secGuia() || document;
+    qa('[data-action="choose-guide"], [data-guide], .choose-guide, .btn-guia, .card-guia, [data-guide-id]', root)
+      .forEach(n=>n.classList.remove('active'));
+    el.classList.add('active');
+
+    goNextAfterGuide();
+  }
+
+  // delegação de clique (funciona mesmo se o DOM mudar depois)
+  document.addEventListener('click', function(ev){
+    const root = secGuia();
+    if (!root) return;
+
+    const target = ev.target;
+    if (!root.contains(target)) return;
+
+    // sobe na árvore até achar algo “clicável” como guia
+    let el = target.closest?.('[data-action="choose-guide"], [data-guide], .choose-guide, .btn-guia, .card-guia, [data-guide-id], #btnLumen, #btnZion, #btnArion, img') || target;
+    if (!el || !root.contains(el)) return;
+
+    const g = inferGuideFrom(el);
+    if (!g) return; // não é um botão válido
+
+    ev.preventDefault();
+    ev.stopPropagation();
+    choose(el);
+  }, true);
+
+  // teclado acessível
+  document.addEventListener('keydown', function(ev){
+    if (ev.key!=='Enter' && ev.key!==' ') return;
+    const root = secGuia(); if (!root) return;
+    const el = document.activeElement;
+    if (!el || !root.contains(el)) return;
+
+    const g = inferGuideFrom(el);
+    if (!g) return;
+
+    ev.preventDefault();
+    choose(el);
+  }, true);
+
+  // quando a seção de guia ficar visível, reforça botões
+  const mo = new MutationObserver(()=>{ 
+    const root = secGuia(); 
+    if (root && !root.classList.contains('hidden')) enhanceButtons();
+  });
+  mo.observe(document.documentElement, {subtree:true, childList:true, attributes:true, attributeFilter:['class','style']});
+
+  // também no carregamento
+  document.addEventListener('DOMContentLoaded', enhanceButtons);
+  // e já tenta agora
+  enhanceButtons();
+})();  
 
   /* ===== Boot ===== */
   console.log('[Boot] Iniciando script seguro');
