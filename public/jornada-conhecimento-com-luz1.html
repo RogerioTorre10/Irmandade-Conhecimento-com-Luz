@@ -608,7 +608,7 @@
   /* ===== datilografia + runTyping ===== */
   const G = (typeof window!=='undefined'? window : globalThis);
   if (G.__typingLock == null) G.__typingLock = false;
-  if (G.__DEFAULT_SPEED_TYPING == null) G.__DEFAULT_SPEED_TYPING = 110; // ajuste global
+  if (G.__DEFAULT_SPEED_TYPING == null) G.__DEFAULT_SPEED_TYPING = 80; // ajuste global
   const DEFAULT_SPEED = G.__DEFAULT_SPEED_TYPING;
 
   function typeWriter(el, text, speed, showCursor){
