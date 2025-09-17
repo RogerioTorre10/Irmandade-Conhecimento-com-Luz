@@ -889,43 +889,60 @@
   }
   window.goNext = goNext;
 
-  // Delegação de clique para vários "avançar"
-  document.addEventListener('click', function (ev) {
-    const qNext = ev.target.closest && ev.target.closest('[data-action="next"]');
-    if (qNext) { ev.preventDefault(); goNext(); return; }
+  // Delegação de clique (corrigida — sem vírgulas fora de string)
+document.addEventListener('click', function (ev) {
+  // avançar perguntas
+  var btnNext = ev.target.closest ? ev.target.closest('[data-action="next"]') : null;
+  if (btnNext) {
+    ev.preventDefault();
+    goNext();
+    return;
+  }
 
-    const toTermos = ev.target.closest && ev.target.closest('[data-action="next-termos"]');
-    if (toTermos) { ev.preventDefault(); showSection('section-termos'); return; }
+  // ir para Termos
+  var btnToTermos = ev.target.closest ? ev.target.closest('[data-action="next-termos"]') : null;
+  if (btnToTermos) {
+    ev.preventDefault();
+    showSection('section-termos');
+    return;
+  }
 
-    const termosNext = ev.target.closest && ev.target.closest('[data-action="termos-next"], [data-action="termos-next2"], [data-action="termos-next3"], [data-action="termos-next4"]');
-    if (termosNext) {
-      ev.preventDefault();
-      const pages = ['termos-pg1','termos-pg2','termos-pg3','termos-pg4','termos-pg5'];
-      const visId = pages.find(id => {
-        const el = document.getElementById(id);
-        return el && !el.classList.contains('hidden');
-      });
-      const idx = pages.indexOf(visId);
-      if (idx >= 0 && idx + 1 < pages.length) {
-        const cur = document.getElementById(pages[idx]);
-        const nxt = document.getElementById(pages[idx + 1]);
-        if (cur) cur.classList.add('hidden');
-        if (nxt) { nxt.classList.remove('hidden'); runTyping(nxt); }
-      }
-      // aceitar termos → ir para a seção de senha
-      const accept = ev.target.closest && ev.target.closest(
-     '[data-action="next-senha"], [data-action="accept"], [data-action="accept-terms"], [data-action="termos-aceito"], [data-action="aceito"]'
-      );
-      if (accept) {
-      ev.preventDefault();
-      showSection('section-senha');
-      requestAnimationFrame(() => setTimeout(() => {
-      const sec = document.getElementById('section-senha');
-      if (sec) runTyping(sec);
-      }, 0));
-      return;
-      }
-     }, true);
+  // aceitar termos → ir para Senha
+  var acceptSel = '[data-action="next-senha"],[data-action="accept"],[data-action="accept-terms"],[data-action="termos-aceito"],[data-action="aceito"]';
+  var btnAccept = ev.target.closest ? ev.target.closest(acceptSel) : null;
+  if (btnAccept) {
+    ev.preventDefault();
+    showSection('section-senha');
+    requestAnimationFrame(function () {
+      setTimeout(function () {
+        var sec = document.getElementById('section-senha');
+        if (sec) runTyping(sec);
+      }, 0);
+    });
+    return;
+  }
+
+  // termos páginas internas (pg1→pg2→...→pg5)
+  var termosSel = '[data-action="termos-next"],[data-action="termos-next2"],[data-action="termos-next3"],[data-action="termos-next4"]';
+  var btnTermosNext = ev.target.closest ? ev.target.closest(termosSel) : null;
+  if (btnTermosNext) {
+    ev.preventDefault();
+    var pages = ['termos-pg1','termos-pg2','termos-pg3','termos-pg4','termos-pg5'];
+    var visId = null;
+    for (var i = 0; i < pages.length; i++) {
+      var el = document.getElementById(pages[i]);
+      if (el && !el.classList.contains('hidden')) { visId = pages[i]; break; }
+    }
+    var idx = pages.indexOf(visId);
+    if (idx >= 0 && idx + 1 < pages.length) {
+      var cur = document.getElementById(pages[idx]);
+      var nxt = document.getElementById(pages[idx + 1]);
+      if (cur) cur.classList.add('hidden');
+      if (nxt) { nxt.classList.remove('hidden'); runTyping(nxt); }
+    }
+    return;
+   }
+   }, true);
    })();
 
   /* ===== Boot ===== */
