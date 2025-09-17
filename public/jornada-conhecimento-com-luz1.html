@@ -789,21 +789,20 @@ document.querySelectorAll('.j-section').forEach(s => {
   }
   window.showSection = showSection;
 
-  /* ===== init básico ===== */
-  console.log('[Boot] Iniciando script seguro');
-  ensureHeaderFlame();
-  ensurePageFlames();
+/* ==== init básico ==== */
+console.log("Boot [Iniciando script segundo]");
+ensureHeaderFlame();
+ensurePageFlame();
 
-  // se quiser começar pela intro, mantém:
-  if(typeof window.speechSynthesis!=='undefined'){
-    speechSynthesis.onvoiceschanged = ()=>{};
-  }
-(function() {
-  // Garanta uma primeira seção (ajuste se o seu fluxo for outro)
-  if (document.getElementById('section-intro')) {
+/* se quiser começar pela intro, mantêm: */
+if (typeof window.speechSynthesis !== "undefined") {
+    speechSynthesis.onvoiceschanged = () => {};
+}
+
+/* garanta uma primeira seção (ajuste se o seu fluxo for outro) */
+if (document.getElementById('section-intro')) {
     showSection('section-intro');
-  }
-})();
+}
 </script>
 </body>
 </html>
