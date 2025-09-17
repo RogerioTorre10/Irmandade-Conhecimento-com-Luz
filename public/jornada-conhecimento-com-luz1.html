@@ -701,7 +701,11 @@
     }
 
     text = (text||'').replace(/[{}[\]]/g,'').trim();
-    let i=0, currentWord='';
+    let i = 0;
+ // let currentWord = '';   // <-- remova
+    let phraseBuffer = '';
+    let ttsChain = Promise.resolve();
+
 
     // pausas configuráveis por elemento (ou usa padrão)
     const PUNCT_PAUSE = parseInt(el.getAttribute('data-pause') || '220', 10); // .,;:!?…
@@ -719,8 +723,8 @@
 
         if(i < text.length){
           const char=text.charAt(i++);
-          el.textContent += char;
-          currentWord += char;
+          el.textContent += char;// dentro do step()
+          currentWord += char;// dentro do step()
 
           const canvas=document.createElement('canvas');
           const ctx=canvas.getContext('2d');
@@ -734,10 +738,21 @@
             currentWord='';
           }
 
-          const isPunct = /[.,;:!?…]/.test(char);
+          // dentro de step(), depois de el.textContent += char;
+          phraseBuffer += char;
+
+          const isPunct = /[.,;:!?…]/.test(char);  // <-- este regex
           const isBreak = (char === '\n');
-          const extra = isBreak ? BREAK_PAUSE : (isPunct ? PUNCT_PAUSE : 0);
-          setTimeout(step, (speed||DEFAULT_SPEED) + extra);
+
+          if (JORNADA?.tts?.readingMode === 'sentence' && (isPunct || isBreak)) {
+          const phrase = phraseBuffer.trim();
+          phraseBuffer = '';
+          if (phrase && !window.isMuted && !el.closest('textarea')) {
+          // encadeia sem await pra não travar a datilografia
+          ttsChain = ttsChain.then(() => speak(phrase));
+         }
+      }
+
         } else {
           el.classList.add('typing-done');
           el.classList.remove('lumen-typing');
