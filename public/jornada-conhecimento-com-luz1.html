@@ -2072,6 +2072,172 @@
   });
 
 })();
+  <style>
+  /* Container da selfie: garante área e clipping */
+  #section-selfie .selfie-wrapper,
+  #section-selfie .selfie-hero,
+  #section-selfie .selfie-bg {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    min-height: 300px; /* ajuste se quiser mais/menos alto */
+    background-color: rgba(0,0,0,0.15); /* fallback sutil */
+  }
+
+  /* Se for IMG, faça ocupar o container */
+  #section-selfie img[data-role="bg"],
+  #section-selfie img#selfieBg,
+  #section-selfie .selfie-bg > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;     /* cobre sem distorcer */
+    object-position: center;
+    pointer-events: none;  /* não intercepta clique nos botões */
+    user-select: none;
+    border-radius: 12px;
+  }
+</style>
+
+/* SELFIE BG FIX: usa <img> dentro do container quando existir */
+(function(){
+  const q=(s,r=document)=>r.querySelector(s);
+  const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
+
+  const GUIDE_BG = {
+    lumen: [
+      '/assets/img/irmandade-quarteto-bg-lumen.png',
+      '/assets/img/irmandade-quarteto-bg-lumen.jpg',
+      '/assets/img/irmandade-quarteto-bg-lumen.jpeg'
+    ],
+    zion: [
+      '/assets/img/irmandade-quarteto-bg-zion.png',
+      '/assets/img/irmandade-quarteto-bg-zion.jpg',
+      '/assets/img/irmandade-quarteto-bg-zion.jpeg'
+    ],
+    arion: [
+      '/assets/img/irmandade-quarteto-bg-arian.jpeg',
+      '/assets/img/irmandade-quarteto-bg-arion.jpeg',
+      '/assets/img/irmandade-quarteto-bg-arion.jpg',
+      '/assets/img/irmandade-quarteto-bg-arion.png'
+    ]
+  };
+
+  function normGuide(s=''){
+    s=String(s).toLowerCase();
+    if(s.includes('lumen')) return 'lumen';
+    if(s.includes('zion'))  return 'zion';
+    if(s.includes('arion')||s.includes('arian')) return 'arion';
+    return 'lumen';
+  }
+  function preloadFirst(list){
+    return new Promise(res=>{
+      let i=0; (function step(){
+        if(i>=list.length) return res(null);
+        const src=list[i++], im=new Image();
+        im.onload =()=>res(src);
+        im.onerror=()=>step();
+        im.src = src;
+      })();
+    });
+  }
+
+  async function applySelfieBg(){
+    const sec = q('#section-selfie') || q('[data-section="selfie"]') || q('.section-selfie');
+    if(!sec || sec.classList.contains('hidden')) return;
+
+    const host = q('.selfie-bg',sec) || q('.selfie-hero',sec) || q('.selfie-wrapper',sec) || sec;
+
+    // prioriza usar <img> dentro do host
+    let img = q('img[data-role="bg"]',host) || q('#selfieBg',host) || q('.selfie-bg > img',sec);
+    if(!img){
+      img = document.createElement('img');
+      img.setAttribute('data-role','bg');
+      img.alt = 'Guia Background';
+      host.appendChild(img);
+    }
+
+    const guia = normGuide(localStorage.getItem('JORNADA_GUIA')||'');
+    const src  = await preloadFirst(GUIDE_BG[guia] || GUIDE_BG.lumen);
+    if(src){ img.src = src; }
+  }
+
+  // roda quando a selfie ficar visível
+  const mo=new MutationObserver(()=>{
+    const sec=q('#section-selfie')||q('[data-section="selfie"]')||q('.section-selfie');
+    if(sec && !sec.classList.contains('hidden')) applySelfieBg();
+  });
+  mo.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style']});
+
+  document.addEventListener('DOMContentLoaded', applySelfieBg);
+})();
+
+/* PERGUNTAS FIX: abre primeiro bloco, ativa 1ª pergunta e roda typing */
+(function(){
+  const q=(s,r=document)=>r.querySelector(s);
+  const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
+
+  function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+  async function ensureQuestionsReady(retries=10){
+    const sec = q('#section-perguntas'); if(!sec) return false;
+
+    // se não houver blocos, tente carregar dinamicamente
+    let blocks = qa('.j-bloco', sec);
+    if(blocks.length===0 && typeof window.loadDynamicBlocks==='function'){
+      try{ window.loadDynamicBlocks(); }catch(_){}
+      await wait(120);
+      blocks = qa('.j-bloco', sec);
+    }
+    if(blocks.length===0 && retries>0){ await wait(150); return ensureQuestionsReady(retries-1); }
+
+    // torna o 1º bloco visível
+    let vis = sec.querySelector('.j-bloco[style*="display: block"]');
+    if(!vis && blocks.length){ blocks.forEach((b,i)=> b.style.display = i===0 ? 'block' : 'none'); vis = blocks[0]; }
+
+    // ativa a 1ª pergunta
+    let active = sec.querySelector('.j-pergunta.active');
+    if(!active && vis){
+      const first = vis.querySelector('.j-pergunta');
+      if(first){
+        first.classList.add('active');
+        const aria = q('#aria-pergunta'); 
+        const lbl  = first.querySelector('.pergunta-enunciado')?.textContent || '';
+        if(aria) aria.textContent = lbl;
+      }
+    }
+
+    // roda datilografia
+    if (typeof window.runTyping === 'function') {
+      window.runTyping(vis || sec);
+    }
+    return true;
+  }
+
+  // substitui/engorda a função openQuestions se existir
+  const _openQuestions = window.openQuestions;
+  window.openQuestions = function patchedOpenQuestions(){
+    if (typeof window.showSection === 'function') window.showSection('section-perguntas');
+    else {
+      document.querySelectorAll('.j-section').forEach(s=>s.classList.add('hidden'));
+      (q('#section-perguntas')||q('[data-section="perguntas"]')||q('.section-perguntas'))?.classList.remove('hidden');
+    }
+    // garante conteúdo visível
+    requestAnimationFrame(()=>{ setTimeout(()=>{ ensureQuestionsReady(); }, 0); });
+  };
+
+  // botão “Pular foto / Iniciar” já deveria chamar openQuestions; reforço aqui:
+  document.addEventListener('click', function(ev){
+    const sec = q('#section-selfie')||q('[data-section="selfie"]')||q('.section-selfie');
+    if(!sec) return;
+    const btn = ev.target.closest?.('[data-action="selfie-next"], [data-action="skip-selfie"], #btnSkipSelfie, .btn-skip-selfie, [data-role="start"]');
+    if(btn && sec.contains(btn)){
+      ev.preventDefault();
+      window.openQuestions();
+    }
+  }, true);
+})();
 
   /* ===== Boot ===== */
   console.log('[Boot] Iniciando script seguro');
