@@ -1115,137 +1115,12 @@ window.showSection = showSection;
   };
 
   /* ===== Guia ===== */
-(function(){
-  'use strict';
+document.addEventListener('click', function(ev) {
   const q = (s, r = document) => r.querySelector(s);
   const qa = (s, r = document) => Array.from(r.querySelectorAll(s));
-  const log = (...a) => { try { console.log('[GUIA v5]', ...a); } catch (_) {} };
+  const log = (...a) => { try { console.log('[Termos v2]', ...a); } catch (_) {} };
 
-  function secGuia() {
-    return q('#section-guia, [data-section="guia"], .section-guia, .guia-container, .guia, [class*="guia"], [id*="guia"]') || document;
-  }
-
-  function normGuide(x = '') {
-    const s = String(x).toLowerCase();
-    if (s.includes('lumen')) return 'lumen';
-    if (s.includes('zion')) return 'zion';
-    if (s.includes('arion') || s.includes('arian')) return 'arion';
-    return 'lumen'; // Fallback
-  }
-
-  function inferGuideFrom(el) {
-    if (!el) return '';
-    const attrs = [
-      el.getAttribute('data-guide'),
-      el.getAttribute('data-guide-id'),
-      el.dataset?.guide,
-      el.dataset?.value,
-      el.id,
-      el.getAttribute('aria-label'),
-      el.getAttribute('alt'),
-      el.title,
-      el.textContent
-    ].filter(Boolean);
-
-    for (const v of attrs) {
-      const g = normGuide(v);
-      if (g) return g;
-    }
-
-    if (el.tagName === 'IMG' && el.src) {
-      const src = el.src.toLowerCase();
-      if (src.includes('lumen')) return 'lumen';
-      if (src.includes('zion')) return 'zion';
-      if (src.includes('arion') || src.includes('arian')) return 'arion';
-    }
-
-    return '';
-  }
-
-  function enhanceButtons() {
-    const root = secGuia();
-    if (!root) {
-      log('Seção de guia não encontrada');
-      return;
-    }
-
-    const candidates = qa(`
-      [data-action*="guide"],
-      [data-guide],
-      [data-guide-id],
-      .choose-guide,
-      .btn-guia,
-      .card-guia,
-      .guia-option,
-      .guia-item,
-      .guide-selector,
-      #btnLumen, #btnZion, #btnArion,
-      img[alt*="Lumen" i], img[alt*="Zion" i], img[alt*="Arion" i],
-      button[class*="guia"], a[class*="guia"],
-      [class*="guide"], [id*="guide"],
-      button, a, div[tabindex], [role="button"]
-    `, root);
-
-    if (candidates.length === 0) {
-      log('Nenhum botão de guia encontrado. Snapshot do DOM:', Array.from(root.children).slice(0, 10).map(el => ({
-        tag: el.tagName.toLowerCase(),
-        id: el.id || '',
-        class: el.className || '',
-        attrs: Object.keys(el.dataset || {}).join(',')
-      })));
-    }
-
-    candidates.forEach(el => {
-      if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
-      el.style.cursor = 'pointer';
-      el.style.pointerEvents = 'auto';
-      if (!el.getAttribute('data-guide')) {
-        const g = inferGuideFrom(el);
-        if (g) el.setAttribute('data-guide', g);
-      }
-      el.setAttribute('role', 'button');
-      el.setAttribute('aria-label', `Escolher guia ${inferGuideFrom(el) || 'desconhecido'}`);
-    });
-
-    qa('.click-shield, .overlay, [data-overlay], .modal-overlay, .blocker, [class*="overlay"], [class*="shield"]', root).forEach(ov => {
-      ov.style.pointerEvents = 'none';
-      ov.style.display = 'none';
-      log('Overlay desativado:', ov.className || ov.id);
-    });
-
-    log('Botões de guia encontrados:', candidates.length);
-  }
-
-  function goNextAfterGuide() {
-    const hasSelfie = !!(q('#section-selfie, [data-section="selfie"], .section-selfie'));
-    if (hasSelfie) {
-      window.showSection('section-selfie');
-      requestAnimationFrame(() => setTimeout(() => {
-        const s = q('#section-selfie, [data-section="selfie"], .section-selfie');
-        if (s && typeof window.runTyping === 'function') window.runTyping(s);
-      }, 0));
-    } else {
-      window.openQuestions();
-    }
-  }
-
-  function choose(el) {
-    const guia = inferGuideFrom(el);
-    log('Guia selecionado:', guia, 'a partir de:', el.tagName, el.id || el.className);
-    if (!guia) {
-      console.warn('[GUIA v5] Não foi possível inferir o guia.');
-      toast('Por favor, selecione um guia válido.');
-      return;
-    }
-
-    try { localStorage.setItem('JORNADA_GUIA', guia); } catch (_) {}
-    qa('[data-action*="guide"], [data-guide], [data-guide-id], .choose-guide, .btn-guia, .card-guia, .guia-option, .guia-item, .guide-selector').forEach(n => n.classList.remove('active'));
-    el.classList.add('active');
-
-    goNextAfterGuide();
-  }
-
- document.addEventListener('click', function(ev) {
+  // Selfie navigation
   const sec = q('#section-selfie, [data-section="selfie"], .section-selfie');
   if (sec) {
     const btn = ev.target.closest?.(`
@@ -1265,12 +1140,29 @@ window.showSection = showSection;
       if (/\bpular|\biniciar|\bcomeçar|\bconfirmar|\bprosseguir/.test(txt) || btn.hasAttribute('data-action')) {
         ev.preventDefault();
         window.showSection('section-perguntas');
-        console.log('[Selfie] Navegação para section-perguntas disparada por:', btn.tagName, btn.className || btn.id);
+        log('Navegação para section-perguntas disparada por:', btn.tagName, btn.className || btn.id);
       }
     }
   }
 
-  const termosSel = '[data-action="termos-next"], [data-action="termos-next2"], [data-action="termos-next3"], [data-action="termos-next4"], [data-action*="next"], .btn-termos, button[class*="termos"], a[class*="termos"], button, a';
+  // Termos navigation
+  const termosSel = `
+    [data-action="termos-next"],
+    [data-action="termos-next2"],
+    [data-action="termos-next3"],
+    [data-action="termos-next4"],
+    [data-action*="next"],
+    [data-action*="avancar"],
+    .btn-termos,
+    .termos-btn,
+    button[class*="termos"],
+    a[class*="termos"],
+    button[class*="next"],
+    a[class*="next"],
+    button[class*="avancar"],
+    a[class*="avancar"],
+    button, a
+  `;
   const btnTermosNext = ev.target.closest?.(termosSel);
   if (btnTermosNext) {
     ev.preventDefault();
@@ -1285,30 +1177,33 @@ window.showSection = showSection;
       const nxt = document.getElementById(pages[idx + 1]);
       if (cur) cur.classList.add('hidden');
       if (nxt) {
-        nxt.classList.remove('AISHAWAD);
+        nxt.classList.remove('hidden');
         window.runTyping(nxt);
-        console.log('[Termos] Navegação para próxima página de termos:', nxt.id);
+        log('Navegação para próxima página de termos:', nxt.id);
       }
     } else {
       window.showSection('section-senha');
-      console.log('[Termos] Navegação para section-senha');
+      log('Navegação para section-senha');
     }
   }
 
+  // Outras ações
   const btnToTermos = ev.target.closest?.('[data-action="next-termos"]');
   if (btnToTermos) {
     ev.preventDefault();
-    showSection('section-termos');
+    window.showSection('section-termos');
+    log('Navegação para section-termos');
   }
 
   const acceptSel = '[data-action="next-senha"], [data-action="accept"], [data-action="accept-terms"], [data-action="termos-aceito"], [data-action="aceito"]';
   const btnAccept = ev.target.closest?.(acceptSel);
   if (btnAccept) {
     ev.preventDefault();
-    showSection('section-senha');
+    window.showSection('section-senha');
     requestAnimationFrame(() => setTimeout(() => {
       const sec = document.getElementById('section-senha');
-      if (sec) runTyping(sec);
+      if (sec) window.runTyping(sec);
+      log('Navegação para section-senha com runTyping');
     }, 0));
   }
 
@@ -1316,129 +1211,16 @@ window.showSection = showSection;
   if (btnStart) {
     ev.preventDefault();
     window.startJourney();
+    log('startJourney disparado');
   }
 
   const btnToggle = ev.target.closest?.('[data-action="toggle-password"], .password-toggle');
   if (btnToggle) {
     ev.preventDefault();
     window.toggleSenha();
+    log('toggleSenha disparado');
   }
 }, true);
-
-  document.addEventListener('keydown', function(ev) {
-    if (ev.key !== 'Enter' && ev.key !== ' ') return;
-    const root = secGuia() || q('.j-section:not(.hidden), [id^="section-"]:not(.hidden)') || document;
-    const el = document.activeElement;
-    if (!el || !root.contains(el)) return;
-
-    const g = inferGuideFrom(el);
-    if (!g) return;
-
-    ev.preventDefault();
-    choose(el);
-  }, true);
-
-  const style = document.createElement('style');
-  style.textContent = `
-    [data-action*="guide"], [data-guide], [data-guide-id], .choose-guide, .btn-guia, .card-guia, .guia-option, .guia-item, .guide-selector {
-      pointer-events: auto;
-      cursor: pointer;
-      outline: none;
-    }
-    [data-action*="guide"].active, [data-guide].active, [data-guide-id].active, .choose-guide.active, .btn-guia.active, .card-guia.active, .guia-option.active, .guia-item.active, .guide-selector.active {
-      box-shadow: 0 0 0 2px rgba(255,215,0,.7);
-    }
-  `;
-  document.head.appendChild(style);
-
-  const mo = new MutationObserver(() => {
-    const root = secGuia();
-    if (root && !root.classList.contains('hidden')) {
-      log('Seção de guia detectada, aplicando enhanceButtons');
-      enhanceButtons();
-    }
-  });
-  mo.observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style'] });
-
-  document.addEventListener('DOMContentLoaded', () => {
-    log('Inicializando enhanceButtons no DOMContentLoaded');
-    enhanceButtons();
-  });
-  enhanceButtons();
-})();
-  
-  document.addEventListener('click', function(ev) {
-    const el = ev.target.closest?.('[data-action="choose-guide"], [data-guide], .choose-guide, .btn-guia, .card-guia, [data-guide-id]');
-    if (el) {
-      ev.preventDefault();
-      chooseGuideFromEl(el);
-    }
-    const btnStart = ev.target.closest?.('[data-action="start"]');
-    if (btnStart) {
-      ev.preventDefault();
-      window.startJourney();
-    }
-    const btnToggle = ev.target.closest?.('[data-action="toggle-password"], .password-toggle');
-    if (btnToggle) {
-      ev.preventDefault();
-      window.toggleSenha();
-    }
-    const btnToTermos = ev.target.closest?.('[data-action="next-termos"]');
-    if (btnToTermos) {
-      ev.preventDefault();
-      showSection('section-termos');
-    }
-    const acceptSel = '[data-action="next-senha"],[data-action="accept"],[data-action="accept-terms"],[data-action="termos-aceito"],[data-action="aceito"]';
-    const btnAccept = ev.target.closest?.(acceptSel);
-    if (btnAccept) {
-      ev.preventDefault();
-      showSection('section-senha');
-      requestAnimationFrame(() => setTimeout(() => {
-        const sec = document.getElementById('section-senha');
-        if (sec) runTyping(sec);
-      }, 0));
-    }
-    const termosSel = '[data-action="termos-next"],[data-action="termos-next2"],[data-action="termos-next3"],[data-action="termos-next4"]';
-    const btnTermosNext = ev.target.closest?.(termosSel);
-    if (btnTermosNext) {
-      ev.preventDefault();
-      const pages = ['termos-pg1', 'termos-pg2', 'termos-pg3', 'termos-pg4', 'termos-pg5'];
-      const visId = pages.find(id => {
-        const el = document.getElementById(id);
-        return el && !el.classList.contains('hidden');
-      });
-      const idx = pages.indexOf(visId);
-      if (idx >= 0 && idx + 1 < pages.length) {
-        const cur = document.getElementById(pages[idx]);
-        const nxt = document.getElementById(pages[idx + 1]);
-        if (cur) cur.classList.add('hidden');
-        if (nxt) {
-          nxt.classList.remove('hidden');
-          runTyping(nxt);
-        }
-      }
-    }
-    const btnNext = ev.target.closest?.('[data-action="next"], [data-action="avancar"]');
-    if (btnNext) {
-      ev.preventDefault();
-      goNext();
-    }
-  }, true);
-
-  document.addEventListener('keydown', function(ev) {
-    const input = getSenhaInput();
-    if (input && ev.key === 'Enter' && document.activeElement === input) {
-      ev.preventDefault();
-      window.startJourney();
-    }
-    if ((ev.key === 'Enter' || ev.key === ' ') && document.activeElement) {
-      const el = document.activeElement;
-      if (el.matches('[data-action="choose-guide"], [data-guide], .choose-guide, .btn-guia, .card-guia, [data-guide-id]')) {
-        ev.preventDefault();
-        chooseGuideFromEl(el);
-      }
-    }
-  }, true);
 
   /* ===== Selfie ===== */
 (function(){
