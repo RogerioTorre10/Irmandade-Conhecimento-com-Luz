@@ -1924,189 +1924,47 @@
   enhanceButtons();
 })();
 
-/* === SCRIPT SELFIE v1: skip + bg por guia + preload robusto === */
+<!-- ======== TAIL PACK: Selfie + Skip + Perguntas (fechado) ======== -->
+<script>
 (function(){
   'use strict';
   const q=(s,r=document)=>r.querySelector(s);
   const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
-  const log=(...a)=>{ try{ console.log('[SELFIE]',...a);}catch(_){} };
 
-  // Mapeia cada guia aos possíveis arquivos (ordem de tentativa)
-  const GUIDE_BG_CANDIDATES = {
-    lumen: [
-      '/assets/img/irmandade-quarteto-bg-lumen.png',
-      '/assets/img/irmandade-quarteto-bg-lumen.jpg',
-      '/assets/img/irmandade-quarteto-bg-lumen.jpeg'
-    ],
-    zion: [
-      '/assets/img/irmandade-quarteto-bg-zion.png',
-      '/assets/img/irmandade-quarteto-bg-zion.jpg',
-      '/assets/img/irmandade-quarteto-bg-zion.jpeg'
-    ],
-    arion: [
-      // cobre a grafia do arquivo informada (arian.jpeg) e variações
-      '/assets/img/irmandade-quarteto-bg-arian.jpeg',
-      '/assets/img/irmandade-quarteto-bg-arion.jpeg',
-      '/assets/img/irmandade-quarteto-bg-arion.jpg',
-      '/assets/img/irmandade-quarteto-bg-arion.png'
-    ]
-  };
-
-  function normGuide(s=''){
-    s = String(s).toLowerCase();
-    if (s.includes('lumen')) return 'lumen';
-    if (s.includes('zion'))  return 'zion';
-    if (s.includes('arion') || s.includes('arian')) return 'arion';
-    // default
-    return 'lumen';
-  }
-
-  // Preload que resolve com o 1º caminho válido
-  function preloadFirst(paths){
-    return new Promise(resolve=>{
-      let idx=0;
-      function tryNext(){
-        if (idx >= paths.length) return resolve(null);
-        const src = paths[idx++];
-        const img = new Image();
-        img.onload  = ()=>resolve(src);
-        img.onerror = ()=>tryNext();
-        // atenção: caminho absoluto a partir da raiz do site
-        img.src = src;
+  /* 1) CSS da selfie (injetado, sem <style>) */
+  (function injectSelfieCss(){
+    const css = `
+      #section-selfie .selfie-wrapper,
+      #section-selfie .selfie-hero,
+      #section-selfie .selfie-bg {
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        min-height: 300px;
+        background-color: rgba(0,0,0,0.15);
       }
-      tryNext();
-    });
-  }
-
-  // Aplica o fundo na seção de selfie
-  async function applySelfieBackground(){
-    const sec = q('#section-selfie') || q('[data-section="selfie"]') || q('.section-selfie');
-    if (!sec) return;
-
-    const guia = normGuide(localStorage.getItem('JORNADA_GUIA') || '');
-    const candidates = GUIDE_BG_CANDIDATES[guia] || GUIDE_BG_CANDIDATES.lumen;
-    const foundSrc = await preloadFirst(candidates);
-    log('Guia:', guia, 'BG selecionado:', foundSrc);
-
-    // alvo do background: tenta elementos específicos e cai no container
-    const bgHost = q('#selfieBg', sec) 
-                || q('.selfie-bg', sec)
-                || q('.selfie-hero', sec)
-                || q('.selfie-wrapper', sec)
-                || sec;
-
-    if (foundSrc){
-      bgHost.style.backgroundImage  = `url("${foundSrc}")`;
-      bgHost.style.backgroundSize   = 'cover';
-      bgHost.style.backgroundRepeat = 'no-repeat';
-      bgHost.style.backgroundPosition = 'center';
-    } else {
-      // fallback neutro (mantém pergaminho)
-      log('Nenhuma imagem encontrada; mantendo fundo padrão.');
-    }
-  }
-
-  // Avança para perguntas
-  function openQuestions(){
-    if (typeof window.openQuestions === 'function') return window.openQuestions();
-    if (typeof window.showSection === 'function') return window.showSection('section-perguntas');
-
-    // fallback simples
-    qa('.j-section').forEach(s=>s.classList.add('hidden'));
-    (q('#section-perguntas')||q('[data-section="perguntas"]')||q('.section-perguntas'))?.classList.remove('hidden');
-  }
-
-  // “Pular foto / Iniciar”
-  function wireSkip(){
-    const sec = q('#section-selfie') || q('[data-section="selfie"]') || q('.section-selfie');
-    if (!sec) return;
-
-    // cobre vários nomes de botão
-    const selectors = [
-      '[data-action="selfie-next"]',
-      '[data-action="skip-selfie"]',
-      '#btnSkipSelfie',
-      '.btn-skip-selfie',
-      'button[name="skipSelfie"]',
-      'button[data-role="start"]',
-      // se tiver um botão com texto aproximado
-      'button, a'
-    ];
-    let btn = null;
-    for (const s of selectors){
-      const el = q(s, sec);
-      if (el && (el.matches('[data-action],#btnSkipSelfie,.btn-skip-selfie,[data-role="start"]') || /pular|iniciar|começar/i.test(el.textContent||''))){
-        btn = el; break;
+      #section-selfie img[data-role="bg"],
+      #section-selfie img#selfieBg,
+      #section-selfie .selfie-bg > img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        pointer-events: none;
+        user-select: none;
+        border-radius: 12px;
+        display: block;
       }
-    }
-    if (!btn) { log('Botão de pular/iniciar não encontrado na selfie.'); return; }
+    `;
+    const st = document.createElement('style');
+    st.id = 'selfie-bg-style';
+    st.textContent = css;
+    document.head.appendChild(st);
+  })();
 
-    btn.style.pointerEvents = 'auto';
-    btn.style.cursor = 'pointer';
-    btn.addEventListener('click', function(ev){
-      ev.preventDefault();
-      log('Clique em “Pular foto/Iniciar”');
-      openQuestions();
-    });
-  }
-
-  // Observa quando a seção de selfie aparece para aplicar tudo
-  const mo = new MutationObserver(()=>{
-    const sec = q('#section-selfie') || q('[data-section="selfie"]') || q('.section-selfie');
-    if (sec && !sec.classList.contains('hidden')){
-      applySelfieBackground();
-      wireSkip();
-      if (typeof window.runTyping === 'function') runTyping(sec);
-    }
-  });
-  mo.observe(document.documentElement, {subtree:true, childList:true, attributes:true, attributeFilter:['class','style']});
-
-  // Também roda no load (se já estiver na selfie)
-  document.addEventListener('DOMContentLoaded', ()=>{
-    const sec = q('#section-selfie') || q('[data-section="selfie"]') || q('.section-selfie');
-    if (sec && !sec.classList.contains('hidden')){
-      applySelfieBackground();
-      wireSkip();
-      if (typeof window.runTyping === 'function') runTyping(sec);
-    }
-  });
-
-})();
-  
-/* [SELFIE CSS injetado via JS] — substitui o <style> removido */
-(function injectSelfieCss(){
-  const css = `
-  /* Container da selfie: garante área e clipping */
-  #section-selfie .selfie-wrapper,
-  #section-selfie .selfie-hero,
-  #section-selfie .selfie-bg {
-    position: relative;
-    overflow: hidden;
-    border-radius: 12px;
-    min-height: 300px; /* ajuste se quiser mais/menos alto */
-    background-color: rgba(0,0,0,0.15); /* fallback sutil */
-  }
-
-  /* Se for IMG, faça ocupar o container */
-  #section-selfie img[data-role="bg"],
-  #section-selfie img#selfieBg,
-  #section-selfie .selfie-bg > img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;     /* cobre sem distorcer */
-    object-position: center;
-    pointer-events: none;  /* não intercepta clique nos botões */
-    user-select: none;
-    border-radius: 12px;
-  }
-
-/* SELFIE BG FIX: usa <img> dentro do container quando existir */
-(function(){
-  const q=(s,r=document)=>r.querySelector(s);
-  const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
-
+  /* 2) Fundo por guia (com preload) */
   const GUIDE_BG = {
     lumen: [
       '/assets/img/irmandade-quarteto-bg-lumen.png',
@@ -2125,7 +1983,6 @@
       '/assets/img/irmandade-quarteto-bg-arion.png'
     ]
   };
-
   function normGuide(s=''){
     s=String(s).toLowerCase();
     if(s.includes('lumen')) return 'lumen';
@@ -2144,14 +2001,12 @@
       })();
     });
   }
-
   async function applySelfieBg(){
     const sec = q('#section-selfie') || q('[data-section="selfie"]') || q('.section-selfie');
     if(!sec || sec.classList.contains('hidden')) return;
 
     const host = q('.selfie-bg',sec) || q('.selfie-hero',sec) || q('.selfie-wrapper',sec) || sec;
 
-    // prioriza usar <img> dentro do host
     let img = q('img[data-role="bg"]',host) || q('#selfieBg',host) || q('.selfie-bg > img',sec);
     if(!img){
       img = document.createElement('img');
@@ -2165,27 +2020,18 @@
     if(src){ img.src = src; }
   }
 
-  // roda quando a selfie ficar visível
-  const mo=new MutationObserver(()=>{
+  const moSelfie=new MutationObserver(()=>{
     const sec=q('#section-selfie')||q('[data-section="selfie"]')||q('.section-selfie');
     if(sec && !sec.classList.contains('hidden')) applySelfieBg();
   });
-  mo.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style']});
-
+  moSelfie.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style']});
   document.addEventListener('DOMContentLoaded', applySelfieBg);
-})();
 
-/* PERGUNTAS FIX: abre primeiro bloco, ativa 1ª pergunta e roda typing */
-(function(){
-  const q=(s,r=document)=>r.querySelector(s);
-  const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
-
+  /* 3) Perguntas: garantir 1º bloco + 1ª pergunta + datilografia */
   function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
-
   async function ensureQuestionsReady(retries=10){
     const sec = q('#section-perguntas'); if(!sec) return false;
 
-    // se não houver blocos, tente carregar dinamicamente
     let blocks = qa('.j-bloco', sec);
     if(blocks.length===0 && typeof window.loadDynamicBlocks==='function'){
       try{ window.loadDynamicBlocks(); }catch(_){}
@@ -2194,42 +2040,40 @@
     }
     if(blocks.length===0 && retries>0){ await wait(150); return ensureQuestionsReady(retries-1); }
 
-    // torna o 1º bloco visível
     let vis = sec.querySelector('.j-bloco[style*="display: block"]');
     if(!vis && blocks.length){ blocks.forEach((b,i)=> b.style.display = i===0 ? 'block' : 'none'); vis = blocks[0]; }
 
-    // ativa a 1ª pergunta
     let active = sec.querySelector('.j-pergunta.active');
     if(!active && vis){
       const first = vis.querySelector('.j-pergunta');
       if(first){
         first.classList.add('active');
-        const aria = q('#aria-pergunta'); 
+        const aria = q('#aria-pergunta');
         const lbl  = first.querySelector('.pergunta-enunciado')?.textContent || '';
         if(aria) aria.textContent = lbl;
       }
     }
 
-    // roda datilografia
-    if (typeof window.runTyping === 'function') {
-      window.runTyping(vis || sec);
-    }
+    if (typeof window.runTyping === 'function') window.runTyping(vis || sec);
     return true;
   }
 
-  // substitui/engorda a função openQuestions se existir
-  const _openQuestions = window.openQuestions;
-  window.openQuestions = function patchedOpenQuestions(){
+  /* 4) Reforça openQuestions (sem quebrar o que já existe) */
+  const __prevOpenQuestions = window.openQuestions;
+  window.openQuestions = function openQuestionsPatched(){
     if (typeof window.showSection === 'function') window.showSection('section-perguntas');
     else {
       document.querySelectorAll('.j-section').forEach(s=>s.classList.add('hidden'));
       (q('#section-perguntas')||q('[data-section="perguntas"]')||q('.section-perguntas'))?.classList.remove('hidden');
     }
-    // garante conteúdo visível
     requestAnimationFrame(()=>{ setTimeout(()=>{ ensureQuestionsReady(); }, 0); });
+    // chama antigo se existir (não deve navegar denovo)
+    if (typeof __prevOpenQuestions === 'function') {
+      try { __prevOpenQuestions(); } catch(_){}
+    }
   };
 
-  // botão “Pular foto / Iniciar” já deveria chamar openQuestions; reforço aqui:
+  /* 5) Botão “Pular foto / Iniciar” */
   document.addEventListener('click', function(ev){
     const sec = q('#section-selfie')||q('[data-section="selfie"]')||q('.section-selfie');
     if(!sec) return;
@@ -2239,6 +2083,7 @@
       window.openQuestions();
     }
   }, true);
+
 })();
 
   /* ===== Boot ===== */
