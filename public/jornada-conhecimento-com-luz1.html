@@ -1073,6 +1073,104 @@
         }
         return;
       }
+   
+/* === SCRIPT 1: SENHA (toggle + validação + ir para perguntas) === */
+(function(){
+  'use strict';
+
+  // util local
+  function q(sel, root=document){ return root.querySelector(sel); }
+  function qa(sel, root=document){ return Array.from(root.querySelectorAll(sel)); }
+  function toast(msg){ try{
+    const t=document.getElementById('toast'); if(!t) return;
+    t.textContent=msg; t.classList.remove('hidden'); t.classList.add('show');
+    setTimeout(()=>{ t.classList.remove('show'); },3000);
+  }catch(_){} }
+
+  // ===== Toggle de visibilidade da senha =====
+  window.toggleSenha = function toggleSenha(){
+    const input = q('#senhaInput, [data-role="senha"], input[type="password"]#senha');
+    if(!input) { console.warn('[Senha] input não encontrado'); return; }
+    input.type = (input.type === 'password' ? 'text' : 'password');
+    const eye = q('[data-role="eye"], [data-action="toggle-password"] i, [data-action="toggle-password"] svg');
+    if(eye){ eye.classList.toggle('on'); }
+  };
+
+  // ===== Validação e início da jornada =====
+  window.startJourney = async function startJourney(){
+    // 1) coleta senha e nome (se existir campo)
+    const inputSenha = q('#senhaInput, [data-role="senha"], input[type="password"]#senha');
+    const inputNome  = q('#nomeInput, [data-role="nome"], input[name="nome"]');
+    const senha = (inputSenha && inputSenha.value || '').trim();
+    const nome  = (inputNome && inputNome.value || '').trim();
+
+    // 2) regra simples de validação (NÃO trava; aceita qualquer não-vazia)
+    if(!senha){
+      toast('Digite a senha para continuar.');
+      if(inputSenha) inputSenha.focus();
+      return;
+    }
+
+    // (Opcional) Se você tiver uma senha fixa via data-attr no body:
+    // const target = document.body.getAttribute('data-pass') || '';
+    // if(target && senha !== target){ toast('Senha inválida.'); return; }
+
+    // 3) guarda nome (se houver)
+    if(nome){ try { localStorage.setItem('JORNADA_NOME', nome); } catch(_){} }
+
+    // 4) vai para PERGUNTAS
+    try {
+      if(window.speechSynthesis) speechSynthesis.cancel();
+    } catch(_){}
+    if (typeof window.showSection === 'function') {
+      showSection('section-perguntas');
+    } else {
+      // fallback: mostra direto a seção se existir
+      const secPerg = q('#section-perguntas');
+      const secs = qa('.j-section');
+      secs.forEach(s=>s.classList.add('hidden'));
+      if(secPerg){ secPerg.classList.remove('hidden'); }
+    }
+
+    // 5) garante primeira pergunta visível e rola datilografia
+    requestAnimationFrame(()=>setTimeout(()=>{
+      const sec = q('#section-perguntas');
+      if(!sec) return;
+
+      // garante um bloco visível
+      let vis = sec.querySelector('.j-bloco[style*="display: block"]');
+      const blocks = qa('.j-bloco', sec);
+      if(!vis && blocks.length){
+        blocks.forEach((b,i)=> b.style.display = i===0 ? 'block' : 'none');
+        vis = blocks[0];
+      }
+
+      // ativa primeira pergunta
+      const active = sec.querySelector('.j-pergunta.active');
+      if(!active && vis){
+        const first = vis.querySelector('.j-pergunta');
+        if(first){
+          first.classList.add('active');
+          const lbl = first.querySelector('.pergunta-enunciado')?.textContent || '';
+          const aria = q('#aria-pergunta'); if(aria) aria.textContent = lbl;
+        }
+      }
+
+      // roda datilografia no bloco visível
+      if (typeof window.runTyping === 'function') {
+        runTyping(vis || sec);
+      }
+    }, 0));
+  };
+
+  // ===== Integra com a tela de senha ao abrir
+  document.addEventListener('DOMContentLoaded', function(){
+    const secSenha = q('#section-senha');
+    if(secSenha && !secSenha.classList.contains('hidden')){
+      if (typeof window.runTyping === 'function') runTyping(secSenha);
+    }
+  });
+})();
 
       // iniciar a jornada (valida senha)
       var btnStart = ev.target.closest ? ev.target.closest('[data-action="start"]') : null;
@@ -1091,6 +1189,7 @@
       }
     }, true);
   })();
+  
 
   /* ===== Boot ===== */
   console.log('[Boot] Iniciando script seguro');
