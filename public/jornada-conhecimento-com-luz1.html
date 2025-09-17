@@ -663,17 +663,20 @@
   }
 
   /* ===== stubs seguros ===== */
-  function updateCanvasBackground(sectionId) {
-    const canvas = document.getElementById('jornada-canvas');
-    if (!canvas) return;
-    if (sectionId === 'section-perguntas') {
-      canvas.className = 'card pergaminho pergaminho-h';
-      canvas.style.background = 'var(--panel) url(/assets/img/pergaminho-rasgado-horiz.png) no-repeat center/cover';
-    } else {
-      canvas.className = 'card pergaminho pergaminho-v';
-      canvas.style.background = 'var(--panel) url(/assets/img/pergaminho-rasgado-vert.png) no-repeat center/cover';
-    }
+function updateCanvasBackground(sectionId) {
+  const canvas = document.getElementById('jornada-canvas');
+  if (!canvas) return;
+  if (sectionId === 'section-perguntas') {
+    canvas.className = 'card pergaminho pergaminho-h';
+    canvas.style.background = 'var(--panel) url(/assets/img/pergaminho-rasgado-horiz.png) no-repeat center/cover';
+  } else if (sectionId === 'section-selfie' || sectionId === 'section-termos') {
+    canvas.className = 'card section-bg';
+    canvas.style.background = 'var(--panel) none'; // Sem pergaminho para selfie ou termos
+  } else {
+    canvas.className = 'card pergaminho pergaminho-v';
+    canvas.style.background = 'var(--panel) url(/assets/img/pergaminho-rasgado-vert.png) no-repeat center/cover';
   }
+}
   function ensureHeroFlame() {}
   function ensureHeaderFlame() {}
   function ensurePageFlames() {}
