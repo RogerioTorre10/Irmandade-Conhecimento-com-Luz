@@ -793,6 +793,10 @@
       unlockNext();
       return;
     }
+    // no final da função:
+   if (JORNADA.tts.readingMode === 'after') {
+   await speak(pergunta || '');
+   }
 
     lockNext();
     cancelSpeech();
