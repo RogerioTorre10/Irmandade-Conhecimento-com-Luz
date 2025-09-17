@@ -539,7 +539,7 @@
 ;(function(){
   'use strict';
 
-  /* ===== util: toast + erro global (stub seguro) ===== */
+  /* ===== util: toast + erro global (leve) ===== */
   function toast(msg){ try{
     const t=document.getElementById('toast'); if(!t) return;
     t.textContent=msg; t.classList.remove('hidden'); t.classList.add('show');
@@ -550,7 +550,7 @@
     toast('Ops… algo falhou, mas já seguimos em frente.');
   });
 
-  /* ===== env tag ===== */
+  /* ===== env tag (opcional) ===== */
   const env=document.getElementById('envTag');
   if(env){ env.textContent=`layout=${document.body.dataset.layout||'master'} · journey=${document.body.dataset.journey||'essencial'} · path=/assets`; }
 
@@ -573,6 +573,7 @@
 
   /* ===== leitura com sinal de término ===== */
   let currentLang='pt-BR';
+  window.isMuted = !!window.isMuted;
   function readAloud(text, voiceGender){
     if(window.isMuted || !('speechSynthesis' in window)) return Promise.resolve();
     return new Promise(resolve=>{
@@ -588,9 +589,8 @@
   }
   window.readAloud = readAloud;
 
-  /* ===== stubs seguros para funções externas usadas no fluxo ===== */
+  /* ===== stubs seguros (não quebram se você já tiver versões completas) ===== */
   function updateCanvasBackground(sectionId){
-    // se você já tem uma versão completa, esta será sobrescrita; senão, evita erro
     const canvas=document.getElementById('jornada-canvas');
     if(!canvas) return;
     if(sectionId==='section-perguntas'){
@@ -601,23 +601,19 @@
       canvas.style.background='var(--panel) url(/assets/img/pergaminho-rasgado-vert.png) no-repeat center/cover';
     }
   }
-  function ensureHeroFlame(){/* noop seguro */}
-  function ensureHeaderFlame(){/* noop seguro */}
-  function ensurePageFlames(){/* noop seguro */}
-  window.isMuted = !!window.isMuted;
+  function ensureHeroFlame(){/* noop */}
+  function ensureHeaderFlame(){/* noop */}
+  function ensurePageFlames(){/* noop */}
 
-  /* ===== datilografia + runTyping (sequencial, com lock) ===== */
+  /* ===== datilografia + runTyping ===== */
   const G = (typeof window!=='undefined'? window : globalThis);
   if (G.__typingLock == null) G.__typingLock = false;
-  if (G.__DEFAULT_SPEED_TYPING == null) G.__DEFAULT_SPEED_TYPING = 140;
+  if (G.__DEFAULT_SPEED_TYPING == null) G.__DEFAULT_SPEED_TYPING = 140; // ajuste global
   const DEFAULT_SPEED = G.__DEFAULT_SPEED_TYPING;
 
   function typeWriter(el, text, speed, showCursor){
     if(!el) return Promise.resolve();
     if(el.dataset.typing==='1' || el.dataset.typed==='1') return Promise.resolve();
-    // pausas configuráveis
-    const PUNCT_PAUSE = parseInt(el.getAttribute('data-pause') || '220', 10); // pausa após . , ; : ! ? …
-    const BREAK_PAUSE = parseInt(el.getAttribute('data-break') || '320', 10); // pausa após \n
 
     el.dataset.typing='1';
     el.textContent='';
@@ -630,8 +626,20 @@
     text = (text||'').replace(/[{}[\]]/g,'').trim();
     let i=0, currentWord='';
 
+    // pausas configuráveis por elemento (ou usa padrão)
+    const PUNCT_PAUSE = parseInt(el.getAttribute('data-pause') || '220', 10); // .,;:!?…
+    const BREAK_PAUSE = parseInt(el.getAttribute('data-break') || '320', 10); // \n
+
     return new Promise(resolve=>{
       async function step(){
+        // aborta se ficou invisível ou saiu do DOM
+        if (!el.isConnected || el.offsetParent === null || el.closest('.j-section.hidden')) {
+          el.classList.remove('lumen-typing');
+          const h = el.querySelector('.highlight'); if (h) h.style.width = '0';
+          el.dataset.typed = '0'; el.dataset.typing = '0';
+          return resolve();
+        }
+
         if(i < text.length){
           const char=text.charAt(i++);
           el.textContent += char;
@@ -648,12 +656,11 @@
             }
             currentWord='';
           }
-          // pausa extra quando a tecla atual é pontuação ou quebra de linha
+
           const isPunct = /[.,;:!?…]/.test(char);
           const isBreak = (char === '\n');
           const extra = isBreak ? BREAK_PAUSE : (isPunct ? PUNCT_PAUSE : 0);
           setTimeout(step, speed + extra);
-
         } else {
           el.classList.add('typing-done');
           el.classList.remove('lumen-typing');
@@ -671,68 +678,62 @@
 
   async function runTyping(root){
     if(!root || root.classList.contains('hidden')) return;
-    if(G.__typingLock) return; G.__typingLock = true;
+    if(G.__typingLock) return;
+    G.__typingLock = true;
+
     try {
-  if (window.speechSynthesis) window.speechSynthesis.cancel();
+      if(window.speechSynthesis) window.speechSynthesis.cancel();
 
-  const elements = Array
-    .from(root.querySelectorAll('[data-typing]'))
-    .filter(el => !el.dataset.typed && el.offsetParent !== null);
+      const elements = Array
+        .from(root.querySelectorAll('[data-typing]'))
+        .filter(el => !el.dataset.typed && el.offsetParent !== null);
 
-  for (const el of elements) {
-    if (el.dataset.typing === '1' || el.dataset.typed === '1') continue;
+      for(const el of elements){
+        if(el.dataset.typing==='1' || el.dataset.typed==='1') continue;
 
-    // capture antes de limpar
-    const rawText = el.getAttribute('data-text') || el.textContent || '';
-    const text = dedupe(rawText);
+        // capture o texto ANTES de limpar
+        const rawText = el.getAttribute('data-text') || el.textContent || '';
+        const text = dedupe(rawText);
 
-    el.textContent = '';
-    const highlight = el.querySelector('.highlight');
-    if (highlight) highlight.style.width = '0';
+        // limpar estado visual só depois de capturar
+        el.textContent='';
+        const highlight=el.querySelector('.highlight');
+        if(highlight) highlight.style.width='0';
 
-    const speed = parseInt(el.getAttribute('data-speed') || DEFAULT_SPEED, 10);
-    const showCursor = String(el.getAttribute('data-cursor') || 'true') === 'true';
+        const speed = parseInt(el.getAttribute('data-speed') || DEFAULT_SPEED, 10);
+        const showCursor = String(el.getAttribute('data-cursor') || 'true')==='true';
 
-    await typeWriter(el, text, speed, showCursor);
+        await typeWriter(el, text, speed, showCursor);
+      }
+    } catch(e) {
+      console.error('[runTyping] erro:', e);
+      toast('Erro durante a datilografia.');
+    } finally {
+      G.__typingLock = false;
+    }
   }
-} catch(e) {
-  console.error('[runTyping] erro:', e);
-  toast('Erro durante a datilografia.');
-} finally {
-  G.__typingLock = false;
-}
-window.runTyping = runTyping;
-
+  window.runTyping = runTyping;
 
   /* ===== showSection seguro ===== */
   function showSection(sectionId){
     console.log('[showSection] Exibindo seção:', sectionId);
     if(window.speechSynthesis) window.speechSynthesis.cancel();
 
-    // esconde e reseta tudo (substituir bloco atual)
-document.querySelectorAll('.j-section').forEach(s => {
-  s.classList.add('hidden');
+    // esconde e reseta tudo
+    document.querySelectorAll('.j-section').forEach(s => {
+      s.classList.add('hidden');
 
-  // reseta apenas elementos de datilografia dentro da seção
-  s.querySelectorAll('[data-typing]').forEach(el => {
-    // aborta qualquer estado de digitação
-    el.classList.remove('lumen-typing', 'typing-done');
-    el.dataset.typing = '0';
-    delete el.dataset.typed;
+      s.querySelectorAll('[data-typing]').forEach(el => {
+        el.classList.remove('lumen-typing', 'typing-done');
+        el.dataset.typing = '0';
+        delete el.dataset.typed;
 
-    // preserva o conteúdo para a próxima execução
-    const keepText = el.getAttribute('data-text') || el.textContent || '';
-
-    // limpa visual e highlight
-    el.textContent = '';
-    const h = el.querySelector('.highlight');
-    if (h) h.style.width = '0';
-
-    // se não havia data-text, regrava para não perder conteúdo
-    if (!el.hasAttribute('data-text') && keepText) {
-      el.setAttribute('data-text', keepText);
-    }
-  });
+        const keepText = el.getAttribute('data-text') || el.textContent || '';
+        el.textContent = '';
+        const h = el.querySelector('.highlight'); if (h) h.style.width = '0';
+        if (!el.hasAttribute('data-text') && keepText) el.setAttribute('data-text', keepText);
+      });
+    });
 
     const active=document.getElementById(sectionId);
     if(!active){
@@ -743,9 +744,11 @@ document.querySelectorAll('.j-section').forEach(s => {
 
     active.classList.remove('hidden');
     console.log('[showSection] Seção ativa:', active.id);
-    requestAnimationFrame(() => {
-    setTimeout(() => runTyping(active), 0);
-});
+
+    // defer: roda só depois do paint
+    requestAnimationFrame(function(){
+      setTimeout(function(){ runTyping(active); }, 0);
+    });
 
     updateCanvasBackground(sectionId);
     ensureHeroFlame(sectionId);
@@ -784,23 +787,19 @@ document.querySelectorAll('.j-section').forEach(s => {
       const pg1=document.getElementById('termos-pg1');
       if(pg1 && !pg1.classList.contains('hidden')) runTyping(pg1);
     }
-
+  }
   window.showSection = showSection;
 
-/* ==== init básico ==== */
-console.log("Boot [Iniciando script segundo]");
-ensureHeaderFlame();
-ensurePageFlame();
+  /* ===== Boot ===== */
+  console.log('[Boot] Iniciando script seguro');
+  try{ ensureHeaderFlame(); ensurePageFlames(); }catch(_){}
+  if(typeof window.speechSynthesis!=='undefined'){ speechSynthesis.onvoiceschanged = ()=>{}; }
 
-/* se quiser começar pela intro, mantêm: */
-if (typeof window.speechSynthesis !== "undefined") {
-    speechSynthesis.onvoiceschanged = () => {};
-}
-
-/* garanta uma primeira seção (ajuste se o seu fluxo for outro) */
-if (document.getElementById('section-intro')) {
+  // garanta uma primeira seção (ajuste conforme seu fluxo)
+  if(document.getElementById('section-intro')){
     showSection('section-intro');
-}
+  }
+})();
 </script>
 </body>
 </html>
