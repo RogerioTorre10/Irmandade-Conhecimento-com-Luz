@@ -646,7 +646,7 @@
     // usa SEU typeWriter (respeita data-attrs existentes)
     try {
       // parâmetros: (el, text, speed, showCursor?) — adapte se seu typeWriter usa assinatura diferente
-      await typeWriter(el, pergunta||'', JORNADA.typing.charDelay, !!JORNADA.typing.caret);
+      await typeAndReadQuestion(perguntaAtual.texto, questionTextEl);
     } catch(e){
       // fallback sem travar
       el.textContent = (pergunta||'');
