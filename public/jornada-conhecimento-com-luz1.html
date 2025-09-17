@@ -809,37 +809,55 @@
   window.typeAndReadQuestion = typeAndReadQuestion;
 
   /* ===== runTyping ===== */
-  async function runTyping(root) {
-    if (!root || root.classList.contains('hidden')) return;
-    if (G.__typingLock) return;
-    G.__typingLock = true;
+async function runTyping(root) {
+  if (!root || root.classList.contains('hidden')) return;
+  if (G.__typingLock) return;
+  G.__typingLock = true;
 
-    try {
-      if (window.speechSynthesis) window.speechSynthesis.cancel();
-      const elements = Array
-        .from(root.querySelectorAll('[data-typing]'))
-        .filter(el => !el.dataset.typed && el.offsetParent !== null);
+  try {
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    const elements = Array
+      .from(root.querySelectorAll('[data-typing]'))
+      .filter(el => !el.dataset.typed && el.offsetParent !== null);
 
-      for (const el of elements) {
-        if (el.dataset.typing === '1' || el.dataset.typed === '1') continue;
-        const rawText = el.getAttribute('data-text') || el.textContent || '';
-        const text = dedupe(rawText);
-        el.textContent = '';
-        const highlight = el.querySelector('.highlight');
-        if (highlight) highlight.style.width = '0';
-        const speed = parseInt(el.getAttribute('data-speed') || DEFAULT_SPEED, 10);
-        const showCursor = String(el.getAttribute('data-cursor') || 'true') === 'true';
-        await window.typeWriter(el, text, speed, showCursor);
+    for (const el of elements) {
+      if (el.dataset.typing === '1' || el.dataset.typed === '1') continue;
+
+      const rawText = el.getAttribute('data-text') || el.textContent || '';
+      const text = dedupe(rawText);
+      el.textContent = '';
+      const highlight = el.querySelector('.highlight');
+      if (highlight) highlight.style.width = '0';
+
+      const speed = parseInt(el.getAttribute('data-speed') || DEFAULT_SPEED, 10);
+      const showCursor = String(el.getAttribute('data-cursor') || 'true') === 'true';
+
+      await window.typeWriter(el, text, speed, showCursor);
+
+      // Ativa TTS após datilografia, se configurado
+      if (JORNADA.tts.enabled && JORNADA.tts.readingMode === 'after' && !window.isMuted) {
+        await speak(text);
       }
-    } catch (e) {
-      console.error('[runTyping] erro:', e);
-      toast('Erro durante a datilografia.');
-    } finally {
-      G.__typingLock = false;
     }
-  }
-  window.runTyping = runTyping;
 
+    // Específico para selfie: garante TTS para textos relevantes
+    if (root.matches('#section-selfie, [data-section="selfie"], .section-selfie')) {
+      const selfieText = root.querySelector('[data-typing], .selfie-text, .text, p, h3, h4');
+      if (selfieText && !selfieText.dataset.typed) {
+        const text = dedupe(selfieText.getAttribute('data-text') || selfieText.textContent || '');
+        if (text && JORNADA.tts.enabled && JORNADA.tts.readingMode === 'after' && !window.isMuted) {
+          await speak(text);
+        }
+      }
+    }
+  } catch (e) {
+    console.error('[runTyping] erro:', e);
+    toast('Erro durante a datilografia.');
+  } finally {
+    G.__typingLock = false;
+  }
+}
+window.runTyping = runTyping;
   /* ===== showSection ===== */
   function showSection(sectionId) {
     console.log('[showSection] Exibindo seção:', sectionId);
