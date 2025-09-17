@@ -1451,6 +1451,157 @@
 
 })();
 
+/* === SCRIPT GUIA: fluxo + botões robustos === */
+(function(){
+  'use strict';
+  const q=(s,r=document)=>r.querySelector(s);
+  const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
+
+  // Mostrar seção com fallback se showSection não existir
+  function show(id){
+    if (typeof window.showSection==='function') return showSection(id);
+    const secs=qa('.j-section'); secs.forEach(s=>s.classList.add('hidden'));
+    const tgt = q('#'+id) || q(`[data-section="${id.replace('section-','')}"]`) || q(`.${id}`);
+    if (tgt) tgt.classList.remove('hidden');
+  }
+  function has(id){
+    return !!( q('#'+id) || q(`[data-section="${id.replace('section-','')}"]`) || q(`.${id}`) );
+  }
+
+  // ---------- OVERRIDE: startJourney só valida e ROTEIA (não pula direto p/ perguntas)
+  window.startJourney = async function startJourney(){
+    const root = q('#section-senha') || document;
+    const inputSenha = root.querySelector(
+      '#senhaInput, input[data-role="senha"], input[name="senha"], input[name*="senha" i], input[id*="senha" i], input[type="password"], input[type="text"][name*="senha" i], input[type="text"][id*="senha" i]'
+    ) || root.querySelector('input');
+
+    const inputNome  = root.querySelector('#nomeInput, [data-role="nome"], input[name="nome"]');
+    const senha = (inputSenha && inputSenha.value || '').trim();
+    const nome  = (inputNome && inputNome.value || '').trim();
+
+    if(!senha){
+      try{
+        const t=document.getElementById('toast');
+        if(t){ t.textContent='Digite a senha para continuar.'; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+      }catch(_){}
+      if(inputSenha) inputSenha.focus();
+      return;
+    }
+
+    if(nome){ try{ localStorage.setItem('JORNADA_NOME', nome); }catch(_){} }
+
+    // Fluxo: GUIA -> SELFIE -> PERGUNTAS
+    if (has('section-guia')) {
+      show('section-guia');
+      requestAnimationFrame(()=>setTimeout(()=>{ if (typeof window.runTyping==='function') runTyping(q('#section-guia')); },0));
+      return;
+    }
+    if (has('section-selfie')) {
+      show('section-selfie');
+      requestAnimationFrame(()=>setTimeout(()=>{ if (typeof window.runTyping==='function') runTyping(q('#section-selfie')); },0));
+      return;
+    }
+    // fallback
+    openQuestions();
+  };
+
+  // ---------- Abrir perguntas garantindo bloco/pergunta ativa
+  function openQuestions(){
+    if (typeof window.showSection==='function') showSection('section-perguntas'); else show('section-perguntas');
+
+    requestAnimationFrame(()=>setTimeout(()=>{
+      const sec = q('#section-perguntas'); if(!sec) return;
+      let vis = sec.querySelector('.j-bloco[style*="display: block"]');
+      const blocks = qa('.j-bloco', sec);
+      if(!vis && blocks.length){
+        blocks.forEach((b,i)=> b.style.display = i===0 ? 'block' : 'none');
+        vis = blocks[0];
+      }
+      const active = sec.querySelector('.j-pergunta.active');
+      if(!active && vis){
+        const first = vis.querySelector('.j-pergunta');
+        if(first){
+          first.classList.add('active');
+          const aria = q('#aria-pergunta'); 
+          const lbl  = first.querySelector('.pergunta-enunciado')?.textContent || '';
+          if(aria) aria.textContent = lbl;
+        }
+      }
+      if (typeof window.runTyping==='function') runTyping(vis || sec);
+    },0));
+  }
+  window.openQuestions = openQuestions;
+
+  // ---------- Normalização de nomes do guia
+  function normGuide(s=''){
+    s = String(s).toLowerCase();
+    if (s.includes('lumen')) return 'lumen';
+    if (s.includes('zion'))  return 'zion';
+    if (s.includes('arion') || s.includes('arian')) return 'arion'; // cobre ARION/ARIAN
+    return 'lumen';
+  }
+
+  function chooseGuideFromEl(el){
+    const guess = el.getAttribute('data-guide')
+                || el.getAttribute('data-guide-id')
+                || el.dataset?.value
+                || el.getAttribute('aria-label')
+                || el.getAttribute('alt')
+                || el.textContent;
+    const guia = normGuide(guess);
+    try{ localStorage.setItem('JORNADA_GUIA', guia); }catch(_){}
+
+    // marca visualmente
+    qa('[data-action="choose-guide"], [data-guide], .choose-guide, .btn-guia, .card-guia, [data-guide-id]')
+      .forEach(n=>n.classList.remove('active'));
+    el.classList.add('active');
+
+    // próximo passo
+    if (has('section-selfie')) {
+      show('section-selfie');
+      requestAnimationFrame(()=>setTimeout(()=>{ if (typeof window.runTyping==='function') runTyping(q('#section-selfie')); },0));
+    } else {
+      openQuestions();
+    }
+  }
+
+  // ---------- Clique nos botões do guia (super abrangente)
+  document.addEventListener('click', function(ev){
+    const el = ev.target.closest && ev.target.closest(
+      '[data-action="choose-guide"], [data-guide], .choose-guide, .btn-guia, .card-guia, [data-guide-id]'
+    );
+    if (!el) return;
+    ev.preventDefault();
+    chooseGuideFromEl(el);
+  }, true);
+
+  // ---------- Teclado acessível (Enter/Espaço)
+  document.addEventListener('keydown', function(ev){
+    if (ev.key!=='Enter' && ev.key!==' ') return;
+    const el = document.activeElement;
+    if (!el) return;
+    if (el.matches('[data-action="choose-guide"], [data-guide], .choose-guide, .btn-guia, .card-guia, [data-guide-id]')){
+      ev.preventDefault();
+      chooseGuideFromEl(el);
+    }
+  }, true);
+
+  // ---------- Segurança: garante clicabilidade
+  const style = document.createElement('style');
+  style.textContent = `
+    [data-action="choose-guide"], [data-guide], .choose-guide, .btn-guia, .card-guia, [data-guide-id] {
+      pointer-events:auto; cursor:pointer; outline: none;
+    }
+    [data-action="choose-guide"].active, [data-guide].active, .choose-guide.active, .btn-guia.active, .card-guia.active {
+      box-shadow: 0 0 0 2px rgba(255,215,0,.7);
+    }
+  `;
+  document.head.appendChild(style);
+
+})();
+
+
+
       // iniciar a jornada (valida senha)
       var btnStart = ev.target.closest ? ev.target.closest('[data-action="start"]') : null;
       if (btnStart) {
