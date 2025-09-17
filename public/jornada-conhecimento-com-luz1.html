@@ -580,7 +580,10 @@
   window.JORNADA = window.JORNADA || {};
   JORNADA.fullTypingMode = (JORNADA.fullTypingMode !== false);   // ligado por padrão
   JORNADA.typing = Object.assign({ charDelay: 18, caret: false }, (JORNADA.typing||{}));
-  JORNADA.tts    = Object.assign({ enabled: true, lang: 'pt-BR', rate: 1.03, pitch: 1.0, voiceName: '' }, (JORNADA.tts||{}));
+  JORNADA.tts = Object.assign({
+  enabled: true, lang: 'pt-BR', rate: 1.03, pitch: 1.0, voiceName: '',
+  readingMode: 'after' // <<< chave: ler somente no final
+}, (JORNADA.tts||{}));
 
   /* ===== TTS utils ===== */
   let currentLang = 'pt-BR';
