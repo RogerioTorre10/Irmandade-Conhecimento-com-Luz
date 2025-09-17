@@ -580,10 +580,7 @@
   window.JORNADA = window.JORNADA || {};
   JORNADA.fullTypingMode = (JORNADA.fullTypingMode !== false);   // ligado por padrão
   JORNADA.typing = Object.assign({ charDelay: 18, caret: false }, (JORNADA.typing||{}));
-  JORNADA.tts = Object.assign({
-  enabled: true, lang: 'pt-BR', rate: 1.03, pitch: 1.0, voiceName: '',
-  readingMode: 'after' // <<< chave: ler somente no final
-}, (JORNADA.tts||{}));
+  JORNADA.tts = Object.assign({ enabled:true, lang:'pt-BR', rate:1.06, pitch:1.0, voiceName:'', readingMode:'after' }, (JORNADA.tts||{}));
 
   /* ===== TTS utils ===== */
   let currentLang = 'pt-BR';
@@ -688,84 +685,7 @@
     });
   }
 
-  function typeWriter(el, text, speed, showCursor){
-    if(!el) return Promise.resolve();
-    if(el.dataset.typing==='1' || el.dataset.typed==='1') return Promise.resolve();
-
-    el.dataset.typing='1';
-    el.textContent='';
-    const highlight = el.querySelector('.highlight') || document.createElement('div');
-    if(!el.querySelector('.highlight')){
-      highlight.className='highlight';
-      el.prepend(highlight);
-    }
-
-    text = (text||'').replace(/[{}[\]]/g,'').trim();
-    let i = 0;
- // let currentWord = '';   // <-- remova
-    let phraseBuffer = '';
-    let ttsChain = Promise.resolve();
-
-
-    // pausas configuráveis por elemento (ou usa padrão)
-    const PUNCT_PAUSE = parseInt(el.getAttribute('data-pause') || '220', 10); // .,;:!?…
-    const BREAK_PAUSE = parseInt(el.getAttribute('data-break') || '320', 10); // \n
-
-    return new Promise(resolve=>{
-      async function step(){
-        // aborta se invisível/fora do DOM
-        if (!el.isConnected || el.offsetParent === null || el.closest('.j-section.hidden')) {
-          el.classList.remove('lumen-typing');
-          const h = el.querySelector('.highlight'); if (h) h.style.width = '0';
-          el.dataset.typed = '0'; el.dataset.typing = '0';
-          return resolve();
-        }
-
-        if(i < text.length){
-          const char=text.charAt(i++);
-          el.textContent += char;// dentro do step()
-          currentWord += char;// dentro do step()
-
-          const canvas=document.createElement('canvas');
-          const ctx=canvas.getContext('2d');
-          ctx.font = getComputedStyle(el).font;
-          highlight.style.width = `${ctx.measureText(el.textContent).width}px`;
-
-          if(char===' ' || i===text.length){
-            if(!window.isMuted && !el.closest('textarea')){
-              await readAloud(currentWord.trim(), (localStorage.getItem('JORNADA_GUIA')==='zion'?'male':'female'));
-            }
-            currentWord='';
-          }
-
-          // dentro de step(), depois de el.textContent += char;
-          phraseBuffer += char;
-
-          const isPunct = /[.,;:!?…]/.test(char);  // <-- este regex
-          const isBreak = (char === '\n');
-
-          if (JORNADA?.tts?.readingMode === 'sentence' && (isPunct || isBreak)) {
-          const phrase = phraseBuffer.trim();
-          phraseBuffer = '';
-          if (phrase && !window.isMuted && !el.closest('textarea')) {
-          // encadeia sem await pra não travar a datilografia
-          ttsChain = ttsChain.then(() => speak(phrase));
-         }
-      }
-
-        } else {
-          el.classList.add('typing-done');
-          el.classList.remove('lumen-typing');
-          highlight.style.width='0';
-          el.dataset.typed='1';
-          el.dataset.typing='0';
-          resolve();
-        }
-      }
-      if(showCursor) el.classList.add('lumen-typing');
-      setTimeout(step,0);
-    });
-  }
+  JORNADA.tts = Object.assign({ enabled:true, lang:'pt-BR', rate:1.06, pitch:1.0, voiceName:'', readingMode:'after' }, (JORNADA.tts||{}));
   window.typeWriter = typeWriter;
 
   /* ===== ALL-IN: pergunta com datilografia + TTS ===== */
