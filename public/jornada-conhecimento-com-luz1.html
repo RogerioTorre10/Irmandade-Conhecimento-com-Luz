@@ -1962,6 +1962,20 @@
     st.textContent = css;
     document.head.appendChild(st);
   })();
+  
+  // Dentro do seu <script>, crie o elemento em vez de colar <img> direto
+(function ensureSelfieBgImg(){
+  const sec = document.querySelector('#section-selfie, [data-section="selfie"], .section-selfie');
+  if(!sec) return;
+  const host = sec.querySelector('.selfie-bg, .selfie-hero, .selfie-wrapper') || sec;
+  let img = host.querySelector('img[data-role="bg"]');
+  if (!img) {
+    img = document.createElement('img');
+    img.setAttribute('data-role','bg');
+    img.alt = 'Guia Background';
+    host.appendChild(img);
+  }
+})();
 
   /* 2) Fundo por guia (com preload) */
   const GUIDE_BG = {
