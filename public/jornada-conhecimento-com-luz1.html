@@ -789,6 +789,104 @@
     }
   }
   window.showSection = showSection;
+  /* ===== Avançar: navegação entre perguntas/blocos ===== */
+let __isTransitioning = false;
+
+function goNext() {
+  if (__isTransitioning) return;
+  __isTransitioning = true;
+
+  try {
+    // seção de perguntas visível
+    const perguntasSection = document.getElementById('section-perguntas');
+    if (!perguntasSection || perguntasSection.classList.contains('hidden')) {
+      // se não estamos em perguntas, tenta ir para perguntas
+      if (document.getElementById('section-perguntas')) {
+        showSection('section-perguntas');
+      }
+      return;
+    }
+
+    // pergunta ativa atual
+    const current = perguntasSection.querySelector('.j-pergunta.active');
+    const bloco = current ? current.closest('.j-bloco') : perguntasSection.querySelector('.j-bloco[style*="display: block"]') || perguntasSection.querySelector('.j-bloco');
+
+    if (!bloco) {
+      console.warn('[goNext] Nenhum bloco encontrado; abrindo perguntas');
+      showSection('section-perguntas');
+      return;
+    }
+
+    const perguntas = Array.from(bloco.querySelectorAll('.j-pergunta'));
+    // se não há pergunta ativa, ativa a primeira
+    if (!current) {
+      const first = perguntas[0];
+      if (first) {
+        first.classList.add('active');
+        const lbl = first.querySelector('.pergunta-enunciado')?.textContent || '';
+        const aria = document.getElementById('aria-pergunta'); if (aria) aria.textContent = lbl;
+        runTyping(first);
+      }
+      return;
+    }
+
+    // índice da pergunta atual
+    const i = perguntas.indexOf(current);
+    current.classList.remove('active');
+
+    // próxima pergunta no mesmo bloco
+    if (i >= 0 && i + 1 < perguntas.length) {
+      const prox = perguntas[i + 1];
+      prox.classList.add('active');
+
+      // atualiza aria e placeholder
+      const lbl = prox.querySelector('.pergunta-enunciado')?.textContent || '';
+      const ta = prox.querySelector('textarea');
+      if (ta) ta.placeholder = 'Digite sua resposta...';
+      const aria = document.getElementById('aria-pergunta'); if (aria) aria.textContent = lbl;
+
+      // datilografia apenas no novo container
+      runTyping(prox);
+      return;
+    }
+
+    // acabou o bloco: vai para o próximo bloco
+    const blocos = Array.from(perguntasSection.querySelectorAll('.j-bloco'));
+    const idxBloco = blocos.indexOf(bloco);
+    const temProx = idxBloco >= 0 && idxBloco + 1 < blocos.length;
+
+    if (temProx) {
+      // esconde todos e mostra só o próximo
+      blocos.forEach(b => b.style.display = 'none');
+      const proxBloco = blocos[idxBloco + 1];
+      proxBloco.style.display = 'block';
+
+      const firstPerg = proxBloco.querySelector('.j-pergunta');
+      if (firstPerg) {
+        firstPerg.classList.add('active');
+        const lbl = firstPerg.querySelector('.pergunta-enunciado')?.textContent || '';
+        const ta = firstPerg.querySelector('textarea'); if (ta) ta.placeholder = 'Digite sua resposta...';
+        const aria = document.getElementById('aria-pergunta'); if (aria) aria.textContent = lbl;
+        runTyping(proxBloco); // roda datilografia do bloco
+      }
+    } else {
+      // acabou tudo: vai para a seção final
+      showSection('section-final');
+    }
+  } finally {
+    // libera rapidamente para cliques subsequentes
+    setTimeout(() => { __isTransitioning = false; }, 150);
+  }
+}
+window.goNext = goNext;
+
+// delegação de clique para botões com data-action="next"
+document.addEventListener('click', function (ev) {
+  const btnNext = ev.target.closest?.('[data-action="next"]');
+  if (!btnNext) return;
+  ev.preventDefault();
+  goNext();
+}, { capture: true });
 
   /* ===== Boot ===== */
   console.log('[Boot] Iniciando script seguro');
