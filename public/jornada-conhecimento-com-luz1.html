@@ -961,6 +961,20 @@ document.addEventListener('click', function (ev) {
    }, true);
    })();
 
+  window.JORNADA = window.JORNADA || {};
+  JORNADA.fullTypingMode = true; // liga datilografia + TTS para TODAS as perguntas
+  JORNADA.typing = Object.assign({ 
+    charDelay: 18,            // velocidade da datilografia (ms por caractere) — você disse “um pouco mais rápido”
+    caret: false              // mantém falso p/ não mostrar cursores piscando
+  }, (JORNADA.typing||{}));
+  JORNADA.tts = Object.assign({
+    enabled: true,            // respeita mute
+    lang: 'pt-BR',
+    rate: 1.03,               // levemente mais rápido que o padrão
+    pitch: 1.0,
+    voiceName: ''             // deixe vazio p/ auto; se quiser fixar uma voz, coloque o nome aqui
+  }, (JORNADA.tts||{}));
+
   /* ===== Boot ===== */
   console.log('[Boot] Iniciando script seguro');
   try{ ensureHeaderFlame(); ensurePageFlames(); }catch(_){}
