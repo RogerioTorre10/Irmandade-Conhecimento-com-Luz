@@ -672,15 +672,20 @@
       for(const el of elements){
         if(el.dataset.typing==='1' || el.dataset.typed==='1') continue;
 
-        el.textContent='';
-        const highlight=el.querySelector('.highlight');
-        if(highlight) highlight.style.width='0';
+       // capture o texto ANTES de limpar
+const rawText = el.getAttribute('data-text') || el.textContent || '';
+const text = dedupe(rawText);
 
-        const speed = parseInt(el.getAttribute('data-speed') || DEFAULT_SPEED, 10);
-        const showCursor = String(el.getAttribute('data-cursor') || 'true')==='true';
-        const text = dedupe(el.getAttribute('data-text') || el.textContent || '');
-        await typeWriter(el, text, speed, showCursor);
-      }
+// limpar estado visual só depois de capturar
+el.textContent = '';
+const highlight = el.querySelector('.highlight');
+if (highlight) highlight.style.width = '0';
+
+const speed = parseInt(el.getAttribute('data-speed') || DEFAULT_SPEED, 10);
+const showCursor = String(el.getAttribute('data-cursor') || 'true') === 'true';
+
+await typeWriter(el, text, speed, showCursor);
+
     } finally {
       G.__typingLock = false;
     }
