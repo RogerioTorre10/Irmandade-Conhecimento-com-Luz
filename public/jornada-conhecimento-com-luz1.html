@@ -2595,13 +2595,32 @@ window.typeAndReadQuestion = typeAndReadQuestion;
 })();
 
   /* ===== Boot ===== */
+(function(){
+  'use strict';
   console.log('[Boot] Iniciando script seguro');
-  try{ ensureHeaderFlame(); ensurePageFlames(); }catch(_){}
-  if(typeof window.speechSynthesis!=='undefined'){ speechSynthesis.onvoiceschanged = ()=>{}; }
+  try {
+    ensureHeaderFlame();
+    ensurePageFlames();
+  } catch(e) {
+    console.error('[Boot] Erro ao garantir chamas:', e);
+  }
+  
+  if (typeof window.speechSynthesis !== 'undefined') {
+    speechSynthesis.onvoiceschanged = () => {};
+  }
 
-  // garanta uma primeira seção (ajuste conforme seu fluxo)
-  if(document.getElementById('section-intro')){
+  // Garante uma primeira seção
+  if (document.getElementById('section-intro')) {
     showSection('section-intro');
+  } else {
+    // Fallback: tenta outras seções iniciais
+    const possibleSections = ['section-termos', 'section-senha', 'section-guia', 'section-perguntas'];
+    for (const secId of possibleSections) {
+      if (document.getElementById(secId)) {
+        showSection(secId);
+        break;
+      }
+    }
   }
 })();
 </script>
