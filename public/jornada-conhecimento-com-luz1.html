@@ -942,6 +942,22 @@ document.addEventListener('click', function (ev) {
     }
     return;
    }
+   // iniciar a jornada (valida senha)
+   var btnStart = ev.target.closest ? ev.target.closest('[data-action="start"]') : null;
+   if (btnStart) {
+   ev.preventDefault();
+   startJourney();
+   return;
+  }
+
+   // alternar visibilidade da senha
+   var btnToggle = ev.target.closest ? ev.target.closest('[data-action="toggle-password"], .password-toggle') : null;
+   if (btnToggle) {
+   ev.preventDefault();
+   toggleSenha();
+   return;
+  }
+
    }, true);
    })();
 
