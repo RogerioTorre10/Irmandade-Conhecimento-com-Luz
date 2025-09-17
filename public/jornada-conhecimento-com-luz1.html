@@ -2216,6 +2216,137 @@
     }
   });
   mo.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style']});
+})();
+
+/* === PERGUNTAS AUTOWIRE v5 — encontra/ativa perguntas em qualquer markup === */
+(function(){
+  'use strict';
+  const q=(s,r=document)=>r.querySelector(s);
+  const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
+  const wait=(ms)=>new Promise(r=>setTimeout(r,ms));
+  const log=(...a)=>{ try{ console.log('[PERGv5]',...a);}catch(_){} };
+
+  function uniq(arr){ return Array.from(new Set(arr)); }
+
+  function findBlocks(sec){
+    // muitos nomes possíveis de "bloco"
+    const sel = [
+      '.j-bloco','.js-bloco','.bloco','.block',
+      '.perguntas-bloco','.bloco-perguntas','.q-block','.quest-block',
+      '.lista-perguntas','.questions','.questions-list',
+      '[data-bloco]','[data-block]','[data-role="bloco"]','[role="group"]'
+    ];
+    let out=[];
+    for(const s of sel){ out=out.concat(qa(s,sec)); }
+    out=uniq(out);
+    if(!out.length){
+      // alguns projetos colocam tudo direto na seção
+      out=[sec];
+    }
+    return out;
+  }
+
+  function looksLikeQuestion(el){
+    // tem título/label?
+    if (el.querySelector('.pergunta-enunciado,.question-title,[data-enunciado],h3,h4,legend')) return true;
+    // tem algo para responder?
+    if (el.querySelector('textarea,input,select,[contenteditable]')) return true;
+    // tem typing?
+    if (el.matches('[data-pergunta],[data-question]') || el.querySelector('[data-typing]')) return true;
+    // heurística: classes com "perg"/"quest"
+    const cls=(el.className||'').toString().toLowerCase();
+    if (/\b(perg|pergunta|question|quest|q-item)\b/.test(cls)) return true;
+    return false;
+  }
+
+  function findQuestions(root){
+    const sel = [
+      '.j-pergunta','.pergunta','.question','.q-item','.questao',
+      '[data-pergunta]','[data-question]','[data-role="pergunta"]'
+    ];
+    let items=[];
+    for(const s of sel){ items=items.concat(qa(s,root)); }
+    items=uniq(items).filter(looksLikeQuestion);
+    if(!items.length){
+      // fallback: qualquer filho que "pareça" pergunta
+      items=qa(':scope > *',root).filter(looksLikeQuestion);
+    }
+    return items;
+  }
+
+  async function ensureQuestionsReady(maxTries=40){
+    const sec = q('#section-perguntas') || q('[data-section="perguntas"]') || q('.section-perguntas');
+    if(!sec){ log('seção não encontrada'); return false; }
+
+    // tenta carregar/construir, se seu app tiver essas funções
+    try{ typeof window.updateBlocks==='function' && window.updateBlocks(); }catch(_){}
+    try{ typeof window.loadDynamicBlocks==='function' && window.loadDynamicBlocks(); }catch(_){}
+    try{ typeof window.initJornada==='function'    && window.initJornada(); }catch(_){}
+
+    let blocks=[], questions=[];
+    for (let i=0;i<maxTries;i++){
+      blocks = findBlocks(sec);
+      questions = findQuestions(blocks[0] || sec);
+      if (blocks.length && questions.length) break;
+      await wait(200);
+    }
+
+    log('blocos:', blocks.length, 'perguntas no 1º bloco:', questions.length);
+
+    if(!blocks.length || !questions.length){
+      // debug para você ver como está o DOM
+      const snap = qa('#section-perguntas *').slice(0,40).map(el=>({
+        tag: el.tagName.toLowerCase(),
+        id:  el.id || '',
+        cls: el.className || '',
+        data: Object.keys(el.dataset||{}).join(',')
+      }));
+      console.table(snap);
+      return false;
+    }
+
+    // mostra 1º bloco
+    const vis = blocks[0];
+    blocks.forEach((b,i)=>{ b.style.display = (b===vis ? 'block' : 'none'); });
+
+    // ativa 1ª pergunta
+    const first = questions[0];
+    qa('.active', sec).forEach(n=>n.classList.remove('active'));
+    first.classList.add('active');
+
+    // aria
+    const aria = q('#aria-pergunta');
+    const lbl  = (first.querySelector('.pergunta-enunciado,.question-title,[data-enunciado],h3,h4,p')||{}).textContent || '';
+    if(aria) aria.textContent = lbl;
+
+    // roda datilografia
+    if (typeof window.runTyping === 'function'){
+      window.runTyping(vis || sec);
+    }
+    return true;
+  }
+
+  // expõe para outros scripts
+  window.ensureQuestionsReady = ensureQuestionsReady;
+
+  // reforça openQuestions (usa nosso ensure)
+  const prevOpen = window.openQuestions;
+  window.openQuestions = function(){
+    if (typeof window.showSection === 'function') window.showSection('section-perguntas');
+    else {
+      document.querySelectorAll('.j-section').forEach(s=>s.classList.add('hidden'));
+      (q('#section-perguntas')||q('[data-section="perguntas"]')||q('.section-perguntas'))?.classList.remove('hidden');
+    }
+    requestAnimationFrame(()=>setTimeout(()=>{ ensureQuestionsReady(); },0));
+    if (typeof prevOpen === 'function') { try{ prevOpen(); }catch(_){} }
+  };
+
+  // quando perguntas ficar visível, tenta ligar
+  const mo = new MutationObserver(()=>{
+    const sec = q('#section-perguntas') || q('[data-section="perguntas"]') || q('.section-perguntas');
+    if (sec && !sec.classList.contains('hidden')) ensureQuestionsReady();
+  });
+  mo.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style']});
 })();  
 
   /* ===== Boot ===== */
