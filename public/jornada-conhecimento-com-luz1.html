@@ -912,10 +912,21 @@
         if (cur) cur.classList.add('hidden');
         if (nxt) { nxt.classList.remove('hidden'); runTyping(nxt); }
       }
+      // aceitar termos → ir para a seção de senha
+      const accept = ev.target.closest && ev.target.closest(
+     '[data-action="next-senha"], [data-action="accept"], [data-action="accept-terms"], [data-action="termos-aceito"], [data-action="aceito"]'
+      );
+      if (accept) {
+      ev.preventDefault();
+      showSection('section-senha');
+      requestAnimationFrame(() => setTimeout(() => {
+      const sec = document.getElementById('section-senha');
+      if (sec) runTyping(sec);
+      }, 0));
       return;
-    }
-  }, true);
-})();
+      }
+     }, true);
+   })();
 
   /* ===== Boot ===== */
   console.log('[Boot] Iniciando script seguro');
