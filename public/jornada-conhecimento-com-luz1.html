@@ -713,7 +713,9 @@
 
     active.classList.remove('hidden');
     console.log('[showSection] Seção ativa:', active.id);
-    runTyping(active);
+    requestAnimationFrame(() => {
+    setTimeout(() => runTyping(active), 0);
+});
 
     updateCanvasBackground(sectionId);
     ensureHeroFlame(sectionId);
