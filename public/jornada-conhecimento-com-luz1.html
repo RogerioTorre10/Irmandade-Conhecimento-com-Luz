@@ -2347,7 +2347,90 @@
     if (sec && !sec.classList.contains('hidden')) ensureQuestionsReady();
   });
   mo.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style']});
-})();  
+})();
+  
+/* === SECTION HIDER v2 — some a Selfie e mostra Perguntas de verdade === */
+(function(){
+  'use strict';
+  const q=(s,r=document)=>r.querySelector(s);
+  const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
+
+  function hideAllSections(){
+    qa('.j-section, [id^="section-"]').forEach(s=>{
+      s.classList.add('hidden');
+      s.style.display = 'none';
+    });
+  }
+
+  // Throttle para evitar spam de ensure
+  let _lastEnsure = 0;
+  function ensureOnce(){
+    const now = performance.now();
+    if (now - _lastEnsure < 300) return;
+    _lastEnsure = now;
+    if (typeof window.ensureQuestionsReady === 'function') {
+      window.ensureQuestionsReady();
+    }
+  }
+
+  // Patch do showSection p/ esconder tudo (inclusive #section-selfie sem .j-section)
+  const prevShow = window.showSection;
+  window.showSection = function(sectionId){
+    try{ window.speechSynthesis && speechSynthesis.cancel(); }catch(_){}
+    hideAllSections();
+
+    const active =
+      document.getElementById(sectionId) ||
+      q(`[data-section="${sectionId.replace('section-','')}"]`) ||
+      q(`.${sectionId}`);
+
+    if (active){
+      active.classList.remove('hidden');
+      active.style.display = 'block';
+    }
+
+    // se for perguntas, garante abertura
+    if (sectionId === 'section-perguntas') {
+      requestAnimationFrame(()=>setTimeout(ensureOnce,0));
+    } else {
+      // para a Selfie, garante que ela não bloqueie nada
+      const selfie = q('#section-selfie') || q('[data-section="selfie"]') || q('.section-selfie');
+      if (selfie && sectionId !== 'section-selfie') {
+        selfie.style.pointerEvents = 'none';
+        selfie.classList.add('hidden');
+        selfie.style.display = 'none';
+      }
+    }
+
+    // roda typing no que ficou ativo (se existir)
+    if (typeof window.runTyping === 'function' && active) {
+      requestAnimationFrame(()=>setTimeout(()=>window.runTyping(active),0));
+    }
+  };
+
+  // Patch do openQuestions p/ usar o hider
+  const prevOpen = window.openQuestions;
+  window.openQuestions = function(){
+    window.showSection('section-perguntas');   // já esconde tudo e chama ensureOnce()
+    if (typeof prevOpen === 'function') { try{ prevOpen(); }catch(_){ } }
+  };
+
+  // Caso alguém tenha ficado preso na Selfie, força a transição quando clicar em “pular/confirmar”
+  document.addEventListener('click', function(ev){
+    const sec = q('#section-selfie') || q('[data-section="selfie"]') || q('.section-selfie');
+    if(!sec) return;
+    const btn = ev.target.closest &&
+      ev.target.closest('[data-action="selfie-next"],[data-action="skip-selfie"],#btnSkipSelfie,.btn-skip-selfie,[data-role="start"],button,a');
+    if (btn && sec.contains(btn)) {
+      // se o texto sugere “pular / iniciar / confirmar”, navega
+      const txt = (btn.textContent||'').toLowerCase();
+      if (/\bpular|\biniciar|\bcomeçar|\bconfirmar/.test(txt) || btn.hasAttribute('data-action')) {
+        ev.preventDefault();
+        window.showSection('section-perguntas');
+      }
+    }
+  }, true);
+})();
 
   /* ===== Boot ===== */
   console.log('[Boot] Iniciando script seguro');
