@@ -736,19 +736,72 @@
     lockNext();
     cancelSpeech();
 
-    try {
-      if (typeof window.typeWriter === 'function') {
-        await typeWriter(el, (pergunta||''), JORNADA.typing.charDelay, !!JORNADA.typing.caret);
-      } else {
-        await typeTextFallback(el, (pergunta||''), JORNADA.typing.charDelay);
-      }
-    } catch(e){
-      el.textContent = (pergunta || '');
-    }
+/* HOTFIX: define window.typeWriter se estiver faltando (sem TTS no loop) */
+(function(){
+  'use strict';
+  if (typeof window.typeWriter === 'function') return;
 
-    await speak(pergunta || '');
-    unlockNext();
-  }
+  const DEFAULT_SPEED = (window.__DEFAULT_SPEED_TYPING || 80);
+
+  window.typeWriter = function(el, text, speed, showCursor){
+    if(!el) return Promise.resolve();
+    if(el.dataset.typing==='1' || el.dataset.typed==='1') return Promise.resolve();
+
+    el.dataset.typing='1';
+    el.textContent='';
+    const highlight = el.querySelector('.highlight') || document.createElement('div');
+    if(!highlight.parentNode){ highlight.className='highlight'; el.prepend(highlight); }
+
+    text = (text||'').replace(/[{}[\]]/g,'').trim();
+    let i=0;
+
+    const PUNCT_PAUSE = parseInt(el.getAttribute('data-pause') || '220',10);
+    const BREAK_PAUSE = parseInt(el.getAttribute('data-break') || '320',10);
+
+    return new Promise(resolve=>{
+      function step(){
+        // aborta se ficar invisível/fora do DOM
+        if (!el.isConnected || el.offsetParent===null || el.closest('.j-section.hidden')) {
+          el.classList.remove('lumen-typing');
+          const h = el.querySelector('.highlight'); if (h) h.style.width='0';
+          el.dataset.typed='0'; el.dataset.typing='0';
+          return resolve();
+        }
+
+        if (i < text.length){
+          const char = text.charAt(i++);
+          el.textContent += char;
+
+          // atualiza a “faixa” embaixo do texto (se existir)
+          try{
+            const canvas=document.createElement('canvas');
+            const ctx=canvas.getContext('2d');
+            ctx.font = getComputedStyle(el).font;
+            highlight.style.width = `${ctx.measureText(el.textContent).width}px`;
+          }catch(_){}
+
+          const isPunct = /[.,;:!?…]/.test(char);
+          const isBreak = (char === '\n');
+          const extra = isBreak ? BREAK_PAUSE : (isPunct ? PUNCT_PAUSE : 0);
+          setTimeout(step, (speed||DEFAULT_SPEED) + extra);
+        } else {
+          el.classList.add('typing-done');
+          el.classList.remove('lumen-typing');
+          const h = el.querySelector('.highlight'); if (h) h.style.width='0';
+          el.dataset.typed='1';
+          el.dataset.typing='0';
+          resolve();
+        }
+      }
+      if (showCursor) el.classList.add('lumen-typing');
+      setTimeout(step,0);
+    });
+  };
+
+  // alias para casos onde o código chama "typewriter" (minúsculo)
+  if (typeof window.typewriter !== 'function') window.typewriter = window.typeWriter;
+})();
+
   window.typeAndReadQuestion = typeAndReadQuestion;
 
   /* ===== runTyping ===== */
