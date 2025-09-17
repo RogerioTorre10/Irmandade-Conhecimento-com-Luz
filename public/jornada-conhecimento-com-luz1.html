@@ -1171,6 +1171,148 @@
     }
   });
 })();
+    
+/* === PATCH: captura robusta da senha e início da jornada === */
+(function(){
+  'use strict';
+
+  function q(sel, root=document){ return root.querySelector(sel); }
+  function qa(sel, root=document){ return Array.from(root.querySelectorAll(sel)); }
+  function toast(msg){ try{
+    const t=document.getElementById('toast'); if(!t) return;
+    t.textContent=msg; t.classList.remove('hidden'); t.classList.add('show');
+    setTimeout(()=>{ t.classList.remove('show'); },3000);
+  }catch(_){} }
+
+  // acha o container da tela de senha
+  function getSenhaSection(){
+    return q('#section-senha') || q('[data-section="senha"]') || q('.section-senha') || document;
+  }
+
+  // acha o input de senha (varia conforme HTML)
+  function getSenhaInput(){
+    const root = getSenhaSection();
+
+    // tente os seletores mais prováveis
+    const tries = [
+      '#senhaInput',
+      'input[data-role="senha"]',
+      'input[name="senha"]',
+      'input[name*="senha" i]',
+      'input[id*="senha" i]',
+      'input[type="password"]',
+      // as vezes é type="text" mas é o campo de senha visual
+      'input[type="text"][name*="senha" i]',
+      'input[type="text"][id*="senha" i]',
+      '.senha input',
+      '.senha-input',
+    ];
+
+    for (const sel of tries){
+      const el = q(sel, root);
+      if (el) return el;
+    }
+    // fallback: primeiro input visível dentro da seção
+    const any = qa('input', root).find(el => el.offsetParent !== null);
+    return any || null;
+  }
+
+  // alternar visibilidade (olhinho)
+  window.toggleSenha = function toggleSenha(){
+    const input = getSenhaInput();
+    if(!input) { console.warn('[Senha] input não encontrado'); return; }
+    input.type = (input.type === 'password' ? 'text' : 'password');
+    const eye = q('[data-role="eye"], [data-action="toggle-password"] i, [data-action="toggle-password"] svg', getSenhaSection());
+    if(eye){ eye.classList.toggle('on'); }
+  };
+
+  // valida e entra nas perguntas
+  window.startJourney = async function startJourney(){
+    const inputSenha = getSenhaInput();
+    const inputNome  = q('#nomeInput, [data-role="nome"], input[name="nome"]', getSenhaSection());
+
+    const senha = (inputSenha && inputSenha.value || '').trim();
+    const nome  = (inputNome && inputNome.value || '').trim();
+
+    if(!senha){
+      toast('Digite a senha para continuar.');
+      if(inputSenha) inputSenha.focus();
+      return;
+    }
+
+    // se quiser restringir a valores específicos, descomente:
+    // const validas = new Set(['jornada2025','iniciar']);
+    // if (!validas.has(senha.toLowerCase())) { toast('Senha inválida.'); return; }
+
+    if(nome){ try { localStorage.setItem('JORNADA_NOME', nome); } catch(_){} }
+
+    try { if(window.speechSynthesis) speechSynthesis.cancel(); } catch(_){}
+
+    if (typeof window.showSection === 'function') {
+      showSection('section-perguntas');
+    } else {
+      const secs = qa('.j-section');
+      const secPerg = q('#section-perguntas');
+      secs.forEach(s=>s.classList.add('hidden'));
+      if(secPerg){ secPerg.classList.remove('hidden'); }
+    }
+
+    // garante primeiro bloco/pergunta e datilografia
+    requestAnimationFrame(()=>setTimeout(()=>{
+      const sec = q('#section-perguntas');
+      if(!sec) return;
+
+      let vis = sec.querySelector('.j-bloco[style*="display: block"]');
+      const blocks = qa('.j-bloco', sec);
+      if(!vis && blocks.length){
+        blocks.forEach((b,i)=> b.style.display = i===0 ? 'block' : 'none');
+        vis = blocks[0];
+      }
+
+      const active = sec.querySelector('.j-pergunta.active');
+      if(!active && vis){
+        const first = vis.querySelector('.j-pergunta');
+        if(first){
+          first.classList.add('active');
+          const lbl = first.querySelector('.pergunta-enunciado')?.textContent || '';
+          const aria = q('#aria-pergunta'); if(aria) aria.textContent = lbl;
+        }
+      }
+
+      if (typeof window.runTyping === 'function') runTyping(vis || sec);
+    }, 0));
+  };
+
+  // Enter no campo de senha dispara startJourney
+  document.addEventListener('keydown', function(ev){
+    const input = getSenhaInput();
+    if (!input) return;
+    if (ev.key === 'Enter' && document.activeElement === input){
+      ev.preventDefault();
+      if (typeof window.startJourney === 'function') startJourney();
+    }
+  }, true);
+
+  // Garante o botão "Ativar e Iniciar" se não tiver data-action="start"
+  document.addEventListener('click', function(ev){
+    const root = getSenhaSection();
+    // se o seu botão já tem [data-action="start"], o listener global existente cuida.
+    // aqui criamos um fallback: qualquer botão dentro da seção com data-role="start" ou .btn-start
+    const btnFallback = ev.target.closest('[data-role="start"], .btn-start');
+    if (btnFallback && root.contains(btnFallback)){
+      ev.preventDefault();
+      if (typeof window.startJourney === 'function') startJourney();
+    }
+  }, true);
+
+  // Ao abrir a seção senha, inicia datilografia se houver
+  document.addEventListener('DOMContentLoaded', function(){
+    const secSenha = getSenhaSection();
+    if(secSenha && !secSenha.classList.contains('hidden')){
+      if (typeof window.runTyping === 'function') runTyping(secSenha);
+    }
+  });
+})();
 
       // iniciar a jornada (valida senha)
       var btnStart = ev.target.closest ? ev.target.closest('[data-action="start"]') : null;
