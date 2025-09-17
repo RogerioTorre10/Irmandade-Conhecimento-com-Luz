@@ -720,22 +720,34 @@
     return el;
   }
 
-  async function typeAndReadQuestion(pergunta, elOrSelector){
-    const el = ensureQuestionTextEl(elOrSelector);
+  async function typeAndReadQuestion(pergunta, elOrSelector) {
+  const el = ensureQuestionTextEl(elOrSelector);
 
-    if (!JORNADA.fullTypingMode){
-      el.textContent = (pergunta || '');
-      unlockNext();
-      return;
+  if (!JORNADA.fullTypingMode) {
+    el.textContent = (pergunta || '');
+    unlockNext();
+    if (JORNADA.tts.enabled && JORNADA.tts.readingMode === 'after' && !window.isMuted) {
+      await speak(pergunta || '');
     }
-    // no final da função:
-   if (JORNADA.tts.readingMode === 'after') {
-   await speak(text || '');
-   }
+    return;
+  }
 
-    lockNext();
-    cancelSpeech();
+  lockNext();
+  cancelSpeech();
 
+  try {
+    await window.typeWriter(el, pergunta || '', JORNADA.typing.charDelay, false);
+    if (JORNADA.tts.enabled && JORNADA.tts.readingMode === 'after' && !window.isMuted) {
+      await speak(pergunta || '');
+    }
+  } catch (e) {
+    console.error('[typeAndReadQuestion] Erro:', e);
+    el.textContent = pergunta || '';
+  } finally {
+    unlockNext();
+  }
+}
+window.typeAndReadQuestion = typeAndReadQuestion;
 /* HOTFIX: define window.typeWriter se estiver faltando (sem TTS no loop) */
 (function(){
   'use strict';
