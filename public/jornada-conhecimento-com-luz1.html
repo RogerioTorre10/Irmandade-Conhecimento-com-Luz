@@ -1400,6 +1400,19 @@ window.runTyping = runTyping;
   }, true);
 
   /* ===== Selfie ===== */
+(function(){
+  'use strict';
+  const q = (s, r = document) => r.querySelector(s);
+  const qa = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+  function normGuide(s = '') {
+    s = String(s).toLowerCase();
+    if (s.includes('lumen')) return 'lumen';
+    if (s.includes('zion')) return 'zion';
+    if (s.includes('arion') || s.includes('arian')) return 'arion';
+    return 'lumen';
+  }
+
   (function injectSelfieCss() {
     const css = `
       #section-selfie .selfie-wrapper,
@@ -1465,7 +1478,7 @@ window.runTyping = runTyping;
   };
 
   async function applySelfieBg() {
-    const sec = q('#section-selfie') || q('[data-section="selfie"]') || q('.section-selfie');
+    const sec = q('#section-selfie, [data-section="selfie"], .section-selfie');
     if (!sec || sec.classList.contains('hidden')) return;
     const host = q('.selfie-bg', sec) || q('.selfie-hero', sec) || q('.selfie-wrapper', sec) || sec;
     let img = q('img[data-role="bg"]', host) || q('#selfieBg', host) || q('.selfie-bg > img', sec);
@@ -1487,14 +1500,22 @@ window.runTyping = runTyping;
         im.src = src;
       })();
     });
-    if (src) img.src = src;
+    if (src) {
+      img.src = src;
+      console.log('[Selfie] Fundo aplicado:', src, 'para guia:', guia);
+    } else {
+      console.warn('[Selfie] Nenhum fundo válido encontrado para guia:', guia);
+    }
   }
 
   const moSelfie = new MutationObserver(() => {
-    const sec = q('#section-selfie') || q('[data-section="selfie"]') || q('.section-selfie');
+    const sec = q('#section-selfie, [data-section="selfie"], .section-selfie');
     if (sec && !sec.classList.contains('hidden')) applySelfieBg();
   });
   moSelfie.observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style'] });
+
+  document.addEventListener('DOMContentLoaded', applySelfieBg);
+})();
 
   /* ===== Perguntas ===== */
   const wait = (ms) => new Promise(r => setTimeout(r, ms));
