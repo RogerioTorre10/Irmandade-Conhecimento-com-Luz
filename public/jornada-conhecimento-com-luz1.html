@@ -859,76 +859,92 @@ async function runTyping(root) {
 }
 window.runTyping = runTyping;
   /* ===== showSection ===== */
-  function showSection(sectionId) {
-    console.log('[showSection] Exibindo seção:', sectionId);
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
+function showSection(sectionId) {
+  console.log('[showSection] Exibindo seção:', sectionId);
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
 
-    document.querySelectorAll('.j-section').forEach(s => {
-      s.classList.add('hidden');
-      s.querySelectorAll('[data-typing]').forEach(el => {
-        el.classList.remove('lumen-typing', 'typing-done');
-        el.dataset.typing = '0';
-        delete el.dataset.typed;
-        const keepText = el.getAttribute('data-text') || el.textContent || '';
-        el.textContent = '';
-        const h = el.querySelector('.highlight');
-        if (h) h.style.width = '0';
-        if (!el.hasAttribute('data-text') && keepText) el.setAttribute('data-text', keepText);
-      });
+  document.querySelectorAll('.j-section').forEach(s => {
+    s.classList.add('hidden');
+    s.querySelectorAll('[data-typing]').forEach(el => {
+      el.classList.remove('lumen-typing', 'typing-done');
+      el.dataset.typing = '0';
+      delete el.dataset.typed;
+      const keepText = el.getAttribute('data-text') || el.textContent || '';
+      el.textContent = '';
+      const h = el.querySelector('.highlight');
+      if (h) h.style.width = '0';
+      if (!el.hasAttribute('data-text') && keepText) el.setAttribute('data-text', keepText);
     });
+  });
 
-    const active = document.getElementById(sectionId);
-    if (!active) {
-      console.error('[showSection] Seção não encontrada:', sectionId);
-      toast('Erro ao carregar a seção. Tente novamente.');
-      return;
-    }
+  const active = document.getElementById(sectionId);
+  if (!active) {
+    console.error('[showSection] Seção não encontrada:', sectionId);
+    toast('Erro ao carregar a seção. Tente novamente.');
+    return;
+  }
 
-    active.classList.remove('hidden');
-    console.log('[showSection] Seção ativa:', active.id);
+  active.classList.remove('hidden');
+  console.log('[showSection] Seção ativa:', active.id);
 
-    requestAnimationFrame(() => setTimeout(() => runTyping(active), 0));
-    updateCanvasBackground(sectionId);
-    ensureHeroFlame(sectionId);
-
-    if (sectionId === 'section-perguntas') {
-      const perguntas = document.querySelectorAll('.j-pergunta');
-      if (perguntas.length) {
-        const first = document.querySelector('.j-pergunta.active') || perguntas[0];
-        first.classList.add('active');
-        const lbl = first.querySelector('.pergunta-enunciado')?.textContent || '';
-        const ta = first.querySelector('textarea');
-        if (ta) ta.placeholder = 'Digite sua resposta...';
-        const aria = document.getElementById('aria-pergunta');
-        if (aria) aria.textContent = lbl;
-      } else if (typeof window.loadDynamicBlocks === 'function') {
-        window.loadDynamicBlocks();
-      }
-      requestAnimationFrame(() => setTimeout(() => ensureQuestionsReady(), 0));
-    }
-
-    if (sectionId === 'section-final') {
-      const url = localStorage.getItem('IRMANDADE_SELFIE_FINAL');
-      if (url) {
-        const img = document.querySelector('#selfieInFlame');
-        if (img) img.src = url;
-        const name = document.querySelector('#clientNameSlotFinal');
-        if (name) name.textContent = (localStorage.getItem('JORNADA_NOME') || '').toUpperCase();
-      }
-    }
-
-    if (sectionId === 'section-guia') {
-      const guiaNameInput = document.getElementById('guiaNameInput');
-      const storedName = localStorage.getItem('JORNADA_NOME') || '';
-      if (guiaNameInput && storedName) guiaNameInput.value = storedName.toUpperCase();
-    }
-
+  requestAnimationFrame(() => setTimeout(() => {
+    runTyping(active);
+    // Específico para termos: garante datilografia e TTS na página visível
     if (sectionId === 'section-termos') {
-      const pg1 = document.getElementById('termos-pg1');
-      if (pg1 && !pg1.classList.contains('hidden')) runTyping(pg1);
+      const pg1 = document.getElementById('termos-pg1') || active.querySelector('[class*="termos-pg"], .termos-page, .page');
+      if (pg1 && !pg1.classList.contains('hidden')) {
+        runTyping(pg1);
+        console.log('[showSection] runTyping chamado para termos-pg1');
+        // Fallback para textos genéricos
+        const textEl = pg1.querySelector('[data-typing], .termos-text, .text, p, h3, h4');
+        if (textEl && !textEl.dataset.typed && typeof window.typeWriter === 'function') {
+          const text = dedupe(textEl.getAttribute('data-text') || textEl.textContent || '');
+          window.typeWriter(textEl, text, JORNADA.typing.charDelay, false);
+          if (JORNADA.tts.enabled && JORNADA.tts.readingMode === 'after' && !window.isMuted) {
+            window.speak(text);
+          }
+          console.log('[showSection] Fallback de datilografia e TTS aplicado em termos:', textEl.tagName, textEl.className || textEl.id);
+        }
+      }
+    }
+  }, 0));
+
+  updateCanvasBackground(sectionId);
+  ensureHeroFlame(sectionId);
+
+  if (sectionId === 'section-perguntas') {
+    const perguntas = document.querySelectorAll('.j-pergunta');
+    if (perguntas.length) {
+      const first = document.querySelector('.j-pergunta.active') || perguntas[0];
+      first.classList.add('active');
+      const lbl = first.querySelector('.pergunta-enunciado')?.textContent || '';
+      const ta = first.querySelector('textarea');
+      if (ta) ta.placeholder = 'Digite sua resposta...';
+      const aria = document.getElementById('aria-pergunta');
+      if (aria) aria.textContent = lbl;
+    } else if (typeof window.loadDynamicBlocks === 'function') {
+      window.loadDynamicBlocks();
+    }
+    requestAnimationFrame(() => setTimeout(() => ensureQuestionsReady(), 0));
+  }
+
+  if (sectionId === 'section-final') {
+    const url = localStorage.getItem('IRMANDADE_SELFIE_FINAL');
+    if (url) {
+      const img = document.querySelector('#selfieInFlame');
+      if (img) img.src = url;
+      const name = document.querySelector('#clientNameSlotFinal');
+      if (name) name.textContent = (localStorage.getItem('JORNADA_NOME') || '').toUpperCase();
     }
   }
-  window.showSection = showSection;
+
+  if (sectionId === 'section-guia') {
+    const guiaNameInput = document.getElementById('guiaNameInput');
+    const storedName = localStorage.getItem('JORNADA_NOME') || '';
+    if (guiaNameInput && storedName) guiaNameInput.value = storedName.toUpperCase();
+  }
+}
+window.showSection = showSection;
 
   /* ===== Avançar ===== */
   let __isTransitioning = false;
