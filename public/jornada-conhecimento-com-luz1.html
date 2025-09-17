@@ -2082,8 +2082,127 @@
       window.openQuestions();
     }
   }, true);
-
 })();
+ 
+/* === PERGUNTAS FIX v3 — encontra blocos/perguntas, ativa 1ª e roda typing === */
+(function(){
+  'use strict';
+  const q=(s,r=document)=>r.querySelector(s);
+  const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
+  const log=(...a)=>{ try{ console.log('[PERG]',...a);}catch(_){} };
+  const wait = (ms)=>new Promise(r=>setTimeout(r,ms));
+
+  function uniq(arr){ return Array.from(new Set(arr)); }
+
+  function findBlocks(sec){
+    // cobre vários jeitos de marcar "bloco"
+    const sels = [
+      '.j-bloco', '.js-bloco', '.bloco', '.block',
+      '.perguntas-bloco', '.bloco-perguntas', '.q-block', '.quest-block',
+      '[data-bloco]', '[data-block]'
+    ];
+    let list=[];
+    for(const s of sels){ list = list.concat(qa(s, sec)); }
+    list = uniq(list).filter(el => el.offsetParent !== null || getComputedStyle(el).display !== 'none');
+    return list;
+  }
+
+  function findQuestions(root){
+    // cobre vários jeitos de marcar "pergunta"
+    const sels = [
+      '.j-pergunta', '.pergunta', '.question', '.q-item',
+      '.item-pergunta', '[data-pergunta]', '[data-question]',
+      '[class*="perg"]', '[class*="quest"]'
+    ];
+    let items=[];
+    for(const s of sels){ items = items.concat(qa(s, root)); }
+    items = uniq(items).filter(el=>{
+      // precisa ter conteúdo relevante dentro
+      return el.querySelector('.pergunta-enunciado, .question-title, [data-enunciado], h3, p, [data-typing], textarea, input');
+    });
+    return items;
+  }
+
+  async function ensureQuestionsReady(maxTries=12){
+    const sec = q('#section-perguntas') || q('[data-section="perguntas"]') || q('.section-perguntas');
+    if(!sec){ log('sec não encontrada'); return false; }
+
+    // tenta (re)construir conteúdo, se existir
+    try{ typeof window.updateBlocks==='function' && window.updateBlocks(); }catch(_){}
+    try{ typeof window.loadDynamicBlocks==='function' && window.loadDynamicBlocks(); }catch(_){}
+
+    let blocks=[], tries=0;
+    while(tries++ < maxTries){
+      blocks = findBlocks(sec);
+      if (blocks.length) break;
+      // caso não tenha "bloco", talvez só tenha perguntas diretas
+      const qs = findQuestions(sec);
+      if (qs.length){
+        blocks = [sec]; // usa a própria seção como "bloco" hospedeiro
+        break;
+      }
+      await wait(150);
+    }
+    log('blocos encontrados:', blocks.length);
+
+    if (!blocks.length) return false;
+
+    // garante 1º bloco visível
+    let vis = sec.querySelector('.j-bloco[style*="display: block"], .bloco[style*="display: block"], .block[style*="display:block"]');
+    if(!vis){ vis = blocks[0]; }
+    blocks.forEach((b,i)=>{ if (b!==vis) b.style.display='none'; });
+    vis.style.display = 'block';
+
+    // ativa 1ª pergunta
+    let qs = findQuestions(vis);
+    log('perguntas no bloco visível:', qs.length);
+    if (!qs.length){ 
+      // tenta na seção inteira
+      qs = findQuestions(sec);
+      log('perguntas na seção:', qs.length);
+    }
+    if (!qs.length) return false;
+
+    // marca ativa
+    const currentActive = sec.querySelector('.j-pergunta.active, .pergunta.active, .question.active, .q-item.active');
+    if (currentActive) currentActive.classList.remove('active');
+    const first = qs[0];
+    first.classList.add('active');
+
+    // aria
+    const aria = q('#aria-pergunta');
+    const lbl  = first.querySelector('.pergunta-enunciado, .question-title, [data-enunciado], h3, p')?.textContent || '';
+    if(aria) aria.textContent = lbl;
+
+    // roda typing
+    try {
+      if (typeof window.runTyping === 'function'){
+        window.runTyping(vis || sec);
+      }
+    } catch(e){ console.warn('[PERG] runTyping erro:', e); }
+
+    return true;
+  }
+
+  // reforça openQuestions para usar nossa rotina
+  window.openQuestions = function(){
+    if (typeof window.showSection === 'function') window.showSection('section-perguntas');
+    else {
+      document.querySelectorAll('.j-section').forEach(s=>s.classList.add('hidden'));
+      (q('#section-perguntas')||q('[data-section="perguntas"]')||q('.section-perguntas'))?.classList.remove('hidden');
+    }
+    requestAnimationFrame(()=>setTimeout(()=>{ ensureQuestionsReady(); }, 0));
+  };
+
+  // também tenta quando a seção perguntas ficar visível
+  const mo = new MutationObserver(()=>{
+    const sec = q('#section-perguntas') || q('[data-section="perguntas"]') || q('.section-perguntas');
+    if (sec && !sec.classList.contains('hidden')) {
+      ensureQuestionsReady();
+    }
+  });
+  mo.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style']});
+})();  
 
   /* ===== Boot ===== */
   console.log('[Boot] Iniciando script seguro');
