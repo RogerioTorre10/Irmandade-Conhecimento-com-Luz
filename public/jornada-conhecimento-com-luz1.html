@@ -1313,6 +1313,143 @@
     }
   });
 })();
+    
+/* === SCRIPT 2: Roteador de Fluxo + Abertura das Perguntas === */
+(function(){
+  'use strict';
+
+  function q(sel, root=document){ return root.querySelector(sel); }
+  function qa(sel, root=document){ return Array.from(root.querySelectorAll(sel)); }
+
+  // Abre perguntas garantindo bloco/pergunta ativa + datilografia
+  function openQuestions(){
+    if (typeof window.showSection === 'function') {
+      showSection('section-perguntas');
+    } else {
+      const secs = qa('.j-section');
+      const secPerg = q('#section-perguntas');
+      secs.forEach(s=>s.classList.add('hidden'));
+      if(secPerg){ secPerg.classList.remove('hidden'); }
+    }
+
+    // garante bloco e pergunta
+    requestAnimationFrame(()=>setTimeout(()=>{
+      const sec = q('#section-perguntas');
+      if(!sec) return;
+
+      // torna um bloco visível
+      let vis = sec.querySelector('.j-bloco[style*="display: block"]');
+      const blocks = qa('.j-bloco', sec);
+      if(!vis && blocks.length){
+        blocks.forEach((b,i)=> b.style.display = i===0 ? 'block' : 'none');
+        vis = blocks[0];
+      }
+
+      // ativa primeira pergunta
+      const active = sec.querySelector('.j-pergunta.active');
+      if(!active && vis){
+        const first = vis.querySelector('.j-pergunta');
+        if(first){
+          first.classList.add('active');
+          const lbl = first.querySelector('.pergunta-enunciado')?.textContent || '';
+          const aria = q('#aria-pergunta'); if(aria) aria.textContent = lbl;
+        }
+      }
+
+      if (typeof window.runTyping === 'function') runTyping(vis || sec);
+    }, 0));
+  }
+  window.openQuestions = openQuestions;
+
+  // Decide próximo passo após “senha”
+  function nextAfterSenha(){
+    // ordem de preferência: GUIA → SELFIE → PERGUNTAS
+    const hasGuia   = !!q('#section-guia, [data-section="guia"], .section-guia');
+    const hasSelfie = !!q('#section-selfie, [data-section="selfie"], .section-selfie');
+
+    if (hasGuia) {
+      if (typeof window.showSection === 'function') showSection('section-guia');
+      else {
+        const secs = qa('.j-section');
+        secs.forEach(s=>s.classList.add('hidden'));
+        (q('#section-guia')||q('[data-section="guia"]')||q('.section-guia'))?.classList.remove('hidden');
+      }
+      // roda datilografia nessa tela
+      requestAnimationFrame(()=>setTimeout(()=>{
+        const sec = q('#section-guia') || q('[data-section="guia"]') || q('.section-guia');
+        if (sec && typeof window.runTyping === 'function') runTyping(sec);
+      },0));
+      return;
+    }
+
+    if (hasSelfie) {
+      if (typeof window.showSection === 'function') showSection('section-selfie');
+      else {
+        const secs = qa('.j-section');
+        secs.forEach(s=>s.classList.add('hidden'));
+        (q('#section-selfie')||q('[data-section="selfie"]')||q('.section-selfie'))?.classList.remove('hidden');
+      }
+      requestAnimationFrame(()=>setTimeout(()=>{
+        const sec = q('#section-selfie') || q('[data-section="selfie"]') || q('.section-selfie');
+        if (sec && typeof window.runTyping === 'function') runTyping(sec);
+      },0));
+      return;
+    }
+
+    // fallback: vai direto pras perguntas
+    openQuestions();
+  }
+
+  // Intercepta o startJourney para usar o roteador acima
+  const _startJourney = window.startJourney;
+  window.startJourney = async function patchedStartJourney(){
+    try {
+      if (typeof _startJourney === 'function') {
+        // roda a validação original (captura senha/nome etc.), mas NÃO navega para perguntas
+        await _startJourney();
+      }
+    } catch(_) { /* não trava */ }
+
+    // Após a validação, forçamos a navegação correta:
+    nextAfterSenha();
+  };
+
+  /* ==== Ações na tela de GUIA e SELFIE ==== */
+
+  // 1) Escolha do guia (qualquer elemento com data-action="choose-guide" e data-guide="lumen|zion|arian")
+  document.addEventListener('click', function(ev){
+    const el = ev.target.closest && ev.target.closest('[data-action="choose-guide"]');
+    if (!el) return;
+
+    ev.preventDefault();
+    const guia = el.getAttribute('data-guide') || 'lumen';
+    try { localStorage.setItem('JORNADA_GUIA', guia); } catch(_){}
+    // depois de escolher o guia, se existir tela de selfie, vai pra ela; senão, perguntas
+    const hasSelfie = !!q('#section-selfie, [data-section="selfie"], .section-selfie');
+    if (hasSelfie){
+      if (typeof window.showSection === 'function') showSection('section-selfie');
+      else {
+        const secs = qa('.j-section'); secs.forEach(s=>s.classList.add('hidden'));
+        (q('#section-selfie')||q('[data-section="selfie"]')||q('.section-selfie'))?.classList.remove('hidden');
+      }
+      requestAnimationFrame(()=>setTimeout(()=>{
+        const sec = q('#section-selfie') || q('[data-section="selfie"]') || q('.section-selfie');
+        if (sec && typeof window.runTyping === 'function') runTyping(sec);
+      },0));
+    } else {
+      openQuestions();
+    }
+  }, true);
+
+  // 2) Botão “Continuar” na selfie (data-action="selfie-next")
+  document.addEventListener('click', function(ev){
+    const btn = ev.target.closest && ev.target.closest('[data-action="selfie-next"]');
+    if (!btn) return;
+    ev.preventDefault();
+    openQuestions();
+  }, true);
+
+})();
 
       // iniciar a jornada (valida senha)
       var btnStart = ev.target.closest ? ev.target.closest('[data-action="start"]') : null;
