@@ -1042,6 +1042,7 @@
     const root = getSenhaSection();
     const tries = [
       '#senhaInput',
+      '#iniciar',
       'input[data-role="senha"]',
       'input[name="senha"]',
       'input[name*="senha" i]',
@@ -1072,6 +1073,8 @@
     const inputNome = getSenhaSection().querySelector('#nomeInput, [data-role="nome"], input[name="nome"]');
     const senha = (inputSenha && inputSenha.value || '').trim().toLowerCase();
     const nome = (inputNome && inputNome.value || '').trim();
+
+    console.log('[startJourney] Senha fornecida:', senha ? '[oculta]' : 'nenhuma', 'Nome:', nome || 'nenhum');
 
     if (!senha) {
       toast('Digite a senha para continuar.');
@@ -1130,7 +1133,7 @@
 
   /* ===== Guia ===== */
   (function(){
-    const log = (...a) => { try { console.log('[GUIA v10]', ...a); } catch (_) {} };
+    const log = (...a) => { try { console.log('[GUIA v11]', ...a); } catch (_) {} };
 
     function secGuia() {
       return document.getElementById('section-guia') || document.querySelector('[data-section="guia"], .section-guia, .guia-container, .guia') || null;
@@ -1173,108 +1176,64 @@
       return '';
     }
 
-    function enhanceButtons() {
-      const root = secGuia();
-      if (!root) {
-        log('Seção de guia não encontrada');
-        return;
-      }
-
-      const candidates = root.querySelectorAll(`
-        [data-action="select-guia"],
-        [data-guide],
-        [data-guide-id],
-        .choose-guide,
-        .btn-guia,
-        .card-guia,
-        .guia-option,
-        .guia-item,
-        .guide-selector,
-        #btnLumen, #btnZion, #btnArion,
-        img[alt*="Lumen" i], img[alt*="Zion" i], img[alt*="Arion" i],
-        button[class*="guia"], a[class*="guia"],
-        [class*="guide"], [id*="guide"]
-      `);
-
-      if (candidates.length === 0) {
-        log('Nenhum botão de guia encontrado. Snapshot do DOM:', Array.from(root.children).slice(0, 10).map(el => ({
-          tag: el.tagName.toLowerCase(),
-          id: el.id || '',
-          class: el.className || '',
-          attrs: Object.keys(el.dataset || {}).join(','),
-          text: (el.textContent || '').slice(0, 50)
-        })));
-      } else {
-        log('Botões de guia encontrados:', candidates.length, 'em:', root.id || root.className);
-      }
-
-      candidates.forEach(el => {
-        if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
-        el.style.cursor = 'pointer';
-        el.style.pointerEvents = 'auto';
-        if (!el.getAttribute('data-guide')) {
-          const g = inferGuideFrom(el);
-          if (g) el.setAttribute('data-guide', g);
-        }
-        el.setAttribute('role', 'button');
-        el.setAttribute('aria-label', `Escolher guia ${inferGuideFrom(el) || 'desconhecido'}`);
-      });
-
-      root.querySelectorAll('.click-shield, .overlay, [data-overlay], .modal-overlay, .blocker, [class*="overlay"], [class*="shield"], [class*="block"]').forEach(ov => {
-        ov.style.pointerEvents = 'none';
-        ov.style.display = 'none';
-        log('Overlay desativado:', ov.className || ov.id);
+    function getBgUrl(guia) {
+      const GUIDE_BG = {
+        lumen: [
+          '/assets/img/irmandade-quarteto-bg-lumen.png',
+          '/assets/img/irmandade-quarteto-bg-lumen.jpg',
+          '/assets/img/irmandade-quarteto-bg-lumen.jpeg'
+        ],
+        zion: [
+          '/assets/img/irmandade-quarteto-bg-zion.png',
+          '/assets/img/irmandade-quarteto-bg-zion.jpg',
+          '/assets/img/irmandade-quarteto-bg-zion.jpeg'
+        ],
+        arion: [
+          '/assets/img/irmandade-quarteto-bg-arian.jpeg',
+          '/assets/img/irmandade-quarteto-bg-arion.jpeg',
+          '/assets/img/irmandade-quarteto-bg-arion.jpg',
+          '/assets/img/irmandade-quarteto-bg-arion.png'
+        ]
+      };
+      return new Promise(res => {
+        let i = 0;
+        (function step() {
+          if (i >= GUIDE_BG[guia].length) return res(null);
+          const src = GUIDE_BG[guia][i++];
+          const im = new Image();
+          im.onload = () => res(src);
+          im.onerror = () => step();
+          im.src = src;
+        })();
       });
     }
 
-    function proceedAfterGuia(guia) {
+    async function proceedAfterGuia(guia) {
       try {
         localStorage.setItem('JORNADA_GUIA', guia);
         const card = document.getElementById('card-guide');
         const bgImg = document.getElementById('guideBg');
         const guideNameEl = document.getElementById('guideNameSlot');
+        const errorDiv = document.getElementById('selfieError');
         if (card) card.dataset.guide = guia.toUpperCase();
         if (guideNameEl) guideNameEl.textContent = guia.toUpperCase();
         if (bgImg) {
-          const GUIDE_BG = {
-            lumen: [
-              '/assets/img/irmandade-quarteto-bg-lumen.png',
-              '/assets/img/irmandade-quarteto-bg-lumen.jpg',
-              '/assets/img/irmandade-quarteto-bg-lumen.jpeg'
-            ],
-            zion: [
-              '/assets/img/irmandade-quarteto-bg-zion.png',
-              '/assets/img/irmandade-quarteto-bg-zion.jpg',
-              '/assets/img/irmandade-quarteto-bg-zion.jpeg'
-            ],
-            arion: [
-              '/assets/img/irmandade-quarteto-bg-arian.jpeg',
-              '/assets/img/irmandade-quarteto-bg-arion.jpeg',
-              '/assets/img/irmandade-quarteto-bg-arion.jpg',
-              '/assets/img/irmandade-quarteto-bg-arion.png'
-            ]
-          };
-          const src = await new Promise(res => {
-            let i = 0;
-            (function step() {
-              if (i >= GUIDE_BG[guia].length) return res(null);
-              const src = GUIDE_BG[guia][i++];
-              const im = new Image();
-              im.onload = () => res(src);
-              im.onerror = () => step();
-              im.src = src;
-            })();
-          });
+          const src = await getBgUrl(guia);
           if (src) {
             bgImg.src = src;
-            log('Imagem do guia aplicada em #guideBg:', src, 'para guia:', guia);
-            const errorDiv = document.getElementById('selfieError');
-            if (errorDiv) errorDiv.style.display = 'none';
+            bgImg.onload = () => {
+              if (errorDiv) errorDiv.style.display = 'none';
+              log('Imagem do guia aplicada em #guideBg:', src, 'para guia:', guia);
+            };
+            bgImg.onerror = () => {
+              if (errorDiv) errorDiv.style.display = 'block';
+              toast('Erro ao carregar a imagem de fundo do guia.');
+              log('Erro ao carregar imagem do guia:', src);
+            };
           } else {
-            log('Nenhum fundo válido encontrado para guia:', guia);
-            const errorDiv = document.getElementById('selfieError');
             if (errorDiv) errorDiv.style.display = 'block';
-            toast('Erro ao carregar a imagem de fundo do guia.');
+            toast('Nenhum fundo válido encontrado para guia: ' + guia);
+            log('Nenhum fundo válido encontrado para guia:', guia);
           }
         }
         window.showSection('section-selfie');
@@ -1282,11 +1241,11 @@
           const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
           if (sec && typeof window.runTyping === 'function') {
             window.runTyping(sec);
-            console.log('[startJourney] runTyping chamado para section-selfie');
+            console.log('[GUIA v11] runTyping chamado para section-selfie');
           }
         }, 0));
       } catch (e) {
-        console.error('[GUIA v10] Erro ao prosseguir após escolha do guia:', e);
+        console.error('[GUIA v11] Erro ao prosseguir após escolha do guia:', e);
         toast('Erro ao prosseguir. Tente novamente.');
       }
     }
@@ -1295,7 +1254,7 @@
       const guia = inferGuideFrom(el);
       log('Guia selecionado:', guia, 'a partir de:', el.tagName, el.id || el.className, 'texto:', (el.textContent || '').slice(0, 50));
       if (!guia) {
-        console.warn('[GUIA v10] Não foi possível inferir o guia.');
+        console.warn('[GUIA v11] Não foi possível inferir o guia.');
         toast('Por favor, selecione um guia válido.');
         return;
       }
@@ -1308,14 +1267,14 @@
         el.classList.add('active');
         proceedAfterGuia(guia);
       } catch (e) {
-        console.error('[GUIA v10] Erro ao escolher guia:', e);
+        console.error('[GUIA v11] Erro ao escolher guia:', e);
         toast('Erro ao selecionar o guia. Tente novamente.');
       }
     }
 
     document.addEventListener('click', function(ev) {
       const root = secGuia();
-      if (!root) return;
+      if (!root || !root.contains(ev.target)) return; // Evita logs fora da section-guia
       const target = ev.target;
       const el = target.closest(`
         [data-action="select-guia"],
@@ -1396,7 +1355,7 @@
 
   /* ===== Selfie ===== */
   (function(){
-    const log = (...a) => { try { console.log('[Selfie v6]', ...a); } catch (_) {} };
+    const log = (...a) => { try { console.log('[Selfie v7]', ...a); } catch (_) {} };
 
     function normGuide(s = '') {
       s = String(s).toLowerCase();
@@ -1445,34 +1404,6 @@
         return;
       }
 
-      const card = document.getElementById('card-guide');
-      const bgImg = document.getElementById('guideBg');
-      const guideNameEl = document.getElementById('guideNameSlot');
-      const errorDiv = document.getElementById('selfieError');
-      const guia = normGuide(localStorage.getItem('JORNADA_GUIA') || '');
-
-      if (card) card.dataset.guide = guia.toUpperCase();
-      if (guideNameEl) guideNameEl.textContent = guia.toUpperCase();
-      if (bgImg) {
-        const src = await getBgUrl(guia);
-        if (src) {
-          bgImg.src = src;
-          bgImg.onload = () => {
-            if (errorDiv) errorDiv.style.display = 'none';
-            log('Imagem do guia aplicada em #guideBg:', src, 'para guia:', guia);
-          };
-          bgImg.onerror = () => {
-            if (errorDiv) errorDiv.style.display = 'block';
-            toast('Erro ao carregar a imagem de fundo do guia.');
-            log('Erro ao carregar imagem do guia:', src);
-          };
-        } else {
-          if (errorDiv) errorDiv.style.display = 'block';
-          toast('Nenhum fundo válido encontrado para guia: ' + guia);
-          log('Nenhum fundo válido encontrado para guia:', guia);
-        }
-      }
-
       try {
         if (typeof window.runTyping === 'function') {
           window.runTyping(sec);
@@ -1500,7 +1431,7 @@
           })));
         }
       } catch (e) {
-        console.error('[Selfie v6] Erro ao aplicar datilografia/TTS:', e);
+        console.error('[Selfie v7] Erro ao aplicar datilografia/TTS:', e);
         toast('Erro ao carregar texto na selfie. Tente prosseguir.');
       }
     }
@@ -1672,7 +1603,7 @@
     };
 
     document.addEventListener('click', function(ev) {
-      const log = (...a) => { try { console.log('[Nav v4]', ...a); } catch (_) {} };
+      const log = (...a) => { try { console.log('[Nav v5]', ...a); } catch (_) {} };
 
       const secIntro = document.getElementById('section-intro') || document.querySelector('[data-section="intro"], .section-intro');
       if (secIntro) {
@@ -1735,13 +1666,33 @@
 
       const secSenha = document.getElementById('section-senha') || document.querySelector('[data-section="senha"], .section-senha');
       if (secSenha) {
-        const btn = ev.target.closest('[data-action="start"], [data-action="next-senha"], [data-action="accept"], [data-action="accept-terms"], [data-action="termos-aceito"], [data-action="aceito"], .btn-start, .btn-iniciar, button[class*="start"], a[class*="start"], button[class*="iniciar"], a[class*="iniciar"], button:not([data-action="select-guia"]), a:not([data-action="select-guia"])');
+        const btn = ev.target.closest(`
+          [data-action="start"],
+          [data-action="next-senha"],
+          [data-action="accept"],
+          [data-action="accept-terms"],
+          [data-action="termos-aceito"],
+          [data-action="aceito"],
+          #iniciar,
+          .btn-start,
+          .btn-iniciar,
+          .btn-continuar,
+          button[class*="start"],
+          a[class*="start"],
+          button[class*="iniciar"],
+          a[class*="iniciar"],
+          button[class*="continuar"],
+          a[class*="continuar"],
+          button:not([data-action="select-guia"]),
+          a:not([data-action="select-guia"])
+        `);
         if (btn && secSenha.contains(btn)) {
           const txt = (btn.textContent || '').toLowerCase();
-          if (/\biniciar|\bstart|\bavançar|\bpróximo|\bcontinuar|\bprosseguir/.test(txt) || btn.hasAttribute('data-action')) {
+          if (/\biniciar|\bstart|\bavançar|\bpróximo|\bcontinuar|\bprosseguir|\baceitar/.test(txt) || btn.hasAttribute('data-action') || btn.id === 'iniciar') {
             ev.preventDefault();
+            ev.stopPropagation();
             window.startJourney();
-            log('startJourney disparado por:', btn.tagName, btn.className || btn.id);
+            log('startJourney disparado por:', btn.tagName, btn.className || btn.id, 'texto:', txt.slice(0, 50));
           }
         }
       }
@@ -1760,7 +1711,8 @@
           a[class*="next"],
           button[class*="avancar"],
           a[class*="avancar"],
-          button:not([data-action="select-guia"]), a:not([data-action="select-guia"])
+          button:not([data-action="select-guia"]),
+          a:not([data-action="select-guia"])
         `);
         if (btn && secSelfie.contains(btn)) {
           const txt = (btn.textContent || '').toLowerCase();
