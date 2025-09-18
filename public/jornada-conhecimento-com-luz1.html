@@ -1514,12 +1514,35 @@
       return items;
     }
 
-    async function ensureQuestionsReady(maxTries = 40) {
-      const sec = document.getElementById('section-perguntas') || document.querySelector('[data-section="perguntas"], .section-perguntas');
-      if (!sec || !(sec instanceof Element)) {
-        log('Seção de perguntas não encontrada ou inválida');
-        return false;
-      }
+  /* Substitua a sua função ensureQuestionsReady() pelo código abaixo */
+
+async function ensureQuestionsReady() {
+    const sec = document.getElementById('section-perguntas') || document.querySelector('[data-section="perguntas"], .section-perguntas');
+    if (!sec || !(sec instanceof Element)) {
+        log('Seção de perguntas não encontrada ou inválida');
+        return false;
+    }
+
+    // Uso do arquivo jornada-paper-qa.js e usa o seu novo script!
+    if (window.JORNADA_QA && window.JORNADA_BLOCKS) {
+        log('[PERGv6] Construindo perguntas dinamicamente com JORNADA_QA');
+        const primeiroBloco = window.JORNADA_BLOCKS[0];
+        if (primeiroBloco && primeiroBloco.questions.length > 0) {
+            JORNADA_QA.mount(sec.id, primeiroBloco.questions, {
+                onBack: () => console.log('Voltar'),
+                onFinish: () => console.log('Finalizar')
+            });
+            log('[PERGv6] Formulário de perguntas montado.');
+            return true;
+        } else {
+            log('[PERGv6] Nenhum bloco de perguntas encontrado para montar.');
+            return false;
+        }
+    } else {
+        log('[PERGv6] JORNADA_QA não encontrado ou JORNADA_BLOCKS não definido.');
+        return false;
+    }
+}
 
       try {
         window.updateBlocks && window.updateBlocks();
