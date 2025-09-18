@@ -1456,7 +1456,7 @@
     }, true);
   })();
   
-<script id="irmandade-hotfix-dialogo">
+<id="irmandade-hotfix-dialogo">
 (function(){
   // ---- Captura erros silenciosos de promessas (limpa "Uncaught (in promise)") ----
   window.addEventListener('unhandledrejection', e => {
@@ -1627,8 +1627,55 @@
   } else {
     initChatForm();
   }
+})();  
+       
+(function(){
+  // 1) Salvar e espelhar Nome (campo "Seu Nome" na etapa Guia)
+  function applyNameAllSlots(name){
+    const up = (name||'').toUpperCase();
+    const ids = ['guideNameSlot', 'clientNameSlot', 'clientNameSlotFinal', 'guideNameSlotFinal'];
+    ids.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = up; });
+  }
+  document.addEventListener('input', function(e){
+    if (e.target && e.target.id === 'guiaNameInput'){
+      const v = (e.target.value||'').trim();
+      try { localStorage.setItem('JORNADA_NOME', v); } catch(_){}
+      applyNameAllSlots(v);
+    }
+  }, true);
+  // também aplica ao abrir páginas (se o nome já estava salvo)
+  document.addEventListener('DOMContentLoaded', function(){
+    const v = (localStorage.getItem('JORNADA_NOME')||'').trim();
+    if (v) applyNameAllSlots(v);
+  });
+
+  // 2) Compat: carregar selfie final (independente da chave usada)
+  document.addEventListener('DOMContentLoaded', function(){
+    const url = localStorage.getItem('IRMANDADE_SELFIE_FINAL') || localStorage.getItem('SELFIE_FINAL_URL');
+    const img = document.getElementById('selfieInFlame') || document.getElementById('minhaFotoFinal');
+    if (url && img) img.src = url;
+  });
+
+  // 3) Compat: botão do olho da senha sempre funciona
+  document.addEventListener('click', function(e){
+    const t = e.target.closest('[data-action="toggle-password"], .password-toggle, [aria-label*="senha" i]');
+    if (!t) return;
+    const root = document.getElementById('section-senha') || document;
+    const inp = root.querySelector('#senha, #senhaInput, input[type="password"], input[name*="senha" i], input[id*="senha" i]');
+    if (!inp) return;
+    e.preventDefault();
+    inp.type = (inp.type === 'password' ? 'text' : 'password');
+    if (t.classList) t.classList.toggle('on');
+  }, true);
+
+  // 4) Compat: aceitar também 'next-termos' para ir à página de termos
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('[data-action="next-termos"]');
+    if (!btn || typeof window.showSection !== 'function') return;
+    e.preventDefault();
+    window.showSection('section-termos');
+  }, true);
 })();
-  </script>
 
   /* ===== Boot ===== */
   (function(){
