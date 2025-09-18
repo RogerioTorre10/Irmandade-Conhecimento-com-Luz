@@ -1842,10 +1842,13 @@
         }
       }
     }
-    document.addEventListener('DOMContentLoaded', () => {
-    const termosBtn = document.querySelector('[data-action="termos-next"]');
-    if (termosBtn) {
-        termosBtn.addEventListener('click', (ev) => {
+   document.addEventListener('DOMContentLoaded', () => {
+    // Este trecho de código vai encontrar TODOS os botões de navegação dos termos
+    // e adicionar um ouvinte de clique para cada um.
+    const termosBtns = document.querySelectorAll('[data-action="termos-next"], [data-action="termos-next2"], [data-action="termos-next3"], [data-action="termos-next4"]');
+
+    termosBtns.forEach(btn => {
+        btn.addEventListener('click', (ev) => {
             ev.preventDefault();
             ev.stopPropagation();
 
@@ -1869,7 +1872,7 @@
                 console.log('Navegação para section-senha');
             }
         });
-    }
+    });
 });
   })();
 })();
