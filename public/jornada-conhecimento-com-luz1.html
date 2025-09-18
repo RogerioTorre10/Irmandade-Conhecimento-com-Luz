@@ -1077,42 +1077,54 @@ window.showSection = showSection;
     if (eye) eye.classList.toggle('on');
   };
 
-  window.startJourney = async function() {
-    const inputSenha = getSenhaInput();
-    const inputNome = q('#nomeInput, [data-role="nome"], input[name="nome"]', getSenhaSection());
-    const senha = (inputSenha && inputSenha.value || '').trim();
-    const nome = (inputNome && inputNome.value || '').trim();
+ window.startJourney = async function() {
+  const inputSenha = getSenhaInput();
+  const inputNome = q('#nomeInput, [data-role="nome"], input[name="nome"]', getSenhaSection());
+  const senha = (inputSenha && inputSenha.value || '').trim();
+  const nome = (inputNome && inputNome.value || '').trim();
 
-    if (!senha) {
-      toast('Digite a senha para continuar.');
-      if (inputSenha) inputSenha.focus();
-      return;
-    }
+  if (!senha) {
+    toast('Digite a senha para continuar.');
+    if (inputSenha) inputSenha.focus();
+    return;
+  }
 
-    if (nome) { try { localStorage.setItem('JORNADA_NOME', nome); } catch (_) {} }
-    try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (_) {}
+  if (nome) { try { localStorage.setItem('JORNADA_NOME', nome); } catch (_) {} }
+  try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (_) {}
 
-    const hasGuia = !!q('#section-guia, [data-section="guia"], .section-guia');
-    const hasSelfie = !!q('#section-selfie, [data-section="selfie"], .section-selfie');
+  const currentSection = q('.j-section:not(.hidden), [id^="section-"]:not(.hidden)')?.id;
+  if (currentSection === 'section-guia') {
+    console.log('[startJourney] Já na section-guia, evitando navegação redundante');
+    return;
+  }
 
-    if (hasGuia) {
-      showSection('section-guia');
-      requestAnimationFrame(() => setTimeout(() => {
-        const sec = q('#section-guia') || q('[data-section="guia"]') || q('.section-guia');
-        if (sec && typeof window.runTyping === 'function') runTyping(sec);
-      }, 0));
-      return;
-    }
-    if (hasSelfie) {
-      showSection('section-selfie');
-      requestAnimationFrame(() => setTimeout(() => {
-        const sec = q('#section-selfie') || q('[data-section="selfie"]') || q('.section-selfie');
-        if (sec && typeof window.runTyping === 'function') runTyping(sec);
-      }, 0));
-      return;
-    }
-    window.openQuestions();
-  };
+  const hasGuia = !!(q('#section-guia, [data-section="guia"], .section-guia'));
+  const hasSelfie = !!(q('#section-selfie, [data-section="selfie"], .section-selfie'));
+
+  if (hasGuia) {
+    window.showSection('section-guia');
+    requestAnimationFrame(() => setTimeout(() => {
+      const sec = q('#section-guia, [data-section="guia"], .section-guia');
+      if (sec && typeof window.runTyping === 'function') {
+        window.runTyping(sec);
+        console.log('[startJourney] runTyping chamado para section-guia');
+      }
+    }, 0));
+    return;
+  }
+  if (hasSelfie) {
+    window.showSection('section-selfie');
+    requestAnimationFrame(() => setTimeout(() => {
+      const sec = q('#section-selfie, [data-section="selfie"], .section-selfie');
+      if (sec && typeof window.runTyping === 'function') {
+        window.runTyping(sec);
+        console.log('[startJourney] runTyping chamado para section-selfie');
+      }
+    }, 0));
+    return;
+  }
+  window.openQuestions();
+};
 
   /* ===== Guia ===== */
 document.addEventListener('click', function(ev) {
