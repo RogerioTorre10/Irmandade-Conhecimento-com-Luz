@@ -991,14 +991,11 @@
       lastStartJourney = now;
 
       const inputSenha = getSenhaInput();
-      const inputNome = getSenhaSection().querySelector('#nomeInput, [data-role="nome"], input[name="nome"]');
       const senha = (inputSenha && inputSenha.value || '').trim().toLowerCase();
-      const nome = (inputNome && inputNome.value || '').trim();
+      const sectionGuia = document.getElementById('section-guia');
+      const sectionSelfie = document.getElementById('section-selfie');
 
-      log('[startJourney] Senha fornecida:', senha ? '[oculta]' : 'nenhuma', 'Nome:', nome || 'nenhum');
-      // Log para verificar o valor do nome antes de salvar
-      console.log('[startJourney] Tentando salvar nome no localStorage:', nome);
-
+      log('[startJourney] Senha fornecida:', senha ? '[oculta]' : 'nenhuma');
 
       if (!senha) {
         toast('Digite a senha para continuar.');
@@ -1007,6 +1004,21 @@
         return;
       }
 
+      window.speak && window.speak('');
+      
+      // Rogério, a lógica de navegação foi corrigida aqui:
+      if (sectionGuia) {
+        window.showSection('section-guia');
+        log('[startJourney] Navegação para section-guia');
+      } else if (sectionSelfie) {
+        window.showSection('section-selfie');
+        log('[startJourney] Navegação para section-selfie');
+      } else {
+        window.showSection('section-perguntas');
+        log('[startJourney] Navegação para section-perguntas');
+      }
+    };
+    
       if (nome) { try { localStorage.setItem('JORNADA_NOME', nome); } catch (_) {} }
       window.speak && window.speak('');
 
