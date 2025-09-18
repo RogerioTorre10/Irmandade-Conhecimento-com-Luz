@@ -567,17 +567,22 @@
 
     function dedupe(s = '') {
       if (!s) return '';
+      // Normaliza e remove espaços extras
       let result = s.normalize('NFC').trim().replace(/\s+/g, ' ');
       const validDoubleConsonants = /^(.*?(?:ss|rr|tt|cc|pp|mm|nn|ll|bb|dd|ff|gg|vv|zz)[a-z]*?)$/i;
       const words = result.split(' ');
       const out = [];
       for (let w of words) {
+        // Preserva consoantes duplas válidas
         if (validDoubleConsonants.test(w)) {
           out.push(w);
         } else {
-          let c = '';
-          for (let i = 0; i < w.length; i++) {
-            if (i === 0 || w[i] !== w[i - 1] || !/[a-zA-Z]/.test(w[i])) c += w[i];
+          // Remove letras duplicadas, exceto em casos especiais
+          let c = w[0] || '';
+          for (let i = 1; i < w.length; i++) {
+            if (w[i] !== w[i - 1] || !/[a-zA-Z]/.test(w[i])) {
+              c += w[i];
+            }
           }
           out.push(c);
         }
@@ -709,6 +714,8 @@
       setMode(document.getElementById('flame-bottom-right'), score);
     };
     window.JORNADA_CHAMA.ensureHeroFlame = ensureHeroFlame;
+    window.JORNADA_CHAMA.ensureHeaderFlame = ensureHeaderFlame;
+    window.JORNADA_CHAMA.ensurePageFlames = ensurePageFlames;
   })();
 
   /* ===== Datilografia ===== */
@@ -728,7 +735,7 @@
         el.prepend(highlight);
       }
 
-      text = (text || '').replace(/[{}[\]]/g, '').trim();
+      text = window.dedupe(text || '').replace(/[{}[\]]/g, '').trim();
       let i = 0;
 
       return new Promise(resolve => {
@@ -777,6 +784,7 @@
       inp.placeholder = '';
       const aria = document.getElementById('aria-pergunta');
       if (aria) aria.textContent = text;
+      text = window.dedupe(text);
       for (let i = 0; i <= text.length; i++) {
         if (abort) break;
         inp.placeholder = text.slice(0, i) + (i < text.length ? '▌' : '');
@@ -789,6 +797,7 @@
       if (!textarea) return;
       textarea.value = '';
       textarea.classList.add('lumen-typing');
+      text = window.dedupe(text);
       for (let i = 0; i <= text.length; i++) {
         textarea.value = text.slice(0, i);
         await new Promise(r => setTimeout(r, speed));
@@ -797,7 +806,10 @@
     }
 
     async function runTyping(root) {
-      if (!root || root.classList.contains('hidden')) return;
+      if (!root || root.classList.contains('hidden') || !(root instanceof Element)) {
+        console.log('[runTyping] Root inválido ou oculto:', root);
+        return;
+      }
       if (G.__typingLock) return;
       G.__typingLock = true;
 
@@ -805,7 +817,7 @@
         window.speak && window.speak('');
         const elements = Array
           .from(root.querySelectorAll('[data-typing], .text, p, h1, h2, h3, h4, [class*="text"], [class*="title"], [class*="content"]'))
-          .filter(el => !el.dataset.typed && el.offsetParent !== null && !el.closest('.j-section.hidden') && !el.classList.contains('muted'));
+          .filter(el => !el.dataset.typed && el.offsetParent !== null && !el.closest('.j-section.hidden'));
 
         if (elements.length === 0) {
           console.log('[runTyping] Nenhum elemento de texto encontrado em:', root.id || root.className);
@@ -909,7 +921,7 @@
             window.runTyping && window.runTyping(pg1);
             console.log('[showSection] runTyping chamado para termos-pg1');
             const textEl = pg1.querySelector('[data-typing], .termos-text, .text, p, h3, h4');
-            if (textEl && !textEl.dataset.typed && typeof window.typeWriter === 'function') {
+            if (textEl && !textEl.dataset.typed && window.typeWriter) {
               const text = window.dedupe(textEl.getAttribute('data-text') || textEl.textContent || '');
               window.typeWriter(textEl, text, JORNADA.typing.charDelay, false);
               if (JORNADA.tts.enabled && JORNADA.tts.readingMode === 'after' && !window.isMuted) {
@@ -946,7 +958,7 @@
 
   /* ===== Senha ===== */
   (function(){
-    const log = (...a) => { try { console.log('[Senha v2]', ...a); } catch (_) {} };
+    const log = (...a) => { try { console.log('[Senha v3]', ...a); } catch (_) {} };
 
     function getSenhaSection() {
       return document.getElementById('section-senha') || document.querySelector('[data-section="senha"], .section-senha') || document;
@@ -1047,7 +1059,7 @@
 
   /* ===== Guia ===== */
   (function(){
-    const log = (...a) => { try { console.log('[GUIA v13]', ...a); } catch (_) {} };
+    const log = (...a) => { try { console.log('[GUIA v14]', ...a); } catch (_) {} };
 
     function secGuia() {
       return document.getElementById('section-guia') || document.querySelector('[data-section="guia"], .section-guia, .guia-container, .guia') || null;
@@ -1123,8 +1135,8 @@
     }
 
     function enhanceButtons(root) {
-      if (!root) {
-        log('Seção de guia não encontrada');
+      if (!root || !(root instanceof Element)) {
+        log('Seção de guia inválida ou não encontrada');
         return;
       }
 
@@ -1183,7 +1195,10 @@
         const guideNameEl = document.getElementById('guideNameSlot');
         const errorDiv = document.getElementById('selfieError');
         if (card) card.dataset.guide = guia.toUpperCase();
-        if (guideNameEl) guideNameEl.textContent = guia.toUpperCase();
+        if (guideNameEl) {
+          const nome = localStorage.getItem('JORNADA_NOME') || '';
+          guideNameEl.textContent = nome.toUpperCase() || guia.toUpperCase();
+        }
         if (bgImg) {
           const src = await getBgUrl(guia);
           if (src) {
@@ -1208,11 +1223,11 @@
           const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
           if (sec && window.runTyping) {
             window.runTyping(sec);
-            log('[GUIA v13] runTyping chamado para section-selfie');
+            log('[GUIA v14] runTyping chamado para section-selfie');
           }
         }, 0));
       } catch (e) {
-        console.error('[GUIA v13] Erro ao prosseguir após escolha do guia:', e);
+        console.error('[GUIA v14] Erro ao prosseguir após escolha do guia:', e);
         toast('Erro ao prosseguir. Tente novamente.');
       }
     }
@@ -1221,7 +1236,7 @@
       const guia = inferGuideFrom(el);
       log('Guia selecionado:', guia, 'a partir de:', el.tagName, el.id || el.className, 'texto:', (el.textContent || '').slice(0, 50));
       if (!guia) {
-        console.warn('[GUIA v13] Não foi possível inferir o guia.');
+        console.warn('[GUIA v14] Não foi possível inferir o guia.');
         toast('Por favor, selecione um guia válido.');
         return;
       }
@@ -1234,7 +1249,7 @@
         el.classList.add('active');
         await proceedAfterGuia(guia);
       } catch (e) {
-        console.error('[GUIA v13] Erro ao escolher guia:', e);
+        console.error('[GUIA v14] Erro ao escolher guia:', e);
         toast('Erro ao selecionar o guia. Tente novamente.');
       }
     }
@@ -1246,7 +1261,7 @@
           enhanceButtons(root);
           log('Inicialização imediata de enhanceButtons');
         } catch (e) {
-          console.error('[GUIA v13] Erro ao inicializar enhanceButtons:', e);
+          console.error('[GUIA v14] Erro ao inicializar enhanceButtons:', e);
         }
       }
 
@@ -1257,7 +1272,7 @@
           try {
             enhanceButtons(root);
           } catch (e) {
-            console.error('[GUIA v13] Erro ao aplicar enhanceButtons:', e);
+            console.error('[GUIA v14] Erro ao aplicar enhanceButtons:', e);
           }
         }
       });
@@ -1329,27 +1344,25 @@
       document.head.appendChild(style);
     }
 
-    // Inicialização imediata
     try {
       initGuia();
     } catch (e) {
-      console.error('[GUIA v13] Erro ao inicializar guia:', e);
+      console.error('[GUIA v14] Erro ao inicializar guia:', e);
     }
 
-    // Inicialização no DOMContentLoaded
     document.addEventListener('DOMContentLoaded', () => {
       log('Inicializando guia no DOMContentLoaded');
       try {
         initGuia();
       } catch (e) {
-        console.error('[GUIA v13] Erro ao inicializar guia no DOMContentLoaded:', e);
+        console.error('[GUIA v14] Erro ao inicializar guia no DOMContentLoaded:', e);
       }
     });
   })();
 
   /* ===== Selfie ===== */
   (function(){
-    const log = (...a) => { try { console.log('[Selfie v9]', ...a); } catch (_) {} };
+    const log = (...a) => { try { console.log('[Selfie v10]', ...a); } catch (_) {} };
 
     function normGuide(s = '') {
       s = String(s).toLowerCase();
@@ -1399,6 +1412,36 @@
       }
 
       try {
+        const guia = normGuide(localStorage.getItem('JORNADA_GUIA') || '');
+        const card = document.getElementById('card-guide');
+        const bgImg = document.getElementById('guideBg');
+        const guideNameEl = document.getElementById('guideNameSlot');
+        const errorDiv = document.getElementById('selfieError');
+        if (card) card.dataset.guide = guia.toUpperCase();
+        if (guideNameEl) {
+          const nome = localStorage.getItem('JORNADA_NOME') || '';
+          guideNameEl.textContent = nome.toUpperCase() || guia.toUpperCase();
+        }
+        if (bgImg) {
+          const src = await getBgUrl(guia);
+          if (src) {
+            bgImg.src = src;
+            bgImg.onload = () => {
+              if (errorDiv) errorDiv.style.display = 'none';
+              log('Imagem do guia aplicada em #guideBg:', src, 'para guia:', guia);
+            };
+            bgImg.onerror = () => {
+              if (errorDiv) errorDiv.style.display = 'block';
+              toast('Erro ao carregar a imagem de fundo do guia.');
+              log('Erro ao carregar imagem do guia:', src);
+            };
+          } else {
+            if (errorDiv) errorDiv.style.display = 'block';
+            toast('Nenhum fundo válido encontrado para guia: ' + guia);
+            log('Nenhum fundo válido encontrado para guia:', guia);
+          }
+        }
+
         if (window.runTyping) {
           window.runTyping(sec);
           log('runTyping chamado para section-selfie');
@@ -1406,8 +1449,9 @@
         const textEls = sec.querySelectorAll('[data-typing], .text, p, h1, h2, h3, h4, [class*="text"], [class*="title"], [class*="content"]');
         if (textEls.length > 0 && window.typeWriter) {
           for (const textEl of textEls) {
-            if (textEl.dataset.typed || textEl.dataset.typing === '1' || !textEl.offsetParent || textEl.classList.contains('muted')) continue;
-            const text = window.dedupe(textEl.getAttribute('data-text') || textEl.textContent || '');
+            if (textEl.dataset.typed || textEl.dataset.typing === '1' || !textEl.offsetParent) continue;
+            const rawText = textEl.getAttribute('data-text') || textEl.textContent || '';
+            const text = window.dedupe(rawText);
             if (text) {
               await window.typeWriter(textEl, text, JORNADA.typing.charDelay, false);
               if (JORNADA.tts.enabled && JORNADA.tts.readingMode === 'after' && !window.isMuted) {
@@ -1425,7 +1469,7 @@
           })));
         }
       } catch (e) {
-        console.error('[Selfie v9] Erro ao aplicar datilografia/TTS:', e);
+        console.error('[Selfie v10] Erro ao aplicar datilografia/TTS:', e);
         toast('Erro ao carregar texto na selfie. Tente prosseguir.');
       }
     }
@@ -1437,7 +1481,7 @@
         try {
           applySelfieBg();
         } catch (e) {
-          console.error('[Selfie v9] Erro ao aplicar applySelfieBg:', e);
+          console.error('[Selfie v10] Erro ao aplicar applySelfieBg:', e);
         }
       }
     });
@@ -1448,19 +1492,23 @@
       try {
         applySelfieBg();
       } catch (e) {
-        console.error('[Selfie v9] Erro ao inicializar applySelfieBg:', e);
+        console.error('[Selfie v10] Erro ao inicializar applySelfieBg:', e);
       }
     });
   })();
 
   /* ===== Perguntas ===== */
   (function(){
-    const log = (...a) => { try { console.log('[PERGv5]', ...a); } catch (_) {} };
+    const log = (...a) => { try { console.log('[PERGv6]', ...a); } catch (_) {} };
     const wait = (ms) => new Promise(r => setTimeout(r, ms));
 
     function uniq(arr) { return Array.from(new Set(arr)); }
 
     function findBlocks(sec) {
+      if (!sec || !(sec instanceof Element)) {
+        log('Seção de perguntas inválida:', sec);
+        return [];
+      }
       const sel = [
         '.j-bloco', '.js-bloco', '.bloco', '.block',
         '.perguntas-bloco', '.bloco-perguntas', '.q-block', '.quest-block',
@@ -1468,13 +1516,16 @@
         '[data-bloco]', '[data-block]', '[data-role="bloco"]', '[role="group"]'
       ];
       let out = [];
-      for (const s of sel) out = out.concat(sec.querySelectorAll(s));
+      for (const s of sel) {
+        out = out.concat(Array.from(sec.querySelectorAll(s)));
+      }
       out = uniq(out).filter(el => el.offsetParent !== null || getComputedStyle(el).display !== 'none');
       if (!out.length) out = [sec];
       return out;
     }
 
     function looksLikeQuestion(el) {
+      if (!el || !(el instanceof Element)) return false;
       if (el.querySelector('.pergunta-enunciado, .question-title, [data-enunciado], h3, h4, legend')) return true;
       if (el.querySelector('textarea, input, select, [contenteditable]')) return true;
       if (el.matches('[data-pergunta], [data-question]') || el.querySelector('[data-typing]')) return true;
@@ -1484,29 +1535,46 @@
     }
 
     function findQuestions(root) {
+      if (!root || !(root instanceof Element)) {
+        log('Root inválido para findQuestions:', root);
+        return [];
+      }
       const sel = [
         '.j-pergunta', '.pergunta', '.question', '.q-item', '.questao',
         '[data-pergunta]', '[data-question]', '[data-role="pergunta"]'
       ];
       let items = [];
-      for (const s of sel) items = items.concat(root.querySelectorAll(s));
+      for (const s of sel) {
+        items = items.concat(Array.from(root.querySelectorAll(s)));
+      }
       items = uniq(items).filter(looksLikeQuestion);
-      if (!items.length) items = Array.from(root.children).filter(looksLikeQuestion);
+      if (!items.length) {
+        items = Array.from(root.children).filter(looksLikeQuestion);
+      }
       return items;
     }
 
     async function ensureQuestionsReady(maxTries = 40) {
       const sec = document.getElementById('section-perguntas') || document.querySelector('[data-section="perguntas"], .section-perguntas');
-      if (!sec) { log('seção não encontrada'); return false; }
+      if (!sec || !(sec instanceof Element)) {
+        log('Seção de perguntas não encontrada ou inválida');
+        return false;
+      }
 
-      try { window.updateBlocks && window.updateBlocks(); } catch (_) {}
-      try { window.loadDynamicBlocks && window.loadDynamicBlocks(); } catch (_) {}
-      try { window.initJornada && window.initJornada(); } catch (_) {}
+      try {
+        window.updateBlocks && window.updateBlocks();
+        window.loadDynamicBlocks && window.loadDynamicBlocks();
+        window.initJornada && window.initJornada();
+      } catch (e) {
+        log('Erro ao chamar funções de inicialização:', e);
+      }
 
       let blocks = [], questions = [];
       for (let i = 0; i < maxTries; i++) {
         blocks = findBlocks(sec);
-        questions = findQuestions(blocks[0] || sec);
+        if (blocks.length) {
+          questions = findQuestions(blocks[0]);
+        }
         if (blocks.length && questions.length) break;
         await wait(200);
       }
@@ -1542,7 +1610,7 @@
       } else {
         const textEl = first.querySelector('[data-typing], .pergunta-enunciado, .question-title');
         if (textEl && window.typeWriter) {
-          window.typeWriter(textEl, textEl.textContent || textEl.getAttribute('data-text') || '', JORNADA.typing.charDelay, false);
+          window.typeWriter(textEl, window.dedupe(textEl.textContent || textEl.getAttribute('data-text') || ''), JORNADA.typing.charDelay, false);
         }
       }
       return true;
@@ -1622,7 +1690,7 @@
 
   /* ===== Navegação de seções ===== */
   (function(){
-    const log = (...a) => { try { console.log('[Nav v7]', ...a); } catch (_) {} };
+    const log = (...a) => { try { console.log('[Nav v8]', ...a); } catch (_) {} };
 
     document.addEventListener('click', function(ev) {
       const secIntro = document.getElementById('section-intro') || document.querySelector('[data-section="intro"], .section-intro');
