@@ -543,327 +543,354 @@
 (function(){
   'use strict';
 
-  /* ===== util: toast + erro global (leve) ===== */
-  function toast(msg) {
-    try {
-      const t = document.getElementById('toast');
-      if (!t) return;
-      t.textContent = msg;
-      t.classList.remove('hidden');
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 3000);
-    } catch (_) {}
-  }
-  window.addEventListener('error', (e) => {
-    console.error('[Erro global]', e?.error || e);
-    toast('Ops… algo falhou, mas já seguimos em frente.');
-  });
-
-  /* ===== env tag (opcional) ===== */
-  const env = document.getElementById('envTag');
-  if (env) {
-    env.textContent = `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/assets`;
-  }
-
-  /* ===== dedupe (ajustada para preservar consoantes duplas) ===== */
-  function dedupe(s = '') {
-    if (!s) return '';
-    let result = s.normalize('NFC').trim().replace(/\s+/g, ' ');
-    const validDoubleConsonants = /^(.*?(?:ss|rr|tt|cc|pp|mm|nn|ll|bb|dd|ff|gg|vv|zz)[a-z]*?)$/i;
-    const words = result.split(' ');
-    const out = [];
-    for (let w of words) {
-      if (validDoubleConsonants.test(w)) {
-        out.push(w);
-      } else {
-        let c = '';
-        for (let i = 0; i < w.length; i++) {
-          if (i === 0 || w[i] !== w[i - 1] || !/[a-zA-Z]/.test(w[i])) c += w[i];
-        }
-        out.push(c);
-      }
+  /* ===== Utilitários globais ===== */
+  (function(){
+    function toast(msg) {
+      try {
+        const t = document.getElementById('toast');
+        if (!t) return;
+        t.textContent = msg;
+        t.classList.remove('hidden');
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+      } catch (_) {}
     }
-    return out.join(' ').trim();
-  }
-  window.dedupe = dedupe;
+    window.addEventListener('error', (e) => {
+      console.error('[Erro global]', e?.error || e);
+      toast('Ops… algo falhou, mas já seguimos em frente.');
+    });
+
+    const env = document.getElementById('envTag');
+    if (env) {
+      env.textContent = `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/assets`;
+    }
+
+    function dedupe(s = '') {
+      if (!s) return '';
+      let result = s.normalize('NFC').trim().replace(/\s+/g, ' ');
+      const validDoubleConsonants = /^(.*?(?:ss|rr|tt|cc|pp|mm|nn|ll|bb|dd|ff|gg|vv|zz)[a-z]*?)$/i;
+      const words = result.split(' ');
+      const out = [];
+      for (let w of words) {
+        if (validDoubleConsonants.test(w)) {
+          out.push(w);
+        } else {
+          let c = '';
+          for (let i = 0; i < w.length; i++) {
+            if (i === 0 || w[i] !== w[i - 1] || !/[a-zA-Z]/.test(w[i])) c += w[i];
+          }
+          out.push(c);
+        }
+      }
+      return out.join(' ').trim();
+    }
+    window.dedupe = dedupe;
+  })();
 
   /* ===== Config global Jornada ===== */
-  window.JORNADA = window.JORNADA || {};
-  JORNADA.fullTypingMode = (JORNADA.fullTypingMode !== false);
-  JORNADA.typing = Object.assign({ charDelay: 18, caret: false }, (JORNADA.typing || {}));
-  JORNADA.tts = Object.assign({ enabled: true, lang: 'pt-BR', rate: 1.06, pitch: 1.0, voiceName: '', readingMode: 'after' }, (JORNADA.tts || {}));
+  (function(){
+    window.JORNADA = window.JORNADA || {};
+    JORNADA.fullTypingMode = (JORNADA.fullTypingMode !== false);
+    JORNADA.typing = Object.assign({ charDelay: 18, caret: false }, (JORNADA.typing || {}));
+    JORNADA.tts = Object.assign({ enabled: true, lang: 'pt-BR', rate: 1.06, pitch: 1.0, voiceName: '', readingMode: 'after' }, (JORNADA.tts || {}));
+  })();
 
   /* ===== TTS utils ===== */
-  let currentLang = 'pt-BR';
-  window.isMuted = !!window.isMuted;
+  (function(){
+    let currentLang = 'pt-BR';
+    window.isMuted = !!window.isMuted;
 
-  function isSpeechAvailable() {
-    return 'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance !== 'undefined';
-  }
-  function cancelSpeech() {
-    try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (_) {}
-  }
-  async function speak(text) {
-    if (!JORNADA.tts.enabled || window.isMuted) return;
-    if (!isSpeechAvailable()) return;
-
-    await new Promise(r => {
-      const v = speechSynthesis.getVoices();
-      if (v && v.length) return r();
-      speechSynthesis.onvoiceschanged = () => r();
-      setTimeout(() => r(), 300);
-    });
-
-    const u = new SpeechSynthesisUtterance(text || '');
-    u.lang = JORNADA.tts.lang || currentLang;
-    u.rate = +JORNADA.tts.rate || 1.0;
-    u.pitch = +JORNADA.tts.pitch || 1.0;
-    if (JORNADA.tts.voiceName) {
-      const v = speechSynthesis.getVoices().find(v => v.name === JORNADA.tts.voiceName);
-      if (v) u.voice = v;
+    function isSpeechAvailable() {
+      return 'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance !== 'undefined';
     }
-    return new Promise(res => {
-      u.onend = () => res();
-      u.onerror = () => res();
-      try { speechSynthesis.speak(u); } catch (_) { res(); }
-    });
-  }
-  window.speak = speak;
+    function cancelSpeech() {
+      try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (_) {}
+    }
+    async function speak(text) {
+      if (!JORNADA.tts.enabled || window.isMuted) return;
+      if (!isSpeechAvailable()) return;
 
-  function readAloud(text, voiceGender) {
-    if (window.isMuted || !isSpeechAvailable()) return Promise.resolve();
-    const genderName = (voiceGender === 'male' ? 'Male' : 'Female');
-    return new Promise(resolve => {
-      try {
-        speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(text || '');
-        u.lang = currentLang;
-        const voices = speechSynthesis.getVoices();
-        let v = voices.find(v => v.lang === currentLang && v.name.includes(genderName))
-             || voices.find(v => v.lang === currentLang) || voices[0];
+      await new Promise(r => {
+        const v = speechSynthesis.getVoices();
+        if (v && v.length) return r();
+        speechSynthesis.onvoiceschanged = () => r();
+        setTimeout(() => r(), 300);
+      });
+
+      const u = new SpeechSynthesisUtterance(text || '');
+      u.lang = JORNADA.tts.lang || currentLang;
+      u.rate = +JORNADA.tts.rate || 1.0;
+      u.pitch = +JORNADA.tts.pitch || 1.0;
+      if (JORNADA.tts.voiceName) {
+        const v = speechSynthesis.getVoices().find(v => v.name === JORNADA.tts.voiceName);
         if (v) u.voice = v;
-        u.onend = resolve;
-        u.onerror = resolve;
-        speechSynthesis.speak(u);
-      } catch (_) { resolve(); }
-    });
-  }
-  window.readAloud = readAloud;
-
-  /* ===== helpers de navegação ===== */
-  function lockNext() {
-    const btn = document.querySelector('[data-action="next"], [data-action="avancar"]');
-    if (btn) {
-      btn.disabled = true;
-      btn.setAttribute('aria-busy', 'true');
-    }
-  }
-  function unlockNext() {
-    const btn = document.querySelector('[data-action="next"], [data-action="avancar"]');
-    if (btn) {
-      btn.disabled = false;
-      btn.removeAttribute('aria-busy');
-    }
-  }
-
-  /* ===== stubs seguros ===== */
-  function updateCanvasBackground(sectionId) {
-    const canvas = document.getElementById('jornada-canvas');
-    if (!canvas) return;
-    if (sectionId === 'section-perguntas') {
-      canvas.className = 'card pergaminho pergaminho-h';
-      canvas.style.background = 'var(--panel) url(/assets/img/pergaminho-rasgado-horiz.png) no-repeat center/cover';
-    } else {
-      canvas.className = 'card pergaminho pergaminho-v';
-      canvas.style.background = 'var(--panel) url(/assets/img/pergaminho-rasgado-vert.png) no-repeat center/cover';
-    }
-  }
-  function ensureHeroFlame(sectionId) {
-    const canvas = document.getElementById('jornada-canvas');
-    if (!canvas) return;
-    let hero = document.getElementById('chama-hero');
-    const show = (sectionId === 'section-intro' || sectionId === 'section-termos' || sectionId === 'section-senha' || sectionId === 'section-final' || sectionId === 'section-selfie' || sectionId === 'section-guia');
-    if (show) {
-      if (!hero) {
-        hero = makeFlame('chama-vela chama-lg');
-        hero.id = 'chama-hero';
-        hero.style.cssText = 'position:absolute;top:8px;left:8px;z-index:60;';
-        canvas.appendChild(hero);
       }
-    } else if (hero) {
-      hero.remove();
+      return new Promise(res => {
+        u.onend = () => res();
+        u.onerror = () => res();
+        try { speechSynthesis.speak(u); } catch (_) { res(); }
+      });
     }
-  }
-  function ensureHeaderFlame() {
-    const H = document.getElementById('chama-header');
-    if (!H) return;
-    if (!H.querySelector('.brasa')) { H.innerHTML = ''; H.appendChild(makeFlame('chama-vela chama-lg')); }
-  }
-  function ensurePageFlames() {
-    if (!document.getElementById('flame-bottom-right')) {
-      const f = makeFlame('chama-vela chama-md');
-      f.id = 'flame-bottom-right';
-      f.style.cssText = 'position:fixed;bottom:12px;right:12px;z-index:1200;';
-      document.body.appendChild(f);
+    window.speak = speak;
+
+    function readAloud(text, voiceGender) {
+      if (window.isMuted || !isSpeechAvailable()) return Promise.resolve();
+      const genderName = (voiceGender === 'male' ? 'Male' : 'Female');
+      return new Promise(resolve => {
+        try {
+          speechSynthesis.cancel();
+          const u = new SpeechSynthesisUtterance(text || '');
+          u.lang = currentLang;
+          const voices = speechSynthesis.getVoices();
+          let v = voices.find(v => v.lang === currentLang && v.name.includes(genderName))
+               || voices.find(v => v.lang === currentLang) || voices[0];
+          if (v) u.voice = v;
+          u.onend = resolve;
+          u.onerror = resolve;
+          speechSynthesis.speak(u);
+        } catch (_) { resolve(); }
+      });
     }
-  }
-  function makeFlame(cls) {
-    const d = document.createElement('div');
-    d.className = (cls || 'chama-vela chama-md');
-    d.innerHTML = '<div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>';
-    return d;
-  }
-  function setMode(el, score) {
-    if (!el) return;
-    el.classList.remove('fraca', 'media', 'forte');
-    el.classList.add(score <= -2 ? 'fraca' : score >= 2 ? 'forte' : 'media');
-  }
-  window.JORNADA_CHAMA = window.JORNADA_CHAMA || {};
-  window.JORNADA_CHAMA.updateChama = function (score) {
-    const main = ensureInlineFlame('chama-perguntas', 'chama-vela chama-md');
-    setMode(main, score);
-    setMode(document.getElementById('flame-bottom-right'), score);
-  };
-  function ensureInlineFlame(id, cls) {
-    const el = document.getElementById(id);
-    if (!el) return null;
-    if (!el.querySelector('.brasa')) { el.innerHTML = ''; el.appendChild(makeFlame(cls || 'chama-vela chama-md')); }
-    return el.firstElementChild;
-  }
+    window.readAloud = readAloud;
+  })();
 
-  /* ===== datilografia fluida ===== */
-  const G = (typeof window !== 'undefined' ? window : globalThis);
-  if (G.__typingLock == null) G.__typingLock = false;
-  if (G.__DEFAULT_SPEED_TYPING == null) G.__DEFAULT_SPEED_TYPING = 80;
-  const DEFAULT_SPEED = G.__DEFAULT_SPEED_TYPING;
+  /* ===== Chamas ===== */
+  (function(){
+    function makeFlame(cls) {
+      const d = document.createElement('div');
+      d.className = (cls || 'chama-vela chama-md');
+      d.innerHTML = '<div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>';
+      return d;
+    }
+    function ensureHeroFlame(sectionId) {
+      const canvas = document.getElementById('jornada-canvas');
+      if (!canvas) return;
+      let hero = document.getElementById('chama-hero');
+      const show = (sectionId === 'section-intro' || sectionId === 'section-termos' || sectionId === 'section-senha' || sectionId === 'section-final' || sectionId === 'section-selfie' || sectionId === 'section-guia');
+      if (show) {
+        if (!hero) {
+          hero = makeFlame('chama-vela chama-lg');
+          hero.id = 'chama-hero';
+          hero.style.cssText = 'position:absolute;top:8px;left:8px;z-index:60;';
+          canvas.appendChild(hero);
+        }
+      } else if (hero) {
+        hero.remove();
+      }
+    }
+    function ensureHeaderFlame() {
+      const H = document.getElementById('chama-header');
+      if (!H) return;
+      if (!H.querySelector('.brasa')) { H.innerHTML = ''; H.appendChild(makeFlame('chama-vela chama-lg')); }
+    }
+    function ensurePageFlames() {
+      if (!document.getElementById('flame-bottom-right')) {
+        const f = makeFlame('chama-vela chama-md');
+        f.id = 'flame-bottom-right';
+        f.style.cssText = 'position:fixed;bottom:12px;right:12px;z-index:1200;';
+        document.body.appendChild(f);
+      }
+    }
+    function setMode(el, score) {
+      if (!el) return;
+      el.classList.remove('fraca', 'media', 'forte');
+      el.classList.add(score <= -2 ? 'fraca' : score >= 2 ? 'forte' : 'media');
+    }
+    function ensureInlineFlame(id, cls) {
+      const el = document.getElementById(id);
+      if (!el) return null;
+      if (!el.querySelector('.brasa')) { el.innerHTML = ''; el.appendChild(makeFlame(cls || 'chama-vela chama-md')); }
+      return el.firstElementChild;
+    }
+    window.JORNADA_CHAMA = window.JORNADA_CHAMA || {};
+    window.JORNADA_CHAMA.updateChama = function(score) {
+      const main = ensureInlineFlame('chama-perguntas', 'chama-vela chama-md');
+      setMode(main, score);
+      setMode(document.getElementById('flame-bottom-right'), score);
+    };
+    window.JORNADA_CHAMA.ensureHeroFlame = ensureHeroFlame;
+  })();
 
-  window.typeWriter = function (el, text, speed, showCursor) {
-    if (!el || el.dataset.typing === '1' || el.dataset.typed === '1') return Promise.resolve();
-    el.dataset.typing = '1';
-    el.textContent = '';
-    const highlight = el.querySelector('.highlight') || document.createElement('div');
-    if (!highlight.parentNode) {
-      highlight.className = 'highlight';
-      el.prepend(highlight);
+  /* ===== Datilografia ===== */
+  (function(){
+    const G = (typeof window !== 'undefined' ? window : globalThis);
+    if (G.__typingLock == null) G.__typingLock = false;
+    if (G.__DEFAULT_SPEED_TYPING == null) G.__DEFAULT_SPEED_TYPING = 80;
+    const DEFAULT_SPEED = G.__DEFAULT_SPEED_TYPING;
+
+    window.typeWriter = function(el, text, speed, showCursor) {
+      if (!el || el.dataset.typing === '1' || el.dataset.typed === '1') return Promise.resolve();
+      el.dataset.typing = '1';
+      el.textContent = '';
+      const highlight = el.querySelector('.highlight') || document.createElement('div');
+      if (!highlight.parentNode) {
+        highlight.className = 'highlight';
+        el.prepend(highlight);
+      }
+
+      text = (text || '').replace(/[{}[\]]/g, '').trim();
+      let i = 0;
+
+      return new Promise(resolve => {
+        function step() {
+          if (!el.isConnected || el.offsetParent === null || el.closest('.j-section.hidden')) {
+            el.classList.remove('lumen-typing');
+            const h = el.querySelector('.highlight');
+            if (h) h.style.width = '0';
+            el.dataset.typed = '0';
+            el.dataset.typing = '0';
+            return resolve();
+          }
+
+          if (i < text.length) {
+            const char = text.charAt(i++);
+            el.textContent += char;
+            try {
+              const canvas = document.createElement('canvas');
+              const ctx = canvas.getContext('2d');
+              ctx.font = getComputedStyle(el).font;
+              highlight.style.width = `${ctx.measureText(el.textContent).width}px`;
+            } catch (_) {}
+            setTimeout(step, speed || DEFAULT_SPEED);
+          } else {
+            el.classList.add('typing-done');
+            el.classList.remove('lumen-typing');
+            const h = el.querySelector('.highlight');
+            if (h) h.style.width = '0';
+            el.dataset.typed = '1';
+            el.dataset.typing = '0';
+            resolve();
+          }
+        }
+        if (showCursor) el.classList.add('lumen-typing');
+        setTimeout(step, 0);
+      });
+    };
+    if (typeof window.typewriter !== 'function') window.typewriter = window.typeWriter;
+
+    let __abortTypingPlaceholder = null;
+    async function typePlaceholder(inp, text, speed = 22) {
+      if (!inp) return;
+      if (__abortTypingPlaceholder) __abortTypingPlaceholder();
+      let abort = false;
+      __abortTypingPlaceholder = () => abort = true;
+      inp.placeholder = '';
+      const aria = document.getElementById('aria-pergunta');
+      if (aria) aria.textContent = text;
+      for (let i = 0; i <= text.length; i++) {
+        if (abort) break;
+        inp.placeholder = text.slice(0, i) + (i < text.length ? '▌' : '');
+        await new Promise(r => setTimeout(r, speed));
+      }
+      if (!abort) inp.placeholder = text;
     }
 
-    text = (text || '').replace(/[{}[\]]/g, '').trim();
-    let i = 0;
+    async function typeAnswer(textarea, text, speed = 36) {
+      if (!textarea) return;
+      textarea.value = '';
+      textarea.classList.add('lumen-typing');
+      for (let i = 0; i <= text.length; i++) {
+        textarea.value = text.slice(0, i);
+        await new Promise(r => setTimeout(r, speed));
+      }
+      textarea.classList.add('typing-done');
+    }
 
-    return new Promise(resolve => {
-      function step() {
-        if (!el.isConnected || el.offsetParent === null || el.closest('.j-section.hidden')) {
-          el.classList.remove('lumen-typing');
-          const h = el.querySelector('.highlight');
-          if (h) h.style.width = '0';
-          el.dataset.typed = '0';
-          el.dataset.typing = '0';
-          return resolve();
+    async function runTyping(root) {
+      if (!root || root.classList.contains('hidden')) return;
+      if (G.__typingLock) return;
+      G.__typingLock = true;
+
+      try {
+        window.speak && window.speak('');
+        const elements = Array
+          .from(root.querySelectorAll('[data-typing], .text, p, h1, h2, h3, h4, [class*="text"], [class*="title"], [class*="content"]'))
+          .filter(el => !el.dataset.typed && el.offsetParent !== null && !el.closest('.j-section.hidden') && !el.classList.contains('muted'));
+
+        if (elements.length === 0) {
+          console.log('[runTyping] Nenhum elemento de texto encontrado em:', root.id || root.className);
         }
 
-        if (i < text.length) {
-          const char = text.charAt(i++);
-          el.textContent += char;
-          try {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            ctx.font = getComputedStyle(el).font;
-            highlight.style.width = `${ctx.measureText(el.textContent).width}px`;
-          } catch (_) {}
-          setTimeout(step, speed || DEFAULT_SPEED);
-        } else {
-          el.classList.add('typing-done');
-          el.classList.remove('lumen-typing');
-          const h = el.querySelector('.highlight');
-          if (h) h.style.width = '0';
-          el.dataset.typed = '1';
-          el.dataset.typing = '0';
-          resolve();
+        for (const el of elements) {
+          if (el.dataset.typing === '1' || el.dataset.typed === '1') continue;
+          const rawText = el.getAttribute('data-text') || el.textContent || '';
+          const text = window.dedupe(rawText);
+          el.textContent = '';
+          const highlight = el.querySelector('.highlight');
+          if (highlight) highlight.style.width = '0';
+          const speed = parseInt(el.getAttribute('data-speed') || DEFAULT_SPEED, 10);
+          const showCursor = String(el.getAttribute('data-cursor') || 'true') === 'true';
+          await window.typeWriter(el, text, speed, showCursor);
+          if (JORNADA.tts.enabled && JORNADA.tts.readingMode === 'after' && !window.isMuted) {
+            await window.speak(text);
+          }
+          console.log('[runTyping] Datilografia e TTS aplicados em:', el.tagName, el.className || el.id, 'texto:', text.slice(0, 50));
         }
+      } catch (e) {
+        console.error('[runTyping] erro:', e);
+        toast('Erro durante a datilografia.');
+      } finally {
+        G.__typingLock = false;
       }
-      if (showCursor) el.classList.add('lumen-typing');
-      setTimeout(step, 0);
-    });
-  };
-  if (typeof window.typewriter !== 'function') window.typewriter = window.typeWriter;
-
-  /* ===== datilografia no placeholder e respostas ===== */
-  let __abortTypingPlaceholder = null;
-  async function typePlaceholder(inp, text, speed = 22) {
-    if (!inp) return;
-    if (__abortTypingPlaceholder) __abortTypingPlaceholder();
-    let abort = false;
-    __abortTypingPlaceholder = () => abort = true;
-    inp.placeholder = '';
-    const aria = document.getElementById('aria-pergunta');
-    if (aria) aria.textContent = text;
-    for (let i = 0; i <= text.length; i++) {
-      if (abort) break;
-      inp.placeholder = text.slice(0, i) + (i < text.length ? '▌' : '');
-      await new Promise(r => setTimeout(r, speed));
     }
-    if (!abort) inp.placeholder = text;
-  }
-  async function typeAnswer(textarea, text, speed = 36) {
-    if (!textarea) return;
-    textarea.value = '';
-    textarea.classList.add('lumen-typing');
-    for (let i = 0; i <= text.length; i++) {
-      textarea.value = text.slice(0, i);
-      await new Promise(r => setTimeout(r, speed));
+    window.runTyping = runTyping;
+    window.typePlaceholder = typePlaceholder;
+    window.typeAnswer = typeAnswer;
+  })();
+
+  /* ===== Navegação ===== */
+  (function(){
+    function hideAllSections() {
+      document.querySelectorAll('.j-section, [id^="section-"]').forEach(s => {
+        s.classList.add('hidden');
+        s.style.display = 'none';
+      });
     }
-    textarea.classList.add('typing-done');
-  }
 
-  /* ===== runTyping (com TTS sincronizado) ===== */
-  async function runTyping(root) {
-    if (!root || root.classList.contains('hidden')) return;
-    if (G.__typingLock) return;
-    G.__typingLock = true;
+    function updateCanvasBackground(sectionId) {
+      const canvas = document.getElementById('jornada-canvas');
+      if (!canvas) return;
+      if (sectionId === 'section-perguntas') {
+        canvas.className = 'card pergaminho pergaminho-h';
+        canvas.style.background = 'var(--panel) url(/assets/img/pergaminho-rasgado-horiz.png) no-repeat center/cover';
+      } else {
+        canvas.className = 'card pergaminho pergaminho-v';
+        canvas.style.background = 'var(--panel) url(/assets/img/pergaminho-rasgado-vert.png) no-repeat center/cover';
+      }
+    }
 
-    try {
-      cancelSpeech();
-      const elements = Array
-        .from(root.querySelectorAll('[data-typing], .text, p, h1, h2, h3, h4, [class*="text"], [class*="title"], [class*="content"]'))
-        .filter(el => !el.dataset.typed && el.offsetParent !== null && !el.closest('.j-section.hidden') && !el.classList.contains('muted'));
+    function lockNext() {
+      const btn = document.querySelector('[data-action="next"], [data-action="avancar"]');
+      if (btn) {
+        btn.disabled = true;
+        btn.setAttribute('aria-busy', 'true');
+      }
+    }
+    function unlockNext() {
+      const btn = document.querySelector('[data-action="next"], [data-action="avancar"]');
+      if (btn) {
+        btn.disabled = false;
+        btn.removeAttribute('aria-busy');
+      }
+    }
 
-      if (elements.length === 0) {
-        console.log('[runTyping] Nenhum elemento de texto encontrado em:', root.id || root.className);
+    window.showSection = function(sectionId) {
+      console.log('[showSection] Exibindo seção:', sectionId);
+      window.speak && window.speak('');
+
+      hideAllSections();
+      const active = document.getElementById(sectionId) || document.querySelector(`[data-section="${sectionId.replace('section-','')}"], .${sectionId}`);
+      if (!active) {
+        console.error('[showSection] Seção não encontrada:', sectionId);
+        toast('Erro ao carregar a seção. Tente novamente.');
+        return;
       }
 
-      for (const el of elements) {
-        if (el.dataset.typing === '1' || el.dataset.typed === '1') continue;
-        const rawText = el.getAttribute('data-text') || el.textContent || '';
-        const text = dedupe(rawText);
-        el.textContent = '';
-        const highlight = el.querySelector('.highlight');
-        if (highlight) highlight.style.width = '0';
-        const speed = parseInt(el.getAttribute('data-speed') || DEFAULT_SPEED, 10);
-        const showCursor = String(el.getAttribute('data-cursor') || 'true') === 'true';
-        await window.typeWriter(el, text, speed, showCursor);
-        if (JORNADA.tts.enabled && JORNADA.tts.readingMode === 'after' && !window.isMuted) {
-          await window.speak(text);
-        }
-        console.log('[runTyping] Datilografia e TTS aplicados em:', el.tagName, el.className || el.id, 'texto:', text.slice(0, 50));
-      }
-    } catch (e) {
-      console.error('[runTyping] erro:', e);
-      toast('Erro durante a datilografia.');
-    } finally {
-      G.__typingLock = false;
-    }
-  }
-  window.runTyping = runTyping;
+      active.classList.remove('hidden');
+      active.style.display = 'block';
+      console.log('[showSection] Seção ativa:', active.id || active.className);
 
-  /* ===== showSection (com runTyping) ===== */
-  function showSection(sectionId) {
-    console.log('[showSection] Exibindo seção:', sectionId);
-    cancelSpeech();
-
-    document.querySelectorAll('.j-section').forEach(s => {
-      s.classList.add('hidden');
-      s.style.display = 'none';
-      s.querySelectorAll('[data-typing], .text, p, h1, h2, h3, h4').forEach(el => {
+      active.querySelectorAll('[data-typing], .text, p, h1, h2, h3, h4').forEach(el => {
         el.classList.remove('lumen-typing', 'typing-done');
         el.dataset.typing = '0';
         delete el.dataset.typed;
@@ -873,267 +900,154 @@
         if (h) h.style.width = '0';
         if (!el.hasAttribute('data-text') && keepText) el.setAttribute('data-text', keepText);
       });
-    });
 
-    const active = document.getElementById(sectionId) || document.querySelector(`[data-section="${sectionId.replace('section-','')}"], .${sectionId}`);
-    if (!active) {
-      console.error('[showSection] Seção não encontrada:', sectionId);
-      toast('Erro ao carregar a seção. Tente novamente.');
-      return;
-    }
-
-    active.classList.remove('hidden');
-    active.style.display = 'block';
-    console.log('[showSection] Seção ativa:', active.id || active.className);
-
-    requestAnimationFrame(() => setTimeout(() => {
-      runTyping(active);
-      if (sectionId === 'section-termos') {
-        const pg1 = document.getElementById('termos-pg1') || active.querySelector('[class*="termos-pg"], .termos-page, .page');
-        if (pg1 && !pg1.classList.contains('hidden')) {
-          runTyping(pg1);
-          console.log('[showSection] runTyping chamado para termos-pg1');
-          const textEl = pg1.querySelector('[data-typing], .termos-text, .text, p, h3, h4');
-          if (textEl && !textEl.dataset.typed && typeof window.typeWriter === 'function') {
-            const text = dedupe(textEl.getAttribute('data-text') || textEl.textContent || '');
-            window.typeWriter(textEl, text, JORNADA.typing.charDelay, false);
-            if (JORNADA.tts.enabled && JORNADA.tts.readingMode === 'after' && !window.isMuted) {
-              window.speak(text);
+      requestAnimationFrame(() => setTimeout(() => {
+        window.runTyping && window.runTyping(active);
+        if (sectionId === 'section-termos') {
+          const pg1 = document.getElementById('termos-pg1') || active.querySelector('[class*="termos-pg"], .termos-page, .page');
+          if (pg1 && !pg1.classList.contains('hidden')) {
+            window.runTyping && window.runTyping(pg1);
+            console.log('[showSection] runTyping chamado para termos-pg1');
+            const textEl = pg1.querySelector('[data-typing], .termos-text, .text, p, h3, h4');
+            if (textEl && !textEl.dataset.typed && typeof window.typeWriter === 'function') {
+              const text = window.dedupe(textEl.getAttribute('data-text') || textEl.textContent || '');
+              window.typeWriter(textEl, text, JORNADA.typing.charDelay, false);
+              if (JORNADA.tts.enabled && JORNADA.tts.readingMode === 'after' && !window.isMuted) {
+                window.speak && window.speak(text);
+              }
+              console.log('[showSection] Fallback de datilografia e TTS aplicado em termos:', textEl.tagName, textEl.className || textEl.id);
             }
-            console.log('[showSection] Fallback de datilografia e TTS aplicado em termos:', textEl.tagName, textEl.className || textEl.id);
           }
         }
+      }, 0));
+
+      updateCanvasBackground(sectionId);
+      window.JORNADA_CHAMA && window.JORNADA_CHAMA.ensureHeroFlame(sectionId);
+
+      if (sectionId === 'section-perguntas') {
+        window.ensureQuestionsReady && window.ensureQuestionsReady();
       }
-    }, 0));
 
-    updateCanvasBackground(sectionId);
-    ensureHeroFlame(sectionId);
-
-    if (sectionId === 'section-perguntas') {
-      const perguntas = document.querySelectorAll('.j-pergunta');
-      if (perguntas.length) {
-        const first = document.querySelector('.j-pergunta.active') || perguntas[0];
-        first.classList.add('active');
-        const lbl = first.querySelector('.pergunta-enunciado')?.textContent || '';
-        const ta = first.querySelector('textarea');
-        if (ta) typePlaceholder(ta, lbl, 22);
-        const aria = document.getElementById('aria-pergunta');
-        if (aria) aria.textContent = lbl;
-      } else if (typeof window.loadDynamicBlocks === 'function') {
-        window.loadDynamicBlocks();
-      }
-      requestAnimationFrame(() => setTimeout(() => ensureQuestionsReady(), 0));
-    }
-
-    if (sectionId === 'section-final') {
-      const url = localStorage.getItem('IRMANDADE_SELFIE_FINAL');
-      if (url) {
-        const img = document.querySelector('#minhaFotoFinal');
-        if (img) img.src = url;
-      }
-    }
-
-    if (sectionId === 'section-guia') {
-      const guiaNameInput = document.getElementById('guiaNameInput');
-      const storedName = localStorage.getItem('JORNADA_NOME') || '';
-      if (guiaNameInput && storedName) guiaNameInput.value = storedName.toUpperCase();
-    }
-  }
-  window.showSection = showSection;
-
-  /* ===== Avançar ===== */
-  let __isTransitioning = false;
-  function ensureFirstQuestion() {
-    const sec = document.getElementById('section-perguntas');
-    if (!sec) return false;
-
-    let vis = sec.querySelector('.j-bloco[style*="display: block"]');
-    const blocks = Array.from(sec.querySelectorAll('.j-bloco'));
-    if (!vis && blocks.length) {
-      blocks.forEach((b, i) => b.style.display = i === 0 ? 'block' : 'none');
-      vis = blocks[0];
-    }
-
-    const activeQ = sec.querySelector('.j-pergunta.active');
-    if (!activeQ && vis) {
-      const first = vis.querySelector('.j-pergunta');
-      if (first) {
-        first.classList.add('active');
-        const lbl = first.querySelector('.pergunta-enunciado')?.textContent || '';
-        const aria = document.getElementById('aria-pergunta');
-        if (aria) aria.textContent = lbl;
-        runTyping(vis);
-        return true;
-      }
-    }
-    return !!activeQ;
-  }
-
-  function goNext() {
-    if (__isTransitioning) return;
-    __isTransitioning = true;
-
-    try {
-      const sec = document.getElementById('section-perguntas');
-      if (!sec || sec.classList.contains('hidden')) {
-        if (sec) {
-          showSection('section-perguntas');
-          requestAnimationFrame(() => setTimeout(() => ensureFirstQuestion(), 0));
+      if (sectionId === 'section-final') {
+        const url = localStorage.getItem('IRMANDADE_SELFIE_FINAL');
+        if (url) {
+          const img = document.querySelector('#minhaFotoFinal');
+          if (img) img.src = url;
         }
-        return;
       }
 
-      if (!ensureFirstQuestion()) return;
-
-      const bloco = sec.querySelector('.j-bloco[style*="display: block"]') || sec.querySelector('.j-bloco');
-      const perguntas = bloco ? Array.from(bloco.querySelectorAll('.j-pergunta')) : [];
-      const current = bloco ? bloco.querySelector('.j-pergunta.active') : null;
-
-      if (!bloco || perguntas.length === 0) return;
-
-      if (!current) {
-        perguntas[0].classList.add('active');
-        runTyping(bloco);
-        return;
+      if (sectionId === 'section-guia') {
+        const guiaNameInput = document.getElementById('guiaNameInput');
+        const storedName = localStorage.getItem('JORNADA_NOME') || '';
+        if (guiaNameInput && storedName) guiaNameInput.value = storedName.toUpperCase();
       }
-
-      const i = perguntas.indexOf(current);
-      current.classList.remove('active');
-
-      if (i >= 0 && i + 1 < perguntas.length) {
-        const prox = perguntas[i + 1];
-        prox.classList.add('active');
-        const lbl = prox.querySelector('.pergunta-enunciado')?.textContent || '';
-        const aria = document.getElementById('aria-pergunta');
-        if (aria) aria.textContent = lbl;
-        runTyping(prox);
-        return;
-      }
-
-      const allBlocks = Array.from(sec.querySelectorAll('.j-bloco'));
-      const idx = allBlocks.indexOf(bloco);
-      if (idx >= 0 && idx + 1 < allBlocks.length) {
-        allBlocks.forEach(b => b.style.display = 'none');
-        const nextBlock = allBlocks[idx + 1];
-        nextBlock.style.display = 'block';
-        const first = nextBlock.querySelector('.j-pergunta');
-        if (first) {
-          first.classList.add('active');
-          const lbl = first.querySelector('.pergunta-enunciado')?.textContent || '';
-          const aria = document.getElementById('aria-pergunta');
-          if (aria) aria.textContent = lbl;
-          runTyping(nextBlock);
-        }
-        return;
-      }
-
-      showSection('section-final');
-    } finally {
-      setTimeout(() => __isTransitioning = false, 150);
-    }
-  }
-  window.goNext = goNext;
+    };
+  })();
 
   /* ===== Senha ===== */
-  function getSenhaSection() {
-    return document.getElementById('section-senha') || document.querySelector('[data-section="senha"], .section-senha') || document;
-  }
-  function getSenhaInput() {
-    const root = getSenhaSection();
-    const tries = [
-      '#senhaInput',
-      '#iniciar',
-      'input[data-role="senha"]',
-      'input[name="senha"]',
-      'input[name*="senha" i]',
-      'input[id*="senha" i]',
-      'input[type="password"]',
-      'input[type="text"][name*="senha" i]',
-      'input[type="text"][id*="senha" i]',
-      '.senha input',
-      '.senha-input'
-    ];
-    for (const sel of tries) {
-      const el = root.querySelector(sel);
-      if (el) return el;
+  (function(){
+    const log = (...a) => { try { console.log('[Senha v2]', ...a); } catch (_) {} };
+
+    function getSenhaSection() {
+      return document.getElementById('section-senha') || document.querySelector('[data-section="senha"], .section-senha') || document;
     }
-    return root.querySelector('input');
-  }
-
-  let lastStartJourney = 0;
-  window.startJourney = async function() {
-    const now = performance.now();
-    if (now - lastStartJourney < 1000) {
-      console.log('[startJourney] Debounce: evitando chamada repetida');
-      return;
-    }
-    lastStartJourney = now;
-
-    const inputSenha = getSenhaInput();
-    const inputNome = getSenhaSection().querySelector('#nomeInput, [data-role="nome"], input[name="nome"]');
-    const senha = (inputSenha && inputSenha.value || '').trim().toLowerCase();
-    const nome = (inputNome && inputNome.value || '').trim();
-
-    console.log('[startJourney] Senha fornecida:', senha ? '[oculta]' : 'nenhuma', 'Nome:', nome || 'nenhum');
-
-    if (!senha) {
-      toast('Digite a senha para continuar.');
-      if (inputSenha) inputSenha.focus();
-      console.log('[startJourney] Senha não fornecida');
-      return;
+    function getSenhaInput() {
+      const root = getSenhaSection();
+      const tries = [
+        '#senhaInput',
+        '#iniciar',
+        'input[data-role="senha"]',
+        'input[name="senha"]',
+        'input[name*="senha" i]',
+        'input[id*="senha" i]',
+        'input[type="password"]',
+        'input[type="text"][name*="senha" i]',
+        'input[type="text"][id*="senha" i]',
+        '.senha input',
+        '.senha-input'
+      ];
+      for (const sel of tries) {
+        const el = root.querySelector(sel);
+        if (el) return el;
+      }
+      return root.querySelector('input');
     }
 
-    if (nome) { try { localStorage.setItem('JORNADA_NOME', nome); } catch (_) {} }
-    cancelSpeech();
+    window.toggleSenha = function() {
+      const input = getSenhaInput();
+      if (!input) { log('[Senha] input não encontrado'); return; }
+      input.type = (input.type === 'password' ? 'text' : 'password');
+      const eye = getSenhaSection().querySelector('[data-role="eye"], [data-action="toggle-password"] i, [data-action="toggle-password"] svg');
+      if (eye) eye.classList.toggle('on');
+    };
 
-    const currentSection = document.querySelector('.j-section:not(.hidden), [id^="section-"]:not(.hidden)')?.id;
-    if (currentSection === 'section-guia' || currentSection === 'section-selfie') {
-      console.log('[startJourney] Já na section-guia ou section-selfie, evitando navegação redundante');
-      return;
-    }
+    let lastStartJourney = 0;
+    window.startJourney = async function() {
+      const now = performance.now();
+      if (now - lastStartJourney < 1000) {
+        log('[startJourney] Debounce: evitando chamada repetida');
+        return;
+      }
+      lastStartJourney = now;
 
-    const hasGuia = !!(document.getElementById('section-guia') || document.querySelector('[data-section="guia"], .section-guia'));
-    const hasSelfie = !!(document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie'));
+      const inputSenha = getSenhaInput();
+      const inputNome = getSenhaSection().querySelector('#nomeInput, [data-role="nome"], input[name="nome"]');
+      const senha = (inputSenha && inputSenha.value || '').trim().toLowerCase();
+      const nome = (inputNome && inputNome.value || '').trim();
 
-    if (hasGuia) {
-      window.showSection('section-guia');
-      requestAnimationFrame(() => setTimeout(() => {
-        const sec = document.getElementById('section-guia') || document.querySelector('[data-section="guia"], .section-guia');
-        if (sec && typeof window.runTyping === 'function') {
-          window.runTyping(sec);
-          console.log('[startJourney] runTyping chamado para section-guia');
-        }
-      }, 0));
-      console.log('[startJourney] Navegação para section-guia');
-      return;
-    }
-    if (hasSelfie) {
-      window.showSection('section-selfie');
-      requestAnimationFrame(() => setTimeout(() => {
-        const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
-        if (sec && typeof window.runTyping === 'function') {
-          window.runTyping(sec);
-          console.log('[startJourney] runTyping chamado para section-selfie');
-        }
-      }, 0));
-      console.log('[startJourney] Navegação para section-selfie');
-      return;
-    }
-    window.openQuestions();
-    console.log('[startJourney] Navegação para section-perguntas (fallback)');
-  };
+      log('[startJourney] Senha fornecida:', senha ? '[oculta]' : 'nenhuma', 'Nome:', nome || 'nenhum');
 
-  window.toggleSenha = function() {
-    const input = getSenhaInput();
-    if (!input) { console.warn('[Senha] input não encontrado'); return; }
-    input.type = (input.type === 'password' ? 'text' : 'password');
-    const eye = getSenhaSection().querySelector('[data-role="eye"], [data-action="toggle-password"] i, [data-action="toggle-password"] svg');
-    if (eye) eye.classList.toggle('on');
-  };
+      if (!senha) {
+        toast('Digite a senha para continuar.');
+        if (inputSenha) inputSenha.focus();
+        log('[startJourney] Senha não fornecida');
+        return;
+      }
+
+      if (nome) { try { localStorage.setItem('JORNADA_NOME', nome); } catch (_) {} }
+      window.speak && window.speak('');
+
+      const currentSection = document.querySelector('.j-section:not(.hidden), [id^="section-"]:not(.hidden)')?.id;
+      if (currentSection === 'section-guia' || currentSection === 'section-selfie') {
+        log('[startJourney] Já na section-guia ou section-selfie, evitando navegação redundante');
+        return;
+      }
+
+      const hasGuia = !!(document.getElementById('section-guia') || document.querySelector('[data-section="guia"], .section-guia'));
+      const hasSelfie = !!(document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie'));
+
+      if (hasGuia) {
+        window.showSection('section-guia');
+        requestAnimationFrame(() => setTimeout(() => {
+          const sec = document.getElementById('section-guia') || document.querySelector('[data-section="guia"], .section-guia');
+          if (sec && window.runTyping) {
+            window.runTyping(sec);
+            log('[startJourney] runTyping chamado para section-guia');
+          }
+        }, 0));
+        log('[startJourney] Navegação para section-guia');
+        return;
+      }
+      if (hasSelfie) {
+        window.showSection('section-selfie');
+        requestAnimationFrame(() => setTimeout(() => {
+          const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
+          if (sec && window.runTyping) {
+            window.runTyping(sec);
+            log('[startJourney] runTyping chamado para section-selfie');
+          }
+        }, 0));
+        log('[startJourney] Navegação para section-selfie');
+        return;
+      }
+      window.openQuestions && window.openQuestions();
+      log('[startJourney] Navegação para section-perguntas (fallback)');
+    };
+  })();
 
   /* ===== Guia ===== */
   (function(){
-    const log = (...a) => { try { console.log('[GUIA v11]', ...a); } catch (_) {} };
+    const log = (...a) => { try { console.log('[GUIA v13]', ...a); } catch (_) {} };
 
     function secGuia() {
       return document.getElementById('section-guia') || document.querySelector('[data-section="guia"], .section-guia, .guia-container, .guia') || null;
@@ -1208,6 +1122,59 @@
       });
     }
 
+    function enhanceButtons(root) {
+      if (!root) {
+        log('Seção de guia não encontrada');
+        return;
+      }
+
+      const candidates = root.querySelectorAll(`
+        [data-action="select-guia"],
+        [data-guide],
+        [data-guide-id],
+        .choose-guide,
+        .btn-guia,
+        .card-guia,
+        .guia-option,
+        .guia-item,
+        .guide-selector,
+        #btnLumen, #btnZion, #btnArion,
+        img[alt*="Lumen" i], img[alt*="Zion" i], img[alt*="Arion" i],
+        button[class*="guia"], a[class*="guia"],
+        [class*="guide"], [id*="guide"]
+      `);
+
+      if (candidates.length === 0) {
+        log('Nenhum botão de guia encontrado. Snapshot do DOM:', Array.from(root.children).slice(0, 10).map(el => ({
+          tag: el.tagName.toLowerCase(),
+          id: el.id || '',
+          class: el.className || '',
+          attrs: Object.keys(el.dataset || {}).join(','),
+          text: (el.textContent || '').slice(0, 50)
+        })));
+      } else {
+        log('Botões de guia encontrados:', candidates.length, 'em:', root.id || root.className);
+      }
+
+      candidates.forEach(el => {
+        if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
+        el.style.cursor = 'pointer';
+        el.style.pointerEvents = 'auto';
+        if (!el.getAttribute('data-guide')) {
+          const g = inferGuideFrom(el);
+          if (g) el.setAttribute('data-guide', g);
+        }
+        el.setAttribute('role', 'button');
+        el.setAttribute('aria-label', `Escolher guia ${inferGuideFrom(el) || 'desconhecido'}`);
+      });
+
+      root.querySelectorAll('.click-shield, .overlay, [data-overlay], .modal-overlay, .blocker, [class*="overlay"], [class*="shield"], [class*="block"]').forEach(ov => {
+        ov.style.pointerEvents = 'none';
+        ov.style.display = 'none';
+        log('Overlay desativado:', ov.className || ov.id);
+      });
+    }
+
     async function proceedAfterGuia(guia) {
       try {
         localStorage.setItem('JORNADA_GUIA', guia);
@@ -1239,22 +1206,22 @@
         window.showSection('section-selfie');
         requestAnimationFrame(() => setTimeout(() => {
           const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
-          if (sec && typeof window.runTyping === 'function') {
+          if (sec && window.runTyping) {
             window.runTyping(sec);
-            console.log('[GUIA v11] runTyping chamado para section-selfie');
+            log('[GUIA v13] runTyping chamado para section-selfie');
           }
         }, 0));
       } catch (e) {
-        console.error('[GUIA v11] Erro ao prosseguir após escolha do guia:', e);
+        console.error('[GUIA v13] Erro ao prosseguir após escolha do guia:', e);
         toast('Erro ao prosseguir. Tente novamente.');
       }
     }
 
-    function choose(el) {
+    async function choose(el) {
       const guia = inferGuideFrom(el);
       log('Guia selecionado:', guia, 'a partir de:', el.tagName, el.id || el.className, 'texto:', (el.textContent || '').slice(0, 50));
       if (!guia) {
-        console.warn('[GUIA v11] Não foi possível inferir o guia.');
+        console.warn('[GUIA v13] Não foi possível inferir o guia.');
         toast('Por favor, selecione um guia válido.');
         return;
       }
@@ -1265,97 +1232,124 @@
           root.querySelectorAll('[data-action="select-guia"], [data-guide], [data-guide-id], .choose-guide, .btn-guia, .card-guia, .guia-option, .guia-item, .guide-selector, #btnLumen, #btnZion, #btnArion').forEach(n => n.classList.remove('active'));
         }
         el.classList.add('active');
-        proceedAfterGuia(guia);
+        await proceedAfterGuia(guia);
       } catch (e) {
-        console.error('[GUIA v11] Erro ao escolher guia:', e);
+        console.error('[GUIA v13] Erro ao escolher guia:', e);
         toast('Erro ao selecionar o guia. Tente novamente.');
       }
     }
 
-    document.addEventListener('click', function(ev) {
+    function initGuia() {
       const root = secGuia();
-      if (!root || !root.contains(ev.target)) return; // Evita logs fora da section-guia
-      const target = ev.target;
-      const el = target.closest(`
-        [data-action="select-guia"],
-        [data-guide],
-        [data-guide-id],
-        .choose-guide,
-        .btn-guia,
-        .card-guia,
-        .guia-option,
-        .guia-item,
-        .guide-selector,
-        #btnLumen, #btnZion, #btnArion,
-        img[alt*="Lumen" i], img[alt*="Zion" i], img[alt*="Arion" i],
-        button[class*="guia"], a[class*="guia"],
-        [class*="guide"], [id*="guide"]
-      `);
-      if (!el || !root.contains(el)) {
-        log('Nenhum botão de guia clicado:', target.tagName, target.className || target.id);
-        return;
+      if (root) {
+        try {
+          enhanceButtons(root);
+          log('Inicialização imediata de enhanceButtons');
+        } catch (e) {
+          console.error('[GUIA v13] Erro ao inicializar enhanceButtons:', e);
+        }
       }
 
-      const g = inferGuideFrom(el);
-      if (!g) {
-        log('Nenhum guia inferido para elemento:', el.tagName, el.id || el.className);
-        return;
-      }
+      const mo = new MutationObserver(() => {
+        const root = secGuia();
+        if (root && !root.classList.contains('hidden')) {
+          log('Seção de guia detectada, aplicando enhanceButtons');
+          try {
+            enhanceButtons(root);
+          } catch (e) {
+            console.error('[GUIA v13] Erro ao aplicar enhanceButtons:', e);
+          }
+        }
+      });
+      mo.observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style'] });
 
-      ev.preventDefault();
-      ev.stopPropagation();
-      choose(el);
-    }, true);
+      document.addEventListener('click', function(ev) {
+        const root = secGuia();
+        if (!root || !root.contains(ev.target)) return;
+        const target = ev.target;
+        const el = target.closest(`
+          [data-action="select-guia"],
+          [data-guide],
+          [data-guide-id],
+          .choose-guide,
+          .btn-guia,
+          .card-guia,
+          .guia-option,
+          .guia-item,
+          .guide-selector,
+          #btnLumen, #btnZion, #btnArion,
+          img[alt*="Lumen" i], img[alt*="Zion" i], img[alt*="Arion" i],
+          button[class*="guia"], a[class*="guia"],
+          [class*="guide"], [id*="guide"]
+        `);
+        if (!el || !root.contains(el)) {
+          log('Nenhum botão de guia clicado:', target.tagName, target.className || target.id);
+          return;
+        }
 
-    document.addEventListener('keydown', function(ev) {
-      if (ev.key !== 'Enter' && ev.key !== ' ') return;
-      const root = secGuia();
-      if (!root) return;
-      const el = document.activeElement;
-      if (!el || !root.contains(el)) return;
+        const g = inferGuideFrom(el);
+        if (!g) {
+          log('Nenhum guia inferido para elemento:', el.tagName, el.id || el.className);
+          return;
+        }
 
-      const g = inferGuideFrom(el);
-      if (!g) {
-        log('Nenhum guia inferido para elemento ativo:', el.tagName, el.id || el.className);
-        return;
-      }
+        ev.preventDefault();
+        ev.stopPropagation();
+        choose(el);
+      }, true);
 
-      ev.preventDefault();
-      choose(el);
-    }, true);
+      document.addEventListener('keydown', function(ev) {
+        if (ev.key !== 'Enter' && ev.key !== ' ') return;
+        const root = secGuia();
+        if (!root) return;
+        const el = document.activeElement;
+        if (!el || !root.contains(el)) return;
 
-    const style = document.createElement('style');
-    style.textContent = `
-      [data-action="select-guia"], [data-guide], [data-guide-id], .choose-guide, .btn-guia, .card-guia, .guia-option, .guia-item, .guide-selector, #btnLumen, #btnZion, #btnArion {
-        pointer-events: auto;
-        cursor: pointer;
-        outline: none;
-      }
-      [data-action="select-guia"].active, [data-guide].active, [data-guide-id].active, .choose-guide.active, .btn-guia.active, .card-guia.active, .guia-option.active, .guia-item.active, .guide-selector.active, #btnLumen.active, #btnZion.active, #btnArion.active {
-        box-shadow: 0 0 0 2px rgba(255,215,0,.7);
-      }
-    `;
-    document.head.appendChild(style);
+        const g = inferGuideFrom(el);
+        if (!g) {
+          log('Nenhum guia inferido para elemento ativo:', el.tagName, el.id || el.className);
+          return;
+        }
 
-    const mo = new MutationObserver(() => {
-      const root = secGuia();
-      if (root && !root.classList.contains('hidden')) {
-        log('Seção de guia detectada, aplicando enhanceButtons');
-        enhanceButtons();
-      }
-    });
-    mo.observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style'] });
+        ev.preventDefault();
+        choose(el);
+      }, true);
 
+      const style = document.createElement('style');
+      style.textContent = `
+        [data-action="select-guia"], [data-guide], [data-guide-id], .choose-guide, .btn-guia, .card-guia, .guia-option, .guia-item, .guide-selector, #btnLumen, #btnZion, #btnArion {
+          pointer-events: auto;
+          cursor: pointer;
+          outline: none;
+        }
+        [data-action="select-guia"].active, [data-guide].active, [data-guide-id].active, .choose-guide.active, .btn-guia.active, .card-guia.active, .guia-option.active, .guia-item.active, .guide-selector.active, #btnLumen.active, #btnZion.active, #btnArion.active {
+          box-shadow: 0 0 0 2px rgba(255,215,0,.7);
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    // Inicialização imediata
+    try {
+      initGuia();
+    } catch (e) {
+      console.error('[GUIA v13] Erro ao inicializar guia:', e);
+    }
+
+    // Inicialização no DOMContentLoaded
     document.addEventListener('DOMContentLoaded', () => {
-      log('Inicializando enhanceButtons no DOMContentLoaded');
-      enhanceButtons();
+      log('Inicializando guia no DOMContentLoaded');
+      try {
+        initGuia();
+      } catch (e) {
+        console.error('[GUIA v13] Erro ao inicializar guia no DOMContentLoaded:', e);
+      }
     });
-    enhanceButtons();
   })();
 
   /* ===== Selfie ===== */
   (function(){
-    const log = (...a) => { try { console.log('[Selfie v7]', ...a); } catch (_) {} };
+    const log = (...a) => { try { console.log('[Selfie v9]', ...a); } catch (_) {} };
 
     function normGuide(s = '') {
       s = String(s).toLowerCase();
@@ -1405,12 +1399,12 @@
       }
 
       try {
-        if (typeof window.runTyping === 'function') {
+        if (window.runTyping) {
           window.runTyping(sec);
           log('runTyping chamado para section-selfie');
         }
         const textEls = sec.querySelectorAll('[data-typing], .text, p, h1, h2, h3, h4, [class*="text"], [class*="title"], [class*="content"]');
-        if (textEls.length > 0 && typeof window.typeWriter === 'function') {
+        if (textEls.length > 0 && window.typeWriter) {
           for (const textEl of textEls) {
             if (textEl.dataset.typed || textEl.dataset.typing === '1' || !textEl.offsetParent || textEl.classList.contains('muted')) continue;
             const text = window.dedupe(textEl.getAttribute('data-text') || textEl.textContent || '');
@@ -1431,7 +1425,7 @@
           })));
         }
       } catch (e) {
-        console.error('[Selfie v7] Erro ao aplicar datilografia/TTS:', e);
+        console.error('[Selfie v9] Erro ao aplicar datilografia/TTS:', e);
         toast('Erro ao carregar texto na selfie. Tente prosseguir.');
       }
     }
@@ -1440,14 +1434,22 @@
       const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
       if (sec && !sec.classList.contains('hidden')) {
         log('Seção de selfie detectada, aplicando applySelfieBg');
-        applySelfieBg();
+        try {
+          applySelfieBg();
+        } catch (e) {
+          console.error('[Selfie v9] Erro ao aplicar applySelfieBg:', e);
+        }
       }
     });
     moSelfie.observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style'] });
 
     document.addEventListener('DOMContentLoaded', () => {
       log('Inicializando applySelfieBg no DOMContentLoaded');
-      applySelfieBg();
+      try {
+        applySelfieBg();
+      } catch (e) {
+        console.error('[Selfie v9] Erro ao inicializar applySelfieBg:', e);
+      }
     });
   })();
 
@@ -1497,9 +1499,9 @@
       const sec = document.getElementById('section-perguntas') || document.querySelector('[data-section="perguntas"], .section-perguntas');
       if (!sec) { log('seção não encontrada'); return false; }
 
-      try { typeof window.updateBlocks === 'function' && window.updateBlocks(); } catch (_) {}
-      try { typeof window.loadDynamicBlocks === 'function' && window.loadDynamicBlocks(); } catch (_) {}
-      try { typeof window.initJornada === 'function' && window.initJornada(); } catch (_) {}
+      try { window.updateBlocks && window.updateBlocks(); } catch (_) {}
+      try { window.loadDynamicBlocks && window.loadDynamicBlocks(); } catch (_) {}
+      try { window.initJornada && window.initJornada(); } catch (_) {}
 
       let blocks = [], questions = [];
       for (let i = 0; i < maxTries; i++) {
@@ -1535,11 +1537,11 @@
       const lbl = (first.querySelector('.pergunta-enunciado, .question-title, [data-enunciado], h3, h4, p') || {}).textContent || '';
       if (aria) aria.textContent = lbl;
 
-      if (typeof window.runTyping === 'function') {
+      if (window.runTyping) {
         window.runTyping(vis || sec);
       } else {
         const textEl = first.querySelector('[data-typing], .pergunta-enunciado, .question-title');
-        if (textEl && typeof window.typeWriter === 'function') {
+        if (textEl && window.typeWriter) {
           window.typeWriter(textEl, textEl.textContent || textEl.getAttribute('data-text') || '', JORNADA.typing.charDelay, false);
         }
       }
@@ -1548,63 +1550,81 @@
     window.ensureQuestionsReady = ensureQuestionsReady;
 
     window.openQuestions = function() {
-      showSection('section-perguntas');
-      requestAnimationFrame(() => setTimeout(() => ensureQuestionsReady(), 0));
+      window.showSection('section-perguntas');
+      requestAnimationFrame(() => setTimeout(() => window.ensureQuestionsReady && window.ensureQuestionsReady(), 0));
     };
 
-    const mo = new MutationObserver(() => {
-      const sec = document.getElementById('section-perguntas') || document.querySelector('[data-section="perguntas"], .section-perguntas');
-      if (sec && !sec.classList.contains('hidden')) ensureQuestionsReady();
-    });
-    mo.observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style'] });
+    let __isTransitioning = false;
+    window.goNext = function() {
+      if (__isTransitioning) return;
+      __isTransitioning = true;
+
+      try {
+        const sec = document.getElementById('section-perguntas');
+        if (!sec || sec.classList.contains('hidden')) {
+          if (sec) {
+            window.showSection('section-perguntas');
+            requestAnimationFrame(() => setTimeout(() => window.ensureQuestionsReady && window.ensureQuestionsReady(), 0));
+          }
+          return;
+        }
+
+        if (!window.ensureQuestionsReady || !window.ensureQuestionsReady()) return;
+
+        const bloco = sec.querySelector('.j-bloco[style*="display: block"]') || sec.querySelector('.j-bloco');
+        const perguntas = bloco ? Array.from(bloco.querySelectorAll('.j-pergunta')) : [];
+        const current = bloco ? bloco.querySelector('.j-pergunta.active') : null;
+
+        if (!bloco || perguntas.length === 0) return;
+
+        if (!current) {
+          perguntas[0].classList.add('active');
+          window.runTyping && window.runTyping(bloco);
+          return;
+        }
+
+        const i = perguntas.indexOf(current);
+        current.classList.remove('active');
+
+        if (i >= 0 && i + 1 < perguntas.length) {
+          const prox = perguntas[i + 1];
+          prox.classList.add('active');
+          const lbl = prox.querySelector('.pergunta-enunciado')?.textContent || '';
+          const aria = document.getElementById('aria-pergunta');
+          if (aria) aria.textContent = lbl;
+          window.runTyping && window.runTyping(prox);
+          return;
+        }
+
+        const allBlocks = Array.from(sec.querySelectorAll('.j-bloco'));
+        const idx = allBlocks.indexOf(bloco);
+        if (idx >= 0 && idx + 1 < allBlocks.length) {
+          allBlocks.forEach(b => b.style.display = 'none');
+          const nextBlock = allBlocks[idx + 1];
+          nextBlock.style.display = 'block';
+          const first = nextBlock.querySelector('.j-pergunta');
+          if (first) {
+            first.classList.add('active');
+            const lbl = first.querySelector('.pergunta-enunciado')?.textContent || '';
+            const aria = document.getElementById('aria-pergunta');
+            if (aria) aria.textContent = lbl;
+            window.runTyping && window.runTyping(nextBlock);
+          }
+          return;
+        }
+
+        window.showSection('section-final');
+      } finally {
+        setTimeout(() => __isTransitioning = false, 150);
+      }
+    };
   })();
 
-  /* ===== Section Hider ===== */
+  /* ===== Navegação de seções ===== */
   (function(){
-    function hideAllSections() {
-      document.querySelectorAll('.j-section, [id^="section-"]').forEach(s => {
-        s.classList.add('hidden');
-        s.style.display = 'none';
-      });
-    }
-
-    let _lastEnsure = 0;
-    function ensureOnce() {
-      const now = performance.now();
-      if (now - _lastEnsure < 300) return;
-      _lastEnsure = now;
-      ensureQuestionsReady();
-    }
-
-    const prevShow = window.showSection;
-    window.showSection = function(sectionId) {
-      try {
-        cancelSpeech();
-      } catch (_) {}
-      hideAllSections();
-      const active = document.getElementById(sectionId) || document.querySelector(`[data-section="${sectionId.replace('section-','')}"], .${sectionId}`);
-      if (active) {
-        active.classList.remove('hidden');
-        active.style.display = 'block';
-      }
-      if (sectionId === 'section-perguntas') {
-        requestAnimationFrame(() => setTimeout(ensureOnce, 0));
-      } else {
-        const selfie = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
-        if (selfie && sectionId !== 'section-selfie') {
-          selfie.style.pointerEvents = 'none';
-          selfie.classList.add('hidden');
-          selfie.style.display = 'none';
-        }
-      }
-      if (typeof window.runTyping === 'function' && active) {
-        requestAnimationFrame(() => setTimeout(() => window.runTyping(active), 0));
-      }
-    };
+    const log = (...a) => { try { console.log('[Nav v7]', ...a); } catch (_) {} };
 
     document.addEventListener('click', function(ev) {
-      const log = (...a) => { try { console.log('[Nav v5]', ...a); } catch (_) {} };
-
       const secIntro = document.getElementById('section-intro') || document.querySelector('[data-section="intro"], .section-intro');
       if (secIntro) {
         const btn = ev.target.closest('[data-action="next"], [data-action="avancar"], .btn-next, .btn-avancar, button[class*="next"], a[class*="next"], button[class*="avancar"], a[class*="avancar"], button:not([data-action="select-guia"]), a:not([data-action="select-guia"])');
@@ -1653,7 +1673,7 @@
               if (cur) cur.classList.add('hidden');
               if (nxt) {
                 nxt.classList.remove('hidden');
-                window.runTyping(nxt);
+                window.runTyping && window.runTyping(nxt);
                 log('Navegação para próxima página de termos:', nxt.id);
               }
             } else {
@@ -1691,7 +1711,7 @@
           if (/\biniciar|\bstart|\bavançar|\bpróximo|\bcontinuar|\bprosseguir|\baceitar/.test(txt) || btn.hasAttribute('data-action') || btn.id === 'iniciar') {
             ev.preventDefault();
             ev.stopPropagation();
-            window.startJourney();
+            window.startJourney && window.startJourney();
             log('startJourney disparado por:', btn.tagName, btn.className || btn.id, 'texto:', txt.slice(0, 50));
           }
         }
@@ -1734,34 +1754,36 @@
       const btnToggle = ev.target.closest('[data-action="toggle-password"], .password-toggle');
       if (btnToggle) {
         ev.preventDefault();
-        window.toggleSenha();
+        window.toggleSenha && window.toggleSenha();
         log('toggleSenha disparado');
       }
     }, true);
   })();
 
   /* ===== Boot ===== */
-  console.log('[Boot] Iniciando script seguro');
-  try {
-    ensureHeaderFlame();
-    ensurePageFlames();
-  } catch (e) {
-    console.error('[Boot] Erro ao garantir chamas:', e);
-  }
-  if (typeof window.speechSynthesis !== 'undefined') {
-    speechSynthesis.onvoiceschanged = () => {};
-  }
-  if (document.getElementById('section-intro')) {
-    showSection('section-intro');
-  } else {
-    const possibleSections = ['section-termos', 'section-senha', 'section-guia', 'section-perguntas'];
-    for (const secId of possibleSections) {
-      if (document.getElementById(secId)) {
-        showSection(secId);
-        break;
+  (function(){
+    console.log('[Boot] Iniciando script seguro');
+    try {
+      window.JORNADA_CHAMA && window.JORNADA_CHAMA.ensureHeaderFlame && window.JORNADA_CHAMA.ensureHeaderFlame();
+      window.JORNADA_CHAMA && window.JORNADA_CHAMA.ensurePageFlames && window.JORNADA_CHAMA.ensurePageFlames();
+    } catch (e) {
+      console.error('[Boot] Erro ao garantir chamas:', e);
+    }
+    if (typeof window.speechSynthesis !== 'undefined') {
+      speechSynthesis.onvoiceschanged = () => {};
+    }
+    if (document.getElementById('section-intro')) {
+      window.showSection('section-intro');
+    } else {
+      const possibleSections = ['section-termos', 'section-senha', 'section-guia', 'section-perguntas'];
+      for (const secId of possibleSections) {
+        if (document.getElementById(secId)) {
+          window.showSection(secId);
+          break;
+        }
       }
     }
-  }
+  })();
 })();
 </script>
 </body>
