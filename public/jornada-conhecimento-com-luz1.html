@@ -1131,10 +1131,10 @@ window.showSection = showSection;
   'use strict';
   const q = (s, r = document) => r.querySelector(s);
   const qa = (s, r = document) => Array.from(r.querySelectorAll(s));
-  const log = (...a) => { try { console.log('[GUIA v6]', ...a); } catch (_) {} };
+  const log = (...a) => { try { console.log('[GUIA v7]', ...a); } catch (_) {} };
 
   function secGuia() {
-    return q('#section-guia, [data-section="guia"], .section-guia, .guia-container, .guia, [class*="guia"], [id*="guia"]') || document;
+    return q('#section-guia, [data-section="guia"], .section-guia, .guia-container, .guia, [class*="guia"], [id*="guia"], .j-section:not(.hidden)') || document;
   }
 
   function normGuide(x = '') {
@@ -1196,7 +1196,7 @@ window.showSection = showSection;
       button[class*="guia"], a[class*="guia"],
       [class*="guide"], [id*="guide"],
       button, a, div[tabindex], [role="button"],
-      .btn, .button, .option
+      .btn, .button, .option, .select-guide, .guide-btn, .guia-button
     `, root);
 
     if (candidates.length === 0) {
@@ -1204,7 +1204,8 @@ window.showSection = showSection;
         tag: el.tagName.toLowerCase(),
         id: el.id || '',
         class: el.className || '',
-        attrs: Object.keys(el.dataset || {}).join(',')
+        attrs: Object.keys(el.dataset || {}).join(','),
+        text: (el.textContent || '').slice(0, 50)
       })));
     } else {
       log('Botões de guia encontrados:', candidates.length, 'em:', root.id || root.className);
@@ -1222,7 +1223,7 @@ window.showSection = showSection;
       el.setAttribute('aria-label', `Escolher guia ${inferGuideFrom(el) || 'desconhecido'}`);
     });
 
-    qa('.click-shield, .overlay, [data-overlay], .modal-overlay, .blocker, [class*="overlay"], [class*="shield"]', root).forEach(ov => {
+    qa('.click-shield, .overlay, [data-overlay], .modal-overlay, .blocker, [class*="overlay"], [class*="shield"], [class*="block"]', root).forEach(ov => {
       ov.style.pointerEvents = 'none';
       ov.style.display = 'none';
       log('Overlay desativado:', ov.className || ov.id);
@@ -1246,155 +1247,68 @@ window.showSection = showSection;
         log('Navegação para section-perguntas');
       }
     } catch (e) {
-      console.error('[GUIA v6] Erro ao navegar após escolha do guia:', e);
+      console.error('[GUIA v7] Erro ao navegar após escolha do guia:', e);
       toast('Erro ao prosseguir. Tente novamente.');
     }
   }
 
   function choose(el) {
     const guia = inferGuideFrom(el);
-    log('Guia selecionado:', guia, 'a partir de:', el.tagName, el.id || el.className);
+    log('Guia selecionado:', guia, 'a partir de:', el.tagName, el.id || el.className, 'texto:', (el.textContent || '').slice(0, 50));
     if (!guia) {
-      console.warn('[GUIA v6] Não foi possível inferir o guia.');
+      console.warn('[GUIA v7] Não foi possível inferir o guia.');
       toast('Por favor, selecione um guia válido.');
       return;
     }
 
     try {
       localStorage.setItem('JORNADA_GUIA', guia);
-      qa('[data-action*="guide"], [data-guide], [data-guide-id], .choose-guide, .btn-guia, .card-guia, .guia-option, .guia-item, .guide-selector, .btn, .button, .option').forEach(n => n.classList.remove('active'));
+      qa('[data-action*="guide"], [data-guide], [data-guide-id], .choose-guide, .btn-guia, .card-guia, .guia-option, .guia-item, .guide-selector, .btn, .button, .option, .select-guide, .guide-btn, .guia-button').forEach(n => n.classList.remove('active'));
       el.classList.add('active');
       goNextAfterGuide();
     } catch (e) {
-      console.error('[GUIA v6] Erro ao escolher guia:', e);
+      console.error('[GUIA v7] Erro ao escolher guia:', e);
       toast('Erro ao selecionar o guia. Tente novamente.');
     }
   }
 
   document.addEventListener('click', function(ev) {
-  const q = (s, r = document) => r.querySelector(s);
-  const qa = (s, r = document) => Array.from(r.querySelectorAll(s));
-  const log = (...a) => { try { console.log('[Nav v1]', ...a); } catch (_) {} };
-
-  // Selfie navigation
-  const secSelfie = q('#section-selfie, [data-section="selfie"], .section-selfie');
-  if (secSelfie) {
-    const btn = ev.target.closest?.(`
-      [data-action="selfie-next"],
-      [data-action="skip-selfie"],
-      #btnSkipSelfie,
-      .btn-skip-selfie,
-      [data-role="start"],
-      button[class*="skip"],
-      button[class*="next"],
-      a[class*="skip"],
-      a[class*="next"],
-      button, a
+    const root = secGuia();
+    const target = ev.target;
+    const activeSection = q('.j-section:not(.hidden), [id^="section-"]:not(.hidden)') || document;
+    const el = target.closest(`
+      [data-action*="guide"],
+      [data-guide],
+      [data-guide-id],
+      .choose-guide,
+      .btn-guia,
+      .card-guia,
+      .guia-option,
+      .guia-item,
+      .guide-selector,
+      #btnLumen, #btnZion, #btnArion,
+      img[alt*="Lumen" i], img[alt*="Zion" i], img[alt*="Arion" i],
+      button[class*="guia"], a[class*="guia"],
+      [class*="guide"], [id*="guide"],
+      button, a, div[tabindex], [role="button"],
+      .btn, .button, .option, .select-guide, .guide-btn, .guia-button
     `);
-    if (btn && secSelfie.contains(btn)) {
-      const txt = (btn.textContent || '').toLowerCase();
-      if (/\bpular|\biniciar|\bcomeçar|\bconfirmar|\bprosseguir/.test(txt) || btn.hasAttribute('data-action')) {
-        ev.preventDefault();
-        window.showSection('section-perguntas');
-        log('Navegação para section-perguntas disparada por:', btn.tagName, btn.className || btn.id);
-      }
+    if (!el || !activeSection.contains(el)) {
+      log('Nenhum botão de guia clicado:', target.tagName, target.className || target.id);
+      return;
     }
-  }
 
-  // Termos navigation
-  const termosSel = `
-    [data-action="termos-next"],
-    [data-action="termos-next2"],
-    [data-action="termos-next3"],
-    [data-action="termos-next4"],
-    [data-action*="next"],
-    [data-action*="avancar"],
-    .btn-termos,
-    .termos-btn,
-    button[class*="termos"],
-    a[class*="termos"],
-    button[class*="next"],
-    a[class*="next"],
-    button[class*="avancar"],
-    a[class*="avancar"],
-    button, a
-  `;
-  const btnTermosNext = ev.target.closest?.(termosSel);
-  if (btnTermosNext) {
-    const secTermos = q('#section-termos, [data-section="termos"], .section-termos');
-    if (secTermos && secTermos.contains(btnTermosNext)) {
-      ev.preventDefault();
-      const pages = ['termos-pg1', 'termos-pg2', 'termos-pg3', 'termos-pg4', 'termos-pg5'];
-      const visId = pages.find(id => {
-        const el = document.getElementById(id);
-        return el && !el.classList.contains('hidden');
-      });
-      const idx = pages.indexOf(visId);
-      if (idx >= 0 && idx + 1 < pages.length) {
-        const cur = document.getElementById(pages[idx]);
-        const nxt = document.getElementById(pages[idx + 1]);
-        if (cur) cur.classList.add('hidden');
-        if (nxt) {
-          nxt.classList.remove('hidden');
-          window.runTyping(nxt);
-          log('Navegação para próxima página de termos:', nxt.id);
-        }
-      } else {
-        window.showSection('section-senha');
-        log('Navegação para section-senha');
-      }
+    const g = inferGuideFrom(el);
+    if (!g) {
+      log('Nenhum guia inferido para elemento:', el.tagName, el.id || el.className);
+      return;
     }
-  }
 
-  // Intro navigation
-  const secIntro = q('#section-intro, [data-section="intro"], .section-intro');
-  if (secIntro) {
-    const btn = ev.target.closest?.('[data-action="next"], [data-action="avancar"], .btn-next, .btn-avancar, button[class*="next"], a[class*="next"], button, a');
-    if (btn && secIntro.contains(btn)) {
-      const txt = (btn.textContent || '').toLowerCase();
-      if (/\bavançar|\bpróximo|\bcontinuar|\bprosseguir/.test(txt) || btn.hasAttribute('data-action')) {
-        ev.preventDefault();
-        window.showSection('section-termos');
-        log('Navegação para section-termos disparada por:', btn.tagName, btn.className || btn.id);
-      }
-    }
-  }
-
-  // Outras ações
-  const btnToTermos = ev.target.closest?.('[data-action="next-termos"]');
-  if (btnToTermos) {
     ev.preventDefault();
-    window.showSection('section-termos');
-    log('Navegação para section-termos');
-  }
+    ev.stopPropagation();
+    choose(el);
+  }, true);
 
-  const acceptSel = '[data-action="next-senha"], [data-action="accept"], [data-action="accept-terms"], [data-action="termos-aceito"], [data-action="aceito"]';
-  const btnAccept = ev.target.closest?.(acceptSel);
-  if (btnAccept) {
-    ev.preventDefault();
-    window.showSection('section-senha');
-    requestAnimationFrame(() => setTimeout(() => {
-      const sec = document.getElementById('section-senha');
-      if (sec) window.runTyping(sec);
-      log('Navegação para section-senha com runTyping');
-    }, 0));
-  }
-
-  const btnStart = ev.target.closest?.('[data-action="start"]');
-  if (btnStart) {
-    ev.preventDefault();
-    window.startJourney();
-    log('startJourney disparado');
-  }
-
-  const btnToggle = ev.target.closest?.('[data-action="toggle-password"], .password-toggle');
-  if (btnToggle) {
-    ev.preventDefault();
-    window.toggleSenha();
-    log('toggleSenha disparado');
-  }
-}, true);
-  
   document.addEventListener('keydown', function(ev) {
     if (ev.key !== 'Enter' && ev.key !== ' ') return;
     const root = secGuia() || q('.j-section:not(.hidden), [id^="section-"]:not(.hidden)') || document;
@@ -1402,7 +1316,10 @@ window.showSection = showSection;
     if (!el || !root.contains(el)) return;
 
     const g = inferGuideFrom(el);
-    if (!g) return;
+    if (!g) {
+      log('Nenhum guia inferido para elemento ativo:', el.tagName, el.id || el.className);
+      return;
+    }
 
     ev.preventDefault();
     choose(el);
@@ -1410,12 +1327,12 @@ window.showSection = showSection;
 
   const style = document.createElement('style');
   style.textContent = `
-    [data-action*="guide"], [data-guide], [data-guide-id], .choose-guide, .btn-guia, .card-guia, .guia-option, .guia-item, .guide-selector, .btn, .button, .option {
+    [data-action*="guide"], [data-guide], [data-guide-id], .choose-guide, .btn-guia, .card-guia, .guia-option, .guia-item, .guide-selector, .btn, .button, .option, .select-guide, .guide-btn, .guia-button {
       pointer-events: auto;
       cursor: pointer;
       outline: none;
     }
-    [data-action*="guide"].active, [data-guide].active, [data-guide-id].active, .choose-guide.active, .btn-guia.active, .card-guia.active, .guia-option.active, .guia-item.active, .guide-selector.active, .btn.active, .button.active, .option.active {
+    [data-action*="guide"].active, [data-guide].active, [data-guide-id].active, .choose-guide.active, .btn-guia.active, .card-guia.active, .guia-option.active, .guia-item.active, .guide-selector.active, .btn.active, .button.active, .option.active, .select-guide.active, .guide-btn.active, .guia-button.active {
       box-shadow: 0 0 0 2px rgba(255,215,0,.7);
     }
   `;
