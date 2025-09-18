@@ -1470,25 +1470,34 @@ window.showSection = showSection;
     if (typeof window.runTyping === 'function') {
       window.runTyping(sec);
       console.log('[Selfie v2] runTyping chamado para section-selfie');
-    } else {
-      const textEl = sec.querySelector('[data-typing], .selfie-text, .text, p, h3, h4, [class*="text"]');
-      if (textEl && typeof window.typeWriter === 'function') {
+    }
+    // Fallback para textos genéricos
+    const textEls = qa('[data-typing], .selfie-text, .text, p, h1, h2, h3, h4, [class*="text"], [class*="title"], [class*="content"]', sec);
+    if (textEls.length > 0 && typeof window.typeWriter === 'function') {
+      for (const textEl of textEls) {
+        if (textEl.dataset.typed || textEl.dataset.typing === '1') continue;
         const text = window.dedupe(textEl.getAttribute('data-text') || textEl.textContent || '');
-        await window.typeWriter(textEl, text, JORNADA.typing.charDelay, false);
-        if (JORNADA.tts.enabled && JORNADA.tts.readingMode === 'after' && !window.isMuted) {
-          await window.speak(text);
+        if (text) {
+          await window.typeWriter(textEl, text, JORNADA.typing.charDelay, false);
+          if (JORNADA.tts.enabled && JORNADA.tts.readingMode === 'after' && !window.isMuted) {
+            await window.speak(text);
+          }
+          console.log('[Selfie v2] Datilografia e TTS aplicados em:', textEl.tagName, textEl.className || textEl.id, 'texto:', text.slice(0, 50));
         }
-        console.log('[Selfie v2] Fallback de datilografia e TTS aplicado em:', textEl.tagName, textEl.className || textEl.id);
-      } else {
-        console.warn('[Selfie v2] Nenhum elemento de texto encontrado para datilografia/TTS');
       }
+    } else {
+      console.warn('[Selfie v2] Nenhum elemento de texto encontrado para datilografia/TTS. Snapshot do DOM:', Array.from(sec.children).slice(0, 10).map(el => ({
+        tag: el.tagName.toLowerCase(),
+        id: el.id || '',
+        class: el.className || '',
+        attrs: Object.keys(el.dataset || {}).join(',')
+      })));
     }
   } catch (e) {
     console.error('[Selfie v2] Erro ao aplicar datilografia/TTS:', e);
     toast('Erro ao carregar texto na selfie. Tente prosseguir.');
   }
 }
-
   const moSelfie = new MutationObserver(() => {
     const sec = q('#section-selfie, [data-section="selfie"], .section-selfie');
     if (sec && !sec.classList.contains('hidden')) applySelfieBg();
