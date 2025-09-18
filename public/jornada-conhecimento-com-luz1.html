@@ -568,17 +568,14 @@
 
     function dedupe(s = '') {
       if (!s) return '';
-      // Normaliza e remove espaços extras
       let result = s.normalize('NFC').trim().replace(/\s+/g, ' ');
       const validDoubleConsonants = /^(.*?(?:ss|rr|tt|cc|pp|mm|nn|ll|bb|dd|ff|gg|vv|zz)[a-z]*?)$/i;
       const words = result.split(' ');
       const out = [];
       for (let w of words) {
-        // Preserva consoantes duplas válidas
         if (validDoubleConsonants.test(w)) {
           out.push(w);
         } else {
-          // Remove letras duplicadas, exceto em casos especiais
           let c = w[0] || '';
           for (let i = 1; i < w.length; i++) {
             if (w[i] !== w[i - 1] || !/[a-zA-Z]/.test(w[i])) {
@@ -916,9 +913,6 @@
 
       requestAnimationFrame(() => setTimeout(() => {
         window.runTyping && window.runTyping(active);
-        // Rogério, removi o trecho de código duplicado aqui.
-        // O `runTyping` acima já vai cuidar da datilografia em todos os elementos.
-        // A duplicação estava causando o efeito de sobreposição.
       }, 0));
 
       updateCanvasBackground(sectionId);
@@ -991,11 +985,11 @@
       lastStartJourney = now;
 
       const inputSenha = getSenhaInput();
+      const inputNome = getSenhaSection().querySelector('#nomeInput, [data-role="nome"], input[name="nome"]');
       const senha = (inputSenha && inputSenha.value || '').trim().toLowerCase();
-      const sectionGuia = document.getElementById('section-guia');
-      const sectionSelfie = document.getElementById('section-selfie');
+      const nome = (inputNome && inputNome.value || '').trim();
 
-      log('[startJourney] Senha fornecida:', senha ? '[oculta]' : 'nenhuma');
+      log('[startJourney] Senha fornecida:', senha ? '[oculta]' : 'nenhuma', 'Nome:', nome || 'nenhum');
 
       if (!senha) {
         toast('Digite a senha para continuar.');
@@ -1004,60 +998,23 @@
         return;
       }
 
-      window.speak && window.speak('');
-      
-      // Rogério, a lógica de navegação foi corrigida aqui:
-      if (sectionGuia) {
-        window.showSection('section-guia');
-        log('[startJourney] Navegação para section-guia');
-      } else if (sectionSelfie) {
-        window.showSection('section-selfie');
-        log('[startJourney] Navegação para section-selfie');
-      } else {
-        window.showSection('section-perguntas');
-        log('[startJourney] Navegação para section-perguntas');
-      }
-    };
-    
       if (nome) { try { localStorage.setItem('JORNADA_NOME', nome); } catch (_) {} }
       window.speak && window.speak('');
-
-      const currentSection = document.querySelector('.j-section:not(.hidden), [id^="section-"]:not(.hidden)')?.id;
-      if (currentSection === 'section-guia' || currentSection === 'section-selfie') {
-        log('[startJourney] Já na section-guia ou section-selfie, evitando navegação redundante');
-        return;
-      }
-
+      
       const hasGuia = !!(document.getElementById('section-guia') || document.querySelector('[data-section="guia"], .section-guia'));
       const hasSelfie = !!(document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie'));
 
       if (hasGuia) {
         window.showSection('section-guia');
-        requestAnimationFrame(() => setTimeout(() => {
-          const sec = document.getElementById('section-guia') || document.querySelector('[data-section="guia"], .section-guia');
-          if (sec && window.runTyping) {
-            window.runTyping(sec);
-            log('[startJourney] runTyping chamado para section-guia');
-          }
-        }, 0));
         log('[startJourney] Navegação para section-guia');
-        return;
-      }
-      if (hasSelfie) {
+      } else if (hasSelfie) {
         window.showSection('section-selfie');
-        requestAnimationFrame(() => setTimeout(() => {
-          const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
-          if (sec && window.runTyping) {
-            window.runTyping(sec);
-            log('[startJourney] runTyping chamado para section-selfie');
-          }
-        }, 0));
         log('[startJourney] Navegação para section-selfie');
-        return;
+      } else {
+        window.openQuestions && window.openQuestions();
+        log('[startJourney] Navegação para section-perguntas (fallback)');
       }
-      window.openQuestions && window.openQuestions();
-      log('[startJourney] Navegação para section-perguntas (fallback)');
-    }
+    };
   })();
 
   /* ===== Guia ===== */
@@ -1709,11 +1666,9 @@
         }
       }
 
-     /* Substitua o trecho da secTermos no seu script pelo código abaixo */
-
       const secTermos = document.getElementById('section-termos') || document.querySelector('[data-section="termos"], .section-termos');
       if (secTermos) {
-        const btn = ev.target.closest(`
+        const btnAvancarTermos = ev.target.closest(`
           [data-action="termos-next"],
           [data-action="termos-next2"],
           [data-action="termos-next3"],
@@ -1721,9 +1676,17 @@
           [data-action*="next"],
           [data-action*="avancar"]
         `);
-        const btnAccept = ev.target.closest(`[data-action="next-senha"], [data-action*="accept"]`);
+        const btnAceitarTermos = ev.target.closest(`
+          [data-action="next-senha"],
+          [data-action="accept"],
+          [data-action="accept-terms"],
+          [data-action="aceito"],
+          .btn-aceitar-termos,
+          button[class*="aceito"]
+        `);
 
-        if (btn && secTermos.contains(btn)) {
+        if (btnAvancarTermos && secTermos.contains(btnAvancarTermos)) {
+          ev.preventDefault();
           const pages = ['termos-pg1', 'termos-pg2', 'termos-pg3', 'termos-pg4', 'termos-pg5'];
           const visId = pages.find(id => {
             const el = document.getElementById(id);
@@ -1740,45 +1703,35 @@
               log('Navegação para próxima página de termos:', nxt.id);
             }
           } else {
-            log('Fim da navegação de termos.');
+            log('Fim da navegação de termos. Botão aceitar deve ser clicado.');
           }
-        }
-        if (btnAccept && secTermos.contains(btnAccept)) {
+        } else if (btnAceitarTermos && secTermos.contains(btnAceitarTermos)) {
           ev.preventDefault();
           window.showSection('section-senha');
           log('Navegação para section-senha, acionada pelo botão de aceitar termos.');
         }
       }
+
       const secSenha = document.getElementById('section-senha') || document.querySelector('[data-section="senha"], .section-senha');
       if (secSenha) {
-        const btn = ev.target.closest(`
+        const btnIniciar = ev.target.closest(`
           [data-action="start"],
           [data-action="next-senha"],
-          [data-action="accept"],
-          [data-action="accept-terms"],
-          [data-action="termos-aceito"],
-          [data-action="aceito"],
           #iniciar,
           .btn-start,
-          .btn-iniciar,
-          .btn-continuar,
-          button[class*="start"],
-          a[class*="start"],
-          button[class*="iniciar"],
-          a[class*="iniciar"],
-          button[class*="continuar"],
-          a[class*="continuar"],
-          button:not([data-action="select-guia"]),
-          a:not([data-action="select-guia"])
+          .btn-iniciar
         `);
-        if (btn && secSenha.contains(btn)) {
-          const txt = (btn.textContent || '').toLowerCase();
-          if (/\biniciar|\bstart|\bavançar|\bpróximo|\bcontinuar|\bprosseguir|\baceitar/.test(txt) || btn.hasAttribute('data-action') || btn.id === 'iniciar') {
-            ev.preventDefault();
-            ev.stopPropagation();
-            window.startJourney && window.startJourney();
-            log('startJourney disparado por:', btn.tagName, btn.className || btn.id, 'texto:', txt.slice(0, 50));
-          }
+        if (btnIniciar && secSenha.contains(btnIniciar)) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          window.startJourney && window.startJourney();
+          log('startJourney disparado por:', btnIniciar.tagName, btnIniciar.className || btnIniciar.id, 'texto:', (btnIniciar.textContent || '').slice(0, 50));
+        }
+        const btnToggle = ev.target.closest('[data-action="toggle-password"], .password-toggle');
+        if (btnToggle && secSenha.contains(btnToggle)) {
+          ev.preventDefault();
+          window.toggleSenha && window.toggleSenha();
+          log('toggleSenha disparado');
         }
       }
 
@@ -1848,40 +1801,7 @@
         }
       }
     }
-   document.addEventListener('DOMContentLoaded', () => {
-    // Este trecho de código vai encontrar TODOS os botões de navegação dos termos
-    // e adicionar um ouvinte de clique para cada um.
-    const termosBtns = document.querySelectorAll('[data-action="termos-next"], [data-action="termos-next2"], [data-action="termos-next3"], [data-action="termos-next4"]');
-
-    termosBtns.forEach(btn => {
-        btn.addEventListener('click', (ev) => {
-            ev.preventDefault();
-            ev.stopPropagation();
-
-            const pages = ['termos-pg1', 'termos-pg2', 'termos-pg3', 'termos-pg4', 'termos-pg5'];
-            const visId = pages.find(id => {
-                const el = document.getElementById(id);
-                return el && !el.classList.contains('hidden');
-            });
-            const idx = pages.indexOf(visId);
-            if (idx >= 0 && idx + 1 < pages.length) {
-                const cur = document.getElementById(pages[idx]);
-                const nxt = document.getElementById(pages[idx + 1]);
-                if (cur) cur.classList.add('hidden');
-                if (nxt) {
-                    nxt.classList.remove('hidden');
-                    window.runTyping && window.runTyping(nxt);
-                    console.log('Navegação para próxima página de termos:', nxt.id);
-                }
-            } else {
-                window.showSection('section-senha');
-                console.log('Navegação para section-senha');
-            }
-        });
-    });
-});
   })();
-})();
 </script>
 </body>
 </html>
