@@ -1694,6 +1694,11 @@
     // Garante que a seção de diálogo existe desde o início
     try { window.openDialogAndKickoff && (function(){ const s=document.getElementById('section-dialogo'); if(!s){ (window.ensureDialogSection||(()=>{}))(); } })(); } catch(_) {}
 
+    <script>document.getElementById('guiaNameInput')&&document.getElementById('guiaNameInput').addEventListener('input',e=>{try{localStorage.setItem('JORNADA_NOME',e.target.value||'')}catch(_){}});</script>
+    <script>document.querySelector('[data-action="toggle-password"]')?.addEventListener('click',()=>{const i=document.querySelector('#section-senha input');if(i)i.type=i.type==='password'?'text':'password';});</script>
+    <script>document.getElementById('clientNameSlot')&&(document.getElementById('clientNameSlot').id='guideNameSlot');</script>
+    <script>window.addEventListener('DOMContentLoaded',()=>{const n=(localStorage.getItem('JORNADA_NOME')||'').toUpperCase();if(n){const f=document.getElementById('clientNameSlotFinal');if(f)f.textContent=n}});</script>
+
     if (document.getElementById('section-intro')) {
       window.showSection('section-intro');
     } else {
