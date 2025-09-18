@@ -539,49 +539,53 @@
   .typewriter::after { display: none !important; content: ''; }
 </style>
   
-<script id="qfx-script">
 /* SAFE SENTINEL */;void 0;
 (function(){
   'use strict';
 
   /* ===== util: toast + erro global (leve) ===== */
-  function toast(msg){
-    try{
-      const t=document.getElementById('toast'); if(!t) return;
-      t.textContent=msg; t.classList.remove('hidden'); t.classList.add('show');
-      setTimeout(()=>{t.classList.remove('show');},3000);
-    }catch(_){}
+  function toast(msg) {
+    try {
+      const t = document.getElementById('toast');
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.remove('hidden');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    } catch (_) {}
   }
-  window.addEventListener('error',(e)=>{
-    console.error('[Erro global]',e?.error||e);
+  window.addEventListener('error', (e) => {
+    console.error('[Erro global]', e?.error || e);
     toast('Ops… algo falhou, mas já seguimos em frente.');
   });
 
-  /* ===== env tag ===== */
-  const env=document.getElementById('envTag');
-  if(env) env.textContent=`layout=${document.body.dataset.layout||'master'} · journey=${document.body.dataset.journey||'essencial'} · path=/assets`;
+  /* ===== env tag (opcional) ===== */
+  const env = document.getElementById('envTag');
+  if (env) {
+    env.textContent = `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/assets`;
+  }
 
   /* ===== dedupe (ajustada para preservar consoantes duplas) ===== */
-  function dedupe(s=''){
-    if(!s) return '';
-    let result=s.normalize('NFC').trim().replace(/\s+/g,' ');
-    const validDoubleConsonants=/^(.*?(?:ss|rr|tt|cc|pp|mm|nn|ll|bb|dd|ff|gg|vv|zz)[a-z]*?)$/i;
-    const words=result.split(' ');
-    const out=[];
-    for(let w of words){
-      if(validDoubleConsonants.test(w)){
+  function dedupe(s = '') {
+    if (!s) return '';
+    let result = s.normalize('NFC').trim().replace(/\s+/g, ' ');
+    const validDoubleConsonants = /^(.*?(?:ss|rr|tt|cc|pp|mm|nn|ll|bb|dd|ff|gg|vv|zz)[a-z]*?)$/i;
+    const words = result.split(' ');
+    const out = [];
+    for (let w of words) {
+      if (validDoubleConsonants.test(w)) {
         out.push(w);
       } else {
-        let c='';
-        for(let i=0;i<w.length;i++){
-          if(i===0 || w[i]!==w[i-1] || !/[a-zA-Z]/.test(w[i])) c+=w[i];
+        let c = '';
+        for (let i = 0; i < w.length; i++) {
+          if (i === 0 || w[i] !== w[i - 1] || !/[a-zA-Z]/.test(w[i])) c += w[i];
         }
         out.push(c);
       }
     }
     return out.join(' ').trim();
   }
-  window.dedupe=dedupe;
+  window.dedupe = dedupe;
 
   /* ===== Config global Jornada ===== */
   window.JORNADA = window.JORNADA || {};
@@ -593,13 +597,13 @@
   let currentLang = 'pt-BR';
   window.isMuted = !!window.isMuted;
 
-  function isSpeechAvailable(){
+  function isSpeechAvailable() {
     return 'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance !== 'undefined';
   }
-  function cancelSpeech(){
+  function cancelSpeech() {
     try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (_) {}
   }
-  async function speak(text){
+  async function speak(text) {
     if (!JORNADA.tts.enabled || window.isMuted) return;
     if (!isSpeechAvailable()) return;
 
@@ -626,7 +630,7 @@
   }
   window.speak = speak;
 
-  function readAloud(text, voiceGender){
+  function readAloud(text, voiceGender) {
     if (window.isMuted || !isSpeechAvailable()) return Promise.resolve();
     const genderName = (voiceGender === 'male' ? 'Male' : 'Female');
     return new Promise(resolve => {
@@ -669,9 +673,6 @@
     if (sectionId === 'section-perguntas') {
       canvas.className = 'card pergaminho pergaminho-h';
       canvas.style.background = 'var(--panel) url(/assets/img/pergaminho-rasgado-horiz.png) no-repeat center/cover';
-    } else if (sectionId === 'section-selfie' || sectionId === 'section-termos' || sectionId === 'section-senha' || sectionId === 'section-guia') {
-      canvas.className = 'card section-bg';
-      canvas.style.background = 'var(--panel) none';
     } else {
       canvas.className = 'card pergaminho pergaminho-v';
       canvas.style.background = 'var(--panel) url(/assets/img/pergaminho-rasgado-vert.png) no-repeat center/cover';
@@ -786,6 +787,34 @@
   };
   if (typeof window.typewriter !== 'function') window.typewriter = window.typeWriter;
 
+  /* ===== datilografia no placeholder e respostas ===== */
+  let __abortTypingPlaceholder = null;
+  async function typePlaceholder(inp, text, speed = 22) {
+    if (!inp) return;
+    if (__abortTypingPlaceholder) __abortTypingPlaceholder();
+    let abort = false;
+    __abortTypingPlaceholder = () => abort = true;
+    inp.placeholder = '';
+    const aria = document.getElementById('aria-pergunta');
+    if (aria) aria.textContent = text;
+    for (let i = 0; i <= text.length; i++) {
+      if (abort) break;
+      inp.placeholder = text.slice(0, i) + (i < text.length ? '▌' : '');
+      await new Promise(r => setTimeout(r, speed));
+    }
+    if (!abort) inp.placeholder = text;
+  }
+  async function typeAnswer(textarea, text, speed = 36) {
+    if (!textarea) return;
+    textarea.value = '';
+    textarea.classList.add('lumen-typing');
+    for (let i = 0; i <= text.length; i++) {
+      textarea.value = text.slice(0, i);
+      await new Promise(r => setTimeout(r, speed));
+    }
+    textarea.classList.add('typing-done');
+  }
+
   /* ===== runTyping (com TTS sincronizado) ===== */
   async function runTyping(root) {
     if (!root || root.classList.contains('hidden')) return;
@@ -796,7 +825,7 @@
       cancelSpeech();
       const elements = Array
         .from(root.querySelectorAll('[data-typing], .text, p, h1, h2, h3, h4, [class*="text"], [class*="title"], [class*="content"]'))
-        .filter(el => !el.dataset.typed && el.offsetParent !== null && !el.closest('.j-section.hidden'));
+        .filter(el => !el.dataset.typed && el.offsetParent !== null && !el.closest('.j-section.hidden') && !el.classList.contains('muted'));
 
       if (elements.length === 0) {
         console.log('[runTyping] Nenhum elemento de texto encontrado em:', root.id || root.className);
@@ -833,6 +862,7 @@
 
     document.querySelectorAll('.j-section').forEach(s => {
       s.classList.add('hidden');
+      s.style.display = 'none';
       s.querySelectorAll('[data-typing], .text, p, h1, h2, h3, h4').forEach(el => {
         el.classList.remove('lumen-typing', 'typing-done');
         el.dataset.typing = '0';
@@ -1006,7 +1036,7 @@
 
   /* ===== Senha ===== */
   function getSenhaSection() {
-    return document.getElementById('section-senha') || document.querySelector('[data-section="senha"]') || document.querySelector('.section-senha') || document;
+    return document.getElementById('section-senha') || document.querySelector('[data-section="senha"], .section-senha') || document;
   }
   function getSenhaInput() {
     const root = getSenhaSection();
@@ -1029,14 +1059,6 @@
     return root.querySelector('input');
   }
 
-  window.toggleSenha = function() {
-    const input = getSenhaInput();
-    if (!input) { console.warn('[Senha] input não encontrado'); return; }
-    input.type = (input.type === 'password' ? 'text' : 'password');
-    const eye = getSenhaSection().querySelector('[data-role="eye"], [data-action="toggle-password"] i, [data-action="toggle-password"] svg');
-    if (eye) eye.classList.toggle('on');
-  };
-
   let lastStartJourney = 0;
   window.startJourney = async function() {
     const now = performance.now();
@@ -1048,7 +1070,7 @@
 
     const inputSenha = getSenhaInput();
     const inputNome = getSenhaSection().querySelector('#nomeInput, [data-role="nome"], input[name="nome"]');
-    const senha = (inputSenha && inputSenha.value || '').trim();
+    const senha = (inputSenha && inputSenha.value || '').trim().toLowerCase();
     const nome = (inputNome && inputNome.value || '').trim();
 
     if (!senha) {
@@ -1066,13 +1088,13 @@
       return;
     }
 
-    const hasGuia = !!(document.getElementById('section-guia') || document.querySelector('[data-section="guia"]') || document.querySelector('.section-guia'));
-    const hasSelfie = !!(document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"]') || document.querySelector('.section-selfie'));
+    const hasGuia = !!(document.getElementById('section-guia') || document.querySelector('[data-section="guia"], .section-guia'));
+    const hasSelfie = !!(document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie'));
 
     if (hasGuia) {
       window.showSection('section-guia');
       requestAnimationFrame(() => setTimeout(() => {
-        const sec = document.getElementById('section-guia') || document.querySelector('[data-section="guia"]') || document.querySelector('.section-guia');
+        const sec = document.getElementById('section-guia') || document.querySelector('[data-section="guia"], .section-guia');
         if (sec && typeof window.runTyping === 'function') {
           window.runTyping(sec);
           console.log('[startJourney] runTyping chamado para section-guia');
@@ -1083,7 +1105,7 @@
     if (hasSelfie) {
       window.showSection('section-selfie');
       requestAnimationFrame(() => setTimeout(() => {
-        const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"]') || document.querySelector('.section-selfie');
+        const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
         if (sec && typeof window.runTyping === 'function') {
           window.runTyping(sec);
           console.log('[startJourney] runTyping chamado para section-selfie');
@@ -1094,244 +1116,21 @@
     window.openQuestions();
   };
 
+  window.toggleSenha = function() {
+    const input = getSenhaInput();
+    if (!input) { console.warn('[Senha] input não encontrado'); return; }
+    input.type = (input.type === 'password' ? 'text' : 'password');
+    const eye = getSenhaSection().querySelector('[data-role="eye"], [data-action="toggle-password"] i, [data-action="toggle-password"] svg');
+    if (eye) eye.classList.toggle('on');
+  };
+
   /* ===== Guia ===== */
-(function(){
-  const log = (...a) => { try { console.log('[GUIA v9]', ...a); } catch (_) {} };
-
-  function secGuia() {
-    return document.getElementById('section-guia') || document.querySelector('[data-section="guia"], .section-guia, .guia-container, .guia') || null;
-  }
-
-  function normGuide(s = '') {
-    s = String(s).toLowerCase();
-    if (s.includes('lumen')) return 'lumen';
-    if (s.includes('zion')) return 'zion';
-    if (s.includes('arion') || s.includes('arian')) return 'arion';
-    return 'lumen';
-  }
-
-  function inferGuideFrom(el) {
-    if (!el) return '';
-    const attrs = [
-      el.getAttribute('data-guide'),
-      el.getAttribute('data-guide-id'),
-      el.dataset?.guide,
-      el.dataset?.value,
-      el.id,
-      el.getAttribute('aria-label'),
-      el.getAttribute('alt'),
-      el.title,
-      el.textContent
-    ].filter(Boolean);
-
-    for (const v of attrs) {
-      const g = normGuide(v);
-      if (g) return g;
-    }
-
-    if (el.tagName === 'IMG' && el.src) {
-      const src = el.src.toLowerCase();
-      if (src.includes('lumen')) return 'lumen';
-      if (src.includes('zion')) return 'zion';
-      if (src.includes('arion') || src.includes('arian')) return 'arion';
-    }
-
-    return '';
-  }
-
-  function enhanceButtons() {
-    const root = secGuia();
-    if (!root) {
-      log('Seção de guia não encontrada');
-      return;
-    }
-
-    const candidates = root.querySelectorAll(`
-      [data-action="select-guia"],
-      [data-guide],
-      [data-guide-id],
-      .choose-guide,
-      .btn-guia,
-      .card-guia,
-      .guia-option,
-      .guia-item,
-      .guide-selector,
-      #btnLumen, #btnZion, #btnArion,
-      img[alt*="Lumen" i], img[alt*="Zion" i], img[alt*="Arion" i],
-      button[class*="guia"], a[class*="guia"],
-      [class*="guide"], [id*="guide"]
-    `);
-
-    if (candidates.length === 0) {
-      log('Nenhum botão de guia encontrado. Snapshot do DOM:', Array.from(root.children).slice(0, 10).map(el => ({
-        tag: el.tagName.toLowerCase(),
-        id: el.id || '',
-        class: el.className || '',
-        attrs: Object.keys(el.dataset || {}).join(','),
-        text: (el.textContent || '').slice(0, 50)
-      })));
-    } else {
-      log('Botões de guia encontrados:', candidates.length, 'em:', root.id || root.className);
-    }
-
-    candidates.forEach(el => {
-      if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
-      el.style.cursor = 'pointer';
-      el.style.pointerEvents = 'auto';
-      if (!el.getAttribute('data-guide')) {
-        const g = inferGuideFrom(el);
-        if (g) el.setAttribute('data-guide', g);
-      }
-      el.setAttribute('role', 'button');
-      el.setAttribute('aria-label', `Escolher guia ${inferGuideFrom(el) || 'desconhecido'}`);
-    });
-
-    root.querySelectorAll('.click-shield, .overlay, [data-overlay], .modal-overlay, .blocker, [class*="overlay"], [class*="shield"], [class*="block"]').forEach(ov => {
-      ov.style.pointerEvents = 'none';
-      ov.style.display = 'none';
-      log('Overlay desativado:', ov.className || ov.id);
-    });
-  }
-
-  function proceedAfterGuia(guia) {
-    try {
-      localStorage.setItem('JORNADA_GUIA', guia);
-      const card = document.getElementById('card-guide');
-      const bgImg = document.getElementById('guideBg');
-      const guideNameEl = document.getElementById('guideNameSlot');
-      if (card) card.dataset.guide = guia.toUpperCase();
-      if (guideNameEl) guideNameEl.textContent = guia.toUpperCase();
-      if (bgImg) {
-        bgImg.src = `/assets/img/irmandade-quarteto-bg-${guia}.png`;
-        bgImg.onload = () => {
-          const errorDiv = document.getElementById('selfieError');
-          if (errorDiv) errorDiv.style.display = 'none';
-        };
-        bgImg.onerror = () => {
-          const errorDiv = document.getElementById('selfieError');
-          if (errorDiv) errorDiv.style.display = 'block';
-          toast('Erro ao carregar a imagem de fundo do guia.');
-        };
-      }
-      window.showSection('section-selfie');
-      requestAnimationFrame(() => setTimeout(() => {
-        const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
-        if (sec && typeof window.runTyping === 'function') {
-          window.runTyping(sec);
-          log('runTyping chamado para section-selfie');
-        }
-      }, 0));
-    } catch (e) {
-      console.error('[GUIA v9] Erro ao prosseguir após escolha do guia:', e);
-      toast('Erro ao prosseguir. Tente novamente.');
-    }
-  }
-
-  function choose(el) {
-    const guia = inferGuideFrom(el);
-    log('Guia selecionado:', guia, 'a partir de:', el.tagName, el.id || el.className, 'texto:', (el.textContent || '').slice(0, 50));
-    if (!guia) {
-      console.warn('[GUIA v9] Não foi possível inferir o guia.');
-      toast('Por favor, selecione um guia válido.');
-      return;
-    }
-
-    try {
-      const root = secGuia();
-      if (root) {
-        root.querySelectorAll('[data-action="select-guia"], [data-guide], [data-guide-id], .choose-guide, .btn-guia, .card-guia, .guia-option, .guia-item, .guide-selector, #btnLumen, #btnZion, #btnArion').forEach(n => n.classList.remove('active'));
-      }
-      el.classList.add('active');
-      proceedAfterGuia(guia);
-    } catch (e) {
-      console.error('[GUIA v9] Erro ao escolher guia:', e);
-      toast('Erro ao selecionar o guia. Tente novamente.');
-    }
-  }
-
-  document.addEventListener('click', function(ev) {
-    const root = secGuia();
-    if (!root) return;
-    const target = ev.target;
-    const el = target.closest(`
-      [data-action="select-guia"],
-      [data-guide],
-      [data-guide-id],
-      .choose-guide,
-      .btn-guia,
-      .card-guia,
-      .guia-option,
-      .guia-item,
-      .guide-selector,
-      #btnLumen, #btnZion, #btnArion,
-      img[alt*="Lumen" i], img[alt*="Zion" i], img[alt*="Arion" i],
-      button[class*="guia"], a[class*="guia"],
-      [class*="guide"], [id*="guide"]
-    `);
-    if (!el || !root.contains(el)) {
-      log('Nenhum botão de guia clicado:', target.tagName, target.className || target.id);
-      return;
-    }
-
-    const g = inferGuideFrom(el);
-    if (!g) {
-      log('Nenhum guia inferido para elemento:', el.tagName, el.id || el.className);
-      return;
-    }
-
-    ev.preventDefault();
-    ev.stopPropagation();
-    choose(el);
-  }, true);
-
-  document.addEventListener('keydown', function(ev) {
-    if (ev.key !== 'Enter' && ev.key !== ' ') return;
-    const root = secGuia();
-    if (!root) return;
-    const el = document.activeElement;
-    if (!el || !root.contains(el)) return;
-
-    const g = inferGuideFrom(el);
-    if (!g) {
-      log('Nenhum guia inferido para elemento ativo:', el.tagName, el.id || el.className);
-      return;
-    }
-
-    ev.preventDefault();
-    choose(el);
-  }, true);
-
-  const style = document.createElement('style');
-  style.textContent = `
-    [data-action="select-guia"], [data-guide], [data-guide-id], .choose-guide, .btn-guia, .card-guia, .guia-option, .guia-item, .guide-selector, #btnLumen, #btnZion, #btnArion {
-      pointer-events: auto;
-      cursor: pointer;
-      outline: none;
-    }
-    [data-action="select-guia"].active, [data-guide].active, [data-guide-id].active, .choose-guide.active, .btn-guia.active, .card-guia.active, .guia-option.active, .guia-item.active, .guide-selector.active, #btnLumen.active, #btnZion.active, #btnArion.active {
-      box-shadow: 0 0 0 2px rgba(255,215,0,.7);
-    }
-  `;
-  document.head.appendChild(style);
-
-  const mo = new MutationObserver(() => {
-    const root = secGuia();
-    if (root && !root.classList.contains('hidden')) {
-      log('Seção de guia detectada, aplicando enhanceButtons');
-      enhanceButtons();
-    }
-  });
-  mo.observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style'] });
-
-  document.addEventListener('DOMContentLoaded', () => {
-    log('Inicializando enhanceButtons no DOMContentLoaded');
-    enhanceButtons();
-  });
-  enhanceButtons();
-})();
-  /* ===== Selfie ===== */
   (function(){
-    const log = (...a) => { try { console.log('[Selfie v4]', ...a); } catch (_) {} };
+    const log = (...a) => { try { console.log('[GUIA v9]', ...a); } catch (_) {} };
+
+    function secGuia() {
+      return document.getElementById('section-guia') || document.querySelector('[data-section="guia"], .section-guia, .guia-container, .guia') || null;
+    }
 
     function normGuide(s = '') {
       s = String(s).toLowerCase();
@@ -1341,101 +1140,230 @@
       return 'lumen';
     }
 
-    (function injectSelfieCss() {
-      const css = `
-        #section-selfie .selfie-wrapper,
-        #section-selfie .selfie-hero,
-        #section-selfie .selfie-bg {
-          position: relative;
-          overflow: hidden;
-          border-radius: 12px;
-          min-height: 300px;
-          background-color: rgba(0,0,0,0.15);
-        }
-        #section-selfie img[data-role="bg"],
-        #section-selfie img#selfieBg,
-        #section-selfie .selfie-bg > img {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          object-position: center;
-          pointer-events: none;
-          user-select: none;
-          border-radius: 12px;
-          display: block;
-        }
-      `;
-      const st = document.createElement('style');
-      st.id = 'selfie-bg-style';
-      st.textContent = css;
-      document.head.appendChild(st);
-    })();
+    function inferGuideFrom(el) {
+      if (!el) return '';
+      const attrs = [
+        el.getAttribute('data-guide'),
+        el.getAttribute('data-guide-id'),
+        el.dataset?.guide,
+        el.dataset?.value,
+        el.id,
+        el.getAttribute('aria-label'),
+        el.getAttribute('alt'),
+        el.title,
+        el.textContent
+      ].filter(Boolean);
 
-    (function ensureSelfieBgImg() {
-      const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"]') || document.querySelector('.section-selfie');
-      if (!sec) return;
-      const host = sec.querySelector('.selfie-bg, .selfie-hero, .selfie-wrapper') || sec;
-      let img = host.querySelector('img[data-role="bg"]');
-      if (!img) {
-        img = document.createElement('img');
-        img.setAttribute('data-role', 'bg');
-        img.alt = 'Guia Background';
-        host.appendChild(img);
+      for (const v of attrs) {
+        const g = normGuide(v);
+        if (g) return g;
       }
-    })();
 
-    const GUIDE_BG = {
-      lumen: [
-        '/assets/img/irmandade-quarteto-bg-lumen.png',
-        '/assets/img/irmandade-quarteto-bg-lumen.jpg',
-        '/assets/img/irmandade-quarteto-bg-lumen.jpeg'
-      ],
-      zion: [
-        '/assets/img/irmandade-quarteto-bg-zion.png',
-        '/assets/img/irmandade-quarteto-bg-zion.jpg',
-        '/assets/img/irmandade-quarteto-bg-zion.jpeg'
-      ],
-      arion: [
-        '/assets/img/irmandade-quarteto-bg-arian.jpeg',
-        '/assets/img/irmandade-quarteto-bg-arion.jpeg',
-        '/assets/img/irmandade-quarteto-bg-arion.jpg',
-        '/assets/img/irmandade-quarteto-bg-arion.png'
-      ]
-    };
+      if (el.tagName === 'IMG' && el.src) {
+        const src = el.src.toLowerCase();
+        if (src.includes('lumen')) return 'lumen';
+        if (src.includes('zion')) return 'zion';
+        if (src.includes('arion') || src.includes('arian')) return 'arion';
+      }
+
+      return '';
+    }
+
+    function enhanceButtons() {
+      const root = secGuia();
+      if (!root) {
+        log('Seção de guia não encontrada');
+        return;
+      }
+
+      const candidates = root.querySelectorAll(`
+        [data-action="select-guia"],
+        [data-guide],
+        [data-guide-id],
+        .choose-guide,
+        .btn-guia,
+        .card-guia,
+        .guia-option,
+        .guia-item,
+        .guide-selector,
+        #btnLumen, #btnZion, #btnArion,
+        img[alt*="Lumen" i], img[alt*="Zion" i], img[alt*="Arion" i],
+        button[class*="guia"], a[class*="guia"],
+        [class*="guide"], [id*="guide"]
+      `);
+
+      if (candidates.length === 0) {
+        log('Nenhum botão de guia encontrado. Snapshot do DOM:', Array.from(root.children).slice(0, 10).map(el => ({
+          tag: el.tagName.toLowerCase(),
+          id: el.id || '',
+          class: el.className || '',
+          attrs: Object.keys(el.dataset || {}).join(','),
+          text: (el.textContent || '').slice(0, 50)
+        })));
+      } else {
+        log('Botões de guia encontrados:', candidates.length, 'em:', root.id || root.className);
+      }
+
+      candidates.forEach(el => {
+        if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
+        el.style.cursor = 'pointer';
+        el.style.pointerEvents = 'auto';
+        if (!el.getAttribute('data-guide')) {
+          const g = inferGuideFrom(el);
+          if (g) el.setAttribute('data-guide', g);
+        }
+        el.setAttribute('role', 'button');
+        el.setAttribute('aria-label', `Escolher guia ${inferGuideFrom(el) || 'desconhecido'}`);
+      });
+
+      root.querySelectorAll('.click-shield, .overlay, [data-overlay], .modal-overlay, .blocker, [class*="overlay"], [class*="shield"], [class*="block"]').forEach(ov => {
+        ov.style.pointerEvents = 'none';
+        ov.style.display = 'none';
+        log('Overlay desativado:', ov.className || ov.id);
+      });
+    }
+
+    function proceedAfterGuia(guia) {
+      try {
+        localStorage.setItem('JORNADA_GUIA', guia);
+        const card = document.getElementById('card-guide');
+        const guideNameEl = document.getElementById('guideNameSlot');
+        if (card) card.dataset.guide = guia.toUpperCase();
+        if (guideNameEl) guideNameEl.textContent = guia.toUpperCase();
+        window.showSection('section-selfie');
+        requestAnimationFrame(() => setTimeout(() => {
+          const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
+          if (sec && typeof window.runTyping === 'function') {
+            window.runTyping(sec);
+            console.log('[startJourney] runTyping chamado para section-selfie');
+          }
+        }, 0));
+      } catch (e) {
+        console.error('[GUIA v9] Erro ao prosseguir após escolha do guia:', e);
+        toast('Erro ao prosseguir. Tente novamente.');
+      }
+    }
+
+    function choose(el) {
+      const guia = inferGuideFrom(el);
+      log('Guia selecionado:', guia, 'a partir de:', el.tagName, el.id || el.className, 'texto:', (el.textContent || '').slice(0, 50));
+      if (!guia) {
+        console.warn('[GUIA v9] Não foi possível inferir o guia.');
+        toast('Por favor, selecione um guia válido.');
+        return;
+      }
+
+      try {
+        const root = secGuia();
+        if (root) {
+          root.querySelectorAll('[data-action="select-guia"], [data-guide], [data-guide-id], .choose-guide, .btn-guia, .card-guia, .guia-option, .guia-item, .guide-selector, #btnLumen, #btnZion, #btnArion').forEach(n => n.classList.remove('active'));
+        }
+        el.classList.add('active');
+        proceedAfterGuia(guia);
+      } catch (e) {
+        console.error('[GUIA v9] Erro ao escolher guia:', e);
+        toast('Erro ao selecionar o guia. Tente novamente.');
+      }
+    }
+
+    document.addEventListener('click', function(ev) {
+      const root = secGuia();
+      if (!root) return;
+      const target = ev.target;
+      const el = target.closest(`
+        [data-action="select-guia"],
+        [data-guide],
+        [data-guide-id],
+        .choose-guide,
+        .btn-guia,
+        .card-guia,
+        .guia-option,
+        .guia-item,
+        .guide-selector,
+        #btnLumen, #btnZion, #btnArion,
+        img[alt*="Lumen" i], img[alt*="Zion" i], img[alt*="Arion" i],
+        button[class*="guia"], a[class*="guia"],
+        [class*="guide"], [id*="guide"]
+      `);
+      if (!el || !root.contains(el)) {
+        log('Nenhum botão de guia clicado:', target.tagName, target.className || target.id);
+        return;
+      }
+
+      const g = inferGuideFrom(el);
+      if (!g) {
+        log('Nenhum guia inferido para elemento:', el.tagName, el.id || el.className);
+        return;
+      }
+
+      ev.preventDefault();
+      ev.stopPropagation();
+      choose(el);
+    }, true);
+
+    document.addEventListener('keydown', function(ev) {
+      if (ev.key !== 'Enter' && ev.key !== ' ') return;
+      const root = secGuia();
+      if (!root) return;
+      const el = document.activeElement;
+      if (!el || !root.contains(el)) return;
+
+      const g = inferGuideFrom(el);
+      if (!g) {
+        log('Nenhum guia inferido para elemento ativo:', el.tagName, el.id || el.className);
+        return;
+      }
+
+      ev.preventDefault();
+      choose(el);
+    }, true);
+
+    const style = document.createElement('style');
+    style.textContent = `
+      [data-action="select-guia"], [data-guide], [data-guide-id], .choose-guide, .btn-guia, .card-guia, .guia-option, .guia-item, .guide-selector, #btnLumen, #btnZion, #btnArion {
+        pointer-events: auto;
+        cursor: pointer;
+        outline: none;
+      }
+      [data-action="select-guia"].active, [data-guide].active, [data-guide-id].active, .choose-guide.active, .btn-guia.active, .card-guia.active, .guia-option.active, .guia-item.active, .guide-selector.active, #btnLumen.active, #btnZion.active, #btnArion.active {
+        box-shadow: 0 0 0 2px rgba(255,215,0,.7);
+      }
+    `;
+    document.head.appendChild(style);
+
+    const mo = new MutationObserver(() => {
+      const root = secGuia();
+      if (root && !root.classList.contains('hidden')) {
+        log('Seção de guia detectada, aplicando enhanceButtons');
+        enhanceButtons();
+      }
+    });
+    mo.observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style'] });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      log('Inicializando enhanceButtons no DOMContentLoaded');
+      enhanceButtons();
+    });
+    enhanceButtons();
+  })();
+
+  /* ===== Selfie ===== */
+  (function(){
+    const log = (...a) => { try { console.log('[Selfie v5]', ...a); } catch (_) {} };
+
+    function normGuide(s = '') {
+      s = String(s).toLowerCase();
+      if (s.includes('lumen')) return 'lumen';
+      if (s.includes('zion')) return 'zion';
+      if (s.includes('arion') || s.includes('arian')) return 'arion';
+      return 'lumen';
+    }
 
     async function applySelfieBg() {
-      const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"]') || document.querySelector('.section-selfie');
+      const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
       if (!sec || sec.classList.contains('hidden')) {
         log('Seção de selfie não visível, pulando applySelfieBg');
         return;
-      }
-      const host = sec.querySelector('.selfie-bg, .selfie-hero, .selfie-wrapper') || sec;
-      let img = host.querySelector('img[data-role="bg"]') || document.getElementById('selfieBg') || sec.querySelector('.selfie-bg > img');
-      if (!img) {
-        img = document.createElement('img');
-        img.setAttribute('data-role', 'bg');
-        img.alt = 'Guia Background';
-        host.appendChild(img);
-      }
-      const guia = normGuide(localStorage.getItem('JORNADA_GUIA') || '');
-      const src = await new Promise(res => {
-        let i = 0;
-        (function step() {
-          if (i >= GUIDE_BG[guia].length) return res(null);
-          const src = GUIDE_BG[guia][i++];
-          const im = new Image();
-          im.onload = () => res(src);
-          im.onerror = () => step();
-          im.src = src;
-        })();
-      });
-      if (src) {
-        img.src = src;
-        log('Fundo aplicado:', src, 'para guia:', guia);
-      } else {
-        log('Nenhum fundo válido encontrado para guia:', guia);
       }
 
       try {
@@ -1443,10 +1371,10 @@
           window.runTyping(sec);
           log('runTyping chamado para section-selfie');
         }
-        const textEls = sec.querySelectorAll('[data-typing], .selfie-text, .text, p, h1, h2, h3, h4, [class*="text"], [class*="title"], [class*="content"]');
+        const textEls = sec.querySelectorAll('[data-typing], .text, p, h1, h2, h3, h4, [class*="text"], [class*="title"], [class*="content"]');
         if (textEls.length > 0 && typeof window.typeWriter === 'function') {
           for (const textEl of textEls) {
-            if (textEl.dataset.typed || textEl.dataset.typing === '1' || !textEl.offsetParent) continue;
+            if (textEl.dataset.typed || textEl.dataset.typing === '1' || !textEl.offsetParent || textEl.classList.contains('muted')) continue;
             const text = window.dedupe(textEl.getAttribute('data-text') || textEl.textContent || '');
             if (text) {
               await window.typeWriter(textEl, text, JORNADA.typing.charDelay, false);
@@ -1465,13 +1393,13 @@
           })));
         }
       } catch (e) {
-        console.error('[Selfie v4] Erro ao aplicar datilografia/TTS:', e);
+        console.error('[Selfie v5] Erro ao aplicar datilografia/TTS:', e);
         toast('Erro ao carregar texto na selfie. Tente prosseguir.');
       }
     }
 
     const moSelfie = new MutationObserver(() => {
-      const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"]') || document.querySelector('.section-selfie');
+      const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
       if (sec && !sec.classList.contains('hidden')) {
         log('Seção de selfie detectada, aplicando applySelfieBg');
         applySelfieBg();
@@ -1528,7 +1456,7 @@
     }
 
     async function ensureQuestionsReady(maxTries = 40) {
-      const sec = document.getElementById('section-perguntas') || document.querySelector('[data-section="perguntas"]') || document.querySelector('.section-perguntas');
+      const sec = document.getElementById('section-perguntas') || document.querySelector('[data-section="perguntas"], .section-perguntas');
       if (!sec) { log('seção não encontrada'); return false; }
 
       try { typeof window.updateBlocks === 'function' && window.updateBlocks(); } catch (_) {}
@@ -1587,7 +1515,7 @@
     };
 
     const mo = new MutationObserver(() => {
-      const sec = document.getElementById('section-perguntas') || document.querySelector('[data-section="perguntas"]') || document.querySelector('.section-perguntas');
+      const sec = document.getElementById('section-perguntas') || document.querySelector('[data-section="perguntas"], .section-perguntas');
       if (sec && !sec.classList.contains('hidden')) ensureQuestionsReady();
     });
     mo.observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style'] });
@@ -1624,7 +1552,7 @@
       if (sectionId === 'section-perguntas') {
         requestAnimationFrame(() => setTimeout(ensureOnce, 0));
       } else {
-        const selfie = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"]') || document.querySelector('.section-selfie');
+        const selfie = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
         if (selfie && sectionId !== 'section-selfie') {
           selfie.style.pointerEvents = 'none';
           selfie.classList.add('hidden');
@@ -1639,9 +1567,9 @@
     document.addEventListener('click', function(ev) {
       const log = (...a) => { try { console.log('[Nav v3]', ...a); } catch (_) {} };
 
-      const secIntro = document.getElementById('section-intro') || document.querySelector('[data-section="intro"]') || document.querySelector('.section-intro');
+      const secIntro = document.getElementById('section-intro') || document.querySelector('[data-section="intro"], .section-intro');
       if (secIntro) {
-        const btn = ev.target.closest?.('[data-action="next"], [data-action="avancar"], .btn-next, .btn-avancar, button[class*="next"], a[class*="next"], button[class*="avancar"], a[class*="avancar"], button, a');
+        const btn = ev.target.closest('[data-action="next"], [data-action="avancar"], .btn-next, .btn-avancar, button[class*="next"], a[class*="next"], button[class*="avancar"], a[class*="avancar"], button:not([data-action="select-guia"]), a:not([data-action="select-guia"])');
         if (btn && secIntro.contains(btn)) {
           const txt = (btn.textContent || '').toLowerCase();
           if (/\bavançar|\bpróximo|\bcontinuar|\bprosseguir/.test(txt) || btn.hasAttribute('data-action')) {
@@ -1652,9 +1580,9 @@
         }
       }
 
-      const secTermos = document.getElementById('section-termos') || document.querySelector('[data-section="termos"]') || document.querySelector('.section-termos');
+      const secTermos = document.getElementById('section-termos') || document.querySelector('[data-section="termos"], .section-termos');
       if (secTermos) {
-        const btn = ev.target.closest?.(`
+        const btn = ev.target.closest(`
           [data-action="termos-next"],
           [data-action="termos-next2"],
           [data-action="termos-next3"],
@@ -1669,7 +1597,7 @@
           a[class*="next"],
           button[class*="avancar"],
           a[class*="avancar"],
-          button, a
+          button:not([data-action="select-guia"]), a:not([data-action="select-guia"])
         `);
         if (btn && secTermos.contains(btn)) {
           const txt = (btn.textContent || '').toLowerCase();
@@ -1698,9 +1626,22 @@
         }
       }
 
-      const secSelfie = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"]') || document.querySelector('.section-selfie');
+      const secSenha = document.getElementById('section-senha') || document.querySelector('[data-section="senha"], .section-senha');
+      if (secSenha) {
+        const btn = ev.target.closest('[data-action="start"], [data-action="next-senha"], [data-action="accept"], [data-action="accept-terms"], [data-action="termos-aceito"], [data-action="aceito"], .btn-start, .btn-iniciar, button[class*="start"], a[class*="start"], button[class*="iniciar"], a[class*="iniciar"], button:not([data-action="select-guia"]), a:not([data-action="select-guia"])');
+        if (btn && secSenha.contains(btn)) {
+          const txt = (btn.textContent || '').toLowerCase();
+          if (/\biniciar|\bstart|\bavançar|\bpróximo|\bcontinuar|\bprosseguir/.test(txt) || btn.hasAttribute('data-action')) {
+            ev.preventDefault();
+            window.startJourney();
+            log('startJourney disparado por:', btn.tagName, btn.className || btn.id);
+          }
+        }
+      }
+
+      const secSelfie = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
       if (secSelfie) {
-        const btn = ev.target.closest?.(`
+        const btn = ev.target.closest(`
           [data-action="selfie-next"],
           [data-action="skip-selfie"],
           #btnSkipSelfie,
@@ -1712,7 +1653,7 @@
           a[class*="next"],
           button[class*="avancar"],
           a[class*="avancar"],
-          button, a
+          button:not([data-action="select-guia"]), a:not([data-action="select-guia"])
         `);
         if (btn && secSelfie.contains(btn)) {
           const txt = (btn.textContent || '').toLowerCase();
@@ -1724,33 +1665,14 @@
         }
       }
 
-      const btnToTermos = ev.target.closest?.('[data-action="next-termos"]');
+      const btnToTermos = ev.target.closest('[data-action="next-termos"]');
       if (btnToTermos) {
         ev.preventDefault();
         window.showSection('section-termos');
         log('Navegação para section-termos');
       }
 
-      const acceptSel = '[data-action="next-senha"], [data-action="accept"], [data-action="accept-terms"], [data-action="termos-aceito"], [data-action="aceito"]';
-      const btnAccept = ev.target.closest?.(acceptSel);
-      if (btnAccept) {
-        ev.preventDefault();
-        window.showSection('section-senha');
-        requestAnimationFrame(() => setTimeout(() => {
-          const sec = document.getElementById('section-senha');
-          if (sec) window.runTyping(sec);
-          log('Navegação para section-senha com runTyping');
-        }, 0));
-      }
-
-      const btnStart = ev.target.closest?.('[data-action="start"]');
-      if (btnStart) {
-        ev.preventDefault();
-        window.startJourney();
-        log('startJourney disparado');
-      }
-
-      const btnToggle = ev.target.closest?.('[data-action="toggle-password"], .password-toggle');
+      const btnToggle = ev.target.closest('[data-action="toggle-password"], .password-toggle');
       if (btnToggle) {
         ev.preventDefault();
         window.toggleSenha();
