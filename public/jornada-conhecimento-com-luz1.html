@@ -1455,6 +1455,180 @@
       }
     }, true);
   })();
+  
+<script id="irmandade-hotfix-dialogo">
+(function(){
+  // ---- Captura erros silenciosos de promessas (limpa "Uncaught (in promise)") ----
+  window.addEventListener('unhandledrejection', e => {
+    console.error('[UnhandledRejection]', e.reason);
+    try { window.toast && window.toast('Algo falhou em segundo plano, mas seguimos.'); } catch(_){}
+  });
+
+  // ---- Config dos guias / API (ajuste as URLs se necessário) ----
+  const JC = (window.JC ||= {});
+  JC.sessionId = JC.sessionId || (crypto?.randomUUID?.() || String(Date.now()));
+  JC.guia = JC.guia || (localStorage.getItem('JORNADA_GUIA') || 'lumen');
+
+  const GUIAS = {
+    zion:  { apiBase: 'https://zion-backend-api.onrender.com',  model: 'grok',   voice:'male'   },
+    lumen: { apiBase: 'https://lumen-backend-api.onrender.com', model: 'gpt-5',  voice:'female' },
+    arion: { apiBase: 'https://arion-backend-api.onrender.com', model: 'gemini', voice:'female' }
+  };
+
+  // ---- CSS mínimo do chat ----
+  (function injectChatCss(){
+    if (document.getElementById('irmandade-chat-css')) return;
+    const css = `
+      .chat-wrap{max-width:900px;margin:0 auto;padding:16px}
+      .chat-log{display:flex;flex-direction:column;gap:12px;min-height:40vh;padding:12px;border:1px solid rgba(155,231,196,.35);border-radius:14px;background:rgba(11,31,22,.25);backdrop-filter:blur(3px)}
+      .msg{max-width:85%;padding:10px 14px;border-radius:14px;line-height:1.5}
+      .msg.bot{align-self:flex-start;border:1px solid #9be7c4;background:rgba(155,231,196,.08)}
+      .msg.user{align-self:flex-end;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.06)}
+      .chat-form{display:flex;gap:8px;margin-top:12px}
+      .chat-form input{flex:1;padding:12px;border-radius:12px;border:1px solid rgba(155,231,196,.35);background:rgba(0,0,0,.2);color:#eaf7f1}
+      .chat-form button{padding:12px 16px;border-radius:12px;border:1px solid #9be7c4;background:transparent;color:#9be7c4;cursor:pointer}
+    `;
+    const s = document.createElement('style');
+    s.id = 'irmandade-chat-css';
+    s.textContent = css;
+    document.head.appendChild(s);
+  })();
+
+  // ---- Seção de diálogo (cria se não existir) ----
+  function ensureDialogSection(){
+    let sec = document.getElementById('section-dialogo');
+    if (sec) return sec;
+    sec = document.createElement('section');
+    sec.id = 'section-dialogo';
+    sec.className = 'j-section hidden';
+    sec.setAttribute('aria-live','polite');
+    sec.innerHTML = `
+      <div class="chat-wrap">
+        <div id="chat-log" class="chat-log" role="log" aria-label="Mensagens da Jornada"></div>
+        <form id="chat-form" class="chat-form" autocomplete="off">
+          <input id="chat-input" type="text" placeholder="Digite sua resposta e pressione Enviar…" />
+          <button id="chat-send" type="submit">Enviar</button>
+        </form>
+      </div>`;
+    const finalSec = document.getElementById('section-final');
+    if (finalSec && finalSec.parentNode) finalSec.parentNode.insertBefore(sec, finalSec);
+    else document.body.appendChild(sec);
+    return sec;
+  }
+
+  // ---- Helpers do chat ----
+  function appendMsg(text, who='bot'){
+    const log = document.getElementById('chat-log');
+    const div = document.createElement('div');
+    div.className = `msg ${who}`;
+    div.textContent = text || '';
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+    return div;
+  }
+  async function botSay(text){
+    const el = appendMsg('', 'bot');
+    const tw = (window.typeWriter || (async (el,t)=>{el.textContent=t;}));
+    await tw(el, String(text||''), 20, false);
+    if (window.JORNADA?.tts?.enabled && !window.isMuted && typeof window.speak === 'function') {
+      try { await window.speak(String(text||'')); } catch(_){}
+    }
+  }
+  function userSay(text){ appendMsg(String(text||''), 'user'); }
+
+  async function fetchNextPrompt(lastAnswer){
+    const cfg = GUIAS[(JC.guia||'lumen')] || GUIAS.lumen;
+    const tries = [
+      {url:`${cfg.apiBase}/v1/jornada/next`,    method:'POST', body:(ans)=>({sessionId:JC.sessionId, guia:JC.guia, model:cfg.model, lastAnswer:ans??null})},
+      {url:`${cfg.apiBase}/v1/jornada/ask-next`,method:'POST', body:(ans)=>({sessionId:JC.sessionId, guia:JC.guia, model:cfg.model, lastAnswer:ans??null})},
+      {url:`${cfg.apiBase}/v1/chat`,            method:'POST', body:(ans)=>({mode:'next', sessionId:JC.sessionId, guia:JC.guia, model:cfg.model, lastAnswer:ans??null})},
+    ];
+    let lastErr=null;
+    for(const t of tries){
+      try{
+        const res = await fetch(t.url, {method:t.method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(t.body(lastAnswer))});
+        if(!res.ok) throw new Error('HTTP '+res.status);
+        const data = await res.json();
+        if (typeof data?.prompt === 'string') return { prompt:data.prompt, done:!!data.done };
+        if (typeof data?.message === 'string') return { prompt:data.message, done:!!data.done };
+        throw new Error('payload inválido');
+      }catch(e){ lastErr=e; }
+    }
+    throw lastErr || new Error('Backend indisponível');
+  }
+
+  // ---- Abre diálogo e inicia a primeira pergunta ----
+  async function openDialogAndKickoff(){
+    ensureDialogSection();
+    // Mostra a seção (usa seu showSection atual se existir)
+    const _show = window.showSection;
+    if (typeof _show === 'function') {
+      try { _show('section-dialogo'); } catch(_){
+        // fallback: mostra manualmente
+        document.querySelectorAll('.j-section,[id^="section-"]').forEach(s=>{ s.classList.add('hidden'); s.style.display='none'; });
+        const d = document.getElementById('section-dialogo'); d.classList.remove('hidden'); d.style.display='block';
+      }
+    }
+    try{
+      const first = await fetchNextPrompt(null);
+      await botSay(first.prompt || 'Vamos começar nossa jornada.');
+      JC.done = !!first.done;
+    }catch(err){
+      console.error('[kickoff] erro', err);
+      try { window.toast && window.toast('Falha ao iniciar diálogo. Tente novamente.', 'error'); } catch(_){}
+    }
+  }
+
+  // ---- Inicializa form do chat (uma vez só) ----
+  function initChatForm(){
+    if (window.__IRM_DIALOGO_READY) return;
+    ensureDialogSection();
+    const form  = document.getElementById('chat-form');
+    const input = document.getElementById('chat-input');
+    if(!form || !input) return;
+    form.addEventListener('submit', async (ev)=>{
+      ev.preventDefault();
+      const text=(input.value||'').trim(); if(!text) return;
+      userSay(text); input.value='';
+      try{
+        const next = await fetchNextPrompt(text);
+        if(next.done){
+          await botSay(next.prompt || 'Gratidão. Jornada concluída!');
+          JC.done=true;
+          try { window.showSection && window.showSection('section-final'); } catch(_){}
+        }else{
+          await botSay(next.prompt);
+        }
+      }catch(err){
+        console.error('[submit] erro', err);
+        try { window.toast && window.toast('Não consegui buscar a próxima pergunta.', 'error'); } catch(_){}
+      }
+    });
+    window.__IRM_DIALOGO_READY = true;
+  }
+
+  // ---- Intercepta section-perguntas e redireciona pro diálogo ----
+  (function patchShowSection(){
+    const prev = window.showSection;
+    window.showSection = function(id){
+      if (id === 'section-perguntas') {
+        console.log('[Hotfix] Redirecionando para section-dialogo (backend)');
+        initChatForm();
+        openDialogAndKickoff();
+        return;
+      }
+      if (typeof prev === 'function') return prev.apply(this, arguments);
+    };
+  })();
+
+  // ---- Garante que o chat esteja pronto quando o DOM terminar ----
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initChatForm, { once:true });
+  } else {
+    initChatForm();
+  }
+})();
+  </script>
 
   /* ===== Boot ===== */
   (function(){
