@@ -1778,8 +1778,8 @@
     }, true);
   })();
 
-  /* ===== Boot ===== */
-  (function(){
+ /* ===== Boot ===== */
+(function(){
     console.log('[Boot] Iniciando script seguro');
     try {
       window.JORNADA_CHAMA && window.JORNADA_CHAMA.ensureHeaderFlame && window.JORNADA_CHAMA.ensureHeaderFlame();
@@ -1789,7 +1789,8 @@
     }
     if (typeof window.speechSynthesis !== 'undefined') {
       speechSynthesis.onvoiceschanged = () => {};
-     if (document.getElementById('section-intro')) {
+    }
+    if (document.getElementById('section-intro')) {
       window.showSection('section-intro');
     } else {
       const possibleSections = ['section-termos', 'section-senha', 'section-guia', 'section-perguntas'];
@@ -1799,7 +1800,8 @@
           break;
         }
       }
-  })();
+    }
+})();
 </script>
 </body>
 </html>
