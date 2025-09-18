@@ -591,13 +591,50 @@
     window.dedupe = dedupe;
   })();
 
-  /* ===== Config global Jornada ===== */
-  (function(){
-    window.JORNADA = window.JORNADA || {};
-    JORNADA.fullTypingMode = (JORNADA.fullTypingMode !== false);
-    JORNADA.typing = Object.assign({ charDelay: 18, caret: false }, (JORNADA.typing || {}));
-    JORNADA.tts = Object.assign({ enabled: true, lang: 'pt-BR', rate: 1.06, pitch: 1.0, voiceName: '', readingMode: 'after' }, (JORNADA.tts || {}));
-  })();
+/* ===== Utilitários globais ===== */
+(function(){
+    window.toast = function(msg) {
+      try {
+        const t = document.getElementById('toast');
+        if (!t) return;
+        t.textContent = msg;
+        t.classList.remove('hidden');
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+      } catch (_) {}
+    }
+    window.addEventListener('error', (e) => {
+      console.error('[Erro global]', e?.error || e);
+      window.toast('Ops… algo falhou, mas já seguimos em frente.');
+    });
+
+    const env = document.getElementById('envTag');
+    if (env) {
+      env.textContent = `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/assets`;
+    }
+
+    window.dedupe = function(s = '') {
+      if (!s) return '';
+      let result = s.normalize('NFC').trim().replace(/\s+/g, ' ');
+      const validDoubleConsonants = /^(.*?(?:ss|rr|tt|cc|pp|mm|nn|ll|bb|dd|ff|gg|vv|zz)[a-z]*?)$/i;
+      const words = result.split(' ');
+      const out = [];
+      for (let w of words) {
+        if (validDoubleConsonants.test(w)) {
+          out.push(w);
+        } else {
+          let c = w[0] || '';
+          for (let i = 1; i < w.length; i++) {
+            if (w[i] !== w[i - 1] || !/[a-zA-Z]/.test(w[i])) {
+              c += w[i];
+            }
+          }
+          out.push(c);
+        }
+      }
+      return out.join(' ').trim();
+    }
+})();
 
   /* ===== TTS utils ===== */
   (function(){
