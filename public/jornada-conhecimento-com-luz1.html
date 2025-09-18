@@ -1076,6 +1076,7 @@
     if (!senha) {
       toast('Digite a senha para continuar.');
       if (inputSenha) inputSenha.focus();
+      console.log('[startJourney] Senha não fornecida');
       return;
     }
 
@@ -1100,6 +1101,7 @@
           console.log('[startJourney] runTyping chamado para section-guia');
         }
       }, 0));
+      console.log('[startJourney] Navegação para section-guia');
       return;
     }
     if (hasSelfie) {
@@ -1111,9 +1113,11 @@
           console.log('[startJourney] runTyping chamado para section-selfie');
         }
       }, 0));
+      console.log('[startJourney] Navegação para section-selfie');
       return;
     }
     window.openQuestions();
+    console.log('[startJourney] Navegação para section-perguntas (fallback)');
   };
 
   window.toggleSenha = function() {
@@ -1126,7 +1130,7 @@
 
   /* ===== Guia ===== */
   (function(){
-    const log = (...a) => { try { console.log('[GUIA v9]', ...a); } catch (_) {} };
+    const log = (...a) => { try { console.log('[GUIA v10]', ...a); } catch (_) {} };
 
     function secGuia() {
       return document.getElementById('section-guia') || document.querySelector('[data-section="guia"], .section-guia, .guia-container, .guia') || null;
@@ -1227,9 +1231,52 @@
       try {
         localStorage.setItem('JORNADA_GUIA', guia);
         const card = document.getElementById('card-guide');
+        const bgImg = document.getElementById('guideBg');
         const guideNameEl = document.getElementById('guideNameSlot');
         if (card) card.dataset.guide = guia.toUpperCase();
         if (guideNameEl) guideNameEl.textContent = guia.toUpperCase();
+        if (bgImg) {
+          const GUIDE_BG = {
+            lumen: [
+              '/assets/img/irmandade-quarteto-bg-lumen.png',
+              '/assets/img/irmandade-quarteto-bg-lumen.jpg',
+              '/assets/img/irmandade-quarteto-bg-lumen.jpeg'
+            ],
+            zion: [
+              '/assets/img/irmandade-quarteto-bg-zion.png',
+              '/assets/img/irmandade-quarteto-bg-zion.jpg',
+              '/assets/img/irmandade-quarteto-bg-zion.jpeg'
+            ],
+            arion: [
+              '/assets/img/irmandade-quarteto-bg-arian.jpeg',
+              '/assets/img/irmandade-quarteto-bg-arion.jpeg',
+              '/assets/img/irmandade-quarteto-bg-arion.jpg',
+              '/assets/img/irmandade-quarteto-bg-arion.png'
+            ]
+          };
+          const src = await new Promise(res => {
+            let i = 0;
+            (function step() {
+              if (i >= GUIDE_BG[guia].length) return res(null);
+              const src = GUIDE_BG[guia][i++];
+              const im = new Image();
+              im.onload = () => res(src);
+              im.onerror = () => step();
+              im.src = src;
+            })();
+          });
+          if (src) {
+            bgImg.src = src;
+            log('Imagem do guia aplicada em #guideBg:', src, 'para guia:', guia);
+            const errorDiv = document.getElementById('selfieError');
+            if (errorDiv) errorDiv.style.display = 'none';
+          } else {
+            log('Nenhum fundo válido encontrado para guia:', guia);
+            const errorDiv = document.getElementById('selfieError');
+            if (errorDiv) errorDiv.style.display = 'block';
+            toast('Erro ao carregar a imagem de fundo do guia.');
+          }
+        }
         window.showSection('section-selfie');
         requestAnimationFrame(() => setTimeout(() => {
           const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
@@ -1239,7 +1286,7 @@
           }
         }, 0));
       } catch (e) {
-        console.error('[GUIA v9] Erro ao prosseguir após escolha do guia:', e);
+        console.error('[GUIA v10] Erro ao prosseguir após escolha do guia:', e);
         toast('Erro ao prosseguir. Tente novamente.');
       }
     }
@@ -1248,7 +1295,7 @@
       const guia = inferGuideFrom(el);
       log('Guia selecionado:', guia, 'a partir de:', el.tagName, el.id || el.className, 'texto:', (el.textContent || '').slice(0, 50));
       if (!guia) {
-        console.warn('[GUIA v9] Não foi possível inferir o guia.');
+        console.warn('[GUIA v10] Não foi possível inferir o guia.');
         toast('Por favor, selecione um guia válido.');
         return;
       }
@@ -1261,7 +1308,7 @@
         el.classList.add('active');
         proceedAfterGuia(guia);
       } catch (e) {
-        console.error('[GUIA v9] Erro ao escolher guia:', e);
+        console.error('[GUIA v10] Erro ao escolher guia:', e);
         toast('Erro ao selecionar o guia. Tente novamente.');
       }
     }
@@ -1349,7 +1396,7 @@
 
   /* ===== Selfie ===== */
   (function(){
-    const log = (...a) => { try { console.log('[Selfie v5]', ...a); } catch (_) {} };
+    const log = (...a) => { try { console.log('[Selfie v6]', ...a); } catch (_) {} };
 
     function normGuide(s = '') {
       s = String(s).toLowerCase();
@@ -1359,11 +1406,71 @@
       return 'lumen';
     }
 
+    function getBgUrl(guia) {
+      const GUIDE_BG = {
+        lumen: [
+          '/assets/img/irmandade-quarteto-bg-lumen.png',
+          '/assets/img/irmandade-quarteto-bg-lumen.jpg',
+          '/assets/img/irmandade-quarteto-bg-lumen.jpeg'
+        ],
+        zion: [
+          '/assets/img/irmandade-quarteto-bg-zion.png',
+          '/assets/img/irmandade-quarteto-bg-zion.jpg',
+          '/assets/img/irmandade-quarteto-bg-zion.jpeg'
+        ],
+        arion: [
+          '/assets/img/irmandade-quarteto-bg-arian.jpeg',
+          '/assets/img/irmandade-quarteto-bg-arion.jpeg',
+          '/assets/img/irmandade-quarteto-bg-arion.jpg',
+          '/assets/img/irmandade-quarteto-bg-arion.png'
+        ]
+      };
+      return new Promise(res => {
+        let i = 0;
+        (function step() {
+          if (i >= GUIDE_BG[guia].length) return res(null);
+          const src = GUIDE_BG[guia][i++];
+          const im = new Image();
+          im.onload = () => res(src);
+          im.onerror = () => step();
+          im.src = src;
+        })();
+      });
+    }
+
     async function applySelfieBg() {
       const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
       if (!sec || sec.classList.contains('hidden')) {
         log('Seção de selfie não visível, pulando applySelfieBg');
         return;
+      }
+
+      const card = document.getElementById('card-guide');
+      const bgImg = document.getElementById('guideBg');
+      const guideNameEl = document.getElementById('guideNameSlot');
+      const errorDiv = document.getElementById('selfieError');
+      const guia = normGuide(localStorage.getItem('JORNADA_GUIA') || '');
+
+      if (card) card.dataset.guide = guia.toUpperCase();
+      if (guideNameEl) guideNameEl.textContent = guia.toUpperCase();
+      if (bgImg) {
+        const src = await getBgUrl(guia);
+        if (src) {
+          bgImg.src = src;
+          bgImg.onload = () => {
+            if (errorDiv) errorDiv.style.display = 'none';
+            log('Imagem do guia aplicada em #guideBg:', src, 'para guia:', guia);
+          };
+          bgImg.onerror = () => {
+            if (errorDiv) errorDiv.style.display = 'block';
+            toast('Erro ao carregar a imagem de fundo do guia.');
+            log('Erro ao carregar imagem do guia:', src);
+          };
+        } else {
+          if (errorDiv) errorDiv.style.display = 'block';
+          toast('Nenhum fundo válido encontrado para guia: ' + guia);
+          log('Nenhum fundo válido encontrado para guia:', guia);
+        }
       }
 
       try {
@@ -1393,7 +1500,7 @@
           })));
         }
       } catch (e) {
-        console.error('[Selfie v5] Erro ao aplicar datilografia/TTS:', e);
+        console.error('[Selfie v6] Erro ao aplicar datilografia/TTS:', e);
         toast('Erro ao carregar texto na selfie. Tente prosseguir.');
       }
     }
@@ -1565,7 +1672,7 @@
     };
 
     document.addEventListener('click', function(ev) {
-      const log = (...a) => { try { console.log('[Nav v3]', ...a); } catch (_) {} };
+      const log = (...a) => { try { console.log('[Nav v4]', ...a); } catch (_) {} };
 
       const secIntro = document.getElementById('section-intro') || document.querySelector('[data-section="intro"], .section-intro');
       if (secIntro) {
