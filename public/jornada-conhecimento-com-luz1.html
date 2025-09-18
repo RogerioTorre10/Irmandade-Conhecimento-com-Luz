@@ -1457,8 +1457,7 @@
       }
     });
   })();
-
-  /* ===== Perguntas ===== */
+ 
  /* ===== Perguntas ===== */
 (function(){
     const log = (...a) => { try { console.log('[PERGv6]', ...a); } catch (_) {} };
@@ -1655,28 +1654,23 @@
 
       const secSelfie = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
       if (secSelfie) {
-        const btn = ev.target.closest(`
-          [data-action="selfie-next"],
-          [data-action="skip-selfie"],
-          #btnSkipSelfie,
-          .btn-skip-selfie,
-          [data-role="start"],
-          button[class*="skip"],
-          button[class*="next"],
-          a[class*="skip"],
-          a[class*="next"],
-          button[class*="avancar"],
-          a[class*="avancar"],
-          button:not([data-action="select-guia"]),
-          a:not([data-action="select-guia"])
-        `);
-        if (btn && secSelfie.contains(btn)) {
-          const txt = (btn.textContent || '').toLowerCase();
-          if (/\bavançar|\bpular|\biniciar|\bcomeçar|\bconfirmar|\bprosseguir/.test(txt) || btn.hasAttribute('data-action')) {
-            ev.preventDefault();
-            window.showSection('section-perguntas');
-            log('Navegação para section-perguntas disparada por:', btn.tagName, btn.className || btn.id);
-          }
+        /* Substitua o trecho da secSelfie no seu script pelo código abaixo */
+
+      const secSelfie = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
+      if (secSelfie) {
+        const btn = ev.target.closest(`
+          [data-action="selfie-next"],
+          [data-action="skip-selfie"],
+          [data-action="next"],
+          .btn-skip-selfie,
+          [data-role="start"]
+        `);
+        if (btn && secSelfie.contains(btn)) {
+          ev.preventDefault();
+          window.showSection('section-perguntas');
+          log('Navegação para section-perguntas disparada por:', btn.tagName, btn.className || btn.id);
+        }
+      }
         }
       }
 
