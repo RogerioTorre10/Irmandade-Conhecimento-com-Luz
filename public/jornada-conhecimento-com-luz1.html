@@ -1789,8 +1789,7 @@
     }
     if (typeof window.speechSynthesis !== 'undefined') {
       speechSynthesis.onvoiceschanged = () => {};
-    }
-    if (document.getElementById('section-intro')) {
+     if (document.getElementById('section-intro')) {
       window.showSection('section-intro');
     } else {
       const possibleSections = ['section-termos', 'section-senha', 'section-guia', 'section-perguntas'];
