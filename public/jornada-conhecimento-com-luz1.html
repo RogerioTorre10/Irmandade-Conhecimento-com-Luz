@@ -1272,64 +1272,129 @@ window.showSection = showSection;
   }
 
   document.addEventListener('click', function(ev) {
-    const root = secGuia();
-    const target = ev.target;
-    if (!root || !root.contains(target)) {
-      const activeSection = q('.j-section:not(.hidden), [id^="section-"]:not(.hidden)') || document;
-      const el = target.closest(`
-        [data-action*="guide"],
-        [data-guide],
-        [data-guide-id],
-        .choose-guide,
-        .btn-guia,
-        .card-guia,
-        .guia-option,
-        .guia-item,
-        .guide-selector,
-        #btnLumen, #btnZion, #btnArion,
-        img[alt*="Lumen" i], img[alt*="Zion" i], img[alt*="Arion" i],
-        button[class*="guia"], a[class*="guia"],
-        [class*="guide"], [id*="guide"],
-        button, a, div[tabindex], [role="button"],
-        .btn, .button, .option
-      `);
-      if (!el || !activeSection.contains(el)) return;
+  const q = (s, r = document) => r.querySelector(s);
+  const qa = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const log = (...a) => { try { console.log('[Nav v1]', ...a); } catch (_) {} };
 
-      const g = inferGuideFrom(el);
-      if (!g) return;
-
-      ev.preventDefault();
-      ev.stopPropagation();
-      choose(el);
-    } else {
-      const el = target.closest(`
-        [data-action*="guide"],
-        [data-guide],
-        [data-guide-id],
-        .choose-guide,
-        .btn-guia,
-        .card-guia,
-        .guia-option,
-        .guia-item,
-        .guide-selector,
-        #btnLumen, #btnZion, #btnArion,
-        img[alt*="Lumen" i], img[alt*="Zion" i], img[alt*="Arion" i],
-        button[class*="guia"], a[class*="guia"],
-        [class*="guide"], [id*="guide"],
-        button, a, div[tabindex], [role="button"],
-        .btn, .button, .option
-      `);
-      if (!el || !root.contains(el)) return;
-
-      const g = inferGuideFrom(el);
-      if (!g) return;
-
-      ev.preventDefault();
-      ev.stopPropagation();
-      choose(el);
+  // Selfie navigation
+  const secSelfie = q('#section-selfie, [data-section="selfie"], .section-selfie');
+  if (secSelfie) {
+    const btn = ev.target.closest?.(`
+      [data-action="selfie-next"],
+      [data-action="skip-selfie"],
+      #btnSkipSelfie,
+      .btn-skip-selfie,
+      [data-role="start"],
+      button[class*="skip"],
+      button[class*="next"],
+      a[class*="skip"],
+      a[class*="next"],
+      button, a
+    `);
+    if (btn && secSelfie.contains(btn)) {
+      const txt = (btn.textContent || '').toLowerCase();
+      if (/\bpular|\biniciar|\bcomeçar|\bconfirmar|\bprosseguir/.test(txt) || btn.hasAttribute('data-action')) {
+        ev.preventDefault();
+        window.showSection('section-perguntas');
+        log('Navegação para section-perguntas disparada por:', btn.tagName, btn.className || btn.id);
+      }
     }
-  }, true);
+  }
 
+  // Termos navigation
+  const termosSel = `
+    [data-action="termos-next"],
+    [data-action="termos-next2"],
+    [data-action="termos-next3"],
+    [data-action="termos-next4"],
+    [data-action*="next"],
+    [data-action*="avancar"],
+    .btn-termos,
+    .termos-btn,
+    button[class*="termos"],
+    a[class*="termos"],
+    button[class*="next"],
+    a[class*="next"],
+    button[class*="avancar"],
+    a[class*="avancar"],
+    button, a
+  `;
+  const btnTermosNext = ev.target.closest?.(termosSel);
+  if (btnTermosNext) {
+    const secTermos = q('#section-termos, [data-section="termos"], .section-termos');
+    if (secTermos && secTermos.contains(btnTermosNext)) {
+      ev.preventDefault();
+      const pages = ['termos-pg1', 'termos-pg2', 'termos-pg3', 'termos-pg4', 'termos-pg5'];
+      const visId = pages.find(id => {
+        const el = document.getElementById(id);
+        return el && !el.classList.contains('hidden');
+      });
+      const idx = pages.indexOf(visId);
+      if (idx >= 0 && idx + 1 < pages.length) {
+        const cur = document.getElementById(pages[idx]);
+        const nxt = document.getElementById(pages[idx + 1]);
+        if (cur) cur.classList.add('hidden');
+        if (nxt) {
+          nxt.classList.remove('hidden');
+          window.runTyping(nxt);
+          log('Navegação para próxima página de termos:', nxt.id);
+        }
+      } else {
+        window.showSection('section-senha');
+        log('Navegação para section-senha');
+      }
+    }
+  }
+
+  // Intro navigation
+  const secIntro = q('#section-intro, [data-section="intro"], .section-intro');
+  if (secIntro) {
+    const btn = ev.target.closest?.('[data-action="next"], [data-action="avancar"], .btn-next, .btn-avancar, button[class*="next"], a[class*="next"], button, a');
+    if (btn && secIntro.contains(btn)) {
+      const txt = (btn.textContent || '').toLowerCase();
+      if (/\bavançar|\bpróximo|\bcontinuar|\bprosseguir/.test(txt) || btn.hasAttribute('data-action')) {
+        ev.preventDefault();
+        window.showSection('section-termos');
+        log('Navegação para section-termos disparada por:', btn.tagName, btn.className || btn.id);
+      }
+    }
+  }
+
+  // Outras ações
+  const btnToTermos = ev.target.closest?.('[data-action="next-termos"]');
+  if (btnToTermos) {
+    ev.preventDefault();
+    window.showSection('section-termos');
+    log('Navegação para section-termos');
+  }
+
+  const acceptSel = '[data-action="next-senha"], [data-action="accept"], [data-action="accept-terms"], [data-action="termos-aceito"], [data-action="aceito"]';
+  const btnAccept = ev.target.closest?.(acceptSel);
+  if (btnAccept) {
+    ev.preventDefault();
+    window.showSection('section-senha');
+    requestAnimationFrame(() => setTimeout(() => {
+      const sec = document.getElementById('section-senha');
+      if (sec) window.runTyping(sec);
+      log('Navegação para section-senha com runTyping');
+    }, 0));
+  }
+
+  const btnStart = ev.target.closest?.('[data-action="start"]');
+  if (btnStart) {
+    ev.preventDefault();
+    window.startJourney();
+    log('startJourney disparado');
+  }
+
+  const btnToggle = ev.target.closest?.('[data-action="toggle-password"], .password-toggle');
+  if (btnToggle) {
+    ev.preventDefault();
+    window.toggleSenha();
+    log('toggleSenha disparado');
+  }
+}, true);
+  
   document.addEventListener('keydown', function(ev) {
     if (ev.key !== 'Enter' && ev.key !== ' ') return;
     const root = secGuia() || q('.j-section:not(.hidden), [id^="section-"]:not(.hidden)') || document;
@@ -1451,35 +1516,61 @@ window.showSection = showSection;
   };
 
   async function applySelfieBg() {
-    const sec = q('#section-selfie, [data-section="selfie"], .section-selfie');
-    if (!sec || sec.classList.contains('hidden')) return;
-    const host = q('.selfie-bg', sec) || q('.selfie-hero', sec) || q('.selfie-wrapper', sec) || sec;
-    let img = q('img[data-role="bg"]', host) || q('#selfieBg', host) || q('.selfie-bg > img', sec);
-    if (!img) {
-      img = document.createElement('img');
-      img.setAttribute('data-role', 'bg');
-      img.alt = 'Guia Background';
-      host.appendChild(img);
-    }
-    const guia = normGuide(localStorage.getItem('JORNADA_GUIA') || '');
-    const src = await new Promise(res => {
-      let i = 0;
-      (function step() {
-        if (i >= GUIDE_BG[guia].length) return res(null);
-        const src = GUIDE_BG[guia][i++];
-        const im = new Image();
-        im.onload = () => res(src);
-        im.onerror = () => step();
-        im.src = src;
-      })();
-    });
-    if (src) {
-      img.src = src;
-      console.log('[Selfie] Fundo aplicado:', src, 'para guia:', guia);
-    } else {
-      console.warn('[Selfie] Nenhum fundo válido encontrado para guia:', guia);
-    }
+  const sec = q('#section-selfie, [data-section="selfie"], .section-selfie');
+  if (!sec || sec.classList.contains('hidden')) {
+    console.log('[Selfie v2] Seção de selfie não visível, pulando applySelfieBg');
+    return;
   }
+  const host = q('.selfie-bg', sec) || q('.selfie-hero', sec) || q('.selfie-wrapper', sec) || sec;
+  let img = q('img[data-role="bg"]', host) || q('#selfieBg', host) || q('.selfie-bg > img', sec);
+  if (!img) {
+    img = document.createElement('img');
+    img.setAttribute('data-role', 'bg');
+    img.alt = 'Guia Background';
+    host.appendChild(img);
+  }
+  const guia = normGuide(localStorage.getItem('JORNADA_GUIA') || '');
+  const src = await new Promise(res => {
+    let i = 0;
+    (function step() {
+      if (i >= GUIDE_BG[guia].length) return res(null);
+      const src = GUIDE_BG[guia][i++];
+      const im = new Image();
+      im.onload = () => res(src);
+      im.onerror = () => step();
+      im.src = src;
+    })();
+  });
+  if (src) {
+    img.src = src;
+    console.log('[Selfie v2] Fundo aplicado:', src, 'para guia:', guia);
+  } else {
+    console.warn('[Selfie v2] Nenhum fundo válido encontrado para guia:', guia);
+  }
+
+  // Garante datilografia e TTS na selfie
+  try {
+    if (typeof window.runTyping === 'function') {
+      window.runTyping(sec);
+      console.log('[Selfie v2] runTyping chamado para section-selfie');
+    } else {
+      const textEl = sec.querySelector('[data-typing], .selfie-text, .text, p, h3, h4, [class*="text"]');
+      if (textEl && typeof window.typeWriter === 'function') {
+        const text = window.dedupe(textEl.getAttribute('data-text') || textEl.textContent || '');
+        await window.typeWriter(textEl, text, JORNADA.typing.charDelay, false);
+        if (JORNADA.tts.enabled && JORNADA.tts.readingMode === 'after' && !window.isMuted) {
+          await window.speak(text);
+        }
+        console.log('[Selfie v2] Fallback de datilografia e TTS aplicado em:', textEl.tagName, textEl.className || textEl.id);
+      } else {
+        console.warn('[Selfie v2] Nenhum elemento de texto encontrado para datilografia/TTS');
+      }
+    }
+  } catch (e) {
+    console.error('[Selfie v2] Erro ao aplicar datilografia/TTS:', e);
+    toast('Erro ao carregar texto na selfie. Tente prosseguir.');
+  }
+}
 
   const moSelfie = new MutationObserver(() => {
     const sec = q('#section-selfie, [data-section="selfie"], .section-selfie');
