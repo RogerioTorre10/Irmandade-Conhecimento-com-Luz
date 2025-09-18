@@ -576,10 +576,8 @@
     const out = [];
     for (let w of words) {
       if (validDoubleConsonants.test(w)) {
-        // Mantém palavras com consoantes duplas válidas
         out.push(w);
       } else {
-        // Remove duplicações apenas para casos inválidos
         let c = '';
         for (let i = 0; i < w.length; i++) {
           if (i === 0 || w[i] !== w[i - 1] || !/[a-zA-Z]/.test(w[i])) c += w[i];
@@ -632,6 +630,7 @@
       try { speechSynthesis.speak(u); } catch (_) { res(); }
     });
   }
+  window.speak = speak; // Expor speak globalmente
 
   function readAloud(text, voiceGender) {
     if (window.isMuted || !isSpeechAvailable()) return Promise.resolve();
@@ -796,7 +795,7 @@
       el.textContent = (pergunta || '');
       unlockNext();
       if (JORNADA.tts.enabled && JORNADA.tts.readingMode === 'after' && !window.isMuted) {
-        await speak(pergunta || '');
+        await window.speak(pergunta || '');
       }
       return;
     }
@@ -807,7 +806,7 @@
     try {
       await window.typeWriter(el, pergunta || '', JORNADA.typing.charDelay, false);
       if (JORNADA.tts.enabled && JORNADA.tts.readingMode === 'after' && !window.isMuted) {
-        await speak(pergunta || '');
+        await window.speak(pergunta || '');
       }
     } catch (e) {
       console.error('[typeAndReadQuestion] Erro:', e);
@@ -841,7 +840,7 @@
         const showCursor = String(el.getAttribute('data-cursor') || 'true') === 'true';
         await window.typeWriter(el, text, speed, showCursor);
         if (JORNADA.tts.enabled && JORNADA.tts.readingMode === 'after' && !window.isMuted) {
-          await speak(text);
+          await window.speak(text);
         }
       }
     } catch (e) {
