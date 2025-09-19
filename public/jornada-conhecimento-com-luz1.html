@@ -11,10 +11,68 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
     <script defer src="/jornada-paper-qa.js?v=2"></script>
-    <script window.JORNADA = window.JORNADA || { tts: { enabled: false, lang: 'pt-BR', rate: 1, pitch: 1, voiceName: '' }, typing: { charDelay: 36 } };></script>
-    <script window.JORNADA_BLOCKS=window.JORNADA_BLOCKS||[{id:"stub",questions:[{id:"q1",label:"O que te trouxe até aqui hoje?"}]}];></script>
+    <script>window.JORNADA=window.JORNADA||{tts:{enabled:!1,lang:"pt-BR",rate:1,pitch:1,voiceName:""},typing:{charDelay:36}};var JORNADA=window.JORNADA;window.JORNADA_BLOCKS=window.JORNADA_BLOCKS||[{id:"stub",questions:[{id:"q1",label:"O que te trouxe até aqui hoje?"}]}];document.addEventListener("click",function(e){const b=e.target.closest('[data-action="next-termos"]');if(!b)return;e.preventDefault();window.showSection&&window.showSection("section-termos")},!0);document.addEventListener("click",function(e){const t=e.target.closest('[data-action^="termos-next"]');if(!t)return;e.preventDefault();const p=["termos-pg1","termos-pg2","termos-pg3","termos-pg4","termos-pg5"],v=p.find(id=>{const el=document.getElementById(id);return el&&!el.classList.contains("hidden")}),i=p.indexOf(v);if(i>=0&&i+1<p.length){document.getElementById(p[i])?.classList.add("hidden");const n=document.getElementById(p[i+1]);n?.classList.remove("hidden");window.runTyping&&n&&window.runTyping(n)}else window.showSection&&window.showSection("section-senha")},!0);document.addEventListener("click",function(e){const eye=e.target.closest('[data-action="toggle-password"]');if(!eye)return;const r=document.getElementById("section-senha")||document;const inp=r.querySelector("#senha")||r.querySelector("#senhaInput")||r.querySelector('input[type="password"]')||r.querySelector("input");if(!inp)return;inp.type="password"===inp.type?"text":"password";eye.querySelector("i,svg")?.classList.toggle("on")},!0);document.addEventListener("DOMContentLoaded",function(){const n=(localStorage.getItem("JORNADA_NOME")||"").toUpperCase();const i=document.getElementById("guiaNameInput");if(i&&n&&!i.value)i.value=n;["guideNameSlot","clientNameSlot","clientNameSlotFinal"].forEach(id=>{const el=document.getElementById(id);if(el&&n)el.textContent=n})});</script>
 
+  <script>
+// ===== Defaults/Config (variável global SEM erro) =====
+window.JORNADA = window.JORNADA || { tts:{ enabled:false, lang:'pt-BR', rate:1, pitch:1, voiceName:'' }, typing:{ charDelay:36 } };
+var JORNADA = window.JORNADA; // evita "JORNADA is not defined"
 
+// ===== Stub de perguntas (evita pular direto pro final se a API ainda não devolveu) =====
+window.JORNADA_BLOCKS = window.JORNADA_BLOCKS || [
+  { id:'stub', questions:[ { id:'q1', label:'O que te trouxe até aqui hoje?' } ] }
+];
+
+// ===== Intro -> Termos (se seu HTML usa data-action="next-termos") =====
+document.addEventListener('click', function(ev){
+  const b = ev.target.closest('[data-action="next-termos"]');
+  if(!b) return;
+  ev.preventDefault();
+  window.showSection && window.showSection('section-termos');
+}, true);
+
+// ===== Páginas de termos: aceita qualquer "termos-next", "termos-next2", "termos-next3", ... =====
+document.addEventListener('click', function(ev){
+  const btn = ev.target.closest('[data-action^="termos-next"]');
+  if(!btn) return;
+  ev.preventDefault();
+  const pages = ['termos-pg1','termos-pg2','termos-pg3','termos-pg4','termos-pg5'];
+  const visId = pages.find(id => { const el = document.getElementById(id); return el && !el.classList.contains('hidden'); });
+  const idx = pages.indexOf(visId);
+  if (idx >= 0 && idx + 1 < pages.length) {
+    document.getElementById(pages[idx])?.classList.add('hidden');
+    const nxt = document.getElementById(pages[idx+1]);
+    nxt?.classList.remove('hidden');
+    window.runTyping && nxt && window.runTyping(nxt);
+  } else {
+    window.showSection && window.showSection('section-senha');
+  }
+}, true);
+
+// ===== Olho da senha: funciona com #senha, #senhaInput ou o primeiro <input type="password"> =====
+document.addEventListener('click', function(ev){
+  const eye = ev.target.closest('[data-action="toggle-password"]');
+  if(!eye) return;
+  const root = document.getElementById('section-senha') || document;
+  const inp = root.querySelector('#senha') || root.querySelector('#senhaInput') ||
+              root.querySelector('input[type="password"]') || root.querySelector('input');
+  if(!inp) return;
+  inp.type = (inp.type === 'password' ? 'text' : 'password');
+  eye.querySelector('i,svg')?.classList.toggle('on');
+}, true);
+
+// ===== Sincroniza o nome do participante em todos os slots =====
+document.addEventListener('DOMContentLoaded', function(){
+  const nome = (localStorage.getItem('JORNADA_NOME') || '').toUpperCase();
+  const inp = document.getElementById('guiaNameInput');
+  if (inp && nome && !inp.value) inp.value = nome;
+  ['guideNameSlot','clientNameSlot','clientNameSlotFinal'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && nome) el.textContent = nome;
+  });
+});
+</script>
+  
   <style>
     @font-face {
       font-family: "ManufacturingConsent";
