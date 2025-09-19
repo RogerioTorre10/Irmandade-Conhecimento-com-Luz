@@ -1589,37 +1589,34 @@ function preloadGuiaBg(guia = 'lumen') {
       return 'lumen';
     }
 
-    function getBgUrl(guia) {
-      const GUIDE_BG = {
-        lumen: [
-          '/assets/img/irmandade-quarteto-bg-lumen.png',
-          '/assets/img/irmandade-quarteto-bg-lumen.jpg',
-          '/assets/img/irmandade-quarteto-bg-lumen.jpeg'
-        ],
-        zion: [
-          '/assets/img/irmandade-quarteto-bg-zion.png',
-          '/assets/img/irmandade-quarteto-bg-zion.jpg',
-          '/assets/img/irmandade-quarteto-bg-zion.jpeg'
-        ],
-        arion: [
-          '/assets/img/irmandade-quarteto-bg-arian.jpeg',
-          '/assets/img/irmandade-quarteto-bg-arion.jpeg',
-          '/assets/img/irmandade-quarteto-bg-arion.jpg',
-          '/assets/img/irmandade-quarteto-bg-arion.png'
-        ]
-      };
-      return new Promise(res => {
-        let i = 0;
-        (function step() {
-          if (i >= GUIDE_BG[guia].length) return res(null);
-          const src = GUIDE_BG[guia][i++];
-          const im = new Image();
-          im.onload = () => res(src);
-          im.onerror = () => step();
-          im.src = src;
-        });
-      });
-    }
+   // carrega o primeiro background disponível para o guia
+function preloadGuiaBg(guia = 'lumen') {
+  guia = normalizeGuia(guia);
+
+  const GUIDE_BG = {
+    lumen: [
+      '/assets/img/irmandade-quarteto-bg-lumen.jpg',
+      '/assets/img/irmandade-quarteto-bg-lumen.jpeg',
+      '/assets/img/irmandade-quarteto-bg-lumen.webp',
+      '/assets/img/irmandade-quarteto-bg-lumen.png'
+    ],
+    zion: [
+      '/assets/img/irmandade-quarteto-bg-zion.jpg',
+      '/assets/img/irmandade-quarteto-bg-zion.jpeg',
+      '/assets/img/irmandade-quarteto-bg-zion.webp',
+      '/assets/img/irmandade-quarteto-bg-zion.png'
+    ],
+    arian: [
+      '/assets/img/irmandade-quarteto-bg-arian.jpg',
+      '/assets/img/irmandade-quarteto-bg-arian.jpeg',
+      '/assets/img/irmandade-quarteto-bg-arian.webp',
+      '/assets/img/irmandade-quarteto-bg-arian.png'
+    ]
+  };
+
+  // versão única e limpa
+  return window.utils.loadFirstAvailable(GUIDE_BG[guia] || []);
+}
 
     async function applySelfieBg() {
       const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
