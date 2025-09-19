@@ -1834,7 +1834,7 @@
       recognition.onerror = (event) => {
         window.toast('Erro no reconhecimento: ' + event.error);
         recognition.onend();
-      };
+      }
       recognition.start();
     }
 
