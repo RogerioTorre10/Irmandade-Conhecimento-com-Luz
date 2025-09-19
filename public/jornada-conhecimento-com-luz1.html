@@ -1864,7 +1864,141 @@ document.addEventListener('DOMContentLoaded', function(){
   if (document.getElementById('section-intro')) showSafe('section-intro');
 })();
 
+/* ==== GLUE v2 — não substitui nada; só integra e dá fallback seguro ==== */
+(function(){
+  if(window.__IRM_GLUE__) return; window.__IRM_GLUE__=1;
 
+  /* ---- Defensas leves ---- */
+  window.JORNADA = window.JORNADA || { tts:{enabled:false,lang:'pt-BR',rate:1,pitch:1,voiceName:''}, typing:{charDelay:28} };
+  const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+  function toast(msg){ try{const t=$("#toast"); if(!t) return; t.textContent=msg; t.classList.remove("hidden"); t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2600);}catch(_){} }
+
+  /* ---- Mostrar seção com segurança (usa o showSection original se houver) ---- */
+  function showSafe(id){
+    try{
+      if(typeof window.showSection==="function") return window.showSection(id);
+      $$('.j-section,[id^="section-"]').forEach(s=>{ s.classList.add('hidden'); s.style.display='none'; });
+      const el = document.getElementById(id);
+      if(el){ el.classList.remove('hidden'); el.style.display='block'; setTimeout(()=>safeRunTyping(el),0); }
+    }catch(e){ console.error('[GLUE] showSafe err',e); }
+  }
+
+  /* ---- Datilografia fallback (só em [data-typing] visíveis) ---- */
+  function safeRunTyping(root){
+    try{
+      if(!root) return;
+      const els = Array.from(root.querySelectorAll('[data-typing]')).filter(el => el.offsetParent!==null);
+      if(!els.length){ console.log('[safeRunTyping] sem nós em', root.id||root.className); return; }
+      els.forEach(el=>{
+        const txt = (el.getAttribute('data-text')||el.textContent||'').trim();
+        el.textContent='';
+        let i=0; (function step(){ if(i<=txt.length){ el.textContent = txt.slice(0,i++); setTimeout(step, 18); } })();
+      });
+    }catch(e){ console.warn('[safeRunTyping] erro', e); }
+  }
+
+  /* ---- Navegação (compatível) ---- */
+  function swap(hideId, showId){
+    const h = document.getElementById(hideId), s = document.getElementById(showId);
+    if(h) h.classList.add('hidden');
+    if(s){ s.classList.remove('hidden'); setTimeout(()=>safeRunTyping(s),0); }
+  }
+
+  document.addEventListener('click', function(ev){
+    const btn = ev.target.closest('[data-action]'); if(!btn) return;
+    const act = btn.getAttribute('data-action'); if(!act) return;
+    ev.preventDefault();
+
+    switch(act){
+      /* Intro → Termos */
+      case 'next-termos': showSafe('section-termos'); {
+        const vis = $('#termos-pg1'); if(vis) setTimeout(()=>safeRunTyping(vis),0);
+      } return;
+
+      /* Termos paginação */
+      case 'termos-next' : return swap('termos-pg1','termos-pg2');
+      case 'termos-next2': return swap('termos-pg2','termos-pg3');
+      case 'termos-next3': return swap('termos-pg3','termos-pg4');
+      case 'termos-next4': return swap('termos-pg4','termos-pg5');
+
+      /* Ir para senha ao aceitar */
+      case 'next-senha': showSafe('section-senha'); return;
+
+      /* Olho da senha */
+      case 'toggle-password': {
+        const inp = $('#section-senha input#senha') || $('#section-senha input[type="password"]') || $('#section-senha input');
+        if(inp) inp.type = (inp.type==='password' ? 'text' : 'password');
+      } return;
+
+      /* Iniciar após senha (se houver startJourney original, usa-o) */
+      case 'start': if(typeof window.startJourney==='function'){ return window.startJourney(); }
+                    else { showSafe('section-guia'); return; }
+
+      /* Escolha do guia */
+      case 'select-guia': {
+        const g = (btn.dataset.guia || btn.dataset.guide || '').toLowerCase() || 'lumen';
+        try{ localStorage.setItem('JORNADA_GUIA', g); }catch(_){}
+        const bg = $('#guideBg');
+        if(bg){
+          bg.src = g==='lumen' ? '/assets/img/irmandade-quarteto-bg-lumen.png'
+               : g==='arian' ? '/assets/img/irmandade-quarteto-bg-arian.jpeg'
+               :              '/assets/img/irmandade-quarteto-bg-zion.jpeg';
+        }
+        showSafe('section-selfie');
+      } return;
+
+      /* Pular selfie → Perguntas (usa renderer da Arian se existir; senão fallback) */
+      case 'skip-selfie': {
+        showSafe('section-perguntas');
+        if(typeof window.ensureQuestionsReady==='function'){ window.ensureQuestionsReady(); }
+        else { renderFallbackQuestion(); }
+      } return;
+
+      /* Chat send (se existir área) – deixamos para o script da Arian tratar. */
+    }
+  }, true);
+
+  /* ---- Nome no card (live + persist) ---- */
+  const nameInput = $('#guiaNameInput');
+  if(nameInput){
+    const boot = (localStorage.getItem('JORNADA_NOME')||'').toUpperCase();
+    if(boot){ nameInput.value=boot; setNameOnCards(boot); }
+    nameInput.addEventListener('input', e=>{
+      const v = (e.target.value||'').toUpperCase();
+      setNameOnCards(v);
+      try{ localStorage.setItem('JORNADA_NOME', v); }catch(_){}
+    });
+  }
+  function setNameOnCards(v){
+    ['clientNameSlot','clientNameSlotFinal','guideNameSlot'].forEach(id=>{
+      const el = document.getElementById(id); if(el) el.textContent = v;
+    });
+  }
+
+  /* ---- Perguntas fallback (não interfere no renderer oficial) ---- */
+  function renderFallbackQuestion(){
+    const cont = document.getElementById('perguntas-container');
+    if(!cont) return;
+    cont.innerHTML = ''
+      + '<div class="j-pergunta bloco active">'
+      +   '<h3 class="pergunta-enunciado">O que te trouxe até aqui hoje?</h3>'
+      +   '<textarea class="w-full px-3 py-2 rounded border bg-white/10" placeholder="Escreva aqui..."></textarea>'
+      +   '<div class="footer-actions"><button class="btn" id="__goFinal">Concluir</button></div>'
+      + '</div>';
+    setTimeout(()=>safeRunTyping(cont),0);
+    $('#__goFinal')?.addEventListener('click', ()=> showSafe('section-final'));
+  }
+
+  /* ---- Boot suave ---- */
+  document.addEventListener('DOMContentLoaded', function(){
+    // Se a intro existe, mostra; senão cai para a primeira seção existente.
+    if(document.getElementById('section-intro')){ showSafe('section-intro'); setTimeout(()=>safeRunTyping(document.getElementById('section-intro')),0); }
+    else{
+      const first = ['section-termos','section-senha','section-guia','section-selfie','section-perguntas','section-final'].find(id=>document.getElementById(id));
+      if(first) showSafe(first);
+    }
+  });
+})();
 
   /* ===== Boot ===== */
   (function(){
