@@ -712,6 +712,27 @@
       }
     }
   }
+ 
+/* ===== Integração rápida ===== */
+(() => {
+  // exibe uma devolutiva em um elemento com typewriter
+  async function mostrarDevolutiva({el, pergunta, resposta, guia='lumen'}){
+    const txt = await window.fetchDevolutiva(pergunta, resposta, guia);
+    if (el) window.typeTextOnce(el, txt, 22);
+    return txt;
+  }
+
+  // fluxo interativo (para modo “chat” depois)
+  async function conversar({el, guia='lumen', historico=[], prompt=''}){
+    const { text } = await window.askInteractive({ guide: guia, history: historico, prompt });
+    if (el) window.typeTextOnce(el, text, 22);
+    return text;
+  }
+
+  window.mostrarDevolutiva = mostrarDevolutiva;
+  window.conversar = conversar;
+})();
+
 
   // ===== Chat interativo (histórico de mensagens estilo “nós dois conversando”) =====
   async function askInteractive({ guide='lumen', history=[], prompt='', temperature=0.7 }={}){
