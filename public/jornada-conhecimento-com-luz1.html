@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
     <script defer src="/jornada-paper-qa.js?v=2"></script>
     <script window.JORNADA = window.JORNADA || { tts: { enabled: false, lang: 'pt-BR', rate: 1, pitch: 1, voiceName: '' }, typing: { charDelay: 36 } }; </script>
-    <script>window.JORNADA_BLOCKS=window.JORNADA_BLOCKS||[{id:"stub",questions:[{id:"q1",label:"O que te trouxe até aqui hoje?"}]}];</script>
+    <script window.JORNADA_BLOCKS=window.JORNADA_BLOCKS||[{id:"stub",questions:[{id:"q1",label:"O que te trouxe até aqui hoje?"}]}];</script>
 
 
   <style>
@@ -1694,10 +1694,10 @@
     // Garante que a seção de diálogo existe desde o início
     try { window.openDialogAndKickoff && (function(){ const s=document.getElementById('section-dialogo'); if(!s){ (window.ensureDialogSection||(()=>{}))(); } })(); } catch(_) {}
 
-    <script>document.getElementById('guiaNameInput')&&document.getElementById('guiaNameInput').addEventListener('input',e=>{try{localStorage.setItem('JORNADA_NOME',e.target.value||'')}catch(_){}});</script>
-    <script>document.querySelector('[data-action="toggle-password"]')?.addEventListener('click',()=>{const i=document.querySelector('#section-senha input');if(i)i.type=i.type==='password'?'text':'password';});</script>
-    <script>document.getElementById('clientNameSlot')&&(document.getElementById('clientNameSlot').id='guideNameSlot');</script>
-    <script>window.addEventListener('DOMContentLoaded',()=>{const n=(localStorage.getItem('JORNADA_NOME')||'').toUpperCase();if(n){const f=document.getElementById('clientNameSlotFinal');if(f)f.textContent=n}});</script>
+    <script document.getElementById('guiaNameInput')&&document.getElementById('guiaNameInput').addEventListener('input',e=>{try{localStorage.setItem('JORNADA_NOME',e.target.value||'')}catch(_){}});</script>
+    <script document.querySelector('[data-action="toggle-password"]')?.addEventListener('click',()=>{const i=document.querySelector('#section-senha input');if(i)i.type=i.type==='password'?'text':'password';});</script>
+    <script document.getElementById('clientNameSlot')&&(document.getElementById('clientNameSlot').id='guideNameSlot');</script>
+    <script window.addEventListener('DOMContentLoaded',()=>{const n=(localStorage.getItem('JORNADA_NOME')||'').toUpperCase();if(n){const f=document.getElementById('clientNameSlotFinal');if(f)f.textContent=n}});</script>
 
     if (document.getElementById('section-intro')) {
       window.showSection('section-intro');
