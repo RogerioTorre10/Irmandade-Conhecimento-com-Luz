@@ -71,6 +71,45 @@ document.addEventListener('DOMContentLoaded', function(){
     if (el && nome) el.textContent = nome;
   });
 });
+ 
+(function(){
+  // ——— Força datilografia na página de termos atualmente visível
+  function runTypingOnVisibleTerms(){
+    try{
+      const ids=['termos-pg1','termos-pg2','termos-pg3','termos-pg4','termos-pg5'];
+      const visId = ids.find(id => {
+        const el = document.getElementById(id);
+        return el && !el.classList.contains('hidden');
+      });
+      const root = visId && document.getElementById(visId);
+      if (root && window.runTyping) window.runTyping(root);
+    }catch(_){}
+  }
+
+  // Ao sair da intro para termos
+  document.addEventListener('click', function(ev){
+    if (ev.target.closest('[data-action="next-termos"]')) {
+      setTimeout(runTypingOnVisibleTerms, 0);
+    }
+    // Garantia ao passar de página dentro dos termos
+    if (ev.target.closest('[data-action^="termos-next"]')) {
+      setTimeout(runTypingOnVisibleTerms, 0);
+    }
+  }, true);
+
+  // ——— Nome “ao vivo” no card e persistência
+  const nameInput = document.getElementById('guiaNameInput');
+  if (nameInput) {
+    nameInput.addEventListener('input', (e)=>{
+      const v = (e.target.value||'').toUpperCase();
+      try { localStorage.setItem('JORNADA_NOME', v); } catch(_){}
+      ['guideNameSlot','clientNameSlot','clientNameSlotFinal'].forEach(id=>{
+        const el = document.getElementById(id);
+        if (el) el.textContent = v;
+      });
+    });
+  }
+})();
 </script>
   
   <style>
