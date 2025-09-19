@@ -1814,36 +1814,34 @@
       });
     }
 
-    function startRecognition(textarea, btn) {
-      if (!recognition || isRecognizing) return;
-      isRecognizing = true;
-      btn.classList.add('recording');
-      btn.textContent = 'Gravando...';
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        window.typeAnswer(textarea, (textarea.value ? textarea.value + ' ' : '') + transcript, 36);
-        window.saveAnswers && window.saveAnswers(); // Dependência externa
-        window.updateProgress && window.updateProgress(); // Dependência externa
-      };
-      recognition.onend = () => {
-        isRecognizing = false;
-        btn.classList.remove('recording');
-        btn.textContent = '🎤 Falar Resposta';
-      };
-      recognition.onerror = (event) => {
-        window.toast('Erro no reconhecimento: ' + event.error);
-        recognition.onend();
-      }
-      recognition.start();
-    }
+   function startRecognition(textarea, btn) {
+  if (!recognition || isRecognizing) return;
+  isRecognizing = true;
+  btn.classList.add('recording');
+  btn.textContent = 'Gravando...';
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    window.typeAnswer(textarea, (textarea.value ? textarea.value + ' ' : '') + transcript, 36);
+    window.saveAnswers && window.saveAnswers(); // Dependência externa
+    window.updateProgress && window.updateProgress(); // Dependência externa
+  };
+  recognition.onend = () => {
+    isRecognizing = false;
+    btn.classList.remove('recording');
+    btn.textContent = '🎤 Falar Resposta';
+  };
+  recognition.onerror = (event) => {
+    window.toast('Erro no reconhecimento: ' + event.error);
+    recognition.onend();
   }
+  recognition.start();
+}
 
-  window.initAccessibility = initAccessibility;
+window.initAccessibility = initAccessibility;
 })();
 </script>
 </body>
 </html>
-
 
 
 
