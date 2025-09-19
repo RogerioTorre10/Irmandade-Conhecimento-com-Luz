@@ -1906,6 +1906,44 @@
         setTimeout(() => __isTransitioning = false, 150);
       }
     };
+    
+     // controle local para não duplicar chamadas
+     let devolutivaInFlight = false;
+
+     // supondo que você já tenha CURRENT_QUESTION e CURRENT_GUIDE
+     async function handleDevolutivaStep() {
+     if (devolutivaInFlight) return;
+     devolutivaInFlight = true;
+
+  try {
+    const el = document.querySelector('#devolutiva'); // seu alvo de texto
+    const pergunta = CURRENT_QUESTION.label;
+    const resposta = CURRENT_QUESTION.answer; // pegue do textarea/input
+    await mostrarDevolutiva({ el, pergunta, resposta, guia: CURRENT_GUIDE });
+  } finally {
+    devolutivaInFlight = false;
+   }
+  }
+
+    // fluxo sequencial de perguntas
+    async function runJornada(questions = []) {
+    for (const q of questions) {
+    CURRENT_QUESTION = q;
+
+    // 1) mostra pergunta (seu typewriter de pergunta)
+    const qEl = document.querySelector('#pergunta');
+    window.typeTextOnce(qEl, window.utils.dedupe(q.label), 18);
+
+    // 2) espera usuário responder (pode ser um botão “próximo” ou enter)
+    await waitUserAnswer(q); // sua função existente
+
+    // 3) chama devolutiva para essa pergunta
+    await handleDevolutivaStep();
+
+    // 4) segue para próxima
+   }
+  }
+
 
     // Integração de JORNADA_BLOCKS e funções de jornada-paper-qa.js
     window.JORNADA_BLOCKS = [
