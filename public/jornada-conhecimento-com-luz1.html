@@ -1122,22 +1122,22 @@
   }
 
   function lockNext() {
-    const btn = document.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next');
+    const btn = document.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, .btn, button:contains("Avançar"), button:contains("Iniciar"), button:contains("Continuar")');
     if (btn) {
       btn.disabled = true;
       btn.setAttribute('aria-busy', 'true');
-      console.log('[lockNext] Botão travado:', btn.id || btn.className || btn.textContent);
+      console.log('[lockNext] Botão travado:', btn.id || btn.className);
     } else {
       console.log('[lockNext] Botão não encontrado');
     }
   }
 
   function unlockNext() {
-    const btn = document.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next');
+    const btn = document.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, .btn, button:contains("Avançar"), button:contains("Iniciar"), button:contains("Continuar")');
     if (btn) {
       btn.disabled = false;
       btn.removeAttribute('aria-busy');
-      console.log('[unlockNext] Botão liberado:', btn.id || btn.className || btn.textContent);
+      console.log('[unlockNext] Botão liberado:', btn.id || btn.className);
     } else {
       console.log('[unlockNext] Botão não encontrado');
     }
@@ -1213,7 +1213,7 @@
 
     // Adiciona evento ao botão de avançar após mostrar a seção
     setTimeout(() => {
-      const nextBtn = active.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next');
+      const nextBtn = active.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, .btn, button:contains("Avançar"), button:contains("Iniciar"), button:contains("Continuar")');
       if (nextBtn) {
         nextBtn.addEventListener('click', (e) => {
           console.log('[showSection] Clique no botão avançar detectado na seção:', sectionId, 'Botão:', nextBtn.id || nextBtn.className || nextBtn.textContent);
@@ -1225,7 +1225,7 @@
         console.log('[showSection] Botão avançar não encontrado na seção:', sectionId);
         window.toast('Botão de avançar não encontrado. Tente recarregar.');
       }
-    }, 200);
+    }, 200); // Atraso maior pra garantir que o DOM esteja pronto
   };
 })();
 
@@ -1233,7 +1233,7 @@
 (function() {
   // Evento delegado para botões de avançar em qualquer seção
   document.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next');
+    const btn = e.target.closest('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, .btn, button:contains("Avançar"), button:contains("Iniciar"), button:contains("Continuar")');
     if (btn) {
       console.log('[Eventos Globais] Clique no botão avançar detectado:', btn.id || btn.className || btn.textContent, 'Seção atual:', document.querySelector('.j-section:not(.hidden)')?.id || 'desconhecida');
       e.preventDefault();
@@ -1246,36 +1246,55 @@
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       const activeEl = document.activeElement;
-      if (activeEl && activeEl.closest('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next')) {
+      if (activeEl && activeEl.closest('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, .btn, button:contains("Avançar"), button:contains("Iniciar"), button:contains("Continuar")')) {
         console.log('[Eventos Globais] Tecla Enter/Espaço no botão avançar:', activeEl.id || activeEl.className || activeEl.textContent);
         e.preventDefault();
         window.goNext();
       }
     }
   });
+
+  // MutationObserver para capturar botões adicionados dinamicamente na section-intro
+  const moButtons = new MutationObserver((mutations) => {
+    const intro = document.getElementById('section-intro') || document.querySelector('[data-section="intro"], .section-intro');
+    if (intro && !intro.classList.contains('hidden')) {
+      const nextBtn = intro.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, .btn, button:contains("Avançar"), button:contains("Iniciar"), button:contains("Continuar")');
+      if (nextBtn && !nextBtn.dataset.eventAdded) {
+        nextBtn.addEventListener('click', (e) => {
+          console.log('[MutationObserver] Clique no botão avançar detectado na section-intro:', nextBtn.id || nextBtn.className || nextBtn.textContent);
+          e.preventDefault();
+          window.goNext();
+        });
+        nextBtn.dataset.eventAdded = 'true';
+        console.log('[MutationObserver] Evento de clique adicionado ao botão avançar na section-intro:', nextBtn.id || nextBtn.className || nextBtn.textContent);
+      } else if (!nextBtn) {
+        console.log('[MutationObserver] Botão avançar não encontrado na section-intro');
+      }
+    }
+  });
+  moButtons.observe(document.documentElement, { subtree: true, childList: true, attributes: true });
 })();
 
 /* ===== Inicialização da Página ===== */
 (function() {
   document.addEventListener('DOMContentLoaded', () => {
     console.log('[Inicialização] Carregando section-intro');
-    setTimeout(() => {
-      try {
-        const intro = document.getElementById('section-intro') || document.querySelector('[data-section="intro"], .section-intro');
-        if (intro) {
-          window.showSection('section-intro');
-          console.log('[Inicialização] section-intro encontrada, chamando showSection');
-        } else {
-          console.error('[Inicialização] section-intro não encontrada');
-          window.toast('Seção de introdução não encontrada. Tente recarregar a página.');
-        }
-      } catch (e) {
-        console.error('[Inicialização] Erro ao inicializar página:', e);
-        window.toast('Erro ao carregar a página inicial. Tente novamente.');
+    try {
+      const intro = document.getElementById('section-intro') || document.querySelector('[data-section="intro"], .section-intro');
+      if (intro) {
+        window.showSection('section-intro');
+        console.log('[Inicialização] section-intro encontrada, chamando showSection');
+      } else {
+        console.error('[Inicialização] section-intro não encontrada');
+        window.toast('Seção de introdução não encontrada. Tente recarregar a página.');
       }
-    }, 100);
+    } catch (e) {
+      console.error('[Inicialização] Erro ao inicializar página:', e);
+      window.toast('Erro ao carregar a página inicial.');
+    }
   });
 })();
+  
 /* ===== Senha ===== */
 (function() {
   const log = (...a) => { try { console.log('[Senha v3]', ...a); } catch (_) {} };
