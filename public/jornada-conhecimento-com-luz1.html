@@ -1814,7 +1814,7 @@
       });
     }
 
-   function startRecognition(textarea, btn) {
+  function startRecognition(textarea, btn) {
   if (!recognition || isRecognizing) return;
   isRecognizing = true;
   btn.classList.add('recording');
@@ -1822,8 +1822,8 @@
   recognition.onresult = (event) => {
     const transcript = event.results[0][0].transcript;
     window.typeAnswer(textarea, (textarea.value ? textarea.value + ' ' : '') + transcript, 36);
-    window.saveAnswers && window.saveAnswers(); // Dependência externa
-    window.updateProgress && window.updateProgress(); // Dependência externa
+    if (typeof window.saveAnswers === 'function') window.saveAnswers(); // Verificação explícita
+    if (typeof window.updateProgress === 'function') window.updateProgress(); // Verificação explícita
   };
   recognition.onend = () => {
     isRecognizing = false;
@@ -1833,7 +1833,7 @@
   recognition.onerror = (event) => {
     window.toast('Erro no reconhecimento: ' + event.error);
     recognition.onend();
-  }
+  };
   recognition.start();
 }
 
