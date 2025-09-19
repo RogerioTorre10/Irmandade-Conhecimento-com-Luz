@@ -1341,9 +1341,7 @@
           '/assets/img/irmandade-quarteto-bg-arion.png'
         ]
       };
-      return new Promise(res => {
-        let i = 0;
-        (function step() {
+      return window.utils.loadFirstAvailable(GUIDE_BG[guia]);
           if (i >= GUIDE_BG[guia].length) return res(null);
           const src = GUIDE_BG[guia][i++];
           const im = new Image();
