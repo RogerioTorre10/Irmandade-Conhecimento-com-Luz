@@ -2075,30 +2075,38 @@ function preloadGuiaBg(guia = 'lumen') {
       });
     }
 
-  function startRecognition(textarea, btn) {
-  if (!recognition || isRecognizing) return;
-  isRecognizing = true;
-  btn.classList.add('recording');
-  btn.textContent = 'Gravando...';
-  recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript;
-    window.typeAnswer(textarea, (textarea.value ? textarea.value + ' ' : '') + transcript, 36);
-    if (typeof window.saveAnswers === 'function') window.saveAnswers(); // Verificação explícita
-    if (typeof window.updateProgress === 'function') window.updateProgress(); // Verificação explícita
-  };
-  recognition.onend = () => {
-    isRecognizing = false;
-    btn.classList.remove('recording');
-    btn.textContent = '🎤 Falar Resposta';
-  };
-  recognition.onerror = (event) => {
-    window.toast('Erro no reconhecimento: ' + event.error);
-    recognition.onend();
-  };
-  recognition.start();
-}
+ function startRecognition(textarea, btn) {
+    if (!recognition || isRecognizing) return;
+    isRecognizing = true;
+    btn.classList.add('recording');
+    btn.textContent = ' Gravando...';
 
-window.initAccessibility = initAccessibility;
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      const prefix = textarea.value ? textarea.value + ' ' : '';
+      window.typeAnswer(textarea, prefix + transcript, 36);
+      if (typeof window.saveAnswers === 'function') window.saveAnswers();
+      if (typeof window.updateProgress === 'function') window.updateProgress();
+    };
+
+    recognition.onend = () => {
+      isRecognizing = false;
+      btn.classList.remove('recording');
+      btn.textContent = ' 🖋️ Falar Resposta';
+    };
+
+    recognition.onerror = (event) => {
+      window.toast('Erro no reconhecimento: ' + event.error);
+      try { recognition.stop(); } catch {}
+      isRecognizing = false;
+      btn.classList.remove('recording');
+      btn.textContent = ' 🖋️ Falar Resposta';
+    };
+
+    recognition.start();
+  }
+
+  window.initAccessibility = initAccessibility;
 })();
 </script>
 </body>
