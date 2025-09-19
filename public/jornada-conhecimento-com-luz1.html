@@ -546,10 +546,8 @@
 
 /* ===== Utils ÚNICOS ===== */
 (() => {
-  // evita colisão se já existir
   if (!window.utils) window.utils = {};
 
-  // remove duplicação de letras/números e espaços extras
   function dedupe(s='') {
     return s
       .normalize('NFC')
@@ -558,15 +556,12 @@
       .trim();
   }
 
-  // sleep
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-  // tira sufixos de API para trabalhar com base + fallback de paths
   function stripApiBase(url='') {
     return url.replace(/\/(v1\/chat|v1\/chat\/completions|v1\/completions|chat|chat\/completions)\/?$/,'');
   }
 
-  // carrega primeira imagem válida de uma lista
   function loadFirstAvailable(srcList) {
     return new Promise(resolve => {
       let i = 0;
@@ -582,7 +577,6 @@
     });
   }
 
-  // normaliza nome do guia
   function normGuide(s = '') {
     s = String(s).toLowerCase();
     if (s.includes('lumen')) return 'lumen';
@@ -591,7 +585,6 @@
     return 'lumen';
   }
 
-  // carrega o primeiro background disponível para o guia
   function preloadGuiaBg(guia = 'lumen') {
     guia = normGuide(guia);
     const GUIDE_BG = {
@@ -617,7 +610,6 @@
     return loadFirstAvailable(GUIDE_BG[guia] || []);
   }
 
-  // tipo "toast" simples (mantém se já existir)
   if (!window.toast) {
     window.toast = (msg) => {
       try {
@@ -631,7 +623,6 @@
     };
   }
 
-  // TTS simples (mantém se já existir)
   if (!window.readAloud) {
     window.readAloud = (text, voiceName) => {
       try {
@@ -645,7 +636,6 @@
     };
   }
 
-  // typewriter com guarda
   function typeTextOnce(el, text, speed=24) {
     if (!el) return;
     if (el.dataset.typerApplied === '1') return;
@@ -678,7 +668,6 @@
     '/chat/completions'
   ];
 
-  // bases padrão; pode sobrescrever via window.guiaConfigs
   const DEFAULTS = {
     lumen: { apiUrlBase: 'https://lumen-backend-api.onrender.com', model: 'gpt-5', voice: 'female' },
     zion:  { apiUrlBase: 'https://zion-backend-api.onrender.com',  model: 'grok',  voice: 'male'   },
@@ -718,7 +707,6 @@
     throw lastErr || new Error('Falha ao chamar chat');
   }
 
-  // ===== Devolutiva (uma pergunta, uma resposta) =====
   async function fetchDevolutiva(pergunta, resposta, guia='lumen', {maxRetries=3, retryDelay=900} = {}) {
     const cfg = getGuideConfig(guia);
     const quem = cfg.guia==='zion' ? 'Zion (Grok)' : (cfg.guia==='arian' ? 'Arian (Gemini)' : 'Lumen (ChatGPT)');
@@ -750,7 +738,6 @@
     }
   }
 
-  // ===== Integração rápida =====
   async function mostrarDevolutiva({el, pergunta, resposta, guia='lumen'}) {
     const txt = await window.fetchDevolutiva(pergunta, resposta, guia);
     if (el) window.typeTextOnce(el, txt, 22);
@@ -766,7 +753,6 @@
   window.mostrarDevolutiva = mostrarDevolutiva;
   window.conversar = conversar;
 
-  // ===== Chat interativo (histórico de mensagens estilo “nós dois conversando”) =====
   async function askInteractive({ guide='lumen', history=[], prompt='', temperature=0.7 }={}) {
     const cfg = getGuideConfig(guide);
     const msgs = [
@@ -785,7 +771,6 @@
 
 /* ===== Utilitários globais ===== */
 (function() {
-  // Exibe mensagens temporárias (toast)
   function toast(msg) {
     try {
       const t = document.getElementById('toast');
@@ -801,13 +786,11 @@
     toast('Ops… algo falhou, mas já seguimos em frente.');
   });
 
-  // Atualiza informações de ambiente no DOM
   const env = document.getElementById('envTag');
   if (env) {
     env.textContent = `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/assets`;
   }
 
-  // Remove caracteres duplicados consecutivos
   function dedupe(s = '') {
     if (!s) return '';
     let result = s.normalize('NFC').trim().replace(/\s+/g, ' ');
@@ -908,7 +891,6 @@
 
 /* ===== Chamas ===== */
 (function() {
-  // Cria elemento visual de chama
   function makeFlame(cls) {
     const d = document.createElement('div');
     d.className = (cls || 'chama-vela chama-md');
@@ -916,7 +898,6 @@
     return d;
   }
 
-  // Garante chama no hero (seção específica)
   function ensureHeroFlame(sectionId) {
     const canvas = document.getElementById('jornada-canvas');
     if (!canvas) return;
@@ -934,14 +915,12 @@
     }
   }
 
-  // Garante chama no header
   function ensureHeaderFlame() {
     const H = document.getElementById('chama-header');
     if (!H) return;
     if (!H.querySelector('.brasa')) { H.innerHTML = ''; H.appendChild(makeFlame('chama-vela chama-lg')); }
   }
 
-  // Garante chamas fixas na página
   function ensurePageFlames() {
     if (!document.getElementById('flame-bottom-right')) {
       const f = makeFlame('chama-vela chama-md');
@@ -951,14 +930,12 @@
     }
   }
 
-  // Define intensidade da chama com base no score
   function setMode(el, score) {
     if (!el) return;
     el.classList.remove('fraca', 'media', 'forte');
     el.classList.add(score <= -2 ? 'fraca' : score >= 2 ? 'forte' : 'media');
   }
 
-  // Garante chama inline em um elemento
   function ensureInlineFlame(id, cls) {
     const el = document.getElementById(id);
     if (!el) return null;
@@ -984,7 +961,6 @@
   if (G.__DEFAULT_SPEED_TYPING == null) G.__DEFAULT_SPEED_TYPING = 80;
   const DEFAULT_SPEED = G.__DEFAULT_SPEED_TYPING;
 
-  // Aplica efeito de datilografia em um elemento
   window.typeWriter = function(el, text, speed, showCursor) {
     if (!el || el.dataset.typing === '1' || el.dataset.typed === '1') return Promise.resolve();
     el.dataset.typing = '1';
@@ -1033,9 +1009,8 @@
       setTimeout(step, 0);
     });
   };
-  window.typewriter = window.typeWriter; // Compatibilidade
+  window.typewriter = window.typeWriter;
 
-  // Aplica datilografia em placeholders
   let __abortTypingPlaceholder = null;
   async function typePlaceholder(inp, text, speed = 22) {
     if (!inp) return;
@@ -1054,7 +1029,6 @@
     if (!abort) inp.placeholder = text;
   }
 
-  // Aplica datilografia em respostas
   async function typeAnswer(textarea, text, speed = 36) {
     if (!textarea) return;
     textarea.value = '';
@@ -1067,13 +1041,15 @@
     textarea.classList.add('typing-done');
   }
 
-  // Executa datilografia em elementos de uma seção
   async function runTyping(root) {
     if (!root || root.classList.contains('hidden') || !(root instanceof Element)) {
-      console.log('[runTyping] Root inválido ou oculto:', root);
+      console.log('[runTyping] Root inválido ou oculto:', root?.id || root?.className || root);
       return;
     }
-    if (G.__typingLock) return;
+    if (G.__typingLock) {
+      console.log('[runTyping] Bloqueado por __typingLock');
+      return;
+    }
     G.__typingLock = true;
 
     try {
@@ -1084,6 +1060,13 @@
 
       if (elements.length === 0) {
         console.log('[runTyping] Nenhum elemento de texto encontrado em:', root.id || root.className);
+        console.log('[runTyping] Snapshot do DOM:', Array.from(root.children).slice(0, 10).map(el => ({
+          tag: el.tagName.toLowerCase(),
+          id: el.id || '',
+          class: el.className || '',
+          attrs: Object.keys(el.dataset || {}).join(','),
+          text: (el.textContent || '').slice(0, 50)
+        })));
       }
 
       for (const el of elements) {
@@ -1116,7 +1099,6 @@
 
 /* ===== Navegação ===== */
 (function() {
-  // Esconde todas as seções
   function hideAllSections() {
     document.querySelectorAll('.j-section, [id^="section-"]').forEach(s => {
       s.classList.add('hidden');
@@ -1124,7 +1106,6 @@
     });
   }
 
-  // Atualiza fundo do canvas com base na seção
   function updateCanvasBackground(sectionId) {
     const canvas = document.getElementById('jornada-canvas');
     if (!canvas) return;
@@ -1137,7 +1118,6 @@
     }
   }
 
-  // Controla botão de avançar
   function lockNext() {
     const btn = document.querySelector('[data-action="next"], [data-action="avancar"]');
     if (btn) {
@@ -1154,7 +1134,6 @@
     }
   }
 
-  // Exibe uma seção específica
   window.showSection = function(sectionId) {
     console.log('[showSection] Exibindo seção:', sectionId);
     window.speak && window.speak('');
@@ -1182,25 +1161,23 @@
       if (!el.hasAttribute('data-text') && keepText) el.setAttribute('data-text', keepText);
     });
 
-    // === Devolutiva em um elemento, com typewriter/TTS já integrados ===
     async function mostrarDevolutiva({ el, pergunta, resposta, guia='lumen' }) {
       const txt = await window.fetchDevolutiva(pergunta, resposta, guia);
       if (el) window.typeTextOnce(el, txt, 22);
       return txt;
     }
 
-    // === Chat interativo (histórico estilo nós dois conversando) ===
     async function conversar({ el, guia='lumen', historico=[], prompt='' }) {
       const { text } = await window.askInteractive({ guide: guia, history: historico, prompt });
       if (el) window.typeTextOnce(el, text, 22);
       return text;
     }
 
-    // expõe se for usar fora
     window.mostrarDevolutiva = mostrarDevolutiva;
     window.conversar = conversar;
 
     requestAnimationFrame(() => setTimeout(() => {
+      console.log('[showSection] Iniciando runTyping para:', sectionId);
       window.runTyping && window.runTyping(active);
     }, 0));
 
@@ -1802,11 +1779,22 @@
 
   let __isTransitioning = false;
   window.goNext = function() {
-    if (__isTransitioning) return;
+    if (__isTransitioning) {
+      console.log('[goNext] Bloqueado por __isTransitioning');
+      return;
+    }
     __isTransitioning = true;
 
     try {
-      const sec = document.getElementById('section-perguntas');
+      const sec = document.getElementById('section-perguntas') || document.querySelector('[data-section="perguntas"], .section-perguntas');
+      const intro = document.getElementById('section-intro') || document.querySelector('[data-section="intro"], .section-intro');
+
+      if (intro && !intro.classList.contains('hidden')) {
+        console.log('[goNext] Navegando da section-intro para section-senha');
+        window.showSection('section-senha');
+        return;
+      }
+
       if (!sec || sec.classList.contains('hidden')) {
         if (sec) {
           window.showSection('section-perguntas');
@@ -1821,7 +1809,10 @@
       const perguntas = bloco ? Array.from(bloco.querySelectorAll('.j-pergunta')) : [];
       const current = bloco ? bloco.querySelector('.j-pergunta.active') : null;
 
-      if (!bloco || perguntas.length === 0) return;
+      if (!bloco || perguntas.length === 0) {
+        console.log('[goNext] Nenhum bloco ou perguntas encontrados na section-perguntas');
+        return;
+      }
 
       if (!current) {
         perguntas[0].classList.add('active');
@@ -1865,44 +1856,47 @@
     }
   };
 
-  // controle local para não duplicar chamadas
   let devolutivaInFlight = false;
 
-  // supondo que você já tenha CURRENT_QUESTION e CURRENT_GUIDE
   async function handleDevolutivaStep() {
     if (devolutivaInFlight) return;
     devolutivaInFlight = true;
 
     try {
-      const el = document.querySelector('#devolutiva'); // seu alvo de texto
+      const el = document.querySelector('#devolutiva');
       const pergunta = CURRENT_QUESTION.label;
-      const resposta = CURRENT_QUESTION.answer; // pegue do textarea/input
-      await mostrarDevolutiva({ el, pergunta, resposta, guia: CURRENT_GUIDE });
+      const resposta = CURRENT_QUESTION.answer;
+      await window.mostrarDevolutiva({ el, pergunta, resposta, guia: CURRENT_GUIDE });
     } finally {
       devolutivaInFlight = false;
     }
   }
 
-  // fluxo sequencial de perguntas
+  async function waitUserAnswer(question) {
+    return new Promise(resolve => {
+      const btn = document.querySelector('[data-action="next"], [data-action="avancar"]');
+      if (btn) {
+        btn.addEventListener('click', () => resolve(), { once: true });
+      } else {
+        console.log('[waitUserAnswer] Botão de avançar não encontrado');
+        setTimeout(resolve, 5000); // Fallback: resolve após 5 segundos se o botão não for encontrado
+      }
+    });
+  }
+
   async function runJornada(questions = []) {
     for (const q of questions) {
       CURRENT_QUESTION = q;
 
-      // 1) mostra pergunta (seu typewriter de pergunta)
       const qEl = document.querySelector('#pergunta');
       window.typeTextOnce(qEl, window.utils.dedupe(q.label), 18);
 
-      // 2) espera usuário responder (pode ser um botão “próximo” ou enter)
-      await waitUserAnswer(q); // sua função existente
+      await waitUserAnswer(q);
 
-      // 3) chama devolutiva para essa pergunta
       await handleDevolutivaStep();
-
-      // 4) segue para próxima
     }
   }
 
-  // Integração de JORNADA_BLOCKS e funções de jornada-paper-qa.js
   window.JORNADA_BLOCKS = [
     { id: "reflexoes", title: "Reflexões da Alma e da Existência", video_after: "/assets/img/filme-1-entrando-na-jornada.mp4", questions: [
       { id: "existencia_primeira_memoria", label: "Você se recorda da idade em que, pela primeira vez, percebeu que era alguém neste mundo?", type: "textarea" },
@@ -2069,9 +2063,41 @@
     window.initAccessibility = initAccessibility;
   }
 })();
+
+/* ===== Inicialização da Página ===== */
+(function() {
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('[Inicialização] Carregando section-intro');
+    try {
+      const intro = document.getElementById('section-intro') || document.querySelector('[data-section="intro"], .section-intro');
+      if (intro) {
+        window.showSection('section-intro');
+        console.log('[Inicialização] section-intro encontrada, chamando showSection');
+      } else {
+        console.error('[Inicialização] section-intro não encontrada');
+        window.toast('Seção de introdução não encontrada. Tente recarregar a página.');
+      }
+
+      // Adiciona evento ao botão de avançar
+      const nextBtn = document.querySelector('[data-action="next"], [data-action="avancar"]');
+      if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+          console.log('[Inicialização] Botão avançar clicado');
+          window.goNext();
+        });
+      } else {
+        console.log('[Inicialização] Botão avançar não encontrado');
+      }
+    } catch (e) {
+      console.error('[Inicialização] Erro ao inicializar página:', e);
+      window.toast('Erro ao carregar a página inicial.');
+    }
+  });
+})();
 </script>
 </body>
 </html>
+
 
 
 
