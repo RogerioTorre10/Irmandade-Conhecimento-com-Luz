@@ -542,8 +542,195 @@
 
 <script>
 /* SAFE SENTINEL */ void 0;
+'use strict';
+
+/* ===== Utils ÚNICOS ===== */
 (() => {
-  'use strict'; 
+  // evita colisão se já existir
+  if (!window.utils) window.utils = {};
+
+  // remove duplicação de letras/números e espaços extras
+  function dedupe(s=''){
+    return s
+      .normalize('NFC')
+      .replace(/([\p{L}\p{N}])\1+/gu, '$1')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+  }
+
+  // sleep
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  // tira sufixos de API para trabalhar com base + fallback de paths
+  function stripApiBase(url=''){
+    return url.replace(/\/(v1\/chat|v1\/chat\/completions|v1\/completions|chat|chat\/completions)\/?$/,'');
+  }
+
+  // carrega primeira imagem válida de uma lista
+  function loadFirstAvailable(srcList){
+    return new Promise(resolve => {
+      let i = 0;
+      const tryNext = () => {
+        if (i >= (srcList?.length || 0)) return resolve(null);
+        const src = srcList[i++];
+        const im = new Image();
+        im.onload  = () => resolve(src);
+        im.onerror = tryNext;
+        im.src = src;
+      };
+      tryNext();
+    });
+  }
+
+  // tipo "toast" simples (mantém se já existir)
+  if (!window.toast) {
+    window.toast = (msg) => {
+      try {
+        const t = document.getElementById('toast') || document.createElement('div');
+        t.id = 'toast';
+        t.style.cssText = 'position:fixed;bottom:16px;left:16px;max-width:60ch;padding:10px 14px;border-radius:10px;background:#000a;color:#fff;backdrop-filter:blur(3px);z-index:9999';
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(()=> t.remove(), 4000);
+      } catch {}
+    };
+  }
+
+  // TTS simples (mantém se já existir)
+  if (!window.readAloud) {
+    window.readAloud = (text, voiceName) => {
+      try {
+        const u = new SpeechSynthesisUtterance(text);
+        if (voiceName) {
+          const v = speechSynthesis.getVoices().find(v=>v.name===voiceName);
+          if (v) u.voice = v;
+        }
+        speechSynthesis.speak(u);
+      } catch {}
+    };
+  }
+
+  // typewriter com guarda
+  function typeTextOnce(el, text, speed=24){
+    if (!el) return;
+    if (el.dataset.typerApplied === '1') return;
+    el.dataset.typerApplied = '1';
+    el.textContent = '';
+    let i = 0;
+    const timer = setInterval(()=>{
+      el.textContent += text[i] || '';
+      i++;
+      if (i >= text.length) clearInterval(timer);
+    }, speed);
+  }
+
+  window.utils.dedupe = dedupe;
+  window.utils.sleep = sleep;
+  window.utils.stripApiBase = stripApiBase;
+  window.utils.loadFirstAvailable = loadFirstAvailable;
+  window.typeTextOnce = typeTextOnce;
+})();
+ 
+/* ===== Config & API Client ===== */
+(() => {
+  const CHAT_PATHS = [
+    '/v1/chat',
+    '/v1/chat/completions',
+    '/v1/completions',
+    '/chat',
+    '/chat/completions'
+  ];
+
+  // bases padrão; pode sobrescrever via window.guiaConfigs
+  const DEFAULTS = {
+    lumen: { apiUrlBase: 'https://lumen-backend-api.onrender.com', model: 'gpt-5', voice: 'female' },
+    zion:  { apiUrlBase: 'https://zion-backend-api.onrender.com',  model: 'grok',  voice: 'male'   },
+    arian: { apiUrlBase: 'https://arion-backend-api.onrender.com',  model: 'gemini',voice: 'female' }
+  };
+
+  function getGuideConfig(guia='lumen'){
+    const g = guia.toLowerCase();
+    const winCfg = (window.guiaConfigs && window.guiaConfigs[g]) || {};
+    const base = window.utils.stripApiBase(winCfg.apiUrlBase || winCfg.apiUrl || DEFAULTS[g]?.apiUrlBase || DEFAULTS.lumen.apiUrlBase);
+    return {
+      guia: g,
+      apiUrlBase: base,
+      model: winCfg.model || DEFAULTS[g]?.model || DEFAULTS.lumen.model,
+      voice: winCfg.voice || DEFAULTS[g]?.voice || DEFAULTS.lumen.voice
+    };
+  }
+
+  async function chatRequest(base, payload){
+    let lastErr;
+    for (const path of CHAT_PATHS) {
+      try {
+        const r = await fetch(base + path, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          mode: 'cors',
+          credentials: 'omit'
+        });
+        if (r.ok) return await r.json();
+        lastErr = new Error(`HTTP ${r.status} @ ${path}`);
+        if (r.status !== 404) break;
+      } catch (e) {
+        lastErr = e;
+      }
+    }
+    throw lastErr || new Error('Falha ao chamar chat');
+  }
+
+  // ===== Devolutiva (uma pergunta, uma resposta) =====
+  async function fetchDevolutiva(pergunta, resposta, guia='lumen', {maxRetries=3, retryDelay=900} = {}){
+    const cfg = getGuideConfig(guia);
+    const quem = cfg.guia==='zion' ? 'Zion (Grok)' : (cfg.guia==='arian' ? 'Arian (Gemini)' : 'Lumen (ChatGPT)');
+    const payload = {
+      model: cfg.model,
+      messages: [
+        { role: 'system', content: `Você é ${quem} guiando a Jornada. Seja acolhedor, simbólico e breve.` },
+        { role: 'user',   content: `Pergunta: ${window.utils.dedupe(pergunta)}\nResposta: ${resposta ?? '(vazia)'}` }
+      ],
+      temperature: 0.7,
+      meta: { guia: cfg.guia.toUpperCase() }
+    };
+
+    for (let attempt=1; attempt<=maxRetries; attempt++){
+      try {
+        const data = await chatRequest(cfg.apiUrlBase, payload);
+        const text = data?.content || data?.choices?.[0]?.message?.content || 'Obrigado por compartilhar. Sua reflexão ilumina o caminho.';
+        if (!window.isMuted) window.readAloud(text, cfg.voice);
+        return text;
+      } catch (e) {
+        if (attempt === maxRetries){
+          const msg = `Não consegui falar com ${cfg.guia}. Tente novamente em instantes.`;
+          window.toast(msg);
+          if (!window.isMuted) window.readAloud(msg, cfg.voice);
+          return msg;
+        }
+        await window.utils.sleep(retryDelay);
+      }
+    }
+  }
+
+  // ===== Chat interativo (histórico de mensagens estilo “nós dois conversando”) =====
+  async function askInteractive({ guide='lumen', history=[], prompt='', temperature=0.7 }={}){
+    const cfg = getGuideConfig(guide);
+    const msgs = [
+      { role:'system', content: `Você é ${guide.toUpperCase()} guiando uma conversa interativa com empatia e objetividade.` },
+      ...history,
+      { role:'user', content: prompt }
+    ];
+    const data = await chatRequest(cfg.apiUrlBase, { model: cfg.model, messages: msgs, temperature });
+    const text = data?.content || data?.choices?.[0]?.message?.content || '';
+    return { text, model: cfg.model, guide: cfg.guia };
+  }
+
+  // expõe APIs globais
+  window.fetchDevolutiva = fetchDevolutiva;
+  window.askInteractive = askInteractive;
+})();
+
   /* ===== Utilitários globais ===== */
   (function() {
     // Exibe mensagens temporárias (toast)
