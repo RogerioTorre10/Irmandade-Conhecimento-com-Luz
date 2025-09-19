@@ -1348,7 +1348,7 @@ function preloadGuiaBg(guia = 'lumen') {
   };
 
   // ✅ IMPLEMENTAÇÃO ÚNICA (sem IIFE/fechamentos extras)
-  return window.utils.loadFirstAvailable(GUIDE_BG[guia] || []);
+  return window.utils.loadFirstAvailable($1);
 }
 
     function enhanceButtons(root) {
@@ -1617,7 +1617,7 @@ function preloadGuiaBg(guia = 'lumen') {
           im.onload = () => res(src);
           im.onerror = () => step();
           im.src = src;
-        })();
+        });
       });
     }
 
