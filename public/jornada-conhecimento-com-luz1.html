@@ -8,110 +8,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Cardo:wght@400;700&display=swap" rel="stylesheet" />
     <link rel="preload" href="/assets/fonts/ManufacturingConsent-Regular.ttf" as="font" type="font/ttf" crossorigin />
     <link rel="preload" href="/assets/fonts/BerkshireSwash-Regular.ttf" as="font" type="font/ttf" crossorigin />
+    <script src="/public/jornada-paper-qa.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-    <script defer src="/jornada-paper-qa.js?v=2"></script>
-    <script>window.JORNADA=window.JORNADA||{tts:{enabled:!1,lang:"pt-BR",rate:1,pitch:1,voiceName:""},typing:{charDelay:36}};var JORNADA=window.JORNADA;window.JORNADA_BLOCKS=window.JORNADA_BLOCKS||[{id:"stub",questions:[{id:"q1",label:"O que te trouxe até aqui hoje?"}]}];document.addEventListener("click",function(e){const b=e.target.closest('[data-action="next-termos"]');if(!b)return;e.preventDefault();window.showSection&&window.showSection("section-termos")},!0);document.addEventListener("click",function(e){const t=e.target.closest('[data-action^="termos-next"]');if(!t)return;e.preventDefault();const p=["termos-pg1","termos-pg2","termos-pg3","termos-pg4","termos-pg5"],v=p.find(id=>{const el=document.getElementById(id);return el&&!el.classList.contains("hidden")}),i=p.indexOf(v);if(i>=0&&i+1<p.length){document.getElementById(p[i])?.classList.add("hidden");const n=document.getElementById(p[i+1]);n?.classList.remove("hidden");window.runTyping&&n&&window.runTyping(n)}else window.showSection&&window.showSection("section-senha")},!0);document.addEventListener("click",function(e){const eye=e.target.closest('[data-action="toggle-password"]');if(!eye)return;const r=document.getElementById("section-senha")||document;const inp=r.querySelector("#senha")||r.querySelector("#senhaInput")||r.querySelector('input[type="password"]')||r.querySelector("input");if(!inp)return;inp.type="password"===inp.type?"text":"password";eye.querySelector("i,svg")?.classList.toggle("on")},!0);document.addEventListener("DOMContentLoaded",function(){const n=(localStorage.getItem("JORNADA_NOME")||"").toUpperCase();const i=document.getElementById("guiaNameInput");if(i&&n&&!i.value)i.value=n;["guideNameSlot","clientNameSlot","clientNameSlotFinal"].forEach(id=>{const el=document.getElementById(id);if(el&&n)el.textContent=n})});</script>
 
-  <script>
-// ===== Defaults/Config (variável global SEM erro) =====
-window.JORNADA = window.JORNADA || { tts:{ enabled:false, lang:'pt-BR', rate:1, pitch:1, voiceName:'' }, typing:{ charDelay:36 } };
-var JORNADA = window.JORNADA; // evita "JORNADA is not defined"
-
-// ===== Stub de perguntas (evita pular direto pro final se a API ainda não devolveu) =====
-window.JORNADA_BLOCKS = window.JORNADA_BLOCKS || [
-  { id:'stub', questions:[ { id:'q1', label:'O que te trouxe até aqui hoje?' } ] }
-];
-
-// ===== Intro -> Termos (se seu HTML usa data-action="next-termos") =====
-document.addEventListener('click', function(ev){
-  const b = ev.target.closest('[data-action="next-termos"]');
-  if(!b) return;
-  ev.preventDefault();
-  window.showSection && window.showSection('section-termos');
-}, true);
-
-// ===== Páginas de termos: aceita qualquer "termos-next", "termos-next2", "termos-next3", ... =====
-document.addEventListener('click', function(ev){
-  const btn = ev.target.closest('[data-action^="termos-next"]');
-  if(!btn) return;
-  ev.preventDefault();
-  const pages = ['termos-pg1','termos-pg2','termos-pg3','termos-pg4','termos-pg5'];
-  const visId = pages.find(id => { const el = document.getElementById(id); return el && !el.classList.contains('hidden'); });
-  const idx = pages.indexOf(visId);
-  if (idx >= 0 && idx + 1 < pages.length) {
-    document.getElementById(pages[idx])?.classList.add('hidden');
-    const nxt = document.getElementById(pages[idx+1]);
-    nxt?.classList.remove('hidden');
-    window.runTyping && nxt && window.runTyping(nxt);
-  } else {
-    window.showSection && window.showSection('section-senha');
-  }
-}, true);
-
-// ===== Olho da senha: funciona com #senha, #senhaInput ou o primeiro <input type="password"> =====
-document.addEventListener('click', function(ev){
-  const eye = ev.target.closest('[data-action="toggle-password"]');
-  if(!eye) return;
-  const root = document.getElementById('section-senha') || document;
-  const inp = root.querySelector('#senha') || root.querySelector('#senhaInput') ||
-              root.querySelector('input[type="password"]') || root.querySelector('input');
-  if(!inp) return;
-  inp.type = (inp.type === 'password' ? 'text' : 'password');
-  eye.querySelector('i,svg')?.classList.toggle('on');
-}, true);
-
-// ===== Sincroniza o nome do participante em todos os slots =====
-document.addEventListener('DOMContentLoaded', function(){
-  const nome = (localStorage.getItem('JORNADA_NOME') || '').toUpperCase();
-  const inp = document.getElementById('guiaNameInput');
-  if (inp && nome && !inp.value) inp.value = nome;
-  ['guideNameSlot','clientNameSlot','clientNameSlotFinal'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el && nome) el.textContent = nome;
-  });
-});
- 
-(function(){
-  // ——— Força datilografia na página de termos atualmente visível
-  function runTypingOnVisibleTerms(){
-    try{
-      const ids=['termos-pg1','termos-pg2','termos-pg3','termos-pg4','termos-pg5'];
-      const visId = ids.find(id => {
-        const el = document.getElementById(id);
-        return el && !el.classList.contains('hidden');
-      });
-      const root = visId && document.getElementById(visId);
-      if (root && window.runTyping) window.runTyping(root);
-    }catch(_){}
-  }
-
-  // Ao sair da intro para termos
-  document.addEventListener('click', function(ev){
-    if (ev.target.closest('[data-action="next-termos"]')) {
-      setTimeout(runTypingOnVisibleTerms, 0);
-    }
-    // Garantia ao passar de página dentro dos termos
-    if (ev.target.closest('[data-action^="termos-next"]')) {
-      setTimeout(runTypingOnVisibleTerms, 0);
-    }
-  }, true);
-
-  // ——— Nome “ao vivo” no card e persistência
-  const nameInput = document.getElementById('guiaNameInput');
-  if (nameInput) {
-    nameInput.addEventListener('input', (e)=>{
-      const v = (e.target.value||'').toUpperCase();
-      try { localStorage.setItem('JORNADA_NOME', v); } catch(_){}
-      ['guideNameSlot','clientNameSlot','clientNameSlotFinal'].forEach(id=>{
-        const el = document.getElementById(id);
-        if (el) el.textContent = v;
-      });
-    });
-  }
-})();
-</script>
-  
   <style>
     @font-face {
       font-family: "ManufacturingConsent";
@@ -413,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
                 <div id="section-intro" class="j-section">
           <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
-          <div class="footer-actions"><button class="btn" data-action="next">Avançar</button>
+          <div class="footer-actions"><button class="btn" data-action="next-termos">Avançar</button></div>
         </div>
         <div id="section-termos" class="j-section hidden">
           <div class="conteudo-pergaminho">
@@ -600,7 +500,7 @@ document.addEventListener('DOMContentLoaded', function(){
     <div class="flame-mask">
       <img id="selfieInFlame" alt="Selfie na chama">
     </div>
-    <div class="client-name" id="guideNameSlot"></div>
+    <div class="client-name" id="clientNameSlotFinal"></div>
   </div>
 </div>
 
@@ -637,40 +537,29 @@ document.addEventListener('DOMContentLoaded', function(){
 
 <!-- ==== QFX: Estilos Globais (remove cursor piscando do typewriter) ==== -->
 <style id="qfx-style">
-  .typewriter::after { display: none !important; content: ""; }
+  .typewriter::after { display: none !important; content: ''; }
 </style>
-
+  
 <script>
 /* SAFE SENTINEL */;void 0;
 (function(){
   'use strict';
 
-  /* ===== Utilitários globais (toast robusto + dedupe + env tag) ===== */
+  /* ===== Utilitários globais ===== */
   (function(){
-    // Toast robusto: usa #toast se existir; senão, fallback flutuante
-    window.toast = function(msg, type='info', ms=2800){
-      try{
+    function toast(msg) {
+      try {
         const t = document.getElementById('toast');
-        if (t){
-          t.textContent = msg;
-          t.classList.remove('hidden');
-          t.classList.add('show');
-          setTimeout(()=> t.classList.remove('show'), ms);
-          return;
-        }
-      }catch(_){}
-      // Fallback visual
-      const el = document.createElement('div');
-      el.className = 'toast-fallback '+type;
-      el.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:99999;padding:10px 14px;border:1px solid #9be7c4;border-radius:10px;background:rgba(11,31,22,.9);color:#eaf7f1;box-shadow:0 6px 20px rgba(0,0,0,.35);transition:opacity .35s';
-      el.textContent = String(msg||'');
-      document.body.appendChild(el);
-      setTimeout(()=>{el.style.opacity='0'; setTimeout(()=>el.remove(),400);}, ms);
-    };
-
+        if (!t) return;
+        t.textContent = msg;
+        t.classList.remove('hidden');
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+      } catch (_) {}
+    }
     window.addEventListener('error', (e) => {
       console.error('[Erro global]', e?.error || e);
-      window.toast('Ops… algo falhou, mas já seguimos em frente.');
+      toast('Ops… algo falhou, mas já seguimos em frente.');
     });
 
     const env = document.getElementById('envTag');
@@ -690,7 +579,9 @@ document.addEventListener('DOMContentLoaded', function(){
         } else {
           let c = w[0] || '';
           for (let i = 1; i < w.length; i++) {
-            if (w[i] !== w[i - 1] || !/[a-zA-Z]/.test(w[i])) c += w[i];
+            if (w[i] !== w[i - 1] || !/[a-zA-Z]/.test(w[i])) {
+              c += w[i];
+            }
           }
           out.push(c);
         }
@@ -699,6 +590,51 @@ document.addEventListener('DOMContentLoaded', function(){
     }
     window.dedupe = dedupe;
   })();
+
+/* ===== Utilitários globais ===== */
+(function(){
+    window.toast = function(msg) {
+      try {
+        const t = document.getElementById('toast');
+        if (!t) return;
+        t.textContent = msg;
+        t.classList.remove('hidden');
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+      } catch (_) {}
+    }
+    window.addEventListener('error', (e) => {
+      console.error('[Erro global]', e?.error || e);
+      window.toast('Ops… algo falhou, mas já seguimos em frente.');
+    });
+
+    const env = document.getElementById('envTag');
+    if (env) {
+      env.textContent = `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/assets`;
+    }
+
+    window.dedupe = function(s = '') {
+      if (!s) return '';
+      let result = s.normalize('NFC').trim().replace(/\s+/g, ' ');
+      const validDoubleConsonants = /^(.*?(?:ss|rr|tt|cc|pp|mm|nn|ll|bb|dd|ff|gg|vv|zz)[a-z]*?)$/i;
+      const words = result.split(' ');
+      const out = [];
+      for (let w of words) {
+        if (validDoubleConsonants.test(w)) {
+          out.push(w);
+        } else {
+          let c = w[0] || '';
+          for (let i = 1; i < w.length; i++) {
+            if (w[i] !== w[i - 1] || !/[a-zA-Z]/.test(w[i])) {
+              c += w[i];
+            }
+          }
+          out.push(c);
+        }
+      }
+      return out.join(' ').trim();
+    }
+})();
 
   /* ===== TTS utils ===== */
   (function(){
@@ -771,7 +707,7 @@ document.addEventListener('DOMContentLoaded', function(){
       const canvas = document.getElementById('jornada-canvas');
       if (!canvas) return;
       let hero = document.getElementById('chama-hero');
-      const show = (sectionId === 'section-intro' || sectionId === 'section-termos' || sectionId === 'section-senha' || sectionId === 'section-final' || sectionId === 'section-selfie' || sectionId === 'section-guia' || sectionId === 'section-dialogo');
+      const show = (sectionId === 'section-intro' || sectionId === 'section-termos' || sectionId === 'section-senha' || sectionId === 'section-final' || sectionId === 'section-selfie' || sectionId === 'section-guia');
       if (show) {
         if (!hero) {
           hero = makeFlame('chama-vela chama-lg');
@@ -950,7 +886,7 @@ document.addEventListener('DOMContentLoaded', function(){
     window.typeAnswer = typeAnswer;
   })();
 
-  /* ===== Navegação base (showSection + canvas + senha/guia hooks) ===== */
+  /* ===== Navegação ===== */
   (function(){
     function hideAllSections() {
       document.querySelectorAll('.j-section, [id^="section-"]').forEach(s => {
@@ -962,7 +898,7 @@ document.addEventListener('DOMContentLoaded', function(){
     function updateCanvasBackground(sectionId) {
       const canvas = document.getElementById('jornada-canvas');
       if (!canvas) return;
-      if (sectionId === 'section-perguntas' || sectionId === 'section-dialogo') {
+      if (sectionId === 'section-perguntas') {
         canvas.className = 'card pergaminho pergaminho-h';
         canvas.style.background = 'var(--panel) url(/assets/img/pergaminho-rasgado-horiz.png) no-repeat center/cover';
       } else {
@@ -971,14 +907,22 @@ document.addEventListener('DOMContentLoaded', function(){
       }
     }
 
-    window.showSection = function(sectionId) {
-      // Intercepta: qualquer pedido para section-perguntas vai para o diálogo dinâmico
-      if (sectionId === 'section-perguntas') {
-        console.log('[showSection] Redirecionando para section-dialogo (backend)');
-        window.openDialogAndKickoff && window.openDialogAndKickoff();
-        return;
+    function lockNext() {
+      const btn = document.querySelector('[data-action="next"], [data-action="avancar"]');
+      if (btn) {
+        btn.disabled = true;
+        btn.setAttribute('aria-busy', 'true');
       }
+    }
+    function unlockNext() {
+      const btn = document.querySelector('[data-action="next"], [data-action="avancar"]');
+      if (btn) {
+        btn.disabled = false;
+        btn.removeAttribute('aria-busy');
+      }
+    }
 
+    window.showSection = function(sectionId) {
       console.log('[showSection] Exibindo seção:', sectionId);
       window.speak && window.speak('');
 
@@ -1012,6 +956,10 @@ document.addEventListener('DOMContentLoaded', function(){
       updateCanvasBackground(sectionId);
       window.JORNADA_CHAMA && window.JORNADA_CHAMA.ensureHeroFlame(sectionId);
 
+      if (sectionId === 'section-perguntas') {
+        window.ensureQuestionsReady && window.ensureQuestionsReady();
+      }
+
       if (sectionId === 'section-final') {
         const url = localStorage.getItem('IRMANDADE_SELFIE_FINAL');
         if (url) {
@@ -1019,6 +967,7 @@ document.addEventListener('DOMContentLoaded', function(){
           if (img) img.src = url;
         }
       }
+
       if (sectionId === 'section-guia') {
         const guiaNameInput = document.getElementById('guiaNameInput');
         const storedName = localStorage.getItem('JORNADA_NOME') || '';
@@ -1036,8 +985,23 @@ document.addEventListener('DOMContentLoaded', function(){
     }
     function getSenhaInput() {
       const root = getSenhaSection();
-      const tries = ['#senhaInput','#iniciar','input[data-role="senha"]','input[name="senha"]','input[name*="senha" i]','input[id*="senha" i]','input[type="password"]','input[type="text"][name*="senha" i]','input[type="text"][id*="senha" i]','.senha input','.senha-input'];
-      for (const sel of tries) { const el = root.querySelector(sel); if (el) return el; }
+      const tries = [
+        '#senhaInput',
+        '#iniciar',
+        'input[data-role="senha"]',
+        'input[name="senha"]',
+        'input[name*="senha" i]',
+        'input[id*="senha" i]',
+        'input[type="password"]',
+        'input[type="text"][name*="senha" i]',
+        'input[type="text"][id*="senha" i]',
+        '.senha input',
+        '.senha-input'
+      ];
+      for (const sel of tries) {
+        const el = root.querySelector(sel);
+        if (el) return el;
+      }
       return root.querySelector('input');
     }
 
@@ -1052,7 +1016,10 @@ document.addEventListener('DOMContentLoaded', function(){
     let lastStartJourney = 0;
     window.startJourney = async function() {
       const now = performance.now();
-      if (now - lastStartJourney < 1000) { log('[startJourney] Debounce'); return; }
+      if (now - lastStartJourney < 1000) {
+        log('[startJourney] Debounce: evitando chamada repetida');
+        return;
+      }
       lastStartJourney = now;
 
       const inputSenha = getSenhaInput();
@@ -1071,7 +1038,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
       if (nome) { try { localStorage.setItem('JORNADA_NOME', nome); } catch (_) {} }
       window.speak && window.speak('');
-
+      
       const hasGuia = !!(document.getElementById('section-guia') || document.querySelector('[data-section="guia"], .section-guia'));
       const hasSelfie = !!(document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie'));
 
@@ -1082,14 +1049,13 @@ document.addEventListener('DOMContentLoaded', function(){
         window.showSection('section-selfie');
         log('[startJourney] Navegação para section-selfie');
       } else {
-        // Fallback antigo: agora redireciona direto para o diálogo
-        window.openDialogAndKickoff && window.openDialogAndKickoff();
-        log('[startJourney] Redireciono para diálogo (backend)');
+        window.openQuestions && window.openQuestions();
+        log('[startJourney] Navegação para section-perguntas (fallback)');
       }
     };
   })();
 
-  /* ===== Guia (mantido) ===== */
+  /* ===== Guia ===== */
   (function(){
     const log = (...a) => { try { console.log('[GUIA v14]', ...a); } catch (_) {} };
 
@@ -1107,36 +1073,115 @@ document.addEventListener('DOMContentLoaded', function(){
 
     function inferGuideFrom(el) {
       if (!el) return '';
-      const attrs = [el.getAttribute('data-guide'), el.getAttribute('data-guide-id'), el.dataset?.guide, el.dataset?.value, el.id, el.getAttribute('aria-label'), el.getAttribute('alt'), el.title, el.textContent].filter(Boolean);
+      const attrs = [
+        el.getAttribute('data-guide'),
+        el.getAttribute('data-guide-id'),
+        el.dataset?.guide,
+        el.dataset?.value,
+        el.id,
+        el.getAttribute('aria-label'),
+        el.getAttribute('alt'),
+        el.title,
+        el.textContent
+      ].filter(Boolean);
+
       for (const v of attrs) {
         const g = normGuide(v);
         if (g) return g;
       }
+
       if (el.tagName === 'IMG' && el.src) {
         const src = el.src.toLowerCase();
         if (src.includes('lumen')) return 'lumen';
         if (src.includes('zion')) return 'zion';
         if (src.includes('arion') || src.includes('arian')) return 'arion';
       }
+
       return '';
     }
 
     function getBgUrl(guia) {
       const GUIDE_BG = {
-        lumen: ['/assets/img/irmandade-quarteto-bg-lumen.png','/assets/img/irmandade-quarteto-bg-lumen.jpg','/assets/img/irmandade-quarteto-bg-lumen.jpeg'],
-        zion:  ['/assets/img/irmandade-quarteto-bg-zion.png','/assets/img/irmandade-quarteto-bg-zion.jpg','/assets/img/irmandade-quarteto-bg-zion.jpeg'],
-        arion: ['/assets/img/irmandade-quarteto-bg-arian.jpeg','/assets/img/irmandade-quarteto-bg-arion.jpeg','/assets/img/irmandade-quarteto-bg-arion.jpg','/assets/img/irmandade-quarteto-bg-arion.png']
+        lumen: [
+          '/assets/img/irmandade-quarteto-bg-lumen.png',
+          '/assets/img/irmandade-quarteto-bg-lumen.jpg',
+          '/assets/img/irmandade-quarteto-bg-lumen.jpeg'
+        ],
+        zion: [
+          '/assets/img/irmandade-quarteto-bg-zion.png',
+          '/assets/img/irmandade-quarteto-bg-zion.jpg',
+          '/assets/img/irmandade-quarteto-bg-zion.jpeg'
+        ],
+        arion: [
+          '/assets/img/irmandade-quarteto-bg-arian.jpeg',
+          '/assets/img/irmandade-quarteto-bg-arion.jpeg',
+          '/assets/img/irmandade-quarteto-bg-arion.jpg',
+          '/assets/img/irmandade-quarteto-bg-arion.png'
+        ]
       };
       return new Promise(res => {
         let i = 0;
-        (function step(){
+        (function step() {
           if (i >= GUIDE_BG[guia].length) return res(null);
           const src = GUIDE_BG[guia][i++];
           const im = new Image();
-          im.onload = ()=> res(src);
-          im.onerror = ()=> step();
+          im.onload = () => res(src);
+          im.onerror = () => step();
           im.src = src;
         })();
+      });
+    }
+
+    function enhanceButtons(root) {
+      if (!root || !(root instanceof Element)) {
+        log('Seção de guia inválida ou não encontrada');
+        return;
+      }
+
+      const candidates = root.querySelectorAll(`
+        [data-action="select-guia"],
+        [data-guide],
+        [data-guide-id],
+        .choose-guide,
+        .btn-guia,
+        .card-guia,
+        .guia-option,
+        .guia-item,
+        .guide-selector,
+        #btnLumen, #btnZion, #btnArion,
+        img[alt*="Lumen" i], img[alt*="Zion" i], img[alt*="Arion" i],
+        button[class*="guia"], a[class*="guia"],
+        [class*="guide"], [id*="guide"]
+      `);
+
+      if (candidates.length === 0) {
+        log('Nenhum botão de guia encontrado. Snapshot do DOM:', Array.from(root.children).slice(0, 10).map(el => ({
+          tag: el.tagName.toLowerCase(),
+          id: el.id || '',
+          class: el.className || '',
+          attrs: Object.keys(el.dataset || {}).join(','),
+          text: (el.textContent || '').slice(0, 50)
+        })));
+      } else {
+        log('Botões de guia encontrados:', candidates.length, 'em:', root.id || root.className);
+      }
+
+      candidates.forEach(el => {
+        if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
+        el.style.cursor = 'pointer';
+        el.style.pointerEvents = 'auto';
+        if (!el.getAttribute('data-guide')) {
+          const g = inferGuideFrom(el);
+          if (g) el.setAttribute('data-guide', g);
+        }
+        el.setAttribute('role', 'button');
+        el.setAttribute('aria-label', `Escolher guia ${inferGuideFrom(el) || 'desconhecido'}`);
+      });
+
+      root.querySelectorAll('.click-shield, .overlay, [data-overlay], .modal-overlay, .blocker, [class*="overlay"], [class*="shield"], [class*="block"]').forEach(ov => {
+        ov.style.pointerEvents = 'none';
+        ov.style.display = 'none';
+        log('Overlay desativado:', ov.className || ov.id);
       });
     }
 
@@ -1156,8 +1201,15 @@ document.addEventListener('DOMContentLoaded', function(){
           const src = await getBgUrl(guia);
           if (src) {
             bgImg.src = src;
-            bgImg.onload = () => { if (errorDiv) errorDiv.style.display = 'none'; log('Imagem do guia aplicada em #guideBg:', src, 'para guia:', guia); };
-            bgImg.onerror = () => { if (errorDiv) errorDiv.style.display = 'block'; toast('Erro ao carregar a imagem de fundo do guia.'); log('Erro ao carregar imagem do guia:', src); };
+            bgImg.onload = () => {
+              if (errorDiv) errorDiv.style.display = 'none';
+              log('Imagem do guia aplicada em #guideBg:', src, 'para guia:', guia);
+            };
+            bgImg.onerror = () => {
+              if (errorDiv) errorDiv.style.display = 'block';
+              toast('Erro ao carregar a imagem de fundo do guia.');
+              log('Erro ao carregar imagem do guia:', src);
+            };
           } else {
             if (errorDiv) errorDiv.style.display = 'block';
             toast('Nenhum fundo válido encontrado para guia: ' + guia);
@@ -1165,9 +1217,12 @@ document.addEventListener('DOMContentLoaded', function(){
           }
         }
         window.showSection('section-selfie');
-        requestAnimationFrame(()=> setTimeout(()=>{
+        requestAnimationFrame(() => setTimeout(() => {
           const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
-          if (sec && window.runTyping) { window.runTyping(sec); log('[GUIA v14] runTyping chamado para section-selfie'); }
+          if (sec && window.runTyping) {
+            window.runTyping(sec);
+            log('[GUIA v14] runTyping chamado para section-selfie');
+          }
         }, 0));
       } catch (e) {
         console.error('[GUIA v14] Erro ao prosseguir após escolha do guia:', e);
@@ -1178,7 +1233,12 @@ document.addEventListener('DOMContentLoaded', function(){
     async function choose(el) {
       const guia = inferGuideFrom(el);
       log('Guia selecionado:', guia, 'a partir de:', el.tagName, el.id || el.className, 'texto:', (el.textContent || '').slice(0, 50));
-      if (!guia) { console.warn('[GUIA v14] Não foi possível inferir o guia.'); toast('Por favor, selecione um guia válido.'); return; }
+      if (!guia) {
+        console.warn('[GUIA v14] Não foi possível inferir o guia.');
+        toast('Por favor, selecione um guia válido.');
+        return;
+      }
+
       try {
         const root = secGuia();
         if (root) {
@@ -1192,75 +1252,113 @@ document.addEventListener('DOMContentLoaded', function(){
       }
     }
 
-    function enhanceButtons(root) {
-      if (!root || !(root instanceof Element)) { log('Seção de guia inválida ou não encontrada'); return; }
-      const candidates = root.querySelectorAll(`
-        [data-action="select-guia"],
-        [data-guide], [data-guide-id],
-        .choose-guide, .btn-guia, .card-guia, .guia-option, .guia-item, .guide-selector,
-        #btnLumen, #btnZion, #btnArion,
-        img[alt*="Lumen" i], img[alt*="Zion" i], img[alt*="Arion" i],
-        button[class*="guia"], a[class*="guia"],
-        [class*="guide"], [id*="guide"]
-      `);
-      candidates.forEach(el => {
-        if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
-        el.style.cursor = 'pointer'; el.style.pointerEvents = 'auto';
-        if (!el.getAttribute('data-guide')) { const g = inferGuideFrom(el); if (g) el.setAttribute('data-guide', g); }
-        el.setAttribute('role', 'button');
-        el.setAttribute('aria-label', `Escolher guia ${inferGuideFrom(el) || 'desconhecido'}`);
-      });
-      root.querySelectorAll('.click-shield, .overlay, [data-overlay], .modal-overlay, .blocker, [class*="overlay"], [class*="shield"], [class*="block"]').forEach(ov => {
-        ov.style.pointerEvents = 'none'; ov.style.display = 'none';
-      });
-    }
-
     function initGuia() {
       const root = secGuia();
-      if (root) { try { enhanceButtons(root); } catch (e) { console.error('[GUIA v14] enhanceButtons err:', e); } }
+      if (root) {
+        try {
+          enhanceButtons(root);
+          log('Inicialização imediata de enhanceButtons');
+        } catch (e) {
+          console.error('[GUIA v14] Erro ao inicializar enhanceButtons:', e);
+        }
+      }
 
       const mo = new MutationObserver(() => {
         const root = secGuia();
-        if (root && !root.classList.contains('hidden')) { try { enhanceButtons(root); } catch (e) { console.error('[GUIA v14] MO enhanceButtons err:', e); } }
+        if (root && !root.classList.contains('hidden')) {
+          log('Seção de guia detectada, aplicando enhanceButtons');
+          try {
+            enhanceButtons(root);
+          } catch (e) {
+            console.error('[GUIA v14] Erro ao aplicar enhanceButtons:', e);
+          }
+        }
       });
-      mo.observe(document.documentElement, { subtree:true, childList:true, attributes:true, attributeFilter:['class','style'] });
+      mo.observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style'] });
 
-      document.addEventListener('click', function(ev){
-        const root = secGuia(); if (!root || !root.contains(ev.target)) return;
-        const el = ev.target.closest(`
+      document.addEventListener('click', function(ev) {
+        const root = secGuia();
+        if (!root || !root.contains(ev.target)) return;
+        const target = ev.target;
+        const el = target.closest(`
           [data-action="select-guia"],
-          [data-guide], [data-guide-id],
-          .choose-guide, .btn-guia, .card-guia, .guia-option, .guia-item, .guide-selector,
+          [data-guide],
+          [data-guide-id],
+          .choose-guide,
+          .btn-guia,
+          .card-guia,
+          .guia-option,
+          .guia-item,
+          .guide-selector,
           #btnLumen, #btnZion, #btnArion,
           img[alt*="Lumen" i], img[alt*="Zion" i], img[alt*="Arion" i],
           button[class*="guia"], a[class*="guia"],
           [class*="guide"], [id*="guide"]
         `);
-        if (!el || !root.contains(el)) return;
-        ev.preventDefault(); ev.stopPropagation();
+        if (!el || !root.contains(el)) {
+          log('Nenhum botão de guia clicado:', target.tagName, target.className || target.id);
+          return;
+        }
+
+        const g = inferGuideFrom(el);
+        if (!g) {
+          log('Nenhum guia inferido para elemento:', el.tagName, el.id || el.className);
+          return;
+        }
+
+        ev.preventDefault();
+        ev.stopPropagation();
         choose(el);
       }, true);
 
-      document.addEventListener('keydown', function(ev){
-        if (ev.key!=='Enter' && ev.key!==' ') return;
-        const root = secGuia(); if (!root) return;
-        const el = document.activeElement; if (!el || !root.contains(el)) return;
-        ev.preventDefault(); choose(el);
+      document.addEventListener('keydown', function(ev) {
+        if (ev.key !== 'Enter' && ev.key !== ' ') return;
+        const root = secGuia();
+        if (!root) return;
+        const el = document.activeElement;
+        if (!el || !root.contains(el)) return;
+
+        const g = inferGuideFrom(el);
+        if (!g) {
+          log('Nenhum guia inferido para elemento ativo:', el.tagName, el.id || el.className);
+          return;
+        }
+
+        ev.preventDefault();
+        choose(el);
       }, true);
 
       const style = document.createElement('style');
       style.textContent = `
-        [data-action="select-guia"], [data-guide], [data-guide-id], .choose-guide, .btn-guia, .card-guia, .guia-option, .guia-item, .guide-selector, #btnLumen, #btnZion, #btnArion { pointer-events:auto; cursor:pointer; outline:none; }
-        [data-action="select-guia"].active, [data-guide].active, [data-guide-id].active, .choose-guide.active, .btn-guia.active, .card-guia.active, .guia-option.active, .guia-item.active, .guide-selector.active, #btnLumen.active, #btnZion.active, #btnArion.active { box-shadow:0 0 0 2px rgba(255,215,0,.7); }
+        [data-action="select-guia"], [data-guide], [data-guide-id], .choose-guide, .btn-guia, .card-guia, .guia-option, .guia-item, .guide-selector, #btnLumen, #btnZion, #btnArion {
+          pointer-events: auto;
+          cursor: pointer;
+          outline: none;
+        }
+        [data-action="select-guia"].active, [data-guide].active, [data-guide-id].active, .choose-guide.active, .btn-guia.active, .card-guia.active, .guia-option.active, .guia-item.active, .guide-selector.active, #btnLumen.active, #btnZion.active, #btnArion.active {
+          box-shadow: 0 0 0 2px rgba(255,215,0,.7);
+        }
       `;
       document.head.appendChild(style);
     }
 
-    try { initGuia(); } catch(e){ console.error('[GUIA v14] init err:', e); }
-    document.addEventListener('DOMContentLoaded', ()=>{ try { initGuia(); } catch(e){ console.error('[GUIA v14] DOMContentLoaded init err:', e); } });
+    try {
+      initGuia();
+    } catch (e) {
+      console.error('[GUIA v14] Erro ao inicializar guia:', e);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      log('Inicializando guia no DOMContentLoaded');
+      try {
+        initGuia();
+      } catch (e) {
+        console.error('[GUIA v14] Erro ao inicializar guia no DOMContentLoaded:', e);
+      }
+    });
   })();
 
-  /* ===== Selfie (mantido) ===== */
+  /* ===== Selfie ===== */
   (function(){
     const log = (...a) => { try { console.log('[Selfie v10]', ...a); } catch (_) {} };
 
@@ -1274,18 +1372,42 @@ document.addEventListener('DOMContentLoaded', function(){
 
     function getBgUrl(guia) {
       const GUIDE_BG = {
-        lumen: ['/assets/img/irmandade-quarteto-bg-lumen.png','/assets/img/irmandade-quarteto-bg-lumen.jpg','/assets/img/irmandade-quarteto-bg-lumen.jpeg'],
-        zion:  ['/assets/img/irmandade-quarteto-bg-zion.png','/assets/img/irmandade-quarteto-bg-zion.jpg','/assets/img/irmandade-quarteto-bg-zion.jpeg'],
-        arion: ['/assets/img/irmandade-quarteto-bg-arian.jpeg','/assets/img/irmandade-quarteto-bg-arion.jpeg','/assets/img/irmandade-quarteto-bg-arion.jpg','/assets/img/irmandade-quarteto-bg-arion.png']
+        lumen: [
+          '/assets/img/irmandade-quarteto-bg-lumen.png',
+          '/assets/img/irmandade-quarteto-bg-lumen.jpg',
+          '/assets/img/irmandade-quarteto-bg-lumen.jpeg'
+        ],
+        zion: [
+          '/assets/img/irmandade-quarteto-bg-zion.png',
+          '/assets/img/irmandade-quarteto-bg-zion.jpg',
+          '/assets/img/irmandade-quarteto-bg-zion.jpeg'
+        ],
+        arion: [
+          '/assets/img/irmandade-quarteto-bg-arian.jpeg',
+          '/assets/img/irmandade-quarteto-bg-arion.jpeg',
+          '/assets/img/irmandade-quarteto-bg-arion.jpg',
+          '/assets/img/irmandade-quarteto-bg-arion.png'
+        ]
       };
       return new Promise(res => {
-        let i=0;(function step(){ if(i>=GUIDE_BG[guia].length) return res(null); const src=GUIDE_BG[guia][i++]; const im=new Image(); im.onload=()=>res(src); im.onerror=()=>step(); im.src=src; })();
+        let i = 0;
+        (function step() {
+          if (i >= GUIDE_BG[guia].length) return res(null);
+          const src = GUIDE_BG[guia][i++];
+          const im = new Image();
+          im.onload = () => res(src);
+          im.onerror = () => step();
+          im.src = src;
+        })();
       });
     }
 
     async function applySelfieBg() {
       const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
-      if (!sec || sec.classList.contains('hidden')) { log('Selfie não visível, pulando'); return; }
+      if (!sec || sec.classList.contains('hidden')) {
+        log('Seção de selfie não visível, pulando applySelfieBg');
+        return;
+      }
 
       try {
         const guia = normGuide(localStorage.getItem('JORNADA_GUIA') || '');
@@ -1302,704 +1424,241 @@ document.addEventListener('DOMContentLoaded', function(){
           const src = await getBgUrl(guia);
           if (src) {
             bgImg.src = src;
-            bgImg.onload = () => { if (errorDiv) errorDiv.style.display = 'none'; log('BG guia aplicado:', src); };
-            bgImg.onerror = () => { if (errorDiv) errorDiv.style.display = 'block'; toast('Erro ao carregar a imagem de fundo do guia.'); };
+            bgImg.onload = () => {
+              if (errorDiv) errorDiv.style.display = 'none';
+              log('Imagem do guia aplicada em #guideBg:', src, 'para guia:', guia);
+            };
+            bgImg.onerror = () => {
+              if (errorDiv) errorDiv.style.display = 'block';
+              toast('Erro ao carregar a imagem de fundo do guia.');
+              log('Erro ao carregar imagem do guia:', src);
+            };
           } else {
             if (errorDiv) errorDiv.style.display = 'block';
             toast('Nenhum fundo válido encontrado para guia: ' + guia);
+            log('Nenhum fundo válido encontrado para guia:', guia);
           }
         }
 
-        if (window.runTyping) { window.runTyping(sec); log('runTyping chamado para section-selfie'); }
+        if (window.runTyping) {
+          window.runTyping(sec);
+          log('runTyping chamado para section-selfie');
+        }
+        const textEls = sec.querySelectorAll('[data-typing], .text, p, h1, h2, h3, h4, [class*="text"], [class*="title"], [class*="content"]');
+        if (textEls.length > 0 && window.typeWriter) {
+          for (const textEl of textEls) {
+            if (textEl.dataset.typed || textEl.dataset.typing === '1' || !textEl.offsetParent) continue;
+            const rawText = textEl.getAttribute('data-text') || textEl.textContent || '';
+            const text = window.dedupe(rawText);
+            if (text) {
+              await window.typeWriter(textEl, text, JORNADA.typing.charDelay, false);
+              if (JORNADA.tts.enabled && JORNADA.tts.readingMode === 'after' && !window.isMuted) {
+                await window.speak(text);
+              }
+              log('Datilografia e TTS aplicados em:', textEl.tagName, textEl.className || textEl.id, 'texto:', text.slice(0, 50));
+            }
+          }
+        } else {
+          log('Nenhum elemento de texto visível encontrado para datilografia/TTS. Snapshot do DOM:', Array.from(sec.children).slice(0, 10).map(el => ({
+            tag: el.tagName.toLowerCase(),
+            id: el.id || '',
+            class: el.className || '',
+            attrs: Object.keys(el.dataset || {}).join(',')
+          })));
+        }
       } catch (e) {
-        console.error('[Selfie v10] Erro:', e);
+        console.error('[Selfie v10] Erro ao aplicar datilografia/TTS:', e);
         toast('Erro ao carregar texto na selfie. Tente prosseguir.');
       }
     }
 
     const moSelfie = new MutationObserver(() => {
       const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
-      if (sec && !sec.classList.contains('hidden')) { try { applySelfieBg(); } catch(e){ console.error('[Selfie v10] MO err:', e); } }
-    });
-    moSelfie.observe(document.documentElement, { subtree:true, childList:true, attributes:true, attributeFilter:['class','style'] });
-
-    document.addEventListener('DOMContentLoaded', () => { try { applySelfieBg(); } catch(e){ console.error('[Selfie v10] DOMContentLoaded err:', e); } });
-  })();
-
-  /* ===== Perguntas (LEGADO, mantido mas não usado) ===== */
-  (function(){
-    const log = (...a) => { try { console.log('[PERGv6]', ...a); } catch (_) {} };
-    let state = { currentBlockIndex: 0, currentQuestionIndex: 0, answers: {} };
-    function getCurrentQuestion(){ if(!window.JORNADA_BLOCKS || !window.JORNADA_BLOCKS[state.currentBlockIndex]) return null; const block = window.JORNADA_BLOCKS[state.currentBlockIndex]; return block.questions[state.currentQuestionIndex] || null; }
-    function renderQuestion(){
-      const sec = document.getElementById('section-perguntas'); if(!sec) return;
-      const q = getCurrentQuestion(); if(!q){ window.showSection('section-final'); return; }
-      sec.innerHTML = `
-        <div class="j-pergunta bloco">
-          <h3 class="pergunta-enunciado text-lg md:text-xl font-bold mb-3">${q.label}</h3>
-          <textarea id="resposta-atual" class="w-full px-3 py-2 rounded border border-gray-300 bg-white/80" placeholder="Escreva aqui..."></textarea>
-          <div class="flex flex-wrap gap-2 mt-4 justify-end">
-            <button id="btn-proximo" class="px-4 py-2 rounded bg-purple-700 text-white" data-action="next-question">Próximo Passo</button>
-          </div>
-        </div>`;
-      const nextBtn = document.getElementById('btn-proximo'); if(nextBtn){ nextBtn.addEventListener('click', ()=> window.goNext()); }
-      window.runTyping && window.runTyping(sec);
-    }
-    async function handleGuiaDevolutiva(ans){
-      const sec = document.getElementById('section-perguntas'); if(!sec) return;
-      sec.innerHTML = `<div class="j-devolutiva bloco"><p id="devolutiva-texto" class="text-lg md:text-xl font-bold mb-3">...</p></div>`;
-      const el = document.getElementById('devolutiva-texto');
-      let t = "A sua jornada é única. Vamos juntos para o próximo passo.";
-      if (ans.length < 10) t = "É bom dar o primeiro passo, mesmo que pequeno. Siga em frente.";
-      else if (ans.toLowerCase().includes("tristeza") || ans.toLowerCase().includes("dor")) t = "Sinto muito que você tenha sentido essa dor. A sua força em falar sobre isso é notável. Estou aqui para te guiar.";
-      else if (ans.toLowerCase().includes("felicidade") || ans.toLowerCase().includes("alegria")) t = "Sua alegria é um farol que ilumina o caminho. Que bom que a gente pode compartilhar a luz.";
-      if (el) window.typeWriter(el, t, 25, false);
-      setTimeout(()=>{ renderQuestion(); }, 4000);
-    }
-    window.goNext = function(){
-      const q = getCurrentQuestion(); const answer = document.getElementById('resposta-atual')?.value || '';
-      if (q && answer){ state.answers[q.id]=answer; handleGuiaDevolutiva(answer); state.currentQuestionIndex++; }
-      else { state.currentQuestionIndex++; renderQuestion(); }
-    };
-    window.ensureQuestionsReady = function(){ renderQuestion(); };
-  })();
-
-  /* ===== DIÁLOGO DINÂMICO (Backend) ===== */
-  (function(){
-    // Config dos guias e API
-    const JC = (window.JC ||= {});
-    JC.sessionId = JC.sessionId || (crypto?.randomUUID?.() || String(Date.now()));
-    JC.guia = JC.guia || (localStorage.getItem('JORNADA_GUIA') || 'lumen');
-
-    const GUIAS = {
-      zion:  { apiBase: 'https://zion-backend-api.onrender.com',  model: 'grok',   voice: 'male'   },
-      lumen: { apiBase: 'https://lumen-backend-api.onrender.com', model: 'gpt-5',  voice: 'female' },
-      arion: { apiBase: 'https://arion-backend-api.onrender.com', model: 'gemini', voice: 'female' }
-    };
-
-    // CSS mínimo do chat (injetado)
-    (function injectChatCss(){
-      const css = `
-      .chat-wrap{max-width:900px;margin:0 auto;padding:16px}
-      .chat-log{display:flex;flex-direction:column;gap:12px;min-height:40vh;padding:12px;border:1px solid rgba(155,231,196,.35);border-radius:14px;background:rgba(11,31,22,.25);backdrop-filter:blur(3px)}
-      .msg{max-width:85%;padding:10px 14px;border-radius:14px;line-height:1.5}
-      .msg.bot{align-self:flex-start;border:1px solid #9be7c4;background:rgba(155,231,196,.08)}
-      .msg.user{align-self:flex-end;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.06)}
-      .chat-form{display:flex;gap:8px;margin-top:12px}
-      .chat-form input{flex:1;padding:12px;border-radius:12px;border:1px solid rgba(155,231,196,.35);background:rgba(0,0,0,.2);color:#eaf7f1}
-      .chat-form button{padding:12px 16px;border-radius:12px;border:1px solid #9be7c4;background:transparent;color:#9be7c4;cursor:pointer}
-      `;
-      const s = document.createElement('style'); s.textContent = css; document.head.appendChild(s);
-    })();
-
-    // Garante a seção de diálogo no DOM
-    function ensureDialogSection(){
-      let sec = document.getElementById('section-dialogo');
-      if (sec) return sec;
-      sec = document.createElement('section');
-      sec.id = 'section-dialogo';
-      sec.className = 'j-section hidden';
-      sec.setAttribute('aria-live','polite');
-      sec.innerHTML = `
-        <div class="chat-wrap">
-          <div id="chat-log" class="chat-log" role="log" aria-label="Mensagens da Jornada"></div>
-          <form id="chat-form" class="chat-form" autocomplete="off">
-            <input id="chat-input" type="text" placeholder="Digite sua resposta e pressione Enviar…" />
-            <button id="chat-send" type="submit">Enviar</button>
-          </form>
-        </div>`;
-      // Insere antes da section-final, se existir; senão, no final do body
-      const finalSec = document.getElementById('section-final');
-      if (finalSec && finalSec.parentNode) finalSec.parentNode.insertBefore(sec, finalSec);
-      else document.body.appendChild(sec);
-      return sec;
-    }
-
-    // Chat helpers
-    function appendMsg(text, who='bot'){
-      const log = document.getElementById('chat-log');
-      const div = document.createElement('div');
-      div.className = `msg ${who}`;
-      div.textContent = text || '';
-      log.appendChild(div);
-      log.scrollTop = log.scrollHeight;
-      return div;
-    }
-    async function botSay(text){
-      const el = appendMsg('', 'bot');
-      await window.typeWriter(el, String(text||''), 20, false);
-      if (window.JORNADA?.tts?.enabled && !window.isMuted) await window.speak(String(text||''));
-    }
-    function userSay(text){ appendMsg(String(text||''), 'user'); }
-
-    // Backend fetch
-    async function fetchNextPrompt(lastAnswer){
-      const cfg = GUIAS[(JC.guia||'lumen')] || GUIAS.lumen;
-      const tries = [
-        {url:`${cfg.apiBase}/v1/jornada/next`, method:'POST', body:(ans)=>({sessionId:JC.sessionId, guia:JC.guia, model:cfg.model, lastAnswer:ans??null})},
-        {url:`${cfg.apiBase}/v1/jornada/ask-next`, method:'POST', body:(ans)=>({sessionId:JC.sessionId, guia:JC.guia, model:cfg.model, lastAnswer:ans??null})},
-        {url:`${cfg.apiBase}/v1/chat`, method:'POST', body:(ans)=>({mode:'next', sessionId:JC.sessionId, guia:JC.guia, model:cfg.model, lastAnswer:ans??null})},
-      ];
-      let lastErr=null;
-      for(const t of tries){
-        try{
-          const res = await fetch(t.url, {method:t.method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(t.body(lastAnswer))});
-          if(!res.ok) throw new Error('HTTP '+res.status);
-          const data = await res.json();
-          if (typeof data?.prompt === 'string') return { prompt:data.prompt, done:!!data.done };
-          if (typeof data?.message === 'string') return { prompt:data.message, done:!!data.done };
-          throw new Error('payload inválido');
-        }catch(e){ lastErr=e; }
-      }
-      throw lastErr || new Error('Backend indisponível');
-    }
-
-    // Abertura do diálogo
-    window.openDialogAndKickoff = async function(){
-      ensureDialogSection();
-      window.showSection('section-dialogo'); // nosso showSection atualiza canvas e chamas
-      try{
-        const first = await fetchNextPrompt(null);
-        await botSay(first.prompt || 'Vamos começar nossa jornada.');
-        window.JC = JC; JC.done = !!first.done;
-      }catch(err){
-        console.error('[kickoff] erro', err);
-        toast('Falha ao iniciar diálogo. Tente novamente.', 'error');
-      }
-    };
-
-    // Inicializa form do chat (delegado)
-    function initChatForm(){
-      ensureDialogSection();
-      const form = document.getElementById('chat-form');
-      const input= document.getElementById('chat-input');
-      if(!form || !input) return;
-      form.addEventListener('submit', async (ev)=>{
-        ev.preventDefault();
-        const text = (input.value||'').trim(); if(!text) return;
-        userSay(text); input.value='';
-        try{
-          const next = await fetchNextPrompt(text);
-          if(next.done){
-            await botSay(next.prompt || 'Gratidão. Jornada concluída!');
-            JC.done = true;
-            try{ window.showSection('section-final'); }catch(_){}
-          }else{
-            await botSay(next.prompt);
-          }
-        }catch(err){
-          console.error('[submit] erro', err);
-          toast('Não consegui buscar a próxima pergunta.', 'error');
+      if (sec && !sec.classList.contains('hidden')) {
+        log('Seção de selfie detectada, aplicando applySelfieBg');
+        try {
+          applySelfieBg();
+        } catch (e) {
+          console.error('[Selfie v10] Erro ao aplicar applySelfieBg:', e);
         }
-      });
-    }
-
-    document.addEventListener('DOMContentLoaded', initChatForm);
-  })();
-
-  /* ===== Navegação de seções (cliques) ===== */
-  (function(){
-    const log = (...a) => { try { console.log('[Nav v8]', ...a); } catch (_) {} };
-
-    document.addEventListener('click', function(ev) {
-      const btn = ev.target.closest('[data-action]');
-      if (!btn) return;
-
-      const action = btn.getAttribute('data-action');
-      ev.preventDefault();
-
-      switch(action) {
-        case 'next-intro':
-        case 'next':
-        case 'avancar':
-          log('Navegação: Intro -> Termos');
-          window.showSection('section-termos');
-          break;
-
-        case 'termos-next':
-          log('Navegação: Termos -> Próxima Página');
-          const pages = ['termos-pg1', 'termos-pg2', 'termos-pg3', 'termos-pg4', 'termos-pg5'];
-          const visId = pages.find(id => {
-            const el = document.getElementById(id);
-            return el && !el.classList.contains('hidden');
-          });
-          const idx = pages.indexOf(visId);
-          if (idx >= 0 && idx + 1 < pages.length) {
-            const cur = document.getElementById(pages[idx]);
-            const nxt = document.getElementById(pages[idx + 1]);
-            if (cur) cur.classList.add('hidden');
-            if (nxt) nxt.classList.remove('hidden');
-            window.runTyping && window.runTyping(document.getElementById(pages[idx + 1]));
-          } else {
-            window.showSection('section-senha');
-            log('Navegação: Termos -> Senha');
-          }
-          break;
-
-        case 'next-senha':
-        case 'start':
-          log('Navegação: Senha -> Guia/Selfie');
-          window.startJourney && window.startJourney();
-          break;
-
-        case 'selfie-next':
-        case 'skip-selfie':
-          log('Navegação: Selfie -> Diálogo (backend)');
-          window.openDialogAndKickoff && window.openDialogAndKickoff();
-          break;
-
-        case 'toggle-password':
-          log('Ação: Alternar senha');
-          window.toggleSenha && window.toggleSenha();
-          break;
-      }
-    }, true);
-  })();  
-
-(function(){
-  // ---- Captura erros silenciosos de promessas (limpa "Uncaught (in promise)") ----
-  window.addEventListener('unhandledrejection', e => {
-    console.error('[UnhandledRejection]', e.reason);
-    try { window.toast && window.toast('Algo falhou em segundo plano, mas seguimos.'); } catch(_){}
-  });
-
-  // ---- Config dos guias / API (ajuste as URLs se necessário) ----
-  const JC = (window.JC ||= {});
-  JC.sessionId = JC.sessionId || (crypto?.randomUUID?.() || String(Date.now()));
-  JC.guia = JC.guia || (localStorage.getItem('JORNADA_GUIA') || 'lumen');
-
-  const GUIAS = {
-    zion:  { apiBase: 'https://zion-backend-api.onrender.com',  model: 'grok',   voice:'male'   },
-    lumen: { apiBase: 'https://lumen-backend-api.onrender.com', model: 'gpt-5',  voice:'female' },
-    arion: { apiBase: 'https://arion-backend-api.onrender.com', model: 'gemini', voice:'female' }
-  };
-
-  // ---- CSS mínimo do chat ----
-  (function injectChatCss(){
-    if (document.getElementById('irmandade-chat-css')) return;
-    const css = `
-      .chat-wrap{max-width:900px;margin:0 auto;padding:16px}
-      .chat-log{display:flex;flex-direction:column;gap:12px;min-height:40vh;padding:12px;border:1px solid rgba(155,231,196,.35);border-radius:14px;background:rgba(11,31,22,.25);backdrop-filter:blur(3px)}
-      .msg{max-width:85%;padding:10px 14px;border-radius:14px;line-height:1.5}
-      .msg.bot{align-self:flex-start;border:1px solid #9be7c4;background:rgba(155,231,196,.08)}
-      .msg.user{align-self:flex-end;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.06)}
-      .chat-form{display:flex;gap:8px;margin-top:12px}
-      .chat-form input{flex:1;padding:12px;border-radius:12px;border:1px solid rgba(155,231,196,.35);background:rgba(0,0,0,.2);color:#eaf7f1}
-      .chat-form button{padding:12px 16px;border-radius:12px;border:1px solid #9be7c4;background:transparent;color:#9be7c4;cursor:pointer}
-    `;
-    const s = document.createElement('style');
-    s.id = 'irmandade-chat-css';
-    s.textContent = css;
-    document.head.appendChild(s);
-  })();
-
-  // ---- Seção de diálogo (cria se não existir) ----
-  function ensureDialogSection(){
-    let sec = document.getElementById('section-dialogo');
-    if (sec) return sec;
-    sec = document.createElement('section');
-    sec.id = 'section-dialogo';
-    sec.className = 'j-section hidden';
-    sec.setAttribute('aria-live','polite');
-    sec.innerHTML = `
-      <div class="chat-wrap">
-        <div id="chat-log" class="chat-log" role="log" aria-label="Mensagens da Jornada"></div>
-        <form id="chat-form" class="chat-form" autocomplete="off">
-          <input id="chat-input" type="text" placeholder="Digite sua resposta e pressione Enviar…" />
-          <button id="chat-send" type="submit">Enviar</button>
-        </form>
-      </div>`;
-    const finalSec = document.getElementById('section-final');
-    if (finalSec && finalSec.parentNode) finalSec.parentNode.insertBefore(sec, finalSec);
-    else document.body.appendChild(sec);
-    return sec;
-  }
-
-  // ---- Helpers do chat ----
-  function appendMsg(text, who='bot'){
-    const log = document.getElementById('chat-log');
-    const div = document.createElement('div');
-    div.className = `msg ${who}`;
-    div.textContent = text || '';
-    log.appendChild(div);
-    log.scrollTop = log.scrollHeight;
-    return div;
-  }
-  async function botSay(text){
-    const el = appendMsg('', 'bot');
-    const tw = (window.typeWriter || (async (el,t)=>{el.textContent=t;}));
-    await tw(el, String(text||''), 20, false);
-    if (window.JORNADA?.tts?.enabled && !window.isMuted && typeof window.speak === 'function') {
-      try { await window.speak(String(text||'')); } catch(_){}
-    }
-  }
-  function userSay(text){ appendMsg(String(text||''), 'user'); }
-
-  async function fetchNextPrompt(lastAnswer){
-    const cfg = GUIAS[(JC.guia||'lumen')] || GUIAS.lumen;
-    const tries = [
-      {url:`${cfg.apiBase}/v1/jornada/next`,    method:'POST', body:(ans)=>({sessionId:JC.sessionId, guia:JC.guia, model:cfg.model, lastAnswer:ans??null})},
-      {url:`${cfg.apiBase}/v1/jornada/ask-next`,method:'POST', body:(ans)=>({sessionId:JC.sessionId, guia:JC.guia, model:cfg.model, lastAnswer:ans??null})},
-      {url:`${cfg.apiBase}/v1/chat`,            method:'POST', body:(ans)=>({mode:'next', sessionId:JC.sessionId, guia:JC.guia, model:cfg.model, lastAnswer:ans??null})},
-    ];
-    let lastErr=null;
-    for(const t of tries){
-      try{
-        const res = await fetch(t.url, {method:t.method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(t.body(lastAnswer))});
-        if(!res.ok) throw new Error('HTTP '+res.status);
-        const data = await res.json();
-        if (typeof data?.prompt === 'string') return { prompt:data.prompt, done:!!data.done };
-        if (typeof data?.message === 'string') return { prompt:data.message, done:!!data.done };
-        throw new Error('payload inválido');
-      }catch(e){ lastErr=e; }
-    }
-    throw lastErr || new Error('Backend indisponível');
-  }
-
-  // ---- Abre diálogo e inicia a primeira pergunta ----
-  async function openDialogAndKickoff(){
-    ensureDialogSection();
-    // Mostra a seção (usa seu showSection atual se existir)
-    const _show = window.showSection;
-    if (typeof _show === 'function') {
-      try { _show('section-dialogo'); } catch(_){
-        // fallback: mostra manualmente
-        document.querySelectorAll('.j-section,[id^="section-"]').forEach(s=>{ s.classList.add('hidden'); s.style.display='none'; });
-        const d = document.getElementById('section-dialogo'); d.classList.remove('hidden'); d.style.display='block';
-      }
-    }
-    try{
-      const first = await fetchNextPrompt(null);
-      await botSay(first.prompt || 'Vamos começar nossa jornada.');
-      JC.done = !!first.done;
-    }catch(err){
-      console.error('[kickoff] erro', err);
-      try { window.toast && window.toast('Falha ao iniciar diálogo. Tente novamente.', 'error'); } catch(_){}
-    }
-  }
-
-  // ---- Inicializa form do chat (uma vez só) ----
-  function initChatForm(){
-    if (window.__IRM_DIALOGO_READY) return;
-    ensureDialogSection();
-    const form  = document.getElementById('chat-form');
-    const input = document.getElementById('chat-input');
-    if(!form || !input) return;
-    form.addEventListener('submit', async (ev)=>{
-      ev.preventDefault();
-      const text=(input.value||'').trim(); if(!text) return;
-      userSay(text); input.value='';
-      try{
-        const next = await fetchNextPrompt(text);
-        if(next.done){
-          await botSay(next.prompt || 'Gratidão. Jornada concluída!');
-          JC.done=true;
-          try { window.showSection && window.showSection('section-final'); } catch(_){}
-        }else{
-          await botSay(next.prompt);
-        }
-      }catch(err){
-        console.error('[submit] erro', err);
-        try { window.toast && window.toast('Não consegui buscar a próxima pergunta.', 'error'); } catch(_){}
       }
     });
-    window.__IRM_DIALOGO_READY = true;
-  }
+    moSelfie.observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style'] });
 
-  // ---- Intercepta section-perguntas e redireciona pro diálogo ----
-  (function patchShowSection(){
-    const prev = window.showSection;
-    window.showSection = function(id){
-      if (id === 'section-perguntas') {
-        console.log('[Hotfix] Redirecionando para section-dialogo (backend)');
-        initChatForm();
-        openDialogAndKickoff();
-        return;
+    document.addEventListener('DOMContentLoaded', () => {
+      log('Inicializando applySelfieBg no DOMContentLoaded');
+      try {
+        applySelfieBg();
+      } catch (e) {
+        console.error('[Selfie v10] Erro ao inicializar applySelfieBg:', e);
       }
-      if (typeof prev === 'function') return prev.apply(this, arguments);
-    };
+    });
   })();
-
-  // ---- Garante que o chat esteja pronto quando o DOM terminar ----
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initChatForm, { once:true });
-  } else {
-    initChatForm();
-  }
-})();  
-       
-(function(){
-  // 1) Salvar e espelhar Nome (campo "Seu Nome" na etapa Guia)
-  function applyNameAllSlots(name){
-    const up = (name||'').toUpperCase();
-    const ids = ['guideNameSlot', 'clientNameSlot', 'clientNameSlotFinal', 'guideNameSlotFinal'];
-    ids.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = up; });
-  }
-  document.addEventListener('input', function(e){
-    if (e.target && e.target.id === 'guiaNameInput'){
-      const v = (e.target.value||'').trim();
-      try { localStorage.setItem('JORNADA_NOME', v); } catch(_){}
-      applyNameAllSlots(v);
-    }
-  }, true);
-  // também aplica ao abrir páginas (se o nome já estava salvo)
-  document.addEventListener('DOMContentLoaded', function(){
-    const v = (localStorage.getItem('JORNADA_NOME')||'').trim();
-    if (v) applyNameAllSlots(v);
-  });
-
-  // 2) Compat: carregar selfie final (independente da chave usada)
-  document.addEventListener('DOMContentLoaded', function(){
-    const url = localStorage.getItem('IRMANDADE_SELFIE_FINAL') || localStorage.getItem('SELFIE_FINAL_URL');
-    const img = document.getElementById('selfieInFlame') || document.getElementById('minhaFotoFinal');
-    if (url && img) img.src = url;
-  });
-
-  // 3) Compat: botão do olho da senha sempre funciona
-  document.addEventListener('click', function(e){
-    const t = e.target.closest('[data-action="toggle-password"], .password-toggle, [aria-label*="senha" i]');
-    if (!t) return;
-    const root = document.getElementById('section-senha') || document;
-    const inp = root.querySelector('#senha, #senhaInput, input[type="password"], input[name*="senha" i], input[id*="senha" i]');
-    if (!inp) return;
-    e.preventDefault();
-    inp.type = (inp.type === 'password' ? 'text' : 'password');
-    if (t.classList) t.classList.toggle('on');
-  }, true);
-
-  // 4) Compat: aceitar também 'next-termos' para ir à página de termos
-  document.addEventListener('click', function(e){
-    const btn = e.target.closest('[data-action="next-termos"]');
-    if (!btn || typeof window.showSection !== 'function') return;
-    e.preventDefault();
-    window.showSection('section-termos');
-  }, true);
-})();
  
+ /* ===== Perguntas ===== */
 (function(){
-  if (window.__J_GLUE__) return; window.__J_GLUE__=1;
-  const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+    const log = (...a) => { try { console.log('[PERGv6]', ...a); } catch (_) {} };
 
-  const showSafe = (id)=>{
-    try{
-      if (window.showSection) return window.showSection(id);
-      $$('.j-section').forEach(s=>{s.classList.add('hidden'); s.style.display='none';});
-      const el=document.getElementById(id); if(el){el.classList.remove('hidden'); el.style.display='block';}
-    }catch(_){}
-  };
+    let state = {
+        currentBlockIndex: 0,
+        currentQuestionIndex: 0,
+        answers: {}
+    };
 
-  // Navegação dos termos (pg1→pg5) + ida pra senha
-  document.addEventListener('click',e=>{
-    const a=e.target.closest('[data-action]'); if(!a) return;
-    const act=a.dataset.action;
+    function getCurrentQuestion() {
+        if (!window.JORNADA_BLOCKS || !window.JORNADA_BLOCKS[state.currentBlockIndex]) {
+            return null;
+        }
+        const block = window.JORNADA_BLOCKS[state.currentBlockIndex];
+        return block.questions[state.currentQuestionIndex] || null;
+    }
 
-    const swap=(hideId,showId)=>{
-      const h=document.getElementById(hideId), s=document.getElementById(showId);
-      if(h) h.classList.add('hidden');
-      if(s){ s.classList.remove('hidden'); window.runTyping && runTyping(s); }
-    };
+    function renderQuestion() {
+        const sec = document.getElementById('section-perguntas');
+        if (!sec) return;
+        
+        const question = getCurrentQuestion();
+        if (!question) {
+            window.showSection('section-final');
+            return;
+        }
 
-    if (act==='next-termos'){ e.preventDefault(); showSafe('section-termos'); return; }
-    if (act==='termos-next'){ e.preventDefault(); swap('termos-pg1','termos-pg2'); return; }
-    if (act==='termos-next2'){ e.preventDefault(); swap('termos-pg2','termos-pg3'); return; }
-    if (act==='termos-next3'){ e.preventDefault(); swap('termos-pg3','termos-pg4'); return; }
-    if (act==='termos-next4'){ e.preventDefault(); swap('termos-pg4','termos-pg5'); return; }
-    if (act==='next-senha'){ e.preventDefault(); showSafe('section-senha'); return; }
+        sec.innerHTML = '';
+        
+        const questionHtml = `
+          <div class="j-pergunta bloco">
+            <h3 class="pergunta-enunciado text-lg md:text-xl font-bold mb-3">${question.label}</h3>
+            <textarea id="resposta-atual" class="w-full px-3 py-2 rounded border border-gray-300 bg-white/80" placeholder="Escreva aqui..."></textarea>
+            <div class="flex flex-wrap gap-2 mt-4 justify-end">
+              <button id="btn-proximo" class="px-4 py-2 rounded bg-purple-700 text-white" data-action="next-question">Próximo Passo</button>
+            </div>
+          </div>
+        `;
 
-    // Olho da senha
-    if (act==='toggle-password'){ e.preventDefault();
-      const inp=$('#section-senha input[type="password"], #section-senha input'); if(inp) inp.type = (inp.type==='password'?'text':'password');
-      return;
-    }
+        sec.innerHTML = questionHtml;
+        
+        const nextBtn = document.getElementById('btn-proximo');
+        if (nextBtn) {
+          nextBtn.addEventListener('click', () => {
+            window.goNext();
+          });
+        }
 
-    // Começar jornada após senha (mantém o start da Arian se existir)
-    if (act==='start'){ e.preventDefault(); if (window.startJourney) return window.startJourney(); showSafe('section-guia'); return; }
+        window.runTyping && window.runTyping(sec);
+    }
 
-    // Escolha de guia (aplica BG mínimo e vai pra selfie)
-    if (act==='select-guia'){ e.preventDefault();
-      const g=(a.dataset.guia||'').toLowerCase(); try{localStorage.setItem('JORNADA_GUIA',g);}catch(_){}
-      const bg=$('#guideBg');
-      if(bg){
-        bg.src = g==='lumen' ? '/assets/img/irmandade-quarteto-bg-lumen.png'
-             : g==='arian' ? '/assets/img/irmandade-quarteto-bg-arian.jpeg'
-             : '/assets/img/irmandade-quarteto-bg-zion.jpeg';
-      }
-      showSafe('section-selfie'); return;
-    }
+    async function handleGuiaDevolutiva(respostaParticipante) {
+        const sec = document.getElementById('section-perguntas');
+        if (!sec) return;
 
-    // Pular selfie → perguntas (usa renderer da Arian se existir, senão fallback)
-    if (act==='skip-selfie'){ e.preventDefault();
-      showSafe('section-perguntas');
-      if (window.ensureQuestionsReady) ensureQuestionsReady(); else fallbackQuestions();
-      return;
-    }
-  }, true);
+        sec.innerHTML = '';
+        const devolutivaHtml = `
+          <div class="j-devolutiva bloco">
+            <p id="devolutiva-texto" class="text-lg md:text-xl font-bold mb-3">...</p>
+          </div>
+        `;
+        sec.innerHTML = devolutivaHtml;
+        const textoDevolutiva = document.getElementById('devolutiva-texto');
 
-  // Nome no card (e no final), uppercase, persistido
-  $('#guiaNameInput')?.addEventListener('input', e=>{
-    const v=(e.target.value||'').toUpperCase();
-    ['clientNameSlot','clientNameSlotFinal'].forEach(id=>{const el=document.getElementById(id); if(el) el.textContent=v;});
-    try{localStorage.setItem('JORNADA_NOME',v);}catch(_){}
-  });
+        let devolutivaSimulada = "A sua jornada é única. Vamos juntos para o próximo passo.";
+        
+        if (respostaParticipante.length < 10) {
+          devolutivaSimulada = "É bom dar o primeiro passo, mesmo que pequeno. Siga em frente.";
+        } else if (respostaParticipante.toLowerCase().includes("tristeza") || respostaParticipante.toLowerCase().includes("dor")) {
+          devolutivaSimulada = "Sinto muito que você tenha sentido essa dor. A sua força em falar sobre isso é notável. Estou aqui para te guiar.";
+        } else if (respostaParticipante.toLowerCase().includes("felicidade") || respostaParticipante.toLowerCase().includes("alegria")) {
+          devolutivaSimulada = "Sua alegria é um farol que ilumina o caminho. Que bom que a gente pode compartilhar a luz.";
+        }
 
-  // Fallback simples de perguntas (se backend/glue da Arian não renderizar)
-  function fallbackQuestions(){
-    const cont = document.getElementById('perguntas-container'); if(!cont) return;
-    cont.innerHTML = '<div class="j-pergunta bloco">\
-      <h3 class="pergunta-enunciado">O que te trouxe até aqui hoje?</h3>\
-      <textarea class="w-full px-3 py-2 rounded border bg-white/10" placeholder="Escreva aqui..."></textarea>\
-      <div class="footer-actions"><button class="btn" id="__goFinal">Concluir</button></div>\
-    </div>';
-    document.getElementById('__goFinal')?.addEventListener('click', ()=> showSafe('section-final'));
-  }
+        if (textoDevolutiva) {
+          window.typeWriter(textoDevolutiva, devolutivaSimulada, 25, false);
+        }
 
-  // Ao entrar em TERMO, datilografa apenas a página visível
-  const termos=$('#section-termos');
-  if (termos){
-    const vis = termos.querySelector('#termos-pg1:not(.hidden),#termos-pg2:not(.hidden),#termos-pg3:not(.hidden),#termos-pg4:not(.hidden),#termos-pg5:not(.hidden)') || $('#termos-pg1');
-    vis && window.runTyping && runTyping(vis);
-  }
+        setTimeout(() => {
+          renderQuestion();
+        }, 4000);
+    }
 
-  // Primeira seção
-  if (document.getElementById('section-intro')) showSafe('section-intro');
+    window.goNext = function() {
+        const currentQuestion = getCurrentQuestion();
+        const answer = document.getElementById('resposta-atual')?.value || '';
+        
+        if (currentQuestion && answer) {
+            state.answers[currentQuestion.id] = answer;
+            console.log(`Resposta salva para a pergunta ${currentQuestion.id}: ${answer}`);
+            
+            handleGuiaDevolutiva(answer);
+            state.currentQuestionIndex++;
+
+        } else {
+            state.currentQuestionIndex++;
+            renderQuestion();
+        }
+    };
+
+    window.ensureQuestionsReady = function() {
+        renderQuestion();
+    };
 })();
 
-/* ==== GLUE v2 — não substitui nada; só integra e dá fallback seguro ==== */
+  /* ===== Navegação de seções ===== */
 (function(){
-  if(window.__IRM_GLUE__) return; window.__IRM_GLUE__=1;
+    const log = (...a) => { try { console.log('[Nav v8]', ...a); } catch (_) {} };
 
-  /* ---- Defensas leves ---- */
-  window.JORNADA = window.JORNADA || { tts:{enabled:false,lang:'pt-BR',rate:1,pitch:1,voiceName:''}, typing:{charDelay:28} };
-  const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
-  function toast(msg){ try{const t=$("#toast"); if(!t) return; t.textContent=msg; t.classList.remove("hidden"); t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2600);}catch(_){} }
+    document.addEventListener('click', function(ev) {
+      const btn = ev.target.closest('[data-action]');
+      if (!btn) return;
 
-  /* ---- Mostrar seção com segurança (usa o showSection original se houver) ---- */
-  function showSafe(id){
-    try{
-      if(typeof window.showSection==="function") return window.showSection(id);
-      $$('.j-section,[id^="section-"]').forEach(s=>{ s.classList.add('hidden'); s.style.display='none'; });
-      const el = document.getElementById(id);
-      if(el){ el.classList.remove('hidden'); el.style.display='block'; setTimeout(()=>safeRunTyping(el),0); }
-    }catch(e){ console.error('[GLUE] showSafe err',e); }
-  }
+      const action = btn.getAttribute('data-action');
+      ev.preventDefault();
+      
+      switch(action) {
+        case 'next-intro':
+        case 'next':
+        case 'avancar':
+          log('Navegação: Intro -> Termos');
+          window.showSection('section-termos');
+          break;
 
-  /* ---- Datilografia fallback (só em [data-typing] visíveis) ---- */
-  function safeRunTyping(root){
-    try{
-      if(!root) return;
-      const els = Array.from(root.querySelectorAll('[data-typing]')).filter(el => el.offsetParent!==null);
-      if(!els.length){ console.log('[safeRunTyping] sem nós em', root.id||root.className); return; }
-      els.forEach(el=>{
-        const txt = (el.getAttribute('data-text')||el.textContent||'').trim();
-        el.textContent='';
-        let i=0; (function step(){ if(i<=txt.length){ el.textContent = txt.slice(0,i++); setTimeout(step, 18); } })();
-      });
-    }catch(e){ console.warn('[safeRunTyping] erro', e); }
-  }
+        case 'termos-next':
+          log('Navegação: Termos -> Próxima Página');
+          const pages = ['termos-pg1', 'termos-pg2', 'termos-pg3', 'termos-pg4', 'termos-pg5'];
+          const visId = pages.find(id => {
+            const el = document.getElementById(id);
+            return el && !el.classList.contains('hidden');
+          });
+          const idx = pages.indexOf(visId);
+          if (idx >= 0 && idx + 1 < pages.length) {
+            const cur = document.getElementById(pages[idx]);
+            const nxt = document.getElementById(pages[idx + 1]);
+            if (cur) cur.classList.add('hidden');
+            if (nxt) nxt.classList.remove('hidden');
+            window.runTyping && window.runTyping(document.getElementById(pages[idx + 1]));
+          } else {
+            window.showSection('section-senha');
+            log('Navegação: Termos -> Senha');
+          }
+          break;
 
-  /* ---- Navegação (compatível) ---- */
-  function swap(hideId, showId){
-    const h = document.getElementById(hideId), s = document.getElementById(showId);
-    if(h) h.classList.add('hidden');
-    if(s){ s.classList.remove('hidden'); setTimeout(()=>safeRunTyping(s),0); }
-  }
+        case 'next-senha':
+        case 'start':
+          log('Navegação: Senha -> Guia/Selfie');
+          window.startJourney && window.startJourney();
+          break;
 
-  document.addEventListener('click', function(ev){
-    const btn = ev.target.closest('[data-action]'); if(!btn) return;
-    const act = btn.getAttribute('data-action'); if(!act) return;
-    ev.preventDefault();
+        case 'selfie-next':
+        case 'skip-selfie':
+          log('Navegação: Selfie -> Perguntas');
+          window.showSection('section-perguntas');
+          break;
 
-    switch(act){
-      /* Intro → Termos */
-      case 'next-termos': showSafe('section-termos'); {
-        const vis = $('#termos-pg1'); if(vis) setTimeout(()=>safeRunTyping(vis),0);
-      } return;
-
-      /* Termos paginação */
-      case 'termos-next' : return swap('termos-pg1','termos-pg2');
-      case 'termos-next2': return swap('termos-pg2','termos-pg3');
-      case 'termos-next3': return swap('termos-pg3','termos-pg4');
-      case 'termos-next4': return swap('termos-pg4','termos-pg5');
-
-      /* Ir para senha ao aceitar */
-      case 'next-senha': showSafe('section-senha'); return;
-
-      /* Olho da senha */
-      case 'toggle-password': {
-        const inp = $('#section-senha input#senha') || $('#section-senha input[type="password"]') || $('#section-senha input');
-        if(inp) inp.type = (inp.type==='password' ? 'text' : 'password');
-      } return;
-
-      /* Iniciar após senha (se houver startJourney original, usa-o) */
-      case 'start': if(typeof window.startJourney==='function'){ return window.startJourney(); }
-                    else { showSafe('section-guia'); return; }
-
-      /* Escolha do guia */
-      case 'select-guia': {
-        const g = (btn.dataset.guia || btn.dataset.guide || '').toLowerCase() || 'lumen';
-        try{ localStorage.setItem('JORNADA_GUIA', g); }catch(_){}
-        const bg = $('#guideBg');
-        if(bg){
-          bg.src = g==='lumen' ? '/assets/img/irmandade-quarteto-bg-lumen.png'
-               : g==='arian' ? '/assets/img/irmandade-quarteto-bg-arian.jpeg'
-               :              '/assets/img/irmandade-quarteto-bg-zion.jpeg';
-        }
-        showSafe('section-selfie');
-      } return;
-
-      /* Pular selfie → Perguntas (usa renderer da Arian se existir; senão fallback) */
-      case 'skip-selfie': {
-        showSafe('section-perguntas');
-        if(typeof window.ensureQuestionsReady==='function'){ window.ensureQuestionsReady(); }
-        else { renderFallbackQuestion(); }
-      } return;
-
-      /* Chat send (se existir área) – deixamos para o script da Arian tratar. */
-    }
-  }, true);
-
-  /* ---- Nome no card (live + persist) ---- */
-  const nameInput = $('#guiaNameInput');
-  if(nameInput){
-    const boot = (localStorage.getItem('JORNADA_NOME')||'').toUpperCase();
-    if(boot){ nameInput.value=boot; setNameOnCards(boot); }
-    nameInput.addEventListener('input', e=>{
-      const v = (e.target.value||'').toUpperCase();
-      setNameOnCards(v);
-      try{ localStorage.setItem('JORNADA_NOME', v); }catch(_){}
-    });
-  }
-  function setNameOnCards(v){
-    ['clientNameSlot','clientNameSlotFinal','guideNameSlot'].forEach(id=>{
-      const el = document.getElementById(id); if(el) el.textContent = v;
-    });
-  }
-
-  /* ---- Perguntas fallback (não interfere no renderer oficial) ---- */
-  function renderFallbackQuestion(){
-    const cont = document.getElementById('perguntas-container');
-    if(!cont) return;
-    cont.innerHTML = ''
-      + '<div class="j-pergunta bloco active">'
-      +   '<h3 class="pergunta-enunciado">O que te trouxe até aqui hoje?</h3>'
-      +   '<textarea class="w-full px-3 py-2 rounded border bg-white/10" placeholder="Escreva aqui..."></textarea>'
-      +   '<div class="footer-actions"><button class="btn" id="__goFinal">Concluir</button></div>'
-      + '</div>';
-    setTimeout(()=>safeRunTyping(cont),0);
-    $('#__goFinal')?.addEventListener('click', ()=> showSafe('section-final'));
-  }
-
-  /* ---- Boot suave ---- */
-  document.addEventListener('DOMContentLoaded', function(){
-    // Se a intro existe, mostra; senão cai para a primeira seção existente.
-    if(document.getElementById('section-intro')){ showSafe('section-intro'); setTimeout(()=>safeRunTyping(document.getElementById('section-intro')),0); }
-    else{
-      const first = ['section-termos','section-senha','section-guia','section-selfie','section-perguntas','section-final'].find(id=>document.getElementById(id));
-      if(first) showSafe(first);
-    }
-  });
+        case 'toggle-password':
+          log('Ação: Alternar senha');
+          window.toggleSenha && window.toggleSenha();
+          break;
+      }
+    }, true);
 })();
-
   /* ===== Boot ===== */
   (function(){
     console.log('[Boot] Iniciando script seguro');
@@ -2012,20 +1671,15 @@ document.addEventListener('DOMContentLoaded', function(){
     if (typeof window.speechSynthesis !== 'undefined') {
       speechSynthesis.onvoiceschanged = () => {};
     }
-    // Garante que a seção de diálogo existe desde o início
-    try { window.openDialogAndKickoff && (function(){ const s=document.getElementById('section-dialogo'); if(!s){ (window.ensureDialogSection||(()=>{}))(); } })(); } catch(_) {}
-
-     document.getElementById('guiaNameInput')&&document.getElementById('guiaNameInput').addEventListener('input',e=>{try{localStorage.setItem('JORNADA_NOME',e.target.value||'')}catch(_){}});
-     document.querySelector('[data-action="toggle-password"]')?.addEventListener('click',()=>{const i=document.querySelector('#section-senha input');if(i)i.type=i.type==='password'?'text':'password';});
-     document.getElementById('clientNameSlot')&&(document.getElementById('clientNameSlot').id='guideNameSlot');
-     window.addEventListener('DOMContentLoaded',()=>{const n=(localStorage.getItem('JORNADA_NOME')||'').toUpperCase();if(n){const f=document.getElementById('clientNameSlotFinal');if(f)f.textContent=n}});
-
     if (document.getElementById('section-intro')) {
       window.showSection('section-intro');
     } else {
-      const possibleSections = ['section-termos', 'section-senha', 'section-guia', 'section-dialogo'];
+      const possibleSections = ['section-termos', 'section-senha', 'section-guia', 'section-perguntas'];
       for (const secId of possibleSections) {
-        if (document.getElementById(secId)) { window.showSection(secId); break; }
+        if (document.getElementById(secId)) {
+          window.showSection(secId);
+          break;
+        }
       }
     }
   })();
@@ -2034,7 +1688,4 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 </body>
 </html>
-
-
-
 
