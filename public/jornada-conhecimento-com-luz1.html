@@ -1150,6 +1150,25 @@
         if (h) h.style.width = '0';
         if (!el.hasAttribute('data-text') && keepText) el.setAttribute('data-text', keepText);
       });
+      
+       // === Devolutiva em um elemento, com typewriter/TTS já integrados ===
+      async function mostrarDevolutiva({ el, pergunta, resposta, guia='lumen' }) {
+      const txt = await window.fetchDevolutiva(pergunta, resposta, guia);
+      if (el) window.typeTextOnce(el, txt, 22);
+      return txt;
+     }
+
+     // === Chat interativo (histórico estilo nós dois conversando) ===
+     async function conversar({ el, guia='lumen', historico=[], prompt='' }) {
+     const { text } = await window.askInteractive({ guide: guia, history: historico, prompt });
+     if (el) window.typeTextOnce(el, text, 22);
+     return text;
+    }
+
+     // expõe se for usar fora
+     window.mostrarDevolutiva = mostrarDevolutiva;
+     window.conversar = conversar;
+
 
       requestAnimationFrame(() => setTimeout(() => {
         window.runTyping && window.runTyping(active);
