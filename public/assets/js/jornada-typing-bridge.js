@@ -51,21 +51,26 @@
   if (!window.runTyping) window.runTyping = runTypingAdapter;
 
   // ---------- Auto reapply ----------
-  function hookPergaminho() {
-    const el =
-      document.getElementById('jornada-conteudo') ||
-      document.querySelector('#jornada-conteudo');
-    if (!el) return;
-
-    setTimeout(() => runTypingAdapter(el), 0);
-
-    let t;
-    const mo = new MutationObserver(() => {
-      clearTimeout(t);
-      t = setTimeout(() => runTypingAdapter(el), 80);
-    });
-    mo.observe(el, { childList: true, subtree: true });
+ function hookPergaminho() {
+  const el =
+    document.getElementById('jornada-conteudo') ||
+    document.querySelector('#jornada-conteudo');
+  if (!el) {
+    console.warn('[TypingBridge] #jornada-conteudo não encontrado');
+    return;
   }
+  setTimeout(() => runTypingAdapter(el), 0);
+  let t;
+  const mo = new MutationObserver((mutations) => {
+    const relevant = mutations.some(m => m.target.id !== 'toast');
+    if (relevant) {
+      console.log('[TypingBridge] Mutação relevante detectada:', mutations);
+      clearTimeout(t);
+      t = setTimeout(() => runTypingAdapter(el), 200);
+    }
+  });
+  mo.observe(el, { childList: true, subtree: true });
+}
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', hookPergaminho, { once: true });
