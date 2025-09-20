@@ -81,4 +81,4 @@
   })();
 
   try { console.log('[TypingBridge] pronto'); } catch (_) {}
-})();
+})();;
