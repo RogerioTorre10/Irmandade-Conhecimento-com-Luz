@@ -20,15 +20,20 @@
   if (!window.speak) {
     window.speak = function (text = '') {
       try {
-        if (!('speechSynthesis' in window) || !text) return;
-        try { window.speechSynthesis.cancel(); } catch (_) {}
+        if (!('speechSynthesis' in window) || !text) {
+          console.warn('[TypingBridge] SpeechSynthesis não disponível ou texto vazio');
+          return;
+        }
+        window.speechSynthesis.cancel();
         const cfg = (window.JORNADA && JORNADA.tts) || {};
         const u = new SpeechSynthesisUtterance(String(text));
-        u.lang  = cfg.lang  || 'pt-BR';
-        u.rate  = Number(cfg.rate  ?? 1.06);
+        u.lang = cfg.lang || 'pt-BR';
+        u.rate = Number(cfg.rate ?? 1.06);
         u.pitch = Number(cfg.pitch ?? 1.0);
         window.speechSynthesis.speak(u);
-      } catch (_) {}
+      } catch (e) {
+        console.error('[TypingBridge] Erro no speak:', e);
+      }
     };
   }
   if (!window.readAloud) window.readAloud = (t) => window.speak(t);
@@ -42,6 +47,10 @@
         document.getElementById('jornada-conteudo') ||
         document.querySelector('#jornada-conteudo') ||
         document;
+      if (!target) {
+        console.warn('[TypingBridge] Nenhum target encontrado para runTypingAdapter');
+        return;
+      }
       if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
         const cfg = (window.JORNADA && JORNADA.typing) || {};
         window.JORNADA_TYPE.run(target, {
@@ -93,8 +102,10 @@
   }
 
   if (document.readyState === 'loading') {
+    console.log('[TypingBridge] Aguardando DOMContentLoaded para hookPergaminho');
     document.addEventListener('DOMContentLoaded', hookPergaminho, { once: true });
   } else {
+    console.log('[TypingBridge] DOM já carregado, executando hookPergaminho');
     hookPergaminho();
   }
 
@@ -115,5 +126,5 @@
     }
   })();
 
-  try { console.log('[TypingBridge] pronto'); } catch (_) {}
+  console.log('[TypingBridge] pronto');
 })();;
