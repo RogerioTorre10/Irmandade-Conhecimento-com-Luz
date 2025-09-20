@@ -1,55 +1,84 @@
-<!-- /jornada-typing-bridge.js -->
-<script>
+/* =========================================================
+   jornada-typing-bridge.js
+   Ponte entre o engine novo (JORNADA_TYPO) e o legado:
+   - runTyping(root)  -> JORNADA_TYPO.typeAll(root)
+   - speak()/readAloud() seguros via Web Speech
+   - Reaplica datilografia quando o pergaminho muda
+   ========================================================= */
 ;(function () {
-  // --- TTS seguro (speak / readAloud) ---
+  'use strict';
+
+  // ---------- TTS seguro ----------
   if (!window.speak) {
     window.speak = function (text = '') {
       try {
-        if (!('speechSynthesis' in window)) return;
-        const u = new SpeechSynthesisUtterance(String(text || ''));
+        if (!('speechSynthesis' in window) || !text) return;
+        try { window.speechSynthesis.cancel(); } catch (_) {}
         const cfg = (window.JORNADA && JORNADA.tts) || {};
+        const u = new SpeechSynthesisUtterance(String(text));
         u.lang  = cfg.lang  || 'pt-BR';
         u.rate  = Number(cfg.rate  ?? 1.06);
         u.pitch = Number(cfg.pitch ?? 1.0);
-        window.speechSynthesis.cancel();
         window.speechSynthesis.speak(u);
-      } catch {}
+      } catch (_) {}
     };
   }
   if (!window.readAloud) window.readAloud = (t) => window.speak(t);
 
-  // --- Adapter: runTyping -> JORNADA_TYPO.typeAll ---
+  // ---------- Adapter: runTyping -> JORNADA_TYPO.typeAll ----------
   function runTypingAdapter(root) {
     try {
-      const target = root || document.getElementById('jornada-conteudo') || '#jornada-conteudo';
+      const target =
+        root ||
+        document.getElementById('jornada-conteudo') ||
+        document.querySelector('#jornada-conteudo') ||
+        document;
       if (window.JORNADA_TYPO && typeof JORNADA_TYPO.typeAll === 'function') {
-        JORNADA_TYPO.typeAll(target);
+        const cfg = (window.JORNADA && JORNADA.typing) || {};
+        JORNADA_TYPO.typeAll(target, {
+          speed: Number(cfg.charDelay ?? (JORNADA_TYPO.DEFAULTS && JORNADA_TYPO.DEFAULTS.speed) || 34),
+          cursor: Boolean(cfg.caret ?? (JORNADA_TYPO.DEFAULTS && JORNADA_TYPO.DEFAULTS.cursor) ?? true),
+        });
       }
-    } catch {}
+    } catch (_) {}
   }
   if (!window.runTyping) window.runTyping = runTypingAdapter;
 
-  // --- Reaplicar quando o conteúdo do pergaminho mudar ---
-  function autoHook() {
-    const el = document.getElementById('jornada-conteudo');
+  // ---------- Auto reapply ----------
+  function hookPergaminho() {
+    const el =
+      document.getElementById('jornada-conteudo') ||
+      document.querySelector('#jornada-conteudo');
     if (!el) return;
+
+    setTimeout(() => runTypingAdapter(el), 0);
+
     let t;
     const mo = new MutationObserver(() => {
       clearTimeout(t);
       t = setTimeout(() => runTypingAdapter(el), 80);
     });
     mo.observe(el, { childList: true, subtree: true });
-    // primeira passada
-    setTimeout(() => runTypingAdapter(el), 0);
   }
 
-  // tenta rodar assim que possível
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', autoHook, { once: true });
+    document.addEventListener('DOMContentLoaded', hookPergaminho, { once: true });
   } else {
-    autoHook();
+    hookPergaminho();
   }
 
-  console.log('[TypingBridge] pronto');
+  // reaplica quando navega de seção
+  (function wrapShowSection() {
+    const prev = window.showSection;
+    if (typeof prev === 'function' && !prev.__wrapped) {
+      window.showSection = function (id) {
+        try { prev.apply(this, arguments); } finally {
+          setTimeout(() => runTypingAdapter(), 60);
+        }
+      };
+      window.showSection.__wrapped = true;
+    }
+  })();
+
+  try { console.log('[TypingBridge] pronto'); } catch (_) {}
 })();
-</script>
