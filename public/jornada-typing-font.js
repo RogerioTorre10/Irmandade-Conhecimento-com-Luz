@@ -87,3 +87,17 @@
 
   window.JORNADA_TYPO = { typeAll, typeText, DEFAULTS };
 })();
+
+// Compat: micro-boot espera window.JTyping
+window.JTyping = window.JTyping || {
+  run: (sel = '#jornada-conteudo', opts = {}) => window.JORNADA_TYPO.typeAll(sel, opts),
+  typeAll: window.JORNADA_TYPO.typeAll,
+  typeText: window.JORNADA_TYPO.typeText,
+  DEFAULTS: window.JORNADA_TYPO.DEFAULTS
+};
+
+// Só define um fallback leve para quem chamar runTyping()
+if (!window.runTyping) {
+  window.runTyping = (root) => window.JORNADA_TYPO.typeAll(root || '#jornada-conteudo');
+}
+
