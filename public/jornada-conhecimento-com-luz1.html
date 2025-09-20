@@ -1935,137 +1935,6 @@
     }, 100);
   };
 
-  let __isTransitioning = false;
-  window.goNext = function() {
-    if (__isTransitioning) {
-      console.log('[goNext] Bloqueado por __isTransitioning');
-      return;
-    }
-    __isTransitioning = true;
-
-    try {
-      const current = document.querySelector('.j-section:not(.hidden)')?.id;
-      console.log('[goNext] Seção atual:', current);
-
-      const flow = [
-        { from: 'section-intro', to: 'section-termos' },
-        { from: 'section-termos', to: 'section-senha' },
-        { from: 'section-senha', to: 'section-guia' },
-        { from: 'section-guia', to: 'section-selfie' },
-        { from: 'section-selfie', to: 'section-perguntas' },
-        { from: 'section-perguntas', to: null }, // Tratado separadamente
-        { from: 'section-final', to: null }
-      ];
-
-      const nextSection = flow.find(f => f.from === current)?.to;
-      if (current === 'section-perguntas') {
-        const sec = document.getElementById('section-perguntas');
-        if (!sec || sec.classList.contains('hidden')) {
-          if (sec) {
-            window.showSection('section-perguntas');
-            setTimeout(() => window.ensureQuestionsReady && window.ensureQuestionsReady(), 100);
-          }
-          return;
-        }
-
-        if (!window.ensureQuestionsReady || !window.ensureQuestionsReady()) return;
-
-        const bloco = sec.querySelector('.j-bloco[style*="display: block"]') || sec.querySelector('.j-bloco');
-        const perguntas = bloco ? Array.from(bloco.querySelectorAll('.j-pergunta')) : [];
-        const currentPergunta = bloco ? bloco.querySelector('.j-pergunta.active') : null;
-
-        if (!bloco || perguntas.length === 0) {
-          console.log('[goNext] Nenhum bloco ou perguntas encontrados na section-perguntas');
-          return;
-        }
-
-        if (!currentPergunta) {
-          perguntas[0].classList.add('active');
-          window.runTyping && window.runTyping(bloco);
-          return;
-        }
-
-        const i = perguntas.indexOf(currentPergunta);
-        currentPergunta.classList.remove('active');
-
-        if (i >= 0 && i + 1 < perguntas.length) {
-          const prox = perguntas[i + 1];
-          prox.classList.add('active');
-          const lbl = prox.querySelector('.pergunta-enunciado')?.textContent || '';
-          const aria = document.getElementById('aria-pergunta');
-          if (aria) aria.textContent = lbl;
-          window.runTyping && window.runTyping(prox);
-          return;
-        }
-
-        const allBlocks = Array.from(sec.querySelectorAll('.j-bloco'));
-        const idx = allBlocks.indexOf(bloco);
-        if (idx >= 0 && idx + 1 < allBlocks.length) {
-          allBlocks.forEach(b => b.style.display = 'none');
-          const nextBlock = allBlocks[idx + 1];
-          nextBlock.style.display = 'block';
-          const first = nextBlock.querySelector('.j-pergunta');
-          if (first) {
-            first.classList.add('active');
-            const lbl = first.querySelector('.pergunta-enunciado')?.textContent || '';
-            const aria = document.getElementById('aria-pergunta');
-            if (aria) aria.textContent = lbl;
-            window.runTyping && window.runTyping(nextBlock);
-          }
-          return;
-        }
-
-        window.showSection('section-final');
-      } else if (nextSection) {
-        console.log('[goNext] Navegando de', current, 'para', nextSection);
-        window.showSection(nextSection);
-      } else {
-        console.log('[goNext] Nenhuma seção seguinte definida para:', current);
-        window.toast('Fim do fluxo. Tente recarregar.');
-      }
-    } finally {
-      setTimeout(() => __isTransitioning = false, 150);
-    }
-  };
-
-  let devolutivaInFlight = false;
-
-  async function handleDevolutivaStep() {
-    if (devolutivaInFlight) return;
-    devolutivaInFlight = true;
-
-    try {
-      const el = document.querySelector('#devolutiva');
-      const pergunta = CURRENT_QUESTION.label;
-      const resposta = CURRENT_QUESTION.answer;
-      await window.mostrarDevolutiva({ el, pergunta, resposta, guia: CURRENT_GUIDE });
-    } finally {
-      devolutivaInFlight = false;
-    }
-  }
-
-  async function waitUserAnswer(question) {
-    return new Promise(resolve => {
-      const btn = document.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next');
-      if (btn) {
-        btn.addEventListener('click', () => resolve(), { once: true });
-      } else {
-        console.log('[waitUserAnswer] Botão de avançar não encontrado');
-        setTimeout(resolve, 5000); // Fallback: resolve após 5 segundos
-      }
-    });
-  }
-
-  async function runJornada(questions = []) {
-    for (const q of questions) {
-      CURRENT_QUESTION = q;
-      const qEl = document.querySelector('#pergunta');
-      window.utils.typeTextOnce(qEl, window.utils.dedupe(q.label), 18);
-      await waitUserAnswer(q);
-      await handleDevolutivaStep();
-    }
-  }
-
   window.JORNADA_BLOCKS = [
     { id: "reflexoes", title: "Reflexões da Alma e da Existência", video_after: "/assets/img/filme-1-entrando-na-jornada.mp4", questions: [
       { id: "existencia_primeira_memoria", label: "Você se recorda da idade em que, pela primeira vez, percebeu que era alguém neste mundo?", type: "textarea" },
@@ -2097,6 +1966,8 @@
     ]}
   ];
   window.JORNADA_FINAL_VIDEO = "/assets/img/filme-5-fim-da-jornada.mp4";
+})();
+})();
 
   window.loadDynamicBlocks = function() {
     const content = document.getElementById('perguntas-container');
