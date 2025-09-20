@@ -2344,47 +2344,56 @@
 <script defer src="/assets/js/i18n/i18n.js?v=5"></script>
 <script defer src="/assets/js/api.js?v=5"></script>
         
+<!-- Micro-boot (SAFE): escolhe API_BASE com fallback e inicia a jornada -->
 <script>
-<!-- Micro-boot: valida carregamento, define API_BASE por health e inicia -->
 (function () {
-  // 1) Log de verificação rápida (aparece no console se tudo carregou)
   console.log("[BOOT] Iniciando micro-boot…");
-  const must = [
-    "CONFIG","JUtils","JCore","JAuth","JChama","JPaperQA",
-    "JTyping","JController","JRender","JBootstrap","JMicro","I18N","API"
-  ];
+
+  // 1) Sondagem de módulos (só loga, não trava)
+  const must = ["CONFIG","JUtils","JCore","JAuth","JChama","JPaperQA","JTyping","JController","JRender","JBootstrap","JMicro","I18N","API"];
   const missing = must.filter(k => !(k in window));
-  if (missing.length) {
-    console.error("[BOOT] Módulos ausentes:", missing);
-  } else {
-    console.log("[BOOT] Todos os módulos presentes ✅");
+  if (missing.length) console.warn("[BOOT] Módulos ausentes:", missing);
+
+  // 2) Definição segura de API_BASE
+  const PRIMARY_DEFAULT  = (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || "https://conhecimento-com-luz-api.onrender.com";
+  const API              = window.API || {};                  // pode não existir ainda
+  const API_PRIMARY      = API.API_PRIMARY   || PRIMARY_DEFAULT;
+  const API_FALLBACK     = API.API_FALLBACK  || API_PRIMARY;  // se não houver, usa o primary mesmo
+
+  async function chooseBase() {
+    // Se API.health existir, testa; senão, usa o primary
+    if (typeof API.health === "function") {
+      try {
+        const ok = await API.health();              // ideal: { ok: true }
+        window.API_BASE = ok ? API_PRIMARY : API_FALLBACK;
+      } catch {
+        console.warn("[BOOT] Health falhou, usando FALLBACK");
+        window.API_BASE = API_FALLBACK;
+      }
+    } else {
+      window.API_BASE = API_PRIMARY;
+    }
+    console.log("[BOOT] API_BASE =", window.API_BASE);
   }
 
-  // 2) Escolha de API_BASE com fallback (usa API.health dos teus arquivos)
-  //    api.js já expõe window.API com endpoints do print (PRIMARY/FALLBACK).
-  (async () => {
-    try {
-      const ok = await window.API.health(); // deve retornar { ok: true } no primary
-      window.API_BASE = ok ? window.API.API_PRIMARY : window.API.API_FALLBACK;
-      console.log("[BOOT] API_BASE =", window.API_BASE);
-    } catch (e) {
-      console.warn("[BOOT] Health falhou, usando FALLBACK");
-      window.API_BASE = window.API.API_FALLBACK;
-    }
-
-    // 3) Start da jornada com tolerância a erros
+  // 3) Start da jornada com tolerância a erros/ordem
+  chooseBase().finally(async () => {
     try {
       if (window.JBootstrap && typeof JBootstrap.start === "function") {
-        await JBootstrap.start(); // aplica fontes/pergaminho/rotas
+        await JBootstrap.start();
       }
-      if (window.JController && typeof JController.init === "function") {
-        await JController.init(); // inicialização principal
-      }
-      console.log("[BOOT] Jornada iniciada 🚀");
-    } catch (err) {
-      console.error("[BOOT] Erro ao iniciar jornada:", err);
+    } catch (e) {
+      console.error("[BOOT] Erro em JBootstrap.start:", e);
     }
-  })();
+    try {
+      if (window.JController && typeof JController.init === "function") {
+        await JController.init();
+      }
+    } catch (e) {
+      console.error("[BOOT] Erro em JController.init:", e);
+    }
+    console.log("[BOOT] Jornada iniciada 🚀");
+  });
 })();
 </script>
 </body>
