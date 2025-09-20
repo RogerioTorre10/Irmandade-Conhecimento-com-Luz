@@ -533,9 +533,42 @@
   </div>
 
     <div id="toast" role="status" aria-live="polite" class="hidden"></div>
+ <script>
+/* Fix: garantir que window.toast seja sempre uma função */
+(function hardenToast(){
+  const TOAST_ID = 'toast';
+  function emit(msg){
+    try{
+      let t = document.getElementById(TOAST_ID);
+      if(!t){
+        t = document.createElement('div');
+        t.id = TOAST_ID;
+        t.className = 'hidden';
+        document.body.appendChild(t);
+      }
+      // estilos mínimos caso o CSS não tenha carregado
+      t.style.position = 'fixed';
+      t.style.left = '50%';
+      t.style.bottom = '16px';
+      t.style.transform = 'translateX(-50%)';
+      t.style.background = '#111';
+      t.style.color = '#fff';
+      t.style.padding = '10px 14px';
+      t.style.borderRadius = '10px';
+      t.style.boxShadow = '0 6px 18px rgba(0,0,0,.35)';
+      t.style.zIndex = '4000';
+      t.textContent = msg;
+      t.classList.remove('hidden');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }catch(_){}
+  }
+  try { delete window.toast; } catch(_){}
+  window.toast = emit; // sombreia o mapeamento global do id
+})();
+</script>
   
-
-<!-- ==== QFX: Estilos Globais (remove cursor piscando do typewriter) ==== -->
+  <!-- ==== QFX: Estilos Globais (remove cursor piscando do typewriter) ==== -->
   <style id="qfx-style">
     .typewriter::after { display: none !important; content: ''; }
   </style>
