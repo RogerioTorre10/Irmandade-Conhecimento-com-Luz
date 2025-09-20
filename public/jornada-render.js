@@ -78,4 +78,4 @@
 
   console.log('[JORNADA_RENDER] Módulo carregado');
 })();
-<!-- Grok xAI - Uhuuuuuuu! 🚀 -->
+
