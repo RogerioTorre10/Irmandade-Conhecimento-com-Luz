@@ -111,19 +111,24 @@
 
   // reaplica quando navega de seção
   (function wrapShowSection() {
+    console.log('[TypingBridge] Configurando wrapShowSection...');
     const prev = window.showSection;
     if (typeof prev === 'function' && !prev.__wrapped) {
       window.showSection = function (id) {
         try {
           prev.apply(this, arguments);
           console.log('[TypingBridge] showSection chamado para id:', id);
-          setTimeout(() => runTypingAdapter(), 60);
+          setTimeout(() => {
+            console.log('[TypingBridge] Executando runTypingAdapter via showSection');
+            runTypingAdapter();
+          }, 60);
         } catch (e) {
           console.error('[TypingBridge] Erro em showSection:', e);
         }
       };
       window.showSection.__wrapped = true;
     }
+    console.log('[TypingBridge] wrapShowSection configurado');
   })();
 
   console.log('[TypingBridge] pronto');
