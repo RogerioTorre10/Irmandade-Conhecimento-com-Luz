@@ -284,10 +284,14 @@ function showSection(sectionId) {
   document.querySelectorAll('.j-section').forEach(s => s.classList.add('hidden'));
   const active = document.getElementById(sectionId);
   if (active) active.classList.remove('hidden');
-  updateCanvasBackground(sectionId); // Assumindo que updateCanvasBackground está em outro módulo ou pode ser definida
-  if (window.JORNADA_CHAMA && typeof window.JORNADA_CHAMA.ensureHeroFlame === 'function') {
-    window.JORNADA_CHAMA.ensureHeroFlame(sectionId);
+
+  if (typeof window.updateCanvasBackground === 'function') {
+    try { window.updateCanvasBackground(sectionId); } catch {}
   }
+  if (window.JORNADA_CHAMA?.ensureHeroFlame) {
+    try { window.JORNADA_CHAMA.ensureHeroFlame(sectionId); } catch {}
+  }
+
   if (sectionId === 'section-perguntas') {
     loadDynamicBlocks();
     setTimeout(() => {
@@ -296,8 +300,8 @@ function showSection(sectionId) {
         const firstBloco = document.querySelector('.j-bloco');
         if (firstBloco) firstBloco.style.display = 'block';
         perguntas[0].classList.add('active');
-        if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
-          window.JORNADA_TYPE.run(perguntas[0]);
+        if (window.JORNADA_TYPE?.run) {
+          try { window.JORNADA_TYPE.run(perguntas[0]); } catch {}
         }
       } else {
         console.error('Nenhuma pergunta encontrada em section-perguntas após loadDynamicBlocks!');
@@ -308,63 +312,61 @@ function showSection(sectionId) {
 
 function loadDynamicBlocks() {
   const content = document.getElementById('perguntas-container');
-  if (!content) {
-    console.error('Erro: #perguntas-container não encontrado no DOM!');
-    return;
+  if (!content) { console.error('Erro: #perguntas-container não encontrado no DOM!'); return; }
+  if (!Array.isArray(window.JORNADA_BLOCKS) || !window.JORNADA_BLOCKS.length) {
+    console.error('Erro: JORNADA_BLOCKS não definido, não é array ou está vazio!'); return;
   }
-  if (!window.JORNADA_BLOCKS || !Array.isArray(window.JORNADA_BLOCKS) || window.JORNADA_BLOCKS.length === 0) {
-    console.error('Erro: JORNADA_BLOCKS não definido, não é um array, ou está vazio!');
-    return;
-  }
+
   console.log('Conteúdo de JORNADA_BLOCKS:', window.JORNADA_BLOCKS);
   content.innerHTML = '';
+
   window.JORNADA_BLOCKS.forEach((block, idx) => {
-    if (!block.questions || !Array.isArray(block.questions)) {
-      console.warn(`Bloco ${idx} inválido: sem perguntas ou perguntas não é um array`);
-      return;
+    if (!Array.isArray(block?.questions)) {
+      console.warn(`Bloco ${idx} inválido: sem perguntas ou perguntas não é um array`); return;
     }
     const bloco = document.createElement('section');
     bloco.className = 'j-bloco';
     bloco.dataset.bloco = idx;
     bloco.dataset.video = block.video_after || '';
     bloco.style.display = 'none';
+
     block.questions.forEach((q, qIdx) => {
-      if (!q.label) {
-        console.warn(`Pergunta ${qIdx} no bloco ${idx} inválida: sem label`);
-        return;
-      }
+      if (!q?.label) { console.warn(`Pergunta ${qIdx} no bloco ${idx} inválida: sem label`); return; }
       const pergunta = document.createElement('div');
       pergunta.className = 'j-pergunta';
       pergunta.dataset.pergunta = qIdx;
       pergunta.innerHTML = `
-        <label class="pergunta-enunciado" data-typing data-text="<b>Pergunta ${qIdx + 1}:</b> ${q.label}" data-speed="40" data-cursor="true"></label>
+        <label class="pergunta-enunciado"
+               data-typing
+               data-text="<b>Pergunta ${qIdx + 1}:</b> ${q.label}"
+               data-speed="40" data-cursor="true"></label>
         <textarea rows="4" class="input" placeholder="Digite sua resposta..." oninput="handleInput(this)"></textarea>
       `;
       bloco.appendChild(pergunta);
     });
+
     content.appendChild(bloco);
     console.log(`Bloco ${idx} criado com ${block.questions.length} perguntas`);
   });
+
   const firstBloco = content.querySelector('.j-bloco');
-  if (firstBloco) {
-    firstBloco.style.display = 'block';
-    const firstPergunta = firstBloco.querySelector('.j-pergunta');
-    if (firstPergunta) {
-      firstPergunta.classList.add('active');
-      if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
-        window.JORNADA_TYPE.run(firstPergunta);
-      }
-      const firstTa = firstPergunta.querySelector('textarea');
-      if (firstTa) handleInput(firstTa);
-    } else {
-      console.error('Nenhuma primeira pergunta encontrada no primeiro bloco!');
-    }
-    loadAnswers();
+  if (!firstBloco) { console.error('Nenhum bloco criado após loadDynamicBlocks!'); return; }
+
+  firstBloco.style.display = 'block';
+  const firstPergunta = firstBloco.querySelector('.j-pergunta');
+  if (firstPergunta) {
+    firstPergunta.classList.add('active');
+    try { window.JORNADA_TYPE?.run && window.JORNADA_TYPE.run(firstPergunta); } catch {}
+    const firstTa = firstPergunta.querySelector('textarea');
+    if (firstTa) handleInput(firstTa);
   } else {
-    console.error('Nenhum bloco criado após loadDynamicBlocks!');
+    console.error('Nenhuma primeira pergunta encontrada no primeiro bloco!');
   }
+
+  try { window.loadAnswers && window.loadAnswers(); } catch {}
   console.log('Blocos carregados com sucesso!');
 }
+
 
 // Certifique-se de que estas funções sejam expostas globalmente
 window.showSection = showSection;
@@ -391,4 +393,4 @@ window.loadDynamicBlocks = loadDynamicBlocks;
   window.showSection = showSection;
   window.loadDynamicBlocks = loadDynamicBlocks;
 })();
-<!-- Grok xAI - Uhuuuuuuu! 🚀 -->
+
