@@ -3,22 +3,11 @@
 
   const JR = (window.JORNADA_RENDER = window.JORNADA_RENDER || {});
 
-  function renderIntro() {
-    console.log('[JORNADA_RENDER] Renderizando intro');
-    const section = document.getElementById('section-intro');
-    if (section) {
-      section.classList.remove('hidden');
-      const canvas = document.getElementById('jornada-canvas');
-      if (canvas) {
-        canvas.className = 'card pergaminho pergaminho-v';
-        canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
-      }
-    }
-  }
-  function updateCanvasBackground(sectionId) {
-  const canvas = document.getElementById('jornada-canvas');
-  if (canvas) {
-    if (sectionId === 'section-perguntas') {
+  // Helper único para ajustar canvas + imagem de fundo
+  function setCanvas(mode /* 'v' | 'h' */) {
+    const canvas = document.getElementById('jornada-canvas');
+    if (!canvas) return;
+    if (mode === 'h') {
       canvas.className = 'card pergaminho pergaminho-h';
       canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-horiz.png)';
     } else {
@@ -26,18 +15,30 @@
       canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
     }
   }
-}
+
+  function renderIntro() {
+    console.log('[JORNADA_RENDER] Renderizando intro');
+    const section = document.getElementById('section-intro');
+    if (section) {
+      section.classList.remove('hidden');
+      setCanvas('v');
+    }
+  }
+
+  // Exportada/Global: controller chama isso
+  function updateCanvasBackground(sectionId) {
+    // perguntas = horizontal; demais = vertical
+    const mode = (sectionId === 'section-perguntas') ? 'h' : 'v';
+    setCanvas(mode);
+  }
 
   function renderPerguntas(blocoIndex = 0) {
     console.log('[JORNADA_RENDER] Renderizando perguntas, bloco:', blocoIndex);
     const section = document.getElementById('section-perguntas');
     if (section) {
       section.classList.remove('hidden');
-      const canvas = document.getElementById('jornada-canvas');
-      if (canvas) {
-        canvas.className = 'card pergaminho pergaminho-h';
-        canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-horiz.png)';
-      }
+      setCanvas('h');
+
       const perguntasContainer = document.getElementById('perguntas-container');
       if (perguntasContainer) {
         const blocos = Array.from(perguntasContainer.querySelectorAll('.j-bloco'));
@@ -47,7 +48,7 @@
           const perguntas = Array.from(blocos[blocoIndex].querySelectorAll('.j-pergunta'));
           if (perguntas.length) {
             perguntas.forEach(p => p.classList.remove('active'));
-            perguntas[0].classList.add('active'); // Exibe a primeira pergunta
+            perguntas[0].classList.add('active');
             console.log('Exibindo pergunta inicial do bloco:', blocoIndex);
           } else {
             console.warn('Nenhuma pergunta encontrada no bloco:', blocoIndex);
@@ -64,18 +65,16 @@
     const section = document.getElementById('section-final');
     if (section) {
       section.classList.remove('hidden');
-      const canvas = document.getElementById('jornada-canvas');
-      if (canvas) {
-        canvas.className = 'card pergaminho pergaminho-v';
-        canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
-      }
+      setCanvas('v');
     }
   }
 
+  // Exports
   JR.renderIntro = renderIntro;
   JR.renderPerguntas = renderPerguntas;
   JR.renderFinal = renderFinal;
+  JR.updateCanvasBackground = updateCanvasBackground;     // export no namespace
+  window.updateCanvasBackground = updateCanvasBackground;  // export global (chamado pelo controller)
 
   console.log('[JORNADA_RENDER] Módulo carregado');
 })();
-
