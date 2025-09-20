@@ -4,31 +4,52 @@
    Expondo: window.JORNADA_CORE e window.APP_CONFIG
    ============================================ */
 ;(function () {
-  const DEFAULT_APP = { API_BASE: "https://conhecimento-com-luz-api.onrender.com" };
-  const APP = (typeof window !== "undefined" && window.APP_CONFIG) ? Object.assign({}, DEFAULT_APP, window.APP_CONFIG) : DEFAULT_APP;
+  'use strict';
+
+  // --- Normalização de base -----------------------
+  const normalizeBase = (u) => String(u || '').replace(/\/+$/,'');
+  const ensureApiSuffix = (u) => normalizeBase(u).match(/\/api$/) ? normalizeBase(u) : normalizeBase(u) + '/api';
+
+  // --- APP_CONFIG unificado -----------------------
+  const DEFAULT_APP = { API_BASE: 'https://conhecimento-com-luz-api.onrender.com/api' };
+  const incoming = (typeof window !== 'undefined' && window.APP_CONFIG) ? window.APP_CONFIG : {};
+  const APP = Object.assign({}, DEFAULT_APP, incoming);
+  APP.API_BASE = ensureApiSuffix(APP.API_BASE);   // garante .../api
+
+  // expõe e mantém alias de compatibilidade
   window.APP_CONFIG = APP;
+  window.CONFIG = window.CONFIG || window.APP_CONFIG;
 
-  const U = window.JORNADA_UTILS || {};
-
-  const STATE = {
-    respostas: {},
+  // --- Utils (com fallback no-op) -----------------
+  const U = window.JORNADA_UTILS || {
+    saveLocal: function(){},
+    loadLocal: function(){ return {}; },
+    clearLocal: function(){},
   };
+
+  // --- Estado central -----------------------------
+  const STATE = { respostas: {} };
 
   function iniciarFluxo() {
     STATE.respostas = {};
   }
 
   function salvarRespostas(data) {
-    if (data && typeof data === "object") {
+    if (data && typeof data === 'object') {
       Object.assign(STATE.respostas, data);
     }
-    U.saveLocal("jornada_respostas", STATE.respostas);
+    try { U.saveLocal('jornada_respostas', STATE.respostas); } catch {}
   }
 
   async function baixarArquivos(payload = {}) {
-    return await window.JORNADA_DOWNLOAD(payload);
+    if (typeof window.JORNADA_DOWNLOAD !== 'function') {
+      (window.toast || console.log)('[JORNADA] Download indisponível no momento.', 'warn');
+      return;
+    }
+    return window.JORNADA_DOWNLOAD(payload);
   }
 
+  // --- Exports ------------------------------------
   window.JORNADA_CORE = {
     iniciarFluxo,
     salvarRespostas,
@@ -36,6 +57,7 @@
     STATE,
   };
 
+  // UI helpers (mantém compat)
   window.JORNADA_UI = Object.assign(window.JORNADA_UI || {}, {
     setProgressoBlocos(blocoIdx0, totalBlocos) {
       const el = document.getElementById('badgeProgressoBlocos');
@@ -49,4 +71,3 @@
     }
   });
 })();
-<!-- Grok xAI - Uhuuuuuuu! 🚀 -->
