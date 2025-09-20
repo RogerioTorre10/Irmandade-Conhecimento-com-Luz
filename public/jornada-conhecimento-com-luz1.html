@@ -597,8 +597,8 @@
     return 'lumen';
   }
 
-  function preloadGuiaBg(guia = 'lumen') {
-    guia = normGuard(guia);
+ function preloadGuiaBg(guia = 'lumen') {
+    guia = normGuide(guia);
     const GUIDE_BG = {
       lumen: [
         '/assets/img/irmandade-quarteto-bg-lumen.jpg',
@@ -1221,6 +1221,35 @@
       }
     }, 500);
   };
+})();
+ /* ===== Termos e orientações ===== */
+(function termosPager(){
+  const ids = ["termos-pg1","termos-pg2","termos-pg3","termos-pg4","termos-pg5"];
+  function show(id){
+    ids.forEach(x=>{
+      const el = document.getElementById(x);
+      if(!el) return;
+      el.classList.toggle('hidden', x!==id);
+    });
+  }
+  // garante que a pg1 apareça ao entrar na seção
+  document.addEventListener('DOMContentLoaded', () => {
+    const termos = document.getElementById('section-termos');
+    if (termos) show("termos-pg1");
+  });
+
+  document.addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-action]');
+    if(!btn) return;
+    const a = btn.getAttribute('data-action');
+    if(!a) return;
+
+    if(a === 'termos-next'){ e.preventDefault(); show('termos-pg2'); }
+    if(a === 'termos-next2'){ e.preventDefault(); show('termos-pg3'); }
+    if(a === 'termos-next3'){ e.preventDefault(); show('termos-pg4'); }
+    if(a === 'termos-next4'){ e.preventDefault(); show('termos-pg5'); }
+    if(a === 'next-senha'){  e.preventDefault(); window.showSection('section-senha'); }
+  }, true);
 })();
 
 /* ===== Eventos Globais de Botões ===== */
