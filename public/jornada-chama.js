@@ -129,5 +129,7 @@
     setChamaBola             // controla intensidade da bola espiritual
   };
 })();
+// Alias para compatibilidade com o micro-boot
+window.JChama = window.JChama || window.JORNADA_CHAMA;
 
-// Grok xAI - Uhuuuuuuu! 🚀
+
