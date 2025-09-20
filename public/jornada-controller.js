@@ -194,20 +194,30 @@
     }
   }
 
-  function startJourney() {
-  console.log('Iniciando jornada... Verificando dependências:', { JORNADA_BLOCKS: !!window.JORNADA_BLOCKS, JORNADA_QA: !!window.JORNADA_QA, JORNADA_PAPER: !!window.JORNADA_PAPER });
-  if (window.JORNADA_BLOCKS && window.JORNADA_QA && window.JORNADA_PAPER) {
+ function startJourney() {
+  console.log('[JORNADA_CONTROLLER] Iniciando jornada... Verificando dependências:', {
+    JORNADA_BLOCKS: !!window.JORNADA_BLOCKS,
+    JORNADA_QA: !!window.JORNADA_QA,
+    JORNADA_PAPER: !!window.JORNADA_PAPER,
+    JORNADA_TYPE: !!window.JORNADA_TYPE
+  });
+  if (window.JORNADA_BLOCKS && window.JORNADA_QA && window.JORNADA_PAPER && window.JORNADA_TYPE) {
+    console.log('[JORNADA_CONTROLLER] Todas as dependências estão presentes, iniciando...');
     showSection('section-perguntas');
     loadDynamicBlocks();
     state.blocoIndex = 0;
     state.perguntaIndex = 0;
     setTimeout(render, 100); // Delay de 100ms
-    console.log('Jornada iniciada com sucesso, exibindo primeira pergunta');
+    console.log('[JORNADA_CONTROLLER] Jornada iniciada com sucesso, exibindo primeira pergunta');
   } else {
-    console.error('Dependências não carregadas para iniciar:', { JORNADA_BLOCKS: !!window.JORNADA_BLOCKS, JORNADA_QA: !!window.JORNADA_QA, JORNADA_PAPER: !!window.JORNADA_PAPER });
+    console.error('[JORNADA_CONTROLLER] Dependências não carregadas para iniciar:', {
+      JORNADA_BLOCKS: !!window.JORNADA_BLOCKS,
+      JORNADA_QA: !!window.JORNADA_QA,
+      JORNADA_PAPER: !!window.JORNADA_PAPER,
+      JORNADA_TYPE: !!window.JORNADA_TYPE
+    });
   }
 }
-
   function playTransition(src, onEnd) {
     const overlay = S.overlay();
     const video = S.video();
