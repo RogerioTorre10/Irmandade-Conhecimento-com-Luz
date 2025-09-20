@@ -545,8 +545,20 @@
 'use strict';
 
 /* ===== Utils ÚNICOS ===== */
-(() => {
+(function() {
   if (!window.utils) window.utils = {};
+
+  // Garante que window.toast esteja definido primeiro
+  window.toast = window.toast || ((msg) => {
+    try {
+      const t = document.getElementById('toast') || document.createElement('div');
+      t.id = 'toast';
+      t.style.cssText = 'position:fixed;bottom:16px;left:16px;max-width:60ch;padding:10px 14px;border-radius:10px;background:#000a;color:#fff;backdrop-filter:blur(3px);z-index:9999';
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 4000);
+    } catch {}
+  });
 
   function dedupe(s='') {
     return s
@@ -586,7 +598,7 @@
   }
 
   function preloadGuiaBg(guia = 'lumen') {
-    guia = normGuide(guia);
+    guia = normGuard(guia);
     const GUIDE_BG = {
       lumen: [
         '/assets/img/irmandade-quarteto-bg-lumen.jpg',
@@ -608,19 +620,6 @@
       ]
     };
     return loadFirstAvailable(GUIDE_BG[guia] || []);
-  }
-
-  if (!window.toast) {
-    window.toast = (msg) => {
-      try {
-        const t = document.getElementById('toast') || document.createElement('div');
-        t.id = 'toast';
-        t.style.cssText = 'position:fixed;bottom:16px;left:16px;max-width:60ch;padding:10px 14px;border-radius:10px;background:#000a;color:#fff;backdrop-filter:blur(3px);z-index:9999';
-        t.textContent = msg;
-        document.body.appendChild(t);
-        setTimeout(() => t.remove(), 4000);
-      } catch {}
-    };
   }
 
   if (!window.readAloud) {
@@ -1122,7 +1121,7 @@
   }
 
   function lockNext() {
-    const btn = document.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next');
+    const btn = document.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next, .btn-continuar, #continuar, button');
     if (btn) {
       btn.disabled = true;
       btn.setAttribute('aria-busy', 'true');
@@ -1133,7 +1132,7 @@
   }
 
   function unlockNext() {
-    const btn = document.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next');
+    const btn = document.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next, .btn-continuar, #continuar, button');
     if (btn) {
       btn.disabled = false;
       btn.removeAttribute('aria-busy');
@@ -1170,21 +1169,6 @@
       if (!el.hasAttribute('data-text') && keepText) el.setAttribute('data-text', keepText);
     });
 
-    async function mostrarDevolutiva({ el, pergunta, resposta, guia='lumen' }) {
-      const txt = await window.fetchDevolutiva(pergunta, resposta, guia);
-      if (el) window.typeTextOnce(el, txt, 22);
-      return txt;
-    }
-
-    async function conversar({ el, guia='lumen', historico=[], prompt='' }) {
-      const { text } = await window.askInteractive({ guide: guia, history: historico, prompt });
-      if (el) window.typeTextOnce(el, text, 22);
-      return text;
-    }
-
-    window.mostrarDevolutiva = mostrarDevolutiva;
-    window.conversar = conversar;
-
     requestAnimationFrame(() => setTimeout(() => {
       console.log('[showSection] Iniciando runTyping para:', sectionId);
       window.runTyping && window.runTyping(active);
@@ -1215,7 +1199,7 @@
 
     // Adiciona evento ao botão de avançar após mostrar a seção
     setTimeout(() => {
-      const nextBtn = active.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next');
+      const nextBtn = active.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next, .btn-continuar, #continuar, button');
       if (nextBtn) {
         nextBtn.addEventListener('click', (e) => {
           console.log('[showSection] Clique no botão avançar detectado na seção:', sectionId, 'Botão:', nextBtn.id || nextBtn.className);
@@ -1225,9 +1209,16 @@
         console.log('[showSection] Evento de clique adicionado ao botão avançar em:', sectionId, 'Botão:', nextBtn.id || nextBtn.className);
       } else {
         console.log('[showSection] Botão avançar não encontrado na seção:', sectionId);
+        console.log('[showSection] Snapshot do DOM da seção:', Array.from(active.children).slice(0, 10).map(el => ({
+          tag: el.tagName.toLowerCase(),
+          id: el.id || '',
+          class: el.className || '',
+          attrs: Object.keys(el.dataset || {}).join(','),
+          text: (el.textContent || '').slice(0, 50)
+        })));
         window.toast('Botão de avançar não encontrado. Tente recarregar.');
       }
-    }, 200);
+    }, 500);
   };
 })();
 
@@ -1235,7 +1226,7 @@
 (function() {
   // Evento delegado para botões de avançar em qualquer seção
   document.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next');
+    const btn = e.target.closest('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next, .btn-continuar, #continuar, button');
     if (btn) {
       console.log('[Eventos Globais] Clique no botão avançar detectado:', btn.id || btn.className, 'Seção atual:', document.querySelector('.j-section:not(.hidden)')?.id || 'desconhecida');
       e.preventDefault();
@@ -1248,7 +1239,7 @@
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       const activeEl = document.activeElement;
-      if (activeEl && activeEl.closest('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next')) {
+      if (activeEl && activeEl.closest('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next, .btn-continuar, #continuar, button')) {
         console.log('[Eventos Globais] Tecla Enter/Espaço no botão avançar:', activeEl.id || activeEl.className);
         e.preventDefault();
         window.goNext();
@@ -1259,7 +1250,13 @@
 
 /* ===== Inicialização da Página ===== */
 (function() {
+  let initialized = false; // Guarda pra evitar inicialização dupla
   document.addEventListener('DOMContentLoaded', () => {
+    if (initialized) {
+      console.log('[Inicialização] Já inicializado, pulando');
+      return;
+    }
+    initialized = true;
     console.log('[Inicialização] Carregando section-intro');
     setTimeout(() => {
       try {
@@ -1275,7 +1272,7 @@
         console.error('[Inicialização] Erro ao inicializar página:', e);
         window.toast('Erro ao carregar a página inicial. Tente novamente.');
       }
-    }, 100);
+    }, 300);
   });
 })();
   
