@@ -322,6 +322,7 @@ function showSection(sectionId) {
 }
 
 function loadDynamicBlocks() {
+  console.log('[JORNADA_CONTROLLER] Iniciando loadDynamicBlocks...');
   const content = document.getElementById('perguntas-container');
   if (!content) {
     console.error('Erro: #perguntas-container não encontrado no DOM!');
@@ -333,13 +334,13 @@ function loadDynamicBlocks() {
     return;
   }
   console.log('[JORNADA_CONTROLLER] Conteúdo de JORNADA_BLOCKS:', window.JORNADA_BLOCKS);
-  // Verificar se JORNADA_BLOCKS contém blocos válidos
   const validBlocks = window.JORNADA_BLOCKS.filter(block => Array.isArray(block?.questions) && block.questions.length);
   if (!validBlocks.length) {
     console.error('Erro: Nenhum bloco válido com perguntas encontrado em JORNADA_BLOCKS!', window.JORNADA_BLOCKS);
     return;
   }
   content.innerHTML = '';
+  console.log('[JORNADA_CONTROLLER] #perguntas-container limpo');
   window.JORNADA_BLOCKS.forEach((block, idx) => {
     if (!Array.isArray(block?.questions)) {
       console.warn(`Bloco ${idx} inválido: sem perguntas ou perguntas não é um array`, block);
@@ -383,14 +384,31 @@ function loadDynamicBlocks() {
   const firstPergunta = firstBloco.querySelector('.j-pergunta');
   if (firstPergunta) {
     firstPergunta.classList.add('active');
-    try { window.JORNADA_TYPE?.run && window.JORNADA_TYPE.run(firstPergunta); } catch {}
+    try {
+      if (window.JORNADA_TYPE?.run) {
+        console.log('[JORNADA_CONTROLLER] Chamando JORNADA_TYPE.run para primeira pergunta');
+        window.JORNADA_TYPE.run(firstPergunta);
+      }
+    } catch (e) {
+      console.error('[JORNADA_CONTROLLER] Erro ao chamar JORNADA_TYPE.run:', e);
+    }
     const firstTa = firstPergunta.querySelector('textarea');
-    if (firstTa) handleInput(firstTa);
+    if (firstTa) {
+      console.log('[JORNADA_CONTROLLER] Chamando handleInput para primeira textarea');
+      handleInput(firstTa);
+    }
   } else {
     console.error('Nenhuma primeira pergunta encontrada no primeiro bloco!');
   }
-  try { window.loadAnswers && window.loadAnswers(); } catch {}
-  console.log('Blocos carregados com sucesso!');
+  try {
+    if (window.loadAnswers) {
+      console.log('[JORNADA_CONTROLLER] Chamando loadAnswers');
+      window.loadAnswers();
+    }
+  } catch (e) {
+    console.error('[JORNADA_CONTROLLER] Erro ao chamar loadAnswers:', e);
+  }
+  console.log('[JORNADA_CONTROLLER] Blocos carregados com sucesso!');
 }
 
 
