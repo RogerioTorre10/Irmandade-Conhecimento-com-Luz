@@ -284,14 +284,12 @@ function showSection(sectionId) {
   document.querySelectorAll('.j-section').forEach(s => s.classList.add('hidden'));
   const active = document.getElementById(sectionId);
   if (active) active.classList.remove('hidden');
-
   if (typeof window.updateCanvasBackground === 'function') {
     try { window.updateCanvasBackground(sectionId); } catch {}
   }
   if (window.JORNADA_CHAMA?.ensureHeroFlame) {
     try { window.JORNADA_CHAMA.ensureHeroFlame(sectionId); } catch {}
   }
-
   if (sectionId === 'section-perguntas') {
     loadDynamicBlocks();
     setTimeout(() => {
@@ -306,7 +304,7 @@ function showSection(sectionId) {
       } else {
         console.error('Nenhuma pergunta encontrada em section-perguntas após loadDynamicBlocks!');
       }
-    }, 0);
+    }, 100); // Delay de 100ms
   }
 }
 
