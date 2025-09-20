@@ -62,16 +62,20 @@
   async function boot() {
     console.log('[BOOT] tentando iniciar • rota:', location.hash || 'intro');
     const route = (location.hash || '#intro').slice(1);
-    if (!window.JORNADA_RENDER || !window.JC || !window.JC._state) {
-      console.warn('[BOOT] JORNADA_RENDER, JC ou estado não disponível ainda. Aguardando...');
+    if (!window.JC || !window.JC._state) {
+      console.warn('[BOOT] JC ou estado não disponível ainda. Aguardando...');
       return;
     }
     try {
-      if (route === 'intro') {
-        console.log('[BOOT] → renderIntro()');
-        window.JORNADA_RENDER.renderIntro();
+      if (window.JORNADA_RENDER) {
+        if (route === 'intro') {
+          console.log('[BOOT] → renderIntro()');
+          window.JORNADA_RENDER.renderIntro();
+        } else {
+          window.JORNADA_RENDER.render(route);
+        }
       } else {
-        window.JORNADA_RENDER.render(route);
+        console.warn('[BOOT] JORNADA_RENDER não disponível, pulando renderização');
       }
       await window.JC.init();
       console.log('[BOOT] inicialização concluída.');
@@ -87,12 +91,12 @@
     const interval = setInterval(async () => {
       tries++;
       console.log('[BOOT] Tentativa', tries, 'de', maxTries);
-      if (window.JORNADA_RENDER && window.JC && window.JC._state) {
+      if (window.JC && window.JC._state) {
         clearInterval(interval);
         await boot();
       } else if (tries >= maxTries) {
         clearInterval(interval);
-        console.error('[BOOT] desisti de iniciar: JORNADA_RENDER ou JC não ficou disponível a tempo.');
+        console.error('[BOOT] desisti de iniciar: JC não ficou disponível a tempo.');
       }
     }, 100);
   }
