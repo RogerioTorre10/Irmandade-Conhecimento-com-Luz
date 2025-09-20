@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Sobre · Irmandade Conhecimento com Luz</title>
   <meta name="description" content="Irmandade Conhecimento com Luz — fé, ciência, filosofia e tecnologia unidas para despertar e guiar.">
-  <link rel="icon" href="/assets/img/perfil-da-irmandade.png" type="image/png" />
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="preload" href="/assets/img/perfil-da-irmandade.png" as="image" imagesrcset="/assets/img/perfil-da-irmandade.png 1x">
+  <link rel="preload" href="/styles.css" as="style">
   <script defer src="https://unpkg.com/lucide@latest"></script>
   <script defer src="/assets/js/main.js"></script>
 </head>
@@ -17,10 +17,11 @@
       <img src="/assets/img/perfil-da-irmandade.png" alt="Logo Irmandade" class="h-8 w-8">
       <span class="font-bold text-white">Irmandade Conhecimento com Luz</span>
     </a>
-    <button id="menuBtn" class="md:hidden text-white" aria-label="Abrir menu">
-      <i data-lucide="menu"></i>
-    </button>
-    <ul id="menu" class="hidden md:flex items-center gap-6 text-gray-200">
+    <button id="menuBtn" class="md:hidden text-white" aria-label="Abrir menu" aria-controls="mobileMenu" aria-expanded="false">
+  <i data-lucide="menu"></i>
+</button>
+<ul id="menu" class="hidden md:flex items-center gap-6 text-gray-200" role="menubar" aria-label="Menu principal"></ul>
+
       <li><a class="hover:text-white" href="/sobre.html">Sobre</a></li>
       <li class="group relative">
         <a class="hover:text-white" href="/jornadas.html">Jornadas</a>
@@ -67,28 +68,31 @@
       </ul>
       <p class="mt-2 text-sm text-gray-300 font-semibold tracking-widest">PARA ALÉM. E SEMPRE!!</p>
     </div>
-    <section id="chamados" class="py-16 px-4 bg-gray-900 text-white text-center">
-      <h2 class="text-3xl md:text-4xl font-bold mb-10 text-yellow-400">Chamados da Irmandade</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-        <div>
-          <img src="/assets/img/chamado do Rogério.png" alt="Chamado do Rogério" class="rounded-xl shadow-lg w-full" />
-          <h3 class="mt-4 font-semibold">Rogério</h3>
-        </div>
-        <div>
-          <img src="/assets/img/chamado do Lumen.png" alt="Chamado do Lumen" class="rounded-xl shadow-lg w-full" />
-          <h3 class="mt-4 font-semibold">Lumen</h3>
-        </div>
-        <div>
-          <img src="/assets/img/chamado do Arion.png" alt="Chamado de Arion" class="rounded-xl shadow-lg w-full" />
-          <h3 class="mt-4 font-semibold">Arion</h3>
-        </div>
-        <div>
-          <img src="/assets/img/chamado do Zion.png" alt="Chamado de Zion" class="rounded-xl shadow-lg w-full" />
-          <h3 class="mt-4 font-semibold">Zion</h3>
-        </div>
-      </div>
-    </section>
-  </section>
+   <section id="chamados" class="py-16 px-4 bg-gray-900 text-white text-center">
+  <h2 class="text-3xl md:text-4xl font-bold mb-10 text-yellow-400">Chamados da Irmandade</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+    <div>
+      <img src="/assets/img/chamado-do-rogerio.png" alt="Chamado do Rogério" class="rounded-xl shadow-lg w-full"
+           loading="lazy" decoding="async" width="640" height="360" />
+      <h3 class="mt-4 font-semibold">Rogério</h3>
+    </div>
+    <div>
+      <img src="/assets/img/chamado-do-lumen.png" alt="Chamado do Lumen" class="rounded-xl shadow-lg w-full"
+           loading="lazy" decoding="async" width="640" height="360" />
+      <h3 class="mt-4 font-semibold">Lumen</h3>
+    </div>
+    <div>
+      <img src="/assets/img/chamado-do-arion.png" alt="Chamado de Arion" class="rounded-xl shadow-lg w-full"
+           loading="lazy" decoding="async" width="640" height="360" />
+      <h3 class="mt-4 font-semibold">Arion</h3>
+    </div>
+    <div>
+      <img src="/assets/img/chamado-do-zion.png" alt="Chamado de Zion" class="rounded-xl shadow-lg w-full"
+           loading="lazy" decoding="async" width="640" height="360" />
+      <h3 class="mt-4 font-semibold">Zion</h3>
+    </div>
+  </div>
+</section>
 </main>
 <footer class="mt-24 border-t border-white/10 bg-gray-900 text-gray-300">
   <div class="max-w-6xl mx-auto px-4 py-10 grid md:grid-cols-3 gap-8">
@@ -118,6 +122,31 @@
       <span class="font-semibold tracking-widest">PARA ALÉM. E SEMPRE!!</span>
     </div>
   </div>
+ 
+  // Fallback para o menu mobile se /assets/js/main.js não carregar
+  (function () {
+    var btn = document.getElementById('menuBtn');
+    var mm  = document.getElementById('mobileMenu');
+    if (!btn || !mm) return;
+    if (!btn._wired) {
+      btn._wired = true;
+      btn.addEventListener('click', function () {
+        var open = !mm.classList.contains('hidden');
+        if (open) {
+          mm.classList.add('hidden');
+          btn.setAttribute('aria-expanded', 'false');
+        } else {
+          mm.classList.remove('hidden');
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      });
+    }
+  })();
+
+  // Fallback para lucide (renderiza ícones se o script externo carregou)
+  try { window.lucide && window.lucide.createIcons(); } catch (e) {}
+
 </footer>
 <script>window.lucide && lucide.createIcons();</script>
-<!-- Grok xAI - Uhuuuuuuu! 🚀 -->
+</body>
+
