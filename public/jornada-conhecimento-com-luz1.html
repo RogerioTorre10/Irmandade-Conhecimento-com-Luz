@@ -1121,7 +1121,7 @@
   }
 
   function lockNext() {
-    const btn = document.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next, .btn-continuar, #continuar, button');
+    const btn = document.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next');
     if (btn) {
       btn.disabled = true;
       btn.setAttribute('aria-busy', 'true');
@@ -1132,7 +1132,7 @@
   }
 
   function unlockNext() {
-    const btn = document.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next, .btn-continuar, #continuar, button');
+    const btn = document.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next');
     if (btn) {
       btn.disabled = false;
       btn.removeAttribute('aria-busy');
@@ -1172,7 +1172,7 @@
     requestAnimationFrame(() => setTimeout(() => {
       console.log('[showSection] Iniciando runTyping para:', sectionId);
       window.runTyping && window.runTyping(active);
-    }, 0));
+    }, 100));
 
     updateCanvasBackground(sectionId);
     window.JORNADA_CHAMA && window.JORNADA_CHAMA.ensureHeroFlame(sectionId);
@@ -1180,7 +1180,9 @@
     if (sectionId === 'section-perguntas') {
       console.log('[showSection] Carregando conteúdo dinâmico para section-perguntas');
       window.loadDynamicBlocks && window.loadDynamicBlocks();
-      window.ensureQuestionsReady && window.ensureQuestionsReady();
+      setTimeout(() => {
+        window.ensureQuestionsReady && window.ensureQuestionsReady();
+      }, 100); // Atraso pra garantir que loadDynamicBlocks terminou
     }
 
     if (sectionId === 'section-final') {
@@ -1197,9 +1199,8 @@
       if (guiaNameInput && storedName) guiaNameInput.value = storedName.toUpperCase();
     }
 
-    // Adiciona evento ao botão de avançar após mostrar a seção
     setTimeout(() => {
-      const nextBtn = active.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next, .btn-continuar, #continuar, button');
+      const nextBtn = active.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next');
       if (nextBtn) {
         nextBtn.addEventListener('click', (e) => {
           console.log('[showSection] Clique no botão avançar detectado na seção:', sectionId, 'Botão:', nextBtn.id || nextBtn.className);
@@ -1224,9 +1225,8 @@
 
 /* ===== Eventos Globais de Botões ===== */
 (function() {
-  // Evento delegado para botões de avançar em qualquer seção
   document.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next, .btn-continuar, #continuar, button');
+    const btn = e.target.closest('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next');
     if (btn) {
       console.log('[Eventos Globais] Clique no botão avançar detectado:', btn.id || btn.className, 'Seção atual:', document.querySelector('.j-section:not(.hidden)')?.id || 'desconhecida');
       e.preventDefault();
@@ -1235,11 +1235,10 @@
     }
   }, true);
 
-  // Suporte para teclas (Enter ou Espaço em botões)
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       const activeEl = document.activeElement;
-      if (activeEl && activeEl.closest('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next, .btn-continuar, #continuar, button')) {
+      if (activeEl && activeEl.closest('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next')) {
         console.log('[Eventos Globais] Tecla Enter/Espaço no botão avançar:', activeEl.id || activeEl.className);
         e.preventDefault();
         window.goNext();
@@ -1250,7 +1249,7 @@
 
 /* ===== Inicialização da Página ===== */
 (function() {
-  let initialized = false; // Guarda pra evitar inicialização dupla
+  let initialized = false;
   document.addEventListener('DOMContentLoaded', () => {
     if (initialized) {
       console.log('[Inicialização] Já inicializado, pulando');
@@ -1273,7 +1272,7 @@
         window.toast('Erro ao carregar a página inicial. Tente novamente.');
       }
     }, 300);
-  });
+  }, { once: true });
 })();
   
 /* ===== Senha ===== */
@@ -1832,21 +1831,19 @@
     const lbl = (first.querySelector('.pergunta-enunciado, .question-title, [data-enunciado], h3, h4, p') || {}).textContent || '';
     if (aria) aria.textContent = lbl;
 
-    if (window.runTyping) {
-      window.runTyping(vis || sec);
-    } else {
-      const textEl = first.querySelector('[data-typing], .pergunta-enunciado, .question-title');
-      if (textEl && window.typeWriter) {
-        window.typeWriter(textEl, window.dedupe(textEl.textContent || textEl.getAttribute('data-text') || ''), JORNADA.typing.charDelay, false);
-      }
-    }
+    setTimeout(() => {
+      window.runTyping && window.runTyping(vis || sec);
+    }, 100); // Atraso pra garantir DOM atualizado
     return true;
   }
   window.ensureQuestionsReady = ensureQuestionsReady;
 
   window.openQuestions = function() {
     window.showSection('section-perguntas');
-    requestAnimationFrame(() => setTimeout(() => window.ensureQuestionsReady && window.ensureQuestionsReady(), 0));
+    setTimeout(() => {
+      window.loadDynamicBlocks && window.loadDynamicBlocks();
+      window.ensureQuestionsReady && window.ensureQuestionsReady();
+    }, 100);
   };
 
   let __isTransitioning = false;
@@ -1858,71 +1855,85 @@
     __isTransitioning = true;
 
     try {
-      const sec = document.getElementById('section-perguntas') || document.querySelector('[data-section="perguntas"], .section-perguntas');
-      const intro = document.getElementById('section-intro') || document.querySelector('[data-section="intro"], .section-intro');
+      const current = document.querySelector('.j-section:not(.hidden)')?.id;
+      console.log('[goNext] Seção atual:', current);
 
-      if (intro && !intro.classList.contains('hidden')) {
-        console.log('[goNext] Navegando da section-intro para section-senha');
-        window.showSection('section-senha');
-        return;
-      }
+      const flow = [
+        { from: 'section-intro', to: 'section-termos' },
+        { from: 'section-termos', to: 'section-senha' },
+        { from: 'section-senha', to: 'section-guia' },
+        { from: 'section-guia', to: 'section-selfie' },
+        { from: 'section-selfie', to: 'section-perguntas' },
+        { from: 'section-perguntas', to: null }, // Tratado separadamente
+        { from: 'section-final', to: null }
+      ];
 
-      if (!sec || sec.classList.contains('hidden')) {
-        if (sec) {
-          window.showSection('section-perguntas');
-          requestAnimationFrame(() => setTimeout(() => window.ensureQuestionsReady && window.ensureQuestionsReady(), 0));
+      const nextSection = flow.find(f => f.from === current)?.to;
+      if (current === 'section-perguntas') {
+        const sec = document.getElementById('section-perguntas');
+        if (!sec || sec.classList.contains('hidden')) {
+          if (sec) {
+            window.showSection('section-perguntas');
+            setTimeout(() => window.ensureQuestionsReady && window.ensureQuestionsReady(), 100);
+          }
+          return;
         }
-        return;
-      }
 
-      if (!window.ensureQuestionsReady || !window.ensureQuestionsReady()) return;
+        if (!window.ensureQuestionsReady || !window.ensureQuestionsReady()) return;
 
-      const bloco = sec.querySelector('.j-bloco[style*="display: block"]') || sec.querySelector('.j-bloco');
-      const perguntas = bloco ? Array.from(bloco.querySelectorAll('.j-pergunta')) : [];
-      const current = bloco ? bloco.querySelector('.j-pergunta.active') : null;
+        const bloco = sec.querySelector('.j-bloco[style*="display: block"]') || sec.querySelector('.j-bloco');
+        const perguntas = bloco ? Array.from(bloco.querySelectorAll('.j-pergunta')) : [];
+        const currentPergunta = bloco ? bloco.querySelector('.j-pergunta.active') : null;
 
-      if (!bloco || perguntas.length === 0) {
-        console.log('[goNext] Nenhum bloco ou perguntas encontrados na section-perguntas');
-        return;
-      }
+        if (!bloco || perguntas.length === 0) {
+          console.log('[goNext] Nenhum bloco ou perguntas encontrados na section-perguntas');
+          return;
+        }
 
-      if (!current) {
-        perguntas[0].classList.add('active');
-        window.runTyping && window.runTyping(bloco);
-        return;
-      }
+        if (!currentPergunta) {
+          perguntas[0].classList.add('active');
+          window.runTyping && window.runTyping(bloco);
+          return;
+        }
 
-      const i = perguntas.indexOf(current);
-      current.classList.remove('active');
+        const i = perguntas.indexOf(currentPergunta);
+        currentPergunta.classList.remove('active');
 
-      if (i >= 0 && i + 1 < perguntas.length) {
-        const prox = perguntas[i + 1];
-        prox.classList.add('active');
-        const lbl = prox.querySelector('.pergunta-enunciado')?.textContent || '';
-        const aria = document.getElementById('aria-pergunta');
-        if (aria) aria.textContent = lbl;
-        window.runTyping && window.runTyping(prox);
-        return;
-      }
-
-      const allBlocks = Array.from(sec.querySelectorAll('.j-bloco'));
-      const idx = allBlocks.indexOf(bloco);
-      if (idx >= 0 && idx + 1 < allBlocks.length) {
-        allBlocks.forEach(b => b.style.display = 'none');
-        const nextBlock = allBlocks[idx + 1];
-        nextBlock.style.display = 'block';
-        const first = nextBlock.querySelector('.j-pergunta');
-        if (first) {
-          first.classList.add('active');
-          const lbl = first.querySelector('.pergunta-enunciado')?.textContent || '';
+        if (i >= 0 && i + 1 < perguntas.length) {
+          const prox = perguntas[i + 1];
+          prox.classList.add('active');
+          const lbl = prox.querySelector('.pergunta-enunciado')?.textContent || '';
           const aria = document.getElementById('aria-pergunta');
           if (aria) aria.textContent = lbl;
-          window.runTyping && window.runTyping(nextBlock);
+          window.runTyping && window.runTyping(prox);
+          return;
         }
-        return;
-      }
 
-      window.showSection('section-final');
+        const allBlocks = Array.from(sec.querySelectorAll('.j-bloco'));
+        const idx = allBlocks.indexOf(bloco);
+        if (idx >= 0 && idx + 1 < allBlocks.length) {
+          allBlocks.forEach(b => b.style.display = 'none');
+          const nextBlock = allBlocks[idx + 1];
+          nextBlock.style.display = 'block';
+          const first = nextBlock.querySelector('.j-pergunta');
+          if (first) {
+            first.classList.add('active');
+            const lbl = first.querySelector('.pergunta-enunciado')?.textContent || '';
+            const aria = document.getElementById('aria-pergunta');
+            if (aria) aria.textContent = lbl;
+            window.runTyping && window.runTyping(nextBlock);
+          }
+          return;
+        }
+
+        window.showSection('section-final');
+      } else if (nextSection) {
+        console.log('[goNext] Navegando de', current, 'para', nextSection);
+        window.showSection(nextSection);
+      } else {
+        console.log('[goNext] Nenhuma seção seguinte definida para:', current);
+        window.toast('Fim do fluxo. Tente recarregar.');
+      }
     } finally {
       setTimeout(() => __isTransitioning = false, 150);
     }
@@ -1946,12 +1957,12 @@
 
   async function waitUserAnswer(question) {
     return new Promise(resolve => {
-      const btn = document.querySelector('[data-action="next"], [data-action="avancar"]');
+      const btn = document.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next');
       if (btn) {
         btn.addEventListener('click', () => resolve(), { once: true });
       } else {
         console.log('[waitUserAnswer] Botão de avançar não encontrado');
-        setTimeout(resolve, 5000); // Fallback: resolve após 5 segundos se o botão não for encontrado
+        setTimeout(resolve, 5000); // Fallback: resolve após 5 segundos
       }
     });
   }
@@ -1959,12 +1970,9 @@
   async function runJornada(questions = []) {
     for (const q of questions) {
       CURRENT_QUESTION = q;
-
       const qEl = document.querySelector('#pergunta');
-      window.typeTextOnce(qEl, window.utils.dedupe(q.label), 18);
-
+      window.utils.typeTextOnce(qEl, window.utils.dedupe(q.label), 18);
       await waitUserAnswer(q);
-
       await handleDevolutivaStep();
     }
   }
@@ -2003,7 +2011,10 @@
 
   window.loadDynamicBlocks = function() {
     const content = document.getElementById('perguntas-container');
-    if (!content) return;
+    if (!content) {
+      log('Container de perguntas não encontrado');
+      return;
+    }
 
     const blocks = window.JORNADA_BLOCKS || [];
     content.innerHTML = '';
@@ -2021,15 +2032,18 @@
         div.dataset.pergunta = qIdx;
 
         const enunciado = `
-          <label class="pergunta-enunciado" 
-            data-typing data-text="Pergunta ${qIdx + 1}: ${label}" 
-            data-speed="36" data-cursor="true"></label>`;
+          <label class="pergunta-enunciado text" 
+                 data-typing="true" 
+                 data-text="Pergunta ${qIdx + 1}: ${label}" 
+                 data-speed="36" 
+                 data-cursor="true"></label>`;
 
         div.innerHTML = enunciado +
           `\n<textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>` +
           `<div class="accessibility-controls">` +
           `<button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>` +
           `<button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>` +
+          `<button class="btn-avancar" data-action="avancar">Avançar</button>` +
           `</div>`;
 
         bloco.appendChild(div);
@@ -2044,7 +2058,7 @@
       const first = firstBloco.querySelector('.j-pergunta');
       if (first) {
         first.classList.add('active');
-        if (window.runTyping) window.runTyping(first);
+        setTimeout(() => window.runTyping && window.runTyping(first), 100);
       }
     }
 
