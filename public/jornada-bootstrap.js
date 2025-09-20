@@ -1,7 +1,7 @@
 /* ============================================================================
-   TÍTULO: JORNADA BOOTSTRAP (v2.1)
+   TÍTULO: JORNADA BOOTSTRAP (v2)
    SUBTÍTULO: Inicializa a jornada quando o renderer estiver pronto
-   CAMINHO SUGERIDO: /public/assets/js/jornada-bootstrap.js
+   CAMINHO: /public/jornada-bootstrap.js
    DEPENDE DE: jornada-render.js (define window.JORNADA_RENDER)
                jornada-controller.js (define window.JC - opcional)
 ============================================================================ */
@@ -9,12 +9,9 @@
   'use strict';
 
   const TAG = '[BOOT]';
-  const log   = (...a) => console.log(TAG, ...a);
-  const warn  = (...a) => console.warn(TAG, ...a);
+  const log = (...a) => console.log(TAG, ...a);
+  const warn = (...a) => console.warn(TAG, ...a);
   const error = (...a) => console.error(TAG, ...a);
-
-  // Fallbacks mínimos para evitar crash se algo ainda não carregou
-  window.toast = window.toast || function (m,t){ try{ console.log('[toast]', t||'info', m);}catch{} };
 
   function routeFromHash() {
     return (location.hash || '#intro').slice(1);
@@ -45,7 +42,6 @@
     const route = routeFromHash();
     log('tentando iniciar • rota:', route);
 
-    // Integração opcional com SPA externa
     if (typeof window.mount === 'function') {
       log('detectado window.mount → delegando para SPA');
       try {
@@ -55,30 +51,26 @@
       return true;
     }
 
-    const hasRender = !!window.JORNADA_RENDER;
-    const hasJC     = !!(window.JC && typeof window.JC.init === 'function');
-
-    if (!hasRender || !hasJC) {
-      warn('JORNADA_RENDER ou JC não disponível ainda. Aguardando…', { hasRender, hasJC });
+    if (!window.JORNADA_RENDER || !window.JC || !window.JC._state) {
+      warn('JORNADA_RENDER, JC ou estado não disponível ainda. Aguardando…');
       return false;
     }
 
     try { document.body.classList.add('jornada-active'); } catch {}
 
-    // Renderiza a rota atual
     try {
       if (route === 'intro') {
         log('→ renderIntro()');
-        window.JORNADA_RENDER.renderIntro?.();
+        window.JORNADA_RENDER.renderIntro();
       } else if (route === 'perguntas') {
         log('→ renderPerguntas(0)');
-        window.JORNADA_RENDER.renderPerguntas?.(0);
+        window.JORNADA_RENDER.renderPerguntas(0);
       } else if (route === 'final') {
         log('→ renderFinal()');
-        window.JORNADA_RENDER.renderFinal?.();
+        window.JORNADA_RENDER.renderFinal();
       } else {
         log('→ rota desconhecida, caindo na intro');
-        window.JORNADA_RENDER.renderIntro?.();
+        window.JORNADA_RENDER.renderIntro();
       }
     } catch (e) {
       error('falha ao chamar renderer:', e);
@@ -86,20 +78,18 @@
     }
 
     setPaperByRoute(route);
-
-    // Reforço de inicialização do controller
     setTimeout(() => {
-      try {
-        if (!window.JC._initialized) {
+      if (window.JC?.init) {
+        try { 
           log('acionando JC.init() (reforço)');
           window.JC.init();
-          window.JC._initialized = true;
+        } catch (e) {
+          warn('falha ao acionar JC.init():', e);
         }
-      } catch (e) {
-        warn('falha ao acionar JC.init():', e);
+      } else {
+        warn('JC.init não disponível, inicialização manual pendente');
       }
     }, 200);
-
     log('inicialização concluída.');
     return true;
   }
@@ -112,14 +102,9 @@
       if (++tries > maxTries) {
         clearInterval(t);
         error('desisti de iniciar: JORNADA_RENDER ou JC não ficou disponível a tempo.');
-        try {
-          if (window.JC?.init) {
-            console.log('Tentando inicialização de emergência com JC.init...');
-            window.JC.init();
-            window.JC._initialized = true;
-          }
-        } catch (e) {
-          warn('falha na inicialização de emergência:', e);
+        if (window.JC?.init) {
+          console.log('Tentando inicialização de emergência com JC.init...');
+          window.JC.init();
         }
       }
     }, 100);
@@ -138,14 +123,10 @@
   }
 
   window.addEventListener('load', () => {
-    try {
-      if (!window.JC?._initialized && window.JC?.init) {
-        console.log('Inicialização final no load…');
-        window.JC.init();
-        window.JC._initialized = true;
-      }
-    } catch (e) {
-      warn('Falha no init final:', e);
+    if (!window.JC._initialized && window.JC?.init) {
+      console.log('Inicialização final no load...');
+      window.JC.init();
+      window.JC._initialized = true;
     }
   });
 })();
