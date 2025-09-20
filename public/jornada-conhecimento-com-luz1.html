@@ -1802,6 +1802,8 @@
 
 /* ===== Perguntas ===== */
 (function() {
+  'use strict';
+  console.log('[PERGv6] Iniciando script de perguntas...');
   const log = (...a) => { try { console.log('[PERGv6]', ...a); } catch (_) {} };
   const wait = (ms) => new Promise(r => setTimeout(r, ms));
 
@@ -1954,7 +1956,8 @@
     ]}
   ];
   window.JORNADA_FINAL_VIDEO = "/assets/img/filme-5-fim-da-jornada.mp4";
-})();
+  console.log('[PERGv6] JORNADA_BLOCKS definido:', window.JORNADA_BLOCKS);
+})();;
 
   window.loadDynamicBlocks = function() {
     const content = document.getElementById('perguntas-container');
