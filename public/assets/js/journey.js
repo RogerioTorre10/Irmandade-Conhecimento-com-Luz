@@ -1,121 +1,84 @@
-// journey.js — seguro e carinhoso 😊
-document.addEventListener("DOMContentLoaded", () => {
-  const iniciarBtn   = document.getElementById("iniciarBtn");
-  const senhaInput   = document.getElementById("senha");
-  const mensagemDiv  = document.getElementById("mensagem");
-  const formularioDiv= document.getElementById("formulario");
-  if (!iniciarBtn || !senhaInput || !mensagemDiv || !formularioDiv) return;
+/* /assets/js/journey.js */
+;(function () {
+  'use strict';
 
-  // ===== Config de API com fallbacks =====
-  const API_BASE =
-    (typeof API_URL === "string" && API_URL) ||
-    window.API_BASE ||
-    window.JORNADA_API_BASE ||
-    (window.API && (window.API.API_PRIMARY || window.API.API_FALLBACK)) ||
-    "https://conhecimento-com-luz-api.onrender.com";
+  document.addEventListener('DOMContentLoaded', function () {
+    const iniciarBtn   = document.getElementById('iniciarBtn');
+    const senhaInput   = document.getElementById('senha');
+    const mensagemDiv  = document.getElementById('mensagem');
+    const formularioDiv= document.getElementById('formulario');
 
-  const ENDPOINTS = {
-    validate: (typeof TOKEN_VALIDATION_ENDPOINT === "string" && TOKEN_VALIDATION_ENDPOINT) || "/validate-token",
-    start:    (typeof JOURNEY_START_ENDPOINT      === "string" && JOURNEY_START_ENDPOINT)      || "/start-journey",
-  };
+    // Se a página não tiver esses elementos, sai sem erro
+    if (!iniciarBtn || !senhaInput || !mensagemDiv || !formularioDiv) return;
 
-  // ===== Helpers =====
-  const toast = (msg) => {
-    try { (typeof window.toast === "function" ? window.toast : console.log)(msg); } catch {}
-  };
+    // Descobre a base da API (usa config.local.js se estiver em dev)
+    const API =
+      window.API_URL ||
+      window.API_BASE ||
+      (window.APP_CONFIG && window.APP_CONFIG.API_BASE) ||
+      (window.JORNADA_CFG && window.JORNADA_CFG.API_BASE) ||
+      'https://conhecimento-com-luz-api.onrender.com';
 
-  const setBusy = (busy) => {
-    iniciarBtn.disabled = !!busy;
-    iniciarBtn.setAttribute("aria-busy", busy ? "true" : "false");
-    iniciarBtn.dataset._label ??= iniciarBtn.textContent;
-    iniciarBtn.textContent = busy ? "Aguarde…" : iniciarBtn.dataset._label;
-  };
+    // Endpoints (podem vir do config.local.js / config.js)
+    const TOKEN_EP = window.TOKEN_VALIDATION_ENDPOINT || '/validate-token';
+    const START_EP = window.JOURNEY_START_ENDPOINT    || '/start-journey';
 
-  const urlJoin = (base, path) => new URL(path, base).toString();
-
-  async function postJSON(path, body) {
-    const res = await fetch(urlJoin(API_BASE, path), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body || {}),
-      mode: "cors",
-      credentials: "omit",
-    });
-    let data = null;
-    try { data = await res.json(); } catch {}
-    return { ok: res.ok, status: res.status, data };
-  }
-
-  async function getText(path) {
-    const res = await fetch(urlJoin(API_BASE, path), { mode: "cors", credentials: "omit" });
-    const text = await res.text();
-    return { ok: res.ok, status: res.status, text };
-  }
-
-  // ===== Fluxo =====
-  iniciarBtn.addEventListener("click", async () => {
-    const senha = (senhaInput.value || "").trim();
-
-    if (!senha) {
-      mensagemDiv.textContent = "Por favor, digite a senha de acesso.";
-      toast("Informe a senha para continuar.");
-      senhaInput.focus();
-      return;
+    function setBusy(busy) {
+      iniciarBtn.disabled = !!busy;
+      iniciarBtn.setAttribute('aria-busy', busy ? 'true' : 'false');
     }
 
-    setBusy(true);
-    mensagemDiv.textContent = "Validando senha...";
+    function setMsg(texto) {
+      mensagemDiv.textContent = texto || '';
+    }
 
-    try {
-      const { ok, data, status } = await postJSON(ENDPOINTS.validate, { token: senha });
+    async function validarToken(token) {
+      const res = await fetch(API + TOKEN_EP, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || 'Senha inválida.');
+      return data;
+    }
 
-      if (!ok) {
-        const msg = (data && (data.message || data.error)) || `Senha inválida (HTTP ${status}).`;
-        mensagemDiv.textContent = msg;
-        toast(msg);
+    async function iniciarJornada() {
+      const res = await fetch(API + START_EP, { method: 'GET' });
+      if (!res.ok) {
+        const tx = await res.text().catch(() => '');
+        throw new Error(tx || 'Erro ao carregar a jornada.');
+      }
+      const html = await res.text();
+      formularioDiv.innerHTML = html;
+      setMsg('');
+    }
+
+    async function onStart() {
+      const senha = (senhaInput.value || '').trim();
+      if (!senha) {
+        setMsg('Por favor, digite a senha de acesso.');
+        senhaInput.focus();
         return;
       }
 
-      mensagemDiv.textContent = "Senha válida! Iniciando a jornada...";
-      await iniciarJornada();
-    } catch (err) {
-      console.error(err);
-      mensagemDiv.textContent = "Erro ao validar senha. Tente novamente.";
-      toast("Falha na validação. Verifique sua conexão ou tente mais tarde.");
-    } finally {
-      setBusy(false);
-    }
-  });
-
-  async function iniciarJornada() {
-    try {
-      const { ok, text, status } = await getText(ENDPOINTS.start);
-      if (!ok) throw new Error(`HTTP ${status}`);
-
-      formularioDiv.innerHTML = text;
-      mensagemDiv.textContent = "";
-
-      // Se a página injetada já contém as seções da Jornada, tenta mostrar a primeira
-      const first =
-        document.getElementById("section-intro") ||
-        document.getElementById("section-termos") ||
-        document.querySelector(".j-section:not(.hidden)") ||
-        null;
-
-      if (first) {
-        (typeof window.showSection === "function")
-          ? window.showSection(first.id || first)
-          : (first.classList.remove("hidden"), first.style.display = "block");
+      setBusy(true);
+      try {
+        setMsg('Validando senha...');
+        await validarToken(senha);
+        setMsg('Senha válida! Iniciando a jornada...');
+        await iniciarJornada();
+      } catch (err) {
+        setMsg(err.message || 'Erro ao validar senha. Tente novamente.');
+        console.error('[journey] erro:', err);
+      } finally {
+        setBusy(false);
       }
-    } catch (error) {
-      console.error(error);
-      mensagemDiv.textContent = "Erro ao carregar a jornada.";
-      toast("Não consegui carregar o formulário da jornada.");
     }
-  }
 
-  // Enter no input dispara o clique
-  senhaInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") iniciarBtn.click();
+    iniciarBtn.addEventListener('click', onStart);
+    senhaInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') onStart();
+    });
   });
-});
+})();
