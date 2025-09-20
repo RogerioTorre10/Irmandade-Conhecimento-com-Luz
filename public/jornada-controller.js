@@ -1,5 +1,10 @@
 (function () {
   'use strict';
+  
+   // --- stubs de segurança (no-ops se módulos ainda não carregaram) ---
+   window.handleInput = window.handleInput || function(){};
+   window.loadAnswers = window.loadAnswers || function(){};
+   window.updateCanvasBackground = window.updateCanvasBackground || function(){};
 
   const JC = (window.JC = window.JC || {});
   const state = {
