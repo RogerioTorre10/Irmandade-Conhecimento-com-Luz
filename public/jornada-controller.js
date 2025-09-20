@@ -1,218 +1,257 @@
-(function () {
+/* =========================================================
+   jornada-controller.js
+   Controla a navegação e estado da jornada
+   ========================================================= */
+;(function () {
   'use strict';
-  
-   // --- stubs de segurança (no-ops se módulos ainda não carregaram) ---
-   window.handleInput = window.handleInput || function(){};
-   window.loadAnswers = window.loadAnswers || function(){};
-   window.updateCanvasBackground = window.updateCanvasBackground || function(){};
+  console.log('[JORNADA_CONTROLLER] Iniciando carregamento do script...');
 
   const JC = (window.JC = window.JC || {});
-  const state = {
-    blocoIndex: 0,
-    perguntaIndex: 0,
-    respostas: Object.create(null),
-  };
+  JC._state = { blocoIndex: 0, perguntaIndex: 0 };
 
+  // Seletores e utilitários
   const S = {
-    root: () => document.getElementById('jornada-canvas'),
-    blocos: () => Array.from(document.querySelectorAll('.j-bloco,[data-bloco]')),
-    blocoAtivo: () => S.blocos()[state.blocoIndex],
-    perguntasDo: (blocoEl) => Array.from(blocoEl.querySelectorAll('.j-pergunta,[data-pergunta]')),
-    btnPrev: () => document.getElementById('btnPrevPerguntas') || document.querySelector('[data-action="prev"]'),
-    btnNext: () => document.getElementById('btnNextPerguntas') || document.querySelector('[data-action="next"]'),
-    btnStart: () => document.querySelector('[data-action="start"]'), // Substitui document.getElementById('btnIniciar'),
-    meta: () => document.getElementById('j-meta'),
-    progressFill: () => document.querySelector('.j-progress__fill'),
-    overlay: () => document.getElementById('videoOverlay'),
-    video: () => document.getElementById('videoTransicao'),
-    skip: () => document.getElementById('skipVideo'),
-  };
-
-  const U = {
-    show(el, disp = 'block') { if (el) el.style.display = disp; },
-    hide(el) { if (el) el.style.display = 'none'; },
-    clamp(n, a, b) { return Math.max(a, Math.min(b, n)); },
-    key(b, q) { return `b${b}-q${q}`; },
-    getAnswerEl(qEl) { return qEl?.querySelector?.('textarea, input[type="text"], input[type="email"], input[type="number"], input[type="search"]') || null; },
-    getVal(el) { return (el && (el.value ?? '')).trim(); },
-    setProgress(cur, total) {
-      const pct = total ? Math.round((cur / total) * 100) : 0;
-      const bar = S.progressFill();
-      const meta = S.meta();
-      if (bar) bar.style.width = pct + '%';
-      if (meta) meta.innerHTML = `<b>${cur}</b> / ${total} (${pct}%)`;
+    blocos() {
+      const section = document.getElementById('section-perguntas');
+      if (!section) {
+        console.error('[JORNADA_CONTROLLER] Seção #section-perguntas não encontrada');
+        return [];
+      }
+      return Array.from(section.querySelectorAll('.j-bloco,[data-bloco]'));
     },
-    analiseSentiment(texto) {
-      const textoNormalizado = texto.toLowerCase().split(/\s+/);
-      let posCount = 0, negCount = 0;
-      textoNormalizado.forEach(word => {
-        if (window.JORNADA_CFG.positiveWords.includes(word)) posCount++;
-        if (window.JORNADA_CFG.negativeWords.includes(word)) negCount++;
-      });
-      return posCount > negCount ? "alegre" : (negCount > posCount ? "sofrida" : "neutra");
+    perguntasDo(bloco) {
+      if (!bloco || !(bloco instanceof Element)) {
+        console.error('[JORNADA_CONTROLLER] Bloco inválido em perguntasDo:', bloco);
+        return [];
+      }
+      return Array.from(bloco.querySelectorAll('.j-pergunta,[data-pergunta]'));
+    },
+    perguntaAtual() {
+      const section = document.getElementById('section-perguntas');
+      if (!section) {
+        console.error('[JORNADA_CONTROLLER] Seção #section-perguntas não encontrada');
+        return null;
+      }
+      return section.querySelector('.j-pergunta.active,[data-pergunta].active');
     }
   };
 
-  function saveCurrentAnswer() {
-    const bloco = S.blocoAtivo();
-    if (!bloco) return;
-    const perguntas = S.perguntasDo(bloco);
-    const qEl = perguntas[state.perguntaIndex];
-    if (!qEl) return;
-    const input = U.getAnswerEl(qEl);
-    if (input) {
-      const k = U.key(state.blocoIndex, state.perguntaIndex);
-      state.respostas[k] = U.getVal(input);
-      try { localStorage.setItem('JORNADA_RESPOSTAS', JSON.stringify(state.respostas)); } catch {}
-    }
-  }
-
-  function applyPergaminhoByRoute() {
-    if (!window.JORNADA_PAPER || typeof window.JORNADA_PAPER.set !== 'function') {
-      console.warn('JORNADA_PAPER não disponível para aplicar pergaminho por rota');
+  // Carrega blocos dinâmicos
+  function loadDynamicBlocks() {
+    console.log('[JORNADA_CONTROLLER] Iniciando loadDynamicBlocks...');
+    const content = document.getElementById('perguntas-container');
+    if (!content) {
+      console.error('Erro: #perguntas-container não encontrado no DOM!');
       return;
     }
-    const route = (location.hash || '#intro').slice(1);
-    console.log('[JORNADA_CONTROLLER] Aplicando pergaminho por rota:', route);
-    if (route === 'intro' || route === 'final') {
-      window.JORNADA_PAPER.set('v');
-    } else {
-      window.JORNADA_PAPER.set('h');
-    }
-  }
-
-  function applyPergaminhoByBloco(blocoEl) {
-    if (!window.JORNADA_PAPER || typeof window.JORNADA_PAPER.set !== 'function') {
-      console.warn('JORNADA_PAPER não disponível para aplicar pergaminho por bloco');
+    console.log('[JORNADA_CONTROLLER] #perguntas-container encontrado:', content);
+    if (!Array.isArray(window.JORNADA_BLOCKS) || !window.JORNADA_BLOCKS.length) {
+      console.error('Erro: JORNADA_BLOCKS não definido, não é array ou está vazio!', window.JORNADA_BLOCKS);
       return;
     }
-    if (!blocoEl) {
-      console.warn('Bloco não encontrado para aplicar pergaminho');
+    console.log('[JORNADA_CONTROLLER] Conteúdo de JORNADA_BLOCKS:', window.JORNADA_BLOCKS);
+    const validBlocks = window.JORNADA_BLOCKS.filter(block => Array.isArray(block?.questions) && block.questions.length);
+    if (!validBlocks.length) {
+      console.error('Erro: Nenhum bloco válido com perguntas encontrado em JORNADA_BLOCKS!', window.JORNADA_BLOCKS);
       return;
     }
-    let modo = 'h';
-    if (blocoEl.hasAttribute('data-pergaminho-h')) modo = 'h';
-    else if (blocoEl.hasAttribute('data-pergaminho-v')) modo = 'v';
-    else modo = blocoEl.getAttribute('data-pergaminho') || 'h';
-    console.log('[JORNADA_CONTROLLER] Aplicando pergaminho para bloco:', modo, blocoEl);
-    window.JORNADA_PAPER.set(modo);
-  }
-
-  function render() {
-    const root = S.root();
-    if (!root) {
-      console.warn('Root #jornada-canvas não encontrado');
+    content.innerHTML = '';
+    console.log('[JORNADA_CONTROLLER] #perguntas-container limpo');
+    window.JORNADA_BLOCKS.forEach((block, idx) => {
+      if (!Array.isArray(block?.questions)) {
+        console.warn(`Bloco ${idx} inválido: sem perguntas ou perguntas não é um array`, block);
+        return;
+      }
+      const bloco = document.createElement('section');
+      bloco.className = 'j-bloco';
+      bloco.dataset.bloco = idx;
+      bloco.dataset.video = block.video_after || '';
+      bloco.style.display = 'none';
+      console.log(`[JORNADA_CONTROLLER] Criando bloco ${idx} com ${block.questions.length} perguntas`);
+      block.questions.forEach((q, qIdx) => {
+        if (!q?.label) {
+          console.warn(`Pergunta ${qIdx} no bloco ${idx} inválida: sem label`, q);
+          return;
+        }
+        const pergunta = document.createElement('div');
+        pergunta.className = 'j-pergunta';
+        pergunta.dataset.pergunta = qIdx;
+        pergunta.innerHTML = `
+          <label class="pergunta-enunciado"
+                 data-typing
+                 data-text="<b>Pergunta ${qIdx + 1}:</b> ${q.label}"
+                 data-speed="40" data-cursor="true"></label>
+          <textarea rows="4" class="input" placeholder="Digite sua resposta..." oninput="handleInput(this)"></textarea>
+        `;
+        bloco.appendChild(pergunta);
+        console.log(`[JORNADA_CONTROLLER] Pergunta ${qIdx} adicionada ao bloco ${idx}`);
+      });
+      content.appendChild(bloco);
+      console.log(`[JORNADA_CONTROLLER] Bloco ${idx} adicionado ao DOM`);
+    });
+    const blocos = document.querySelectorAll('.j-bloco');
+    console.log('[JORNADA_CONTROLLER] Blocos no DOM após loadDynamicBlocks:', blocos.length, Array.from(blocos));
+    const firstBloco = content.querySelector('.j-bloco');
+    if (!firstBloco) {
+      console.error('Nenhum bloco criado após loadDynamicBlocks!');
       return;
     }
-    U.show(root, 'block');
-    const blocos = S.blocos();
-    if (!blocos.length) {
-      console.error('Nenhum bloco encontrado após loadDynamicBlocks!');
-      return;
-    }
-    blocos.forEach(U.hide);
-    const bloco = S.blocoAtivo();
-    if (bloco) U.show(bloco);
-    else {
-      console.error('Bloco ativo não encontrado no índice:', state.blocoIndex);
-      return;
-    }
-    const perguntas = S.perguntasDo(bloco);
-    if (!perguntas.length) {
-      console.error('Nenhuma pergunta encontrada no bloco ativo:', bloco);
-      return;
-    }
-    perguntas.forEach(q => q.classList.remove('active')); // Remove active de todas
-    state.perguntaIndex = U.clamp(state.perguntaIndex, 0, Math.max(0, perguntas.length - 1));
-    const atual = perguntas[state.perguntaIndex];
-    if (atual) {
-      atual.classList.add('active'); // Mostra só a pergunta atual
-      console.log('Exibindo pergunta:', state.perguntaIndex + 1, 'de', perguntas.length);
-      const input = U.getAnswerEl(atual);
-      if (input) {
-        input.removeAttribute?.('hidden');
-        input.style.display = 'block';
-        input.style.visibility = 'visible';
-        try { input.focus({ preventScroll: true }); } catch (e) { console.warn('Erro ao focar input:', e); }
+    firstBloco.style.display = 'block';
+    const firstPergunta = firstBloco.querySelector('.j-pergunta');
+    if (firstPergunta) {
+      firstPergunta.classList.add('active');
+      try {
+        if (window.JORNADA_TYPE?.run) {
+          console.log('[JORNADA_CONTROLLER] Chamando JORNADA_TYPE.run para primeira pergunta');
+          window.JORNADA_TYPE.run(firstPergunta);
+        }
+      } catch (e) {
+        console.error('[JORNADA_CONTROLLER] Erro ao chamar JORNADA_TYPE.run:', e);
+      }
+      const firstTa = firstPergunta.querySelector('textarea');
+      if (firstTa) {
+        console.log('[JORNADA_CONTROLLER] Chamando handleInput para primeira textarea');
+        handleInput(firstTa);
       }
     } else {
-      console.error('Pergunta atual não encontrada no índice:', state.perguntaIndex);
+      console.error('Nenhuma primeira pergunta encontrada no primeiro bloco!');
     }
-    if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
-  console.log('[JORNADA_CONTROLLER] Executando JORNADA_TYPE.run em:', atual);
-  window.JORNADA_TYPE.run(atual);
-} else {
-  console.warn('[JORNADA_CONTROLLER] JORNADA_TYPE não disponível ou run não é função');
-}
-    applyPergaminhoByBloco(bloco);
-    U.setProgress(state.perguntaIndex + 1, perguntas.length);
-    const prev = S.btnPrev();
-    const next = S.btnNext();
-    if (prev) prev.disabled = (state.blocoIndex === 0 && state.perguntaIndex === 0);
-    if (next) {
-      const ultimaPergunta = state.perguntaIndex === perguntas.length - 1;
-      const ultimoBloco = state.blocoIndex === blocos.length - 1;
-      next.textContent = ultimaPergunta ? (ultimoBloco ? 'Finalizar' : 'Concluir bloco ➜') : 'Próxima';
-      next.disabled = false; // Garante que o botão não fique travado
+    try {
+      if (window.loadAnswers) {
+        console.log('[JORNADA_CONTROLLER] Chamando loadAnswers');
+        window.loadAnswers();
+      }
+    } catch (e) {
+      console.error('[JORNADA_CONTROLLER] Erro ao chamar loadAnswers:', e);
     }
+    console.log('[JORNADA_CONTROLLER] Blocos carregados com sucesso!');
   }
 
+  // Navegação para a próxima seção/pergunta
   function goNext() {
-    const bloco = S.blocoAtivo();
-    const perguntas = S.perguntasDo(bloco);
-    saveCurrentAnswer();
-    if (state.perguntaIndex < perguntas.length - 1) {
-      state.perguntaIndex++;
-      render();
-      return;
-    }
-    const videoSrc = bloco.getAttribute('data-video') || '';
-    console.log('Transição para próximo bloco, videoSrc:', videoSrc);
-    const haProximoBloco = state.blocoIndex < S.blocos().length - 1;
-    if (haProximoBloco) {
-      playTransition(videoSrc, () => {
+    console.log('[JORNADA_CONTROLLER] Iniciando goNext...');
+    const state = JC._state || { blocoIndex: 0, perguntaIndex: 0 };
+    const currentSection = document.querySelector('.j-section:not(.hidden)')?.id;
+    console.log('[JORNADA_CONTROLLER] Seção atual:', currentSection);
+
+    const flow = [
+      { from: 'section-intro', to: 'section-termos' },
+      { from: 'section-termos', to: 'section-senha' },
+      { from: 'section-senha', to: 'section-guia' },
+      { from: 'section-guia', to: 'section-selfie' },
+      { from: 'section-selfie', to: 'section-perguntas' },
+      { from: 'section-perguntas', to: null }, // Tratado separadamente
+      { from: 'section-final', to: null }
+    ];
+
+    if (currentSection === 'section-perguntas') {
+      const section = document.getElementById('section-perguntas');
+      if (!section) {
+        console.error('[JORNADA_CONTROLLER] Seção #section-perguntas não encontrada em goNext');
+        window.showSection('section-final');
+        return;
+      }
+      const blocos = S.blocos();
+      if (!blocos.length) {
+        console.error('[JORNADA_CONTROLLER] Nenhum bloco encontrado em goNext');
+        window.showSection('section-final');
+        return;
+      }
+      const bloco = blocos[state.blocoIndex];
+      if (!bloco) {
+        console.error('[JORNADA_CONTROLLER] Bloco não encontrado no índice:', state.blocoIndex);
+        window.showSection('section-final');
+        return;
+      }
+      const perguntas = S.perguntasDo(bloco);
+      if (!perguntas.length) {
+        console.error('[JORNADA_CONTROLLER] Nenhuma pergunta encontrada no bloco:', state.blocoIndex);
+        window.showSection('section-final');
+        return;
+      }
+      const current = perguntas[state.perguntaIndex];
+      if (current) {
+        current.classList.remove('active');
+      }
+      if (state.perguntaIndex + 1 < perguntas.length) {
+        state.perguntaIndex++;
+        const next = perguntas[state.perguntaIndex];
+        next.classList.add('active');
+        console.log('[JORNADA_CONTROLLER] Exibindo pergunta:', state.perguntaIndex, 'no bloco:', state.blocoIndex);
+        try {
+          if (window.JORNADA_TYPE?.run) {
+            window.JORNADA_TYPE.run(next);
+          }
+        } catch (e) {
+          console.error('[JORNADA_CONTROLLER] Erro ao chamar JORNADA_TYPE.run em goNext:', e);
+        }
+      } else if (state.blocoIndex + 1 < blocos.length) {
         state.blocoIndex++;
         state.perguntaIndex = 0;
-        render();
-      });
+        blocos.forEach(b => b.style.display = 'none');
+        const nextBloco = blocos[state.blocoIndex];
+        nextBloco.style.display = 'block';
+        const firstPergunta = S.perguntasDo(nextBloco)[0];
+        if (firstPergunta) {
+          firstPergunta.classList.add('active');
+          console.log('[JORNADA_CONTROLLER] Exibindo primeira pergunta do bloco:', state.blocoIndex);
+          try {
+            if (window.JORNADA_TYPE?.run) {
+              window.JORNADA_TYPE.run(firstPergunta);
+            }
+          } catch (e) {
+            console.error('[JORNADA_CONTROLLER] Erro ao chamar JORNADA_TYPE.run em goNext:', e);
+          }
+        }
+      } else {
+        console.log('[JORNADA_CONTROLLER] Fim dos blocos, navegando para section-final');
+        window.showSection('section-final');
+      }
     } else {
-      finalize();
+      const nextSection = flow.find(f => f.from === currentSection)?.to;
+      if (nextSection) {
+        console.log('[JORNADA_CONTROLLER] Navegando de', currentSection, 'para', nextSection);
+        window.showSection(nextSection);
+      } else {
+        console.log('[JORNADA_CONTROLLER] Nenhuma seção seguinte definida para:', currentSection);
+        window.toast('Fim do fluxo. Tente recarregar.');
+      }
     }
   }
 
-  function goPrev() {
-    if (state.perguntaIndex > 0) {
-      state.perguntaIndex--;
-      render();
-      return;
-    }
-    if (state.blocoIndex > 0) {
-      state.blocoIndex--;
-      const perguntas = S.perguntasDo(S.blocoAtivo());
-      state.perguntaIndex = Math.max(0, perguntas.length - 1);
-      render();
+  // Inicialização da jornada
+  async function initJornada() {
+    console.log('[JORNADA_CONTROLLER] Iniciando initJornada...');
+    try {
+      window.JORNADA_RENDER?.updateCanvasBackground('section-intro');
+      window.JORNADA_CHAMA?.ensureHeroFlame('section-intro');
+      const section = document.getElementById('section-intro');
+      if (section) {
+        window.showSection('section-intro');
+      } else {
+        console.error('[JORNADA_CONTROLLER] section-intro não encontrada');
+        window.toast('Seção de introdução não encontrada. Tente recarregar.');
+      }
+      const startBtn = document.querySelector('#iniciar, [data-action="start"], [data-action="iniciar"], .btn-iniciar');
+      if (startBtn) {
+        startBtn.addEventListener('click', () => {
+          console.log('[JORNADA_CONTROLLER] Botão Iniciar clicado');
+          startJourney();
+        }, { once: true });
+        console.log('[JORNADA_CONTROLLER] Botão Iniciar inicializado em JC.init');
+      } else {
+        console.warn('[JORNADA_CONTROLLER] Botão Iniciar não encontrado');
+      }
+      loadDynamicBlocks();
+    } catch (e) {
+      console.error('[JORNADA_CONTROLLER] Erro em initJornada:', e);
+      window.toast('Erro ao inicializar a jornada. Tente recarregar.');
     }
   }
 
-function startJourney() {
-  console.log('[JORNADA_CONTROLLER] Iniciando jornada... Verificando dependências:', {
-    JORNADA_BLOCKS: !!window.JORNADA_BLOCKS,
-    JORNADA_QA: !!window.JORNADA_QA,
-    JORNADA_PAPER: !!window.JORNADA_PAPER,
-    JORNADA_TYPE: !!window.JORNADA_TYPE,
-    JORNADA_RENDER: !!window.JORNADA_RENDER,
-    JC: !!window.JC
-  });
-  if (window.JORNADA_BLOCKS && window.JORNADA_QA && window.JORNADA_PAPER && window.JORNADA_TYPE) {
-    console.log('[JORNADA_CONTROLLER] Todas as dependências estão presentes, iniciando...');
-    showSection('section-perguntas');
-    loadDynamicBlocks();
-    state.blocoIndex = 0;
-    state.perguntaIndex = 0;
-    setTimeout(render, 100); // Delay de 100ms
-    console.log('[JORNADA_CONTROLLER] Jornada iniciada com sucesso, exibindo primeira pergunta');
-  } else {
-    console.error('[JORNADA_CONTROLLER] Dependências não carregadas para iniciar:', {
+  // Iniciar jornada
+  function startJourney() {
+    console.log('[JORNADA_CONTROLLER] Iniciando jornada... Verificando dependências:', {
       JORNADA_BLOCKS: !!window.JORNADA_BLOCKS,
       JORNADA_QA: !!window.JORNADA_QA,
       JORNADA_PAPER: !!window.JORNADA_PAPER,
@@ -220,225 +259,67 @@ function startJourney() {
       JORNADA_RENDER: !!window.JORNADA_RENDER,
       JC: !!window.JC
     });
-  }
-}
-  function playTransition(src, onEnd) {
-    const overlay = S.overlay();
-    const video = S.video();
-    const skip = S.skip();
-    if (!overlay || !video || !src) {
-      console.warn('Overlay, vídeo ou src não disponível:', { overlay, video, src });
-      onEnd && onEnd();
-      return;
-    }
-    try { video.pause(); video.removeAttribute('src'); video.load(); } catch {}
-    video.src = src;
-    overlay.classList.remove('hidden');
-    const cleanup = () => {
-      try { video.pause(); } catch {}
-      overlay.classList.add('hidden');
-      try { video.removeAttribute('src'); video.load(); } catch {}
-      onEnd && onEnd();
-    };
-    video.onended = cleanup;
-    video.onerror = cleanup;
-    if (skip) skip.onclick = cleanup;
-    try {
-      video.muted = true;
-      const p = video.play();
-      if (p && p.catch) p.catch(() => {});
-    } catch {}
-  }
-
-  function finalize() {
-    saveCurrentAnswer();
-    console.log('[JORNADA] Finalizado. Respostas:', state.respostas);
-    if (window.JORNADA_DOWNLOAD) {
-      window.JORNADA_DOWNLOAD(state.respostas).then(() => {
-        alert('Jornada concluída! Arquivos gerados.');
-        location.replace('/index.html');
-      }).catch(() => alert('Erro ao gerar arquivos.'));
-    } else {
-      console.error('JORNADA_DOWNLOAD não disponível!');
-    }
-  }
-
-  JC.init = function initJornada() {
-    const root = S.root();
-    if (!root) {
-      console.warn('Root #jornada-canvas não encontrado para inicialização');
-      return;
-    }
-    applyPergaminhoByRoute();
-    const startBtn = S.btnStart();
-    if (startBtn) {
-      startBtn.addEventListener('click', startJourney);
-      console.log('Botão Iniciar inicializado em JC.init');
-    } else {
-      console.error('Botão #btnIniciar não encontrado no DOM durante JC.init!');
-    }
-    const prevBtn = S.btnPrev();
-    const nextBtn = S.btnNext();
-    if (nextBtn) nextBtn.addEventListener('click', goNext);
-    if (prevBtn) prevBtn.addEventListener('click', goPrev);
-    document.addEventListener('click', (ev) => {
-      const n = ev.target.closest?.('[data-action="next"]');
-      const p = ev.target.closest?.('[data-action="prev"]');
-      const s = ev.target.closest?.('[data-action="start"]');
-      if (n) { ev.preventDefault(); goNext(); }
-      if (p) { ev.preventDefault(); goPrev(); }
-      if (s) { ev.preventDefault(); startJourney(); }
-    });
-    try {
-      const stash = localStorage.getItem('JORNADA_RESPOSTAS');
-      if (stash) state.respostas = JSON.parse(stash) || state.respostas;
-    } catch {}
-    render();
-  };
-
-  // Adicionar estas funções ao final de jornada-controller.js
-function showSection(sectionId) {
-  document.querySelectorAll('.j-section').forEach(s => s.classList.add('hidden'));
-  const active = document.getElementById(sectionId);
-  if (active) active.classList.remove('hidden');
-  if (typeof window.updateCanvasBackground === 'function') {
-    try { window.updateCanvasBackground(sectionId); } catch {}
-  }
-  if (window.JORNADA_CHAMA?.ensureHeroFlame) {
-    try { window.JORNADA_CHAMA.ensureHeroFlame(sectionId); } catch {}
-  }
-  if (sectionId === 'section-perguntas') {
-    loadDynamicBlocks();
-    setTimeout(() => {
-      const perguntas = document.querySelectorAll('.j-pergunta');
-      if (perguntas.length) {
-        const firstBloco = document.querySelector('.j-bloco');
-        if (firstBloco) firstBloco.style.display = 'block';
-        perguntas[0].classList.add('active');
-        if (window.JORNADA_TYPE?.run) {
-          try { window.JORNADA_TYPE.run(perguntas[0]); } catch {}
+    if (window.JORNADA_BLOCKS && window.JORNADA_QA && window.JORNADA_PAPER && window.JORNADA_TYPE) {
+      console.log('[JORNADA_CONTROLLER] Todas as dependências estão presentes, iniciando...');
+      window.showSection('section-perguntas');
+      loadDynamicBlocks();
+      JC._state.blocoIndex = 0;
+      JC._state.perguntaIndex = 0;
+      setTimeout(() => {
+        try {
+          window.JORNADA_RENDER?.renderPerguntas(0);
+        } catch (e) {
+          console.error('[JORNADA_CONTROLLER] Erro ao chamar JORNADA_RENDER.renderPerguntas:', e);
         }
-      } else {
-        console.error('Nenhuma pergunta encontrada em section-perguntas após loadDynamicBlocks!');
-      }
-    }, 100); // Delay de 100ms
-  }
-}
-
-function loadDynamicBlocks() {
-  console.log('[JORNADA_CONTROLLER] Iniciando loadDynamicBlocks...');
-  const content = document.getElementById('perguntas-container');
-  if (!content) {
-    console.error('Erro: #perguntas-container não encontrado no DOM!');
-    return;
-  }
-  console.log('[JORNADA_CONTROLLER] #perguntas-container encontrado:', content);
-  if (!Array.isArray(window.JORNADA_BLOCKS) || !window.JORNADA_BLOCKS.length) {
-    console.error('Erro: JORNADA_BLOCKS não definido, não é array ou está vazio!', window.JORNADA_BLOCKS);
-    return;
-  }
-  console.log('[JORNADA_CONTROLLER] Conteúdo de JORNADA_BLOCKS:', window.JORNADA_BLOCKS);
-  const validBlocks = window.JORNADA_BLOCKS.filter(block => Array.isArray(block?.questions) && block.questions.length);
-  if (!validBlocks.length) {
-    console.error('Erro: Nenhum bloco válido com perguntas encontrado em JORNADA_BLOCKS!', window.JORNADA_BLOCKS);
-    return;
-  }
-  content.innerHTML = '';
-  console.log('[JORNADA_CONTROLLER] #perguntas-container limpo');
-  window.JORNADA_BLOCKS.forEach((block, idx) => {
-    if (!Array.isArray(block?.questions)) {
-      console.warn(`Bloco ${idx} inválido: sem perguntas ou perguntas não é um array`, block);
-      return;
+      }, 100);
+      console.log('[JORNADA_CONTROLLER] Jornada iniciada com sucesso, exibindo primeira pergunta');
+    } else {
+      console.error('[JORNADA_CONTROLLER] Dependências não carregadas para iniciar:', {
+        JORNADA_BLOCKS: !!window.JORNADA_BLOCKS,
+        JORNADA_QA: !!window.JORNADA_QA,
+        JORNADA_PAPER: !!window.JORNADA_PAPER,
+        JORNADA_TYPE: !!window.JORNADA_TYPE,
+        JORNADA_RENDER: !!window.JORNADA_RENDER,
+        JC: !!window.JC
+      });
     }
-    const bloco = document.createElement('section');
-    bloco.className = 'j-bloco';
-    bloco.dataset.bloco = idx;
-    bloco.dataset.video = block.video_after || '';
-    bloco.style.display = 'none';
-    console.log(`[JORNADA_CONTROLLER] Criando bloco ${idx} com ${block.questions.length} perguntas`);
-    block.questions.forEach((q, qIdx) => {
-      if (!q?.label) {
-        console.warn(`Pergunta ${qIdx} no bloco ${idx} inválida: sem label`, q);
-        return;
+  }
+
+  // Eventos globais
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next');
+    if (btn) {
+      console.log('[JORNADA_CONTROLLER] Clique no botão avançar detectado:', btn.id || btn.className, 'Seção atual:', document.querySelector('.j-section:not(.hidden)')?.id || 'desconhecida');
+      e.preventDefault();
+      goNext();
+    }
+  }, true);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      const activeEl = document.activeElement;
+      if (activeEl && activeEl.closest('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next')) {
+        console.log('[JORNADA_CONTROLLER] Tecla Enter/Espaço no botão avançar:', activeEl.id || activeEl.className);
+        e.preventDefault();
+        goNext();
       }
-      const pergunta = document.createElement('div');
-      pergunta.className = 'j-pergunta';
-      pergunta.dataset.pergunta = qIdx;
-      pergunta.innerHTML = `
-        <label class="pergunta-enunciado"
-               data-typing
-               data-text="<b>Pergunta ${qIdx + 1}:</b> ${q.label}"
-               data-speed="40" data-cursor="true"></label>
-        <textarea rows="4" class="input" placeholder="Digite sua resposta..." oninput="handleInput(this)"></textarea>
-      `;
-      bloco.appendChild(pergunta);
-      console.log(`[JORNADA_CONTROLLER] Pergunta ${qIdx} adicionada ao bloco ${idx}`);
-    });
-    content.appendChild(bloco);
-    console.log(`[JORNADA_CONTROLLER] Bloco ${idx} adicionado ao DOM`);
+    }
   });
-  const blocos = document.querySelectorAll('.j-bloco');
-  console.log('[JORNADA_CONTROLLER] Blocos no DOM após loadDynamicBlocks:', blocos.length, Array.from(blocos));
-  const firstBloco = content.querySelector('.j-bloco');
-  if (!firstBloco) {
-    console.error('Nenhum bloco criado após loadDynamicBlocks!');
-    return;
-  }
-  firstBloco.style.display = 'block';
-  const firstPergunta = firstBloco.querySelector('.j-pergunta');
-  if (firstPergunta) {
-    firstPergunta.classList.add('active');
-    try {
-      if (window.JORNADA_TYPE?.run) {
-        console.log('[JORNADA_CONTROLLER] Chamando JORNADA_TYPE.run para primeira pergunta');
-        window.JORNADA_TYPE.run(firstPergunta);
-      }
-    } catch (e) {
-      console.error('[JORNADA_CONTROLLER] Erro ao chamar JORNADA_TYPE.run:', e);
-    }
-    const firstTa = firstPergunta.querySelector('textarea');
-    if (firstTa) {
-      console.log('[JORNADA_CONTROLLER] Chamando handleInput para primeira textarea');
-      handleInput(firstTa);
-    }
-  } else {
-    console.error('Nenhuma primeira pergunta encontrada no primeiro bloco!');
-  }
-  try {
-    if (window.loadAnswers) {
-      console.log('[JORNADA_CONTROLLER] Chamando loadAnswers');
-      window.loadAnswers();
-    }
-  } catch (e) {
-    console.error('[JORNADA_CONTROLLER] Erro ao chamar loadAnswers:', e);
-  }
-  console.log('[JORNADA_CONTROLLER] Blocos carregados com sucesso!');
-}
-  
 
-// Certifique-se de que estas funções sejam expostas globalmente
-window.showSection = showSection;
-window.loadDynamicBlocks = loadDynamicBlocks;
+  // Inicialização
   document.addEventListener('DOMContentLoaded', () => {
-    if (S.root()) JC.init();
-    window.addEventListener('load', () => {
-      if (!window.JC._initialized && window.JC?.init) {
-        console.log('Forçando inicialização no load...');
-        JC.init();
-        window.JC._initialized = true;
-      }
-    });
-        window.addEventListener('hashchange', applyPergaminhoByRoute);
+    console.log('[JORNADA_CONTROLLER] Forçando inicialização no DOMContentLoaded...');
+    initJornada();
   });
- 
-  JC._state = state;
-  JC.next = goNext;
-  JC.prev = goPrev;
-  JC.render = render;
-  JC.start = startJourney;
+  window.addEventListener('load', () => {
+    console.log('[JORNADA_CONTROLLER] Forçando inicialização no load...');
+    initJornada();
+  });
 
-  // Funções expostas globalmente para depuração
-  window.showSection = showSection;
-  window.loadDynamicBlocks = loadDynamicBlocks;
-})();
+  // Exports
+  JC.init = initJornada;
+  JC.startJourney = startJourney;
+  JC.goNext = goNext;
 
+  console.log('[JORNADA_CONTROLLER] pronto');
+})();;
