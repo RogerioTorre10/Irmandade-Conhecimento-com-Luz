@@ -312,26 +312,33 @@ function showSection(sectionId) {
 
 function loadDynamicBlocks() {
   const content = document.getElementById('perguntas-container');
-  if (!content) { console.error('Erro: #perguntas-container não encontrado no DOM!'); return; }
-  if (!Array.isArray(window.JORNADA_BLOCKS) || !window.JORNADA_BLOCKS.length) {
-    console.error('Erro: JORNADA_BLOCKS não definido, não é array ou está vazio!'); return;
+  if (!content) {
+    console.error('Erro: #perguntas-container não encontrado no DOM!');
+    return;
   }
-
-  console.log('Conteúdo de JORNADA_BLOCKS:', window.JORNADA_BLOCKS);
+  console.log('[JORNADA_CONTROLLER] #perguntas-container encontrado:', content);
+  if (!Array.isArray(window.JORNADA_BLOCKS) || !window.JORNADA_BLOCKS.length) {
+    console.error('Erro: JORNADA_BLOCKS não definido, não é array ou está vazio!', window.JORNADA_BLOCKS);
+    return;
+  }
+  console.log('[JORNADA_CONTROLLER] Conteúdo de JORNADA_BLOCKS:', window.JORNADA_BLOCKS);
   content.innerHTML = '';
-
   window.JORNADA_BLOCKS.forEach((block, idx) => {
     if (!Array.isArray(block?.questions)) {
-      console.warn(`Bloco ${idx} inválido: sem perguntas ou perguntas não é um array`); return;
+      console.warn(`Bloco ${idx} inválido: sem perguntas ou perguntas não é um array`, block);
+      return;
     }
     const bloco = document.createElement('section');
     bloco.className = 'j-bloco';
     bloco.dataset.bloco = idx;
     bloco.dataset.video = block.video_after || '';
     bloco.style.display = 'none';
-
+    console.log(`[JORNADA_CONTROLLER] Criando bloco ${idx} com ${block.questions.length} perguntas`);
     block.questions.forEach((q, qIdx) => {
-      if (!q?.label) { console.warn(`Pergunta ${qIdx} no bloco ${idx} inválida: sem label`); return; }
+      if (!q?.label) {
+        console.warn(`Pergunta ${qIdx} no bloco ${idx} inválida: sem label`, q);
+        return;
+      }
       const pergunta = document.createElement('div');
       pergunta.className = 'j-pergunta';
       pergunta.dataset.pergunta = qIdx;
@@ -343,15 +350,18 @@ function loadDynamicBlocks() {
         <textarea rows="4" class="input" placeholder="Digite sua resposta..." oninput="handleInput(this)"></textarea>
       `;
       bloco.appendChild(pergunta);
+      console.log(`[JORNADA_CONTROLLER] Pergunta ${qIdx} adicionada ao bloco ${idx}`);
     });
-
     content.appendChild(bloco);
-    console.log(`Bloco ${idx} criado com ${block.questions.length} perguntas`);
+    console.log(`[JORNADA_CONTROLLER] Bloco ${idx} adicionado ao DOM`);
   });
-
+  const blocos = document.querySelectorAll('.j-bloco');
+  console.log('[JORNADA_CONTROLLER] Blocos no DOM após loadDynamicBlocks:', blocos.length, Array.from(blocos));
   const firstBloco = content.querySelector('.j-bloco');
-  if (!firstBloco) { console.error('Nenhum bloco criado após loadDynamicBlocks!'); return; }
-
+  if (!firstBloco) {
+    console.error('Nenhum bloco criado após loadDynamicBlocks!');
+    return;
+  }
   firstBloco.style.display = 'block';
   const firstPergunta = firstBloco.querySelector('.j-pergunta');
   if (firstPergunta) {
@@ -362,7 +372,6 @@ function loadDynamicBlocks() {
   } else {
     console.error('Nenhuma primeira pergunta encontrada no primeiro bloco!');
   }
-
   try { window.loadAnswers && window.loadAnswers(); } catch {}
   console.log('Blocos carregados com sucesso!');
 }
