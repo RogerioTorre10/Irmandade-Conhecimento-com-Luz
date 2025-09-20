@@ -608,18 +608,6 @@
 (function() {
   if (!window.utils) window.utils = {};
 
-  // Garante que window.toast esteja definido primeiro
-  window.toast = window.toast || ((msg) => {
-    try {
-      const t = document.getElementById('toast') || document.createElement('div');
-      t.id = 'toast';
-      t.style.cssText = 'position:fixed;bottom:16px;left:16px;max-width:60ch;padding:10px 14px;border-radius:10px;background:#000a;color:#fff;backdrop-filter:blur(3px);z-index:9999';
-      t.textContent = msg;
-      document.body.appendChild(t);
-      setTimeout(() => t.remove(), 4000);
-    } catch {}
-  });
-
   function dedupe(s='') {
     return s
       .normalize('NFC')
@@ -657,7 +645,7 @@
     return 'lumen';
   }
 
- function preloadGuiaBg(guia = 'lumen') {
+  function preloadGuiaBg(guia = 'lumen') {
     guia = normGuide(guia);
     const GUIDE_BG = {
       lumen: [
