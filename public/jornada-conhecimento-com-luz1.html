@@ -1122,22 +1122,22 @@
   }
 
   function lockNext() {
-    const btn = document.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, .btn, #avancar, #next');
+    const btn = document.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next');
     if (btn) {
       btn.disabled = true;
       btn.setAttribute('aria-busy', 'true');
-      console.log('[lockNext] Botão travado:', btn.id || btn.className || btn.textContent);
+      console.log('[lockNext] Botão travado:', btn.id || btn.className);
     } else {
       console.log('[lockNext] Botão não encontrado');
     }
   }
 
   function unlockNext() {
-    const btn = document.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, .btn, #avancar, #next');
+    const btn = document.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next');
     if (btn) {
       btn.disabled = false;
       btn.removeAttribute('aria-busy');
-      console.log('[unlockNext] Botão liberado:', btn.id || btn.className || btn.textContent);
+      console.log('[unlockNext] Botão liberado:', btn.id || btn.className);
     } else {
       console.log('[unlockNext] Botão não encontrado');
     }
@@ -1194,6 +1194,8 @@
     window.JORNADA_CHAMA && window.JORNADA_CHAMA.ensureHeroFlame(sectionId);
 
     if (sectionId === 'section-perguntas') {
+      console.log('[showSection] Carregando conteúdo dinâmico para section-perguntas');
+      window.loadDynamicBlocks && window.loadDynamicBlocks();
       window.ensureQuestionsReady && window.ensureQuestionsReady();
     }
 
@@ -1213,19 +1215,19 @@
 
     // Adiciona evento ao botão de avançar após mostrar a seção
     setTimeout(() => {
-      const nextBtn = active.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, .btn, #avancar, #next');
+      const nextBtn = active.querySelector('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next');
       if (nextBtn) {
         nextBtn.addEventListener('click', (e) => {
-          console.log('[showSection] Clique no botão avançar detectado na seção:', sectionId, 'Botão:', nextBtn.id || nextBtn.className || nextBtn.textContent);
+          console.log('[showSection] Clique no botão avançar detectado na seção:', sectionId, 'Botão:', nextBtn.id || nextBtn.className);
           e.preventDefault();
           window.goNext();
         }, { once: true });
-        console.log('[showSection] Evento de clique adicionado ao botão avançar em:', sectionId, 'Botão:', nextBtn.id || nextBtn.className || nextBtn.textContent);
+        console.log('[showSection] Evento de clique adicionado ao botão avançar em:', sectionId, 'Botão:', nextBtn.id || nextBtn.className);
       } else {
         console.log('[showSection] Botão avançar não encontrado na seção:', sectionId);
         window.toast('Botão de avançar não encontrado. Tente recarregar.');
       }
-    }, 300); // Atraso maior pra garantir DOM pronto
+    }, 200);
   };
 })();
 
@@ -1233,9 +1235,9 @@
 (function() {
   // Evento delegado para botões de avançar em qualquer seção
   document.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, .btn, #avancar, #next');
+    const btn = e.target.closest('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next');
     if (btn) {
-      console.log('[Eventos Globais] Clique no botão avançar detectado:', btn.id || btn.className || btn.textContent, 'Seção atual:', document.querySelector('.j-section:not(.hidden)')?.id || 'desconhecida');
+      console.log('[Eventos Globais] Clique no botão avançar detectado:', btn.id || btn.className, 'Seção atual:', document.querySelector('.j-section:not(.hidden)')?.id || 'desconhecida');
       e.preventDefault();
       e.stopPropagation();
       window.goNext();
@@ -1246,8 +1248,8 @@
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       const activeEl = document.activeElement;
-      if (activeEl && activeEl.closest('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, .btn, #avancar, #next')) {
-        console.log('[Eventos Globais] Tecla Enter/Espaço no botão avançar:', activeEl.id || activeEl.className || activeEl.textContent);
+      if (activeEl && activeEl.closest('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next')) {
+        console.log('[Eventos Globais] Tecla Enter/Espaço no botão avançar:', activeEl.id || activeEl.className);
         e.preventDefault();
         window.goNext();
       }
@@ -1273,7 +1275,7 @@
         console.error('[Inicialização] Erro ao inicializar página:', e);
         window.toast('Erro ao carregar a página inicial. Tente novamente.');
       }
-    }, 100); // Pequeno atraso pra garantir DOM
+    }, 100);
   });
 })();
   
