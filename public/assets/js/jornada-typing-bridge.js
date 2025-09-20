@@ -26,22 +26,28 @@
   if (!window.readAloud) window.readAloud = (t) => window.speak(t);
 
   // ---------- Adapter: runTyping -> JORNADA_TYPO.typeAll ----------
-  function runTypingAdapter(root) {
-    try {
-      const target =
-        root ||
-        document.getElementById('jornada-conteudo') ||
-        document.querySelector('#jornada-conteudo') ||
-        document;
-      if (window.JORNADA_TYPO && typeof JORNADA_TYPO.typeAll === 'function') {
-        const cfg = (window.JORNADA && JORNADA.typing) || {};
-        JORNADA_TYPO.typeAll(target, {
-          speed: Number(cfg.charDelay ?? (JORNADA_TYPO.DEFAULTS && JORNADA_TYPO.DEFAULTS.speed) || 34),
-          cursor: Boolean(cfg.caret ?? (JORNADA_TYPO.DEFAULTS && JORNADA_TYPO.DEFAULTS.cursor) ?? true),
-        });
-      }
-    } catch (_) {}
+ function runTypingAdapter(root) {
+  try {
+    const target =
+      root ||
+      document.getElementById('jornada-conteudo') ||
+      document.querySelector('#jornada-conteudo') ||
+      document;
+    if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
+      const cfg = (window.JORNADA && JORNADA.typing) || {};
+      window.JORNADA_TYPE.run(target, {
+        selector: '[data-typing]',
+        speed: Number(cfg.charDelay ?? (window.JORNADA_TYPE.DEFAULTS && window.JORNADA_TYPE.DEFAULTS.speed) || 34),
+        delay: 0,
+        showCaret: Boolean(cfg.caret ?? (window.JORNADA_TYPE.DEFAULTS && window.JORNADA_TYPE.DEFAULTS.cursor) ?? true),
+      });
+    } else {
+      console.warn('[TypingBridge] JORNADA_TYPE não disponível ou run não é função');
+    }
+  } catch (e) {
+    console.error('[TypingBridge] Erro ao executar runTypingAdapter:', e);
   }
+}
   if (!window.runTyping) window.runTyping = runTypingAdapter;
 
   // ---------- Auto reapply ----------
