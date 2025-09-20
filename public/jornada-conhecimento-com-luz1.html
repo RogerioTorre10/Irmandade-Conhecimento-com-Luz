@@ -2239,6 +2239,39 @@
     window.initAccessibility = initAccessibility;
   }
 })();
+  
+/* Autobind do mic nas perguntas — 1 função, idempotente */
+(function(){
+  function autobindMic(scope){
+    try{
+      if(!window.JORNADA_MICRO || !window.JORNADA_MICRO.attachAll) return;
+      const sec = document.getElementById('section-perguntas') || document;
+      window.JORNADA_MICRO.attachAll(sec, { mode:'append' }); // liga/religa sem duplicar
+    }catch(e){ console.error('[MIC] autobind erro:', e); }
+  }
+
+  // executa já
+  if (document.readyState !== 'loading') autobindMic();
+  else document.addEventListener('DOMContentLoaded', () => autobindMic());
+
+  // religa ao trocar de idioma
+  document.getElementById('language-select')?.addEventListener('change', () => autobindMic());
+
+  // religa quando aparecer perguntas / avançar de pergunta / criar novos blocos
+  const target = document.getElementById('section-perguntas') || document.body;
+  const mo = new MutationObserver(() => autobindMic());
+  mo.observe(target, { childList:true, subtree:true, attributes:true, attributeFilter:['class'] });
+
+  // religa em cliques de avanço/prev
+  document.addEventListener('click', (e)=>{
+    if (e.target.closest('[data-action="next"],[data-action="avancar"],.btn-avancar,#btnNextPerguntas')) {
+      setTimeout(() => autobindMic(), 0);
+    }
+  }, true);
+
+  // expõe se quiser chamar manualmente
+  window.autobindMic = autobindMic;
+})();
 
 /* ===== Inicialização da Página ===== */
 (function() {
