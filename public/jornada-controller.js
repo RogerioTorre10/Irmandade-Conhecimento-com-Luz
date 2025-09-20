@@ -194,7 +194,7 @@
     }
   }
 
- function startJourney() {
+function startJourney() {
   console.log('[JORNADA_CONTROLLER] Iniciando jornada... Verificando dependências:', {
     JORNADA_BLOCKS: !!window.JORNADA_BLOCKS,
     JORNADA_QA: !!window.JORNADA_QA,
