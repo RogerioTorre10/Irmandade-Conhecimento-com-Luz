@@ -139,8 +139,11 @@
       console.error('Pergunta atual não encontrada no índice:', state.perguntaIndex);
     }
     if (window.JORNADA_TYPE && typeof window.JORNADA_TYPE.run === 'function') {
-      window.JORNADA_TYPE.run(atual);
-    }
+  console.log('[JORNADA_CONTROLLER] Executando JORNADA_TYPE.run em:', atual);
+  window.JORNADA_TYPE.run(atual);
+} else {
+  console.warn('[JORNADA_CONTROLLER] JORNADA_TYPE não disponível ou run não é função');
+}
     applyPergaminhoByBloco(bloco);
     U.setProgress(state.perguntaIndex + 1, perguntas.length);
     const prev = S.btnPrev();
