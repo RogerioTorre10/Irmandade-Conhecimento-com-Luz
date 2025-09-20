@@ -323,6 +323,12 @@ function loadDynamicBlocks() {
     return;
   }
   console.log('[JORNADA_CONTROLLER] Conteúdo de JORNADA_BLOCKS:', window.JORNADA_BLOCKS);
+  // Verificar se JORNADA_BLOCKS contém blocos válidos
+  const validBlocks = window.JORNADA_BLOCKS.filter(block => Array.isArray(block?.questions) && block.questions.length);
+  if (!validBlocks.length) {
+    console.error('Erro: Nenhum bloco válido com perguntas encontrado em JORNADA_BLOCKS!', window.JORNADA_BLOCKS);
+    return;
+  }
   content.innerHTML = '';
   window.JORNADA_BLOCKS.forEach((block, idx) => {
     if (!Array.isArray(block?.questions)) {
