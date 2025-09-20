@@ -192,18 +192,18 @@
   }
 
   function startJourney() {
-    console.log('Iniciando jornada... Verificando dependências:', { JORNADA_BLOCKS: !!window.JORNADA_BLOCKS, JORNADA_QA: !!window.JORNADA_QA, JORNADA_PAPER: !!window.JORNADA_PAPER });
-    if (window.JORNADA_BLOCKS && window.JORNADA_QA && window.JORNADA_PAPER) {
-      showSection('section-perguntas');
-      loadDynamicBlocks();
-      state.blocoIndex = 0;
-      state.perguntaIndex = 0;
-      render(); // Garante a primeira pergunta
-      console.log('Jornada iniciada com sucesso, exibindo primeira pergunta');
-    } else {
-      console.error('Dependências não carregadas para iniciar:', { JORNADA_BLOCKS: !!window.JORNADA_BLOCKS, JORNADA_QA: !!window.JORNADA_QA, JORNADA_PAPER: !!window.JORNADA_PAPER });
-    }
+  console.log('Iniciando jornada... Verificando dependências:', { JORNADA_BLOCKS: !!window.JORNADA_BLOCKS, JORNADA_QA: !!window.JORNADA_QA, JORNADA_PAPER: !!window.JORNADA_PAPER });
+  if (window.JORNADA_BLOCKS && window.JORNADA_QA && window.JORNADA_PAPER) {
+    showSection('section-perguntas');
+    loadDynamicBlocks();
+    state.blocoIndex = 0;
+    state.perguntaIndex = 0;
+    setTimeout(render, 100); // Delay de 100ms
+    console.log('Jornada iniciada com sucesso, exibindo primeira pergunta');
+  } else {
+    console.error('Dependências não carregadas para iniciar:', { JORNADA_BLOCKS: !!window.JORNADA_BLOCKS, JORNADA_QA: !!window.JORNADA_QA, JORNADA_PAPER: !!window.JORNADA_PAPER });
   }
+}
 
   function playTransition(src, onEnd) {
     const overlay = S.overlay();
