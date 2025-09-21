@@ -2178,12 +2178,9 @@ window.loadDynamicBlocks = function() {
     try { console.log('[MIC] attachAll ligados:', count); } catch {}
     return count;
   };
-})(window);
-
-```html
-/* ===== Scripts Externos e Micro-boot ===== */
+})(window);   
 </script>
-
+  
 <script defer src="/config.js?v=5" onload="console.log('[LOAD] config.js carregado')" onerror="console.error('[LOAD] Erro ao carregar config.js')"></script>
 <script defer src="/jornada-utils.js?v=5" onload="console.log('[LOAD] jornada-utils.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-utils.js')"></script>
 <script defer src="/jornada-core.js?v=5" onload="console.log('[LOAD] jornada-core.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-core.js')"></script>
@@ -2200,90 +2197,6 @@ window.loadDynamicBlocks = function() {
 <script defer src="/i18n/i18n.js?v=5" onload="console.log('[LOAD] i18n.js carregado')" onerror="console.error('[LOAD] Erro ao carregar i18n.js')"></script>
 <script defer src="/api.js?v=5" onload="console.log('[LOAD] api.js carregado')" onerror="console.error('[LOAD] Erro ao carregar api.js')"></script>
 
-<!-- HOTFIX: Garantir JC.init com fallback -->
-<script defer>
-(function() {
-  window.JC = window.JC || {};
-  if (typeof window.JC.init !== 'function') {
-    window.JC.state = window.JC.state || { route: 'intro', booted: false };
-    window.JC.onReady = window.JC.onReady || function(cb) { try { cb && cb(); } catch (e) { console.error('[JC] Erro em onReady:', e); } };
-    window.JC.init = function() {
-      window.JC.state.booted = true;
-      window.JC.ready = true;
-      console.warn('[JC] init (fallback) usado — controller não expôs init.');
-    };
-  }
-  console.log('[JC] expose+fallback aplicado — init =', typeof window.JC.init);
-})();
-</script>
-
-<!-- Micro-boot: Inicialização segura com fallback -->
-<script defer>
-(function() {
-  console.log('[BOOT] Iniciando micro-boot…');
-
-  // Verificar módulos ausentes
-  const must = ['CONFIG', 'JUtils', 'JCore', 'JAuth', 'JChama', 'JPaperQA', 'JTyping', 'JController', 'JRender', 'JBootstrap', 'JMicro', 'I18N', 'API'];
-  const missing = must.filter(k => !(k in window));
-  if (missing.length) {
-    console.warn('[BOOT] Módulos ausentes:', missing);
-    window.toast('Alguns módulos não foram carregados. Tente recarregar a página.');
-  }
-
-  // Definir API_BASE com fallback
-  const PRIMARY_DEFAULT = (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || 'https://lumen-backend-api.onrender.com/api';
-  const API = window.API || {};
-  const API_PRIMARY = API.API_PRIMARY || PRIMARY_DEFAULT;
-  const API_FALLBACK = API.API_FALLBACK || API_PRIMARY;
-
-  async function chooseBase() {
-    if (typeof window.API?.health === 'function') {
-      try {
-        const ok = await window.API.health();
-        window.API_BASE = ok ? API_PRIMARY : API_FALLBACK;
-      } catch {
-        console.warn('[BOOT] Health falhou, usando FALLBACK');
-        window.API_BASE = API_FALLBACK;
-      }
-    } else {
-      console.warn('[BOOT] API.health não definido, usando PRIMARY');
-      window.API_BASE = API_PRIMARY;
-    }
-    console.log('[BOOT] API_BASE =', window.API_BASE);
-  }
-
-  // Iniciar jornada com tolerância a erros
-  chooseBase().finally(async () => {
-    try {
-      if (window.JBootstrap && typeof window.JBootstrap.start === 'function') {
-        await window.JBootstrap.start();
-      } else {
-        console.warn('[BOOT] JBootstrap.start não definido');
-      }
-    } catch (e) {
-      console.error('[BOOT] Erro em JBootstrap.start:', e);
-      window.toast('Erro ao iniciar bootstrap.');
-    }
-    try {
-      if (window.JController && typeof window.JController.init === 'function') {
-        await window.JController.init();
-      } else {
-        console.warn('[BOOT] JController.init não definido');
-        if (window.JC && typeof window.JC.init === 'function') {
-          window.JC.init();
-        } else {
-          console.error('[BOOT] JC.init não definido mesmo após hotfix');
-          window.toast('Erro crítico ao iniciar a jornada.');
-        }
-      }
-    } catch (e) {
-      console.error('[BOOT] Erro em JController.init:', e);
-      window.toast('Erro ao iniciar controlador.');
-    }
-    console.log('[BOOT] Jornada iniciada 🚀');
-  });
-})();
-</script>
 </body>
 </html>
 
