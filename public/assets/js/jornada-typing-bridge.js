@@ -9,13 +9,6 @@
   'use strict';
   console.log('[TypingBridge] Iniciando carregamento do script...');
 
-  // Definir runTypingAdapter como fallback
-  if (!window.runTypingAdapter) {
-    window.runTypingAdapter = function (root) {
-      console.warn('[TypingBridge] runTypingAdapter chamado antes da inicialização completa');
-    };
-  }
-
   // ---------- TTS seguro ----------
   if (!window.speak) {
     window.speak = function (text = '') {
