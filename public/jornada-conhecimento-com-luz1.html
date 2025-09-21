@@ -1368,41 +1368,7 @@
       function updateBlocks(){
         window.JORNADA_BLOCKS = blockTranslations[currentLang] || blockTranslations['pt-BR'];
       }
-      /* ===== JORNADA_MICRO.attachAll ===== */
-(function(g) {
-  if (!g.JORNADA_MICRO) return;
-  if (g.JORNADA_MICRO.attachAll) return;
-  g.JORNADA_MICRO.attachAll = function(scope = document, opts = {}) {
-    const root = (typeof scope === 'string') ? document.querySelector(scope) : (scope || document);
-    if (!root) return 0;
-    if (!g.JORNADA_MICRO.attach) {
-      console.error('[MIC] JORNADA_MICRO.attach não definido');
-      return 0;
-    }
-    const areas = Array.from(root.querySelectorAll('textarea'));
-    let count = 0;
-    for (const ta of areas) {
-      if (ta.dataset.micBound === '1') continue;
-      const ctrl = g.JORNADA_MICRO.attach(ta, opts);
-      ta.dataset.micBound = '1';
-      ta._micCtrl = ctrl;
-      count++;
-    }
-    try { console.log('[MIC] attachAll ligados:', count); } catch {}
-    return count;
-  };
-})(window);   
-
-      /* boot */
-      ensureHeaderFlame();
-      ensurePageFlames();
-      runTyping();
-      initJornada();
-      showSection('section-intro');
-      updateBlocks();
-      lockVideoOrientation();
-    })();
-  
+      
 </script>
   
 <script defer src="/config.js?v=5" onload="console.log('[LOAD] config.js carregado')" onerror="console.error('[LOAD] Erro ao carregar config.js')"></script>
