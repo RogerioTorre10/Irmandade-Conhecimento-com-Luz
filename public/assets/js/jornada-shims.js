@@ -42,18 +42,17 @@
     } catch (e) {
       console.error('[SHIMS] Erro showSection:', e);
     }
-  }
- 
-/* Delegação simples para navegar por data-next */
+  } 
+
+/* Delegação só se houver data-next; caso contrário, não faz nada */
 document.addEventListener('click', (ev) => {
-  const btn = ev.target.closest('[data-action="next"]');
-  if (!btn) return;
+  const btn = ev.target.closest('[data-action="next"][data-next]');
+  if (!btn) return;               // sem data-next -> ignora silencioso
   ev.preventDefault();
+  ev.stopPropagation();           // evita dupla manobra se outro handler existir
   const next = btn.getAttribute('data-next');
-  if (next && typeof window.showSection === 'function') {
+  if (typeof window.showSection === 'function') {
     window.showSection(next);
-  } else {
-    console.warn('[NAV] Botão sem data-next ou showSection indisponível.');
   }
 });
 
