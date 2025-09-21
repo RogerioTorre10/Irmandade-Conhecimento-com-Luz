@@ -2,57 +2,35 @@
    jornada-bootstrap.js
    Inicialização da jornada com tolerância a erros e espera por dependências
    ========================================================= */
-;(function () {
+(function () {
   'use strict';
-  console.log('[BOOT] Iniciando micro-boot...');
-
-  // Lista de scripts carregados
-  const scripts = [
-    { defer: true, src: 'https://irmandade-conhecimento-com-luz.onrender.com/assets/js/toast-safe.js' },
-    { defer: false, src: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js' },
-    { defer: false, src: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js' },
-    { defer: false, src: '(inline)' },
-    { defer: false, src: '(inline)' },
-    { defer: false, src: '(inline)' },
-    { defer: true, src: 'https://irmandade-conhecimento-com-luz.onrender.com/config.js?v=5' },
-    { defer: true, src: 'https://irmandade-conhecimento-com-luz.onrender.com/jornada-utils.js?v=5' },
-    { defer: true, src: 'https://irmandade-conhecimento-com-luz.onrender.com/jornada-core.js?v=5' },
-    { defer: true, src: 'https://irmandade-conhecimento-com-luz.onrender.com/jornada-auth.js?v=5' },
-    { defer: true, src: 'https://irmandade-conhecimento-com-luz.onrender.com/jornada-chama.js?v=5' },
-    { defer: true, src: 'https://irmandade-conhecimento-com-luz.onrender.com/jornada-paper-qa.js?v=5' },
-    { defer: true, src: 'https://irmandade-conhecimento-com-luz.onrender.com/jornada-typing.js?v=5' },
-    { defer: true, src: 'https://irmandade-conhecimento-com-luz.onrender.com/assets/js/jornada-typing-bridge.js?v=1' },
-    { defer: true, src: 'https://irmandade-conhecimento-com-luz.onrender.com/jornada-controller.js?v=5' },
-    { defer: true, src: 'https://irmandade-conhecimento-com-luz.onrender.com/jornada-render.js?v=5' },
-    { defer: true, src: 'https://irmandade-conhecimento-com-luz.onrender.com/jornada-bootstrap.js?v=5' },
-    { defer: true, src: 'https://irmandade-conhecimento-com-luz.onrender.com/jornada-micro.js?v=5' },
-    { defer: true, src: 'https://irmandade-conhecimento-com-luz.onrender.com/i18n/i18n.js?v=5' },
-    { defer: true, src: 'https://irmandade-conhecimento-com-luz.onrender.com/api.js?v=5' },
-    { defer: false, src: '(inline)' }
-  ];
-  console.log('[BOOT] scripts carregados (ordem):', scripts);
+  console.log('[BOOT] Iniciando micro-boot v5.1...');
 
   // Sondagem de módulos
   const must = ['CONFIG', 'JUtils', 'JCore', 'JAuth', 'JChama', 'JPaperQA', 'JTyping', 'JController', 'JRender', 'JBootstrap', 'JMicro', 'I18N', 'API'];
   const missing = must.filter(k => !(k in window));
-  if (missing.length) console.warn('[BOOT] Módulos ausentes:', missing);
+  if (missing.length) {
+    console.warn('[BOOT] Módulos ausentes:', missing);
+    window.toast && window.toast('Alguns módulos não foram carregados. Tente recarregar.');
+  }
 
   // Definição segura de API_BASE
-  const PRIMARY_DEFAULT = (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || 'https://conhecimento-com-luz-api.onrender.com';
+  const PRIMARY_DEFAULT = (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || 'https://lumen-backend-api.onrender.com/api';
   const API = window.API || {};
   const API_PRIMARY = API.API_PRIMARY || PRIMARY_DEFAULT;
-  const API_FALLBACK = API.API_FALLBACK || API_PRIMARY;
+  const API_FALLBACK = API.API_FALLBACK || 'https://conhecimento-com-luz-api.onrender.com';
 
   async function chooseBase() {
-    if (typeof API.health === 'function') {
+    if (typeof window.API?.health === 'function') {
       try {
-        const ok = await API.health();
+        const ok = await window.API.health();
         window.API_BASE = ok ? API_PRIMARY : API_FALLBACK;
       } catch {
-        console.warn('[BOOT] Health falhou, usando FALLBACK');
+        console.warn('[BOOT] Health falhou, usando FALLBACK:', API_FALLBACK);
         window.API_BASE = API_FALLBACK;
       }
     } else {
+      console.warn('[BOOT] API.health não definido, usando PRIMARY:', API_PRIMARY);
       window.API_BASE = API_PRIMARY;
     }
     console.log('[BOOT] API_BASE =', window.API_BASE);
@@ -60,45 +38,70 @@
 
   // Função de inicialização
   async function boot() {
-    console.log('[BOOT] tentando iniciar • rota:', location.hash || 'intro');
+    console.log('[BOOT] Tentando iniciar • rota:', location.hash || 'intro');
     const route = (location.hash || '#intro').slice(1);
-    if (!window.JC || !window.JC._state) {
-      console.warn('[BOOT] JC ou estado não disponível ainda. Aguardando...');
-      return;
-    }
     try {
       if (window.JORNADA_RENDER) {
         if (route === 'intro') {
-          console.log('[BOOT] → renderIntro()');
-          window.JORNADA_RENDER.renderIntro();
+          window.JORNADA_RENDER.renderIntro && window.JORNADA_RENDER.renderIntro();
         } else {
-          window.JORNADA_RENDER.render(route);
+          window.JORNADA_RENDER.render && window.JORNADA_RENDER.render(route);
         }
       } else {
         console.warn('[BOOT] JORNADA_RENDER não disponível, pulando renderização');
       }
-      await window.JC.init();
-      console.log('[BOOT] inicialização concluída.');
+      if (window.JC && typeof window.JC.init === 'function') {
+        await window.JC.init();
+        console.log('[BOOT] JC.init concluído');
+      } else {
+        console.warn('[BOOT] JC.init não disponível, usando fallback');
+        window.JC = window.JC || {};
+        window.JC.state = window.JC.state || { route: 'intro', booted: true };
+        window.JC.init = function() {
+          window.JC.state.booted = true;
+          window.JC.ready = true;
+          console.warn('[BOOT] JC.init (fallback) aplicado');
+        };
+        await window.JC.init();
+      }
+      console.log('[BOOT] Inicialização concluída com sucesso');
     } catch (e) {
       console.error('[BOOT] Erro ao iniciar:', e);
+      window.toast && window.toast('Erro ao iniciar a jornada.');
     }
   }
 
-  // Espera dependências com timeout maior
+  // Espera dependências
   function startWhenReady() {
     let tries = 0;
-    const maxTries = 50; // Aumentado para 5 segundos (50 * 100ms)
+    const maxTries = 100;
     const interval = setInterval(async () => {
       tries++;
       console.log('[BOOT] Tentativa', tries, 'de', maxTries);
-      if (window.JC && window.JC._state) {
+      if (window.JC && typeof window.JC.init === 'function') {
         clearInterval(interval);
         await boot();
       } else if (tries >= maxTries) {
         clearInterval(interval);
-        console.error('[BOOT] desisti de iniciar: JC não ficou disponível a tempo.');
+        console.error('[BOOT] JC não disponível após', maxTries, 'tentativas');
+        window.JC = window.JC || {};
+        window.JC.state = window.JC.state || { route: 'intro', booted: true };
+        window.JC.init = function() {
+          window.JC.state.booted = true;
+          window.JC.ready = true;
+          console.warn('[BOOT] JC.init (fallback) aplicado');
+        };
+        await boot();
       }
     }, 100);
+    // Timeout de segurança
+    setTimeout(() => {
+      if (tries < maxTries) {
+        clearInterval(interval);
+        console.warn('[BOOT] Timeout de segurança atingido, forçando inicialização');
+        boot();
+      }
+    }, 15000);
   }
 
   // Iniciar após escolher API_BASE
@@ -112,4 +115,4 @@
     console.log('[BOOT] Inicialização final no load...');
     boot();
   });
-})();;
+})();
