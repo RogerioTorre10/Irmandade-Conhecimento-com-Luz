@@ -1998,13 +1998,18 @@ window.loadDynamicBlocks = function() {
   const content = document.getElementById('perguntas-container');
   if (!content) {
     console.log('[loadDynamicBlocks] Container de perguntas não encontrado');
-    window.toast('Erro ao carregar perguntas.');
+    window.toast && window.toast('Erro ao carregar perguntas.');
     return;
   }
 
   const blocks = window.JORNADA_BLOCKS || [];
-  content.innerHTML = '';
+  if (!blocks.length) {
+    console.error('[loadDynamicBlocks] JORNADA_BLOCKS não definido ou vazio');
+    window.toast && window.toast('Nenhum bloco de perguntas encontrado.');
+    return;
+  }
 
+  content.innerHTML = '';
   blocks.forEach((block, bIdx) => {
     const bloco = document.createElement('section');
     bloco.className = 'j-bloco';
@@ -2017,21 +2022,19 @@ window.loadDynamicBlocks = function() {
       div.className = 'j-pergunta';
       div.dataset.pergunta = qIdx;
 
-      const enunciado = `
+      div.innerHTML = `
         <label class="pergunta-enunciado text" 
                data-typing="true" 
                data-text="Pergunta ${qIdx + 1}: ${label}" 
                data-speed="36" 
-               data-cursor="true"></label>`;
-
-      div.innerHTML = enunciado +
-        `\n<textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>` +
-        `<div class="accessibility-controls">` +
-        `<button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>` +
-        `<button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>` +
-        `<button class="btn-avancar" data-action="avancar">Avançar</button>` +
-        `</div>`;
-
+               data-cursor="true"></label>
+        <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
+        <div class="accessibility-controls">
+          <button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>
+          <button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>
+          <button class="btn-avancar" data-action="avancar">Avançar</button>
+        </div>
+      `;
       bloco.appendChild(div);
     });
 
@@ -2052,6 +2055,7 @@ window.loadDynamicBlocks = function() {
   const firstTa = document.querySelector('.j-bloco .j-pergunta textarea');
   if (firstTa && window.handleInput) window.handleInput(firstTa);
   if (window.initAccessibility) window.initAccessibility();
+  console.log('[loadDynamicBlocks] Blocos carregados com sucesso');
 };
 
 /* ===== Acessibilidade: Microfone e Áudio ===== */
