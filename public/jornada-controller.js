@@ -51,7 +51,7 @@
     console.log('[JORNADA_CONTROLLER] Iniciando loadDynamicBlocks...');
     const content = document.getElementById('perguntas-container');
     if (!content) {
-      console.error('[JORNADA_CONTROLLER] Erro: #perguntas-container não encontrado no DOM!');
+      console.error('[JORNADA_CONTROLLER] Erro: #perguntas-container não encontrado!');
       window.toast && window.toast('Container de perguntas não encontrado.');
       return;
     }
@@ -235,6 +235,10 @@
       console.error('[JORNADA_CONTROLLER] Erro em initJornada:', e);
       window.toast && window.toast('Erro ao inicializar a jornada.');
     }
+    if (JC._onReady && Array.isArray(JC._onReady)) {
+      JC._onReady.forEach(fn => { try { fn(); } catch (e) {} });
+      JC._onReady = [];
+    }
   }
 
   // Iniciar jornada
@@ -244,8 +248,7 @@
       JORNADA_QA: !!window.JORNADA_QA,
       JORNADA_PAPER: !!window.JORNADA_PAPER,
       JORNADA_TYPE: !!window.JORNADA_TYPE,
-      JORNADA_RENDER: !!window.JORNADA_RENDER,
-      JC: !!window.JC
+      JORNADA_RENDER: !!window.JORNADA_RENDER
     });
     if (window.JORNADA_BLOCKS && window.JORNADA_QA && window.JORNADA_PAPER && window.JORNADA_TYPE) {
       window.showSection && window.showSection('section-perguntas');
@@ -338,16 +341,15 @@
 })();
 ```
 
-#### Corrected `jornada-bootstrap.js`
+#### 2. `jornada-bootstrap.js`
 
-**Changes Made**:
-1. **Improved `startWhenReady`**: Updated to check for `JC.init` instead of `JC._state`, aligning with the hotfix and controller logic. Increased `maxTries` to 100 (10 seconds) for more leniency.
-2. **Fallback for `JC`**: Added logic to force the creation of `JC.init` if it’s still missing after the maximum attempts.
-3. **Standardized `API_BASE`**: Used `https://lumen-backend-api.onrender.com/api` to align with the main HTML file, with fallback to `https://conhecimento-com-luz-api.onrender.com`.
-4. **Enhanced Logging**: Added detailed logs for each attempt to aid debugging.
-5. **Removed Redundant Scripts List**: The `scripts` array is logged but not used; I kept it for debugging but simplified the boot process.
+**Mudanças**:
+- **Ajustado `startWhenReady`**: Verifica `JC.init` em vez de `JC._state`, alinhando com o hotfix e `jornada-controller.js`. Aumentado `maxTries` para 100 (10 segundos).
+- **Adicionado Fallback**: Força a criação de `JC.init` se não estiver disponível após as tentativas.
+- **Padronizado `API_BASE`**: Usado `https://lumen-backend-api.onrender.com/api` com fallback para `https://conhecimento-com-luz-api.onrender.com`.
+- **Removido Lista de Scripts Redundante**: A lista de scripts não é usada para nada além de logging, então simplifiquei o código.
 
-<xaiArtifact artifact_id="f4e83de0-3e2c-49de-87ce-6e0eac406eb0" artifact_version_id="e7a35fd4-942b-42f2-b187-891b5a9b9082" title="jornada-bootstrap.js" contentType="text/javascript">
+<xaiArtifact artifact_id="ead42723-e106-4aff-8505-e03ff980547e" artifact_version_id="fddbca80-0468-4cd1-b2f2-4a5593200810" title="jornada-bootstrap.js" contentType="text/javascript">
 ```javascript
 /* =========================================================
    jornada-bootstrap.js
@@ -425,7 +427,7 @@
   // Espera dependências
   function startWhenReady() {
     let tries = 0;
-    const maxTries = 100; // 10 segundos
+    const maxTries = 100;
     const interval = setInterval(async () => {
       tries++;
       console.log('[BOOT] Tentativa', tries, 'de', maxTries);
@@ -435,7 +437,6 @@
       } else if (tries >= maxTries) {
         clearInterval(interval);
         console.error('[BOOT] JC não disponível após', maxTries, 'tentativas');
-        // Forçar fallback
         window.JC = window.JC || {};
         window.JC.state = window.JC.state || { route: 'intro', booted: true };
         window.JC.init = function() {
@@ -462,13 +463,120 @@
 })();
 ```
 
----
+#### 3. `jornada-shims.js`
 
-### Integration with `jornada-conhecimento-com-luz1.html`
+**Mudanças**:
+- **Removido `showSection` redundante**: Como `jornada-conhecimento-com-luz1.html` já define uma versão mais robusta de `window.showSection`, removi a definição de `jornada-shims.js` para evitar conflitos.
+- **Simplificado Shims**: Mantive apenas os shims necessários para módulos ausentes e funções críticas.
+- **Adicionado Verificações**: Garanti que os shims não sobrescrevam implementações reais.
 
-The main HTML file already includes the scripts in the correct order, with the hotfix for `JC` before `jornada-bootstrap.js`. However, to ensure compatibility, here’s the updated `<script>` section from `jornada-conhecimento-com-luz1.html` to match the corrected `jornada-controller.js` and `jornada-bootstrap.js`:
+<xaiArtifact artifact_id="9a4c5710-46cf-48fc-832a-77ac6676a3a1" artifact_version_id="7d984461-2bab-485a-84bb-d2725ecefc38" title="jornada-shims.js" contentType="text/javascript">
+```javascript
+/* =========================================================
+   jornada-shims.js
+   Garante funções globais e módulos ausentes
+   ========================================================= */
+(function () {
+  'use strict';
+  console.log('[SHIMS] Iniciando shims v5...');
 
-<xaiArtifact artifact_id="60ea2d4b-35d5-4288-be0e-2f72819a7cd2" artifact_version_id="b2741262-efab-447a-95df-4f105cab3bea" title="jornada-conhecimento-com-luz1.html" contentType="text/html">
+  // Helpers leves
+  const q = (sel, root = document) => root.querySelector(sel);
+  const qa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+  // Evita quebra se console não existir
+  window.console = window.console || { log() {}, warn() {}, error() {} };
+
+  // Classe usada para esconder seções
+  const HIDE_CLASS = 'section-hidden';
+
+  // Garante a classe CSS básica
+  if (!q('#jornada-shims-style')) {
+    const st = document.createElement('style');
+    st.id = 'jornada-shims-style';
+    st.textContent = `
+      .${HIDE_CLASS} { display: none !important; }
+      section[id^="section-"] { width: 100%; }
+    `;
+    document.head.appendChild(st);
+  }
+
+  // Shims para módulos ausentes
+  window.CONFIG = window.CONFIG || {};
+  window.JUtils = window.JUtils || {};
+  window.JCore = window.JCore || {};
+  window.JAuth = window.JAuth || {};
+  window.JChama = window.JChama || {};
+  window.JPaperQA = window.JPaperQA || {};
+  window.JTyping = window.JTyping || {};
+  window.JController = window.JController || {};
+  window.JRender = window.JRender || {};
+  window.JBootstrap = window.JBootstrap || {};
+  window.JMicro = window.JMicro || {};
+  window.I18N = window.I18N || {};
+  window.API = window.API || { base: (window.API_BASE || '') };
+
+  // Handler leve para inputs
+  window.handleInput = window.handleInput || function handleInput(ev) {
+    try {
+      const el = ev && ev.target ? ev.target : null;
+      if (!el) return;
+      const max = parseInt(el.getAttribute('maxlength') || '0', 10);
+      if (max > 0 && el.value.length > max) el.value = el.value.slice(0, max);
+      el.dataset.touched = '1';
+    } catch (e) {
+      console.error('[SHIMS] handleInput erro:', e);
+    }
+  };
+
+  // Ponte mínima para datilografia
+  window.JORNADA_TYPE = window.JORNADA_TYPE || {
+    run(rootSelector = '#perguntas-container') {
+      try {
+        const root = (typeof rootSelector === 'string')
+          ? (window.q ? q(rootSelector) : document.querySelector(rootSelector))
+          : rootSelector;
+        if (!root) {
+          console.warn('[JORNADA_TYPE] root não encontrado');
+          return;
+        }
+        const firstText = (window.q ? q('[data-type="texto"], .j-texto, p, .typing', root)
+          : root.querySelector('[data-type="texto"], .j-texto, p, .typing'));
+        if (firstText && window.TypingBridge && typeof window.TypingBridge.play === 'function') {
+          window.TypingBridge.play(firstText);
+        }
+        const inputs = (window.qa ? qa('textarea, input[type="text"], input[type="search"]', root)
+          : Array.from(root.querySelectorAll('textarea, input[type="text"], input[type="search"]')));
+        inputs.forEach(el => {
+          el.removeEventListener('input', window.handleInput);
+          el.addEventListener('input', window.handleInput);
+        });
+        console.log('[JORNADA_TYPE] run concluído');
+      } catch (e) {
+        console.error('[JORNADA_TYPE] erro:', e);
+      }
+    }
+  };
+
+  // Fallback para seção inicial
+  document.addEventListener('DOMContentLoaded', () => {
+    const visible = qa('section[id^="section-"]').find(s => !s.classList.contains(HIDE_CLASS));
+    if (!visible && window.showSection) {
+      if (q('#section-intro')) window.showSection('section-intro');
+    }
+  });
+})();
+```
+
+#### 4. `jornada-conhecimento-com-luz1.html` (trecho até `</body>`)
+
+**Mudanças**:
+- **Removido Hotfix Redundante**: O hotfix para `JC` foi consolidado em `jornada-controller.js`.
+- **Atualizado Ordem de Scripts**: Garantido que `jornada-shims.js` carrega antes de `jornada-controller.js` para fornecer fallbacks.
+- **Adicionado Logs de Carregamento**: Mantido `onload` e `onerror` para depuração.
+- **Padronizado `API_BASE`**: Alinhado com `jornada-bootstrap.js`.
+
+<xaiArtifact artifact_id="e9003230-a49c-4999-b697-a0d4e2456d4b" artifact_version_id="2451cc22-14be-4ea3-84da-00d89761f33d" title="jornada-conhecimento-com-luz1.html" contentType="text/html">
 ```html
 <!-- Scripts Externos -->
 <script defer src="/config.js?v=5" onload="console.log('[LOAD] config.js carregado')" onerror="console.error('[LOAD] Erro ao carregar config.js')"></script>
@@ -479,15 +587,15 @@ The main HTML file already includes the scripts in the correct order, with the h
 <script defer src="/jornada-paper-qa.js?v=5" onload="console.log('[LOAD] jornada-paper-qa.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-paper-qa.js')"></script>
 <script defer src="/jornada-typing.js?v=5" onload="console.log('[LOAD] jornada-typing.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-typing.js')"></script>
 <script defer src="/assets/js/jornada-typing-bridge.js?v=1" onload="console.log('[LOAD] jornada-typing-bridge.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-typing-bridge.js')"></script>
+<script defer src="/assets/js/jornada-shims.js?v=5" onload="console.log('[LOAD] jornada-shims.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-shims.js')"></script>
 <script defer src="/jornada-controller.js?v=5" onload="console.log('[LOAD] jornada-controller.js carregado'); console.log('[JC] Após controller: JC existe?', !!window.JC, 'init =', typeof (window.JC && window.JC.init))" onerror="console.error('[LOAD] Erro ao carregar jornada-controller.js')"></script>
 <script defer src="/jornada-render.js?v=5" onload="console.log('[LOAD] jornada-render.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-render.js')"></script>
-<script defer src="/assets/js/jornada-shims.js?v=5" onload="console.log('[LOAD] jornada-shims.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-shims.js')"></script>
 <script defer src="/jornada-bootstrap.js?v=5" onload="console.log('[LOAD] jornada-bootstrap.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-bootstrap.js')"></script>
 <script defer src="/jornada-micro.js?v=5" onload="console.log('[LOAD] jornada-micro.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-micro.js')"></script>
 <script defer src="/i18n/i18n.js?v=5" onload="console.log('[LOAD] i18n.js carregado')" onerror="console.error('[LOAD] Erro ao carregar i18n.js')"></script>
 <script defer src="/api.js?v=5" onload="console.log('[LOAD] api.js carregado')" onerror="console.error('[LOAD] Erro ao carregar api.js')"></script>
 
-<!-- Micro-boot: Inicialização segura com fallback -->
+<!-- Micro-boot: Inicialização segura -->
 <script defer>
 (function() {
   console.log('[BOOT] Iniciando micro-boot…');
@@ -556,3 +664,5 @@ The main HTML file already includes the scripts in the correct order, with the h
   });
 })();
 </script>
+</body>
+</html>
