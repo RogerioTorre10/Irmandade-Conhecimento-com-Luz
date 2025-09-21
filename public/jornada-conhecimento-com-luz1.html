@@ -2271,6 +2271,9 @@ window.loadDynamicBlocks = function() {
         console.warn('[BOOT] JController.init não definido');
         if (window.JC && typeof window.JC.init === 'function') {
           window.JC.init();
+        } else {
+          console.error('[BOOT] JC.init não definido mesmo após hotfix');
+          window.toast('Erro crítico ao iniciar a jornada.');
         }
       }
     } catch (e) {
@@ -2283,12 +2286,5 @@ window.loadDynamicBlocks = function() {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
 
 
