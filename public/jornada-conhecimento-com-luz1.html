@@ -604,63 +604,21 @@
 /* SAFE SENTINEL */ void 0;
 'use strict';
 
-/* ===== Toast ===== */
-(function hardenToast() {
-  const TOAST_ID = 'toast';
-  function emit(msg) {
-    try {
-      let t = document.getElementById(TOAST_ID);
-      if (!t) {
-        t = document.createElement('div');
-        t.id = TOAST_ID;
-        t.className = 'hidden';
-        t.style.cssText = `
-          position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%);
-          background: #111; color: #fff; padding: 10px 14px; border-radius: 10px;
-          box-shadow: 0 6px 18px rgba(0,0,0,.35); z-index: 4000;
-        `;
-        document.body.appendChild(t);
-      }
-      t.textContent = msg;
-      t.classList.remove('hidden');
-      t.classList.add('show');
-      setTimeout(() => {
-        t.classList.remove('show');
-        t.classList.add('hidden');
-      }, 3000);
-    } catch (_) {}
-  }
-  try { delete window.toast; } catch (_) {}
-  window.toast = emit;
-})();
-
-/* ===== Utils ===== */
+/* ===== Utils ÚNICOS ===== */
 (function() {
   if (!window.utils) window.utils = {};
 
-  function dedupe(s = '') {
-    if (!s) return '';
-    let result = s.normalize('NFC').trim().replace(/\s+/g, ' ');
-    const validDoubleConsonants = /^(.*?(?:ss|rr|tt|cc|pp|mm|nn|ll|bb|dd|ff|gg|vv|zz)[a-z]*?)$/i;
-    const words = result.split(' ');
-    const out = [];
-    for (let w of words) {
-      if (validDoubleConsonants.test(w)) {
-        out.push(w);
-      } else {
-        let c = w[0] || '';
-        for (let i = 1; i < w.length; i++) {
-          if (w[i] !== w[i - 1] || !/[a-zA-Z]/.test(w[i])) c += w[i];
-        }
-        out.push(c);
-      }
-    }
-    return out.join(' ').trim();
+  function dedupe(s='') {
+    return s
+      .normalize('NFC')
+      .replace(/([\p{L}\p{N}])\1+/gu, '$1')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
   }
 
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-  function stripApiBase(url = '') {
+  function stripApiBase(url='') {
     return url.replace(/\/(v1\/chat|v1\/chat\/completions|v1\/completions|chat|chat\/completions)\/?$/,'');
   }
 
@@ -712,32 +670,59 @@
     return loadFirstAvailable(GUIDE_BG[guia] || []);
   }
 
+  if (!window.readAloud) {
+    window.readAloud = (text, voiceName) => {
+      try {
+        const u = new SpeechSynthesisUtterance(text);
+        if (voiceName) {
+          const v = speechSynthesis.getVoices().find(v => v.name === voiceName);
+          if (v) u.voice = v;
+        }
+        speechSynthesis.speak(u);
+      } catch {}
+    };
+  }
+
+  function typeTextOnce(el, text, speed=24) {
+    if (!el) return;
+    if (el.dataset.typerApplied === '1') return;
+    el.dataset.typerApplied = '1';
+    el.textContent = '';
+    let i = 0;
+    const timer = setInterval(() => {
+      el.textContent += text[i] || '';
+      i++;
+      if (i >= text.length) clearInterval(timer);
+    }, speed);
+  }
+
   window.utils.dedupe = dedupe;
   window.utils.sleep = sleep;
   window.utils.stripApiBase = stripApiBase;
   window.utils.loadFirstAvailable = loadFirstAvailable;
   window.utils.normGuide = normGuide;
   window.utils.preloadGuiaBg = preloadGuiaBg;
+  window.typeTextOnce = typeTextOnce;
 })();
 
 /* ===== Config & API Client ===== */
-(function() {
+(() => {
   const CHAT_PATHS = [
-    '/v1/chat', '/v1/chat/completions', '/v1/completions', '/chat', '/chat/completions'
+    '/v1/chat',
+    '/v1/chat/completions',
+    '/v1/completions',
+    '/chat',
+    '/chat/completions'
   ];
+
   const DEFAULTS = {
     lumen: { apiUrlBase: 'https://lumen-backend-api.onrender.com', model: 'gpt-5', voice: 'female' },
     zion:  { apiUrlBase: 'https://zion-backend-api.onrender.com',  model: 'grok',  voice: 'male'   },
-    arian: { apiUrlBase: 'https://arion-backend-api.onrender.com', model: 'gemini', voice: 'female' }
+    arian: { apiUrlBase: 'https://arion-backend-api.onrender.com',  model: 'gemini',voice: 'female' }
   };
 
-  function getGuideConfig(guia = 'lumen') {
-    if (!window.utils || !window.utils.stripApiBase) {
-      console.error('[Config & API] window.utils.stripApiBase não definido');
-      window.toast('Erro de configuração. Tente recarregar.');
-      return DEFAULTS.lumen;
-    }
-    const g = window.utils.normGuide(guia);
+  function getGuideConfig(guia='lumen') {
+    const g = guia.toLowerCase();
     const winCfg = (window.guiaConfigs && window.guiaConfigs[g]) || {};
     const base = window.utils.stripApiBase(winCfg.apiUrlBase || winCfg.apiUrl || DEFAULTS[g]?.apiUrlBase || DEFAULTS.lumen.apiUrlBase);
     return {
@@ -760,7 +745,7 @@
           credentials: 'omit'
         });
         if (r.ok) return await r.json();
-        lastErr = new Error(`HTTP ${r.status} @ ${path}: ${await r.text()}`);
+        lastErr = new Error(`HTTP ${r.status} @ ${path}`);
         if (r.status !== 404) break;
       } catch (e) {
         lastErr = e;
@@ -769,35 +754,30 @@
     throw lastErr || new Error('Falha ao chamar chat');
   }
 
-  async function fetchDevolutiva(pergunta, resposta, guia = 'lumen', { maxRetries = 3, retryDelay = 900 } = {}) {
-    if (!window.utils || !window.utils.dedupe) {
-      console.error('[fetchDevolutiva] window.utils.dedupe não definido');
-      window.toast('Erro ao processar devolutiva.');
-      return 'Erro ao processar devolutiva.';
-    }
+  async function fetchDevolutiva(pergunta, resposta, guia='lumen', {maxRetries=3, retryDelay=900} = {}) {
     const cfg = getGuideConfig(guia);
-    const quem = cfg.guia === 'zion' ? 'Zion (Grok)' : (cfg.guia === 'arian' ? 'Arian (Gemini)' : 'Lumen (ChatGPT)');
+    const quem = cfg.guia==='zion' ? 'Zion (Grok)' : (cfg.guia==='arian' ? 'Arian (Gemini)' : 'Lumen (ChatGPT)');
     const payload = {
       model: cfg.model,
       messages: [
         { role: 'system', content: `Você é ${quem} guiando a Jornada. Seja acolhedor, simbólico e breve.` },
-        { role: 'user', content: `Pergunta: ${window.utils.dedupe(pergunta)}\nResposta: ${resposta ?? '(vazia)'}` }
+        { role: 'user',   content: `Pergunta: ${window.utils.dedupe(pergunta)}\nResposta: ${resposta ?? '(vazia)'}` }
       ],
       temperature: 0.7,
       meta: { guia: cfg.guia.toUpperCase() }
     };
 
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    for (let attempt=1; attempt<=maxRetries; attempt++) {
       try {
         const data = await chatRequest(cfg.apiUrlBase, payload);
         const text = data?.content || data?.choices?.[0]?.message?.content || 'Obrigado por compartilhar. Sua reflexão ilumina o caminho.';
-        if (!window.isMuted && window.readAloud) window.readAloud(text, cfg.voice);
+        if (!window.isMuted) window.readAloud(text, cfg.voice);
         return text;
       } catch (e) {
         if (attempt === maxRetries) {
           const msg = `Não consegui falar com ${cfg.guia}. Tente novamente em instantes.`;
           window.toast(msg);
-          if (!window.isMuted && window.readAloud) window.readAloud(msg, cfg.voice);
+          if (!window.isMuted) window.readAloud(msg, cfg.voice);
           return msg;
         }
         await window.utils.sleep(retryDelay);
@@ -805,29 +785,27 @@
     }
   }
 
-  async function mostrarDevolutiva({ el, pergunta, resposta, guia = 'lumen' }) {
+  async function mostrarDevolutiva({el, pergunta, resposta, guia='lumen'}) {
     const txt = await window.fetchDevolutiva(pergunta, resposta, guia);
-    if (el && window.typeTextOnce) window.typeTextOnce(el, txt, 22);
+    if (el) window.typeTextOnce(el, txt, 22);
     return txt;
   }
 
-  async function conversar({ el, guia = 'lumen', historico = [], prompt = '' }) {
-    if (!window.askInteractive) {
-      console.error('[conversar] window.askInteractive não definido');
-      window.toast('Erro ao iniciar conversa.');
-      return '';
-    }
+  async function conversar({el, guia='lumen', historico=[], prompt=''}) {
     const { text } = await window.askInteractive({ guide: guia, history: historico, prompt });
-    if (el && window.typeTextOnce) window.typeTextOnce(el, text, 22);
+    if (el) window.typeTextOnce(el, text, 22);
     return text;
   }
 
-  async function askInteractive({ guide = 'lumen', history = [], prompt = '', temperature = 0.7 } = {}) {
+  window.mostrarDevolutiva = mostrarDevolutiva;
+  window.conversar = conversar;
+
+  async function askInteractive({ guide='lumen', history=[], prompt='', temperature=0.7 }={}) {
     const cfg = getGuideConfig(guide);
     const msgs = [
-      { role: 'system', content: `Você é ${guide.toUpperCase()} guiando uma conversa interativa com empatia e objetividade.` },
+      { role:'system', content: `Você é ${guide.toUpperCase()} guiando uma conversa interativa com empatia e objetividade.` },
       ...history,
-      { role: 'user', content: prompt }
+      { role:'user', content: prompt }
     ];
     const data = await chatRequest(cfg.apiUrlBase, { model: cfg.model, messages: msgs, temperature });
     const text = data?.content || data?.choices?.[0]?.message?.content || '';
@@ -835,27 +813,68 @@
   }
 
   window.fetchDevolutiva = fetchDevolutiva;
-  window.mostrarDevolutiva = mostrarDevolutiva;
-  window.conversar = conversar;
   window.askInteractive = askInteractive;
+})();
+
+/* ===== Utilitários globais ===== */
+(function() {
+  function toast(msg) {
+    try {
+      const t = document.getElementById('toast');
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.remove('hidden');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    } catch (_) {}
+  }
+  window.addEventListener('error', (e) => {
+    console.error('[Erro global]', e?.error || e);
+    toast('Ops… algo falhou, mas já seguimos em frente.');
+  });
+
+  const env = document.getElementById('envTag');
+  if (env) {
+    env.textContent = `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/assets`;
+  }
+
+  function dedupe(s = '') {
+    if (!s) return '';
+    let result = s.normalize('NFC').trim().replace(/\s+/g, ' ');
+    const validDoubleConsonants = /^(.*?(?:ss|rr|tt|cc|pp|mm|nn|ll|bb|dd|ff|gg|vv|zz)[a-z]*?)$/i;
+    const words = result.split(' ');
+    const out = [];
+    for (let w of words) {
+      if (validDoubleConsonants.test(w)) {
+        out.push(w);
+      } else {
+        let c = w[0] || '';
+        for (let i = 1; i < w.length; i++) {
+          if (w[i] !== w[i - 1] || !/[a-zA-Z]/.test(w[i])) {
+            c += w[i];
+          }
+        }
+        out.push(c);
+      }
+    }
+    return out.join(' ').trim();
+  }
+  window.dedupe = dedupe;
 })();
 
 /* ===== Configuração global Jornada ===== */
 (function() {
   window.JORNADA = window.JORNADA || {};
-  window.JORNADA.fullTypingMode = (window.JORNADA.fullTypingMode !== false);
-  window.JORNADA.typing = Object.assign({ charDelay: 18, caret: false }, window.JORNADA.typing || {});
-  window.JORNADA.tts = Object.assign({
+  JORNADA.fullTypingMode = (JORNADA.fullTypingMode !== false);
+  JORNADA.typing = Object.assign({ charDelay: 18, caret: false }, (JORNADA.typing || {}));
+  JORNADA.tts = Object.assign({
     enabled: true,
     lang: 'pt-BR',
     rate: 1.06,
     pitch: 1.0,
     voiceName: '',
     readingMode: 'after'
-  }, window.JORNADA.tts || {});
-  if (typeof window.JORNADA.typing.charDelay !== 'number' || window.JORNADA.typing.charDelay < 0) {
-    window.JORNADA.typing.charDelay = 18;
-  }
+  }, (JORNADA.tts || {}));
 })();
 
 /* ===== Text-to-Speech (TTS) ===== */
@@ -872,20 +891,20 @@
   }
 
   async function speak(text) {
-    if (!window.JORNADA.tts.enabled || window.isMuted || !isSpeechAvailable()) return;
+    if (!JORNADA.tts.enabled || window.isMuted || !isSpeechAvailable()) return;
     await new Promise(r => {
       const v = speechSynthesis.getVoices();
       if (v && v.length) return r();
       speechSynthesis.onvoiceschanged = () => r();
-      setTimeout(() => r(), 1000);
+      setTimeout(() => r(), 300);
     });
 
     const u = new SpeechSynthesisUtterance(text || '');
-    u.lang = window.JORNADA.tts.lang || currentLang;
-    u.rate = +window.JORNADA.tts.rate || 1.0;
-    u.pitch = +window.JORNADA.tts.pitch || 1.0;
-    if (window.JORNADA.tts.voiceName) {
-      const v = speechSynthesis.getVoices().find(v => v.name === window.JORNADA.tts.voiceName);
+    u.lang = JORNADA.tts.lang || currentLang;
+    u.rate = +JORNADA.tts.rate || 1.0;
+    u.pitch = +JORNADA.tts.pitch || 1.0;
+    if (JORNADA.tts.voiceName) {
+      const v = speechSynthesis.getVoices().find(v => v.name === JORNADA.tts.voiceName);
       if (v) u.voice = v;
     }
     return new Promise(res => {
@@ -894,6 +913,7 @@
       try { speechSynthesis.speak(u); } catch (_) { res(); }
     });
   }
+  window.speak = speak;
 
   function readAloud(text, voiceGender) {
     if (window.isMuted || !isSpeechAvailable()) return Promise.resolve();
@@ -904,8 +924,8 @@
         const u = new SpeechSynthesisUtterance(text || '');
         u.lang = currentLang;
         const voices = speechSynthesis.getVoices();
-        let v = voices.find(v => v.lang === currentLang && v.name.includes(genderName)) ||
-                voices.find(v => v.lang === currentLang) || voices[0];
+        let v = voices.find(v => v.lang === currentLang && v.name.includes(genderName))
+             || voices.find(v => v.lang === currentLang) || voices[0];
         if (v) u.voice = v;
         u.onend = resolve;
         u.onerror = resolve;
@@ -913,8 +933,6 @@
       } catch (_) { resolve(); }
     });
   }
-
-  window.speak = speak;
   window.readAloud = readAloud;
 })();
 
@@ -922,33 +940,32 @@
 (function() {
   function makeFlame(cls) {
     const d = document.createElement('div');
-    d.className = cls || 'chama-vela chama-md';
+    d.className = (cls || 'chama-vela chama-md');
     d.innerHTML = '<div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>';
-    d.style.cssText = 'transition: opacity 0.3s; opacity: 1;';
     return d;
   }
 
   function ensureHeroFlame(sectionId) {
     const canvas = document.getElementById('jornada-canvas');
     if (!canvas) return;
-    const existing = document.getElementById('chama-hero');
-    if (existing) existing.remove();
-    const show = ['section-intro', 'section-termos', 'section-senha', 'section-final', 'section-selfie', 'section-guia'].includes(sectionId);
+    let hero = document.getElementById('chama-hero');
+    const show = (sectionId === 'section-intro' || sectionId === 'section-termos' || sectionId === 'section-senha' || sectionId === 'section-final' || sectionId === 'section-selfie' || sectionId === 'section-guia');
     if (show) {
-      const hero = makeFlame('chama-vela chama-lg');
-      hero.id = 'chama-hero';
-      hero.style.cssText = 'position:absolute;top:8px;left:8px;z-index:60;';
-      canvas.appendChild(hero);
+      if (!hero) {
+        hero = makeFlame('chama-vela chama-lg');
+        hero.id = 'chama-hero';
+        hero.style.cssText = 'position:absolute;top:8px;left:8px;z-index:60;';
+        canvas.appendChild(hero);
+      }
+    } else if (hero) {
+      hero.remove();
     }
   }
 
   function ensureHeaderFlame() {
     const H = document.getElementById('chama-header');
     if (!H) return;
-    if (!H.querySelector('.brasa')) {
-      H.innerHTML = '';
-      H.appendChild(makeFlame('chama-vela chama-lg'));
-    }
+    if (!H.querySelector('.brasa')) { H.innerHTML = ''; H.appendChild(makeFlame('chama-vela chama-lg')); }
   }
 
   function ensurePageFlames() {
@@ -969,10 +986,7 @@
   function ensureInlineFlame(id, cls) {
     const el = document.getElementById(id);
     if (!el) return null;
-    if (!el.querySelector('.brasa')) {
-      el.innerHTML = '';
-      el.appendChild(makeFlame(cls || 'chama-vela chama-md'));
-    }
+    if (!el.querySelector('.brasa')) { el.innerHTML = ''; el.appendChild(makeFlame(cls || 'chama-vela chama-md')); }
     return el.firstElementChild;
   }
 
@@ -994,25 +1008,8 @@
   if (G.__DEFAULT_SPEED_TYPING == null) G.__DEFAULT_SPEED_TYPING = 80;
   const DEFAULT_SPEED = G.__DEFAULT_SPEED_TYPING;
 
-  function typeTextOnce(el, text, speed = 24) {
-    if (!el || el.dataset.typerApplied === '1') return;
-    el.dataset.typerApplied = '1';
-    el.textContent = '';
-    let i = 0;
-    const timer = setInterval(() => {
-      el.textContent += text[i] || '';
-      i++;
-      if (i >= text.length) clearInterval(timer);
-    }, speed);
-  }
-
-  function typeWriter(el, text, speed, showCursor) {
+  window.typeWriter = function(el, text, speed, showCursor) {
     if (!el || el.dataset.typing === '1' || el.dataset.typed === '1') return Promise.resolve();
-    if (!window.utils || !window.utils.dedupe) {
-      console.error('[typeWriter] window.utils.dedupe não definido');
-      window.toast && window.toast('Erro ao processar datilografia.');
-      return Promise.resolve();
-    }
     el.dataset.typing = '1';
     el.textContent = '';
     const highlight = el.querySelector('.highlight') || document.createElement('div');
@@ -1021,7 +1018,7 @@
       el.prepend(highlight);
     }
 
-    text = window.utils.dedupe(text || '').replace(/[{}[\]]/g, '').trim();
+    text = window.dedupe(text || '').replace(/[{}[\]]/g, '').trim();
     let i = 0;
 
     return new Promise(resolve => {
@@ -1058,7 +1055,8 @@
       if (showCursor) el.classList.add('lumen-typing');
       setTimeout(step, 0);
     });
-  }
+  };
+  window.typewriter = window.typeWriter;
 
   let __abortTypingPlaceholder = null;
   async function typePlaceholder(inp, text, speed = 22) {
@@ -1069,7 +1067,7 @@
     inp.placeholder = '';
     const aria = document.getElementById('aria-pergunta');
     if (aria) aria.textContent = text;
-    text = window.utils ? window.utils.dedupe(text) : text;
+    text = window.dedupe(text);
     for (let i = 0; i <= text.length; i++) {
       if (abort) break;
       inp.placeholder = text.slice(0, i) + (i < text.length ? '▌' : '');
@@ -1082,7 +1080,7 @@
     if (!textarea) return;
     textarea.value = '';
     textarea.classList.add('lumen-typing');
-    text = window.utils ? window.utils.dedupe(text) : text;
+    text = window.dedupe(text);
     for (let i = 0; i <= text.length; i++) {
       textarea.value = text.slice(0, i);
       await new Promise(r => setTimeout(r, speed));
@@ -1096,15 +1094,15 @@
       return;
     }
     if (G.__typingLock) {
-      console.log('[runTyping] Bloqueado por __typingLock, liberando...');
-      G.__typingLock = false;
+      console.log('[runTyping] Bloqueado por __typingLock');
+      return;
     }
     G.__typingLock = true;
 
     try {
       window.speak && window.speak('');
       const elements = Array
-        .from(root.querySelectorAll('[data-typing], .text, p, h1, h2, h3, h4, [class*="text"], [class*="title"], [class*="content"], .termos-texto, .pergunta-enunciado, [data-termos]'))
+        .from(root.querySelectorAll('[data-typing], .text, p, h1, h2, h3, h4, [class*="text"], [class*="title"], [class*="content"]'))
         .filter(el => !el.dataset.typed && el.offsetParent !== null && !el.closest('.j-section.hidden'));
 
       if (elements.length === 0) {
@@ -1121,28 +1119,26 @@
       for (const el of elements) {
         if (el.dataset.typing === '1' || el.dataset.typed === '1') continue;
         const rawText = el.getAttribute('data-text') || el.textContent || '';
-        const text = window.utils ? window.utils.dedupe(rawText) : rawText;
+        const text = window.dedupe(rawText);
         el.textContent = '';
         const highlight = el.querySelector('.highlight');
         if (highlight) highlight.style.width = '0';
         const speed = parseInt(el.getAttribute('data-speed') || DEFAULT_SPEED, 10);
         const showCursor = String(el.getAttribute('data-cursor') || 'true') === 'true';
         await window.typeWriter(el, text, speed, showCursor);
-        if (window.JORNADA.tts.enabled && window.JORNADA.tts.readingMode === 'after' && !window.isMuted) {
+        if (JORNADA.tts.enabled && JORNADA.tts.readingMode === 'after' && !window.isMuted) {
           await window.speak(text);
         }
         console.log('[runTyping] Datilografia e TTS aplicados em:', el.tagName, el.className || el.id, 'texto:', text.slice(0, 50));
       }
     } catch (e) {
       console.error('[runTyping] erro:', e);
-      window.toast && window.toast('Erro durante a datilografia.');
+      window.toast('Erro durante a datilografia.');
     } finally {
       G.__typingLock = false;
     }
   }
 
-  window.typeTextOnce = typeTextOnce;
-  window.typeWriter = typeWriter;
   window.runTyping = runTyping;
   window.typePlaceholder = typePlaceholder;
   window.typeAnswer = typeAnswer;
@@ -1221,24 +1217,20 @@
       if (!el.hasAttribute('data-text') && keepText) el.setAttribute('data-text', keepText);
     });
 
-    if (window.runTyping) {
-      requestAnimationFrame(() => setTimeout(() => {
-        console.log('[showSection] Iniciando runTyping para:', sectionId);
-        window.runTyping(active);
-      }, 100));
-    }
+    requestAnimationFrame(() => setTimeout(() => {
+      console.log('[showSection] Iniciando runTyping para:', sectionId);
+      window.runTyping && window.runTyping(active);
+    }, 100));
 
     updateCanvasBackground(sectionId);
-    if (window.JORNADA_CHAMA && window.JORNADA_CHAMA.ensureHeroFlame) {
-      window.JORNADA_CHAMA.ensureHeroFlame(sectionId);
-    }
+    window.JORNADA_CHAMA && window.JORNADA_CHAMA.ensureHeroFlame(sectionId);
 
     if (sectionId === 'section-perguntas') {
       console.log('[showSection] Carregando conteúdo dinâmico para section-perguntas');
-      if (window.loadDynamicBlocks) window.loadDynamicBlocks();
+      window.loadDynamicBlocks && window.loadDynamicBlocks();
       setTimeout(() => {
-        if (window.ensureQuestionsReady) window.ensureQuestionsReady();
-      }, 100);
+        window.ensureQuestionsReady && window.ensureQuestionsReady();
+      }, 100); // Atraso pra garantir que loadDynamicBlocks terminou
     }
 
     if (sectionId === 'section-final') {
@@ -1261,7 +1253,7 @@
         nextBtn.addEventListener('click', (e) => {
           console.log('[showSection] Clique no botão avançar detectado na seção:', sectionId, 'Botão:', nextBtn.id || nextBtn.className);
           e.preventDefault();
-          window.goNext && window.goNext();
+          window.goNext();
         }, { once: true });
         console.log('[showSection] Evento de clique adicionado ao botão avançar em:', sectionId, 'Botão:', nextBtn.id || nextBtn.className);
       } else {
@@ -1278,44 +1270,33 @@
     }, 500);
   };
 })();
-
-/* ===== Termos e orientações ===== */
-(function termosPager() {
-  const ids = ["termos-pg1", "termos-pg2", "termos-pg3", "termos-pg4", "termos-pg5"];
-  function show(id) {
-    ids.forEach(x => {
+ /* ===== Termos e orientações ===== */
+(function termosPager(){
+  const ids = ["termos-pg1","termos-pg2","termos-pg3","termos-pg4","termos-pg5"];
+  function show(id){
+    ids.forEach(x=>{
       const el = document.getElementById(x);
-      if (!el) return;
-      el.classList.toggle('hidden', x !== id);
+      if(!el) return;
+      el.classList.toggle('hidden', x!==id);
     });
   }
-
-  let initialized = false;
+  // garante que a pg1 apareça ao entrar na seção
   document.addEventListener('DOMContentLoaded', () => {
-    if (initialized) return;
-    initialized = true;
     const termos = document.getElementById('section-termos');
     if (termos) show("termos-pg1");
-  }, { once: true });
+  });
 
-  document.addEventListener('click', (e) => {
+  document.addEventListener('click', (e)=>{
     const btn = e.target.closest('[data-action]');
-    if (!btn) return;
+    if(!btn) return;
     const a = btn.getAttribute('data-action');
-    if (!a) return;
-    if (a === 'termos-next') { e.preventDefault(); show('termos-pg2'); }
-    if (a === 'termos-next2') { e.preventDefault(); show('termos-pg3'); }
-    if (a === 'termos-next3') { e.preventDefault(); show('termos-pg4'); }
-    if (a === 'termos-next4') { e.preventDefault(); show('termos-pg5'); }
-    if (a === 'next-senha') {
-      e.preventDefault();
-      if (window.showSection) {
-        window.showSection('section-senha');
-      } else {
-        console.error('[termosPager] window.showSection não definido');
-        window.toast('Erro ao navegar para a seção de senha.');
-      }
-    }
+    if(!a) return;
+
+    if(a === 'termos-next'){ e.preventDefault(); show('termos-pg2'); }
+    if(a === 'termos-next2'){ e.preventDefault(); show('termos-pg3'); }
+    if(a === 'termos-next3'){ e.preventDefault(); show('termos-pg4'); }
+    if(a === 'termos-next4'){ e.preventDefault(); show('termos-pg5'); }
+    if(a === 'next-senha'){  e.preventDefault(); window.showSection('section-senha'); }
   }, true);
 })();
 
@@ -1327,8 +1308,7 @@
       console.log('[Eventos Globais] Clique no botão avançar detectado:', btn.id || btn.className, 'Seção atual:', document.querySelector('.j-section:not(.hidden)')?.id || 'desconhecida');
       e.preventDefault();
       e.stopPropagation();
-      if (window.goNext) window.goNext();
-      else window.toast('Erro ao avançar. Tente recarregar.');
+      window.goNext();
     }
   }, true);
 
@@ -1338,8 +1318,7 @@
       if (activeEl && activeEl.closest('[data-action="next"], [data-action="avancar"], .btn-avancar, .next-section, #avancar, #next')) {
         console.log('[Eventos Globais] Tecla Enter/Espaço no botão avançar:', activeEl.id || activeEl.className);
         e.preventDefault();
-        if (window.goNext) window.goNext();
-        else window.toast('Erro ao avançar. Tente recarregar.');
+        window.goNext();
       }
     }
   });
@@ -1359,29 +1338,23 @@
       try {
         const intro = document.getElementById('section-intro') || document.querySelector('[data-section="intro"], .section-intro');
         if (intro) {
-          if (window.showSection) {
-            window.showSection('section-intro');
-            console.log('[Inicialização] section-intro encontrada, chamando showSection');
-          } else {
-            console.error('[Inicialização] window.showSection não definido');
-            window.toast('Erro ao carregar a seção inicial.');
-          }
+          window.showSection('section-intro');
+          console.log('[Inicialização] section-intro encontrada, chamando showSection');
         } else {
           console.error('[Inicialização] section-intro não encontrada');
-          window.toast('Seção de introdução não encontrada. Tente recarregar.');
+          window.toast('Seção de introdução não encontrada. Tente recarregar a página.');
         }
       } catch (e) {
         console.error('[Inicialização] Erro ao inicializar página:', e);
-        window.toast('Erro ao carregar a página inicial.');
+        window.toast('Erro ao carregar a página inicial. Tente novamente.');
       }
     }, 300);
   }, { once: true });
 })();
-
+  
 /* ===== Senha ===== */
 (function() {
-  const log = (...a) => { try { console.log('[Senha v4]', ...a); } catch (_) {} };
-  const VALID_PASSWORD = 'luz123'; // Defina a senha correta aqui
+  const log = (...a) => { try { console.log('[Senha v3]', ...a); } catch (_) {} };
 
   function getSenhaSection() {
     return document.getElementById('section-senha') || document.querySelector('[data-section="senha"], .section-senha') || document;
@@ -1390,10 +1363,17 @@
   function getSenhaInput() {
     const root = getSenhaSection();
     const tries = [
-      '#senhaInput', '#iniciar', 'input[data-role="senha"]', 'input[name="senha"]',
-      'input[name*="senha" i]', 'input[id*="senha" i]', 'input[type="password"]',
-      'input[type="text"][name*="senha" i]', 'input[type="text"][id*="senha" i]',
-      '.senha input', '.senha-input'
+      '#senhaInput',
+      '#iniciar',
+      'input[data-role="senha"]',
+      'input[name="senha"]',
+      'input[name*="senha" i]',
+      'input[id*="senha" i]',
+      'input[type="password"]',
+      'input[type="text"][name*="senha" i]',
+      'input[type="text"][id*="senha" i]',
+      '.senha input',
+      '.senha-input'
     ];
     for (const sel of tries) {
       const el = root.querySelector(sel);
@@ -1404,20 +1384,10 @@
 
   window.toggleSenha = function() {
     const input = getSenhaInput();
-    if (!input) {
-      log('[Senha] input não encontrado');
-      window.toast && window.toast('Campo de senha não encontrado.');
-      return;
-    }
+    if (!input) { log('[Senha] input não encontrado'); return; }
     input.type = (input.type === 'password' ? 'text' : 'password');
-    const eye = getSenhaSection().querySelector('[data-role="eye"], [data-action="toggle-password"] i, [data-action="toggle-password"] svg, .eye-icon');
-    if (eye) {
-      eye.classList.toggle('on');
-      log('[Senha] Visibilidade da senha alternada');
-    } else {
-      log('[Senha] Olho mágico não encontrado');
-      window.toast && window.toast('Botão de visibilidade não encontrado.');
-    }
+    const eye = getSenhaSection().querySelector('[data-role="eye"], [data-action="toggle-password"] i, [data-action="toggle-password"] svg');
+    if (eye) eye.classList.toggle('on');
   };
 
   let lastStartJourney = 0;
@@ -1437,44 +1407,27 @@
     log('[startJourney] Senha fornecida:', senha ? '[oculta]' : 'nenhuma', 'Nome:', nome || 'nenhum');
 
     if (!senha) {
-      window.toast && window.toast('Digite a senha para continuar.');
+      window.toast('Digite a senha para continuar.');
       if (inputSenha) inputSenha.focus();
       log('[startJourney] Senha não fornecida');
       return;
     }
 
-    if (senha !== VALID_PASSWORD) {
-      window.toast && window.toast('Senha incorreta. Tente novamente.');
-      if (inputSenha) inputSenha.focus();
-      log('[startJourney] Senha inválida:', senha);
-      return;
-    }
-
-    if (nome) {
-      try { localStorage.setItem('JORNADA_NOME', nome); } catch (_) {}
-    }
+    if (nome) { try { localStorage.setItem('JORNADA_NOME', nome); } catch (_) {} }
     window.speak && window.speak('');
 
-    const hasGuia = document.getElementById('section-guia') || document.querySelector('[data-section="guia"], .section-guia');
-    const hasSelfie = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
+    const hasGuia = !!(document.getElementById('section-guia') || document.querySelector('[data-section="guia"], .section-guia'));
+    const hasSelfie = !!(document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie'));
 
-    if (!hasGuia) {
-      console.error('[startJourney] Seção section-guia não encontrada');
-      window.toast && window.toast('Seção de guia não encontrada. Verifique o DOM.');
-      return;
-    }
-    if (!hasSelfie) {
-      console.error('[startJourney] Seção section-selfie não encontrada');
-      window.toast && window.toast('Seção de selfie não encontrada. Verifique o DOM.');
-      return;
-    }
-
-    if (window.showSection) {
+    if (hasGuia) {
       window.showSection('section-guia');
       log('[startJourney] Navegação para section-guia');
+    } else if (hasSelfie) {
+      window.showSection('section-selfie');
+      log('[startJourney] Navegação para section-selfie');
     } else {
-      log('[startJourney] window.showSection não definido');
-      window.toast && window.toast('Erro ao navegar para a seção de guia.');
+      window.openQuestions && window.openQuestions();
+      log('[startJourney] Navegação para section-perguntas (fallback)');
     }
   };
 })();
@@ -1487,16 +1440,30 @@
     return document.getElementById('section-guia') || document.querySelector('[data-section="guia"], .section-guia, .guia-container, .guia') || null;
   }
 
+  function normGuide(s = '') {
+    s = String(s).toLowerCase();
+    if (s.includes('lumen')) return 'lumen';
+    if (s.includes('zion')) return 'zion';
+    if (s.includes('arion') || s.includes('arian')) return 'arian';
+    return 'lumen';
+  }
+
   function inferGuideFrom(el) {
     if (!el) return '';
     const attrs = [
-      el.getAttribute('data-guide'), el.getAttribute('data-guide-id'),
-      el.dataset?.guide, el.dataset?.value, el.id, el.getAttribute('aria-label'),
-      el.getAttribute('alt'), el.title, el.textContent
+      el.getAttribute('data-guide'),
+      el.getAttribute('data-guide-id'),
+      el.dataset?.guide,
+      el.dataset?.value,
+      el.id,
+      el.getAttribute('aria-label'),
+      el.getAttribute('alt'),
+      el.title,
+      el.textContent
     ].filter(Boolean);
 
     for (const v of attrs) {
-      const g = window.utils ? window.utils.normGuide(v) : v.toLowerCase();
+      const g = normGuide(v);
       if (g) return g;
     }
 
@@ -1506,6 +1473,7 @@
       if (src.includes('zion')) return 'zion';
       if (src.includes('arion') || src.includes('arian')) return 'arian';
     }
+
     return '';
   }
 
@@ -1516,11 +1484,19 @@
     }
 
     const candidates = root.querySelectorAll(`
-      [data-action="select-guia"], [data-guide], [data-guide-id], .choose-guide,
-      .btn-guia, .card-guia, .guia-option, .guia-item, .guide-selector,
+      [data-action="select-guia"],
+      [data-guide],
+      [data-guide-id],
+      .choose-guide,
+      .btn-guia,
+      .card-guia,
+      .guia-option,
+      .guia-item,
+      .guide-selector,
       #btnLumen, #btnZion, #btnArion,
       img[alt*="Lumen" i], img[alt*="Zion" i], img[alt*="Arion" i],
-      button[class*="guia"], a[class*="guia"], [class*="guide"], [id*="guide"]
+      button[class*="guia"], a[class*="guia"],
+      [class*="guide"], [id*="guide"]
     `);
 
     if (candidates.length === 0) {
@@ -1566,7 +1542,7 @@
         const nome = localStorage.getItem('JORNADA_NOME') || '';
         guideNameEl.textContent = nome.toUpperCase() || guia.toUpperCase();
       }
-      if (bgImg && window.utils && window.utils.preloadGuiaBg) {
+      if (bgImg) {
         const src = await window.utils.preloadGuiaBg(guia);
         if (src) {
           bgImg.src = src;
@@ -1585,19 +1561,14 @@
           log('Nenhum fundo válido encontrado para guia:', guia);
         }
       }
-      if (window.showSection) {
-        window.showSection('section-selfie');
-        requestAnimationFrame(() => setTimeout(() => {
-          const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
-          if (sec && window.runTyping) {
-            window.runTyping(sec);
-            log('[GUIA v14] runTyping chamado para section-selfie');
-          }
-        }, 0));
-      } else {
-        console.error('[proceedAfterGuia] window.showSection não definido');
-        window.toast('Erro ao navegar para a seção de selfie.');
-      }
+      window.showSection('section-selfie');
+      requestAnimationFrame(() => setTimeout(() => {
+        const sec = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
+        if (sec && window.runTyping) {
+          window.runTyping(sec);
+          log('[GUIA v14] runTyping chamado para section-selfie');
+        }
+      }, 0));
     } catch (e) {
       console.error('[GUIA v14] Erro ao prosseguir após escolha do guia:', e);
       window.toast('Erro ao prosseguir. Tente novamente.');
@@ -1643,7 +1614,6 @@
         log('Seção de guia detectada, aplicando enhanceButtons');
         try {
           enhanceButtons(root);
-          mo.disconnect();
         } catch (e) {
           console.error('[GUIA v14] Erro ao aplicar enhanceButtons:', e);
         }
@@ -1656,11 +1626,19 @@
       if (!root || !root.contains(ev.target)) return;
       const target = ev.target;
       const el = target.closest(`
-        [data-action="select-guia"], [data-guide], [data-guide-id], .choose-guide,
-        .btn-guia, .card-guia, .guia-option, .guia-item, .guide-selector,
+        [data-action="select-guia"],
+        [data-guide],
+        [data-guide-id],
+        .choose-guide,
+        .btn-guia,
+        .card-guia,
+        .guia-option,
+        .guia-item,
+        .guide-selector,
         #btnLumen, #btnZion, #btnArion,
         img[alt*="Lumen" i], img[alt*="Zion" i], img[alt*="Arion" i],
-        button[class*="guia"], a[class*="guia"], [class*="guide"], [id*="guide"]
+        button[class*="guia"], a[class*="guia"],
+        [class*="guide"], [id*="guide"]
       `);
       if (!el || !root.contains(el)) {
         log('Nenhum botão de guia clicado:', target.tagName, target.className || target.id);
@@ -1698,7 +1676,9 @@
     const style = document.createElement('style');
     style.textContent = `
       [data-action="select-guia"], [data-guide], [data-guide-id], .choose-guide, .btn-guia, .card-guia, .guia-option, .guia-item, .guide-selector, #btnLumen, #btnZion, #btnArion {
-        pointer-events: auto; cursor: pointer; outline: none;
+        pointer-events: auto;
+        cursor: pointer;
+        outline: none;
       }
       [data-action="select-guia"].active, [data-guide].active, [data-guide-id].active, .choose-guide.active, .btn-guia.active, .card-guia.active, .guia-option.active, .guia-item.active, .guide-selector.active, #btnLumen.active, #btnZion.active, #btnArion.active {
         box-shadow: 0 0 0 2px rgba(255,215,0,.7);
@@ -1735,7 +1715,7 @@
     }
 
     try {
-      const guia = window.utils ? window.utils.normGuide(localStorage.getItem('JORNADA_GUIA') || '') : 'lumen';
+      const guia = window.utils.normGuide(localStorage.getItem('JORNADA_GUIA') || '');
       const card = document.getElementById('card-guide');
       const bgImg = document.getElementById('guideBg');
       const guideNameEl = document.getElementById('guideNameSlot');
@@ -1745,7 +1725,7 @@
         const nome = localStorage.getItem('JORNADA_NOME') || '';
         guideNameEl.textContent = nome.toUpperCase() || guia.toUpperCase();
       }
-      if (bgImg && window.utils && window.utils.preloadGuiaBg) {
+      if (bgImg) {
         const src = await window.utils.preloadGuiaBg(guia);
         if (src) {
           bgImg.src = src;
@@ -1774,10 +1754,10 @@
         for (const textEl of textEls) {
           if (textEl.dataset.typed || textEl.dataset.typing === '1' || !textEl.offsetParent) continue;
           const rawText = textEl.getAttribute('data-text') || textEl.textContent || '';
-          const text = window.utils ? window.utils.dedupe(rawText) : rawText;
+          const text = window.dedupe(rawText);
           if (text) {
-            await window.typeWriter(textEl, text, window.JORNADA.typing.charDelay, false);
-            if (window.JORNADA.tts.enabled && window.JORNADA.tts.readingMode === 'after' && !window.isMuted) {
+            await window.typeWriter(textEl, text, JORNADA.typing.charDelay, false);
+            if (JORNADA.tts.enabled && JORNADA.tts.readingMode === 'after' && !window.isMuted) {
               await window.speak(text);
             }
             log('Datilografia e TTS aplicados em:', textEl.tagName, textEl.className || textEl.id, 'texto:', text.slice(0, 50));
@@ -1803,7 +1783,6 @@
       log('Seção de selfie detectada, aplicando applySelfieBg');
       try {
         applySelfieBg();
-        moSelfie.disconnect();
       } catch (e) {
         console.error('[Selfie v10] Erro ao aplicar applySelfieBg:', e);
       }
@@ -1880,18 +1859,17 @@
     return items;
   }
 
-  async function ensureQuestionsReady(maxTries = 20) {
+  async function ensureQuestionsReady(maxTries = 40) {
     const sec = document.getElementById('section-perguntas') || document.querySelector('[data-section="perguntas"], .section-perguntas');
     if (!sec || !(sec instanceof Element)) {
       log('Seção de perguntas não encontrada ou inválida');
-      window.toast('Erro ao carregar perguntas. Tente recarregar.');
       return false;
     }
 
     try {
-      if (window.updateBlocks) window.updateBlocks();
-      if (window.loadDynamicBlocks) window.loadDynamicBlocks();
-      if (window.initJornada) window.initJornada();
+      window.updateBlocks && window.updateBlocks();
+      window.loadDynamicBlocks && window.loadDynamicBlocks();
+      window.initJornada && window.initJornada();
     } catch (e) {
       log('Erro ao chamar funções de inicialização:', e);
     }
@@ -1916,7 +1894,6 @@
         attrs: Object.keys(el.dataset || {}).join(',')
       }));
       console.table(snap);
-      window.toast('Erro ao carregar perguntas. Tente recarregar.');
       return false;
     }
 
@@ -1934,24 +1911,18 @@
     if (aria) aria.textContent = lbl;
 
     setTimeout(() => {
-      if (window.runTyping) window.runTyping(vis || sec);
-    }, 100);
+      window.runTyping && window.runTyping(vis || sec);
+    }, 100); // Atraso pra garantir DOM atualizado
     return true;
   }
-
   window.ensureQuestionsReady = ensureQuestionsReady;
 
   window.openQuestions = function() {
-    if (window.showSection) {
-      window.showSection('section-perguntas');
-      setTimeout(() => {
-        if (window.loadDynamicBlocks) window.loadDynamicBlocks();
-        if (window.ensureQuestionsReady) window.ensureQuestionsReady();
-      }, 100);
-    } else {
-      console.error('[openQuestions] window.showSection não definido');
-      window.toast('Erro ao abrir perguntas.');
-    }
+    window.showSection('section-perguntas');
+    setTimeout(() => {
+      window.loadDynamicBlocks && window.loadDynamicBlocks();
+      window.ensureQuestionsReady && window.ensureQuestionsReady();
+    }, 100);
   };
 
   window.JORNADA_BLOCKS = [
@@ -1986,74 +1957,67 @@
   ];
   window.JORNADA_FINAL_VIDEO = "/assets/img/filme-5-fim-da-jornada.mp4";
   console.log('[PERGv6] JORNADA_BLOCKS definido:', window.JORNADA_BLOCKS);
-})();
+})();;
+  
+  window.loadDynamicBlocks = function() {
+    const content = document.getElementById('perguntas-container');
+    if (!content) {
+      log('Container de perguntas não encontrado');
+      return;
+    }
 
-window.loadDynamicBlocks = function() {
-  const content = document.getElementById('perguntas-container');
-  if (!content) {
-    console.log('[loadDynamicBlocks] Container de perguntas não encontrado');
-    window.toast && window.toast('Erro ao carregar perguntas.');
-    return;
-  }
+    const blocks = window.JORNADA_BLOCKS || [];
+    content.innerHTML = '';
 
-  const blocks = window.JORNADA_BLOCKS || [];
-  if (!blocks.length) {
-    console.error('[loadDynamicBlocks] JORNADA_BLOCKS não definido ou vazio');
-    window.toast && window.toast('Nenhum bloco de perguntas encontrado.');
-    return;
-  }
+    blocks.forEach((block, bIdx) => {
+      const bloco = document.createElement('section');
+      bloco.className = 'j-bloco';
+      bloco.dataset.bloco = bIdx;
+      bloco.dataset.video = block.video_after || '';
 
-  content.innerHTML = '';
-  blocks.forEach((block, bIdx) => {
-    const bloco = document.createElement('section');
-    bloco.className = 'j-bloco';
-    bloco.dataset.bloco = bIdx;
-    bloco.dataset.video = block.video_after || '';
+      (block.questions || []).forEach((q, qIdx) => {
+        const label = typeof q === 'string' ? q : (q.label || q.text || '');
+        const div = document.createElement('div');
+        div.className = 'j-pergunta';
+        div.dataset.pergunta = qIdx;
 
-    (block.questions || []).forEach((q, qIdx) => {
-      const label = typeof q === 'string' ? q : (q.label || q.text || '');
-      const div = document.createElement('div');
-      div.className = 'j-pergunta';
-      div.dataset.pergunta = qIdx;
+        const enunciado = `
+          <label class="pergunta-enunciado text" 
+                 data-typing="true" 
+                 data-text="Pergunta ${qIdx + 1}: ${label}" 
+                 data-speed="36" 
+                 data-cursor="true"></label>`;
 
-      div.innerHTML = `
-        <label class="pergunta-enunciado text" 
-               data-typing="true" 
-               data-text="Pergunta ${qIdx + 1}: ${label}" 
-               data-speed="36" 
-               data-cursor="true"></label>
-        <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
-        <div class="accessibility-controls">
-          <button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>
-          <button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>
-          <button class="btn-avancar" data-action="avancar">Avançar</button>
-        </div>
-      `;
-      bloco.appendChild(div);
+        div.innerHTML = enunciado +
+          `\n<textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>` +
+          `<div class="accessibility-controls">` +
+          `<button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>` +
+          `<button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>` +
+          `<button class="btn-avancar" data-action="avancar">Avançar</button>` +
+          `</div>`;
+
+        bloco.appendChild(div);
+      });
+
+      content.appendChild(bloco);
     });
 
-    content.appendChild(bloco);
-  });
-
-  const firstBloco = content.querySelector('.j-bloco');
-  if (firstBloco) {
-    firstBloco.style.display = 'block';
-    const first = firstBloco.querySelector('.j-pergunta');
-    if (first) {
-      first.classList.add('active');
-      setTimeout(() => window.runTyping && window.runTyping(first), 100);
+    const firstBloco = content.querySelector('.j-bloco');
+    if (firstBloco) {
+      firstBloco.style.display = 'block';
+      const first = firstBloco.querySelector('.j-pergunta');
+      if (first) {
+        first.classList.add('active');
+        setTimeout(() => window.runTyping && window.runTyping(first), 100);
+      }
     }
-  } else {
-    console.error('[loadDynamicBlocks] Nenhum bloco criado');
-    window.toast && window.toast('Erro ao criar blocos de perguntas.');
-  }
 
-  if (window.loadAnswers) window.loadAnswers();
-  const firstTa = document.querySelector('.j-bloco .j-pergunta textarea');
-  if (firstTa && window.handleInput) window.handleInput(firstTa);
-  if (window.initAccessibility) window.initAccessibility();
-  console.log('[loadDynamicBlocks] Blocos carregados com sucesso');
-};
+    if (typeof loadAnswers === 'function') loadAnswers();
+    const firstTa = document.querySelector('.j-bloco .j-pergunta textarea');
+    if (firstTa && typeof handleInput === 'function') handleInput(firstTa);
+    window.initAccessibility && window.initAccessibility();
+
+})();
 
 /* ===== Acessibilidade: Microfone e Áudio ===== */
 (function() {
@@ -2084,7 +2048,7 @@ window.loadDynamicBlocks = function() {
         ev.preventDefault();
         const enunciado = btnAudio.closest('.j-pergunta')?.querySelector('.pergunta-enunciado');
         const text = enunciado?.textContent || '';
-        if (window.readAloud) window.readAloud(text);
+        window.readAloud(text);
       }
     });
 
@@ -2094,9 +2058,9 @@ window.loadDynamicBlocks = function() {
         currentLang = ev.target.value;
         if (recognition) recognition.lang = currentLang;
         window.toast(`Idioma alterado para ${currentLang}`);
-        if (window.updateBlocks) window.updateBlocks();
+        window.updateBlocks && window.updateBlocks();
         if (!document.getElementById('section-perguntas').classList.contains('hidden')) {
-          if (window.loadDynamicBlocks) window.loadDynamicBlocks();
+          window.loadDynamicBlocks && window.loadDynamicBlocks();
         }
       });
     }
@@ -2110,9 +2074,9 @@ window.loadDynamicBlocks = function() {
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         const prefix = textarea.value ? textarea.value + ' ' : '';
-        if (window.typeAnswer) window.typeAnswer(textarea, prefix + transcript, 36);
-        if (window.saveAnswers) window.saveAnswers();
-        if (window.updateProgress) window.updateProgress();
+        window.typeAnswer(textarea, prefix + transcript, 36);
+        if (typeof window.saveAnswers === 'function') window.saveAnswers();
+        if (typeof window.updateProgress === 'function') window.updateProgress();
       };
 
       recognition.onend = () => {
@@ -2134,89 +2098,200 @@ window.loadDynamicBlocks = function() {
 
     window.initAccessibility = initAccessibility;
   }
-
-  initAccessibility();
 })();
-
-/* ===== Autobind do mic ===== */
-(function() {
-  function autobindMic(scope) {
-    try {
-      if (!window.JORNADA_MICRO || !window.JORNADA_MICRO.attachAll) {
-        console.error('[MIC] JORNADA_MICRO.attachAll não definido');
-        return;
-      }
+  
+/* Autobind do mic nas perguntas — 1 função, idempotente */
+(function(){
+  function autobindMic(scope){
+    try{
+      if(!window.JORNADA_MICRO || !window.JORNADA_MICRO.attachAll) return;
       const sec = document.getElementById('section-perguntas') || document;
-      window.JORNADA_MICRO.attachAll(sec, { mode: 'append' });
-    } catch (e) {
-      console.error('[MIC] autobind erro:', e);
-    }
+      window.JORNADA_MICRO.attachAll(sec, { mode:'append' }); // liga/religa sem duplicar
+    }catch(e){ console.error('[MIC] autobind erro:', e); }
   }
 
+  // executa já
   if (document.readyState !== 'loading') autobindMic();
   else document.addEventListener('DOMContentLoaded', () => autobindMic());
 
+  // religa ao trocar de idioma
   document.getElementById('language-select')?.addEventListener('change', () => autobindMic());
 
+  // religa quando aparecer perguntas / avançar de pergunta / criar novos blocos
   const target = document.getElementById('section-perguntas') || document.body;
-  const mo = new MutationObserver(() => {
-    autobindMic();
-    mo.disconnect();
-  });
-  mo.observe(target, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+  const mo = new MutationObserver(() => autobindMic());
+  mo.observe(target, { childList:true, subtree:true, attributes:true, attributeFilter:['class'] });
 
-  document.addEventListener('click', (e) => {
+  // religa em cliques de avanço/prev
+  document.addEventListener('click', (e)=>{
     if (e.target.closest('[data-action="next"],[data-action="avancar"],.btn-avancar,#btnNextPerguntas')) {
       setTimeout(() => autobindMic(), 0);
     }
   }, true);
 
+  // expõe se quiser chamar manualmente
   window.autobindMic = autobindMic;
 })();
 
-/* ===== JORNADA_MICRO.attachAll ===== */
-(function(g) {
+/* Patch: JORNADA_MICRO.attachAll — idempotente, sem duplicar */
+(function (g) {
   if (!g.JORNADA_MICRO) return;
-  if (g.JORNADA_MICRO.attachAll) return;
-  g.JORNADA_MICRO.attachAll = function(scope = document, opts = {}) {
+  if (g.JORNADA_MICRO.attachAll) return; // já existe
+
+  g.JORNADA_MICRO.attachAll = function (scope = document, opts = {}) {
     const root = (typeof scope === 'string') ? document.querySelector(scope) : (scope || document);
     if (!root) return 0;
-    if (!g.JORNADA_MICRO.attach) {
-      console.error('[MIC] JORNADA_MICRO.attach não definido');
-      return 0;
-    }
+
     const areas = Array.from(root.querySelectorAll('textarea'));
     let count = 0;
     for (const ta of areas) {
-      if (ta.dataset.micBound === '1') continue;
-      const ctrl = g.JORNADA_MICRO.attach(ta, opts);
+      if (ta.dataset.micBound === '1') continue;        // evita duplicar
+      const ctrl = g.JORNADA_MICRO.attach(ta, opts);    // usa attach existente
       ta.dataset.micBound = '1';
-      ta._micCtrl = ctrl;
+      ta._micCtrl = ctrl;                               // guarda se quiser start/stop
       count++;
     }
     try { console.log('[MIC] attachAll ligados:', count); } catch {}
     return count;
   };
-})(window);   
-</script>
-  
-<script defer src="/config.js?v=5" onload="console.log('[LOAD] config.js carregado')" onerror="console.error('[LOAD] Erro ao carregar config.js')"></script>
-<script defer src="/jornada-utils.js?v=5" onload="console.log('[LOAD] jornada-utils.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-utils.js')"></script>
-<script defer src="/jornada-core.js?v=5" onload="console.log('[LOAD] jornada-core.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-core.js')"></script>
-<script defer src="/jornada-auth.js?v=5" onload="console.log('[LOAD] jornada-auth.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-auth.js')"></script>
-<script defer src="/jornada-chama.js?v=5" onload="console.log('[LOAD] jornada-chama.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-chama.js')"></script>
-<script defer src="/jornada-paper-qa.js?v=5" onload="console.log('[LOAD] jornada-paper-qa.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-paper-qa.js')"></script>
-<script defer src="/jornada-typing.js?v=5" onload="console.log('[LOAD] jornada-typing.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-typing.js')"></script>
-<script defer src="/assets/js/jornada-typing-bridge.js?v=1" onload="console.log('[LOAD] jornada-typing-bridge.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-typing-bridge.js')"></script>
-<script defer src="/jornada-controller.js?v=5" onload="console.log('[LOAD] jornada-controller.js carregado'); console.log('[JC] Após controller: JC existe?', !!window.JC, 'init =', typeof (window.JC && window.JC.init))" onerror="console.error('[LOAD] Erro ao carregar jornada-controller.js')"></script>
-<script defer src="/jornada-render.js?v=5" onload="console.log('[LOAD] jornada-render.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-render.js')"></script>
-<script defer src="/assets/js/jornada-shims.js?v=5" onload="console.log('[LOAD] jornada-shims.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-shims.js')"></script>
-<script defer src="/jornada-bootstrap.js?v=5" onload="console.log('[LOAD] jornada-bootstrap.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-bootstrap.js')"></script>
-<script defer src="/jornada-micro.js?v=5" onload="console.log('[LOAD] jornada-micro.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-micro.js')"></script>
-<script defer src="/i18n/i18n.js?v=5" onload="console.log('[LOAD] i18n.js carregado')" onerror="console.error('[LOAD] Erro ao carregar i18n.js')"></script>
-<script defer src="/api.js?v=5" onload="console.log('[LOAD] api.js carregado')" onerror="console.error('[LOAD] Erro ao carregar api.js')"></script>
+})(window);
 
+
+/* ===== Inicialização da Página ===== */
+(function() {
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('[Inicialização] Carregando section-intro');
+    try {
+      const intro = document.getElementById('section-intro') || document.querySelector('[data-section="intro"], .section-intro');
+      if (intro) {
+        window.showSection('section-intro');
+        console.log('[Inicialização] section-intro encontrada, chamando showSection');
+      } else {
+        console.error('[Inicialização] section-intro não encontrada');
+        window.toast('Seção de introdução não encontrada. Tente recarregar a página.');
+      }
+
+      // Adiciona evento ao botão de avançar
+      const nextBtn = document.querySelector('[data-action="next"], [data-action="avancar"]');
+      if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+          console.log('[Inicialização] Botão avançar clicado');
+          window.goNext();
+        });
+      } else {
+        console.log('[Inicialização] Botão avançar não encontrado');
+      }
+    } catch (e) {
+      console.error('[Inicialização] Erro ao inicializar página:', e);
+      window.toast('Erro ao carregar a página inicial.');
+    }
+  });
+})();
+</script>
+
+<!-- --- scripts utilitários básicos --- -->
+<script defer src="/config.js?v=5"></script>
+<script defer src="/jornada-utils.js?v=5"></script>
+
+<!-- --- módulos principais da jornada --- -->
+<script defer src="/jornada-core.js?v=5"></script>
+<script defer src="/jornada-auth.js?v=5"></script>
+<script defer src="/jornada-chama.js?v=5"></script>
+<script defer src="/jornada-paper-qa.js?v=5"></script>
+<script defer src="/jornada-typing.js?v=5"></script>
+<script defer src="/assets/js/jornada-typing-bridge.js?v=1"></script>
+
+<!-- --- controller e dependências que definem JC --- -->
+<script defer src="/jornada-controller.js?v=5"></script>
+<script defer>(function () { console.log("[PROBE] após controller: JC existe?", !!window.JC, "init =", typeof (window.JC && window.JC.init)); })();</script>
+<script defer src="/jornada-render.js?v=5"></script>
+<script defer src="/assets/js/jornada-shims.js?v=5"></script>
+
+<script defer>
+  // HOTFIX: expose + init de emergência (só se faltar)
+  (function () {
+    window.JC = window.JC || {};
+    if (typeof JC.init !== "function") {
+      JC.state = JC.state || { route: "intro", booted: false };
+      JC.onReady = JC.onReady || function (cb) { try { cb && cb(); } catch (e) {} };
+      JC.init = function () {
+        JC.state.booted = true;
+        JC.ready = true;
+        console.warn("[JC] init (fallback) usado — controller não expôs init.");
+      };
+    }
+    console.log("[JC] expose+fallback aplicado — init =", typeof JC.init);
+  })();
+</script>
+
+  console.log('[JC] expose shim carregado (JC.init disponível)');
+})();
+</script>
+<!-- --- bootstrap e demais que dependem do JC --- -->
+<script defer>(function () { window.JC = window.JC || {}; console.log("[JC] expose shim carregado (JC.init disponível?)"); })();</script>  
+<script defer src="/jornada-bootstrap.js?v=5"></script>
+<script defer src="/jornada-micro.js?v=5"></script>
+<script defer src="/i18n/i18n.js?v=5"></script>
+<script defer src="/api.js?v=5"></script> 
+  
+<!-- Micro-boot (SAFE): escolhe API_BASE com fallback e inicia a jornada -->
+<script>
+(function () {
+  console.log("[BOOT] Iniciando micro-boot…");
+
+  // 1) Sondagem de módulos (só loga, não trava)
+  const must = ["CONFIG","JUtils","JCore","JAuth","JChama","JPaperQA","JTyping","JController","JRender","JBootstrap","JMicro","I18N","API"];
+  const missing = must.filter(k => !(k in window));
+  if (missing.length) console.warn("[BOOT] Módulos ausentes:", missing);
+
+  // 2) Definição segura de API_BASE
+  const PRIMARY_DEFAULT  = (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || "https://conhecimento-com-luz-api.onrender.com";
+  const API              = window.API || {};                  // pode não existir ainda
+  const API_PRIMARY      = API.API_PRIMARY   || PRIMARY_DEFAULT;
+  const API_FALLBACK     = API.API_FALLBACK  || API_PRIMARY;  // se não houver, usa o primary mesmo
+
+  async function chooseBase() {
+    // Se API.health existir, testa; senão, usa o primary
+    if (typeof API.health === "function") {
+      try {
+        const ok = await API.health();              // ideal: { ok: true }
+        window.API_BASE = ok ? API_PRIMARY : API_FALLBACK;
+      } catch {
+        console.warn("[BOOT] Health falhou, usando FALLBACK");
+        window.API_BASE = API_FALLBACK;
+      }
+    } else {
+      window.API_BASE = API_PRIMARY;
+    }
+    console.log("[BOOT] API_BASE =", window.API_BASE);
+  }
+
+  // 3) Start da jornada com tolerância a erros/ordem
+  chooseBase().finally(async () => {
+    try {
+      if (window.JBootstrap && typeof JBootstrap.start === "function") {
+        await JBootstrap.start();
+      }
+    } catch (e) {
+      console.error("[BOOT] Erro em JBootstrap.start:", e);
+    }
+    try {
+      if (window.JController && typeof JController.init === "function") {
+        await JController.init();
+      }
+    } catch (e) {
+      console.error("[BOOT] Erro em JController.init:", e);
+    }
+    console.log("[BOOT] Jornada iniciada 🚀");
+  });
+})();
+</script>
 </body>
 </html>
+
+
+
+
+
 
 
