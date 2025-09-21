@@ -402,7 +402,7 @@
           <div class="selfie-final" style="text-align:center; margin-top:20px;">
             <img id="minhaFotoFinal" alt="Minha foto com a Irmandade" style="max-width:80%; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.3)" />
           </div>
-          <p style="margin-top:12px;"><small>Sua imagem foi unida à Irmandade. 🙏</small></p>
+          <p style="margin-top:12px;"><small data-typing="true" data-text="Sua imagem foi unida à Irmandade. 🙏" data-speed="40" data-cursor="true"></small></p>
           <div class="footer-actions">
             <button id="btnGeneratePDF" class="btn" data-action="generate-pdf">Gerar PDF/HQ</button>
             <button id="btnRestart" class="btn" data-action="restart">Voltar ao Portal</button>
@@ -734,7 +734,9 @@
         return;
       }
 
-      if (window.showSection) {
+      if (window.playVideo) {
+        window.playVideo('/assets/videos/transicao_guia.mp4');
+      } else if (window.showSection) {
         window.showSection('section-guia');
         log('[startJourney] Navegação para section-guia');
       } else {
@@ -750,7 +752,16 @@
   <script>
   (function() {
     const HIDE_CLASS = 'hidden';
+    let lastShowSection = 0;
+
     window.showSection = function(id) {
+      const now = performance.now();
+      if (now - lastShowSection < 500) {
+        console.log('[showSection] Debounce: evitando chamada repetida');
+        return;
+      }
+      lastShowSection = now;
+
       try {
         const all = Array.from(document.querySelectorAll('div[id^="section-"]'));
         const target = document.getElementById(id);
@@ -770,7 +781,10 @@
           }
           const btn = target.querySelector('[data-action="avancar"], .btn-avancar, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"]');
           if (btn && !btn.dataset.clickAttached) {
-            btn.addEventListener('click', () => window.JC && window.JC.goNext && window.JC.goNext(), { once: true });
+            btn.addEventListener('click', (e) => {
+              e.preventDefault();
+              if (window.JC && window.JC.goNext) window.JC.goNext();
+            }, { once: true });
             btn.dataset.clickAttached = '1';
             console.log('[showSection] Evento de clique adicionado ao botão avançar em:', id, 'Botão:', btn.id || btn.className);
           }
@@ -789,13 +803,41 @@
   (function() {
     window.JORNADA_BLOCKS = window.JORNADA_BLOCKS || [
       {
+        video_after: "/assets/img/filme-0-ao-encontro-da-jornada.mp4"
         questions: [
           { label: "O que te motiva a buscar conhecimento?" },
           { label: "Como você lida com desafios em sua jornada?" },
           { label: "O que significa 'luz' para você?" },
           { label: "Qual é o maior aprendizado que você teve até agora?" }
         ],
-        video_after: "/assets/videos/transicao_bloco1.mp4"
+        video_after: "/assets/img/filme-1-entrando-na-jornada.mp4"
+      },
+      {
+        questions: [
+          { label: "Como você enxerga seu propósito hoje?" },
+          { label: "O que te inspira a continuar?" }
+        ],
+        video_after: "/assets/img/filme-2-dentro-da-jornada.mp4"
+      },
+      {
+        questions: [
+          { label: "Qual é o maior obstáculo que você superou?" },
+          { label: "Como você gostaria de contribuir para o mundo?" }
+        ],
+        video_after: "/assets/img/filme-3-traumas-na-jornada.mp4"
+      },
+      {
+        questions: [
+          { label: "O que te faz sentir mais vivo?" },
+          { label: "Qual é sua visão para o futuro?" }
+        ],
+        video_after: "/assets/img/filme-4-aproximando-do-final.mp4"
+      },
+      {
+        questions: [
+          { label: "O que você aprendeu sobre si mesmo nesta jornada?" }
+        ],
+        video_after: "/assets/videos/transicao_bloco5.mp4"
       }
     ];
 
@@ -967,10 +1009,97 @@
         const guia = btn.dataset.guia;
         window.JORNADA.selectedGuia = guia;
         console.log('[Guia] Guia selecionado:', guia);
-        window.showSection && window.showSection('section-selfie');
+        if (window.playVideo) {
+          window.playVideo('/assets/videos/transicao_selfie.mp4');
+        } else if (window.showSection) {
+          window.showSection('section-selfie');
+        }
       }
     });
     console.log('[Guia] Bloco carregado');
+  })();
+  </script>
+
+  <!-- Selfie -->
+  <script>
+  (function() {
+    let lastPreview = 0;
+    let lastCapture = 0;
+
+    document.addEventListener('change', (e) => {
+      const input = e.target.closest('#selfieInput');
+      if (input && input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = document.getElementById('selfieImage');
+          if (img) {
+            img.setAttribute('href', ev.target.result);
+            document.querySelector('.flame-layer').style.opacity = '1';
+            console.log('[Selfie] Imagem carregada');
+          }
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    });
+
+    document.addEventListener('input', (e) => {
+      const input = e.target.closest('#nameInput, #selfieScale, #selfieOffsetX, #selfieOffsetY');
+      if (input) {
+        const img = document.getElementById('selfieImage');
+        const nameSlot = document.getElementById('userNameSlot');
+        if (!img || !nameSlot) return;
+
+        if (input.id === 'nameInput') {
+          nameSlot.textContent = input.value || 'NOME';
+        } else {
+          const scale = document.getElementById('selfieScale')?.value || 1;
+          const offsetX = document.getElementById('selfieOffsetX')?.value || 0;
+          const offsetY = document.getElementById('selfieOffsetY')?.value || 0;
+          img.style.transform = `scale(${scale}) translate(${offsetX}px, ${offsetY}px)`;
+        }
+        console.log('[Selfie] Ajustes aplicados');
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('#previewBtn, #captureBtn');
+      if (btn) {
+        e.preventDefault();
+        const now = performance.now();
+        if (btn.id === 'previewBtn') {
+          if (now - lastPreview < 1000) return;
+          lastPreview = now;
+          const img = document.getElementById('selfieImage');
+          if (img && img.getAttribute('href')) {
+            document.querySelector('.flame-layer').style.opacity = '1';
+            window.toast && window.toast('Pré-visualização atualizada!');
+          } else {
+            window.toast && window.toast('Selecione uma imagem primeiro.');
+          }
+        } else if (btn.id === 'captureBtn') {
+          if (now - lastCapture < 1000) return;
+          lastCapture = now;
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          const img = document.getElementById('selfieImage');
+          const bg = document.getElementById('guideBg');
+          if (!img || !bg) {
+            window.toast && window.toast('Erro ao capturar imagem.');
+            return;
+          }
+          canvas.width = bg.width;
+          canvas.height = bg.height;
+          ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 15, 35, 70, 90);
+          const link = document.createElement('a');
+          link.download = 'selfie-irmandade.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          console.log('[Selfie] Imagem baixada');
+        }
+      }
+    });
+    console.log('[Selfie] Bloco carregado');
   })();
   </script>
 
