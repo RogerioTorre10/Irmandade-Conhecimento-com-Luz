@@ -398,3 +398,47 @@ window.JC.startJourney = startJourney;
 window.JC.goNext = goNext;
 
 console.log('[JORNADA_CONTROLLER] pronto');
+
+<!-- FIM DE jornada-controller.js (HOTFIX v5.1) -->
+/* === HOTFIX v5.1 — Tail seguro do Controller === */
+(function (global) {
+  "use strict";
+
+  // Se já existir, reaproveita; senão cria
+  const JC = global.JC || {};
+
+  // Estado mínimo para não quebrar dependências
+  JC.state = JC.state || { route: "intro", booted: false };
+
+  // Evita redefinir se já existir um init funcional
+  if (typeof JC.init !== "function") {
+    JC.init = function initJornada() {
+      try {
+        JC.state.booted = true;
+        JC.ready = true;
+        console.log("[JC] init ok");
+        // Se o controller tiver callbacks pendentes, chame-os aqui
+        if (Array.isArray(JC._onReady)) {
+          JC._onReady.forEach(fn => { try { fn(); } catch(e){} });
+          JC._onReady = [];
+        }
+      } catch (err) {
+        console.error("[JC] falha no init:", err);
+      }
+    };
+  }
+
+  // Utilidade opcional para escutar readiness
+  JC.onReady = function (cb) {
+    if (JC.ready) { try { cb(); } catch(e){}; return; }
+    JC._onReady = JC._onReady || [];
+    JC._onReady.push(cb);
+  };
+
+  // Expõe global
+  global.JC = JC;
+
+})(window);
+// === FIM HOTFIX v5.1 ===
+
+   
