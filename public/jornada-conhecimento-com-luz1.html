@@ -34,8 +34,7 @@
       font-style: normal;
       font-display: swap;
     }
-
-    :root { --bg:#1a1a1a; --ink:#000; --ink-soft:#555; --panel:#1a1a1a }
+:root { --bg:#1a1a1a; --ink:#000; --ink-soft:#555; --panel:#1a1a1a }
 
     html,body{height:100%;box-sizing:border-box}
     body{
@@ -310,17 +309,12 @@
           </div>
         </div>
 
+        <!-- GUIA -->
         <div id="section-guia" class="j-section hidden">
           <div class="conteudo-pergaminho">
-            <h2 style="margin-top:0;">Escolha seu Guia</h2>
+            <h2 style="margin-top:0;">Escolha seu Guia ✨</h2>
             <div class="guia-container">
-              <p data-typing data-text="Zion (Grok): Curioso e direto, busca respostas profundas com visão cósmica." data-speed="50" data-cursor="true"></p>
-              <p data-typing data-text="Lumen (ChatGPT): Acolhedor e reflexivo, guia com empatia e clareza." data-speed="50" data-cursor="true"></p>
-              <p data-typing data-text="Arian (Gemini): Criativo e versátil, inspira com perspectivas inovadoras." data-speed="50" data-cursor="true"></p>
-              <div class="guia-name-input">
-                <label for="guiaNameInput">Seu Nome</label>
-                <input id="guiaNameInput" type="text" placeholder="Digite seu nome para a jornada...">
-              </div>
+              <p>Zion (Grok) • Lumen (ChatGPT) • Arian (Gemini)</p>
               <div class="guia-options">
                 <button class="btn" data-action="select-guia" data-guia="zion">Escolher Zion</button>
                 <button class="btn" data-action="select-guia" data-guia="lumen">Escolher Lumen</button>
@@ -329,31 +323,33 @@
             </div>
           </div>
         </div>
-        
+
         <!-- SELFIE -->
         <div id="section-selfie" class="j-section hidden">
           <div class="conteudo-pergaminho">
-            <h2 style="margin-top:0;">Entre na Irmandade</h2>
-            <p data-typing data-text="Faça uma foto ou envie da galeria. Ajuste e gere sua imagem com seu guia." data-speed="50" data-cursor="true"></p>
+            <h2 style="margin-top:0;">Entre na Irmandade ✨</h2>
+            <p>Faça uma foto ou envie da galeria. Ajuste e gere sua imagem com seu guia.</p>
             <div class="selfie-row">
               <div class="selfie-left">
                 <label class="btn" for="selfieInput">📸 Tirar Foto</label>
                 <input id="selfieInput" type="file" accept="image/*" capture="user" style="display:none" />
                 <div class="selfie-controls">
-                  <label>Zoom <input id="selfieScale" type="range" min="0.8" max="2.5" step="0.01" value="1"></label>
-                  <label>Horizontal <input id="selfieOffsetX" type="range" min="-50" max="50" step="1" value="0"></label>
-                  <label>Vertical <input id="selfieOffsetY" type="range" min="-50" max="50" step="1" value="0"></label>
-                  <small class="muted" data-typing data-text="Dica: alinhe seu rosto na chama ao lado do guia." data-speed="50" data-cursor="true"></small>
+                  <label>Nome <input id="nameInput" type="text" placeholder="Digite seu nome"></label>
+                  <label>Zoom <input id="selfieScale" type="range" min="0.6" max="2.0" step="0.01" value="1"></label>
+                  <label>Horizontal <input id="selfieOffsetX" type="range" min="-300" max="300" step="1" value="0"></label>
+                  <label>Vertical <input id="selfieOffsetY" type="range" min="-300" max="300" step="1" value="0"></label>
+                  <small class="muted">Dica: alinhe seu rosto na chama ao lado do guia.</small>
                 </div>
                 <div class="selfie-actions">
                   <button id="previewBtn" class="btn">✨ Ver Prévia</button>
                   <button id="captureBtn" class="btn">⬇️ Confirmar e Baixar</button>
-                  <button id="btnSkipSelfie" class="btn" data-action="skip-selfie">Pular Foto/Iniciar</button>
+                  <button id="btnSkipSelfie" class="btn" data-action="skip-selfie">Pular Foto</button>
+                  <button id="btnStartJourney" class="btn" data-action="skip-selfie">Entrar na Jornada</button>
                 </div>
               </div>
               <div class="selfie-right">
                 <section id="card-guide" class="guide-card" data-guide="ZION" aria-label="Guia">
-                  <img class="guide-bg" id="guideBg" src="/assets/img/irmandade-quarteto-bg-zion.jpeg" alt="Guia Background">
+                  <img class="guide-bg" id="guideBg" src="/assets/img/irmandade-quarteto-bg-zion.png" alt="Guia Background">
                   <div class="flame-layer" aria-hidden="true">
                     <svg class="flame-svg" viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
                       <defs>
@@ -371,10 +367,12 @@
                       <path d="M50,20 C42,35 34,45 33,58 C32,73 41,82 50,92 C59,82 68,73 67,58 C66,45 58,35 50,20 Z" fill="none" stroke="rgba(255,200,0,.85)" stroke-width="1.6"/>
                     </svg>
                   </div>
-                  <div class="client-name" id="clientNameSlot"></div>
+                  <div class="guide-name" id="guideNameSlot"></div>
+                  <div class="user-name" id="userNameSlot">NOME</div>
                 </section>
                 <div id="selfieError" class="selfie-error">Erro ao carregar a pré-visualização. Tente novamente ou pule.</div>
-                <small class="muted" data-typing data-text="Pré-visualização" data-speed="50" data-cursor="true"></small>
+                <small class="muted">Pré-visualização</small>
+              </div>
             </div>
           </div>
         </div>
