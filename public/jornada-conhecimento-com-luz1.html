@@ -2043,6 +2043,9 @@ window.loadDynamicBlocks = function() {
       first.classList.add('active');
       setTimeout(() => window.runTyping && window.runTyping(first), 100);
     }
+  } else {
+    console.error('[loadDynamicBlocks] Nenhum bloco criado');
+    window.toast && window.toast('Erro ao criar blocos de perguntas.');
   }
 
   if (window.loadAnswers) window.loadAnswers();
