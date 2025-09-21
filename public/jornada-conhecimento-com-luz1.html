@@ -1421,70 +1421,69 @@
   };
 
   let lastStartJourney = 0;
-  window.startJourney = async function() {
-    const now = performance.now();
-    if (now - lastStartJourney < 1000) {
-      log('[startJourney] Debounce: evitando chamada repetida');
-      return;
-    }
-    lastStartJourney = now;
+ window.startJourney = async function() {
+  const now = performance.now();
+  if (now - lastStartJourney < 1000) {
+    log('[startJourney] Debounce: evitando chamada repetida');
+    return;
+  }
+  lastStartJourney = now;
 
-    const inputSenha = getSenhaInput();
-    const inputNome = getSenhaSection().querySelector('#nomeInput, [data-role="nome"], input[name="nome"]');
-    const senha = (inputSenha && inputSenha.value || '').trim().toLowerCase();
-    const nome = (inputNome && inputNome.value || '').trim();
+  const inputSenha = getSenhaInput();
+  const inputNome = getSenhaSection().querySelector('#nomeInput, [data-role="nome"], input[name="nome"]');
+  const senha = (inputSenha && inputSenha.value || '').trim().toLowerCase();
+  const nome = (inputNome && inputNome.value || '').trim();
 
-    log('[startJourney] Senha fornecida:', senha ? '[oculta]' : 'nenhuma', 'Nome:', nome || 'nenhum');
+  log('[startJourney] Senha fornecida:', senha ? '[oculta]' : 'nenhuma', 'Nome:', nome || 'nenhum');
 
-    if (!senha) {
-      window.toast && window.toast('Digite a senha para continuar.');
-      if (inputSenha) inputSenha.focus();
-      log('[startJourney] Senha não fornecida');
-      return;
-    }
+  if (!senha) {
+    window.toast && window.toast('Digite a senha para continuar.');
+    if (inputSenha) inputSenha.focus();
+    log('[startJourney] Senha não fornecida');
+    return;
+  }
 
-    if (senha !== VALID_PASSWORD) {
-      window.toast && window.toast('Senha incorreta. Tente novamente.');
-      if (inputSenha) inputSenha.focus();
-      log('[startJourney] Senha inválida:', senha);
-      return;
-    }
+  if (senha !== VALID_PASSWORD) {
+    window.toast && window.toast('Senha incorreta. Tente novamente.');
+    if (inputSenha) inputSenha.focus();
+    log('[startJourney] Senha inválida:', senha);
+    return;
+  }
 
-    if (nome) {
-      try { localStorage.setItem('JORNADA_NOME', nome); } catch (_) {}
-    }
-    window.speak && window.speak('');
+  if (nome) {
+    try { localStorage.setItem('JORNADA_NOME', nome); } catch (_) {}
+  }
+  window.speak && window.speak('');
 
-    const hasGuia = !!(document.getElementById('section-guia') || document.querySelector('[data-section="guia"], .section-guia'));
-    const hasSelfie = !!(document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie'));
+  const hasGuia = document.getElementById('section-guia') || document.querySelector('[data-section="guia"], .section-guia');
+  const hasSelfie = document.getElementById('section-selfie') || document.querySelector('[data-section="selfie"], .section-selfie');
 
-    if (hasGuia) {
-      if (window.showSection) {
-        window.showSection('section-guia');
-        log('[startJourney] Navegação para section-guia');
-      } else {
-        log('[startJourney] window.showSection não definido');
-        window.toast && window.toast('Erro ao navegar para a seção de guia.');
-      }
-    } else if (hasSelfie) {
-      if (window.showSection) {
-        window.showSection('section-selfie');
-        log('[startJourney] Navegação para section-selfie');
-      } else {
-        log('[startJourney] window.showSection não definido');
-        window.toast && window.toast('Erro ao navegar para a seção de selfie.');
-      }
+  if (hasGuia) {
+    if (window.showSection) {
+      window.showSection('section-guia');
+      log('[startJourney] Navegação para section-guia');
     } else {
-      if (window.openQuestions) {
-        window.openQuestions();
-        log('[startJourney] Navegação para section-perguntas (fallback)');
-      } else {
-        log('[startJourney] window.openQuestions não definido');
-        window.toast && window.toast('Erro ao abrir perguntas.');
-      }
+      log('[startJourney] window.showSection não definido');
+      window.toast && window.toast('Erro ao navegar para a seção de guia.');
     }
-  };
-})();
+  } else if (hasSelfie) {
+    if (window.showSection) {
+      window.showSection('section-selfie');
+      log('[startJourney] Navegação para section-selfie');
+    } else {
+      log('[startJourney] window.showSection não definido');
+      window.toast && window.toast('Erro ao navegar para a seção de selfie.');
+    }
+  } else {
+    if (window.openQuestions) {
+      window.openQuestions();
+      log('[startJourney] Navegação para section-perguntas (fallback)');
+    } else {
+      log('[startJourney] window.openQuestions não definido');
+      window.toast && window.toast('Erro ao abrir perguntas. Verifique as seções de guia e selfie.');
+    }
+  }
+};
 
 /* ===== Guia ===== */
 (function() {
