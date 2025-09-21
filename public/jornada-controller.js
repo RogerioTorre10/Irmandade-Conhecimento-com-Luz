@@ -175,81 +175,99 @@
 
   // Navegação para a próxima seção/pergunta
   function goNext() {
-    console.log('[JORNADA_CONTROLLER] Iniciando goNext...');
-    const state = JC.state;
-    const currentSection = document.querySelector('.j-section:not(.hidden)')?.id;
-    const flow = [
-      { from: 'section-intro', to: 'section-termos' },
-      { from: 'section-termos', to: 'section-senha' },
-      { from: 'section-senha', to: 'section-guia' },
-      { from: 'section-guia', to: 'section-selfie' },
-      { from: 'section-selfie', to: 'section-perguntas' },
-      { from: 'section-perguntas', to: null },
-      { from: 'section-final', to: null }
-    ];
+  console.log('[JORNADA_CONTROLLER] Iniciando goNext...');
+  const state = JC.state;
+  let currentSection = document.querySelector('.j-section:not(.hidden)')?.id;
+  if (!currentSection) {
+    console.error('[JORNADA_CONTROLLER] Nenhuma seção ativa encontrada');
+    window.toast && window.toast('Nenhuma seção ativa encontrada. Tente recarregar.');
+    return;
+  }
+  // Corrigir truncamento
+  if (currentSection.startsWith('section-int')) {
+    currentSection = 'section-intro';
+    console.log('[JORNADA_CONTROLLER] Corrigido truncamento: section-intro');
+  }
 
-    if (currentSection === 'section-perguntas') {
-      const section = document.getElementById('section-perguntas');
-      if (!section) {
-        console.error('[JORNADA_CONTROLLER] Seção #section-perguntas não encontrada em goNext');
-        window.showSection && window.showSection('section-final');
-        return;
+  const flow = [
+    { from: 'section-intro', to: 'section-termos' },
+    { from: 'section-termos', to: 'section-senha' },
+    { from: 'section-senha', to: 'section-guia' },
+    { from: 'section-guia', to: 'section-selfie' },
+    { from: 'section-selfie', to: 'section-perguntas' },
+    { from: 'section-perguntas', to: 'section-final' },
+    { from: 'section-final', to: null }
+  ];
+
+  if (currentSection === 'section-perguntas') {
+    const section = document.getElementById('section-perguntas');
+    if (!section) {
+      console.error('[JORNADA_CONTROLLER] Seção #section-perguntas não encontrada em goNext');
+      window.showSection && window.showSection('section-final');
+      return;
+    }
+    const blocos = S.blocos();
+    if (!blocos.length) {
+      console.error('[JORNADA_CONTROLLER] Nenhum bloco encontrado em goNext');
+      window.showSection && window.showSection('section-final');
+      return;
+    }
+    const bloco = blocos[state.blocoIndex];
+    if (!bloco) {
+      console.error('[JORNADA_CONTROLLER] Bloco não encontrado no índice:', state.blocoIndex);
+      window.showSection && window.showSection('section-final');
+      return;
+    }
+    const perguntas = S.perguntasDo(bloco);
+    if (!perguntas.length) {
+      console.error('[JORNADA_CONTROLLER] Nenhuma pergunta encontrada no bloco:', state.blocoIndex);
+      window.showSection && window.showSection('section-final');
+      return;
+    }
+    const current = perguntas[state.perguntaIndex];
+    if (current) {
+      current.classList.remove('active');
+    }
+    if (state.perguntaIndex + 1 < perguntas.length) {
+      state.perguntaIndex++;
+      const next = perguntas[state.perguntaIndex];
+      next.classList.add('active');
+      if (window.runTyping) {
+        window.runTyping(next);
       }
-      const blocos = S.blocos();
-      if (!blocos.length) {
-        console.error('[JORNADA_CONTROLLER] Nenhum bloco encontrado em goNext');
-        window.showSection && window.showSection('section-final');
-        return;
-      }
-      const bloco = blocos[state.blocoIndex];
-      if (!bloco) {
-        console.error('[JORNADA_CONTROLLER] Bloco não encontrado no índice:', state.blocoIndex);
-        window.showSection && window.showSection('section-final');
-        return;
-      }
-      const perguntas = S.perguntasDo(bloco);
-      if (!perguntas.length) {
-        console.error('[JORNADA_CONTROLLER] Nenhuma pergunta encontrada no bloco:', state.blocoIndex);
-        window.showSection && window.showSection('section-final');
-        return;
-      }
-      const current = perguntas[state.perguntaIndex];
-      if (current) {
-        current.classList.remove('active');
-      }
-      if (state.perguntaIndex + 1 < perguntas.length) {
-        state.perguntaIndex++;
-        const next = perguntas[state.perguntaIndex];
-        next.classList.add('active');
+    } else if (state.blocoIndex + 1 < blocos.length) {
+      state.blocoIndex++;
+      state.perguntaIndex = 0;
+      blocos.forEach(b => b.style.display = 'none');
+      const nextBloco = blocos[state.blocoIndex];
+      nextBloco.style.display = 'block';
+      const firstPergunta = S.perguntasDo(nextBloco)[0];
+      if (firstPergunta) {
+        firstPergunta.classList.add('active');
         if (window.runTyping) {
-          window.runTyping(next);
+          window.runTyping(firstPergunta);
         }
-      } else if (state.blocoIndex + 1 < blocos.length) {
-        state.blocoIndex++;
-        state.perguntaIndex = 0;
-        blocos.forEach(b => b.style.display = 'none');
-        const nextBloco = blocos[state.blocoIndex];
-        nextBloco.style.display = 'block';
-        const firstPergunta = S.perguntasDo(nextBloco)[0];
-        if (firstPergunta) {
-          firstPergunta.classList.add('active');
-          if (window.runTyping) {
-            window.runTyping(firstPergunta);
-          }
-        }
-      } else {
-        window.showSection && window.showSection('section-final');
       }
     } else {
-      const nextSection = flow.find(f => f.from === currentSection)?.to;
-      if (nextSection && window.showSection) {
+      window.showSection && window.showSection('section-final');
+    }
+  } else {
+    const nextSection = flow.find(f => f.from === currentSection)?.to;
+    if (nextSection && window.showSection) {
+      const nextSectionEl = document.getElementById(nextSection) || document.querySelector(`[data-section="${nextSection.replace('section-', '')}"], .${nextSection}`);
+      if (nextSectionEl) {
         window.showSection(nextSection);
+        console.log('[JORNADA_CONTROLLER] Navegando de', currentSection, 'para', nextSection);
       } else {
-        console.log('[JORNADA_CONTROLLER] Nenhuma seção seguinte definida para:', currentSection);
-        window.toast && window.toast('Fim do fluxo. Tente recarregar.');
+        console.error('[JORNADA_CONTROLLER] Seção seguinte não encontrada:', nextSection);
+        window.toast && window.toast(`Seção ${nextSection} não encontrada. Tente recarregar.`);
       }
+    } else {
+      console.log('[JORNADA_CONTROLLER] Nenhuma seção seguinte definida para:', currentSection);
+      window.toast && window.toast('Fim do fluxo. Tente recarregar.');
     }
   }
+}
 
   // Iniciar jornada
   function startJourney() {
