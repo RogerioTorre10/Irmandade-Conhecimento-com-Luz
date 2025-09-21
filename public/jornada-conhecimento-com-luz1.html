@@ -5,21 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>Jornada • Irmandade Conhecimento com Luz</title>
     <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png" />
-    <link href="https://fonts.googleapis.com/css2?family=Cardo:wght@400;700&display=swap" rel="stylesheet" />
-    <link rel="preload" href="/assets/fonts/ManufacturingConsent-Regular.ttf" as="font" type="font/ttf" crossorigin />
-    <link rel="preload" href="/assets/fonts/BerkshireSwash-Regular.ttf" as="font" type="font/ttf" crossorigin />
     <script defer src="/assets/js/toast-safe.js"></script>  
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    
 
   <style>
-    @font-face {
+     @font-face {
       font-family: "ManufacturingConsent";
       src: url("/assets/fonts/ManufacturingConsent-Regular.ttf") format("truetype");
       font-weight: 400;
       font-style: normal;
       font-display: swap;
-   }
+    }
     @font-face {
       font-family: "BerkshireSwash";
       src: url("/assets/fonts/BerkshireSwash-Regular.ttf") format("truetype");
@@ -34,7 +30,8 @@
       font-style: normal;
       font-display: swap;
     }
-:root { --bg:#1a1a1a; --ink:#000; --ink-soft:#555; --panel:#1a1a1a }
+
+    :root { --bg:#1a1a1a; --ink:#000; --ink-soft:#555; --panel:#1a1a1a }
 
     html,body{height:100%;box-sizing:border-box}
     body{
@@ -1367,8 +1364,17 @@
       function updateBlocks(){
         window.JORNADA_BLOCKS = blockTranslations[currentLang] || blockTranslations['pt-BR'];
       }
-      
-</script>
+
+      /* boot */
+      ensureHeaderFlame();
+      ensurePageFlames();
+      runTyping();
+      initJornada();
+      showSection('section-intro');
+      updateBlocks();
+      lockVideoOrientation();
+    })();
+  </script>
   
 <script defer src="/config.js?v=5" onload="console.log('[LOAD] config.js carregado')" onerror="console.error('[LOAD] Erro ao carregar config.js')"></script>
 <script defer src="/jornada-utils.js?v=5" onload="console.log('[LOAD] jornada-utils.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-utils.js')"></script>
@@ -1387,4 +1393,5 @@
 <script defer src="/api.js?v=5" onload="console.log('[LOAD] api.js carregado')" onerror="console.error('[LOAD] Erro ao carregar api.js')"></script>
 
 </body>
-</html>     
+</html>
+</body>
