@@ -2234,10 +2234,11 @@
 })();
 </script>
 <!-- --- bootstrap e demais que dependem do JC --- -->
+<script defer src="/jornada-bootstrap.js?v=5"></script>
 <script defer src="/jornada-micro.js?v=5"></script>
 <script defer src="/i18n/i18n.js?v=5"></script>
-<script defer src="/api.js?v=5"></script>
-<script defer src="/jornada-bootstrap.js?v=5"></script>  
+<script defer>(function () { window.JC = window.JC || {}; console.log("[JC] expose shim carregado (JC.init disponível?)"); })();</script>
+<script defer src="/api.js?v=5"></script> 
   
 <!-- Micro-boot (SAFE): escolhe API_BASE com fallback e inicia a jornada -->
 <script>
