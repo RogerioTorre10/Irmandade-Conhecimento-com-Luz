@@ -1010,7 +1010,7 @@
     if (!el || el.dataset.typing === '1' || el.dataset.typed === '1') return Promise.resolve();
     if (!window.utils || !window.utils.dedupe) {
       console.error('[typeWriter] window.utils.dedupe não definido');
-      window.toast('Erro ao processar datilografia.');
+      window.toast && window.toast('Erro ao processar datilografia.');
       return Promise.resolve();
     }
     el.dataset.typing = '1';
@@ -1096,16 +1096,15 @@
       return;
     }
     if (G.__typingLock) {
-      console.log('[runTyping] Bloqueado por __typingLock');
-      return;
+      console.log('[runTyping] Bloqueado por __typingLock, liberando...');
+      G.__typingLock = false;
     }
     G.__typingLock = true;
-    setTimeout(() => { G.__typingLock = false; }, 5000);
 
     try {
       window.speak && window.speak('');
       const elements = Array
-        .from(root.querySelectorAll('[data-typing], .text, p, h1, h2, h3, h4, [class*="text"], [class*="title"], [class*="content"]'))
+        .from(root.querySelectorAll('[data-typing], .text, p, h1, h2, h3, h4, [class*="text"], [class*="title"], [class*="content"], .termos-texto, .pergunta-enunciado'))
         .filter(el => !el.dataset.typed && el.offsetParent !== null && !el.closest('.j-section.hidden'));
 
       if (elements.length === 0) {
@@ -1136,7 +1135,7 @@
       }
     } catch (e) {
       console.error('[runTyping] erro:', e);
-      window.toast('Erro durante a datilografia.');
+      window.toast && window.toast('Erro durante a datilografia.');
     } finally {
       G.__typingLock = false;
     }
