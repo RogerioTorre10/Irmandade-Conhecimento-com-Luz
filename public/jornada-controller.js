@@ -3,7 +3,7 @@
    jornada-controller.js
    Controla a navegação e estado da jornada
    ========================================================= */
-;(function () {
+(function () {
   'use strict';
   console.log('[JORNADA_CONTROLLER] Iniciando carregamento do script...');
 
@@ -17,6 +17,53 @@
   // Define namespace JC
   const JC = (window.JC = window.JC || {});
   JC.state = JC.state || { route: 'intro', booted: false, blocoIndex: 0, perguntaIndex: 0 };
+
+  // Define JC.init imediatamente
+  if (typeof JC.init !== 'function') {
+    JC.init = function initJornada() {
+      if (JC.state.booted) {
+        console.log('[JORNADA_CONTROLLER] init já feito — ignorando.');
+        return;
+      }
+      JC.state.booted = true;
+      JC.state.route = 'intro';
+      JC.ready = true;
+      console.log('[JORNADA_CONTROLLER] JC.init executado');
+
+      try {
+        if (window.JORNADA_RENDER && window.JORNADA_RENDER.updateCanvasBackground) {
+          window.JORNADA_RENDER.updateCanvasBackground('section-intro');
+        }
+        if (window.JORNADA_CHAMA && window.JORNADA_CHAMA.ensureHeroFlame) {
+          window.JORNADA_CHAMA.ensureHeroFlame('section-intro');
+        }
+        const section = document.getElementById('section-intro');
+        if (section && window.showSection) {
+          window.showSection('section-intro');
+        } else {
+          console.error('[JORNADA_CONTROLLER] section-intro não encontrada');
+          window.toast && window.toast('Seção de introdução não encontrada.');
+        }
+        const startBtn = document.querySelector('#iniciar, [data-action="start"], [data-action="iniciar"], .btn-iniciar');
+        if (startBtn) {
+          startBtn.removeEventListener('click', window.__JC_startJourney);
+          window.__JC_startJourney = () => {
+            console.log('[JORNADA_CONTROLLER] Botão Iniciar clicado');
+            startJourney();
+          };
+          startBtn.addEventListener('click', window.__JC_startJourney, { once: true });
+        }
+        loadDynamicBlocks();
+        if (JC._onReady && Array.isArray(JC._onReady)) {
+          JC._onReady.forEach(fn => { try { fn(); } catch (e) {} });
+          JC._onReady = [];
+        }
+      } catch (e) {
+        console.error('[JORNADA_CONTROLLER] Erro em initJornada:', e);
+        window.toast && window.toast('Erro ao inicializar a jornada.');
+      }
+    };
+  }
 
   // Seletores e utilitários
   const S = {
@@ -197,50 +244,6 @@
     }
   }
 
-  // Inicialização da jornada
-  function initJornada() {
-    if (JC.state.booted) {
-      console.log('[JORNADA_CONTROLLER] init já feito — ignorando.');
-      return;
-    }
-    JC.state.booted = true;
-    JC.state.route = 'intro';
-    JC.ready = true;
-
-    try {
-      if (window.JORNADA_RENDER && window.JORNADA_RENDER.updateCanvasBackground) {
-        window.JORNADA_RENDER.updateCanvasBackground('section-intro');
-      }
-      if (window.JORNADA_CHAMA && window.JORNADA_CHAMA.ensureHeroFlame) {
-        window.JORNADA_CHAMA.ensureHeroFlame('section-intro');
-      }
-      const section = document.getElementById('section-intro');
-      if (section && window.showSection) {
-        window.showSection('section-intro');
-      } else {
-        console.error('[JORNADA_CONTROLLER] section-intro não encontrada');
-        window.toast && window.toast('Seção de introdução não encontrada.');
-      }
-      const startBtn = document.querySelector('#iniciar, [data-action="start"], [data-action="iniciar"], .btn-iniciar');
-      if (startBtn) {
-        startBtn.removeEventListener('click', window.__JC_startJourney);
-        window.__JC_startJourney = () => {
-          console.log('[JORNADA_CONTROLLER] Botão Iniciar clicado');
-          startJourney();
-        };
-        startBtn.addEventListener('click', window.__JC_startJourney, { once: true });
-      }
-      loadDynamicBlocks();
-    } catch (e) {
-      console.error('[JORNADA_CONTROLLER] Erro em initJornada:', e);
-      window.toast && window.toast('Erro ao inicializar a jornada.');
-    }
-    if (JC._onReady && Array.isArray(JC._onReady)) {
-      JC._onReady.forEach(fn => { try { fn(); } catch (e) {} });
-      JC._onReady = [];
-    }
-  }
-
   // Iniciar jornada
   function startJourney() {
     console.log('[JORNADA_CONTROLLER] Iniciando jornada... Dependências:', {
@@ -308,20 +311,12 @@
     document.removeEventListener('DOMContentLoaded', window.__JC_onDomC);
     window.__JC_onDomC = () => {
       console.log('[JORNADA_CONTROLLER] Inicialização no DOMContentLoaded...');
-      initJornada();
+      JC.init();
     };
     document.addEventListener('DOMContentLoaded', window.__JC_onDomC, { once: true });
-
-    window.removeEventListener('load', window.__JC_onLoadC);
-    window.__JC_onLoadC = () => {
-      console.log('[JORNADA_CONTROLLER] Inicialização no load...');
-      initJornada();
-    };
-    window.addEventListener('load', window.__JC_onLoadC, { once: true });
   }
 
   // Exports globais
-  JC.init = initJornada;
   JC.onReady = (cb) => {
     if (JC.ready) {
       try { cb(); } catch (e) {}
@@ -344,20 +339,19 @@
 #### 2. `jornada-bootstrap.js`
 
 **Mudanças**:
-- **Ajustado `startWhenReady`**: Verifica `JC.init` em vez de `JC._state`, alinhando com o hotfix e `jornada-controller.js`. Aumentado `maxTries` para 100 (10 segundos).
-- **Adicionado Fallback**: Força a criação de `JC.init` se não estiver disponível após as tentativas.
-- **Padronizado `API_BASE`**: Usado `https://lumen-backend-api.onrender.com/api` com fallback para `https://conhecimento-com-luz-api.onrender.com`.
-- **Removido Lista de Scripts Redundante**: A lista de scripts não é usada para nada além de logging, então simplifiquei o código.
+- Removido o evento `load` redundante que causava múltiplas inicializações.
+- Adicionado log para confirmar que `startWhenReady` concluiu.
+- Mantido o timeout de segurança, mas reduzido para 10 segundos para evitar delays desnecessários.
 
-<xaiArtifact artifact_id="ead42723-e106-4aff-8505-e03ff980547e" artifact_version_id="fddbca80-0468-4cd1-b2f2-4a5593200810" title="jornada-bootstrap.js" contentType="text/javascript">
+<xaiArtifact artifact_id="de1fe212-fec5-4631-a16a-ac9853df6d2e" artifact_version_id="b43261ab-c617-4f14-a7a6-29eebbed0a2c" title="jornada-bootstrap.js" contentType="text/javascript">
 ```javascript
 /* =========================================================
    jornada-bootstrap.js
    Inicialização da jornada com tolerância a erros e espera por dependências
    ========================================================= */
-;(function () {
+(function () {
   'use strict';
-  console.log('[BOOT] Iniciando micro-boot...');
+  console.log('[BOOT] Iniciando micro-boot v5.2...');
 
   // Sondagem de módulos
   const must = ['CONFIG', 'JUtils', 'JCore', 'JAuth', 'JChama', 'JPaperQA', 'JTyping', 'JController', 'JRender', 'JBootstrap', 'JMicro', 'I18N', 'API'];
@@ -417,7 +411,7 @@
         };
         await window.JC.init();
       }
-      console.log('[BOOT] Inicialização concluída');
+      console.log('[BOOT] Inicialização concluída com sucesso');
     } catch (e) {
       console.error('[BOOT] Erro ao iniciar:', e);
       window.toast && window.toast('Erro ao iniciar a jornada.');
@@ -434,6 +428,7 @@
       if (window.JC && typeof window.JC.init === 'function') {
         clearInterval(interval);
         await boot();
+        console.log('[BOOT] startWhenReady concluído');
       } else if (tries >= maxTries) {
         clearInterval(interval);
         console.error('[BOOT] JC não disponível após', maxTries, 'tentativas');
@@ -445,8 +440,17 @@
           console.warn('[BOOT] JC.init (fallback) aplicado');
         };
         await boot();
+        console.log('[BOOT] startWhenReady concluído com fallback');
       }
     }, 100);
+    // Timeout de segurança
+    setTimeout(() => {
+      if (tries < maxTries) {
+        clearInterval(interval);
+        console.warn('[BOOT] Timeout de segurança atingido, forçando inicialização');
+        boot();
+      }
+    }, 10000);
   }
 
   // Iniciar após escolher API_BASE
@@ -454,23 +458,16 @@
     console.log('[BOOT] API_BASE escolhido, iniciando startWhenReady...');
     startWhenReady();
   });
-
-  // Reexecuta boot no load
-  window.addEventListener('load', () => {
-    console.log('[BOOT] Inicialização final no load...');
-    boot();
-  });
 })();
 ```
 
 #### 3. `jornada-shims.js`
 
 **Mudanças**:
-- **Removido `showSection` redundante**: Como `jornada-conhecimento-com-luz1.html` já define uma versão mais robusta de `window.showSection`, removi a definição de `jornada-shims.js` para evitar conflitos.
-- **Simplificado Shims**: Mantive apenas os shims necessários para módulos ausentes e funções críticas.
-- **Adicionado Verificações**: Garanti que os shims não sobrescrevam implementações reais.
+- Mantido o código ajustado anteriormente, com o listener de clique removido e o fallback para `JORNADA_TYPE` usando `window.typeTextOnce`.
+- Adicionado log de versão `v5.2` para consistência.
 
-<xaiArtifact artifact_id="9a4c5710-46cf-48fc-832a-77ac6676a3a1" artifact_version_id="7d984461-2bab-485a-84bb-d2725ecefc38" title="jornada-shims.js" contentType="text/javascript">
+<xaiArtifact artifact_id="7cef7444-29f5-436e-9644-60b198ee01ca" artifact_version_id="1437b8e6-1891-42d2-89f5-564fc5a7ab7b" title="jornada-shims.js" contentType="text/javascript">
 ```javascript
 /* =========================================================
    jornada-shims.js
@@ -478,7 +475,7 @@
    ========================================================= */
 (function () {
   'use strict';
-  console.log('[SHIMS] Iniciando shims v5...');
+  console.log('[SHIMS] Aplicando shims v5.2...');
 
   // Helpers leves
   const q = (sel, root = document) => root.querySelector(sel);
@@ -542,8 +539,13 @@
         }
         const firstText = (window.q ? q('[data-type="texto"], .j-texto, p, .typing', root)
           : root.querySelector('[data-type="texto"], .j-texto, p, .typing'));
-        if (firstText && window.TypingBridge && typeof window.TypingBridge.play === 'function') {
-          window.TypingBridge.play(firstText);
+        if (firstText) {
+          if (window.TypingBridge && typeof window.TypingBridge.play === 'function') {
+            window.TypingBridge.play(firstText);
+          } else if (window.typeTextOnce) {
+            const text = firstText.getAttribute('data-text') || firstText.textContent || '';
+            window.typeTextOnce(firstText, text, 40);
+          }
         }
         const inputs = (window.qa ? qa('textarea, input[type="text"], input[type="search"]', root)
           : Array.from(root.querySelectorAll('textarea, input[type="text"], input[type="search"]')));
@@ -565,104 +567,6 @@
       if (q('#section-intro')) window.showSection('section-intro');
     }
   });
+
+  console.log('[SHIMS] Shims v5.2 aplicados com sucesso');
 })();
-```
-
-#### 4. `jornada-conhecimento-com-luz1.html` (trecho até `</body>`)
-
-**Mudanças**:
-- **Removido Hotfix Redundante**: O hotfix para `JC` foi consolidado em `jornada-controller.js`.
-- **Atualizado Ordem de Scripts**: Garantido que `jornada-shims.js` carrega antes de `jornada-controller.js` para fornecer fallbacks.
-- **Adicionado Logs de Carregamento**: Mantido `onload` e `onerror` para depuração.
-- **Padronizado `API_BASE`**: Alinhado com `jornada-bootstrap.js`.
-
-<xaiArtifact artifact_id="e9003230-a49c-4999-b697-a0d4e2456d4b" artifact_version_id="2451cc22-14be-4ea3-84da-00d89761f33d" title="jornada-conhecimento-com-luz1.html" contentType="text/html">
-```html
-<!-- Scripts Externos -->
-<script defer src="/config.js?v=5" onload="console.log('[LOAD] config.js carregado')" onerror="console.error('[LOAD] Erro ao carregar config.js')"></script>
-<script defer src="/jornada-utils.js?v=5" onload="console.log('[LOAD] jornada-utils.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-utils.js')"></script>
-<script defer src="/jornada-core.js?v=5" onload="console.log('[LOAD] jornada-core.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-core.js')"></script>
-<script defer src="/jornada-auth.js?v=5" onload="console.log('[LOAD] jornada-auth.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-auth.js')"></script>
-<script defer src="/jornada-chama.js?v=5" onload="console.log('[LOAD] jornada-chama.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-chama.js')"></script>
-<script defer src="/jornada-paper-qa.js?v=5" onload="console.log('[LOAD] jornada-paper-qa.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-paper-qa.js')"></script>
-<script defer src="/jornada-typing.js?v=5" onload="console.log('[LOAD] jornada-typing.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-typing.js')"></script>
-<script defer src="/assets/js/jornada-typing-bridge.js?v=1" onload="console.log('[LOAD] jornada-typing-bridge.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-typing-bridge.js')"></script>
-<script defer src="/assets/js/jornada-shims.js?v=5" onload="console.log('[LOAD] jornada-shims.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-shims.js')"></script>
-<script defer src="/jornada-controller.js?v=5" onload="console.log('[LOAD] jornada-controller.js carregado'); console.log('[JC] Após controller: JC existe?', !!window.JC, 'init =', typeof (window.JC && window.JC.init))" onerror="console.error('[LOAD] Erro ao carregar jornada-controller.js')"></script>
-<script defer src="/jornada-render.js?v=5" onload="console.log('[LOAD] jornada-render.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-render.js')"></script>
-<script defer src="/jornada-bootstrap.js?v=5" onload="console.log('[LOAD] jornada-bootstrap.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-bootstrap.js')"></script>
-<script defer src="/jornada-micro.js?v=5" onload="console.log('[LOAD] jornada-micro.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-micro.js')"></script>
-<script defer src="/i18n/i18n.js?v=5" onload="console.log('[LOAD] i18n.js carregado')" onerror="console.error('[LOAD] Erro ao carregar i18n.js')"></script>
-<script defer src="/api.js?v=5" onload="console.log('[LOAD] api.js carregado')" onerror="console.error('[LOAD] Erro ao carregar api.js')"></script>
-
-<!-- Micro-boot: Inicialização segura -->
-<script defer>
-(function() {
-  console.log('[BOOT] Iniciando micro-boot…');
-
-  // Verificar módulos ausentes
-  const must = ['CONFIG', 'JUtils', 'JCore', 'JAuth', 'JChama', 'JPaperQA', 'JTyping', 'JController', 'JRender', 'JBootstrap', 'JMicro', 'I18N', 'API'];
-  const missing = must.filter(k => !(k in window));
-  if (missing.length) {
-    console.warn('[BOOT] Módulos ausentes:', missing);
-    window.toast && window.toast('Alguns módulos não foram carregados. Tente recarregar.');
-  }
-
-  // Definir API_BASE com fallback
-  const PRIMARY_DEFAULT = (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || 'https://lumen-backend-api.onrender.com/api';
-  const API = window.API || {};
-  const API_PRIMARY = API.API_PRIMARY || PRIMARY_DEFAULT;
-  const API_FALLBACK = API.API_FALLBACK || 'https://conhecimento-com-luz-api.onrender.com';
-
-  async function chooseBase() {
-    if (typeof window.API?.health === 'function') {
-      try {
-        const ok = await window.API.health();
-        window.API_BASE = ok ? API_PRIMARY : API_FALLBACK;
-      } catch {
-        console.warn('[BOOT] Health falhou, usando FALLBACK:', API_FALLBACK);
-        window.API_BASE = API_FALLBACK;
-      }
-    } else {
-      console.warn('[BOOT] API.health não definido, usando PRIMARY:', API_PRIMARY);
-      window.API_BASE = API_PRIMARY;
-    }
-    console.log('[BOOT] API_BASE =', window.API_BASE);
-  }
-
-  // Iniciar jornada
-  chooseBase().finally(async () => {
-    try {
-      if (window.JBootstrap && typeof window.JBootstrap.start === 'function') {
-        await window.JBootstrap.start();
-      } else {
-        console.warn('[BOOT] JBootstrap.start não definido');
-      }
-    } catch (e) {
-      console.error('[BOOT] Erro em JBootstrap.start:', e);
-      window.toast && window.toast('Erro ao iniciar bootstrap.');
-    }
-    try {
-      if (window.JC && typeof window.JC.init === 'function') {
-        await window.JC.init();
-      } else {
-        console.warn('[BOOT] JC.init não definido, aplicando fallback');
-        window.JC = window.JC || {};
-        window.JC.state = window.JC.state || { route: 'intro', booted: true };
-        window.JC.init = function() {
-          window.JC.state.booted = true;
-          window.JC.ready = true;
-          console.warn('[BOOT] JC.init (fallback) aplicado');
-        };
-        await window.JC.init();
-      }
-    } catch (e) {
-      console.error('[BOOT] Erro em JC.init:', e);
-      window.toast && window.toast('Erro ao iniciar controlador.');
-    }
-    console.log('[BOOT] Jornada iniciada 🚀');
-  });
-})();
-</script>
-</body>
-</html>
