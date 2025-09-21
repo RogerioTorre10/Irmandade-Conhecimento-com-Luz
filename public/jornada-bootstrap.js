@@ -4,7 +4,7 @@
    ========================================================= */
 (function () {
   'use strict';
-  console.log('[BOOT] Iniciando micro-boot v5.1...');
+  console.log('[BOOT] Iniciando micro-boot v5.4...');
 
   // Sondagem de módulos
   const must = ['CONFIG', 'JUtils', 'JCore', 'JAuth', 'JChama', 'JPaperQA', 'JTyping', 'JController', 'JRender', 'JBootstrap', 'JMicro', 'I18N', 'API'];
@@ -38,6 +38,11 @@
 
   // Função de inicialização
   async function boot() {
+    if (window.__BOOT_COMPLETED) {
+      console.log('[BOOT] Inicialização já concluída, ignorando');
+      return;
+    }
+    window.__BOOT_COMPLETED = true;
     console.log('[BOOT] Tentando iniciar • rota:', location.hash || 'intro');
     const route = (location.hash || '#intro').slice(1);
     try {
@@ -73,6 +78,11 @@
 
   // Espera dependências
   function startWhenReady() {
+    if (window.__BOOT_STARTED) {
+      console.log('[BOOT] startWhenReady já iniciado, ignorando');
+      return;
+    }
+    window.__BOOT_STARTED = true;
     let tries = 0;
     const maxTries = 100;
     const interval = setInterval(async () => {
@@ -81,6 +91,7 @@
       if (window.JC && typeof window.JC.init === 'function') {
         clearInterval(interval);
         await boot();
+        console.log('[BOOT] startWhenReady concluído');
       } else if (tries >= maxTries) {
         clearInterval(interval);
         console.error('[BOOT] JC não disponível após', maxTries, 'tentativas');
@@ -92,6 +103,7 @@
           console.warn('[BOOT] JC.init (fallback) aplicado');
         };
         await boot();
+        console.log('[BOOT] startWhenReady concluído com fallback');
       }
     }, 100);
     // Timeout de segurança
@@ -101,18 +113,12 @@
         console.warn('[BOOT] Timeout de segurança atingido, forçando inicialização');
         boot();
       }
-    }, 15000);
+    }, 10000);
   }
 
   // Iniciar após escolher API_BASE
   chooseBase().finally(() => {
     console.log('[BOOT] API_BASE escolhido, iniciando startWhenReady...');
     startWhenReady();
-  });
-
-  // Reexecuta boot no load
-  window.addEventListener('load', () => {
-    console.log('[BOOT] Inicialização final no load...');
-    boot();
   });
 })();
