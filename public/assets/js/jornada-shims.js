@@ -4,7 +4,7 @@
    ========================================================= */
 (function () {
   'use strict';
-  console.log('[SHIMS] Aplicando shims v5.1...');
+  console.log('[SHIMS] Aplicando shims v5.4...');
 
   // Helpers leves
   const q = (sel, root = document) => root.querySelector(sel);
@@ -72,7 +72,6 @@
           if (window.TypingBridge && typeof window.TypingBridge.play === 'function') {
             window.TypingBridge.play(firstText);
           } else if (window.typeTextOnce) {
-            // Fallback básico para datilografia
             const text = firstText.getAttribute('data-text') || firstText.textContent || '';
             window.typeTextOnce(firstText, text, 40);
           }
@@ -98,5 +97,5 @@
     }
   });
 
-  console.log('[SHIMS] Shims v5.1 aplicados com sucesso');
+  console.log('[SHIMS] Shims v5.4 aplicados com sucesso');
 })();
