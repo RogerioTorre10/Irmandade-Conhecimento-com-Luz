@@ -15,6 +15,41 @@
    return;
   }
    window.__JC_INIT_DONE = true;
+   // === EXPOSE: torna o controller visível pro bootstrap ===
+(function(){
+  // Se já exposto, não faz nada
+  if (window.__JC_EXPOSED) return;
+
+  // Namespace global que o bootstrap espera
+  window.JC = window.JC || {};
+
+  // Anexa a função de init do controller (idempotente)
+  window.JC.init = window.JC.init || function(){
+    // guarda-vida: evita executar 2x
+    if (window.__JC_INIT_DONE) {
+      console.log('[JORNADA_CONTROLLER] init já feito — ignorando.');
+      return;
+    }
+    window.__JC_INIT_DONE = true;
+
+    // *** CHAME A SUA FUNÇÃO REAL AQUI ***
+    // se a sua função real se chama initJornada, delega para ela:
+    try {
+      initJornada && initJornada();
+    } catch (e) {
+      console.error('[JORNADA_CONTROLLER] erro no init real:', e);
+      // se falhar, libera para tentativa futura:
+      window.__JC_INIT_DONE = false;
+      throw e;
+    }
+  };
+
+  // Sinaliza que o JC está pronto para o bootstrap começar
+  window.__JC_READY = true;
+  window.__JC_EXPOSED = true;
+  console.log('[JORNADA_CONTROLLER] sinalizado READY ao bootstrap (JC.init disponível)');
+})();
+
 
    // Seletores e utilitários
   const S = {
