@@ -2203,41 +2203,35 @@
 
 <!-- --- controller e dependências que definem JC --- -->
 <script defer src="/jornada-controller.js?v=5"></script>
+<script defer>(function () { console.log("[PROBE] após controller: JC existe?", !!window.JC, "init =", typeof (window.JC && window.JC.init)); })();</script>
 <script defer src="/jornada-render.js?v=5"></script>
 <script defer src="/assets/js/jornada-shims.js?v=5"></script>
 
-<!-- >>> expose shim vem AQUI, em um script inline <<< -->
 <script defer>
-(function () {
-  window.JC = window.JC || {};
-  window.__JC_READY = true;
-  if (typeof window.JC.init !== 'function') {
-    window.JC.init = function () {
-      if (window.__JC_INIT_DONE) {
-        console.log('[JC] init já executado — ignorando');
-        return;
-      }
-      window.__JC_INIT_DONE = true;
-      try {
-        if (typeof window.initJornada === 'function') {
-          return window.initJornada();
-        }
-        document.dispatchEvent(new CustomEvent('JC:init'));
-      } catch (e) {
-        console.error('[JC] erro no init:', e);
-        window.__JC_INIT_DONE = false;
-        throw e;
-      }
-    };
-  }
+  // HOTFIX: expose + init de emergência (só se faltar)
+  (function () {
+    window.JC = window.JC || {};
+    if (typeof JC.init !== "function") {
+      JC.state = JC.state || { route: "intro", booted: false };
+      JC.onReady = JC.onReady || function (cb) { try { cb && cb(); } catch (e) {} };
+      JC.init = function () {
+        JC.state.booted = true;
+        JC.ready = true;
+        console.warn("[JC] init (fallback) usado — controller não expôs init.");
+      };
+    }
+    console.log("[JC] expose+fallback aplicado — init =", typeof JC.init);
+  })();
+</script>
+
   console.log('[JC] expose shim carregado (JC.init disponível)');
 })();
 </script>
 <!-- --- bootstrap e demais que dependem do JC --- -->
+<script defer>(function () { window.JC = window.JC || {}; console.log("[JC] expose shim carregado (JC.init disponível?)"); })();</script>  
 <script defer src="/jornada-bootstrap.js?v=5"></script>
 <script defer src="/jornada-micro.js?v=5"></script>
 <script defer src="/i18n/i18n.js?v=5"></script>
-<script defer>(function () { window.JC = window.JC || {}; console.log("[JC] expose shim carregado (JC.init disponível?)"); })();</script>
 <script defer src="/api.js?v=5"></script> 
   
 <!-- Micro-boot (SAFE): escolhe API_BASE com fallback e inicia a jornada -->
