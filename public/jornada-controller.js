@@ -9,7 +9,14 @@
   const JC = (window.JC = window.JC || {});
   JC._state = { blocoIndex: 0, perguntaIndex: 0 };
 
-  // Seletores e utilitários
+   // Evita múltiplas inicializações do Controller
+   if (window.__JC_INIT_DONE) {
+   console.log('[JORNADA_CONTROLLER] init já feito — ignorando.');
+   return;
+  }
+   window.__JC_INIT_DONE = true;
+
+   // Seletores e utilitários
   const S = {
     blocos() {
       const section = document.getElementById('section-perguntas');
@@ -143,6 +150,26 @@
       { from: 'section-perguntas', to: null }, // Tratado separadamente
       { from: 'section-final', to: null }
     ];
+     function initJornada() {
+  // evita múltiplas inicializações
+  if (window.__JC_INIT_DONE) {
+    console.log('[JORNADA_CONTROLLER] init já feito — ignorando.');
+    return;
+  }
+  window.__JC_INIT_DONE = true;
+
+  const btnNext = document.getElementById('btnNextPerguntas') ||
+                  document.querySelector('[data-action="next"]');
+  if (btnNext) {
+    btnNext.removeEventListener('click', window.__JC_onNext);
+    window.__JC_onNext = function(e){
+      e.preventDefault();
+      console.log('[JORNADA_CONTROLLER] Clique no botão avançar detectado: btn',
+                  'Seção atual:', window.__currentSectionId || 'desconhecida');
+      window.showSection && window.showSection('section-termos');
+    };
+    btnNext.addEventListener('click', window.__JC_onNext, { passive:false });
+  }
 
     if (currentSection === 'section-perguntas') {
       const section = document.getElementById('section-perguntas');
