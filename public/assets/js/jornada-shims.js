@@ -129,10 +129,55 @@ window.JORNADA_TYPE = window.JORNADA_TYPE || {
           el.removeEventListener('input', window.handleInput);
           el.addEventListener('input', window.handleInput);
         });
+      
+(function(){
+  // Ordem canônica das seções (ajuste se precisar)
+  const ORDER = [
+    'section-intro',
+    'section-termos',
+    'section-senha',
+    'section-selfie',
+    'section-perguntas',
+    'section-final'
+  ];
 
+  function getCurrentSectionId() {
+    // 1) valor mantido pelo shim
+    if (window.__currentSectionId) return window.__currentSectionId;
+    // 2) fallback: primeira seção não-oculta
+    const vis = document.querySelector('section[id^="section-"]:not(.section-hidden):not(.hidden)');
+    return vis ? vis.id : ORDER[0];
+  }
+
+  document.addEventListener('click', (ev) => {
+    const btn = ev.target.closest('[data-action]');
+    if (!btn) return;
+
+    const act = btn.getAttribute('data-action');
+    // Só intercepta se for navegação
+    if (act !== 'next' && act !== 'next-senha' && !btn.hasAttribute('data-next')) return;
+
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    let target = btn.getAttribute('data-next');
+    if (!target) {
+      if (act === 'next-senha') {
+        target = 'section-senha';
+      } else {
+        const cur = getCurrentSectionId();
+        const ix = Math.max(0, ORDER.indexOf(cur));
+        target = ORDER[Math.min(ix + 1, ORDER.length - 1)];
+      }
+    }
+    if (typeof window.showSection === 'function') {
+      window.showSection(target);
+    }
+  });
       console.log('[JORNADA_TYPE] run concluído');
     } catch (e) {
       console.error('[JORNADA_TYPE] erro:', e);
     }
   }
 };
+})();
