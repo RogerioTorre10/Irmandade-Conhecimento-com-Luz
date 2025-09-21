@@ -43,6 +43,19 @@
       console.error('[SHIMS] Erro showSection:', e);
     }
   }
+ 
+/* Delegação simples para navegar por data-next */
+document.addEventListener('click', (ev) => {
+  const btn = ev.target.closest('[data-action="next"]');
+  if (!btn) return;
+  ev.preventDefault();
+  const next = btn.getAttribute('data-next');
+  if (next && typeof window.showSection === 'function') {
+    window.showSection(next);
+  } else {
+    console.warn('[NAV] Botão sem data-next ou showSection indisponível.');
+  }
+});
 
   // Exponha no escopo global, pois o controller chama "window.showSection"
   window.showSection = showSection;
@@ -65,3 +78,62 @@
     }
   });
 })();
+
+/* ==== SHIMS EXTRA p/ Controller v5 ==== */
+
+// Placeholders p/ módulos que o bootstrap "sente falta".
+// (Se os módulos reais carregarem depois, eles sobrescrevem estes.)
+window.CONFIG     = window.CONFIG     || {};
+window.JUtils     = window.JUtils     || {};
+window.JCore      = window.JCore      || {};
+window.JAuth      = window.JAuth      || {};
+window.JChama     = window.JChama     || {};
+window.JPaperQA   = window.JPaperQA   || {};
+window.JTyping    = window.JTyping    || {};
+window.JController= window.JController|| {};
+window.JRender    = window.JRender    || {};
+window.JBootstrap = window.JBootstrap || {};
+window.JMicro     = window.JMicro     || {};
+window.I18N       = window.I18N       || {};
+window.API        = window.API        || { base: (window.API_BASE || '' ) };
+
+// Handler leve para textareas/inputs das perguntas
+window.handleInput = window.handleInput || function handleInput(ev){
+  try {
+    const el = ev && ev.target ? ev.target : null;
+    if (!el) return;
+    // Ex.: espelho de contagem, validação básica e debounce (se quiser evoluir depois)
+    const max = parseInt(el.getAttribute('maxlength') || '0', 10);
+    if (max > 0 && el.value.length > max) el.value = el.value.slice(0, max);
+    el.dataset.touched = '1';
+  } catch(e){
+    console.error('[SHIMS] handleInput erro:', e);
+  }
+};
+
+// Ponte mínima de datilografia + TTS para a 1ª pergunta do bloco
+window.JORNADA_TYPE = window.JORNADA_TYPE || {
+  run(rootSelector = '#perguntas-container') {
+    try {
+      const root = typeof rootSelector === 'string' ? q(rootSelector) : rootSelector;
+      if (!root) { console.warn('[JORNADA_TYPE] root não encontrado'); return; }
+
+      // 1) se houver bloco visível, pega o primeiro texto alvo p/ datilografia
+      const firstText = q('[data-type="texto"], .j-texto, p, .typing', root);
+      if (firstText && window.TypingBridge && typeof window.TypingBridge.play === 'function') {
+        window.TypingBridge.play(firstText);
+      }
+
+      // 2) garanta listeners nas primeiras áreas de resposta
+      qa('textarea, input[type="text"], input[type="search"]', root)
+        .forEach(el => {
+          el.removeEventListener('input', window.handleInput);
+          el.addEventListener('input', window.handleInput);
+        });
+
+      console.log('[JORNADA_TYPE] run concluído');
+    } catch (e) {
+      console.error('[JORNADA_TYPE] erro:', e);
+    }
+  }
+};
