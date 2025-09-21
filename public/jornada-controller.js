@@ -368,20 +368,33 @@
     }
   });
 
-  // Inicialização
-  document.addEventListener('DOMContentLoaded', () => {
+ // Inicialização (bind uma vez)
+function _bindBoot() {
+  if (window.__JC_BIND_DONE) return;
+  window.__JC_BIND_DONE = true;
+
+  // DOMContentLoaded
+  document.removeEventListener('DOMContentLoaded', window.__JC_onDomC);
+  window.__JC_onDomC = () => {
     console.log('[JORNADA_CONTROLLER] Forçando inicialização no DOMContentLoaded...');
-    initJornada();
-  });
-  window.addEventListener('load', () => {
+    (window.JC && typeof window.JC.init === 'function') ? window.JC.init() : initJornada();
+  };
+  document.addEventListener('DOMContentLoaded', window.__JC_onDomC, { once: true });
+
+  // load
+  window.removeEventListener('load', window.__JC_onLoadC);
+  window.__JC_onLoadC = () => {
     console.log('[JORNADA_CONTROLLER] Forçando inicialização no load...');
-    initJornada();
-  });
+    (window.JC && typeof window.JC.init === 'function') ? window.JC.init() : initJornada();
+  };
+  window.addEventListener('load', window.__JC_onLoadC, { once: true });
+}
+_bindBoot();
 
-  // Exports
-  JC.init = initJornada;
-  JC.startJourney = startJourney;
-  JC.goNext = goNext;
+// Exports globais (que o bootstrap usa)
+window.JC = window.JC || {};
+window.JC.init = window.JC.init || initJornada;
+window.JC.startJourney = startJourney;
+window.JC.goNext = goNext;
 
-  console.log('[JORNADA_CONTROLLER] pronto');
-})();;
+console.log('[JORNADA_CONTROLLER] pronto');
