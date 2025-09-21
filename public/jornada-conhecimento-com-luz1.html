@@ -2189,23 +2189,56 @@
 })();
 </script>
 
+<!-- --- scripts utilitários básicos --- -->
 <script defer src="/config.js?v=5"></script>
 <script defer src="/jornada-utils.js?v=5"></script>
 
+<!-- --- módulos principais da jornada --- -->
 <script defer src="/jornada-core.js?v=5"></script>
 <script defer src="/jornada-auth.js?v=5"></script>
 <script defer src="/jornada-chama.js?v=5"></script>
 <script defer src="/jornada-paper-qa.js?v=5"></script>
 <script defer src="/jornada-typing.js?v=5"></script>
-<script defer src="/assets/js/jornada-shims.js?v=5"></script>
-<script defer src="/assets/js/jornada-typing-bridge.js?v=1"></script>        
+<script defer src="/assets/js/jornada-typing-bridge.js?v=1"></script>
+
+<!-- --- controller e dependências que definem JC --- -->
 <script defer src="/jornada-controller.js?v=5"></script>
 <script defer src="/jornada-render.js?v=5"></script>
-<script defer src="/jornada-bootstrap.js?v=5"></script>
+<script defer src="/assets/js/jornada-shims.js?v=5"></script>
+
+<!-- >>> expose shim vem AQUI, em um script inline <<< -->
+<script defer>
+(function () {
+  window.JC = window.JC || {};
+  window.__JC_READY = true;
+  if (typeof window.JC.init !== 'function') {
+    window.JC.init = function () {
+      if (window.__JC_INIT_DONE) {
+        console.log('[JC] init já executado — ignorando');
+        return;
+      }
+      window.__JC_INIT_DONE = true;
+      try {
+        if (typeof window.initJornada === 'function') {
+          return window.initJornada();
+        }
+        document.dispatchEvent(new CustomEvent('JC:init'));
+      } catch (e) {
+        console.error('[JC] erro no init:', e);
+        window.__JC_INIT_DONE = false;
+        throw e;
+      }
+    };
+  }
+  console.log('[JC] expose shim carregado (JC.init disponível)');
+})();
+</script>
+<!-- --- bootstrap e demais que dependem do JC --- -->
 <script defer src="/jornada-micro.js?v=5"></script>
 <script defer src="/i18n/i18n.js?v=5"></script>
 <script defer src="/api.js?v=5"></script>
-        
+<script defer src="/jornada-bootstrap.js?v=5"></script>  
+  
 <!-- Micro-boot (SAFE): escolhe API_BASE com fallback e inicia a jornada -->
 <script>
 (function () {
