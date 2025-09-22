@@ -188,7 +188,7 @@
 
    <!-- pro playVideo usar -->
    <div id="video-container" style="display: none;"></div> <!-- Adicione se não tiver, pro playVideo usar -->
-   #video-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,.95); display: flex; justify-content: center; align-items: center; z-index: 2000;}
+   #video-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,.95); display: flex; justify-content: center; align-items: center; z-index: 9999;}
    #video-container.hidden {display: none;}
    #video-container video { width: 100vw; height: 100vh; object-fit: contain; background: #000;}
    @media (orientation: portrait) {
@@ -197,7 +197,7 @@
   .j-section {display: block;}
     
     /* Vídeo overlay */
-    #videoOverlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,.95);display:flex;justify-content:center;align-items:center;z-index:2000}
+    #videoOverlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,.95);display:flex;justify-content:center;align-items:center;z-index:9999}
     #videoOverlay.hidden{display:none}
     .video-player{width:100vw;height:100vh;object-fit:contain;background:#000;transform:rotate(0deg)}
     @media (orientation: portrait){
