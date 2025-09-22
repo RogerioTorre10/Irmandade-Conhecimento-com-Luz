@@ -4,7 +4,7 @@
 
   // Debounce pra evitar cliques múltiplos
   let isProcessingClick = false;
-  function debounceClick(callback, wait = 500) { // Aumentado pra 500ms
+  function debounceClick(callback, wait = 500) {
     return (...args) => {
       if (isProcessingClick) {
         log('Clique ignorado (debounce ativo)');
@@ -23,10 +23,10 @@
     const videoContainer = document.getElementById('video-container');
     if (!videoContainer) {
       console.error('[JORNADA_CONTROLLER] video-container não encontrado');
-      window.JC.nextSection = 'section-final';
-      window.__currentSectionId = 'section-final';
-      window.showSection && window.showSection('section-final');
-      log('Forçando section-final (sem video-container)');
+      window.JC.nextSection = videoSrc.includes('filme-5') ? 'section-final' : 'section-perguntas';
+      window.__currentSectionId = window.JC.nextSection;
+      window.showSection && window.showSection(window.JC.nextSection);
+      log('Forçando', window.JC.nextSection, '(sem video-container)');
       return;
     }
     videoContainer.innerHTML = '';
@@ -39,30 +39,55 @@
     video.style.width = '100%';
     video.style.height = 'auto';
 
-    // Timeout de segurança: 60 segundos pro vídeo final
+    // Timeout de segurança: 60 segundos
     const videoTimeout = setTimeout(() => {
       log('Timeout de segurança disparado para vídeo:', videoSrc);
       videoContainer.style.display = 'none';
-      if (videoSrc.includes('filme-5') || videoSrc === window.JORNADA_FINAL_VIDEO) {
+      if (videoSrc.includes('filme-5')) {
         window.JC.nextSection = 'section-final';
         window.__currentSectionId = 'section-final';
         window.showSection && window.showSection('section-final');
         log('Forçando section-final após timeout');
+      } else if (videoSrc.includes('filme-0')) {
+        window.JC.nextSection = 'section-perguntas';
+        window.__currentSectionId = 'section-perguntas';
+        window.showSection && window.showSection('section-perguntas');
+        log('Forçando section-perguntas após filme-0');
+      } else {
+        window.JC.nextSection = 'section-perguntas';
+        window.__currentSectionId = 'section-perguntas';
+        window.showSection && window.showSection('section-perguntas');
+        log('Voltando para section-perguntas após vídeo');
       }
-    }, 60000); // 60 segundos
+    }, 60000);
 
-    // onended: avança pro final ou volta pras perguntas
+    // onended: avança conforme vídeo
     video.onended = () => {
       clearTimeout(videoTimeout);
       videoContainer.style.display = 'none';
       log('Vídeo terminado:', videoSrc);
-      if (videoSrc.includes('filme-5') || videoSrc === window.JORNADA_FINAL_VIDEO) {
+      if (videoSrc.includes('filme-5')) {
         window.JC.nextSection = 'section-final';
         window.__currentSectionId = 'section-final';
         window.showSection && window.showSection('section-final');
         log('Avançando para section-final após filme-5');
+        const finalText = document.querySelector('#section-final [data-typing="true"]');
+        if (finalText && window.runTyping) {
+          window.runTyping(finalText);
+          log('runTyping disparado para section-final');
+        }
+      } else if (videoSrc.includes('filme-0')) {
+        window.JC.nextSection = 'section-perguntas';
+        window.__currentSectionId = 'section-perguntas';
+        window.showSection && window.showSection('section-perguntas');
+        log('Avançando para section-perguntas após filme-0');
+        if (window.loadDynamicBlocks) {
+          window.loadDynamicBlocks();
+          log('loadDynamicBlocks chamado após filme-0');
+        }
       } else {
         window.JC.nextSection = 'section-perguntas';
+        window.__currentSectionId = 'section-perguntas';
         window.showSection && window.showSection('section-perguntas');
         log('Voltando para section-perguntas após vídeo');
       }
@@ -79,6 +104,7 @@
         window.showSection && window.showSection('section-final');
       } else {
         window.JC.nextSection = 'section-perguntas';
+        window.__currentSectionId = 'section-perguntas';
         window.showSection && window.showSection('section-perguntas');
       }
     };
@@ -109,14 +135,24 @@
       };
       log('Dependências:', dependencies);
 
+      if (!window.JORNADA_BLOCKS) {
+        console.error('JORNADA_BLOCKS não definido, pulando para section-final');
+        window.__currentSectionId = 'section-final';
+        window.showSection && window.showSection('section-final');
+        return;
+      }
+
       if (route === 'section-perguntas' && window.loadDynamicBlocks) {
         window.loadDynamicBlocks();
         log('loadDynamicBlocks concluído');
+      } else if (route === 'section-selfie' && window.JORNADA_VIDEOS?.intro) {
+        window.playVideo(window.JORNADA_VIDEOS.intro); // Roda filme-0 após selfie
+        log('Reproduzindo filme-0 após section-selfie');
+      } else {
+        window.showSection && window.showSection(route === 'intro' ? 'section-intro' : route);
+        window.__currentSectionId = route === 'intro' ? 'section-intro' : route;
+        log('Seção inicial:', window.__currentSectionId);
       }
-
-      window.showSection && window.showSection(route === 'intro' ? 'section-intro' : route);
-      window.__currentSectionId = route === 'intro' ? 'section-intro' : route;
-      log('Seção inicial:', window.__currentSectionId);
     },
     goNext: () => {
       log('Iniciando goNext... Estado atual: currentBloco=', window.JC.currentBloco, ', blocos totais=', window.JORNADA_BLOCKS ? window.JORNADA_BLOCKS.length : 0, ', currentSection=', window.__currentSectionId);
@@ -125,6 +161,28 @@
       const currentIdx = sections.indexOf(currentSection);
       if (currentIdx < 0) {
         console.warn('Seção atual não encontrada:', currentSection);
+        window.__currentSectionId = 'section-intro';
+        window.showSection && window.showSection('section-intro');
+        return;
+      }
+
+      if (currentSection === 'section-selfie') {
+        // Após selfie, roda filme-0
+        if (window.JORNADA_VIDEOS?.intro) {
+          window.JC.nextSection = 'section-perguntas';
+          window.playVideo(window.JORNADA_VIDEOS.intro);
+          log('Reproduzindo filme-0 após section-selfie');
+          return;
+        } else {
+          window.JC.nextSection = 'section-perguntas';
+          window.__currentSectionId = 'section-perguntas';
+          window.showSection && window.showSection('section-perguntas');
+          log('Avançando para section-perguntas (sem filme-0)');
+          if (window.loadDynamicBlocks) {
+            window.loadDynamicBlocks();
+            log('loadDynamicBlocks chamado após section-selfie');
+          }
+        }
         return;
       }
 
@@ -238,8 +296,10 @@
           window.__currentSectionId = nextSection;
           window.showSection && window.showSection(nextSection);
           log('Navegando de', currentSection, 'para', nextSection);
-          // Garante que runTyping rode no section-final
-          if (nextSection === 'section-final') {
+          if (nextSection === 'section-perguntas' && window.loadDynamicBlocks) {
+            window.loadDynamicBlocks();
+            log('loadDynamicBlocks chamado ao entrar em section-perguntas');
+          } else if (nextSection === 'section-final') {
             const finalText = document.querySelector('#section-final [data-typing="true"]');
             if (finalText && window.runTyping) {
               window.runTyping(finalText);
