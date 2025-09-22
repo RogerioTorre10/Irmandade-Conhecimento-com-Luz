@@ -1,9 +1,9 @@
-// jornada-controller.js
 (function() {
   const log = (...args) => console.log('[JORNADA_CONTROLLER]', ...args);
 
   window.JC = window.JC || {
     currentBloco: 0,
+    currentPergunta: 0,
     nextSection: null,
     initialized: false,
     init: (route) => {
@@ -47,12 +47,7 @@
         if (!content) {
           console.error('perguntas-container não encontrado');
           window.JC.nextSection = 'section-final';
-          if (window.JORNADA_FINAL_VIDEO && window.playVideo) {
-            window.playVideo(window.JORNADA_FINAL_VIDEO);
-            log('Reproduzindo vídeo final:', window.JORNADA_FINAL_VIDEO);
-          } else {
-            window.showSection('section-final');
-          }
+          window.showSection('section-final');
           return;
         }
 
@@ -60,12 +55,7 @@
         if (!currentBloco) {
           console.error('Bloco atual não encontrado para bloco', window.JC.currentBloco);
           window.JC.nextSection = 'section-final';
-          if (window.JORNADA_FINAL_VIDEO && window.playVideo) {
-            window.playVideo(window.JORNADA_FINAL_VIDEO);
-            log('Reproduzindo vídeo final:', window.JORNADA_FINAL_VIDEO);
-          } else {
-            window.showSection('section-final');
-          }
+          window.showSection('section-final');
           return;
         }
 
@@ -73,12 +63,7 @@
         if (perguntas.length === 0) {
           console.error('Nenhuma pergunta encontrada no bloco', window.JC.currentBloco);
           window.JC.nextSection = 'section-final';
-          if (window.JORNADA_FINAL_VIDEO && window.playVideo) {
-            window.playVideo(window.JORNADA_FINAL_VIDEO);
-            log('Reproduzindo vídeo final:', window.JORNADA_FINAL_VIDEO);
-          } else {
-            window.showSection('section-final');
-          }
+          window.showSection('section-final');
           return;
         }
 
@@ -90,11 +75,13 @@
           currentPergunta.style.display = 'none';
           perguntas[currentPerguntaIdx + 1].classList.add('active');
           perguntas[currentPerguntaIdx + 1].style.display = 'block';
+          window.JC.currentPergunta = currentPerguntaIdx + 1;
           window.runTyping && window.runTyping(perguntas[currentPerguntaIdx + 1]);
           log('Avançando para pergunta', currentPerguntaIdx + 1, 'no bloco', window.JC.currentBloco);
         } else if (window.JORNADA_BLOCKS && window.JC.currentBloco < window.JORNADA_BLOCKS.length - 1) {
           currentBloco.style.display = 'none';
           window.JC.currentBloco = (window.JC.currentBloco || 0) + 1;
+          window.JC.currentPergunta = 0;
           const nextBloco = content.querySelector(`[data-bloco="${window.JC.currentBloco}"]`);
           if (nextBloco) {
             nextBloco.style.display = 'block';
@@ -102,7 +89,7 @@
             if (first) {
               first.classList.add('active');
               first.style.display = 'block';
-              window.runTyping && window.runTyping(nextBloco);
+              window.runTyping && window.runTyping(first);
             }
             const video = currentBloco.dataset.video;
             if (video && window.playVideo) {
@@ -119,16 +106,17 @@
             log('Reproduzindo vídeo final:', window.JORNADA_FINAL_VIDEO);
             return;
           }
+          window.showSection('section-final');
         }
-      }
-
-      const nextSection = window.JC.nextSection || sections[currentIdx + 1];
-      if (nextSection) {
-        window.JC.nextSection = null;
-        window.showSection && window.showSection(nextSection);
-        log('Navegando de', currentSection, 'para', nextSection);
       } else {
-        log('Nenhuma seção seguinte encontrada para', currentSection);
+        const nextSection = window.JC.nextSection || sections[currentIdx + 1];
+        if (nextSection) {
+          window.JC.nextSection = null;
+          window.showSection && window.showSection(nextSection);
+          log('Navegando de', currentSection, 'para', nextSection);
+        } else {
+          log('Nenhuma seção seguinte encontrada para', currentSection);
+        }
       }
     }
   };
