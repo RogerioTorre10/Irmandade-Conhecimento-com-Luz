@@ -1017,22 +1017,30 @@
   })();
   </script>
 
- <!-- Vídeo Transição -->
+<!-- Vídeo Transição -->
 <script>
 (function() {
+  let isPlaying = false;
+
   window.playVideo = function(videoSrc) {
+    if (isPlaying) {
+      console.log('[playVideo] Já está reproduzindo um vídeo, ignorando:', videoSrc);
+      return;
+    }
+    isPlaying = true;
+
     const overlay = document.getElementById('videoOverlay');
     const video = document.getElementById('videoTransicao');
     const fallback = document.getElementById('videoFallback');
     if (!overlay || !video) {
       console.error('[playVideo] Elementos de vídeo não encontrados', { overlay: !!overlay, video: !!video });
       window.toast && window.toast('Erro ao reproduzir vídeo.');
+      isPlaying = false;
       if (window.JC && window.JC.goNext) window.JC.goNext();
       return;
     }
     console.log('[playVideo] Tentando reproduzir:', videoSrc);
     try {
-      // Verificar se o vídeo existe
       fetch(videoSrc, { method: 'HEAD' })
         .then(response => {
           if (!response.ok) throw new Error('Vídeo não encontrado');
@@ -1041,7 +1049,8 @@
             console.log('[playVideo] Vídeo finalizado:', videoSrc);
             overlay.classList.add('hidden');
             video.src = '';
-            window.JC && window.JC.goNext && window.JC.goNext();
+            isPlaying = false;
+            if (window.JC && window.JC.goNext) window.JC.goNext();
           };
           video.onerror = (e) => {
             console.error('[playVideo] Erro ao carregar vídeo:', videoSrc, e);
@@ -1052,7 +1061,8 @@
               overlay.classList.add('hidden');
               fallback.classList.add('hidden');
               video.classList.remove('hidden');
-              window.JC && window.JC.goNext && window.JC.goNext();
+              isPlaying = false;
+              if (window.JC && window.JC.goNext) window.JC.goNext();
             }, 3000);
           };
           overlay.classList.remove('hidden');
@@ -1065,7 +1075,8 @@
               overlay.classList.add('hidden');
               fallback.classList.add('hidden');
               video.classList.remove('hidden');
-              window.JC && window.JC.goNext && window.JC.goNext();
+              isPlaying = false;
+              if (window.JC && window.JC.goNext) window.JC.goNext();
             }, 3000);
           });
           console.log('[playVideo] Iniciando reprodução:', videoSrc);
@@ -1073,12 +1084,14 @@
         .catch(e => {
           console.error('[playVideo] Erro ao verificar vídeo:', videoSrc, e);
           window.toast && window.toast('Vídeo não encontrado.');
-          window.JC && window.JC.goNext && window.JC.goNext();
+          isPlaying = false;
+          if (window.JC && window.JC.goNext) window.JC.goNext();
         });
     } catch (e) {
       console.error('[playVideo] Erro inesperado:', videoSrc, e);
       window.toast && window.toast('Erro ao reproduzir vídeo.');
-      window.JC && window.JC.goNext && window.JC.goNext();
+      isPlaying = false;
+      if (window.JC && window.JC.goNext) window.JC.goNext();
     }
   };
 
@@ -1092,7 +1105,8 @@
         video.pause();
         video.src = '';
         overlay.classList.add('hidden');
-        window.JC && window.JC.goNext && window.JC.goNext();
+        isPlaying = false;
+        if (window.JC && window.JC.goNext) window.JC.goNext();
       }
     }
   });
