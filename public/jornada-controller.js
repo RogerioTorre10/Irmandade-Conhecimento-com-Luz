@@ -177,6 +177,56 @@
     }
     console.log('[JORNADA_CONTROLLER] loadDynamicBlocks concluído');
   }
+   goNext() {
+  console.log('[JORNADA_CONTROLLER] Iniciando goNext...');
+  const currentSection = window.__currentSectionId;
+  const sections = ['section-intro', 'section-termos', 'section-senha', 'section-guia', 'section-selfie', 'section-perguntas', 'section-final'];
+  const currentIdx = sections.indexOf(currentSection);
+  if (currentIdx < 0) {
+    console.warn('[JORNADA_CONTROLLER] Seção atual não encontrada:', currentSection);
+    return;
+  }
+  if (currentSection === 'section-perguntas') {
+    const content = document.getElementById('perguntas-container');
+    const currentBloco = content?.querySelector('.j-bloco:not(.hidden)') || content?.querySelector(`[data-bloco="${window.JC.currentBloco || 0}"]`);
+    const perguntas = currentBloco?.querySelectorAll('.j-pergunta') || [];
+    const currentPergunta = currentBloco?.querySelector('.j-pergunta.active') || perguntas[0];
+    const currentPerguntaIdx = parseInt(currentPergunta?.dataset.pergunta || '0', 10);
+    if (currentPerguntaIdx < perguntas.length - 1) {
+      currentPergunta.classList.remove('active');
+      perguntas[currentPerguntaIdx + 1].classList.add('active');
+      window.runTyping && window.runTyping(perguntas[currentPerguntaIdx + 1]);
+    } else if (currentBloco && window.JORNADA_BLOCKS && window.JC.currentBloco < window.JORNADA_BLOCKS.length - 1) {
+      currentBloco.style.display = 'none';
+      window.JC.currentBloco = (window.JC.currentBloco || 0) + 1;
+      const nextBloco = content?.querySelector(`[data-bloco="${window.JC.currentBloco}"]`);
+      if (nextBloco) {
+        nextBloco.style.display = 'block';
+        const first = nextBloco.querySelector('.j-pergunta');
+        if (first) {
+          first.classList.add('active');
+          window.runTyping && window.runTyping(first);
+        }
+        const video = currentBloco.dataset.video;
+        if (video && window.playVideo) {
+          window.JC.nextSection = 'section-perguntas';
+          window.playVideo(video);
+          return;
+        }
+      }
+    } else if (window.JORNADA_FINAL_VIDEO && window.playVideo) {
+      window.JC.nextSection = 'section-final';
+      window.playVideo(window.JORNADA_FINAL_VIDEO);
+      return;
+    }
+  }
+  const nextSection = window.JC.nextSection || sections[currentIdx + 1];
+  if (nextSection) {
+    window.JC.nextSection = null;
+    window.showSection(nextSection);
+    console.log('[JORNADA_CONTROLLER] Navegando de', currentSection, 'para', nextSection);
+  }
+}
 
   // Navegação para a próxima seção/pergunta
   function goNext() {
