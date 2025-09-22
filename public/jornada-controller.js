@@ -55,6 +55,25 @@
           }
           return;
         }
+        const totalBlocos = window.JORNADA_BLOCKS ? window.JORNADA_BLOCKS.length : 0;
+        const totalPerguntas = perguntas.length;
+        const totalSteps = totalBlocos * totalPerguntas;
+        const currentStep = window.JC.currentBloco * totalPerguntas + currentPerguntaIdx + 1;
+        const progress = (currentStep / totalSteps) * 100;
+        const jprogFill = document.getElementById('jprog-fill');
+        const jprogPct = document.getElementById('jprog-pct');
+        if (jprogFill && jprogPct) {
+        jprogFill.style.width = `${progress}%`;
+        jprogPct.textContent = `${Math.round(progress)}% concluído`;
+       }
+        const jFillInline = document.getElementById('j-fill-inline');
+        const jMeta = document.getElementById('j-meta');
+        if (jFillInline && jMeta) {
+        const blocoProgress = ((currentPerguntaIdx + 1) / totalPerguntas) * 100;
+        jFillInline.style.width = `${blocoProgress}%`;
+        jMeta.textContent = `Bloco ${window.JC.currentBloco + 1} de ${totalBlocos} • Pergunta ${currentPerguntaIdx + 1} de ${totalPerguntas}`;
+       }
+      }
 
         const currentBloco = content.querySelector('.j-bloco:not(.hidden)') || content.querySelector(`[data-bloco="${window.JC.currentBloco || 0}"]`);
         if (!currentBloco) {
