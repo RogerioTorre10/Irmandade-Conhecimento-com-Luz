@@ -1,7 +1,7 @@
 // jornada-bootstrap.js
 (function() {
   const log = (...args) => console.log('[BOOT]', ...args);
-  const MAX_ATTEMPTS = 200; // Aumentado para mais segurança
+  const MAX_ATTEMPTS = 200;
   let attempts = 0;
 
   function startWhenReady(route = 'intro') {
