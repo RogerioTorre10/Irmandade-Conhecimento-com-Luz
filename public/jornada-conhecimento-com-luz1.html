@@ -889,6 +889,7 @@
         const div = document.createElement('div');
         div.className = 'j-pergunta';
         div.dataset.pergunta = qIdx;
+        div.style.display = 'none'; // Inicialmente escondido
 
         div.innerHTML = `
           <label class="pergunta-enunciado text" 
@@ -913,9 +914,10 @@
     if (firstBloco) {
       firstBloco.style.display = 'block';
       window.JC.currentBloco = 0;
-      const first = firstBloco.querySelector('.j-pergunta');
-      if (first) {
-        first.classList.add('active');
+      const firstPergunta = firstBloco.querySelector('.j-pergunta');
+      if (firstPergunta) {
+        firstPergunta.style.display = 'block';
+        firstPergunta.classList.add('active');
         setTimeout(() => window.runTyping && window.runTyping(firstBloco), 100);
       }
     } else {
