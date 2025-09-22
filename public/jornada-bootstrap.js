@@ -1,7 +1,7 @@
 // jornada-bootstrap.js
 (function() {
   const log = (...args) => console.log('[BOOT]', ...args);
-  const MAX_ATTEMPTS = 100;
+  const MAX_ATTEMPTS = 150; // Aumentado para dar mais tempo
   let attempts = 0;
 
   function startWhenReady(route = 'intro') {
@@ -18,7 +18,6 @@
       return new Promise(resolve => setTimeout(() => resolve(startWhenReady(route)), 100));
     } else {
       log(`JC não disponível após ${MAX_ATTEMPTS} tentativas`);
-      // Fallback: Definir JC básico
       window.JC = window.JC || {
         init: (r) => {
           log('JC.init (fallback) aplicado');
@@ -48,14 +47,6 @@
   document.addEventListener('DOMContentLoaded', () => {
     startWhenReady('intro').finally(() => {
       log('startWhenReady concluído');
-      // Timeout de segurança (20s)
-      setTimeout(() => {
-        if (!window.JC || typeof window.JC.init !== 'function') {
-          log('Timeout de segurança atingido, forçando inicialização');
-          window.JC = window.JC || { init: () => log('JC.init (timeout fallback)') };
-          window.JC.init('intro');
-        }
-      }, 20000);
     });
   });
 
