@@ -809,7 +809,7 @@
   <!-- loadDynamicBlocks -->
 <script>
 (function() {
-  const VIDEO_BASE = '/assets/img/';
+  const VIDEO_BASE = '/assets/videos/'; // Ajustado para /assets/videos/
   window.JORNADA_VIDEOS = {
     intro: VIDEO_BASE + 'filme-0-ao-encontro-da-jornada.mp4',
     afterBlocks: {
@@ -866,7 +866,7 @@
     }
 
     content.innerHTML = '';
-    content.classList.remove('hidden'); // Garante visibilidade
+    content.classList.remove('hidden');
     blocks.forEach((block, bIdx) => {
       const bloco = document.createElement('div');
       bloco.className = 'j-bloco';
@@ -918,7 +918,10 @@
       if (firstPergunta) {
         firstPergunta.style.display = 'block';
         firstPergunta.classList.add('active');
-        setTimeout(() => window.runTyping && window.runTyping(firstBloco), 100);
+        setTimeout(() => {
+          console.log('[loadDynamicBlocks] Iniciando runTyping para primeiro bloco');
+          window.runTyping && window.runTyping(firstBloco);
+        }, 100);
       }
     } else {
       console.error('[loadDynamicBlocks] Nenhum bloco criado');
@@ -984,35 +987,59 @@
     if (!overlay || !video) {
       console.error('[playVideo] Elementos de vídeo não encontrados', { overlay: !!overlay, video: !!video });
       window.toast && window.toast('Erro ao reproduzir vídeo.');
+      if (window.JC && window.JC.goNext) window.JC.goNext();
       return;
     }
     console.log('[playVideo] Tentando reproduzir:', videoSrc);
-    video.src = videoSrc;
-    video.onended = () => {
-      console.log('[playVideo] Vídeo finalizado:', videoSrc);
-      overlay.classList.add('hidden');
-      video.src = '';
+    try {
+      // Verificar se o vídeo existe
+      fetch(videoSrc, { method: 'HEAD' })
+        .then(response => {
+          if (!response.ok) throw new Error('Vídeo não encontrado');
+          video.src = videoSrc;
+          video.onended = () => {
+            console.log('[playVideo] Vídeo finalizado:', videoSrc);
+            overlay.classList.add('hidden');
+            video.src = '';
+            window.JC && window.JC.goNext && window.JC.goNext();
+          };
+          video.onerror = (e) => {
+            console.error('[playVideo] Erro ao carregar vídeo:', videoSrc, e);
+            fallback.classList.remove('hidden');
+            video.classList.add('hidden');
+            window.toast && window.toast('Erro ao carregar vídeo. Usando fallback.');
+            setTimeout(() => {
+              overlay.classList.add('hidden');
+              fallback.classList.add('hidden');
+              video.classList.remove('hidden');
+              window.JC && window.JC.goNext && window.JC.goNext();
+            }, 3000);
+          };
+          overlay.classList.remove('hidden');
+          video.play().catch(e => {
+            console.error('[playVideo] Erro ao iniciar reprodução:', videoSrc, e);
+            fallback.classList.remove('hidden');
+            video.classList.add('hidden');
+            window.toast && window.toast('Erro ao reproduzir vídeo. Usando fallback.');
+            setTimeout(() => {
+              overlay.classList.add('hidden');
+              fallback.classList.add('hidden');
+              video.classList.remove('hidden');
+              window.JC && window.JC.goNext && window.JC.goNext();
+            }, 3000);
+          });
+          console.log('[playVideo] Iniciando reprodução:', videoSrc);
+        })
+        .catch(e => {
+          console.error('[playVideo] Erro ao verificar vídeo:', videoSrc, e);
+          window.toast && window.toast('Vídeo não encontrado.');
+          window.JC && window.JC.goNext && window.JC.goNext();
+        });
+    } catch (e) {
+      console.error('[playVideo] Erro inesperado:', videoSrc, e);
+      window.toast && window.toast('Erro ao reproduzir vídeo.');
       window.JC && window.JC.goNext && window.JC.goNext();
-    };
-    video.onerror = (e) => {
-      console.error('[playVideo] Erro ao carregar vídeo:', videoSrc, e);
-      fallback.classList.remove('hidden');
-      video.classList.add('hidden');
-      setTimeout(() => {
-        overlay.classList.add('hidden');
-        fallback.classList.add('hidden');
-        video.classList.remove('hidden');
-        window.JC && window.JC.goNext && window.JC.goNext();
-      }, 3000);
-    };
-    overlay.classList.remove('hidden');
-    video.play().catch(e => {
-      console.error('[playVideo] Erro ao iniciar reprodução:', videoSrc, e);
-      fallback.classList.remove('hidden');
-      video.classList.add('hidden');
-      window.toast && window.toast('Erro ao reproduzir vídeo. Usando fallback.');
-    });
-    console.log('[playVideo] Iniciando reprodução:', videoSrc);
+    }
   };
 
   document.addEventListener('click', (e) => {
