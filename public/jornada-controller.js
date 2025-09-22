@@ -1,69 +1,7 @@
-// jornada-controller.js
+// jornada-controller.js (versão simplificada, sem JornadaController)
 (function() {
   const log = (...args) => console.log('[JORNADA_CONTROLLER]', ...args);
 
-  class JornadaController {
-    constructor() {
-      this.currentBlock = null;
-    }
-
-    initialize() {
-      if (!window.JORNADA_BLOCKS) {
-        console.error('[JORNADA_CONTROLLER] window.JORNADA_BLOCKS não definido');
-        return;
-      }
-      this.currentBlock = window.JORNADA_BLOCKS[0]; // Inicializa com o primeiro bloco
-      log('JornadaController inicializado com bloco:', this.currentBlock);
-      this.renderBlock();
-    }
-
-    setCurrentBlock(blockId) {
-      if (!window.JORNADA_BLOCKS) {
-        console.error('[JORNADA_CONTROLLER] window.JORNADA_BLOCKS não definido');
-        return;
-      }
-      const block = window.JORNADA_BLOCKS[blockId];
-      if (!block) {
-        console.error(`[JORNADA_CONTROLLER] Bloco atual não encontrado para bloco ${blockId}`);
-        return;
-      }
-      this.currentBlock = block;
-      this.renderBlock();
-    }
-
-    renderBlock() {
-      if (!this.currentBlock) return;
-      window.loadDynamicBlocks(); // Chama loadDynamicBlocks sem passar parâmetro
-      log('Renderizando bloco:', this.currentBlock);
-    }
-
-    nextBlock() {
-      const currentIdx = window.JORNADA_BLOCKS.indexOf(this.currentBlock);
-      const nextId = currentIdx + 1;
-      if (nextId < window.JORNADA_BLOCKS.length) {
-        this.setCurrentBlock(nextId);
-      } else {
-        this.transitionToFinal();
-      }
-    }
-
-    transitionToFinal() {
-      window.JC.nextSection = 'section-final';
-      if (window.JORNADA_FINAL_VIDEO && window.playVideo) {
-        window.playVideo(window.JORNADA_FINAL_VIDEO);
-        log('Reproduzindo vídeo final:', window.JORNADA_FINAL_VIDEO);
-      } else {
-        window.showSection && window.showSection('section-final');
-      }
-    }
-  }
-
-  // Instancia e exporta
-  const controller = new JornadaController();
-  window.JornadaController = controller;
-  log('jornada-controller.js carregado');
-
-  // Integra com window.JC
   window.JC = window.JC || {
     currentBloco: 0,
     currentPergunta: 0,
@@ -86,13 +24,7 @@
       };
       log('Dependências:', dependencies);
 
-      // Inicializa JornadaController
-      if (window.JornadaController) {
-        window.JornadaController.initialize();
-        log('JornadaController inicializado');
-      }
-
-      if (route === 'section-perguntas') {
+      if (route === 'section-perguntas' && window.loadDynamicBlocks) {
         window.loadDynamicBlocks();
         log('loadDynamicBlocks concluído');
       }
