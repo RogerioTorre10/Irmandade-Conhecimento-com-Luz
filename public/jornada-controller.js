@@ -1,6 +1,69 @@
+// jornada-controller.js
 (function() {
   const log = (...args) => console.log('[JORNADA_CONTROLLER]', ...args);
 
+  class JornadaController {
+    constructor() {
+      this.currentBlock = null;
+    }
+
+    initialize() {
+      if (!window.JORNADA_BLOCKS) {
+        console.error('[JORNADA_CONTROLLER] window.JORNADA_BLOCKS não definido');
+        return;
+      }
+      this.currentBlock = window.JORNADA_BLOCKS[0]; // Inicializa com o primeiro bloco
+      log('JornadaController inicializado com bloco:', this.currentBlock);
+      this.renderBlock();
+    }
+
+    setCurrentBlock(blockId) {
+      if (!window.JORNADA_BLOCKS) {
+        console.error('[JORNADA_CONTROLLER] window.JORNADA_BLOCKS não definido');
+        return;
+      }
+      const block = window.JORNADA_BLOCKS[blockId];
+      if (!block) {
+        console.error(`[JORNADA_CONTROLLER] Bloco atual não encontrado para bloco ${blockId}`);
+        return;
+      }
+      this.currentBlock = block;
+      this.renderBlock();
+    }
+
+    renderBlock() {
+      if (!this.currentBlock) return;
+      window.loadDynamicBlocks(); // Chama loadDynamicBlocks sem passar parâmetro
+      log('Renderizando bloco:', this.currentBlock);
+    }
+
+    nextBlock() {
+      const currentIdx = window.JORNADA_BLOCKS.indexOf(this.currentBlock);
+      const nextId = currentIdx + 1;
+      if (nextId < window.JORNADA_BLOCKS.length) {
+        this.setCurrentBlock(nextId);
+      } else {
+        this.transitionToFinal();
+      }
+    }
+
+    transitionToFinal() {
+      window.JC.nextSection = 'section-final';
+      if (window.JORNADA_FINAL_VIDEO && window.playVideo) {
+        window.playVideo(window.JORNADA_FINAL_VIDEO);
+        log('Reproduzindo vídeo final:', window.JORNADA_FINAL_VIDEO);
+      } else {
+        window.showSection && window.showSection('section-final');
+      }
+    }
+  }
+
+  // Instancia e exporta
+  const controller = new JornadaController();
+  window.JornadaController = controller;
+  log('jornada-controller.js carregado');
+
+  // Integra com window.JC
   window.JC = window.JC || {
     currentBloco: 0,
     currentPergunta: 0,
@@ -23,11 +86,15 @@
       };
       log('Dependências:', dependencies);
 
-      if (window.loadDynamicBlocks) {
+      // Inicializa JornadaController
+      if (window.JornadaController) {
+        window.JornadaController.initialize();
+        log('JornadaController inicializado');
+      }
+
+      if (route === 'section-perguntas') {
         window.loadDynamicBlocks();
         log('loadDynamicBlocks concluído');
-      } else {
-        console.error('loadDynamicBlocks não definido');
       }
 
       window.showSection && window.showSection(route === 'intro' ? 'section-intro' : route);
@@ -43,6 +110,13 @@
       }
 
       if (currentSection === 'section-perguntas') {
+        if (!window.JORNADA_BLOCKS || window.JORNADA_BLOCKS.length === 0) {
+          console.error('window.JORNADA_BLOCKS não definido ou vazio');
+          window.JC.nextSection = 'section-final';
+          window.showSection('section-final');
+          return;
+        }
+
         const content = document.getElementById('perguntas-container');
         if (!content) {
           console.error('perguntas-container não encontrado');
@@ -78,20 +152,20 @@
           window.JC.currentPergunta = currentPerguntaIdx + 1;
           window.runTyping && window.runTyping(perguntas[currentPerguntaIdx + 1]);
           log('Avançando para pergunta', currentPerguntaIdx + 1, 'no bloco', window.JC.currentBloco);
-        } else if (window.JORNADA_BLOCKS && window.JC.currentBloco < window.JORNADA_BLOCKS.length - 1) {
-          currentBloco.style.display = 'none';
+        } else if (window.JC.currentBloco < window.JORNADA_BLOCKS.length - 1) {
+          currentBloco.classList.add('hidden');
           window.JC.currentBloco = (window.JC.currentBloco || 0) + 1;
           window.JC.currentPergunta = 0;
           const nextBloco = content.querySelector(`[data-bloco="${window.JC.currentBloco}"]`);
           if (nextBloco) {
-            nextBloco.style.display = 'block';
+            nextBloco.classList.remove('hidden');
             const first = nextBloco.querySelector('.j-pergunta');
             if (first) {
               first.classList.add('active');
               first.style.display = 'block';
               window.runTyping && window.runTyping(first);
             }
-            const video = currentBloco.dataset.video;
+            const video = nextBloco.dataset.video;
             if (video && window.playVideo) {
               window.JC.nextSection = 'section-perguntas';
               window.playVideo(video);
@@ -133,48 +207,6 @@
       }
     }
   });
-  // jornada-controller.js
-class JornadaController {
-  constructor() {
-    this.currentBlock = null;
-    this.blocks = [];
-  }
-
-  initialize() {
-    this.blocks = [
-      { id: 0, type: 'perguntas', content: 'Quem é você hoje?' },
-      { id: 1, type: 'perguntas', content: 'Qual é o seu maior sonho?' },
-      { id: 2, type: 'perguntas', content: 'O que te move?' },
-      { id: 3, type: 'perguntas', content: 'O que te inspira?' },
-      { id: 4, type: 'perguntas', content: 'O que você quer aprender?' }
-    ];
-    this.setCurrentBlock(0); // Inicializa com bloco 0
-  }
-
-  setCurrentBlock(blockId) {
-    const block = this.blocks.find(b => b.id === blockId);
-    if (!block) {
-      console.error(`[JORNADA_CONTROLLER] Bloco atual não encontrado para bloco ${blockId}`);
-      return;
-    }
-    this.currentBlock = block;
-    this.renderBlock();
-  }
-
-  renderBlock() {
-    if (!this.currentBlock) return;
-    loadDynamicBlocks(this.currentBlock); // Chama função de renderização
-  }
-
-  nextBlock() {
-    const nextId = this.currentBlock.id + 1;
-    if (nextId < this.blocks.length) {
-      this.setCurrentBlock(nextId);
-    } else {
-      this.transitionToFinal(); // Só vai pro section-final após todos os blocos
-    }
-  }
-}
 
   log('jornada-controller.js carregado');
 })();
