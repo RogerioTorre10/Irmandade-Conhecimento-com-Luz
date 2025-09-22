@@ -2,11 +2,32 @@
 (function() {
   const log = (...args) => console.log('[JORNADA_CONTROLLER]', ...args);
 
-  // Função helper para playVideo com onended para vídeo final
+  // Debounce pra evitar cliques múltiplos
+  let isProcessingClick = false;
+  function debounceClick(callback, wait = 300) {
+    return (...args) => {
+      if (isProcessingClick) {
+        log('Clique ignorado (debounce ativo)');
+        return;
+      }
+      isProcessingClick = true;
+      callback(...args);
+      setTimeout(() => {
+        isProcessingClick = false;
+      }, wait);
+    };
+  }
+
+  // Função playVideo com timeout de segurança
   window.playVideo = window.playVideo || function(videoSrc) {
-    const videoContainer = document.getElementById('video-container') || document.getElementById('transicao-video-container') || document.createElement('div'); // Fallback pro container
-    if (!videoContainer.parentNode) document.body.appendChild(videoContainer);
+    const videoContainer = document.getElementById('video-container');
+    if (!videoContainer) {
+      console.error('[JORNADA_CONTROLLER] video-container não encontrado');
+      window.showSection && window.showSection('section-final'); // Fallback pro final
+      return;
+    }
     videoContainer.innerHTML = '';
+    videoContainer.style.display = 'block';
 
     const video = document.createElement('video');
     video.src = videoSrc;
@@ -15,35 +36,64 @@
     video.style.width = '100%';
     video.style.height = 'auto';
 
-    // onended genérico: esconde vídeo e avança (específico pro final)
+    // onended: avança pro final ou volta pras perguntas
     video.onended = () => {
       videoContainer.style.display = 'none';
       log('Vídeo terminado:', videoSrc);
       if (videoSrc.includes('filme-5') || videoSrc === window.JORNADA_FINAL_VIDEO) {
-        // Força avanço pro final após filme-5
         window.JC.nextSection = 'section-final';
         window.__currentSectionId = 'section-final';
         window.showSection && window.showSection('section-final');
-        log('Avançando para section-final após vídeo final');
+        log('Avançando para section-final após filme-5');
       } else {
-        // Para outros vídeos, volta pro estado de perguntas ou próxima seção
         window.JC.nextSection = 'section-perguntas';
         window.showSection && window.showSection('section-perguntas');
         log('Voltando para section-perguntas após vídeo');
       }
     };
 
-    // Erro no vídeo: força avanço pra evitar loop
+    // Timeout de segurança: força avanço após 2 minutos (duração máxima do vídeo)
+    const videoTimeout = setTimeout(() => {
+      log('Timeout de segurança disparado para vídeo:', videoSrc);
+      videoContainer.style.display = 'none';
+      if (videoSrc.includes('filme-5')) {
+        window.__currentSectionId = 'section-final';
+        window.showSection && window.showSection('section-final');
+        log('Forçando section-final após timeout');
+      }
+    }, 120000); // 2 minutos
+
+    // Cancela timeout se vídeo terminar normalmente
+    video.onended = (e) => {
+      clearTimeout(videoTimeout);
+      videoContainer.style.display = 'none';
+      log('Vídeo terminado:', videoSrc);
+      if (videoSrc.includes('filme-5') || videoSrc === window.JORNADA_FINAL_VIDEO) {
+        window.JC.nextSection = 'section-final';
+        window.__currentSectionId = 'section-final';
+        window.showSection && window.showSection('section-final');
+        log('Avançando para section-final após filme-5');
+      } else {
+        window.JC.nextSection = 'section-perguntas';
+        window.showSection && window.showSection('section-perguntas');
+        log('Voltando para section-perguntas após vídeo');
+      }
+    };
+
+    // Erro no vídeo: força avanço
     video.onerror = () => {
+      clearTimeout(videoTimeout);
       log('Erro no vídeo:', videoSrc, '- Forçando avanço');
       videoContainer.style.display = 'none';
       if (videoSrc.includes('filme-5')) {
+        window.__currentSectionId = 'section-final';
         window.showSection && window.showSection('section-final');
+      } else {
+        window.showSection && window.showSection('section-perguntas');
       }
     };
 
     videoContainer.appendChild(video);
-    videoContainer.style.display = 'block';
     log('Reproduzindo vídeo:', videoSrc);
   };
 
@@ -75,9 +125,11 @@
       }
 
       window.showSection && window.showSection(route === 'intro' ? 'section-intro' : route);
+      window.__currentSectionId = route === 'intro' ? 'section-intro' : route;
+      log('Seção inicial:', window.__currentSectionId);
     },
     goNext: () => {
-      log('Iniciando goNext... Estado atual: currentBloco=', window.JC.currentBloco, ', blocos totais=', window.JORNADA_BLOCKS ? window.JORNADA_BLOCKS.length : 0);
+      log('Iniciando goNext... Estado atual: currentBloco=', window.JC.currentBloco, ', blocos totais=', window.JORNADA_BLOCKS ? window.JORNADA_BLOCKS.length : 0, ', currentSection=', window.__currentSectionId);
       const currentSection = window.__currentSectionId || 'section-intro';
       const sections = ['section-intro', 'section-termos', 'section-senha', 'section-guia', 'section-selfie', 'section-perguntas', 'section-final'];
       const currentIdx = sections.indexOf(currentSection);
@@ -90,6 +142,7 @@
         if (!window.JORNADA_BLOCKS || window.JORNADA_BLOCKS.length === 0) {
           console.error('window.JORNADA_BLOCKS não definido ou vazio');
           window.JC.nextSection = 'section-final';
+          window.__currentSectionId = 'section-final';
           window.showSection('section-final');
           return;
         }
@@ -98,6 +151,7 @@
         if (!content) {
           console.error('perguntas-container não encontrado');
           window.JC.nextSection = 'section-final';
+          window.__currentSectionId = 'section-final';
           window.showSection('section-final');
           return;
         }
@@ -105,13 +159,15 @@
         const currentBloco = content.querySelector('.j-bloco:not(.hidden)') || content.querySelector(`[data-bloco="${window.JC.currentBloco || 0}"]`);
         if (!currentBloco) {
           console.error('Bloco atual não encontrado para bloco', window.JC.currentBloco);
-          // Força fim se bloco não encontrado (anti-loop)
-          window.JC.currentBloco = window.JORNADA_BLOCKS.length; // Marca como "acabado"
+          window.JC.currentBloco = window.JORNADA_BLOCKS.length; // Marca como acabado
           window.JC.nextSection = 'section-final';
+          window.__currentSectionId = 'section-final';
           if (window.JORNADA_FINAL_VIDEO && window.playVideo) {
             window.playVideo(window.JORNADA_FINAL_VIDEO);
+            log('Vídeo final iniciado (bloco não encontrado)');
           } else {
             window.showSection('section-final');
+            log('Avanço direto pro final (sem vídeo, bloco não encontrado)');
           }
           return;
         }
@@ -119,14 +175,16 @@
         const perguntas = currentBloco.querySelectorAll('.j-pergunta') || [];
         if (perguntas.length === 0) {
           console.error('Nenhuma pergunta encontrada no bloco', window.JC.currentBloco);
-          // Força próximo bloco ou final
-          window.JC.currentBloco += 1;
+          window.JC.currentBloco += 1; // Tenta próximo bloco
           if (window.JC.currentBloco >= window.JORNADA_BLOCKS.length) {
             window.JC.nextSection = 'section-final';
+            window.__currentSectionId = 'section-final';
             if (window.JORNADA_FINAL_VIDEO && window.playVideo) {
               window.playVideo(window.JORNADA_FINAL_VIDEO);
+              log('Vídeo final iniciado (sem perguntas)');
             } else {
               window.showSection('section-final');
+              log('Avanço direto pro final (sem vídeo, sem perguntas)');
             }
           }
           return;
@@ -164,19 +222,19 @@
               window.JC.nextSection = 'section-perguntas';
               window.playVideo(video);
               log('Reproduzindo vídeo após bloco', window.JC.currentBloco - 1, ':', video);
-              return; // Para aqui e espera onended voltar
+              return;
             }
           }
         } else {
           // Fim dos blocos: vídeo final e section-final
           log('Fim dos blocos! Iniciando vídeo final.');
           window.JC.nextSection = 'section-final';
+          window.__currentSectionId = 'section-final';
           if (window.JORNADA_FINAL_VIDEO && window.playVideo) {
             window.playVideo(window.JORNADA_FINAL_VIDEO);
             log('Vídeo final iniciado - deve avançar no onended');
-            return; // Para aqui, onended cuida do resto
+            return;
           } else {
-            // Fallback se sem vídeo
             window.showSection('section-final');
             log('Avanço direto pro final (sem vídeo)');
           }
@@ -185,7 +243,7 @@
         const nextSection = window.JC.nextSection || sections[currentIdx + 1];
         if (nextSection) {
           window.JC.nextSection = null;
-          window.__currentSectionId = nextSection; // Atualiza o estado explicitamente
+          window.__currentSectionId = nextSection;
           window.showSection && window.showSection(nextSection);
           log('Navegando de', currentSection, 'para', nextSection);
         } else {
@@ -195,7 +253,8 @@
     }
   };
 
-  document.addEventListener('click', (e) => {
+  // Event listener com debounce
+  document.addEventListener('click', debounceClick((e) => {
     const btn = e.target.closest('[data-action="avancar"], .btn-avancar, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney');
     if (btn) {
       log('Clique no botão avançar:', btn.id || btn.className);
@@ -206,7 +265,7 @@
         window.toast && window.toast('Erro ao avançar. Tente recarregar a página.');
       }
     }
-  });
+  }));
 
   log('jornada-controller.js carregado');
 })();
