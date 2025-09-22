@@ -733,16 +733,18 @@
       return;
     }
 
-    if (window.playVideo && window.JORNADA_VIDEOS && window.JORNADA_VIDEOS.intro) {
+    if (window.JC) {
       window.JC.nextSection = 'section-guia';
-      window.playVideo(window.JORNADA_VIDEOS.intro);
-      log('[startJourney] Reproduzindo vídeo de introdução');
-    } else if (window.showSection) {
-      window.showSection('section-guia');
-      log('[startJourney] Navegação para section-guia');
+      if (window.playVideo && window.JORNADA_VIDEOS && window.JORNADA_VIDEOS.intro) {
+        window.playVideo(window.JORNADA_VIDEOS.intro);
+        log('[startJourney] Reproduzindo vídeo de introdução');
+      } else {
+        window.showSection('section-guia');
+        log('[startJourney] Navegação para section-guia');
+      }
     } else {
-      log('[startJourney] window.showSection não definido');
-      window.toast && window.toast('Erro ao navegar para a seção de guia.');
+      console.error('[startJourney] window.JC não definido');
+      window.toast && window.toast('Erro ao inicializar jornada. Tente recarregar a página.');
     }
   };
   console.log('[Senha] Bloco carregado');
@@ -1040,11 +1042,16 @@
       if (guideNameSlot) {
         guideNameSlot.textContent = guia.charAt(0).toUpperCase() + guia.slice(1);
       }
-      if (window.playVideo) {
+      if (window.JC) {
         window.JC.nextSection = 'section-selfie';
-        window.playVideo('/assets/videos/transicao_selfie.mp4');
-      } else if (window.showSection) {
-        window.showSection('section-selfie');
+        if (window.playVideo) {
+          window.playVideo('/assets/videos/transicao_selfie.mp4');
+        } else {
+          window.showSection('section-selfie');
+        }
+      } else {
+        console.error('[Guia] window.JC não definido');
+        window.toast && window.toast('Erro ao navegar para a seção de selfie.');
       }
     }
   });
