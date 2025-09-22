@@ -87,7 +87,9 @@
 
         if (currentPerguntaIdx < perguntas.length - 1) {
           currentPergunta.classList.remove('active');
+          currentPergunta.style.display = 'none';
           perguntas[currentPerguntaIdx + 1].classList.add('active');
+          perguntas[currentPerguntaIdx + 1].style.display = 'block';
           window.runTyping && window.runTyping(perguntas[currentPerguntaIdx + 1]);
           log('Avançando para pergunta', currentPerguntaIdx + 1, 'no bloco', window.JC.currentBloco);
         } else if (window.JORNADA_BLOCKS && window.JC.currentBloco < window.JORNADA_BLOCKS.length - 1) {
@@ -99,6 +101,7 @@
             const first = nextBloco.querySelector('.j-pergunta');
             if (first) {
               first.classList.add('active');
+              first.style.display = 'block';
               window.runTyping && window.runTyping(nextBloco);
             }
             const video = currentBloco.dataset.video;
