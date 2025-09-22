@@ -1,14 +1,14 @@
 // jornada-bootstrap.js
 (function() {
   const log = (...args) => console.log('[BOOT]', ...args);
-  const MAX_ATTEMPTS = 200; // Aumentado para mais segurança
+  const MAX_ATTEMPTS = 200;
   let attempts = 0;
 
   function startWhenReady(route = 'intro') {
     log(`Tentando iniciar • rota: ${route}`);
     attempts++;
 
-    if (window.JC && typeof window.JC.init === 'function') {
+    if (window.JC && typeof window.JC.init === 'function' && window.JORNADA_BLOCKS) {
       log('JC.init concluído');
       window.JC.init(route);
       log('Inicialização concluída com sucesso');
@@ -17,7 +17,7 @@
       log(`Tentativa ${attempts} de ${MAX_ATTEMPTS}`);
       return new Promise(resolve => setTimeout(() => resolve(startWhenReady(route)), 50));
     } else {
-      log(`JC não disponível após ${MAX_ATTEMPTS} tentativas`);
+      log(`JC ou JORNADA_BLOCKS não disponível após ${MAX_ATTEMPTS} tentativas`);
       window.JC = window.JC || {
         init: (r) => {
           log('JC.init (fallback) aplicado');
