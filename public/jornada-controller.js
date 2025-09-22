@@ -2,9 +2,8 @@
 (function() {
   const log = (...args) => console.log('[JORNADA_CONTROLLER]', ...args);
 
-  window.perguntasLoaded = false; // Flag pra controlar blocos
+  window.perguntasLoaded = false;
 
-  // Debounce pra evitar cliques múltiplos
   let isProcessingClick = false;
   function debounceClick(callback, wait = 500) {
     return (...args) => {
@@ -20,7 +19,6 @@
     };
   }
 
-  // Função showSection
   window.showSection = window.showSection || function(sectionId) {
     document.querySelectorAll('.j-section, #videoOverlay, #video-container').forEach(elem => {
       elem.classList.add('hidden');
@@ -36,7 +34,6 @@
     }
   };
 
-  // Função playVideo (filme-0 a filme-5)
   window.playVideo = function(videoSrc) {
     document.querySelectorAll('.j-section, #videoOverlay').forEach(elem => {
       elem.classList.add('hidden');
@@ -171,22 +168,8 @@
       }
 
       window.__currentSectionId = route === 'intro' ? 'section-intro' : route;
-      if (route === 'section-guia' && window.playTransitionVideo) {
-        setTimeout(() => {
-          window.playTransitionVideo();
-          log('Reproduzindo transicao_selfie após section-guia');
-        }, 100);
-      } else if (route === 'section-perguntas' && window.loadDynamicBlocks) {
-        setTimeout(() => {
-          window.loadDynamicBlocks();
-          window.perguntasLoaded = true;
-          window.showSection && window.showSection('section-perguntas');
-          log('loadDynamicBlocks concluído no init');
-        }, 100);
-      } else {
-        window.showSection && window.showSection(window.__currentSectionId);
-        log('Seção inicial:', window.__currentSectionId);
-      }
+      window.showSection && window.showSection(window.__currentSectionId);
+      log('Seção inicial:', window.__currentSectionId);
     },
     goNext: () => {
       log('Iniciando goNext... Estado atual: currentBloco=', window.JC.currentBloco, ', blocos totais=', window.JORNADA_BLOCKS ? window.JORNADA_BLOCKS.length : 0, ', currentSection=', window.__currentSectionId, ', perguntasLoaded=', window.perguntasLoaded);
@@ -207,17 +190,13 @@
         window.__currentSectionId = nextSection;
         window.showSection && window.showSection(nextSection);
         log('Avançando de', currentSection, 'para', nextSection);
-        if (nextSection === 'section-guia' && window.playTransitionVideo) {
-          setTimeout(() => {
-            window.playTransitionVideo();
-            log('Reproduzindo transicao_selfie após', currentSection);
-          }, 100);
-        }
         return;
       }
 
       if (currentSection === 'section-guia') {
         if (window.playTransitionVideo) {
+          window.JC.nextSection = 'section-selfie';
+          window.__currentSectionId = 'section-guia'; // Mantém section-guia até vídeo rodar
           setTimeout(() => {
             window.playTransitionVideo();
             log('Reproduzindo transicao_selfie após section-guia');
@@ -353,6 +332,9 @@
                 window.playVideo(video);
                 log('Reproduzindo vídeo após bloco', window.JC.currentBloco - 1, ':', video);
                 return;
+              } else {
+                window.showSection && window.showSection('section-perguntas');
+                log('Mostrando próximo bloco sem vídeo');
               }
             }
           } else {
@@ -399,7 +381,6 @@
     }
   };
 
-  // Event listener com debounce
   document.addEventListener('click', debounceClick((e) => {
     const btn = e.target.closest('[data-action="avancar"], .btn-avancar, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney');
     if (btn) {
