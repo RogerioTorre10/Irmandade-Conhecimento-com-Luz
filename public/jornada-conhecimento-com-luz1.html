@@ -849,85 +849,84 @@
     console.log('[loadDynamicBlocks] Blocos atualizados para idioma:', currentLang);
   }
 
-  window.loadDynamicBlocks = function() {
-    updateBlocks();
-    const content = document.getElementById('perguntas-container');
-    if (!content) {
-      console.error('[loadDynamicBlocks] Container de perguntas não encontrado');
-      window.toast && window.toast('Erro ao carregar perguntas.');
-      return;
+window.loadDynamicBlocks = function() {
+  updateBlocks();
+  const content = document.getElementById('perguntas-container');
+  if (!content) {
+    console.error('[loadDynamicBlocks] Container de perguntas não encontrado');
+    window.toast && window.toast('Erro ao carregar perguntas.');
+    return;
+  }
+
+  const blocks = window.JORNADA_BLOCKS || [];
+  if (!blocks.length) {
+    console.error('[loadDynamicBlocks] JORNADA_BLOCKS não definido ou vazio');
+    window.toast && window.toast('Nenhum bloco de perguntas encontrado.');
+    return;
+  }
+
+  content.innerHTML = '';
+  content.classList.remove('hidden');
+  blocks.forEach((block, bIdx) => {
+    const bloco = document.createElement('div');
+    bloco.className = 'j-bloco';
+    bloco.dataset.bloco = bIdx;
+    bloco.dataset.video = block.video_after || '';
+
+    if (block.title) {
+      const title = document.createElement('h3');
+      title.className = 'pergunta-enunciado text';
+      title.dataset.typing = 'true';
+      title.dataset.text = block.title;
+      title.dataset.speed = '36';
+      title.dataset.cursor = 'true';
+      bloco.appendChild(title);
     }
 
-    const blocks = window.JORNADA_BLOCKS || [];
-    if (!blocks.length) {
-      console.error('[loadDynamicBlocks] JORNADA_BLOCKS não definido ou vazio');
-      window.toast && window.toast('Nenhum bloco de perguntas encontrado.');
-      return;
-    }
+    (block.questions || []).forEach((q, qIdx) => {
+      const label = typeof q === 'string' ? q : (q.label || q.text || '');
+      const div = document.createElement('div');
+      div.className = 'j-pergunta';
+      div.dataset.pergunta = qIdx;
 
-    content.innerHTML = '';
-    content.classList.remove('hidden'); // Garante visibilidade
-    blocks.forEach((block, bIdx) => {
-      const bloco = document.createElement('div');
-      bloco.className = 'j-bloco';
-      bloco.dataset.bloco = bIdx;
-      bloco.dataset.video = block.video_after || '';
-      bloco.style.display = 'none';
-
-      if (block.title) {
-        const title = document.createElement('h3');
-        title.className = 'pergunta-enunciado text';
-        title.dataset.typing = 'true';
-        title.dataset.text = block.title;
-        title.dataset.speed = '36';
-        title.dataset.cursor = 'true';
-        bloco.appendChild(title);
-      }
-
-      (block.questions || []).forEach((q, qIdx) => {
-        const label = typeof q === 'string' ? q : (q.label || q.text || '');
-        const div = document.createElement('div');
-        div.className = 'j-pergunta';
-        div.dataset.pergunta = qIdx;
-
-        div.innerHTML = `
-          <label class="pergunta-enunciado text" 
-                 data-typing="true" 
-                 data-text="Pergunta ${qIdx + 1}: ${label}" 
-                 data-speed="36" 
-                 data-cursor="true"></label>
-          <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
-          <div class="accessibility-controls">
-            <button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>
-            <button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>
-            <button class="btn btn-avancar" data-action="avancar">Avançar</button>
-          </div>
-        `;
-        bloco.appendChild(div);
-      });
-
-      content.appendChild(bloco);
+      div.innerHTML = `
+        <label class="pergunta-enunciado text" 
+               data-typing="true" 
+               data-text="Pergunta ${qIdx + 1}: ${label}" 
+               data-speed="36" 
+               data-cursor="true"></label>
+        <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
+        <div class="accessibility-controls">
+          <button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>
+          <button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>
+          <button class="btn btn-avancar" data-action="avancar">Avançar</button>
+        </div>
+      `;
+      bloco.appendChild(div);
     });
 
-    const firstBloco = content.querySelector('.j-bloco');
-    if (firstBloco) {
-      firstBloco.style.display = 'block';
-      window.JC.currentBloco = 0;
-      const first = firstBloco.querySelector('.j-pergunta');
-      if (first) {
-        first.classList.add('active');
-        setTimeout(() => window.runTyping && window.runTyping(firstBloco), 100);
-      }
-    } else {
-      console.error('[loadDynamicBlocks] Nenhum bloco criado');
-      window.toast && window.toast('Erro ao criar blocos de perguntas.');
-    }
+    content.appendChild(bloco);
+  });
 
-    if (window.loadAnswers) window.loadAnswers();
-    const firstTa = document.querySelector('.j-bloco .j-pergunta textarea');
-    if (firstTa && window.handleInput) window.handleInput(firstTa);
-    console.log('[loadDynamicBlocks] Blocos carregados com sucesso');
-  };
+  const firstBloco = content.querySelector('.j-bloco');
+  if (firstBloco) {
+    firstBloco.classList.add('active'); // Usa classe active
+    window.JC.currentBloco = 0;
+    const first = firstBloco.querySelector('.j-pergunta');
+    if (first) {
+      first.classList.add('active');
+      setTimeout(() => window.runTyping && window.runTyping(firstBloco), 100);
+    }
+  } else {
+    console.error('[loadDynamicBlocks] Nenhum bloco criado');
+    window.toast && window.toast('Erro ao criar blocos de perguntas.');
+  }
+
+  if (window.loadAnswers) window.loadAnswers();
+  const firstTa = document.querySelector('.j-bloco .j-pergunta textarea');
+  if (firstTa && window.handleInput) window.handleInput(firstTa);
+  console.log('[loadDynamicBlocks] Blocos carregados com sucesso');
+};
 
   document.addEventListener('change', (e) => {
     if (e.target.id === 'language-select') {
