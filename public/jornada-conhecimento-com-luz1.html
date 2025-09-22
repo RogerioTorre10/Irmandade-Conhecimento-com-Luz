@@ -1020,14 +1020,14 @@
   })();
   </script>
 
-<!-- Vídeo Transição -->
-<script>
+// video-transicao.js
 (function() {
+  const log = (...args) => console.log('[VIDEO_TRANSICAO]', ...args);
   let isPlaying = false;
 
-  window.playVideo = function(videoSrc) {
+  window.playTransitionVideo = function(videoSrc = '/assets/img/transicao_selfie.mp4') {
     if (isPlaying) {
-      console.log('[playVideo] Já está reproduzindo um vídeo, ignorando:', videoSrc);
+      log('Já está reproduzindo um vídeo, ignorando:', videoSrc);
       return;
     }
     isPlaying = true;
@@ -1036,65 +1036,84 @@
     const video = document.getElementById('videoTransicao');
     const fallback = document.getElementById('videoFallback');
     if (!overlay || !video) {
-      console.error('[playVideo] Elementos de vídeo não encontrados', { overlay: !!overlay, video: !!video });
-      window.toast && window.toast('Erro ao reproduzir vídeo.');
+      console.error('[VIDEO_TRANSICAO] Elementos de vídeo não encontrados', { overlay: !!overlay, video: !!video });
+      window.toast && window.toast('Erro ao reproduzir vídeo de transição.');
       isPlaying = false;
-      if (window.JC && window.JC.goNext) window.JC.goNext();
+      window.JC.nextSection = 'section-selfie';
+      window.__currentSectionId = 'section-selfie';
+      window.showSection && window.showSection('section-selfie');
+      log('Forçando section-selfie (sem elementos de vídeo)');
       return;
     }
-    console.log('[playVideo] Tentando reproduzir:', videoSrc);
+    log('Tentando reproduzir:', videoSrc);
+
     try {
       fetch(videoSrc, { method: 'HEAD' })
         .then(response => {
           if (!response.ok) throw new Error('Vídeo não encontrado');
           video.src = videoSrc;
           video.onended = () => {
-            console.log('[playVideo] Vídeo finalizado:', videoSrc);
+            log('Vídeo finalizado:', videoSrc);
             overlay.classList.add('hidden');
             video.src = '';
             isPlaying = false;
-            if (window.JC && window.JC.goNext) window.JC.goNext();
+            window.JC.nextSection = 'section-selfie';
+            window.__currentSectionId = 'section-selfie';
+            window.showSection && window.showSection('section-selfie');
+            log('Avançando para section-selfie após vídeo');
           };
           video.onerror = (e) => {
-            console.error('[playVideo] Erro ao carregar vídeo:', videoSrc, e);
+            console.error('[VIDEO_TRANSICAO] Erro ao carregar vídeo:', videoSrc, e);
             fallback.classList.remove('hidden');
             video.classList.add('hidden');
-            window.toast && window.toast('Erro ao carregar vídeo. Usando fallback.');
+            window.toast && window.toast('Erro ao carregar vídeo de transição. Usando fallback.');
             setTimeout(() => {
               overlay.classList.add('hidden');
               fallback.classList.add('hidden');
               video.classList.remove('hidden');
               isPlaying = false;
-              if (window.JC && window.JC.goNext) window.JC.goNext();
+              window.JC.nextSection = 'section-selfie';
+              window.__currentSectionId = 'section-selfie';
+              window.showSection && window.showSection('section-selfie');
+              log('Avançando para section-selfie após erro');
             }, 3000);
           };
           overlay.classList.remove('hidden');
           video.play().catch(e => {
-            console.error('[playVideo] Erro ao iniciar reprodução:', videoSrc, e);
+            console.error('[VIDEO_TRANSICAO] Erro ao iniciar reprodução:', videoSrc, e);
             fallback.classList.remove('hidden');
             video.classList.add('hidden');
-            window.toast && window.toast('Erro ao reproduzir vídeo. Usando fallback.');
+            window.toast && window.toast('Erro ao reproduzir vídeo de transição. Usando fallback.');
             setTimeout(() => {
               overlay.classList.add('hidden');
               fallback.classList.add('hidden');
               video.classList.remove('hidden');
               isPlaying = false;
-              if (window.JC && window.JC.goNext) window.JC.goNext();
+              window.JC.nextSection = 'section-selfie';
+              window.__currentSectionId = 'section-selfie';
+              window.showSection && window.showSection('section-selfie');
+              log('Avançando para section-selfie após erro de reprodução');
             }, 3000);
           });
-          console.log('[playVideo] Iniciando reprodução:', videoSrc);
+          log('Iniciando reprodução:', videoSrc);
         })
         .catch(e => {
-          console.error('[playVideo] Erro ao verificar vídeo:', videoSrc, e);
-          window.toast && window.toast('Vídeo não encontrado.');
+          console.error('[VIDEO_TRANSICAO] Erro ao verificar vídeo:', videoSrc, e);
+          window.toast && window.toast('Vídeo de transição não encontrado.');
           isPlaying = false;
-          if (window.JC && window.JC.goNext) window.JC.goNext();
+          window.JC.nextSection = 'section-selfie';
+          window.__currentSectionId = 'section-selfie';
+          window.showSection && window.showSection('section-selfie');
+          log('Forçando section-selfie (vídeo não encontrado)');
         });
     } catch (e) {
-      console.error('[playVideo] Erro inesperado:', videoSrc, e);
-      window.toast && window.toast('Erro ao reproduzir vídeo.');
+      console.error('[VIDEO_TRANSICAO] Erro inesperado:', videoSrc, e);
+      window.toast && window.toast('Erro ao reproduzir vídeo de transição.');
       isPlaying = false;
-      if (window.JC && window.JC.goNext) window.JC.goNext();
+      window.JC.nextSection = 'section-selfie';
+      window.__currentSectionId = 'section-selfie';
+      window.showSection && window.showSection('section-selfie');
+      log('Forçando section-selfie (erro inesperado)');
     }
   };
 
@@ -1104,18 +1123,21 @@
       const overlay = document.getElementById('videoOverlay');
       const video = document.getElementById('videoTransicao');
       if (overlay && video) {
-        console.log('[playVideo] Vídeo pulado pelo usuário');
+        log('Vídeo pulado pelo usuário');
         video.pause();
         video.src = '';
         overlay.classList.add('hidden');
         isPlaying = false;
-        if (window.JC && window.JC.goNext) window.JC.goNext();
+        window.JC.nextSection = 'section-selfie';
+        window.__currentSectionId = 'section-selfie';
+        window.showSection && window.showSection('section-selfie');
+        log('Avançando para section-selfie após skip');
       }
     }
   });
-  console.log('[Video] Bloco carregado');
+
+  log('video-transicao.js carregado');
 })();
-</script>
   
  <!-- Guia Seleção -->
 <script>
