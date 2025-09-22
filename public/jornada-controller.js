@@ -49,6 +49,7 @@
           window.JC.nextSection = 'section-final';
           if (window.JORNADA_FINAL_VIDEO && window.playVideo) {
             window.playVideo(window.JORNADA_FINAL_VIDEO);
+            log('Reproduzindo vídeo final:', window.JORNADA_FINAL_VIDEO);
           } else {
             window.showSection('section-final');
           }
@@ -61,6 +62,7 @@
           window.JC.nextSection = 'section-final';
           if (window.JORNADA_FINAL_VIDEO && window.playVideo) {
             window.playVideo(window.JORNADA_FINAL_VIDEO);
+            log('Reproduzindo vídeo final:', window.JORNADA_FINAL_VIDEO);
           } else {
             window.showSection('section-final');
           }
@@ -76,6 +78,7 @@
           window.JC.nextSection = 'section-final';
           if (window.JORNADA_FINAL_VIDEO && window.playVideo) {
             window.playVideo(window.JORNADA_FINAL_VIDEO);
+            log('Reproduzindo vídeo final:', window.JORNADA_FINAL_VIDEO);
           } else {
             window.showSection('section-final');
           }
