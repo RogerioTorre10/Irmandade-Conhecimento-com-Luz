@@ -1022,6 +1022,41 @@
     console.log('[Video] Bloco carregado');
   })();
   </script>
+  
+  <!-- Guia Seleção -->
+<script>
+(function() {
+  window.JORNADA = window.JORNADA || {};
+  window.JORNADA.selectedGuia = window.JORNADA.selectedGuia || null;
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action="select-guia"]');
+    if (btn) {
+      e.preventDefault();
+      const guia = btn.dataset.guia;
+      window.JORNADA.selectedGuia = guia;
+      console.log('[Guia] Guia selecionado:', guia);
+      const guideBg = document.getElementById('guideBg');
+      if (guideBg) {
+        guideBg.src = `/assets/img/irmandade-quarteto-bg-${guia}.png`;
+      }
+      const guideNameSlot = document.getElementById('guideNameSlot');
+      if (guideNameSlot) {
+        guideNameSlot.textContent = guia.charAt(0).toUpperCase() + guia.slice(1);
+      }
+      if (window.JC && window.playVideo) {
+        window.JC.nextSection = 'section-selfie';
+        window.playVideo('/assets/videos/transicao_selfie.mp4');
+        console.log('[Guia] Reproduzindo vídeo transicao_selfie');
+      } else {
+        window.showSection && window.showSection('section-selfie');
+        console.log('[Guia] Navegação direta para section-selfie');
+      }
+    }
+  });
+  console.log('[Guia] Bloco carregado');
+})();
+</script>
  
 <!-- Selfie -->
 <script>
