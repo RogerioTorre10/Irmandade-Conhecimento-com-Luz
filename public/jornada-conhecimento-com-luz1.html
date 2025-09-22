@@ -781,6 +781,11 @@
           window.loadDynamicBlocks();
           console.log('[showSection] loadDynamicBlocks chamado para section-perguntas');
         }
+        window.runTyping = function(root) {
+        if (!root || root.classList.contains('hidden') || !(root instanceof Element)) {
+        console.log('[runTyping] Root inválido ou oculto:', root?.id || root?.className || root);
+        return;
+      }
         if (window.runTyping) {
           window.runTyping(target);
           console.log('[showSection] Iniciando runTyping para:', id);
