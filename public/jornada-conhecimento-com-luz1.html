@@ -974,39 +974,69 @@ window.loadDynamicBlocks = function() {
   <!-- Vídeo Transição -->
   <script>
   (function() {
-    window.playVideo = function(videoSrc) {
-      const overlay = document.getElementById('videoOverlay');
-      const video = document.getElementById('videoTransicao');
-      const fallback = document.getElementById('videoFallback');
-      if (!overlay || !video) {
-        console.error('[playVideo] Elementos de vídeo não encontrados');
-        window.toast && window.toast('Erro ao reproduzir vídeo.');
-        return;
-      }
-      video.src = videoSrc;
-      video.onended = () => {
-        overlay.classList.add('hidden');
-        video.src = '';
-        window.JC && window.JC.goNext && window.JC.goNext();
-      };
-      video.onerror = () => {
-        fallback.classList.remove('hidden');
-        video.classList.add('hidden');
+   window.playVideo = function(videoSrc) {
+  const overlay = document.getElementById('videoOverlay');
+  const video = document.getElementById('videoTransicao');
+  const fallback = document.getElementById('videoFallback');
+  if (!overlay || !video) {
+    console.error('[playVideo] Elementos de vídeo não encontrados');
+    window.toast && window.toast('Erro ao reproduzir vídeo.');
+    return;
+  }
+  video.src = videoSrc;
+  video.onended = () => {
+    overlay.classList.add('hidden');
+    video.src = '';
+    if (window.JC.nextBloco !== null && window.JC.nextBloco !== undefined) {
+      const content = document.getElementById('perguntas-container');
+      const currentBloco = content.querySelector(`.j-bloco[data-bloco="${window.JC.currentBloco}"]`);
+      const nextBloco = content.querySelector(`.j-bloco[data-bloco="${window.JC.nextBloco}"]`);
+      if (currentBloco && nextBloco) {
+        currentBloco.classList.remove('active');
         setTimeout(() => {
-          overlay.classList.add('hidden');
-          fallback.classList.add('hidden');
-          video.classList.remove('hidden');
-          window.JC && window.JC.goNext && window.JC.goNext();
-        }, 3000);
-      };
-      overlay.classList.remove('hidden');
-      video.play().catch(e => {
-        console.error('[playVideo] Erro ao reproduzir vídeo:', e);
-        fallback.classList.remove('hidden');
-        video.classList.add('hidden');
-      });
-      console.log('[playVideo] Reproduzindo vídeo:', videoSrc);
-    };
+          currentBloco.style.display = 'none';
+          nextBloco.style.display = 'block';
+          setTimeout(() => {
+            nextBloco.classList.add('active');
+            window.JC.currentBloco = window.JC.nextBloco;
+            delete window.JC.nextBloco;
+            const first = nextBloco.querySelector('.j-pergunta');
+            if (first) {
+              first.classList.add('active');
+              window.runTyping && window.runTyping(nextBloco);
+            }
+            console.log('[playVideo] Avançando para bloco', window.JC.currentBloco);
+          }, 50);
+        }, 500);
+      } else {
+        window.JC.goNext && window.JC.goNext();
+      }
+    } else if (window.JC.nextSection) {
+      window.showSection(window.JC.nextSection);
+      window.JC.nextSection = null;
+      console.log('[playVideo] Navegando para', window.JC.nextSection);
+    } else {
+      window.JC.goNext && window.JC.goNext();
+    }
+  };
+  video.onerror = () => {
+    fallback.classList.remove('hidden');
+    video.classList.add('hidden');
+    setTimeout(() => {
+      overlay.classList.add('hidden');
+      fallback.classList.add('hidden');
+      video.classList.remove('hidden');
+      window.JC.goNext && window.JC.goNext();
+    }, 3000);
+  };
+  overlay.classList.remove('hidden');
+  video.play().catch(e => {
+    console.error('[playVideo] Erro ao reproduzir vídeo:', e);
+    fallback.classList.remove('hidden');
+    video.classList.add('hidden');
+  });
+  console.log('[playVideo] Reproduzindo vídeo:', videoSrc);
+};
 
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('#skipVideo');
