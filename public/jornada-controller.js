@@ -133,6 +133,48 @@
       }
     }
   });
+  // jornada-controller.js
+class JornadaController {
+  constructor() {
+    this.currentBlock = null;
+    this.blocks = [];
+  }
+
+  initialize() {
+    this.blocks = [
+      { id: 0, type: 'perguntas', content: 'Quem é você hoje?' },
+      { id: 1, type: 'perguntas', content: 'Qual é o seu maior sonho?' },
+      { id: 2, type: 'perguntas', content: 'O que te move?' },
+      { id: 3, type: 'perguntas', content: 'O que te inspira?' },
+      { id: 4, type: 'perguntas', content: 'O que você quer aprender?' }
+    ];
+    this.setCurrentBlock(0); // Inicializa com bloco 0
+  }
+
+  setCurrentBlock(blockId) {
+    const block = this.blocks.find(b => b.id === blockId);
+    if (!block) {
+      console.error(`[JORNADA_CONTROLLER] Bloco atual não encontrado para bloco ${blockId}`);
+      return;
+    }
+    this.currentBlock = block;
+    this.renderBlock();
+  }
+
+  renderBlock() {
+    if (!this.currentBlock) return;
+    loadDynamicBlocks(this.currentBlock); // Chama função de renderização
+  }
+
+  nextBlock() {
+    const nextId = this.currentBlock.id + 1;
+    if (nextId < this.blocks.length) {
+      this.setCurrentBlock(nextId);
+    } else {
+      this.transitionToFinal(); // Só vai pro section-final após todos os blocos
+    }
+  }
+}
 
   log('jornada-controller.js carregado');
 })();
