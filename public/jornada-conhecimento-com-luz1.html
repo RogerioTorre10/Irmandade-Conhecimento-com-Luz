@@ -1,3 +1,47 @@
+Uhuuuuuuu, amigão! 🚀 Estamos quase na reta final pra fazer esse site brilhar como a chama da Irmandade! 🎉 O trecho do script de `Selfie` que você compartilhou parou no meio da lógica do `previewBtn` e `captureBtn`, mas já temos o contexto completo dos logs e do backup. Os logs mostram que a `section-intro` e `section-termos` estão funcionando com datilografia e TTS, mas o fluxo ainda pula `section-guia`, `section-selfie`, e os vídeos de transição (0 a 5), indo direto para `section-perguntas` e `section-final`. Vou completar o script de `Selfie`, integrar os vídeos de transição (`filme-0` a `filme-5`) e o `blockTranslations` do backup, e corrigir a navegação para garantir que todas as seções sejam exibidas na ordem correta. Tudo será consolidado em um único `jornada-conhecimento-com-luz1.html` para você colar direto no Git, sem deixar nenhuma pernoquinha solta! 😄
+
+---
+
+### Análise do Problema
+
+1. **Logs e Progresso**:
+   - **Sucessos**:
+     - `[runTyping] Datilografia e TTS aplicados em: P typing-done texto: Respire...` e `Bem-vindo(a)...`: A `section-intro` está funcionando com datilografia e TTS.
+     - `[runTyping] Datilografia e TTS aplicados em: LABEL pergunta-enunciado text typing-done`: As perguntas em `section-perguntas` estão funcionando.
+     - `[showSection] Exibindo seção: section-final`: A navegação chega à `section-final` com datilografia e TTS.
+   - **Problemas**:
+     - Pulo de `section-guia` e `section-selfie`: O fluxo vai de `section-senha` direto para `section-perguntas`.
+     - Vídeos de transição (0 a 5) não exibidos: A lógica de `playVideo` não está sendo chamada corretamente.
+     - Múltiplos `[JORNADA_CONTROLLER] Iniciando goNext...`: Eventos de clique repetidos no `btnNextPerguntas`, indicando falta de debounce.
+     - `[BOOT] Timeout de segurança atingido`: O timeout em `jornada-bootstrap.js` é redundante, já que a inicialização já foi concluída.
+
+2. **Trecho Incompleto do Script de Selfie**:
+   - O script parou na lógica do `previewBtn` e `captureBtn`. O `previewBtn` atualiza a pré-visualização da selfie, e o `captureBtn` gera a imagem para download. Vou completar essa lógica com base no backup anterior, garantindo que funcione com `section-selfie`.
+
+3. **Backup do Trecho Fornecido**:
+   - Contém `JORNADA_VIDEOS` com `filme-0` (intro), `filme-1` a `filme-4` (transições de blocos), e `filme-5` (final).
+   - `blockTranslations` define blocos de perguntas para `pt-BR`, `en-US`, e `es-ES`, com `video_after` para cada bloco.
+   - `updateBlocks` atualiza `JORNADA_BLOCKS` com base no idioma selecionado.
+
+4. **Causas dos Problemas**:
+   - **Pulo de seções**: A função `startJourney` em `section-senha` está navegando diretamente para `section-perguntas`, ignorando `section-guia` e `section-selfie`.
+   - **Vídeos não exibidos**: A lógica de `playVideo` não está sendo chamada, ou os caminhos dos vídeos em `JORNADA_VIDEOS` não estão alinhados com `jornada-controller.js`.
+   - **Eventos repetidos**: Falta de remoção de listeners ou debounce em `goNext` e `showSection`.
+
+---
+
+### Soluções
+
+Vou atualizar o `jornada-conhecimento-com-luz1.html` para:
+- Completar o script de `Selfie` com a lógica de `previewBtn` e `captureBtn`.
+- Integrar `JORNADA_VIDEOS` e `blockTranslations` do backup, com vídeos de transição (0 a 5).
+- Corrigir a navegação para incluir `section-guia` e `section-selfie`.
+- Adicionar debounce robusto para evitar chamadas concorrentes de `runTyping` e `goNext`.
+- Suportar troca de idioma com `updateBlocks`.
+
+#### `jornada-conhecimento-com-luz1.html`
+<xaiArtifact artifact_id="c3acdccf-e276-4e6c-a487-3b90fcba34a7" artifact_version_id="e35c112b-8dd6-4995-83d0-147c3f449e6e" title="jornada-conhecimento-com-luz1.html" contentType="text/html">
+```html:disable-run
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -151,7 +195,7 @@
 
     /* Progresso */
     .progress-container{margin:16px 0;text-align:center}
-    .progress-badge{padding:8px 16px;background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;background-blend-mode: overlay;color:#fff;border-radius:8px;font-size:18px;border: 3px solid #4a4a4a;box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);text-shadow: 1px 1px 3px rgba(0,0,0,0.7);}
+    .progress-badge{padding:8px 16px;background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;background-blend-mode: overlay;color:#fff;border-radius:8px;font-size:18px;border: 3px solid #4a4a4a;box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);text-shadow: 1px 1px 3px rgba(0,0,0,0.7)}
     .progress-bar{width:100%;height:8px;background:#e5e7eb;border-radius:4px;margin-top:12px}
     .progress-bar-fill{height:100%;background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;background-blend-mode: overlay;border-radius:4px;transition:width .25s ease}
     .j-progress{margin:8px 0 16px}
@@ -594,9 +638,8 @@
         return;
       }
       if (G.__typingLock) {
-        console.log('[runTyping] Bloqueado por __typingLock, liberando...');
-        G.__typingLock = false;
-        return; // Evitar chamadas concorrentes
+        console.log('[runTyping] Bloqueado por __typingLock, ignorando...');
+        return;
       }
       G.__typingLock = true;
 
@@ -734,8 +777,8 @@
         return;
       }
 
-      if (window.playVideo) {
-        window.playVideo('/assets/videos/transicao_guia.mp4');
+      if (window.playVideo && window.JORNADA_VIDEOS && window.JORNADA_VIDEOS.intro) {
+        window.playVideo(window.JORNADA_VIDEOS.intro);
       } else if (window.showSection) {
         window.showSection('section-guia');
         log('[startJourney] Navegação para section-guia');
@@ -779,15 +822,17 @@
             window.runTyping(target);
             console.log('[showSection] Iniciando runTyping para:', id);
           }
-          const btn = target.querySelector('[data-action="avancar"], .btn-avancar, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"]');
-          if (btn && !btn.dataset.clickAttached) {
-            btn.addEventListener('click', (e) => {
-              e.preventDefault();
-              if (window.JC && window.JC.goNext) window.JC.goNext();
-            }, { once: true });
-            btn.dataset.clickAttached = '1';
-            console.log('[showSection] Evento de clique adicionado ao botão avançar em:', id, 'Botão:', btn.id || btn.className);
-          }
+          const btns = target.querySelectorAll('[data-action="avancar"], .btn-avancar, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"]');
+          btns.forEach(btn => {
+            if (!btn.dataset.clickAttached) {
+              btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (window.JC && window.JC.goNext) window.JC.goNext();
+              }, { once: true });
+              btn.dataset.clickAttached = '1';
+              console.log('[showSection] Evento de clique adicionado ao botão avançar em:', id, 'Botão:', btn.id || btn.className);
+            }
+          });
         }, 100);
       } catch (e) {
         console.error('[showSection] Erro:', e);
@@ -801,47 +846,48 @@
   <!-- loadDynamicBlocks -->
   <script>
   (function() {
-    window.JORNADA_BLOCKS = window.JORNADA_BLOCKS || [
-      {
-        video_after: "/assets/img/filme-0-ao-encontro-da-jornada.mp4"
-        questions: [
-          { label: "O que te motiva a buscar conhecimento?" },
-          { label: "Como você lida com desafios em sua jornada?" },
-          { label: "O que significa 'luz' para você?" },
-          { label: "Qual é o maior aprendizado que você teve até agora?" }
-        ],
-        video_after: "/assets/img/filme-1-entrando-na-jornada.mp4"
+    const VIDEO_BASE = '/assets/img/';
+    window.JORNADA_VIDEOS = {
+      intro: VIDEO_BASE + 'filme-0-ao-encontro-da-jornada.mp4',
+      afterBlocks: {
+        0: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
+        1: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
+        2: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
+        3: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
       },
-      {
-        questions: [
-          { label: "Como você enxerga seu propósito hoje?" },
-          { label: "O que te inspira a continuar?" }
-        ],
-        video_after: "/assets/img/filme-2-dentro-da-jornada.mp4"
-      },
-      {
-        questions: [
-          { label: "Qual é o maior obstáculo que você superou?" },
-          { label: "Como você gostaria de contribuir para o mundo?" }
-        ],
-        video_after: "/assets/img/filme-3-traumas-na-jornada.mp4"
-      },
-      {
-        questions: [
-          { label: "O que te faz sentir mais vivo?" },
-          { label: "Qual é sua visão para o futuro?" }
-        ],
-        video_after: "/assets/img/filme-4-aproximando-do-final.mp4"
-      },
-      {
-        questions: [
-          { label: "O que você aprendeu sobre si mesmo nesta jornada?" }
-        ],
-        video_after: "/assets/videos/transicao_bloco5.mp4"
-      }
-    ];
+      final: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
+    };
+    window.JORNADA_FINAL_VIDEO = window.JORNADA_VIDEOS.final;
+
+    const blockTranslations = {
+      'pt-BR': [
+        { title: 'Bloco 1 — Raízes', questions: [{ label: 'Quem é você hoje?' }, { label: 'O que te trouxe até esta jornada?' }, { label: 'Qual é o seu maior sonho espiritual?' }], video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4' },
+        { title: 'Bloco 2 — Reflexões', questions: [{ label: 'Quais são seus maiores desafios atuais?' }, { label: 'Como você lida com o medo ou a dúvida?' }, { label: 'O que a "luz" significa para você?' }], video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4' },
+        { title: 'Bloco 3 — Crescimento', questions: [{ label: 'O que você quer mudar na sua vida?' }, { label: 'Quem inspira você e por quê?' }, { label: 'Como você pratica gratidão no dia a dia?' }], video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4' },
+        { title: 'Bloco 4 — Integração', questions: [{ label: 'Qual lição você leva dessa jornada?' }, { label: 'Como vai aplicar isso no futuro?' }, { label: 'Uma mensagem para seu eu futuro.' }], video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4' }
+      ],
+      'en-US': [
+        { title: 'Block 1 — Roots', questions: [{ label: 'Who are you today?' }, { label: 'What brought you to this journey?' }, { label: 'What is your greatest spiritual dream?' }], video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4' },
+        { title: 'Block 2 — Reflections', questions: [{ label: 'What are your biggest current challenges?' }, { label: 'How do you deal with fear or doubt?' }, { label: 'What does "light" mean to you?' }], video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4' },
+        { title: 'Block 3 — Growth', questions: [{ label: 'What do you want to change in your life?' }, { label: 'Who inspires you and why?' }, { label: 'How do you practice gratitude in your daily life?' }], video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4' },
+        { title: 'Block 4 — Integration', questions: [{ label: 'What lesson do you take from this journey?' }, { label: 'How will you apply this in the future?' }, { label: 'A message to your future self.' }], video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4' }
+      ],
+      'es-ES': [
+        { title: 'Bloque 1 — Raíces', questions: [{ label: '¿Quién eres hoy?' }, { label: '¿Qué te trajo a este viaje?' }, { label: '¿Cuál es tu mayor sueño espiritual?' }], video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4' },
+        { title: 'Bloque 2 — Reflexiones', questions: [{ label: '¿Cuáles son tus mayores desafíos actuales?' }, { label: '¿Cómo lidias con el miedo o la duda?' }, { label: '¿Qué significa la "luz" para ti?' }], video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4' },
+        { title: 'Bloque 3 — Crecimiento', questions: [{ label: '¿Qué quieres cambiar en tu vida?' }, { label: '¿Quién te inspira y por qué?' }, { label: '¿Cómo practicas la gratitud en el día a día?' }], video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4' },
+        { title: 'Bloque 4 — Integración', questions: [{ label: '¿Qué lección te llevas de este viaje?' }, { label: '¿Cómo lo aplicarás en el futuro?' }, { label: 'Un mensaje para tu yo futuro.' }], video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4' }
+      ]
+    };
+
+    function updateBlocks() {
+      const currentLang = document.getElementById('language-select')?.value || 'pt-BR';
+      window.JORNADA_BLOCKS = blockTranslations[currentLang] || blockTranslations['pt-BR'];
+      console.log('[loadDynamicBlocks] Blocos atualizados para idioma:', currentLang);
+    }
 
     window.loadDynamicBlocks = function() {
+      updateBlocks();
       const content = document.getElementById('perguntas-container');
       if (!content) {
         console.log('[loadDynamicBlocks] Container de perguntas não encontrado');
@@ -873,7 +919,7 @@
           div.innerHTML = `
             <label class="pergunta-enunciado text" 
                    data-typing="true" 
-                   data-text="Pergunta ${qIdx + 1}: ${label}" 
+                   data-text="${block.title ? block.title + ': ' : ''}Pergunta ${qIdx + 1}: ${label}" 
                    data-speed="36" 
                    data-cursor="true"></label>
             <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
@@ -907,6 +953,15 @@
       if (firstTa && window.handleInput) window.handleInput(firstTa);
       console.log('[loadDynamicBlocks] Blocos carregados com sucesso');
     };
+
+    document.addEventListener('change', (e) => {
+      if (e.target.id === 'language-select') {
+        updateBlocks();
+        window.loadDynamicBlocks();
+        console.log('[loadDynamicBlocks] Idioma alterado, blocos recarregados');
+      }
+    });
+
     console.log('[loadDynamicBlocks] Bloco carregado');
   })();
   </script>
@@ -1009,6 +1064,14 @@
         const guia = btn.dataset.guia;
         window.JORNADA.selectedGuia = guia;
         console.log('[Guia] Guia selecionado:', guia);
+        const guideBg = document.getElementById('guideBg');
+        if (guideBg) {
+          guideBg.src = `/assets/img/irmandade-quarteto-bg-${guia}.png`;
+        }
+        const guideNameSlot = document.getElementById('guideNameSlot');
+        if (guideNameSlot) {
+          guideNameSlot.textContent = guia.charAt(0).toUpperCase() + guia.slice(1);
+        }
         if (window.playVideo) {
           window.playVideo('/assets/videos/transicao_selfie.mp4');
         } else if (window.showSection) {
@@ -1020,90 +1083,100 @@
   })();
   </script>
 
-  <!-- Selfie -->
-  <script>
-  (function() {
-    let lastPreview = 0;
-    let lastCapture = 0;
+ <!-- Selfie -->
+<script>
+(function() {
+  let lastPreview = 0;
+  let lastCapture = 0;
 
-    document.addEventListener('change', (e) => {
-      const input = e.target.closest('#selfieInput');
-      if (input && input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          const img = document.getElementById('selfieImage');
-          if (img) {
-            img.setAttribute('href', ev.target.result);
-            document.querySelector('.flame-layer').style.opacity = '1';
-            console.log('[Selfie] Imagem carregada');
-          }
-        };
-        reader.readAsDataURL(input.files[0]);
-      }
-    });
-
-    document.addEventListener('input', (e) => {
-      const input = e.target.closest('#nameInput, #selfieScale, #selfieOffsetX, #selfieOffsetY');
-      if (input) {
+  document.addEventListener('change', (e) => {
+    const input = e.target.closest('#selfieInput');
+    if (input && input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
         const img = document.getElementById('selfieImage');
-        const nameSlot = document.getElementById('userNameSlot');
-        if (!img || !nameSlot) return;
+        if (img) {
+          img.setAttribute('href', ev.target.result);
+          document.querySelector('.flame-layer').style.opacity = '1';
+          console.log('[Selfie] Imagem carregada');
+        }
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  });
 
-        if (input.id === 'nameInput') {
-          nameSlot.textContent = input.value || 'NOME';
+  document.addEventListener('input', (e) => {
+    const input = e.target.closest('#nameInput, #selfieScale, #selfieOffsetX, #selfieOffsetY');
+    if (input) {
+      const img = document.getElementById('selfieImage');
+      const nameSlot = document.getElementById('userNameSlot');
+      if (!img || !nameSlot) return;
+
+      if (input.id === 'nameInput') {
+        nameSlot.textContent = input.value || 'NOME';
+      } else {
+        const scale = document.getElementById('selfieScale')?.value || 1;
+        const offsetX = document.getElementById('selfieOffsetX')?.value || 0;
+        const offsetY = document.getElementById('selfieOffsetY')?.value || 0;
+        img.style.transform = `scale(${scale}) translate(${offsetX}px, ${offsetY}px)`;
+      }
+      console.log('[Selfie] Ajustes aplicados');
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('#previewBtn, #captureBtn');
+    if (btn) {
+      e.preventDefault();
+      const now = performance.now();
+      if (btn.id === 'previewBtn') {
+        if (now - lastPreview < 1000) return;
+        lastPreview = now;
+        const img = document.getElementById('selfieImage');
+        if (img && img.getAttribute('href')) {
+          document.querySelector('.flame-layer').style.opacity = '1';
+          window.toast && window.toast('Pré-visualização atualizada!');
+          console.log('[Selfie] Pré-visualização atualizada');
         } else {
-          const scale = document.getElementById('selfieScale')?.value || 1;
-          const offsetX = document.getElementById('selfieOffsetX')?.value || 0;
-          const offsetY = document.getElementById('selfieOffsetY')?.value || 0;
-          img.style.transform = `scale(${scale}) translate(${offsetX}px, ${offsetY}px)`;
+          window.toast && window.toast('Selecione uma imagem primeiro.');
+          console.log('[Selfie] Nenhuma imagem selecionada para pré-visualização');
         }
-        console.log('[Selfie] Ajustes aplicados');
-      }
-    });
-
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('#previewBtn, #captureBtn');
-      if (btn) {
-        e.preventDefault();
-        const now = performance.now();
-        if (btn.id === 'previewBtn') {
-          if (now - lastPreview < 1000) return;
-          lastPreview = now;
-          const img = document.getElementById('selfieImage');
-          if (img && img.getAttribute('href')) {
-            document.querySelector('.flame-layer').style.opacity = '1';
-            window.toast && window.toast('Pré-visualização atualizada!');
-          } else {
-            window.toast && window.toast('Selecione uma imagem primeiro.');
-          }
-        } else if (btn.id === 'captureBtn') {
-          if (now - lastCapture < 1000) return;
-          lastCapture = now;
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          const img = document.getElementById('selfieImage');
-          const bg = document.getElementById('guideBg');
-          if (!img || !bg) {
-            window.toast && window.toast('Erro ao capturar imagem.');
-            return;
-          }
-          canvas.width = bg.width;
-          canvas.height = bg.height;
-          ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
-          ctx.drawImage(img, 15, 35, 70, 90);
-          const link = document.createElement('a');
-          link.download = 'selfie-irmandade.png';
-          link.href = canvas.toDataURL('image/png');
-          link.click();
-          console.log('[Selfie] Imagem baixada');
+      } else if (btn.id === 'captureBtn') {
+        if (now - lastCapture < 1000) return;
+        lastCapture = now;
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = document.getElementById('selfieImage');
+        const bg = document.getElementById('guideBg');
+        if (!img || !bg) {
+          window.toast && window.toast('Erro ao capturar imagem.');
+          console.log('[Selfie] Elementos de imagem ou fundo não encontrados');
+          return;
         }
+        canvas.width = bg.width;
+        canvas.height = bg.height;
+        ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
+        const scale = document.getElementById('selfieScale')?.value || 1;
+        const offsetX = document.getElementById('selfieOffsetX')?.value || 0;
+        const offsetY = document.getElementById('selfieOffsetY')?.value || 0;
+        ctx.save();
+        ctx.translate(15 + parseFloat(offsetX), 35 + parseFloat(offsetY));
+        ctx.scale(scale, scale);
+        ctx.drawImage(img, 0, 0, 70, 90);
+        ctx.restore();
+        const link = document.createElement('a');
+        link.download = 'selfie-irmandade.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        console.log('[Selfie] Imagem baixada');
       }
-    });
-    console.log('[Selfie] Bloco carregado');
-  })();
-  </script>
+    }
+  });
+  console.log('[Selfie] Bloco carregado');
+})();
+</script>
 
-  <!-- Scripts Externos -->
+<!-- Scripts Externos -->
   <script defer src="/config.js?v=6" onload="console.log('[LOAD] config.js carregado')" onerror="console.error('[LOAD] Erro ao carregar config.js')"></script>
   <script defer src="/jornada-utils.js?v=6" onload="console.log('[LOAD] jornada-utils.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-utils.js')"></script>
   <script defer src="/jornada-core.js?v=6" onload="console.log('[LOAD] jornada-core.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-core.js')"></script>
