@@ -5,20 +5,21 @@
   window.JC = window.JC || {
     currentBloco: 0,
     nextSection: null,
+    initialized: false,
     init: (route) => {
-      log('Iniciando jornada...');
       if (window.JC.initialized) {
         log('init já feito — ignorando.');
         return;
       }
       window.JC.initialized = true;
+      log('Iniciando jornada...');
 
       const dependencies = {
         JORNADA_BLOCKS: !!window.JORNADA_BLOCKS,
-        JORNADA_QA: !!window.JORNADA_QA,
-        JORNADA_PAPER: !!window.JORNADA_PAPER,
-        JORNADA_TYPE: !!window.JORNADA_TYPE,
-        JORNADA_RENDER: !!window.JORNADA_RENDER
+        JORNADA_VIDEOS: !!window.JORNADA_VIDEOS,
+        showSection: !!window.showSection,
+        runTyping: !!window.runTyping,
+        playVideo: !!window.playVideo
       };
       log('Dependências:', dependencies);
 
@@ -45,12 +46,29 @@
         const content = document.getElementById('perguntas-container');
         if (!content) {
           console.error('perguntas-container não encontrado');
-          window.showSection('section-final');
+          window.JC.nextSection = 'section-final';
+          if (window.JORNADA_FINAL_VIDEO && window.playVideo) {
+            window.playVideo(window.JORNADA_FINAL_VIDEO);
+          } else {
+            window.showSection('section-final');
+          }
           return;
         }
+
         const currentBloco = content.querySelector('.j-bloco:not(.hidden)') || content.querySelector(`[data-bloco="${window.JC.currentBloco || 0}"]`);
-        const perguntas = currentBloco?.querySelectorAll('.j-pergunta') || [];
-        const currentPergunta = currentBloco?.querySelector('.j-pergunta.active') || perguntas[0];
+        if (!currentBloco) {
+          console.error('Bloco atual não encontrado para bloco', window.JC.currentBloco);
+          window.JC.nextSection = 'section-final';
+          if (window.JORNADA_FINAL_VIDEO && window.playVideo) {
+            window.playVideo(window.JORNADA_FINAL_VIDEO);
+          } else {
+            window.showSection('section-final');
+          }
+          return;
+        }
+
+        const perguntas = currentBloco.querySelectorAll('.j-pergunta') || [];
+        const currentPergunta = currentBloco.querySelector('.j-pergunta.active') || perguntas[0];
         const currentPerguntaIdx = parseInt(currentPergunta?.dataset.pergunta || '0', 10);
 
         if (perguntas.length === 0) {
@@ -69,7 +87,7 @@
           perguntas[currentPerguntaIdx + 1].classList.add('active');
           window.runTyping && window.runTyping(perguntas[currentPerguntaIdx + 1]);
           log('Avançando para pergunta', currentPerguntaIdx + 1, 'no bloco', window.JC.currentBloco);
-        } else if (currentBloco && window.JORNADA_BLOCKS && window.JC.currentBloco < window.JORNADA_BLOCKS.length - 1) {
+        } else if (window.JORNADA_BLOCKS && window.JC.currentBloco < window.JORNADA_BLOCKS.length - 1) {
           currentBloco.style.display = 'none';
           window.JC.currentBloco = (window.JC.currentBloco || 0) + 1;
           const nextBloco = content.querySelector(`[data-bloco="${window.JC.currentBloco}"]`);
@@ -84,7 +102,7 @@
             if (video && window.playVideo) {
               window.JC.nextSection = 'section-perguntas';
               window.playVideo(video);
-              log('Reproduzindo vídeo após bloco', window.JC.currentBloco - 1);
+              log('Reproduzindo vídeo após bloco', window.JC.currentBloco - 1, ':', video);
               return;
             }
           }
@@ -92,7 +110,7 @@
           window.JC.nextSection = 'section-final';
           if (window.JORNADA_FINAL_VIDEO && window.playVideo) {
             window.playVideo(window.JORNADA_FINAL_VIDEO);
-            log('Reproduzindo vídeo final');
+            log('Reproduzindo vídeo final:', window.JORNADA_FINAL_VIDEO);
             return;
           }
         }
@@ -104,7 +122,7 @@
         window.showSection && window.showSection(nextSection);
         log('Navegando de', currentSection, 'para', nextSection);
       } else {
-        console.warn('Nenhuma seção seguinte encontrada para', currentSection);
+        log('Nenhuma seção seguinte encontrada para', currentSection);
       }
     }
   };
@@ -113,7 +131,12 @@
     const btn = e.target.closest('[data-action="avancar"], .btn-avancar, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney');
     if (btn) {
       log('Clique no botão avançar:', btn.id || btn.className);
-      window.JC.goNext();
+      if (window.JC && window.JC.goNext) {
+        window.JC.goNext();
+      } else {
+        console.error('window.JC.goNext não definido');
+        window.toast && window.toast('Erro ao avançar. Tente recarregar a página.');
+      }
     }
   });
 
