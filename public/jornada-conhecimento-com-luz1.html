@@ -746,7 +746,7 @@
 })();
 </script>
 
- <!-- showSection -->
+<!-- showSection -->
 <script>
 (function() {
   const HIDE_CLASS = 'hidden';
@@ -974,59 +974,64 @@
   })();
   </script>
 
-  <!-- Vídeo Transição -->
-  <script>
-  (function() {
-    window.playVideo = function(videoSrc) {
+ <!-- Vídeo Transição -->
+<script>
+(function() {
+  window.playVideo = function(videoSrc) {
+    const overlay = document.getElementById('videoOverlay');
+    const video = document.getElementById('videoTransicao');
+    const fallback = document.getElementById('videoFallback');
+    if (!overlay || !video) {
+      console.error('[playVideo] Elementos de vídeo não encontrados', { overlay: !!overlay, video: !!video });
+      window.toast && window.toast('Erro ao reproduzir vídeo.');
+      return;
+    }
+    console.log('[playVideo] Tentando reproduzir:', videoSrc);
+    video.src = videoSrc;
+    video.onended = () => {
+      console.log('[playVideo] Vídeo finalizado:', videoSrc);
+      overlay.classList.add('hidden');
+      video.src = '';
+      window.JC && window.JC.goNext && window.JC.goNext();
+    };
+    video.onerror = (e) => {
+      console.error('[playVideo] Erro ao carregar vídeo:', videoSrc, e);
+      fallback.classList.remove('hidden');
+      video.classList.add('hidden');
+      setTimeout(() => {
+        overlay.classList.add('hidden');
+        fallback.classList.add('hidden');
+        video.classList.remove('hidden');
+        window.JC && window.JC.goNext && window.JC.goNext();
+      }, 3000);
+    };
+    overlay.classList.remove('hidden');
+    video.play().catch(e => {
+      console.error('[playVideo] Erro ao iniciar reprodução:', videoSrc, e);
+      fallback.classList.remove('hidden');
+      video.classList.add('hidden');
+      window.toast && window.toast('Erro ao reproduzir vídeo. Usando fallback.');
+    });
+    console.log('[playVideo] Iniciando reprodução:', videoSrc);
+  };
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('#skipVideo');
+    if (btn) {
       const overlay = document.getElementById('videoOverlay');
       const video = document.getElementById('videoTransicao');
-      const fallback = document.getElementById('videoFallback');
-      if (!overlay || !video) {
-        console.error('[playVideo] Elementos de vídeo não encontrados');
-        window.toast && window.toast('Erro ao reproduzir vídeo.');
-        return;
-      }
-      video.src = videoSrc;
-      video.onended = () => {
-        overlay.classList.add('hidden');
+      if (overlay && video) {
+        console.log('[playVideo] Vídeo pulado pelo usuário');
+        video.pause();
         video.src = '';
+        overlay.classList.add('hidden');
         window.JC && window.JC.goNext && window.JC.goNext();
-      };
-      video.onerror = () => {
-        fallback.classList.remove('hidden');
-        video.classList.add('hidden');
-        setTimeout(() => {
-          overlay.classList.add('hidden');
-          fallback.classList.add('hidden');
-          video.classList.remove('hidden');
-          window.JC && window.JC.goNext && window.JC.goNext();
-        }, 3000);
-      };
-      overlay.classList.remove('hidden');
-      video.play().catch(e => {
-        console.error('[playVideo] Erro ao reproduzir vídeo:', e);
-        fallback.classList.remove('hidden');
-        video.classList.add('hidden');
-      });
-      console.log('[playVideo] Reproduzindo vídeo:', videoSrc);
-    };
-
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('#skipVideo');
-      if (btn) {
-        const overlay = document.getElementById('videoOverlay');
-        const video = document.getElementById('videoTransicao');
-        if (overlay && video) {
-          video.pause();
-          video.src = '';
-          overlay.classList.add('hidden');
-          window.JC && window.JC.goNext && window.JC.goNext();
-        }
       }
-    });
-    console.log('[Video] Bloco carregado');
-  })();
-  </script>
+    }
+  });
+  console.log('[Video] Bloco carregado');
+})();
+</script>
   
  <!-- Guia Seleção -->
 <script>
