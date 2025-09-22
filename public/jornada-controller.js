@@ -20,11 +20,11 @@
     };
   }
 
-  // Função showSection pra garantir visibilidade
+  // Função showSection
   window.showSection = window.showSection || function(sectionId) {
-    document.querySelectorAll('.j-section').forEach(section => {
-      section.classList.add('hidden');
-      section.style.display = 'none';
+    document.querySelectorAll('.j-section, #videoOverlay, #video-container').forEach(elem => {
+      elem.classList.add('hidden');
+      elem.style.display = 'none';
     });
     const targetSection = document.getElementById(sectionId);
     if (targetSection) {
@@ -38,28 +38,19 @@
 
   // Função playVideo (filme-0 a filme-5)
   window.playVideo = function(videoSrc) {
-    document.querySelectorAll('.j-section').forEach(section => {
-      section.classList.add('hidden');
-      section.style.display = 'none';
+    document.querySelectorAll('.j-section, #videoOverlay').forEach(elem => {
+      elem.classList.add('hidden');
+      elem.style.display = 'none';
     });
-    log('Escondendo todas as seções durante vídeo:', videoSrc);
+    log('Escondendo todas as seções e videoOverlay durante vídeo:', videoSrc);
 
-    const videoContainer = document.getElementById('video-container');
+    let videoContainer = document.getElementById('video-container');
     if (!videoContainer) {
-      console.error('[JORNADA_CONTROLLER] video-container não encontrado');
-      const nextSection = videoSrc.includes('filme-5') ? 'section-final' : 'section-perguntas';
-      window.JC.nextSection = nextSection;
-      window.__currentSectionId = nextSection;
-      window.showSection && window.showSection(nextSection);
-      log('Forçando', nextSection, '(sem video-container)');
-      if (nextSection === 'section-perguntas' && window.loadDynamicBlocks) {
-        setTimeout(() => {
-          window.loadDynamicBlocks();
-          window.perguntasLoaded = true;
-          log('loadDynamicBlocks chamado após erro no video-container');
-        }, 100);
-      }
-      return;
+      console.warn('[JORNADA_CONTROLLER] video-container não encontrado, criando dinamicamente');
+      videoContainer = document.createElement('div');
+      videoContainer.id = 'video-container';
+      videoContainer.style.display = 'none';
+      document.body.appendChild(videoContainer);
     }
     videoContainer.innerHTML = '';
     videoContainer.style.display = 'block';
@@ -68,7 +59,7 @@
     video.src = videoSrc;
     video.autoplay = true;
     video.controls = true;
-    video.className = 'video-player'; // Reusa classe pra consistência
+    video.className = 'video-player';
     video.style.width = '100%';
     video.style.height = 'auto';
 
@@ -181,8 +172,10 @@
 
       window.__currentSectionId = route === 'intro' ? 'section-intro' : route;
       if (route === 'section-guia' && window.playTransitionVideo) {
-        window.playTransitionVideo();
-        log('Reproduzindo transicao_selfie após section-guia');
+        setTimeout(() => {
+          window.playTransitionVideo();
+          log('Reproduzindo transicao_selfie após section-guia');
+        }, 100);
       } else if (route === 'section-perguntas' && window.loadDynamicBlocks) {
         setTimeout(() => {
           window.loadDynamicBlocks();
@@ -225,8 +218,10 @@
 
       if (currentSection === 'section-guia') {
         if (window.playTransitionVideo) {
-          window.playTransitionVideo();
-          log('Reproduzindo transicao_selfie após section-guia');
+          setTimeout(() => {
+            window.playTransitionVideo();
+            log('Reproduzindo transicao_selfie após section-guia');
+          }, 100);
           return;
         } else {
           window.JC.nextSection = 'section-selfie';
@@ -268,8 +263,8 @@
               window.perguntasLoaded = true;
               log('loadDynamicBlocks chamado (flag false) - ignorando goNext por agora');
             }, 100);
+            return;
           }
-          return;
         }
 
         if (!window.JORNADA_BLOCKS || window.JORNADA_BLOCKS.length === 0) {
@@ -337,43 +332,43 @@
           window.JC.currentPergunta = currentPerguntaIdx + 1;
           window.runTyping && window.runTyping(nextPergunta);
           log('Avançando para pergunta', currentPerguntaIdx + 1, 'no bloco', window.JC.currentBloco);
-        } else if (window.JC.currentBloco < window.JORNADA_BLOCKS.length - 1) {
+        } else {
           currentBloco.classList.add('hidden');
           window.JC.currentBloco += 1;
           window.JC.currentPergunta = 0;
-          const nextBloco = content.querySelector(`[data-bloco="${window.JC.currentBloco}"]`);
-          if (nextBloco) {
-            nextBloco.classList.remove('hidden');
-            const firstPergunta = nextBloco.querySelector('.j-pergunta');
-            if (firstPergunta) {
-              firstPergunta.classList.add('active');
-              firstPergunta.style.display = 'block';
-              window.runTyping && window.runTyping(firstPergunta);
+          if (window.JC.currentBloco < window.JORNADA_BLOCKS.length) {
+            const nextBloco = content.querySelector(`[data-bloco="${window.JC.currentBloco}"]`);
+            if (nextBloco) {
+              nextBloco.classList.remove('hidden');
+              const firstPergunta = nextBloco.querySelector('.j-pergunta');
+              if (firstPergunta) {
+                firstPergunta.classList.add('active');
+                firstPergunta.style.display = 'block';
+                window.runTyping && window.runTyping(firstPergunta);
+              }
+              const video = window.JORNADA_BLOCKS[window.JC.currentBloco]?.video_after;
+              if (video && window.playVideo) {
+                window.JC.nextSection = 'section-perguntas';
+                window.__currentSectionId = 'section-perguntas';
+                window.playVideo(video);
+                log('Reproduzindo vídeo após bloco', window.JC.currentBloco - 1, ':', video);
+                return;
+              }
             }
-            const video = nextBloco.dataset.video;
-            if (video && window.playVideo) {
-              window.JC.nextSection = 'section-perguntas';
-              window.__currentSectionId = 'section-perguntas';
-              window.playVideo(video);
-              log('Reproduzindo vídeo após bloco', window.JC.currentBloco - 1, ':', video);
-              return;
-            }
-          }
-        } else {
-          log('Fim dos blocos! Iniciando vídeo final.');
-          window.JC.nextSection = 'section-final';
-          window.__currentSectionId = 'section-final';
-          if (window.JORNADA_FINAL_VIDEO && window.playVideo) {
-            window.playVideo(window.JORNADA_FINAL_VIDEO);
-            log('Vídeo final iniciado - deve avançar no onended');
-            return;
           } else {
-            window.showSection && window.showSection('section-final');
-            log('Avanço direto pro final (sem vídeo)');
-            const finalText = document.querySelector('#section-final p[data-typing="true"]');
-            if (finalText && window.runTyping) {
-              window.runTyping(finalText);
-              log('runTyping disparado para section-final (p)');
+            window.JC.nextSection = 'section-final';
+            window.__currentSectionId = 'section-final';
+            if (window.JORNADA_FINAL_VIDEO && window.playVideo) {
+              window.playVideo(window.JORNADA_FINAL_VIDEO);
+              log('Vídeo final iniciado (fim dos blocos)');
+            } else {
+              window.showSection && window.showSection('section-final');
+              log('Avanço direto pro final (sem vídeo)');
+              const finalText = document.querySelector('#section-final p[data-typing="true"]');
+              if (finalText && window.runTyping) {
+                window.runTyping(finalText);
+                log('runTyping disparado para section-final (p)');
+              }
             }
           }
         }
