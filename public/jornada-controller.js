@@ -194,20 +194,13 @@
       }
 
       if (currentSection === 'section-guia') {
-        if (window.playTransitionVideo) {
-          window.JC.nextSection = 'section-selfie';
-          window.__currentSectionId = 'section-guia'; // Mantém section-guia até vídeo rodar
-          setTimeout(() => {
-            window.playTransitionVideo();
-            log('Reproduzindo transicao_selfie após section-guia');
-          }, 100);
-          return;
-        } else {
-          window.JC.nextSection = 'section-selfie';
-          window.__currentSectionId = 'section-selfie';
-          window.showSection && window.showSection('section-selfie');
-          log('Avançando para section-selfie (sem transicao_selfie)');
-        }
+        window.JC.nextSection = 'section-selfie';
+        window.__currentSectionId = 'section-guia';
+        window.showSection && window.showSection('section-guia');
+        setTimeout(() => {
+          window.playTransitionVideo();
+          log('Reproduzindo transicao_selfie após section-guia');
+        }, 100);
         return;
       }
 
@@ -281,7 +274,7 @@
           return;
         }
 
-        const perguntas = currentBloco.querySelectorAll('.j-pergunta') || [];
+        const perguntas = currentBloco.querySelectorAll('.j-pergunta');
         if (perguntas.length === 0) {
           console.error('Nenhuma pergunta encontrada no bloco', window.JC.currentBloco);
           window.JC.currentBloco += 1;
@@ -299,7 +292,13 @@
           return;
         }
 
-        const currentPergunta = currentBloco.querySelector('.j-pergunta.active') || perguntas[0];
+        let currentPergunta = currentBloco.querySelector('.j-pergunta.active');
+        if (!currentPergunta) {
+          currentPergunta = perguntas[0];
+          currentPergunta.classList.add('active');
+          currentPergunta.style.display = 'block';
+          log('Ativando primeira pergunta do bloco', window.JC.currentBloco);
+        }
         const currentPerguntaIdx = parseInt(currentPergunta?.dataset.pergunta || '0', 10);
 
         if (currentPerguntaIdx < perguntas.length - 1) {
@@ -309,7 +308,7 @@
           nextPergunta.classList.add('active');
           nextPergunta.style.display = 'block';
           window.JC.currentPergunta = currentPerguntaIdx + 1;
-          window.runTyping && window.runTyping(nextPergunta);
+          window.runTyping && window.runTyping(nextPergunta.querySelector('.pergunta-enunciado'));
           log('Avançando para pergunta', currentPerguntaIdx + 1, 'no bloco', window.JC.currentBloco);
         } else {
           currentBloco.classList.add('hidden');
@@ -323,7 +322,8 @@
               if (firstPergunta) {
                 firstPergunta.classList.add('active');
                 firstPergunta.style.display = 'block';
-                window.runTyping && window.runTyping(firstPergunta);
+                window.runTyping && window.runTyping(firstPergunta.querySelector('.pergunta-enunciado'));
+                log('Ativando primeira pergunta do bloco', window.JC.currentBloco);
               }
               const video = window.JORNADA_BLOCKS[window.JC.currentBloco]?.video_after;
               if (video && window.playVideo) {
