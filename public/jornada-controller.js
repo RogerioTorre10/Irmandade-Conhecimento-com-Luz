@@ -70,9 +70,6 @@
         }
 
         const perguntas = currentBloco.querySelectorAll('.j-pergunta') || [];
-        const currentPergunta = currentBloco.querySelector('.j-pergunta.active') || perguntas[0];
-        const currentPerguntaIdx = parseInt(currentPergunta?.dataset.pergunta || '0', 10);
-
         if (perguntas.length === 0) {
           console.error('Nenhuma pergunta encontrada no bloco', window.JC.currentBloco);
           window.JC.nextSection = 'section-final';
@@ -84,6 +81,9 @@
           }
           return;
         }
+
+        const currentPergunta = currentBloco.querySelector('.j-pergunta.active') || perguntas[0];
+        const currentPerguntaIdx = parseInt(currentPergunta?.dataset.pergunta || '0', 10);
 
         if (currentPerguntaIdx < perguntas.length - 1) {
           currentPergunta.classList.remove('active');
