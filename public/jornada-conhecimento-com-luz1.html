@@ -435,7 +435,15 @@
   <div id="toast" role="status" aria-live="polite" class="hidden"></div>
   
   <!-- pro playVideo usar -->
-  <div id="video-container" style="display: none;"></div> <!-- Adicione se não tiver, pro playVideo usar -->
+   <div id="video-container" style="display: none;"></div> <!-- Adicione se não tiver, pro playVideo usar -->
+   video-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,.95); display: flex; justify-content: center; align-items: center; z-index: 2000;}
+   video-container.hidden {display: none;}
+   video-container video { width: 100vw; height: 100vh; object-fit: contain; background: #000;}
+   @media (orientation: portrait) {
+   video-container video { width: 100vw; height: 100%; max-height: 100vh; object-fit: contain;} }
+  .j-section.hidden { display: none;}
+  .j-section {display: block;}
+
   
   <!-- Scripts Inline -->
   <!-- Utils -->
