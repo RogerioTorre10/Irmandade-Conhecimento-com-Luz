@@ -20,12 +20,27 @@
     };
   }
 
+  // Função showSection pra garantir visibilidade
+  window.showSection = window.showSection || function(sectionId) {
+    document.querySelectorAll('.j-section').forEach(section => {
+      section.classList.add('hidden');
+      section.style.display = 'none';
+    });
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) {
+      targetSection.classList.remove('hidden');
+      targetSection.style.display = 'block';
+      log('[showSection] Exibindo seção:', sectionId);
+    } else {
+      console.error('[showSection] Seção não encontrada:', sectionId);
+    }
+  };
+
   // Função playVideo (filme-0 a filme-5)
   window.playVideo = function(videoSrc) {
-    // Esconde todas as seções pra evitar overlapping
     document.querySelectorAll('.j-section').forEach(section => {
-      section.style.display = 'none';
       section.classList.add('hidden');
+      section.style.display = 'none';
     });
     log('Escondendo todas as seções durante vídeo:', videoSrc);
 
@@ -42,7 +57,7 @@
           window.loadDynamicBlocks();
           window.perguntasLoaded = true;
           log('loadDynamicBlocks chamado após erro no video-container');
-        }, 100); // Delay pra DOM
+        }, 100);
       }
       return;
     }
@@ -53,10 +68,10 @@
     video.src = videoSrc;
     video.autoplay = true;
     video.controls = true;
+    video.className = 'video-player'; // Reusa classe pra consistência
     video.style.width = '100%';
     video.style.height = 'auto';
 
-    // Timeout de segurança: 60 segundos
     const videoTimeout = setTimeout(() => {
       log('Timeout de segurança disparado para vídeo:', videoSrc);
       videoContainer.style.display = 'none';
@@ -72,15 +87,14 @@
           log('loadDynamicBlocks chamado após timeout');
         }, 100);
       } else if (nextSection === 'section-final') {
-        const finalText = document.querySelector('#section-final [data-typing="true"]');
+        const finalText = document.querySelector('#section-final p[data-typing="true"]');
         if (finalText && window.runTyping) {
           window.runTyping(finalText);
-          log('runTyping disparado para section-final');
+          log('runTyping disparado para section-final (p)');
         }
       }
     }, 60000);
 
-    // onended: avança conforme vídeo
     video.onended = () => {
       clearTimeout(videoTimeout);
       videoContainer.style.display = 'none';
@@ -97,15 +111,14 @@
           log('loadDynamicBlocks chamado após vídeo');
         }, 100);
       } else if (nextSection === 'section-final') {
-        const finalText = document.querySelector('#section-final [data-typing="true"]');
+        const finalText = document.querySelector('#section-final p[data-typing="true"]');
         if (finalText && window.runTyping) {
           window.runTyping(finalText);
-          log('runTyping disparado para section-final');
+          log('runTyping disparado para section-final (p)');
         }
       }
     };
 
-    // Erro no vídeo: força avanço
     video.onerror = () => {
       clearTimeout(videoTimeout);
       log('Erro no vídeo:', videoSrc, '- Forçando avanço');
@@ -122,10 +135,10 @@
           log('loadDynamicBlocks chamado após erro no vídeo');
         }, 100);
       } else if (nextSection === 'section-final') {
-        const finalText = document.querySelector('#section-final [data-typing="true"]');
+        const finalText = document.querySelector('#section-final p[data-typing="true"]');
         if (finalText && window.runTyping) {
           window.runTyping(finalText);
-          log('runTyping disparado para section-final');
+          log('runTyping disparado para section-final (p)');
         }
       }
     };
@@ -157,7 +170,7 @@
       };
       log('Dependências:', dependencies);
 
-      window.perguntasLoaded = false; // Reset flag
+      window.perguntasLoaded = false;
 
       if (!window.JORNADA_BLOCKS || !window.JORNADA_VIDEOS) {
         console.error('JORNADA_BLOCKS ou JORNADA_VIDEOS não definido, pulando para section-final');
@@ -281,7 +294,7 @@
         const currentBloco = content.querySelector('.j-bloco:not(.hidden)') || content.querySelector(`[data-bloco="${window.JC.currentBloco || 0}"]`);
         if (!currentBloco) {
           console.error('Bloco atual não encontrado para bloco', window.JC.currentBloco);
-          window.JC.currentBloco = window.JORNADA_BLOCKS.length; // Marca como acabado
+          window.JC.currentBloco = window.JORNADA_BLOCKS.length;
           window.JC.nextSection = 'section-final';
           window.__currentSectionId = 'section-final';
           if (window.JORNADA_FINAL_VIDEO && window.playVideo) {
@@ -357,10 +370,10 @@
           } else {
             window.showSection && window.showSection('section-final');
             log('Avanço direto pro final (sem vídeo)');
-            const finalText = document.querySelector('#section-final [data-typing="true"]');
+            const finalText = document.querySelector('#section-final p[data-typing="true"]');
             if (finalText && window.runTyping) {
               window.runTyping(finalText);
-              log('runTyping disparado para section-final');
+              log('runTyping disparado para section-final (p)');
             }
           }
         }
@@ -378,10 +391,10 @@
               log('loadDynamicBlocks chamado ao entrar em section-perguntas');
             }, 100);
           } else if (nextSection === 'section-final') {
-            const finalText = document.querySelector('#section-final [data-typing="true"]');
+            const finalText = document.querySelector('#section-final p[data-typing="true"]');
             if (finalText && window.runTyping) {
               window.runTyping(finalText);
-              log('runTyping disparado para section-final');
+              log('runTyping disparado para section-final (p)');
             }
           }
         } else {
