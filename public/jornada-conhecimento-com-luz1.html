@@ -781,11 +781,6 @@
           window.loadDynamicBlocks();
           console.log('[showSection] loadDynamicBlocks chamado para section-perguntas');
         }
-        window.runTyping = function(root) {
-        if (!root || root.classList.contains('hidden') || !(root instanceof Element)) {
-        console.log('[runTyping] Root inválido ou oculto:', root?.id || root?.className || root);
-        return;
-      }
         if (window.runTyping) {
           window.runTyping(target);
           console.log('[showSection] Iniciando runTyping para:', id);
@@ -854,84 +849,85 @@
     console.log('[loadDynamicBlocks] Blocos atualizados para idioma:', currentLang);
   }
 
-window.loadDynamicBlocks = function() {
-  updateBlocks();
-  const content = document.getElementById('perguntas-container');
-  if (!content) {
-    console.error('[loadDynamicBlocks] Container de perguntas não encontrado');
-    window.toast && window.toast('Erro ao carregar perguntas.');
-    return;
-  }
-
-  const blocks = window.JORNADA_BLOCKS || [];
-  if (!blocks.length) {
-    console.error('[loadDynamicBlocks] JORNADA_BLOCKS não definido ou vazio');
-    window.toast && window.toast('Nenhum bloco de perguntas encontrado.');
-    return;
-  }
-
-  content.innerHTML = '';
-  content.classList.remove('hidden');
-  blocks.forEach((block, bIdx) => {
-    const bloco = document.createElement('div');
-    bloco.className = 'j-bloco';
-    bloco.dataset.bloco = bIdx;
-    bloco.dataset.video = block.video_after || '';
-
-    if (block.title) {
-      const title = document.createElement('h3');
-      title.className = 'pergunta-enunciado text';
-      title.dataset.typing = 'true';
-      title.dataset.text = block.title;
-      title.dataset.speed = '36';
-      title.dataset.cursor = 'true';
-      bloco.appendChild(title);
+  window.loadDynamicBlocks = function() {
+    updateBlocks();
+    const content = document.getElementById('perguntas-container');
+    if (!content) {
+      console.error('[loadDynamicBlocks] Container de perguntas não encontrado');
+      window.toast && window.toast('Erro ao carregar perguntas.');
+      return;
     }
 
-    (block.questions || []).forEach((q, qIdx) => {
-      const label = typeof q === 'string' ? q : (q.label || q.text || '');
-      const div = document.createElement('div');
-      div.className = 'j-pergunta';
-      div.dataset.pergunta = qIdx;
+    const blocks = window.JORNADA_BLOCKS || [];
+    if (!blocks.length) {
+      console.error('[loadDynamicBlocks] JORNADA_BLOCKS não definido ou vazio');
+      window.toast && window.toast('Nenhum bloco de perguntas encontrado.');
+      return;
+    }
 
-      div.innerHTML = `
-        <label class="pergunta-enunciado text" 
-               data-typing="true" 
-               data-text="Pergunta ${qIdx + 1}: ${label}" 
-               data-speed="36" 
-               data-cursor="true"></label>
-        <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
-        <div class="accessibility-controls">
-          <button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>
-          <button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>
-          <button class="btn btn-avancar" data-action="avancar">Avançar</button>
-        </div>
-      `;
-      bloco.appendChild(div);
+    content.innerHTML = '';
+    content.classList.remove('hidden'); // Garante visibilidade
+    blocks.forEach((block, bIdx) => {
+      const bloco = document.createElement('div');
+      bloco.className = 'j-bloco';
+      bloco.dataset.bloco = bIdx;
+      bloco.dataset.video = block.video_after || '';
+      bloco.style.display = 'none';
+
+      if (block.title) {
+        const title = document.createElement('h3');
+        title.className = 'pergunta-enunciado text';
+        title.dataset.typing = 'true';
+        title.dataset.text = block.title;
+        title.dataset.speed = '36';
+        title.dataset.cursor = 'true';
+        bloco.appendChild(title);
+      }
+
+      (block.questions || []).forEach((q, qIdx) => {
+        const label = typeof q === 'string' ? q : (q.label || q.text || '');
+        const div = document.createElement('div');
+        div.className = 'j-pergunta';
+        div.dataset.pergunta = qIdx;
+
+        div.innerHTML = `
+          <label class="pergunta-enunciado text" 
+                 data-typing="true" 
+                 data-text="Pergunta ${qIdx + 1}: ${label}" 
+                 data-speed="36" 
+                 data-cursor="true"></label>
+          <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
+          <div class="accessibility-controls">
+            <button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>
+            <button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>
+            <button class="btn btn-avancar" data-action="avancar">Avançar</button>
+          </div>
+        `;
+        bloco.appendChild(div);
+      });
+
+      content.appendChild(bloco);
     });
 
-    content.appendChild(bloco);
-  });
-
-  const firstBloco = content.querySelector('.j-bloco');
-  if (firstBloco) {
-    firstBloco.classList.add('active'); // Usa classe active
-    window.JC.currentBloco = 0;
-    const first = firstBloco.querySelector('.j-pergunta');
-    if (first) {
-      first.classList.add('active');
-      setTimeout(() => window.runTyping && window.runTyping(firstBloco), 100);
+    const firstBloco = content.querySelector('.j-bloco');
+    if (firstBloco) {
+      firstBloco.style.display = 'block';
+      window.JC.currentBloco = 0;
+      const first = firstBloco.querySelector('.j-pergunta');
+      if (first) {
+        first.classList.add('active');
+        setTimeout(() => window.runTyping && window.runTyping(firstBloco), 100);
+      }
+    } else {
+      console.error('[loadDynamicBlocks] Nenhum bloco criado');
+      window.toast && window.toast('Erro ao criar blocos de perguntas.');
     }
-  } else {
-    console.error('[loadDynamicBlocks] Nenhum bloco criado');
-    window.toast && window.toast('Erro ao criar blocos de perguntas.');
-  }
 
-  if (window.loadAnswers) window.loadAnswers();
-  const firstTa = document.querySelector('.j-bloco .j-pergunta textarea');
-  if (firstTa && window.handleInput) window.handleInput(firstTa);
-  console.log('[loadDynamicBlocks] Blocos carregados com sucesso');
-};
+    if (window.loadAnswers) window.loadAnswers();
+    const firstTa = document.querySelector('.j-bloco .j-pergunta textarea');
+    if (firstTa && window.handleInput) window.handleInput(firstTa);
+    console.log('[loadDynamicBlocks] Blocos carregados com sucesso');
+  };
 
   document.addEventListener('change', (e) => {
     if (e.target.id === 'language-select') {
@@ -979,69 +975,39 @@ window.loadDynamicBlocks = function() {
   <!-- Vídeo Transição -->
   <script>
   (function() {
-   window.playVideo = function(videoSrc) {
-  const overlay = document.getElementById('videoOverlay');
-  const video = document.getElementById('videoTransicao');
-  const fallback = document.getElementById('videoFallback');
-  if (!overlay || !video) {
-    console.error('[playVideo] Elementos de vídeo não encontrados');
-    window.toast && window.toast('Erro ao reproduzir vídeo.');
-    return;
-  }
-  video.src = videoSrc;
-  video.onended = () => {
-    overlay.classList.add('hidden');
-    video.src = '';
-    if (window.JC.nextBloco !== null && window.JC.nextBloco !== undefined) {
-      const content = document.getElementById('perguntas-container');
-      const currentBloco = content.querySelector(`.j-bloco[data-bloco="${window.JC.currentBloco}"]`);
-      const nextBloco = content.querySelector(`.j-bloco[data-bloco="${window.JC.nextBloco}"]`);
-      if (currentBloco && nextBloco) {
-        currentBloco.classList.remove('active');
-        setTimeout(() => {
-          currentBloco.style.display = 'none';
-          nextBloco.style.display = 'block';
-          setTimeout(() => {
-            nextBloco.classList.add('active');
-            window.JC.currentBloco = window.JC.nextBloco;
-            delete window.JC.nextBloco;
-            const first = nextBloco.querySelector('.j-pergunta');
-            if (first) {
-              first.classList.add('active');
-              window.runTyping && window.runTyping(nextBloco);
-            }
-            console.log('[playVideo] Avançando para bloco', window.JC.currentBloco);
-          }, 50);
-        }, 500);
-      } else {
-        window.JC.goNext && window.JC.goNext();
+    window.playVideo = function(videoSrc) {
+      const overlay = document.getElementById('videoOverlay');
+      const video = document.getElementById('videoTransicao');
+      const fallback = document.getElementById('videoFallback');
+      if (!overlay || !video) {
+        console.error('[playVideo] Elementos de vídeo não encontrados');
+        window.toast && window.toast('Erro ao reproduzir vídeo.');
+        return;
       }
-    } else if (window.JC.nextSection) {
-      window.showSection(window.JC.nextSection);
-      window.JC.nextSection = null;
-      console.log('[playVideo] Navegando para', window.JC.nextSection);
-    } else {
-      window.JC.goNext && window.JC.goNext();
-    }
-  };
-  video.onerror = () => {
-    fallback.classList.remove('hidden');
-    video.classList.add('hidden');
-    setTimeout(() => {
-      overlay.classList.add('hidden');
-      fallback.classList.add('hidden');
-      video.classList.remove('hidden');
-      window.JC.goNext && window.JC.goNext();
-    }, 3000);
-  };
-  overlay.classList.remove('hidden');
-  video.play().catch(e => {
-    console.error('[playVideo] Erro ao reproduzir vídeo:', e);
-    fallback.classList.remove('hidden');
-    video.classList.add('hidden');
-  });
-  console.log('[playVideo] Reproduzindo vídeo:', videoSrc);
-};
+      video.src = videoSrc;
+      video.onended = () => {
+        overlay.classList.add('hidden');
+        video.src = '';
+        window.JC && window.JC.goNext && window.JC.goNext();
+      };
+      video.onerror = () => {
+        fallback.classList.remove('hidden');
+        video.classList.add('hidden');
+        setTimeout(() => {
+          overlay.classList.add('hidden');
+          fallback.classList.add('hidden');
+          video.classList.remove('hidden');
+          window.JC && window.JC.goNext && window.JC.goNext();
+        }, 3000);
+      };
+      overlay.classList.remove('hidden');
+      video.play().catch(e => {
+        console.error('[playVideo] Erro ao reproduzir vídeo:', e);
+        fallback.classList.remove('hidden');
+        video.classList.add('hidden');
+      });
+      console.log('[playVideo] Reproduzindo vídeo:', videoSrc);
+    };
 
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('#skipVideo');
