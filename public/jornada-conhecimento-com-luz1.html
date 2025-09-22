@@ -735,13 +735,8 @@
 
     if (window.JC) {
       window.JC.nextSection = 'section-guia';
-      if (window.playVideo && window.JORNADA_VIDEOS && window.JORNADA_VIDEOS.intro) {
-        window.playVideo(window.JORNADA_VIDEOS.intro);
-        log('[startJourney] Reproduzindo vídeo de introdução');
-      } else {
-        window.showSection('section-guia');
-        log('[startJourney] Navegação para section-guia');
-      }
+      window.showSection && window.showSection('section-guia');
+      log('[startJourney] Navegação para section-guia');
     } else {
       console.error('[startJourney] window.JC não definido');
       window.toast && window.toast('Erro ao inicializar jornada. Tente recarregar a página.');
@@ -749,9 +744,9 @@
   };
   console.log('[Senha] Bloco carregado');
 })();
-</script>
+</script>>
 
-  <!-- showSection -->
+ <!-- showSection -->
 <script>
 (function() {
   const HIDE_CLASS = 'hidden';
@@ -782,6 +777,10 @@
       window.__typingLock = false;
       
       setTimeout(() => {
+        if (id === 'section-perguntas' && window.loadDynamicBlocks) {
+          window.loadDynamicBlocks();
+          console.log('[showSection] loadDynamicBlocks chamado para section-perguntas');
+        }
         if (window.runTyping) {
           window.runTyping(target);
           console.log('[showSection] Iniciando runTyping para:', id);
@@ -867,7 +866,7 @@
     }
 
     content.innerHTML = '';
-    content.classList.remove('hidden'); // Garante que o container seja visível
+    content.classList.remove('hidden'); // Garante visibilidade
     blocks.forEach((block, bIdx) => {
       const bloco = document.createElement('div');
       bloco.className = 'j-bloco';
@@ -1027,7 +1026,7 @@
   })();
   </script>
   
-  <!-- Guia Seleção -->
+ <!-- Guia Seleção -->
 <script>
 (function() {
   window.JORNADA = window.JORNADA || {};
@@ -1162,9 +1161,9 @@
       } else if (btn.id === 'btnSkipSelfie' || btn.id === 'btnStartJourney') {
         if (window.JC) {
           window.JC.nextSection = 'section-perguntas';
-          if (window.playVideo && window.JORNADA_VIDEOS && window.JORNADA_VIDEOS.afterBlocks[0]) {
-            window.playVideo(window.JORNADA_VIDEOS.afterBlocks[0]);
-            console.log('[Selfie] Reproduzindo vídeo filme-1 antes de section-perguntas');
+          if (window.playVideo && window.JORNADA_VIDEOS && window.JORNADA_VIDEOS.intro) {
+            window.playVideo(window.JORNADA_VIDEOS.intro);
+            console.log('[Selfie] Reproduzindo vídeo filme-0 antes de section-perguntas');
           } else {
             window.showSection('section-perguntas');
             console.log('[Selfie] Navegação direta para section-perguntas');
