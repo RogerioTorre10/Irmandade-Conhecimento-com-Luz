@@ -1,7 +1,7 @@
 // jornada-bootstrap.js
 (function() {
   const log = (...args) => console.log('[BOOT]', ...args);
-  const MAX_ATTEMPTS = 150; // Aumentado para dar mais tempo
+  const MAX_ATTEMPTS = 200; // Aumentado para mais segurança
   let attempts = 0;
 
   function startWhenReady(route = 'intro') {
@@ -15,7 +15,7 @@
       return Promise.resolve();
     } else if (attempts < MAX_ATTEMPTS) {
       log(`Tentativa ${attempts} de ${MAX_ATTEMPTS}`);
-      return new Promise(resolve => setTimeout(() => resolve(startWhenReady(route)), 100));
+      return new Promise(resolve => setTimeout(() => resolve(startWhenReady(route)), 50));
     } else {
       log(`JC não disponível após ${MAX_ATTEMPTS} tentativas`);
       window.JC = window.JC || {
