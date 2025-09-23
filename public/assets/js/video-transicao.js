@@ -1,4 +1,3 @@
-<script>
 // video-transicao.js
 (function() {
   const log = (...args) => console.log('[VIDEO_TRANSICAO]', ...args);
@@ -116,4 +115,4 @@
   });
 
   log('video-transicao.js carregado');
-})()
+})();
