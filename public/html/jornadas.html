@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jornadas · Irmandade Conhecimento com Luz</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png">
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #f9f9f9; color: #333; }
+    .site-header { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 16px; background: #1f2937; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; }
+    .chama { display: inline-flex; gap: 8px; margin: 16px 0; }
+    .chama span { width: 12px; height: 24px; background: #ff4500; border-radius: 3px; animation: flicker 1.5s infinite; }
+    .chama span:nth-child(2) { animation-delay: 0.2s; }
+    .chama span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes flicker { 0%, 100% { transform: scaleY(1); opacity: 1; } 50% { transform: scaleY(1.2); opacity: 0.8; } }
+    .lang-switch { display: flex; gap: 8px; justify-content: center; padding: 12px; }
+    .lang-btn { padding: 8px 16px; border-radius: 8px; border: 1px solid #fff; background: #374151; color: #fff; cursor: pointer; transition: background 0.3s ease; }
+    .lang-btn:hover { background: #4b5563; }
+    .container { max-width: 900px; margin: 24px auto; padding: 0 16px; }
+    .card { background: #f6efe0 !important; border-radius: 14px; box-shadow: 0 8px 28px rgba(0,0,0,0.12); padding: 32px; position: relative; z-index: 1; }
+    .pergaminho-v { background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important; background-size: cover !important; background-position: center !important; min-height: 82vh !important; }
+    .card-content { background: transparent !important; position: relative; z-index: 2; padding: 20px; }
+    .btn { display: inline-block; padding: 12px 24px; border-radius: 10px; border: 0; background: #1f2937; color: #fff; font-weight: 600; text-decoration: none; transition: background 0.3s ease, transform 0.2s ease; }
+    .btn:hover { background: #374151; transform: scale(1.05); }
+    .btn-primary { background: #6b21a8; }
+    .btn-primary:hover { background: #7c3aed; }
+    .btn + .btn { margin-left: 12px; }
+    .jornada-perguntas { margin-top: 32px; }
+    .jornada-perguntas h2 { font-size: 1.8rem; margin-bottom: 16px; color: #1f2937; }
+    .pergunta { margin-bottom: 24px; }
+    .pergunta p { font-weight: 600; margin-bottom: 8px; }
+    .pergunta textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; background: rgba(255, 255, 255, 0.8); resize: vertical; min-height: 100px; }
+    .footer-actions { display: flex; gap: 12px; justify-content: center; margin-top: 24px; }
+    .lumen-typing { white-space: pre-wrap; position: relative; }
+    .lumen-typing::after { content: "▌"; margin-left: 2px; opacity: 0.75; animation: lumenBlink 1s steps(2, end) infinite; }
+    .lumen-typing.typing-done::after { content: ""; animation: none; }
+    @keyframes lumenBlink { 50% { opacity: 0; } }
+    #jornada-canvas { display: none; }
+    #videoOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+    #videoOverlay.hidden { display: none; }
+    .video-player { max-width: 90vw; max-height: 80vh; background: #000; }
+    .site-footer { text-align: center; padding: 16px; opacity: 0.6; font-size: 0.85rem; }
+    @media (max-width: 600px) { .card { margin: 16px; padding: 20px; } .site-header h1 { font-size: 1.6rem; } .btn { padding: 10px 16px; font-size: 0.9rem; } .chama span { width: 8px; height: 16px; } }
+  </style>
+</head>
+<body>
+  <main id="page-shell">
+    <header class="site-header">
+      <div class="chama">
+        <span></span><span></span><span></span>
+      </div>
+      <h1 data-typing data-text="Jornadas Disponíveis" data-speed="40" data-cursor="true"></h1>
+      <p data-typing data-text="Escolha por onde começar sua transformação." data-speed="30" data-cursor="true"></p>
+      <h2>Irmandade Conhecimento com Luz</h2>
+      <p>Fé, ciência e filosofia caminhando juntas para despertar e guiar. 🌟</p>
+    </header>
+    <nav class="lang-switch" aria-label="Escolher idioma">
+      <button class="lang-btn" data-lang="pt">PT</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="es">ES</button>
+    </nav>
+    <section class="container">
+      <div class="card pergaminho pergaminho-v">
+        <div class="card-content">
+          <h2 data-typing data-text="Jornada Conhecimento com Luz - Essencial" data-speed="40" data-cursor="true"></h2>
+          <p>Uma viagem interior com 32 reflexões essenciais.</p>
+          <div class="actions">
+            <button id="btnComecar" class="btn btn-primary">Iniciar Jornada</button>
+          </div>
+          <div class="jornada-perguntas">
+            <h2 data-typing data-text="📝 Pré-visualização de Perguntas" data-speed="40" data-cursor="true"></h2>
+            <div id="jornada-conteudo"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="jornada-canvas" class="card pergaminho">
+      <div id="jornada-conteudo" class="conteudo-pergaminho"></div>
+    </section>
+    <div id="videoOverlay" class="video-overlay hidden">
+      <video id="videoTransicao" class="video-player" playsinline preload="metadata" controls></video>
+      <button id="skipVideo" class="btn btn-secondary" style="position:absolute; top:14px; right:14px">Pular vídeo</button>
+    </div>
+    <footer class="site-footer">
+      <small>© 2025 Irmandade Conhecimento com Luz</small>
+    </footer>
+  </main>
+  <script>
+    (function () {
+      function typeWriter(el, text, speed, showCursor) {
+        if (!el) return;
+        el.textContent = '';
+        if (showCursor) el.classList.add('lumen-typing');
+        let i = 0;
+        (function step() {
+          if (i < text.length) {
+            el.textContent += text.charAt(i++);
+            setTimeout(step, speed);
+          } else {
+            el.classList.add('typing-done');
+          }
+        })();
+      }
+      function runTyping(root) {
+        (root || document).querySelectorAll('[data-typing]').forEach(el => {
+          if (el.dataset._typed) return;
+          const t = el.getAttribute('data-text') || el.textContent || '';
+          const spd = parseInt(el.getAttribute('data-speed') || '26', 10);
+          const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
+          el.dataset._typed = '1';
+          typeWriter(el, t, spd, cur);
+        });
+      }
+      document.addEventListener('DOMContentLoaded', () => runTyping(document));
+
+      function loadPreviewQuestions() {
+        if (!window.JORNADA_BLOCKS || !window.JORNADA_QA) return;
+        const content = document.getElementById('jornada-conteudo');
+        if (!content) return;
+        const questions = window.JORNADA_BLOCKS[0]?.questions.slice(0, 2) || [];
+        window.JORNADA_QA.mount('jornada-conteudo', questions, {
+          onBack: () => window.location.href = '/index.html',
+          onFinish: () => window.location.href = '/jornada-conhecimento-com-luz1.html#intro'
+        });
+      }
+
+      function boot() {
+        if (window.JORNADA_RENDER?.renderIntro) {
+          document.body.classList.add('jornada-active');
+          const route = (location.hash || '#intro').slice(1);
+          if (route === 'perguntas') {
+            window.JORNADA_RENDER.renderPerguntas(0);
+            window.JORNADA_PAPER?.set?.('h');
+          } else if (route === 'final') {
+            window.JORNADA_RENDER.renderFinal();
+            window.JORNADA_PAPER?.set?.('v');
+          } else {
+            window.JORNADA_RENDER.renderIntro();
+            window.JORNADA_PAPER?.set?.('v');
+          }
+          loadPreviewQuestions();
+          return true;
+        }
+        return false;
+      }
+      if (!boot()) {
+        let tries = 0;
+        const timer = setInterval(() => {
+          if (boot() || ++tries > 40) clearInterval(timer);
+        }, 100);
+      }
+
+      document.getElementById('btnComecar')?.addEventListener('click', () => {
+        window.location.href = '/jornada-conhecimento-com-luz1.html#intro';
+      });
+    })();
+  <
