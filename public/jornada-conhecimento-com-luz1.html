@@ -484,7 +484,9 @@
         console.error('[Erro global]',e?.error||e);
         toast('Ops… algo falhou, mas já seguimos em frente.');
       });
-
+      </script>
+  
+      <script>
       /* ===== env tag ===== */
       const env=document.getElementById('envTag');
       if(env) env.textContent=`layout=${document.body.dataset.layout||'master'} · journey=${document.body.dataset.journey||'essencial'} · path=/assets`;
@@ -514,7 +516,9 @@
           typeWriter(el,t,spd,cur);
         });
       }
-
+     </script>
+        
+     <script>
       /* ===== datilografia no placeholder e respostas ===== */
       let __abortTypingPlaceholder=null;
       async function typePlaceholder(inp, text, speed=22){
@@ -552,7 +556,9 @@
         }
         div.classList.add('typing-done');
       }
+</script>
 
+  <script>
       /* ===== chamas ===== */
       function makeFlame(cls){
         const d=document.createElement('div');
@@ -612,7 +618,9 @@
       function ensureHeroFlame(sectionId){
         window.JORNADA_CHAMA.ensureHeroFlame(sectionId);
       }
+</script>
 
+  <script>
       /* ===== selfie ===== */
       (function(){
         const $=s=>document.querySelector(s);
@@ -798,20 +806,11 @@
             const a=document.createElement('a');
             a.href=dataURL;
             a.download=`jornada-${card.dataset.guide.toLowerCase()}-${Date.now()}.png`;
-            a.click();
-            if(errorDiv) errorDiv.style.display='none';
-          }catch(_){
-            if(errorDiv) errorDiv.style.display='block';
-            toast('Erro ao salvar ou baixar a imagem.');
-          }
-        });
+          </script>
 
-        loadBg();
-        syncNameInput();
-      })();
-
-      <!-- Guia Seleção -->
-      <script>
+        </script>
+     <!-- Guia Seleção -->
+     
       (function() {
       window.JORNADA = window.JORNADA || {};
      window.JORNADA.selectedGuia = window.JORNADA.selectedGuia || null;
@@ -845,8 +844,10 @@
   console.log('[Guia] Bloco carregado');
 })();
 </script>
-<!-- Guia Seleção -->
+
 <script>
+<!-- Guia Seleção -->
+
 (function() {
   window.JORNADA = window.JORNADA || {};
   window.JORNADA.selectedGuia = window.JORNADA.selectedGuia || null;
@@ -881,6 +882,7 @@
 })();
 </script>
 
+   <script>
       /* ===== chat com guia ===== */
       async function sendChatMessage(){
         const input=document.getElementById('grok-chat-input');
@@ -947,7 +949,9 @@
         }
         input.value='';
       }
+     </script>
 
+     <script>
       /* ===== devolutiva da API ===== */
       async function fetchDevolutiva(pergunta, resposta, guia){
         const guiaConfigs=window.guiaConfigs||{
@@ -978,7 +982,9 @@
           return 'Ops, algo deu errado ao gerar a devolutiva. Continue sua jornada!';
         }
       }
+     </script>
 
+    <script>
       /* ===== progresso & storage ===== */
       function updateProgress(){
         const perguntas=document.querySelectorAll('.j-pergunta');
@@ -1015,7 +1021,8 @@
         });
         updateProgress();
       }
-
+    </script>
+    <script>
       /* ===== pergaminho & seções ===== */
       function checkImage(url,fallbackUrl){
         return new Promise(resolve=>{
@@ -1071,7 +1078,9 @@
           if(guiaNameInput&&storedName) guiaNameInput.value=storedName;
         }
       }
+     </script>
 
+     <script>
       /* ===== blocos dinâmicos ===== */
       window.loadDynamicBlocks=function(){
         const content=document.getElementById('perguntas-container');
@@ -1135,7 +1144,9 @@
           if(active&&window.runTyping) window.runTyping(active);
         };
       })();
-
+     </script>
+  
+     <script>
       /* ===== controles ===== */
       function analyzeSentiment(text){
         const POS={'feliz':2,'alegria':2,'amor':3,'sucesso':2,'esperança':3,'paz':2,'fé':3,'gratidão':2,'vitória':3,'superação':3,'luz':2,'deus':3,'coragem':2,'força':2,'confiança':2,'propósito':3};
@@ -1347,7 +1358,9 @@
           setTimeout(cleanup,90000);
         }
         window.playTransition=playTransition;
+      </script>
 
+      <script>
         /* ===== controle de orientação de vídeo ===== */
         function lockVideoOrientation(){
           const video=document.getElementById('videoTransicao');
@@ -1412,7 +1425,9 @@
           }
           updateProgress();
         }
+       </script>
 
+       <script>
         /* ===== Acessibilidade: Microfone e Áudio ===== */
         let recognition=null;
         let currentLang='pt-BR';
@@ -1559,7 +1574,9 @@
             }
           });
         }
+     </script>
 
+     <script>
         /* vídeos & blocos */
         const VIDEO_BASE='/assets/img/';
         window.JORNADA_VIDEOS={
@@ -1599,6 +1616,9 @@
           window.JORNADA_BLOCKS=blockTranslations[currentLang]||blockTranslations['pt-BR'];
         }
 
+     </script>
+
+     <script>
         /* boot */
         ensureHeaderFlame();
         ensurePageFlames();
@@ -1627,5 +1647,4 @@
   <script defer src="/assets/js/api.js?v=6" onload="console.log('[LOAD] api.js carregado')" onerror="console.error('[LOAD] Erro ao carregar api.js')"></script>
 </body>
 </html>
-</body>
-</html>
+
