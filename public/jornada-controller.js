@@ -192,7 +192,24 @@
         return;
       }
 
-      if (currentSection === 'section-termos' || currentSection === 'section-senha') {
+      if (currentSection === 'section-termos') {
+        const termosPg1 = document.getElementById('termos-pg1');
+        const termosPg2 = document.getElementById('termos-pg2');
+        if (termosPg1 && !termosPg1.classList.contains('hidden')) {
+          termosPg1.classList.add('hidden');
+          termosPg2.classList.remove('hidden');
+          log('Avançando de termos-pg1 para termos-pg2');
+          return;
+        }
+        const nextSection = sections[currentIdx + 1];
+        window.JC.nextSection = nextSection;
+        window.__currentSectionId = nextSection;
+        window.showSection && window.showSection(nextSection);
+        log('Avançando de', currentSection, 'para', nextSection);
+        return;
+      }
+
+      if (currentSection === 'section-senha') {
         const nextSection = sections[currentIdx + 1];
         window.JC.nextSection = nextSection;
         window.__currentSectionId = nextSection;
@@ -433,9 +450,19 @@
   };
 
   document.addEventListener('click', debounceClick((e) => {
-    const btn = e.target.closest('[data-action="avancar"], .btn-avancar, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney, #iniciarSenha');
+    const btn = e.target.closest('[data-action="avancar"], .btn-avancar, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney, #iniciarSenha, [data-action="termos-prev"], [data-action="termos-next"]');
     if (btn) {
       log('Clique no botão avançar:', btn.id || btn.className, ', currentSection=', window.__currentSectionId);
+      if (btn.dataset.action === 'termos-prev') {
+        const termosPg1 = document.getElementById('termos-pg1');
+        const termosPg2 = document.getElementById('termos-pg2');
+        if (termosPg2 && !termosPg2.classList.contains('hidden')) {
+          termosPg2.classList.add('hidden');
+          termosPg1.classList.remove('hidden');
+          log('Voltando de termos-pg2 para termos-pg1');
+          return;
+        }
+      }
       if (window.JC && window.JC.goNext) {
         window.JC.goNext();
       } else {
