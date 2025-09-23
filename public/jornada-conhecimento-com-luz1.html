@@ -1074,6 +1074,66 @@
         }
       }
      </script>
+  
+<script>
+  <!-- showSection -->
+(function() {
+  const HIDE_CLASS = 'hidden';
+  let lastShowSection = 0;
+
+  window.showSection = function(id) {
+    const now = performance.now();
+    if (now - lastShowSection < 500) {
+      console.log('[showSection] Debounce: evitando chamada repetida');
+      return;
+    }
+    lastShowSection = now;
+
+    try {
+      const all = Array.from(document.querySelectorAll('div[id^="section-"]'));
+      const target = document.getElementById(id);
+      if (!target) {
+        console.warn('[showSection] Seção não encontrada:', id);
+        window.toast && window.toast(`Seção ${id} não encontrada.`);
+        return;
+      }
+      all.forEach(s => s.classList.add(HIDE_CLASS));
+      target.classList.remove(HIDE_CLASS);
+      window.__currentSectionId = id;
+      console.log('[showSection] Exibindo seção:', id);
+      
+      // Resetar __typingLock para evitar bloqueios
+      window.__typingLock = false;
+      
+      setTimeout(() => {
+        if (id === 'section-perguntas' && window.loadDynamicBlocks) {
+          window.loadDynamicBlocks();
+          console.log('[showSection] loadDynamicBlocks chamado para section-perguntas');
+        }
+        if (window.runTyping) {
+          window.runTyping(target);
+          console.log('[showSection] Iniciando runTyping para:', id);
+        }
+        const btns = target.querySelectorAll('[data-action="avancar"], .btn-avancar, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney');
+        btns.forEach(btn => {
+          if (!btn.dataset.clickAttached) {
+            btn.addEventListener('click', (e) => {
+              e.preventDefault();
+              if (window.JC && window.JC.goNext) window.JC.goNext();
+            }, { once: true });
+            btn.dataset.clickAttached = '1';
+            console.log('[showSection] Evento de clique adicionado ao botão avançar em:', id, 'Botão:', btn.id || btn.className);
+          }
+        });
+      }, 100);
+    } catch (e) {
+      console.error('[showSection] Erro:', e);
+      window.toast && window.toast('Erro ao exibir seção.');
+    }
+  };
+  console.log('[showSection] Bloco carregado');
+})();
+</script>
 
      <script>
       /* ===== blocos dinâmicos ===== */
