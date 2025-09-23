@@ -845,6 +845,37 @@
 })();
 </script>
   
+  <script>
+   <!-- Navegação de Termos -->
+    (function() {
+    const showPage = (pg) => {
+      const pages = ['termos-pg1', 'termos-pg2'];
+      pages.forEach(p => {
+        const el = document.getElementById(p);
+        if (el) el.classList.add('hidden');
+      });
+      const target = document.getElementById(pg);
+      if (target) {
+        target.classList.remove('hidden');
+        window.runTyping && window.runTyping(target);
+      }
+    };
+
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-action="termos-next"], [data-action="termos-prev"]');
+      if (btn) {
+        e.preventDefault();
+        if (btn.dataset.action === 'termos-next') {
+          showPage('termos-pg2');
+        } else if (btn.dataset.action === 'termos-prev') {
+          showPage('termos-pg1');
+        }
+      }
+    });
+    console.log('[Termos] Bloco carregado');
+  })();
+  </script>
+  
    <script>
       /* ===== chat com guia ===== */
       async function sendChatMessage(){
