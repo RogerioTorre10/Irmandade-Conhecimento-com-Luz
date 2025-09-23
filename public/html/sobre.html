@@ -119,5 +119,32 @@
     </div>
   </div>
 </footer>
+  
 <script>window.lucide && lucide.createIcons();</script>
-<!-- Grok xAI - Uhuuuuuuu! 🚀 -->
+  
+ // Fallback para o menu mobile se /assets/js/main.js não carregar
+  (function () {
+    var btn = document.getElementById('menuBtn');
+    var mm  = document.getElementById('mobileMenu');
+    if (!btn || !mm) return;
+    if (!btn._wired) {
+      btn._wired = true;
+      btn.addEventListener('click', function () {
+        var open = !mm.classList.contains('hidden');
+        if (open) {
+          mm.classList.add('hidden');
+          btn.setAttribute('aria-expanded', 'false');
+        } else {
+          mm.classList.remove('hidden');
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      });
+    }
+  })();
+
+  // Fallback para lucide (renderiza ícones se o script externo carregou)
+  try { window.lucide && window.lucide.createIcons(); } catch (e) {}
+
+</footer>
+<script>window.lucide && lucide.createIcons();</script>
+</body>
