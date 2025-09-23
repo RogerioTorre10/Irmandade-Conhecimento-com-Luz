@@ -481,10 +481,7 @@
       window.addEventListener('error',(e)=>{
         console.error('[Erro global]',e?.error||e);
         toast('Ops… algo falhou, mas já seguimos em frente.');
-      });
-      </script>
-  
-      <script>
+      });      
       /* ===== env tag ===== */
       const env=document.getElementById('envTag');
       if(env) env.textContent=`layout=${document.body.dataset.layout||'master'} · journey=${document.body.dataset.journey||'essencial'} · path=/assets`;
@@ -807,10 +804,63 @@
             a.href=dataURL;
             a.download=`jornada-${card.dataset.guide.toLowerCase()}-${Date.now()}.png`;
           </script>
+  
+                 <!-- Vídeo Transição -->
+  <script>
+  (function() {
+    window.playVideo = function(videoSrc) {
+      const overlay = document.getElementById('videoOverlay');
+      const video = document.getElementById('videoTransicao');
+      const fallback = document.getElementById('videoFallback');
+      if (!overlay || !video) {
+        console.error('[playVideo] Elementos de vídeo não encontrados');
+        window.toast && window.toast('Erro ao reproduzir vídeo.');
+        return;
+      }
+      video.src = videoSrc;
+      video.onended = () => {
+        overlay.classList.add('hidden');
+        video.src = '';
+        window.JC && window.JC.goNext && window.JC.goNext();
+      };
+      video.onerror = () => {
+        fallback.classList.remove('hidden');
+        video.classList.add('hidden');
+        setTimeout(() => {
+          overlay.classList.add('hidden');
+          fallback.classList.add('hidden');
+          video.classList.remove('hidden');
+          window.JC && window.JC.goNext && window.JC.goNext();
+        }, 3000);
+      };
+      overlay.classList.remove('hidden');
+      video.play().catch(e => {
+        console.error('[playVideo] Erro ao reproduzir vídeo:', e);
+        fallback.classList.remove('hidden');
+        video.classList.add('hidden');
+      });
+      console.log('[playVideo] Reproduzindo vídeo:', videoSrc);
+    };
 
-        <script>
-     <!-- Guia Seleção -->
-     
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('#skipVideo');
+      if (btn) {
+        const overlay = document.getElementById('videoOverlay');
+        const video = document.getElementById('videoTransicao');
+        if (overlay && video) {
+          video.pause();
+          video.src = '';
+          overlay.classList.add('hidden');
+          window.JC && window.JC.goNext && window.JC.goNext();
+        }
+      }
+    });
+    console.log('[Video] Bloco carregado');
+  })();
+  </script>
+  
+                      <!-- Guia Seleção -->
+        <script>          
       (function() {
       window.JORNADA = window.JORNADA || {};
      window.JORNADA.selectedGuia = window.JORNADA.selectedGuia || null;
@@ -845,8 +895,8 @@
 })();
 </script>
   
-  <script>
-   <!-- Navegação de Termos -->
+              <!-- Navegação de Termos -->
+  <script>   
     (function() {
     const showPage = (pg) => {
       const pages = ['termos-pg1', 'termos-pg2'];
@@ -875,9 +925,9 @@
     console.log('[Termos] Bloco carregado');
   })();
   </script>
-  
-   <script>
-      /* ===== chat com guia ===== */
+
+             <!-- chat com guia -->
+   <script>     
       async function sendChatMessage(){
         const input=document.getElementById('grok-chat-input');
         const messagesDiv=document.getElementById('grok-chat-messages');
@@ -944,9 +994,9 @@
         input.value='';
       }
      </script>
-
-     <script>
-      /* ===== devolutiva da API ===== */
+                
+                <!-- devolutiva da API -->
+       <script>      
       async function fetchDevolutiva(pergunta, resposta, guia){
         const guiaConfigs=window.guiaConfigs||{
           zion:{apiUrl:'https://zion-backend-api.onrender.com/v1/chat',model:'grok'},
@@ -1017,8 +1067,8 @@
       }
     </script>
   
-    <script>
-      /* ===== pergaminho & seções ===== */
+                  <!-- pergaminho & seções --> 
+    <script>    
       function checkImage(url,fallbackUrl){
         return new Promise(resolve=>{
           const img=new Image();
@@ -1075,8 +1125,8 @@
       }
      </script>
   
-<script>
-  <!-- showSection -->
+               <!-- showSection -->  
+<script>  
 (function() {
   const HIDE_CLASS = 'hidden';
   let lastShowSection = 0;
