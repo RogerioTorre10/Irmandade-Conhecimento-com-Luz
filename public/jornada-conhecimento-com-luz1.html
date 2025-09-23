@@ -255,7 +255,7 @@
         <!-- TERMOS -->
         <div id="section-termos" class="j-section hidden">
           <div class="conteudo-pergaminho">
-            <h2 style="margin-top:0;" data-typing="true" data-text="Jornada Conhecimento com Luz - Essencial " data-speed="40" data-cursor="true"></h2>
+            <h2 style="margin-top:0;" data-typing="true" data-text="Jornada Conhecimento com Luz - Essencial" data-speed="40" data-cursor="true"></h2>
             <div id="termos-pg1">
               <p data-typing="true" data-text="AVISO IMPORTANTE – LEIA ANTES DE INICIAR" data-speed="40" data-cursor="true"></p>
               <p data-typing="true" data-text="Esta é uma jornada pessoal, simbólica e inspiradora. Para proteger sua privacidade e garantir uma experiência ética, leia com atenção:" data-speed="40" data-cursor="true"></p>
@@ -298,7 +298,7 @@
               </ul>
               <div class="footer-actions">
                 <button class="btn" data-action="termos-prev">Voltar</button>
-                <button class="btn btn-avancar" data-action="avancar">Aceito e quero continuar</button>
+                <button class="btn btn-avancar" id="iniciar" data-action="avancar">Aceito e quero continuar</button>
               </div>
             </div>
           </div>
@@ -307,21 +307,21 @@
         <!-- SENHA -->
         <div id="section-senha" class="j-section hidden">
           <div class="password-form">
-            <h3 style="margin:.2rem 0 1rem;font-family:'Berkshire Swash',cursive;font-size:22px;" data-typing="true" data-text="Ative sua Senha" data-speed="40" data-cursor="true">Ative sua Senha</h3>
+            <h3 style="margin:.2rem 0 1rem;font-family:'Berkshire Swash',cursive;font-size:22px;" data-typing="true" data-text="Ative sua Senha" data-speed="40" data-cursor="true"></h3>
             <div class="password-input">
               <input type="password" id="senhaInput" placeholder="Digite sua senha..." />
               <span class="password-toggle" data-action="toggle-password">👁️</span>
             </div>
-            <div style="margin-top:12px"><button class="btn" id="iniciar" data-action="start">Ativar e Iniciar</button></div>
+            <div style="margin-top:12px"><button class="btn" id="iniciarSenha" data-action="start">Ativar e Iniciar</button></div>
           </div>
         </div>
 
         <!-- GUIA -->
         <div id="section-guia" class="j-section hidden">
           <div class="conteudo-pergaminho">
-            <h2 style="margin-top:0;" data-typing="true" data-text="Escolha seu Guia ✨" data-speed="40" data-cursor="true">Escolha seu Guia ✨</h2>
+            <h2 style="margin-top:0;" data-typing="true" data-text="Escolha seu Guia ✨" data-speed="40" data-cursor="true"></h2>
             <div class="guia-container">
-              <p data-typing="true" data-text="Zion (Grok) • Lumen (ChatGPT) • Arian (Gemini)" data-speed="40" data-cursor="true">Zion (Grok) • Lumen (ChatGPT) • Arian (Gemini)</p>
+              <p data-typing="true" data-text="Zion (Grok) • Lumen (ChatGPT) • Arian (Gemini)" data-speed="40" data-cursor="true"></p>
               <div class="guia-options">
                 <button class="btn" data-action="select-guia" data-guia="zion">Escolher Zion</button>
                 <button class="btn" data-action="select-guia" data-guia="lumen">Escolher Lumen</button>
@@ -337,8 +337,8 @@
         <!-- SELFIE -->
         <div id="section-selfie" class="j-section hidden">
           <div class="conteudo-pergaminho">
-            <h2 style="margin-top:0;" data-typing="true" data-text="Entre na Irmandade " data-speed="40" data-cursor="true">Entre na Irmandade ✨</h2>
-            <p data-typing="true" data-text="Faça uma foto ou envie da galeria. Ajuste e gere sua imagem com seu guia." data-speed="40" data-cursor="true">Faça uma foto ou envie da galeria. Ajuste e gere sua imagem com seu guia.</p>
+            <h2 style="margin-top:0;" data-typing="true" data-text="Entre na Irmandade" data-speed="40" data-cursor="true"></h2>
+            <p data-typing="true" data-text="Faça uma foto ou envie da galeria. Ajuste e gere sua imagem com seu guia." data-speed="40" data-cursor="true"></p>
             <div class="selfie-row">
               <div class="selfie-left">
                 <label class="btn" for="selfieInput">Tirar Foto</label>
@@ -353,7 +353,7 @@
                 <div class="selfie-actions">
                   <button id="previewBtn" class="btn">Ver Prévia</button>
                   <button id="captureBtn" class="btn">Confirmar e Baixar</button>
-                  <button id="btnSkipSelfie" class="btn" data-action="avancar">Pular Foto</button>
+                  <button id="btnSkipSelfie" class="btn" data-action="skip-selfie">Pular Foto</button>
                   <button id="btnStartJourney" class="btn" data-action="avancar">Entrar na Jornada</button>
                 </div>
               </div>
@@ -412,7 +412,7 @@
           <div class="selfie-final" style="text-align:center; margin-top:20px;">
             <img id="minhaFotoFinal" alt="Minha foto com a Irmandade" style="max-width:80%; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.3)" />
           </div>
-          <p style="margin-top:12px;"><small data-typing="true" data-text="Sua imagem foi unida à Irmandade. " data-speed="40" data-cursor="true"></small></p>
+          <p style="margin-top:12px;"><small data-typing="true" data-text="Sua imagem foi unida à Irmandade da Luz" data-speed="40" data-cursor="true"></small></p>
           <div class="footer-actions">
             <button id="btnGeneratePDF" class="btn" data-action="generate-pdf">Gerar PDF/HQ</button>
             <button id="btnRestart" class="btn" data-action="restart">Voltar ao Portal</button>
@@ -443,6 +443,139 @@
 
   <!-- Toast -->
   <div id="toast" role="status" aria-live="polite" class="hidden"></div>
+
+  <script defer src="/js/jornada-bootstrap.js"></script>
+  <script defer src="/js/loadDynamicBlocks.js"></script>
+  <script defer src="/js/video-transicao.js"></script>
+  <script defer src="/js/jornada-controller.js"></script>
+</body>
+</html>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const originalShowSection = window.showSection;
+    window.showSection = function(sectionId) {
+      const canvas = document.getElementById('jornada-canvas');
+      if (sectionId === 'section-perguntas') {
+        canvas.classList.remove('pergaminho-v');
+        canvas.classList.add('pergaminho-h');
+      } else {
+        canvas.classList.remove('pergaminho-h');
+        canvas.classList.add('pergaminho-v');
+      }
+      originalShowSection && originalShowSection(sectionId);
+    };
+  });
+</script>
+/* Adicionar ao <style> no HTML */
+#video-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+#video-container.hidden {
+  display: none;
+}
+#video-container video {
+  width: 100vw;
+  height: 100vh;
+  object-fit: contain;
+  background: #000;
+}
+@media (orientation: portrait) {
+  #video-container video {
+    width: 100vw;
+    height: 100%;
+    max-height: 100vh;
+    object-fit: contain;
+  }
+}
+#videoOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+#videoOverlay.hidden {
+  display: none;
+}
+.video-player {
+  width: 100vw;
+  height: 100vh;
+  object-fit: contain;
+  background: #000;
+  transform: rotate(0deg);
+}
+@media (orientation: portrait) {
+  .video-player {
+    width: 100vw;
+    height: 100%;
+    max-height: 100vh;
+    object-fit: contain;
+  }
+}
+.video-fallback {
+  width: 100vw;
+  height: 100vh;
+  background: url('/assets/img/perfil-da-irmandade.png') center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  text-align: center;
+  padding: 20px;
+  font-family: "Berkshire Swash", cursive;
+}
+.j-section.hidden {
+  display: none;
+}
+.j-section {
+  display: block;
+}
+#perguntas-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  width: 100%;
+  scroll-behavior: smooth;
+}
+.j-bloco {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 10px;
+}
+.j-pergunta {
+  display: none;
+}
+.j-pergunta.active {
+  display: block;
+}
+.pergaminho-v {
+  background: var(--panel) url('/assets/img/pergaminho-rasgado-vert.png') no-repeat center/cover !important;
+  min-height: 82vh !important;
+}
+.pergaminho-h {
+  background: var(--panel) url('/assets/img/pergaminho-rasgado-horiz.png') no-repeat center/cover !important;
+  min-height: 82vh !important;
+}
+.pergaminho-h.fallback {
+  background: var(--panel) url('/assets/img/pergaminho-rasgado-vert.png') no-repeat center/cover !important;
+}
   
   
   
