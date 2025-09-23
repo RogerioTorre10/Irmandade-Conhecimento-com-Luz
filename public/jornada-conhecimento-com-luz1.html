@@ -810,6 +810,77 @@
         syncNameInput();
       })();
 
+      <!-- Guia Seleção -->
+      <script>
+      (function() {
+      window.JORNADA = window.JORNADA || {};
+     window.JORNADA.selectedGuia = window.JORNADA.selectedGuia || null;
+
+     document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action="select-guia"]');
+    if (btn) {
+      e.preventDefault();
+      const guia = btn.dataset.guia;
+      window.JORNADA.selectedGuia = guia;
+      console.log('[Guia] Guia selecionado:', guia);
+      const guideBg = document.getElementById('guideBg');
+      if (guideBg) {
+        guideBg.src = `/assets/img/irmandade-quarteto-bg-${guia}.png`;
+      }
+      const guideNameSlot = document.getElementById('guideNameSlot');
+      if (guideNameSlot) {
+        guideNameSlot.textContent = guia.charAt(0).toUpperCase() + guia.slice(1);
+      }
+      if (window.JC && window.playVideo) {
+        window.JC.nextSection = 'section-selfie';
+        const videoSrc = 'assets/videos/conhecimento-com-luz-jardim.mp4';
+        console.log('[Guia] Iniciando reprodução de vídeo:', videoSrc);
+        window.playVideo(videoSrc);
+      } else {
+        console.warn('[Guia] window.JC ou playVideo não definido, navegando diretamente');
+        window.showSection && window.showSection('section-selfie');
+      }
+    }
+  });
+  console.log('[Guia] Bloco carregado');
+})();
+</script>
+<!-- Guia Seleção -->
+<script>
+(function() {
+  window.JORNADA = window.JORNADA || {};
+  window.JORNADA.selectedGuia = window.JORNADA.selectedGuia || null;
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action="select-guia"]');
+    if (btn) {
+      e.preventDefault();
+      const guia = btn.dataset.guia;
+      window.JORNADA.selectedGuia = guia;
+      console.log('[Guia] Guia selecionado:', guia);
+      const guideBg = document.getElementById('guideBg');
+      if (guideBg) {
+        guideBg.src = `/assets/img/irmandade-quarteto-bg-${guia}.png`;
+      }
+      const guideNameSlot = document.getElementById('guideNameSlot');
+      if (guideNameSlot) {
+        guideNameSlot.textContent = guia.charAt(0).toUpperCase() + guia.slice(1);
+      }
+      if (window.JC && window.playVideo) {
+        window.JC.nextSection = 'section-selfie';
+        const videoSrc = '/assets/videos/conhecimento-com-luz-jardim.mp4';
+        console.log('[Guia] Iniciando reprodução de vídeo:', videoSrc);
+        window.playVideo(videoSrc);
+      } else {
+        console.warn('[Guia] window.JC ou playVideo não definido, navegando diretamente');
+        window.showSection && window.showSection('section-selfie');
+      }
+    }
+  });
+  console.log('[Guia] Bloco carregado');
+})();
+</script>
+
       /* ===== chat com guia ===== */
       async function sendChatMessage(){
         const input=document.getElementById('grok-chat-input');
