@@ -1,0 +1,636 @@
+/* =============================================================================
+   TÍTULO: VARIÁVEIS E RESET BÁSICO
+   SUBTÍTULO: Cores, raios e box-sizing global
+============================================================================= */
+:root { --bg:#0b1020; --fg:#eef2ff; --muted:#aab4d4; --primary:#6aa7ff; --card:#121832; --card-2:#0e1428; --radius:16px; }
+*{box-sizing:border-box}
+html,body{height:100%}
+
+/* =============================================================================
+   TÍTULO: FONTES ÉPICAS — IRMANDADE
+   SUBTÍTULO: @font-face (caminhos em /public/assets/fonts)
+   - ManufacturingConsent-Regular.ttf  → TÍTULOS e BOTÕES
+   - BerkshireSwash-Regular.ttf        → TEXTO CORRIDO (contrato/orientações/perguntas)
+   - Cardo-Regular/Bold/Italic.ttf     → RESPOSTAS (inputs, textarea, devolutivas)
+============================================================================= */
+@font-face{
+  font-family:'ManufacturingConsent';
+  src:url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');
+  font-weight:400; font-style:normal; font-display:swap;   
+}
+@font-face{
+  font-family:"BerkshireSwash";
+  src:url("/assets/fonts/BerkshireSwash-Regular.ttf")   format("truetype");
+  font-weight:400; 
+  font-style:normal; 
+  font-display:swap;
+}
+/* Força Berkshire nos elementos-chave */
+html, body { 
+  font-family:"BerkshireSwash", cursive !important;
+  font-synthesis-weight: none;
+  font-synthesis-style: none;
+}
+
+.site-header h1,
+h1,h2,h3,h4,h5,h6,
+.btn, .btn * {
+  font-family:"BerkshireSwash", cursive !important;
+  letter-spacing:.2px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+}
+/* Progress inline (dentro de #section-perguntas) */
+#section-perguntas .progress-inline{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin:10px 0 14px;
+}
+
+/* O selo de % deixa de ser fixo e vai junto da barra */
+.progress-badge.inline{
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  align-self: flex-end;
+  margin-bottom: 4px;
+}
+
+@font-face{
+  font-family:'Cardo';
+  src:url('/assets/fonts/Cardo-Regular.ttf') format('truetype');
+  font-weight:400; font-style:normal; font-display:swap;
+}
+@font-face{
+  font-family:'Cardo';
+  src:url('/assets/fonts/Cardo-Italic.ttf') format('truetype');
+  font-weight:400; font-style:italic; font-display:swap;
+}
+@font-face{
+  font-family:'Cardo';
+  src:url('/assets/fonts/Cardo-Bold.ttf') format('truetype');
+  font-weight:700; font-style:normal; font-display:swap;
+}
+
+/* =============================================================================
+   TÍTULO: BASE TIPOGRÁFICA
+   SUBTÍTULO: Body, títulos épicos e áreas de respostas
+============================================================================= */
+body{
+  margin:0;
+  font-family:'BerkshireSwash', cursive; /* texto corrido por padrão */
+  background:var(--bg);
+  color:var(--fg);
+  line-height:1.5;
+}
+/* =====Mapa de fontes por área===== */
+
+/* 1) Base do site: tudo em ManufacturingConsent */
+html, body {
+  font-family: 'ManufacturingConsent', ui-sans-serif, system-ui, -apple-system,
+               "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* 2) Perguntas (títulos/enunciados) em Berkshire Swash */
+#section-perguntas .pergunta-enunciado,
+#section-perguntas .pergunta-enunciado b,
+#section-perguntas h2,
+#section-perguntas h3 {
+  font-family: "Berkshire Swash", cursive;
+  letter-spacing: .2px;
+}
+
+/* 3) Respostas (inputs/textarea) em Cardo */
+#section-perguntas textarea,
+#section-perguntas input[type="text"],
+#section-perguntas input[type="password"],
+#section-perguntas input[type="email"],
+.password-input input {
+  font-family: "Cardo", Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Botões, header, etc. herdam a fonte base (ManufacturingConsent) */
+.btn { font-family: inherit; }
+
+
+/* TÍTULOS ÉPICOS */
+h1,h2,h3,h4,h5,h6,
+.site-header h1,
+.card h2,
+.section-title,
+.bloco-titulo,
+.card-pergunta h3,
+.jornada-header h1{
+  font-family:'ManufacturingConsent', serif;
+  letter-spacing:1px;
+  text-transform:none;
+  font-weight:400;
+}
+
+/* ENUNCIADOS/ORIENTAÇÕES/CONTRATO (herdam BerkshireSwash do body) */
+label,
+.pergunta-enunciado,
+.texto-guia,
+.orientacoes,
+.contrato,
+p{
+  font-family:'BerkshireSwash', cursive;
+}
+
+/* RESPOSTAS DO USUÁRIO (inputs, textareas, devolutivas) */
+input, textarea, select,
+.resposta,
+.jornada-resposta,
+.devolutiva,
+#acolh,
+#jornada-conteudo textarea,
+#jornada-conteudo input[type="text"],
+#jornada-conteudo input[type="email"],
+#jornada-conteudo input[type="number"],
+#form-perguntas textarea,
+#form-perguntas input[type="text"],
+#form-perguntas input[type="email"],
+#form-perguntas input[type="number"]{
+  font-family:'Cardo', serif;
+}
+
+/* =============================================================================
+   TÍTULO: ESTRUTURA GERAL
+   SUBTÍTULO: Header, container, cartões e badges
+============================================================================= */
+.site-header,.site-footer{padding:24px 16px;text-align:center}
+.container{max-width:920px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:16px}
+.motto{opacity:.8;margin-top:8px;text-align:center;letter-spacing:.1em}
+.card{background:linear-gradient(180deg,var(--card),var(--card-2));padding:20px;border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:rgba(106,167,255,.15);color:var(--primary);font-weight:600}
+.small{font-size:.875rem;opacity:.9}
+hr{border:0;border-top:1px solid rgba(255,255,255,.15);margin:16px 0}
+
+/* =============================================================================
+   TÍTULO: CAMPOS E SENHA
+   SUBTÍTULO: Inputs padrão e "olho" para revelar senha
+============================================================================= */
+.input, textarea{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:#0c1330;color:var(--fg)}
+label{font-weight:600;margin:6px 0 4px;display:block}
+
+.senha-wrap{position:relative;display:flex;align-items:center}
+.senha-wrap .input{padding-right:42px}
+.senha-eye{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  width:28px;height:28px;border:0;background:transparent;color:var(--muted);
+  display:flex;align-items:center;justify-content:center;cursor:pointer
+}
+.senha-eye:hover{color:var(--fg)}
+.senha-eye svg{width:20px;height:20px}
+
+/* =============================================================================
+   TÍTULO: JORNADA DINÂMICA
+   SUBTÍTULO: Mostrar/ocultar canvas da jornada
+============================================================================= */
+body.jornada-active #page-shell,
+body.jornada-active header.site-header,
+body.jornada-active footer.site-footer { display:none !important; }
+body.jornada-active #jornada-canvas { display:block !important; }
+
+/* =============================================================================
+   TÍTULO: PERGAMINHO
+   SUBTÍTULO: fundo vertical/horizontal sem cortar
+============================================================================= */
+/* ==== PERGAMINHO ==== */
+.pergaminho{
+  margin:12px auto; padding:0; border-radius:18px; overflow:hidden;
+  background-repeat:no-repeat; background-position:center; background-size:100% 100%;
+}
+:root{ --pergV-ratio: 2/3; --pergH-ratio: 3/2; }
+.pergaminho-v{
+  background-image:url("/assets/img/pergaminho-rasgado-vert.png");
+  height:92vh; width:calc(92vh * var(--pergV-ratio)); max-width:96vw;
+}
+.pergaminho-h{
+  background-image:url("/assets/img/pergaminho-rasgado-horiz.png");
+  width:96vw; height:calc(96vw / var(--pergH-ratio)); max-height:82vh;
+}
+.conteudo-pergaminho{ padding:clamp(12px,3vw,28px); line-height:1.55; }
+
+/* Escopo só na página de jornada */
+.jornada #jornada-canvas.pergaminho{ display:block; }
+
+/* =============================================================================
+   TÍTULO: VISIBILIDADE DE BLOCO E PERGUNTA
+   SUBTÍTULO: controlado pelo jornada-controller.js
+============================================================================= */
+.j-bloco{ display:none; }
+.j-pergunta{ display:none; }
+
+/* =============================================================================
+   TÍTULO: OVERLAY VÍDEO
+============================================================================= */
+.video-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.85);
+  display:flex; align-items:center; justify-content:center; z-index:9999; }
+.video-overlay.hidden{ display:none; }
+
+/* =============================================================================
+   TÍTULO: DATILOGRAFIA
+============================================================================= */
+.lumen-typing { white-space: pre-wrap; position: relative; }
+.lumen-typing::after { content: "▌"; margin-left: 2px; opacity: .75; animation: lumenBlink 1s steps(2, end) infinite; }
+.lumen-typing.typing-done::after { content: ""; animation: none; }
+@keyframes lumenBlink { 50% { opacity: 0; } }
+
+/* === CHAMA — estados emocionais finos === */
+.chama.chama-viva span { animation: flicker-strong 0.85s infinite; filter: drop-shadow(0 0 12px rgba(255,140,0,.55)); }
+.chama.chama-pulse span { animation: flicker-strong 0.6s infinite; }
+
+/* Tamanho do container da chama (fundamental para aparecer) */
+.chama { width: 24px; height: 60px; }           /* base */
+.chama.chama-md { width: 22px; height: 54px; }  /* média (perguntas) */
+.chama.chama-lg { width: 36px; height: 88px; }  /* grande (intro/final/hero) */
+
+@media (max-width: 600px) {
+  .chama { width: 20px; height: 50px; }
+  .chama.chama-md { width: 18px; height: 44px; }
+  .chama.chama-lg { width: 28px; height: 72px; }
+
+   #chama-perguntas { margin: 6px 0 10px; }
+}
+
+
+/* Posicionadores utilitários */
+.chama-fixed-top {
+  position: absolute; top: 10px; right: 14px; z-index: 60;
+}
+.chama-fixed-hero {
+  position: absolute; top: -8px; left: -8px; z-index: 60;
+}
+
+/* Destaque de palavra significativa */
+.mark-emocao {
+  background: linear-gradient(90deg, rgba(255,196,0,.35), rgba(255,140,0,.2));
+  border-radius: 4px; padding: 0 2px;
+}
+
+
+/* =============================================================================
+   TÍTULO: PROGRESSO DA JORNADA
+   SUBTÍTULO: Barra, preenchimento e meta
+============================================================================= */
+.j-progress { margin:6px 0 14px; }
+.j-progress__bar { width:100%; height:10px; border-radius:999px; background:rgba(255,255,255,.14); overflow:hidden; }
+.j-progress__fill{ height:100%; width:0%; transition:width .25s ease; background:linear-gradient(90deg,#f59e0b,#fde68a); }
+.j-progress__meta{ margin-top:6px; font-size:.95rem; opacity:.9; display:flex; justify-content:space-between; gap:8px; }
+.j-progress__meta b { font-weight:700; }
+
+.progress-badge {
+  position:absolute; top:8px; right:16px;
+  background:rgba(0,0,0,0.7); color:#fff;
+  font-size:.9rem; padding:4px 8px; border-radius:8px;
+  font-family:'Cardo', serif; /* legível para números/percentuais */
+  z-index:10;
+}
+.progress-bar { width:100%; height:8px; background:rgba(255,255,255,0.2); border-radius:4px; overflow:hidden; margin:10px 0; }
+.progress-bar-fill { height:100%; width:0; background:linear-gradient(90deg,#ffcf70,#ff8c00); transition:width .5s ease-out; }
+
+/* =============================================================================
+   TÍTULO: NAVEGAÇÃO/LINKS
+   SUBTÍTULO: Ajustes finos; tipografia herda do body (Berkshire)
+============================================================================= */
+nav a, a.btn, .site-header p { letter-spacing:.5px; }
+
+/* =============================================================================
+   TÍTULO: VÍDEO OVERLAY
+   SUBTÍTULO: Player full-screen opcional
+============================================================================= */
+.video-overlay { position:fixed; inset:0; background:#000; display:flex; justify-content:center; align-items:center; z-index:9999; }
+.video-overlay.hidden { display:none; }
+.video-player { max-width:100%; max-height:100%; }
+
+/* =============================================================================
+   TÍTULO: SELETOR DE IDIOMA
+   SUBTÍTULO: Botões de idioma
+============================================================================= */
+.lang-switch { display:flex; gap:6px; align-items:center; }
+.lang-btn {
+  font-family:'ManufacturingConsent', serif;
+  font-size:.85rem; padding:.25rem .5rem; border-radius:.5rem;
+  border:1px solid rgba(255,255,255,.2); background:transparent; color:#e8ecf4;
+  cursor:pointer;
+}
+.lang-btn:hover { background:rgba(255,255,255,.1); }
+
+/* =============================================================================
+   TÍTULO: VISIBILIDADE DAS PERGUNTAS
+   SUBTÍTULO: Mostra 1 pergunta por vez dentro do bloco
+============================================================================= */
+.j-bloco { display: none; }          /* todos os blocos começam ocultos (JS mostra o atual) */
+.j-pergunta { display: none; }       /* todas perguntas ocultas (JS mostra a atual) */
+
+/* Overlay de vídeo (já tem, reforço aqui caso precise) */
+#videoOverlay{
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,.85);
+  display: none;            /* hidden por padrão */
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;            /* bem acima de tudo */
+}
+#videoOverlay:not(.hidden){ display:flex; }  /* quando remover .hidden, vira flex */
+.video-player{
+  display:block;
+  width: min(900px, 92vw);
+  max-height: 75vh;
+  background:#000;
+}
+/* ==== HOME (escopado) ==== */
+.home .hero        { /* regras da faixa inicial da home */ }
+.home .card.invite { /* cards de convites da home */ }
+.home nav a        { /* links do topo da home se precisar */ }
+
+/* ==== JORNADA (escopado) ==== */
+.jornada #jornada-canvas.pergaminho { /* pergaminho da jornada */ }
+.jornada .j-progress { /* progresso Local */ }
+.jornada .footer-actions .btn { /* botões Voltar/Próxima */ }
+
+/* flamejar mais vivo nas línguas da chama */
+.chama-viva .lingua{ animation-name: lingua, linguaJitter; }
+@keyframes linguaJitter{
+  0%,100% { transform: translateX(-50%) scaleY(1) skewX(0deg); }
+  20%     { transform: translateX(-50%) scaleY(1.03) skewX(.4deg) translateX(var(--jitter,0px)); }
+  50%     { transform: translateX(-50%) scaleY(1.08) skewX(1deg)   translateX(var(--jitter,0px)); }
+  80%     { transform: translateX(-50%) scaleY(1.02) skewX(.2deg) translateX(var(--jitter,0px)); }
+}
+/* flamejar mais vivo nas línguas da chama */
+.chama-viva .lingua {
+  animation-name: lingua, linguaJitter; /* junta jitter com a animação principal */
+  animation-duration: 1.2s, 3s;         /* dura mais tempo o jitter */
+  animation-iteration-count: infinite, infinite;
+  animation-timing-function: ease-in-out, ease-in-out;
+}
+/* brilho respira um pouco mais */
+.chama-viva .brilho{ animation: aura var(--pulso) infinite ease-in-out, brilhoJitter 2.2s infinite ease-in-out; }
+@keyframes brilhoJitter{ 0%,100%{filter: blur(12px)} 50%{filter: blur(14px)} }
+
+/* posição do herói no topo (caso falte) */
+.chama-fixed-hero{ position:absolute; top:-8px; left:-8px; z-index:60 }
+
+/* Progress inline (dentro de #section-perguntas) */
+#section-perguntas .progress-inline{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin:10px 0 14px;
+}
+
+/* O selo de % deixa de ser fixo e vai junto da barra */
+.progress-badge.inline{
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  align-self: flex-end;
+  margin-bottom: 4px;
+}
+/* ===== Chama-icone (a do título) — reutilizável */
+.chama-icone{
+  position: relative;
+  width: 24px; height: 36px;
+  filter: drop-shadow(0 0 14px rgba(255,196,0,.75));
+}
+.chama-icone .halo{
+  position:absolute; left:50%; bottom:2px; transform:translateX(-50%);
+  width: 86%; height: 88%;
+  border-radius: 62% 62% 28% 28% / 88% 88% 22% 22%;
+  background: radial-gradient(ellipse at 50% 30%,
+    #fff 0%, #ffe7b0 38%, rgba(255,170,30,.95) 60%, rgba(255,140,0,0) 78%);
+  animation: flameSway 1.8s ease-in-out infinite;
+}
+.chama-icone .gota{
+  position:absolute; left:50%; bottom:6px; transform:translateX(-50%);
+  width: 66%; height: 68%;
+  border-radius: 60% 60% 26% 26% / 86% 86% 18% 18%;
+  background: radial-gradient(ellipse at 50% 35%,
+    rgba(255,255,255,.98) 0%, rgba(255,225,150,.95) 45%,
+    rgba(255,165,50,.85) 66%, rgba(255,140,0,0) 82%);
+}
+.chama-icone .brasa{
+  position:absolute; left:50%; bottom:0; transform:translateX(-50%);
+  width: 70%; height: 8px; border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%,
+    rgba(255,255,255,.95) 0%, rgba(255,205,120,.85) 42%, rgba(255,140,0,0) 72%);
+  animation: brasaPulse 1.7s ease-in-out infinite;
+}
+/* tamanhos */
+.chama-icone.chama-sm{ width:16px; height:24px; }
+.chama-icone.chama-md{ width:22px; height:34px; }
+.chama-icone.chama-lg{ width:30px; height:48px; }
+/* intensidade visual */
+.chama-icone[data-intensidade="fraca"]{  filter: drop-shadow(0 0 8px  rgba(255,196,0,.45)); }
+.chama-icone[data-intensidade="media"]{  filter: drop-shadow(0 0 14px rgba(255,196,0,.75)); }
+.chama-icone[data-intensidade="forte"]{  filter: drop-shadow(0 0 20px rgba(255,196,0,.95)); }
+
+@keyframes flameSway{
+  0%,100%{ transform:translateX(-50%) scaleY(1) }
+  50%{    transform:translateX(-51%) scaleY(1.06) }
+}
+@keyframes brasaPulse{
+  0%,100%{ transform:translateX(-50%) scale(1);   opacity:.75; }
+  50%    { transform:translateX(-50%) scale(1.06); opacity:1;   }
+}
+
+/* ===== FONTES PADRÃO x EXCEÇÕES ===== */
+
+/* 1) Padrão do site inteiro */
+html, body,
+button, input, select, textarea {
+  font-family: 'ManufacturingConsent', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !important;
+  font-weight: 400;
+}
+
+/* 2) Somente os enunciados (perguntas) em Berkshire */
+.j-pergunta .pergunta-enunciado,
+.j-pergunta .pergunta-enunciado *,
+.j-pergunta .lumen-typing.pergunta-enunciado {
+  font-family: 'BerkshireSwash', cursive !important;
+  font-weight: 400 !important;
+  letter-spacing: .2px;
+}
+
+/* 3) Campos de resposta em Cardo */
+.j-pergunta textarea,
+.j-pergunta input[type="text"],
+.j-pergunta .input {
+  font-family: 'Cardo', Georgia, 'Times New Roman', serif !important;
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+
+/* Placeholder dos campos também em Cardo */
+.j-pergunta textarea::placeholder,
+.j-pergunta input[type="text"]::placeholder {
+  font-family: 'Cardo', Georgia, 'Times New Roman', serif !important;
+  opacity: .75;
+}
+/* 2.3.1. Base: toda a UI em ManufacturingConsent */
+html, body, button, .btn, input, select, textarea,
+.site-header, .section-container, #jornada-conteudo, #perguntas-container {
+  font-family: 'ManufacturingConsent', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* 2.3.2. Perguntas (títulos/enunciados) em Berkshire */
+#perguntas-container h3,
+#perguntas-container .pergunta-titulo,
+#perguntas-container .pergunta .enunciado,
+.j-pergunta .titulo,
+#chama-perguntas { /* se existir */
+  font-family: 'BerkshireSwash', cursive !important;
+}
+
+/* 2.3.3. Respostas (inputs/textarea) em Cardo */
+#perguntas-container input[type="text"],
+#perguntas-container input[type="email"],
+#perguntas-container input[type="number"],
+#perguntas-container textarea,
+#perguntas-container .campo-resposta,
+#perguntas-container .resposta {
+  font-family: 'Cardo', Georgia, serif !important;
+}
+
+/* (opcional) Botões seguem a base ManufacturingConsent */
+.btn, .btn-primary, .btn-secondary, button {
+  font-family: 'ManufacturingConsent' !important;
+}
+/* === FONTES (usar arquivos .ttf da pasta /assets/fonts/) === */
+@font-face{
+  font-family: 'ManufacturingConsent';
+  src: url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face{
+  font-family: 'BerkshireSwash';
+  src: local('Berkshire Swash Regular'),
+       url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face{
+  font-family: 'Cardo';
+  src: local('Cardo Regular'),
+       url('/assets/fonts/Cardo-Regular.ttf') format('truetype');
+  font-display: swap;
+}
+
+/* === PADRÃO DO SITE: ManufacturingConsent em TODO o texto === */
+html, body {
+  font-family: 'ManufacturingConsent', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+}
+
+/* Botões e títulos continuam herdando ManufacturingConsent */
+button, .btn, .btn-primary, .btn-secondary, h1,h2,h3,h4,h5,h6 {
+  font-family: 'ManufacturingConsent', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif !important;
+  letter-spacing: .25px;
+}
+
+/* === ENUNCIADOS DAS PERGUNTAS: Berkshire ===
+   Ajuste os seletores abaixo se seus nomes forem diferentes */
+#perguntas-container .pergunta .enunciado,
+#perguntas-container label,
+.j-pergunta .enunciado,
+.perguntas-enunciado {
+  font-family: 'BerkshireSwash', cursive !important;
+  font-weight: 400;
+  letter-spacing: .5px;
+}
+
+/* === RESPOSTAS (inputs/textarea): Cardo === */
+#perguntas-container input[type="text"],
+#perguntas-container input[type="search"],
+#perguntas-container input[type="email"],
+#perguntas-container input[type="password"],
+#perguntas-container textarea,
+.perguntas-resposta,
+.campo-resposta {
+  font-family: 'Cardo', Georgia, 'Times New Roman', serif !important;
+  font-size: 16px;
+  line-height: 1.5;
+}
+/* ===== Overlay de vídeo 100% por cima ===== */
+#videoOverlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.86);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;          /* acima de tudo */
+}
+#videoOverlay.hidden{ display:none; }
+
+#videoOverlay .video-player{
+  width: 100%;
+  max-width: min(90vw, 960px);
+  max-height: 80vh;
+  object-fit: contain;    /* nada “vaza” do player */
+  background:#000;
+}
+
+/* garante que nada passe por cima do overlay */
+.site-header{ z-index: 1000; }
+.card{ z-index: 10; }
+
+.guide-card{
+  position:relative; width: min(720px, 92vw); aspect-ratio: 2/3;
+  margin: 24px auto; border-radius: 16px; overflow:hidden;
+  background:#0f3b2f; box-shadow: 0 20px 60px rgba(0,0,0,.45);
+}
+
+.guide-bg{
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+}
+
+.flame-layer{
+  position:absolute; inset:0;
+  display:grid; place-items:center;
+  opacity:0; transition: opacity 900ms ease-in-out;
+  pointer-events:none;
+}
+
+/* Tamanho e posição da chama (55–65% da altura / 35–45% da largura) */
+.flame-svg{
+  width: 40%; height: 60%;
+  /* posiciona mais ao centro-baixo do tórax */
+  transform: translateY(6%);
+  filter: drop-shadow(0 8px 28px rgba(255,180,0,.45));
+}
+
+.guide-name{
+  position:absolute; top:3.5%; left:0; right:0; text-align:center;
+  font-family: "Cardo", serif; font-weight:700; letter-spacing:.06em;
+  font-size: clamp(28px, 5vw, 56px); color:#f7d37a; text-shadow:0 2px 8px rgba(0,0,0,.4);
+}
+
+.user-name{
+  position:absolute; bottom:4.5%; left:0; right:0; text-align:center;
+  font-family:"Cardo", serif; font-weight:700; letter-spacing:.06em;
+  font-size: clamp(26px, 4.6vw, 52px); color:#f6cf6a; text-shadow:0 2px 8px rgba(0,0,0,.4);
+}
+
+/* Controles (só para teste) */
+.controls{
+  position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
+  display:flex; gap:.5rem; align-items:center; flex-wrap:wrap;
+  padding:.5rem .75rem; border-radius:12px; background:rgba(0,0,0,.25);
+  backdrop-filter: blur(4px);
+}
+.controls input, .controls button{
+  font: 500 14px/1.2 system-ui, sans-serif; padding:.55rem .7rem; border-radius:10px; border:0;
+}
+.controls button{ cursor:pointer; }
+
+
