@@ -468,9 +468,9 @@
   <!-- Toast -->
   <div id="toast" role="status" aria-live="polite" class="hidden"></div>
 
+                 <!-- util: toast + erro global -->
   <script>
-    (function(){
-      /* ===== util: toast + erro global ===== */
+    (function(){   
       function toast(msg){
         try{
           const t=document.getElementById('toast'); if(!t) return;
@@ -482,13 +482,13 @@
         console.error('[Erro global]',e?.error||e);
         toast('Ops… algo falhou, mas já seguimos em frente.');
       });      
-      /* ===== env tag ===== */
+                   <!-- env tag  -->
       const env=document.getElementById('envTag');
       if(env) env.textContent=`layout=${document.body.dataset.layout||'master'} · journey=${document.body.dataset.journey||'essencial'} · path=/assets`;
      </script>
   
-      <script>
-      /* ===== datilografia ===== */
+                  <!-- datilografia -->
+      <script>     
       function typeWriter(el, text, speed, showCursor){
         if(!el) return;
         el.textContent='';
@@ -514,9 +514,9 @@
         });
       }
      </script>
-        
-     <script>
-      /* ===== datilografia no placeholder e respostas ===== */
+  
+         <!-- datilografia no placeholder e respostas -->
+     <script>   
       let __abortTypingPlaceholder=null;
       async function typePlaceholder(inp, text, speed=22){
         if(!inp) return;
@@ -554,9 +554,9 @@
         div.classList.add('typing-done');
       }
    </script>
-
-  <script>
-      /* ===== chamas ===== */
+  
+                <!-- chamas -->
+  <script>      
       function makeFlame(cls){
         const d=document.createElement('div');
         d.className=(cls||'chama-vela chama-md');
@@ -617,8 +617,8 @@
       }
   </script>
 
-  <script>
-      /* ===== selfie ===== */
+                  <!-- selfie -->
+  <script>     
       (function(){
         const $=s=>document.querySelector(s);
         const card=$("#card-guide");
@@ -1027,9 +1027,9 @@
         }
       }
      </script>
-
-    <script>
-      /* ===== progresso & storage ===== */
+  
+               <!-- progresso & storage -->
+    <script>      
       function updateProgress(){
         const perguntas=document.querySelectorAll('.j-pergunta');
         const respondidas=Array.from(perguntas).filter(p=> (p.querySelector('textarea')?.value.trim()||'')!=='').length;
@@ -1184,9 +1184,9 @@
   console.log('[showSection] Bloco carregado');
 })();
 </script>
-
-     <script>
-      /* ===== blocos dinâmicos ===== */
+  
+                  <!-- blocos dinâmicos -->
+     <script>      
       window.loadDynamicBlocks=function(){
         const content=document.getElementById('perguntas-container');
         if(!content) return;
@@ -1251,8 +1251,8 @@
       })();
      </script>
   
-     <script>
-      /* ===== controles ===== */
+                   <!--  controles -->
+     <script>      
       function analyzeSentiment(text){
         const POS={'feliz':2,'alegria':2,'amor':3,'sucesso':2,'esperança':3,'paz':2,'fé':3,'gratidão':2,'vitória':3,'superação':3,'luz':2,'deus':3,'coragem':2,'força':2,'confiança':2,'propósito':3};
         const NEG={'triste':-2,'dor':-3,'raiva':-2,'medo':-2,'frustracao':-2,'frustração':-2,'decepcao':-2,'decepção':-2,'perda':-3,'culpa':-2,'ansiedade':-2,'solidao':-2,'solidão':-2,'desespero':-3,'cansaco':-2,'cansaço':-2,'fracasso':-2,'trauma':-3,'duvida':-2,'dúvida':-2};
@@ -1464,9 +1464,9 @@
         }
         window.playTransition=playTransition;
       </script>
-
-      <script>
-        /* ===== controle de orientação de vídeo ===== */
+  
+                   <!-- controle de orientação de vídeo -->
+      <script>       
         function lockVideoOrientation(){
           const video=document.getElementById('videoTransicao');
           if(!video) return;
@@ -1531,9 +1531,9 @@
           updateProgress();
         }
        </script>
-
-       <script>
-        /* ===== Acessibilidade: Microfone e Áudio ===== */
+  
+                 <!-- Acessibilidade: Microfone e Áudio -->
+       <script>       
         let recognition=null;
         let currentLang='pt-BR';
         let isRecognizing=false;
@@ -1680,9 +1680,9 @@
           });
         }
      </script>
-
-     <script>
-        /* vídeos & blocos */
+  
+                    <!-- vídeos & blocos -->
+     <script>      
         const VIDEO_BASE='/assets/img/';
         window.JORNADA_VIDEOS={
           intro:VIDEO_BASE+'filme-0-ao-encontro-da-jornada.mp4',
