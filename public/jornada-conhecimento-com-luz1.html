@@ -1492,6 +1492,19 @@
         console.warn('[Seções] Seção #', sectionId, 'não encontrada');
         return;
       }
+      function showSection(sectionId) {
+      document.querySelectorAll('.section').forEach(section => {
+      section.style.display = section.id === sectionId ? 'block' : 'none';
+     });
+      window.i18n?.apply?.(document.querySelector(`#${sectionId}`));
+     }
+
+     document.querySelectorAll('.btn-avancar').forEach(button => {
+     button.addEventListener('click', () => {
+     const nextSection = button.dataset.next;
+     if (nextSection) showSection(nextSection);
+    });
+   });
 
       updateCanvasBackground(sectionId);
 
