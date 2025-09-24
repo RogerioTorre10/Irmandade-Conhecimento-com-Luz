@@ -1,4 +1,4 @@
-/* /assets/js/i18n/i18n.js  —  i18n simples com JSON por idioma
+/* /assets/js/i18n.js  —  i18n simples com JSON por idioma
    Uso:
    - Marque textos com data-i18n="chave"
    - Placeholders com data-i18n-placeholder="chave"
@@ -14,7 +14,7 @@
     set(v) { localStorage.setItem(STORAGE_KEY, v); }
   };
 
-  const I18N = {
+  const i18n = {
     lang: DEFAULT,
     dict: {},
     ready: false,
@@ -77,6 +77,6 @@
     }
   };
 
-  window.I18N = I18N;
-  document.addEventListener("DOMContentLoaded", () => I18N.init());
+  window.i18n = i18n;
+  document.addEventListener("DOMContentLoaded", () => i18n.init());
 })();
