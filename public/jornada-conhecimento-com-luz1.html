@@ -2345,6 +2345,7 @@
   }
 }
     function initJornada() {
+      console.log('[InitJornada] Inicializando eventos');
       let isProcessingClick = false;
 
       document.addEventListener('input', (ev) => {
@@ -2684,6 +2685,9 @@
           if (window.showSection) {
             window.showSection('section-intro');
             console.log('[Boot] showSection chamado para section-intro');
+            setTimeout(() => {
+            window.showSection('section-perguntas');
+            }, 5000); // Exemplo: avança após 5s para test
           } else {
             console.warn('[Boot] window.showSection não definido');
           }
