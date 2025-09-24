@@ -511,69 +511,8 @@
       const env=document.getElementById('envTag');
       if(env) env.textContent=`layout=${document.body.dataset.layout||'master'} · journey=${document.body.dataset.journey||'essencial'} · path=/assets`;
     }
-      </script> 
-               
-         <!-- datilografia no placeholder e respostas -->
-<script>
-  (function() {
-    let __abortTypingPlaceholder = null;
-
-    async function typePlaceholder(inp, text, speed = 22) {
-      if (!inp) {
-        console.warn('[TypePlaceholder] Input não encontrado');
-        return;
-      }
-      if (__abortTypingPlaceholder) __abortTypingPlaceholder();
-      let abort = false;
-      __abortTypingPlaceholder = () => (abort = true);
-      inp.placeholder = '';
-      const aria = document.getElementById('aria-pergunta');
-      if (aria) aria.textContent = text;
-      for (let i = 0; i <= text.length; i++) {
-        if (abort) break;
-        inp.placeholder = text.slice(0, i) + (i < text.length ? '▌' : '');
-        await new Promise(r => setTimeout(r, speed));
-      }
-      if (!abort) inp.placeholder = text;
-      console.log('[TypePlaceholder] Digitação concluída para:', inp);
-    }
-
-    async function typeAnswer(textarea, text, speed = 36) {
-      if (!textarea) {
-        console.warn('[TypeAnswer] Textarea não encontrado');
-        return;
-      }
-      textarea.value = '';
-      textarea.classList.add('lumen-typing');
-      for (let i = 0; i <= text.length; i++) {
-        textarea.value = text.slice(0, i);
-        await new Promise(r => setTimeout(r, speed));
-      }
-      textarea.classList.add('typing-done');
-      console.log('[TypeAnswer] Digitação concluída para:', textarea);
-    }
-
-    async function typeDevolutiva(div, text, speed = 36) {
-      if (!div) {
-        console.warn('[TypeDevolutiva] Div não encontrada');
-        return;
-      }
-      div.textContent = '';
-      div.classList.add('lumen-typing');
-      for (let i = 0; i <= text.length; i++) {
-        div.textContent = text.slice(0, i);
-        await new Promise(r => setTimeout(r, speed));
-      }
-      div.classList.add('typing-done');
-      console.log('[TypeDevolutiva] Digitação concluída para:', div);
-    }
-
-    // Expor funções globalmente para uso em outros scripts
-    window.typePlaceholder = typePlaceholder;
-    window.typeAnswer = typeAnswer;
-    window.typeDevolutiva = typeDevolutiva;
-  })();
-</script>
+      </script>              
+        
   
                 <!-- chamas -->
   <script>      
@@ -2504,36 +2443,36 @@
         {
           title: 'Bloco 1 — Raízes',
           questions: [
-            { label: window.I18N?.t('pergunta1', 'Quem é você hoje?') },
-            { label: window.I18N?.t('pergunta2', 'O que te trouxe até esta jornada?') },
-            { label: window.I18N?.t('pergunta3', 'Qual é o seu maior sonho espiritual?') }
+            { label: window.i18n?.t('pergunta1', 'Quem é você hoje?') },
+            { label: window.i18n?.t('pergunta2', 'O que te trouxe até esta jornada?') },
+            { label: window.i18n?.t('pergunta3', 'Qual é o seu maior sonho espiritual?') }
           ],
           video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
         },
         {
           title: 'Bloco 2 — Reflexões',
           questions: [
-            { label: window.I18N?.t('pergunta4', 'Quais são seus maiores desafios atuais?') },
-            { label: window.I18N?.t('pergunta5', 'Como você lida com o medo ou a dúvida?') },
-            { label: window.I18N?.t('pergunta6', 'O que a "luz" significa para você?') }
+            { label: window.i18n?.t('pergunta4', 'Quais são seus maiores desafios atuais?') },
+            { label: window.i18n?.t('pergunta5', 'Como você lida com o medo ou a dúvida?') },
+            { label: window.i18n?.t('pergunta6', 'O que a "luz" significa para você?') }
           ],
           video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
         },
         {
           title: 'Bloco 3 — Crescimento',
           questions: [
-            { label: window.I18N?.t('pergunta7', 'O que você quer mudar na sua vida?') },
-            { label: window.I18N?.t('pergunta8', 'Quem inspira você e por quê?') },
-            { label: window.I18N?.t('pergunta9', 'Como você pratica gratidão no dia a dia?') }
+            { label: window.i18n?.t('pergunta7', 'O que você quer mudar na sua vida?') },
+            { label: window.i18n?.t('pergunta8', 'Quem inspira você e por quê?') },
+            { label: window.i18n?.t('pergunta9', 'Como você pratica gratidão no dia a dia?') }
           ],
           video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4'
         },
         {
           title: 'Bloco 4 — Integração',
           questions: [
-            { label: window.I18N?.t('pergunta10', 'Qual lição você leva dessa jornada?') },
-            { label: window.I18N?.t('pergunta11', 'Como vai aplicar isso no futuro?') },
-            { label: window.I18N?.t('pergunta12', 'Uma mensagem para seu eu futuro.') }
+            { label: window.i18n?.t('pergunta10', 'Qual lição você leva dessa jornada?') },
+            { label: window.i18n?.t('pergunta11', 'Como vai aplicar isso no futuro?') },
+            { label: window.i18n?.t('pergunta12', 'Uma mensagem para seu eu futuro.') }
           ],
           video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
         }
@@ -2542,9 +2481,9 @@
         {
           title: 'Block 1 — Roots',
           questions: [
-            { label: window.I18N?.t('pergunta1', 'Who are you today?') },
-            { label: window.I18N?.t('pergunta2', 'What brought you to this journey?') },
-            { label: window.I18N?.t('pergunta3', 'What is your greatest spiritual dream?') }
+            { label: window.i18n?.t('pergunta1', 'Who are you today?') },
+            { label: window.i18n?.t('pergunta2', 'What brought you to this journey?') },
+            { label: window.i18n?.t('pergunta3', 'What is your greatest spiritual dream?') }
           ],
           video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
         },
@@ -2569,9 +2508,9 @@
         {
           title: 'Block 4 — Integration',
           questions: [
-            { label: window.I18N?.t('pergunta10', 'What lesson do you take from this journey?') },
-            { label: window.I18N?.t('pergunta11', 'How will you apply this in the future?') },
-            { label: window.I18N?.t('pergunta12', 'A message to your future self.') }
+            { label: window.i18n?.t('pergunta10', 'What lesson do you take from this journey?') },
+            { label: window.i18n?.t('pergunta11', 'How will you apply this in the future?') },
+            { label: window.i18n?.t('pergunta12', 'A message to your future self.') }
           ],
           video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
         }
@@ -2580,36 +2519,36 @@
         {
           title: 'Bloque 1 — Raíces',
           questions: [
-            { label: window.I18N?.t('pergunta1', '¿Quién eres hoy?') },
-            { label: window.I18N?.t('pergunta2', '¿Qué te trajo a este viaje?') },
-            { label: window.I18N?.t('pergunta3', '¿Cuál es tu mayor sueño espiritual?') }
+            { label: window.i18n?.t('pergunta1', '¿Quién eres hoy?') },
+            { label: window.i18n?.t('pergunta2', '¿Qué te trajo a este viaje?') },
+            { label: window.i18n?.t('pergunta3', '¿Cuál es tu mayor sueño espiritual?') }
           ],
           video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
         },
         {
           title: 'Bloque 2 — Reflexiones',
           questions: [
-            { label: window.I18N?.t('pergunta4', '¿Cuáles son tus mayores desafíos actuales?') },
-            { label: window.I18N?.t('pergunta5', '¿Cómo lidias con el miedo o la duda?') },
-            { label: window.I18N?.t('pergunta6', '¿Qué significa la "luz" para ti?') }
+            { label: window.i18n?.t('pergunta4', '¿Cuáles son tus mayores desafíos actuales?') },
+            { label: window.i18n?.t('pergunta5', '¿Cómo lidias con el miedo o la duda?') },
+            { label: window.i18n?.t('pergunta6', '¿Qué significa la "luz" para ti?') }
           ],
           video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
         },
         {
           title: 'Bloque 3 — Crecimiento',
           questions: [
-            { label: window.I18N?.t('pergunta7', '¿Qué quieres cambiar en tu vida?') },
-            { label: window.I18N?.t('pergunta8', '¿Quién te inspira y por qué?') },
-            { label: window.I18N?.t('pergunta9', '¿Cómo practicas la gratitud en el día a día?') }
+            { label: window.i18n?.t('pergunta7', '¿Qué quieres cambiar en tu vida?') },
+            { label: window.i18n?.t('pergunta8', '¿Quién te inspira y por qué?') },
+            { label: window.i18n?.t('pergunta9', '¿Cómo practicas la gratitud en el día a día?') }
           ],
           video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4'
         },
         {
           title: 'Bloque 4 — Integración',
           questions: [
-            { label: window.I18N?.t('pergunta10', '¿Qué lección te llevas de este viaje?') },
-            { label: window.I18N?.t('pergunta11', '¿Cómo lo aplicarás en el futuro?') },
-            { label: window.I18N?.t('pergunta12', 'Un mensaje para tu yo futuro.') }
+            { label: window.i18n?.t('pergunta10', '¿Qué lección te llevas de este viaje?') },
+            { label: window.i18n?.t('pergunta11', '¿Cómo lo aplicarás en el futuro?') },
+            { label: window.i18n?.t('pergunta12', 'Un mensaje para tu yo futuro.') }
           ],
           video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
         }
@@ -2617,7 +2556,7 @@
     };
 
     function updateBlocks() {
-      const currentLang = window.I18N?.lang || document.getElementById('language-select')?.value || 'pt-BR';
+      const currentLang = window.i18n?.lang || document.getElementById('language-select')?.value || 'pt-BR';
       window.JORNADA_BLOCKS = blockTranslations[currentLang] || blockTranslations['pt-BR'];
       console.log('[loadDynamicBlocks] Blocos atualizados para idioma:', currentLang);
     }
@@ -2742,7 +2681,7 @@
       updateBlocks();
       console.log('[Blocos] updateBlocks inicial chamado');
     } else {
-      console.warn('[Blocos] window.I18N.lang não definido, usando pt-BR');
+      console.warn('[Blocos] window.i18n.lang não definido, usando pt-BR');
       window.I18N?.setLang('pt-BR');
       updateBlocks();
     }
