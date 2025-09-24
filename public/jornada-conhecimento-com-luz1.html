@@ -2612,9 +2612,9 @@
                    data-cursor="true"></label>
             <textarea rows="4" class="input" placeholder="${window.I18N?.t('placeholder.resposta', 'Digite sua resposta...')}"></textarea>
             <div class="accessibility-controls">
-              <button class="btn-mic" data-action="start-mic">🎤 ${window.I18N?.t('botao.falar', 'Falar Resposta')}</button>
-              <button class="btn-audio" data-action="read-question">🔊 ${window.I18N?.t('botao.ler', 'Ler Pergunta')}</button>
-              <button class="btn btn-avancar" data-action="avancar">${window.I18N?.t('botao.avancar', 'Avançar')}</button>
+              <button class="btn-mic" data-action="start-mic">🎤 ${window.i18n?.t('botao.falar', 'Falar Resposta')}</button>
+              <button class="btn-audio" data-action="read-question">🔊 ${window.i18n?.t('botao.ler', 'Ler Pergunta')}</button>
+              <button class="btn btn-avancar" data-action="avancar">${window.i18n?.t('botao.avancar', 'Avançar')}</button>
             </div>
           `;
           bloco.appendChild(div);
@@ -2677,7 +2677,7 @@
     });
 
     // Inicializar blocos com idioma padrão
-    if (window.I18N?.lang) {
+    if (window.i18n?.lang) {
       updateBlocks();
       console.log('[Blocos] updateBlocks inicial chamado');
     } else {
