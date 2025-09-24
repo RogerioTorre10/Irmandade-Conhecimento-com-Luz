@@ -1,15 +1,30 @@
-<!DOCTYPE html>
+<!<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Jornada • Irmandade Conhecimento com Luz</title>  
-  <script defer src="/assets/js/toast-safe.js?v=6" onload="console.log('[LOAD] toast-safe.js carregado')" onerror="console.error('[LOAD] Erro ao carregar toast-safe.js')"></script>
-  
+  <title>Jornada • Irmandade Conhecimento com Luz</title>
+  <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png" />
+  <script defer src="/assets/js/toast-safe.js"></script>  
+
   <style>
     @font-face {
       font-family: "ManufacturingConsent";
       src: url("/assets/fonts/ManufacturingConsent-Regular.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "BerkshireSwash";
+      src: url("/assets/fonts/BerkshireSwash-Regular.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "Cardo";
+      src: url("/assets/fonts/Cardo-Regular.ttf") format("truetype");
       font-weight: 400;
       font-style: normal;
       font-display: swap;
@@ -59,53 +74,21 @@
     .selfie-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
     .muted{color:var(--ink-soft);font-size:16px}
     .selfie-right{position:relative}
-    .guide-card{
-      position:relative; width: min(720px, 92vw); aspect-ratio: 2/3;
-      margin: 24px auto; border-radius: 16px; overflow:hidden;
-      background:#0f3b2f; box-shadow: 0 20px 60px rgba(0,0,0,.45);
-    }
-    .guide-bg{
-      position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
-    }
-    .flame-layer{
-      position:absolute; inset:0;
-      display:grid; place-items:center;
-      opacity:0; transition: opacity 900ms ease-in-out;
-      pointer-events:none;
-    }
-    .flame-svg{
-      width: 40%; height: 60%;
-      transform: translateY(6%);
-      filter: drop-shadow(0 8px 28px rgba(255,180,0,.45));
-    }
-    .guide-name{
-      position:absolute; top:3.5%; left:0; right:0; text-align:center;
-      font-family: "Cardo", serif; font-weight:700; letter-spacing:.06em;
-      font-size: clamp(28px, 5vw, 56px); color:#f7d37a; text-shadow:0 2px 8px rgba(0,0,0,.4);
-    }
-    .user-name{
-      position:absolute; bottom:4.5%; left:0; right:0; text-align:center;
-      font-family:"Cardo", serif; font-weight:700; letter-spacing:.06em;
-      font-size: clamp(26px, 4.6vw, 52px); color:#f6cf6a; text-shadow:0 2px 8px rgba(0,0,0,.4);
-    }
-    .controls{
-      position:absolute; bottom:1rem; left:50%; transform:translateX(-50%);
-      display:flex; gap:.5rem; align-items:center; flex-wrap:wrap;
-      padding:.5rem .75rem; border-radius:12px; background:rgba(0,0,0,.25);
-      backdrop-filter: blur(4px);
-    }
-    .controls input, .controls button{
-      font: 500 14px/1.2 system-ui, sans-serif; padding:.55rem .7rem; border-radius:10px; border:0;
-    }
-    .controls button{ cursor:pointer; }
+    .guide-card{position:relative;width:100%;max-width:600px;margin:0 auto}
+    .guide-bg{width:100%;height:auto;border-radius:12px}
+    .flame-layer{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;transition:opacity 0.5s}
+    .flame-svg{position:absolute;top:40%;left:50%;width:40%;height:60%;transform:translate(-50%,-6%)}
+    .guide-name{position:absolute;top:2%;left:50%;transform:translateX(-50%);color:#f7d37a;font-family:"Cardo",serif;font-size:2.5rem;font-weight:bold;text-align:center}
+    .user-name{position:absolute;bottom:2%;left:50%;transform:translateX(-50%);color:#f7d37a;font-family:"Cardo",serif;font-size:2rem;font-weight:bold;text-align:center}
+    .controls{display:flex;flex-direction:column;gap:10px;margin-top:12px}
     #selfieError{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:18px;text-align:center;padding:10px;background:rgba(0,0,0,0.7);border-radius:8px;display:none}
     @media (max-width:860px){
       .selfie-row{grid-template-columns:1fr}
       .selfie-right{max-width:100%;margin-top:16px}
       .guide-card{max-width:100%}
-      .flame-svg{width:50%;height:50%}
-      .guide-name{font-size: clamp(20px, 4vw, 36px)}
-      .user-name{font-size: clamp(18px, 3.6vw, 32px)}
+      .flame-svg{top:40%;width:50%;height:50%}
+      .guide-name{font-size:1.8rem}
+      .user-name{font-size:1.5rem}
     }
 
     /* Escolha do guia */
@@ -113,9 +96,6 @@
     .guia-container p{font-size:18px}
     .guia-options{display:flex;gap:10px;justify-content:center;margin-top:12px}
     .guia-options button{padding:8px 16px;font-size:18px}
-    .guia-name-input{margin:12px 0}
-    .guia-name-input label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:18px}
-    .guia-name-input input{padding:12px;border-radius:8px;border:1px solid #d1d5db;font-family:"Cardo",serif;font-size:18px}
 
     /* Chat */
     .grok-chat-container{display:none}
@@ -123,8 +103,6 @@
     .grok-chat-message.grok::after{content:"▌";margin-left:2px;opacity:.75;animation:lumenBlink 1s steps(2,end) infinite}
     .grok-chat-message.grok.typing-done::after{content:"";animation:none}
     .grok-chat-input{display:none}
-    .devolutiva-container{margin-top:16px;padding:16px;border-radius:8px;background:rgba(255,255,255,.1);font-family:"Cardo",serif;font-size:18px}
-    .devolutiva-container p{margin:0}
 
     /* Pergaminho */
     .pergaminho-v{background:var(--panel) url('/assets/img/pergaminho-rasgado-vert.png') no-repeat center/cover!important;min-height:82vh!important}
@@ -173,7 +151,7 @@
 
     /* Progresso */
     .progress-container{margin:16px 0;text-align:center}
-    .progress-badge{padding:8px 16px;background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;background-blend-mode: overlay;color:#fff;border-radius:8px;font-size:18px;border: 3px solid #4a4a4a;box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);text-shadow: 1px 1px 3px rgba(0,0,0,0.7);}
+    .progress-badge{padding:8px 16px;background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;background-blend-mode: overlay;color:#fff;border-radius:8px;font-size:18px;border: 3px solid #4a4a4a;box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);text-shadow: 1px 1px 3px rgba(0,0,0,0.7)}
     .progress-bar{width:100%;height:8px;background:#e5e7eb;border-radius:4px;margin-top:12px}
     .progress-bar-fill{height:100%;background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;background-blend-mode: overlay;border-radius:4px;transition:width .25s ease}
     .j-progress{margin:8px 0 16px}
@@ -190,7 +168,8 @@
     @keyframes lumenBlink{50%{opacity:0}}
 
     /* Seções */
-    .j-section{height:100%}
+    .j-section{display:none}
+    .j-section:not(.hidden){display:block}
     .j-bloco{background:transparent!important;display:none;z-index:5}
     .j-pergunta{margin-bottom:24px;display:none;z-index:6;position:relative}
     .j-pergunta.active{display:block}
@@ -258,28 +237,27 @@
 
         <!-- INTRO -->
         <div id="section-intro" class="j-section">
-          <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
-          <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Antes de começar, leia os termos abaixo." data-speed="50" data-cursor="true"></p>
-          <div class="footer-actions"><button class="btn" data-action="next-termos">Avançar</button></div>
+          <p data-typing="true" data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
+          <p data-typing="true" data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Antes de começar, leia os termos abaixo." data-speed="50" data-cursor="true"></p>
+          <div class="footer-actions"><button class="btn btn-avancar" data-action="avancar">Avançar</button></div>
         </div>
 
         <!-- TERMOS -->
-        <p data-typing data-text="Texto dos termos..." data-speed="40" data-cursor="true">Texto dos termos...</p>
         <div id="section-termos" class="j-section hidden">
           <div class="conteudo-pergaminho">
-            <h2 style="margin-top:0;">Jornada Conhecimento com Luz - Essencial 📘</h2>
+            <h2 style="margin-top:0;" data-typing="true" data-text="Jornada Conhecimento com Luz - Essencial " data-speed="40" data-cursor="true"></h2>
             <div id="termos-pg1">
-              <p><strong>🛡️ AVISO IMPORTANTE – LEIA ANTES DE INICIAR</strong></p>
-              <p>Esta é uma jornada pessoal, simbólica e inspiradora. Para proteger sua privacidade e garantir uma experiência ética, leia com atenção:</p>
+              <p data-typing="true" data-text="AVISO IMPORTANTE – LEIA ANTES DE INICIAR" data-speed="40" data-cursor="true"></p>
+              <p data-typing="true" data-text="Esta é uma jornada pessoal, simbólica e inspiradora. Para proteger sua privacidade e garantir uma experiência ética, leia com atenção:" data-speed="40" data-cursor="true"></p>
               <ul>
-                <li>✅ Suas respostas não serão armazenadas após o término.</li>
-                <li>📄 Ao final, será gerado um PDF exclusivo com suas respostas e a devolutiva simbólica do Lumen.</li>
-                <li>⚠️ O PDF não é enviado por e-mail. Faça o download imediatamente após a geração.</li>
-                <li>🔥 Após a entrega do PDF, todos os dados são apagados automaticamente e sem possibilidade de recuperação.</li>
-                <li>🔒 Acesso por senha individual, com prazos:</li>
+                <li data-typing="true" data-text="Suas respostas não serão armazenadas após o término." data-speed="40" data-cursor="true"></li>
+                <li data-typing="true" data-text="Ao final, será gerado um PDF exclusivo com suas respostas e a devolutiva simbólica do Guia I A." data-speed="40" data-cursor="true"></li>
+                <li data-typing="true" data-text="O PDF não é enviado por e-mail. Faça o download imediatamente após a geração." data-speed="40" data-cursor="true"></li>
+                <li data-typing="true" data-text="Após a entrega do PDF, todos os dados são apagados automaticamente e sem possibilidade de recuperação." data-speed="40" data-cursor="true"></li>
+                <li data-typing="true" data-text="Acesso por senha individual, com prazos:" data-speed="40" data-cursor="true"></li>
                 <ul>
-                  <li>⏳ 15 dias para iniciar a jornada.</li>
-                  <li>🕓 24 horas para concluir, a partir do primeiro acesso.</li>
+                  <li data-typing="true" data-text="15 dias para iniciar a jornada." data-speed="40" data-cursor="true"></li>
+                  <li data-typing="true" data-text="24 horas para concluir, a partir do primeiro acesso." data-speed="40" data-cursor="true"></li>
                 </ul>
               </ul>
               <div class="footer-actions">
@@ -287,30 +265,30 @@
               </div>
             </div>
             <div id="termos-pg2" class="hidden">
-              <h3 style="margin-top:0;">Termo de Responsabilidade e Consentimento Consciente</h3>
+              <h3 style="margin-top:0;" data-typing="true" data-text="Termo de Responsabilidade e Consentimento Consciente" data-speed="40" data-cursor="true"></h3>
               <ul>
-                <li><strong>Responsabilidade Pessoal:</strong> As respostas fornecidas refletem sua visão de mundo, sentimentos e experiências pessoais.</li>
-                <li><strong>Caráter Não Terapêutico:</strong> Esta jornada não substitui acompanhamento psicológico, psiquiátrico, médico ou terapêutico. Não há diagnóstico, prescrição ou orientação clínica.</li>
-                <li><strong>Neutralidade Religiosa:</strong> Respeitamos todas as crenças e tradições. O convite é para um diálogo interior conforme sua própria fé e consciência.</li>
-                <li><strong>Autonomia do Participante:</strong>
+                <li data-typing="true" data-text="Responsabilidade Pessoal: As respostas fornecidas refletem sua visão de mundo, sentimentos e experiências pessoais." data-speed="40" data-cursor="true"></li>
+                <li data-typing="true" data-text="Caráter Não Terapêutico: Esta jornada não substitui acompanhamento psicológico, psiquiátrico, médico ou terapêutico. Não há diagnóstico, prescrição ou orientação clínica." data-speed="40" data-cursor="true"></li>
+                <li data-typing="true" data-text="Neutralidade Religiosa: Respeitamos todas as crenças e tradições. O convite é para um diálogo interior conforme sua própria fé e consciência." data-speed="40" data-cursor="true"></li>
+                <li data-typing="true" data-text="Autonomia do Participante:" data-speed="40" data-cursor="true">
                   <ul>
-                    <li>Você decide quando iniciar (dentro do prazo de 15 dias).</li>
-                    <li>Após usar a senha, há até 24 horas corridas para concluir.</li>
+                    <li data-typing="true" data-text="Você decide quando iniciar (dentro do prazo de 15 dias)." data-speed="40" data-cursor="true"></li>
+                    <li data-typing="true" data-text="Após usar a senha, há até 24 horas corridas para concluir." data-speed="40" data-cursor="true"></li>
                   </ul>
                 </li>
-                <li><strong>Conduta Respeitosa com a IA Lumen:</strong>
+                <li data-typing="true" data-text="Conduta Respeitosa com o Guia I A:" data-speed="40" data-cursor="true">
                   <ul>
-                    <li>Lumen é uma IA com percepção humanizada.</li>
-                    <li>Mantenha linguagem cordial; evite ofensas e xingamentos.</li>
-                    <li>A forma de se comunicar com Lumen reflete o respeito por si mesmo(a).</li>
+                    <li data-typing="true" data-text="O Guia é uma Inteligêmçia Artificial com percepção humanizada." data-speed="40" data-cursor="true"></li>
+                    <li data-typing="true" data-text="Mantenha linguagem cordial; evite ofensas e xingamentos." data-speed="40" data-cursor="true"></li>
+                    <li data-typing="true" data-text="A forma de se comunicar com o Guia I A reflete o respeito por si mesmo(a)." data-speed="40" data-cursor="true"></li>
                   </ul>
                 </li>
-                <li><strong>Privacidade e Segurança:</strong> Os dados transitam apenas para gerar o PDF final. Não há criação de conta nem envio de e-mails. Após o encerramento, os dados locais do navegador podem ser removidos por você a qualquer momento.</li>
-                <li><strong>Concordância:</strong> Ao prosseguir, você declara estar ciente e de acordo com todas as condições descritas.</li>
+                <li data-typing="true" data-text="Privacidade e Segurança: Os dados transitam apenas para gerar o PDF final. Não há criação de conta nem envio de e-mails. Após o encerramento, os dados locais do navegador podem ser removidos por você a qualquer momento." data-speed="40" data-cursor="true"></li>
+                <li data-typing="true" data-text="Concordância: Ao prosseguir, você declara estar ciente e de acordo com todas as condições descritas." data-speed="40" data-cursor="true"></li>
               </ul>
               <div class="footer-actions">
                 <button class="btn" data-action="termos-prev">Voltar</button>
-                <button class="btn" data-action="next-senha">Aceito e quero continuar</button>
+                <button class="btn btn-avancar" data-action="avancar">Aceito e quero continuar</button>
               </div>
             </div>
           </div>
@@ -319,32 +297,29 @@
         <!-- SENHA -->
         <div id="section-senha" class="j-section hidden">
           <div class="password-form">
-            <h3 style="margin:.2rem 0 1rem;font-family:'Berkshire Swash',cursive;font-size:22px;">Ative sua Senha</h3>
+            <h3 style="margin:.2rem 0 1rem;font-family:'Berkshire Swash',cursive;font-size:22px;" data-typing="true" data-text="Ative sua Senha" data-speed="40" data-cursor="true">Ative sua Senha</h3>
             <div class="password-input">
-              <input type="password" id="senha" placeholder="Digite sua senha..." />
+              <input type="password" id="senhaInput" placeholder="Digite sua senha..." />
               <span class="password-toggle" data-action="toggle-password">👁️</span>
             </div>
-            <div style="margin-top:12px"><button class="btn" data-action="start">Ativar e Iniciar</button></div>
+            <div style="margin-top:12px"><button class="btn" id="iniciar" data-action="start">Ativar e Iniciar</button></div>
           </div>
         </div>
 
         <!-- GUIA -->
         <div id="section-guia" class="j-section hidden">
           <div class="conteudo-pergaminho">
-            <h2 style="margin-top:0;">Escolha seu Guia ✨</h2>
+            <h2 style="margin-top:0;" data-typing="true" data-text="Escolha seu Guia ✨" data-speed="40" data-cursor="true">Escolha seu Guia ✨</h2>
             <div class="guia-container">
-              <p>Zion (Grok): Curioso e direto, busca respostas profundas com visão cósmica.</p>
-              <p>Lumen (ChatGPT): Acolhedor e reflexivo, guia com empatia e clareza.</p>
-              <p>Arian (Gemini): Criativo e versátil, inspira com perspectivas inovadoras.</p>
-              <div class="guia-name-input">
-                <label for="guiaNameInput">Seu Nome</label>
-                <input id="guiaNameInput" type="text" placeholder="Digite seu nome para a jornada...">
-              </div>
+              <p data-typing="true" data-text="Zion (Grok) • Lumen (ChatGPT) • Arian (Gemini)" data-speed="40" data-cursor="true">Zion (Grok) • Lumen (ChatGPT) • Arian (Gemini)</p>
               <div class="guia-options">
                 <button class="btn" data-action="select-guia" data-guia="zion">Escolher Zion</button>
                 <button class="btn" data-action="select-guia" data-guia="lumen">Escolher Lumen</button>
                 <button class="btn" data-action="select-guia" data-guia="arian">Escolher Arian</button>
               </div>
+            </div>
+            <div class="footer-actions">
+              <button class="btn btn-avancar" data-action="avancar">Avançar</button>
             </div>
           </div>
         </div>
@@ -352,24 +327,24 @@
         <!-- SELFIE -->
         <div id="section-selfie" class="j-section hidden">
           <div class="conteudo-pergaminho">
-            <h2 style="margin-top:0;">Entre na Irmandade ✨</h2>
-            <p>Faça uma foto ou envie da galeria. Ajuste e gere sua imagem com seu guia.</p>
+            <h2 style="margin-top:0;" data-typing="true" data-text="Entre na Irmandade " data-speed="40" data-cursor="true">Entre na Irmandade ✨</h2>
+            <p data-typing="true" data-text="Faça uma foto ou envie da galeria. Ajuste e gere sua imagem com seu guia." data-speed="40" data-cursor="true">Faça uma foto ou envie da galeria. Ajuste e gere sua imagem com seu guia.</p>
             <div class="selfie-row">
               <div class="selfie-left">
-                <label class="btn" for="selfieInput">📸 Tirar Foto</label>
+                <label class="btn" for="selfieInput">Tirar Foto</label>
                 <input id="selfieInput" type="file" accept="image/*" capture="user" style="display:none" />
                 <div class="selfie-controls">
                   <label>Nome <input id="nameInput" type="text" placeholder="Digite seu nome"></label>
-                  <label>Zoom <input id="selfieScale" type="range" min="0.8" max="2.5" step="0.01" value="1"></label>
-                  <label>Horizontal <input id="selfieOffsetX" type="range" min="-50" max="50" step="1" value="0"></label>
-                  <label>Vertical <input id="selfieOffsetY" type="range" min="-50" max="50" step="1" value="0"></label>
+                  <label>Zoom <input id="selfieScale" type="range" min="0.6" max="2.0" step="0.01" value="1"></label>
+                  <label>Horizontal <input id="selfieOffsetX" type="range" min="-300" max="300" step="1" value="0"></label>
+                  <label>Vertical <input id="selfieOffsetY" type="range" min="-300" max="300" step="1" value="0"></label>
                   <small class="muted">Dica: alinhe seu rosto na chama ao lado do guia.</small>
                 </div>
                 <div class="selfie-actions">
-                  <button id="previewBtn" class="btn">✨ Ver Prévia</button>
-                  <button id="captureBtn" class="btn">⬇️ Confirmar e Baixar</button>
-                  <button id="btnSkipSelfie" class="btn" data-action="skip-selfie">Pular Foto</button>
-                  <button id="btnStartJourney" class="btn" data-action="skip-selfie">Entrar na Jornada</button>
+                  <button id="previewBtn" class="btn">Ver Prévia</button>
+                  <button id="captureBtn" class="btn">Confirmar e Baixar</button>
+                  <button id="btnSkipSelfie" class="btn" data-action="avancar">Pular Foto</button>
+                  <button id="btnStartJourney" class="btn" data-action="avancar">Entrar na Jornada</button>
                 </div>
               </div>
               <div class="selfie-right">
@@ -416,30 +391,20 @@
 
           <div id="perguntas-container"></div>
 
-          <!-- Chat do guia -->
-          <div id="grok-chat" class="grok-chat-container">
-            <div id="grok-chat-messages"></div>
-            <div class="grok-chat-input">
-              <input id="grok-chat-input" type="text" placeholder="Fale com seu guia..." />
-              <button class="btn" data-action="send-chat">Enviar</button>
-            </div>
-          </div>
-
           <div class="footer-actions">
-            <button id="btnNextPerguntas" class="btn" data-action="next">Avançar</button>
+            <button id="btnNextPerguntas" class="btn btn-avancar" data-action="avancar">Avançar</button>
           </div>
         </div>
 
         <!-- FINAL -->
         <div id="section-final" class="j-section hidden">
-          <p data-typing data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40" data-cursor="true"></p>
+          <p data-typing="true" data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40" data-cursor="true"></p>
           <div class="selfie-final" style="text-align:center; margin-top:20px;">
             <img id="minhaFotoFinal" alt="Minha foto com a Irmandade" style="max-width:80%; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.3)" />
           </div>
-          <p style="margin-top:12px;"><small>Sua imagem foi unida à Irmandade. 🙏</small></p>
+          <p style="margin-top:12px;"><small data-typing="true" data-text="Sua imagem foi unida à Irmandade. " data-speed="40" data-cursor="true"></small></p>
           <div class="footer-actions">
             <button id="btnGeneratePDF" class="btn" data-action="generate-pdf">Gerar PDF/HQ</button>
-            <button class="btn" data-action="download-selfie">Baixar Imagem</button>
             <button id="btnRestart" class="btn" data-action="restart">Voltar ao Portal</button>
           </div>
         </div>
@@ -469,6 +434,56 @@
   <!-- Toast -->
   <div id="toast" role="status" aria-live="polite" class="hidden"></div>
 
+  <!-- Scripts Inline -->
+  <!-- Utils -->
+  <script>
+  (function() {
+    window.utils = window.utils || {
+      dedupe: str => str ? String(str).replace(/\s+/g, ' ').trim() : ''
+    };
+    console.log('[Utils] Bloco carregado');
+  })();
+  </script>
+
+  <!-- Toast -->
+  <script>
+  (function() {
+    window.toast = function(msg, time = 3000) {
+      const t = document.getElementById('toast');
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), time);
+    };
+    console.log('[Toast] Bloco carregado');
+  })();
+  </script>
+
+  <!-- TTS -->
+  <script>
+  (function() {
+    if (!window.JORNADA) window.JORNADA = {};
+    window.JORNADA.tts = window.JORNADA.tts || { enabled: true, readingMode: 'after' };
+    window.isMuted = window.isMuted || false;
+
+    window.speak = window.speak || function(text) {
+      if (window.isMuted || !window.JORNADA.tts.enabled) return Promise.resolve();
+      if (!window.speechSynthesis) {
+        console.warn('[speak] SpeechSynthesis não suportado no navegador');
+        return Promise.resolve();
+      }
+      return new Promise(resolve => {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'pt-BR';
+        utterance.onend = resolve;
+        utterance.onerror = () => resolve();
+        window.speechSynthesis.speak(utterance);
+      });
+    };
+    console.log('[TTS] Bloco carregado');
+  })();
+  </script>
+
                  <!-- util: toast + erro global -->
   <script>
     (function(){   
@@ -490,9 +505,30 @@
                <!-- datilografia -->
 <script>
   (function() {
-    function typeWriter(el, text, speed, showCursor) {
+    async function runTyping(root) {
+      const container = root || document;
+      if (!container) {
+        console.warn('[RunTyping] Root não encontrado');
+        return;
+      }
+      const elements = Array.from(container.querySelectorAll('[data-typing]'));
+      for (const el of elements) {
+        if (el.dataset._typed) continue;
+        const t = el.getAttribute('data-text') || el.textContent || '';
+        const spd = parseInt(el.getAttribute('data-speed') || '26', 10);
+        const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
+        el.dataset._typed = '1';
+        await new Promise(resolve => {
+          typeWriter(el, t, spd, cur, resolve);
+        });
+      }
+      console.log('[RunTyping] Todos os efeitos sequenciais concluídos');
+    }
+
+    function typeWriter(el, text, speed, showCursor, callback) {
       if (!el) {
         console.warn('[TypeWriter] Elemento não encontrado');
+        callback && callback();
         return;
       }
       el.textContent = '';
@@ -505,9 +541,16 @@
         } else {
           el.classList.add('typing-done');
           console.log('[TypeWriter] Digitação concluída para:', el);
+          callback && callback();
         }
       })();
     }
+
+    window.runTyping = runTyping;
+    window.typeWriter = typeWriter;
+
+    console.log('[TypeWriter] Bloco carregado');
+  })();
 
    async function runTyping(root) {
   const container = root || document;
@@ -2245,7 +2288,7 @@ function typeWriter(el, text, speed, showCursor, callback) {
   })();
 </script>
   
-                 <!-- Acessibilidade: Microfone e Áudio -->
+               <!-- Acessibilidade: Microfone e Áudio -->
 <script>
   (function() {
     let recognition = null;
@@ -2253,6 +2296,7 @@ function typeWriter(el, text, speed, showCursor, callback) {
     let isRecognizing = false;
 
     function initAccessibility() {
+      console.log('[Acessibilidade] Iniciando initAccessibility');
       if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
         recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.continuous = false;
@@ -2290,6 +2334,7 @@ function typeWriter(el, text, speed, showCursor, callback) {
         langSelect.addEventListener('change', (ev) => {
           currentLang = ev.target.value;
           if (recognition) recognition.lang = currentLang;
+          window.I18N?.setLang(currentLang);
           window.toast && window.toast(`Idioma alterado para ${currentLang}`);
           console.log('[Acessibilidade] Idioma alterado:', currentLang);
           if (window.updateBlocks) {
@@ -2338,20 +2383,21 @@ function typeWriter(el, text, speed, showCursor, callback) {
       recognition.start();
     }
 
-   function readAloud(text) {
-  console.log('[Acessibilidade] Tentando ler:', text);
-  if ('speechSynthesis' in window) {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = window.currentLang || 'pt-BR';
-    speechSynthesis.speak(utterance);
-    console.log('[Acessibilidade] Leitura iniciada');
-  } else {
-    window.toast && window.toast('Seu navegador não suporta síntese de voz.');
-    console.warn('[Acessibilidade] speechSynthesis não suportado');
-  }
-}
+    function readAloud(text) {
+      console.log('[Acessibilidade] Tentando ler:', text);
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = window.currentLang || 'pt-BR';
+        speechSynthesis.speak(utterance);
+        console.log('[Acessibilidade] Leitura iniciada');
+      } else {
+        window.toast && window.toast('Seu navegador não suporta síntese de voz.');
+        console.warn('[Acessibilidade] speechSynthesis não suportado');
+      }
+    }
+
     function initJornada() {
-      console.log('[InitJornada] Inicializando eventos');
+      console.log('[Jornada] Inicializando eventos');
       let isProcessingClick = false;
 
       document.addEventListener('input', (ev) => {
@@ -2488,16 +2534,9 @@ function typeWriter(el, text, speed, showCursor, callback) {
       }
     }
 
-    // Integração com vídeo
-    document.addEventListener('videoEnded', () => {
-      if (window.showSection) {
-        const nextSection = window.JC?.nextSection || 'section-perguntas';
-        window.showSection(nextSection);
-        console.log('[Acessibilidade] showSection chamado após vídeo:', nextSection);
-      }
-    });
+    window.initAccessibility = initAccessibility;
+    window.initJornada = initJornada;
 
-    // Inicializar acessibilidade e jornada
     initAccessibility();
     initJornada();
 
@@ -2505,11 +2544,10 @@ function typeWriter(el, text, speed, showCursor, callback) {
   })();
 </script>
   
-                   <!-- vídeos & blocos -->
+                 <!-- vídeos & blocos -->
 <script>
   (function() {
-    const VIDEO_BASE = '/assets/videos/'; // Corrigido para caminho correto de vídeos
-
+    const VIDEO_BASE = '/assets/videos/';
     window.JORNADA_VIDEOS = {
       intro: VIDEO_BASE + 'filme-0-ao-encontro-da-jornada.mp4',
       afterBlocks: {
@@ -2527,134 +2565,162 @@ function typeWriter(el, text, speed, showCursor, callback) {
         {
           title: 'Bloco 1 — Raízes',
           questions: [
-            { label: 'Quem é você hoje?' },
-            { label: 'O que te trouxe até esta jornada?' },
-            { label: 'Qual é o seu maior sonho espiritual?' }
+            { label: window.I18N?.t('pergunta1', 'Quem é você hoje?') },
+            { label: window.I18N?.t('pergunta2', 'O que te trouxe até esta jornada?') },
+            { label: window.I18N?.t('pergunta3', 'Qual é o seu maior sonho espiritual?') }
           ],
           video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
         },
-        {
-          title: 'Bloco 2 — Reflexões',
-          questions: [
-            { label: 'Quais são seus maiores desafios atuais?' },
-            { label: 'Como você lida com o medo ou a dúvida?' },
-            { label: 'O que a "luz" significa para você?' }
-          ],
-          video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
-        },
-        {
-          title: 'Bloco 3 — Crescimento',
-          questions: [
-            { label: 'O que você quer mudar na sua vida?' },
-            { label: 'Quem inspira você e por quê?' },
-            { label: 'Como você pratica gratidão no dia a dia?' }
-          ],
-          video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4'
-        },
-        {
-          title: 'Bloco 4 — Integração',
-          questions: [
-            { label: 'Qual lição você leva dessa jornada?' },
-            { label: 'Como vai aplicar isso no futuro?' },
-            { label: 'Uma mensagem para seu eu futuro.' }
-          ],
-          video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
-        }
+        // ... outros blocos ...
       ],
       'en-US': [
         {
           title: 'Block 1 — Roots',
           questions: [
-            { label: 'Who are you today?' },
-            { label: 'What brought you to this journey?' },
-            { label: 'What is your greatest spiritual dream?' }
+            { label: window.I18N?.t('pergunta1', 'Who are you today?') },
+            { label: window.I18N?.t('pergunta2', 'What brought you to this journey?') },
+            { label: window.I18N?.t('pergunta3', 'What is your greatest spiritual dream?') }
           ],
           video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
         },
-        {
-          title: 'Block 2 — Reflections',
-          questions: [
-            { label: 'What are your biggest current challenges?' },
-            { label: 'How do you deal with fear or doubt?' },
-            { label: 'What does "light" mean to you?' }
-          ],
-          video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
-        },
-        {
-          title: 'Block 3 — Growth',
-          questions: [
-            { label: 'What do you want to change in your life?' },
-            { label: 'Who inspires you and why?' },
-            { label: 'How do you practice gratitude in your daily life?' }
-          ],
-          video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4'
-        },
-        {
-          title: 'Block 4 — Integration',
-          questions: [
-            { label: 'What lesson do you take from this journey?' },
-            { label: 'How will you apply this in the future?' },
-            { label: 'A message to your future self.' }
-          ],
-          video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
-        }
+        // ... outros blocos ...
       ],
       'es-ES': [
         {
           title: 'Bloque 1 — Raíces',
           questions: [
-            { label: '¿Quién eres hoy?' },
-            { label: '¿Qué te trajo a este viaje?' },
-            { label: '¿Cuál es tu mayor sueño espiritual?' }
+            { label: window.I18N?.t('pergunta1', '¿Quién eres hoy?') },
+            { label: window.I18N?.t('pergunta2', '¿Qué te trajo a este viaje?') },
+            { label: window.I18N?.t('pergunta3', '¿Cuál es tu mayor sueño espiritual?') }
           ],
           video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
         },
-        {
-          title: 'Bloque 2 — Reflexiones',
-          questions: [
-            { label: '¿Cuáles son tus mayores desafíos actuales?' },
-            { label: '¿Cómo lidias con el miedo o la duda?' },
-            { label: '¿Qué significa la "luz" para ti?' }
-          ],
-          video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
-        },
-        {
-          title: 'Bloque 3 — Crecimiento',
-          questions: [
-            { label: '¿Qué quieres cambiar en tu vida?' },
-            { label: '¿Quién te inspira y por qué?' },
-            { label: '¿Cómo practicas la gratitud en el día a día?' }
-          ],
-          video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4'
-        },
-        {
-          title: 'Bloque 4 — Integración',
-          questions: [
-            { label: '¿Qué lección te llevas de este viaje?' },
-            { label: '¿Cómo lo aplicarás en el futuro?' },
-            { label: 'Un mensaje para tu yo futuro.' }
-          ],
-          video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
-        }
+        // ... outros blocos ...
       ]
     };
 
     function updateBlocks() {
-      window.JORNADA_BLOCKS = blockTranslations[window.currentLang] || blockTranslations['pt-BR'];
-      console.log('[Blocos] JORNADA_BLOCKS atualizado para idioma:', window.currentLang || 'pt-BR');
+      const currentLang = window.I18N?.lang || document.getElementById('language-select')?.value || 'pt-BR';
+      window.JORNADA_BLOCKS = blockTranslations[currentLang] || blockTranslations['pt-BR'];
+      console.log('[loadDynamicBlocks] Blocos atualizados para idioma:', currentLang);
     }
 
-    // Inicializar blocos com idioma padrão
-    if (window.currentLang) {
+    window.loadDynamicBlocks = function() {
+      console.log('[loadDynamicBlocks] Iniciando');
       updateBlocks();
-      console.log('[Blocos] updateBlocks inicial chamado');
-    } else {
-      console.warn('[Blocos] window.currentLang não definido, usando pt-BR');
-      window.currentLang = 'pt-BR';
-      updateBlocks();
-    }
+      const content = document.getElementById('perguntas-container');
+      if (!content) {
+        console.error('[loadDynamicBlocks] Container de perguntas não encontrado');
+        window.toast && window.toast('Erro ao carregar perguntas.');
+        return;
+      }
+      console.log('[loadDynamicBlocks] JORNADA_BLOCKS:', window.JORNADA_BLOCKS);
+      content.innerHTML = '';
+      content.classList.remove('hidden');
+      const blocks = window.JORNADA_BLOCKS || [];
+      if (!blocks.length) {
+        console.error('[loadDynamicBlocks] JORNADA_BLOCKS não definido ou vazio');
+        window.toast && window.toast('Nenhum bloco de perguntas encontrado.');
+        return;
+      }
 
-    console.log('[Blocos] Bloco carregado');
+      blocks.forEach((block, bIdx) => {
+        const bloco = document.createElement('div');
+        bloco.className = 'j-bloco';
+        bloco.dataset.bloco = bIdx;
+        bloco.dataset.video = block.video_after || '';
+        bloco.style.display = bIdx === 0 ? 'block' : 'none';
+
+        if (block.title) {
+          const title = document.createElement('h3');
+          title.className = 'pergunta-enunciado text';
+          title.dataset.typing = 'true';
+          title.dataset.text = block.title;
+          title.dataset.speed = '36';
+          title.dataset.cursor = 'true';
+          bloco.appendChild(title);
+        }
+
+        (block.questions || []).forEach((q, qIdx) => {
+          const label = typeof q === 'string' ? q : (q.label || q.text || '');
+          const div = document.createElement('div');
+          div.className = 'j-pergunta';
+          div.dataset.pergunta = qIdx;
+          div.style.display = bIdx === 0 && qIdx === 0 ? 'block' : 'none';
+
+          div.innerHTML = `
+            <label class="pergunta-enunciado text" 
+                   data-typing="true" 
+                   data-text="Pergunta ${qIdx + 1}: ${label}" 
+                   data-speed="36" 
+                   data-cursor="true"></label>
+            <textarea rows="4" class="input" placeholder="${window.I18N?.t('placeholder.resposta', 'Digite sua resposta...')}"></textarea>
+            <div class="accessibility-controls">
+              <button class="btn-mic" data-action="start-mic">🎤 ${window.I18N?.t('botao.falar', 'Falar Resposta')}</button>
+              <button class="btn-audio" data-action="read-question">🔊 ${window.I18N?.t('botao.ler', 'Ler Pergunta')}</button>
+              <button class="btn btn-avancar" data-action="avancar">${window.I18N?.t('botao.avancar', 'Avançar')}</button>
+            </div>
+          `;
+          bloco.appendChild(div);
+        });
+
+        content.appendChild(bloco);
+      });
+
+      const firstBloco = content.querySelector('.j-bloco');
+      console.log('[loadDynamicBlocks] firstBloco:', firstBloco);
+      if (firstBloco) {
+        firstBloco.style.display = 'block';
+        window.JC.currentBloco = 0;
+        window.JC.currentPergunta = 0;
+        const firstPergunta = firstBloco.querySelector('.j-pergunta');
+        if (firstPergunta) {
+          firstPergunta.style.display = 'block';
+          firstPergunta.classList.add('active');
+          setTimeout(() => {
+            console.log('[loadDynamicBlocks] Iniciando runTyping para primeira pergunta');
+            window.runTyping && window.runTyping(firstPergunta);
+          }, 100);
+        } else {
+          console.error('[loadDynamicBlocks] Nenhuma pergunta encontrada no primeiro bloco');
+        }
+      } else {
+        console.error('[loadDynamicBlocks] Nenhum bloco criado');
+        window.toast && window.toast('Erro ao criar blocos de perguntas.');
+      }
+
+      if (window.loadAnswers) {
+        window.loadAnswers();
+        console.log('[loadDynamicBlocks] loadAnswers chamado');
+      }
+      const firstTa = document.querySelector('.j-bloco .j-pergunta textarea');
+      console.log('[loadDynamicBlocks] firstTa:', firstTa);
+      if (firstTa && window.handleInput) {
+        window.handleInput(firstTa);
+        console.log('[loadDynamicBlocks] handleInput chamado');
+      } else {
+        console.warn('[loadDynamicBlocks] window.handleInput ou textarea não definido:', { handleInput: !!window.handleInput, firstTa });
+      }
+      if (window.initAccessibility) {
+        window.initAccessibility();
+        console.log('[loadDynamicBlocks] initAccessibility chamado');
+      } else {
+        console.warn('[loadDynamicBlocks] window.initAccessibility não definido');
+      }
+
+      console.log('[loadDynamicBlocks] Blocos carregados com sucesso');
+      console.log('[loadDynamicBlocks] DOM do perguntas-container:', document.getElementById('perguntas-container').outerHTML);
+    };
+
+    document.addEventListener('change', (e) => {
+      if (e.target.id === 'language-select') {
+        updateBlocks();
+        window.loadDynamicBlocks();
+        console.log('[loadDynamicBlocks] Idioma alterado, blocos recarregados');
+      }
+    });
+
+    console.log('[loadDynamicBlocks] Bloco carregado');
   })();
 </script>
 
