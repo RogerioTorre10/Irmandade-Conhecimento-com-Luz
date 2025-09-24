@@ -1433,11 +1433,20 @@
         return;
       }
       function showSection(sectionId) {
-      document.querySelectorAll('.section').forEach(section => {
-      section.style.display = section.id === sectionId ? 'block' : 'none';
-     });
-      window.i18n?.apply?.(document.querySelector(`#${sectionId}`));
-     }
+  document.querySelectorAll('.section').forEach(section => {
+    section.style.display = section.id === sectionId ? 'block' : 'none';
+  });
+  window.i18n?.apply?.(document.querySelector(`#${sectionId}`));
+  if (sectionId === 'section-perguntas') {
+    const firstBloco = document.querySelector('.j-bloco');
+    if (firstBloco) {
+      console.log('[showSection] Iniciando typeQuestionsSequentially para section-perguntas');
+      window.JORNADA_QA?.typeQuestionsSequentially?.(firstBloco);
+    } else {
+      console.warn('[showSection] Nenhum bloco encontrado em section-perguntas');
+    }
+  }
+}
 
      document.querySelectorAll('.btn-avancar').forEach(button => {
      button.addEventListener('click', () => {
