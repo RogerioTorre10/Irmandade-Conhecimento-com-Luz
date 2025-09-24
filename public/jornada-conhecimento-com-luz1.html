@@ -1114,6 +1114,28 @@
 
       isNavigating = false;
     };
+    document.querySelectorAll('[data-action="read-question"]').forEach(button => {
+    button.addEventListener('click', () => {
+    const pergunta = button.closest('.j-pergunta').querySelector('[data-i18n]');
+    const key = pergunta.dataset.i18n;
+    const text = window.i18n.t(key, pergunta.textContent);
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = window.i18n.lang || 'pt-BR';
+      window.speechSynthesis.speak(utterance);
+    } else {
+      console.warn('[readAloud] SpeechSynthesis não suportado');
+    }
+  });
+});
+    
+   document.querySelectorAll('[data-action="toggle-password"]').forEach(button => {
+  button.addEventListener('click', () => {
+    const input = button.closest('.input-group').querySelector('input');
+    input.type = input.type === 'password' ? 'text' : 'password';
+    button.textContent = input.type === 'password' ? 'Mostrar' : 'Ocultar';
+  });
+}); 
 
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-action="termos-next"], [data-action="termos-prev"]');
