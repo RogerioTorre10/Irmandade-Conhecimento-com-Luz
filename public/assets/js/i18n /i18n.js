@@ -1,4 +1,4 @@
-/* /public/i18n/i18n.js  —  i18n simples com JSON por idioma
+/* /assets/js/i18n/i18n.js  —  i18n simples com JSON por idioma
    Uso:
    - Marque textos com data-i18n="chave"
    - Placeholders com data-i18n-placeholder="chave"
