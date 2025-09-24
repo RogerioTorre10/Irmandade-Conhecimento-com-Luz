@@ -1553,53 +1553,47 @@
       lastShowSection = now;
 
       try {
-        const all = Array.from(document.querySelectorAll('div[id^="section-"]'));
+        document.querySelectorAll('.j-section, #videoOverlay, #video-container').forEach(elem => {
+          elem.classList.add(HIDE_CLASS);
+          elem.style.display = 'none';
+        });
         const target = document.getElementById(id);
         if (!target) {
           console.warn('[showSection] Seção não encontrada:', id);
           window.toast && window.toast(`Seção ${id} não encontrada.`);
           return;
         }
-        all.forEach(s => s.classList.add(HIDE_CLASS));
         target.classList.remove(HIDE_CLASS);
+        target.style.display = 'block';
         window.__currentSectionId = id;
         console.log('[showSection] Exibindo seção:', id);
 
-        // Resetar __typingLock para evitar bloqueios
-        window.__typingLock = false;
+        const canvas = document.getElementById('jornada-canvas');
+        if (canvas) {
+          if (id === 'section-perguntas') {
+            canvas.classList.remove('pergaminho-v');
+            canvas.classList.add('pergaminho-h');
+          } else {
+            canvas.classList.remove('pergaminho-h');
+            canvas.classList.add('pergaminho-v');
+          }
+        }
 
         setTimeout(() => {
-          if (id === 'section-perguntas') {
-            if (window.loadDynamicBlocks) {
-              window.loadDynamicBlocks();
-              console.log('[showSection] loadDynamicBlocks chamado para section-perguntas');
-            } else {
-              console.warn('[showSection] window.loadDynamicBlocks não definida');
-            }
-            if (window.updateProgress) {
-              window.updateProgress();
-              console.log('[showSection] updateProgress chamado para section-perguntas');
-            } else {
-              console.warn('[showSection] window.updateProgress não definida');
-            }
+          if (id === 'section-perguntas' && window.loadDynamicBlocks) {
+            window.loadDynamicBlocks();
+            console.log('[showSection] loadDynamicBlocks chamado para section-perguntas');
           }
           if (window.runTyping) {
             window.runTyping(target);
             console.log('[showSection] Iniciando runTyping para:', id);
-          } else {
-            console.warn('[showSection] window.runTyping não definida');
           }
           const btns = target.querySelectorAll('[data-action="avancar"], .btn-avancar, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney');
           btns.forEach(btn => {
             if (!btn.dataset.clickAttached) {
               btn.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (window.JC && window.JC.goNext) {
-                  window.JC.goNext();
-                  console.log('[showSection] JC.goNext chamado pelo botão:', btn.id || btn.className);
-                } else {
-                  console.warn('[showSection] window.JC.goNext não definida');
-                }
+                if (window.JC && window.JC.goNext) window.JC.goNext();
               }, { once: true });
               btn.dataset.clickAttached = '1';
               console.log('[showSection] Evento de clique adicionado ao botão avançar em:', id, 'Botão:', btn.id || btn.className);
@@ -1612,7 +1606,6 @@
       }
     };
 
-    // Integração com vídeo
     document.addEventListener('videoEnded', () => {
       const nextSection = window.JC?.nextSection || 'section-perguntas';
       window.showSection(nextSection);
