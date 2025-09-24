@@ -290,6 +290,13 @@
       console.log('[JORNADA_PAPER] Idioma alterado, blocos recarregados');
     }
   });
+  document.querySelectorAll('[data-action="toggle-password"]').forEach(button => {
+    button.addEventListener('click', () => {
+    const input = button.closest('.input-group').querySelector('input');
+    input.type = input.type === 'password' ? 'text' : 'password';
+    button.textContent = input.type === 'password' ? 'Mostrar' : 'Ocultar';
+  });
+});
 
   // Expor funções
   window.JORNADA_PAPER = { set: setPergaminho, ensureCanvas };
