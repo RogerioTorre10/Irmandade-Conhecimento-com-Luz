@@ -508,20 +508,45 @@
       })();
     }
 
-    function runTyping(root) {
+   async function runTyping(root) {
       const container = root || document;
       if (!container) {
         console.warn('[RunTyping] Root não encontrado');
         return;
       }
-      container.querySelectorAll('[data-typing]').forEach(el => {
-        if (el.dataset._typed) return;
+      const elements = container.querySelectorAll('[data-typing]');
+      for (const el of elements) {
+        if (el.dataset._typed) continue;
         const t = el.getAttribute('data-text') || el.textContent || '';
         const spd = parseInt(el.getAttribute('data-speed') || '26', 10);
         const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
         el.dataset._typed = '1';
-        typeWriter(el, t, spd, cur);
-      });
+        await new Promise(resolve => {
+          typeWriter(el, t, spd, cur, resolve); // Modificar typeWriter para chamar resolve ao final
+        });
+      }
+    }
+
+    // Modificar typeWriter para suportar callback ao final
+    function typeWriter(el, text, speed, showCursor, callback) {
+      if (!el) {
+        console.warn('[TypeWriter] Elemento não encontrado');
+        callback && callback();
+        return;
+      }
+      el.textContent = '';
+      if (showCursor) el.classList.add('lumen-typing');
+      let i = 0;
+      (function step() {
+        if (i < text.length) {
+          el.textContent += text.charAt(i++);
+          setTimeout(step, speed);
+        } else {
+          el.classList.add('typing-done');
+          console.log('[TypeWriter] Digitação concluída para:', el);
+          callback && callback();
+        }
+      })();
     }
 
     // Expor runTyping globalmente para uso em outros scripts
