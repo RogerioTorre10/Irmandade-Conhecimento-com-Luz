@@ -5,7 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Jornada • Irmandade Conhecimento com Luz</title>
   <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png" />
-  <script defer src="/assets/js/toast-safe.js"></script>  
+  <script defer src="/assets/js/toast-safe.js"></script>
+<script>
+  window.I18N = window.I18N || {
+    lang: 'pt-BR',
+    dict: {},
+    ready: true,
+    t: function(key, fallback) { return fallback || key; },
+    apply: function() {
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        el.textContent = key;
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        el.setAttribute('placeholder', key);
+      });
+    },
+    setLang: function(lang) {
+      this.lang = lang;
+      console.log('[I18N Fallback] Idioma definido:', lang);
+    }
+  };
+  console.log('[I18N Fallback] Inicializado');
+</script>
+  
 
   <style>
     @font-face {
@@ -471,7 +495,7 @@
       if(env) env.textContent=`layout=${document.body.dataset.layout||'master'} · journey=${document.body.dataset.journey||'essencial'} · path=/assets`;
      </script>
   
-              <!-- datilografia -->
+             <!-- datilografia -->
 <script>
   (function() {
     let isTyping = false;
