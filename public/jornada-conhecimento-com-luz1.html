@@ -2332,18 +2332,18 @@
       recognition.start();
     }
 
-    function readAloud(text) {
-      if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = currentLang;
-        speechSynthesis.speak(utterance);
-        console.log('[Acessibilidade] Iniciando leitura:', text);
-      } else {
-        window.toast && window.toast('Seu navegador não suporta síntese de voz.');
-        console.warn('[Acessibilidade] speechSynthesis não suportado');
-      }
-    }
-
+   function readAloud(text) {
+  console.log('[Acessibilidade] Tentando ler:', text);
+  if ('speechSynthesis' in window) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = currentLang;
+    speechSynthesis.speak(utterance);
+    console.log('[Acessibilidade] Leitura iniciada');
+  } else {
+    toast('Seu navegador não suporta síntese de voz.');
+    console.warn('[Acessibilidade] speechSynthesis não suportado');
+  }
+}
     function initJornada() {
       let isProcessingClick = false;
 
