@@ -502,69 +502,8 @@
       const env=document.getElementById('envTag');
       if(env) env.textContent=`layout=${document.body.dataset.layout||'master'} · journey=${document.body.dataset.journey||'essencial'} · path=/assets`;
     }
-      </script>
-  
-             <!-- datilografia -->
-<script>
-  (function() {
-    let isTyping = false;
-
-    async function runTyping(root) {
-      if (isTyping) {
-        console.warn('[RunTyping] Digitação em andamento, ignorando');
-        return;
-      }
-      isTyping = true;
-      const container = root || document;
-      if (!container) {
-        console.warn('[RunTyping] Root não encontrado');
-        isTyping = false;
-        return;
-      }
-      const elements = Array.from(container.querySelectorAll('[data-typing]'));
-      for (const el of elements) {
-        if (el.dataset._typed) continue;
-        const t = el.getAttribute('data-text') || el.textContent || '';
-        const spd = parseInt(el.getAttribute('data-speed') || '26', 10);
-        const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
-        el.dataset._typed = '1';
-        await new Promise(resolve => {
-          typeWriter(el, t, spd, cur, resolve);
-        });
-      }
-      console.log('[RunTyping] Todos os efeitos sequenciais concluídos');
-      isTyping = false;
-    }
-
-    function typeWriter(el, text, speed, showCursor, callback) {
-      if (!el) {
-        console.warn('[TypeWriter] Elemento não encontrado');
-        callback && callback();
-        return;
-      }
-      el.textContent = '';
-      if (showCursor) el.classList.add('lumen-typing');
-      let i = 0;
-      function step() {
-        if (i < text.length) {
-          el.textContent += text.charAt(i++);
-          setTimeout(step, speed);
-        } else {
-          el.classList.add('typing-done');
-          console.log('[TypeWriter] Digitação concluída para:', el);
-          callback && callback();
-        }
-      }
-      step();
-    }
-
-    window.runTyping = runTyping;
-    window.typeWriter = typeWriter;
-
-    console.log('[TypeWriter] Bloco carregado');
-  })();
-</script>
-  
+      </script> 
+               
          <!-- datilografia no placeholder e respostas -->
 <script>
   (function() {
