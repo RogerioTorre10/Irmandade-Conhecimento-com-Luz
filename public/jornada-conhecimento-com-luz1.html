@@ -433,32 +433,7 @@
 
   <!-- Toast -->
   <div id="toast" role="status" aria-live="polite" class="hidden"></div>
-
-  <!-- Scripts Inline -->
-  <!-- Utils -->
-  <script>
-  (function() {
-    window.utils = window.utils || {
-      dedupe: str => str ? String(str).replace(/\s+/g, ' ').trim() : ''
-    };
-    console.log('[Utils] Bloco carregado');
-  })();
-  </script>
-
-  <!-- Toast -->
-  <script>
-  (function() {
-    window.toast = function(msg, time = 3000) {
-      const t = document.getElementById('toast');
-      if (!t) return;
-      t.textContent = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), time);
-    };
-    console.log('[Toast] Bloco carregado');
-  })();
-  </script>
-
+  
   <!-- TTS -->
   <script>
   (function() {
