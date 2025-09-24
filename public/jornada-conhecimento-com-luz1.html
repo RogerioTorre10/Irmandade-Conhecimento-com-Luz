@@ -2262,17 +2262,21 @@
     }
 
     function readAloud(text) {
-      console.log('[Acessibilidade] Tentando ler:', text);
-      if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = window.currentLang || 'pt-BR';
-        speechSynthesis.speak(utterance);
-        console.log('[Acessibilidade] Leitura iniciada');
-      } else {
-        window.toast && window.toast('Seu navegador não suporta síntese de voz.');
-        console.warn('[Acessibilidade] speechSynthesis não suportado');
-      }
-    }
+  if ('speechSynthesis' in window) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'pt-BR'; // Ajuste conforme o idioma
+    window.speechSynthesis.speak(utterance);
+  } else {
+    console.error('API de síntese de voz não suportada');
+  }
+}
+
+document.querySelectorAll('[data-action="read-question"]').forEach(button => {
+  button.addEventListener('click', () => {
+    const pergunta = button.closest('.pergunta').textContent;
+    readAloud(pergunta);
+  });
+});
 
     function initJornada() {
       console.log('[Jornada] Inicializando eventos');
