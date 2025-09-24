@@ -434,30 +434,6 @@
   <!-- Toast -->
   <div id="toast" role="status" aria-live="polite" class="hidden"></div>
   
-  <!-- TTS -->
-  <script>
-  (function() {
-    if (!window.JORNADA) window.JORNADA = {};
-    window.JORNADA.tts = window.JORNADA.tts || { enabled: true, readingMode: 'after' };
-    window.isMuted = window.isMuted || false;
-
-    window.speak = window.speak || function(text) {
-      if (window.isMuted || !window.JORNADA.tts.enabled) return Promise.resolve();
-      if (!window.speechSynthesis) {
-        console.warn('[speak] SpeechSynthesis não suportado no navegador');
-        return Promise.resolve();
-      }
-      return new Promise(resolve => {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'pt-BR';
-        utterance.onend = resolve;
-        utterance.onerror = () => resolve();
-        window.speechSynthesis.speak(utterance);
-      });
-    };
-    console.log('[TTS] Bloco carregado');
-  })();
-  </script>
 
                  <!-- util: toast + erro global -->
   <script>
