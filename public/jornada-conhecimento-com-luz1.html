@@ -511,10 +511,21 @@
 
    async function runTyping(root) {
       const container = root || document;
-      if (!container) {
-        console.warn('[RunTyping] Root não encontrado');
-        return;
+      if (!container) return;
+      const elements = Array.from(container.querySelectorAll('[data-typing]'));
+      for (const el of elements) {
+        if (el.dataset._typed) continue;
+        const t = el.getAttribute('data-text') || el.textContent || '';
+        const spd = parseInt(el.getAttribute('data-speed') || '26', 10);
+        const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
+        el.dataset._typed = '1';
+        await new Promise(resolve => {
+          typeWriter(el, t, spd, cur);
+          setTimeout(resolve, t.length * spd + 500); // Atraso para o próximo
+        });
       }
+      console.log('[RunTyping] Todos os efeitos sequenciais concluídos');
+    }
       const elements = container.querySelectorAll('[data-typing]');
       for (const el of elements) {
         if (el.dataset._typed) continue;
@@ -2011,6 +2022,7 @@
     function playTransition(src, onEnd) {
       const overlay = document.getElementById('videoOverlay');
       const video = document.getElementById('videoTransicao');
+            video.loop = false; // Impede looping
       const fallback = document.getElementById('videoFallback');
       const skip = document.getElementById('skipVideo');
       if (!overlay || !video || !fallback || !src) {
