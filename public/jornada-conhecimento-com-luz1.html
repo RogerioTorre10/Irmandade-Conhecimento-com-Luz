@@ -932,10 +932,12 @@
         overlay.classList.add('hidden');
         video.src = '';
         isPlaying = false;
-        console.log('[playVideo] Vídeo terminou');
+        console.log('[playVideo] Vídeo terminou');        
         if (window.JC && window.JC.goNext) {
           window.JC.goNext();
           console.log('[playVideo] Avançando para próxima seção');
+          console.log('[Controles] onended disparado');
+          cleanup();
         }
         // Chama runTyping para exibir perguntas após o vídeo
         if (perguntaDiv && window.runTyping) {
