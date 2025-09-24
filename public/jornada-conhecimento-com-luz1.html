@@ -2683,7 +2683,7 @@ function typeWriter(el, text, speed, showCursor, callback) {
             console.warn('[Boot] window.runTyping não definido');
           }
           if (window.initJornada) {
-            window.initJornada();
+           window.initJornada = initJornada;
             console.log('[Boot] initJornada chamado');
           } else {
             console.warn('[Boot] window.initJornada não definido');
