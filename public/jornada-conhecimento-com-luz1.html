@@ -381,9 +381,27 @@
         <div id="section-perguntas" class="j-section hidden">
           <div class="progress-container">
             <div class="progress-badge" id="jprog-pct">0% concluído</div>
-            <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
-            <div class="j-progress"><div class="j-progress__bar"><div class="j-progress__fill" id="j-fill-inline"></div></div><div class="j-progress__meta" id="j-meta"></div></div>
+             <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
+              <div class="j-progress"><div class="j-progress__bar"><div class="j-progress__fill" id="j-fill-inline"></div></div><div class="j-progress__meta" id="j-meta"></div></div>
+               </div>
+               <div class="j-pergunta" data-pergunta="1" style="display: none;">
+              <label class="pergunta-enunciado text" data-typing="true" data-text="Pergunta 2: " data-speed="36" data-cursor="true"></label>
+            <textarea rows="4" class="input" placeholder="undefined"></textarea>
+          <div class="accessibility-controls">
+        <button class="btn-mic" data-action="start-mic">🎤 undefined</button>
+        <button class="btn-audio" data-action="read-question">🔊 undefined</button>
+         <button class="btn btn-avancar" data-action="avancar">undefined</button>
           </div>
+           </div>
+            <div class="j-pergunta" data-pergunta="2" style="display: none;">
+             <label class="pergunta-enunciado text" data-typing="true" data-text="Pergunta 3: " data-speed="36" data-cursor="true"></label>
+              <textarea rows="4" class="input" placeholder="undefined"></textarea>
+              <div class="accessibility-controls">
+             <button class="btn-mic" data-action="start-mic">🎤 undefined</button>
+           <button class="btn-audio" data-action="read-question">🔊 undefined</button>
+          <button class="btn btn-avancar" data-action="avancar">undefined</button>
+         </div>
+       </div>
 
           <div id="chama-perguntas" class="chama-icone chama-fixed-hero media" aria-hidden="true">
             <div class="chama-vela chama-md"><div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div></div>
@@ -453,13 +471,21 @@
       if(env) env.textContent=`layout=${document.body.dataset.layout||'master'} · journey=${document.body.dataset.journey||'essencial'} · path=/assets`;
      </script>
   
-               <!-- datilografia -->
+              <!-- datilografia -->
 <script>
   (function() {
+    let isTyping = false;
+
     async function runTyping(root) {
+      if (isTyping) {
+        console.warn('[RunTyping] Digitação em andamento, ignorando');
+        return;
+      }
+      isTyping = true;
       const container = root || document;
       if (!container) {
         console.warn('[RunTyping] Root não encontrado');
+        isTyping = false;
         return;
       }
       const elements = Array.from(container.querySelectorAll('[data-typing]'));
@@ -474,6 +500,7 @@
         });
       }
       console.log('[RunTyping] Todos os efeitos sequenciais concluídos');
+      isTyping = false;
     }
 
     function typeWriter(el, text, speed, showCursor, callback) {
@@ -485,7 +512,7 @@
       el.textContent = '';
       if (showCursor) el.classList.add('lumen-typing');
       let i = 0;
-      (function step() {
+      function step() {
         if (i < text.length) {
           el.textContent += text.charAt(i++);
           setTimeout(step, speed);
@@ -494,80 +521,14 @@
           console.log('[TypeWriter] Digitação concluída para:', el);
           callback && callback();
         }
-      })();
+      }
+      step();
     }
 
     window.runTyping = runTyping;
     window.typeWriter = typeWriter;
 
     console.log('[TypeWriter] Bloco carregado');
-  })();
-
-   async function runTyping(root) {
-  const container = root || document;
-  if (!container) {
-    console.warn('[RunTyping] Root não encontrado');
-    return;
-  }
-  const elements = Array.from(container.querySelectorAll('[data-typing]'));
-  for (const el of elements) {
-    if (el.dataset._typed) continue;
-    const t = el.getAttribute('data-text') || el.textContent || '';
-    const spd = parseInt(el.getAttribute('data-speed') || '26', 10);
-    const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
-    el.dataset._typed = '1';
-    await new Promise(resolve => {
-      typeWriter(el, t, spd, cur, resolve);
-    });
-  }
-  console.log('[RunTyping] Todos os efeitos sequenciais concluídos');
-}
-
-function typeWriter(el, text, speed, showCursor, callback) {
-  if (!el) {
-    console.warn('[TypeWriter] Elemento não encontrado');
-    callback && callback();
-    return;
-  }
-  el.textContent = '';
-  if (showCursor) el.classList.add('lumen-typing');
-  let i = 0;
-  (function step() {
-    if (i < text.length) {
-      el.textContent += text.charAt(i++);
-      setTimeout(step, speed);
-    } else {
-      el.classList.add('typing-done');
-      console.log('[TypeWriter] Digitação concluída para:', el);
-      callback && callback();
-    }
-  })();
-}
-
-    // Modificar typeWriter para suportar callback ao final
-    function typeWriter(el, text, speed, showCursor, callback) {
-      if (!el) {
-        console.warn('[TypeWriter] Elemento não encontrado');
-        callback && callback();
-        return;
-      }
-      el.textContent = '';
-      if (showCursor) el.classList.add('lumen-typing');
-      let i = 0;
-      (function step() {
-        if (i < text.length) {
-          el.textContent += text.charAt(i++);
-          setTimeout(step, speed);
-        } else {
-          el.classList.add('typing-done');
-          console.log('[TypeWriter] Digitação concluída para:', el);
-          callback && callback();
-        }
-      })();
-    }
-
-    // Expor runTyping globalmente para uso em outros scripts
-    window.runTyping = runTyping;
   })();
 </script>
   
@@ -2495,7 +2456,7 @@ function typeWriter(el, text, speed, showCursor, callback) {
   })();
 </script>
   
-                 <!-- vídeos & blocos -->
+                <!-- vídeos & blocos -->
 <script>
   (function() {
     const VIDEO_BASE = '/assets/videos/';
@@ -2522,7 +2483,33 @@ function typeWriter(el, text, speed, showCursor, callback) {
           ],
           video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
         },
-        // ... outros blocos ...
+        {
+          title: 'Bloco 2 — Reflexões',
+          questions: [
+            { label: window.I18N?.t('pergunta4', 'Quais são seus maiores desafios atuais?') },
+            { label: window.I18N?.t('pergunta5', 'Como você lida com o medo ou a dúvida?') },
+            { label: window.I18N?.t('pergunta6', 'O que a "luz" significa para você?') }
+          ],
+          video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
+        },
+        {
+          title: 'Bloco 3 — Crescimento',
+          questions: [
+            { label: window.I18N?.t('pergunta7', 'O que você quer mudar na sua vida?') },
+            { label: window.I18N?.t('pergunta8', 'Quem inspira você e por quê?') },
+            { label: window.I18N?.t('pergunta9', 'Como você pratica gratidão no dia a dia?') }
+          ],
+          video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4'
+        },
+        {
+          title: 'Bloco 4 — Integração',
+          questions: [
+            { label: window.I18N?.t('pergunta10', 'Qual lição você leva dessa jornada?') },
+            { label: window.I18N?.t('pergunta11', 'Como vai aplicar isso no futuro?') },
+            { label: window.I18N?.t('pergunta12', 'Uma mensagem para seu eu futuro.') }
+          ],
+          video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
+        }
       ],
       'en-US': [
         {
@@ -2534,7 +2521,33 @@ function typeWriter(el, text, speed, showCursor, callback) {
           ],
           video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
         },
-        // ... outros blocos ...
+        {
+          title: 'Block 2 — Reflections',
+          questions: [
+            { label: window.I18N?.t('pergunta4', 'What are your biggest current challenges?') },
+            { label: window.I18N?.t('pergunta5', 'How do you deal with fear or doubt?') },
+            { label: window.I18N?.t('pergunta6', 'What does "light" mean to you?') }
+          ],
+          video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
+        },
+        {
+          title: 'Block 3 — Growth',
+          questions: [
+            { label: window.I18N?.t('pergunta7', 'What do you want to change in your life?') },
+            { label: window.I18N?.t('pergunta8', 'Who inspires you and why?') },
+            { label: window.I18N?.t('pergunta9', 'How do you practice gratitude in your daily life?') }
+          ],
+          video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4'
+        },
+        {
+          title: 'Block 4 — Integration',
+          questions: [
+            { label: window.I18N?.t('pergunta10', 'What lesson do you take from this journey?') },
+            { label: window.I18N?.t('pergunta11', 'How will you apply this in the future?') },
+            { label: window.I18N?.t('pergunta12', 'A message to your future self.') }
+          ],
+          video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
+        }
       ],
       'es-ES': [
         {
@@ -2546,7 +2559,33 @@ function typeWriter(el, text, speed, showCursor, callback) {
           ],
           video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
         },
-        // ... outros blocos ...
+        {
+          title: 'Bloque 2 — Reflexiones',
+          questions: [
+            { label: window.I18N?.t('pergunta4', '¿Cuáles son tus mayores desafíos actuales?') },
+            { label: window.I18N?.t('pergunta5', '¿Cómo lidias con el miedo o la duda?') },
+            { label: window.I18N?.t('pergunta6', '¿Qué significa la "luz" para ti?') }
+          ],
+          video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
+        },
+        {
+          title: 'Bloque 3 — Crecimiento',
+          questions: [
+            { label: window.I18N?.t('pergunta7', '¿Qué quieres cambiar en tu vida?') },
+            { label: window.I18N?.t('pergunta8', '¿Quién te inspira y por qué?') },
+            { label: window.I18N?.t('pergunta9', '¿Cómo practicas la gratitud en el día a día?') }
+          ],
+          video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4'
+        },
+        {
+          title: 'Bloque 4 — Integración',
+          questions: [
+            { label: window.I18N?.t('pergunta10', '¿Qué lección te llevas de este viaje?') },
+            { label: window.I18N?.t('pergunta11', '¿Cómo lo aplicarás en el futuro?') },
+            { label: window.I18N?.t('pergunta12', 'Un mensaje para tu yo futuro.') }
+          ],
+          video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
+        }
       ]
     };
 
@@ -2671,6 +2710,16 @@ function typeWriter(el, text, speed, showCursor, callback) {
       }
     });
 
+    // Inicializar blocos com idioma padrão
+    if (window.I18N?.lang) {
+      updateBlocks();
+      console.log('[Blocos] updateBlocks inicial chamado');
+    } else {
+      console.warn('[Blocos] window.I18N.lang não definido, usando pt-BR');
+      window.I18N?.setLang('pt-BR');
+      updateBlocks();
+    }
+
     console.log('[loadDynamicBlocks] Bloco carregado');
   })();
 </script>
@@ -2731,6 +2780,68 @@ function typeWriter(el, text, speed, showCursor, callback) {
       initializeJourney();
       console.log('[Boot] Bloco carregado');
     })();
+  </script>
+    
+    <!-- boot -->
+<script>
+  (function() {
+    function initializeJourney() {
+      document.addEventListener('DOMContentLoaded', () => {
+        if (window.ensureHeaderFlame) {
+          window.ensureHeaderFlame();
+          console.log('[Boot] ensureHeaderFlame chamado');
+        } else {
+          console.warn('[Boot] window.ensureHeaderFlame não definido');
+        }
+        if (window.ensurePageFlames) {
+          window.ensurePageFlames();
+          console.log('[Boot] ensurePageFlames chamado');
+        } else {
+          console.warn('[Boot] window.ensurePageFlames não definido');
+        }
+        if (window.runTyping) {
+          window.runTyping();
+          console.log('[Boot] runTyping chamado');
+        } else {
+          console.warn('[Boot] window.runTyping não definido');
+        }
+        if (window.initJornada) {
+          window.initJornada();
+          console.log('[Boot] initJornada chamado');
+        } else {
+          console.warn('[Boot] window.initJornada não definido');
+        }
+        if (window.showSection) {
+          window.showSection('section-intro');
+          console.log('[Boot] showSection chamado para section-intro');
+        } else {
+          console.warn('[Boot] window.showSection não definido');
+        }
+        if (window.updateBlocks) {
+          window.updateBlocks();
+          console.log('[Boot] updateBlocks chamado');
+        } else {
+          console.warn('[Boot] window.updateBlocks não definido');
+        }
+        if (window.lockVideoOrientation) {
+          window.lockVideoOrientation();
+          console.log('[Boot] lockVideoOrientation chamado');
+        } else {
+          console.warn('[Boot] window.lockVideoOrientation não definido');
+        }
+        // Teste: Forçar avanço para section-perguntas após 5 segundos
+        setTimeout(() => {
+          if (window.showSection && window.loadDynamicBlocks) {
+            window.showSection('section-perguntas');
+            window.loadDynamicBlocks();
+            console.log('[Boot] Forçando section-perguntas para teste');
+          }
+        }, 5000);
+      });
+    }
+    initializeJourney();
+    console.log('[Boot] Bloco carregado');
+  })();
   </script>
 
   <!-- Scripts Externos -->
