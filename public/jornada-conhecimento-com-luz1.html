@@ -1216,16 +1216,18 @@
     });
 
     // Vincular sendChatMessage a um botão ou input
-    const chatInput = document.getElementById('grok-chat-input');
-    if (chatInput) {
-      chatInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          sendChatMessage();
-        }
-      });
-    }
-
-    console.log('[Chat] Bloco carregado');
+   const chatInput = document.querySelector('#grok-chat-input');
+  if (chatInput) {
+    chatInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        console.log('[Jornada] Chat enviado:', chatInput.value);
+        chatInput.value = '';
+      }
+    });
+  } else {
+    console.warn('[Jornada] #grok-chat-input não encontrado, ignorando inicialização do chat');
+  }
+  console.log('[Jornada] Inicializando eventos');
   })();
 </script>
                 
