@@ -39,7 +39,7 @@
   window.JRender = window.JRender || {};
   window.JBootstrap = window.JBootstrap || {};
   window.JMicro = window.JMicro || {};
-  window.I18N = window.I18N || {};
+  window.i18n = window.i18n || {};
   window.API = window.API || { base: (window.API_BASE || '') };
 
   // Handler leve para inputs
