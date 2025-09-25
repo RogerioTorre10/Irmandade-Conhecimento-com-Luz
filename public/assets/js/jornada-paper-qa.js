@@ -310,7 +310,12 @@
   console.log('[loadDynamicBlocks] Blocos carregados com sucesso');
 }
 
- function loadDynamicBlocks() {
+function loadDynamicBlocks() {
+  console.log('[loadDynamicBlocks] Iniciando');
+  if (typeof window.JC === 'undefined') {
+    console.warn('[loadDynamicBlocks] window.JC não definido, inicializando fallback');
+    window.JC = { currentBloco: 0, currentPergunta: 0, initialized: false, nextSection: null };
+  }
   updateBlocks();
   const content = document.getElementById('perguntas-container');
   if (!content) {
@@ -320,7 +325,7 @@
   }
 
   const blocks = window.JORNADA_BLOCKS || [];
-  console.log('[JORNADA_PAPER] Blocos disponíveis:', blocks); // Adicionado para depuração
+  console.log('[loadDynamicBlocks] JORNADA_BLOCKS:', blocks);
   if (!blocks.length) {
     console.error('[JORNADA_PAPER] JORNADA_BLOCKS não definido ou vazio');
     window.toast && window.toast('Nenhum bloco de perguntas encontrado.');
@@ -330,7 +335,7 @@
   content.innerHTML = '';
   content.classList.remove('hidden');
   blocks.forEach((block, bIdx) => {
-    console.log('[JORNADA_PAPER] Gerando bloco:', block.id, 'com', block.questions.length, 'perguntas'); // Adicionado
+    console.log('[JORNADA_PAPER] Gerando bloco:', block.id, 'com', block.questions ? block.questions.length : 0, 'perguntas');
     const bloco = document.createElement('div');
     bloco.className = 'j-bloco';
     bloco.dataset.bloco = bIdx;
@@ -375,6 +380,7 @@
   window.i18n?.apply?.(content);
 
   const firstBloco = content.querySelector('.j-bloco');
+  console.log('[loadDynamicBlocks] firstBloco:', firstBloco);
   if (firstBloco) {
     firstBloco.style.display = 'block';
     window.JC.currentBloco = 0;
