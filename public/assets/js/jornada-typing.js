@@ -126,4 +126,5 @@
   }
 
   global.JORNADA_TYPE = { run, typeIt, cancelAll, get locked(){ return ACTIVE; } };
-})(window);;
+  global.runTyping = global.JORNADA_TYPE.run;
+})(window);
