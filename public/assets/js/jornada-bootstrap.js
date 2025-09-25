@@ -23,6 +23,25 @@
           log('JC.init (fallback) aplicado');
           window.showSection && window.showSection(r === 'intro' ? 'section-intro' : r);
         },
+
+        // Exemplo de ajuste em jornada-bootstrap.js
+let retryCount = 0;
+const MAX_RETRIES = 20; // Reduzir de 200 para 20 para evitar loop longo
+
+function startWhenReady() {
+  retryCount++;
+  console.log(`[BOOT] Tentativa ${retryCount} de ${MAX_RETRIES} • rota: intro`);
+  if (retryCount > MAX_RETRIES) {
+    console.error('[BOOT] Máximo de tentativas excedido. Inicialização falhou.');
+    return;
+  }
+  if (window.JC && window.JC.initialized && window.JORNADA_BLOCKS && window.perguntasLoaded) {
+    console.log('[BOOT] Inicialização concluída com sucesso');
+    return;
+  }
+  setTimeout(startWhenReady, 100);
+}
+  startWhenReady();
         nextSection: null,
         currentBloco: 0,
         goNext: () => {
