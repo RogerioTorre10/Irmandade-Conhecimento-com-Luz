@@ -7,6 +7,7 @@
   <link rel="icon" href="/assets/img/perfil-da-irmandade.png" type="image/png">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+  <script defer src="/assets/js/i18n/i18n.js?v=6" onload="console.log('[LOAD] i18n.js carregado')" onerror="console.error('[LOAD] Erro ao carregar i18n.js')"></script>
   <script defer src="/assets/js/toast-safe.js?v=6" onload="console.log('[LOAD] toast-safe.js carregado')" onerror="console.error('[LOAD] Erro ao carregar toast-safe.js')"></script>
 
   <style>
@@ -480,7 +481,7 @@
       });                   
       const env=document.getElementById('envTag');
       if(env) env.textContent=`layout=${document.body.dataset.layout||'master'} · journey=${document.body.dataset.journey||'essencial'} · path=/assets`;
-    }
+    };
       </script>              
         
   
@@ -2796,7 +2797,6 @@ document.querySelectorAll('[data-action="read-question"]').forEach(button => {
   <script defer src="/assets/js/jornada-controller.js?v=6" onload="console.log('[LOAD] jornada-controller.js carregado'); console.log('[JC] Após controller: JC existe?', !!window.JC, 'init =', typeof (window.JC && window.JC.init))" onerror="console.error('[LOAD] Erro ao carregar jornada-controller.js')"></script>
   <script defer src="/assets/js/jornada-render.js?v=6" onload="console.log('[LOAD] jornada-render.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-render.js')"></script>
   <script defer src="/assets/js/jornada-bootstrap.js?v=6" onload="console.log('[LOAD] jornada-bootstrap.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-bootstrap.js')"></script>
-  <script defer src="/assets/js/i18n/i18n.js?v=6" onload="console.log('[LOAD] i18n.js carregado')" onerror="console.error('[LOAD] Erro ao carregar i18n.js')"></script>
   <script defer src="/assets/js/jornada-micro.js?v=6" onload="console.log('[LOAD] jornada-micro.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-micro.js')"></script>
   <script defer src="/assets/js/api.js?v=6" onload="console.log('[LOAD] api.js carregado')" onerror="console.error('[LOAD] Erro ao carregar api.js')"></script>
   
