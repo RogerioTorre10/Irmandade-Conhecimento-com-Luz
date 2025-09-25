@@ -54,17 +54,19 @@
       log('Seção inicial:', window.__currentSectionId);
     },
     goNext: () => {
-      log('Iniciando goNext... Estado atual: currentBloco=', window.JC.currentBloco, ', blocos totais=', window.JORNADA_BLOCKS ? window.JORNADA_BLOCKS.length : 0, ', currentSection=', window.__currentSectionId, ', perguntasLoaded=', window.perguntasLoaded);
-      const currentSection = window.__currentSectionId || 'section-intro';
-      const sections = ['section-intro', 'section-termos', 'section-senha', 'section-guia', 'section-selfie', 'section-perguntas', 'section-final'];
-      const currentIdx = sections.indexOf(currentSection);
-      if (currentIdx < 0) {
-        console.warn('Seção atual não encontrada:', currentSection);
-        window.__currentSectionId = 'section-intro';
-        window.showSection && window.showSection('section-intro');
-        log('Reiniciando para section-intro');
-        return;
-      }
+  log('Iniciando goNext... Estado atual: currentBloco=', window.JC.currentBloco, ', blocos totais=', window.JORNADA_BLOCKS ? window.JORNADA_BLOCKS.length : 0, ', currentSection=', window.__currentSectionId, ', perguntasLoaded=', window.perguntasLoaded);
+  const currentSection = window.__currentSectionId || 'section-intro';
+  const sections = ['section-intro', 'section-termos', 'section-senha', 'section-guia', 'section-selfie', 'section-perguntas', 'section-final'];
+  const currentIdx = sections.indexOf(currentSection);
+  log('Seção atual:', currentSection, 'Índice:', currentIdx); // Adicionado
+  if (currentIdx < 0) {
+    console.warn('Seção atual não encontrada:', currentSection);
+    window.__currentSectionId = 'section-intro';
+    window.showSection && window.showSection('section-intro');
+    log('Reiniciando para section-intro');
+    return;
+  }
+}
 
       if (currentSection === 'section-termos') {
         const termosPg1 = document.getElementById('termos-pg1');
