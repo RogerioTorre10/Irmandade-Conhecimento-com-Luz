@@ -2135,6 +2135,44 @@
 
     console.log('[Controle] Bloco carregado');
   })();
+  
+  /* Adicione ao final de jornada-controller.js ou crie um novo arquivo /assets/js/transitions.js */
+  (function () {
+   window.playTransition = function (videoSrc, callback) {
+    const videoOverlay = document.getElementById('videoOverlay');
+    const video = document.getElementById('videoTransicao');
+    const skipButton = document.getElementById('skipVideo');
+
+    if (!videoOverlay || !video) {
+      console.error('[playTransition] videoOverlay ou videoTransicao não encontrado');
+      callback && callback();
+      return;
+    }
+
+    video.src = videoSrc;
+    videoOverlay.classList.remove('hidden');
+    video.play().catch(err => {
+      console.error('[playTransition] Erro ao reproduzir vídeo:', err);
+      document.getElementById('videoFallback').classList.remove('hidden');
+    });
+
+    video.onended = () => {
+      videoOverlay.classList.add('hidden');
+      video.src = '';
+      callback && callback();
+    };
+
+    skipButton.onclick = () => {
+      video.pause();
+      videoOverlay.classList.add('hidden');
+      video.src = '';
+      callback && callback();
+    };
+
+    console.log('[playTransition] Reproduzindo vídeo:', videoSrc);
+  };
+})();
+  
 </script>
   
                <!-- Acessibilidade: Microfone e Áudio -->
