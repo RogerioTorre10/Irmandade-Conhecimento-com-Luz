@@ -6,38 +6,6 @@
   <title>Jornada • Irmandade Conhecimento com Luz</title>
   <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png" />
   <script defer src="/assets/js/toast-safe.js?v=6" onload="console.log('[LOAD] toast-safe.js carregado')" onerror="console.error('[LOAD] Erro ao carregar toast-safe.js')"></script>
-<script>
-  window.i18n = window.i18n || {
-    lang: 'pt-BR',
-    dict: {
-      "pergunta_1": "Quem é você hoje?",
-      "pergunta_2": "Qual é o seu propósito?",
-      "site.title": "Jornada Conhecimento com Luz",
-      "chat_placeholder": "Digite sua mensagem...",
-      "placeholder_senha": "Digite sua senha"
-    },
-    ready: true,
-    t: function(key, fallback) {
-      return this.dict[key] || fallback || key; // Usar dict se disponível
-    },
-    apply: function(root = document) {
-      root.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        el.textContent = this.t(key, el.textContent || key);
-      });
-      root.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-        const key = el.getAttribute('data-i18n-placeholder');
-        el.setAttribute('placeholder', this.t(key, el.getAttribute('placeholder') || key));
-      });
-    },
-    setLang: function(lang) {
-      this.lang = lang;
-      console.log('[i18n Fallback] Idioma definido:', lang);
-    }
-  };
-  console.log('[i18n Fallback] Inicializado');
-</script>
-  
 
   <style>
     @font-face {
@@ -2812,15 +2780,7 @@ document.querySelectorAll('[data-action="read-question"]').forEach(button => {
     initializeJourney();
     console.log('[Boot] Bloco carregado');
   })();
-  </script>
-  <!-- antes (apontando pro lugar antigo) -->
-<!-- <script defer src="/assets/js/i18n.js?v=6" ...> -->
-
-<!-- depois (novo caminho real) -->
-<script defer src="/assets/js/i18n.js?v=7"
-        onload="console.log('[LOAD] i18n.js carregado')"
-        onerror="console.error('[LOAD] Erro ao carregar i18n.js')"></script>
-
+  </script> 
 
   <!-- Scripts Externos -->
   <script defer src="/assets/js/config.js?v=6" onload="console.log('[LOAD] config.js carregado')" onerror="console.error('[LOAD] Erro ao carregar config.js')"></script>
@@ -2835,7 +2795,7 @@ document.querySelectorAll('[data-action="read-question"]').forEach(button => {
   <script defer src="/assets/js/jornada-render.js?v=6" onload="console.log('[LOAD] jornada-render.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-render.js')"></script>
   <script defer src="/assets/js/jornada-bootstrap.js?v=6" onload="console.log('[LOAD] jornada-bootstrap.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-bootstrap.js')"></script>
   <script defer src="/assets/js/jornada-micro.js?v=6" onload="console.log('[LOAD] jornada-micro.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-micro.js')"></script>
-  <script defer src="/assets/js/i18n.js?v=7" onload="console.log('[LOAD] i18n.js carregado')" onerror="console.error('[LOAD] Erro ao carregar i18n.js')"></script>
+  <script defer src="/assets/js/i18n.js?v=6" onload="console.log('[LOAD] i18n.js carregado')" onerror="console.error('[LOAD] Erro ao carregar i18n.js')"></script>
   <script defer src="/assets/js/api.js?v=6" onload="console.log('[LOAD] api.js carregado')" onerror="console.error('[LOAD] Erro ao carregar api.js')"></script>
   
 </body>
