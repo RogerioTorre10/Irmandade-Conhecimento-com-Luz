@@ -11,7 +11,7 @@ const STATIC_DIR = path.join(__dirname, "public");
 app.use(cors({
   origin: [
     "http://localhost:3000",
-    "http://localhost:5173", // se usar vite
+    "http://localhost:5173",
     "https://irmandade-conhecimento-com-luz.onrender.com"
   ],
   credentials: true
@@ -20,7 +20,20 @@ app.use(cors({
 // Servir arquivos estáticos
 app.use(express.static(STATIC_DIR, { extensions: ["html"] }));
 
-// Fallback: qualquer rota não encontrada → index.html
+// Rota específica para arquivos JSON
+app.get("/i18n/:lang.json", (req, res) => {
+  const filePath = path.join(STATIC_DIR, "i18n", `${req.params.lang}.json`);
+  res.sendFile(filePath, {
+    headers: { "Content-Type": "application/json" }
+  }, (err) => {
+    if (err) {
+      console.error(`Erro ao servir /i18n/${req.params.lang}.json:`, err);
+      res.status(404).json({ error: "Arquivo JSON não encontrado" });
+    }
+  });
+});
+
+// Fallback: qualquer outra rota não encontrada → index.html
 app.get("*", (req, res) => {
   res.sendFile(path.join(STATIC_DIR, "index.html"));
 });
