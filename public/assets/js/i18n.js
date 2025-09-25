@@ -1,9 +1,4 @@
-/* /assets/js/i18n.js — i18n simples com JSON por idioma
-   Uso:
-   - Marque textos com data-i18n="chave"
-   - Placeholders com data-i18n-placeholder="chave"
-   - Troca de idioma com <button data-lang="pt|en|es">PT</button>
-*/
+/* /assets/js/i18n.js */
 ;(function () {
   const STORAGE_KEY = "i18n_lang";
   const DEFAULT = "pt";
@@ -43,10 +38,10 @@
         if (!res.ok) {
           throw new Error(`HTTP ${res.status}: Falha ao carregar /i18n/${lang}.json`);
         }
-        const contentType = res.headers.get("content-type");
+        const contentType = res.headers.get("content-type") || "";
         if (!contentType.includes("application/json")) {
           const text = await res.text();
-          throw new Error(`Resposta não é JSON (Content-Type: ${contentType}): ${text.slice(0, 50)}...`);
+          throw new Error(`Resposta não é JSON (Content-Type: ${contentType}): ${text.slice(0, 100)}...`);
         }
         this.dict = await res.json();
         this.lang = lang;
@@ -60,6 +55,9 @@
         if (lang !== DEFAULT) {
           console.log(`[i18n] Tentando fallback para ${DEFAULT}...`);
           await this.setLang(DEFAULT, applyAfter);
+        } else {
+          console.error(`[i18n] Falha no idioma padrão ${DEFAULT}. Traduções não aplicadas.`);
+          this.ready = false;
         }
       }
     },
@@ -94,6 +92,15 @@
         if (SUPPORTED.includes(lang)) {
           console.log(`[i18n] Solicitada troca para idioma ${lang}`);
           this.setLang(lang);
+        }
+      });
+      document.addEventListener('change', (ev) => {
+        if (ev.target.id === 'language-select') {
+          const lang = ev.target.value;
+          if (SUPPORTED.includes(lang)) {
+            console.log(`[i18n] Selecionado idioma ${lang} via select`);
+            this.setLang(lang);
+          }
         }
       });
     }
