@@ -24,19 +24,30 @@
     ready: false,
 
     async init() {
-      // Detecta o idioma do navegador ou usa o armazenado
+      console.log("[i18n] Iniciando i18n...");
       let lang = Store.get() || (navigator.language || navigator.userLanguage || "pt").slice(0, 2).toLowerCase();
-      if (!SUPPORTED.includes(lang)) lang = DEFAULT;
+      console.log("[i18n] Idioma detectado:", lang);
+      if (!SUPPORTED.includes(lang)) {
+        console.log(`[i18n] Idioma ${lang} não suportado, usando padrão: ${DEFAULT}`);
+        lang = DEFAULT;
+      }
       await this.setLang(lang, false);
       this.autobind();
-      this.apply(); // Aplica na primeira carga
+      this.apply();
     },
 
     async setLang(lang, applyAfter = true) {
       try {
-        // Ajuste o caminho conforme a estrutura do servidor
+        console.log(`[i18n] Carregando /i18n/${lang}.json...`);
         const res = await fetch(`/i18n/${lang}.json`, { cache: "no-store" });
-        if (!res.ok) throw new Error(`HTTP ${res.status}: Falha ao carregar /i18n/${lang}.json`);
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: Falha ao carregar /i18n/${lang}.json`);
+        }
+        const contentType = res.headers.get("content-type");
+        if (!contentType.includes("application/json")) {
+          const text = await res.text();
+          throw new Error(`Resposta não é JSON (Content-Type: ${contentType}): ${text.slice(0, 50)}...`);
+        }
         this.dict = await res.json();
         this.lang = lang;
         Store.set(lang);
@@ -46,8 +57,8 @@
         console.log(`[i18n] Idioma ${lang} carregado com sucesso`);
       } catch (e) {
         console.warn(`[i18n] Falha ao carregar idioma ${lang}:`, e);
-        // Fallback para o idioma padrão se falhar
         if (lang !== DEFAULT) {
+          console.log(`[i18n] Tentando fallback para ${DEFAULT}...`);
           await this.setLang(DEFAULT, applyAfter);
         }
       }
@@ -58,33 +69,30 @@
     },
 
     apply(root = document) {
-      if (!this.ready) return;
-
-      // Textos
+      if (!this.ready) {
+        console.warn("[i18n] Não aplicado: dicionário não carregado");
+        return;
+      }
       root.querySelectorAll("[data-i18n]").forEach(el => {
         const key = el.getAttribute("data-i18n");
         el.textContent = this.t(key, el.textContent?.trim() || "");
       });
-
-      // Placeholders
       root.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
         const key = el.getAttribute("data-i18n-placeholder");
         el.setAttribute("placeholder", this.t(key, el.getAttribute("placeholder") || ""));
       });
-
-      // Título da aba
       const siteTitle = this.t("site.title", document.title);
       if (siteTitle) document.title = siteTitle;
     },
 
     autobind() {
-      // Troca de idioma por data-lang
       document.addEventListener("click", (ev) => {
         const btn = ev.target.closest("[data-lang]");
         if (!btn) return;
         ev.preventDefault();
         const lang = btn.getAttribute("data-lang");
         if (SUPPORTED.includes(lang)) {
+          console.log(`[i18n] Solicitada troca para idioma ${lang}`);
           this.setLang(lang);
         }
       });
@@ -93,7 +101,7 @@
 
   window.i18n = i18n;
   document.addEventListener("DOMContentLoaded", () => {
-    console.log("[i18n] Inicializando...");
+    console.log("[i18n] Carregando i18n.js...");
     i18n.init().catch(err => console.error("[i18n] Erro na inicialização:", err));
   });
 })();
