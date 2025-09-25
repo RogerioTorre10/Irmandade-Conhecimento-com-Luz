@@ -1,10 +1,11 @@
-<!<!DOCTYPE html>
-<html lang="pt-br">
+<!DOCTYPE html>
+<html lang="pt">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Jornada • Irmandade Conhecimento com Luz</title>
-  <link rel="alternate icon" href="/assets/img/perfil-da-irmandade.png" type="image/png" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title data-i18n="site.title">Jornada • Irmandade Conhecimento com Luz</title>
+  <link rel="icon" href="/assets/img/perfil-da-irmandade.png" type="image/png">
+  <script defer src="/assets/js/i18n.js?v=6" onload="console.log('[LOAD] i18n.js carregado')" onerror="console.error('[LOAD] Erro ao carregar i18n.js')"></script>
   <script defer src="/assets/js/toast-safe.js?v=6" onload="console.log('[LOAD] toast-safe.js carregado')" onerror="console.error('[LOAD] Erro ao carregar toast-safe.js')"></script>
 
   <style>
@@ -210,6 +211,19 @@
     #toast.show{opacity:1}
   </style>
 </head>
+  
+<!-- Exemplo para testar i18n (adicione onde precisar, como na section-intro) -->
+   <section class="section-intro">
+     <h1 data-i18n="welcome">Bem-vindo!</h1>
+       <p data-i18n="description">Este é um site incrível.</p>
+       <button class="btn btn-avancar" data-i18n="btn-avancar">Avançar</button>
+      <!-- Botões de troca de idioma (adicione se quiser testar manualmente) -->
+     <div>
+    <button data-lang="pt">PT</button>
+   <button data-lang="en">EN</button>
+  <button data-lang="es">ES</button>
+ </div>
+</section>  
 
 <body data-layout="master" data-journey="essencial">
   <!-- Seletor de Idioma -->
