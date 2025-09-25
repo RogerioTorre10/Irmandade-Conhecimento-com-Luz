@@ -267,90 +267,92 @@
     }
   }
 
-  function loadDynamicBlocks() {
-    updateBlocks();
-    const content = document.getElementById('perguntas-container');
-    if (!content) {
-      console.error('[JORNADA_PAPER] Container de perguntas não encontrado');
-      window.toast && window.toast('Erro ao carregar perguntas.');
-      return;
+ function loadDynamicBlocks() {
+  updateBlocks();
+  const content = document.getElementById('perguntas-container');
+  if (!content) {
+    console.error('[JORNADA_PAPER] Container de perguntas não encontrado');
+    window.toast && window.toast('Erro ao carregar perguntas.');
+    return;
+  }
+
+  const blocks = window.JORNADA_BLOCKS || [];
+  console.log('[JORNADA_PAPER] Blocos disponíveis:', blocks); // Adicionado para depuração
+  if (!blocks.length) {
+    console.error('[JORNADA_PAPER] JORNADA_BLOCKS não definido ou vazio');
+    window.toast && window.toast('Nenhum bloco de perguntas encontrado.');
+    return;
+  }
+
+  content.innerHTML = '';
+  content.classList.remove('hidden');
+  blocks.forEach((block, bIdx) => {
+    console.log('[JORNADA_PAPER] Gerando bloco:', block.id, 'com', block.questions.length, 'perguntas'); // Adicionado
+    const bloco = document.createElement('div');
+    bloco.className = 'j-bloco';
+    bloco.dataset.bloco = bIdx;
+    bloco.dataset.video = block.video_after || '';
+    bloco.style.display = bIdx === 0 ? 'block' : 'none';
+
+    if (block.title) {
+      const title = document.createElement('h3');
+      title.className = 'pergunta-enunciado text';
+      title.dataset.i18n = block.data_i18n;
+      title.dataset.typing = 'true';
+      title.dataset.speed = '36';
+      title.dataset.cursor = 'true';
+      title.textContent = block.title;
+      bloco.appendChild(title);
     }
 
-    const blocks = window.JORNADA_BLOCKS || [];
-    if (!blocks.length) {
-      console.error('[JORNADA_PAPER] JORNADA_BLOCKS não definido ou vazio');
-      window.toast && window.toast('Nenhum bloco de perguntas encontrado.');
-      return;
-    }
-
-    content.innerHTML = '';
-    content.classList.remove('hidden');
-    blocks.forEach((block, bIdx) => {
-      const bloco = document.createElement('div');
-      bloco.className = 'j-bloco';
-      bloco.dataset.bloco = bIdx;
-      bloco.dataset.video = block.video_after || '';
-      bloco.style.display = bIdx === 0 ? 'block' : 'none';
-
-      if (block.title) {
-        const title = document.createElement('h3');
-        title.className = 'pergunta-enunciado text';
-        title.dataset.i18n = block.data_i18n;
-        title.dataset.typing = 'true';
-        title.dataset.speed = '36';
-        title.dataset.cursor = 'true';
-        title.textContent = block.title;
-        bloco.appendChild(title);
-      }
-
-      (block.questions || []).forEach((q, qIdx) => {
-        const div = document.createElement('div');
-        div.className = 'j-pergunta';
-        div.dataset.pergunta = qIdx;
-        div.style.display = bIdx === 0 && qIdx === 0 ? 'block' : 'none';
-        div.innerHTML = `
-          <label class="pergunta-enunciado text" 
-                 data-i18n="${q.data_i18n}" 
-                 data-typing="true" 
-                 data-speed="36" 
-                 data-cursor="true">${q.label}</label>
-          <textarea rows="4" class="input" data-i18n-placeholder="resposta_placeholder" placeholder="Digite sua resposta..."></textarea>
-          <div class="accessibility-controls">
-            <button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>
-            <button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>
-            <button class="btn btn-avancar" data-action="avancar">Avançar</button>
-          </div>
-        `;
-        bloco.appendChild(div);
-      });
-
-      content.appendChild(bloco);
+    (block.questions || []).forEach((q, qIdx) => {
+      const div = document.createElement('div');
+      div.className = 'j-pergunta';
+      div.dataset.pergunta = qIdx;
+      div.style.display = bIdx === 0 && qIdx === 0 ? 'block' : 'none';
+      div.innerHTML = `
+        <label class="pergunta-enunciado text" 
+               data-i18n="${q.data_i18n}" 
+               data-typing="true" 
+               data-speed="36" 
+               data-cursor="true">${q.label}</label>
+        <textarea rows="4" class="input" data-i18n-placeholder="resposta_placeholder" placeholder="Digite sua resposta..."></textarea>
+        <div class="accessibility-controls">
+          <button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>
+          <button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>
+          <button class="btn btn-avancar" data-i18n="btn-avancar">Avançar</button>
+        </div>
+      `;
+      bloco.appendChild(div);
     });
 
-    window.i18n?.apply?.(content);
+    content.appendChild(bloco);
+  });
 
-    const firstBloco = content.querySelector('.j-bloco');
-    if (firstBloco) {
-      firstBloco.style.display = 'block';
-      window.JC.currentBloco = 0;
-      window.JC.currentPergunta = 0;
-      const firstPergunta = firstBloco.querySelector('.j-pergunta');
-      if (firstPergunta) {
-        firstPergunta.style.display = 'block';
-        firstPergunta.classList.add('active');
-        setTimeout(() => {
-          console.log('[JORNADA_PAPER] Iniciando typeQuestionsSequentially para primeira pergunta');
-          typeQuestionsSequentially(firstBloco);
-        }, 100);
-      }
+  window.i18n?.apply?.(content);
+
+  const firstBloco = content.querySelector('.j-bloco');
+  if (firstBloco) {
+    firstBloco.style.display = 'block';
+    window.JC.currentBloco = 0;
+    window.JC.currentPergunta = 0;
+    const firstPergunta = firstBloco.querySelector('.j-pergunta');
+    if (firstPergunta) {
+      firstPergunta.style.display = 'block';
+      firstPergunta.classList.add('active');
+      setTimeout(() => {
+        console.log('[JORNADA_PAPER] Iniciando typeQuestionsSequentially para primeira pergunta');
+        typeQuestionsSequentially(firstBloco);
+      }, 100);
     }
-
-    if (window.loadAnswers) window.loadAnswers();
-    const firstTa = document.querySelector('.j-bloco .j-pergunta textarea');
-    if (firstTa && window.handleInput) window.handleInput(firstTa);
-    console.log('[JORNADA_PAPER] Blocos carregados com sucesso');
-    console.log('[JORNADA_PAPER] Dicionário i18n:', window.i18n?.dict);
   }
+
+  if (window.loadAnswers) window.loadAnswers();
+  const firstTa = document.querySelector('.j-bloco .j-pergunta textarea');
+  if (firstTa && window.handleInput) window.handleInput(firstTa);
+  console.log('[JORNADA_PAPER] Blocos carregados com sucesso');
+  console.log('[JORNADA_PAPER] Dicionário i18n:', window.i18n?.dict);
+}
 
   function mount(containerId = CFG.CONTENT_ID, questions = [], { onBack, onFinish } = {}) {
     setPergaminho('h');
