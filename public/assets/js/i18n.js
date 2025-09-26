@@ -65,6 +65,18 @@
     t(key, fallback) {
       return (this.dict && this.dict[key] != null) ? this.dict[key] : (fallback ?? key);
     },
+    // i18n.js
+    async function loadLanguage(lang) {
+      try {
+      const response = await fetch(`/${lang}.json`);
+      const data = await response.json();
+      console.log(`[i18n] Idioma ${lang} carregado com sucesso`);
+      return data;
+    } catch (error) {
+      console.error(`[i18n] Erro ao carregar idioma ${lang}:`, error);
+      throw error;
+    }
+  }
 
     apply(root = document) {
       if (!this.ready) {
