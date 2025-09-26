@@ -268,6 +268,33 @@
       }
     }
   };
+  
+  function initController() {
+  // Inicializar botões de navegação
+  document.querySelectorAll('.btn-avancar').forEach(button => {
+    button.addEventListener('click', () => {
+      console.log('[initController] Botão avançar clicado');
+      goToNextSection();
+    });
+  });
+
+  // Escutar eventos do jornada-paper-qa.js
+  document.addEventListener('questionAnswered', (event) => {
+    console.log('[initController] Pergunta respondida:', event.detail.questionId);
+    // Avançar ou realizar outra ação, se necessário
+  });
+
+  document.addEventListener('videoSkipped', () => {
+    console.log('[initController] Vídeo pulado, avançando...');
+    goToNextSection();
+  });
+
+  // Carregar vídeo inicial, se necessário
+  loadVideo('/path/to/initial-video.mp4'); // Ajuste o caminho
+}
+
+document.addEventListener('DOMContentLoaded', initController);
+  
 
   document.addEventListener('click', debounceClick((e) => {
     const btn = e.target.closest('[data-action="avancar"], .btn-avancar, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney, #iniciarSenha, [data-action="termos-prev"], [data-action="termos-next"]');
