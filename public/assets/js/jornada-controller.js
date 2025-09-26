@@ -133,8 +133,14 @@ function goToNextSection() {
   }
 }
 
-function initController(route = 'inicio') {
+function initController(route = 'intro') {
   log('Inicializando controlador...');
+
+  // Fallback para dependências
+  window.JORNADA_BLOCKS = window.JORNADA_BLOCKS || [];
+  window.JORNADA_VIDEOS = window.JORNADA_VIDEOS || {};
+  log('JORNADA_BLOCKS:', window.JORNADA_BLOCKS);
+  log('JORNADA_VIDEOS:', window.JORNADA_VIDEOS);
 
   // Verificar dependências
   const dependencies = {
@@ -146,14 +152,6 @@ function initController(route = 'inicio') {
   };
   log('Dependências:', dependencies);
 
-  if (!window.JORNADA_BLOCKS || !window.JORNADA_VIDEOS) {
-    console.error('JORNADA_BLOCKS ou JORNADA_VIDEOS não definido, pulando para section-final');
-    currentSection = 'section-final';
-    const finalElement = document.querySelector('#section-final');
-    if (finalElement) finalElement.classList.add('active');
-    return;
-  }
-
   // Configurar globals para compatibilidade com código legado
   window.JC = {
     currentBloco: 0,
@@ -163,7 +161,7 @@ function initController(route = 'inicio') {
     init: () => log('JC init chamado (já inicializado)'),
     goNext: goToNextSection
   };
-  window.__currentSectionId = route === 'inicio' ? 'section-inicio' : route;
+  window.__currentSectionId = route === 'intro' ? 'section-inicio' : route;
   window.perguntasLoaded = false;
 
   // Mostrar seção inicial
@@ -173,6 +171,50 @@ function initController(route = 'inicio') {
     log(`Seção inicial exibida: ${currentSection}`);
   } else {
     console.error(`[CONTROLLER] Seção inicial ${currentSection} não encontrada`);
+  }
+
+  // Executar animação de digitação na inicialização
+  if (window.runTyping) {
+    const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]`);
+    if (typingElements.length > 0) {
+      typingElements.forEach((element, index) => {
+        window.runTyping(element, () => {
+          log(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
+        });
+      });
+    } else {
+      log('Nenhum elemento de digitação encontrado em', currentSection);
+    }
+  } else {
+    log('window.runTyping não definido na inicialização, aplicando fallback');
+    window.runTyping = function(element, callback) {
+      const text = element.getAttribute('data-text') || '';
+      const speed = parseInt(element.getAttribute('data-speed')) || 50;
+      let i = 0;
+      element.textContent = '';
+      element.classList.add('lumen-typing');
+
+      function type() {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          i++;
+          setTimeout(type, speed);
+        } else {
+          element.classList.add('typing-done');
+          element.classList.remove('lumen-typing');
+          log('Animação de digitação concluída para:', text);
+          if (callback) callback();
+        }
+      }
+      type();
+    };
+    // Re-executar animação com o fallback
+    const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]`);
+    typingElements.forEach((element, index) => {
+      window.runTyping(element, () => {
+        log(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
+      });
+    });
   }
 
   // Inicializar botões de navegação (debounced)
@@ -204,7 +246,6 @@ function initController(route = 'inicio') {
     const questionId = event.detail.questionId;
     answeredQuestions.add(questionId);
     log(`Pergunta respondida: ${questionId}, Total respondidas: ${answeredQuestions.size}`);
-    // Tentar avançar após cada resposta
     goToNextSection();
   });
 
@@ -242,6 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initController('inicio');
   }
 });
+
 document.addEventListener('DOMContentLoaded', () => {
   const avancarButton = document.querySelector('#section-inicio .btn-avancar, #section-inicio #iniciar, #section-inicio [data-action="avancar"]');
   if (avancarButton) {
