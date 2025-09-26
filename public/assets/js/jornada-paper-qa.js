@@ -278,7 +278,62 @@
     }
   } 
 
-async function loadDynamicBlocks() {
+
+
+  function mount(containerId = CFG.CONTENT_ID, questions = [], { onBack, onFinish } = {}) {
+    setPergaminho('h');
+    const { content } = ensureCanvas();
+    content.innerHTML = `
+      <h2 class="text-xl md:text-2xl font-semibold mb-3" data-i18n="perguntas_title">Perguntas</h2>
+      ${buildForm(questions)}
+      <div class="mt-4 flex flex-wrap gap-2">
+        <button id="qa-back" class="px-3 py-2 rounded bg-gray-700 text-white">Voltar</button>
+        <button id="qa-finish" class="px-4 py-2 rounded bg-purple-700 text-white">Finalizar</button>
+      </div>
+    `;
+    window.i18n?.apply?.(content);
+    document.getElementById('qa-back')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      onBack && onBack();
+    });
+    document.getElementById('qa-finish')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      onFinish && onFinish();
+    });
+  }
+
+  document.addEventListener('change', (e) => {
+    if (e.target.id === 'language-select') {
+      window.i18n?.setLang?.(e.target.value);
+      updateBlocks();
+      loadDynamicBlocks();
+      console.log('[JORNADA_PAPER] Idioma alterado, blocos recarregados');
+    }
+  });
+
+  document.querySelectorAll('[data-action="read-question"]').forEach(button => {
+    button.addEventListener('click', () => {
+      const pergunta = button.closest('.j-pergunta').querySelector('[data-i18n]');
+      const key = pergunta.dataset.i18n;
+      const text = window.i18n.t(key, pergunta.textContent);
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = window.i18n.lang || 'pt-BR';
+        window.speechSynthesis.speak(utterance);
+      } else {
+        console.warn('[readAloud] SpeechSynthesis não suportado');
+      }
+    });
+  });
+
+  document.querySelectorAll('[data-action="toggle-password"]').forEach(button => {
+    button.addEventListener('click', () => {
+      const input = button.closest('.input-group').querySelector('input');
+      input.type = input.type === 'password' ? 'text' : 'password';
+      button.textContent = input.type === 'password' ? 'Mostrar' : 'Ocultar';
+    });
+  });
+  async function loadDynamicBlocks() {
   let attempts = 0;
   const maxAttempts = 50; // 5 segundos com intervalo de 100ms
   while (!i18n.ready && attempts < maxAttempts) {
@@ -383,60 +438,6 @@ async function loadDynamicBlocks() {
   console.log('[JORNADA_PAPER] Blocos carregados com sucesso');
   console.log('[JORNADA_PAPER] Dicionário i18n:', window.i18n?.dict);
 }
-
-  function mount(containerId = CFG.CONTENT_ID, questions = [], { onBack, onFinish } = {}) {
-    setPergaminho('h');
-    const { content } = ensureCanvas();
-    content.innerHTML = `
-      <h2 class="text-xl md:text-2xl font-semibold mb-3" data-i18n="perguntas_title">Perguntas</h2>
-      ${buildForm(questions)}
-      <div class="mt-4 flex flex-wrap gap-2">
-        <button id="qa-back" class="px-3 py-2 rounded bg-gray-700 text-white">Voltar</button>
-        <button id="qa-finish" class="px-4 py-2 rounded bg-purple-700 text-white">Finalizar</button>
-      </div>
-    `;
-    window.i18n?.apply?.(content);
-    document.getElementById('qa-back')?.addEventListener('click', (e) => {
-      e.preventDefault();
-      onBack && onBack();
-    });
-    document.getElementById('qa-finish')?.addEventListener('click', (e) => {
-      e.preventDefault();
-      onFinish && onFinish();
-    });
-  }
-
-  document.addEventListener('change', (e) => {
-    if (e.target.id === 'language-select') {
-      window.i18n?.setLang?.(e.target.value);
-      updateBlocks();
-      loadDynamicBlocks();
-      console.log('[JORNADA_PAPER] Idioma alterado, blocos recarregados');
-    }
-  });
-
-  document.querySelectorAll('[data-action="read-question"]').forEach(button => {
-    button.addEventListener('click', () => {
-      const pergunta = button.closest('.j-pergunta').querySelector('[data-i18n]');
-      const key = pergunta.dataset.i18n;
-      const text = window.i18n.t(key, pergunta.textContent);
-      if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = window.i18n.lang || 'pt-BR';
-        window.speechSynthesis.speak(utterance);
-      } else {
-        console.warn('[readAloud] SpeechSynthesis não suportado');
-      }
-    });
-  });
-
-  document.querySelectorAll('[data-action="toggle-password"]').forEach(button => {
-    button.addEventListener('click', () => {
-      const input = button.closest('.input-group').querySelector('input');
-      input.type = input.type === 'password' ? 'text' : 'password';
-      button.textContent = input.type === 'password' ? 'Mostrar' : 'Ocultar';
-    });
-  });
 
   window.JORNADA_PAPER = { set: setPergaminho, ensureCanvas };
   window.JORNADA_QA = { buildForm, mount, loadDynamicBlocks, typeQuestionsSequentially, typePlaceholder, typeAnswer };
