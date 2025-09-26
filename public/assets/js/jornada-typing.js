@@ -1,130 +1,145 @@
-/* =========================
-   JORNADA_TYPE – efeito de datilografia (v2.2)
-   Uso: JORNADA_TYPE.run(root?, { selector, speed, delay })
-        JORNADA_TYPE.typeIt(el, text, speed?)
-        JORNADA_TYPE.cancelAll()
-   Compat: [data-typing], [data-text], [data-speed], [data-cursor]
-   ========================= */
-(function (global) {
-  'use strict';
-  if (global.JORNADA_TYPE) return; // evita redefinição
+// /public/assets/js/jornada-type.js
+import i18n from './i18n.js'; // Ajuste o caminho conforme necessário
 
-  // injeta o cursor (uma vez)
-  (function ensureStyle(){
-    if (document.getElementById('typing-style')) return;
-    const st = document.createElement('style');
-    st.id = 'typing-style';
-    st.textContent = `
-      .typing-caret{display:inline-block;width:0.6ch;margin-left:2px;animation:blink 1s step-end infinite}
-      .typing-done[data-typing]::after{content:''}
-      @keyframes blink{50%{opacity:0}}
-    `;
-    document.head.appendChild(st);
-  })();
+// Evita redefinição
+if (window.JORNADA_TYPE) {
+  console.log('[JORNADA_TYPE] Já carregado, ignorando');
+  throw new Error('JORNADA_TYPE já carregado');
+}
 
-  const sleep = (ms) => new Promise(r=>setTimeout(r, ms));
+// Injeta estilo do cursor
+(function ensureStyle() {
+  if (document.getElementById('typing-style')) return;
+  const st = document.createElement('style');
+  st.id = 'typing-style';
+  st.textContent = `
+    .typing-caret{display:inline-block;width:0.6ch;margin-left:2px;animation:blink 1s step-end infinite}
+    .typing-done[data-typing]::after{content:''}
+    @keyframes blink{50%{opacity:0}}
+  `;
+  document.head.appendChild(st);
+})();
 
-  // Controle simples de concorrência
-  let ACTIVE = false;
-  function lock(){ ACTIVE = true; global.__typingLock = true; }
-  function unlock(){ ACTIVE = false; global.__typingLock = false; }
+const log = (...args) => console.log('[JORNADA_TYPE]', ...args);
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+const plain = (text) => (text ?? '').toString();
 
-  function plain(text){
-    // fallback seguro para texto
-    return (text ?? '').toString();
+let ACTIVE = false;
+let abortCurrent = null;
+
+function lock() {
+  ACTIVE = true;
+  window.__typingLock = true;
+}
+
+function unlock() {
+  ACTIVE = false;
+  window.__typingLock = false;
+}
+
+async function typeNode(node, fullText, { speed = 18, delay = 0, showCaret = true, finalHTML = null } = {}) {
+  if (!node) return;
+  if (abortCurrent) abortCurrent();
+  let abort = false;
+  abortCurrent = () => (abort = true);
+
+  const caret = document.createElement('span');
+  caret.className = 'typing-caret';
+  caret.textContent = '|';
+
+  node.classList.remove('typing-done');
+  node.innerHTML = '';
+  if (delay) await sleep(delay);
+  if (showCaret) node.appendChild(caret);
+
+  for (let i = 0; i < fullText.length; i++) {
+    if (abort) break;
+    caret.before(document.createTextNode(fullText[i]));
+    await sleep(speed);
   }
 
-  // Digita texto plain; se recebeu HTML no data-text, digita versão "sem tags"
-  // e, ao final, troca por innerHTML completo (mantendo tags <b>, <i>, etc.)
-  async function typeNode(node, fullText, { speed=18, delay=0, showCaret=true, finalHTML=null } = {}){
-    if (!node) return;
-    // prepara
-    const caret = document.createElement('span');
-    caret.className = 'typing-caret';
-    caret.textContent = '|';
+  if (!abort && showCaret) caret.remove();
+  if (!abort && finalHTML) {
+    node.innerHTML = finalHTML;
+  }
+  if (!abort) node.classList.add('typing-done');
 
-    node.classList.remove('typing-done');
-    node.innerHTML = ''; // começamos do zero
-    if (delay) await sleep(delay);
-    if (showCaret) node.appendChild(caret);
+  abortCurrent = null;
+}
 
-    for (let i = 0; i < fullText.length; i++) {
-      caret.before(document.createTextNode(fullText[i]));
-      await sleep(speed);
+async function run(root, opts = {}) {
+  if (ACTIVE) {
+    log('Animação em andamento, ignorando');
+    return;
+  }
+  lock();
+  try {
+    const scope = typeof root === 'string' ? document.querySelector(root) : (root || document);
+    if (!scope) {
+      log('Escopo não encontrado');
+      return;
     }
 
-    if (showCaret) caret.remove();
+    const selector = opts.selector || '[data-typing]';
+    const nodes = Array.from(scope.querySelectorAll(selector));
+    for (const n of nodes) {
+      if (n.classList.contains('typing-done')) continue;
 
-    // Se foi fornecido um HTML final (com tags), aplica agora
-    if (finalHTML) {
-      node.innerHTML = finalHTML;
+      const dataHTML = n.getAttribute('data-text');
+      const dataSpeed = n.getAttribute('data-speed');
+      const dataCursor = n.getAttribute('data-cursor');
+      const speed = Number(dataSpeed ?? opts.speed ?? 18);
+      const delay = Number(opts.delay ?? 0);
+      const showCaret = String(dataCursor ?? 'true') !== 'false';
+
+      const text = dataHTML
+        ? (() => {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = i18n.t(dataHTML, plain(n.textContent));
+            return tmp.textContent || tmp.innerText || '';
+          })()
+        : i18n.t(n.getAttribute('data-i18n') || plain(n.textContent), plain(n.textContent));
+
+      await typeNode(n, text, { speed, delay, showCaret, finalHTML: dataHTML ? i18n.t(dataHTML) : null });
     }
-
-    node.classList.add('typing-done');
-  }
-
-  // Runner principal
-  async function run(root, opts = {}) {
-    if (ACTIVE) { /* evita corridas */ return; }
-    lock();
-    try {
-      const scope = (typeof root === 'string') ? document.querySelector(root) : (root || document);
-      if (!scope) { unlock(); return; }
-
-      // Por padrão trabalhamos com [data-typing]; se quiser selector custom, permite também
-      const selector = opts.selector || '[data-typing]';
-      const nodes = Array.from(scope.querySelectorAll(selector));
-      for (const n of nodes) {
-        // se já digitado, não repete
-        if (n.classList.contains('typing-done')) continue;
-
-        // prioridade para data-attributes usados no seu HTML
-        const dataHTML   = n.getAttribute('data-text');           // pode vir com <b>...</b>
-        const dataSpeed  = n.getAttribute('data-speed');
-        const dataCursor = n.getAttribute('data-cursor');         // "true"/"false"
-        const speed = Number(dataSpeed ?? opts.speed ?? 18);
-        const delay = Number(opts.delay ?? 0);
-        const showCaret = String(dataCursor ?? 'true') !== 'false';
-
-        // Se vier HTML no data-text, digitamos seu texto "plain" e depois aplicamos o HTML completo
-        if (dataHTML) {
-          const tmp = document.createElement('div');
-          tmp.innerHTML = dataHTML;
-          const plainText = tmp.textContent || tmp.innerText || '';
-          await typeNode(n, plainText, { speed, delay, showCaret, finalHTML: dataHTML });
-        } else {
-          // Sem data-text → usa o texto atual do elemento
-          const text = plain(n.textContent);
-          await typeNode(n, text, { speed, delay, showCaret, finalHTML: null });
-        }
-      }
-    } finally {
-      unlock();
-    }
-  }
-
-  // Datilografia simples, imediata (sem caret, sem atraso)
-  function typeIt(el, text, speed=24){
-    if(!el || !text) return;
-    el.classList.remove('typing-done');
-    el.textContent = '';
-    let i = 0;
-    const tick = () => {
-      if(i < text.length){
-        el.textContent += text.charAt(i++);
-        setTimeout(tick, speed);
-      } else {
-        el.classList.add('typing-done');
-      }
-    };
-    setTimeout(tick, 0);
-  }
-
-  function cancelAll(){
-    // versão simples: só solta o lock
+  } finally {
     unlock();
   }
+}
 
-  global.JORNADA_TYPE = { run, typeIt, cancelAll, get locked(){ return ACTIVE; } };
-  global.runTyping = global.JORNADA_TYPE.run;
-})(window);
+function typeIt(el, text, speed = 24) {
+  if (!el || !text) return;
+  el.classList.remove('typing-done');
+  el.textContent = '';
+  let i = 0;
+  const tick = () => {
+    if (i < text.length) {
+      el.textContent += text.charAt(i++);
+      setTimeout(tick, speed);
+    } else {
+      el.classList.add('typing-done');
+    }
+  };
+  setTimeout(tick, 0);
+}
+
+function cancelAll() {
+  if (abortCurrent) abortCurrent();
+  unlock();
+}
+
+const JORNADA_TYPE = {
+  run,
+  typeIt,
+  cancelAll,
+  get locked() {
+    return ACTIVE;
+  }
+};
+
+window.JORNADA_TYPE = JORNADA_TYPE;
+window.runTyping = run; // Para compatibilidade com jornada-paper-qa.js
+
+log('Pronto');
+
+export default JORNADA_TYPE;
