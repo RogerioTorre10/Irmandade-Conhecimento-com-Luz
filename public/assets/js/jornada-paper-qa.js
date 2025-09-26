@@ -266,52 +266,14 @@
       element.classList.remove('typing-cursor');
     }
   }
-
-  function loadDynamicBlocks() {
-  console.log('[loadDynamicBlocks] Iniciando');
-  if (typeof window.JC === 'undefined') {
-    console.warn('[loadDynamicBlocks] window.JC não definido, aguardando...');
-    setTimeout(loadDynamicBlocks, 100); // Retry em 100ms
-    return;
-  }
-  updateBlocks();
-  const content = document.getElementById('perguntas-container');
-  if (!content) {
-    console.error('[JORNADA_PAPER] Container de perguntas não encontrado');
-    window.toast && window.toast('Erro ao carregar perguntas.');
-    return;
-  }
-
-  const blocks = window.JORNADA_BLOCKS || [];
-  console.log('[loadDynamicBlocks] JORNADA_BLOCKS:', blocks);
-  if (!blocks.length) {
-    console.error('[JORNADA_PAPER] JORNADA_BLOCKS não definido ou vazio');
-    window.toast && window.toast('Nenhum bloco de perguntas encontrado.');
-    return;
-  }
-
-  content.innerHTML = '';
-  content.classList.remove('hidden');
-  blocks.forEach((block, bIdx) => {
-    console.log('[loadDynamicBlocks] Gerando bloco:', block.id, 'com', block.questions ? block.questions.length : 0, 'perguntas');
-    // ... (resto do código para gerar blocos) ...
-  });
-
-  window.i18n?.apply?.(content);
-
-  const firstBloco = content.querySelector('.j-bloco');
-  if (firstBloco) {
-    firstBloco.style.display = 'block';
-    window.JC.currentBloco = 0; // Agora seguro, pois verificamos window.JC
-    window.JC.currentPergunta = 0;
-    // ... (resto do código) ...
-  }
-
-  console.log('[loadDynamicBlocks] Blocos carregados com sucesso');
-}
-
+ 
 function loadDynamicBlocks() {
   console.log('[loadDynamicBlocks] Iniciando');
+  if (!window.i18n || !window.i18n.ready) {
+    console.warn('[loadDynamicBlocks] i18n não pronto, aguardando...');
+    setTimeout(loadDynamicBlocks, 100);
+    return;
+  }
   if (typeof window.JC === 'undefined') {
     console.warn('[loadDynamicBlocks] window.JC não definido, inicializando fallback');
     window.JC = { currentBloco: 0, currentPergunta: 0, initialized: false, nextSection: null };
