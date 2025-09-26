@@ -68,6 +68,28 @@
         log('Reiniciando para section-intro');
         return;
       }
+      function goToNextSection() {
+  const currentIndex = sections.indexOf(currentSection);
+  if (currentIndex < sections.length - 1) {
+    const previousSection = currentSection;
+    currentSection = sections[currentIndex + 1];
+    console.log('[goToNextSection] Indo de', previousSection, 'para', currentSection);
+
+    // Ocultar seção anterior
+    document.querySelector(`#${previousSection}`).classList.remove('active');
+    // Mostrar nova seção
+    document.querySelector(`#${currentSection}`).classList.add('active');
+
+    // Ações específicas por seção
+    if (currentSection === 'section-perguntas') {
+      renderQuestions(); // Chamar função do jornada-paper-qa.js
+    } else if (currentSection === 'section-final') {
+      console.log('[goToNextSection] Jornada concluída!');
+    }
+  } else {
+    console.warn('[goToNextSection] Nenhuma seção seguinte disponível');
+  }
+}
 
       if (currentSection === 'section-termos') {
         const termosPg1 = document.getElementById('termos-pg1');
