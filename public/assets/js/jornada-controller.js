@@ -368,14 +368,3 @@ document.addEventListener('DOMContentLoaded', initController);
   
 })();
 
-(function () {
-  const JController = {
-    init() {
-      console.log('[JController] pronto');
-    },
-  };
-
-  window.JController = JController;
-  window.__markReady && window.__markReady('JController');
-})();
-
