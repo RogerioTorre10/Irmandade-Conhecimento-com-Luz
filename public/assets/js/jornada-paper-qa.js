@@ -361,12 +361,13 @@
   }
 
   const blocks = window.JORNADA_BLOCKS || [];
-  console.log('[loadDynamicBlocks] JORNADA_BLOCKS:', blocks);
-  if (!blocks.length) {
-    console.error('[JORNADA_PAPER] JORNADA_BLOCKS não definido ou vazio');
-    window.toast && window.toast('Nenhum bloco de perguntas encontrado.');
-    return;
+ console.log('[loadDynamicBlocks] JORNADA_BLOCKS preenchido:', JORNADA_BLOCKS);
+    return true;
+  } catch (error) {
+    console.error('[loadDynamicBlocks] Erro ao preencher JORNADA_BLOCKS:', error);
+    return false;
   }
+}
 
   content.innerHTML = '';
   content.classList.remove('hidden');
