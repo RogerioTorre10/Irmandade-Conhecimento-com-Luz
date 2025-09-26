@@ -238,16 +238,43 @@
     console.log('[TypeAnswer] Digitação concluída para:', textarea);
   }
   // jornada-paper-qa.js
-    function renderQuestions() {
-     const container = document.querySelector('#perguntas-container');
-      JORNADA_BLOCKS.forEach(block => {
-      block.questions.forEach((question, index) => {
-      const questionElement = document.createElement('div');
-      questionElement.innerHTML = `<p>${question.text}</p>`;
-      container.appendChild(questionElement);
-     });
-    });
+   function renderQuestions() {
+  const container = document.querySelector('#perguntas-container');
+  if (!container) {
+    console.error('[renderQuestions] #perguntas-container não encontrado');
+    return;
   }
+  container.innerHTML = ''; // Limpar conteúdo anterior
+  JORNADA_BLOCKS.forEach(block => {
+    if (block.questions && block.questions.length > 0) {
+      block.questions.forEach((question, index) => {
+        const questionElement = document.createElement('div');
+        questionElement.className = 'pergunta';
+        questionElement.innerHTML = `
+          <p>${question.text}</p>
+          <button class="btn-avancar" data-action="read-question" data-question-id="${block.id}-${index}">Responder</button>
+        `;
+        container.appendChild(questionElement);
+      });
+    }
+  });
+  console.log('[renderQuestions] Perguntas renderizadas');
+}
+
+// Carregar e exibir vídeo, garantindo que fique acima do pergaminho
+function loadVideo(videoSrc) {
+  const video = document.querySelector('#videoTransicao');
+  const videoOverlay = document.querySelector('#videoOverlay');
+  if (!video || !videoOverlay) {
+    console.error('[loadVideo] #videoTransicao ou #videoOverlay não encontrado');
+    return;
+  }
+  video.src = videoSrc || '/path/to/video.mp4'; // Ajuste o caminho do vídeo
+  video.style.zIndex = 2001; // Garantir que o vídeo fique acima
+  videoOverlay.style.zIndex = 2000; // Overlay acima do #jornada-canvas (z-index: 1000)
+  video.load();
+  video.play().catch(err => console.error('[loadVideo] Erro ao reproduzir vídeo:', err));
+}
 
   async function typeQuestionsSequentially(bloco) {
     const elements = bloco.querySelectorAll('[data-typing="true"]');
