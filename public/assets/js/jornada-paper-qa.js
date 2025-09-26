@@ -265,15 +265,13 @@
     if (element.dataset.cursor === 'true') {
       element.classList.remove('typing-cursor');
     }
-  }
- 
-/* /public/assets/js/jornada-paper-qa.js */
-;/* (seu código original com as seguintes mudanças) */
+  } 
+
 function loadDynamicBlocks() {
   console.log('[loadDynamicBlocks] Iniciando');
   if (!window.i18n || !window.i18n.ready) {
     console.warn('[loadDynamicBlocks] i18n não pronto, aguardando...');
-    setTimeout(loadDynamicBlocks, 100);
+    setTimeout(loadDynamicBlocks, 200); // Aumentado o delay
     return;
   }
   if (typeof window.JC === 'undefined') {
