@@ -51,56 +51,61 @@ function debounceClick(callback, wait = 500) {
 
 function goToNextSection() {
   const currentIdx = sections.indexOf(currentSection);
+  log('Índice atual:', currentIdx, 'Seção atual:', currentSection);
   if (currentIdx < sections.length - 1) {
-    // Verificar se todas as perguntas foram respondidas em section-perguntas
-    if (currentSection === 'section-perguntas') {
-      const totalQuestions = window.JORNADA_BLOCKS?.reduce((sum, block) => sum + (block.questions?.length || 0), 0) || 0;
-      if (answeredQuestions.size < totalQuestions) {
-        log('Aguardando todas as perguntas serem respondidas:', {
-          respondidas: answeredQuestions.size,
-          total: totalQuestions
-        });
-        return;
-      }
-    }
-
     const previousSection = currentSection;
     currentSection = sections[currentIdx + 1];
-    log(`Indo de ${previousSection} para ${currentSection}`);
+    log(`Tentando navegar de ${previousSection} para ${currentSection}`);
 
     // Ocultar seção anterior
     const prevElement = document.querySelector(`#${previousSection}`);
-    if (prevElement) prevElement.classList.remove('active');
+    if (prevElement) {
+      prevElement.classList.remove('active');
+      prevElement.classList.add('hidden');
+      log(`Seção anterior ${previousSection} ocultada`);
+    } else {
+      console.error(`[CONTROLLER] Seção anterior ${previousSection} não encontrada`);
+    }
 
     // Mostrar nova seção
     const nextElement = document.querySelector(`#${currentSection}`);
     if (nextElement) {
       nextElement.classList.add('active');
+      nextElement.classList.remove('hidden');
+      log(`Seção ${currentSection} exibida`);
     } else {
       console.error(`[CONTROLLER] Seção ${currentSection} não encontrada`);
       return;
     }
 
-    // Lógica específica por seção (mantendo compatibilidade com termos-pg1/pg2)
+    // Lógica específica por seção
     if (currentSection === 'section-termos') {
       const termosPg1 = document.getElementById('termos-pg1');
       const termosPg2 = document.getElementById('termos-pg2');
       if (termosPg1 && !termosPg1.classList.contains('hidden')) {
-        termosPg1.classList.add('hidden');
-        termosPg2.classList.remove('hidden');
-        log('Avançando de termos-pg1 para termos-pg2');
+        termosPg1.classList.remove('hidden');
+        termosPg2.classList.add('hidden');
+        log('Exibindo termos-pg1');
         return;
       }
     } else if (currentSection === 'section-perguntas') {
-      answeredQuestions.clear(); // Resetar respostas ao entrar na seção
-      renderQuestions(); // Renderizar todas as perguntas
-      window.perguntasLoaded = true; // Flag para compatibilidade
-      log('Perguntas carregadas e renderizadas');
+      try {
+        answeredQuestions.clear();
+        renderQuestions();
+        window.perguntasLoaded = true;
+        log('Perguntas carregadas e renderizadas');
+      } catch (error) {
+        console.error('[CONTROLLER] Erro ao renderizar perguntas:', error);
+      }
     } else if (currentSection === 'section-guia') {
-      loadVideo('/path/to/guia-video.mp4'); // Ajuste o caminho
+      try {
+        loadVideo('/path/to/guia-video.mp4');
+        log('Vídeo do guia carregado');
+      } catch (error) {
+        console.error('[CONTROLLER] Erro ao carregar vídeo do guia:', error);
+      }
     } else if (currentSection === 'section-final') {
       log('Jornada concluída! 🎉');
-      // Opcional: reproduzir vídeo final se disponível
       if (window.JORNADA_FINAL_VIDEO && window.playTransition) {
         window.playTransition(window.JORNADA_FINAL_VIDEO, () => {
           log('Vídeo final concluído');
@@ -108,21 +113,20 @@ function goToNextSection() {
       }
     }
 
-    // Transições globais (typing, etc., se disponíveis)
+    // Executar animação de digitação
     if (window.runTyping) {
-      const typingElement = document.querySelector(`#${currentSection} .typing-target`); // Ajuste o seletor
-      if (typingElement) {
-        window.runTyping(typingElement);
-      }
-    }
-
-    if (window.playTransition) {
-      const transitionVideo = window.JORNADA_VIDEOS?.[currentSection]; // Vídeo de transição por seção
-      if (transitionVideo) {
-        window.playTransition(transitionVideo, () => {
-          log(`Transição concluída para ${currentSection}`);
+      const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]`);
+      if (typingElements.length > 0) {
+        typingElements.forEach((element, index) => {
+          window.runTyping(element, () => {
+            log(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
+          });
         });
+      } else {
+        log('Nenhum elemento de digitação encontrado em', currentSection);
       }
+    } else {
+      log('window.runTyping não definido');
     }
   } else {
     log('Nenhuma seção seguinte disponível. Jornada finalizada.');
