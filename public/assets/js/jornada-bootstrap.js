@@ -4,6 +4,17 @@
   const log = (...args) => console.log('[BOOT]', ...args);
   let retryCount = 0;
   const MAX_RETRIES = 50;
+  
+  // jornada-bootstrap.js
+async function bootstrap() {
+  try {
+    await i18n.init('pt');
+    console.log('[BOOT] i18n inicializado');
+    await loadDynamicBlocks();
+  } catch (error) {
+    console.error('[BOOT] Falha no bootstrap:', error);
+  }
+}
 
   function startWhenReady(route = 'intro') {
     retryCount++;
