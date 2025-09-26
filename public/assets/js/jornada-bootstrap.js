@@ -15,6 +15,86 @@ async function bootstrap() {
     console.error('[BOOT] Falha no bootstrap:', error);
   }
 }
+  // --- [BOOT v6-fix] Dependency gate + diagnostics -----------------------------
+(function () {
+  const REQUIRED = [
+    'CONFIG', 'JUtils', 'JCore', 'JAuth', 'JChama', 
+    'JController', 'I18N', 'API'
+  ];
+
+  // Marca módulos prontos (chame em cada módulo quando terminar)
+  window.__markReady = function (name) {
+    window.__readySet = window.__readySet || new Set();
+    window.__readySet.add(name);
+    document.dispatchEvent(new Event('jc:module-ready'));
+  };
+
+  function missingDeps() {
+    const g = window;
+    return REQUIRED.filter((key) => typeof g[key] === 'undefined');
+  }
+
+  async function waitDom() {
+    if (document.readyState === 'complete' || document.readyState === 'interactive') return;
+    await new Promise((r) => document.addEventListener('DOMContentLoaded', r, { once: true }));
+  }
+
+  let attempts = 0;
+  const MAX = 80;      // ~8s se interval = 100ms
+  const INTERVAL = 100;
+
+  async function startWhenReady(route = 'intro') {
+    console.log(`[BOOT] Tentativa ${attempts + 1} de ${MAX} • rota: ${route}`);
+    if (attempts === 0) await waitDom();
+
+    const missing = missingDeps();
+    if (missing.length === 0) {
+      console.log('[BOOT] Dependências prontas ✅');
+      try {
+        // Preferência: inicializador central se existir
+        if (window.JBootstrap?.init) {
+          await window.JBootstrap.init({ route });
+        } else if (window.JC?.init) {
+          await window.JC.init({ route });
+        } else if (typeof window.initJornada === 'function') {
+          await window.initJornada({ route });
+        } else {
+          console.warn('[BOOT] Nenhum init central encontrado. Prosseguindo mesmo assim.');
+        }
+        console.log('[BOOT] Jornada iniciada 🚀');
+        document.dispatchEvent(new Event('jc:ready'));
+      } catch (err) {
+        console.error('[BOOT] Erro na inicialização (init):', err);
+      }
+      return;
+    }
+
+    attempts++;
+    if (attempts >= MAX) {
+      console.error('[BOOT] Máximo de tentativas excedido. Inicialização falhou.');
+      console.warn('[BOOT] Faltando:', missing);
+      throw new Error('Inicialização falhou: máximo de tentativas excedido');
+    }
+
+    console.log('[BOOT] Dependências não prontas, retry em 100ms', { faltando: missing });
+    await new Promise((r) => setTimeout(r, INTERVAL));
+    startWhenReady(route);
+  }
+
+  // expõe para ser chamado no final do HTML ou por outros scripts
+  window.startWhenReady = startWhenReady;
+
+  // também tenta iniciar automaticamente após carregamento
+  window.addEventListener('load', () => {
+    // só dispara se ninguém chamou manualmente até agora
+    if (!window.__autoBootDone) {
+      window.__autoBootDone = true;
+      startWhenReady('intro').catch((e) => {
+        console.error('[BOOT] Erro na inicialização:', e.message || e);
+      });
+    }
+  });
+})();
 
   function startWhenReady(route = 'intro') {
     retryCount++;
