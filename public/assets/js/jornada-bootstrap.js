@@ -3,7 +3,7 @@
   'use strict';
   const log = (...args) => console.log('[BOOT]', ...args);
   let retryCount = 0;
-  const MAX_RETRIES = 20;
+  const MAX_RETRIES = 50;
 
   function startWhenReady(route = 'intro') {
     retryCount++;
