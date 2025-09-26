@@ -117,23 +117,24 @@
       });
     }
   };
-     // i18n.js
-      let i18n = {
-      ready: false,
-      translations: {},
-      async init(lang) {
-      try {
-      this.translations = await loadLanguage(lang);
+    // i18n.js
+let i18n = {
+  ready: false,
+  translations: {},
+  async init(lang) {
+    try {
+      const response = await fetch(`/i18n/${lang}.json`); // Novo caminho
+      if (!response.ok) {
+        throw new Error(`Falha ao carregar /i18n/${lang}.json: ${response.status}`);
+      }
+      this.translations = await response.json();
       this.ready = true;
+      console.log(`[i18n] Idioma ${lang} carregado com sucesso`);
     } catch (error) {
-      console.error('[i18n] Inicialização falhou:', error);
+      console.error(`[i18n] Erro ao carregar idioma ${lang}:`, error);
+      this.ready = false;
     }
   }
 };
 
-     window.i18n = i18n;
-      document.addEventListener("DOMContentLoaded", () => {
-      console.log("[i18n] Carregando i18n.js...");
-      i18n.init().catch(err => console.error("[i18n] Erro na inicialização:", err));
-    });
- })();
+export default i18n;    
