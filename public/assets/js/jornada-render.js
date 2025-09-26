@@ -16,9 +16,9 @@
     }
   }
 
-  function renderIntro() {
-    console.log('[JORNADA_RENDER] Renderizando intro');
-    const section = document.getElementById('section-intro');
+  function renderinicio() {
+    console.log('[JORNADA_RENDER] Renderizando inicio');
+    const section = document.getElementById('section-inicio');
     if (section) {
       section.classList.remove('hidden');
       setCanvas('v');
@@ -79,7 +79,7 @@
   }
 
   // Exports
-  JR.renderIntro = renderIntro;
+  JR.renderIntro = renderinicio;
   JR.renderPerguntas = renderPerguntas;
   JR.renderFinal = renderFinal;
   JR.updateCanvasBackground = updateCanvasBackground;     // export no namespace
