@@ -5,6 +5,51 @@
 
   window.perguntasLoaded = false;
 
+  // --- [CTRL v6-fix] Safe next + action queue ---------------------------------
+(function () {
+  // Fila: se o controller ainda não estiver pronto, acumulamos ações
+  window.__JCQ = window.__JCQ || [];
+
+  function doGoNext() {
+    if (window.JController?.goNext) {
+      try { window.JController.goNext(); } catch (e) { console.error('[CTRL] goNext erro:', e); }
+      return true;
+    }
+    if (window.JC?.next) {
+      try { window.JC.next(); } catch (e) { console.error('[CTRL] JC.next erro:', e); }
+      return true;
+    }
+    return false;
+  }
+
+  // Expor a função global esperada pelo HTML/atributos inline
+  window.goToNextSection = function () {
+    if (!doGoNext()) {
+      console.warn('[CTRL] Controller ainda não pronto. Enfileirando AÇÃO: next');
+      window.__JCQ.push({ type: 'next' });
+    }
+  };
+
+  // Quando o sistema sinalizar que está pronto, drenamos a fila
+  document.addEventListener('jc:ready', () => {
+    if (!window.__JCQ?.length) return;
+    const queue = window.__JCQ.slice();
+    window.__JCQ.length = 0;
+    for (const item of queue) {
+      if (item.type === 'next') doGoNext();
+    }
+  });
+
+  // Delegação para qualquer botão com data-action="next" (backup)
+  document.addEventListener('click', (ev) => {
+    const btn = ev.target.closest?.('[data-action="next"]');
+    if (!btn) return;
+    ev.preventDefault();
+    window.goToNextSection();
+  });
+})();
+
+
   let isProcessingClick = false;
   function debounceClick(callback, wait = 500) {
     return (...args) => {
