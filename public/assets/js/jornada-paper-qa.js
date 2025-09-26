@@ -267,13 +267,21 @@
     }
   } 
 
-function loadDynamicBlocks() {
-  console.log('[loadDynamicBlocks] Iniciando');
-  if (!window.i18n || !window.i18n.ready) {
-    console.warn('[loadDynamicBlocks] i18n não pronto, aguardando...');
-    setTimeout(loadDynamicBlocks, 200); // Aumentado o delay
-    return;
+async function loadDynamicBlocks() {
+  let attempts = 0;
+  const maxAttempts = 50; // 5 segundos com intervalo de 100ms
+  while (!i18n.ready && attempts < maxAttempts) {
+    console.log('[loadDynamicBlocks] i18n não pronto, aguardando...');
+    await new Promise(resolve => setTimeout(resolve, 100));
+    attempts++;
   }
+  if (!i18n.ready) {
+    console.error('[loadDynamicBlocks] Falha: i18n não inicializado após', maxAttempts, 'tentativas');
+    return false;
+  }
+  // Carregar blocos
+  return true;
+}
   if (typeof window.JC === 'undefined') {
     console.warn('[loadDynamicBlocks] window.JC não definido, inicializando fallback');
     window.JC = { currentBloco: 0, currentPergunta: 0, initialized: false, nextSection: null };
