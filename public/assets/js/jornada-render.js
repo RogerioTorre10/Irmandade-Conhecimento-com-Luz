@@ -31,6 +31,15 @@
     const mode = (sectionId === 'section-perguntas') ? 'h' : 'v';
     setCanvas(mode);
   }
+  function renderBlocks() {
+  const container = document.querySelector('#perguntas-container');
+  JORNADA_BLOCKS.forEach(block => {
+    const blockElement = document.createElement('div');
+    blockElement.id = block.id;
+    blockElement.innerHTML = `<h2>${block.content.title}</h2><p>${block.content.description}</p>`;
+    container.appendChild(blockElement);
+  });
+}
 
   function renderPerguntas(blocoIndex = 0) {
     console.log('[JORNADA_RENDER] Renderizando perguntas, bloco:', blocoIndex);
