@@ -79,7 +79,7 @@
   }
 
   // Exports
-  JR.renderIntro = renderinicio;
+  JR.renderInicio = renderinicio;
   JR.renderPerguntas = renderPerguntas;
   JR.renderFinal = renderFinal;
   JR.updateCanvasBackground = updateCanvasBackground;     // export no namespace
