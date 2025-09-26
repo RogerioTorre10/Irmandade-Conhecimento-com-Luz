@@ -275,7 +275,6 @@ function loadVideo(videoSrc) {
   video.load();
   video.play().catch(err => console.error('[loadVideo] Erro ao reproduzir vídeo:', err));
 }
-
   async function typeQuestionsSequentially(bloco) {
     const elements = bloco.querySelectorAll('[data-typing="true"]');
     for (const el of elements) {
@@ -304,8 +303,6 @@ function loadVideo(videoSrc) {
       element.classList.remove('typing-cursor');
     }
   } 
-
-
 
   function mount(containerId = CFG.CONTENT_ID, questions = [], { onBack, onFinish } = {}) {
     setPergaminho('h');
@@ -466,6 +463,50 @@ function loadVideo(videoSrc) {
   console.log('[JORNADA_PAPER] Blocos carregados com sucesso');
   console.log('[JORNADA_PAPER] Dicionário i18n:', window.i18n?.dict);
 }
+/ Inicializar botões relacionados a perguntas e vídeos
+function initPaperQAEvents() {
+  // Botões de perguntas (o fluxo é gerenciado pelo jornada-controller.js)
+  document.querySelectorAll('[data-action="read-question"]').forEach(button => {
+    button.addEventListener('click', () => {
+      console.log('[initPaperQAEvents] Pergunta respondida:', button.dataset.questionId);
+      // Notificar jornada-controller.js, se necessário
+      document.dispatchEvent(new CustomEvent('questionAnswered', { detail: { questionId: button.dataset.questionId } }));
+    });
+  });
+
+  // Botão de pular vídeo
+  const skipVideoButton = document.querySelector('#skipVideo');
+  if (skipVideoButton) {
+    skipVideoButton.addEventListener('click', () => {
+      console.log('[initPaperQAEvents] Vídeo pulado');
+      // Notificar jornada-controller.js para avançar
+      document.dispatchEvent(new CustomEvent('videoSkipped'));
+    });
+  }
+}
+
+// Inicializar tudo
+async function initPaperQA() {
+  console.log('[initPaperQA] Inicializando...');
+  try {
+    const blocksLoaded = await loadDynamicBlocks();
+    if (!blocksLoaded) {
+      throw new Error('Falha ao carregar JORNADA_BLOCKS');
+    }
+    initPaperQAEvents();
+    // Carregar vídeo inicial, se necessário
+    loadVideo('/path/to/initial-video.mp4'); // Ajuste o caminho
+    console.log('[initPaperQA] Inicialização concluída');
+  } catch (error) {
+    console.error('[initPaperQA] Erro na inicialização:', error);
+  }
+}
+
+// Chamar inicialização
+document.addEventListener('DOMContentLoaded', initPaperQA);
+
+// Exportar funções para uso pelo jornada-controller.js, se necessário
+export { loadDynamicBlocks, renderQuestions, loadVideo }
 
   window.JORNADA_PAPER = { set: setPergaminho, ensureCanvas };
   window.JORNADA_QA = { buildForm, mount, loadDynamicBlocks, typeQuestionsSequentially, typePlaceholder, typeAnswer };
