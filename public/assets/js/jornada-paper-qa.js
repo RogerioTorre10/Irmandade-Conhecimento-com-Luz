@@ -15,7 +15,7 @@ const CFG = {
 
   const VIDEO_BASE = CFG.VIDEO_BASE;
   window.JORNADA_VIDEOS = {
-    intro: VIDEO_BASE + 'filme-0-ao-encontro-da-jornada.mp4',
+    inicio: VIDEO_BASE + 'filme-0-ao-encontro-da-jornada.mp4',
     afterBlocks: {
       0: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
       1: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
@@ -411,7 +411,7 @@ async function initPaperQA() {
       throw new Error('Falha ao carregar JORNADA_BLOCKS');
     }
     initPaperQAEvents();
-    loadVideo(JORNADA_VIDEOS.intro); // Carregar vídeo inicial
+    loadVideo(JORNADA_VIDEOS.inicio); // Carregar vídeo inicial
     log('Inicialização concluída');
   } catch (error) {
     console.error('[JORNADA_PAPER] Erro na inicialização:', error);
