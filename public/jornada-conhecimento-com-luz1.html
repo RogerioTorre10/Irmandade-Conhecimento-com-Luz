@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta charset="utf-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title data-i18n="site.title">Jornada • Irmandade Conhecimento com Luz</title>
   <link rel="icon" href="/assets/img/perfil-da-irmandade.png" type="image/png">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
@@ -25,7 +25,6 @@
   <script defer src="/assets/js/jornada-micro.js?v=6" onload="console.log('[LOAD] jornada-micro.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-micro.js')"></script>
   <script defer src="/assets/js/api.js?v=6" onload="console.log('[LOAD] api.js carregado')" onerror="console.error('[LOAD] Erro ao carregar api.js')"></script>
 
-  
   <style>
     @font-face {
       font-family: "ManufacturingConsent";
@@ -228,9 +227,9 @@
     #toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#111;color:#fff;padding:10px 14px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.35);font-size:16px;z-index:4000;opacity:0;pointer-events:none;transition:opacity .25s ease}
     #toast.show{opacity:1}
   </style>
-</head> 
-  
- <body data-layout="master" data-journey="essencial">
+</head>
+
+<body data-layout="master" data-journey="essencial">
   <!-- Seletor de Idioma -->
   <div class="language-selector">
     <select id="language-select">
@@ -255,7 +254,7 @@
         <div id="aria-pergunta" class="sr-only" aria-live="polite"></div>
 
         <!-- INTRO -->
-        <div id="section-inicio" class="j-section">
+        <div id="section-intro" class="j-section">
           <p data-typing="true" data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
           <p data-typing="true" data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Antes de começar, leia os termos abaixo." data-speed="50" data-cursor="true"></p>
           <div class="footer-actions"><button class="btn btn-avancar" data-action="avancar">Avançar</button></div>
@@ -312,7 +311,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- SENHA -->
         <div id="section-senha" class="j-section hidden">
           <div class="password-form">
@@ -400,39 +399,17 @@
         <div id="section-perguntas" class="j-section hidden">
           <div class="progress-container">
             <div class="progress-badge" id="jprog-pct">0% concluído</div>
-             <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
-              <div class="j-progress"><div class="j-progress__bar"><div class="j-progress__fill" id="j-fill-inline"></div></div><div class="j-progress__meta" id="j-meta"></div></div>
-               </div>
-               <div class="j-pergunta" data-pergunta="1" style="display: none;">
-              <label class="pergunta-enunciado text" data-typing="true" data-text="Pergunta 2: " data-speed="36" data-cursor="true"></label>
-            <textarea rows="4" class="input" placeholder="undefined"></textarea>
-          <div class="accessibility-controls">
-        <button class="btn-mic" data-action="start-mic">🎤 undefined</button>
-        <button class="btn-audio" data-action="read-question">🔊 undefined</button>
-         <button class="btn btn-avancar" data-action="avancar">undefined</button>
+            <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
+            <div class="j-progress"><div class="j-progress__bar"><div class="j-progress__fill" id="j-fill-inline"></div></div><div class="j-progress__meta" id="j-meta"></div></div>
           </div>
-           </div>
-            <div class="j-pergunta" data-pergunta="2" style="display: none;">
-             <label class="pergunta-enunciado text" data-typing="true" data-text="Pergunta 3: " data-speed="36" data-cursor="true"></label>
-              <textarea rows="4" class="input" placeholder="undefined"></textarea>
-              <div class="accessibility-controls">
-             <button class="btn-mic" data-action="start-mic">🎤 undefined</button>
-           <button class="btn-audio" data-action="read-question">🔊 undefined</button>
-          <button class="btn btn-avancar" data-action="avancar">undefined</button>
-         </div>
-       </div>
 
           <div id="chama-perguntas" class="chama-icone chama-fixed-hero media" aria-hidden="true">
             <div class="chama-vela chama-md"><div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div></div>
           </div>
 
           <div id="perguntas-container"></div>
-           <div id="chat-container">
-             <input type="text" id="grok-chat-input" data-i18n-placeholder="chat_placeholder" placeholder="Digite sua mensagem...">
-               <button class="btn-avancar" data-action="send-chat">Enviar</button>
-                </div>
 
-              <div class="footer-actions">
+          <div class="footer-actions">
             <button id="btnNextPerguntas" class="btn btn-avancar" data-action="avancar">Avançar</button>
           </div>
         </div>
@@ -474,1978 +451,839 @@
 
   <!-- Toast -->
   <div id="toast" role="status" aria-live="polite" class="hidden"></div>
-  
 
-                 <!-- util: toast + erro global -->
+  <!-- Scripts Inline -->
+  <!-- Utils -->
   <script>
-    (function(){   
-      function toast(msg){
-        try{
-          const t=document.getElementById('toast'); if(!t) return;
-          t.textContent=msg; t.classList.remove('hidden'); t.classList.add('show');
-          setTimeout(()=>{t.classList.remove('show');},3000);
-        }catch(_){}
-      }
-      window.addEventListener('error',(e)=>{
-        console.error('[Erro global]',e?.error||e);
-        toast('Ops… algo falhou, mas já seguimos em frente.');
-      });                   
-      const env=document.getElementById('envTag');
-      if(env) env.textContent=`layout=${document.body.dataset.layout||'master'} · journey=${document.body.dataset.journey||'essencial'} · path=/assets`;
-    });
-      </script>              
-        
-  
-                <!-- chamas -->
-  <script>      
-      function makeFlame(cls){
-        const d=document.createElement('div');
-        d.className=(cls||'chama-vela chama-md');
-        d.innerHTML='<div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>';
-        return d;
-      }
-      function ensureHeaderFlame(){
-        const H=document.getElementById('chama-header');
-        if(!H) return;
-        if(!H.querySelector('.brasa')){H.innerHTML='';H.appendChild(makeFlame('chama-vela chama-lg'));}
-      }
-      function ensureInlineFlame(id,cls){
-        const el=document.getElementById(id);
-        if(!el) return null;
-        if(!el.querySelector('.brasa')){el.innerHTML='';el.appendChild(makeFlame(cls||'chama-vela chama-md'));}
-        return el.firstElementChild;
-      }
-      function ensurePageFlames(){
-        if(!document.getElementById('flame-bottom-right')){
-          const f=makeFlame('chama-vela chama-md');
-          f.id='flame-bottom-right';
-          f.style.cssText='position:fixed;bottom:12px;right:12px;z-index:1200;';
-          document.body.appendChild(f);
-        }
-      }
-      function setMode(el,score){
-        if(!el) return;
-        el.classList.remove('fraca','media','forte');
-        el.classList.add(score<=-2?'fraca':score>=2?'forte':'media');
-      }
-      window.JORNADA_CHAMA=window.JORNADA_CHAMA||{};
-      window.JORNADA_CHAMA.updateChama=function(score){
-        const main=ensureInlineFlame('chama-perguntas','chama-vela chama-md');
-        setMode(main,score);
-        setMode(document.getElementById('flame-bottom-right'),score);
-      };
-      window.JORNADA_CHAMA.ensureHeroFlame=function(sectionId){
-        const canvas=document.getElementById('jornada-canvas');
-        if(!canvas) return;
-        let hero=document.getElementById('chama-hero');
-        const show=(sectionId==='section-intro'||sectionId==='section-termos'||sectionId==='section-senha'||sectionId==='section-final'||sectionId==='section-selfie'||sectionId==='section-guia');
-        if(show){
-          if(!hero){
-            hero=makeFlame('chama-vela chama-lg');
-            hero.id='chama-hero';
-            hero.style.cssText='position:absolute;top:8px;left:8px;z-index:60;';
-            canvas.appendChild(hero);
-          }
-        } else if(hero){
-          hero.remove();
-        }
-      };
-      function updateChama(score){
-        window.JORNADA_CHAMA.updateChama(score);
-      }
-      function ensureHeroFlame(sectionId){
-        window.JORNADA_CHAMA.ensureHeroFlame(sectionId);
-      }
+  (function() {
+    window.utils = window.utils || {
+      dedupe: str => str ? String(str).replace(/\s+/g, ' ').trim() : ''
+    };
+    console.log('[Utils] Bloco carregado');
+  })();
   </script>
 
-                 <!-- selfie -->
-<script>
+  <!-- Toast -->
+  <script>
   (function() {
-    const $ = s => document.querySelector(s);
-    const card = $('#card-guide');
-    const guideNameEl = $('#guideNameSlot');
-    const userNameEl = $('#userNameSlot');
-    const flameLayer = $('#card-guide .flame-layer');
-    const selfieImg = $('#selfieImage');
-    const bgImg = $('#guideBg');
-    const nameInput = $('#nameInput');
-    const guiaNameInput = $('#guiaNameInput');
-    const fileInput = $('#selfieInput');
-    const previewBtn = $('#previewBtn');
-    const captureBtn = $('#captureBtn');
-    const errorDiv = $('#selfieError');
-    const scaleInput = $('#selfieScale');
-    const offsetXInput = $('#selfieOffsetX');
-    const offsetYInput = $('#selfieOffsetY');
+    window.toast = function(msg, time = 3000) {
+      const t = document.getElementById('toast');
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), time);
+    };
+    console.log('[Toast] Bloco carregado');
+  })();
+  </script>
 
-    if (!card || !guideNameEl || !userNameEl || !flameLayer || !selfieImg || !bgImg || !nameInput || !fileInput || !previewBtn || !captureBtn) {
-      console.warn('[Selfie] Um ou mais elementos DOM não encontrados');
+  <!-- TTS -->
+  <script>
+  (function() {
+    if (!window.JORNADA) window.JORNADA = {};
+    window.JORNADA.tts = window.JORNADA.tts || { enabled: true, readingMode: 'after' };
+    window.isMuted = window.isMuted || false;
+
+    window.speak = window.speak || function(text) {
+      if (window.isMuted || !window.JORNADA.tts.enabled) return Promise.resolve();
+      if (!window.speechSynthesis) {
+        console.warn('[speak] SpeechSynthesis não suportado no navegador');
+        return Promise.resolve();
+      }
+      return new Promise(resolve => {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'pt-BR';
+        utterance.onend = resolve;
+        utterance.onerror = () => resolve();
+        window.speechSynthesis.speak(utterance);
+      });
+    };
+    console.log('[TTS] Bloco carregado');
+  })();
+  </script>
+
+  <!-- Datilografia -->
+  <script>
+  (function() {
+    const G = (typeof window !== 'undefined' ? window : globalThis);
+    if (G.__typingLock == null) G.__typingLock = false;
+    if (G.__DEFAULT_SPEED_TYPING == null) G.__DEFAULT_SPEED_TYPING = 80;
+    const DEFAULT_SPEED = G.__DEFAULT_SPEED_TYPING;
+
+    function typeTextOnce(el, text, speed = 24) {
+      if (!el || el.dataset.typerApplied === '1') return;
+      el.dataset.typerApplied = '1';
+      el.textContent = '';
+      let i = 0;
+      const timer = setInterval(() => {
+        el.textContent += text[i] || '';
+        i++;
+        if (i >= text.length) clearInterval(timer);
+      }, speed);
+    }
+
+    function typeWriter(el, text, speed, showCursor) {
+      if (!el || el.dataset.typing === '1' || el.dataset.typed === '1') return Promise.resolve();
+      if (!window.utils || !window.utils.dedupe) {
+        console.error('[typeWriter] window.utils.dedupe não definido');
+        window.toast && window.toast('Erro ao processar datilografia.');
+        return Promise.resolve();
+      }
+      el.dataset.typing = '1';
+      el.textContent = '';
+      const highlight = el.querySelector('.highlight') || document.createElement('div');
+      if (!highlight.parentNode) {
+        highlight.className = 'highlight';
+        el.prepend(highlight);
+      }
+
+      text = window.utils.dedupe(text || '').replace(/[{}[\]]/g, '').trim();
+      let i = 0;
+
+      return new Promise(resolve => {
+        function step() {
+          if (!el.isConnected || el.offsetParent === null || el.closest('.j-section.hidden')) {
+            el.classList.remove('lumen-typing');
+            const h = el.querySelector('.highlight');
+            if (h) h.style.width = '0';
+            el.dataset.typed = '0';
+            el.dataset.typing = '0';
+            return resolve();
+          }
+
+          if (i < text.length) {
+            const char = text.charAt(i++);
+            el.textContent += char;
+            try {
+              const canvas = document.createElement('canvas');
+              const ctx = canvas.getContext('2d');
+              ctx.font = getComputedStyle(el).font;
+              highlight.style.width = `${ctx.measureText(el.textContent).width}px`;
+            } catch (_) {}
+            setTimeout(step, speed || DEFAULT_SPEED);
+          } else {
+            el.classList.add('typing-done');
+            el.classList.remove('lumen-typing');
+            const h = el.querySelector('.highlight');
+            if (h) h.style.width = '0';
+            el.dataset.typed = '1';
+            el.dataset.typing = '0';
+            resolve();
+          }
+        }
+        if (showCursor) el.classList.add('lumen-typing');
+        setTimeout(step, 0);
+      });
+    }
+
+    let __abortTypingPlaceholder = null;
+    async function typePlaceholder(inp, text, speed = 22) {
+      if (!inp) return;
+      if (__abortTypingPlaceholder) __abortTypingPlaceholder();
+      let abort = false;
+      __abortTypingPlaceholder = () => abort = true;
+      inp.placeholder = '';
+      const aria = document.getElementById('aria-pergunta');
+      if (aria) aria.textContent = text;
+      text = window.utils ? window.utils.dedupe(text) : text;
+      for (let i = 0; i <= text.length; i++) {
+        if (abort) break;
+        inp.placeholder = text.slice(0, i) + (i < text.length ? '▌' : '');
+        await new Promise(r => setTimeout(r, speed));
+      }
+      if (!abort) inp.placeholder = text;
+    }
+
+    async function typeAnswer(textarea, text, speed = 36) {
+      if (!textarea) return;
+      textarea.value = '';
+      textarea.classList.add('lumen-typing');
+      text = window.utils ? window.utils.dedupe(text) : text;
+      for (let i = 0; i <= text.length; i++) {
+        textarea.value = text.slice(0, i);
+        await new Promise(r => setTimeout(r, speed));
+      }
+      textarea.classList.add('typing-done');
+    }
+
+    async function runTyping(root) {
+      if (!root || root.classList.contains('hidden') || !(root instanceof Element)) {
+        console.log('[runTyping] Root inválido ou oculto:', root?.id || root?.className || root);
+        return;
+      }
+      if (G.__typingLock) {
+        console.log('[runTyping] Bloqueado por __typingLock, ignorando...');
+        return;
+      }
+      G.__typingLock = true;
+
+      try {
+        window.speak && window.speak('');
+        const elements = Array
+          .from(root.querySelectorAll('[data-typing], .text, p, h1, h2, h3, h4, [class*="text"], [class*="title"], [class*="content"], .termos-texto, .pergunta-enunciado, [data-termos], li'))
+          .filter(el => !el.dataset.typed && el.offsetParent !== null && !el.closest('.j-section.hidden'));
+
+        if (elements.length === 0) {
+          console.log('[runTyping] Nenhum elemento de texto encontrado em:', root.id || root.className);
+          console.log('[runTyping] Snapshot do DOM:', Array.from(root.children).slice(0, 10).map(el => ({
+            tag: el.tagName.toLowerCase(),
+            id: el.id || '',
+            class: el.className || '',
+            attrs: Object.keys(el.dataset || {}).join(','),
+            text: (el.textContent || '').slice(0, 50)
+          })));
+        }
+
+        for (const el of elements) {
+          if (el.dataset.typing === '1' || el.dataset.typed === '1') continue;
+          const rawText = el.getAttribute('data-text') || el.textContent || '';
+          const text = window.utils ? window.utils.dedupe(rawText) : rawText;
+          el.textContent = '';
+          const highlight = el.querySelector('.highlight');
+          if (highlight) highlight.style.width = '0';
+          const speed = parseInt(el.getAttribute('data-speed') || DEFAULT_SPEED, 10);
+          const showCursor = String(el.getAttribute('data-cursor') || 'true') === 'true';
+          await window.typeWriter(el, text, speed, showCursor);
+          if (window.JORNADA.tts.enabled && window.JORNADA.tts.readingMode === 'after' && !window.isMuted) {
+            await window.speak(text);
+          }
+          console.log('[runTyping] Datilografia e TTS aplicados em:', el.tagName, el.className || el.id, 'texto:', text.slice(0, 50));
+        }
+      } catch (e) {
+        console.error('[runTyping] erro:', e);
+        window.toast && window.toast('Erro durante a datilografia.');
+      } finally {
+        G.__typingLock = false;
+      }
+    }
+
+    window.typeTextOnce = typeTextOnce;
+    window.typeWriter = typeWriter;
+    window.runTyping = runTyping;
+    window.typePlaceholder = typePlaceholder;
+    window.typeAnswer = typeAnswer;
+    console.log('[Datilografia] Bloco carregado');
+  })();
+  </script>
+
+ <!-- Senha -->
+<script>
+(function() {
+  const log = (...a) => { try { console.log('[Senha v4]', ...a); } catch (_) {} };
+  const VALID_PASSWORD = 'luz123';
+
+  function getSenhaSection() {
+    return document.getElementById('section-senha') || document.querySelector('[data-section="senha"], .section-senha') || document;
+  }
+
+  function getSenhaInput() {
+    const root = getSenhaSection();
+    const tries = [
+      '#senhaInput', '#iniciar', 'input[data-role="senha"]', 'input[name="senha"]',
+      'input[name*="senha" i]', 'input[id*="senha" i]', 'input[type="password"]',
+      'input[type="text"][name*="senha" i]', 'input[type="text"][id*="senha" i]',
+      '.senha input', '.senha-input'
+    ];
+    for (const sel of tries) {
+      const el = root.querySelector(sel);
+      if (el) return el;
+    }
+    return root.querySelector('input');
+  }
+
+  window.toggleSenha = function() {
+    const input = getSenhaInput();
+    if (!input) {
+      log('[Senha] input não encontrado');
+      window.toast && window.toast('Campo de senha não encontrado.');
+      return;
+    }
+    input.type = (input.type === 'password' ? 'text' : 'password');
+    const eye = getSenhaSection().querySelector('[data-action="toggle-password"]');
+    if (eye) {
+      eye.classList.toggle('on');
+      log('[Senha] Visibilidade da senha alternada');
+    } else {
+      log('[Senha] Olho mágico não encontrado');
+      window.toast && window.toast('Botão de visibilidade não encontrado.');
+    }
+  };
+
+  let lastStartJourney = 0;
+  window.startJourney = function() {
+    const now = performance.now();
+    if (now - lastStartJourney < 1000) {
+      log('[startJourney] Debounce: evitando chamada repetida');
+      return;
+    }
+    lastStartJourney = now;
+
+    const inputSenha = getSenhaInput();
+    const inputNome = getSenhaSection().querySelector('#nameInput, [data-role="nome"], input[name="nome"]');
+    const senha = (inputSenha && inputSenha.value || '').trim().toLowerCase();
+    const nome = (inputNome && inputNome.value || '').trim();
+
+    log('[startJourney] Senha fornecida:', senha ? '[oculta]' : 'nenhuma', 'Nome:', nome || 'nenhum');
+
+    if (!senha) {
+      window.toast && window.toast('Digite a senha para continuar.');
+      if (inputSenha) inputSenha.focus();
+      log('[startJourney] Senha não fornecida');
       return;
     }
 
-    let selfieURL = '';
-
-    function getBgUrl() {
-      const guia = localStorage.getItem('JORNADA_GUIA') || 'zion';
-      card.dataset.guide = guia.toUpperCase();
-      guideNameEl.textContent = guia.toUpperCase();
-      return `/assets/img/irmandade-quarteto-bg-${guia}.png`;
+    if (senha !== VALID_PASSWORD) {
+      window.toast && window.toast('Senha incorreta. Tente novamente.');
+      if (inputSenha) inputSenha.focus();
+      log('[startJourney] Senha inválida:', senha);
+      return;
     }
 
-    function loadBg() {
-      const bgUrl = getBgUrl();
-      bgImg.src = bgUrl;
-      bgImg.onload = () => {
-        if (errorDiv) errorDiv.style.display = 'none';
-        console.log('[Selfie] Imagem de fundo carregada:', bgUrl);
-      };
-      bgImg.onerror = () => {
-        if (errorDiv) errorDiv.style.display = 'block';
-        toast('Erro ao carregar a imagem de fundo do guia.');
-      };
+    if (nome) {
+      try { localStorage.setItem('JORNADA_NOME', nome); } catch (_) {}
+    }
+    window.speak && window.speak('');
+
+    const hasGuia = document.getElementById('section-guia');
+    if (!hasGuia) {
+      console.error('[startJourney] Seção section-guia não encontrada');
+      window.toast && window.toast('Seção de guia não encontrada. Verifique o DOM.');
+      return;
     }
 
-    function updatePreview() {
-      const scale = parseFloat(scaleInput.value) || 1;
-      const ox = parseFloat(offsetXInput.value) || 0;
-      const oy = parseFloat(offsetYInput.value) || 0;
-      const baseX = 15 + ox;
-      const baseY = 35 + oy;
-      const baseW = 70 * scale;
-      const baseH = 90 * scale;
-      selfieImg.setAttribute('x', baseX);
-      selfieImg.setAttribute('y', baseY);
-      selfieImg.setAttribute('width', baseW);
-      selfieImg.setAttribute('height', baseH);
-      console.log('[Selfie] Preview atualizado:', { scale, ox, oy });
+    if (window.JC) {
+      window.JC.nextSection = 'section-guia';
+      window.showSection && window.showSection('section-guia');
+      log('[startJourney] Navegação para section-guia');
+    } else {
+      console.error('[startJourney] window.JC não definido');
+      window.toast && window.toast('Erro ao inicializar jornada. Tente recarregar a página.');
     }
-
-    function syncNameInput() {
-      const storedName = localStorage.getItem('JORNADA_NOME') || '';
-      if (storedName) {
-        nameInput.value = storedName;
-        userNameEl.textContent = storedName.toUpperCase() || 'NOME';
-      }
-      nameInput.addEventListener('input', () => {
-        const name = nameInput.value.trim();
-        userNameEl.textContent = name.toUpperCase() || 'NOME';
-        localStorage.setItem('JORNADA_NOME', name);
-      });
-    }
-
-    scaleInput.addEventListener('input', updatePreview);
-    offsetXInput.addEventListener('input', updatePreview);
-    offsetYInput.addEventListener('input', updatePreview);
-
-    fileInput.addEventListener('change', () => {
-      const f = fileInput.files?.[0];
-      if (!f) return;
-      if (selfieURL) URL.revokeObjectURL(selfieURL);
-      selfieURL = URL.createObjectURL(f);
-      selfieImg.setAttribute('href', selfieURL);
-      if (errorDiv) errorDiv.style.display = 'none';
-      updatePreview();
-      console.log('[Selfie] Selfie carregada');
-    });
-
-    previewBtn.addEventListener('click', async () => {
-      if (!selfieImg.getAttribute('href')) {
-        toast('Selecione uma selfie antes.');
-        return;
-      }
-      updatePreview();
-      flameLayer.style.opacity = 1;
-      console.log('[Selfie] Preview ativado');
-    });
-
-    captureBtn.addEventListener('click', async () => {
-      if (!selfieImg.getAttribute('href')) {
-        toast('Selecione uma selfie antes.');
-        return;
-      }
-      updatePreview();
-      flameLayer.style.opacity = 1;
-      await new Promise(r => requestAnimationFrame(r));
-
-      const canvas = document.createElement('canvas');
-      const rect = card.getBoundingClientRect();
-      const scale = window.devicePixelRatio || 1;
-      canvas.width = Math.round(rect.width * scale);
-      canvas.height = Math.round(rect.height * scale);
-      const ctx = canvas.getContext('2d');
-
-      const load = (src) => new Promise((res, rej) => {
-        const im = new Image();
-        im.crossOrigin = 'anonymous';
-        im.onload = () => res(im);
-        im.onerror = rej;
-        im.src = src;
-      });
-
-      const bg = await load(bgImg.currentSrc || bgImg.src).catch(() => {
-        if (errorDiv) errorDiv.style.display = 'block';
-        toast('Erro ao carregar a imagem de fundo.');
-        return;
-      });
-      if (!bg) return;
-      ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
-
-      const W = canvas.width, H = canvas.height;
-      const fw = 0.40 * W, fh = 0.60 * H, fx = (W - fw) / 2, fy = (H - fh) / 2 + 0.06 * H;
-
-      const grad = ctx.createRadialGradient(fx + fw / 2, fy + fh * 0.65, fh * 0.02, fx + fw / 2, fy + fh * 0.65, fh * 0.55);
-      grad.addColorStop(0, 'rgba(255,224,130,1)');
-      grad.addColorStop(0.55, 'rgba(255,180,0,0.9)');
-      grad.addColorStop(1, 'rgba(255,180,0,0)');
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.ellipse(fx + fw / 2, fy + fh * 0.65, fw * 0.35, fh * 0.45, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      function flamePath(ctx, x, y, w, h) {
-        ctx.beginPath();
-        ctx.moveTo(x + 0.50 * w, y + 0.133 * h);
-        ctx.bezierCurveTo(x + 0.42 * w, y + 0.233 * h, x + 0.34 * w, y + 0.300 * h, x + 0.33 * w, y + 0.387 * h);
-        ctx.bezierCurveTo(x + 0.32 * w, y + 0.487 * h, x + 0.41 * w, y + 0.547 * h, x + 0.50 * w, y + 0.613 * h);
-        ctx.bezierCurveTo(x + 0.59 * w, y + 0.547 * h, x + 0.68 * w, y + 0.487 * h, x + 0.67 * w, y + 0.387 * h);
-        ctx.bezierCurveTo(x + 0.66 * w, y + 0.300 * h, x + 0.58 * w, y + 0.233 * h, x + 0.50 * w, y + 0.133 * h);
-      }
-
-      ctx.save();
-      flamePath(ctx, fx, fy, fw, fh);
-      ctx.clip();
-
-      const selfie = await load(selfieImg.getAttribute('href')).catch(() => {
-        if (errorDiv) errorDiv.style.display = 'block';
-        toast('Erro ao carregar a selfie.');
-        return;
-      });
-      if (!selfie) return;
-
-      const selfieScaleVal = parseFloat(scaleInput.value) || 1;
-      const ox = parseFloat(offsetXInput.value) || 0;
-      const oy = parseFloat(offsetYInput.value) || 0;
-      const svgScaleX = fw / 100;
-      const svgScaleY = fh / 150;
-
-      let coverRatio = Math.max(fw / selfie.width, fh / selfie.height) * selfieScaleVal;
-      let sw = selfie.width * coverRatio;
-      let sh = selfie.height * coverRatio;
-      let sx = fx + (fw - sw) / 2 + ox * svgScaleX;
-      let sy = fy + (fh - sh) / 2 + oy * svgScaleY;
-
-      ctx.drawImage(selfie, sx, sy, sw, sh);
-      ctx.restore();
-
-      ctx.strokeStyle = 'rgba(255,200,0,.85)';
-      ctx.lineWidth = Math.max(1.2, W * 0.0022);
-      flamePath(ctx, fx, fy, fw, fh);
-      ctx.stroke();
-
-      ctx.fillStyle = '#f7d37a';
-      ctx.textAlign = 'center';
-      ctx.font = `bold ${Math.round(W * 0.075)}px Cardo, serif`;
-      ctx.textBaseline = 'top';
-      ctx.fillText(card.dataset.guide, W / 2, H * 0.035);
-      const userName = (nameInput.value.trim() || 'NOME').toUpperCase();
-      ctx.font = `bold ${Math.round(W * 0.068)}px Cardo, serif`;
-      ctx.fillText(userName, W / 2, H * 0.955);
-
-      const dataURL = canvas.toDataURL('image/png');
-      try {
-        localStorage.setItem('IRMANDADE_SELFIE_FINAL', dataURL);
-        const a = document.createElement('a');
-        a.href = dataURL;
-        a.download = `jornada-${card.dataset.guide.toLowerCase()}-${Date.now()}.png`;
-        a.click();
-        console.log('[Selfie] Imagem salva e download iniciado');
-      } catch (e) {
-        console.error('[Selfie] Erro ao salvar imagem:', e);
-        toast('Erro ao salvar a imagem final.');
-      }
-    });
-
-    loadBg();
-    syncNameInput();
-  })();
+  };
+  console.log('[Senha] Bloco carregado');
+})();
 </script>
   
-                 <!-- Vídeo Transição -->
+  <!-- loadDynamicBlocks -->
 <script>
-  (function() {
-    let isPlaying = false; // Evitar múltiplas reproduções simultâneas
+(function() {
+  const VIDEO_BASE = '/assets/videos/';
+  window.JORNADA_VIDEOS = {
+    intro: VIDEO_BASE + 'filme-0-ao-encontro-da-jornada.mp4',
+    afterBlocks: {
+      0: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
+      1: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
+      2: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
+      3: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
+    },
+    final: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
+  };
+  window.JORNADA_FINAL_VIDEO = window.JORNADA_VIDEOS.final;
 
-    window.playVideo = function(videoSrc) {
-      if (isPlaying) {
-        console.warn('[playVideo] Vídeo já está sendo reproduzido');
-        return;
+  const blockTranslations = {
+    'pt-BR': [
+      { title: 'Bloco 1 — Raízes', questions: [{ label: 'Quem é você hoje?' }, { label: 'O que te trouxe até esta jornada?' }, { label: 'Qual é o seu maior sonho espiritual?' }], video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4' },
+      { title: 'Bloco 2 — Reflexões', questions: [{ label: 'Quais são seus maiores desafios atuais?' }, { label: 'Como você lida com o medo ou a dúvida?' }, { label: 'O que a "luz" significa para você?' }], video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4' },
+      { title: 'Bloco 3 — Crescimento', questions: [{ label: 'O que você quer mudar na sua vida?' }, { label: 'Quem inspira você e por quê?' }, { label: 'Como você pratica gratidão no dia a dia?' }], video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4' },
+      { title: 'Bloco 4 — Integração', questions: [{ label: 'Qual lição você leva dessa jornada?' }, { label: 'Como vai aplicar isso no futuro?' }, { label: 'Uma mensagem para seu eu futuro.' }], video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4' }
+    ],
+    'en-US': [
+      { title: 'Block 1 — Roots', questions: [{ label: 'Who are you today?' }, { label: 'What brought you to this journey?' }, { label: 'What is your greatest spiritual dream?' }], video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4' },
+      { title: 'Block 2 — Reflections', questions: [{ label: 'What are your biggest current challenges?' }, { label: 'How do you deal with fear or doubt?' }, { label: 'What does "light" mean to you?' }], video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4' },
+      { title: 'Block 3 — Growth', questions: [{ label: 'What do you want to change in your life?' }, { label: 'Who inspires you and why?' }, { label: 'How do you practice gratitude in your daily life?' }], video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4' },
+      { title: 'Block 4 — Integration', questions: [{ label: 'What lesson do you take from this journey?' }, { label: 'How will you apply this in the future?' }, { label: 'A message to your future self.' }], video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4' }
+    ],
+    'es-ES': [
+      { title: 'Bloque 1 — Raíces', questions: [{ label: '¿Quién eres hoy?' }, { label: '¿Qué te trajo a este viaje?' }, { label: '¿Cuál es tu mayor sueño espiritual?' }], video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4' },
+      { title: 'Bloque 2 — Reflexiones', questions: [{ label: '¿Cuáles son tus mayores desafíos actuales?' }, { label: '¿Cómo lidias con el miedo o la duda?' }, { label: '¿Qué significa la "luz" para ti?' }], video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4' },
+      { title: 'Bloque 3 — Crecimiento', questions: [{ label: '¿Qué quieres cambiar en tu vida?' }, { label: '¿Quién te inspira y por qué?' }, { label: '¿Cómo practicas la gratitud en el día a dia?' }], video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4' },
+      { title: 'Bloque 4 — Integración', questions: [{ label: '¿Qué lección te llevas de este viaje?' }, { label: '¿Cómo lo aplicarás en el futuro?' }, { label: 'Un mensaje para tu yo futuro.' }], video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4' }
+    ]
+  };
+
+  function updateBlocks() {
+    const currentLang = document.getElementById('language-select')?.value || 'pt-BR';
+    window.JORNADA_BLOCKS = blockTranslations[currentLang] || blockTranslations['pt-BR'];
+    console.log('[loadDynamicBlocks] Blocos atualizados para idioma:', currentLang);
+  }
+
+  window.loadDynamicBlocks = function() {
+    updateBlocks();
+    const content = document.getElementById('perguntas-container');
+    if (!content) {
+      console.error('[loadDynamicBlocks] Container de perguntas não encontrado');
+      window.toast && window.toast('Erro ao carregar perguntas.');
+      return;
+    }
+
+    const blocks = window.JORNADA_BLOCKS || [];
+    if (!blocks.length) {
+      console.error('[loadDynamicBlocks] JORNADA_BLOCKS não definido ou vazio');
+      window.toast && window.toast('Nenhum bloco de perguntas encontrado.');
+      return;
+    }
+
+    content.innerHTML = '';
+    content.classList.remove('hidden');
+    blocks.forEach((block, bIdx) => {
+      const bloco = document.createElement('div');
+      bloco.className = 'j-bloco';
+      bloco.dataset.bloco = bIdx;
+      bloco.dataset.video = block.video_after || '';
+      bloco.style.display = bIdx === 0 ? 'block' : 'none';
+
+      if (block.title) {
+        const title = document.createElement('h3');
+        title.className = 'pergunta-enunciado text';
+        title.dataset.typing = 'true';
+        title.dataset.text = block.title;
+        title.dataset.speed = '36';
+        title.dataset.cursor = 'true';
+        bloco.appendChild(title);
       }
-      isPlaying = true;
 
-      const overlay = document.getElementById('videoOverlay');
-      const video = document.getElementById('videoTransicao');
-      const fallback = document.getElementById('videoFallback');
-      const perguntaInput = document.getElementById('meuInputPergunta'); // Ajuste o ID
-      const perguntaDiv = document.getElementById('minhaDivPergunta'); // Ajuste o ID
+      (block.questions || []).forEach((q, qIdx) => {
+        const label = typeof q === 'string' ? q : (q.label || q.text || '');
+        const div = document.createElement('div');
+        div.className = 'j-pergunta';
+        div.dataset.pergunta = qIdx;
+        div.style.display = bIdx === 0 && qIdx === 0 ? 'block' : 'none';
 
-      if (!overlay || !video) {
-        console.error('[playVideo] Elementos de vídeo não encontrados');
-        window.toast && window.toast('Erro ao reproduzir vídeo.');
-        isPlaying = false;
-        return;
-      }
+        div.innerHTML = `
+          <label class="pergunta-enunciado text" 
+                 data-typing="true" 
+                 data-text="Pergunta ${qIdx + 1}: ${label}" 
+                 data-speed="36" 
+                 data-cursor="true"></label>
+          <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
+          <div class="accessibility-controls">
+            <button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>
+            <button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>
+            <button class="btn btn-avancar" data-action="avancar">Avançar</button>
+          </div>
+        `;
+        bloco.appendChild(div);
+      });
 
-      video.src = videoSrc;
-      video.onended = () => {
-        overlay.classList.add('hidden');
-        video.src = '';
-        isPlaying = false;
-        console.log('[playVideo] Vídeo terminou');        
-        if (window.JC && window.JC.goNext) {
-          window.JC.goNext();
-          console.log('[playVideo] Avançando para próxima seção');
-          console.log('[Controles] onended disparado');
-          cleanup();
-        }
-        // Chama runTyping para exibir perguntas após o vídeo
-        if (perguntaDiv && window.runTyping) {
-          window.runTyping(perguntaDiv);
-        }
-      };
+      content.appendChild(bloco);
+    });
 
-      video.onerror = () => {
-        fallback.classList.remove('hidden');
-        video.classList.add('hidden');
+    const firstBloco = content.querySelector('.j-bloco');
+    if (firstBloco) {
+      firstBloco.style.display = 'block';
+      window.JC.currentBloco = 0;
+      window.JC.currentPergunta = 0;
+      const firstPergunta = firstBloco.querySelector('.j-pergunta');
+      if (firstPergunta) {
+        firstPergunta.style.display = 'block';
+        firstPergunta.classList.add('active');
         setTimeout(() => {
-          overlay.classList.add('hidden');
-          fallback.classList.add('hidden');
-          video.classList.remove('hidden');
-          isPlaying = false;
-          console.log('[playVideo] Fallback exibido, avançando');
-          if (window.JC && window.JC.goNext) {
-            window.JC.goNext();
-          }
-        }, 3000);
-      };
-
-      video.addEventListener('timeupdate', () => {
-        const tempoAtual = video.currentTime;
-        console.log(`[playVideo] Tempo do vídeo: ${tempoAtual}s`);
-        // Exemplo: exibir placeholder de pergunta entre 5-10s
-        if (tempoAtual >= 5 && tempoAtual < 10 && perguntaInput && window.typePlaceholder) {
-          window.typePlaceholder(perguntaInput, 'Digite sua resposta aqui', 22);
-        }
-      });
-
-      overlay.classList.remove('hidden');
-      video.play().catch(e => {
-        console.error('[playVideo] Erro ao reproduzir vídeo:', e);
-        fallback.classList.remove('hidden');
-        video.classList.add('hidden');
-        isPlaying = false;
-      });
-      console.log('[playVideo] Reproduzindo vídeo:', videoSrc);
-    };
-
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('#skipVideo');
-      if (btn) {
-        const overlay = document.getElementById('videoOverlay');
-        const video = document.getElementById('videoTransicao');
-        if (overlay && video) {
-          video.pause();
-          video.src = '';
-          overlay.classList.add('hidden');
-          isPlaying = false;
-          console.log('[playVideo] Vídeo pulado');
-          if (window.JC && window.JC.goNext) {
-            window.JC.goNext();
-          }
-        }
+          console.log('[loadDynamicBlocks] Iniciando runTyping para primeira pergunta');
+          window.runTyping && window.runTyping(firstPergunta);
+        }, 100);
+      } else {
+        console.error('[loadDynamicBlocks] Nenhuma pergunta encontrada no primeiro bloco');
       }
-    });
+    } else {
+      console.error('[loadDynamicBlocks] Nenhum bloco criado');
+      window.toast && window.toast('Erro ao criar blocos de perguntas.');
+    }
 
-    console.log('[Video] Bloco carregado');
-  })();
+    if (window.loadAnswers) window.loadAnswers();
+    const firstTa = document.querySelector('.j-bloco .j-pergunta textarea');
+    if (firstTa && window.handleInput) window.handleInput(firstTa);
+    console.log('[loadDynamicBlocks] Blocos carregados com sucesso');
+    console.log('[loadDynamicBlocks] DOM do perguntas-container:', document.getElementById('perguntas-container').outerHTML);
+  };
+
+  document.addEventListener('change', (e) => {
+    if (e.target.id === 'language-select') {
+      updateBlocks();
+      window.loadDynamicBlocks();
+      console.log('[loadDynamicBlocks] Idioma alterado, blocos recarregados');
+    }
+  });
+
+  console.log('[loadDynamicBlocks] Bloco carregado');
+})();
 </script>
-  
-                      <!-- Guia Seleção -->
+
+<!-- showSection -->
 <script>
-  (function() {
-    window.JORNADA = window.JORNADA || {};
-    window.JORNADA.selectedGuia = window.JORNADA.selectedGuia || null;
+(function() {
+  const HIDE_CLASS = 'hidden';
+  let lastShowSection = 0;
 
-    let isSelecting = false; // Evitar múltiplos cliques simultâneos
+  window.showSection = function(id) {
+    const now = performance.now();
+    if (now - lastShowSection < 500) {
+      console.log('[showSection] Debounce: evitando chamada repetida');
+      return;
+    }
+    lastShowSection = now;
 
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('[data-action="select-guia"]');
-      if (btn) {
-        e.preventDefault();
-        if (isSelecting) {
-          console.warn('[Guia] Seleção em andamento, ignorando clique');
-          return;
-        }
-        isSelecting = true;
-
-        const guia = btn.dataset.guia;
-        if (!guia) {
-          console.warn('[Guia] Guia não especificado no botão');
-          isSelecting = false;
-          return;
-        }
-
-        window.JORNADA.selectedGuia = guia;
-        console.log('[Guia] Guia selecionado:', guia);
-
-        const guideBg = document.getElementById('guideBg');
-        if (guideBg) {
-          const bgUrl = `/assets/img/irmandade-quarteto-bg-${guia}.png`;
-          guideBg.src = bgUrl;
-          console.log('[Guia] Imagem de fundo atualizada:', bgUrl);
-        } else {
-          console.warn('[Guia] Elemento #guideBg não encontrado');
-        }
-
-        const guideNameSlot = document.getElementById('guideNameSlot');
-        if (guideNameSlot) {
-          guideNameSlot.textContent = guia.charAt(0).toUpperCase() + guia.slice(1);
-        } else {
-          console.warn('[Guia] Elemento #guideNameSlot não encontrado');
-        }
-
-        if (window.JC && window.playVideo) {
-          window.JC.nextSection = 'section-selfie';
-          const videoSrc = '/assets/videos/conhecimento-com-luz-jardim.mp4'; // Ajustado o caminho
-          console.log('[Guia] Iniciando reprodução de vídeo:', videoSrc);
-          window.playVideo(videoSrc);
-
-          // Chama runTyping após um atraso para garantir que a seção esteja pronta
-          setTimeout(() => {
-            const sectionSelfie = document.getElementById('section-selfie');
-            if (sectionSelfie && window.runTyping) {
-              window.runTyping(sectionSelfie);
-              console.log('[Guia] runTyping chamado para section-selfie');
-            }
-          }, 1000); // Ajuste o tempo conforme necessário
-        } else {
-          console.warn('[Guia] window.JC ou playVideo não definido, navegando diretamente');
-          if (window.showSection) {
-            window.showSection('section-selfie');
-            const sectionSelfie = document.getElementById('section-selfie');
-            if (sectionSelfie && window.runTyping) {
-              window.runTyping(sectionSelfie);
-              console.log('[Guia] runTyping chamado para section-selfie');
-            }
-          }
-        }
-
-        isSelecting = false;
-      }
-    });
-
-    console.log('[Guia] Bloco carregado');
-  })();
-</script>
-  
-              <!-- Navegação de Termos -->
-<script>
-  (function() {
-    let isNavigating = false; // Evitar múltiplos cliques simultâneos
-
-    const showPage = (pg) => {
-      if (isNavigating) {
-        console.warn('[Termos] Navegação em andamento, ignorando');
+    try {
+      const all = Array.from(document.querySelectorAll('div[id^="section-"]'));
+      const target = document.getElementById(id);
+      if (!target) {
+        console.warn('[showSection] Seção não encontrada:', id);
+        window.toast && window.toast(`Seção ${id} não encontrada.`);
         return;
       }
-      isNavigating = true;
+      all.forEach(s => s.classList.add(HIDE_CLASS));
+      target.classList.remove(HIDE_CLASS);
+      window.__currentSectionId = id;
+      console.log('[showSection] Exibindo seção:', id);
+      
+      // Resetar __typingLock para evitar bloqueios
+      window.__typingLock = false;
+      
+      setTimeout(() => {
+        if (id === 'section-perguntas' && window.loadDynamicBlocks) {
+          window.loadDynamicBlocks();
+          console.log('[showSection] loadDynamicBlocks chamado para section-perguntas');
+        }
+        if (window.runTyping) {
+          window.runTyping(target);
+          console.log('[showSection] Iniciando runTyping para:', id);
+        }
+        const btns = target.querySelectorAll('[data-action="avancar"], .btn-avancar, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney');
+        btns.forEach(btn => {
+          if (!btn.dataset.clickAttached) {
+            btn.addEventListener('click', (e) => {
+              e.preventDefault();
+              if (window.JC && window.JC.goNext) window.JC.goNext();
+            }, { once: true });
+            btn.dataset.clickAttached = '1';
+            console.log('[showSection] Evento de clique adicionado ao botão avançar em:', id, 'Botão:', btn.id || btn.className);
+          }
+        });
+      }, 100);
+    } catch (e) {
+      console.error('[showSection] Erro:', e);
+      window.toast && window.toast('Erro ao exibir seção.');
+    }
+  };
+  console.log('[showSection] Bloco carregado');
+})();
+</script>
 
+  <!-- Guia Seleção -->
+<script>
+(function() {
+  window.JORNADA = window.JORNADA || {};
+  window.JORNADA.selectedGuia = window.JORNADA.selectedGuia || null;
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action="select-guia"]');
+    if (btn) {
+      e.preventDefault();
+      const guia = btn.dataset.guia;
+      window.JORNADA.selectedGuia = guia;
+      console.log('[Guia] Guia selecionado:', guia);
+      const guideBg = document.getElementById('guideBg');
+      if (guideBg) {
+        guideBg.src = `/assets/img/irmandade-quarteto-bg-${guia}.png`;
+      }
+      const guideNameSlot = document.getElementById('guideNameSlot');
+      if (guideNameSlot) {
+        guideNameSlot.textContent = guia.charAt(0).toUpperCase() + guia.slice(1);
+      }
+      if (window.JC && window.playVideo) {
+        window.JC.nextSection = 'section-selfie';
+        const videoSrc = '/assets/videos/transicao_selfie.mp4';
+        console.log('[Guia] Iniciando reprodução de vídeo:', videoSrc);
+        window.playVideo(videoSrc);
+      } else {
+        console.warn('[Guia] window.JC ou playVideo não definido, navegando diretamente');
+        window.showSection && window.showSection('section-selfie');
+      }
+    }
+  });
+  console.log('[Guia] Bloco carregado');
+})();
+</script>
+
+  <!-- Navegação de Termos -->
+  <script>
+  (function() {
+    const showPage = (pg) => {
       const pages = ['termos-pg1', 'termos-pg2'];
       pages.forEach(p => {
         const el = document.getElementById(p);
-        if (el) {
-          el.classList.add('hidden');
-        } else {
-          console.warn(`[Termos] Página ${p} não encontrada`);
-        }
+        if (el) el.classList.add('hidden');
       });
-
       const target = document.getElementById(pg);
       if (target) {
         target.classList.remove('hidden');
-        if (window.runTyping) {
-          window.runTyping(target);
-          console.log(`[Termos] runTyping chamado para: ${pg}`);
-        } else {
-          console.warn('[Termos] window.runTyping não definido');
-        }
-      } else {
-        console.warn(`[Termos] Página alvo ${pg} não encontrada`);
+        window.runTyping && window.runTyping(target);
       }
-
-      isNavigating = false;
     };
-    document.querySelectorAll('[data-action="read-question"]').forEach(button => {
-    button.addEventListener('click', () => {
-    const pergunta = button.closest('.j-pergunta').querySelector('[data-i18n]');
-    const key = pergunta.dataset.i18n;
-    const text = window.i18n.t(key, pergunta.textContent);
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = window.i18n.lang || 'pt-BR';
-      window.speechSynthesis.speak(utterance);
-    } else {
-      console.warn('[readAloud] SpeechSynthesis não suportado');
-    }
-  });
-});
-    
-   document.querySelectorAll('[data-action="toggle-password"]').forEach(button => {
-  button.addEventListener('click', () => {
-    const input = button.closest('.input-group').querySelector('input');
-    input.type = input.type === 'password' ? 'text' : 'password';
-    button.textContent = input.type === 'password' ? 'Mostrar' : 'Ocultar';
-  });
-}); 
 
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-action="termos-next"], [data-action="termos-prev"]');
       if (btn) {
         e.preventDefault();
-        const action = btn.dataset.action;
-        console.log('[Termos] Ação disparada:', action);
-        if (action === 'termos-next') {
+        if (btn.dataset.action === 'termos-next') {
           showPage('termos-pg2');
-        } else if (action === 'termos-prev') {
+        } else if (btn.dataset.action === 'termos-prev') {
           showPage('termos-pg1');
         }
       }
     });
-
     console.log('[Termos] Bloco carregado');
   })();
-</script>
+  </script>
 
-            <!-- chat com guia -->
+<!-- Vídeo Transição -->
 <script>
-  (function() {
-    let isSending = false; // Evitar múltiplas chamadas simultâneas
-
-    async function sendChatMessage() {
-      if (isSending) {
-        console.warn('[Chat] Envio de mensagem em andamento, ignorando');
-        return;
-      }
-      isSending = true;
-
-      const input = document.getElementById('grok-chat-input');
-      const messagesDiv = document.getElementById('grok-chat-messages');
-      if (!input || !messagesDiv) {
-        console.warn('[Chat] Elementos de chat não encontrados');
-        isSending = false;
-        return;
-      }
-
-      const userMessage = input.value.trim();
-      if (!userMessage) {
-        console.warn('[Chat] Mensagem vazia, ignorando');
-        isSending = false;
-        return;
-      }
-
-      const tokens = userMessage.split(/\s+/).length;
-      if (tokens > 100) {
-        const guiaMsg = document.createElement('div');
-        guiaMsg.className = 'grok-chat-message grok';
-        guiaMsg.textContent = 'Por favor, limite sua mensagem a 100 palavras.';
-        messagesDiv.appendChild(guiaMsg);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        isSending = false;
-        return;
-      }
-
-      const userMsg = document.createElement('div');
-      userMsg.className = 'grok-chat-message user';
-      userMsg.textContent = userMessage;
-      messagesDiv.appendChild(userMsg);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-      const currentQuestion = document.querySelector('.j-pergunta.active .pergunta-enunciado')?.textContent || '';
-      const currentAnswer = document.querySelector('.j-pergunta.active textarea')?.value || '';
-      const respostas = JSON.parse(localStorage.getItem('jornada_respostas') || '{}');
-      const blocoIdx = document.querySelector('.j-bloco[style*="display: block"]')?.dataset.bloco || 0;
-      const guia = localStorage.getItem('JORNADA_GUIA') || 'zion';
-      const context = {
-        currentQuestion,
-        currentAnswer,
-        respostas,
-        blocoIdx,
-        progresso: document.getElementById('jprog-pct')?.textContent || '0% concluído',
-        guia
-      };
-
-      const guiaConfigs = window.guiaConfigs || {
-        zion: { apiUrl: 'https://zion-backend-api.onrender.com/v1/chat', model: 'grok' },
-        lumen: { apiUrl: 'https://lumen-backend-api.onrender.com/v1/chat', model: 'gpt-5' },
-        arian: { apiUrl: 'https://arion-backend-api.onrender.com/v1/chat', model: 'gemini' }
-      };
-      const cfg = guiaConfigs[guia] || guiaConfigs.lumen;
-
-      try {
-        const system = `Você é ${guia === 'zion' ? 'Zion (Grok)' : guia === 'arian' ? 'Arian (Gemini)' : 'Lumen (ChatGPT)'} guiando a Jornada. Contexto: ` + JSON.stringify(context);
-        const resp = await fetch(cfg.apiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: cfg.model,
-            messages: [{ role: 'system', content: system }, { role: 'user', content: userMessage }],
-            temperature: 0.7
-          })
-        });
-        if (!resp.ok) throw new Error('API falhou: ' + resp.status);
-        const data = await resp.json();
-        const guiaMessage = data?.choices?.[0]?.message?.content || data?.message?.content || 'Tô pronto pra te guiar! Como posso ajudar?';
-        const guiaMsg = document.createElement('div');
-        guiaMsg.className = 'grok-chat-message grok';
-        messagesDiv.appendChild(guiaMsg);
-        if (window.typeWriter) {
-          window.typeWriter(guiaMsg, guiaMessage, 36, true);
-          console.log('[Chat] Resposta do guia exibida:', guiaMessage);
-        } else {
-          guiaMsg.textContent = guiaMessage;
-          console.warn('[Chat] window.typeWriter não definido, exibindo diretamente');
-        }
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      } catch (e) {
-        console.error('[Chat] Erro ao chamar API:', e);
-        const guiaMsg = document.createElement('div');
-        guiaMsg.className = 'grok-chat-message grok';
-        if (window.typeWriter) {
-          window.typeWriter(guiaMsg, 'Ops, algo deu errado! Tenta de novo ou pula pra próxima pergunta.', 36, true);
-        } else {
-          guiaMsg.textContent = 'Ops, algo deu errado! Tenta de novo ou pula pra próxima pergunta.';
-        }
-        messagesDiv.appendChild(guiaMsg);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      }
-
-      input.value = '';
-      isSending = false;
-    }
-
-    // Chamar sendChatMessage após um vídeo (exemplo de integração)
-    document.addEventListener('videoEnded', () => {
-      const perguntaDiv = document.getElementById('minhaDivPergunta'); // Ajuste o ID
-      if (perguntaDiv && window.runTyping) {
-        window.runTyping(perguntaDiv);
-        console.log('[Chat] runTyping chamado após vídeo');
-      }
-    });
-
-    // Vincular sendChatMessage a um botão ou input
-   const chatInput = document.querySelector('#grok-chat-input');
-  if (chatInput) {
-    chatInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        console.log('[Jornada] Chat enviado:', chatInput.value);
-        chatInput.value = '';
-      }
-    });
-  } else {
-    console.warn('[Jornada] #grok-chat-input não encontrado, ignorando inicialização do chat');
-  }
-  console.log('[Jornada] Inicializando eventos');
-  })();
-</script>
-                
-                <!-- devolutiva da API -->
-<script>
-  (function() {
-    let isFetching = false; // Evitar múltiplas chamadas simultâneas
-
-    async function fetchDevolutiva(pergunta, resposta, guia) {
-      if (isFetching) {
-        console.warn('[Devolutiva] Requisição em andamento, ignorando');
-        return 'Aguarde a devolutiva anterior.';
-      }
-      isFetching = true;
-
-      if (!pergunta || !resposta || !guia) {
-        console.warn('[Devolutiva] Parâmetros inválidos:', { pergunta, resposta, guia });
-        isFetching = false;
-        return 'Parâmetros inválidos. Continue sua jornada!';
-      }
-
-      const guiaConfigs = window.guiaConfigs || {
-        zion: { apiUrl: 'https://zion-backend-api.onrender.com/v1/chat', model: 'grok' },
-        lumen: { apiUrl: 'https://lumen-backend-api.onrender.com/v1/chat', model: 'gpt-5' },
-        arian: { apiUrl: 'https://arion-backend-api.onrender.com/v1/chat', model: 'gemini' }
-      };
-      const cfg = guiaConfigs[guia] || guiaConfigs.lumen;
-
-      try {
-        const system = `Você é ${guia === 'zion' ? 'Zion (Grok)' : guia === 'arian' ? 'Arian (Gemini)' : 'Lumen (ChatGPT)'} guiando a Jornada. Forneça uma devolutiva acolhedora, reflexiva e simbólica para a resposta do usuário à pergunta "${pergunta}".`;
-        const resp = await fetch(cfg.apiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: cfg.model,
-            messages: [
-              { role: 'system', content: system },
-              { role: 'user', content: resposta }
-            ],
-            temperature: 0.7
-          })
-        });
-        if (!resp.ok) throw new Error('API falhou: ' + resp.status);
-        const data = await resp.json();
-        const devolutiva = data?.choices?.[0]?.message?.content || data?.message?.content || 'Obrigado por compartilhar. Sua reflexão ilumina o caminho.';
-        console.log('[Devolutiva] Resposta recebida:', devolutiva);
-        isFetching = false;
-        return devolutiva;
-      } catch (e) {
-        console.error('[Devolutiva] Erro ao chamar API:', e);
-        isFetching = false;
-        return 'Ops, algo deu errado ao gerar a devolutiva. Continue sua jornada!';
-      }
-    }
-
-    // Exemplo de integração com vídeos e perguntas
-    document.addEventListener('videoEnded', async () => {
-      const pergunta = document.querySelector('.j-pergunta.active .pergunta-enunciado')?.textContent || '';
-      const resposta = document.querySelector('.j-pergunta.active textarea')?.value || '';
-      const guia = localStorage.getItem('JORNADA_GUIA') || 'zion';
-      if (pergunta && resposta) {
-        const devolutiva = await fetchDevolutiva(pergunta, resposta, guia);
-        const devolutivaDiv = document.getElementById('minhaDivDevolutiva'); // Ajuste o ID
-        if (devolutivaDiv && window.typeDevolutiva) {
-          window.typeDevolutiva(devolutivaDiv, devolutiva, 36);
-          console.log('[Devolutiva] Exibindo devolutiva após vídeo');
-        }
-      }
-    });
-
-    // Expor fetchDevolutiva globalmente
-    window.fetchDevolutiva = fetchDevolutiva;
-
-    console.log('[Devolutiva] Bloco carregado');
-  })();
-</script>
-  
-               <!-- progresso & storage -->
-<script>
-  (function() {
-    let isUpdating = false; // Evitar chamadas simultâneas
-
-    function updateProgress() {
-      if (isUpdating) {
-        console.warn('[Progresso] Atualização em andamento, ignorando');
-        return;
-      }
-      isUpdating = true;
-
-      const perguntas = document.querySelectorAll('.j-pergunta');
-      const respondidas = Array.from(perguntas).filter(p => (p.querySelector('textarea')?.value.trim() || '') !== '').length;
-      const total = perguntas.length || 1;
-      const pct = Math.round((respondidas / total) * 100);
-      const fill = document.getElementById('jprog-fill');
-      const badge = document.getElementById('jprog-pct');
-      const jFill = document.getElementById('j-fill-inline');
-      const jMeta = document.getElementById('j-meta');
-
-      if (fill) fill.style.width = pct + '%';
-      if (badge) badge.textContent = pct + '% concluído';
-      if (jFill) jFill.style.width = pct + '%';
-      if (jMeta) jMeta.textContent = `Respondidas: ${respondidas} de ${total}`;
-      console.log('[Progresso] Progresso atualizado:', { respondidas, total, pct });
-
-      isUpdating = false;
-    }
-
-    function saveAnswers() {
-      const respostas = {};
-      const inputs = document.querySelectorAll('.j-pergunta textarea');
-      inputs.forEach((input, idx) => {
-        const text = input.value.trim();
-        const tokens = text.split(/\s+/).length;
-        if (tokens > 100) {
-          input.value = text.split(/\s+/).slice(0, 100).join(' ');
-          window.toast && window.toast('Resposta limitada a 100 palavras.');
-        }
-        respostas[`q${idx}`] = input.value || '';
-      });
-
-      try {
-        localStorage.setItem('jornada_respostas', JSON.stringify(respostas));
-        console.log('[Progresso] Respostas salvas:', respostas);
-      } catch (e) {
-        console.error('[Progresso] Erro ao salvar respostas:', e);
-        window.toast && window.toast('Erro ao salvar respostas.');
-      }
-    }
-
-    function loadAnswers() {
-      const respostas = JSON.parse(localStorage.getItem('jornada_respostas') || '{}');
-      const inputs = document.querySelectorAll('.j-pergunta textarea');
-      inputs.forEach((input, idx) => {
-        input.value = respostas[`q${idx}`] || '';
-        if (input.value && window.typeAnswer) {
-          window.typeAnswer(input, input.value, 36);
-          console.log('[Progresso] Resposta carregada com typeAnswer:', `q${idx}`);
-        } else if (input.value) {
-          console.warn('[Progresso] window.typeAnswer não definido, resposta aplicada diretamente:', `q${idx}`);
-        }
-      });
-      updateProgress();
-      console.log('[Progresso] Respostas carregadas:', respostas);
-    }
-
-    // Vincular eventos aos textareas
-    document.addEventListener('input', (e) => {
-      if (e.target.matches('.j-pergunta textarea')) {
-        saveAnswers();
-        updateProgress();
-      }
-    });
-
-    // Carregar respostas após vídeo (exemplo de integração)
-    document.addEventListener('videoEnded', () => {
-      loadAnswers();
-      console.log('[Progresso] loadAnswers chamado após vídeo');
-    });
-
-    // Expor funções globalmente
-    window.updateProgress = updateProgress;
-    window.saveAnswers = saveAnswers;
-    window.loadAnswers = loadAnswers;
-
-    console.log('[Progresso] Bloco carregado');
-  })();
-</script>
-  
-                 <!-- pergaminho & seções -->
-<script>
-  (function() {
-    function checkImage(url, fallbackUrl) {
-      return new Promise(resolve => {
-        const img = new Image();
-        img.onload = () => resolve(url);
-        img.onerror = () => resolve(fallbackUrl);
-        img.src = url;
-      });
-    }
-
-    function updateCanvasBackground(sectionId) {
-      const canvas = document.getElementById('jornada-canvas');
-      if (!canvas) {
-        console.warn('[Seções] Canvas #jornada-canvas não encontrado');
-        return;
-      }
-      if (sectionId === 'section-perguntas') {
-        checkImage('/assets/img/pergaminho-rasgado-horiz.png', '/assets/img/pergaminho-rasgado-vert.png').then(bg => {
-          canvas.className = `card pergaminho pergaminho-h${bg.includes('vert') ? ' fallback' : ''}`;
-          canvas.style.background = `var(--panel) url('${bg}') no-repeat center/cover`;
-          console.log('[Seções] Fundo do canvas atualizado para perguntas:', bg);
-        });
-      } else {
-        canvas.className = 'card pergaminho pergaminho-v';
-        canvas.style.background = 'var(--panel) url(/assets/img/pergaminho-rasgado-vert.png) no-repeat center/cover';
-        console.log('[Seções] Fundo do canvas atualizado para seção:', sectionId);
-      }
-    }
-
-    function showSection(sectionId) {
-      const sections = document.querySelectorAll('.j-section');
-      sections.forEach(s => s.classList.add('hidden'));
-      const active = document.getElementById(sectionId);
-      if (active) {
-        active.classList.remove('hidden');
-        console.log('[Seções] Seção exibida:', sectionId);
-      } else {
-        console.warn('[Seções] Seção #', sectionId, 'não encontrada');
-        return;
-      }
-      function showSection(sectionId) {
-  document.querySelectorAll('.section').forEach(section => {
-    section.style.display = section.id === sectionId ? 'block' : 'none';
-  });
-  window.i18n?.apply?.(document.querySelector(`#${sectionId}`));
-  if (sectionId === 'section-perguntas') {
-    const firstBloco = document.querySelector('.j-bloco');
-    if (firstBloco) {
-      console.log('[showSection] Iniciando typeQuestionsSequentially para section-perguntas');
-      window.JORNADA_QA?.typeQuestionsSequentially?.(firstBloco);
-    } else {
-      console.warn('[showSection] Nenhum bloco encontrado em section-perguntas');
-    }
-  }
-}
-
-     document.querySelectorAll('.btn-avancar').forEach(button => {
-     button.addEventListener('click', () => {
-     const nextSection = button.dataset.next;
-     if (nextSection) showSection(nextSection);
-    });
-   });
-
-      updateCanvasBackground(sectionId);
-
-      // Chamar ensureHeroFlame se definida
-      if (window.ensureHeroFlame) {
-        window.ensureHeroFlame(sectionId);
-      } else {
-        console.warn('[Seções] window.ensureHeroFlame não definida');
-      }
-
-      if (sectionId === 'section-perguntas') {
-        if (window.updateProgress) {
-          window.updateProgress();
-        } else {
-          console.warn('[Seções] window.updateProgress não definida');
-        }
-        const perguntas = document.querySelectorAll('.j-pergunta');
-        if (perguntas.length) {
-          const first = document.querySelector('.j-pergunta.active') || perguntas[0];
-          first.classList.add('active');
-          const lbl = first.querySelector('.pergunta-enunciado')?.textContent || '';
-          const ta = first.querySelector('textarea');
-          if (ta) {
-            ta.placeholder = "Digite sua resposta...";
-          }
-          const aria = document.getElementById('aria-pergunta');
-          if (aria) aria.textContent = lbl;
-          // Chamar runTyping para a seção de perguntas
-          if (window.runTyping) {
-            window.runTyping(active);
-            console.log('[Seções] runTyping chamado para section-perguntas');
-          } else {
-            console.warn('[Seções] window.runTyping não definida');
-          }
-        }
-      }
-      if (sectionId === 'section-final') {
-        const url = localStorage.getItem('IRMANDADE_SELFIE_FINAL');
-        if (url) {
-          const img = document.querySelector('#minhaFotoFinal');
-          if (img) img.src = url;
-          console.log('[Seções] Foto final carregada:', url);
-        }
-      }
-      if (sectionId === 'section-guia') {
-        const guiaNameInput = document.getElementById('guiaNameInput');
-        const storedName = localStorage.getItem('JORNADA_NOME') || '';
-        if (guiaNameInput && storedName) guiaNameInput.value = storedName;
-        console.log('[Seções] Nome carregado para section-guia:', storedName);
-      }
-    }
-
-    // Integração com vídeo: chamar showSection após vídeo
-    document.addEventListener('videoEnded', () => {
-      const nextSection = window.JC?.nextSection || 'section-perguntas'; // Assumindo JC.nextSection definido em outro script
-      showSection(nextSection);
-      console.log('[Seções] showSection chamado após vídeo para:', nextSection);
-    });
-
-    // Expor showSection globalmente
-    window.showSection = showSection;
-
-    console.log('[Seções] Bloco carregado');
-  })();
-</script>
-  
-               <!-- showSection -->
-<script>
-  (function() {
-    const HIDE_CLASS = 'hidden';
-    let lastShowSection = 0;
-
-    window.showSection = function(id) {
-      const now = performance.now();
-      if (now - lastShowSection < 500) {
-        console.log('[showSection] Debounce: evitando chamada repetida');
-        return;
-      }
-      lastShowSection = now;
-
-      try {
-        document.querySelectorAll('.j-section, #videoOverlay, #video-container').forEach(elem => {
-          elem.classList.add(HIDE_CLASS);
-          elem.style.display = 'none';
-        });
-        const target = document.getElementById(id);
-        if (!target) {
-          console.warn('[showSection] Seção não encontrada:', id);
-          window.toast && window.toast(`Seção ${id} não encontrada.`);
-          return;
-        }
-        target.classList.remove(HIDE_CLASS);
-        target.style.display = 'block';
-        window.__currentSectionId = id;
-        console.log('[showSection] Exibindo seção:', id);
-
-        const canvas = document.getElementById('jornada-canvas');
-        if (canvas) {
-          if (id === 'section-perguntas') {
-            canvas.classList.remove('pergaminho-v');
-            canvas.classList.add('pergaminho-h');
-          } else {
-            canvas.classList.remove('pergaminho-h');
-            canvas.classList.add('pergaminho-v');
-          }
-        }
-
-        setTimeout(() => {
-          if (id === 'section-perguntas' && window.loadDynamicBlocks) {
-            window.loadDynamicBlocks();
-            console.log('[showSection] loadDynamicBlocks chamado para section-perguntas');
-          }
-          if (window.runTyping) {
-            window.runTyping(target);
-            console.log('[showSection] Iniciando runTyping para:', id);
-          }
-          const btns = target.querySelectorAll('[data-action="avancar"], .btn-avancar, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney');
-          btns.forEach(btn => {
-            if (!btn.dataset.clickAttached) {
-              btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (window.JC && window.JC.goNext) window.JC.goNext();
-              }, { once: true });
-              btn.dataset.clickAttached = '1';
-              console.log('[showSection] Evento de clique adicionado ao botão avançar em:', id, 'Botão:', btn.id || btn.className);
-            }
-          });
-        }, 100);
-      } catch (e) {
-        console.error('[showSection] Erro:', e);
-        window.toast && window.toast('Erro ao exibir seção.');
-      }
-    };
-
-    document.addEventListener('videoEnded', () => {
-      const nextSection = window.JC?.nextSection || 'section-perguntas';
-      window.showSection(nextSection);
-      console.log('[showSection] Chamado após vídeo para:', nextSection);
-    });
-
-    console.log('[showSection] Bloco carregado');
-  })();
-</script>
-  
-                  <!-- blocos dinâmicos -->
-<script>
-  (function() {
-    let isLoadingBlocks = false; // Evitar chamadas simultâneas
-
-    window.loadDynamicBlocks = function() {
-      if (isLoadingBlocks) {
-        console.warn('[DynamicBlocks] Carregamento em andamento, ignorando');
-        return;
-      }
-      isLoadingBlocks = true;
-
-      const content = document.getElementById('perguntas-container');
-      if (!content) {
-        console.warn('[DynamicBlocks] #perguntas-container não encontrado');
-        isLoadingBlocks = false;
-        return;
-      }
-
-      const blocks = window.JORNADA_BLOCKS || [];
-      if (!blocks.length) {
-        console.warn('[DynamicBlocks] window.JORNADA_BLOCKS vazio ou não definido');
-        isLoadingBlocks = false;
-        return;
-      }
-
-      content.innerHTML = '';
-
-      blocks.forEach((block, bIdx) => {
-        const bloco = document.createElement('section');
-        bloco.className = 'j-bloco';
-        bloco.dataset.bloco = bIdx;
-        bloco.dataset.video = block.video_after || '';
-
-        (block.questions || []).forEach((q, qIdx) => {
-          const label = typeof q === 'string' ? q : (q.label || q.text || '');
-          const div = document.createElement('div');
-          div.className = 'j-pergunta';
-          div.dataset.pergunta = qIdx;
-
-          const enunciado =
-            `<label class="pergunta-enunciado" ` +
-            `data-typing data-text="Pergunta ${qIdx + 1}: ${label}" ` +
-            `data-speed="36" data-cursor="true"></label>`;
-
-          div.innerHTML = enunciado +
-            `\n<textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>` +
-            `<div class="devolutiva-container" style="display:none;"><p data-typing data-speed="36" data-cursor="true"></p></div>` +
-            `<div class="accessibility-controls">` +
-            `<button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>` +
-            `<button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>` +
-            `</div>`;
-
-          bloco.appendChild(div);
-        });
-
-        content.appendChild(bloco);
-      });
-
-      const firstBloco = content.querySelector('.j-bloco');
-      if (firstBloco) {
-        firstBloco.style.display = 'block';
-        const first = firstBloco.querySelector('.j-pergunta');
-        if (first) {
-          first.classList.add('active');
-          if (window.runTyping) {
-            window.runTyping(first);
-            console.log('[DynamicBlocks] runTyping chamado para primeira pergunta');
-          } else {
-            console.warn('[DynamicBlocks] window.runTyping não definido');
-          }
-          // Reproduzir vídeo associado ao primeiro bloco, se houver
-          const videoAfter = firstBloco.dataset.video;
-          if (videoAfter && window.playVideo) {
-            window.playVideo(videoAfter);
-            console.log('[DynamicBlocks] Reproduzindo vídeo do bloco:', videoAfter);
-          }
-        }
-      }
-
-      if (window.loadAnswers) {
-        window.loadAnswers();
-        console.log('[DynamicBlocks] loadAnswers chamado');
-      } else {
-        console.warn('[DynamicBlocks] window.loadAnswers não definido');
-      }
-
-      const firstTa = document.querySelector('.j-bloco .j-pergunta textarea');
-      if (firstTa && window.handleInput) {
-        window.handleInput(firstTa);
-        console.log('[DynamicBlocks] handleInput chamado para primeiro textarea');
-      } else {
-        console.warn('[DynamicBlocks] window.handleInput ou textarea não definido');
-      }
-
-      if (window.initAccessibility) {
-        window.initAccessibility();
-        console.log('[DynamicBlocks] initAccessibility chamado');
-      } else {
-        console.warn('[DynamicBlocks] window.initAccessibility não definido');
-      }
-
-      isLoadingBlocks = false;
-    };
-
-    // Redefinir goNext
-    const prevGoNext = window.goNext;
-    window.goNext = function() {
-      if (prevGoNext) {
-        prevGoNext();
-        console.log('[DynamicBlocks] prevGoNext chamado');
-      }
-      const active = document.querySelector('.j-pergunta.active');
-      if (active && window.runTyping) {
-        window.runTyping(active);
-        console.log('[DynamicBlocks] runTyping chamado em goNext');
-      } else {
-        console.warn('[DynamicBlocks] .j-pergunta.active ou window.runTyping não definido');
-      }
-      // Reproduzir vídeo do próximo bloco, se houver
-      const activeBloco = document.querySelector('.j-bloco[style*="display: block"]');
-      const nextBlocoIdx = activeBloco ? parseInt(activeBloco.dataset.bloco) + 1 : 0;
-      const nextBloco = document.querySelector(`.j-bloco[data-bloco="${nextBlocoIdx}"]`);
-      if (nextBloco) {
-        document.querySelectorAll('.j-bloco').forEach(b => b.style.display = 'none');
-        nextBloco.style.display = 'block';
-        const videoAfter = nextBloco.dataset.video;
-        if (videoAfter && window.playVideo) {
-          window.playVideo(videoAfter);
-          console.log('[DynamicBlocks] Reproduzindo vídeo do próximo bloco:', videoAfter);
-        }
-      }
-    };
-
-    // Integração com vídeo
-    document.addEventListener('videoEnded', () => {
-      const activeBloco = document.querySelector('.j-bloco[style*="display: block"]');
-      if (activeBloco) {
-        const firstPergunta = activeBloco.querySelector('.j-pergunta');
-        if (firstPergunta && window.runTyping) {
-          firstPergunta.classList.add('active');
-          window.runTyping(firstPergunta);
-          console.log('[DynamicBlocks] runTyping chamado após vídeo');
-        }
-      }
-    });
-
-    console.log('[DynamicBlocks] Bloco carregado');
-  })();
-</script>
-  
-                  <!-- controles -->
-<script>
-  (function() {
-    let isHandlingInput = false; // Evitar múltiplas chamadas a handleInput
-
-    function analyzeSentiment(text) {
-      const POS = {
-        'feliz': 2, 'alegria': 2, 'amor': 3, 'sucesso': 2, 'esperança': 3, 'paz': 2,
-        'fé': 3, 'gratidão': 2, 'vitória': 3, 'superação': 3, 'luz': 2, 'deus': 3,
-        'coragem': 2, 'força': 2, 'confiança': 2, 'propósito': 3
-      };
-      const NEG = {
-        'triste': -2, 'dor': -3, 'raiva': -2, 'medo': -2, 'frustracao': -2, 'frustração': -2,
-        'decepcao': -2, 'decepção': -2, 'perda': -3, 'culpa': -2, 'ansiedade': -2,
-        'solidao': -2, 'solidão': -2, 'desespero': -3, 'cansaco': -2, 'cansaço': -2,
-        'fracasso': -2, 'trauma': -3, 'duvida': -2, 'dúvida': -2
-      };
-      let score = 0;
-      (text || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').split(/\s+/).forEach(t => {
-        if (POS[t] != null) score += POS[t];
-        if (NEG[t] != null) score += NEG[t];
-      });
-      return score;
-    }
-
-    async function handleInput(textarea) {
-      if (isHandlingInput) {
-        console.warn('[Controles] Processamento de input em andamento, ignorando');
-        return;
-      }
-      isHandlingInput = true;
-
-      if (!textarea) {
-        console.warn('[Controles] Textarea não encontrado');
-        isHandlingInput = false;
-        return;
-      }
-
-      const score = analyzeSentiment(textarea.value);
-      if (window.updateChama) {
-        window.updateChama(score);
-        console.log('[Controles] updateChama chamado com score:', score);
-      } else {
-        console.warn('[Controles] window.updateChama não definido');
-      }
-
-      if (window.saveAnswers) window.saveAnswers();
-      if (window.updateProgress) window.updateProgress();
-
-      const perguntaDiv = textarea.closest('.j-pergunta');
-      const devolutivaDiv = perguntaDiv?.querySelector('.devolutiva-container');
-      const devolutivaP = devolutivaDiv?.querySelector('p');
-      if (textarea.value.trim() && devolutivaDiv && devolutivaP) {
-        devolutivaDiv.style.display = 'block';
-        const pergunta = perguntaDiv?.querySelector('.pergunta-enunciado')?.textContent || '';
-        const resposta = textarea.value;
-        const guia = localStorage.getItem('JORNADA_GUIA') || 'zion';
-        if (window.fetchDevolutiva) {
-          const devolutiva = await window.fetchDevolutiva(pergunta, resposta, guia);
-          if (window.typeDevolutiva) {
-            window.typeDevolutiva(devolutivaP, devolutiva, 36);
-            console.log('[Controles] Devolutiva exibida:', devolutiva);
-          } else {
-            devolutivaP.textContent = devolutiva;
-            console.warn('[Controles] window.typeDevolutiva não definido, exibindo diretamente');
-          }
-        }
-      } else {
-        if (devolutivaDiv) devolutivaDiv.style.display = 'none';
-      }
-      isHandlingInput = false;
-    }
-
-    function toggleSenha() {
-      const input = document.getElementById('senha');
-      if (!input) {
-        console.warn('[Controles] Input #senha não encontrado');
-        return;
-      }
-      input.type = (input.type === 'password' ? 'text' : 'password');
-      console.log('[Controles] Tipo de senha alternado:', input.type);
-    }
-
-    function proceedAfterGuia(guia) {
-      const guiaNameInput = document.getElementById('guiaNameInput');
-      if (guiaNameInput && guiaNameInput.value.trim()) {
-        localStorage.setItem('JORNADA_NOME', guiaNameInput.value.trim());
-      } else {
-        window.toast && window.toast('Por favor, insira seu nome antes de prosseguir.');
-        console.warn('[Controles] Nome não inserido');
-        return;
-      }
-      localStorage.setItem('JORNADA_GUIA', guia);
-      if (window.ensureHeroFlame) {
-        window.ensureHeroFlame('section-selfie');
-      } else {
-        console.warn('[Controles] window.ensureHeroFlame não definido');
-      }
-      if (window.showSection) {
-        window.showSection('section-selfie');
-      }
-      const card = document.getElementById('card-guide');
-      const bgImg = document.getElementById('guideBg');
-      const guideNameEl = document.getElementById('guideNameSlot');
-      if (card && bgImg && guideNameEl) {
-        card.dataset.guide = guia.toUpperCase();
-        guideNameEl.textContent = guia.toUpperCase();
-        bgImg.src = `/assets/img/irmandade-quarteto-bg-${guia}.png`;
-        console.log('[Controles] Interface de guia atualizada:', guia);
-      } else {
-        console.warn('[Controles] Elementos do guia não encontrados');
-      }
-    }
-
-    function proceedAfterSelfie() {
-      isTransitioning = false;
-      const intro = window.JORNADA_VIDEOS?.intro || '';
-      if (!intro || window.__introPlayed) {
-        if (window.proceedToQuestions) {
-          window.proceedToQuestions();
-          console.log('[Controles] proceedToQuestions chamado');
-        } else {
-          console.warn('[Controles] window.proceedToQuestions não definido');
-        }
-        return;
-      }
-      window.__introPlayed = true;
-      if (window.playTransition) {
-        window.playTransition(intro, () => {
-          if (window.proceedToQuestions) {
-            window.proceedToQuestions();
-            console.log('[Controles] proceedToQuestions chamado após vídeo');
-          }
-        });
-      } else {
-        console.warn('[Controles] window.playTransition não definido');
-      }
-    }
-
-    let isTransitioning = false;
-    function goNext() {
-      if (isTransitioning) {
-        console.warn('[Controles] Transição em andamento, ignorando');
-        return;
-      }
-      isTransitioning = true;
-
-      const current = document.querySelector('.j-pergunta.active');
-      if (!current) {
-        console.warn('[Controles] .j-pergunta.active não encontrado');
-        isTransitioning = false;
-        return;
-      }
-
-      const bloco = current.closest('.j-bloco');
-      if (!bloco) {
-        console.warn('[Controles] .j-bloco não encontrado');
-        isTransitioning = false;
-        return;
-      }
-
-      const perguntas = Array.from(bloco.querySelectorAll('.j-pergunta'));
-      const i = perguntas.indexOf(current);
-      current.classList.remove('active');
-
-      if (i + 1 < perguntas.length) {
-        const prox = perguntas[i + 1];
-        prox.classList.add('active');
-        const lbl = prox.querySelector('.pergunta-enunciado')?.textContent || '';
-        const ta = prox.querySelector('textarea');
-        if (ta) ta.placeholder = "Digite sua resposta...";
-        const aria = document.getElementById('aria-pergunta');
-        if (aria) aria.textContent = lbl;
-        if (window.runTyping) {
-          window.runTyping(prox);
-          console.log('[Controles] runTyping chamado para próxima pergunta');
-        }
-        if (window.updateProgress) {
-          window.updateProgress();
-        }
-        isTransitioning = false;
-        return;
-      }
-
-      const blocos = Array.from(document.querySelectorAll('.j-bloco'));
-      const idxBloco = parseInt(bloco.dataset.bloco, 10);
-      const temProx = idxBloco + 1 < blocos.length;
-
-      const irAdiante = () => {
-        if (temProx) {
-          blocos.forEach(b => b.style.display = 'none');
-          const proxBloco = blocos[idxBloco + 1];
-          if (!proxBloco) {
-            console.warn('[Controles] Próximo bloco não encontrado');
-            isTransitioning = false;
-            return;
-          }
-          proxBloco.style.display = 'block';
-          const primeira = proxBloco.querySelector('.j-pergunta');
-          if (primeira) {
-            primeira.classList.add('active');
-            const lbl = primeira.querySelector('.pergunta-enunciado')?.textContent || '';
-            const ta = primeira.querySelector('textarea');
-            if (ta) ta.placeholder = "Digite sua resposta...";
-            const aria = document.getElementById('aria-pergunta');
-            if (aria) aria.textContent = lbl;
-            if (window.runTyping) {
-              window.runTyping(primeira);
-              console.log('[Controles] runTyping chamado para primeiro bloco');
-            }
-          }
-          if (window.updateProgress) {
-            window.updateProgress();
-          }
-        } else {
-          if (window.JORNADA_FINAL_VIDEO && window.playTransition) {
-            window.playTransition(window.JORNADA_FINAL_VIDEO, () => {
-              if (window.showSection) {
-                window.showSection('section-final');
-                console.log('[Controles] showSection chamado para section-final');
-              }
-              isTransitioning = false;
-            });
-          } else {
-            if (window.showSection) {
-              window.showSection('section-final');
-            }
-            isTransitioning = false;
-          }
-          if (window.updateProgress) {
-            window.updateProgress();
-          }
-        }
-      };
-
-      const src = (window.JORNADA_BLOCKS[idxBloco] && window.JORNADA_BLOCKS[idxBloco].video_after) || '';
-      if (src && window.playTransition) {
-        window.playTransition(src, () => {
-          irAdiante();
-          console.log('[Controles] irAdiante chamado após vídeo');
-        });
-      } else {
-        irAdiante();
-      }
-    }
-    window.goNext = goNext;
-
-    function playTransition(src, onEnd) {
-      const overlay = document.getElementById('videoOverlay');
-      const video = document.getElementById('videoTransicao');
-            video.loop = false; // Impede looping
-      const fallback = document.getElementById('videoFallback');
-      const skip = document.getElementById('skipVideo');
-      if (!overlay || !video || !fallback || !src) {
-        console.warn('[Controles] Elementos de vídeo ou src não encontrados');
-        onEnd && onEnd();
-        return;
-      }
-
-      window.__playingTransition = true;
-      overlay.classList.remove('hidden');
-      video.classList.remove('hidden');
-      fallback.classList.add('hidden');
-      video.pause();
-      video.removeAttribute('src');
-      video.load();
-      video.currentTime = 0;
-      video.controls = true;
-      video.muted = false;
-      video.playsInline = true;
-      video.setAttribute('playsinline', '');
-      video.setAttribute('webkit-playsinline', '');
-      video.style.background = '#000';
-
-      let ended = false;
-      const cleanup = () => {
-        if (ended) return;
-        ended = true;
-        isTransitioning = false;
-        window.__playingTransition = false;
-        video.pause();
-        overlay.classList.add('hidden');
-        video.classList.add('hidden');
-        fallback.classList.add('hidden');
-        video.removeAttribute('src');
-        video.load();
-        onEnd && onEnd();
-        document.dispatchEvent(new Event('videoEnded')); // Disparar evento
-        console.log('[Controles] Transição de vídeo finalizada');
-      };
-
-      video.onerror = (e) => {
-        console.error('[Controles] Erro no vídeo:', e, 'Source:', src);
-        fallback.classList.remove('hidden');
-        video.classList.add('hidden');
-        window.toast && window.toast('Não foi possível carregar o vídeo.');
-        setTimeout(cleanup, 1500);
-      };
-      video.onended = cleanup;
-      if (skip) skip.onclick = cleanup;
-
-      video.onloadedmetadata = () => {
-        if (!video.videoWidth || !video.videoHeight) {
-          video.classList.add('hidden');
-          fallback.classList.remove('hidden');
-        }
-        video.currentTime = 0;
-        setTimeout(() => {
-          video.play().catch((e) => {
-            console.error('[Controles] Erro na reprodução do vídeo:', e, 'Source:', src);
-            fallback.classList.remove('hidden');
-            video.classList.add('hidden');
-            setTimeout(cleanup, 1500);
-          });
-        }, 400);
-      };
-
-      video.src = src + '?t=' + Date.now();
-      setTimeout(cleanup, 90000);
-    }
-    window.playTransition = playTransition;
-
-    console.log('[Controles] Bloco carregado');
-  })();
-</script>
-  
-                  <!-- controle de orientação de vídeo -->
-<script>
-  (function() {
-    let isStartingJourney = false;
-    let isProceedingToQuestions = false;
-
-    function lockVideoOrientation() {
-      const video = document.getElementById('videoTransicao');
-      if (!video) {
-        console.warn('[Controle] Vídeo #videoTransicao não encontrado');
-        return;
-      }
-      video.addEventListener('webkitbeginfullscreen', (e) => {
-        e.preventDefault();
-        video.exitFullscreen?.();
-        console.log('[Controle] Tela cheia bloqueada para vídeo');
-      });
-      video.addEventListener('fullscreenchange', () => {
-        if (document.fullscreenElement === video) {
-          document.exitFullscreen?.();
-          console.log('[Controle] Saiu do modo tela cheia');
-        }
-      });
-      window.addEventListener('orientationchange', () => {
-        video.style.transform = 'rotate(0deg)';
-        console.log('[Controle] Orientação ajustada');
-      });
-      if (window.matchMedia('(orientation: portrait)').matches) {
-        video.style.width = '100vw';
-        video.style.height = 'auto';
-        video.style.maxHeight = '100vh';
-        console.log('[Controle] Vídeo ajustado para modo retrato');
-      }
-    }
-
-    function generatePDF() {
-      const respostas = JSON.parse(localStorage.getItem('jornada_respostas') || '{}');
-      const doc = { content: [] };
-      doc.content.push({
-        text: 'Jornada Essencial - Irmandade Conhecimento com Luz',
-        style: { fontSize: 20, bold: true, alignment: 'center', margin: [0, 0, 0, 20] }
-      });
-      Object.keys(respostas).forEach((key, idx) => {
-        const pergunta = document.querySelector(`.j-pergunta[data-pergunta="${idx}"] .pergunta-enunciado`)?.textContent || `Pergunta ${idx + 1}`;
-        doc.content.push(
-          { text: pergunta, style: { fontSize: 14, bold: true, margin: [0, 10, 0, 5] } },
-          { text: respostas[key] || 'Sem resposta', style: { fontSize: 12, margin: [0, 0, 0, 10] } }
-        );
-      });
-      if (window.pdfMake) {
-        window.pdfMake.createPdf(doc).download('jornada_essencial.pdf');
-        console.log('[Controle] PDF gerado e baixado');
-      } else {
-        window.toast && window.toast('PDF não disponível.');
-        console.warn('[Controle] window.pdfMake não definido');
-      }
-    }
-
-    function startJourney() {
-      if (isStartingJourney) {
-        console.warn('[Controle] Início da jornada em andamento, ignorando');
-        return;
-      }
-      isStartingJourney = true;
-
-      const senha = (document.getElementById('senha')?.value || '').trim().toLowerCase();
-      console.log('[startJourney] Senha ignorada p/ debug:', senha);
-      if (window.ensureHeroFlame) {
-        window.ensureHeroFlame('section-guia');
-      } else {
-        console.warn('[Controle] window.ensureHeroFlame não definido');
-      }
-      if (window.showSection) {
-        window.showSection('section-guia');
-        console.log('[Controle] showSection chamado para section-guia');
-      } else {
-        console.warn('[Controle] window.showSection não definido');
-      }
-      isStartingJourney = false;
-    }
-
-    function proceedToQuestions() {
-      if (isProceedingToQuestions) {
-        console.warn('[Controle] Navegação para perguntas em andamento, ignorando');
-        return;
-      }
-      isProceedingToQuestions = true;
-
-      window.isTransitioning = false;
-      if (window.showSection) {
-        window.showSection('section-perguntas');
-      } else {
-        console.warn('[Controle] window.showSection não definido');
-      }
-      if (window.loadDynamicBlocks) {
-        window.loadDynamicBlocks();
-        console.log('[Controle] loadDynamicBlocks chamado');
-      } else {
-        console.warn('[Controle] window.loadDynamicBlocks não definido');
-      }
-
-      const perguntas = document.querySelectorAll('.j-pergunta');
-      if (perguntas.length) {
-        perguntas[0].classList.add('active');
-        const lbl = perguntas[0].querySelector('.pergunta-enunciado')?.textContent || '';
-        const ta = perguntas[0].querySelector('textarea');
-        if (ta) {
-          ta.placeholder = "Digite sua resposta...";
-          if (window.handleInput) {
-            window.handleInput(ta);
-            console.log('[Controle] handleInput chamado para primeira pergunta');
-          }
-        }
-        const aria = document.getElementById('aria-pergunta');
-        if (aria) aria.textContent = lbl;
-      }
-      if (window.updateProgress) {
-        window.updateProgress();
-        console.log('[Controle] updateProgress chamado');
-      } else {
-        console.warn('[Controle] window.updateProgress não definido');
-      }
-      isProceedingToQuestions = false;
-    }
-
-    // Integração com vídeo
-    document.addEventListener('videoEnded', () => {
-      proceedToQuestions();
-      console.log('[Controle] proceedToQuestions chamado após vídeo');
-    });
-
-    // Expor funções globalmente
-    window.lockVideoOrientation = lockVideoOrientation;
-    window.generatePDF = generatePDF;
-    window.startJourney = startJourney;
-    window.proceedToQuestions = proceedToQuestions;
-
-    console.log('[Controle] Bloco carregado');
-  })();
-  
- /* /public/assets/js/transitions.js */
-(function () {
-  'use strict';
-  window.playTransition = function (videoSrc, callback) {
-    const videoOverlay = document.getElementById('videoOverlay');
-    const video = document.getElementById('videoTransicao');
-    const skipButton = document.getElementById('skipVideo');
-
-    if (!videoOverlay || !video) {
-      console.error('[playTransition] videoOverlay ou videoTransicao não encontrado');
-      callback && callback();
+(function() {
+  let isPlaying = false;
+
+  window.playVideo = function(videoSrc) {
+    if (isPlaying) {
+      console.log('[playVideo] Já está reproduzindo um vídeo, ignorando:', videoSrc);
       return;
     }
+    isPlaying = true;
 
-    video.src = videoSrc;
-    videoOverlay.classList.remove('hidden');
-    video.play().catch(err => {
-      console.error('[playTransition] Erro ao reproduzir vídeo:', err);
-      document.getElementById('videoFallback').classList.remove('hidden');
-    });
-
-    video.onended = () => {
-      videoOverlay.classList.add('hidden');
-      video.src = '';
-      callback && callback();
-    };
-
-    skipButton.onclick = () => {
-      video.pause();
-      videoOverlay.classList.add('hidden');
-      video.src = '';
-      callback && callback();
-    };
-
-    console.log('[playTransition] Reproduzindo vídeo:', videoSrc);
+    const overlay = document.getElementById('videoOverlay');
+    const video = document.getElementById('videoTransicao');
+    const fallback = document.getElementById('videoFallback');
+    if (!overlay || !video) {
+      console.error('[playVideo] Elementos de vídeo não encontrados', { overlay: !!overlay, video: !!video });
+      window.toast && window.toast('Erro ao reproduzir vídeo.');
+      isPlaying = false;
+      if (window.JC && window.JC.goNext) window.JC.goNext();
+      return;
+    }
+    console.log('[playVideo] Tentando reproduzir:', videoSrc);
+    try {
+      fetch(videoSrc, { method: 'HEAD' })
+        .then(response => {
+          if (!response.ok) throw new Error('Vídeo não encontrado');
+          video.src = videoSrc;
+          video.onended = () => {
+            console.log('[playVideo] Vídeo finalizado:', videoSrc);
+            overlay.classList.add('hidden');
+            video.src = '';
+            isPlaying = false;
+            if (window.JC && window.JC.goNext) window.JC.goNext();
+          };
+          video.onerror = (e) => {
+            console.error('[playVideo] Erro ao carregar vídeo:', videoSrc, e);
+            fallback.classList.remove('hidden');
+            video.classList.add('hidden');
+            window.toast && window.toast('Erro ao carregar vídeo. Usando fallback.');
+            setTimeout(() => {
+              overlay.classList.add('hidden');
+              fallback.classList.add('hidden');
+              video.classList.remove('hidden');
+              isPlaying = false;
+              if (window.JC && window.JC.goNext) window.JC.goNext();
+            }, 3000);
+          };
+          overlay.classList.remove('hidden');
+          video.play().catch(e => {
+            console.error('[playVideo] Erro ao iniciar reprodução:', videoSrc, e);
+            fallback.classList.remove('hidden');
+            video.classList.add('hidden');
+            window.toast && window.toast('Erro ao reproduzir vídeo. Usando fallback.');
+            setTimeout(() => {
+              overlay.classList.add('hidden');
+              fallback.classList.add('hidden');
+              video.classList.remove('hidden');
+              isPlaying = false;
+              if (window.JC && window.JC.goNext) window.JC.goNext();
+            }, 3000);
+          });
+          console.log('[playVideo] Iniciando reprodução:', videoSrc);
+        })
+        .catch(e => {
+          console.error('[playVideo] Erro ao verificar vídeo:', videoSrc, e);
+          window.toast && window.toast('Vídeo não encontrado.');
+          isPlaying = false;
+          if (window.JC && window.JC.goNext) window.JC.goNext();
+        });
+    } catch (e) {
+      console.error('[playVideo] Erro inesperado:', videoSrc, e);
+      window.toast && window.toast('Erro ao reproduzir vídeo.');
+      isPlaying = false;
+      if (window.JC && window.JC.goNext) window.JC.goNext();
+    }
   };
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('#skipVideo');
+    if (btn) {
+      const overlay = document.getElementById('videoOverlay');
+      const video = document.getElementById('videoTransicao');
+      if (overlay && video) {
+        console.log('[playVideo] Vídeo pulado pelo usuário');
+        video.pause();
+        video.src = '';
+        overlay.classList.add('hidden');
+        isPlaying = false;
+        if (window.JC && window.JC.goNext) window.JC.goNext();
+      }
+    }
+  });
+  console.log('[Video] Bloco carregado');
 })();
-  
 </script>
   
-               <!-- Acessibilidade: Microfone e Áudio -->
+ <!-- Guia Seleção -->
 <script>
-  (function() {
-    let recognition = null;
-    let currentLang = 'pt-BR';
-    let isRecognizing = false;
+(function() {
+  window.JORNADA = window.JORNADA || {};
+  window.JORNADA.selectedGuia = window.JORNADA.selectedGuia || null;
 
-    function initAccessibility() {
-      console.log('[Acessibilidade] Iniciando initAccessibility');
-      if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-        recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.lang = currentLang;
-        console.log('[Acessibilidade] Reconhecimento de voz inicializado:', currentLang);
-      } else {
-        window.toast && window.toast('Seu navegador não suporta reconhecimento de voz.');
-        console.warn('[Acessibilidade] SpeechRecognition não suportado');
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action="select-guia"]');
+    if (btn) {
+      e.preventDefault();
+      const guia = btn.dataset.guia;
+      window.JORNADA.selectedGuia = guia;
+      console.log('[Guia] Guia selecionado:', guia);
+      const guideBg = document.getElementById('guideBg');
+      if (guideBg) {
+        guideBg.src = `/assets/img/irmandade-quarteto-bg-${guia}.png`;
       }
-
-      document.addEventListener('click', (ev) => {
-        if (!ev.target) return;
-        const btnMic = ev.target.closest('[data-action="start-mic"]');
-        const btnAudio = ev.target.closest('[data-action="read-question"]');
-        if (btnMic) {
-          ev.preventDefault();
-          const ta = btnMic.closest('.j-pergunta')?.querySelector('textarea');
-          if (ta) {
-            startRecognition(ta, btnMic);
-            console.log('[Acessibilidade] Iniciando reconhecimento de voz');
-          }
-        }
-        if (btnAudio) {
-          ev.preventDefault();
-          const enunciado = btnAudio.closest('.j-pergunta')?.querySelector('.pergunta-enunciado');
-          const text = enunciado?.textContent || '';
-          readAloud(text);
-          console.log('[Acessibilidade] Lendo enunciado:', text);
-        }
-      });
-
-      const langSelect = document.getElementById('language-select');
-      if (langSelect) {
-        langSelect.addEventListener('change', (ev) => {
-          currentLang = ev.target.value;
-          if (recognition) recognition.lang = currentLang;
-          window.I18N?.setLang(currentLang);
-          window.toast && window.toast(`Idioma alterado para ${currentLang}`);
-          console.log('[Acessibilidade] Idioma alterado:', currentLang);
-          if (window.updateBlocks) {
-            window.updateBlocks();
-          } else {
-            console.warn('[Acessibilidade] window.updateBlocks não definido');
-          }
-          if (!document.getElementById('section-perguntas').classList.contains('hidden') && window.loadDynamicBlocks) {
-            window.loadDynamicBlocks();
-            console.log('[Acessibilidade] loadDynamicBlocks chamado após mudança de idioma');
-          }
-        });
+      const guideNameSlot = document.getElementById('guideNameSlot');
+      if (guideNameSlot) {
+        guideNameSlot.textContent = guia.charAt(0).toUpperCase() + guia.slice(1);
+      }
+      if (window.JC && window.playVideo) {
+        window.JC.nextSection = 'section-selfie';
+        const videoSrc = '/assets/videos/transicao_selfie.mp4';
+        console.log('[Guia] Iniciando reprodução de vídeo:', videoSrc);
+        window.playVideo(videoSrc);
       } else {
-        console.warn('[Acessibilidade] #language-select não encontrado');
+        console.warn('[Guia] window.JC ou playVideo não definido, navegando diretamente');
+        window.showSection && window.showSection('section-selfie');
       }
     }
-
-    function startRecognition(textarea, btn) {
-      if (!recognition || isRecognizing) {
-        console.warn('[Acessibilidade] Reconhecimento já em andamento ou não inicializado');
-        return;
-      }
-      isRecognizing = true;
-      btn.classList.add('recording');
-      btn.textContent = 'Gravando...';
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        if (window.typeAnswer) {
-          window.typeAnswer(textarea, (textarea.value ? textarea.value + ' ' : '') + transcript, 36);
-          console.log('[Acessibilidade] Texto transcrito:', transcript);
-        }
-        if (window.saveAnswers) window.saveAnswers();
-        if (window.updateProgress) window.updateProgress();
-      };
-      recognition.onend = () => {
-        isRecognizing = false;
-        btn.classList.remove('recording');
-        btn.textContent = '🎤 Falar Resposta';
-        console.log('[Acessibilidade] Reconhecimento finalizado');
-      };
-      recognition.onerror = (event) => {
-        window.toast && window.toast('Erro no reconhecimento: ' + event.error);
-        console.error('[Acessibilidade] Erro no reconhecimento:', event.error);
-        recognition.onend();
-      };
-      recognition.start();
-    }
-
-    function readAloud(text) {
-  if ('speechSynthesis' in window) {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'pt-BR'; // Ajuste conforme o idioma
-    window.speechSynthesis.speak(utterance);
-  } else {
-    console.error('API de síntese de voz não suportada');
-  }
-}
-
-document.querySelectorAll('[data-action="read-question"]').forEach(button => {
-  button.addEventListener('click', () => {
-    const pergunta = button.closest('.pergunta').textContent;
-    readAloud(pergunta);
   });
-});
+  console.log('[Guia] Bloco carregado');
+})();
+</script>
+ 
+<!-- Selfie -->
+<script>
+(function() {
+  let lastPreview = 0;
+  let lastCapture = 0;
 
-    function initJornada() {
-      console.log('[Jornada] Inicializando eventos');
-      let isProcessingClick = false;
+  document.addEventListener('change', (e) => {
+    const input = e.target.closest('#selfieInput');
+    if (input && input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = document.getElementById('selfieImage');
+        if (img) {
+          img.setAttribute('href', ev.target.result);
+          document.querySelector('.flame-layer').style.opacity = '1';
+          console.log('[Selfie] Imagem carregada');
+        }
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  });
 
-      document.addEventListener('input', (ev) => {
-        const ta = ev.target.closest?.('.j-pergunta textarea');
-        if (ta && window.handleInput) {
-          window.handleInput(ta);
-          console.log('[Jornada] handleInput chamado em input');
-        }
-      });
+  document.addEventListener('input', (e) => {
+    const input = e.target.closest('#nameInput, #selfieScale, #selfieOffsetX, #selfieOffsetY');
+    if (input) {
+      const img = document.getElementById('selfieImage');
+      const nameSlot = document.getElementById('userNameSlot');
+      if (!img || !nameSlot) return;
 
-      document.addEventListener('focusin', (ev) => {
-        if (ev.target && ev.target.matches('.j-pergunta textarea') && window.__abortTypingPlaceholder) {
-          window.__abortTypingPlaceholder();
-          console.log('[Jornada] Aborted typing placeholder');
-        }
-      });
-
-      document.addEventListener('click', (ev) => {
-        if (isProcessingClick || window.isTransitioning || !ev.target) return;
-        isProcessingClick = true;
-
-        const aNext = ev.target.closest?.('[data-action="next"]');
-        const aStart = ev.target.closest?.('[data-action="start"]');
-        const aToggle = ev.target.closest?.('[data-action="toggle-password"], .password-toggle');
-        const aRestart = ev.target.closest?.('[data-action="restart"]');
-        const btnPDF = ev.target.closest?.('[data-action="generate-pdf"]');
-        const btnDownloadSelfie = ev.target.closest?.('[data-action="download-selfie"]');
-        const btnSkipSelfie = ev.target.closest?.('[data-action="skip-selfie"]');
-        const btnSendChat = ev.target.closest?.('[data-action="send-chat"]');
-        const btnSelectGuia = ev.target.closest?.('[data-action="select-guia"]');
-        const btnNextTermos = ev.target.closest?.('[data-action="next-termos"]');
-        const btnNextSenha = ev.target.closest?.('[data-action="next-senha"]');
-        const btnTermosNext = ev.target.closest?.('[data-action="termos-next"]');
-        const btnTermosPrev = ev.target.closest?.('[data-action="termos-prev"]');
-
-        if (aNext) {
-          ev.preventDefault();
-          if (window.goNext) window.goNext();
-          console.log('[Jornada] goNext chamado');
-        }
-        if (aStart) {
-          ev.preventDefault();
-          if (window.startJourney) window.startJourney();
-          console.log('[Jornada] startJourney chamado');
-        }
-        if (aToggle) {
-          ev.preventDefault();
-          if (window.toggleSenha) window.toggleSenha();
-          console.log('[Jornada] toggleSenha chamado');
-        }
-        if (aRestart) {
-          ev.preventDefault();
-          localStorage.removeItem('jornada_respostas');
-          localStorage.removeItem('JORNADA_GUIA');
-          location.hash = '#intro';
-          location.replace('/index.html');
-          console.log('[Jornada] Jornada reiniciada');
-        }
-        if (btnPDF) {
-          ev.preventDefault();
-          if (window.generatePDF) window.generatePDF();
-          console.log('[Jornada] generatePDF chamado');
-        }
-        if (btnDownloadSelfie) {
-          ev.preventDefault();
-          const dataURL = localStorage.getItem('IRMANDADE_SELFIE_FINAL');
-          if (dataURL) {
-            const a = document.createElement('a');
-            a.href = dataURL;
-            a.download = 'jornada-selfie.png';
-            a.click();
-            console.log('[Jornada] Download de selfie iniciado');
-          } else {
-            window.toast && window.toast('Nenhuma imagem disponível para download.');
-            console.warn('[Jornada] Nenhuma selfie disponível');
-          }
-        }
-        if (btnSkipSelfie) {
-          ev.preventDefault();
-          if (window.proceedAfterSelfie) window.proceedAfterSelfie();
-          console.log('[Jornada] proceedAfterSelfie chamado');
-        }
-        if (btnSendChat) {
-          ev.preventDefault();
-          if (window.sendChatMessage) window.sendChatMessage();
-          console.log('[Jornada] sendChatMessage chamado');
-        }
-        if (btnSelectGuia) {
-          ev.preventDefault();
-          if (window.proceedAfterGuia) window.proceedAfterGuia(btnSelectGuia.dataset.guia);
-          console.log('[Jornada] proceedAfterGuia chamado:', btnSelectGuia.dataset.guia);
-        }
-        if (btnNextTermos) {
-          ev.preventDefault();
-          if (window.showSection) window.showSection('section-termos');
-          console.log('[Jornada] showSection chamado para section-termos');
-        }
-        if (btnNextSenha) {
-          ev.preventDefault();
-          if (window.showSection) window.showSection('section-senha');
-          console.log('[Jornada] showSection chamado para section-senha');
-        }
-        if (btnTermosNext) {
-          ev.preventDefault();
-          const pg1 = document.getElementById('termos-pg1');
-          const pg2 = document.getElementById('termos-pg2');
-          if (pg1) pg1.classList.add('hidden');
-          if (pg2) pg2.classList.remove('hidden');
-          console.log('[Jornada] Navegação para termos-pg2');
-        }
-        if (btnTermosPrev) {
-          ev.preventDefault();
-          const pg1 = document.getElementById('termos-pg1');
-          const pg2 = document.getElementById('termos-pg2');
-          if (pg2) pg2.classList.add('hidden');
-          if (pg1) pg1.classList.remove('hidden');
-          console.log('[Jornada] Navegação para termos-pg1');
-        }
-
-        isProcessingClick = false;
-      }, { capture: true });
-
-      const chatInput = document.getElementById('grok-chat-input');
-      if (chatInput) {
-        chatInput.addEventListener('keypress', (ev) => {
-          if (ev.key === 'Enter') {
-            ev.preventDefault();
-            if (window.sendChatMessage) window.sendChatMessage();
-            console.log('[Jornada] sendChatMessage chamado via Enter');
-          }
-        });
+      if (input.id === 'nameInput') {
+        nameSlot.textContent = input.value || 'NOME';
       } else {
-        console.warn('[Jornada] #grok-chat-input não encontrado');
+        const scale = document.getElementById('selfieScale')?.value || 1;
+        const offsetX = document.getElementById('selfieOffsetX')?.value || 0;
+        const offsetY = document.getElementById('selfieOffsetY')?.value || 0;
+        img.style.transform = `scale(${scale}) translate(${offsetX}px, ${offsetY}px)`;
+      }
+      console.log('[Selfie] Ajustes aplicados');
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('#previewBtn, #captureBtn, #btnSkipSelfie, #btnStartJourney');
+    if (btn) {
+      e.preventDefault();
+      const now = performance.now();
+      if (btn.id === 'previewBtn') {
+        if (now - lastPreview < 1000) return;
+        lastPreview = now;
+        const img = document.getElementById('selfieImage');
+        if (img && img.getAttribute('href')) {
+          document.querySelector('.flame-layer').style.opacity = '1';
+          window.toast && window.toast('Pré-visualização atualizada!');
+          console.log('[Selfie] Pré-visualização atualizada');
+        } else {
+          window.toast && window.toast('Selecione uma imagem primeiro.');
+          console.log('[Selfie] Nenhuma imagem selecionada para pré-visualização');
+        }
+      } else if (btn.id === 'captureBtn') {
+        if (now - lastCapture < 1000) return;
+        lastCapture = now;
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = document.getElementById('selfieImage');
+        const bg = document.getElementById('guideBg');
+        const nameSlot = document.getElementById('userNameSlot');
+        const guideNameSlot = document.getElementById('guideNameSlot');
+        if (!img || !bg || !nameSlot || !guideNameSlot) {
+          window.toast && window.toast('Erro ao capturar imagem.');
+          console.log('[Selfie] Elementos de imagem, fundo ou nomes não encontrados');
+          return;
+        }
+        canvas.width = bg.width;
+        canvas.height = bg.height;
+        ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
+        const scale = document.getElementById('selfieScale')?.value || 1;
+        const offsetX = document.getElementById('selfieOffsetX')?.value || 0;
+        const offsetY = document.getElementById('selfieOffsetY')?.value || 0;
+        ctx.save();
+        ctx.translate(15 + parseFloat(offsetX), 35 + parseFloat(offsetY));
+        ctx.scale(scale, scale);
+        ctx.drawImage(img, 0, 0, 70, 90);
+        ctx.restore();
+        ctx.font = 'bold 2.5rem Cardo, serif';
+        ctx.fillStyle = '#f7d37a';
+        ctx.textAlign = 'center';
+        ctx.fillText(guideNameSlot.textContent, canvas.width / 2, canvas.height * 0.02 + 30);
+        ctx.font = 'bold 2rem Cardo, serif';
+        ctx.fillText(nameSlot.textContent, canvas.width / 2, canvas.height * 0.98 - 10);
+        const link = document.createElement('a');
+        link.download = 'selfie-irmandade.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        console.log('[Selfie] Imagem baixada');
+        try {
+          localStorage.setItem('JORNADA_SELFIE', link.href);
+        } catch (_) {}
+      } else if (btn.id === 'btnSkipSelfie' || btn.id === 'btnStartJourney') {
+        if (window.JC) {
+          window.JC.nextSection = 'section-perguntas';
+          if (window.playVideo && window.JORNADA_VIDEOS && window.JORNADA_VIDEOS.intro) {
+            window.playVideo(window.JORNADA_VIDEOS.intro);
+            console.log('[Selfie] Reproduzindo vídeo filme-0 antes de section-perguntas');
+          } else {
+            window.showSection('section-perguntas');
+            console.log('[Selfie] Navegação direta para section-perguntas');
+          }
+        } else {
+          console.error('[Selfie] window.JC não definido');
+          window.toast && window.toast('Erro ao navegar para as perguntas.');
+        }
       }
     }
-
-    window.initAccessibility = initAccessibility;
-    window.initJornada = initJornada;
-
-    initAccessibility();
-    initJornada();
-
-    console.log('[Acessibilidade] Bloco carregado');
-  })();
-</script> 
+  });
+  console.log('[Selfie] Bloco carregado');
+})();
+</script>
 </body>
 </html>
-
