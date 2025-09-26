@@ -267,6 +267,8 @@
     }
   }
  
+/* /public/assets/js/jornada-paper-qa.js */
+;/* (seu código original com as seguintes mudanças) */
 function loadDynamicBlocks() {
   console.log('[loadDynamicBlocks] Iniciando');
   if (!window.i18n || !window.i18n.ready) {
