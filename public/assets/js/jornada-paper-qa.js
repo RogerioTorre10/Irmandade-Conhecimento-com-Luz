@@ -237,6 +237,17 @@
     textarea.classList.add('typing-done');
     console.log('[TypeAnswer] Digitação concluída para:', textarea);
   }
+  // jornada-paper-qa.js
+    function renderQuestions() {
+     const container = document.querySelector('#perguntas-container');
+      JORNADA_BLOCKS.forEach(block => {
+      block.questions.forEach((question, index) => {
+      const questionElement = document.createElement('div');
+      questionElement.innerHTML = `<p>${question.text}</p>`;
+      container.appendChild(questionElement);
+     });
+    });
+  }
 
   async function typeQuestionsSequentially(bloco) {
     const elements = bloco.querySelectorAll('[data-typing="true"]');
