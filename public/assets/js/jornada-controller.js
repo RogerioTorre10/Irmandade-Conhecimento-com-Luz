@@ -238,3 +238,17 @@ document.addEventListener('DOMContentLoaded', () => {
     initController('intro');
   }
 });
+document.addEventListener('DOMContentLoaded', () => {
+  const avancarButton = document.querySelector('#section-inicio .btn-avancar, #section-inicio #iniciar, #section-inicio [data-action="avancar"]');
+  if (avancarButton) {
+    console.log('[DEBUG] Botão Avançar encontrado:', avancarButton);
+    avancarButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      console.log('[DEBUG] Clique no botão Avançar detectado');
+      window.goToNextSection();
+    });
+  } else {
+    console.error('[DEBUG] Botão Avançar não encontrado em #section-inicio');
+  }
+});
+
