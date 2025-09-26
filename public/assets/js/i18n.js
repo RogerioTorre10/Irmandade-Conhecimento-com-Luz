@@ -117,10 +117,23 @@
       });
     }
   };
+     // i18n.js
+      let i18n = {
+      ready: false,
+      translations: {},
+      async init(lang) {
+      try {
+      this.translations = await loadLanguage(lang);
+      this.ready = true;
+    } catch (error) {
+      console.error('[i18n] Inicialização falhou:', error);
+    }
+  }
+};
 
-  window.i18n = i18n;
-  document.addEventListener("DOMContentLoaded", () => {
-    console.log("[i18n] Carregando i18n.js...");
-    i18n.init().catch(err => console.error("[i18n] Erro na inicialização:", err));
-  });
-})();
+     window.i18n = i18n;
+      document.addEventListener("DOMContentLoaded", () => {
+      console.log("[i18n] Carregando i18n.js...");
+      i18n.init().catch(err => console.error("[i18n] Erro na inicialização:", err));
+    });
+ })();
