@@ -129,7 +129,7 @@ function goToNextSection() {
   }
 }
 
-function initController(route = 'intro') {
+function initController(route = 'inicio') {
   log('Inicializando controlador...');
 
   // Verificar dependências
@@ -159,7 +159,7 @@ function initController(route = 'intro') {
     init: () => log('JC init chamado (já inicializado)'),
     goNext: goToNextSection
   };
-  window.__currentSectionId = route === 'intro' ? 'section-inicio' : route;
+  window.__currentSectionId = route === 'inicio' ? 'section-inicio' : route;
   window.perguntasLoaded = false;
 
   // Mostrar seção inicial
@@ -228,14 +228,14 @@ function initController(route = 'intro') {
 // Aguardar inicialização do bootstrap
 document.addEventListener('bootstrapComplete', () => {
   log('Bootstrap concluído, iniciando controlador');
-  initController('intro');
+  initController('inicio');
 });
 
 // Fallback para inicialização direta (compatibilidade)
 document.addEventListener('DOMContentLoaded', () => {
   if (!window.JC?.initialized) {
     log('Fallback: Inicializando controlador via DOMContentLoaded');
-    initController('intro');
+    initController('inicio');
   }
 });
 document.addEventListener('DOMContentLoaded', () => {
