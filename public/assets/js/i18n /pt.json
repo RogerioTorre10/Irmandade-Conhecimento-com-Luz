@@ -1,18 +1,4 @@
 {
-  "lang_name": "Português",
-  "site.title": "Irmandade Conhecimento com Luz",
-  "home.explore": "Explorar Jornadas",
-  "home.repo": "Repositório",
-  "journeys.available": "Jornadas Disponíveis",
-  "intro.title": "Introdução",
-  "intro.start": "Iniciar",
-  "questions.title": "Perguntas",
-  "next": "Avançar ▶",
-  "back_home": "← Voltar ao início",
-  "final.title": "Conclusão da Jornada",
-  "final.back_home": "Voltar ao início",
-  "tts.read": "Ouvir esta seção",
-  "tts.stop": "Parar leitura"
   "welcome": "Bem-vindo!",
   "description": "Este é um site incrível.",
   "site.title": "Jornada • Irmandade Conhecimento com Luz",
@@ -39,4 +25,3 @@
   "pergunta_passo_fe": "Qual será seu próximo passo de fé e coragem?",
   "resposta_placeholder": "Digite sua resposta..."
 }
-
