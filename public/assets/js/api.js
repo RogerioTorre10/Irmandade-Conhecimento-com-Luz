@@ -84,3 +84,14 @@
 
   console.log('[API] pronto · PRIMARY=', API_PRIMARY, '· FALLBACK=', API_FALLBACK);
 })();
+(function () {
+  const API = {
+    init() {
+      console.log('[API] pronto');
+    },
+  };
+
+  window.API = API;
+  window.__markReady && window.__markReady('API');
+})();
+
