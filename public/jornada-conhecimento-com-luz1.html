@@ -2151,9 +2151,10 @@
     console.log('[Controle] Bloco carregado');
   })();
   
-  /* Adicione ao final de jornada-controller.js ou crie um novo arquivo /assets/js/transitions.js */
-  (function () {
-   window.playTransition = function (videoSrc, callback) {
+  /* /public/assets/js/transitions.js */
+(function () {
+  'use strict';
+  window.playTransition = function (videoSrc, callback) {
     const videoOverlay = document.getElementById('videoOverlay');
     const video = document.getElementById('videoTransicao');
     const skipButton = document.getElementById('skipVideo');
