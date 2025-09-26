@@ -1,4 +1,6 @@
-(function() {
+/* /public/assets/js/jornada-controller.js */
+(function () {
+  'use strict';
   const log = (...args) => console.log('[JORNADA_CONTROLLER]', ...args);
 
   window.perguntasLoaded = false;
@@ -54,19 +56,18 @@
       log('Seção inicial:', window.__currentSectionId);
     },
     goNext: () => {
-  log('Iniciando goNext... Estado atual: currentBloco=', window.JC.currentBloco, ', blocos totais=', window.JORNADA_BLOCKS ? window.JORNADA_BLOCKS.length : 0, ', currentSection=', window.__currentSectionId, ', perguntasLoaded=', window.perguntasLoaded);
-  const currentSection = window.__currentSectionId || 'section-intro';
-  const sections = ['section-intro', 'section-termos', 'section-senha', 'section-guia', 'section-selfie', 'section-perguntas', 'section-final'];
-  const currentIdx = sections.indexOf(currentSection);
-  log('Seção atual:', currentSection, 'Índice:', currentIdx); // Adicionado
-  if (currentIdx < 0) {
-    console.warn('Seção atual não encontrada:', currentSection);
-    window.__currentSectionId = 'section-intro';
-    window.showSection && window.showSection('section-intro');
-    log('Reiniciando para section-intro');
-    return;
-  }
-}
+      log('Iniciando goNext... Estado atual: currentBloco=', window.JC.currentBloco, ', blocos totais=', window.JORNADA_BLOCKS ? window.JORNADA_BLOCKS.length : 0, ', currentSection=', window.__currentSectionId, ', perguntasLoaded=', window.perguntasLoaded);
+      const currentSection = window.__currentSectionId || 'section-intro';
+      const sections = ['section-intro', 'section-termos', 'section-senha', 'section-guia', 'section-selfie', 'section-perguntas', 'section-final'];
+      const currentIdx = sections.indexOf(currentSection);
+      log('Seção atual:', currentSection, 'Índice:', currentIdx);
+      if (currentIdx < 0) {
+        console.warn('Seção atual não encontrada:', currentSection);
+        window.__currentSectionId = 'section-intro';
+        window.showSection && window.showSection('section-intro');
+        log('Reiniciando para section-intro');
+        return;
+      }
 
       if (currentSection === 'section-termos') {
         const termosPg1 = document.getElementById('termos-pg1');
@@ -85,51 +86,12 @@
         return;
       }
 
-      if (currentSection === 'section-senha') {
+      if (currentSection === 'section-senha' || currentSection === 'section-guia' || currentSection === 'section-selfie') {
         const nextSection = sections[currentIdx + 1];
         window.JC.nextSection = nextSection;
         window.__currentSectionId = nextSection;
         window.showSection && window.showSection(nextSection);
         log('Avançando de', currentSection, 'para', nextSection);
-        return;
-      }
-
-      if (currentSection === 'section-guia') {
-        window.JC.nextSection = 'section-selfie';
-        window.__currentSectionId = 'section-selfie';
-        window.showSection && window.showSection('section-selfie');
-        log('Avançando para section-selfie');
-        return;
-      }
-
-      if (currentSection === 'section-selfie') {
-        if (window.JORNADA_VIDEOS?.intro && window.playTransition) {
-          window.JC.nextSection = 'section-perguntas';
-          window.__currentSectionId = 'section-perguntas';
-          window.playTransition(window.JORNADA_VIDEOS.intro, () => {
-            window.showSection('section-perguntas');
-            if (window.loadDynamicBlocks) {
-              setTimeout(() => {
-                window.loadDynamicBlocks();
-                window.perguntasLoaded = true;
-                log('loadDynamicBlocks chamado após vídeo intro');
-              }, 100);
-            }
-          });
-          log('Reproduzindo filme-0 após section-selfie');
-        } else {
-          window.JC.nextSection = 'section-perguntas';
-          window.__currentSectionId = 'section-perguntas';
-          window.showSection && window.showSection('section-perguntas');
-          log('Avançando para section-perguntas (sem filme-0)');
-          if (window.loadDynamicBlocks) {
-            setTimeout(() => {
-              window.loadDynamicBlocks();
-              window.perguntasLoaded = true;
-              log('loadDynamicBlocks chamado após section-selfie');
-            }, 100);
-          }
-        }
         return;
       }
 
@@ -146,7 +108,7 @@
         }
 
         if (!window.JORNADA_BLOCKS || window.JORNADA_BLOCKS.length === 0) {
-          console.error('window.JORNADA_BLOCKS não definido ou vazio');
+          console.error('JORNADA_BLOCKS não definido ou vazio');
           window.JC.nextSection = 'section-final';
           window.__currentSectionId = 'section-final';
           window.showSection && window.showSection('section-final');
@@ -199,6 +161,19 @@
             } else {
               window.showSection && window.showSection('section-final');
               log('Avanço direto pro final (sem vídeo, sem perguntas)');
+            }
+          } else {
+            const nextBloco = content.querySelector(`[data-bloco="${window.JC.currentBloco}"]`);
+            if (nextBloco) {
+              currentBloco.classList.add('hidden');
+              nextBloco.classList.remove('hidden');
+              const firstPergunta = nextBloco.querySelector('.j-pergunta');
+              if (firstPergunta) {
+                firstPergunta.classList.add('active');
+                firstPergunta.style.display = 'block';
+                window.runTyping && window.runTyping(firstPergunta.querySelector('.pergunta-enunciado'));
+                log('Ativando primeira pergunta do bloco', window.JC.currentBloco);
+              }
             }
           }
           return;
@@ -295,5 +270,5 @@
     }
   }));
 
-  log('jornada-controller.js carregado');
+  console.log('[JORNADA_CONTROLLER] jornada-controller.js carregado');
 })();
