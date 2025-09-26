@@ -365,4 +365,17 @@ document.addEventListener('DOMContentLoaded', initController);
   }));
 
   console.log('[JORNADA_CONTROLLER] jornada-controller.js carregado');
+  
 })();
+
+(function () {
+  const JController = {
+    init() {
+      console.log('[JController] pronto');
+    },
+  };
+
+  window.JController = JController;
+  window.__markReady && window.__markReady('JController');
+})();
+
