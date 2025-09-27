@@ -1,7 +1,5 @@
-// /public/assets/js/jornada-typing-bridge.js
-import i18n from './i18n.js'; // Ajuste o caminho conforme necessário
+import i18n from './i18n.js';
 
-// Protege repetição de carga
 if (window.__TypingBridgeReady) {
   console.log('[TypingBridge] Já carregado, ignorando');
   throw new Error('TypingBridge já carregado');
@@ -10,12 +8,26 @@ window.__TypingBridgeReady = true;
 
 const log = (...args) => console.log('[TypingBridge]', ...args);
 
-// Utilitários de seleção
 const q = window.q || ((s, r = document) => r.querySelector(s));
 const qa = window.qa || ((s, r = document) => Array.from(r.querySelectorAll(s)));
 
-// Função para digitação e fala
-function playTypingAndSpeak(selector) {
+function playTypingAndSpeak(selectorOrElement) {
+  let selector;
+  if (typeof selectorOrElement === 'string') {
+    selector = selectorOrElement;
+  } else if (selectorOrElement instanceof HTMLElement) {
+    // Tenta usar id ou classe, ou gera um seletor único
+    selector = selectorOrElement.id
+      ? `#${selectorOrElement.id}`
+      : selectorOrElement.className.split(' ')[0]
+      ? `.${selectorOrElement.className.split(' ')[0]}`
+      : `[data-typing="true"]`; // Fallback genérico
+    console.warn('[TypingBridge] Recebido elemento DOM, convertido para seletor:', selector);
+  } else {
+    console.error('[TypingBridge] Argumento inválido:', selectorOrElement);
+    return;
+  }
+
   try {
     const el = q(selector);
     if (!el) {
@@ -29,6 +41,8 @@ function playTypingAndSpeak(selector) {
       tw.start && tw.start();
     } else {
       console.warn('[TypingBridge] window.TypeWriter não definido, pulando digitação');
+      // Fallback simples
+      el.textContent = el.getAttribute('data-text') || el.textContent;
     }
 
     // Síntese de voz
@@ -38,7 +52,7 @@ function playTypingAndSpeak(selector) {
       utt.rate = 1.03;
       utt.pitch = 1.0;
       utt.volume = window.isMuted ? 0 : 1;
-      speechSynthesis.cancel(); // Evita acumular
+      speechSynthesis.cancel();
       speechSynthesis.speak(utt);
     } else {
       console.warn('[TypingBridge] SpeechSynthesis não suportado ou texto ausente');
@@ -48,13 +62,12 @@ function playTypingAndSpeak(selector) {
   }
 }
 
-// Exportar API
 const TypingBridge = {
-  play: playTypingAndSpeak
+  play: playTypingAndSpeak,
 };
 
-window.TypingBridge = TypingBridge; // Para compatibilidade
-window.runTyping = playTypingAndSpeak; // Para jornada-paper-qa.js e jornada-controller.js
+window.TypingBridge = TypingBridge;
+window.runTyping = playTypingAndSpeak;
 
 log('Pronto');
 
