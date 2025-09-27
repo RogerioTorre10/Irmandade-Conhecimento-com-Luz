@@ -453,8 +453,7 @@
   <!-- Toast -->
   <div id="toast" role="status" aria-live="polite" class="hidden"></div>
 
-  <!-- Scripts Inline -->
-  <!-- Utils -->
+ <!-- Utils -->
   <script>
   (function() {
     window.utils = window.utils || {
@@ -509,509 +508,186 @@
     const G = (typeof window !== 'undefined' ? window : globalThis);
     if (G.__typingLock == null) G.__typingLock = false;
     if (G.__DEFAULT_SPEED_TYPING == null) G.__DEFAULT_SPEED_TYPING = 80;
-    const DEFAULT_SPEED = G.__DEFAULT_SPEED_TYPING;
 
-    function typeTextOnce(el, text, speed = 24) {
-      if (!el || el.dataset.typerApplied === '1') return;
-      el.dataset.typerApplied = '1';
-      el.textContent = '';
-      let i = 0;
-      const timer = setInterval(() => {
-        el.textContent += text[i] || '';
-        i++;
-        if (i >= text.length) clearInterval(timer);
-      }, speed);
-    }
-
-    function typeWriter(el, text, speed, showCursor) {
-      if (!el || el.dataset.typing === '1' || el.dataset.typed === '1') return Promise.resolve();
-      if (!window.utils || !window.utils.dedupe) {
-        console.error('[typeWriter] window.utils.dedupe não definido');
-        window.toast && window.toast('Erro ao processar datilografia.');
-        return Promise.resolve();
-      }
-      el.dataset.typing = '1';
-      el.textContent = '';
-      const highlight = el.querySelector('.highlight') || document.createElement('div');
-      if (!highlight.parentNode) {
-        highlight.className = 'highlight';
-        el.prepend(highlight);
-      }
-
-      text = window.utils.dedupe(text || '').replace(/[{}[\]]/g, '').trim();
-      let i = 0;
-
-      return new Promise(resolve => {
-        function step() {
-          if (!el.isConnected || el.offsetParent === null || el.closest('.j-section.hidden')) {
-            el.classList.remove('lumen-typing');
-            const h = el.querySelector('.highlight');
-            if (h) h.style.width = '0';
-            el.dataset.typed = '0';
-            el.dataset.typing = '0';
-            return resolve();
-          }
-
-          if (i < text.length) {
-            const char = text.charAt(i++);
-            el.textContent += char;
-            try {
-              const canvas = document.createElement('canvas');
-              const ctx = canvas.getContext('2d');
-              ctx.font = getComputedStyle(el).font;
-              highlight.style.width = `${ctx.measureText(el.textContent).width}px`;
-            } catch (_) {}
-            setTimeout(step, speed || DEFAULT_SPEED);
-          } else {
-            el.classList.add('typing-done');
-            el.classList.remove('lumen-typing');
-            const h = el.querySelector('.highlight');
-            if (h) h.style.width = '0';
-            el.dataset.typed = '1';
-            el.dataset.typing = '0';
-            resolve();
-          }
-        }
-        if (showCursor) el.classList.add('lumen-typing');
-        setTimeout(step, 0);
-      });
-    }
-
-    let __abortTypingPlaceholder = null;
-    async function typePlaceholder(inp, text, speed = 22) {
-      if (!inp) return;
-      if (__abortTypingPlaceholder) __abortTypingPlaceholder();
-      let abort = false;
-      __abortTypingPlaceholder = () => abort = true;
-      inp.placeholder = '';
-      const aria = document.getElementById('aria-pergunta');
-      if (aria) aria.textContent = text;
-      text = window.utils ? window.utils.dedupe(text) : text;
-      for (let i = 0; i <= text.length; i++) {
-        if (abort) break;
-        inp.placeholder = text.slice(0, i) + (i < text.length ? '▌' : '');
-        await new Promise(r => setTimeout(r, speed));
-      }
-      if (!abort) inp.placeholder = text;
-    }
-
-    async function typeAnswer(textarea, text, speed = 36) {
-      if (!textarea) return;
-      textarea.value = '';
-      textarea.classList.add('lumen-typing');
-      text = window.utils ? window.utils.dedupe(text) : text;
-      for (let i = 0; i <= text.length; i++) {
-        textarea.value = text.slice(0, i);
-        await new Promise(r => setTimeout(r, speed));
-      }
-      textarea.classList.add('typing-done');
-    }
-
-    async function runTyping(root) {
-      if (!root || root.classList.contains('hidden') || !(root instanceof Element)) {
-        console.log('[runTyping] Root inválido ou oculto:', root?.id || root?.className || root);
-        return;
-      }
-      if (G.__typingLock) {
-        console.log('[runTyping] Bloqueado por __typingLock, ignorando...');
-        return;
-      }
-      G.__typingLock = true;
-
-      try {
-        window.speak && window.speak('');
-        const elements = Array
-          .from(root.querySelectorAll('[data-typing], .text, p, h1, h2, h3, h4, [class*="text"], [class*="title"], [class*="content"], .termos-texto, .pergunta-enunciado, [data-termos], li'))
-          .filter(el => !el.dataset.typed && el.offsetParent !== null && !el.closest('.j-section.hidden'));
-
-        if (elements.length === 0) {
-          console.log('[runTyping] Nenhum elemento de texto encontrado em:', root.id || root.className);
-          console.log('[runTyping] Snapshot do DOM:', Array.from(root.children).slice(0, 10).map(el => ({
-            tag: el.tagName.toLowerCase(),
-            id: el.id || '',
-            class: el.className || '',
-            attrs: Object.keys(el.dataset || {}).join(','),
-            text: (el.textContent || '').slice(0, 50)
-          })));
-        }
-
-        for (const el of elements) {
-          if (el.dataset.typing === '1' || el.dataset.typed === '1') continue;
-          const rawText = el.getAttribute('data-text') || el.textContent || '';
-          const text = window.utils ? window.utils.dedupe(rawText) : rawText;
-          el.textContent = '';
-          const highlight = el.querySelector('.highlight');
-          if (highlight) highlight.style.width = '0';
-          const speed = parseInt(el.getAttribute('data-speed') || DEFAULT_SPEED, 10);
-          const showCursor = String(el.getAttribute('data-cursor') || 'true') === 'true';
-          await window.typeWriter(el, text, speed, showCursor);
-          if (window.JORNADA.tts.enabled && window.JORNADA.tts.readingMode === 'after' && !window.isMuted) {
-            await window.speak(text);
-          }
-          console.log('[runTyping] Datilografia e TTS aplicados em:', el.tagName, el.className || el.id, 'texto:', text.slice(0, 50));
-        }
-      } catch (e) {
-        console.error('[runTyping] erro:', e);
-        window.toast && window.toast('Erro durante a datilografia.');
-      } finally {
-        G.__typingLock = false;
-      }
-    }
-
-    window.typeTextOnce = typeTextOnce;
-    window.typeWriter = typeWriter;
-    window.runTyping = runTyping;
-    window.typePlaceholder = typePlaceholder;
-    window.typeAnswer = typeAnswer;
+    // Funções movidas para jornada-typing.js e jornada-typing-bridge.js
+    // Apenas inicializa window.G pra compatibilidade
+    window.G = G;
     console.log('[Datilografia] Bloco carregado');
   })();
   </script>
 
- <!-- Senha -->
-<script>
-(function() {
-  const log = (...a) => { try { console.log('[Senha v4]', ...a); } catch (_) {} };
-  const VALID_PASSWORD = 'luz123';
+  <!-- Senha -->
+  <script>
+  (function() {
+    const log = (...a) => { try { console.log('[Senha v4]', ...a); } catch (_) {} };
+    const VALID_PASSWORD = 'luz123';
 
-  function getSenhaSection() {
-    return document.getElementById('section-senha') || document.querySelector('[data-section="senha"], .section-senha') || document;
-  }
-
-  function getSenhaInput() {
-    const root = getSenhaSection();
-    const tries = [
-      '#senhaInput', '#iniciar', 'input[data-role="senha"]', 'input[name="senha"]',
-      'input[name*="senha" i]', 'input[id*="senha" i]', 'input[type="password"]',
-      'input[type="text"][name*="senha" i]', 'input[type="text"][id*="senha" i]',
-      '.senha input', '.senha-input'
-    ];
-    for (const sel of tries) {
-      const el = root.querySelector(sel);
-      if (el) return el;
-    }
-    return root.querySelector('input');
-  }
-
-  window.toggleSenha = function() {
-    const input = getSenhaInput();
-    if (!input) {
-      log('[Senha] input não encontrado');
-      window.toast && window.toast('Campo de senha não encontrado.');
-      return;
-    }
-    input.type = (input.type === 'password' ? 'text' : 'password');
-    const eye = getSenhaSection().querySelector('[data-action="toggle-password"]');
-    if (eye) {
-      eye.classList.toggle('on');
-      log('[Senha] Visibilidade da senha alternada');
-    } else {
-      log('[Senha] Olho mágico não encontrado');
-      window.toast && window.toast('Botão de visibilidade não encontrado.');
-    }
-  };
-
-  let lastStartJourney = 0;
-  window.startJourney = function() {
-    const now = performance.now();
-    if (now - lastStartJourney < 1000) {
-      log('[startJourney] Debounce: evitando chamada repetida');
-      return;
-    }
-    lastStartJourney = now;
-
-    const inputSenha = getSenhaInput();
-    const inputNome = getSenhaSection().querySelector('#nameInput, [data-role="nome"], input[name="nome"]');
-    const senha = (inputSenha && inputSenha.value || '').trim().toLowerCase();
-    const nome = (inputNome && inputNome.value || '').trim();
-
-    log('[startJourney] Senha fornecida:', senha ? '[oculta]' : 'nenhuma', 'Nome:', nome || 'nenhum');
-
-    if (!senha) {
-      window.toast && window.toast('Digite a senha para continuar.');
-      if (inputSenha) inputSenha.focus();
-      log('[startJourney] Senha não fornecida');
-      return;
+    function getSenhaSection() {
+      return document.getElementById('section-senha') || document.querySelector('[data-section="senha"], .section-senha') || document;
     }
 
-    if (senha !== VALID_PASSWORD) {
-      window.toast && window.toast('Senha incorreta. Tente novamente.');
-      if (inputSenha) inputSenha.focus();
-      log('[startJourney] Senha inválida:', senha);
-      return;
-    }
-
-    if (nome) {
-      try { localStorage.setItem('JORNADA_NOME', nome); } catch (_) {}
-    }
-    window.speak && window.speak('');
-
-    const hasGuia = document.getElementById('section-guia');
-    if (!hasGuia) {
-      console.error('[startJourney] Seção section-guia não encontrada');
-      window.toast && window.toast('Seção de guia não encontrada. Verifique o DOM.');
-      return;
-    }
-
-    if (window.JC) {
-      window.JC.nextSection = 'section-guia';
-      window.showSection && window.showSection('section-guia');
-      log('[startJourney] Navegação para section-guia');
-    } else {
-      console.error('[startJourney] window.JC não definido');
-      window.toast && window.toast('Erro ao inicializar jornada. Tente recarregar a página.');
-    }
-  };
-  console.log('[Senha] Bloco carregado');
-})();
-</script>>
-
- <!-- showSection -->
-<script>
-(function() {
-  const HIDE_CLASS = 'hidden';
-  let lastShowSection = 0;
-
-  function showSection(sectionId) {
-    console.log('[showSection] Exibindo seção:', sectionId);
-    const section = document.getElementById(sectionId);
-    if (section) {
-      section.classList.add('active');
-      section.classList.remove('hidden');
-      const textElements = section.querySelectorAll('[data-typing="true"]');
-      textElements.forEach(el => {
-        const selector = el.id ? `#${el.id}` : `.${el.className.split(' ')[0]}`;
-        window.runTyping(selector); // Passa seletor
-      });
-      console.log('[showSection] Iniciando runTyping para:', sectionId);
-      const button = section.querySelector('.btn.btn-avancar');
-      if (button) {
-        button.addEventListener('click', () => window.goToNextSection());
-        console.log('[showSection] Evento de clique adicionado ao botão avançar em:', sectionId, 'Botão:', button.className);
+    function getSenhaInput() {
+      const root = getSenhaSection();
+      const tries = [
+        '#senhaInput', '#iniciar', 'input[data-role="senha"]', 'input[name="senha"]',
+        'input[name*="senha" i]', 'input[id*="senha" i]', 'input[type="password"]',
+        'input[type="text"][name*="senha" i]', 'input[type="text"][id*="senha" i]',
+        '.senha input', '.senha-input'
+      ];
+      for (const sel of tries) {
+        const el = root.querySelector(sel);
+        if (el) return el;
       }
-    } else {
-      console.error('[showSection] Seção não encontrada:', sectionId);
+      return root.querySelector('input');
     }
-  }
-  showSection('section-intro');
 
-  window.showSection = function(id) {
-    const now = performance.now();
-    if (now - lastShowSection < 500) {
-      console.log('[showSection] Debounce: evitando chamada repetida');
-      return;
-    }
-    lastShowSection = now;
-
-    try {
-      const all = Array.from(document.querySelectorAll('div[id^="section-"]'));
-      const target = document.getElementById(id);
-      if (!target) {
-        console.warn('[showSection] Seção não encontrada:', id);
-        window.toast && window.toast(`Seção ${id} não encontrada.`);
+    window.toggleSenha = function() {
+      const input = getSenhaInput();
+      if (!input) {
+        log('[Senha] input não encontrado');
+        window.toast && window.toast('Campo de senha não encontrado.');
         return;
       }
-      all.forEach(s => s.classList.add(HIDE_CLASS));
-      target.classList.remove(HIDE_CLASS);
-      window.__currentSectionId = id;
-      console.log('[showSection] Exibindo seção:', id);
-      
-      // Resetar __typingLock para evitar bloqueios
-      window.__typingLock = false;
-      
-      <script>
-  // Remover runTyping local e usar window.runTyping
-  window.runTyping = window.runTyping || function (root, callback) {
-    console.log('[runTyping] Iniciando para:', root?.id || root?.className || root);
-    if (!root || !(root instanceof Element)) {
-      console.error('[runTyping] Root inválido:', root);
-      return;
-    }
-    if (root.classList.contains('hidden')) {
-      console.log('[runTyping] Elemento oculto, ignorando:', root.id || root.className);
-      return;
-    }
-    if (window.G.__typingLock) {
-      console.log('[runTyping] Bloqueado por __typingLock, ignorando...');
-      return;
-    }
-    window.G.__typingLock = true;
+      input.type = (input.type === 'password' ? 'text' : 'password');
+      const eye = getSenhaSection().querySelector('[data-action="toggle-password"]');
+      if (eye) {
+        eye.classList.toggle('on');
+        log('[Senha] Visibilidade da senha alternada');
+      } else {
+        log('[Senha] Olho mágico não encontrado');
+        window.toast && window.toast('Botão de visibilidade não encontrado.');
+      }
+    };
 
-    try {
-      const selector = root.id ? `#${root.id}` : `.${root.className.split(' ')[0]}`;
-      window.TypingBridge.play(selector, () => {
+    let lastStartJourney = 0;
+    window.startJourney = function() {
+      const now = performance.now();
+      if (now - lastStartJourney < 1000) {
+        log('[startJourney] Debounce: evitando chamada repetida');
+        return;
+      }
+      lastStartJourney = now;
+
+      const inputSenha = getSenhaInput();
+      const inputNome = getSenhaSection().querySelector('#nameInput, [data-role="nome"], input[name="nome"]');
+      const senha = (inputSenha && inputSenha.value || '').trim().toLowerCase();
+      const nome = (inputNome && inputNome.value || '').trim();
+
+      log('[startJourney] Senha fornecida:', senha ? '[oculta]' : 'nenhuma', 'Nome:', nome || 'nenhum');
+
+      if (!senha) {
+        window.toast && window.toast('Digite a senha para continuar.');
+        if (inputSenha) inputSenha.focus();
+        log('[startJourney] Senha não fornecida');
+        return;
+      }
+
+      if (senha !== VALID_PASSWORD) {
+        window.toast && window.toast('Senha incorreta. Tente novamente.');
+        if (inputSenha) inputSenha.focus();
+        log('[startJourney] Senha inválida:', senha);
+        return;
+      }
+
+      if (nome) {
+        try { localStorage.setItem('JORNADA_NOME', nome); } catch (_) {}
+      }
+      window.speak && window.speak('');
+
+      const hasGuia = document.getElementById('section-guia');
+      if (!hasGuia) {
+        console.error('[startJourney] Seção section-guia não encontrada');
+        window.toast && window.toast('Seção de guia não encontrada.');
+        return;
+      }
+
+      if (window.JC) {
+        window.JC.nextSection = 'section-guia';
+        window.showSection && window.showSection('section-guia');
+        log('[startJourney] Navegação para section-guia');
+      } else {
+        console.error('[startJourney] window.JC não definido');
+        window.toast && window.toast('Erro ao inicializar jornada. Tente recarregar a página.');
+      }
+    };
+    console.log('[Senha] Bloco carregado');
+  })();
+  </script>
+
+  <!-- showSection -->
+  <script>
+  (function() {
+    const HIDE_CLASS = 'hidden';
+    let lastShowSection = 0;
+
+    window.showSection = function(id) {
+      const now = performance.now();
+      if (now - lastShowSection < 500) {
+        console.log('[showSection] Debounce: evitando chamada repetida');
+        return;
+      }
+      lastShowSection = now;
+
+      try {
+        const all = Array.from(document.querySelectorAll('div[id^="section-"]'));
+        const target = document.getElementById(id);
+        if (!target) {
+          console.warn('[showSection] Seção não encontrada:', id);
+          window.toast && window.toast(`Seção ${id} não encontrada.`);
+          return;
+        }
+        all.forEach(s => s.classList.add(HIDE_CLASS));
+        target.classList.remove(HIDE_CLASS);
+        window.__currentSectionId = id;
+        console.log('[showSection] Exibindo seção:', id);
+
+        // Resetar __typingLock para evitar bloqueios
+        window.G = window.G || {};
         window.G.__typingLock = false;
-        if (callback) callback();
-      });
-    } catch (e) {
-      console.error('[runTyping] Erro:', e);
-      window.G.__typingLock = false;
-    }
-  };
 
-  function showSection(sectionId) {
-    console.log('[showSection] Exibindo seção:', sectionId);
-    const section = document.getElementById(sectionId);
-    if (!section) {
-      console.error('[showSection] Seção não encontrada:', sectionId);
-      return;
-    }
-    section.classList.add('active');
-    section.classList.remove('hidden');
-    const textElements = section.querySelectorAll('[data-typing="true"]');
-    textElements.forEach(el => {
-      if (!el || !(el instanceof Element)) {
-        console.error('[showSection] Elemento de digitação inválido:', el);
-        return;
+        setTimeout(() => {
+          const textElements = target.querySelectorAll('[data-typing="true"]:not(.hidden)');
+          textElements.forEach(el => {
+            if (!el || !(el instanceof Element)) {
+              console.error('[showSection] Elemento de digitação inválido:', el);
+              return;
+            }
+            const selector = el.id ? `#${el.id}` : `.${el.className.split(' ')[0] || 'text'}`;
+            window.runTyping(selector);
+            console.log('[showSection] Iniciando runTyping para:', id);
+          });
+
+          const btns = target.querySelectorAll(
+            '[data-action="avancar"], .btn-avancar, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney'
+          );
+          btns.forEach(btn => {
+            if (!btn.dataset.clickAttached) {
+              btn.addEventListener(
+                'click',
+                (e) => {
+                  e.preventDefault();
+                  if (window.JC && window.JC.goNext) window.JC.goNext();
+                },
+                { once: true }
+              );
+              btn.dataset.clickAttached = '1';
+              console.log('[showSection] Evento de clique adicionado ao botão avançar em:', id, 'Botão:', btn.id || btn.className);
+            }
+          });
+        }, 100);
+      } catch (e) {
+        console.error('[showSection] Erro:', e);
+        window.toast && window.toast('Erro ao exibir seção');
       }
-      window.runTyping(el);
-      console.log('[showSection] Iniciando runTyping para:', sectionId);
+      console.log('[showSection] Bloco carregado');
+    };
+
+    // Inicializar seção inicial
+    document.addEventListener('DOMContentLoaded', () => {
+      window.showSection('section-intro');
     });
-    const button = section.querySelector('.btn.btn-avancar');
-    if (button) {
-      button.addEventListener('click', () => window.goToNextSection());
-      console.log('[showSection] Evento de clique adicionado ao botão avançar em:', sectionId, 'Botão:', button.className);
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    showSection('section-intro');
-  });
-</script>
-
-  <!-- loadDynamicBlocks -->
-<script>
-(function() {
-  const VIDEO_BASE = '/assets/img/';
-  window.JORNADA_VIDEOS = {
-    intro: VIDEO_BASE + 'filme-0-ao-encontro-da-jornada.mp4',
-    afterBlocks: {
-      0: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
-      1: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
-      2: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
-      3: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
-    },
-    final: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
-  };
-  window.JORNADA_FINAL_VIDEO = window.JORNADA_VIDEOS.final;
-
-  const blockTranslations = {
-    'pt-BR': [
-      { title: 'Bloco 1 — Raízes', questions: [{ label: 'Quem é você hoje?' }, { label: 'O que te trouxe até esta jornada?' }, { label: 'Qual é o seu maior sonho espiritual?' }], video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4' },
-      { title: 'Bloco 2 — Reflexões', questions: [{ label: 'Quais são seus maiores desafios atuais?' }, { label: 'Como você lida com o medo ou a dúvida?' }, { label: 'O que a "luz" significa para você?' }], video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4' },
-      { title: 'Bloco 3 — Crescimento', questions: [{ label: 'O que você quer mudar na sua vida?' }, { label: 'Quem inspira você e por quê?' }, { label: 'Como você pratica gratidão no dia a dia?' }], video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4' },
-      { title: 'Bloco 4 — Integração', questions: [{ label: 'Qual lição você leva dessa jornada?' }, { label: 'Como vai aplicar isso no futuro?' }, { label: 'Uma mensagem para seu eu futuro.' }], video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4' }
-    ],
-    'en-US': [
-      { title: 'Block 1 — Roots', questions: [{ label: 'Who are you today?' }, { label: 'What brought you to this journey?' }, { label: 'What is your greatest spiritual dream?' }], video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4' },
-      { title: 'Block 2 — Reflections', questions: [{ label: 'What are your biggest current challenges?' }, { label: 'How do you deal with fear or doubt?' }, { label: 'What does "light" mean to you?' }], video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4' },
-      { title: 'Block 3 — Growth', questions: [{ label: 'What do you want to change in your life?' }, { label: 'Who inspires you and why?' }, { label: 'How do you practice gratitude in your daily life?' }], video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4' },
-      { title: 'Block 4 — Integration', questions: [{ label: 'What lesson do you take from this journey?' }, { label: 'How will you apply this in the future?' }, { label: 'A message to your future self.' }], video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4' }
-    ],
-    'es-ES': [
-      { title: 'Bloque 1 — Raíces', questions: [{ label: '¿Quién eres hoy?' }, { label: '¿Qué te trajo a este viaje?' }, { label: '¿Cuál es tu mayor sueño espiritual?' }], video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4' },
-      { title: 'Bloque 2 — Reflexiones', questions: [{ label: '¿Cuáles son tus mayores desafíos actuales?' }, { label: '¿Cómo lidias con el miedo o la duda?' }, { label: '¿Qué significa la "luz" para ti?' }], video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4' },
-      { title: 'Bloque 3 — Crecimiento', questions: [{ label: '¿Qué quieres cambiar en tu vida?' }, { label: '¿Quién te inspira y por qué?' }, { label: '¿Cómo practicas la gratitud en el día a día?' }], video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4' },
-      { title: 'Bloque 4 — Integración', questions: [{ label: '¿Qué lección te llevas de este viaje?' }, { label: '¿Cómo lo aplicarás en el futuro?' }, { label: 'Un mensaje para tu yo futuro.' }], video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4' }
-    ]
-  };
-
-  function updateBlocks() {
-    const currentLang = document.getElementById('language-select')?.value || 'pt-BR';
-    window.JORNADA_BLOCKS = blockTranslations[currentLang] || blockTranslations['pt-BR'];
-    console.log('[loadDynamicBlocks] Blocos atualizados para idioma:', currentLang);
-  }
-
-  window.loadDynamicBlocks = function() {
-    updateBlocks();
-    const content = document.getElementById('perguntas-container');
-    if (!content) {
-      console.error('[loadDynamicBlocks] Container de perguntas não encontrado');
-      window.toast && window.toast('Erro ao carregar perguntas.');
-      return;
-    }
-
-    const blocks = window.JORNADA_BLOCKS || [];
-    if (!blocks.length) {
-      console.error('[loadDynamicBlocks] JORNADA_BLOCKS não definido ou vazio');
-      window.toast && window.toast('Nenhum bloco de perguntas encontrado.');
-      return;
-    }
-
-    content.innerHTML = '';
-    content.classList.remove('hidden'); // Garante visibilidade
-    blocks.forEach((block, bIdx) => {
-      const bloco = document.createElement('div');
-      bloco.className = 'j-bloco';
-      bloco.dataset.bloco = bIdx;
-      bloco.dataset.video = block.video_after || '';
-      bloco.style.display = 'none';
-
-      if (block.title) {
-        const title = document.createElement('h3');
-        title.className = 'pergunta-enunciado text';
-        title.dataset.typing = 'true';
-        title.dataset.text = block.title;
-        title.dataset.speed = '36';
-        title.dataset.cursor = 'true';
-        bloco.appendChild(title);
-      }
-
-      (block.questions || []).forEach((q, qIdx) => {
-        const label = typeof q === 'string' ? q : (q.label || q.text || '');
-        const div = document.createElement('div');
-        div.className = 'j-pergunta';
-        div.dataset.pergunta = qIdx;
-
-        div.innerHTML = `
-          <label class="pergunta-enunciado text" 
-                 data-typing="true" 
-                 data-text="Pergunta ${qIdx + 1}: ${label}" 
-                 data-speed="36" 
-                 data-cursor="true"></label>
-          <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
-          <div class="accessibility-controls">
-            <button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>
-            <button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>
-            <button class="btn btn-avancar" data-action="avancar">Avançar</button>
-          </div>
-        `;
-        bloco.appendChild(div);
-      });
-
-      content.appendChild(bloco);
-    });
-
-    const firstBloco = content.querySelector('.j-bloco');
-    if (firstBloco) {
-      firstBloco.style.display = 'block';
-      window.JC.currentBloco = 0;
-      const first = firstBloco.querySelector('.j-pergunta');
-      if (first) {
-        first.classList.add('active');
-        setTimeout(() => window.runTyping && window.runTyping(firstBloco), 100);
-      }
-    } else {
-      console.error('[loadDynamicBlocks] Nenhum bloco criado');
-      window.toast && window.toast('Erro ao criar blocos de perguntas.');
-    }
-
-    if (window.loadAnswers) window.loadAnswers();
-    const firstTa = document.querySelector('.j-bloco .j-pergunta textarea');
-    if (firstTa && window.handleInput) window.handleInput(firstTa);
-    console.log('[loadDynamicBlocks] Blocos carregados com sucesso');
-  };
-
-  document.addEventListener('change', (e) => {
-    if (e.target.id === 'language-select') {
-      updateBlocks();
-      window.loadDynamicBlocks();
-      console.log('[loadDynamicBlocks] Idioma alterado, blocos recarregados');
-    }
-  });
-
-  console.log('[loadDynamicBlocks] Bloco carregado');
-})();
-</script>
+  })();
+  </script>
 
   <!-- Navegação de Termos -->
   <script>
@@ -1026,6 +702,7 @@
       if (target) {
         target.classList.remove('hidden');
         window.runTyping && window.runTyping(target);
+        console.log('[Termos] Exibindo página:', pg);
       }
     };
 
@@ -1048,6 +725,7 @@
   <script>
   (function() {
     window.playVideo = function(videoSrc) {
+      console.log('[playVideo] Reproduzindo vídeo:', videoSrc);
       const overlay = document.getElementById('videoOverlay');
       const video = document.getElementById('videoTransicao');
       const fallback = document.getElementById('videoFallback');
@@ -1056,29 +734,47 @@
         window.toast && window.toast('Erro ao reproduzir vídeo.');
         return;
       }
-      video.src = videoSrc;
-      video.onended = () => {
-        overlay.classList.add('hidden');
-        video.src = '';
-        window.JC && window.JC.goNext && window.JC.goNext();
-      };
-      video.onerror = () => {
-        fallback.classList.remove('hidden');
-        video.classList.add('hidden');
-        setTimeout(() => {
-          overlay.classList.add('hidden');
-          fallback.classList.add('hidden');
-          video.classList.remove('hidden');
-          window.JC && window.JC.goNext && window.JC.goNext();
-        }, 3000);
-      };
-      overlay.classList.remove('hidden');
-      video.play().catch(e => {
-        console.error('[playVideo] Erro ao reproduzir vídeo:', e);
-        fallback.classList.remove('hidden');
-        video.classList.add('hidden');
-      });
-      console.log('[playVideo] Reproduzindo vídeo:', videoSrc);
+      fetch(videoSrc, { method: 'HEAD' })
+        .then(res => {
+          if (!res.ok) throw new Error(`Vídeo não encontrado: ${videoSrc}`);
+          video.src = videoSrc;
+          video.onended = () => {
+            overlay.classList.add('hidden');
+            video.src = '';
+            window.JC && window.JC.goNext && window.JC.goNext();
+          };
+          video.onerror = () => {
+            console.error('[playVideo] Erro ao carregar vídeo:', videoSrc);
+            if (fallback) {
+              fallback.classList.remove('hidden');
+              video.classList.add('hidden');
+              setTimeout(() => {
+                overlay.classList.add('hidden');
+                fallback.classList.add('hidden');
+                video.classList.remove('hidden');
+                window.JC && window.JC.goNext && window.JC.goNext();
+              }, 3000);
+            }
+          };
+          overlay.classList.remove('hidden');
+          video.load();
+          video.play().catch(e => {
+            console.error('[playVideo] Erro ao reproduzir vídeo:', e);
+            window.toast && window.toast('Erro ao reproduzir vídeo');
+            if (fallback) {
+              fallback.classList.remove('hidden');
+              video.classList.add('hidden');
+            }
+          });
+        })
+        .catch(err => {
+          console.error('[playVideo] Erro ao verificar vídeo:', err);
+          window.toast && window.toast('Vídeo não disponível');
+          if (fallback) {
+            fallback.classList.remove('hidden');
+            video.classList.add('hidden');
+          }
+        });
     };
 
     document.addEventListener('click', (e) => {
@@ -1097,158 +793,275 @@
     console.log('[Video] Bloco carregado');
   })();
   </script>
-  
- <!-- Guia Seleção -->
-<script>
-(function() {
-  window.JORNADA = window.JORNADA || {};
-  window.JORNADA.selectedGuia = window.JORNADA.selectedGuia || null;
 
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-action="select-guia"]');
-    if (btn) {
-      e.preventDefault();
-      const guia = btn.dataset.guia;
-      window.JORNADA.selectedGuia = guia;
-      console.log('[Guia] Guia selecionado:', guia);
-      const guideBg = document.getElementById('guideBg');
-      if (guideBg) {
-        guideBg.src = `/assets/img/irmandade-quarteto-bg-${guia}.png`;
-      }
-      const guideNameSlot = document.getElementById('guideNameSlot');
-      if (guideNameSlot) {
-        guideNameSlot.textContent = guia.charAt(0).toUpperCase() + guia.slice(1);
-      }
-      if (window.JC && window.playVideo) {
-        window.JC.nextSection = 'section-selfie';
-        window.playVideo('/assets/videos/transicao_selfie.mp4');
-        console.log('[Guia] Reproduzindo vídeo transicao_selfie');
-      } else {
-        window.showSection && window.showSection('section-selfie');
-        console.log('[Guia] Navegação direta para section-selfie');
-      }
-    }
-  });
-  console.log('[Guia] Bloco carregado');
-})();
-</script>
- 
-<!-- Selfie -->
-<script>
-(function() {
-  let lastPreview = 0;
-  let lastCapture = 0;
+  <!-- Guia Seleção -->
+  <script>
+  (function() {
+    window.JORNADA = window.JORNADA || {};
+    window.JORNADA.selectedGuia = window.JORNADA.selectedGuia || null;
 
-  document.addEventListener('change', (e) => {
-    const input = e.target.closest('#selfieInput');
-    if (input && input.files && input.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const img = document.getElementById('selfieImage');
-        if (img) {
-          img.setAttribute('href', ev.target.result);
-          document.querySelector('.flame-layer').style.opacity = '1';
-          console.log('[Selfie] Imagem carregada');
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-action="select-guia"]');
+      if (btn) {
+        e.preventDefault();
+        const guia = btn.dataset.guia;
+        window.JORNADA.selectedGuia = guia;
+        console.log('[Guia] Guia selecionado:', guia);
+        const guideBg = document.getElementById('guideBg');
+        if (guideBg) {
+          guideBg.src = `/assets/img/irmandade-quarteto-bg-${guia}.png`;
         }
-      };
-      reader.readAsDataURL(input.files[0]);
-    }
-  });
-
-  document.addEventListener('input', (e) => {
-    const input = e.target.closest('#nameInput, #selfieScale, #selfieOffsetX, #selfieOffsetY');
-    if (input) {
-      const img = document.getElementById('selfieImage');
-      const nameSlot = document.getElementById('userNameSlot');
-      if (!img || !nameSlot) return;
-
-      if (input.id === 'nameInput') {
-        nameSlot.textContent = input.value || 'NOME';
-      } else {
-        const scale = document.getElementById('selfieScale')?.value || 1;
-        const offsetX = document.getElementById('selfieOffsetX')?.value || 0;
-        const offsetY = document.getElementById('selfieOffsetY')?.value || 0;
-        img.style.transform = `scale(${scale}) translate(${offsetX}px, ${offsetY}px)`;
-      }
-      console.log('[Selfie] Ajustes aplicados');
-    }
-  });
-
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('#previewBtn, #captureBtn, #btnSkipSelfie, #btnStartJourney');
-    if (btn) {
-      e.preventDefault();
-      const now = performance.now();
-      if (btn.id === 'previewBtn') {
-        if (now - lastPreview < 1000) return;
-        lastPreview = now;
-        const img = document.getElementById('selfieImage');
-        if (img && img.getAttribute('href')) {
-          document.querySelector('.flame-layer').style.opacity = '1';
-          window.toast && window.toast('Pré-visualização atualizada!');
-          console.log('[Selfie] Pré-visualização atualizada');
-        } else {
-          window.toast && window.toast('Selecione uma imagem primeiro.');
-          console.log('[Selfie] Nenhuma imagem selecionada para pré-visualização');
-        }
-      } else if (btn.id === 'captureBtn') {
-        if (now - lastCapture < 1000) return;
-        lastCapture = now;
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        const img = document.getElementById('selfieImage');
-        const bg = document.getElementById('guideBg');
-        const nameSlot = document.getElementById('userNameSlot');
         const guideNameSlot = document.getElementById('guideNameSlot');
-        if (!img || !bg || !nameSlot || !guideNameSlot) {
-          window.toast && window.toast('Erro ao capturar imagem.');
-          console.log('[Selfie] Elementos de imagem, fundo ou nomes não encontrados');
+        if (guideNameSlot) {
+          guideNameSlot.textContent = guia.charAt(0).toUpperCase() + guia.slice(1);
+        }
+        if (window.JC && window.playVideo) {
+          window.JC.nextSection = 'section-selfie';
+          window.playVideo('/assets/img/conhecimento-com-luz-jardim.mp4');
+          console.log('[Guia] Reproduzindo vídeo conhecimento-com-luz-jardim');
+        } else {
+          window.showSection && window.showSection('section-selfie');
+          console.log('[Guia] Navegação direta para section-selfie');
+        }
+      }
+    });
+    console.log('[Guia] Bloco carregado');
+  })();
+  </script>
+
+  <!-- Selfie -->
+  <script>
+  (function() {
+    let lastPreview = 0;
+    let lastCapture = 0;
+
+    document.addEventListener('change', (e) => {
+      const input = e.target.closest('#selfieInput');
+      if (input && input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = document.getElementById('selfieImage');
+          if (img) {
+            img.setAttribute('href', ev.target.result);
+            document.querySelector('.flame-layer').style.opacity = '1';
+            console.log('[Selfie] Imagem carregada');
+          }
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    });
+
+    document.addEventListener('input', (e) => {
+      const input = e.target.closest('#nameInput, #selfieScale, #selfieOffsetX, #selfieOffsetY');
+      if (input) {
+        const img = document.getElementById('selfieImage');
+        const nameSlot = document.getElementById('userNameSlot');
+        if (!img || !nameSlot) return;
+
+        if (input.id === 'nameInput') {
+          nameSlot.textContent = input.value || 'NOME';
+        } else {
+          const scale = document.getElementById('selfieScale')?.value || 1;
+          const offsetX = document.getElementById('selfieOffsetX')?.value || 0;
+          const offsetY = document.getElementById('selfieOffsetY')?.value || 0;
+          img.style.transform = `scale(${scale}) translate(${offsetX}px, ${offsetY}px)`;
+        }
+        console.log('[Selfie] Ajustes aplicados');
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('#previewBtn, #captureBtn, #btnSkipSelfie, #btnStartJourney');
+      if (btn) {
+        e.preventDefault();
+        const now = performance.now();
+        if (btn.id === 'previewBtn') {
+          if (now - lastPreview < 1000) return;
+          lastPreview = now;
+          const img = document.getElementById('selfieImage');
+          if (img && img.getAttribute('href')) {
+            document.querySelector('.flame-layer').style.opacity = '1';
+            window.toast && window.toast('Pré-visualização atualizada!');
+            console.log('[Selfie] Pré-visualização atualizada');
+          } else {
+            window.toast && window.toast('Selecione uma imagem primeiro.');
+            console.log('[Selfie] Nenhuma imagem selecionada para pré-visualização');
+          }
+        } else if (btn.id === 'captureBtn') {
+          if (now - lastCapture < 1000) return;
+          lastCapture = now;
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          const img = document.getElementById('selfieImage');
+          const bg = document.getElementById('guideBg');
+          const nameSlot = document.getElementById('userNameSlot');
+          const guideNameSlot = document.getElementById('guideNameSlot');
+          if (!img || !bg || !nameSlot || !guideNameSlot) {
+            window.toast && window.toast('Erro ao capturar imagem.');
+            console.log('[Selfie] Elementos de imagem, fundo ou nomes não encontrados');
+            return;
+          }
+          canvas.width = bg.width;
+          canvas.height = bg.height;
+          ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
+          const scale = document.getElementById('selfieScale')?.value || 1;
+          const offsetX = document.getElementById('selfieOffsetX')?.value || 0;
+          const offsetY = document.getElementById('selfieOffsetY')?.value || 0;
+          ctx.save();
+          ctx.translate(15 + parseFloat(offsetX), 35 + parseFloat(offsetY));
+          ctx.scale(scale, scale);
+          ctx.drawImage(img, 0, 0, 70, 90);
+          ctx.restore();
+          ctx.font = 'bold 2.5rem Cardo, serif';
+          ctx.fillStyle = '#f7d37a';
+          ctx.textAlign = 'center';
+          ctx.fillText(guideNameSlot.textContent, canvas.width / 2, canvas.height * 0.02 + 30);
+          ctx.font = 'bold 2rem Cardo, serif';
+          ctx.fillText(nameSlot.textContent, canvas.width / 2, canvas.height * 0.98 - 10);
+          const link = document.createElement('a');
+          link.download = 'selfie-irmandade.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          console.log('[Selfie] Imagem baixada');
+          try {
+            localStorage.setItem('JORNADA_SELFIE', link.href);
+          } catch (_) {}
+        } else if (btn.id === 'btnSkipSelfie' || btn.id === 'btnStartJourney') {
+          if (window.JC) {
+            window.JC.nextSection = 'section-perguntas';
+            if (window.playVideo && window.JORNADA_VIDEOS && window.JORNADA_VIDEOS.intro) {
+              window.playVideo('/assets/img/conhecimento-com-luz-jardim.mp4');
+              console.log('[Selfie] Reproduzindo vídeo conhecimento-com-luz-jardim antes de section-perguntas');
+            } else {
+              window.showSection('section-perguntas');
+              console.log('[Selfie] Navegação direta para section-perguntas');
+            }
+          } else {
+            console.error('[Selfie] window.JC não definido');
+            window.toast && window.toast('Erro ao navegar para as perguntas.');
+          }
+        }
+      }
+    });
+    console.log('[Selfie] Bloco carregado');
+  })();
+  </script>
+
+  <!-- loadDynamicBlocks -->
+  <script>
+  (function() {
+    const VIDEO_BASE = '/assets/img/';
+    window.JORNADA_VIDEOS = {
+      intro: VIDEO_BASE + 'conhecimento-com-luz-jardim.mp4',
+      afterBlocks: {
+        0: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
+        1: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
+        2: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
+        3: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
+      },
+      final: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
+    };
+    window.JORNADA_FINAL_VIDEO = window.JORNADA_VIDEOS.final;
+
+    window.loadDynamicBlocks = async function() {
+      try {
+        await i18n.waitForReady(10000);
+        if (!i18n.ready) throw new Error('i18n não inicializado');
+        const currentLang = i18n.lang || 'pt-BR';
+        const content = document.getElementById('perguntas-container');
+        if (!content) {
+          console.error('[loadDynamicBlocks] Container de perguntas não encontrado');
+          window.toast && window.toast('Erro ao carregar perguntas.');
           return;
         }
-        canvas.width = bg.width;
-        canvas.height = bg.height;
-        ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
-        const scale = document.getElementById('selfieScale')?.value || 1;
-        const offsetX = document.getElementById('selfieOffsetX')?.value || 0;
-        const offsetY = document.getElementById('selfieOffsetY')?.value || 0;
-        ctx.save();
-        ctx.translate(15 + parseFloat(offsetX), 35 + parseFloat(offsetY));
-        ctx.scale(scale, scale);
-        ctx.drawImage(img, 0, 0, 70, 90);
-        ctx.restore();
-        ctx.font = 'bold 2.5rem Cardo, serif';
-        ctx.fillStyle = '#f7d37a';
-        ctx.textAlign = 'center';
-        ctx.fillText(guideNameSlot.textContent, canvas.width / 2, canvas.height * 0.02 + 30);
-        ctx.font = 'bold 2rem Cardo, serif';
-        ctx.fillText(nameSlot.textContent, canvas.width / 2, canvas.height * 0.98 - 10);
-        const link = document.createElement('a');
-        link.download = 'selfie-irmandade.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        console.log('[Selfie] Imagem baixada');
-        try {
-          localStorage.setItem('JORNADA_SELFIE', link.href);
-        } catch (_) {}
-      } else if (btn.id === 'btnSkipSelfie' || btn.id === 'btnStartJourney') {
-        if (window.JC) {
-          window.JC.nextSection = 'section-perguntas';
-          if (window.playVideo && window.JORNADA_VIDEOS && window.JORNADA_VIDEOS.intro) {
-            window.playVideo(window.JORNADA_VIDEOS.intro);
-            console.log('[Selfie] Reproduzindo vídeo filme-0 antes de section-perguntas');
-          } else {
-            window.showSection('section-perguntas');
-            console.log('[Selfie] Navegação direta para section-perguntas');
+
+        content.innerHTML = '';
+        content.classList.remove('hidden');
+        const blocks = window.JORNADA_BLOCKS || [];
+        if (!blocks.length) {
+          console.error('[loadDynamicBlocks] JORNADA_BLOCKS não definido ou vazio');
+          window.toast && window.toast('Nenhum bloco de perguntas encontrado.');
+          return;
+        }
+
+        blocks.forEach((block, bIdx) => {
+          const bloco = document.createElement('div');
+          bloco.className = 'j-bloco';
+          bloco.dataset.bloco = bIdx;
+          bloco.dataset.video = block.video_after || '';
+          bloco.style.display = 'none';
+
+          if (block.title) {
+            const title = document.createElement('h3');
+            title.className = 'pergunta-enunciado text';
+            title.dataset.typing = 'true';
+            title.dataset.text = block.title;
+            title.dataset.speed = '36';
+            title.dataset.cursor = 'true';
+            title.textContent = block.title;
+            bloco.appendChild(title);
+          }
+
+          (block.questions || []).forEach((q, qIdx) => {
+            const label = typeof q === 'string' ? q : (q.label || q.text || '');
+            const div = document.createElement('div');
+            div.className = 'j-pergunta';
+            div.dataset.pergunta = qIdx;
+            div.innerHTML = `
+              <label class="pergunta-enunciado text" 
+                     data-typing="true" 
+                     data-text="Pergunta ${qIdx + 1}: ${label}" 
+                     data-speed="36" 
+                     data-cursor="true">${label}</label>
+              <textarea rows="4" class="input" data-i18n-placeholder="resposta_placeholder" placeholder="Digite sua resposta..."></textarea>
+              <div class="accessibility-controls">
+                <button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>
+                <button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>
+                <button class="btn btn-avancar" data-action="avancar">Avançar</button>
+              </div>
+            `;
+            bloco.appendChild(div);
+          });
+
+          content.appendChild(bloco);
+        });
+
+        const firstBloco = content.querySelector('.j-bloco');
+        if (firstBloco) {
+          firstBloco.style.display = 'block';
+          window.JC.currentBloco = 0;
+          const first = firstBloco.querySelector('.j-pergunta');
+          if (first) {
+            first.classList.add('active');
+            setTimeout(() => window.runTyping && window.runTyping(firstBloco), 100);
           }
         } else {
-          console.error('[Selfie] window.JC não definido');
-          window.toast && window.toast('Erro ao navegar para as perguntas.');
+          console.error('[loadDynamicBlocks] Nenhum bloco criado');
+          window.toast && window.toast('Erro ao criar blocos de perguntas.');
         }
+
+        if (window.loadAnswers) window.loadAnswers();
+        const firstTa = document.querySelector('.j-bloco .j-pergunta textarea');
+        if (firstTa && window.handleInput) window.handleInput(firstTa);
+        console.log('[loadDynamicBlocks] Blocos carregados com sucesso');
+      } catch (error) {
+        console.error('[loadDynamicBlocks] Erro:', error);
+        window.toast && window.toast('Erro ao carregar blocos de perguntas');
       }
-    }
-  });
-  console.log('[Selfie] Bloco carregado');
-})();
-</script>
+    };
+
+    document.addEventListener('change', (e) => {
+      if (e.target.id === 'language-select') {
+        i18n.setLang(e.target.value).then(() => {
+          window.loadDynamicBlocks();
+          console.log('[loadDynamicBlocks] Idioma alterado, blocos recarregados');
+        });
+      }
+    });
+
+    console.log('[loadDynamicBlocks] Bloco carregado');
+  })();
+  </script>
+
 </body>
 </html>
