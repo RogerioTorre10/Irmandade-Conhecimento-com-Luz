@@ -1,17 +1,15 @@
-;(function () {
-  'use strict';
-  
-  import i18n from './i18n.js';
+// jornada-paper-qa.js
+'use strict';
 
-const CFG = {
-      CANVAS_ID: 'jornada-canvas',
-      CONTENT_ID: 'jornada-conteudo',
-      PERGAMINHO_VERT: '/assets/img/pergaminho-rasgado-vert.png',
-      PERGAMINHO_HORIZ: '/assets/img/pergaminho-rasgado-horiz.png',
-      VIDEO_BASE: '/assets/img/'
-    },
-    window.JORNADA_CFG || {}
-  );
+import i18n from './i18n.js';
+
+const CFG = Object.assign({
+  CANVAS_ID: 'jornada-canvas',
+  CONTENT_ID: 'jornada-conteudo',
+  PERGAMINHO_VERT: '/assets/img/pergaminho-rasgado-vert.png',
+  PERGAMINHO_HORIZ: '/assets/img/pergaminho-rasgado-horiz.png',
+  VIDEO_BASE: '/assets/img/'
+}, window.JORNADA_CFG || {});
 
   const VIDEO_BASE = CFG.VIDEO_BASE;
   window.JORNADA_VIDEOS = {
@@ -142,10 +140,6 @@ const CFG = {
   ]
 };
 
- 'en-US': blockTranslations['en-US'], // Mantém o original
-  'es-ES': blockTranslations['es-ES']
-};
-
 let JORNADA_BLOCKS = [];
 
 const log = (...args) => console.log('[JORNADA_PAPER]', ...args);
@@ -220,7 +214,7 @@ async function loadDynamicBlocks() {
   try {
     const currentLang = i18n.lang || 'pt-BR';
     JORNADA_BLOCKS = blockTranslations[currentLang] || blockTranslations['pt-BR'];
-    window.JORNADA_BLOCKS = JORNADA_BLOCKS; // Para compatibilidade
+    window.JORNADA_BLOCKS = JORNADA_BLOCKS;
     log('JORNADA_BLOCKS preenchido:', JORNADA_BLOCKS);
     return true;
   } catch (error) {
@@ -241,7 +235,6 @@ async function renderQuestions() {
   content.innerHTML = '';
   content.classList.remove('hidden');
   JORNADA_BLOCKS.forEach((block, bIdx) => {
-    log('Gerando bloco:', block.id, 'com', block.questions.length, 'perguntas');
     const bloco = document.createElement('div');
     bloco.className = 'j-bloco';
     bloco.dataset.bloco = bIdx;
@@ -315,10 +308,7 @@ function loadVideo(videoSrc) {
 let __abortTypingPlaceholder = null;
 
 async function typePlaceholder(inp, text, speed = 22) {
-  if (!inp) {
-    console.warn('[JORNADA_PAPER] Input não encontrado');
-    return;
-  }
+  if (!inp) return;
   if (__abortTypingPlaceholder) __abortTypingPlaceholder();
   let abort = false;
   __abortTypingPlaceholder = () => (abort = true);
@@ -330,8 +320,13 @@ async function typePlaceholder(inp, text, speed = 22) {
     inp.placeholder = text.slice(0, i) + (i < text.length ? '▌' : '');
     await new Promise(r => setTimeout(r, speed));
   }
-  if (!abort) inp.placeholder = text;
-  log('Digitação de placeholder concluída para:', inp);
+    if (!abort) {
+    inp.placeholder = text;
+  }
+  if (aria) {
+    aria.textContent = '';
+  }
+  log('Placeholder digitado:', text);
 }
 
 async function typeQuestionsSequentially(bloco) {
@@ -366,21 +361,6 @@ async function typeEffect(element, text, delay = 36) {
 function initPaperQAEvents() {
   document.querySelectorAll('[data-action="read-question"]').forEach(button => {
     button.addEventListener('click', () => {
-      const questionId = button.dataset.questionId;
-      log('Pergunta respondida:', questionId);
-      document.dispatchEvent(new CustomEvent('questionAnswered', { detail: { questionId } }));
-    });
-  });
-
-  document.querySelectorAll('[data-action="start-mic"]').forEach(button => {
-    button.addEventListener('click', () => {
-      log('Microfone acionado (funcionalidade não implementada)');
-      window.toast && window.toast('Microfone não implementado ainda.');
-    });
-  });
-
-  document.querySelectorAll('[data-action="read-question"]').forEach(button => {
-    button.addEventListener('click', () => {
       const pergunta = button.closest('.j-pergunta').querySelector('[data-i18n]');
       const key = pergunta.dataset.i18n;
       const text = i18n.t(key, pergunta.textContent);
@@ -391,6 +371,13 @@ function initPaperQAEvents() {
       } else {
         console.warn('[JORNADA_PAPER] SpeechSynthesis não suportado');
       }
+    });
+  });
+
+  document.querySelectorAll('[data-action="start-mic"]').forEach(button => {
+    button.addEventListener('click', () => {
+      log('Microfone acionado (funcionalidade não implementada)');
+      window.toast && window.toast('Microfone não implementado ainda.');
     });
   });
 
@@ -411,7 +398,7 @@ async function initPaperQA() {
       throw new Error('Falha ao carregar JORNADA_BLOCKS');
     }
     initPaperQAEvents();
-    loadVideo(JORNADA_VIDEOS.inicio); // Carregar vídeo inicial
+    loadVideo(JORNADA_VIDEOS.inicio);
     log('Inicialização concluída');
   } catch (error) {
     console.error('[JORNADA_PAPER] Erro na inicialização:', error);
@@ -429,6 +416,14 @@ document.addEventListener('change', (e) => {
   }
 });
 
-export { loadDynamicBlocks, renderQuestions, loadVideo, setPergaminho, ensureCanvas, typeQuestionsSequentially, typePlaceholder };
+export {
+  loadDynamicBlocks,
+  renderQuestions,
+  loadVideo,
+  setPergaminho,
+  ensureCanvas,
+  typeQuestionsSequentially,
+  typePlaceholder
+};
 
-log('Script carregado');
+log('Script jornada-paper-qa.js carregado com sucesso');
