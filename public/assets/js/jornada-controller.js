@@ -9,9 +9,9 @@ log('Dependências iniciais:', {
   loadVideo: !!window.loadVideo
 });
 
-let currentSection = 'section-inicio';
+let currentSection = 'section-intro';
 const sections = [
-  'section-inicio',
+  'section-intro',
   'section-termos',
   'section-senha',
   'section-guia',
@@ -147,7 +147,7 @@ function goToNextSection() {
   }
 }
 
-function initController(route = 'inicio') {
+function initController(route = 'intro') {
   log('Inicializando controlador...');
 
   // Fallback para dependências
@@ -175,7 +175,7 @@ function initController(route = 'inicio') {
     init: () => log('JC init chamado (já inicializado)'),
     goNext: goToNextSection
   };
-  window.__currentSectionId = route === 'inicio' ? 'section-inicio' : route;
+  window.__currentSectionId = route === 'intro' ? 'section-intro' : route;
   window.perguntasLoaded = false;
 
   // Mostrar seção inicial
@@ -319,13 +319,13 @@ function initController(route = 'inicio') {
 // Aguardar inicialização do bootstrap
 document.addEventListener('bootstrapComplete', () => {
   log('Bootstrap concluído, iniciando controlador');
-  initController('inicio');
+  initController('intro');
 });
 
 // Fallback para inicialização direta (compatibilidade)
 document.addEventListener('DOMContentLoaded', () => {
   if (!window.JC?.initialized) {
     log('Fallback: Inicializando controlador via DOMContentLoaded');
-    initController('inicio');
+    initController('intro');
   }
 });
