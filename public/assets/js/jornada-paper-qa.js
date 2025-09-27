@@ -398,7 +398,7 @@ async function initPaperQA() {
       throw new Error('Falha ao carregar JORNADA_BLOCKS');
     }
     initPaperQAEvents();
-    loadVideo(JORNADA_VIDEOS.inicio);
+    loadVideo(JORNADA_VIDEOS.intro);
     log('Inicialização concluída');
   } catch (error) {
     console.error('[JORNADA_PAPER] Erro na inicialização:', error);
