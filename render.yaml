@@ -1,12 +1,13 @@
 services:
   - type: web
-    name: Irmandade-Conhecimento-com-Luz-1
+    name: Irmandade-Conhecimento-com-Luz
     env: node
     plan: starter
     region: oregon
-    buildCommand: "npm install"
-    startCommand: "npm start"
+    buildCommand: npm install
+    startCommand: npm start
     autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
+    staticPublishPath: public
