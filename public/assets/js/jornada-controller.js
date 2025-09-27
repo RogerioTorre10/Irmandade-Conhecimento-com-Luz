@@ -1,12 +1,12 @@
-import { renderQuestions, loadVideo } from './jornada-paper-qa.js'; // Ajuste o caminho conforme necessário
+import { renderQuestions, loadVideo } from './jornada-paper-qa.js';
+import i18n from './i18n.js';
 
 const log = (...args) => console.log('[CONTROLLER]', ...args);
 
-// Verificar dependências no carregamento
 log('Dependências iniciais:', {
   runTyping: !!window.runTyping,
   renderQuestions: !!window.renderQuestions,
-  loadVideo: !!window.loadVideo
+  loadVideo: !!window.loadVideo,
 });
 
 let currentSection = 'section-intro';
@@ -17,13 +17,12 @@ const sections = [
   'section-guia',
   'section-selfie',
   'section-perguntas',
-  'section-final'
+  'section-final',
 ];
-let answeredQuestions = new Set(); // Rastrear perguntas respondidas
-let isProcessingClick = false; // Debounce para cliques
-let queue = []; // Fila de ações pendentes (next, etc.)
+let answeredQuestions = new Set();
+let isProcessingClick = false;
+let queue = [];
 
-// Fila de ações para quando o controller não estiver pronto
 function enqueueAction(action) {
   queue.push(action);
   log('Ação enfileirada:', action.type);
@@ -40,7 +39,6 @@ function processQueue() {
   log('Fila processada, ações executadas:', pending.length);
 }
 
-// Função debounced para cliques
 function debounceClick(callback, wait = 500) {
   return (...args) => {
     if (isProcessingClick) {
@@ -55,7 +53,7 @@ function debounceClick(callback, wait = 500) {
   };
 }
 
-function goToNextSection() {
+async function goToNextSection() {
   const currentIdx = sections.indexOf(currentSection);
   log('Índice atual:', currentIdx, 'Seção atual:', currentSection);
   if (currentIdx < sections.length - 1) {
@@ -63,7 +61,6 @@ function goToNextSection() {
     currentSection = sections[currentIdx + 1];
     log(`Tentando navegar de ${previousSection} para ${currentSection}`);
 
-    // Ocultar seção anterior
     const prevElement = document.querySelector(`#${previousSection}`);
     if (prevElement) {
       prevElement.classList.remove('active');
@@ -73,7 +70,6 @@ function goToNextSection() {
       console.error(`[CONTROLLER] Seção anterior ${previousSection} não encontrada`);
     }
 
-    // Mostrar nova seção
     const nextElement = document.querySelector(`#${currentSection}`);
     if (nextElement) {
       nextElement.classList.add('active');
@@ -84,7 +80,6 @@ function goToNextSection() {
       return;
     }
 
-    // Lógica específica por seção
     if (currentSection === 'section-termos') {
       const termosPg1 = document.getElementById('termos-pg1');
       const termosPg2 = document.getElementById('termos-pg2');
@@ -95,17 +90,16 @@ function goToNextSection() {
         return;
       }
     } else if (currentSection === 'section-perguntas') {
-    try {
-      await i18n.waitForReady(10000); // Aguarda i18n
-      answeredQuestions.clear();
-      renderQuestions();
-      window.perguntasLoaded = true;
-      log('Perguntas carregadas e renderizadas');
-    } catch (error) {
-      console.error('[CONTROLLER] Erro ao renderizar perguntas:', error);
-      window.toast && window.toast('Erro ao carregar perguntas');
-    }
-  }
+      try {
+        await i18n.waitForReady(10000);
+        answeredQuestions.clear();
+        renderQuestions();
+        window.perguntasLoaded = true;
+        log('Perguntas carregadas e renderizadas');
+      } catch (error) {
+        console.error('[CONTROLLER] Erro ao renderizar perguntas:', error);
+        window.toast && window.toast('Erro ao carregar perguntas');
+      }
     } else if (currentSection === 'section-guia') {
       try {
         loadVideo('/path/to/guia-video.mp4');
@@ -122,27 +116,25 @@ function goToNextSection() {
       }
     }
 
-    // Executar animação de digitação e leitura automática
     if (window.runTyping) {
-  const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]:not(.hidden *)`);
-  if (typingElements.length > 0) {
-    let completed = 0;
-    typingElements.forEach((element, index) => {
-      const selector = element.id ? `#${element.id}` : `.${element.className.split(' ')[0]}`;
-      window.runTyping(selector, () => {
-        completed++;
-        log(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
-        const text = element.getAttribute('data-text') || element.textContent;
-        window.readText(text);
-        if (completed === typingElements.length) {
-          log('Todas as animações de digitação concluídas em', currentSection);
-        }
-      });
-    });
-  } else {
-    log('Nenhum elemento de digitação encontrado em', currentSection);
-  }
-}
+      const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]:not(.hidden *)`);
+      if (typingElements.length > 0) {
+        let completed = 0;
+        typingElements.forEach((element, index) => {
+          const selector = element.id ? `#${element.id}` : `.${element.className.split(' ')[0]}`;
+          window.runTyping(selector, () => {
+            completed++;
+            log(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
+            const text = element.getAttribute('data-text') || element.textContent;
+            window.readText(text);
+            if (completed === typingElements.length) {
+              log('Todas as animações de digitação concluídas em', currentSection);
+            }
+          });
+        });
+      } else {
+        log('Nenhum elemento de digitação encontrado em', currentSection);
+      }
     } else {
       log('window.runTyping não definido');
     }
@@ -154,35 +146,31 @@ function goToNextSection() {
 function initController(route = 'intro') {
   log('Inicializando controlador...');
 
-  // Fallback para dependências
   window.JORNADA_BLOCKS = window.JORNADA_BLOCKS || [];
   window.JORNADA_VIDEOS = window.JORNADA_VIDEOS || {};
   log('JORNADA_BLOCKS:', window.JORNADA_BLOCKS);
   log('JORNADA_VIDEOS:', window.JORNADA_VIDEOS);
 
-  // Verificar dependências
   const dependencies = {
     JORNADA_BLOCKS: !!window.JORNADA_BLOCKS,
     JORNADA_VIDEOS: !!window.JORNADA_VIDEOS,
     showSection: !!window.showSection,
     runTyping: !!window.runTyping,
-    playTransition: !!window.playTransition
+    playTransition: !!window.playTransition,
   };
   log('Dependências:', dependencies);
 
-  // Configurar globals para compatibilidade com código legado
   window.JC = {
     currentBloco: 0,
     currentPergunta: 0,
     nextSection: null,
     initialized: true,
     init: () => log('JC init chamado (já inicializado)'),
-    goNext: goToNextSection
+    goNext: goToNextSection,
   };
   window.__currentSectionId = route === 'intro' ? 'section-intro' : route;
   window.perguntasLoaded = false;
 
-  // Mostrar seção inicial
   const initialElement = document.querySelector(`#${currentSection}`);
   if (initialElement) {
     initialElement.classList.add('active');
@@ -191,11 +179,10 @@ function initController(route = 'intro') {
     console.error(`[CONTROLLER] Seção inicial ${currentSection} não encontrada`);
   }
 
-  // Função para ler texto em voz alta
-  window.readText = window.readText || function(text, callback) {
+  window.readText = window.readText || function (text, callback) {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'pt-BR';
+      utterance.lang = i18n.lang || 'pt-BR';
       utterance.rate = 1.0;
       utterance.pitch = 1.0;
       utterance.volume = 1.0;
@@ -213,31 +200,28 @@ function initController(route = 'intro') {
     }
   };
 
-  // Executar animação de digitação e leitura na inicialização
- // Executar animação de digitação e leitura na inicialização
-if (window.runTyping) {
-  const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]`);
-  if (typingElements.length > 0) {
-    let completed = 0;
-    typingElements.forEach((element, index) => {
-      const selector = element.id ? `#${element.id}` : `.${element.className.split(' ')[0]}`;
-      window.runTyping(selector, () => {
-        completed++;
-        log(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
-        const text = element.getAttribute('data-text') || element.textContent;
-        window.readText(text);
-        if (completed === typingElements.length) {
-          log('Todas as animações de digitação concluídas em', currentSection);
-        }
+  if (window.runTyping) {
+    const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]`);
+    if (typingElements.length > 0) {
+      let completed = 0;
+      typingElements.forEach((element, index) => {
+        const selector = element.id ? `#${element.id}` : `.${element.className.split(' ')[0]}`;
+        window.runTyping(selector, () => {
+          completed++;
+          log(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
+          const text = element.getAttribute('data-text') || element.textContent;
+          window.readText(text);
+          if (completed === typingElements.length) {
+            log('Todas as animações de digitação concluídas em', currentSection);
+          }
+        });
       });
-    });
+    } else {
+      log('Nenhum elemento de digitação encontrado em', currentSection);
+    }
   } else {
-    log('Nenhum elemento de digitação encontrado em', currentSection);
-  }
-  
-} else {
     log('window.runTyping não definido na inicialização, aplicando fallback');
-    window.runTyping = function(element, callback) {
+    window.runTyping = function (element, callback) {
       const text = element.getAttribute('data-text') || '';
       const speed = parseInt(element.getAttribute('data-speed')) || 50;
       let i = 0;
@@ -253,14 +237,12 @@ if (window.runTyping) {
           element.classList.add('typing-done');
           element.classList.remove('lumen-typing');
           log('Animação de digitação concluída para:', text);
-          // Ler o texto após a animação
           window.readText(text);
           if (callback) callback();
         }
       }
       type();
     };
-    // Re-executar animação com o fallback
     const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]`);
     typingElements.forEach((element, index) => {
       window.runTyping(element, () => {
@@ -269,17 +251,19 @@ if (window.runTyping) {
     });
   }
 
-  // Inicializar botões de navegação (debounced)
   const debouncedGoNext = debounceClick(() => goToNextSection());
-  document.querySelectorAll('.btn-avancar, [data-action="avancar"], #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney, #iniciarSenha, [data-action="termos-next"]').forEach(button => {
-    button.addEventListener('click', (e) => {
-      e.preventDefault();
-      log('Botão avançar clicado:', button.id || button.className);
-      debouncedGoNext();
+  document
+    .querySelectorAll(
+      '.btn-avancar, [data-action="avancar"], #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney, #iniciarSenha, [data-action="termos-next"]'
+    )
+    .forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        log('Botão avançar clicado:', button.id || button.className);
+        debouncedGoNext();
+      });
     });
-  });
 
-  // Botão termos-prev (específico)
   document.querySelectorAll('[data-action="termos-prev"]').forEach(button => {
     button.addEventListener('click', (e) => {
       e.preventDefault();
@@ -293,7 +277,6 @@ if (window.runTyping) {
     });
   });
 
-  // Escutar respostas de perguntas
   document.addEventListener('questionAnswered', (event) => {
     const questionId = event.detail.questionId;
     answeredQuestions.add(questionId);
@@ -301,13 +284,11 @@ if (window.runTyping) {
     goToNextSection();
   });
 
-  // Escutar pulo de vídeo
   document.addEventListener('videoSkipped', () => {
     log('Vídeo pulado, avançando...');
     goToNextSection();
   });
 
-  // Expor funções globais para compatibilidade
   window.goToNextSection = () => {
     if (window.JC?.initialized) {
       goToNextSection();
@@ -316,22 +297,30 @@ if (window.runTyping) {
     }
   };
 
-  // Processar fila quando pronto
   document.addEventListener('jc:ready', processQueue);
 
   log('Controlador inicializado com sucesso');
 }
 
-// Aguardar inicialização do bootstrap
 document.addEventListener('bootstrapComplete', () => {
-  log('Bootstrap concluído, iniciando controlador');
-  initController('intro');
+  log('Bootstrap concluído, aguardando i18n...');
+  i18n.init().then(() => {
+    log('i18n pronto, iniciando controlador');
+    initController('intro');
+  }).catch(err => {
+    console.error('[CONTROLLER] Erro ao aguardar i18n:', err);
+    initController('intro');
+  });
 });
 
-// Fallback para inicialização direta (compatibilidade)
 document.addEventListener('DOMContentLoaded', () => {
   if (!window.JC?.initialized) {
     log('Fallback: Inicializando controlador via DOMContentLoaded');
-    initController('intro');
+    i18n.init().then(() => {
+      initController('intro');
+    }).catch(err => {
+      console.error('[CONTROLLER] Erro ao aguardar i18n:', err);
+      initController('intro');
+    });
   }
 });
