@@ -95,14 +95,17 @@ function goToNextSection() {
         return;
       }
     } else if (currentSection === 'section-perguntas') {
-      try {
-        answeredQuestions.clear();
-        renderQuestions();
-        window.perguntasLoaded = true;
-        log('Perguntas carregadas e renderizadas');
-      } catch (error) {
-        console.error('[CONTROLLER] Erro ao renderizar perguntas:', error);
-      }
+    try {
+      await i18n.waitForReady(10000); // Aguarda i18n
+      answeredQuestions.clear();
+      renderQuestions();
+      window.perguntasLoaded = true;
+      log('Perguntas carregadas e renderizadas');
+    } catch (error) {
+      console.error('[CONTROLLER] Erro ao renderizar perguntas:', error);
+      window.toast && window.toast('Erro ao carregar perguntas');
+    }
+  }
     } else if (currentSection === 'section-guia') {
       try {
         loadVideo('/path/to/guia-video.mp4');
