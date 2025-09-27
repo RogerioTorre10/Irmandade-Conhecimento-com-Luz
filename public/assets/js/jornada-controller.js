@@ -2,6 +2,13 @@ import { renderQuestions, loadVideo } from './jornada-paper-qa.js'; // Ajuste o 
 
 const log = (...args) => console.log('[CONTROLLER]', ...args);
 
+// Verificar dependências no carregamento
+log('Dependências iniciais:', {
+  runTyping: !!window.runTyping,
+  renderQuestions: !!window.renderQuestions,
+  loadVideo: !!window.loadVideo
+});
+
 let currentSection = 'section-inicio';
 const sections = [
   'section-inicio',
