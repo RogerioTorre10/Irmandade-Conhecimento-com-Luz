@@ -818,34 +818,64 @@
       // Resetar __typingLock para evitar bloqueios
       window.__typingLock = false;
       
-      setTimeout(() => {
-        if (id === 'section-perguntas' && window.loadDynamicBlocks) {
-          window.loadDynamicBlocks();
-          console.log('[showSection] loadDynamicBlocks chamado para section-perguntas');
-        }
-        if (window.runTyping) {
-          window.runTyping(target);
-          console.log('[showSection] Iniciando runTyping para:', id);
-        }
-        const btns = target.querySelectorAll('[data-action="avancar"], .btn-avancar, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney');
-        btns.forEach(btn => {
-          if (!btn.dataset.clickAttached) {
-            btn.addEventListener('click', (e) => {
-              e.preventDefault();
-              if (window.JC && window.JC.goNext) window.JC.goNext();
-            }, { once: true });
-            btn.dataset.clickAttached = '1';
-            console.log('[showSection] Evento de clique adicionado ao botão avançar em:', id, 'Botão:', btn.id || btn.className);
-          }
-        });
-      }, 100);
+      <script>
+  // Remover runTyping local e usar window.runTyping
+  window.runTyping = window.runTyping || function (root, callback) {
+    console.log('[runTyping] Iniciando para:', root?.id || root?.className || root);
+    if (!root || !(root instanceof Element)) {
+      console.error('[runTyping] Root inválido:', root);
+      return;
+    }
+    if (root.classList.contains('hidden')) {
+      console.log('[runTyping] Elemento oculto, ignorando:', root.id || root.className);
+      return;
+    }
+    if (window.G.__typingLock) {
+      console.log('[runTyping] Bloqueado por __typingLock, ignorando...');
+      return;
+    }
+    window.G.__typingLock = true;
+
+    try {
+      const selector = root.id ? `#${root.id}` : `.${root.className.split(' ')[0]}`;
+      window.TypingBridge.play(selector, () => {
+        window.G.__typingLock = false;
+        if (callback) callback();
+      });
     } catch (e) {
-      console.error('[showSection] Erro:', e);
-      window.toast && window.toast('Erro ao exibir seção.');
+      console.error('[runTyping] Erro:', e);
+      window.G.__typingLock = false;
     }
   };
-  console.log('[showSection] Bloco carregado');
-})();
+
+  function showSection(sectionId) {
+    console.log('[showSection] Exibindo seção:', sectionId);
+    const section = document.getElementById(sectionId);
+    if (!section) {
+      console.error('[showSection] Seção não encontrada:', sectionId);
+      return;
+    }
+    section.classList.add('active');
+    section.classList.remove('hidden');
+    const textElements = section.querySelectorAll('[data-typing="true"]');
+    textElements.forEach(el => {
+      if (!el || !(el instanceof Element)) {
+        console.error('[showSection] Elemento de digitação inválido:', el);
+        return;
+      }
+      window.runTyping(el);
+      console.log('[showSection] Iniciando runTyping para:', sectionId);
+    });
+    const button = section.querySelector('.btn.btn-avancar');
+    if (button) {
+      button.addEventListener('click', () => window.goToNextSection());
+      console.log('[showSection] Evento de clique adicionado ao botão avançar em:', sectionId, 'Botão:', button.className);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    showSection('section-intro');
+  });
 </script>
 
   <!-- loadDynamicBlocks -->
