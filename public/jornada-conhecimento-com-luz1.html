@@ -289,8 +289,8 @@
       <div id="jornada-conteudo" class="conteudo-pergaminho">
         <div id="aria-pergunta" class="sr-only" aria-live="polite"></div>
 
-        <!-- INTRO -->
-        <div id="section-intro" class="j-section">
+        <!-- inicio -->
+        <div id="section-inicio" class="j-section">
           <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
           <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Antes de começar, leia os termos abaixo." data-speed="50" data-cursor="true"></p>
           <div class="footer-actions"><button class="btn" data-action="next-termos">Avançar</button></div>
@@ -625,7 +625,7 @@
         const canvas=document.getElementById('jornada-canvas');
         if(!canvas) return;
         let hero=document.getElementById('chama-hero');
-        const show=(sectionId==='section-intro'||sectionId==='section-termos'||sectionId==='section-senha'||sectionId==='section-final'||sectionId==='section-selfie'||sectionId==='section-guia');
+        const show=(sectionId==='section-inicio'||sectionId==='section-termos'||sectionId==='section-senha'||sectionId==='section-final'||sectionId==='section-selfie'||sectionId==='section-guia');
         if(show){
           if(!hero){
             hero=makeFlame('chama-vela chama-lg');
@@ -1151,13 +1151,13 @@
       }
       function proceedAfterSelfie(){
         isTransitioning=false;
-        const intro=window.JORNADA_VIDEOS?.intro||'';
-        if(!intro||window.__introPlayed){
+        const inicio=window.JORNADA_VIDEOS?.inicio||'';
+        if(!inicio||window.__inicioPlayed){
           proceedToQuestions();
           return;
         }
-        window.__introPlayed=true;
-        playTransition(intro,()=>{ proceedToQuestions(); });
+        window.__inicioPlayed=true;
+        playTransition(inicio,()=>{ proceedToQuestions(); });
       }
 
       let isTransitioning=false;
@@ -1481,7 +1481,7 @@
             if(aNext){ev.preventDefault(); goNext();}
             if(aStart){ev.preventDefault(); startJourney();}
             if(aToggle){ev.preventDefault(); toggleSenha();}
-            if(aRestart){ev.preventDefault(); localStorage.removeItem('jornada_respostas'); localStorage.removeItem('JORNADA_GUIA'); location.hash='#intro'; location.replace('/index.html');}
+            if(aRestart){ev.preventDefault(); localStorage.removeItem('jornada_respostas'); localStorage.removeItem('JORNADA_GUIA'); location.hash='#inicio'; location.replace('/index.html');}
             if(btnPDF){ev.preventDefault(); generatePDF();}
             if(btnDownloadSelfie){
               ev.preventDefault();
@@ -1523,7 +1523,7 @@
         /* vídeos & blocos */
         const VIDEO_BASE='/assets/img/';
         window.JORNADA_VIDEOS={
-          intro:VIDEO_BASE+'filme-0-ao-encontro-da-jornada.mp4',
+          inicio:VIDEO_BASE+'filme-0-ao-encontro-da-jornada.mp4',
           afterBlocks:{
             0:VIDEO_BASE+'filme-1-entrando-na-jornada.mp4',
             1:VIDEO_BASE+'filme-2-dentro-da-jornada.mp4',
@@ -1564,7 +1564,7 @@
         ensurePageFlames();
         runTyping();
         initJornada();
-        showSection('section-intro');
+        showSection('section-inicio');
         updateBlocks();
         lockVideoOrientation();
       })();
