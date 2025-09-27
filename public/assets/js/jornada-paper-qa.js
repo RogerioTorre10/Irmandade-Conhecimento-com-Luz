@@ -25,9 +25,8 @@ const CFG = Object.assign({
   window.JORNADA_FINAL_VIDEO = window.JORNADA_VIDEOS.final;
 
   const blockTranslations = {
-  'pt-BR': [/* seu array original */],
-  'en-US': [
-    {
+  'pt-BR': [
+     {
       id: 'raizes',
       title: 'Block 1 — Roots',
       data_i18n: 'bloco_raizes_title',
@@ -200,34 +199,16 @@ function buildForm(questions = []) {
 
 async function loadDynamicBlocks() {
   try {
-    await i18n.waitForReady(10000); // Aguarda até 10s
+    await i18n.waitForReady(10000);
     if (!i18n.ready) throw new Error('i18n não inicializado');
     const currentLang = i18n.lang || 'pt-BR';
-    if (!window.blockTranslations) throw new Error('blockTranslations não definido');
-    JORNADA_BLOCKS = window.blockTranslations[currentLang] || window.blockTranslations['pt-BR'] || [];
+    JORNADA_BLOCKS = blockTranslations[currentLang] || blockTranslations['pt-BR'] || [];
     window.JORNADA_BLOCKS = JORNADA_BLOCKS;
     log('JORNADA_BLOCKS preenchido:', JORNADA_BLOCKS);
     return true;
   } catch (error) {
     console.error('[JORNADA_PAPER] Erro ao preencher JORNADA_BLOCKS:', error);
     window.toast && window.toast('Erro ao carregar blocos de perguntas');
-    return false;
-  }
-}
-
-  try {
-    const currentLang = i18n.lang || 'pt-BR';
-    if (!blockTranslations || !blockTranslations[currentLang]) {
-      console.warn('[JORNADA_PAPER] blockTranslations não encontrado para', currentLang, 'usando fallback');
-      JORNADA_BLOCKS = blockTranslations['pt-BR'] || [];
-    } else {
-      JORNADA_BLOCKS = blockTranslations[currentLang];
-    }
-    window.JORNADA_BLOCKS = JORNADA_BLOCKS;
-    log('JORNADA_BLOCKS preenchido:', JORNADA_BLOCKS);
-    return true;
-  } catch (error) {
-    console.error('[JORNADA_PAPER] Erro ao preencher JORNADA_BLOCKS:', error);
     return false;
   }
 }
@@ -340,7 +321,7 @@ async function typePlaceholder(inp, text, speed = 22) {
     inp.placeholder = text.slice(0, i) + (i < text.length ? '▌' : '');
     await new Promise(r => setTimeout(r, speed));
   }
-    if (!abort) {
+  if (!abort) {
     inp.placeholder = text;
   }
   if (aria) {
