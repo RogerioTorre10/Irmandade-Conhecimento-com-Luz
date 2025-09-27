@@ -173,13 +173,43 @@ function initController(route = 'intro') {
     console.error(`[CONTROLLER] Seção inicial ${currentSection} não encontrada`);
   }
 
-  // Executar animação de digitação na inicialização
+  // Função para ler texto em voz alta
+  window.readText = window.readText || function(text, callback) {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'pt-BR'; // Idioma português brasileiro
+      utterance.rate = 1.0; // Velocidade padrão
+      utterance.pitch = 1.0; // Tom padrão
+      utterance.volume = 1.0; // Volume padrão
+      utterance.onend = () => {
+        log('Leitura concluída para:', text);
+        if (callback) callback();
+      };
+      utterance.onerror = (error) => {
+        console.error('[CONTROLLER] Erro na leitura:', error);
+      };
+      window.speechSynthesis.speak(utterance);
+      log('Iniciando leitura de:', text);
+    } else {
+      console.error('[CONTROLLER] API Web Speech não suportada neste navegador');
+    }
+  };
+
+  // Executar animação de digitação e leitura na inicialização
   if (window.runTyping) {
     const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]`);
     if (typingElements.length > 0) {
+      let completed = 0;
       typingElements.forEach((element, index) => {
         window.runTyping(element, () => {
+          completed++;
           log(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
+          // Ler o texto após a animação
+          const text = element.getAttribute('data-text') || element.textContent;
+          window.readText(text);
+          if (completed === typingElements.length) {
+            log('Todas as animações de digitação concluídas em', currentSection);
+          }
         });
       });
     } else {
@@ -203,6 +233,8 @@ function initController(route = 'intro') {
           element.classList.add('typing-done');
           element.classList.remove('lumen-typing');
           log('Animação de digitação concluída para:', text);
+          // Ler o texto após a animação
+          window.readText(text);
           if (callback) callback();
         }
       }
@@ -269,32 +301,4 @@ function initController(route = 'intro') {
 
   log('Controlador inicializado com sucesso');
 }
-
-// Aguardar inicialização do bootstrap
-document.addEventListener('bootstrapComplete', () => {
-  log('Bootstrap concluído, iniciando controlador');
-  initController('inicio');
-});
-
-// Fallback para inicialização direta (compatibilidade)
-document.addEventListener('DOMContentLoaded', () => {
-  if (!window.JC?.initialized) {
-    log('Fallback: Inicializando controlador via DOMContentLoaded');
-    initController('inicio');
-  }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  const avancarButton = document.querySelector('#section-inicio .btn-avancar, #section-inicio #iniciar, #section-inicio [data-action="avancar"]');
-  if (avancarButton) {
-    console.log('[DEBUG] Botão Avançar encontrado:', avancarButton);
-    avancarButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      console.log('[DEBUG] Clique no botão Avançar detectado');
-      window.goToNextSection();
-    });
-  } else {
-    console.error('[DEBUG] Botão Avançar não encontrado em #section-inicio');
-  }
-});
 
