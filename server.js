@@ -46,15 +46,10 @@ app.use(express.static(STATIC_DIR, {
 // Rota para arquivos de tradução (i18n)
 app.get("/i18n/:lang.json", async (req, res) => {
   const lang = req.params.lang;
-  const supportedLangs = ["pt-BR", "en-US", "es-ES"];
-  if (!supportedLangs.includes(lang)) {
-    console.warn(`[${new Date().toLocaleString()}] Idioma não suportado: ${lang}`);
-    return res.status(404).json({ error: `Idioma ${lang} não suportado` });
-  }
-
+  console.log(`[${new Date().toLocaleString()}] Servindo /i18n/${lang}.json`);
   const filePath = path.join(STATIC_DIR, "i18n", `${lang}.json`);
   try {
-    await fs.access(filePath); // Verifica se o arquivo existe
+    await fs.access(filePath);
     res.sendFile(filePath, (err) => {
       if (err) {
         console.error(`[${new Date().toLocaleString()}] Erro ao servir /i18n/${lang}.json:`, err);
