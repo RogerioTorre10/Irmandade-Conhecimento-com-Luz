@@ -1,13 +1,10 @@
-// /public/assets/js/jornada-type.js
-import i18n from './i18n.js'; // Ajuste o caminho conforme necessário
+import i18n from './i18n.js';
 
-// Evita redefinição
 if (window.JORNADA_TYPE) {
   console.log('[JORNADA_TYPE] Já carregado, ignorando');
   throw new Error('JORNADA_TYPE já carregado');
 }
 
-// Injeta estilo do cursor
 (function ensureStyle() {
   if (document.getElementById('typing-style')) return;
   const st = document.createElement('style');
@@ -30,15 +27,22 @@ let abortCurrent = null;
 function lock() {
   ACTIVE = true;
   window.__typingLock = true;
+  window.G = window.G || {};
+  window.G.__typingLock = true; // Compatibilidade com runTyping no HTML
 }
 
 function unlock() {
   ACTIVE = false;
   window.__typingLock = false;
+  window.G = window.G || {};
+  window.G.__typingLock = false;
 }
 
 async function typeNode(node, fullText, { speed = 18, delay = 0, showCaret = true, finalHTML = null } = {}) {
-  if (!node) return;
+  if (!node) {
+    log('Nó inválido para typeNode');
+    return;
+  }
   if (abortCurrent) abortCurrent();
   let abort = false;
   abortCurrent = () => (abort = true);
@@ -102,13 +106,18 @@ async function run(root, opts = {}) {
 
       await typeNode(n, text, { speed, delay, showCaret, finalHTML: dataHTML ? i18n.t(dataHTML) : null });
     }
+  } catch (e) {
+    console.error('[JORNADA_TYPE] Erro em run:', e);
   } finally {
     unlock();
   }
 }
 
 function typeIt(el, text, speed = 24) {
-  if (!el || !text) return;
+  if (!el || !text) {
+    log('Elemento ou texto inválido para typeIt');
+    return;
+  }
   el.classList.remove('typing-done');
   el.textContent = '';
   let i = 0;
@@ -134,11 +143,12 @@ const JORNADA_TYPE = {
   cancelAll,
   get locked() {
     return ACTIVE;
-  }
+  },
 };
 
 window.JORNADA_TYPE = JORNADA_TYPE;
-window.runTyping = run; // Para compatibilidade com jornada-paper-qa.js
+window.runTyping = run;
+window.TypeWriter = run; // Compatibilidade com jornada-typing-bridge.js
 
 log('Pronto');
 
