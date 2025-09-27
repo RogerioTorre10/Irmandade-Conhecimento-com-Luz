@@ -52,7 +52,7 @@
     SECTIONS: {
       "01-HEADER": "topo, nav, logo",
       "02-CHAMA": "variações sm/md/lg",
-      "03-PERGAMINHO": "vertical/horizontal (inicio/perguntas/final)",
+      "03-PERGAMINHO": "vertical/horizontal (intro/perguntas/final)",
       "04-DATILOGRAFIA": "Respire…, Bem-vindo, Pergunta 1",
       "05-PERGUNTAS": "layout, textarea, placeholders",
       "06-NAVEGAÇÃO": "Voltar/Próxima + listeners",
