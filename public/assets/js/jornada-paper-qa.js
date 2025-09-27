@@ -200,7 +200,7 @@ function buildForm(questions = []) {
 
 async function loadDynamicBlocks() {
   let attempts = 0;
-  const maxAttempts = 50;
+  const maxAttempts = 100;
   while (!i18n.ready && attempts < maxAttempts) {
     log('i18n não pronto, aguardando...');
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -213,7 +213,12 @@ async function loadDynamicBlocks() {
 
   try {
     const currentLang = i18n.lang || 'pt-BR';
-    JORNADA_BLOCKS = blockTranslations[currentLang] || blockTranslations['pt-BR'];
+    if (!blockTranslations || !blockTranslations[currentLang]) {
+      console.warn('[JORNADA_PAPER] blockTranslations não encontrado para', currentLang, 'usando fallback');
+      JORNADA_BLOCKS = blockTranslations['pt-BR'] || [];
+    } else {
+      JORNADA_BLOCKS = blockTranslations[currentLang];
+    }
     window.JORNADA_BLOCKS = JORNADA_BLOCKS;
     log('JORNADA_BLOCKS preenchido:', JORNADA_BLOCKS);
     return true;
@@ -229,6 +234,12 @@ async function renderQuestions() {
   if (!content) {
     console.error('[JORNADA_PAPER] Container de perguntas não encontrado');
     window.toast && window.toast('Erro ao carregar perguntas.');
+    return;
+  }
+
+  if (!JORNADA_BLOCKS || !Array.isArray(JORNADA_BLOCKS)) {
+    console.error('[JORNADA_PAPER] JORNADA_BLOCKS não está definido ou não é um array');
+    window.toast && window.toast('Erro ao carregar blocos de perguntas.');
     return;
   }
 
@@ -272,7 +283,12 @@ async function renderQuestions() {
     content.appendChild(bloco);
   });
 
-  i18n.apply(content);
+  if (i18n.ready) {
+    i18n.apply(content);
+  } else {
+    console.warn('[JORNADA_PAPER] i18n não pronto, pulando i18n.apply');
+  }
+
   const currentBloco = content.querySelector(`[data-bloco="${window.JC.currentBloco}"]`);
   if (currentBloco) {
     currentBloco.style.display = 'block';
