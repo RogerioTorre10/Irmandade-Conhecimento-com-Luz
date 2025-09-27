@@ -16,12 +16,11 @@ function playTypingAndSpeak(selectorOrElement) {
   if (typeof selectorOrElement === 'string') {
     selector = selectorOrElement;
   } else if (selectorOrElement instanceof HTMLElement) {
-    // Tenta usar id ou classe, ou gera um seletor único
     selector = selectorOrElement.id
       ? `#${selectorOrElement.id}`
       : selectorOrElement.className.split(' ')[0]
       ? `.${selectorOrElement.className.split(' ')[0]}`
-      : `[data-typing="true"]`; // Fallback genérico
+      : `[data-typing="true"]`;
     console.warn('[TypingBridge] Recebido elemento DOM, convertido para seletor:', selector);
   } else {
     console.error('[TypingBridge] Argumento inválido:', selectorOrElement);
@@ -35,17 +34,14 @@ function playTypingAndSpeak(selectorOrElement) {
       return;
     }
 
-    // Efeito de digitação
     if (typeof window.TypeWriter === 'function') {
       const tw = new window.TypeWriter(el, { speed: 22, cursor: false });
       tw.start && tw.start();
     } else {
       console.warn('[TypingBridge] window.TypeWriter não definido, pulando digitação');
-      // Fallback simples
       el.textContent = el.getAttribute('data-text') || el.textContent;
     }
 
-    // Síntese de voz
     if ('speechSynthesis' in window && el && el.textContent) {
       const utt = new SpeechSynthesisUtterance(el.textContent.trim());
       utt.lang = i18n.lang || 'pt-BR';
