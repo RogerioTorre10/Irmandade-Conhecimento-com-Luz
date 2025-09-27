@@ -13,7 +13,7 @@ const CFG = Object.assign({
 
   const VIDEO_BASE = CFG.VIDEO_BASE;
   window.JORNADA_VIDEOS = {
-    inicio: VIDEO_BASE + 'filme-0-ao-encontro-da-jornada.mp4',
+    intro: VIDEO_BASE + 'filme-0-ao-encontro-da-jornada.mp4',
     afterBlocks: {
       0: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
       1: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
