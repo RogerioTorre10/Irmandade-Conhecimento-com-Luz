@@ -771,6 +771,29 @@
   const HIDE_CLASS = 'hidden';
   let lastShowSection = 0;
 
+  function showSection(sectionId) {
+    console.log('[showSection] Exibindo seção:', sectionId);
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.classList.add('active');
+      section.classList.remove('hidden');
+      const textElements = section.querySelectorAll('[data-typing="true"]');
+      textElements.forEach(el => {
+        const selector = el.id ? `#${el.id}` : `.${el.className.split(' ')[0]}`;
+        window.runTyping(selector); // Passa seletor
+      });
+      console.log('[showSection] Iniciando runTyping para:', sectionId);
+      const button = section.querySelector('.btn.btn-avancar');
+      if (button) {
+        button.addEventListener('click', () => window.goToNextSection());
+        console.log('[showSection] Evento de clique adicionado ao botão avançar em:', sectionId, 'Botão:', button.className);
+      }
+    } else {
+      console.error('[showSection] Seção não encontrada:', sectionId);
+    }
+  }
+  showSection('section-intro');
+
   window.showSection = function(id) {
     const now = performance.now();
     if (now - lastShowSection < 500) {
