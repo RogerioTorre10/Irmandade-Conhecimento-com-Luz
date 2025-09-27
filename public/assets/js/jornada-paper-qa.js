@@ -199,17 +199,21 @@ function buildForm(questions = []) {
 }
 
 async function loadDynamicBlocks() {
-  let attempts = 0;
-  const maxAttempts = 100;
-  while (!i18n.ready && attempts < maxAttempts) {
-    log('i18n não pronto, aguardando...');
-    await new Promise(resolve => setTimeout(resolve, 100));
-    attempts++;
-  }
-  if (!i18n.ready) {
-    console.error('[JORNADA_PAPER] Falha: i18n não inicializado após', maxAttempts, 'tentativas');
+  try {
+    await i18n.waitForReady(10000); // Aguarda até 10s
+    if (!i18n.ready) throw new Error('i18n não inicializado');
+    const currentLang = i18n.lang || 'pt-BR';
+    if (!window.blockTranslations) throw new Error('blockTranslations não definido');
+    JORNADA_BLOCKS = window.blockTranslations[currentLang] || window.blockTranslations['pt-BR'] || [];
+    window.JORNADA_BLOCKS = JORNADA_BLOCKS;
+    log('JORNADA_BLOCKS preenchido:', JORNADA_BLOCKS);
+    return true;
+  } catch (error) {
+    console.error('[JORNADA_PAPER] Erro ao preencher JORNADA_BLOCKS:', error);
+    window.toast && window.toast('Erro ao carregar blocos de perguntas');
     return false;
   }
+}
 
   try {
     const currentLang = i18n.lang || 'pt-BR';
