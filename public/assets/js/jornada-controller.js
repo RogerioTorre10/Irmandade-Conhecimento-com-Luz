@@ -210,26 +210,28 @@ function initController(route = 'intro') {
   };
 
   // Executar animação de digitação e leitura na inicialização
-  if (window.runTyping) {
-    const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]`);
-    if (typingElements.length > 0) {
-      let completed = 0;
-      typingElements.forEach((element, index) => {
-        window.runTyping(element, () => {
-          completed++;
-          log(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
-          // Ler o texto após a animação
-          const text = element.getAttribute('data-text') || element.textContent;
-          window.readText(text);
-          if (completed === typingElements.length) {
-            log('Todas as animações de digitação concluídas em', currentSection);
-          }
-        });
+ // Executar animação de digitação e leitura na inicialização
+if (window.runTyping) {
+  const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]`);
+  if (typingElements.length > 0) {
+    let completed = 0;
+    typingElements.forEach((element, index) => {
+      const selector = element.id ? `#${element.id}` : `.${element.className.split(' ')[0]}`;
+      window.runTyping(selector, () => {
+        completed++;
+        log(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
+        const text = element.getAttribute('data-text') || element.textContent;
+        window.readText(text);
+        if (completed === typingElements.length) {
+          log('Todas as animações de digitação concluídas em', currentSection);
+        }
       });
-    } else {
-      log('Nenhum elemento de digitação encontrado em', currentSection);
-    }
+    });
   } else {
+    log('Nenhum elemento de digitação encontrado em', currentSection);
+  }
+  
+} else {
     log('window.runTyping não definido na inicialização, aplicando fallback');
     window.runTyping = function(element, callback) {
       const text = element.getAttribute('data-text') || '';
