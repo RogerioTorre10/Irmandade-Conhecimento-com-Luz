@@ -177,10 +177,10 @@ function initController(route = 'intro') {
   window.readText = window.readText || function(text, callback) {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'pt-BR'; // Idioma português brasileiro
-      utterance.rate = 1.0; // Velocidade padrão
-      utterance.pitch = 1.0; // Tom padrão
-      utterance.volume = 1.0; // Volume padrão
+      utterance.lang = 'pt-BR';
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
       utterance.onend = () => {
         log('Leitura concluída para:', text);
         if (callback) callback();
@@ -195,7 +195,7 @@ function initController(route = 'intro') {
     }
   };
 
-  // Executar animação de digitação e leitura na inicialização
+  // Executar animação de digitação na inicialização
   if (window.runTyping) {
     const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]`);
     if (typingElements.length > 0) {
@@ -204,9 +204,6 @@ function initController(route = 'intro') {
         window.runTyping(element, () => {
           completed++;
           log(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
-          // Ler o texto após a animação
-          const text = element.getAttribute('data-text') || element.textContent;
-          window.readText(text);
           if (completed === typingElements.length) {
             log('Todas as animações de digitação concluídas em', currentSection);
           }
@@ -233,8 +230,6 @@ function initController(route = 'intro') {
           element.classList.add('typing-done');
           element.classList.remove('lumen-typing');
           log('Animação de digitação concluída para:', text);
-          // Ler o texto após a animação
-          window.readText(text);
           if (callback) callback();
         }
       }
@@ -256,6 +251,19 @@ function initController(route = 'intro') {
       e.preventDefault();
       log('Botão avançar clicado:', button.id || button.className);
       debouncedGoNext();
+    });
+  });
+
+  // Inicializar botões de áudio
+  document.querySelectorAll('.btn-audio[data-action="read-text"]').forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      log('Botão de áudio clicado:', button.id || button.className);
+      const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]`);
+      typingElements.forEach(element => {
+        const text = element.getAttribute('data-text') || element.textContent;
+        window.readText(text);
+      });
     });
   });
 
