@@ -30,16 +30,6 @@ const i18n = {
     this.apply();
   },
 
-  const lang = navigator.language || 'pt-BR';
-// Exemplo de URL: /i18n/pt-BR.json
-fetch(`/i18n/${lang}.json`)
-  .then(resp => resp.json())
-  .then(dict => {
-    window.i18n = { lang, dict };
-    console.log('[i18n] Traduções carregadas:', lang);
-  })
-  .catch(err => console.error('[i18n] Erro ao carregar', err));
-
 
   async setLang(lang, applyAfter = true) {
     try {
