@@ -17,24 +17,17 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(express.static(STATIC_DIR, {
-  extensions: ['html'],
-  setHeaders: (res, filePath) => {
-    if (filePath.endsWith('.json')) res.type('application/json');
-    else if (filePath.endsWith('.js')) res.type('application/javascript');
+// Servir arquivos estáticos (incluindo .js e .json)
+app.use(express.static(STATIC_DIR, { 
+  extensions: ["html"],
+  setHeaders: (res, path) => {
+    if (path.endsWith('.json')) {
+      res.set('Content-Type', 'application/json');
+    } else if (path.endsWith('.js')) {
+      res.set('Content-Type', 'application/javascript');
+    }
   }
 }));
-
-app.get('/i18n/:lang.json', (req, res) => {
-  const filePath = path.join(STATIC_DIR, 'i18n', `${req.params.lang}.json`);
-  res.sendFile(filePath, err => {
-    if (err) {
-      console.error(`[i18n] Erro ao servir ${req.params.lang}.json`, err);
-      res.status(404).send('Arquivo de idioma não encontrado');
-    }
-  });
-});
-
 
 // Rota específica para arquivos JSON em /assets/js/i18n/ (se ainda estiver nesse caminho)
 app.get("/assets/js/i18n/:lang.json", (req, res) => {
@@ -47,7 +40,16 @@ app.get("/assets/js/i18n/:lang.json", (req, res) => {
   });
 });
 
-
+// Rota específica para /i18n/ (caminho padrão)
+app.get("/i18n/:lang.json", (req, res) => {
+  const filePath = path.join(STATIC_DIR, "i18n", `${req.params.lang}.json`);
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      console.error(`Erro ao servir /i18n/${req.params.lang}.json:`, err);
+      res.status(404).send('Arquivo não encontrado');
+    }
+  });
+});
 
 // Fallback: qualquer outra rota não encontrada → index.html
 app.get("*", (req, res) => {
