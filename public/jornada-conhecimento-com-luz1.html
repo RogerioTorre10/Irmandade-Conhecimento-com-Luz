@@ -49,8 +49,6 @@
       font-display: swap;
     }
 
-    :root { --bg:#1a1a1a; --ink:#000; --ink-soft:#555; --panel:#1a1a1a }
-
      html,body{height:100%;box-sizing:border-box}
     body{
       margin:0;color:#fff;background:var(--bg);
@@ -1308,40 +1306,6 @@
           setTimeout(cleanup,90000);
         }
         window.playTransition=playTransition;
-      
-      <!-- Guia Seleção -->
-<script>
-(function() {
-  window.JORNADA = window.JORNADA || {};
-  window.JORNADA.selectedGuia = window.JORNADA.selectedGuia || null;
-
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-action="select-guia"]');
-    if (btn) {
-      e.preventDefault();
-      const guia = btn.dataset.guia;
-      window.JORNADA.selectedGuia = guia;
-      console.log('[Guia] Guia selecionado:', guia);
-      const guideBg = document.getElementById('guideBg');
-      if (guideBg) {
-        guideBg.src = `/assets/img/irmandade-quarteto-bg-${guia}.png`;
-      }
-      const guideNameSlot = document.getElementById('guideNameSlot');
-      if (guideNameSlot) {
-        guideNameSlot.textContent = guia.charAt(0).toUpperCase() + guia.slice(1);
-      }
-      if (window.JC && window.playVideo) {
-        window.JC.nextSection = 'section-selfie';
-        window.playVideo('/assets/videos/conhecimento-com-luz-jardim.mp4');
-        console.log('[Guia] Reproduzindo vídeo transicao_selfie');
-      } else {
-        window.showSection && window.showSection('section-selfie');
-        console.log('[Guia] Navegação direta para section-selfie');
-      }
-    }
-  });
-  console.log('[Guia] Bloco carregado');
-})();
 
         /* ===== controle de orientação de vídeo ===== */
         function lockVideoOrientation(){
@@ -1553,8 +1517,9 @@
               sendChatMessage();
             }
           });
-        } 
-    /* vídeos & blocos */
+        }
+
+        /* vídeos & blocos */
         const VIDEO_BASE='/assets/img/';
         window.JORNADA_VIDEOS={
           intro:VIDEO_BASE+'filme-0-ao-encontro-da-jornada.mp4',
