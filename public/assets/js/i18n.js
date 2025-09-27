@@ -77,9 +77,9 @@ const i18n = {
 
   // Carrega idioma com retries
   async setLang(lang, applyAfter = true, retries = 3, delayMs = 500) {
-    const canon = canonicalize(lang);
-    const url = `/i18n/${canon}.json`;
-    let lastError = null;
+  const canon = canonicalize(lang);
+  const url = `/i18n/${canon}.json`;
+  console.log('[i18n] URL completa:', window.location.origin + url);
 
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
