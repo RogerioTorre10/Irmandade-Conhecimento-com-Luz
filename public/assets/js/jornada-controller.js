@@ -1,4 +1,3 @@
-// /assets/js/jornada-controller.js
 import { renderQuestions, loadVideo } from './jornada-paper-qa.js'; // Ajuste o caminho conforme necessário
 
 const log = (...args) => console.log('[CONTROLLER]', ...args);
@@ -7,7 +6,7 @@ let currentSection = 'section-inicio';
 const sections = [
   'section-inicio',
   'section-termos',
-  'section-senha',  // Mantido para compatibilidade com o código original
+  'section-senha',
   'section-guia',
   'section-selfie',
   'section-perguntas',
@@ -113,13 +112,21 @@ function goToNextSection() {
       }
     }
 
-    // Executar animação de digitação
+    // Executar animação de digitação e leitura automática
     if (window.runTyping) {
-      const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]`);
+      const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]:not(.hidden *)`);
       if (typingElements.length > 0) {
+        let completed = 0;
         typingElements.forEach((element, index) => {
           window.runTyping(element, () => {
+            completed++;
             log(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
+            // Ler o texto após a animação
+            const text = element.getAttribute('data-text') || element.textContent;
+            window.readText(text);
+            if (completed === typingElements.length) {
+              log('Todas as animações de digitação concluídas em', currentSection);
+            }
           });
         });
       } else {
@@ -195,7 +202,7 @@ function initController(route = 'intro') {
     }
   };
 
-  // Executar animação de digitação na inicialização
+  // Executar animação de digitação e leitura na inicialização
   if (window.runTyping) {
     const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]`);
     if (typingElements.length > 0) {
@@ -204,6 +211,9 @@ function initController(route = 'intro') {
         window.runTyping(element, () => {
           completed++;
           log(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
+          // Ler o texto após a animação
+          const text = element.getAttribute('data-text') || element.textContent;
+          window.readText(text);
           if (completed === typingElements.length) {
             log('Todas as animações de digitação concluídas em', currentSection);
           }
@@ -230,6 +240,8 @@ function initController(route = 'intro') {
           element.classList.add('typing-done');
           element.classList.remove('lumen-typing');
           log('Animação de digitação concluída para:', text);
+          // Ler o texto após a animação
+          window.readText(text);
           if (callback) callback();
         }
       }
@@ -251,19 +263,6 @@ function initController(route = 'intro') {
       e.preventDefault();
       log('Botão avançar clicado:', button.id || button.className);
       debouncedGoNext();
-    });
-  });
-
-  // Inicializar botões de áudio
-  document.querySelectorAll('.btn-audio[data-action="read-text"]').forEach(button => {
-    button.addEventListener('click', (e) => {
-      e.preventDefault();
-      log('Botão de áudio clicado:', button.id || button.className);
-      const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]`);
-      typingElements.forEach(element => {
-        const text = element.getAttribute('data-text') || element.textContent;
-        window.readText(text);
-      });
     });
   });
 
@@ -310,3 +309,16 @@ function initController(route = 'intro') {
   log('Controlador inicializado com sucesso');
 }
 
+// Aguardar inicialização do bootstrap
+document.addEventListener('bootstrapComplete', () => {
+  log('Bootstrap concluído, iniciando controlador');
+  initController('intro');
+});
+
+// Fallback para inicialização direta (compatibilidade)
+document.addEventListener('DOMContentLoaded', () => {
+  if (!window.JC?.initialized) {
+    log('Fallback: Inicializando controlador via DOMContentLoaded');
+    initController('intro');
+  }
+});
