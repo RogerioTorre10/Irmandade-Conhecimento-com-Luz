@@ -1519,7 +1519,92 @@
               sendChatMessage();
             }
           });
+        }<!-- Vídeo Transição -->
+  <script>
+  (function() {
+    window.playVideo = function(videoSrc) {
+      const overlay = document.getElementById('videoOverlay');
+      const video = document.getElementById('videoTransicao');
+      const fallback = document.getElementById('videoFallback');
+      if (!overlay || !video) {
+        console.error('[playVideo] Elementos de vídeo não encontrados');
+        window.toast && window.toast('Erro ao reproduzir vídeo.');
+        return;
+      }
+      video.src = videoSrc;
+      video.onended = () => {
+        overlay.classList.add('hidden');
+        video.src = '';
+        window.JC && window.JC.goNext && window.JC.goNext();
+      };
+      video.onerror = () => {
+        fallback.classList.remove('hidden');
+        video.classList.add('hidden');
+        setTimeout(() => {
+          overlay.classList.add('hidden');
+          fallback.classList.add('hidden');
+          video.classList.remove('hidden');
+          window.JC && window.JC.goNext && window.JC.goNext();
+        }, 3000);
+      };
+      overlay.classList.remove('hidden');
+      video.play().catch(e => {
+        console.error('[playVideo] Erro ao reproduzir vídeo:', e);
+        fallback.classList.remove('hidden');
+        video.classList.add('hidden');
+      });
+      console.log('[playVideo] Reproduzindo vídeo:', videoSrc);
+    };
+
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('#skipVideo');
+      if (btn) {
+        const overlay = document.getElementById('videoOverlay');
+        const video = document.getElementById('videoTransicao');
+        if (overlay && video) {
+          video.pause();
+          video.src = '';
+          overlay.classList.add('hidden');
+          window.JC && window.JC.goNext && window.JC.goNext();
         }
+      }
+    });
+    console.log('[Video] Bloco carregado');
+  })();
+  </script>
+
+  <!-- Guia Seleção -->
+  <script>
+  (function() {
+    window.JORNADA = window.JORNADA || {};
+    window.JORNADA.selectedGuia = window.JORNADA.selectedGuia || null;
+
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-action="select-guia"]');
+      if (btn) {
+        e.preventDefault();
+        const guia = btn.dataset.guia;
+        window.JORNADA.selectedGuia = guia;
+        console.log('[Guia] Guia selecionado:', guia);
+        const guideBg = document.getElementById('guideBg');
+        if (guideBg) {
+          guideBg.src = `/assets/img/irmandade-quarteto-bg-${guia}.png`;
+        }
+        const guideNameSlot = document.getElementById('guideNameSlot');
+        if (guideNameSlot) {
+          guideNameSlot.textContent = guia.charAt(0).toUpperCase() + guia.slice(1);
+        }
+        if (window.playVideo) {
+          window.playVideo('/assets/videos/conhecimento-com-luz-jardim.mp4');
+        } else if (window.showSection) {
+          window.showSection('section-selfie');
+        }
+      }
+    });
+    console.log('[Guia] Bloco carregado');
+  })();
+  </script>
+      
 
         /* vídeos & blocos */
         const VIDEO_BASE='/assets/img/';
