@@ -1,7 +1,7 @@
 // jornada-paper-qa.js
 'use strict';
 
-import .i18n from './i18n.js';
+import i18n from './i18n.js';
 
 const CFG = Object.assign({
   CANVAS_ID: 'jornada-canvas',
