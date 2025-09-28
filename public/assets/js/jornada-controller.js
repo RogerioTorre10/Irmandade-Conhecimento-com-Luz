@@ -76,104 +76,102 @@ async function goToNextSection() {
         currentSection = JC.nextSection && sections.includes(JC.nextSection) ? JC.nextSection : sections[currentIdx + 1];
         log(`Tentando navegar de ${previousSection} para ${currentSection}`);
 
-    const prevElement = document.querySelector(`#${previousSection}`);
-    if (prevElement) {
-      prevElement.classList.remove('active');
-      prevElement.classList.add('hidden');
-      log(`Seção anterior ${previousSection} ocultada`);
-    } else {
-      console.error(`[CONTROLLER] Seção anterior ${previousSection} não encontrada`);
-    }
+        const prevElement = document.querySelector(`#${previousSection}`);
+        if (prevElement) {
+            prevElement.classList.remove('active');
+            prevElement.classList.add('hidden');
+            log(`Seção anterior ${previousSection} ocultada`);
+        } else {
+            console.error(`[CONTROLLER] Seção anterior ${previousSection} não encontrada`);
+        }
 
-    const nextElement = document.querySelector(`#${currentSection}`);
-    if (nextElement) {
-      nextElement.classList.add('active');
-      nextElement.classList.remove('hidden');
-      log(`Seção ${currentSection} exibida`);
-    } else {
-      console.error(`[CONTROLLER] Seção ${currentSection} não encontrada`);
-      return;
-    }
-
-    if (currentSection === 'section-termos') {
-      const termosPg1 = document.getElementById('termos-pg1');
-      const termosPg2 = document.getElementById('termos-pg2');
-      if (termosPg1 && !termosPg1.classList.contains('hidden')) {
-        termosPg1.classList.remove('hidden');
-        termosPg2.classList.add('hidden');
-        log('Exibindo termos-pg1');
-        window.runTyping && window.runTyping('#termos-pg1');
-        return;
-      }
-    } else if (currentSection === 'section-guia') {
-    try {
-        loadVideo('/assets/img/conhecimento-com-luz-jardim.mp4'); // Use import
-        log('Vídeo do guia carregado');
-    } catch (error) {
-        console.error('[CONTROLLER] Erro ao carregar vídeo do guia:', error);
-        window.showSection && window.showSection('section-guia');
-    }
-} else if (currentSection === 'section-selfie') {
-    try {
-        loadVideo('/assets/img/filme-0-ao-encontro-da-jornada.mp4'); // Use import
-        log('Vídeo da selfie carregado');
-    } catch (error) {
-        console.error('[CONTROLLER] Erro ao carregar vídeo da selfie:', error);
-        window.showSection && window.showSection('section-selfie');
-    }
-}
-   } else if (currentSection === 'section-perguntas') {
-    try {
-        await i18n.waitForReady(10000);
-        if (!i18n.ready) throw new Error('i18n não inicializado');
-        answeredQuestions.clear();
-        JC.currentBloco = 0;
-        JC.currentPergunta = 0;
-        renderQuestions();
-        window.perguntasLoaded = true;
-        log('Perguntas carregadas e renderizadas');
-    } catch (error) {
-        console.error('[CONTROLLER] Erro ao renderizar perguntas:', error.message);
-        window.toast && window.toast(`Erro ao carregar perguntas: ${error.message}`);
-    }
-}
-    } else if (currentSection === 'section-final') {
-      log('Jornada concluída! 🎉');
-      if (window.JORNADA_FINAL_VIDEO && window.playVideo) {
-        window.playVideo(window.JORNADA_FINAL_VIDEO);
-        log('Vídeo final carregado');
-      }
-    }
-
-    if (window.runTyping) {
-      const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]:not(.hidden)`);
-      if (typingElements.length > 0) {
-        let completed = 0;
-        typingElements.forEach((element, index) => {
-          if (!element || !element.className) {
-            console.warn('[CONTROLLER] Elemento sem classe ou inválido:', element);
+        const nextElement = document.querySelector(`#${currentSection}`);
+        if (nextElement) {
+            nextElement.classList.add('active');
+            nextElement.classList.remove('hidden');
+            log(`Seção ${currentSection} exibida`);
+        } else {
+            console.error(`[CONTROLLER] Seção ${currentSection} não encontrada`);
             return;
-          }
-          const selector = element.id ? `#${element.id}` : `.${element.className.split(' ')[0] || 'text'}`;
-          window.runTyping(selector, () => {
-            completed++;
-            log(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
-            const text = element.getAttribute('data-text') || element.textContent;
-            window.speak && window.speak(text);
-            if (completed === typingElements.length) {
-              log('Todas as animações de digitação concluídas em', currentSection);
+        }
+
+        if (currentSection === 'section-termos') {
+            const termosPg1 = document.getElementById('termos-pg1');
+            const termosPg2 = document.getElementById('termos-pg2');
+            if (termosPg1 && !termosPg1.classList.contains('hidden')) {
+                termosPg1.classList.remove('hidden');
+                termosPg2.classList.add('hidden');
+                log('Exibindo termos-pg1');
+                window.runTyping && window.runTyping('#termos-pg1', () => log('Digitação de termos-pg1 concluída'));
+                return;
             }
-          });
-        });
-      } else {
-        log('Nenhum elemento de digitação encontrado em', currentSection);
-      }
+        } else if (currentSection === 'section-guia') {
+            try {
+                loadVideo('/public/assets/img/conhecimento-com-luz-jardim.mp4'); // Caminho ajustado
+                log('Vídeo do guia carregado');
+            } catch (error) {
+                console.error('[CONTROLLER] Erro ao carregar vídeo do guia:', error);
+                window.showSection && window.showSection('section-guia');
+            }
+        } else if (currentSection === 'section-selfie') {
+            try {
+                loadVideo('/public/assets/img/filme-0-ao-encontro-da-jornada.mp4'); // Caminho ajustado
+                log('Vídeo da selfie carregado');
+            } catch (error) {
+                console.error('[CONTROLLER] Erro ao carregar vídeo da selfie:', error);
+                window.showSection && window.showSection('section-selfie');
+            }
+        } else if (currentSection === 'section-perguntas') {
+            try {
+                await i18n.waitForReady(10000);
+                if (!i18n.ready) throw new Error('i18n não inicializado');
+                answeredQuestions.clear();
+                JC.currentBloco = 0;
+                JC.currentPergunta = 0;
+                renderQuestions();
+                window.perguntasLoaded = true;
+                log('Perguntas carregadas e renderizadas');
+            } catch (error) {
+                console.error('[CONTROLLER] Erro ao renderizar perguntas:', error.message);
+                window.toast && window.toast(`Erro ao carregar perguntas: ${error.message}`);
+            }
+        } else if (currentSection === 'section-final') {
+            log('Jornada concluída! 🎉');
+            if (window.JORNADA_FINAL_VIDEO && loadVideo) { // Substituído playVideo por loadVideo
+                loadVideo(window.JORNADA_FINAL_VIDEO);
+                log('Vídeo final carregado');
+            }
+        }
+
+        if (window.runTyping) {
+            const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]:not(.hidden)`);
+            if (typingElements.length > 0) {
+                let completed = 0;
+                typingElements.forEach((element, index) => {
+                    if (!element || !element.className) {
+                        console.warn('[CONTROLLER] Elemento sem classe ou inválido:', element);
+                        return;
+                    }
+                    const selector = element.id ? `#${element.id}` : `.${element.className.split(' ')[0] || 'text'}`;
+                    window.runTyping(selector, () => {
+                        completed++;
+                        log(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
+                        const text = element.getAttribute('data-text') || element.textContent;
+                        window.readText && window.readText(text); // Substituído speak por readText
+                        if (completed === typingElements.length) {
+                            log('Todas as animações de digitação concluídas em', currentSection);
+                        }
+                    });
+                });
+            } else {
+                log('Nenhum elemento de digitação encontrado em', currentSection);
+            }
+        } else {
+            log('window.runTyping não definido');
+        }
     } else {
-      log('window.runTyping não definido');
+        log('Nenhuma seção seguinte disponível. Jornada finalizada.');
     }
-  } else {
-    log('Nenhuma seção seguinte disponível. Jornada finalizada.');
-  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
