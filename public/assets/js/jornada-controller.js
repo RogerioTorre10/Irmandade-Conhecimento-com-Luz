@@ -353,24 +353,25 @@ function initController(route = 'intro') {
 }
 
 document.addEventListener('bootstrapComplete', () => {
-  log('Bootstrap concluído, aguardando i18n...');
-  i18n.init().then(() => {
-    log('i18n pronto, iniciando controlador');
-    initController('intro');
-  }).catch(err => {
-    console.error('[CONTROLLER] Erro ao aguardar i18n:', err);
-    initController('intro');
-  });
+    log('Bootstrap concluído, aguardando i18n...');
+    i18n.init().then(() => {
+        log('i18n pronto, iniciando controlador');
+        initController('intro');
+    }).catch(err => {
+        console.error('[CONTROLLER] Erro ao aguardar i18n:', err.message);
+        log('Prosseguindo com i18n em modo fallback');
+        initController('intro');  // Força init
+    });
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (!window.JC?.initialized) {
-    log('Fallback: Inicializando controlador via DOMContentLoaded');
-    i18n.init().then(() => {
-      initController('intro');
-    }).catch(err => {
-      console.error('[CONTROLLER] Erro ao aguardar i18n:', err);
-      initController('intro');
-    });
-  }
+    if (!window.JC?.initialized) {
+        log('Fallback: Inicializando controlador via DOMContentLoaded');
+        i18n.init().then(() => {
+            initController('intro');
+        }).catch(err => {
+            console.error('[CONTROLLER] Erro ao aguardar i18n:', err.message);
+            initController('intro');  // Força init
+        });
+    }
 });
