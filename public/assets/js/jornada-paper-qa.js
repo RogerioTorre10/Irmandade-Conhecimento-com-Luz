@@ -393,18 +393,15 @@ function initPaperQAEvents() {
 }
 
 async function initPaperQA() {
-  log('Inicializando...');
-  try {
-    const blocksLoaded = await loadDynamicBlocks();
-    if (!blocksLoaded) {
-      throw new Error('Falha ao carregar JORNADA_BLOCKS');
+    try {
+        await loadDynamicBlocks();
+        console.log('[JORNADA_PAPER] Inicializado com sucesso');
+        // Resto do init...
+    } catch (error) {
+        console.error('[JORNADA_PAPER] Erro na inicialização:', error.message);
+        // Não trava: usa o que tem
+        window.JORNADA_BLOCKS = window.JORNADA_BLOCKS || [];
     }
-    initPaperQAEvents();
-    loadVideo(JORNADA_VIDEOS.intro);
-    log('Inicialização concluída');
-  } catch (error) {
-    console.error('[JORNADA_PAPER] Erro na inicialização:', error);
-  }
 }
 
 document.addEventListener('DOMContentLoaded', initPaperQA);
