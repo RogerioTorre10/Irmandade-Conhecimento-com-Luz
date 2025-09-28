@@ -1,4 +1,3 @@
-// server.js
 const path = require("path");
 const express = require("express");
 const cors = require("cors");
@@ -11,54 +10,43 @@ const STATIC_DIR = path.join(__dirname, "public");
 // Utilitário de log com timestamp
 const log = (...args) => console.log(`[${new Date().toLocaleString()}]`, ...args);
 
-// Configuração de CORS
+// CORS liberado para origens confiáveis
 app.use(cors({
-  origin: (origin, callback) => {
-    const allowedOrigins = [
-      "http://localhost:3000",
-      "http://localhost:5173",
-      "https://irmandade-conhecimento-com-luz.onrender.com",
-    ];
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Origem não permitida pelo CORS"));
-    }
-  },
+  origin: [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://irmandade-conhecimento-com-luz.onrender.com"
+  ],
   credentials: true,
 }));
 
-// Middleware para logging de requisições
+// Logging de requisições
 app.use((req, res, next) => {
   log(`${req.method} ${req.url}`);
   next();
 });
 
-// Servir arquivos estáticos
+// Servir arquivos estáticos da pasta public
 app.use(express.static(STATIC_DIR, {
   extensions: ["html"],
   setHeaders: (res, filePath) => {
-    if (filePath.endsWith(".json")) {
-      res.set("Content-Type", "application/json");
-    } else if (filePath.endsWith(".js")) {
-      res.set("Content-Type", "application/javascript");
-    } else if (filePath.endsWith(".mp4")) {
-      res.set("Content-Type", "video/mp4");
-    }
+    if (filePath.endsWith(".json")) res.set("Content-Type", "application/json");
+    if (filePath.endsWith(".js")) res.set("Content-Type", "application/javascript");
+    if (filePath.endsWith(".mp4")) res.set("Content-Type", "video/mp4");
   },
 }));
 
-// Rota para arquivos de tradução (i18n) com fallback para pt-BR
-app.get("/i18n/:lang.json", async (req, res) => {
+// Rota para arquivos de tradução i18n dentro de /assets/js/i18n/
+app.get("/assets/js/i18n/:lang.json", async (req, res) => {
   const lang = req.params.lang;
-  const filePath = path.join(STATIC_DIR, "i18n", `${lang}.json`);
+  const filePath = path.join(STATIC_DIR, "assets", "js", "i18n", `${lang}.json`);
   try {
     await fs.access(filePath);
-    log(`Servindo /i18n/${lang}.json`);
+    log(`Servindo /assets/js/i18n/${lang}.json`);
     res.sendFile(filePath);
   } catch (err) {
     log(`Arquivo de tradução ${lang}.json não encontrado`);
-    const fallbackPath = path.join(STATIC_DIR, "i18n", "pt-BR.json");
+    const fallbackPath = path.join(STATIC_DIR, "assets", "js", "i18n", "pt-BR.json");
     try {
       await fs.access(fallbackPath);
       log(`Servindo fallback pt-BR.json`);
@@ -72,7 +60,7 @@ app.get("/i18n/:lang.json", async (req, res) => {
   }
 });
 
-// Fallback para rotas não encontradas
+// Fallback para SPA
 app.get("*", async (req, res) => {
   const fallbackPath = path.join(STATIC_DIR, "jornada-conhecimento-com-luz1.html");
   try {
@@ -88,7 +76,7 @@ app.get("*", async (req, res) => {
 
 // Inicialização do servidor
 app.listen(PORT, () => {
-  log(`🚀 Servidor no ar na porta ${PORT}`);
+  log(`🚀 Servidor rodando na porta ${PORT}`);
 });
 
 // Tratamento de erros gerais
