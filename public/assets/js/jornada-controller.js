@@ -4,9 +4,9 @@ import i18n from './i18n.js';
 const log = (...args) => console.log('[CONTROLLER]', ...args);
 
 log('Dependências iniciais:', {
-  runTyping: !!window.runTyping,
-  renderQuestions: !!window.renderQuestions,
-  loadVideo: !!window.loadVideo,
+    runTyping: !!window.runTyping,
+    renderQuestions: !!renderQuestions, // Note que é importado, não window
+    loadVideo: !!loadVideo // Note que é importado, não window
 });
 
 const sections = [
@@ -51,19 +51,18 @@ function processQueue() {
 }
 
 function debounceClick(callback, wait = 500) {
-  return (...args) => {
-    if (isProcessingClick) {
-      log('Clique ignorado (debounce ativo)');
-      return;
-    }
-    isProcessingClick = true;
-    setTimeout(() => {
-      isProcessingClick = false;
-    }, wait);
-    callback(...args);
-  };
+    return (...args) => {
+        if (isProcessingClick) {
+            log('Clique ignorado (debounce ativo)');
+            return;
+        }
+        isProcessingClick = true;
+        setTimeout(() => {
+            isProcessingClick = false;
+        }, wait);
+        callback(...args);
+    };
 }
-
 
 
 async function goToNextSection() {
