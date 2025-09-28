@@ -207,6 +207,8 @@ function initController(route = 'intro') {
     init: () => log('JC init chamado (já inicializado)'),
     goNext: goToNextSection,
   };
+    log('window.JC inicializado com goNext definido!');  // Novo log pra debug
+     
   window.__currentSectionId = route === 'intro' ? 'section-intro' : route;
   window.perguntasLoaded = false;
 
