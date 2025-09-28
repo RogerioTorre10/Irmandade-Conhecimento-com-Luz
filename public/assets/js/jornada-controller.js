@@ -1,8 +1,6 @@
 import { renderQuestions, loadVideo } from './jornada-paper-qa.js';
 import i18n from './i18n.js';
 
-const log = (...args) => console.log('[CONTROLLER]', ...args);
-
 log('Dependências iniciais:', {
   runTyping: !!window.runTyping,
   renderQuestions: !!window.renderQuestions,
@@ -17,11 +15,23 @@ const sections = [
   'section-guia',
   'section-selfie',
   'section-perguntas',
-  'section-final',
+  'section-final'
 ];
-let answeredQuestions = new Set();
-let isProcessingClick = false;
-let queue = [];
+let currentSection = 'section-intro';
+const answeredQuestions = new Set();
+let currentBloco = 0;
+let currentPergunta = 0;
+
+const log = (...args) => console.log('[CONTROLLER]', ...args);
+
+const JC = {
+  currentBloco,
+  currentPergunta,
+  nextSection: null,
+  goNext: () => goToNextSection()
+};
+
+window.JC = JC;
 
 function enqueueAction(action) {
   queue.push(action);
@@ -53,12 +63,14 @@ function debounceClick(callback, wait = 500) {
   };
 }
 
+
+
 async function goToNextSection() {
   const currentIdx = sections.indexOf(currentSection);
   log('Índice atual:', currentIdx, 'Seção atual:', currentSection);
   if (currentIdx < sections.length - 1) {
     const previousSection = currentSection;
-    currentSection = sections[currentIdx + 1];
+    currentSection = JC.nextSection || sections[currentIdx + 1];
     log(`Tentando navegar de ${previousSection} para ${currentSection}`);
 
     const prevElement = document.querySelector(`#${previousSection}`);
@@ -92,7 +104,10 @@ async function goToNextSection() {
     } else if (currentSection === 'section-perguntas') {
       try {
         await i18n.waitForReady(10000);
+        if (!i18n.ready) throw new Error('i18n não inicializado');
         answeredQuestions.clear();
+        JC.currentBloco = 0;
+        JC.currentPergunta = 0;
         renderQuestions();
         window.perguntasLoaded = true;
         log('Perguntas carregadas e renderizadas');
@@ -102,10 +117,17 @@ async function goToNextSection() {
       }
     } else if (currentSection === 'section-guia') {
       try {
-        loadVideo('/path/to/guia-video.mp4');
+        window.playVideo('/assets/img/conhecimento-com-luz-jardim.mp4');
         log('Vídeo do guia carregado');
       } catch (error) {
         console.error('[CONTROLLER] Erro ao carregar vídeo do guia:', error);
+      }
+    } else if (currentSection === 'section-selfie') {
+      try {
+        window.playVideo('/assets/img/filme-0-ao-encontro-da-jornada.mp4');
+        log('Vídeo da selfie carregado');
+      } catch (error) {
+        console.error('[CONTROLLER] Erro ao carregar vídeo da selfie:', error);
       }
     } else if (currentSection === 'section-final') {
       log('Jornada concluída! 🎉');
@@ -116,17 +138,21 @@ async function goToNextSection() {
       }
     }
 
-    if (window.runTyping) {
-      const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]:not(.hidden *)`);
+  if (window.runTyping) {
+      const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]:not(.hidden)`);
       if (typingElements.length > 0) {
         let completed = 0;
         typingElements.forEach((element, index) => {
-          const selector = element.id ? `#${element.id}` : `.${element.className.split(' ')[0]}`;
+          if (!element || !element.className) {
+            console.warn('[CONTROLLER] Elemento sem classe ou inválido:', element);
+            return;
+          }
+          const selector = element.id ? `#${element.id}` : `.${element.className.split(' ')[0] || 'text'}`;
           window.runTyping(selector, () => {
             completed++;
             log(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
             const text = element.getAttribute('data-text') || element.textContent;
-            window.readText(text);
+            window.speak && window.speak(text);
             if (completed === typingElements.length) {
               log('Todas as animações de digitação concluídas em', currentSection);
             }
@@ -142,6 +168,11 @@ async function goToNextSection() {
     log('Nenhuma seção seguinte disponível. Jornada finalizada.');
   }
 }
+document.addEventListener('DOMContentLoaded', () => {
+  log('Inicializando controlador...');
+  window.JC = JC;
+  console.log('[CONTROLLER] Controlador inicializado com sucesso');
+});
 
 function initController(route = 'intro') {
   log('Inicializando controlador...');
