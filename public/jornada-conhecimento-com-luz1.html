@@ -7,27 +7,24 @@
   <link rel="icon" href="/assets/img/perfil-da-irmandade.png" type="image/png">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/i18next@25.5.2/dist/umd/i18next.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next-browser-languagedetector/8.2.0/i18nextBrowserLanguageDetector.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next-http-backend/3.0.2/i18nextHttpBackend.min.js"></script>
   <script src="https://unpkg.com/typewriter-effect@latest/dist/core.js"></script>
     
-<script type="module" src="/assets/js/i18n.js?v=6" onload="console.log('[LOAD] i18n.js carregado')" onerror="console.error('[LOAD] Erro ao carregar i18n.js')"></script>
-<script defer src="/assets/js/config.js?v=6" onload="console.log('[LOAD] config.js carregado')" onerror="console.error('[LOAD] Erro ao carregar config.js')"></script>
-<script defer src="/assets/js/jornada-utils.js?v=6" onload="console.log('[LOAD] jornada-utils.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-utils.js')"></script>
-<script defer src="/assets/js/jornada-core.js?v=6" onload="console.log('[LOAD] jornada-core.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-core.js')"></script>
-<script type="module" src="/assets/js/jornada-typing.js?v=6" onload="console.log('[LOAD] jornada-typing.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-typing.js')"></script>
-<script type="module" src="/assets/js/jornada-typing-bridge.js?v=1" onload="console.log('[LOAD] jornada-typing-bridge.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-typing-bridge.js')"></script>
-<script type="module" src="/assets/js/jornada-controller.js?v=6" onload="console.log('[LOAD] jornada-controller.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-controller.js')"></script>
-<script type="module" src="/assets/js/jornada-bootstrap.js?v=6" onload="console.log('[LOAD] jornada-bootstrap.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-bootstrap.js')"></script>
-<script type="module" src="/assets/js/jornada-paper-qa.js?v=6" onload="console.log('[LOAD] jornada-paper-qa.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-paper-qa.js')"></script>
-<script defer src="/assets/js/toast-safe.js?v=6" onload="console.log('[LOAD] toast-safe.js carregado')" onerror="console.error('[LOAD] Erro ao carregar toast-safe.js')"></script>
-<script defer src="/assets/js/jornada-shims.js?v=6" onload="console.log('[LOAD] jornada-shims.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-shims.js')"></script>
-<script defer src="/assets/js/jornada-chama.js?v=6" onload="console.log('[LOAD] jornada-chama.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-chama.js')"></script>
-<script defer src="/assets/js/jornada-auth.js?v=6" onload="console.log('[LOAD] jornada-auth.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-auth.js')"></script>
-<script defer src="/assets/js/jornada-render.js?v=6" onload="console.log('[LOAD] jornada-render.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-render.js')"></script>
-<script defer src="/assets/js/jornada-micro.js?v=6" onload="console.log('[LOAD] jornada-micro.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-micro.js')"></script>
-<script defer src="/assets/js/api.js?v=6" onload="console.log('[LOAD] api.js carregado')" onerror="console.error('[LOAD] Erro ao carregar api.js')"></script>
+  <script type="module" src="/assets/js/i18n.js?v=6" onload="console.log('[LOAD] i18n.js carregado')" onerror="console.error('[LOAD] Erro ao carregar i18n.js')"></script>
+  <script defer src="/assets/js/config.js?v=6" onload="console.log('[LOAD] config.js carregado')" onerror="console.error('[LOAD] Erro ao carregar config.js')"></script>
+  <script defer src="/assets/js/jornada-utils.js?v=6" onload="console.log('[LOAD] jornada-utils.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-utils.js')"></script>
+  <script defer src="/assets/js/jornada-core.js?v=6" onload="console.log('[LOAD] jornada-core.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-core.js')"></script>
+  <script type="module" src="/assets/js/jornada-typing.js?v=6" onload="console.log('[LOAD] jornada-typing.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-typing.js')"></script>
+  <script type="module" src="/assets/js/jornada-typing-bridge.js?v=1" onload="console.log('[LOAD] jornada-typing-bridge.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-typing-bridge.js')"></script>
+  <script type="module" src="/assets/js/jornada-controller.js?v=6" onload="console.log('[LOAD] jornada-controller.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-controller.js')"></script>
+  <script type="module" src="/assets/js/jornada-bootstrap.js?v=6" onload="console.log('[LOAD] jornada-bootstrap.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-bootstrap.js')"></script>
+  <script type="module" src="/assets/js/jornada-paper-qa.js?v=6" onload="console.log('[LOAD] jornada-paper-qa.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-paper-qa.js')"></script>
+  <script defer src="/assets/js/toast-safe.js?v=6" onload="console.log('[LOAD] toast-safe.js carregado')" onerror="console.error('[LOAD] Erro ao carregar toast-safe.js')"></script>
+  <script defer src="/assets/js/jornada-shims.js?v=6" onload="console.log('[LOAD] jornada-shims.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-shims.js')"></script>
+  <script defer src="/assets/js/jornada-chama.js?v=6" onload="console.log('[LOAD] jornada-chama.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-chama.js')"></script>
+  <script defer src="/assets/js/jornada-auth.js?v=6" onload="console.log('[LOAD] jornada-auth.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-auth.js')"></script>
+  <script defer src="/assets/js/jornada-render.js?v=6" onload="console.log('[LOAD] jornada-render.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-render.js')"></script>
+  <script defer src="/assets/js/jornada-micro.js?v=6" onload="console.log('[LOAD] jornada-micro.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-micro.js')"></script>
+  <script defer src="/assets/js/api.js?v=6" onload="console.log('[LOAD] api.js carregado')" onerror="console.error('[LOAD] Erro ao carregar api.js')"></script>
 
   <style>
     @font-face {
