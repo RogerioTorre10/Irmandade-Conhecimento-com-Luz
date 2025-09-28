@@ -591,17 +591,17 @@
       }
       window.speak && window.speak('');
 
-      const hasTermos = document.getElementById('section-termos');
-      if (!hasTermos) {
-        console.error('[startJourney] Seção section-termos não encontrada');
-        window.toast && window.toast('Seção de termos não encontrada.');
+      const hasGuia = document.getElementById('section-guia');
+      if (!hasGuia) {
+        console.error('[startJourney] Seção section-guia não encontrada');
+        window.toast && window.toast('Seção de guia não encontrada.');
         return;
       }
 
       if (window.JC) {
-        window.JC.nextSection = 'section-termos';
-        window.showSection && window.showSection('section-termos');
-        log('[startJourney] Navegação para section-termos');
+        window.JC.nextSection = 'section-guia';
+        window.playVideo('/assets/img/conhecimento-com-luz-jardim.mp4');
+        log('[startJourney] Reproduzindo vídeo conhecimento-com-luz-jardim antes de section-guia');
       } else {
         console.error('[startJourney] window.JC não definido');
         window.toast && window.toast('Erro ao inicializar jornada. Tente recarregar a página.');
@@ -635,6 +635,7 @@
         }
         all.forEach(s => s.classList.add(HIDE_CLASS));
         target.classList.remove(HIDE_CLASS);
+        target.classList.add('active');
         window.__currentSectionId = id;
         console.log('[showSection] Exibindo seção:', id);
 
@@ -669,12 +670,18 @@
                 'click',
                 (e) => {
                   e.preventDefault();
-                  if (window.JC && window.JC.goNext) window.JC.goNext();
+                  console.log('[showSection] Botão clicado:', btn.id || btn.className);
+                  if (window.JC && window.JC.goNext) {
+                    window.JC.goNext();
+                  } else {
+                    console.error('[showSection] window.JC.goNext não definido');
+                    window.toast && window.toast('Erro ao navegar. Tente recarregar.');
+                  }
                 },
                 { once: true }
               );
               btn.dataset.clickAttached = '1';
-              console.log('[showSection] Evento de clique adicionado ao botão avançar em:', id, 'Botão:', btn.id || btn.className);
+              console.log('[showSection] Evento de clique adicionado ao botão em:', id, 'Botão:', btn.id || btn.className);
             }
           });
         }, 100);
@@ -838,8 +845,8 @@
         }
         if (window.JC && window.playVideo) {
           window.JC.nextSection = 'section-selfie';
-          window.playVideo('/assets/img/conhecimento-com-luz-jardim.mp4');
-          console.log('[Guia] Reproduzindo vídeo conhecimento-com-luz-jardim antes de section-selfie');
+          window.playVideo('/assets/img/filme-0-ao-encontro-da-jornada.mp4');
+          console.log('[Guia] Reproduzindo vídeo filme-0-ao-encontro-da-jornada antes de section-selfie');
         } else {
           window.showSection && window.showSection('section-selfie');
           console.log('[Guia] Navegação direta para section-selfie');
@@ -1008,6 +1015,7 @@
         blocks.forEach((block, bIdx) => {
           const bloco = document.createElement('div');
           bloco.className = 'j-bloco';
+          bloco.id = `bloco-${bIdx}`;
           bloco.dataset.bloco = bIdx;
           bloco.dataset.video = block.video_after || '';
           bloco.style.display = bIdx === window.JC.currentBloco ? 'block' : 'none';
