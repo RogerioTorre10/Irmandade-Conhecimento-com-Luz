@@ -1,3 +1,4 @@
+// server.js
 const path = require("path");
 const express = require("express");
 const cors = require("cors");
@@ -7,6 +8,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const STATIC_DIR = path.join(__dirname, "public");
 
+// Utilitário de log com timestamp
+const log = (...args) => console.log(`[${new Date().toLocaleString()}]`, ...args);
+
 // Configuração de CORS
 app.use(cors({
   origin: (origin, callback) => {
@@ -15,7 +19,6 @@ app.use(cors({
       "http://localhost:5173",
       "https://irmandade-conhecimento-com-luz.onrender.com",
     ];
-    // Permitir requisições sem origem (ex.: Postman) ou de origens permitidas
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -27,7 +30,7 @@ app.use(cors({
 
 // Middleware para logging de requisições
 app.use((req, res, next) => {
-  console.log(`[${new Date().toLocaleString()}] ${req.method} ${req.url}`);
+  log(`${req.method} ${req.url}`);
   next();
 });
 
@@ -39,26 +42,33 @@ app.use(express.static(STATIC_DIR, {
       res.set("Content-Type", "application/json");
     } else if (filePath.endsWith(".js")) {
       res.set("Content-Type", "application/javascript");
+    } else if (filePath.endsWith(".mp4")) {
+      res.set("Content-Type", "video/mp4");
     }
   },
 }));
 
-// Rota para arquivos de tradução (i18n)
+// Rota para arquivos de tradução (i18n) com fallback para pt-BR
 app.get("/i18n/:lang.json", async (req, res) => {
   const lang = req.params.lang;
-  console.log(`[${new Date().toLocaleString()}] Servindo /i18n/${lang}.json`);
   const filePath = path.join(STATIC_DIR, "i18n", `${lang}.json`);
   try {
     await fs.access(filePath);
-    res.sendFile(filePath, (err) => {
-      if (err) {
-        console.error(`[${new Date().toLocaleString()}] Erro ao servir /i18n/${lang}.json:`, err);
-        res.status(500).json({ error: "Erro ao carregar arquivo de tradução" });
-      }
-    });
+    log(`Servindo /i18n/${lang}.json`);
+    res.sendFile(filePath);
   } catch (err) {
-    console.error(`[${new Date().toLocaleString()}] Arquivo /i18n/${lang}.json não encontrado:`, err);
-    res.status(404).json({ error: `Arquivo de tradução ${lang}.json não encontrado` });
+    log(`Arquivo de tradução ${lang}.json não encontrado`);
+    const fallbackPath = path.join(STATIC_DIR, "i18n", "pt-BR.json");
+    try {
+      await fs.access(fallbackPath);
+      log(`Servindo fallback pt-BR.json`);
+      res.sendFile(fallbackPath);
+    } catch (fallbackErr) {
+      log(`Fallback pt-BR.json também não encontrado`, fallbackErr);
+      if (!res.headersSent) {
+        res.status(404).json({ error: `Arquivo de tradução ${lang}.json não encontrado` });
+      }
+    }
   }
 });
 
@@ -66,21 +76,25 @@ app.get("/i18n/:lang.json", async (req, res) => {
 app.get("*", async (req, res) => {
   const fallbackPath = path.join(STATIC_DIR, "jornada-conhecimento-com-luz1.html");
   try {
-    await fs.access(fallbackPath); // Verifica se o arquivo existe
+    await fs.access(fallbackPath);
     res.sendFile(fallbackPath);
   } catch (err) {
-    console.error(`[${new Date().toLocaleString()}] Erro ao servir fallback ${fallbackPath}:`, err);
-    res.status(404).json({ error: "Página não encontrada" });
+    log(`Erro ao servir fallback ${fallbackPath}:`, err);
+    if (!res.headersSent) {
+      res.status(404).json({ error: "Página não encontrada" });
+    }
   }
 });
 
 // Inicialização do servidor
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor no ar na porta ${PORT} (${new Date().toLocaleString()})`);
+  log(`🚀 Servidor no ar na porta ${PORT}`);
 });
 
 // Tratamento de erros gerais
 app.use((err, req, res, next) => {
-  console.error(`[${new Date().toLocaleString()}] Erro no servidor:`, err);
-  res.status(500).json({ error: "Erro interno do servidor" });
+  log(`Erro interno do servidor`, err);
+  if (!res.headersSent) {
+    res.status(500).json({ error: "Erro interno do servidor" });
+  }
 });
