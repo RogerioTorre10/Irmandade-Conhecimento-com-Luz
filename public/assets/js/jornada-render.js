@@ -1,11 +1,5 @@
 (function () {
   'use strict';
-import i18n from '/public/assets/js/i18n.js';
-
-const paperLog = (...args) => console.log('[JORNADA_RENDER]', ...args);
-
-async
-
   
   const JR = (window.JORNADA_RENDER = window.JORNADA_RENDER || {});
 
