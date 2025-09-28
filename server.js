@@ -43,6 +43,7 @@ app.get("/assets/js/i18n/:lang.json", async (req, res) => {
   try {
     await fs.access(filePath);
     log(`Servindo /assets/js/i18n/${lang}.json`);
+    res.setHeader("Content-Type", "application/json");
     res.sendFile(filePath);
   } catch (err) {
     log(`Arquivo de tradução ${lang}.json não encontrado`);
@@ -50,6 +51,7 @@ app.get("/assets/js/i18n/:lang.json", async (req, res) => {
     try {
       await fs.access(fallbackPath);
       log(`Servindo fallback pt-BR.json`);
+      res.setHeader("Content-Type", "application/json");
       res.sendFile(fallbackPath);
     } catch (fallbackErr) {
       log(`Fallback pt-BR.json também não encontrado`, fallbackErr);
