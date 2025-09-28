@@ -1,11 +1,10 @@
-const STORAGE_KEY = 'i18n_lang';
+// assets/js/i18n.js
 
-// Idiomas suportados
+const STORAGE_KEY = 'i18n_lang';
 const SUPPORTED = ['pt-BR', 'en-US', 'es-ES'];
 const SHORT_TO_FULL = { pt: 'pt-BR', en: 'en-US', es: 'es-ES' };
 const DEFAULT = 'pt-BR';
 
-// Armazenamento no localStorage
 const Store = {
   get() {
     try {
@@ -21,7 +20,6 @@ const Store = {
   },
 };
 
-// Normaliza entradas de idioma (ex.: "pt", "pt_BR", "pt-br" → "pt-BR")
 function canonicalize(input) {
   if (!input) return DEFAULT;
   const raw = String(input).trim().replace('_', '-').toLowerCase();
@@ -37,13 +35,11 @@ const i18n = {
   lang: DEFAULT,
   dict: {},
   ready: false,
-  readyPromise: null, // Promessa pra sincronizar inicialização
+  readyPromise: null,
 
-  // Inicializa i18n e retorna uma promessa que resolve quando pronto
   init(pref) {
     console.log('[i18n] Iniciando i18n...');
     this.readyPromise = new Promise((resolve, reject) => {
-      // Prioridade: armazenado → argumento → navegador → DEFAULT
       const fromStorage = Store.get();
       const fromArg = pref;
       const fromNav = navigator.language || navigator.userLanguage || DEFAULT;
@@ -64,7 +60,6 @@ const i18n = {
     return this.readyPromise;
   },
 
-  // Aguarda até que i18n esteja pronto (pra sincronizar com outras partes)
   async waitForReady(timeoutMs = 10000) {
     if (this.ready) return true;
     return Promise.race([
@@ -75,17 +70,18 @@ const i18n = {
     ]);
   },
 
-  // Carrega idioma com retries
   async setLang(lang, applyAfter = true, retries = 3, delayMs = 500) {
-  const canon = canonicalize(lang);
-  const url = `/i18n/${canon}.json`;
-  console.log('[i18n] URL completa:', window.location.origin + url);
+    const canon = canonicalize(lang);
+    const url = `/i18n/${canon}.json`;
+    console.log('[i18n] URL completa:', window.location.origin + url);
+
+    let lastError = null;
 
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
         console.log(`[i18n] Tentativa ${attempt}/${retries} carregando ${url}...`);
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // Timeout de 5s por tentativa
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
         const res = await fetch(url, { cache: 'no-store', signal: controller.signal });
         clearTimeout(timeoutId);
 
@@ -128,14 +124,12 @@ const i18n = {
     throw lastError;
   },
 
-  // Traduz uma chave com fallback
   t(key, fallback) {
     return this.dict && Object.prototype.hasOwnProperty.call(this.dict, key)
       ? this.dict[key]
       : fallback ?? key;
   },
 
-  // Aplica traduções no DOM
   apply(root = document) {
     if (!this.ready) {
       console.warn('[i18n] Não aplicado: dicionário não carregado');
@@ -154,9 +148,7 @@ const i18n = {
     if (siteTitle) document.title = siteTitle;
   },
 
-  // Configura eventos de troca de idioma
   autobind() {
-    // Evita múltiplos listeners
     document.removeEventListener('click', this._handleClick);
     document.removeEventListener('change', this._handleChange);
 
@@ -182,7 +174,6 @@ const i18n = {
     document.addEventListener('click', this._handleClick);
     document.addEventListener('change', this._handleChange);
 
-    // Debounce pra evitar chamadas simultâneas
     let timeout;
     const debounceSetLang = (lang) => {
       clearTimeout(timeout);
