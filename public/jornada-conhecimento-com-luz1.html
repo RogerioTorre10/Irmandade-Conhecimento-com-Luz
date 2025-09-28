@@ -492,7 +492,7 @@
       }
       return new Promise(resolve => {
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'pt-BR';
+        utterance.lang = i18n?.lang || 'pt-BR';
         utterance.onend = resolve;
         utterance.onerror = () => resolve();
         window.speechSynthesis.speak(utterance);
@@ -508,9 +508,6 @@
     const G = (typeof window !== 'undefined' ? window : globalThis);
     if (G.__typingLock == null) G.__typingLock = false;
     if (G.__DEFAULT_SPEED_TYPING == null) G.__DEFAULT_SPEED_TYPING = 80;
-
-    // Funções movidas para jornada-typing.js e jornada-typing-bridge.js
-    // Apenas inicializa window.G pra compatibilidade
     window.G = G;
     console.log('[Datilografia] Bloco carregado');
   })();
@@ -594,17 +591,17 @@
       }
       window.speak && window.speak('');
 
-      const hasGuia = document.getElementById('section-guia');
-      if (!hasGuia) {
-        console.error('[startJourney] Seção section-guia não encontrada');
-        window.toast && window.toast('Seção de guia não encontrada.');
+      const hasTermos = document.getElementById('section-termos');
+      if (!hasTermos) {
+        console.error('[startJourney] Seção section-termos não encontrada');
+        window.toast && window.toast('Seção de termos não encontrada.');
         return;
       }
 
       if (window.JC) {
-        window.JC.nextSection = 'section-guia';
-        window.showSection && window.showSection('section-guia');
-        log('[startJourney] Navegação para section-guia');
+        window.JC.nextSection = 'section-termos';
+        window.showSection && window.showSection('section-termos');
+        log('[startJourney] Navegação para section-termos');
       } else {
         console.error('[startJourney] window.JC não definido');
         window.toast && window.toast('Erro ao inicializar jornada. Tente recarregar a página.');
@@ -641,20 +638,26 @@
         window.__currentSectionId = id;
         console.log('[showSection] Exibindo seção:', id);
 
-        // Resetar __typingLock para evitar bloqueios
         window.G = window.G || {};
         window.G.__typingLock = false;
 
         setTimeout(() => {
           const textElements = target.querySelectorAll('[data-typing="true"]:not(.hidden)');
+          if (textElements.length === 0) {
+            console.warn('[showSection] Nenhum elemento de digitação encontrado em:', id);
+          }
           textElements.forEach(el => {
             if (!el || !(el instanceof Element)) {
               console.error('[showSection] Elemento de digitação inválido:', el);
               return;
             }
             const selector = el.id ? `#${el.id}` : `.${el.className.split(' ')[0] || 'text'}`;
-            window.runTyping(selector);
-            console.log('[showSection] Iniciando runTyping para:', id);
+            window.runTyping(selector, () => {
+              console.log('[showSection] Digitação concluída para:', selector);
+              const text = el.getAttribute('data-text') || el.textContent;
+              window.speak && window.speak(text);
+            });
+            console.log('[showSection] Iniciando runTyping para:', id, 'Seletor:', selector);
           });
 
           const btns = target.querySelectorAll(
@@ -682,7 +685,6 @@
       console.log('[showSection] Bloco carregado');
     };
 
-    // Inicializar seção inicial
     document.addEventListener('DOMContentLoaded', () => {
       window.showSection('section-intro');
     });
@@ -701,19 +703,32 @@
       const target = document.getElementById(pg);
       if (target) {
         target.classList.remove('hidden');
-        window.runTyping && window.runTyping(target);
+        window.runTyping && window.runTyping(`#${pg}`, () => {
+          console.log('[Termos] Digitação concluída para:', pg);
+          const text = target.getAttribute('data-text') || target.textContent;
+          window.speak && window.speak(text);
+        });
         console.log('[Termos] Exibindo página:', pg);
       }
     };
 
     document.addEventListener('click', (e) => {
-      const btn = e.target.closest('[data-action="termos-next"], [data-action="termos-prev"]');
+      const btn = e.target.closest('[data-action="termos-next"], [data-action="termos-prev"], [data-action="termos-accept"]');
       if (btn) {
         e.preventDefault();
         if (btn.dataset.action === 'termos-next') {
           showPage('termos-pg2');
         } else if (btn.dataset.action === 'termos-prev') {
           showPage('termos-pg1');
+        } else if (btn.dataset.action === 'termos-accept') {
+          if (window.JC) {
+            window.JC.nextSection = 'section-senha';
+            window.showSection && window.showSection('section-senha');
+            console.log('[Termos] Navegação para section-senha');
+          } else {
+            console.error('[Termos] window.JC não definido');
+            window.toast && window.toast('Erro ao navegar para a senha.');
+          }
         }
       }
     });
@@ -741,7 +756,9 @@
           video.onended = () => {
             overlay.classList.add('hidden');
             video.src = '';
-            window.JC && window.JC.goNext && window.JC.goNext();
+            if (window.JC && window.JC.nextSection) {
+              window.showSection && window.showSection(window.JC.nextSection);
+            }
           };
           video.onerror = () => {
             console.error('[playVideo] Erro ao carregar vídeo:', videoSrc);
@@ -752,7 +769,9 @@
                 overlay.classList.add('hidden');
                 fallback.classList.add('hidden');
                 video.classList.remove('hidden');
-                window.JC && window.JC.goNext && window.JC.goNext();
+                if (window.JC && window.JC.nextSection) {
+                  window.showSection && window.showSection(window.JC.nextSection);
+                }
               }, 3000);
             }
           };
@@ -786,7 +805,9 @@
           video.pause();
           video.src = '';
           overlay.classList.add('hidden');
-          window.JC && window.JC.goNext && window.JC.goNext();
+          if (window.JC && window.JC.nextSection) {
+            window.showSection && window.showSection(window.JC.nextSection);
+          }
         }
       }
     });
@@ -818,7 +839,7 @@
         if (window.JC && window.playVideo) {
           window.JC.nextSection = 'section-selfie';
           window.playVideo('/assets/img/conhecimento-com-luz-jardim.mp4');
-          console.log('[Guia] Reproduzindo vídeo conhecimento-com-luz-jardim');
+          console.log('[Guia] Reproduzindo vídeo conhecimento-com-luz-jardim antes de section-selfie');
         } else {
           window.showSection && window.showSection('section-selfie');
           console.log('[Guia] Navegação direta para section-selfie');
@@ -843,7 +864,7 @@
           const img = document.getElementById('selfieImage');
           if (img) {
             img.setAttribute('href', ev.target.result);
-            document.querySelector('.flame-layer').style.opacity = '1';
+            document.querySelector('.flame-layer')?.style.opacity = '1';
             console.log('[Selfie] Imagem carregada');
           }
         };
@@ -880,7 +901,7 @@
           lastPreview = now;
           const img = document.getElementById('selfieImage');
           if (img && img.getAttribute('href')) {
-            document.querySelector('.flame-layer').style.opacity = '1';
+            document.querySelector('.flame-layer')?.style.opacity = '1';
             window.toast && window.toast('Pré-visualização atualizada!');
             console.log('[Selfie] Pré-visualização atualizada');
           } else {
@@ -929,9 +950,9 @@
         } else if (btn.id === 'btnSkipSelfie' || btn.id === 'btnStartJourney') {
           if (window.JC) {
             window.JC.nextSection = 'section-perguntas';
-            if (window.playVideo && window.JORNADA_VIDEOS && window.JORNADA_VIDEOS.intro) {
-              window.playVideo('/assets/img/conhecimento-com-luz-jardim.mp4');
-              console.log('[Selfie] Reproduzindo vídeo conhecimento-com-luz-jardim antes de section-perguntas');
+            if (window.playVideo && window.JORNADA_VIDEOS && window.JORNADA_VIDEOS.afterBlocks[0]) {
+              window.playVideo('/assets/img/filme-1-entrando-na-jornada.mp4');
+              console.log('[Selfie] Reproduzindo vídeo filme-1 antes de section-perguntas');
             } else {
               window.showSection('section-perguntas');
               console.log('[Selfie] Navegação direta para section-perguntas');
@@ -989,11 +1010,12 @@
           bloco.className = 'j-bloco';
           bloco.dataset.bloco = bIdx;
           bloco.dataset.video = block.video_after || '';
-          bloco.style.display = 'none';
+          bloco.style.display = bIdx === window.JC.currentBloco ? 'block' : 'none';
 
           if (block.title) {
             const title = document.createElement('h3');
             title.className = 'pergunta-enunciado text';
+            title.id = `bloco-title-${bIdx}`;
             title.dataset.typing = 'true';
             title.dataset.text = block.title;
             title.dataset.speed = '36';
@@ -1006,14 +1028,17 @@
             const label = typeof q === 'string' ? q : (q.label || q.text || '');
             const div = document.createElement('div');
             div.className = 'j-pergunta';
+            div.id = `pergunta-${bIdx}-${qIdx}`;
             div.dataset.pergunta = qIdx;
+            div.style.display = bIdx === window.JC.currentBloco && qIdx === window.JC.currentPergunta ? 'block' : 'none';
             div.innerHTML = `
               <label class="pergunta-enunciado text" 
+                     id="pergunta-label-${bIdx}-${qIdx}" 
                      data-typing="true" 
                      data-text="Pergunta ${qIdx + 1}: ${label}" 
                      data-speed="36" 
                      data-cursor="true">${label}</label>
-              <textarea rows="4" class="input" data-i18n-placeholder="resposta_placeholder" placeholder="Digite sua resposta..."></textarea>
+              <textarea rows="4" class="input" id="pergunta-input-${bIdx}-${qIdx}" data-i18n-placeholder="resposta_placeholder" placeholder="Digite sua resposta..."></textarea>
               <div class="accessibility-controls">
                 <button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>
                 <button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>
@@ -1030,10 +1055,12 @@
         if (firstBloco) {
           firstBloco.style.display = 'block';
           window.JC.currentBloco = 0;
+          window.JC.currentPergunta = 0;
           const first = firstBloco.querySelector('.j-pergunta');
           if (first) {
             first.classList.add('active');
-            setTimeout(() => window.runTyping && window.runTyping(firstBloco), 100);
+            first.style.display = 'block';
+            setTimeout(() => window.runTyping && window.runTyping(`#${first.id}`), 100);
           }
         } else {
           console.error('[loadDynamicBlocks] Nenhum bloco criado');
