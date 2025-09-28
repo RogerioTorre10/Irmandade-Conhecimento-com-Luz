@@ -1,5 +1,7 @@
 import i18n from './i18n.js';
 
+const typingLog = (...args) => console.log('[JORNADA_TYPE]', ...args);
+
 if (window.JORNADA_TYPE) {
   console.log('[JORNADA_TYPE] Já carregado, ignorando');
   throw new Error('JORNADA_TYPE já carregado');
@@ -17,7 +19,6 @@ if (window.JORNADA_TYPE) {
   document.head.appendChild(st);
 })();
 
-const log = (...args) => console.log('[JORNADA_TYPE]', ...args);
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 const plain = (text) => (text ?? '').toString();
 
@@ -112,6 +113,30 @@ async function run(root, opts = {}) {
     unlock();
   }
 }
+function runTyping(selector, callback) {
+    const el = document.querySelector(selector);
+    if (!el) {
+        typingLog('Escopo não encontrado para seletor:', selector);
+        if (callback) callback();
+        return;
+    }
+    typingLog('Iniciando digitação para:', selector);
+    if (window.Typewriter) {
+        const tw = new window.Typewriter(el, { delay: 22, cursor: '' });
+        tw.typeString(el.getAttribute('data-text') || el.textContent || '')
+          .start()
+          .callFunction(() => {
+              typingLog('Digitação concluída para:', selector);
+              if (callback) callback();
+          });
+    } else {
+        el.textContent = el.getAttribute('data-text') || el.textContent || '';
+        if (callback) callback();
+    }
+}
+
+window.runTyping = runTyping;
+typingLog('Pronto');
 
 function typeIt(el, text, speed = 24) {
   if (!el || !text) {
