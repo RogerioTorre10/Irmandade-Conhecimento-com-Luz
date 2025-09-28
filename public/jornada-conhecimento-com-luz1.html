@@ -700,7 +700,8 @@
     });
   })();
   </script>
-  <script>
+  <script type="module">
+    import i18n from '/public/assets/js/i18n.js';
     document.addEventListener('DOMContentLoaded', () => {
         const btns = document.querySelectorAll('.btn-avancar');
         btns.forEach(btn => {
@@ -734,11 +735,17 @@
             }, { once: false });
         });
 
-        // Habilita botão após inicialização
+        // Habilita botão após i18n
         i18n.init().then(() => {
-            document.querySelectorAll('.btn-avancar').forEach(btn => btn.removeAttribute('disabled'));
+            document.querySelectorAll('.btn-avancar').forEach(btn => {
+                btn.removeAttribute('disabled');
+                btn.innerHTML = 'Avançar';
+            });
         }).catch(() => {
-            document.querySelectorAll('.btn-avancar').forEach(btn => btn.removeAttribute('disabled'));
+            document.querySelectorAll('.btn-avancar').forEach(btn => {
+                btn.removeAttribute('disabled');
+                btn.innerHTML = 'Avançar';
+            });
         });
     });
 </script>
