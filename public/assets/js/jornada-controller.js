@@ -57,8 +57,11 @@ function debounceClick(callback, wait = 500) {
             return;
         }
         isProcessingClick = true;
+        const button = args[0]?.target;
+        if (button) button.innerHTML = 'Carregando...'; // Visual feedback
         setTimeout(() => {
             isProcessingClick = false;
+            if (button) button.innerHTML = 'Avançar'; // Restaura
         }, wait);
         callback(...args);
     };
@@ -103,23 +106,24 @@ async function goToNextSection() {
         return;
       }
     } else if (currentSection === 'section-guia') {
-      try {
-        window.playVideo('/assets/img/conhecimento-com-luz-jardim.mp4');
+    try {
+        loadVideo('/assets/img/conhecimento-com-luz-jardim.mp4'); // Use import
         log('Vídeo do guia carregado');
-      } catch (error) {
+    } catch (error) {
         console.error('[CONTROLLER] Erro ao carregar vídeo do guia:', error);
-        window.showSection('section-guia');
-      }
-    } else if (currentSection === 'section-selfie') {
-      try {
-        window.playVideo('/assets/img/filme-0-ao-encontro-da-jornada.mp4');
+        window.showSection && window.showSection('section-guia');
+    }
+} else if (currentSection === 'section-selfie') {
+    try {
+        loadVideo('/assets/img/filme-0-ao-encontro-da-jornada.mp4'); // Use import
         log('Vídeo da selfie carregado');
-      } catch (error) {
+    } catch (error) {
         console.error('[CONTROLLER] Erro ao carregar vídeo da selfie:', error);
-        window.showSection('section-selfie');
-      }
-    } else if (currentSection === 'section-perguntas') {
-      try {
+        window.showSection && window.showSection('section-selfie');
+    }
+}
+   } else if (currentSection === 'section-perguntas') {
+    try {
         await i18n.waitForReady(10000);
         if (!i18n.ready) throw new Error('i18n não inicializado');
         answeredQuestions.clear();
@@ -128,10 +132,11 @@ async function goToNextSection() {
         renderQuestions();
         window.perguntasLoaded = true;
         log('Perguntas carregadas e renderizadas');
-      } catch (error) {
-        console.error('[CONTROLLER] Erro ao renderizar perguntas:', error);
-        window.toast && window.toast('Erro ao carregar perguntas');
-      }
+    } catch (error) {
+        console.error('[CONTROLLER] Erro ao renderizar perguntas:', error.message);
+        window.toast && window.toast(`Erro ao carregar perguntas: ${error.message}`);
+    }
+}
     } else if (currentSection === 'section-final') {
       log('Jornada concluída! 🎉');
       if (window.JORNADA_FINAL_VIDEO && window.playVideo) {
