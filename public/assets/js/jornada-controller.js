@@ -68,7 +68,12 @@ async function goToNextSection() {
         const previousSection = currentSection;
         currentSection = JC.nextSection && sections.includes(JC.nextSection) ? JC.nextSection : sections[currentIdx + 1];
         controllerLog(`Tentando navegar de ${previousSection} para ${currentSection}`);
-
+       
+        if (window.runTypingSequence) { 
+            const section = document.querySelector(`#${currentSection}`);
+        if (section) runTypingSequence(section);
+     }
+        
         const prevElement = document.querySelector(`#${previousSection}`);
         if (prevElement) {
             prevElement.classList.remove('active');
