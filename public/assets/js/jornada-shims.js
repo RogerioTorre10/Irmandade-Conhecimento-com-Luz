@@ -1,10 +1,10 @@
-/* =========================================================
-   jornada-shims.js
-   Garante funções globais e módulos ausentes
-   ========================================================= */
+async
 (function () {
   'use strict';
   console.log('[SHIMS] Aplicando shims v5.4...');
+
+  import i18n from '/public/assets/js/i18n.js';
+  const paperLog = (...args) => console.log('[JORNADA_PAPER]', ...args);
 
   // Helpers leves
   const q = (sel, root = document) => root.querySelector(sel);
