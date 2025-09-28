@@ -3,6 +3,8 @@
 
 import i18n from './i18n.js';
 
+const log = (...args) => console.log('[JORNADA_PAPER]', ...args);
+
 const CFG = Object.assign({
   CANVAS_ID: 'jornada-canvas',
   CONTENT_ID: 'jornada-conteudo',
@@ -141,7 +143,6 @@ const CFG = Object.assign({
 
 let JORNADA_BLOCKS = [];
 
-const log = (...args) => console.log('[JORNADA_PAPER]', ...args);
 
 function elCanvas() {
   return document.getElementById(CFG.CANVAS_ID);
@@ -198,12 +199,12 @@ function buildForm(questions = []) {
 }
 
 async function loadDynamicBlocks() {
-  try {
-    await i18n.waitForReady(10000);
-    if (!i18n.ready) throw new Error('i18n não inicializado');
+    try {
+        await i18n.waitForReady(10000);
+        if (!i18n.ready) throw new Error('i18n não inicializado – usando fallback');
     const currentLang = i18n.lang || 'pt-BR';
     JORNADA_BLOCKS = blockTranslations[currentLang] || blockTranslations['pt-BR'] || [];
-    window.JORNADA_BLOCKS = JORNADA_BLOCKS;
+    window.JORNADA_BLOCKS = [
     log('JORNADA_BLOCKS preenchido:', JORNADA_BLOCKS);
     return true;
   } catch (error) {
@@ -211,7 +212,7 @@ async function loadDynamicBlocks() {
     window.toast && window.toast('Erro ao carregar blocos de perguntas');
     return false;
   }
-}
+ }
 
 async function renderQuestions() {
   setPergaminho('h');
