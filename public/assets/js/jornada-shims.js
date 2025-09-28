@@ -3,9 +3,6 @@ async
   'use strict';
   console.log('[SHIMS] Aplicando shims v5.4...');
 
-  import i18n from '/public/assets/js/i18n.js';
-  const paperLog = (...args) => console.log('[JORNADA_SHIMS]', ...args);
-
   // Helpers leves
   const q = (sel, root = document) => root.querySelector(sel);
   const qa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
