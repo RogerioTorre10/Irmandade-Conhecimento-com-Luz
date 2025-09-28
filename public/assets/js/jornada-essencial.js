@@ -1,6 +1,5 @@
 // Wizard passo a passo – export ES module + compat global (sem botão "Salvar")
-import i18n from '/public/assets/js/i18n.js';
-const paperLog = (...args) => console.log('[JORNADA_ESSENCIAL]', ...args);
+
 const PERGUNTAS = [
   'Quem é você hoje?',
   'O que a Luz te pede agora?',
