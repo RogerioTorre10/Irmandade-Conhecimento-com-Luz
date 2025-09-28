@@ -7,7 +7,6 @@ log('Dependências iniciais:', {
   loadVideo: !!window.loadVideo,
 });
 
-let currentSection = 'section-intro';
 const sections = [
   'section-intro',
   'section-termos',
@@ -99,7 +98,24 @@ async function goToNextSection() {
         termosPg1.classList.remove('hidden');
         termosPg2.classList.add('hidden');
         log('Exibindo termos-pg1');
+        window.runTyping && window.runTyping('#termos-pg1');
         return;
+      }
+    } else if (currentSection === 'section-guia') {
+      try {
+        window.playVideo('/assets/img/conhecimento-com-luz-jardim.mp4');
+        log('Vídeo do guia carregado');
+      } catch (error) {
+        console.error('[CONTROLLER] Erro ao carregar vídeo do guia:', error);
+        window.showSection('section-guia');
+      }
+    } else if (currentSection === 'section-selfie') {
+      try {
+        window.playVideo('/assets/img/filme-0-ao-encontro-da-jornada.mp4');
+        log('Vídeo da selfie carregado');
+      } catch (error) {
+        console.error('[CONTROLLER] Erro ao carregar vídeo da selfie:', error);
+        window.showSection('section-selfie');
       }
     } else if (currentSection === 'section-perguntas') {
       try {
@@ -115,30 +131,15 @@ async function goToNextSection() {
         console.error('[CONTROLLER] Erro ao renderizar perguntas:', error);
         window.toast && window.toast('Erro ao carregar perguntas');
       }
-    } else if (currentSection === 'section-guia') {
-      try {
-        window.playVideo('/assets/img/conhecimento-com-luz-jardim.mp4');
-        log('Vídeo do guia carregado');
-      } catch (error) {
-        console.error('[CONTROLLER] Erro ao carregar vídeo do guia:', error);
-      }
-    } else if (currentSection === 'section-selfie') {
-      try {
-        window.playVideo('/assets/img/filme-0-ao-encontro-da-jornada.mp4');
-        log('Vídeo da selfie carregado');
-      } catch (error) {
-        console.error('[CONTROLLER] Erro ao carregar vídeo da selfie:', error);
-      }
     } else if (currentSection === 'section-final') {
       log('Jornada concluída! 🎉');
-      if (window.JORNADA_FINAL_VIDEO && window.playTransition) {
-        window.playTransition(window.JORNADA_FINAL_VIDEO, () => {
-          log('Vídeo final concluído');
-        });
+      if (window.JORNADA_FINAL_VIDEO && window.playVideo) {
+        window.playVideo(window.JORNADA_FINAL_VIDEO);
+        log('Vídeo final carregado');
       }
     }
 
-  if (window.runTyping) {
+    if (window.runTyping) {
       const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]:not(.hidden)`);
       if (typingElements.length > 0) {
         let completed = 0;
@@ -168,6 +169,7 @@ async function goToNextSection() {
     log('Nenhuma seção seguinte disponível. Jornada finalizada.');
   }
 }
+
 document.addEventListener('DOMContentLoaded', () => {
   log('Inicializando controlador...');
   window.JC = JC;
