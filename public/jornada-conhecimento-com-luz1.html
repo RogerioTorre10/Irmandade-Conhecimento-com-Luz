@@ -698,7 +698,48 @@
     });
   })();
   </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const btns = document.querySelectorAll('.btn-avancar');
+        btns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('[showSection] Botão clicado:', btn.id || btn.className);
+                if (window.JC?.goNext) {
+                    window.JC.goNext();
+                    btn.innerHTML = 'Carregando...';
+                } else {
+                    console.warn('[showSection] window.JC.goNext não definido, aguardando...');
+                    setTimeout(() => {
+                        if (window.JC?.goNext) {
+                            window.JC.goNext();
+                            btn.innerHTML = 'Carregando...';
+                        } else {
+                            console.error('[showSection] JC ainda não inicializado');
+                            const current = document.querySelector('.active');
+                            const nextSection = document.getElementById('section-termos');
+                            if (current && nextSection) {
+                                current.classList.remove('active');
+                                current.classList.add('hidden');
+                                nextSection.classList.add('active');
+                                nextSection.classList.remove('hidden');
+                                console.log('[showSection] Fallback: Avançou para section-termos');
+                                window.runTyping && window.runTyping('#termos-pg1');
+                            }
+                        }
+                    }, 1000);
+                }
+            }, { once: false });
+        });
 
+        // Habilita botão após inicialização
+        i18n.init().then(() => {
+            document.querySelectorAll('.btn-avancar').forEach(btn => btn.removeAttribute('disabled'));
+        }).catch(() => {
+            document.querySelectorAll('.btn-avancar').forEach(btn => btn.removeAttribute('disabled'));
+        });
+    });
+</script>
   <!-- Navegação de Termos -->
   <script>
   (function() {
