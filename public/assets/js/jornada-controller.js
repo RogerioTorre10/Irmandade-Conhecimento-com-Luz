@@ -167,11 +167,18 @@ async function goToNextSection() {
     }
 }
 
+import './jornada-typing.js'; // já deve estar incluído
+// ou import { runTypingSequence } from './jornada-typing.js';
+
 document.addEventListener('DOMContentLoaded', () => {
-    controllerLog('Inicializando controlador...');
-    window.JC = JC;
-    controllerLog('Controlador inicializado com sucesso');
+  controllerLog('Inicializando controlador...');
+  window.JC = JC;
+  controllerLog('Controlador inicializado com sucesso');
+
+  // ✨ Inicia digitação + leitura automática
+  runTypingSequence(document);
 });
+
 
 function initController(route = 'intro') {
     controllerLog('Inicializando controlador...');
