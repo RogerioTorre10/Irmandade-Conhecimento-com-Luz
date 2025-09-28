@@ -2,11 +2,6 @@ import i18n from './i18n.js';
 
 const typingLog = (...args) => console.log('[JORNADA_TYPE]', ...args);
 
-if (window.JORNADA_TYPE) {
-  console.log('[JORNADA_TYPE] Já carregado, ignorando');
-  throw new Error('JORNADA_TYPE já carregado');
-}
-
 (function ensureStyle() {
   if (document.getElementById('typing-style')) return;
   const st = document.createElement('style');
@@ -28,22 +23,32 @@ let abortCurrent = null;
 function lock() {
   ACTIVE = true;
   window.__typingLock = true;
-  window.G = window.G || {};
-  window.G.__typingLock = true; // Compatibilidade com runTyping no HTML
 }
 
 function unlock() {
   ACTIVE = false;
   window.__typingLock = false;
-  window.G = window.G || {};
-  window.G.__typingLock = false;
 }
 
-async function typeNode(node, fullText, { speed = 18, delay = 0, showCaret = true, finalHTML = null } = {}) {
-  if (!node) {
-    log('Nó inválido para typeNode');
-    return;
-  }
+function readText(text) {
+  return new Promise(resolve => {
+    if (!('speechSynthesis' in window)) {
+      typingLog('Leitura não suportada');
+      return resolve();
+    }
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = i18n.lang || 'pt-BR';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+    utterance.onend = () => resolve();
+    utterance.onerror = () => resolve();
+    window.speechSynthesis.speak(utterance);
+  });
+}
+
+async function typeNode(node, fullText, { speed = 18, delay = 0, showCaret = true } = {}) {
+  if (!node) return;
   if (abortCurrent) abortCurrent();
   let abort = false;
   abortCurrent = () => (abort = true);
@@ -64,117 +69,35 @@ async function typeNode(node, fullText, { speed = 18, delay = 0, showCaret = tru
   }
 
   if (!abort && showCaret) caret.remove();
-  if (!abort && finalHTML) {
-    node.innerHTML = finalHTML;
-  }
   if (!abort) node.classList.add('typing-done');
-
   abortCurrent = null;
+
+  if (!abort && fullText) {
+    await readText(fullText);
+  }
 }
 
-async function run(root, opts = {}) {
+async function runTypingSequence(scope = document) {
   if (ACTIVE) {
-    log('Animação em andamento, ignorando');
+    typingLog('Já em execução, ignorando');
     return;
   }
   lock();
   try {
-    const scope = typeof root === 'string' ? document.querySelector(root) : (root || document);
-    if (!scope) {
-      log('Escopo não encontrado');
-      return;
+    const nodes = Array.from(scope.querySelectorAll('[data-typing="true"][data-text]'));
+    for (const node of nodes) {
+      const raw = node.getAttribute('data-text');
+      const speed = parseInt(node.getAttribute('data-speed')) || 22;
+      const showCaret = node.getAttribute('data-cursor') !== 'false';
+      const translated = i18n.t(raw, raw);
+      await typeNode(node, translated, { speed, showCaret });
     }
-
-    const selector = opts.selector || '[data-typing]';
-    const nodes = Array.from(scope.querySelectorAll(selector));
-    for (const n of nodes) {
-      if (n.classList.contains('typing-done')) continue;
-
-      const dataHTML = n.getAttribute('data-text');
-      const dataSpeed = n.getAttribute('data-speed');
-      const dataCursor = n.getAttribute('data-cursor');
-      const speed = Number(dataSpeed ?? opts.speed ?? 18);
-      const delay = Number(opts.delay ?? 0);
-      const showCaret = String(dataCursor ?? 'true') !== 'false';
-
-      const text = dataHTML
-        ? (() => {
-            const tmp = document.createElement('div');
-            tmp.innerHTML = i18n.t(dataHTML, plain(n.textContent));
-            return tmp.textContent || tmp.innerText || '';
-          })()
-        : i18n.t(n.getAttribute('data-i18n') || plain(n.textContent), plain(n.textContent));
-
-      await typeNode(n, text, { speed, delay, showCaret, finalHTML: dataHTML ? i18n.t(dataHTML) : null });
-    }
-  } catch (e) {
-    console.error('[JORNADA_TYPE] Erro em run:', e);
+  } catch (err) {
+    console.error('[JORNADA_TYPE] Erro na sequência:', err);
   } finally {
     unlock();
   }
 }
-function runTyping(selector, callback) {
-    const el = document.querySelector(selector);
-    if (!el) {
-        typingLog('Escopo não encontrado para seletor:', selector);
-        if (callback) callback();
-        return;
-    }
-    typingLog('Iniciando digitação para:', selector);
-    if (window.Typewriter) {
-        const tw = new window.Typewriter(el, { delay: 22, cursor: '' });
-        tw.typeString(el.getAttribute('data-text') || el.textContent || '')
-          .start()
-          .callFunction(() => {
-              typingLog('Digitação concluída para:', selector);
-              if (callback) callback();
-          });
-    } else {
-        el.textContent = el.getAttribute('data-text') || el.textContent || '';
-        if (callback) callback();
-    }
-}
 
-window.runTyping = runTyping;
-typingLog('Pronto');
-
-function typeIt(el, text, speed = 24) {
-  if (!el || !text) {
-    log('Elemento ou texto inválido para typeIt');
-    return;
-  }
-  el.classList.remove('typing-done');
-  el.textContent = '';
-  let i = 0;
-  const tick = () => {
-    if (i < text.length) {
-      el.textContent += text.charAt(i++);
-      setTimeout(tick, speed);
-    } else {
-      el.classList.add('typing-done');
-    }
-  };
-  setTimeout(tick, 0);
-}
-
-function cancelAll() {
-  if (abortCurrent) abortCurrent();
-  unlock();
-}
-
-const JORNADA_TYPE = {
-  run,
-  typeIt,
-  cancelAll,
-  get locked() {
-    return ACTIVE;
-  },
-};
-
-window.JORNADA_TYPE = JORNADA_TYPE;
-window.runTyping = run;
-window.TypeWriter = run; // Compatibilidade com jornada-typing-bridge.js
-
-log('Pronto');
-
-export default JORNADA_TYPE;
+window.runTypingSequence = runTypingSequence;
+typingLog('Sincronizador de digitação + leitura pronto');
