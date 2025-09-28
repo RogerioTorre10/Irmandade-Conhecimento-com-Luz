@@ -235,56 +235,67 @@ function initController(route = 'intro') {
     }
   };
 
-  if (window.runTyping) {
-    const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]`);
+ if (window.runTyping) {
+    const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]:not(.hidden)`);
     if (typingElements.length > 0) {
-      let completed = 0;
-      typingElements.forEach((element, index) => {
-        const selector = element.id ? `#${element.id}` : `.${element.className.split(' ')[0]}`;
-        window.runTyping(selector, () => {
-          completed++;
-          log(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
-          const text = element.getAttribute('data-text') || element.textContent;
-          window.readText(text);
-          if (completed === typingElements.length) {
-            log('Todas as animações de digitação concluídas em', currentSection);
-          }
+        let completed = 0;
+        typingElements.forEach((element, index) => {
+            if (!element || !element.className) {
+                console.warn('[CONTROLLER] Elemento sem classe ou inválido:', element);
+                return;
+            }
+            const selector = element.id ? `#${element.id}` : `.${element.className.split(' ')[0] || 'text'}`;
+            window.runTyping(selector, () => {
+                completed++;
+                log(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
+                const text = element.getAttribute('data-text') || element.textContent;
+                window.readText && window.readText(text); // Usa readText em vez de speak
+                if (completed === typingElements.length) {
+                    log('Todas as animações de digitação concluídas em', currentSection);
+                }
+            });
         });
-      });
     } else {
-      log('Nenhum elemento de digitação encontrado em', currentSection);
+        log('Nenhum elemento de digitação encontrado em', currentSection);
     }
-  } else {
-    log('window.runTyping não definido na inicialização, aplicando fallback');
-    window.runTyping = function (element, callback) {
-      const text = element.getAttribute('data-text') || '';
-      const speed = parseInt(element.getAttribute('data-speed')) || 50;
-      let i = 0;
-      element.textContent = '';
-      element.classList.add('lumen-typing');
-
-      function type() {
-        if (i < text.length) {
-          element.textContent += text.charAt(i);
-          i++;
-          setTimeout(type, speed);
-        } else {
-          element.classList.add('typing-done');
-          element.classList.remove('lumen-typing');
-          log('Animação de digitação concluída para:', text);
-          window.readText(text);
-          if (callback) callback();
+} else {
+    log('window.runTyping não definido, usando fallback');
+    window.runTyping = function (selector, callback) {
+        const element = document.querySelector(selector);
+        if (!element) {
+            console.error('[CONTROLLER] Elemento não encontrado:', selector);
+            return;
         }
-      }
-      type();
+        const text = element.getAttribute('data-text') || element.textContent || '';
+        const speed = parseInt(element.getAttribute('data-speed')) || 50;
+        let i = 0;
+        element.textContent = '';
+        element.classList.add('lumen-typing');
+
+        function type() {
+            if (i < text.length) {
+                element.textContent += text.charAt(i);
+                i++;
+                setTimeout(type, speed);
+            } else {
+                element.classList.add('typing-done');
+                element.classList.remove('lumen-typing');
+                log('Animação de digitação concluída para:', text);
+                window.readText && window.readText(text);
+                if (callback) callback();
+            }
+        }
+        type();
     };
-    const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]`);
+    // Re-executa a lógica de digitação com o fallback
+    const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]:not(.hidden)`);
     typingElements.forEach((element, index) => {
-      window.runTyping(element, () => {
-        log(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
-      });
+        const selector = element.id ? `#${element.id}` : `.${element.className.split(' ')[0] || 'text'}`;
+        window.runTyping(selector, () => {
+            log(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
+        });
     });
-  }
+}
 
   const debouncedGoNext = debounceClick(() => goToNextSection());
   document
