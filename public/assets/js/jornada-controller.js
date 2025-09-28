@@ -1,6 +1,8 @@
 import { renderQuestions, loadVideo } from './jornada-paper-qa.js';
 import i18n from './i18n.js';
 
+const log = (...args) => console.log('[CONTROLLER]', ...args);
+
 log('Dependências iniciais:', {
   runTyping: !!window.runTyping,
   renderQuestions: !!window.renderQuestions,
@@ -21,7 +23,7 @@ const answeredQuestions = new Set();
 let currentBloco = 0;
 let currentPergunta = 0;
 
-const log = (...args) => console.log('[CONTROLLER]', ...args);
+
 
 const JC = {
   currentBloco,
