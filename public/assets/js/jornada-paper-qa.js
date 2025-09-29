@@ -412,6 +412,23 @@ document.addEventListener('change', (e) => {
     });
   }
 });
+paperLog('JORNADA_BLOCKS preenchido:', window.JORNADA_BLOCKS);
+    } catch (error) {
+        console.error('[JORNADA_PAPER] Erro ao preencher JORNADA_BLOCKS:', error.message);
+        window.JORNADA_BLOCKS = [
+
+          function renderQuestions() {
+    if (!window.JORNADA_BLOCKS?.length) {
+        paperLog('Nenhum bloco disponível para renderizar');
+        return;
+    }
+    window.JORNADA_BLOCKS.forEach(block => {
+        paperLog('Renderizando bloco:', block.id);
+        // Lógica de renderização
+    });
+}
+
+export { loadDynamicBlocks, renderQuestions };
 
 export {
   loadDynamicBlocks,
