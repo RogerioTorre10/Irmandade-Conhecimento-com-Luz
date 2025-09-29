@@ -1,5 +1,5 @@
 // /public/assets/js/jornada-bootstrap.js
-import i18n from '/assets/js/i18n.js';
+import i18n from './i18n.js';
 import { loadDynamicBlocks } from './jornada-paper-qa.js'; // Ajuste o caminho
 
 const log = (...args) => console.log('[BOOT]', ...args);
