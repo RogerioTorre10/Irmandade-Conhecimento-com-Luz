@@ -1,5 +1,5 @@
 // /assets/js/jornada-typing.js  (ES MODULE!)
-import i18n from '/assets/js/i18n.js';  // sem /public
+import i18n from './i18n.js';  // sem /public
 
 const typingLog = (...args) => console.log('[JORNADA_TYPE]', ...args);
 
