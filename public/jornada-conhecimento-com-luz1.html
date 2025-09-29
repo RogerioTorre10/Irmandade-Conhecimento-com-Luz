@@ -29,17 +29,13 @@
 
   <script type="module">
   import i18n from '/assets/js/i18n.js';
-
   (async () => {
-    try {
-      await i18n.init(); // Carrega traduções
-      i18n.apply(document.body); // Aplica nos elementos com data-i18n
-      console.log('[i18n] Traduções aplicadas');
-    } catch (err) {
-      console.error('[i18n] Erro ao carregar traduções:', err);
-    }
+    await i18n.init();
+    i18n.apply(document.body);
+    console.log('[i18n] Traduções aplicadas');
   })();
 </script>
+
 
   <style>
     @font-face {
