@@ -232,12 +232,18 @@ function initController(route = 'intro') {
     window.perguntasLoaded = false;
 
     const initialElement = document.querySelector(`#${currentSection}`);
-    if (initialElement) {
-        initialElement.classList.add('active');
-        controllerLog(`Seção inicial exibida: ${currentSection}`);
-    } else {
-        console.error(`[CONTROLLER] Seção inicial ${currentSection} não encontrada`);
+if (initialElement) {
+    initialElement.classList.add('active');
+    controllerLog(`Seção inicial exibida: ${currentSection}`);
+
+    // ✨ Adiciona datilografia + leitura sincronizada
+    if (window.runTypingSequence) {
+        runTypingSequence(initialElement);
     }
+} else {
+    console.error(`[CONTROLLER] Seção inicial ${currentSection} não encontrada`);
+}
+
 
     window.readText = window.readText || function (text, callback) {
         if ('speechSynthesis' in window) {
