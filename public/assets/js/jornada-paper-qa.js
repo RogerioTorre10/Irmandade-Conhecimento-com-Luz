@@ -201,10 +201,8 @@ function buildForm(questions = []) {
 async function loadDynamicBlocks() {
     try {
         await i18n.waitForReady(10000);
-        if (!i18n.ready) throw new Error('i18n não inicializado – usando fallback');
-    const currentLang = i18n.lang || 'pt-BR';
-    JORNADA_BLOCKS = blockTranslations[currentLang] || blockTranslations['pt-BR'] || [];
-    window.JORNADA_BLOCKS = [
+        if (!i18n.ready) throw new Error('i18n não inicializado');
+        window.JORNADA_BLOCKS = [        
     log('JORNADA_BLOCKS preenchido:', JORNADA_BLOCKS);
     return true;
   } catch (error) {
