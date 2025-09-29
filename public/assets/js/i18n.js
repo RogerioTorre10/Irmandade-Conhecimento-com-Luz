@@ -13,16 +13,18 @@ const i18n = {
 
     async init() {
         try {
-            i18nLog('Inicializando i18next...');
+            i18nLog('Inicializando i18next com namespaces...');
             await i18next
                 .use(HttpBackend)
                 .use(LanguageDetector)
                 .init({
                     lng: 'pt-BR', // Idioma padrão
                     fallbackLng: 'pt-BR', // Fallback se detecção falhar
+                    ns: ['common', 'moduleA', 'moduleB'], // Namespaces
+                    defaultNS: 'common', // Namespace padrão
                     backend: {
-                        loadPath: '/public/assets/js/i18n/{{lng}}.json', // Novo caminho
-                        fallbackLoadPath: '/i18n/{{lng}}.json' // Antigo, como fallback
+                        loadPath: '/public/assets/js/i18n/{{lng}}/{{ns}}.json', // Novo caminho
+                        fallbackLoadPath: '/i18n/{{lng}}/{{ns}}.json' // Antigo, como fallback
                     },
                     detection: {
                         order: ['navigator', 'htmlTag', 'path', 'subdomain'],
@@ -30,33 +32,44 @@ const i18n = {
                     },
                     debug: true, // Logs detalhados pra debug
                     interpolation: {
-                        escapeValue: false // Evita escaping (já que usamos HTML seguro)
+                        escapeValue: false // Evita escaping (HTML seguro)
                     }
                 });
 
-            this.translations = i18next.store.data[i18next.language] || i18next.store.data['pt-BR'] || {};
+            // Copia traduções pro objeto translations pra compatibilidade
+            this.translations = {
+                common: i18next.store.data[i18next.language]?.common || i18next.store.data['pt-BR']?.common || {},
+                moduleA: i18next.store.data[i18next.language]?.moduleA || i18next.store.data['pt-BR']?.moduleA || {},
+                moduleB: i18next.store.data[i18next.language]?.moduleB || i18next.store.data['pt-BR']?.moduleB || {}
+            };
             this.lang = i18next.language || 'pt-BR';
             this.ready = true;
-            i18nLog('i18next inicializado com sucesso, idioma:', this.lang);
+            i18nLog('i18next inicializado com sucesso, idioma:', this.lang, 'namespaces:', Object.keys(this.translations));
         } catch (error) {
             console.error('[i18n] Falha na inicialização:', error.message);
             // Fallback hardcoded
             this.translations = {
-                welcome: 'Bem-vindo à jornada de luz!',
-                continue: 'Continue sua jornada...',
-                terms: 'Leia e aceite os termos',
-                error_loading: 'Erro ao carregar conteúdo',
-                question1: 'Qual é o seu nível de consciência atual?',
-                option1: 'Iniciante',
-                option2: 'Intermediário',
-                option3: 'Avançado',
-                question2: 'O que você busca nesta jornada?',
-                option4: 'Autoconhecimento',
-                option5: 'Transformação'
+                common: {
+                    welcome: 'Bem-vindo à jornada de luz!',
+                    continue: 'Continue sua jornada...',
+                    terms: 'Leia e aceite os termos',
+                    error_loading: 'Erro ao carregar conteúdo'
+                },
+                moduleA: {
+                    question1: 'Qual é o seu nível de consciência atual?',
+                    option1: 'Iniciante',
+                    option2: 'Intermediário',
+                    option3: 'Avançado'
+                },
+                moduleB: {
+                    question2: 'O que você busca nesta jornada?',
+                    option4: 'Autoconhecimento',
+                    option5: 'Transformação'
+                }
             };
             this.lang = 'pt-BR';
             this.ready = true;
-            i18nLog('Usando traduções de fallback');
+            i18nLog('Usando traduções de fallback com namespaces');
         }
     },
 
@@ -75,8 +88,30 @@ const i18n = {
         });
     },
 
-    t(key) {
-        return i18next.t(key) || this.translations[key] || key;
+    async loadNamespaces(namespaces) {
+        try {
+            await i18next.loadNamespaces(namespaces);
+            this.translations = {
+                ...this.translations,
+                ...Object.fromEntries(
+                    namespaces.map(ns => [ns, i18next.store.data[i18next.language]?.[ns] || i18next.store.data['pt-BR']?.[ns] || {}])
+                )
+            };
+            i18nLog('Namespaces carregados:', namespaces);
+        } catch (error) {
+            console.error('[i18n] Falha ao carregar namespaces:', namespaces, error.message);
+            // Adiciona fallbacks vazios pros namespaces solicitados
+            namespaces.forEach(ns => {
+                if (!this.translations[ns]) {
+                    this.translations[ns] = {};
+                }
+            });
+            i18nLog('Usando fallback vazio para namespaces:', namespaces);
+        }
+    },
+
+    t(key, options = {}) {
+        return i18next.t(key, { ns: options.ns || 'common' }) || this.translations[options.ns || 'common'][key] || key;
     }
 };
 
