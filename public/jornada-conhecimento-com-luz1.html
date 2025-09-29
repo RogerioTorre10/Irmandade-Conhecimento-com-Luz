@@ -520,6 +520,22 @@
         toast('Ops… algo falhou, mas já seguimos em frente.');
       });
 
+      import i18n from './i18n.js';
+
+     document.addEventListener('DOMContentLoaded', async () => {
+      try {
+      await i18n.init(); // carrega traduções
+      i18n.apply(document.body); // aplica nos elementos
+      console.log('[JORNADA] Traduções aplicadas');
+
+      // Agora pode iniciar controlador e renderizar perguntas
+      initController('intro');
+    } catch (err) {
+      console.error('[JORNADA] Erro ao iniciar i18n:', err);
+      initController('intro'); // fallback mesmo com erro
+     }
+   });
+
       /* ===== env tag ===== */
       const env=document.getElementById('envTag');
       if(env) env.textContent=`layout=${document.body.dataset.layout||'master'} · journey=${document.body.dataset.journey||'essencial'} · path=/assets`;
