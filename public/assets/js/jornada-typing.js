@@ -1,4 +1,4 @@
-import i18n from './i18n.js';
+import i18n from '/public/assets/js/i18n.js';
 
 const typingLog = (...args) => console.log('[JORNADA_TYPE]', ...args);
 
