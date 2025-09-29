@@ -1,15 +1,14 @@
 // i18n.js
-import i18next from 'https://cdn.jsdelivr.net/npm/i18next@25.5.2/dist/es/i18next.min.js';
-import HttpBackend from 'https://cdnjs.cloudflare.com/ajax/libs/i18next-http-backend/3.0.2/i18nextHttpBackend.min.js';
-import LanguageDetector from 'https://cdnjs.cloudflare.com/ajax/libs/i18next-browser-languagedetector/8.2.0/i18nextBrowserLanguageDetector.min.js';
+import i18next from 'https://cdn.jsdelivr.net/npm/i18next@23.15.1/dist/umd/i18next.min.js';
+import HttpBackend from 'https://cdnjs.cloudflare.com/ajax/libs/i18next-http-backend/2.5.2/i18nextHttpBackend.min.js';
+import LanguageDetector from 'https://cdnjs.cloudflare.com/ajax/libs/i18next-browser-languagedetector/8.0.0/i18nextBrowserLanguageDetector.min.js';
 
-// Evita conflito com outros scripts
 const i18nLog = (...args) => console.log('[i18n]', ...args);
 
 const i18n = {
     ready: false,
     translations: {},
-    lang: 'pt-BR', // Padrão
+    lang: 'pt-BR',
 
     async init() {
         try {
@@ -18,25 +17,22 @@ const i18n = {
                 .use(HttpBackend)
                 .use(LanguageDetector)
                 .init({
-                    lng: 'pt-BR', // Idioma padrão
-                    fallbackLng: 'pt-BR', // Fallback se detecção falhar
-                    ns: ['common', 'moduleA', 'moduleB'], // Namespaces
-                    defaultNS: 'common', // Namespace padrão
+                    lng: 'pt-BR',
+                    fallbackLng: 'pt-BR',
+                    ns: ['common', 'moduleA', 'moduleB'],
+                    defaultNS: 'common',
                     backend: {
-                        loadPath: '/public/assets/js/i18n/{{lng}}/{{ns}}.json', // Novo caminho
-                        fallbackLoadPath: '/i18n/{{lng}}/{{ns}}.json' // Antigo, como fallback
+                        loadPath: '/public/assets/js/i18n/{{lng}}/{{ns}}.json',
+                        fallbackLoadPath: '/i18n/{{lng}}/{{ns}}.json'
                     },
                     detection: {
                         order: ['navigator', 'htmlTag', 'path', 'subdomain'],
                         caches: ['localStorage', 'cookie']
                     },
-                    debug: true, // Logs detalhados pra debug
-                    interpolation: {
-                        escapeValue: false // Evita escaping (HTML seguro)
-                    }
+                    debug: true,
+                    interpolation: { escapeValue: false }
                 });
 
-            // Copia traduções pro objeto translations pra compatibilidade
             this.translations = {
                 common: i18next.store.data[i18next.language]?.common || i18next.store.data['pt-BR']?.common || {},
                 moduleA: i18next.store.data[i18next.language]?.moduleA || i18next.store.data['pt-BR']?.moduleA || {},
@@ -44,10 +40,9 @@ const i18n = {
             };
             this.lang = i18next.language || 'pt-BR';
             this.ready = true;
-            i18nLog('i18next inicializado com sucesso, idioma:', this.lang, 'namespaces:', Object.keys(this.translations));
+            i18nLog('i18next inicializado, idioma:', this.lang);
         } catch (error) {
             console.error('[i18n] Falha na inicialização:', error.message);
-            // Fallback hardcoded
             this.translations = {
                 common: {
                     welcome: 'Bem-vindo à jornada de luz!',
@@ -69,7 +64,7 @@ const i18n = {
             };
             this.lang = 'pt-BR';
             this.ready = true;
-            i18nLog('Usando traduções de fallback com namespaces');
+            i18nLog('Usando traduções de fallback');
         }
     },
 
@@ -99,8 +94,7 @@ const i18n = {
             };
             i18nLog('Namespaces carregados:', namespaces);
         } catch (error) {
-            console.error('[i18n] Falha ao carregar namespaces:', namespaces, error.message);
-            // Adiciona fallbacks vazios pros namespaces solicitados
+            console.error('[i18n] Falha ao carregar namespaces:', namespaces, error);
             namespaces.forEach(ns => {
                 if (!this.translations[ns]) {
                     this.translations[ns] = {};
@@ -117,5 +111,4 @@ const i18n = {
 
 export default i18n;
 
-// Inicializa automaticamente
 i18n.init().catch(err => i18nLog('Erro ao inicializar i18n:', err.message));
