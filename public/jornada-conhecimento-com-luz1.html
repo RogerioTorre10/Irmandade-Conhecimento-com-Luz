@@ -699,9 +699,39 @@
   })();
   </script>
   
-  <script type="module">
-    import i18n from '/assets/js/i18n.js';
+ <script type="module">
+    import i18n from '/public/assets/js/i18n.js';
+
     document.addEventListener('DOMContentLoaded', () => {
+        // Fallback pra runTyping
+        if (!window.runTyping) {
+            window.runTyping = (selector, callback) => {
+                const el = document.querySelector(selector);
+                if (!el) {
+                    console.error('[Fallback] Elemento não encontrado:', selector);
+                    if (callback) callback();
+                    return;
+                }
+                const text = el.getAttribute('data-text') || el.textContent || '';
+                el.textContent = text;
+                console.log('[Fallback] runTyping aplicado para:', selector);
+                if (callback) callback();
+            };
+        }
+
+        // Aplica runTyping na section-intro
+        document.querySelectorAll('#section-intro [data-typing="true"]').forEach(el => {
+            const selector = el.id ? `#${el.id}` : '.text';
+            try {
+                window.runTyping(selector);
+            } catch (e) {
+                console.error('[showSection] Erro ao executar runTyping:', e);
+                const el = document.querySelector(selector);
+                if (el) el.textContent = el.getAttribute('data-text') || el.textContent || '';
+            }
+        });
+
+        // Listener do botão
         const btns = document.querySelectorAll('.btn-avancar');
         btns.forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -711,7 +741,7 @@
                     window.JC.goNext();
                     btn.innerHTML = 'Carregando...';
                 } else {
-                    console.warn('[showSection] window.JC.goNext não definido, tentando fallback...');
+                    console.warn('[showSection] window.JC.goNext não definido, trying fallback...');
                     setTimeout(() => {
                         if (window.JC?.goNext) {
                             window.JC.goNext();
@@ -746,7 +776,9 @@
                 btn.innerHTML = 'Avançar';
             });
         });
-
+    });
+</script>
+<script>
         // Fallback pra runTyping
         if (!window.runTyping) {
             window.runTyping = (selector, callback) => {
