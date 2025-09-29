@@ -1,4 +1,4 @@
-import i18n from '/assets/js/i18n.js';
+import i18n from './i18n.js';
 import { renderQuestions, loadVideo } from '/assets/js/jornada-paper-qa.js';
 
 const controllerLog = (...args) => console.log('[CONTROLLER]', ...args); // Renomeado pra evitar conflito
@@ -60,6 +60,22 @@ function debounceClick(callback, wait = 500) {
         callback(...args);
     };
 }
+
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    await i18n.init(); // ✅ Traduções carregadas
+    i18n.apply(document.body); // ✅ Textos traduzidos
+    console.log('[JORNADA] Traduções aplicadas');
+
+    // Agora que tudo está traduzido, inicia o controlador
+    initController('intro');
+  } catch (err) {
+    console.error('[JORNADA] Erro ao iniciar i18n:', err);
+    initController('intro'); // fallback mesmo com erro
+  }
+});
+
+
 
 async function goToNextSection() {
     const currentIdx = sections.indexOf(currentSection);
