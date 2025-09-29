@@ -1,7 +1,7 @@
 // i18n.js
-import i18next from 'https://cdn.jsdelivr.net/npm/i18next@23.15.1/dist/umd/i18next.min.js';
-import HttpBackend from 'https://cdnjs.cloudflare.com/ajax/libs/i18next-http-backend/2.5.2/i18nextHttpBackend.min.js';
-import LanguageDetector from 'https://cdnjs.cloudflare.com/ajax/libs/i18next-browser-languagedetector/8.0.0/i18nextBrowserLanguageDetector.min.js';
+import i18next from 'https://cdn.jsdelivr.net/npm/i18next@25.5.2/esm/index.js';
+import HttpBackend from 'https://cdn.jsdelivr.net/npm/i18next-http-backend@3.0.2/esm/index.js';
+import LanguageDetector from 'https://cdn.jsdelivr.net/npm/i18next-browser-languagedetector@8.2.0/esm/index.js';
 
 const i18nLog = (...args) => console.log('[i18n]', ...args);
 
