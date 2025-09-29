@@ -1,7 +1,7 @@
 // jornada-paper-qa.js
 'use strict';
 
-import i18n from '/public/assets/js/i18n.js';
+import i18n from '/assets/js/i18n.js';
 
 const log = (...args) => console.log('[JORNADA_PAPER]', ...args);
 
