@@ -1,6 +1,16 @@
-import i18n from '/public/assets/js/i18n.js';
+// jornada-typing-bridge.js
+import i18n from '/assets/js/i18n.js';
+
+if (window.__TypingBridgeReady) {
+    console.log('[TypingBridge] Já carregado, ignorando');
+    throw new Error('TypingBridge já carregado');
+}
+window.__TypingBridgeReady = true;
 
 const typingLog = (...args) => console.log('[TypingBridge]', ...args);
+
+const q = window.q || ((s, r = document) => r.querySelector(s));
+const qa = window.qa || ((s, r = document) => Array.from(r.querySelectorAll(s)));
 
 async function playTypingAndSpeak(selectorOrElement, callback) {
     let selector;
@@ -19,7 +29,7 @@ async function playTypingAndSpeak(selectorOrElement, callback) {
         return;
     }
 
-    const el = document.querySelector(selector);
+    const el = q(selector);
     if (!el) {
         console.warn('[TypingBridge] Elemento não encontrado:', selector);
         if (callback) callback();
