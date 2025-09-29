@@ -141,20 +141,17 @@ const CFG = Object.assign({
   ]
 };
 
-// Inicializa JORNADA_BLOCKS
 let JORNADA_BLOCKS = [];
 
-// Função para obter o elemento canvas
+
 function elCanvas() {
   return document.getElementById(CFG.CANVAS_ID);
 }
 
-// Função para obter o elemento de conteúdo
 function elContent() {
   return document.getElementById(CFG.CONTENT_ID);
 }
 
-// Garante que o canvas e o conteúdo existam no DOM
 function ensureCanvas() {
   let root = elCanvas();
   if (!root) {
@@ -174,7 +171,6 @@ function ensureCanvas() {
   return { root, content };
 }
 
-// Aplica o estilo de pergaminho ao canvas
 function setPergaminho(mode = 'h') {
   const { root } = ensureCanvas();
   root.classList.remove('pergaminho-v', 'pergaminho-h');
@@ -189,7 +185,6 @@ function setPergaminho(mode = 'h') {
   log('Pergaminho aplicado:', { mode, imageUrl });
 }
 
-// Constrói o formulário HTML para as perguntas
 function buildForm(questions = []) {
   return `
     <form id="form-perguntas" class="grid gap-3">
@@ -203,57 +198,77 @@ function buildForm(questions = []) {
   `;
 }
 
-// Carrega blocos dinâmicos com traduções
 async function loadDynamicBlocks() {
   try {
     await i18n.waitForReady(10000);
     if (!i18n.ready) throw new Error('i18n não inicializado');
 
-    // Seleciona blocos com base no idioma atual
-    const lang = i18n.lang || 'pt-BR';
-    window.JORNADA_BLOCKS = blockTranslations[lang] || blockTranslations['pt-BR'];
+    // Blocos com perguntas reais
+    const bloco1 = [
+      { id: 1, pergunta: i18n.t('pergunta1'), tipo: 'texto' },
+      { id: 2, pergunta: i18n.t('pergunta2'), tipo: 'texto' },
+      { id: 3, pergunta: i18n.t('pergunta3'), tipo: 'texto' }
+    ];
+
+    const bloco2 = [
+      { id: 4, pergunta: i18n.t('pergunta4'), tipo: 'texto' },
+      { id: 5, pergunta: i18n.t('pergunta5'), tipo: 'texto' },
+      { id: 6, pergunta: i18n.t('pergunta6'), tipo: 'texto' }
+    ];
+
+    // Blocos placeholders (você pode preencher depois)
+    const bloco3 = [{ tipo: 'filme', src: '/assets/videos/filme3.mp4' }];
+    const bloco4 = [{ tipo: 'filme', src: '/assets/videos/filme4.mp4' }];
+    const bloco5 = [{ tipo: 'filme', src: '/assets/videos/filme5.mp4' }];
+
+    // Página final
+    const paginaFinal = [{ tipo: 'final', mensagem: i18n.t('fim_jornada') }];
+
+    // Junta tudo em sequência
+    window.JORNADA_BLOCKS = [
+      ...bloco1,
+      { tipo: 'filme', src: '/assets/videos/filme1.mp4' },
+      ...bloco2,
+      { tipo: 'filme', src: '/assets/videos/filme2.mp4' },
+      ...bloco3,
+      ...bloco4,
+      ...bloco5,
+      ...paginaFinal
+    ];
 
     log('JORNADA_BLOCKS preenchido:', window.JORNADA_BLOCKS);
-    
-    // Renderiza os blocos imediatamente
-    await renderQuestions();
-    
     return true;
   } catch (error) {
-    console.error('[JORNADA_PAPER] Erro ao preencher JORNADA_BLOCKS:', error.message);
-    window.JORNADA_BLOCKS = []; // Array vazia válida
-    if (window.toast) {
-      window.toast('Erro ao carregar blocos de perguntas');
-    }
+    console.error('[JORNADA_PAPER] Erro ao preencher JORNADA_BLOCKS:', error);
+    window.toast && window.toast('Erro ao carregar blocos de perguntas');
     return false;
   }
 }
 
-// Renderiza as perguntas na UI
+
 async function renderQuestions() {
   setPergaminho('h');
   const { content } = ensureCanvas();
   if (!content) {
     console.error('[JORNADA_PAPER] Container de perguntas não encontrado');
-    if (window.toast) window.toast('Erro ao carregar perguntas.');
+    window.toast && window.toast('Erro ao carregar perguntas.');
     return;
   }
 
-  if (!window.JORNADA_BLOCKS || !Array.isArray(window.JORNADA_BLOCKS)) {
+  if (!JORNADA_BLOCKS || !Array.isArray(JORNADA_BLOCKS)) {
     console.error('[JORNADA_PAPER] JORNADA_BLOCKS não está definido ou não é um array');
-    if (window.toast) window.toast('Erro ao carregar blocos de perguntas.');
+    window.toast && window.toast('Erro ao carregar blocos de perguntas.');
     return;
   }
 
   content.innerHTML = '';
   content.classList.remove('hidden');
-  
-  window.JORNADA_BLOCKS.forEach((block, bIdx) => {
+  JORNADA_BLOCKS.forEach((block, bIdx) => {
     const bloco = document.createElement('div');
     bloco.className = 'j-bloco';
     bloco.dataset.bloco = bIdx;
     bloco.dataset.video = block.video_after || '';
-    bloco.style.display = bIdx === window.JC?.currentBloco ? 'block' : 'none';
+    bloco.style.display = bIdx === window.JC.currentBloco ? 'block' : 'none';
 
     if (block.title) {
       const title = document.createElement('h3');
@@ -270,14 +285,14 @@ async function renderQuestions() {
       const div = document.createElement('div');
       div.className = 'j-pergunta';
       div.dataset.perguntaId = `${block.id}-${qIdx}`;
-      div.style.display = bIdx === window.JC?.currentBloco && qIdx === window.JC?.currentPergunta ? 'block' : 'none';
+      div.style.display = bIdx === window.JC.currentBloco && qIdx === window.JC.currentPergunta ? 'block' : 'none';
       div.innerHTML = `
         <label class="pergunta-enunciado text" data-i18n="${q.data_i18n}" data-typing="true" data-speed="36" data-cursor="true">${q.label}</label>
         <textarea rows="4" class="input" data-i18n-placeholder="resposta_placeholder" placeholder="Digite sua resposta..."></textarea>
         <div class="accessibility-controls">
           <button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>
           <button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>
-          <button class="btn btn-avancar" data-action="avancar" data-question-id="${block.id}-${qIdx}" data-i18n="btn-avancar">Avançar</button>
+          <button class="btn btn-avancar" data-action="read-question" data-question-id="${block.id}-${qIdx}" data-i18n="btn-avancar">Avançar</button>
         </div>
       `;
       bloco.appendChild(div);
@@ -292,24 +307,23 @@ async function renderQuestions() {
     console.warn('[JORNADA_PAPER] i18n não pronto, pulando i18n.apply');
   }
 
-  const currentBloco = content.querySelector(`[data-bloco="${window.JC?.currentBloco || 0}"]`);
+  const currentBloco = content.querySelector(`[data-bloco="${window.JC.currentBloco}"]`);
   if (currentBloco) {
     currentBloco.style.display = 'block';
-    const currentPergunta = currentBloco.querySelector(`[data-perguntaId="${window.JC?.currentBloco || 0}-${window.JC?.currentPergunta || 0}"]`);
+    const currentPergunta = currentBloco.querySelector(`[data-perguntaId="${window.JC.currentBloco}-${window.JC.currentPergunta}"]`);
     if (currentPergunta) {
       currentPergunta.style.display = 'block';
       currentPergunta.classList.add('active');
       setTimeout(() => {
-        log('Iniciando typeQuestionsSequentially para bloco', window.JC?.currentBloco || 0);
+        log('Iniciando typeQuestionsSequentially para bloco', window.JC.currentBloco);
         typeQuestionsSequentially(currentBloco);
       }, 100);
     }
   }
 
-  log('Perguntas renderizadas, total de blocos:', window.JORNADA_BLOCKS.length);
+  log('Perguntas renderizadas, total de blocos:', JORNADA_BLOCKS.length);
 }
 
-// Carrega e reproduz um vídeo de transição
 function loadVideo(videoSrc) {
   const video = document.querySelector('#videoTransicao');
   const videoOverlay = document.querySelector('#videoOverlay');
@@ -325,8 +339,8 @@ function loadVideo(videoSrc) {
   log('Vídeo carregado:', videoSrc);
 }
 
-// Digita o placeholder de um input com efeito de digitação
 let __abortTypingPlaceholder = null;
+
 async function typePlaceholder(inp, text, speed = 22) {
   if (!inp) return;
   if (__abortTypingPlaceholder) __abortTypingPlaceholder();
@@ -349,7 +363,6 @@ async function typePlaceholder(inp, text, speed = 22) {
   log('Placeholder digitado:', text);
 }
 
-// Digita elementos com efeito de digitação sequencial
 async function typeQuestionsSequentially(bloco) {
   const elements = bloco.querySelectorAll('[data-typing="true"]');
   for (const el of elements) {
@@ -365,7 +378,6 @@ async function typeQuestionsSequentially(bloco) {
   }
 }
 
-// Aplica efeito de digitação a um elemento
 async function typeEffect(element, text, delay = 36) {
   element.textContent = '';
   if (element.dataset.cursor === 'true') {
@@ -380,7 +392,6 @@ async function typeEffect(element, text, delay = 36) {
   }
 }
 
-// Inicializa eventos de acessibilidade e interação
 function initPaperQAEvents() {
   document.querySelectorAll('[data-action="read-question"]').forEach(button => {
     button.addEventListener('click', () => {
@@ -400,37 +411,7 @@ function initPaperQAEvents() {
   document.querySelectorAll('[data-action="start-mic"]').forEach(button => {
     button.addEventListener('click', () => {
       log('Microfone acionado (funcionalidade não implementada)');
-      if (window.toast) window.toast('Microfone não implementado ainda.');
-    });
-  });
-
-  document.querySelectorAll('[data-action="avancar"]').forEach(button => {
-    button.addEventListener('click', () => {
-      const questionId = button.dataset.questionId;
-      const [blockId, qIdx] = questionId.split('-');
-      const currentBloco = window.JORNADA_BLOCKS[window.JC?.currentBloco || 0];
-      const nextQIdx = parseInt(qIdx) + 1;
-
-      if (nextQIdx < currentBloco.questions.length) {
-        // Próxima pergunta no mesmo bloco
-        window.JC.currentPergunta = nextQIdx;
-        renderQuestions();
-      } else if (window.JC.currentBloco < window.JORNADA_BLOCKS.length - 1) {
-        // Próximo bloco
-        window.JC.currentBloco = (window.JC?.currentBloco || 0) + 1;
-        window.JC.currentPergunta = 0;
-        if (currentBloco.video_after) {
-          loadVideo(currentBloco.video_after);
-        }
-        renderQuestions();
-      } else {
-        // Jornada concluída
-        if (window.JORNADA_FINAL_VIDEO) {
-          loadVideo(window.JORNADA_FINAL_VIDEO);
-        }
-        if (window.toast) window.toast('Jornada concluída!');
-      }
-      log('Avançar clicado:', { blockId, qIdx, nextBloco: window.JC?.currentBloco, nextPergunta: window.JC?.currentPergunta });
+      window.toast && window.toast('Microfone não implementado ainda.');
     });
   });
 
@@ -443,20 +424,18 @@ function initPaperQAEvents() {
   }
 }
 
-// Inicializa o módulo Paper QA
 async function initPaperQA() {
-  try {
-    await loadDynamicBlocks();
-    initPaperQAEvents();
-    log('Inicializado com sucesso');
-  } catch (error) {
-    console.error('[JORNADA_PAPER] Erro na inicialização:', error.message);
-    window.JORNADA_BLOCKS = [];
-    if (window.toast) window.toast('Erro ao inicializar a jornada.');
-  }
+    try {
+        await loadDynamicBlocks();
+        console.log('[JORNADA_PAPER] Inicializado com sucesso');
+        // Resto do init...
+    } catch (error) {
+        console.error('[JORNADA_PAPER] Erro na inicialização:', error.message);
+        // Não trava: usa o que tem
+        window.JORNADA_BLOCKS = window.JORNADA_BLOCKS || [];
+    }
 }
 
-// Listeners de eventos
 document.addEventListener('DOMContentLoaded', initPaperQA);
 document.addEventListener('change', (e) => {
   if (e.target.id === 'language-select') {
@@ -467,11 +446,24 @@ document.addEventListener('change', (e) => {
     });
   }
 });
+paperLog('JORNADA_BLOCKS preenchido:', window.JORNADA_BLOCKS);
+    } catch (error) {
+        console.error('[JORNADA_PAPER] Erro ao preencher JORNADA_BLOCKS:', error.message);
+        window.JORNADA_BLOCKS = [
 
-// Log de carregamento do script
-log('Script jornada-paper-qa.js carregado com sucesso');
+          function renderQuestions() {
+    if (!window.JORNADA_BLOCKS?.length) {
+        paperLog('Nenhum bloco disponível para renderizar');
+        return;
+    }
+    window.JORNADA_BLOCKS.forEach(block => {
+        paperLog('Renderizando bloco:', block.id);
+        // Lógica de renderização
+    });
+}
 
-// Exporta funções para uso em outros módulos
+export { loadDynamicBlocks, renderQuestions };
+
 export {
   loadDynamicBlocks,
   renderQuestions,
@@ -481,3 +473,5 @@ export {
   typeQuestionsSequentially,
   typePlaceholder
 };
+
+log('Script jornada-paper-qa.js carregado com sucesso');
