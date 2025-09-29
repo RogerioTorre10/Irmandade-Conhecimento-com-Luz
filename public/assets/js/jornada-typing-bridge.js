@@ -1,15 +1,6 @@
 import i18n from '/public/assets/js/i18n.js';
 
-if (window.__TypingBridgeReady) {
-    console.log('[TypingBridge] Já carregado, ignorando');
-    throw new Error('TypingBridge já carregado');
-}
-window.__TypingBridgeReady = true;
-
 const typingLog = (...args) => console.log('[TypingBridge]', ...args);
-
-const q = window.q || ((s, r = document) => r.querySelector(s));
-const qa = window.qa || ((s, r = document) => Array.from(r.querySelectorAll(s)));
 
 async function playTypingAndSpeak(selectorOrElement, callback) {
     let selector;
@@ -28,7 +19,7 @@ async function playTypingAndSpeak(selectorOrElement, callback) {
         return;
     }
 
-    const el = q(selector);
+    const el = document.querySelector(selector);
     if (!el) {
         console.warn('[TypingBridge] Elemento não encontrado:', selector);
         if (callback) callback();
@@ -44,7 +35,8 @@ async function playTypingAndSpeak(selectorOrElement, callback) {
                 delay: 22,
                 cursor: ''
             });
-            tw.typeString(el.getAttribute('data-text') || el.textContent || '')
+            const text = el.getAttribute('data-text') || i18n.t(el.getAttribute('data-i18n-key') || 'welcome', { ns: 'common' }) || el.textContent || '';
+            tw.typeString(text)
               .start()
               .callFunction(() => {
                   typingLog('Animação de digitação concluída para:', selector);
@@ -52,7 +44,7 @@ async function playTypingAndSpeak(selectorOrElement, callback) {
               });
         } else {
             console.warn('[TypingBridge] window.Typewriter não definido, aplicando fallback');
-            el.textContent = el.getAttribute('data-text') || el.textContent || '';
+            el.textContent = el.getAttribute('data-text') || i18n.t(el.getAttribute('data-i18n-key') || 'welcome', { ns: 'common' }) || el.textContent || '';
             if (callback) callback();
         }
 
@@ -73,7 +65,7 @@ async function playTypingAndSpeak(selectorOrElement, callback) {
         }
     } catch (e) {
         console.error('[TypingBridge] Erro:', e);
-        el.textContent = el.getAttribute('data-text') || el.textContent || '';
+        el.textContent = el.getAttribute('data-text') || i18n.t(el.getAttribute('data-i18n-key') || 'welcome', { ns: 'common' }) || el.textContent || '';
         if (callback) callback();
     }
 }
