@@ -27,6 +27,20 @@
   <script defer src="/assets/js/jornada-micro.js?v=6" onload="console.log('[LOAD] jornada-micro.js carregado')" onerror="console.error('[LOAD] Erro ao carregar jornada-micro.js')"></script>
   <script defer src="/assets/js/api.js?v=6" onload="console.log('[LOAD] api.js carregado')" onerror="console.error('[LOAD] Erro ao carregar api.js')"></script>
 
+  <script type="module">
+  import i18n from '/assets/js/i18n.js';
+
+  (async () => {
+    try {
+      await i18n.init(); // Carrega traduções
+      i18n.apply(document.body); // Aplica nos elementos com data-i18n
+      console.log('[i18n] Traduções aplicadas');
+    } catch (err) {
+      console.error('[i18n] Erro ao carregar traduções:', err);
+    }
+  })();
+</script>
+
   <style>
     @font-face {
       font-family: "ManufacturingConsent";
