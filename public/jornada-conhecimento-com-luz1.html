@@ -697,6 +697,7 @@
     });
   })();
   </script>
+  
   <script type="module">
     import i18n from '/public/assets/js/i18n.js';
     document.addEventListener('DOMContentLoaded', () => {
@@ -709,7 +710,7 @@
                     window.JC.goNext();
                     btn.innerHTML = 'Carregando...';
                 } else {
-                    console.warn('[showSection] window.JC.goNext não definido, aguardando...');
+                    console.warn('[showSection] window.JC.goNext não definido, tentando fallback...');
                     setTimeout(() => {
                         if (window.JC?.goNext) {
                             window.JC.goNext();
@@ -744,6 +745,26 @@
                 btn.innerHTML = 'Avançar';
             });
         });
+
+        // Fallback pra runTyping
+        if (!window.runTyping) {
+            window.runTyping = (selector, callback) => {
+                const el = document.querySelector(selector);
+                if (!el) {
+                    console.error('[Fallback] Elemento não encontrado:', selector);
+                    if (callback) callback();
+                    return;
+                }
+                const text = el.getAttribute('data-text') || el.textContent || '';
+                el.textContent = text;
+                console.log('[Fallback] runTyping aplicado para:', selector);
+                if (callback) callback();
+            };
+            document.querySelectorAll('#section-intro [data-typing="true"]').forEach(el => {
+                const selector = el.id ? `#${el.id}` : '.text';
+                window.runTyping(selector);
+            });
+        }
     });
 </script>
   <!-- Navegação de Termos -->
