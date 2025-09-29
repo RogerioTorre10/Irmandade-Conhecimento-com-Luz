@@ -1,114 +1,61 @@
-// i18n.js
-import i18next from 'https://cdn.jsdelivr.net/npm/i18next@25.5.2/esm/index.js';
-import HttpBackend from 'https://cdn.jsdelivr.net/npm/i18next-http-backend@3.0.2/esm/index.js';
-import LanguageDetector from 'https://cdn.jsdelivr.net/npm/i18next-browser-languagedetector@8.2.0/esm/index.js';
-
-const i18nLog = (...args) => console.log('[i18n]', ...args);
-
 const i18n = {
-    ready: false,
-    translations: {},
-    lang: 'pt-BR',
+  lang: 'pt-BR',
+  translations: {},
+  ready: false,
 
-    async init() {
-        try {
-            i18nLog('Inicializando i18next com namespaces...');
-            await i18next
-                .use(HttpBackend)
-                .use(LanguageDetector)
-                .init({
-                    lng: 'pt-BR',
-                    fallbackLng: 'pt-BR',
-                    ns: ['common', 'moduleA', 'moduleB'],
-                    defaultNS: 'common',
-                    backend: {
-                        loadPath: '/public/assets/js/i18n/{{lng}}/{{ns}}.json',
-                        fallbackLoadPath: '/i18n/{{lng}}/{{ns}}.json'
-                    },
-                    detection: {
-                        order: ['navigator', 'htmlTag', 'path', 'subdomain'],
-                        caches: ['localStorage', 'cookie']
-                    },
-                    debug: true,
-                    interpolation: { escapeValue: false }
-                });
-
-            this.translations = {
-                common: i18next.store.data[i18next.language]?.common || i18next.store.data['pt-BR']?.common || {},
-                moduleA: i18next.store.data[i18next.language]?.moduleA || i18next.store.data['pt-BR']?.moduleA || {},
-                moduleB: i18next.store.data[i18next.language]?.moduleB || i18next.store.data['pt-BR']?.moduleB || {}
-            };
-            this.lang = i18next.language || 'pt-BR';
-            this.ready = true;
-            i18nLog('i18next inicializado, idioma:', this.lang);
-        } catch (error) {
-            console.error('[i18n] Falha na inicialização:', error.message);
-            this.translations = {
-                common: {
-                    welcome: 'Bem-vindo à jornada de luz!',
-                    continue: 'Continue sua jornada...',
-                    terms: 'Leia e aceite os termos',
-                    error_loading: 'Erro ao carregar conteúdo'
-                },
-                moduleA: {
-                    question1: 'Qual é o seu nível de consciência atual?',
-                    option1: 'Iniciante',
-                    option2: 'Intermediário',
-                    option3: 'Avançado'
-                },
-                moduleB: {
-                    question2: 'O que você busca nesta jornada?',
-                    option4: 'Autoconhecimento',
-                    option5: 'Transformação'
-                }
-            };
-            this.lang = 'pt-BR';
-            this.ready = true;
-            i18nLog('Usando traduções de fallback');
-        }
-    },
-
-    async waitForReady(timeout = 10000) {
-        return new Promise((resolve) => {
-            if (this.ready) return resolve(true);
-            const start = Date.now();
-            const check = () => {
-                if (this.ready || Date.now() - start > timeout) {
-                    resolve(this.ready);
-                } else {
-                    setTimeout(check, 100);
-                }
-            };
-            check();
-        });
-    },
-
-    async loadNamespaces(namespaces) {
-        try {
-            await i18next.loadNamespaces(namespaces);
-            this.translations = {
-                ...this.translations,
-                ...Object.fromEntries(
-                    namespaces.map(ns => [ns, i18next.store.data[i18next.language]?.[ns] || i18next.store.data['pt-BR']?.[ns] || {}])
-                )
-            };
-            i18nLog('Namespaces carregados:', namespaces);
-        } catch (error) {
-            console.error('[i18n] Falha ao carregar namespaces:', namespaces, error);
-            namespaces.forEach(ns => {
-                if (!this.translations[ns]) {
-                    this.translations[ns] = {};
-                }
-            });
-            i18nLog('Usando fallback vazio para namespaces:', namespaces);
-        }
-    },
-
-    t(key, options = {}) {
-        return i18next.t(key, { ns: options.ns || 'common' }) || this.translations[options.ns || 'common'][key] || key;
+  async init(langOverride) {
+    this.lang = langOverride || navigator.language || 'pt-BR';
+    try {
+      const res = await fetch(`/assets/js/i18n/${this.lang}.json`);
+      if (!res.ok) throw new Error(`Erro ao carregar ${this.lang}.json`);
+      this.translations = await res.json();
+      this.ready = true;
+      console.log('[i18n] Traduções carregadas para:', this.lang);
+    } catch (err) {
+      console.warn('[i18n] Fallback para pt-BR');
+      const fallback = await fetch(`/assets/js/i18n/pt-BR.json`);
+      this.translations = await fallback.json();
+      this.lang = 'pt-BR';
+      this.ready = true;
     }
+  },
+
+  t(key, fallback = '') {
+    return this.translations[key] || fallback || key;
+  },
+
+  apply(scope = document) {
+    if (!this.ready) return;
+    const nodes = scope.querySelectorAll('[data-i18n]');
+    nodes.forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      el.textContent = this.t(key, el.textContent);
+    });
+
+    const placeholders = scope.querySelectorAll('[data-i18n-placeholder]');
+    placeholders.forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      el.placeholder = this.t(key, el.placeholder);
+    });
+  },
+
+  async setLang(newLang) {
+    this.ready = false;
+    await this.init(newLang);
+    this.apply(document.body);
+  },
+
+  waitForReady(timeout = 10000) {
+    return new Promise((resolve, reject) => {
+      const start = Date.now();
+      const check = () => {
+        if (this.ready) return resolve(true);
+        if (Date.now() - start > timeout) return reject(new Error('i18n timeout'));
+        setTimeout(check, 100);
+      };
+      check();
+    });
+  }
 };
 
 export default i18n;
-
-i18n.init().catch(err => i18nLog('Erro ao inicializar i18n:', err.message));
