@@ -1,4 +1,4 @@
-import i18n from '/public/assets/js/i18n.js';
+import i18n from '/assets/js/i18n.js';
 import { renderQuestions, loadVideo } from '/public/assets/js/jornada-paper-qa.js';
 
 const controllerLog = (...args) => console.log('[CONTROLLER]', ...args); // Renomeado pra evitar conflito
