@@ -255,11 +255,12 @@
       <div id="jornada-conteudo" class="conteudo-pergaminho">
         <div id="aria-pergunta" class="sr-only" aria-live="polite"></div>
 
-        <!-- INTRO -->
-        <section id="section-intro" class="active">
-     <div class="text" data-typing="true" data-i18n-key="welcome" data-text="Bem-vindo à jornada de luz!"></div>
-    <button class="btn btn-avancar" disabled>Carregando...</button>
-   </section>
+         <!-- INTRO -->
+        <div id="section-intro" class="j-section">
+          <p data-typing data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
+          <p data-typing data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Antes de começar, leia os termos abaixo." data-speed="50" data-cursor="true"></p>
+          <div class="footer-actions"><button class="btn" data-action="next-termos">Avançar</button></div>
+        </div>
       
       </div>
 
@@ -503,867 +504,1076 @@
   })();
   </script>
 
- <script>
-  (function() {
-    /* ===== Tag ambiente ===== */
-    const env = document.getElementById('envTag');
-    if (env) env.textContent = `layout=${document.body.dataset.layout || 'master'} · journey=${document.body.dataset.journey || 'essencial'} · path=/assets`;
+<!-- Toast -->
+  <div id="toast" role="status" aria-live="polite" class="hidden"></div>
 
-    /* =========================
-       DATILOGRAFIA
-    ========================== */
-    function typeWriter(el, text, speed, showCursor) {
-      if (!el) return;
-      el.textContent = '';
-      if (showCursor) el.classList.add('lumen-typing');
-      let i = 0;
-      (function step() {
-        if (i < text.length) {
-          el.textContent += text.charAt(i++);
-          setTimeout(step, speed);
-        } else {
-          el.classList.add('typing-done');
-        }
-      })();
-    }
-    function runTyping(root) {
-      (root || document).querySelectorAll('[data-typing]').forEach(el => {
-        if (el.dataset._typed) return;
-        const t = el.getAttribute('data-text') || el.textContent || '';
-        const spd = parseInt(el.getAttribute('data-speed') || '26', 10);
-        const cur = String(el.getAttribute('data-cursor') || 'true') === 'true';
-        el.dataset._typed = '1';
-        typeWriter(el, t, spd, cur);
+  <script>
+    (function(){
+      /* ===== util: toast + erro global ===== */
+      function toast(msg){
+        try{
+          const t=document.getElementById('toast'); if(!t) return;
+          t.textContent=msg; t.classList.remove('hidden'); t.classList.add('show');
+          setTimeout(()=>{t.classList.remove('show');},3000);
+        }catch(_){}
+      }
+      window.addEventListener('error',(e)=>{
+        console.error('[Erro global]',e?.error||e);
+        toast('Ops… algo falhou, mas já seguimos em frente.');
       });
-    }
 
-    /* =========================
-       CHAMA API (intensidade por classe)
-    ========================== */
-    function makeFlame(cls) {
-      const d = document.createElement('div');
-      d.className = (cls || 'chama-vela chama-md');
-      d.innerHTML = '<div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>';
-      return d;
-    }
-    function ensureHeaderFlame() {
-      const H = document.getElementById('chama-header');
-      if (!H) return;
-      if (!H.querySelector('.brasa')) {
-        H.innerHTML = '';
-        H.appendChild(makeFlame('chama-vela chama-lg'));
+      /* ===== env tag ===== */
+      const env=document.getElementById('envTag');
+      if(env) env.textContent=`layout=${document.body.dataset.layout||'master'} · journey=${document.body.dataset.journey||'essencial'} · path=/assets`;
+
+      /* ===== datilografia ===== */
+      function typeWriter(el, text, speed, showCursor){
+        if(!el) return;
+        el.textContent='';
+        if(showCursor) el.classList.add('lumen-typing');
+        let i=0;
+        (function step(){
+          if(i<text.length){
+            el.textContent+=text.charAt(i++);
+            setTimeout(step, speed);
+          } else {
+            el.classList.add('typing-done');
+          }
+        })();
       }
-    }
-    function ensureInlineFlame(id, cls) {
-      const el = document.getElementById(id);
-      if (!el) return null;
-      if (!el.querySelector('.brasa')) {
-        el.innerHTML = '';
-        el.appendChild(makeFlame(cls || 'chama-vela chama-md'));
-      }
-      return el.firstElementChild;
-    }
-    function ensurePageFlames() {
-      if (!document.getElementById('flame-top-right')) {
-        const f = makeFlame('chama-vela chama-md');
-        f.id = 'flame-top-right';
-        f.style.cssText = 'position:fixed;top:12px;right:12px;z-index:1200;';
-        document.body.appendChild(f);
-      }
-      if (!document.getElementById('flame-bottom-right')) {
-        const f = makeFlame('chama-vela chama-md');
-        f.id = 'flame-bottom-right';
-        f.style.cssText = 'position:fixed;bottom:12px;right:12px;z-index:1200;';
-        document.body.appendChild(f);
-      }
-    }
-    function setMode(el, score) {
-      if (!el) return;
-      el.classList.remove('fraca', 'media', 'forte');
-      el.classList.add(score <= -2 ? 'fraca' : score >= 2 ? 'forte' : 'media');
-    }
-
-    window.JORNADA_CHAMA = window.JORNADA_CHAMA || {};
-    window.JORNADA_CHAMA.updateChama = function(score) {
-      const main = ensureInlineFlame('chama-perguntas', 'chama-vela chama-md');
-      setMode(main, score);
-      setMode(document.getElementById('flame-top-right'), score);
-      setMode(document.getElementById('flame-bottom-right'), score);
-    };
-    window.JORNADA_CHAMA.ensureHeroFlame = function(sectionId) {
-      const canvas = document.getElementById('jornada-canvas');
-      if (!canvas) return;
-      let hero = document.getElementById('chama-hero');
-      const show = (sectionId === 'section-intro' || sectionId === 'section-final' || sectionId === 'section-selfie');
-      if (show) {
-        if (!hero) {
-          hero = makeFlame('chama-vela chama-lg');
-          hero.id = 'chama-hero';
-          hero.style.cssText = 'position:absolute;top:8px;left:8px;z-index:60;';
-          canvas.appendChild(hero);
-        }
-      } else if (hero) {
-        hero.remove();
-      }
-    };
-    function updateChama(score) { window.JORNADA_CHAMA.updateChama(score); }
-    function ensureHeroFlame(sectionId) { window.JORNADA_CHAMA.ensureHeroFlame(sectionId); }
-
-    /* =========================
-       SELFIE COM A IRMANDADE
-    ========================== */
-    (function() {
-      const BG_URL = "/assets/img/irmandade-quarteto-bg.png";
-      const GLOW_URL = "/assets/img/moldura-brilho.png";
-      const FACE_X = 820;
-      const FACE_Y = 410;
-      const FACE_R = 150;
-
-      const $ = (sel) => document.querySelector(sel);
-      const input = $("#selfieInput");
-      const cv = $("#selfieCanvas");
-      const ctx = cv.getContext("2d");
-      const rScale = $("#selfieScale");
-      const rX = $("#selfieOffsetX");
-      const rY = $("#selfieOffsetY");
-      const btnGo = $("#btnRenderSelfie");
-      const aDown = $("#btnDownloadSelfie");
-
-      const bgImg = new Image(); bgImg.crossOrigin = "anonymous"; bgImg.src = BG_URL;
-      const glowImg = new Image(); glowImg.crossOrigin = "anonymous"; glowImg.src = GLOW_URL;
-      let userImg = null;
-
-      const st = {
-        scale: parseFloat(rScale?.value || 1),
-        offX: parseInt(rX?.value || 0, 10),
-        offY: parseInt(rY?.value || 0, 10),
-      };
-
-      function renderAll() {
-        ctx.clearRect(0, 0, cv.width, cv.height);
-        if (bgImg.complete) ctx.drawImage(bgImg, 0, 0, cv.width, cv.height);
-
-        if (userImg) {
-          ctx.save();
-          ctx.beginPath();
-          ctx.arc(FACE_X, FACE_Y, FACE_R, 0, Math.PI * 2);
-          ctx.closePath();
-          ctx.clip();
-
-          const scale = st.scale || 1;
-          const drawW = FACE_R * 2 * scale;
-          const drawH = FACE_R * 2 * scale;
-          const dx = FACE_X - drawW / 2 + st.offX;
-          const dy = FACE_Y - drawH / 2 + st.offY;
-          ctx.drawImage(userImg, dx, dy, drawW, drawH);
-
-          ctx.restore();
-        }
-
-        if (glowImg && glowImg.complete) {
-          ctx.drawImage(glowImg, FACE_X - FACE_R * 1.2, FACE_Y - FACE_R * 1.2, FACE_R * 2.4, FACE_R * 2.4);
-        }
-      }
-
-      function loadFromLocal() {
-        try {
-          const saved = localStorage.getItem("IRMANDADE_SELFIE_FINAL");
-          if (!saved) return;
-          const img = new Image();
-          img.onload = () => { userImg = img; renderAll(); };
-          img.src = saved;
-        } catch (e) {}
-      }
-
-      if (input) {
-        input.addEventListener("change", (ev) => {
-          const f = ev.target.files && ev.target.files[0];
-          if (!f) return;
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-              userImg = img;
-              try { localStorage.setItem("IRMANDADE_SELFIE_FINAL", e.target.result); } catch (_) {}
-              renderAll();
-            };
-            img.src = e.target.result;
-          };
-          reader.readAsDataURL(f);
+      function runTyping(root){
+        (root||document).querySelectorAll('[data-typing]').forEach(el=>{
+          if(el.dataset._typed) return;
+          const t=el.getAttribute('data-text')||el.textContent||'';
+          const spd=parseInt(el.getAttribute('data-speed')||'26',10);
+          const cur=String(el.getAttribute('data-cursor')||'true')==='true';
+          el.dataset._typed='1';
+          typeWriter(el,t,spd,cur);
         });
       }
 
-      [rScale, rX, rY].forEach(el => {
-        if (el) {
-          el.addEventListener("input", () => {
-            st.scale = parseFloat(rScale.value);
-            st.offX = parseInt(rX.value, 10);
-            st.offY = parseInt(rY.value, 10);
-            renderAll();
+      /* ===== datilografia no placeholder e respostas ===== */
+      let __abortTypingPlaceholder=null;
+      async function typePlaceholder(inp, text, speed=22){
+        if(!inp) return;
+        if(__abortTypingPlaceholder) __abortTypingPlaceholder();
+        let abort=false;
+        __abortTypingPlaceholder=()=>abort=true;
+        inp.placeholder='';
+        const aria=document.getElementById('aria-pergunta');
+        if(aria) aria.textContent=text;
+        for(let i=0;i<=text.length;i++){
+          if(abort) break;
+          inp.placeholder=text.slice(0,i)+(i<text.length?'▌':'');
+          await new Promise(r=>setTimeout(r,speed));
+        }
+        if(!abort) inp.placeholder=text;
+      }
+      async function typeAnswer(textarea, text, speed=36){
+        if(!textarea) return;
+        textarea.value='';
+        textarea.classList.add('lumen-typing');
+        for(let i=0;i<=text.length;i++){
+          textarea.value=text.slice(0,i);
+          await new Promise(r=>setTimeout(r,speed));
+        }
+        textarea.classList.add('typing-done');
+      }
+      async function typeDevolutiva(div, text, speed=36){
+        if(!div) return;
+        div.textContent='';
+        div.classList.add('lumen-typing');
+        for(let i=0;i<=text.length;i++){
+          div.textContent=text.slice(0,i);
+          await new Promise(r=>setTimeout(r,speed));
+        }
+        div.classList.add('typing-done');
+      }
+
+      /* ===== chamas ===== */
+      function makeFlame(cls){
+        const d=document.createElement('div');
+        d.className=(cls||'chama-vela chama-md');
+        d.innerHTML='<div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div>';
+        return d;
+      }
+      function ensureHeaderFlame(){
+        const H=document.getElementById('chama-header');
+        if(!H) return;
+        if(!H.querySelector('.brasa')){H.innerHTML='';H.appendChild(makeFlame('chama-vela chama-lg'));}
+      }
+      function ensureInlineFlame(id,cls){
+        const el=document.getElementById(id);
+        if(!el) return null;
+        if(!el.querySelector('.brasa')){el.innerHTML='';el.appendChild(makeFlame(cls||'chama-vela chama-md'));}
+        return el.firstElementChild;
+      }
+      function ensurePageFlames(){
+        if(!document.getElementById('flame-bottom-right')){
+          const f=makeFlame('chama-vela chama-md');
+          f.id='flame-bottom-right';
+          f.style.cssText='position:fixed;bottom:12px;right:12px;z-index:1200;';
+          document.body.appendChild(f);
+        }
+      }
+      function setMode(el,score){
+        if(!el) return;
+        el.classList.remove('fraca','media','forte');
+        el.classList.add(score<=-2?'fraca':score>=2?'forte':'media');
+      }
+      window.JORNADA_CHAMA=window.JORNADA_CHAMA||{};
+      window.JORNADA_CHAMA.updateChama=function(score){
+        const main=ensureInlineFlame('chama-perguntas','chama-vela chama-md');
+        setMode(main,score);
+        setMode(document.getElementById('flame-bottom-right'),score);
+      };
+      window.JORNADA_CHAMA.ensureHeroFlame=function(sectionId){
+        const canvas=document.getElementById('jornada-canvas');
+        if(!canvas) return;
+        let hero=document.getElementById('chama-hero');
+        const show=(sectionId==='section-intro'||sectionId==='section-termos'||sectionId==='section-senha'||sectionId==='section-final'||sectionId==='section-selfie'||sectionId==='section-guia');
+        if(show){
+          if(!hero){
+            hero=makeFlame('chama-vela chama-lg');
+            hero.id='chama-hero';
+            hero.style.cssText='position:absolute;top:8px;left:8px;z-index:60;';
+            canvas.appendChild(hero);
+          }
+        } else if(hero){
+          hero.remove();
+        }
+      };
+      function updateChama(score){
+        window.JORNADA_CHAMA.updateChama(score);
+      }
+      function ensureHeroFlame(sectionId){
+        window.JORNADA_CHAMA.ensureHeroFlame(sectionId);
+      }
+
+      /* ===== selfie ===== */
+      (function(){
+        const $=s=>document.querySelector(s);
+        const card=$("#card-guide");
+        const guideNameEl=$("#guideNameSlot");
+        const userNameEl=$("#userNameSlot");
+        const flameLayer=$("#card-guide .flame-layer");
+        const selfieImg=$("#selfieImage");
+        const bgImg=$("#guideBg");
+        const nameInput=$("#nameInput");
+        const guiaNameInput=$("#guiaNameInput");
+        const fileInput=$("#selfieInput");
+        const previewBtn=$("#previewBtn");
+        const captureBtn=$("#captureBtn");
+        const errorDiv=$("#selfieError");
+        const scaleInput=$("#selfieScale");
+        const offsetXInput=$("#selfieOffsetX");
+        const offsetYInput=$("#selfieOffsetY");
+
+        let selfieURL='';
+
+        function getBgUrl(){
+          const guia=localStorage.getItem('JORNADA_GUIA')||'zion';
+          card.dataset.guide=guia.toUpperCase();
+          guideNameEl.textContent=guia.toUpperCase();
+          return `/assets/img/irmandade-quarteto-bg-${guia}.png`;
+        }
+
+        function loadBg(){
+          const bgUrl=getBgUrl();
+          bgImg.src=bgUrl;
+          bgImg.onload=()=>{
+            if(errorDiv) errorDiv.style.display='none';
+          };
+          bgImg.onerror=()=>{
+            if(errorDiv) errorDiv.style.display='block';
+            toast('Erro ao carregar a imagem de fundo do guia.');
+          };
+        }
+
+        function updatePreview(){
+          const scale=parseFloat(scaleInput.value);
+          const ox=parseFloat(offsetXInput.value);
+          const oy=parseFloat(offsetYInput.value);
+          const baseX=15+ox;
+          const baseY=35+oy;
+          const baseW=70*scale;
+          const baseH=90*scale;
+          selfieImg.setAttribute('x',baseX);
+          selfieImg.setAttribute('y',baseY);
+          selfieImg.setAttribute('width',baseW);
+          selfieImg.setAttribute('height',baseH);
+        }
+
+        function syncNameInput(){
+          const storedName=localStorage.getItem('JORNADA_NOME')||'';
+          if(storedName){
+            nameInput.value=storedName;
+            userNameEl.textContent=storedName.toUpperCase()||'NOME';
+          }
+          nameInput.addEventListener('input',()=>{
+            const name=nameInput.value.trim();
+            userNameEl.textContent=name.toUpperCase()||'NOME';
+            localStorage.setItem('JORNADA_NOME',name);
           });
         }
-      });
 
-      if (btnGo) {
-        btnGo.addEventListener("click", () => {
-          renderAll();
-          const url = cv.toDataURL("image/png");
-          aDown.href = url;
-          try { localStorage.setItem("IRMANDADE_SELFIE_FINAL", url); } catch (_) {}
-          proceedAfterSelfie();
-        });
-      }
+        scaleInput.addEventListener('input',updatePreview);
+        offsetXInput.addEventListener('input',updatePreview);
+        offsetYInput.addEventListener('input',updatePreview);
 
-      bgImg.onload = renderAll;
-      glowImg.onload = renderAll;
-      loadFromLocal();
-    })();
-
-    /* =========================
-       PROGRESSO & STORAGE
-    ========================== */
-    function updateProgress() {
-      const perguntas = document.querySelectorAll('.j-pergunta');
-      const respondidas = Array.from(perguntas).filter(p => (p.querySelector('textarea')?.value.trim() || '') !== '').length;
-      const total = perguntas.length || 1;
-      const progresso = Math.round((respondidas / total) * 100);
-
-      const fill = document.getElementById('jprog-fill');
-      const badge = document.getElementById('jprog-pct');
-      const jFill = document.getElementById('j-fill-inline');
-      const jMeta = document.getElementById('j-meta');
-      if (fill) fill.style.width = progresso + '%';
-      if (badge) badge.textContent = progresso + '% concluído';
-      if (jFill) jFill.style.width = progresso + '%';
-      if (jMeta) jMeta.textContent = `Respondidas: ${respondidas} de ${total}`;
-    }
-    function saveAnswers() {
-      const respostas = {};
-      document.querySelectorAll('.j-pergunta textarea').forEach((input, idx) => {
-        respostas[`q${idx}`] = input.value || '';
-      });
-      localStorage.setItem('jornada_respostas', JSON.stringify(respostas));
-    }
-    function loadAnswers() {
-      const respostas = JSON.parse(localStorage.getItem('jornada_respostas') || '{}');
-      document.querySelectorAll('.j-pergunta textarea').forEach((input, idx) => {
-        input.value = respostas[`q${idx}`] || '';
-      });
-      updateProgress();
-    }
-
-    /* =========================
-       PERGAMINHO & SEÇÕES
-    ========================== */
-    function checkImage(url, fallbackUrl) {
-      return new Promise(resolve => {
-        const img = new Image();
-        img.onload = () => resolve(url);
-        img.onerror = () => {
-          console.warn('[checkImage] Imagem não encontrada:', url, 'Usando fallback:', fallbackUrl);
-          resolve(fallbackUrl);
-        };
-        img.src = url;
-      });
-    }
-    function updateCanvasBackground(sectionId) {
-      const canvas = document.getElementById('jornada-canvas');
-      if (!canvas) return;
-      if (sectionId === 'section-perguntas') {
-        checkImage('/assets/img/pergaminho-rasgado-horiz.png', '/assets/img/pergaminho-rasgado-vert.png').then(bg => {
-          canvas.className = `card pergaminho pergaminho-h${bg.includes('vert') ? ' fallback' : ''}`;
-          canvas.style.backgroundImage = `url('${bg}')`;
-        });
-      } else {
-        canvas.className = 'card pergaminho pergaminho-v';
-        canvas.style.backgroundImage = 'url(/assets/img/pergaminho-rasgado-vert.png)';
-      }
-    }
-    function showSection(sectionId) {
-      document.querySelectorAll('.j-section').forEach(s => s.classList.add('hidden'));
-      const active = document.getElementById(sectionId);
-      if (active) active.classList.remove('hidden');
-      updateCanvasBackground(sectionId);
-      ensureHeroFlame(sectionId);
-      if (sectionId === 'section-perguntas') {
-        updateProgress();
-        const perguntas = document.querySelectorAll('.j-pergunta');
-        if (perguntas.length) runTyping(perguntas[0]);
-      }
-      if (sectionId === 'section-final') {
-        const url = localStorage.getItem("IRMANDADE_SELFIE_FINAL");
-        if (url) {
-          document.querySelector("#minhaFotoFinal").src = url;
-          document.getElementById("section-final").style.display = "block";
-        }
-      }
-    }
-
-    function loadDynamicBlocks() {
-      const content = document.getElementById('perguntas-container');
-      if (!content) {
-        console.error('[loadDynamicBlocks] Container de perguntas não encontrado!');
-        return;
-      }
-
-      const blocks = window.JORNADA_BLOCKS || [];
-      console.log('[loadDynamicBlocks] Carregando blocos:', blocks);
-      content.innerHTML = '';
-
-      blocks.forEach((block, idx) => {
-        const bloco = document.createElement('section');
-        bloco.className = 'j-bloco';
-        bloco.dataset.bloco = idx;
-        bloco.dataset.video = block.video_after || '';
-
-        (block.questions || []).forEach((q, qIdx) => {
-          const label = (typeof q === 'string') ? q : (q.label || q.text || '');
-          const div = document.createElement('div');
-          div.className = 'j-pergunta';
-          div.dataset.pergunta = qIdx;
-          div.innerHTML = `
-            <label class="pergunta-enunciado" data-typing data-text="<b>Pergunta ${qIdx + 1}:</b> ${label}" data-speed="36" data-cursor="true"></label>
-            <textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>
-          `;
-          bloco.appendChild(div);
+        fileInput.addEventListener('change',()=>{
+          const f=fileInput.files?.[0];
+          if(!f) return;
+          if(selfieURL) URL.revokeObjectURL(selfieURL);
+          selfieURL=URL.createObjectURL(f);
+          selfieImg.setAttribute('href',selfieURL);
+          if(errorDiv) errorDiv.style.display='none';
+          updatePreview();
         });
 
-        content.appendChild(bloco);
-      });
-
-      const firstBloco = content.querySelector('.j-bloco');
-      if (firstBloco) {
-        firstBloco.style.display = 'block';
-        const firstPergunta = firstBloco.querySelector('.j-pergunta');
-        if (firstPergunta) {
-          firstPergunta.classList.add('active');
-          runTyping(firstPergunta);
-        }
-      } else {
-        console.error('[loadDynamicBlocks] Nenhum bloco carregado!');
-      }
-
-      loadAnswers();
-      const firstTa = document.querySelector('.j-bloco .j-pergunta textarea');
-      if (firstTa) handleInput(firstTa);
-
-      console.log('Blocos carregados! Total de blocos:', blocks.length);
-    }
-
-    /* =========================
-       CONTROLES
-    ========================== */
-    function analyzeSentiment(text) {
-      const POS = {
-        'feliz': 2, 'alegria': 2, 'amor': 3, 'sucesso': 2, 'esperança': 3, 'paz': 2, 'fé': 3, 'gratidão': 2, 'vitória': 3, 'superação': 3,
-        'luz': 2, 'deus': 3, 'coragem': 2, 'força': 2, 'confiança': 2, 'propósito': 3
-      };
-      const NEG = {
-        'triste': -2, 'dor': -3, 'raiva': -2, 'medo': -2, 'frustracao': -2, 'frustração': -2, 'decepcao': -2, 'decepção': -2,
-        'perda': -3, 'culpa': -2, 'ansiedade': -2, 'solidao': -2, 'solidão': -2, 'desespero': -3, 'cansaco': -2, 'cansaço': -2,
-        'fracasso': -2, 'trauma': -3, 'duvida': -2, 'dúvida': -2
-      };
-      let score = 0;
-      (text || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').split(/\s+/).forEach(t => {
-        if (POS[t] != null) score += POS[t];
-        if (NEG[t] != null) score += NEG[t];
-      });
-      return score;
-    }
-    function handleInput(textarea) {
-      const score = analyzeSentiment(textarea.value);
-      updateChama(score);
-      saveAnswers();
-      updateProgress();
-    }
-    function toggleSenha() {
-      const input = document.getElementById('senha');
-      if (!input) return;
-      input.type = (input.type === 'password' ? 'text' : 'password');
-    }
-
-    function proceedAfterSelfie() {
-      isTransitioning = false;
-      console.log('[proceedAfterSelfie] Resetando isTransitioning:', isTransitioning);
-      const intro = window.JORNADA_VIDEOS?.intro || '';
-      console.log('[proceedAfterSelfie] Iniciando filme 0:', intro);
-
-      if (!intro || window.__introPlayed) {
-        proceedToQuestions();
-        return;
-      }
-
-      window.__introPlayed = true;
-      playTransition(intro, () => {
-        console.log('[proceedAfterSelfie] Filme 0 concluído, prosseguindo para perguntas');
-        proceedToQuestions();
-      });
-    }
-
-    let isTransitioning = false;
-    function goNext() {
-      if (isTransitioning) {
-        console.warn('[goNext] Já em transição, ignorando. isTransitioning:', isTransitioning);
-        return;
-      }
-      isTransitioning = true;
-      console.log('[goNext] Iniciando goNext, isTransitioning:', isTransitioning);
-
-      const current = document.querySelector('.j-pergunta.active');
-      if (!current) {
-        console.error('[goNext] Nenhuma pergunta ativa encontrada!');
-        isTransitioning = false;
-        return;
-      }
-
-      const bloco = current.closest('.j-bloco');
-      if (!bloco) {
-        console.error('[goNext] Bloco não encontrado para pergunta ativa!');
-        isTransitioning = false;
-        return;
-      }
-
-      const perguntasDoBloco = Array.from(bloco.querySelectorAll('.j-pergunta'));
-      const i = perguntasDoBloco.indexOf(current);
-
-      console.log('[goNext] Pergunta atual:', i + 1, 'de', perguntasDoBloco.length, 'no bloco', bloco.dataset.bloco);
-
-      current.classList.remove('active');
-      if (i + 1 < perguntasDoBloco.length) {
-        const prox = perguntasDoBloco[i + 1];
-        prox.classList.add('active');
-        runTyping(prox);
-        updateProgress();
-        isTransitioning = false;
-        console.log('[goNext] Avançando para próxima pergunta:', i + 2);
-        return;
-      }
-
-      const blocos = Array.from(document.querySelectorAll('.j-bloco'));
-      const idxBloco = parseInt(bloco.dataset.bloco, 10);
-      const temProx = idxBloco + 1 < blocos.length;
-
-      console.log('[goNext] Bloco atual:', idxBloco, 'Tem próximo?', temProx, 'Total de blocos:', blocos.length);
-
-      const irAdiante = () => {
-        if (temProx) {
-          blocos.forEach(b => b.style.display = 'none');
-          const proxBloco = blocos[idxBloco + 1];
-          if (!proxBloco) {
-            console.error('[goNext] Próximo bloco não encontrado para índice:', idxBloco + 1);
-            isTransitioning = false;
+        previewBtn.addEventListener('click',async()=>{
+          if(!selfieImg.getAttribute('href')){
+            toast('Selecione uma selfie antes.');
             return;
           }
-          proxBloco.style.display = 'block';
-          const primeira = proxBloco.querySelector('.j-pergunta');
-          if (primeira) {
-            primeira.classList.add('active');
-            runTyping(primeira);
-          } else {
-            console.error('[goNext] Nenhuma pergunta encontrada no bloco', idxBloco + 1);
+          updatePreview();
+          flameLayer.style.opacity=1;
+        });
+
+        captureBtn.addEventListener('click',async()=>{
+          if(!selfieImg.getAttribute('href')){
+            toast('Selecione uma selfie antes.');
+            return;
           }
-          updateProgress();
-          isTransitioning = false;
-          console.log('[goNext] Avançando para bloco:', idxBloco + 1);
-        } else {
-          if (window.JORNADA_FINAL_VIDEO) {
-            console.log('[goNext] Tentando tocar Filme 5:', window.JORNADA_FINAL_VIDEO);
-            playTransition(window.JORNADA_FINAL_VIDEO, () => {
-              showSection('section-final');
-              isTransitioning = false;
-            });
-          } else {
-            console.warn('[goNext] Nenhum Filme 5 definido, indo para página final');
-            showSection('section-final');
-            isTransitioning = false;
+          updatePreview();
+          flameLayer.style.opacity=1;
+          await new Promise(r=>requestAnimationFrame(r));
+
+          const canvas=document.createElement('canvas');
+          const rect=card.getBoundingClientRect();
+          const scale=window.devicePixelRatio||1;
+          canvas.width=Math.round(rect.width*scale);
+          canvas.height=Math.round(rect.height*scale);
+          const ctx=canvas.getContext('2d');
+
+          const load=(src)=>new Promise((res,rej)=>{
+            const im=new Image();
+            im.crossOrigin='anonymous';
+            im.onload=()=>res(im);
+            im.onerror=rej;
+            im.src=src;
+          });
+
+          const bg=await load(bgImg.currentSrc||bgImg.src).catch(()=>{
+            if(errorDiv) errorDiv.style.display='block';
+            toast('Erro ao carregar a imagem de fundo.');
+            return;
+          });
+          ctx.drawImage(bg,0,0,canvas.width,canvas.height);
+
+          const W=canvas.width,H=canvas.height;
+          const fw=0.40*W,fh=0.60*H,fx=(W-fw)/2,fy=(H-fh)/2+0.06*H;
+
+          const grad=ctx.createRadialGradient(fx+fw/2,fy+fh*0.65,fh*0.02,fx+fw/2,fy+fh*0.65,fh*0.55);
+          grad.addColorStop(0,'rgba(255,224,130,1)');
+          grad.addColorStop(0.55,'rgba(255,180,0,0.9)');
+          grad.addColorStop(1,'rgba(255,180,0,0)');
+          ctx.fillStyle=grad;
+          ctx.beginPath(); ctx.ellipse(fx+fw/2,fy+fh*0.65,fw*0.35,fh*0.45,0,0,Math.PI*2); ctx.fill();
+
+          function flamePath(ctx,x,y,w,h){
+            ctx.beginPath();
+            ctx.moveTo(x+0.50*w,y+0.133*h);
+            ctx.bezierCurveTo(x+0.42*w,y+0.233*h,x+0.34*w,y+0.300*h,x+0.33*w,y+0.387*h);
+            ctx.bezierCurveTo(x+0.32*w,y+0.487*h,x+0.41*w,y+0.547*h,x+0.50*w,y+0.613*h);
+            ctx.bezierCurveTo(x+0.59*w,y+0.547*h,x+0.68*w,y+0.487*h,x+0.67*w,y+0.387*h);
+            ctx.bezierCurveTo(x+0.66*w,y+0.300*h,x+0.58*w,y+0.233*h,x+0.50*w,y+0.133*h);
           }
-          updateProgress();
-          console.log('[goNext] Indo para página final');
+
+          ctx.save();
+          flamePath(ctx,fx,fy,fw,fh);
+          ctx.clip();
+
+          const selfie=await load(selfieImg.getAttribute('href')).catch(()=>{
+            if(errorDiv) errorDiv.style.display='block';
+            toast('Erro ao carregar a selfie.');
+            return;
+          });
+
+          const selfieScaleVal=parseFloat(scaleInput.value);
+          const ox=parseFloat(offsetXInput.value);
+          const oy=parseFloat(offsetYInput.value);
+          const svgScaleX=fw/100;
+          const svgScaleY=fh/150;
+
+          let coverRatio=Math.max(fw/selfie.width,fh/selfie.height)*selfieScaleVal;
+          let sw=selfie.width*coverRatio;
+          let sh=selfie.height*coverRatio;
+          let sx=fx+(fw-sw)/2+ox*svgScaleX;
+          let sy=fy+(fh-sh)/2+oy*svgScaleY;
+
+          ctx.drawImage(selfie,sx,sy,sw,sh);
+          ctx.restore();
+
+          ctx.strokeStyle='rgba(255,200,0,.85)';
+          ctx.lineWidth=Math.max(1.2,W*0.0022);
+          flamePath(ctx,fx,fy,fw,fh);
+          ctx.stroke();
+
+          ctx.fillStyle='#f7d37a';
+          ctx.textAlign='center';
+          ctx.font=`bold ${Math.round(W*0.075)}px Cardo, serif`;
+          ctx.textBaseline='top';
+          ctx.fillText(card.dataset.guide,W/2,H*0.035);
+          const userName=(nameInput.value.trim()||'NOME').toUpperCase();
+          ctx.font=`bold ${Math.round(W*0.068)}px Cardo, serif`;
+          ctx.fillText(userName,W/2,H*0.955);
+
+          const dataURL=canvas.toDataURL('image/png');
+          try{
+            localStorage.setItem('IRMANDADE_SELFIE_FINAL',dataURL);
+            const a=document.createElement('a');
+            a.href=dataURL;
+            a.download=`jornada-${card.dataset.guide.toLowerCase()}-${Date.now()}.png`;
+            a.click();
+            if(errorDiv) errorDiv.style.display='none';
+          }catch(_){
+            if(errorDiv) errorDiv.style.display='block';
+            toast('Erro ao salvar ou baixar a imagem.');
+          }
+        });
+
+        loadBg();
+        syncNameInput();
+      })();
+
+      /* ===== chat com guia ===== */
+      async function sendChatMessage(){
+        const input=document.getElementById('grok-chat-input');
+        const messagesDiv=document.getElementById('grok-chat-messages');
+        if(!input||!messagesDiv) return;
+        const userMessage=input.value.trim();
+        if(!userMessage) return;
+
+        const tokens=userMessage.split(/\s+/).length;
+        if(tokens>100){
+          const guiaMsg=document.createElement('div');
+          guiaMsg.className='grok-chat-message grok';
+          guiaMsg.textContent='Por favor, limite sua mensagem a 100 palavras.';
+          messagesDiv.appendChild(guiaMsg);
+          messagesDiv.scrollTop=messagesDiv.scrollHeight;
+          return;
         }
+
+        const userMsg=document.createElement('div');
+        userMsg.className='grok-chat-message user';
+        userMsg.textContent=userMessage;
+        messagesDiv.appendChild(userMsg);
+
+        const currentQuestion=document.querySelector('.j-pergunta.active .pergunta-enunciado')?.textContent||'';
+        const currentAnswer=document.querySelector('.j-pergunta.active textarea')?.value||'';
+        const respostas=JSON.parse(localStorage.getItem('jornada_respostas')||'{}');
+        const blocoIdx=document.querySelector('.j-bloco[style*="display: block"]')?.dataset.bloco||0;
+        const guia=localStorage.getItem('JORNADA_GUIA')||'zion';
+        const context={currentQuestion,currentAnswer,respostas,blocoIdx,progresso:document.getElementById('jprog-pct')?.textContent||'0% concluído',guia};
+
+        const guiaConfigs=window.guiaConfigs||{
+          zion:{apiUrl:'https://zion-backend-api.onrender.com/v1/chat',model:'grok'},
+          lumen:{apiUrl:'https://lumen-backend-api.onrender.com/v1/chat',model:'gpt-5'},
+          arian:{apiUrl:'https://arion-backend-api.onrender.com/v1/chat',model:'gemini'}
+        };
+        const cfg=guiaConfigs[guia]||guiaConfigs.lumen;
+
+        try{
+          const system=`Você é ${guia==='zion'?'Zion (Grok)':guia==='arian'?'Arian (Gemini)':'Lumen (ChatGPT)'} guiando a Jornada. Contexto: `+JSON.stringify(context);
+          const resp=await fetch(cfg.apiUrl,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+              model:cfg.model,
+              messages:[{role:'system',content:system},{role:'user',content:userMessage}],
+              temperature:0.7
+            })
+          });
+          if(!resp.ok) throw new Error('API falhou: '+resp.status);
+          const data=await resp.json();
+          const guiaMessage=data?.choices?.[0]?.message?.content||data?.message?.content||'Tô pronto pra te guiar! Como posso ajudar?';
+          const guiaMsg=document.createElement('div');
+          guiaMsg.className='grok-chat-message grok';
+          messagesDiv.appendChild(guiaMsg);
+          typeWriter(guiaMsg,guiaMessage,36,true);
+          messagesDiv.scrollTop=messagesDiv.scrollHeight;
+        }catch(e){
+          console.error('[Chat] erro',e);
+          const guiaMsg=document.createElement('div');
+          guiaMsg.className='grok-chat-message grok';
+          typeWriter(guiaMsg,'Ops, algo deu errado! Tenta de novo ou pula pra próxima pergunta.',36,true);
+          messagesDiv.appendChild(guiaMsg);
+          messagesDiv.scrollTop=messagesDiv.scrollHeight;
+        }
+        input.value='';
+      }
+
+      /* ===== devolutiva da API ===== */
+      async function fetchDevolutiva(pergunta, resposta, guia){
+        const guiaConfigs=window.guiaConfigs||{
+          zion:{apiUrl:'https://zion-backend-api.onrender.com/v1/chat',model:'grok'},
+          lumen:{apiUrl:'https://lumen-backend-api.onrender.com/v1/chat',model:'gpt-5'},
+          arian:{apiUrl:'https://arion-backend-api.onrender.com/v1/chat',model:'gemini'}
+        };
+        const cfg=guiaConfigs[guia]||guiaConfigs.lumen;
+        try{
+          const system=`Você é ${guia==='zion'?'Zion (Grok)':guia==='arian'?'Arian (Gemini)':'Lumen (ChatGPT)'} guiando a Jornada. Forneça uma devolutiva acolhedora, reflexiva e simbólica para a resposta do usuário à pergunta "${pergunta}".`;
+          const resp=await fetch(cfg.apiUrl,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+              model:cfg.model,
+              messages:[
+                {role:'system',content:system},
+                {role:'user',content:resposta}
+              ],
+              temperature:0.7
+            })
+          });
+          if(!resp.ok) throw new Error('API falhou: '+resp.status);
+          const data=await resp.json();
+          return data?.choices?.[0]?.message?.content||data?.message?.content||'Obrigado por compartilhar. Sua reflexão ilumina o caminho.';
+        }catch(e){
+          console.error('[Devolutiva] erro',e);
+          return 'Ops, algo deu errado ao gerar a devolutiva. Continue sua jornada!';
+        }
+      }
+
+      /* ===== progresso & storage ===== */
+      function updateProgress(){
+        const perguntas=document.querySelectorAll('.j-pergunta');
+        const respondidas=Array.from(perguntas).filter(p=> (p.querySelector('textarea')?.value.trim()||'')!=='').length;
+        const total=perguntas.length||1;
+        const pct=Math.round((respondidas/total)*100);
+        const fill=document.getElementById('jprog-fill');
+        const badge=document.getElementById('jprog-pct');
+        const jFill=document.getElementById('j-fill-inline');
+        const jMeta=document.getElementById('j-meta');
+        if(fill) fill.style.width=pct+'%';
+        if(badge) badge.textContent=pct+'% concluído';
+        if(jFill) jFill.style.width=pct+'%';
+        if(jMeta) jMeta.textContent=`Respondidas: ${respondidas} de ${total}`;
+      }
+      function saveAnswers(){
+        const respostas={};
+        document.querySelectorAll('.j-pergunta textarea').forEach((input,idx)=>{
+          const text=input.value.trim();
+          const tokens=text.split(/\s+/).length;
+          if(tokens>100){
+            input.value=text.split(/\s+/).slice(0,100).join(' ');
+            toast('Resposta limitada a 100 palavras.');
+          }
+          respostas[`q${idx}`]=input.value||'';
+        });
+        try{ localStorage.setItem('jornada_respostas', JSON.stringify(respostas)); }catch(_){}
+      }
+      function loadAnswers(){
+        const respostas=JSON.parse(localStorage.getItem('jornada_respostas')||'{}');
+        document.querySelectorAll('.j-pergunta textarea').forEach((input,idx)=>{
+          input.value=respostas[`q${idx}`]||'';
+          if(input.value) typeAnswer(input, input.value, 36);
+        });
+        updateProgress();
+      }
+
+      /* ===== pergaminho & seções ===== */
+      function checkImage(url,fallbackUrl){
+        return new Promise(resolve=>{
+          const img=new Image();
+          img.onload=()=>resolve(url);
+          img.onerror=()=>resolve(fallbackUrl);
+          img.src=url;
+        });
+      }
+      function updateCanvasBackground(sectionId){
+        const canvas=document.getElementById('jornada-canvas');
+        if(!canvas) return;
+        if(sectionId==='section-perguntas'){
+          checkImage('/assets/img/pergaminho-rasgado-horiz.png','/assets/img/pergaminho-rasgado-vert.png').then(bg=>{
+            canvas.className=`card pergaminho pergaminho-h${bg.includes('vert')?' fallback':''}`;
+            canvas.style.background=`var(--panel) url('${bg}') no-repeat center/cover`;
+          });
+        } else {
+          canvas.className='card pergaminho pergaminho-v';
+          canvas.style.background='var(--panel) url(/assets/img/pergaminho-rasgado-vert.png) no-repeat center/cover';
+        }
+      }
+      function showSection(sectionId){
+        document.querySelectorAll('.j-section').forEach(s=>s.classList.add('hidden'));
+        const active=document.getElementById(sectionId);
+        if(active) active.classList.remove('hidden');
+        updateCanvasBackground(sectionId);
+        ensureHeroFlame(sectionId);
+
+        if(sectionId==='section-perguntas'){
+          updateProgress();
+          const perguntas=document.querySelectorAll('.j-pergunta');
+          if(perguntas.length){
+            const first=document.querySelector('.j-pergunta.active')||perguntas[0];
+            first.classList.add('active');
+            const lbl=first.querySelector('.pergunta-enunciado')?.textContent||'';
+            const ta=first.querySelector('textarea');
+            ta.placeholder="Digite sua resposta...";
+            const aria=document.getElementById('aria-pergunta');
+            if(aria) aria.textContent=lbl;
+          }
+        }
+        if(sectionId==='section-final'){
+          const url=localStorage.getItem('IRMANDADE_SELFIE_FINAL');
+          if(url){
+            const img=document.querySelector('#minhaFotoFinal');
+            if(img) img.src=url;
+          }
+        }
+        if(sectionId==='section-guia'){
+          const guiaNameInput=document.getElementById('guiaNameInput');
+          const storedName=localStorage.getItem('JORNADA_NOME')||'';
+          if(guiaNameInput&&storedName) guiaNameInput.value=storedName;
+        }
+      }
+
+      /* ===== blocos dinâmicos ===== */
+      window.loadDynamicBlocks=function(){
+        const content=document.getElementById('perguntas-container');
+        if(!content) return;
+
+        const blocks=window.JORNADA_BLOCKS||[];
+        content.innerHTML='';
+
+        blocks.forEach((block,bIdx)=>{
+          const bloco=document.createElement('section');
+          bloco.className='j-bloco';
+          bloco.dataset.bloco=bIdx;
+          bloco.dataset.video=block.video_after||'';
+
+          (block.questions||[]).forEach((q,qIdx)=>{
+            const label=typeof q==='string'?q:(q.label||q.text||'');
+            const div=document.createElement('div');
+            div.className='j-pergunta';
+            div.dataset.pergunta=qIdx;
+
+            const enunciado=
+              `<label class="pergunta-enunciado" `+
+              `data-typing data-text="Pergunta ${qIdx+1}: ${label}" `+
+              `data-speed="36" data-cursor="true"></label>`;
+
+            div.innerHTML=enunciado+
+              `\n<textarea rows="4" class="input" placeholder="Digite sua resposta..."></textarea>`+
+              `<div class="devolutiva-container" style="display:none;"><p data-typing data-speed="36" data-cursor="true"></p></div>`+
+              `<div class="accessibility-controls">`+
+              `<button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>`+
+              `<button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>`+
+              `</div>`;
+
+            bloco.appendChild(div);
+          });
+
+          content.appendChild(bloco);
+        });
+
+        const firstBloco=content.querySelector('.j-bloco');
+        if(firstBloco){
+          firstBloco.style.display='block';
+          const first=firstBloco.querySelector('.j-pergunta');
+          if(first){
+            first.classList.add('active');
+            if(window.runTyping) window.runTyping(first);
+          }
+        }
+
+        if(typeof loadAnswers==='function') loadAnswers();
+        const firstTa=document.querySelector('.j-bloco .j-pergunta textarea');
+        if(firstTa&&typeof handleInput==='function') handleInput(firstTa);
+        initAccessibility();
       };
 
-      const src = (window.JORNADA_BLOCKS[idxBloco] && window.JORNADA_BLOCKS[idxBloco].video_after) || '';
-      if (src) {
-        console.log('[goNext] Tentando tocar vídeo do bloco', idxBloco, ':', src);
-        playTransition(src, () => {
-          irAdiante();
+      (function(){
+        const prevGoNext=window.goNext;
+        window.goNext=function(){
+          if(typeof prevGoNext==='function') prevGoNext();
+          const active=document.querySelector('.j-pergunta.active');
+          if(active&&window.runTyping) window.runTyping(active);
+        };
+      })();
+
+      /* ===== controles ===== */
+      function analyzeSentiment(text){
+        const POS={'feliz':2,'alegria':2,'amor':3,'sucesso':2,'esperança':3,'paz':2,'fé':3,'gratidão':2,'vitória':3,'superação':3,'luz':2,'deus':3,'coragem':2,'força':2,'confiança':2,'propósito':3};
+        const NEG={'triste':-2,'dor':-3,'raiva':-2,'medo':-2,'frustracao':-2,'frustração':-2,'decepcao':-2,'decepção':-2,'perda':-3,'culpa':-2,'ansiedade':-2,'solidao':-2,'solidão':-2,'desespero':-3,'cansaco':-2,'cansaço':-2,'fracasso':-2,'trauma':-3,'duvida':-2,'dúvida':-2};
+        let score=0;
+        (text||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').split(/\s+/).forEach(t=>{
+          if(POS[t]!=null) score+=POS[t];
+          if(NEG[t]!=null) score+=NEG[t];
         });
-      } else {
-        console.warn('[goNext] Nenhum vídeo associado ao bloco', idxBloco);
-        irAdiante();
+        return score;
       }
-    }
-
-    function goPrev() {
-      if (isTransitioning) {
-        console.warn('[goPrev] Já em transição, ignorando. isTransitioning:', isTransitioning);
-        return;
-      }
-      isTransitioning = true;
-      console.log('[goPrev] Iniciando goPrev, isTransitioning:', isTransitioning);
-
-      const current = document.querySelector('.j-pergunta.active');
-      if (!current) {
-        console.error('[goPrev] Nenhuma pergunta ativa encontrada!');
-        isTransitioning = false;
-        return;
-      }
-
-      const bloco = current.closest('.j-bloco');
-      if (!bloco) {
-        console.error('[goPrev] Bloco não encontrado para pergunta ativa!');
-        isTransitioning = false;
-        return;
-      }
-
-      const perguntasDoBloco = Array.from(bloco.querySelectorAll('.j-pergunta'));
-      const i = perguntasDoBloco.indexOf(current);
-
-      console.log('[goPrev] Pergunta atual:', i + 1, 'de', perguntasDoBloco.length, 'no bloco', bloco.dataset.bloco);
-
-      current.classList.remove('active');
-
-      if (i - 1 >= 0) {
-        const prev = perguntasDoBloco[i - 1];
-        prev.classList.add('active');
-        runTyping(prev);
+      async function handleInput(textarea){
+        const score=analyzeSentiment(textarea.value);
+        updateChama(score);
+        saveAnswers();
         updateProgress();
-        isTransitioning = false;
-        console.log('[goPrev] Voltando para pergunta:', i);
-        return;
-      }
-
-      const blocos = Array.from(document.querySelectorAll('.j-bloco'));
-      const idxBloco = parseInt(bloco.dataset.bloco, 10);
-      const temAnterior = idxBloco - 1 >= 0;
-
-      console.log('[goPrev] Bloco atual:', idxBloco, 'Tem anterior?', temAnterior);
-
-      if (temAnterior) {
-        blocos.forEach(b => b.style.display = 'none');
-        const ant = blocos[idxBloco - 1];
-        ant.style.display = 'block';
-        const ultima = ant.querySelector('.j-pergunta:last-child');
-        if (ultima) {
-          ultima.classList.add('active');
-          runTyping(ultima);
+        const perguntaDiv=textarea.closest('.j-pergunta');
+        const devolutivaDiv=perguntaDiv.querySelector('.devolutiva-container');
+        const devolutivaP=devolutivaDiv.querySelector('p');
+        if(textarea.value.trim()&&devolutivaDiv){
+          devolutivaDiv.style.display='block';
+          const pergunta=perguntaDiv.querySelector('.pergunta-enunciado')?.textContent||'';
+          const resposta=textarea.value;
+          const guia=localStorage.getItem('JORNADA_GUIA')||'zion';
+          const devolutiva=await fetchDevolutiva(pergunta,resposta,guia);
+          typeDevolutiva(devolutivaP,devolutiva,36);
+        } else {
+          devolutivaDiv.style.display='none';
         }
-        updateProgress();
-        isTransitioning = false;
-        console.log('[goPrev] Voltando para bloco:', idxBloco - 1);
-      } else {
+      }
+      function toggleSenha(){
+        const input=document.getElementById('senha');
+        if(!input) return;
+        input.type=(input.type==='password'?'text':'password');
+      }
+      function proceedAfterGuia(guia){
+        const guiaNameInput=document.getElementById('guiaNameInput');
+        if(guiaNameInput&&guiaNameInput.value.trim()){
+          localStorage.setItem('JORNADA_NOME',guiaNameInput.value.trim());
+        } else {
+          toast('Por favor, insira seu nome antes de prosseguir.');
+          return;
+        }
+        localStorage.setItem('JORNADA_GUIA',guia);
+        ensureHeroFlame('section-selfie');
         showSection('section-selfie');
-        isTransitioning = false;
-        console.log('[goPrev] Voltando para selfie');
+        const card=document.getElementById('card-guide');
+        const bgImg=document.getElementById('guideBg');
+        const guideNameEl=document.getElementById('guideNameSlot');
+        card.dataset.guide=guia.toUpperCase();
+        guideNameEl.textContent=guia.toUpperCase();
+        bgImg.src=`/assets/img/irmandade-quarteto-bg-${guia}.png`;
       }
-    }
-
-    /* =========================
-       VÍDEO (overlay)
-    ========================== */
-    function playTransition(src, onEnd) {
-      console.log('[playTransition] Iniciando transição para:', src);
-
-      const overlay = document.getElementById('videoOverlay');
-      const video = document.getElementById('videoTransicao');
-      const fallback = document.getElementById('videoFallback');
-      const skip = document.getElementById('skipVideo');
-
-      if (!overlay || !video || !fallback || !src) {
-        console.warn('[playTransition] Falta overlay, vídeo, fallback ou src:', { overlay, video, fallback, src });
-        alert('Erro ao carregar o vídeo. Verifique o arquivo no servidor.');
-        onEnd && onEnd();
-        return;
+      function proceedAfterSelfie(){
+        isTransitioning=false;
+        const intro=window.JORNADA_VIDEOS?.intro||'';
+        if(!intro||window.__introPlayed){
+          proceedToQuestions();
+          return;
+        }
+        window.__introPlayed=true;
+        playTransition(intro,()=>{ proceedToQuestions(); });
       }
 
-      window.__playingTransition = true;
-      overlay.classList.remove('hidden');
-      video.classList.remove('hidden');
-      fallback.classList.add('hidden');
-      video.pause();
-      video.removeAttribute('src');
-      video.load();
-      video.currentTime = 0;
+      let isTransitioning=false;
+      function goNext(){
+        if(isTransitioning) return;
+        isTransitioning=true;
+        const current=document.querySelector('.j-pergunta.active');
+        if(!current){
+          isTransitioning=false;
+          return;
+        }
+        const bloco=current.closest('.j-bloco');
+        if(!bloco){
+          isTransitioning=false;
+          return;
+        }
+        const perguntas=Array.from(bloco.querySelectorAll('.j-pergunta'));
+        const i=perguntas.indexOf(current);
+        current.classList.remove('active');
 
-      video.controls = true;
-      video.muted = false;
-      video.playsInline = true;
-      video.setAttribute('playsinline', '');
-      video.setAttribute('webkit-playsinline', '');
-      video.style.background = '#000';
+        if(i+1<perguntas.length){
+          const prox=perguntas[i+1];
+          prox.classList.add('active');
+          const lbl=prox.querySelector('.pergunta-enunciado')?.textContent||'';
+          const ta=prox.querySelector('textarea');
+          ta.placeholder="Digite sua resposta...";
+          const aria=document.getElementById('aria-pergunta');
+          if(aria) aria.textContent=lbl;
+          runTyping(prox);
+          updateProgress();
+          isTransitioning=false;
+          return;
+        }
 
-      let ended = false;
-      const cleanup = () => {
-        if (ended) return;
-        ended = true;
-        isTransitioning = false;
-        window.__playingTransition = false;
-        video.pause();
-        overlay.classList.add('hidden');
-        video.classList.add('hidden');
+        const blocos=Array.from(document.querySelectorAll('.j-bloco'));
+        const idxBloco=parseInt(bloco.dataset.bloco,10);
+        const temProx=idxBloco+1<blocos.length;
+
+        const irAdiante=()=>{
+          if(temProx){
+            blocos.forEach(b=>b.style.display='none');
+            const proxBloco=blocos[idxBloco+1];
+            if(!proxBloco){
+              isTransitioning=false;
+              return;
+            }
+            proxBloco.style.display='block';
+            const primeira=proxBloco.querySelector('.j-pergunta');
+            if(primeira){
+              primeira.classList.add('active');
+              const lbl=primeira.querySelector('.pergunta-enunciado')?.textContent||'';
+              const ta=primeira.querySelector('textarea');
+              ta.placeholder="Digite sua resposta...";
+              const aria=document.getElementById('aria-pergunta');
+              if(aria) aria.textContent=lbl;
+              runTyping(primeira);
+            }
+            updateProgress();
+            isTransitioning=false;
+          } else {
+            if(window.JORNADA_FINAL_VIDEO){
+              playTransition(window.JORNADA_FINAL_VIDEO,()=>{ showSection('section-final'); isTransitioning=false;});
+            } else {
+              showSection('section-final');
+              isTransitioning=false;
+            }
+            updateProgress();
+          }
+        };
+
+        const src=(window.JORNADA_BLOCKS[idxBloco]&&window.JORNADA_BLOCKS[idxBloco].video_after)||'';
+        if(src){
+          playTransition(src,()=>{ irAdiante(); });
+        } else {
+          irAdiante();
+        }
+      }
+      window.goNext=goNext;
+
+      function playTransition(src,onEnd){
+        const overlay=document.getElementById('videoOverlay');
+        const video=document.getElementById('videoTransicao');
+        const fallback=document.getElementById('videoFallback');
+        const skip=document.getElementById('skipVideo');
+        if(!overlay||!video||!fallback||!src){
+          onEnd&&onEnd();
+          return;
+        }
+
+        window.__playingTransition=true;
+        overlay.classList.remove('hidden');
+        video.classList.remove('hidden');
         fallback.classList.add('hidden');
+        video.pause();
         video.removeAttribute('src');
         video.load();
-        console.log('[playTransition] Transição concluída para:', src);
-        onEnd && onEnd();
-      };
+        video.currentTime=0;
+        video.controls=true;
+        video.muted=false;
+        video.playsInline=true;
+        video.setAttribute('playsinline','');
+        video.setAttribute('webkit-playsinline','');
+        video.style.background='#000';
 
-      video.onerror = () => {
-        console.error('[Vídeo] Erro ao carregar:', src);
-        video.classList.add('hidden');
-        fallback.classList.remove('hidden');
-        alert('Não foi possível carregar o vídeo: ' + src + '. Converta para H.264 MP4 (ex.: ffmpeg -i input.mp4 -c:v libx264 -c:a aac output.mp4).');
-        setTimeout(cleanup, 5000);
-      };
-      video.onended = cleanup;
-      if (skip) skip.onclick = cleanup;
+        let ended=false;
+        const cleanup=()=>{
+          if(ended) return;
+          ended=true;
+          isTransitioning=false;
+          window.__playingTransition=false;
+            video.pause();
+            overlay.classList.add('hidden');
+            video.classList.add('hidden');
+            fallback.classList.add('hidden');
+            video.removeAttribute('src');
+            video.load();
+            onEnd&&onEnd();
+          };
 
-      video.onloadedmetadata = () => {
-        console.log('[Vídeo] Metadados carregados:', src, 'Dimensões:', video.videoWidth, 'x', video.videoHeight, 'Tempo inicial:', video.currentTime);
-        if (!video.videoWidth || !video.videoHeight) {
-          console.warn('[Vídeo] Apenas áudio detectado:', src);
-          video.classList.add('hidden');
-          fallback.classList.remove('hidden');
-        }
-        video.currentTime = 0;
-        if (video.readyState >= 1) {
-          setTimeout(() => {
-            console.log('[Vídeo] Iniciando reprodução:', src, 'Tempo atual:', video.currentTime);
-            video.play().catch(err => {
-              console.error('[Vídeo] Falha ao reproduzir:', err);
+          video.onerror=(e)=>{
+            console.error('Video error:',e,'Source:',src);
+            fallback.classList.remove('hidden');
+            video.classList.add('hidden');
+            toast('Não foi possível carregar o vídeo.');
+            setTimeout(cleanup,1500);
+          };
+          video.onended=cleanup;
+          if(skip) skip.onclick=cleanup;
+
+          video.onloadedmetadata=()=>{
+            if(!video.videoWidth||!video.videoHeight){
               video.classList.add('hidden');
               fallback.classList.remove('hidden');
-              setTimeout(cleanup, 5000);
-            });
-          }, 500);
-        } else {
-          console.warn('[Vídeo] readyState insuficiente:', video.readyState);
-          setTimeout(() => cleanup(), 5000);
+            }
+            video.currentTime=0;
+            setTimeout(()=>{
+              video.play().catch((e)=>{
+                console.error('Video playback error:',e,'Source:',src);
+                fallback.classList.remove('hidden');
+                video.classList.add('hidden');
+                setTimeout(cleanup,1500);
+              });
+            },400);
+          };
+
+          video.src=src+'?t='+Date.now();
+          setTimeout(cleanup,90000);
         }
-      };
+        window.playTransition=playTransition;
 
-      video.src = src + '?t=' + Date.now();
-      setTimeout(cleanup, 120000);
-    }
-
-    window.playTransition = playTransition;
-
-    function generatePDF() {
-      const respostas = JSON.parse(localStorage.getItem('jornada_respostas') || '{}');
-      const doc = { content: [] };
-
-      doc.content.push({
-        text: 'Jornada Essencial - Irmandade Conhecimento com Luz',
-        style: { fontSize: 20, bold: true, alignment: 'center', margin: [0, 0, 0, 20] }
-      });
-
-      Object.keys(respostas).forEach((key, idx) => {
-        const pergunta = document.querySelector(`.j-pergunta[data-pergunta="${idx}"] .pergunta-enunciado`)?.textContent || `Pergunta ${idx + 1}`;
-        doc.content.push(
-          { text: pergunta, style: { fontSize: 14, bold: true, margin: [0, 10, 0, 5] } },
-          { text: respostas[key] || 'Sem resposta', style: { fontSize: 12, margin: [0, 0, 0, 10] } }
-        );
-      });
-
-      if (window.pdfMake) {
-        pdfMake.createPdf(doc).download('jornada_essencial.pdf');
-      } else {
-        console.error('Biblioteca pdfMake não encontrada.');
-        alert('Funcionalidade de PDF não disponível. Contate o suporte.');
-      }
-    }
-
-    function finalize() {
-      const respostas = {};
-      document.querySelectorAll('.j-pergunta textarea').forEach((input, idx) => {
-        respostas[`q${idx}`] = input.value || '';
-      });
-      console.log('[JORNADA] Finalizado. Respostas:', respostas);
-      localStorage.removeItem('jornada_respostas');
-      setTimeout(() => location.replace('/index.html'), 1200);
-    }
-
-    function startJourney() {
-      const senha = (document.getElementById('senha')?.value || '').trim().toLowerCase();
-      if (!['iniciar', 'olho magico', 'olho mágico'].includes(senha)) {
-        alert('Senha incorreta. Tente novamente.');
-        return;
-      }
-
-      console.log('[startJourney] Senha validada, indo para selfie');
-      showSection('section-selfie');
-    }
-
-    function proceedToQuestions() {
-      isTransitioning = false;
-      console.log('[proceedToQuestions] Resetando isTransitioning:', isTransitioning);
-      showSection('section-perguntas');
-      loadDynamicBlocks();
-      const perguntas = document.querySelectorAll('.j-pergunta');
-      if (perguntas.length) {
-        perguntas[0].classList.add('active');
-        runTyping(perguntas[0]);
-        const firstTa = document.querySelector('.j-pergunta.active textarea');
-        if (firstTa) handleInput(firstTa);
-      } else {
-        console.error('Nenhuma pergunta encontrada após loadDynamicBlocks!');
-      }
-      updateProgress();
-      console.log('Jornada iniciada com sucesso!');
-    }
-
-    function initJornada() {
-      document.addEventListener('input', (ev) => {
-        const ta = ev.target.closest('.j-pergunta textarea');
-        if (ta) handleInput(ta);
-      });
-
-      document.addEventListener('click', (ev) => {
-        if (isTransitioning) {
-          console.warn('[initJornada] Clique ignorado, em transição. isTransitioning:', isTransitioning);
-          return;
-        }
-
-        const aNext = ev.target.closest('[data-action="next"]');
-        const aPrev = ev.target.closest('[data-action="prev"]');
-        const aStart = ev.target.closest('[data-action="start"]');
-        const aToggle = ev.target.closest('[data-action="toggle-password"], .password-toggle');
-        const aRestart = ev.target.closest('[data-action="restart"]');
-        const btnPDF = ev.target.closest('[data-action="generate-pdf"]');
-        const btnSkipSelfie = ev.target.closest('[data-action="skip-selfie"]');
-
-        console.log('[initJornada] Clique detectado:', { aNext, aPrev, aStart, aToggle, aRestart, btnPDF, btnSkipSelfie });
-
-        if (aNext) { ev.preventDefault(); goNext(); }
-        if (aPrev) { ev.preventDefault(); goPrev(); }
-        if (aStart) { ev.preventDefault(); startJourney(); }
-        if (aToggle) { ev.preventDefault(); toggleSenha(); }
-        if (aRestart) { ev.preventDefault(); localStorage.removeItem('jornada_respostas'); location.hash = '#intro'; location.reload(); }
-        if (btnPDF) { ev.preventDefault(); generatePDF(); }
-        if (btnSkipSelfie) { ev.preventDefault(); proceedAfterSelfie(); }
-      }, { capture: true });
-
-      console.log('Controlador da jornada inicializado!');
-    }
-
-    /* ===== Blocos e vídeos ===== */
-    const VIDEO_BASE = '/assets/img/';
-    window.JORNADA_VIDEOS = {
-      intro: VIDEO_BASE + 'filme-0-ao-encontro-da-jornada.mp4',
-      afterBlocks: {
-        0: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
-        1: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
-        2: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
-        3: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
-      },
-      final: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
-    };
-
-    (function ensureBlocks() {
-      const fallback = [
-        {
-          title: 'Bloco 1 — Raízes',
-          questions: [{ label: 'Quem é você hoje?' }, { label: 'O que a Luz te pede agora?' }],
-          video_after: window.JORNADA_VIDEOS.afterBlocks[0]
-        },
-        {
-          title: 'Bloco 2 — Caminho',
-          questions: [{ label: 'Qual verdade você precisa admitir para seguir?' }, { label: 'O que precisa ser curado neste momento?' }],
-          video_after: window.JORNADA_VIDEOS.afterBlocks[1]
-        },
-        {
-          title: 'Bloco 3 — Transformação',
-          questions: [{ label: 'O que você aprendeu até agora?' }, { label: 'Como você pode crescer com isso?' }],
-          video_after: window.JORNADA_VIDEOS.afterBlocks[2]
-        },
-        {
-          title: 'Bloco 4 — Conclusão',
-          questions: [{ label: 'O que você leva desta jornada?' }, { label: 'Qual é o próximo passo?' }],
-          video_after: window.JORNADA_VIDEOS.afterBlocks[3]
-        }
-      ];
-
-      window.JORNADA_BLOCKS = (window.JORNADA_BLOCKS || fallback).map((b, idx) => ({
-        title: b.title || `Bloco ${idx + 1}`,
-        questions: (b.questions || []).map(q => ({ label: typeof q === 'string' ? q : q.label || q.text || '' })),
-        video_after: b.video_after || window.JORNADA_VIDEOS.afterBlocks[idx] || ''
-      }));
-
-      window.JORNADA_FINAL_VIDEO = window.JORNADA_FINAL_VIDEO || window.JORNADA_VIDEOS.final;
-      console.log('JORNADA_BLOCKS normalizados:', window.JORNADA_BLOCKS);
-    })();
-
-    /* ===== Silenciar diálogos enquanto há vídeo ===== */
-    (function patchDialogs() {
-      const A = window.alert, C = window.confirm, P = window.prompt;
-      function emTransicao() { return !!(window.__playingTransition || !document.getElementById('videoOverlay')?.classList.contains('hidden')); }
-      window.alert = (m) => emTransicao() ? (console.warn('[silenced alert]', m), void 0) : A(m);
-      window.confirm = (m) => emTransicao() ? (console.warn('[silenced confirm]', m), true) : C(m);
-      window.prompt = (m, d) => emTransicao() ? (console.warn('[silenced prompt]', m), d || '') : P(m, d);
-    })();
-
-    /* ===== Lock do vídeo final e rota ===== */
-    (function patchFinalLock() {
-      const ORIG_SHOW = showSection;
-      let LOCK_UNTIL = 0;
-      window.showSection = function(id) {
-        if (Date.now() < LOCK_UNTIL && id !== 'section-final') {
-          console.warn('[FinalLock] Ignorando troca durante lock:', id);
-          return;
-        }
-        return ORIG_SHOW.apply(this, arguments);
-      };
-
-      const ORIG_PLAY = playTransition;
-      window.playTransition = function(src, onEnd) {
-        const isFinal = (window.JORNADA_FINAL_VIDEO && src === window.JORNADA_FINAL_VIDEO);
-        return ORIG_PLAY(src, function() {
-          if (isFinal) {
-            try { location.hash = '#final'; } catch (_) {}
-            LOCK_UNTIL = Date.now() + 1500;
-            try { ORIG_SHOW('section-final'); } catch (_) {}
-          }
-          onEnd && onEnd();
-        });
-      };
-    })();
-
-    /* ===== Boot ===== */
-    function boot() {
-      ensureHeaderFlame();
-      ensureInlineFlame('chama-perguntas', 'chama-vela chama-md');
-      ensurePageFlames();
-      const route = (location.hash || '#intro').slice(1);
-      if (route === 'perguntas') { showSection('section-perguntas'); loadDynamicBlocks(); }
-      else if (route === 'final') { showSection('section-final'); }
-      else if (route === 'selfie') { showSection('section-selfie'); }
-      else { showSection('section-intro'); }
-      runTyping(document);
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      runTyping(document);
-      initJornada();
-      boot();
-
-      const target = document.getElementById('jornada-conteudo');
-      if (target) {
-        const obs = new MutationObserver(muts => {
-          muts.forEach(m => {
-            runTyping(m.target);
-            if (m.target.id === 'perguntas-container') updateProgress();
+        /* ===== controle de orientação de vídeo ===== */
+        function lockVideoOrientation(){
+          const video=document.getElementById('videoTransicao');
+          if(!video) return;
+          video.addEventListener('webkitbeginfullscreen',(e)=>{
+            e.preventDefault();
+            video.exitFullscreen?.();
           });
-        });
-        obs.observe(target, { childList: true, subtree: true });
-      }
-    });
+          video.addEventListener('fullscreenchange',()=>{
+            if(document.fullscreenElement===video){
+              document.exitFullscreen?.();
+            }
+          });
+          window.addEventListener('orientationchange',()=>{
+            video.style.transform='rotate(0deg)';
+          });
+          if(window.matchMedia('(orientation: portrait)').matches){
+            video.style.width='100vw';
+            video.style.height='auto';
+            video.style.maxHeight='100vh';
+          }
+        }
 
-    // ponte global
-    window.toggleSenha = toggleSenha;
-    window.startJourney = startJourney;
-    window.showSection = showSection;
-    window.proceedAfterSelfie = proceedAfterSelfie;
-  })();
-  </script>
+        function generatePDF(){
+          const respostas=JSON.parse(localStorage.getItem('jornada_respostas')||'{}');
+          const doc={content:[]};
+          doc.content.push({text:'Jornada Essencial - Irmandade Conhecimento com Luz',style:{fontSize:20,bold:true,alignment:'center',margin:[0,0,0,20]}});
+          Object.keys(respostas).forEach((key,idx)=>{
+            const pergunta=document.querySelector(`.j-pergunta[data-pergunta="${idx}"] .pergunta-enunciado`)?.textContent||`Pergunta ${idx+1}`;
+            doc.content.push(
+              {text:pergunta,style:{fontSize:14,bold:true,margin:[0,10,0,5]}},
+              {text:respostas[key]||'Sem resposta',style:{fontSize:12,margin:[0,0,0,10]}}
+            );
+          });
+          if(window.pdfMake){
+            pdfMake.createPdf(doc).download('jornada_essencial.pdf');
+          } else {
+            toast('PDF não disponível.');
+          }
+        }
+
+        function startJourney(){
+          const senha=(document.getElementById('senha')?.value||'').trim().toLowerCase();
+          console.log('[startJourney] senha ignorada p/ debug');
+          ensureHeroFlame('section-guia');
+          showSection('section-guia');
+        }
+
+        function proceedToQuestions(){
+          isTransitioning=false;
+          showSection('section-perguntas');
+          loadDynamicBlocks();
+          const perguntas=document.querySelectorAll('.j-pergunta');
+          if(perguntas.length){
+            perguntas[0].classList.add('active');
+            const lbl=perguntas[0].querySelector('.pergunta-enunciado')?.textContent||'';
+            const ta=perguntas[0].querySelector('textarea');
+            ta.placeholder="Digite sua resposta...";
+            const aria=document.getElementById('aria-pergunta');
+            if(aria) aria.textContent=lbl;
+            if(ta) handleInput(ta);
+          }
+          updateProgress();
+        }
+
+        /* ===== Acessibilidade: Microfone e Áudio ===== */
+        let recognition=null;
+        let currentLang='pt-BR';
+        let isRecognizing=false;
+
+        function initAccessibility(){
+          if('SpeechRecognition' in window||'webkitSpeechRecognition' in window){
+            recognition=new(window.SpeechRecognition||window.webkitSpeechRecognition)();
+            recognition.continuous=false;
+            recognition.interimResults=false;
+            recognition.lang=currentLang;
+          } else {
+            toast('Seu navegador não suporta reconhecimento de voz.');
+          }
+
+          document.addEventListener('click',(ev)=>{
+            if(!ev.target) return;
+            const btnMic=ev.target.closest('[data-action="start-mic"]');
+            const btnAudio=ev.target.closest('[data-action="read-question"]');
+            if(btnMic){
+              ev.preventDefault();
+              const ta=btnMic.closest('.j-pergunta')?.querySelector('textarea');
+              if(ta) startRecognition(ta,btnMic);
+            }
+            if(btnAudio){
+              ev.preventDefault();
+              const enunciado=btnAudio.closest('.j-pergunta')?.querySelector('.pergunta-enunciado');
+              const text=enunciado?.textContent||'';
+              readAloud(text);
+            }
+          });
+
+          const langSelect = document.getElementById('language-select');
+          if(langSelect){
+            langSelect.addEventListener('change', (ev) => {
+              currentLang = ev.target.value;
+              if(recognition) recognition.lang = currentLang;
+              toast(`Idioma alterado para ${currentLang}`);
+              updateBlocks();
+              if(!document.getElementById('section-perguntas').classList.contains('hidden')){
+                loadDynamicBlocks();
+              }
+            });
+          }
+        }
+
+        function startRecognition(textarea, btn){
+          if(!recognition || isRecognizing) return;
+          isRecognizing=true;
+          btn.classList.add('recording');
+          btn.textContent='Gravando...';
+          recognition.onresult=(event)=>{
+            const transcript=event.results[0][0].transcript;
+            typeAnswer(textarea,(textarea.value?textarea.value+' ':'')+transcript,36);
+            saveAnswers();
+            updateProgress();
+          };
+          recognition.onend=()=>{
+            isRecognizing=false;
+            btn.classList.remove('recording');
+            btn.textContent='🎤 Falar Resposta';
+          };
+          recognition.onerror=(event)=>{
+            toast('Erro no reconhecimento: '+event.error);
+            recognition.onend();
+          };
+          recognition.start();
+        }
+
+        function readAloud(text){
+          if('speechSynthesis' in window){
+            const utterance=new SpeechSynthesisUtterance(text);
+            utterance.lang=currentLang;
+            speechSynthesis.speak(utterance);
+          } else {
+            toast('Seu navegador não suporta síntese de voz.');
+          }
+        }
+
+        function initJornada(){
+          document.addEventListener('input',(ev)=>{
+            const ta=ev.target.closest?.('.j-pergunta textarea');
+            if(ta) handleInput(ta);
+          });
+          document.addEventListener('focusin',(ev)=>{
+            if(ev.target && ev.target.matches('.j-pergunta textarea')){
+              if(__abortTypingPlaceholder) __abortTypingPlaceholder();
+            }
+          });
+          document.addEventListener('click',(ev)=>{
+            if(isTransitioning || !ev.target) return;
+            const aNext=ev.target.closest?.('[data-action="next"]');
+            const aStart=ev.target.closest?.('[data-action="start"]');
+            const aToggle=ev.target.closest?.('[data-action="toggle-password"], .password-toggle');
+            const aRestart=ev.target.closest?.('[data-action="restart"]');
+            const btnPDF=ev.target.closest?.('[data-action="generate-pdf"]');
+            const btnDownloadSelfie=ev.target.closest?.('[data-action="download-selfie"]');
+            const btnSkipSelfie=ev.target.closest?.('[data-action="skip-selfie"]');
+            const btnSendChat=ev.target.closest?.('[data-action="send-chat"]');
+            const btnSelectGuia=ev.target.closest?.('[data-action="select-guia"]');
+            const btnNextTermos=ev.target.closest?.('[data-action="next-termos"]');
+            const btnNextSenha=ev.target.closest?.('[data-action="next-senha"]');
+            const btnTermosNext=ev.target.closest?.('[data-action="termos-next"]');
+            const btnTermosPrev=ev.target.closest?.('[data-action="termos-prev"]');
+
+            if(aNext){ev.preventDefault(); goNext();}
+            if(aStart){ev.preventDefault(); startJourney();}
+            if(aToggle){ev.preventDefault(); toggleSenha();}
+            if(aRestart){ev.preventDefault(); localStorage.removeItem('jornada_respostas'); localStorage.removeItem('JORNADA_GUIA'); location.hash='#intro'; location.replace('/index.html');}
+            if(btnPDF){ev.preventDefault(); generatePDF();}
+            if(btnDownloadSelfie){
+              ev.preventDefault();
+              const dataURL=localStorage.getItem('IRMANDADE_SELFIE_FINAL');
+              if(dataURL){
+                const a=document.createElement('a');
+                a.href=dataURL;
+                a.download='jornada-selfie.png';
+                a.click();
+              } else {
+                toast('Nenhuma imagem disponível para download.');
+              }
+            }
+            if(btnSkipSelfie){ev.preventDefault(); proceedAfterSelfie();}
+            if(btnSendChat){ev.preventDefault(); sendChatMessage();}
+            if(btnSelectGuia){ev.preventDefault(); proceedAfterGuia(btnSelectGuia.dataset.guia);}
+            if(btnNextTermos){ev.preventDefault(); showSection('section-termos');}
+            if(btnNextSenha){ev.preventDefault(); showSection('section-senha');}
+            if(btnTermosNext){
+              ev.preventDefault();
+              document.getElementById('termos-pg1')?.classList.add('hidden');
+              document.getElementById('termos-pg2')?.classList.remove('hidden');
+            }
+            if(btnTermosPrev){
+              ev.preventDefault();
+              document.getElementById('termos-pg2')?.classList.add('hidden');
+              document.getElementById('termos-pg1')?.classList.remove('hidden');
+            }
+          },{capture:true});
+
+          document.getElementById('grok-chat-input')?.addEventListener('keypress',(ev)=>{
+            if(ev.key==='Enter'){
+              ev.preventDefault();
+              sendChatMessage();
+            }
+          });
+        }
+
+        /* vídeos & blocos */
+        const VIDEO_BASE='/assets/img/';
+        window.JORNADA_VIDEOS={
+          intro:VIDEO_BASE+'filme-0-ao-encontro-da-jornada.mp4',
+          afterBlocks:{
+            0:VIDEO_BASE+'filme-1-entrando-na-jornada.mp4',
+            1:VIDEO_BASE+'filme-2-dentro-da-jornada.mp4',
+            2:VIDEO_BASE+'filme-3-traumas-na-jornada.mp4',
+            3:VIDEO_BASE+'filme-4-aproximando-do-final.mp4'
+          },
+          final:VIDEO_BASE+'filme-5-fim-da-jornada.mp4'
+        };
+        window.JORNADA_FINAL_VIDEO=window.JORNADA_VIDEOS.final;
+
+        const blockTranslations={
+          'pt-BR':[
+            {title:'Bloco 1 — Raízes',questions:[{label:'Quem é você hoje?'},{label:'O que te trouxe até esta jornada?'},{label:'Qual é o seu maior sonho espiritual?'}],video_after:VIDEO_BASE+'filme-1-entrando-na-jornada.mp4'},
+            {title:'Bloco 2 — Reflexões',questions:[{label:'Quais são seus maiores desafios atuais?'},{label:'Como você lida com o medo ou a dúvida?'},{label:'O que a "luz" significa para você?'}],video_after:VIDEO_BASE+'filme-2-dentro-da-jornada.mp4'},
+            {title:'Bloco 3 — Crescimento',questions:[{label:'O que você quer mudar na sua vida?'},{label:'Quem inspira você e por quê?'},{label:'Como você pratica gratidão no dia a dia?'}],video_after:VIDEO_BASE+'filme-3-traumas-na-jornada.mp4'},
+            {title:'Bloco 4 — Integração',questions:[{label:'Qual lição você leva dessa jornada?'},{label:'Como vai aplicar isso no futuro?'},{label:'Uma mensagem para seu eu futuro.'}],video_after:VIDEO_BASE+'filme-4-aproximando-do-final.mp4'}
+          ],
+          'en-US':[
+            {title:'Block 1 — Roots',questions:[{label:'Who are you today?'},{label:'What brought you to this journey?'},{label:'What is your greatest spiritual dream?'}],video_after:VIDEO_BASE+'filme-1-entrando-na-jornada.mp4'},
+            {title:'Block 2 — Reflections',questions:[{label:'What are your biggest current challenges?'},{label:'How do you deal with fear or doubt?'},{label:'What does "light" mean to you?'}],video_after:VIDEO_BASE+'filme-2-dentro-da-jornada.mp4'},
+            {title:'Block 3 — Growth',questions:[{label:'What do you want to change in your life?'},{label:'Who inspires you and why?'},{label:'How do you practice gratitude in your daily life?'}],video_after:VIDEO_BASE+'filme-3-traumas-na-jornada.mp4'},
+            {title:'Block 4 — Integration',questions:[{label:'What lesson do you take from this journey?'},{label:'How will you apply this in the future?'},{label:'A message to your future self.'}],video_after:VIDEO_BASE+'filme-4-aproximando-do-final.mp4'}
+          ],
+          'es-ES':[
+            {title:'Bloque 1 — Raíces',questions:[{label:'¿Quién eres hoy?'},{label:'¿Qué te trajo a este viaje?'},{label:'¿Cuál es tu mayor sueño espiritual?'}],video_after:VIDEO_BASE+'filme-1-entrando-na-jornada.mp4'},
+            {title:'Bloque 2 — Reflexiones',questions:[{label:'¿Cuáles son tus mayores desafíos actuales?'},{label:'¿Cómo lidias con el miedo o la duda?'},{label:'¿Qué significa la "luz" para ti?'}],video_after:VIDEO_BASE+'filme-2-dentro-da-jornada.mp4'},
+            {title:'Bloque 3 — Crecimiento',questions:[{label:'¿Qué quieres cambiar en tu vida?'},{label:'¿Quién te inspira y por qué?'},{label:'¿Cómo practicas la gratitud en el día a día?'}],video_after:VIDEO_BASE+'filme-3-traumas-na-jornada.mp4'},
+            {title:'Bloque 4 — Integración',questions:[{label:'¿Qué lección te llevas de este viaje?'},{label:'¿Cómo lo aplicarás en el futuro?'},{label:'Un mensaje para tu yo futuro.'}],video_after:VIDEO_BASE+'filme-4-aproximando-do-final.mp4'}
+          ]
+        };
+
+        function updateBlocks(){
+          window.JORNADA_BLOCKS=blockTranslations[currentLang]||blockTranslations['pt-BR'];
+        }
+
+        /* boot */
+        ensureHeaderFlame();
+        ensurePageFlames();
+        runTyping();
+        initJornada();
+        showSection('section-intro');
+        updateBlocks();
+        lockVideoOrientation();
+      })();
+    </script>
 </body>
 </html>
