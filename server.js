@@ -62,8 +62,12 @@ app.get("/assets/js/i18n/:lang.json", async (req, res) => {
   }
 });
 
-// Fallback para SPA
-app.get("*", async (req, res) => {
+app.get("*", async (req, res, next) => {
+  // Ignora arquivos estáticos
+  if (req.path.endsWith(".js") || req.path.endsWith(".json") || req.path.endsWith(".css") || req.path.endsWith(".woff")) {
+    return next();
+  }
+
   const fallbackPath = path.join(STATIC_DIR, "jornada-conhecimento-com-luz1.html");
   try {
     await fs.access(fallbackPath);
@@ -75,6 +79,7 @@ app.get("*", async (req, res) => {
     }
   }
 });
+
 
 // Inicialização do servidor
 app.listen(PORT, () => {
