@@ -199,18 +199,52 @@ function buildForm(questions = []) {
 }
 
 async function loadDynamicBlocks() {
-    try {
-        await i18n.waitForReady(10000);
-        if (!i18n.ready) throw new Error('i18n não inicializado');
-        window.JORNADA_BLOCKS = [        
-    log('JORNADA_BLOCKS preenchido:', JORNADA_BLOCKS);
+  try {
+    await i18n.waitForReady(10000);
+    if (!i18n.ready) throw new Error('i18n não inicializado');
+
+    // Blocos com perguntas reais
+    const bloco1 = [
+      { id: 1, pergunta: i18n.t('pergunta1'), tipo: 'texto' },
+      { id: 2, pergunta: i18n.t('pergunta2'), tipo: 'texto' },
+      { id: 3, pergunta: i18n.t('pergunta3'), tipo: 'texto' }
+    ];
+
+    const bloco2 = [
+      { id: 4, pergunta: i18n.t('pergunta4'), tipo: 'texto' },
+      { id: 5, pergunta: i18n.t('pergunta5'), tipo: 'texto' },
+      { id: 6, pergunta: i18n.t('pergunta6'), tipo: 'texto' }
+    ];
+
+    // Blocos placeholders (você pode preencher depois)
+    const bloco3 = [{ tipo: 'filme', src: '/assets/videos/filme3.mp4' }];
+    const bloco4 = [{ tipo: 'filme', src: '/assets/videos/filme4.mp4' }];
+    const bloco5 = [{ tipo: 'filme', src: '/assets/videos/filme5.mp4' }];
+
+    // Página final
+    const paginaFinal = [{ tipo: 'final', mensagem: i18n.t('fim_jornada') }];
+
+    // Junta tudo em sequência
+    window.JORNADA_BLOCKS = [
+      ...bloco1,
+      { tipo: 'filme', src: '/assets/videos/filme1.mp4' },
+      ...bloco2,
+      { tipo: 'filme', src: '/assets/videos/filme2.mp4' },
+      ...bloco3,
+      ...bloco4,
+      ...bloco5,
+      ...paginaFinal
+    ];
+
+    log('JORNADA_BLOCKS preenchido:', window.JORNADA_BLOCKS);
     return true;
   } catch (error) {
     console.error('[JORNADA_PAPER] Erro ao preencher JORNADA_BLOCKS:', error);
     window.toast && window.toast('Erro ao carregar blocos de perguntas');
     return false;
   }
- }
+}
+
 
 async function renderQuestions() {
   setPergaminho('h');
