@@ -91,7 +91,6 @@ async function goToNextSection() {
       nextElement.classList.remove('section-hidden');
       controllerLog(`Seção ${currentSection} exibida`);
 
-      // Aplica digitação se disponível
       if (window.runTypingSequence) {
         const typingElements = nextElement.querySelectorAll('.text[data-typing="true"]:not(.section-hidden)');
         if (typingElements.length) {
@@ -155,7 +154,6 @@ async function goToNextSection() {
       }
     }
 
-    // Aplica digitação para elementos [data-typing="true"]
     if (window.runTyping) {
       const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]:not(.section-hidden)`);
       if (typingElements.length > 0) {
@@ -186,7 +184,7 @@ async function goToNextSection() {
 }
 
 // Inicializa o controlador
-async function initController(route = 'intro') {
+function initController(route = 'intro') {
   if (JC.initialized) {
     controllerLog('Controlador já inicializado, pulando');
     return;
@@ -227,7 +225,6 @@ async function initController(route = 'intro') {
     console.error(`[CONTROLLER] Seção inicial ${currentSection} não encontrada`);
   }
 
-  // Fallback para leitura de texto
   window.readText = window.readText || function (text, callback) {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
@@ -249,7 +246,6 @@ async function initController(route = 'intro') {
     }
   };
 
-  // Fallback para runTyping
   if (!window.runTyping) {
     window.runTyping = function (selector, callback) {
       const element = document.querySelector(selector);
@@ -280,7 +276,6 @@ async function initController(route = 'intro') {
     };
   }
 
-  // Configura eventos de clique
   const debouncedGoNext = debounceClick(() => goToNextSection());
   document
     .querySelectorAll(
@@ -334,7 +329,7 @@ async function initController(route = 'intro') {
   controllerLog('Controlador inicializado com sucesso');
 }
 
-// Inicialização no DOMContentLoaded
+// Inicialização
 document.addEventListener('DOMContentLoaded', () => {
   if (!JC.initialized) {
     controllerLog('Inicializando controlador via DOMContentLoaded');
@@ -347,7 +342,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Inicialização no bootstrapComplete
 document.addEventListener('bootstrapComplete', () => {
   if (!JC.initialized) {
     controllerLog('Bootstrap concluído, inicializando controlador');
@@ -360,6 +354,4 @@ document.addEventListener('bootstrapComplete', () => {
   }
 });
 
-// Exporta initController para uso externo
 export { initController };
-```
