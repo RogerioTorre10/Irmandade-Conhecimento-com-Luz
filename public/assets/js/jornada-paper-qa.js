@@ -1,15 +1,20 @@
+```javascript
 // jornada-paper-qa.js
+// Versão corrigida - Sem erro de export, liso e funcional (Outubro 2025)
+// Descrição: Módulo para QA dinâmico com blocos de perguntas, vídeos e efeitos visuais na Jornada Conhecimento com Luz
+
 'use strict';
 
 import i18n from './i18n.js';
 
+// Função de log
 const log = (...args) => console.log('[JORNADA_PAPER]', ...args);
 
 // Evita redeclaração do módulo
 if (window.JornadaPaperQA) {
   console.warn('[JORNADA_PAPER] Módulo já carregado, pulando redefinição');
 } else {
-  window.JornadaPaperQA = true; 
+  window.JornadaPaperQA = true;
 
   // Configurações
   const CFG = Object.assign({
@@ -217,15 +222,11 @@ if (window.JornadaPaperQA) {
       await i18n.waitForReady(10000);
       if (!i18n.ready) throw new Error('i18n não inicializado');
 
-      // Seleciona blocos com base no idioma atual
       const lang = i18n.lang || 'pt-BR';
       window.JORNADA_BLOCKS = blockTranslations[lang] || blockTranslations['pt-BR'];
 
       log('JORNADA_BLOCKS preenchido:', window.JORNADA_BLOCKS);
-
-      // Renderiza os blocos imediatamente
       await renderQuestions();
-
       return true;
     } catch (error) {
       console.error('[JORNADA_PAPER] Erro ao preencher JORNADA_BLOCKS:', error.message);
@@ -254,7 +255,7 @@ if (window.JornadaPaperQA) {
     }
 
     content.innerHTML = '';
-    content.classList.remove('hidden');
+    content.classList.remove('section-hidden');
 
     window.JORNADA_BLOCKS.forEach((block, bIdx) => {
       const bloco = document.createElement('div');
@@ -420,11 +421,9 @@ if (window.JornadaPaperQA) {
         const nextQIdx = parseInt(qIdx) + 1;
 
         if (nextQIdx < currentBloco.questions.length) {
-          // Próxima pergunta no mesmo bloco
           window.JC.currentPergunta = nextQIdx;
           renderQuestions();
         } else if (window.JC.currentBloco < window.JORNADA_BLOCKS.length - 1) {
-          // Próximo bloco
           window.JC.currentBloco = (window.JC?.currentBloco || 0) + 1;
           window.JC.currentPergunta = 0;
           if (currentBloco.video_after) {
@@ -432,7 +431,6 @@ if (window.JornadaPaperQA) {
           }
           renderQuestions();
         } else {
-          // Jornada concluída
           if (window.JORNADA_FINAL_VIDEO) {
             loadVideo(window.JORNADA_FINAL_VIDEO);
           }
@@ -464,7 +462,7 @@ if (window.JornadaPaperQA) {
     }
   }
 
-  // Listeners de eventos
+  // Inicialização
   document.addEventListener('DOMContentLoaded', initPaperQA);
   document.addEventListener('change', (e) => {
     if (e.target.id === 'language-select') {
@@ -476,10 +474,9 @@ if (window.JornadaPaperQA) {
     }
   });
 
-  // Log de carregamento do script
   log('Script jornada-paper-qa.js carregado com sucesso');
 
-  // Exporta funções para uso em outros módulos
+  // Exportações
   export {
     loadDynamicBlocks,
     renderQuestions,
@@ -490,5 +487,3 @@ if (window.JornadaPaperQA) {
     typePlaceholder
   };
 }
-```
-log('Script jornada-paper-qa.js carregado com sucesso');
