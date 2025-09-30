@@ -447,7 +447,7 @@ document.addEventListener('change', (e) => {
   }
 });
 paperLog('JORNADA_BLOCKS preenchido:', window.JORNADA_BLOCKS);
-    } catch (error) {
+    } catch (error) {   
         console.error('[JORNADA_PAPER] Erro ao preencher JORNADA_BLOCKS:', error.message);
         window.JORNADA_BLOCKS = [
 
@@ -461,7 +461,7 @@ paperLog('JORNADA_BLOCKS preenchido:', window.JORNADA_BLOCKS);
         // Lógica de renderização
     });
 }
-
+}
 export { loadDynamicBlocks, renderQuestions };
 
 export {
