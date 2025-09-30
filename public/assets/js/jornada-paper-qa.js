@@ -188,19 +188,23 @@ if (window.JornadaPaperQA) {
   }
 
   // Aplica o estilo de pergaminho ao canvas
-  function setPergaminho(mode = 'h') {
-    const { root } = ensureCanvas();
-    root.classList.remove('pergaminho-v', 'pergaminho-h');
-    const isV = mode === 'v';
-    root.classList.add(isV ? 'pergaminho-v' : 'pergaminho-h');
-    const imageUrl = isV ? CFG.PERGAMINHO_VERT : CFG.PERGAMINHO_HORIZ;
-    root.style.backgroundImage = `url("${imageUrl}")`;
-    root.style.backgroundRepeat = 'no-repeat';
-    root.style.backgroundPosition = 'center';
-    root.style.backgroundSize = 'cover';
-    root.style.minHeight = '82vh';
-    log('Pergaminho aplicado:', { mode, imageUrl });
+function setPergaminho(mode = 'h') {
+  const { root } = ensureCanvas();
+  root.classList.remove('pergaminho-v', 'pergaminho-h');
+  const isV = mode === 'v';
+  root.classList.add(isV ? 'pergaminho-v' : 'pergaminho-h');
+  const imageUrl = (isV ? CFG?.PERGAMINHO_VERT : CFG?.PERGAMINHO_HORIZ) || '/assets/images/fallback.jpg';
+  if (!imageUrl) {
+    console.error('[JORNADA] URL do pergaminho não definida:', { mode, CFG });
+    return;
   }
+  root.style.backgroundImage = `url("${imageUrl}")`;
+  root.style.backgroundRepeat = 'no-repeat';
+  root.style.backgroundPosition = 'center';
+  root.style.backgroundSize = 'cover';
+  root.style.minHeight = '82vh';
+  log('Pergaminho aplicado:', { mode, imageUrl });
+}
 
   // Constrói o formulário HTML para as perguntas
   function buildForm(questions = []) {
