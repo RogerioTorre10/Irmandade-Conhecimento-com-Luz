@@ -67,6 +67,20 @@ async function typeNode(node, fullText, { speed = 18, delay = 0, showCaret = tru
   if (!abort && fullText) await readText(fullText);
 }
 
+window.runTypingSequence = function(container) {
+  const elements = container.querySelectorAll('.text[data-typing="true"]:not(.section-hidden)');
+  if (!elements.length) {
+    console.warn('[JORNADA_TYPE] Nenhum elemento de digitação encontrado em:', container);
+    return;
+  }
+  elements.forEach((el, index) => {
+    const text = el.getAttribute('data-text') || el.textContent || '';
+    window.runTyping(`#${el.id || `.text:nth-child(${index + 1})`}`, () => {
+      console.log('[JORNADA_TYPE] Digitação concluída para:', text);
+    });
+  });
+};
+
 export async function runTyping(scope = document) {
   if (ACTIVE) { typingLog('Já em execução, ignorando'); return; }
   lock();
