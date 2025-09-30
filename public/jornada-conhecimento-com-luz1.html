@@ -464,21 +464,24 @@
   <div id="toast" role="status" aria-live="polite" class="hidden"></div>
 
  <!-- Utils -->
-  <script>
-      document.addEventListener('DOMContentLoaded', async () => {
-      try {
-      await i18n.init(); // carrega traduções
-      i18n.apply(document.body); // aplica nos elementos
+  <script type="module">
+  import i18n from './assets/js/i18n.js';
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      await i18n.init();
+      i18n.apply(document.body);
       console.log('[JORNADA] Traduções aplicadas');
 
-      // Agora pode iniciar controlador e renderizar perguntas
       initController('intro');
     } catch (err) {
       console.error('[JORNADA] Erro ao iniciar i18n:', err);
-      initController('intro'); // fallback mesmo com erro
-     }
-   });
+      initController('intro');
+    }
+  });
+</script>
 
+ <script>
   (function() {
     window.utils = window.utils || {
       dedupe: str => str ? String(str).replace(/\s+/g, ' ').trim() : ''
