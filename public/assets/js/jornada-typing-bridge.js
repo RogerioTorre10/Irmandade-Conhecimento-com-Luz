@@ -1,4 +1,3 @@
-// jornada-typing-bridge.js
 import i18n from './i18n.js';
 
 if (window.__TypingBridgeReady) {
@@ -29,14 +28,6 @@ async function typeText(element, text, speed = 40, showCursor = false) {
     }, speed);
   });
 }
-function playTypingAndSpeak(container) {
-  const elements = container.querySelectorAll('.text[data-typing="true"]');
-  if (!elements.length) {
-    console.warn('[TypingBridge] Nenhum elemento com .text[data-typing="true"] encontrado em:', container);
-    return;
-  }
-  console.log('[TypingBridge] Iniciando digitação para:', elements);
- }
 
 async function playTypingAndSpeak(selectorOrElement, callback) {
   let container;
