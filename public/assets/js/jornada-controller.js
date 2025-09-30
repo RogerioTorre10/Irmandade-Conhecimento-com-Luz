@@ -79,13 +79,8 @@ async function goToNextSection() {
       : sections[currentIdx + 1];
 
     controllerLog(`Navegando de ${previousSection} para ${currentSection}`);
-    showSection(currentSection);
-  } else {
-    controllerLog('Última seção atingida');
-  }
-}
 
-
+    // Hide the previous section
     const prevElement = document.querySelector(`#${previousSection}`);
     if (prevElement) {
       prevElement.classList.remove('active');
@@ -95,6 +90,7 @@ async function goToNextSection() {
       console.error(`[CONTROLLER] Seção anterior ${previousSection} não encontrada`);
     }
 
+    // Show the next section
     const nextElement = document.querySelector(`#${currentSection}`);
     if (nextElement) {
       nextElement.classList.add('active');
@@ -112,9 +108,10 @@ async function goToNextSection() {
       }
     } else {
       console.error(`[CONTROLLER] Seção ${currentSection} não encontrada`);
-      return;
+      return; // Properly scoped return
     }
 
+    // Section-specific logic
     if (currentSection === 'section-termos') {
       const termosPg1 = document.getElementById('termos-pg1');
       const termosPg2 = document.getElementById('termos-pg2');
@@ -164,6 +161,7 @@ async function goToNextSection() {
       }
     }
 
+    // Typing animations for the current section
     if (window.runTyping) {
       const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]:not(.section-hidden)`);
       if (typingElements.length > 0) {
