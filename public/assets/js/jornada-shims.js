@@ -12,7 +12,7 @@ async
 
   // Classe usada para esconder seções
   const HIDE_CLASS = 'section-hidden';
-}
+};
   // Garante a classe CSS básica
   if (!q('#jornada-shims-style')) {
     const st = document.createElement('style');
