@@ -710,9 +710,34 @@
       window.showSection('section-intro');
     });
   })();
-  </script>
-
-  <!-- Navegação de Termos -->
+<script>
+  window.showSection = function(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (!section) {
+      console.error('[showSection] Seção não encontrada:', sectionId);
+      return;
+    }
+    document.querySelectorAll('section').forEach(s => s.classList.add('section-hidden'));
+    section.classList.remove('section-hidden');
+    section.classList.add('active');
+    setTimeout(() => {
+      const typingElements = section.querySelectorAll('.text[data-typing="true"]:not(.section-hidden)');
+      if (typingElements.length && window.runTypingSequence) {
+        window.runTypingSequence(section);
+        console.log('[showSection] Iniciando runTyping para:', sectionId);
+      } else {
+        console.warn('[showSection] Nenhum elemento .text[data-typing="true"] encontrado em:', sectionId);
+      }
+    }, 100);
+    const button = section.querySelector('.btn-avancar, [data-action="avancar"]');
+    if (button) {
+      button.addEventListener('click', () => window.goToNextSection?.());
+      console.log('[showSection] Evento de clique adicionado ao botão avançar em:', sectionId);
+    }
+  };
+</script>
+    
+<!-- Navegação de Termos -->
   <script>
   (function() {
     const showPage = (pg) => {
