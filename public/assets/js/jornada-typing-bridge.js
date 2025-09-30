@@ -13,21 +13,45 @@ const q = window.q || ((s, r = document) => r.querySelector(s));
 const qa = window.qa || ((s, r = document) => Array.from(r.querySelectorAll(s)));
 
 async function playTypingAndSpeak(selectorOrElement, callback) {
-    let selector;
-    if (typeof selectorOrElement === 'string') {
-        selector = selectorOrElement;
-    } else if (selectorOrElement instanceof HTMLElement) {
-        selector = selectorOrElement.id
-            ? `#${selectorOrElement.id}`
-            : selectorOrElement.className.split(' ')[0]
-            ? `.${selectorOrElement.className.split(' ')[0]}`
-            : `[data-typing="true"]`;
-        typingLog('Recebido elemento DOM, convertido para seletor:', selector);
-    } else {
-        console.error('[TypingBridge] Argumento inválido:', selectorOrElement);
-        if (callback) callback();
-        return;
-    }
+  let container;
+
+  if (typeof selectorOrElement === 'string') {
+    container = document.querySelector(selectorOrElement);
+  } else if (selectorOrElement instanceof HTMLElement) {
+    container = selectorOrElement;
+  } else {
+    console.error('[TypingBridge] Argumento inválido:', selectorOrElement);
+    if (callback) callback();
+    return;
+  }
+
+  if (!container) {
+    console.warn('[TypingBridge] Container não encontrado:', selectorOrElement);
+    if (callback) callback();
+    return;
+  }
+
+  const elementos = container.querySelectorAll('[data-typing]');
+  if (!elementos.length) {
+    console.warn('[TypingBridge] Nenhum elemento com data-typing encontrado em:', container);
+    if (callback) callback();
+    return;
+  }
+
+  for (const el of elementos) {
+    const texto = el.getAttribute('data-text');
+    const velocidade = parseInt(el.getAttribute('data-speed')) || 40;
+    const mostrarCursor = el.getAttribute('data-cursor') === 'true';
+
+    if (!texto) continue;
+
+    await typeText(el, texto, velocidade, mostrarCursor);
+    if (window.speak) window.speak(texto);
+  }
+
+  if (callback) callback();
+}
+
 
     const el = q(selector);
     if (!el) {
