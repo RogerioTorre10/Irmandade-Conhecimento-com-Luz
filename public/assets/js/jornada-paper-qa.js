@@ -446,17 +446,30 @@ document.addEventListener('change', (e) => {
     });
   }
 });
-paperLog('JORNADA_BLOCKS preenchido:', window.JORNADA_BLOCKS);
- catch (error) {
-  console.error('[JORNADA_PAPER] Erro ao preencher JORNADA_BLOCKS:', error.message);
+async function loadDynamicBlocks() {
+  try {
+    await i18n.waitForReady(10000);
+    if (!i18n.ready) throw new Error('i18n não inicializado');
 
-  // Define blocos de fallback ou vazios
-  window.JORNADA_BLOCKS = [
-    { id: 'fallback-1', tipo: 'mensagem', texto: 'Bloco de recuperação' },
-    { id: 'fallback-2', tipo: 'mensagem', texto: 'Verifique sua conexão ou tente novamente' }
-  ];
+    window.JORNADA_BLOCKS = [
+      { id: 1, tipo: 'pergunta', texto: 'Qual é a sua missão?' },
+      { id: 2, tipo: 'pergunta', texto: 'O que você busca nesta jornada?' }
+    ];
+
+    paperLog('JORNADA_BLOCKS preenchido:', window.JORNADA_BLOCKS);
+    return true;
+  } catch (error) {
+    console.error('[JORNADA_PAPER] Erro ao preencher JORNADA_BLOCKS:', error.message);
+
+    // Define blocos de fallback ou vazios
+    window.JORNADA_BLOCKS = [
+      { id: 'fallback-1', tipo: 'mensagem', texto: 'Bloco de recuperação' },
+      { id: 'fallback-2', tipo: 'mensagem', texto: 'Verifique sua conexão ou tente novamente' }
+    ];
+
+    return false;
+  }
 }
-
 // Função de renderização fora do bloco try/catch
 function renderQuestions() {
   if (!window.JORNADA_BLOCKS?.length) {
