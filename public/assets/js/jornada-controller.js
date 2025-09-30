@@ -1,8 +1,3 @@
-```javascript
-// jornada-controller.js
-// Versão corrigida - Sem erro de sintaxe, inicialização única (Outubro 2025)
-// Descrição: Controlador para navegação e inicialização da Jornada Conhecimento com Luz
-
 'use strict';
 
 import i18n from './i18n.js';
