@@ -461,7 +461,7 @@ paperLog('JORNADA_BLOCKS preenchido:', window.JORNADA_BLOCKS);
         // Lógica de renderização
     });
 }
-}
+};
 export { loadDynamicBlocks, renderQuestions };
 
 export {
