@@ -76,10 +76,20 @@ function debounceClick(callback, wait = 500) {
 async function goToNextSection() {
   const currentIdx = sections.indexOf(currentSection);
   controllerLog('Índice atual:', currentIdx, 'Seção atual:', currentSection);
+
   if (currentIdx < sections.length - 1) {
     const previousSection = currentSection;
-    currentSection = JC.nextSection && sections.includes(JC.nextSection) ? JC.nextSection : sections[currentIdx + 1];
+    currentSection = JC.nextSection && sections.includes(JC.nextSection)
+      ? JC.nextSection
+      : sections[currentIdx + 1];
+
     controllerLog(`Navegando de ${previousSection} para ${currentSection}`);
+    showSection(currentSection);
+  } else {
+    controllerLog('Última seção atingida');
+  }
+}
+
 
     const prevElement = document.querySelector(`#${previousSection}`);
     if (prevElement) {
