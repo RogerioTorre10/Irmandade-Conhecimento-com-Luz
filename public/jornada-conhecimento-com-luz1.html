@@ -465,19 +465,15 @@
 
  <!-- Utils -->
   <script type="module">
-  import i18n from './assets/js/i18n.js';
-
-  document.addEventListener('DOMContentLoaded', async () => {
-    try {
-      await i18n.init();
-      i18n.apply(document.body);
+  import { initController } from './jornada-controller.js';
+  document.addEventListener('DOMContentLoaded', () => {
+    i18n.setLang('pt-BR').then(() => {
+      initController('intro');
       console.log('[JORNADA] Traduções aplicadas');
-
+    }).catch(error => {
+      console.error('[JORNADA] Erro ao iniciar i18n:', error);
       initController('intro');
-    } catch (err) {
-      console.error('[JORNADA] Erro ao iniciar i18n:', err);
-      initController('intro');
-    }
+    });
   });
 </script>
 
