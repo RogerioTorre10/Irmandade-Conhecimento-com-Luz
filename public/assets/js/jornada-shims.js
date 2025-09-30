@@ -12,9 +12,6 @@
   // Classe usada para esconder seções
   const HIDE_CLASS = 'section-hidden';
 
-  // Aqui você pode adicionar mais lógica se quiser
-})();
-
   // Garante a classe CSS básica
   if (!q('#jornada-shims-style')) {
     const st = document.createElement('style');
@@ -59,13 +56,13 @@
     run(rootSelector = '#perguntas-container') {
       try {
         const root = (typeof rootSelector === 'string')
-          ? (window.q ? q(rootSelector) : document.querySelector(rootSelector))
+          ? (window.q ? window.q(rootSelector) : document.querySelector(rootSelector))
           : rootSelector;
         if (!root) {
           console.warn('[JORNADA_TYPE] root não encontrado');
           return;
         }
-        const firstText = (window.q ? q('[data-type="texto"], .j-texto, p, .typing', root)
+        const firstText = (window.q ? window.q('[data-type="texto"], .j-texto, p, .typing', root)
           : root.querySelector('[data-type="texto"], .j-texto, p, .typing'));
         if (firstText) {
           if (window.TypingBridge && typeof window.TypingBridge.play === 'function') {
@@ -75,7 +72,7 @@
             window.typeTextOnce(firstText, text, 40);
           }
         }
-        const inputs = (window.qa ? qa('textarea, input[type="text"], input[type="search"]', root)
+        const inputs = (window.qa ? window.qa('textarea, input[type="text"], input[type="search"]', root)
           : Array.from(root.querySelectorAll('textarea, input[type="text"], input[type="search"]')));
         inputs.forEach(el => {
           el.removeEventListener('input', window.handleInput);
@@ -98,3 +95,4 @@
 
   console.log('[SHIMS] Shims v5.4 aplicados com sucesso');
 })();
+
