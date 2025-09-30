@@ -447,21 +447,29 @@ document.addEventListener('change', (e) => {
   }
 });
 paperLog('JORNADA_BLOCKS preenchido:', window.JORNADA_BLOCKS);
-    } catch (error) {   
-        console.error('[JORNADA_PAPER] Erro ao preencher JORNADA_BLOCKS:', error.message);
-        window.JORNADA_BLOCKS = [
+} catch (error) {
+  console.error('[JORNADA_PAPER] Erro ao preencher JORNADA_BLOCKS:', error.message);
 
-          function renderQuestions() {
-    if (!window.JORNADA_BLOCKS?.length) {
-        paperLog('Nenhum bloco disponível para renderizar');
-        return;
-    }
-    window.JORNADA_BLOCKS.forEach(block => {
-        paperLog('Renderizando bloco:', block.id);
-        // Lógica de renderização
-    });
+  // Define blocos de fallback ou vazios
+  window.JORNADA_BLOCKS = [
+    { id: 'fallback-1', tipo: 'mensagem', texto: 'Bloco de recuperação' },
+    { id: 'fallback-2', tipo: 'mensagem', texto: 'Verifique sua conexão ou tente novamente' }
+  ];
 }
-};
+
+// Função de renderização fora do bloco try/catch
+function renderQuestions() {
+  if (!window.JORNADA_BLOCKS?.length) {
+    paperLog('Nenhum bloco disponível para renderizar');
+    return;
+  }
+
+  window.JORNADA_BLOCKS.forEach(block => {
+    paperLog('Renderizando bloco:', block.id);
+    // Lógica de renderização aqui
+  });
+}
+
 export { loadDynamicBlocks, renderQuestions };
 
 export {
