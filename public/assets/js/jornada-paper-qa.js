@@ -193,12 +193,14 @@ function setPergaminho(mode = 'h') {
   root.classList.remove('pergaminho-v', 'pergaminho-h');
   const isV = mode === 'v';
   root.classList.add(isV ? 'pergaminho-v' : 'pergaminho-h');
-  const imageUrl = (isV ? CFG?.PERGAMINHO_VERT : CFG?.PERGAMINHO_HORIZ) || '/assets/images/fallback.jpg';
-  if (!imageUrl) {
-    console.error('[JORNADA] URL do pergaminho não definida:', { mode, CFG });
+  const imageUrl = isV ? CFG.PERGAMINHO_VERT : CFG.PERGAMINHO_HORIZ;
+  if (!imageUrl || typeof imageUrl !== 'string') {
+    console.error('[JORNADA] URL do pergaminho inválida:', { mode, imageUrl, CFG });
+    root.style.backgroundImage = 'none';
+    root.style.backgroundColor = '#f5e6cc'; // Fallback visual
     return;
   }
-  root.style.backgroundImage = `url("${imageUrl}")`;
+  root.style.backgroundImage = `url(${imageUrl})`;
   root.style.backgroundRepeat = 'no-repeat';
   root.style.backgroundPosition = 'center';
   root.style.backgroundSize = 'cover';
