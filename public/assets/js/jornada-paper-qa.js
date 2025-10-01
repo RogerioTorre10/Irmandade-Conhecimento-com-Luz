@@ -204,34 +204,15 @@ if (window.jornadaPaperQALoaded) {
       await i18n.waitForReady(10000);
       if (!i18n.ready) throw new Error('i18n não inicializado');
 
-      const bloco1 = [
-        { id: 1, pergunta: i18n.t('pergunta1'), tipo: 'texto' },
-        { id: 2, pergunta: i18n.t('pergunta2'), tipo: 'texto' },
-        { id: 3, pergunta: i18n.t('pergunta3'), tipo: 'texto' }
-      ];
-
-      const bloco2 = [
-        { id: 4, pergunta: i18n.t('pergunta4'), tipo: 'texto' },
-        { id: 5, pergunta: i18n.t('pergunta5'), tipo: 'texto' },
-        { id: 6, pergunta: i18n.t('pergunta6'), tipo: 'texto' }
-      ];
-
-      const bloco3 = [{ tipo: 'filme', src: '/assets/videos/filme3.mp4' }];
-      const bloco4 = [{ tipo: 'filme', src: '/assets/videos/filme4.mp4' }];
-      const bloco5 = [{ tipo: 'filme', src: '/assets/videos/filme5.mp4' }];
-
-      const paginaFinal = [{ tipo: 'final', mensagem: i18n.t('fim_jornada') }];
-
-      window.JORNADA_BLOCKS = [
-        ...bloco1,
-        { tipo: 'filme', src: '/assets/videos/filme1.mp4' },
-        ...bloco2,
-        { tipo: 'filme', src: '/assets/videos/filme2.mp4' },
-        ...bloco3,
-        ...bloco4,
-        ...bloco5,
-        ...paginaFinal
-      ];
+      const lang = i18n.lang || 'pt-BR';
+      window.JORNADA_BLOCKS = blockTranslations[lang].map(block => ({
+        id: block.id,
+        title: block.title,
+        data_i18n: block.data_i18n,
+        questions: block.questions,
+        video_after: block.video_after,
+        tipo: 'perguntas'
+      }));
 
       log('JORNADA_BLOCKS preenchido:', window.JORNADA_BLOCKS);
       return true;
@@ -314,6 +295,9 @@ if (window.jornadaPaperQALoaded) {
         setTimeout(() => {
           log('Iniciando typeQuestionsSequentially para bloco', window.JC.currentBloco);
           typeQuestionsSequentially(currentBloco);
+          if (window.TypingBridge) {
+            window.TypingBridge.play('.text', () => console.log('[JORNADA_PAPER] Animação de digitação concluída'));
+          }
         }, 100);
       }
     }
@@ -365,7 +349,7 @@ if (window.jornadaPaperQALoaded) {
     for (const el of elements) {
       const key = el.dataset.i18n;
       const text = i18n.t(key, el.textContent || key);
-      await typeEffect(el, text, parseInt(el.dataset.speed) || 36);
+      await typeText(el, text, parseInt(el.dataset.speed) || 36);
     }
     const textareas = bloco.querySelectorAll('.j-pergunta textarea');
     for (const textarea of textareas) {
@@ -375,18 +359,26 @@ if (window.jornadaPaperQALoaded) {
     }
   }
 
-  async function typeEffect(element, text, delay = 36) {
-    element.textContent = '';
-    if (element.dataset.cursor === 'true') {
-      element.classList.add('typing-cursor');
-    }
-    for (let char of text) {
-      element.textContent += char;
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-    if (element.dataset.cursor === 'true') {
-      element.classList.remove('typing-cursor');
-    }
+  async function typeText(element, text, speed = 36) {
+    return new Promise(resolve => {
+      let i = 0;
+      element.textContent = '';
+      const caret = document.createElement('span');
+      caret.className = 'typing-caret';
+      caret.textContent = '|';
+      element.appendChild(caret);
+
+      const interval = setInterval(() => {
+        element.textContent = text.slice(0, i);
+        i++;
+        if (i >= text.length) {
+          clearInterval(interval);
+          caret.remove();
+          element.classList.add('typing-done');
+          resolve();
+        }
+      }, speed);
+    });
   }
 
   function initPaperQAEvents() {
@@ -425,7 +417,6 @@ if (window.jornadaPaperQALoaded) {
     try {
       await loadDynamicBlocks();
       console.log('[JORNADA_PAPER] Inicializado com sucesso');
-      // Resto do init...
     } catch (error) {
       console.error('[JORNADA_PAPER] Erro na inicialização:', error.message);
       window.JORNADA_BLOCKS = [];
