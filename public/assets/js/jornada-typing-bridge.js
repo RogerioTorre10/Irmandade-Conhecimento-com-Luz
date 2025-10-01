@@ -29,6 +29,21 @@ async function typeText(element, text, speed = 40, showCursor = false) {
   });
 }
 
+async function playTypingAndSpeak(selector) {
+  const elements = document.querySelectorAll(selector);
+  if (!elements.length) {
+    console.warn('[TypingBridge] Seletor não encontrou elementos:', selector);
+    return;
+  }
+  for (const el of elements) {
+    const text = el.textContent;
+    // Executar animação de digitação e TTS
+    await typeEffect(el, text); // Exemplo de função de digitação
+    // ... TTS logic
+  }
+  console.log('[TypingBridge] Animação e leitura concluídas');
+}
+
 async function playTypingAndSpeak(selectorOrElement, callback) {
   let container;
 
