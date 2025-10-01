@@ -162,45 +162,48 @@ async function goToNextSection() {
     }
 
     // Typing animations for the current section
-    if (window.runTyping) {
-      const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]:not(.section-hidden)`);
-      if (typingElements.length > 0) {
-        let completed = 0;
-        typingElements.forEach((element, index) => {
-          if (!element || !element.tagName) {
-            console.warn('[CONTROLLER] Elemento inválido:', element);
-            return;
-          }
-          // Improved selector construction
-          let selector;
-          if (element.id) {
-            selector = `#${element.id}`;
-          } else {
-            const classNames = element.className.split(' ').filter(c => c && c !== 'typing-cursor' && c !== 'typing-done');
-            selector = classNames.length > 0 ? `.${classNames[0]}` : `[data-typing="true"]:nth-child(${index + 1})`;
-          }
-          try {
-            // Validate selector
-            document.querySelector(selector);
-            window.runTyping(selector, () => {
-              completed++;
-              controllerLog(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
-              const text = element.getAttribute('data-text') || element.textContent || '';
-              window.readText && window.readText(text);
-              if (completed === typingElements.length) {
-                controllerLog('Todas as animações de digitação concluídas em', currentSection);
-              }
-            });
-          } catch (e) {
-            console.error('[CONTROLLER] Selector inválido:', selector, e);
+    // Dentro de goToNextSection
+if (window.runTyping) {
+  const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]:not(.section-hidden)`);
+  if (typingElements.length > 0) {
+    let completed = 0;
+    typingElements.forEach((element, index) => {
+      if (!element || !element.tagName) {
+        console.warn('[CONTROLLER] Elemento inválido:', element);
+        return;
+      }
+      // Construção de seletor robusta
+      let selector;
+      if (element.id) {
+        selector = `#${element.id}`;
+      } else {
+        const classNames = element.className.split(' ').filter(c => c && c !== 'typing-cursor' && c !== 'typing-done');
+        if (classNames.length > 0) {
+          selector = `.${classNames[0]}`;
+        } else {
+          // Usar o índice para criar um seletor único
+          selector = `#${currentSection} [data-typing="true"]:nth-of-type(${index + 1})`;
+        }
+      }
+      try {
+        // Validar seletor
+        document.querySelector(selector);
+        console.log('[CONTROLLER] Seletor gerado:', selector);
+        window.runTyping(selector, () => {
+          completed++;
+          controllerLog(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
+          const text = element.getAttribute('data-text') || element.textContent || '';
+          window.readText && window.readText(text);
+          if (completed === typingElements.length) {
+            controllerLog('Todas as animações de digitação concluídas em', currentSection);
           }
         });
-      } else {
-        controllerLog('Nenhum elemento de digitação encontrado em', currentSection);
+      } catch (e) {
+        console.error('[CONTROLLER] Seletor inválido:', selector, e);
       }
-    }
+    });
   } else {
-    controllerLog('Nenhuma seção seguinte disponível. Jornada finalizada.');
+    controllerLog('Nenhum elemento de digitação encontrado em', currentSection);
   }
 }
 
