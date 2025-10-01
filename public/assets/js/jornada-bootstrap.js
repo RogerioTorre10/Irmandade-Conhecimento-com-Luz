@@ -1,6 +1,8 @@
 // /public/assets/js/jornada-bootstrap.js
-import i18n from './i18n.js'
-import { loadDynamicBlocks } from './jornada-paper-qa.js'; // Ajuste o caminho
+'use strict';
+
+import i18n from './i18n.js';
+import { loadDynamicBlocks } from './jornada-paper-qa.js';
 
 const log = (...args) => console.log('[BOOT]', ...args);
 
@@ -37,16 +39,23 @@ async function bootstrap() {
   try {
     await i18n.init('pt'); // Inicia com português
     log('i18n inicializado');
+
     const blocksLoaded = await loadDynamicBlocks();
     if (!blocksLoaded) {
       throw new Error('Falha ao carregar JORNADA_BLOCKS');
     }
+
     await startWhenReady();
     log('Inicialização concluída 🚀');
+
     document.dispatchEvent(new CustomEvent('bootstrapComplete'));
   } catch (error) {
     console.error('[BOOT] Erro na inicialização:', error);
   }
 }
 
+// ⏳ Executa bootstrap quando DOM estiver pronto
 document.addEventListener('DOMContentLoaded', bootstrap);
+
+// 🌐 Opcional: expõe globalmente se quiser chamar manualmente
+window.bootstrap = bootstrap;
