@@ -265,11 +265,11 @@
         <div id="aria-pergunta" class="sr-only" aria-live="polite"></div>
 
         <!-- INTRO -->
-        <section id="section-intro">
-          <div class="text" data-typing="true" data-i18n="intro_text">Respire. Esta jornada é sua. Um passo de cada vez.</div>
-          <div class="text" data-typing="true" data-i18n="intro_text">Bem-vindo(a) à nossa casa de reflexão e coragem. Antes de começar, leia os termos abaixo.</div>
-          <button class="btn btn-avancar">Avançar</button>
-        </section>
+        <div id="section-intro" class="j-section">
+          <p data-typing="true" data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
+          <p data-typing="true" data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Antes de começar, leia os termos abaixo." data-speed="50" data-cursor="true"></p>
+          <div class="footer-actions"><button class="btn btn-avancar" data-action="avancar">Avançar</button></div>
+        </div>
 
         <!-- TERMOS -->
         <div id="section-termos" class="j-section hidden">
@@ -464,8 +464,7 @@
   <div id="toast" role="status" aria-live="polite" class="hidden"></div>
 
  <!-- Utils -->
- <!-- Utils -->
-<script type="module">
+  <script type="module">
   import { initController } from '/assets/js/jornada-controller.js';
   document.addEventListener('DOMContentLoaded', () => {
     i18n.setLang('pt-BR').then(() => {
@@ -478,7 +477,6 @@
   });
 </script>
 
- <script>
   (function() {
     window.utils = window.utils || {
       dedupe: str => str ? String(str).replace(/\s+/g, ' ').trim() : ''
@@ -711,34 +709,9 @@
       window.showSection('section-intro');
     });
   })();
+  </script>
 
-  window.showSection = function(sectionId) {
-    const section = document.getElementById(sectionId);
-    if (!section) {
-      console.error('[showSection] Seção não encontrada:', sectionId);
-      return;
-    }
-    document.querySelectorAll('section').forEach(s => s.classList.add('section-hidden'));
-    section.classList.remove('section-hidden');
-    section.classList.add('active');
-    setTimeout(() => {
-      const typingElements = section.querySelectorAll('.text[data-typing="true"]:not(.section-hidden)');
-      if (typingElements.length && window.runTypingSequence) {
-        window.runTypingSequence(section);
-        console.log('[showSection] Iniciando runTyping para:', sectionId);
-      } else {
-        console.warn('[showSection] Nenhum elemento .text[data-typing="true"] encontrado em:', sectionId);
-      }
-    }, 100);
-    const button = section.querySelector('.btn-avancar, [data-action="avancar"]');
-    if (button) {
-      button.addEventListener('click', () => window.goToNextSection?.());
-      console.log('[showSection] Evento de clique adicionado ao botão avançar em:', sectionId);
-    }
-  };
-</script>
-    
-<!-- Navegação de Termos -->
+  <!-- Navegação de Termos -->
   <script>
   (function() {
     const showPage = (pg) => {
