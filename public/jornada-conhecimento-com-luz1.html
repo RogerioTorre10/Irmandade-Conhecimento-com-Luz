@@ -453,18 +453,7 @@
   <div id="toast" role="status" aria-live="polite" class="hidden"></div>
 
  <!-- Utils -->
-  <script type="module">
-  import { initController } from '/assets/js/jornada-controller.js';
-  document.addEventListener('DOMContentLoaded', () => {
-    i18n.setLang('pt-BR').then(() => {
-      initController('intro');
-      console.log('[JORNADA] Traduções aplicadas');
-    }).catch(error => {
-      console.error('[JORNADA] Erro ao iniciar i18n:', error);
-      initController('intro');
-    });
-  });
-</script>
+ 
 <script>
   (function() {
     window.utils = window.utils || {
