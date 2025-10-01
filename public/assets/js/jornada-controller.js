@@ -1,6 +1,7 @@
 'use strict';
 
 import i18n from './i18n.js';
+import TypingBridge from './jornada-typing-bridge.js'; // Importar TypingBridge
 import { renderQuestions, loadVideo } from './jornada-paper-qa.js';
 
 // Função de log
@@ -80,7 +81,6 @@ async function goToNextSection() {
 
     controllerLog(`Navegando de ${previousSection} para ${currentSection}`);
 
-    // Hide the previous section
     const prevElement = document.querySelector(`#${previousSection}`);
     if (prevElement) {
       prevElement.classList.remove('active');
@@ -90,20 +90,30 @@ async function goToNextSection() {
       console.error(`[CONTROLLER] Seção anterior ${previousSection} não encontrada`);
     }
 
-    // Show the next section
     const nextElement = document.querySelector(`#${currentSection}`);
     if (nextElement) {
       nextElement.classList.add('active');
       nextElement.classList.remove('section-hidden');
       controllerLog(`Seção ${currentSection} exibida`);
 
-      if (window.runTypingSequence) {
+      if (TypingBridge.play) {
         const typingElements = nextElement.querySelectorAll('.text[data-typing="true"]:not(.section-hidden)');
         if (typingElements.length) {
-          window.runTypingSequence(nextElement);
-          controllerLog('Iniciando runTypingSequence para:', currentSection);
+          typingElements.forEach((element, index) => {
+            let selector = element.id ? `#${element.id}` : `.text[data-typing="true"]:nth-of-type(${index + 1})`;
+            try {
+              document.querySelector(selector);
+              TypingBridge.play(selector, () => {
+                controllerLog(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
+                const text = element.getAttribute('data-text') || element.textContent || '';
+                window.readText && window.readText(text);
+              });
+            } catch (e) {
+              console.error('[CONTROLLER] Seletor inválido:', selector, e);
+            }
+          });
         } else {
-          controllerLog('Nenhum elemento .text[data-typing="true"] encontrado em:', currentSection);
+          controllerLog('Nenhum elemento de digitação encontrado em', currentSection);
         }
       }
     } else {
@@ -111,7 +121,6 @@ async function goToNextSection() {
       return;
     }
 
-    // Section-specific logic
     if (currentSection === 'section-termos') {
       const termosPg1 = document.getElementById('termos-pg1');
       const termosPg2 = document.getElementById('termos-pg2');
@@ -119,8 +128,8 @@ async function goToNextSection() {
         termosPg1.classList.remove('section-hidden');
         termosPg2.classList.add('section-hidden');
         controllerLog('Exibindo termos-pg1');
-        if (window.runTyping) {
-          window.runTyping('#termos-pg1', () => controllerLog('Digitação de termos-pg1 concluída'));
+        if (TypingBridge.play) {
+          TypingBridge.play('#termos-pg1', () => controllerLog('Digitação de termos-pg1 concluída'));
         }
       }
     } else if (currentSection === 'section-guia') {
@@ -160,50 +169,6 @@ async function goToNextSection() {
         controllerLog('Vídeo final carregado');
       }
     }
-
-    // Typing animations for the current section
-    // Dentro de goToNextSection
-if (window.runTyping) {
-  const typingElements = document.querySelectorAll(`#${currentSection} [data-typing="true"]:not(.section-hidden)`);
-  if (typingElements.length > 0) {
-    let completed = 0;
-    typingElements.forEach((element, index) => {
-      if (!element || !element.tagName) {
-        console.warn('[CONTROLLER] Elemento inválido:', element);
-        return;
-      }
-      // Construção de seletor robusta
-      let selector;
-      if (element.id) {
-        selector = `#${element.id}`;
-      } else {
-        const classNames = element.className.split(' ').filter(c => c && c !== 'typing-cursor' && c !== 'typing-done');
-        if (classNames.length > 0) {
-          selector = `.${classNames[0]}`;
-        } else {
-          // Usar o índice para criar um seletor único
-          selector = `#${currentSection} [data-typing="true"]:nth-of-type(${index + 1})`;
-        }
-      }
-      try {
-        // Validar seletor
-        document.querySelector(selector);
-        console.log('[CONTROLLER] Seletor gerado:', selector);
-        window.runTyping(selector, () => {
-          completed++;
-          controllerLog(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
-          const text = element.getAttribute('data-text') || element.textContent || '';
-          window.readText && window.readText(text);
-          if (completed === typingElements.length) {
-            controllerLog('Todas as animações de digitação concluídas em', currentSection);
-          }
-        });
-      } catch (e) {
-        console.error('[CONTROLLER] Seletor inválido:', selector, e);
-      }
-    });
-  } else {
-    controllerLog('Nenhum elemento de digitação encontrado em', currentSection);
   }
 }
 
@@ -221,33 +186,37 @@ function initController(route = 'intro') {
   controllerLog('JORNADA_BLOCKS:', window.JORNADA_BLOCKS);
   controllerLog('JORNADA_VIDEOS:', window.JORNADA_VIDEOS);
 
-  const dependencies = {
-    JORNADA_BLOCKS: !!window.JORNADA_BLOCKS,
-    JORNADA_VIDEOS: !!window.JORNADA_VIDEOS,
-    showSection: !!window.showSection,
-    runTyping: !!window.runTyping,
-    playTransition: !!window.playTransition
-  };
-  controllerLog('Dependências:', dependencies);
-
   window.__currentSectionId = route === 'intro' ? 'section-intro' : route;
-  window.perguntasLoaded = false;
+  currentSection = window.__currentSectionId;
 
-  const initialElement = document.querySelector(`#${currentSection}`);
-  if (initialElement) {
-    initialElement.classList.add('active');
-    initialElement.classList.remove('section-hidden');
-    controllerLog(`Seção inicial exibida: ${currentSection}`);
-    if (window.runTypingSequence) {
-      const typingElements = initialElement.querySelectorAll('.text[data-typing="true"]:not(.section-hidden)');
-      if (typingElements.length) {
-        window.runTypingSequence(initialElement);
-        controllerLog('Iniciando runTypingSequence para:', currentSection);
+  const tryInitializeSection = (maxAttempts = 5, interval = 500) => {
+    let attempts = 0;
+    const tryExecute = () => {
+      const initialElement = document.querySelector(`#${currentSection}`);
+      if (initialElement) {
+        initialElement.classList.add('active');
+        initialElement.classList.remove('section-hidden');
+        controllerLog(`Seção inicial exibida: ${currentSection}`);
+        if (TypingBridge.play) {
+          const typingElements = initialElement.querySelectorAll('.text[data-typing="true"]:not(.section-hidden)');
+          if (typingElements.length) {
+            TypingBridge.play('.text', () => {
+              controllerLog('Animação inicial concluída para:', currentSection);
+            });
+          }
+        }
+      } else if (attempts < maxAttempts) {
+        attempts++;
+        controllerLog(`Tentativa ${attempts}: seção ${currentSection} não encontrada, tentando novamente...`);
+        setTimeout(tryExecute, interval);
+      } else {
+        console.error(`[CONTROLLER] Falha após ${maxAttempts} tentativas: seção ${currentSection} não encontrada`);
       }
-    }
-  } else {
-    console.error(`[CONTROLLER] Seção inicial ${currentSection} não encontrada`);
-  }
+    };
+    tryExecute();
+  };
+
+  tryInitializeSection();
 
   window.readText = window.readText || function (text, callback) {
     if ('speechSynthesis' in window) {
@@ -269,36 +238,6 @@ function initController(route = 'intro') {
       console.error('[CONTROLLER] API Web Speech não suportada neste navegador');
     }
   };
-
-  if (!window.runTyping) {
-    window.runTyping = function (selector, callback) {
-      const element = document.querySelector(selector);
-      if (!element) {
-        console.error('[CONTROLLER] Elemento não encontrado:', selector);
-        return;
-      }
-      const text = element.getAttribute('data-text') || element.textContent || '';
-      const speed = parseInt(element.getAttribute('data-speed')) || 50;
-      let i = 0;
-      element.textContent = '';
-      element.classList.add('lumen-typing');
-
-      function type() {
-        if (i < text.length) {
-          element.textContent += text.charAt(i);
-          i++;
-          setTimeout(type, speed);
-        } else {
-          element.classList.add('typing-done');
-          element.classList.remove('lumen-typing');
-          controllerLog('Animação de digitação concluída para:', text);
-          window.readText && window.readText(text);
-          if (callback) callback();
-        }
-      }
-      type();
-    };
-  }
 
   const debouncedGoNext = debounceClick(() => goToNextSection());
   document
@@ -322,8 +261,8 @@ function initController(route = 'intro') {
         termosPg2.classList.add('section-hidden');
         termosPg1.classList.remove('section-hidden');
         controllerLog('Voltando de termos-pg2 para termos-pg1');
-        if (window.runTyping) {
-          window.runTyping('#termos-pg1', () => controllerLog('Digitação de termos-pg1 concluída'));
+        if (TypingBridge.play) {
+          TypingBridge.play('#termos-pg1', () => controllerLog('Digitação de termos-pg1 concluída'));
         }
       }
     });
@@ -354,9 +293,9 @@ function initController(route = 'intro') {
 }
 
 // Inicialização
-document.addEventListener('DOMContentLoaded', () => {
+function initializeController() {
   if (!JC.initialized) {
-    controllerLog('Inicializando controlador via DOMContentLoaded');
+    controllerLog('Inicializando controlador');
     i18n.init().then(() => {
       initController('intro');
     }).catch(err => {
@@ -364,18 +303,9 @@ document.addEventListener('DOMContentLoaded', () => {
       initController('intro');
     });
   }
-});
+}
 
-document.addEventListener('bootstrapComplete', () => {
-  if (!JC.initialized) {
-    controllerLog('Bootstrap concluído, inicializando controlador');
-    i18n.init().then(() => {
-      initController('intro');
-    }).catch(err => {
-      console.error('[CONTROLLER] Erro ao aguardar i18n:', err.message);
-      initController('intro');
-    });
-  }
-});
+document.addEventListener('DOMContentLoaded', initializeController, { once: true });
+document.addEventListener('bootstrapComplete', initializeController, { once: true });
 
 export { initController };
