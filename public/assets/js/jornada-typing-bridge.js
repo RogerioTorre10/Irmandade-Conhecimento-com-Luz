@@ -59,7 +59,11 @@ async function playTypingAndSpeak(selectorOrElement, callback) {
     return;
   }
 
-  const elementos = container.querySelectorAll('[data-typing]');
+  // Incluir o próprio container se tiver data-typing
+  const elementos = container.hasAttribute('data-typing')
+    ? [container]
+    : container.querySelectorAll('[data-typing]');
+
   if (!elementos.length) {
     console.warn('[TypingBridge] Nenhum elemento com data-typing encontrado em:', container);
     if (callback) callback();
@@ -71,9 +75,16 @@ async function playTypingAndSpeak(selectorOrElement, callback) {
     typingLog('i18n pronto, idioma:', i18n.lang || 'pt-BR (fallback)');
 
     for (const el of elementos) {
-      const texto = el.getAttribute('data-text') || i18n.t(el.getAttribute('data-i18n-key') || 'welcome', { ns: 'common' }) || el.textContent || '';
+      const texto = el.getAttribute('data-text') || 
+                    i18n.t(el.getAttribute('data-i18n-key') || el.getAttribute('data-i18n') || 'welcome', { ns: 'common' }) || 
+                    el.textContent || '';
       const velocidade = parseInt(el.getAttribute('data-speed')) || 40;
       const mostrarCursor = el.getAttribute('data-cursor') === 'true';
+
+      if (!texto) {
+        console.warn('[TypingBridge] Texto não encontrado para elemento:', el);
+        continue;
+      }
 
       await typeText(el, texto, velocidade, mostrarCursor);
 
@@ -100,6 +111,8 @@ async function playTypingAndSpeak(selectorOrElement, callback) {
   }
 }
 
+// ... (resto do código, incluindo a função playTypingAndSpeak)
+
 const TypingBridge = {
   play: playTypingAndSpeak,
 };
@@ -108,5 +121,12 @@ window.TypingBridge = TypingBridge;
 window.runTyping = playTypingAndSpeak;
 
 typingLog('Pronto');
+
+// Executar após o DOM carregar
+document.addEventListener('DOMContentLoaded', () => {
+  playTypingAndSpeak('.text', () => {
+    console.log('[TypingBridge] Animação e leitura concluídas');
+  });
+});
 
 export default TypingBridge;
