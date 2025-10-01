@@ -33,7 +33,18 @@ async function playTypingAndSpeak(selectorOrElement, callback) {
   let container;
 
   if (typeof selectorOrElement === 'string') {
-    container = document.querySelector(selectorOrElement);
+    try {
+      container = document.querySelector(selectorOrElement);
+      if (!container) {
+        console.warn('[TypingBridge] Seletor não encontrou elementos:', selectorOrElement);
+        if (callback) callback();
+        return;
+      }
+    } catch (e) {
+      console.error('[TypingBridge] Seletor inválido:', selectorOrElement, e);
+      if (callback) callback();
+      return;
+    }
   } else if (selectorOrElement instanceof HTMLElement) {
     container = selectorOrElement;
   } else {
