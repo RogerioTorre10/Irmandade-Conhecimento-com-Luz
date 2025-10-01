@@ -108,7 +108,7 @@ async function goToNextSection() {
       }
     } else {
       console.error(`[CONTROLLER] Seção ${currentSection} não encontrada`);
-      return; // Properly scoped return
+      return;
     }
 
     // Section-specific logic
@@ -167,20 +167,33 @@ async function goToNextSection() {
       if (typingElements.length > 0) {
         let completed = 0;
         typingElements.forEach((element, index) => {
-          if (!element || !element.className) {
-            console.warn('[CONTROLLER] Elemento sem classe ou inválido:', element);
+          if (!element || !element.tagName) {
+            console.warn('[CONTROLLER] Elemento inválido:', element);
             return;
           }
-          const selector = element.id ? `#${element.id}` : `.${element.className.split(' ')[0] || 'text'}`;
-          window.runTyping(selector, () => {
-            completed++;
-            controllerLog(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
-            const text = element.getAttribute('data-text') || element.textContent;
-            window.readText && window.readText(text);
-            if (completed === typingElements.length) {
-              controllerLog('Todas as animações de digitação concluídas em', currentSection);
-            }
-          });
+          // Improved selector construction
+          let selector;
+          if (element.id) {
+            selector = `#${element.id}`;
+          } else {
+            const classNames = element.className.split(' ').filter(c => c && c !== 'typing-cursor' && c !== 'typing-done');
+            selector = classNames.length > 0 ? `.${classNames[0]}` : `[data-typing="true"]:nth-child(${index + 1})`;
+          }
+          try {
+            // Validate selector
+            document.querySelector(selector);
+            window.runTyping(selector, () => {
+              completed++;
+              controllerLog(`Animação ${index + 1}/${typingElements.length} concluída em ${currentSection}`);
+              const text = element.getAttribute('data-text') || element.textContent || '';
+              window.readText && window.readText(text);
+              if (completed === typingElements.length) {
+                controllerLog('Todas as animações de digitação concluídas em', currentSection);
+              }
+            });
+          } catch (e) {
+            console.error('[CONTROLLER] Selector inválido:', selector, e);
+          }
         });
       } else {
         controllerLog('Nenhum elemento de digitação encontrado em', currentSection);
