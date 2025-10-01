@@ -1,12 +1,25 @@
-import i18n from './i18n.js';
+/* jornada-typing-bridge.js — versão global (sem ESM) */
+(function (global) {
+  'use strict';
 
-if (window.__TypingBridgeReady) {
-  console.log('[TypingBridge] Já carregado, ignorando');
-} else {
-  window.__TypingBridgeReady = true;
+  if (global.__TypingBridgeReady) {
+    console.log('[TypingBridge] Já carregado, ignorando');
+    return;
+  }
+  global.__TypingBridgeReady = true;
 
   const typingLog = (...args) => console.log('[TypingBridge]', ...args);
 
+  // Usa o i18n global se existir; senão, cria um stub seguro
+  const i18n = global.i18n || {
+    lang: 'pt-BR',
+    ready: false,
+    t: (_, fallback) => fallback || _,
+    apply: () => {},
+    waitForReady: async () => {}
+  };
+
+  // --- estilo do cursor (uma única vez) ---
   (function ensureStyle() {
     if (document.getElementById('typing-style')) return;
     const st = document.createElement('style');
@@ -24,12 +37,12 @@ if (window.__TypingBridgeReady) {
 
   function lock() {
     ACTIVE = true;
-    window.__typingLock = true;
+    global.__typingLock = true;
   }
 
   function unlock() {
     ACTIVE = false;
-    window.__typingLock = false;
+    global.__typingLock = false;
   }
 
   async function typeText(element, text, speed = 40, showCursor = false) {
@@ -102,9 +115,11 @@ if (window.__TypingBridgeReady) {
       typingLog('i18n pronto, idioma:', i18n.lang || 'pt-BR (fallback)');
 
       for (const el of elementos) {
-        const texto = el.getAttribute('data-text') || 
-                      i18n.t(el.getAttribute('data-i18n-key') || el.getAttribute('data-i18n') || 'welcome', { ns: 'common' }) || 
-                      el.textContent || '';
+        const texto =
+          el.getAttribute('data-text') ||
+          i18n.t(el.getAttribute('data-i18n-key') || el.getAttribute('data-i18n') || 'welcome', { ns: 'common' }) ||
+          el.textContent || '';
+
         const velocidade = parseInt(el.getAttribute('data-speed')) || 40;
         const mostrarCursor = el.getAttribute('data-cursor') === 'true';
 
@@ -115,12 +130,13 @@ if (window.__TypingBridgeReady) {
 
         await typeText(el, texto, velocidade, mostrarCursor);
 
-        if (!abortCurrent && 'speechSynthesis' in window && texto) {
+        // TTS (respeita mute)
+        if ('speechSynthesis' in global && texto) {
           const utt = new SpeechSynthesisUtterance(texto.trim());
           utt.lang = i18n.lang || 'pt-BR';
           utt.rate = 1.03;
           utt.pitch = 1.0;
-          utt.volume = window.isMuted ? 0 : 1;
+          utt.volume = global.isMuted ? 0 : 1;
           utt.onend = () => typingLog('Leitura concluída para:', texto);
           utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
           speechSynthesis.cancel();
@@ -138,22 +154,17 @@ if (window.__TypingBridgeReady) {
     }
   }
 
-  const TypingBridge = {
-    play: playTypingAndSpeak,
-  };
+  const TypingBridge = { play: playTypingAndSpeak };
 
-  window.TypingBridge = TypingBridge;
-  window.runTyping = playTypingAndSpeak;
+  // Exposição global (compatível com os outros arquivos)
+  global.TypingBridge = TypingBridge;
+  global.runTyping = playTypingAndSpeak;
 
   typingLog('Pronto');
 
+  // Auto-play suave após carregar a página
   document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => playTypingAndSpeak('.text', null), 3000);
   });
 
-  export function playTypingAndSpeak(selector, options) {
-  // lógica da função
-}
-
-export default TypingBridge;
-
+})(window);
