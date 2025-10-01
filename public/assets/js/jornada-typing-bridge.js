@@ -1,4 +1,4 @@
-import i18n from './i18n.js';
+import i18n from '/public/assets/js/i18n.js';
 
 if (window.__TypingBridgeReady) {
   console.log('[TypingBridge] Já carregado, ignorando');
