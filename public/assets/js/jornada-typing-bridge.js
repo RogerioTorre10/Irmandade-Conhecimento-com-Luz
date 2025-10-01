@@ -1,106 +1,104 @@
-import i18n from './i18n.js'
+import i18n from './i18n.js';
 
 if (window.__TypingBridgeReady) {
   console.log('[TypingBridge] Já carregado, ignorando');
-  throw new Error('TypingBridge já carregado');
+  return;
 }
 window.__TypingBridgeReady = true;
 
 const typingLog = (...args) => console.log('[TypingBridge]', ...args);
 
-const q = window.q || ((s, r = document) => r.querySelector(s));
-const qa = window.qa || ((s, r = document) => Array.from(r.querySelectorAll(s)));
+(function ensureStyle() {
+  if (document.getElementById('typing-style')) return;
+  const st = document.createElement('style');
+  st.id = 'typing-style';
+  st.textContent = `
+    .typing-caret{display:inline-block;width:0.6ch;margin-left:2px;animation:blink 1s step-end infinite}
+    .typing-done[data-typing]::after{content:''}
+    @keyframes blink{50%{opacity:0}}
+  `;
+  document.head.appendChild(st);
+})();
+
+let ACTIVE = false;
+let abortCurrent = null;
+
+function lock() {
+  ACTIVE = true;
+  window.__typingLock = true;
+}
+
+function unlock() {
+  ACTIVE = false;
+  window.__typingLock = false;
+}
 
 async function typeText(element, text, speed = 40, showCursor = false) {
   return new Promise(resolve => {
-    let i = 0;
-    element.textContent = '';
-    if (showCursor) element.classList.add('typing-cursor');
+    if (!element) return resolve();
+    if (abortCurrent) abortCurrent();
+    let abort = false;
+    abortCurrent = () => (abort = true);
 
+    element.textContent = '';
+    const caret = document.createElement('span');
+    caret.className = 'typing-caret';
+    caret.textContent = '|';
+    if (showCursor) element.appendChild(caret);
+
+    let i = 0;
     const interval = setInterval(() => {
-      element.textContent += text.charAt(i);
+      if (abort) {
+        clearInterval(interval);
+        if (showCursor) caret.remove();
+        return resolve();
+      }
+      element.textContent = text.slice(0, i);
       i++;
       if (i >= text.length) {
         clearInterval(interval);
-        if (showCursor) element.classList.remove('typing-cursor');
+        if (showCursor) caret.remove();
+        element.classList.add('typing-done');
         resolve();
       }
     }, speed);
   });
 }
 
-async function playTypingAndSpeak(selector = '.text') {
-  console.log('[TypingBridge] Procurando elementos com seletor:', selector);
-  const elements = document.querySelectorAll(selector);
-  console.log('[TypingBridge] Elementos encontrados:', elements.length, elements);
-  if (!elements.length) {
-    console.warn('[TypingBridge] Seletor não encontrou elementos:', selector);
+async function playTypingAndSpeak(selectorOrElement, callback) {
+  if (ACTIVE) {
+    typingLog('Já em execução, ignorando');
+    if (callback) callback();
     return;
   }
-}
-  for (const el of elements) {
-    const text = el.textContent || el.dataset.i18n || '';
-    await typeEffect(el, text, 36); // Ajustar velocidade conforme necessário
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'pt-BR';
-      window.speechSynthesis.speak(utterance);
-    }
-  }
-  console.log('[TypingBridge] Animação e leitura concluídas');
-
-async function typeEffect(element, text, delay = 36) {
-  element.textContent = '';
-  element.classList.add('typing-cursor');
-  for (let char of text) {
-    element.textContent += char;
-    await new Promise(resolve => setTimeout(resolve, delay));
-  }
-  element.classList.remove('typing-cursor');
-}
-
-async function playTypingAndSpeak(selectorOrElement, callback) {
-  let container;
-
-  if (typeof selectorOrElement === 'string') {
-    try {
+  lock();
+  try {
+    let container;
+    if (typeof selectorOrElement === 'string') {
       container = document.querySelector(selectorOrElement);
       if (!container) {
         console.warn('[TypingBridge] Seletor não encontrou elementos:', selectorOrElement);
         if (callback) callback();
         return;
       }
-    } catch (e) {
-      console.error('[TypingBridge] Seletor inválido:', selectorOrElement, e);
+    } else if (selectorOrElement instanceof HTMLElement) {
+      container = selectorOrElement;
+    } else {
+      console.error('[TypingBridge] Argumento inválido:', selectorOrElement);
       if (callback) callback();
       return;
     }
-  } else if (selectorOrElement instanceof HTMLElement) {
-    container = selectorOrElement;
-  } else {
-    console.error('[TypingBridge] Argumento inválido:', selectorOrElement);
-    if (callback) callback();
-    return;
-  }
 
-  if (!container) {
-    console.warn('[TypingBridge] Container não encontrado:', selectorOrElement);
-    if (callback) callback();
-    return;
-  }
+    const elementos = container.hasAttribute('data-typing')
+      ? [container]
+      : container.querySelectorAll('[data-typing]');
 
-  // Incluir o próprio container se tiver data-typing
-  const elementos = container.hasAttribute('data-typing')
-    ? [container]
-    : container.querySelectorAll('[data-typing]');
+    if (!elementos.length) {
+      console.warn('[TypingBridge] Nenhum elemento com data-typing encontrado em:', container);
+      if (callback) callback();
+      return;
+    }
 
-  if (!elementos.length) {
-    console.warn('[TypingBridge] Nenhum elemento com data-typing encontrado em:', container);
-    if (callback) callback();
-    return;
-  }
-
-  try {
     await i18n.waitForReady(5000);
     typingLog('i18n pronto, idioma:', i18n.lang || 'pt-BR (fallback)');
 
@@ -118,7 +116,7 @@ async function playTypingAndSpeak(selectorOrElement, callback) {
 
       await typeText(el, texto, velocidade, mostrarCursor);
 
-      if ('speechSynthesis' in window && texto) {
+      if (!abortCurrent && 'speechSynthesis' in window && texto) {
         const utt = new SpeechSynthesisUtterance(texto.trim());
         utt.lang = i18n.lang || 'pt-BR';
         utt.rate = 1.03;
@@ -129,8 +127,6 @@ async function playTypingAndSpeak(selectorOrElement, callback) {
         speechSynthesis.cancel();
         speechSynthesis.speak(utt);
         typingLog('Iniciando leitura com idioma:', utt.lang);
-      } else {
-        console.warn('[TypingBridge] SpeechSynthesis não suportado ou texto ausente');
       }
     }
 
@@ -138,10 +134,10 @@ async function playTypingAndSpeak(selectorOrElement, callback) {
   } catch (e) {
     console.error('[TypingBridge] Erro:', e);
     if (callback) callback();
+  } finally {
+    unlock();
   }
 }
-
-// ... (resto do código, incluindo a função playTypingAndSpeak)
 
 const TypingBridge = {
   play: playTypingAndSpeak,
@@ -152,9 +148,8 @@ window.runTyping = playTypingAndSpeak;
 
 typingLog('Pronto');
 
-// Executar após o DOM carregar
 document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => playTypingAndSpeak('.text'), 1000); // Atraso de 1 segundo
+  setTimeout(() => playTypingAndSpeak('.text', null), 3000);
 });
 
 export default TypingBridge;
