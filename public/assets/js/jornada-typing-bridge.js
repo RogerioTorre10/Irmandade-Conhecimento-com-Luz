@@ -151,5 +151,9 @@ if (window.__TypingBridgeReady) {
     setTimeout(() => playTypingAndSpeak('.text', null), 3000);
   });
 
-  export default TypingBridge;
+  export function playTypingAndSpeak(selector, options) {
+  // lógica da função
 }
+
+export default TypingBridge;
+
