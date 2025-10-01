@@ -1,61 +1,124 @@
-const i18n = {
-  lang: 'pt-BR',
-  translations: {},
-  ready: false,
+/* i18n.js — versão global (sem ESM) */
+(function (global) {
+  'use strict';
 
-  async init(langOverride) {
-    this.lang = langOverride || navigator.language || 'pt-BR';
+  if (global.__i18nReadyShim) return; // evita dupla carga
+  global.__i18nReadyShim = true;
+
+  const STORAGE_KEY = 'i18n_lang';
+  const DEFAULT = 'pt-BR';
+  const SUPPORTED = ['pt-BR', 'en-US', 'es-ES'];
+
+  const state = {
+    lang: DEFAULT,
+    ready: false,
+    dict: {}
+  };
+
+  function detectLang() {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored && SUPPORTED.includes(stored)) return stored;
+    const nav =
+      (navigator.language || navigator.userLanguage || DEFAULT)
+        .replace('_', '-');
+    // normaliza pt->pt-BR, en->en-US, es->es-ES
+    if (nav.startsWith('pt')) return 'pt-BR';
+    if (nav.startsWith('en')) return 'en-US';
+    if (nav.startsWith('es')) return 'es-ES';
+    return DEFAULT;
+  }
+
+  async function loadDict(lang) {
+    const url = `/assets/i18n/${lang}.json`;
     try {
-      const res = await fetch(`/assets/js/i18n/${this.lang}.json`);
-      if (!res.ok) throw new Error(`Erro ao carregar ${this.lang}.json`);
-      this.translations = await res.json();
-      this.ready = true;
-      console.log('[i18n] Traduções carregadas para:', this.lang);
-    } catch (err) {
-      console.warn('[i18n] Fallback para pt-BR');
-      const fallback = await fetch(`/assets/js/i18n/pt-BR.json`);
-      this.translations = await fallback.json();
-      this.lang = 'pt-BR';
-      this.ready = true;
+      const res = await fetch(url, { cache: 'no-cache' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (e) {
+      console.warn('[i18n] Falha ao carregar', url, e);
+      return {};
     }
-  },
+  }
 
-  t(key, fallback = '') {
-    return this.translations[key] || fallback || key;
-  },
+  async function init(lang) {
+    state.lang = lang || detectLang();
+    try {
+      state.dict = await loadDict(state.lang);
+      state.ready = true;
+      console.log('[i18n] Pronto para:', state.lang);
+    } catch (e) {
+      console.error('[i18n] Erro no init:', e);
+      state.dict = {};
+      state.ready = true; // segue “vazio” para não travar
+    }
+  }
 
-  apply(scope = document) {
-    if (!this.ready) return;
-    const nodes = scope.querySelectorAll('[data-i18n]');
-    nodes.forEach(el => {
+  function t(key, fallbackOrOpts) {
+    // aceita (key, fallbackString) ou (key, {…})
+    if (!key) return '';
+    const val = state.dict[key];
+    if (typeof val === 'string') return val;
+    if (typeof fallbackOrOpts === 'string') return fallbackOrOpts;
+    return key;
+  }
+
+  function apply(root) {
+    const ctx = root || document;
+    // texto
+    ctx.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
-      el.textContent = this.t(key, el.textContent);
+      if (!key) return;
+      el.textContent = t(key, el.textContent || key);
     });
-
-    const placeholders = scope.querySelectorAll('[data-i18n-placeholder]');
-    placeholders.forEach(el => {
+    // placeholder
+    ctx.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
       const key = el.getAttribute('data-i18n-placeholder');
-      el.placeholder = this.t(key, el.placeholder);
-    });
-  },
-
-  async setLang(newLang) {
-    this.ready = false;
-    await this.init(newLang);
-    this.apply(document.body);
-  },
-
-  waitForReady(timeout = 10000) {
-    return new Promise((resolve, reject) => {
-      const start = Date.now();
-      const check = () => {
-        if (this.ready) return resolve(true);
-        if (Date.now() - start > timeout) return reject(new Error('i18n timeout'));
-        setTimeout(check, 100);
-      };
-      check();
+      if (!key) return;
+      const val = t(key, el.getAttribute('placeholder') || key);
+      el.setAttribute('placeholder', val);
     });
   }
-};
 
-export default i18n;
+  async function setLang(lang) {
+    if (!SUPPORTED.includes(lang)) lang = DEFAULT;
+    localStorage.setItem(STORAGE_KEY, lang);
+    state.ready = false;
+    await init(lang);
+    apply(document.body);
+  }
+
+  async function waitForReady(timeoutMs = 10000) {
+    if (state.ready) return true;
+    return new Promise((resolve, reject) => {
+      const start = Date.now();
+      const id = setInterval(() => {
+        if (state.ready) {
+          clearInterval(id);
+          resolve(true);
+        } else if (Date.now() - start > timeoutMs) {
+          clearInterval(id);
+          reject(new Error('timeout'));
+        }
+      }, 50);
+    });
+  }
+
+  // Exposição global
+  const api = {
+    get lang() { return state.lang; },
+    get ready() { return state.ready; },
+    init, t, apply, setLang, waitForReady
+  };
+  global.i18n = api;
+
+  // Autoinit leve
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!state.ready) {
+      init().then(() => {
+        apply(document.body);
+        console.log('[i18n] Traduções aplicadas');
+      });
+    }
+  }, { once: true });
+
+})(window);
