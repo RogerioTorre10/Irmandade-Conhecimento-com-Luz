@@ -5,7 +5,7 @@ if (window.jornadaPaperQALoaded) {
 } else {
   window.jornadaPaperQALoaded = true;
   
-  import i18n from './i18n.js';
+  import i18n from './assets/js/i18n.js';
 
   const log = (...args) => console.log('[JORNADA_PAPER]', ...args);
 
