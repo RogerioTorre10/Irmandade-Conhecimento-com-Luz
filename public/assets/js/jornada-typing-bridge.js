@@ -29,19 +29,36 @@ async function typeText(element, text, speed = 40, showCursor = false) {
   });
 }
 
-async function playTypingAndSpeak(selector) {
+async function playTypingAndSpeak(selector = '.text') {
+  console.log('[TypingBridge] Procurando elementos com seletor:', selector);
   const elements = document.querySelectorAll(selector);
+  console.log('[TypingBridge] Elementos encontrados:', elements.length, elements);
   if (!elements.length) {
     console.warn('[TypingBridge] Seletor não encontrou elementos:', selector);
     return;
   }
+  // ... resto do código
+}
   for (const el of elements) {
-    const text = el.textContent;
-    // Executar animação de digitação e TTS
-    await typeEffect(el, text); // Exemplo de função de digitação
-    // ... TTS logic
+    const text = el.textContent || el.dataset.i18n || '';
+    await typeEffect(el, text, 36); // Ajustar velocidade conforme necessário
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'pt-BR';
+      window.speechSynthesis.speak(utterance);
+    }
   }
   console.log('[TypingBridge] Animação e leitura concluídas');
+}
+
+async function typeEffect(element, text, delay = 36) {
+  element.textContent = '';
+  element.classList.add('typing-cursor');
+  for (let char of text) {
+    element.textContent += char;
+    await new Promise(resolve => setTimeout(resolve, delay));
+  }
+  element.classList.remove('typing-cursor');
 }
 
 async function playTypingAndSpeak(selectorOrElement, callback) {
@@ -139,9 +156,7 @@ typingLog('Pronto');
 
 // Executar após o DOM carregar
 document.addEventListener('DOMContentLoaded', () => {
-  playTypingAndSpeak('.text', () => {
-    console.log('[TypingBridge] Animação e leitura concluídas');
-  });
+  setTimeout(() => playTypingAndSpeak('.text'), 1000); // Atraso de 1 segundo
 });
 
 export default TypingBridge;
