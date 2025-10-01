@@ -4,9 +4,7 @@ if (window.jornadaPaperQALoaded) {
   console.log('[JORNADA_PAPER] Script já carregado, ignorando...');
 } else {
   window.jornadaPaperQALoaded = true;
-  
-  import i18n from './assets/js/i18n.js';
-
+    
   const log = (...args) => console.log('[JORNADA_PAPER]', ...args);
 
   const CFG = Object.assign({
