@@ -67,17 +67,32 @@ async function typeNode(node, fullText, { speed = 18, delay = 0, showCaret = tru
   if (!abort && fullText) await readText(fullText);
 }
 
-window.runTypingSequence = function(container) {
-  const elements = container.querySelectorAll('.text[data-typing="true"]:not(.section-hidden)');
-  if (!elements.length) {
-    console.warn('[JORNADA_TYPE] Nenhum elemento de digitação encontrado em:', container);
+window.runTypingSequence = function (container) {
+  if (!(container instanceof HTMLElement)) {
+    console.error('[TypingSequence] Container inválido:', container);
     return;
   }
-  elements.forEach((el, index) => {
-    const text = el.getAttribute('data-text') || el.textContent || '';
-    window.runTyping(`#${el.id || `.text:nth-child(${index + 1})`}`, () => {
-      console.log('[JORNADA_TYPE] Digitação concluída para:', text);
-    });
+  const elements = container.querySelectorAll('[data-typing="true"]:not(.section-hidden)');
+  if (!elements.length) {
+    console.warn('[TypingSequence] Nenhum elemento com data-typing encontrado em:', container);
+    return;
+  }
+  elements.forEach((element, index) => {
+    let selector;
+    if (element.id) {
+      selector = `#${element.id}`;
+    } else {
+      const classNames = element.className.split(' ').filter(c => c && c !== 'typing-cursor' && c !== 'typing-done');
+      selector = classNames.length > 0 ? `.${classNames[0]}` : `[data-typing="true"]:nth-of-type(${index + 1})`;
+    }
+    try {
+      console.log('[TypingSequence] Seletor gerado:', selector);
+      window.runTyping(selector, () => {
+        console.log(`[TypingSequence] Animação concluída para elemento ${index + 1}`);
+      });
+    } catch (e) {
+      console.error('[TypingSequence] Seletor inválido:', selector, e);
+    }
   });
 };
 
