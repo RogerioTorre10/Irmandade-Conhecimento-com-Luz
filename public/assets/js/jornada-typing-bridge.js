@@ -37,7 +37,6 @@ async function playTypingAndSpeak(selector = '.text') {
     console.warn('[TypingBridge] Seletor não encontrou elementos:', selector);
     return;
   }
-  // ... resto do código
 }
   for (const el of elements) {
     const text = el.textContent || el.dataset.i18n || '';
@@ -49,7 +48,6 @@ async function playTypingAndSpeak(selector = '.text') {
     }
   }
   console.log('[TypingBridge] Animação e leitura concluídas');
-}
 
 async function typeEffect(element, text, delay = 36) {
   element.textContent = '';
