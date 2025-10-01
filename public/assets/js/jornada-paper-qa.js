@@ -2,11 +2,9 @@
 
 if (window.jornadaPaperQALoaded) {
   console.log('[JORNADA_PAPER] Script já carregado, ignorando...');
-  // Exporta funções existentes para evitar erros em outros módulos
-  export { loadDynamicBlocks, renderQuestions, loadVideo, setPergaminho, ensureCanvas, typeQuestionsSequentially, typePlaceholder };
 } else {
   window.jornadaPaperQALoaded = true;
-
+  
   import i18n from './i18n.js';
 
   const log = (...args) => console.log('[JORNADA_PAPER]', ...args);
