@@ -1,26 +1,22 @@
 'use strict';
 
+// 📦 Importações de módulos
 import i18n from './i18n.js';
-import TypingBridge from './jornada-typing-bridge.js';
-import { renderQuestions, loadVideo } from './jornada-paper-qa.js';
-// Função de log
+import TypingBridge, { runTyping, playTypingAndSpeak } from './jornada-typing-bridge.js';
+import {
+  loadDynamicBlocks,
+  renderQuestions,
+  loadVideo,
+  setPergaminho,
+  ensureCanvas,
+  typeQuestionsSequentially,
+  typePlaceholder
+} from './jornada-paper-qa.js';
+
+// 🧠 Função de log
 const controllerLog = (...args) => console.log('[CONTROLLER]', ...args);
 
-// Expondo no escopo global (window)
-window.i18n = i18n;
-window.TypingBridge = TypingBridge;
-window.renderQuestions = renderQuestions;
-window.loadVideo = loadVideo;
-window.controllerLog = controllerLog;
-window.isProcessingClick = isProcessingClick;
-window.sections = sections;
-
-// Exemplo: se TypingBridge tiver métodos que você quer usar diretamente
-if (TypingBridge?.runTyping) {
-  window.runTyping = TypingBridge.runTyping;
-}
-
-// Estado global
+// 🗂️ Estado inicial
 let isProcessingClick = false;
 const sections = [
   'section-intro',
@@ -32,8 +28,25 @@ const sections = [
   'section-final'
 ];
 let currentSection = 'section-intro';
-const answeredQuestions = new Set();
-let queue = [];
+
+// 🌐 Expondo no escopo global
+window.i18n = i18n;
+window.TypingBridge = TypingBridge;
+window.runTyping = runTyping;
+window.playTypingAndSpeak = playTypingAndSpeak;
+
+window.loadDynamicBlocks = loadDynamicBlocks;
+window.renderQuestions = renderQuestions;
+window.loadVideo = loadVideo;
+window.setPergaminho = setPergaminho;
+window.ensureCanvas = ensureCanvas;
+window.typeQuestionsSequentially = typeQuestionsSequentially;
+window.typePlaceholder = typePlaceholder;
+
+window.controllerLog = controllerLog;
+window.isProcessingClick = isProcessingClick;
+window.sections = sections;
+window.currentSection = currentSection;
 
 // Estado da jornada
 const JC = {
