@@ -1,9 +1,7 @@
-// /assets/js/jornada-typing.js  (ES MODULE!)
-import i18n from './i18n.js';  // sem /public
+import i18n from '/public/assets/js/i18n.js';
 
 const typingLog = (...args) => console.log('[JORNADA_TYPE]', ...args);
 
-// injeta estilo do cursor
 (function ensureStyle() {
   if (document.getElementById('typing-style')) return;
   const st = document.createElement('style');
@@ -16,24 +14,34 @@ const typingLog = (...args) => console.log('[JORNADA_TYPE]', ...args);
   document.head.appendChild(st);
 })();
 
-const sleep  = (ms) => new Promise(r => setTimeout(r, ms));
-const plain  = (text) => (text ?? '').toString();
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+const plain = (text) => (text ?? '').toString();
 
 let ACTIVE = false;
 let abortCurrent = null;
 
-function lock()   { ACTIVE = true;  window.__typingLock = true; }
-function unlock() { ACTIVE = false; window.__typingLock = false; }
+function lock() {
+  ACTIVE = true;
+  window.__typingLock = true;
+}
+
+function unlock() {
+  ACTIVE = false;
+  window.__typingLock = false;
+}
 
 function readText(text) {
   return new Promise(resolve => {
-    if (!('speechSynthesis' in window)) return resolve();
+    if (!('speechSynthesis' in window)) {
+      typingLog('Leitura não suportada');
+      return resolve();
+    }
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang    = i18n?.lang || 'pt-BR';
-    utterance.rate    = 1.0;
-    utterance.pitch   = 1.0;
-    utterance.volume  = 1.0;
-    utterance.onend   = () => resolve();
+    utterance.lang = i18n.lang || 'pt-BR';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+    utterance.onend = () => resolve();
     utterance.onerror = () => resolve();
     window.speechSynthesis.speak(utterance);
   });
@@ -64,53 +72,25 @@ async function typeNode(node, fullText, { speed = 18, delay = 0, showCaret = tru
   if (!abort) node.classList.add('typing-done');
   abortCurrent = null;
 
-  if (!abort && fullText) await readText(fullText);
+  if (!abort && fullText) {
+    await readText(fullText);
+  }
 }
 
-window.runTypingSequence = function (container) {
-  if (!(container instanceof HTMLElement)) {
-    console.error('[TypingSequence] Container inválido:', container);
+async function runTypingSequence(scope = document) {
+  if (ACTIVE) {
+    typingLog('Já em execução, ignorando');
     return;
   }
-  const elements = container.querySelectorAll('[data-typing="true"]:not(.section-hidden)');
-  if (!elements.length) {
-    console.warn('[TypingSequence] Nenhum elemento com data-typing encontrado em:', container);
-    return;
-  }
-  elements.forEach((element, index) => {
-    let selector;
-    if (element.id) {
-      selector = `#${element.id}`;
-    } else {
-      const classNames = element.className.split(' ').filter(c => c && c !== 'typing-cursor' && c !== 'typing-done');
-      selector = classNames.length > 0 ? `.${classNames[0]}` : `[data-typing="true"]:nth-of-type(${index + 1})`;
-    }
-    try {
-      console.log('[TypingSequence] Seletor gerado:', selector);
-      window.runTyping(selector, () => {
-        console.log(`[TypingSequence] Animação concluída para elemento ${index + 1}`);
-      });
-    } catch (e) {
-      console.error('[TypingSequence] Seletor inválido:', selector, e);
-    }
-  });
-};
-
-export async function runTyping(scope = document) {
-  if (ACTIVE) { typingLog('Já em execução, ignorando'); return; }
   lock();
   try {
-    // garanta que i18n inicializou (não trava se já estiver pronto)
-    if (i18n?.waitForReady) await i18n.waitForReady(5000);
-
     const nodes = Array.from(scope.querySelectorAll('[data-typing="true"][data-text]'));
     for (const node of nodes) {
-      const key       = node.getAttribute('data-text');
-      const speed     = parseInt(node.getAttribute('data-speed')) || 22;
+      const raw = node.getAttribute('data-text');
+      const speed = parseInt(node.getAttribute('data-speed')) || 22;
       const showCaret = node.getAttribute('data-cursor') !== 'false';
-      // defaultValue = chave como fallback; ns padrão 'common'
-      const text = i18n?.t ? i18n.t(key, { defaultValue: key, ns: 'common' }) : key;
-      await typeNode(node, plain(text), { speed, showCaret });
+      const translated = i18n.t(raw, raw);
+      await typeNode(node, translated, { speed, showCaret });
     }
   } catch (err) {
     console.error('[JORNADA_TYPE] Erro na sequência:', err);
@@ -119,7 +99,5 @@ export async function runTyping(scope = document) {
   }
 }
 
-// expõe com o NOME que o seu HTML chama:
-window.runTyping = runTyping;
-
+window.runTypingSequence = runTypingSequence;
 typingLog('Sincronizador de digitação + leitura pronto');
