@@ -1,61 +1,28 @@
-// /public/assets/js/jornada-bootstrap.js
-'use strict';
+/* jornada-bootstrap.js — micro-boot global */
+(function (global) {
+  'use strict';
 
-import i18n from './i18n.js';
-import { loadDynamicBlocks } from './jornada-paper-qa.js';
+  if (global.__JornadaBootstrapReady) {
+    console.log('[BOOT] Já carregado, ignorando');
+    return;
+  }
+  global.__JornadaBootstrapReady = true;
 
-const log = (...args) => console.log('[BOOT]', ...args);
+  console.log('[BOOT] Iniciando micro-boot…');
 
-async function startWhenReady() {
-  let attempts = 0;
-  const maxAttempts = 50;
-  const interval = 100;
-
-  while (attempts < maxAttempts) {
-    const dependencies = {
-      i18n: i18n.ready,
-      paperQA: window.JORNADA_BLOCKS?.length > 0 || false
-    };
-
-    if (dependencies.i18n && dependencies.paperQA) {
-      log('Todas as dependências prontas:', dependencies);
-      return true;
+  function fire() {
+    try {
+      document.dispatchEvent(new CustomEvent('bootstrapComplete'));
+      console.log('[BOOT] Evento bootstrapComplete disparado');
+    } catch (e) {
+      console.error('[BOOT] Erro ao disparar bootstrapComplete:', e);
     }
-
-    log('Dependências não prontas, retry em', interval, 'ms:', dependencies);
-    await new Promise(resolve => setTimeout(resolve, interval));
-    attempts++;
   }
 
-  log('Máximo de tentativas excedido. Dependências:', {
-    i18n: i18n.ready,
-    paperQA: window.JORNADA_BLOCKS?.length > 0 || false
-  });
-  throw new Error('Inicialização falhou: máximo de tentativas excedido');
-}
-
-async function bootstrap() {
-  log('Inicializando jornada...');
-  try {
-    await i18n.init('pt'); // Inicia com português
-    log('i18n inicializado');
-
-    const blocksLoaded = await loadDynamicBlocks();
-    if (!blocksLoaded) {
-      throw new Error('Falha ao carregar JORNADA_BLOCKS');
-    }
-
-    await startWhenReady();
-    log('Inicialização concluída 🚀');
-
-    document.dispatchEvent(new CustomEvent('bootstrapComplete'));
-  } catch (error) {
-    console.error('[BOOT] Erro na inicialização:', error);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', fire, { once: true });
+  } else {
+    setTimeout(fire, 0);
   }
-}
 
-// ⏳ Executa bootstrap quando DOM estiver pronto
-document.addEventListener('DOMContentLoaded', bootstrap);
-
-// 🌐 Opcional: expõe globalmente se quiser chamar manualmente
-window.bootstrap = bootstrap;
+})(window);
