@@ -1,6 +1,6 @@
 'use strict';
 
-import i18n from './i18n.js';
+import i18n from '/public/assets/js/i18n.js';
 import TypingBridge from './jornada-typing-bridge.js'; // Importar TypingBridge
 import { renderQuestions, loadVideo } from './jornada-paper-qa.js';
 
