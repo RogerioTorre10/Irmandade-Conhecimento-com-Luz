@@ -436,7 +436,12 @@ if (window.jornadaPaperQALoaded) {
 
   log('JORNADA_BLOCKS preenchido:', window.JORNADA_BLOCKS);
 
-  export { loadDynamicBlocks, renderQuestions, loadVideo, setPergaminho, ensureCanvas, typeQuestionsSequentially, typePlaceholder };
+ export function loadDynamicBlocks() { /* ... */ }
+export function renderQuestions() { /* ... */ }
+export function loadVideo() { /* ... */ }
+export function setPergaminho() { /* ... */ }
+export function ensureCanvas() { /* ... */ }
+export function typeQuestionsSequentially() { /* ... */ }
+export function typePlaceholder() { /* ... */ }
 
-  log('Script jornada-paper-qa.js carregado com sucesso');
-}
+log('Script jornada-paper-qa.js carregado com sucesso');
