@@ -1,11 +1,24 @@
 'use strict';
 
-import i18n from './i18n.js'
-import TypingBridge from './jornada-typing-bridge.js'; // Importar TypingBridge
+import i18n from './i18n.js';
+import TypingBridge from './jornada-typing-bridge.js';
 import { renderQuestions, loadVideo } from './jornada-paper-qa.js';
-
 // Função de log
 const controllerLog = (...args) => console.log('[CONTROLLER]', ...args);
+
+// Expondo no escopo global (window)
+window.i18n = i18n;
+window.TypingBridge = TypingBridge;
+window.renderQuestions = renderQuestions;
+window.loadVideo = loadVideo;
+window.controllerLog = controllerLog;
+window.isProcessingClick = isProcessingClick;
+window.sections = sections;
+
+// Exemplo: se TypingBridge tiver métodos que você quer usar diretamente
+if (TypingBridge?.runTyping) {
+  window.runTyping = TypingBridge.runTyping;
+}
 
 // Estado global
 let isProcessingClick = false;
