@@ -29,16 +29,24 @@
   }
 
   async function loadDict(lang) {
-    const url = `/assets/i18n/${lang}.json`;
+  // tenta onde você já versionou primeiro
+  const candidates = [
+    `/i18n/${lang}.json`,
+    `/assets/i18n/${lang}.json`
+  ];
+  for (const url of candidates) {
     try {
       const res = await fetch(url, { cache: 'no-cache' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      console.log('[i18n] Carregado:', url);
       return await res.json();
     } catch (e) {
       console.warn('[i18n] Falha ao carregar', url, e);
-      return {};
     }
   }
+  // se nenhum caminho funcionou:
+  throw new Error('Nenhum dicionário encontrado para ' + lang);
+}
 
   async function init(lang) {
     state.lang = lang || detectLang();
