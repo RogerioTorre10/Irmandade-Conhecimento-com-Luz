@@ -1,203 +1,144 @@
-/* jornada-typing-bridge.js — versão global (sem ESM) */
-(function (global) {
-  'use strict';
+/* jornada-typing-bridge.js — v2 (drop‑in)
+ * Corrige:
+ * 1) "[TypingBridge] Nenhum container/elemento encontrado" (aguarda a seção estar visível e procura por vários seletores) 
+ * 2) Erros de TTS "interrupted" (ignora interrupções esperadas e evita fala em duplicidade)
+ * 3) Integra com showSection (dispara leitura e datilografia somente quando há conteúdo)
+ *
+ * Como usar:
+ * - Substitua o conteúdo de /assets/js/jornada-typing-bridge.js por este arquivo.
+ * - Garanta que os parágrafos a serem lidos/datilografados tenham um destes seletores:
+ *     [data-typing]  |  .typing-text  |  .text
+ * - Opcional: ajuste selectors/voz em window.TypingBridgeConfig antes do load do script.
+ */
+(function () {
+  const HIDE_CLASS = 'hidden';
+  const cfg = window.TypingBridgeConfig || {};
+  const SELECTORS = cfg.selectors || ['[data-typing]', '.typing-text', '.text'];
+  const LANG = cfg.lang || 'pt-BR';
+  const RATE = typeof cfg.rate === 'number' ? cfg.rate : 1.0; // 0.8 ~ 1.2
+  const PITCH = typeof cfg.pitch === 'number' ? cfg.pitch : 1.0; // 0.8 ~ 1.2
 
-  if (global.__TypingBridgeReady) {
-    console.log('[TypingBridge] Já carregado, ignorando');
-    return;
-  }
-  global.__TypingBridgeReady = true;
-
-  const typingLog = (...args) => console.log('[TypingBridge]', ...args);
-
-  // Usa o i18n global se existir; senão, cria um stub seguro
-  const i18n = global.i18n || {
-    lang: 'pt-BR',
-    ready: false,
-    t: (_, fallback) => fallback || _,
-    apply: () => {},
-    waitForReady: async () => {}
+  const state = {
+    currentSectionId: null,
+    playing: false,
   };
 
-  // --- estilo do cursor (uma única vez) ---
-  (function ensureStyle() {
-    if (document.getElementById('typing-style')) return;
-    const st = document.createElement('style');
-    st.id = 'typing-style';
-    st.textContent = `
-      .typing-caret{display:inline-block;width:0.6ch;margin-left:2px;animation:blink 1s step-end infinite}
-      .typing-done[data-typing]::after{content:''}
-      @keyframes blink{50%{opacity:0}}
-    `;
-    document.head.appendChild(st);
-  })();
-
-  let ACTIVE = false;
-  let abortCurrent = null;
-
-  function lock() {
-    ACTIVE = true;
-    global.__typingLock = true;
+  function visibleSections() {
+    return Array.from(
+      document.querySelectorAll(`div[id^="section-"]:not(.${HIDE_CLASS})`)
+    );
   }
 
-  function unlock() {
-    ACTIVE = false;
-    global.__typingLock = false;
-  }
-
-  async function typeText(element, text, speed = 40, showCursor = false) {
-    return new Promise(resolve => {
-      if (!element) return resolve();
-      if (abortCurrent) abortCurrent();
-      let abort = false;
-      abortCurrent = () => (abort = true);
-
-      element.textContent = '';
-      const caret = document.createElement('span');
-      caret.className = 'typing-caret';
-      caret.textContent = '|';
-      if (showCursor) element.appendChild(caret);
-
-      let i = 0;
-      const interval = setInterval(() => {
-        if (abort) {
-          clearInterval(interval);
-          if (showCursor) caret.remove();
-          return resolve();
-        }
-        element.textContent = text.slice(0, i);
-        i++;
-        if (i >= text.length) {
-          clearInterval(interval);
-          if (showCursor) caret.remove();
-          element.classList.add('typing-done');
-          resolve();
-        }
-      }, speed);
-    });
-  }
-
- async function playTypingAndSpeak(target, callback, _attempt = 0) {
-  if (ACTIVE) {
-    typingLog('Já em execução, ignorando');
-    if (callback) callback();
-    return;
-  }
-  lock();
-  try {
-    let container = null;
-    let elements = null;
-
-    // 1) Descobrir container/elements a partir do "target"
-    if (typeof target === 'string') {
-      // tenta um único elemento
-      container = document.querySelector(target);
-
-      if (!container) {
-        // tenta NodeList do seletor
-        const list = document.querySelectorAll(target);
-        if (list && list.length) {
-          elements = Array.from(list);
-        } else {
-          // fallback: usa a seção ativa
-          const active = document.querySelector('section.active, .section.active, [id^="section-"].active');
-          if (active) container = active;
-        }
-      }
-    } else if (target instanceof HTMLElement) {
-      container = target;
-    } else if (target && typeof NodeList !== 'undefined' && target instanceof NodeList) {
-      elements = Array.from(target);
-    } else if (Array.isArray(target)) {
-      elements = target.filter(Boolean);
-    } else {
-      // sem target: usa a seção ativa
-      const active = document.querySelector('section.active, .section.active, [id^="section-"].active');
-      if (active) container = active;
+  function findTargets(root) {
+    for (const sel of SELECTORS) {
+      const els = root.querySelectorAll(sel);
+      if (els && els.length) return { els: Array.from(els), sel };
     }
+    return { els: [], sel: null };
+  }
 
-    // 2) Se ainda não temos "elements", extraímos do container
-    if (!elements) {
-      if (!container) {
-        // re-tenta algumas vezes (aguarda render)
-        if (_attempt < 3) {
-          setTimeout(() => playTypingAndSpeak(target, callback, _attempt + 1), 220);
-        } else {
-          console.warn('[TypingBridge] Nenhum container/elemento encontrado para:', target);
-          if (callback) callback();
-        }
-        return;
-      }
-      const nodeList = container.hasAttribute('data-typing')
-        ? [container]
-        : container.querySelectorAll('[data-typing]');
-      elements = Array.from(nodeList);
+  function collectText(els) {
+    return els
+      .map((el) => (el.textContent || '').trim())
+      .filter(Boolean)
+      .join('\n\n');
+  }
+
+  function speak(text) {
+    if (!('speechSynthesis' in window)) {
+      console.warn('[TypingBridge] speechSynthesis não suportado neste navegador.');
+      return;
     }
+    if (!text) return;
 
-    // 3) Se ainda vazio, mais uma tentativa curta
-    if (!elements.length) {
-      if (_attempt < 3) {
-        setTimeout(() => playTypingAndSpeak(target, callback, _attempt + 1), 220);
-      } else {
-        console.warn('[TypingBridge] Nenhum elemento com [data-typing] encontrado para:', target || '(seção ativa)');
-        if (callback) callback();
+    try { window.speechSynthesis.cancel(); } catch (e) {}
+
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = LANG;
+    u.rate = RATE;
+    u.pitch = PITCH;
+
+    u.onend = () => {
+      state.playing = false;
+      // console.log('[TypingBridge] Fala concluída');
+    };
+    u.onerror = (ev) => {
+      // 'interrupted' é normal quando trocamos de seção/atualizamos conteúdo
+      if (ev && ev.error === 'interrupted') return;
+      console.warn('[TypingBridge] TTS error:', ev && ev.error ? ev.error : ev);
+      state.playing = false;
+    };
+
+    state.playing = true;
+    window.speechSynthesis.speak(u);
+  }
+
+  function runTypingIfAvailable(els) {
+    if (typeof window.runTyping === 'function') {
+      try {
+        window.runTyping(els);
+      } catch (e) {
+        console.warn('[TypingBridge] runTyping falhou:', e);
       }
+    }
+  }
+
+  function maybeRun(root) {
+    if (!root) return;
+    const { els, sel } = findTargets(root);
+    if (!els.length) {
+      // Debug brando; evita spam no console
+      console.debug('[TypingBridge] Nenhum alvo encontrado em', root.id || root, '(', SELECTORS.join(', '), ')');
       return;
     }
 
-    // 4) Aguarda i18n
-    try { await i18n.waitForReady(5000); } catch (_) {}
+    console.log('[TypingBridge] Alvos:', els.length, 'selector:', sel);
 
-    // 5) Digita + (opcional) Lê
-    for (const el of elements) {
-      const texto =
-        el.getAttribute('data-text') ||
-        i18n.t(el.getAttribute('data-i18n-key') || el.getAttribute('data-i18n') || 'welcome', { ns: 'common' }) ||
-        el.textContent || '';
+    // Dispara datilografia se existir implementação anterior
+    runTypingIfAvailable(els);
 
-      const velocidade = parseInt(el.getAttribute('data-speed')) || 40;
-      const mostrarCursor = el.getAttribute('data-cursor') === 'true';
-
-      if (!texto) continue;
-
-      await typeText(el, texto, velocidade, mostrarCursor);
-
-      if ('speechSynthesis' in window && texto) {
-        const utt = new SpeechSynthesisUtterance(texto.trim());
-        utt.lang = i18n.lang || 'pt-BR';
-        utt.rate = 1.03;
-        utt.pitch = 1.0;
-        utt.volume = window.isMuted ? 0 : 1;
-        utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
-        speechSynthesis.cancel();
-        speechSynthesis.speak(utt);
-      }
-    }
-
-    if (callback) callback();
-  } catch (e) {
-    console.error('[TypingBridge] Erro:', e);
-    if (callback) callback();
-  } finally {
-    unlock();
+    // Concatena texto e fala
+    const text = collectText(els);
+    speak(text);
   }
-}
 
+  function onSectionShown(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    state.currentSectionId = id;
+    // Pequeno atraso para permitir carregamento dinâmico/i18n
+    setTimeout(() => maybeRun(el), 80);
+  }
 
-  const TypingBridge = { play: playTypingAndSpeak };
+  // Monkey‑patch de showSection para emitir um evento padronizado
+  const originalShow = window.showSection;
+  window.showSection = function (id) {
+    const r = typeof originalShow === 'function' ? originalShow(id) : undefined;
+    try {
+      document.dispatchEvent(
+        new CustomEvent('jornada:section:shown', { detail: { id } })
+      );
+    } catch (e) {}
+    return r;
+  };
 
-  // Exposição global (compatível com os outros arquivos)
-  global.TypingBridge = TypingBridge;
-  global.runTyping = playTypingAndSpeak;
+  // Reage quando uma seção fica visível
+  document.addEventListener('jornada:section:shown', (e) => onSectionShown(e.detail.id));
 
-  typingLog('Pronto');
+  // Tenta executar no bootstrap para a seção inicialmente visível
+  window.addEventListener('bootstrapComplete', () => {
+    const visible = visibleSections();
+    if (visible[0]) maybeRun(visible[0]);
+  });
 
-  // Auto-play suave após carregar a página
-  document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    const active = document.querySelector('section.active, .section.active, [id^="section-"].active');
-    playTypingAndSpeak(active || document.body, null);
-  }, 1200);
-});
-
-})(window);
+  // API pública opcional
+  window.TypingBridge = {
+    play(root = null) {
+      if (root) return maybeRun(root);
+      const visible = visibleSections();
+      if (visible[0]) maybeRun(visible[0]);
+    },
+    speak,
+    config: { SELECTORS, LANG, RATE, PITCH },
+  };
+})();
