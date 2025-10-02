@@ -323,7 +323,7 @@ else if (currentSection === 'section-final') {
 
     // botões “avançar” globais (NÃO inclui termos-next; termos é tratado dentro da seção)
     const debouncedNext = debounceClick((e) => goToNextSection());
-    document.querySelectorAll(
+   document.querySelectorAll(
   '[data-action="avancar"], #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney, #iniciarSenha, .btn-section-next'
 ).forEach(button => {
   button.addEventListener('click', (e) => {
@@ -335,6 +335,7 @@ else if (currentSection === 'section-final') {
     debouncedNext(e);
   });
 });
+
 
 
     // atalhos dos termos (caso já existam no DOM ao iniciar)
