@@ -31,7 +31,6 @@
   async function loadDict(lang) {
   // tenta onde você já versionou primeiro
   const candidates = [
-    `/i18n/${lang}.json`,
     `/assets/js/i18n/${lang}.json`
   ];
   for (const url of candidates) {
