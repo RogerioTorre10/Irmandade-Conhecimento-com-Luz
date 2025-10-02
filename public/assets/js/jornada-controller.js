@@ -217,27 +217,44 @@ if (currentSection === 'section-termos') {
     id: 'btn-termos-next',
     text: i18n.t('btn_avancar', 'Avançar'),
     dataset: { action: 'termos-next' },
+   onClick: () => {
+  hide(pg1); show(pg2);
+  if (typeof playTyping === 'function') {
+    setTimeout(() => {
+      if (pg2.offsetParent !== null) {
+        playTyping(pg2, () => log('Typing termos-pg2 ok'));
+      }
+    }, 60);
+  }
+
+  // ✅ Avança na jornada se estiver usando JC
+  if (window.JC && typeof JC.goNext === 'function') {
+    JC.goNext();
+  }
+}
+
+
+  // “Voltar” (pg2 -> pg1), se existir segunda página
+ if (pg2) {
+  createIsolatedButton(navWrap2, {
+    id: 'btn-termos-prev',
+    text: i18n.t('btn_voltar', 'Voltar'),
+    dataset: { action: 'termos-prev' },
     onClick: () => {
-      hide(pg1); show(pg2);
+      hide(pg2); show(pg1);
+
       if (typeof playTyping === 'function') {
-        setTimeout(() => playTyping(pg2, () => log('Typing termos-pg2 ok')), 60);
+        setTimeout(() => {
+          if (pg1.offsetParent !== null) {
+            playTyping(pg1, () => log('Typing termos-pg1 ok'));
+          } else {
+            log('Typing ignorado: pg1 não visível');
+          }
+        }, 60);
       }
     }
   });
-
-  // “Voltar” (pg2 -> pg1), se existir segunda página
-  if (pg2) {
-    createIsolatedButton(navWrap2, {
-      id: 'btn-termos-prev',
-      text: i18n.t('btn_voltar', 'Voltar'),
-      dataset: { action: 'termos-prev' },
-      onClick: () => {
-        hide(pg2); show(pg1);
-        if (typeof playTyping === 'function') {
-          setTimeout(() => playTyping(pg1, () => log('Typing termos-pg1 ok')), 60);
-        }
-      }
-    });
+}
 
     // “Aceito / Continuar” (pg2 -> próxima seção real)
     createIsolatedButton(navWrap2, {
