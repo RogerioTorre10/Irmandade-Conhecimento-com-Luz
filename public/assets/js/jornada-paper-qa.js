@@ -286,19 +286,29 @@
       const { root, content } = ensureCanvas();
       content.innerHTML = '';
 
-      const video = document.createElement('video');
-      video.src = global.JORNADA_FINAL_VIDEO;
-      video.autoplay = true;
-      video.controls = false;
-      video.className = 'w-full rounded shadow';
-      video.addEventListener('ended', () => {
-        log('Vídeo final concluído');
-        if (typeof global.showSectionByIndex === 'function') {
-          global.showSectionByIndex(global.__JornadaFinalIndex || 8); // seção final
-        }
-      });
-      content.appendChild(video);
-    }
+      cdocument.addEventListener('change', (e) => {
+  if (e.target && e.target.id === 'language-select') {
+    i18n.setLang(e.target.value).then(() => {
+      global.toast && global.toast('Idioma alterado com sucesso');
+
+      // Reinicia estado da jornada
+      global.JC = { currentBloco: 0, currentPergunta: 0 };
+
+      // Recarrega blocos com novo idioma
+      if (global.loadDynamicBlocks && global.renderQuestions) {
+        global.loadDynamicBlocks().then(() => {
+          global.renderQuestions();
+        });
+      }
+
+      // Volta visualmente para a primeira seção
+      if (typeof global.showSectionByIndex === 'function') {
+        global.showSectionByIndex(0); // volta para section-intro
+      }
+    });
+  }
+});
+
 
     renderBlock(currentBlockIndex);
     return true;
