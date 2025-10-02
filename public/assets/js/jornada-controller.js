@@ -432,6 +432,92 @@ function initializeController() {
   document.addEventListener('DOMContentLoaded', initializeController, { once: true });
   document.addEventListener('bootstrapComplete', initializeController, { once: true });
 }
+    // ===== PATCH: bloquear regressão indevida para 'section-intro' =====
+(function hardenShowSection(global){
+  const originalShow = global.showSection;
+  // deixa claro onde estamos
+  global.__currentSectionId = global.__currentSectionId || 'section-intro';
+
+  global.showSection = function(id){
+    try {
+      // se já saímos da intro, ignora qualquer tentativa de voltar implicitamente
+      const cur = global.__currentSectionId;
+      if (id === 'section-intro' && cur !== 'section-intro') {
+        console.warn('[CONTROLLER] showSection("section-intro") bloqueado (já avançou).');
+        return;
+      }
+      global.__currentSectionId = id;
+      if (typeof originalShow === 'function') {
+        return originalShow.apply(this, arguments);
+      }
+      // fallback simples se não houver função original
+      document.querySelectorAll('[id^="section-"]').forEach(s => {
+        s.classList.add('section-hidden'); s.classList.remove('active');
+      });
+      const nextEl = document.getElementById(id);
+      if (nextEl) { nextEl.classList.remove('section-hidden'); nextEl.classList.add('active'); }
+    } catch (e) {
+      console.error('[CONTROLLER] showSection wrapper error:', e);
+    }
+  };
+})(window);
+// ===== PATCH: interceptar '.btn-avancar' dentro de #section-termos =====
+(function shieldTermosButtons(global){
+  const log = (...a) => console.log('[CONTROLLER:TERMOS_BTN]', ...a);
+
+  // Captura no CAPTURE phase para parar listeners globais
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('.btn-avancar');
+    if (!btn) return;
+
+    const inTermos = !!btn.closest('#section-termos');
+    if (!inTermos) return;
+
+    // Isola do mundo
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+
+    const pg1 = document.getElementById('termos-pg1');
+    const pg2 = document.getElementById('termos-pg2');
+
+    // Se não houver estrutura de páginas, segue fluxo normal
+    if (!pg1 && !pg2) {
+      log('Sem pg1/pg2 — seguindo fluxo normal');
+      if (typeof global.goToNextSection === 'function') global.goToNextSection();
+      return;
+    }
+
+    // typing helper
+    const playTyping = (global.TypingBridge && typeof global.TypingBridge.play === 'function')
+      ? global.TypingBridge.play
+      : (typeof global.runTyping === 'function' ? global.runTyping : null);
+
+    // Estado atual: se pg2 já está visível, tratamos como "aceitar/continuar"
+    const pg2Visivel = pg2 && !pg2.classList.contains('section-hidden') && pg2.style.display !== 'none';
+
+    if (!pg2Visivel) {
+      // pg1 -> pg2
+      if (pg1) { pg1.classList.add('section-hidden'); pg1.style.display = 'none'; }
+      if (pg2) { pg2.classList.remove('section-hidden'); pg2.style.display = ''; }
+      if (typeof playTyping === 'function') setTimeout(() => playTyping(pg2 || pg1), 60);
+      log('Termos: pg1 → pg2');
+    } else {
+      // pg2 -> próxima seção
+      if (global.JC) global.JC.nextSection = null; // sequência natural
+      if (typeof global.goToNextSection === 'function') {
+        const debounced = (function(){
+          let t; return function(){ clearTimeout(t); t = setTimeout(() => global.goToNextSection(), 120); };
+        })();
+        debounced();
+      }
+      log('Termos: aceitar e continuar');
+    }
+  }, true); // capture = true
+})(window);
+
+    
+
 
   global.initController = initController;
 
