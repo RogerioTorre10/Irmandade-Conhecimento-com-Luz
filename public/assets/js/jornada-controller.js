@@ -397,20 +397,37 @@ else if (currentSection === 'section-final') {
     log('Controlador inicializado com sucesso');
   }
 
-  function initializeController() {
-    if (!JC.initialized) {
-      log('Bootstrap inicial do controller...');
-      const maybeInit = (i18n && typeof i18n.init === 'function')
-        ? i18n.init().catch(() => {})
-        : Promise.resolve();
-      Promise.resolve(maybeInit).finally(() => {
-        initController('intro');
-      });
-    }
+ // ===== FIX: inicialização à prova de corrida =====
+function initializeController() {
+  // evita reentrância (DOMContentLoaded + bootstrapComplete)
+  if (JC.initialized || global.__ControllerBooting) {
+    log('Bootstrap ignorado (já inicializado ou bootando)');
+    return;
   }
+  global.__ControllerBooting = true;
+  log('Bootstrap inicial do controller...');
 
+  const maybeInit = (i18n && typeof i18n.init === 'function')
+    ? i18n.init().catch(() => {})
+    : Promise.resolve();
+
+  Promise.resolve(maybeInit).finally(() => {
+    // só define rota inicial se ainda não foi definida
+    if (!global.__currentSectionId) {
+      initController('intro');
+    } else {
+      initController(global.__currentSectionId);
+    }
+    // Mantém travado para impedir boots subsequentes
+    // (se preferir liberar depois, troque por: global.__ControllerBooting = false;)
+  });
+}
+
+  if (!global.__ControllerEventsBound) {
+  global.__ControllerEventsBound = true;
   document.addEventListener('DOMContentLoaded', initializeController, { once: true });
   document.addEventListener('bootstrapComplete', initializeController, { once: true });
+}
 
   global.initController = initController;
 
