@@ -10,11 +10,11 @@
 
   const log = (...args) => console.log('[JORNADA_PAPER]', ...args);
 
-  // Usa o i18n global se existir; senão, cria um stub seguro
+  // i18n seguro
   const i18n = global.i18n || {
     lang: 'pt-BR',
     ready: false,
-    t: (_, fallback) => fallback || _,
+    t: (k, fallback) => fallback || k,
     apply: () => {},
     waitForReady: async () => {}
   };
@@ -29,7 +29,7 @@
 
   const VIDEO_BASE = CFG.VIDEO_BASE;
 
-  global.JORNADA_VIDEOS = {
+  global.JORNADA_VIDEOS = global.JORNADA_VIDEOS || {
     intro: VIDEO_BASE + 'filme-0-ao-encontro-da-jornada.mp4',
     afterBlocks: {
       0: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
@@ -41,6 +41,7 @@
   };
   global.JORNADA_FINAL_VIDEO = global.JORNADA_VIDEOS.final;
 
+  // Traduções locais (pode ajustar à vontade)
   const blockTranslations = {
     'pt-BR': [
       {
@@ -157,15 +158,15 @@
   };
 
   let JORNADA_BLOCKS = [];
+  global.JORNADA_BLOCKS = global.JORNADA_BLOCKS || [];
 
+  // ===== util DOM =====
   function elCanvas() {
     return document.getElementById(CFG.CANVAS_ID);
   }
-
   function elContent() {
     return document.getElementById(CFG.CONTENT_ID);
   }
-
   function ensureCanvas() {
     let root = elCanvas();
     if (!root) {
@@ -212,110 +213,264 @@
     `;
   }
 
-   async function loadDynamicBlocks() {
-    await i18n.waitForReady();
+  // ===== typing helpers (internos ao Paper) =====
+  let __abortTypingPlaceholder = null;
 
-    const lang = i18n.lang || 'pt-BR';
-    const blocks = blockTranslations[lang] || blockTranslations['pt-BR'];
-    if (!blocks || !Array.isArray(blocks)) {
-      log('Nenhum bloco disponível para o idioma:', lang);
-      return false;
+  async function typePlaceholder(inp, text, speed = 22) {
+    if (!inp) return;
+    if (__abortTypingPlaceholder) __abortTypingPlaceholder();
+    let abort = false;
+    __abortTypingPlaceholder = () => (abort = true);
+    inp.placeholder = '';
+    const aria = document.getElementById('aria-pergunta');
+    if (aria) aria.textContent = text;
+    for (let i = 0; i <= text.length; i++) {
+      if (abort) break;
+      inp.placeholder = text.slice(0, i) + (i < text.length ? '▌' : '');
+      await new Promise(r => setTimeout(r, speed));
     }
-
-    JORNADA_BLOCKS = blocks;
-    log('Blocos carregados:', blocks);
-
-    let currentBlockIndex = 0;
-
-    function renderBlock(index) {
-      const block = blocks[index];
-      if (!block) {
-        log('Todos os blocos renderizados');
-        return renderFinalVideo();
-      }
-
-      const { root, content } = ensureCanvas();
-      content.innerHTML = ''; // limpa conteúdo anterior
-
-      setPergaminho(index % 2 === 0 ? 'h' : 'v');
-
-      const title = document.createElement('h2');
-      title.className = 'text-xl font-bold text-center text';
-      title.setAttribute('data-i18n', block.data_i18n);
-      title.setAttribute('data-typing', 'true');
-      title.setAttribute('data-speed', '42');
-      title.setAttribute('data-cursor', 'true');
-      title.textContent = block.title;
-      content.appendChild(title);
-
-      const formWrapper = document.createElement('div');
-      formWrapper.innerHTML = buildForm(block.questions);
-      content.appendChild(formWrapper);
-
-      const btn = document.createElement('button');
-      btn.className = 'btn btn-avancar mt-6';
-      btn.textContent = i18n.t('btn-avancar', 'Avançar');
-      btn.addEventListener('click', () => {
-        playVideoAfterBlock(index);
-      });
-      content.appendChild(btn);
-
-      i18n.apply(content);
-      if (global.runTyping) global.runTyping(content);
-      if (global.playTypingAndSpeak) global.playTypingAndSpeak('.text');
+    if (!abort) {
+      inp.placeholder = text;
     }
+    if (aria) aria.textContent = '';
+    log('Placeholder digitado:', text);
+  }
 
-    function playVideoAfterBlock(index) {
-      const block = blocks[index];
-      const videoUrl = block.video_after;
-      const { root, content } = ensureCanvas();
-      content.innerHTML = '';
+  async function typeText(element, text, speed = 36) {
+    return new Promise(resolve => {
+      let i = 0;
+      element.textContent = '';
+      const caret = document.createElement('span');
+      caret.className = 'typing-caret';
+      caret.textContent = '|';
+      element.appendChild(caret);
 
-      const video = document.createElement('video');
-      video.src = videoUrl;
-      video.autoplay = true;
-      video.controls = false;
-      video.className = 'w-full rounded shadow';
-      video.addEventListener('ended', () => {
-        renderBlock(index + 1);
-      });
-      content.appendChild(video);
-    }
-
-    function renderFinalVideo() {
-      const { root, content } = ensureCanvas();
-      content.innerHTML = '';
-
-      cdocument.addEventListener('change', (e) => {
-  if (e.target && e.target.id === 'language-select') {
-    i18n.setLang(e.target.value).then(() => {
-      global.toast && global.toast('Idioma alterado com sucesso');
-
-      // Reinicia estado da jornada
-      global.JC = { currentBloco: 0, currentPergunta: 0 };
-
-      // Recarrega blocos com novo idioma
-      if (global.loadDynamicBlocks && global.renderQuestions) {
-        global.loadDynamicBlocks().then(() => {
-          global.renderQuestions();
-        });
-      }
-
-      // Volta visualmente para a primeira seção
-      if (typeof global.showSectionByIndex === 'function') {
-        global.showSectionByIndex(0); // volta para section-intro
-      }
+      const interval = setInterval(() => {
+        element.textContent = text.slice(0, i);
+        i++;
+        if (i >= text.length) {
+          clearInterval(interval);
+          caret.remove();
+          element.classList.add('typing-done');
+          resolve();
+        }
+      }, speed);
     });
   }
-});
 
-
-    renderBlock(currentBlockIndex);
-    return true;
+  async function typeQuestionsSequentially(bloco) {
+    const elements = bloco.querySelectorAll('[data-typing="true"]');
+    for (const el of elements) {
+      const key = el.dataset.i18n;
+      const text = i18n.t(key, el.textContent || key);
+      await typeText(el, text, parseInt(el.dataset.speed) || 36);
+    }
+    const textareas = bloco.querySelectorAll('.j-pergunta textarea');
+    for (const textarea of textareas) {
+      const key = textarea.dataset.i18nPlaceholder;
+      const text = i18n.t(key, textarea.placeholder || key);
+      await typePlaceholder(textarea, text, 22);
+    }
   }
 
-  global.loadDynamicBlocks = loadDynamicBlocks;
-  global.setPergaminho = setPergaminho;
-  global.ensureCanvas = ensureCanvas;
-})(window);
+  // ===== vídeo =====
+  function loadVideo(videoSrc) {
+    const video = document.querySelector('#videoTransicao');
+    const videoOverlay = document.querySelector('#videoOverlay');
+    if (!video || !videoOverlay) {
+      console.error('[JORNADA_PAPER] #videoTransicao ou #videoOverlay não encontrado');
+      return;
+    }
+    video.src = videoSrc;
+    video.style.zIndex = 2001;
+    videoOverlay.style.zIndex = 2000;
+    video.load();
+    video.play().catch(err => console.error('[JORNADA_PAPER] Erro ao reproduzir vídeo:', err));
+    log('Vídeo carregado:', videoSrc);
+  }
 
+  // ===== render =====
+  async function renderQuestions() {
+    setPergaminho('h');
+    const { content } = ensureCanvas();
+    if (!content) {
+      console.error('[JORNADA_PAPER] Container de perguntas não encontrado');
+      global.toast && global.toast('Erro ao carregar perguntas.');
+      return;
+    }
+
+    if (!JORNADA_BLOCKS || !Array.isArray(JORNADA_BLOCKS)) {
+      console.error('[JORNADA_PAPER] JORNADA_BLOCKS não está definido ou não é um array');
+      global.toast && global.toast('Erro ao carregar blocos de perguntas.');
+      return;
+    }
+
+    content.innerHTML = '';
+    content.classList.remove('hidden');
+
+    const JC = global.JC || { currentBloco: 0, currentPergunta: 0 };
+
+    JORNADA_BLOCKS.forEach((block, bIdx) => {
+      const bloco = document.createElement('div');
+      bloco.className = 'j-bloco';
+      bloco.dataset.bloco = String(bIdx);
+      bloco.dataset.video = block.video_after || '';
+      bloco.style.display = bIdx === JC.currentBloco ? 'block' : 'none';
+
+      if (block.title) {
+        const title = document.createElement('h3');
+        title.className = 'pergunta-enunciado text';
+        title.dataset.i18n = block.data_i18n;
+        title.dataset.typing = 'true';
+        title.dataset.speed = '36';
+        title.dataset.cursor = 'true';
+        title.textContent = block.title;
+        bloco.appendChild(title);
+      }
+
+      block.questions.forEach((q, qIdx) => {
+        const div = document.createElement('div');
+        div.className = 'j-pergunta';
+        div.dataset.perguntaId = `${block.id}-${qIdx}`;
+        div.style.display = (bIdx === JC.currentBloco && qIdx === JC.currentPergunta) ? 'block' : 'none';
+        div.innerHTML = `
+          <label class="pergunta-enunciado text" data-i18n="${q.data_i18n}" data-typing="true" data-speed="36" data-cursor="true">${q.label}</label>
+          <textarea rows="4" class="input" data-i18n-placeholder="resposta_placeholder" placeholder="Digite sua resposta..."></textarea>
+          <div class="accessibility-controls">
+            <button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>
+            <button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>
+            <button class="btn btn-avancar" data-action="read-question" data-question-id="${block.id}-${qIdx}" data-i18n="btn-avancar">Avançar</button>
+          </div>
+        `;
+        bloco.appendChild(div);
+      });
+
+      content.appendChild(bloco);
+    });
+
+    if (i18n.ready) {
+      i18n.apply(content);
+    } else {
+      console.warn('[JORNADA_PAPER] i18n não pronto, pulando i18n.apply');
+    }
+
+    const currentBloco = content.querySelector(`[data-bloco="${JC.currentBloco}"]`);
+    if (currentBloco) {
+      currentBloco.style.display = 'block';
+      const curId = `${JORNADA_BLOCKS[JC.currentBloco]?.id || 'b'}-${JC.currentPergunta}`;
+      const currentPergunta = currentBloco.querySelector(`[data-perguntaId="${curId}"]`);
+      if (currentPergunta) {
+        currentPergunta.style.display = 'block';
+        currentPergunta.classList.add('active');
+        setTimeout(() => {
+          log('Iniciando typeQuestionsSequentially para bloco', JC.currentBloco);
+          typeQuestionsSequentially(currentBloco);
+          if (global.TypingBridge && typeof global.TypingBridge.play === 'function') {
+            global.TypingBridge.play('.text', () => console.log('[JORNADA_PAPER] Animação de digitação concluída'));
+          } else if (typeof global.runTyping === 'function') {
+            global.runTyping('.text', () => console.log('[JORNADA_PAPER] Animação de digitação concluída'));
+          } else {
+            console.warn('[JORNADA_PAPER] TypingBridge/runTyping indisponível no momento');
+          }
+        }, 100);
+      }
+    }
+
+    log('Perguntas renderizadas, total de blocos:', JORNADA_BLOCKS.length);
+  }
+
+  // ===== eventos =====
+  function initPaperQAEvents() {
+    document.addEventListener('click', (ev) => {
+      const btn = ev.target.closest('[data-action="read-question"]');
+      if (!btn) return;
+      const pergunta = btn.closest('.j-pergunta')?.querySelector('[data-i18n]');
+      if (!pergunta) return;
+      const key = pergunta.dataset.i18n;
+      const text = i18n.t(key, pergunta.textContent);
+      if ('speechSynthesis' in global) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = i18n.lang || 'pt-BR';
+        global.speechSynthesis.speak(utterance);
+      } else {
+        console.warn('[JORNADA_PAPER] SpeechSynthesis não suportado');
+      }
+    });
+
+    document.addEventListener('click', (ev) => {
+      const btn = ev.target.closest('[data-action="start-mic"]');
+      if (!btn) return;
+      log('Microfone acionado (funcionalidade não implementada)');
+      global.toast && global.toast('Microfone não implementado ainda.');
+    });
+
+    const skipVideoButton = document.querySelector('#skipVideo');
+    if (skipVideoButton) {
+      skipVideoButton.addEventListener('click', () => {
+        log('Vídeo pulado');
+        document.dispatchEvent(new CustomEvent('videoSkipped'));
+      });
+    }
+  }
+
+  // ===== init =====
+  async function loadDynamicBlocks() {
+    try {
+      await i18n.waitForReady(10000);
+      if (!i18n.ready) throw new Error('i18n não inicializado');
+
+      const lang = i18n.lang || 'pt-BR';
+      const base = blockTranslations[lang] || blockTranslations['pt-BR'];
+      JORNADA_BLOCKS = base.map(block => ({
+        id: block.id,
+        title: block.title,
+        data_i18n: block.data_i18n,
+        questions: block.questions,
+        video_after: block.video_after,
+        tipo: 'perguntas'
+      }));
+
+      global.JORNADA_BLOCKS = JORNADA_BLOCKS;
+      log('JORNADA_BLOCKS preenchido:', JORNADA_BLOCKS);
+      return true;
+    } catch (error) {
+      console.error('[JORNADA_PAPER] Erro ao preencher JORNADA_BLOCKS:', error);
+      JORNADA_BLOCKS = [];
+      global.JORNADA_BLOCKS = [];
+      global.toast && global.toast('Erro ao carregar blocos de perguntas');
+      return false;
+    }
+  }
+
+  async function initPaperQA() {
+    try {
+      await loadDynamicBlocks();
+      console.log('[JORNADA_PAPER] Inicializado com sucesso');
+    } catch (error) {
+      console.error('[JORNADA_PAPER] Erro na inicialização:', error && error.message);
+      global.JORNADA_BLOCKS = [];
+    }
+  }
+
+  // Bootstrap de eventos/estado
+  document.addEventListener('DOMContentLoaded', () => {
+    initPaperQA();
+    initPaperQAEvents();
+  });
+
+  // API global
+  global.JPaperQA = {
+    loadDynamicBlocks,
+    renderQuestions,
+    loadVideo,
+    setPergaminho,
+    ensureCanvas,
+    typeQuestionsSequentially,
+    typePlaceholder,
+    initEvents: initPaperQAEvents,
+    init: initPaperQA
+  };
+
+  log('Script jornada-paper-qa.js carregado com sucesso');
+
+})(window);
