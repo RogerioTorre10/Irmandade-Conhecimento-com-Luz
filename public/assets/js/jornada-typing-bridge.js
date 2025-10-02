@@ -168,9 +168,12 @@
         utt.rate = 1.03;
         utt.pitch = 1.0;
         utt.volume = window.isMuted ? 0 : 1;
-        utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
-        speechSynthesis.cancel();
-        speechSynthesis.speak(utt);
+        utt.onerror = (e) => {
+      if (e && e.error !== 'interrupted') {
+        console.error('[TypingBridge] Erro na leitura:', e);
+      }
+     };
+
       }
     }
 
