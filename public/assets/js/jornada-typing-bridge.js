@@ -77,7 +77,7 @@
     });
   }
 
- async function playTypingAndSpeak(target, callback, _attempt = 0) {
+ async function playTypingAndSpeak(selectorOrElement, callback) {
   if (ACTIVE) {
     typingLog('Já em execução, ignorando');
     if (callback) callback();
@@ -85,92 +85,69 @@
   }
   lock();
   try {
-    let container = null;
-    let elements = null;
-
-    // 1) Descobrir container/elements a partir do "target"
-    if (typeof target === 'string') {
-      // tenta um único elemento
-      container = document.querySelector(target);
-
+    let container;
+    if (typeof selectorOrElement === 'string') {
+      container = document.querySelector(selectorOrElement);
       if (!container) {
-        // tenta NodeList do seletor
-        const list = document.querySelectorAll(target);
-        if (list && list.length) {
-          elements = Array.from(list);
-        } else {
-          // fallback: usa a seção ativa
-          const active = document.querySelector('section.active, .section.active, [id^="section-"].active');
-          if (active) container = active;
-        }
-      }
-    } else if (target instanceof HTMLElement) {
-      container = target;
-    } else if (target && typeof NodeList !== 'undefined' && target instanceof NodeList) {
-      elements = Array.from(target);
-    } else if (Array.isArray(target)) {
-      elements = target.filter(Boolean);
-    } else {
-      // sem target: usa a seção ativa
-      const active = document.querySelector('section.active, .section.active, [id^="section-"].active');
-      if (active) container = active;
-    }
-
-    // 2) Se ainda não temos "elements", extraímos do container
-    if (!elements) {
-      if (!container) {
-        // re-tenta algumas vezes (aguarda render)
-        if (_attempt < 3) {
-          setTimeout(() => playTypingAndSpeak(target, callback, _attempt + 1), 220);
-        } else {
-          console.warn('[TypingBridge] Nenhum container/elemento encontrado para:', target);
-          if (callback) callback();
-        }
+        console.warn('[TypingBridge] Seletor não encontrou elementos:', selectorOrElement);
+        if (callback) callback();
         return;
       }
-      const nodeList = container.hasAttribute('data-typing')
-        ? [container]
-        : container.querySelectorAll('[data-typing]');
-      elements = Array.from(nodeList);
-    }
-
-    // 3) Se ainda vazio, mais uma tentativa curta
-    if (!elements.length) {
-      if (_attempt < 3) {
-        setTimeout(() => playTypingAndSpeak(target, callback, _attempt + 1), 220);
-      } else {
-        console.warn('[TypingBridge] Nenhum elemento com [data-typing] encontrado para:', target || '(seção ativa)');
-        if (callback) callback();
-      }
+    } else if (selectorOrElement instanceof HTMLElement) {
+      container = selectorOrElement;
+    } else {
+      console.error('[TypingBridge] Argumento inválido:', selectorOrElement);
+      if (callback) callback();
       return;
     }
 
-    // 4) Aguarda i18n
-    try { await i18n.waitForReady(5000); } catch (_) {}
+    const elementos = container.hasAttribute('data-typing')
+      ? [container]
+      : container.querySelectorAll('[data-typing]');
 
-    // 5) Digita + (opcional) Lê
-    for (const el of elements) {
-      const texto =
-        el.getAttribute('data-text') ||
-        i18n.t(el.getAttribute('data-i18n-key') || el.getAttribute('data-i18n') || 'welcome', { ns: 'common' }) ||
-        el.textContent || '';
+    if (!elementos.length) {
+      console.warn('[TypingBridge] Nenhum elemento com data-typing encontrado em:', container);
+      if (callback) callback();
+      return;
+    }
 
+    await i18n.waitForReady(5000);
+    typingLog('i18n pronto, idioma:', i18n.lang || 'pt-BR (fallback)');
+
+    // Aguardar interação do usuário para TTS
+    await new Promise(resolve => {
+      const handler = () => {
+        document.removeEventListener('click', handler);
+        resolve();
+      };
+      document.addEventListener('click', handler);
+    });
+
+    for (const el of elementos) {
+      const texto = el.getAttribute('data-text') || 
+                    i18n.t(el.getAttribute('data-i18n-key') || el.getAttribute('data-i18n') || 'welcome', { ns: 'common' }) || 
+                    el.textContent || '';
       const velocidade = parseInt(el.getAttribute('data-speed')) || 40;
       const mostrarCursor = el.getAttribute('data-cursor') === 'true';
 
-      if (!texto) continue;
+      if (!texto) {
+        console.warn('[TypingBridge] Texto não encontrado para elemento:', el);
+        continue;
+      }
 
       await typeText(el, texto, velocidade, mostrarCursor);
 
-      if ('speechSynthesis' in window && texto) {
+      if (!abortCurrent && 'speechSynthesis' in window && texto) {
         const utt = new SpeechSynthesisUtterance(texto.trim());
         utt.lang = i18n.lang || 'pt-BR';
         utt.rate = 1.03;
         utt.pitch = 1.0;
         utt.volume = window.isMuted ? 0 : 1;
+        utt.onend = () => typingLog('Leitura concluída para:', texto);
         utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
         speechSynthesis.cancel();
         speechSynthesis.speak(utt);
+        typingLog('Iniciando leitura com idioma:', utt.lang);
       }
     }
 
