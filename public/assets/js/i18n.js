@@ -1,4 +1,4 @@
-/* i18n.js — versão global (sem ESM) */
+/* i18n.js — cabeça + detecção forçada */
 (function (global) {
   'use strict';
 
@@ -9,6 +9,16 @@
   const DEFAULT = 'pt-BR';
   const SUPPORTED = ['pt-BR', 'en-US', 'es-ES'];
 
+  // 🚩 preferências que podem forçar o idioma:
+  // - JORNADA_CFG.LANG (ex.: 'pt-BR')
+  // - atributo data-lang no <html>
+  // - variável global __FORCE_LANG
+  const FORCE_LANG =
+    (global.JORNADA_CFG && global.JORNADA_CFG.LANG) ||
+    (document.documentElement && document.documentElement.getAttribute('data-lang')) ||
+    global.__FORCE_LANG ||
+    null;
+
   const state = {
     lang: DEFAULT,
     ready: false,
@@ -16,12 +26,15 @@
   };
 
   function detectLang() {
+    // 1) se existe forçado e suportado → usa
+    if (FORCE_LANG && SUPPORTED.includes(FORCE_LANG)) return FORCE_LANG;
+
+    // 2) se existe salvo em storage → usa
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored && SUPPORTED.includes(stored)) return stored;
-    const nav =
-      (navigator.language || navigator.userLanguage || DEFAULT)
-        .replace('_', '-');
-    // normaliza pt->pt-BR, en->en-US, es->es-ES
+
+    // 3) caso contrário, tenta o navegador
+    const nav = (navigator.language || navigator.userLanguage || DEFAULT).replace('_', '-');
     if (nav.startsWith('pt')) return 'pt-BR';
     if (nav.startsWith('en')) return 'en-US';
     if (nav.startsWith('es')) return 'es-ES';
@@ -29,25 +42,27 @@
   }
 
   async function loadDict(lang) {
-  // tenta onde você já versionou primeiro
-  const candidates = [
-    `/assets/js/i18n/${lang}.json`
-  ];
-  for (const url of candidates) {
-    try {
-      const res = await fetch(url, { cache: 'no-cache' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      console.log('[i18n] Carregado:', url);
-      return await res.json();
-    } catch (e) {
-      console.warn('[i18n] Falha ao carregar', url, e);
+    // tenta múltiplos caminhos (na ordem)
+    const candidates = [
+      `/assets/js/i18n/${lang}.json`,
+      `/assets/i18n/${lang}.json`,
+      `/i18n/${lang}.json`
+    ];
+    for (const url of candidates) {
+      try {
+        const res = await fetch(url, { cache: 'no-cache' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        console.log('[i18n] Carregado:', url);
+        return await res.json();
+      } catch (e) {
+        console.warn('[i18n] Falha ao carregar', url, e);
+      }
     }
+    throw new Error('Nenhum dicionário encontrado para ' + lang);
   }
-  // se nenhum caminho funcionou:
-  throw new Error('Nenhum dicionário encontrado para ' + lang);
-}
 
-  async function init(lang) {
+
+    async function init(lang) {
     state.lang = lang || detectLang();
     try {
       state.dict = await loadDict(state.lang);
@@ -61,7 +76,6 @@
   }
 
   function t(key, fallbackOrOpts) {
-    // aceita (key, fallbackString) ou (key, {…})
     if (!key) return '';
     const val = state.dict[key];
     if (typeof val === 'string') return val;
@@ -71,13 +85,11 @@
 
   function apply(root) {
     const ctx = root || document;
-    // texto
     ctx.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
       if (!key) return;
       el.textContent = t(key, el.textContent || key);
     });
-    // placeholder
     ctx.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
       const key = el.getAttribute('data-i18n-placeholder');
       if (!key) return;
@@ -92,6 +104,12 @@
     state.ready = false;
     await init(lang);
     apply(document.body);
+  }
+
+  // atalho explícito para “forçar” via código
+  async function forceLang(lang, persist = true) {
+    if (persist) localStorage.setItem(STORAGE_KEY, lang);
+    return setLang(lang);
   }
 
   async function waitForReady(timeoutMs = 10000) {
@@ -114,18 +132,22 @@
   const api = {
     get lang() { return state.lang; },
     get ready() { return state.ready; },
-    init, t, apply, setLang, waitForReady
+    init, t, apply, setLang, forceLang, waitForReady
   };
   global.i18n = api;
 
-  // Autoinit leve
+  // Autoinit com respeito ao FORCE_LANG
   document.addEventListener('DOMContentLoaded', () => {
-    if (!state.ready) {
-      init().then(() => {
+    (async () => {
+      try {
+        await init(FORCE_LANG || undefined);
         apply(document.body);
-        console.log('[i18n] Traduções aplicadas');
-      });
-    }
+        console.log('[i18n] Traduções aplicadas (' + state.lang + ')');
+      } catch (e) {
+        console.error('[i18n] Erro no autoinit/apply:', e);
+      }
+    })();
   }, { once: true });
 
 })(window);
+
