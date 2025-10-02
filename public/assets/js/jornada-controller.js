@@ -185,32 +185,29 @@ if (currentSection === 'section-termos') {
 
   // Helper local para criar botão isolado (sem interferir no listener global)
   function createIsolatedButton(parent, { id, text, dataset = {}, onClick }) {
-    if (!parent) return null;
-    let btn = parent.querySelector('#' + id + ', [data-id="' + id + '"]');
-    if (!btn) {
-      btn = document.createElement('button');
-      btn.id = id;
-      btn.className = 'btn btn-termos'; // NÃO usar .btn-avancar aqui
-      btn.textContent = text;
-      btn.setAttribute('data-scope', 'termos'); // marca escopo
-      Object.keys(dataset || {}).forEach(k => btn.dataset[k] = dataset[k]);
-      parent.appendChild(btn);
-    }
-    // remove possíveis handlers duplicados antes de adicionar
-    const clone = btn.cloneNode(true);
-    btn.replaceWith(clone);
-    btn = clone;
+  if (!parent) return null;
+  let btn = parent.querySelector('#' + id + ', [data-id="' + id + '"]');
+  if (!btn) {
+    btn = document.createElement('button');
+    btn.id = id;
+    btn.className = 'btn btn-termos'; // NÃO usar .btn-avancar aqui
+    btn.textContent = text;
+    btn.setAttribute('data-scope', 'termos'); // marca escopo
+    Object.keys(dataset || {}).forEach(k => btn.dataset[k] = dataset[k]);
+    parent.appendChild(btn);
+  }
 
+  // ✅ Vincula o evento de clique
+  if (onClick) {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
-      // isola dos listeners globais
-      e.stopPropagation();
-      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-      if (typeof onClick === 'function') onClick(e);
+      onClick(e);
     });
-
-    return btn;
   }
+
+  return btn;
+}
+
 
   // “Próximo” dentro dos termos (pg1 -> pg2)
   createIsolatedButton(navWrap1, {
