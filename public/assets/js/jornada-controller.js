@@ -431,4 +431,3 @@ function initializeController() {
 
   global.initController = initController;
 
-})(window);
