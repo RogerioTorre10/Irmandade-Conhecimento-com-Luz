@@ -591,6 +591,115 @@ function initializeController() {
   }, true); // capture
 })(window);
 
+  // ===== LOCK DA SEÇÃO TERMOS =====
+let __termsObserver = null;
+
+function lockTermosSection() {
+  const termos = document.getElementById('section-termos');
+  if (!termos) return;
+
+  window.__termsLocked = true;
+
+  // força visibilidade da seção termos
+  document.querySelectorAll('[id^="section-"]').forEach(sec => {
+    if (sec === termos) {
+      sec.classList.add('active');
+      sec.classList.remove('section-hidden');
+    } else {
+      sec.classList.add('section-hidden');
+      sec.classList.remove('active');
+    }
+  });
+
+  // Observa qualquer tentativa de mudar classes e desfaz
+  if (__termsObserver) { try { __termsObserver.disconnect(); } catch(_){} }
+  __termsObserver = new MutationObserver(() => {
+    if (!window.__termsLocked) return;
+    const termosNow = document.getElementById('section-termos');
+    if (!termosNow) return;
+    termosNow.classList.add('active');
+    termosNow.classList.remove('section-hidden');
+    document.querySelectorAll('[id^="section-"]:not(#section-termos)').forEach(sec => {
+      sec.classList.add('section-hidden');
+      sec.classList.remove('active');
+    });
+  });
+
+  __termsObserver.observe(document.body, {
+    attributes: true, subtree: true, attributeFilter: ['class']
+  });
+}
+
+function unlockTermosSection() {
+  window.__termsLocked = false;
+  if (__termsObserver) { try { __termsObserver.disconnect(); } catch(_){}; __termsObserver = null; }
+}
+// ===== BLOQUEIO DE showSection ENQUANTO TERMOS ESTIVEREM TRANCADOS =====
+(function (global) {
+  const originalShow = global.showSection;
+  global.showSection = function(id) {
+    if (window.__termsLocked && id !== 'section-termos') {
+      console.warn('[CONTROLLER] showSection("' + id + '") bloqueado (Termos trancado).');
+      return;
+    }
+    if (typeof originalShow === 'function') return originalShow.apply(this, arguments);
+
+    // fallback simples
+    document.querySelectorAll('[id^="section-"]').forEach(sec => {
+      sec.classList.add('section-hidden'); sec.classList.remove('active');
+    });
+    const nextEl = document.getElementById(id);
+    if (nextEl) { nextEl.classList.remove('section-hidden'); nextEl.classList.add('active'); }
+  };
+})(window);
+// ===== BOTÕES DENTRO DE TERMOS: pg1→pg2→aceitar =====
+(function (global) {
+  const play = (global.TypingBridge && typeof global.TypingBridge.play === 'function')
+    ? global.TypingBridge.play
+    : (typeof global.runTyping === 'function' ? global.runTyping : null);
+
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.btn-avancar');
+    if (!btn) return;
+    const inTermos = !!btn.closest('#section-termos');
+    if (!inTermos) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+
+    const pg1 = document.getElementById('termos-pg1');
+    const pg2 = document.getElementById('termos-pg2');
+
+    // inicializa step
+    if (!window.__termsStep) window.__termsStep = 1;
+
+    if (window.__termsStep === 1) {
+      // pg1 -> pg2
+      if (pg1) { pg1.classList.add('section-hidden'); pg1.style.display = 'none'; }
+      if (pg2) { pg2.classList.remove('section-hidden'); pg2.style.display = ''; }
+      if (typeof play === 'function') setTimeout(() => play(pg2 || pg1), 60);
+      window.__termsStep = 2;
+      return;
+    }
+
+    if (window.__termsStep === 2) {
+      // precisa aceitar (se houver checkbox)
+      const chk = document.querySelector('#termos-aceite, input[name="termos-aceite"]');
+      if (chk && !chk.checked) {
+        window.toast && window.toast(i18n.t('aceite_necessario','Você precisa aceitar os termos para continuar.'));
+        return;
+      }
+      window.__termsAccepted = true;
+      unlockTermosSection();            // libera a seção
+      window.__termsStep = 0;           // reset
+      if (typeof global.goToNextSection === 'function') {
+        setTimeout(() => global.goToNextSection(), 80);
+      }
+    }
+  }, true); // capture
+})(window);
+
 
   global.initController = initController;
 
