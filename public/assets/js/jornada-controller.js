@@ -305,14 +305,21 @@ else if (currentSection === 'section-final') {
 
   // ===== init =====
   function initController(route = 'intro') {
-    if (JC.initialized) { log('Já inicializado'); return; }
-    JC.initialized = true;
-    log('Inicializando controlador...');
+  if (JC.initialized) { log('Controlador já inicializado, pulando'); return; }
+  JC.initialized = true;
+  log('Inicializando controlador...');
 
-    global.JORNADA_BLOCKS = global.JORNADA_BLOCKS || [];
-    global.JORNADA_VIDEOS = global.JORNADA_VIDEOS || {};
-    global.__currentSectionId = route === 'intro' ? 'section-intro' : route;
-    currentSection = global.__currentSectionId;
+  global.JORNADA_BLOCKS = global.JORNADA_BLOCKS || [];
+  global.JORNADA_VIDEOS = global.JORNADA_VIDEOS || {};
+
+  // 🚫 NÃO sobrescrever a seção atual se já foi definida
+  if (!global.__currentSectionId) {
+    global.__currentSectionId = (route === 'intro' ? 'section-intro' : route);
+  }
+  currentSection = global.__currentSectionId;
+
+  // (restante da função continua igual…)
+
 
     // botões “avançar” globais (NÃO inclui termos-next; termos é tratado dentro da seção)
     const debouncedNext = debounceClick((e) => goToNextSection());
