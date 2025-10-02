@@ -615,111 +615,146 @@
   </script>
 
   <!-- showSection -->
-  <script>
-  (function() {
-    const HIDE_CLASS = 'hidden';
-    let lastShowSection = 0;
+ <script>
+(function () {
+  const HIDE_CLASSES = ['hidden', 'section-hidden'];
+  let lastShowSection = 0;
 
-    window.showSection = function(id) {
-      const now = performance.now();
-      if (now - lastShowSection < 500) {
-        console.log('[showSection] Debounce: evitando chamada repetida');
+  function addHidden(el){ if(!el) return; HIDE_CLASSES.forEach(c=>el.classList.add(c)); }
+  function removeHidden(el){ if(!el) return; HIDE_CLASSES.forEach(c=>el.classList.remove(c)); }
+
+  // garante data-typing quando faltar
+  function ensureTypingAttrs(container) {
+    if (!container) return;
+    const candidates = container.querySelectorAll('[data-typing], h1, h2, h3, h4, h5, p, .text');
+    candidates.forEach(el => {
+      if (!el.hasAttribute('data-typing')) {
+        el.setAttribute('data-typing', 'true');
+        el.setAttribute('data-speed', '36');
+        el.setAttribute('data-cursor', 'true');
+      }
+    });
+  }
+
+  window.showSection = function(id) {
+    const now = performance.now();
+    if (now - lastShowSection < 500) {
+      console.log('[showSection] Debounce: evitando chamada repetida');
+      return;
+    }
+    lastShowSection = now;
+
+    try {
+      // 🔒 se Termos estiver trancado, não deixa trocar de seção
+      if (window.__termsLocked && id !== 'section-termos') {
+        console.warn('[showSection] Bloqueado: Termos trancado.');
         return;
       }
-      lastShowSection = now;
-
-      try {
-        const all = Array.from(document.querySelectorAll('div[id^="section-"]'));
-        const target = document.getElementById(id);
-        if (!target) {
-          console.warn('[showSection] Seção não encontrada:', id);
-          window.toast && window.toast(`Seção ${id} não encontrada.`);
-          return;
-        }
-        all.forEach(s => s.classList.add(HIDE_CLASS));
-        target.classList.remove(HIDE_CLASS);
-        window.__currentSectionId = id;
-        console.log('[showSection] Exibindo seção:', id);
-
-        // Resetar __typingLock para evitar bloqueios
-        window.G = window.G || {};
-        window.G.__typingLock = false;
-
-        setTimeout(() => {
-          const textElements = target.querySelectorAll('[data-typing="true"]:not(.hidden)');
-          textElements.forEach(el => {
-            if (!el || !(el instanceof Element)) {
-              console.error('[showSection] Elemento de digitação inválido:', el);
-              return;
-            }
-            const selector = el.id ? `#${el.id}` : `.${el.className.split(' ')[0] || 'text'}`;
-            window.runTyping(selector);
-            console.log('[showSection] Iniciando runTyping para:', id);
-          });
-
-          const btns = target.querySelectorAll(
-            '[data-action="avancar"], .btn-avancar, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney'
-          );
-          btns.forEach(btn => {
-            if (!btn.dataset.clickAttached) {
-              btn.addEventListener(
-                'click',
-                (e) => {
-                  e.preventDefault();
-                  if (window.JC && window.JC.goNext) window.JC.goNext();
-                },
-                { once: true }
-              );
-              btn.dataset.clickAttached = '1';
-              console.log('[showSection] Evento de clique adicionado ao botão avançar em:', id, 'Botão:', btn.id || btn.className);
-            }
-          });
-        }, 100);
-      } catch (e) {
-        console.error('[showSection] Erro:', e);
-        window.toast && window.toast('Erro ao exibir seção');
+      // 🛡️ não permite voltar para intro após sair dela
+      const cur = window.__currentSectionId || 'section-intro';
+      if (id === 'section-intro' && cur !== 'section-intro') {
+        console.warn('[showSection] Voltar para intro bloqueado (já avançou).');
+        return;
       }
-      console.log('[showSection] Bloco carregado');
-    };
 
-    // Inicializar seção inicial
-    document.addEventListener('DOMContentLoaded', () => {
-      window.showSection('section-intro');
-    });
-  })();
-  </script>
+      const all = Array.from(document.querySelectorAll('div[id^="section-"]'));
+      const target = document.getElementById(id);
+      if (!target) {
+        console.warn('[showSection] Seção não encontrada:', id);
+        window.toast && window.toast(`Seção ${id} não encontrada.`);
+        return;
+      }
+
+      all.forEach(addHidden);
+      removeHidden(target);
+      window.__currentSectionId = id;
+      if (id !== 'section-intro') window.__hasLeftIntro = true;
+      console.log('[showSection] Exibindo seção:', id);
+
+      // Resetar lock de digitação
+      window.G = window.G || {};
+      window.G.__typingLock = false;
+
+      // Garante data-typing e roda digitação uma ÚNICA vez por seção
+      ensureTypingAttrs(target);
+      setTimeout(() => {
+        if (window.runTyping) {
+          window.runTyping(target);
+          console.log('[showSection] Iniciando runTyping para:', id);
+        }
+      }, 120);
+
+      // Liga botões globais, exceto os que estão dentro de Termos
+      const btns = target.querySelectorAll(
+        '[data-action="avancar"], .btn-section-next, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney'
+      );
+      btns.forEach(btn => {
+        // ❌ não anexar handler global dentro de Termos
+        if (btn.closest('#section-termos')) return;
+        if (!btn.dataset.clickAttached) {
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (window.JC && window.JC.goNext) window.JC.goNext();
+          }, { once: true });
+          btn.dataset.clickAttached = '1';
+          console.log('[showSection] Evento de clique adicionado ao botão avançar em:', id, 'Botão:', btn.id || btn.className);
+        }
+      });
+    } catch (e) {
+      console.error('[showSection] Erro:', e);
+      window.toast && window.toast('Erro ao exibir seção');
+    }
+    console.log('[showSection] Bloco carregado');
+  };
+
+  // Inicializar seção inicial apenas se ninguém tiver setado antes
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!window.__currentSectionId) window.showSection('section-intro');
+  });
+})();
+</script>
+
 
   <!-- Navegação de Termos -->
   <script>
-  (function() {
-    const showPage = (pg) => {
-      const pages = ['termos-pg1', 'termos-pg2'];
-      pages.forEach(p => {
-        const el = document.getElementById(p);
-        if (el) el.classList.add('hidden');
-      });
-      const target = document.getElementById(pg);
-      if (target) {
-        target.classList.remove('hidden');
-        window.runTyping && window.runTyping(target);
-        console.log('[Termos] Exibindo página:', pg);
-      }
-    };
+(function () {
+  function addHidden(el){ if(!el) return; el.classList.add('hidden'); el.classList.add('section-hidden'); }
+  function removeHidden(el){ if(!el) return; el.classList.remove('hidden'); el.classList.remove('section-hidden'); }
 
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('[data-action="termos-next"], [data-action="termos-prev"]');
-      if (btn) {
-        e.preventDefault();
-        if (btn.dataset.action === 'termos-next') {
-          showPage('termos-pg2');
-        } else if (btn.dataset.action === 'termos-prev') {
-          showPage('termos-pg1');
-        }
-      }
+  const showPage = (pg) => {
+    const pages = ['termos-pg1', 'termos-pg2'];
+    pages.forEach(p => {
+      const el = document.getElementById(p);
+      addHidden(el);
     });
-    console.log('[Termos] Bloco carregado');
-  })();
-  </script>
+    const target = document.getElementById(pg);
+    if (target) {
+      removeHidden(target);
+      setTimeout(() => {
+        window.runTyping && window.runTyping(target);
+      }, 80);
+      console.log('[Termos] Exibindo página:', pg);
+    }
+  };
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action="termos-next"], [data-action="termos-prev"]');
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+
+    if (btn.dataset.action === 'termos-next') {
+      showPage('termos-pg2');
+    } else if (btn.dataset.action === 'termos-prev') {
+      showPage('termos-pg1');
+    }
+  });
+
+  console.log('[Termos] Bloco carregado');
+})();
+</script>
+
 
   <!-- Vídeo Transição -->
   <script>
