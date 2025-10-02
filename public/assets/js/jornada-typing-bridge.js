@@ -1,104 +1,203 @@
-/* jornada-terms-controller-v2.js — drop‑in
- * Resolve travamento na página de Termos:
- *  - Habilita o botão "Aceito e quero continuar" somente quando os checkboxes estiverem ok (se existirem).
- *  - Navega para a próxima seção com showSection, respeitando data-next se definido no HTML.
- *  - Funciona mesmo com conteúdo carregado via i18n/dinâmico (escuta o evento jornada:section:shown e bootstrapComplete).
- *  - Não depende de JCore/JC — usa apenas showSection e o DOM.
- */
-(function(){
-  const HIDE_CLASS = 'hidden';
+/* jornada-typing-bridge.js — versão global (sem ESM) */
+(function (global) {
+  'use strict';
 
-  function getVisibleSection(){
-    return document.querySelector(`div[id^="section-"]:not(.${HIDE_CLASS})`);
+  if (global.__TypingBridgeReady) {
+    console.log('[TypingBridge] Já carregado, ignorando');
+    return;
+  }
+  global.__TypingBridgeReady = true;
+
+  const typingLog = (...args) => console.log('[TypingBridge]', ...args);
+
+  // Usa o i18n global se existir; senão, cria um stub seguro
+  const i18n = global.i18n || {
+    lang: 'pt-BR',
+    ready: false,
+    t: (_, fallback) => fallback || _,
+    apply: () => {},
+    waitForReady: async () => {}
+  };
+
+  // --- estilo do cursor (uma única vez) ---
+  (function ensureStyle() {
+    if (document.getElementById('typing-style')) return;
+    const st = document.createElement('style');
+    st.id = 'typing-style';
+    st.textContent = `
+      .typing-caret{display:inline-block;width:0.6ch;margin-left:2px;animation:blink 1s step-end infinite}
+      .typing-done[data-typing]::after{content:''}
+      @keyframes blink{50%{opacity:0}}
+    `;
+    document.head.appendChild(st);
+  })();
+
+  let ACTIVE = false;
+  let abortCurrent = null;
+
+  function lock() {
+    ACTIVE = true;
+    global.__typingLock = true;
   }
 
-  function getNextFrom(elOrId){
-    const el = typeof elOrId === 'string' ? document.getElementById(elOrId) : elOrId;
-    if (!el) return null;
-    // 1) data-next no container da seção
-    if (el.dataset && el.dataset.next) return el.dataset.next;
-    // 2) data-next no botão (pegaremos no click também)
-    // 3) fallback por convenção comum
-    const map = {
-      'section-intro': 'section-termos',
-      'section-termos': 'section-video',
-      'section-video': 'section-guia',
-      'section-guia': 'section-selfie'
-    };
-    return map[el.id] || null;
+  function unlock() {
+    ACTIVE = false;
+    global.__typingLock = false;
   }
 
-  function selectTermsElements(sec){
-    // Suporta múltiplas variações de markup
-    const acceptBtn = sec.querySelector('[data-action="accept-terms"], [data-action="continue"], .btn-aceito, button[name="accept-terms"]');
-    const rejectBtn = sec.querySelector('[data-action="reject-terms"], .btn-recusar, button[name="reject-terms"]');
-    const checks = sec.querySelectorAll('input[type="checkbox"].terms-accept, [data-terms-check]');
-    return { acceptBtn, rejectBtn, checks: Array.from(checks) };
-  }
+  async function typeText(element, text, speed = 40, showCursor = false) {
+    return new Promise(resolve => {
+      if (!element) return resolve();
+      if (abortCurrent) abortCurrent();
+      let abort = false;
+      abortCurrent = () => (abort = true);
 
-  function allChecked(checks){
-    if (!checks || !checks.length) return true; // se não há checkboxes, não bloqueia
-    return checks.every(c => !!c.checked);
-  }
+      element.textContent = '';
+      const caret = document.createElement('span');
+      caret.className = 'typing-caret';
+      caret.textContent = '|';
+      if (showCursor) element.appendChild(caret);
 
-  function wireTerms(sec){
-    if (!sec || sec.dataset.termsBound === '1') return;
-    sec.dataset.termsBound = '1';
-
-    const { acceptBtn, rejectBtn, checks } = selectTermsElements(sec);
-
-    function updateState(){
-      const ok = allChecked(checks);
-      if (acceptBtn) acceptBtn.disabled = !ok;
-    }
-
-    checks.forEach(c => c.addEventListener('change', updateState));
-    updateState();
-
-    if (acceptBtn){
-      acceptBtn.type = acceptBtn.type || 'button'; // evita submit de formulário acidental
-      acceptBtn.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        if (acceptBtn.disabled){
-          window.toast && window.toast('Marque que leu e aceita os termos para continuar.');
-          return;
+      let i = 0;
+      const interval = setInterval(() => {
+        if (abort) {
+          clearInterval(interval);
+          if (showCursor) caret.remove();
+          return resolve();
         }
-        window.G = window.G || {}; window.G.termsAccepted = true;
-        // data-next no botão tem prioridade
-        const btnNext = acceptBtn.dataset && acceptBtn.dataset.next ? acceptBtn.dataset.next : null;
-        const next = btnNext || getNextFrom(sec) || 'section-video';
-        // pequeno atraso para não brigar com outros handlers
-        setTimeout(() => { try { window.showSection && window.showSection(next); } catch(e){} }, 10);
-      });
-    }
-
-    if (rejectBtn){
-      rejectBtn.type = rejectBtn.type || 'button';
-      rejectBtn.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        const back = rejectBtn.dataset && rejectBtn.dataset.back ? rejectBtn.dataset.back : 'section-intro';
-        try { window.showSection && window.showSection(back); } catch(e){}
-      });
-    }
+        element.textContent = text.slice(0, i);
+        i++;
+        if (i >= text.length) {
+          clearInterval(interval);
+          if (showCursor) caret.remove();
+          element.classList.add('typing-done');
+          resolve();
+        }
+      }, speed);
+    });
   }
 
-  function onSectionShown(id){
-    if (id !== 'section-termos') return;
-    const sec = document.getElementById(id);
-    if (!sec) return;
-    wireTerms(sec);
+ async function playTypingAndSpeak(target, callback, _attempt = 0) {
+  if (ACTIVE) {
+    typingLog('Já em execução, ignorando');
+    if (callback) callback();
+    return;
   }
+  lock();
+  try {
+    let container = null;
+    let elements = null;
 
-  // Integrações com o ciclo de vida da página
-  document.addEventListener('jornada:section:shown', (e) => onSectionShown(e.detail && e.detail.id));
-  window.addEventListener('bootstrapComplete', () => {
-    const sec = document.getElementById('section-termos');
-    if (sec && !sec.classList.contains(HIDE_CLASS)) wireTerms(sec);
-  });
+    // 1) Descobrir container/elements a partir do "target"
+    if (typeof target === 'string') {
+      // tenta um único elemento
+      container = document.querySelector(target);
 
-  // Fallback manual (caso a seção já esteja visível antes dos eventos)
+      if (!container) {
+        // tenta NodeList do seletor
+        const list = document.querySelectorAll(target);
+        if (list && list.length) {
+          elements = Array.from(list);
+        } else {
+          // fallback: usa a seção ativa
+          const active = document.querySelector('section.active, .section.active, [id^="section-"].active');
+          if (active) container = active;
+        }
+      }
+    } else if (target instanceof HTMLElement) {
+      container = target;
+    } else if (target && typeof NodeList !== 'undefined' && target instanceof NodeList) {
+      elements = Array.from(target);
+    } else if (Array.isArray(target)) {
+      elements = target.filter(Boolean);
+    } else {
+      // sem target: usa a seção ativa
+      const active = document.querySelector('section.active, .section.active, [id^="section-"].active');
+      if (active) container = active;
+    }
+
+    // 2) Se ainda não temos "elements", extraímos do container
+    if (!elements) {
+      if (!container) {
+        // re-tenta algumas vezes (aguarda render)
+        if (_attempt < 3) {
+          setTimeout(() => playTypingAndSpeak(target, callback, _attempt + 1), 220);
+        } else {
+          console.warn('[TypingBridge] Nenhum container/elemento encontrado para:', target);
+          if (callback) callback();
+        }
+        return;
+      }
+      const nodeList = container.hasAttribute('data-typing')
+        ? [container]
+        : container.querySelectorAll('[data-typing]');
+      elements = Array.from(nodeList);
+    }
+
+    // 3) Se ainda vazio, mais uma tentativa curta
+    if (!elements.length) {
+      if (_attempt < 3) {
+        setTimeout(() => playTypingAndSpeak(target, callback, _attempt + 1), 220);
+      } else {
+        console.warn('[TypingBridge] Nenhum elemento com [data-typing] encontrado para:', target || '(seção ativa)');
+        if (callback) callback();
+      }
+      return;
+    }
+
+    // 4) Aguarda i18n
+    try { await i18n.waitForReady(5000); } catch (_) {}
+
+    // 5) Digita + (opcional) Lê
+    for (const el of elements) {
+      const texto =
+        el.getAttribute('data-text') ||
+        i18n.t(el.getAttribute('data-i18n-key') || el.getAttribute('data-i18n') || 'welcome', { ns: 'common' }) ||
+        el.textContent || '';
+
+      const velocidade = parseInt(el.getAttribute('data-speed')) || 40;
+      const mostrarCursor = el.getAttribute('data-cursor') === 'true';
+
+      if (!texto) continue;
+
+      await typeText(el, texto, velocidade, mostrarCursor);
+
+      if ('speechSynthesis' in window && texto) {
+        const utt = new SpeechSynthesisUtterance(texto.trim());
+        utt.lang = i18n.lang || 'pt-BR';
+        utt.rate = 1.03;
+        utt.pitch = 1.0;
+        utt.volume = window.isMuted ? 0 : 1;
+        utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
+        speechSynthesis.cancel();
+        speechSynthesis.speak(utt);
+      }
+    }
+
+    if (callback) callback();
+  } catch (e) {
+    console.error('[TypingBridge] Erro:', e);
+    if (callback) callback();
+  } finally {
+    unlock();
+  }
+}
+
+
+  const TypingBridge = { play: playTypingAndSpeak };
+
+  // Exposição global (compatível com os outros arquivos)
+  global.TypingBridge = TypingBridge;
+  global.runTyping = playTypingAndSpeak;
+
+  typingLog('Pronto');
+
+  // Auto-play suave após carregar a página
   document.addEventListener('DOMContentLoaded', () => {
-    const visible = getVisibleSection();
-    if (visible && visible.id === 'section-termos') wireTerms(visible);
-  });
-})();
+  setTimeout(() => {
+    const active = document.querySelector('section.active, .section.active, [id^="section-"].active');
+    playTypingAndSpeak(active || document.body, null);
+  }, 1200);
+});
+
+})(window);
