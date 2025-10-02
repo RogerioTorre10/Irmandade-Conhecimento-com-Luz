@@ -429,5 +429,27 @@ function initializeController() {
   document.addEventListener('bootstrapComplete', initializeController, { once: true });
 }
 
-  global.initController = initController;
+Promise.resolve(maybeInit).finally(() => {
+  // 🔐 Define a seção inicial se ainda não foi definida
+  if (!global.__currentSectionId) {
+    global.__currentSectionId = 'section-termos'; // ou outro ponto de entrada
+  }
+
+  // 🔥 Inicia a jornada pela seção correta
+  if (typeof showSection === 'function') {
+    showSection(global.__currentSectionId);
+  }
+
+  // 🛡️ Impede boots subsequentes
+  global.__controllerBooting = true;
+
+  // 🧭 Garante que eventos sejam vinculados apenas uma vez
+  if (!global.__ControllerEventsBound) {
+    global.__ControllerEventsBound = true;
+    document.addEventListener('DOMContentLoaded', initializeController, { once: true });
+    document.addEventListener('bootstrapComplete', initializeController, { once: true });
+  }
+
+  global.initController = initializeController;
+});
 
