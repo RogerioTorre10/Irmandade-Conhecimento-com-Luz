@@ -77,32 +77,25 @@
     });
   }
 
- async function playTypingAndSpeak(target, callback, _attempt = 0) {
+// Substituir playTypingAndSpeak por esta versão (mata o job atual e recomeça)
+async function playTypingAndSpeak(target, callback, _attempt = 0) {
+  // se já tem algo rodando, cancela e segue (em vez de "ignorar")
   if (ACTIVE) {
-    typingLog('Já em execução, ignorando');
-    if (callback) callback();
-    return;
+    typingLog('Cancelando execução anterior e reiniciando');
+    if (abortCurrent) abortCurrent();
+    unlock();
   }
   lock();
   try {
     let container = null;
     let elements = null;
 
-    // 1) Descobrir container/elements a partir do "target"
+    // resolve o alvo
     if (typeof target === 'string') {
-      // tenta um único elemento
       container = document.querySelector(target);
-
       if (!container) {
-        // tenta NodeList do seletor
         const list = document.querySelectorAll(target);
-        if (list && list.length) {
-          elements = Array.from(list);
-        } else {
-          // fallback: usa a seção ativa
-          const active = document.querySelector('section.active, .section.active, [id^="section-"].active');
-          if (active) container = active;
-        }
+        if (list && list.length) elements = Array.from(list);
       }
     } else if (target instanceof HTMLElement) {
       container = target;
@@ -110,16 +103,17 @@
       elements = Array.from(target);
     } else if (Array.isArray(target)) {
       elements = target.filter(Boolean);
-    } else {
-      // sem target: usa a seção ativa
+    }
+
+    // fallback para a seção ativa
+    if (!container && !elements) {
       const active = document.querySelector('section.active, .section.active, [id^="section-"].active');
       if (active) container = active;
     }
 
-    // 2) Se ainda não temos "elements", extraímos do container
+    // espera DOM
     if (!elements) {
       if (!container) {
-        // re-tenta algumas vezes (aguarda render)
         if (_attempt < 3) {
           setTimeout(() => playTypingAndSpeak(target, callback, _attempt + 1), 220);
         } else {
@@ -134,30 +128,25 @@
       elements = Array.from(nodeList);
     }
 
-    // 3) Se ainda vazio, mais uma tentativa curta
     if (!elements.length) {
       if (_attempt < 3) {
         setTimeout(() => playTypingAndSpeak(target, callback, _attempt + 1), 220);
       } else {
-        console.warn('[TypingBridge] Nenhum elemento com [data-typing] encontrado para:', target || '(seção ativa)');
+        console.warn('[TypingBridge] Nenhum [data-typing] encontrado para:', target || '(seção ativa)');
         if (callback) callback();
       }
       return;
     }
 
-    // 4) Aguarda i18n
     try { await i18n.waitForReady(5000); } catch (_) {}
 
-    // 5) Digita + (opcional) Lê
     for (const el of elements) {
       const texto =
         el.getAttribute('data-text') ||
         i18n.t(el.getAttribute('data-i18n-key') || el.getAttribute('data-i18n') || 'welcome', { ns: 'common' }) ||
         el.textContent || '';
-
       const velocidade = parseInt(el.getAttribute('data-speed')) || 40;
       const mostrarCursor = el.getAttribute('data-cursor') === 'true';
-
       if (!texto) continue;
 
       await typeText(el, texto, velocidade, mostrarCursor);
@@ -169,11 +158,10 @@
         utt.pitch = 1.0;
         utt.volume = window.isMuted ? 0 : 1;
         utt.onerror = (e) => {
-      if (e && e.error !== 'interrupted') {
-        console.error('[TypingBridge] Erro na leitura:', e);
-      }
-     };
-
+          if (!e || e.error !== 'interrupted') console.error('[TypingBridge] Erro na leitura:', e);
+        };
+        speechSynthesis.cancel();
+        speechSynthesis.speak(utt);
       }
     }
 
@@ -185,6 +173,7 @@
     unlock();
   }
 }
+
 
 
   const TypingBridge = { play: playTypingAndSpeak };
