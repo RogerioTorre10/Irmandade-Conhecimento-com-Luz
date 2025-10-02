@@ -1,394 +1,203 @@
+/* jornada-typing-bridge.js — versão global (sem ESM) */
 (function (global) {
   'use strict';
 
-  /* GUARD: evita carregamento duplicado */
-  if (global.__JornadaControllerReady) {
-    console.log('[CONTROLLER] Já carregado, ignorando');
+  if (global.__TypingBridgeReady) {
+    console.log('[TypingBridge] Já carregado, ignorando');
     return;
   }
-  global.__JornadaControllerReady = true;
+  global.__TypingBridgeReady = true;
 
-  /* FLAGS DE BOOTSTRAP */
-  if (global.__ControllerBooting === undefined) global.__ControllerBooting = false;
-  if (global.__ControllerEventsBound === undefined) global.__ControllerEventsBound = false;
+  const typingLog = (...args) => console.log('[TypingBridge]', ...args);
 
-  /* DEPENDÊNCIAS SEGURAS */
+  // Usa o i18n global se existir; senão, cria um stub seguro
   const i18n = global.i18n || {
-    lang: 'pt-BR', ready: false,
-    t: (k, f) => f || k,
+    lang: 'pt-BR',
+    ready: false,
+    t: (_, fallback) => fallback || _,
     apply: () => {},
-    waitForReady: async () => {},
-    init: async () => {}
+    waitForReady: async () => {}
   };
 
-  const TypingBridge = global.TypingBridge || {};
-  const playTyping = (TypingBridge && typeof TypingBridge.play === 'function')
-    ? TypingBridge.play
-    : (typeof global.runTyping === 'function' ? global.runTyping : null);
+  // --- estilo do cursor (uma única vez) ---
+  (function ensureStyle() {
+    if (document.getElementById('typing-style')) return;
+    const st = document.createElement('style');
+    st.id = 'typing-style';
+    st.textContent = `
+      .typing-caret{display:inline-block;width:0.6ch;margin-left:2px;animation:blink 1s step-end infinite}
+      .typing-done[data-typing]::after{content:''}
+      @keyframes blink{50%{opacity:0}}
+    `;
+    document.head.appendChild(st);
+  })();
 
-  const Paper = global.JPaperQA || {};
-  const fnLoadDynamicBlocks = Paper.loadDynamicBlocks || (async () => false);
-  const fnRenderQuestions   = Paper.renderQuestions   || (async () => {});
-  const fnLoadVideo         = Paper.loadVideo         || (() => {});
-  const fnSetPergaminho     = Paper.setPergaminho     || (() => {});
-  const fnEnsureCanvas      = Paper.ensureCanvas      || (() => {});
-  const fnTypeSeq           = Paper.typeQuestionsSequentially || (() => {});
-  const fnTypePh            = Paper.typePlaceholder   || (async () => {});
+  let ACTIVE = false;
+  let abortCurrent = null;
 
-  const log = (...args) => console.log('[CONTROLLER]', ...args);
+  function lock() {
+    ACTIVE = true;
+    global.__typingLock = true;
+  }
 
-  /* ESTADO GLOBAL */
-  const state = {
-    sections: global.sections || [
-      'section-intro', 'section-termos', 'section-senha',
-      'section-guia', 'section-selfie', 'section-perguntas', 'section-final'
-    ],
-    currentSection: global.__currentSectionId || 'section-intro',
-    answeredQuestions: global.answeredQuestions || new Set(),
-    isProcessingClick: false,
-    queue: []
-  };
-  global.sections = state.sections;
-  global.currentSection = state.currentSection;
+  function unlock() {
+    ACTIVE = false;
+    global.__typingLock = false;
+  }
 
-  const JC = global.JC || {
-    currentBloco: 0,
-    currentPergunta: 0,
-    nextSection: null,
-    goNext: () => goToNextSection(),
-    initialized: false
-  };
-  global.JC = JC;
+  async function typeText(element, text, speed = 40, showCursor = false) {
+    return new Promise(resolve => {
+      if (!element) return resolve();
+      if (abortCurrent) abortCurrent();
+      let abort = false;
+      abortCurrent = () => (abort = true);
 
-  /* HELPERS */
-  function debounceClick(callback, wait = 500) {
-    return (...args) => {
-      if (state.isProcessingClick) {
-        log('Clique ignorado (debounce)');
+      element.textContent = '';
+      const caret = document.createElement('span');
+      caret.className = 'typing-caret';
+      caret.textContent = '|';
+      if (showCursor) element.appendChild(caret);
+
+      let i = 0;
+      const interval = setInterval(() => {
+        if (abort) {
+          clearInterval(interval);
+          if (showCursor) caret.remove();
+          return resolve();
+        }
+        element.textContent = text.slice(0, i);
+        i++;
+        if (i >= text.length) {
+          clearInterval(interval);
+          if (showCursor) caret.remove();
+          element.classList.add('typing-done');
+          resolve();
+        }
+      }, speed);
+    });
+  }
+
+ async function playTypingAndSpeak(target, callback, _attempt = 0) {
+  if (ACTIVE) {
+    typingLog('Já em execução, ignorando');
+    if (callback) callback();
+    return;
+  }
+  lock();
+  try {
+    let container = null;
+    let elements = null;
+
+    // 1) Descobrir container/elements a partir do "target"
+    if (typeof target === 'string') {
+      // tenta um único elemento
+      container = document.querySelector(target);
+
+      if (!container) {
+        // tenta NodeList do seletor
+        const list = document.querySelectorAll(target);
+        if (list && list.length) {
+          elements = Array.from(list);
+        } else {
+          // fallback: usa a seção ativa
+          const active = document.querySelector('section.active, .section.active, [id^="section-"].active');
+          if (active) container = active;
+        }
+      }
+    } else if (target instanceof HTMLElement) {
+      container = target;
+    } else if (target && typeof NodeList !== 'undefined' && target instanceof NodeList) {
+      elements = Array.from(target);
+    } else if (Array.isArray(target)) {
+      elements = target.filter(Boolean);
+    } else {
+      // sem target: usa a seção ativa
+      const active = document.querySelector('section.active, .section.active, [id^="section-"].active');
+      if (active) container = active;
+    }
+
+    // 2) Se ainda não temos "elements", extraímos do container
+    if (!elements) {
+      if (!container) {
+        // re-tenta algumas vezes (aguarda render)
+        if (_attempt < 3) {
+          setTimeout(() => playTypingAndSpeak(target, callback, _attempt + 1), 220);
+        } else {
+          console.warn('[TypingBridge] Nenhum container/elemento encontrado para:', target);
+          if (callback) callback();
+        }
         return;
       }
-      state.isProcessingClick = true;
-      const ev = args[0];
-      const btn = ev && ev.target ? ev.target.closest('button') : null;
-      if (btn) btn.innerHTML = i18n.t('btn_carregando', 'Carregando...');
-
-      setTimeout(() => {
-        state.isProcessingClick = false;
-        if (btn) btn.innerHTML = i18n.t('btn_avancar', 'Avançar');
-      }, wait);
-
-      callback(...args);
-    };
-  }
-
-  function ensureTypingAttrs(container) {
-    if (!container) return;
-    const candidates = container.querySelectorAll('h1,h2,h3,h4,p,.text');
-    candidates.forEach(el => {
-      if (!el.hasAttribute('data-typing')) {
-        el.setAttribute('data-typing', 'true');
-        el.setAttribute('data-speed', '36');
-        el.setAttribute('data-cursor', 'true');
-      }
-    });
-  }
-
-  function createIsolatedButton(parent, { id, text, dataset = {}, onClick }) {
-    if (!parent) return null;
-    let btn = parent.querySelector(`#${id}, [data-id="${id}"]`);
-    if (!btn) {
-      btn = document.createElement('button');
-      btn.id = id;
-      btn.className = 'btn btn-termos';
-      btn.textContent = text;
-      Object.entries(dataset).forEach(([k, v]) => btn.dataset[k] = v);
-      parent.appendChild(btn);
-    }
-    const fresh = btn.cloneNode(true);
-    btn.replaceWith(fresh);
-    btn = fresh;
-
-    btn.addEventListener('click', e => {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-      if (typeof onClick === 'function') onClick(e);
-    });
-    return btn;
-  }
-
-  function show(el) {
-    if (el) {
-      el.classList.remove('hidden', 'section-hidden');
-      el.style.display = '';
-    }
-  }
-  function hide(el) {
-    if (el) {
-      el.classList.add('section-hidden');
-      el.style.display = 'none';
-    }
-  }
-
-  /* NAVEGAÇÃO */
-  function showSection(id) {
-    if (!id) return;
-    const el = document.getElementById(id);
-    if (!el) {
-      console.error(`[CONTROLLER] Seção não encontrada: ${id}`);
-      return;
+      const nodeList = container.hasAttribute('data-typing')
+        ? [container]
+        : container.querySelectorAll('[data-typing]');
+      elements = Array.from(nodeList);
     }
 
-    // Esconde todas as seções
-    document.querySelectorAll('.j-section, section').forEach(sec => {
-      hide(sec);
-      sec.classList.remove('active');
-    });
-
-    // Mostra a nova
-    show(el);
-    el.classList.add('active');
-    state.currentSection = id;
-    global.__currentSectionId = id; // Persiste globalmente
-    log(`Seção exibida: #${id}`);
-
-    // Inicia digitação
-    if (typeof playTyping === 'function') {
-      setTimeout(() => playTyping(el, () => {
-        log('Digitação concluída em', id);
-        // Habilita botões após digitação
-        el.querySelectorAll('button').forEach(btn => btn.removeAttribute('disabled'));
-      }), 100);
-    }
-  }
-
-  function goToNextSection() {
-    const idx = state.sections.indexOf(state.currentSection);
-    if (idx === -1 || idx >= state.sections.length - 1) {
-      log('Fim da jornada');
-      return;
-    }
-    const nextId = JC.nextSection && state.sections.includes(JC.nextSection) ? JC.nextSection : state.sections[idx + 1];
-    JC.nextSection = null;
-    showSection(nextId);
-    handleSectionSpecificLogic(nextId);
-  }
-
-  /* LÓGICA POR SEÇÃO */
-  function handleSectionSpecificLogic(sectionId) {
-    if (sectionId === 'section-termos') {
-      const pg1 = document.getElementById('termos-pg1');
-      const pg2 = document.getElementById('termos-pg2');
-
-      if (!pg1) {
-        console.warn('[CONTROLLER] termos-pg1 não encontrado');
-        return;
-      }
-
-      ensureTypingAttrs(pg1);
-      if (pg2) ensureTypingAttrs(pg2);
-
-      show(pg1);
-      if (pg2) hide(pg2);
-
-      const nav1 = pg1.querySelector('.footer-actions') || pg1;
-      const nav2 = pg2 ? (pg2.querySelector('.footer-actions') || pg2) : null;
-
-      createIsolatedButton(nav1, {
-        id: 'btn-termos-next',
-        text: i18n.t('btn_proxima_pagina', 'Próxima página'),
-        dataset: { action: 'termos-next' },
-        onClick: () => {
-          hide(pg1);
-          if (pg2) show(pg2);
-          if (typeof playTyping === 'function') {
-            setTimeout(() => playTyping(pg2, () => log('typing pg2 ok')), 100);
-          }
-        }
-      });
-
-      if (pg2 && nav2) {
-        createIsolatedButton(nav2, {
-          id: 'btn-termos-prev',
-          text: i18n.t('btn_voltar', 'Voltar'),
-          dataset: { action: 'termos-prev' },
-          onClick: () => {
-            hide(pg2);
-            show(pg1);
-            if (typeof playTyping === 'function') {
-              setTimeout(() => playTyping(pg1, () => log('typing pg1 ok')), 100);
-            }
-          }
-        });
-
-        createIsolatedButton(nav2, {
-          id: 'btn-termos-accept',
-          text: i18n.t('btn_aceito_continuar', 'Aceito e quero continuar'),
-          dataset: { action: 'termos-accept' },
-          onClick: debounceClick(() => goToNextSection(), 300)
-        });
-      }
-
-      if (typeof playTyping === 'function') {
-        setTimeout(() => playTyping(pg1, () => log('typing pg1 ok')), 100);
-      }
-    } else if (sectionId === 'section-guia' || sectionId === 'section-selfie') {
-      try {
-        const videoUrl = (global.JORNADA_VIDEOS && global.JORNADA_VIDEOS.intro) ||
-                         '/assets/img/filme-0-ao-encontro-da-jornada.mp4';
-        fnLoadVideo(videoUrl);
-      } catch (e) {
-        console.error('[CONTROLLER] Erro ao carregar vídeo:', e);
-      }
-    } else if (sectionId === 'section-perguntas') {
-      (async () => {
-        try {
-          await i18n.waitForReady(10000);
-          if (!i18n.ready) throw new Error('i18n não pronto');
-          state.answeredQuestions.clear();
-          JC.currentBloco = 0;
-          JC.currentPergunta = 0;
-          await fnLoadDynamicBlocks();
-          await fnRenderQuestions();
-          global.perguntasLoaded = true;
-          log('Perguntas carregadas e renderizadas');
-        } catch (err) {
-          console.error('[CONTROLLER] Falha ao carregar perguntas:', err);
-          if (global.toast) global.toast(i18n.t('erro_perguntas', 'Erro ao carregar perguntas'));
-        }
-      })();
-    } else if (sectionId === 'section-final') {
-      log('Jornada concluída!');
-      try {
-        const finalVideo = global.JORNADA_FINAL_VIDEO ||
-                          (global.JORNADA_VIDEOS && global.JORNADA_VIDEOS.final);
-        if (finalVideo) fnLoadVideo(finalVideo);
-      } catch (e) {
-        console.error('[CONTROLLER] Vídeo final erro:', e);
-      }
-    }
-  }
-
-  /* EVENTOS GLOBAIS */
-  function bindGlobalEvents() {
-    if (global.__ControllerEventsBound) return;
-    global.__ControllerEventsBound = true;
-
-    const debouncedNext = debounceClick(() => goToNextSection(), 500);
-    document.querySelectorAll([
-      '[data-action="avancar"]',
-      '#iniciar',
-      '[data-action="skip-selfie"]',
-      '[data-action="select-guia"]',
-      '#btnSkipSelfie',
-      '#btnStartJourney',
-      '#iniciarSenha',
-      '.btn-section-next'
-    ].join(',')).forEach(btn => {
-      btn.addEventListener('click', e => {
-        e.preventDefault();
-        if (e.target.closest('#section-termos')) return;
-        log('Botão global avançar clicado');
-        debouncedNext(e);
-      });
-    });
-
-    document.addEventListener('questionAnswered', ev => {
-      const qId = ev?.detail?.questionId || '(?)';
-      state.answeredQuestions.add(qId);
-      log(`Pergunta respondida: ${qId} (total ${state.answeredQuestions.size})`);
-      goToNextSection();
-    });
-
-    document.addEventListener('videoSkipped', () => {
-      log('Vídeo pulado');
-      goToNextSection();
-    });
-
-    document.addEventListener('jc:ready', () => {
-      state.queue.forEach(action => {
-        if (action.type === 'next') goToNextSection();
-      });
-      state.queue = [];
-    });
-  }
-
-  /* INICIALIZAÇÃO */
-  function initController(route = 'intro') {
-    if (JC.initialized) {
-      log('Controlador já inicializado, ignorando');
-      return;
-    }
-    JC.initialized = true;
-    log('Inicializando controlador...');
-
-    if (!global.__currentSectionId) {
-      global.__currentSectionId = (route === 'intro') ? 'section-intro' : route;
-    }
-    state.currentSection = global.__currentSectionId;
-
-    global.JORNADA_BLOCKS = global.JORNADA_BLOCKS || [];
-    global.JORNADA_VIDEOS = global.JORNADA_VIDEOS || {};
-
-    // Esconde todas as seções exceto a inicial
-    document.querySelectorAll('.j-section, section').forEach(sec => {
-      hide(sec);
-      sec.classList.remove('active');
-    });
-
-    bindGlobalEvents();
-
-    const tryShowInitial = (attempt = 0, max = 5) => {
-      const el = document.getElementById(state.currentSection);
-      if (el) {
-        showSection(state.currentSection);
-        handleSectionSpecificLogic(state.currentSection);
-      } else if (attempt < max) {
-        log(`Tentativa ${attempt + 1}: aguardando ${state.currentSection}`);
-        setTimeout(() => tryShowInitial(attempt + 1, max), 400);
+    // 3) Se ainda vazio, mais uma tentativa curta
+    if (!elements.length) {
+      if (_attempt < 3) {
+        setTimeout(() => playTypingAndSpeak(target, callback, _attempt + 1), 220);
       } else {
-        console.error('[CONTROLLER] Não foi possível encontrar a seção inicial');
+        console.warn('[TypingBridge] Nenhum elemento com [data-typing] encontrado para:', target || '(seção ativa)');
+        if (callback) callback();
       }
-    };
-    tryShowInitial();
-
-    global.readText = global.readText || function (text, cb) {
-      if (!('speechSynthesis' in window)) return;
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = i18n.lang || 'pt-BR';
-      utter.onend = () => { if (cb) cb(); };
-      utter.onerror = e => console.error('[CONTROLLER] TTS error:', e);
-      window.speechSynthesis.speak(utter);
-    };
-
-    log('Controlador inicializado com sucesso');
-  }
-
-  /* BOOTSTRAP */
-  function bootstrapController() {
-    if (JC.initialized || global.__ControllerBooting) {
-      log('Bootstrap ignorado (já inicializado ou em andamento)');
       return;
     }
-    global.__ControllerBooting = true;
-    log('Bootstrap inicial do controller...');
 
-    const i18nPromise = (i18n && typeof i18n.init === 'function')
-      ? i18n.init().catch(() => {})
-      : Promise.resolve();
+    // 4) Aguarda i18n
+    try { await i18n.waitForReady(5000); } catch (_) {}
 
-    i18nPromise.finally(() => {
-      initController(global.__currentSectionId || 'intro');
-    });
+    // 5) Digita + (opcional) Lê
+    for (const el of elements) {
+      const texto =
+        el.getAttribute('data-text') ||
+        i18n.t(el.getAttribute('data-i18n-key') || el.getAttribute('data-i18n') || 'welcome', { ns: 'common' }) ||
+        el.textContent || '';
+
+      const velocidade = parseInt(el.getAttribute('data-speed')) || 40;
+      const mostrarCursor = el.getAttribute('data-cursor') === 'true';
+
+      if (!texto) continue;
+
+      await typeText(el, texto, velocidade, mostrarCursor);
+
+      if ('speechSynthesis' in window && texto) {
+        const utt = new SpeechSynthesisUtterance(texto.trim());
+        utt.lang = i18n.lang || 'pt-BR';
+        utt.rate = 1.03;
+        utt.pitch = 1.0;
+        utt.volume = window.isMuted ? 0 : 1;
+        utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
+        speechSynthesis.cancel();
+        speechSynthesis.speak(utt);
+      }
+    }
+
+    if (callback) callback();
+  } catch (e) {
+    console.error('[TypingBridge] Erro:', e);
+    if (callback) callback();
+  } finally {
+    unlock();
   }
+}
 
-  if (!global.__ControllerEventsBound) {
-    document.addEventListener('DOMContentLoaded', bootstrapController, { once: true });
-    document.addEventListener('bootstrapComplete', bootstrapController, { once: true });
-  }
 
-  global.initController = initController;
-  global.showSection = showSection;
-  global.goToNextSection = goToNextSection;
+  const TypingBridge = { play: playTypingAndSpeak };
+
+  // Exposição global (compatível com os outros arquivos)
+  global.TypingBridge = TypingBridge;
+  global.runTyping = playTypingAndSpeak;
+
+  typingLog('Pronto');
+
+  // Auto-play suave após carregar a página
+  document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const active = document.querySelector('section.active, .section.active, [id^="section-"].active');
+    playTypingAndSpeak(active || document.body, null);
+  }, 1200);
+});
 
 })(window);
