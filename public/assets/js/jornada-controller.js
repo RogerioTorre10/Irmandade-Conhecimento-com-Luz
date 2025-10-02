@@ -117,7 +117,15 @@
       playTyping(nextEl, () => log('Digitação concluída em', nextEl.id));
     }
   }
+  function show(el) {
+    if (el) {
+    el.classList.remove('hidden'); // ← esta linha resolve o problema
+    el.classList.remove('section-hidden');
+    el.style.display = '';
+  }
+}
 
+  
   // ===== fluxo =====
   function enqueueAction(action) { queue.push(action); }
   function processQueue() {
