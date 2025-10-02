@@ -147,6 +147,7 @@ if (global.__ControllerEventsBound === undefined) global.__ControllerEventsBound
     const idx = sections.indexOf(currentSection);
     log('Índice atual:', idx, 'Seção atual:', currentSection);
     if (idx >= sections.length - 1) return;
+    log('🔍 goToNextSection chamado. currentSection:', currentSection);
 
     const prev = currentSection;
     currentSection = (JC.nextSection && sections.includes(JC.nextSection))
@@ -305,6 +306,8 @@ else if (currentSection === 'section-final') {
   if (JC.initialized) { log('Controlador já inicializado, pulando'); return; }
   JC.initialized = true;
   log('Inicializando controlador...');
+  log('🔍 initController iniciado com route:', route);
+ 
 
   global.JORNADA_BLOCKS = global.JORNADA_BLOCKS || [];
   global.JORNADA_VIDEOS = global.JORNADA_VIDEOS || {};
@@ -352,6 +355,9 @@ else if (currentSection === 'section-final') {
         else { goToNextSection(); } // se não houver pg2, segue jornada
       });
     });
+    
+    JC.nextSection = 'section-termos';
+       goToNextSection();
 
     // seção inicial
     const tryInit = (max = 5, ms = 500) => {
