@@ -1,144 +1,104 @@
-/* jornada-typing-bridge.js — v2 (drop‑in)
- * Corrige:
- * 1) "[TypingBridge] Nenhum container/elemento encontrado" (aguarda a seção estar visível e procura por vários seletores) 
- * 2) Erros de TTS "interrupted" (ignora interrupções esperadas e evita fala em duplicidade)
- * 3) Integra com showSection (dispara leitura e datilografia somente quando há conteúdo)
- *
- * Como usar:
- * - Substitua o conteúdo de /assets/js/jornada-typing-bridge.js por este arquivo.
- * - Garanta que os parágrafos a serem lidos/datilografados tenham um destes seletores:
- *     [data-typing]  |  .typing-text  |  .text
- * - Opcional: ajuste selectors/voz em window.TypingBridgeConfig antes do load do script.
+/* jornada-terms-controller-v2.js — drop‑in
+ * Resolve travamento na página de Termos:
+ *  - Habilita o botão "Aceito e quero continuar" somente quando os checkboxes estiverem ok (se existirem).
+ *  - Navega para a próxima seção com showSection, respeitando data-next se definido no HTML.
+ *  - Funciona mesmo com conteúdo carregado via i18n/dinâmico (escuta o evento jornada:section:shown e bootstrapComplete).
+ *  - Não depende de JCore/JC — usa apenas showSection e o DOM.
  */
-(function () {
+(function(){
   const HIDE_CLASS = 'hidden';
-  const cfg = window.TypingBridgeConfig || {};
-  const SELECTORS = cfg.selectors || ['[data-typing]', '.typing-text', '.text'];
-  const LANG = cfg.lang || 'pt-BR';
-  const RATE = typeof cfg.rate === 'number' ? cfg.rate : 1.0; // 0.8 ~ 1.2
-  const PITCH = typeof cfg.pitch === 'number' ? cfg.pitch : 1.0; // 0.8 ~ 1.2
 
-  const state = {
-    currentSectionId: null,
-    playing: false,
-  };
-
-  function visibleSections() {
-    return Array.from(
-      document.querySelectorAll(`div[id^="section-"]:not(.${HIDE_CLASS})`)
-    );
+  function getVisibleSection(){
+    return document.querySelector(`div[id^="section-"]:not(.${HIDE_CLASS})`);
   }
 
-  function findTargets(root) {
-    for (const sel of SELECTORS) {
-      const els = root.querySelectorAll(sel);
-      if (els && els.length) return { els: Array.from(els), sel };
-    }
-    return { els: [], sel: null };
-  }
-
-  function collectText(els) {
-    return els
-      .map((el) => (el.textContent || '').trim())
-      .filter(Boolean)
-      .join('\n\n');
-  }
-
-  function speak(text) {
-    if (!('speechSynthesis' in window)) {
-      console.warn('[TypingBridge] speechSynthesis não suportado neste navegador.');
-      return;
-    }
-    if (!text) return;
-
-    try { window.speechSynthesis.cancel(); } catch (e) {}
-
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = LANG;
-    u.rate = RATE;
-    u.pitch = PITCH;
-
-    u.onend = () => {
-      state.playing = false;
-      // console.log('[TypingBridge] Fala concluída');
+  function getNextFrom(elOrId){
+    const el = typeof elOrId === 'string' ? document.getElementById(elOrId) : elOrId;
+    if (!el) return null;
+    // 1) data-next no container da seção
+    if (el.dataset && el.dataset.next) return el.dataset.next;
+    // 2) data-next no botão (pegaremos no click também)
+    // 3) fallback por convenção comum
+    const map = {
+      'section-intro': 'section-termos',
+      'section-termos': 'section-video',
+      'section-video': 'section-guia',
+      'section-guia': 'section-selfie'
     };
-    u.onerror = (ev) => {
-      // 'interrupted' é normal quando trocamos de seção/atualizamos conteúdo
-      if (ev && ev.error === 'interrupted') return;
-      console.warn('[TypingBridge] TTS error:', ev && ev.error ? ev.error : ev);
-      state.playing = false;
-    };
-
-    state.playing = true;
-    window.speechSynthesis.speak(u);
+    return map[el.id] || null;
   }
 
-  function runTypingIfAvailable(els) {
-    if (typeof window.runTyping === 'function') {
-      try {
-        window.runTyping(els);
-      } catch (e) {
-        console.warn('[TypingBridge] runTyping falhou:', e);
-      }
+  function selectTermsElements(sec){
+    // Suporta múltiplas variações de markup
+    const acceptBtn = sec.querySelector('[data-action="accept-terms"], [data-action="continue"], .btn-aceito, button[name="accept-terms"]');
+    const rejectBtn = sec.querySelector('[data-action="reject-terms"], .btn-recusar, button[name="reject-terms"]');
+    const checks = sec.querySelectorAll('input[type="checkbox"].terms-accept, [data-terms-check]');
+    return { acceptBtn, rejectBtn, checks: Array.from(checks) };
+  }
+
+  function allChecked(checks){
+    if (!checks || !checks.length) return true; // se não há checkboxes, não bloqueia
+    return checks.every(c => !!c.checked);
+  }
+
+  function wireTerms(sec){
+    if (!sec || sec.dataset.termsBound === '1') return;
+    sec.dataset.termsBound = '1';
+
+    const { acceptBtn, rejectBtn, checks } = selectTermsElements(sec);
+
+    function updateState(){
+      const ok = allChecked(checks);
+      if (acceptBtn) acceptBtn.disabled = !ok;
+    }
+
+    checks.forEach(c => c.addEventListener('change', updateState));
+    updateState();
+
+    if (acceptBtn){
+      acceptBtn.type = acceptBtn.type || 'button'; // evita submit de formulário acidental
+      acceptBtn.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        if (acceptBtn.disabled){
+          window.toast && window.toast('Marque que leu e aceita os termos para continuar.');
+          return;
+        }
+        window.G = window.G || {}; window.G.termsAccepted = true;
+        // data-next no botão tem prioridade
+        const btnNext = acceptBtn.dataset && acceptBtn.dataset.next ? acceptBtn.dataset.next : null;
+        const next = btnNext || getNextFrom(sec) || 'section-video';
+        // pequeno atraso para não brigar com outros handlers
+        setTimeout(() => { try { window.showSection && window.showSection(next); } catch(e){} }, 10);
+      });
+    }
+
+    if (rejectBtn){
+      rejectBtn.type = rejectBtn.type || 'button';
+      rejectBtn.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        const back = rejectBtn.dataset && rejectBtn.dataset.back ? rejectBtn.dataset.back : 'section-intro';
+        try { window.showSection && window.showSection(back); } catch(e){}
+      });
     }
   }
 
-  function maybeRun(root) {
-    if (!root) return;
-    const { els, sel } = findTargets(root);
-    if (!els.length) {
-      // Debug brando; evita spam no console
-      console.debug('[TypingBridge] Nenhum alvo encontrado em', root.id || root, '(', SELECTORS.join(', '), ')');
-      return;
-    }
-
-    console.log('[TypingBridge] Alvos:', els.length, 'selector:', sel);
-
-    // Dispara datilografia se existir implementação anterior
-    runTypingIfAvailable(els);
-
-    // Concatena texto e fala
-    const text = collectText(els);
-    speak(text);
+  function onSectionShown(id){
+    if (id !== 'section-termos') return;
+    const sec = document.getElementById(id);
+    if (!sec) return;
+    wireTerms(sec);
   }
 
-  function onSectionShown(id) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    state.currentSectionId = id;
-    // Pequeno atraso para permitir carregamento dinâmico/i18n
-    setTimeout(() => maybeRun(el), 80);
-  }
-
-  // Monkey‑patch de showSection para emitir um evento padronizado
-  const originalShow = window.showSection;
-  window.showSection = function (id) {
-    const r = typeof originalShow === 'function' ? originalShow(id) : undefined;
-    try {
-      document.dispatchEvent(
-        new CustomEvent('jornada:section:shown', { detail: { id } })
-      );
-    } catch (e) {}
-    return r;
-  };
-
-  // Reage quando uma seção fica visível
-  document.addEventListener('jornada:section:shown', (e) => onSectionShown(e.detail.id));
-
-  // Tenta executar no bootstrap para a seção inicialmente visível
+  // Integrações com o ciclo de vida da página
+  document.addEventListener('jornada:section:shown', (e) => onSectionShown(e.detail && e.detail.id));
   window.addEventListener('bootstrapComplete', () => {
-    const visible = visibleSections();
-    if (visible[0]) maybeRun(visible[0]);
+    const sec = document.getElementById('section-termos');
+    if (sec && !sec.classList.contains(HIDE_CLASS)) wireTerms(sec);
   });
 
-  // API pública opcional
-  window.TypingBridge = {
-    play(root = null) {
-      if (root) return maybeRun(root);
-      const visible = visibleSections();
-      if (visible[0]) maybeRun(visible[0]);
-    },
-    speak,
-    config: { SELECTORS, LANG, RATE, PITCH },
-  };
+  // Fallback manual (caso a seção já esteja visível antes dos eventos)
+  document.addEventListener('DOMContentLoaded', () => {
+    const visible = getVisibleSection();
+    if (visible && visible.id === 'section-termos') wireTerms(visible);
+  });
 })();
