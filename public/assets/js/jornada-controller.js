@@ -239,19 +239,26 @@ async function goToNextSection() {
     }
 
     // ===== regras por seção =====
-    if (currentSection === 'section-termos') {
-      const pg1 = document.getElementById('termos-pg1');
-      const pg2 = document.getElementById('termos-pg2');
-      // reset do gate ao entrar em Termos
-      global.__termsStep = 1;
-      global.__termsAccepted = false;
+if (currentSection === 'section-termos') {
+  const pg1 = document.getElementById('termos-pg1');
+  const pg2 = document.getElementById('termos-pg2');
 
-      ensureTypingAttrs(pg1);
-      ensureTypingAttrs(pg2);
-      show(pg1); hide(pg2);
+  // reseta gate e tranca a seção
+  window.__termsStep = 1;
+  window.__termsAccepted = false;
+  lockTermosSection();
 
-      if (typeof playTyping === 'function') setTimeout(() => playTyping(pg1, () => log('Typing termos-pg1 ok')), 60);
-    }
+  ensureTypingAttrs(pg1);
+  ensureTypingAttrs(pg2);
+  show(pg1); hide(pg2);
+
+  if (typeof playTyping === 'function') {
+    setTimeout(() => playTyping(pg1, () => log('Typing termos-pg1 ok')), 60);
+  }
+
+  // NÃO AVANÇA DE SEÇÃO AQUI — fica trancado até aceitar
+}
+
 
     else if (currentSection === 'section-guia') {
       try {
