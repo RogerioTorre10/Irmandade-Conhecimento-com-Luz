@@ -7,6 +7,10 @@
     return;
   }
   global.__JornadaControllerReady = true;
+  // ===== FIX: flags globais anti-corrida =====
+if (global.__ControllerBooting === undefined) global.__ControllerBooting = false;
+if (global.__ControllerEventsBound === undefined) global.__ControllerEventsBound = false;
+
 
   // i18n seguro
   const i18n = global.i18n || {
