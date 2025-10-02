@@ -37,16 +37,25 @@
     if (current) {
       current.classList.remove('hidden');
 
-      if (global.runTyping) global.runTyping(current);
-      if (global.playTypingAndSpeak) global.playTypingAndSpeak('.text');
+      // Evita leitura duplicada
+      if (global.runTyping && !global.G?.__typingLock) {
+        global.runTyping(current);
+      }
+
+      if (global.playTypingAndSpeak) {
+        global.playTypingAndSpeak('.text');
+      }
 
       setupNavigation(current);
+
       if (id === 'section-perguntas' && global.loadDynamicBlocks) {
         global.loadDynamicBlocks();
       }
     }
 
     currentIndex = index;
+    global.__currentSectionId = id;
+    console.log('[BOOT] Seção exibida via índice:', id);
   }
 
   function setupNavigation(sectionEl) {
@@ -68,6 +77,7 @@
       btnNext.addEventListener('click', () => {
         termosPg1.classList.add('hidden');
         termosPg2.classList.remove('hidden');
+        if (global.runTyping) global.runTyping(termosPg2);
       });
     }
 
@@ -75,6 +85,7 @@
       btnPrev.addEventListener('click', () => {
         termosPg2.classList.add('hidden');
         termosPg1.classList.remove('hidden');
+        if (global.runTyping) global.runTyping(termosPg1);
       });
     }
 
@@ -96,7 +107,11 @@
     try {
       document.dispatchEvent(new CustomEvent('bootstrapComplete'));
       console.log('[BOOT] Evento bootstrapComplete disparado');
-      showSectionByIndex(0); // inicia na intro
+
+      // 🧠 Respeita a seção inicial definida pelo controlador
+      const initialId = global.__currentSectionId || 'section-intro';
+      const initialIndex = sectionOrder.indexOf(initialId);
+      showSectionByIndex(initialIndex >= 0 ? initialIndex : 0);
     } catch (e) {
       console.error('[BOOT] Erro ao disparar bootstrapComplete:', e);
     }
