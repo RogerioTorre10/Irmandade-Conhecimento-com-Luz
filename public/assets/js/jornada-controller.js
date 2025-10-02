@@ -2,29 +2,37 @@
 (function (global) {
   'use strict';
 
+  /* --------------------------------------------------------------
+   *  GUARD: evita carregamento duplicado
+   * -------------------------------------------------------------- */
   if (global.__JornadaControllerReady) {
     console.log('[CONTROLLER] Já carregado, ignorando');
     return;
   }
   global.__JornadaControllerReady = true;
-  // ===== FIX: flags globais anti-corrida =====
-if (global.__ControllerBooting === undefined) global.__ControllerBooting = false;
-if (global.__ControllerEventsBound === undefined) global.__ControllerEventsBound = false;
 
+  /* --------------------------------------------------------------
+   *  FLAGS DE BOOTSTRAP (evita corrida entre DOMContentLoaded e bootstrapComplete)
+   * -------------------------------------------------------------- */
+  if (global.__ControllerBooting === undefined) global.__ControllerBooting = false;
+  if (global.__ControllerEventsBound === undefined) global.__ControllerEventsBound = false;
 
-  // i18n seguro
+  /* --------------------------------------------------------------
+   *  DEPENDÊNCIAS SEGURAS
+   * -------------------------------------------------------------- */
   const i18n = global.i18n || {
     lang: 'pt-BR', ready: false,
-    t: (k, f) => f || k, apply: () => {},
-    waitForReady: async () => {}, init: async () => {}
+    t: (k, f) => f || k,
+    apply: () => {},
+    waitForReady: async () => {},
+    init: async () => {}
   };
 
-  // Typing
+  // TypingBridge – aceita tanto TypingBridge.play quanto runTyping
   const TypingBridge = global.TypingBridge || {};
-  const playTyping =
-    (TypingBridge && typeof TypingBridge.play === 'function')
-      ? TypingBridge.play
-      : (typeof global.runTyping === 'function' ? global.runTyping : null);
+  const playTyping = (TypingBridge && typeof TypingBridge.play === 'function')
+    ? TypingBridge.play
+    : (typeof global.runTyping === 'function' ? global.runTyping : null);
 
   // Paper / Perguntas
   const Paper = global.JPaperQA || {};
@@ -36,48 +44,60 @@ if (global.__ControllerEventsBound === undefined) global.__ControllerEventsBound
   const fnTypeSeq           = Paper.typeQuestionsSequentially || (() => {});
   const fnTypePh            = Paper.typePlaceholder   || (async () => {});
 
-  const log = (...a) => console.log('[CONTROLLER]', ...a);
+  const log = (...args) => console.log('[CONTROLLER]', ...args);
 
-  // Estado
-  let isProcessingClick = false;
-  let queue = [];
-  const sections = global.sections || [
-    'section-intro','section-termos','section-senha',
-    'section-guia','section-selfie','section-perguntas','section-final'
-  ];
-  let currentSection = global.currentSection || 'section-intro';
-  const answeredQuestions = global.answeredQuestions || new Set();
-
-  global.sections = sections;
-  global.currentSection = currentSection;
+  /* --------------------------------------------------------------
+   *  ESTADO GLOBAL DA JORNADA
+   * -------------------------------------------------------------- */
+  const state = {
+    sections: global.sections || [
+      'section-intro', 'section-termos', 'section-senha',
+      'section-guia', 'section-selfie', 'section-perguntas', 'section-final'
+    ],
+    currentSection: global.currentSection || 'section-intro',
+    answeredQuestions: global.answeredQuestions || new Set(),
+    isProcessingClick: false,
+    queue: []                                   // ações enfileiradas (ex.: next)
+  };
+  global.sections = state.sections;
+  global.currentSection = state.currentSection;
 
   const JC = global.JC || {
-    currentBloco: 0, currentPergunta: 0,
-    nextSection: null, goNext: () => goToNextSection(),
+    currentBloco: 0,
+    currentPergunta: 0,
+    nextSection: null,
+    goNext: () => goToNextSection(),
     initialized: false
   };
   global.JC = JC;
 
-  // ===== helpers =====
+  /* --------------------------------------------------------------
+   *  HELPERS
+   * -------------------------------------------------------------- */
+  // debounce genérico (usado apenas nos botões globais)
   function debounceClick(callback, wait = 500) {
     return (...args) => {
-      if (isProcessingClick) { log('Clique ignorado (debounce)'); return; }
-      isProcessingClick = true;
+      if (state.isProcessingClick) {
+        log('Clique ignorado (debounce)');
+        return;
+      }
+      state.isProcessingClick = true;
       const ev = args[0];
-      const btn = ev && ev.target ? ev.target : null;
+      const btn = ev && ev.target ? ev.target.closest('button') : null;
       if (btn) btn.innerHTML = i18n.t('btn_carregando', 'Carregando...');
+
       setTimeout(() => {
-        isProcessingClick = false;
+        state.isProcessingClick = false;
         if (btn) btn.innerHTML = i18n.t('btn_avancar', 'Avançar');
       }, wait);
+
       callback(...args);
     };
   }
 
-  // Garante que elementos de um container tenham data-typing
+  // garante atributos de digitação em todos os elementos de texto
   function ensureTypingAttrs(container) {
     if (!container) return;
-    // Se já há [data-typing], ótimo; senão, promovemos h*, p, .text
     const candidates = container.querySelectorAll('h1,h2,h3,h4,p,.text');
     candidates.forEach(el => {
       if (!el.hasAttribute('data-typing')) {
@@ -88,347 +108,369 @@ if (global.__ControllerEventsBound === undefined) global.__ControllerEventsBound
     });
   }
 
-  // Cria botão se não existir
-  function ensureButton(container, { id, text, attrs = {}, onClick }) {
-  if (!container) return null;
-  let btn = container.querySelector('#' + id + ', button#' + id + ', [data-id="' + id + '"]');
-  if (!btn) {
-    btn = document.createElement('button');
-    btn.id = id;
-    // NÃO usar .btn-avancar aqui para não ativar o listener global
-    btn.className = 'btn btn-termos'; // estilize igual no CSS, se quiser
-    btn.textContent = text;
-    Object.keys(attrs).forEach(k => btn.setAttribute(k, attrs[k]));
-    container.appendChild(btn);
-  }
-  if (onClick) {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      // blindagem: não deixa o clique “subir” para listeners globais
-      e.stopPropagation();
-      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-      onClick(e);
-    });
-  }
-  return btn;
-}
-
-
-  function show(el) { if (el) { el.classList.remove('section-hidden'); el.style.display = ''; } }
-  function hide(el) { if (el) { el.classList.add('section-hidden'); el.style.display = 'none'; } }
-
-  function showSectionAndType(nextEl) {
-    if (!nextEl) return;
-    nextEl.classList.add('active');
-    nextEl.classList.remove('section-hidden');
-    log(`Seção exibida: #${nextEl.id}`);
-    if (typeof playTyping === 'function') {
-      playTyping(nextEl, () => log('Digitação concluída em', nextEl.id));
-    }
-  }
-  function show(el) {
-    if (el) {
-    el.classList.remove('hidden'); // ← esta linha resolve o problema
-    el.classList.remove('section-hidden');
-    el.style.display = '';
-  }
-}
-
-  
-  // ===== fluxo =====
-  function enqueueAction(action) { queue.push(action); }
-  function processQueue() {
-    const pending = queue.slice(); queue = [];
-    pending.forEach(a => { if (a.type === 'next') goToNextSection(); });
-  }
-
-  // Navegação principal
-  async function goToNextSection() {
-    const idx = sections.indexOf(currentSection);
-    log('Índice atual:', idx, 'Seção atual:', currentSection);
-    if (idx >= sections.length - 1) return;
-
-    const prev = currentSection;
-    currentSection = (JC.nextSection && sections.includes(JC.nextSection))
-      ? JC.nextSection : sections[idx + 1];
-    log(`Navegando de ${prev} para ${currentSection}`);
-
-    const prevEl = document.querySelector('#' + prev);
-    if (prevEl) { prevEl.classList.remove('active'); prevEl.classList.add('section-hidden'); }
-
-    const nextEl = document.querySelector('#' + currentSection);
-    if (!nextEl) { console.error('[CONTROLLER] Seção não encontrada:', currentSection); return; }
-    showSectionAndType(nextEl);
-
-   // ===== regras por seção =====
-if (currentSection === 'section-termos') {
-  // páginas internas
-  const pg1 = document.getElementById('termos-pg1');
-  const pg2 = document.getElementById('termos-pg2');
-
-  // se não existir, não travar
-  if (!pg1 && !pg2) {
-    console.warn('[CONTROLLER] termos-pg1/pg2 não encontrados; seguindo fluxo padrão');
-    return;
-  }
-
-  // typing garantido
-  ensureTypingAttrs(pg1);
-  ensureTypingAttrs(pg2);
-
-  // exibir pg1, ocultar pg2
-  show(pg1); hide(pg2);
-
-  // garante containers de ações
-  const navWrap1 = pg1.querySelector('.termos-actions') || pg1;
-  const navWrap2 = pg2 ? (pg2.querySelector('.termos-actions') || pg2) : null;
-
-  // Helper local para criar botão isolado (sem interferir no listener global)
+  // cria (ou reutiliza) botão isolado – NÃO usa classes que acionam o listener global
   function createIsolatedButton(parent, { id, text, dataset = {}, onClick }) {
     if (!parent) return null;
-    let btn = parent.querySelector('#' + id + ', [data-id="' + id + '"]');
+    let btn = parent.querySelector(`#${id}, [data-id="${id}"]`);
     if (!btn) {
       btn = document.createElement('button');
       btn.id = id;
-      btn.className = 'btn btn-termos'; // NÃO usar .btn-avancar aqui
+      btn.className = 'btn btn-termos';               // classe própria, não .btn-avancar
       btn.textContent = text;
-      btn.setAttribute('data-scope', 'termos'); // marca escopo
-      Object.keys(dataset || {}).forEach(k => btn.dataset[k] = dataset[k]);
+      Object.entries(dataset).forEach(([k, v]) => btn.dataset[k] = v);
       parent.appendChild(btn);
     }
-    // remove possíveis handlers duplicados antes de adicionar
-    const clone = btn.cloneNode(true);
-    btn.replaceWith(clone);
-    btn = clone;
+    // remove handlers antigos (clone‑replace trick)
+    const fresh = btn.cloneNode(true);
+    btn.replaceWith(fresh);
+    btn = fresh;
 
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', e => {
       e.preventDefault();
-      // isola dos listeners globais
       e.stopPropagation();
-      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+      e.stopImmediatePropagation();
       if (typeof onClick === 'function') onClick(e);
     });
-
     return btn;
   }
 
-  // “Próximo” dentro dos termos (pg1 -> pg2)
-  createIsolatedButton(navWrap1, {
-    id: 'btn-termos-next',
-    text: i18n.t('btn_avancar', 'Avançar'),
-    dataset: { action: 'termos-next' },
-    onClick: () => {
-      hide(pg1); show(pg2);
+  // visibilidade simples
+  function show(el) {
+    if (el) {
+      el.classList.remove('hidden', 'section-hidden');
+      el.style.display = '';
+    }
+  }
+  function hide(el) {
+    if (el) {
+      el.classList.add('section-hidden');
+      el.style.display = 'none';
+    }
+  }
+
+  /* --------------------------------------------------------------
+   *  NAVEGAÇÃO PRINCIPAL
+   * -------------------------------------------------------------- */
+  function showSection(id) {
+    if (!id) return;
+    const el = document.getElementById(id);
+    if (!el) {
+      console.error(`[CONTROLLER] Seção não encontrada: ${id}`);
+      return;
+    }
+
+    // esconde todas
+    document.querySelectorAll('.j-section, section').forEach(sec => {
+      hide(sec);
+      sec.classList.remove('active');
+    });
+
+    // mostra a nova
+    show(el);
+    el.classList.add('active');
+    state.currentSection = id;
+    log(`Seção exibida: #${id}`);
+
+    // inicia digitação (se houver ponte)
+    if (typeof playTyping === 'function') {
+      // pequeno delay garante que o DOM já está visível
+      setTimeout(() => playTyping(el, () => log('Digitação concluída em', id)), 80);
+    }
+  }
+
+  function goToNextSection() {
+    const idx = state.sections.indexOf(state.currentSection);
+    if (idx === -1 || idx >= state.sections.length - 1) {
+      log('Fim da jornada');
+      return;
+    }
+    const nextId = state.sections[idx + 1];
+    JC.nextSection = null;               // limpa eventual override
+    showSection(nextId);
+    handleSectionSpecificLogic(nextId);
+  }
+
+  /* --------------------------------------------------------------
+   *  LÓGICA ESPECÍFICA POR SEÇÃO
+   * -------------------------------------------------------------- */
+  function handleSectionSpecificLogic(sectionId) {
+    /* ---------- TERMOS ---------- */
+    if (sectionId === 'section-termos') {
+      const pg1 = document.getElementById('termos-pg1');
+      const pg2 = document.getElementById('termos-pg2');
+
+      if (!pg1) {
+        console.warn('[CONTROLLER] termos-pg1 não encontrado – pulando lógica interna');
+        return;
+      }
+
+      // garante atributos de typing
+      ensureTypingAttrs(pg1);
+      if (pg2) ensureTypingAttrs(pg2);
+
+      // estado inicial: pg1 visível, pg2 oculto
+      show(pg1);
+      if (pg2) hide(pg2);
+
+      // containers para botões
+      const nav1 = pg1.querySelector('.termos-actions') || pg1;
+      const nav2 = pg2 ? (pg2.querySelector('.termos-actions') || pg2) : null;
+
+      // Botão “Próxima página” (pg1 → pg2)
+      createIsolatedButton(nav1, {
+        id: 'btn-termos-next',
+        text: i18n.t('btn_proxima_pagina', 'Próxima página'),
+        dataset: { action: 'termos-next' },
+        onClick: () => {
+          hide(pg1);
+          if (pg2) show(pg2);
+          if (typeof playTyping === 'function') {
+            setTimeout(() => playTyping(pg2, () => log('typing pg2 ok')), 80);
+          }
+        }
+      });
+
+      // Botões da pg2 (se existir)
+      if (pg2 && nav2) {
+        // Voltar
+        createIsolatedButton(nav2, {
+          id: 'btn-termos-prev',
+          text: i18n.t('btn_voltar', 'Voltar'),
+          dataset: { action: 'termos-prev' },
+          onClick: () => {
+            hide(pg2);
+            show(pg1);
+            if (typeof playTyping === 'function') {
+              setTimeout(() => playTyping(pg1, () => log('typing pg1 ok')), 80);
+            }
+          }
+        });
+
+        // Aceitar e avançar para próxima seção da jornada
+        createIsolatedButton(nav2, {
+          id: 'btn-termos-accept',
+          text: i18n.t('btn_aceito_continuar', 'Aceito e quero continuar'),
+          dataset: { action: 'termos-accept' },
+          onClick: debounceClick(() => goToNextSection(), 300)
+        });
+      }
+
+      // inicia digitação da pg1
       if (typeof playTyping === 'function') {
-        setTimeout(() => playTyping(pg2, () => log('Typing termos-pg2 ok')), 60);
+        setTimeout(() => playTyping(pg1, () => log('typing pg1 ok')), 80);
       }
     }
-  });
 
-  // “Voltar” (pg2 -> pg1), se existir segunda página
-  if (pg2) {
-    createIsolatedButton(navWrap2, {
-      id: 'btn-termos-prev',
-      text: i18n.t('btn_voltar', 'Voltar'),
-      dataset: { action: 'termos-prev' },
-      onClick: () => {
-        hide(pg2); show(pg1);
-        if (typeof playTyping === 'function') {
-          setTimeout(() => playTyping(pg1, () => log('Typing termos-pg1 ok')), 60);
+    /* ---------- GUIA (vídeo) ---------- */
+    else if (sectionId === 'section-guia' || sectionId === 'section-selfie') {
+      try {
+        const videoUrl = (global.JORNADA_VIDEOS && global.JORNADA_VIDEOS.intro) ||
+                         '/assets/img/filme-0-ao-encontro-da-jornada.mp4';
+        fnLoadVideo(videoUrl);
+      } catch (e) {
+        console.error('[CONTROLLER] Erro ao carregar vídeo:', e);
+      }
+    }
+
+    /* ---------- PERGUNTAS ---------- */
+    else if (sectionId === 'section-perguntas') {
+      (async () => {
+        try {
+          await i18n.waitForReady(10000);
+          if (!i18n.ready) throw new Error('i18n não pronto');
+
+          state.answeredQuestions.clear();
+          JC.currentBloco = 0;
+          JC.currentPergunta = 0;
+
+          await fnLoadDynamicBlocks();
+          await fnRenderQuestions();
+
+          global.perguntasLoaded = true;
+          log('Perguntas carregadas e renderizadas');
+        } catch (err) {
+          console.error('[CONTROLLER] Falha ao carregar perguntas:', err);
+          if (global.toast) global.toast(i18n.t('erro_perguntas', 'Erro ao carregar perguntas'));
         }
+      })();
+    }
+
+    /* ---------- FINAL ---------- */
+    else if (sectionId === 'section-final') {
+      log('Jornada concluída!');
+      try {
+        const finalVideo = global.JORNADA_FINAL_VIDEO ||
+                          (global.JORNADA_VIDEOS && global.JORNADA_VIDEOS.final);
+        if (finalVideo) fnLoadVideo(finalVideo);
+      } catch (e) {
+        console.error('[CONTROLLER] Vídeo final erro:', e);
       }
+    }
+  }
+
+  /* --------------------------------------------------------------
+   *  EVENTOS GLOBAIS
+   * -------------------------------------------------------------- */
+  function bindGlobalEvents() {
+    if (global.__ControllerEventsBound) return;
+    global.__ControllerEventsBound = true;
+
+    // ---------- AVANÇAR (botões fora dos termos) ----------
+    const debouncedNext = debounceClick(() => goToNextSection(), 500);
+    document.querySelectorAll([
+      '[data-action="avancar"]',
+      '#iniciar',
+      '[data-action="skip-selfie"]',
+      '[data-action="select-guia"]',
+      '#btnSkipSelfie',
+      '#btnStartJourney',
+      '#iniciarSenha',
+      '.btn-section-next'
+    ].join(',')).forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        // Ignora cliques que acontecem dentro da seção termos (já tratado internamente)
+        if (e.target.closest('#section-termos')) return;
+        log('Botão global avançar clicado');
+        debouncedNext(e);
+      });
     });
 
-    // “Aceito / Continuar” (pg2 -> próxima seção real)
-    createIsolatedButton(navWrap2, {
-      id: 'btn-termos-accept',
-      text: i18n.t('btn_aceito_continuar', 'Aceito e quero continuar'),
-      dataset: { action: 'termos-accept' },
-      onClick: () => {
-        // segue o fluxo normal da jornada
-        JC.nextSection = null; // garante sequência natural
-        const debounced = debounceClick(() => { goToNextSection(); }, 300);
-        debounced();
-      }
-    });
-  }
-
-  // dispara typing da pg1
-  if (typeof playTyping === 'function') {
-    setTimeout(() => playTyping(pg1, () => log('Typing termos-pg1 ok')), 60);
-  }
-}
-
-else if (currentSection === 'section-guia') {
-  try {
-    const video = (global.JORNADA_VIDEOS && global.JORNADA_VIDEOS.intro)
-      ? global.JORNADA_VIDEOS.intro : '/assets/img/filme-0-ao-encontro-da-jornada.mp4';
-    fnLoadVideo(video);
-  } catch(e){ console.error('[CONTROLLER] Vídeo guia:', e); }
-}
-
-else if (currentSection === 'section-selfie') {
-  try {
-    const video = (global.JORNADA_VIDEOS && global.JORNADA_VIDEOS.intro)
-      ? global.JORNADA_VIDEOS.intro : '/assets/img/filme-0-ao-encontro-da-jornada.mp4';
-    fnLoadVideo(video);
-  } catch(e){ console.error('[CONTROLLER] Vídeo selfie:', e); }
-}
-
-else if (currentSection === 'section-perguntas') {
-  try {
-    await i18n.waitForReady(10000);
-    if (!i18n.ready) throw new Error('i18n não inicializado');
-
-    answeredQuestions.clear();
-    JC.currentBloco = 0; JC.currentPergunta = 0;
-
-    await fnLoadDynamicBlocks();
-    await fnRenderQuestions();
-
-    global.perguntasLoaded = true;
-    log('Perguntas renderizadas');
-  } catch (e) {
-    console.error('[CONTROLLER] Perguntas:', e && e.message ? e.message : e);
-    if (global.toast) global.toast(i18n.t('erro_perguntas','Erro ao carregar perguntas: ') + (e && e.message ? e.message : ''));
-  }
-}
-
-else if (currentSection === 'section-final') {
-  log('Jornada concluída! 🎉');
-  try {
-    const video = global.JORNADA_FINAL_VIDEO || (global.JORNADA_VIDEOS && global.JORNADA_VIDEOS.final);
-    if (video) fnLoadVideo(video);
-  } catch(e){ console.error('[CONTROLLER] Vídeo final:', e); }
-}
-
-
-  // ===== init =====
-  function initController(route = 'intro') {
-  if (JC.initialized) { log('Controlador já inicializado, pulando'); return; }
-  JC.initialized = true;
-  log('Inicializando controlador...');
-
-  global.JORNADA_BLOCKS = global.JORNADA_BLOCKS || [];
-  global.JORNADA_VIDEOS = global.JORNADA_VIDEOS || {};
-
-  // 🚫 NÃO sobrescrever a seção atual se já foi definida
-  if (!global.__currentSectionId) {
-    global.__currentSectionId = (route === 'intro' ? 'section-intro' : route);
-  }
-  currentSection = global.__currentSectionId;
-
-  // (restante da função continua igual…)
-
-
-    // botões “avançar” globais (NÃO inclui termos-next; termos é tratado dentro da seção)
-    const debouncedNext = debounceClick((e) => goToNextSection());
-    document.querySelectorAll(
-  '[data-action="avancar"], #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney, #iniciarSenha, .btn-section-next'
-).forEach(button => {
-  button.addEventListener('click', (e) => {
-    e.preventDefault();
-    // evita interferir dentro de section-termos
-    const inTermos = !!e.target.closest('#section-termos');
-    if (inTermos) return; // Termos tem seu próprio fluxo
-    log('Avançar (global) clicado:', button.id || button.className);
-    debouncedNext(e);
-  });
-});
-
-
-    // atalhos dos termos (caso já existam no DOM ao iniciar)
+    // ---------- ATALHOS DE TERMOS (caso já existam no DOM) ----------
     document.querySelectorAll('[data-action="termos-prev"]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', e => {
         e.preventDefault();
         const pg1 = document.getElementById('termos-pg1');
         const pg2 = document.getElementById('termos-pg2');
-        if (pg2) { hide(pg2); show(pg1); if (typeof playTyping === 'function') playTyping(pg1); }
+        if (pg2) {
+          hide(pg2); show(pg1);
+          if (typeof playTyping === 'function') playTyping(pg1);
+        }
       });
     });
     document.querySelectorAll('[data-action="termos-next"]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', e => {
         e.preventDefault();
         const pg1 = document.getElementById('termos-pg1');
         const pg2 = document.getElementById('termos-pg2');
-        if (pg2) { hide(pg1); show(pg2); if (typeof playTyping === 'function') playTyping(pg2); }
-        else { goToNextSection(); } // se não houver pg2, segue jornada
+        if (pg2) {
+          hide(pg1); show(pg2);
+          if (typeof playTyping === 'function') playTyping(pg2);
+        } else {
+          goToNextSection(); // fallback se não houver pg2
+        }
       });
     });
 
-    // seção inicial
-    const tryInit = (max = 5, ms = 500) => {
-      let at = 0;
-      const tick = () => {
-        const el = document.querySelector('#' + currentSection);
-        if (el) { showSectionAndType(el); }
-        else if (at++ < max) { log(`Tentativa ${at}: aguardando ${currentSection}`); setTimeout(tick, ms); }
-        else { console.error('[CONTROLLER] Seção inicial não encontrada:', currentSection); }
-      };
-      tick();
-    };
-    tryInit();
-
-    // utilitário TTS
-    global.readText = global.readText || function (text, cb) {
-      if (!('speechSynthesis' in global)) { console.error('[CONTROLLER] Web Speech não suportado'); return; }
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = i18n.lang || 'pt-BR'; u.rate = 1; u.pitch = 1; u.volume = 1;
-      u.onend = () => { log('Leitura ok'); if (cb) cb(); };
-      u.onerror = (e) => console.error('[CONTROLLER] TTS erro:', e);
-      global.speechSynthesis.speak(u);
-    };
-
-    // eventos de fluxo
-    document.addEventListener('questionAnswered', (ev) => {
-      const id = ev && ev.detail ? ev.detail.questionId : '(?)';
-      answeredQuestions.add(id);
-      log(`Pergunta respondida: ${id} Total: ${answeredQuestions.size}`);
+    // ---------- RESPOSTAS DE PERGUNTAS ----------
+    document.addEventListener('questionAnswered', ev => {
+      const qId = ev?.detail?.questionId || '(?)';
+      state.answeredQuestions.add(qId);
+      log(`Pergunta respondida: ${qId} (total ${state.answeredQuestions.size})`);
       goToNextSection();
     });
 
+    // ---------- PULO DE VÍDEO ----------
     document.addEventListener('videoSkipped', () => {
       log('Vídeo pulado');
       goToNextSection();
     });
 
-    // fila
-    document.addEventListener('jc:ready', processQueue);
+    // ---------- FILA DE AÇÕES ----------
+    document.addEventListener('jc:ready', () => {
+      state.queue.forEach(action => {
+        if (action.type === 'next') goToNextSection();
+      });
+      state.queue = [];
+    });
+  }
+
+  /* --------------------------------------------------------------
+   *  INICIALIZAÇÃO
+   * -------------------------------------------------------------- */
+  function initController(route = 'intro') {
+    if (JC.initialized) {
+      log('Controlador já inicializado, ignorando');
+      return;
+    }
+    JC.initialized = true;
+    log('Inicializando controlador...');
+
+    // Define seção inicial (não sobrescreve se já houver)
+    if (!global.__currentSectionId) {
+      global.__currentSectionId = (route === 'intro') ? 'section-intro' : route;
+    }
+    state.currentSection = global.__currentSectionId;
+
+    // Garante objetos globais auxiliares
+    global.JORNADA_BLOCKS = global.JORNADA_BLOCKS || [];
+    global.JORNADA_VIDEOS = global.JORNADA_VIDEOS || {};
+
+    // Bind de eventos globais
+    bindGlobalEvents();
+
+    // Mostra a primeira seção (com retry caso o DOM ainda não esteja pronto)
+    const tryShowInitial = (attempt = 0, max = 5) => {
+      const el = document.getElementById(state.currentSection);
+      if (el) {
+        showSection(state.currentSection);
+        handleSectionSpecificLogic(state.currentSection);
+      } else if (attempt < max) {
+        log(`Tentativa ${attempt + 1}: aguardando ${state.currentSection}`);
+        setTimeout(() => tryShowInitial(attempt + 1, max), 400);
+      } else {
+        console.error('[CONTROLLER] Não foi possível encontrar a seção inicial');
+      }
+    };
+    tryShowInitial();
+
+    // Utilitário TTS (se precisar)
+    global.readText = global.readText || function (text, cb) {
+      if (!('speechSynthesis' in window)) return;
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = i18n.lang || 'pt-BR';
+      utter.onend = () => { if (cb) cb(); };
+      utter.onerror = e => console.error('[CONTROLLER] TTS error:', e);
+      window.speechSynthesis.speak(utter);
+    };
+
     log('Controlador inicializado com sucesso');
   }
 
- // ===== FIX: inicialização à prova de corrida =====
-function initializeController() {
-  // evita reentrância (DOMContentLoaded + bootstrapComplete)
-  if (JC.initialized || global.__ControllerBooting) {
-    log('Bootstrap ignorado (já inicializado ou bootando)');
-    return;
-  }
-  global.__ControllerBooting = true;
-  log('Bootstrap inicial do controller...');
-
-  const maybeInit = (i18n && typeof i18n.init === 'function')
-    ? i18n.init().catch(() => {})
-    : Promise.resolve();
-
-  Promise.resolve(maybeInit).finally(() => {
-    // só define rota inicial se ainda não foi definida
-    if (!global.__currentSectionId) {
-      initController('intro');
-    } else {
-      initController(global.__currentSectionId);
+  /* --------------------------------------------------------------
+   *  BOOTSTRAP À PROVA DE CORRIDA
+   * -------------------------------------------------------------- */
+  function bootstrapController() {
+    if (JC.initialized || global.__ControllerBooting) {
+      log('Bootstrap ignorado (já inicializado ou em andamento)');
+      return;
     }
-    // Mantém travado para impedir boots subsequentes
-    // (se preferir liberar depois, troque por: global.__ControllerBooting = false;)
-  });
-}
+    global.__ControllerBooting = true;
+    log('Bootstrap inicial do controller...');
 
+    const i18nPromise = (i18n && typeof i18n.init === 'function')
+      ? i18n.init().catch(() => {})
+      : Promise.resolve();
+
+    i18nPromise.finally(() => {
+      // Se ainda não houver uma rota definida, usa intro
+      const startRoute = global.__currentSectionId || 'intro';
+      initController(startRoute);
+      // Não limpamos __ControllerBooting – assim garantimos que só rode uma vez
+    });
+  }
+
+  // Registra listeners que disparam o bootstrap
   if (!global.__ControllerEventsBound) {
-  global.__ControllerEventsBound = true;
-  document.addEventListener('DOMContentLoaded', initializeController, { once: true });
-  document.addEventListener('bootstrapComplete', initializeController, { once: true });
-}
+    document.addEventListener('DOMContentLoaded', bootstrapController, { once: true });
+    document.addEventListener('bootstrapComplete', bootstrapController, { once: true });
+  }
 
+  /* --------------------------------------------------------------
+   *  EXPORTA FUNÇÕES (se precisar chamar de outro script)
+   * -------------------------------------------------------------- */
   global.initController = initController;
+  global.showSection = showSection;
+  global.goToNextSection = goToNextSection;
 
 })(window);
