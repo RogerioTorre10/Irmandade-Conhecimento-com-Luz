@@ -143,172 +143,161 @@ if (global.__ControllerEventsBound === undefined) global.__ControllerEventsBound
   }
 
   // Navegação principal
-// SUBSTITUA toda a função por esta
-async function goToNextSection() {
-  // ===== GATE DE TERMOS (não deixa sair da seção sem pg1→pg2→aceite) =====
-  const inTermosNow =
-    currentSection === 'section-termos' ||
-    (document.getElementById('section-termos')?.classList.contains('active'));
+  async function goToNextSection() {
+    const idx = sections.indexOf(currentSection);
+    log('Índice atual:', idx, 'Seção atual:', currentSection);
+    if (idx >= sections.length - 1) return;
+    log('🔍 goToNextSection chamado. currentSection:', currentSection);
 
-  if (inTermosNow && !global.__termsAccepted) {
-    const pg1 = document.getElementById('termos-pg1');
-    const pg2 = document.getElementById('termos-pg2');
+    const prev = currentSection;
+    currentSection = (JC.nextSection && sections.includes(JC.nextSection))
+      ? JC.nextSection : sections[idx + 1];
+    log(`Navegando de ${prev} para ${currentSection}`);
 
-    // inicializa passo interno
-    if (!global.__termsStep) global.__termsStep = 1;
+    const prevEl = document.querySelector('#' + prev);
+    if (prevEl) { prevEl.classList.remove('active'); prevEl.classList.add('section-hidden'); }
 
-    // garante atributos de digitação e estado inicial coerente
-    ensureTypingAttrs(pg1);
-    ensureTypingAttrs(pg2);
+    const nextEl = document.querySelector('#' + currentSection);
+    if (!nextEl) { console.error('[CONTROLLER] Seção não encontrada:', currentSection); return; }
+    showSectionAndType(nextEl);
 
-    // força pg1 visível na 1ª chegada
-    if (global.__termsStep === 1) {
-      show(pg1); hide(pg2);
-    }
-
-    if (global.__termsStep === 1) {
-      // 1º NEXT dentro de termos: pg1 -> pg2
-      hide(pg1); show(pg2);
-      if (typeof playTyping === 'function') setTimeout(() => playTyping(pg2), 60);
-      global.__termsStep = 2;
-      console.log('[CONTROLLER] Termos gate: pg1 → pg2 (bloqueando avanço de seção)');
-      return; // BLOQUEIA avanço de seção
-    }
-
-    if (global.__termsStep === 2) {
-      // 2º NEXT: só libera se tiver aceite marcado (se existir checkbox)
-      const chk = document.querySelector('#termos-aceite, input[name="termos-aceite"]');
-      if (chk && !chk.checked) {
-        global.toast && global.toast(i18n.t('aceite_necessario','Você precisa aceitar os termos para continuar.'));
-        console.log('[CONTROLLER] Termos gate: aceite necessário');
-        return; // BLOQUEIA enquanto não aceitar
-      }
-      global.__termsAccepted = true; // liberado
-      console.log('[CONTROLLER] Termos gate: aceito = true, pode avançar');
-      // segue para fluxo normal abaixo
-    }
-  }
-  // ===== FIM GATE DE TERMOS =====
-
-  const currentIdx = sections.indexOf(currentSection);
-  log('Índice atual:', currentIdx, 'Seção atual:', currentSection);
-
-  if (currentIdx < sections.length - 1) {
-    const previousSection = currentSection;
-    currentSection = JC.nextSection && sections.includes(JC.nextSection)
-      ? JC.nextSection
-      : sections[currentIdx + 1];
-
-    // marca estado global para anti-rollback
-    global.__currentSectionId = currentSection;
-    if (currentSection !== 'section-intro') global.__hasLeftIntro = true;
-
-    log(`Navegando de ${previousSection} para ${currentSection}`);
-
-    const prevElement = document.querySelector(`#${previousSection}`);
-    if (prevElement) {
-      prevElement.classList.remove('active');
-      prevElement.classList.add('section-hidden');
-      log(`Seção anterior ${previousSection} ocultada`);
-    } else {
-      console.error(`[CONTROLLER] Seção anterior ${previousSection} não encontrada`);
-    }
-
-    const nextElement = document.querySelector(`#${currentSection}`);
-    if (nextElement) {
-      nextElement.classList.add('active');
-      nextElement.classList.remove('section-hidden');
-      log(`Seção ${currentSection} exibida`);
-
-      if (TypingBridge.play) {
-        const typingElements = nextElement.querySelectorAll('[data-typing="true"]:not(.section-hidden)');
-        if (typingElements.length) {
-          TypingBridge.play(nextElement, () => {
-            log('Digitação concluída em', currentSection);
-            const first = typingElements[0];
-            const text = first?.getAttribute('data-text') || first?.textContent || '';
-            window.readText && window.readText(text);
-          });
-        } else {
-          log('Nenhum elemento de digitação encontrado em', currentSection);
-        }
-      }
-    } else {
-      console.error(`[CONTROLLER] Seção ${currentSection} não encontrada`);
-      return;
-    }
-
-    // ===== regras por seção =====
+   // ===== regras por seção =====
 if (currentSection === 'section-termos') {
+  // páginas internas
   const pg1 = document.getElementById('termos-pg1');
   const pg2 = document.getElementById('termos-pg2');
 
-  // reseta gate e tranca a seção
-  window.__termsStep = 1;
-  window.__termsAccepted = false;
-  lockTermosSection();
-
-  ensureTypingAttrs(pg1);
-  ensureTypingAttrs(pg2);
-  show(pg1); hide(pg2);
-
-  if (typeof playTyping === 'function') {
-    setTimeout(() => playTyping(pg1, () => log('Typing termos-pg1 ok')), 60);
+  // se não existir, não travar
+  if (!pg1 && !pg2) {
+    console.warn('[CONTROLLER] termos-pg1/pg2 não encontrados; seguindo fluxo padrão');
+    return;
   }
 
-  // NÃO AVANÇA DE SEÇÃO AQUI — fica trancado até aceitar
+  // typing garantido
+  ensureTypingAttrs(pg1);
+  ensureTypingAttrs(pg2);
+
+  // exibir pg1, ocultar pg2
+  show(pg1); hide(pg2);
+
+  // garante containers de ações
+  const navWrap1 = pg1.querySelector('.termos-actions') || pg1;
+  const navWrap2 = pg2 ? (pg2.querySelector('.termos-actions') || pg2) : null;
+
+  // Helper local para criar botão isolado (sem interferir no listener global)
+  function createIsolatedButton(parent, { id, text, dataset = {}, onClick }) {
+  if (!parent) return null;
+  let btn = parent.querySelector('#' + id + ', [data-id="' + id + '"]');
+  if (!btn) {
+    btn = document.createElement('button');
+    btn.id = id;
+    btn.className = 'btn btn-termos'; // NÃO usar .btn-avancar aqui
+    btn.textContent = text;
+    btn.setAttribute('data-scope', 'termos'); // marca escopo
+    Object.keys(dataset || {}).forEach(k => btn.dataset[k] = dataset[k]);
+    parent.appendChild(btn);
+  }
+
+  // ✅ Vincula o evento de clique
+  if (onClick) {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      onClick(e);
+    });
+  }
+
+  return btn;
 }
 
 
-    else if (currentSection === 'section-guia') {
-      try {
-        const video = (global.JORNADA_VIDEOS && global.JORNADA_VIDEOS.intro)
-          ? global.JORNADA_VIDEOS.intro : '/assets/img/filme-0-ao-encontro-da-jornada.mp4';
-        fnLoadVideo(video);
-      } catch (error) {
-        console.error('[CONTROLLER] Erro ao carregar vídeo do guia:', error);
-        window.showSection && window.showSection('section-guia');
+  // “Próximo” dentro dos termos (pg1 -> pg2)
+  createIsolatedButton(navWrap1, {
+    id: 'btn-termos-next',
+    text: i18n.t('btn_avancar', 'Avançar'),
+    dataset: { action: 'termos-next' },
+    onClick: () => {
+      hide(pg1); show(pg2);
+      if (typeof playTyping === 'function') {
+        setTimeout(() => playTyping(pg2, () => log('Typing termos-pg2 ok')), 60);
       }
     }
+  });
 
-    else if (currentSection === 'section-selfie') {
-      try {
-        const video = (global.JORNADA_VIDEOS && global.JORNADA_VIDEOS.intro)
-          ? global.JORNADA_VIDEOS.intro : '/assets/img/filme-0-ao-encontro-da-jornada.mp4';
-        fnLoadVideo(video);
-      } catch (error) {
-        console.error('[CONTROLLER] Erro ao carregar vídeo da selfie:', error);
-        window.showSection && window.showSection('section-selfie');
+  // “Voltar” (pg2 -> pg1), se existir segunda página
+  if (pg2) {
+    createIsolatedButton(navWrap2, {
+      id: 'btn-termos-prev',
+      text: i18n.t('btn_voltar', 'Voltar'),
+      dataset: { action: 'termos-prev' },
+      onClick: () => {
+        hide(pg2); show(pg1);
+        if (typeof playTyping === 'function') {
+          setTimeout(() => playTyping(pg1, () => log('Typing termos-pg1 ok')), 60);
+        }
       }
-    }
+    });
 
-    else if (currentSection === 'section-perguntas') {
-      try {
-        await i18n.waitForReady(10000);
-        if (!i18n.ready) throw new Error('i18n não inicializado');
-
-        answeredQuestions.clear();
-        JC.currentBloco = 0;
-        JC.currentPergunta = 0;
-        await fnLoadDynamicBlocks();
-        await fnRenderQuestions();
-
-        window.perguntasLoaded = true;
-        log('Perguntas renderizadas');
-      } catch (error) {
-        console.error('[CONTROLLER] Erro ao renderizar perguntas:', error.message);
-        if (window.toast) window.toast(i18n.t('erro_perguntas', 'Erro ao carregar perguntas: ') + error.message);
+    // “Aceito / Continuar” (pg2 -> próxima seção real)
+    createIsolatedButton(navWrap2, {
+      id: 'btn-termos-accept',
+      text: i18n.t('btn_aceito_continuar', 'Aceito e quero continuar'),
+      dataset: { action: 'termos-accept' },
+      onClick: () => {
+        // segue o fluxo normal da jornada
+        JC.nextSection = null; // garante sequência natural
+        const debounced = debounceClick(() => { goToNextSection(); }, 300);
+        debounced();
       }
-    }
-
-    else if (currentSection === 'section-final') {
-      log('Jornada concluída! 🎉');
-      if (window.JORNADA_FINAL_VIDEO && fnLoadVideo) {
-        fnLoadVideo(window.JORNADA_FINAL_VIDEO);
-        log('Vídeo final carregado');
-      }
-    }
+    });
   }
+
+  // dispara typing da pg1
+  if (typeof playTyping === 'function') {
+    setTimeout(() => playTyping(pg1, () => log('Typing termos-pg1 ok')), 60);
+  }
+}
+
+else if (currentSection === 'section-guia') {
+  try {
+    const video = (global.JORNADA_VIDEOS && global.JORNADA_VIDEOS.intro)
+      ? global.JORNADA_VIDEOS.intro : '/assets/img/filme-0-ao-encontro-da-jornada.mp4';
+    fnLoadVideo(video);
+  } catch(e){ console.error('[CONTROLLER] Vídeo guia:', e); }
+}
+
+else if (currentSection === 'section-selfie') {
+  try {
+    const video = (global.JORNADA_VIDEOS && global.JORNADA_VIDEOS.intro)
+      ? global.JORNADA_VIDEOS.intro : '/assets/img/filme-0-ao-encontro-da-jornada.mp4';
+    fnLoadVideo(video);
+  } catch(e){ console.error('[CONTROLLER] Vídeo selfie:', e); }
+}
+
+else if (currentSection === 'section-perguntas') {
+  try {
+    await i18n.waitForReady(10000);
+    if (!i18n.ready) throw new Error('i18n não inicializado');
+
+    answeredQuestions.clear();
+    JC.currentBloco = 0; JC.currentPergunta = 0;
+
+    await fnLoadDynamicBlocks();
+    await fnRenderQuestions();
+
+    global.perguntasLoaded = true;
+    log('Perguntas renderizadas');
+  } catch (e) {
+    console.error('[CONTROLLER] Perguntas:', e && e.message ? e.message : e);
+    if (global.toast) global.toast(i18n.t('erro_perguntas','Erro ao carregar perguntas: ') + (e && e.message ? e.message : ''));
+  }
+}
+
+else if (currentSection === 'section-final') {
+  log('Jornada concluída! 🎉');
+  try {
+    const video = global.JORNADA_FINAL_VIDEO || (global.JORNADA_VIDEOS && global.JORNADA_VIDEOS.final);
+    if (video) fnLoadVideo(video);
+  } catch(e){ console.error('[CONTROLLER] Vídeo final:', e); }
 }
 
 
@@ -526,186 +515,8 @@ function initializeController() {
     }
   }, true); // capture = true
 })(window);
+
     
-// ===== Anti-regressão para 'section-intro' =====
-(function (global) {
-  const originalShow = global.showSection;
-  global.showSection = function(id) {
-    try {
-      const cur = global.__currentSectionId || 'section-intro';
-      // bloqueia qualquer volta automática pra intro depois que saímos dela
-      if (id === 'section-intro' && (global.__hasLeftIntro || cur !== 'section-intro')) {
-        console.warn('[CONTROLLER] showSection("section-intro") bloqueado (já avançou).');
-        return;
-      }
-      global.__currentSectionId = id;
-      if (typeof originalShow === 'function') {
-        return originalShow.apply(this, arguments);
-      }
-      // fallback simples
-      document.querySelectorAll('[id^="section-"]').forEach(s => {
-        s.classList.add('section-hidden'); s.classList.remove('active');
-      });
-      const nextEl = document.getElementById(id);
-      if (nextEl) { nextEl.classList.remove('section-hidden'); nextEl.classList.add('active'); }
-    } catch (e) {
-      console.error('[CONTROLLER] showSection wrapper error:', e);
-    }
-  };
-})(window);
-
-    // ===== Intercepta .btn-avancar dentro de #section-termos =====
-(function (global) {
-  const log = (...a) => console.log('[CONTROLLER:TERMOS_BTN]', ...a);
-  const play = (global.TypingBridge && typeof global.TypingBridge.play === 'function')
-    ? global.TypingBridge.play
-    : (typeof global.runTyping === 'function' ? global.runTyping : null);
-
-  document.addEventListener('click', function (e) {
-    const btn = e.target.closest('.btn-avancar');
-    if (!btn) return;
-    const inTermos = !!btn.closest('#section-termos');
-    if (!inTermos) return;
-
-    // isola dos listeners globais
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-
-    const pg1 = document.getElementById('termos-pg1');
-    const pg2 = document.getElementById('termos-pg2');
-
-    if (!pg1 && !pg2) {
-      log('Sem pg1/pg2 — seguindo fluxo normal');
-      if (typeof global.goToNextSection === 'function') global.goToNextSection();
-      return;
-    }
-
-    const pg2Visible = pg2 && !pg2.classList.contains('section-hidden') && pg2.style.display !== 'none';
-
-    if (!pg2Visible) {
-      // pg1 -> pg2
-      if (pg1) { pg1.classList.add('section-hidden'); pg1.style.display = 'none'; }
-      if (pg2) { pg2.classList.remove('section-hidden'); pg2.style.display = ''; }
-      if (typeof play === 'function') setTimeout(() => play(pg2 || pg1), 60);
-      log('Termos: pg1 → pg2');
-    } else {
-      // pg2 -> próxima seção
-      if (global.JC) global.JC.nextSection = null;
-      setTimeout(() => { if (typeof global.goToNextSection === 'function') global.goToNextSection(); }, 120);
-      log('Termos: aceitar e continuar');
-    }
-  }, true); // capture
-})(window);
-
-  // ===== LOCK DA SEÇÃO TERMOS =====
-let __termsObserver = null;
-
-function lockTermosSection() {
-  const termos = document.getElementById('section-termos');
-  if (!termos) return;
-
-  window.__termsLocked = true;
-
-  // força visibilidade da seção termos
-  document.querySelectorAll('[id^="section-"]').forEach(sec => {
-    if (sec === termos) {
-      sec.classList.add('active');
-      sec.classList.remove('section-hidden');
-    } else {
-      sec.classList.add('section-hidden');
-      sec.classList.remove('active');
-    }
-  });
-
-  // Observa qualquer tentativa de mudar classes e desfaz
-  if (__termsObserver) { try { __termsObserver.disconnect(); } catch(_){} }
-  __termsObserver = new MutationObserver(() => {
-    if (!window.__termsLocked) return;
-    const termosNow = document.getElementById('section-termos');
-    if (!termosNow) return;
-    termosNow.classList.add('active');
-    termosNow.classList.remove('section-hidden');
-    document.querySelectorAll('[id^="section-"]:not(#section-termos)').forEach(sec => {
-      sec.classList.add('section-hidden');
-      sec.classList.remove('active');
-    });
-  });
-
-  __termsObserver.observe(document.body, {
-    attributes: true, subtree: true, attributeFilter: ['class']
-  });
-}
-
-function unlockTermosSection() {
-  window.__termsLocked = false;
-  if (__termsObserver) { try { __termsObserver.disconnect(); } catch(_){}; __termsObserver = null; }
-}
-// ===== BLOQUEIO DE showSection ENQUANTO TERMOS ESTIVEREM TRANCADOS =====
-(function (global) {
-  const originalShow = global.showSection;
-  global.showSection = function(id) {
-    if (window.__termsLocked && id !== 'section-termos') {
-      console.warn('[CONTROLLER] showSection("' + id + '") bloqueado (Termos trancado).');
-      return;
-    }
-    if (typeof originalShow === 'function') return originalShow.apply(this, arguments);
-
-    // fallback simples
-    document.querySelectorAll('[id^="section-"]').forEach(sec => {
-      sec.classList.add('section-hidden'); sec.classList.remove('active');
-    });
-    const nextEl = document.getElementById(id);
-    if (nextEl) { nextEl.classList.remove('section-hidden'); nextEl.classList.add('active'); }
-  };
-})(window);
-// ===== BOTÕES DENTRO DE TERMOS: pg1→pg2→aceitar =====
-(function (global) {
-  const play = (global.TypingBridge && typeof global.TypingBridge.play === 'function')
-    ? global.TypingBridge.play
-    : (typeof global.runTyping === 'function' ? global.runTyping : null);
-
-  document.addEventListener('click', function (e) {
-    const btn = e.target.closest('.btn-avancar');
-    if (!btn) return;
-    const inTermos = !!btn.closest('#section-termos');
-    if (!inTermos) return;
-
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-
-    const pg1 = document.getElementById('termos-pg1');
-    const pg2 = document.getElementById('termos-pg2');
-
-    // inicializa step
-    if (!window.__termsStep) window.__termsStep = 1;
-
-    if (window.__termsStep === 1) {
-      // pg1 -> pg2
-      if (pg1) { pg1.classList.add('section-hidden'); pg1.style.display = 'none'; }
-      if (pg2) { pg2.classList.remove('section-hidden'); pg2.style.display = ''; }
-      if (typeof play === 'function') setTimeout(() => play(pg2 || pg1), 60);
-      window.__termsStep = 2;
-      return;
-    }
-
-    if (window.__termsStep === 2) {
-      // precisa aceitar (se houver checkbox)
-      const chk = document.querySelector('#termos-aceite, input[name="termos-aceite"]');
-      if (chk && !chk.checked) {
-        window.toast && window.toast(i18n.t('aceite_necessario','Você precisa aceitar os termos para continuar.'));
-        return;
-      }
-      window.__termsAccepted = true;
-      unlockTermosSection();            // libera a seção
-      window.__termsStep = 0;           // reset
-      if (typeof global.goToNextSection === 'function') {
-        setTimeout(() => global.goToNextSection(), 80);
-      }
-    }
-  }, true); // capture
-})(window);
 
 
   global.initController = initController;
