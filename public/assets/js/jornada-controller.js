@@ -160,12 +160,17 @@ if (global.__ControllerEventsBound === undefined) global.__ControllerEventsBound
     const nextEl = document.querySelector('#' + currentSection);
     if (!nextEl) { console.error('[CONTROLLER] Seção não encontrada:', currentSection); return; }
     showSectionAndType(nextEl);
+    
+    // guarda seção atual globalmente e marca se já saiu da intro
+    global.__currentSectionId = currentSection;
+    if (currentSection !== 'section-intro') global.__hasLeftIntro = true;
+
 
    // ===== regras por seção =====
-if (currentSection === 'section-termos') {
-  // páginas internas
-  const pg1 = document.getElementById('termos-pg1');
-  const pg2 = document.getElementById('termos-pg2');
+ if (currentSection === 'section-termos') {
+   // páginas internas
+   const pg1 = document.getElementById('termos-pg1');
+   const pg2 = document.getElementById('termos-pg2');
 
   // se não existir, não travar
   if (!pg1 && !pg2) {
@@ -515,8 +520,77 @@ function initializeController() {
     }
   }, true); // capture = true
 })(window);
-
     
+// ===== Anti-regressão para 'section-intro' =====
+(function (global) {
+  const originalShow = global.showSection;
+  global.showSection = function(id) {
+    try {
+      const cur = global.__currentSectionId || 'section-intro';
+      // bloqueia qualquer volta automática pra intro depois que saímos dela
+      if (id === 'section-intro' && (global.__hasLeftIntro || cur !== 'section-intro')) {
+        console.warn('[CONTROLLER] showSection("section-intro") bloqueado (já avançou).');
+        return;
+      }
+      global.__currentSectionId = id;
+      if (typeof originalShow === 'function') {
+        return originalShow.apply(this, arguments);
+      }
+      // fallback simples
+      document.querySelectorAll('[id^="section-"]').forEach(s => {
+        s.classList.add('section-hidden'); s.classList.remove('active');
+      });
+      const nextEl = document.getElementById(id);
+      if (nextEl) { nextEl.classList.remove('section-hidden'); nextEl.classList.add('active'); }
+    } catch (e) {
+      console.error('[CONTROLLER] showSection wrapper error:', e);
+    }
+  };
+})(window);
+
+    // ===== Intercepta .btn-avancar dentro de #section-termos =====
+(function (global) {
+  const log = (...a) => console.log('[CONTROLLER:TERMOS_BTN]', ...a);
+  const play = (global.TypingBridge && typeof global.TypingBridge.play === 'function')
+    ? global.TypingBridge.play
+    : (typeof global.runTyping === 'function' ? global.runTyping : null);
+
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.btn-avancar');
+    if (!btn) return;
+    const inTermos = !!btn.closest('#section-termos');
+    if (!inTermos) return;
+
+    // isola dos listeners globais
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+
+    const pg1 = document.getElementById('termos-pg1');
+    const pg2 = document.getElementById('termos-pg2');
+
+    if (!pg1 && !pg2) {
+      log('Sem pg1/pg2 — seguindo fluxo normal');
+      if (typeof global.goToNextSection === 'function') global.goToNextSection();
+      return;
+    }
+
+    const pg2Visible = pg2 && !pg2.classList.contains('section-hidden') && pg2.style.display !== 'none';
+
+    if (!pg2Visible) {
+      // pg1 -> pg2
+      if (pg1) { pg1.classList.add('section-hidden'); pg1.style.display = 'none'; }
+      if (pg2) { pg2.classList.remove('section-hidden'); pg2.style.display = ''; }
+      if (typeof play === 'function') setTimeout(() => play(pg2 || pg1), 60);
+      log('Termos: pg1 → pg2');
+    } else {
+      // pg2 -> próxima seção
+      if (global.JC) global.JC.nextSection = null;
+      setTimeout(() => { if (typeof global.goToNextSection === 'function') global.goToNextSection(); }, 120);
+      log('Termos: aceitar e continuar');
+    }
+  }, true); // capture
+})(window);
 
 
   global.initController = initController;
