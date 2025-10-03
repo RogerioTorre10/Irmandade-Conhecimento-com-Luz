@@ -637,4 +637,47 @@ button, .btn, .btn-primary, .btn-secondary, h1,h2,h3,h4,h5,h6 {
 .section-hidden {
   display: none !important;
 }
+/* === efeito datilografia === */
 
+.j-section {
+  display: block;
+  visibility: visible;
+}
+.conteudo-pergaminho {
+  display: block;
+  visibility: visible;
+}
+.conteudo-pergaminho > * {
+  display: block;
+  visibility: visible;
+}
+.hidden {
+  display: none !important;
+}
+[data-typing="true"] {
+  min-height: 20px;
+  display: block !important;
+  visibility: visible !important;
+  position: relative;
+}
+[data-typing="true"] h2, [data-typing="true"] h3, [data-typing="true"] p, [data-typing="true"] li {
+  display: block !important;
+  visibility: visible !important;
+}
+.typing-caret {
+  display: inline-block !important;
+  width: 0.6ch;
+  margin-left: 2px;
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}
+.footer-actions {
+  display: block;
+  visibility: visible;
+}
+.footer-actions .btn {
+  display: inline-block;
+  visibility: visible;
+}
