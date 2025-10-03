@@ -215,6 +215,7 @@
     }
     const blocoIdx = parseInt(bloco.dataset.bloco);
     if (JORNADA_BLOCKS[blocoIdx]?.video_after) {
+      speechSynthesis.cancel(); // Cancela TTS antes do vídeo
       document.dispatchEvent(new CustomEvent('blockCompleted', { 
         detail: { 
           blocoId: JORNADA_BLOCKS[blocoIdx].id, 
@@ -232,12 +233,18 @@
       window.toast && window.toast('Erro ao carregar vídeo');
       return;
     }
+    // Pausa e limpa vídeo anterior
+    video.pause();
+    video.src = '';
+    videoOverlay.classList.add('hidden');
+    
     fetch(videoSrc, { method: 'HEAD' })
       .then(res => {
         if (!res.ok) throw new Error(`Vídeo não encontrado: ${videoSrc}`);
         video.src = videoSrc;
         video.style.zIndex = 2001;
         videoOverlay.style.zIndex = 2000;
+        videoOverlay.classList.remove('hidden');
         video.load();
         video.play().catch(err => {
           console.error('[JORNADA_PAPER] Erro ao reproduzir vídeo:', err);
@@ -253,6 +260,7 @@
       .catch(err => {
         console.error('[JORNADA_PAPER] Erro ao verificar vídeo:', err);
         window.toast && window.toast('Vídeo não disponível');
+        videoOverlay.classList.add('hidden');
       });
     log('Vídeo carregado:', videoSrc);
   }
@@ -352,6 +360,7 @@
       const key = pergunta.dataset.i18n;
       const text = i18n.t(key, pergunta.textContent);
       if ('speechSynthesis' in global && window.JORNADA?.tts?.enabled && !window.isMuted) {
+        speechSynthesis.cancel(); // Cancela TTS anterior
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = i18n.lang || 'pt-BR';
         utterance.rate = 1.03;
@@ -396,6 +405,12 @@
     if (skipVideoButton) {
       skipVideoButton.addEventListener('click', () => {
         log('Vídeo pulado');
+        const video = document.querySelector('#videoTransicao');
+        if (video) {
+          video.pause();
+          video.src = '';
+          document.querySelector('#videoOverlay')?.classList.add('hidden');
+        }
         document.dispatchEvent(new CustomEvent('videoSkipped'));
         document.dispatchEvent(new CustomEvent('videoEnded'));
       });
