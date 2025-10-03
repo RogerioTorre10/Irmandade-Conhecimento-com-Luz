@@ -334,7 +334,7 @@
 
 <!-- FILME: conhecimento-com-luz-jardim -->
 <div id="section-filme-jardim" class="j-section hidden">
-  <video id="video-jardim" controls>
+  <video id="video-jardim" autoplay>
     <source src='/assets/img/conhecimento-com-luz-jardim.mp4' type="video/mp4">
     Seu navegador não suporta vídeo.
   </video>
@@ -356,7 +356,7 @@
 
 <!-- FILME: filme-0-ao-encontro-da-jornada -->
 <div id="section-filme-ao-encontro" class="j-section hidden">
-  <video id="video-ao-encontro" controls>
+  <video id="video-ao-encontro" autoplay>
     <source src='/assets/img/filme-0-ao-encontro-da-jornada.mp4' type="video/mp4">
     Seu navegador não suporta vídeo.
   </video>
@@ -378,8 +378,8 @@
 
 <!-- FILME: filme-1-entrando-na-jornada -->
 <div id="section-filme-entrando" class="j-section hidden">
-  <video id="video-entrando" controls>
-    <source src="public/assets/img/filme-1-entrando-na-jornada.mp4" type="video/mp4">
+  <video id="video-entrando" autoplay>
+    <source src='/assets/img/filme-1-entrando-na-jornada.mp4' type="video/mp4">
     Seu navegador não suporta vídeo.
   </video>
   <div class="footer-actions">
@@ -1007,6 +1007,37 @@
 
     console.log('[loadDynamicBlocks] Bloco carregado');
   })();
+```javascript
+(function (global) {
+  'use strict';
+
+  function initVideoManager() {
+    const sections = document.querySelectorAll('.j-section');
+    sections.forEach(section => {
+      if (section.id.startsWith('section-filme')) {
+        const video = section.querySelector('video');
+        if (video) {
+          video.autoplay = true;
+          video.controls = false; // Esconde controls
+          video.addEventListener('ended', () => {
+            console.log('[VideoManager] Vídeo terminado em:', section.id, '- Avançando para próxima seção');
+            if (global.JC && global.JC.goNext) global.JC.goNext();
+          });
+          video.addEventListener('play', () => {
+            console.log('[VideoManager] Vídeo iniciado automaticamente em:', section.id);
+          });
+          video.addEventListener('error', (e) => {
+            console.error('[VideoManager] Erro ao reproduzir vídeo em:', section.id, e);
+            if (global.JC && global.JC.goNext) global.JC.goNext(); // Avança mesmo com erro
+          });
+        }
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initVideoManager);
+})(window);
+    
   </script>
 
 </body>
