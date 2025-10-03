@@ -21,6 +21,18 @@
     'section-final': global.JORNADA_VIDEOS?.final
   };
 
+  function pauseAllVideos() {
+    const videos = document.querySelectorAll('video');
+    videos.forEach(video => {
+      video.pause();
+      video.src = '';
+      video.load();
+    });
+    const videoOverlay = document.querySelector('#videoOverlay');
+    if (videoOverlay) videoOverlay.classList.add('hidden');
+    console.log('[JornadaController] Todos os vídeos pausados');
+  }
+
   JC.setOrder = function (order) {
     sectionOrder = order;
   };
@@ -57,13 +69,7 @@
     try {
       // Cancela TTS e vídeos anteriores
       speechSynthesis.cancel();
-      const video = document.querySelector('#videoTransicao');
-      if (video) {
-        video.pause();
-        video.src = '';
-        const videoOverlay = document.querySelector('#videoOverlay');
-        if (videoOverlay) videoOverlay.classList.add('hidden');
-      }
+      pauseAllVideos();
 
       const all = document.querySelectorAll('div[id^="section-"]');
       const target = document.getElementById(id);
@@ -99,7 +105,7 @@
           console.log('[JornadaController] Nenhum elemento com data-typing, ativando botão imediatamente');
           const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : 
                      id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) : 
-                     target.querySelector('[data-action="avancar"], [data-action="read-question"], [data-action="iniciar"], .btn-avancar, .btn, #iniciar, .btn-iniciar');
+                     target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], .btn-avancar, .btn, #iniciar, .btn-iniciar, .start-btn');
           if (btn) {
             btn.disabled = false;
             console.log('[JornadaController] Botão ativado imediatamente em:', id, 'Botão:', btn.id || btn.className);
@@ -118,7 +124,7 @@
         const onAllComplete = () => {
           const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : 
                      id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) : 
-                     target.querySelector('[data-action="avancar"], [data-action="read-question"], [data-action="iniciar"], .btn-avancar, .btn, #iniciar, .btn-iniciar');
+                     target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], .btn-avancar, .btn, #iniciar, .btn-iniciar, .start-btn');
           if (btn) {
             btn.disabled = false;
             console.log('[JornadaController] Botão ativado após toda datilografia em:', id, 'Botão:', btn.id || btn.className);
@@ -128,9 +134,11 @@
           }
 
           if (videoMapping[id] && global.JPaperQA) {
-            speechSynthesis.cancel(); // Garante que TTS está parado antes do vídeo
-            global.JPaperQA.loadVideo(videoMapping[id]);
-            console.log('[JornadaController] Carregando vídeo após datilografia para seção:', id, 'Vídeo:', videoMapping[id]);
+            speechSynthesis.cancel();
+            setTimeout(() => {
+              global.JPaperQA.loadVideo(videoMapping[id]);
+              console.log('[JornadaController] Carregando vídeo após datilografia para seção:', id, 'Vídeo:', videoMapping[id]);
+            }, 500); // Atraso para garantir que TTS termine
           }
 
           if (id === 'section-termos' && currentTermosPage === 'termos-pg2') {
@@ -141,13 +149,24 @@
             }
           }
 
+          // Depuração: Listener de clique direto no botão da intro
+          if (id === 'section-intro') {
+            const introBtn = target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], .btn-avancar, .btn, #iniciar, .btn-iniciar, .start-btn');
+            if (introBtn) {
+              introBtn.addEventListener('click', () => {
+                console.log('[JornadaController] Clique manual detectado no botão da intro:', introBtn.id || introBtn.className);
+                JC.goNext();
+              }, { once: true });
+            }
+          }
+
           document.removeEventListener('allTypingComplete', onAllComplete);
         };
         document.addEventListener('allTypingComplete', onAllComplete, { once: true });
 
         // Fallback para ativar botão após 10 segundos
         setTimeout(() => {
-          const btn = target.querySelector('[data-action="avancar"], [data-action="read-question"], [data-action="iniciar"], .btn-avancar, .btn, #iniciar, .btn-iniciar');
+          const btn = target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], .btn-avancar, .btn, #iniciar, .btn-iniciar, .start-btn');
           if (btn && btn.disabled) {
             btn.disabled = false;
             console.warn('[JornadaController] Fallback: Botão ativado após timeout em:', id, 'Botão:', btn.id || btn.className);
@@ -156,7 +175,7 @@
         }, 10000);
 
         const btns = target.querySelectorAll(
-          '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], [data-action="read-question"], [data-action="iniciar"], .btn-avancar, .btn, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney, .btn-iniciar'
+          '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], [data-action="read-question"], [data-action="iniciar"], [data-action="start"], .btn-avancar, .btn, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney, .btn-iniciar, .start-btn'
         );
         console.log('[JornadaController] Botões encontrados:', btns.length, 'em', id);
         btns.forEach(btn => {
@@ -231,9 +250,11 @@
   document.addEventListener('blockCompleted', (e) => {
     const { video } = e.detail;
     if (video && global.JPaperQA) {
-      speechSynthesis.cancel(); // Cancela TTS antes do vídeo
-      global.JPaperQA.loadVideo(video);
-      console.log('[JornadaController] Carregando vídeo após bloco:', video);
+      speechSynthesis.cancel();
+      setTimeout(() => {
+        global.JPaperQA.loadVideo(video);
+        console.log('[JornadaController] Carregando vídeo após bloco:', video);
+      }, 500);
     }
   });
 
