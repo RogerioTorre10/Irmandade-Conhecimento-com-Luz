@@ -1,8 +1,8 @@
 (function (global) {
   'use strict';
 
-  if (!global.TypingBridge) {
-    console.error('[JornadaController] Erro: TypingBridge não inicializado');
+  if (!global.TypingBridge || !global.JPaperQA) {
+    console.error('[JornadaController] Erro: TypingBridge ou JPaperQA não inicializado');
     return;
   }
 
@@ -12,13 +12,13 @@
   const HIDE_CLASS = 'hidden';
   let sectionOrder = [];
   let currentTermosPage = 'termos-pg1';
-  let currentPerguntasIndex = 0; // Mudado para índice numérico para alinhar com paper
+  let currentPerguntasIndex = 0;
 
   const videoMapping = {
     'section-filme-jardim': global.JORNADA_VIDEOS?.intro,
     'section-filme-ao-encontro': global.JORNADA_VIDEOS?.afterBlocks?.[0],
-    'section-filme-entrando': global.JORNADA_VIDEOS?.afterBlocks?.[1]
-    // Adicione mais mapeamentos se necessário
+    'section-filme-entrando': global.JORNADA_VIDEOS?.afterBlocks?.[1],
+    'section-final': global.JORNADA_VIDEOS?.final
   };
 
   JC.setOrder = function (order) {
@@ -55,7 +55,7 @@
     global.lastShowSection = now;
 
     try {
-      speechSynthesis.cancel(); // Cancela TTS anterior
+      speechSynthesis.cancel();
       const all = document.querySelectorAll('div[id^="section-"]');
       const target = document.getElementById(id);
       if (!target) {
@@ -77,8 +77,8 @@
         if (id === 'section-termos') {
           container = target.querySelector(`#${currentTermosPage}`);
         } else if (id === 'section-perguntas') {
-          global.JPaperQA.renderQuestions(); // Chama renderização dinâmica do paper
-          container = target.querySelector('#jornada-conteudo'); // Usa o container do paper
+          global.JPaperQA.renderQuestions();
+          container = target.querySelector('#jornada-conteudo');
         } else {
           container = target;
         }
@@ -87,16 +87,14 @@
         console.log('[JornadaController] Elementos [data-typing] encontrados:', textElements.length);
 
         if (textElements.length === 0) {
-          document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target: id } })); // Simula conclusão se não houver elementos
+          document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target: id } }));
           return;
         }
 
-        // Chama runTyping no container inteiro para processar sequencialmente todos os parágrafos
         global.runTyping(container, () => {
           console.log('[JornadaController] Datilografia sequencial concluída para container:', id);
         });
 
-        // Listener para allTypingComplete para ativar botões e vídeos
         const onAllComplete = () => {
           const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : 
                      id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) : 
@@ -154,7 +152,7 @@
                 const totalBlocos = global.JORNADA_BLOCKS ? global.JORNADA_BLOCKS.length : 5;
                 if (currentPerguntasIndex < totalBlocos - 1) {
                   currentPerguntasIndex++;
-                  global.JPaperQA.renderQuestions(); // Re-renderiza para o próximo bloco
+                  global.JPaperQA.renderQuestions();
                   console.log('[JornadaController] Navegando para próximo bloco de perguntas:', currentPerguntasIndex);
                   JC.show(id);
                 } else {
