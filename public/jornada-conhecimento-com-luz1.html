@@ -254,6 +254,7 @@
         <div id="aria-pergunta" class="sr-only" aria-live="polite"></div>
 
              
+```html
 <!-- INTRO -->
 <div id="section-intro" class="j-section">
   <div class="content">
@@ -321,156 +322,161 @@
   </div>
 </div>
 
-        <!-- SENHA -->
-        <div id="section-senha" class="j-section hidden">
-          <div class="password-form">
-            <h3 style="margin:.2rem 0 1rem;font-family:'Berkshire Swash',cursive;font-size:22px;" data-typing="true" data-text="Ative sua Senha" data-speed="40" data-cursor="true">Ative sua Senha</h3>
-            <div class="password-input">
-              <input type="password" id="senhaInput" placeholder="Digite sua senha..." />
-              <span class="password-toggle" data-action="toggle-password">👁️</span>
-            </div>
-            <div style="margin-top:12px"><button class="btn" id="iniciar" data-action="start">Ativar e Iniciar</button></div>
-          </div>
-        </div>
-        
-        <!-- FILME: conhecimento-com-luz-jardim -->
-       <div id="section-filme-jardim" class="j-section hidden">
-      <video id="video-jardim" controls>
-    <source src='/assets/img/conhecimento-com-luz-jardim.mp4' type="video/mp4">
-    Seu navegador não suporta vídeo.
-      </video>
-       <div class="footer-actions">
-        <button class="btn btn-avancar" data-action="avancar">Avançar</button>
-         </div>
-         </div>
-
-        <!-- GUIA -->
-        <div id="section-guia" class="j-section hidden">
-          <div class="conteudo-pergaminho">
-            <h2 style="margin-top:0;" data-typing="true" data-text="Escolha seu Guia ✨" data-speed="40" data-cursor="true">Escolha seu Guia ✨</h2>
-            <div class="guia-container">
-              <p data-typing="true" data-text="Zion (Grok) • Lumen (ChatGPT) • Arian (Gemini)" data-speed="40" data-cursor="true">Zion (Grok) • Lumen (ChatGPT) • Arian (Gemini)</p>
-              <div class="guia-options">
-                <button class="btn" data-action="select-guia" data-guia="zion">Escolher Zion</button>
-                <button class="btn" data-action="select-guia" data-guia="lumen">Escolher Lumen</button>
-                <button class="btn" data-action="select-guia" data-guia="arian">Escolher Arian</button>
-              </div>
-            </div>
-            <div class="footer-actions">
-              <button class="btn btn-avancar" data-action="avancar">Avançar</button>
-            </div>
-          </div>
-        </div>
-        
-        <!-- FILME: filme-0-ao-encontro-da-jornada -->
-         <div id="section-filme-ao-encontro" class="j-section hidden">
-          <video id="video-ao-encontro" controls>
-           <source src="public/assets/img/filme-0-ao-encontro-da-jornada.mp4" type="video/mp4">
-          Seu navegador não suporta vídeo.
-         </video>
-        <div class="footer-actions">
-       <button class="btn btn-avancar" data-action="avancar">Avançar</button>
-       </div>
-       </div>
-
-        <!-- SELFIE -->
-        <div id="section-selfie" class="j-section hidden">
-          <div class="conteudo-pergaminho">
-            <h2 style="margin-top:0;" data-typing="true" data-text="Entre na Irmandade " data-speed="40" data-cursor="true">Entre na Irmandade ✨</h2>
-            <p data-typing="true" data-text="Faça uma foto ou envie da galeria. Ajuste e gere sua imagem com seu guia." data-speed="40" data-cursor="true">Faça uma foto ou envie da galeria. Ajuste e gere sua imagem com seu guia.</p>
-            <div class="selfie-row">
-              <div class="selfie-left">
-                <label class="btn" for="selfieInput">Tirar Foto</label>
-                <input id="selfieInput" type="file" accept="image/*" capture="user" style="display:none" />
-                <div class="selfie-controls">
-                  <label>Nome <input id="nameInput" type="text" placeholder="Digite seu nome"></label>
-                  <label>Zoom <input id="selfieScale" type="range" min="0.6" max="2.0" step="0.01" value="1"></label>
-                  <label>Horizontal <input id="selfieOffsetX" type="range" min="-300" max="300" step="1" value="0"></label>
-                  <label>Vertical <input id="selfieOffsetY" type="range" min="-300" max="300" step="1" value="0"></label>
-                  <small class="muted">Dica: alinhe seu rosto na chama ao lado do guia.</small>
-                </div>
-                <div class="selfie-actions">
-                  <button id="previewBtn" class="btn">Ver Prévia</button>
-                  <button id="captureBtn" class="btn">Confirmar e Baixar</button>
-                  <button id="btnSkipSelfie" class="btn" data-action="avancar">Pular Foto</button>
-                  <button id="btnStartJourney" class="btn" data-action="avancar">Entrar na Jornada</button>
-                </div>
-              </div>
-              <div class="selfie-right">
-                <section id="card-guide" class="guide-card" data-guide="ZION" aria-label="Guia">
-                  <img class="guide-bg" id="guideBg" src="/assets/img/irmandade-quarteto-bg-zion.png" alt="Guia Background">
-                  <div class="flame-layer" aria-hidden="true">
-                    <svg class="flame-svg" viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
-                      <defs>
-                        <clipPath id="flameClip">
-                          <path d="M50,20 C42,35 34,45 33,58 C32,73 41,82 50,92 C59,82 68,73 67,58 C66,45 58,35 50,20 Z" />
-                        </clipPath>
-                        <radialGradient id="flameGlow" cx="50%" cy="70%" r="55%">
-                          <stop offset="0%" stop-color="rgba(255, 224, 130, 1)"/>
-                          <stop offset="55%" stop-color="rgba(255, 180, 0, 0.9)"/>
-                          <stop offset="100%" stop-color="rgba(255, 180, 0, 0)"/>
-                        </radialGradient>
-                      </defs>
-                      <image id="selfieImage" href="" x="15" y="35" width="70" height="90" clip-path="url(#flameClip)" preserveAspectRatio="xMidYMid slice" />
-                      <ellipse cx="50" cy="95" rx="28" ry="40" fill="url(#flameGlow)"></ellipse>
-                      <path d="M50,20 C42,35 34,45 33,58 C32,73 41,82 50,92 C59,82 68,73 67,58 C66,45 58,35 50,20 Z" fill="none" stroke="rgba(255,200,0,.85)" stroke-width="1.6"/>
-                    </svg>
-                  </div>
-                  <div class="guide-name" id="guideNameSlot"></div>
-                  <div class="user-name" id="userNameSlot">NOME</div>
-                </section>
-                <div id="selfieError" class="selfie-error">Erro ao carregar a pré-visualização. Tente novamente ou pule.</div>
-                <small class="muted">Pré-visualização</small>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- FILME: filme-1-entrando-na-jornada -->
-         <div id="section-filme-entrando" class="j-section hidden">
-          <video id="video-entrando" controls>
-           <source src="public/assets/img/filme-1-entrando-na-jornada.mp4" type="video/mp4">
-             Seu navegador não suporta vídeo.
-              </video>
-             <div class="footer-actions">
-           <button class="btn btn-avancar" data-action="avancar">Avançar</button>
-         </div>
-        </div>
-
-        <!-- PERGUNTAS -->
-        <div id="section-perguntas" class="j-section hidden">
-          <div class="progress-container">
-            <div class="progress-badge" id="jprog-pct">0% concluído</div>
-            <div class="progress-bar"><div class="progress-bar-fill" id="jprog-fill"></div></div>
-            <div class="j-progress"><div class="j-progress__bar"><div class="j-progress__fill" id="j-fill-inline"></div></div><div class="j-progress__meta" id="j-meta"></div></div>
-          </div>
-
-          <div id="chama-perguntas" class="chama-icone chama-fixed-hero media" aria-hidden="true">
-            <div class="chama-vela chama-md"><div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div></div>
-          </div>
-
-          <div id="perguntas-container"></div>
-
-          <div class="footer-actions">
-            <button id="btnNextPerguntas" class="btn btn-avancar" data-action="avancar">Avançar</button>
-          </div>
-        </div>
-
-        <!-- FINAL -->
-        <div id="section-final" class="j-section hidden">
-          <p data-typing="true" data-text="Parabéns por completar esta jornada! Que sua chama interior continue a brilhar." data-speed="40" data-cursor="true"></p>
-          <div class="selfie-final" style="text-align:center; margin-top:20px;">
-            <img id="minhaFotoFinal" alt="Minha foto com a Irmandade" style="max-width:80%; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.3)" />
-          </div>
-          <p style="margin-top:12px;"><small data-typing="true" data-text="Sua imagem foi unida à Irmandade. " data-speed="40" data-cursor="true"></small></p>
-          <div class="footer-actions">
-            <button id="btnGeneratePDF" class="btn" data-action="generate-pdf">Gerar PDF/HQ</button>
-            <button id="btnRestart" class="btn" data-action="restart">Voltar ao Portal</button>
-          </div>
-        </div>
-      </div>
-    </section>
+<!-- SENHA -->
+<div id="section-senha" class="j-section hidden">
+  <div class="content">
+    <p id="senha-text" data-typing="true" data-text="Digite sua senha para continuar a jornada." data-speed="40" data-cursor="true"></p>
+    <input type="password" id="senha-input" placeholder="Digite a senha">
   </div>
+  <div class="footer-actions">
+    <button class="btn btn-avancar" data-action="avancar" disabled>Confirmar</button>
+  </div>
+</div>
+
+<!-- FILME: conhecimento-com-luz-jardim -->
+<div id="section-filme-jardim" class="j-section hidden">
+  <video id="video-jardim" controls>
+    <source src="public/assets/img/conhecimento-com-luz-jardim.mp4" type="video/mp4">
+    Seu navegador não suporta vídeo.
+  </video>
+  <div class="footer-actions">
+    <button class="btn btn-avancar" data-action="avancar">Avançar</button>
+  </div>
+</div>
+
+<!-- ESCOLHA GUIA -->
+<div id="section-escolha-guia" class="j-section hidden">
+  <div class="content">
+    <p id="guia-text" data-typing="true" data-text="Escolha seu guia para a jornada." data-speed="40" data-cursor="true"></p>
+    <!-- Adicione opções de guia aqui -->
+  </div>
+  <div class="footer-actions">
+    <button class="btn btn-avancar" data-action="avancar" disabled>Confirmar</button>
+  </div>
+</div>
+
+<!-- FILME: filme-0-ao-encontro-da-jornada -->
+<div id="section-filme-ao-encontro" class="j-section hidden">
+  <video id="video-ao-encontro" controls>
+    <source src="public/assets/img/filme-0-ao-encontro-da-jornada.mp4" type="video/mp4">
+    Seu navegador não suporta vídeo.
+  </video>
+  <div class="footer-actions">
+    <button class="btn btn-avancar" data-action="avancar">Avançar</button>
+  </div>
+</div>
+
+<!-- SELFIE -->
+<div id="section-selfie" class="j-section hidden">
+  <div class="content">
+    <p id="selfie-text" data-typing="true" data-text="Tire uma selfie para personalizar sua jornada." data-speed="40" data-cursor="true"></p>
+    <!-- Adicione input de selfie aqui -->
+  </div>
+  <div class="footer-actions">
+    <button class="btn btn-avancar" data-action="avancar" disabled>Avançar</button>
+  </div>
+</div>
+
+<!-- FILME: filme-1-entrando-na-jornada -->
+<div id="section-filme-entrando" class="j-section hidden">
+  <video id="video-entrando" controls>
+    <source src="public/assets/img/filme-1-entrando-na-jornada.mp4" type="video/mp4">
+    Seu navegador não suporta vídeo.
+  </video>
+  <div class="footer-actions">
+    <button class="btn btn-avancar" data-action="avancar">Avançar</button>
+  </div>
+</div>
+
+<!-- PERGUNTAS -->
+<div id="section-perguntas" class="j-section hidden">
+  <div class="content">
+    <div id="bloco-raizes" class="bloco-perguntas">
+      <h2 id="raizes-title" data-typing="true" data-text="Block 1 — Roots" data-speed="40" data-cursor="true"></h2>
+      <div class="pergunta">
+        <label for="quem_voce_hoje" data-i18n="pergunta_quem_voce_hoje" data-typing="true" data-speed="36" data-cursor="true">Who are you today?</label>
+        <textarea id="quem_voce_hoje"></textarea>
+      </div>
+      <div class="pergunta">
+        <label for="o_que_te_trouxe" data-i18n="pergunta_o_que_te_trouxe" data-typing="true" data-speed="36" data-cursor="true">What brought you to this journey?</label>
+        <textarea id="o_que_te_trouxe"></textarea>
+      </div>
+      <div class="pergunta">
+        <label for="sonho_espiritual" data-i18n="pergunta_sonho_espiritual" data-typing="true" data-speed="36" data-cursor="true">What is your greatest spiritual dream?</label>
+        <textarea id="sonho_espiritual"></textarea>
+      </div>
+    </div>
+    <div id="bloco-reflexoes" class="bloco-perguntas hidden">
+      <h2 id="reflexoes-title" data-typing="true" data-text="Block 2 — Reflections" data-speed="40" data-cursor="true"></h2>
+      <div class="pergunta">
+        <label for="desafios_atuais" data-i18n="pergunta_desafios_atuais" data-typing="true" data-speed="36" data-cursor="true">What are your biggest current challenges?</label>
+        <textarea id="desafios_atuais"></textarea>
+      </div>
+      <div class="pergunta">
+        <label for="medo_duvida" data-i18n="pergunta_medo_duvida" data-typing="true" data-speed="36" data-cursor="true">How do you deal with fear or doubt?</label>
+        <textarea id="medo_duvida"></textarea>
+      </div>
+      <div class="pergunta">
+        <label for="significado_luz" data-i18n="pergunta_significado_luz" data-typing="true" data-speed="36" data-cursor="true">What does "light" mean to you?</label>
+        <textarea id="significado_luz"></textarea>
+      </div>
+    </div>
+    <div id="bloco-crescimento" class="bloco-perguntas hidden">
+      <h2 id="crescimento-title" data-typing="true" data-text="Block 3 — Growth" data-speed="40" data-cursor="true"></h2>
+      <div class="pergunta">
+        <label for="mudar_vida" data-i18n="pergunta_mudar_vida" data-typing="true" data-speed="36" data-cursor="true">What do you want to change in your life?</label>
+        <textarea id="mudar_vida"></textarea>
+      </div>
+      <div class="pergunta">
+        <label for="quem_inspira" data-i18n="pergunta_quem_inspira" data-typing="true" data-speed="36" data-cursor="true">Who inspires you and why?</label>
+        <textarea id="quem_inspira"></textarea>
+      </div>
+      <div class="pergunta">
+        <label for="pratica_gratidao" data-i18n="pergunta_pratica_gratidao" data-typing="true" data-speed="36" data-cursor="true">How do you practice gratitude daily?</label>
+        <textarea id="pratica_gratidao"></textarea>
+      </div>
+    </div>
+    <div id="bloco-integracao" class="bloco-perguntas hidden">
+      <h2 id="integracao-title" data-typing="true" data-text="Block 4 — Integration" data-speed="40" data-cursor="true"></h2>
+      <div class="pergunta">
+        <label for="licao_jornada" data-i18n="pergunta_licao_jornada" data-typing="true" data-speed="36" data-cursor="true">What lesson do you take from this journey?</label>
+        <textarea id="licao_jornada"></textarea>
+      </div>
+      <div class="pergunta">
+        <label for="aplicar_futuro" data-i18n="pergunta_aplicar_futuro" data-typing="true" data-speed="36" data-cursor="true">How will you apply this in the future?</label>
+        <textarea id="aplicar_futuro"></textarea>
+      </div>
+      <div class="pergunta">
+        <label for="mensagem_futuro" data-i18n="pergunta_mensagem_futuro" data-typing="true" data-speed="36" data-cursor="true">A message for your future self.</label>
+        <textarea id="mensagem_futuro"></textarea>
+      </div>
+    </div>
+    <div id="bloco-sintese" class="bloco-perguntas hidden">
+      <h2 id="sintese-title" data-typing="true" data-text="Block 5 — Synthesis and Delivery" data-speed="40" data-cursor="true"></h2>
+      <div class="pergunta">
+        <label for="essencia_hoje" data-i18n="pergunta_essencia_hoje" data-typing="true" data-speed="36" data-cursor="true">Who are you today, in one true sentence?</label>
+        <textarea id="essencia_hoje"></textarea>
+      </div>
+      <div class="pergunta">
+        <label for="passo_fe" data-i18n="pergunta_passo_fe" data-typing="true" data-speed="36" data-cursor="true">What will be your next step of faith and courage?</label>
+        <textarea id="passo_fe"></textarea>
+      </div>
+    </div>
+    <div class="footer-actions">
+      <button class="btn btn-avancar" data-action="avancar">Avançar</button>
+    </div>
+  </div>
+</div>
+
+<!-- FINAL -->
+<div id="section-final" class="j-section hidden">
+  <div class="content">
+    <p id="final-text" data-typing="true" data-text="Parabéns por completar a jornada!" data-speed="40" data-cursor="true"></p>
+  </div>
+  <div class="footer-actions">
+    <button class="btn btn-avancar" data-action="avancar">Finalizar</button>
+  </div>
+</div>
 
   <footer class="site-footer">
     <small>© 2025 Irmandade Conhecimento com Luz</small>
