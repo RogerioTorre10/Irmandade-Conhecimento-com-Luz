@@ -27,23 +27,8 @@
     CANVAS_ID: 'jornada-canvas',
     CONTENT_ID: 'jornada-conteudo',
     PERGAMINHO_VERT: '/assets/img/pergaminho-rasgado-vert.png',
-    PERGAMINHO_HORIZ: '/assets/img/pergaminho-rasgado-horiz.png',
-    VIDEO_BASE: '/assets/img/'
+    PERGAMINHO_HORIZ: '/assets/img/pergaminho-rasgado-horiz.png'
   }, global.JORNADA_CFG || {});
-
-  const VIDEO_BASE = CFG.VIDEO_BASE;
-
-  global.JORNADA_VIDEOS = global.JORNADA_VIDEOS || {
-    intro: VIDEO_BASE + 'filme-0-ao-encontro-da-jornada.mp4',
-    afterBlocks: {
-      0: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
-      1: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
-      2: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
-      3: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
-    },
-    final: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
-  };
-  global.JORNADA_FINAL_VIDEO = global.JORNADA_VIDEOS.final;
 
   const blockTranslations = {
     'pt-BR': [
@@ -56,7 +41,7 @@
           { id: 'o_que_te_trouxe',   label: 'What brought you to this journey?',          data_i18n: 'pergunta_o_que_te_trouxe' },
           { id: 'sonho_espiritual',  label: 'What is your greatest spiritual dream?',     data_i18n: 'pergunta_sonho_espiritual' }
         ],
-        video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
+        video_after: global.JORNADA_VIDEOS?.afterBlocks?.[0]
       },
       {
         id: 'reflexoes',
@@ -67,7 +52,7 @@
           { id: 'medo_duvida',      label: 'How do you deal with fear or doubt?',        data_i18n: 'pergunta_medo_duvida' },
           { id: 'significado_luz',  label: 'What does "light" mean to you?',             data_i18n: 'pergunta_significado_luz' }
         ],
-        video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
+        video_after: global.JORNADA_VIDEOS?.afterBlocks?.[1]
       },
       {
         id: 'crescimento',
@@ -78,7 +63,7 @@
           { id: 'quem_inspira',     label: 'Who inspires you and why?',                  data_i18n: 'pergunta_quem_inspira' },
           { id: 'pratica_gratidao', label: 'How do you practice gratitude daily?',       data_i18n: 'pergunta_pratica_gratidao' }
         ],
-        video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4'
+        video_after: global.JORNADA_VIDEOS?.afterBlocks?.[2]
       },
       {
         id: 'integracao',
@@ -89,7 +74,7 @@
           { id: 'aplicar_futuro',   label: 'How will you apply this in the future?',     data_i18n: 'pergunta_aplicar_futuro' },
           { id: 'mensagem_futuro',  label: 'A message for your future self.',            data_i18n: 'pergunta_mensagem_futuro' }
         ],
-        video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
+        video_after: global.JORNADA_VIDEOS?.afterBlocks?.[3]
       },
       {
         id: 'sintese',
@@ -99,7 +84,7 @@
           { id: 'essencia_hoje',    label: 'Who are you today, in one true sentence?',   data_i18n: 'pergunta_essencia_hoje' },
           { id: 'passo_fe',         label: 'What will be your next step of faith and courage?', data_i18n: 'pergunta_passo_fe' }
         ],
-        video_after: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
+        video_after: global.JORNADA_VIDEOS?.final
       }
     ],
     'es-ES': [
@@ -112,7 +97,7 @@
           { id: 'o_que_te_trouxe',   label: '¿Qué te trajo a este viaje?',               data_i18n: 'pergunta_o_que_te_trouxe' },
           { id: 'sonho_espiritual',  label: '¿Cuál es tu mayor sueño espiritual?',       data_i18n: 'pergunta_sonho_espiritual' }
         ],
-        video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
+        video_after: global.JORNADA_VIDEOS?.afterBlocks?.[0]
       },
       {
         id: 'reflexoes',
@@ -123,7 +108,7 @@
           { id: 'medo_duvida',      label: '¿Cómo lidias con el miedo o la duda?',       data_i18n: 'pergunta_medo_duvida' },
           { id: 'significado_luz',  label: '¿Qué significa la "luz" para ti?',          data_i18n: 'pergunta_significado_luz' }
         ],
-        video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
+        video_after: global.JORNADA_VIDEOS?.afterBlocks?.[1]
       },
       {
         id: 'crescimento',
@@ -134,7 +119,7 @@
           { id: 'quem_inspira',     label: '¿Quién te inspira y por qué?',              data_i18n: 'pergunta_quem_inspira' },
           { id: 'pratica_gratidao', label: '¿Cómo practicas la gratitud a diario?',     data_i18n: 'pergunta_pratica_gratidao' }
         ],
-        video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4'
+        video_after: global.JORNADA_VIDEOS?.afterBlocks?.[2]
       },
       {
         id: 'integracao',
@@ -145,7 +130,7 @@
           { id: 'aplicar_futuro',   label: '¿Cómo aplicarás esto en el futuro?',        data_i18n: 'pergunta_aplicar_futuro' },
           { id: 'mensagem_futuro',  label: 'Un mensaje para tu yo futuro.',             data_i18n: 'pergunta_mensagem_futuro' }
         ],
-        video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
+        video_after: global.JORNADA_VIDEOS?.afterBlocks?.[3]
       },
       {
         id: 'sintese',
@@ -155,7 +140,7 @@
           { id: 'essencia_hoje',    label: '¿Quién eres hoy, en una frase verdadera?',  data_i18n: 'pergunta_essencia_hoje' },
           { id: 'passo_fe',         label: '¿Cuál será tu próximo paso de fe y coraje?', data_i18n: 'pergunta_passo_fe' }
         ],
-        video_after: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
+        video_after: global.JORNADA_VIDEOS?.final
       }
     ]
   };
@@ -228,7 +213,7 @@
       const text = i18n.t(key, textarea.placeholder || key);
       await global.TypingBridge.typePlaceholder(textarea, text, 22);
     }
-    const blocoIdx = bloco.dataset.bloco;
+    const blocoIdx = parseInt(bloco.dataset.bloco);
     if (JORNADA_BLOCKS[blocoIdx]?.video_after) {
       document.dispatchEvent(new CustomEvent('blockCompleted', { 
         detail: { 
@@ -247,18 +232,28 @@
       window.toast && window.toast('Erro ao carregar vídeo');
       return;
     }
-    video.src = videoSrc;
-    video.style.zIndex = 2001;
-    videoOverlay.style.zIndex = 2000;
-    video.load();
-    video.play().catch(err => {
-      console.error('[JORNADA_PAPER] Erro ao reproduzir vídeo:', err);
-      window.toast && window.toast('Erro ao reproduzir vídeo');
-    });
-    video.onended = () => {
-      document.dispatchEvent(new CustomEvent('videoEnded', { detail: { videoSrc } }));
-      log('Vídeo finalizado:', videoSrc);
-    };
+    fetch(videoSrc, { method: 'HEAD' })
+      .then(res => {
+        if (!res.ok) throw new Error(`Vídeo não encontrado: ${videoSrc}`);
+        video.src = videoSrc;
+        video.style.zIndex = 2001;
+        videoOverlay.style.zIndex = 2000;
+        video.load();
+        video.play().catch(err => {
+          console.error('[JORNADA_PAPER] Erro ao reproduzir vídeo:', err);
+          window.toast && window.toast('Erro ao reproduzir vídeo');
+        });
+        video.onended = () => {
+          video.src = '';
+          videoOverlay.classList.add('hidden');
+          document.dispatchEvent(new CustomEvent('videoEnded', { detail: { videoSrc } }));
+          log('Vídeo finalizado:', videoSrc);
+        };
+      })
+      .catch(err => {
+        console.error('[JORNADA_PAPER] Erro ao verificar vídeo:', err);
+        window.toast && window.toast('Vídeo não disponível');
+      });
     log('Vídeo carregado:', videoSrc);
   }
 
@@ -277,11 +272,11 @@
       return;
     }
 
-    content.innerHTML = ''; // Limpa qualquer conteúdo HTML estático anterior
+    content.innerHTML = '';
     content.classList.remove('hidden');
 
     const JC = global.JC || { currentBloco: 0, currentPergunta: 0 };
-    JC.currentBloco = window.currentPerguntasIndex || 0; // Alinha com índice do controller
+    JC.currentBloco = window.currentPerguntasIndex || 0;
 
     JORNADA_BLOCKS.forEach((block, bIdx) => {
       const bloco = document.createElement('div');
@@ -341,7 +336,7 @@
           log('Iniciando typeQuestionsSequentially para bloco', JC.currentBloco);
           typeQuestionsSequentially(currentBloco);
           window.toast && window.toast('Perguntas prontas! Responda e clique para avançar.');
-        }, 300); // Atraso para garantir render completo
+        }, 300);
       }
     }
 
@@ -356,13 +351,16 @@
       if (!pergunta) return;
       const key = pergunta.dataset.i18n;
       const text = i18n.t(key, pergunta.textContent);
-      if ('speechSynthesis' in global) {
+      if ('speechSynthesis' in global && window.JORNADA?.tts?.enabled && !window.isMuted) {
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = i18n.lang || 'pt-BR';
+        utterance.rate = 1.03;
+        utterance.pitch = 1.0;
+        utterance.volume = 1;
         global.speechSynthesis.speak(utterance);
         window.toast && window.toast('Lendo pergunta...');
       } else {
-        console.warn('[JORNADA_PAPER] SpeechSynthesis não suportado');
+        console.warn('[JORNADA_PAPER] SpeechSynthesis não suportado ou TTS desativado');
         window.toast && window.toast('Leitura de voz não suportada.');
       }
     });
