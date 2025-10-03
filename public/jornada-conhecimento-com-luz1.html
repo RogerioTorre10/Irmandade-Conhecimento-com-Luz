@@ -254,28 +254,29 @@
         <div id="aria-pergunta" class="sr-only" aria-live="polite"></div>
 
        
-       <!-- INTRO -->
-      <div id="section-intro" class="j-section">
-     <div class="content">
-    <p data-typing="true" data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
-    <p data-typing="true" data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Antes de começar, leia os termos abaixo." data-speed="50" data-cursor="true"></p>
-    </div>
-     <div class="footer-actions">
+       ```html
+<!-- INTRO -->
+<div id="section-intro" class="j-section">
+  <div class="content">
+    <p id="intro-p1" data-typing="true" data-text="Respire. Esta jornada é sua. Um passo de cada vez." data-speed="40" data-cursor="true"></p>
+    <p id="intro-p2" data-typing="true" data-text="Bem-vindo(a) à nossa casa de reflexão e coragem. Antes de começar, leia os termos abaixo." data-speed="50" data-cursor="true"></p>
+  </div>
+  <div class="footer-actions">
     <button class="btn btn-avancar" data-action="avancar">Avançar</button>
-   </div>
-     </div>
+  </div>
+</div>
 
-      <!-- TERMOS -->
-     <div id="section-termos" class="j-section hidden">
-    <div class="conteudo-pergaminho">
+<!-- TERMOS -->
+<div id="section-termos" class="j-section hidden">
+  <div class="conteudo-pergaminho">
     <h2 id="termos-titulo" style="margin-top:0;" data-typing="true" data-text="Jornada Conhecimento com Luz - Essencial" data-speed="40" data-cursor="true"></h2>
     
     <!-- Página 1 dos Termos -->
     <div id="termos-pg1">
-      <p data-typing="true" data-text="AVISO IMPORTANTE – LEIA ANTES DE INICIAR" data-speed="40" data-cursor="true"></p>
-      <p data-typing="true" data-text="Esta é uma jornada pessoal, simbólica e inspiradora. Para proteger sua privacidade e garantir uma experiência ética, leia com atenção:" data-speed="40" data-cursor="true"></p>
+      <p id="termos-aviso" data-typing="true" data-text="AVISO IMPORTANTE – LEIA ANTES DE INICIAR" data-speed="40" data-cursor="true"></p>
+      <p id="termos-desc1" data-typing="true" data-text="Esta é uma jornada pessoal, simbólica e inspiradora. Para proteger sua privacidade e garantir uma experiência ética, leia com atenção:" data-speed="40" data-cursor="true"></p>
       <ul>
-        <li data-typing="true" data-text="Suas respostas não serão armazenadas após o término." data-speed="40" data-cursor="true"></li>
+        <li id="termos-li1" data-typing="true" data-text="Suas respostas não serão armazenadas após o término." data-speed="40" data-cursor="true"></li>
         <li id="termos-li2" data-typing="true" data-text="Ao final, será gerado um PDF exclusivo com suas respostas e a devolutiva simbólica do Guia I A." data-speed="40" data-cursor="true"></li>
         <li id="termos-li3" data-typing="true" data-text="O PDF não é enviado por e-mail. Faça o download imediatamente após a geração." data-speed="40" data-cursor="true"></li>
         <li id="termos-li4" data-typing="true" data-text="Após a entrega do PDF, todos os dados são apagados automaticamente e sem possibilidade de recuperação." data-speed="40" data-cursor="true"></li>
@@ -288,11 +289,11 @@
       <div class="footer-actions">
         <button class="btn" id="btn-termos-next" data-action="termos-next" disabled>Próxima página</button>
       </div>
-       </div>
+    </div>
     
-          <!-- Página 2 dos Termos (oculta inicialmente) -->
-        <div id="termos-pg2" class="hidden">
-       <h3 id="termos-h3" style="margin-top:0;" data-typing="true" data-text="Termo de Responsabilidade e Consentimento Consciente" data-speed="40" data-cursor="true"></h3>
+    <!-- Página 2 dos Termos (oculta inicialmente) -->
+    <div id="termos-pg2" class="hidden">
+      <h3 id="termos-h3" style="margin-top:0;" data-typing="true" data-text="Termo de Responsabilidade e Consentimento Consciente" data-speed="40" data-cursor="true"></h3>
       <ul>
         <li id="termos-li6" data-typing="true" data-text="Responsabilidade Pessoal: As respostas fornecidas refletem sua visão de mundo, sentimentos e experiências pessoais." data-speed="40" data-cursor="true"></li>
         <li id="termos-li7" data-typing="true" data-text="Caráter Não Terapêutico: Esta jornada não substitui acompanhamento psicológico, psiquiátrico, médico ou terapêutico. Não há diagnóstico, prescrição ou orientação clínica." data-speed="40" data-cursor="true"></li>
@@ -317,9 +318,9 @@
         <button class="btn" id="btn-termos-prev" data-action="termos-prev" disabled>Voltar</button>
         <button class="btn btn-avancar" id="btn-termos-accept" data-action="avancar" disabled>Aceito e quero continuar</button>
       </div>
-       </div>
-        </div>
-         </div>
+    </div>
+  </div>
+</div>
 
         <!-- SENHA -->
         <div id="section-senha" class="j-section hidden">
