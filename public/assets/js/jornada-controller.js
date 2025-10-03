@@ -9,6 +9,7 @@
   let currentIndex = 0;
   let lastShowSection = 0;
   let currentTermosPage = 'termos-pg1';
+  let currentPerguntasBlock = 'bloco-raizes';
 
   JC.setOrder = function (order) {
     sectionOrder = order;
@@ -65,14 +66,14 @@
 
       setTimeout(() => {
         console.log('[JornadaController] Processando elementos [data-typing] em:', id, 'Página:', currentTermosPage);
-        const container = id === 'section-termos' ? target.querySelector(`#${currentTermosPage}`) : target;
+        const container = id === 'section-termos' ? target.querySelector(`#${currentTermosPage}`) : id === 'section-perguntas' ? target.querySelector(`#${currentPerguntasBlock}`) : target;
         const textElements = container.querySelectorAll('[data-typing="true"]:not(.hidden)');
         console.log('[JornadaController] Elementos [data-typing] encontrados:', textElements.length);
 
         if (textElements.length === 0) {
-          const termosBtn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : target.querySelector('[data-action="avancar"], .btn-avancar, .btn');
-          if (termosBtn && termosBtn.disabled) {
-            termosBtn.disabled = false;
+          const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : target.querySelector('[data-action="avancar"], .btn-avancar, .btn');
+          if (btn && btn.disabled) {
+            btn.disabled = false;
             console.log('[JornadaController] Botão ativado (sem datilografia) em:', id, currentTermosPage || '');
             window.toast && window.toast('Conteúdo pronto! Clique para avançar.');
           }
@@ -90,10 +91,9 @@
               typingCompleted++;
               console.log('[JornadaController] Datilografia concluída para elemento:', el.id || el.className, '- Progresso:', typingCompleted + '/' + totalTypingElements);
               
-              // Ativar botões após cada elemento datilografado
-              const termosBtn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : target.querySelector('[data-action="avancar"], .btn-avancar, .btn');
-              if (termosBtn && termosBtn.disabled) {
-                termosBtn.disabled = false;
+              const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : target.querySelector('[data-action="avancar"], .btn-avancar, .btn');
+              if (btn && btn.disabled) {
+                btn.disabled = false;
                 console.log('[JornadaController] Botão ativado após datilografia em:', id, currentTermosPage || '', 'Elemento:', el.id || el.className);
                 window.toast && window.toast('Conteúdo lido! Clique para avançar.');
               }
@@ -136,6 +136,19 @@
                   console.log('[JornadaController] Avançando de section-termos para a próxima seção');
                   if (JC.goNext) JC.goNext();
                 }
+              } else if (id === 'section-perguntas') {
+                const blocks = ['bloco-raizes', 'bloco-reflexoes', 'bloco-crescimento', 'bloco-integracao', 'bloco-sintese'];
+                const currentBlockIdx = blocks.indexOf(currentPerguntasBlock);
+                if (currentBlockIdx < blocks.length - 1) {
+                  console.log('[JornadaController] Navegando para próximo bloco de perguntas:', blocks[currentBlockIdx + 1]);
+                  document.getElementById(currentPerguntasBlock).classList.add(HIDE_CLASS);
+                  currentPerguntasBlock = blocks[currentBlockIdx + 1];
+                  document.getElementById(currentPerguntasBlock).classList.remove(HIDE_CLASS);
+                  JC.show(id);
+                } else {
+                  console.log('[JornadaController] Avançando de section-perguntas para a próxima seção');
+                  if (JC.goNext) JC.goNext();
+                }
               } else {
                 if (JC.goNext) JC.goNext();
               }
@@ -157,13 +170,13 @@
         'section-intro',
         'section-termos',
         'section-senha',
-        'section-filme-jardim', // Filme: conhecimento-com-luz-jardim.mp4
+        'section-filme-jardim',
         'section-escolha-guia',
-        'section-filme-ao-encontro', // Filme: filme-0-ao-encontro-da-jornada.mp4
+        'section-filme-ao-encontro',
         'section-selfie',
-        'section-filme-entrando', // Filme: filme-1-entrando-na-jornada.mp4
+        'section-filme-entrando',
         'section-perguntas',
-        'section-final' // Filme 6 pendente, não incluído
+        'section-final'
       ]);
     }
     const initial = global.__currentSectionId || 'section-intro';
