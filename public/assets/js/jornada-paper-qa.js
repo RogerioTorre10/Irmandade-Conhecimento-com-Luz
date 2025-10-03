@@ -277,10 +277,11 @@
       return;
     }
 
-    content.innerHTML = '';
+    content.innerHTML = ''; // Limpa qualquer conteúdo HTML estático anterior
     content.classList.remove('hidden');
 
     const JC = global.JC || { currentBloco: 0, currentPergunta: 0 };
+    JC.currentBloco = window.currentPerguntasIndex || 0; // Alinha com índice do controller
 
     JORNADA_BLOCKS.forEach((block, bIdx) => {
       const bloco = document.createElement('div');
@@ -340,11 +341,11 @@
           log('Iniciando typeQuestionsSequentially para bloco', JC.currentBloco);
           typeQuestionsSequentially(currentBloco);
           window.toast && window.toast('Perguntas prontas! Responda e clique para avançar.');
-        }, 100);
+        }, 300); // Atraso para garantir render completo
       }
     }
 
-    log('Perguntas renderizadas, total de blocos:', JORNADA_BLOCKS.length);
+    log('Perguntas renderizadas dinamicamente, total de blocos:', JORNADA_BLOCKS.length);
   }
 
   function initPaperQAEvents() {
