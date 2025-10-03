@@ -30,42 +30,53 @@
     }
   };
 
-  JC.show = function (id) {
-    const all = document.querySelectorAll('div[id^="section-"]');
-    const target = document.getElementById(id);
-    if (!target) return;
+ JC.show = function (id) {
+  console.log('[JornadaController] Mostrando seção:', id);
+  const all = document.querySelectorAll('div[id^="section-"]');
+  const target = document.getElementById(id);
+  if (!target) {
+    console.warn('[JornadaController] Seção não encontrada:', id);
+    return;
+  }
 
-    all.forEach(s => s.classList.add(HIDE_CLASS));
-    target.classList.remove(HIDE_CLASS);
-    global.__currentSectionId = id;
-    global.G = global.G || {};
-    global.G.__typingLock = false;
+  all.forEach(s => s.classList.add(HIDE_CLASS));
+  target.classList.remove(HIDE_CLASS);
+  global.__currentSectionId = id;
+  global.G = global.G || {};
+  global.G.__typingLock = false;
 
-    setTimeout(() => {
-      const textElements = target.querySelectorAll('[data-typing="true"]');
-      textElements.forEach(el => {
-        if (el.offsetParent !== null) {
-          const selector = el.id ? `#${el.id}` : `.${el.className.split(' ')[0] || 'text'}`;
-          global.runTyping(selector);
-        }
-      });
+  setTimeout(() => {
+    console.log('[JornadaController] Processando elementos [data-typing] em:', id);
+    const textElements = target.querySelectorAll('[data-typing="true"]');
+    console.log('[JornadaController] Elementos [data-typing] encontrados:', textElements.length);
+    textElements.forEach(el => {
+      if (el.offsetParent !== null) {
+        const selector = el.id ? `#${el.id}` : `.${el.className.split(' ')[0] || 'text'}`;
+        console.log('[JornadaController] Chamando runTyping para:', selector);
+        global.runTyping(selector, () => {
+          console.log('[JornadaController] Datilografia concluída para:', selector);
+        });
+      }
+    });
 
-      const btns = target.querySelectorAll(
-        '[data-action="avancar"], .btn-avancar, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney'
-      );
-      btns.forEach(btn => {
-        if (!btn.dataset.clickAttached) {
-          btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const inTermos = !!e.target.closest('#section-termos');
-            if (inTermos) return;
-            if (JC.goNext) JC.goNext();
-          }, { once: true });
-          btn.dataset.clickAttached = '1';
-        }
-      });
-    }, 100);
-  };
+    const btns = target.querySelectorAll(
+      '[data-action="avancar"], .btn-avancar, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney'
+    );
+    console.log('[JornadaController] Botões encontrados:', btns.length);
+    btns.forEach(btn => {
+      if (!btn.dataset.clickAttached) {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const inTermos = !!e.target.closest('#section-termos');
+          console.log('[JornadaController] Botão clicado, inTermos:', inTermos);
+          console.log('[JornadaController] Avançando para a próxima seção');
+          if (JC.goNext) JC.goNext();
+        }, { once: true });
+        btn.dataset.clickAttached = '1';
+      }
+    });
+  }, 100);
+};
 
   function initializeController() {
     if (!sectionOrder.length) {
