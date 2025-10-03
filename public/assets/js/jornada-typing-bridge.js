@@ -44,7 +44,10 @@
 
   async function typeText(element, text, speed = 40, showCursor = false) {
     return new Promise(resolve => {
-      if (!element) return resolve();
+      if (!element) {
+        console.warn('[TypingBridge] Elemento inválido para typeText');
+        return resolve();
+      }
       if (abortCurrent) abortCurrent();
       let abort = false;
       abortCurrent = () => (abort = true);
@@ -56,18 +59,22 @@
       if (showCursor) element.appendChild(caret);
 
       let i = 0;
+      console.log('[TypingBridge] Iniciando datilografia para:', element.id || element.className, 'Texto:', text); // Novo log
       const interval = setInterval(() => {
         if (abort) {
           clearInterval(interval);
           if (showCursor) caret.remove();
+          console.log('[TypingBridge] Datilografia abortada para:', element.id || element.className);
           return resolve();
         }
+        console.log('[TypingBridge] Datilografando caractere', i + 1, '/', text.length, '- Texto atual:', text.slice(0, i)); // Novo log
         element.textContent = text.slice(0, i);
         i++;
         if (i >= text.length) {
           clearInterval(interval);
           if (showCursor) caret.remove();
           element.classList.add('typing-done');
+          console.log('[TypingBridge] Datilografia concluída para:', element.id || element.className); // Novo log
           resolve();
         }
       }, speed);
@@ -151,40 +158,44 @@
           el.getAttribute('data-text') ||
           i18n.t(el.getAttribute('data-i18n-key') || el.getAttribute('data-i18n') || 'welcome', { ns: 'common' }) ||
           el.textContent || '';
-        console.log('[TypingBridge] Processando elemento com texto:', texto);
+        console.log('[TypingBridge] Processando elemento com texto:', texto, 'Elemento:', el.id || el.className);
 
         const velocidade = parseInt(el.getAttribute('data-speed')) || 40;
         const mostrarCursor = el.getAttribute('data-cursor') === 'true';
 
-        if (!texto) continue;
+        if (!texto) {
+          console.warn('[TypingBridge] Nenhum texto encontrado para elemento:', el.id || el.className);
+          continue;
+        }
 
         await typeText(el, texto, velocidade, mostrarCursor);
 
-        if ('speechSynthesis' in window && texto) {
+        if ('speechSynthesis' in window && texto && (target === '#section-termos' || (target instanceof HTMLElement && target.closest('#section-termos')))) {
+          console.log('[TypingBridge] Aguardando clique para TTS em section-termos');
+          const btn = document.querySelector('#section-termos [data-action="termos-next"]');
+          if (btn) {
+            btn.addEventListener('click', () => {
+              const utt = new SpeechSynthesisUtterance(texto.trim());
+              utt.lang = i18n.lang || 'pt-BR';
+              utt.rate = 1.03;
+              utt.pitch = 1.0;
+              utt.volume = window.isMuted ? 0 : 1;
+              utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
+              speechSynthesis.cancel();
+              speechSynthesis.speak(utt);
+              console.log('[TypingBridge] TTS iniciado após clique em section-termos');
+            }, { once: true });
+          }
+        } else if ('speechSynthesis' in window && texto) {
           const utt = new SpeechSynthesisUtterance(texto.trim());
           utt.lang = i18n.lang || 'pt-BR';
           utt.rate = 1.03;
           utt.pitch = 1.0;
           utt.volume = window.isMuted ? 0 : 1;
           utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
-          try {
-            if (target === '#section-termos' || (target instanceof HTMLElement && target.closest('#section-termos'))) {
-              console.log('[TypingBridge] Aguardando clique para TTS em section-termos');
-              const btn = document.querySelector('#section-termos [data-action="avancar"]');
-              if (btn) {
-                btn.addEventListener('click', () => {
-                  speechSynthesis.cancel();
-                  speechSynthesis.speak(utt);
-                  console.log('[TypingBridge] TTS iniciado após clique em section-termos');
-                }, { once: true });
-              }
-            } else {
-              speechSynthesis.cancel();
-              speechSynthesis.speak(utt);
-            }
-          } catch (e) {
-            console.warn('[TypingBridge] Falha no TTS:', e.message);
-          }
+          speechSynthesis.cancel();
+          speechSynthesis.speak(utt);
+          console.log('[TypingBridge] TTS iniciado automaticamente para:', target);
         }
       }
 
