@@ -58,7 +58,7 @@
       let abort = false;
       abortCurrent = () => {
         abort = true;
-        speechSynthesis.cancel(); // Cancela TTS ativo
+        speechSynthesis.cancel();
       };
 
       const isVisible = element.offsetParent !== null && 
@@ -198,6 +198,7 @@
         } else {
           console.error('[TypingBridge] Nenhum elemento com [data-typing] encontrado para:', target || '(seção ativa)');
           document.dispatchEvent(new CustomEvent('typingError', { detail: { target, error: 'No typing elements found' } }));
+          document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
           if (callback) callback();
           return;
         }
@@ -205,7 +206,6 @@
 
       try { await i18n.waitForReady(5000); } catch (_) {}
 
-      let ttsQueue = [];
       let completed = 0;
       const total = elements.length;
 
@@ -235,57 +235,15 @@
           typingLog('Todos os elementos datilografados para:', target);
         }
 
-        if ('speechSynthesis' in window && texto) {
-          if (target === '#section-termos' || (target instanceof HTMLElement && target.closest('#section-termos'))) {
-            ttsQueue.push(texto.trim());
-          } else {
-            const utt = new SpeechSynthesisUtterance(texto.trim());
-            utt.lang = i18n.lang || 'pt-BR';
-            utt.rate = 1.03;
-            utt.pitch = 1.0;
-            utt.volume = window.isMuted !== undefined ? (window.isMuted ? 0 : 1) : 1;
-            utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
-            speechSynthesis.speak(utt);
-            typingLog('TTS iniciado automaticamente para:', target);
-          }
-        }
-      }
-
-      if (ttsQueue.length > 0 && (target === '#section-termos' || (target instanceof HTMLElement && target.closest('#section-termos')))) {
-        const pageId = window.currentTermosPage || 'termos-pg1';
-        const btn = document.querySelector(`#${pageId} [data-action="termos-next"], #${pageId} [data-action="avancar"]`);
-        if (btn) {
-          btn.addEventListener('click', () => {
-            setTimeout(() => {
-              ttsQueue.forEach((text, index) => {
-                setTimeout(() => {
-                  const utt = new SpeechSynthesisUtterance(text);
-                  utt.lang = i18n.lang || 'pt-BR';
-                  utt.rate = 1.03;
-                  utt.pitch = 1.0;
-                  utt.volume = window.isMuted !== undefined ? (window.isMuted ? 0 : 1) : 1;
-                  utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
-                  speechSynthesis.speak(utt);
-                  typingLog('TTS iniciado para texto', index + 1, 'de', ttsQueue.length, 'em:', pageId);
-                }, index * 1000);
-              });
-              ttsQueue = [];
-            }, 100);
-          }, { once: true });
-        } else {
-          console.warn('[TypingBridge] Botão de navegação não encontrado para:', pageId);
-          ttsQueue.forEach((text, index) => {
-            setTimeout(() => {
-              const utt = new SpeechSynthesisUtterance(text);
-              utt.lang = i18n.lang || 'pt-BR';
-              utt.rate = 1.03;
-              utt.pitch = 1.0;
-              utt.volume = window.isMuted !== undefined ? (window.isMuted ? 0 : 1) : 1;
-              utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
-              speechSynthesis.speak(utt);
-            }, index * 1000);
-          });
-          ttsQueue = [];
+        if ('speechSynthesis' in window && texto && window.JORNADA?.tts?.enabled && !window.isMuted) {
+          const utt = new SpeechSynthesisUtterance(texto.trim());
+          utt.lang = i18n.lang || 'pt-BR';
+          utt.rate = 1.03;
+          utt.pitch = 1.0;
+          utt.volume = 1;
+          utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
+          speechSynthesis.speak(utt);
+          typingLog('TTS iniciado para:', target);
         }
       }
 
