@@ -211,7 +211,7 @@
                   utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
                   speechSynthesis.speak(utt);
                   console.log('[TypingBridge] TTS iniciado para texto', index + 1, 'de', ttsQueue.length, 'em:', window.currentTermosPage || 'termos-pg1');
-                }, index * 1000); // Delay para evitar sobreposição de áudio
+                }, index * 1000);
               });
               ttsQueue = [];
             }, 100);
