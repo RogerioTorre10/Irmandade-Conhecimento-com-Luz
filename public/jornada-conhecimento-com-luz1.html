@@ -624,90 +624,10 @@
   </script>
 
  <!-- showSection -->
-<script>
-(function() {
-  const HIDE_CLASS = 'hidden';
-  let lastShowSection = 0;
 
-  window.showSection = function(id) {
-    const now = performance.now();
-    if (now - lastShowSection < 500) return;
-    lastShowSection = now;
-
-    const all = document.querySelectorAll('div[id^="section-"]');
-    const target = document.getElementById(id);
-    if (!target) return;
-
-    all.forEach(s => s.classList.add(HIDE_CLASS));
-    target.classList.remove(HIDE_CLASS);
-    window.__currentSectionId = id;
-    window.G = window.G || {};
-    window.G.__typingLock = false;
-
-    setTimeout(() => {
-      const textElements = target.querySelectorAll('[data-typing="true"]');
-      textElements.forEach(el => {
-        if (el.offsetParent !== null) {
-          const selector = el.id ? `#${el.id}` : `.${el.className.split(' ')[0] || 'text'}`;
-          window.runTyping(selector);
-        }
-      });
-
-      const btns = target.querySelectorAll(
-        '[data-action="avancar"], .btn-avancar, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney'
-      );
-      btns.forEach(btn => {
-        if (!btn.dataset.clickAttached) {
-          btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const inTermos = !!e.target.closest('#section-termos');
-            if (inTermos) return;
-            if (window.JC?.goNext) window.JC.goNext();
-          }, { once: true });
-          btn.dataset.clickAttached = '1';
-        }
-      });
-    }, 100);
-  };
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const initial = window.__currentSectionId || 'section-intro';
-    window.showSection(initial);
-  });
-})();
-</script>
 
   <!-- Navegação de Termos -->
-  <script>
-  (function() {
-    const showPage = (pg) => {
-      const pages = ['termos-pg1', 'termos-pg2'];
-      pages.forEach(p => {
-        const el = document.getElementById(p);
-        if (el) el.classList.add('hidden');
-      });
-      const target = document.getElementById(pg);
-      if (target) {
-        target.classList.remove('hidden');
-        window.runTyping && window.runTyping(target);
-        console.log('[Termos] Exibindo página:', pg);
-      }
-    };
-
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('[data-action="termos-next"], [data-action="termos-prev"]');
-      if (btn) {
-        e.preventDefault();
-        if (btn.dataset.action === 'termos-next') {
-          showPage('termos-pg2');
-        } else if (btn.dataset.action === 'termos-prev') {
-          showPage('termos-pg1');
-        }
-      }
-    });
-    console.log('[Termos] Bloco carregado');
-  })();
-  </script>
+ 
 
   <!-- Vídeo Transição -->
   <script>
