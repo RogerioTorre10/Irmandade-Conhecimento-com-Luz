@@ -69,44 +69,46 @@
         const textElements = container.querySelectorAll('[data-typing="true"]:not(.hidden)');
         console.log('[JornadaController] Elementos [data-typing] encontrados:', textElements.length);
 
-        if (textElements.length === 0 && id === 'section-termos') {
-          const termosBtn = target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`);
+        if (textElements.length === 0) {
+          const termosBtn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : target.querySelector('[data-action="avancar"], .btn-avancar, .btn');
           if (termosBtn && termosBtn.disabled) {
             termosBtn.disabled = false;
-            console.log('[JornadaController] Botão ativado (sem datilografia) em:', currentTermosPage);
-            window.toast && window.toast('Termos prontos! Clique para avançar.');
+            console.log('[JornadaController] Botão ativado (sem datilografia) em:', id, currentTermosPage || '');
+            window.toast && window.toast('Conteúdo pronto! Clique para avançar.');
           }
         }
 
         let typingCompleted = 0;
         const totalTypingElements = textElements.length;
 
-       textElements.forEach(el => {
-  if (el.offsetParent !== null) {
-    console.log('[JornadaController] Chamando runTyping para elemento:', el.id || el.className);
-    global.runTyping(el, () => {
-      typingCompleted++;
-      console.log('[JornadaController] Datilografia concluída para elemento:', el.id || el.className, '- Progresso:', typingCompleted + '/' + totalTypingElements);
-      
-      // Ativar botões após cada elemento datilografado
-      if (id === 'section-termos') {
-        const termosBtn = target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`);
-        if (termosBtn && termosBtn.disabled) {
-          termosBtn.disabled = false;
-          console.log('[JornadaController] Botão ativado após datilografia em:', currentTermosPage, 'Elemento:', el.id || el.className);
-          window.toast && window.toast('Termos lidos! Clique para avançar.');
-        }
-        if (currentTermosPage === 'termos-pg2') {
-          const prevBtn = target.querySelector('#btn-termos-prev');
-          if (prevBtn && prevBtn.disabled) {
-            prevBtn.disabled = false;
-            console.log('[JornadaController] Botão "Voltar" ativado em termos-pg2');
+        textElements.forEach(el => {
+          console.log('[JornadaController] Verificando visibilidade para elemento:', el.id || el.className);
+          const isVisible = el.offsetParent !== null && window.getComputedStyle(el).visibility !== 'hidden' && window.getComputedStyle(el).display !== 'none';
+          if (isVisible) {
+            console.log('[JornadaController] Chamando runTyping para elemento:', el.id || el.className);
+            global.runTyping(el, () => {
+              typingCompleted++;
+              console.log('[JornadaController] Datilografia concluída para elemento:', el.id || el.className, '- Progresso:', typingCompleted + '/' + totalTypingElements);
+              
+              // Ativar botões após cada elemento datilografado
+              const termosBtn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : target.querySelector('[data-action="avancar"], .btn-avancar, .btn');
+              if (termosBtn && termosBtn.disabled) {
+                termosBtn.disabled = false;
+                console.log('[JornadaController] Botão ativado após datilografia em:', id, currentTermosPage || '', 'Elemento:', el.id || el.className);
+                window.toast && window.toast('Conteúdo lido! Clique para avançar.');
+              }
+              if (id === 'section-termos' && currentTermosPage === 'termos-pg2') {
+                const prevBtn = target.querySelector('#btn-termos-prev');
+                if (prevBtn && prevBtn.disabled) {
+                  prevBtn.disabled = false;
+                  console.log('[JornadaController] Botão "Voltar" ativado em termos-pg2');
+                }
+              }
+            });
+          } else {
+            console.warn('[JornadaController] Elemento não visível, pulando datilografia:', el.id || el.className);
           }
-        }
-      }
-    });
-  }
-});
+        });
 
         const btns = target.querySelectorAll(
           '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], .btn-avancar, .btn, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney'
@@ -154,13 +156,14 @@
       JC.setOrder([
         'section-intro',
         'section-termos',
-        'section-filme1',
+        'section-senha',
+        'section-filme-jardim', // Filme: conhecimento-com-luz-jardim.mp4
         'section-escolha-guia',
+        'section-filme-ao-encontro', // Filme: filme-0-ao-encontro-da-jornada.mp4
         'section-selfie',
-        'section-filme2',
+        'section-filme-entrando', // Filme: filme-1-entrando-na-jornada.mp4
         'section-perguntas',
-        'section-filme3',
-        'section-final'
+        'section-final' // Filme 6 pendente, não incluído
       ]);
     }
     const initial = global.__currentSectionId || 'section-intro';
