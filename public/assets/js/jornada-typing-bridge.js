@@ -206,6 +206,9 @@
       try { await i18n.waitForReady(5000); } catch (_) {}
 
       let ttsQueue = [];
+      let completed = 0;
+      const total = elements.length;
+
       for (const el of elements) {
         const texto =
           el.getAttribute('data-text') ||
@@ -218,10 +221,19 @@
 
         if (!texto) {
           console.warn('[TypingBridge] Nenhum texto encontrado para elemento:', el.id || el.className);
+          completed++;
+          if (completed === total) {
+            document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
+          }
           continue;
         }
 
         await typeText(el, texto, velocidade, mostrarCursor);
+        completed++;
+        if (completed === total) {
+          document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
+          typingLog('Todos os elementos datilografados para:', target);
+        }
 
         if ('speechSynthesis' in window && texto) {
           if (target === '#section-termos' || (target instanceof HTMLElement && target.closest('#section-termos'))) {
