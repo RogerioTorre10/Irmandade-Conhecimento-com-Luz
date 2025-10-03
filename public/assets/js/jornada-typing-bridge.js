@@ -52,7 +52,7 @@
       let abort = false;
       abortCurrent = () => (abort = true);
 
-      const isVisible = element.offsetParent !== null && window.getComputedStyle(element).display !== 'none';
+      const isVisible = element.offsetParent !== null && window.getComputedStyle(element).visibility !== 'hidden' && window.getComputedStyle(element).display !== 'none';
       console.log('[TypingBridge] Elemento visível:', isVisible, 'ID:', element.id || element.className);
       if (!isVisible) {
         console.warn('[TypingBridge] Elemento não visível, pulando datilografia:', element.id || element.className);
@@ -202,16 +202,18 @@
           btn.addEventListener('click', () => {
             setTimeout(() => {
               ttsQueue.forEach((text, index) => {
-                const utt = new SpeechSynthesisUtterance(text);
-                utt.lang = i18n.lang || 'pt-BR';
-                utt.rate = 1.03;
-                utt.pitch = 1.0;
-                utt.volume = window.isMuted ? 0 : 1;
-                utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
-                speechSynthesis.speak(utt);
-                console.log('[TypingBridge] TTS iniciado para texto', index + 1, 'de', ttsQueue.length, 'em:', window.currentTermosPage || 'termos-pg1');
+                setTimeout(() => {
+                  const utt = new SpeechSynthesisUtterance(text);
+                  utt.lang = i18n.lang || 'pt-BR';
+                  utt.rate = 1.03;
+                  utt.pitch = 1.0;
+                  utt.volume = window.isMuted ? 0 : 1;
+                  utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
+                  speechSynthesis.speak(utt);
+                  console.log('[TypingBridge] TTS iniciado para texto', index + 1, 'de', ttsQueue.length, 'em:', window.currentTermosPage || 'termos-pg1');
+                }, index * 1000); // Delay para evitar sobreposição de áudio
               });
-              ttsQueue = []; // Limpar fila após leitura
+              ttsQueue = [];
             }, 100);
           }, { once: true });
         }
