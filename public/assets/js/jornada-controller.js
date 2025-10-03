@@ -18,7 +18,10 @@
     const idx = sectionOrder.indexOf(currentId);
     if (idx >= 0 && idx < sectionOrder.length - 1) {
       const nextId = sectionOrder[idx + 1];
+      console.log('[JornadaController] goNext: Avançando de', currentId, 'para', nextId);
       JC.show(nextId);
+    } else {
+      console.log('[JornadaController] goNext: Fim da jornada ou índice inválido:', idx);
     }
   };
 
@@ -58,34 +61,53 @@
         console.log('[JornadaController] Processando elementos [data-typing] em:', id);
         const textElements = target.querySelectorAll('[data-typing="true"]:not(.hidden)');
         console.log('[JornadaController] Elementos [data-typing] encontrados:', textElements.length);
+
+        if (textElements.length === 0 && id === 'section-termos') {
+          // Ativar botão mesmo sem datilografia
+          const termosBtn = target.querySelector('[data-action="termos-next"]');
+          if (termosBtn && termosBtn.disabled) {
+            termosBtn.disabled = false;
+            console.log('[JornadaController] Botão "Próxima página" ativado (sem datilografia) em section-termos');
+            window.toast && window.toast('Termos prontos! Clique para avançar.');
+          }
+        }
+
+        let typingCompleted = 0;
+        const totalTypingElements = textElements.length;
+
         textElements.forEach(el => {
           if (el.offsetParent !== null) {
             console.log('[JornadaController] Chamando runTyping para elemento:', el.id || el.className);
             global.runTyping(el, () => {
-              console.log('[JornadaController] Datilografia concluída para elemento:', el.id || el.className);
+              typingCompleted++;
+              console.log('[JornadaController] Datilografia concluída para elemento:', el.id || el.className, '- Progresso:', typingCompleted + '/' + totalTypingElements);
+              
+              // Ativar botão após datilografia completa
+              if (typingCompleted === totalTypingElements) {
+                const termosBtn = target.querySelector('[data-action="termos-next"]');
+                if (termosBtn && termosBtn.disabled) {
+                  termosBtn.disabled = false;
+                  console.log('[JornadaController] Botão "Próxima página" ativado após datilografia em:', id);
+                  window.toast && window.toast('Termos lidos! Clique para avançar.');
+                }
+              }
             });
           }
         });
 
         const btns = target.querySelectorAll(
-          '[data-action="avancar"], .btn-avancar, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney'
+          '[data-action="avancar"], [data-action="termos-next"], .btn-avancar, .btn, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney'
         );
         console.log('[JornadaController] Botões encontrados:', btns.length);
         btns.forEach(btn => {
           if (!btn.dataset.clickAttached) {
             btn.addEventListener('click', (e) => {
               e.preventDefault();
-              console.log('[JornadaController] Botão clicado em:', id, 'Botão:', btn.id || btn.className);
-              if (id === 'section-termos') {
-                // Garantir que o botão em section-termos avance
-                console.log('[JornadaController] Avançando de section-termos para a próxima seção');
-                if (JC.goNext) JC.goNext();
-              } else {
-                if (JC.goNext) JC.goNext();
-              }
+              console.log('[JornadaController] Botão clicado em:', id, 'Botão:', btn.id || btn.className || btn.dataset.action);
+              if (JC.goNext) JC.goNext();
             }, { once: true });
             btn.dataset.clickAttached = '1';
-            console.log('[JornadaController] Evento de clique adicionado ao botão em:', id, 'Botão:', btn.id || btn.className);
+            console.log('[JornadaController] Evento de clique adicionado ao botão em:', id, 'Botão:', btn.id || btn.className || btn.dataset.action);
           }
         });
       }, 100);
