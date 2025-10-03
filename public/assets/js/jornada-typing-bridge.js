@@ -42,52 +42,51 @@
     global.__typingLock = false;
   }
 
-async function typeText(element, text, speed = 40, showCursor = false) {
-  return new Promise(resolve => {
-    if (!element) {
-      console.warn('[TypingBridge] Elemento inválido para typeText');
-      return resolve();
-    }
-    if (abortCurrent) abortCurrent();
-    let abort = false;
-    abortCurrent = () => (abort = true);
-
-    // Verificar visibilidade
-    const isVisible = element.offsetParent !== null && window.getComputedStyle(element).display !== 'none';
-    console.log('[TypingBridge] Elemento visível:', isVisible, 'ID:', element.id || element.className);
-    if (!isVisible) {
-      console.warn('[TypingBridge] Elemento não visível, pulando datilografia:', element.id || element.className);
-      return resolve();
-    }
-
-    element.textContent = '';
-    const caret = document.createElement('span');
-    caret.className = 'typing-caret';
-    caret.textContent = '|';
-    if (showCursor) element.appendChild(caret);
-
-    let i = 0;
-    console.log('[TypingBridge] Iniciando datilografia para:', element.id || element.className, 'Texto:', text);
-    const interval = setInterval(() => {
-      if (abort) {
-        clearInterval(interval);
-        if (showCursor) caret.remove();
-        console.log('[TypingBridge] Datilografia abortada para:', element.id || element.className);
+  async function typeText(element, text, speed = 40, showCursor = false) {
+    return new Promise(resolve => {
+      if (!element) {
+        console.warn('[TypingBridge] Elemento inválido para typeText');
         return resolve();
       }
-      console.log('[TypingBridge] Datilografando caractere', i + 1, '/', text.length, '- Texto atual:', text.slice(0, i));
-      element.textContent = text.slice(0, i);
-      i++;
-      if (i >= text.length) {
-        clearInterval(interval);
-        if (showCursor) caret.remove();
-        element.classList.add('typing-done');
-        console.log('[TypingBridge] Datilografia concluída para:', element.id || element.className);
-        resolve();
+      if (abortCurrent) abortCurrent();
+      let abort = false;
+      abortCurrent = () => (abort = true);
+
+      const isVisible = element.offsetParent !== null && window.getComputedStyle(element).display !== 'none';
+      console.log('[TypingBridge] Elemento visível:', isVisible, 'ID:', element.id || element.className);
+      if (!isVisible) {
+        console.warn('[TypingBridge] Elemento não visível, pulando datilografia:', element.id || element.className);
+        return resolve();
       }
-    }, speed);
-  });
-}
+
+      element.textContent = '';
+      const caret = document.createElement('span');
+      caret.className = 'typing-caret';
+      caret.textContent = '|';
+      if (showCursor) element.appendChild(caret);
+
+      let i = 0;
+      console.log('[TypingBridge] Iniciando datilografia para:', element.id || element.className, 'Texto:', text);
+      const interval = setInterval(() => {
+        if (abort) {
+          clearInterval(interval);
+          if (showCursor) caret.remove();
+          console.log('[TypingBridge] Datilografia abortada para:', element.id || element.className);
+          return resolve();
+        }
+        console.log('[TypingBridge] Datilografando caractere', i + 1, '/', text.length, '- Texto atual:', text.slice(0, i));
+        element.textContent = text.slice(0, i);
+        i++;
+        if (i >= text.length) {
+          clearInterval(interval);
+          if (showCursor) caret.remove();
+          element.classList.add('typing-done');
+          console.log('[TypingBridge] Datilografia concluída para:', element.id || element.className);
+          resolve();
+        }
+      }, speed);
+    });
+  }
 
   async function playTypingAndSpeak(target, callback, _attempt = 0) {
     if (ACTIVE) {
@@ -142,7 +141,7 @@ async function typeText(element, text, speed = 40, showCursor = false) {
         }
         const nodeList = container.hasAttribute('data-typing')
           ? [container]
-          : container.querySelectorAll('[data-typing="true"]');
+          : container.querySelectorAll('[data-typing="true"]:not(.hidden)');
         elements = Array.from(nodeList);
         console.log('[TypingBridge] Elementos [data-typing] encontrados:', elements.length);
       }
@@ -161,6 +160,7 @@ async function typeText(element, text, speed = 40, showCursor = false) {
 
       try { await i18n.waitForReady(5000); } catch (_) {}
 
+      let ttsQueue = [];
       for (const el of elements) {
         const texto =
           el.getAttribute('data-text') ||
@@ -178,32 +178,42 @@ async function typeText(element, text, speed = 40, showCursor = false) {
 
         await typeText(el, texto, velocidade, mostrarCursor);
 
-        if ('speechSynthesis' in window && texto && (target === '#section-termos' || (target instanceof HTMLElement && target.closest('#section-termos')))) {
-          console.log('[TypingBridge] Aguardando clique para TTS em section-termos');
-          const btn = document.querySelector('#section-termos [data-action="termos-next"]');
-          if (btn) {
-            btn.addEventListener('click', () => {
-              const utt = new SpeechSynthesisUtterance(texto.trim());
-              utt.lang = i18n.lang || 'pt-BR';
-              utt.rate = 1.03;
-              utt.pitch = 1.0;
-              utt.volume = window.isMuted ? 0 : 1;
-              utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
-              speechSynthesis.cancel();
-              speechSynthesis.speak(utt);
-              console.log('[TypingBridge] TTS iniciado após clique em section-termos');
-            }, { once: true });
+        if ('speechSynthesis' in window && texto) {
+          if (target === '#section-termos' || (target instanceof HTMLElement && target.closest('#section-termos'))) {
+            console.log('[TypingBridge] Adicionando texto à fila TTS para section-termos, página:', window.currentTermosPage || 'termos-pg1');
+            ttsQueue.push(texto.trim());
+          } else {
+            const utt = new SpeechSynthesisUtterance(texto.trim());
+            utt.lang = i18n.lang || 'pt-BR';
+            utt.rate = 1.03;
+            utt.pitch = 1.0;
+            utt.volume = window.isMuted ? 0 : 1;
+            utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
+            speechSynthesis.speak(utt);
+            console.log('[TypingBridge] TTS iniciado automaticamente para:', target);
           }
-        } else if ('speechSynthesis' in window && texto) {
-          const utt = new SpeechSynthesisUtterance(texto.trim());
-          utt.lang = i18n.lang || 'pt-BR';
-          utt.rate = 1.03;
-          utt.pitch = 1.0;
-          utt.volume = window.isMuted ? 0 : 1;
-          utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
-          speechSynthesis.cancel();
-          speechSynthesis.speak(utt);
-          console.log('[TypingBridge] TTS iniciado automaticamente para:', target);
+        }
+      }
+
+      if (ttsQueue.length > 0 && (target === '#section-termos' || (target instanceof HTMLElement && target.closest('#section-termos')))) {
+        console.log('[TypingBridge] Aguardando clique para TTS em section-termos, página:', window.currentTermosPage || 'termos-pg1');
+        const btn = document.querySelector(`#${window.currentTermosPage || 'termos-pg1'} [data-action="termos-next"], #${window.currentTermosPage || 'termos-pg1'} [data-action="avancar"]`);
+        if (btn) {
+          btn.addEventListener('click', () => {
+            setTimeout(() => {
+              ttsQueue.forEach((text, index) => {
+                const utt = new SpeechSynthesisUtterance(text);
+                utt.lang = i18n.lang || 'pt-BR';
+                utt.rate = 1.03;
+                utt.pitch = 1.0;
+                utt.volume = window.isMuted ? 0 : 1;
+                utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
+                speechSynthesis.speak(utt);
+                console.log('[TypingBridge] TTS iniciado para texto', index + 1, 'de', ttsQueue.length, 'em:', window.currentTermosPage || 'termos-pg1');
+              });
+              ttsQueue = []; // Limpar fila após leitura
+            }, 100);
+          }, { once: true });
         }
       }
 
