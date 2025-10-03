@@ -12,12 +12,13 @@
   const HIDE_CLASS = 'hidden';
   let sectionOrder = [];
   let currentTermosPage = 'termos-pg1';
-  let currentPerguntasBlock = 'bloco-raizes';
+  let currentPerguntasIndex = 0; // Mudado para índice numérico para alinhar com paper
 
   const videoMapping = {
     'section-filme-jardim': global.JORNADA_VIDEOS?.intro,
     'section-filme-ao-encontro': global.JORNADA_VIDEOS?.afterBlocks?.[0],
     'section-filme-entrando': global.JORNADA_VIDEOS?.afterBlocks?.[1]
+    // Adicione mais mapeamentos se necessário
   };
 
   JC.setOrder = function (order) {
@@ -71,58 +72,57 @@
       global.G.__typingLock = false;
 
       setTimeout(() => {
-        console.log('[JornadaController] Processando elementos [data-typing] em:', id, 'Página:', currentTermosPage);
-        const container = id === 'section-termos' ? target.querySelector(`#${currentTermosPage}`) : id === 'section-perguntas' ? target.querySelector(`#${currentPerguntasBlock}`) : target;
+        console.log('[JornadaController] Processando seção:', id, 'Página:', currentTermosPage);
+        let container;
+        if (id === 'section-termos') {
+          container = target.querySelector(`#${currentTermosPage}`);
+        } else if (id === 'section-perguntas') {
+          global.JPaperQA.renderQuestions(); // Chama renderização dinâmica do paper
+          container = target.querySelector('#jornada-conteudo'); // Usa o container do paper
+        } else {
+          container = target;
+        }
+
         const textElements = container.querySelectorAll('[data-typing="true"]:not(.hidden)');
         console.log('[JornadaController] Elementos [data-typing] encontrados:', textElements.length);
 
         if (textElements.length === 0) {
+          document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target: id } })); // Simula conclusão se não houver elementos
+          return;
+        }
+
+        // Chama runTyping no container inteiro para processar sequencialmente todos os parágrafos
+        global.runTyping(container, () => {
+          console.log('[JornadaController] Datilografia sequencial concluída para container:', id);
+        });
+
+        // Listener para allTypingComplete para ativar botões e vídeos
+        const onAllComplete = () => {
           const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : 
-                     id === 'section-perguntas' ? target.querySelector(`#${currentPerguntasBlock} [data-action="avancar"]`) : 
+                     id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) : 
                      target.querySelector('[data-action="avancar"], [data-action="read-question"], .btn-avancar, .btn');
           if (btn && btn.disabled) {
             btn.disabled = false;
-            console.log('[JornadaController] Botão ativado (sem datilografia) em:', id, currentTermosPage || '');
+            console.log('[JornadaController] Botão ativado após toda datilografia em:', id);
             window.toast && window.toast('Conteúdo pronto! Clique para avançar.');
           }
-        }
 
-        let typingCompleted = 0;
-        const totalTypingElements = textElements.length;
-
-        textElements.forEach(el => {
-          const isVisible = el.offsetParent !== null && window.getComputedStyle(el).visibility !== 'hidden' && window.getComputedStyle(el).display !== 'none';
-          if (isVisible) {
-            console.log('[JornadaController] Chamando runTyping para elemento:', el.id || el.className);
-            global.runTyping(el, () => {
-              typingCompleted++;
-              console.log('[JornadaController] Datilografia concluída para elemento:', el.id || el.className, '- Progresso:', typingCompleted + '/' + totalTypingElements);
-              
-              const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : 
-                         id === 'section-perguntas' ? target.querySelector(`#${currentPerguntasBlock} [data-action="avancar"]`) : 
-                         target.querySelector('[data-action="avancar"], [data-action="read-question"], .btn-avancar, .btn');
-              if (btn && btn.disabled) {
-                btn.disabled = false;
-                console.log('[JornadaController] Botão ativado após datilografia em:', id, currentTermosPage || '', 'Elemento:', el.id || el.className);
-                window.toast && window.toast('Conteúdo lido! Clique para avançar.');
-              }
-              if (id === 'section-termos' && currentTermosPage === 'termos-pg2') {
-                const prevBtn = target.querySelector('#btn-termos-prev');
-                if (prevBtn && prevBtn.disabled) {
-                  prevBtn.disabled = false;
-                  console.log('[JornadaController] Botão "Voltar" ativado em termos-pg2');
-                }
-              }
-            });
-          } else {
-            console.warn('[JornadaController] Elemento não visível, pulando datilografia:', el.id || el.className);
+          if (videoMapping[id] && global.JPaperQA) {
+            global.JPaperQA.loadVideo(videoMapping[id]);
+            console.log('[JornadaController] Carregando vídeo após datilografia para seção:', id, 'Vídeo:', videoMapping[id]);
           }
-        });
 
-        if (videoMapping[id] && global.JPaperQA) {
-          global.JPaperQA.loadVideo(videoMapping[id]);
-          console.log('[JornadaController] Carregando vídeo para seção:', id, 'Vídeo:', videoMapping[id]);
-        }
+          if (id === 'section-termos' && currentTermosPage === 'termos-pg2') {
+            const prevBtn = target.querySelector('#btn-termos-prev');
+            if (prevBtn && prevBtn.disabled) {
+              prevBtn.disabled = false;
+              console.log('[JornadaController] Botão "Voltar" ativado em termos-pg2');
+            }
+          }
+
+          document.removeEventListener('allTypingComplete', onAllComplete);
+        };
+        document.addEventListener('allTypingComplete', onAllComplete, { once: true });
 
         const btns = target.querySelectorAll(
           '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], [data-action="read-question"], .btn-avancar, .btn, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney'
@@ -151,13 +151,11 @@
                   JC.goNext();
                 }
               } else if (id === 'section-perguntas') {
-                const blocks = global.JORNADA_BLOCKS ? global.JORNADA_BLOCKS.map(b => b.id) : ['bloco-raizes', 'bloco-reflexoes', 'bloco-crescimento', 'bloco-integracao', 'bloco-sintese'];
-                const currentBlockIdx = blocks.indexOf(currentPerguntasBlock);
-                if (currentBlockIdx < blocks.length - 1) {
-                  console.log('[JornadaController] Navegando para próximo bloco de perguntas:', blocks[currentBlockIdx + 1]);
-                  document.getElementById(currentPerguntasBlock).classList.add(HIDE_CLASS);
-                  currentPerguntasBlock = blocks[currentBlockIdx + 1];
-                  document.getElementById(currentPerguntasBlock).classList.remove(HIDE_CLASS);
+                const totalBlocos = global.JORNADA_BLOCKS ? global.JORNADA_BLOCKS.length : 5;
+                if (currentPerguntasIndex < totalBlocos - 1) {
+                  currentPerguntasIndex++;
+                  global.JPaperQA.renderQuestions(); // Re-renderiza para o próximo bloco
+                  console.log('[JornadaController] Navegando para próximo bloco de perguntas:', currentPerguntasIndex);
                   JC.show(id);
                 } else {
                   console.log('[JornadaController] Avançando de section-perguntas para a próxima seção');
