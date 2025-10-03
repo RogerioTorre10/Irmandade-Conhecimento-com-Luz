@@ -84,9 +84,10 @@
         }
 
         const textElements = container.querySelectorAll('[data-typing="true"]:not(.hidden)');
-        console.log('[JornadaController] Elementos [data-typing] encontrados:', textElements.length);
+        console.log('[JornadaController] Elementos [data-typing] encontrados:', textElements.length, 'em', id);
 
         if (textElements.length === 0) {
+          console.log('[JornadaController] Nenhum elemento com data-typing, disparando allTypingComplete');
           document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target: id } }));
           return;
         }
@@ -98,11 +99,13 @@
         const onAllComplete = () => {
           const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : 
                      id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) : 
-                     target.querySelector('[data-action="avancar"], [data-action="read-question"], .btn-avancar, .btn');
-          if (btn && btn.disabled) {
+                     target.querySelector('[data-action="avancar"], [data-action="read-question"], .btn-avancar, .btn, #iniciar, .btn-iniciar');
+          if (btn) {
             btn.disabled = false;
-            console.log('[JornadaController] Botão ativado após toda datilografia em:', id);
+            console.log('[JornadaController] Botão ativado após toda datilografia em:', id, 'Botão:', btn.id || btn.className);
             window.toast && window.toast('Conteúdo pronto! Clique para avançar.');
+          } else {
+            console.warn('[JornadaController] Botão de avançar não encontrado em:', id);
           }
 
           if (videoMapping[id] && global.JPaperQA) {
@@ -122,10 +125,20 @@
         };
         document.addEventListener('allTypingComplete', onAllComplete, { once: true });
 
+        // Fallback para ativar botão após 10 segundos
+        setTimeout(() => {
+          const btn = target.querySelector('[data-action="avancar"], [data-action="read-question"], .btn-avancar, .btn, #iniciar, .btn-iniciar');
+          if (btn && btn.disabled) {
+            btn.disabled = false;
+            console.warn('[JornadaController] Fallback: Botão ativado após timeout em:', id);
+            window.toast && window.toast('Conteúdo pronto (fallback)! Clique para avançar.');
+          }
+        }, 10000);
+
         const btns = target.querySelectorAll(
-          '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], [data-action="read-question"], .btn-avancar, .btn, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney'
+          '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], [data-action="read-question"], .btn-avancar, .btn, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney, .btn-iniciar'
         );
-        console.log('[JornadaController] Botões encontrados:', btns.length);
+        console.log('[JornadaController] Botões encontrados:', btns.length, 'em', id);
         btns.forEach(btn => {
           if (!btn.dataset.clickAttached) {
             btn.addEventListener('click', (e) => {
