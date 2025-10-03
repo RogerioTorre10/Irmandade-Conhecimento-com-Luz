@@ -81,32 +81,32 @@
         let typingCompleted = 0;
         const totalTypingElements = textElements.length;
 
-        textElements.forEach(el => {
-          if (el.offsetParent !== null) {
-            console.log('[JornadaController] Chamando runTyping para elemento:', el.id || el.className);
-            global.runTyping(el, () => {
-              typingCompleted++;
-              console.log('[JornadaController] Datilografia concluída para elemento:', el.id || el.className, '- Progresso:', typingCompleted + '/' + totalTypingElements);
-              
-              // Ativar botões após cada elemento datilografado
-              if (id === 'section-termos') {
-                const termosBtn = target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`);
-                if (termosBtn && termosBtn.disabled) {
-                  termosBtn.disabled = false;
-                  console.log('[JornadaController] Botão ativado após datilografia em:', currentTermosPage, 'Elemento:', el.id || el.className);
-                  window.toast && window.toast('Termos lidos! Clique para avançar.');
-                }
-                if (currentTermosPage === 'termos-pg2') {
-                  const prevBtn = target.querySelector('#btn-termos-prev');
-                  if (prevBtn && prevBtn.disabled) {
-                    prevBtn.disabled = false;
-                    console.log('[JornadaController] Botão "Voltar" ativado em termos-pg2');
-                  }
-                }
-              }
-            });
+       textElements.forEach(el => {
+  if (el.offsetParent !== null) {
+    console.log('[JornadaController] Chamando runTyping para elemento:', el.id || el.className);
+    global.runTyping(el, () => {
+      typingCompleted++;
+      console.log('[JornadaController] Datilografia concluída para elemento:', el.id || el.className, '- Progresso:', typingCompleted + '/' + totalTypingElements);
+      
+      // Ativar botões após cada elemento datilografado
+      if (id === 'section-termos') {
+        const termosBtn = target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`);
+        if (termosBtn && termosBtn.disabled) {
+          termosBtn.disabled = false;
+          console.log('[JornadaController] Botão ativado após datilografia em:', currentTermosPage, 'Elemento:', el.id || el.className);
+          window.toast && window.toast('Termos lidos! Clique para avançar.');
+        }
+        if (currentTermosPage === 'termos-pg2') {
+          const prevBtn = target.querySelector('#btn-termos-prev');
+          if (prevBtn && prevBtn.disabled) {
+            prevBtn.disabled = false;
+            console.log('[JornadaController] Botão "Voltar" ativado em termos-pg2');
           }
-        });
+        }
+      }
+    });
+  }
+});
 
         const btns = target.querySelectorAll(
           '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], .btn-avancar, .btn, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney'
