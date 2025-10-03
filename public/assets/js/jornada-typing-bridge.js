@@ -77,7 +77,7 @@
     });
   }
 
- async function playTypingAndSpeak(target, callback, _attempt = 0) {
+async function playTypingAndSpeak(target, callback, _attempt = 0) {
   if (ACTIVE) {
     typingLog('Já em execução, ignorando');
     if (callback) callback();
@@ -88,39 +88,40 @@
     let container = null;
     let elements = null;
 
+    console.log('[TypingBridge] Tentando processar target:', target);
+
     // 1) Descobrir container/elements a partir do "target"
     if (typeof target === 'string') {
-      // tenta um único elemento
       container = document.querySelector(target);
-
+      console.log('[TypingBridge] Container encontrado:', container ? container.id : 'Nenhum');
       if (!container) {
-        // tenta NodeList do seletor
         const list = document.querySelectorAll(target);
         if (list && list.length) {
           elements = Array.from(list);
         } else {
-          // fallback: usa a seção ativa
-          const active = document.querySelector('section.active, .section.active, [id^="section-"].active');
+          const active = document.querySelector('div[id^="section-"].active') || document.getElementById('section-intro');
           if (active) container = active;
+          console.log('[TypingBridge] Seção ativa como fallback:', active ? active.id : 'Nenhuma');
         }
       }
     } else if (target instanceof HTMLElement) {
       container = target;
+      console.log('[TypingBridge] Container é HTMLElement:', container.id);
     } else if (target && typeof NodeList !== 'undefined' && target instanceof NodeList) {
       elements = Array.from(target);
     } else if (Array.isArray(target)) {
       elements = target.filter(Boolean);
     } else {
-      // sem target: usa a seção ativa
-      const active = document.querySelector('section.active, .section.active, [id^="section-"].active');
+      const active = document.querySelector('div[id^="section-"].active') || document.getElementById('section-intro');
       if (active) container = active;
+      console.log('[TypingBridge] Usando seção ativa:', active ? active.id : 'Nenhuma');
     }
 
     // 2) Se ainda não temos "elements", extraímos do container
     if (!elements) {
       if (!container) {
-        // re-tenta algumas vezes (aguarda render)
         if (_attempt < 3) {
+          console.log('[TypingBridge] Tentativa', _attempt + 1, 'para target:', target);
           setTimeout(() => playTypingAndSpeak(target, callback, _attempt + 1), 220);
         } else {
           console.warn('[TypingBridge] Nenhum container/elemento encontrado para:', target);
@@ -130,13 +131,15 @@
       }
       const nodeList = container.hasAttribute('data-typing')
         ? [container]
-        : container.querySelectorAll('[data-typing]');
+        : container.querySelectorAll('[data-typing="true"]');
       elements = Array.from(nodeList);
+      console.log('[TypingBridge] Elementos [data-typing] encontrados:', elements.length);
     }
 
     // 3) Se ainda vazio, mais uma tentativa curta
     if (!elements.length) {
       if (_attempt < 3) {
+        console.log('[TypingBridge] Tentativa', _attempt + 1, 'sem elementos [data-typing]');
         setTimeout(() => playTypingAndSpeak(target, callback, _attempt + 1), 220);
       } else {
         console.warn('[TypingBridge] Nenhum elemento com [data-typing] encontrado para:', target || '(seção ativa)');
@@ -154,6 +157,7 @@
         el.getAttribute('data-text') ||
         i18n.t(el.getAttribute('data-i18n-key') || el.getAttribute('data-i18n') || 'welcome', { ns: 'common' }) ||
         el.textContent || '';
+      console.log('[TypingBridge] Processando elemento com texto:', texto);
 
       const velocidade = parseInt(el.getAttribute('data-speed')) || 40;
       const mostrarCursor = el.getAttribute('data-cursor') === 'true';
@@ -169,8 +173,23 @@
         utt.pitch = 1.0;
         utt.volume = window.isMuted ? 0 : 1;
         utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
-        speechSynthesis.cancel();
-        speechSynthesis.speak(utt);
+        try {
+          if (target === '#section-termos') {
+            // Aguardar interação do usuário para TTS em section-termos
+            const btn = document.querySelector('#section-termos [data-action="avancar"]');
+            if (btn) {
+              btn.addEventListener('click', () => {
+                speechSynthesis.cancel();
+                speechSynthesis.speak(utt);
+              }, { once: true });
+            }
+          } else {
+            speechSynthesis.cancel();
+            speechSynthesis.speak(utt);
+          }
+        } catch (e) {
+          console.warn('[TypingBridge] Falha no TTS:', e.message);
+        }
       }
     }
 
