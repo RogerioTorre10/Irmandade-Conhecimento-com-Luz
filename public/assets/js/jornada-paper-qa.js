@@ -205,7 +205,7 @@
       <form id="form-perguntas" class="grid gap-3">
         ${questions.map(q => `
           <label class="grid gap-1">
-            <span class="font-medium pergunta-enunciado text" data-i18n="${q.data_i18n}" data-typing="true" data-speed="36" data-cursor="true">${q.label}</span>
+            <span class="font-medium pergunta-enunciado text" id="${q.id}-label" data-i18n="${q.data_i18n}" data-typing="true" data-speed="36" data-cursor="true">${q.label}</span>
             <textarea name="${q.id}" class="px-3 py-2 rounded border border-gray-300 bg-white/80" data-i18n-placeholder="resposta_placeholder" placeholder="Digite sua resposta..."></textarea>
           </label>
         `).join('')}
@@ -236,7 +236,7 @@
     log('Placeholder digitado:', text);
   }
 
-  async function typeText(element, text, speed = 36) {
+  async function paperTypeText(element, text, speed = 36) {
     return new Promise(resolve => {
       let i = 0;
       element.textContent = '';
@@ -263,7 +263,7 @@
     for (const el of elements) {
       const key = el.dataset.i18n;
       const text = i18n.t(key, el.textContent || key);
-      await typeText(el, text, parseInt(el.dataset.speed) || 36);
+      await global.runTyping(el, () => console.log('[JORNADA_PAPER] Datilografia concluída para:', el.id || el.className));
     }
     const textareas = bloco.querySelectorAll('.j-pergunta textarea');
     for (const textarea of textareas) {
@@ -339,7 +339,7 @@
           <div class="accessibility-controls">
             <button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>
             <button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>
-            <button class="btn btn-avancar" data-action="read-question" data-question-id="${block.id}-${qIdx}" data-i18n="btn-avancar">Avançar</button>
+            <button class="btn btn-avancar" data-action="avancar" data-question-id="${block.id}-${qIdx}" data-i18n="btn-avancar">Avançar</button>
           </div>
         `;
         bloco.appendChild(div);
@@ -365,13 +365,6 @@
         setTimeout(() => {
           log('Iniciando typeQuestionsSequentially para bloco', JC.currentBloco);
           typeQuestionsSequentially(currentBloco);
-          if (global.TypingBridge && typeof global.TypingBridge.play === 'function') {
-            global.TypingBridge.play('.text', () => console.log('[JORNADA_PAPER] Animação de digitação concluída'));
-          } else if (typeof global.runTyping === 'function') {
-            global.runTyping('.text', () => console.log('[JORNADA_PAPER] Animação de digitação concluída'));
-          } else {
-            console.warn('[JORNADA_PAPER] TypingBridge/runTyping indisponível no momento');
-          }
         }, 100);
       }
     }
