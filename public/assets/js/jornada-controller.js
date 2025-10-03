@@ -88,7 +88,7 @@
               typingCompleted++;
               console.log('[JornadaController] Datilografia concluída para elemento:', el.id || el.className, '- Progresso:', typingCompleted + '/' + totalTypingElements);
               
-              // Ativar botões após qualquer elemento completar (para evitar travamento)
+              // Ativar botões após cada elemento datilografado
               if (id === 'section-termos') {
                 const termosBtn = target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`);
                 if (termosBtn && termosBtn.disabled) {
