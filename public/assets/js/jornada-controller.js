@@ -60,10 +60,9 @@
         console.log('[JornadaController] Elementos [data-typing] encontrados:', textElements.length);
         textElements.forEach(el => {
           if (el.offsetParent !== null) {
-            const selector = el.id ? `#${el.id}` : `.${el.className.split(' ')[0] || 'text'}`;
-            console.log('[JornadaController] Chamando runTyping para:', selector);
-            global.runTyping(selector, () => {
-              console.log('[JornadaController] Datilografia concluída para:', selector);
+            console.log('[JornadaController] Chamando runTyping para elemento:', el.id || el.className);
+            global.runTyping(el, () => {
+              console.log('[JornadaController] Datilografia concluída para elemento:', el.id || el.className);
             });
           }
         });
@@ -76,8 +75,14 @@
           if (!btn.dataset.clickAttached) {
             btn.addEventListener('click', (e) => {
               e.preventDefault();
-              console.log('[JornadaController] Botão clicado em:', id);
-              if (JC.goNext) JC.goNext();
+              console.log('[JornadaController] Botão clicado em:', id, 'Botão:', btn.id || btn.className);
+              if (id === 'section-termos') {
+                // Garantir que o botão em section-termos avance
+                console.log('[JornadaController] Avançando de section-termos para a próxima seção');
+                if (JC.goNext) JC.goNext();
+              } else {
+                if (JC.goNext) JC.goNext();
+              }
             }, { once: true });
             btn.dataset.clickAttached = '1';
             console.log('[JornadaController] Evento de clique adicionado ao botão em:', id, 'Botão:', btn.id || btn.className);
