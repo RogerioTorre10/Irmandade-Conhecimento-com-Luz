@@ -188,7 +188,7 @@
           ? [container]
           : container.querySelectorAll('[data-typing="true"]:not(.hidden)');
         elements = Array.from(nodeList);
-        typingLog('Elementos [data-typing] encontrados:', elements.length);
+        typingLog('Elementos [data-typing] encontrados:', elements.length, 'em', target);
       }
 
       if (!elements.length) {
@@ -231,6 +231,7 @@
         }
 
         if ('speechSynthesis' in window && texto && window.JORNADA?.tts?.enabled && !window.isMuted) {
+          speechSynthesis.cancel(); // Cancela TTS anterior
           const utt = new SpeechSynthesisUtterance(texto.trim());
           utt.lang = i18n.lang || 'pt-BR';
           utt.rate = 1.03;
