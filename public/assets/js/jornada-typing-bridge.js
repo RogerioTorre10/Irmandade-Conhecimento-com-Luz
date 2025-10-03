@@ -179,6 +179,7 @@
           } else {
             console.error('[TypingBridge] Nenhum container/elemento encontrado para:', target);
             document.dispatchEvent(new CustomEvent('typingError', { detail: { target, error: 'No elements found' } }));
+            document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
             if (callback) callback();
             return;
           }
@@ -191,17 +192,10 @@
       }
 
       if (!elements.length) {
-        if (_attempt < 3) {
-          typingLog('Tentativa', _attempt + 1, 'sem elementos [data-typing]');
-          setTimeout(() => playTypingAndSpeak(target, callback, _attempt + 1), 220);
-          return;
-        } else {
-          console.error('[TypingBridge] Nenhum elemento com [data-typing] encontrado para:', target || '(seção ativa)');
-          document.dispatchEvent(new CustomEvent('typingError', { detail: { target, error: 'No typing elements found' } }));
-          document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
-          if (callback) callback();
-          return;
-        }
+        typingLog('Nenhum elemento com [data-typing] encontrado para:', target || '(seção ativa)');
+        document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
+        if (callback) callback();
+        return;
       }
 
       try { await i18n.waitForReady(5000); } catch (_) {}
@@ -219,11 +213,12 @@
         const velocidade = parseInt(el.getAttribute('data-speed')) || 40;
         const mostrarCursor = el.getAttribute('data-cursor') === 'true';
 
-        if (!texto) {
-          console.warn('[TypingBridge] Nenhum texto encontrado para elemento:', el.id || el.className);
+        if (!texto || !el.offsetParent) {
+          console.warn('[TypingBridge] Elemento sem texto ou invisível, pulando:', el.id || el.className);
           completed++;
           if (completed === total) {
             document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
+            typingLog('Todos os elementos processados (alguns pulados) para:', target);
           }
           continue;
         }
@@ -251,6 +246,7 @@
     } catch (e) {
       console.error('[TypingBridge] Erro:', e);
       document.dispatchEvent(new CustomEvent('typingError', { detail: { target, error: e.message } }));
+      document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
       if (callback) callback();
     } finally {
       unlock();
