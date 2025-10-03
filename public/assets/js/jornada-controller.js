@@ -71,7 +71,7 @@
         console.log('[JornadaController] Elementos [data-typing] encontrados:', textElements.length);
 
         if (textElements.length === 0) {
-          const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : target.querySelector('[data-action="avancar"], .btn-avancar, .btn');
+          const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : target.querySelector('[data-action="avancar"], [data-action="read-question"], .btn-avancar, .btn');
           if (btn && btn.disabled) {
             btn.disabled = false;
             console.log('[JornadaController] Botão ativado (sem datilografia) em:', id, currentTermosPage || '');
@@ -91,7 +91,7 @@
               typingCompleted++;
               console.log('[JornadaController] Datilografia concluída para elemento:', el.id || el.className, '- Progresso:', typingCompleted + '/' + totalTypingElements);
               
-              const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : target.querySelector('[data-action="avancar"], .btn-avancar, .btn');
+              const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : target.querySelector('[data-action="avancar"], [data-action="read-question"], .btn-avancar, .btn');
               if (btn && btn.disabled) {
                 btn.disabled = false;
                 console.log('[JornadaController] Botão ativado após datilografia em:', id, currentTermosPage || '', 'Elemento:', el.id || el.className);
@@ -111,7 +111,7 @@
         });
 
         const btns = target.querySelectorAll(
-          '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], .btn-avancar, .btn, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney'
+          '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], [data-action="read-question"], .btn-avancar, .btn, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney'
         );
         console.log('[JornadaController] Botões encontrados:', btns.length);
         btns.forEach(btn => {
