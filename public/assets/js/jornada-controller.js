@@ -55,7 +55,16 @@
     global.lastShowSection = now;
 
     try {
+      // Cancela TTS e vídeos anteriores
       speechSynthesis.cancel();
+      const video = document.querySelector('#videoTransicao');
+      if (video) {
+        video.pause();
+        video.src = '';
+        const videoOverlay = document.querySelector('#videoOverlay');
+        if (videoOverlay) videoOverlay.classList.add('hidden');
+      }
+
       const all = document.querySelectorAll('div[id^="section-"]');
       const target = document.getElementById(id);
       if (!target) {
@@ -83,11 +92,21 @@
           container = target;
         }
 
-        const textElements = container.querySelectorAll('[data-typing="true"]:not(.hidden)');
+        const textElements = container ? container.querySelectorAll('[data-typing="true"]:not(.hidden)') : [];
         console.log('[JornadaController] Elementos [data-typing] encontrados:', textElements.length, 'em', id);
 
         if (textElements.length === 0) {
-          console.log('[JornadaController] Nenhum elemento com data-typing, disparando allTypingComplete');
+          console.log('[JornadaController] Nenhum elemento com data-typing, ativando botão imediatamente');
+          const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : 
+                     id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) : 
+                     target.querySelector('[data-action="avancar"], [data-action="read-question"], [data-action="iniciar"], .btn-avancar, .btn, #iniciar, .btn-iniciar');
+          if (btn) {
+            btn.disabled = false;
+            console.log('[JornadaController] Botão ativado imediatamente em:', id, 'Botão:', btn.id || btn.className);
+            window.toast && window.toast('Conteúdo pronto! Clique para avançar.');
+          } else {
+            console.warn('[JornadaController] Botão de avançar não encontrado em:', id);
+          }
           document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target: id } }));
           return;
         }
@@ -99,7 +118,7 @@
         const onAllComplete = () => {
           const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : 
                      id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) : 
-                     target.querySelector('[data-action="avancar"], [data-action="read-question"], .btn-avancar, .btn, #iniciar, .btn-iniciar');
+                     target.querySelector('[data-action="avancar"], [data-action="read-question"], [data-action="iniciar"], .btn-avancar, .btn, #iniciar, .btn-iniciar');
           if (btn) {
             btn.disabled = false;
             console.log('[JornadaController] Botão ativado após toda datilografia em:', id, 'Botão:', btn.id || btn.className);
@@ -109,6 +128,7 @@
           }
 
           if (videoMapping[id] && global.JPaperQA) {
+            speechSynthesis.cancel(); // Garante que TTS está parado antes do vídeo
             global.JPaperQA.loadVideo(videoMapping[id]);
             console.log('[JornadaController] Carregando vídeo após datilografia para seção:', id, 'Vídeo:', videoMapping[id]);
           }
@@ -127,16 +147,16 @@
 
         // Fallback para ativar botão após 10 segundos
         setTimeout(() => {
-          const btn = target.querySelector('[data-action="avancar"], [data-action="read-question"], .btn-avancar, .btn, #iniciar, .btn-iniciar');
+          const btn = target.querySelector('[data-action="avancar"], [data-action="read-question"], [data-action="iniciar"], .btn-avancar, .btn, #iniciar, .btn-iniciar');
           if (btn && btn.disabled) {
             btn.disabled = false;
-            console.warn('[JornadaController] Fallback: Botão ativado após timeout em:', id);
+            console.warn('[JornadaController] Fallback: Botão ativado após timeout em:', id, 'Botão:', btn.id || btn.className);
             window.toast && window.toast('Conteúdo pronto (fallback)! Clique para avançar.');
           }
         }, 10000);
 
         const btns = target.querySelectorAll(
-          '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], [data-action="read-question"], .btn-avancar, .btn, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney, .btn-iniciar'
+          '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], [data-action="read-question"], [data-action="iniciar"], .btn-avancar, .btn, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney, .btn-iniciar'
         );
         console.log('[JornadaController] Botões encontrados:', btns.length, 'em', id);
         btns.forEach(btn => {
@@ -211,6 +231,7 @@
   document.addEventListener('blockCompleted', (e) => {
     const { video } = e.detail;
     if (video && global.JPaperQA) {
+      speechSynthesis.cancel(); // Cancela TTS antes do vídeo
       global.JPaperQA.loadVideo(video);
       console.log('[JornadaController] Carregando vídeo após bloco:', video);
     }
