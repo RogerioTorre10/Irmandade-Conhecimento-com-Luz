@@ -42,44 +42,52 @@
     global.__typingLock = false;
   }
 
-  async function typeText(element, text, speed = 40, showCursor = false) {
-    return new Promise(resolve => {
-      if (!element) {
-        console.warn('[TypingBridge] Elemento inválido para typeText');
+async function typeText(element, text, speed = 40, showCursor = false) {
+  return new Promise(resolve => {
+    if (!element) {
+      console.warn('[TypingBridge] Elemento inválido para typeText');
+      return resolve();
+    }
+    if (abortCurrent) abortCurrent();
+    let abort = false;
+    abortCurrent = () => (abort = true);
+
+    // Verificar visibilidade
+    const isVisible = element.offsetParent !== null && window.getComputedStyle(element).display !== 'none';
+    console.log('[TypingBridge] Elemento visível:', isVisible, 'ID:', element.id || element.className);
+    if (!isVisible) {
+      console.warn('[TypingBridge] Elemento não visível, pulando datilografia:', element.id || element.className);
+      return resolve();
+    }
+
+    element.textContent = '';
+    const caret = document.createElement('span');
+    caret.className = 'typing-caret';
+    caret.textContent = '|';
+    if (showCursor) element.appendChild(caret);
+
+    let i = 0;
+    console.log('[TypingBridge] Iniciando datilografia para:', element.id || element.className, 'Texto:', text);
+    const interval = setInterval(() => {
+      if (abort) {
+        clearInterval(interval);
+        if (showCursor) caret.remove();
+        console.log('[TypingBridge] Datilografia abortada para:', element.id || element.className);
         return resolve();
       }
-      if (abortCurrent) abortCurrent();
-      let abort = false;
-      abortCurrent = () => (abort = true);
-
-      element.textContent = '';
-      const caret = document.createElement('span');
-      caret.className = 'typing-caret';
-      caret.textContent = '|';
-      if (showCursor) element.appendChild(caret);
-
-      let i = 0;
-      console.log('[TypingBridge] Iniciando datilografia para:', element.id || element.className, 'Texto:', text); // Novo log
-      const interval = setInterval(() => {
-        if (abort) {
-          clearInterval(interval);
-          if (showCursor) caret.remove();
-          console.log('[TypingBridge] Datilografia abortada para:', element.id || element.className);
-          return resolve();
-        }
-        console.log('[TypingBridge] Datilografando caractere', i + 1, '/', text.length, '- Texto atual:', text.slice(0, i)); // Novo log
-        element.textContent = text.slice(0, i);
-        i++;
-        if (i >= text.length) {
-          clearInterval(interval);
-          if (showCursor) caret.remove();
-          element.classList.add('typing-done');
-          console.log('[TypingBridge] Datilografia concluída para:', element.id || element.className); // Novo log
-          resolve();
-        }
-      }, speed);
-    });
-  }
+      console.log('[TypingBridge] Datilografando caractere', i + 1, '/', text.length, '- Texto atual:', text.slice(0, i));
+      element.textContent = text.slice(0, i);
+      i++;
+      if (i >= text.length) {
+        clearInterval(interval);
+        if (showCursor) caret.remove();
+        element.classList.add('typing-done');
+        console.log('[TypingBridge] Datilografia concluída para:', element.id || element.className);
+        resolve();
+      }
+    }, speed);
+  });
+}
 
   async function playTypingAndSpeak(target, callback, _attempt = 0) {
     if (ACTIVE) {
