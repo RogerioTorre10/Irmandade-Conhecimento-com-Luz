@@ -203,6 +203,14 @@
       let completed = 0;
       const total = elements.length;
 
+      // Timeout para garantir allTypingComplete
+      setTimeout(() => {
+        if (completed < total) {
+          console.warn('[TypingBridge] Timeout: Forçando allTypingComplete para:', target);
+          document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
+        }
+      }, 15000);
+
       for (const el of elements) {
         const texto =
           el.getAttribute('data-text') ||
