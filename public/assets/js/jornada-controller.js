@@ -1,15 +1,24 @@
 (function (global) {
   'use strict';
 
+  if (!global.TypingBridge) {
+    console.error('[JornadaController] Erro: TypingBridge não inicializado');
+    return;
+  }
+
   const JC = {};
   global.JC = JC;
 
   const HIDE_CLASS = 'hidden';
   let sectionOrder = [];
-  let currentIndex = 0;
-  let lastShowSection = 0;
   let currentTermosPage = 'termos-pg1';
   let currentPerguntasBlock = 'bloco-raizes';
+
+  const videoMapping = {
+    'section-filme-jardim': global.JORNADA_VIDEOS?.intro,
+    'section-filme-ao-encontro': global.JORNADA_VIDEOS?.afterBlocks?.[0],
+    'section-filme-entrando': global.JORNADA_VIDEOS?.afterBlocks?.[1]
+  };
 
   JC.setOrder = function (order) {
     sectionOrder = order;
@@ -38,17 +47,19 @@
 
   JC.show = function (id) {
     const now = performance.now();
-    if (now - lastShowSection < 500) {
+    if (now - global.lastShowSection < 500) {
       console.log('[JornadaController] Debounce: evitando chamada repetida para:', id);
       return;
     }
-    lastShowSection = now;
+    global.lastShowSection = now;
 
     try {
+      speechSynthesis.cancel(); // Cancela TTS anterior
       const all = document.querySelectorAll('div[id^="section-"]');
       const target = document.getElementById(id);
       if (!target) {
-        console.warn('[JornadaController] Seção não encontrada:', id);
+        console.error('[JornadaController] Seção não encontrada:', id);
+        document.dispatchEvent(new CustomEvent('sectionError', { detail: { id, error: 'Section not found' } }));
         window.toast && window.toast(`Seção ${id} não encontrada.`);
         return;
       }
@@ -59,11 +70,6 @@
       global.G = global.G || {};
       global.G.__typingLock = false;
 
-      if (id === 'section-termos') {
-        speechSynthesis.cancel();
-        console.log('[JornadaController] TTS cancelado para section-termos');
-      }
-
       setTimeout(() => {
         console.log('[JornadaController] Processando elementos [data-typing] em:', id, 'Página:', currentTermosPage);
         const container = id === 'section-termos' ? target.querySelector(`#${currentTermosPage}`) : id === 'section-perguntas' ? target.querySelector(`#${currentPerguntasBlock}`) : target;
@@ -71,7 +77,9 @@
         console.log('[JornadaController] Elementos [data-typing] encontrados:', textElements.length);
 
         if (textElements.length === 0) {
-          const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : target.querySelector('[data-action="avancar"], [data-action="read-question"], .btn-avancar, .btn');
+          const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : 
+                     id === 'section-perguntas' ? target.querySelector(`#${currentPerguntasBlock} [data-action="avancar"]`) : 
+                     target.querySelector('[data-action="avancar"], [data-action="read-question"], .btn-avancar, .btn');
           if (btn && btn.disabled) {
             btn.disabled = false;
             console.log('[JornadaController] Botão ativado (sem datilografia) em:', id, currentTermosPage || '');
@@ -83,7 +91,6 @@
         const totalTypingElements = textElements.length;
 
         textElements.forEach(el => {
-          console.log('[JornadaController] Verificando visibilidade para elemento:', el.id || el.className);
           const isVisible = el.offsetParent !== null && window.getComputedStyle(el).visibility !== 'hidden' && window.getComputedStyle(el).display !== 'none';
           if (isVisible) {
             console.log('[JornadaController] Chamando runTyping para elemento:', el.id || el.className);
@@ -91,7 +98,9 @@
               typingCompleted++;
               console.log('[JornadaController] Datilografia concluída para elemento:', el.id || el.className, '- Progresso:', typingCompleted + '/' + totalTypingElements);
               
-              const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : target.querySelector('[data-action="avancar"], [data-action="read-question"], .btn-avancar, .btn');
+              const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : 
+                         id === 'section-perguntas' ? target.querySelector(`#${currentPerguntasBlock} [data-action="avancar"]`) : 
+                         target.querySelector('[data-action="avancar"], [data-action="read-question"], .btn-avancar, .btn');
               if (btn && btn.disabled) {
                 btn.disabled = false;
                 console.log('[JornadaController] Botão ativado após datilografia em:', id, currentTermosPage || '', 'Elemento:', el.id || el.className);
@@ -109,6 +118,11 @@
             console.warn('[JornadaController] Elemento não visível, pulando datilografia:', el.id || el.className);
           }
         });
+
+        if (videoMapping[id] && global.JPaperQA) {
+          global.JPaperQA.loadVideo(videoMapping[id]);
+          console.log('[JornadaController] Carregando vídeo para seção:', id, 'Vídeo:', videoMapping[id]);
+        }
 
         const btns = target.querySelectorAll(
           '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], [data-action="read-question"], .btn-avancar, .btn, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney'
@@ -134,10 +148,10 @@
                   JC.show(id);
                 } else if (btn.dataset.action === 'avancar' && currentTermosPage === 'termos-pg2') {
                   console.log('[JornadaController] Avançando de section-termos para a próxima seção');
-                  if (JC.goNext) JC.goNext();
+                  JC.goNext();
                 }
               } else if (id === 'section-perguntas') {
-                const blocks = ['bloco-raizes', 'bloco-reflexoes', 'bloco-crescimento', 'bloco-integracao', 'bloco-sintese'];
+                const blocks = global.JORNADA_BLOCKS ? global.JORNADA_BLOCKS.map(b => b.id) : ['bloco-raizes', 'bloco-reflexoes', 'bloco-crescimento', 'bloco-integracao', 'bloco-sintese'];
                 const currentBlockIdx = blocks.indexOf(currentPerguntasBlock);
                 if (currentBlockIdx < blocks.length - 1) {
                   console.log('[JornadaController] Navegando para próximo bloco de perguntas:', blocks[currentBlockIdx + 1]);
@@ -147,10 +161,10 @@
                   JC.show(id);
                 } else {
                   console.log('[JornadaController] Avançando de section-perguntas para a próxima seção');
-                  if (JC.goNext) JC.goNext();
+                  JC.goNext();
                 }
               } else {
-                if (JC.goNext) JC.goNext();
+                JC.goNext();
               }
             }, { once: true });
             btn.dataset.clickAttached = '1';
@@ -160,6 +174,7 @@
       }, 100);
     } catch (e) {
       console.error('[JornadaController] Erro:', e);
+      document.dispatchEvent(new CustomEvent('sectionError', { detail: { id, error: e.message } }));
       window.toast && window.toast('Erro ao exibir seção');
     }
   };
@@ -183,6 +198,19 @@
     console.log('[JornadaController] Inicializando com seção:', initial);
     JC.show(initial);
   }
+
+  document.addEventListener('blockCompleted', (e) => {
+    const { video } = e.detail;
+    if (video && global.JPaperQA) {
+      global.JPaperQA.loadVideo(video);
+      console.log('[JornadaController] Carregando vídeo após bloco:', video);
+    }
+  });
+
+  document.addEventListener('videoEnded', () => {
+    console.log('[JornadaController] Vídeo finalizado, avançando para próxima seção');
+    JC.goNext();
+  });
 
   Promise.resolve().finally(() => {
     if (!global.__ControllerEventsBound) {
