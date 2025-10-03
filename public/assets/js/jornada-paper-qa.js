@@ -148,6 +148,18 @@
   let JORNADA_BLOCKS = [];
   global.JORNADA_BLOCKS = global.JORNADA_BLOCKS || [];
 
+  function pauseAllVideos() {
+    const videos = document.querySelectorAll('video');
+    videos.forEach(video => {
+      video.pause();
+      video.src = '';
+      video.load();
+    });
+    const videoOverlay = document.querySelector('#videoOverlay');
+    if (videoOverlay) videoOverlay.classList.add('hidden');
+    console.log('[JORNADA_PAPER] Todos os vídeos pausados');
+  }
+
   function elCanvas() {
     return document.getElementById(CFG.CANVAS_ID);
   }
@@ -215,17 +227,20 @@
     }
     const blocoIdx = parseInt(bloco.dataset.bloco);
     if (JORNADA_BLOCKS[blocoIdx]?.video_after) {
-      speechSynthesis.cancel(); // Cancela TTS antes do vídeo
-      document.dispatchEvent(new CustomEvent('blockCompleted', { 
-        detail: { 
-          blocoId: JORNADA_BLOCKS[blocoIdx].id, 
-          video: JORNADA_BLOCKS[blocoIdx].video_after 
-        } 
-      }));
+      speechSynthesis.cancel();
+      setTimeout(() => {
+        document.dispatchEvent(new CustomEvent('blockCompleted', { 
+          detail: { 
+            blocoId: JORNADA_BLOCKS[blocoIdx].id, 
+            video: JORNADA_BLOCKS[blocoIdx].video_after 
+          } 
+        }));
+      }, 500);
     }
   }
 
   function loadVideo(videoSrc) {
+    pauseAllVideos(); // Pausa todos os vídeos antes de carregar
     const video = document.querySelector('#videoTransicao');
     const videoOverlay = document.querySelector('#videoOverlay');
     if (!video || !videoOverlay) {
@@ -233,11 +248,6 @@
       window.toast && window.toast('Erro ao carregar vídeo');
       return;
     }
-    // Pausa e limpa vídeo anterior
-    video.pause();
-    video.src = '';
-    videoOverlay.classList.add('hidden');
-    
     fetch(videoSrc, { method: 'HEAD' })
       .then(res => {
         if (!res.ok) throw new Error(`Vídeo não encontrado: ${videoSrc}`);
@@ -344,7 +354,7 @@
           log('Iniciando typeQuestionsSequentially para bloco', JC.currentBloco);
           typeQuestionsSequentially(currentBloco);
           window.toast && window.toast('Perguntas prontas! Responda e clique para avançar.');
-        }, 300);
+        }, 500);
       }
     }
 
@@ -360,7 +370,7 @@
       const key = pergunta.dataset.i18n;
       const text = i18n.t(key, pergunta.textContent);
       if ('speechSynthesis' in global && window.JORNADA?.tts?.enabled && !window.isMuted) {
-        speechSynthesis.cancel(); // Cancela TTS anterior
+        speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = i18n.lang || 'pt-BR';
         utterance.rate = 1.03;
@@ -405,12 +415,7 @@
     if (skipVideoButton) {
       skipVideoButton.addEventListener('click', () => {
         log('Vídeo pulado');
-        const video = document.querySelector('#videoTransicao');
-        if (video) {
-          video.pause();
-          video.src = '';
-          document.querySelector('#videoOverlay')?.classList.add('hidden');
-        }
+        pauseAllVideos();
         document.dispatchEvent(new CustomEvent('videoSkipped'));
         document.dispatchEvent(new CustomEvent('videoEnded'));
       });
