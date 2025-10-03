@@ -8,6 +8,7 @@
   let sectionOrder = [];
   let currentIndex = 0;
   let lastShowSection = 0;
+  let currentTermosPage = 'termos-pg1';
 
   JC.setOrder = function (order) {
     sectionOrder = order;
@@ -57,17 +58,22 @@
       global.G = global.G || {};
       global.G.__typingLock = false;
 
+      if (id === 'section-termos') {
+        speechSynthesis.cancel();
+        console.log('[JornadaController] TTS cancelado para section-termos');
+      }
+
       setTimeout(() => {
-        console.log('[JornadaController] Processando elementos [data-typing] em:', id);
-        const textElements = target.querySelectorAll('[data-typing="true"]:not(.hidden)');
+        console.log('[JornadaController] Processando elementos [data-typing] em:', id, 'Página:', currentTermosPage);
+        const container = id === 'section-termos' ? target.querySelector(`#${currentTermosPage}`) : target;
+        const textElements = container.querySelectorAll('[data-typing="true"]:not(.hidden)');
         console.log('[JornadaController] Elementos [data-typing] encontrados:', textElements.length);
 
         if (textElements.length === 0 && id === 'section-termos') {
-          // Ativar botão mesmo sem datilografia
-          const termosBtn = target.querySelector('[data-action="termos-next"]');
+          const termosBtn = target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`);
           if (termosBtn && termosBtn.disabled) {
             termosBtn.disabled = false;
-            console.log('[JornadaController] Botão "Próxima página" ativado (sem datilografia) em section-termos');
+            console.log('[JornadaController] Botão ativado (sem datilografia) em:', currentTermosPage);
             window.toast && window.toast('Termos prontos! Clique para avançar.');
           }
         }
@@ -82,13 +88,20 @@
               typingCompleted++;
               console.log('[JornadaController] Datilografia concluída para elemento:', el.id || el.className, '- Progresso:', typingCompleted + '/' + totalTypingElements);
               
-              // Ativar botão após datilografia completa
-              if (typingCompleted === totalTypingElements) {
-                const termosBtn = target.querySelector('[data-action="termos-next"]');
+              // Ativar botões após qualquer elemento completar (para evitar travamento)
+              if (id === 'section-termos') {
+                const termosBtn = target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`);
                 if (termosBtn && termosBtn.disabled) {
                   termosBtn.disabled = false;
-                  console.log('[JornadaController] Botão "Próxima página" ativado após datilografia em:', id);
+                  console.log('[JornadaController] Botão ativado após datilografia em:', currentTermosPage, 'Elemento:', el.id || el.className);
                   window.toast && window.toast('Termos lidos! Clique para avançar.');
+                }
+                if (currentTermosPage === 'termos-pg2') {
+                  const prevBtn = target.querySelector('#btn-termos-prev');
+                  if (prevBtn && prevBtn.disabled) {
+                    prevBtn.disabled = false;
+                    console.log('[JornadaController] Botão "Voltar" ativado em termos-pg2');
+                  }
                 }
               }
             });
@@ -96,7 +109,7 @@
         });
 
         const btns = target.querySelectorAll(
-          '[data-action="avancar"], [data-action="termos-next"], .btn-avancar, .btn, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney'
+          '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], .btn-avancar, .btn, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney'
         );
         console.log('[JornadaController] Botões encontrados:', btns.length);
         btns.forEach(btn => {
@@ -104,7 +117,26 @@
             btn.addEventListener('click', (e) => {
               e.preventDefault();
               console.log('[JornadaController] Botão clicado em:', id, 'Botão:', btn.id || btn.className || btn.dataset.action);
-              if (JC.goNext) JC.goNext();
+              if (id === 'section-termos') {
+                if (btn.dataset.action === 'termos-next' && currentTermosPage === 'termos-pg1') {
+                  console.log('[JornadaController] Navegando de termos-pg1 para termos-pg2');
+                  document.getElementById('termos-pg1').classList.add(HIDE_CLASS);
+                  document.getElementById('termos-pg2').classList.remove(HIDE_CLASS);
+                  currentTermosPage = 'termos-pg2';
+                  JC.show(id);
+                } else if (btn.dataset.action === 'termos-prev' && currentTermosPage === 'termos-pg2') {
+                  console.log('[JornadaController] Navegando de termos-pg2 para termos-pg1');
+                  document.getElementById('termos-pg2').classList.add(HIDE_CLASS);
+                  document.getElementById('termos-pg1').classList.remove(HIDE_CLASS);
+                  currentTermosPage = 'termos-pg1';
+                  JC.show(id);
+                } else if (btn.dataset.action === 'avancar' && currentTermosPage === 'termos-pg2') {
+                  console.log('[JornadaController] Avançando de section-termos para a próxima seção');
+                  if (JC.goNext) JC.goNext();
+                }
+              } else {
+                if (JC.goNext) JC.goNext();
+              }
             }, { once: true });
             btn.dataset.clickAttached = '1';
             console.log('[JornadaController] Evento de clique adicionado ao botão em:', id, 'Botão:', btn.id || btn.className || btn.dataset.action);
