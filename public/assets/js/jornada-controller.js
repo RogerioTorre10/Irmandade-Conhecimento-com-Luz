@@ -46,6 +46,9 @@
     if (idx >= 0 && idx < sectionOrder.length - 1) {
       const nextId = sectionOrder[idx + 1];
       console.log('[JornadaController] goNext: Avançando de', currentId, 'para', nextId);
+      if (currentId === 'section-termos') {
+        currentTermosPage = 'termos-pg1'; // Reseta ao sair de section-termos
+      }
       JC.show(nextId);
     } else {
       console.log('[JornadaController] goNext: Fim da jornada ou índice inválido:', idx);
@@ -57,6 +60,9 @@
     const idx = sectionOrder.indexOf(currentId);
     if (idx > 0) {
       const prevId = sectionOrder[idx - 1];
+      if (currentId === 'section-termos') {
+        currentTermosPage = 'termos-pg1';
+      }
       JC.show(prevId);
     }
   };
@@ -108,9 +114,9 @@
           console.log('[JornadaController] Nenhum elemento com data-typing, ativando botão imediatamente');
           let btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : 
                    id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) : 
-                   target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn');
-          if (id === 'section-intro' && !btn) {
-            btn = target.querySelector('button') || document.querySelector('#iniciar, [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-iniciar, .start-btn, .next-btn');
+                   target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn-avanca, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn');
+          if (!btn) {
+            btn = target.querySelector('button') || document.querySelector('#iniciar, [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-iniciar, .start-btn, .next-btn, .btn-avancar, .btn-avanca');
             console.warn('[JornadaController] Botão não encontrado pelos seletores padrão, usando fallback:', btn ? (btn.id || btn.className) : 'nenhum botão encontrado');
           }
           if (btn) {
@@ -137,9 +143,9 @@
         const onAllComplete = () => {
           let btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : 
                    id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) : 
-                   target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn');
-          if (id === 'section-intro' && !btn) {
-            btn = target.querySelector('button') || document.querySelector('#iniciar, [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-iniciar, .start-btn, .next-btn');
+                   target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn-avanca, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn');
+          if (!btn) {
+            btn = target.querySelector('button') || document.querySelector('#iniciar, [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-iniciar, .start-btn, .next-btn, .btn-avancar, .btn-avanca');
             console.warn('[JornadaController] Botão não encontrado pelos seletores padrão, usando fallback:', btn ? (btn.id || btn.className) : 'nenhum botão encontrado');
           }
           if (btn) {
@@ -167,26 +173,25 @@
             }
           }
 
-          // Depuração: Listener de clique direto no botão da intro
-          if (id === 'section-intro') {
-            const introBtn = target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn') || target.querySelector('button');
-            if (introBtn) {
-              introBtn.addEventListener('click', () => {
-                console.log('[JornadaController] Clique manual detectado no botão da intro:', introBtn.id || introBtn.className);
-                JC.goNext();
-              }, { once: true });
-            }
+          // Depuração: Listener de clique direto
+          const introBtn = target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn-avanca, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn') || target.querySelector('button');
+          if (introBtn) {
+            introBtn.addEventListener('click', () => {
+              console.log('[JornadaController] Clique manual detectado no botão:', introBtn.id || introBtn.className);
+              JC.goNext();
+            }, { once: true });
           }
 
+          console.log('[JornadaController] Navegação concluída para:', id);
           document.removeEventListener('allTypingComplete', onAllComplete);
         };
         document.addEventListener('allTypingComplete', onAllComplete, { once: true });
 
         // Fallback para ativar botão após 10 segundos
         setTimeout(() => {
-          let btn = target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn');
-          if (id === 'section-intro' && !btn) {
-            btn = target.querySelector('button') || document.querySelector('#iniciar, [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-iniciar, .start-btn, .next-btn');
+          let btn = target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn-avanca, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn');
+          if (!btn) {
+            btn = target.querySelector('button') || document.querySelector('#iniciar, [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-iniciar, .start-btn, .next-btn, .btn-avancar, .btn-avanca');
           }
           if (btn && btn.disabled) {
             btn.disabled = false;
@@ -196,7 +201,7 @@
         }, 10000);
 
         const btns = target.querySelectorAll(
-          '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], [data-action="read-question"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney, .btn-iniciar, .start-btn, .next-btn'
+          '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], [data-action="read-question"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn-avanca, .btn, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney, .btn-iniciar, .start-btn, .next-btn'
         );
         console.log('[JornadaController] Botões encontrados:', btns.length, 'em', id);
         btns.forEach(btn => {
