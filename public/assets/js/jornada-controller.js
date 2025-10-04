@@ -18,7 +18,6 @@
   let currentPerguntasIndex = 0;
 
   const videoMapping = {
-    'section-filme-jardim': global.JORNADA_VIDEOS?.intro,
     'section-filme-ao-encontro': global.JORNADA_VIDEOS?.afterBlocks?.[0],
     'section-filme-entrando': global.JORNADA_VIDEOS?.afterBlocks?.[1],
     'section-final': global.JORNADA_VIDEOS?.final
@@ -42,14 +41,25 @@
 
   JC.goNext = function () {
     const currentId = global.__currentSectionId;
-    const idx = sectionOrder.indexOf(currentId);
+    let idx = sectionOrder.indexOf(currentId);
     if (idx >= 0 && idx < sectionOrder.length - 1) {
-      const nextId = sectionOrder[idx + 1];
-      console.log('[JornadaController] goNext: Avançando de', currentId, 'para', nextId);
-      if (currentId === 'section-termos') {
-        currentTermosPage = 'termos-pg1'; // Reseta ao sair de section-termos
+      let nextId = sectionOrder[idx + 1];
+      // Pular seções inexistentes
+      while (nextId && !document.getElementById(nextId) && idx < sectionOrder.length - 1) {
+        idx++;
+        nextId = sectionOrder[idx + 1];
+        console.warn('[JornadaController] Seção', sectionOrder[idx], 'não encontrada, tentando próxima:', nextId);
       }
-      JC.show(nextId);
+      if (nextId && document.getElementById(nextId)) {
+        console.log('[JornadaController] goNext: Avançando de', currentId, 'para', nextId);
+        if (currentId === 'section-termos') {
+          currentTermosPage = 'termos-pg1';
+        }
+        JC.show(nextId);
+      } else {
+        console.error('[JornadaController] Nenhuma seção válida encontrada após', currentId);
+        window.toast && window.toast('Erro: Nenhuma seção válida encontrada.');
+      }
     } else {
       console.log('[JornadaController] goNext: Fim da jornada ou índice inválido:', idx);
     }
@@ -57,13 +67,23 @@
 
   JC.goPrev = function () {
     const currentId = global.__currentSectionId;
-    const idx = sectionOrder.indexOf(currentId);
+    let idx = sectionOrder.indexOf(currentId);
     if (idx > 0) {
-      const prevId = sectionOrder[idx - 1];
-      if (currentId === 'section-termos') {
-        currentTermosPage = 'termos-pg1';
+      let prevId = sectionOrder[idx - 1];
+      while (prevId && !document.getElementById(prevId) && idx > 0) {
+        idx--;
+        prevId = sectionOrder[idx - 1];
+        console.warn('[JornadaController] Seção', sectionOrder[idx], 'não encontrada, tentando anterior:', prevId);
       }
-      JC.show(prevId);
+      if (prevId && document.getElementById(prevId)) {
+        if (currentId === 'section-termos') {
+          currentTermosPage = 'termos-pg1';
+        }
+        JC.show(prevId);
+      } else {
+        console.error('[JornadaController] Nenhuma seção válida encontrada antes de', currentId);
+        window.toast && window.toast('Erro: Nenhuma seção válida encontrada.');
+      }
     }
   };
 
@@ -86,6 +106,7 @@
         console.error('[JornadaController] Seção não encontrada:', id);
         document.dispatchEvent(new CustomEvent('sectionError', { detail: { id, error: 'Section not found' } }));
         window.toast && window.toast(`Seção ${id} não encontrada.`);
+        JC.goNext(); // Tenta a próxima seção
         return;
       }
 
@@ -250,6 +271,7 @@
       console.error('[JornadaController] Erro:', e);
       document.dispatchEvent(new CustomEvent('sectionError', { detail: { id, error: e.message } }));
       window.toast && window.toast('Erro ao exibir seção');
+      JC.goNext(); // Tenta a próxima seção em caso de erro
     }
   };
 
@@ -259,7 +281,6 @@
         'section-intro',
         'section-termos',
         'section-senha',
-        'section-filme-jardim',
         'section-escolha-guia',
         'section-filme-ao-encontro',
         'section-selfie',
