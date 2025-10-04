@@ -686,146 +686,83 @@
       if (guideNameSlot) {
         guideNameSlot.textContent = guia.charAt(0).toUpperCase() + guia.slice(1);
       }
-      if (window.JC) {
-        document.addEventListener('allTypingComplete', () => {
-          speechSynthesis.cancel();
-          const videos = document.querySelectorAll('video');
-          videos.forEach(video => {
-            video.pause();
-            video.src = '';
-            video.load();
-          });
-          window.JC.goNext();
-          console.log('[Guia] Navegação para próxima seção após digitação');
-        }, { once: true });
-      } else {
-        console.error('[Guia] window.JC não definido');
-        window.toast && window.toast('Erro ao navegar para próxima seção.');
+      const avancarBtn = document.querySelector('#section-guia [data-action="avancar"]');
+      if (avancarBtn) {
+        avancarBtn.disabled = false;
+        console.log('[Guia] Botão de avançar ativado após seleção do guia');
+        window.toast && window.toast('Guia selecionado! Clique em Avançar para continuar.');
+      }
+      // Carrega vídeo após seleção do guia
+      if (global.JPaperQA) {
+        speechSynthesis.cancel();
+        setTimeout(() => {
+          global.JPaperQA.loadVideo('/assets/img/conhecimento-com-luz-jardim.mp4');
+          console.log('[Guia] Reproduzindo vídeo conhecimento-com-luz-jardim após seleção do guia');
+        }, 500);
       }
     }
   });
-  console.log('[Guia] Bloco carregado');
-})();
-</script>
 
-  <!-- Selfie -->
-<script>
-(function() {
-  let lastPreview = 0;
-  let lastCapture = 0;
-
-  document.addEventListener('change', (e) => {
-    const input = e.target.closest('#selfieInput');
-    if (input && input.files && input.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const img = document.getElementById('selfieImage');
-        if (img) {
-          img.setAttribute('href', ev.target.result);
-          document.querySelector('.flame-layer').style.opacity = '1';
-          console.log('[Selfie] Imagem carregada');
-        }
-      };
-      reader.readAsDataURL(input.files[0]);
-    }
-  });
-
-  document.addEventListener('input', (e) => {
-    const input = e.target.closest('#nameInput, #selfieScale, #selfieOffsetX, #selfieOffsetY');
-    if (input) {
-      const img = document.getElementById('selfieImage');
-      const nameSlot = document.getElementById('userNameSlot');
-      if (!img || !nameSlot) return;
-
-      if (input.id === 'nameInput') {
-        nameSlot.textContent = input.value || 'NOME';
-      } else {
-        const scale = document.getElementById('selfieScale')?.value || 1;
-        const offsetX = document.getElementById('selfieOffsetX')?.value || 0;
-        const offsetY = document.getElementById('selfieOffsetY')?.value || 0;
-        img.style.transform = `scale(${scale}) translate(${offsetX}px, ${offsetY}px)`;
+  // Processar datilografia e TTS para #section-guia
+  document.addEventListener('sectionLoaded', (e) => {
+    if (e.detail.sectionId === 'section-guia') {
+      const container = document.getElementById('section-guia');
+      if (!container) {
+        console.error('[Guia] Container #section-guia não encontrado');
+        window.toast && window.toast('Erro: Seção de guias não encontrada.');
+        return;
       }
-      console.log('[Selfie] Ajustes aplicados');
+      if (global.i18n && global.i18n.ready) {
+        global.i18n.apply(container);
+        console.log('[Guia] Traduções i18n aplicadas a #section-guia');
+      }
+      if (global.runTyping) {
+        global.runTyping(container, () => {
+          console.log('[Guia] Datilografia e TTS concluídos para #section-guia');
+          const nameInput = document.getElementById('guiaNameInput');
+          if (nameInput) {
+            const placeholderText = global.i18n ? global.i18n.t('guia_name_placeholder', nameInput.placeholder) : nameInput.placeholder;
+            global.TypingBridge.typePlaceholder(nameInput, placeholderText, 22);
+          }
+        });
+      }
     }
   });
 
+  // Listener para o botão de avançar
   document.addEventListener('click', (e) => {
-    const btn = e.target.closest('#previewBtn, #captureBtn, #btnSkipSelfie, #btnStartJourney');
-    if (btn) {
+    const btn = e.target.closest('#section-guia [data-action="avancar"]');
+    if (btn && !btn.disabled) {
       e.preventDefault();
-      const now = performance.now();
-      if (btn.id === 'previewBtn') {
-        if (now - lastPreview < 1000) return;
-        lastPreview = now;
-        const img = document.getElementById('selfieImage');
-        if (img && img.getAttribute('href')) {
-          document.querySelector('.flame-layer').style.opacity = '1';
-          window.toast && window.toast('Pré-visualização atualizada!');
-          console.log('[Selfie] Pré-visualização atualizada');
-        } else {
-          window.toast && window.toast('Selecione uma imagem primeiro.');
-          console.log('[Selfie] Nenhuma imagem selecionada para pré-visualização');
-        }
-      } else if (btn.id === 'captureBtn') {
-        if (now - lastCapture < 1000) return;
-        lastCapture = now;
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        const img = document.getElementById('selfieImage');
-        const bg = document.getElementById('guideBg');
-        const nameSlot = document.getElementById('userNameSlot');
-        const guideNameSlot = document.getElementById('guideNameSlot');
-        if (!img || !bg || !nameSlot || !guideNameSlot) {
-          window.toast && window.toast('Erro ao capturar imagem.');
-          console.log('[Selfie] Elementos de imagem, fundo ou nomes não encontrados');
-          return;
-        }
-        canvas.width = bg.width;
-        canvas.height = bg.height;
-        ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
-        const scale = document.getElementById('selfieScale')?.value || 1;
-        const offsetX = document.getElementById('selfieOffsetX')?.value || 0;
-        const offsetY = document.getElementById('selfieOffsetY')?.value || 0;
-        ctx.save();
-        ctx.translate(15 + parseFloat(offsetX), 35 + parseFloat(offsetY));
-        ctx.scale(scale, scale);
-        ctx.drawImage(img, 0, 0, 70, 90);
-        ctx.restore();
-        ctx.font = 'bold 2.5rem Cardo, serif';
-        ctx.fillStyle = '#f7d37a';
-        ctx.textAlign = 'center';
-        ctx.fillText(guideNameSlot.textContent, canvas.width / 2, canvas.height * 0.02 + 30);
-        ctx.font = 'bold 2rem Cardo, serif';
-        ctx.fillText(nameSlot.textContent, canvas.width / 2, canvas.height * 0.98 - 10);
-        const link = document.createElement('a');
-        link.download = 'selfie-irmandade.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        console.log('[Selfie] Imagem baixada');
-        try {
-          localStorage.setItem('JORNADA_SELFIE', link.href);
-        } catch (_) {}
-      } else if (btn.id === 'btnSkipSelfie' || btn.id === 'btnStartJourney') {
-        if (window.JC) {
-          document.addEventListener('allTypingComplete', () => {
-            speechSynthesis.cancel();
-            const videos = document.querySelectorAll('video');
-            videos.forEach(video => {
-              video.pause();
-              video.src = '';
-              video.load();
-            });
-            window.JC.goNext();
-            console.log('[Selfie] Navegação para próxima seção após digitação');
-          }, { once: true });
-        } else {
-          console.error('[Selfie] window.JC não definido');
-          window.toast && window.toast('Erro ao navegar para próxima seção.');
-        }
+      if (window.JORNADA.selectedGuia) {
+        speechSynthesis.cancel();
+        const videos = document.querySelectorAll('video');
+        videos.forEach(video => {
+          video.pause();
+          video.src = '';
+          video.load();
+        });
+        window.JC.goNext();
+        console.log('[Guia] Navegação para próxima seção após seleção do guia');
+      } else {
+        window.toast && window.toast('Por favor, selecione um guia antes de avançar.');
       }
     }
   });
-  console.log('[Selfie] Bloco carregado');
+
+  // Listener para vídeo finalizado
+  document.addEventListener('videoEnded', (e) => {
+    if (e.detail.videoSrc === '/assets/img/conhecimento-com-luz-jardim.mp4') {
+      const avancarBtn = document.querySelector('#section-guia [data-action="avancar"]');
+      if (avancarBtn && window.JORNADA.selectedGuia) {
+        avancarBtn.disabled = false;
+        console.log('[Guia] Botão de avançar ativado após vídeo');
+        window.toast && window.toast('Vídeo concluído! Clique em Avançar para continuar.');
+      }
+    }
+  });
+
+  console.log('[Guia] Bloco carregado');
 })();
 </script>
   
