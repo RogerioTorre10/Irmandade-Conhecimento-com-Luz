@@ -536,7 +536,7 @@
 </script>
 
  <!-- Senha -->
-  <script>
+ <script>
 (function() {
   const log = (...a) => { try { console.log('[Senha v4]', ...a); } catch (_) {} };
   const VALID_PASSWORD = 'luz123';
@@ -614,6 +614,13 @@
 
     if (window.JC) {
       document.addEventListener('allTypingComplete', () => {
+        speechSynthesis.cancel();
+        const videos = document.querySelectorAll('video');
+        videos.forEach(video => {
+          video.pause();
+          video.src = '';
+          video.load();
+        });
         window.JC.show('section-escolha-guia');
         log('[startJourney] Navegação para section-escolha-guia após digitação');
       }, { once: true });
@@ -627,7 +634,7 @@
 </script>
 
   <!-- Guia Seleção -->
- <script>
+<script>
 (function() {
   window.JORNADA = window.JORNADA || {};
   window.JORNADA.selectedGuia = window.JORNADA.selectedGuia || null;
@@ -649,9 +656,18 @@
       }
       if (window.JC && window.JPaperQA) {
         document.addEventListener('allTypingComplete', () => {
+          speechSynthesis.cancel();
+          const videos = document.querySelectorAll('video');
+          videos.forEach(video => {
+            video.pause();
+            video.src = '';
+            video.load();
+          });
           window.JC.show('section-selfie');
-          window.JPaperQA.loadVideo('/assets/img/conhecimento-com-luz-jardim.mp4');
-          console.log('[Guia] Reproduzindo vídeo conhecimento-com-luz-jardim após digitação');
+          setTimeout(() => {
+            window.JPaperQA.loadVideo('/assets/img/conhecimento-com-luz-jardim.mp4');
+            console.log('[Guia] Reproduzindo vídeo conhecimento-com-luz-jardim após digitação');
+          }, 500);
         }, { once: true });
       } else {
         console.error('[Guia] window.JC ou JPaperQA não definido');
@@ -661,10 +677,10 @@
   });
   console.log('[Guia] Bloco carregado');
 })();
-</script>
+</script>>
 
   <!-- Selfie -->
-  <script>
+ <script>
 (function() {
   let lastPreview = 0;
   let lastCapture = 0;
@@ -763,9 +779,18 @@
       } else if (btn.id === 'btnSkipSelfie' || btn.id === 'btnStartJourney') {
         if (window.JC && window.JPaperQA) {
           document.addEventListener('allTypingComplete', () => {
+            speechSynthesis.cancel();
+            const videos = document.querySelectorAll('video');
+            videos.forEach(video => {
+              video.pause();
+              video.src = '';
+              video.load();
+            });
             window.JC.show('section-perguntas');
-            window.JPaperQA.loadVideo('/assets/img/conhecimento-com-luz-jardim.mp4');
-            console.log('[Selfie] Reproduzindo vídeo conhecimento-com-luz-jardim após digitação');
+            setTimeout(() => {
+              window.JPaperQA.loadVideo('/assets/img/conhecimento-com-luz-jardim.mp4');
+              console.log('[Selfie] Reproduzindo vídeo conhecimento-com-luz-jardim após digitação');
+            }, 500);
           }, { once: true });
         } else {
           console.error('[Selfie] window.JC ou JPaperQA não definido');
