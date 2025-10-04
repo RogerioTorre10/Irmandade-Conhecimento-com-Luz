@@ -135,6 +135,31 @@
     });
   }
 
+  async function speakText(text, lang = 'pt-BR') {
+    return new Promise((resolve) => {
+      if (!('speechSynthesis' in window) || !text || !window.JORNADA?.tts?.enabled || window.isMuted) {
+        console.warn('[TypingBridge] TTS desativado ou não suportado:', { speechSynthesis: 'speechSynthesis' in window, text, ttsEnabled: window.JORNADA?.tts?.enabled, isMuted: window.isMuted });
+        return resolve();
+      }
+      speechSynthesis.cancel();
+      const utt = new SpeechSynthesisUtterance(text.trim());
+      utt.lang = lang;
+      utt.rate = 1.03;
+      utt.pitch = 1.0;
+      utt.volume = 1;
+      utt.onend = () => {
+        typingLog('TTS concluído para texto:', text);
+        resolve();
+      };
+      utt.onerror = (error) => {
+        console.error('[TypingBridge] Erro na leitura:', error);
+        resolve(); // Continua mesmo com erro
+      };
+      speechSynthesis.speak(utt);
+      typingLog('TTS iniciado para texto:', text);
+    });
+  }
+
   async function playTypingAndSpeak(target, callback, _attempt = 0) {
     if (ACTIVE) {
       typingLog('Já em execução, ignorando');
@@ -212,6 +237,11 @@
       }, 10000);
 
       for (const el of elements) {
+        const isVisible = el.offsetParent !== null && 
+          window.getComputedStyle(el).visibility !== 'hidden' && 
+          window.getComputedStyle(el).display !== 'none';
+        typingLog('Verificando visibilidade do elemento:', el.id || el.className, 'Visível:', isVisible);
+
         const texto =
           el.getAttribute('data-text') ||
           i18n.t(el.getAttribute('data-i18n-key') || el.getAttribute('data-i18n') || 'welcome', { ns: 'common' }) ||
@@ -221,7 +251,7 @@
         const velocidade = parseInt(el.getAttribute('data-speed')) || 40;
         const mostrarCursor = el.getAttribute('data-cursor') === 'true';
 
-        if (!texto || !el.offsetParent) {
+        if (!texto || !isVisible) {
           console.warn('[TypingBridge] Elemento sem texto ou invisível, pulando:', el.id || el.className);
           completed++;
           if (completed === total) {
@@ -232,29 +262,11 @@
         }
 
         await typeText(el, texto, velocidade, mostrarCursor);
+        await speakText(texto, i18n.lang || 'pt-BR');
         completed++;
         if (completed === total) {
           document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
           typingLog('Todos os elementos datilografados para:', target);
-        }
-
-        if ('speechSynthesis' in window && texto && window.JORNADA?.tts?.enabled && !window.isMuted) {
-          try {
-            speechSynthesis.cancel();
-            const utt = new SpeechSynthesisUtterance(texto.trim());
-            utt.lang = i18n.lang || 'pt-BR';
-            utt.rate = 1.03;
-            utt.pitch = 1.0;
-            utt.volume = 1;
-            utt.onerror = (error) => {
-              console.error('[TypingBridge] Erro na leitura:', error);
-              // Continua mesmo com erro no TTS
-            };
-            speechSynthesis.speak(utt);
-            typingLog('TTS iniciado para:', target);
-          } catch (e) {
-            console.warn('[TypingBridge] Falha ao iniciar TTS:', e);
-          }
         }
       }
 
@@ -272,7 +284,8 @@
   const TypingBridge = { 
     play: playTypingAndSpeak,
     typeText,
-    typePlaceholder
+    typePlaceholder,
+    speakText
   };
   global.TypingBridge = TypingBridge;
   global.runTyping = playTypingAndSpeak;
