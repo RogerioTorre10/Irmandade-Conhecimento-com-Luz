@@ -1,9 +1,12 @@
 (function (global) {
   'use strict';
 
-  if (!global.TypingBridge || !global.JPaperQA) {
-    console.error('[JornadaController] Erro: TypingBridge ou JPaperQA não inicializado');
-    return;
+  // Inicializa mesmo sem todas as dependências
+  if (!global.TypingBridge) {
+    console.warn('[JornadaController] TypingBridge não inicializado, prosseguindo com limitações');
+  }
+  if (!global.JPaperQA) {
+    console.warn('[JornadaController] JPaperQA não inicializado, prosseguindo com limitações');
   }
 
   const JC = {};
@@ -91,7 +94,7 @@
         let container;
         if (id === 'section-termos') {
           container = target.querySelector(`#${currentTermosPage}`);
-        } else if (id === 'section-perguntas') {
+        } else if (id === 'section-perguntas' && global.JPaperQA) {
           global.JPaperQA.renderQuestions();
           container = target.querySelector('#jornada-conteudo');
         } else {
@@ -103,34 +106,49 @@
 
         if (textElements.length === 0) {
           console.log('[JornadaController] Nenhum elemento com data-typing, ativando botão imediatamente');
-          const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : 
-                     id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) : 
-                     target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], .btn-avancar, .btn, #iniciar, .btn-iniciar, .start-btn');
+          let btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : 
+                   id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) : 
+                   target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn');
+          if (id === 'section-intro' && !btn) {
+            btn = target.querySelector('button') || document.querySelector('#iniciar, [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-iniciar, .start-btn, .next-btn');
+            console.warn('[JornadaController] Botão não encontrado pelos seletores padrão, usando fallback:', btn ? (btn.id || btn.className) : 'nenhum botão encontrado');
+          }
           if (btn) {
             btn.disabled = false;
             console.log('[JornadaController] Botão ativado imediatamente em:', id, 'Botão:', btn.id || btn.className);
             window.toast && window.toast('Conteúdo pronto! Clique para avançar.');
           } else {
-            console.warn('[JornadaController] Botão de avançar não encontrado em:', id);
+            console.error('[JornadaController] Botão de avançar não encontrado em:', id);
+            window.toast && window.toast('Botão de avançar não encontrado!');
           }
           document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target: id } }));
           return;
         }
 
-        global.runTyping(container, () => {
-          console.log('[JornadaController] Datilografia sequencial concluída para container:', id);
-        });
+        if (global.runTyping) {
+          global.runTyping(container, () => {
+            console.log('[JornadaController] Datilografia sequencial concluída para container:', id);
+          });
+        } else {
+          console.warn('[JornadaController] runTyping não disponível, pulando datilografia');
+          document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target: id } }));
+        }
 
         const onAllComplete = () => {
-          const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : 
-                     id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) : 
-                     target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], .btn-avancar, .btn, #iniciar, .btn-iniciar, .start-btn');
+          let btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : 
+                   id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) : 
+                   target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn');
+          if (id === 'section-intro' && !btn) {
+            btn = target.querySelector('button') || document.querySelector('#iniciar, [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-iniciar, .start-btn, .next-btn');
+            console.warn('[JornadaController] Botão não encontrado pelos seletores padrão, usando fallback:', btn ? (btn.id || btn.className) : 'nenhum botão encontrado');
+          }
           if (btn) {
             btn.disabled = false;
             console.log('[JornadaController] Botão ativado após toda datilografia em:', id, 'Botão:', btn.id || btn.className);
             window.toast && window.toast('Conteúdo pronto! Clique para avançar.');
           } else {
-            console.warn('[JornadaController] Botão de avançar não encontrado em:', id);
+            console.error('[JornadaController] Botão de avançar não encontrado em:', id);
+            window.toast && window.toast('Botão de avançar não encontrado!');
           }
 
           if (videoMapping[id] && global.JPaperQA) {
@@ -138,7 +156,7 @@
             setTimeout(() => {
               global.JPaperQA.loadVideo(videoMapping[id]);
               console.log('[JornadaController] Carregando vídeo após datilografia para seção:', id, 'Vídeo:', videoMapping[id]);
-            }, 500); // Atraso para garantir que TTS termine
+            }, 500);
           }
 
           if (id === 'section-termos' && currentTermosPage === 'termos-pg2') {
@@ -151,7 +169,7 @@
 
           // Depuração: Listener de clique direto no botão da intro
           if (id === 'section-intro') {
-            const introBtn = target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], .btn-avancar, .btn, #iniciar, .btn-iniciar, .start-btn');
+            const introBtn = target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn') || target.querySelector('button');
             if (introBtn) {
               introBtn.addEventListener('click', () => {
                 console.log('[JornadaController] Clique manual detectado no botão da intro:', introBtn.id || introBtn.className);
@@ -166,7 +184,10 @@
 
         // Fallback para ativar botão após 10 segundos
         setTimeout(() => {
-          const btn = target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], .btn-avancar, .btn, #iniciar, .btn-iniciar, .start-btn');
+          let btn = target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn');
+          if (id === 'section-intro' && !btn) {
+            btn = target.querySelector('button') || document.querySelector('#iniciar, [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-iniciar, .start-btn, .next-btn');
+          }
           if (btn && btn.disabled) {
             btn.disabled = false;
             console.warn('[JornadaController] Fallback: Botão ativado após timeout em:', id, 'Botão:', btn.id || btn.className);
@@ -175,7 +196,7 @@
         }, 10000);
 
         const btns = target.querySelectorAll(
-          '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], [data-action="read-question"], [data-action="iniciar"], [data-action="start"], .btn-avancar, .btn, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney, .btn-iniciar, .start-btn'
+          '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], [data-action="read-question"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn, #iniciar, [data-action="skip-selfie"], [data-action="select-guia"], #btnSkipSelfie, #btnStartJourney, .btn-iniciar, .start-btn, .next-btn'
         );
         console.log('[JornadaController] Botões encontrados:', btns.length, 'em', id);
         btns.forEach(btn => {
@@ -204,7 +225,7 @@
                 const totalBlocos = global.JORNADA_BLOCKS ? global.JORNADA_BLOCKS.length : 5;
                 if (currentPerguntasIndex < totalBlocos - 1) {
                   currentPerguntasIndex++;
-                  global.JPaperQA.renderQuestions();
+                  global.JPaperQA && global.JPaperQA.renderQuestions();
                   console.log('[JornadaController] Navegando para próximo bloco de perguntas:', currentPerguntasIndex);
                   JC.show(id);
                 } else {
