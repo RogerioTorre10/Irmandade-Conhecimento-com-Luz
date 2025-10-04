@@ -138,25 +138,64 @@
   async function speakText(text, lang = 'pt-BR') {
     return new Promise((resolve) => {
       if (!('speechSynthesis' in window) || !text || !window.JORNADA?.tts?.enabled || window.isMuted) {
-        console.warn('[TypingBridge] TTS desativado ou não suportado:', { speechSynthesis: 'speechSynthesis' in window, text, ttsEnabled: window.JORNADA?.tts?.enabled, isMuted: window.isMuted });
+        console.warn('[TypingBridge] TTS desativado ou não suportado:', { 
+          speechSynthesis: 'speechSynthesis' in window, 
+          text, 
+          ttsEnabled: window.JORNADA?.tts?.enabled, 
+          isMuted: window.isMuted 
+        });
         return resolve();
       }
-      speechSynthesis.cancel();
-      const utt = new SpeechSynthesisUtterance(text.trim());
-      utt.lang = lang;
-      utt.rate = 1.03;
-      utt.pitch = 1.0;
-      utt.volume = 1;
-      utt.onend = () => {
-        typingLog('TTS concluído para texto:', text);
-        resolve();
-      };
-      utt.onerror = (error) => {
-        console.error('[TypingBridge] Erro na leitura:', error);
-        resolve(); // Continua mesmo com erro
-      };
-      speechSynthesis.speak(utt);
-      typingLog('TTS iniciado para texto:', text);
+
+      // Aguarda até que a fala atual termine
+      if (speechSynthesis.speaking || speechSynthesis.pending) {
+        typingLog('TTS em andamento, aguardando conclusão...');
+        const waitForTTS = () => new Promise(r => {
+          const check = () => {
+            if (!speechSynthesis.speaking && !speechSynthesis.pending) {
+              r();
+            } else {
+              setTimeout(check, 100);
+            }
+          };
+          check();
+        });
+        waitForTTS().then(() => {
+          speechSynthesis.cancel();
+          const utt = new SpeechSynthesisUtterance(text.trim());
+          utt.lang = lang;
+          utt.rate = 1.03;
+          utt.pitch = 1.0;
+          utt.volume = 1;
+          utt.onend = () => {
+            typingLog('TTS concluído para texto:', text);
+            resolve();
+          };
+          utt.onerror = (error) => {
+            console.error('[TypingBridge] Erro na leitura:', error);
+            resolve(); // Continua mesmo com erro
+          };
+          speechSynthesis.speak(utt);
+          typingLog('TTS iniciado para texto:', text);
+        });
+      } else {
+        speechSynthesis.cancel();
+        const utt = new SpeechSynthesisUtterance(text.trim());
+        utt.lang = lang;
+        utt.rate = 1.03;
+        utt.pitch = 1.0;
+        utt.volume = 1;
+        utt.onend = () => {
+          typingLog('TTS concluído para texto:', text);
+          resolve();
+        };
+        utt.onerror = (error) => {
+          console.error('[TypingBridge] Erro na leitura:', error);
+          resolve(); // Continua mesmo com erro
+        };
+        speechSynthesis.speak(utt);
+        typingLog('TTS iniciado para texto:', text);
+      }
     });
   }
 
@@ -203,6 +242,7 @@
             return;
           } else {
             console.error('[TypingBridge] Nenhum container/elemento encontrado para:', target);
+            window.toast && window.toast(`Erro: Nenhum elemento encontrado para ${target}`);
             document.dispatchEvent(new CustomEvent('typingError', { detail: { target, error: 'No elements found' } }));
             document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
             if (callback) callback();
@@ -218,6 +258,7 @@
 
       if (!elements.length) {
         typingLog('Nenhum elemento com [data-typing] encontrado para:', target || '(seção ativa)');
+        window.toast && window.toast('Nenhum conteúdo para exibir.');
         document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
         if (callback) callback();
         return;
@@ -263,6 +304,7 @@
 
         await typeText(el, texto, velocidade, mostrarCursor);
         await speakText(texto, i18n.lang || 'pt-BR');
+        await new Promise(resolve => setTimeout(resolve, 100)); // Atraso entre parágrafos
         completed++;
         if (completed === total) {
           document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
@@ -273,6 +315,7 @@
       if (callback) callback();
     } catch (e) {
       console.error('[TypingBridge] Erro:', e);
+      window.toast && window.toast('Erro ao processar conteúdo.');
       document.dispatchEvent(new CustomEvent('typingError', { detail: { target, error: e.message } }));
       document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
       if (callback) callback();
