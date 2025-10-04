@@ -621,8 +621,8 @@
           video.src = '';
           video.load();
         });
-        window.JC.show('section-escolha-guia');
-        log('[startJourney] Navegação para section-escolha-guia após digitação');
+        window.JC.goNext(); // Usa goNext para pular seções inexistentes
+        log('[startJourney] Navegação para próxima seção após digitação');
       }, { once: true });
     } else {
       console.error('[startJourney] window.JC não definido');
@@ -663,17 +663,12 @@
             video.src = '';
             video.load();
           });
-          window.JC.show('section-selfie');
-          setTimeout(() => {
-            if (global.JPaperQA) {
-              global.JPaperQA.loadVideo('/assets/img/conhecimento-com-luz-jardim.mp4');
-              console.log('[Guia] Reproduzindo vídeo conhecimento-com-luz-jardim após digitação');
-            }
-          }, 500);
+          window.JC.goNext();
+          console.log('[Guia] Navegação para próxima seção após digitação');
         }, { once: true });
       } else {
         console.error('[Guia] window.JC não definido');
-        window.toast && window.toast('Erro ao navegar para selfie.');
+        window.toast && window.toast('Erro ao navegar para próxima seção.');
       }
     }
   });
@@ -682,7 +677,7 @@
 </script>
 
   <!-- Selfie -->
- <script>
+<script>
 (function() {
   let lastPreview = 0;
   let lastCapture = 0;
@@ -788,17 +783,12 @@
               video.src = '';
               video.load();
             });
-            window.JC.show('section-perguntas');
-            setTimeout(() => {
-              if (global.JPaperQA) {
-                global.JPaperQA.loadVideo('/assets/img/conhecimento-com-luz-jardim.mp4');
-                console.log('[Selfie] Reproduzindo vídeo conhecimento-com-luz-jardim após digitação');
-              }
-            }, 500);
+            window.JC.goNext();
+            console.log('[Selfie] Navegação para próxima seção após digitação');
           }, { once: true });
         } else {
           console.error('[Selfie] window.JC não definido');
-          window.toast && window.toast('Erro ao navegar para as perguntas.');
+          window.toast && window.toast('Erro ao navegar para próxima seção.');
         }
       }
     }
