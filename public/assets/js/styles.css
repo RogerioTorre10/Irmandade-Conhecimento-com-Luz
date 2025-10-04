@@ -687,4 +687,6 @@ div[id^="section-"], .j-bloco, .j-pergunta, #termos-pg1, #termos-pg2 { opacity: 
 div[id^="section-"]:not(.hidden), .j-bloco[style*="display: block"], .j-pergunta[style*="display: block"], #termos-pg1:not(.hidden), #termos-pg2:not(.hidden) { opacity: 1; }
 #videoOverlay.hidden { display: none; }
 video { display: none; }
-#videoTransicao:not(.hidden) { display: block; }
+#videoTransicao:not(.hidden), #video-guia:not(.hidden), #video-ao-encontro:not(.hidden), #video-entrando:not(.hidden) { display: block; }
+[data-typing="true"] { opacity: 0; }
+[data-typing="true"].typing-done { opacity: 1; }
