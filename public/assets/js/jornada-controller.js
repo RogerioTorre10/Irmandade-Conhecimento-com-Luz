@@ -127,10 +127,17 @@
             return;
           }
           // Garante visibilidade correta
-          document.getElementById('termos-pg1').classList.add(HIDE_CLASS);
-          document.getElementById('termos-pg2').classList.add(HIDE_CLASS);
-          page.classList.remove(HIDE_CLASS);
-          console.log('[JornadaController] Exibindo página de termos:', currentTermosPage, 'Visível:', page.offsetParent !== null);
+          const pg1 = document.getElementById('termos-pg1');
+          const pg2 = document.getElementById('termos-pg2');
+          if (pg1 && pg2) {
+            pg1.classList.add(HIDE_CLASS);
+            pg2.classList.add(HIDE_CLASS);
+            page.classList.remove(HIDE_CLASS);
+            console.log('[JornadaController] Exibindo página de termos:', currentTermosPage, 'Visível:', page.offsetParent !== null);
+          } else {
+            console.error('[JornadaController] Uma ou mais páginas de termos (#termos-pg1, #termos-pg2) não encontradas');
+            window.toast && window.toast('Erro: Páginas de termos não encontradas.');
+          }
           container = page;
         } else if (id === 'section-perguntas' && global.JPaperQA) {
           global.JPaperQA.renderQuestions();
@@ -198,7 +205,7 @@
           }
 
           if (id === 'section-termos' && currentTermosPage === 'termos-pg2') {
-            const prevBtn = target.querySelector('#btn-termos-prev');
+            const prevBtn = container.querySelector('#btn-termos-prev, [data-action="termos-prev"]');
             if (prevBtn && prevBtn.disabled) {
               prevBtn.disabled = false;
               console.log('[JornadaController] Botão "Voltar" ativado em termos-pg2');
@@ -211,17 +218,20 @@
             introBtn.addEventListener('click', () => {
               console.log('[JornadaController] Clique manual detectado no botão:', introBtn.id || introBtn.className);
               if (id === 'section-termos' && currentTermosPage === 'termos-pg1') {
+                console.log('[JornadaController] Navegando de termos-pg1 para termos-pg2');
                 document.getElementById('termos-pg1').classList.add(HIDE_CLASS);
                 document.getElementById('termos-pg2').classList.remove(HIDE_CLASS);
                 currentTermosPage = 'termos-pg2';
                 JC.show(id);
               } else if (id === 'section-termos' && currentTermosPage === 'termos-pg2') {
                 if (introBtn.dataset.action === 'termos-prev') {
+                  console.log('[JornadaController] Navegando de termos-pg2 para termos-pg1');
                   document.getElementById('termos-pg2').classList.add(HIDE_CLASS);
                   document.getElementById('termos-pg1').classList.remove(HIDE_CLASS);
                   currentTermosPage = 'termos-pg1';
                   JC.show(id);
                 } else {
+                  console.log('[JornadaController] Avançando de section-termos para a próxima seção');
                   JC.goNext();
                 }
               } else {
@@ -251,7 +261,7 @@
         ) : target.querySelectorAll(
           '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], [data-action="read-question"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn-avanca, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn'
         );
-        console.log('[JornadaController] Botões encontrados:', btns.length, 'em', id);
+        console.log('[JornadaController] Botões encontrados:', btns.length, 'em', id, 'Container:', container?.id || container?.className);
         btns.forEach(btn => {
           if (!btn.dataset.clickAttached) {
             btn.addEventListener('click', (e) => {
