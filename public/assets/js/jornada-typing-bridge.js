@@ -172,7 +172,7 @@
             resolve();
           };
           utt.onerror = (error) => {
-            console.error('[TypingBridge] Erro na leitura:', error);
+            console.error('[TypingBridge] Erro na leitura:', error, 'Texto:', text);
             resolve(); // Continua mesmo com erro
           };
           speechSynthesis.speak(utt);
@@ -190,7 +190,7 @@
           resolve();
         };
         utt.onerror = (error) => {
-          console.error('[TypingBridge] Erro na leitura:', error);
+          console.error('[TypingBridge] Erro na leitura:', error, 'Texto:', text);
           resolve(); // Continua mesmo com erro
         };
         speechSynthesis.speak(utt);
