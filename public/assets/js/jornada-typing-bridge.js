@@ -209,7 +209,7 @@
           console.warn('[TypingBridge] Timeout: Forçando allTypingComplete para:', target);
           document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
         }
-      }, 15000);
+      }, 10000);
 
       for (const el of elements) {
         const texto =
@@ -239,15 +239,22 @@
         }
 
         if ('speechSynthesis' in window && texto && window.JORNADA?.tts?.enabled && !window.isMuted) {
-          speechSynthesis.cancel(); // Cancela TTS anterior
-          const utt = new SpeechSynthesisUtterance(texto.trim());
-          utt.lang = i18n.lang || 'pt-BR';
-          utt.rate = 1.03;
-          utt.pitch = 1.0;
-          utt.volume = 1;
-          utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
-          speechSynthesis.speak(utt);
-          typingLog('TTS iniciado para:', target);
+          try {
+            speechSynthesis.cancel();
+            const utt = new SpeechSynthesisUtterance(texto.trim());
+            utt.lang = i18n.lang || 'pt-BR';
+            utt.rate = 1.03;
+            utt.pitch = 1.0;
+            utt.volume = 1;
+            utt.onerror = (error) => {
+              console.error('[TypingBridge] Erro na leitura:', error);
+              // Continua mesmo com erro no TTS
+            };
+            speechSynthesis.speak(utt);
+            typingLog('TTS iniciado para:', target);
+          } catch (e) {
+            console.warn('[TypingBridge] Falha ao iniciar TTS:', e);
+          }
         }
       }
 
@@ -271,12 +278,4 @@
   global.runTyping = playTypingAndSpeak;
 
   typingLog('Pronto');
-
-  document.addEventListener('bootstrapComplete', () => {
-    setTimeout(() => {
-      const active = document.querySelector('div[id^="section-"].active') || document.getElementById('section-intro');
-      typingLog('Seção ativa após bootstrapComplete:', active ? active.id : 'Nenhuma');
-      playTypingAndSpeak(active ? `#${active.id}` : '#section-intro', null);
-    }, 100);
-  });
 })(window);
