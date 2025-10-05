@@ -1,4 +1,3 @@
-<script>
 (function (global) {
   'use strict';
 
@@ -54,7 +53,7 @@
 
       element.setAttribute('aria-live', 'polite');
       element.textContent = '';
-      element.style.display = 'none'; // Garante ocultação imediata
+      element.style.opacity = '0';
       const caret = document.createElement('span');
       caret.className = 'typing-caret';
       caret.textContent = '|';
@@ -69,7 +68,7 @@
           typingLog('Datilografia abortada para:', element.id || element.className);
           return resolve();
         }
-        element.style.display = 'block';
+        element.style.opacity = '1';
         element.textContent = text.slice(0, i);
         i++;
         if (i >= text.length) {
@@ -82,10 +81,8 @@
         }
       }, speed);
 
-      const delay = parseInt(element.getAttribute('data-delay')) || 0;
-      if (delay) {
-        setTimeout(() => {}, delay);
-      }
+      const delay = parseInt(element.getAttribute('data-delay')) || 500;
+      setTimeout(() => {}, delay);
     });
   }
 
@@ -248,7 +245,7 @@
         return;
       }
 
-      try { await i18n.waitForReady(5000); } catch (_) { console.warn('[TypingBridge] i18n.waitForReady falhou'); }
+      try { await i18n.waitForReady(10000); } catch (_) { console.warn('[TypingBridge] i18n.waitForReady falhou'); }
 
       let completed = 0;
       const total = elements.length;
@@ -258,7 +255,7 @@
           console.warn('[TypingBridge] Timeout: Forçando allTypingComplete para:', target);
           document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
         }
-      }, 10000);
+      }, 15000); // Aumentado para dar tempo a parágrafos longos
 
       for (const el of elements) {
         const isVisible = el.offsetParent !== null && 
@@ -287,7 +284,7 @@
 
         await typeText(el, texto, velocidade, mostrarCursor);
         await speakText(texto, i18n.lang || 'pt-BR');
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 600));
         completed++;
         if (completed === total) {
           document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
@@ -318,4 +315,3 @@
 
   typingLog('Pronto');
 })(window);
-</script>
