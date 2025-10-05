@@ -17,6 +17,20 @@
     waitForReady: async () => {}
   };
 
+  (function ensureStyle() {
+    if (document.getElementById('typing-style')) return;
+    const st = document.createElement('style');
+    st.id = 'typing-style';
+    st.textContent = `
+      .typing-caret{display:inline-block;width:0.6ch;margin-left:2px;animation:blink 1s step-end infinite}
+      .typing-done[data-typing]::after{content:''}
+      @keyframes blink{50%{opacity:0}}
+      [data-typing="true"] { opacity: 0; transition: opacity 0.1s; }
+      [data-typing="true"].typing-done { opacity: 1; }
+    `;
+    document.head.appendChild(st);
+  })();
+
   let ACTIVE = false;
   let abortCurrent = null;
 
@@ -38,115 +52,42 @@
       }
       if (abortCurrent) abortCurrent();
       let abort = false;
-      abortCurrent = () => {
-        abort = true;
-        speechSynthesis.cancel();
-      };
+      abortCurrent = () => (abort = true);
 
-      const isVisible = element.offsetParent !== null && 
-        window.getComputedStyle(element).visibility !== 'hidden' && 
-        window.getComputedStyle(element).display !== 'none';
+      const isVisible = element.offsetParent !== null && window.getComputedStyle(element).visibility !== 'hidden' && window.getComputedStyle(element).display !== 'none';
+      console.log('[TypingBridge] Elemento visível:', isVisible, 'ID:', element.id || element.className);
       if (!isVisible) {
         console.warn('[TypingBridge] Elemento não visível, pulando datilografia:', element.id || element.className);
         return resolve();
       }
 
-      element.setAttribute('aria-live', 'polite');
       element.textContent = '';
-      element.style.opacity = '0';
+      element.style.opacity = '1';
       const caret = document.createElement('span');
       caret.className = 'typing-caret';
       caret.textContent = '|';
       if (showCursor) element.appendChild(caret);
 
       let i = 0;
-      typingLog('Iniciando datilografia para:', element.id || element.className, 'Texto:', text);
+      console.log('[TypingBridge] Iniciando datilografia para:', element.id || element.className, 'Texto:', text);
       const interval = setInterval(() => {
         if (abort) {
           clearInterval(interval);
           if (showCursor) caret.remove();
-          typingLog('Datilografia abortada para:', element.id || element.className);
+          console.log('[TypingBridge] Datilografia abortada para:', element.id || element.className);
           return resolve();
         }
-        element.style.opacity = '1';
+        console.log('[TypingBridge] Datilografando caractere', i + 1, '/', text.length, '- Texto atual:', text.slice(0, i));
         element.textContent = text.slice(0, i);
         i++;
         if (i >= text.length) {
           clearInterval(interval);
           if (showCursor) caret.remove();
           element.classList.add('typing-done');
-          typingLog('Datilografia concluída para:', element.id || element.className);
-          document.dispatchEvent(new CustomEvent('typingComplete', { detail: { element, text } }));
+          console.log('[TypingBridge] Datilografia concluída para:', element.id || element.className);
           resolve();
         }
       }, speed);
-
-      const delay = parseInt(element.getAttribute('data-delay')) || 500;
-      setTimeout(() => {}, delay);
-    });
-  }
-
-  async function typePlaceholder(input, text, speed = 22) {
-    return new Promise(resolve => {
-      if (!input) {
-        console.warn('[TypingBridge] Input inválido para typePlaceholder');
-        return resolve();
-      }
-      if (abortCurrent) abortCurrent();
-      let abort = false;
-      abortCurrent = () => {
-        abort = true;
-        speechSynthesis.cancel();
-      };
-      input.placeholder = '';
-      let i = 0;
-      const interval = setInterval(() => {
-        if (abort) {
-          clearInterval(interval);
-          return resolve();
-        }
-        input.placeholder = text.slice(0, i) + (i < text.length ? '▌' : '');
-        i++;
-        if (i > text.length) {
-          clearInterval(interval);
-          input.placeholder = text;
-          typingLog('Placeholder digitado:', text);
-          resolve();
-        }
-      }, speed);
-    });
-  }
-
-  async function speakText(text, lang = 'pt-BR') {
-    return new Promise((resolve) => {
-      if (!('speechSynthesis' in window) || !text || !window.JORNADA?.tts?.enabled || window.isMuted) {
-        console.warn('[TypingBridge] TTS desativado ou não suportado:', { 
-          speechSynthesis: 'speechSynthesis' in window, 
-          text, 
-          ttsEnabled: window.JORNADA?.tts?.enabled, 
-          isMuted: window.isMuted 
-        });
-        return resolve();
-      }
-
-      if (speechSynthesis.speaking || speechSynthesis.pending) {
-        speechSynthesis.cancel();
-      }
-      const utt = new SpeechSynthesisUtterance(text.trim());
-      utt.lang = lang;
-      utt.rate = 1.03;
-      utt.pitch = 1.0;
-      utt.volume = 1;
-      utt.onend = () => {
-        typingLog('TTS concluído para texto:', text);
-        resolve();
-      };
-      utt.onerror = (error) => {
-        console.error('[TypingBridge] Erro na leitura:', error, 'Texto:', text);
-        resolve();
-      };
-      speechSynthesis.speak(utt);
-      typingLog('TTS iniciado para texto:', text);
     });
   }
 
@@ -161,8 +102,11 @@
       let container = null;
       let elements = null;
 
+      console.log('[TypingBridge] Tentando processar target:', target);
+
       if (typeof target === 'string') {
         container = document.querySelector(target);
+        console.log('[TypingBridge] Container encontrado:', container ? container.id : 'Nenhum');
         if (!container) {
           const list = document.querySelectorAll(target);
           if (list && list.length) {
@@ -170,11 +114,12 @@
           } else {
             const active = document.querySelector('div[id^="section-"].active') || document.getElementById('section-intro');
             if (active) container = active;
-            typingLog('Seção ativa como fallback:', active ? active.id : 'Nenhuma');
+            console.log('[TypingBridge] Seção ativa como fallback:', active ? active.id : 'Nenhuma');
           }
         }
       } else if (target instanceof HTMLElement) {
         container = target;
+        console.log('[TypingBridge] Container é HTMLElement:', container.id || container.className);
       } else if (target && typeof NodeList !== 'undefined' && target instanceof NodeList) {
         elements = Array.from(target);
       } else if (Array.isArray(target)) {
@@ -182,20 +127,17 @@
       } else {
         const active = document.querySelector('div[id^="section-"].active') || document.getElementById('section-intro');
         if (active) container = active;
-        typingLog('Usando seção ativa:', active ? active.id : 'Nenhuma');
+        console.log('[TypingBridge] Usando seção ativa:', active ? active.id : 'Nenhuma');
       }
 
       if (!elements) {
         if (!container) {
           if (_attempt < 3) {
-            typingLog('Tentativa', _attempt + 1, 'para target:', target);
+            console.log('[TypingBridge] Tentativa', _attempt + 1, 'para target:', target);
             setTimeout(() => playTypingAndSpeak(target, callback, _attempt + 1), 220);
             return;
           } else {
-            console.error('[TypingBridge] Nenhum container/elemento encontrado para:', target);
-            window.toast && window.toast(`Erro: Nenhum elemento encontrado para ${target}`);
-            document.dispatchEvent(new CustomEvent('typingError', { detail: { target, error: 'No elements found' } }));
-            document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
+            console.warn('[TypingBridge] Nenhum container/elemento encontrado para:', target);
             if (callback) callback();
             return;
           }
@@ -204,84 +146,102 @@
           ? [container]
           : container.querySelectorAll('[data-typing="true"]:not(.hidden)');
         elements = Array.from(nodeList);
-        typingLog('Elementos [data-typing] encontrados:', elements.length, 'em', target);
+        console.log('[TypingBridge] Elementos [data-typing] encontrados:', elements.length);
       }
 
       if (!elements.length) {
-        typingLog('Nenhum elemento com [data-typing], forçando allTypingComplete para:', target);
-        document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
-        if (callback) callback();
-        return;
+        if (_attempt < 3) {
+          console.log('[TypingBridge] Tentativa', _attempt + 1, 'sem elementos [data-typing]');
+          setTimeout(() => playTypingAndSpeak(target, callback, _attempt + 1), 220);
+          return;
+        } else {
+          console.warn('[TypingBridge] Nenhum elemento com [data-typing] encontrado para:', target || '(seção ativa)');
+          if (callback) callback();
+          return;
+        }
       }
 
-      try { await i18n.waitForReady(12000); } catch (_) { console.warn('[TypingBridge] i18n.waitForReady falhou'); }
+      try { await i18n.waitForReady(5000); } catch (_) {}
 
-      let completed = 0;
-      const total = elements.length;
-
-      setTimeout(() => {
-        if (completed < total) {
-          console.warn('[TypingBridge] Timeout: Forçando allTypingComplete para:', target);
-          document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
-          if (callback) callback();
-        }
-      }, 15000);
-
+      let ttsQueue = [];
       for (const el of elements) {
-        const isVisible = el.offsetParent !== null && 
-          window.getComputedStyle(el).visibility !== 'hidden' && 
-          window.getComputedStyle(el).display !== 'none';
-        typingLog('Verificando visibilidade do elemento:', el.id || el.className, 'Visível:', isVisible);
-
         const texto =
           el.getAttribute('data-text') ||
-          (global.i18n ? i18n.t(el.getAttribute('data-i18n-key') || el.getAttribute('data-i18n') || 'welcome', { ns: 'common', defaultValue: el.textContent }) : el.textContent) ||
+          i18n.t(el.getAttribute('data-i18n-key') || el.getAttribute('data-i18n') || 'welcome', { ns: 'common' }) ||
           el.textContent || '';
-        typingLog('Processando elemento com texto:', texto, 'Elemento:', el.id || el.className);
+        console.log('[TypingBridge] Processando elemento com texto:', texto, 'Elemento:', el.id || el.className);
 
         const velocidade = parseInt(el.getAttribute('data-speed')) || 40;
         const mostrarCursor = el.getAttribute('data-cursor') === 'true';
 
-        if (!texto || !isVisible) {
-          console.warn('[TypingBridge] Elemento sem texto ou invisível, pulando:', el.id || el.className);
-          completed++;
-          if (completed === total) {
-            document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
-            typingLog('Todos os elementos processados (alguns pulados) para:', target);
-          }
+        if (!texto) {
+          console.warn('[TypingBridge] Nenhum texto encontrado para elemento:', el.id || el.className);
           continue;
         }
 
         await typeText(el, texto, velocidade, mostrarCursor);
-        await speakText(texto, i18n.lang || 'pt-BR');
-        await new Promise(resolve => setTimeout(resolve, 600));
-        completed++;
-        if (completed === total) {
-          document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
-          typingLog('Todos os elementos datilografados para:', target);
+
+        if ('speechSynthesis' in window && texto) {
+          if (target === '#section-termos' || (target instanceof HTMLElement && target.closest('#section-termos'))) {
+            console.log('[TypingBridge] Adicionando texto à fila TTS para section-termos, página:', window.currentTermosPage || 'termos-pg1');
+            ttsQueue.push(texto.trim());
+          } else {
+            const utt = new SpeechSynthesisUtterance(texto.trim());
+            utt.lang = i18n.lang || 'pt-BR';
+            utt.rate = 1.03;
+            utt.pitch = 1.0;
+            utt.volume = window.isMuted ? 0 : 1;
+            utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
+            speechSynthesis.speak(utt);
+            console.log('[TypingBridge] TTS iniciado automaticamente para:', target);
+          }
+        }
+      }
+
+      if (ttsQueue.length > 0 && (target === '#section-termos' || (target instanceof HTMLElement && target.closest('#section-termos'))) {
+        console.log('[TypingBridge] Aguardando clique para TTS em section-termos, página:', window.currentTermosPage || 'termos-pg1');
+        const btn = document.querySelector(`#${window.currentTermosPage || 'termos-pg1'} [data-action="termos-next"], #${window.currentTermosPage || 'termos-pg1'} [data-action="avancar"]`);
+        if (btn) {
+          btn.addEventListener('click', () => {
+            setTimeout(() => {
+              ttsQueue.forEach((text, index) => {
+                setTimeout(() => {
+                  const utt = new SpeechSynthesisUtterance(text);
+                  utt.lang = i18n.lang || 'pt-BR';
+                  utt.rate = 1.03;
+                  utt.pitch = 1.0;
+                  utt.volume = window.isMuted ? 0 : 1;
+                  utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
+                  speechSynthesis.speak(utt);
+                  console.log('[TypingBridge] TTS iniciado para texto', index + 1, 'de', ttsQueue.length, 'em:', window.currentTermosPage || 'termos-pg1');
+                }, index * 1000);
+              });
+              ttsQueue = [];
+            }, 100);
+          }, { once: true });
         }
       }
 
       if (callback) callback();
     } catch (e) {
       console.error('[TypingBridge] Erro:', e);
-      window.toast && window.toast('Erro ao processar conteúdo.');
-      document.dispatchEvent(new CustomEvent('typingError', { detail: { target, error: e.message } }));
-      document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
       if (callback) callback();
     } finally {
       unlock();
     }
   }
 
-  const TypingBridge = { 
-    play: playTypingAndSpeak,
-    typeText,
-    typePlaceholder,
-    speakText
-  };
+  const TypingBridge = { play: playTypingAndSpeak };
   global.TypingBridge = TypingBridge;
   global.runTyping = playTypingAndSpeak;
 
   typingLog('Pronto');
+
+  document.addEventListener('bootstrapComplete', () => {
+    setTimeout(() => {
+      const active = document.querySelector('div[id^="section-"].active') || document.getElementById('section-intro');
+      console.log('[TypingBridge] Seção ativa após bootstrapComplete:', active ? active.id : 'Nenhuma');
+      playTypingAndSpeak(active ? `#${active.id}` : '#section-intro', null);
+    }, 100);
+  });
 })(window);
