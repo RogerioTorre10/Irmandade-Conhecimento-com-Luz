@@ -59,6 +59,10 @@
       global.G = global.G || {};
       global.G.__typingLock = false;
 
+      if (id !== 'section-termos') {
+        currentTermosPage = 'termos-pg1';
+      }
+
       if (id === 'section-termos') {
         speechSynthesis.cancel();
         console.log('[JornadaController] TTS cancelado para section-termos');
@@ -75,23 +79,29 @@
       } else if (id === 'section-perguntas') {
         global.JPaperQA && global.JPaperQA.renderQuestions();
         global.JGuiaSelfie && global.JGuiaSelfie.loadAnswers();
+        global.JSecoes && global.JSecoes.loadDynamicBlocks();
       } else if (id === 'section-selfie') {
         global.JGuiaSelfie && global.JGuiaSelfie.initSelfie();
+      } else if (id === 'section-escolha-guia') {
+        global.JSecoes && global.JSecoes.proceedAfterGuia(localStorage.getItem('JORNADA_GUIA') || 'zion');
+      } else if (id === 'section-final') {
+        global.JSecoes && global.JSecoes.generatePDF();
       }
+
+      global.JSecoes && global.JSecoes.updateCanvasBackground(id);
 
       setTimeout(() => {
-        console.log('[JornadaController] Processando elementos [data-typing] em:', id, 'Página:', currentTermosPage);
-        const container = id === 'section-termos' ? target.querySelector(`#${currentTermosPage}`) : id === 'section-perguntas' ? target.querySelector(`#${currentPerguntasBlock}`) : target;
-        const textElements = container.querySelectorAll('[data-typing="true"]:not(.hidden)');
+        console.log('[JornadaController] Processando elementos [data-typing] em:', id, 'Página:', id === 'section-termos' ? currentTermosPage : currentPerguntasBlock);
+        const container = id === 'section-termos' ? target.querySelector(`#${currentTermosPage}`) : id === 'section-perguntas' ? target.querySelector('.content') : target;
+        const textElements = container ? container.querySelectorAll('[data-typing="true"]:not(.hidden)') : [];
         console.log('[JornadaController] Elementos [data-typing] encontrados:', textElements.length);
 
-      // Ativar botão imediatamente para evitar travamento
-      const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : target.querySelector('[data-action="avancar"], [data-action="read-question"], [data-action="select-guia"], [data-action="skip-selfie"], .btn-avancar, .btn');
-      if (btn && btn.disabled) {
-        btn.disabled = false;
-        console.log('[JornadaController] Botão ativado (sem datilografia) em:', id, currentTermosPage || '');
-        window.toast && window.toast('Conteúdo pronto! Clique para avançar.');
-      }
+        const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : target.querySelector('[data-action="avancar"], [data-action="read-question"], [data-action="select-guia"], [data-action="skip-selfie"], .btn-avancar, .btn');
+        if (btn && btn.disabled) {
+          btn.disabled = false;
+          console.log('[JornadaController] Botão ativado (sem datilografia) em:', id, currentTermosPage || '');
+          window.toast && window.toast('Conteúdo pronto! Clique para avançar.');
+        }
 
         let typingCompleted = 0;
         const totalTypingElements = textElements.length;
@@ -154,28 +164,15 @@
                 selectedGuia = btn.dataset.guia;
                 localStorage.setItem('JORNADA_GUIA', selectedGuia);
                 console.log('[JornadaController] Guia selecionado:', selectedGuia);
-                const avancarBtn = target.querySelector('[data-action="avancar"]');
-                if (avancarBtn && avancarBtn.disabled) {
-                  avancarBtn.disabled = false;
-                  console.log('[JornadaController] Botão "Avançar" ativado em section-escolha-guia');
-                }
+                global.JSecoes && global.JSecoes.proceedAfterGuia(selectedGuia);
               } else if (id === 'section-selfie' && btn.dataset.action === 'skip-selfie') {
                 console.log('[JornadaController] Pulando selfie');
-                if (JC.goNext) JC.goNext();
-              } else if (id === 'section-perguntas') {
+                global.JSecoes && global.JSecoes.proceedAfterSelfie();
+              } else if (id === 'section-perguntas' && btn.dataset.action === 'avancar') {
                 global.JGuiaSelfie && global.JGuiaSelfie.saveAnswers();
-                const blocks = ['bloco-raizes', 'bloco-reflexoes', 'bloco-crescimento', 'bloco-integracao', 'bloco-sintese'];
-                const currentBlockIdx = blocks.indexOf(currentPerguntasBlock);
-                if (currentBlockIdx < blocks.length - 1) {
-                  console.log('[JornadaController] Navegando para próximo bloco de perguntas:', blocks[currentBlockIdx + 1]);
-                  document.getElementById(currentPerguntasBlock).classList.add(HIDE_CLASS);
-                  currentPerguntasBlock = blocks[currentBlockIdx + 1];
-                  document.getElementById(currentPerguntasBlock).classList.remove(HIDE_CLASS);
-                  JC.show(id);
-                } else {
-                  console.log('[JornadaController] Avançando de section-perguntas para a próxima seção');
-                  if (JC.goNext) JC.goNext();
-                }
+                global.JSecoes && global.JSecoes.goNext();
+              } else if (id === 'section-senha' && btn.dataset.action === 'avancar') {
+                global.JSecoes && global.JSecoes.startJourney();
               } else {
                 if (JC.goNext) JC.goNext();
               }
@@ -220,7 +217,6 @@
     global.initController = initializeController;
   });
 
-  // Substituir window.showSection para usar JC.show
   global.showSection = function(id) {
     console.log('[JornadaController] showSection chamado para:', id);
     JC.show(id);
