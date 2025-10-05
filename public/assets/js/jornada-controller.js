@@ -17,9 +17,14 @@
   let currentPerguntasIndex = 0;
 
   const videoMapping = {
-    'section-filme-ao-encontro': global.JORNADA_VIDEOS?.afterBlocks?.[0] || '/assets/img/filme-0-ao-encontro-da-jornada.mp4',
-    'section-filme-entrando': '/assets/img/filme-1-entrando-na-jornada.mp4',
-    'section-final': global.JORNADA_VIDEOS?.final
+    'section-senha-to-guia': '/assets/img/filme-senha-to-guia.mp4',
+    'section-guia-to-selfie': '/assets/img/filme-guia-to-selfie.mp4',
+    'section-selfie-to-bloco1': '/assets/img/filme-selfie-to-bloco1.mp4',
+    'section-bloco1-to-bloco2': '/assets/img/filme-bloco1-to-bloco2.mp4',
+    'section-bloco2-to-bloco3': '/assets/img/filme-bloco2-to-bloco3.mp4',
+    'section-bloco3-to-bloco4': '/assets/img/filme-bloco3-to-bloco4.mp4',
+    'section-bloco4-to-bloco5': '/assets/img/filme-bloco4-to-bloco5.mp4',
+    'section-bloco5-to-final': '/assets/img/filme-bloco5-to-final.mp4'
   };
 
   function pauseAllVideos() {
@@ -34,8 +39,21 @@
     console.log('[JornadaController] Todos os vídeos pausados');
   }
 
+  function playTransitionVideo(fromSection, toSection) {
+    const key = `${fromSection}-to-${toSection}`;
+    const videoSrc = videoMapping[key];
+    if (videoSrc && global.JPaperQA) {
+      speechSynthesis.cancel();
+      setTimeout(() => {
+        global.JPaperQA.loadVideo(videoSrc);
+        console.log('[JornadaController] Transição de vídeo:', key, 'Vídeo:', videoSrc);
+      }, 300);
+    }
+  }
+
   JC.setOrder = function (order) {
     sectionOrder = order;
+    console.log('[JornadaController] Ordem das seções definida:', order);
   };
 
   JC.goNext = function () {
@@ -53,6 +71,7 @@
         if (currentId === 'section-termos') {
           currentTermosPage = 'termos-pg1';
         }
+        playTransitionVideo(currentId, nextId);
         JC.show(nextId);
       } else {
         console.error('[JornadaController] Nenhuma seção válida encontrada após', currentId);
@@ -113,6 +132,10 @@
       global.G = global.G || {};
       global.G.__typingLock = false;
 
+      // Cleanup de botões extras
+      const extraBtns = target.querySelectorAll('.btn-confirm-extra, .btn-duplicate');
+      extraBtns.forEach(btn => btn.remove());
+
       setTimeout(async () => {
         console.log('[JornadaController] Processando seção:', id, 'Página:', currentTermosPage);
         let container;
@@ -129,9 +152,9 @@
             pg1.classList.add(HIDE_CLASS);
             pg2.classList.add(HIDE_CLASS);
             page.classList.remove(HIDE_CLASS);
-            console.log('[JornadaController] Exibindo página de termos:', currentTermosPage, 'Visível:', page.offsetParent !== null);
+            console.log('[JornadaController] Exibindo página de termos:', currentTermosPage);
           } else {
-            console.error('[JornadaController] Uma ou mais páginas de termos (#termos-pg1, #termos-pg2) não encontradas');
+            console.error('[JornadaController] Uma ou mais páginas de termos não encontradas');
             window.toast && window.toast('Erro: Páginas de termos não encontradas.');
           }
           container = page;
@@ -142,14 +165,14 @@
           container = target;
         }
 
-        // Aplica traduções i18n
         if (global.i18n) {
           try {
-            await i18n.waitForReady(5000);
+            await i18n.waitForReady(10000);
             global.i18n.apply(container || target);
             console.log('[JornadaController] Traduções i18n aplicadas a:', id);
           } catch (e) {
             console.warn('[JornadaController] Falha ao aplicar i18n:', e);
+            window.toast && window.toast('Traduções parciais aplicadas.');
           }
         }
 
@@ -158,8 +181,8 @@
 
         if (textElements.length === 0) {
           console.log('[JornadaController] Nenhum elemento com data-typing, ativando botão imediatamente');
-          let btn = id === 'section-termos' ? container.querySelector('[data-action="termos-next"], [data-action="avancar"]') : 
-                   id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) : 
+          let btn = id === 'section-termos' ? container.querySelector('[data-action="termos-next"], [data-action="avancar"]') :
+                   id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) :
                    target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn-avanca, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn');
           if (!btn) {
             btn = container?.querySelector('button') || target.querySelector('button') || document.querySelector('#iniciar, [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-iniciar, .start-btn, .next-btn, .btn-avancar, .btn-avanca');
@@ -167,7 +190,7 @@
           }
           if (btn) {
             btn.disabled = false;
-            console.log('[JornadaController] Botão ativado imediatamente em:', id, 'Botão:', btn.id || btn.className);
+            console.log('[JornadaController] Botão ativado em:', id, 'Botão:', btn.id || btn.className);
             window.toast && window.toast('Conteúdo pronto! Clique para avançar.');
           } else {
             console.error('[JornadaController] Botão de avançar não encontrado em:', id);
@@ -175,13 +198,6 @@
           }
           document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target: id } }));
           document.dispatchEvent(new CustomEvent('sectionLoaded', { detail: { sectionId: id } }));
-          if (videoMapping[id] && global.JPaperQA) {
-            speechSynthesis.cancel();
-            setTimeout(() => {
-              global.JPaperQA.loadVideo(videoMapping[id]);
-              console.log('[JornadaController] Carregando vídeo para seção:', id, 'Vídeo:', videoMapping[id]);
-            }, 500);
-          }
           return;
         }
 
@@ -197,49 +213,31 @@
         }
 
         const onAllComplete = () => {
-          let btn = id === 'section-termos' ? container.querySelector('[data-action="termos-next"], [data-action="avancar"]') : 
-                   id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) : 
+          let btn = id === 'section-termos' ? container.querySelector('[data-action="termos-next"], [data-action="avancar"]') :
+                   id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) :
                    target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn-avanca, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn');
-          if (!btn) {
-            btn = container?.querySelector('button') || target.querySelector('button') || document.querySelector('#iniciar, [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-iniciar, .start-btn, .next-btn, .btn-avancar, .btn-avanca');
-            console.warn('[JornadaController] Botão não encontrado pelos seletores padrão, usando fallback:', btn ? (iranno
+          if (btn) {
+            btn.disabled = false;
+            console.log('[JornadaController] Botão ativado após datilografia em:', id);
+          }
+        };
 
-System: Uhuuu, amigão! Nada de travar, estamos avançando na Jornada do Conhecimento com Luz! 🚀 Agradeço pelo feedback detalhado e pelo HTML atualizado. Vamos resolver os problemas um a um:
+        document.addEventListener('allTypingComplete', onAllComplete, { once: true });
+      }, 0);
+    } catch (e) {
+      console.error('[JornadaController] Erro ao mostrar seção:', e);
+      window.toast && window.toast('Erro ao carregar seção.');
+    }
+  };
 
-- **Texto inteiro exibido antes da datilografia**: O texto em `#section-guia` aparece antes do efeito, apesar do CSS `opacity: 0`. Vamos reforçar o CSS e garantir a execução precoce do `TypingBridge.js`.
-- **Internacionalização (i18n) não funcionou**: As traduções não estão sendo aplicadas, provavelmente devido a falhas no carregamento do `i18n.js` ou chaves de tradução ausentes.
-- **Botão "Confirmar" extra**: O botão duplicado em `#section-guia` foi removido do HTML.
-- **Travamento em `#section-senha`**: O botão de avançar não funciona, possivelmente devido a falhas na validação da senha ou no evento `allTypingComplete`.
-
-Com base nos logs anteriores (ex.: `[TypingBridge] Elementos [data-typing] encontrados`, `[JornadaController] Botão clicado em: section-senha`), no histórico (erros de i18n, MIME, navegação), e nos scripts fornecidos, vou ajustar os scripts e o HTML para corrigir esses problemas e garantir a coerência dos efeitos e da navegação.
-
----
-
-### **HTML Ajustado**
-
-#### **Para `#section-guia`**
-```html
-<div id="section-guia" class="j-section hidden">
-  <div class="conteudo-pergaminho">
-    <h2 data-typing="true" data-i18n="guia_title">Escolha seu Guia ✨</h2>
-    <div class="guia-container">
-      <p data-typing="true" data-i18n="guia_zion">Zion (Grok): Curioso e direto, busca respostas profundas com visão cósmica.</p>
-      <p data-typing="true" data-i18n="guia_lumen">Lumen (ChatGPT): Acolhedor e reflexivo, guia com empatia e clareza.</p>
-      <p data-typing="true" data-i18n="guia_arian">Arian (Gemini): Criativo e versátil, inspira com perspectivas inovadoras.</p>
-      <div class="guia-name-input">
-        <label for="guiaNameInput" data-i18n="guia_name_label">Seu Nome</label>
-        <input id="guiaNameInput" type="text" data-i18n-placeholder="guia_name_placeholder" placeholder="Digite seu nome para a jornada...">
-      </div>
-      <div class="guia-options">
-        <button class="btn" data-action="select-guia" data-guia="zion" data-i18n="guia_zion_button">Escolher Zion</button>
-        <button class="btn" data-action="select-guia" data-guia="lumen" data-i18n="guia_lumen_button">Escolher Lumen</button>
-        <button class="btn" data-action="select-guia" data-guia="arian" data-i18n="guia_arian_button">Escolher Arian</button>
-      </div>
-      <video id="video-guia" style="display: none;">
-        <source src="/assets/img/conhecimento-com-luz-jardim.mp4" type="video/mp4">
-        Seu navegador não suporta vídeo.
-      </video>
-      <button data-action="avancar" class="btn btn-avancar" disabled data-i18n="avancar_button">Avançar</button>
-    </div>
-  </div>
-</div>
+  // Listener para evitar travamento na senha
+  document.addEventListener('allTypingComplete', (e) => {
+    if (e.detail.target === 'section-senha') {
+      const btn = document.querySelector('#section-senha [data-action="avancar"]');
+      if (btn) {
+        btn.disabled = false;
+        console.log('[JornadaController] Botão de senha ativado');
+      }
+    }
+  });
+})(window);
