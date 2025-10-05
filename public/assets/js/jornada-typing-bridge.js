@@ -130,53 +130,23 @@
       }
 
       if (speechSynthesis.speaking || speechSynthesis.pending) {
-        typingLog('TTS em andamento, aguardando conclusão...');
-        const waitForTTS = () => new Promise(r => {
-          const check = () => {
-            if (!speechSynthesis.speaking && !speechSynthesis.pending) {
-              r();
-            } else {
-              setTimeout(check, 100);
-            }
-          };
-          check();
-        });
-        waitForTTS().then(() => {
-          speechSynthesis.cancel();
-          const utt = new SpeechSynthesisUtterance(text.trim());
-          utt.lang = lang;
-          utt.rate = 1.03;
-          utt.pitch = 1.0;
-          utt.volume = 1;
-          utt.onend = () => {
-            typingLog('TTS concluído para texto:', text);
-            resolve();
-          };
-          utt.onerror = (error) => {
-            console.error('[TypingBridge] Erro na leitura:', error, 'Texto:', text);
-            resolve();
-          };
-          speechSynthesis.speak(utt);
-          typingLog('TTS iniciado para texto:', text);
-        });
-      } else {
         speechSynthesis.cancel();
-        const utt = new SpeechSynthesisUtterance(text.trim());
-        utt.lang = lang;
-        utt.rate = 1.03;
-        utt.pitch = 1.0;
-        utt.volume = 1;
-        utt.onend = () => {
-          typingLog('TTS concluído para texto:', text);
-          resolve();
-        };
-        utt.onerror = (error) => {
-          console.error('[TypingBridge] Erro na leitura:', error, 'Texto:', text);
-          resolve();
-        };
-        speechSynthesis.speak(utt);
-        typingLog('TTS iniciado para texto:', text);
       }
+      const utt = new SpeechSynthesisUtterance(text.trim());
+      utt.lang = lang;
+      utt.rate = 1.03;
+      utt.pitch = 1.0;
+      utt.volume = 1;
+      utt.onend = () => {
+        typingLog('TTS concluído para texto:', text);
+        resolve();
+      };
+      utt.onerror = (error) => {
+        console.error('[TypingBridge] Erro na leitura:', error, 'Texto:', text);
+        resolve();
+      };
+      speechSynthesis.speak(utt);
+      typingLog('TTS iniciado para texto:', text);
     });
   }
 
@@ -239,13 +209,12 @@
 
       if (!elements.length) {
         typingLog('Nenhum elemento com [data-typing], forçando allTypingComplete para:', target);
-    document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
-    if (callback) callback();
-    return;
-  }
-      
+        document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
+        if (callback) callback();
+        return;
+      }
 
-      try { await i18n.waitForReady(10000); } catch (_) { console.warn('[TypingBridge] i18n.waitForReady falhou'); }
+      try { await i18n.waitForReady(12000); } catch (_) { console.warn('[TypingBridge] i18n.waitForReady falhou'); }
 
       let completed = 0;
       const total = elements.length;
@@ -254,8 +223,9 @@
         if (completed < total) {
           console.warn('[TypingBridge] Timeout: Forçando allTypingComplete para:', target);
           document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
+          if (callback) callback();
         }
-      }, 15000); // Aumentado para dar tempo a parágrafos longos
+      }, 15000);
 
       for (const el of elements) {
         const isVisible = el.offsetParent !== null && 
