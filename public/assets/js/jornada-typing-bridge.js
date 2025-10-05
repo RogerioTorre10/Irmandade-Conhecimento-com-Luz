@@ -238,12 +238,12 @@
       }
 
       if (!elements.length) {
-        typingLog('Nenhum elemento com [data-typing] encontrado para:', target || '(seção ativa)');
-        window.toast && window.toast('Nenhum conteúdo para exibir.');
-        document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
-        if (callback) callback();
-        return;
-      }
+        typingLog('Nenhum elemento com [data-typing], forçando allTypingComplete para:', target);
+    document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
+    if (callback) callback();
+    return;
+  }
+      
 
       try { await i18n.waitForReady(10000); } catch (_) { console.warn('[TypingBridge] i18n.waitForReady falhou'); }
 
