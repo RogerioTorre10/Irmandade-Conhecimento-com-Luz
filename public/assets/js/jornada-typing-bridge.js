@@ -1,3 +1,4 @@
+<script>
 (function (global) {
   'use strict';
 
@@ -53,7 +54,7 @@
 
       element.setAttribute('aria-live', 'polite');
       element.textContent = '';
-      element.style.opacity = '0'; // Garante ocultação imediata
+      element.style.display = 'none'; // Garante ocultação imediata
       const caret = document.createElement('span');
       caret.className = 'typing-caret';
       caret.textContent = '|';
@@ -68,13 +69,13 @@
           typingLog('Datilografia abortada para:', element.id || element.className);
           return resolve();
         }
+        element.style.display = 'block';
         element.textContent = text.slice(0, i);
         i++;
         if (i >= text.length) {
           clearInterval(interval);
           if (showCursor) caret.remove();
           element.classList.add('typing-done');
-          element.style.opacity = '1';
           typingLog('Datilografia concluída para:', element.id || element.className);
           document.dispatchEvent(new CustomEvent('typingComplete', { detail: { element, text } }));
           resolve();
@@ -252,7 +253,6 @@
       let completed = 0;
       const total = elements.length;
 
-      // Timeout para garantir allTypingComplete
       setTimeout(() => {
         if (completed < total) {
           console.warn('[TypingBridge] Timeout: Forçando allTypingComplete para:', target);
@@ -318,3 +318,4 @@
 
   typingLog('Pronto');
 })(window);
+</script>
