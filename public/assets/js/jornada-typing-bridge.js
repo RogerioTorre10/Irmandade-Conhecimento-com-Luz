@@ -25,7 +25,7 @@
       .typing-caret { display: inline-block; width: 0.6ch; margin-left: 2px; animation: blink 1s step-end infinite; }
       .typing-done[data-typing]::after { content: ''; }
       @keyframes blink { 50% { opacity: 0; } }
-      [data-typing="true"] { opacity: 0; transition: opacity 0.1s; visibility: visible; }
+      [data-typing="true"] { opacity: 0; transition: opacity 0.1s; visibility: visible; display: block !important; }
       [data-typing="true"].typing-done { opacity: 1; visibility: visible; }
     `;
     document.head.appendChild(st);
@@ -58,8 +58,10 @@
       abortCurrent = () => (abort = true);
 
       element.style.visibility = 'visible';
+      element.style.display = 'block';
       element.style.opacity = '0';
       element.textContent = '';
+
       const caret = document.createElement('span');
       caret.className = 'typing-caret';
       caret.textContent = '|';
@@ -109,7 +111,7 @@
           if (list && list.length) {
             elements = Array.from(list);
           } else {
-            const active = document.querySelector('div[id^="section-"].active') || document.getElementById('section-intro');
+            const active = document.querySelector('div[id^="section-"]:not(.hidden)') || document.getElementById('section-intro');
             if (active) container = active;
             console.log('[TypingBridge] Seção ativa como fallback:', active ? active.id : 'Nenhuma');
           }
@@ -122,7 +124,7 @@
       } else if (Array.isArray(target)) {
         elements = target.filter(Boolean);
       } else {
-        const active = document.querySelector('div[id^="section-"].active') || document.getElementById('section-intro');
+        const active = document.querySelector('div[id^="section-"]:not(.hidden)') || document.getElementById('section-intro');
         if (active) container = active;
         console.log('[TypingBridge] Usando seção ativa:', active ? active.id : 'Nenhuma');
       }
@@ -242,7 +244,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
-      const active = document.querySelector('div[id^="section-"].active') || document.getElementById('section-intro');
+      const active = document.querySelector('div[id^="section-"]:not(.hidden)') || document.getElementById('section-intro');
       console.log('[TypingBridge] Seção ativa após DOMContentLoaded:', active ? active.id : 'Nenhuma');
       playTypingAndSpeak(active ? `#${active.id}` : '#section-intro', null);
     }, 100);
@@ -250,7 +252,7 @@
 
   document.addEventListener('bootstrapComplete', () => {
     setTimeout(() => {
-      const active = document.querySelector('div[id^="section-"].active') || document.getElementById('section-intro');
+      const active = document.querySelector('div[id^="section-"]:not(.hidden)') || document.getElementById('section-intro');
       console.log('[TypingBridge] Seção ativa após bootstrapComplete:', active ? active.id : 'Nenhuma');
       playTypingAndSpeak(active ? `#${active.id}` : '#section-intro', null);
     }, 100);
