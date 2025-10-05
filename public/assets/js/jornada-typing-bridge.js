@@ -25,8 +25,8 @@
       .typing-caret{display:inline-block;width:0.6ch;margin-left:2px;animation:blink 1s step-end infinite}
       .typing-done[data-typing]::after{content:''}
       @keyframes blink{50%{opacity:0}}
-      [data-typing="true"] { opacity: 0; transition: opacity 0.1s; }
-      [data-typing="true"].typing-done { opacity: 1; }
+      [data-typing="true"] { opacity: 0; transition: opacity 0.1s; visibility: hidden; }
+      [data-typing="true"].typing-done { opacity: 1; visibility: visible; }
     `;
     document.head.appendChild(st);
   })();
@@ -62,7 +62,8 @@
       }
 
       element.textContent = '';
-      element.style.opacity = '1';
+      element.style.opacity = '0';
+      element.style.visibility = 'hidden';
       const caret = document.createElement('span');
       caret.className = 'typing-caret';
       caret.textContent = '|';
@@ -236,6 +237,14 @@
   global.runTyping = playTypingAndSpeak;
 
   typingLog('Pronto');
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const active = document.querySelector('div[id^="section-"].active') || document.getElementById('section-intro');
+      console.log('[TypingBridge] Seção ativa após DOMContentLoaded:', active ? active.id : 'Nenhuma');
+      playTypingAndSpeak(active ? `#${active.id}` : '#section-intro', null);
+    }, 100);
+  });
 
   document.addEventListener('bootstrapComplete', () => {
     setTimeout(() => {
