@@ -82,13 +82,12 @@
         const textElements = container.querySelectorAll('[data-typing="true"]:not(.hidden)');
         console.log('[JornadaController] Elementos [data-typing] encontrados:', textElements.length);
 
-        if (textElements.length === 0) {
-          const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : target.querySelector('[data-action="avancar"], [data-action="read-question"], [data-action="select-guia"], [data-action="skip-selfie"], .btn-avancar, .btn');
-          if (btn && btn.disabled) {
-            btn.disabled = false;
-            console.log('[JornadaController] Botão ativado (sem datilografia) em:', id, currentTermosPage || '');
-            window.toast && window.toast('Conteúdo pronto! Clique para avançar.');
-          }
+        // Ativar botão mesmo sem datilografia para evitar travamento
+        const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : target.querySelector('[data-action="avancar"], [data-action="read-question"], [data-action="select-guia"], [data-action="skip-selfie"], .btn-avancar, .btn');
+        if (btn && btn.disabled) {
+          btn.disabled = false;
+          console.log('[JornadaController] Botão ativado (sem datilografia) em:', id, currentTermosPage || '');
+          window.toast && window.toast('Conteúdo pronto! Clique para avançar.');
         }
 
         let typingCompleted = 0;
