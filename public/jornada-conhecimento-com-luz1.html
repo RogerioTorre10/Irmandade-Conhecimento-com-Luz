@@ -644,6 +644,13 @@
       try { localStorage.setItem('JORNADA_NOME', nome); } catch (_) {}
     }
 
+    const avancarBtn = document.querySelector('#section-senha [data-action="avancar"]');
+    if (avancarBtn) {
+      avancarBtn.disabled = false;
+      log('[Senha] Botão de avançar ativado após validação da senha');
+      window.toast && window.toast('Senha correta! Clique em Avançar para continuar.');
+    }
+
     if (window.JC) {
       document.addEventListener('allTypingComplete', () => {
         speechSynthesis.cancel();
@@ -653,7 +660,7 @@
           video.src = '';
           video.load();
         });
-        window.JC.goNext(); // Usa goNext para pular seções inexistentes
+        window.JC.goNext();
         log('[startJourney] Navegação para próxima seção após digitação');
       }, { once: true });
     } else {
@@ -661,6 +668,33 @@
       window.toast && window.toast('Erro ao inicializar jornada. Tente recarregar a página.');
     }
   };
+
+  // Processar datilografia e TTS para #section-senha
+  document.addEventListener('sectionLoaded', (e) => {
+    if (e.detail.sectionId === 'section-senha') {
+      const container = document.getElementById('section-senha');
+      if (!container) {
+        console.error('[Senha] Container #section-senha não encontrado');
+        window.toast && window.toast('Erro: Seção de senha não encontrada.');
+        return;
+      }
+      if (global.i18n && global.i18n.ready) {
+        global.i18n.apply(container);
+        console.log('[Senha] Traduções i18n aplicadas a #section-senha');
+      }
+      if (global.runTyping) {
+        global.runTyping(container, () => {
+          console.log('[Senha] Datilografia e TTS concluídos para #section-senha');
+          const senhaInput = document.getElementById('senhaInput');
+          if (senhaInput) {
+            const placeholderText = global.i18n ? global.i18n.t('senha_placeholder', senhaInput.placeholder) : senhaInput.placeholder;
+            global.TypingBridge.typePlaceholder(senhaInput, placeholderText, 22);
+          }
+        });
+      }
+    }
+  });
+
   console.log('[Senha] Bloco carregado');
 })();
 </script>
