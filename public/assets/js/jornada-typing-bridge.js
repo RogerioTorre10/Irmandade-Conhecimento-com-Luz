@@ -25,7 +25,7 @@
       .typing-caret { display: inline-block; width: 0.6ch; margin-left: 2px; animation: blink 1s step-end infinite; }
       .typing-done[data-typing]::after { content: ''; }
       @keyframes blink { 50% { opacity: 0; } }
-      [data-typing="true"] { opacity: 0; transition: opacity 0.1s; visibility: hidden; }
+      [data-typing="true"] { opacity: 0; transition: opacity 0.1s; visibility: visible; }
       [data-typing="true"].typing-done { opacity: 1; visibility: visible; }
     `;
     document.head.appendChild(st);
@@ -57,13 +57,8 @@
       let abort = false;
       abortCurrent = () => (abort = true);
 
-      const isVisible = element.offsetParent !== null && window.getComputedStyle(element).visibility !== 'hidden' && window.getComputedStyle(element).display !== 'none';
-      console.log('[TypingBridge] Elemento visível:', isVisible, 'ID:', element.id || element.className);
-      if (!isVisible) {
-        console.warn('[TypingBridge] Elemento não visível, pulando datilografia:', element.id || element.className);
-        return resolve();
-      }
-
+      element.style.visibility = 'visible';
+      element.style.opacity = '0';
       element.textContent = '';
       const caret = document.createElement('span');
       caret.className = 'typing-caret';
@@ -204,4 +199,60 @@
 
       if (ttsQueue.length > 0 && (target === '#section-termos' || (target instanceof HTMLElement && target.closest('#section-termos'))) {
         console.log('[TypingBridge] Aguardando clique para TTS em section-termos, página:', window.currentTermosPage || 'termos-pg1');
-        const btn = document.querySelector(`#${window.currentTermosPage || 'termos
+        const btn = document.querySelector(`#${window.currentTermosPage || 'termos-pg1'} [data-action="termos-next"], #${window.currentTermosPage || 'termos-pg1'} [data-action="avancar"]`);
+        if (btn) {
+          btn.addEventListener('click', () => {
+            setTimeout(() => {
+              ttsQueue.forEach((text, index) => {
+                setTimeout(() => {
+                  const utt = new SpeechSynthesisUtterance(text);
+                  utt.lang = i18n.lang || 'pt-BR';
+                  utt.rate = 1.03;
+                  utt.pitch = 1.0;
+                  utt.volume = window.isMuted ? 0 : 1;
+                  utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
+                  speechSynthesis.speak(utt);
+                  console.log('[TypingBridge] TTS iniciado para texto', index + 1, 'de', ttsQueue.length, 'em:', window.currentTermosPage || 'termos-pg1');
+                }, index * 1000);
+              });
+              ttsQueue = [];
+            }, 100);
+          }, { once: true });
+        }
+      }
+
+      if (callback) callback();
+    } catch (e) {
+      console.error('[TypingBridge] Erro:', e);
+      if (callback) callback();
+    } finally {
+      unlock();
+    }
+  }
+
+  const TypingBridge = { play: playTypingAndSpeak };
+  global.TypingBridge = TypingBridge;
+  global.runTyping = (element, text, callback) => {
+    typeText(element, text, 36, true).then(() => {
+      if (callback) callback();
+    });
+  };
+
+  typingLog('Pronto');
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const active = document.querySelector('div[id^="section-"].active') || document.getElementById('section-intro');
+      console.log('[TypingBridge] Seção ativa após DOMContentLoaded:', active ? active.id : 'Nenhuma');
+      playTypingAndSpeak(active ? `#${active.id}` : '#section-intro', null);
+    }, 100);
+  });
+
+  document.addEventListener('bootstrapComplete', () => {
+    setTimeout(() => {
+      const active = document.querySelector('div[id^="section-"].active') || document.getElementById('section-intro');
+      console.log('[TypingBridge] Seção ativa após bootstrapComplete:', active ? active.id : 'Nenhuma');
+      playTypingAndSpeak(active ? `#${active.id}` : '#section-intro', null);
+    }, 100);
+  });
+})(window);
