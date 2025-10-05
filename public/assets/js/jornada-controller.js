@@ -92,7 +92,7 @@
 
       setTimeout(() => {
         console.log('[JornadaController] Processando elementos [data-typing] em:', id, 'Página:', id === 'section-termos' ? currentTermosPage : currentPerguntasBlock);
-        const container = id === 'section-termos' ? target.querySelector(`#${currentTermosPage}`) : id === 'section-perguntas' ? target.querySelector('.content') : target;
+        const container = id === 'section-termos' ? target.querySelector(`#${currentTermosPage}`) : id === 'section-perguntas' ? target.querySelector('#perguntas-container') : target;
         const textElements = container ? container.querySelectorAll('[data-typing="true"]:not(.hidden)') : [];
         console.log('[JornadaController] Elementos [data-typing] encontrados:', textElements.length);
 
@@ -108,7 +108,9 @@
 
         textElements.forEach(el => {
           console.log('[JornadaController] Verificando visibilidade para elemento:', el.id || el.className);
-          const isVisible = el.offsetParent !== null && window.getComputedStyle(el).visibility !== 'hidden' && window.getComputedStyle(el).display !== 'none';
+          el.style.display = 'block';
+          el.style.visibility = 'visible';
+          const isVisible = el.offsetParent !== null && window.getComputedStyle(el).display !== 'none';
           if (isVisible && typeof global.runTyping === 'function') {
             console.log('[JornadaController] Chamando runTyping para elemento:', el.id || el.className);
             global.runTyping(el, el.getAttribute('data-text') || el.textContent, () => {
@@ -131,6 +133,7 @@
             });
           } else {
             console.warn('[JornadaController] Elemento não visível ou runTyping não disponível, pulando datilografia:', el.id || el.className);
+            el.classList.add('typing-done');
           }
         });
 
