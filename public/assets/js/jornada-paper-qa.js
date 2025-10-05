@@ -10,7 +10,6 @@
 
   const log = (...args) => console.log('[JORNADA_PAPER]', ...args);
 
-  // i18n seguro
   const i18n = global.i18n || {
     lang: 'pt-BR',
     ready: false,
@@ -41,7 +40,6 @@
   };
   global.JORNADA_FINAL_VIDEO = global.JORNADA_VIDEOS.final;
 
-  // Traduções locais
   const blockTranslations = {
     'pt-BR': [
       {
@@ -49,9 +47,9 @@
         title: 'Block 1 — Roots',
         data_i18n: 'bloco_raizes_title',
         questions: [
-          { id: 'quem_voce_hoje',    label: 'Who are you today?',                         data_i18n: 'pergunta_quem_voce_hoje' },
-          { id: 'o_que_te_trouxe',   label: 'What brought you to this journey?',          data_i18n: 'pergunta_o_que_te_trouxe' },
-          { id: 'sonho_espiritual',  label: 'What is your greatest spiritual dream?',     data_i18n: 'pergunta_sonho_espiritual' }
+          { id: 'quem_voce_hoje', label: 'Who are you today?', data_i18n: 'pergunta_quem_voce_hoje' },
+          { id: 'o_que_te_trouxe', label: 'What brought you to this journey?', data_i18n: 'pergunta_o_que_te_trouxe' },
+          { id: 'sonho_espiritual', label: 'What is your greatest spiritual dream?', data_i18n: 'pergunta_sonho_espiritual' }
         ],
         video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
       },
@@ -60,9 +58,9 @@
         title: 'Block 2 — Reflections',
         data_i18n: 'bloco_reflexoes_title',
         questions: [
-          { id: 'desafios_atuais',  label: 'What are your biggest current challenges?',  data_i18n: 'pergunta_desafios_atuais' },
-          { id: 'medo_duvida',      label: 'How do you deal with fear or doubt?',        data_i18n: 'pergunta_medo_duvida' },
-          { id: 'significado_luz',  label: 'What does "light" mean to you?',             data_i18n: 'pergunta_significado_luz' }
+          { id: 'desafios_atuais', label: 'What are your biggest current challenges?', data_i18n: 'pergunta_desafios_atuais' },
+          { id: 'medo_duvida', label: 'How do you deal with fear or doubt?', data_i18n: 'pergunta_medo_duvida' },
+          { id: 'significado_luz', label: 'What does "light" mean to you?', data_i18n: 'pergunta_significado_luz' }
         ],
         video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
       },
@@ -71,9 +69,9 @@
         title: 'Block 3 — Growth',
         data_i18n: 'bloco_crescimento_title',
         questions: [
-          { id: 'mudar_vida',       label: 'What do you want to change in your life?',   data_i18n: 'pergunta_mudar_vida' },
-          { id: 'quem_inspira',     label: 'Who inspires you and why?',                  data_i18n: 'pergunta_quem_inspira' },
-          { id: 'pratica_gratidao', label: 'How do you practice gratitude daily?',       data_i18n: 'pergunta_pratica_gratidao' }
+          { id: 'mudar_vida', label: 'What do you want to change in your life?', data_i24n: 'pergunta_mudar_vida' },
+          { id: 'quem_inspira', label: 'Who inspires you and why?', data_i18n: 'pergunta_quem_inspira' },
+          { id: 'pratica_gratidao', label: 'How do you practice gratitude daily?', data_i18n: 'pergunta_pratica_gratidao' }
         ],
         video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4'
       },
@@ -82,9 +80,9 @@
         title: 'Block 4 — Integration',
         data_i18n: 'bloco_integracao_title',
         questions: [
-          { id: 'licao_jornada',    label: 'What lesson do you take from this journey?', data_i18n: 'pergunta_licao_jornada' },
-          { id: 'aplicar_futuro',   label: 'How will you apply this in the future?',     data_i18n: 'pergunta_aplicar_futuro' },
-          { id: 'mensagem_futuro',  label: 'A message for your future self.',            data_i18n: 'pergunta_mensagem_futuro' }
+          { id: 'licao_jornada', label: 'What lesson do you take from this journey?', data_i18n: 'pergunta_licao_jornada' },
+          { id: 'aplicar_futuro', label: 'How will you apply this in the future?', data_i18n: 'pergunta_aplicar_futuro' },
+          { id: 'mensagem_futuro', label: 'A message for your future self.', data_i18n: 'pergunta_mensagem_futuro' }
         ],
         video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
       },
@@ -93,8 +91,8 @@
         title: 'Block 5 — Synthesis and Delivery',
         data_i18n: 'bloco_sintese_title',
         questions: [
-          { id: 'essencia_hoje',    label: 'Who are you today, in one true sentence?',   data_i18n: 'pergunta_essencia_hoje' },
-          { id: 'passo_fe',         label: 'What will be your next step of faith and courage?', data_i18n: 'pergunta_passo_fe' }
+          { id: 'essencia_hoje', label: 'Who are you today, in one true sentence?', data_i18n: 'pergunta_essencia_hoje' },
+          { id: 'passo_fe', label: 'What will be your next step of faith and courage?', data_i18n: 'pergunta_passo_fe' }
         ],
         video_after: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
       }
@@ -113,14 +111,14 @@
   }
   function ensureCanvas() {
     let root = elCanvas();
-    if (!root) {
+    if (!root && global.__currentSectionId === 'section-perguntas') {
       root = document.createElement('section');
       root.id = CFG.CANVAS_ID;
       root.className = 'card pergaminho';
-      document.body.appendChild(root);
+      document.getElementById('section-perguntas')?.querySelector('.content')?.appendChild(root);
     }
     let content = elContent();
-    if (!content) {
+    if (!content && root) {
       content = document.createElement('div');
       content.id = CFG.CONTENT_ID;
       content.className = 'conteudo-pergaminho';
@@ -132,6 +130,7 @@
 
   function setPergaminho(mode = 'h') {
     const { root } = ensureCanvas();
+    if (!root) return;
     root.classList.remove('pergaminho-v', 'pergaminho-h');
     const isV = mode === 'v';
     root.classList.add(isV ? 'pergaminho-v' : 'pergaminho-h');
@@ -300,114 +299,4 @@
 
     const currentBloco = content.querySelector(`[data-bloco="${JC.currentBloco}"]`);
     if (currentBloco) {
-      currentBloco.style.display = 'block';
-      const curId = `${JORNADA_BLOCKS[JC.currentBloco]?.id || 'b'}-${JC.currentPergunta}`;
-      const currentPergunta = currentBloco.querySelector(`[data-perguntaId="${curId}"]`);
-      if (currentPergunta) {
-        currentPergunta.style.display = 'block';
-        currentPergunta.classList.add('active');
-        setTimeout(() => {
-          log('Iniciando typeQuestionsSequentially para bloco', JC.currentBloco);
-          typeQuestionsSequentially(currentBloco);
-        }, 100);
-      }
-    }
-
-    log('Perguntas renderizadas, total de blocos:', JORNADA_BLOCKS.length);
-  }
-
-  // ===== eventos =====
-  function initPaperQAEvents() {
-    document.addEventListener('click', (ev) => {
-      const btn = ev.target.closest('[data-action="read-question"]');
-      if (!btn) return;
-      const pergunta = btn.closest('.j-pergunta')?.querySelector('[data-i18n]');
-      if (!pergunta) return;
-      const key = pergunta.dataset.i18n;
-      const text = i18n.t(key, pergunta.textContent);
-      if ('speechSynthesis' in global) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = i18n.lang || 'pt-BR';
-        global.speechSynthesis.speak(utterance);
-      } else {
-        console.warn('[JORNADA_PAPER] SpeechSynthesis não suportado');
-      }
-    });
-
-    document.addEventListener('click', (ev) => {
-      const btn = ev.target.closest('[data-action="start-mic"]');
-      if (!btn) return;
-      log('Microfone acionado (funcionalidade não implementada)');
-      global.toast && global.toast('Microfone não implementado ainda.');
-    });
-
-    const skipVideoButton = document.querySelector('#skipVideo');
-    if (skipVideoButton) {
-      skipVideoButton.addEventListener('click', () => {
-        log('Vídeo pulado');
-        document.dispatchEvent(new CustomEvent('videoSkipped'));
-      });
-    }
-  }
-
-  // ===== init =====
-  async function loadDynamicBlocks() {
-    try {
-      await i18n.waitForReady(10000);
-      if (!i18n.ready) throw new Error('i18n não inicializado');
-
-      const lang = i18n.lang || 'pt-BR';
-      const base = blockTranslations[lang] || blockTranslations['pt-BR'];
-      JORNADA_BLOCKS = base.map(block => ({
-        id: block.id,
-        title: block.title,
-        data_i18n: block.data_i18n,
-        questions: block.questions,
-        video_after: block.video_after,
-        tipo: 'perguntas'
-      }));
-
-      global.JORNADA_BLOCKS = JORNADA_BLOCKS;
-      log('JORNADA_BLOCKS preenchido:', JORNADA_BLOCKS);
-      return true;
-    } catch (error) {
-      console.error('[JORNADA_PAPER] Erro ao preencher JORNADA_BLOCKS:', error);
-      JORNADA_BLOCKS = [];
-      global.JORNADA_BLOCKS = [];
-      global.toast && global.toast('Erro ao carregar blocos de perguntas');
-      return false;
-    }
-  }
-
-  async function initPaperQA() {
-    try {
-      await loadDynamicBlocks();
-      console.log('[JORNADA_PAPER] Inicializado com sucesso');
-    } catch (error) {
-      console.error('[JORNADA_PAPER] Erro na inicialização:', error && error.message);
-      global.JORNADA_BLOCKS = [];
-    }
-  }
-
-  // Bootstrap de eventos/estado
-  document.addEventListener('DOMContentLoaded', () => {
-    initPaperQA();
-    initPaperQAEvents();
-  });
-
-  // API global
-  global.JPaperQA = {
-    loadDynamicBlocks,
-    renderQuestions,
-    loadVideo,
-    setPergaminho,
-    ensureCanvas,
-    typeQuestionsSequentially,
-    typePlaceholder,
-    initEvents: initPaperQAEvents,
-    init: initPaperQA
-  };
-
-  log('Script jornada-paper-qa.js carregado com sucesso');
-
-})(window);
+      currentBloco.style.display = '
