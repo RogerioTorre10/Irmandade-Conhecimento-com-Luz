@@ -22,9 +22,9 @@
     const st = document.createElement('style');
     st.id = 'typing-style';
     st.textContent = `
-      .typing-caret{display:inline-block;width:0.6ch;margin-left:2px;animation:blink 1s step-end infinite}
-      .typing-done[data-typing]::after{content:''}
-      @keyframes blink{50%{opacity:0}}
+      .typing-caret { display: inline-block; width: 0.6ch; margin-left: 2px; animation: blink 1s step-end infinite; }
+      .typing-done[data-typing]::after { content: ''; }
+      @keyframes blink { 50% { opacity: 0; } }
       [data-typing="true"] { opacity: 0; transition: opacity 0.1s; visibility: hidden; }
       [data-typing="true"].typing-done { opacity: 1; visibility: visible; }
     `;
