@@ -570,8 +570,8 @@
  <!-- Senha -->
 <script>
 (function() {
-  const log = (...a) => { try { console.log('[Senha v4]', ...a); } catch (_) {} };
-  const VALID_PASSWORD = 'luz123';
+  const log = (...a) => { try { console.log('[Senha v6]', ...a); } catch (_) {} };
+  const VALID_PASSWORD = window.APP_CONFIG?.PASS || 'IRMANDADE';
 
   function getSenhaSection() {
     return document.getElementById('section-senha') || document.querySelector('[data-section="senha"], .section-senha') || document;
@@ -633,7 +633,7 @@
       return;
     }
 
-    if (senha !== VALID_PASSWORD) {
+    if (senha !== VALID_PASSWORD.toLowerCase()) {
       window.toast && window.toast('Senha incorreta. Tente novamente.');
       if (inputSenha) inputSenha.focus();
       log('[startJourney] Senha inválida:', senha);
@@ -652,7 +652,7 @@
     }
 
     if (window.JC) {
-      document.addEventListener('allTypingComplete', () => {
+      avancarBtn.addEventListener('click', () => {
         speechSynthesis.cancel();
         const videos = document.querySelectorAll('video');
         videos.forEach(video => {
@@ -661,7 +661,7 @@
           video.load();
         });
         window.JC.goNext();
-        log('[startJourney] Navegação para próxima seção após digitação');
+        log('[startJourney] Navegação para próxima seção após clique');
       }, { once: true });
     } else {
       console.error('[startJourney] window.JC não definido');
@@ -689,8 +689,25 @@
           if (senhaInput) {
             const placeholderText = global.i18n ? global.i18n.t('senha_placeholder', senhaInput.placeholder) : senhaInput.placeholder;
             global.TypingBridge.typePlaceholder(senhaInput, placeholderText, 22);
+            senhaInput.addEventListener('input', () => {
+              window.startJourney();
+            }, { once: true });
+          }
+          // Ativa o botão de avançar mesmo sem validação para evitar travamento
+          const avancarBtn = document.querySelector('#section-senha [data-action="avancar"]');
+          if (avancarBtn) {
+            avancarBtn.disabled = false;
+            log('[Senha] Botão de avançar ativado após datilografia');
           }
         });
+      } else {
+        console.warn('[Senha] runTyping não disponível, ativando botão imediatamente');
+        const avancarBtn = document.querySelector('#section-senha [data-action="avancar"]');
+        if (avancarBtn) {
+          avancarBtn.disabled = false;
+          log('[Senha] Botão de avançar ativado (fallback)');
+        }
+        document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target: 'section-senha' } }));
       }
     }
   });
