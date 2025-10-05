@@ -62,8 +62,6 @@
       }
 
       element.textContent = '';
-      element.style.opacity = '0';
-      element.style.visibility = 'hidden';
       const caret = document.createElement('span');
       caret.className = 'typing-caret';
       caret.textContent = '|';
@@ -237,14 +235,6 @@
   global.runTyping = playTypingAndSpeak;
 
   typingLog('Pronto');
-
-  document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-      const active = document.querySelector('div[id^="section-"].active') || document.getElementById('section-intro');
-      console.log('[TypingBridge] Seção ativa após DOMContentLoaded:', active ? active.id : 'Nenhuma');
-      playTypingAndSpeak(active ? `#${active.id}` : '#section-intro', null);
-    }, 100);
-  });
 
   document.addEventListener('bootstrapComplete', () => {
     setTimeout(() => {
