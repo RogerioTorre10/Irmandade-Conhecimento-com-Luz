@@ -69,7 +69,7 @@
         title: 'Block 3 — Growth',
         data_i18n: 'bloco_crescimento_title',
         questions: [
-          { id: 'mudar_vida', label: 'What do you want to change in your life?', data_i24n: 'pergunta_mudar_vida' },
+          { id: 'mudar_vida', label: 'What do you want to change in your life?', data_i18n: 'pergunta_mudar_vida' },
           { id: 'quem_inspira', label: 'Who inspires you and why?', data_i18n: 'pergunta_quem_inspira' },
           { id: 'pratica_gratidao', label: 'How do you practice gratitude daily?', data_i18n: 'pergunta_pratica_gratidao' }
         ],
@@ -110,8 +110,9 @@
     return document.getElementById(CFG.CONTENT_ID);
   }
   function ensureCanvas() {
+    if (global.__currentSectionId !== 'section-perguntas') return { root: null, content: null };
     let root = elCanvas();
-    if (!root && global.__currentSectionId === 'section-perguntas') {
+    if (!root) {
       root = document.createElement('section');
       root.id = CFG.CANVAS_ID;
       root.className = 'card pergaminho';
@@ -218,6 +219,7 @@
 
   // ===== vídeo =====
   function loadVideo(videoSrc) {
+    if (global.__currentSectionId !== 'section-perguntas') return;
     const video = document.querySelector('#videoTransicao');
     const videoOverlay = document.querySelector('#videoOverlay');
     if (!video || !videoOverlay) {
@@ -299,4 +301,113 @@
 
     const currentBloco = content.querySelector(`[data-bloco="${JC.currentBloco}"]`);
     if (currentBloco) {
-      currentBloco.style.display = '
+      currentBloco.style.display = 'block';
+      const curId = `${JORNADA_BLOCKS[JC.currentBloco]?.id || 'b'}-${JC.currentPergunta}`;
+      const currentPergunta = currentBloco.querySelector(`[data-perguntaId="${curId}"]`);
+      if (currentPergunta) {
+        currentPergunta.style.display = 'block';
+        currentPergunta.classList.add('active');
+        setTimeout(() => {
+          log('Iniciando typeQuestionsSequentially para bloco', JC.currentBloco);
+          typeQuestionsSequentially(currentBloco);
+        }, 100);
+      }
+    }
+
+    log('Perguntas renderizadas, total de blocos:', JORNADA_BLOCKS.length);
+  }
+
+  // ===== eventos =====
+  function initPaperQAEvents() {
+    document.addEventListener('click', (ev) => {
+      const btn = ev.target.closest('[data-action="read-question"]');
+      if (!btn) return;
+      const pergunta = btn.closest('.j-pergunta')?.querySelector('[data-i18n]');
+      if (!pergunta) return;
+      const key = pergunta.dataset.i18n;
+      const text = i18n.t(key, pergunta.textContent);
+      if ('speechSynthesis' in global) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = i18n.lang || 'pt-BR';
+        global.speechSynthesis.speak(utterance);
+      } else {
+        console.warn('[JORNADA_PAPER] SpeechSynthesis não suportado');
+      }
+    });
+
+    document.addEventListener('click', (ev) => {
+      const btn = ev.target.closest('[data-action="start-mic"]');
+      if (!btn) return;
+      log('Microfone acionado (funcionalidade não implementada)');
+      global.toast && global.toast('Microfone não implementado ainda.');
+    });
+
+    const skipVideoButton = document.querySelector('#skipVideo');
+    if (skipVideoButton) {
+      skipVideoButton.addEventListener('click', () => {
+        log('Vídeo pulado');
+        document.dispatchEvent(new CustomEvent('videoSkipped'));
+      });
+    }
+  }
+
+  // ===== init =====
+  async function loadDynamicBlocks() {
+    try {
+      await i18n.waitForReady(10000);
+      if (!i18n.ready) throw new Error('i18n não inicializado');
+
+      const lang = i18n.lang || 'pt-BR';
+      const base = blockTranslations[lang] || blockTranslations['pt-BR'];
+      JORNADA_BLOCKS = base.map(block => ({
+        id: block.id,
+        title: block.title,
+        data_i18n: block.data_i18n,
+        questions: block.questions,
+        video_after: block.video_after,
+        tipo: 'perguntas'
+      }));
+
+      global.JORNADA_BLOCKS = JORNADA_BLOCKS;
+      log('JORNADA_BLOCKS preenchido:', JORNADA_BLOCKS);
+      return true;
+    } catch (error) {
+      console.error('[JORNADA_PAPER] Erro ao preencher JORNADA_BLOCKS:', error);
+      JORNADA_BLOCKS = [];
+      global.JORNADA_BLOCKS = [];
+      global.toast && global.toast('Erro ao carregar blocos de perguntas');
+      return false;
+    }
+  }
+
+  async function initPaperQA() {
+    try {
+      await loadDynamicBlocks();
+      console.log('[JORNADA_PAPER] Inicializado com sucesso');
+    } catch (error) {
+      console.error('[JORNADA_PAPER] Erro na inicialização:', error && error.message);
+      global.JORNADA_BLOCKS = [];
+    }
+  }
+
+  // Bootstrap de eventos/estado
+  document.addEventListener('DOMContentLoaded', () => {
+    initPaperQA();
+    initPaperQAEvents();
+  });
+
+  // API global
+  global.JPaperQA = {
+    loadDynamicBlocks,
+    renderQuestions,
+    loadVideo,
+    setPergaminho,
+    ensureCanvas,
+    typeQuestionsSequentially,
+    typePlaceholder,
+    initEvents: initPaperQAEvents,
+    init: initPaperQA
+  };
+
+  log('Script jornada-paper-qa.js carregado com sucesso');
+})(window);
