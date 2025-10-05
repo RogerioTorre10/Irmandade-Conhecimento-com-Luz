@@ -114,7 +114,7 @@
 
     try {
       speechSynthesis.cancel();
-      pauseAllVideos();
+      pauseAllVideos(); // Força pausa sempre ao mostrar seção
 
       const all = document.querySelectorAll('div[id^="section-"]');
       const target = document.getElementById(id);
@@ -132,9 +132,15 @@
       global.G = global.G || {};
       global.G.__typingLock = false;
 
-      // Cleanup de botões extras
-      const extraBtns = target.querySelectorAll('.btn-confirm-extra, .btn-duplicate');
-      extraBtns.forEach(btn => btn.remove());
+      // Cleanup específico para botões extras da selfie na intro
+      if (id === 'section-intro') {
+        const extraSelfieBtns = document.querySelectorAll('[data-action="pre-visualizar"], [data-action="capturar"], [data-action="pular-selfie"], [data-action="confirmar"]');
+        extraSelfieBtns.forEach(btn => {
+          btn.remove();
+          console.log('[JornadaController] Removido botão extra da selfie na intro:', btn.dataset.action);
+        });
+        pauseAllVideos(); // Pausa extra para vídeos em fundo na intro
+      }
 
       setTimeout(async () => {
         console.log('[JornadaController] Processando seção:', id, 'Página:', currentTermosPage);
@@ -152,9 +158,9 @@
             pg1.classList.add(HIDE_CLASS);
             pg2.classList.add(HIDE_CLASS);
             page.classList.remove(HIDE_CLASS);
-            console.log('[JornadaController] Exibindo página de termos:', currentTermosPage);
+            console.log('[JornadaController] Exibindo página de termos:', currentTermosPage, 'Visível:', page.offsetParent !== null);
           } else {
-            console.error('[JornadaController] Uma ou mais páginas de termos não encontradas');
+            console.error('[JornadaController] Uma ou mais páginas de termos (#termos-pg1, #termos-pg2) não encontradas');
             window.toast && window.toast('Erro: Páginas de termos não encontradas.');
           }
           container = page;
@@ -165,6 +171,7 @@
           container = target;
         }
 
+        // Aplica traduções i18n
         if (global.i18n) {
           try {
             await i18n.waitForReady(10000);
@@ -172,7 +179,6 @@
             console.log('[JornadaController] Traduções i18n aplicadas a:', id);
           } catch (e) {
             console.warn('[JornadaController] Falha ao aplicar i18n:', e);
-            window.toast && window.toast('Traduções parciais aplicadas.');
           }
         }
 
@@ -180,9 +186,9 @@
         console.log('[JornadaController] Elementos [data-typing] encontrados:', textElements.length, 'em', id);
 
         if (textElements.length === 0) {
-          console.log('[JornadaController] Nenhum elemento com data-typing, ativando botão imediatamente');
-          let btn = id === 'section-termos' ? container.querySelector('[data-action="termos-next"], [data-action="avancar"]') :
-                   id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) :
+          console.log('[JornadaController] Nenhum elemento com [data-typing], ativando botão imediatamente');
+          let btn = id === 'section-termos' ? container.querySelector('[data-action="termos-next"], [data-action="avancar"]') : 
+                   id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) : 
                    target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn-avanca, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn');
           if (!btn) {
             btn = container?.querySelector('button') || target.querySelector('button') || document.querySelector('#iniciar, [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-iniciar, .start-btn, .next-btn, .btn-avancar, .btn-avanca');
@@ -190,7 +196,7 @@
           }
           if (btn) {
             btn.disabled = false;
-            console.log('[JornadaController] Botão ativado em:', id, 'Botão:', btn.id || btn.className);
+            console.log('[JornadaController] Botão ativado imediatamente em:', id, 'Botão:', btn.id || btn.className);
             window.toast && window.toast('Conteúdo pronto! Clique para avançar.');
           } else {
             console.error('[JornadaController] Botão de avançar não encontrado em:', id);
@@ -213,9 +219,13 @@
         }
 
         const onAllComplete = () => {
-          let btn = id === 'section-termos' ? container.querySelector('[data-action="termos-next"], [data-action="avancar"]') :
-                   id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) :
+          let btn = id === 'section-termos' ? container.querySelector('[data-action="termos-next"], [data-action="avancar"]') : 
+                   id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) : 
                    target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn-avanca, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn');
+          if (!btn) {
+            btn = container?.querySelector('button') || target.querySelector('button') || document.querySelector('#iniciar, [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-iniciar, .start-btn, .next-btn, .btn-avancar, .btn-avanca');
+            console.warn('[JornadaController] Botão não encontrado pelos seletores padrão, usando fallback:', btn ? (btn.id || btn.className) : 'nenhum botão encontrado');
+          }
           if (btn) {
             btn.disabled = false;
             console.log('[JornadaController] Botão ativado após datilografia em:', id);
@@ -230,7 +240,7 @@
     }
   };
 
-  // Listener para evitar travamento na senha
+  // Listener para travamento na senha: adicione validação extra
   document.addEventListener('allTypingComplete', (e) => {
     if (e.detail.target === 'section-senha') {
       const btn = document.querySelector('#section-senha [data-action="avancar"]');
