@@ -17,24 +17,6 @@
     waitForReady: async () => {}
   };
 
-  (function ensureStyle() {
-    if (document.getElementById('typing-style')) return;
-    const st = document.createElement('style');
-    st.id = 'typing-style';
-    st.textContent = `
-      .typing-caret {
-        display: inline-block;
-        width: var(--caret-width, 0.6ch);
-        margin-left: var(--caret-margin, 2px);
-        animation: blink 1s step-end infinite;
-        color: var(--caret-color, currentColor);
-      }
-      .typing-done[data-typing]::after { content: '' }
-      @keyframes blink { 50% { opacity: 0 } }
-    `;
-    document.head.appendChild(st);
-  })();
-
   let ACTIVE = false;
   let abortCurrent = null;
 
@@ -71,6 +53,7 @@
 
       element.setAttribute('aria-live', 'polite');
       element.textContent = '';
+      element.style.opacity = '0'; // Garante ocultação imediata
       const caret = document.createElement('span');
       caret.className = 'typing-caret';
       caret.textContent = '|';
@@ -91,6 +74,7 @@
           clearInterval(interval);
           if (showCursor) caret.remove();
           element.classList.add('typing-done');
+          element.style.opacity = '1';
           typingLog('Datilografia concluída para:', element.id || element.className);
           document.dispatchEvent(new CustomEvent('typingComplete', { detail: { element, text } }));
           resolve();
@@ -147,7 +131,6 @@
         return resolve();
       }
 
-      // Aguarda até que a fala atual termine
       if (speechSynthesis.speaking || speechSynthesis.pending) {
         typingLog('TTS em andamento, aguardando conclusão...');
         const waitForTTS = () => new Promise(r => {
@@ -173,7 +156,7 @@
           };
           utt.onerror = (error) => {
             console.error('[TypingBridge] Erro na leitura:', error, 'Texto:', text);
-            resolve(); // Continua mesmo com erro
+            resolve();
           };
           speechSynthesis.speak(utt);
           typingLog('TTS iniciado para texto:', text);
@@ -191,7 +174,7 @@
         };
         utt.onerror = (error) => {
           console.error('[TypingBridge] Erro na leitura:', error, 'Texto:', text);
-          resolve(); // Continua mesmo com erro
+          resolve();
         };
         speechSynthesis.speak(utt);
         typingLog('TTS iniciado para texto:', text);
@@ -264,7 +247,7 @@
         return;
       }
 
-      try { await i18n.waitForReady(5000); } catch (_) {}
+      try { await i18n.waitForReady(5000); } catch (_) { console.warn('[TypingBridge] i18n.waitForReady falhou'); }
 
       let completed = 0;
       const total = elements.length;
@@ -285,7 +268,7 @@
 
         const texto =
           el.getAttribute('data-text') ||
-          i18n.t(el.getAttribute('data-i18n-key') || el.getAttribute('data-i18n') || 'welcome', { ns: 'common' }) ||
+          (global.i18n ? i18n.t(el.getAttribute('data-i18n-key') || el.getAttribute('data-i18n') || 'welcome', { ns: 'common', defaultValue: el.textContent }) : el.textContent) ||
           el.textContent || '';
         typingLog('Processando elemento com texto:', texto, 'Elemento:', el.id || el.className);
 
@@ -304,7 +287,7 @@
 
         await typeText(el, texto, velocidade, mostrarCursor);
         await speakText(texto, i18n.lang || 'pt-BR');
-        await new Promise(resolve => setTimeout(resolve, 100)); // Atraso entre parágrafos
+        await new Promise(resolve => setTimeout(resolve, 100));
         completed++;
         if (completed === total) {
           document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target } }));
