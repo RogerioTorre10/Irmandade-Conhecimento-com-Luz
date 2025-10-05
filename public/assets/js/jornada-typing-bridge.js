@@ -236,6 +236,14 @@
 
   typingLog('Pronto');
 
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const active = document.querySelector('div[id^="section-"].active') || document.getElementById('section-intro');
+      console.log('[TypingBridge] Seção ativa após DOMContentLoaded:', active ? active.id : 'Nenhuma');
+      playTypingAndSpeak(active ? `#${active.id}` : '#section-intro', null);
+    }, 100);
+  });
+
   document.addEventListener('bootstrapComplete', () => {
     setTimeout(() => {
       const active = document.querySelector('div[id^="section-"].active') || document.getElementById('section-intro');
