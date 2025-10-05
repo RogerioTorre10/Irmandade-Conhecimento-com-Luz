@@ -38,7 +38,7 @@
 
   JC.show = function (id) {
     const now = performance.now();
-    if (now - lastShowSection < 1000) {
+    if (now - lastShowSection < 300) {
       console.log('[JornadaController] Debounce: evitando chamada repetida para:', id);
       return;
     }
@@ -63,6 +63,9 @@
 
       if (id !== 'section-termos') {
         currentTermosPage = 'termos-pg1';
+      }
+      if (id !== 'section-perguntas') {
+        currentPerguntasBlock = 'bloco-raizes';
       }
 
       if (id === 'section-termos') {
@@ -93,7 +96,7 @@
       global.JSecoes && global.JSecoes.updateCanvasBackground(id);
 
       setTimeout(() => {
-        console.log('[JornadaController] Processando elementos [data-typing] em:', id, 'Página:', id === 'section-termos' ? currentTermosPage : currentPerguntasBlock);
+        console.log('[JornadaController] Processando elementos [data-typing] em:', id, 'Página:', id === 'section-termos' ? currentTermosPage : id === 'section-perguntas' ? currentPerguntasBlock : 'N/A');
         const container = id === 'section-termos' ? target.querySelector(`#${currentTermosPage}`) : id === 'section-perguntas' ? target.querySelector('#perguntas-container') : target;
         const textElements = container ? container.querySelectorAll('[data-typing="true"]:not(.hidden)') : [];
         console.log('[JornadaController] Elementos [data-typing] encontrados:', textElements.length);
@@ -112,7 +115,7 @@
           console.log('[JornadaController] Verificando visibilidade para elemento:', el.id || el.className);
           el.style.display = 'block';
           el.style.visibility = 'visible';
-          const isVisible = el.offsetParent !== null && window.getComputedStyle(el).display !== 'none';
+          const isVisible = true; // Forçar visibilidade
           if (isVisible && typeof global.runTyping === 'function') {
             console.log('[JornadaController] Chamando runTyping para elemento:', el.id || el.className);
             global.runTyping(el, el.getAttribute('data-text') || el.textContent, () => {
@@ -134,7 +137,7 @@
               }
             });
           } else {
-            console.warn('[JornadaController] Elemento não visível ou runTyping não disponível, pulando datilografia:', el.id || el.className);
+            console.warn('[JornadaController] runTyping não disponível, pulando datilografia:', el.id || el.className);
             el.classList.add('typing-done');
             el.style.opacity = '1';
           }
@@ -182,12 +185,12 @@
               } else {
                 if (JC.goNext) JC.goNext();
               }
-            }, { once: true });
+            });
             btn.dataset.clickAttached = '1';
             console.log('[JornadaController] Evento de clique adicionado ao botão em:', id, 'Botão:', btn.id || btn.className || btn.dataset.action);
           }
         });
-      }, 200);
+      }, 300);
     } catch (e) {
       console.error('[JornadaController] Erro:', e);
       window.toast && window.toast('Erro ao exibir seção');
