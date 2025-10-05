@@ -1,4 +1,3 @@
-// video-transicao.js
 (function() {
   const log = (...args) => console.log('[VIDEO_TRANSICAO]', ...args);
   let isPlaying = false;
@@ -17,10 +16,8 @@
       console.error('[VIDEO_TRANSICAO] Elementos de vídeo não encontrados', { overlay: !!overlay, video: !!video });
       window.toast && window.toast('Erro ao reproduzir vídeo de transição.');
       isPlaying = false;
-      window.JC.nextSection = 'section-selfie';
-      window.__currentSectionId = 'section-selfie';
-      window.showSection && window.showSection('section-selfie');
-      log('Forçando section-selfie (sem elementos de vídeo)');
+      window.JC.goNext();
+      log('Avançando para próxima seção (sem elementos de vídeo)');
       return;
     }
     log('Tentando reproduzir:', videoSrc);
@@ -35,10 +32,8 @@
             overlay.classList.add('hidden');
             video.src = '';
             isPlaying = false;
-            window.JC.nextSection = 'section-selfie';
-            window.__currentSectionId = 'section-selfie';
-            window.showSection && window.showSection('section-selfie');
-            log('Avançando para section-selfie após vídeo');
+            window.JC.goNext();
+            log('Avançando para próxima seção após vídeo');
           };
           video.onerror = (e) => {
             console.error('[VIDEO_TRANSICAO] Erro ao carregar vídeo:', videoSrc, e);
@@ -50,10 +45,8 @@
               fallback.classList.add('hidden');
               video.classList.remove('hidden');
               isPlaying = false;
-              window.JC.nextSection = 'section-selfie';
-              window.__currentSectionId = 'section-selfie';
-              window.showSection && window.showSection('section-selfie');
-              log('Avançando para section-selfie após erro');
+              window.JC.goNext();
+              log('Avançando para próxima seção após erro');
             }, 3000);
           };
           overlay.classList.remove('hidden');
@@ -67,10 +60,8 @@
               fallback.classList.add('hidden');
               video.classList.remove('hidden');
               isPlaying = false;
-              window.JC.nextSection = 'section-selfie';
-              window.__currentSectionId = 'section-selfie';
-              window.showSection && window.showSection('section-selfie');
-              log('Avançando para section-selfie após erro de reprodução');
+              window.JC.goNext();
+              log('Avançando para próxima seção após erro de reprodução');
             }, 3000);
           });
           log('Iniciando reprodução:', videoSrc);
@@ -79,19 +70,15 @@
           console.error('[VIDEO_TRANSICAO] Erro ao verificar vídeo:', videoSrc, e);
           window.toast && window.toast('Vídeo de transição não encontrado.');
           isPlaying = false;
-          window.JC.nextSection = 'section-selfie';
-          window.__currentSectionId = 'section-selfie';
-          window.showSection && window.showSection('section-selfie');
-          log('Forçando section-selfie (vídeo não encontrado)');
+          window.JC.goNext();
+          log('Avançando para próxima seção (vídeo não encontrado)');
         });
     } catch (e) {
       console.error('[VIDEO_TRANSICAO] Erro inesperado:', videoSrc, e);
       window.toast && window.toast('Erro ao reproduzir vídeo de transição.');
       isPlaying = false;
-      window.JC.nextSection = 'section-selfie';
-      window.__currentSectionId = 'section-selfie';
-      window.showSection && window.showSection('section-selfie');
-      log('Forçando section-selfie (erro inesperado)');
+      window.JC.goNext();
+      log('Avançando para próxima seção (erro inesperado)');
     }
   };
 
@@ -106,13 +93,11 @@
         video.src = '';
         overlay.classList.add('hidden');
         isPlaying = false;
-        window.JC.nextSection = 'section-selfie';
-        window.__currentSectionId = 'section-selfie';
-        window.showSection && window.showSection('section-selfie');
-        log('Avançando para section-selfie após skip');
+        window.JC.goNext();
+        log('Avançando para próxima seção após skip');
       }
     }
   });
 
-  log('video-transicao.js carregado');
+  log('jornada-video-transicao.js carregado');
 })();
