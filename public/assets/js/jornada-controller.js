@@ -1,7 +1,6 @@
 (function (global) {
   'use strict';
 
-  // Inicializa mesmo sem todas as dependências
   if (!global.TypingBridge) {
     console.warn('[JornadaController] TypingBridge não inicializado, prosseguindo com limitações');
   }
@@ -18,8 +17,8 @@
   let currentPerguntasIndex = 0;
 
   const videoMapping = {
-    'section-filme-ao-encontro': global.JORNADA_VIDEOS?.afterBlocks?.[0],
-    'section-filme-entrando': global.JORNADA_VIDEOS?.afterBlocks?.[1],
+    'section-filme-ao-encontro': global.JORNADA_VIDEOS?.afterBlocks?.[0] || '/assets/img/filme-0-ao-encontro-da-jornada.mp4',
+    'section-filme-entrando': '/assets/img/filme-1-entrando-na-jornada.mp4',
     'section-final': global.JORNADA_VIDEOS?.final
   };
 
@@ -44,7 +43,6 @@
     let idx = sectionOrder.indexOf(currentId);
     if (idx >= 0 && idx < sectionOrder.length - 1) {
       let nextId = sectionOrder[idx + 1];
-      // Pular seções inexistentes
       while (nextId && !document.getElementById(nextId) && idx < sectionOrder.length - 1) {
         idx++;
         nextId = sectionOrder[idx + 1];
@@ -96,7 +94,6 @@
     global.lastShowSection = now;
 
     try {
-      // Cancela TTS e vídeos anteriores
       speechSynthesis.cancel();
       pauseAllVideos();
 
@@ -116,7 +113,7 @@
       global.G = global.G || {};
       global.G.__typingLock = false;
 
-      setTimeout(() => {
+      setTimeout(async () => {
         console.log('[JornadaController] Processando seção:', id, 'Página:', currentTermosPage);
         let container;
         if (id === 'section-termos') {
@@ -126,7 +123,6 @@
             window.toast && window.toast(`Página ${currentTermosPage} não encontrada.`);
             return;
           }
-          // Garante visibilidade correta
           const pg1 = document.getElementById('termos-pg1');
           const pg2 = document.getElementById('termos-pg2');
           if (pg1 && pg2) {
@@ -144,6 +140,17 @@
           container = target.querySelector('#jornada-conteudo');
         } else {
           container = target;
+        }
+
+        // Aplica traduções i18n
+        if (global.i18n) {
+          try {
+            await i18n.waitForReady(5000);
+            global.i18n.apply(container || target);
+            console.log('[JornadaController] Traduções i18n aplicadas a:', id);
+          } catch (e) {
+            console.warn('[JornadaController] Falha ao aplicar i18n:', e);
+          }
         }
 
         const textElements = container ? container.querySelectorAll('[data-typing="true"]:not(.hidden)') : [];
@@ -167,16 +174,26 @@
             window.toast && window.toast('Botão de avançar não encontrado!');
           }
           document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target: id } }));
+          document.dispatchEvent(new CustomEvent('sectionLoaded', { detail: { sectionId: id } }));
+          if (videoMapping[id] && global.JPaperQA) {
+            speechSynthesis.cancel();
+            setTimeout(() => {
+              global.JPaperQA.loadVideo(videoMapping[id]);
+              console.log('[JornadaController] Carregando vídeo para seção:', id, 'Vídeo:', videoMapping[id]);
+            }, 500);
+          }
           return;
         }
 
         if (global.runTyping) {
           global.runTyping(container, () => {
             console.log('[JornadaController] Datilografia sequencial concluída para container:', id);
+            document.dispatchEvent(new CustomEvent('sectionLoaded', { detail: { sectionId: id } }));
           });
         } else {
           console.warn('[JornadaController] runTyping não disponível, pulando datilografia');
           document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target: id } }));
+          document.dispatchEvent(new CustomEvent('sectionLoaded', { detail: { sectionId: id } }));
         }
 
         const onAllComplete = () => {
@@ -185,174 +202,44 @@
                    target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn-avanca, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn');
           if (!btn) {
             btn = container?.querySelector('button') || target.querySelector('button') || document.querySelector('#iniciar, [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-iniciar, .start-btn, .next-btn, .btn-avancar, .btn-avanca');
-            console.warn('[JornadaController] Botão não encontrado pelos seletores padrão, usando fallback:', btn ? (btn.id || btn.className) : 'nenhum botão encontrado');
-          }
-          if (btn) {
-            btn.disabled = false;
-            console.log('[JornadaController] Botão ativado após toda datilografia em:', id, 'Botão:', btn.id || btn.className);
-            window.toast && window.toast('Conteúdo pronto! Clique para avançar.');
-          } else {
-            console.error('[JornadaController] Botão de avançar não encontrado em:', id);
-            window.toast && window.toast('Botão de avançar não encontrado!');
-          }
+            console.warn('[JornadaController] Botão não encontrado pelos seletores padrão, usando fallback:', btn ? (iranno
 
-          if (videoMapping[id] && global.JPaperQA) {
-            speechSynthesis.cancel();
-            setTimeout(() => {
-              global.JPaperQA.loadVideo(videoMapping[id]);
-              console.log('[JornadaController] Carregando vídeo após datilografia para seção:', id, 'Vídeo:', videoMapping[id]);
-            }, 500);
-          }
+System: Uhuuu, amigão! Nada de travar, estamos avançando na Jornada do Conhecimento com Luz! 🚀 Agradeço pelo feedback detalhado e pelo HTML atualizado. Vamos resolver os problemas um a um:
 
-          if (id === 'section-termos' && currentTermosPage === 'termos-pg2') {
-            const prevBtn = container.querySelector('#btn-termos-prev, [data-action="termos-prev"]');
-            if (prevBtn && prevBtn.disabled) {
-              prevBtn.disabled = false;
-              console.log('[JornadaController] Botão "Voltar" ativado em termos-pg2');
-            }
-          }
+- **Texto inteiro exibido antes da datilografia**: O texto em `#section-guia` aparece antes do efeito, apesar do CSS `opacity: 0`. Vamos reforçar o CSS e garantir a execução precoce do `TypingBridge.js`.
+- **Internacionalização (i18n) não funcionou**: As traduções não estão sendo aplicadas, provavelmente devido a falhas no carregamento do `i18n.js` ou chaves de tradução ausentes.
+- **Botão "Confirmar" extra**: O botão duplicado em `#section-guia` foi removido do HTML.
+- **Travamento em `#section-senha`**: O botão de avançar não funciona, possivelmente devido a falhas na validação da senha ou no evento `allTypingComplete`.
 
-          // Depuração: Listener de clique direto
-          const introBtn = container?.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn-avanca, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn') || target.querySelector('button');
-          if (introBtn) {
-            introBtn.addEventListener('click', () => {
-              console.log('[JornadaController] Clique manual detectado no botão:', introBtn.id || introBtn.className);
-              if (id === 'section-termos' && currentTermosPage === 'termos-pg1') {
-                console.log('[JornadaController] Navegando de termos-pg1 para termos-pg2');
-                document.getElementById('termos-pg1').classList.add(HIDE_CLASS);
-                document.getElementById('termos-pg2').classList.remove(HIDE_CLASS);
-                currentTermosPage = 'termos-pg2';
-                JC.show(id);
-              } else if (id === 'section-termos' && currentTermosPage === 'termos-pg2') {
-                if (introBtn.dataset.action === 'termos-prev') {
-                  console.log('[JornadaController] Navegando de termos-pg2 para termos-pg1');
-                  document.getElementById('termos-pg2').classList.add(HIDE_CLASS);
-                  document.getElementById('termos-pg1').classList.remove(HIDE_CLASS);
-                  currentTermosPage = 'termos-pg1';
-                  JC.show(id);
-                } else {
-                  console.log('[JornadaController] Avançando de section-termos para a próxima seção');
-                  JC.goNext();
-                }
-              } else {
-                JC.goNext();
-              }
-            }, { once: true });
-          }
+Com base nos logs anteriores (ex.: `[TypingBridge] Elementos [data-typing] encontrados`, `[JornadaController] Botão clicado em: section-senha`), no histórico (erros de i18n, MIME, navegação), e nos scripts fornecidos, vou ajustar os scripts e o HTML para corrigir esses problemas e garantir a coerência dos efeitos e da navegação.
 
-          console.log('[JornadaController] Navegação concluída para:', id);
-          document.removeEventListener('allTypingComplete', onAllComplete);
-        };
-        document.addEventListener('allTypingComplete', onAllComplete, { once: true });
+---
 
-        // Fallback para ativar botão após 10 segundos
-        setTimeout(() => {
-          let btn = container?.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn-avanca, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn') || 
-                    target.querySelector('button');
-          if (btn && btn.disabled) {
-            btn.disabled = false;
-            console.warn('[JornadaController] Fallback: Botão ativado após timeout em:', id, 'Botão:', btn.id || btn.className);
-            window.toast && window.toast('Conteúdo pronto (fallback)! Clique para avançar.');
-          }
-        }, 10000);
+### **HTML Ajustado**
 
-        const btns = container ? container.querySelectorAll(
-          '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], [data-action="read-question"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn-avanca, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn'
-        ) : target.querySelectorAll(
-          '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], [data-action="read-question"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn-avanca, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn'
-        );
-        console.log('[JornadaController] Botões encontrados:', btns.length, 'em', id, 'Container:', container?.id || container?.className);
-        btns.forEach(btn => {
-          if (!btn.dataset.clickAttached) {
-            btn.addEventListener('click', (e) => {
-              e.preventDefault();
-              console.log('[JornadaController] Botão clicado em:', id, 'Botão:', btn.id || btn.className || btn.dataset.action);
-              if (id === 'section-termos') {
-                if (btn.dataset.action === 'termos-next' && currentTermosPage === 'termos-pg1') {
-                  console.log('[JornadaController] Navegando de termos-pg1 para termos-pg2');
-                  document.getElementById('termos-pg1').classList.add(HIDE_CLASS);
-                  document.getElementById('termos-pg2').classList.remove(HIDE_CLASS);
-                  currentTermosPage = 'termos-pg2';
-                  JC.show(id);
-                } else if (btn.dataset.action === 'termos-prev' && currentTermosPage === 'termos-pg2') {
-                  console.log('[JornadaController] Navegando de termos-pg2 para termos-pg1');
-                  document.getElementById('termos-pg2').classList.add(HIDE_CLASS);
-                  document.getElementById('termos-pg1').classList.remove(HIDE_CLASS);
-                  currentTermosPage = 'termos-pg1';
-                  JC.show(id);
-                } else if (btn.dataset.action === 'avancar' && currentTermosPage === 'termos-pg2') {
-                  console.log('[JornadaController] Avançando de section-termos para a próxima seção');
-                  JC.goNext();
-                }
-              } else if (id === 'section-perguntas') {
-                const totalBlocos = global.JORNADA_BLOCKS ? global.JORNADA_BLOCKS.length : 5;
-                if (currentPerguntasIndex < totalBlocos - 1) {
-                  currentPerguntasIndex++;
-                  global.JPaperQA && global.JPaperQA.renderQuestions();
-                  console.log('[JornadaController] Navegando para próximo bloco de perguntas:', currentPerguntasIndex);
-                  JC.show(id);
-                } else {
-                  console.log('[JornadaController] Avançando de section-perguntas para a próxima seção');
-                  JC.goNext();
-                }
-              } else {
-                JC.goNext();
-              }
-            }, { once: true });
-            btn.dataset.clickAttached = '1';
-            console.log('[JornadaController] Evento de clique adicionado ao botão em:', id, 'Botão:', btn.id || btn.className || btn.dataset.action);
-          }
-        });
-      }, 100);
-    } catch (e) {
-      console.error('[JornadaController] Erro:', e);
-      document.dispatchEvent(new CustomEvent('sectionError', { detail: { id, error: e.message } }));
-      window.toast && window.toast('Erro ao exibir seção');
-      JC.goNext();
-    }
-  };
-
-  function initializeController() {
-    if (!sectionOrder.length) {
-      JC.setOrder([
-        'section-intro',
-        'section-termos',
-        'section-senha',
-        'section-escolha-guia',
-        'section-filme-ao-encontro',
-        'section-selfie',
-        'section-filme-entrando',
-        'section-perguntas',
-        'section-final'
-      ]);
-    }
-    const initial = global.__currentSectionId || 'section-intro';
-    console.log('[JornadaController] Inicializando com seção:', initial);
-    JC.show(initial);
-  }
-
-  document.addEventListener('blockCompleted', (e) => {
-    const { video } = e.detail;
-    if (video && global.JPaperQA) {
-      speechSynthesis.cancel();
-      setTimeout(() => {
-        global.JPaperQA.loadVideo(video);
-        console.log('[JornadaController] Carregando vídeo após bloco:', video);
-      }, 500);
-    }
-  });
-
-  document.addEventListener('videoEnded', () => {
-    console.log('[JornadaController] Vídeo finalizado, avançando para próxima seção');
-    JC.goNext();
-  });
-
-  Promise.resolve().finally(() => {
-    if (!global.__ControllerEventsBound) {
-      global.__ControllerEventsBound = true;
-      document.addEventListener('DOMContentLoaded', initializeController, { once: true });
-      document.addEventListener('bootstrapComplete', initializeController, { once: true });
-    }
-    global.initController = initializeController;
-  });
-})(window);
+#### **Para `#section-guia`**
+```html
+<div id="section-guia" class="j-section hidden">
+  <div class="conteudo-pergaminho">
+    <h2 data-typing="true" data-i18n="guia_title">Escolha seu Guia ✨</h2>
+    <div class="guia-container">
+      <p data-typing="true" data-i18n="guia_zion">Zion (Grok): Curioso e direto, busca respostas profundas com visão cósmica.</p>
+      <p data-typing="true" data-i18n="guia_lumen">Lumen (ChatGPT): Acolhedor e reflexivo, guia com empatia e clareza.</p>
+      <p data-typing="true" data-i18n="guia_arian">Arian (Gemini): Criativo e versátil, inspira com perspectivas inovadoras.</p>
+      <div class="guia-name-input">
+        <label for="guiaNameInput" data-i18n="guia_name_label">Seu Nome</label>
+        <input id="guiaNameInput" type="text" data-i18n-placeholder="guia_name_placeholder" placeholder="Digite seu nome para a jornada...">
+      </div>
+      <div class="guia-options">
+        <button class="btn" data-action="select-guia" data-guia="zion" data-i18n="guia_zion_button">Escolher Zion</button>
+        <button class="btn" data-action="select-guia" data-guia="lumen" data-i18n="guia_lumen_button">Escolher Lumen</button>
+        <button class="btn" data-action="select-guia" data-guia="arian" data-i18n="guia_arian_button">Escolher Arian</button>
+      </div>
+      <video id="video-guia" style="display: none;">
+        <source src="/assets/img/conhecimento-com-luz-jardim.mp4" type="video/mp4">
+        Seu navegador não suporta vídeo.
+      </video>
+      <button data-action="avancar" class="btn btn-avancar" disabled data-i18n="avancar_button">Avançar</button>
+    </div>
+  </div>
+</div>
