@@ -235,6 +235,11 @@
   const TypingBridge = { play: playTypingAndSpeak };
   global.TypingBridge = TypingBridge;
   global.runTyping = (element, text, callback) => {
+    if (!element || !text) {
+      console.warn('[TypingBridge] Elemento ou texto inválido para runTyping');
+      if (callback) callback();
+      return;
+    }
     typeText(element, text, 36, true).then(() => {
       if (callback) callback();
     });
@@ -247,7 +252,7 @@
       const active = document.querySelector('div[id^="section-"]:not(.hidden)') || document.getElementById('section-intro');
       console.log('[TypingBridge] Seção ativa após DOMContentLoaded:', active ? active.id : 'Nenhuma');
       playTypingAndSpeak(active ? `#${active.id}` : '#section-intro', null);
-    }, 100);
+    }, 200);
   });
 
   document.addEventListener('bootstrapComplete', () => {
@@ -255,6 +260,6 @@
       const active = document.querySelector('div[id^="section-"]:not(.hidden)') || document.getElementById('section-intro');
       console.log('[TypingBridge] Seção ativa após bootstrapComplete:', active ? active.id : 'Nenhuma');
       playTypingAndSpeak(active ? `#${active.id}` : '#section-intro', null);
-    }, 100);
+    }, 200);
   });
 })(window);
