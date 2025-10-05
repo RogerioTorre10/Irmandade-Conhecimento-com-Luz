@@ -33,6 +33,7 @@
       video.pause();
       video.src = '';
       video.load();
+      video.removeAttribute('src'); // Garante que vídeo não toque
     });
     const videoOverlay = document.querySelector('#videoOverlay');
     if (videoOverlay) videoOverlay.classList.add('hidden');
@@ -42,7 +43,7 @@
   function playTransitionVideo(fromSection, toSection) {
     const key = `${fromSection}-to-${toSection}`;
     const videoSrc = videoMapping[key];
-    if (videoSrc && global.JPaperQA) {
+    if (videoSrc && global.JPaperQA && fromSection !== 'section-intro') {
       speechSynthesis.cancel();
       setTimeout(() => {
         global.JPaperQA.loadVideo(videoSrc);
@@ -51,13 +52,23 @@
     }
   }
 
+  // Cleanup global de botões extras na inicialização
+  document.addEventListener('DOMContentLoaded', () => {
+    const extraBtns = document.querySelectorAll('[data-action="pre-visualizar"], [data-action="capturar"], [data-action="pular-selfie"], [data-action="confirmar"]');
+    extraBtns.forEach(btn => {
+      btn.remove();
+      console.log('[JornadaController] Removido botão extra na inicialização:', btn.dataset.action);
+    });
+    pauseAllVideos(); // Pausa vídeos na carga inicial
+  });
+
   JC.setOrder = function (order) {
     sectionOrder = order;
     console.log('[JornadaController] Ordem das seções definida:', order);
   };
 
   JC.goNext = function () {
-    const currentId = global.__currentSectionId;
+    const currentId = global.__currentSectionId || 'section-intro';
     let idx = sectionOrder.indexOf(currentId);
     if (idx >= 0 && idx < sectionOrder.length - 1) {
       let nextId = sectionOrder[idx + 1];
@@ -83,7 +94,7 @@
   };
 
   JC.goPrev = function () {
-    const currentId = global.__currentSectionId;
+    const currentId = global.__currentSectionId || 'section-intro';
     let idx = sectionOrder.indexOf(currentId);
     if (idx > 0) {
       let prevId = sectionOrder[idx - 1];
@@ -114,7 +125,7 @@
 
     try {
       speechSynthesis.cancel();
-      pauseAllVideos(); // Força pausa sempre ao mostrar seção
+      pauseAllVideos();
 
       const all = document.querySelectorAll('div[id^="section-"]');
       const target = document.getElementById(id);
@@ -132,14 +143,14 @@
       global.G = global.G || {};
       global.G.__typingLock = false;
 
-      // Cleanup específico para botões extras da selfie na intro
+      // Cleanup específico para botões da selfie na intro
       if (id === 'section-intro') {
-        const extraSelfieBtns = document.querySelectorAll('[data-action="pre-visualizar"], [data-action="capturar"], [data-action="pular-selfie"], [data-action="confirmar"]');
-        extraSelfieBtns.forEach(btn => {
+        const extraBtns = document.querySelectorAll('[data-action="pre-visualizar"], [data-action="capturar"], [data-action="pular-selfie"], [data-action="confirmar"], .btn-confirm-extra');
+        extraBtns.forEach(btn => {
           btn.remove();
-          console.log('[JornadaController] Removido botão extra da selfie na intro:', btn.dataset.action);
+          console.log('[JornadaController] Removido botão extra na intro:', btn.dataset.action || btn.className);
         });
-        pauseAllVideos(); // Pausa extra para vídeos em fundo na intro
+        pauseAllVideos();
       }
 
       setTimeout(async () => {
@@ -158,9 +169,9 @@
             pg1.classList.add(HIDE_CLASS);
             pg2.classList.add(HIDE_CLASS);
             page.classList.remove(HIDE_CLASS);
-            console.log('[JornadaController] Exibindo página de termos:', currentTermosPage, 'Visível:', page.offsetParent !== null);
+            console.log('[JornadaController] Exibindo página de termos:', currentTermosPage);
           } else {
-            console.error('[JornadaController] Uma ou mais páginas de termos (#termos-pg1, #termos-pg2) não encontradas');
+            console.error('[JornadaController] Uma ou mais páginas de termos não encontradas');
             window.toast && window.toast('Erro: Páginas de termos não encontradas.');
           }
           container = page;
@@ -171,45 +182,46 @@
           container = target;
         }
 
-        // Aplica traduções i18n
         if (global.i18n) {
           try {
-            await i18n.waitForReady(10000);
+            await i18n.waitForReady(12000); // Timeout aumentado
             global.i18n.apply(container || target);
             console.log('[JornadaController] Traduções i18n aplicadas a:', id);
           } catch (e) {
             console.warn('[JornadaController] Falha ao aplicar i18n:', e);
+            window.toast && window.toast('Traduções parciais aplicadas.');
           }
         }
 
         const textElements = container ? container.querySelectorAll('[data-typing="true"]:not(.hidden)') : [];
         console.log('[JornadaController] Elementos [data-typing] encontrados:', textElements.length, 'em', id);
 
-        if (textElements.length === 0) {
-          console.log('[JornadaController] Nenhum elemento com [data-typing], ativando botão imediatamente');
+        // Fallback para ativar botão mesmo sem datilografia
+        setTimeout(() => {
           let btn = id === 'section-termos' ? container.querySelector('[data-action="termos-next"], [data-action="avancar"]') : 
                    id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) : 
                    target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn-avanca, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn');
           if (!btn) {
-            btn = container?.querySelector('button') || target.querySelector('button') || document.querySelector('#iniciar, [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-iniciar, .start-btn, .next-btn, .btn-avancar, .btn-avanca');
-            console.warn('[JornadaController] Botão não encontrado pelos seletores padrão, usando fallback:', btn ? (btn.id || btn.className) : 'nenhum botão encontrado');
+            btn = container?.querySelector('button') || target.querySelector('button');
+            console.warn('[JornadaController] Botão não encontrado, usando fallback:', btn ? (btn.id || btn.className) : 'nenhum botão encontrado');
           }
           if (btn) {
             btn.disabled = false;
-            console.log('[JornadaController] Botão ativado imediatamente em:', id, 'Botão:', btn.id || btn.className);
+            console.log('[JornadaController] Botão ativado (fallback) em:', id, 'Botão:', btn.id || btn.className);
             window.toast && window.toast('Conteúdo pronto! Clique para avançar.');
-          } else {
-            console.error('[JornadaController] Botão de avançar não encontrado em:', id);
-            window.toast && window.toast('Botão de avançar não encontrado!');
           }
           document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target: id } }));
           document.dispatchEvent(new CustomEvent('sectionLoaded', { detail: { sectionId: id } }));
+        }, 15000); // Força ativação após 15s
+
+        if (textElements.length === 0) {
+          console.log('[JornadaController] Nenhum elemento com [data-typing], ativando botão');
           return;
         }
 
         if (global.runTyping) {
           global.runTyping(container, () => {
-            console.log('[JornadaController] Datilografia sequencial concluída para container:', id);
+            console.log('[JornadaController] Datilografia concluída para:', id);
             document.dispatchEvent(new CustomEvent('sectionLoaded', { detail: { sectionId: id } }));
           });
         } else {
@@ -217,37 +229,10 @@
           document.dispatchEvent(new CustomEvent('allTypingComplete', { detail: { target: id } }));
           document.dispatchEvent(new CustomEvent('sectionLoaded', { detail: { sectionId: id } }));
         }
-
-        const onAllComplete = () => {
-          let btn = id === 'section-termos' ? container.querySelector('[data-action="termos-next"], [data-action="avancar"]') : 
-                   id === 'section-perguntas' ? target.querySelector(`[data-bloco="${currentPerguntasIndex}"] [data-action="avancar"]`) : 
-                   target.querySelector('[data-action="avancar"], [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-avancar, .btn-avanca, .btn, #iniciar, .btn-iniciar, .start-btn, .next-btn');
-          if (!btn) {
-            btn = container?.querySelector('button') || target.querySelector('button') || document.querySelector('#iniciar, [data-action="iniciar"], [data-action="start"], [data-action="next"], .btn-iniciar, .start-btn, .next-btn, .btn-avancar, .btn-avanca');
-            console.warn('[JornadaController] Botão não encontrado pelos seletores padrão, usando fallback:', btn ? (btn.id || btn.className) : 'nenhum botão encontrado');
-          }
-          if (btn) {
-            btn.disabled = false;
-            console.log('[JornadaController] Botão ativado após datilografia em:', id);
-          }
-        };
-
-        document.addEventListener('allTypingComplete', onAllComplete, { once: true });
       }, 0);
     } catch (e) {
       console.error('[JornadaController] Erro ao mostrar seção:', e);
       window.toast && window.toast('Erro ao carregar seção.');
     }
   };
-
-  // Listener para travamento na senha: adicione validação extra
-  document.addEventListener('allTypingComplete', (e) => {
-    if (e.detail.target === 'section-senha') {
-      const btn = document.querySelector('#section-senha [data-action="avancar"]');
-      if (btn) {
-        btn.disabled = false;
-        console.log('[JornadaController] Botão de senha ativado');
-      }
-    }
-  });
 })(window);
