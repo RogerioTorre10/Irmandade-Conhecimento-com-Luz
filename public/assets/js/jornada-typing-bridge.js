@@ -49,8 +49,8 @@
 
   async function typeText(element, text, speed = 40, showCursor = false) {
     return new Promise(resolve => {
-      if (!element) {
-        console.warn('[TypingBridge] Elemento inválido para typeText');
+      if (!element || !text) {
+        console.warn('[TypingBridge] Elemento ou texto inválido para typeText');
         return resolve();
       }
       if (abortCurrent) abortCurrent();
@@ -133,7 +133,7 @@
         if (!container) {
           if (_attempt < 3) {
             console.log('[TypingBridge] Tentativa', _attempt + 1, 'para target:', target);
-            setTimeout(() => playTypingAndSpeak(target, callback, _attempt + 1), 220);
+            setTimeout(() => playTypingAndSpeak(target, callback, _attempt + 1), 300);
             return;
           } else {
             console.warn('[TypingBridge] Nenhum container/elemento encontrado para:', target);
@@ -151,7 +151,7 @@
       if (!elements.length) {
         if (_attempt < 3) {
           console.log('[TypingBridge] Tentativa', _attempt + 1, 'sem elementos [data-typing]');
-          setTimeout(() => playTypingAndSpeak(target, callback, _attempt + 1), 220);
+          setTimeout(() => playTypingAndSpeak(target, callback, _attempt + 1), 300);
           return;
         } else {
           console.warn('[TypingBridge] Nenhum elemento com [data-typing] encontrado para:', target || '(seção ativa)');
@@ -180,6 +180,8 @@
           continue;
         }
 
+        el.style.display = 'block';
+        el.style.visibility = 'visible';
         await typeText(el, texto, velocidade, mostrarCursor);
 
         if ('speechSynthesis' in window && texto) {
@@ -252,7 +254,7 @@
       const active = document.querySelector('div[id^="section-"]:not(.hidden)') || document.getElementById('section-intro');
       console.log('[TypingBridge] Seção ativa após DOMContentLoaded:', active ? active.id : 'Nenhuma');
       playTypingAndSpeak(active ? `#${active.id}` : '#section-intro', null);
-    }, 200);
+    }, 300);
   });
 
   document.addEventListener('bootstrapComplete', () => {
@@ -260,6 +262,6 @@
       const active = document.querySelector('div[id^="section-"]:not(.hidden)') || document.getElementById('section-intro');
       console.log('[TypingBridge] Seção ativa após bootstrapComplete:', active ? active.id : 'Nenhuma');
       playTypingAndSpeak(active ? `#${active.id}` : '#section-intro', null);
-    }, 200);
+    }, 300);
   });
 })(window);
