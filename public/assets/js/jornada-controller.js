@@ -38,7 +38,7 @@
 
   JC.show = function (id) {
     const now = performance.now();
-    if (now - lastShowSection < 500) {
+    if (now - lastShowSection < 1000) {
       console.log('[JornadaController] Debounce: evitando chamada repetida para:', id);
       return;
     }
@@ -55,6 +55,8 @@
 
       all.forEach(s => s.classList.add(HIDE_CLASS));
       target.classList.remove(HIDE_CLASS);
+      target.style.display = 'block';
+      target.style.visibility = 'visible';
       global.__currentSectionId = id;
       global.G = global.G || {};
       global.G.__typingLock = false;
@@ -134,6 +136,7 @@
           } else {
             console.warn('[JornadaController] Elemento não visível ou runTyping não disponível, pulando datilografia:', el.id || el.className);
             el.classList.add('typing-done');
+            el.style.opacity = '1';
           }
         });
 
@@ -184,7 +187,7 @@
             console.log('[JornadaController] Evento de clique adicionado ao botão em:', id, 'Botão:', btn.id || btn.className || btn.dataset.action);
           }
         });
-      }, 100);
+      }, 200);
     } catch (e) {
       console.error('[JornadaController] Erro:', e);
       window.toast && window.toast('Erro ao exibir seção');
