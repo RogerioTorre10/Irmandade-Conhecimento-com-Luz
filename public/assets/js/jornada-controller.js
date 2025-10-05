@@ -6,7 +6,6 @@
 
   const HIDE_CLASS = 'hidden';
   let sectionOrder = [];
-  let currentIndex = 0;
   let lastShowSection = 0;
   let currentTermosPage = 'termos-pg1';
   let currentPerguntasBlock = 'bloco-raizes';
@@ -65,7 +64,7 @@
       } else if (id.includes('filme')) {
         const video = target.querySelector('video');
         if (video) {
-          video.play();
+          video.play().catch(err => console.error('[JornadaController] Erro ao reproduzir vídeo:', err));
           console.log('[JornadaController] Vídeo iniciado automaticamente em:', id);
           video.addEventListener('ended', () => {
             console.log('[JornadaController] Vídeo terminou em:', id, 'Avançando para a próxima seção');
