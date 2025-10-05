@@ -204,40 +204,4 @@
 
       if (ttsQueue.length > 0 && (target === '#section-termos' || (target instanceof HTMLElement && target.closest('#section-termos'))) {
         console.log('[TypingBridge] Aguardando clique para TTS em section-termos, página:', window.currentTermosPage || 'termos-pg1');
-        const btn = document.querySelector(`#${window.currentTermosPage || 'termos-pg1'} [data-action="termos-next"], #${window.currentTermosPage || 'termos-pg1'} [data-action="avancar"]`);
-        if (btn) {
-          btn.addEventListener('click', () => {
-            setTimeout(() => {
-              ttsQueue.forEach((text, index) => {
-                setTimeout(() => {
-                  const utt = new SpeechSynthesisUtterance(text);
-                  utt.lang = i18n.lang || 'pt-BR';
-                  utt.rate = 1.03;
-                  utt.pitch = 1.0;
-                  utt.volume = window.isMuted ? 0 : 1;
-                  utt.onerror = (error) => console.error('[TypingBridge] Erro na leitura:', error);
-                  speechSynthesis.speak(utt);
-                  console.log('[TypingBridge] TTS iniciado para texto', index + 1, 'de', ttsQueue.length, 'em:', window.currentTermosPage || 'termos-pg1');
-                }, index * 1000);
-              });
-              ttsQueue = [];
-            }, 100);
-          }, { once: true });
-        }
-      }
-
-      if (callback) callback();
-    } catch (e) {
-      console.error('[TypingBridge] Erro:', e);
-      if (callback) callback();
-    } finally {
-      unlock();
-    }
-  }
-
-  const TypingBridge = { play: playTypingAndSpeak };
-  global.TypingBridge = TypingBridge;
-  global.runTyping = playTypingAndSpeak;
-
-  typingLog('Pronto');
-})(window);
+        const btn = document.querySelector(`#${window.currentTermosPage || 'termos
