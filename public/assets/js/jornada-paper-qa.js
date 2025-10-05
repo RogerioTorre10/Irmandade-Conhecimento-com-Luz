@@ -10,6 +10,7 @@
 
   const log = (...args) => console.log('[JORNADA_PAPER]', ...args);
 
+  // i18n seguro
   const i18n = global.i18n || {
     lang: 'pt-BR',
     ready: false,
@@ -22,86 +23,88 @@
     CANVAS_ID: 'jornada-canvas',
     CONTENT_ID: 'jornada-conteudo',
     PERGAMINHO_VERT: '/assets/img/pergaminho-rasgado-vert.png',
-    PERGAMINHO_HORIZ: '/assets/img/pergaminho-rasgado-horiz.png'
+    PERGAMINHO_HORIZ: '/assets/img/pergaminho-rasgado-horiz.png',
+    VIDEO_BASE: '/assets/img/'
   }, global.JORNADA_CFG || {});
 
+  const VIDEO_BASE = CFG.VIDEO_BASE;
+
+  global.JORNADA_VIDEOS = global.JORNADA_VIDEOS || {
+    intro: VIDEO_BASE + 'filme-0-ao-encontro-da-jornada.mp4',
+    afterBlocks: {
+      0: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
+      1: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
+      2: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
+      3: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
+    },
+    final: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
+  };
+  global.JORNADA_FINAL_VIDEO = global.JORNADA_VIDEOS.final;
+
+  // Traduções locais
   const blockTranslations = {
     'pt-BR': [
       {
         id: 'raizes',
-        title: 'Bloco 1 — Raízes',
+        title: 'Block 1 — Roots',
         data_i18n: 'bloco_raizes_title',
         questions: [
-          { id: 'quem_voce_hoje',    label: 'Quem é você hoje?',                         data_i18n: 'pergunta_quem_voce_hoje' },
-          { id: 'o_que_te_trouxe',   label: 'O que te trouxe a essa jornada?',          data_i18n: 'pergunta_o_que_te_trouxe' },
-          { id: 'sonho_espiritual',  label: 'Qual é o seu maior sonho espiritual?',     data_i18n: 'pergunta_sonho_espiritual' }
+          { id: 'quem_voce_hoje',    label: 'Who are you today?',                         data_i18n: 'pergunta_quem_voce_hoje' },
+          { id: 'o_que_te_trouxe',   label: 'What brought you to this journey?',          data_i18n: 'pergunta_o_que_te_trouxe' },
+          { id: 'sonho_espiritual',  label: 'What is your greatest spiritual dream?',     data_i18n: 'pergunta_sonho_espiritual' }
         ],
-        video_after: global.JORNADA_VIDEOS?.afterBlocks?.[0] || '/assets/img/filme-bloco1.mp4'
+        video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
       },
       {
         id: 'reflexoes',
-        title: 'Bloco 2 — Reflexões',
+        title: 'Block 2 — Reflections',
         data_i18n: 'bloco_reflexoes_title',
         questions: [
-          { id: 'desafios_atuais',  label: 'Quais são seus maiores desafios atuais?',  data_i18n: 'pergunta_desafios_atuais' },
-          { id: 'medo_duvida',      label: 'Como você lida com medo ou dúvida?',       data_i18n: 'pergunta_medo_duvida' },
-          { id: 'significado_luz',  label: 'O que significa "luz" para você?',         data_i18n: 'pergunta_significado_luz' }
+          { id: 'desafios_atuais',  label: 'What are your biggest current challenges?',  data_i18n: 'pergunta_desafios_atuais' },
+          { id: 'medo_duvida',      label: 'How do you deal with fear or doubt?',        data_i18n: 'pergunta_medo_duvida' },
+          { id: 'significado_luz',  label: 'What does "light" mean to you?',             data_i18n: 'pergunta_significado_luz' }
         ],
-        video_after: global.JORNADA_VIDEOS?.afterBlocks?.[1] || '/assets/img/filme-bloco2.mp4'
+        video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
       },
       {
         id: 'crescimento',
-        title: 'Bloco 3 — Crescimento',
+        title: 'Block 3 — Growth',
         data_i18n: 'bloco_crescimento_title',
         questions: [
-          { id: 'mudar_vida',       label: 'O que você quer mudar na sua vida?',      data_i18n: 'pergunta_mudar_vida' },
-          { id: 'quem_inspira',     label: 'Quem te inspira e por quê?',              data_i18n: 'pergunta_quem_inspira' },
-          { id: 'pratica_gratidao', label: 'Como você pratica gratidão diariamente?',  data_i18n: 'pergunta_pratica_gratidao' }
+          { id: 'mudar_vida',       label: 'What do you want to change in your life?',   data_i18n: 'pergunta_mudar_vida' },
+          { id: 'quem_inspira',     label: 'Who inspires you and why?',                  data_i18n: 'pergunta_quem_inspira' },
+          { id: 'pratica_gratidao', label: 'How do you practice gratitude daily?',       data_i18n: 'pergunta_pratica_gratidao' }
         ],
-        video_after: global.JORNADA_VIDEOS?.afterBlocks?.[2] || '/assets/img/filme-bloco3.mp4'
+        video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4'
       },
       {
         id: 'integracao',
-        title: 'Bloco 4 — Integração',
+        title: 'Block 4 — Integration',
         data_i18n: 'bloco_integracao_title',
         questions: [
-          { id: 'licao_jornada',    label: 'Que lição você tira dessa jornada?',      data_i18n: 'pergunta_licao_jornada' },
-          { id: 'aplicar_futuro',   label: 'Como você aplicará isso no futuro?',      data_i18n: 'pergunta_aplicar_futuro' },
-          { id: 'mensagem_futuro',  label: 'Uma mensagem para o seu futuro eu.',      data_i18n: 'pergunta_mensagem_futuro' }
+          { id: 'licao_jornada',    label: 'What lesson do you take from this journey?', data_i18n: 'pergunta_licao_jornada' },
+          { id: 'aplicar_futuro',   label: 'How will you apply this in the future?',     data_i18n: 'pergunta_aplicar_futuro' },
+          { id: 'mensagem_futuro',  label: 'A message for your future self.',            data_i18n: 'pergunta_mensagem_futuro' }
         ],
-        video_after: global.JORNADA_VIDEOS?.afterBlocks?.[3] || '/assets/img/filme-bloco4.mp4'
+        video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
       },
       {
         id: 'sintese',
-        title: 'Bloco 5 — Síntese e Entrega',
+        title: 'Block 5 — Synthesis and Delivery',
         data_i18n: 'bloco_sintese_title',
         questions: [
-          { id: 'essencia_hoje',    label: 'Quem é você hoje, em uma frase verdadeira?', data_i18n: 'pergunta_essencia_hoje' },
-          { id: 'passo_fe',         label: 'Qual será seu próximo passo de fé e coragem?', data_i18n: 'pergunta_passo_fe' }
+          { id: 'essencia_hoje',    label: 'Who are you today, in one true sentence?',   data_i18n: 'pergunta_essencia_hoje' },
+          { id: 'passo_fe',         label: 'What will be your next step of faith and courage?', data_i18n: 'pergunta_passo_fe' }
         ],
-        video_after: global.JORNADA_VIDEOS?.final || '/assets/img/filme-final.mp4'
+        video_after: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
       }
-    ],
-    'es-ES': [
-      // ... (mantém traduções em espanhol como no original)
     ]
   };
 
   let JORNADA_BLOCKS = [];
   global.JORNADA_BLOCKS = global.JORNADA_BLOCKS || [];
 
-  function pauseAllVideos() {
-    const videos = document.querySelectorAll('video');
-    videos.forEach(video => {
-      video.pause();
-      video.src = '';
-      video.load();
-    });
-    const videoOverlay = document.querySelector('#videoOverlay');
-    if (videoOverlay) videoOverlay.classList.add('hidden');
-    console.log('[JORNADA_PAPER] Todos os vídeos pausados');
-  }
-
+  // ===== util DOM =====
   function elCanvas() {
     return document.getElementById(CFG.CANVAS_ID);
   }
@@ -146,7 +149,7 @@
       <form id="form-perguntas" class="grid gap-3">
         ${questions.map(q => `
           <label class="grid gap-1">
-            <span class="font-medium pergunta-enunciado text" id="${q.id}-label" data-i18n="${q.data_i18n}" data-typing="true" data-speed="36" data-cursor="true" data-delay="500" aria-live="polite">${q.label}</span>
+            <span class="font-medium pergunta-enunciado text" id="${q.id}-label" data-i18n="${q.data_i18n}" data-typing="true" data-speed="36" data-cursor="true">${q.label}</span>
             <textarea name="${q.id}" class="px-3 py-2 rounded border border-gray-300 bg-white/80" data-i18n-placeholder="resposta_placeholder" placeholder="Digite sua resposta..."></textarea>
           </label>
         `).join('')}
@@ -154,82 +157,95 @@
     `;
   }
 
+  // ===== typing helpers (internos ao Paper) =====
+  let __abortTypingPlaceholder = null;
+
+  async function typePlaceholder(inp, text, speed = 22) {
+    if (!inp) return;
+    if (__abortTypingPlaceholder) __abortTypingPlaceholder();
+    let abort = false;
+    __abortTypingPlaceholder = () => (abort = true);
+    inp.placeholder = '';
+    const aria = document.getElementById('aria-pergunta');
+    if (aria) aria.textContent = text;
+    for (let i = 0; i <= text.length; i++) {
+      if (abort) break;
+      inp.placeholder = text.slice(0, i) + (i < text.length ? '▌' : '');
+      await new Promise(r => setTimeout(r, speed));
+    }
+    if (!abort) {
+      inp.placeholder = text;
+    }
+    if (aria) aria.textContent = '';
+    log('Placeholder digitado:', text);
+  }
+
+  async function paperTypeText(element, text, speed = 36) {
+    return new Promise(resolve => {
+      let i = 0;
+      element.textContent = '';
+      const caret = document.createElement('span');
+      caret.className = 'typing-caret';
+      caret.textContent = '|';
+      element.appendChild(caret);
+
+      const interval = setInterval(() => {
+        element.textContent = text.slice(0, i);
+        i++;
+        if (i >= text.length) {
+          clearInterval(interval);
+          caret.remove();
+          element.classList.add('typing-done');
+          resolve();
+        }
+      }, speed);
+    });
+  }
+
   async function typeQuestionsSequentially(bloco) {
     const elements = bloco.querySelectorAll('[data-typing="true"]');
     for (const el of elements) {
       const key = el.dataset.i18n;
       const text = i18n.t(key, el.textContent || key);
-      await global.TypingBridge?.typeText(el, text, 36, true);
-      await new Promise(resolve => setTimeout(resolve, 600));
+      await global.runTyping(el, () => console.log('[JORNADA_PAPER] Datilografia concluída para:', el.id || el.className));
     }
     const textareas = bloco.querySelectorAll('.j-pergunta textarea');
     for (const textarea of textareas) {
       const key = textarea.dataset.i18nPlaceholder;
       const text = i18n.t(key, textarea.placeholder || key);
-      await global.TypingBridge?.typePlaceholder(textarea, text, 22);
-    }
-    const blocoIdx = parseInt(bloco.dataset.bloco);
-    if (JORNADA_BLOCKS[blocoIdx]?.video_after) {
-      speechSynthesis.cancel();
-      setTimeout(() => {
-        document.dispatchEvent(new CustomEvent('blockCompleted', { 
-          detail: { 
-            blocoId: JORNADA_BLOCKS[blocoIdx].id, 
-            video: JORNADA_BLOCKS[blocoIdx].video_after 
-          } 
-        }));
-      }, 500);
+      await typePlaceholder(textarea, text, 22);
     }
   }
 
+  // ===== vídeo =====
   function loadVideo(videoSrc) {
-    pauseAllVideos();
     const video = document.querySelector('#videoTransicao');
     const videoOverlay = document.querySelector('#videoOverlay');
     if (!video || !videoOverlay) {
       console.error('[JORNADA_PAPER] #videoTransicao ou #videoOverlay não encontrado');
-      window.toast && window.toast('Erro ao carregar vídeo');
       return;
     }
-    fetch(videoSrc, { method: 'HEAD' })
-      .then(res => {
-        if (!res.ok) throw new Error(`Vídeo não encontrado: ${videoSrc}`);
-        video.src = videoSrc;
-        video.style.zIndex = 2001;
-        videoOverlay.style.zIndex = 2000;
-        videoOverlay.classList.remove('hidden');
-        video.load();
-        video.play().catch(err => {
-          console.error('[JORNADA_PAPER] Erro ao reproduzir vídeo:', err);
-          window.toast && window.toast('Erro ao reproduzir vídeo');
-        });
-        video.onended = () => {
-          video.src = '';
-          videoOverlay.classList.add('hidden');
-          document.dispatchEvent(new CustomEvent('videoEnded', { detail: { videoSrc } }));
-          log('Vídeo finalizado:', videoSrc);
-        };
-      })
-      .catch(err => {
-        console.error('[JORNADA_PAPER] Erro ao verificar vídeo:', err);
-        window.toast && window.toast('Vídeo não disponível');
-        videoOverlay.classList.add('hidden');
-      });
+    video.src = videoSrc;
+    video.style.zIndex = 2001;
+    videoOverlay.style.zIndex = 2000;
+    video.load();
+    video.play().catch(err => console.error('[JORNADA_PAPER] Erro ao reproduzir vídeo:', err));
     log('Vídeo carregado:', videoSrc);
   }
 
+  // ===== render =====
   async function renderQuestions() {
     setPergaminho('h');
     const { content } = ensureCanvas();
     if (!content) {
       console.error('[JORNADA_PAPER] Container de perguntas não encontrado');
-      window.toast && window.toast('Erro ao carregar perguntas.');
+      global.toast && global.toast('Erro ao carregar perguntas.');
       return;
     }
 
     if (!JORNADA_BLOCKS || !Array.isArray(JORNADA_BLOCKS)) {
       console.error('[JORNADA_PAPER] JORNADA_BLOCKS não está definido ou não é um array');
-      window.toast && window.toast('Erro ao carregar blocos de perguntas.');
+      global.toast && global.toast('Erro ao carregar blocos de perguntas.');
       return;
     }
 
@@ -237,7 +253,6 @@
     content.classList.remove('hidden');
 
     const JC = global.JC || { currentBloco: 0, currentPergunta: 0 };
-    JC.currentBloco = window.currentPerguntasIndex || 0;
 
     JORNADA_BLOCKS.forEach((block, bIdx) => {
       const bloco = document.createElement('div');
@@ -253,8 +268,6 @@
         title.dataset.typing = 'true';
         title.dataset.speed = '36';
         title.dataset.cursor = 'true';
-        title.dataset.delay = '500';
-        title.setAttribute('aria-live', 'polite');
         title.textContent = block.title;
         bloco.appendChild(title);
       }
@@ -265,7 +278,7 @@
         div.dataset.perguntaId = `${block.id}-${qIdx}`;
         div.style.display = (bIdx === JC.currentBloco && qIdx === JC.currentPergunta) ? 'block' : 'none';
         div.innerHTML = `
-          <label class="pergunta-enunciado text" data-i18n="${q.data_i18n}" data-typing="true" data-speed="36" data-cursor="true" data-delay="500" aria-live="polite">${q.label}</label>
+          <label class="pergunta-enunciado text" data-i18n="${q.data_i18n}" data-typing="true" data-speed="36" data-cursor="true">${q.label}</label>
           <textarea rows="4" class="input" data-i18n-placeholder="resposta_placeholder" placeholder="Digite sua resposta..."></textarea>
           <div class="accessibility-controls">
             <button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>
@@ -279,7 +292,6 @@
       content.appendChild(bloco);
     });
 
-    await new Promise(resolve => setTimeout(resolve, 500));
     if (i18n.ready) {
       i18n.apply(content);
     } else {
@@ -297,14 +309,14 @@
         setTimeout(() => {
           log('Iniciando typeQuestionsSequentially para bloco', JC.currentBloco);
           typeQuestionsSequentially(currentBloco);
-          window.toast && window.toast('Perguntas prontas! Responda e clique para avançar.');
-        }, 500);
+        }, 100);
       }
     }
 
-    log('Perguntas renderizadas dinamicamente, total de blocos:', JORNADA_BLOCKS.length);
+    log('Perguntas renderizadas, total de blocos:', JORNADA_BLOCKS.length);
   }
 
+  // ===== eventos =====
   function initPaperQAEvents() {
     document.addEventListener('click', (ev) => {
       const btn = ev.target.closest('[data-action="read-question"]');
@@ -313,60 +325,32 @@
       if (!pergunta) return;
       const key = pergunta.dataset.i18n;
       const text = i18n.t(key, pergunta.textContent);
-      if ('speechSynthesis' in global && window.JORNADA?.tts?.enabled && !window.isMuted) {
-        speechSynthesis.cancel();
+      if ('speechSynthesis' in global) {
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = i18n.lang || 'pt-BR';
-        utterance.rate = 1.03;
-        utterance.pitch = 1.0;
-        utterance.volume = 1;
-        utterance.onerror = (error) => console.error('[JORNADA_PAPER] Erro na leitura:', error);
         global.speechSynthesis.speak(utterance);
-        window.toast && window.toast('Lendo pergunta...');
       } else {
-        console.warn('[JORNADA_PAPER] SpeechSynthesis não suportado ou TTS desativado');
-        window.toast && window.toast('Leitura de voz não suportada.');
+        console.warn('[JORNADA_PAPER] SpeechSynthesis não suportado');
       }
     });
 
     document.addEventListener('click', (ev) => {
       const btn = ev.target.closest('[data-action="start-mic"]');
       if (!btn) return;
-      if ('SpeechRecognition' in global || 'webkitSpeechRecognition' in global) {
-        const SpeechRecognition = global.SpeechRecognition || global.webkitSpeechRecognition;
-        const recognition = new SpeechRecognition();
-        recognition.lang = i18n.lang || 'pt-BR';
-        recognition.onresult = (event) => {
-          const transcript = event.results[0][0].transcript;
-          const textarea = btn.closest('.j-pergunta').querySelector('textarea');
-          textarea.value = transcript;
-          log('Transcrição de voz:', transcript);
-          window.toast && window.toast('Resposta gravada com sucesso!');
-        };
-        recognition.onerror = (err) => {
-          console.error('[JORNADA_PAPER] Erro no reconhecimento de voz:', err);
-          window.toast && window.toast('Erro ao gravar resposta.');
-        };
-        recognition.start();
-        log('Iniciando reconhecimento de voz');
-        window.toast && window.toast('Gravando sua resposta...');
-      } else {
-        console.warn('[JORNADA_PAPER] SpeechRecognition não suportado');
-        window.toast && window.toast('Microfone não suportado neste navegador.');
-      }
+      log('Microfone acionado (funcionalidade não implementada)');
+      global.toast && global.toast('Microfone não implementado ainda.');
     });
 
     const skipVideoButton = document.querySelector('#skipVideo');
     if (skipVideoButton) {
       skipVideoButton.addEventListener('click', () => {
         log('Vídeo pulado');
-        pauseAllVideos();
         document.dispatchEvent(new CustomEvent('videoSkipped'));
-        document.dispatchEvent(new CustomEvent('videoEnded'));
       });
     }
   }
 
+  // ===== init =====
   async function loadDynamicBlocks() {
     try {
       await i18n.waitForReady(10000);
@@ -390,7 +374,7 @@
       console.error('[JORNADA_PAPER] Erro ao preencher JORNADA_BLOCKS:', error);
       JORNADA_BLOCKS = [];
       global.JORNADA_BLOCKS = [];
-      window.toast && window.toast('Erro ao carregar blocos de perguntas');
+      global.toast && global.toast('Erro ao carregar blocos de perguntas');
       return false;
     }
   }
@@ -402,15 +386,16 @@
     } catch (error) {
       console.error('[JORNADA_PAPER] Erro na inicialização:', error && error.message);
       global.JORNADA_BLOCKS = [];
-      window.toast && window.toast('Erro ao inicializar perguntas');
     }
   }
 
+  // Bootstrap de eventos/estado
   document.addEventListener('DOMContentLoaded', () => {
     initPaperQA();
     initPaperQAEvents();
   });
 
+  // API global
   global.JPaperQA = {
     loadDynamicBlocks,
     renderQuestions,
@@ -418,9 +403,11 @@
     setPergaminho,
     ensureCanvas,
     typeQuestionsSequentially,
+    typePlaceholder,
     initEvents: initPaperQAEvents,
     init: initPaperQA
   };
 
   log('Script jornada-paper-qa.js carregado com sucesso');
+
 })(window);
