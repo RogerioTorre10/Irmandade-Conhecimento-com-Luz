@@ -99,24 +99,28 @@
           const isVisible = el.offsetParent !== null && window.getComputedStyle(el).visibility !== 'hidden' && window.getComputedStyle(el).display !== 'none';
           if (isVisible) {
             console.log('[JornadaController] Chamando runTyping para elemento:', el.id || el.className);
-            global.runTyping(el, () => {
-              typingCompleted++;
-              console.log('[JornadaController] Datilografia concluída para elemento:', el.id || el.className, '- Progresso:', typingCompleted + '/' + totalTypingElements);
-              
-              const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : target.querySelector('[data-action="avancar"], [data-action="read-question"], [data-action="select-guia"], [data-action="skip-selfie"], .btn-avancar, .btn');
-              if (btn && btn.disabled) {
-                btn.disabled = false;
-                console.log('[JornadaController] Botão ativado após datilografia em:', id, currentTermosPage || '', 'Elemento:', el.id || el.className);
-                window.toast && window.toast('Conteúdo lido! Clique para avançar.');
-              }
-              if (id === 'section-termos' && currentTermosPage === 'termos-pg2') {
-                const prevBtn = target.querySelector('#btn-termos-prev');
-                if (prevBtn && prevBtn.disabled) {
-                  prevBtn.disabled = false;
-                  console.log('[JornadaController] Botão "Voltar" ativado em termos-pg2');
+            if (typeof global.runTyping === 'function') {
+              global.runTyping(el, () => {
+                typingCompleted++;
+                console.log('[JornadaController] Datilografia concluída para elemento:', el.id || el.className, '- Progresso:', typingCompleted + '/' + totalTypingElements);
+                
+                const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : target.querySelector('[data-action="avancar"], [data-action="read-question"], [data-action="select-guia"], [data-action="skip-selfie"], .btn-avancar, .btn');
+                if (btn && btn.disabled) {
+                  btn.disabled = false;
+                  console.log('[JornadaController] Botão ativado após datilografia em:', id, currentTermosPage || '', 'Elemento:', el.id || el.className);
+                  window.toast && window.toast('Conteúdo lido! Clique para avançar.');
                 }
-              }
-            });
+                if (id === 'section-termos' && currentTermosPage === 'termos-pg2') {
+                  const prevBtn = target.querySelector('#btn-termos-prev');
+                  if (prevBtn && prevBtn.disabled) {
+                    prevBtn.disabled = false;
+                    console.log('[JornadaController] Botão "Voltar" ativado em termos-pg2');
+                  }
+                }
+              });
+            } else {
+              console.warn('[JornadaController] global.runTyping não é uma função, pulando datilografia para:', el.id || el.className);
+            }
           } else {
             console.warn('[JornadaController] Elemento não visível, pulando datilografia:', el.id || el.className);
           }
