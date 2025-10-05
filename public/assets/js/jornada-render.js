@@ -3,7 +3,6 @@
   
   const JR = (window.JORNADA_RENDER = window.JORNADA_RENDER || {});
 
-  // Helper único para ajustar canvas + imagem de fundo
   function setCanvas(mode /* 'v' | 'h' */) {
     const canvas = document.getElementById('jornada-canvas');
     if (!canvas) return;
@@ -16,30 +15,25 @@
     }
   }
 
-  function renderinicio() {
-    console.log('[JORNADA_RENDER] Renderizando inicio');
-    const section = document.getElementById('section-inicio');
+  function renderInicio() {
+    console.log('[JORNADA_RENDER] Renderizando intro');
+    const section = document.getElementById('section-intro');
     if (section) {
+      // Cleanup de botões extras da selfie
+      const extraBtns = section.querySelectorAll('[data-action="pre-visualizar"], [data-action="capturar"], [data-action="pular-selfie"], [data-action="confirmar"]');
+      extraBtns.forEach(btn => {
+        btn.remove();
+        console.log('[JORNADA_RENDER] Removido botão extra na intro:', btn.dataset.action);
+      });
       section.classList.remove('hidden');
       setCanvas('v');
     }
   }
 
-  // Exportada/Global: controller chama isso
   function updateCanvasBackground(sectionId) {
-    // perguntas = horizontal; demais = vertical
     const mode = (sectionId === 'section-perguntas') ? 'h' : 'v';
     setCanvas(mode);
   }
-  function renderBlocks() {
-  const container = document.querySelector('#perguntas-container');
-  JORNADA_BLOCKS.forEach(block => {
-    const blockElement = document.createElement('div');
-    blockElement.id = block.id;
-    blockElement.innerHTML = `<h2>${block.content.title}</h2><p>${block.content.description}</p>`;
-    container.appendChild(blockElement);
-  });
-}
 
   function renderPerguntas(blocoIndex = 0) {
     console.log('[JORNADA_RENDER] Renderizando perguntas, bloco:', blocoIndex);
@@ -79,11 +73,11 @@
   }
 
   // Exports
-  JR.renderInicio = renderinicio;
+  JR.renderInicio = renderInicio;
   JR.renderPerguntas = renderPerguntas;
   JR.renderFinal = renderFinal;
-  JR.updateCanvasBackground = updateCanvasBackground;     // export no namespace
-  window.updateCanvasBackground = updateCanvasBackground;  // export global (chamado pelo controller)
+  JR.updateCanvasBackground = updateCanvasBackground;
+  window.updateCanvasBackground = updateCanvasBackground;
 
   console.log('[JORNADA_RENDER] Módulo carregado');
 })();
