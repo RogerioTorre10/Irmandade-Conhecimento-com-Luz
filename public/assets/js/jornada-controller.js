@@ -96,7 +96,7 @@
 
         textElements.forEach(el => {
           console.log('[JornadaController] Verificando visibilidade para elemento:', el.id || el.className);
-          const isVisible = el.offsetParent !== null && window.getComputedStyle(el).visibility !== 'hidden' && window.getComputedStyle(element).display !== 'none';
+          const isVisible = el.offsetParent !== null && window.getComputedStyle(el).visibility !== 'hidden' && window.getComputedStyle(el).display !== 'none';
           if (isVisible) {
             console.log('[JornadaController] Chamando runTyping para elemento:', el.id || el.className);
             global.runTyping(el, () => {
