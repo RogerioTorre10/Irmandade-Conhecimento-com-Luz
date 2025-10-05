@@ -360,6 +360,10 @@
         <button class="btn" data-action="select-guia" data-guia="lumen" data-i18n="guia_lumen_button">Escolher Lumen</button>
         <button class="btn" data-action="select-guia" data-guia="arian" data-i18n="guia_arian_button">Escolher Arian</button>
       </div>
+      <video id="video-guia" style="display: none;">
+        <source src="/assets/img/conhecimento-com-luz-jardim.mp4" type="video/mp4">
+        Seu navegador não suporta vídeo.
+      </video>
       <button data-action="avancar" class="btn btn-avancar" disabled data-i18n="avancar_button">Avançar</button>
     </div>
   </div>
@@ -371,7 +375,7 @@
 
 <!-- FILME: filme-0-ao-encontro-da-jornada -->
 <div id="section-filme-ao-encontro" class="j-section hidden">
-  <video id="video-ao-encontro" averplay>
+  <video id="video-ao-encontro" overplay>
     <source src="/assets/img/filme-0-ao-encontro-da-jornada.mp4" type="video/mp4">
     Seu navegador não suporta vídeo.
   </video>
@@ -383,23 +387,19 @@
 <div id="videoOverlay" class="hidden"></div>
 <video id="videoTransicao"></video>
 <section id="jornada-canvas"><div id="jornada-conteudo"></div></section>
-  </div>
-</div>
 
 <!-- SELFIE -->
-<div id="section-selfie" class="j-section hidden">
+<div id="section-senha" class="j-section hidden">
   <div class="content">
-    <p id="selfie-text" data-typing="true" data-i18n="selfie_text">Tire uma selfie para personalizar sua jornada.</p>
-    <div class="selfie-container">
-      <input id="selfieInput" type="file" accept="image/*" style="display: none;">
-      <img id="selfieImage" src="" alt="Sua selfie" style="display: none;">
-      <div class="flame-layer" style="opacity: 0;"></div>
-      <label for="nameInput" data-i18n="selfie_name_label">Seu Nome</label>
-      <input id="nameInput" type="text" data-i18n-placeholder="selfie_name_placeholder" placeholder="Digite seu nome...">
-      <div id="userNameSlot" data-i18n="selfie_name_slot">NOME</div>
-      <div id="guideNameSlot" data-i18n="guia_name_slot">GUIA</div>
+    <p data-typing="true" data-i18n="senha_text">Digite a senha para continuar sua jornada.</p>
+    <div class="senha-container">
+      <label for="senhaInput" data-i18n="senha_label">Senha</label>
+      <input id="senhaInput" type="password" data-i18n-placeholder="senha_placeholder" placeholder="Digite a senha...">
+      <button data-action="toggle-password" data-i18n="toggle_password_button">👁️</button>
     </div>
+    <button id="iniciar" data-action="avancar" class="btn btn-avancar" disabled data-i18n="avancar_button">Avançar</button>
   </div>
+</div>
   <div class="footer-actions">
     <button id="previewBtn" class="btn" data-action="preview">Pré-visualizar</button>
     <button id="captureBtn" class="btn" data-action="capture">Capturar</button>
