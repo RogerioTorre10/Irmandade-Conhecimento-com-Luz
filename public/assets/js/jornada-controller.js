@@ -74,6 +74,9 @@
         }
       } else if (id === 'section-perguntas') {
         global.JPaperQA && global.JPaperQA.renderQuestions();
+        global.JGuiaSelfie && global.JGuiaSelfie.loadAnswers();
+      } else if (id === 'section-selfie') {
+        global.JGuiaSelfie && global.JGuiaSelfie.initSelfie();
       }
 
       setTimeout(() => {
@@ -82,13 +85,13 @@
         const textElements = container.querySelectorAll('[data-typing="true"]:not(.hidden)');
         console.log('[JornadaController] Elementos [data-typing] encontrados:', textElements.length);
 
-        // Ativar botão imediatamente para evitar travamento
-        const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : target.querySelector('[data-action="avancar"], [data-action="read-question"], [data-action="select-guia"], [data-action="skip-selfie"], .btn-avancar, .btn');
-        if (btn && btn.disabled) {
-          btn.disabled = false;
-          console.log('[JornadaController] Botão ativado (sem datilografia) em:', id, currentTermosPage || '');
-          window.toast && window.toast('Conteúdo pronto! Clique para avançar.');
-        }
+      // Ativar botão imediatamente para evitar travamento
+      const btn = id === 'section-termos' ? target.querySelector(`#${currentTermosPage} [data-action="termos-next"], #${currentTermosPage} [data-action="avancar"]`) : target.querySelector('[data-action="avancar"], [data-action="read-question"], [data-action="select-guia"], [data-action="skip-selfie"], .btn-avancar, .btn');
+      if (btn && btn.disabled) {
+        btn.disabled = false;
+        console.log('[JornadaController] Botão ativado (sem datilografia) em:', id, currentTermosPage || '');
+        window.toast && window.toast('Conteúdo pronto! Clique para avançar.');
+      }
 
         let typingCompleted = 0;
         const totalTypingElements = textElements.length;
@@ -98,7 +101,7 @@
           const isVisible = el.offsetParent !== null && window.getComputedStyle(el).visibility !== 'hidden' && window.getComputedStyle(el).display !== 'none';
           if (isVisible && typeof global.runTyping === 'function') {
             console.log('[JornadaController] Chamando runTyping para elemento:', el.id || el.className);
-            global.runTyping(el, () => {
+            global.runTyping(el, el.getAttribute('data-text') || el.textContent, () => {
               typingCompleted++;
               console.log('[JornadaController] Datilografia concluída para elemento:', el.id || el.className, '- Progresso:', typingCompleted + '/' + totalTypingElements);
               
@@ -122,7 +125,7 @@
         });
 
         const btns = target.querySelectorAll(
-          '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], [data-action="read-question"], [data-action="select-guia"], [data-action="skip-selfie"], .btn-avancar, .btn, #iniciar, #btnSkipSelfie, #btnStartJourney'
+          '[data-action="avancar"], [data-action="termos-next"], [data-action="termos-prev"], [data-action="read-question"], [data-action="select-guia"], [data-action="skip-selfie"], .btn-avancar, .btn, #iniciar, #btnSkipSelfie, #btnStartJourney, #previewBtn, #captureBtn, #grok-chat-send'
         );
         console.log('[JornadaController] Botões encontrados:', btns.length);
         btns.forEach(btn => {
@@ -149,6 +152,7 @@
                 }
               } else if (id === 'section-escolha-guia' && btn.dataset.action === 'select-guia') {
                 selectedGuia = btn.dataset.guia;
+                localStorage.setItem('JORNADA_GUIA', selectedGuia);
                 console.log('[JornadaController] Guia selecionado:', selectedGuia);
                 const avancarBtn = target.querySelector('[data-action="avancar"]');
                 if (avancarBtn && avancarBtn.disabled) {
@@ -159,6 +163,7 @@
                 console.log('[JornadaController] Pulando selfie');
                 if (JC.goNext) JC.goNext();
               } else if (id === 'section-perguntas') {
+                global.JGuiaSelfie && global.JGuiaSelfie.saveAnswers();
                 const blocks = ['bloco-raizes', 'bloco-reflexoes', 'bloco-crescimento', 'bloco-integracao', 'bloco-sintese'];
                 const currentBlockIdx = blocks.indexOf(currentPerguntasBlock);
                 if (currentBlockIdx < blocks.length - 1) {
@@ -214,4 +219,10 @@
     }
     global.initController = initializeController;
   });
+
+  // Substituir window.showSection para usar JC.show
+  global.showSection = function(id) {
+    console.log('[JornadaController] showSection chamado para:', id);
+    JC.show(id);
+  };
 })(window);
