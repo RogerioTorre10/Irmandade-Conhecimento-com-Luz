@@ -29,6 +29,7 @@
       [data-typing="true"].typing-done { opacity: 1; visibility: visible; }
     `;
     document.head.appendChild(st);
+    console.log('[TypingBridge] Estilo de datilografia aplicado');
   })();
 
   let ACTIVE = false;
@@ -37,11 +38,13 @@
   function lock() {
     ACTIVE = true;
     global.__typingLock = true;
+    console.log('[TypingBridge] Lock ativado');
   }
 
   function unlock() {
     ACTIVE = false;
     global.__typingLock = false;
+    console.log('[TypingBridge] Lock desativado');
   }
 
   async function typeText(element, text, speed = 40, showCursor = false) {
@@ -160,7 +163,9 @@
         }
       }
 
-      try { await i18n.waitForReady(5000); } catch (_) {}
+      try { await i18n.waitForReady(5000); } catch (e) {
+        console.warn('[TypingBridge] Erro ao esperar i18n:', e);
+      }
 
       let ttsQueue = [];
       for (const el of elements) {
@@ -235,20 +240,4 @@
   global.runTyping = playTypingAndSpeak;
 
   typingLog('Pronto');
-
-  document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-      const active = document.querySelector('div[id^="section-"].active') || document.getElementById('section-intro');
-      console.log('[TypingBridge] Seção ativa após DOMContentLoaded:', active ? active.id : 'Nenhuma');
-      playTypingAndSpeak(active ? `#${active.id}` : '#section-intro', null);
-    }, 100);
-  });
-
-  document.addEventListener('bootstrapComplete', () => {
-    setTimeout(() => {
-      const active = document.querySelector('div[id^="section-"].active') || document.getElementById('section-intro');
-      console.log('[TypingBridge] Seção ativa após bootstrapComplete:', active ? active.id : 'Nenhuma');
-      playTypingAndSpeak(active ? `#${active.id}` : '#section-intro', null);
-    }, 100);
-  });
 })(window);
