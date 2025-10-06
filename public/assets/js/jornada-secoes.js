@@ -201,7 +201,8 @@
       return;
     }
     window.__introPlayed = true;
-    global.playTransition(intro, () => proceedToQuestions());
+    const _play = global.playTransition || playTransition;
+    _play(intro, () => proceedToQuestions());
   }
 
   function proceedToQuestions() {
@@ -299,11 +300,13 @@
     };
 
     const src = (window.JORNADA_BLOCKS[idxBloco] && window.JORNADA_BLOCKS[idxBloco].video_after) || '';
-    if (src) {
-      global.playTransition(src, () => irAdiante());
-    } else {
-      irAdiante();
-    }
+     if (src) {
+    const _play = global.playTransition || playTransition;
+    _play(src, () => irAdiante());
+  } else {
+    irAdiante();
+  }
+
   }
 
   // ===== Vídeo de Transição =====
