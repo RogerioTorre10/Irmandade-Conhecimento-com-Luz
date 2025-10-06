@@ -18,6 +18,42 @@
     waitForReady: async () => {}
   };
 
+(function () {
+  const LOG = (...a) => console.log('[TypingBridge]', ...a);
+  const ERR = (...a) => console.error('[TypingBridge]', ...a);
+
+  if (typeof window.runTyping !== 'function') {
+    window.runTyping = async function runTyping(el, text, onDone) {
+      try {
+        if (!el) return onDone && onDone();
+        const msg = (typeof text === 'string' && text.length) ? text
+                  : (el.dataset?.text || el.textContent || '');
+        // TTS (não trava se indisponível)
+        try {
+          if ('speechSynthesis' in window && msg) {
+            const u = new SpeechSynthesisUtterance(msg);
+            u.lang = 'pt-BR'; u.rate = 1.02; u.pitch = 1.0; u.volume = 1.0;
+            speechSynthesis.cancel(); // cancela leitura anterior
+            speechSynthesis.speak(u);
+          }
+        } catch (e) { /* no-op */ }
+
+        // Datilografia visual simples
+        el.textContent = '';
+        for (const ch of msg) {
+          el.textContent += ch;
+          await new Promise(r => setTimeout(r, 18));
+        }
+        onDone && onDone();
+        LOG('ok em', el.id || el);
+      } catch (e) {
+        ERR('falha', e);
+        onDone && onDone();
+      }
+    };
+  }
+})();
+
   (function ensureStyle() {
     if (document.getElementById('typing-style')) return;
     const st = document.createElement('style');
