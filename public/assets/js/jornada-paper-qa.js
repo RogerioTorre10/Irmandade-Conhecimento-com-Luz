@@ -42,6 +42,7 @@
 
   const blockTranslations = {
     'pt-BR': [
+       {
       id: 'raizes',
       title: 'Block 1 — Roots',
       data_i18n: 'bloco_raizes_title',
