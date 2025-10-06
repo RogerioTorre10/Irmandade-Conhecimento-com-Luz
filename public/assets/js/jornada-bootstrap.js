@@ -34,3 +34,28 @@
     setTimeout(fire, 0);
   }
 })(window);
+// jornada-bootstrap.js
+(function(){
+  let tries = 0, maxTries = 60; // ~3s se usar 50ms
+  function ready(fn){
+    if (document.readyState === 'complete' || document.readyState === 'interactive') return fn();
+    document.addEventListener('DOMContentLoaded', fn, { once:true });
+  }
+  function attempt(){
+    tries++;
+    if (window.JC && typeof window.JC.init === 'function') {
+      console.log('[BOOT] Iniciando Jornada…');
+      try { window.JC.init(); } catch(e){ console.error('[BOOT] falha no init', e); }
+      return;
+    }
+    if (tries >= maxTries) {
+      console.error('[BOOT] Desisti: JC não disponível a tempo');
+      window.toast && window.toast('Falha ao iniciar a Jornada (JC não disponível).');
+      return;
+    }
+    setTimeout(attempt, 50);
+  }
+  ready(attempt);
+})();
+
+
