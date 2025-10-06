@@ -241,6 +241,13 @@
     syncNameInput();
     log('Selfie inicializado');
   }
+  
+    setTimeout(() => {
+      const selfieSection = document.getElementById('section-selfie');
+      if (selfieSection) {
+      window.JGuiaSelfie?.initSelfie();
+     }
+   }, 300);
 
     // ===== Chat com Guia =====
     async function sendChatMessage() {
@@ -313,13 +320,7 @@
       input.value = '';
       log('Mensagem enviada:', userMessage);
     }
-      setTimeout(() => {
-      const selfieSection = document.getElementById('section-selfie');
-      if (selfieSection) {
-      window.JGuiaSelfie?.initSelfie();
-     }
-   }, 300);
-
+      
     // ===== Progresso & Storage =====
     function updateProgress() {
       const perguntas = $$('.j-pergunta');
