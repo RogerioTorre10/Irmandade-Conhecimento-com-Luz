@@ -444,30 +444,4 @@
   document.addEventListener('DOMContentLoaded', initSecoes);
   global.JSecoes = { checkImage, updateCanvasBackground, loadDynamicBlocks, analyzeSentiment, handleInput, toggleSenha, proceedAfterGuia, proceedAfterSelfie, proceedToQuestions, goNext, playTransition, generatePDF };
 })(window);
-// === [BOTTOM] jornada-secoes.js ===
-(function(){
-  // preserva caso já exista
-  window.JSecoes = window.JSecoes || {};
 
-  // Se você já tiver a função real, ALIAS:
-  // window.JSecoes.startJourney = window.JSecoes.startJourney || window.iniciarPerguntas || window.start || function(){...};
-
-  // Implementação mínima para destravar o fluxo SENHA → próxima seção
-  if (typeof window.JSecoes.startJourney !== 'function') {
-    window.JSecoes.startJourney = function startJourney() {
-      // decide próxima seção: prioriza 'section-guia', senão cai em 'section-selfie'
-      var next = document.getElementById('section-guia') ? 'section-guia'
-               : document.getElementById('section-guia-selfie') ? 'section-guia-selfie'
-               : 'section-selfie';
-      if (typeof window.showSection === 'function') {
-        console.log('[JSecoes] startJourney →', next);
-        window.showSection(next);
-        // libera locks antigos de typing
-        window.G = window.G || {};
-        window.G.__typingLock = false;
-      } else {
-        window.toast && window.toast('showSection indisponível.');
-      }
-    };
-  }
-})();
