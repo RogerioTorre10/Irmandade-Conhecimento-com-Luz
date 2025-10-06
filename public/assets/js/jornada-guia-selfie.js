@@ -36,7 +36,9 @@
   const guideNameEl = document.getElementById('guideNameSlot');
   if (!card || !guideNameEl) {
     console.warn('[GuiaSelfie] Elementos do guia não encontrados');
-    return '/assets/img/irmandade-quarteto-bg-zion.png'; // fallback seguro
+    return '/assets/img/irmandade-quarteto-bg-arian.jpeg';
+           '/assets/img/irmandade-quarteto-bg-lumen.png';
+           '/assets/img/irmandade-quarteto-bg-zion.png';// fallback seguro
   }
   const guia = localStorage.getItem('JORNADA_GUIA') || 'zion';
   card.dataset.guide = guia.toUpperCase();
