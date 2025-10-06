@@ -45,18 +45,29 @@
 }
 
 
-    function loadBg() {
-      const bgUrl = getBgUrl();
-      bgImg.src = bgUrl;
-      bgImg.onload = () => {
-        if (errorDiv) errorDiv.style.display = 'none';
-        log('Imagem de fundo carregada:', bgUrl);
-      };
-      bgImg.onerror = () => {
-        if (errorDiv) errorDiv.style.display = 'block';
-        global.toast && global.toast('Erro ao carregar a imagem de fundo do guia.');
-      };
-    }
+   function loadBg() {
+  const bgImg = document.getElementById('guia-bg-img');
+  const errorDiv = document.getElementById('guia-bg-error');
+  const bgUrl = getBgUrl();
+
+  if (!bgImg) {
+    console.warn('[GuiaSelfie] Elemento de imagem não encontrado: #guia-bg-img');
+    return;
+  }
+
+  bgImg.src = bgUrl;
+
+  bgImg.onload = () => {
+    if (errorDiv) errorDiv.style.display = 'none';
+    console.log('[GuiaSelfie] Imagem de fundo carregada:', bgUrl);
+  };
+
+  bgImg.onerror = () => {
+    if (errorDiv) errorDiv.style.display = 'block';
+    window.toast && window.toast('Erro ao carregar a imagem de fundo do guia.');
+  };
+}
+
 
     function updatePreview() {
       const scale = parseFloat(scaleInput.value);
