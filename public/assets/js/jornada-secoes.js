@@ -486,4 +486,4 @@
     startJourney
   };
 
-})(window
+})(window)
