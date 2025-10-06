@@ -31,10 +31,11 @@
 
     let selfieURL = '';
 
-   function getBgUrl() {
+  function getBgUrl() {
   const card = document.getElementById('card-guide');
-  if (!card) {
-    console.warn('[GuiaSelfie] Elemento #card-guide não encontrado');
+  const guideNameEl = document.getElementById('guideNameSlot');
+  if (!card || !guideNameEl) {
+    console.warn('[GuiaSelfie] Elementos do guia não encontrados');
     return '/assets/img/irmandade-quarteto-bg-zion.png'; // fallback seguro
   }
   const guia = localStorage.getItem('JORNADA_GUIA') || 'zion';
@@ -42,6 +43,7 @@
   guideNameEl.textContent = guia.toUpperCase();
   return `/assets/img/irmandade-quarteto-bg-${guia}.png`;
 }
+
 
     function loadBg() {
       const bgUrl = getBgUrl();
