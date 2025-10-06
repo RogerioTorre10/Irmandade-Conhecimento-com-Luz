@@ -313,6 +313,12 @@
       input.value = '';
       log('Mensagem enviada:', userMessage);
     }
+      setTimeout(() => {
+      const selfieSection = document.getElementById('section-selfie');
+      if (selfieSection) {
+      window.JGuiaSelfie?.initSelfie();
+     }
+   }, 300);
 
     // ===== Progresso & Storage =====
     function updateProgress() {
