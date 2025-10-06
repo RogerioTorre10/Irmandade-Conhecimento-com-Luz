@@ -95,4 +95,39 @@
 
   console.log('[SHIMS] Shims v5.4 aplicados com sucesso');
 })();
+// jornada-shims.js  (idempotente)
+(function(){
+  // Evita travas por lock antigo
+  window.G = window.G || {};
+  window.G.__typingLock = false;
+
+  // Fallback showSection simples (se não existir um oficial)
+  if (typeof window.showSection !== 'function') {
+    window.showSection = function(id) {
+      const all = document.querySelectorAll('div[id^="section-"], section[id^="section-"]');
+      all.forEach(s => s.classList ? s.classList.add('hidden') : s.hidden = true);
+      const target = document.getElementById(id);
+      if (target) {
+        target.classList ? target.classList.remove('hidden') : (target.hidden = false);
+        console.log('[showSection] Exibindo seção:', id);
+      } else {
+        window.toast && window.toast(`Seção ${id} não encontrada`);
+      }
+      // solta typing sempre que navegar
+      window.G.__typingLock = false;
+    };
+  }
+
+  // Fallback JC para evitar "goNext não definido"
+  window.JC = window.JC || {};
+  if (typeof window.JC.init !== 'function') {
+    window.JC.init = function(){ console.log('[JC] init (shim)'); };
+  }
+  if (typeof window.JC.goNext !== 'function') {
+    window.JC.goNext = function(nextId){
+      console.log('[JC] goNext (shim)', nextId);
+      if (nextId) window.showSection(nextId);
+    };
+  }
+})();
 
