@@ -16,27 +16,34 @@
       <div class="pergaminho-layer">
 
         <!-- Seção de introdução integrada -->
-        <section id="section-intro" data-section class="intro-bloco">
-          <h1>Bem-vindo(a) à Jornada Essencial</h1>
-          <p id="intro-p1" data-typing="true" data-text="Esta é uma experiência de reflexão profunda, simbólica e acolhedora." data-speed="36" data-cursor="true"></p>
-          <p id="intro-p2" data-typing="true" data-text="Leia com atenção o Termo de Responsabilidade e siga quando estiver pronto(a)." data-speed="36" data-cursor="true"></p>
+       <section id="section-intro" data-section class="pergaminho pergaminho-v">
+  <h1>Bem-vindo(a) à Jornada Essencial</h1>
+  <p id="intro-p1" data-typing="true" data-text="Esta é uma experiência de reflexão profunda, simbólica e acolhedora." data-speed="36" data-cursor="true"></p>
+  <p id="intro-p2" data-typing="true" data-text="Leia com atenção o Termo de Responsabilidade e siga quando estiver pronto(a)." data-speed="36" data-cursor="true"></p>
 
-          <div class="termo">
-            <h2>Termo de Responsabilidade e Consentimento</h2>
-            <p>
-              Ao iniciar, você concorda em participar de forma consciente, sabendo que
-              este material é de autoconhecimento e não substitui apoio médico ou psicológico.
-            </p>
-          </div>
+  <div class="termo">
+    <h2>Termo de Responsabilidade e Consentimento</h2>
+    <p>Ao iniciar, você concorda em participar de forma consciente, sabendo que este material é de autoconhecimento e não substitui apoio médico ou psicológico.</p>
+  </div>
 
-          <footer>
-            <button id="btn-avancar" class="btn btn-primary">Iniciar Jornada</button>
-          </footer>
+  <footer>
+    <button id="btn-avancar" class="btn btn-primary">Iniciar Jornada</button>
+  </footer>
 
-          <div class="intro-acoes">
-            <a class="btn" href="/jornadas.html">Voltar à página das Jornadas</a>
-          </div>
-        </section>
+  <script>
+    const el1 = document.getElementById('intro-p1');
+    const el2 = document.getElementById('intro-p2');
+    if (el1 && el2) {
+      window.runTyping?.(el1, el1.dataset.text, () => {
+        window.runTyping?.(el2, el2.dataset.text);
+      });
+    }
+
+    document.getElementById('btn-avancar')?.addEventListener('click', () => {
+      window.JC?.goNext('section-senha');
+    });
+  </script>
+</section>
 
         <!-- Seção de senha (exemplo mínimo) -->
         <section id="section-senha" data-section class="senha-bloco section-hidden" aria-hidden="true">
