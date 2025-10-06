@@ -84,33 +84,3 @@
   // Para debug rápido em console
   window.__API_DEBUG__ = { API_BASE: API_BASE_NORM, API_URL_NO_API };
 })();
-
-// 🔄 Loader dinâmico de etapas HTML (fora do bloco principal)
-document.addEventListener('DOMContentLoaded', () => {
-  const etapas = {
-    intro: '/html/jornada-intro.html',
-    barra: '/html/jornada_barracontador.html',
-    olho: '/html/jornada_olhomagico.html',
-    final: '/html/jornada-final.html',
-    pergaminho: '/html/jornada-pergaminho.html'
-  };
-
-  window.carregarEtapa = function (nome) {
-    const url = etapas[nome];
-    if (!url) return console.warn(`Etapa "${nome}" não encontrada`);
-
-    fetch(url)
-      .then(res => res.text())
-      .then(html => {
-        const app = document.getElementById('app');
-        if (app) {
-          app.innerHTML = html;
-          console.log(`[LOAD] ${nome}.html carregado`);
-        }
-      })
-      .catch(err => console.error(`[LOAD] Erro ao carregar ${nome}.html`, err));
-  };
-
-  // Etapa inicial da jornada
-  carregarEtapa('intro');
-});
