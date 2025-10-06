@@ -44,6 +44,31 @@
             <a class="btn" href="/jornadas.html">Voltar à página das Jornadas</a>
           </div>
         </section>
+        <section id="section-final" data-section class="pergaminho pergaminho-v section-hidden" aria-hidden="true">
+        <h2>Parabéns! Você finalizou a jornada 🎉</h2>
+        <p>Revise se quiser e depois gere seu PDF e HQ.</p>
+        <div class="acoes">
+        <button id="btnRevisar" class="btn">Revisar</button>
+        <button id="btnLimparRespostas" class="btn">Limpar respostas</button>
+        <button id="btnBaixarPDFHQ" class="btn btn-primary">Baixar PDF e HQ</button>
+      </div>
+ 
+  <script>
+    document.getElementById('btnRevisar')?.addEventListener('click', () => {
+      window.JC?.goNext('section-perguntas');
+    });
+
+    document.getElementById('btnLimparRespostas')?.addEventListener('click', () => {
+      localStorage.removeItem('jornada_respostas');
+      alert('Respostas apagadas!');
+    });
+
+    document.getElementById('btnBaixarPDFHQ')?.addEventListener('click', () => {
+      alert('Função de exportação ainda em desenvolvimento.');
+    });
+  </script>
+</section>
+
 
         <!-- Seção de senha -->
         <section id="section-senha" data-section class="senha-bloco section-hidden" aria-hidden="true">
