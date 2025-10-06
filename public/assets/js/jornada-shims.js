@@ -85,49 +85,63 @@
     }
   };
 
-  // Fallback para seção inicial
-  document.addEventListener('DOMContentLoaded', () => {
-    const visible = qa('section[id^="section-"]').find(s => !s.classList.contains(HIDE_CLASS));
-    if (!visible && window.showSection) {
-      if (q('#section-intro')) window.showSection('section-intro');
-    }
-  });
+// jornada-shims.js — SHIMS UNIFICADOS (v5.5)
+(function () {
+  const SELECTOR = '[data-section]';
+  const HIDE_CLASS = 'hidden';
 
-  console.log('[SHIMS] Shims v5.4 aplicados com sucesso');
-})();
-// jornada-shims.js  (idempotente)
-(function(){
-  // Evita travas por lock antigo
+  // evita travas antigas de typing
   window.G = window.G || {};
   window.G.__typingLock = false;
 
-  // Fallback showSection simples (se não existir um oficial)
-  if (typeof window.showSection !== 'function') {
-    window.showSection = function(id) {
-      const all = document.querySelectorAll('div[id^="section-"], section[id^="section-"]');
-      all.forEach(s => s.classList ? s.classList.add('hidden') : s.hidden = true);
-      const target = document.getElementById(id);
-      if (target) {
-        target.classList ? target.classList.remove('hidden') : (target.hidden = false);
-        console.log('[showSection] Exibindo seção:', id);
-      } else {
-        window.toast && window.toast(`Seção ${id} não encontrada`);
-      }
-      // solta typing sempre que navegar
-      window.G.__typingLock = false;
+  function hideAll() {
+    document.querySelectorAll(SELECTOR).forEach(s => {
+      s.classList.add(HIDE_CLASS);
+      s.setAttribute('aria-hidden', 'true');
+    });
+  }
+
+  function show(id) {
+    const el = document.getElementById(id);
+    if (!el) { window.toast && window.toast(`Seção ${id} não encontrada`); return; }
+    hideAll();
+    el.classList.remove(HIDE_CLASS);
+    el.removeAttribute('aria-hidden');
+    window.scrollTo(0, 0);
+    window.G.__typingLock = false; // solta qualquer lock antigo
+    console.log('[showSection] →', id);
+  }
+
+  // Ponto único de navegação
+  window.showSection = show;
+
+  // Wrapper JC.* (só define se não existir)
+  window.JC = window.JC || {};
+  if (typeof window.JC.show !== 'function') window.JC.show = show;
+  if (typeof window.JC.goNext !== 'function') {
+    window.JC.goNext = function (nextId) {
+      console.log('[JC.goNext]', nextId || '(sem destino)');
+      if (nextId) show(nextId);
     };
   }
 
-  // Fallback JC para evitar "goNext não definido"
-  window.JC = window.JC || {};
-  if (typeof window.JC.init !== 'function') {
-    window.JC.init = function(){ console.log('[JC] init (shim)'); };
-  }
-  if (typeof window.JC.goNext !== 'function') {
-    window.JC.goNext = function(nextId){
-      console.log('[JC] goNext (shim)', nextId);
-      if (nextId) window.showSection(nextId);
-    };
-  }
+  // Seção inicial: se nenhuma visível, abre a intro
+  document.addEventListener('DOMContentLoaded', () => {
+    const anyVisible = Array.from(document.querySelectorAll(SELECTOR))
+      .some(s => !s.classList.contains(HIDE_CLASS));
+    if (!anyVisible && document.getElementById('section-intro')) {
+      show('section-intro');
+    }
+  });
+
+  console.log('[SHIMS] v5.5 aplicados');
 })();
+  
+<section id="section-intro" data-section>…</section>
+<section id="section-termos" data-section>…</section>
+<section id="section-senha" data-section>…</section>
+<section id="section-guia" data-section>…</section>
+<section id="section-selfie" data-section>…</section>
+<section id="section-perguntas" data-section>…</section>
+
 
