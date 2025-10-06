@@ -8,7 +8,6 @@
   global.__GuiaSelfieReady = true;
 
   const log = (...args) => console.log('[GuiaSelfie]', ...args);
-
   const $ = s => document.querySelector(s);
   const $$ = s => document.querySelectorAll(s);
 
@@ -204,8 +203,8 @@
         ctx.font = `bold ${Math.round(W * 0.068)}px Cardo, serif`;
         ctx.fillText(userName, W / 2, H * 0.955);
 
-        const dataURL = canvas.toDataURL('image/png');
         try {
+          const dataURL = canvas.toDataURL('image/png');
           localStorage.setItem('IRMANDADE_SELFIE_FINAL', dataURL);
           const a = document.createElement('a');
           a.href = dataURL;
@@ -218,11 +217,12 @@
           global.toast && global.toast('Erro ao salvar ou baixar a imagem.');
         }
       });
-
-      loadBg();
-      syncNameInput();
-      log('Selfie inicializado');
     }
+
+    loadBg();
+    syncNameInput();
+    log('Selfie inicializado');
+  }
 
     // ===== Chat com Guia =====
     async function sendChatMessage() {
@@ -345,30 +345,36 @@
     }
 
     // ===== Inicialização =====
-    function initGuiaSelfie() {
-      initSelfie();
-      const chatInput = $('#grok-chat-input');
-      if (chatInput) {
-        chatInput.addEventListener('keypress', (e) => {
-          if (e.key === 'Enter') {
-            sendChatMessage();
-          }
-        });
-      }
-      const chatSendBtn = $('#grok-chat-send');
-      if (chatSendBtn) {
-        chatSendBtn.addEventListener('click', sendChatMessage);
-      }
-      $$('.j-pergunta textarea').forEach(input => {
-        input.addEventListener('input', () => {
-          saveAnswers();
-          updateProgress();
-        });
+   function initGuiaSelfie() {
+    initSelfie();
+    const chatInput = $('#grok-chat-input');
+    if (chatInput) {
+      chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          sendChatMessage();
+        }
       });
-      loadAnswers();
-      log('GuiaSelfie inicializado');
     }
+    const chatSendBtn = $('#grok-chat-send');
+    if (chatSendBtn) {
+      chatSendBtn.addEventListener('click', sendChatMessage);
+    }
+    $$('.j-pergunta textarea').forEach(input => {
+      input.addEventListener('input', () => {
+        saveAnswers();
+        updateProgress();
+      });
+    });
+    loadAnswers();
+    log('GuiaSelfie inicializado');
+  }
 
-    document.addEventListener('DOMContentLoaded', initGuiaSelfie);
-    global.JGuiaSelfie = { initSelfie, sendChatMessage, updateProgress, saveAnswers, loadAnswers };
+  document.addEventListener('DOMContentLoaded', initGuiaSelfie);
+  global.JGuiaSelfie = {
+    initSelfie,
+    sendChatMessage,
+    updateProgress,
+    saveAnswers,
+    loadAnswers
+  };
 })(window);
