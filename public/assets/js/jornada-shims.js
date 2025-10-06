@@ -137,11 +137,5 @@
   console.log('[SHIMS] v5.5 aplicados');
 })();
   
-<section id="section-intro" data-section>…</section>
-<section id="section-termos" data-section>…</section>
-<section id="section-senha" data-section>…</section>
-<section id="section-guia" data-section>…</section>
-<section id="section-selfie" data-section>…</section>
-<section id="section-perguntas" data-section>…</section>
 
 
