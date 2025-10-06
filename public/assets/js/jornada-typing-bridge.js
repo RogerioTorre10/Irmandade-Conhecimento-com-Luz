@@ -8,10 +8,7 @@
   global.__TypingBridgeReady = true;
 
   const typingLog = (...args) => console.log('[TypingBridge]', ...args);
-  const log = (...a) => console.log('[TypingBridge]', ...a);
-  const warn = (...a) => console.warn('[TypingBridge]', ...a);
-  const err  = (...a) => console.error('[TypingBridge]', ...a);
-
+  
   
   const i18n = global.i18n || {
     lang: 'pt-BR',
