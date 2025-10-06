@@ -1,0 +1,65 @@
+:root{
+  --bg-900:#0c0f1a; --bg-800:#131828;
+  --surface-700:#1b2237; --surface-600:#222b45;
+  --primary-500:#7c3aed; --primary-600:#6d28d9;
+  --accent-amber:#ffdf8a; --text-100:#e7e9f1; --text-200:#cdd2e6;
+  --border: rgba(255,223,169,.35);
+}
+*{ box-sizing:border-box } html,body{ height:100% }
+body{ background:var(--bg-900); color:var(--text-100); font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; }
+
+.bg-grad{
+  background:
+    radial-gradient(1200px 600px at 10% 0%, #1a1340 0%, #0c0f1a 55%),
+    linear-gradient(180deg, #0c0f1a, #0c0f1a);
+}
+.card{
+  background: var(--surface-700);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-body{
+  position: relative;
+  z-index: 1;
+  padding: 1.25rem;
+  padding-bottom: 3.75rem; /* ~60px para a chama */
+}
+
+.btn-primary,.btn-secondary,.btn-tertiary{ padding:.75rem 1rem; border-radius:12px; font-weight:600; border:1px solid transparent }
+.btn-primary{ background:var(--primary-500); color:#fff } .btn-primary:hover{ background:var(--primary-600) }
+.btn-secondary{ background:var(--surface-600); color:var(--text-100); border-color:var(--border) }
+.btn-secondary:hover{ filter:brightness(1.05) }
+.btn-tertiary{ background:transparent; color:var(--text-200); border-color:var(--border) }
+
+.input{ width:100%; padding:.9rem 1rem; border-radius:12px; background:var(--bg-800); border:1px solid var(--border); color:var(--text-100) }
+.input:focus{ outline:2px solid var(--primary-500) }
+
+/* Barra de progresso */
+.progress{ height:6px; background:#2b3553; border-radius:999px; overflow:hidden; }
+.progress>div{ height:100%; width:0%; background:var(--accent-amber); transition: width .35s ease; }
+
+/* Utilidades */
+.hidden{ display:none !important; }
+/* opcional, reforça o ocultamento da tela de senha */
+#sec-auth.hidden{ display:none !important; }
+
+.hidden{ display:none!important }
+.opacity-80{ opacity:.8 } .opacity-90{ opacity:.9 }
+.mt-6{ margin-top:1.5rem } .mb-8{ margin-bottom:2rem }
+.text-center{ text-align:center } .font-extrabold{ font-weight:800 }
+.container{ max-width: 960px }
+
+/* Olho mágico do campo de senha */
+.btn-eye{
+  position:absolute; right:10px; top:50%; transform:translateY(-50%);
+  width:38px; height:38px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  background: transparent; border: 1px solid transparent;
+  color: var(--surface-300);
+  cursor: pointer; pointer-events: auto;
+}
+.btn-eye:hover{ background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.12); }
+.btn-eye svg{ width:20px; height:20px; display:block; }
