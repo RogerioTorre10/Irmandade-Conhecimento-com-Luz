@@ -7,24 +7,24 @@
   'use strict';
 
   // --- Normalização de base -----------------------
-  const normalizeBase = (u) => String(u || '').replace(/\/+$/,'');
-  const ensureApiSuffix = (u) => normalizeBase(u).match(/\/api$/) ? normalizeBase(u) : normalizeBase(u) + '/api';
+  const normalizeBase = (u) => String(u || '').replace(/\/+$/, '');
+  const ensureApiSuffix = (u) =>
+    normalizeBase(u).endsWith('/api') ? normalizeBase(u) : normalizeBase(u) + '/api';
 
   // --- APP_CONFIG unificado -----------------------
   const DEFAULT_APP = { API_BASE: 'https://conhecimento-com-luz-api.onrender.com/api' };
-  const incoming = (typeof window !== 'undefined' && window.APP_CONFIG) ? window.APP_CONFIG : {};
+  const incoming = typeof window !== 'undefined' && window.APP_CONFIG ? window.APP_CONFIG : {};
   const APP = Object.assign({}, DEFAULT_APP, incoming);
-  APP.API_BASE = ensureApiSuffix(APP.API_BASE);   // garante .../api
+  APP.API_BASE = ensureApiSuffix(APP.API_BASE);
 
-  // expõe e mantém alias de compatibilidade
   window.APP_CONFIG = APP;
-  window.CONFIG = window.CONFIG || window.APP_CONFIG;
+  window.CONFIG = window.CONFIG || APP;
 
   // --- Utils (com fallback no-op) -----------------
   const U = window.JORNADA_UTILS || {
-    saveLocal: function(){},
-    loadLocal: function(){ return {}; },
-    clearLocal: function(){},
+    saveLocal: () => {},
+    loadLocal: () => ({}),
+    clearLocal: () => {}
   };
 
   // --- Estado central -----------------------------
@@ -38,7 +38,9 @@
     if (data && typeof data === 'object') {
       Object.assign(STATE.respostas, data);
     }
-    try { U.saveLocal('jornada_respostas', STATE.respostas); } catch {}
+    try {
+      U.saveLocal('jornada_respostas', STATE.respostas);
+    } catch {}
   }
 
   async function baixarArquivos(payload = {}) {
@@ -54,10 +56,10 @@
     iniciarFluxo,
     salvarRespostas,
     baixarArquivos,
-    STATE,
+    STATE
   };
 
-  // UI helpers (mantém compat)
+  // --- UI helpers ---------------------------------
   window.JORNADA_UI = Object.assign(window.JORNADA_UI || {}, {
     setProgressoBlocos(blocoIdx0, totalBlocos) {
       const el = document.getElementById('badgeProgressoBlocos');
@@ -67,7 +69,7 @@
     },
     setProgressoPerguntas(percent) {
       const bar = document.getElementById('progressBar');
-      if (bar) bar.style.width = `${Math.max(0, Math.min(100, percent|0))}%`;
+      if (bar) bar.style.width = `${Math.max(0, Math.min(100, percent | 0))}%`;
     }
   });
 })();
