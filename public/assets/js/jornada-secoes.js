@@ -287,14 +287,16 @@
         isTransitioning = false;
       } else {
         if (window.JORNADA_FINAL_VIDEO) {
-          global.playTransition(window.JORNADA_FINAL_VIDEO, () => {
-            global.JC.show('section-final');
-            isTransitioning = false;
-          });
-        } else {
-          global.JC.show('section-final');
-          isTransitioning = false;
-        }
+        const _play = global.playTransition || playTransition;
+        _play(window.JORNADA_FINAL_VIDEO, () => {
+        global.JC.show('section-final');
+        isTransitioning = false;
+      });
+      } else {
+        global.JC.show('section-final');
+        isTransitioning = false;
+    }
+
         global.JGuiaSelfie && global.JGuiaSelfie.updateProgress();
       }
     };
@@ -306,7 +308,7 @@
   } else {
     irAdiante();
   }
-
+    global.runTyping && global.runTyping(el, el.dataset.text, cb)
   }
 
   // ===== Vídeo de Transição =====
