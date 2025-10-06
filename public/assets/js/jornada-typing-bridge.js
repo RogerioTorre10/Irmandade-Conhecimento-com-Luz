@@ -266,3 +266,9 @@
     }, 300);
   });
 })(window);
+
+// … sua implementação oficial …
+function runTyping(el, opts) { /* ... */ }
+window.runTyping = runTyping; // <- garante export global
+
+
