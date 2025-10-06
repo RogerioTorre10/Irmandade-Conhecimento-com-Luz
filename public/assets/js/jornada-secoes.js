@@ -429,28 +429,9 @@
       log('pdfMake não encontrado');
     }
   }
-
-  // ===== Inicialização =====
-  function initSecoes() {
-    lockVideoOrientation();
-    $$('.j-pergunta textarea').forEach(input => {
-      input.addEventListener('input', () => handleInput(input));
-    });
-    const senhaInput = $('#senha-input');
-    if (senhaInput) {
-      senhaInput.addEventListener('input', () => {
-        const btn = $('#btn-senha-avancar');
-        if (btn) btn.disabled = !senhaInput.value.trim();
-      });
-    }
-    log('Secoes inicializado');
-  }
-
-  document.addEventListener('DOMContentLoaded', initSecoes);
-  global.JSecoes = { checkImage, updateCanvasBackground, loadDynamicBlocks, analyzeSentiment, handleInput, toggleSenha, proceedAfterGuia, proceedAfterSelfie, proceedToQuestions, goNext, playTransition, generatePDF };
-})(window);
-  // ===== Inicialização =====
-  function initSecoes() {
+  
+ // ===== Inicialização =====
+ function initSecoes() {
     lockVideoOrientation();
     $$('.j-pergunta textarea').forEach(input => {
       input.addEventListener('input', () => handleInput(input));
@@ -469,12 +450,10 @@
 
   // ===== startJourney (precisa existir antes do controller usar) =====
   function startJourney() {
-    // decide próxima seção: guia » selfie (fallback)
     var next = document.getElementById('section-guia') ? 'section-guia'
              : document.getElementById('section-guia-selfie') ? 'section-guia-selfie'
              : 'section-selfie';
 
-    // Preferir JC.show (coerente com seu fluxo)
     if (global.JC && typeof global.JC.show === 'function') {
       console.log('[JSecoes] startJourney →', next);
       global.JC.show(next);
@@ -486,12 +465,11 @@
       return;
     }
 
-    // solta locks antigos de typing
     global.G = global.G || {};
     global.G.__typingLock = false;
   }
 
-  // ===== Export público (um único ponto) =====
+  // ===== Export público =====
   global.JSecoes = {
     checkImage,
     updateCanvasBackground,
@@ -505,8 +483,7 @@
     goNext,
     playTransition,
     generatePDF,
-    startJourney,        // <- agora exposto junto
+    startJourney
   };
 
-})(window);
-
+})(window
