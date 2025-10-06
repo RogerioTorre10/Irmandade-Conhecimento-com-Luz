@@ -58,4 +58,16 @@
   ready(attempt);
 })();
 
+function waitForJC(attempt = 0) {
+  if (window.JC && typeof window.JC.show === 'function') {
+    document.dispatchEvent(new Event('bootstrapComplete'));
+  } else if (attempt < 30) {
+    setTimeout(() => waitForJC(attempt + 1), 100);
+  } else {
+    console.warn('[BOOT] Desisti: JC não disponível a tempo');
+    window.toast && window.toast('Falha ao iniciar a Jornada (JC não disponível).');
+  }
+}
+waitForJC();
+
 
