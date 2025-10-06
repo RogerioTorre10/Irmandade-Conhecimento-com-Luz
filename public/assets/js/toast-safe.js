@@ -43,3 +43,14 @@
     } catch {}
   };
 })();
+// toast-safe.js  (idempotente)
+(function(){
+  if (typeof window.toast === 'function') return;
+  window.toast = function(msg){
+    try {
+      console.log('[TOAST]', msg);
+      // Se você já tem componente visual, pode chamar aqui.
+    } catch(e) { /* no-op */ }
+  };
+})();
+
