@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jornada · Pergaminho Integrado</title>
+  <meta name="description" content="Jornada guiada com estilo pergaminho vertical e horizontal conforme a etapa.">
+
+  <!-- Favicon -->
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+
+  <!-- CSS base + estilos de pergaminho -->
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/css/styles-pergaminho.css" />
+  <link rel="stylesheet" href="/css/styles-pergaminho-rasgado.css" />
+
+  <!-- Fonte Cardo (SIL OFL 1.1) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    body.epic {
+      font-family: 'Cardo', Georgia, 'Times New Roman', serif;
+      line-height: 1.55;
+    }
+    .epic h1, .epic h2, .epic h3 {
+      font-weight: 700;
+      letter-spacing: .02em;
+      font-variant: small-caps;
+    }
+
+    /* Garantia visual do pergaminho */
+    .card.pergaminho { background: transparent; border: 0; box-shadow: none; position: relative; }
+    .pergaminho { position: relative; padding: 24px 20px; }
+    @media (min-width:768px) { .pergaminho { padding: 40px 48px; } }
+    .pergaminho::before {
+      content: ""; position: absolute; inset: 0; z-index: 0;
+      background-repeat: no-repeat; background-position: center; background-size: 100% 100%;
+      border-radius: 16px; opacity: .98;
+      filter: drop-shadow(0 12px 32px rgba(0,0,0,.45));
+    }
+    .pergaminho > * { position: relative; z-index: 1; }
+
+    /* Mapeamento das texturas */
+    .pergaminho-h::before { background-image: url("/assets/img/pergaminho-rasgado-horiz.png"); }
+    .pergaminho-v::before { background-image: url("/assets/img/pergaminho-rasgado-vert.png"); }
+
+    /* Aplicação vertical padrão */
+    .parchment-rough { background-image: url("/assets/img/pergaminho-rasgado-vert.png"); }
+  </style>
+</head>
+
+<body class="epic min-h-screen bg-slate-900 text-slate-100">
+  <main class="container">
+    <!-- Seções da jornada -->
+    <section id="sec-intro" class="section parchment-wrap-rough">
+      <div class="parchment-rough">
+        <div class="parchment-inner-rough">
+          <h2 class="parchment-title-rough">Bem-vindo à Jornada</h2>
+          <p class="parchment-text-rough">Esta jornada é simbólica, reflexiva e acolhedora.</p>
+          <button id="btnComecar" class="btn btn-primary">Começar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seção de perguntas com pergaminho horizontal -->
+    <section id="sec-wizard" class="section parchment-wrap-rough hidden" aria-hidden="true">
+      <div class="pergaminho pergaminho-h">
+        <div class="parchment-inner-rough">
+          <div class="parchment-progress-rough mb-3">
+            <div id="q-progress" class="bar" style="width: 0%"></div>
+          </div>
+
+          <div id="q-status" class="parchment-text-rough">Pergunta 0/0</div>
+          <h2 id="q-title" class="parchment-title-rough">Pergunta</h2>
+          <p id="q-text" class="parchment-text-rough">...</p>
+
+          <textarea id="q-input" data-qid="" class="parchment-input-rough" rows="5" placeholder="Escreva aqui..."></textarea>
+
+          <div class="parchment-actions-rough mt-3">
+            <button id="btnVoltar" class="btn">Voltar</button>
+            <button id="btnLimpar" class="btn">Limpar</button>
+            <span style="flex:1"></span>
+            <button id="btnProxima" class="btn btn-primary">Próxima</button>
+          </div>
+
+          <div class="mt-3">
+            <button id="btnFinalizar" class="btn btn-primary">Finalizar Jornada</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seção final com pergaminho vertical -->
+    <section id="sec-final" class="section parchment-wrap-rough hidden" aria-hidden="true">
+      <div class="parchment-rough">
+        <div class="parchment-inner-rough">
+          <h2 class="parchment-title-rough">Parabéns! Você finalizou a jornada 🎉</h2>
+          <p class="parchment-text-rough">Revise se quiser e depois gere seu PDF e HQ.</p>
+          <div class="parchment-actions-rough mt-3">
+            <button id="btnRevisar" class="btn">Revisar</button>
+            <button id="btnLimparRespostas" class="btn">Limpar respostas</button>
+            <span style="flex:1"></span>
+            <button id="btnBaixarPDFHQ" class="btn btn-primary">Baixar PDF e HQ</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Scripts essenciais -->
+  <script src="/jornada-utils.js"></script>
+  <script src="/jornada-core.js"></script>
+  <script src="/jornada-auth.js"></script>
+  <script src="/jornada-paper-qa.js"></script>
+  <script src="/jornada-typing-font.js"></script>
+  <script src="/jornada-render.js"></script>
+  <script src="/jornada-bootstrap.js"></script>
+  <script src="/questions.js"></script>
+  <script src="/state.js"></script>
+  <script src="/main.js"></script>
+  <script src="/jornada.js"></script>
+
+  <!-- Inicialização -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        onJornadaEssencial();
+      } catch (e) {
+        console.error('Falha ao iniciar jornada:', e);
+      }
+    });
+  </script>
+
+  <noscript>
+    <p style="text-align:center; padding:12px">Ative o JavaScript para usar esta página.</p>
+  </noscript>
+</body>
+</html>
