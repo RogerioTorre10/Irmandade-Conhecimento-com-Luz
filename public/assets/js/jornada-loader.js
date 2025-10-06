@@ -2,12 +2,12 @@
   'use strict';
 
   const etapas = {
-    intro: '/html/jornada-intro.html',
+    intro:  '/html/jornada-intro.html',
     termos: '/html/jornada-termos.html',
-    senha: '/html/jornada-senha.html',
-    barra: '/html/jornada_barracontador.html',
-    olho: '/html/jornada_olhomagico.html',
-    final: '/html/jornada-final.html'
+    senha:  '/html/jornada-senha.html',
+    barra:  '/html/jornada_barracontador.html',
+    olho:   '/html/jornada_olhomagico.html',
+    final:  '/html/jornada-final.html'
   };
 
   window.carregarEtapa = function (nome, callback) {
