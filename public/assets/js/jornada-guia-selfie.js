@@ -36,7 +36,7 @@
   const guideNameEl = document.getElementById('guideNameSlot');
   if (!card || !guideNameEl) {
     console.warn('[GuiaSelfie] Elementos do guia não encontrados');
-    return '/assets/img/irmandade-quarteto-bg-arian.jpeg';
+    return '/assets/img/irmandade-quarteto-bg-arian.png';
            '/assets/img/irmandade-quarteto-bg-lumen.png';
            '/assets/img/irmandade-quarteto-bg-zion.png';// fallback seguro
   }
@@ -48,12 +48,12 @@
 
 
    function loadBg() {
-  const bgImg = document.getElementById('guia-bg-img');
+  const bgImg = document.getElementById('guia-bg-png');
   const errorDiv = document.getElementById('guia-bg-error');
   const bgUrl = getBgUrl();
 
   if (!bgImg) {
-    console.warn('[GuiaSelfie] Elemento de imagem não encontrado: #guia-bg-img');
+    console.warn('[GuiaSelfie] Elemento de imagem não encontrado: #guia-bg-png');
     return;
   }
 
