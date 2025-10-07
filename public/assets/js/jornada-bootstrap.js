@@ -67,11 +67,10 @@
     startBootstrap();
   }
 
-  document.addEventListener('bootstrapComplete', () => {
+ document.addEventListener('bootstrapComplete', () => {
   if (window.carregarEtapa) {
     carregarEtapa('intro', () => {
-      console.log('[Bootstrap] Etapa intro carregada');
-      window.JC?.show('section-intro'); // exibe a intro após carregar
+      window.JC?.show('section-intro');
     });
   }
 });
