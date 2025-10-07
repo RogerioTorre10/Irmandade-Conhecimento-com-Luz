@@ -70,4 +70,15 @@ function waitForJC(attempt = 0) {
 }
 waitForJC();
 
+document.addEventListener('DOMContentLoaded', () => {
+  document.dispatchEvent(new CustomEvent('bootstrapComplete'));
+});
+
+document.addEventListener('bootstrapComplete', () => {
+  carregarEtapa('intro', () => {
+    JC.show('section-intro');
+    console.log('[Bootstrap] Etapa intro carregada e exibida');
+  });
+});
+
 
