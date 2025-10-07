@@ -32,9 +32,10 @@
   }
 
   // ===== Handler principal (assíncrono) =====
-  const handler = async (e) => {
-    const id = e?.detail?.sectionId || e?.detail?.id;
-    if (id !== 'section-intro') return;
+ const handler = async (e) => {
+  console.log('[jornada-intro.js] Evento recebido:', e?.detail);
+  const id = e?.detail?.sectionId || e?.detail?.id;
+  if (id !== 'section-intro') return;
 
     console.log('[jornada-intro.js] Ativando intro');
 
