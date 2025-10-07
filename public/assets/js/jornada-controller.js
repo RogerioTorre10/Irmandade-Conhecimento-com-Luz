@@ -201,14 +201,20 @@
       document.addEventListener('bootstrapComplete', JC.init, { once: true });
     }
     
-  JC.show = function (id) {
-    console.log('[JC.show] Exibindo:', id);
-    const target = document.getElementById(id);
-    if (target) {
+ JC.show = function (id) {
+  console.log('[JC.show] Exibindo:', id);
+  const target = document.getElementById(id);
+  if (target) {
     document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
     target.classList.remove('hidden');
-   }
-  };
+    target.style.display = 'block';
+    target.style.visibility = 'visible';
+    global.__currentSectionId = id;
+    document.dispatchEvent(new CustomEvent('section:shown', { detail: { sectionId: id, root: target } }));
+  } else {
+    console.error(`[JC.show] Elemento #${id} não encontrado`);
+  }
+};
     
     JC.goNext = function(id) {
     console.log('[JC.goNext] Indo para:', id);
