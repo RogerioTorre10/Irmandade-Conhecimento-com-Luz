@@ -15,13 +15,14 @@
       if (now - lastPreview < 1000) return;
       lastPreview = now;
       const img = document.getElementById('selfieImage');
-      if (img && img.src) {
-        document.querySelector('.selfie-preview').style.opacity = '1';
+      const preview = document.querySelector('.selfie-preview');
+      if (img && img.src && preview) {
+        preview.style.opacity = '1';
         window.toast?.('Pré-visualização atualizada!');
         console.log('[Selfie] Pré-visualização atualizada!');
       } else {
         window.toast?.('Selecione uma imagem primeiro.');
-        console.log('[Selfie] Nenhuma imagem selecionada para pré-visualização.');
+        console.log('[Selfie] Nenhuma imagem ou preview encontrado.');
       }
 
     } else if (btn.id === 'captureBtn') {
@@ -31,7 +32,7 @@
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const img = document.getElementById('selfieImage');
-      const bg = document.getElementById('guideBg');
+      const bg = document.getElementById('guia-bg-png'); // Unifique com jornada-guia-selfie.js
       const nameSlot = document.getElementById('userNameSlot');
       const guideNameSlot = document.getElementById('guideNameSlot');
 
@@ -41,8 +42,8 @@
         return;
       }
 
-      canvas.width = bg.width;
-      canvas.height = bg.height;
+      canvas.width = bg.naturalWidth || bg.width;
+      canvas.height = bg.naturalHeight || bg.height;
       ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
       const scale = parseFloat(document.getElementById('selfieScale')?.value || 1);
@@ -58,9 +59,9 @@
       ctx.font = 'bold 2.5rem Cardo, serif';
       ctx.fillStyle = '#f7d37a';
       ctx.textAlign = 'center';
-      ctx.fillText(guideNameSlot.textContent, canvas.width / 2, canvas.height * 0.02 + 30);
+      ctx.fillText(guideNameSlot.textContent || 'GUIA', canvas.width / 2, canvas.height * 0.02 + 30);
       ctx.font = 'bold 2rem Cardo, serif';
-      ctx.fillText(nameSlot.textContent, canvas.width / 2, canvas.height * 0.98 - 10);
+      ctx.fillText(nameSlot.textContent || 'USUÁRIO', canvas.width / 2, canvas.height * 0.98 - 10);
 
       const link = document.createElement('a');
       link.download = 'selfie-irmandade.png';
