@@ -5,6 +5,8 @@
     intro:  '/html/jornada-intro.html',
     termos: '/html/jornada-termos.html',
     senha:  '/html/jornada-senha.html',
+    guia:   '/html/jornada-guia.html',
+    selfie: '/html/jornada-selfie.html',
     barra:  '/html/jornada_barracontador.html',
     olho:   '/html/jornada_olhomagico.html',
     final:  '/html/jornada-final.html'
@@ -12,6 +14,8 @@
 
   function carregarEtapa(nome, callback) {
   const url = `/assets/html/jornada-${nome}.html`;
+  if (!url) return;
+
   fetch(url)
     .then(res => res.text())
     .then(html => {
@@ -47,4 +51,5 @@
       window.toast?.('Erro ao carregar etapa. Tente novamente.');
     });
 }
+
 
