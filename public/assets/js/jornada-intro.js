@@ -8,6 +8,7 @@ document.addEventListener('sectionLoaded', (e) => {
 
     if (el1 && el2 && btn) {
       btn.classList.add('hidd');
+
       window.runTyping?.(el1, el1.dataset.text, () => {
         window.runTyping?.(el2, el2.dataset.text, () => {
           btn.classList.remove('hidd');
@@ -15,8 +16,10 @@ document.addEventListener('sectionLoaded', (e) => {
       });
 
       btn.addEventListener('click', () => {
-        window.JC?.goNext('section-termos');
+        window.JC?.goNext('section-senha');
       });
+    } else {
+      console.warn('[jornada-intro.js] Elementos não encontrados');
     }
   }
-}, 300);
+});
