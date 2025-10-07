@@ -48,12 +48,14 @@
 
 
    function loadBg() {
-  const bgImg = document.getElementById('guia-bg-png');
+  const bgImg = document.getElementById('guia-bg-png'); // Ajuste para o ID correto
   const errorDiv = document.getElementById('guia-bg-error');
   const bgUrl = getBgUrl();
 
   if (!bgImg) {
     console.warn('[GuiaSelfie] Elemento de imagem não encontrado: #guia-bg-png');
+    if (errorDiv) errorDiv.style.display = 'block';
+    window.toast && window.toast('Elemento de imagem não encontrado.');
     return;
   }
 
@@ -65,8 +67,10 @@
   };
 
   bgImg.onerror = () => {
+    console.error('[GuiaSelfie] Falha ao carregar imagem:', bgUrl);
     if (errorDiv) errorDiv.style.display = 'block';
     window.toast && window.toast('Erro ao carregar a imagem de fundo do guia.');
+    bgImg.src = '/assets/img/irmandade-quarteto-bg-zion.png'; // Fallback
   };
 }
 
