@@ -1,129 +1,156 @@
-// jornada-intro.js (patch cirúrgico, idempotente)
+// jornada-intro.js (completo, patch idempotente e root-scoped)
 (() => {
-  // evita múltiplos bindings se o script for avaliado mais de uma vez
+  // Evita múltiplos bindings se o script for avaliado mais de uma vez
   if (window.__introBound) return;
   window.__introBound = true;
 
+  // ===== Helpers =====
   const once = (el, ev, fn) => {
+    if (!el) return;
     const h = (e) => { el.removeEventListener(ev, h); fn(e); };
     el.addEventListener(ev, h);
   };
 
-  // compat: também aceitaremos 'section:shown' se o loader emitir esse
-  const bindIntroHandler = () => {
-    const handler = (e) => {
-      const id = e?.detail?.sectionId || e?.detail?.id;
-      if (id !== 'section-intro') return;
+  async function waitForEl(selector, { within = document, timeout = 4000, step = 40 } = {}) {
+    const start = performance.now();
+    return new Promise((resolve, reject) => {
+      const tick = () => {
+        const el = within.querySelector(selector);
+        if (el) return resolve(el);
+        if (performance.now() - start >= timeout) return reject(new Error(`timeout waiting ${selector}`));
+        setTimeout(tick, step);
+      };
+      tick();
+    });
+  }
 
-      console.log('[jornada-intro.js] Ativando intro');
+  function getText(el) {
+    return (el?.dataset?.text ?? el?.textContent ?? '').trim();
+  }
 
-      // root da seção (evita query global e conflitos)
-      const root = document.getElementById('section-intro') || document.querySelector('#section-intro');
-      if (!root) {
-        console.warn('[jornada-intro.js] Root da intro não encontrado');
+  // ===== Handler principal (assíncrono) =====
+  const handler = async (e) => {
+    const id = e?.detail?.sectionId || e?.detail?.id;
+    if (id !== 'section-intro') return;
+
+    console.log('[jornada-intro.js] Ativando intro');
+
+    // Root da seção — tenta pegar, espera se ainda não montou; aceita root no próprio evento
+    let root = e?.detail?.root
+            || document.getElementById('section-intro')
+            || document.querySelector('#section-intro');
+
+    if (!root) {
+      try {
+        root = await waitForEl('#section-intro', { timeout: 4000, step: 40 });
+      } catch {
+        root = document.querySelector('section.section.bloco-intro, section[data-section="section-intro"]') || null;
+      }
+    }
+
+    if (!root) {
+      console.warn('[jornada-intro.js] Root da intro não encontrado (após espera)');
+      window.toast?.('Intro ainda não montou no DOM. Verifique a ordem do evento.', 'warn');
+      return;
+    }
+
+    // Busca de elementos APENAS dentro da seção (root-scoped)
+    const el1 = root.querySelector('#intro-p1');
+    const el2 = root.querySelector('#intro-p2');
+    const btn = root.querySelector('#btn-avancar');
+
+    if (!(el1 && el2 && btn)) {
+      console.warn('[jornada-intro.js] Elementos não encontrados', { el1, el2, btn });
+      return;
+    }
+
+    // Garante estado inicial do botão (compat com .hidd e .hidden)
+    btn.classList.add('hidden');
+    btn.classList.add('hidd');
+    const showBtn = () => { btn.classList.remove('hidden'); btn.classList.remove('hidd'); };
+
+    // Parâmetros dos data-*
+    const speed1 = Number(el1.dataset.speed || 36);
+    const speed2 = Number(el2.dataset.speed || 36);
+    const t1 = getText(el1);
+    const t2 = getText(el2);
+    const cursor1 = String(el1.dataset.cursor || 'true') === 'true';
+    const cursor2 = String(el2.dataset.cursor || 'true') === 'true';
+
+    // Limpa efeitos anteriores (se houver)
+    window.EffectCoordinator?.stopAll?.();
+
+    // ===== Cadeia de datilografia + TTS =====
+    const runTypingChain = async () => {
+      // Preferência: tua função runTyping, mantendo callbacks
+      if (typeof window.runTyping === 'function') {
+        window.runTyping(el1, t1, () => {
+          window.runTyping(el2, t2, () => {
+            showBtn();
+          }, { speed: speed2, cursor: cursor2 });
+        }, { speed: speed1, cursor: cursor1 });
+
+        // TTS fluido (texto inteiro)
+        window.EffectCoordinator?.speak?.(t1, { rate: 1.06 });
+        setTimeout(() => window.EffectCoordinator?.speak?.(t2, { rate: 1.05 }),
+          Math.max(1000, t1.length * speed1 * 0.75));
         return;
       }
 
-      const el1 = root.querySelector('#intro-p1');
-      const el2 = root.querySelector('#intro-p2');
-      const btn = root.querySelector('#btn-avancar');
+      // Fallback moderno: EffectCoordinator
+      if (window.EffectCoordinator?.type) {
+        await window.EffectCoordinator.type(el1, t1, { speed: speed1, cursor: cursor1 });
+        window.EffectCoordinator?.speak?.(t1, { rate: 1.06 });
 
-      if (!(el1 && el2 && btn)) {
-        console.warn('[jornada-intro.js] Elementos não encontrados', { el1, el2, btn });
+        await window.EffectCoordinator.type(el2, t2, { speed: speed2, cursor: cursor2 });
+        window.EffectCoordinator?.speak?.(t2, { rate: 1.05 });
+
+        showBtn();
         return;
       }
 
-      // garante estado visual do botão (compat com 'hidd' e 'hidden')
-      btn.classList.add('hidden');   // usa padrão
-      btn.classList.add('hidd');     // mantém compat
-      const showBtn = () => {
-        btn.classList.remove('hidden');
-        btn.classList.remove('hidd');
-      };
-
-      // helper: pega texto a partir dos data-* ou conteúdo
-      const getText = (el) =>
-        (el?.dataset?.text ?? el?.textContent ?? '').trim();
-
-      const speed1 = Number(el1.dataset.speed || 36);
-      const speed2 = Number(el2.dataset.speed || 36);
-      const t1 = getText(el1);
-      const t2 = getText(el2);
-
-      // limpa efeitos anteriores (se existir coord.)
-      window.EffectCoordinator?.stopAll();
-
-      // ==============================================
-      // TYPING com fallback:
-      // - se runTyping existir, usa tua função (com callback)
-      // - se não existir, usa EffectCoordinator.type + speak fluido
-      // ==============================================
-      const runTypingChain = async () => {
-        // preferencial: tua função
-        if (typeof window.runTyping === 'function') {
-          window.runTyping(el1, t1, () => {
-            window.runTyping(el2, t2, () => {
-              showBtn();
-            }, { speed: speed2, cursor: el2.dataset.cursor === 'true' });
-          }, { speed: speed1, cursor: el1.dataset.cursor === 'true' });
-
-          // fala com fluidez (texto inteiro, não palavra a palavra)
-          window.EffectCoordinator?.speak(t1, { rate: 1.06 });
-          // aguarda um pouco e fala o segundo
-          setTimeout(() => window.EffectCoordinator?.speak(t2, { rate: 1.05 }), Math.max(1000, t1.length * speed1 * 0.75));
-          return;
-        }
-
-        // fallback moderno
-        if (window.EffectCoordinator?.type) {
-          await window.EffectCoordinator.type(el1, t1, { speed: speed1, cursor: el1.dataset.cursor === 'true' });
-          window.EffectCoordinator?.speak(t1, { rate: 1.06 });
-
-          await window.EffectCoordinator.type(el2, t2, { speed: speed2, cursor: el2.dataset.cursor === 'true' });
-          window.EffectCoordinator?.speak(t2, { rate: 1.05 });
-
-          showBtn();
-          return;
-        }
-
-        // último fallback bem simples
-        el1.textContent = t1;
-        el2.textContent = t2;
-        showBtn();
-      };
-
-      runTypingChain().catch(err => {
-        console.warn('[jornada-intro.js] typing chain falhou', err);
-        el1.textContent = t1;
-        el2.textContent = t2;
-        showBtn();
-      });
-
-      // navegação (com compat e debounce global se existir)
-      const goNext = () => {
-        if (typeof window.__canNavigate === 'function' && !window.__canNavigate()) return;
-        if (window.JC?.goNext) {
-          window.JC.goNext('section-senha'); // mantém teu fluxo atual
-        } else {
-          window.showSection?.('section-senha'); // fallback
-        }
-      };
-
-      // evitar múltiplos handlers no botão
-      btn.replaceWith(btn.cloneNode(true));
-      const freshBtn = root.querySelector('#btn-avancar');
-      once(freshBtn, 'click', goNext);
+      // Último fallback (sem efeitos)
+      el1.textContent = t1;
+      el2.textContent = t2;
+      showBtn();
     };
 
-    // escuta ambos formatos de eventos (qualquer um que teu loader emitir)
-    document.addEventListener('sectionLoaded', handler);
-    document.addEventListener('section:shown', handler);
+    try {
+      await runTypingChain();
+    } catch (err) {
+      console.warn('[jornada-intro.js] typing chain falhou', err);
+      el1.textContent = t1;
+      el2.textContent = t2;
+      showBtn();
+    }
+
+    // ===== Navegação =====
+    const goNext = () => {
+      if (typeof window.__canNavigate === 'function' && !window.__canNavigate()) return;
+      if (window.JC?.goNext) {
+        window.JC.goNext('section-senha');
+      } else {
+        window.showSection?.('section-senha');
+      }
+    };
+
+    // Evita múltiplos listeners no botão (rebind limpo)
+    const freshBtn = btn.cloneNode(true);
+    btn.replaceWith(freshBtn);
+    once(freshBtn, 'click', goNext);
   };
 
-  // garante binding após DOM pronto
+  // ===== Binding dos eventos do loader =====
+  const bind = () => {
+    // Mantém compatibilidade com ambos formatos de evento
+    document.addEventListener('sectionLoaded', handler);
+    document.addEventListener('section:shown', handler);
+    console.log('[jornada-intro.js] Handler ligado');
+  };
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bindIntroHandler, { once: true });
+    document.addEventListener('DOMContentLoaded', bind, { once: true });
   } else {
-    bindIntroHandler();
+    bind();
   }
 })();
