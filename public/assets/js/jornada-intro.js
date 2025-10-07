@@ -32,41 +32,38 @@
   }
 
   // ===== Handler principal (assíncrono) =====
- const handler = async (e) => {
+  const handler = async (e) => {
   console.log('[jornada-intro.js] Evento recebido:', e?.detail);
   const id = e?.detail?.sectionId || e?.detail?.id;
   if (id !== 'section-intro') return;
 
-    console.log('[jornada-intro.js] Ativando intro');
+  console.log('[jornada-intro.js] Ativando intro');
 
-    // Root da seção — tenta pegar, espera se ainda não montou; aceita root no próprio evento
-    let root = e?.detail?.root
-            || document.getElementById('section-intro')
-            || document.querySelector('#section-intro');
-
-    if (!root) {
-      try {
-        root = await waitForEl('#section-intro', { timeout: 4000, step: 40 });
-      } catch {
-        root = document.querySelector('section.section.bloco-intro, section[data-section="section-intro"]') || null;
-      }
+  let root = e?.detail?.root || document.getElementById('section-intro');
+  if (!root) {
+    try {
+      root = await waitForEl('#section-intro', { timeout: 8000, step: 100 });
+    } catch {
+      root = document.querySelector('section.section.bloco-intro, section[data-section="section-intro"]') || null;
     }
+  }
 
-    if (!root) {
-      console.warn('[jornada-intro.js] Root da intro não encontrado (após espera)');
-      window.toast?.('Intro ainda não montou no DOM. Verifique a ordem do evento.', 'warn');
-      return;
-    }
+  if (!root) {
+    console.warn('[jornada-intro.js] Root da intro não encontrado (após espera)');
+    window.toast?.('Intro ainda não montou no DOM. Verifique a ordem do evento.', 'warn');
+    return;
+  }
 
-    // Busca de elementos APENAS dentro da seção (root-scoped)
-    const el1 = root.querySelector('#intro-p1');
-    const el2 = root.querySelector('#intro-p2');
-    const btn = root.querySelector('#btn-avancar');
+  const el1 = root.querySelector('#intro-p1');
+  const el2 = root.querySelector('#intro-p2');
+  const btn = root.querySelector('#btn-avancar');
+  console.log('[jornada-intro.js] Elementos encontrados:', { el1, el2, btn });
 
-    if (!(el1 && el2 && btn)) {
-      console.warn('[jornada-intro.js] Elementos não encontrados', { el1, el2, btn });
-      return;
-    }
+  if (!(el1 && el2 && btn)) {
+    console.warn('[jornada-intro.js] Elementos não encontrados', { el1, el2, btn });
+    return;
+  }
+};
 
     // Garante estado inicial do botão (compat com .hidd e .hidden)
     btn.classList.add('hidden');
