@@ -76,9 +76,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.addEventListener('bootstrapComplete', () => {
   carregarEtapa('intro', () => {
-    JC.show('section-intro');
+    JC?.show('section-intro');
     console.log('[Bootstrap] Etapa intro carregada e exibida');
   });
 });
+
 
 
