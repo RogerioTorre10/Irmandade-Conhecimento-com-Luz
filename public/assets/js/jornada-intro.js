@@ -1,20 +1,22 @@
- setTimeout(() => {
-  const el1 = document.getElementById('intro-p1');
-  const el2 = document.getElementById('intro-p2');
-  const btn = document.getElementById('btn-avancar');
+document.addEventListener('sectionLoaded', (e) => {
+  if (e.detail.sectionId === 'section-intro') {
+    console.log('[jornada-intro.js] Ativando intro');
 
-  if (el1 && el2 && btn) {
-    btn.classList.add('hidd'); // esconde o botão
+    const el1 = document.getElementById('intro-p1');
+    const el2 = document.getElementById('intro-p2');
+    const btn = document.getElementById('btn-avancar');
 
-    window.runTyping?.(el1, el1.dataset.text, () => {
-      window.runTyping?.(el2, el2.dataset.text, () => {
-        btn.classList.remove('hidd'); // exibe o botão após o segundo texto
+    if (el1 && el2 && btn) {
+      btn.classList.add('hidd');
+      window.runTyping?.(el1, el1.dataset.text, () => {
+        window.runTyping?.(el2, el2.dataset.text, () => {
+          btn.classList.remove('hidd');
+        });
       });
-    });
 
-    document.getElementById('btn-avancar')?.addEventListener('click', () => {
-      window.JC?.goNext('section-senha');
-    });
+      btn.addEventListener('click', () => {
+        window.JC?.goNext('section-senha');
+      });
+    }
   }
-  });
-
+});
