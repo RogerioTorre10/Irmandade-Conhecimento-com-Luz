@@ -1,4 +1,3 @@
-<script>
  setTimeout(() => {
   const el1 = document.getElementById('intro-p1');
   const el2 = document.getElementById('intro-p2');
@@ -18,4 +17,4 @@
     });
   }
   });
-</script>
+
