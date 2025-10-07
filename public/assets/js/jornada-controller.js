@@ -205,3 +205,10 @@
     JC.show(id);
   };
 })(window);
+
+if (typeof JC.init === 'function') {
+  console.log('[JC] init disponível, disparando bootstrapComplete');
+  document.dispatchEvent(new CustomEvent('bootstrapComplete'));
+}
+
+
