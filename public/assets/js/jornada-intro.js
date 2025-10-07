@@ -17,5 +17,5 @@
       window.JC?.goNext('section-senha');
     });
   }
-  }), 300);
+  });
 </script>
