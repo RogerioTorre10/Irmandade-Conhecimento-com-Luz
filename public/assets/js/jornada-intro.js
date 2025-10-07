@@ -32,7 +32,7 @@
   }
 
   // ===== Handler principal (assíncrono) =====
-  const handler = async (e) => {
+ const handler = async (e) => {
   console.log('[jornada-intro.js] Evento recebido:', e?.detail);
   const id = e?.detail?.sectionId || e?.detail?.id;
   if (id !== 'section-intro') return;
@@ -63,34 +63,42 @@
     console.warn('[jornada-intro.js] Elementos não encontrados', { el1, el2, btn });
     return;
   }
-};
 
-    // Garante estado inicial do botão (compat com .hidd e .hidden)
-    btn.classList.add('hidden');
-    btn.classList.add('hidd');
-    const showBtn = () => { btn.classList.remove('hidden'); btn.classList.remove('hidd'); };
+  btn.classList.add('hidden');
+  btn.classList.add('hidd');
+  const showBtn = () => {
+    console.log('[jornada-intro.js] Mostrando botão');
+    btn.classList.remove('hidden');
+    btn.classList.remove('hidd');
+  };
 
-    // Parâmetros dos data-*
-    const speed1 = Number(el1.dataset.speed || 36);
-    const speed2 = Number(el2.dataset.speed || 36);
-    const t1 = getText(el1);
-    const t2 = getText(el2);
-    const cursor1 = String(el1.dataset.cursor || 'true') === 'true';
-    const cursor2 = String(el2.dataset.cursor || 'true') === 'true';
+  const speed1 = Number(el1.dataset.speed || 36);
+  const speed2 = Number(el2.dataset.speed || 36);
+  const t1 = getText(el1);
+  const t2 = getText(el2);
+  const cursor1 = String(el1.dataset.cursor || 'true') === 'true';
+  const cursor2 = String(el2.dataset.cursor || 'true') === 'true';
 
-    // Limpa efeitos anteriores (se houver)
-    window.EffectCoordinator?.stopAll?.();
+  console.log('[jornada-intro.js] Parâmetros de typing:', { t1, t2, speed1, speed2, cursor1, cursor2 });
+
+  window.EffectCoordinator?.stopAll?.();
 
     // ===== Cadeia de datilografia + TTS =====
     const runTypingChain = async () => {
-      // Preferência: tua função runTyping, mantendo callbacks
-      if (typeof window.runTyping === 'function') {
-        window.runTyping(el1, t1, () => {
-          window.runTyping(el2, t2, () => {
-            showBtn();
-          }, { speed: speed2, cursor: cursor2 });
-        }, { speed: speed1, cursor: cursor1 });
-
+    if (typeof window.runTyping === 'function') {
+      console.log('[jornada-intro.js] Usando runTyping');
+      window.runTyping(el1, t1, () => {
+        console.log('[jornada-intro.js] Typing concluído para intro-p1');
+        window.runTyping(el2, t2, () => {
+          console.log('[jornada-intro.js] Typing concluído para intro-p2');
+          showBtn();
+        }, { speed: speed2, cursor: cursor2 });
+      }, { speed: speed1, cursor: cursor1 });
+      window.EffectCoordinator?.speak?.(t1, { rate: 1.06 });
+      setTimeout(() => window.EffectCoordinator?.speak?.(t2, { rate: 1.05 }), Math.max(1000, t1.length * speed1 * 0.75));
+      return;
+    }
+   };
         // TTS fluido (texto inteiro)
         window.EffectCoordinator?.speak?.(t1, { rate: 1.06 });
         setTimeout(() => window.EffectCoordinator?.speak?.(t2, { rate: 1.05 }),
@@ -117,13 +125,13 @@
     };
 
     try {
-      await runTypingChain();
-    } catch (err) {
-      console.warn('[jornada-intro.js] typing chain falhou', err);
-      el1.textContent = t1;
-      el2.textContent = t2;
-      showBtn();
-    }
+    await runTypingChain();
+  } catch (err) {
+    console.warn('[jornada-intro.js] Typing chain falhou', err);
+    el1.textContent = t1;
+    el2.textContent = t2;
+    showBtn();
+  }
 
     // ===== Navegação =====
     const goNext = () => {
