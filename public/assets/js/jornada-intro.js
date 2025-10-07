@@ -15,8 +15,8 @@ document.addEventListener('sectionLoaded', (e) => {
       });
 
       btn.addEventListener('click', () => {
-        window.JC?.goNext('section-senha');
+        window.JC?.goNext('section-termos');
       });
     }
   }
-});
+}, 300);
