@@ -16,5 +16,6 @@
     document.getElementById('btn-avancar')?.addEventListener('click', () => {
       window.JC?.goNext('section-senha');
     });
+  }
   }, 300);
 </script>
