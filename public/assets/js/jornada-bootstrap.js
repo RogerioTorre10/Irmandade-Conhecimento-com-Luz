@@ -9,77 +9,68 @@
 
   console.log('[BOOT] Iniciando micro-boot…');
 
-  async function fire() {
-    try {
-      if (!global.APP_CONFIG) {
-        console.warn('[BOOT] APP_CONFIG não encontrado, aguardando…');
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-      if (global.i18n) {
+  async function waitForConfig() {
+    let tries = 0;
+    while (!global.APP_CONFIG && tries < 30) {
+      console.warn('[BOOT] APP_CONFIG não encontrado, aguardando…');
+      await new Promise(resolve => setTimeout(resolve, 100));
+      tries++;
+    }
+  }
+
+  async function waitForI18n() {
+    if (global.i18n) {
+      try {
         await global.i18n.waitForReady(5000);
-        console.log('[BOOT] i18n pronto, disparando bootstrapComplete');
-      } else {
-        console.warn('[BOOT] i18n não encontrado, prosseguindo sem esperar');
+        console.log('[BOOT] i18n pronto');
+      } catch (e) {
+        console.warn('[BOOT] i18n falhou ao ficar pronto');
       }
-      document.dispatchEvent(new CustomEvent('bootstrapComplete'));
-      console.log('[BOOT] Evento bootstrapComplete disparado');
+    } else {
+      console.warn('[BOOT] i18n não encontrado, prosseguindo sem esperar');
+    }
+  }
+
+  async function waitForJC() {
+    let tries = 0;
+    while (!(global.JC && typeof global.JC.init === 'function') && tries < 60) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      tries++;
+    }
+    if (global.JC && typeof global.JC.init === 'function') {
+      try {
+        console.log('[BOOT] Iniciando Jornada…');
+        global.JC.init();
+        document.dispatchEvent(new CustomEvent('bootstrapComplete'));
+      } catch (e) {
+        console.error('[BOOT] falha no JC.init()', e);
+      }
+    } else {
+      console.error('[BOOT] Desisti: JC não disponível a tempo');
+      window.toast?.('Falha ao iniciar a Jornada (JC não disponível).');
+    }
+  }
+
+  async function startBootstrap() {
+    try {
+      await waitForConfig();
+      await waitForI18n();
+      await waitForJC();
     } catch (e) {
-      console.error('[BOOT] Erro ao disparar bootstrapComplete:', e);
+      console.error('[BOOT] Erro geral no bootstrap:', e);
     }
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', fire, { once: true });
+    document.addEventListener('DOMContentLoaded', startBootstrap, { once: true });
   } else {
-    setTimeout(fire, 0);
+    startBootstrap();
   }
-})(window);
-// jornada-bootstrap.js
-(function(){
-  let tries = 0, maxTries = 60; // ~3s se usar 50ms
-  function ready(fn){
-    if (document.readyState === 'complete' || document.readyState === 'interactive') return fn();
-    document.addEventListener('DOMContentLoaded', fn, { once:true });
-  }
-  function attempt(){
-    tries++;
-    if (window.JC && typeof window.JC.init === 'function') {
-      console.log('[BOOT] Iniciando Jornada…');
-      try { window.JC.init(); } catch(e){ console.error('[BOOT] falha no init', e); }
-      return;
-    }
-    if (tries >= maxTries) {
-      console.error('[BOOT] Desisti: JC não disponível a tempo');
-      window.toast && window.toast('Falha ao iniciar a Jornada (JC não disponível).');
-      return;
-    }
-    setTimeout(attempt, 50);
-  }
-  ready(attempt);
-})();
 
-function waitForJC(attempt = 0) {
-  if (window.JC && typeof window.JC.show === 'function') {
-    document.dispatchEvent(new Event('bootstrapComplete'));
-  } else if (attempt < 30) {
-    setTimeout(() => waitForJC(attempt + 1), 100);
-  } else {
-    console.warn('[BOOT] Desisti: JC não disponível a tempo');
-    window.toast && window.toast('Falha ao iniciar a Jornada (JC não disponível).');
-  }
-}
-waitForJC();
-
-document.addEventListener('DOMContentLoaded', () => {
-  document.dispatchEvent(new CustomEvent('bootstrapComplete'));
-});
-
-document.addEventListener('bootstrapComplete', () => {
-  carregarEtapa('intro', () => {
-    JC?.show('section-intro');
-    console.log('[Bootstrap] Etapa intro carregada e exibida');
+  document.addEventListener('bootstrapComplete', () => {
+    carregarEtapa('intro', () => {
+      global.JC?.show('section-intro');
+      console.log('[Bootstrap] Etapa intro carregada e exibida');
+    });
   });
-});
-
-
-
+})(window);
