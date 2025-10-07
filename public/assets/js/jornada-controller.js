@@ -200,8 +200,18 @@
       document.addEventListener('DOMContentLoaded', JC.init, { once: true });
       document.addEventListener('bootstrapComplete', JC.init, { once: true });
     }
+    
+  JC.show = function (id) {
+    console.log('[JC.show] Exibindo:', id);
+    const target = document.getElementById(id);
+    if (target) {
+    document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+    target.classList.remove('hidden');
+   }
+  };   
+    
     global.initController = JC.init;
   });
-
+  
   global.showSection = JC.show;
 })(window);
