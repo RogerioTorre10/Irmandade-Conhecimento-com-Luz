@@ -11,19 +11,22 @@
     el.addEventListener(ev, h);
   };
 
-  async function waitForEl(selector, { within = document, timeout = 4000, step = 40 } = {}) {
-    const start = performance.now();
-    return new Promise((resolve, reject) => {
-      const tick = () => {
-        const el = within.querySelector(selector);
-        if (el) return resolve(el);
-        if (performance.now() - start >= timeout) return reject(new Error(`timeout waiting ${selector}`));
-        setTimeout(tick, step);
-      };
-      tick();
-    });
-  }
-
+ async function waitForEl(selector, { within = document, timeout = 8000, step = 100 } = {}) {
+  const start = performance.now();
+  return new Promise((resolve, reject) => {
+    const tick = () => {
+      const el = within.querySelector(selector);
+      console.log(`[waitForEl] Buscando ${selector}, tempo: ${performance.now() - start}ms`);
+      if (el) return resolve(el);
+      if (performance.now() - start >= timeout) {
+        console.error(`[waitForEl] Timeout após ${timeout}ms para ${selector}`);
+        return reject(new Error(`timeout waiting ${selector}`));
+      }
+      setTimeout(tick, step);
+    };
+    tick();
+  });
+}
   function getText(el) {
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
   }
