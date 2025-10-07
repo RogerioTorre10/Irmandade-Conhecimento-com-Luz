@@ -12,18 +12,17 @@
     const now = performance.now();
 
     if (btn.id === 'previewBtn') {
-    if (now - lastPreview < 1000) return;
-    lastPreview = now;
-    const img = document.getElementById('selfieImage');
-    if (img && img.src) {
-    document.querySelector('.selfie-preview').style.opacity = '1';
-    window.toast?.('Pré-visualização atualizada!');
-    console.log('[Selfie] Pré-visualização atualizada!');
-  } else {
-    window.toast?.('Selecione uma imagem primeiro.');
-    console.log('[Selfie] Nenhuma imagem selecionada para pré-visualização.');
-  }
-}
+      if (now - lastPreview < 1000) return;
+      lastPreview = now;
+      const img = document.getElementById('selfieImage');
+      if (img && img.src) {
+        document.querySelector('.selfie-preview').style.opacity = '1';
+        window.toast?.('Pré-visualização atualizada!');
+        console.log('[Selfie] Pré-visualização atualizada!');
+      } else {
+        window.toast?.('Selecione uma imagem primeiro.');
+        console.log('[Selfie] Nenhuma imagem selecionada para pré-visualização.');
+      }
 
     } else if (btn.id === 'captureBtn') {
       if (now - lastCapture < 1000) return;
