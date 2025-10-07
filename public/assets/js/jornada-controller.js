@@ -210,7 +210,10 @@
    }
   };
     
+    JC.goNext = function(id) {
     console.log('[JC.goNext] Indo para:', id);
+    JC.show(id);
+   };
 
     global.initController = JC.init;
   });
