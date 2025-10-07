@@ -10,40 +10,9 @@
     final:  '/html/jornada-final.html'
   };
 
-const sectionCache = {};
 function carregarEtapa(nome, callback) {
   const url = `/assets/html/jornada-${nome}.html`;
-  if (sectionCache[url]) {
-    console.log(`[carregarEtapa] Cache hit para ${url}`);
-    const container = document.getElementById('jornada-conteudo');
-    container.innerHTML = '';
-    const temp = document.createElement('div');
-    temp.innerHTML = sectionCache[url];
-    const scripts = temp.querySelectorAll('script');
-    scripts.forEach(script => {
-      const newScript = document.createElement('script');
-      if (script.src) {
-        newScript.src = script.src;
-      } else {
-        newScript.textContent = script.textContent;
-      }
-      document.body.appendChild(newScript);
-    });
-    scripts.forEach(s => s.remove());
-    container.appendChild(temp);
-    setTimeout(() => {
-      const root = container.querySelector(`#section-${nome}`);
-      console.log(`[carregarEtapa] Root encontrado para section-${nome}:`, root);
-      if (!root) {
-        console.error(`[carregarEtapa] Elemento #section-${nome} não encontrado após injeção (cache)`);
-      }
-      document.dispatchEvent(new CustomEvent('sectionLoaded', {
-        detail: { sectionId: `section-${nome}`, root }
-      }));
-      if (callback) callback();
-    }, 0);
-    return;
-  }
+  if (!url) return;
 
   fetch(url)
     .then(res => {
@@ -51,11 +20,13 @@ function carregarEtapa(nome, callback) {
       return res.text();
     })
     .then(html => {
-      sectionCache[url] = html;
+      console.log(`[carregarEtapa] HTML retornado para ${nome}:`, html);
       const container = document.getElementById('jornada-conteudo');
-      container.innerHTML = '';
+      container.innerHTML = ''; // limpa antes
       const temp = document.createElement('div');
       temp.innerHTML = html;
+
+      // Executa scripts embutidos
       const scripts = temp.querySelectorAll('script');
       scripts.forEach(script => {
         const newScript = document.createElement('script');
@@ -67,7 +38,12 @@ function carregarEtapa(nome, callback) {
         document.body.appendChild(newScript);
       });
       scripts.forEach(s => s.remove());
-      container.appendChild(temp);
+
+      // Injeta diretamente os filhos do temp
+      while (temp.firstChild) {
+        container.appendChild(temp.firstChild);
+      }
+
       setTimeout(() => {
         const root = container.querySelector(`#section-${nome}`);
         console.log(`[carregarEtapa] Root encontrado para section-${nome}:`, root);
@@ -85,7 +61,6 @@ function carregarEtapa(nome, callback) {
       window.toast?.('Erro ao carregar etapa. Tente novamente.');
     });
 }
-
   // Torna a função acessível globalmente
   window.carregarEtapa = carregarEtapa;
 
