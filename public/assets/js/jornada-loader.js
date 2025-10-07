@@ -10,28 +10,41 @@
     final:  '/html/jornada-final.html'
   };
 
-  window.carregarEtapa = function (nome, callback) {
-    const url = etapas[nome];
-    if (!url) {
-      console.warn(`[Loader] Etapa "${nome}" não encontrada`);
-      return;
-    }
+  function carregarEtapa(nome, callback) {
+  const url = `/assets/html/jornada-${nome}.html`;
+  fetch(url)
+    .then(res => res.text())
+    .then(html => {
+      const container = document.getElementById('jornada-conteudo');
+      container.innerHTML = ''; // limpa antes
+      const temp = document.createElement('div');
+      temp.innerHTML = html;
 
-    fetch(url)
-      .then(res => res.text())
-      .then(html => {
-        const app = document.getElementById('jornada-conteudo');
-        if (app) {
-          app.innerHTML = html;
-          if (typeof callback === 'function') callback();
+      // Executa scripts embutidos
+      const scripts = temp.querySelectorAll('script');
+      scripts.forEach(script => {
+        const newScript = document.createElement('script');
+        if (script.src) {
+          newScript.src = script.src;
+        } else {
+          newScript.textContent = script.textContent;
         }
-      })
-      .catch(err => console.error(`[Loader] Erro ao carregar etapa "${nome}"`, err));
-  };
+        document.body.appendChild(newScript);
+      });
 
-  document.addEventListener('DOMContentLoaded', () => {
-    carregarEtapa('intro', () => {
-      window.JC?.show('section-intro');
+      // Remove os scripts do DOM temporário
+      scripts.forEach(s => s.remove());
+      container.appendChild(temp);
+
+      document.dispatchEvent(new CustomEvent('sectionLoaded', {
+        detail: { sectionId: `section-${nome}` }
+      }));
+
+      if (callback) callback();
+    })
+    .catch(err => {
+      console.error(`[carregarEtapa] Erro ao carregar etapa ${nome}:`, err);
+      window.toast?.('Erro ao carregar etapa. Tente novamente.');
     });
-  });
-})();
+}
+
