@@ -38,8 +38,8 @@
       tries++;
     }
     if (global.JC && typeof global.JC.init === 'function') {
+      console.log('[BOOT] JC disponível, iniciando...');
       try {
-        console.log('[BOOT] Iniciando Jornada…');
         global.JC.init();
         document.dispatchEvent(new CustomEvent('bootstrapComplete'));
       } catch (e) {
@@ -68,6 +68,11 @@
   }
 
   document.addEventListener('bootstrapComplete', () => {
+    if (typeof carregarEtapa !== 'function') {
+      console.warn('[Bootstrap] carregarEtapa não está disponível');
+      return;
+    }
+
     carregarEtapa('intro', () => {
       global.JC?.show('section-intro');
       console.log('[Bootstrap] Etapa intro carregada e exibida');
