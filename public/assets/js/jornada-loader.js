@@ -10,9 +10,40 @@
     final:  '/html/jornada-final.html'
   };
 
- function carregarEtapa(nome, callback) {
+const sectionCache = {};
+function carregarEtapa(nome, callback) {
   const url = `/assets/html/jornada-${nome}.html`;
-  if (!url) return;
+  if (sectionCache[url]) {
+    console.log(`[carregarEtapa] Cache hit para ${url}`);
+    const container = document.getElementById('jornada-conteudo');
+    container.innerHTML = '';
+    const temp = document.createElement('div');
+    temp.innerHTML = sectionCache[url];
+    const scripts = temp.querySelectorAll('script');
+    scripts.forEach(script => {
+      const newScript = document.createElement('script');
+      if (script.src) {
+        newScript.src = script.src;
+      } else {
+        newScript.textContent = script.textContent;
+      }
+      document.body.appendChild(newScript);
+    });
+    scripts.forEach(s => s.remove());
+    container.appendChild(temp);
+    setTimeout(() => {
+      const root = container.querySelector(`#section-${nome}`);
+      console.log(`[carregarEtapa] Root encontrado para section-${nome}:`, root);
+      if (!root) {
+        console.error(`[carregarEtapa] Elemento #section-${nome} não encontrado após injeção (cache)`);
+      }
+      document.dispatchEvent(new CustomEvent('sectionLoaded', {
+        detail: { sectionId: `section-${nome}`, root }
+      }));
+      if (callback) callback();
+    }, 0);
+    return;
+  }
 
   fetch(url)
     .then(res => {
@@ -20,12 +51,11 @@
       return res.text();
     })
     .then(html => {
+      sectionCache[url] = html;
       const container = document.getElementById('jornada-conteudo');
-      container.innerHTML = ''; // limpa antes
+      container.innerHTML = '';
       const temp = document.createElement('div');
       temp.innerHTML = html;
-
-      // Executa scripts embutidos
       const scripts = temp.querySelectorAll('script');
       scripts.forEach(script => {
         const newScript = document.createElement('script');
@@ -38,8 +68,6 @@
       });
       scripts.forEach(s => s.remove());
       container.appendChild(temp);
-
-      // Garante que o DOM esteja atualizado
       setTimeout(() => {
         const root = container.querySelector(`#section-${nome}`);
         console.log(`[carregarEtapa] Root encontrado para section-${nome}:`, root);
