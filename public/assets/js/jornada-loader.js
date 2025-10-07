@@ -5,8 +5,6 @@
     intro:  '/html/jornada-intro.html',
     termos: '/html/jornada-termos.html',
     senha:  '/html/jornada-senha.html',
-    guia:   '/html/jornada-guia-selfie.html',
-    selfie: '/html/jornada-selfie.html',
     barra:  '/html/jornada_barracontador.html',
     olho:   '/html/jornada_olhomagico.html',
     final:  '/html/jornada-final.html'
