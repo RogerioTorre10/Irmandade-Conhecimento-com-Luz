@@ -3,6 +3,22 @@
 
   const JC = {};
   global.JC = JC;
+  
+  JC.init = function () {
+  console.log('[JC] init chamado');
+  JC.setOrder([
+    'section-intro',
+    'section-termos',
+    'section-senha',
+    'section-filme-jardim',
+    'section-escolha-guia',
+    'section-filme-ao-encontro',
+    'section-selfie',
+    'section-filme-entrando',
+    'section-perguntas',
+    'section-final'
+  ]);
+};  
 
   const HIDE_CLASS = 'hidden';
   let sectionOrder = [];
