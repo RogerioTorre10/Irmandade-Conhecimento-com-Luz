@@ -242,6 +242,15 @@
         }
       });
     }
+    
+         function syncNameInput() {
+         const nameInput = document.getElementById('name-input'); // Ajuste o ID conforme necessário
+         if (!nameInput) {
+         console.warn('[GuiaSelfie] Elemento #name-input não encontrado');
+         return;
+      }
+         nameInput.value = localStorage.getItem('JORNADA_NOME') || '';
+   }
 
     loadBg();
     syncNameInput();
