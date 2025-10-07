@@ -198,14 +198,17 @@
   global.TypingBridge = TypingBridge;
 
   global.runTyping = (element, text, callback) => {
-    if (!element || !text) {
-      if (callback) callback();
-      return;
-    }
-    typeText(element, text, 36, true).then(() => {
-      if (callback) callback();
-    });
-  };
+  console.log('[TypingBridge] Iniciando runTyping:', { element, text });
+  if (!element || !text) {
+    console.warn('[TypingBridge] Elemento ou texto inválido');
+    if (callback) callback();
+    return;
+  }
+  typeText(element, text, 36, true).then(() => {
+    console.log('[TypingBridge] Typing concluído');
+    if (callback) callback();
+  });
+};
 
   typingLog('Pronto');
 })(window);
