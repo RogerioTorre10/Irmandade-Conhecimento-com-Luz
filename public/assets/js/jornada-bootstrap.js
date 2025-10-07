@@ -68,14 +68,11 @@
   }
 
   document.addEventListener('bootstrapComplete', () => {
-    if (typeof carregarEtapa !== 'function') {
-      console.warn('[Bootstrap] carregarEtapa não está disponível');
-      return;
-    }
-
+  if (window.carregarEtapa) {
     carregarEtapa('intro', () => {
-      global.JC?.show('section-intro');
-      console.log('[Bootstrap] Etapa intro carregada e exibida');
+      console.log('[Bootstrap] Etapa intro carregada');
+      window.JC?.show('section-intro'); // exibe a intro após carregar
     });
-  });
+  }
+});
 })(window);
