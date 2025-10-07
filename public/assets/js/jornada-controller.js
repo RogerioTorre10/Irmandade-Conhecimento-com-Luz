@@ -208,8 +208,10 @@
     document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
     target.classList.remove('hidden');
    }
-  };   
+  };
     
+    console.log('[JC.goNext] Indo para:', id);
+
     global.initController = JC.init;
   });
   
