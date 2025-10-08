@@ -1,4 +1,4 @@
-<!-- /assets/js/jornada-intro.js -->
+<!-- /assets/js/section-intro.js -->
 (() => {
   if (window.__introBound) return;
   window.__introBound = true;
