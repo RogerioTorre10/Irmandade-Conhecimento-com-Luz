@@ -50,6 +50,21 @@
       window.toast?.('Falha ao iniciar a Jornada (JC não disponível).');
     }
   }
+  
+  // Exemplo de trecho do bootstrap
+(async () => {
+  // ... depois do i18n pronto e do JC estar disponível:
+  console.log('[BOOT] JC disponível, iniciando...');
+
+  // Garante que a seção existe
+  if (window.Loader?.ensure) {
+    await window.Loader.ensure('section-intro');
+  }
+
+  // Agora inicializa e exibe
+  window.JC?.init?.();
+  await window.JC?.show?.('section-intro');
+})();
 
   async function startBootstrap() {
     try {
