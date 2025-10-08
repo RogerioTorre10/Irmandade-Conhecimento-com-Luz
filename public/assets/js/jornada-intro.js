@@ -130,21 +130,24 @@
       showBtn();
     }
 
-    const goNext = () => {
-      console.log('[jornada-intro.js] Botão clicado, navegando para section-termos');
-      if (typeof window.__canNavigate === 'function' && !window.__canNavigate()) return;
-      if (window.JC?.goNext) {
-        window.JC.goNext();
-      } else {
-        window.showSection?.('section-termos');
-      }
-    };
+   const goNext = () => {
+  console.log('[jornada-intro.js] Botão clicado, navegando para section-termos');
+  if (typeof window.__canNavigate === 'function' && !window.__canNavigate()) return;
 
-    console.log('[jornada-intro.js] Configurando evento de clique no botão');
-    const freshBtn = btn.cloneNode(true);
-    btn.replaceWith(freshBtn);
-    once(freshBtn, 'click', goNext);
-  };
+  const nextSection = 'section-termos';
+
+  if (window.JC?.goNext) {
+    window.JC.goNext(nextSection);
+  } else {
+    window.showSection?.(nextSection);
+  }
+};
+
+console.log('[jornada-intro.js] Configurando evento de clique no botão');
+const freshBtn = btn.cloneNode(true);
+btn.replaceWith(freshBtn);
+once(freshBtn, 'click', goNext);
+
 
   const bind = () => {
     document.addEventListener('sectionLoaded', handler);
