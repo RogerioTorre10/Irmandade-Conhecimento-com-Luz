@@ -143,7 +143,6 @@
   }
 };
     
-(() => {
 console.log('[jornada-intro.js] Configurando evento de clique no botão');
 const freshBtn = btn.cloneNode(true);
 btn.replaceWith(freshBtn);
