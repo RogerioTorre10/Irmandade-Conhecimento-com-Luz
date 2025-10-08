@@ -1,3 +1,4 @@
+<!-- /assets/js/jornada-intro.js -->
 (() => {
   if (window.__introBound) return;
   window.__introBound = true;
@@ -35,9 +36,10 @@
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
   }
 
+  // ===== HANDLER PRINCIPAL DA INTRO =====
   const handler = async (e) => {
     console.log('[jornada-intro.js] Evento recebido:', e?.detail);
-    const id = e?.detail?.sectionId || e?.detail?.id;
+    const id = e?.detail?.sectionId || e?.detail?.id || window.__currentSectionId;
     if (id !== 'section-intro') return;
 
     console.log('[jornada-intro.js] Ativando intro');
@@ -67,8 +69,10 @@
       return;
     }
 
+    // Preparar botão
     btn.classList.add('hidden');
-    btn.classList.add('hidd');
+    btn.classList.add('hidd'); // se essa classe não existir, não faz mal
+
     const showBtn = () => {
       console.log('[jornada-intro.js] Mostrando botão');
       btn.classList.remove('hidden');
@@ -78,6 +82,7 @@
       btn.disabled = false;
     };
 
+    // Parâmetros de typing
     const speed1 = Number(el1.dataset.speed || 36);
     const speed2 = Number(el2.dataset.speed || 36);
     const t1 = getText(el1);
@@ -86,6 +91,7 @@
     const cursor2 = String(el2.dataset.cursor || 'true') === 'true';
     console.log('[jornada-intro.js] Parâmetros de typing:', { t1, t2, speed1, speed2, cursor1, cursor2 });
 
+    // Parar qualquer efeito anterior
     window.EffectCoordinator?.stopAll?.();
 
     const runTypingChain = async () => {
@@ -110,11 +116,13 @@
           console.warn('[jornada-intro.js] Erro no runTyping:', err);
         }
 
+        // TTS coordenado (se existir)
         window.EffectCoordinator?.speak?.(t1, { rate: 1.06 });
         setTimeout(() => window.EffectCoordinator?.speak?.(t2, { rate: 1.05 }), Math.max(1000, t1.length * speed1 * 0.75));
         return;
       }
 
+      // Fallback
       console.log('[jornada-intro.js] Fallback: sem efeitos');
       el1.textContent = t1;
       el2.textContent = t2;
@@ -130,29 +138,35 @@
       showBtn();
     }
 
-   const goNext = () => {
-  console.log('[jornada-intro.js] Botão clicado, navegando para section-termos');
-  if (typeof window.__canNavigate === 'function' && !window.__canNavigate()) return;
+    const goNext = () => {
+      console.log('[jornada-intro.js] Botão clicado, navegando para section-termos');
+      if (typeof window.__canNavigate === 'function' && !window.__canNavigate()) return;
 
-  const nextSection = 'section-termos';
+      const nextSection = 'section-termos';
+      if (window.JC?.goNext) {
+        window.JC.goNext(nextSection);
+      } else {
+        window.showSection?.(nextSection);
+      }
+    };
 
-  if (window.JC?.goNext) {
-    window.JC.goNext(nextSection);
-  } else {
-    window.showSection?.(nextSection);
-  }
-};
-    
-console.log('[jornada-intro.js] Configurando evento de clique no botão');
-const freshBtn = btn.cloneNode(true);
-btn.replaceWith(freshBtn);
-once(freshBtn, 'click', goNext);
+    console.log('[jornada-intro.js] Configurando evento de clique no botão');
+    const freshBtn = btn.cloneNode(true);
+    btn.replaceWith(freshBtn);
+    once(freshBtn, 'click', goNext);
+  }; // <<<<<< FALTAVA ESTE FECHAMENTO DO HANDLER
 
-
+  // ===== BIND DOS EVENTOS =====
   const bind = () => {
     document.addEventListener('sectionLoaded', handler);
     document.addEventListener('section:shown', handler);
     console.log('[jornada-intro.js] Handler ligado');
+
+    // Se a intro já estiver visível, dispara uma vez
+    const current = window.__currentSectionId || document.querySelector('#section-intro:not(.hidden)') ? 'section-intro' : null;
+    if (current === 'section-intro') {
+      handler({ detail: { sectionId: 'section-intro', root: document.getElementById('section-intro') } });
+    }
   };
 
   if (document.readyState === 'loading') {
