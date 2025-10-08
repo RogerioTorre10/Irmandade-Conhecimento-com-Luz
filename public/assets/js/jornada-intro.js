@@ -1,7 +1,9 @@
 (() => {
+  // Evita múltiplos bindings se o script for avaliado mais de uma vez
   if (window.__introBound) return;
   window.__introBound = true;
 
+  // HTML embutido - todo o conteúdo da intro aqui, sem dependência externa
   const introHtml = `
     <section id="section-intro" class="section bloco bloco-intro hidden">
       <div class="bloco-conteudo">
@@ -19,6 +21,7 @@
     </section>
   `;
 
+  // ===== Helpers =====
   const once = (el, ev, fn) => {
     if (!el) {
       console.warn('[jornada-intro.js] Elemento para evento não encontrado:', ev);
@@ -52,6 +55,7 @@
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
   }
 
+  // ===== Handler principal (assíncrono) =====
   const handler = async (e) => {
     console.log('[jornada-intro.js] Evento recebido:', e?.detail);
     const id = e?.detail?.sectionId || e?.detail?.id;
@@ -59,10 +63,10 @@
 
     console.log('[jornada-intro.js] Ativando intro');
 
-    // Injeta o HTML
+    // Injeta o HTML embutido no container
     const container = document.getElementById('jornada-conteudo');
     if (!container) {
-      console.error('[jornada-intro.js] Container #jornada-conteudo não encontrado');
+      console.error('[jornada-intro.js] Container #jornada-conteudo não encontrado - verifique o index.html');
       return;
     }
     container.innerHTML = '';
@@ -87,9 +91,11 @@
       return;
     }
 
+    // Busca de elementos APENAS dentro da seção (root-scoped)
     const el1 = root.querySelector('#intro-p1');
     const el2 = root.querySelector('#intro-p2');
     const btn = root.querySelector('#btn-avancar');
+
     console.log('[jornada-intro.js] Elementos encontrados:', { el1, el2, btn });
 
     if (!(el1 && el2 && btn)) {
@@ -97,6 +103,7 @@
       return;
     }
 
+    // Garante estado inicial do botão (compat com .hidd e .hidden)
     btn.classList.add('hidden');
     btn.classList.add('hidd');
     const showBtn = () => {
@@ -104,47 +111,58 @@
       btn.classList.remove('hidden');
       btn.classList.remove('hidd');
       btn.style.display = 'inline-block';
-      btn.style.pointerEvents = 'auto';
-      btn.disabled = false;
+      btn.style.pointerEvents = 'auto'; // Garante que o botão seja clicável
+      btn.disabled = false; // Garante que não esteja disabled
     };
 
+    // Parâmetros dos data-*
     const speed1 = Number(el1.dataset.speed || 36);
     const speed2 = Number(el2.dataset.speed || 36);
     const t1 = getText(el1);
     const t2 = getText(el2);
     const cursor1 = String(el1.dataset.cursor || 'true') === 'true';
     const cursor2 = String(el2.dataset.cursor || 'true') === 'true';
+
     console.log('[jornada-intro.js] Parâmetros de typing:', { t1, t2, speed1, speed2, cursor1, cursor2 });
 
+    // Limpa efeitos anteriores (se houver)
     window.EffectCoordinator?.stopAll?.();
 
+    // ===== Cadeia de datilografia + TTS =====
     const runTypingChain = async () => {
       console.log('[jornada-intro.js] Iniciando runTypingChain');
+
       if (typeof window.runTyping === 'function') {
         console.log('[jornada-intro.js] Usando runTyping');
-        try {
-          await new Promise((resolve) => {
-            window.runTyping(el1, t1, () => {
-              console.log('[jornada-intro.js] Typing concluído para intro-p1');
-              resolve();
-            }, { speed: speed1, cursor: cursor1 });
-          });
-          await new Promise((resolve) => {
-            window.runTyping(el2, t2, () => {
-              console.log('[jornada-intro.js] Typing concluído para intro-p2');
-              showBtn();
-              resolve();
-            }, { speed: speed2, cursor: cursor2 });
-          });
-        } catch (err) {
-          console.warn('[jornada-intro.js] Erro no runTyping:', err);
-        }
+        window.runTyping(el1, t1, () => {
+          console.log('[jornada-intro.js] Typing concluído para intro-p1');
+          window.runTyping(el2, t2, () => {
+            console.log('[jornada-intro.js] Typing concluído para intro-p2');
+            showBtn();
+          }, { speed: speed2, cursor: cursor2 });
+        }, { speed: speed1, cursor: cursor1 });
 
+        // TTS fluido (texto inteiro)
         window.EffectCoordinator?.speak?.(t1, { rate: 1.06 });
-        setTimeout(() => window.EffectCoordinator?.speak?.(t2, { rate: 1.05 }), Math.max(1000, t1.length * speed1 * 0.75));
+        setTimeout(() => window.EffectCoordinator?.speak?.(t2, { rate: 1.05 }),
+          Math.max(1000, t1.length * speed1 * 0.75));
         return;
       }
 
+      // Fallback moderno: EffectCoordinator
+      if (window.EffectCoordinator?.type) {
+        console.log('[jornada-intro.js] Usando EffectCoordinator');
+        await window.EffectCoordinator.type(el1, t1, { speed: speed1, cursor: cursor1 });
+        window.EffectCoordinator?.speak?.(t1, { rate: 1.06 });
+
+        await window.EffectCoordinator.type(el2, t2, { speed: speed2, cursor: cursor2 });
+        window.EffectCoordinator?.speak?.(t2, { rate: 1.05 });
+
+        showBtn();
+        return;
+      }
+
+      // Último fallback (sem efeitos)
       console.log('[jornada-intro.js] Fallback: sem efeitos');
       el1.textContent = t1;
       el2.textContent = t2;
@@ -160,8 +178,9 @@
       showBtn();
     }
 
+    // ===== Navegação =====
     const goNext = () => {
-      console.log('[jornada-intro.js] Navegando para próxima seção');
+      console.log('[jornada-intro.js] Botão clicado, navegando para próxima seção');
       if (typeof window.__canNavigate === 'function' && !window.__canNavigate()) return;
       if (window.JC?.goNext) {
         window.JC.goNext('section-senha');
@@ -170,13 +189,15 @@
       }
     };
 
-    console.log('[jornada-intro.js] Configurando evento de clique no botão');
+    // Evita múltiplos listeners no botão (rebind limpo)
     const freshBtn = btn.cloneNode(true);
     btn.replaceWith(freshBtn);
     once(freshBtn, 'click', goNext);
   };
 
+  // ===== Binding dos eventos do loader =====
   const bind = () => {
+    // Mantém compatibilidade com ambos formatos de evento
     document.addEventListener('sectionLoaded', handler);
     document.addEventListener('section:shown', handler);
     console.log('[jornada-intro.js] Handler ligado');
