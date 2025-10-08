@@ -10,39 +10,56 @@
     final: '/html/jornada-final.html'
   };
 
-  // Função para carregar uma etapa
   function carregarEtapa(nome, html, callback) {
     console.log(`[carregarEtapa] Usando HTML para ${nome}`);
     const container = document.getElementById('jornada-conteudo');
-    container.innerHTML = ''; // Limpa o contêiner antes
+    if (!container) {
+      console.error('[carregarEtapa] Contêiner #jornada-conteudo não encontrado');
+      return;
+    }
+    container.innerHTML = ''; // Limpa o contêiner
 
     const temp = document.createElement('div');
-    temp.innerHTML = html; // Insere o HTML recebido
+    temp.innerHTML = html;
 
-    // Executa scripts embutidos (se houver)
+    // Processar scripts embutidos
     const scripts = temp.querySelectorAll('script');
     scripts.forEach(script => {
       const newScript = document.createElement('script');
       if (script.src) {
         newScript.src = script.src;
+        newScript.async = true; // Adiciona async para scripts externos
       } else {
-        newScript.textContent = script.textContent;
+        try {
+          // Avalia o conteúdo do script como uma função
+          const scriptContent = script.textContent.trim();
+          if (scriptContent) {
+            // Se for uma arrow function, executa diretamente
+            if (scriptContent.startsWith('() =>')) {
+              eval(`(${scriptContent})()`); // Executa a função
+            } else {
+              newScript.textContent = scriptContent;
+              document.body.appendChild(newScript);
+            }
+          }
+        } catch (error) {
+          console.error('[carregarEtapa] Erro ao executar script embutido:', error);
+        }
       }
-      document.body.appendChild(newScript);
     });
-    scripts.forEach(s => s.remove()); // Remove scripts originais
+    scripts.forEach(s => s.remove());
 
-    // Transfere o conteúdo do temp para o contêiner
+    // Transfere o conteúdo para o contêiner
     while (temp.firstChild) {
       container.appendChild(temp.firstChild);
     }
 
-    // Verifica se o elemento da seção foi encontrado
+    // Verifica a seção carregada
     setTimeout(() => {
       const root = container.querySelector(`#section-${nome}`);
       console.log(`[carregarEtapa] Root encontrado para section-${nome}:`, root);
       if (!root) {
-        console.error(`[carregarEtapa] Elemento #section-${nome} não encontrado após injeção`);
+        console.error(`[carregarEtapa] Elemento #section-${nome} não encontrado`);
       }
       document.dispatchEvent(new CustomEvent('sectionLoaded', {
         detail: { sectionId: `section-${nome}`, root }
@@ -53,11 +70,5 @@
     }, 0);
   }
 
-  // Exemplo de uso (remova isso em produção, é só para teste)
-  // carregarEtapa('intro', '<div id="section-intro">Conteúdo de teste</div>', () => {
-  //   console.log('Callback executado!');
-  // });
-
-  // Expor a função globalmente, se necessário
   window.carregarEtapa = carregarEtapa;
 })();
