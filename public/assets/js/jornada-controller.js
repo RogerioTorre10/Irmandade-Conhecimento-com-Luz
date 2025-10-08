@@ -37,36 +37,69 @@
   };
 
   // Exibe uma seção
-  JC.show = function (id) {
-    const now = performance.now();
-    if (now - lastShowSection < 300 || global.__currentSectionId === id) return;
-    lastShowSection = now;
+// Exibe uma seção (versão async: garante DOM via Loader.ensure)
+JC.show = async function (id, { force = false } = {}) {
+  const now = performance.now();
+  if (!force && (now - lastShowSection < 300 || global.__currentSectionId === id)) return;
+  lastShowSection = now;
 
-    const all = document.querySelectorAll('div[id^="section-"]');
-    const target = document.getElementById(id);
-    if (!target) return;
+  try {
+    // 1) Garante que a seção exista (montada pelo Loader) antes de exibir
+    if (window.Loader?.ensure) {
+      await window.Loader.ensure(id);
+      // opcional: reaplicar i18n após inserir HTML
+      window.i18n?.apply?.();
+    }
 
-    all.forEach(s => s.classList.add(HIDE_CLASS));
-    target.classList.remove(HIDE_CLASS);
+    // 2) Resolve o alvo e o conjunto de seções
+    const all = document.querySelectorAll('section[id^="section-"], div[id^="section-"]');
+    const target =
+      document.getElementById(id) ||
+      document.querySelector(`#${id}, section#${id}, div#${id}`);
+
+    if (!target) {
+      console.error('[JC.show] Elemento #' + id + ' não encontrado mesmo após ensure');
+      return;
+    }
+
+    // 3) Oculta todas e mostra apenas o alvo
+    all.forEach(s => {
+      s.classList?.add(HIDE_CLASS);
+      s.style.display = 'none';
+      s.style.visibility = 'hidden';
+    });
+
+    target.classList?.remove(HIDE_CLASS);
     target.style.display = 'block';
     target.style.visibility = 'visible';
     global.__currentSectionId = id;
 
+    // 4) Reset de locks/estado
     global.G = global.G || {};
     global.G.__typingLock = false;
 
-    // Reset de estado
-    if (id !== 'section-termos') currentTermosPage = 'termos-pg1';
-    if (id !== 'section-perguntas') currentPerguntasBlock = 'bloco-raizes';
+    if (id !== 'section-termos')     currentTermosPage     = 'termos-pg1';
+    if (id !== 'section-perguntas')  currentPerguntasBlock = 'bloco-raizes';
 
-    // Lógica por seção
-    handleSectionLogic(id, target);
+    // 5) Lógica por seção
+    handleSectionLogic?.(id, target);
 
-    // Tipagem e botões
+    // 6) Eventos p/ quem escuta (intro, senha, etc.)
+    const detail = { sectionId: id, id, root: target };
+    document.dispatchEvent(new CustomEvent('sectionLoaded', { detail }));
+    document.dispatchEvent(new CustomEvent('section:shown',  { detail }));
+
+    // 7) Tipagem e botões (mantém teu delay atual)
     setTimeout(() => {
-      handleTypingAndButtons(id, target);
+      handleTypingAndButtons?.(id, target);
     }, 300);
-  };
+
+    console.log('[JC.show] Exibido com sucesso:', id);
+  } catch (e) {
+    console.error('[JC.show] Falha ao exibir', id, e);
+  }
+};
+
 
   // Lógica específica por seção
   function handleSectionLogic(id, target) {
