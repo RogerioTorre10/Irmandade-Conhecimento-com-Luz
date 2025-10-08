@@ -16,9 +16,10 @@
     <footer>
             <button id="btn-avancar" class="btn btn-primary" disabled data-action="avancar">Iniciar Jornada</button>
     </footer>
-  </div>
-  
-//</section> /assets/js/section-intro.js
+  </div>  
+</section>
+
+<script>  
 (() => {
   if (window.__introBound) return;
   window.__introBound = true;
@@ -195,3 +196,4 @@
     bind();
   }
 })();
+</script>   
