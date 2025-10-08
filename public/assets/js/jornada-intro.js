@@ -131,12 +131,12 @@
     }
 
     const goNext = () => {
-      console.log('[jornada-intro.js] Botão clicado, navegando para próxima seção');
+      console.log('[jornada-intro.js] Botão clicado, navegando para section-termos');
       if (typeof window.__canNavigate === 'function' && !window.__canNavigate()) return;
       if (window.JC?.goNext) {
         window.JC.goNext();
       } else {
-        window.showSection?.('section-senha');
+        window.showSection?.('section-termos');
       }
     };
 
