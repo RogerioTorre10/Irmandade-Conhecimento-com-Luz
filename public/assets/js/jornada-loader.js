@@ -146,3 +146,68 @@ function carregarEtapa(nome, callback) {
   window.carregarEtapa = carregarEtapa;
 
 })();
+// ===== PATCH: Expor Loader.ensure(id) =====
+(() => {
+  const Loader = window.Loader = window.Loader || {};
+
+  Loader.ensure = async function(id) {
+    // Já existe no DOM?
+    let el = document.getElementById(id);
+    if (el) return el;
+
+    console.log('[Loader.ensure] Montando', id);
+
+    // 1) Se você já tem o "carregarEtapa", use-o como caminho preferencial atual
+    if (typeof window.carregarEtapa === 'function') {
+      try {
+        const maybeRoot = await window.carregarEtapa(id);
+        el = document.getElementById(id) || maybeRoot;
+        if (el) {
+          console.log('[Loader.ensure] Montado via carregarEtapa');
+          window.i18n?.apply?.(); // reaplica traduções após inserir HTML
+          return el;
+        }
+      } catch (e) {
+        console.warn('[Loader.ensure] carregarEtapa falhou:', e);
+      }
+    }
+
+    // 2) Caminho futuro (templates por arquivo). Tenta buscar:
+    const tryFetch = async (url) => {
+      try {
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) return null;
+        const html = await res.text();
+        const mountAt = document.getElementById('app') || document.body;
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        const found = tmp.querySelector(`#${id}`) || tmp.firstElementChild;
+        if (found) {
+          mountAt.appendChild(found);
+          console.log('[Loader.ensure] Inserido a partir de', url);
+          return found;
+        }
+      } catch { /* ignora */ }
+      return null;
+    };
+
+    el = await tryFetch(`/html/${id}.html`) ||
+         await tryFetch(`/html/${id.replace('section-','')}.html`);
+
+    // 3) Fallback final: cria contêiner vazio para não quebrar fluxo
+    if (!el) {
+      const mountAt = document.getElementById('app') || document.body;
+      const sec = document.createElement('section');
+      sec.id = id;
+      sec.className = 'section bloco hidden';
+      mountAt.appendChild(sec);
+      el = sec;
+      console.warn('[Loader.ensure] Fallback: criou contêiner vazio para', id);
+    }
+
+    window.i18n?.apply?.();
+    return el;
+  };
+})();
+
+
