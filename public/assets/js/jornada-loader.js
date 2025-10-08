@@ -115,6 +115,3 @@
 
     window.carregarEtapa = carregarEtapa;
 })();
-
-  window.carregarEtapa = carregarEtapa;
-})();
