@@ -15,7 +15,7 @@ function carregarEtapa(nome, callback) {
   if (nome === 'intro') {
     console.log('[carregarEtapa] Ignorando intro, tratado por jornada-intro.js');
     document.dispatchEvent(new CustomEvent('sectionLoaded', {
-      detail: { sectionId: `section-${nome}` }
+      detail: { sectionId: 'section-intro' }
     }));
     if (callback) callback();
     return;
