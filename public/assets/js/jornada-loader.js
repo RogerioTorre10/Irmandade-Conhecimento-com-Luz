@@ -88,24 +88,28 @@
             }
 
             // 3. EVENTOS DE FINALIZAÇÃO
-            setTimeout(() => {
-                const root = container.querySelector(`#section-${nome}`);
-                console.log(`[carregarEtapa] Root encontrado para section-${nome}:`, root);
-                if (!root) {
-                    // Este erro só ocorrerá se o arquivo HTML carregado não tiver o ID correto
-                    console.error(`[carregarEtapa] Elemento #section-${nome} não encontrado dentro do HTML carregado.`);
-                }
+           setTimeout(() => {
+                // CORREÇÃO APLICADA AQUI:
+                // Tenta buscar no container E, se falhar, tenta buscar no documento inteiro (getElementById)
+                const sectionId = `section-${nome}`;
+                const root = container.querySelector(`#${sectionId}`) || document.getElementById(sectionId);
                 
-                // Dispara o evento 'sectionLoaded' para o controller
-                document.dispatchEvent(new CustomEvent('sectionLoaded', {
-                    detail: { sectionId: `section-${nome}`, root }
-                }));
-                
-                if (callback && typeof callback === 'function') {
-                    callback();
-                }
-            }, 0);
-
+                console.log(`[carregarEtapa] Root encontrado para ${sectionId}:`, root);
+                
+                if (!root) {
+                    // Este erro só ocorrerá se o arquivo HTML carregado não tiver o ID correto
+                    console.error(`[carregarEtapa] Elemento #${sectionId} não encontrado dentro do HTML carregado.`);
+                }
+                
+                // Dispara o evento 'sectionLoaded' para o controller
+                document.dispatchEvent(new CustomEvent('sectionLoaded', {
+                    detail: { sectionId: sectionId, root }
+                }));
+                
+                if (callback && typeof callback === 'function') {
+                    callback();
+                }
+            }, 0);
         } catch (error) {
             console.error(`[carregarEtapa] Erro no FETCH ou processamento da etapa '${nome}':`, error.message);
             // Mensagem clara de erro para o console
