@@ -39,7 +39,7 @@
     let root = e?.detail?.root || document.getElementById('section-intro');
     if (!root) {
       try {
-        root = await waitForEl('#section-intro', { timeout: 8000, step: 100 });
+        root = await waitForEl('#section-intro', { timeout: 8000, step = 100 });
       } catch {
         root = document.querySelector('section.section.bloco-intro, section[data-section="section-intro"]') || null;
       }
