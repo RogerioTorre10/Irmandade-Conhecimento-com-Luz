@@ -194,9 +194,6 @@
     }
   }
 
-  const TypingBridge = { play: playTypingAndSpeak };
-  global.TypingBridge = TypingBridge;
-
   global.runTyping = (element, text, callback) => {
   console.log('[TypingBridge] Iniciando runTyping:', { element, text });
   if (!element || !text) {
