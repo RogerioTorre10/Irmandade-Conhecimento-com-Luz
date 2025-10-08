@@ -2,9 +2,32 @@
   if (window.__introBound) return;
   window.__introBound = true;
 
+  const introHtml = `
+    <section id="section-intro" class="section bloco bloco-intro hidden">
+      <div class="bloco-conteudo">
+        <h1>Bem-vindo(a) à Jornada Essencial</h1>
+        <p id="intro-p1" data-typing="true" data-text="Esta é uma experiência de reflexão profunda, simbólica e acolhedora." data-speed="36" data-cursor="true"></p>
+        <p id="intro-p2" data-typing="true" data-text="Leia com atenção o Termo de Responsabilidade e siga quando estiver pronto(a)." data-speed="36" data-cursor="true"></p>
+        <div class="termo">
+          <h2>Termo de Responsabilidade e Consentimento</h2>
+          <p>Ao iniciar, você concorda em participar de forma consciente, sabendo que este material é de autoconhecimento e não substitui apoio médico ou psicológico.</p>
+        </div>
+        <footer>
+          <button id="btn-avancar" class="btn btn-primary hidd">Iniciar Jornada</button>
+        </footer>
+      </div>
+    </section>
+  `;
+
   const once = (el, ev, fn) => {
-    if (!el) return;
-    const h = (e) => { el.removeEventListener(ev, h); fn(e); };
+    if (!el) {
+      console.warn('[jornada-intro.js] Elemento para evento não encontrado:', ev);
+      return;
+    }
+    const h = (e) => {
+      el.removeEventListener(ev, h);
+      fn(e);
+    };
     el.addEventListener(ev, h);
   };
 
@@ -36,7 +59,20 @@
 
     console.log('[jornada-intro.js] Ativando intro');
 
-    let root = e?.detail?.root || document.getElementById('section-intro');
+    // Injeta o HTML
+    const container = document.getElementById('jornada-conteudo');
+    if (!container) {
+      console.error('[jornada-intro.js] Container #jornada-conteudo não encontrado');
+      return;
+    }
+    container.innerHTML = '';
+    const temp = document.createElement('div');
+    temp.innerHTML = introHtml;
+    while (temp.firstChild) {
+      container.appendChild(temp.firstChild);
+    }
+
+    let root = document.getElementById('section-intro');
     if (!root) {
       try {
         root = await waitForEl('#section-intro', { timeout: 8000, step = 100 });
@@ -68,6 +104,8 @@
       btn.classList.remove('hidden');
       btn.classList.remove('hidd');
       btn.style.display = 'inline-block';
+      btn.style.pointerEvents = 'auto';
+      btn.disabled = false;
     };
 
     const speed1 = Number(el1.dataset.speed || 36);
@@ -84,26 +122,26 @@
       console.log('[jornada-intro.js] Iniciando runTypingChain');
       if (typeof window.runTyping === 'function') {
         console.log('[jornada-intro.js] Usando runTyping');
-        window.runTyping(el1, t1, () => {
-          console.log('[jornada-intro.js] Typing concluído para intro-p1');
-          window.runTyping(el2, t2, () => {
-            console.log('[jornada-intro.js] Typing concluído para intro-p2');
-            showBtn();
-          }, { speed: speed2, cursor: cursor2 });
-        }, { speed: speed1, cursor: cursor1 });
+        try {
+          await new Promise((resolve) => {
+            window.runTyping(el1, t1, () => {
+              console.log('[jornada-intro.js] Typing concluído para intro-p1');
+              resolve();
+            }, { speed: speed1, cursor: cursor1 });
+          });
+          await new Promise((resolve) => {
+            window.runTyping(el2, t2, () => {
+              console.log('[jornada-intro.js] Typing concluído para intro-p2');
+              showBtn();
+              resolve();
+            }, { speed: speed2, cursor: cursor2 });
+          });
+        } catch (err) {
+          console.warn('[jornada-intro.js] Erro no runTyping:', err);
+        }
 
         window.EffectCoordinator?.speak?.(t1, { rate: 1.06 });
         setTimeout(() => window.EffectCoordinator?.speak?.(t2, { rate: 1.05 }), Math.max(1000, t1.length * speed1 * 0.75));
-        return;
-      }
-
-      if (window.EffectCoordinator?.type) {
-        console.log('[jornada-intro.js] Usando EffectCoordinator');
-        await window.EffectCoordinator.type(el1, t1, { speed: speed1, cursor: cursor1 });
-        window.EffectCoordinator?.speak?.(t1, { rate: 1.06 });
-        await window.EffectCoordinator.type(el2, t2, { speed: speed2, cursor: cursor2 });
-        window.EffectCoordinator?.speak?.(t2, { rate: 1.05 });
-        showBtn();
         return;
       }
 
@@ -132,6 +170,7 @@
       }
     };
 
+    console.log('[jornada-intro.js] Configurando evento de clique no botão');
     const freshBtn = btn.cloneNode(true);
     btn.replaceWith(freshBtn);
     once(freshBtn, 'click', goNext);
