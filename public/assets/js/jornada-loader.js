@@ -2,7 +2,7 @@
   'use strict';
 
   const etapas = {
-    intro:  '/assets/html/jornada-intro.html',
+    intro:  '/assets/html/section-intro.html',
     termos: '/assets/html/jornada-termos.html',
     senha:  '/assets/html/jornada-senha.html',
     barra:  '/assets/html/jornada_barracontador.html',
