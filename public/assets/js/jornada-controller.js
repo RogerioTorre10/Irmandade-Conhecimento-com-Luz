@@ -217,9 +217,15 @@
 };
     
     JC.goNext = function(id) {
-    console.log('[JC.goNext] Indo para:', id);
-    JC.show(id);
-   };
+  if (!id || typeof id !== 'string') {
+    console.warn('[JC.goNext] ID inválido:', id);
+    return;
+  }
+
+  console.log('[JC.goNext] Indo para:', id);
+  JC.show(id);
+};
+
 
     global.initController = JC.init;
   });
