@@ -202,10 +202,13 @@
         'section-termos',         // 2. Termos de uso
         'section-senha',          // 3. Senha (se houver)
         'section-filme-jardim',   // 4. Primeiro filme
-        'section-selfie',         // 5. Selfie (Guia já escolhido na Intro)
+        'section-guia',
+        'section-filme-jardim',
+        'section-selfie',         // 5. Selfie (Guia já escolhido na Intro)
         'section-filme-ao-encontro', // 6. Próximo filme
         'section-perguntas',      // 7. Seção de perguntas dinâmicas
-        'section-final'           // 8. Final e PDF
+        'section-filme-jardim',
+        'section-final'           // 8. Final e PDF
       ]);
     }
 
