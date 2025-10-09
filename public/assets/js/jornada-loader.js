@@ -13,54 +13,58 @@
   const JORNADA_CONTAINER_ID = 'jornada-conteudo';
 
  // /assets/js/jornada-loader.js  (patch no carregarEtapa)
+// /assets/js/jornada-loader.js  (ajuste de URL + checagem de status)
 async function carregarEtapa(nome) {
   try {
-    const url = `/html/section-${nome}.html`;
-    console.log('[carregarEtapa] Carregando etapa', `'${nome}'`, 'de:', url);
+    const url = `/html/section-${nome}.html`; // ✅ sem "public/"
+    console.log('[carregarEtapa] Carregando etapa', nome, 'de:', url);
 
-    const html = await fetch(url, { cache: 'no-store' }).then(r => r.text());
-    console.log('[carregarEtapa] HTML recebido para', `'${nome}':`, html.slice(0, 200) + '...');
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) {
+      console.warn('[carregarEtapa] HTTP', res.status, 'para', url);
+      throw new Error(`HTTP ${res.status} em ${url}`);
+    }
+    const html = await res.text();
 
-    // Parseia como documento isolado
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
 
-    // 1) Tenta pegar a seção por id
-    let section = doc.querySelector(`#section-${nome}`);
+    // tenta achar a section certinha
+    let section = doc.querySelector('#section-' + nome) 
+                || doc.querySelector(`[data-section="${nome}"]`);
 
-    // 2) Se não achar, tenta por data-section
-    if (!section) section = doc.querySelector(`[data-section="${nome}"]`);
-
-    // 3) Se ainda não achar, cria fallback bem formado
+    // Se veio página inteira por engano, tenta extrair a primeira <section ...>
     if (!section) {
-      console.warn(`[carregarEtapa] Fragmento de seção não encontrado para '${nome}'. Criando fallback...`);
-      const tmp = document.createElement('section');
-      tmp.id = `section-${nome}`;
-      tmp.className = 'card';
-      tmp.innerHTML = `<div class="p-4">Seção ${nome} carregada, mas sem conteúdo.</div>`;
-      section = tmp;
-    } else {
-      // Remove <script> internos do fragmento pra evitar cargas duplicadas
-      section.querySelectorAll('script').forEach(s => s.remove());
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html;
+      section = tmp.querySelector('#section-' + nome) 
+             || tmp.querySelector(`[data-section="${nome}"]`)
+             || tmp.querySelector('section');
     }
 
-    // Container onde as seções vivem
-    const container = document.getElementById('jornada-conteudo') || document.getElementById('jornada-canvas') || document.body;
+    if (!section) {
+      console.warn(`[carregarEtapa] Fragmento não encontrado para '${nome}', usando fallback.`);
+      const fb = document.createElement('section');
+      fb.id = `section-${nome}`;
+      fb.className = 'card';
+      fb.innerHTML = `<div class="p-4">Seção ${nome} carregada, mas sem conteúdo.</div>`;
+      section = fb;
+    } else {
+      section.querySelectorAll('script').forEach(s => s.remove());
+      // garante o id correto
+      if (!section.id) section.id = `section-${nome}`;
+    }
 
-    // Remove seção anterior igual (se existir) e injeta a nova
-    const old = container.querySelector(`#section-${nome}`);
-    if (old) old.remove();
+    const container = document.getElementById('jornada-conteudo') || document.body;
+    container.querySelectorAll(`#section-${nome}`).forEach(n => n.remove());
     container.appendChild(section);
 
-    console.log('[carregarEtapa] Seção injetada com id:', section.id);
-
-    // Dispara eventos pra quem escuta (section-intro.js, etc.)
-    const ev = new CustomEvent('sectionLoaded', { detail: { sectionId: section.id, name: nome, node: section } });
-    document.dispatchEvent(ev);
-
+    document.dispatchEvent(new CustomEvent('sectionLoaded', {
+      detail: { sectionId: section.id, name: nome, node: section }
+    }));
   } catch (err) {
-    console.error('[carregarEtapa] Erro ao carregar etapa', nome, err);
-    window.toast && window.toast(`Falha ao carregar etapa ${nome}.`);
+    console.error('[carregarEtapa] Erro:', err);
+    window.toast?.(`Falha ao carregar etapa ${nome}.`, 'error');
   }
 }
 
