@@ -259,7 +259,16 @@
   JC.show('section-intro');
 })();
 
-
+ // Em jornada-controller.js, função JC.show
+  function show(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (!section) {
+    console.warn(`[JC.show] Elemento #${sectionId} não encontrado. Aguardando carregamento...`);
+    setTimeout(() => show(sectionId), 100); // Tenta novamente após um pequeno delay
+    return;
+    }
+    // Prossegue com a exibição
+}
 
   // Eventos
   Promise.resolve().finally(() => {
