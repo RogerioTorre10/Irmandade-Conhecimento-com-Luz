@@ -1,24 +1,4 @@
-<section id="section-intro" class="section bloco bloco-intro hidden">
-  <div class="bloco-conteudo">
-    <h1>Bem-vindo(a) à Jornada Essencial</h1>
-
-    <p id="intro-p1" data-typing="true" data-text="Esta é uma experiência de reflexão profunda, simbólica e acolhedora, Rogério."></p>
-
-    <p id="intro-p2" data-typing="true" data-text="Utilizaremos símbolos e arquétipos para iluminar sua vocação e seu propósito de vida."></p>
-
-    <p id="intro-p3" data-typing="true" data-text="Antes de começar, você deve ler com atenção o Termo de Responsabilidade e seguir quando estiver pronto(a)."></p>
-
-    <div class="termo">
-      <h2>Termo de Responsabilidade e Consentimento</h2>
-      <p>Ao iniciar, você concorda em participar de forma consciente e reconhece que este material é exclusivamente para autoconhecimento e desenvolvimento pessoal. Ele não substitui apoio médico, psicológico ou profissional.</p>
-    </div>
-    
-    <footer>
-            <button id="btn-avancar" class="btn btn-primary" disabled data-action="avancar">Iniciar Jornada</button>
-    </footer>
-  </div>
-</section>
-<script> 
+<script>   
 (() => {
   if (window.__introBound) return;
   window.__introBound = true;
