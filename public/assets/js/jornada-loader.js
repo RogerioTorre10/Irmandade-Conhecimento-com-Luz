@@ -12,50 +12,48 @@
 
   const JORNADA_CONTAINER_ID = 'jornada-conteudo';
 
- // /assets/js/jornada-loader.js  (patch no carregarEtapa)
-// /assets/js/jornada-loader.js  (ajuste de URL + checagem de status)
+// /assets/js/jornada-loader.js
 async function carregarEtapa(nome) {
   try {
-    const url = `/html/section-${nome}.html`; // ✅ sem "public/"
-    console.log('[carregarEtapa] Carregando etapa', nome, 'de:', url);
-
+    const url = `/html/section-${nome}.html`; // <- sem "public/"
     const res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) {
-      console.warn('[carregarEtapa] HTTP', res.status, 'para', url);
-      throw new Error(`HTTP ${res.status} em ${url}`);
-    }
+    if (!res.ok) throw new Error(`HTTP ${res.status} em ${url}`);
     const html = await res.text();
 
+    // parse seguro (aceita fragmento ou página inteira)
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
 
-    // tenta achar a section certinha
-    let section = doc.querySelector('#section-' + nome) 
-                || doc.querySelector(`[data-section="${nome}"]`);
+    let section =
+      doc.querySelector('#section-' + nome) ||
+      doc.querySelector(`[data-section="${nome}"]`);
 
-    // Se veio página inteira por engano, tenta extrair a primeira <section ...>
     if (!section) {
       const tmp = document.createElement('div');
       tmp.innerHTML = html;
-      section = tmp.querySelector('#section-' + nome) 
-             || tmp.querySelector(`[data-section="${nome}"]`)
-             || tmp.querySelector('section');
+      section =
+        tmp.querySelector('#section-' + nome) ||
+        tmp.querySelector(`[data-section="${nome}"]`) ||
+        tmp.querySelector('section');
     }
 
     if (!section) {
-      console.warn(`[carregarEtapa] Fragmento não encontrado para '${nome}', usando fallback.`);
       const fb = document.createElement('section');
       fb.id = `section-${nome}`;
-      fb.className = 'card';
+      fb.className = 'section';
       fb.innerHTML = `<div class="p-4">Seção ${nome} carregada, mas sem conteúdo.</div>`;
       section = fb;
     } else {
+      // remove qualquer script acidental do fragmento
       section.querySelectorAll('script').forEach(s => s.remove());
-      // garante o id correto
+      // força id e classe padrão
       if (!section.id) section.id = `section-${nome}`;
+      section.classList.add('section');
+      section.classList.remove('pergaminho', 'pergaminho-v'); // <- garante sem fundo
     }
 
     const container = document.getElementById('jornada-conteudo') || document.body;
+    // remove somente a section homônima já existente
     container.querySelectorAll(`#section-${nome}`).forEach(n => n.remove());
     container.appendChild(section);
 
@@ -67,6 +65,7 @@ async function carregarEtapa(nome) {
     window.toast?.(`Falha ao carregar etapa ${nome}.`, 'error');
   }
 }
+
 
 
   window.carregarEtapa = carregarEtapa;
