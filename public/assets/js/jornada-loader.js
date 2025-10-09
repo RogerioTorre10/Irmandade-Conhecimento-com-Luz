@@ -2,12 +2,12 @@
   'use strict';
 
   const etapas = {
-    intro:  '/assets/html/section-intro.html',
+    intro: '/assets/html/section-intro.html',
     termos: '/assets/html/jornada-termos.html',
-    senha:  '/assets/html/jornada-senha.html',
-    barra:  '/assets/html/jornada_barracontador.html',
-    olho:   '/assets/html/jornada_olhomagico.html',
-    final:  '/assets/html/jornada-final.html'
+    senha: '/assets/html/jornada-senha.html',
+    barra: '/assets/html/jornada_barracontador.html',
+    olho: '/assets/html/jornada_olhomagico.html',
+    final: '/assets/html/jornada-final.html'
   };
 
   const JORNADA_CONTAINER_ID = 'jornada-conteudo';
@@ -28,6 +28,8 @@
       if (!response.ok) throw new Error(`HTTP ${response.status} ao buscar '${url}'`);
 
       const html = await response.text();
+      console.log(`[carregarEtapa] HTML recebido para '${nome}':`, html);
+
       const temp = document.createElement('div');
       temp.innerHTML = html;
 
@@ -65,6 +67,9 @@
         container.appendChild(temp.firstChild);
       }
 
+      // Log do DOM após injeção
+      console.log(`[carregarEtapa] DOM após injeção para '${nome}':`, container.innerHTML);
+
       // Esperar o DOM renderizar (ajuste de tempo)
       setTimeout(() => {
         let root = container.querySelector(`#section-${nome}`) ||
@@ -72,7 +77,11 @@
                    container.querySelector(`section.bloco-${nome}`);
 
         if (!root) {
-          console.warn(`[carregarEtapa] Elemento #section-${nome} não encontrado após injeção.`);
+          console.warn(`[carregarEtapa] Elemento #section-${nome} não encontrado após injeção. Criando fallback...`);
+          root = document.createElement('section');
+          root.id = `section-${nome}`;
+          root.classList.add('hidden'); // Esconde o elemento
+          container.appendChild(root);
         } else {
           console.log(`[carregarEtapa] Root encontrado:`, root);
         }
@@ -83,7 +92,7 @@
         }));
 
         if (typeof callback === 'function') callback();
-      }, 150); // tempo ajustado para garantir renderização
+      }, 150); // Tempo ajustado para garantir renderização
 
     } catch (error) {
       console.error(`[carregarEtapa] Falha ao carregar etapa '${nome}':`, error.message);
