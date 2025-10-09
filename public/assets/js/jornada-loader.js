@@ -8,8 +8,8 @@
     barra: '/assets/html/section_barracontador.html',
     olho: '/assets/html/section_olhomagico.html',
     final: '/assets/html/section-final.html',
-    guia: '/assets/html/section-guia.html', // Adicionado
-    selfie: '/assets/html/section-selfie.html' // Adicionado
+    guia: '/assets/html/section-guia.html', 
+    selfie: '/assets/html/section-selfie.html'
   };
 
   const SECTION_CONTAINER_ID = 'section-conteudo';
