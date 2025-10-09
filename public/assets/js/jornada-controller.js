@@ -252,11 +252,13 @@
     // A chamada inicial para section-intro agora é responsabilidade do bootstrap
   };
   
-   await window.Loader?.ensure('section-intro');
-   const introEl = document.getElementById('section-intro');
-   if (introEl) {
-   JC.show('section-intro');
+  (async () => {
+  if (!document.getElementById('section-intro')) {
+    await carregarEtapa('intro');
   }
+  JC.show('section-intro');
+})();
+
 
 
   // Eventos
