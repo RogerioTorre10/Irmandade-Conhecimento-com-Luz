@@ -2,7 +2,7 @@
   'use strict';
 
   const etapas = {
-    intro:  '/html/section-intro.html',
+    intro:  '/assets/html/section-intro.html',
     termos: '/assets/html/jornada-termos.html',
     senha:  '/assets/html/jornada-senha.html',
     barra:  '/assets/html/jornada_barracontador.html',
@@ -15,7 +15,7 @@
 // /assets/js/jornada-loader.js
 async function carregarEtapa(nome) {
   try {
-    const url = `/html/section-${nome}.html`; // <- sem "public/"
+    const url = `/assets/html/section-${nome}.html`; // <- sem "public/"
     const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status} em ${url}`);
     const html = await res.text();
