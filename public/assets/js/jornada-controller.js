@@ -21,12 +21,98 @@
     element.classList.add('section', HIDE_CLASS); 
     element.style.display = 'none'; 
     element.innerHTML = `<h1>Erro: Seção ${id} não carregada.</h1>`; 
-    // Anexa ao contêiner principal para que o Loader possa encontrá-lo, se for o caso
     const container = document.getElementById('section-conteudo') || document.body;
     container.appendChild(element);
     return element;
   }
 
+  // Lógica específica por seção (MOVIDA PARA CÁ)
+  function handleSectionLogic(id, target) {
+    if (id === 'section-perguntas') {
+      global.JSecoes?.loadDynamicBlocks();
+      global.JGuiaSelfie?.loadAnswers(); 
+    } else if (id === 'section-selfie') {
+      global.JGuiaSelfie?.initSelfie(); // Acesso OK
+    } else if (id === 'section-final') {
+      global.JSecoes?.generatePDF();
+    } 
+    global.JSecoes?.updateCanvasBackground(id);
+  }
+
+  // Tipagem e ativação de botões (MOVIDA PARA CÁ)
+  function handleTypingAndButtons(id, target) {
+    const container = id === 'section-termos'
+      ? target.querySelector(`#${currentTermosPage}`)
+      : id === 'section-perguntas'
+      ? target.querySelector('#perguntas-container')
+      : target;
+
+    const textElements = container ? container.querySelectorAll('[data-typing="true"]:not(.hidden)') : [];
+
+    textElements.forEach(el => {
+      el.style.display = 'block';
+      el.style.visibility = 'visible';
+      if (typeof global.runTyping === 'function') {
+        global.runTyping(el, el.getAttribute('data-text') || el.textContent, () => {
+          const btn = target.querySelector('[data-action="avancar"], .btn-avancar, .btn');
+          if (btn && btn.disabled) btn.disabled = false;
+        });
+      } else {
+        el.classList.add('typing-done');
+        el.style.opacity = '1';
+      }
+    });
+
+    attachButtonEvents(id, target);
+  }
+
+  // Eventos de clique
+  function attachButtonEvents(id, target) {
+    const btns = target.querySelectorAll('[data-action], .btn-avancar, .btn, #iniciar, #btnSkipSelfie, #btnStartJourney, #previewBtn, #captureBtn, #grok-chat-send');
+
+    btns.forEach(btn => {
+      if (!btn.dataset.clickAttached) {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          handleButtonAction(id, btn);
+        });
+        btn.dataset.clickAttached = '1';
+      }
+    });
+  }
+
+  // Ações dos botões
+  function handleButtonAction(id, btn) {
+    const action = btn.dataset.action;
+
+    if (id === 'section-termos') {
+      if (action === 'termos-next' && currentTermosPage === 'termos-pg1') {
+        document.getElementById('termos-pg1')?.classList.add(HIDE_CLASS);
+        document.getElementById('termos-pg2')?.classList.remove(HIDE_CLASS);
+        currentTermosPage = 'termos-pg2';
+        JC.show(id);
+      } else if (action === 'termos-prev' && currentTermosPage === 'termos-pg2') {
+        document.getElementById('termos-pg2')?.classList.add(HIDE_CLASS);
+        document.getElementById('termos-pg1')?.classList.remove(HIDE_CLASS);
+        currentTermosPage = 'termos-pg1';
+        JC.show(id);
+      } else if (action === 'avancar' && currentTermosPage === 'termos-pg2') {
+        JC.goNext();
+      }
+    } else if (id === 'section-intro' && action === 'avancar') {
+      JC.goNext(); 
+    } else if (id === 'section-selfie' && action === 'skip-selfie') {
+      global.JSecoes?.proceedAfterSelfie();
+    } else if (id === 'section-perguntas' && action === 'avancar') {
+      global.JGuiaSelfie?.saveAnswers();
+      global.JSecoes?.goNext();
+    } else if (id === 'section-senha' && action === 'avancar') {
+      JC.goNext(); 
+    } else {
+      JC.goNext();
+    }
+  }
+  
   // Define a ordem das seções
   JC.setOrder = function (order) {
     sectionOrder = order;
@@ -54,62 +140,47 @@
     }
   };
 
-  // Exibe uma seção (versão async: garante DOM via Loader.ensure)
+  // Exibe uma seção
   JC.show = async function (id, { force = false } = {}) {
     const now = performance.now();
-    // Remove a verificação global.__currentSectionId === id para permitir recarregamento limpo
     if (!force && (now - lastShowSection < 300)) { 
       console.log(`[JC.show] Ignorando chamada para ${id}: muito rápida`);
       return;
     }
     lastShowSection = now;
     
-    // O ID passado para o Loader é o nome da seção sem o prefixo 'section-'
     const loaderName = id.startsWith('section-') ? id.substring(8) : id;
 
     try {
-      // 1) Garante que a seção exista (montada pelo Loader)
-      if (window.carregarEtapa) { // Verifica a função do jornada-loader.js
-        // carregarEtapa limpa o container e injeta o HTML
+      if (window.carregarEtapa) { 
         await window.carregarEtapa(loaderName); 
-        window.i18n?.apply?.(); // Reaplica i18n
+        window.i18n?.apply?.(); 
       } else {
-        console.error('[JC.show] Função carregarEtapa não encontrada. Seções não serão carregadas dinamicamente.');
+        console.error('[JC.show] Função carregarEtapa não encontrada.');
       }
 
-      // 2) Resolve o alvo
       let target = document.getElementById(id);
       if (!target) {
         target = createFallbackElement(id);
         window.toast?.(`Seção ${id} não encontrada. Usando fallback.`, 'error');
       }    
      
-      // 3) Oculta todas as seções, mantendo apenas o alvo
-      const container = document.getElementById('section-conteudo') || document.body;
-      // Como o carregarEtapa limpa o container, a única seção visível deve ser o 'target'
-      
-      // 4) Exibe o alvo (caso o Loader não tenha feito)
       target.classList?.remove(HIDE_CLASS);
       target.style.display = 'block';
       target.style.visibility = 'visible';
       global.__currentSectionId = id;
 
-      // 5) Reset de locks/estado e Lógica por seção
       global.G = global.G || {};
       global.G.__typingLock = false;
       
-      // Reset de estado (como você tinha no original)
       if (id !== 'section-termos') currentTermosPage = 'termos-pg1';
       if (id !== 'section-perguntas') currentPerguntasBlock = 'bloco-raizes';
 
       handleSectionLogic(id, target);
 
-      // 6) Eventos para quem escuta (intro, senha, etc.)
       const detail = { sectionId: id, id, root: target };
-      // sectionLoaded deve ser disparado pelo loader.js. Aqui disparamos apenas o 'shown'.
       document.dispatchEvent(new CustomEvent('section:shown', { detail }));
 
-      // 7) Tipagem e botões (mantém o delay atual)
       setTimeout(() => {
         handleTypingAndButtons(id, target);
       }, 300);
@@ -120,67 +191,12 @@
     }
   };
 
-  // Lógica específica por seção (Ajustada a chamada de Guia)
-  function handleSectionLogic(id, target) {
-    // ... (mantido o código de termos, filme, perguntas, selfie e final)
-    
-    // Lógica para a Introdução
-    if (id === 'section-intro') {
-      // O section-intro.js já escuta o 'section:shown' para iniciar typing e fetch do guia
-    } else if (id === 'section-perguntas') {
-      // Garante que a lógica de perguntas seja carregada
-      global.JSecoes?.loadDynamicBlocks();
-      global.JGuiaSelfie?.loadAnswers(); // Para carregar respostas salvas
-    } else if (id === 'section-selfie') {
-      global.JGuiaSelfie?.initSelfie();
-    } else if (id === 'section-final') {
-      global.JSecoes?.generatePDF();
-    } else if (id === 'section-escolha-guia') {
-      // Essa seção provavelmente será removida do fluxo. Mantido como fallback.
-      global.JSecoes?.proceedAfterGuia(localStorage.getItem('JORNADA_GUIA') || 'zion');
-    }
-
-    global.JSecoes?.updateCanvasBackground(id);
-  }
-
-  // ... (funções handleTypingAndButtons, attachButtonEvents, handleButtonAction mantidas) ...
-
-  // Ações dos botões (Revisão da lógica de Avanço)
-  function handleButtonAction(id, btn) {
-    const action = btn.dataset.action;
-
-    // ... (lógica de section-termos mantida)
-
-    if (id === 'section-intro' && action === 'avancar') {
-      // O botão avançar na introdução deve ser desabilitado se o nome/guia não estiver pronto.
-      // Se chegou aqui e o botão está habilitado, avança para a próxima seção (Termos).
-      JC.goNext(); 
-    } else if (id === 'section-escolha-guia' && action === 'select-guia') {
-      // Essa lógica deve ter sido movida para section-intro.js, mas mantemos o fallback
-      const selectedGuia = btn.dataset.guia;
-      localStorage.setItem('JORNADA_GUIA', selectedGuia);
-      global.JSecoes?.proceedAfterGuia(selectedGuia);
-    } else if (id === 'section-selfie' && action === 'skip-selfie') {
-      global.JSecoes?.proceedAfterSelfie();
-    } else if (id === 'section-perguntas' && action === 'avancar') {
-      global.JGuiaSelfie?.saveAnswers();
-      global.JSecoes?.goNext();
-    } else if (id === 'section-senha' && action === 'avancar') {
-      // Se a senha estiver correta, começa a Jornada real (que é a intro/primeiro filme)
-      JC.goNext(); 
-    } else {
-      // Default para outros botões sem ação específica
-      JC.goNext();
-    }
-  }
-  
   // Inicialização única
   JC.init = function () {
     if (controllerInitialized) return;
     controllerInitialized = true;
 
     if (!sectionOrder.length) {
-      // Ordem padrão da Jornada (corrigida para começar na intro e manter um fluxo lógico)
       JC.setOrder([
         'section-intro',          // 1. Apresentação, nome e escolha do guia (com fetch)
         'section-termos',         // 2. Termos de uso
@@ -196,7 +212,7 @@
     console.log('[JC.init] Controlador inicializado com sucesso.');
   };
   
-  // Correção do bloco final: Usar DOMContentLoaded apenas para inicializar o controlador
+  // Finalização da Inicialização
   Promise.resolve().finally(() => {
     if (!global.__ControllerEventsBound) {
       global.__ControllerEventsBound = true;
@@ -205,6 +221,6 @@
   });
   
   global.initController = JC.init;
-  global.showSection = JC.show; // Exporta JC.show como showSection
+  global.showSection = JC.show; 
   
 })(window);
