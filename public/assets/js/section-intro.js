@@ -66,51 +66,64 @@
 
   // ===== NOVA FUNÇÃO: CARREGAMENTO DE DADOS E SETUP DO GUIA (SEU PROBLEMA DE FETCH AQUI) =====
   async function loadAndSetupGuia(root, btn) {
-    const nameInput = root.querySelector('#name-input');
-    const guiaPlaceholder = root.querySelector('#guia-selfie-placeholder');
+    const nameInput = root.querySelector('#name-input');
+    const guiaPlaceholder = root.querySelector('#guia-selfie-placeholder');
 
-    // 1) Monitora o campo de nome
-    if (nameInput) {
-      nameInput.addEventListener('input', () => {
-        nomeDigitado = nameInput.value.trim().length > 2; // Exige no mínimo 3 caracteres
-        checkReady(btn);
-      });
-      // Verifica o estado inicial caso haja autocompletar
-      nomeDigitado = nameInput.value.trim().length > 2;
-    }
+    // 1) Monitora o campo de nome
+    if (nameInput) {
+        nameInput.addEventListener('input', () => {
+            nomeDigitado = nameInput.value.trim().length > 2;
+            checkReady(btn);
+        });
+        nomeDigitado = nameInput.value.trim().length > 2;
+    }
 
-    // 2) Tenta carregar os dados dos guias com fetch
-    try {
-      console.log('[Guia Setup] Iniciando fetch para dados dos guias...');
-        
-      // ATENÇÃO: Confirme que este é o caminho correto no seu servidor!
-      const response = await fetch('/assets/data/guias.json'); 
-        
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status} - Verifique o caminho '/assets/data/guias.json'`);
-      }
-        
-      const guias = await response.json();
-      console.log('[Guia Setup] Dados dos guias carregados com sucesso:', guias.length);
+    // 2) Tenta carregar os dados dos guias com fetch
+    try {
+        console.log('[Guia Setup] Iniciando fetch para dados dos guias...');
+        const response = await fetch('/assets/data/guias.json'); 
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status} - Verifique o caminho '/assets/data/guias.json'`);
+        }
+        
+        const guias = await response.json();
+        console.log('[Guia Setup] Dados dos guias carregados com sucesso:', guias.length);
 
-      // 3) Renderiza o seletor de guia
-      if (guiaPlaceholder && guias.length > 0) {
-        // Se você já tem a função que injeta o HTML dos guias, chame-a aqui.
-        // Exemplo: window.JornadaGuiaSelfie?.renderSelector(guiaPlaceholder, guias);
-        console.log('[Guia Setup] Renderizando seletor de guia (próximo passo).');
-      }
-        
-      dadosGuiaCarregados = true;
+        // 3) Renderiza o seletor de guia
+        if (guiaPlaceholder && guias.length > 0) {
+            if (typeof window.JornadaGuiaSelfie?.renderSelector === 'function') {
+                window.JornadaGuiaSelfie.renderSelector(guiaPlaceholder, guias);
+                
+                // Monitora a seleção para garantir que o botão só habilite DEPOIS de escolher
+                document.addEventListener('guiaSelected', (e) => {
+                    log('[Intro] Guia selecionado. Verificando se pode avançar.');
+                    dadosGuiaCarregados = true; // Confirma que o dado foi usado
+                    checkReady(btn); // Re-checa o estado (nome + guia selecionado)
+                }, { once: true });
+                
+                // Mantenha dadosGuiaCarregados como 'false' se você exigir a seleção!
+                dadosGuiaCarregados = false; // Começa como false, só será true após o evento 'guiaSelected'
+                
+            } else {
+                console.warn('[Guia Setup] Função de renderização do guia não encontrada. Avance sem seleção.');
+                dadosGuiaCarregados = true; // Fallback: avança mesmo sem o renderizador do Guia
+            }
+        } else {
+            // Se não houver dados de guia, avança apenas com o nome
+            dadosGuiaCarregados = true;
+        }
+        // <<< ATENÇÃO: AQUI AS LINHAS DELETADAS SUMIRAM. O 'try' TERMINA LIMPO.
 
-    } catch (err) {
-      console.error('[Guia Setup] Falha crítica no fetch dos guias. Verifique a URL e o JSON:', err);
-      window.toast?.('Falha ao carregar dados dos guias. Tente recarregar a página.', 'error');
-      // Em caso de falha, forçamos o avanço para não travar (ou deixe como false para bloquear)
-      dadosGuiaCarregados = true; // Permite o avanço mesmo sem guias, se o nome for preenchido (AJUSTE SE QUISER BLOQUEAR)
-    } finally {
-      checkReady(btn);
-    }
-  }
+    } catch (err) {
+        console.error('[Guia Setup] Falha crítica no fetch dos guias. Verifique a URL e o JSON:', err);
+        window.toast?.('Falha ao carregar dados dos guias. Tente recarregar a página.', 'error');
+        // Em caso de falha, forçamos o avanço para não travar:
+        dadosGuiaCarregados = true; 
+    } finally {
+        checkReady(btn); // ATUALIZA O ESTADO DO BOTÃO NO FINAL
+    }
+}
 
 
   // ===== HANDLER PRINCIPAL DA INTRO (fluxo original) =====
