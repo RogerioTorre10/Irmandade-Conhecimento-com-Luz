@@ -1,4 +1,3 @@
-<script> 
 (() => {
   if (window.__introBound) return;
   window.__introBound = true;
@@ -175,4 +174,3 @@
     bind();
   }
 })();
-</script> 
