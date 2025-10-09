@@ -84,6 +84,13 @@
         console.warn(`[JC.show] Elemento #${id} não encontrado após ensure. Criando fallback...`);
         target = createFallbackElement(id);
       }
+      
+      // antes de JC.show('section-intro'):
+      if (!document.getElementById('section-intro')) {
+        await carregarEtapa('intro'); // chama o loader acima
+     }
+      JC.show('section-intro');
+
 
       // 5) Log do DOM após ensure (para confirmar a presença do elemento)
       console.log('[JC.show] Estado do DOM após ensure:', document.body.innerHTML);
