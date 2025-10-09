@@ -17,7 +17,30 @@ document.addEventListener('sectionLoaded', (e) => {
   if (id !== 'section-guia' && id !== 'section-selfie') return;
 
   const root = e.detail.node;
-  if (!root) return;
+  if (!root) {
+    console.warn('[GuiaSelfie] Nó raiz não encontrado para a seção', id);
+    return;
+  }
+
+  // Verifica elementos específicos dentro do root
+  const guiaBg = root.querySelector('#guia-bg-png');
+  const nameInput = root.querySelector('#name-input');
+
+  if (!guiaBg) {
+    console.warn('[GuiaSelfie] Elemento #guia-bg-png não encontrado na seção', id);
+  }
+  if (!nameInput) {
+    console.warn('[GuiaSelfie] Elemento #name-input não encontrado na seção', id);
+  }
+
+  // Prossegue apenas se os elementos necessários existirem
+  if (guiaBg && nameInput) {
+    console.log('[GuiaSelfie] Inicializado com sucesso para a seção', id);
+    // Lógica de inicialização (ex.: configurar eventos, carregar imagens, etc.)
+  } else {
+    console.warn('[GuiaSelfie] Inicialização abortada devido a elementos ausentes na seção', id);
+  }
+});
 
   // Protege as queries ao root
   const bg = root.querySelector('#guia-bg-png');
