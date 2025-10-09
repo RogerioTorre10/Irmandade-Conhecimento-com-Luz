@@ -10,7 +10,7 @@
     final:  '/assets/html/section-final.html'
   };
 
-  const JORNADA_CONTAINER_ID = 'section-conteudo';
+  const SECTION_CONTAINER_ID = 'section-conteudo';
 
 // /assets/js/jornada-loader.js  [PATCH robusto]
 async function carregarEtapa(nome) {
