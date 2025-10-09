@@ -2,20 +2,17 @@
   'use strict';
 
   const etapas = {
-    intro: '/assets/html/section-intro.html',
-    termos: ,
-    senha: ',
-    barra: '',
-    olho: '',
-    final: '',
-    guia: '', 
-    selfie: ''
+    intro:  '/html/section-intro.html',
+    termos: '/html/section-termos.html',
+    final:  '/html/section-final.html',
+    guia:   '/html/section-guia.html',
+    selfie: '/html/section-selfie.html'
   };
 
   const SECTION_CONTAINER_ID = 'section-conteudo';
 
   async function carregarEtapa(nome) {
-    const url = etapas[nome] || `/assets/html/section-${nome}.html`;
+    const url = etapas[nome] || `/html/section-${nome}.html`;
     console.log('[carregarEtapa] Carregando etapa', nome, 'de:', url);
 
     const res = await fetch(url, { cache: 'no-store' });
