@@ -15,16 +15,16 @@
   let selectedGuia = null;
 
   // Função auxiliar para criar um elemento fallback
-  function createFallbackElement(id) {
-    console.warn(`[JC.createFallbackElement] Criando fallback para #${id}`);
-    const element = document.createElement('section');
-    element.id = id;
-    element.innerHTML = `<p>Seção ${id} (fallback criado automaticamente)</p>`;
-    element.style.display = 'block';
-    element.style.visibility = 'visible';
-    document.body.appendChild(element);
-    return element;
-  }
+ function createFallbackElement(id) {
+  console.warn(`[JC.createFallbackElement] Criando fallback para #${id}`);
+  const element = document.createElement('section');
+  element.id = id;
+  element.classList.add('hidden'); // Usa a classe HIDE_CLASS para esconder
+  element.style.display = 'none'; // Garante que não seja visível
+  element.innerHTML = ''; // Deixa vazio para evitar conteúdo visível
+  document.body.appendChild(element);
+  return element;
+}
 
   // Define a ordem das seções
   JC.setOrder = function (order) {
