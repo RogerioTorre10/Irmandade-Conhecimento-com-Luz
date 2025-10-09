@@ -44,6 +44,31 @@ function updateCanvasBackground(sectionId) {
     log('Canvas atualizado para:', sectionId);
   }
 }
+  // jornada-secoes.js  (exemplo de guarda)
+(function(){
+  const CANVAS = () => document.getElementById('jornada-canvas');
+
+  // Se houver lógica que muda a orientação, limite:
+  function updateCanvasFor(sectionId) {
+    const canvas = CANVAS();
+    if (!canvas) return;
+
+    // Nunca remova .pergaminho / .pergaminho-v do canvas
+    // Apenas se precisar trocar de V para H para *seções específicas*
+    if (sectionId === 'section-intro' || sectionId === 'section-termos') {
+      // intro/termos em pergaminho vertical
+      canvas.classList.add('pergaminho', 'pergaminho-v');
+    } else {
+      // outras seções podem trocar, se desejado
+      canvas.classList.add('pergaminho');
+      // canvas.classList.toggle('pergaminho-v', false);  // só se realmente precisar
+    }
+  }
+
+  document.addEventListener('sectionLoaded', (e) => updateCanvasFor(e.detail.sectionId));
+  document.addEventListener('section:shown', (e) => updateCanvasFor(e.detail.sectionId));
+})();
+
 
   // ===== Blocos Dinâmicos =====
   function loadDynamicBlocks() {
