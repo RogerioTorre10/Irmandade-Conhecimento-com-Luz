@@ -3,13 +3,13 @@
 
   const etapas = {
     intro: '/assets/html/section-intro.html',
-    termos: '/assets/html/section-termos.html',
-    senha: '/assets/html/section-senha.html',
-    barra: '/assets/html/section_barracontador.html',
-    olho: '/assets/html/section_olhomagico.html',
-    final: '/assets/html/section-final.html',
-    guia: '/assets/html/section-guia.html', 
-    selfie: '/assets/html/section-selfie.html'
+    termos: ,
+    senha: ',
+    barra: '',
+    olho: '',
+    final: '',
+    guia: '', 
+    selfie: ''
   };
 
   const SECTION_CONTAINER_ID = 'section-conteudo';
