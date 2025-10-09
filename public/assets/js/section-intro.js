@@ -1,9 +1,11 @@
-(() => {
+(function () {
+  'use strict';
+
   if (window.__introBound) return;
   window.__introBound = true;
 
   // ===== GUARDAS =====
-  let INTRO_READY = false; // evita reprocessar datilografia/voz
+  let INTRO_READY = false;
 
   // ===== HELPERS =====
   const once = (el, ev, fn) => {
@@ -40,7 +42,6 @@
   }
 
   function fromDetail(detail = {}) {
-    // compat: aceita sectionId/id + node/root + name
     const sectionId = detail.sectionId || detail.id || window.__currentSectionId;
     const node = detail.node || detail.root || null;
     const name = detail.name || null;
@@ -49,8 +50,8 @@
 
   // ===== HANDLER PRINCIPAL DA INTRO =====
   const handler = async (evt) => {
-    const { sectionId, node, name } = fromDetail(evt?.detail);
-    console.log('[section-intro.js] Evento recebido:', { sectionId, name, hasNode: !!node });
+    const { sectionId, node } = fromDetail(evt?.detail);
+    console.log('[section-intro.js] Evento recebido:', { sectionId, hasNode: !!node });
     if (sectionId !== 'section-intro') return;
 
     console.log('[section-intro.js] Ativando intro');
@@ -61,18 +62,17 @@
       try {
         root = await waitForEl('#section-intro', { timeout: 8000, step: 100 });
       } catch {
-        // seletor legado corrigido: data-section="intro" (não "section-intro")
-        root = document.querySelector('section[data-section="intro"], section.section.bloco-intro') || null;
+        root = document.querySelector('section[data-section="intro"]') || null;
       }
     }
 
     if (!root) {
       console.warn('[section-intro.js] Root da intro não encontrado (após espera)');
-      window.toast?.('Intro ainda não montou no DOM. Verifique a ordem do evento.', 'warn');
+      window.toast?.('Intro ainda não montou no DOM.', 'warn');
       return;
     }
 
-    // 2) Busca elementos dentro do root (escopo protegido)
+    // 2) Busca elementos dentro do root
     const el1 = root.querySelector('#intro-p1');
     const el2 = root.querySelector('#intro-p2');
     const btn = root.querySelector('#btn-avancar');
@@ -86,93 +86,81 @@
     // 3) Garante visibilidade
     try {
       if (typeof window.JC?.show === 'function') {
-        JC.show('section-intro');
+        window.JC.show('section-intro');
       } else if (typeof window.showSection === 'function') {
-        showSection('section-intro');
+        window.showSection('section-intro');
       } else {
         root.classList.remove('hidden');
+        root.style.display = 'block';
       }
     } catch (err) {
       console.warn('[section-intro.js] Falha ao exibir seção:', err);
       root.classList.remove('hidden');
+      root.style.display = 'block';
     }
 
-    // 4) Prepara botão (oculto até terminar a intro)
+    // 4) Prepara botão
     btn.classList.add('hidden');
-    btn.classList.add('hidd'); // ok se não existir
+    btn.disabled = true;
     const showBtn = () => {
       console.log('[section-intro.js] Mostrando botão');
       btn.classList.remove('hidden');
-      btn.classList.remove('hidd');
       btn.style.display = 'inline-block';
-      btn.style.pointerEvents = 'auto';
       btn.disabled = false;
     };
 
-    // 5) Parâmetros da datilografia/voz
+    // 5) Parâmetros da datilografia
     const speed1 = Number(el1.dataset.speed || 36);
     const speed2 = Number(el2.dataset.speed || 36);
     const t1 = getText(el1);
     const t2 = getText(el2);
     const cursor1 = String(el1.dataset.cursor || 'true') === 'true';
     const cursor2 = String(el2.dataset.cursor || 'true') === 'true';
-    console.log('[section-intro.js] Parâmetros de typing:', { t1, t2, speed1, speed2, cursor1, cursor2 });
 
-    // 6) Evita duplicar efeitos se já rodou (evento pode disparar mais de uma vez)
+    // 6) Evita duplicar efeitos
     if (INTRO_READY) {
-      console.log('[section-intro.js] Intro já preparada — evitando reprocesso');
+      console.log('[section-intro.js] Intro já preparada');
       showBtn();
       return;
     }
 
-    // 7) Interrompe efeitos anteriores globais (se houver)
+    // 7) Interrompe efeitos anteriores
     window.EffectCoordinator?.stopAll?.();
 
-    // 8) Encadeia typing + TTS
+    // 8) Encadeia typing
     const runTypingChain = async () => {
       console.log('[section-intro.js] Iniciando runTypingChain');
       if (typeof window.runTyping === 'function') {
-        console.log('[section-intro.js] Usando runTyping');
         try {
           await new Promise((resolve) => {
-            window.runTyping(el1, t1, () => {
-              console.log('[section-intro.js] Typing concluído para intro-p1');
-              resolve();
-            }, { speed: speed1, cursor: cursor1 });
+            window.runTyping(el1, t1, resolve, { speed: speed1, cursor: cursor1 });
           });
-
-          // dispara o TTS da primeira frase ao finalizar p1
+          console.log('[section-intro.js] Typing concluído para intro-p1');
           window.EffectCoordinator?.speak?.(t1, { rate: 1.06 });
 
           await new Promise((resolve) => {
-            window.runTyping(el2, t2, () => {
-              console.log('[section-intro.js] Typing concluído para intro-p2');
-              showBtn();
-              resolve();
-            }, { speed: speed2, cursor: cursor2 });
+            window.runTyping(el2, t2, resolve, { speed: speed2, cursor: cursor2 });
           });
-
-          // dispara o TTS da segunda com leve defasagem
+          console.log('[section-intro.js] Typing concluído para intro-p2');
           setTimeout(() => window.EffectCoordinator?.speak?.(t2, { rate: 1.05 }), 300);
+          showBtn();
         } catch (err) {
           console.warn('[section-intro.js] Erro no runTyping:', err);
           el1.textContent = t1;
           el2.textContent = t2;
           showBtn();
         }
-        return;
+      } else {
+        console.log('[section-intro.js] Fallback: sem efeitos');
+        el1.textContent = t1;
+        el2.textContent = t2;
+        showBtn();
       }
-
-      // Fallback sem efeitos
-      console.log('[section-intro.js] Fallback: sem efeitos');
-      el1.textContent = t1;
-      el2.textContent = t2;
-      showBtn();
     };
 
     try {
       await runTypingChain();
-      INTRO_READY = true; // marca como concluído
+      INTRO_READY = true;
     } catch (err) {
       console.warn('[section-intro.js] Typing chain falhou', err);
       el1.textContent = t1;
@@ -189,32 +177,29 @@
       const nextSection = 'section-termos';
       try {
         if (window.JC?.goNext) {
-          return window.JC.goNext(nextSection);
+          window.JC.goNext(nextSection);
+        } else if (typeof window.showSection === 'function') {
+          window.showSection(nextSection);
         }
-        window.showSection?.(nextSection);
       } catch (err) {
         console.error('[section-intro.js] Erro ao avançar:', err);
       }
     };
 
     console.log('[section-intro.js] Configurando evento de clique no botão');
-    const freshBtn = btn.cloneNode(true); // remove listeners antigos
+    const freshBtn = btn.cloneNode(true);
     btn.replaceWith(freshBtn);
     once(freshBtn, 'click', goNext);
-  }; // <<<<<< FECHAMENTO DO HANDLER
+  };
 
   // ===== BIND DOS EVENTOS =====
   const bind = () => {
-    // limpa binds antigos (idempotência)
     document.removeEventListener('sectionLoaded', handler);
     document.removeEventListener('section:shown', handler);
-
-    // escuta carregamento da seção (loader) e exibição
     document.addEventListener('sectionLoaded', handler, { passive: true });
     document.addEventListener('section:shown', handler, { passive: true });
     console.log('[section-intro.js] Handler ligado');
 
-    // Se a intro já estiver no DOM visível, dispara uma vez
     const visibleIntro = document.querySelector('#section-intro:not(.hidden)');
     if (visibleIntro) {
       handler({ detail: { sectionId: 'section-intro', node: visibleIntro } });
