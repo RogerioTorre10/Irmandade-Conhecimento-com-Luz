@@ -259,28 +259,34 @@
   JC.show('section-intro');
 })();
 
- // Em jornada-controller.js, função JC.show
-  function show(sectionId) {
-    const section = document.getElementById(sectionId);
-    if (!section) {
-    console.warn(`[JC.show] Elemento #${sectionId} não encontrado. Aguardando carregamento...`);
-    setTimeout(() => show(sectionId), 100); // Tenta novamente após um pequeno delay
+ // Em jornada-controller.js
+function show(sectionId) {
+  const section = document.getElementById(sectionId);
+  if (!section) {
+    console.warn(`[JC.show] Elemento #${sectionId} não encontrado.`);
+    createFallbackElement(sectionId); // Mantém o fallback, se necessário
     return;
-    }
-    // Prossegue com a exibição
+  }
+  section.classList.remove('hidden');
+  section.style.display = 'block';
+  console.log('[JC.show] Exibido com sucesso:', sectionId);
 }
 
-  // Eventos
-  Promise.resolve().finally(() => {
-    if (!global.__ControllerEventsBound) {
-      global.__ControllerEventsBound = true;
-      document.addEventListener('DOMContentLoaded', JC.init, { once: true });
-      // O bootstrapComplete será o ponto de partida principal
-      // document.addEventListener('bootstrapComplete', () => JC.show('section-intro'), { once: true });
+// Eventos
+Promise.resolve().finally(() => {
+  if (!global.__ControllerEventsBound) {
+    global.__ControllerEventsBound = true;
+    document.addEventListener('DOMContentLoaded', JC.init, { once: true });
+    document.addEventListener('sectionLoaded', (e) => {
+      const sectionId = e.detail.sectionId;
+      if (sectionId === 'section-intro') {
+        console.log('[JC] Evento sectionLoaded recebido para section-intro');
+        show('section-intro');
+      }
+    }, { once: true });
+  }
+});
 
-      global.initController = JC.init;
-    }
-
-    global.showSection = JC.show;
-  });
-})(window);
+   global.initController = JC.init;
+   global.showSection = JC.show;
+  })(window);
