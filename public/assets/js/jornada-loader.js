@@ -2,13 +2,13 @@
   'use strict';
 
   const etapas = {
-    intro:     'public/html/section-intro.html',
-    termos:    'public/html/section-termos.html',
-    senha:     'public/html/section-senha.html',
-    guia:      'public/html/section-guia.html',
-    selfie:    'public/html/section-selfie.html',
-    perguntas: 'public/html/section-perguntas.html',
-    final:     'public/html/section-final.html',
+    intro:     'assets/html/section-intro.html',
+    termos:    'assets/html/section-termos.html',
+    senha:     'assets/html/section-senha.html',
+    guia:      'assets/html/section-guia.html',
+    selfie:    'assets/html/section-selfie.html',
+    perguntas: 'assets/html/section-perguntas.html',
+    final:     'assets/html/section-final.html',
     
     
   };
@@ -16,7 +16,7 @@
   const SECTION_CONTAINER_ID = 'section-conteudo';
 
   async function carregarEtapa(nome) {
-    const url = etapas[nome] || `public/html/section-${nome}.html`;
+    const url = etapas[nome] || `assets/html/section-${nome}.html`;
     console.log('[carregarEtapa] Carregando etapa', nome, 'de:', url);
 
     const res = await fetch(url, { cache: 'no-store' });
