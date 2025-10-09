@@ -2,11 +2,15 @@
   'use strict';
 
   const etapas = {
-    intro:  '/html/section-intro.html',
-    termos: '/html/section-termos.html',
-    final:  '/html/section-final.html',
-    guia:   '/html/section-guia.html',
-    selfie: '/html/section-selfie.html'
+    intro:     '/html/section-intro.html',
+    termos:    '/html/section-termos.html',
+    senha:     '/html/section-senha.html',
+    guia:      '/html/section-guia.html',
+    selfie:    '/html/section-selfie.html',
+    perguntas: '/html/section-perguntas.html',
+    final:     '/html/section-final.html',
+    
+    
   };
 
   const SECTION_CONTAINER_ID = 'section-conteudo';
