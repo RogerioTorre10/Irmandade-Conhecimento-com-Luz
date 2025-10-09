@@ -9,6 +9,7 @@
 
   console.log('[BOOT] Iniciando micro-boot…');
 
+  // ===== DEPENDÊNCIAS ASSÍNCRONAS (Mantidas) =====
   async function waitForConfig() {
     let tries = 0;
     while (!global.APP_CONFIG && tries < 30) {
@@ -21,7 +22,8 @@
   async function waitForI18n() {
     if (global.i18n) {
       try {
-        await global.i18n.waitForReady(5000);
+        // Usa a função global para aguardar o i18n
+        await global.i18n.waitForReady(5000); 
         console.log('[BOOT] i18n pronto');
       } catch (e) {
         console.warn('[BOOT] i18n falhou ao ficar pronto');
@@ -40,7 +42,8 @@
     if (global.JC && typeof global.JC.init === 'function') {
       console.log('[BOOT] JC disponível, iniciando...');
       try {
-        global.JC.init(); // APENAS INICIALIZAÇÃO
+        // JC.init() DEVE ser o ponto de partida que chama startJourney()
+        global.JC.init(); 
         document.dispatchEvent(new CustomEvent('bootstrapComplete'));
       } catch (e) {
         console.error('[BOOT] falha no JC.init()', e);
@@ -51,7 +54,9 @@
     }
   }
   
+  // ===== FLUXO PRINCIPAL =====
   async function startBootstrap() {
+    console.log('[BOOT] Iniciando sequência de inicialização...');
     try {
       await waitForConfig();
       await waitForI18n();
@@ -67,29 +72,19 @@
     startBootstrap();
   }
 
-  // CHAVE DA SINCRONIZAÇÃO: Carrega e só depois exibe
+  // CHAVE DA SINCRONIZAÇÃO: Chama o startJourney (que está no jornada-secoes.js)
   document.addEventListener('bootstrapComplete', () => {
-  console.log('[BOOT] bootstrapComplete recebido. Carregando etapa inicial...');
-  if (window.carregarEtapa) {
-    // 1. Carrega o HTML da 'intro'
-    carregarEtapa('intro', () => {
-      console.log('[BOOT] Etapa inicial carregada. Verificando #section-intro...');
-      // 2. Verifica se o elemento #section-intro existe no DOM
-      const sectionIntro = document.getElementById('section-intro');
-      if (sectionIntro) {
-        console.log('[BOOT] Elemento #section-intro encontrado. Exibindo...');
-        window.JC?.show('section-intro');
-      } else {
-        console.error('[BOOT] Elemento #section-intro não encontrado após carregarEtapa.');
-        console.log('[BOOT] Estado do DOM:', document.body.innerHTML);
-        // Opcional: Tenta chamar JC.show com force para acionar o fallback
-        window.JC?.show('section-intro', { force: true });
-      }
-    });
-  } else {
-    console.error('[BOOT] A função carregarEtapa não foi encontrada.');
-    // Tenta exibir section-intro mesmo assim, usando o fallback
-    window.JC?.show('section-intro', { force: true });
-  }
-});
+    console.log('[BOOT] bootstrapComplete recebido. Chamando startJourney...');
+    
+    // Agora, confiamos que o JC.init() foi bem-sucedido e a função startJourney existe no global.JSecoes
+    if (window.JSecoes?.startJourney) {
+      // startJourney chama carregarEtapa('intro')
+      window.JSecoes.startJourney(); 
+    } else if (window.JC?.show) {
+      // Fallback: se JSecoes ainda não carregou, tentamos carregar a intro diretamente
+      window.JC.show('section-intro');
+    } else {
+      console.error('[BOOT] Não foi possível iniciar a Jornada (JSecoes ou JC.show indisponível).');
+    }
+  });
 })(window);
