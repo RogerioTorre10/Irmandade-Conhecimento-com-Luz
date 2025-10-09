@@ -56,7 +56,9 @@ async function carregarEtapa(nome) {
     section.classList.remove('pergaminho', 'pergaminho-v'); // ❌ sem pergaminho dentro
   }
 
-  const container = document.getElementById('section-conteudo') || document.body;
+  const container =
+  document.getElementById('section-conteudo') ||
+  document.getElementById('jornada-conteudo') || document.body;
   container.querySelectorAll(`#section-${nome}`).forEach(n => n.remove());
   container.appendChild(section);
   console.log('[carregarEtapa] Injetada:', section.outerHTML.slice(0, 120) + '...');
