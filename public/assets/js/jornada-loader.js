@@ -3,14 +3,14 @@
 
   const etapas = {
     intro:  '/assets/html/section-intro.html',
-    termos: '/assets/html/jornada-termos.html',
-    senha:  '/assets/html/jornada-senha.html',
-    barra:  '/assets/html/jornada_barracontador.html',
-    olho:   '/assets/html/jornada_olhomagico.html',
-    final:  '/assets/html/jornada-final.html'
+    termos: '/assets/html/section-termos.html',
+    senha:  '/assets/html/section-senha.html',
+    barra:  '/assets/html/section_barracontador.html',
+    olho:   '/assets/html/section_olhomagico.html',
+    final:  '/assets/html/section-final.html'
   };
 
-  const JORNADA_CONTAINER_ID = 'jornada-conteudo';
+  const JORNADA_CONTAINER_ID = 'section-conteudo';
 
 // /assets/js/jornada-loader.js  [PATCH robusto]
 async function carregarEtapa(nome) {
@@ -56,7 +56,7 @@ async function carregarEtapa(nome) {
     section.classList.remove('pergaminho', 'pergaminho-v'); // ❌ sem pergaminho dentro
   }
 
-  const container = document.getElementById('jornada-conteudo') || document.body;
+  const container = document.getElementById('section-conteudo') || document.body;
   container.querySelectorAll(`#section-${nome}`).forEach(n => n.remove());
   container.appendChild(section);
   console.log('[carregarEtapa] Injetada:', section.outerHTML.slice(0, 120) + '...');
