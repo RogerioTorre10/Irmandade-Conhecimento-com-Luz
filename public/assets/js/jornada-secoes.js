@@ -20,6 +20,48 @@
     log('playTransition indisponível. Avançando diretamente.'); 
     onEnd && onEnd();
   };
+function analyzeSentiment(text) {
+    const POS = {
+      'feliz': 2, 'alegria': 2, 'amor': 3, 'sucesso': 2, 'esperança': 3, 'paz': 2, 'fé': 3, 'gratidão': 2,
+      'vitória': 3, 'superação': 3, 'luz': 2, 'deus': 3, 'coragem': 2, 'força': 2, 'confiança': 2, 'propósito': 3
+    };
+    const NEG = {
+      'triste': -2, 'dor': -3, 'raiva': -2, 'medo': -2, 'frustracao': -2, 'frustração': -2, 'decepcao': -2,
+      'decepção': -2, 'perda': -3, 'culpa': -2, 'ansiedade': -2, 'solidao': -2, 'solidão': -2, 'desespero': -3,
+      'cansaco': -2, 'cansaço': -2, 'fracasso': -2, 'trauma': -3, 'duvida': -2, 'dúvida': -2
+    };
+    let score = 0;
+    (text || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').split(/\s+/).forEach(t => {
+      if (POS[t] != null) score += POS[t];
+      if (NEG[t] != null) score += NEG[t];
+    });
+    return score;
+  }
+  
+  // Movi a função LOCKVIDEOORIENTATION para cá (Correção do Erro 3)
+  function lockVideoOrientation() {
+    const video = $('#videoTransicao');
+    if (!video) return;
+    video.addEventListener('webkitbeginfullscreen', (e) => {
+      e.preventDefault();
+      video.exitFullscreen?.();
+    });
+    video.addEventListener('fullscreenchange', () => {
+      if (document.fullscreenElement === video) {
+        document.exitFullscreen?.();
+      }
+    });
+    window.addEventListener('orientationchange', () => {
+      video.style.transform = 'rotate(0deg)';
+    });
+    if (window.matchMedia('(orientation: portrait)').matches) {
+      video.style.width = '100vw';
+      video.style.height = 'auto';
+      video.style.maxHeight = '100vh';
+    }
+    log('Orientação de vídeo travada');
+  }
+  
   
   // ===== Pergaminho & Canvas =====
   // Mantido o bloco original, removendo apenas o código redundante/duplicado de "guarda"
@@ -127,7 +169,27 @@ document.addEventListener('section:shown', (e) => updateCanvasBackground(e.detai
     if (firstTa) handleInput(firstTa);
     log('Blocos dinâmicos carregados:', blocks.length);
   }
-
+async function handleInput(textarea) {
+    const score = analyzeSentiment(textarea.value); // Agora OK!
+    global.updateChama && global.updateChama(score);
+    global.JGuiaSelfie && global.JGuiaSelfie.saveAnswers();
+    global.JGuiaSelfie && global.JGuiaSelfie.updateProgress();
+    const perguntaDiv = textarea.closest('.j-pergunta');
+    const devolutivaDiv = perguntaDiv.querySelector('.devolutiva-container');
+    const devolutivaP = devolutivaDiv.querySelector('p');
+    if (textarea.value.trim() && devolutivaDiv) {
+      devolutivaDiv.style.display = 'block';
+      const pergunta = perguntaDiv.querySelector('.pergunta-enunciado')?.textContent || '';
+      const resposta = textarea.value;
+      const guia = localStorage.getItem('JORNADA_GUIA') || 'zion';
+      const devolutiva = await fetchDevolutiva(pergunta, resposta, guia);
+      global.runTyping && global.runTyping(devolutivaP, devolutiva, () => log('Datilografia concluída para devolutiva'));
+    } else {
+      devolutivaDiv.style.display = 'none';
+    }
+    log('Input processado:', { score, resposta: textarea.value });
+  }
+  
   // ... (Código de analyzeSentiment, handleInput, fetchDevolutiva, toggleSenha) ...
 
   // ===== Lógicas de Avanço (Mantidas) =====
