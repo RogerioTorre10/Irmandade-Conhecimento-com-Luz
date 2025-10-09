@@ -14,7 +14,7 @@
 
 // /assets/js/jornada-loader.js  [PATCH robusto]
 async function carregarEtapa(nome) {
-  const url = `/html/section-${nome}.html`; // ✅ sem "public/"
+  const url = `/assets/html/section-${nome}.html`; // ✅ sem "public/"
   console.log('[carregarEtapa] Carregando etapa', nome, 'de:', url);
 
   const res = await fetch(url, { cache: 'no-store' });
