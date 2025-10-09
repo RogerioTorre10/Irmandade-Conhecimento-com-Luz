@@ -240,13 +240,18 @@ async function handleInput(textarea) {
   // ... (código de playTransition, lockVideoOrientation, generatePDF mantidos) ...
   
   // ===== Inicialização =====
-  function initSecoes() {
-    lockVideoOrientation();
-    // Sincroniza o manuseio de inputs para que respostas salvem e atualizem a chama/progresso
+   function initSecoes() {
+    lockVideoOrientation(); // Agora OK!
     $$('.j-pergunta textarea').forEach(input => {
       input.addEventListener('input', () => handleInput(input));
     });
-    // ... (lógica de input de senha mantida) ...
+    const senhaInput = $('#senha-input');
+    if (senhaInput) {
+      senhaInput.addEventListener('input', () => {
+        const btn = $('#btn-senha-avancar');
+        if (btn) btn.disabled = !senhaInput.value.trim();
+      });
+    }
     log('Secoes inicializado');
   }
 
