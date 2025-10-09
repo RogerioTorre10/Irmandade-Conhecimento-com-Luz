@@ -69,16 +69,27 @@
 
   // CHAVE DA SINCRONIZAÇÃO: Carrega e só depois exibe
   document.addEventListener('bootstrapComplete', () => {
-    console.log('[BOOT] bootstrapComplete recebido. Carregando etapa inicial...');
-    if (window.carregarEtapa) {
-      // 1. Carrega o HTML da 'intro'
-      carregarEtapa('intro', () => {
-        console.log('[BOOT] Etapa inicial carregada. Exibindo section-intro...');
-        // 2. Chama o JC.show SÓ DEPOIS que a etapa está no DOM
-        window.JC?.show('section-intro');
-      });
-    } else {
-        console.error('[BOOT] A função carregarEtapa não foi encontrada.');
-    }
-  });
+  console.log('[BOOT] bootstrapComplete recebido. Carregando etapa inicial...');
+  if (window.carregarEtapa) {
+    // 1. Carrega o HTML da 'intro'
+    carregarEtapa('intro', () => {
+      console.log('[BOOT] Etapa inicial carregada. Verificando #section-intro...');
+      // 2. Verifica se o elemento #section-intro existe no DOM
+      const sectionIntro = document.getElementById('section-intro');
+      if (sectionIntro) {
+        console.log('[BOOT] Elemento #section-intro encontrado. Exibindo...');
+        window.JC?.show('section-intro');
+      } else {
+        console.error('[BOOT] Elemento #section-intro não encontrado após carregarEtapa.');
+        console.log('[BOOT] Estado do DOM:', document.body.innerHTML);
+        // Opcional: Tenta chamar JC.show com force para acionar o fallback
+        window.JC?.show('section-intro', { force: true });
+      }
+    });
+  } else {
+    console.error('[BOOT] A função carregarEtapa não foi encontrada.');
+    // Tenta exibir section-intro mesmo assim, usando o fallback
+    window.JC?.show('section-intro', { force: true });
+  }
+});
 })(window);
