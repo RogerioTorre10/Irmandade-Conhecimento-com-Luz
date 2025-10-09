@@ -2,12 +2,12 @@
   'use strict';
 
   const etapas = {
-    intro: 'public/html/section-intro.html',
+    intro:  '/html/section-intro.html',
     termos: '/assets/html/jornada-termos.html',
-    senha: '/assets/html/jornada-senha.html',
-    barra: '/assets/html/jornada_barracontador.html',
-    olho: '/assets/html/jornada_olhomagico.html',
-    final: '/assets/html/jornada-final.html'
+    senha:  '/assets/html/jornada-senha.html',
+    barra:  '/assets/html/jornada_barracontador.html',
+    olho:   '/assets/html/jornada_olhomagico.html',
+    final:  '/assets/html/jornada-final.html'
   };
 
   const JORNADA_CONTAINER_ID = 'jornada-conteudo';
@@ -15,7 +15,7 @@
  // /assets/js/jornada-loader.js  (patch no carregarEtapa)
 async function carregarEtapa(nome) {
   try {
-    const url = `/public/html/section-${nome}.html`;
+    const url = `/html/section-${nome}.html`;
     console.log('[carregarEtapa] Carregando etapa', `'${nome}'`, 'de:', url);
 
     const html = await fetch(url, { cache: 'no-store' }).then(r => r.text());
