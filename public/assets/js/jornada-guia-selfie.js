@@ -263,7 +263,26 @@
       window.JGuiaSelfie?.initSelfie();
      }
    }, 300);
+  
+// Só inicializa quando a seção 'guia' OU 'selfie' for exibida
+document.addEventListener('sectionLoaded', (e) => {
+  const id = e.detail.sectionId;
+  if (id !== 'section-guia' && id !== 'section-selfie') return;
 
+  const root = e.detail.node;
+  if (!root) return;
+
+  // Protege as queries ao root
+  const bg = root.querySelector('#guia-bg-png');
+  const nameInput = root.querySelector('#name-input');
+  if (!bg || !nameInput) {
+    console.log('[GuiaSelfie] Seção exibida mas elementos ainda não renderizados; aguardando...');
+    return; // ou use um MutationObserver curto para aguardar filhos
+  }
+
+  // ... segue a inicialização com segurança ...
+});
+  
     // ===== Chat com Guia =====
     async function sendChatMessage() {
       const input = $('#grok-chat-input');
@@ -407,26 +426,7 @@
     });
     loadAnswers();
     log('GuiaSelfie inicializado');
-  }
-  
-// Só inicializa quando a seção 'guia' OU 'selfie' for exibida
-document.addEventListener('sectionLoaded', (e) => {
-  const id = e.detail.sectionId;
-  if (id !== 'section-guia' && id !== 'section-selfie') return;
-
-  const root = e.detail.node;
-  if (!root) return;
-
-  // Protege as queries ao root
-  const bg = root.querySelector('#guia-bg-png');
-  const nameInput = root.querySelector('#name-input');
-  if (!bg || !nameInput) {
-    console.log('[GuiaSelfie] Seção exibida mas elementos ainda não renderizados; aguardando...');
-    return; // ou use um MutationObserver curto para aguardar filhos
-  }
-
-  // ... segue a inicialização com segurança ...
-});
+  } 
 
   document.addEventListener('DOMContentLoaded', initGuiaSelfie);
   global.JGuiaSelfie = {
