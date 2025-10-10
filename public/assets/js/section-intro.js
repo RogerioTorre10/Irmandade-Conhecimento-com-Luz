@@ -23,14 +23,22 @@
     el.addEventListener(ev, h);
   };
 
-  async function waitForEl(selector, { within = document, timeout = 2000, step = 100 } = {}) {
+ async function waitForEl(selector, { within = document, timeout = 3000, step = 50 } = {}) {
     const start = performance.now();
     return new Promise((resolve, reject) => {
       const tick = () => {
-        // Corrigido para buscar no WITHIN (que é o ROOT da seção)
-        const el = within.querySelector(selector); 
+        // Tenta buscar dentro do contexto (root)
+        let el = within.querySelector(selector);
+        
+        // Se a busca no contexto falhar (o que está acontecendo)
+        if (!el && within !== document) {
+            // Tenta buscar no DOM global (segunda chance)
+            el = document.querySelector(`#jornada-content-wrapper ${selector}`);
+        }
+        
         console.log(`[waitForEl] Buscando ${selector}, tempo: ${Math.round(performance.now() - start)}ms`);
         if (el) return resolve(el);
+        
         if (performance.now() - start >= timeout) {
           console.error(`[waitForEl] Timeout após ${timeout}ms para ${selector}`);
           return reject(new Error(`timeout waiting ${selector}`));
@@ -39,7 +47,7 @@
       };
       tick();
     });
-  }
+}
 
   function getText(el) {
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
