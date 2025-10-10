@@ -20,6 +20,7 @@ html, body {
   background: var(--bg);
   color: var(--fg);
   line-height: 1.5;
+  overflow-x: hidden;
 }
 
 * {
@@ -88,16 +89,19 @@ input, textarea, .resposta, .devolutiva, #name-input {
 
 /* === Pergaminho ===
    Relacionado a: assets/js/jornada-pergaminho.js */
-.pergaminho {
-  position: relative;
+#jornada-canvas.pergaminho {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1;
 }
 
 .pergaminho.pergaminho-v {
@@ -109,11 +113,13 @@ input, textarea, .resposta, .devolutiva, #name-input {
 }
 
 .conteudo-pergaminho {
-  padding: clamp(12px, 3vw, 28px);
+  padding: clamp(20px, 4vw, 32px);
   line-height: 1.55;
   width: 90%;
   max-width: 800px;
   margin: auto;
+  position: relative;
+  z-index: 2;
 }
 
 /* === Chama ===
@@ -128,6 +134,7 @@ input, textarea, .resposta, .devolutiva, #name-input {
   transform: translateX(-50%);
   animation: flicker 1.5s infinite alternate;
   filter: drop-shadow(0 0 10px rgba(255, 140, 0, 0.8));
+  z-index: 3;
 }
 
 @keyframes flicker {
@@ -141,21 +148,6 @@ input, textarea, .resposta, .devolutiva, #name-input {
 
 .chama-fixed-top { top: 10px; right: 14px; left: auto; transform: none; }
 .chama-fixed-hero { top: -8px; left: -8px; transform: none; }
-
-.chama.chama-viva span {
-  animation: flicker-strong 0.85s infinite;
-  filter: drop-shadow(0 0 12px rgba(255, 140, 0, 0.55));
-}
-
-.chama.chama-pulse span {
-  animation: flicker-strong 0.6s infinite;
-}
-
-@keyframes flicker-strong {
-  0% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(1.2); opacity: 1; }
-  100% { transform: scale(0.9); opacity: 0.7; }
-}
 
 /* === Chama Ícone ===
    Relacionado a: assets/js/jornada-chama.js */
@@ -225,13 +217,13 @@ input, textarea, .resposta, .devolutiva, #name-input {
   max-width: 800px;
   width: 90%;
   margin: auto;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.1);
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.15);
   border-radius: var(--radius);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
   text-align: center;
-  opacity: 1;
-  transition: opacity 0.5s ease-in-out;
+  position: relative;
+  z-index: 2;
 }
 
 .section.hidden {
@@ -240,22 +232,29 @@ input, textarea, .resposta, .devolutiva, #name-input {
 
 /* === Intro ===
    Relacionado a: assets/js/section-intro.js */
+#section-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 #section-intro .intro-wrap {
   padding: 20px;
+  width: 100%;
 }
 
 .intro-paragraph {
-  font-size: 24px;
+  font-size: 26px;
   color: #fff;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  margin: 16px 0;
-  line-height: 1.5;
+  margin: 20px 0;
+  line-height: 1.6;
   font-family: 'BerkshireSwash', cursive;
 }
 
 #name-input {
   width: 100%;
-  max-width: 300px;
+  max-width: 320px;
   padding: 12px;
   font-size: 18px;
   border: 2px solid #4a4a4a;
@@ -274,7 +273,7 @@ input, textarea, .resposta, .devolutiva, #name-input {
 }
 
 #guia-selfie-placeholder {
-  min-height: 100px;
+  min-height: 120px;
   margin: 16px 0;
   display: flex;
   justify-content: center;
@@ -282,7 +281,7 @@ input, textarea, .resposta, .devolutiva, #name-input {
 }
 
 .intro-actions {
-  margin-top: 20px;
+  margin-top: 24px;
 }
 
 /* === Botões ===
@@ -303,6 +302,7 @@ input, textarea, .resposta, .devolutiva, #name-input {
   opacity: 1;
   visibility: visible;
   display: inline-block;
+  z-index: 2;
 }
 
 .btn:hover:not(:disabled) {
@@ -320,7 +320,9 @@ input, textarea, .resposta, .devolutiva, #name-input {
 [data-typing="true"] {
   white-space: pre-wrap;
   position: relative;
-  opacity: 1; /* Evita conflito com JS */
+  opacity: 1;
+  display: block;
+  visibility: visible;
 }
 
 [data-typing="true"]::after {
@@ -468,6 +470,24 @@ input, textarea, .resposta, .devolutiva, #name-input {
 .guide-name { top: 3.5%; }
 .user-name { bottom: 4.5%; }
 
+/* === Footer e Copyright ===
+   Relacionado a: Estrutura geral do projeto */
+.site-footer {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  font-size: 14px;
+  color: var(--muted);
+  font-family: 'Cardo', serif;
+  z-index: 2;
+}
+
+.motto {
+  font-size: 14px;
+  opacity: 0.8;
+  letter-spacing: 0.1em;
+}
+
 /* === Toast ===
    Relacionado a: assets/js/jornada-controller.js */
 #toast {
@@ -481,6 +501,7 @@ input, textarea, .resposta, .devolutiva, #name-input {
   border-radius: 10px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
   font-size: 16px;
+  font-family: 'Cardo', serif;
   z-index: 4000;
   opacity: 0;
   pointer-events: none;
