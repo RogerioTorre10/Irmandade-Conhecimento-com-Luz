@@ -14,11 +14,9 @@
   const SECTION_CONTAINER_ID = 'section-conteudo';
 
   function checkCriticalElements(container, nome) {
-    const criticalElements = nome === 'intro' 
-      ? ['#intro-p1', '#intro-p2', '#btn-avancar', '#name-input', '#guia-selfie-placeholder']
-      : nome === 'termos' 
-        ? ['#termos-pg1', '#termos-pg2']
-        : ['#section-' + nome];
+    if (nome !== 'intro') return true;
+
+    const criticalElements = ['#intro-p1', '#intro-p2', '#btn-avancar'];
     let allFound = true;
     for (const selector of criticalElements) {
       const el = container.querySelector(selector);
@@ -37,9 +35,8 @@
     const id = `section-${nome}`;
 
     if (document.getElementById(id)) {
-      console.log(`[carregarEtapa] Seção #${id} já está no DOM. Limpando e reutilizando.`);
-      const existingSection = document.getElementById(id);
-      existingSection.remove();
+      console.log(`[carregarEtapa] Seção #${id} já está no DOM. Pulando fetch.`);
+      return document.getElementById(id);
     }
 
     console.log('[carregarEtapa] Carregando etapa', nome, 'de:', url);
@@ -50,7 +47,6 @@
       throw new Error(`HTTP ${res.status} em ${url}`);
     }
     const html = await res.text();
-    console.log('[carregarEtapa] HTML bruto recebido:', html.slice(0, 200) + '...');
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
@@ -58,7 +54,7 @@
     section = doc.querySelector('#' + id) || doc.querySelector(`[data-section="${nome}"]`) || doc.querySelector('section');
 
     if (!section) {
-      console.error(`[carregarEtapa] Fragmento HTML da seção '${nome}' não encontrado no arquivo recebido! HTML bruto:`, html);
+      console.error(`[carregarEtapa] Fragmento HTML da seção '${nome}' não encontrado no arquivo recebido!`);
       throw new Error(`Fragmento HTML da seção '${nome}' não encontrado.`);
     }
 
@@ -68,22 +64,8 @@
 
     const container = document.getElementById('jornada-content-wrapper');
     if (!container) {
-      console.error('[carregarEtapa] Content Wrapper (#jornada-content-wrapper) não encontrado! Criando...');
-      const parent = document.getElementById(SECTION_CONTAINER_ID);
-      if (parent) {
-        const newContainer = document.createElement('div');
-        newContainer.id = 'jornada-content-wrapper';
-        parent.appendChild(newContainer);
-      } else {
-        throw new Error('SECTION_CONTAINER_ID não encontrado.');
-      }
-    }
-
-    // Limpa todas as seções anteriores
-    const parent = document.getElementById(SECTION_CONTAINER_ID);
-    if (parent) {
-      parent.innerHTML = '';
-      parent.appendChild(container);
+      console.error('[carregarEtapa] Content Wrapper (#jornada-content-wrapper) não encontrado!');
+      throw new Error('Jornada Content Wrapper não encontrado.');
     }
 
     container.innerHTML = '';
