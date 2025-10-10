@@ -95,7 +95,11 @@
     } catch (e) {
       console.error('[section-termos.js] Falha ao esperar pelos elementos essenciais:', e);
       window.toast?.('Falha ao carregar a seção Termos. Verifique o HTML.', 'error');
-      return;
+      pg1 = root.querySelector('#termos-pg1') || document.createElement('div');
+      pg2 = root.querySelector('#termos-pg2') || document.createElement('div');
+      nextBtn = root.querySelector('[data-action="termos-next"]') || document.createElement('button');
+      prevBtn = root.querySelector('[data-action="termos-prev"]') || document.createElement('button');
+      avancarBtn = root.querySelector('[data-action="avancar"]') || document.createElement('button');
     }
 
     console.log('[section-termos.js] Elementos encontrados:', { pg1: !!pg1, pg2: !!pg2, nextBtn: !!nextBtn, prevBtn: !!prevBtn, avancarBtn: !!avancarBtn });
