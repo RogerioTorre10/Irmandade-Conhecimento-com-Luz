@@ -150,17 +150,27 @@
       return;
     }
 
-    // 2) Busca elementos dentro do root
-    const el1 = root.querySelector('#intro-p1');
-    const el2 = root.querySelector('#intro-p2');
-    const btn = root.querySelector('#btn-avancar');
+   // 2) Busca elementos dentro do root, GARANTINDO que eles existam
+    let el1, el2, btn;
+    try {
+        // Usa waitForEl para garantir que o DOM esteja pronto antes de prosseguir
+        el1 = await waitForEl('#intro-p1', { within: root, timeout: 500, step: 50 });
+        el2 = await waitForEl('#intro-p2', { within: root, timeout: 500, step: 50 });
+        btn = await waitForEl('#btn-avancar', { within: root, timeout: 500, step: 50 });
+    } catch (e) {
+        // Se falhar, registra o erro e prossegue com o fallback
+        console.error('[section-intro.js] Falha ao esperar pelos elementos essenciais:', e);
+    }
+    
     console.log('[section-intro.js] Elementos encontrados:', { el1: !!el1, el2: !!el2, btn: !!btn });
 
     if (!(el1 && el2 && btn)) {
-      console.warn('[section-intro.js] Elementos não encontrados', { el1, el2, btn });
+      console.warn('[section-intro.js] Elementos não encontrados - Falha na injeção de HTML?');
+      window.toast?.('Falha ao carregar a Introdução.', 'error');
       return;
     }
 
+    
     // 3) Garante visibilidade
     // ... (código de show/showSection mantido) ...
     try {
