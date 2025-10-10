@@ -20,7 +20,7 @@
     el.addEventListener(ev, h);
   };
 
-  function waitForElement(selector, { within = document, timeout = 8000 } = {}) {
+  function waitForElement(selector, { within = document, timeout = 10000 } = {}) {
     return new Promise((resolve, reject) => {
       let el = within.querySelector(selector);
       if (el) {
@@ -152,13 +152,13 @@
     if (!root) {
       try {
         root = await waitForElement('#section-intro', { within: document.getElementById('jornada-content-wrapper') || document, timeout: 10000 });
+        console.log('[section-intro.js] Root encontrado via waitForElement:', root.outerHTML.slice(0, 200) + '...');
       } catch (e) {
-        console.error('[section-intro.js] Root da intro não encontrado (após espera):', e);
+        console.error('[section-intro.js] Root da intro não encontrado:', e);
         window.toast?.('Erro: Seção section-intro não carregada.', 'error');
         return;
       }
     }
-    console.log('[section-intro.js] Root encontrado:', root.outerHTML.slice(0, 200) + '...');
 
     let el1, el2, btn;
     try {
@@ -168,9 +168,37 @@
     } catch (e) {
       console.error('[section-intro.js] Falha ao esperar pelos elementos essenciais:', e);
       window.toast?.('Falha ao carregar a Introdução. Usando fallback.', 'error');
-      el1 = root.querySelector('#intro-p1') || root.appendChild(Object.assign(document.createElement('div'), { id: 'intro-p1', className: 'intro-paragraph', textContent: 'Bem-vindo à Jornada Conhecimento com Luz.', dataset: { typing: '', speed: '36', cursor: 'true' } }));
-      el2 = root.querySelector('#intro-p2') || root.appendChild(Object.assign(document.createElement('div'), { id: 'intro-p2', className: 'intro-paragraph', textContent: 'Respire fundo. Vamos caminhar juntos com fé, coragem e propósito.', dataset: { typing: '', speed: '36', cursor: 'true' } }));
-      btn = root.querySelector('#btn-avancar') || root.appendChild(Object.assign(document.createElement('button'), { id: 'btn-avancar', className: 'btn btn-primary', textContent: 'Iniciar' }));
+      // Fallback corrigido para evitar TypeError
+      el1 = root.querySelector('#intro-p1');
+      if (!el1) {
+        el1 = document.createElement('div');
+        el1.id = 'intro-p1';
+        el1.className = 'intro-paragraph';
+        el1.textContent = 'Bem-vindo à Jornada Conhecimento com Luz.';
+        el1.setAttribute('data-typing', '');
+        el1.setAttribute('data-speed', '36');
+        el1.setAttribute('data-cursor', 'true');
+        root.appendChild(el1);
+      }
+      el2 = root.querySelector('#intro-p2');
+      if (!el2) {
+        el2 = document.createElement('div');
+        el2.id = 'intro-p2';
+        el2.className = 'intro-paragraph';
+        el2.textContent = 'Respire fundo. Vamos caminhar juntos com fé, coragem e propósito.';
+        el2.setAttribute('data-typing', '');
+        el2.setAttribute('data-speed', '36');
+        el2.setAttribute('data-cursor', 'true');
+        root.appendChild(el2);
+      }
+      btn = root.querySelector('#btn-avancar');
+      if (!btn) {
+        btn = document.createElement('button');
+        btn.id = 'btn-avancar';
+        btn.className = 'btn btn-primary';
+        btn.textContent = 'Iniciar';
+        root.appendChild(btn);
+      }
     }
 
     console.log('[section-intro.js] Elementos encontrados:', { el1: !!el1, el2: !!el2, btn: !!btn });
