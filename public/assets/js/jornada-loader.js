@@ -68,8 +68,15 @@
 
     const container = document.getElementById('jornada-content-wrapper');
     if (!container) {
-      console.error('[carregarEtapa] Content Wrapper (#jornada-content-wrapper) não encontrado!');
-      throw new Error('Jornada Content Wrapper não encontrado.');
+      console.error('[carregarEtapa] Content Wrapper (#jornada-content-wrapper) não encontrado! Criando...');
+      const parent = document.getElementById(SECTION_CONTAINER_ID);
+      if (parent) {
+        const newContainer = document.createElement('div');
+        newContainer.id = 'jornada-content-wrapper';
+        parent.appendChild(newContainer);
+      } else {
+        throw new Error('SECTION_CONTAINER_ID não encontrado.');
+      }
     }
 
     // Limpa todas as seções anteriores
