@@ -1,229 +1,76 @@
-(function (global) {
-  'use strict';
+(function () {
+  'use strict';
 
-  const JC = {};
-  global.JC = JC;
+  if (window.JC) return;
+  window.JC = {};
 
-  const HIDE_CLASS = 'hidden';
-  let sectionOrder = [];
-  let lastShowSection = 0;
-  let controllerInitialized = false;
+  let currentSectionIndex = -1;
+  let sectionsOrder = [];
 
-  // Estado interno
-  let currentTermosPage = 'termos-pg1';
-  let currentPerguntasBlock = 'bloco-raizes';
-  
-  // Função auxiliar para criar um elemento fallback
-  function createFallbackElement(id) {
-    console.warn(`[JC.createFallbackElement] Criando fallback para #${id}`);
-    const element = document.createElement('section');
-    element.id = id;
-    element.classList.add('section', HIDE_CLASS); 
-    element.style.display = 'none'; 
-    element.innerHTML = `<h1>Erro: Seção ${id} não carregada.</h1>`; 
-    const container = document.getElementById('section-conteudo') || document.body;
-    container.appendChild(element);
-    return element;
-  }
+  function createFallbackElement(id) {
+    console.log('[JC.createFallbackElement] Criando fallback para', id);
+    const section = document.createElement('section');
+    section.id = id;
+    section.className = 'section';
+    section.innerHTML = `<h1>Erro: Seção ${id} não carregada.</h1>`;
+    return section;
+  }
 
-  // Lógica específica por seção (MOVIDA PARA CÁ)
-  function handleSectionLogic(id, target) {
-    if (id === 'section-perguntas') {
-      global.JSecoes?.loadDynamicBlocks();
-      global.JGuiaSelfie?.loadAnswers(); 
-    } else if (id === 'section-selfie') {
-      global.JGuiaSelfie?.initSelfie(); // Acesso OK
-    } else if (id === 'section-final') {
-      global.JSecoes?.generatePDF();
-    } 
-    global.JSecoes?.updateCanvasBackground(id);
-  }
+  async function show(sectionId) {
+    const nome = sectionId.replace('section-', '');
+    console.log('[JC.show] Tentando exibir:', sectionId);
 
-  // Tipagem e ativação de botões (MOVIDA PARA CÁ)
-  function handleTypingAndButtons(id, target) {
-    const container = id === 'section-termos'
-      ? target.querySelector(`#${currentTermosPage}`)
-      : id === 'section-perguntas'
-      ? target.querySelector('#perguntas-container')
-      : target;
+    const container = document.getElementById('jornada-content-wrapper');
+    if (!container) {
+      console.error('[JC.show] Content Wrapper (#jornada-content-wrapper) não encontrado!');
+      return;
+    }
 
-    const textElements = container ? container.querySelectorAll('[data-typing="true"]:not(.hidden)') : [];
+    // Limpa todas as seções existentes
+    container.innerHTML = '';
 
-    textElements.forEach(el => {
-      el.style.display = 'block';
-      el.style.visibility = 'visible';
-      if (typeof global.runTyping === 'function') {
-        global.runTyping(el, el.getAttribute('data-text') || el.textContent, () => {
-          const btn = target.querySelector('[data-action="avancar"], .btn-avancar, .btn');
-          if (btn && btn.disabled) btn.disabled = false;
-        });
-      } else {
-        el.classList.add('typing-done');
-        el.style.opacity = '1';
-      }
-    });
+    let section;
+    try {
+      section = await window.carregarEtapa(nome);
+    } catch (e) {
+      console.error('[JC.show] Falha ao carregar etapa:', e);
+      section = createFallbackElement(sectionId);
+      container.appendChild(section);
+    }
 
-    attachButtonEvents(id, target);
-  }
+    // Garante que apenas a seção atual seja visível
+    document.querySelectorAll('.section').forEach(s => {
+      if (s.id !== sectionId) s.classList.add('hidden');
+    });
+    section.classList.remove('hidden');
+    section.style.display = 'flex';
 
-  // Eventos de clique
-  function attachButtonEvents(id, target) {
-    const btns = target.querySelectorAll('[data-action], .btn-avancar, .btn, #iniciar, #btnSkipSelfie, #btnStartJourney, #previewBtn, #captureBtn, #grok-chat-send');
+    console.log('[JC.show] Exibido com sucesso:', sectionId);
+  }
 
-    btns.forEach(btn => {
-      if (!btn.dataset.clickAttached) {
-        btn.addEventListener('click', (e) => {
-          e.preventDefault();
-          handleButtonAction(id, btn);
-        });
-        btn.dataset.clickAttached = '1';
-      }
-    });
-  }
+  function setOrder(order) {
+    sectionsOrder = order;
+    console.log('[JC.setOrder] Ordem das seções definida:', sectionsOrder);
+  }
 
-  // Ações dos botões
-  function handleButtonAction(id, btn) {
-    const action = btn.dataset.action;
+  async function goNext(nextSection) {
+    if (!nextSection && currentSectionIndex < sectionsOrder.length - 1) {
+      currentSectionIndex++;
+      nextSection = sectionsOrder[currentSectionIndex];
+    }
+    if (nextSection) {
+      await show(nextSection);
+    }
+  }
 
-    if (id === 'section-termos') {
-      if (action === 'termos-next' && currentTermosPage === 'termos-pg1') {
-        document.getElementById('termos-pg1')?.classList.add(HIDE_CLASS);
-        document.getElementById('termos-pg2')?.classList.remove(HIDE_CLASS);
-        currentTermosPage = 'termos-pg2';
-        JC.show(id);
-      } else if (action === 'termos-prev' && currentTermosPage === 'termos-pg2') {
-        document.getElementById('termos-pg2')?.classList.add(HIDE_CLASS);
-        document.getElementById('termos-pg1')?.classList.remove(HIDE_CLASS);
-        currentTermosPage = 'termos-pg1';
-        JC.show(id);
-      } else if (action === 'avancar' && currentTermosPage === 'termos-pg2') {
-        JC.goNext();
-      }
-    } else if (id === 'section-intro' && action === 'avancar') {
-      JC.goNext(); 
-    } else if (id === 'section-selfie' && action === 'skip-selfie') {
-      global.JSecoes?.proceedAfterSelfie();
-    } else if (id === 'section-perguntas' && action === 'avancar') {
-      global.JGuiaSelfie?.saveAnswers();
-      global.JSecoes?.goNext();
-    } else if (id === 'section-senha' && action === 'avancar') {
-      JC.goNext(); 
-    } else {
-      JC.goNext();
-    }
-  }
-  
-  // Define a ordem das seções
-  JC.setOrder = function (order) {
-    sectionOrder = order;
-    console.log('[JC.setOrder] Ordem das seções definida:', sectionOrder);
-  };
+  async function init() {
+    console.log('[JC.init] Controlador inicializado com sucesso.');
+  }
 
-  // Navegação
-  JC.goNext = function () {
-    const currentId = global.__currentSectionId;
-    const idx = sectionOrder.indexOf(currentId);
-    if (idx >= 0 && idx < sectionOrder.length - 1) {
-      JC.show(sectionOrder[idx + 1]);
-    } else {
-      console.log('[JC.goNext] Não há próxima seção para', currentId);
-    }
-  };
+  window.JC.show = show;
+  window.JC.setOrder = setOrder;
+  window.JC.goNext = goNext;
+  window.JC.init = init;
 
-  JC.goPrev = function () {
-    const currentId = global.__currentSectionId;
-    const idx = sectionOrder.indexOf(currentId);
-    if (idx > 0) {
-      JC.show(sectionOrder[idx - 1]);
-    } else {
-      console.log('[JC.goPrev] Não há seção anterior para', currentId);
-    }
-  };
-
-  // Exibe uma seção
-  JC.show = async function (id, { force = false } = {}) {
-    const now = performance.now();
-    if (!force && (now - lastShowSection < 300)) { 
-      console.log(`[JC.show] Ignorando chamada para ${id}: muito rápida`);
-      return;
-    }
-    lastShowSection = now;
-    
-    const loaderName = id.startsWith('section-') ? id.substring(8) : id;
-
-    try {
-      if (window.carregarEtapa) { 
-        await window.carregarEtapa(loaderName); 
-        window.i18n?.apply?.(); 
-      } else {
-        console.error('[JC.show] Função carregarEtapa não encontrada.');
-      }
-
-      let target = document.getElementById(id);
-      if (!target) {
-        target = createFallbackElement(id);
-        window.toast?.(`Seção ${id} não encontrada. Usando fallback.`, 'error');
-      }    
-     
-      target.classList?.remove(HIDE_CLASS);
-      target.style.display = 'block';
-      target.style.visibility = 'visible';
-      global.__currentSectionId = id;
-
-      global.G = global.G || {};
-      global.G.__typingLock = false;
-      
-      if (id !== 'section-termos') currentTermosPage = 'termos-pg1';
-      if (id !== 'section-perguntas') currentPerguntasBlock = 'bloco-raizes';
-
-      handleSectionLogic(id, target);
-
-      const detail = { sectionId: id, id, root: target };
-      document.dispatchEvent(new CustomEvent('section:shown', { detail }));
-
-      setTimeout(() => {
-        handleTypingAndButtons(id, target);
-      }, 300);
-
-      console.log('[JC.show] Exibido com sucesso:', id);
-    } catch (e) {
-      console.error('[JC.show] Falha ao exibir', id, e);
-    }
-  };
-
-  // Inicialização única
-  JC.init = function () {
-    if (controllerInitialized) return;
-    controllerInitialized = true;
-
-    if (!sectionOrder.length) {
-      JC.setOrder([
-        'section-intro',          // 1. Apresentação, nome e escolha do guia (com fetch)
-        'section-termos',         // 2. Termos de uso
-        'section-senha',          // 3. Senha (se houver)
-        'section-filme-jardim',   // 4. Primeiro filme
-        'section-guia',
-        'section-filme-jardim',
-        'section-selfie',         // 5. Selfie (Guia já escolhido na Intro)
-        'section-filme-ao-encontro', // 6. Próximo filme
-        'section-perguntas',      // 7. Seção de perguntas dinâmicas
-        'section-filme-jardim',
-        'section-final'           // 8. Final e PDF
-      ]);
-    }
-
-    console.log('[JC.init] Controlador inicializado com sucesso.');
-  };
-  
-  // Finalização da Inicialização
-  Promise.resolve().finally(() => {
-    if (!global.__ControllerEventsBound) {
-      global.__ControllerEventsBound = true;
-      document.addEventListener('DOMContentLoaded', JC.init, { once: true });
-    }
-  });
-  
-  global.initController = JC.init;
-  global.showSection = JC.show; 
-  
-})(window);
+  init();
+})();
