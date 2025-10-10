@@ -2,7 +2,12 @@
   'use strict';
 
   // Define window.JC imediatamente
-  window.JC = {};
+  window.JC = {
+    show: null,
+    setOrder: null,
+    goNext: null,
+    init: null
+  };
   console.log('[JC] Definindo controlador JC...');
 
   if (window.JC.show || window.JC.setOrder || window.JC.goNext || window.JC.init) {
@@ -29,6 +34,7 @@
     const container = document.getElementById('jornada-content-wrapper');
     if (!container) {
       console.error('[JC.show] Content Wrapper (#jornada-content-wrapper) não encontrado!');
+      window.toast?.('Erro: Content Wrapper não encontrado.', 'error');
       return;
     }
 
@@ -44,6 +50,7 @@
       console.error('[JC.show] Falha ao carregar etapa:', e);
       section = createFallbackElement(sectionId);
       container.appendChild(section);
+      window.toast?.(`Falha ao carregar a seção ${nome}.`, 'error');
       return;
     }
 
