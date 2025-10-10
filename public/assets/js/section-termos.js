@@ -122,6 +122,10 @@
     const runTypingChain = async () => {
       console.log('[section-termos.js] Iniciando runTypingChain');
       const typingElements = root.querySelectorAll('[data-typing="true"]');
+      if (typingElements.length === 0) {
+        console.warn('[section-termos.js] Nenhum elemento com [data-typing="true"] encontrado');
+        return;
+      }
       if (typeof window.runTyping === 'function') {
         try {
           for (const el of typingElements) {
