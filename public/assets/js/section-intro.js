@@ -68,18 +68,22 @@
     return { sectionId, node, name };
   }
 
- // Função para checar as condições e habilitar o botão
-  const checkReady = (btn) => {
-    // AJUSTE TEMPORÁRIO: Habilita com o NOME, ignorando a seleção do guia.
-    if (nomeDigitado) { 
-      btn.disabled = false;
-      btn.classList.remove('disabled-temp');
-      console.log('[Guia Setup] Botão "Iniciar" ativado (Ajuste Temporário).');
-    } else {
-      btn.disabled = true;
-      btn.classList.add('disabled-temp');
-    }
-  };
+ // A condição está dentro da função 'checkReady' no seu section-intro.js
+
+// Localize a função checkReady no seu section-intro.js e substitua.
+// Agora ela não precisa de lógica de input de usuário.
+
+const checkReady = (btn) => {
+    // A única condição real é que o typing chain tenha terminado.
+    // O Typing chain chama showBtn, que chama checkReady.
+    
+    // Como o botão precisa ser ativado para que o usuário avance:
+    btn.disabled = false;
+    btn.classList.remove('disabled-temp');
+    btn.style.opacity = '1'; // Garante que a transparência suma.
+    btn.style.cursor = 'pointer'; 
+    console.log('[Guia Setup] Botão "Iniciar" ativado (Pronto para avançar).');
+};
 
   async function loadAndSetupGuia(root, btn) {
     const nameInput = root.querySelector('#name-input');
