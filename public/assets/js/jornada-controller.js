@@ -4,6 +4,8 @@
   if (window.JC) return;
   window.JC = {};
 
+  console.log('[JC] Inicializando controlador...');
+
   let currentSectionIndex = -1;
   let sectionsOrder = [];
 
@@ -32,15 +34,20 @@
     let section;
     try {
       section = await window.carregarEtapa(nome);
+      console.log('[JC.show] Seção carregada:', section.id);
     } catch (e) {
       console.error('[JC.show] Falha ao carregar etapa:', e);
       section = createFallbackElement(sectionId);
       container.appendChild(section);
+      return;
     }
 
     // Garante que apenas a seção atual seja visível
     document.querySelectorAll('.section').forEach(s => {
-      if (s.id !== sectionId) s.classList.add('hidden');
+      if (s.id !== sectionId) {
+        s.classList.add('hidden');
+        s.remove();
+      }
     });
     section.classList.remove('hidden');
     section.style.display = 'flex';
@@ -67,10 +74,12 @@
     console.log('[JC.init] Controlador inicializado com sucesso.');
   }
 
-  window.JC.show = show;
-  window.JC.setOrder = setOrder;
-  window.JC.goNext = goNext;
-  window.JC.init = init;
+  window.JC = {
+    show,
+    setOrder,
+    goNext,
+    init
+  };
 
   init();
 })();
