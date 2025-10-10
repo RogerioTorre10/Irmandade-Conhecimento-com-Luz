@@ -5,8 +5,6 @@
   --fg: #eef2ff;
   --muted: #aab4d4;
   --primary: #6aa7ff;
-  --card: #121832;
-  --card-2: #0e1428;
   --radius: 16px;
 }
 
@@ -76,7 +74,7 @@ h1, h2, h3, h4, h5, h6, .btn, .section-title, .jornada-header {
   font-weight: 400;
 }
 
-.pergunta-enunciado, .texto-guia, .orientacoes, p, label, .intro-paragraph {
+.pergunta-enunciado, .texto-guia, .orientacoes, p, label, .intro-paragraph, ul li {
   font-family: 'BerkshireSwash', cursive;
   letter-spacing: 0.5px;
 }
@@ -102,7 +100,7 @@ input, textarea, .resposta, .devolutiva, #name-input {
   justify-content: center;
   align-items: center;
   z-index: 1;
-  background-color: transparent; /* Garante fundo transparente */
+  background-color: transparent;
 }
 
 .pergaminho.pergaminho-v {
@@ -113,7 +111,7 @@ input, textarea, .resposta, .devolutiva, #name-input {
   background-image: url('/assets/img/pergaminho-rasgado-horiz.png');
 }
 
-.conteudo-pergaminho {
+#section-conteudo.conteudo-pergaminho {
   padding: clamp(20px, 4vw, 32px);
   line-height: 1.55;
   width: 90%;
@@ -121,6 +119,7 @@ input, textarea, .resposta, .devolutiva, #name-input {
   margin: auto;
   position: relative;
   z-index: 2;
+  background: transparent;
 }
 
 /* === Chama ===
@@ -213,7 +212,7 @@ input, textarea, .resposta, .devolutiva, #name-input {
 }
 
 /* === Seções ===
-   Relacionado a: assets/js/jornada-loader.js, assets/js/section-intro.js */
+   Relacionado a: assets/js/jornada-loader.js, assets/js/section-intro.js, assets/js/section-termos.js */
 .section {
   max-width: 800px;
   width: 90%;
@@ -231,6 +230,11 @@ input, textarea, .resposta, .devolutiva, #name-input {
 }
 
 .section.hidden {
+  display: none;
+}
+
+/* Limpa seções duplicadas */
+#jornada-content-wrapper > .section:not(:last-child) {
   display: none;
 }
 
@@ -262,7 +266,7 @@ input, textarea, .resposta, .devolutiva, #name-input {
   margin: 20px 0;
   line-height: 1.6;
   font-family: 'BerkshireSwash', cursive;
-  visibility: hidden; /* Oculta até datilografia */
+  visibility: hidden;
 }
 
 .intro-paragraph.typing-active {
@@ -301,8 +305,49 @@ input, textarea, .resposta, .devolutiva, #name-input {
   margin-top: 24px;
 }
 
+/* === Termos ===
+   Relacionado a: assets/js/section-termos.js */
+#section-termos .conteudo-pergaminho {
+  padding: 20px;
+  width: 100%;
+}
+
+#termos-pg1, #termos-pg2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#termos-pg1.hidden, #termos-pg2.hidden {
+  display: none;
+}
+
+#section-termos h2, #section-termos h3 {
+  font-size: 28px;
+  color: #fff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  margin: 20px 0;
+  font-family: 'ManufacturingConsent', serif;
+}
+
+#section-termos p, #section-termos li {
+  font-size: 20px;
+  color: #fff;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  margin: 10px 0;
+  line-height: 1.6;
+  font-family: 'BerkshireSwash', cursive;
+}
+
+.footer-actions {
+  margin-top: 24px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
 /* === Botões ===
-   Relacionado a: assets/js/section-intro.js, outros scripts com botões */
+   Relacionado a: assets/js/section-intro.js, assets/js/section-termos.js */
 .btn {
   padding: 12px 24px;
   background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
@@ -333,7 +378,7 @@ input, textarea, .resposta, .devolutiva, #name-input {
 }
 
 /* === Datilografia ===
-   Relacionado a: assets/js/section-intro.js, assets/js/jornada-typing-bridge.js */
+   Relacionado a: assets/js/section-intro.js, assets/js/section-termos.js, assets/js/jornada-typing-bridge.js */
 [data-typing="true"] {
   white-space: pre-wrap;
   position: relative;
@@ -534,7 +579,7 @@ input, textarea, .resposta, .devolutiva, #name-input {
   .section-title {
     font-size: 28px;
   }
-  .intro-paragraph {
+  .intro-paragraph, #section-termos p, #section-termos li {
     font-size: 20px;
   }
   .btn {
