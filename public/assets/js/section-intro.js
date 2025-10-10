@@ -165,16 +165,20 @@
       el1 = await waitForElement('#intro-p1', { within: root, timeout: 5000 });
       el2 = await waitForElement('#intro-p2', { within: root, timeout: 5000 });
       btn = await waitForElement('#btn-avancar', { within: root, timeout: 5000 });
+      // Limpa texto inicial para datilografia
+      el1.textContent = '';
+      el2.textContent = '';
+      el1.style.visibility = 'visible';
+      el2.style.visibility = 'visible';
     } catch (e) {
       console.error('[section-intro.js] Falha ao esperar pelos elementos essenciais:', e);
       window.toast?.('Falha ao carregar a Introdução. Usando fallback.', 'error');
-      // Fallback corrigido para evitar TypeError
+      // Fallback corrigido
       el1 = root.querySelector('#intro-p1');
       if (!el1) {
         el1 = document.createElement('div');
         el1.id = 'intro-p1';
         el1.className = 'intro-paragraph';
-        el1.textContent = 'Bem-vindo à Jornada Conhecimento com Luz.';
         el1.setAttribute('data-typing', '');
         el1.setAttribute('data-speed', '36');
         el1.setAttribute('data-cursor', 'true');
@@ -185,7 +189,6 @@
         el2 = document.createElement('div');
         el2.id = 'intro-p2';
         el2.className = 'intro-paragraph';
-        el2.textContent = 'Respire fundo. Vamos caminhar juntos com fé, coragem e propósito.';
         el2.setAttribute('data-typing', '');
         el2.setAttribute('data-speed', '36');
         el2.setAttribute('data-cursor', 'true');
@@ -229,8 +232,8 @@
 
     const speed1 = Number(el1.dataset.speed || 36);
     const speed2 = Number(el2.dataset.speed || 36);
-    const t1 = getText(el1);
-    const t2 = getText(el2);
+    const t1 = getText(el1) || 'Bem-vindo à Jornada Conhecimento com Luz.';
+    const t2 = getText(el2) || 'Respire fundo. Vamos caminhar juntos com fé, coragem e propósito.';
     const cursor1 = String(el1.dataset.cursor || 'true') === 'true';
     const cursor2 = String(el2.dataset.cursor || 'true') === 'true';
 
