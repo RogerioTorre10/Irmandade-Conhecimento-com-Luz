@@ -20,7 +20,7 @@
     el.addEventListener(ev, h);
   };
 
-  function waitForElement(selector, { within = document, timeout = 10000 } = {}) {
+  function waitForElement(selector, { within = document, timeout = 5000 } = {}) {
     return new Promise((resolve, reject) => {
       let el = within.querySelector(selector);
       if (el) {
@@ -69,12 +69,6 @@
   }
 
   const checkReady = (btn) => {
-    console.log('[checkReady] Verificando estado:', { nomeDigitado, dadosGuiaCarregados });
-    btn.disabled = false; // Debug: sempre habilita
-    btn.classList.remove('disabled-temp');
-    console.log('[Guia Setup] Botão "Iniciar" ativado (debug mode).');
-    // Descomente para lógica original
-    /*
     if (nomeDigitado && dadosGuiaCarregados) {
       btn.disabled = false;
       btn.classList.remove('disabled-temp');
@@ -83,25 +77,18 @@
       btn.disabled = true;
       btn.classList.add('disabled-temp');
     }
-    */
   };
 
   async function loadAndSetupGuia(root, btn) {
     const nameInput = root.querySelector('#name-input');
     const guiaPlaceholder = root.querySelector('#guia-selfie-placeholder');
 
-    console.log('[loadAndSetupGuia] Elementos:', { nameInput: !!nameInput, guiaPlaceholder: !!guiaPlaceholder });
-
     if (nameInput) {
       nameInput.addEventListener('input', () => {
         nomeDigitado = nameInput.value.trim().length > 2;
-        console.log('[loadAndSetupGuia] Nome digitado:', nameInput.value, 'nomeDigitado:', nomeDigitado);
         checkReady(btn);
       });
       nomeDigitado = nameInput.value.trim().length > 2;
-      console.log('[loadAndSetupGuia] Estado inicial do nome:', nameInput.value, 'nomeDigitado:', nomeDigitado);
-    } else {
-      console.warn('[loadAndSetupGuia] #name-input não encontrado');
     }
 
     try {
@@ -122,21 +109,18 @@
             checkReady(btn);
           }, { once: true });
           dadosGuiaCarregados = false;
-          console.log('[loadAndSetupGuia] Aguardando evento guiaSelected');
         } else {
           console.warn('[Guia Setup] Função de renderização do guia não encontrada. Avance sem seleção.');
           dadosGuiaCarregados = true;
-          checkReady(btn);
         }
       } else {
-        console.warn('[loadAndSetupGuia] Nenhum guia disponível ou placeholder ausente. Prosseguindo.');
         dadosGuiaCarregados = true;
-        checkReady(btn);
       }
     } catch (err) {
       console.error('[Guia Setup] Falha crítica no fetch dos guias. Verifique a URL e o JSON:', err);
       window.toast?.('Falha ao carregar dados dos guias. Tente recarregar a página.', 'error');
       dadosGuiaCarregados = true;
+    } finally {
       checkReady(btn);
     }
   }
@@ -151,13 +135,15 @@
     let root = node || document.getElementById('section-intro');
     if (!root) {
       try {
-        root = await waitForElement('#section-intro', { within: document.getElementById('jornada-content-wrapper') || document, timeout: 10000 });
-        console.log('[section-intro.js] Root encontrado via waitForElement:', root.outerHTML.slice(0, 200) + '...');
-      } catch (e) {
-        console.error('[section-intro.js] Root da intro não encontrado:', e);
-        window.toast?.('Erro: Seção section-intro não carregada.', 'error');
-        return;
+        root = await waitForElement('#section-intro', { timeout: 8000 });
+      } catch {
+        root = document.querySelector('section[data-section="intro"]') || null;
       }
+    }
+    if (!root) {
+      console.warn('[section-intro.js] Root da intro não encontrado (após espera)');
+      window.toast?.('Intro ainda não montou no DOM.', 'warn');
+      return;
     }
 
     let el1, el2, btn;
@@ -168,37 +154,10 @@
     } catch (e) {
       console.error('[section-intro.js] Falha ao esperar pelos elementos essenciais:', e);
       window.toast?.('Falha ao carregar a Introdução. Usando fallback.', 'error');
-      // Fallback corrigido para evitar TypeError
-      el1 = root.querySelector('#intro-p1');
-      if (!el1) {
-        el1 = document.createElement('div');
-        el1.id = 'intro-p1';
-        el1.className = 'intro-paragraph';
-        el1.textContent = 'Bem-vindo à Jornada Conhecimento com Luz.';
-        el1.setAttribute('data-typing', '');
-        el1.setAttribute('data-speed', '36');
-        el1.setAttribute('data-cursor', 'true');
-        root.appendChild(el1);
-      }
-      el2 = root.querySelector('#intro-p2');
-      if (!el2) {
-        el2 = document.createElement('div');
-        el2.id = 'intro-p2';
-        el2.className = 'intro-paragraph';
-        el2.textContent = 'Respire fundo. Vamos caminhar juntos com fé, coragem e propósito.';
-        el2.setAttribute('data-typing', '');
-        el2.setAttribute('data-speed', '36');
-        el2.setAttribute('data-cursor', 'true');
-        root.appendChild(el2);
-      }
-      btn = root.querySelector('#btn-avancar');
-      if (!btn) {
-        btn = document.createElement('button');
-        btn.id = 'btn-avancar';
-        btn.className = 'btn btn-primary';
-        btn.textContent = 'Iniciar';
-        root.appendChild(btn);
-      }
+      // Fallback: cria elementos básicos para evitar crash
+      el1 = el1 || root.appendChild(Object.assign(document.createElement('p'), { id: 'intro-p1', textContent: 'Bem-vindo à sua jornada!' }));
+      el2 = el2 || root.appendChild(Object.assign(document.createElement('p'), { id: 'intro-p2', textContent: 'Vamos começar?' }));
+      btn = btn || root.appendChild(Object.assign(document.createElement('button'), { id: 'btn-avancar', textContent: 'Avançar', className: 'hidden disabled-temp' }));
     }
 
     console.log('[section-intro.js] Elementos encontrados:', { el1: !!el1, el2: !!el2, btn: !!btn });
@@ -210,20 +169,20 @@
         window.showSection('section-intro');
       } else {
         root.classList.remove('hidden');
-        root.style.display = 'flex';
+        root.style.display = 'block';
       }
     } catch (err) {
       console.warn('[section-intro.js] Falha ao exibir seção:', err);
       root.classList.remove('hidden');
-      root.style.display = 'flex';
+      root.style.display = 'block';
     }
 
-    btn.classList.add('hidden');
+    btn.classList.add('hidden', 'disabled-temp');
     btn.disabled = true;
     const showBtn = () => {
       console.log('[section-intro.js] Mostrando botão (aguardando dados/nome)');
       btn.classList.remove('hidden');
-      btn.classList.add('btn');
+      btn.style.display = 'inline-block';
       checkReady(btn);
     };
 
@@ -275,21 +234,17 @@
       await runTypingChain();
       INTRO_READY = true;
       await loadAndSetupGuia(root, btn);
-      checkReady(btn);
     } catch (err) {
       console.warn('[section-intro.js] Typing chain falhou', err);
       el1.textContent = t1;
       el2.textContent = t2;
       showBtn();
-      checkReady(btn);
+      INTRO_READY = true;
     }
 
     const goNext = () => {
       console.log('[section-intro.js] Botão clicado, navegando para section-termos');
-      if (typeof window.__canNavigate === 'function' && !window.__canNavigate()) {
-        console.log('[section-intro.js] Navegação bloqueada por __canNavigate');
-        return;
-      }
+      if (typeof window.__canNavigate === 'function' && !window.__canNavigate()) return;
 
       const nextSection = 'section-termos';
       try {
@@ -297,8 +252,6 @@
           window.JC.goNext(nextSection);
         } else if (typeof window.showSection === 'function') {
           window.showSection(nextSection);
-        } else {
-          console.warn('[section-intro.js] Nenhuma função de navegação disponível');
         }
       } catch (err) {
         console.error('[section-intro.js] Erro ao avançar:', err);
@@ -307,7 +260,6 @@
 
     console.log('[section-intro.js] Configurando evento de clique no botão');
     const freshBtn = btn.cloneNode(true);
-    freshBtn.classList.add('btn');
     btn.replaceWith(freshBtn);
     once(freshBtn, 'click', goNext);
   };
