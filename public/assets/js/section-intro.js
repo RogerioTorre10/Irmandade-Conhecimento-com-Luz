@@ -4,12 +4,10 @@
   if (window.__introBound) return;
   window.__introBound = true;
 
-  // ===== GUARDAS E ESTADOS =====
   let INTRO_READY = false;
   let nomeDigitado = false;
   let dadosGuiaCarregados = false;
 
-  // ===== HELPERS =====
   const once = (el, ev, fn) => {
     if (!el) {
       console.warn('[section-intro.js] Elemento para evento não encontrado:', ev);
@@ -22,7 +20,6 @@
     el.addEventListener(ev, h);
   };
 
-  // Nova função waitForElement com MutationObserver
   function waitForElement(selector, { within = document, timeout = 5000 } = {}) {
     return new Promise((resolve, reject) => {
       let el = within.querySelector(selector);
@@ -46,7 +43,6 @@
         attributes: false
       });
 
-      // Timeout de segurança
       setTimeout(() => {
         observer.disconnect();
         const fallbackEl = document.querySelector(`#jornada-content-wrapper ${selector}`);
@@ -72,7 +68,6 @@
     return { sectionId, node, name };
   }
 
-  // ===== CONTROLE DO BOTÃO =====
   const checkReady = (btn) => {
     if (nomeDigitado && dadosGuiaCarregados) {
       btn.disabled = false;
@@ -84,12 +79,10 @@
     }
   };
 
-  // ===== CARREGAMENTO DE DADOS E SETUP DO GUIA =====
   async function loadAndSetupGuia(root, btn) {
     const nameInput = root.querySelector('#name-input');
     const guiaPlaceholder = root.querySelector('#guia-selfie-placeholder');
 
-    // Monitora o campo de nome
     if (nameInput) {
       nameInput.addEventListener('input', () => {
         nomeDigitado = nameInput.value.trim().length > 2;
@@ -98,7 +91,6 @@
       nomeDigitado = nameInput.value.trim().length > 2;
     }
 
-    // Carrega dados dos guias
     try {
       console.log('[Guia Setup] Iniciando fetch para dados dos guias...');
       const response = await fetch('/assets/data/guias.json');
@@ -108,7 +100,6 @@
       const guias = await response.json();
       console.log('[Guia Setup] Dados dos guias carregados com sucesso:', guias.length);
 
-      // Renderiza o seletor de guia
       if (guiaPlaceholder && guias.length > 0) {
         if (typeof window.JornadaGuiaSelfie?.renderSelector === 'function') {
           window.JornadaGuiaSelfie.renderSelector(guiaPlaceholder, guias);
@@ -134,7 +125,6 @@
     }
   }
 
-  // ===== HANDLER PRINCIPAL DA INTRO =====
   const handler = async (evt) => {
     const { sectionId, node } = fromDetail(evt?.detail);
     console.log('[section-intro.js] Evento recebido:', { sectionId, hasNode: !!node });
@@ -142,7 +132,6 @@
 
     console.log('[section-intro.js] Ativando intro');
 
-    // Garante o root da seção
     let root = node || document.getElementById('section-intro');
     if (!root) {
       try {
@@ -157,7 +146,6 @@
       return;
     }
 
-    // Busca elementos dentro do root
     let el1, el2, btn;
     try {
       el1 = await waitForElement('#intro-p1', { within: root, timeout: 5000 });
@@ -165,13 +153,15 @@
       btn = await waitForElement('#btn-avancar', { within: root, timeout: 5000 });
     } catch (e) {
       console.error('[section-intro.js] Falha ao esperar pelos elementos essenciais:', e);
-      window.toast?.('Falha ao carregar a Introdução.', 'error');
-      return;
+      window.toast?.('Falha ao carregar a Introdução. Usando fallback.', 'error');
+      // Fallback: cria elementos básicos para evitar crash
+      el1 = el1 || root.appendChild(Object.assign(document.createElement('p'), { id: 'intro-p1', textContent: 'Bem-vindo à sua jornada!' }));
+      el2 = el2 || root.appendChild(Object.assign(document.createElement('p'), { id: 'intro-p2', textContent: 'Vamos começar?' }));
+      btn = btn || root.appendChild(Object.assign(document.createElement('button'), { id: 'btn-avancar', textContent: 'Avançar', className: 'hidden disabled-temp' }));
     }
 
     console.log('[section-intro.js] Elementos encontrados:', { el1: !!el1, el2: !!el2, btn: !!btn });
 
-    // Garante visibilidade
     try {
       if (typeof window.JC?.show === 'function') {
         window.JC.show('section-intro');
@@ -187,7 +177,6 @@
       root.style.display = 'block';
     }
 
-    // Prepara botão
     btn.classList.add('hidden', 'disabled-temp');
     btn.disabled = true;
     const showBtn = () => {
@@ -197,7 +186,6 @@
       checkReady(btn);
     };
 
-    // Parâmetros da datilografia
     const speed1 = Number(el1.dataset.speed || 36);
     const speed2 = Number(el2.dataset.speed || 36);
     const t1 = getText(el1);
@@ -205,7 +193,6 @@
     const cursor1 = String(el1.dataset.cursor || 'true') === 'true';
     const cursor2 = String(el2.dataset.cursor || 'true') === 'true';
 
-    // Evita duplicar efeitos
     if (INTRO_READY) {
       console.log('[section-intro.js] Intro já preparada');
       showBtn();
@@ -213,10 +200,8 @@
       return;
     }
 
-    // Interrompe efeitos anteriores
     window.EffectCoordinator?.stopAll?.();
 
-    // Encadeia typing
     const runTypingChain = async () => {
       console.log('[section-intro.js] Iniciando runTypingChain');
       if (typeof window.runTyping === 'function') {
@@ -257,7 +242,6 @@
       INTRO_READY = true;
     }
 
-    // Navegação
     const goNext = () => {
       console.log('[section-intro.js] Botão clicado, navegando para section-termos');
       if (typeof window.__canNavigate === 'function' && !window.__canNavigate()) return;
@@ -280,7 +264,6 @@
     once(freshBtn, 'click', goNext);
   };
 
-  // ===== BIND DOS EVENTOS =====
   const bind = () => {
     document.removeEventListener('sectionLoaded', handler);
     document.removeEventListener('section:shown', handler);
