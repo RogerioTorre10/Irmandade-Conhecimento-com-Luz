@@ -1,10 +1,14 @@
 (function () {
   'use strict';
 
-  if (window.JC) return;
+  // Define window.JC imediatamente
   window.JC = {};
+  console.log('[JC] Definindo controlador JC...');
 
-  console.log('[JC] Inicializando controlador...');
+  if (window.JC.show || window.JC.setOrder || window.JC.goNext || window.JC.init) {
+    console.warn('[JC] Controlador JC já definido, pulando inicialização.');
+    return;
+  }
 
   let currentSectionIndex = -1;
   let sectionsOrder = [];
@@ -30,6 +34,7 @@
 
     // Limpa todas as seções existentes
     container.innerHTML = '';
+    document.querySelectorAll('.section').forEach(s => s.remove());
 
     let section;
     try {
