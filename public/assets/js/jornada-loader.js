@@ -49,6 +49,6 @@
         resolve(section); // Retorna a seção APÓS a injeção no próximo frame.
       });
     })
-
+  }
   window.carregarEtapa = carregarEtapa;
 })();
