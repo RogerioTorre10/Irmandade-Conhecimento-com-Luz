@@ -3,17 +3,17 @@
 
   console.log('[BOOT] Iniciando micro-boot…');
 
-  async function waitForJC(timeout = 10000) {
+  async function waitForJC(timeout = 15000) {
     const start = Date.now();
-    while (!window.JC && Date.now() - start < timeout) {
-      console.log('[BOOT] Aguardando JC... Tempo decorrido:', Date.now() - start, 'ms');
+    while (!window.JC || typeof window.JC.setOrder !== 'function') {
+      console.log('[BOOT] Aguardando JC e JC.setOrder... Tempo decorrido:', Date.now() - start, 'ms');
+      if (Date.now() - start >= timeout) {
+        console.error('[BOOT] Desisti: JC ou JC.setOrder não disponível a tempo após', timeout, 'ms');
+        throw new Error('JC or JC.setOrder not available');
+      }
       await new Promise(resolve => setTimeout(resolve, 100));
     }
-    if (!window.JC) {
-      console.error('[BOOT] Desisti: JC não disponível a tempo após', timeout, 'ms');
-      throw new Error('JC not available');
-    }
-    console.log('[BOOT] JC disponível, iniciando...');
+    console.log('[BOOT] JC e JC.setOrder disponíveis, iniciando...');
     return window.JC;
   }
 
@@ -36,7 +36,15 @@
       JC = await waitForJC();
     } catch (e) {
       console.error('[BOOT] Falha ao aguardar JC:', e);
-      return;
+      // Fallback: tenta reiniciar a inicialização
+      console.log('[BOOT] Tentando reiniciar inicialização do controlador...');
+      if (window.JC && typeof window.JC.init === 'function') {
+        await window.JC.init();
+        JC = window.JC;
+      } else {
+        console.error('[BOOT] Fallback falhou: JC não disponível');
+        return;
+      }
     }
 
     // Define ordem das seções
@@ -53,7 +61,12 @@
       'section-filme-jardim',
       'section-final'
     ];
-    JC.setOrder(order);
+    try {
+      JC.setOrder(order);
+    } catch (e) {
+      console.error('[BOOT] Falha ao definir ordem das seções:', e);
+      return;
+    }
 
     // Inicia a jornada
     try {
