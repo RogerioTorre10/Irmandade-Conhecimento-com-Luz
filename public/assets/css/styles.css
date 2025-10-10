@@ -224,6 +224,9 @@ input, textarea, .resposta, .devolutiva, #name-input {
   text-align: center;
   position: relative;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .section.hidden {
@@ -241,6 +244,14 @@ input, textarea, .resposta, .devolutiva, #name-input {
 #section-intro .intro-wrap {
   padding: 20px;
   width: 100%;
+}
+
+.section-title {
+  font-size: 32px;
+  color: #fff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  margin: 20px 0;
+  font-family: 'ManufacturingConsent', serif;
 }
 
 .intro-paragraph {
@@ -316,7 +327,7 @@ input, textarea, .resposta, .devolutiva, #name-input {
 }
 
 /* === Datilografia ===
-   Relacionado a: assets/js/section-intro.js */
+   Relacionado a: assets/js/section-intro.js, assets/js/jornada-typing-bridge.js */
 [data-typing="true"] {
   white-space: pre-wrap;
   position: relative;
@@ -342,7 +353,7 @@ input, textarea, .resposta, .devolutiva, #name-input {
 }
 
 /* === Video Overlay ===
-   Relacionado a: assets/js/jornada-controller.js */
+   Relacionado a: assets/js/jornada-controller.js, assets/js/video-transicao.js */
 #videoOverlay {
   position: fixed;
   inset: 0;
@@ -482,12 +493,6 @@ input, textarea, .resposta, .devolutiva, #name-input {
   z-index: 2;
 }
 
-.motto {
-  font-size: 14px;
-  opacity: 0.8;
-  letter-spacing: 0.1em;
-}
-
 /* === Toast ===
    Relacionado a: assets/js/jornada-controller.js */
 #toast {
@@ -516,6 +521,9 @@ input, textarea, .resposta, .devolutiva, #name-input {
 @media (max-width: 600px) {
   .section {
     padding: 15px;
+  }
+  .section-title {
+    font-size: 28px;
   }
   .intro-paragraph {
     font-size: 20px;
