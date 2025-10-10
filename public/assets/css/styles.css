@@ -102,6 +102,7 @@ input, textarea, .resposta, .devolutiva, #name-input {
   justify-content: center;
   align-items: center;
   z-index: 1;
+  background-color: transparent; /* Garante fundo transparente */
 }
 
 .pergaminho.pergaminho-v {
@@ -198,7 +199,7 @@ input, textarea, .resposta, .devolutiva, #name-input {
   height: 8px;
   border-radius: 50%;
   background: radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 205, 120, 0.85) 42%, rgba(255, 140, 0, 0) 72%);
-  animation: brasaPulse 1.7s ease-in-out infinite;
+  animation: brasaPulse 1.8s ease-in-out infinite;
 }
 
 @keyframes flameSway {
@@ -261,6 +262,11 @@ input, textarea, .resposta, .devolutiva, #name-input {
   margin: 20px 0;
   line-height: 1.6;
   font-family: 'BerkshireSwash', cursive;
+  visibility: hidden; /* Oculta até datilografia */
+}
+
+.intro-paragraph.typing-active {
+  visibility: visible;
 }
 
 #name-input {
@@ -331,8 +337,11 @@ input, textarea, .resposta, .devolutiva, #name-input {
 [data-typing="true"] {
   white-space: pre-wrap;
   position: relative;
-  opacity: 1;
+  visibility: hidden;
   display: block;
+}
+
+[data-typing="true"].typing-active {
   visibility: visible;
 }
 
