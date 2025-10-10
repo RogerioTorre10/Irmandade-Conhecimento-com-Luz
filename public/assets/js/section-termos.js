@@ -18,42 +18,31 @@
     el.addEventListener(ev, h);
   };
 
-  function waitForElement(selector, { within = document, timeout = 5000 } = {}) {
+  async function waitForElement(selector, { within = document, timeout = 5000, step = 50 } = {}) {
+    const start = performance.now();
     return new Promise((resolve, reject) => {
-      let el = within.querySelector(selector);
-      if (el) {
-        console.log(`[waitForElement] Elemento ${selector} encontrado imediatamente`);
-        return resolve(el);
-      }
-
-      const observer = new MutationObserver((mutations, obs) => {
-        el = within.querySelector(selector);
-        if (el) {
-          console.log(`[waitForElement] Elemento ${selector} encontrado após mutação`);
-          obs.disconnect();
-          resolve(el);
-        }
-      });
-
-      observer.observe(within, {
-        childList: true,
-        subtree: true,
-        attributes: false
-      });
-
-      setTimeout(() => {
-        observer.disconnect();
-        const fallbackEl = document.querySelector(`#jornada-content-wrapper ${selector}`);
-        if (fallbackEl) {
-          console.log(`[waitForElement] Elemento ${selector} encontrado via fallback global`);
-          resolve(fallbackEl);
-        } else {
-          console.error(`[waitForElement] Timeout após ${timeout}ms para ${selector}`);
-          reject(new Error(`timeout waiting ${selector}`));
-        }
-      }, timeout);
+        const tick = () => {
+            let el = within.querySelector(selector);
+            
+            // O FALLBACK GLOBAL QUE VENCEU O CONFLITO DA INTRODUÇÃO
+            if (!el && within !== document) {
+                el = document.querySelector(`#jornada-content-wrapper ${selector}`);
+            }
+            
+            if (el) {
+                console.log(`[waitForElement] Elemento ${selector} encontrado!`);
+                return resolve(el);
+            }
+            
+            if (performance.now() - start >= timeout) {
+                console.error(`[waitForElement] Timeout após ${timeout}ms para ${selector}`);
+                return reject(new Error(`timeout waiting ${selector}`));
+            }
+            setTimeout(tick, step);
+        };
+        tick();
     });
-  }
+}
 
   function getText(el) {
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
