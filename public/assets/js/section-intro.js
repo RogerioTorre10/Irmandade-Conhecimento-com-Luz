@@ -68,12 +68,14 @@
     return { sectionId, node, name };
   }
 
-  const checkReady = (btn) => {
-    if (nomeDigitado && dadosGuiaCarregados) {
-      btn.disabled = false;
-      btn.classList.remove('disabled-temp');
-      console.log('[Guia Setup] Botão "Iniciar" ativado.');
-    } else {
+ // Função para checar as condições e habilitar o botão
+  const checkReady = (btn) => {
+    // AJUSTE TEMPORÁRIO: Habilita com o NOME, ignorando a seleção do guia.
+    if (nomeDigitado) { 
+      btn.disabled = false;
+      btn.classList.remove('disabled-temp');
+      console.log('[Guia Setup] Botão "Iniciar" ativado (Ajuste Temporário).');
+    } else {
       btn.disabled = true;
       btn.classList.add('disabled-temp');
     }
