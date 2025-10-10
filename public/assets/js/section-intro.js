@@ -169,8 +169,8 @@
       // Limpa texto inicial para datilografia
       el1.textContent = '';
       el2.textContent = '';
-      el1.style.visibility = 'visible';
-      el2.style.visibility = 'visible';
+      el1.classList.add('typing-active');
+      el2.classList.add('typing-active');
     } catch (e) {
       console.error('[section-intro.js] Falha ao esperar pelos elementos essenciais:', e);
       window.toast?.('Falha ao carregar a Introdução. Usando fallback.', 'error');
@@ -265,11 +265,15 @@
           console.warn('[section-intro.js] Erro no runTyping:', err);
           el1.textContent = t1;
           el2.textContent = t2;
+          el1.classList.add('typing-done');
+          el2.classList.add('typing-done');
         }
       } else {
         console.log('[section-intro.js] Fallback: sem efeitos');
         el1.textContent = t1;
         el2.textContent = t2;
+        el1.classList.add('typing-done');
+        el2.classList.add('typing-done');
       }
       showBtn();
     };
@@ -283,6 +287,8 @@
       console.warn('[section-intro.js] Typing chain falhou', err);
       el1.textContent = t1;
       el2.textContent = t2;
+      el1.classList.add('typing-done');
+      el2.classList.add('typing-done');
       showBtn();
       checkReady(btn);
     }
