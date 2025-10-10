@@ -15,7 +15,7 @@
 
   function checkCriticalElements(container, nome) {
     const criticalElements = nome === 'intro' 
-      ? ['#intro-p1', '#intro-p2', '#btn-avancar']
+      ? ['#intro-p1', '#intro-p2', '#btn-avancar', '#name-input', '#guia-selfie-placeholder']
       : nome === 'termos' 
         ? ['#termos-pg1', '#termos-pg2']
         : ['#section-' + nome];
@@ -37,8 +37,9 @@
     const id = `section-${nome}`;
 
     if (document.getElementById(id)) {
-      console.log(`[carregarEtapa] Seção #${id} já está no DOM. Pulando fetch.`);
-      return document.getElementById(id);
+      console.log(`[carregarEtapa] Seção #${id} já está no DOM. Limpando e reutilizando.`);
+      const existingSection = document.getElementById(id);
+      existingSection.remove();
     }
 
     console.log('[carregarEtapa] Carregando etapa', nome, 'de:', url);
@@ -71,7 +72,7 @@
       throw new Error('Jornada Content Wrapper não encontrado.');
     }
 
-    // Limpa containers anteriores
+    // Limpa todas as seções anteriores
     const parent = document.getElementById(SECTION_CONTAINER_ID);
     if (parent) {
       parent.innerHTML = '';
