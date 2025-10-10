@@ -101,7 +101,8 @@
       nomeDigitado = nameInput.value.trim().length > 2;
       console.log('[loadAndSetupGuia] Estado inicial do nome:', nameInput.value, 'nomeDigitado:', nomeDigitado);
     } else {
-      console.warn('[loadAndSetupGuia] #name-input não encontrado');
+      console.warn('[loadAndSetupGuia] #name-input não encontrado, prosseguindo sem entrada de nome');
+      nomeDigitado = true; // Fallback para permitir avanço
     }
 
     try {
@@ -173,7 +174,6 @@
     } catch (e) {
       console.error('[section-intro.js] Falha ao esperar pelos elementos essenciais:', e);
       window.toast?.('Falha ao carregar a Introdução. Usando fallback.', 'error');
-      // Fallback corrigido
       el1 = root.querySelector('#intro-p1');
       if (!el1) {
         el1 = document.createElement('div');
