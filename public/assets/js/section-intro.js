@@ -23,11 +23,12 @@
     el.addEventListener(ev, h);
   };
 
-  async function waitForEl(selector, { within = document, timeout = 8000, step = 100 } = {}) {
+  async function waitForEl(selector, { within = document, timeout = 2000, step = 100 } = {}) {
     const start = performance.now();
     return new Promise((resolve, reject) => {
       const tick = () => {
-        const el = within.querySelector(selector);
+        // Corrigido para buscar no WITHIN (que é o ROOT da seção)
+        const el = within.querySelector(selector); 
         console.log(`[waitForEl] Buscando ${selector}, tempo: ${Math.round(performance.now() - start)}ms`);
         if (el) return resolve(el);
         if (performance.now() - start >= timeout) {
