@@ -54,7 +54,7 @@
     section = doc.querySelector('#' + id) || doc.querySelector(`[data-section="${nome}"]`) || doc.querySelector('section');
 
     if (!section) {
-      console.error(`[carregarEtapa] Fragmento HTML da seção '${nome}' não encontrado no arquivo recebido!`);
+      console.error(`[carregarEtapa] Fragmento HTML da seção '${nome}' não encontrado no arquivo recebido! HTML bruto:`, html);
       throw new Error(`Fragmento HTML da seção '${nome}' não encontrado.`);
     }
 
