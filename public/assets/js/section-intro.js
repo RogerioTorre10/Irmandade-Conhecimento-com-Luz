@@ -70,9 +70,11 @@
 
   const checkReady = (btn) => {
     console.log('[checkReady] Verificando estado:', { nomeDigitado, dadosGuiaCarregados });
-    // Temporariamente, habilita o botão para debug, mesmo sem condições
+    // Temporariamente, habilita o botão para debug
     btn.disabled = false;
     btn.classList.remove('disabled-temp');
+    btn.style.opacity = '1';
+    btn.style.visibility = 'visible';
     console.log('[Guia Setup] Botão "Iniciar" ativado (debug mode).');
     // Descomente abaixo para restaurar a lógica original
     /*
@@ -175,10 +177,27 @@
       window.toast?.('Falha ao carregar a Introdução. Usando fallback.', 'error');
       el1 = root.querySelector('#intro-p1') || root.appendChild(Object.assign(document.createElement('div'), { id: 'intro-p1', className: 'intro-paragraph', textContent: 'Bem-vindo à Jornada Conhecimento com Luz.', dataset: { typing: '', speed: '36', cursor: 'true' } }));
       el2 = root.querySelector('#intro-p2') || root.appendChild(Object.assign(document.createElement('div'), { id: 'intro-p2', className: 'intro-paragraph', textContent: 'Respire fundo. Vamos caminhar juntos com fé, coragem e propósito.', dataset: { typing: '', speed: '36', cursor: 'true' } }));
-      btn = root.querySelector('#btn-avancar') || root.appendChild(Object.assign(document.createElement('button'), { id: 'btn-avancar', className: 'btn btn-primary hidden disabled-temp', textContent: 'Iniciar' }));
+      btn = root.querySelector('#btn-avancar') || root.appendChild(Object.assign(document.createElement('button'), { id: 'btn-avancar', className: 'btn btn-primary btn-stone hidden disabled-temp', textContent: 'Iniciar' }));
     }
 
     console.log('[section-intro.js] Elementos encontrados:', { el1: !!el1, el2: !!el2, btn: !!btn });
+
+    // Aplica textura de pedra ao botão
+    btn.classList.add('btn-stone');
+    btn.style.cssText = `
+      padding: 8px 16px;
+      background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
+      background-blend-mode: overlay;
+      color: #fff;
+      border-radius: 8px;
+      font-size: 18px;
+      border: 3px solid #4a4a4a;
+      box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+      opacity: 1;
+      visibility: visible;
+      display: inline-block;
+    `;
 
     try {
       if (typeof window.JC?.show === 'function') {
@@ -197,14 +216,12 @@
 
     btn.classList.add('hidden', 'disabled-temp');
     btn.disabled = true;
-    btn.style.opacity = '1'; // Força visibilidade
-    btn.style.visibility = 'visible';
     const showBtn = () => {
       console.log('[section-intro.js] Mostrando botão (aguardando dados/nome)');
       btn.classList.remove('hidden', 'disabled-temp');
-      btn.style.display = 'inline-block';
       btn.style.opacity = '1';
       btn.style.visibility = 'visible';
+      btn.style.display = 'inline-block';
       checkReady(btn);
     };
 
@@ -256,7 +273,6 @@
       await runTypingChain();
       INTRO_READY = true;
       await loadAndSetupGuia(root, btn);
-      // Força a chamada de checkReady após loadAndSetupGuia
       checkReady(btn);
     } catch (err) {
       console.warn('[section-intro.js] Typing chain falhou', err);
@@ -289,6 +305,21 @@
 
     console.log('[section-intro.js] Configurando evento de clique no botão');
     const freshBtn = btn.cloneNode(true);
+    freshBtn.classList.add('btn-stone');
+    freshBtn.style.cssText = `
+      padding: 8px 16px;
+      background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
+      background-blend-mode: overlay;
+      color: #fff;
+      border-radius: 8px;
+      font-size: 18px;
+      border: 3px solid #4a4a4a;
+      box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+      opacity: 1;
+      visibility: visible;
+      display: inline-block;
+    `;
     btn.replaceWith(freshBtn);
     once(freshBtn, 'click', goNext);
   };
