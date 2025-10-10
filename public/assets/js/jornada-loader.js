@@ -13,6 +13,7 @@
 
   const SECTION_CONTAINER_ID = 'section-conteudo';
 
+  // Função para verificar elementos críticos
   function checkCriticalElements(container, nome) {
     if (nome !== 'intro') return true;
 
@@ -70,7 +71,7 @@
 
     container.innerHTML = '';
     container.appendChild(section);
-    console.log('[carregarEtapa] Injetada e apensa no wrapper. Conteúdo:', container.innerHTML);
+    console.log('[carregarEtapa] Injetada e apensa no wrapper. Conteúdo:', section.outerHTML);
 
     return new Promise(resolve => {
       requestAnimationFrame(() => {
