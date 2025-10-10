@@ -155,9 +155,9 @@
     let el1, el2, btn;
     try {
         // Usa waitForEl para garantir que o DOM esteja pronto antes de prosseguir
-        el1 = await waitForEl('#intro-p1', { within: root, timeout: 500, step: 50 });
-        el2 = await waitForEl('#intro-p2', { within: root, timeout: 500, step: 50 });
-        btn = await waitForEl('#btn-avancar', { within: root, timeout: 500, step: 50 });
+        el1 = await waitForEl('#intro-p1', { within: root, timeout: 2000, step: 50 });
+        el2 = await waitForEl('#intro-p2', { within: root, timeout: 2000, step: 50 });
+        btn = await waitForEl('#btn-avancar', { within: root, timeout: 2000, step: 50 });
     } catch (e) {
         // Se falhar, registra o erro e prossegue com o fallback
         console.error('[section-intro.js] Falha ao esperar pelos elementos essenciais:', e);
