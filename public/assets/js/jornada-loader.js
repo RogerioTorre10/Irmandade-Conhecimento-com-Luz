@@ -14,9 +14,11 @@
   const SECTION_CONTAINER_ID = 'section-conteudo';
 
   function checkCriticalElements(container, nome) {
-    if (nome !== 'intro') return true;
-
-    const criticalElements = ['#intro-p1', '#intro-p2', '#btn-avancar'];
+    const criticalElements = nome === 'intro' 
+      ? ['#intro-p1', '#intro-p2', '#btn-avancar']
+      : nome === 'termos' 
+        ? ['#termos-pg1', '#termos-pg2']
+        : ['#section-' + nome];
     let allFound = true;
     for (const selector of criticalElements) {
       const el = container.querySelector(selector);
@@ -47,6 +49,7 @@
       throw new Error(`HTTP ${res.status} em ${url}`);
     }
     const html = await res.text();
+    console.log('[carregarEtapa] HTML bruto recebido:', html.slice(0, 200) + '...');
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
@@ -66,6 +69,13 @@
     if (!container) {
       console.error('[carregarEtapa] Content Wrapper (#jornada-content-wrapper) não encontrado!');
       throw new Error('Jornada Content Wrapper não encontrado.');
+    }
+
+    // Limpa containers anteriores
+    const parent = document.getElementById(SECTION_CONTAINER_ID);
+    if (parent) {
+      parent.innerHTML = '';
+      parent.appendChild(container);
     }
 
     container.innerHTML = '';
