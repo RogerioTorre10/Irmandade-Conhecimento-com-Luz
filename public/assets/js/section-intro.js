@@ -70,23 +70,10 @@
 
   const checkReady = (btn) => {
     console.log('[checkReady] Verificando estado:', { nomeDigitado, dadosGuiaCarregados });
-    // Temporariamente, habilita o botão para debug
+    // MODO DEBUG: Habilita o botão sempre para testar
     btn.disabled = false;
     btn.classList.remove('disabled-temp');
-    btn.style.opacity = '1';
-    btn.style.visibility = 'visible';
     console.log('[Guia Setup] Botão "Iniciar" ativado (debug mode).');
-    // Descomente abaixo para restaurar a lógica original
-    /*
-    if (nomeDigitado && dadosGuiaCarregados) {
-      btn.disabled = false;
-      btn.classList.remove('disabled-temp');
-      console.log('[Guia Setup] Botão "Iniciar" ativado.');
-    } else {
-      btn.disabled = true;
-      btn.classList.add('disabled-temp');
-    }
-    */
   };
 
   async function loadAndSetupGuia(root, btn) {
@@ -102,46 +89,12 @@
         checkReady(btn);
       });
       nomeDigitado = nameInput.value.trim().length > 2;
-      console.log('[loadAndSetupGuia] Estado inicial do nome:', nameInput.value, 'nomeDigitado:', nomeDigitado);
-    } else {
-      console.warn('[loadAndSetupGuia] #name-input não encontrado');
     }
 
-    try {
-      console.log('[Guia Setup] Iniciando fetch para dados dos guias...');
-      const response = await fetch('/assets/data/guias.json');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status} - Verifique o caminho '/assets/data/guias.json'`);
-      }
-      const guias = await response.json();
-      console.log('[Guia Setup] Dados dos guias carregados com sucesso:', guias.length);
-
-      if (guiaPlaceholder && guias.length > 0) {
-        if (typeof window.JornadaGuiaSelfie?.renderSelector === 'function') {
-          window.JornadaGuiaSelfie.renderSelector(guiaPlaceholder, guias);
-          document.addEventListener('guiaSelected', (e) => {
-            console.log('[Intro] Guia selecionado. Verificando se pode avançar.');
-            dadosGuiaCarregados = true;
-            checkReady(btn);
-          }, { once: true });
-          dadosGuiaCarregados = false;
-          console.log('[loadAndSetupGuia] Aguardando evento guiaSelected');
-        } else {
-          console.warn('[Guia Setup] Função de renderização do guia não encontrada. Avance sem seleção.');
-          dadosGuiaCarregados = true;
-          checkReady(btn);
-        }
-      } else {
-        console.warn('[loadAndSetupGuia] Nenhum guia disponível ou placeholder ausente. Prosseguindo.');
-        dadosGuiaCarregados = true;
-        checkReady(btn);
-      }
-    } catch (err) {
-      console.error('[Guia Setup] Falha crítica no fetch dos guias. Verifique a URL e o JSON:', err);
-      window.toast?.('Falha ao carregar dados dos guias. Tente recarregar a página.', 'error');
-      dadosGuiaCarregados = true;
-      checkReady(btn);
-    }
+    // Simula carregamento de guias para debug
+    dadosGuiaCarregados = true;
+    console.log('[loadAndSetupGuia] Guias simulados carregados. Prosseguindo.');
+    checkReady(btn);
   }
 
   const handler = async (evt) => {
@@ -160,181 +113,128 @@
       }
     }
     if (!root) {
-      console.error('[section-intro.js] Root da intro não encontrado (após espera)');
-      window.toast?.('Intro ainda não montou no DOM.', 'error');
+      console.error('[section-intro.js] Root da intro não encontrado');
       return;
     }
-
-    console.log('[section-intro.js] Root encontrado:', root.outerHTML.slice(0, 200) + '...');
 
     let el1, el2, btn;
     try {
       el1 = await waitForElement('#intro-p1', { within: root, timeout: 5000 });
       el2 = await waitForElement('#intro-p2', { within: root, timeout: 5000 });
       btn = await waitForElement('#btn-avancar', { within: root, timeout: 5000 });
+      console.log('[section-intro.js] Elementos encontrados com sucesso!');
     } catch (e) {
-      console.error('[section-intro.js] Falha ao esperar pelos elementos essenciais:', e);
-      window.toast?.('Falha ao carregar a Introdução. Usando fallback.', 'error');
-      el1 = root.querySelector('#intro-p1') || root.appendChild(Object.assign(document.createElement('div'), { id: 'intro-p1', className: 'intro-paragraph', textContent: 'Bem-vindo à Jornada Conhecimento com Luz.', dataset: { typing: '', speed: '36', cursor: 'true' } }));
-      el2 = root.querySelector('#intro-p2') || root.appendChild(Object.assign(document.createElement('div'), { id: 'intro-p2', className: 'intro-paragraph', textContent: 'Respire fundo. Vamos caminhar juntos com fé, coragem e propósito.', dataset: { typing: '', speed: '36', cursor: 'true' } }));
-      btn = root.querySelector('#btn-avancar') || root.appendChild(Object.assign(document.createElement('button'), { id: 'btn-avancar', className: 'btn btn-primary btn-stone hidden disabled-temp', textContent: 'Iniciar' }));
+      console.error('[section-intro.js] Falha ao encontrar elementos:', e);
+      return; // Para aqui se não encontrar elementos
     }
 
-    console.log('[section-intro.js] Elementos encontrados:', { el1: !!el1, el2: !!el2, btn: !!btn });
+    // APLICA TEXTURA DE PEDRA AO BOTÃO (SEM QUEBRAR O JS)
+    const applyStoneTexture = (button) => {
+      button.style.cssText += `
+        padding: 12px 24px !important;
+        background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover !important;
+        background-blend-mode: overlay !important;
+        color: #fff !important;
+        border-radius: 8px !important;
+        font-size: 18px !important;
+        border: 3px solid #4a4a4a !important;
+        box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6) !important;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.7) !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+      `;
+      button.classList.add('btn-stone');
+    };
 
-    // Aplica textura de pedra ao botão
-    btn.classList.add('btn-stone');
-    btn.style.cssText = `
-      padding: 8px 16px;
-      background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
-      background-blend-mode: overlay;
-      color: #fff;
-      border-radius: 8px;
-      font-size: 18px;
-      border: 3px solid #4a4a4a;
-      box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
-      opacity: 1;
-      visibility: visible;
-      display: inline-block;
-    `;
+    applyStoneTexture(btn);
 
+    // Mostra a seção
     try {
       if (typeof window.JC?.show === 'function') {
         window.JC.show('section-intro');
-      } else if (typeof window.showSection === 'function') {
-        window.showSection('section-intro');
       } else {
-        root.classList.remove('hidden');
         root.style.display = 'block';
+        root.classList.remove('hidden');
       }
     } catch (err) {
-      console.warn('[section-intro.js] Falha ao exibir seção:', err);
-      root.classList.remove('hidden');
       root.style.display = 'block';
     }
 
-    btn.classList.add('hidden', 'disabled-temp');
+    // Configura botão inicialmente invisível
+    btn.classList.add('hidden');
     btn.disabled = true;
+
     const showBtn = () => {
-      console.log('[section-intro.js] Mostrando botão (aguardando dados/nome)');
-      btn.classList.remove('hidden', 'disabled-temp');
-      btn.style.opacity = '1';
-      btn.style.visibility = 'visible';
-      btn.style.display = 'inline-block';
-      checkReady(btn);
+      console.log('[section-intro.js] Mostrando botão');
+      btn.classList.remove('hidden');
+      btn.disabled = false; // Habilita imediatamente para debug
+      applyStoneTexture(btn); // Reaplica textura
     };
 
+    // Efeitos de datilografia
     const speed1 = Number(el1.dataset.speed || 36);
     const speed2 = Number(el2.dataset.speed || 36);
     const t1 = getText(el1);
     const t2 = getText(el2);
-    const cursor1 = String(el1.dataset.cursor || 'true') === 'true';
-    const cursor2 = String(el2.dataset.cursor || 'true') === 'true';
-
-    if (INTRO_READY) {
-      console.log('[section-intro.js] Intro já preparada');
-      showBtn();
-      loadAndSetupGuia(root, btn);
-      return;
-    }
-
-    window.EffectCoordinator?.stopAll?.();
 
     const runTypingChain = async () => {
-      console.log('[section-intro.js] Iniciando runTypingChain');
+      console.log('[section-intro.js] Iniciando datilografia');
       if (typeof window.runTyping === 'function') {
         try {
           await new Promise((resolve) => {
-            window.runTyping(el1, t1, resolve, { speed: speed1, cursor: cursor1 });
+            window.runTyping(el1, t1, resolve, { speed: speed1, cursor: true });
           });
-          console.log('[section-intro.js] Typing concluído para intro-p1');
-          window.EffectCoordinator?.speak?.(t1, { rate: 1.06 });
+          console.log('Datilografia p1 concluída');
 
           await new Promise((resolve) => {
-            window.runTyping(el2, t2, resolve, { speed: speed2, cursor: cursor2 });
+            window.runTyping(el2, t2, resolve, { speed: speed2, cursor: true });
           });
-          console.log('[section-intro.js] Typing concluído para intro-p2');
-          setTimeout(() => window.EffectCoordinator?.speak?.(t2, { rate: 1.05 }), 300);
+          console.log('Datilografia p2 concluída');
         } catch (err) {
-          console.warn('[section-intro.js] Erro no runTyping:', err);
+          console.warn('Erro na datilografia:', err);
           el1.textContent = t1;
           el2.textContent = t2;
         }
       } else {
-        console.log('[section-intro.js] Fallback: sem efeitos');
         el1.textContent = t1;
         el2.textContent = t2;
       }
-      showBtn();
+      showBtn(); // MOSTRA O BOTÃO APÓS DATILOGRAFIA
+      loadAndSetupGuia(root, btn);
     };
 
     try {
       await runTypingChain();
       INTRO_READY = true;
-      await loadAndSetupGuia(root, btn);
-      checkReady(btn);
     } catch (err) {
-      console.warn('[section-intro.js] Typing chain falhou', err);
-      el1.textContent = t1;
-      el2.textContent = t2;
+      console.error('Falha na intro:', err);
       showBtn();
-      checkReady(btn);
     }
 
+    // Navegação
     const goNext = () => {
-      console.log('[section-intro.js] Botão clicado, navegando para section-termos');
-      if (typeof window.__canNavigate === 'function' && !window.__canNavigate()) {
-        console.log('[section-intro.js] Navegação bloqueada por __canNavigate');
-        return;
-      }
-
+      console.log('[section-intro.js] Botão clicado!');
       const nextSection = 'section-termos';
       try {
         if (window.JC?.goNext) {
           window.JC.goNext(nextSection);
-        } else if (typeof window.showSection === 'function') {
-          window.showSection(nextSection);
-        } else {
-          console.warn('[section-intro.js] Nenhuma função de navegação disponível');
         }
       } catch (err) {
-        console.error('[section-intro.js] Erro ao avançar:', err);
+        console.error('Erro na navegação:', err);
       }
     };
 
-    console.log('[section-intro.js] Configurando evento de clique no botão');
+    // Clona botão para evento limpo
     const freshBtn = btn.cloneNode(true);
-    freshBtn.classList.add('btn-stone');
-    freshBtn.style.cssText = `
-      padding: 8px 16px;
-      background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
-      background-blend-mode: overlay;
-      color: #fff;
-      border-radius: 8px;
-      font-size: 18px;
-      border: 3px solid #4a4a4a;
-      box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
-      opacity: 1;
-      visibility: visible;
-      display: inline-block;
-    `;
+    applyStoneTexture(freshBtn);
     btn.replaceWith(freshBtn);
     once(freshBtn, 'click', goNext);
   };
 
   const bind = () => {
-    document.removeEventListener('sectionLoaded', handler);
-    document.removeEventListener('section:shown', handler);
     document.addEventListener('sectionLoaded', handler, { passive: true });
     document.addEventListener('section:shown', handler, { passive: true });
-    console.log('[section-intro.js] Handler ligado');
-
-    const visibleIntro = document.querySelector('#section-intro:not(.hidden)');
-    if (visibleIntro) {
-      handler({ detail: { sectionId: 'section-intro', node: visibleIntro } });
-    }
+    console.log('[section-intro.js] Bind completo');
   };
 
   if (document.readyState === 'loading') {
