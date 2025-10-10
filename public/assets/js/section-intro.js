@@ -242,21 +242,21 @@
       INTRO_READY = true;
     }
 
-    const goNext = () => {
-      console.log('[section-intro.js] Botão clicado, navegando para section-termos');
-      if (typeof window.__canNavigate === 'function' && !window.__canNavigate()) return;
+   // 9) Navegação (CORRIGIDA)
+    const goNext = () => {
+      console.log('[section-intro.js] Botão clicado, avançando...');
 
-      const nextSection = 'section-termos';
-      try {
-        if (window.JC?.goNext) {
-          window.JC.goNext(nextSection);
-        } else if (typeof window.showSection === 'function') {
-          window.showSection(nextSection);
-        }
-      } catch (err) {
-        console.error('[section-intro.js] Erro ao avançar:', err);
-      }
-    };
+      // Se a escolha do guia e o nome estiverem OK, basta ir para a próxima seção na ordem do Controller.
+      try {
+        if (window.JC?.goNext) {
+          window.JC.goNext(); // Chama a próxima seção na ordem (section-termos)
+        } else if (typeof window.showSection === 'function') {
+          window.showSection('section-termos');
+        }
+      } catch (err) {
+        console.error('[section-intro.js] Erro ao avançar:', err);
+      }
+    };
 
     console.log('[section-intro.js] Configurando evento de clique no botão');
     const freshBtn = btn.cloneNode(true);
