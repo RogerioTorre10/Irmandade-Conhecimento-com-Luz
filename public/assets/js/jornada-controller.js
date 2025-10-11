@@ -172,10 +172,15 @@
       
       // Se ainda não encontrou, cria o fallback
       if (!target) {
-        target = createFallbackElement(id);
+        // Se a seção for injetada diretamente no canvas, procuramos lá
+        target = document.getElementById('jornada-canvas')?.querySelector(`#${id}`);
+      }
+      
+       if (!target) { // Verifica se ainda não encontramos
+        target = createFallbackElement(id); // Cria o fallback (o que está acontecendo)
         window.toast?.(`Seção ${id} não encontrada. Usando fallback.`, 'error');
       } 
-      
+            
       // Esconde a seção anterior
       const previousSection = document.getElementById(global.__currentSectionId);
       if (previousSection && previousSection.id !== id) {
