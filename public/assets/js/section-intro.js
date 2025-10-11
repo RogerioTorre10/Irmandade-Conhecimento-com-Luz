@@ -69,15 +69,6 @@
   }
 
   const checkReady = (btn) => {
-    console.log('[checkReady] Verificando estado:', { nomeDigitado, dadosGuiaCarregados });
-    // Temporariamente, habilita o botão para debug
-    btn.disabled = false;
-    btn.classList.remove('disabled-temp');
-    btn.style.opacity = '1';
-    btn.style.visibility = 'visible';
-    console.log('[Guia Setup] Botão "Iniciar" ativado (debug mode).');
-    // Descomente abaixo para restaurar a lógica original
-    /*
     if (nomeDigitado && dadosGuiaCarregados) {
       btn.disabled = false;
       btn.classList.remove('disabled-temp');
@@ -86,9 +77,53 @@
       btn.disabled = true;
       btn.classList.add('disabled-temp');
     }
-    */
   };
- 
+
+  async function loadAndSetupGuia(root, btn) {
+    const nameInput = root.querySelector('#name-input');
+    const guiaPlaceholder = root.querySelector('#guia-selfie-placeholder');
+
+    if (nameInput) {
+      nameInput.addEventListener('input', () => {
+        nomeDigitado = nameInput.value.trim().length > 2;
+        checkReady(btn);
+      });
+      nomeDigitado = nameInput.value.trim().length > 2;
+    }
+
+    try {
+      console.log('[Guia Setup] Iniciando fetch para dados dos guias...');
+      const response = await fetch('/assets/data/guias.json');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status} - Verifique o caminho '/assets/data/guias.json'`);
+      }
+      const guias = await response.json();
+      console.log('[Guia Setup] Dados dos guias carregados com sucesso:', guias.length);
+
+      if (guiaPlaceholder && guias.length > 0) {
+        if (typeof window.JornadaGuiaSelfie?.renderSelector === 'function') {
+          window.JornadaGuiaSelfie.renderSelector(guiaPlaceholder, guias);
+          document.addEventListener('guiaSelected', (e) => {
+            console.log('[Intro] Guia selecionado. Verificando se pode avançar.');
+            dadosGuiaCarregados = true;
+            checkReady(btn);
+          }, { once: true });
+          dadosGuiaCarregados = false;
+        } else {
+          console.warn('[Guia Setup] Função de renderização do guia não encontrada. Avance sem seleção.');
+          dadosGuiaCarregados = true;
+        }
+      } else {
+        dadosGuiaCarregados = true;
+      }
+    } catch (err) {
+      console.error('[Guia Setup] Falha crítica no fetch dos guias. Verifique a URL e o JSON:', err);
+      window.toast?.('Falha ao carregar dados dos guias. Tente recarregar a página.', 'error');
+      dadosGuiaCarregados = true;
+    } finally {
+      checkReady(btn);
+    }
+  }
 
   const handler = async (evt) => {
     const { sectionId, node } = fromDetail(evt?.detail);
@@ -100,18 +135,16 @@
     let root = node || document.getElementById('section-intro');
     if (!root) {
       try {
-        root = await waitForElement('#section-intro', { within: document.getElementById('jornada-content-wrapper') || document, timeout: 8000 });
+        root = await waitForElement('#section-intro', { timeout: 8000 });
       } catch {
         root = document.querySelector('section[data-section="intro"]') || null;
       }
     }
     if (!root) {
-      console.error('[section-intro.js] Root da intro não encontrado (após espera)');
-      window.toast?.('Intro ainda não montou no DOM.', 'error');
+      console.warn('[section-intro.js] Root da intro não encontrado (após espera)');
+      window.toast?.('Intro ainda não montou no DOM.', 'warn');
       return;
     }
-
-    console.log('[section-intro.js] Root encontrado:', root.outerHTML.slice(0, 200) + '...');
 
     let el1, el2, btn;
     try {
@@ -121,9 +154,10 @@
     } catch (e) {
       console.error('[section-intro.js] Falha ao esperar pelos elementos essenciais:', e);
       window.toast?.('Falha ao carregar a Introdução. Usando fallback.', 'error');
-      el1 = root.querySelector('#intro-p1') || root.appendChild(Object.assign(document.createElement('div'), { id: 'intro-p1', className: 'intro-paragraph', textContent: 'Bem-vindo à Jornada Conhecimento com Luz.', dataset: { typing: '', speed: '36', cursor: 'true' } }));
-      el2 = root.querySelector('#intro-p2') || root.appendChild(Object.assign(document.createElement('div'), { id: 'intro-p2', className: 'intro-paragraph', textContent: 'Respire fundo. Vamos caminhar juntos com fé, coragem e propósito.', dataset: { typing: '', speed: '36', cursor: 'true' } }));
-      btn = root.querySelector('#btn-avancar') || root.appendChild(Object.assign(document.createElement('button'), { id: 'btn-avancar', className: 'btn btn-primary btn-stone hidden disabled-temp', textContent: 'Iniciar' }));
+      // Fallback: cria elementos básicos para evitar crash
+      el1 = el1 || root.appendChild(Object.assign(document.createElement('p'), { id: 'intro-p1', textContent: 'Bem-vindo à sua jornada!' }));
+      el2 = el2 || root.appendChild(Object.assign(document.createElement('p'), { id: 'intro-p2', textContent: 'Vamos começar?' }));
+      btn = btn || root.appendChild(Object.assign(document.createElement('button'), { id: 'btn-avancar', textContent: 'Avançar', className: 'hidden disabled-temp' }));
     }
 
     console.log('[section-intro.js] Elementos encontrados:', { el1: !!el1, el2: !!el2, btn: !!btn });
@@ -144,7 +178,6 @@
       visibility: visible;
       display: inline-block;
     `;
-
     try {
       if (typeof window.JC?.show === 'function') {
         window.JC.show('section-intro');
@@ -164,9 +197,7 @@
     btn.disabled = true;
     const showBtn = () => {
       console.log('[section-intro.js] Mostrando botão (aguardando dados/nome)');
-      btn.classList.remove('hidden', 'disabled-temp');
-      btn.style.opacity = '1';
-      btn.style.visibility = 'visible';
+      btn.classList.remove('hidden');
       btn.style.display = 'inline-block';
       checkReady(btn);
     };
@@ -219,21 +250,17 @@
       await runTypingChain();
       INTRO_READY = true;
       await loadAndSetupGuia(root, btn);
-      checkReady(btn);
     } catch (err) {
       console.warn('[section-intro.js] Typing chain falhou', err);
       el1.textContent = t1;
       el2.textContent = t2;
       showBtn();
-      checkReady(btn);
+      INTRO_READY = true;
     }
 
     const goNext = () => {
       console.log('[section-intro.js] Botão clicado, navegando para section-termos');
-      if (typeof window.__canNavigate === 'function' && !window.__canNavigate()) {
-        console.log('[section-intro.js] Navegação bloqueada por __canNavigate');
-        return;
-      }
+      if (typeof window.__canNavigate === 'function' && !window.__canNavigate()) return;
 
       const nextSection = 'section-termos';
       try {
@@ -241,8 +268,6 @@
           window.JC.goNext(nextSection);
         } else if (typeof window.showSection === 'function') {
           window.showSection(nextSection);
-        } else {
-          console.warn('[section-intro.js] Nenhuma função de navegação disponível');
         }
       } catch (err) {
         console.error('[section-intro.js] Erro ao avançar:', err);
@@ -251,21 +276,6 @@
 
     console.log('[section-intro.js] Configurando evento de clique no botão');
     const freshBtn = btn.cloneNode(true);
-    freshBtn.classList.add('btn-stone');
-    freshBtn.style.cssText = `
-      padding: 8px 16px;
-      background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
-      background-blend-mode: overlay;
-      color: #fff;
-      border-radius: 8px;
-      font-size: 18px;
-      border: 3px solid #4a4a4a;
-      box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
-      opacity: 1;
-      visibility: visible;
-      display: inline-block;
-    `;
     btn.replaceWith(freshBtn);
     once(freshBtn, 'click', goNext);
   };
