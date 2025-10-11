@@ -204,17 +204,22 @@
     }
   };
    
-  const bind = () => {
+    const bind = () => {
     document.removeEventListener('sectionLoaded', handler);
     document.removeEventListener('section:shown', handler);
+    // Remove o listener 'section:shown' para evitar ativação dupla e rápida do handler
     document.addEventListener('sectionLoaded', handler, { passive: true });
-    document.addEventListener('section:shown', handler, { passive: true });
+    
     console.log('[section-termos.js] Handler ligado');
-
-    const visibleTermos = document.querySelector('#section-termos:not(.hidden)');
-    if (visibleTermos) {
-      handler({ detail: { sectionId: 'section-termos', node: visibleTermos } });
-    }
+    
+    // NOVO: Adiciona um pequeno atraso para dar tempo ao JC de inicializar TUDO
+    setTimeout(() => {
+        const visibleTermos = document.querySelector('#section-termos:not(.hidden)');
+        if (visibleTermos) {
+             console.log('[section-termos.js] Disparando handler com atraso.');
+             handler({ detail: { sectionId: 'section-termos', node: visibleTermos } });
+        }
+    }, 100); // 100ms de atraso
   };
 
   if (document.readyState === 'loading') {
@@ -222,4 +227,4 @@
   } else {
     bind();
   }
-})();
+})(); 
