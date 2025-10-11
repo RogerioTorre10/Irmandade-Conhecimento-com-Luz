@@ -15,7 +15,7 @@
     el.addEventListener(ev, h);
   };
 
-  async function waitForElement(selector, { within = document, timeout = 7000, step = 50 } = {}) {
+  async function waitForElement(selector, { within = document, timeout = 10000, step = 50 } = {}) {
     const start = performance.now();
     return new Promise((resolve, reject) => {
       const tick = () => {
@@ -45,7 +45,7 @@
 
   const handler = async (evt) => {
     const { sectionId, node } = fromDetail(evt?.detail);
-    if (sectionId !== 'section-termos') return;
+    if (sectionId !== 'section-termos') return; // Ignora se não for section-termos
 
     let root = node || document.getElementById('section-termos');
     if (!root) {
@@ -59,13 +59,13 @@
 
     let pg1, pg2, nextBtn, prevBtn, avancarBtn;
     try {
-      pg1 = root.querySelector('#termos-pg1');
-      pg2 = root.querySelector('#termos-pg2');
-      nextBtn = await waitForElement('[data-action="termos-next"]', { within: root });
-      prevBtn = await waitForElement('[data-action="termos-prev"]', { within: root });
-      avancarBtn = await waitForElement('[data-action="avancar"]', { within: root });
+      pg1 = await waitForElement('#termos-pg1', { within: root, timeout: 10000 });
+      pg2 = await waitForElement('#termos-pg2', { within: root, timeout: 10000 });
+      nextBtn = await waitForElement('[data-action="termos-next"]', { within: root, timeout: 10000 });
+      prevBtn = await waitForElement('[data-action="termos-prev"]', { within: root, timeout: 10000 });
+      avancarBtn = await waitForElement('[data-action="avancar"]', { within: root, timeout: 10000 });
     } catch (e) {
-      window.toast?.('Falha ao carregar os botões da seção Termos.', 'error');
+      window.toast?.('Falha ao carregar os elementos da seção Termos.', 'error');
       pg1 = pg1 || root.querySelector('#termos-pg1') || document.createElement('div');
       pg2 = pg2 || root.querySelector('#termos-pg2') || document.createElement('div');
       nextBtn = nextBtn || root.querySelector('[data-action="termos-next"]') || document.createElement('button');
@@ -108,6 +108,32 @@
     nextBtn.disabled = true;
     prevBtn.disabled = true;
     avancarBtn.disabled = true;
+
+    // Adicionar manipuladores de cliques
+    once(nextBtn, 'click', () => {
+      pg1.classList.add('hidden');
+      pg2.classList.remove('hidden');
+      if (typeof window.JC?.show === 'function') {
+        window.JC.show('section-termos');
+      }
+    });
+
+    once(prevBtn, 'click', () => {
+      pg2.classList.add('hidden');
+      pg1.classList.remove('hidden');
+      if (typeof window.JC?.show === 'function') {
+        window.JC.show('section-termos');
+      }
+    });
+
+    once(avancarBtn, 'click', () => {
+      // Substitua 'section-proxima' pelo ID da próxima seção real
+      if (typeof window.JC?.show === 'function') {
+        window.JC.show('section-proxima');
+      } else {
+        window.location.href = '/proxima-pagina'; // Ajuste a URL conforme necessário
+      }
+    });
 
     const runTypingChain = async () => {
       const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
