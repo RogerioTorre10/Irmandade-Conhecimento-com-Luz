@@ -222,11 +222,27 @@
       }
     };
 
-    console.log('[section-intro.js] Configurando evento de clique no botão');
-    // Adiciona uma pequena correção para garantir que o botão seja clicável após o "voltar"
+     console.log('[section-intro.js] Configurando evento de clique no botão');
+    // 1. Clonamos o botão para limpar quaisquer listeners internos remanescentes
     const freshBtn = btn.cloneNode(true);
     btn.replaceWith(freshBtn);
-    once(freshBtn, 'click', goNext);
+    
+    // 2. Agora, ligamos o evento de clique que chama a função de ação do CONTROLLER.
+    // Isso garante que o fluxo de eventos seja unificado pelo JC.
+    once(freshBtn, 'click', (e) => {
+        e.preventDefault();
+        console.log('[section-intro.js] Click detectado, delegando ação ao JC.');
+        if (window.JC?.handleButtonAction) {
+            // Chamamos a função do controlador diretamente.
+            // O ID da seção deve ser 'section-intro' e o botão deve ser o elemento clicado.
+            window.JC.handleButtonAction('section-intro', freshBtn); 
+        } else {
+            // Fallback se o JC não estiver disponível (menos provável)
+            window.JC?.goNext?.('section-termos');
+        }
+    });
+    // Garantir que o atributo data-action esteja presente, caso o JC dependa dele
+    freshBtn.setAttribute('data-action', 'avancar');
   };
 
   const bind = () => {
