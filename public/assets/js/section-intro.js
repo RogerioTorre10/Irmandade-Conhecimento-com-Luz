@@ -1,3 +1,4 @@
+```javascript
 (function () {
   'use strict';
 
@@ -5,8 +6,6 @@
   window.__introBound = true;
 
   let INTRO_READY = false;
-  let nomeDigitado = false;
-  let dadosGuiaCarregados = false;
 
   const once = (el, ev, fn) => {
     if (!el) {
@@ -37,11 +36,7 @@
         }
       });
 
-      observer.observe(within, {
-        childList: true,
-        subtree: true,
-        attributes: false
-      });
+      observer.observe(within, { childList: true, subtree: true });
 
       setTimeout(() => {
         observer.disconnect();
@@ -64,72 +59,21 @@
   function fromDetail(detail = {}) {
     const sectionId = detail.sectionId || detail.id || window.__currentSectionId;
     const node = detail.node || detail.root || null;
-    const name = detail.name || null;
-    return { sectionId, node, name };
+    return { sectionId, node };
   }
 
- // A condição está dentro da função 'checkReady' no seu section-intro.js
-
-// Localize a função checkReady no seu section-intro.js e substitua.
-// Agora ela não precisa de lógica de input de usuário.
-
-const checkReady = (btn) => {
-    // A única condição real é que o typing chain tenha terminado.
-    // O Typing chain chama showBtn, que chama checkReady.
-    
-    // Como o botão precisa ser ativado para que o usuário avance:
-    btn.disabled = false;
-    btn.classList.remove('disabled-temp');
-    btn.style.opacity = '1'; // Garante que a transparência suma.
-    btn.style.cursor = 'pointer'; 
-    console.log('[Guia Setup] Botão "Iniciar" ativado (Pronto para avançar).');
-};
-
-  async function loadAndSetupGuia(root, btn) {
-    const nameInput = root.querySelector('#name-input');
-    const guiaPlaceholder = root.querySelector('#guia-selfie-placeholder');
-
-    if (nameInput) {
-      nameInput.addEventListener('input', () => {
-        nomeDigitado = nameInput.value.trim().length > 2;
-        checkReady(btn);
-      });
-      nomeDigitado = nameInput.value.trim().length > 2;
+  const checkReady = (btn, nameInput) => {
+    const isNameValid = nameInput?.value.trim().length > 2;
+    if (isNameValid) {
+      btn.disabled = false;
+      btn.classList.remove('disabled-temp');
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
+      console.log('[section-intro.js] Botão "Iniciar" ativado (nome válido).');
+    } else {
+      console.log('[section-intro.js] Aguardando nome válido para ativar botão.');
     }
-
-    try {
-      console.log('[Guia Setup] Iniciando fetch para dados dos guias...');
-      const response = await fetch('/assets/data/guias.json');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status} - Verifique o caminho '/assets/data/guias.json'`);
-      }
-      const guias = await response.json();
-      console.log('[Guia Setup] Dados dos guias carregados com sucesso:', guias.length);
-
-      if (guiaPlaceholder && guias.length > 0) {
-        if (typeof window.JornadaGuiaSelfie?.renderSelector === 'function') {
-          window.JornadaGuiaSelfie.renderSelector(guiaPlaceholder, guias);
-          document.addEventListener('guiaSelected', (e) => {
-            console.log('[Intro] Guia selecionado. Verificando se pode avançar.');
-            dadosGuiaCarregados = true;
-            checkReady(btn);
-          }, { once: true });
-          dadosGuiaCarregados = false;
-        } else {
-          console.warn('[Guia Setup] Função de renderização do guia não encontrada. Avance sem seleção.');
-          dadosGuiaCarregados = true;
-        }
-      } else {
-        dadosGuiaCarregados = true;
-      }
-    } catch (err) {
-      console.error('[Guia Setup] Falha crítica no fetch dos guias. Verifique a URL e o JSON:', err);
-      window.toast?.('Falha ao carregar dados dos guias. Tente recarregar a página.', 'error');
-      dadosGuiaCarregados = true;
-    } finally {
-      checkReady(btn);
-    }
-  }
+  };
 
   const handler = async (evt) => {
     const { sectionId, node } = fromDetail(evt?.detail);
@@ -138,41 +82,38 @@ const checkReady = (btn) => {
 
     console.log('[section-intro.js] Ativando intro');
 
-    let root = node || document.getElementById('section-intro');
+    let root = node || document.getElementById('jornada-content-wrapper');
     if (!root) {
       try {
-        root = await waitForElement('#section-intro', { timeout: 8000 });
+        root = await waitForElement('#jornada-content-wrapper', { timeout: 10000 });
+        console.log('[section-intro.js] Root encontrado:', root.outerHTML.slice(0, 200) + '...');
       } catch {
-        root = document.querySelector('section[data-section="intro"]') || null;
+        console.error('[section-intro.js] Root da intro não encontrado');
+        window.toast?.('Intro ainda não montou no DOM.', 'error');
+        return;
       }
     }
-    if (!root) {
-      console.warn('[section-intro.js] Root da intro não encontrado (após espera)');
-      window.toast?.('Intro ainda não montou no DOM.', 'warn');
-      return;
-    }
 
-    let el1, el2, btn;
+    let el1, el2, btn, nameInput;
     try {
       el1 = await waitForElement('#intro-p1', { within: root, timeout: 5000 });
       el2 = await waitForElement('#intro-p2', { within: root, timeout: 5000 });
       btn = await waitForElement('#btn-avancar', { within: root, timeout: 5000 });
+      nameInput = await waitForElement('#name-input', { within: root, timeout: 5000 });
     } catch (e) {
       console.error('[section-intro.js] Falha ao esperar pelos elementos essenciais:', e);
       window.toast?.('Falha ao carregar a Introdução. Usando fallback.', 'error');
-      // Fallback: cria elementos básicos para evitar crash
-      el1 = el1 || root.appendChild(Object.assign(document.createElement('p'), { id: 'intro-p1', textContent: 'Bem-vindo à sua jornada!' }));
-      el2 = el2 || root.appendChild(Object.assign(document.createElement('p'), { id: 'intro-p2', textContent: 'Vamos começar?' }));
-      btn = btn || root.appendChild(Object.assign(document.createElement('button'), { id: 'btn-avancar', textContent: 'Avançar', className: 'hidden disabled-temp' }));
+      el1 = el1 || root.appendChild(Object.assign(document.createElement('div'), { id: 'intro-p1', textContent: 'Bem-vindo à sua jornada!', dataset: { typing: 'true' } }));
+      el2 = el2 || root.appendChild(Object.assign(document.createElement('div'), { id: 'intro-p2', textContent: 'Vamos começar?', dataset: { typing: 'true' } }));
+      btn = btn || root.appendChild(Object.assign(document.createElement('button'), { id: 'btn-avancar', textContent: 'Iniciar', className: 'hidden disabled-temp', disabled: true }));
+      nameInput = nameInput || root.appendChild(Object.assign(document.createElement('input'), { id: 'name-input', type: 'text', placeholder: 'Digite seu nome' }));
     }
 
-    console.log('[section-intro.js] Elementos encontrados:', { el1: !!el1, el2: !!el2, btn: !!btn });
+    console.log('[section-intro.js] Elementos encontrados:', { el1: !!el1, el2: !!el2, btn: !!btn, nameInput: !!nameInput });
 
     try {
       if (typeof window.JC?.show === 'function') {
         window.JC.show('section-intro');
-      } else if (typeof window.showSection === 'function') {
-        window.showSection('section-intro');
       } else {
         root.classList.remove('hidden');
         root.style.display = 'block';
@@ -186,11 +127,18 @@ const checkReady = (btn) => {
     btn.classList.add('hidden', 'disabled-temp');
     btn.disabled = true;
     const showBtn = () => {
-      console.log('[section-intro.js] Mostrando botão (aguardando dados/nome)');
+      console.log('[section-intro.js] Mostrando botão (aguardando nome)');
       btn.classList.remove('hidden');
       btn.style.display = 'inline-block';
-      checkReady(btn);
+      checkReady(btn, nameInput);
     };
+
+    if (nameInput) {
+      nameInput.addEventListener('input', () => checkReady(btn, nameInput));
+      checkReady(btn, nameInput);
+    } else {
+      showBtn();
+    }
 
     const speed1 = Number(el1.dataset.speed || 36);
     const speed2 = Number(el2.dataset.speed || 36);
@@ -202,7 +150,6 @@ const checkReady = (btn) => {
     if (INTRO_READY) {
       console.log('[section-intro.js] Intro já preparada');
       showBtn();
-      loadAndSetupGuia(root, btn);
       return;
     }
 
@@ -239,7 +186,6 @@ const checkReady = (btn) => {
     try {
       await runTypingChain();
       INTRO_READY = true;
-      await loadAndSetupGuia(root, btn);
     } catch (err) {
       console.warn('[section-intro.js] Typing chain falhou', err);
       el1.textContent = t1;
@@ -248,21 +194,18 @@ const checkReady = (btn) => {
       INTRO_READY = true;
     }
 
-   // 9) Navegação (CORRIGIDA)
-    const goNext = () => {
-      console.log('[section-intro.js] Botão clicado, avançando...');
-
-      // Se a escolha do guia e o nome estiverem OK, basta ir para a próxima seção na ordem do Controller.
-      try {
-        if (window.JC?.goNext) {
-          window.JC.goNext(); // Chama a próxima seção na ordem (section-termos)
-        } else if (typeof window.showSection === 'function') {
-          window.showSection('section-termos');
-        }
-      } catch (err) {
-        console.error('[section-intro.js] Erro ao avançar:', err);
-      }
-    };
+    const goNext = () => {
+      console.log('[section-intro.js] Botão clicado, avançando...');
+      try {
+        if (window.JC?.goNext) {
+          window.JC.goNext();
+        } else if (typeof window.showSection === 'function') {
+          window.showSection('section-termos');
+        }
+      } catch (err) {
+        console.error('[section-intro.js] Erro ao avançar:', err);
+      }
+    };
 
     console.log('[section-intro.js] Configurando evento de clique no botão');
     const freshBtn = btn.cloneNode(true);
@@ -276,8 +219,7 @@ const checkReady = (btn) => {
     document.addEventListener('sectionLoaded', handler, { passive: true });
     document.addEventListener('section:shown', handler, { passive: true });
     console.log('[section-intro.js] Handler ligado');
-
-    const visibleIntro = document.querySelector('#section-intro:not(.hidden)');
+    const visibleIntro = document.querySelector('#jornada-content-wrapper:not(.hidden)');
     if (visibleIntro) {
       handler({ detail: { sectionId: 'section-intro', node: visibleIntro } });
     }
