@@ -168,20 +168,31 @@
       }
 
       // 2. CORREÇÃO: Busca o elemento na div de conteúdo (#jornada-content-wrapper)
-      let target = document.getElementById(id) || document.getElementById('jornada-content-wrapper')?.querySelector(`#${id}`);
-      
-      // Se ainda não encontrou, cria o fallback
-      if (!target) {
-        // Se a seção for injetada diretamente no canvas, procuramos lá
-        target = document.getElementById('jornada-canvas')?.querySelector(`#${id}`);
+      try {
+      if (window.carregarEtapa) { 
+        await window.carregarEtapa(loaderName); 
+        window.i18n?.apply?.(); 
+      } else {
+        console.error('[JC.show] Função carregarEtapa não encontrada.');
       }
       
-       if (!target) { // Verifica se ainda não encontramos
-        target = createFallbackElement(id); // Cria o fallback (o que está acontecendo)
+      // MUDANÇA: Implementa um loop de espera DOM para evitar o fallback
+      let target = document.getElementById(id) || document.getElementById('jornada-content-wrapper')?.querySelector(`#${id}`);
+      let attempts = 0;
+      const MAX_ATTEMPTS = 50; 
+
+      while (!target && attempts < MAX_ATTEMPTS) {
+          await new Promise(r => setTimeout(r, 10)); // Espera 10ms
+          target = document.getElementById(id) || document.getElementById('jornada-content-wrapper')?.querySelector(`#${id}`);
+          attempts++;
+      }
+      
+      if (!target) {
+        target = createFallbackElement(id);
         window.toast?.(`Seção ${id} não encontrada. Usando fallback.`, 'error');
       } 
-            
-      // Esconde a seção anterior
+      
+      // Esconde a seção anterior se houver
       const previousSection = document.getElementById(global.__currentSectionId);
       if (previousSection && previousSection.id !== id) {
           previousSection.classList?.add(HIDE_CLASS);
