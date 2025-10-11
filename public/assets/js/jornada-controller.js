@@ -54,13 +54,7 @@
       el.style.visibility = 'visible';
       if (typeof global.runTyping === 'function') {
         global.runTyping(el, el.getAttribute('data-text') || el.textContent, () => {
-          // Nota: a lógica de botão desabilitado deve ser gerenciada pelo script da seção
-          // (ex: section-intro.js ou section-guia.js) e não pelo controlador geral.
-          // Comentado para evitar conflito com a lógica específica da seção.
-          /*
-          const btn = target.querySelector('[data-action="avancar"], .btn-avancar, .btn');
-          if (btn && btn.disabled) btn.disabled = false;
-          */
+          // Lógica de ativação do botão removida para ser gerenciada pelo script da seção
         });
       } else {
         el.classList.add('typing-done');
@@ -73,7 +67,7 @@
 
   // Eventos de clique
   function attachButtonEvents(id, target) {
-    const btns = target.querySelectorAll('[data-action], .btn-avancar, .btn, #iniciar, #btnSkipSelfie, #btnStartJourney, #previewBtn, #captureBtn, #grok-chat-send');
+    const btns = target.querySelectorAll('[data-action], .btn-avancar, .btn, #iniciar, #btnSkipSelfie, #btnStartJourney, #previewBtn, #captureBtn, #grok-chat-send, #btn-selecionar-guia, #btn-skip-guia');
 
     btns.forEach(btn => {
       if (!btn.dataset.clickAttached) {
@@ -90,13 +84,14 @@
   function handleButtonAction(id, btn) {
     const action = btn.dataset.action;
 
-    // Lógica para section-termos
+    // Lógica para section-termos (Navegação interna e avanço)
     if (id === 'section-termos') {
       if (action === 'termos-next' && currentTermosPage === 'termos-pg1') {
         document.getElementById('termos-pg1')?.classList.add(HIDE_CLASS);
         document.getElementById('termos-pg2')?.classList.remove(HIDE_CLASS);
         currentTermosPage = 'termos-pg2';
-        JC.show(id);
+        // Chama show para re-exibir a seção e aplicar lógica/typing na nova página
+        JC.show(id); 
       } else if (action === 'termos-prev' && currentTermosPage === 'termos-pg2') {
         document.getElementById('termos-pg2')?.classList.add(HIDE_CLASS);
         document.getElementById('termos-pg1')?.classList.remove(HIDE_CLASS);
@@ -109,7 +104,7 @@
     } else if (
         (id === 'section-intro' && action === 'avancar') ||
         (id === 'section-senha' && action === 'avancar') ||
-        (id === 'section-guia' && (btn.id === 'btn-selecionar-guia' || btn.id === 'btn-skip-guia')) // Incluído seção-guia
+        (id === 'section-guia' && (btn.id === 'btn-selecionar-guia' || btn.id === 'btn-skip-guia'))
     ) {
       JC.goNext(); 
     // Lógica para seções com ações customizadas
@@ -119,7 +114,6 @@
       global.JGuiaSelfie?.saveAnswers();
       global.JSecoes?.goNext();
     } else {
-      // Fallback para qualquer outro botão sem ação específica (pode ser perigoso, mas mantém o comportamento original)
       JC.goNext();
     }
   }
@@ -135,7 +129,6 @@
     const currentId = global.__currentSectionId;
     const idx = sectionOrder.indexOf(currentId);
     if (idx >= 0 && idx < sectionOrder.length - 1) {
-      // Adicionado um pequeno atraso para permitir a transição visual
       setTimeout(() => {
          JC.show(sectionOrder[idx + 1]);
       }, 50); 
@@ -167,19 +160,23 @@
 
     try {
       if (window.carregarEtapa) { 
+        // 1. CARREGA E INJETA O HTML
         await window.carregarEtapa(loaderName); 
         window.i18n?.apply?.(); 
       } else {
         console.error('[JC.show] Função carregarEtapa não encontrada.');
       }
 
-      let target = document.getElementById(id);
+      // 2. CORREÇÃO: Busca o elemento na div de conteúdo (#jornada-content-wrapper)
+      let target = document.getElementById(id) || document.getElementById('jornada-content-wrapper')?.querySelector(`#${id}`);
+      
+      // Se ainda não encontrou, cria o fallback
       if (!target) {
         target = createFallbackElement(id);
         window.toast?.(`Seção ${id} não encontrada. Usando fallback.`, 'error');
       } 
       
-      // Esconde a seção anterior se houver
+      // Esconde a seção anterior
       const previousSection = document.getElementById(global.__currentSectionId);
       if (previousSection && previousSection.id !== id) {
           previousSection.classList?.add(HIDE_CLASS);
@@ -217,19 +214,19 @@
     if (controllerInitialized) return;
     controllerInitialized = true;
 
-    // ORDEM DAS SEÇÕES CORRIGIDA
+    // ORDEM DAS SEÇÕES MANTIDA CORRETA
     if (!sectionOrder.length) {
       JC.setOrder([
-        'section-intro',          // 1. Apresentação (Limpa, sem guia)
-        'section-termos',         // 2. Termos de uso
-        'section-senha',          // 3. Senha (se houver)
-        'section-filme-jardim',   // 4. Primeiro filme
-        'section-guia',           // 5. SELEÇÃO DO GUIA (POSIÇÃO CORRIGIDA)
-        'section-selfie',         // 6. Selfie (Guia já escolhido)
-        'section-filme-ao-encontro', // 7. Próximo filme
-        'section-perguntas',      // 8. Seção de perguntas dinâmicas
-        'section-filme-jardim',   // 9. Filme intermediário/final (MANTIDO)
-        'section-final'           // 10. Final e PDF
+        'section-intro',          
+        'section-termos',         
+        'section-senha',          
+        'section-filme-jardim',   
+        'section-guia',           
+        'section-selfie',         
+        'section-filme-ao-encontro', 
+        'section-perguntas',      
+        'section-filme-jardim',   
+        'section-final'           
       ]);
     }
 
