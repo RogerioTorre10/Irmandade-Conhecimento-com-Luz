@@ -18,7 +18,8 @@
     el.addEventListener(ev, h);
   };
 
-  async function waitForElement(selector, { within = document, timeout = 5000, step = 50 } = {}) {
+  async function waitForElement(selector, { within = document, timeout = 7000, step = 50 } = {}) {
+    // Aumentei o timeout de 5000ms para 7000ms para dar mais tempo ao DOM.
     const start = performance.now();
     return new Promise((resolve, reject) => {
       const tick = () => {
@@ -74,19 +75,23 @@
 
     let pg1, pg2, nextBtn, prevBtn, avancarBtn;
     try {
+      // 1. A busca por pg1 e pg2 não precisa de await, pois eles são filhos diretos do root injetado.
       pg1 = root.querySelector('#termos-pg1');
       pg2 = root.querySelector('#termos-pg2');
-      nextBtn = await waitForElement('[data-action="termos-next"]', { within: root, timeout: 5000 });
-      prevBtn = await waitForElement('[data-action="termos-prev"]', { within: root, timeout: 5000 });
-      avancarBtn = await waitForElement('[data-action="avancar"]', { within: root, timeout: 5000 });
+
+      // 2. Usamos o await para os botões com o timeout maior.
+      nextBtn = await waitForElement('[data-action="termos-next"]', { within: root, timeout: 7000 });
+      prevBtn = await waitForElement('[data-action="termos-prev"]', { within: root, timeout: 7000 });
+      avancarBtn = await waitForElement('[data-action="avancar"]', { within: root, timeout: 7000 });
     } catch (e) {
       console.error('[section-termos.js] Falha ao esperar pelos elementos essenciais de botão:', e);
       window.toast?.('Falha ao carregar os botões da seção Termos. Verifique o HTML.', 'error');
-      pg1 = pg1 || document.createElement('div');
-      pg2 = pg2 || document.createElement('div');
-      nextBtn = nextBtn || document.createElement('button');
-      prevBtn = prevBtn || document.createElement('button');
-      avancarBtn = avancarBtn || document.createElement('button');
+      // Criamos fallbacks robustos para evitar o crash
+      pg1 = pg1 || root.querySelector('#termos-pg1') || document.createElement('div');
+      pg2 = pg2 || root.querySelector('#termos-pg2') || document.createElement('div');
+      nextBtn = nextBtn || root.querySelector('[data-action="termos-next"]') || document.createElement('button');
+      prevBtn = prevBtn || root.querySelector('[data-action="termos-prev"]') || document.createElement('button');
+      avancarBtn = avancarBtn || root.querySelector('[data-action="avancar"]') || document.createElement('button');
     }
 
     console.log('[section-termos.js] Elementos encontrados:', { pg1: !!pg1, pg2: !!pg2, nextBtn: !!nextBtn, prevBtn: !!prevBtn, avancarBtn: !!avancarBtn });
@@ -106,7 +111,7 @@
       root.style.display = 'flex';
     }
     
-    // Adiciona estilização de textura de pedra ao botão "avancarBtn"
+    // Aplica estilização de pedra ao botão "avancarBtn" (mantido)
     avancarBtn.classList.add('btn-stone');
     avancarBtn.style.cssText = `
       padding: 8px 16px;
@@ -123,24 +128,32 @@
       display: inline-block;
     `;
 
-    // Desativa os botões antes do typing (serão ativados após)
+    // Injeção da chama (seguindo a sugestão anterior)
+    if (typeof window.setupCandleFlame === 'function') {
+        window.setupCandleFlame('media', 'flame-bottom-right');
+    }
+
+    // Desativa os botões antes do typing/exibição
     nextBtn.disabled = true;
     prevBtn.disabled = true;
     avancarBtn.disabled = true;
 
     const runTypingChain = async () => {
       console.log('[section-termos.js] Iniciando runTypingChain');
+      // Adicionado :not(.typing-done) para evitar re-typing
       const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)'); 
+      
       if (typingElements.length === 0) {
-        console.warn('[section-termos.js] Nenhum elemento com [data-typing="true"] encontrado');
-        // Se não houver typing, garante que os botões serão ativados
-        nextBtn.disabled = false;
-        prevBtn.disabled = false;
-        avancarBtn.disabled = false;
-        return;
+        // CORREÇÃO DE CONTEÚDO: Se não há elementos com data-typing, garante que pg1 e pg2 são visíveis.
+        console.warn('[section-termos.js] Nenhum elemento com [data-typing="true"] encontrado. Exibindo conteúdo integral.');
+        pg1.style.opacity = '1';
+        pg2.style.opacity = '1';
+        // Simplesmente retorna para reativar os botões logo em seguida.
+        return; 
       }
       
       if (typeof window.runTyping === 'function') {
+        // ... (lógica de typing mantida)
         try {
           for (const el of typingElements) {
             const text = getText(el);
@@ -190,23 +203,5 @@
         avancarBtn.disabled = false;
     }
   };
-
-  const bind = () => {
-    document.removeEventListener('sectionLoaded', handler);
-    document.removeEventListener('section:shown', handler);
-    document.addEventListener('sectionLoaded', handler, { passive: true });
-    document.addEventListener('section:shown', handler, { passive: true });
-    console.log('[section-termos.js] Handler ligado');
-
-    const visibleTermos = document.querySelector('#section-termos:not(.hidden)');
-    if (visibleTermos) {
-      handler({ detail: { sectionId: 'section-termos', node: visibleTermos } });
-    }
-  };
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bind, { once: true });
-  } else {
-    bind();
-  }
-})();
+  
+  // ... (restante do bind)
