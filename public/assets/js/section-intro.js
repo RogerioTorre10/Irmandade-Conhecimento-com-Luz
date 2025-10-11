@@ -1,12 +1,11 @@
 (function () {
   'use strict';
 
+  // Verifica se o script já foi vinculado para evitar duplicidade
   if (window.__introBound) return;
   window.__introBound = true;
 
   let INTRO_READY = false;
-  let nomeDigitado = false;
-  let dadosGuiaCarregados = false;
 
   const once = (el, ev, fn) => {
     if (!el) {
@@ -68,62 +67,7 @@
     return { sectionId, node, name };
   }
 
-  const checkReady = (btn) => {
-    if (nomeDigitado && dadosGuiaCarregados) {
-      btn.disabled = false;
-      btn.classList.remove('disabled-temp');
-      console.log('[Guia Setup] Botão "Iniciar" ativado.');
-    } else {
-      btn.disabled = true;
-      btn.classList.add('disabled-temp');
-    }
-  };
-
-  async function loadAndSetupGuia(root, btn) {
-    const nameInput = root.querySelector('#name-input');
-    const guiaPlaceholder = root.querySelector('#guia-selfie-placeholder');
-
-    if (nameInput) {
-      nameInput.addEventListener('input', () => {
-        nomeDigitado = nameInput.value.trim().length > 2;
-        checkReady(btn);
-      });
-      nomeDigitado = nameInput.value.trim().length > 2;
-    }
-
-    try {
-      console.log('[Guia Setup] Iniciando fetch para dados dos guias...');
-      const response = await fetch('/assets/data/guias.json');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status} - Verifique o caminho '/assets/data/guias.json'`);
-      }
-      const guias = await response.json();
-      console.log('[Guia Setup] Dados dos guias carregados com sucesso:', guias.length);
-
-      if (guiaPlaceholder && guias.length > 0) {
-        if (typeof window.JornadaGuiaSelfie?.renderSelector === 'function') {
-          window.JornadaGuiaSelfie.renderSelector(guiaPlaceholder, guias);
-          document.addEventListener('guiaSelected', (e) => {
-            console.log('[Intro] Guia selecionado. Verificando se pode avançar.');
-            dadosGuiaCarregados = true;
-            checkReady(btn);
-          }, { once: true });
-          dadosGuiaCarregados = false;
-        } else {
-          console.warn('[Guia Setup] Função de renderização do guia não encontrada. Avance sem seleção.');
-          dadosGuiaCarregados = true;
-        }
-      } else {
-        dadosGuiaCarregados = true;
-      }
-    } catch (err) {
-      console.error('[Guia Setup] Falha crítica no fetch dos guias. Verifique a URL e o JSON:', err);
-      window.toast?.('Falha ao carregar dados dos guias. Tente recarregar a página.', 'error');
-      dadosGuiaCarregados = true;
-    } finally {
-      checkReady(btn);
-    }
-  }
+  // A função checkReady e loadAndSetupGuia foram removidas desta seção.
 
   const handler = async (evt) => {
     const { sectionId, node } = fromDetail(evt?.detail);
@@ -133,6 +77,7 @@
     console.log('[section-intro.js] Ativando intro');
 
     let root = node || document.getElementById('section-intro');
+    // ... (restante da lógica de carregamento do root e dos elementos el1, el2, btn)
     if (!root) {
       try {
         root = await waitForElement('#section-intro', { timeout: 8000 });
@@ -157,12 +102,12 @@
       // Fallback: cria elementos básicos para evitar crash
       el1 = el1 || root.appendChild(Object.assign(document.createElement('p'), { id: 'intro-p1', textContent: 'Bem-vindo à sua jornada!' }));
       el2 = el2 || root.appendChild(Object.assign(document.createElement('p'), { id: 'intro-p2', textContent: 'Vamos começar?' }));
-      btn = btn || root.appendChild(Object.assign(document.createElement('button'), { id: 'btn-avancar', textContent: 'Avançar', className: 'hidden disabled-temp' }));
+      btn = btn || root.appendChild(Object.assign(document.createElement('button'), { id: 'btn-avancar', textContent: 'Avançar', className: 'hidden' })); // Removido disabled-temp no fallback
     }
 
     console.log('[section-intro.js] Elementos encontrados:', { el1: !!el1, el2: !!el2, btn: !!btn });
 
-    // Aplica textura de pedra ao botão
+    // Aplica textura de pedra ao botão (mantido, pois é apenas estilo)
     btn.classList.add('btn-stone');
     btn.style.cssText = `
       padding: 8px 16px;
@@ -193,13 +138,15 @@
       root.style.display = 'block';
     }
 
-    btn.classList.add('hidden', 'disabled-temp');
-    btn.disabled = true;
+    // O botão fica oculto até o typing chain terminar
+    btn.classList.add('hidden');
+    btn.disabled = false; // O botão não precisa mais de desabilitação condicional
     const showBtn = () => {
-      console.log('[section-intro.js] Mostrando botão (aguardando dados/nome)');
+      console.log('[section-intro.js] Mostrando botão "Avançar"');
       btn.classList.remove('hidden');
+      btn.classList.remove('disabled-temp'); // Caso tenha sobrado
       btn.style.display = 'inline-block';
-      checkReady(btn);
+      btn.disabled = false;
     };
 
     const speed1 = Number(el1.dataset.speed || 36);
@@ -212,7 +159,7 @@
     if (INTRO_READY) {
       console.log('[section-intro.js] Intro já preparada');
       showBtn();
-      loadAndSetupGuia(root, btn);
+      // loadAndSetupGuia(root, btn); // REMOVIDO
       return;
     }
 
@@ -249,7 +196,7 @@
     try {
       await runTypingChain();
       INTRO_READY = true;
-      await loadAndSetupGuia(root, btn);
+      // await loadAndSetupGuia(root, btn); // REMOVIDO
     } catch (err) {
       console.warn('[section-intro.js] Typing chain falhou', err);
       el1.textContent = t1;
@@ -259,6 +206,7 @@
     }
 
     const goNext = () => {
+      // O AVANÇAR AGORA ESTÁ SEMPRE LIBERADO APÓS O TYPING
       console.log('[section-intro.js] Botão clicado, navegando para section-termos');
       if (typeof window.__canNavigate === 'function' && !window.__canNavigate()) return;
 
@@ -275,6 +223,7 @@
     };
 
     console.log('[section-intro.js] Configurando evento de clique no botão');
+    // Adiciona uma pequena correção para garantir que o botão seja clicável após o "voltar"
     const freshBtn = btn.cloneNode(true);
     btn.replaceWith(freshBtn);
     once(freshBtn, 'click', goNext);
