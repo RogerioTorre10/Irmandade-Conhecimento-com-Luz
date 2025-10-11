@@ -7,10 +7,7 @@
   let TERMOS_READY = false;
 
   const once = (el, ev, fn) => {
-    if (!el) {
-      console.warn('[section-termos.js] Elemento para evento não encontrado:', ev);
-      return;
-    }
+    if (!el) return;
     const h = (e) => {
       el.removeEventListener(ev, h);
       fn(e);
@@ -19,23 +16,15 @@
   };
 
   async function waitForElement(selector, { within = document, timeout = 7000, step = 50 } = {}) {
-    // Aumentei o timeout de 5000ms para 7000ms para dar mais tempo ao DOM.
     const start = performance.now();
     return new Promise((resolve, reject) => {
       const tick = () => {
         let el = within.querySelector(selector);
-        
         if (!el && within !== document) {
           el = document.querySelector(`#jornada-content-wrapper ${selector}`);
         }
-        
-        if (el) {
-          console.log(`[waitForElement] Elemento ${selector} encontrado!`);
-          return resolve(el);
-        }
-        
+        if (el) return resolve(el);
         if (performance.now() - start >= timeout) {
-          console.error(`[waitForElement] Timeout após ${timeout}ms para ${selector}`);
           return reject(new Error(`timeout waiting ${selector}`));
         }
         setTimeout(tick, step);
@@ -56,18 +45,13 @@
 
   const handler = async (evt) => {
     const { sectionId, node } = fromDetail(evt?.detail);
-    console.log('[section-termos.js] Evento recebido:', { sectionId, hasNode: !!node });
     if (sectionId !== 'section-termos') return;
-
-    console.log('[section-termos.js] Ativando termos');
 
     let root = node || document.getElementById('section-termos');
     if (!root) {
       try {
         root = await waitForElement('#section-termos', { within: document.getElementById('jornada-content-wrapper') || document, timeout: 10000 });
-        console.log('[section-termos.js] Root encontrado:', root.outerHTML.slice(0, 200) + '...');
       } catch (e) {
-        console.error('[section-termos.js] Root da termos não encontrado:', e);
         window.toast?.('Erro: Seção section-termos não carregada.', 'error');
         return;
       }
@@ -75,18 +59,13 @@
 
     let pg1, pg2, nextBtn, prevBtn, avancarBtn;
     try {
-      // 1. A busca por pg1 e pg2 não precisa de await, pois eles são filhos diretos do root injetado.
       pg1 = root.querySelector('#termos-pg1');
       pg2 = root.querySelector('#termos-pg2');
-
-      // 2. Usamos o await para os botões com o timeout maior.
-      nextBtn = await waitForElement('[data-action="termos-next"]', { within: root, timeout: 7000 });
-      prevBtn = await waitForElement('[data-action="termos-prev"]', { within: root, timeout: 7000 });
-      avancarBtn = await waitForElement('[data-action="avancar"]', { within: root, timeout: 7000 });
+      nextBtn = await waitForElement('[data-action="termos-next"]', { within: root });
+      prevBtn = await waitForElement('[data-action="termos-prev"]', { within: root });
+      avancarBtn = await waitForElement('[data-action="avancar"]', { within: root });
     } catch (e) {
-      console.error('[section-termos.js] Falha ao esperar pelos elementos essenciais de botão:', e);
-      window.toast?.('Falha ao carregar os botões da seção Termos. Verifique o HTML.', 'error');
-      // Criamos fallbacks robustos para evitar o crash
+      window.toast?.('Falha ao carregar os botões da seção Termos.', 'error');
       pg1 = pg1 || root.querySelector('#termos-pg1') || document.createElement('div');
       pg2 = pg2 || root.querySelector('#termos-pg2') || document.createElement('div');
       nextBtn = nextBtn || root.querySelector('[data-action="termos-next"]') || document.createElement('button');
@@ -94,24 +73,18 @@
       avancarBtn = avancarBtn || root.querySelector('[data-action="avancar"]') || document.createElement('button');
     }
 
-    console.log('[section-termos.js] Elementos encontrados:', { pg1: !!pg1, pg2: !!pg2, nextBtn: !!nextBtn, prevBtn: !!prevBtn, avancarBtn: !!avancarBtn });
-
     try {
       if (typeof window.JC?.show === 'function') {
         window.JC.show('section-termos');
-      } else if (typeof window.showSection === 'function') {
-        window.showSection('section-termos');
       } else {
         root.classList.remove('hidden');
         root.style.display = 'flex';
       }
     } catch (err) {
-      console.warn('[section-termos.js] Falha ao exibir seção:', err);
       root.classList.remove('hidden');
       root.style.display = 'flex';
     }
-    
-    // Aplica estilização de pedra ao botão "avancarBtn" (mantido)
+
     avancarBtn.classList.add('btn-stone');
     avancarBtn.style.cssText = `
       padding: 8px 16px;
@@ -128,98 +101,79 @@
       display: inline-block;
     `;
 
-    // Injeção da chama (seguindo a sugestão anterior)
     if (typeof window.setupCandleFlame === 'function') {
-        window.setupCandleFlame('media', 'flame-bottom-right');
+      window.setupCandleFlame('media', 'flame-bottom-right');
     }
 
-    // Desativa os botões antes do typing/exibição
     nextBtn.disabled = true;
     prevBtn.disabled = true;
     avancarBtn.disabled = true;
 
     const runTypingChain = async () => {
-      console.log('[section-termos.js] Iniciando runTypingChain');
-      // Adicionado :not(.typing-done) para evitar re-typing
-      const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)'); 
-      
-      if (typingElements.length === 0) {
-        // CORREÇÃO DE CONTEÚDO: Se não há elementos com data-typing, garante que pg1 e pg2 são visíveis.
-        console.warn('[section-termos.js] Nenhum elemento com [data-typing="true"] encontrado. Exibindo conteúdo integral.');
-        pg1.style.opacity = '1';
-        pg2.style.opacity = '1';
-        // Simplesmente retorna para reativar os botões logo em seguida.
-        return; 
+      const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
+      if (typingElements.length === 0 || typeof window.runTyping !== 'function') {
+        typingElements.forEach(el => {
+          el.textContent = getText(el);
+          el.classList.add('typing-done');
+        });
+        nextBtn.disabled = false;
+        prevBtn.disabled = false;
+        avancarBtn.disabled = false;
+        return;
       }
-      
-      if (typeof window.runTyping === 'function') {
-        // ... (lógica de typing mantida)
-        try {
-          for (const el of typingElements) {
-            const text = getText(el);
-            el.textContent = '';
-            el.classList.add('typing-active');
-            await new Promise((resolve) => {
-              window.runTyping(el, text, resolve, { speed: Number(el.dataset.speed || 40), cursor: String(el.dataset.cursor || 'true') === 'true' });
+
+      try {
+        for (const el of typingElements) {
+          const text = getText(el);
+          el.textContent = '';
+          el.classList.add('typing-active');
+          await new Promise((resolve) => {
+            window.runTyping(el, text, resolve, {
+              speed: Number(el.dataset.speed || 40),
+              cursor: String(el.dataset.cursor || 'true') === 'true'
             });
-            el.classList.add('typing-done');
-            console.log(`[section-termos.js] Typing concluído para ${el.tagName}${el.id ? '#' + el.id : ''}`);
-          }
-        } catch (err) {
-          console.warn('[section-termos.js] Erro no runTyping:', err);
-          typingElements.forEach(el => {
-            el.textContent = getText(el);
-            el.classList.add('typing-done');
           });
+          el.classList.add('typing-done');
         }
-      } else {
-        console.log('[section-termos.js] Fallback: sem efeitos');
+      } catch (err) {
         typingElements.forEach(el => {
           el.textContent = getText(el);
           el.classList.add('typing-done');
         });
       }
-      
-      // Reativa os botões após o typing
+
       nextBtn.disabled = false;
       prevBtn.disabled = false;
       avancarBtn.disabled = false;
     };
 
     if (!TERMOS_READY) {
-        try {
-            await runTypingChain();
-            TERMOS_READY = true;
-        } catch (err) {
-            console.warn('[section-termos.js] Typing chain falhou', err);
-            nextBtn.disabled = false;
-            prevBtn.disabled = false;
-            avancarBtn.disabled = false;
-        }
-    } else {
-        console.log('[section-termos.js] Termos já preparado, reativando botões.');
+      try {
+        await runTypingChain();
+        TERMOS_READY = true;
+      } catch (err) {
         nextBtn.disabled = false;
         prevBtn.disabled = false;
         avancarBtn.disabled = false;
+      }
+    } else {
+      nextBtn.disabled = false;
+      prevBtn.disabled = false;
+      avancarBtn.disabled = false;
     }
   };
-   
-    const bind = () => {
+
+  const bind = () => {
     document.removeEventListener('sectionLoaded', handler);
     document.removeEventListener('section:shown', handler);
-    // Remove o listener 'section:shown' para evitar ativação dupla e rápida do handler
     document.addEventListener('sectionLoaded', handler, { passive: true });
-    
-    console.log('[section-termos.js] Handler ligado');
-    
-    // NOVO: Adiciona um pequeno atraso para dar tempo ao JC de inicializar TUDO
+
     setTimeout(() => {
-        const visibleTermos = document.querySelector('#section-termos:not(.hidden)');
-        if (visibleTermos) {
-             console.log('[section-termos.js] Disparando handler com atraso.');
-             handler({ detail: { sectionId: 'section-termos', node: visibleTermos } });
-        }
-    }, 100); // 100ms de atraso
+      const visibleTermos = document.querySelector('#section-termos:not(.hidden)');
+      if (visibleTermos) {
+        handler({ detail: { sectionId: 'section-termos', node: visibleTermos } });
+      }
+    }, 100);
   };
 
   if (document.readyState === 'loading') {
@@ -227,4 +181,4 @@
   } else {
     bind();
   }
-})(); 
+})();
