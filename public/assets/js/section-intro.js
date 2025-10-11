@@ -88,61 +88,7 @@
     }
     */
   };
-
-  async function loadAndSetupGuia(root, btn) {
-    const nameInput = root.querySelector('#name-input');
-    const guiaPlaceholder = root.querySelector('#guia-selfie-placeholder');
-
-    console.log('[loadAndSetupGuia] Elementos:', { nameInput: !!nameInput, guiaPlaceholder: !!guiaPlaceholder });
-
-    if (nameInput) {
-      nameInput.addEventListener('input', () => {
-        nomeDigitado = nameInput.value.trim().length > 2;
-        console.log('[loadAndSetupGuia] Nome digitado:', nameInput.value, 'nomeDigitado:', nomeDigitado);
-        checkReady(btn);
-      });
-      nomeDigitado = nameInput.value.trim().length > 2;
-      console.log('[loadAndSetupGuia] Estado inicial do nome:', nameInput.value, 'nomeDigitado:', nomeDigitado);
-    } else {
-      console.warn('[loadAndSetupGuia] #name-input não encontrado');
-    }
-
-    try {
-      console.log('[Guia Setup] Iniciando fetch para dados dos guias...');
-      const response = await fetch('/assets/data/guias.json');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status} - Verifique o caminho '/assets/data/guias.json'`);
-      }
-      const guias = await response.json();
-      console.log('[Guia Setup] Dados dos guias carregados com sucesso:', guias.length);
-
-      if (guiaPlaceholder && guias.length > 0) {
-        if (typeof window.JornadaGuiaSelfie?.renderSelector === 'function') {
-          window.JornadaGuiaSelfie.renderSelector(guiaPlaceholder, guias);
-          document.addEventListener('guiaSelected', (e) => {
-            console.log('[Intro] Guia selecionado. Verificando se pode avançar.');
-            dadosGuiaCarregados = true;
-            checkReady(btn);
-          }, { once: true });
-          dadosGuiaCarregados = false;
-          console.log('[loadAndSetupGuia] Aguardando evento guiaSelected');
-        } else {
-          console.warn('[Guia Setup] Função de renderização do guia não encontrada. Avance sem seleção.');
-          dadosGuiaCarregados = true;
-          checkReady(btn);
-        }
-      } else {
-        console.warn('[loadAndSetupGuia] Nenhum guia disponível ou placeholder ausente. Prosseguindo.');
-        dadosGuiaCarregados = true;
-        checkReady(btn);
-      }
-    } catch (err) {
-      console.error('[Guia Setup] Falha crítica no fetch dos guias. Verifique a URL e o JSON:', err);
-      window.toast?.('Falha ao carregar dados dos guias. Tente recarregar a página.', 'error');
-      dadosGuiaCarregados = true;
-      checkReady(btn);
-    }
-  }
+ 
 
   const handler = async (evt) => {
     const { sectionId, node } = fromDetail(evt?.detail);
