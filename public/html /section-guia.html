@@ -1,16 +1,13 @@
-<section id="section-guia" data-section="guia" class="section">
-    <div class="guia-wrap">
-        <h2 data-typing data-text="O Encontro: Crie sua Selfie com o Guia.">
-            O Encontro: Crie sua Selfie com o Guia.
-        </h2>
-        <div id="card-guide" class="selfie-card">
-            </div>
-
-        <div class="selfie-controls">
-            <input type="file" id="selfieInput" accept="image/*">
-            <button id="captureBtn" class="btn btn-primary" data-action="capture">Gerar Imagem</button>
-            <button id="btnSkipSelfie" class="btn btn-secondary" data-action="skip-selfie">Pular e Continuar</button>
-        </div>
-        <div id="selfieError" style="display:none; color: red;">Erro ao processar imagem.</div>
+<div id="jornada-content-wrapper">
+  <div class="guia-wrap">
+    <h2 data-typing="true" data-text="Escolha seu Guia para a Jornada" data-speed="40" data-cursor="true">
+      Escolha seu Guia para a Jornada
+    </h2>
+    <div id="guia-selector" class="guia-selecao"></div>
+    <div class="guia-actions">
+      <button id="btn-selecionar-guia" class="btn btn-primary" data-action="selecionar-guia" disabled>Selecionar Guia</button>
+      <button id="btn-skip-guia" class="btn btn-secondary" data-action="skip-guia">Pular e Continuar</button>
     </div>
-</section>
+    <div id="guia-error" style="display:none; color: red;">Erro ao carregar guias.</div>
+  </div>
+</div>
