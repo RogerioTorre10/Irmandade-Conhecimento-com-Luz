@@ -21,28 +21,27 @@
   async function waitForElement(selector, { within = document, timeout = 5000, step = 50 } = {}) {
     const start = performance.now();
     return new Promise((resolve, reject) => {
-        const tick = () => {
-            let el = within.querySelector(selector);
-            
-            // O FALLBACK GLOBAL QUE VENCEU O CONFLITO DA INTRODUÇÃO
-            if (!el && within !== document) {
-                el = document.querySelector(`#jornada-content-wrapper ${selector}`);
-            }
-            
-            if (el) {
-                console.log(`[waitForElement] Elemento ${selector} encontrado!`);
-                return resolve(el);
-            }
-            
-            if (performance.now() - start >= timeout) {
-                console.error(`[waitForElement] Timeout após ${timeout}ms para ${selector}`);
-                return reject(new Error(`timeout waiting ${selector}`));
-            }
-            setTimeout(tick, step);
-        };
-        tick();
+      const tick = () => {
+        let el = within.querySelector(selector);
+        
+        if (!el && within !== document) {
+          el = document.querySelector(`#jornada-content-wrapper ${selector}`);
+        }
+        
+        if (el) {
+          console.log(`[waitForElement] Elemento ${selector} encontrado!`);
+          return resolve(el);
+        }
+        
+        if (performance.now() - start >= timeout) {
+          console.error(`[waitForElement] Timeout após ${timeout}ms para ${selector}`);
+          return reject(new Error(`timeout waiting ${selector}`));
+        }
+        setTimeout(tick, step);
+      };
+      tick();
     });
-}
+  }
 
   function getText(el) {
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
@@ -51,8 +50,7 @@
   function fromDetail(detail = {}) {
     const sectionId = detail.sectionId || detail.id || window.__currentSectionId;
     const node = detail.node || detail.root || null;
-    const name = detail.name || null;
-    return { sectionId, node, name };
+    return { sectionId, node };
   }
 
   const handler = async (evt) => {
@@ -76,19 +74,19 @@
 
     let pg1, pg2, nextBtn, prevBtn, avancarBtn;
     try {
-      pg1 = await waitForElement('#termos-pg1', { within: root, timeout: 5000 });
-      pg2 = await waitForElement('#termos-pg2', { within: root, timeout: 5000 });
+      pg1 = root.querySelector('#termos-pg1');
+      pg2 = root.querySelector('#termos-pg2');
       nextBtn = await waitForElement('[data-action="termos-next"]', { within: root, timeout: 5000 });
       prevBtn = await waitForElement('[data-action="termos-prev"]', { within: root, timeout: 5000 });
       avancarBtn = await waitForElement('[data-action="avancar"]', { within: root, timeout: 5000 });
     } catch (e) {
-      console.error('[section-termos.js] Falha ao esperar pelos elementos essenciais:', e);
-      window.toast?.('Falha ao carregar a seção Termos. Verifique o HTML.', 'error');
-      pg1 = root.querySelector('#termos-pg1') || document.createElement('div');
-      pg2 = root.querySelector('#termos-pg2') || document.createElement('div');
-      nextBtn = root.querySelector('[data-action="termos-next"]') || document.createElement('button');
-      prevBtn = root.querySelector('[data-action="termos-prev"]') || document.createElement('button');
-      avancarBtn = root.querySelector('[data-action="avancar"]') || document.createElement('button');
+      console.error('[section-termos.js] Falha ao esperar pelos elementos essenciais de botão:', e);
+      window.toast?.('Falha ao carregar os botões da seção Termos. Verifique o HTML.', 'error');
+      pg1 = pg1 || document.createElement('div');
+      pg2 = pg2 || document.createElement('div');
+      nextBtn = nextBtn || document.createElement('button');
+      prevBtn = prevBtn || document.createElement('button');
+      avancarBtn = avancarBtn || document.createElement('button');
     }
 
     console.log('[section-termos.js] Elementos encontrados:', { pg1: !!pg1, pg2: !!pg2, nextBtn: !!nextBtn, prevBtn: !!prevBtn, avancarBtn: !!avancarBtn });
@@ -107,14 +105,41 @@
       root.classList.remove('hidden');
       root.style.display = 'flex';
     }
+    
+    // Adiciona estilização de textura de pedra ao botão "avancarBtn"
+    avancarBtn.classList.add('btn-stone');
+    avancarBtn.style.cssText = `
+      padding: 8px 16px;
+      background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
+      background-blend-mode: overlay;
+      color: #fff;
+      border-radius: 8px;
+      font-size: 18px;
+      border: 3px solid #4a4a4a;
+      box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+      opacity: 1;
+      visibility: visible;
+      display: inline-block;
+    `;
+
+    // Desativa os botões antes do typing (serão ativados após)
+    nextBtn.disabled = true;
+    prevBtn.disabled = true;
+    avancarBtn.disabled = true;
 
     const runTypingChain = async () => {
       console.log('[section-termos.js] Iniciando runTypingChain');
-      const typingElements = root.querySelectorAll('[data-typing="true"]');
+      const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)'); 
       if (typingElements.length === 0) {
         console.warn('[section-termos.js] Nenhum elemento com [data-typing="true"] encontrado');
+        // Se não houver typing, garante que os botões serão ativados
+        nextBtn.disabled = false;
+        prevBtn.disabled = false;
+        avancarBtn.disabled = false;
         return;
       }
+      
       if (typeof window.runTyping === 'function') {
         try {
           for (const el of typingElements) {
@@ -141,55 +166,29 @@
           el.classList.add('typing-done');
         });
       }
+      
+      // Reativa os botões após o typing
       nextBtn.disabled = false;
       prevBtn.disabled = false;
       avancarBtn.disabled = false;
     };
 
-    try {
-      await runTypingChain();
-      TERMOS_READY = true;
-    } catch (err) {
-      console.warn('[section-termos.js] Typing chain falhou', err);
-      nextBtn.disabled = false;
-      prevBtn.disabled = false;
-      avancarBtn.disabled = false;
-    }
-
-    const showPage = (page) => {
-      pg1.classList.toggle('hidden', page === 2);
-      pg2.classList.toggle('hidden', page === 1);
-      console.log(`[section-termos.js] Mostrando página ${page}`);
-    };
-
-    once(nextBtn, 'click', () => {
-      showPage(2);
-    });
-
-    once(prevBtn, 'click', () => {
-      showPage(1);
-    });
-
-    once(avancarBtn, 'click', () => {
-      console.log('[section-termos.js] Botão "Aceito" clicado, navegando para próxima seção');
-      if (typeof window.__canNavigate === 'function' && !window.__canNavigate()) {
-        console.log('[section-termos.js] Navegação bloqueada por __canNavigate');
-        return;
-      }
-
-      const nextSection = 'section-senha';
-      try {
-        if (window.JC?.goNext) {
-          window.JC.goNext(nextSection);
-        } else if (typeof window.showSection === 'function') {
-          window.showSection(nextSection);
-        } else {
-          console.warn('[section-termos.js] Nenhuma função de navegação disponível');
+    if (!TERMOS_READY) {
+        try {
+            await runTypingChain();
+            TERMOS_READY = true;
+        } catch (err) {
+            console.warn('[section-termos.js] Typing chain falhou', err);
+            nextBtn.disabled = false;
+            prevBtn.disabled = false;
+            avancarBtn.disabled = false;
         }
-      } catch (err) {
-        console.error('[section-termos.js] Erro ao avançar:', err);
-      }
-    });
+    } else {
+        console.log('[section-termos.js] Termos já preparado, reativando botões.');
+        nextBtn.disabled = false;
+        prevBtn.disabled = false;
+        avancarBtn.disabled = false;
+    }
   };
 
   const bind = () => {
