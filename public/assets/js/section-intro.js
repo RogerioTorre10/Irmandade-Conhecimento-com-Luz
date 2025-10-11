@@ -19,7 +19,7 @@
     el.addEventListener(ev, h);
   };
 
-  function waitForElement(selector, { within = document, timeout = 5000 } = {}) {
+  function waitForElement(selector, { within = document, timeout = 7000 } = {}) {
     return new Promise((resolve, reject) => {
       let el = within.querySelector(selector);
       if (el) {
@@ -93,9 +93,9 @@
 
     let el1, el2, btn;
     try {
-      el1 = await waitForElement('#intro-p1', { within: root, timeout: 5000 });
-      el2 = await waitForElement('#intro-p2', { within: root, timeout: 5000 });
-      btn = await waitForElement('#btn-avancar', { within: root, timeout: 5000 });
+      el1 = await waitForElement('#intro-p1', { within: root, timeout: 7000 });
+      el2 = await waitForElement('#intro-p2', { within: root, timeout: 7000 });
+      btn = await waitForElement('#btn-avancar', { within: root, timeout: 7000 });
     } catch (e) {
       console.error('[section-intro.js] Falha ao esperar pelos elementos essenciais:', e);
       window.toast?.('Falha ao carregar a Introdução. Usando fallback.', 'error');
