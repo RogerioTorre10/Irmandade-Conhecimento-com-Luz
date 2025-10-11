@@ -203,5 +203,23 @@
         avancarBtn.disabled = false;
     }
   };
-  
-  // ... (restante do bind)
+   
+  const bind = () => {
+    document.removeEventListener('sectionLoaded', handler);
+    document.removeEventListener('section:shown', handler);
+    document.addEventListener('sectionLoaded', handler, { passive: true });
+    document.addEventListener('section:shown', handler, { passive: true });
+    console.log('[section-termos.js] Handler ligado');
+
+    const visibleTermos = document.querySelector('#section-termos:not(.hidden)');
+    if (visibleTermos) {
+      handler({ detail: { sectionId: 'section-termos', node: visibleTermos } });
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bind, { once: true });
+  } else {
+    bind();
+  }
+})();
