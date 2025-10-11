@@ -9,6 +9,32 @@
 </head>
 
 <body>
+  /* Header + chama */
+    .site-header{display:flex;align-items:center;justify-content:center;padding:16px;background:transparent}
+    .chama-icone{position:relative;width:18px;height:36px;display:flex;align-items:flex-end;margin-right:12px}
+    .chama-icone>*{position:static}
+    .site-header h1{font-family:"Berkshire Swash",cursive;font-size:32px;color:#fff;text-shadow:0 0 10px hsla(28,96%,60%,.7);margin:0}
+
+    /* Chama */
+    .chama-vela{--altura:45px;--largura:30px;--pulso:1.2s;--glow:8px;--hue:28;--satur:96%;--light:58%;--op:.98;position:relative;width:var(--largura);height:var(--altura);display:inline-block;filter:drop-shadow(0 0 var(--glow) hsla(var(--hue),var(--satur),60%,.75))}
+    .chama-vela.chama-md{--largura:40px;--altura:90px}
+    .chama-vela.chama-lg{--largura:30px;--altura:60px}
+    .chama-vela .brasa{position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:calc(var(--largura)*1.4);height:10px;border-radius:50% 50% 40% 40%;background:radial-gradient(circle at 50% 40%,hsla(var(--hue),var(--satur),95%,.95) 0%,hsla(var(--hue),var(--satur),70%,.85) 50%,transparent 80%);filter:blur(1px);animation:brasaPulse var(--pulso) ease-in-out infinite;opacity:var(--op)}
+    .chama-vela .lingua{position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:calc(var(--largura)*1.0);height:calc(var(--altura)*1.0);border-radius:50% 50% 4% 4%;background:radial-gradient(ellipse at center,rgba(255,190,0,.95) 0%,rgba(255,69,0,.75) 50%,rgba(230,10,10,.3) 70%,transparent 100%);mix-blend-mode:screen;filter:blur(.7px);transform-origin:50% 100%;animation:velaWaver 1.2s ease-in-out infinite;opacity:var(--op);-webkit-mask:radial-gradient(60% 90% at 50% 4%,#000 65%,transparent 69%)}
+    .chama-vela .lingua:nth-child(2){width:calc(var(--largura)*.92);height:calc(var(--altura)*.95);animation-duration:1.5s;animation-delay:.08s;filter:blur(.6px)}
+    .chama-vela .lingua:nth-child(3){width:calc(var(--largura)*.78);height:calc(var(--altura)*.85);animation-duration:1.8s;animation-delay:.15s;filter:blur(.5px)}
+    .chama-vela .brilho{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:calc(var(--largura)*1.7);height:calc(var(--altura)*1.5);background:radial-gradient(circle,hsla(var(--hue),var(--satur),72%,.55) 0%,transparent 70%);filter:blur(9px);mix-blend-mode:screen;animation:aura var(--pulso) ease-in-out infinite;opacity:.85;pointer-events:none}
+    .chama-vela.fraca{--altura:35px;--largura:25px;--pulso:1.6s;--glow:5px;--hue:36;--satur:86%;--light:66%;--op:.70}
+    .chama-vela.media{--altura:45px;--largura:30px;--pulso:1.2s;--glow:8px;--hue:28;--satur:96%;--light:58%;--op:.98}
+    .chama-vela.forte{--altura:55px;--largura:35px;--pulso:.7s;--glow:11px;--hue:20;--satur:100%;--light:52%;--op:1}
+    .flame-corner{position:fixed;z-index:1200;pointer-events:none}
+    .flame-bottom-right{bottom:20px;right:20px}
+    #chama-header .chama-vela{--largura:30px;--altura:60px}
+    @keyframes velaWaver{0%,100%{transform:translateX(-50%) scaleY(1.00) skewX(0deg)}25%{transform:translateX(calc(-50% + .7px)) scaleY(1.12) skewX(1.4deg)}50%{transform:translateX(-50%) scaleY(1.20) skewX(2.2deg)}75%{transform:translateX(calc(-50% - .6px)) scaleY(1.10) skewX(1.2deg)}}
+    @keyframes brasaPulse{0%,100%{transform:translateX(-50%) scale(1);opacity:.85}50%{transform:translateX(-50%) scale(1.14);opacity:1}}
+    @keyframes aura{0%,100%{opacity:.75}50%{opacity:1}}
+    @media (prefers-reduced-motion: reduce){.chama-vela .lingua,.chama-vela .brasa,.chama-vela .brilho{animation:none!important}}
+
    <div data-layout="master" data-journey="essencial">
     <!-- Seletor de Idioma -->
      <div class="language-selector">
