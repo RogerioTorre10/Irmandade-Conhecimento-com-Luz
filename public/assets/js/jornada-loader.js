@@ -26,14 +26,17 @@
     
     let section = container.querySelector('#' + sectionId);
     if (!section) {
-      console.error('[carregarEtapa] Seção principal #' + sectionId + ' não encontrada no HTML bruto!');
-      section = container.querySelector('section') || document.createElement('section');
-      section.id = sectionId; // Força o ID correto
+      console.warn('[carregarEtapa] Seção principal #' + sectionId + ' não encontrada no HTML bruto! Forçando criação.');
+      section = document.createElement('section');
+      section.id = sectionId;
+      section.innerHTML = container.innerHTML; // Usa o HTML bruto completo
     }
 
     for (const selector of criticalSelectors) {
       if (section.querySelector(selector)) {
         console.log(`[carregarEtapa] Elemento crítico ${selector} ENCONTRADO.`);
+      } else {
+        console.warn(`[carregarEtapa] Elemento crítico ${selector} NÃO encontrado.`);
       }
     }
     
@@ -86,6 +89,11 @@
     container.appendChild(section);
     console.log('[carregarEtapa] Injetada e apensa no wrapper:', section.outerHTML.slice(0, 120) + '...');
     console.log('[carregarEtapa] Elemento #' + id + ' presente:', !!document.getElementById(id));
+    console.log('[carregarEtapa] Elementos críticos presentes:', {
+      introP1: !!section.querySelector('#intro-p1'),
+      introP2: !!section.querySelector('#intro-p2'),
+      btnAvancar: !!section.querySelector('#btn-avancar')
+    });
 
     return new Promise(resolve => {
       requestAnimationFrame(() => {
