@@ -160,19 +160,10 @@
       }
 
       let target = document.getElementById(id);
-      let attempts = 0;
-      const MAX_ATTEMPTS = 50; // Tenta por 50 * 10ms = 500ms
-
-      while (!target && attempts < MAX_ATTEMPTS) {
-          await new Promise(r => setTimeout(r, 10)); // Espera 10ms
-          target = document.getElementById(id) || document.getElementById('jornada-content-wrapper')?.querySelector(`#${id}`);
-          attempts++;
-      }
-      
-      if (!target) {
-        target = createFallbackElement(id);
-        window.toast?.(`Seção ${id} não encontrada. Usando fallback.`, 'error');
-      } 
+      if (!target) {
+        target = createFallbackElement(id);
+        window.toast?.(`Seção ${id} não encontrada. Usando fallback.`, 'error');
+      }    
      
       target.classList?.remove(HIDE_CLASS);
       target.style.display = 'block';
