@@ -13,9 +13,8 @@
             <div id="intro-p2" class="intro-paragraph" data-typing="true" data-speed="36" data-cursor="true">
               Respire fundo. Vamos caminhar juntos com fé, coragem e propósito.
             </div>
-            <input id="name-input" type="text" placeholder="Digite seu nome">
             <div class="intro-actions">
-              <button id="btn-avancar" class="btn btn-primary" data-action="avancar" disabled>Iniciar</button>
+              <button id="btn-avancar" class="btn btn-primary btn-stone" data-action="avancar" disabled>Iniciar</button>
             </div>
           </div>
         </div>
@@ -41,7 +40,7 @@
     final:    '/assets/html/section-final.html'
     };
 
-  // Função para verificar elementos críticos no HTML
+  / Função para verificar elementos críticos no HTML
   function checkCriticalElements(section, sectionId) {
     const criticalSelectors = {
       'section-intro': ['#intro-p1', '#intro-p2', '#btn-avancar'],
@@ -82,7 +81,6 @@
     if (html) {
       console.log('[carregarEtapa] Usando template embutido para', nome);
     } else {
-      // Se não houver template, tenta carregar via fetch
       const url = etapas[nome] || `/assets/html/section-${nome}.html`;
       console.log('[carregarEtapa] Carregando via fetch:', url);
       const res = await fetch(url, { cache: 'no-store' });
@@ -125,9 +123,7 @@
 
     return new Promise(resolve => {
       requestAnimationFrame(() => {
-        document.dispatchEvent(new CustomEvent('sectionLoaded', {
-          detail: { sectionId: id, name: nome, node: section }
-        }));
+        document.dispatchEvent(new CustomEvent('sectionLoaded', { detail: { sectionId: id, name: nome, node: section } }));
         resolve(section);
       });
     });
