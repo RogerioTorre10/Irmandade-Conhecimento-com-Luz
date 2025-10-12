@@ -53,7 +53,7 @@
     }
 
     // Carrega o HTML via fetch
-    const url = etapas[nome] || `/assets/js/html/section-intro.html`;
+    const url = etapas[nome] || `/assets/js/html/section-${nome}.html`;
     console.log('[carregarEtapa] Carregando via fetch:', url);
     const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) {
