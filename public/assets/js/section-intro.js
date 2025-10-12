@@ -24,9 +24,9 @@
       return;
     }
 
-    // Desativa qualquer animação em andamento para evitar conflitos
+    // Desativa qualquer animação em andamento
     if (window.__typingLock && typeof window.EffectCoordinator?.stopAll === 'function') {
-      console.log('[section-intro.js] Desativando typingLock para evitar conflitos');
+      console.log('[section-intro.js] Desativando typingLock');
       window.EffectCoordinator.stopAll();
     }
 
@@ -50,7 +50,7 @@
         console.log('[section-intro.js] Datilografia concluída para:', el.id);
       }
 
-      // Aplica TTS após a datilografia
+      // Aplica TTS
       if (typeof window.EffectCoordinator?.speak === 'function') {
         const fullText = Array.from(typingElements).map(el => getText(el)).join(' ');
         window.EffectCoordinator.speak(fullText, { rate: 1.03, pitch: 1.0 });
@@ -72,7 +72,7 @@
   async function init() {
     console.log('[section-intro.js] Iniciando inicialização');
 
-    // Busca a seção #section-intro
+    // Busca a seção
     let root = document.getElementById('section-intro');
     if (!root) {
       console.error('[section-intro.js] Erro: Seção #section-intro não encontrada');
@@ -132,12 +132,6 @@
       cursor: pointer;
     `;
 
-    // Aplica efeito de vela, se disponível
-    if (typeof window.setupCandleFlame === 'function') {
-      window.setupCandleFlame('media', 'flame-bottom-right');
-      console.log('[section-intro.js] Efeito de vela aplicado');
-    }
-
     // Exibe a seção
     root.classList.remove('hidden');
     root.style.display = 'block';
@@ -164,20 +158,10 @@
   }
 
   // Executa a inicialização imediatamente
-  console.log('[section-intro.js] Estado do DOM:', document.readyState);
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('[section-intro.js] DOMContentLoaded disparado');
-      init();
-    }, { once: true });
-  } else {
-    console.log('[section-intro.js] DOM já carregado, iniciando diretamente');
+  try {
+    console.log('[section-intro.js] Estado do DOM:', document.readyState);
     init();
+  } catch (err) {
+    console.error('[section-intro.js] Erro na inicialização imediata:', err);
   }
-
-  // Força a inicialização após um pequeno atraso
-  setTimeout(() => {
-    console.log('[section-intro.js] Forçando inicialização tardia');
-    init();
-  }, 100);
 })();
