@@ -42,7 +42,7 @@
 
     // Verifica se a seção já existe no DOM
     if (document.getElementById(id)) {
-      console.log(`[carregarEtapa] Seção #${id} já está no DOM. Pulando.`);
+      console.log(`[carregarEtapa] section #${id} já está no DOM. Pulando.`);
       const section = document.getElementById(id);
       return new Promise(resolve => {
         requestAnimationFrame(() => {
@@ -53,7 +53,7 @@
     }
 
     // Carrega o HTML via fetch
-    const url = etapas[nome] || `/assets/html/section-${nome}.html`;
+    const url = etapas[nome] || `/assets/js/html/section-${nome}.html`;
     console.log('[carregarEtapa] Carregando via fetch:', url);
     const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) {
