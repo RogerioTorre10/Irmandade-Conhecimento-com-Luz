@@ -118,6 +118,7 @@
 
       try {
         for (const el of typingElements) {
+          if (el.classList.contains('typing-done')) continue; // Ignora elementos já processados
           const text = getText(el);
           el.textContent = '';
           el.classList.add('typing-active');
@@ -129,6 +130,12 @@
           });
           el.classList.add('typing-done');
         }
+        // Adiciona o TTS
+    if (typeof window.EffectCoordinator?.speak === 'function') {
+      const fullText = Array.from(typingElements).map(el => getText(el)).join(' ');
+      window.EffectCoordinator.speak(fullText, { rate: 1.03, pitch: 1.0 });
+      console.log('[section-intro.js] TTS ativado para:', fullText.substring(0, 50) + '...');
+    }
       } catch (err) {
         typingElements.forEach(el => {
           el.textContent = getText(el);
