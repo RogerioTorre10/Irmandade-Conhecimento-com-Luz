@@ -1,17 +1,13 @@
 (function () {
   'use strict';
 
-  // Verifica se o script já foi vinculado para evitar duplicidade
   if (window.__introBound) return;
   window.__introBound = true;
 
   let INTRO_READY = false;
 
   const once = (el, ev, fn) => {
-    if (!el) {
-      console.warn('[section-intro.js] Elemento para evento não encontrado:', ev);
-      return;
-    }
+    if (!el) return;
     const h = (e) => {
       el.removeEventListener(ev, h);
       fn(e);
@@ -19,40 +15,21 @@
     el.addEventListener(ev, h);
   };
 
-  function waitForElement(selector, { within = document, timeout = 7000 } = {}) {
+  async function waitForElement(selector, { within = document, timeout = 10000, step = 50 } = {}) {
+    const start = performance.now();
     return new Promise((resolve, reject) => {
-      let el = within.querySelector(selector);
-      if (el) {
-        console.log(`[waitForElement] Elemento ${selector} encontrado imediatamente`);
-        return resolve(el);
-      }
-
-      const observer = new MutationObserver((mutations, obs) => {
-        el = within.querySelector(selector);
-        if (el) {
-          console.log(`[waitForElement] Elemento ${selector} encontrado após mutação`);
-          obs.disconnect();
-          resolve(el);
+      const tick = () => {
+        let el = within.querySelector(selector);
+        if (!el && within !== document) {
+          el = document.querySelector(`#jornada-content-wrapper ${selector}`);
         }
-      });
-
-      observer.observe(within, {
-        childList: true,
-        subtree: true,
-        attributes: false
-      });
-
-      setTimeout(() => {
-        observer.disconnect();
-        const fallbackEl = document.querySelector(`#jornada-content-wrapper ${selector}`);
-        if (fallbackEl) {
-          console.log(`[waitForElement] Elemento ${selector} encontrado via fallback global`);
-          resolve(fallbackEl);
-        } else {
-          console.error(`[waitForElement] Timeout após ${timeout}ms para ${selector}`);
-          reject(new Error(`timeout waiting ${selector}`));
+        if (el) return resolve(el);
+        if (performance.now() - start >= timeout) {
+          return reject(new Error(`timeout waiting ${selector}`));
         }
-      }, timeout);
+        setTimeout(tick, step);
+      };
+      tick();
     });
   }
 
@@ -63,51 +40,49 @@
   function fromDetail(detail = {}) {
     const sectionId = detail.sectionId || detail.id || window.__currentSectionId;
     const node = detail.node || detail.root || null;
-    const name = detail.name || null;
-    return { sectionId, node, name };
+    return { sectionId, node };
   }
-
-  // A função checkReady e loadAndSetupGuia foram removidas desta seção.
 
   const handler = async (evt) => {
     const { sectionId, node } = fromDetail(evt?.detail);
-    console.log('[section-intro.js] Evento recebido:', { sectionId, hasNode: !!node });
-    if (sectionId !== 'section-intro') return;
-
-    console.log('[section-intro.js] Ativando intro');
+    if (sectionId !== 'section-intro') return; // Ignora se não for section-intro
 
     let root = node || document.getElementById('section-intro');
-    // ... (restante da lógica de carregamento do root e dos elementos el1, el2, btn)
     if (!root) {
       try {
-        root = await waitForElement('#section-intro', { timeout: 8000 });
-      } catch {
-        root = document.querySelector('section[data-section="intro"]') || null;
+        root = await waitForElement('#section-intro', { within: document.getElementById('jornada-content-wrapper') || document, timeout: 10000 });
+      } catch (e) {
+        window.toast?.('Erro: Seção section-intro não carregada.', 'error');
+        return;
       }
-    }
-    if (!root) {
-      console.warn('[section-intro.js] Root da intro não encontrado (após espera)');
-      window.toast?.('Intro ainda não montou no DOM.', 'warn');
-      return;
     }
 
     let el1, el2, btn;
     try {
-      el1 = await waitForElement('#intro-p1', { within: root, timeout: 7000 });
-      el2 = await waitForElement('#intro-p2', { within: root, timeout: 7000 });
-      btn = await waitForElement('#btn-avancar', { within: root, timeout: 7000 });
+      el1 = await waitForElement('#intro-p1', { within: root, timeout: 10000 });
+      el2 = await waitForElement('#intro-p2', { within: root, timeout: 10000 });
+      btn = await waitForElement('#btn-avancar', { within: root, timeout: 10000 });
     } catch (e) {
-      console.error('[section-intro.js] Falha ao esperar pelos elementos essenciais:', e);
-      window.toast?.('Falha ao carregar a Introdução. Usando fallback.', 'error');
-      // Fallback: cria elementos básicos para evitar crash
-      el1 = el1 || root.appendChild(Object.assign(document.createElement('p'), { id: 'intro-p1', textContent: 'Bem-vindo à sua jornada!' }));
-      el2 = el2 || root.appendChild(Object.assign(document.createElement('p'), { id: 'intro-p2', textContent: 'Vamos começar?' }));
-      btn = btn || root.appendChild(Object.assign(document.createElement('button'), { id: 'btn-avancar', textContent: 'Avançar', className: 'hidden' })); // Removido disabled-temp no fallback
+      window.toast?.('Falha ao carregar os elementos da seção Intro.', 'error');
+      console.log('[section-intro.js] Elementos encontrados via fallback:', { el1: !!el1, el2: !!el2, btn: !!btn });
+      // Fallback: usa os textos corretos do HTML esperado
+      el1 = el1 || root.appendChild(Object.assign(document.createElement('p'), { id: 'intro-p1', textContent: 'Bem-vindo à Jornada Conhecimento com Luz.', className: 'intro-paragraph', dataset: { typing: 'true', speed: '36', cursor: 'true' } }));
+      el2 = el2 || root.appendChild(Object.assign(document.createElement('p'), { id: 'intro-p2', textContent: 'Respire fundo. Vamos caminhar juntos com fé, coragem e propósito.', className: 'intro-paragraph', dataset: { typing: 'true', speed: '36', cursor: 'true' } }));
+      btn = btn || root.appendChild(Object.assign(document.createElement('button'), { id: 'btn-avancar', textContent: 'Avançar', className: 'avancarBtn', dataset: { action: 'avancar' }, disabled: true }));
     }
 
-    console.log('[section-intro.js] Elementos encontrados:', { el1: !!el1, el2: !!el2, btn: !!btn });
+    try {
+      if (typeof window.JC?.show === 'function') {
+        window.JC.show('section-intro');
+      } else {
+        root.classList.remove('hidden');
+        root.style.display = 'flex';
+      }
+    } catch (err) {
+      root.classList.remove('hidden');
+      root.style.display = 'flex';
+    }
 
-    // Aplica textura de pedra ao botão (mantido, pois é apenas estilo)
     btn.classList.add('btn-stone');
     btn.style.cssText = `
       padding: 8px 16px;
@@ -123,139 +98,82 @@
       visibility: visible;
       display: inline-block;
     `;
-    try {
-      if (typeof window.JC?.show === 'function') {
-        window.JC.show('section-intro');
-      } else if (typeof window.showSection === 'function') {
-        window.showSection('section-intro');
-      } else {
-        root.classList.remove('hidden');
-        root.style.display = 'block';
-      }
-    } catch (err) {
-      console.warn('[section-intro.js] Falha ao exibir seção:', err);
-      root.classList.remove('hidden');
-      root.style.display = 'block';
+
+    if (typeof window.setupCandleFlame === 'function') {
+      window.setupCandleFlame('media', 'flame-bottom-right');
     }
 
-    // O botão fica oculto até o typing chain terminar
-    btn.classList.add('hidden');
-    btn.disabled = false; // O botão não precisa mais de desabilitação condicional
-    const showBtn = () => {
-      console.log('[section-intro.js] Mostrando botão "Avançar"');
-      btn.classList.remove('hidden');
-      btn.classList.remove('disabled-temp'); // Caso tenha sobrado
-      btn.style.display = 'inline-block';
-      btn.disabled = false;
-    };
-
-    const speed1 = Number(el1.dataset.speed || 36);
-    const speed2 = Number(el2.dataset.speed || 36);
-    const t1 = getText(el1);
-    const t2 = getText(el2);
-    const cursor1 = String(el1.dataset.cursor || 'true') === 'true';
-    const cursor2 = String(el2.dataset.cursor || 'true') === 'true';
-
-    if (INTRO_READY) {
-      console.log('[section-intro.js] Intro já preparada');
-      showBtn();
-      // loadAndSetupGuia(root, btn); // REMOVIDO
-      return;
-    }
-
-    window.EffectCoordinator?.stopAll?.();
+    btn.disabled = true;
 
     const runTypingChain = async () => {
-      console.log('[section-intro.js] Iniciando runTypingChain');
-      if (typeof window.runTyping === 'function') {
-        try {
-          await new Promise((resolve) => {
-            window.runTyping(el1, t1, resolve, { speed: speed1, cursor: cursor1 });
-          });
-          console.log('[section-intro.js] Typing concluído para intro-p1');
-          window.EffectCoordinator?.speak?.(t1, { rate: 1.06 });
-
-          await new Promise((resolve) => {
-            window.runTyping(el2, t2, resolve, { speed: speed2, cursor: cursor2 });
-          });
-          console.log('[section-intro.js] Typing concluído para intro-p2');
-          setTimeout(() => window.EffectCoordinator?.speak?.(t2, { rate: 1.05 }), 300);
-        } catch (err) {
-          console.warn('[section-intro.js] Erro no runTyping:', err);
-          el1.textContent = t1;
-          el2.textContent = t2;
-        }
-      } else {
-        console.log('[section-intro.js] Fallback: sem efeitos');
-        el1.textContent = t1;
-        el2.textContent = t2;
+      const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
+      if (typingElements.length === 0 || typeof window.runTyping !== 'function') {
+        typingElements.forEach(el => {
+          el.textContent = getText(el);
+          el.classList.add('typing-done');
+        });
+        btn.disabled = false;
+        return;
       }
-      showBtn();
-    };
 
-    try {
-      await runTypingChain();
-      INTRO_READY = true;
-      // await loadAndSetupGuia(root, btn); // REMOVIDO
-    } catch (err) {
-      console.warn('[section-intro.js] Typing chain falhou', err);
-      el1.textContent = t1;
-      el2.textContent = t2;
-      showBtn();
-      INTRO_READY = true;
-    }
-
-    const goNext = () => {
-      // O AVANÇAR AGORA ESTÁ SEMPRE LIBERADO APÓS O TYPING
-      console.log('[section-intro.js] Botão clicado, navegando para section-termos');
-      if (typeof window.__canNavigate === 'function' && !window.__canNavigate()) return;
-
-      const nextSection = 'section-termos';
       try {
-        if (window.JC?.goNext) {
-          window.JC.goNext(nextSection);
-        } else if (typeof window.showSection === 'function') {
-          window.showSection(nextSection);
+        for (const el of typingElements) {
+          const text = getText(el);
+          el.textContent = '';
+          el.classList.add('typing-active');
+          await new Promise((resolve) => {
+            window.runTyping(el, text, resolve, {
+              speed: Number(el.dataset.speed || 36),
+              cursor: String(el.dataset.cursor || 'true') === 'true'
+            });
+          });
+          el.classList.add('typing-done');
         }
       } catch (err) {
-        console.error('[section-intro.js] Erro ao avançar:', err);
+        typingElements.forEach(el => {
+          el.textContent = getText(el);
+          el.classList.add('typing-done');
+        });
       }
+
+      btn.disabled = false;
+      console.log('[section-intro.js] Mostrando botão "Avançar"');
     };
 
-     console.log('[section-intro.js] Configurando evento de clique no botão');
-    // 1. Clonamos o botão para limpar quaisquer listeners internos remanescentes
-    const freshBtn = btn.cloneNode(true);
-    btn.replaceWith(freshBtn);
-    
-    // 2. Agora, ligamos o evento de clique que chama a função de ação do CONTROLLER.
-    // Isso garante que o fluxo de eventos seja unificado pelo JC.
-    once(freshBtn, 'click', (e) => {
-        e.preventDefault();
-        console.log('[section-intro.js] Click detectado, delegando ação ao JC.');
-        if (window.JC?.handleButtonAction) {
-            // Chamamos a função do controlador diretamente.
-            // O ID da seção deve ser 'section-intro' e o botão deve ser o elemento clicado.
-            window.JC.handleButtonAction('section-intro', freshBtn); 
-        } else {
-            // Fallback se o JC não estiver disponível (menos provável)
-            window.JC?.goNext?.('section-termos');
-        }
+    once(btn, 'click', () => {
+      if (typeof window.JC?.show === 'function') {
+        window.JC.show('section-termos'); // Avança para a página termos
+      } else {
+        window.location.href = '/termos'; // Ajuste a URL conforme necessário
+      }
     });
-    // Garantir que o atributo data-action esteja presente, caso o JC dependa dele
-    freshBtn.setAttribute('data-action', 'avancar');
+
+    if (!INTRO_READY) {
+      try {
+        await runTypingChain();
+        INTRO_READY = true;
+        console.log('[section-intro.js] Intro já preparada');
+      } catch (err) {
+        btn.disabled = false;
+      }
+    } else {
+      btn.disabled = false;
+    }
+
+    console.log('[section-intro.js] Elementos encontrados:', { el1: !!el1, el2: !!el2, btn: !!btn });
   };
 
   const bind = () => {
     document.removeEventListener('sectionLoaded', handler);
     document.removeEventListener('section:shown', handler);
     document.addEventListener('sectionLoaded', handler, { passive: true });
-    document.addEventListener('section:shown', handler, { passive: true });
-    console.log('[section-intro.js] Handler ligado');
 
-    const visibleIntro = document.querySelector('#section-intro:not(.hidden)');
-    if (visibleIntro) {
-      handler({ detail: { sectionId: 'section-intro', node: visibleIntro } });
-    }
+    setTimeout(() => {
+      const visibleIntro = document.querySelector('#section-intro:not(.hidden)');
+      if (visibleIntro) {
+        handler({ detail: { sectionId: 'section-intro', node: visibleIntro } });
+      }
+    }, 100);
   };
 
   if (document.readyState === 'loading') {
