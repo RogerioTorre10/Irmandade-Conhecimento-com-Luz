@@ -45,7 +45,7 @@
 
   const handler = async (evt) => {
     const { sectionId, node } = fromDetail(evt?.detail);
-    if (sectionId !== 'section-intro') return; // Ignora se não for section-intro
+    if (sectionId !== 'section-intro') return;
 
     let root = node || document.getElementById('section-intro');
     if (!root) {
@@ -53,6 +53,7 @@
         root = await waitForElement('#section-intro', { within: document.getElementById('jornada-content-wrapper') || document, timeout: 10000 });
       } catch (e) {
         window.toast?.('Erro: Seção section-intro não carregada.', 'error');
+        console.error('[section-intro.js] Erro ao encontrar section-intro:', e);
         return;
       }
     }
@@ -64,11 +65,13 @@
       btn = await waitForElement('#btn-avancar', { within: root, timeout: 10000 });
     } catch (e) {
       window.toast?.('Falha ao carregar os elementos da seção Intro.', 'error');
-      console.log('[section-intro.js] Elementos encontrados via fallback:', { el1: !!el1, el2: !!el2, btn: !!btn });
+      console.error('[section-intro.js] Elementos encontrados via fallback:', { el1: !!el1, el2: !!el2, btn: !!btn });
       // Fallback: usa os textos corretos do HTML esperado
-      el1 = el1 || root.appendChild(Object.assign(document.createElement('p'), { id: 'intro-p1', textContent: 'Bem-vindo à Jornada Conhecimento com Luz.', className: 'intro-paragraph', dataset: { typing: 'true', speed: '36', cursor: 'true' } }));
-      el2 = el2 || root.appendChild(Object.assign(document.createElement('p'), { id: 'intro-p2', textContent: 'Respire fundo. Vamos caminhar juntos com fé, coragem e propósito.', className: 'intro-paragraph', dataset: { typing: 'true', speed: '36', cursor: 'true' } }));
-      btn = btn || root.appendChild(Object.assign(document.createElement('button'), { id: 'btn-avancar', textContent: 'Avançar', className: 'avancarBtn', dataset: { action: 'avancar' }, disabled: true }));
+      const wrapper = root.querySelector('#jornada-content-wrapper') || root.appendChild(document.createElement('div'));
+      wrapper.id = 'jornada-content-wrapper';
+      el1 = el1 || wrapper.appendChild(Object.assign(document.createElement('p'), { id: 'intro-p1', textContent: 'Bem-vindo à Jornada Conhecimento com Luz.', className: 'intro-paragraph', dataset: { typing: 'true', speed: '36', cursor: 'true' } }));
+      el2 = el2 || wrapper.appendChild(Object.assign(document.createElement('p'), { id: 'intro-p2', textContent: 'Respire fundo. Vamos caminhar juntos com fé, coragem e propósito.', className: 'intro-paragraph', dataset: { typing: 'true', speed: '36', cursor: 'true' } }));
+      btn = btn || wrapper.appendChild(Object.assign(document.createElement('button'), { id: 'btn-avancar', textContent: 'Iniciar', className: 'btn btn-primary', dataset: { action: 'avancar' }, disabled: true }));
     }
 
     try {
@@ -105,59 +108,59 @@
 
     btn.disabled = true;
 
-   const runTypingChain = async () => {
-  const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
-  console.log('[section-intro.js] Elementos com data-typing:', typingElements.length);
-  if (typingElements.length === 0 || typeof window.runTyping !== 'function') {
-    console.warn('[section-intro.js] Nenhum elemento com data-typing ou runTyping não disponível');
-    typingElements.forEach(el => {
-      el.textContent = getText(el);
-      el.classList.add('typing-done');
-    });
-    btn.disabled = false;
-    return;
-  }
-
-  try {
-    for (const el of typingElements) {
-      if (el.classList.contains('typing-done')) {
-        console.log('[section-intro.js] Ignorando elemento já processado:', el.id);
-        continue;
-      }
-      const text = getText(el);
-      el.textContent = '';
-      el.classList.add('typing-active');
-      await new Promise((resolve) => {
-        window.runTyping(el, text, resolve, {
-          speed: Number(el.dataset.speed || 36),
-          cursor: String(el.dataset.cursor || 'true') === 'true'
+    const runTypingChain = async () => {
+      const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
+      console.log('[section-intro.js] Elementos com data-typing:', typingElements.length);
+      if (typingElements.length === 0 || typeof window.runTyping !== 'function') {
+        console.warn('[section-intro.js] Nenhum elemento com data-typing ou runTyping não disponível');
+        typingElements.forEach(el => {
+          el.textContent = getText(el);
+          el.classList.add('typing-done');
         });
-      });
-      el.classList.add('typing-done');
-    }
-    
-    if (typeof window.EffectCoordinator?.speak === 'function') {
-      const fullText = Array.from(typingElements).map(el => getText(el)).join(' ');
-      window.EffectCoordinator.speak(fullText, { rate: 1.03, pitch: 1.0 });
-      console.log('[section-intro.js] TTS ativado para:', fullText.substring(0, 50) + '...');
-    }
-  } catch (err) {
-    console.error('[section-intro.js] Erro ao aplicar datilografia:', err);
-    typingElements.forEach(el => {
-      el.textContent = getText(el);
-      el.classList.add('typing-done');
-    });
-  }
+        btn.disabled = false;
+        return;
+      }
 
-  btn.disabled = false;
-  console.log('[section-intro.js] Mostrando botão "Avançar"');
-};
+      try {
+        for (const el of typingElements) {
+          if (el.classList.contains('typing-done')) {
+            console.log('[section-intro.js] Ignorando elemento já processado:', el.id);
+            continue;
+          }
+          const text = getText(el);
+          el.textContent = '';
+          el.classList.add('typing-active');
+          await new Promise((resolve) => {
+            window.runTyping(el, text, resolve, {
+              speed: Number(el.dataset.speed || 36),
+              cursor: String(el.dataset.cursor || 'true') === 'true'
+            });
+          });
+          el.classList.add('typing-done');
+        }
+        
+        if (typeof window.EffectCoordinator?.speak === 'function') {
+          const fullText = Array.from(typingElements).map(el => getText(el)).join(' ');
+          window.EffectCoordinator.speak(fullText, { rate: 1.03, pitch: 1.0 });
+          console.log('[section-intro.js] TTS ativado para:', fullText.substring(0, 50) + '...');
+        }
+      } catch (err) {
+        console.error('[section-intro.js] Erro ao aplicar datilografia:', err);
+        typingElements.forEach(el => {
+          el.textContent = getText(el);
+          el.classList.add('typing-done');
+        });
+      }
+
+      btn.disabled = false;
+      console.log('[section-intro.js] Mostrando botão "Avançar"');
+    };
 
     once(btn, 'click', () => {
       if (typeof window.JC?.show === 'function') {
-        window.JC.show('section-termos'); // Avança para a página termos
+        window.JC.show('section-termos');
       } else {
-        window.location.href = '/termos'; // Ajuste a URL conforme necessário
+        window.location.href = '/termos';
       }
     });
 
@@ -167,6 +170,7 @@
         INTRO_READY = true;
         console.log('[section-intro.js] Intro já preparada');
       } catch (err) {
+        console.error('[section-intro.js] Erro ao preparar intro:', err);
         btn.disabled = false;
       }
     } else {
