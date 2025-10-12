@@ -40,7 +40,7 @@
     final:    '/assets/html/section-final.html'
     };
 
-  / Função para verificar elementos críticos no HTML
+ // Função para verificar elementos críticos no HTML
   function checkCriticalElements(section, sectionId) {
     const criticalSelectors = {
       'section-intro': ['#intro-p1', '#intro-p2', '#btn-avancar'],
@@ -94,12 +94,12 @@
     // Cria um contêiner temporário para processar o HTML
     const container = document.createElement('div');
     container.innerHTML = html;
-    let section = container.querySelector('#' + id) || container.firstElementChild;
+    let section = container.querySelector('#' + id);
     if (!section) {
-      console.error('[carregarEtapa] Seção principal #' + id + ' não encontrada! Criando vazia.');
-      section = document.createElement('section');
+      console.warn('[carregarEtapa] Seção #' + id + ' não encontrada no HTML. Usando primeiro elemento ou criando novo.');
+      section = container.firstElementChild || document.createElement('section');
       section.id = id;
-      section.innerHTML = html;
+      section.innerHTML = container.innerHTML;
     }
 
     // Garante que o ID e a classe estejam corretos
