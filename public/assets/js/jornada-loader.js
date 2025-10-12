@@ -4,16 +4,18 @@
 
   // DEFINIÇÃO CENTRALIZADA DAS ETAPAS
   const etapas = {
-    intro: '/assets/html/section-intro.html',
-    termos: '/assets/html/section-termos.html',
-    senha: '/assets/html/section-senha.html',
-    perguntas: '/assets/html/section-perguntas.html', 
-    final: '/assets/html/section-final.html',
-    'filme-jardim': '/assets/html/section-filme-jardim.html', 
-    'filme-ao-encontro': '/assets/html/section-filme-ao-encontro.html',
-    'section-barra': '/assets/html/section_barracontador.html',
-    'section-olho': '/assets/html/section_olhomagico.html' 
-  };
+    intro:    '/assets/html/section-intro.html',
+    termos:   '/assets/html/section-termos.html',
+    senha:    '/assets/html/section-senha.html',
+    filme:    '/assets/img/conhecimento-com-luz-jardim.mp4',
+    guia:     '/assets/html/section-guia.html',
+    filme:    '/assets/img/conhecimento-com-luz-jardim.mp4',
+    selfie:   '/assets/html/section-selfie.html',
+    filme:    '/assets/img/filme-0-ao-encontro-da-jornada.mp4',
+    perguntas:'/assets/html/section-perguntas.html', 
+    filme:    '/assets/img/filme-5-fim-da-jornada.mp4',
+    final:    '/assets/html/section-final.html',
+    };
 
   const SECTION_CONTAINER_ID = 'section-conteudo';
 
