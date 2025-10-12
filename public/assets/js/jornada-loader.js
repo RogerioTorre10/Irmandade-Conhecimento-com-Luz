@@ -14,7 +14,7 @@
     filme:    '/assets/img/filme-0-ao-encontro-da-jornada.mp4',
     perguntas:'/assets/html/section-perguntas.html', 
     filme:    '/assets/img/filme-5-fim-da-jornada.mp4',
-    final:    '/assets/html/section-final.html',
+    final:    '/assets/html/section-final.html'
     };
 
   const SECTION_CONTAINER_ID = 'section-conteudo';
