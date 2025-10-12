@@ -20,7 +20,7 @@
     el.addEventListener(ev, h);
   };
 
-  function waitForElement(selector, { within = document, timeout = 5000 } = {}) {
+  function waitForElement(selector, { within = document, timeout = 10000 } = {}) {
     return new Promise((resolve, reject) => {
       let el = within.querySelector(selector);
       if (el) {
@@ -67,64 +67,7 @@
     const name = detail.name || null;
     return { sectionId, node, name };
   }
-
-  const checkReady = (btn) => {
-    if (nomeDigitado && dadosGuiaCarregados) {
-      btn.disabled = false;
-      btn.classList.remove('disabled-temp');
-      console.log('[Guia Setup] Botão "Iniciar" ativado.');
-    } else {
-      btn.disabled = true;
-      btn.classList.add('disabled-temp');
-    }
-  };
-
-  async function loadAndSetupGuia(root, btn) {
-    const nameInput = root.querySelector('#name-input');
-    const guiaPlaceholder = root.querySelector('#guia-selfie-placeholder');
-
-    if (nameInput) {
-      nameInput.addEventListener('input', () => {
-        nomeDigitado = nameInput.value.trim().length > 2;
-        checkReady(btn);
-      });
-      nomeDigitado = nameInput.value.trim().length > 2;
-    }
-
-    try {
-      console.log('[Guia Setup] Iniciando fetch para dados dos guias...');
-      const response = await fetch('/assets/data/guias.json');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status} - Verifique o caminho '/assets/data/guias.json'`);
-      }
-      const guias = await response.json();
-      console.log('[Guia Setup] Dados dos guias carregados com sucesso:', guias.length);
-
-      if (guiaPlaceholder && guias.length > 0) {
-        if (typeof window.JornadaGuiaSelfie?.renderSelector === 'function') {
-          window.JornadaGuiaSelfie.renderSelector(guiaPlaceholder, guias);
-          document.addEventListener('guiaSelected', (e) => {
-            console.log('[Intro] Guia selecionado. Verificando se pode avançar.');
-            dadosGuiaCarregados = true;
-            checkReady(btn);
-          }, { once: true });
-          dadosGuiaCarregados = false;
-        } else {
-          console.warn('[Guia Setup] Função de renderização do guia não encontrada. Avance sem seleção.');
-          dadosGuiaCarregados = true;
-        }
-      } else {
-        dadosGuiaCarregados = true;
-      }
-    } catch (err) {
-      console.error('[Guia Setup] Falha crítica no fetch dos guias. Verifique a URL e o JSON:', err);
-      window.toast?.('Falha ao carregar dados dos guias. Tente recarregar a página.', 'error');
-      dadosGuiaCarregados = true;
-    } finally {
-      checkReady(btn);
-    }
-  }
-
+  
   const handler = async (evt) => {
     const { sectionId, node } = fromDetail(evt?.detail);
     console.log('[section-intro.js] Evento recebido:', { sectionId, hasNode: !!node });
@@ -135,7 +78,7 @@
     let root = node || document.getElementById('section-intro');
     if (!root) {
       try {
-        root = await waitForElement('#section-intro', { timeout: 8000 });
+        root = await waitForElement('#section-intro', { timeout: 10000 });
       } catch {
         root = document.querySelector('section[data-section="intro"]') || null;
       }
@@ -148,9 +91,9 @@
 
     let el1, el2, btn;
     try {
-      el1 = await waitForElement('#intro-p1', { within: root, timeout: 5000 });
-      el2 = await waitForElement('#intro-p2', { within: root, timeout: 5000 });
-      btn = await waitForElement('#btn-avancar', { within: root, timeout: 5000 });
+      el1 = await waitForElement('#intro-p1', { within: root, timeout: 10000 });
+      el2 = await waitForElement('#intro-p2', { within: root, timeout: 10000 });
+      btn = await waitForElement('#btn-avancar', { within: root, timeout: 10000 });
     } catch (e) {
       console.error('[section-intro.js] Falha ao esperar pelos elementos essenciais:', e);
       window.toast?.('Falha ao carregar a Introdução. Usando fallback.', 'error');
