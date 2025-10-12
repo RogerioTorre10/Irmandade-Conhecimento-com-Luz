@@ -29,17 +29,45 @@
       console.warn('[carregarEtapa] Seção principal #' + sectionId + ' não encontrada no HTML bruto! Forçando criação.');
       section = document.createElement('section');
       section.id = sectionId;
-      section.innerHTML = container.innerHTML; // Usa o HTML bruto completo
+      // Tenta extrair o conteúdo interno, ignorando tags <html>, <body>, <meta>
+      const content = container.querySelector('section') || container.firstElementChild;
+      if (content) {
+        section.innerHTML = content.innerHTML;
+      } else {
+        section.innerHTML = container.innerHTML.replace(/<html[^>]*>|<body[^>]*>|<meta[^>]*>/gi, '');
+      }
     }
 
+    const foundSelectors = {};
     for (const selector of criticalSelectors) {
-      if (section.querySelector(selector)) {
+      foundSelectors[selector] = !!section.querySelector(selector);
+      if (foundSelectors[selector]) {
         console.log(`[carregarEtapa] Elemento crítico ${selector} ENCONTRADO.`);
       } else {
         console.warn(`[carregarEtapa] Elemento crítico ${selector} NÃO encontrado.`);
       }
     }
     
+    // Se for section-intro e elementos críticos estiverem ausentes, usar HTML de fallback
+    if (sectionId === 'section-intro' && (!foundSelectors['#intro-p1'] || !foundSelectors['#intro-p2'] || !foundSelectors['#btn-avancar'])) {
+      console.warn('[carregarEtapa] Elementos críticos de section-intro ausentes. Usando HTML de fallback.');
+      section.innerHTML = `
+        <div id="jornada-content-wrapper">
+          <div class="intro-wrap">
+            <div id="intro-p1" class="intro-paragraph" data-typing="true" data-speed="36" data-cursor="true">
+              Bem-vindo à Jornada Conhecimento com Luz.
+            </div>
+            <div id="intro-p2" class="intro-paragraph" data-typing="true" data-speed="36" data-cursor="true">
+              Respire fundo. Vamos caminhar juntos com fé, coragem e propósito.
+            </div>
+            <input id="name-input" type="text" placeholder="Digite seu nome">
+            <div class="intro-actions">
+              <button id="btn-avancar" class="btn btn-primary" data-action="avancar" disabled>Iniciar</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
     return section;
   }
 
