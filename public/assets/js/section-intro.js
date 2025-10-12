@@ -3,36 +3,6 @@
 
   console.log('[section-intro.js] Script carregado');
 
-  if (window.__introBound) {
-    console.log('[section-intro.js] Já vinculado, ignorando.');
-    return;
-  }
-  window.__introBound = true;
-
-  // Função para buscar elementos com timeout
-  async function waitForElement(selector, { within = document, timeout = 5000, step = 50 } = {}) {
-    console.log('[section-intro.js] Aguardando elemento:', selector);
-    const start = performance.now();
-    return new Promise((resolve, reject) => {
-      const tick = () => {
-        let el = within.querySelector(selector);
-        if (!el && within !== document) {
-          el = document.querySelector(selector);
-        }
-        if (el) {
-          console.log('[section-intro.js] Elemento', selector, 'encontrado');
-          return resolve(el);
-        }
-        if (performance.now() - start >= timeout) {
-          console.error('[section-intro.js] Timeout esperando', selector);
-          return reject(new Error(`Timeout esperando ${selector}`));
-        }
-        setTimeout(tick, step);
-      };
-      tick();
-    });
-  }
-
   // Função para obter texto do elemento
   function getText(el) {
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
@@ -98,32 +68,31 @@
     console.log('[section-intro.js] Habilitando botão "Avançar"');
   }
 
-  // Função principal
+  // Função principal de inicialização
   async function init() {
     console.log('[section-intro.js] Iniciando inicialização');
 
-    let root;
-    try {
-      root = await waitForElement('#section-intro', { timeout: 10000 });
-      console.log('[section-intro.js] Seção #section-intro encontrada');
-    } catch (e) {
-      console.error('[section-intro.js] Erro: Seção #section-intro não encontrada:', e);
+    // Busca a seção #section-intro
+    let root = document.getElementById('section-intro');
+    if (!root) {
+      console.error('[section-intro.js] Erro: Seção #section-intro não encontrada');
       window.toast?.('Erro: Seção section-intro não carregada.', 'error');
       return;
     }
+    console.log('[section-intro.js] Seção #section-intro encontrada');
 
-    let el1, el2, btn;
-    try {
-      el1 = await waitForElement('#intro-p1', { within: root });
-      el2 = await waitForElement('#intro-p2', { within: root });
-      btn = await waitForElement('#btn-avancar', { within: root });
-      console.log('[section-intro.js] Elementos encontrados:', { el1: !!el1, el2: !!el2, btn: !!btn });
-    } catch (e) {
-      console.error('[section-intro.js] Falha ao carregar elementos:', e);
-      window.toast?.('Falha ao carregar elementos da seção Intro.', 'error');
-      // Cria elementos de fallback
+    // Busca os elementos
+    let el1 = root.querySelector('#intro-p1');
+    let el2 = root.querySelector('#intro-p2');
+    let btn = root.querySelector('#btn-avancar');
+    console.log('[section-intro.js] Elementos encontrados:', { el1: !!el1, el2: !!el2, btn: !!btn });
+
+    // Cria elementos de fallback, se necessário
+    if (!el1 || !el2 || !btn) {
+      console.warn('[section-intro.js] Criando elementos de fallback');
       const wrapper = root.querySelector('#jornada-content-wrapper') || root.appendChild(document.createElement('div'));
       wrapper.id = 'jornada-content-wrapper';
+      wrapper.className = 'intro-wrap';
       el1 = el1 || wrapper.appendChild(Object.assign(document.createElement('div'), {
         id: 'intro-p1',
         className: 'intro-paragraph',
@@ -138,7 +107,7 @@
       }));
       btn = btn || wrapper.appendChild(Object.assign(document.createElement('button'), {
         id: 'btn-avancar',
-        className: 'btn btn-primary',
+        className: 'btn btn-primary btn-stone',
         textContent: 'Iniciar',
         dataset: { action: 'avancar' },
         disabled: true
@@ -147,7 +116,6 @@
     }
 
     // Aplica estilos ao botão
-    btn.classList.add('btn-stone');
     btn.style.cssText = `
       padding: 8px 16px;
       background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
@@ -169,6 +137,11 @@
       window.setupCandleFlame('media', 'flame-bottom-right');
       console.log('[section-intro.js] Efeito de vela aplicado');
     }
+
+    // Exibe a seção
+    root.classList.remove('hidden');
+    root.style.display = 'block';
+    console.log('[section-intro.js] Exibindo section-intro');
 
     // Vincula o evento de clique ao botão
     btn.addEventListener('click', () => {
@@ -193,14 +166,18 @@
   // Executa a inicialização imediatamente
   console.log('[section-intro.js] Estado do DOM:', document.readyState);
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, { once: true });
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('[section-intro.js] DOMContentLoaded disparado');
+      init();
+    }, { once: true });
   } else {
+    console.log('[section-intro.js] DOM já carregado, iniciando diretamente');
     init();
   }
 
-  // Tenta executar novamente após um pequeno atraso
+  // Força a inicialização após um pequeno atraso
   setTimeout(() => {
-    console.log('[section-intro.js] Tentando inicialização tardia');
+    console.log('[section-intro.js] Forçando inicialização tardia');
     init();
   }, 100);
 })();
