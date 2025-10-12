@@ -2,16 +2,19 @@
   'use strict';
 
   // Definição de URLs para seções
-  const etapas = {
-    intro: '/assets/js/html/section-intro.html', // Novo caminho
-    termos: '/assets/html/section-termos.html',
-    senha: '/assets/html/section-senha.html',
-    filme: '/assets/img/conhecimento-com-luz-jardim.mp4',
-    guia: '/assets/html/section-guia.html',
-    selfie: '/assets/html/section-selfie.html',
-    perguntas: '/assets/html/section-perguntas.html',
-    final: '/assets/html/section-final.html'
-  };
+ const etapas = {
+    intro:    '/assets/html/section-intro.html',
+    termos:   '/assets/html/section-termos.html',
+    senha:    '/assets/html/section-senha.html',
+    filme:    '/assets/img/conhecimento-com-luz-jardim.mp4',
+    guia:     '/assets/html/section-guia.html',
+    filme:    '/assets/img/conhecimento-com-luz-jardim.mp4',
+    selfie:   '/assets/html/section-selfie.html',
+    filme:    '/assets/img/filme-0-ao-encontro-da-jornada.mp4',
+    perguntas:'/assets/html/section-perguntas.html', 
+    filme:    '/assets/img/filme-5-fim-da-jornada.mp4',
+    final:    '/assets/html/section-final.html'
+    };
 
   // Função para verificar elementos críticos no HTML
   function checkCriticalElements(section, sectionId) {
