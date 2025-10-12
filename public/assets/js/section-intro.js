@@ -105,47 +105,47 @@
 
     btn.disabled = true;
 
-    const runTypingChain = async () => {
-      const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
-      if (typingElements.length === 0 || typeof window.runTyping !== 'function') {
-        typingElements.forEach(el => {
-          el.textContent = getText(el);
-          el.classList.add('typing-done');
-        });
-        btn.disabled = false;
-        return;
-      }
+   const runTypingChain = async () => {
+  const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
+  if (typingElements.length === 0 || typeof window.runTyping !== 'function') {
+    typingElements.forEach(el => {
+      el.textContent = getText(el);
+      el.classList.add('typing-done');
+    });
+    btn.disabled = false;
+    return;
+  }
 
-      try {
-        for (const el of typingElements) {
-          if (el.classList.contains('typing-done')) continue; // Ignora elementos já processados
-          const text = getText(el);
-          el.textContent = '';
-          el.classList.add('typing-active');
-          await new Promise((resolve) => {
-            window.runTyping(el, text, resolve, {
-              speed: Number(el.dataset.speed || 36),
-              cursor: String(el.dataset.cursor || 'true') === 'true'
-            });
-          });
-          el.classList.add('typing-done');
-        }
-        // Adiciona o TTS
+  try {
+    for (const el of typingElements) {
+      if (el.classList.contains('typing-done')) continue;
+      const text = getText(el);
+      el.textContent = '';
+      el.classList.add('typing-active');
+      await new Promise((resolve) => {
+        window.runTyping(el, text, resolve, {
+          speed: Number(el.dataset.speed || 36),
+          cursor: String(el.dataset.cursor || 'true') === 'true'
+        });
+      });
+      el.classList.add('typing-done');
+    }
+    
     if (typeof window.EffectCoordinator?.speak === 'function') {
       const fullText = Array.from(typingElements).map(el => getText(el)).join(' ');
       window.EffectCoordinator.speak(fullText, { rate: 1.03, pitch: 1.0 });
       console.log('[section-intro.js] TTS ativado para:', fullText.substring(0, 50) + '...');
     }
-      } catch (err) {
-        typingElements.forEach(el => {
-          el.textContent = getText(el);
-          el.classList.add('typing-done');
-        });
-      }
+  } catch (err) {
+    typingElements.forEach(el => {
+      el.textContent = getText(el);
+      el.classList.add('typing-done');
+    });
+  }
 
-      btn.disabled = false;
-      console.log('[section-intro.js] Mostrando botão "Avançar"');
-    };
+  btn.disabled = false;
+  console.log('[section-intro.js] Mostrando botão "Avançar"');
+};
 
     once(btn, 'click', () => {
       if (typeof window.JC?.show === 'function') {
