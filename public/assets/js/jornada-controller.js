@@ -207,17 +207,17 @@
 
     if (!sectionOrder.length) {
       JC.setOrder([
-        'section-intro',          // 1. Apresentação, nome e escolha do guia (com fetch)
-        'section-termos',         // 2. Termos de uso
-        'section-senha',          // 3. Senha (se houver)
-        'section-filme-jardim',   // 4. Primeiro filme
+        'section-intro',          
+        'section-termos',         
+        'section-senha',          
+        'section-filme-conhecimento-com-luz-jardim',   
         'section-guia',
-        'section-filme-jardim',
-        'section-selfie',         // 5. Selfie (Guia já escolhido na Intro)
-        'section-filme-ao-encontro', // 6. Próximo filme
-        'section-perguntas',      // 7. Seção de perguntas dinâmicas
-        'section-filme-jardim',
-        'section-final'           // 8. Final e PDF
+        'section-filme-conhecimento-com-luz-jardim',
+        'section-selfie',         
+        'section-filme-0-ao-encontro-da-jornada', 
+        'section-perguntas',      
+        'section-filme-5-fim-da-jornada',
+        'section-final'           
       ]);
     }
 
