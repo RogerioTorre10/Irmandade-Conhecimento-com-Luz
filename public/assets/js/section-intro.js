@@ -69,11 +69,11 @@
   }
 
   // Função principal de inicialização
-  async function init() {
+  function init() {
     console.log('[section-intro.js] Iniciando inicialização');
 
     // Busca a seção
-    let root = document.getElementById('section-intro');
+    const root = document.getElementById('section-intro');
     if (!root) {
       console.error('[section-intro.js] Erro: Seção #section-intro não encontrada');
       window.toast?.('Erro: Seção section-intro não carregada.', 'error');
@@ -149,7 +149,7 @@
 
     // Executa a cadeia de datilografia
     try {
-      await runTypingChain(root, btn);
+      runTypingChain(root, btn);
       console.log('[section-intro.js] Intro preparada com sucesso');
     } catch (err) {
       console.error('[section-intro.js] Erro ao preparar intro:', err);
