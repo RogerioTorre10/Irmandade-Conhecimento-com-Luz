@@ -27,7 +27,7 @@
 
   // Definição de URLs para seções não embutidas (ex.: vídeos)
   const etapas = {
-    intro:    '/html/section-intro.html',
+    intro:    '/assets/html/section-intro.html',
     termos:   '/assets/html/section-termos.html',
     senha:    '/assets/html/section-senha.html',
     filme:    '/assets/img/conhecimento-com-luz-jardim.mp4',
@@ -81,7 +81,7 @@
     if (html) {
       console.log('[carregarEtapa] Usando template embutido para', nome);
     } else {
-      const url = etapas[nome] || `/html/section-${nome}.html`;
+      const url = etapas[nome] || `/assets/html/section-${nome}.html`;
       console.log('[carregarEtapa] Carregando via fetch:', url);
       const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) {
