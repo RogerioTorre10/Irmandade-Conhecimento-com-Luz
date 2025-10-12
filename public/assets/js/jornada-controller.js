@@ -179,7 +179,7 @@
       console.error(`[JC.show] Elemento #${id} não encontrado. NÃO criando fallback para diagnóstico.`);
       console.log('[JC.show] Conteúdo de #jornada-canvas:', document.getElementById('jornada-canvas')?.innerHTML);
       console.log('[JC.show] Conteúdo de #section-conteudo:', document.getElementById('section-conteudo')?.innerHTML);
-      return; // Impede a criação do fallback
+      return;
     }
     
     target.classList?.remove(HIDE_CLASS);
