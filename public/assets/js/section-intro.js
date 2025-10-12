@@ -9,20 +9,7 @@
   }
   window.__introBound = true;
 
-  let INTRO_READY = false;
-
-  const once = (el, ev, fn) => {
-    if (!el) {
-      console.warn('[section-intro.js] Elemento para evento', ev, 'não encontrado');
-      return;
-    }
-    const h = (e) => {
-      el.removeEventListener(ev, h);
-      fn(e);
-    };
-    el.addEventListener(ev, h);
-  };
-
+  // Função para buscar elementos com timeout
   async function waitForElement(selector, { within = document, timeout = 5000, step = 50 } = {}) {
     console.log('[section-intro.js] Aguardando elemento:', selector);
     const start = performance.now();
@@ -46,10 +33,12 @@
     });
   }
 
+  // Função para obter texto do elemento
   function getText(el) {
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
   }
 
+  // Função principal para aplicar datilografia e TTS
   async function runTypingChain(root, btn) {
     console.log('[section-intro.js] Iniciando runTypingChain');
     const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
@@ -106,21 +95,21 @@
     }
 
     btn.disabled = false;
-    console.log('[section-intro.js] Mostrando botão "Avançar"');
+    console.log('[section-intro.js] Habilitando botão "Avançar"');
   }
 
-  const handler = async (evt) => {
-    console.log('[section-intro.js] Iniciando handler para section-intro');
+  // Função principal
+  async function init() {
+    console.log('[section-intro.js] Iniciando inicialização');
 
-    let root = document.getElementById('section-intro');
-    if (!root) {
-      try {
-        root = await waitForElement('#section-intro', { timeout: 10000 });
-      } catch (e) {
-        console.error('[section-intro.js] Erro: Seção #section-intro não encontrada:', e);
-        window.toast?.('Erro: Seção section-intro não carregada.', 'error');
-        return;
-      }
+    let root;
+    try {
+      root = await waitForElement('#section-intro', { timeout: 10000 });
+      console.log('[section-intro.js] Seção #section-intro encontrada');
+    } catch (e) {
+      console.error('[section-intro.js] Erro: Seção #section-intro não encontrada:', e);
+      window.toast?.('Erro: Seção section-intro não carregada.', 'error');
+      return;
     }
 
     let el1, el2, btn;
@@ -132,6 +121,7 @@
     } catch (e) {
       console.error('[section-intro.js] Falha ao carregar elementos:', e);
       window.toast?.('Falha ao carregar elementos da seção Intro.', 'error');
+      // Cria elementos de fallback
       const wrapper = root.querySelector('#jornada-content-wrapper') || root.appendChild(document.createElement('div'));
       wrapper.id = 'jornada-content-wrapper';
       el1 = el1 || wrapper.appendChild(Object.assign(document.createElement('div'), {
@@ -181,7 +171,7 @@
     }
 
     // Vincula o evento de clique ao botão
-    once(btn, 'click', () => {
+    btn.addEventListener('click', () => {
       console.log('[section-intro.js] Botão Avançar clicado');
       if (typeof window.JC?.show === 'function') {
         window.JC.show('section-termos');
@@ -191,45 +181,26 @@
     });
 
     // Executa a cadeia de datilografia
-    if (!INTRO_READY) {
-      try {
-        await runTypingChain(root, btn);
-        INTRO_READY = true;
-        console.log('[section-intro.js] Intro preparada com sucesso');
-      } catch (err) {
-        console.error('[section-intro.js] Erro ao preparar intro:', err);
-        btn.disabled = false;
-      }
-    } else {
-      console.log('[section-intro.js] Intro já preparada, habilitando botão');
+    try {
+      await runTypingChain(root, btn);
+      console.log('[section-intro.js] Intro preparada com sucesso');
+    } catch (err) {
+      console.error('[section-intro.js] Erro ao preparar intro:', err);
       btn.disabled = false;
     }
-  };
+  }
 
-  const bind = () => {
-    console.log('[section-intro.js] Vinculando eventos');
-    document.removeEventListener('sectionLoaded', handler);
-    document.removeEventListener('section:shown', handler);
-    document.addEventListener('sectionLoaded', handler, { passive: true });
-    document.addEventListener('section:shown', handler, { passive: true });
-
-    // Força a execução do handler imediatamente, se a seção já estiver visível
-    setTimeout(() => {
-      const visibleIntro = document.querySelector('#section-intro:not(.hidden)');
-      if (visibleIntro) {
-        console.log('[section-intro.js] Seção #section-intro visível, chamando handler');
-        handler({ detail: { sectionId: 'section-intro', node: visibleIntro } });
-      } else {
-        console.warn('[section-intro.js] Seção #section-intro não visível, aguardando evento');
-      }
-    }, 100);
-  };
-
-  // Garante que o script seja executado mesmo se o DOM já estiver carregado
+  // Executa a inicialização imediatamente
   console.log('[section-intro.js] Estado do DOM:', document.readyState);
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bind, { once: true });
+    document.addEventListener('DOMContentLoaded', init, { once: true });
   } else {
-    bind();
+    init();
   }
+
+  // Tenta executar novamente após um pequeno atraso
+  setTimeout(() => {
+    console.log('[section-intro.js] Tentando inicialização tardia');
+    init();
+  }, 100);
 })();
