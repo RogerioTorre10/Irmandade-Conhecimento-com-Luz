@@ -15,7 +15,7 @@
     el.addEventListener(ev, h);
   };
 
-  async function waitForElement(selector, { within = document, timeout = 10000, step = 50 } = {}) {
+  async function waitForElement(selector, { within = document, timeout = 2000, step = 50 } = {}) {
     const start = performance.now();
     return new Promise((resolve, reject) => {
       const tick = () => {
@@ -60,9 +60,9 @@
 
     let el1, el2, btn;
     try {
-      el1 = await waitForElement('#intro-p1', { within: root, timeout: 10000 });
-      el2 = await waitForElement('#intro-p2', { within: root, timeout: 10000 });
-      btn = await waitForElement('#btn-avancar', { within: root, timeout: 10000 });
+      el1 = await waitForElement('#intro-p1', { within: root, timeout: 2000 });
+      el2 = await waitForElement('#intro-p2', { within: root, timeout: 2000 });
+      btn = await waitForElement('#btn-avancar', { within: root, timeout: 2000 });
     } catch (e) {
       window.toast?.('Falha ao carregar os elementos da seção Intro.', 'error');
       console.error('[section-intro.js] Elementos encontrados via fallback:', { el1: !!el1, el2: !!el2, btn: !!btn });
