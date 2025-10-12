@@ -167,8 +167,8 @@
     if (window.carregarEtapa) { 
       console.log('[JC.show] Iniciando carregarEtapa para', loaderName);
       await window.carregarEtapa(loaderName); 
-      console.log('[JC.show] carregarEtapa concluído, elemento #section-intro:', !!document.getElementById('section-intro'));
-      console.log('[JC.show] DOM após carregarEtapa:', document.getElementById('jornada-canvas')?.innerHTML);
+      console.log('[JC.show] carregarEtapa concluído, elemento #' + id + ':', !!document.getElementById(id));
+      console.log('[JC.show] Conteúdo de #jornada-content-wrapper:', document.getElementById('jornada-content-wrapper')?.innerHTML.slice(0, 120) + '...');
       window.i18n?.apply?.(); 
     } else {
       console.error('[JC.show] Função carregarEtapa não encontrada.');
