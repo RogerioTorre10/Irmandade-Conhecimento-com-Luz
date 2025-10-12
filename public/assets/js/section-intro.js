@@ -162,22 +162,6 @@
 
     console.log('[section-intro.js] Elementos encontrados:', { el1: !!el1, el2: !!el2, btn: !!btn });
 
-    // Aplica textura de pedra ao botão
-    btn.classList.add('btn-stone');
-    btn.style.cssText = `
-      padding: 8px 16px;
-      background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
-      background-blend-mode: overlay;
-      color: #fff;
-      border-radius: 8px;
-      font-size: 18px;
-      border: 3px solid #4a4a4a;
-      box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
-      opacity: 1;
-      visibility: visible;
-      display: inline-block;
-    `;
     try {
       if (typeof window.JC?.show === 'function') {
         window.JC.show('section-intro');
