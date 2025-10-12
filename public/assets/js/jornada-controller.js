@@ -153,57 +153,60 @@
     }
   };
 
-  JC.show = async function (id, { force = false } = {}) {
-    const now = performance.now();
-    if (!force && (now - lastShowSection < 300)) { 
-      console.log(`[JC.show] Ignorando chamada para ${id}: muito rápida`);
-      return;
+ JC.show = async function (id, { force = false } = {}) {
+  const now = performance.now();
+  if (!force && (now - lastShowSection < 300)) { 
+    console.log(`[JC.show] Ignorando chamada para ${id}: muito rápida`);
+    return;
+  }
+  lastShowSection = now;
+  
+  const loaderName = id.startsWith('section-') ? id.substring(8) : id;
+
+  try {
+    if (window.carregarEtapa) { 
+      console.log('[JC.show] Iniciando carregarEtapa para', loaderName);
+      await window.carregarEtapa(loaderName); 
+      console.log('[JC.show] carregarEtapa concluído, elemento #section-intro:', !!document.getElementById('section-intro'));
+      console.log('[JC.show] DOM após carregarEtapa:', document.getElementById('jornada-canvas')?.innerHTML);
+      window.i18n?.apply?.(); 
+    } else {
+      console.error('[JC.show] Função carregarEtapa não encontrada.');
     }
-    lastShowSection = now;
+
+    let target = document.getElementById(id);
+    if (!target) {
+      console.error(`[JC.show] Elemento #${id} não encontrado. NÃO criando fallback para diagnóstico.`);
+      console.log('[JC.show] Conteúdo de #jornada-canvas:', document.getElementById('jornada-canvas')?.innerHTML);
+      console.log('[JC.show] Conteúdo de #section-conteudo:', document.getElementById('section-conteudo')?.innerHTML);
+      return; // Impede a criação do fallback
+    }
     
-    const loaderName = id.startsWith('section-') ? id.substring(8) : id;
+    target.classList?.remove(HIDE_CLASS);
+    target.style.display = 'block';
+    target.style.visibility = 'visible';
+    global.__currentSectionId = id;
 
-    try {
-      if (window.carregarEtapa) { 
-        console.log('[JC.show] Iniciando carregarEtapa para', loaderName);
-        await window.carregarEtapa(loaderName); 
-        console.log('[JC.show] carregarEtapa concluído, elemento #section-intro:', !!document.getElementById('section-intro'));
-        window.i18n?.apply?.(); 
-      } else {
-        console.error('[JC.show] Função carregarEtapa não encontrada.');
-      }
+    global.G = global.G || {};
+    global.G.__typingLock = false;
+    
+    if (id !== 'section-termos') currentTermosPage = 'termos-pg1';
+    if (id !== 'section-perguntas') currentPerguntasBlock = 'bloco-raizes';
 
-      let target = document.getElementById(id);
-      if (!target) {
-        target = createFallbackElement(id);
-        window.toast?.(`Seção ${id} não encontrada. Usando fallback.`, 'error');
-      }
-      
-      target.classList?.remove(HIDE_CLASS);
-      target.style.display = 'block';
-      target.style.visibility = 'visible';
-      global.__currentSectionId = id;
+    handleSectionLogic(id, target);
 
-      global.G = global.G || {};
-      global.G.__typingLock = false;
-      
-      if (id !== 'section-termos') currentTermosPage = 'termos-pg1';
-      if (id !== 'section-perguntas') currentPerguntasBlock = 'bloco-raizes';
+    const detail = { sectionId: id, id, root: target };
+    document.dispatchEvent(new CustomEvent('section:shown', { detail }));
 
-      handleSectionLogic(id, target);
+    setTimeout(() => {
+      handleTypingAndButtons(id, target);
+    }, 300);
 
-      const detail = { sectionId: id, id, root: target };
-      document.dispatchEvent(new CustomEvent('section:shown', { detail }));
-
-      setTimeout(() => {
-        handleTypingAndButtons(id, target);
-      }, 300);
-
-      console.log('[JC.show] Exibido com sucesso:', id);
-    } catch (e) {
-      console.error('[JC.show] Falha ao exibir', id, e);
-    }
-  };
+    console.log('[JC.show] Exibido com sucesso:', id);
+  } catch (e) {
+    console.error('[JC.show] Falha ao exibir', id, e);
+  }
+};
 
   JC.init = function () {
     if (controllerInitialized) return;
