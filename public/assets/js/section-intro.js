@@ -107,7 +107,9 @@
 
    const runTypingChain = async () => {
   const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
+  console.log('[section-intro.js] Elementos com data-typing:', typingElements.length);
   if (typingElements.length === 0 || typeof window.runTyping !== 'function') {
+    console.warn('[section-intro.js] Nenhum elemento com data-typing ou runTyping não disponível');
     typingElements.forEach(el => {
       el.textContent = getText(el);
       el.classList.add('typing-done');
@@ -118,7 +120,10 @@
 
   try {
     for (const el of typingElements) {
-      if (el.classList.contains('typing-done')) continue;
+      if (el.classList.contains('typing-done')) {
+        console.log('[section-intro.js] Ignorando elemento já processado:', el.id);
+        continue;
+      }
       const text = getText(el);
       el.textContent = '';
       el.classList.add('typing-active');
@@ -137,6 +142,7 @@
       console.log('[section-intro.js] TTS ativado para:', fullText.substring(0, 50) + '...');
     }
   } catch (err) {
+    console.error('[section-intro.js] Erro ao aplicar datilografia:', err);
     typingElements.forEach(el => {
       el.textContent = getText(el);
       el.classList.add('typing-done');
