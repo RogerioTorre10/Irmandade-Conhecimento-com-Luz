@@ -4,17 +4,17 @@
 
   // DEFINIÇÃO CENTRALIZADA DAS ETAPAS
   const etapas = {
-    intro:    '/assets/html/section-intro.html',
-    termos:   '/assets/html/section-termos.html',
-    senha:    '/assets/html/section-senha.html',
+    intro:    '/html/section-intro.html',
+    termos:   '/html/section-termos.html',
+    senha:    '/html/section-senha.html',
     filme:    '/assets/img/conhecimento-com-luz-jardim.mp4',
-    guia:     '/assets/html/section-guia.html',
+    guia:     '/html/section-guia.html',
     filme:    '/assets/img/conhecimento-com-luz-jardim.mp4',
-    selfie:   '/assets/html/section-selfie.html',
+    selfie:   '/html/section-selfie.html',
     filme:    '/assets/img/filme-0-ao-encontro-da-jornada.mp4',
-    perguntas:'/assets/html/section-perguntas.html', 
+    perguntas:'/html/section-perguntas.html', 
     filme:    '/assets/img/filme-5-fim-da-jornada.mp4',
-    final:    '/assets/html/section-final.html'
+    final:    '/html/section-final.html'
     };
 
   const SECTION_CONTAINER_ID = 'section-conteudo';
@@ -43,7 +43,7 @@
 
   async function carregarEtapa(nome) {
     let section = null; 
-    const url = etapas[nome] || `/assets/html/section-${nome}.html`; 
+    const url = etapas[nome] || `/html/section-${nome}.html`; 
     const id = `section-${nome}`;
     
     if (document.getElementById(id)) {
