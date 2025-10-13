@@ -52,62 +52,63 @@
   }
 
   // ===== FUNÇÃO PRIMÁRIA DE DATILOGRAFIA (Melhorada para evitar 'append' no caret) =====
- async function typeText(element, text, speed = 40, showCursor = false) {
-  console.log('[TypingBridge] typeText iniciado para:', element.id, 'texto:', text);
-  return new Promise(resolve => {
-    if (!element || !text) {
-      console.warn('[TypingBridge] Elemento ou texto inválido:', element, text);
-      return resolve();
-    }
-    
-    if (abortCurrent) abortCurrent(); 
-    let abort = false;
-    abortCurrent = () => (abort = true);
+  async function typeText(element, text, speed = 40, showCursor = false) {
+    return new Promise(resolve => {
+      if (!element || !text) return resolve();
+      
+      // Se houver typing em andamento, aborta
+      if (abortCurrent) abortCurrent(); 
+      
+      let abort = false;
+      abortCurrent = () => (abort = true);
 
-    element.classList.remove('typing-done');
-    element.style.visibility = 'visible';
-    element.style.opacity = '0';
-    
-    let caret = element.querySelector('.typing-caret');
-    if (!caret && showCursor) {
-      caret = document.createElement('span');
-      caret.className = 'typing-caret';
-      caret.textContent = '|';
-      console.log('[TypingBridge] Caret criado para:', element.id);
-    }
-    
-    element.textContent = '';
-    if (showCursor) element.appendChild(caret);
-    element.style.opacity = '1';
-    
-    let i = 0;
-    const interval = setInterval(() => {
-      if (abort) {
-        clearInterval(interval);
-        if (showCursor && caret) caret.remove();
-        console.log('[TypingBridge] Animação abortada para:', element.id);
-        return resolve();
-      }
-      
-      const currentText = text.slice(0, i + 1);
-      if (showCursor) {
-        element.textContent = currentText;
-        if (caret) element.appendChild(caret);
-      } else {
-        element.textContent = currentText;
-      }
-      
-      i++;
-      if (i >= text.length) {
-        clearInterval(interval);
-        if (showCursor && caret) caret.remove();
-        element.classList.add('typing-done');
-        console.log('[TypingBridge] Animação concluída para:', element.id);
-        resolve();
-      }
-    }, speed);
-  });
-}
+      element.classList.remove('typing-done');
+      element.style.visibility = 'visible';
+      element.style.opacity = '0';
+      
+      // Cria/busca o caret (cursor)
+      let caret = element.querySelector('.typing-caret');
+      if (!caret) {
+        caret = document.createElement('span');
+        caret.className = 'typing-caret';
+        caret.textContent = '|';
+      }
+      
+      // Limpa o texto e anexa o caret se for para mostrar
+      element.textContent = '';
+      if (showCursor) element.appendChild(caret);
+      
+      // Garante que o elemento está visível antes de começar a digitar
+      element.style.opacity = '1';
+      
+
+      let i = 0;
+      const interval = setInterval(() => {
+        if (abort) {
+          clearInterval(interval);
+          if (showCursor) caret.remove();
+          return resolve();
+        }
+        
+        // Insere o texto + cursor
+        const currentText = text.slice(0, i + 1);
+        if (showCursor) {
+          element.textContent = currentText;
+          element.appendChild(caret);
+        } else {
+          element.textContent = currentText;
+        }
+        
+        i++;
+        if (i >= text.length) {
+          clearInterval(interval);
+          if (showCursor) caret.remove();
+          element.classList.add('typing-done');
+          resolve();
+        }
+      }, speed);
+    });
+  }
 
   // ===== RUN TYPING (A função que você usa no section-intro.js) =====
   global.runTyping = (element, text, callback, options = {}) => {
