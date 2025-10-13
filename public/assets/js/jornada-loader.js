@@ -92,16 +92,26 @@
     container.appendChild(section);
     console.log('[carregarEtapa] Injetada e apensa no wrapper:', section.outerHTML.slice(0, 120) + '...');
 
+    // 🔁 Reaplica fundo de pergaminho vertical se necessário
+    const canvas = document.getElementById('jornada-canvas');
+    if (canvas) {
+    canvas.classList.remove('pergaminho', 'pergaminho-v'); // limpa antes
+    if (['filme', 'intro', 'guia'].includes(nome)) {
+    canvas.classList.add('pergaminho', 'pergaminho-v');
+    console.log('[carregarEtapa] Fundo de pergaminho vertical aplicado ao canvas.');
+   }
+  }
+      
     // *** RESOLVE A PROMISE APÓS A INJEÇÃO ***
     return new Promise(resolve => {
-      requestAnimationFrame(() => {
-        document.dispatchEvent(new CustomEvent('sectionLoaded', {
-          detail: { sectionId: id, name: nome, node: section }
-        }));
-        resolve(section); 
+    requestAnimationFrame(() => {
+    document.dispatchEvent(new CustomEvent('sectionLoaded', {
+    detail: { sectionId: id, name: nome, node: section }
+    }));
+    resolve(section); 
       });
-    });
-  }
+     });
+   }
 
-  window.carregarEtapa = carregarEtapa;
-})();
+    window.carregarEtapa = carregarEtapa;
+   })();
