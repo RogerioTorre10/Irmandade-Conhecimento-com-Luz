@@ -6,7 +6,7 @@
   <title>Jornada Conhecimento com Luz</title>
   <link rel="stylesheet" href="/assets/css/styles.css">
   <link rel="stylesheet" href="/assets/css/chama.css"> <!-- 🔥 estilo da chama -->
-  <style>
+ <style>
     /* Estilos básicos para a página */
     body {
       margin: 0;
@@ -29,70 +29,92 @@
       max-width: 600px;
       margin: 0 auto;
     }
-    .card.pergaminho.pergaminho-v.section {
+    #section-intro {
       background: #fff !important;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 600px;
-      text-align: center;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      padding: 20px !important;
+      border-radius: 8px !important;
+      max-width: 600px !important;
+      text-align: center !important;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5) !important;
       display: block !important;
       opacity: 1 !important;
       visibility: visible !important;
-      position: relative;
-      z-index: 2;
+      position: relative !important;
+      z-index: 2 !important;
+    }
+    .card.pergaminho.pergaminho-v.section {
+      background: #fff !important;
+      padding: 20px !important;
+      border-radius: 8px !important;
+      max-width: 600px !important;
+      text-align: center !important;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5) !important;
+      display: block !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      position: relative !important;
+      z-index: 2 !important;
+    }
+    .intro-wrap {
+      display: block !important;
+      opacity: 1 !important;
+      visibility: visible !important;
     }
     .intro-paragraph {
-      font-size: 18px;
-      margin-bottom: 20px;
-      color: #333;
-      opacity: 0;
-      transition: opacity 0.1s;
+      font-size: 18px !important;
+      margin-bottom: 20px !important;
+      color: #333 !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      display: block !important;
     }
     .intro-paragraph.typing-done {
-      opacity: 1;
+      opacity: 1 !important;
+    }
+    #intro-p1, #intro-p2 {
+      opacity: 1 !important;
+      visibility: visible !important;
+      display: block !important;
     }
     .btn.btn-primary.btn-stone {
-      padding: 8px 16px;
-      background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
-      background-blend-mode: overlay;
-      color: #fff;
-      border-radius: 8px;
-      font-size: 18px;
-      border: 3px solid #4a4a4a;
-      box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+      padding: 8px 16px !important;
+      background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover !important;
+      background-blend-mode: overlay !important;
+      color: #fff !important;
+      border-radius: 8px !important;
+      font-size: 18px !important;
+      border: 3px solid #4a4a4a !important;
+      box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6) !important;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.7) !important;
       opacity: 1 !important;
       visibility: visible !important;
       display: inline-block !important;
-      cursor: pointer;
+      cursor: pointer !important;
     }
     .btn:disabled {
       opacity: 0.5 !important;
-      cursor: not-allowed;
+      cursor: not-allowed !important;
     }
     .typing-caret {
-      display: inline-block;
-      width: 0.6ch;
-      margin-left: 2px;
-      animation: blink 1s step-end infinite;
+      display: inline-block !important;
+      width: 0.6ch !important;
+      margin-left: 2px !important;
+      animation: blink 1s step-end infinite !important;
     }
     @keyframes blink {
       50% { opacity: 0; }
     }
     [data-typing="true"] {
-      opacity: 0;
-      transition: opacity 0.1s;
-      visibility: visible;
+      opacity: 0 !important;
+      transition: opacity 0.1s !important;
+      visibility: visible !important;
     }
     [data-typing="true"].typing-done {
-      opacity: 1;
-      visibility: visible;
+      opacity: 1 !important;
+      visibility: visible !important;
     }
     /* Estilos da chama */
     .chama-vela {
-      --altura: 45px;
-      --largura: 30px;
       --pulso: 1.2s;
       --glow: 8px;
       --hue: 28;
@@ -100,8 +122,6 @@
       --light: 58%;
       --op: 0.98;
       position: fixed;
-      width: var(--largura);
-      height: var(--altura);
       display: block !important;
       z-index: 1200;
       filter: drop-shadow(0 0 var(--glow) hsla(var(--hue), var(--satur), 60%, 0.75));
@@ -109,13 +129,17 @@
       opacity: 1 !important;
       visibility: visible !important;
     }
-    .chama-vela.chama-md {
-      --largura: 40px;
-      --altura: 90px;
+    .chama-vela.flame-bottom-right {
+      --altura: 90px; /* Dobro de 45px */
+      --largura: 60px; /* Dobro de 30px */
+      bottom: 20px;
+      right: 20px;
     }
-    .chama-vela.chama-lg {
-      --largura: 30px;
-      --altura: 60px;
+    .chama-vela.flame-top-left {
+      --altura: 67.5px; /* 50% maior que 45px */
+      --largura: 45px; /* 50% maior que 30px */
+      top: 20px;
+      left: 20px;
     }
     .chama-vela .brasa {
       position: absolute;
@@ -208,20 +232,21 @@
       position: fixed;
       z-index: 1200;
       pointer-events: none;
+      display: block !important;
+      opacity: 1 !important;
+      visibility: visible !important;
     }
     .flame-bottom-right {
       bottom: 20px;
       right: 20px;
-      display: block !important;
-      visibility: visible !important;
-      opacity: 1 !important;
+      --altura: 90px;
+      --largura: 60px;
     }
     .flame-top-left {
       top: 20px;
       left: 20px;
-      display: block !important;
-      visibility: visible !important;
-      opacity: 1 !important;
+      --altura: 67.5px;
+      --largura: 45px;
     }
     #chama-header .chama-vela {
       --largura: 30px;
@@ -295,12 +320,30 @@
     console.log('[inline] Checking section-intro.js load');
     if (typeof window.__introBound === 'undefined') {
       console.error('[inline] section-intro.js not loaded!');
-      // Força exibição do pergaminho
+      // Força exibição do pergaminho e elementos
       const root = document.getElementById('section-intro');
       if (root) {
         root.style.display = 'block';
         root.style.opacity = '1';
         root.style.visibility = 'visible';
+      }
+      const wrapper = document.getElementById('jornada-content-wrapper');
+      if (wrapper) {
+        wrapper.style.display = 'block';
+        wrapper.style.opacity = '1';
+        wrapper.style.visibility = 'visible';
+      }
+      const el1 = document.getElementById('intro-p1');
+      const el2 = document.getElementById('intro-p2');
+      if (el1) {
+        el1.style.opacity = '1';
+        el1.style.visibility = 'visible';
+        el1.classList.add('typing-done');
+      }
+      if (el2) {
+        el2.style.opacity = '1';
+        el2.style.visibility = 'visible';
+        el2.classList.add('typing-done');
       }
       // Força estilização do botão
       const btn = document.getElementById('btn-avancar');
@@ -308,6 +351,19 @@
         btn.style.opacity = '1';
         btn.style.cursor = 'pointer';
         btn.disabled = false;
+        btn.addEventListener('click', () => {
+          console.log('[inline] Next button clicked');
+          if (typeof window.JC?.show === 'function') {
+            window.JC.show('section-termos');
+          } else {
+            window.location.href = '/termos';
+          }
+        });
+      }
+      // Força TTS se disponível
+      if (typeof window.EffectCoordinator?.speak === 'function') {
+        window.EffectCoordinator.speak('Bem-vindo à Jornada Conhecimento com Luz. Respire fundo. Vamos caminhar juntos com fé, coragem e propósito.', { rate: 1.03, pitch: 1.0 });
+        console.log('[inline] TTS activated');
       }
     }
   </script>
