@@ -3,7 +3,7 @@
 
   // Definição de URLs para seções
  const etapas = {
-    intro:    '/assets/js/html/section-intro.html',
+    intro:    '/html/section-intro.html',
     termos:   '/assets/js/html/section-termos.html',
     senha:    '/assets/js/html/section-senha.html',
     filme:    '/assets/img/conhecimento-com-luz-jardim.mp4',
@@ -53,7 +53,7 @@
     }
 
     // Carrega o HTML via fetch
-    const url = etapas[nome] || `/assets/js/html/section-${nome}.html`;
+    const url = etapas[nome] || `/html/section-${nome}.html`;
     console.log('[carregarEtapa] Carregando via fetch:', url);
     const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) {
