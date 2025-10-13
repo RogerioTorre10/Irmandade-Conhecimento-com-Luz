@@ -317,10 +317,9 @@
   <script src="/assets/js/jornada-bootstrap.js"></script>
 
 <script>
-    console.log('[inline] Checking section-intro.js load');
+   console.log('[inline] Checking section-intro.js load');
     if (typeof window.__introBound === 'undefined') {
       console.error('[inline] section-intro.js not loaded!');
-      // Força exibição do pergaminho e elementos
       const root = document.getElementById('section-intro');
       if (root) {
         root.style.display = 'block';
@@ -345,7 +344,6 @@
         el2.style.visibility = 'visible';
         el2.classList.add('typing-done');
       }
-      // Força estilização do botão
       const btn = document.getElementById('btn-avancar');
       if (btn) {
         btn.style.opacity = '1';
@@ -360,7 +358,6 @@
           }
         });
       }
-      // Força TTS se disponível
       if (typeof window.EffectCoordinator?.speak === 'function') {
         window.EffectCoordinator.speak('Bem-vindo à Jornada Conhecimento com Luz. Respire fundo. Vamos caminhar juntos com fé, coragem e propósito.', { rate: 1.03, pitch: 1.0 });
         console.log('[inline] TTS activated');
