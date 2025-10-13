@@ -16,15 +16,21 @@
       overflow-x: hidden;
     }
     #jornada-canvas {
-      display: flex;
+      display: flex !important;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       position: relative;
       z-index: 1;
+      background: transparent;
+    }
+    #section-conteudo {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
     }
     .card.pergaminho.pergaminho-v.section {
-      background: #fff;
+      background: #fff !important;
       padding: 20px;
       border-radius: 8px;
       max-width: 600px;
@@ -33,11 +39,18 @@
       display: block !important;
       opacity: 1 !important;
       visibility: visible !important;
+      position: relative;
+      z-index: 2;
     }
     .intro-paragraph {
       font-size: 18px;
       margin-bottom: 20px;
       color: #333;
+      opacity: 0;
+      transition: opacity 0.1s;
+    }
+    .intro-paragraph.typing-done {
+      opacity: 1;
     }
     .btn.btn-primary.btn-stone {
       padding: 8px 16px;
@@ -50,12 +63,12 @@
       box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);
       text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
       opacity: 1 !important;
-      visibility: visible;
-      display: inline-block;
+      visibility: visible !important;
+      display: inline-block !important;
       cursor: pointer;
     }
     .btn:disabled {
-      opacity: 0.5;
+      opacity: 0.5 !important;
       cursor: not-allowed;
     }
     .typing-caret {
@@ -93,6 +106,8 @@
       z-index: 1200;
       filter: drop-shadow(0 0 var(--glow) hsla(var(--hue), var(--satur), 60%, 0.75));
       pointer-events: none;
+      opacity: 1 !important;
+      visibility: visible !important;
     }
     .chama-vela.chama-md {
       --largura: 40px;
@@ -275,5 +290,26 @@
   <script src="/assets/js/jornada-controller.js"></script>
   <script src="/assets/js/jornada-micro.js"></script>
   <script src="/assets/js/jornada-bootstrap.js"></script>
+
+<script>
+    console.log('[inline] Checking section-intro.js load');
+    if (typeof window.__introBound === 'undefined') {
+      console.error('[inline] section-intro.js not loaded!');
+      // Força exibição do pergaminho
+      const root = document.getElementById('section-intro');
+      if (root) {
+        root.style.display = 'block';
+        root.style.opacity = '1';
+        root.style.visibility = 'visible';
+      }
+      // Força estilização do botão
+      const btn = document.getElementById('btn-avancar');
+      if (btn) {
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+        btn.disabled = false;
+      }
+    }
+  </script>
 </body>
 </html>
