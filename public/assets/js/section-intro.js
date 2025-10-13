@@ -68,24 +68,35 @@ console.log('[section-intro.js] === SCRIPT LOADED ===');
     // Aplica estilos ao botão
     console.log('[section-intro.js] Applying button styles');
     btn.style.cssText = `
-      padding: 8px 16px;
-      background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
-      background-blend-mode: overlay;
-      color: #fff;
-      border-radius: 8px;
-      font-size: 18px;
-      border: 3px solid #4a4a4a;
-      box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+      padding: 8px 16px !important;
+      background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover !important;
+      background-blend-mode: overlay !important;
+      color: #fff !important;
+      border-radius: 8px !important;
+      font-size: 18px !important;
+      border: 3px solid #4a4a4a !important;
+      box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6) !important;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.7) !important;
       opacity: 1 !important;
-      visibility: visible;
-      display: inline-block;
-      cursor: pointer;
+      visibility: visible !important;
+      display: inline-block !important;
+      cursor: pointer !important;
     `;
 
     // Exibe a seção
-    root.classList.remove('hidden');
-    root.style.display = 'block';
+    root.style.cssText = `
+      background: #fff !important;
+      padding: 20px !important;
+      border-radius: 8px !important;
+      max-width: 600px !important;
+      text-align: center !important;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5) !important;
+      display: block !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      position: relative !important;
+      z-index: 2 !important;
+    `;
     console.log('[section-intro.js] Section displayed');
 
     // Vincula o evento de clique ao botão
@@ -124,7 +135,7 @@ console.log('[section-intro.js] === SCRIPT LOADED ===');
           console.log('[section-intro.js] Typing completed:', el.id);
         }
 
-        // Aplica TTS
+        // Aplica TTS (fallback, já que está funcionando via inline)
         if (typeof window.EffectCoordinator?.speak === 'function') {
           const fullText = Array.from(typingElements).map(el => getText(el)).join(' ');
           window.EffectCoordinator.speak(fullText, { rate: 1.03, pitch: 1.0 });
@@ -144,6 +155,8 @@ console.log('[section-intro.js] === SCRIPT LOADED ===');
       typingElements.forEach(el => {
         el.textContent = getText(el);
         el.classList.add('typing-done');
+        el.style.opacity = '1';
+        el.style.visibility = 'visible';
       });
     }
 
