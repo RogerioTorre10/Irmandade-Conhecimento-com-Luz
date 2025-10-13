@@ -93,14 +93,21 @@
     console.log('[carregarEtapa] Injetada e apensa no wrapper:', section.outerHTML.slice(0, 120) + '...');
 
     // 🔁 Reaplica fundo de pergaminho vertical se necessário
-    const canvas = document.getElementById('jornada-canvas');
-    if (canvas) {
-    canvas.classList.remove('pergaminho', 'pergaminho-v'); // limpa antes
-    if (['filme', 'intro', 'guia'].includes(nome)) {
+   const canvas = document.getElementById('jornada-canvas');
+if (canvas) {
+  // Limpa todas as classes de pergaminho antes de aplicar a nova
+  canvas.classList.remove('pergaminho', 'pergaminho-v', 'pergaminho-h');
+
+  if (['intro', 'termos', 'senha', 'guia', 'selfie', 'final'].includes(nome)) {
     canvas.classList.add('pergaminho', 'pergaminho-v');
-    console.log('[carregarEtapa] Fundo de pergaminho vertical aplicado ao canvas.');
-   }
+    console.log('[carregarEtapa] Fundo de pergaminho VERTICAL aplicado ao canvas.');
   }
+
+  if (nome === 'perguntas') {
+    canvas.classList.add('pergaminho', 'pergaminho-h');
+    console.log('[carregarEtapa] Fundo de pergaminho HORIZONTAL aplicado ao canvas.');
+  }
+}
       
     // *** RESOLVE A PROMISE APÓS A INJEÇÃO ***
     return new Promise(resolve => {
