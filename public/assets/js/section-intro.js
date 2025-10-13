@@ -8,57 +8,61 @@ console.log('[section-intro.js] === SCRIPT LOADED ===');
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
   }
 
-  // Função principal para aplicar datilografia e TTS
+  // Função principal para aplicar efeitos
   async function applyEffects() {
     console.log('[section-intro.js] === APPLYING EFFECTS ===');
+
+    // Verifica duplicação no DOM
+    const introSections = document.querySelectorAll('#section-intro');
+    console.log('[section-intro.js] Number of #section-intro elements:', introSections.length);
+    if (introSections.length > 1) {
+      console.warn('[section-intro.js] Multiple #section-intro elements detected. Keeping only the first.');
+      for (let i = 1; i < introSections.length; i++) {
+        introSections[i].remove();
+      }
+    }
 
     // Busca a seção
     const root = document.getElementById('section-intro');
     if (!root) {
       console.error('[section-intro.js] ERROR: #section-intro not found');
+      window.toast?.('Error: section-intro not loaded.', 'error');
       return;
     }
     console.log('[section-intro.js] #section-intro found');
 
     // Busca os elementos
-    const el1 = root.querySelector('#intro-p1');
-    const el2 = root.querySelector('#intro-p2');
-    const btn = root.querySelector('#btn-avancar');
+    let el1 = root.querySelector('#intro-p1');
+    let el2 = root.querySelector('#intro-p2');
+    let btn = root.querySelector('#btn-avancar');
     console.log('[section-intro.js] Elements found:', { el1: !!el1, el2: !!el2, btn: !!btn });
 
+    // Cria elementos de fallback, se necessário
     if (!el1 || !el2 || !btn) {
       console.warn('[section-intro.js] WARNING: Some elements missing, creating fallback');
-      // Cria fallback se necessário
       const wrapper = root.querySelector('#jornada-content-wrapper') || root.appendChild(document.createElement('div'));
       wrapper.id = 'jornada-content-wrapper';
       wrapper.className = 'intro-wrap';
-      
-      if (!el1) {
-        el1 = wrapper.appendChild(Object.assign(document.createElement('div'), {
-          id: 'intro-p1',
-          className: 'intro-paragraph',
-          textContent: 'Bem-vindo à Jornada Conhecimento com Luz.',
-          dataset: { typing: 'true', speed: '36', cursor: 'true' }
-        }));
-      }
-      if (!el2) {
-        el2 = wrapper.appendChild(Object.assign(document.createElement('div'), {
-          id: 'intro-p2',
-          className: 'intro-paragraph',
-          textContent: 'Respire fundo. Vamos caminhar juntos com fé, coragem e propósito.',
-          dataset: { typing: 'true', speed: '36', cursor: 'true' }
-        }));
-      }
-      if (!btn) {
-        btn = wrapper.appendChild(Object.assign(document.createElement('button'), {
-          id: 'btn-avancar',
-          className: 'btn btn-primary btn-stone',
-          textContent: 'Iniciar',
-          dataset: { action: 'avancar' },
-          disabled: true
-        }));
-      }
-      console.log('[section-intro.js] Fallback elements created');
+      el1 = el1 || wrapper.appendChild(Object.assign(document.createElement('div'), {
+        id: 'intro-p1',
+        className: 'intro-paragraph',
+        textContent: 'Bem-vindo à Jornada Conhecimento com Luz.',
+        dataset: { typing: 'true', speed: '36', cursor: 'true' }
+      }));
+      el2 = el2 || wrapper.appendChild(Object.assign(document.createElement('div'), {
+        id: 'intro-p2',
+        className: 'intro-paragraph',
+        textContent: 'Respire fundo. Vamos caminhar juntos com fé, coragem e propósito.',
+        dataset: { typing: 'true', speed: '36', cursor: 'true' }
+      }));
+      btn = btn || wrapper.appendChild(Object.assign(document.createElement('button'), {
+        id: 'btn-avancar',
+        className: 'btn btn-primary btn-stone',
+        textContent: 'Iniciar',
+        dataset: { action: 'avancar' },
+        disabled: true
+      }));
+      console.log('[section-intro.js] Fallback elements created:', { el1: !!el1, el2: !!el2, btn: !!btn });
     }
 
     // Aplica estilos ao botão
@@ -100,10 +104,12 @@ console.log('[section-intro.js] === SCRIPT LOADED ===');
 
     if (typingElements.length > 0 && typeof window.runTyping === 'function') {
       console.log('[section-intro.js] Starting typing animation');
-      
       try {
         for (const el of typingElements) {
-          if (el.classList.contains('typing-done')) continue;
+          if (el.classList.contains('typing-done')) {
+            console.log('[section-intro.js] Skipping already processed:', el.id);
+            continue;
+          }
           const text = getText(el);
           console.log('[section-intro.js] Typing:', el.id, text.substring(0, 30) + '...');
           el.textContent = '';
@@ -122,19 +128,45 @@ console.log('[section-intro.js] === SCRIPT LOADED ===');
         if (typeof window.EffectCoordinator?.speak === 'function') {
           const fullText = Array.from(typingElements).map(el => getText(el)).join(' ');
           window.EffectCoordinator.speak(fullText, { rate: 1.03, pitch: 1.0 });
-          console.log('[section-intro.js] TTS activated');
+          console.log('[section-intro.js] TTS activated:', fullText.substring(0, 50) + '...');
+        } else {
+          console.warn('[section-intro.js] EffectCoordinator.speak not available');
         }
       } catch (err) {
         console.error('[section-intro.js] Typing error:', err);
+        typingElements.forEach(el => {
+          el.textContent = getText(el);
+          el.classList.add('typing-done');
+        });
       }
+    } else {
+      console.warn('[section-intro.js] No typing elements or runTyping not available');
+      typingElements.forEach(el => {
+        el.textContent = getText(el);
+        el.classList.add('typing-done');
+      });
     }
 
+    // Aplica efeito de vela
+    if (typeof window.setupCandleFlame === 'function') {
+      window.setupCandleFlame('media', 'flame-bottom-right');
+      window.setupCandleFlame('media', 'flame-top-left');
+      console.log('[section-intro.js] Candle flame effect applied for bottom-right and top-left');
+    } else {
+      console.warn('[section-intro.js] setupCandleFlame not available');
+    }
+
+    // Habilita o botão
     btn.disabled = false;
     console.log('[section-intro.js] Button enabled');
     console.log('[section-intro.js] === EFFECTS APPLIED ===');
   }
 
   // Executa imediatamente
-  console.log('[section-intro.js] DOM state:', document.readyState);
-  applyEffects();
+  try {
+    console.log('[section-intro.js] DOM state:', document.readyState);
+    applyEffects();
+  } catch (err) {
+    console.error('[section-intro.js] Error in immediate initialization:', err);
+  }
 })();
