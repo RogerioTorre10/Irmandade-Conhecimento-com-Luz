@@ -1,16 +1,76 @@
-console.log('[section-intro.js] === SCRIPT LOADED ===');
-
 (function () {
   'use strict';
+
+  console.log('[section-intro.js] Script loaded');
 
   // Função para obter texto do elemento
   function getText(el) {
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
   }
 
-  // Função principal para aplicar efeitos
-  async function applyEffects() {
-    console.log('[section-intro.js] === APPLYING EFFECTS ===');
+  // Função principal para aplicar datilografia, TTS e chama
+  async function runTypingChain(root, btn) {
+    console.log('[section-intro.js] Starting runTypingChain');
+    const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
+    console.log('[section-intro.js] Typing elements found:', typingElements.length);
+
+    if (typingElements.length === 0 || typeof window.runTyping !== 'function') {
+      console.warn('[section-intro.js] No typing elements or runTyping not available');
+      typingElements.forEach(el => {
+        el.textContent = getText(el);
+        el.classList.add('typing-done');
+      });
+      btn.disabled = false;
+      return;
+    }
+
+    // Desativa qualquer animação em andamento
+    if (window.__typingLock && typeof window.EffectCoordinator?.stopAll === 'function') {
+      console.log('[section-intro.js] Clearing typingLock');
+      window.EffectCoordinator.stopAll();
+    }
+
+    try {
+      for (const el of typingElements) {
+        if (el.classList.contains('typing-done')) {
+          console.log('[section-intro.js] Skipping already processed element:', el.id);
+          continue;
+        }
+        const text = getText(el);
+        console.log('[section-intro.js] Applying typing effect for:', el.id, 'text:', text);
+        el.textContent = '';
+        el.classList.add('typing-active');
+        await new Promise((resolve) => {
+          window.runTyping(el, text, resolve, {
+            speed: Number(el.dataset.speed || 36),
+            cursor: String(el.dataset.cursor || 'true') === 'true'
+          });
+        });
+        el.classList.add('typing-done');
+        console.log('[section-intro.js] Typing completed for:', el.id);
+      }
+
+      // Aplica TTS
+      if (typeof window.EffectCoordinator?.speak === 'function') {
+        const fullText = Array.from(typingElements).map(el => getText(el)).join(' ');
+        window.EffectCoordinator.speak(fullText, { rate: 1.03, pitch: 1.0 });
+        console.log('[section-intro.js] TTS activated for:', fullText.substring(0, 50) + '...');
+      }
+    } catch (err) {
+      console.error('[section-intro.js] Error applying typing:', err);
+      typingElements.forEach(el => {
+        el.textContent = getText(el);
+        el.classList.add('typing-done');
+      });
+    }
+
+    btn.disabled = false;
+    console.log('[section-intro.js] Enabling "Next" button');
+  }
+
+  // Função principal de inicialização
+  function init() {
+    console.log('[section-intro.js] Starting initialization');
 
     // Verifica duplicação no DOM
     const introSections = document.querySelectorAll('#section-intro');
@@ -25,7 +85,7 @@ console.log('[section-intro.js] === SCRIPT LOADED ===');
     // Busca a seção
     const root = document.getElementById('section-intro');
     if (!root) {
-      console.error('[section-intro.js] ERROR: #section-intro not found');
+      console.error('[section-intro.js] Error: #section-intro not found');
       window.toast?.('Error: section-intro not loaded.', 'error');
       return;
     }
@@ -39,7 +99,7 @@ console.log('[section-intro.js] === SCRIPT LOADED ===');
 
     // Cria elementos de fallback, se necessário
     if (!el1 || !el2 || !btn) {
-      console.warn('[section-intro.js] WARNING: Some elements missing, creating fallback');
+      console.warn('[section-intro.js] Creating fallback elements');
       const wrapper = root.querySelector('#jornada-content-wrapper') || root.appendChild(document.createElement('div'));
       wrapper.id = 'jornada-content-wrapper';
       wrapper.className = 'intro-wrap';
@@ -66,38 +126,35 @@ console.log('[section-intro.js] === SCRIPT LOADED ===');
     }
 
     // Aplica estilos ao botão
-    console.log('[section-intro.js] Applying button styles');
     btn.style.cssText = `
-      padding: 8px 16px !important;
-      background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover !important;
-      background-blend-mode: overlay !important;
-      color: #fff !important;
-      border-radius: 8px !important;
-      font-size: 18px !important;
-      border: 3px solid #4a4a4a !important;
-      box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6) !important;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.7) !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-      display: inline-block !important;
-      cursor: pointer !important;
+      padding: 8px 16px;
+      background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
+      background-blend-mode: overlay;
+      color: #fff;
+      border-radius: 8px;
+      font-size: 18px;
+      border: 3px solid #4a4a4a;
+      box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+      opacity: 1;
+      visibility: visible;
+      display: inline-block;
+      cursor: pointer;
     `;
 
+    // Aplica efeito de vela
+    if (typeof window.setupCandleFlame === 'function') {
+      window.setupCandleFlame('media', 'flame-bottom-right');
+      window.setupCandleFlame('media', 'flame-top-left');
+      console.log('[section-intro.js] Candle flame effect applied for bottom-right and top-left');
+    } else {
+      console.warn('[section-intro.js] setupCandleFlame not available');
+    }
+
     // Exibe a seção
-    root.style.cssText = `
-      background: #fff !important;
-      padding: 20px !important;
-      border-radius: 8px !important;
-      max-width: 600px !important;
-      text-align: center !important;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5) !important;
-      display: block !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-      position: relative !important;
-      z-index: 2 !important;
-    `;
-    console.log('[section-intro.js] Section displayed');
+    root.classList.remove('hidden');
+    root.style.display = 'block';
+    console.log('[section-intro.js] Displaying section-intro');
 
     // Vincula o evento de clique ao botão
     btn.addEventListener('click', () => {
@@ -109,76 +166,20 @@ console.log('[section-intro.js] === SCRIPT LOADED ===');
       }
     });
 
-    // Aplica datilografia
-    const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
-    console.log('[section-intro.js] Typing elements:', typingElements.length);
-
-    if (typingElements.length > 0 && typeof window.runTyping === 'function') {
-      console.log('[section-intro.js] Starting typing animation');
-      try {
-        for (const el of typingElements) {
-          if (el.classList.contains('typing-done')) {
-            console.log('[section-intro.js] Skipping already processed:', el.id);
-            continue;
-          }
-          const text = getText(el);
-          console.log('[section-intro.js] Typing:', el.id, text.substring(0, 30) + '...');
-          el.textContent = '';
-          el.classList.add('typing-active');
-          await new Promise((resolve) => {
-            window.runTyping(el, text, resolve, {
-              speed: Number(el.dataset.speed || 36),
-              cursor: String(el.dataset.cursor || 'true') === 'true'
-            });
-          });
-          el.classList.add('typing-done');
-          console.log('[section-intro.js] Typing completed:', el.id);
-        }
-
-        // Aplica TTS (fallback, já que está funcionando via inline)
-        if (typeof window.EffectCoordinator?.speak === 'function') {
-          const fullText = Array.from(typingElements).map(el => getText(el)).join(' ');
-          window.EffectCoordinator.speak(fullText, { rate: 1.03, pitch: 1.0 });
-          console.log('[section-intro.js] TTS activated:', fullText.substring(0, 50) + '...');
-        } else {
-          console.warn('[section-intro.js] EffectCoordinator.speak not available');
-        }
-      } catch (err) {
-        console.error('[section-intro.js] Typing error:', err);
-        typingElements.forEach(el => {
-          el.textContent = getText(el);
-          el.classList.add('typing-done');
-        });
-      }
-    } else {
-      console.warn('[section-intro.js] No typing elements or runTyping not available');
-      typingElements.forEach(el => {
-        el.textContent = getText(el);
-        el.classList.add('typing-done');
-        el.style.opacity = '1';
-        el.style.visibility = 'visible';
-      });
+    // Executa a cadeia de datilografia
+    try {
+      runTypingChain(root, btn);
+      console.log('[section-intro.js] Intro prepared successfully');
+    } catch (err) {
+      console.error('[section-intro.js] Error preparing intro:', err);
+      btn.disabled = false;
     }
-
-    // Aplica efeito de vela
-    if (typeof window.setupCandleFlame === 'function') {
-      window.setupCandleFlame('media', 'flame-bottom-right');
-      window.setupCandleFlame('media', 'flame-top-left');
-      console.log('[section-intro.js] Candle flame effect applied for bottom-right and top-left');
-    } else {
-      console.warn('[section-intro.js] setupCandleFlame not available');
-    }
-
-    // Habilita o botão
-    btn.disabled = false;
-    console.log('[section-intro.js] Button enabled');
-    console.log('[section-intro.js] === EFFECTS APPLIED ===');
   }
 
-  // Executa imediatamente
+  // Executa a inicialização imediatamente
   try {
     console.log('[section-intro.js] DOM state:', document.readyState);
-    applyEffects();
+    init();
   } catch (err) {
     console.error('[section-intro.js] Error in immediate initialization:', err);
   }
