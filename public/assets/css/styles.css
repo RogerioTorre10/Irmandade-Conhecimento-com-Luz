@@ -147,7 +147,7 @@ body.jornada-active #page-shell,
 body.jornada-active header.site-header,
 body.jornada-active footer.site-footer{ display:none !important; }
 body.jornada-active #jornada-canvas { display: block !important;
-  background-color: radial-gradient(800px at 50% 50%, #0b1020, #05080f)
+  background-color: #0b1020;
   position: relative;
   min-height: 100vh;
   overflow: hidden;
