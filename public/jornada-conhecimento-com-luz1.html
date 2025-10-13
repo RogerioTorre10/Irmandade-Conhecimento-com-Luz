@@ -29,31 +29,19 @@
       max-width: 600px;
       margin: 0 auto;
     }
-    #section-intro {
-      background: #fff !important;
-      padding: 20px !important;
-      border-radius: 8px !important;
+    #section-intro, .card.pergaminho.pergaminho-v.section {
+      background: #fff url('/assets/img/textura-pergaminho.jpg') center/cover !important;
+      padding: 30px !important;
+      border-radius: 12px !important;
       max-width: 600px !important;
       text-align: center !important;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5) !important;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6) !important;
       display: block !important;
       opacity: 1 !important;
       visibility: visible !important;
       position: relative !important;
       z-index: 2 !important;
-    }
-    .card.pergaminho.pergaminho-v.section {
-      background: #fff !important;
-      padding: 20px !important;
-      border-radius: 8px !important;
-      max-width: 600px !important;
-      text-align: center !important;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5) !important;
-      display: block !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-      position: relative !important;
-      z-index: 2 !important;
+      border: 2px solid #8B4513 !important;
     }
     .intro-wrap {
       display: block !important;
@@ -67,6 +55,7 @@
       opacity: 1 !important;
       visibility: visible !important;
       display: block !important;
+      font-family: 'Times New Roman', serif !important;
     }
     .intro-paragraph.typing-done {
       opacity: 1 !important;
@@ -116,141 +105,141 @@
     /* Estilos da chama */
     .chama-vela {
       --pulso: 1.2s;
-      --glow: 8px;
+      --glow: 10px;
       --hue: 28;
       --satur: 96%;
       --light: 58%;
       --op: 0.98;
-      position: fixed;
+      position: fixed !important;
       display: block !important;
-      z-index: 1200;
-      filter: drop-shadow(0 0 var(--glow) hsla(var(--hue), var(--satur), 60%, 0.75));
-      pointer-events: none;
+      z-index: 1200 !important;
+      filter: drop-shadow(0 0 var(--glow) hsla(var(--hue), var(--satur), 60%, 0.75)) !important;
+      pointer-events: none !important;
       opacity: 1 !important;
       visibility: visible !important;
     }
     .chama-vela.flame-bottom-right {
-      --altura: 90px; /* Dobro de 45px */
-      --largura: 60px; /* Dobro de 30px */
-      bottom: 20px;
-      right: 20px;
+      --altura: 90px !important; /* Dobro de 45px */
+      --largura: 60px !important; /* Dobro de 30px */
+      bottom: 20px !important;
+      right: 20px !important;
     }
     .chama-vela.flame-top-left {
-      --altura: 67.5px; /* 50% maior que 45px */
-      --largura: 45px; /* 50% maior que 30px */
-      top: 20px;
-      left: 20px;
+      --altura: 67.5px !important; /* 50% maior que 45px */
+      --largura: 45px !important; /* 50% maior que 30px */
+      top: 20px !important;
+      left: 20px !important;
     }
     .chama-vela .brasa {
-      position: absolute;
-      left: 50%;
-      bottom: 2px;
-      transform: translateX(-50%);
-      width: calc(var(--largura) * 1.4);
-      height: 10px;
-      border-radius: 50% 50% 40% 40%;
-      background: radial-gradient(circle at 50% 40%, hsla(var(--hue), var(--satur), 95%, 0.95) 0%, hsla(var(--hue), var(--satur), 70%, 0.85) 50%, transparent 80%);
-      filter: blur(1px);
-      animation: brasaPulse var(--pulso) ease-in-out infinite;
-      opacity: var(--op);
+      position: absolute !important;
+      left: 50% !important;
+      bottom: 2px !important;
+      transform: translateX(-50%) !important;
+      width: calc(var(--largura) * 1.4) !important;
+      height: 10px !important;
+      border-radius: 50% 50% 40% 40% !important;
+      background: radial-gradient(circle at 50% 40%, hsla(var(--hue), var(--satur), 95%, 0.95) 0%, hsla(var(--hue), var(--satur), 70%, 0.85) 50%, transparent 80%) !important;
+      filter: blur(1px) !important;
+      animation: brasaPulse var(--pulso) ease-in-out infinite !important;
+      opacity: var(--op) !important;
     }
     .chama-vela .lingua {
-      position: absolute;
-      left: 50%;
-      bottom: 2px;
-      transform: translateX(-50%);
-      width: calc(var(--largura) * 1.0);
-      height: calc(var(--altura) * 1.0);
-      border-radius: 50% 50% 4% 4%;
-      background: radial-gradient(ellipse at center, rgba(255, 190, 0, 0.95) 0%, rgba(255, 69, 0, 0.75) 50%, rgba(230, 10, 10, 0.3) 70%, transparent 100%);
-      mix-blend-mode: screen;
-      filter: blur(0.7px);
-      transform-origin: 50% 100%;
-      animation: velaWaver 1.2s ease-in-out infinite;
-      opacity: var(--op);
-      -webkit-mask: radial-gradient(60% 90% at 50% 4%, #000 65%, transparent 69%);
+      position: absolute !important;
+      left: 50% !important;
+      bottom: 2px !important;
+      transform: translateX(-50%) !important;
+      width: calc(var(--largura) * 1.0) !important;
+      height: calc(var(--altura) * 1.0) !important;
+      border-radius: 50% 50% 4% 4% !important;
+      background: radial-gradient(ellipse at center, rgba(255, 190, 0, 0.95) 0%, rgba(255, 69, 0, 0.75) 50%, rgba(230, 10, 10, 0.3) 70%, transparent 100%) !important;
+      mix-blend-mode: screen !important;
+      filter: blur(0.7px) !important;
+      transform-origin: 50% 100% !important;
+      animation: velaWaver 1.2s ease-in-out infinite !important;
+      opacity: var(--op) !important;
+      -webkit-mask: radial-gradient(60% 90% at 50% 4%, #000 65%, transparent 69%) !important;
     }
     .chama-vela .lingua:nth-child(2) {
-      width: calc(var(--largura) * 0.92);
-      height: calc(var(--altura) * 0.95);
-      animation-duration: 1.5s;
-      animation-delay: 0.08s;
-      filter: blur(0.6px);
+      width: calc(var(--largura) * 0.92) !important;
+      height: calc(var(--altura) * 0.95) !important;
+      animation-duration: 1.5s !important;
+      animation-delay: 0.08s !important;
+      filter: blur(0.6px) !important;
     }
     .chama-vela .lingua:nth-child(3) {
-      width: calc(var(--largura) * 0.78);
-      height: calc(var(--altura) * 0.85);
-      animation-duration: 1.8s;
-      animation-delay: 0.15s;
-      filter: blur(0.5px);
+      width: calc(var(--largura) * 0.78) !important;
+      height: calc(var(--altura) * 0.85) !important;
+      animation-duration: 1.8s !important;
+      animation-delay: 0.15s !important;
+      filter: blur(0.5px) !important;
     }
     .chama-vela .brilho {
-      position: absolute;
-      left: 50%;
-      bottom: 0;
-      transform: translateX(-50%);
-      width: calc(var(--largura) * 1.7);
-      height: calc(var(--altura) * 1.5);
-      background: radial-gradient(circle, hsla(var(--hue), var(--satur), 72%, 0.55) 0%, transparent 70%);
-      filter: blur(9px);
-      mix-blend-mode: screen;
-      animation: aura var(--pulso) ease-in-out infinite;
-      opacity: 0.85;
-      pointer-events: none;
+      position: absolute !important;
+      left: 50% !important;
+      bottom: 0 !important;
+      transform: translateX(-50%) !important;
+      width: calc(var(--largura) * 1.7) !important;
+      height: calc(var(--altura) * 1.5) !important;
+      background: radial-gradient(circle, hsla(var(--hue), var(--satur), 72%, 0.55) 0%, transparent 70%) !important;
+      filter: blur(9px) !important;
+      mix-blend-mode: screen !important;
+      animation: aura var(--pulso) ease-in-out infinite !important;
+      opacity: 0.85 !important;
+      pointer-events: none !important;
     }
     .chama-vela.fraca {
-      --altura: 35px;
-      --largura: 25px;
-      --pulso: 1.6s;
-      --glow: 5px;
-      --hue: 36;
-      --satur: 86%;
-      --light: 66%;
-      --op: 0.70;
+      --altura: 35px !important;
+      --largura: 25px !important;
+      --pulso: 1.6s !important;
+      --glow: 5px !important;
+      --hue: 36 !important;
+      --satur: 86% !important;
+      --light: 66% !important;
+      --op: 0.70 !important;
     }
     .chama-vela.media {
-      --altura: 45px;
-      --largura: 30px;
-      --pulso: 1.2s;
-      --glow: 8px;
-      --hue: 28;
-      --satur: 96%;
-      --light: 58%;
-      --op: 0.98;
+      --altura: 45px !important;
+      --largura: 30px !important;
+      --pulso: 1.2s !important;
+      --glow: 8px !important;
+      --hue: 28 !important;
+      --satur: 96% !important;
+      --light: 58% !important;
+      --op: 0.98 !important;
     }
     .chama-vela.forte {
-      --altura: 55px;
-      --largura: 35px;
-      --pulso: 0.7s;
-      --glow: 11px;
-      --hue: 20;
-      --satur: 100%;
-      --light: 52%;
-      --op: 1;
+      --altura: 55px !important;
+      --largura: 35px !important;
+      --pulso: 0.7s !important;
+      --glow: 11px !important;
+      --hue: 20 !important;
+      --satur: 100% !important;
+      --light: 52% !important;
+      --op: 1 !important;
     }
     .flame-corner {
-      position: fixed;
-      z-index: 1200;
-      pointer-events: none;
+      position: fixed !important;
+      z-index: 1200 !important;
+      pointer-events: none !important;
       display: block !important;
       opacity: 1 !important;
       visibility: visible !important;
     }
     .flame-bottom-right {
-      bottom: 20px;
-      right: 20px;
-      --altura: 90px;
-      --largura: 60px;
+      bottom: 20px !important;
+      right: 20px !important;
+      --altura: 90px !important;
+      --largura: 60px !important;
     }
     .flame-top-left {
-      top: 20px;
-      left: 20px;
-      --altura: 67.5px;
-      --largura: 45px;
+      top: 20px !important;
+      left: 20px !important;
+      --altura: 67.5px !important;
+      --largura: 45px !important;
     }
     #chama-header .chama-vela {
-      --largura: 30px;
-      --altura: 60px;
+      --largura: 30px !important;
+      --altura: 60px !important;
     }
     @keyframes velaWaver {
       0%, 100% { transform: translateX(-50%) scaleY(1.00) skewX(0deg); }
@@ -317,37 +306,76 @@
   <script src="/assets/js/jornada-bootstrap.js"></script>
 
 <script>
-   console.log('[inline] Checking section-intro.js load');
+    console.log('[inline] Checking section-intro.js load');
     if (typeof window.__introBound === 'undefined') {
       console.error('[inline] section-intro.js not loaded!');
+      // Força exibição do pergaminho e elementos
       const root = document.getElementById('section-intro');
       if (root) {
-        root.style.display = 'block';
-        root.style.opacity = '1';
-        root.style.visibility = 'visible';
+        root.style.cssText = `
+          background: url('/assets/img/textura-pergaminho.jpg') center/cover !important;
+          padding: 30px !important;
+          border-radius: 12px !important;
+          max-width: 600px !important;
+          text-align: center !important;
+          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6) !important;
+          display: block !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          position: relative !important;
+          z-index: 2 !important;
+          border: 2px solid #8B4513 !important;
+        `;
       }
       const wrapper = document.getElementById('jornada-content-wrapper');
       if (wrapper) {
-        wrapper.style.display = 'block';
-        wrapper.style.opacity = '1';
-        wrapper.style.visibility = 'visible';
+        wrapper.style.cssText = `
+          display: block !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+        `;
       }
       const el1 = document.getElementById('intro-p1');
       const el2 = document.getElementById('intro-p2');
       if (el1) {
-        el1.style.opacity = '1';
-        el1.style.visibility = 'visible';
+        el1.style.cssText = `
+          font-size: 18px !important;
+          margin-bottom: 20px !important;
+          color: #333 !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          display: block !important;
+        `;
         el1.classList.add('typing-done');
       }
       if (el2) {
-        el2.style.opacity = '1';
-        el2.style.visibility = 'visible';
+        el2.style.cssText = `
+          font-size: 18px !important;
+          margin-bottom: 20px !important;
+          color: #333 !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          display: block !important;
+        `;
         el2.classList.add('typing-done');
       }
       const btn = document.getElementById('btn-avancar');
       if (btn) {
-        btn.style.opacity = '1';
-        btn.style.cursor = 'pointer';
+        btn.style.cssText = `
+          padding: 8px 16px !important;
+          background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover !important;
+          background-blend-mode: overlay !important;
+          color: #fff !important;
+          border-radius: 8px !important;
+          font-size: 18px !important;
+          border: 3px solid #4a4a4a !important;
+          box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6) !important;
+          text-shadow: 1px 1px 3px rgba(0,0,0,0.7) !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          display: inline-block !important;
+          cursor: pointer !important;
+        `;
         btn.disabled = false;
         btn.addEventListener('click', () => {
           console.log('[inline] Next button clicked');
@@ -358,6 +386,7 @@
           }
         });
       }
+      // Força TTS
       if (typeof window.EffectCoordinator?.speak === 'function') {
         window.EffectCoordinator.speak('Bem-vindo à Jornada Conhecimento com Luz. Respire fundo. Vamos caminhar juntos com fé, coragem e propósito.', { rate: 1.03, pitch: 1.0 });
         console.log('[inline] TTS activated');
