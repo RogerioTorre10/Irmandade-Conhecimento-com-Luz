@@ -16,7 +16,7 @@
     final:    '/assets/js/html/section-final.html'
     };
 
-  // Função para verificar elementos críticos no HTML
+ // Função para verificar elementos críticos no HTML
   function checkCriticalElements(section, sectionId) {
     const criticalSelectors = {
       'section-intro': ['#intro-p1', '#intro-p2', '#btn-avancar'],
@@ -28,9 +28,9 @@
     for (const selector of criticalSelectors) {
       found[selector] = !!section.querySelector(selector);
       if (found[selector]) {
-        console.log(`[carregarEtapa] Elemento crítico ${selector} ENCONTRADO.`);
+        console.log(`[carregarEtapa] Critical element ${selector} FOUND.`);
       } else {
-        console.warn(`[carregarEtapa] Elemento crítico ${selector} NÃO encontrado.`);
+        console.warn(`[carregarEtapa] Critical element ${selector} NOT found.`);
       }
     }
     return found;
@@ -38,11 +38,11 @@
 
   async function carregarEtapa(nome) {
     const id = `section-${nome}`;
-    console.log('[carregarEtapa] Iniciando carregamento para', nome, 'ID:', id);
+    console.log('[carregarEtapa] Starting load for', nome, 'ID:', id);
 
     // Verifica se a seção já existe no DOM
     if (document.getElementById(id)) {
-      console.log(`[carregarEtapa] section #${id} já está no DOM. Pulando.`);
+      console.log(`[carregarEtapa] Section #${id} already in DOM. Skipping.`);
       const section = document.getElementById(id);
       return new Promise(resolve => {
         requestAnimationFrame(() => {
@@ -53,12 +53,12 @@
     }
 
     // Carrega o HTML via fetch
-    const url = etapas[nome] || `/html/section-${nome}.html`;
-    console.log('[carregarEtapa] Carregando via fetch:', url);
+    const url = etapas[nome] || `/assets/html/section-${nome}.html`;
+    console.log('[carregarEtapa] Loading via fetch:', url);
     const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) {
-      console.error('[carregarEtapa] Falha HTTP ao carregar etapa:', res.status, url);
-      throw new Error(`HTTP ${res.status} em ${url}`);
+      console.error('[carregarEtapa] HTTP failure loading stage:', res.status, url);
+      throw new Error(`HTTP ${res.status} at ${url}`);
     }
     const html = await res.text();
 
@@ -67,7 +67,7 @@
     container.innerHTML = html;
     let section = container.querySelector('#' + id);
     if (!section) {
-      console.warn('[carregarEtapa] Seção #' + id + ' não encontrada no HTML. Usando primeiro elemento ou criando novo.');
+      console.warn('[carregarEtapa] Section #' + id + ' not found in HTML. Using first element or creating new.');
       section = container.firstElementChild || document.createElement('section');
       section.id = id;
       section.innerHTML = container.innerHTML;
@@ -81,16 +81,16 @@
     // Verifica se o wrapper existe
     const wrapper = document.getElementById('jornada-content-wrapper');
     if (!wrapper) {
-      console.error('[carregarEtapa] Wrapper #jornada-content-wrapper não encontrado!');
-      throw new Error('Wrapper #jornada-content-wrapper não encontrado.');
+      console.error('[carregarEtapa] Wrapper #jornada-content-wrapper not found!');
+      throw new Error('Wrapper #jornada-content-wrapper not found.');
     }
 
     // Limpa o wrapper e injeta a seção
     wrapper.innerHTML = '';
     wrapper.appendChild(section);
-    console.log('[carregarEtapa] Injetada no wrapper:', section.outerHTML.slice(0, 120) + '...');
-    console.log('[carregarEtapa] Elemento #' + id + ' presente:', !!document.getElementById(id));
-    console.log('[carregarEtapa] Elementos críticos presentes:', criticalElements);
+    console.log('[carregarEtapa] Injected into wrapper:', section.outerHTML.slice(0, 120) + '...');
+    console.log('[carregarEtapa] Section #' + id + ' present:', !!document.getElementById(id));
+    console.log('[carregarEtapa] Critical elements present:', criticalElements);
 
     return new Promise(resolve => {
       requestAnimationFrame(() => {
