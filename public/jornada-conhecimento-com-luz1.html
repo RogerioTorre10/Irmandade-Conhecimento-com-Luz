@@ -13,7 +13,7 @@
       align-items: center;
       justify-content: center;
       padding: 16px;
-      background: transparent;
+      background: #000;
     }
     .chama-icone {
       position: relative;
@@ -208,7 +208,7 @@
   padding: 0 !important;
 }
     #section-intro, #section-termos, .card.pergaminho.pergaminho-v.section {
-      background: url('/assets/img/textura-pergaminho.jpg') center/cover !important;
+      background: transparent !important; /* Remove textura de pergaminho duplicada */      padding: 30px !important;
       padding: 30px !important;
       border-radius: 12px !important;
       max-width: 600px !important;
@@ -222,26 +222,25 @@
       z-index: 2 !important;
     }
     /* Se o intro-wrap estiver com fundo preto, altere-o */
-.intro-wrap {
+    .intro-wrap {
     display: block !important;
     opacity: 1 !important;
     visibility: visible !important;
     background: transparent !important; /* Adicione isso se ele estiver com fundo */
-}
+    }
 
-/* O parágrafo em si */
-.intro-paragraph {
-    font-size: 18px !important;
-    margin-bottom: 20px !important;
-    color: #333 !important; /* Garante cor escura para contraste */
-    opacity: 0 !important;
-    visibility: visible !important;
-    display: block !important;
-    font-family: 'Times New Roman', serif !important;
-    text-align: left !important;
-    background: transparent !important; /* Garante que o parágrafo seja transparente */
+    /* O parágrafo em si */
+   .intro-paragraph {
+  font-size: 18px !important;
+  margin-bottom: 20px !important;
+  color: #fff !important; /* Cor branca para contraste no fundo de pergaminho */
+  opacity: 0 !important;
+  visibility: visible !important;
+  display: block !important;
+  font-family: 'Times New Roman', serif !important;
+  text-align: left !important;
+  background: transparent !important;
 }
-
 /* Remova bordas, se houver */
 #section-intro, #section-termos, .card.pergaminho.pergaminho-v.section {
     /* ... (outras propriedades) ... */
