@@ -49,7 +49,6 @@
               cursor: String(el.dataset.cursor || 'true') === 'true'
             });
           });
-          el.style.textAlign = 'center';
           el.classList.add('typing-done');
           el.style.opacity = '1 !important';
           console.log('[JC.applyTypingAndTTS] Typing completed:', el.id);
@@ -70,7 +69,7 @@
           el.classList.add('typing-done');
           el.style.opacity = '1 !important';
           el.style.direction = 'ltr';
-          el.style.textAlign = 'center';
+          el.style.textAlign = 'left';
         });
       }
     } else {
@@ -80,7 +79,7 @@
         el.classList.add('typing-done');
         el.style.opacity = '1 !important';
         el.style.direction = 'ltr';
-        el.style.textAlign = 'center';
+        el.style.textAlign = 'left';
       });
     }
   }
