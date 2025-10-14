@@ -13,8 +13,7 @@
       align-items: center;
       justify-content: center;
       padding: 16px;
-      background: #000 !important; /* Fundo preto para o container do título */
-      color: #fff;
+      background: transparent;
     }
     .chama-icone {
       position: relative;
@@ -190,26 +189,22 @@
     }
     /* Estilos do layout */
     #jornada-canvas {
-  display: flex !important;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  position: relative;
-  z-index: 1;
-  /* Mantenha o fundo, adicione background-attachment: fixed se desejar o efeito parallax */
-  background: #000 url('/assets/img/textura-pergaminho.jpg') center/cover no-repeat fixed !important; 
-  background-size: cover !important; /* Garante que cubra a tela */
-}
+      display: flex !important;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+      background: #000 !important;
+    }
     #section-conteudo {
-  width: 100%;
-  max-width: 600px; /* Mantém a largura do conteúdo, mas agora é transparente */
-  margin: 0 auto;
-  background: transparent !important; /* MUDANÇA PRINCIPAL: Torna transparente */
-  /* Remove a margem superior e inferior que pode ter sido herdada, se necessário */
-  padding: 0 !important;
-}
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background: #000 !important;
+    }
     #section-intro, #section-termos, .card.pergaminho.pergaminho-v.section {
-      background: transparent !important; /* Fundo transparente para exibir o pergaminho */
+      background: url('/assets/img/textura-pergaminho.jpg') center/cover !important;
       padding: 30px !important;
       border-radius: 12px !important;
       max-width: 600px !important;
@@ -221,13 +216,11 @@
       visibility: visible !important;
       position: relative !important;
       z-index: 2 !important;
-      color: #333 !important; /* Cor do texto para contraste com o pergaminho */
     }
     .intro-wrap {
       display: block !important;
       opacity: 1 !important;
       visibility: visible !important;
-      background: transparent !important; /* Adicione isso se ele estiver com fundo */
     }
     .intro-paragraph {
       font-size: 18px !important;
@@ -238,12 +231,6 @@
       display: block !important;
       font-family: 'Times New Roman', serif !important;
       text-align: left !important;
-      background: transparent !important; /* Garante que o parágrafo seja transparente */
-    }
-    #section-intro, #section-termos, .card.pergaminho.pergaminho-v.section {
-    /* ... (outras propriedades) ... */
-    box-shadow: none !important;
-    border: none !important; /* Já está sem borda, mas é bom garantir */
     }
     .intro-paragraph.typing-active {
       text-align: left !important;
