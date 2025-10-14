@@ -141,26 +141,26 @@
 
   // Função para processar lógica da seção
   function handleSectionLogic(sectionId, root) {
-    console.log('[JC.handleSectionLogic] Processing logic for:', sectionId);
-    if (sectionId === 'section-intro' || sectionId === 'section-termos') {
-      root.style.cssText = `
-        background: transparent !important;) center/cover !important;
-        padding: 30px !important;
-        border-radius: 12px !important;
-        max-width: 600px !important;
-        text-align: center !important;
-        box-shadow: none !important;
-        border: none !important;
-        display: block !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-        position: relative !important;
-        z-index: 2 !important;
-      `;
-      applyTypingAndTTS(sectionId, root);
-      attachButtonEvents(sectionId, root);
-    }
+  console.log('[JC.handleSectionLogic] Processing logic for:', sectionId);
+  if (sectionId === 'section-intro' || sectionId === 'section-termos') {
+    root.style.cssText = `
+      background: transparent !important;
+      padding: 30px !important;
+      border-radius: 12px !important;
+      max-width: 600px !important;
+      text-align: center !important;
+      box-shadow: none !important;
+      border: none !important;
+      display: block !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      position: relative !important;
+      z-index: 2 !important;
+    `;
+    applyTypingAndTTS(sectionId, root);
+    attachButtonEvents(sectionId, root);
   }
+}
 
   // Função para exibir uma seção
   async function show(sectionId) {
