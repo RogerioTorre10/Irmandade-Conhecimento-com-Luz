@@ -23,7 +23,7 @@
   // Função para aplicar datilografia e TTS
   async function applyTypingAndTTS(sectionId, root) {
     console.log('[JC.applyTypingAndTTS] Processing typing and TTS for:', sectionId);
-    const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
+    const typingElements = [root.querySelector('#intro-p1'), root.querySelector('#intro-p2')].filter(el => el && el.dataset.typing === 'true' && !el.classList.contains('typing-done'));
     console.log('[JC.applyTypingAndTTS] Typing elements:', typingElements.length);
 
     if (typingElements.length > 0 && typeof window.runTyping === 'function') {
@@ -38,24 +38,25 @@
           console.log('[JC.applyTypingAndTTS] Typing:', el.id, text.substring(0, 30) + '...');
           el.textContent = '';
           el.classList.add('typing-active');
+          el.style.direction = 'rtl'; // Aplica datilografia da direita para a esquerda
           await new Promise((resolve) => {
             window.runTyping(el, text, resolve, {
               speed: Number(el.dataset.speed || 36),
               cursor: String(el.dataset.cursor || 'true') === 'true'
             });
           });
+          el.style.direction = 'ltr'; // Volta ao normal após a datilografia
           el.classList.add('typing-done');
           el.style.opacity = '1 !important';
           console.log('[JC.applyTypingAndTTS] Typing completed:', el.id);
-        }
 
-        // Aplica TTS após datilografia
-        if (typeof window.EffectCoordinator?.speak === 'function') {
-          const fullText = Array.from(typingElements).map(el => getText(el)).join(' ');
-          window.EffectCoordinator.speak(fullText, { rate: 1.03, pitch: 1.0 });
-          console.log('[JC.applyTypingAndTTS] TTS activated:', fullText.substring(0, 50) + '...');
-        } else {
-          console.warn('[JC.applyTypingAndTTS] EffectCoordinator.speak not available');
+          // Aplica TTS para o parágrafo atual
+          if (typeof window.EffectCoordinator?.speak === 'function') {
+            window.EffectCoordinator.speak(text, { rate: 1.03, pitch: 1.0 });
+            console.log('[JC.applyTypingAndTTS] TTS activated for:', el.id, text.substring(0, 50) + '...');
+          } else {
+            console.warn('[JC.applyTypingAndTTS] EffectCoordinator.speak not available');
+          }
         }
       } catch (err) {
         console.error('[JC.applyTypingAndTTS] Typing error:', err);
@@ -63,6 +64,7 @@
           el.textContent = getText(el);
           el.classList.add('typing-done');
           el.style.opacity = '1 !important';
+          el.style.direction = 'ltr';
         });
       }
     } else {
@@ -71,6 +73,7 @@
         el.textContent = getText(el);
         el.classList.add('typing-done');
         el.style.opacity = '1 !important';
+        el.style.direction = 'ltr';
       });
     }
   }
@@ -84,12 +87,12 @@
       const action = btn.dataset.action;
       btn.disabled = false;
       btn.style.cssText = `
-        padding: 12px 24px !important;
+        padding: 10px 20px !important;
         background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover !important;
         background-blend-mode: overlay !important;
         color: #fff !important;
-        border-radius: 10px !important;
-        font-size: 22px !important;
+        border-radius: 8px !important;
+        font-size: 20px !important;
         border: 3px solid #4a4a4a !important;
         box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6) !important;
         text-shadow: 1px 1px 3px rgba(0,0,0,0.7) !important;
@@ -138,7 +141,6 @@
         visibility: visible !important;
         position: relative !important;
         z-index: 2 !important;
-        border: 2px solid #8B4513 !important;
       `;
       applyTypingAndTTS(sectionId, root);
       attachButtonEvents(sectionId, root);
