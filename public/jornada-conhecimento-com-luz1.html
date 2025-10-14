@@ -14,8 +14,19 @@
     .site-header{display:flex;align-items:center;justify-content:center;padding:16px;background:transparent}
     .chama-icone{position:relative;width:18px;height:36px;display:flex;align-items:flex-end;margin-right:12px}
     .chama-icone>*{position:static}
-    .site-header h1{font-family:"Berkshire Swash",cursive;font-size:32px;color:#fff;text-shadow:0 0 10px hsla(28,96%,60%,.7);margin:0}
+    .site-header h1{font-family:"Berkshire Swash",cursive;font-size:32px;color:#000;text-shadow:0 0 10px hsla(28,96%,60%,.7);margin:0}
 
+     /* Estilos do layout */
+    #jornada-canvas {
+      display: flex !important;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+      background: #000 url('/assets/img/textura-pergaminho.jpg') center/cover !important;
+    }
+     
     /* Chama */
     .chama-vela{--altura:45px;--largura:30px;--pulso:1.2s;--glow:8px;--hue:28;--satur:96%;--light:58%;--op:.98;position:relative;width:var(--largura);height:var(--altura);display:inline-block;filter:drop-shadow(0 0 var(--glow) hsla(var(--hue),var(--satur),60%,.75))}
     .chama-vela.chama-md{--largura:40px;--altura:90px}
