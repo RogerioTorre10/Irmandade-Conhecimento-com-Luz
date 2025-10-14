@@ -22,17 +22,17 @@
 
   // Função para aplicar datilografia e TTS
   async function applyTypingAndTTS(sectionId, root) {
-    console.log('[JC.applyTypingAndTTS] Processing typing and TTS for:', sectionId);
-    const typingElements = sectionId === 'section-intro' 
-      ? [root.querySelector('#intro-p1'), root.querySelector('#intro-p2')]
-      : [root.querySelector('#termos-p1'), root.querySelector('#termos-p2')];
-    const validElements = typingElements.filter(el => {
-      if (!el) {
-        console.warn('[JC.applyTypingAndTTS] Element not found for:', sectionId);
-        return false;
-      }
-      return el.dataset.typing === 'true' && !el.classList.contains('typing-done');
-    });
+  console.log('[JC.applyTypingAndTTS] Processing typing and TTS for:', sectionId);
+  const typingElements = sectionId === 'section-intro' 
+    ? [root.querySelector('#intro-p1'), root.querySelector('#intro-p2')]
+    : [root.querySelector('#termos-p1'), root.querySelector('#termos-p2')];
+  const validElements = typingElements.filter(el => {
+    if (!el) {
+      console.error('[JC.applyTypingAndTTS] Element not found for:', sectionId, 'Selector:', typingElements.map(e => e?.id));
+      return false;
+    }
+    return el.dataset.typing === 'true' && !el.classList.contains('typing-done');
+  });
     console.log('[JC.applyTypingAndTTS] Typing elements:', validElements.length, validElements.map(el => el?.id));
 
     if (validElements.length > 0 && typeof window.runTyping === 'function') {
@@ -144,7 +144,7 @@
     console.log('[JC.handleSectionLogic] Processing logic for:', sectionId);
     if (sectionId === 'section-intro' || sectionId === 'section-termos') {
       root.style.cssText = `
-        background: url('/assets/img/textura-pergaminho.jpg') center/cover !important;
+        background: transparent !important;) center/cover !important;
         padding: 30px !important;
         border-radius: 12px !important;
         max-width: 600px !important;
