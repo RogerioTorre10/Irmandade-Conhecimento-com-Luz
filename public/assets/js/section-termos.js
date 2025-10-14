@@ -71,6 +71,21 @@
   nextBtn = nextBtn || root.querySelector('[data-action="termos-next"]') || document.createElement('button');
   prevBtn = prevBtn || root.querySelector('[data-action="termos-prev"]') || document.createElement('button');
   avancarBtn = avancarBtn || root.querySelector('[data-action="avancar"]') || document.createElement('button');
+  // Configurar placeholders para parágrafos ausentes
+  if (!pg1.id) {
+    pg1.id = 'termos-p1';
+    pg1.classList.add('intro-paragraph');
+    pg1.dataset.typing = 'true';
+    pg1.textContent = 'Placeholder para Termos 1';
+    root.appendChild(pg1);
+  }
+  if (!pg2.id) {
+    pg2.id = 'termos-p2';
+    pg2.classList.add('intro-paragraph');
+    pg2.dataset.typing = 'true';
+    pg2.textContent = 'Placeholder para Termos 2';
+    root.appendChild(pg2);
+  }
 }
 
     try {
@@ -134,12 +149,16 @@
     }
    });
 
-   const runTypingChain = async () => {
+  const runTypingChain = async () => {
   const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
+  console.log('[section-termos] Typing elements found:', typingElements.length, Array.from(typingElements).map(el => el.id));
   if (typingElements.length === 0 || typeof window.runTyping !== 'function') {
+    console.warn('[section-termos] No typing elements or runTyping not available');
     typingElements.forEach(el => {
       el.textContent = getText(el);
       el.classList.add('typing-done');
+      el.style.opacity = '1';
+      el.style.color = '#fff';
     });
     nextBtn.disabled = false;
     prevBtn.disabled = false;
@@ -151,6 +170,7 @@
       const text = getText(el);
       el.textContent = '';
       el.classList.add('typing-active');
+      el.style.color = '#fff'; // Garante visibilidade
       await new Promise((resolve) => {
         window.runTyping(el, text, resolve, {
           speed: Number(el.dataset.speed || 40),
@@ -158,11 +178,16 @@
         });
       });
       el.classList.add('typing-done');
+      el.style.opacity = '1';
+      el.style.color = '#fff';
     }
   } catch (err) {
+    console.error('[section-termos] Typing error:', err);
     typingElements.forEach(el => {
       el.textContent = getText(el);
       el.classList.add('typing-done');
+      el.style.opacity = '1';
+      el.style.color = '#fff';
     });
   }
   nextBtn.disabled = false;
