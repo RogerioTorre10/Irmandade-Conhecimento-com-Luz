@@ -17,23 +17,32 @@
     };
 
 // Função para verificar elementos críticos no HTML
-  function checkCriticalElements(section, sectionId) {
-    const criticalSelectors = {
-      'section-intro': ['#intro-p1', '#intro-p2', '#btn-avancar'],
-      'section-termos': ['#termos-p1', '#termos-p2', '#termos-next'],
-    }[sectionId] || [];
-
-    const found = {};
-    for (const selector of criticalSelectors) {
-      found[selector] = !!section.querySelector(selector);
-      if (found[selector]) {
-        console.log(`[carregarEtapa] Critical element ${selector} FOUND.`);
-      } else {
-        console.warn(`[carregarEtapa] Critical element ${selector} NOT found.`);
-      }
+ function checkCriticalElements(section, sectionId) {
+  const criticalSelectors = {
+    'section-intro': ['#intro-p1', '#intro-p2', '#btn-avancar'],
+    'section-termos': ['#termos-p1', '#termos-p2', '#termos-next']
+  }[sectionId] || [];
+  const found = {};
+  for (const selector of criticalSelectors) {
+    let el = section.querySelector(selector);
+    if (!el && selector.startsWith('#termos-p')) {
+      el = document.createElement('p');
+      el.id = selector.slice(1);
+      el.classList.add('intro-paragraph');
+      el.dataset.typing = 'true';
+      el.textContent = `Placeholder para ${selector}`;
+      section.appendChild(el);
+      console.warn(`[carregarEtapa] Created placeholder for ${selector}`);
     }
-    return found;
+    found[selector] = !!el;
+    if (found[selector]) {
+      console.log(`[carregarEtapa] Critical element ${selector} FOUND.`);
+    } else {
+      console.warn(`[carregarEtapa] Critical element ${selector} NOT found.`);
+    }
   }
+  return found;
+}
 
   async function carregarEtapa(nome) {
     const id = `section-${nome}`;
