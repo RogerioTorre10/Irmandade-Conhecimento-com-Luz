@@ -38,14 +38,16 @@
           console.log('[JC.applyTypingAndTTS] Typing:', el.id, text.substring(0, 30) + '...');
           el.textContent = '';
           el.classList.add('typing-active');
-          el.style.direction = 'rtl'; // Aplica datilografia da direita para a esquerda
+          el.style.direction = 'rtl'; // Datilografia da direita para a esquerda
+          el.style.textAlign = 'right'; // Alinha o texto à direita durante a datilografia
           await new Promise((resolve) => {
             window.runTyping(el, text, resolve, {
               speed: Number(el.dataset.speed || 36),
               cursor: String(el.dataset.cursor || 'true') === 'true'
             });
           });
-          el.style.direction = 'ltr'; // Volta ao normal após a datilografia
+          el.style.direction = 'ltr'; // Volta ao normal
+          el.style.textAlign = 'center'; // Restaura alinhamento central
           el.classList.add('typing-done');
           el.style.opacity = '1 !important';
           console.log('[JC.applyTypingAndTTS] Typing completed:', el.id);
@@ -54,6 +56,8 @@
           if (typeof window.EffectCoordinator?.speak === 'function') {
             window.EffectCoordinator.speak(text, { rate: 1.03, pitch: 1.0 });
             console.log('[JC.applyTypingAndTTS] TTS activated for:', el.id, text.substring(0, 50) + '...');
+            // Aguarda o TTS terminar antes de prosseguir
+            await new Promise(resolve => setTimeout(resolve, text.length * 50)); // Aproximadamente 50ms por caractere
           } else {
             console.warn('[JC.applyTypingAndTTS] EffectCoordinator.speak not available');
           }
@@ -65,6 +69,7 @@
           el.classList.add('typing-done');
           el.style.opacity = '1 !important';
           el.style.direction = 'ltr';
+          el.style.textAlign = 'center';
         });
       }
     } else {
@@ -74,6 +79,7 @@
         el.classList.add('typing-done');
         el.style.opacity = '1 !important';
         el.style.direction = 'ltr';
+        el.style.textAlign = 'center';
       });
     }
   }
@@ -141,6 +147,7 @@
         visibility: visible !important;
         position: relative !important;
         z-index: 2 !important;
+        border: none !important;
       `;
       applyTypingAndTTS(sectionId, root);
       attachButtonEvents(sectionId, root);
