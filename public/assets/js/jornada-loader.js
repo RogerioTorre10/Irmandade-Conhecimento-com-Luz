@@ -16,24 +16,11 @@
     final:    '/html/section-final.html'
     };
 
-(function () {
-  'use strict';
-
-  const etapas = {
-    intro: '/html/section-intro.html',
-    termos: '/html/section-termos.html',
-    senha: '/html/section-senha.html',
-    filme: '/assets/img/conhecimento-com-luz-jardim.mp4',
-    guia: '/html/section-guia.html',
-    selfie: '/html/section-selfie.html',
-    perguntas: '/html/section-perguntas.html',
-    final: '/html/section-final.html'
-  };
-
+// Função para verificar elementos críticos no HTML
   function checkCriticalElements(section, sectionId) {
     const criticalSelectors = {
       'section-intro': ['#intro-p1', '#intro-p2', '#btn-avancar'],
-      'section-termos': ['#termos-pg1', '#termos-pg2', '#termos-next']
+      'section-termos': ['#termos-p1', '#termos-p2', '#termos-next'],
     }[sectionId] || [];
 
     const found = {};
@@ -52,6 +39,7 @@
     const id = `section-${nome}`;
     console.log('[carregarEtapa] Starting load for', nome, 'ID:', id);
 
+    // Verifica se a seção já existe no DOM
     if (document.getElementById(id)) {
       console.log(`[carregarEtapa] Section #${id} already in DOM. Skipping.`);
       const section = document.getElementById(id);
@@ -63,6 +51,7 @@
       });
     }
 
+    // Carrega o HTML via fetch
     const url = etapas[nome] || `/assets/html/section-${nome}.html`;
     console.log('[carregarEtapa] Loading via fetch:', url);
     const res = await fetch(url, { cache: 'no-store' });
@@ -73,6 +62,7 @@
     const html = await res.text();
     console.log('[carregarEtapa] Fetched HTML:', html.slice(0, 120) + '...');
 
+    // Cria um contêiner temporário para processar o HTML
     const container = document.createElement('div');
     container.innerHTML = html;
     let section = container.querySelector('#' + id);
@@ -83,16 +73,19 @@
       section.innerHTML = container.innerHTML;
     }
 
+    // Garante que o ID e a classe estejam corretos
     section.id = id;
     section.classList.add('section');
     const criticalElements = checkCriticalElements(section, id);
 
+    // Verifica se o wrapper existe
     const wrapper = document.getElementById('jornada-content-wrapper');
     if (!wrapper) {
       console.error('[carregarEtapa] Wrapper #jornada-content-wrapper not found!');
       throw new Error('Wrapper #jornada-content-wrapper not found.');
     }
 
+    // Limpa o wrapper e injeta a seção
     wrapper.innerHTML = '';
     wrapper.appendChild(section);
     console.log('[carregarEtapa] Injected into wrapper:', section.outerHTML.slice(0, 120) + '...');
