@@ -59,19 +59,19 @@
 
     let pg1, pg2, nextBtn, prevBtn, avancarBtn;
     try {
-      pg1 = await waitForElement('#termos-pg1', { within: root, timeout: 10000 });
-      pg2 = await waitForElement('#termos-pg2', { within: root, timeout: 10000 });
-      nextBtn = await waitForElement('[data-action="termos-next"]', { within: root, timeout: 10000 });
-      prevBtn = await waitForElement('[data-action="termos-prev"]', { within: root, timeout: 10000 });
-      avancarBtn = await waitForElement('[data-action="avancar"]', { within: root, timeout: 10000 });
-    } catch (e) {
-      window.toast?.('Falha ao carregar os elementos da seção Termos.', 'error');
-      pg1 = pg1 || root.querySelector('#termos-pg1') || document.createElement('div');
-      pg2 = pg2 || root.querySelector('#termos-pg2') || document.createElement('div');
-      nextBtn = nextBtn || root.querySelector('[data-action="termos-next"]') || document.createElement('button');
-      prevBtn = prevBtn || root.querySelector('[data-action="termos-prev"]') || document.createElement('button');
-      avancarBtn = avancarBtn || root.querySelector('[data-action="avancar"]') || document.createElement('button');
-    }
+  pg1 = await waitForElement('#termos-p1', { within: root, timeout: 10000 });
+  pg2 = await waitForElement('#termos-p2', { within: root, timeout: 10000 });
+  nextBtn = await waitForElement('[data-action="termos-next"]', { within: root, timeout: 10000 });
+  prevBtn = await waitForElement('[data-action="termos-prev"]', { within: root, timeout: 10000 });
+  avancarBtn = await waitForElement('[data-action="avancar"]', { within: root, timeout: 10000 });
+} catch (e) {
+  window.toast?.('Falha ao carregar os elementos da seção Termos.', 'error');
+  pg1 = pg1 || root.querySelector('#termos-p1') || document.createElement('p');
+  pg2 = pg2 || root.querySelector('#termos-p2') || document.createElement('p');
+  nextBtn = nextBtn || root.querySelector('[data-action="termos-next"]') || document.createElement('button');
+  prevBtn = prevBtn || root.querySelector('[data-action="termos-prev"]') || document.createElement('button');
+  avancarBtn = avancarBtn || root.querySelector('[data-action="avancar"]') || document.createElement('button');
+}
 
     try {
       if (typeof window.JC?.show === 'function') {
@@ -127,51 +127,48 @@
     });
 
     once(avancarBtn, 'click', () => {
-      // Substitua 'section-proxima' pelo ID da próxima seção real
-      if (typeof window.JC?.show === 'function') {
-        window.JC.show('section-proxima');
-      } else {
-        window.location.href = '/proxima-pagina'; // Ajuste a URL conforme necessário
-      }
+     if (typeof window.JC?.show === 'function') {
+     window.JC.show('section-senha');
+   } else {
+     window.location.href = '/senha';
+    }
+   });
+
+   const runTypingChain = async () => {
+  const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
+  if (typingElements.length === 0 || typeof window.runTyping !== 'function') {
+    typingElements.forEach(el => {
+      el.textContent = getText(el);
+      el.classList.add('typing-done');
     });
-
-    const runTypingChain = async () => {
-      const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
-      if (typingElements.length === 0 || typeof window.runTyping !== 'function') {
-        typingElements.forEach(el => {
-          el.textContent = getText(el);
-          el.classList.add('typing-done');
+    nextBtn.disabled = false;
+    prevBtn.disabled = false;
+    avancarBtn.disabled = false;
+    return;
+  }
+  try {
+    for (const el of typingElements) {
+      const text = getText(el);
+      el.textContent = '';
+      el.classList.add('typing-active');
+      await new Promise((resolve) => {
+        window.runTyping(el, text, resolve, {
+          speed: Number(el.dataset.speed || 40),
+          cursor: String(el.dataset.cursor || 'true') === 'true'
         });
-        nextBtn.disabled = false;
-        prevBtn.disabled = false;
-        avancarBtn.disabled = false;
-        return;
-      }
-
-      try {
-        for (const el of typingElements) {
-          const text = getText(el);
-          el.textContent = '';
-          el.classList.add('typing-active');
-          await new Promise((resolve) => {
-            window.runTyping(el, text, resolve, {
-              speed: Number(el.dataset.speed || 40),
-              cursor: String(el.dataset.cursor || 'true') === 'true'
-            });
-          });
-          el.classList.add('typing-done');
-        }
-      } catch (err) {
-        typingElements.forEach(el => {
-          el.textContent = getText(el);
-          el.classList.add('typing-done');
-        });
-      }
-
-      nextBtn.disabled = false;
-      prevBtn.disabled = false;
-      avancarBtn.disabled = false;
-    };
+      });
+      el.classList.add('typing-done');
+    }
+  } catch (err) {
+    typingElements.forEach(el => {
+      el.textContent = getText(el);
+      el.classList.add('typing-done');
+    });
+  }
+  nextBtn.disabled = false;
+  prevBtn.disabled = false;
+  avancarBtn.disabled = false;
+};
 
     if (!TERMOS_READY) {
       try {
