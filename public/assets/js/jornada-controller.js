@@ -38,15 +38,15 @@
           console.log('[JC.applyTypingAndTTS] Typing:', el.id, text.substring(0, 30) + '...');
           el.textContent = '';
           el.classList.add('typing-active');
-          el.style.direction = 'ltr'; // Datilografia da direita para a esquerda
-          el.style.textAlign = 'left'; // Alinha o texto à direita durante a datilografia
+          el.style.direction = 'ltr';
+          el.style.textAlign = 'left';
           await new Promise((resolve) => {
             window.runTyping(el, text, resolve, {
-              speed: Number(el.dataset.speed || 26),
+              speed: Number(el.dataset.speed || 36),
               cursor: String(el.dataset.cursor || 'true') === 'true'
             });
           });
-          el.style.direction = 'ltr'; // Volta ao normal
+          el.style.textAlign = 'center';
           el.classList.add('typing-done');
           el.style.opacity = '1 !important';
           console.log('[JC.applyTypingAndTTS] Typing completed:', el.id);
@@ -55,8 +55,7 @@
           if (typeof window.EffectCoordinator?.speak === 'function') {
             window.EffectCoordinator.speak(text, { rate: 1.03, pitch: 1.0 });
             console.log('[JC.applyTypingAndTTS] TTS activated for:', el.id, text.substring(0, 50) + '...');
-            // Aguarda o TTS terminar antes de prosseguir
-            await new Promise(resolve => setTimeout(resolve, text.length * 50)); // Aproximadamente 50ms por caractere
+            await new Promise(resolve => setTimeout(resolve, text.length * 50));
           } else {
             console.warn('[JC.applyTypingAndTTS] EffectCoordinator.speak not available');
           }
@@ -140,7 +139,7 @@
         border-radius: 12px !important;
         max-width: 600px !important;
         text-align: center !important;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6) !important;
+        box-shadow: 0 6px 12px rgba(0,0,0,0.6) !important;
         display: block !important;
         opacity: 1 !important;
         visibility: visible !important;
@@ -149,6 +148,22 @@
         border: none !important;
       `;
       applyTypingAndTTS(sectionId, root);
+      attachButtonEvents(sectionId, root);
+    } else if (sectionId === 'section-termos') {
+      root.style.cssText = `
+        background: url('/assets/img/textura-pergaminho.jpg') center/cover !important;
+        padding: 30px !important;
+        border-radius: 12px !important;
+        max-width: 600px !important;
+        text-align: center !important;
+        box-shadow: 0 6px 12px rgba(0,0,0,0.6) !important;
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        position: relative !important;
+        z-index: 2 !important;
+        border: none !important;
+      `;
       attachButtonEvents(sectionId, root);
     }
   }
