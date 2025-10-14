@@ -26,8 +26,14 @@
     const typingElements = sectionId === 'section-intro' 
       ? [root.querySelector('#intro-p1'), root.querySelector('#intro-p2')]
       : [root.querySelector('#termos-p1'), root.querySelector('#termos-p2')];
-    const validElements = typingElements.filter(el => el && el.dataset.typing === 'true' && !el.classList.contains('typing-done'));
-    console.log('[JC.applyTypingAndTTS] Typing elements:', validElements.length);
+    const validElements = typingElements.filter(el => {
+      if (!el) {
+        console.warn('[JC.applyTypingAndTTS] Element not found for:', sectionId);
+        return false;
+      }
+      return el.dataset.typing === 'true' && !el.classList.contains('typing-done');
+    });
+    console.log('[JC.applyTypingAndTTS] Typing elements:', validElements.length, validElements.map(el => el?.id));
 
     if (validElements.length > 0 && typeof window.runTyping === 'function') {
       console.log('[JC.applyTypingAndTTS] Starting typing animation');
@@ -73,7 +79,7 @@
         });
       }
     } else {
-      console.warn('[JC.applyTypingAndTTS] No typing elements or runTyping not available');
+      console.warn('[JC.applyTypingAndTTS] No valid typing elements or runTyping not available');
       validElements.forEach(el => {
         el.textContent = getText(el);
         el.classList.add('typing-done');
@@ -88,7 +94,7 @@
   function attachButtonEvents(sectionId, root) {
     console.log('[JC.attachButtonEvents] Attaching buttons for:', sectionId);
     const buttons = root.querySelectorAll('[data-action]');
-    console.log('[JC.attachButtonEvents] Buttons found:', buttons.length);
+    console.log('[JC.attachButtonEvents] Buttons found:', buttons.length, Array.from(buttons).map(btn => btn.id));
     buttons.forEach(btn => {
       const action = btn.dataset.action;
       btn.disabled = false;
@@ -109,13 +115,15 @@
         transition: transform 0.2s ease, box-shadow 0.2s ease !important;
       `;
       btn.addEventListener('click', () => {
-        console.log('[JC.attachButtonEvents] Button clicked:', action);
+        console.log('[JC.attachButtonEvents] Button clicked:', action, btn.id);
         if (action === 'avancar') {
           const currentIndex = sectionOrder.indexOf(sectionId);
           const nextSection = sectionOrder[currentIndex + 1];
+          console.log('[JC.attachButtonEvents] Navigating to:', nextSection);
           if (nextSection) {
             show(nextSection);
           } else {
+            console.warn('[JC.attachButtonEvents] No next section, redirecting to /termos');
             window.location.href = '/termos';
           }
         }
@@ -141,13 +149,13 @@
         border-radius: 12px !important;
         max-width: 600px !important;
         text-align: center !important;
-        box-shadow: 0 6px 12px rgba(0,0,0,0.6) !important;
+        box-shadow: none !important;
+        border: none !important;
         display: block !important;
         opacity: 1 !important;
         visibility: visible !important;
         position: relative !important;
         z-index: 2 !important;
-        border: none !important;
       `;
       applyTypingAndTTS(sectionId, root);
       attachButtonEvents(sectionId, root);
@@ -161,11 +169,15 @@
       console.log('[JC.show] Starting carregarEtapa for:', sectionId.replace('section-', ''));
       const section = await window.carregarEtapa(sectionId.replace('section-', ''));
       console.log('[JC.show] carregarEtapa completed, element #', sectionId, ':', !!section);
-      console.log('[JC.show] Content of #jornada-content-wrapper:', document.getElementById('jornada-content-wrapper')?.innerHTML.slice(0, 120) + '...');
-      handleSectionLogic(sectionId, section);
-      document.dispatchEvent(new CustomEvent('section:shown', { detail: { sectionId } }));
-      console.log('[JC.show] Event section:shown fired for:', sectionId);
-      console.log('[JC.show] Displayed successfully:', sectionId);
+      if (section) {
+        console.log('[JC.show] Content of #jornada-content-wrapper:', document.getElementById('jornada-content-wrapper')?.innerHTML.slice(0, 120) + '...');
+        handleSectionLogic(sectionId, section);
+        document.dispatchEvent(new CustomEvent('section:shown', { detail: { sectionId } }));
+        console.log('[JC.show] Event section:shown fired for:', sectionId);
+        console.log('[JC.show] Displayed successfully:', sectionId);
+      } else {
+        console.error('[JC.show] Section element is null for:', sectionId);
+      }
     } catch (err) {
       console.error('[JC.show] Error showing section:', sectionId, err);
     }
