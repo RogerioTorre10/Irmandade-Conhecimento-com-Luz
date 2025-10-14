@@ -23,13 +23,16 @@
   // Função para aplicar datilografia e TTS
   async function applyTypingAndTTS(sectionId, root) {
     console.log('[JC.applyTypingAndTTS] Processing typing and TTS for:', sectionId);
-    const typingElements = [root.querySelector('#intro-p1'), root.querySelector('#intro-p2')].filter(el => el && el.dataset.typing === 'true' && !el.classList.contains('typing-done'));
-    console.log('[JC.applyTypingAndTTS] Typing elements:', typingElements.length);
+    const typingElements = sectionId === 'section-intro' 
+      ? [root.querySelector('#intro-p1'), root.querySelector('#intro-p2')]
+      : [root.querySelector('#termos-p1'), root.querySelector('#termos-p2')];
+    const validElements = typingElements.filter(el => el && el.dataset.typing === 'true' && !el.classList.contains('typing-done'));
+    console.log('[JC.applyTypingAndTTS] Typing elements:', validElements.length);
 
-    if (typingElements.length > 0 && typeof window.runTyping === 'function') {
+    if (validElements.length > 0 && typeof window.runTyping === 'function') {
       console.log('[JC.applyTypingAndTTS] Starting typing animation');
       try {
-        for (const el of typingElements) {
+        for (const el of validElements) {
           if (el.classList.contains('typing-done')) {
             console.log('[JC.applyTypingAndTTS] Skipping already processed:', el.id);
             continue;
@@ -62,7 +65,7 @@
         }
       } catch (err) {
         console.error('[JC.applyTypingAndTTS] Typing error:', err);
-        typingElements.forEach(el => {
+        validElements.forEach(el => {
           el.textContent = getText(el);
           el.classList.add('typing-done');
           el.style.opacity = '1 !important';
@@ -72,7 +75,7 @@
       }
     } else {
       console.warn('[JC.applyTypingAndTTS] No typing elements or runTyping not available');
-      typingElements.forEach(el => {
+      validElements.forEach(el => {
         el.textContent = getText(el);
         el.classList.add('typing-done');
         el.style.opacity = '1 !important';
@@ -132,7 +135,7 @@
   // Função para processar lógica da seção
   function handleSectionLogic(sectionId, root) {
     console.log('[JC.handleSectionLogic] Processing logic for:', sectionId);
-    if (sectionId === 'section-intro') {
+    if (sectionId === 'section-intro' || sectionId === 'section-termos') {
       root.style.cssText = `
         background: url('/assets/img/textura-pergaminho.jpg') center/cover !important;
         padding: 30px !important;
@@ -148,22 +151,6 @@
         border: none !important;
       `;
       applyTypingAndTTS(sectionId, root);
-      attachButtonEvents(sectionId, root);
-    } else if (sectionId === 'section-termos') {
-      root.style.cssText = `
-        background: url('/assets/img/textura-pergaminho.jpg') center/cover !important;
-        padding: 30px !important;
-        border-radius: 12px !important;
-        max-width: 600px !important;
-        text-align: center !important;
-        box-shadow: 0 6px 12px rgba(0,0,0,0.6) !important;
-        display: block !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-        position: relative !important;
-        z-index: 2 !important;
-        border: none !important;
-      `;
       attachButtonEvents(sectionId, root);
     }
   }
