@@ -4,16 +4,16 @@
   // Definição de URLs para seções
  const etapas = {
     intro:    '/html/section-intro.html',
-    termos:   '/assets/js/html/section-termos.html',
-    senha:    '/assets/js/html/section-senha.html',
+    termos:   '/html/section-termos.html',
+    senha:    '/html/section-senha.html',
     filme:    '/assets/img/conhecimento-com-luz-jardim.mp4',
-    guia:     '/assets/js/html/section-guia.html',
+    guia:     '/html/section-guia.html',
     filme:    '/assets/img/conhecimento-com-luz-jardim.mp4',
-    selfie:   '/assets/js/html/section-selfie.html',
+    selfie:   '/html/section-selfie.html',
     filme:    '/assets/img/filme-0-ao-encontro-da-jornada.mp4',
-    perguntas:'/assets/js/html/section-perguntas.html', 
+    perguntas:'/html/section-perguntas.html', 
     filme:    '/assets/img/filme-5-fim-da-jornada.mp4',
-    final:    '/assets/js/html/section-final.html'
+    final:    '/html/section-final.html'
     };
 
   // Função para verificar elementos críticos no HTML
