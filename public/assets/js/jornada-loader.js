@@ -17,7 +17,7 @@
     };
 
   // Função para verificar elementos críticos no HTML
-function checkCriticalElements(section, sectionId) {
+  function checkCriticalElements(section, sectionId) {
     const criticalSelectors = {
       'section-intro': ['#intro-p1', '#intro-p2', '#btn-avancar'],
       'section-termos': ['[data-action="termos-next"]'],
