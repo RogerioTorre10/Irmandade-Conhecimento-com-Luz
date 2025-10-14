@@ -20,7 +20,7 @@
   function checkCriticalElements(section, sectionId) {
     const criticalSelectors = {
       'section-intro': ['#intro-p1', '#intro-p2', '#btn-avancar'],
-      'section-termos': ['[data-action="termos-next"]'],
+      'section-termos': ['#termos-p1', '#termos-p2', '#termos-next'],
       // Adicione seletores para outras seções, se necessário
     }[sectionId] || [];
 
