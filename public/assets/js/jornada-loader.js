@@ -60,6 +60,7 @@
       throw new Error(`HTTP ${res.status} at ${url}`);
     }
     const html = await res.text();
+    console.log('[carregarEtapa] Fetched HTML:', html.slice(0, 120) + '...');
 
     // Cria um contêiner temporário para processar o HTML
     const container = document.createElement('div');
