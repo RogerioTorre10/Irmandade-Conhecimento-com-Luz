@@ -49,6 +49,8 @@
           el.classList.add('typing-active');
           el.style.direction = 'ltr';
           el.style.textAlign = 'left';
+          el.style.opacity = '1 !important'; // Garante visibilidade
+          el.style.display = 'block !important'; // Força exibição
           await new Promise((resolve) => {
             window.runTyping(el, text, resolve, {
               speed: Number(el.dataset.speed || 36),
@@ -56,7 +58,6 @@
             });
           });
           el.classList.add('typing-done');
-          el.style.opacity = '1 !important';
           console.log('[JC.applyTypingAndTTS] Typing completed:', el.id);
 
           // Aplica TTS para o parágrafo atual
@@ -74,6 +75,7 @@
           el.textContent = getText(el);
           el.classList.add('typing-done');
           el.style.opacity = '1 !important';
+          el.style.display = 'block !important';
           el.style.direction = 'ltr';
           el.style.textAlign = 'left';
         });
@@ -84,6 +86,7 @@
         el.textContent = getText(el);
         el.classList.add('typing-done');
         el.style.opacity = '1 !important';
+        el.style.display = 'block !important';
         el.style.direction = 'ltr';
         el.style.textAlign = 'left';
       });
@@ -97,7 +100,8 @@
     console.log('[JC.attachButtonEvents] Buttons found:', buttons.length, Array.from(buttons).map(btn => btn.id));
     buttons.forEach(btn => {
       const action = btn.dataset.action;
-      btn.disabled = false;
+      btn.disabled = false; // Garante que o botão não esteja desabilitado
+      btn.style.opacity = '1 !important'; // Garante visibilidade total
       btn.style.cssText = `
         padding: 10px 20px !important;
         background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover !important;
@@ -144,7 +148,7 @@
     console.log('[JC.handleSectionLogic] Processing logic for:', sectionId);
     if (sectionId === 'section-intro' || sectionId === 'section-termos') {
       root.style.cssText = `
-        background: url('/assets/img/textura-pergaminho.jpg') center/cover !important;
+        background: transparent !important; /* Fundo transparente para exibir o pergaminho do #jornada-canvas */
         padding: 30px !important;
         border-radius: 12px !important;
         max-width: 600px !important;
@@ -156,6 +160,7 @@
         visibility: visible !important;
         position: relative !important;
         z-index: 2 !important;
+        color: #333 !important; /* Contraste com o pergaminho */
       `;
       applyTypingAndTTS(sectionId, root);
       attachButtonEvents(sectionId, root);
@@ -194,6 +199,8 @@
   function init() {
     console.log('[JC.init] Controller initialized successfully');
     window.JC = { show, setOrder };
+    // Carrega a seção inicial
+    show('section-intro');
   }
 
   init();
