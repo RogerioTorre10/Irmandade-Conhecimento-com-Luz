@@ -38,15 +38,15 @@
           console.log('[JC.applyTypingAndTTS] Typing:', el.id, text.substring(0, 30) + '...');
           el.textContent = '';
           el.classList.add('typing-active');
-          el.style.direction = 'ltr'; // Datilografia da esquerda para a direita
-          el.style.textAlign = 'left'; // Alinha o texto à esquerda durante a datilografia
+          el.style.direction = 'ltr'; // Datilografia da direita para a esquerda
+          el.style.textAlign = 'left'; // Alinha o texto à direita durante a datilografia
           await new Promise((resolve) => {
             window.runTyping(el, text, resolve, {
-              speed: Number(el.dataset.speed || 36),
+              speed: Number(el.dataset.speed || 26),
               cursor: String(el.dataset.cursor || 'true') === 'true'
             });
           });
-          el.style.textAlign = 'center'; // Restaura alinhamento central
+          el.style.direction = 'ltr'; // Volta ao normal
           el.classList.add('typing-done');
           el.style.opacity = '1 !important';
           console.log('[JC.applyTypingAndTTS] Typing completed:', el.id);
@@ -135,7 +135,7 @@
     console.log('[JC.handleSectionLogic] Processing logic for:', sectionId);
     if (sectionId === 'section-intro') {
       root.style.cssText = `
-        background: #000 !important;
+        background: url('/assets/img/textura-pergaminho.jpg') center/cover !important;
         padding: 30px !important;
         border-radius: 12px !important;
         max-width: 600px !important;
