@@ -45,7 +45,7 @@
             });
           });
           el.classList.add('typing-done');
-          el.style.opacity = '1';
+          el.style.opacity = '1 !important';
           console.log('[JC.applyTypingAndTTS] Typing completed:', el.id);
         }
 
@@ -62,7 +62,7 @@
         typingElements.forEach(el => {
           el.textContent = getText(el);
           el.classList.add('typing-done');
-          el.style.opacity = '1';
+          el.style.opacity = '1 !important';
         });
       }
     } else {
@@ -70,7 +70,7 @@
       typingElements.forEach(el => {
         el.textContent = getText(el);
         el.classList.add('typing-done');
-        el.style.opacity = '1';
+        el.style.opacity = '1 !important';
       });
     }
   }
@@ -83,8 +83,22 @@
     buttons.forEach(btn => {
       const action = btn.dataset.action;
       btn.disabled = false;
-      btn.style.opacity = '1';
-      btn.style.cursor = 'pointer';
+      btn.style.cssText = `
+        padding: 12px 24px !important;
+        background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover !important;
+        background-blend-mode: overlay !important;
+        color: #fff !important;
+        border-radius: 10px !important;
+        font-size: 22px !important;
+        border: 3px solid #4a4a4a !important;
+        box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6) !important;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.7) !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: inline-block !important;
+        cursor: pointer !important;
+        transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+      `;
       btn.addEventListener('click', () => {
         console.log('[JC.attachButtonEvents] Button clicked:', action);
         if (action === 'avancar') {
@@ -97,6 +111,14 @@
           }
         }
       });
+      btn.addEventListener('mouseover', () => {
+        btn.style.transform = 'scale(1.05)';
+        btn.style.boxShadow = '0 8px 16px rgba(0,0,0,0.7)';
+      });
+      btn.addEventListener('mouseout', () => {
+        btn.style.transform = 'scale(1)';
+        btn.style.boxShadow = 'inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6)';
+      });
     });
   }
 
@@ -104,6 +126,20 @@
   function handleSectionLogic(sectionId, root) {
     console.log('[JC.handleSectionLogic] Processing logic for:', sectionId);
     if (sectionId === 'section-intro') {
+      root.style.cssText = `
+        background: url('/assets/img/textura-pergaminho.jpg') center/cover !important;
+        padding: 30px !important;
+        border-radius: 12px !important;
+        max-width: 600px !important;
+        text-align: center !important;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6) !important;
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        position: relative !important;
+        z-index: 2 !important;
+        border: 2px solid #8B4513 !important;
+      `;
       applyTypingAndTTS(sectionId, root);
       attachButtonEvents(sectionId, root);
     }
