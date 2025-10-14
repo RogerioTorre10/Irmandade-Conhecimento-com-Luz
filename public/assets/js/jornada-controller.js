@@ -1,229 +1,143 @@
-(function (global) {
-  'use strict';
+(function () {
+  'use strict';
 
-  const JC = {};
-  global.JC = JC;
+  console.log('[JC.init] Initializing controller...');
 
-  const HIDE_CLASS = 'hidden';
-  let sectionOrder = [];
-  let lastShowSection = 0;
-  let controllerInitialized = false;
+  // Ordem das seções
+  const sectionOrder = [
+    'section-intro',
+    'section-termos',
+    'section-senha',
+    'section-filme',
+    'section-guia',
+    'section-selfie',
+    'section-perguntas',
+    'section-final'
+  ];
 
-  // Estado interno
-  let currentTermosPage = 'termos-pg1';
-  let currentPerguntasBlock = 'bloco-raizes';
-  
-  // Função auxiliar para criar um elemento fallback
-  function createFallbackElement(id) {
-    console.warn(`[JC.createFallbackElement] Criando fallback para #${id}`);
-    const element = document.createElement('section');
-    element.id = id;
-    element.classList.add('section', HIDE_CLASS); 
-    element.style.display = 'none'; 
-    element.innerHTML = `<h1>Erro: Seção ${id} não carregada.</h1>`; 
-    const container = document.getElementById('section-conteudo') || document.body;
-    container.appendChild(element);
-    return element;
-  }
+  // Função para obter texto do elemento
+  function getText(el) {
+    return (el?.dataset?.text ?? el?.textContent ?? '').trim();
+  }
 
-  // Lógica específica por seção (MOVIDA PARA CÁ)
-  function handleSectionLogic(id, target) {
-    if (id === 'section-perguntas') {
-      global.JSecoes?.loadDynamicBlocks();
-      global.JGuiaSelfie?.loadAnswers(); 
-    } else if (id === 'section-selfie') {
-      global.JGuiaSelfie?.initSelfie(); // Acesso OK
-    } else if (id === 'section-final') {
-      global.JSecoes?.generatePDF();
-    } 
-    global.JSecoes?.updateCanvasBackground(id);
-  }
+  // Função para aplicar datilografia e TTS
+  async function applyTypingAndTTS(sectionId, root) {
+    console.log('[JC.applyTypingAndTTS] Processing typing and TTS for:', sectionId);
+    const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
+    console.log('[JC.applyTypingAndTTS] Typing elements:', typingElements.length);
 
-  // Tipagem e ativação de botões (MOVIDA PARA CÁ)
-  function handleTypingAndButtons(id, target) {
-    const container = id === 'section-termos'
-      ? target.querySelector(`#${currentTermosPage}`)
-      : id === 'section-perguntas'
-      ? target.querySelector('#perguntas-container')
-      : target;
+    if (typingElements.length > 0 && typeof window.runTyping === 'function') {
+      console.log('[JC.applyTypingAndTTS] Starting typing animation');
+      try {
+        for (const el of typingElements) {
+          if (el.classList.contains('typing-done')) {
+            console.log('[JC.applyTypingAndTTS] Skipping already processed:', el.id);
+            continue;
+          }
+          const text = getText(el);
+          console.log('[JC.applyTypingAndTTS] Typing:', el.id, text.substring(0, 30) + '...');
+          el.textContent = '';
+          el.classList.add('typing-active');
+          await new Promise((resolve) => {
+            window.runTyping(el, text, resolve, {
+              speed: Number(el.dataset.speed || 36),
+              cursor: String(el.dataset.cursor || 'true') === 'true'
+            });
+          });
+          el.classList.add('typing-done');
+          el.style.opacity = '1';
+          console.log('[JC.applyTypingAndTTS] Typing completed:', el.id);
+        }
 
-    const textElements = container ? container.querySelectorAll('[data-typing="true"]:not(.hidden)') : [];
+        // Aplica TTS após datilografia
+        if (typeof window.EffectCoordinator?.speak === 'function') {
+          const fullText = Array.from(typingElements).map(el => getText(el)).join(' ');
+          window.EffectCoordinator.speak(fullText, { rate: 1.03, pitch: 1.0 });
+          console.log('[JC.applyTypingAndTTS] TTS activated:', fullText.substring(0, 50) + '...');
+        } else {
+          console.warn('[JC.applyTypingAndTTS] EffectCoordinator.speak not available');
+        }
+      } catch (err) {
+        console.error('[JC.applyTypingAndTTS] Typing error:', err);
+        typingElements.forEach(el => {
+          el.textContent = getText(el);
+          el.classList.add('typing-done');
+          el.style.opacity = '1';
+        });
+      }
+    } else {
+      console.warn('[JC.applyTypingAndTTS] No typing elements or runTyping not available');
+      typingElements.forEach(el => {
+        el.textContent = getText(el);
+        el.classList.add('typing-done');
+        el.style.opacity = '1';
+      });
+    }
+  }
 
-    textElements.forEach(el => {
-      el.style.display = 'block';
-      el.style.visibility = 'visible';
-      if (typeof global.runTyping === 'function') {
-        global.runTyping(el, el.getAttribute('data-text') || el.textContent, () => {
-          const btn = target.querySelector('[data-action="avancar"], .btn-avancar, .btn');
-          if (btn && btn.disabled) btn.disabled = false;
-        });
-      } else {
-        el.classList.add('typing-done');
-        el.style.opacity = '1';
-      }
-    });
+  // Função para anexar eventos aos botões
+  function attachButtonEvents(sectionId, root) {
+    console.log('[JC.attachButtonEvents] Attaching buttons for:', sectionId);
+    const buttons = root.querySelectorAll('[data-action]');
+    console.log('[JC.attachButtonEvents] Buttons found:', buttons.length);
+    buttons.forEach(btn => {
+      const action = btn.dataset.action;
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
+      btn.addEventListener('click', () => {
+        console.log('[JC.attachButtonEvents] Button clicked:', action);
+        if (action === 'avancar') {
+          const currentIndex = sectionOrder.indexOf(sectionId);
+          const nextSection = sectionOrder[currentIndex + 1];
+          if (nextSection) {
+            show(nextSection);
+          } else {
+            window.location.href = '/termos';
+          }
+        }
+      });
+    });
+  }
 
-    attachButtonEvents(id, target);
-  }
+  // Função para processar lógica da seção
+  function handleSectionLogic(sectionId, root) {
+    console.log('[JC.handleSectionLogic] Processing logic for:', sectionId);
+    if (sectionId === 'section-intro') {
+      applyTypingAndTTS(sectionId, root);
+      attachButtonEvents(sectionId, root);
+    }
+  }
 
-  // Eventos de clique
-  function attachButtonEvents(id, target) {
-    const btns = target.querySelectorAll('[data-action], .btn-avancar, .btn, #iniciar, #btnSkipSelfie, #btnStartJourney, #previewBtn, #captureBtn, #grok-chat-send');
+  // Função para exibir uma seção
+  async function show(sectionId) {
+    console.log('[JC.show] Starting display for:', sectionId);
+    try {
+      console.log('[JC.show] Starting carregarEtapa for:', sectionId.replace('section-', ''));
+      const section = await window.carregarEtapa(sectionId.replace('section-', ''));
+      console.log('[JC.show] carregarEtapa completed, element #', sectionId, ':', !!section);
+      console.log('[JC.show] Content of #jornada-content-wrapper:', document.getElementById('jornada-content-wrapper')?.innerHTML.slice(0, 120) + '...');
+      handleSectionLogic(sectionId, section);
+      document.dispatchEvent(new CustomEvent('section:shown', { detail: { sectionId } }));
+      console.log('[JC.show] Event section:shown fired for:', sectionId);
+      console.log('[JC.show] Displayed successfully:', sectionId);
+    } catch (err) {
+      console.error('[JC.show] Error showing section:', sectionId, err);
+    }
+  }
 
-    btns.forEach(btn => {
-      if (!btn.dataset.clickAttached) {
-        btn.addEventListener('click', (e) => {
-          e.preventDefault();
-          handleButtonAction(id, btn);
-        });
-        btn.dataset.clickAttached = '1';
-      }
-    });
-  }
+  // Função para definir a ordem das seções
+  function setOrder(order) {
+    console.log('[JC.setOrder] Setting section order:', order);
+    sectionOrder.length = 0;
+    sectionOrder.push(...order);
+  }
 
-  // Ações dos botões
-  function handleButtonAction(id, btn) {
-    const action = btn.dataset.action;
+  // Inicializa o controlador
+  function init() {
+    console.log('[JC.init] Controller initialized successfully');
+    window.JC = { show, setOrder };
+  }
 
-    if (id === 'section-termos') {
-      if (action === 'termos-next' && currentTermosPage === 'termos-pg1') {
-        document.getElementById('termos-pg1')?.classList.add(HIDE_CLASS);
-        document.getElementById('termos-pg2')?.classList.remove(HIDE_CLASS);
-        currentTermosPage = 'termos-pg2';
-        JC.show(id);
-      } else if (action === 'termos-prev' && currentTermosPage === 'termos-pg2') {
-        document.getElementById('termos-pg2')?.classList.add(HIDE_CLASS);
-        document.getElementById('termos-pg1')?.classList.remove(HIDE_CLASS);
-        currentTermosPage = 'termos-pg1';
-        JC.show(id);
-      } else if (action === 'avancar' && currentTermosPage === 'termos-pg2') {
-        JC.goNext();
-      }
-    } else if (id === 'section-intro' && action === 'avancar') {
-      JC.goNext(); 
-    } else if (id === 'section-selfie' && action === 'skip-selfie') {
-      global.JSecoes?.proceedAfterSelfie();
-    } else if (id === 'section-perguntas' && action === 'avancar') {
-      global.JGuiaSelfie?.saveAnswers();
-      global.JSecoes?.goNext();
-    } else if (id === 'section-senha' && action === 'avancar') {
-      JC.goNext(); 
-    } else {
-      JC.goNext();
-    }
-  }
-  
-  // Define a ordem das seções
-  JC.setOrder = function (order) {
-    sectionOrder = order;
-    console.log('[JC.setOrder] Ordem das seções definida:', sectionOrder);
-  };
-
-  // Navegação
-  JC.goNext = function () {
-    const currentId = global.__currentSectionId;
-    const idx = sectionOrder.indexOf(currentId);
-    if (idx >= 0 && idx < sectionOrder.length - 1) {
-      JC.show(sectionOrder[idx + 1]);
-    } else {
-      console.log('[JC.goNext] Não há próxima seção para', currentId);
-    }
-  };
-
-  JC.goPrev = function () {
-    const currentId = global.__currentSectionId;
-    const idx = sectionOrder.indexOf(currentId);
-    if (idx > 0) {
-      JC.show(sectionOrder[idx - 1]);
-    } else {
-      console.log('[JC.goPrev] Não há seção anterior para', currentId);
-    }
-  };
-
-  // Exibe uma seção
-  JC.show = async function (id, { force = false } = {}) {
-    const now = performance.now();
-    if (!force && (now - lastShowSection < 300)) { 
-      console.log(`[JC.show] Ignorando chamada para ${id}: muito rápida`);
-      return;
-    }
-    lastShowSection = now;
-    
-    const loaderName = id.startsWith('section-') ? id.substring(8) : id;
-
-    try {
-      if (window.carregarEtapa) { 
-        await window.carregarEtapa(loaderName); 
-        window.i18n?.apply?.(); 
-      } else {
-        console.error('[JC.show] Função carregarEtapa não encontrada.');
-      }
-
-      let target = document.getElementById(id);
-      if (!target) {
-        target = createFallbackElement(id);
-        window.toast?.(`Seção ${id} não encontrada. Usando fallback.`, 'error');
-      }    
-     
-      target.classList?.remove(HIDE_CLASS);
-      target.style.display = 'block';
-      target.style.visibility = 'visible';
-      global.__currentSectionId = id;
-
-      global.G = global.G || {};
-      global.G.__typingLock = false;
-      
-      if (id !== 'section-termos') currentTermosPage = 'termos-pg1';
-      if (id !== 'section-perguntas') currentPerguntasBlock = 'bloco-raizes';
-
-      handleSectionLogic(id, target);
-
-      const detail = { sectionId: id, id, root: target };
-      document.dispatchEvent(new CustomEvent('section:shown', { detail }));
-
-      setTimeout(() => {
-        handleTypingAndButtons(id, target);
-      }, 300);
-
-      console.log('[JC.show] Exibido com sucesso:', id);
-    } catch (e) {
-      console.error('[JC.show] Falha ao exibir', id, e);
-    }
-  };
-
-  // Inicialização única
-  JC.init = function () {
-    if (controllerInitialized) return;
-    controllerInitialized = true;
-
-    if (!sectionOrder.length) {
-      JC.setOrder([
-        'section-intro',          
-        'section-termos',         
-        'section-senha',          
-        'section-filme-conhecimento-com-luz-jardim',   
-        'section-guia',
-        'section-filme-conhecimento-com-luz-jardim',
-        'section-selfie',         
-        'section-filme-0-ao-encontro-da-jornada', 
-        'section-perguntas',      
-        'section-filme-5-fim-da-jornada',
-        'section-final'           
-      ]);
-    }
-
-    console.log('[JC.init] Controlador inicializado com sucesso.');
-  };
-  
-  // Finalização da Inicialização
-  Promise.resolve().finally(() => {
-    if (!global.__ControllerEventsBound) {
-      global.__ControllerEventsBound = true;
-      document.addEventListener('DOMContentLoaded', JC.init, { once: true });
-    }
-  });
-  
-  global.initController = JC.init;
-  global.showSection = JC.show; 
-  
-})(window);
+  init();
+})();
