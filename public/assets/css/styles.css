@@ -159,8 +159,7 @@ TÍTULO: PERGAMINHO
 }
 
 .parchment-rough {
-  background-image: url('/assets/img/pergaminho-rasgado-vert.png');
-  background-size: cover;
+  background: transparent; /* Removido background-image para evitar conflito */
   border-radius: 16px;
 }
 
