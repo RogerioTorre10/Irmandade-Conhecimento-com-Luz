@@ -100,7 +100,7 @@
       if (typeof window.JC?.init === 'function') {
         window.JC.init();
       } else {
-        console.error('JC.init não definido');
+        console.error('JC.init não definido. Verifique se jornada-controller.js está carregado.');
       }
     } catch (e) {
       console.error('Falha ao iniciar jornada:', e);
