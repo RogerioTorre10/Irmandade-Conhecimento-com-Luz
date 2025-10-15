@@ -91,13 +91,14 @@
   <script src="/assets/js/section-termos.js"></script>
   <script src="/assets/js/section-senha.js"></script>
   
-  <!-- Inicialização -->
+ <!-- Inicialização -->
 <script>
   // Esperar todos os scripts carregarem
   window.addEventListener('load', () => {
     try {
       if (typeof window.JC?.init === 'function') {
         window.JC.init();
+        console.log('JC.init executado com sucesso');
       } else {
         console.error('JC.init não definido. Verifique se jornada-controller.js está carregado.');
         // Fallback para carregar intro
