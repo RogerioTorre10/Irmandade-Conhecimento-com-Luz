@@ -124,7 +124,9 @@ TÍTULO: PERGAMINHO
   max-width: 600px;
   margin: 12px auto;
   min-height: 80vh;
-  overflow: hidden;
+  height: 80vh !important; /* Fixa altura */
+  box-sizing: border-box; /* Inclui padding */
+  overflow: hidden !important; /* Evita barras */
 }
 
 @media (min-width: 768px) {
@@ -140,8 +142,8 @@ TÍTULO: PERGAMINHO
   z-index: 0;
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 100% 100%; /* Alterado de cover para 100% 100% para evitar oscilação */
-  background-attachment: fixed; /* Fixa o background durante mudanças no conteúdo */
+  background-size: 100% 100%; /* Tamanho fixo */
+  background-attachment: fixed; /* Imóvel */
   border-radius: 16px;
   opacity: .98;
   filter: drop-shadow(0 12px 32px rgba(0,0,0,.45));
@@ -161,20 +163,32 @@ TÍTULO: PERGAMINHO
 }
 
 .parchment-rough {
-  background: transparent !important;/* Removido background-image para evitar conflito */
+  background: transparent !important;
   border-radius: 16px;
 }
 
 .parchment-inner-rough {
   background: transparent !important;
   box-shadow: none;
-  overflow: hidden !important; /* Evitar barra lateral */
+  overflow: hidden !important;
+  height: 100% !important; /* Ocupa altura do pai */
+  box-sizing: border-box;
 }
 
 .parchment-title-rough {
   color: #fff;
   font-size: 20px;
   margin-bottom: 12px;
+  opacity: 0 !important;
+  display: none !important;
+  visibility: hidden !important;
+}
+
+.parchment-title-rough.typing-active,
+.parchment-title-rough.typing-done {
+  opacity: 1 !important;
+  display: block !important;
+  visibility: visible !important;
 }
 
 .parchment-text-rough {
@@ -186,12 +200,14 @@ TÍTULO: PERGAMINHO
   display: none !important;
   visibility: hidden !important;
 }
+
 .parchment-text-rough.typing-active,
 .parchment-text-rough.typing-done {
   opacity: 1 !important;
   display: block !important;
   visibility: visible !important;
 }
+
 .parchment-input-rough {
   width: 100%;
   padding: 12px;
@@ -203,15 +219,16 @@ TÍTULO: PERGAMINHO
 }
 
 .parchment-actions-rough {
-  display: flex;
+  display: flex !important;
   justify-content: center;
   gap: 8px;
   margin-top: 12px;
   position: sticky;
   bottom: 0;
-  background: transparent;
+  background: transparent !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
-
 /* =============================================================================
 TÍTULO: CAMPOS E SENHA
 ============================================================================= */
