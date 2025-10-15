@@ -111,6 +111,7 @@
         btn.style.cursor = 'pointer !important';
         btn.style.display = 'inline-block !important';
         btn.style.margin = '8px !important';
+        btn.style.position = 'relative !important';
         console.log('[section-termos] Botão habilitado:', btn.className, btn.textContent);
       }
     });
