@@ -3,7 +3,6 @@
 
   console.log('[JC.init] Initializing controller...');
 
-  // Ordem das seções
   const sectionOrder = [
     'section-intro',
     'section-termos',
@@ -15,62 +14,71 @@
     'section-final'
   ];
 
-  // Função para obter texto do elemento
   function getText(el) {
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
   }
 
-  // Função para aplicar datilografia e TTS
   async function applyTypingAndTTS(sectionId, root) {
-  console.log('[JC.applyTypingAndTTS] Processing typing and TTS for:', sectionId);
-  const typingElements = sectionId === 'section-intro' 
-    ? [root.querySelector('#intro-p1'), root.querySelector('#intro-p2')]
-    : [root.querySelector('#termos-p1'), root.querySelector('#termos-p2')];
-  const validElements = typingElements.filter(el => {
-    if (!el) {
-      console.error('[JC.applyTypingAndTTS] Element not found for:', sectionId, 'Selector:', typingElements.map(e => e?.id));
-      return false;
-    }
-    return el.dataset.typing === 'true' && !el.classList.contains('typing-done');
-  });
-  console.log('[JC.applyTypingAndTTS] Typing elements:', validElements.length, validElements.map(el => el?.id));
-
-  if (validElements.length > 0 && typeof window.runTyping === 'function') {
-    console.log('[JC.applyTypingAndTTS] Starting typing animation');
-    try {
-      for (const el of validElements) {
-        if (el.classList.contains('typing-done')) {
-          console.log('[JC.applyTypingAndTTS] Skipping already processed:', el.id);
-          continue;
-        }
-        const text = getText(el);
-        console.log('[JC.applyTypingAndTTS] Typing:', el.id, text.substring(0, 30) + '...');
-        el.textContent = '';
-        el.classList.add('typing-active');
-        el.style.direction = 'ltr';
-        el.style.textAlign = 'left';
-        el.style.color = '#fff'; // Garante visibilidade
-        await new Promise((resolve) => {
-          window.runTyping(el, text, resolve, {
-            speed: Number(el.dataset.speed || 36),
-            cursor: String(el.dataset.cursor || 'true') === 'true'
-          });
-        });
-        el.classList.add('typing-done');
-        el.style.opacity = '1 !important';
-        el.style.color = '#fff !important';
-        console.log('[JC.applyTypingAndTTS] Typing completed:', el.id);
-
-        if (typeof window.EffectCoordinator?.speak === 'function') {
-          window.EffectCoordinator.speak(text, { rate: 1.03, pitch: 1.0 });
-          console.log('[JC.applyTypingAndTTS] TTS activated for:', el.id, text.substring(0, 50) + '...');
-          await new Promise(resolve => setTimeout(resolve, text.length * 50));
-        } else {
-          console.warn('[JC.applyTypingAndTTS] EffectCoordinator.speak not available');
-        }
+    console.log('[JC.applyTypingAndTTS] Processing typing and TTS for:', sectionId);
+    const typingElements = sectionId === 'section-intro' 
+      ? [root.querySelector('#intro-p1'), root.querySelector('#intro-p2')]
+      : [root.querySelector('#termos-p1'), root.querySelector('#termos-p2')];
+    const validElements = typingElements.filter(el => {
+      if (!el) {
+        console.error('[JC.applyTypingAndTTS] Element not found for:', sectionId, 'Selector:', typingElements.map(e => e?.id));
+        return false;
       }
-    } catch (err) {
-      console.error('[JC.applyTypingAndTTS] Typing error:', err);
+      return el.dataset.typing === 'true' && !el.classList.contains('typing-done');
+    });
+    console.log('[JC.applyTypingAndTTS] Typing elements:', validElements.length, validElements.map(el => el?.id));
+
+    if (validElements.length > 0 && typeof window.runTyping === 'function') {
+      console.log('[JC.applyTypingAndTTS] Starting typing animation');
+      try {
+        for (const el of validElements) {
+          if (el.classList.contains('typing-done')) {
+            console.log('[JC.applyTypingAndTTS] Skipping already processed:', el.id);
+            continue;
+          }
+          const text = getText(el);
+          console.log('[JC.applyTypingAndTTS] Typing:', el.id, text.substring(0, 30) + '...');
+          el.textContent = '';
+          el.classList.add('typing-active');
+          el.style.direction = 'ltr';
+          el.style.textAlign = 'left';
+          el.style.color = '#fff'; // Garante visibilidade
+          await new Promise((resolve) => {
+            window.runTyping(el, text, resolve, {
+              speed: Number(el.dataset.speed || 36),
+              cursor: String(el.dataset.cursor || 'true') === 'true'
+            });
+          });
+          el.classList.add('typing-done');
+          el.style.opacity = '1 !important';
+          el.style.color = '#fff !important';
+          console.log('[JC.applyTypingAndTTS] Typing completed:', el.id);
+
+          if (typeof window.EffectCoordinator?.speak === 'function') {
+            window.EffectCoordinator.speak(text, { rate: 1.03, pitch: 1.0 });
+            console.log('[JC.applyTypingAndTTS] TTS activated for:', el.id, text.substring(0, 50) + '...');
+            await new Promise(resolve => setTimeout(resolve, text.length * 50));
+          } else {
+            console.warn('[JC.applyTypingAndTTS] EffectCoordinator.speak not available');
+          }
+        }
+      } catch (err) {
+        console.error('[JC.applyTypingAndTTS] Typing error:', err);
+        validElements.forEach(el => {
+          el.textContent = getText(el);
+          el.classList.add('typing-done');
+          el.style.opacity = '1 !important';
+          el.style.color = '#fff !important';
+          el.style.direction = 'ltr';
+          el.style.textAlign = 'left';
+        });
+      }
+    } else {
+      console.warn('[JC.applyTypingAndTTS] No valid typing elements or runTyping not available');
       validElements.forEach(el => {
         el.textContent = getText(el);
         el.classList.add('typing-done');
@@ -80,20 +88,8 @@
         el.style.textAlign = 'left';
       });
     }
-  } else {
-    console.warn('[JC.applyTypingAndTTS] No valid typing elements or runTyping not available');
-    validElements.forEach(el => {
-      el.textContent = getText(el);
-      el.classList.add('typing-done');
-      el.style.opacity = '1 !important';
-      el.style.color = '#fff !important';
-      el.style.direction = 'ltr';
-      el.style.textAlign = 'left';
-    });
   }
-}
 
-  // Função para anexar eventos aos botões
   function attachButtonEvents(sectionId, root) {
     console.log('[JC.attachButtonEvents] Attaching buttons for:', sectionId);
     const buttons = root.querySelectorAll('[data-action]');
@@ -101,22 +97,7 @@
     buttons.forEach(btn => {
       const action = btn.dataset.action;
       btn.disabled = false;
-      btn.style.cssText = `
-        padding: 10px 20px !important;
-        background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover !important;
-        background-blend-mode: overlay !important;
-        color: #fff !important;
-        border-radius: 8px !important;
-        font-size: 20px !important;
-        border: 3px solid #4a4a4a !important;
-        box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6) !important;
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.7) !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-        display: inline-block !important;
-        cursor: pointer !important;
-        transition: transform 0.2s ease, box-shadow 0.2s ease !important;
-      `;
+      btn.classList.add('btn', 'btn-primary', 'btn-stone');
       btn.addEventListener('click', () => {
         console.log('[JC.attachButtonEvents] Button clicked:', action, btn.id);
         if (action === 'avancar') {
@@ -142,30 +123,28 @@
     });
   }
 
-  // Função para processar lógica da seção
   function handleSectionLogic(sectionId, root) {
-  console.log('[JC.handleSectionLogic] Processing logic for:', sectionId);
-  if (sectionId === 'section-intro' || sectionId === 'section-termos') {
-    root.style.cssText = `
-      background: transparent !important;
-      padding: 30px !important;
-      border-radius: 12px !important;
-      max-width: 600px !important;
-      text-align: center !important;
-      box-shadow: none !important;
-      border: none !important;
-      display: block !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-      position: relative !important;
-      z-index: 2 !important;
-    `;
-    applyTypingAndTTS(sectionId, root);
-    attachButtonEvents(sectionId, root);
+    console.log('[JC.handleSectionLogic] Processing logic for:', sectionId);
+    if (sectionId === 'section-intro' || sectionId === 'section-termos') {
+      root.style.cssText = `
+        background: transparent !important;
+        padding: 30px !important;
+        border-radius: 12px !important;
+        max-width: 600px !important;
+        text-align: center !important;
+        box-shadow: none !important;
+        border: none !important;
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        position: relative !important;
+        z-index: 2 !important;
+      `;
+      applyTypingAndTTS(sectionId, root);
+      attachButtonEvents(sectionId, root);
+    }
   }
-}
 
-  // Função para exibir uma seção
   async function show(sectionId) {
     console.log('[JC.show] Starting display for:', sectionId);
     try {
@@ -186,14 +165,12 @@
     }
   }
 
-  // Função para definir a ordem das seções
   function setOrder(order) {
     console.log('[JC.setOrder] Setting section order:', order);
     sectionOrder.length = 0;
     sectionOrder.push(...order);
   }
 
-  // Inicializa o controlador
   function init() {
     console.log('[JC.init] Controller initialized successfully');
     window.JC = { show, setOrder };
