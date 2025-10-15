@@ -124,6 +124,7 @@ TÍTULO: PERGAMINHO
   max-width: 600px;
   margin: 12px auto;
   min-height: 80vh;
+  overflow: hidden;
 }
 
 @media (min-width: 768px) {
@@ -139,7 +140,8 @@ TÍTULO: PERGAMINHO
   z-index: 0;
   background-repeat: no-repeat;
   background-position: center;
-  background-size: cover;
+  background-size: 100% 100%; /* Alterado de cover para 100% 100% para evitar oscilação */
+  background-attachment: fixed; /* Fixa o background durante mudanças no conteúdo */
   border-radius: 16px;
   opacity: .98;
   filter: drop-shadow(0 12px 32px rgba(0,0,0,.45));
