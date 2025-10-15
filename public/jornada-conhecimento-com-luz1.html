@@ -90,15 +90,20 @@
   <script src="/assets/js/sec-intro.js"></script>
   <script src="/assets/js/section-termos.js"></script>
   <script src="/assets/js/section-senha.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      try {
-        onJornadaEssencial();
-      } catch (e) {
-        console.error('Falha ao iniciar jornada:', e);
+  <!-- Em jornada-conhecimento-com-luz1.html -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    try {
+      if (typeof window.JC?.init === 'function') {
+        window.JC.init();
+      } else {
+        console.error('JC.init não definido');
       }
-    });
-  </script>
+    } catch (e) {
+      console.error('Falha ao iniciar jornada:', e);
+    }
+  });
+</script>
 
   <noscript>
     <p style="text-align:center; padding:12px">Ative o JavaScript para usar esta página.</p>
