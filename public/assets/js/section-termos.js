@@ -111,19 +111,17 @@
       }
     }
 
-    // Forçar visibilidade inicial
     [pg1, pg2].forEach((el, i) => {
       if (el) {
         el.style.color = '#fff !important';
         el.style.opacity = i === 0 ? '1 !important' : '0 !important';
         el.style.visibility = 'visible !important';
         el.style.display = i === 0 ? 'block !important' : 'none !important';
-        el.classList.remove('hidden'); // Remover class hidden se presente
+        el.classList.remove('hidden');
         console.log(`[section-termos] Texto ${i+1} inicializado:`, el.id, el.textContent?.substring(0, 50));
       }
     });
 
-    // Estilizar root
     root.style.cssText = `
       background: transparent !important;
       padding: 30px !important;
@@ -137,11 +135,10 @@
       visibility: visible !important;
       position: relative !important;
       z-index: 2 !important;
-      overflow: visible !important; // Remover barra de rolamento
-      max-height: none !important;
+      overflow: hidden !important;
+      max-height: 80vh !important; /* Evitar barra de rolamento */
     `;
 
-    // Estilizar botões
     [nextBtn, prevBtn, avancarBtn].forEach(btn => {
       if (btn) {
         btn.classList.add('btn', 'btn-primary', 'btn-stone');
@@ -152,12 +149,10 @@
       }
     });
 
-    // Configurar chama
     if (typeof window.setupCandleFlame === 'function') {
       window.setupCandleFlame('media', 'flame-bottom-right');
     }
 
-    // Lógica de navegação entre termos-pg1 e termos-pg2
     once(nextBtn, 'click', () => {
       if (currentTermosPage === 1 && pg2) {
         pg1.style.display = 'none !important';
@@ -168,6 +163,7 @@
         currentTermosPage = 2;
         console.log('[section-termos] Mostrando termos-pg2');
         avancarBtn.textContent = 'Aceito e quero continuar';
+        runTypingChain(); // Reaplicar datilografia para pg2
       }
     });
 
@@ -201,14 +197,14 @@
           currentTermosPage = 2;
           console.log('[section-termos] Mostrando termos-pg2 antes de avançar');
           avancarBtn.textContent = 'Aceito e quero continuar';
+          runTypingChain(); // Reaplicar datilografia para pg2
         }
       }
     });
 
-    // Função de datilografia simplificada
     const runTypingChain = async () => {
       console.log('[section-termos] Iniciando datilografia...');
-      const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
+      const typingElements = root.querySelectorAll(`#termos-pg${currentTermosPage} [data-typing="true"]:not(.typing-done)`);
       
       for (let el of typingElements) {
         const text = getText(el);
