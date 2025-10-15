@@ -246,7 +246,7 @@ const handler = async (evt) => {
     p2_2: !!p2_2, p2_2Id: p2_2?.id,
     avancarBtn: !!avancarBtn, avancarId: avancarBtn?.id
   });
-};;
+};
 
   const bind = () => {
     document.removeEventListener('sectionLoaded', handler);
