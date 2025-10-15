@@ -168,6 +168,7 @@ TÍTULO: PERGAMINHO
 .parchment-inner-rough {
   background: transparent !important;
   box-shadow: none;
+  overflow: hidden !important; /* Evitar barra lateral */
 }
 
 .parchment-title-rough {
