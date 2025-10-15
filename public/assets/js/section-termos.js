@@ -62,18 +62,17 @@
     try {
       pg1 = await waitForElement('#termos-p1', { within: root, timeout: 10000 });
       pg2 = await waitForElement('#termos-p2', { within: root, timeout: 10000 });
-      nextBtn = await waitForElement('[data-action="termos-next"]', { within: root, timeout: 10000 });
-      prevBtn = await waitForElement('[data-action="termos-prev"]', { within: root, timeout: 10000 });
-      avancarBtn = await waitForElement('[data-action="avancar"]', { within: root, timeout: 10000 });
+      nextBtn = await waitForElement('#termos-next', { within: root, timeout: 10000 });
+      prevBtn = await waitForElement('#termos-prev', { within: root, timeout: 10000 });
+      avancarBtn = await waitForElement('#termos-avancar', { within: root, timeout: 10000 });
     } catch (e) {
       window.toast?.('Falha ao carregar os elementos da seção Termos.', 'error');
       console.error('[section-termos] Elements not found:', e);
       pg1 = pg1 || root.querySelector('#termos-p1') || document.createElement('p');
       pg2 = pg2 || root.querySelector('#termos-p2') || document.createElement('p');
-      nextBtn = nextBtn || root.querySelector('[data-action="termos-next"]') || document.createElement('button');
-      prevBtn = prevBtn || root.querySelector('[data-action="termos-prev"]') || document.createElement('button');
-      avancarBtn = avancarBtn || root.querySelector('[data-action="avancar"]') || document.createElement('button');
-      // Configurar placeholders
+      nextBtn = nextBtn || root.querySelector('#termos-next') || document.createElement('button');
+      prevBtn = prevBtn || root.querySelector('#termos-prev') || document.createElement('button');
+      avancarBtn = avancarBtn || root.querySelector('#termos-avancar') || document.createElement('button');
       if (!pg1.id) {
         pg1.id = 'termos-p1';
         pg1.classList.add('intro-paragraph');
@@ -88,9 +87,26 @@
         pg2.textContent = 'Placeholder para Termos 2';
         root.appendChild(pg2);
       }
+      if (!nextBtn.id) {
+        nextBtn.id = 'termos-next';
+        nextBtn.classList.add('btn', 'btn-primary', 'btn-stone');
+        nextBtn.dataset.action = 'termos-next';
+        root.appendChild(nextBtn);
+      }
+      if (!prevBtn.id) {
+        prevBtn.id = 'termos-prev';
+        prevBtn.classList.add('btn', 'btn-primary', 'btn-stone');
+        prevBtn.dataset.action = 'termos-prev';
+        root.appendChild(prevBtn);
+      }
+      if (!avancarBtn.id) {
+        avancarBtn.id = 'termos-avancar';
+        avancarBtn.classList.add('btn', 'btn-primary', 'btn-stone');
+        avancarBtn.dataset.action = 'avancar';
+        root.appendChild(avancarBtn);
+      }
     }
 
-    // Aplicar estilos ao root
     root.style.cssText = `
       background: transparent !important;
       padding: 30px !important;
@@ -106,19 +122,21 @@
       z-index: 2 !important;
     `;
 
-    // Estilizar botão avançar
+    nextBtn.classList.add('btn', 'btn-primary', 'btn-stone');
+    prevBtn.classList.add('btn', 'btn-primary', 'btn-stone');
     avancarBtn.classList.add('btn', 'btn-primary', 'btn-stone');
-    avancarBtn.disabled = false; // Habilitar por padrão
+    nextBtn.disabled = false;
+    prevBtn.disabled = false;
+    avancarBtn.disabled = false;
 
-    // Configurar chama
     if (typeof window.setupCandleFlame === 'function') {
       window.setupCandleFlame('media', 'flame-bottom-right');
     }
 
-    // Manipuladores de cliques
     once(nextBtn, 'click', () => {
       pg1.classList.add('hidden');
       pg2.classList.remove('hidden');
+      console.log('[section-termos] Next button clicked, showing #termos-p2');
       if (typeof window.JC?.show === 'function') {
         window.JC.show('section-termos');
       }
@@ -127,12 +145,14 @@
     once(prevBtn, 'click', () => {
       pg2.classList.add('hidden');
       pg1.classList.remove('hidden');
+      console.log('[section-termos] Previous button clicked, showing #termos-p1');
       if (typeof window.JC?.show === 'function') {
         window.JC.show('section-termos');
       }
     });
 
     once(avancarBtn, 'click', () => {
+      console.log('[section-termos] Avançar button clicked');
       if (typeof window.JC?.show === 'function') {
         window.JC.show('section-senha');
         console.log('[section-termos] Navigating to section-senha');
@@ -174,7 +194,6 @@
           el.classList.add('typing-done');
           el.style.opacity = '1';
           el.style.color = '#fff';
-          // Aplicar TTS
           if (typeof window.EffectCoordinator?.speak === 'function') {
             window.EffectCoordinator.speak(text, { rate: 1.03, pitch: 1.0 });
             console.log('[section-termos] TTS activated for:', el.id);
