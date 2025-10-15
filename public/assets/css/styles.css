@@ -233,7 +233,7 @@ label {
   width: 100%;
 }
 
-.senha-eye {
+.senha-eye, .btn-toggle-senha {
   position: absolute;
   right: 10px;
   top: 50%;
@@ -249,11 +249,11 @@ label {
   cursor: pointer;
 }
 
-.senha-eye:hover {
+.senha-eye:hover, .btn-toggle-senha:hover {
   color: var(--fg);
 }
 
-.senha-eye svg {
+.senha-eye svg, .btn-toggle-senha {
   width: 20px;
   height: 20px;
 }
@@ -366,7 +366,7 @@ TÍTULO: JORNADA ESPECÍFICA
   visibility: visible;
   z-index: 2;
   overflow: hidden;
-  max-height: 100vh;
+  max-height: 80vh;
 }
 
 .intro-paragraph,
@@ -374,7 +374,7 @@ TÍTULO: JORNADA ESPECÍFICA
 [data-typing="true"],
 #termos-pg1 p, #termos-pg1 li, #termos-pg1 h2,
 #termos-pg2 p, #termos-pg2 li, #termos-pg2 h3,
-#senha-p1 p, #senha-p1 h2 {
+#section-senha h2, #section-senha p {
   font-size: 18px;
   margin-bottom: 20px;
   color: #fff;
@@ -395,13 +395,13 @@ TÍTULO: JORNADA ESPECÍFICA
 [data-typing="true"].typing-done,
 #termos-pg1.typing-done p, #termos-pg1.typing-done li, #termos-pg1.typing-done h2,
 #termos-pg2.typing-done p, #termos-pg2.typing-done li, #termos-pg2.typing-done h3,
-#senha-p1.typing-done p, #senha-p1.typing-done h2 {
+#section-senha.typing-done h2, #section-senha.typing-done p {
   opacity: 1;
   color: #fff;
 }
 
 .btn.btn-primary.btn-stone,
-.nextBtn, .prevBtn, .avancarBtn {
+.nextBtn, .prevBtn, .avancarBtn, #btn-senha-avancar {
   padding: 10px 20px;
   background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
   background-blend-mode: overlay;
@@ -416,22 +416,37 @@ TÍTULO: JORNADA ESPECÍFICA
   visibility: visible;
   display: inline-block;
   cursor: pointer;
-  margin: 10px;
+  margin: 10px auto;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   width: auto;
-  min-width: 150px;
+  min-width: 200px;
+  max-width: 300px;
+  position: relative;
 }
 
 .btn.btn-primary.btn-stone:hover,
-.nextBtn:hover, .prevBtn:hover, .avancarBtn:hover {
+.nextBtn:hover, .prevBtn:hover, .avancarBtn:hover, #btn-senha-avancar:hover {
   transform: scale(1.05);
   box-shadow: 0 8px 16px rgba(0,0,0,0.7);
 }
 
 .btn:disabled,
-.nextBtn:disabled, .prevBtn:disabled, .avancarBtn:disabled {
+.nextBtn:disabled, .prevBtn:disabled, .avancarBtn:disabled, #btn-senha-avancar:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.senha-input-group {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+  margin: 20px auto;
+}
+
+.intro-actions {
+  text-align: center;
+  margin-top: 20px;
 }
 
 .flame-corner,
@@ -462,7 +477,7 @@ TÍTULO: JORNADA ESPECÍFICA
 
 #chama-header {
   margin-right: 12px;
-  order: -1; /* Coloca a chama antes do título */
+  order: -1;
 }
 
 #chama-header .chama-vela {
