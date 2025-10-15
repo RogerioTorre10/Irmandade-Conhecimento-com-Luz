@@ -180,6 +180,9 @@ TÍTULO: PERGAMINHO
   margin-bottom: 8px;
   line-height: 1.4;
   background: transparent !important;
+  opacity: 1 !important;
+  display: block !important;
+  visibility: visible !important;
 }
 
 .parchment-input-rough {
