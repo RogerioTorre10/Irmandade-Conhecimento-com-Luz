@@ -8,7 +8,174 @@
   <link rel="stylesheet" href="/assets/css/chama.css"> <!-- 🔥 estilo da chama -->
 </head>
 <body>
-  <div data-layout="master" data-journey="essencial">
+  <style>
+    /* CORREÇÕES CRÍTICAS - SOBRESCREVER styles.css */
+    
+    /* FUNDO PERGAMINHO */
+    body, html {
+      background: #0b1020 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      height: 100% !important;
+    }
+    
+    #jornada-canvas {
+      background: #0b1020 url('/assets/img/textura-pergaminho.jpg') center/cover no-repeat fixed !important;
+      background-size: cover !important;
+      min-height: 100vh !important;
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      position: relative !important;
+      z-index: 1 !important;
+    }
+    
+    /* HEADER PRETO E VISÍVEL */
+    .site-header {
+      background: #0b1020 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 16px !important;
+      z-index: 1300 !important;
+      position: relative !important;
+    }
+    
+    .site-header h1 {
+      color: #fff !important;
+      font-size: 32px !important;
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+    
+    /* SELETOR DE IDIOMA - CANT O DIREITO */
+    .language-selector {
+      position: absolute !important;
+      top: 10px !important;
+      right: 10px !important;
+      z-index: 1400 !important;
+    }
+    
+    #language-select {
+      padding: 8px 12px !important;
+      font-size: 16px !important;
+      border-radius: 6px !important;
+      background: #1a1a2e !important;
+      color: #fff !important;
+      border: 1px solid #333 !important;
+      min-width: 140px !important;
+    }
+    
+    /* CHAMAS VISÍVEIS */
+    #flame-top-left, #flame-bottom-right, #chama-header {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      position: fixed !important;
+      pointer-events: none !important;
+      z-index: 1200 !important;
+    }
+    
+    .flame-top-left {
+      top: 80px !important; /* Abaixo do header */
+      left: 20px !important;
+    }
+    
+    .flame-bottom-right {
+      bottom: 20px !important;
+      right: 20px !important;
+    }
+    
+    #chama-header .chama-vela {
+      --largura: 30px !important;
+      --altura: 60px !important;
+    }
+    
+    /* CONTAINERS TRANSPARENTES */
+    #section-conteudo {
+      background: transparent !important;
+      padding: 0 !important;
+      max-width: 600px !important;
+      margin: 0 auto !important;
+    }
+    
+    #section-intro, #section-termos {
+      background: transparent !important;
+      padding: 30px !important;
+      border-radius: 12px !important;
+      max-width: 600px !important;
+      text-align: center !important;
+      box-shadow: none !important;
+      border: none !important;
+      display: block !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      z-index: 2 !important;
+    }
+    
+    /* TEXTOS VISÍVEIS */
+    .intro-paragraph, 
+    #intro-p1, #intro-p2, 
+    #termos-p1, #termos-p2,
+    [data-typing="true"] {
+      color: #fff !important;
+      font-family: 'BerkshireSwash', cursive !important;
+      font-size: 18px !important;
+      background: transparent !important;
+      text-align: left !important;
+      visibility: visible !important;
+      display: block !important;
+    }
+    
+    /* FORÇAR VISIBILIDADE APÓS DATILOGRAFIA */
+    .intro-paragraph.typing-done,
+    [data-typing="true"].typing-done {
+      opacity: 1 !important;
+      color: #fff !important;
+    }
+    
+    /* BOTÕES COM TEXTURA DE PEDRA */
+    .btn.btn-primary.btn-stone {
+      padding: 10px 20px !important;
+      background: linear-gradient(to bottom, #a0a0a0, #808080), 
+                  url('/assets/img/textura-de-pedra.jpg') center/cover !important;
+      background-blend-mode: overlay !important;
+      color: #fff !important;
+      border-radius: 8px !important;
+      font-size: 20px !important;
+      font-family: 'ManufacturingConsent', sans-serif !important;
+      border: 3px solid #4a4a4a !important;
+      box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 
+                  0 6px 12px rgba(0,0,0,0.6) !important;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.7) !important;
+      opacity: 1 !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+    }
+    
+    .btn.btn-primary.btn-stone:hover {
+      transform: scale(1.05) !important;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.7) !important;
+    }
+    
+    .btn:disabled {
+      opacity: 0.5 !important;
+      cursor: not-allowed !important;
+    }
+    
+    /* SOBRESCREVER ESTILOS CONFLITANTES */
+    .card, .pergaminho, .pergaminho-v, .parchment-rough, .parchment-inner-rough {
+      background: transparent !important;
+      background-image: none !important;
+      box-shadow: none !important;
+    }
+    
+    body.jornada-active header.site-header {
+      display: flex !important;
+    }
+  </style>
+  <div data-layout="master" data-journey="essencial"></div>
     <!-- Seletor de Idioma -->
      <div class="language-selector">
       <select id="language-select">
@@ -56,8 +223,7 @@
         </footer>
       </div>
     </section>
-  </div>
-
+  
   <!-- Scripts da jornada -->
   <script src="/assets/js/i18n.js"></script>
   <script src="/assets/js/config.js"></script>
