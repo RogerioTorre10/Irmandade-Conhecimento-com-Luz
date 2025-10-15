@@ -223,10 +223,14 @@ label {
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
+  max-width: 400px;
+  margin: 20px auto;
 }
 
 .senha-wrap .input {
   padding-right: 42px;
+  width: 100%;
 }
 
 .senha-eye {
@@ -252,21 +256,6 @@ label {
 .senha-eye svg {
   width: 20px;
   height: 20px;
-}
-
-/* Página Senha */
-#section-senha .btn, #btn-senha, #senha-avancar {
-  opacity: 1 !important;
-  cursor: pointer !important;
-  disabled: false !important;
-  background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover !important;
-  background-blend-mode: overlay !important;
-  color: #fff !important;
-}
-
-#section-senha .olho-magico, #senha-eye {
-  display: block !important;
-  visibility: visible !important;
 }
 
 /* =============================================================================
@@ -364,7 +353,7 @@ TÍTULO: JORNADA ESPECÍFICA
   opacity: 1;
 }
 
-#section-intro, #section-termos, .termo-wrap {
+#section-intro, #section-termos, .termo-wrap, #section-senha {
   background: transparent;
   padding: 30px;
   border-radius: 12px;
@@ -376,13 +365,16 @@ TÍTULO: JORNADA ESPECÍFICA
   opacity: 1;
   visibility: visible;
   z-index: 2;
+  overflow: hidden;
+  max-height: 100vh;
 }
 
 .intro-paragraph,
-#termos-pg1, #termos-pg2,
+#termos-pg1, #termos-pg2, #senha-p1,
 [data-typing="true"],
 #termos-pg1 p, #termos-pg1 li, #termos-pg1 h2,
-#termos-pg2 p, #termos-pg2 li, #termos-pg2 h3 {
+#termos-pg2 p, #termos-pg2 li, #termos-pg2 h3,
+#senha-p1 p, #senha-p1 h2 {
   font-size: 18px;
   margin-bottom: 20px;
   color: #fff;
@@ -402,7 +394,8 @@ TÍTULO: JORNADA ESPECÍFICA
 .intro-paragraph.typing-done,
 [data-typing="true"].typing-done,
 #termos-pg1.typing-done p, #termos-pg1.typing-done li, #termos-pg1.typing-done h2,
-#termos-pg2.typing-done p, #termos-pg2.typing-done li, #termos-pg2.typing-done h3 {
+#termos-pg2.typing-done p, #termos-pg2.typing-done li, #termos-pg2.typing-done h3,
+#senha-p1.typing-done p, #senha-p1.typing-done h2 {
   opacity: 1;
   color: #fff;
 }
@@ -425,6 +418,8 @@ TÍTULO: JORNADA ESPECÍFICA
   cursor: pointer;
   margin: 10px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: auto;
+  min-width: 150px;
 }
 
 .btn.btn-primary.btn-stone:hover,
@@ -465,6 +460,11 @@ TÍTULO: JORNADA ESPECÍFICA
   --largura: 60px;
 }
 
+#chama-header {
+  margin-right: 12px;
+  order: -1; /* Coloca a chama antes do título */
+}
+
 #chama-header .chama-vela {
   --largura: 30px;
   --altura: 60px;
@@ -481,7 +481,7 @@ TÍTULO: VISIBILIDADE DE BLOCO E PERGUNTA
   display: none;
 }
 
-div[id^="section-"], .j-bloco, .j-pergunta, #termos-pg1, #termos-pg2 {
+div[id^="section-"], .j-bloco, .j-pergunta, #termos-pg1, #termos-pg2, #senha-p1 {
   opacity: 0;
   transition: opacity .5s ease-in-out;
 }
@@ -489,7 +489,7 @@ div[id^="section-"], .j-bloco, .j-pergunta, #termos-pg1, #termos-pg2 {
 div[id^="section-"]:not(.hidden),
 .j-bloco[style*="display: block"],
 .j-pergunta[style*="display: block"],
-#termos-pg1:not(.hidden), #termos-pg2:not(.hidden) {
+#termos-pg1:not(.hidden), #termos-pg2:not(.hidden), #senha-p1:not(.hidden) {
   opacity: 1;
 }
 
@@ -660,7 +660,7 @@ TÍTULO: CHAMA — ESTADOS E TAMANHOS
   height: 8px;
   border-radius: 50%;
   background: radial-gradient(circle at 50% 40%, rgba(255,255,255,.95) 0%, rgba(255,205,120,.85) 42%, rgba(255,140,0,0) 72%);
-  animation: brasaPulse 1.7s ease-in-out infinite;
+  animation: brasaPulse 1.8s ease-in-out infinite;
 }
 
 .chama-icone.chama-sm {
