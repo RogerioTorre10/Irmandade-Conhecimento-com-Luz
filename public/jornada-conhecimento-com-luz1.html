@@ -95,18 +95,22 @@
 <script src="/assets/js/section-intro.js"></script>
 <!-- ... outros scripts ... -->
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  // Esperar todos os scripts carregarem
+  window.addEventListener('load', () => {
     try {
       if (typeof window.JC?.init === 'function') {
         window.JC.init();
       } else {
         console.error('JC.init não definido. Verifique se jornada-controller.js está carregado.');
+        // Fallback para carregar intro
+        if (typeof window.carregarEtapa === 'function') {
+          window.carregarEtapa('intro');
+        }
       }
     } catch (e) {
       console.error('Falha ao iniciar jornada:', e);
     }
   });
-</script>
 
   <noscript>
     <p style="text-align:center; padding:12px">Ative o JavaScript para usar esta página.</p>
