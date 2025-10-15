@@ -75,7 +75,8 @@
     return;
   }
 
-  // Inicializar visibilidade
+  root.classList.add('section-termos'); // Adicionar classe para CSS específico
+
   [pg1, pg2].forEach((el, i) => {
     if (el) {
       el.style.opacity = i === 0 ? '1 !important' : '0 !important';
@@ -86,7 +87,6 @@
     }
   });
 
-  // Estilizar container principal
   root.style.cssText = `
     background: transparent !important;
     padding: 24px !important;
@@ -108,7 +108,6 @@
     box-sizing: border-box !important;
   `;
 
-  // Inicializar botões
   [nextBtn, prevBtn, avancarBtn].forEach(btn => {
     if (btn) {
       btn.classList.add('btn', 'btn-primary', 'btn-stone');
@@ -272,7 +271,7 @@
     });
   };
 
-  // Forçar inicialização mesmo se TERMOS_READY for true
+  // Forçar inicialização
   TERMOS_READY = false;
   try {
     await runTypingChain();
