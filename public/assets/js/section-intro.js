@@ -120,7 +120,7 @@
       }
     });
 
-    const runTypingChain = async () => {
+   const runTypingChain = async () => {
   console.log('[section-intro] Iniciando datilografia...');
   const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
 
@@ -130,7 +130,11 @@
     return;
   }
 
-  // Fallback para window.runTyping se não estiver disponível
+  // Verificar carregamento de scripts
+  console.log('[section-intro] Verificando window.runTyping:', typeof window.runTyping);
+  console.log('[section-intro] Verificando window.EffectCoordinator.speak:', typeof window.EffectCoordinator?.speak);
+
+  // Fallback para window.runTyping
   if (typeof window.runTyping !== 'function') {
     console.warn('[section-intro] window.runTyping não encontrado, usando fallback');
     window.runTyping = (el, text, resolve, options) => {
@@ -173,11 +177,11 @@
     
     try {
       if (typeof window.EffectCoordinator?.speak === 'function') {
-        window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 }); // Ajustado rate para fluidez
+        window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
         console.log('[section-intro] TTS ativado para:', el.id);
         await new Promise(resolve => setTimeout(resolve, text.length * 30));
       } else {
-        console.warn('[section-intro] window.EffectCoordinator.speak não encontrado');
+        console.warn('[section-intro] window.EffectCoordinator.speak não encontrado, pulando TTS');
       }
     } catch (err) {
       console.error('[section-intro] Erro no TTS para', el.id, err);
