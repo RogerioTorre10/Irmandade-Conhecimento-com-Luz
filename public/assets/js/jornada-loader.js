@@ -18,29 +18,28 @@
 
 function checkCriticalElements(section, sectionId) {
     const criticalSelectors = {
-      'section-intro': ['#intro-p1', '#intro-p2', '#btn-avancar'],
-      'section-termos': ['#termos-p1', '#termos-p2', '#termos-next', '#termos-prev', '#termos-avancar']
+      'section-intro': ['#intro-p1-1', '#intro-p1-2', '#intro-p1-3', '#intro-p2-1', '#intro-p2-2', '#btn-avancar'],
+      'section-termos': ['#termos-pg1', '#termos-pg2', '.nextBtn[data-action="termos-next"]', '.prevBtn[data-action="termos-prev"]', '.avancarBtn[data-action="avancar"]']
     }[sectionId] || [];
 
     const found = {};
     for (const selector of criticalSelectors) {
       let el = section.querySelector(selector);
-      if (!el && selector.startsWith('#termos-p')) {
-        el = document.createElement('p');
+      if (!el && selector.startsWith('#termos-pg')) {
+        el = document.createElement('div');
         el.id = selector.slice(1);
-        el.classList.add('intro-paragraph');
+        el.classList.add('parchment-text-rough', 'lumen-typing');
         el.dataset.typing = 'true';
         el.textContent = `Placeholder para ${selector}`;
         section.appendChild(el);
         console.warn(`[carregarEtapa] Created placeholder for ${selector}`);
       }
-      if (!el && selector.startsWith('#termos-')) {
+      if (!el && selector.startsWith('.nextBtn') || selector.startsWith('.prevBtn') || selector.startsWith('.avancarBtn')) {
         el = document.createElement('button');
-        el.id = selector.slice(1);
         el.classList.add('btn', 'btn-primary', 'btn-stone');
-        el.dataset.action = selector.slice(1).replace('termos-', '');
-        el.textContent = selector.includes('next') ? 'Próximo' : selector.includes('prev') ? 'Anterior' : 'Avançar';
-        section.appendChild(el);
+        el.dataset.action = selector.includes('next') ? 'termos-next' : selector.includes('prev') ? 'termos-prev' : 'avancar';
+        el.textContent = selector.includes('next') ? 'Próxima página' : selector.includes('prev') ? 'Voltar' : 'Aceito e quero continuar';
+        section.querySelector('.parchment-actions-rough')?.appendChild(el);
         console.warn(`[carregarEtapa] Created placeholder for ${selector}`);
       }
       found[selector] = !!el;
