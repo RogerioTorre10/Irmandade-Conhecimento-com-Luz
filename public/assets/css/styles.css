@@ -159,12 +159,12 @@ TÍTULO: PERGAMINHO
 }
 
 .parchment-rough {
-  background: transparent; /* Removido background-image para evitar conflito */
+  background: transparent !important;/* Removido background-image para evitar conflito */
   border-radius: 16px;
 }
 
 .parchment-inner-rough {
-  background: transparent;
+  background: transparent !important;
   box-shadow: none;
 }
 
@@ -179,6 +179,7 @@ TÍTULO: PERGAMINHO
   font-size: 13px;
   margin-bottom: 8px;
   line-height: 1.4;
+  background: transparent !important;
 }
 
 .parchment-input-rough {
