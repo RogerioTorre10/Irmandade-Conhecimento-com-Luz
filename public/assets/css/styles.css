@@ -162,6 +162,12 @@ TÍTULO: PERGAMINHO
   background-image: url('/assets/img/pergaminho-rasgado-horiz.png');
 }
 
+.pergaminho-v.section-intro::before,
+.pergaminho-v.section-termos::before {
+  background-size: 100% 100% !important; /* Reforça tamanho fixo */
+  background-attachment: fixed !important; /* Imóvel */
+}
+
 .parchment-rough {
   background: transparent !important;
   border-radius: 16px;
