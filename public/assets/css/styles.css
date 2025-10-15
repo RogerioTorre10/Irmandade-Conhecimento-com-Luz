@@ -254,6 +254,21 @@ label {
   height: 20px;
 }
 
+/* Página Senha */
+#section-senha .btn, #btn-senha, #senha-avancar {
+  opacity: 1 !important;
+  cursor: pointer !important;
+  disabled: false !important;
+  background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover !important;
+  background-blend-mode: overlay !important;
+  color: #fff !important;
+}
+
+#section-senha .olho-magico, #senha-eye {
+  display: block !important;
+  visibility: visible !important;
+}
+
 /* =============================================================================
 TÍTULO: ESTADO "JORNADA ATIVA"
 ============================================================================= */
