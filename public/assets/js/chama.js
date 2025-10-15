@@ -1,23 +1,63 @@
-// Anima apenas variáveis CSS (não mexe em transform direto)
-(function(){
-  const flames = document.querySelectorAll('.chama-grande, .chama-pequena');
-  flames.forEach((el, i)=>{
-    let t = Math.random()*200;
-    const base = 1.04;                    // base maior
-    const ampS = i===0 ? 0.055 : 0.075;   // pulso de escala
-    const ampY = i===0 ? 1.6   : 1.3;     // sobe/desce
-    const ampR = i===0 ? 0.6   : 1.0;     // rotação bem leve
+(function () {
+  'use strict';
 
-    (function loop(){
-      t += 0.032 + Math.random()*0.008;
-      const s   = base + Math.sin(t)*ampS + (Math.random()*0.015 - 0.007);
-      const y   = Math.sin(t*1.18)*ampY;
-      const rot = Math.sin(t*0.85)*ampR;
+  if (window.__chamaBound) return;
+  window.__chamaBound = true;
 
-      el.style.setProperty('--scale', s.toFixed(3));
-      el.style.setProperty('--y',     y.toFixed(2) + 'px');
-      el.style.setProperty('--rot',   rot.toFixed(2) + 'deg');
-      requestAnimationFrame(loop);
-    })();
-  });
+  const SAD_WORDS = ['triste', 'deprimido', 'sofrimento', 'dor', 'perda', 'fracasso'];
+  const HAPPY_WORDS = ['feliz', 'alegria', 'sucesso', 'amor', 'esperança', 'vitória'];
+
+  function analyzeResponse(text) {
+    const normalized = text.toLowerCase();
+    let sadScore = 0;
+    let happyScore = 0;
+
+    SAD_WORDS.forEach(word => {
+      if (normalized.includes(word)) sadScore++;
+    });
+    HAPPY_WORDS.forEach(word => {
+      if (normalized.includes(word)) happyScore++;
+    });
+
+    if (sadScore > happyScore) return 'fraca';
+    if (happyScore > sadScore) return 'forte';
+    return 'media';
+  }
+
+  function updateFlameIntensity(intensity) {
+    const flames = document.querySelectorAll('.chama-icone');
+    flames.forEach(flame => {
+      flame.dataset.intensidade = intensity;
+      console.log(`[jornada-chama] Intensidade da chama atualizada para: ${intensity}`);
+    });
+  }
+
+  const handler = async (evt) => {
+    const { sectionId } = evt?.detail || {};
+    if (sectionId !== 'sec-wizard') return;
+
+    const input = document.getElementById('q-input');
+    if (!input) {
+      console.error('[jornada-chama] Input #q-input não encontrado');
+      return;
+    }
+
+    input.addEventListener('input', (e) => {
+      const intensity = analyzeResponse(e.target.value);
+      updateFlameIntensity(intensity);
+    });
+
+    // Aplicar intensidade inicial
+    updateFlameIntensity('media');
+  };
+
+  document.addEventListener('sectionLoaded', handler, { passive: true });
+
+  // Inicializar se sec-wizard já estiver visível
+  setTimeout(() => {
+    const visibleWizard = document.querySelector('#sec-wizard:not(.hidden)');
+    if (visibleWizard) {
+      handler({ detail: { sectionId: 'sec-wizard' } });
+    }
+  }, 100);
 })();
