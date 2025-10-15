@@ -43,186 +43,189 @@
     return { sectionId, node };
   }
 
-  const handler = async (evt) => {
-    const { sectionId, node } = fromDetail(evt?.detail);
-    if (sectionId !== 'section-intro') return;
+ const handler = async (evt) => {
+  const { sectionId, node } = fromDetail(evt?.detail);
+  if (sectionId !== 'section-intro') return;
 
-    let root = node || document.getElementById('section-intro');
-    if (!root) {
-      try {
-        root = await waitForElement('#section-intro', { 
-          within: document.getElementById('jornada-content-wrapper') || document, 
-          timeout: 10000 
-        });
-      } catch (e) {
-        window.toast?.('Erro: Seção section-intro não carregada.', 'error');
-        console.error('[section-intro] Section not found:', e);
-        return;
-      }
-    }
-
-    let p1, p2, avancarBtn;
+  let root = node || document.getElementById('section-intro');
+  if (!root) {
     try {
-      p1 = await waitForElement('#intro-p1', { within: root, timeout: 10000 });
-      p2 = await waitForElement('#intro-p2', { within: root, timeout: 10000 });
-      avancarBtn = await waitForElement('#btn-avancar', { within: root, timeout: 10000 });
+      root = await waitForElement('#section-intro', { 
+        within: document.getElementById('jornada-content-wrapper') || document, 
+        timeout: 10000 
+      });
     } catch (e) {
-      console.error('[section-intro] Elements not found:', e);
-      window.toast?.('Falha ao carregar os elementos da seção Intro.', 'error');
+      window.toast?.('Erro: Seção section-intro não carregada.', 'error');
+      console.error('[section-intro] Section not found:', e);
       return;
     }
+  }
 
-    [p1, p2].forEach(el => {
-      if (el) {
-        el.style.color = '#fff !important';
-        el.style.opacity = '1 !important';
-        el.style.visibility = 'visible !important';
-        el.style.display = 'block !important';
-        console.log('[section-intro] Texto inicializado:', el.id, el.textContent?.substring(0, 50));
-      }
-    });
-
-    root.style.cssText = `
-      background: transparent !important;
-      padding: 24px !important;
-      border-radius: 12px !important;
-      max-width: 600px !important;
-      text-align: center !important;
-      box-shadow: none !important;
-      border: none !important;
-      display: block !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-      position: relative !important;
-      z-index: 2 !important;
-      overflow-y: auto !important;
-      max-height: 60vh !important;
-    `;
-
-    if (avancarBtn) {
-      avancarBtn.classList.add('btn', 'btn-primary', 'btn-stone');
-      avancarBtn.disabled = false;
-      avancarBtn.style.opacity = '1 !important';
-      avancarBtn.style.cursor = 'pointer !important';
-      avancarBtn.style.display = 'block !important';
-      avancarBtn.style.margin = '8px auto !important';
-      avancarBtn.textContent = 'Iniciar';
-      console.log('[section-intro] Botão habilitado:', avancarBtn.className, avancarBtn.textContent);
-    }
-
-    once(avancarBtn, 'click', () => {
-      console.log('[section-intro] Avançando para section-termos');
-      if (typeof window.JC?.show === 'function') {
-        window.JC.show('section-termos');
-      } else {
-        window.location.href = '/termos';
-        console.warn('[section-intro] Fallback navigation to /termos');
-      }
-    });
-
-   const runTypingChain = async () => {
-  console.log('[section-intro] Iniciando datilografia...');
-  const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
-
-  if (!typingElements.length) {
-    console.warn('[section-intro] Nenhum elemento com data-typing="true" encontrado');
-    if (avancarBtn) avancarBtn.disabled = false;
+  let p1_1, p1_2, p1_3, p2_1, p2_2, avancarBtn;
+  try {
+    p1_1 = await waitForElement('#intro-p1-1', { within: root, timeout: 10000 });
+    p1_2 = await waitForElement('#intro-p1-2', { within: root, timeout: 10000 });
+    p1_3 = await waitForElement('#intro-p1-3', { within: root, timeout: 10000 });
+    p2_1 = await waitForElement('#intro-p2-1', { within: root, timeout: 10000 });
+    p2_2 = await waitForElement('#intro-p2-2', { within: root, timeout: 10000 });
+    avancarBtn = await waitForElement('#btn-avancar', { within: root, timeout: 10000 });
+  } catch (e) {
+    console.error('[section-intro] Elements not found:', e);
+    window.toast?.('Falha ao carregar os elementos da seção Intro.', 'error');
     return;
   }
 
-  console.log('[section-intro] Elementos encontrados:', Array.from(typingElements).map(el => el.id));
-
-  // Fallback para window.runTyping
-  if (typeof window.runTyping !== 'function') {
-    console.warn('[section-intro] window.runTyping não encontrado, usando fallback');
-    window.runTyping = (el, text, resolve, options) => {
-      let i = 0;
-      const speed = options.speed || 20;
-      const type = () => {
-        if (i < text.length) {
-          el.textContent += text.charAt(i);
-          i++;
-          setTimeout(type, speed);
-        } else {
-          resolve();
-        }
-      };
-      type();
-    };
-  }
-
-  for (let el of typingElements) {
-    const text = getText(el);
-    console.log('[section-intro] Datilografando:', el.id, text.substring(0, 50));
-    
-    try {
-      el.textContent = '';
-      el.classList.add('typing-active', 'lumen-typing');
+  [p1_1, p1_2, p1_3, p2_1, p2_2].forEach(el => {
+    if (el) {
       el.style.color = '#fff !important';
-      await new Promise(resolve => window.runTyping(el, text, resolve, {
-        speed: Number(el.dataset.speed || 20),
-        cursor: String(el.dataset.cursor || 'true') === 'true'
-      }));
-    } catch (err) {
-      console.error('[section-intro] Erro na datilografia para', el.id, err);
-      el.textContent = text;
+      el.style.opacity = '1 !important';
+      el.style.visibility = 'visible !important';
+      el.style.display = 'block !important';
+      console.log('[section-intro] Texto inicializado:', el.id, el.textContent?.substring(0, 50));
     }
-    
-    el.classList.add('typing-done');
-    el.classList.remove('typing-active');
-    el.style.opacity = '1 !important';
-    el.style.color = '#fff !important';
-    
-    try {
-      if (typeof window.EffectCoordinator?.speak === 'function') {
-        window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
-        console.log('[section-intro] TTS ativado para:', el.id);
-        await new Promise(resolve => setTimeout(resolve, text.length * 30));
-      } else {
-        console.warn('[section-intro] window.EffectCoordinator.speak não encontrado, pulando TTS');
-      }
-    } catch (err) {
-      console.error('[section-intro] Erro no TTS para', el.id, err);
-    }
-    
-    // Pausa curta para fluidez, alinhada com section-termos
-    await new Promise(resolve => setTimeout(resolve, 300));
-  }
-  
-  console.log('[section-intro] Datilografia concluída');
+  });
+
+  root.style.cssText = `
+    background: transparent !important;
+    padding: 24px !important;
+    border-radius: 12px !important;
+    max-width: 600px !important;
+    text-align: center !important;
+    box-shadow: none !important;
+    border: none !important;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    position: relative !important;
+    z-index: 2 !important;
+    overflow-y: auto !important;
+    max-height: 60vh !important;
+  `;
+
   if (avancarBtn) {
+    avancarBtn.classList.add('btn', 'btn-primary', 'btn-stone');
     avancarBtn.disabled = false;
     avancarBtn.style.opacity = '1 !important';
+    avancarBtn.style.cursor = 'pointer !important';
+    avancarBtn.style.display = 'block !important';
+    avancarBtn.style.margin = '8px auto !important';
+    avancarBtn.textContent = 'Iniciar';
+    console.log('[section-intro] Botão habilitado:', avancarBtn.className, avancarBtn.textContent);
   }
-};
 
-// Reset INTRO_READY para garantir datilografia em recarregamentos
-INTRO_READY = false;
-
-    if (!INTRO_READY) {
-      try {
-        await runTypingChain();
-        INTRO_READY = true;
-      } catch (err) {
-        console.error('[section-intro] Erro na datilografia:', err);
-        root.querySelectorAll('[data-typing="true"]').forEach(el => {
-          el.textContent = getText(el);
-          el.classList.add('typing-done');
-          el.style.opacity = '1 !important';
-          el.style.color = '#fff !important';
-        });
-        if (avancarBtn) avancarBtn.disabled = false;
-      }
+  once(avancarBtn, 'click', () => {
+    console.log('[section-intro] Avançando para section-termos');
+    if (typeof window.JC?.show === 'function') {
+      window.JC.show('section-termos');
     } else {
+      window.location.href = '/termos';
+      console.warn('[section-intro] Fallback navigation to /termos');
+    }
+  });
+
+  const runTypingChain = async () => {
+    console.log('[section-intro] Iniciando datilografia...');
+    const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
+
+    if (!typingElements.length) {
+      console.warn('[section-intro] Nenhum elemento com data-typing="true" encontrado');
       if (avancarBtn) avancarBtn.disabled = false;
+      return;
     }
 
-    console.log('[section-intro] Elementos encontrados:', {
-      p1: !!p1, p1Id: p1?.id,
-      p2: !!p2, p2Id: p2?.id,
-      avancarBtn: !!avancarBtn, avancarId: avancarBtn?.id
-    });
+    console.log('[section-intro] Elementos encontrados:', Array.from(typingElements).map(el => el.id));
+
+    // Fallback para window.runTyping
+    if (typeof window.runTyping !== 'function') {
+      console.warn('[section-intro] window.runTyping não encontrado, usando fallback');
+      window.runTyping = (el, text, resolve, options) => {
+        let i = 0;
+        const speed = options.speed || 20;
+        const type = () => {
+          if (i < text.length) {
+            el.textContent += text.charAt(i);
+            i++;
+            setTimeout(type, speed);
+          } else {
+            resolve();
+          }
+        };
+        type();
+      };
+    }
+
+    for (let el of typingElements) {
+      const text = getText(el);
+      console.log('[section-intro] Datilografando:', el.id, text.substring(0, 50));
+      
+      try {
+        el.textContent = '';
+        el.classList.add('typing-active', 'lumen-typing');
+        el.style.color = '#fff !important';
+        await new Promise(resolve => window.runTyping(el, text, resolve, {
+          speed: Number(el.dataset.speed || 20),
+          cursor: String(el.dataset.cursor || 'true') === 'true'
+        }));
+      } catch (err) {
+        console.error('[section-intro] Erro na datilografia para', el.id, err);
+        el.textContent = text;
+      }
+      
+      el.classList.add('typing-done');
+      el.classList.remove('typing-active');
+      el.style.opacity = '1 !important';
+      el.style.color = '#fff !important';
+      
+      try {
+        if (typeof window.EffectCoordinator?.speak === 'function') {
+          window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
+          console.log('[section-intro] TTS ativado para:', el.id);
+          await new Promise(resolve => setTimeout(resolve, text.length * 30));
+        } else {
+          console.warn('[section-intro] window.EffectCoordinator.speak não encontrado, pulando TTS');
+        }
+      } catch (err) {
+        console.error('[section-intro] Erro no TTS para', el.id, err);
+      }
+      
+      // Pausa curta para fluidez, alinhada com section-termos
+      await new Promise(resolve => setTimeout(resolve, 300));
+    }
+    
+    console.log('[section-intro] Datilografia concluída');
+    if (avancarBtn) {
+      avancarBtn.disabled = false;
+      avancarBtn.style.opacity = '1 !important';
+    }
   };
+
+  if (!INTRO_READY) {
+    try {
+      await runTypingChain();
+      INTRO_READY = true;
+    } catch (err) {
+      console.error('[section-intro] Erro na datilografia:', err);
+      root.querySelectorAll('[data-typing="true"]').forEach(el => {
+        el.textContent = getText(el);
+        el.classList.add('typing-done');
+        el.style.opacity = '1 !important';
+        el.style.color = '#fff !important';
+      });
+      if (avancarBtn) avancarBtn.disabled = false;
+    }
+  } else {
+    if (avancarBtn) avancarBtn.disabled = false;
+  }
+
+  console.log('[section-intro] Elementos encontrados:', {
+    p1_1: !!p1_1, p1_1Id: p1_1?.id,
+    p1_2: !!p1_2, p1_2Id: p1_2?.id,
+    p1_3: !!p1_3, p1_3Id: p1_3?.id,
+    p2_1: !!p2_1, p2_1Id: p2_1?.id,
+    p2_2: !!p2_2, p2_2Id: p2_2?.id,
+    avancarBtn: !!avancarBtn, avancarId: avancarBtn?.id
+  });
+};
 
   const bind = () => {
     document.removeEventListener('sectionLoaded', handler);
