@@ -78,9 +78,9 @@
   [p1_1, p1_2, p1_3, p2_1, p2_2].forEach(el => {
     if (el) {
       el.style.color = '#fff !important';
-      el.style.opacity = '1 !important';
-      el.style.visibility = 'visible !important';
-      el.style.display = 'block !important';
+      el.style.opacity = '0 !important'; // Iniciar invisível
+      el.style.visibility = 'hidden !important';
+      el.style.display = 'none !important';
       console.log('[section-intro] Texto inicializado:', el.id, el.textContent?.substring(0, 50));
     }
   });
@@ -104,13 +104,13 @@
 
   if (avancarBtn) {
     avancarBtn.classList.add('btn', 'btn-primary', 'btn-stone');
-    avancarBtn.disabled = false;
-    avancarBtn.style.opacity = '1 !important';
-    avancarBtn.style.cursor = 'pointer !important';
+    avancarBtn.disabled = true; // Desabilitar até concluir datilografia
+    avancarBtn.style.opacity = '0.5 !important';
+    avancarBtn.style.cursor = 'not-allowed !important';
     avancarBtn.style.display = 'block !important';
     avancarBtn.style.margin = '8px auto !important';
     avancarBtn.textContent = 'Iniciar';
-    console.log('[section-intro] Botão habilitado:', avancarBtn.className, avancarBtn.textContent);
+    console.log('[section-intro] Botão inicializado:', avancarBtn.className, avancarBtn.textContent);
   }
 
   once(avancarBtn, 'click', () => {
@@ -129,7 +129,10 @@
 
     if (!typingElements.length) {
       console.warn('[section-intro] Nenhum elemento com data-typing="true" encontrado');
-      if (avancarBtn) avancarBtn.disabled = false;
+      if (avancarBtn) {
+        avancarBtn.disabled = false;
+        avancarBtn.style.opacity = '1 !important';
+      }
       return;
     }
 
@@ -162,6 +165,8 @@
         el.textContent = '';
         el.classList.add('typing-active', 'lumen-typing');
         el.style.color = '#fff !important';
+        el.style.opacity = '0 !important';
+        el.style.display = 'block !important';
         await new Promise(resolve => window.runTyping(el, text, resolve, {
           speed: Number(el.dataset.speed || 20),
           cursor: String(el.dataset.cursor || 'true') === 'true'
@@ -174,7 +179,8 @@
       el.classList.add('typing-done');
       el.classList.remove('typing-active');
       el.style.opacity = '1 !important';
-      el.style.color = '#fff !important';
+      el.style.visibility = 'visible !important';
+      el.style.display = 'block !important';
       
       try {
         if (typeof window.EffectCoordinator?.speak === 'function') {
@@ -182,13 +188,12 @@
           console.log('[section-intro] TTS ativado para:', el.id);
           await new Promise(resolve => setTimeout(resolve, text.length * 30));
         } else {
-          console.warn('[section-intro] window.EffectCoordinator.speak não encontrado, pulando TTS');
+          console.warn('[section-intro] window.EffectCoordinator.speak não encontrado');
         }
       } catch (err) {
         console.error('[section-intro] Erro no TTS para', el.id, err);
       }
       
-      // Pausa curta para fluidez, alinhada com section-termos
       await new Promise(resolve => setTimeout(resolve, 300));
     }
     
@@ -196,6 +201,7 @@
     if (avancarBtn) {
       avancarBtn.disabled = false;
       avancarBtn.style.opacity = '1 !important';
+      avancarBtn.style.cursor = 'pointer !important';
     }
   };
 
@@ -209,12 +215,19 @@
         el.textContent = getText(el);
         el.classList.add('typing-done');
         el.style.opacity = '1 !important';
-        el.style.color = '#fff !important';
+        el.style.visibility = 'visible !important';
+        el.style.display = 'block !important';
       });
-      if (avancarBtn) avancarBtn.disabled = false;
+      if (avancarBtn) {
+        avancarBtn.disabled = false;
+        avancarBtn.style.opacity = '1 !important';
+      }
     }
   } else {
-    if (avancarBtn) avancarBtn.disabled = false;
+    if (avancarBtn) {
+      avancarBtn.disabled = false;
+      avancarBtn.style.opacity = '1 !important';
+    }
   }
 
   console.log('[section-intro] Elementos encontrados:', {
