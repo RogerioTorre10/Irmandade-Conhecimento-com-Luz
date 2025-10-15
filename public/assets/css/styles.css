@@ -185,6 +185,7 @@ TÍTULO: PERGAMINHO
   width: 100% !important;
   box-sizing: border-box;
 }
+.section-intro .parchment-inner-rough,
 .section-termos .parchment-inner-rough {
   display: flex;
   flex-direction: column;
@@ -205,7 +206,9 @@ TÍTULO: PERGAMINHO
   display: none !important;
   visibility: hidden !important;
 }
+.section-intro .parchment-title-rough,
 .section-termos .parchment-title-rough,
+.section-intro .parchment-text-rough,
 .section-termos .parchment-text-rough {
   opacity: 0 !important;
   display: none !important;
@@ -214,8 +217,12 @@ TÍTULO: PERGAMINHO
 
 .parchment-title-rough.typing-active,
 .parchment-title-rough.typing-done,
+.section-intro .parchment-title-rough.typing-active,
+.section-intro .parchment-title-rough.typing-done,
 .section-termos .parchment-title-rough.typing-active,
 .section-termos .parchment-title-rough.typing-done,
+.section-intro .parchment-text-rough.typing-active,
+.section-intro .parchment-text-rough.typing-done,
 .section-termos .parchment-text-rough.typing-active,
 .section-termos .parchment-text-rough.typing-done {
   opacity: 1 !important;
@@ -261,6 +268,7 @@ TÍTULO: PERGAMINHO
   opacity: 1 !important;
   visibility: visible !important;
 }
+.section-intro .parchment-actions-rough,
 .section-termos .parchment-actions-rough {
   opacity: 1 !important;
   visibility: visible !important;
