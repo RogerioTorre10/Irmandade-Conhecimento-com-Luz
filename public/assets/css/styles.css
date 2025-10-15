@@ -1,81 +1,102 @@
-=============================================================================
+/* =============================================================================
 TÍTULO: VARIÁVEIS E RESET BÁSICO
 SUBTÍTULO: Cores, raios e box-sizing global
 ============================================================================= */
-:root{
---bg:#0b1020; --fg:#eef2ff; --muted:#aab4d4; --primary:#6aa7ff;
---card:#121832; --card-2:#0e1428; --radius:16px;
---pergV-ratio: 2/3; --pergH-ratio: 3/2;
+:root {
+  --bg: #0b1020;
+  --fg: #eef2ff;
+  --muted: #aab4d4;
+  --primary: #6aa7ff;
+  --card: #121832;
+  --card-2: #0e1428;
+  --radius: 16px;
+  --pergV-ratio: 2/3;
+  --pergH-ratio: 3/2;
 }
-*{ box-sizing:border-box; }
-html,body{ height:100%; margin:0; background:var(--bg); color:var(--fg); line-height:1.5; }
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.5;
+}
 
 /* =============================================================================
 TÍTULO: FONTES ÉPICAS — IRMANDADE
-SUBTÍTULO: @font-face (caminhos em /public/assets/fonts)
-
-ManufacturingConsent-Regular.ttf → TÍTULOS e BOTÕES
-
-BerkshireSwash-Regular.ttf → TEXTO CORRIDO (contrato/orientações/perguntas)
-
-Cardo-Regular/Bold/Italic.ttf → RESPOSTAS (inputs, textarea, devolutivas)
 ============================================================================= */
-@font-face{
-font-family:'ManufacturingConsent';
-src:url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');
-font-weight:400; font-style:normal; font-display:swap;
+@font-face {
+  font-family: 'ManufacturingConsent';
+  src: url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
-@font-face{
-font-family:'BerkshireSwash';
-src:url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');
-font-weight:400; font-style:normal; font-display:swap;
+
+@font-face {
+  font-family: 'BerkshireSwash';
+  src: url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
-@font-face{
-font-family:'Cardo';
-src:url('/assets/fonts/Cardo-Regular.ttf') format('truetype');
-font-weight:400; font-style:normal; font-display:swap;
+
+@font-face {
+  font-family: 'Cardo';
+  src: url('/assets/fonts/Cardo-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
-@font-face{
-font-family:'Cardo';
-src:url('/assets/fonts/Cardo-Italic.ttf') format('truetype');
-font-weight:400; font-style:italic; font-display:swap;
+
+@font-face {
+  font-family: 'Cardo';
+  src: url('/assets/fonts/Cardo-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
 }
-@font-face{
-font-family:'Cardo';
-src:url('/assets/fonts/Cardo-Bold.ttf') format('truetype');
-font-weight:700; font-style:normal; font-display:swap;
+
+@font-face {
+  font-family: 'Cardo';
+  src: url('/assets/fonts/Cardo-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 /* =============================================================================
-TÍTULO: BASE TIPOGRÁFICA (MAPA)
-SUBTÍTULO: Body= Berkshire • Títulos/Botões= Manufacturing • Campos= Cardo
+TÍTULO: BASE TIPOGRÁFICA
 ============================================================================= */
-html, body{
-font-family:'BerkshireSwash', cursive;
-font-synthesis-weight: none;
-font-synthesis-style: none;
--webkit-font-smoothing: antialiased;
-text-rendering: optimizeLegibility;
+html, body {
+  font-family: 'BerkshireSwash', cursive;
+  font-synthesis-weight: none;
+  font-synthesis-style: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* TÍTULOS + BOTÕES em ManufacturingConsent */
-h1,h2,h3,h4,h5,h6,
+h1, h2, h3, h4, h5, h6,
 .site-header h1,
 .section-title,
 .card h2,
 .bloco-titulo,
 .card-pergunta h3,
 .jornada-header h1,
-.btn, .btn *{
-font-family:'ManufacturingConsent', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-letter-spacing:.2px;
-font-weight:400;
+.btn, .btn * {
+  font-family: 'ManufacturingConsent', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  letter-spacing: .2px;
+  font-weight: 400;
 }
 
-/* ENUNCIADOS/TEXTO CORRIDO mantêm Berkshire (herdado do body) */
-label, .pergunta-enunciado, .texto-guia, .orientacoes, .contrato, p{ font-family:'BerkshireSwash', cursive; }
+label, .pergunta-enunciado, .texto-guia, .orientacoes, .contrato, p {
+  font-family: 'BerkshireSwash', cursive;
+}
 
-/* CAMPOS/RESPOSTAS em Cardo */
 input, textarea, select,
 .resposta, .jornada-resposta, .devolutiva,
 #acolh,
@@ -86,388 +107,717 @@ input, textarea, select,
 #form-perguntas textarea,
 #form-perguntas input[type="text"],
 #form-perguntas input[type="email"],
-#form-perguntas input[type="number"]{
-font-family:'Cardo', Georgia, "Times New Roman", serif;
+#form-perguntas input[type="number"] {
+  font-family: 'Cardo', Georgia, "Times New Roman", serif;
 }
 
-/* Específicos do bloco de perguntas */
 #section-perguntas .pergunta-enunciado,
-#section-perguntas h2,#section-perguntas h3{ font-family:'BerkshireSwash', cursive; }
+#section-perguntas h2, #section-perguntas h3 {
+  font-family: 'BerkshireSwash', cursive;
+}
+
 #section-perguntas textarea,
 #section-perguntas input[type="text"],
 #section-perguntas input[type="password"],
 #section-perguntas input[type="email"],
-.password-input input{
-font-family:'Cardo', Georgia, "Times New Roman", serif;
-font-size:1rem; line-height:1.6;
+.password-input input {
+  font-family: 'Cardo', Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 /* =============================================================================
 TÍTULO: ESTRUTURA GERAL
 ============================================================================= */
-.site-header{ padding:24px 16px; text-align:center; }
-.site-footer{
-position:fixed; bottom:0; left:0; right:0; padding:24px 16px; text-align:center;
-background:var(--bg); z-index:1000; border-top:1px solid rgba(255,255,255,.1);
+.site-header {
+  padding: 24px 16px;
+  text-align: center;
+  background: var(--bg) !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  z-index: 1300 !important;
 }
-.container{ max-width:920px; margin:0 auto; padding:16px; display:flex; flex-direction:column; gap:16px; }
-.motto{ opacity:.8; margin-top:8px; text-align:center; letter-spacing:.1em; }
-.card{
-background:linear-gradient(180deg,var(--card),var(--card-2));
-padding:20px; border-radius:var(--radius);
-box-shadow:0 10px 30px rgba(0,0,0,.35);
+
+.site-header h1 {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
-.badge{ display:inline-block; padding:4px 8px; border-radius:999px; background:rgba(106,167,255,.15); color:var(--primary); font-weight:600; }
-.small{ font-size:.875rem; opacity:.9; }
-hr{ border:0; border-top:1px solid rgba(255,255,255,.15); margin:16px 0; }
+
+.site-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24px 16px;
+  text-align: center;
+  background: var(--bg);
+  z-index: 1000;
+  border-top: 1px solid rgba(255,255,255,.1);
+}
+
+.container {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.motto {
+  opacity: .8;
+  margin-top: 8px;
+  text-align: center;
+  letter-spacing: .1em;
+}
+
+.card {
+  background: transparent !important;
+  padding: 20px;
+  border-radius: var(--radius);
+  box-shadow: none !important;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(106,167,255,.15);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.small {
+  font-size: .875rem;
+  opacity: .9;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid rgba(255,255,255,.15);
+  margin: 16px 0;
+}
 
 /* =============================================================================
 TÍTULO: CAMPOS E SENHA
 ============================================================================= */
-.input, textarea{
-width:100%; padding:12px 14px; border-radius:10px;
-border:1px solid rgba(255,255,255,.15); background:#0c1330; color:var(--fg);
+.input, textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.15);
+  background: #0c1330;
+  color: var(--fg);
 }
-label{ font-weight:600; margin:6px 0 4px; display:block; }
 
-.senha-wrap{ position:relative; display:flex; align-items:center; }
-.senha-wrap .input{ padding-right:42px; }
-.senha-eye{
-position:absolute; right:10px; top:50%; transform:translateY(-50%);
-width:28px; height:28px; border:0; background:transparent; color:var(--muted);
-display:flex; align-items:center; justify-content:center; cursor:pointer;
+label {
+  font-weight: 600;
+  margin: 6px 0 4px;
+  display: block;
 }
-.senha-eye:hover{ color:var(--fg); }
-.senha-eye svg{ width:20px; height:20px; }
+
+.senha-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.senha-wrap .input {
+  padding-right: 42px;
+}
+
+.senha-eye {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.senha-eye:hover {
+  color: var(--fg);
+}
+
+.senha-eye svg {
+  width: 20px;
+  height: 20px;
+}
 
 /* =============================================================================
 TÍTULO: ESTADO "JORNADA ATIVA"
 ============================================================================= */
 body.jornada-active #page-shell,
-body.jornada-active header.site-header,
-body.jornada-active footer.site-footer{ display:none !important; }
-body.jornada-active #jornada-canvas { display: block !important;
-  background-color: #0b1020;
+body.jornada-active footer.site-footer {
+  display: none !important;
+}
+
+body.jornada-active header.site-header {
+  display: flex !important;
+  visibility: visible !important;
+}
+
+body.jornada-active #jornada-canvas {
+  display: block !important;
+  background: var(--bg) url('/assets/img/textura-pergaminho.jpg') center/cover no-repeat fixed !important;
+  background-size: cover !important;
   position: relative;
   min-height: 100vh;
   overflow: hidden;
 }
 
 /* =============================================================================
-TÍTULO: PERGAMINHO 
+TÍTULO: PERGAMINHO
 ============================================================================= */
-.pergaminho{
-margin:12px auto; padding:0; border-radius:18px; overflow:hidden;
-background-repeat:no-repeat; background-position:center; background-size:100% 100%;
-}
-.conteudo-pergaminho{ padding:clamp(12px,3vw,28px); line-height:1.55; }
-.jornada #jornada-canvas.pergaminho{ display:block; }
-.pergaminho-h::before{ background-image:url("/assets/img/pergaminho-rasgado-horiz.png"); }
-.pergaminho-v::before{ background-image:url("/assets/img/pergaminho-rasgado-vert.png"); }
-.pergaminho-h::before,
-.pergaminho-v::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-  z-index: -1;
-}
-
-/* Envoltório */
-.parchment-wrap-rough {
-  position: relative;
-  padding: clamp(14px, 3vw, 24px);
-  border-radius: 10px;
-  background:
-    radial-gradient(600px 300px at 10% 0%, rgba(250,204,21,.08), transparent 60%),
-    radial-gradient(500px 300px at 90% 100%, rgba(249,115,22,.06), transparent 60%),
-    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-  border: 1px solid rgba(250,204,21,.15);
-  box-shadow: 0 12px 36px rgba(0,0,0,.45);
-}
-/* Tema épico: escopo só quando <body class="epic"> */
-.epic{
-  font-family: 'Cardo', serif;            /* corpo legível e clássico */
-}
-.epic h1, .epic h2, .epic h3,
-.epic .parchment-title-rough,
-.epic .site-header h1{
-  font-family: 'Cinzel', serif;           /* títulos épicos */
-  letter-spacing: .02em;
-}
-.epic .motto, .epic .small { font-variant: small-caps;
-}
-
-/* Pergaminho rasgado */
-.parchment-rough {
-  position: relative;
-  background-color: #3b2f2f;
-  background-image: url("/assets/img/pergaminho-rasgado-horiz.png"); /* PNG com borda irregular transparente */
-  background-image: url("/assets/img/pergaminho-rasgado-vert.png"); /* PNG com borda irregular transparente */
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  border-radius: 12px;
-  padding: clamp(18px, 3.5vw, 30px);
+.pergaminho {
+  margin: 12px auto;
+  padding: 0;
+  border-radius: 18px;
   overflow: hidden;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.04), 0 14px 40px rgba(0,0,0,.55);
+  background: transparent !important;
+  background-image: none !important;
 }
 
-/* Sombra das bordas rasgadas */
-.parchment-rough::before {
-  content: "";
-  position: absolute; inset: 0;
-  background: radial-gradient(800px at 20% 30%, rgba(0,0,0,.35), transparent 70%),
-              radial-gradient(600px at 80% 70%, rgba(0,0,0,.25), transparent 70%);
-  mix-blend-mode: multiply;
-  pointer-events: none;
+.conteudo-pergaminho {
+  padding: clamp(12px, 3vw, 28px);
+  line-height: 1.55;
+  background: transparent !important;
 }
 
-/* Camada interna */
-.parchment-inner-rough {
-  background: linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.15));
-  border-radius: 8px;
-  padding: clamp(14px, 3vw, 22px);
-  color: #fef9c3;
-  text-shadow: 0 1px 0 rgba(0,0,0,.55);
+.jornada #jornada-canvas.pergaminho {
+  display: block;
 }
 
-/* Título medieval */
-.parchment-title-rough {
-  font-family: "Uncial Antiqua", "Goudy Old Style", Georgia, serif;
-  letter-spacing: 1px;
-  color: #fde68a;
-  text-shadow: 0 2px 2px rgba(0,0,0,.65);
-  font-size: clamp(22px, 3.2vw, 30px);
-  margin: 0 0 10px;
+.pergaminho-h::before, .pergaminho-v::before {
+  background-image: none !important;
 }
 
-/* Texto */
+.parchment-rough, .parchment-inner-rough {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
 .parchment-text-rough {
-  color: #fff8dc;
+  color: #fff !important;
   opacity: .95;
   margin: 6px 0 14px;
 }
 
-/* Input */
-.parchment-input-rough {
-  width: 100%;
-  background: rgba(0,0,0,.35);
-  color: #fff8dc;
-  border: 1px solid rgba(253, 230, 138, .35);
-  border-radius: 10px;
-  padding: 12px 14px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
-}
-.parchment-input-rough:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(253, 230, 138, .3);
-}
-
-/* Barra dourada */
-.parchment-progress-rough {
-  width: 100%; height: 6px; border-radius: 999px; background: rgba(253, 230, 138, .22); overflow: hidden;
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,.35);
-}
-.parchment-progress-rough > .bar {
-  height: 100%; width: 0%;
-  background: linear-gradient(90deg, #facc15, #f59e0b);
-  border-radius: inherit; transition: width .25s ease;
-}
-
-/* Botões */
 .parchment-actions-rough .btn {
   border-color: rgba(253, 230, 138, .35);
-  background: linear-gradient(180deg, rgba(31,41,55,.9), rgba(2,6,23,.9));
-  color: #fff8dc;
+  background: linear-gradient(180deg, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover !important;
+  background-blend-mode: overlay !important;
+  color: #fff !important;
+  font-family: 'ManufacturingConsent', sans-serif !important;
 }
+
 .parchment-actions-rough .btn-primary {
-  background: linear-gradient(180deg, #f59e0b, #b45309);
-  border-color: rgba(245, 158, 11, .5);
-  color: #1f2937;
+  background: linear-gradient(180deg, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover !important;
+  border-color: #4a4a4a !important;
+  color: #fff !important;
 }
+
 .parchment-actions-rough .btn-primary:hover {
-  background: linear-gradient(180deg, #b45309, #92400e);
+  transform: scale(1.05) !important;
 }
 
-/* Responsivo */
-@media (max-width: 720px) {
-  .parchment-rough { padding: 16px; }
-  .parchment-inner-rough { padding: 12px; }
+/* =============================================================================
+TÍTULO: JORNADA ESPECÍFICA
+============================================================================= */
+#section-conteudo {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  background: transparent !important;
+  padding: 0 !important;
 }
 
-/* Animação */
-.parchment-rough, .parchment-inner-rough { animation: parchmentRoughFade .35s ease both; }
-@keyframes parchmentRoughFade {
-  from { opacity: 0; transform: translateY(8px) }
-  to { opacity: 1; transform: translateY(0) }
+#section-intro, #section-termos, .card.pergaminho.pergaminho-v.section {
+  background: transparent !important;
+  padding: 30px !important;
+  border-radius: 12px !important;
+  max-width: 600px !important;
+  text-align: center !important;
+  box-shadow: none !important;
+  border: none !important;
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+.intro-paragraph {
+  font-size: 18px !important;
+  margin-bottom: 20px !important;
+  color: #fff !important;
+  opacity: 0 !important;
+  visibility: visible !important;
+  display: block !important;
+  font-family: 'BerkshireSwash', cursive !important;
+  text-align: left !important;
+  background: transparent !important;
+}
+
+.intro-paragraph.typing-active {
+  text-align: left !important;
+}
+
+.intro-paragraph.typing-done {
+  opacity: 1 !important;
+  color: #fff !important;
+  text-align: left !important;
+}
+
+#intro-p1, #intro-p2, #termos-p1, #termos-p2 {
+  opacity: 0 !important;
+  visibility: visible !important;
+  display: block !important;
+  color: #fff !important;
+  font-family: 'BerkshireSwash', cursive !important;
+}
+
+.btn.btn-primary.btn-stone {
+  padding: 10px 20px !important;
+  background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover !important;
+  background-blend-mode: overlay !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+  font-size: 20px !important;
+  font-family: 'ManufacturingConsent', sans-serif !important;
+  border: 3px solid #4a4a4a !important;
+  box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6) !important;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.7) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
+  cursor: pointer !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.btn.btn-primary.btn-stone:hover {
+  transform: scale(1.05) !important;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.7) !important;
+}
+
+.btn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.flame-corner {
+  position: fixed !important;
+  z-index: 1200 !important;
+  pointer-events: none !important;
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.flame-top-left {
+  top: 60px !important;
+  left: 20px !important;
+  --altura: 67.5px !important;
+  --largura: 45px !important;
+}
+
+.flame-bottom-right {
+  bottom: 20px !important;
+  right: 20px !important;
+  --altura: 90px !important;
+  --largura: 60px !important;
+}
+
+#chama-header {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* =============================================================================
 TÍTULO: VISIBILIDADE DE BLOCO E PERGUNTA
-SUBTÍTULO: controlado pelo controlador JS
 ============================================================================= */
-.j-bloco,.j-pergunta{ display:none; }
-.hidden, .section-hidden{ display:none !important; }
-
-/* Fade-in suave para trocas de seção/itens /
-div[id^="section-"], .j-bloco, .j-pergunta, #termos-pg1, #termos-pg2{
-opacity:0; transition:opacity .5s ease-in-out;
+.j-bloco, .j-pergunta {
+  display: none;
 }
+
+.hidden, .section-hidden {
+  display: none !important;
+}
+
+div[id^="section-"], .j-bloco, .j-pergunta, #termos-p1, #termos-p2 {
+  opacity: 0;
+  transition: opacity .5s ease-in-out;
+}
+
 div[id^="section-"]:not(.hidden),
-.j-bloco[style="display: block"],
+.j-bloco[style*="display: block"],
 .j-pergunta[style*="display: block"],
-#termos-pg1:not(.hidden), #termos-pg2:not(.hidden){ opacity:1; }
+#termos-p1:not(.hidden), #termos-p2:not(.hidden) {
+  opacity: 1;
+}
 
 /* =============================================================================
 TÍTULO: OVERLAY DE VÍDEO (unificado)
 ============================================================================= */
-.video-overlay, #videoOverlay{
-position:fixed; inset:0; width:100%; height:100%;
-background:rgba(0,0,0,.86);
-display:flex; align-items:center; justify-content:center;
-z-index:9999;
-}
-.video-overlay.hidden, #videoOverlay.hidden{ display:none; }
-.video-player, #videoOverlay .video-player{
-width:min(900px,92vw); max-height:80vh; object-fit:contain; background:#000;
+.video-overlay, #videoOverlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,.86);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
 }
 
-/* Garante que header/card não passem por cima */
-.site-header{ z-index:1000; }
-.card{ z-index:10; }
+.video-overlay.hidden, #videoOverlay.hidden {
+  display: none;
+}
+
+.video-player, #videoOverlay .video-player {
+  width: min(900px,92vw);
+  max-height: 80vh;
+  object-fit: contain;
+  background: #000;
+}
 
 /* =============================================================================
 TÍTULO: DATILOGRAFIA
 ============================================================================= */
-.lumen-typing{ white-space:pre-wrap; position:relative; }
-.lumen-typing::after{ content:"▌"; margin-left:2px; opacity:.75; animation:lumenBlink 1s steps(2,end) infinite; }
-.lumen-typing.typing-done::after{ content:""; animation:none; }
-@keyframes lumenBlink{ 50%{ opacity:0; } }
+.lumen-typing {
+  white-space: pre-wrap;
+  position: relative;
+}
 
-[data-typing="true"]{
-min-height:20px; display:block !important; visibility:visible !important; position:relative; opacity:0;
+.lumen-typing::after {
+  content: "▌";
+  margin-left: 2px;
+  opacity: .75;
+  animation: lumenBlink 1s steps(2,end) infinite;
 }
-[data-typing="true"] h2,[data-typing="true"] h3,[data-typing="true"] p,[data-typing="true"] li{
-display:block !important; visibility:visible !important;
-}
-[data-typing="true"].typing-done{ opacity:1; }
 
-.typing-caret{
-display:inline-block !important; width:.6ch; margin-left:2px; animation:blink 1s step-end infinite;
+.lumen-typing.typing-done::after {
+  content: "";
+  animation: none;
 }
-@keyframes blink{ 50%{ opacity:0; } }
+
+@keyframes lumenBlink {
+  50% { opacity: 0; }
+}
+
+[data-typing="true"] {
+  min-height: 20px;
+  display: block !important;
+  visibility: visible !important;
+  position: relative;
+  opacity: 0;
+  color: #fff !important;
+}
+
+[data-typing="true"].typing-done {
+  opacity: 1;
+}
 
 /* =============================================================================
 TÍTULO: CHAMA — ESTADOS E TAMANHOS
 ============================================================================= */
-.chama{ width:24px; height:60px; }
-.chama.chama-md{ width:22px; height:54px; }
-.chama.chama-lg{ width:36px; height:88px; }
-
-@media (max-width:600px){
-.chama{ width:20px; height:50px; }
-.chama.chama-md{ width:18px; height:44px; }
-.chama.chama-lg{ width:28px; height:72px; }
-#chama-perguntas{ margin:6px 0 10px; }
+.chama {
+  width: 24px;
+  height: 60px;
 }
 
-.chama.chama-viva span{ animation:flicker-strong .85s infinite; filter:drop-shadow(0 0 12px rgba(255,140,0,.55)); }
-.chama.chama-pulse span{ animation:flicker-strong .6s infinite; }
-.chama-fixed-top{ position:absolute; top:10px; right:14px; z-index:60; }
-.chama-fixed-hero{ position:absolute; top:-8px; left:-8px; z-index:60; }
+.chama.chama-md {
+  width: 22px;
+  height: 54px;
+}
 
-/* Ícone de chama (para títulos) /
-.chama-icone{ position:relative; width:24px; height:36px; filter:drop-shadow(0 0 14px rgba(255,196,0,.75)); }
-.chama-icone .halo{
-position:absolute; left:50%; bottom:2px; transform:translateX(-50%);
-width:86%; height:88%; border-radius:62% 62% 28% 28% / 88% 88% 22% 22%;
-background:radial-gradient(ellipse at 50% 30%, #fff 0%, #ffe7b0 38%, rgba(255,170,30,.95) 60%, rgba(255,140,0,0) 78%);
-animation:flameSway 1.8s ease-in-out infinite;
+.chama.chama-lg {
+  width: 36px;
+  height: 88px;
 }
-.chama-icone .gota{
-position:absolute; left:50%; bottom:6px; transform:translateX(-50%);
-width:66%; height:68%; border-radius:60% 60% 26% 26% / 86% 86% 18% 18%;
-background:radial-gradient(ellipse at 50% 35%, rgba(255,255,255,.98) 0%, rgba(255,225,150,.95) 45%, rgba(255,165,50,.85) 66%, rgba(255,140,0,0) 82%);
-}
-.chama-icone .brasa{
-position:absolute; left:50%; bottom:0; transform:translateX(-50%);
-width:70%; height:8px; border-radius:50%;
-background:radial-gradient(circle at 50% 40%, rgba(255,255,255,.95) 0%, rgba(255,205,120,.85) 42%, rgba(255,140,0,0) 72%);
-animation:brasaPulse 1.7s ease-in-out infinite;
-}
-/ tamanhos e intensidade */
-.chama-icone.chama-sm{ width:16px; height:24px; }
-.chama-icone.chama-md{ width:22px; height:34px; }
-.chama-icone.chama-lg{ width:30px; height:48px; }
-.chama-icone[data-intensidade="fraca"]{ filter:drop-shadow(0 0 8px rgba(255,196,0,.45)); }
-.chama-icone[data-intensidade="media"]{ filter:drop-shadow(0 0 14px rgba(255,196,0,.75)); }
-.chama-icone[data-intensidade="forte"]{ filter:drop-shadow(0 0 20px rgba(255,196,0,.95)); }
 
-@keyframes flameSway{ 0%,100%{ transform:translateX(-50%) scaleY(1) } 50%{ transform:translateX(-51%) scaleY(1.06) } }
-@keyframes brasaPulse{ 0%,100%{ transform:translateX(-50%) scale(1); opacity:.75 } 50%{ transform:translateX(-50%) scale(1.06); opacity:1 } }
+@media (max-width: 600px) {
+  .chama {
+    width: 20px;
+    height: 50px;
+  }
+
+  .chama.chama-md {
+    width: 18px;
+    height: 44px;
+  }
+
+  .chama.chama-lg {
+    width: 28px;
+    height: 72px;
+  }
+
+  #chama-perguntas {
+    margin: 6px 0 10px;
+  }
+}
+
+.chama.chama-viva span {
+  animation: flicker-strong .85s infinite;
+  filter: drop-shadow(0 0 12px rgba(255,140,0,.55));
+}
+
+.chama.chama-pulse span {
+  animation: flicker-strong .6s infinite;
+}
+
+.chama-fixed-top {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  z-index: 60;
+}
+
+.chama-fixed-hero {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  z-index: 60;
+}
+
+/* Ícone de chama (para títulos) */
+.chama-icone {
+  position: relative;
+  width: 24px;
+  height: 36px;
+  filter: drop-shadow(0 0 14px rgba(255,196,0,.75));
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.chama-icone .halo {
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  transform: translateX(-50%);
+  width: 86%;
+  height: 88%;
+  border-radius: 62% 62% 28% 28% / 88% 88% 22% 22%;
+  background: radial-gradient(ellipse at 50% 30%, #fff 0%, #ffe7b0 38%, rgba(255,170,30,.95) 60%, rgba(255,140,0,0) 78%);
+  animation: flameSway 1.8s ease-in-out infinite;
+}
+
+.chama-icone .gota {
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  transform: translateX(-50%);
+  width: 66%;
+  height: 68%;
+  border-radius: 60% 60% 26% 26% / 86% 86% 18% 18%;
+  background: radial-gradient(ellipse at 50% 35%, rgba(255,255,255,.98) 0%, rgba(255,225,150,.95) 45%, rgba(255,165,50,.85) 66%, rgba(255,140,0,0) 82%);
+}
+
+.chama-icone .brasa {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, rgba(255,255,255,.95) 0%, rgba(255,205,120,.85) 42%, rgba(255,140,0,0) 72%);
+  animation: brasaPulse 1.7s ease-in-out infinite;
+}
+
+/* Tamanhos e intensidade */
+.chama-icone.chama-sm {
+  width: 16px;
+  height: 24px;
+}
+
+.chama-icone.chama-md {
+  width: 22px;
+  height: 34px;
+}
+
+.chama-icone.chama-lg {
+  width: 30px;
+  height: 48px;
+}
+
+.chama-icone[data-intensidade="fraca"] {
+  filter: drop-shadow(0 0 8px rgba(255,196,0,.45));
+}
+
+.chama-icone[data-intensidade="media"] {
+  filter: drop-shadow(0 0 14px rgba(255,196,0,.75));
+}
+
+.chama-icone[data-intensidade="forte"] {
+  filter: drop-shadow(0 0 20px rgba(255,196,0,.95));
+}
+
+@keyframes flameSway {
+  0%, 100% { transform: translateX(-50%) scaleY(1); }
+  50% { transform: translateX(-51%) scaleY(1.06); }
+}
+
+@keyframes brasaPulse {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: .75; }
+  50% { transform: translateX(-50%) scale(1.06); opacity: 1; }
+}
 
 /* Efeitos finos */
-.mark-emocao{
-background:linear-gradient(90deg, rgba(255,196,0,.35), rgba(255,140,0,.2));
-border-radius:4px; padding:0 2px;
+.mark-emocao {
+  background: linear-gradient(90deg, rgba(255,196,0,.35), rgba(255,140,0,.2));
+  border-radius: 4px;
+  padding: 0 2px;
 }
 
 /* =============================================================================
 TÍTULO: PROGRESSO DA JORNADA
 ============================================================================= */
-.j-progress{ margin:6px 0 14px; }
-.j-progress__bar{ width:100%; height:10px; border-radius:999px; background:rgba(255,255,255,.14); overflow:hidden; }
-.j-progress__fill{ height:100%; width:0%; transition:width .25s ease; background:linear-gradient(90deg,#f59e0b,#fde68a); }
-.j-progress__meta{ margin-top:6px; font-size:.95rem; opacity:.9; display:flex; justify-content:space-between; gap:8px; }
-.j-progress__meta b{ font-weight:700; }
-
-.progress-badge{
-position:absolute; top:8px; right:16px;
-background:rgba(0,0,0,.7); color:#fff;
-font-size:.9rem; padding:4px 8px; border-radius:8px;
-font-family:'Cardo', serif; z-index:10;
+.j-progress {
+  margin: 6px 0 14px;
 }
-.progress-bar{ width:100%; height:8px; background:rgba(255,255,255,.2); border-radius:4px; overflow:hidden; margin:10px 0; }
-.progress-bar-fill{ height:100%; width:0; background:linear-gradient(90deg,#ffcf70,#ff8c00); transition:width .5s ease-out; }
+
+.j-progress__bar {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.14);
+  overflow: hidden;
+}
+
+.j-progress__fill {
+  height: 100%;
+  width: 0%;
+  transition: width .25s ease;
+  background: linear-gradient(90deg,#f59e0b,#fde68a);
+}
+
+.j-progress__meta {
+  margin-top: 6px;
+  font-size: .95rem;
+  opacity: .9;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.j-progress__meta b {
+  font-weight: 700;
+}
+
+.progress-badge {
+  position: absolute;
+  top: 8px;
+  right: 16px;
+  background: rgba(0,0,0,.7);
+  color: #fff;
+  font-size: .9rem;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-family: 'Cardo', serif;
+  z-index: 10;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255,255,255,.2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg,#ffcf70,#ff8c00);
+  transition: width .5s ease-out;
+}
 
 /* Versão inline usada dentro de #section-perguntas */
-#section-perguntas .progress-inline{
-display:flex; flex-direction:column; gap:6px; margin:10px 0 14px;
+#section-perguntas .progress-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0 14px;
 }
-.progress-badge.inline{
-position:static !important; top:auto !important; right:auto !important;
-align-self:flex-end; margin-bottom:4px;
+
+.progress-badge.inline {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  align-self: flex-end;
+  margin-bottom: 4px;
 }
 
 /* =============================================================================
 TÍTULO: NAVEGAÇÃO/LINKS E LINGUAGEM
 ============================================================================= */
-nav a, a.btn, .site-header p{ letter-spacing:.5px; }
-.lang-switch{ display:flex; gap:6px; align-items:center; }
-.lang-btn{
-font-family:'ManufacturingConsent', serif; font-size:.85rem; padding:.25rem .5rem; border-radius:.5rem;
-border:1px solid rgba(255,255,255,.2); background:transparent; color:#e8ecf4; cursor:pointer;
+nav a, a.btn, .site-header p {
+  letter-spacing: .5px;
 }
-.lang-btn:hover{ background:rgba(255,255,255,.1); }
+
+.lang-switch {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.lang-btn {
+  font-family: 'ManufacturingConsent', serif;
+  font-size: .85rem;
+  padding: .25rem .5rem;
+  border-radius: .5rem;
+  border: 1px solid rgba(255,255,255,.2);
+  background: transparent;
+  color: #e8ecf4;
+  cursor: pointer;
+}
+
+.lang-btn:hover {
+  background: rgba(255,255,255,.1);
+}
 
 /* =============================================================================
 TÍTULO: TOAST (UTIL)
 ============================================================================= */
-#toast{
-position:fixed; left:50%; bottom:16px; transform:translateX(-50%);
-background:#111; color:#fff; padding:10px 14px; border-radius:10px;
-box-shadow:0 6px 18px rgba(0,0,0,.35); font-size:16px; z-index:4000;
-opacity:0; pointer-events:none; transition:opacity .25s ease;
+#toast {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  background: #111;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.35);
+  font-size: 16px;
+  z-index: 4000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease;
 }
-#toast.show{ opacity:1; }
+
+#toast.show {
+  opacity: 1;
+}
 
 /* =============================================================================
 TÍTULO: HOME/JORNADA (ESPAÇOS PARA FUTUROS ESCOPOS)
-============================================================================= /
-/ .home .hero { } /
-/ .home .card.invite { } /
-/ .jornada .j-progress { } /
-/ .jornada .footer-actions .btn { } */
+============================================================================= */
+/* .home .hero { } */
+/* .home .card.invite { } */
+/* .jornada .j-progress { } */
+/* .jornada .footer-actions .btn { } */
