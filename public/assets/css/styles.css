@@ -179,12 +179,16 @@ TÍTULO: PERGAMINHO
   font-size: 13px;
   margin-bottom: 8px;
   line-height: 1.4;
-  background: transparent !important;
+  opacity: 0 !important;
+  display: none !important;
+  visibility: hidden !important;
+}
+.parchment-text-rough.typing-active,
+.parchment-text-rough.typing-done {
   opacity: 1 !important;
   display: block !important;
   visibility: visible !important;
 }
-
 .parchment-input-rough {
   width: 100%;
   padding: 12px;
