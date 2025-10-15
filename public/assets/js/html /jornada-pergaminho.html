@@ -9,8 +9,8 @@
   <!-- Favicon -->
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
 
-  <!-- CSS base + estilos de pergaminho -->
-  <link rel="stylesheet" href="/styles.css" />
+  <!-- CSS base -->
+  <link rel="stylesheet" href="/assets/css/styles.css" />
   <link rel="stylesheet" href="/css/styles-pergaminho.css" />
   <link rel="stylesheet" href="/css/styles-pergaminho-rasgado.css" />
 
@@ -18,97 +18,101 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-
-  <style>
-    body.epic {
-      font-family: 'Cardo', Georgia, 'Times New Roman', serif;
-      line-height: 1.55;
-    }
-    .epic h1, .epic h2, .epic h3 {
-      font-weight: 700;
-      letter-spacing: .02em;
-      font-variant: small-caps;
-    }
-
-    /* Garantia visual do pergaminho */
-    .card.pergaminho { background: transparent; border: 0; box-shadow: none; position: relative; }
-    .pergaminho { position: relative; padding: 24px 20px; }
-    @media (min-width:768px) { .pergaminho { padding: 40px 48px; } }
-    .pergaminho::before {
-      content: ""; position: absolute; inset: 0; z-index: 0;
-      background-repeat: no-repeat; background-position: center; background-size: 100% 100%;
-      border-radius: 16px; opacity: .98;
-      filter: drop-shadow(0 12px 32px rgba(0,0,0,.45));
-    }
-    .pergaminho > * { position: relative; z-index: 1; }
-
-    /* Mapeamento das texturas */
-    .pergaminho-h::before { background-image: url("/assets/img/pergaminho-rasgado-horiz.png"); }
-    .pergaminho-v::before { background-image: url("/assets/img/pergaminho-rasgado-vert.png"); }
-
-    /* Aplicação vertical padrão */
-    .parchment-rough { background-image: url("/assets/img/pergaminho-rasgado-vert.png"); }
-  </style>
 </head>
 
 <body class="epic min-h-screen bg-slate-900 text-slate-100">
   <main class="container">
-    <!-- Seções da jornada -->
-    <section id="sec-intro" class="section parchment-wrap-rough">
-      <div class="parchment-rough">
-        <div class="parchment-inner-rough">
-          <h2 class="parchment-title-rough">Bem-vindo à Jornada</h2>
-          <p class="parchment-text-rough">Esta jornada é simbólica, reflexiva e acolhedora.</p>
-          <button id="btnComecar" class="btn btn-primary">Começar</button>
+    <!-- Intro -->
+    <section id="section-intro" class="pergaminho pergaminho-v">
+      <div class="parchment-inner-rough">
+        <h2 class="parchment-title-rough">Bem-vindo à Jornada</h2>
+        <p class="parchment-text-rough">Esta jornada é simbólica, reflexiva e acolhedora.</p>
+        <button id="btn-avancar" class="btn btn-primary btn-stone">Começar</button>
+      </div>
+    </section>
+
+    <!-- Termos -->
+    <section id="section-termos" class="pergaminho pergaminho-v hidden" aria-hidden="true">
+      <div class="parchment-inner-rough">
+        <div id="termos-pg1">
+          <h2 class="parchment-title-rough">Termos de Uso</h2>
+          <p class="parchment-text-rough">Leia os termos para prosseguir.</p>
+        </div>
+        <div id="termos-pg2" style="display: none; opacity: 0; visibility: hidden;">
+          <h3 class="parchment-title-rough">Detalhes Adicionais</h3>
+          <p class="parchment-text-rough">Mais informações sobre a jornada.</p>
+        </div>
+        <div class="parchment-actions-rough">
+          <button id="btn-termos-avancar" class="btn btn-primary btn-stone">Avançar</button>
         </div>
       </div>
     </section>
 
-    <!-- Seção de perguntas com pergaminho horizontal -->
-    <section id="sec-wizard" class="section parchment-wrap-rough hidden" aria-hidden="true">
-      <div class="pergaminho pergaminho-h">
-        <div class="parchment-inner-rough">
-          <div class="parchment-progress-rough mb-3">
-            <div id="q-progress" class="bar" style="width: 0%"></div>
+    <!-- Senha -->
+    <section id="section-senha" class="pergaminho pergaminho-v hidden" aria-hidden="true">
+      <div class="parchment-inner-rough">
+        <h2 class="parchment-title-rough">Digite sua Senha</h2>
+        <div class="senha-wrap">
+          <div class="senha-input-group">
+            <input id="input-senha" type="password" class="parchment-input-rough" placeholder="Senha">
+            <button class="btn-toggle-senha">👁️</button>
           </div>
-
-          <div id="q-status" class="parchment-text-rough">Pergunta 0/0</div>
-          <h2 id="q-title" class="parchment-title-rough">Pergunta</h2>
-          <p id="q-text" class="parchment-text-rough">...</p>
-
-          <textarea id="q-input" data-qid="" class="parchment-input-rough" rows="5" placeholder="Escreva aqui..."></textarea>
-
-          <div class="parchment-actions-rough mt-3">
-            <button id="btnVoltar" class="btn">Voltar</button>
-            <button id="btnLimpar" class="btn">Limpar</button>
-            <span style="flex:1"></span>
-            <button id="btnProxima" class="btn btn-primary">Próxima</button>
-          </div>
-
-          <div class="mt-3">
-            <button id="btnFinalizar" class="btn btn-primary">Finalizar Jornada</button>
-          </div>
+          <button id="btn-senha-avancar" class="btn btn-primary btn-stone">Acessar Jornada</button>
         </div>
       </div>
     </section>
-    
-    <section id="section-pergaminho" data-section class="pergaminho pergaminho-h section-hidden" aria-hidden="true">
-    <h2>Pergaminho Horizontal</h2>
-    <p>Esta seção usa o estilo horizontal para perguntas e blocos dinâmicos.</p>
-   </section>
 
-    <!-- Seção final com pergaminho vertical -->
-    <section id="sec-final" class="section parchment-wrap-rough hidden" aria-hidden="true">
-      <div class="parchment-rough">
-        <div class="parchment-inner-rough">
-          <h2 class="parchment-title-rough">Parabéns! Você finalizou a jornada 🎉</h2>
-          <p class="parchment-text-rough">Revise se quiser e depois gere seu PDF e HQ.</p>
-          <div class="parchment-actions-rough mt-3">
-            <button id="btnRevisar" class="btn">Revisar</button>
-            <button id="btnLimparRespostas" class="btn">Limpar respostas</button>
-            <span style="flex:1"></span>
-            <button id="btnBaixarPDFHQ" class="btn btn-primary">Baixar PDF e HQ</button>
-          </div>
+    <!-- Perguntas -->
+    <section id="sec-perguntas" class="pergaminho pergaminho-h hidden" aria-hidden="true">
+      <div class="parchment-inner-rough">
+        <div class="parchment-progress-rough mb-3">
+          <div id="q-progress" class="bar" style="width: 0%"></div>
+        </div>
+        <div id="q-status" class="parchment-text-rough">Pergunta 0/0</div>
+        <h2 id="q-title" class="parchment-title-rough">Pergunta</h2>
+        <p id="q-text" class="parchment-text-rough">...</p>
+        <textarea id="q-input" data-qid="" class="parchment-input-rough" rows="5" placeholder="Escreva aqui..."></textarea>
+        <div class="parchment-actions-rough mt-3">
+          <button id="btnVoltar" class="btn">Voltar</button>
+          <button id="btnLimpar" class="btn">Limpar</button>
+          <span style="flex:1"></span>
+          <button id="btnProxima" class="btn btn-primary btn-stone">Próxima</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Wizard -->
+    <section id="sec-wizard" class="pergaminho pergaminho-h hidden" aria-hidden="true">
+      <div class="parchment-inner-rough">
+        <div class="parchment-progress-rough mb-3">
+          <div id="q-progress" class="bar" style="width: 0%"></div>
+        </div>
+        <div id="q-status" class="parchment-text-rough">Pergunta 0/0</div>
+        <h2 id="q-title" class="parchment-title-rough">Pergunta</h2>
+        <p id="q-text" class="parchment-text-rough">...</p>
+        <textarea id="q-input" data-qid="" class="parchment-input-rough" rows="5" placeholder="Escreva aqui..."></textarea>
+        <div class="parchment-actions-rough mt-3">
+          <button id="btnVoltar" class="btn">Voltar</button>
+          <button id="btnLimpar" class="btn">Limpar</button>
+          <span style="flex:1"></span>
+          <button id="btnProxima" class="btn btn-primary btn-stone">Próxima</button>
+        </div>
+        <div class="mt-3">
+          <button id="btnFinalizar" class="btn btn-primary btn-stone">Finalizar Jornada</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final -->
+    <section id="sec-final" class="pergaminho pergaminho-v hidden" aria-hidden="true">
+      <div class="parchment-inner-rough">
+        <h2 class="parchment-title-rough">Parabéns! Você finalizou a jornada 🎉</h2>
+        <p class="parchment-text-rough">Revise se quiser e depois gere seu PDF e HQ.</p>
+        <div class="parchment-actions-rough mt-3">
+          <button id="btnRevisar" class="btn">Revisar</button>
+          <button id="btnLimparRespostas" class="btn">Limpar respostas</button>
+          <span style="flex:1"></span>
+          <button id="btnBaixarPDFHQ" class="btn btn-primary btn-stone">Baixar PDF e HQ</button>
         </div>
       </div>
     </section>
