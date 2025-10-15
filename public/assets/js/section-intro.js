@@ -130,9 +130,7 @@
     return;
   }
 
-  // Verificar carregamento de scripts
-  console.log('[section-intro] Verificando window.runTyping:', typeof window.runTyping);
-  console.log('[section-intro] Verificando window.EffectCoordinator.speak:', typeof window.EffectCoordinator?.speak);
+  console.log('[section-intro] Elementos encontrados:', Array.from(typingElements).map(el => el.id));
 
   // Fallback para window.runTyping
   if (typeof window.runTyping !== 'function') {
