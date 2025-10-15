@@ -82,7 +82,7 @@
       el.style.visibility = i === 0 ? 'visible !important' : 'hidden !important';
       el.style.display = i === 0 ? 'block !important' : 'none !important';
       el.classList.remove('hidden');
-      console.log(`[section-termos] Texto ${i+1} inicializado:`, el.id, el.textContent?.substring(0, 50));
+      console.log(`[section-termos] Página ${i+1} inicializada:`, el.id);
     }
   });
 
@@ -99,7 +99,7 @@
     visibility: visible !important;
     position: relative !important;
     z-index: 2 !important;
-    overflow: hidden !important; /* Evitar barra lateral */
+    overflow: hidden !important;
     max-height: 80vh !important;
   `;
 
@@ -111,14 +111,16 @@
       btn.style.cursor = 'pointer !important';
       btn.style.display = 'inline-block !important';
       btn.style.margin = '8px !important';
+      btn.style.visibility = 'visible !important';
       console.log('[section-termos] Botão habilitado:', btn.className, btn.textContent);
     }
   });
 
-  once(nextBtn, 'click', () => {
+  once(nextBtn, 'click', async () => {
     if (currentTermosPage === 1 && pg2) {
       pg1.style.display = 'none !important';
       pg1.style.opacity = '0 !important';
+      pg1.style.visibility = 'hidden !important';
       pg2.style.display = 'block !important';
       pg2.style.opacity = '1 !important';
       pg2.style.visibility = 'visible !important';
@@ -127,14 +129,15 @@
       currentTermosPage = 2;
       console.log('[section-termos] Mostrando termos-pg2');
       avancarBtn.textContent = 'Aceito e quero continuar';
-      runTypingChain();
+      await runTypingChain();
     }
   });
 
-  once(prevBtn, 'click', () => {
+  once(prevBtn, 'click', async () => {
     if (currentTermosPage === 2 && pg1) {
       pg2.style.display = 'none !important';
       pg2.style.opacity = '0 !important';
+      pg2.style.visibility = 'hidden !important';
       pg1.style.display = 'block !important';
       pg1.style.opacity = '1 !important';
       pg1.style.visibility = 'visible !important';
@@ -142,11 +145,11 @@
       currentTermosPage = 1;
       console.log('[section-termos] Voltando para termos-pg1');
       avancarBtn.textContent = 'Avançar';
-      runTypingChain();
+      await runTypingChain();
     }
   });
 
-  once(avancarBtn, 'click', () => {
+  once(avancarBtn, 'click', async () => {
     if (currentTermosPage === 2) {
       console.log('[section-termos] Avançando para section-senha');
       if (typeof window.JC?.show === 'function') {
@@ -155,19 +158,18 @@
         window.location.href = '/senha';
         console.warn('[section-termos] Fallback navigation to /senha');
       }
-    } else {
-      if (pg2 && currentTermosPage === 1) {
-        pg1.style.display = 'none !important';
-        pg1.style.opacity = '0 !important';
-        pg2.style.display = 'block !important';
-        pg2.style.opacity = '1 !important';
-        pg2.style.visibility = 'visible !important';
-        pg2.classList.remove('hidden');
-        currentTermosPage = 2;
-        console.log('[section-termos] Mostrando termos-pg2 antes de avançar');
-        avancarBtn.textContent = 'Aceito e quero continuar';
-        runTypingChain();
-      }
+    } else if (pg2 && currentTermosPage === 1) {
+      pg1.style.display = 'none !important';
+      pg1.style.opacity = '0 !important';
+      pg1.style.visibility = 'hidden !important';
+      pg2.style.display = 'block !important';
+      pg2.style.opacity = '1 !important';
+      pg2.style.visibility = 'visible !important';
+      pg2.classList.remove('hidden');
+      currentTermosPage = 2;
+      console.log('[section-termos] Mostrando termos-pg2 antes de avançar');
+      avancarBtn.textContent = 'Aceito e quero continuar';
+      await runTypingChain();
     }
   });
 
@@ -178,7 +180,11 @@
     if (!typingElements.length) {
       console.warn('[section-termos] Nenhum elemento com data-typing="true" encontrado');
       [nextBtn, prevBtn, avancarBtn].forEach(btn => {
-        if (btn) btn.disabled = false;
+        if (btn) {
+          btn.disabled = false;
+          btn.style.opacity = '1 !important';
+          btn.style.visibility = 'visible !important';
+        }
       });
       return;
     }
@@ -204,7 +210,7 @@
       };
     }
 
-    for (let el of typingElements) {
+    for (const el of typingElements) {
       const text = getText(el);
       console.log('[section-termos] Datilografando:', el.tagName, text.substring(0, 50));
       
@@ -214,20 +220,24 @@
         el.style.color = '#fff !important';
         el.style.opacity = '0 !important';
         el.style.display = 'block !important';
+        el.style.visibility = 'hidden !important';
         await new Promise(resolve => window.runTyping(el, text, resolve, {
           speed: Number(el.dataset.speed || 20),
           cursor: String(el.dataset.cursor || 'true') === 'true'
         }));
+        el.classList.add('typing-done');
+        el.classList.remove('typing-active');
+        el.style.opacity = '1 !important';
+        el.style.visibility = 'visible !important';
+        el.style.display = 'block !important';
       } catch (err) {
         console.error('[section-termos] Erro na datilografia para', el.tagName, err);
         el.textContent = text;
+        el.classList.add('typing-done');
+        el.style.opacity = '1 !important';
+        el.style.visibility = 'visible !important';
+        el.style.display = 'block !important';
       }
-      
-      el.classList.add('typing-done');
-      el.classList.remove('typing-active');
-      el.style.opacity = '1 !important';
-      el.style.visibility = 'visible !important';
-      el.style.display = 'block !important';
       
       try {
         if (typeof window.EffectCoordinator?.speak === 'function') {
@@ -246,40 +256,53 @@
     
     console.log('[section-termos] Datilografia concluída');
     [nextBtn, prevBtn, avancarBtn].forEach(btn => {
-      if (btn) btn.disabled = false;
+      if (btn) {
+        btn.disabled = false;
+        btn.style.opacity = '1 !important';
+        btn.style.visibility = 'visible !important';
+      }
     });
   };
-};
-    if (!TERMOS_READY) {
-      try {
-        await runTypingChain();
-        TERMOS_READY = true;
-      } catch (err) {
-        console.error('[section-termos] Erro na datilografia:', err);
-        root.querySelectorAll('[data-typing="true"]').forEach(el => {
-          el.textContent = getText(el);
-          el.classList.add('typing-done');
-          el.style.opacity = '1 !important';
-          el.style.color = '#fff !important';
-        });
-        [nextBtn, prevBtn, avancarBtn].forEach(btn => {
-          if (btn) btn.disabled = false;
-        });
-      }
-    } else {
+
+  if (!TERMOS_READY) {
+    try {
+      await runTypingChain();
+      TERMOS_READY = true;
+    } catch (err) {
+      console.error('[section-termos] Erro na datilografia:', err);
+      root.querySelectorAll('[data-typing="true"]').forEach(el => {
+        el.textContent = getText(el);
+        el.classList.add('typing-done');
+        el.style.opacity = '1 !important';
+        el.style.visibility = 'visible !important';
+        el.style.display = 'block !important';
+      });
       [nextBtn, prevBtn, avancarBtn].forEach(btn => {
-        if (btn) btn.disabled = false;
+        if (btn) {
+          btn.disabled = false;
+          btn.style.opacity = '1 !important';
+          btn.style.visibility = 'visible !important';
+        }
       });
     }
-
-    console.log('[section-termos] Elementos encontrados:', {
-      pg1: !!pg1, pg1Id: pg1?.id,
-      pg2: !!pg2, pg2Id: pg2?.id,
-      nextBtn: !!nextBtn, nextClass: nextBtn?.className,
-      prevBtn: !!prevBtn, prevClass: prevBtn?.className,
-      avancarBtn: !!avancarBtn, avancarClass: avancarBtn?.className
+  } else {
+    [nextBtn, prevBtn, avancarBtn].forEach(btn => {
+      if (btn) {
+        btn.disabled = false;
+        btn.style.opacity = '1 !important';
+        btn.style.visibility = 'visible !important';
+      }
     });
-  };
+  }
+
+  console.log('[section-termos] Elementos encontrados:', {
+    pg1: !!pg1, pg1Id: pg1?.id,
+    pg2: !!pg2, pg2Id: pg2?.id,
+    nextBtn: !!nextBtn, nextClass: nextBtn?.className,
+    prevBtn: !!prevBtn, prevClass: prevBtn?.className,
+    avancarBtn: !!avancarBtn, avancarClass: avancarBtn?.className
+  });
+};
 
   const bind = () => {
     document.removeEventListener('sectionLoaded', handler);
