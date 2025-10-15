@@ -46,7 +46,7 @@
           el.classList.add('typing-active');
           el.style.direction = 'ltr';
           el.style.textAlign = 'left';
-          el.style.color = '#fff'; // Garante visibilidade
+          el.style.color = '#fff';
           await new Promise((resolve) => {
             window.runTyping(el, text, resolve, {
               speed: Number(el.dataset.speed || 36),
