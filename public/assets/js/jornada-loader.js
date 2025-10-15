@@ -16,8 +16,7 @@
     final:    '/html/section-final.html'
     };
 
-// Função para verificar elementos críticos no HTML
- function checkCriticalElements(section, sectionId) {
+function checkCriticalElements(section, sectionId) {
     const criticalSelectors = {
       'section-intro': ['#intro-p1', '#intro-p2', '#btn-avancar'],
       'section-termos': ['#termos-p1', '#termos-p2', '#termos-next', '#termos-prev', '#termos-avancar']
@@ -32,6 +31,15 @@
         el.classList.add('intro-paragraph');
         el.dataset.typing = 'true';
         el.textContent = `Placeholder para ${selector}`;
+        section.appendChild(el);
+        console.warn(`[carregarEtapa] Created placeholder for ${selector}`);
+      }
+      if (!el && selector.startsWith('#termos-')) {
+        el = document.createElement('button');
+        el.id = selector.slice(1);
+        el.classList.add('btn', 'btn-primary', 'btn-stone');
+        el.dataset.action = selector.slice(1).replace('termos-', '');
+        el.textContent = selector.includes('next') ? 'Próximo' : selector.includes('prev') ? 'Anterior' : 'Avançar';
         section.appendChild(el);
         console.warn(`[carregarEtapa] Created placeholder for ${selector}`);
       }
