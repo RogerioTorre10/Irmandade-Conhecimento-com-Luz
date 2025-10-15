@@ -75,9 +75,9 @@
     return;
   }
 
+  // Inicializar visibilidade
   [pg1, pg2].forEach((el, i) => {
     if (el) {
-      el.style.color = '#fff !important';
       el.style.opacity = i === 0 ? '1 !important' : '0 !important';
       el.style.visibility = i === 0 ? 'visible !important' : 'hidden !important';
       el.style.display = i === 0 ? 'block !important' : 'none !important';
@@ -86,11 +86,14 @@
     }
   });
 
+  // Estilizar container principal
   root.style.cssText = `
     background: transparent !important;
     padding: 24px !important;
     border-radius: 12px !important;
+    width: 100% !important;
     max-width: 600px !important;
+    margin: 12px auto !important;
     text-align: center !important;
     box-shadow: none !important;
     border: none !important;
@@ -100,19 +103,22 @@
     position: relative !important;
     z-index: 2 !important;
     overflow: hidden !important;
-    max-height: 80vh !important;
+    min-height: 80vh !important;
+    height: 80vh !important;
+    box-sizing: border-box !important;
   `;
 
+  // Inicializar botões
   [nextBtn, prevBtn, avancarBtn].forEach(btn => {
     if (btn) {
       btn.classList.add('btn', 'btn-primary', 'btn-stone');
-      btn.disabled = false;
-      btn.style.opacity = '1 !important';
-      btn.style.cursor = 'pointer !important';
+      btn.disabled = true;
+      btn.style.opacity = '0.5 !important';
+      btn.style.cursor = 'not-allowed !important';
       btn.style.display = 'inline-block !important';
       btn.style.margin = '8px !important';
       btn.style.visibility = 'visible !important';
-      console.log('[section-termos] Botão habilitado:', btn.className, btn.textContent);
+      console.log('[section-termos] Botão inicializado:', btn.className, btn.textContent);
     }
   });
 
@@ -184,6 +190,7 @@
           btn.disabled = false;
           btn.style.opacity = '1 !important';
           btn.style.visibility = 'visible !important';
+          btn.style.cursor = 'pointer !important';
         }
       });
       return;
@@ -260,37 +267,31 @@
         btn.disabled = false;
         btn.style.opacity = '1 !important';
         btn.style.visibility = 'visible !important';
+        btn.style.cursor = 'pointer !important';
       }
     });
   };
 
-  if (!TERMOS_READY) {
-    try {
-      await runTypingChain();
-      TERMOS_READY = true;
-    } catch (err) {
-      console.error('[section-termos] Erro na datilografia:', err);
-      root.querySelectorAll('[data-typing="true"]').forEach(el => {
-        el.textContent = getText(el);
-        el.classList.add('typing-done');
-        el.style.opacity = '1 !important';
-        el.style.visibility = 'visible !important';
-        el.style.display = 'block !important';
-      });
-      [nextBtn, prevBtn, avancarBtn].forEach(btn => {
-        if (btn) {
-          btn.disabled = false;
-          btn.style.opacity = '1 !important';
-          btn.style.visibility = 'visible !important';
-        }
-      });
-    }
-  } else {
+  // Forçar inicialização mesmo se TERMOS_READY for true
+  TERMOS_READY = false;
+  try {
+    await runTypingChain();
+    TERMOS_READY = true;
+  } catch (err) {
+    console.error('[section-termos] Erro na datilografia:', err);
+    root.querySelectorAll('[data-typing="true"]').forEach(el => {
+      el.textContent = getText(el);
+      el.classList.add('typing-done');
+      el.style.opacity = '1 !important';
+      el.style.visibility = 'visible !important';
+      el.style.display = 'block !important';
+    });
     [nextBtn, prevBtn, avancarBtn].forEach(btn => {
       if (btn) {
         btn.disabled = false;
         btn.style.opacity = '1 !important';
         btn.style.visibility = 'visible !important';
+        btn.style.cursor = 'pointer !important';
       }
     });
   }
