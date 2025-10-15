@@ -21,7 +21,7 @@
       const tick = () => {
         let el = within.querySelector(selector);
         if (!el && within !== document) {
-          el = document.querySelector(`#jornada-content-wrapper ${selector}`);
+          el = document.querySelector(`.container ${selector}`);
         }
         if (el) return resolve(el);
         if (performance.now() - start >= timeout) {
@@ -51,7 +51,7 @@
     if (!root) {
       try {
         root = await waitForElement('#section-senha', { 
-          within: document.getElementById('jornada-content-wrapper') || document, 
+          within: document.querySelector('.container') || document, 
           timeout: 10000 
         });
       } catch (e) {
@@ -63,51 +63,15 @@
 
     let title, p1, input, eye, avancarBtn;
     try {
-      title = await waitForElement('.title-senha', { within: root, timeout: 10000 });
-      p1 = await waitForElement('.senha-wrap p', { within: root, timeout: 10000 });
+      title = await waitForElement('.parchment-title-rough', { within: root, timeout: 10000 });
+      p1 = await waitForElement('.parchment-text-rough', { within: root, timeout: 10000 });
       input = await waitForElement('#senha-input', { within: root, timeout: 10000 });
       eye = await waitForElement('.btn-toggle-senha', { within: root, timeout: 10000 });
       avancarBtn = await waitForElement('#btn-senha-avancar', { within: root, timeout: 10000 });
     } catch (e) {
       console.error('[section-senha] Elements not found:', e);
       window.toast?.('Falha ao carregar os elementos da seção Senha.', 'error');
-
-      title = title || root.querySelector('.title-senha') || document.createElement('h2');
-      p1 = p1 || root.querySelector('.senha-wrap p') || document.createElement('p');
-      input = input || root.querySelector('#senha-input') || document.createElement('input');
-      eye = eye || root.querySelector('.btn-toggle-senha') || document.createElement('button');
-      avancarBtn = avancarBtn || root.querySelector('#btn-senha-avancar') || document.createElement('button');
-
-      if (!title.classList.contains('title-senha')) {
-        title.classList.add('title-senha');
-        title.dataset.typing = 'true';
-        title.textContent = 'Insira sua Palavra-Chave Sagrada.';
-        root.appendChild(title);
-      }
-      if (!p1.textContent) {
-        p1.textContent = 'A Palavra-Chave garante que apenas você acesse seu progresso.';
-        p1.dataset.typing = 'true';
-        root.appendChild(p1);
-      }
-      if (!input.id) {
-        input.id = 'senha-input';
-        input.type = 'password';
-        input.classList.add('input');
-        input.placeholder = 'Digite a Palavra-Chave';
-        root.appendChild(input);
-      }
-      if (!eye.classList.contains('btn-toggle-senha')) {
-        eye.classList.add('btn-toggle-senha');
-        eye.textContent = '👁️';
-        root.appendChild(eye);
-      }
-      if (!avancarBtn.id) {
-        avancarBtn.id = 'btn-senha-avancar';
-        avancarBtn.classList.add('btn', 'btn-primary', 'btn-stone');
-        avancarBtn.dataset.action = 'avancar';
-        avancarBtn.textContent = 'Acessar Jornada';
-        root.appendChild(avancarBtn);
-      }
+      return;
     }
 
     [title, p1].forEach(el => {
@@ -120,9 +84,11 @@
       }
     });
 
+    avancarBtn.textContent = 'Acessar Jornada';
+
     root.style.cssText = `
       background: transparent !important;
-      padding: 30px !important;
+      padding: 24px !important;
       border-radius: 12px !important;
       max-width: 600px !important;
       text-align: center !important;
@@ -133,8 +99,8 @@
       visibility: visible !important;
       position: relative !important;
       z-index: 2 !important;
-      overflow: hidden !important;
-      max-height: 80vh !important;
+      overflow-y: auto !important;
+      max-height: 60vh !important;
     `;
 
     [avancarBtn, eye].forEach(btn => {
@@ -143,6 +109,8 @@
         btn.disabled = false;
         btn.style.opacity = '1 !important';
         btn.style.cursor = 'pointer !important';
+        btn.style.display = 'block !important';
+        btn.style.margin = '10px auto !important';
         console.log('[section-senha] Botão habilitado:', btn.className, btn.textContent);
       }
     });
@@ -150,20 +118,22 @@
     once(eye, 'click', () => {
       if (input.type === 'password') {
         input.type = 'text';
+        eye.textContent = '🙈';
         console.log('[section-senha] Senha visível');
       } else {
         input.type = 'password';
+        eye.textContent = '👁️';
         console.log('[section-senha] Senha oculta');
       }
     });
 
     once(avancarBtn, 'click', () => {
-      console.log('[section-senha] Avançando para section-filme');
+      console.log('[section-senha] Avançando para sec-wizard');
       if (typeof window.JC?.show === 'function') {
-        window.JC.show('section-filme');
+        window.JC.show('sec-wizard');
       } else {
-        window.location.href = '/filme';
-        console.warn('[section-senha] Fallback navigation to /filme');
+        window.location.href = '/wizard';
+        console.warn('[section-senha] Fallback navigation to /wizard');
       }
     });
 
