@@ -124,38 +124,78 @@
   console.log('[section-intro] Iniciando datilografia...');
   const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
 
+  if (!typingElements.length) {
+    console.warn('[section-intro] Nenhum elemento com data-typing="true" encontrado');
+    if (avancarBtn) avancarBtn.disabled = false;
+    return;
+  }
+
+  // Fallback para window.runTyping se não estiver disponível
+  if (typeof window.runTyping !== 'function') {
+    console.warn('[section-intro] window.runTyping não encontrado, usando fallback');
+    window.runTyping = (el, text, resolve, options) => {
+      let i = 0;
+      const speed = options.speed || 20;
+      const type = () => {
+        if (i < text.length) {
+          el.textContent += text.charAt(i);
+          i++;
+          setTimeout(type, speed);
+        } else {
+          resolve();
+        }
+      };
+      type();
+    };
+  }
+
   for (let el of typingElements) {
     const text = getText(el);
     console.log('[section-intro] Datilografando:', el.id, text.substring(0, 50));
     
-    if (typeof window.runTyping === 'function') {
+    try {
       el.textContent = '';
-      el.classList.add('typing-active');
+      el.classList.add('typing-active', 'lumen-typing');
       el.style.color = '#fff !important';
       await new Promise(resolve => window.runTyping(el, text, resolve, {
-        speed: Number(el.dataset.speed || 20), // Reduzido para 20ms
+        speed: Number(el.dataset.speed || 20),
         cursor: String(el.dataset.cursor || 'true') === 'true'
       }));
-      // Pausa curta entre elementos para maior fluidez
-      await new Promise(resolve => setTimeout(resolve, 300));
-    } else {
+    } catch (err) {
+      console.error('[section-intro] Erro na datilografia para', el.id, err);
       el.textContent = text;
     }
     
     el.classList.add('typing-done');
+    el.classList.remove('typing-active');
     el.style.opacity = '1 !important';
     el.style.color = '#fff !important';
     
-    if (typeof window.EffectCoordinator?.speak === 'function') {
-      window.EffectCoordinator.speak(text, { rate: 1.03, pitch: 1.0 });
-      console.log('[section-intro] TTS ativado para:', el.id);
-      await new Promise(resolve => setTimeout(resolve, text.length * 30)); // Reduzido para 30ms por caractere
+    try {
+      if (typeof window.EffectCoordinator?.speak === 'function') {
+        window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 }); // Ajustado rate para fluidez
+        console.log('[section-intro] TTS ativado para:', el.id);
+        await new Promise(resolve => setTimeout(resolve, text.length * 30));
+      } else {
+        console.warn('[section-intro] window.EffectCoordinator.speak não encontrado');
+      }
+    } catch (err) {
+      console.error('[section-intro] Erro no TTS para', el.id, err);
     }
+    
+    // Pausa curta para fluidez, alinhada com section-termos
+    await new Promise(resolve => setTimeout(resolve, 300));
   }
   
   console.log('[section-intro] Datilografia concluída');
-  if (avancarBtn) avancarBtn.disabled = false;
+  if (avancarBtn) {
+    avancarBtn.disabled = false;
+    avancarBtn.style.opacity = '1 !important';
+  }
 };
+
+// Reset INTRO_READY para garantir datilografia em recarregamentos
+INTRO_READY = false;
 
     if (!INTRO_READY) {
       try {
