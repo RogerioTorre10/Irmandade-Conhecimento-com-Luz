@@ -90,10 +90,8 @@
   <script src="/assets/js/sec-intro.js"></script>
   <script src="/assets/js/section-termos.js"></script>
   <script src="/assets/js/section-senha.js"></script>
-  <!-- Em jornada-conhecimento-com-luz1.html -->
-<!-- Em jornada-conhecimento-com-luz1.html -->
-<script src="/assets/js/section-intro.js"></script>
-<!-- ... outros scripts ... -->
+  
+  <!-- Inicialização -->
 <script>
   // Esperar todos os scripts carregarem
   window.addEventListener('load', () => {
@@ -102,7 +100,7 @@
         window.JC.init();
       } else {
         console.error('JC.init não definido. Verifique se jornada-controller.js está carregado.');
-        // Fallback para carregar intro
+        // Fallback para carregar intro e termos
         if (typeof window.carregarEtapa === 'function') {
           window.carregarEtapa('intro');
         }
@@ -111,6 +109,7 @@
       console.error('Falha ao iniciar jornada:', e);
     }
   });
+</script>
 
   <noscript>
     <p style="text-align:center; padding:12px">Ative o JavaScript para usar esta página.</p>
