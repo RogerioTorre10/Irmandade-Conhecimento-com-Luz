@@ -100,7 +100,7 @@
         window.JC.init();
       } else {
         console.error('JC.init não definido. Verifique se jornada-controller.js está carregado.');
-        // Fallback para carregar intro e termos
+        // Fallback para carregar intro
         if (typeof window.carregarEtapa === 'function') {
           window.carregarEtapa('intro');
         }
