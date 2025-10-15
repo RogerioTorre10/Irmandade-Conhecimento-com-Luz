@@ -44,7 +44,7 @@
     return { sectionId, node };
   }
 
- const handler = async (evt) => {
+const handler = async (evt) => {
   const { sectionId, node } = fromDetail(evt?.detail);
   if (sectionId !== 'section-intro') return;
 
