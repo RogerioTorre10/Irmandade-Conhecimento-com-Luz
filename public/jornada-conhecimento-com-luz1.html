@@ -1,63 +1,74 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Jornada Conhecimento com Luz</title>
-  <link rel="stylesheet" href="/assets/css/styles.css">
-  <link rel="stylesheet" href="/assets/css/chama.css">
+  <meta name="description" content="Jornada guiada com estilo pergaminho vertical e horizontal.">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <link rel="stylesheet" href="/assets/css/chama.css" />
+
+  <!-- Fonte Cardo -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 </head>
-<body>
-  <div data-layout="master" data-journey="essencial">
-    <div class="language-selector">
-      <select id="language-select">
-        <option value="pt-BR">Português (BR)</option>
-        <option value="en-US">English (US)</option>
-        <option value="es-ES">Español (ES)</option>
-      </select>
-    </div>
-    <header class="site-header">
-      <div id="chama-header" class="chama-icone" aria-hidden="true">
-        <div class="chama-vela chama-lg">
-          <div class="brasa"></div>
-          <div class="lingua"></div>
-          <div class="lingua"></div>
-          <div class="lingua"></div>
-          <div class="brilho"></div>
-        </div>
+
+<body class="epic min-h-screen bg-slate-900 text-slate-100">
+  <div class="language-selector">
+    <select id="language-select">
+      <option value="pt-BR">Português (BR)</option>
+      <option value="en-US">English (US)</option>
+      <option value="es-ES">Español (ES)</option>
+    </select>
+  </div>
+  <header class="site-header">
+    <div id="chama-header" class="chama-icone" aria-hidden="true">
+      <div class="chama-vela chama-lg">
+        <div class="brasa"></div>
+        <div class="lingua"></div>
+        <div class="lingua"></div>
+        <div class="lingua"></div>
+        <div class="brilho"></div>
       </div>
-      <h1>Jornada Essencial</h1>
-    </header>
+    </div>
+    <h1>Jornada Essencial</h1>
+  </header>
+  <main class="container">
     <section id="jornada-canvas" class="card pergaminho pergaminho-v">
       <div id="section-conteudo" class="conteudo-pergaminho">
         <div id="aria-pergunta" class="sr-only" aria-live="polite"></div>
         <div id="jornada-content-wrapper"></div>
-        <div id="flame-top-left" class="flame-corner flame-top-left">
-          <div class="chama-vela chama-md">
-            <div class="brasa"></div>
-            <div class="lingua"></div>
-            <div class="lingua"></div>
-            <div class="lingua"></div>
-            <div class="brilho"></div>
-          </div>
-        </div>
-        <div id="flame-bottom-right" class="flame-corner flame-bottom-right">
-          <div class="chama-vela chama-md">
-            <div class="brasa"></div>
-            <div class="lingua"></div>
-            <div class="lingua"></div>
-            <div class="lingua"></div>
-            <div class="brilho"></div>
-          </div>
-        </div>
-        <footer class="site-footer">
-          <small>© 2025 Irmandade Conhecimento com Luz</small>
-          <div id="envTag" style="margin-top:6px;opacity:.6;font-size:18px;"></div>
-        </footer>
       </div>
     </section>
-  </div>
+    <div id="flame-top-left" class="flame-corner flame-top-left">
+      <div class="chama-vela chama-md">
+        <div class="brasa"></div>
+        <div class="lingua"></div>
+        <div class="lingua"></div>
+        <div class="lingua"></div>
+        <div class="brilho"></div>
+      </div>
+    </div>
+    <div id="flame-bottom-right" class="flame-corner flame-bottom-right">
+      <div class="chama-vela chama-md">
+        <div class="brasa"></div>
+        <div class="lingua"></div>
+        <div class="lingua"></div>
+        <div class="lingua"></div>
+        <div class="brilho"></div>
+      </div>
+    </div>
+  </main>
 
+  <footer class="site-footer">
+    <small>© 2025 Irmandade Conhecimento com Luz</small>
+    <div id="envTag" style="margin-top:6px;opacity:.6;font-size:18px;"></div>
+  </footer>
+
+  <!-- Scripts -->
   <script src="/assets/js/i18n.js"></script>
   <script src="/assets/js/config.js"></script>
   <script src="/assets/js/jornada-loader.js"></script>
@@ -78,5 +89,18 @@
   <script src="/assets/js/jornada-bootstrap.js"></script>
   <script src="/assets/js/section-termos.js"></script>
   <script src="/assets/js/section-senha.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        onJornadaEssencial();
+      } catch (e) {
+        console.error('Falha ao iniciar jornada:', e);
+      }
+    });
+  </script>
+
+  <noscript>
+    <p style="text-align:center; padding:12px">Ative o JavaScript para usar esta página.</p>
+  </noscript>
 </body>
 </html>
