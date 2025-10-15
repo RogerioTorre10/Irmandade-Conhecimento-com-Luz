@@ -185,6 +185,11 @@ TÍTULO: PERGAMINHO
   width: 100% !important;
   box-sizing: border-box;
 }
+.section-termos .parchment-inner-rough {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 
 .intro-wrap {
   height: 100% !important;
@@ -200,9 +205,19 @@ TÍTULO: PERGAMINHO
   display: none !important;
   visibility: hidden !important;
 }
+.section-termos .parchment-title-rough,
+.section-termos .parchment-text-rough {
+  opacity: 0 !important;
+  display: none !important;
+  visibility: hidden !important;
+}
 
 .parchment-title-rough.typing-active,
-.parchment-title-rough.typing-done {
+.parchment-title-rough.typing-done,
+.section-termos .parchment-title-rough.typing-active,
+.section-termos .parchment-title-rough.typing-done,
+.section-termos .parchment-text-rough.typing-active,
+.section-termos .parchment-text-rough.typing-done {
   opacity: 1 !important;
   display: block !important;
   visibility: visible !important;
@@ -245,6 +260,11 @@ TÍTULO: PERGAMINHO
   background: transparent !important;
   opacity: 1 !important;
   visibility: visible !important;
+}
+.section-termos .parchment-actions-rough {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: flex !important;
 }
 /* =============================================================================
 TÍTULO: CAMPOS E SENHA
