@@ -149,12 +149,12 @@ TÍTULO: PERGAMINHO
   z-index: 1;
 }
 
-.pergaminho-h::before {
-  background-image: url('/assets/img/pergaminho-rasgado-horiz.png');
-}
-
 .pergaminho-v::before {
   background-image: url('/assets/img/pergaminho-rasgado-vert.png');
+}
+
+.pergaminho-h::before {
+  background-image: url('/assets/img/pergaminho-rasgado-horiz.png');
 }
 
 .parchment-rough {
@@ -170,14 +170,14 @@ TÍTULO: PERGAMINHO
 
 .parchment-title-rough {
   color: #fff;
-  font-size: 24px;
-  margin-bottom: 16px;
+  font-size: 20px;
+  margin-bottom: 12px;
 }
 
 .parchment-text-rough {
   color: #fff;
   font-size: 14px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   line-height: 1.4;
 }
 
@@ -194,8 +194,8 @@ TÍTULO: PERGAMINHO
 .parchment-actions-rough {
   display: flex;
   justify-content: center;
-  gap: 10px;
-  margin-top: 16px;
+  gap: 8px;
+  margin-top: 12px;
 }
 
 /* =============================================================================
@@ -217,14 +217,14 @@ TÍTULO: CAMPOS E SENHA
   align-items: center;
   width: 100%;
   max-width: 400px;
-  margin: 20px auto;
+  margin: 16px auto;
 }
 
 .senha-input-group {
   position: relative;
   width: 100%;
   max-width: 400px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .senha-eye, .btn-toggle-senha {
@@ -241,6 +241,7 @@ TÍTULO: CAMPOS E SENHA
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  font-size: 20px;
 }
 
 .senha-eye:hover, .btn-toggle-senha:hover {
@@ -252,7 +253,7 @@ TÍTULO: BOTÕES
 ============================================================================= */
 .btn.btn-primary.btn-stone,
 .nextBtn, .prevBtn, .avancarBtn, #btn-senha-avancar, #btn-avancar {
-  padding: 10px 20px;
+  padding: 8px 16px;
   background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
   background-blend-mode: overlay;
   color: #fff !important;
@@ -266,7 +267,7 @@ TÍTULO: BOTÕES
   visibility: visible;
   display: block;
   cursor: pointer;
-  margin: 10px auto;
+  margin: 8px auto;
   min-width: 150px;
   text-align: center;
 }
@@ -322,7 +323,7 @@ TÍTULO: JORNADA ESPECÍFICA
 #termos-pg1, #termos-pg2, #section-senha h2, #section-senha p,
 #sec-wizard #q-text, #sec-final p {
   font-size: 14px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   color: #fff;
   opacity: 0;
   visibility: visible;
@@ -336,7 +337,7 @@ TÍTULO: JORNADA ESPECÍFICA
 .parchment-title-rough,
 #termos-pg1 h2, #termos-pg2 h3, #section-senha h2, #sec-wizard h2, #sec-final h2 {
   font-size: 20px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   color: #fff;
   opacity: 0;
 }
