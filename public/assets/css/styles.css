@@ -10,8 +10,6 @@ SUBTÍTULO: Cores, raios e box-sizing global
   --card: #121832;
   --card-2: #0e1428;
   --radius: 16px;
-  --pergV-ratio: 2/3;
-  --pergH-ratio: 3/2;
 }
 
 * {
@@ -24,7 +22,7 @@ html, body {
   background: var(--bg);
   color: var(--fg);
   line-height: 1.5;
-  font-family: 'BerkshireSwash', cursive;
+  font-family: 'Cardo', Georgia, 'Times New Roman', serif;
 }
 
 /* =============================================================================
@@ -46,77 +44,20 @@ TÍTULO: FONTES ÉPICAS — IRMANDADE
   font-display: swap;
 }
 
-@font-face {
-  font-family: 'Cardo';
-  src: url('/assets/fonts/Cardo-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
+body.epic {
+  font-family: 'Cardo', Georgia, 'Times New Roman', serif;
+  line-height: 1.55;
 }
 
-@font-face {
-  font-family: 'Cardo';
-  src: url('/assets/fonts/Cardo-Italic.ttf') format('truetype');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Cardo';
-  src: url('/assets/fonts/Cardo-Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* =============================================================================
-TÍTULO: BASE TIPOGRÁFICA
-============================================================================= */
-h1, h2, h3, h4, h5, h6,
-.site-header h1,
-.section-title,
-.card h2,
-.bloco-titulo,
-.card-pergunta h3,
-.jornada-header h1,
-.btn, .btn * {
+.epic h1, .epic h2, .epic h3 {
   font-family: 'ManufacturingConsent', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  letter-spacing: .2px;
-  font-weight: 400;
+  font-weight: 700;
+  letter-spacing: .02em;
+  font-variant: small-caps;
 }
 
-label, .pergunta-enunciado, .texto-guia, .orientacoes, .contrato, p {
+p, li {
   font-family: 'BerkshireSwash', cursive;
-}
-
-input, textarea, select,
-.resposta, .jornada-resposta, .devolutiva,
-#acolh,
-#jornada-conteudo textarea,
-#jornada-conteudo input[type="text"],
-#jornada-conteudo input[type="email"],
-#jornada-conteudo input[type="number"],
-#form-perguntas textarea,
-#form-perguntas input[type="text"],
-#form-perguntas input[type="email"],
-#form-perguntas input[type="number"] {
-  font-family: 'Cardo', Georgia, "Times New Roman", serif;
-}
-
-#section-perguntas .pergunta-enunciado,
-#section-perguntas h2, #section-perguntas h3 {
-  font-family: 'BerkshireSwash', cursive;
-}
-
-#section-perguntas textarea,
-#section-perguntas input[type="text"],
-#section-perguntas input[type="password"],
-#section-perguntas input[type="email"],
-.password-input input {
-  font-family: 'Cardo', Georgia, "Times New Roman", serif;
-  font-size: 1rem;
-  line-height: 1.6;
 }
 
 /* =============================================================================
@@ -167,38 +108,94 @@ TÍTULO: ESTRUTURA GERAL
   gap: 16px;
 }
 
-.motto {
-  opacity: .8;
-  margin-top: 8px;
-  text-align: center;
-  letter-spacing: .1em;
+/* =============================================================================
+TÍTULO: PERGAMINHO
+============================================================================= */
+.card.pergaminho {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  position: relative;
 }
 
-.card {
+.pergaminho {
+  position: relative;
+  padding: 24px 20px;
+  max-width: 600px;
+  margin: 12px auto;
+}
+
+@media (min-width: 768px) {
+  .pergaminho {
+    padding: 40px 48px;
+  }
+}
+
+.pergaminho::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  border-radius: 16px;
+  opacity: .98;
+  filter: drop-shadow(0 12px 32px rgba(0,0,0,.45));
+}
+
+.pergaminho > * {
+  position: relative;
+  z-index: 1;
+}
+
+.pergaminho-h::before {
+  background-image: url('/assets/img/pergaminho-rasgado-horiz.png');
+}
+
+.pergaminho-v::before {
+  background-image: url('/assets/img/pergaminho-rasgado-vert.png');
+}
+
+.parchment-rough {
+  background-image: url('/assets/img/pergaminho-rasgado-vert.png');
+  background-size: cover;
+  border-radius: 16px;
+}
+
+.parchment-inner-rough {
   background: transparent;
-  padding: 20px;
-  border-radius: var(--radius);
   box-shadow: none;
 }
 
-.badge {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 999px;
-  background: rgba(106,167,255,.15);
-  color: var(--primary);
-  font-weight: 600;
+.parchment-title-rough {
+  color: #fff;
+  font-size: 24px;
+  margin-bottom: 16px;
 }
 
-.small {
-  font-size: .875rem;
-  opacity: .9;
+.parchment-text-rough {
+  color: #fff;
+  font-size: 14px;
+  margin-bottom: 12px;
+  line-height: 1.4;
 }
 
-hr {
-  border: 0;
-  border-top: 1px solid rgba(255,255,255,.15);
-  margin: 16px 0;
+.parchment-input-rough {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.15);
+  background: #0c1330;
+  color: #fff;
+  font-family: 'Cardo', serif;
+}
+
+.parchment-actions-rough {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 16px;
 }
 
 /* =============================================================================
@@ -213,12 +210,6 @@ TÍTULO: CAMPOS E SENHA
   color: var(--fg);
 }
 
-label {
-  font-weight: 600;
-  margin: 6px 0 4px;
-  display: block;
-}
-
 .senha-wrap {
   position: relative;
   display: flex;
@@ -227,11 +218,6 @@ label {
   width: 100%;
   max-width: 400px;
   margin: 20px auto;
-}
-
-.senha-wrap .input {
-  padding-right: 42px;
-  width: 100%;
 }
 
 .senha-input-group {
@@ -261,86 +247,40 @@ label {
   color: var(--fg);
 }
 
-.senha-eye svg, .btn-toggle-senha {
-  width: 20px;
-  height: 20px;
-}
-
 /* =============================================================================
-TÍTULO: ESTADO "JORNADA ATIVA"
+TÍTULO: BOTÕES
 ============================================================================= */
-body.jornada-active #page-shell,
-body.jornada-active footer.site-footer {
-  display: none;
-}
-
-body.jornada-active header.site-header {
-  display: flex;
-  visibility: visible;
-}
-
-body.jornada-active #jornada-canvas {
-  display: block;
-  background: var(--bg) url('/assets/img/textura-pergaminho.jpg') center/cover no-repeat fixed;
-  background-size: cover;
-  position: relative;
-  min-height: 100vh;
-  overflow: hidden;
-}
-
-/* =============================================================================
-TÍTULO: PERGAMINHO
-============================================================================= */
-.pergaminho {
-  margin: 12px auto;
-  padding: 0;
-  border-radius: 18px;
-  overflow: hidden;
-  background: transparent;
-  background-image: none;
-}
-
-.conteudo-pergaminho {
-  padding: clamp(12px, 3vw, 28px);
-  line-height: 1.55;
-  background: transparent;
-}
-
-.jornada #jornada-canvas.pergaminho {
-  display: block;
-}
-
-.pergaminho-h::before, .pergaminho-v::before {
-  background-image: none;
-}
-
-.parchment-rough, .parchment-inner-rough {
-  background: transparent;
-  box-shadow: none;
-}
-
-.parchment-text-rough {
-  color: #fff;
-  opacity: .95;
-  margin: 6px 0 14px;
-}
-
-.parchment-actions-rough .btn {
-  border-color: rgba(253, 230, 138, .35);
-  background: linear-gradient(180deg, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
+.btn.btn-primary.btn-stone,
+.nextBtn, .prevBtn, .avancarBtn, #btn-senha-avancar, #btn-avancar {
+  padding: 10px 20px;
+  background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
   background-blend-mode: overlay;
-  color: #fff;
+  color: #fff !important;
+  border-radius: 8px;
+  font-size: 16px;
   font-family: 'ManufacturingConsent', sans-serif;
+  border: 3px solid #4a4a4a;
+  box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+  opacity: 1;
+  visibility: visible;
+  display: block;
+  cursor: pointer;
+  margin: 10px auto;
+  min-width: 150px;
+  text-align: center;
 }
 
-.parchment-actions-rough .btn-primary {
-  background: linear-gradient(180deg, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
-  border-color: #4a4a4a;
-  color: #fff;
-}
-
-.parchment-actions-rough .btn-primary:hover {
+.btn.btn-primary.btn-stone:hover,
+.nextBtn:hover, .prevBtn:hover, .avancarBtn:hover, #btn-senha-avancar:hover, #btn-avancar:hover {
   transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.7);
+}
+
+.btn:disabled,
+.nextBtn:disabled, .prevBtn:disabled, .avancarBtn:disabled, #btn-senha-avancar:disabled, #btn-avancar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* =============================================================================
@@ -361,9 +301,9 @@ TÍTULO: JORNADA ESPECÍFICA
   opacity: 1;
 }
 
-#section-intro, #section-termos, .termo-wrap, #section-senha {
+#sec-intro, #section-termos, .termo-wrap, #section-senha, #sec-wizard, #sec-final {
   background: transparent;
-  padding: 30px;
+  padding: 24px;
   border-radius: 12px;
   max-width: 600px;
   text-align: center;
@@ -373,18 +313,16 @@ TÍTULO: JORNADA ESPECÍFICA
   opacity: 1;
   visibility: visible;
   z-index: 2;
-  overflow: hidden;
-  max-height: 70vh;
+  overflow-y: auto;
+  max-height: 60vh;
 }
 
 .intro-paragraph,
-#termos-pg1, #termos-pg2, #senha-p1,
-[data-typing="true"],
-#termos-pg1 p, #termos-pg1 li, #termos-pg1 h2,
-#termos-pg2 p, #termos-pg2 li, #termos-pg2 h3,
-#section-senha h2, #section-senha p {
-  font-size: 16px; /* Reduzir tamanho */
-  margin-bottom: 15px;
+.parchment-text-rough,
+#termos-pg1, #termos-pg2, #section-senha h2, #section-senha p,
+#sec-wizard #q-text, #sec-final p {
+  font-size: 14px;
+  margin-bottom: 12px;
   color: #fff;
   opacity: 0;
   visibility: visible;
@@ -395,77 +333,27 @@ TÍTULO: JORNADA ESPECÍFICA
   line-height: 1.4;
 }
 
-.intro-paragraph.typing-active,
-[data-typing="true"].typing-active {
+.parchment-title-rough,
+#termos-pg1 h2, #termos-pg2 h3, #section-senha h2, #sec-wizard h2, #sec-final h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  color: #fff;
+  opacity: 0;
+}
+
+.typing-active {
   text-align: left;
 }
 
-.intro-paragraph.typing-done,
-[data-typing="true"].typing-done,
-#termos-pg1.typing-done p, #termos-pg1.typing-done li, #termos-pg1.typing-done h2,
-#termos-pg2.typing-done p, #termos-pg2.typing-done li, #termos-pg2.typing-done h3,
-#section-senha.typing-done h2, #section-senha.typing-done p {
+.typing-done,
+[data-typing="true"].typing-done {
   opacity: 1;
   color: #fff;
 }
 
-.btn.btn-primary.btn-stone,
-.nextBtn, .prevBtn, .avancarBtn, #btn-senha-avancar {
-  padding: 12px 24px;
-  background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
-  background-blend-mode: overlay;
-  color: #fff !important;
-  border-radius: 8px;
-  font-size: 18px;
-  font-family: 'ManufacturingConsent', sans-serif;
-  border: 3px solid #4a4a4a;
-  box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
-  opacity: 1;
-  visibility: visible;
-  display: block;
-  cursor: pointer;
-  margin: 15px auto;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  width: 100%;
-  max-width: 300px;
-  text-align: center;
-}
-
-.btn.btn-primary.btn-stone:hover,
-.nextBtn:hover, .prevBtn:hover, .avancarBtn:hover, #btn-senha-avancar:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.7);
-}
-
-.btn:disabled,
-.nextBtn:disabled, .prevBtn:disabled, .avancarBtn:disabled, #btn-senha-avancar:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.senha-input-group {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  max-width: 400px;
-  margin-bottom: 20px;
-  position: relative;
-}
-
-.intro-actions {
-  text-align: center;
-  margin-top: 20px;
-}
-
-.footer-actions {
-  text-align: center;
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
+/* =============================================================================
+TÍTULO: CHAMAS
+============================================================================= */
 .flame-corner,
 #flame-top-left,
 #flame-bottom-right,
@@ -500,154 +388,6 @@ TÍTULO: JORNADA ESPECÍFICA
 #chama-header .chama-vela {
   --largura: 30px;
   --altura: 60px;
-}
-
-/* =============================================================================
-TÍTULO: VISIBILIDADE DE BLOCO E PERGUNTA
-============================================================================= */
-.j-bloco, .j-pergunta {
-  display: none;
-}
-
-.hidden, .section-hidden {
-  display: none;
-}
-
-div[id^="section-"], .j-bloco, .j-pergunta, #termos-pg1, #termos-pg2, #senha-p1 {
-  opacity: 0;
-  transition: opacity .5s ease-in-out;
-}
-
-div[id^="section-"]:not(.hidden),
-.j-bloco[style*="display: block"],
-.j-pergunta[style*="display: block"],
-#termos-pg1:not(.hidden), #termos-pg2:not(.hidden), #senha-p1:not(.hidden) {
-  opacity: 1;
-}
-
-/* =============================================================================
-TÍTULO: OVERLAY DE VÍDEO
-============================================================================= */
-.video-overlay, #videoOverlay {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,.86);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-.video-overlay.hidden, #videoOverlay.hidden {
-  display: none;
-}
-
-.video-player, #videoOverlay .video-player {
-  width: min(900px, 92vw);
-  max-height: 80vh;
-  object-fit: contain;
-  background: #000;
-}
-
-/* =============================================================================
-TÍTULO: DATILOGRAFIA
-============================================================================= */
-.lumen-typing {
-  white-space: pre-wrap;
-  position: relative;
-}
-
-.lumen-typing::after {
-  content: "▌";
-  margin-left: 2px;
-  opacity: .75;
-  animation: lumenBlink 1s steps(2,end) infinite;
-}
-
-.lumen-typing.typing-done::after {
-  content: "";
-  animation: none;
-}
-
-@keyframes lumenBlink {
-  50% { opacity: 0; }
-}
-
-[data-typing="true"] {
-  min-height: 20px;
-  display: block;
-  visibility: visible;
-  position: relative;
-  opacity: 0;
-  color: #fff;
-}
-
-[data-typing="true"].typing-done {
-  opacity: 1;
-}
-
-/* =============================================================================
-TÍTULO: CHAMA — ESTADOS E TAMANHOS
-============================================================================= */
-.chama {
-  width: 24px;
-  height: 60px;
-}
-
-.chama.chama-md {
-  width: 22px;
-  height: 54px;
-}
-
-.chama.chama-lg {
-  width: 36px;
-  height: 88px;
-}
-
-@media (max-width: 600px) {
-  .chama {
-    width: 20px;
-    height: 50px;
-  }
-
-  .chama.chama-md {
-    width: 18px;
-    height: 44px;
-  }
-
-  .chama.chama-lg {
-    width: 28px;
-    height: 72px;
-  }
-
-  #chama-perguntas {
-    margin: 6px 0 10px;
-  }
-}
-
-.chama.chama-viva span {
-  animation: flicker-strong .85s infinite;
-  filter: drop-shadow(0 0 12px rgba(255,140,0,.55));
-}
-
-.chama.chama-pulse span {
-  animation: flicker-strong .6s infinite;
-}
-
-.chama-fixed-top {
-  position: absolute;
-  top: 10px;
-  right: 14px;
-  z-index: 60;
-}
-
-.chama-fixed-hero {
-  position: absolute;
-  top: -8px;
-  left: -8px;
-  z-index: 60;
 }
 
 .chama-icone {
@@ -733,112 +473,45 @@ TÍTULO: CHAMA — ESTADOS E TAMANHOS
 }
 
 /* =============================================================================
-TÍTULO: PROGRESSO DA JORNADA
+TÍTULO: DATILOGRAFIA
 ============================================================================= */
-.j-progress {
-  margin: 6px 0 14px;
+.lumen-typing {
+  white-space: pre-wrap;
+  position: relative;
 }
 
-.j-progress__bar {
-  width: 100%;
-  height: 10px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.14);
-  overflow: hidden;
+.lumen-typing::after {
+  content: "▌";
+  margin-left: 2px;
+  opacity: .75;
+  animation: lumenBlink 1s steps(2,end) infinite;
 }
 
-.j-progress__fill {
-  height: 100%;
-  width: 0%;
-  transition: width .25s ease;
-  background: linear-gradient(90deg,#f59e0b,#fde68a);
+.lumen-typing.typing-done::after {
+  content: "";
+  animation: none;
 }
 
-.j-progress__meta {
-  margin-top: 6px;
-  font-size: .95rem;
-  opacity: .9;
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
+@keyframes lumenBlink {
+  50% { opacity: 0; }
 }
 
-.j-progress__meta b {
-  font-weight: 700;
-}
-
-.progress-badge {
-  position: absolute;
-  top: 8px;
-  right: 16px;
-  background: rgba(0,0,0,.7);
+[data-typing="true"] {
+  min-height: 20px;
+  display: block;
+  visibility: visible;
+  position: relative;
+  opacity: 0;
   color: #fff;
-  font-size: .9rem;
-  padding: 4px 8px;
-  border-radius: 8px;
-  font-family: 'Cardo', serif;
-  z-index: 10;
 }
 
-.progress-bar {
-  width: 100%;
-  height: 8px;
-  background: rgba(255,255,255,.2);
-  border-radius: 4px;
-  overflow: hidden;
-  margin: 10px 0;
-}
-
-.progress-bar-fill {
-  height: 100%;
-  width: 0;
-  background: linear-gradient(90deg,#ffcf70,#ff8c00);
-  transition: width .5s ease-out;
-}
-
-#section-perguntas .progress-inline {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin: 10px 0 14px;
-}
-
-.progress-badge.inline {
-  position: static;
-  top: auto;
-  right: auto;
-  align-self: flex-end;
-  margin-bottom: 4px;
+[data-typing="true"].typing-done {
+  opacity: 1;
 }
 
 /* =============================================================================
 TÍTULO: NAVEGAÇÃO/LINKS E LINGUAGEM
 ============================================================================= */
-nav a, a.btn, .site-header p {
-  letter-spacing: .5px;
-}
-
-.lang-switch {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
-.lang-btn {
-  font-family: 'ManufacturingConsent', serif;
-  font-size: .85rem;
-  padding: .25rem .5rem;
-  border-radius: .5rem;
-  border: 1px solid rgba(255,255,255,.2);
-  background: transparent;
-  color: #e8ecf4;
-  cursor: pointer;
-}
-
-.lang-btn:hover {
-  background: rgba(255,255,255,.1);
-}
-
 .language-selector {
   position: absolute;
   top: 10px;
