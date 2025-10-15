@@ -43,7 +43,7 @@
     return { sectionId, node };
   }
 
- const handler = async (evt) => {
+const handler = async (evt) => {
   const { sectionId, node } = fromDetail(evt?.detail);
   if (sectionId !== 'section-intro') return;
 
@@ -60,6 +60,8 @@
       return;
     }
   }
+
+  root.classList.add('section-intro');
 
   let p1_1, p1_2, p1_3, p2_1, p2_2, avancarBtn;
   try {
@@ -78,7 +80,7 @@
   [p1_1, p1_2, p1_3, p2_1, p2_2].forEach(el => {
     if (el) {
       el.style.color = '#fff !important';
-      el.style.opacity = '0 !important'; // Iniciar invisível
+      el.style.opacity = '0 !important';
       el.style.visibility = 'hidden !important';
       el.style.display = 'none !important';
       console.log('[section-intro] Texto inicializado:', el.id, el.textContent?.substring(0, 50));
@@ -89,7 +91,9 @@
     background: transparent !important;
     padding: 24px !important;
     border-radius: 12px !important;
+    width: 100% !important;
     max-width: 600px !important;
+    margin: 12px auto !important;
     text-align: center !important;
     box-shadow: none !important;
     border: none !important;
@@ -98,17 +102,20 @@
     visibility: visible !important;
     position: relative !important;
     z-index: 2 !important;
-    overflow-y: auto !important;
-    max-height: 60vh !important;
+    overflow: hidden !important;
+    min-height: 80vh !important;
+    height: 80vh !important;
+    box-sizing: border-box !important;
   `;
 
   if (avancarBtn) {
     avancarBtn.classList.add('btn', 'btn-primary', 'btn-stone');
-    avancarBtn.disabled = true; // Desabilitar até concluir datilografia
+    avancarBtn.disabled = true;
     avancarBtn.style.opacity = '0.5 !important';
     avancarBtn.style.cursor = 'not-allowed !important';
-    avancarBtn.style.display = 'block !important';
+    avancarBtn.style.display = 'inline-block !important';
     avancarBtn.style.margin = '8px auto !important';
+    avancarBtn.style.visibility = 'visible !important';
     avancarBtn.textContent = 'Iniciar';
     console.log('[section-intro] Botão inicializado:', avancarBtn.className, avancarBtn.textContent);
   }
@@ -132,6 +139,7 @@
       if (avancarBtn) {
         avancarBtn.disabled = false;
         avancarBtn.style.opacity = '1 !important';
+        avancarBtn.style.cursor = 'pointer !important';
       }
       return;
     }
@@ -157,7 +165,7 @@
       };
     }
 
-    for (let el of typingElements) {
+    for (const el of typingElements) {
       const text = getText(el);
       console.log('[section-intro] Datilografando:', el.id, text.substring(0, 50));
       
@@ -167,20 +175,24 @@
         el.style.color = '#fff !important';
         el.style.opacity = '0 !important';
         el.style.display = 'block !important';
+        el.style.visibility = 'hidden !important';
         await new Promise(resolve => window.runTyping(el, text, resolve, {
           speed: Number(el.dataset.speed || 20),
           cursor: String(el.dataset.cursor || 'true') === 'true'
         }));
+        el.classList.add('typing-done');
+        el.classList.remove('typing-active');
+        el.style.opacity = '1 !important';
+        el.style.visibility = 'visible !important';
+        el.style.display = 'block !important';
       } catch (err) {
         console.error('[section-intro] Erro na datilografia para', el.id, err);
         el.textContent = text;
+        el.classList.add('typing-done');
+        el.style.opacity = '1 !important';
+        el.style.visibility = 'visible !important';
+        el.style.display = 'block !important';
       }
-      
-      el.classList.add('typing-done');
-      el.classList.remove('typing-active');
-      el.style.opacity = '1 !important';
-      el.style.visibility = 'visible !important';
-      el.style.display = 'block !important';
       
       try {
         if (typeof window.EffectCoordinator?.speak === 'function') {
@@ -205,28 +217,24 @@
     }
   };
 
-  if (!INTRO_READY) {
-    try {
-      await runTypingChain();
-      INTRO_READY = true;
-    } catch (err) {
-      console.error('[section-intro] Erro na datilografia:', err);
-      root.querySelectorAll('[data-typing="true"]').forEach(el => {
-        el.textContent = getText(el);
-        el.classList.add('typing-done');
-        el.style.opacity = '1 !important';
-        el.style.visibility = 'visible !important';
-        el.style.display = 'block !important';
-      });
-      if (avancarBtn) {
-        avancarBtn.disabled = false;
-        avancarBtn.style.opacity = '1 !important';
-      }
-    }
-  } else {
+  // Forçar inicialização
+  INTRO_READY = false;
+  try {
+    await runTypingChain();
+    INTRO_READY = true;
+  } catch (err) {
+    console.error('[section-intro] Erro na datilografia:', err);
+    root.querySelectorAll('[data-typing="true"]').forEach(el => {
+      el.textContent = getText(el);
+      el.classList.add('typing-done');
+      el.style.opacity = '1 !important';
+      el.style.visibility = 'visible !important';
+      el.style.display = 'block !important';
+    });
     if (avancarBtn) {
       avancarBtn.disabled = false;
       avancarBtn.style.opacity = '1 !important';
+      avancarBtn.style.cursor = 'pointer !important';
     }
   }
 
