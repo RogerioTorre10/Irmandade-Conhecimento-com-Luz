@@ -61,55 +61,62 @@
       }
     }
 
-    let p1, input, eye, avancarBtn;
+    let title, p1, input, eye, avancarBtn;
     try {
-      p1 = await waitForElement('#senha-p1', { within: root, timeout: 10000 });
+      title = await waitForElement('.title-senha', { within: root, timeout: 10000 });
+      p1 = await waitForElement('.senha-wrap p', { within: root, timeout: 10000 });
       input = await waitForElement('#senha-input', { within: root, timeout: 10000 });
-      eye = await waitForElement('#senha-eye', { within: root, timeout: 10000 });
-      avancarBtn = await waitForElement('.avancarBtn[data-action="avancar"]', { within: root, timeout: 10000 });
+      eye = await waitForElement('.btn-toggle-senha', { within: root, timeout: 10000 });
+      avancarBtn = await waitForElement('#btn-senha-avancar', { within: root, timeout: 10000 });
     } catch (e) {
       console.error('[section-senha] Elements not found:', e);
       window.toast?.('Falha ao carregar os elementos da seção Senha.', 'error');
 
-      p1 = p1 || root.querySelector('#senha-p1') || document.createElement('p');
+      title = title || root.querySelector('.title-senha') || document.createElement('h2');
+      p1 = p1 || root.querySelector('.senha-wrap p') || document.createElement('p');
       input = input || root.querySelector('#senha-input') || document.createElement('input');
-      eye = eye || root.querySelector('#senha-eye') || document.createElement('button');
-      avancarBtn = avancarBtn || root.querySelector('.avancarBtn[data-action="avancar"]') || document.createElement('button');
+      eye = eye || root.querySelector('.btn-toggle-senha') || document.createElement('button');
+      avancarBtn = avancarBtn || root.querySelector('#btn-senha-avancar') || document.createElement('button');
 
-      if (!p1.id) {
-        p1.id = 'senha-p1';
-        p1.classList.add('intro-paragraph');
+      if (!title.classList.contains('title-senha')) {
+        title.classList.add('title-senha');
+        title.dataset.typing = 'true';
+        title.textContent = 'Insira sua Palavra-Chave Sagrada.';
+        root.appendChild(title);
+      }
+      if (!p1.textContent) {
+        p1.textContent = 'A Palavra-Chave garante que apenas você acesse seu progresso.';
         p1.dataset.typing = 'true';
-        p1.textContent = 'Digite a senha fornecida para continuar sua jornada...';
         root.appendChild(p1);
       }
       if (!input.id) {
         input.id = 'senha-input';
         input.type = 'password';
         input.classList.add('input');
+        input.placeholder = 'Digite a Palavra-Chave';
         root.appendChild(input);
       }
-      if (!eye.id) {
-        eye.id = 'senha-eye';
-        eye.classList.add('senha-eye');
-        eye.innerHTML = '<svg>...</svg>';
+      if (!eye.classList.contains('btn-toggle-senha')) {
+        eye.classList.add('btn-toggle-senha');
+        eye.textContent = '👁️';
         root.appendChild(eye);
       }
-      if (!avancarBtn.classList.contains('avancarBtn')) {
-        avancarBtn.classList.add('btn', 'btn-primary', 'btn-stone', 'avancarBtn');
+      if (!avancarBtn.id) {
+        avancarBtn.id = 'btn-senha-avancar';
+        avancarBtn.classList.add('btn', 'btn-primary', 'btn-stone');
         avancarBtn.dataset.action = 'avancar';
-        avancarBtn.textContent = 'Continuar';
+        avancarBtn.textContent = 'Acessar Jornada';
         root.appendChild(avancarBtn);
       }
     }
 
-    [p1].forEach(el => {
+    [title, p1].forEach(el => {
       if (el) {
         el.style.color = '#fff !important';
         el.style.opacity = '1 !important';
         el.style.visibility = 'visible !important';
         el.style.display = 'block !important';
-        console.log('[section-senha] Texto inicializado:', el.id, el.textContent?.substring(0, 50));
+        console.log('[section-senha] Texto inicializado:', el.tagName, el.textContent?.substring(0, 50));
       }
     });
 
@@ -127,7 +134,7 @@
       position: relative !important;
       z-index: 2 !important;
       overflow: hidden !important;
-      max-height: 100vh !important;
+      max-height: 80vh !important;
     `;
 
     [avancarBtn, eye].forEach(btn => {
@@ -220,10 +227,11 @@
     }
 
     console.log('[section-senha] Elementos encontrados:', {
-      p1: !!p1, p1Id: p1?.id,
+      title: !!title, titleClass: title?.className,
+      p1: !!p1, p1Text: p1?.textContent?.substring(0, 50),
       input: !!input, inputId: input?.id,
-      eye: !!eye, eyeId: eye?.id,
-      avancarBtn: !!avancarBtn, avancarClass: avancarBtn?.className
+      eye: !!eye, eyeClass: eye?.className,
+      avancarBtn: !!avancarBtn, avancarId: avancarBtn?.id
     });
   };
 
