@@ -136,7 +136,7 @@
       position: relative !important;
       z-index: 2 !important;
       overflow: hidden !important;
-      max-height: 80vh !important; /* Evitar barra de rolamento */
+      max-height: 70vh !important; /* Reduzir altura para evitar barra */
     `;
 
     [nextBtn, prevBtn, avancarBtn].forEach(btn => {
@@ -145,6 +145,8 @@
         btn.disabled = false;
         btn.style.opacity = '1 !important';
         btn.style.cursor = 'pointer !important';
+        btn.style.display = 'inline-block !important';
+        btn.style.margin = '10px !important';
         console.log('[section-termos] Botão habilitado:', btn.className, btn.textContent);
       }
     });
@@ -163,7 +165,7 @@
         currentTermosPage = 2;
         console.log('[section-termos] Mostrando termos-pg2');
         avancarBtn.textContent = 'Aceito e quero continuar';
-        runTypingChain(); // Reaplicar datilografia para pg2
+        runTypingChain();
       }
     });
 
@@ -197,7 +199,7 @@
           currentTermosPage = 2;
           console.log('[section-termos] Mostrando termos-pg2 antes de avançar');
           avancarBtn.textContent = 'Aceito e quero continuar';
-          runTypingChain(); // Reaplicar datilografia para pg2
+          runTypingChain();
         }
       }
     });
