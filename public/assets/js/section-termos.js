@@ -169,42 +169,85 @@
       }
     });
 
-    const runTypingChain = async () => {
-      console.log('[section-termos] Iniciando datilografia...');
-      const typingElements = root.querySelectorAll(`#termos-pg${currentTermosPage} [data-typing="true"]:not(.typing-done)`);
-      
-      for (let el of typingElements) {
-        const text = getText(el);
-        console.log('[section-termos] Datilografando:', el.tagName, text.substring(0, 50));
-        
-        if (typeof window.runTyping === 'function') {
-          el.textContent = '';
-          el.classList.add('typing-active');
-          el.style.color = '#fff !important';
-          await new Promise(resolve => window.runTyping(el, text, resolve, {
-            speed: Number(el.dataset.speed || 40),
-            cursor: String(el.dataset.cursor || 'true') === 'true'
-          }));
+   const runTypingChain = async () => {
+  console.log('[section-termos] Iniciando datilografia...');
+  const typingElements = root.querySelectorAll(`#termos-pg${currentTermosPage} [data-typing="true"]:not(.typing-done)`);
+
+  if (!typingElements.length) {
+    console.warn('[section-termos] Nenhum elemento com data-typing="true" encontrado');
+    [nextBtn, prevBtn, avancarBtn].forEach(btn => {
+      if (btn) btn.disabled = false;
+    });
+    return;
+  }
+
+  console.log('[section-termos] Elementos encontrados:', Array.from(typingElements).map(el => el.tagName + (el.id ? `#${el.id}` : '')));
+
+  // Fallback para window.runTyping
+  if (typeof window.runTyping !== 'function') {
+    console.warn('[section-termos] window.runTyping não encontrado, usando fallback');
+    window.runTyping = (el, text, resolve, options) => {
+      let i = 0;
+      const speed = options.speed || 20;
+      const type = () => {
+        if (i < text.length) {
+          el.textContent += text.charAt(i);
+          i++;
+          setTimeout(type, speed);
         } else {
-          el.textContent = text;
+          resolve();
         }
-        
-        el.classList.add('typing-done');
-        el.style.opacity = '1 !important';
-        el.style.color = '#fff !important';
-        
-        if (typeof window.EffectCoordinator?.speak === 'function') {
-          window.EffectCoordinator.speak(text, { rate: 1.03, pitch: 1.0 });
-          console.log('[section-termos] TTS ativado para:', el.tagName);
-          await new Promise(resolve => setTimeout(resolve, text.length * 50));
-        }
-      }
-      
-      console.log('[section-termos] Datilografia concluída');
-      [nextBtn, prevBtn, avancarBtn].forEach(btn => {
-        if (btn) btn.disabled = false;
-      });
+      };
+      type();
     };
+  }
+
+  for (let el of typingElements) {
+    const text = getText(el);
+    console.log('[section-termos] Datilografando:', el.tagName, text.substring(0, 50));
+    
+    try {
+      el.textContent = '';
+      el.classList.add('typing-active', 'lumen-typing');
+      el.style.color = '#fff !important';
+      el.style.opacity = '1 !important';
+      el.style.display = 'block !important';
+      await new Promise(resolve => window.runTyping(el, text, resolve, {
+        speed: Number(el.dataset.speed || 20), // Reduzido para 20ms
+        cursor: String(el.dataset.cursor || 'true') === 'true'
+      }));
+    } catch (err) {
+      console.error('[section-termos] Erro na datilografia para', el.tagName, err);
+      el.textContent = text;
+    }
+    
+    el.classList.add('typing-done');
+    el.classList.remove('typing-active');
+    el.style.opacity = '1 !important';
+    el.style.color = '#fff !important';
+    el.style.display = 'block !important';
+    
+    try {
+      if (typeof window.EffectCoordinator?.speak === 'function') {
+        window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
+        console.log('[section-termos] TTS ativado para:', el.tagName);
+        await new Promise(resolve => setTimeout(resolve, text.length * 30)); // Reduzido para 30ms
+      } else {
+        console.warn('[section-termos] window.EffectCoordinator.speak não encontrado');
+      }
+    } catch (err) {
+      console.error('[section-termos] Erro no TTS para', el.tagName, err);
+    }
+    
+    // Pausa curta para fluidez
+    await new Promise(resolve => setTimeout(resolve, 300));
+  }
+  
+  console.log('[section-termos] Datilografia concluída');
+  [nextBtn, prevBtn, avancarBtn].forEach(btn => {
+    if (btn) btn.disabled = false;
+  });
+};
 
     if (!TERMOS_READY) {
       try {
