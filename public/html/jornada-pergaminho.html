@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jornada · Pergaminho Integrado</title>
+  <meta name="description" content="Jornada guiada com estilo pergaminho vertical e horizontal conforme a etapa.">
+
+  <!-- Favicon -->
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+
+  <!-- CSS base -->
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+  <link rel="stylesheet" href="/css/styles-pergaminho.css" />
+  <link rel="stylesheet" href="/css/styles-pergaminho-rasgado.css" />
+
+  <!-- Fonte Cardo (SIL OFL 1.1) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+</head>
+
+<body class="epic min-h-screen bg-slate-900 text-slate-100">
+  <main class="container">
+    <!-- Intro -->
+    <section id="section-intro" class="pergaminho pergaminho-v">
+      <div class="parchment-inner-rough">
+        <h2 class="parchment-title-rough">Bem-vindo à Jornada</h2>
+        <p class="parchment-text-rough">Esta jornada é simbólica, reflexiva e acolhedora.</p>
+        <button id="btn-avancar" class="btn btn-primary btn-stone">Começar</button>
+      </div>
+    </section>
+
+    <!-- Termos -->
+    <section id="section-termos" class="pergaminho pergaminho-v hidden" aria-hidden="true">
+      <div class="parchment-inner-rough">
+        <div id="termos-pg1">
+          <h2 class="parchment-title-rough">Termos de Uso</h2>
+          <p class="parchment-text-rough">Leia os termos para prosseguir.</p>
+        </div>
+        <div id="termos-pg2" style="display: none; opacity: 0; visibility: hidden;">
+          <h3 class="parchment-title-rough">Detalhes Adicionais</h3>
+          <p class="parchment-text-rough">Mais informações sobre a jornada.</p>
+        </div>
+        <div class="parchment-actions-rough">
+          <button id="btn-termos-avancar" class="btn btn-primary btn-stone">Avançar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Senha -->
+    <section id="section-senha" class="pergaminho pergaminho-v hidden" aria-hidden="true">
+      <div class="parchment-inner-rough">
+        <h2 class="parchment-title-rough">Digite sua Senha</h2>
+        <div class="senha-wrap">
+          <div class="senha-input-group">
+            <input id="input-senha" type="password" class="parchment-input-rough" placeholder="Senha">
+            <button class="btn-toggle-senha">👁️</button>
+          </div>
+          <button id="btn-senha-avancar" class="btn btn-primary btn-stone">Acessar Jornada</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Perguntas -->
+    <section id="sec-perguntas" class="pergaminho pergaminho-h hidden" aria-hidden="true">
+      <div class="parchment-inner-rough">
+        <div class="parchment-progress-rough mb-3">
+          <div id="q-progress" class="bar" style="width: 0%"></div>
+        </div>
+        <div id="q-status" class="parchment-text-rough">Pergunta 0/0</div>
+        <h2 id="q-title" class="parchment-title-rough">Pergunta</h2>
+        <p id="q-text" class="parchment-text-rough">...</p>
+        <textarea id="q-input" data-qid="" class="parchment-input-rough" rows="5" placeholder="Escreva aqui..."></textarea>
+        <div class="parchment-actions-rough mt-3">
+          <button id="btnVoltar" class="btn">Voltar</button>
+          <button id="btnLimpar" class="btn">Limpar</button>
+          <span style="flex:1"></span>
+          <button id="btnProxima" class="btn btn-primary btn-stone">Próxima</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Wizard -->
+    <section id="sec-wizard" class="pergaminho pergaminho-h hidden" aria-hidden="true">
+      <div class="parchment-inner-rough">
+        <div class="parchment-progress-rough mb-3">
+          <div id="q-progress" class="bar" style="width: 0%"></div>
+        </div>
+        <div id="q-status" class="parchment-text-rough">Pergunta 0/0</div>
+        <h2 id="q-title" class="parchment-title-rough">Pergunta</h2>
+        <p id="q-text" class="parchment-text-rough">...</p>
+        <textarea id="q-input" data-qid="" class="parchment-input-rough" rows="5" placeholder="Escreva aqui..."></textarea>
+        <div class="parchment-actions-rough mt-3">
+          <button id="btnVoltar" class="btn">Voltar</button>
+          <button id="btnLimpar" class="btn">Limpar</button>
+          <span style="flex:1"></span>
+          <button id="btnProxima" class="btn btn-primary btn-stone">Próxima</button>
+        </div>
+        <div class="mt-3">
+          <button id="btnFinalizar" class="btn btn-primary btn-stone">Finalizar Jornada</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final -->
+    <section id="sec-final" class="pergaminho pergaminho-v hidden" aria-hidden="true">
+      <div class="parchment-inner-rough">
+        <h2 class="parchment-title-rough">Parabéns! Você finalizou a jornada 🎉</h2>
+        <p class="parchment-text-rough">Revise se quiser e depois gere seu PDF e HQ.</p>
+        <div class="parchment-actions-rough mt-3">
+          <button id="btnRevisar" class="btn">Revisar</button>
+          <button id="btnLimparRespostas" class="btn">Limpar respostas</button>
+          <span style="flex:1"></span>
+          <button id="btnBaixarPDFHQ" class="btn btn-primary btn-stone">Baixar PDF e HQ</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Scripts essenciais -->
+  <script src="/jornada-utils.js"></script>
+  <script src="/jornada-core.js"></script>
+  <script src="/jornada-auth.js"></script>
+  <script src="/jornada-paper-qa.js"></script>
+  <script src="/jornada-typing-font.js"></script>
+  <script src="/jornada-render.js"></script>
+  <script src="/jornada-bootstrap.js"></script>
+  <script src="/questions.js"></script>
+  <script src="/state.js"></script>
+  <script src="/main.js"></script>
+  <script src="/jornada.js"></script>
+
+  <!-- Inicialização -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        onJornadaEssencial();
+      } catch (e) {
+        console.error('Falha ao iniciar jornada:', e);
+      }
+    });
+  </script>
+
+  <noscript>
+    <p style="text-align:center; padding:12px">Ative o JavaScript para usar esta página.</p>
+  </noscript>
+</body>
+</html>
