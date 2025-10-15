@@ -5,9 +5,8 @@
   window.__termosBound = true;
 
   let TERMOS_READY = false;
-  let currentTermosPage = 1; // Controla se está em termos-p1 (1) ou termos-p2 (2)
+  let currentTermosPage = 1;
 
-  // Função para adicionar evento único
   const once = (el, ev, fn) => {
     if (!el) return;
     const h = (e) => {
@@ -17,7 +16,6 @@
     el.addEventListener(ev, h);
   };
 
-  // Função para aguardar elemento no DOM
   async function waitForElement(selector, { within = document, timeout = 10000, step = 50 } = {}) {
     const start = performance.now();
     return new Promise((resolve, reject) => {
@@ -36,12 +34,10 @@
     });
   }
 
-  // Função para obter texto do elemento
   function getText(el) {
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
   }
 
-  // Extrair sectionId e node do evento
   function fromDetail(detail = {}) {
     const sectionId = detail.sectionId || detail.id || window.__currentSectionId;
     const node = detail.node || detail.root || null;
@@ -66,74 +62,65 @@
       }
     }
 
-    // Buscar elementos
     let pg1, pg2, nextBtn, prevBtn, avancarBtn;
     try {
-      pg1 = await waitForElement('#termos-p1', { within: root, timeout: 10000 });
-      pg2 = await waitForElement('#termos-p2', { within: root, timeout: 10000 });
-      nextBtn = await waitForElement('#termos-next', { within: root, timeout: 10000 });
-      prevBtn = await waitForElement('#termos-prev', { within: root, timeout: 10000 });
-      avancarBtn = await waitForElement('#termos-avancar', { within: root, timeout: 10000 });
+      pg1 = await waitForElement('#termos-pg1', { within: root, timeout: 10000 });
+      pg2 = await waitForElement('#termos-pg2', { within: root, timeout: 10000 });
+      nextBtn = await waitForElement('.nextBtn[data-action="termos-next"]', { within: root, timeout: 10000 });
+      prevBtn = await waitForElement('.prevBtn[data-action="termos-prev"]', { within: root, timeout: 10000 });
+      avancarBtn = await waitForElement('.avancarBtn[data-action="avancar"]', { within: root, timeout: 10000 });
     } catch (e) {
       console.error('[section-termos] Elements not found:', e);
       window.toast?.('Falha ao carregar os elementos da seção Termos.', 'error');
 
-      // Criar placeholders apenas se necessário
-      pg1 = pg1 || root.querySelector('#termos-p1') || document.createElement('p');
-      pg2 = pg2 || root.querySelector('#termos-p2') || document.createElement('p');
-      nextBtn = nextBtn || root.querySelector('#termos-next') || document.createElement('button');
-      prevBtn = prevBtn || root.querySelector('#termos-prev') || document.createElement('button');
-      avancarBtn = avancarBtn || root.querySelector('#termos-avancar') || document.createElement('button');
+      pg1 = pg1 || root.querySelector('#termos-pg1') || document.createElement('div');
+      pg2 = pg2 || root.querySelector('#termos-pg2') || document.createElement('div');
+      nextBtn = nextBtn || root.querySelector('.nextBtn[data-action="termos-next"]') || document.createElement('button');
+      prevBtn = prevBtn || root.querySelector('.prevBtn[data-action="termos-prev"]') || document.createElement('button');
+      avancarBtn = avancarBtn || root.querySelector('.avancarBtn[data-action="avancar"]') || document.createElement('button');
 
       if (!pg1.id) {
-        pg1.id = 'termos-p1';
+        pg1.id = 'termos-pg1';
         pg1.classList.add('intro-paragraph');
-        pg1.dataset.typing = 'true';
-        pg1.textContent = 'Bem-vindo aos Termos e Condições...';
+        pg1.innerHTML = '<p data-typing="true">Bem-vindo aos Termos e Condições...</p>';
         root.appendChild(pg1);
       }
       if (!pg2.id) {
-        pg2.id = 'termos-p2';
-        pg2.classList.add('intro-paragraph');
-        pg2.dataset.typing = 'true';
-        pg2.textContent = 'Por favor, leia atentamente...';
+        pg2.id = 'termos-pg2';
+        pg2.classList.add('intro-paragraph', 'hidden');
+        pg2.innerHTML = '<p data-typing="true">Por favor, leia atentamente...</p>';
         root.appendChild(pg2);
       }
-      if (!nextBtn.id) {
-        nextBtn.id = 'termos-next';
-        nextBtn.classList.add('btn', 'btn-primary', 'btn-stone');
+      if (!nextBtn.classList.contains('nextBtn')) {
+        nextBtn.classList.add('btn', 'btn-primary', 'btn-stone', 'nextBtn');
         nextBtn.dataset.action = 'termos-next';
-        nextBtn.textContent = 'Próximo';
+        nextBtn.textContent = 'Próxima página';
         root.appendChild(nextBtn);
       }
-      if (!prevBtn.id) {
-        prevBtn.id = 'termos-prev';
-        prevBtn.classList.add('btn', 'btn-primary', 'btn-stone');
+      if (!prevBtn.classList.contains('prevBtn')) {
+        prevBtn.classList.add('btn', 'btn-primary', 'btn-stone', 'prevBtn');
         prevBtn.dataset.action = 'termos-prev';
-        prevBtn.textContent = 'Anterior';
+        prevBtn.textContent = 'Voltar';
         root.appendChild(prevBtn);
       }
-      if (!avancarBtn.id) {
-        avancarBtn.id = 'termos-avancar';
-        avancarBtn.classList.add('btn', 'btn-primary', 'btn-stone');
+      if (!avancarBtn.classList.contains('avancarBtn')) {
+        avancarBtn.classList.add('btn', 'btn-primary', 'btn-stone', 'avancarBtn');
         avancarBtn.dataset.action = 'avancar';
-        avancarBtn.textContent = 'Avançar';
+        avancarBtn.textContent = 'Aceito e quero continuar';
         root.appendChild(avancarBtn);
       }
     }
 
-    // Forçar visibilidade inicial
     [pg1, pg2].forEach((el, i) => {
       if (el) {
         el.style.color = '#fff !important';
-        el.style.opacity = i === 0 ? '1 !important' : '0 !important'; // Mostrar apenas termos-p1 inicialmente
+        el.style.opacity = i === 0 ? '1 !important' : '0 !important';
         el.style.visibility = 'visible !important';
         el.style.display = i === 0 ? 'block !important' : 'none !important';
         console.log(`[section-termos] Texto ${i+1} inicializado:`, el.id, el.textContent?.substring(0, 50));
       }
     });
 
-    // Estilizar root
     root.style.cssText = `
       background: transparent !important;
       padding: 30px !important;
@@ -149,23 +136,20 @@
       z-index: 2 !important;
     `;
 
-    // Estilizar botões
     [nextBtn, prevBtn, avancarBtn].forEach(btn => {
       if (btn) {
         btn.classList.add('btn', 'btn-primary', 'btn-stone');
         btn.disabled = false;
         btn.style.opacity = '1 !important';
         btn.style.cursor = 'pointer !important';
-        console.log('[section-termos] Botão habilitado:', btn.id || btn.textContent);
+        console.log('[section-termos] Botão habilitado:', btn.className, btn.textContent);
       }
     });
 
-    // Configurar chama
     if (typeof window.setupCandleFlame === 'function') {
       window.setupCandleFlame('media', 'flame-bottom-right');
     }
 
-    // Lógica de navegação entre termos-p1 e termos-p2
     once(nextBtn, 'click', () => {
       if (currentTermosPage === 1 && pg2) {
         pg1.style.display = 'none !important';
@@ -173,8 +157,8 @@
         pg2.style.opacity = '1 !important';
         pg2.scrollIntoView({ behavior: 'smooth' });
         currentTermosPage = 2;
-        console.log('[section-termos] Mostrando termos-p2');
-        avancarBtn.textContent = 'Avançar para Senha';
+        console.log('[section-termos] Mostrando termos-pg2');
+        avancarBtn.textContent = 'Aceito e quero continuar';
       }
     });
 
@@ -184,7 +168,7 @@
         pg1.style.display = 'block !important';
         pg1.style.opacity = '1 !important';
         currentTermosPage = 1;
-        console.log('[section-termos] Voltando para termos-p1');
+        console.log('[section-termos] Voltando para termos-pg1');
         avancarBtn.textContent = 'Avançar';
       }
     });
@@ -199,26 +183,24 @@
           console.warn('[section-termos] Fallback navigation to /senha');
         }
       } else {
-        // Mostrar termos-p2 se ainda está em termos-p1
         if (pg2 && currentTermosPage === 1) {
           pg1.style.display = 'none !important';
           pg2.style.display = 'block !important';
           pg2.style.opacity = '1 !important';
           currentTermosPage = 2;
-          console.log('[section-termos] Mostrando termos-p2 antes de avançar');
-          avancarBtn.textContent = 'Avançar para Senha';
+          console.log('[section-termos] Mostrando termos-pg2 antes de avançar');
+          avancarBtn.textContent = 'Aceito e quero continuar';
         }
       }
     });
 
-    // Função de datilografia simplificada
     const runTypingChain = async () => {
       console.log('[section-termos] Iniciando datilografia...');
-      const typingElements = [pg1, pg2].filter(el => el && el.dataset.typing === 'true' && !el.classList.contains('typing-done'));
+      const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
       
       for (let el of typingElements) {
         const text = getText(el);
-        console.log('[section-termos] Datilografando:', el.id, text.substring(0, 50));
+        console.log('[section-termos] Datilografando:', el.tagName, text.substring(0, 50));
         
         if (typeof window.runTyping === 'function') {
           el.textContent = '';
@@ -236,16 +218,14 @@
         el.style.opacity = '1 !important';
         el.style.color = '#fff !important';
         
-        // TTS
         if (typeof window.EffectCoordinator?.speak === 'function') {
           window.EffectCoordinator.speak(text, { rate: 1.03, pitch: 1.0 });
-          console.log('[section-termos] TTS ativado para:', el.id);
+          console.log('[section-termos] TTS ativado para:', el.tagName);
           await new Promise(resolve => setTimeout(resolve, text.length * 50));
         }
       }
       
       console.log('[section-termos] Datilografia concluída');
-      // Garantir que botões estejam habilitados
       [nextBtn, prevBtn, avancarBtn].forEach(btn => {
         if (btn) btn.disabled = false;
       });
@@ -257,13 +237,15 @@
         TERMOS_READY = true;
       } catch (err) {
         console.error('[section-termos] Erro na datilografia:', err);
-        // Forçar visibilidade em caso de erro
         [pg1, pg2].forEach((el, i) => {
           if (el) {
-            el.textContent = getText(el);
-            el.classList.add('typing-done');
+            el.querySelectorAll('[data-typing="true"]').forEach(child => {
+              child.textContent = getText(child);
+              child.classList.add('typing-done');
+              child.style.opacity = '1 !important';
+              child.style.color = '#fff !important';
+            });
             el.style.opacity = i === 0 ? '1 !important' : currentTermosPage === 2 ? '1 !important' : '0 !important';
-            el.style.color = '#fff !important';
             el.style.display = i === 0 ? 'block !important' : currentTermosPage === 2 ? 'block !important' : 'none !important';
           }
         });
@@ -277,13 +259,12 @@
       });
     }
 
-    // Debug: Logar elementos
     console.log('[section-termos] Elementos encontrados:', {
       pg1: !!pg1, pg1Id: pg1?.id,
       pg2: !!pg2, pg2Id: pg2?.id,
-      nextBtn: !!nextBtn, nextId: nextBtn?.id,
-      prevBtn: !!prevBtn, prevId: prevBtn?.id,
-      avancarBtn: !!avancarBtn, avancarId: avancarBtn?.id
+      nextBtn: !!nextBtn, nextClass: nextBtn?.className,
+      prevBtn: !!prevBtn, prevClass: prevBtn?.className,
+      avancarBtn: !!avancarBtn, avancarClass: avancarBtn?.className
     });
   };
 
