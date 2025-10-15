@@ -24,6 +24,7 @@ html, body {
   background: var(--bg);
   color: var(--fg);
   line-height: 1.5;
+  font-family: 'BerkshireSwash', cursive;
 }
 
 /* =============================================================================
@@ -72,14 +73,6 @@ TÍTULO: FONTES ÉPICAS — IRMANDADE
 /* =============================================================================
 TÍTULO: BASE TIPOGRÁFICA
 ============================================================================= */
-html, body {
-  font-family: 'BerkshireSwash', cursive;
-  font-synthesis-weight: none;
-  font-synthesis-style: none;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
 h1, h2, h3, h4, h5, h6,
 .site-header h1,
 .section-title,
@@ -132,17 +125,21 @@ TÍTULO: ESTRUTURA GERAL
 .site-header {
   padding: 24px 16px;
   text-align: center;
-  background: var(--bg) !important;
-  display: flex !important;
+  background: var(--bg);
+  display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1300 !important;
+  z-index: 1300;
 }
 
 .site-header h1 {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
+  color: #fff;
+  font-size: 32px;
+  display: block;
+  visibility: visible;
+  opacity: 1;
+  margin: 0;
+  text-shadow: 0 0 10px hsla(28, 96%, 60%, .7);
 }
 
 .site-footer {
@@ -155,6 +152,10 @@ TÍTULO: ESTRUTURA GERAL
   background: var(--bg);
   z-index: 1000;
   border-top: 1px solid rgba(255,255,255,.1);
+  display: block;
+  opacity: 0.6;
+  color: #fff;
+  font-size: 14px;
 }
 
 .container {
@@ -174,10 +175,10 @@ TÍTULO: ESTRUTURA GERAL
 }
 
 .card {
-  background: transparent !important;
+  background: transparent;
   padding: 20px;
   border-radius: var(--radius);
-  box-shadow: none !important;
+  box-shadow: none;
 }
 
 .badge {
@@ -258,18 +259,18 @@ TÍTULO: ESTADO "JORNADA ATIVA"
 ============================================================================= */
 body.jornada-active #page-shell,
 body.jornada-active footer.site-footer {
-  display: none !important;
+  display: none;
 }
 
 body.jornada-active header.site-header {
-  display: flex !important;
-  visibility: visible !important;
+  display: flex;
+  visibility: visible;
 }
 
 body.jornada-active #jornada-canvas {
-  display: block !important;
-  background: var(--bg) url('/assets/img/textura-pergaminho.jpg') center/cover no-repeat fixed !important;
-  background-size: cover !important;
+  display: block;
+  background: var(--bg) url('/assets/img/textura-pergaminho.jpg') center/cover no-repeat fixed;
+  background-size: cover;
   position: relative;
   min-height: 100vh;
   overflow: hidden;
@@ -283,14 +284,14 @@ TÍTULO: PERGAMINHO
   padding: 0;
   border-radius: 18px;
   overflow: hidden;
-  background: transparent !important;
-  background-image: none !important;
+  background: transparent;
+  background-image: none;
 }
 
 .conteudo-pergaminho {
   padding: clamp(12px, 3vw, 28px);
   line-height: 1.55;
-  background: transparent !important;
+  background: transparent;
 }
 
 .jornada #jornada-canvas.pergaminho {
@@ -298,36 +299,36 @@ TÍTULO: PERGAMINHO
 }
 
 .pergaminho-h::before, .pergaminho-v::before {
-  background-image: none !important;
+  background-image: none;
 }
 
 .parchment-rough, .parchment-inner-rough {
-  background: transparent !important;
-  box-shadow: none !important;
+  background: transparent;
+  box-shadow: none;
 }
 
 .parchment-text-rough {
-  color: #fff !important;
+  color: #fff;
   opacity: .95;
   margin: 6px 0 14px;
 }
 
 .parchment-actions-rough .btn {
   border-color: rgba(253, 230, 138, .35);
-  background: linear-gradient(180deg, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover !important;
-  background-blend-mode: overlay !important;
-  color: #fff !important;
-  font-family: 'ManufacturingConsent', sans-serif !important;
+  background: linear-gradient(180deg, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
+  background-blend-mode: overlay;
+  color: #fff;
+  font-family: 'ManufacturingConsent', sans-serif;
 }
 
 .parchment-actions-rough .btn-primary {
-  background: linear-gradient(180deg, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover !important;
-  border-color: #4a4a4a !important;
-  color: #fff !important;
+  background: linear-gradient(180deg, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
+  border-color: #4a4a4a;
+  color: #fff;
 }
 
 .parchment-actions-rough .btn-primary:hover {
-  transform: scale(1.05) !important;
+  transform: scale(1.05);
 }
 
 /* =============================================================================
@@ -337,110 +338,121 @@ TÍTULO: JORNADA ESPECÍFICA
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
-  background: transparent !important;
-  padding: 0 !important;
+  background: transparent;
+  padding: 0;
+  display: block;
 }
 
-#section-intro, #section-termos, .card.pergaminho.pergaminho-v.section {
-  background: transparent !important;
-  padding: 30px !important;
-  border-radius: 12px !important;
-  max-width: 600px !important;
-  text-align: center !important;
-  box-shadow: none !important;
-  border: none !important;
-  display: block !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  position: relative !important;
-  z-index: 2 !important;
+#jornada-content-wrapper {
+  display: block;
+  visibility: visible;
+  opacity: 1;
 }
 
-.intro-paragraph {
-  font-size: 18px !important;
-  margin-bottom: 20px !important;
-  color: #fff !important;
-  opacity: 0 !important;
-  visibility: visible !important;
-  display: block !important;
-  font-family: 'BerkshireSwash', cursive !important;
-  text-align: left !important;
-  background: transparent !important;
+#section-intro, #section-termos, .termo-wrap {
+  background: transparent;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 600px;
+  text-align: center;
+  box-shadow: none;
+  border: none;
+  display: block;
+  opacity: 1;
+  visibility: visible;
+  z-index: 2;
 }
 
-.intro-paragraph.typing-active {
-  text-align: left !important;
+.intro-paragraph,
+#termos-pg1, #termos-pg2,
+[data-typing="true"],
+#termos-pg1 p, #termos-pg1 li, #termos-pg1 h2,
+#termos-pg2 p, #termos-pg2 li, #termos-pg2 h3 {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: #fff;
+  opacity: 0;
+  visibility: visible;
+  display: block;
+  font-family: 'BerkshireSwash', cursive;
+  text-align: left;
+  background: transparent;
 }
 
-.intro-paragraph.typing-done {
-  opacity: 1 !important;
-  color: #fff !important;
-  text-align: left !important;
+.intro-paragraph.typing-active,
+[data-typing="true"].typing-active {
+  text-align: left;
 }
 
-#intro-p1, #intro-p2, #termos-p1, #termos-p2 {
-  opacity: 0 !important;
-  visibility: visible !important;
-  display: block !important;
-  color: #fff !important;
-  font-family: 'BerkshireSwash', cursive !important;
+.intro-paragraph.typing-done,
+[data-typing="true"].typing-done,
+#termos-pg1.typing-done p, #termos-pg1.typing-done li, #termos-pg1.typing-done h2,
+#termos-pg2.typing-done p, #termos-pg2.typing-done li, #termos-pg2.typing-done h3 {
+  opacity: 1;
+  color: #fff;
 }
 
-.btn.btn-primary.btn-stone {
-  padding: 10px 20px !important;
-  background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover !important;
-  background-blend-mode: overlay !important;
-  color: #fff !important;
-  border-radius: 8px !important;
-  font-size: 20px !important;
-  font-family: 'ManufacturingConsent', sans-serif !important;
-  border: 3px solid #4a4a4a !important;
-  box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6) !important;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.7) !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: inline-block !important;
-  cursor: pointer !important;
-  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+.btn.btn-primary.btn-stone,
+.nextBtn, .prevBtn, .avancarBtn {
+  padding: 10px 20px;
+  background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
+  background-blend-mode: overlay;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 20px;
+  font-family: 'ManufacturingConsent', sans-serif;
+  border: 3px solid #4a4a4a;
+  box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+  opacity: 1;
+  visibility: visible;
+  display: inline-block;
+  cursor: pointer;
+  margin: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.btn.btn-primary.btn-stone:hover {
-  transform: scale(1.05) !important;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.7) !important;
+.btn.btn-primary.btn-stone:hover,
+.nextBtn:hover, .prevBtn:hover, .avancarBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.7);
 }
 
-.btn:disabled {
-  opacity: 0.5 !important;
-  cursor: not-allowed !important;
+.btn:disabled,
+.nextBtn:disabled, .prevBtn:disabled, .avancarBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.flame-corner {
-  position: fixed !important;
-  z-index: 1200 !important;
-  pointer-events: none !important;
-  display: block !important;
-  opacity: 1 !important;
-  visibility: visible !important;
+.flame-corner,
+#flame-top-left,
+#flame-bottom-right,
+#chama-header {
+  display: block;
+  visibility: visible;
+  opacity: 1;
+  position: fixed;
+  pointer-events: none;
+  z-index: 1200;
 }
 
 .flame-top-left {
-  top: 60px !important;
-  left: 20px !important;
-  --altura: 67.5px !important;
-  --largura: 45px !important;
+  top: 80px;
+  left: 20px;
+  --altura: 67.5px;
+  --largura: 45px;
 }
 
 .flame-bottom-right {
-  bottom: 20px !important;
-  right: 20px !important;
-  --altura: 90px !important;
-  --largura: 60px !important;
+  bottom: 20px;
+  right: 20px;
+  --altura: 90px;
+  --largura: 60px;
 }
 
-#chama-header {
-  display: flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
+#chama-header .chama-vela {
+  --largura: 30px;
+  --altura: 60px;
 }
 
 /* =============================================================================
@@ -451,10 +463,10 @@ TÍTULO: VISIBILIDADE DE BLOCO E PERGUNTA
 }
 
 .hidden, .section-hidden {
-  display: none !important;
+  display: none;
 }
 
-div[id^="section-"], .j-bloco, .j-pergunta, #termos-p1, #termos-p2 {
+div[id^="section-"], .j-bloco, .j-pergunta, #termos-pg1, #termos-pg2 {
   opacity: 0;
   transition: opacity .5s ease-in-out;
 }
@@ -462,12 +474,12 @@ div[id^="section-"], .j-bloco, .j-pergunta, #termos-p1, #termos-p2 {
 div[id^="section-"]:not(.hidden),
 .j-bloco[style*="display: block"],
 .j-pergunta[style*="display: block"],
-#termos-p1:not(.hidden), #termos-p2:not(.hidden) {
+#termos-pg1:not(.hidden), #termos-pg2:not(.hidden) {
   opacity: 1;
 }
 
 /* =============================================================================
-TÍTULO: OVERLAY DE VÍDEO (unificado)
+TÍTULO: OVERLAY DE VÍDEO
 ============================================================================= */
 .video-overlay, #videoOverlay {
   position: fixed;
@@ -486,7 +498,7 @@ TÍTULO: OVERLAY DE VÍDEO (unificado)
 }
 
 .video-player, #videoOverlay .video-player {
-  width: min(900px,92vw);
+  width: min(900px, 92vw);
   max-height: 80vh;
   object-fit: contain;
   background: #000;
@@ -518,11 +530,11 @@ TÍTULO: DATILOGRAFIA
 
 [data-typing="true"] {
   min-height: 20px;
-  display: block !important;
-  visibility: visible !important;
+  display: block;
+  visibility: visible;
   position: relative;
   opacity: 0;
-  color: #fff !important;
+  color: #fff;
 }
 
 [data-typing="true"].typing-done {
@@ -591,15 +603,14 @@ TÍTULO: CHAMA — ESTADOS E TAMANHOS
   z-index: 60;
 }
 
-/* Ícone de chama (para títulos) */
 .chama-icone {
   position: relative;
   width: 24px;
   height: 36px;
   filter: drop-shadow(0 0 14px rgba(255,196,0,.75));
-  display: flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
+  display: flex;
+  visibility: visible;
+  opacity: 1;
 }
 
 .chama-icone .halo {
@@ -637,7 +648,6 @@ TÍTULO: CHAMA — ESTADOS E TAMANHOS
   animation: brasaPulse 1.7s ease-in-out infinite;
 }
 
-/* Tamanhos e intensidade */
 .chama-icone.chama-sm {
   width: 16px;
   height: 24px;
@@ -673,13 +683,6 @@ TÍTULO: CHAMA — ESTADOS E TAMANHOS
 @keyframes brasaPulse {
   0%, 100% { transform: translateX(-50%) scale(1); opacity: .75; }
   50% { transform: translateX(-50%) scale(1.06); opacity: 1; }
-}
-
-/* Efeitos finos */
-.mark-emocao {
-  background: linear-gradient(90deg, rgba(255,196,0,.35), rgba(255,140,0,.2));
-  border-radius: 4px;
-  padding: 0 2px;
 }
 
 /* =============================================================================
@@ -746,7 +749,6 @@ TÍTULO: PROGRESSO DA JORNADA
   transition: width .5s ease-out;
 }
 
-/* Versão inline usada dentro de #section-perguntas */
 #section-perguntas .progress-inline {
   display: flex;
   flex-direction: column;
@@ -755,9 +757,9 @@ TÍTULO: PROGRESSO DA JORNADA
 }
 
 .progress-badge.inline {
-  position: static !important;
-  top: auto !important;
-  right: auto !important;
+  position: static;
+  top: auto;
+  right: auto;
   align-self: flex-end;
   margin-bottom: 4px;
 }
@@ -790,8 +792,26 @@ nav a, a.btn, .site-header p {
   background: rgba(255,255,255,.1);
 }
 
+.language-selector {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1400;
+}
+
+#language-select {
+  padding: 8px 12px;
+  font-size: 16px;
+  border-radius: 6px;
+  background: #1a1a2e;
+  color: #fff;
+  border: 1px solid #333;
+  min-width: 140px;
+  font-family: 'Cardo', serif;
+}
+
 /* =============================================================================
-TÍTULO: TOAST (UTIL)
+TÍTULO: TOAST
 ============================================================================= */
 #toast {
   position: fixed;
@@ -813,11 +833,3 @@ TÍTULO: TOAST (UTIL)
 #toast.show {
   opacity: 1;
 }
-
-/* =============================================================================
-TÍTULO: HOME/JORNADA (ESPAÇOS PARA FUTUROS ESCOPOS)
-============================================================================= */
-/* .home .hero { } */
-/* .home .card.invite { } */
-/* .jornada .j-progress { } */
-/* .jornada .footer-actions .btn { } */
