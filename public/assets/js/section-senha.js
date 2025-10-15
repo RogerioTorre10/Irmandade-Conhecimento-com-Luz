@@ -52,7 +52,7 @@
       try {
         root = await waitForElement('#section-senha', { 
           within: document.getElementById('jornada-content-wrapper') || document, 
-          timeout = 10000 
+          timeout: 10000 
         });
       } catch (e) {
         window.toast?.('Erro: Seção section-senha não carregada.', 'error');
