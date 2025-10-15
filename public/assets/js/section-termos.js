@@ -72,43 +72,7 @@
     } catch (e) {
       console.error('[section-termos] Elements not found:', e);
       window.toast?.('Falha ao carregar os elementos da seção Termos.', 'error');
-
-      pg1 = pg1 || root.querySelector('#termos-pg1') || document.createElement('div');
-      pg2 = pg2 || root.querySelector('#termos-pg2') || document.createElement('div');
-      nextBtn = nextBtn || root.querySelector('.nextBtn[data-action="termos-next"]') || document.createElement('button');
-      prevBtn = prevBtn || root.querySelector('.prevBtn[data-action="termos-prev"]') || document.createElement('button');
-      avancarBtn = avancarBtn || root.querySelector('.avancarBtn[data-action="avancar"]') || document.createElement('button');
-
-      if (!pg1.id) {
-        pg1.id = 'termos-pg1';
-        pg1.classList.add('intro-paragraph');
-        pg1.innerHTML = '<p data-typing="true">Bem-vindo aos Termos e Condições...</p>';
-        root.appendChild(pg1);
-      }
-      if (!pg2.id) {
-        pg2.id = 'termos-pg2';
-        pg2.classList.add('intro-paragraph', 'hidden');
-        pg2.innerHTML = '<p data-typing="true">Por favor, leia atentamente...</p>';
-        root.appendChild(pg2);
-      }
-      if (!nextBtn.classList.contains('nextBtn')) {
-        nextBtn.classList.add('btn', 'btn-primary', 'btn-stone', 'nextBtn');
-        nextBtn.dataset.action = 'termos-next';
-        nextBtn.textContent = 'Próxima página';
-        root.appendChild(nextBtn);
-      }
-      if (!prevBtn.classList.contains('prevBtn')) {
-        prevBtn.classList.add('btn', 'btn-primary', 'btn-stone', 'prevBtn');
-        prevBtn.dataset.action = 'termos-prev';
-        prevBtn.textContent = 'Voltar';
-        root.appendChild(prevBtn);
-      }
-      if (!avancarBtn.classList.contains('avancarBtn')) {
-        avancarBtn.classList.add('btn', 'btn-primary', 'btn-stone', 'avancarBtn');
-        avancarBtn.dataset.action = 'avancar';
-        avancarBtn.textContent = 'Aceito e quero continuar';
-        root.appendChild(avancarBtn);
-      }
+      return;
     }
 
     [pg1, pg2].forEach((el, i) => {
@@ -124,7 +88,7 @@
 
     root.style.cssText = `
       background: transparent !important;
-      padding: 30px !important;
+      padding: 24px !important;
       border-radius: 12px !important;
       max-width: 600px !important;
       text-align: center !important;
@@ -135,8 +99,8 @@
       visibility: visible !important;
       position: relative !important;
       z-index: 2 !important;
-      overflow: hidden !important;
-      max-height: 70vh !important; /* Reduzir altura para evitar barra */
+      overflow-y: auto !important;
+      max-height: 60vh !important;
     `;
 
     [nextBtn, prevBtn, avancarBtn].forEach(btn => {
@@ -146,7 +110,7 @@
         btn.style.opacity = '1 !important';
         btn.style.cursor = 'pointer !important';
         btn.style.display = 'inline-block !important';
-        btn.style.margin = '10px !important';
+        btn.style.margin = '8px !important';
         console.log('[section-termos] Botão habilitado:', btn.className, btn.textContent);
       }
     });
