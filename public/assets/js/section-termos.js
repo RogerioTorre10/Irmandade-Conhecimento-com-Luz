@@ -32,7 +32,7 @@
       };
       tick();
     });
-  }
+  };
 
   function getText(el) {
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
@@ -111,16 +111,19 @@
       }
     }
 
+    // Forçar visibilidade inicial
     [pg1, pg2].forEach((el, i) => {
       if (el) {
         el.style.color = '#fff !important';
         el.style.opacity = i === 0 ? '1 !important' : '0 !important';
         el.style.visibility = 'visible !important';
         el.style.display = i === 0 ? 'block !important' : 'none !important';
+        el.classList.remove('hidden'); // Remover class hidden se presente
         console.log(`[section-termos] Texto ${i+1} inicializado:`, el.id, el.textContent?.substring(0, 50));
       }
     });
 
+    // Estilizar root
     root.style.cssText = `
       background: transparent !important;
       padding: 30px !important;
@@ -134,8 +137,11 @@
       visibility: visible !important;
       position: relative !important;
       z-index: 2 !important;
+      overflow: visible !important; // Remover barra de rolamento
+      max-height: none !important;
     `;
 
+    // Estilizar botões
     [nextBtn, prevBtn, avancarBtn].forEach(btn => {
       if (btn) {
         btn.classList.add('btn', 'btn-primary', 'btn-stone');
@@ -146,15 +152,18 @@
       }
     });
 
+    // Configurar chama
     if (typeof window.setupCandleFlame === 'function') {
       window.setupCandleFlame('media', 'flame-bottom-right');
     }
 
+    // Lógica de navegação entre termos-pg1 e termos-pg2
     once(nextBtn, 'click', () => {
       if (currentTermosPage === 1 && pg2) {
         pg1.style.display = 'none !important';
         pg2.style.display = 'block !important';
         pg2.style.opacity = '1 !important';
+        pg2.classList.remove('hidden');
         pg2.scrollIntoView({ behavior: 'smooth' });
         currentTermosPage = 2;
         console.log('[section-termos] Mostrando termos-pg2');
@@ -167,6 +176,7 @@
         pg2.style.display = 'none !important';
         pg1.style.display = 'block !important';
         pg1.style.opacity = '1 !important';
+        pg1.classList.remove('hidden');
         currentTermosPage = 1;
         console.log('[section-termos] Voltando para termos-pg1');
         avancarBtn.textContent = 'Avançar';
@@ -187,6 +197,7 @@
           pg1.style.display = 'none !important';
           pg2.style.display = 'block !important';
           pg2.style.opacity = '1 !important';
+          pg2.classList.remove('hidden');
           currentTermosPage = 2;
           console.log('[section-termos] Mostrando termos-pg2 antes de avançar');
           avancarBtn.textContent = 'Aceito e quero continuar';
@@ -194,6 +205,7 @@
       }
     });
 
+    // Função de datilografia simplificada
     const runTypingChain = async () => {
       console.log('[section-termos] Iniciando datilografia...');
       const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
@@ -237,17 +249,11 @@
         TERMOS_READY = true;
       } catch (err) {
         console.error('[section-termos] Erro na datilografia:', err);
-        [pg1, pg2].forEach((el, i) => {
-          if (el) {
-            el.querySelectorAll('[data-typing="true"]').forEach(child => {
-              child.textContent = getText(child);
-              child.classList.add('typing-done');
-              child.style.opacity = '1 !important';
-              child.style.color = '#fff !important';
-            });
-            el.style.opacity = i === 0 ? '1 !important' : currentTermosPage === 2 ? '1 !important' : '0 !important';
-            el.style.display = i === 0 ? 'block !important' : currentTermosPage === 2 ? 'block !important' : 'none !important';
-          }
+        root.querySelectorAll('[data-typing="true"]').forEach(el => {
+          el.textContent = getText(el);
+          el.classList.add('typing-done');
+          el.style.opacity = '1 !important';
+          el.style.color = '#fff !important';
         });
         [nextBtn, prevBtn, avancarBtn].forEach(btn => {
           if (btn) btn.disabled = false;
