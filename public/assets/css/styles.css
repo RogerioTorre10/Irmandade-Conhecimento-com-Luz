@@ -222,6 +222,7 @@ label {
 .senha-wrap {
   position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
   width: 100%;
   max-width: 400px;
@@ -231,6 +232,13 @@ label {
 .senha-wrap .input {
   padding-right: 42px;
   width: 100%;
+}
+
+.senha-input-group {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 20px;
 }
 
 .senha-eye, .btn-toggle-senha {
@@ -366,7 +374,7 @@ TÍTULO: JORNADA ESPECÍFICA
   visibility: visible;
   z-index: 2;
   overflow: hidden;
-  max-height: 80vh;
+  max-height: 70vh;
 }
 
 .intro-paragraph,
@@ -375,8 +383,8 @@ TÍTULO: JORNADA ESPECÍFICA
 #termos-pg1 p, #termos-pg1 li, #termos-pg1 h2,
 #termos-pg2 p, #termos-pg2 li, #termos-pg2 h3,
 #section-senha h2, #section-senha p {
-  font-size: 18px;
-  margin-bottom: 20px;
+  font-size: 16px; /* Reduzir tamanho */
+  margin-bottom: 15px;
   color: #fff;
   opacity: 0;
   visibility: visible;
@@ -384,6 +392,7 @@ TÍTULO: JORNADA ESPECÍFICA
   font-family: 'BerkshireSwash', cursive;
   text-align: left;
   background: transparent;
+  line-height: 1.4;
 }
 
 .intro-paragraph.typing-active,
@@ -402,26 +411,25 @@ TÍTULO: JORNADA ESPECÍFICA
 
 .btn.btn-primary.btn-stone,
 .nextBtn, .prevBtn, .avancarBtn, #btn-senha-avancar {
-  padding: 10px 20px;
+  padding: 12px 24px;
   background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
   background-blend-mode: overlay;
-  color: #fff;
+  color: #fff !important;
   border-radius: 8px;
-  font-size: 20px;
+  font-size: 18px;
   font-family: 'ManufacturingConsent', sans-serif;
   border: 3px solid #4a4a4a;
   box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);
   text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
   opacity: 1;
   visibility: visible;
-  display: inline-block;
+  display: block;
   cursor: pointer;
-  margin: 10px auto;
+  margin: 15px auto;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  width: auto;
-  min-width: 200px;
+  width: 100%;
   max-width: 300px;
-  position: relative;
+  text-align: center;
 }
 
 .btn.btn-primary.btn-stone:hover,
@@ -441,12 +449,21 @@ TÍTULO: JORNADA ESPECÍFICA
   align-items: center;
   width: 100%;
   max-width: 400px;
-  margin: 20px auto;
+  margin-bottom: 20px;
+  position: relative;
 }
 
 .intro-actions {
   text-align: center;
   margin-top: 20px;
+}
+
+.footer-actions {
+  text-align: center;
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
 }
 
 .flame-corner,
