@@ -21,7 +21,7 @@
       const tick = () => {
         let el = within.querySelector(selector);
         if (!el && within !== document) {
-          el = document.querySelector(`.container ${selector}`);
+          el = document.querySelector(`#jornada-content-wrapper ${selector}`);
         }
         if (el) return resolve(el);
         if (performance.now() - start >= timeout) {
@@ -51,7 +51,7 @@
     if (!root) {
       try {
         root = await waitForElement('#section-senha', { 
-          within: document.querySelector('.container') || document, 
+          within: document.getElementById('jornada-content-wrapper') || document, 
           timeout: 10000 
         });
       } catch (e) {
@@ -110,7 +110,7 @@
         btn.style.opacity = '1 !important';
         btn.style.cursor = 'pointer !important';
         btn.style.display = 'block !important';
-        btn.style.margin = '10px auto !important';
+        btn.style.margin = '8px auto !important';
         console.log('[section-senha] Botão habilitado:', btn.className, btn.textContent);
       }
     });
