@@ -44,46 +44,47 @@
     return { sectionId, node };
   }
 
-  const handler = async (evt) => {
+ const handler = async (evt) => {
   const { sectionId, node } = fromDetail(evt?.detail);
-  if (sectionId !== 'section-termos') return;
+  if (sectionId !== 'section-intro') return;
 
-  let root = node || document.getElementById('section-termos');
+  let root = node || document.getElementById('section-intro');
   if (!root) {
     try {
-      root = await waitForElement('#section-termos', { 
+      root = await waitForElement('#section-intro', { 
         within: document.getElementById('jornada-content-wrapper') || document, 
         timeout: 10000 
       });
     } catch (e) {
-      window.toast?.('Erro: Seção section-termos não carregada.', 'error');
-      console.error('[section-termos] Section not found:', e);
+      window.toast?.('Erro: Seção section-intro não carregada.', 'error');
+      console.error('[section-intro] Section not found:', e);
       return;
     }
   }
 
-  let pg1, pg2, nextBtn, prevBtn, avancarBtn;
+  root.classList.add('section-intro'); // Adicionar classe para CSS específico
+
+  let p1_1, p1_2, p1_3, p2_1, p2_2, avancarBtn;
   try {
-    pg1 = await waitForElement('#termos-pg1', { within: root, timeout: 10000 });
-    pg2 = await waitForElement('#termos-pg2', { within: root, timeout: 10000 });
-    nextBtn = await waitForElement('.nextBtn[data-action="termos-next"]', { within: root, timeout: 10000 });
-    prevBtn = await waitForElement('.prevBtn[data-action="termos-prev"]', { within: root, timeout: 10000 });
-    avancarBtn = await waitForElement('.avancarBtn[data-action="avancar"]', { within: root, timeout: 10000 });
+    p1_1 = await waitForElement('#intro-p1-1', { within: root, timeout: 10000 });
+    p1_2 = await waitForElement('#intro-p1-2', { within: root, timeout: 10000 });
+    p1_3 = await waitForElement('#intro-p1-3', { within: root, timeout: 10000 });
+    p2_1 = await waitForElement('#intro-p2-1', { within: root, timeout: 10000 });
+    p2_2 = await waitForElement('#intro-p2-2', { within: root, timeout: 10000 });
+    avancarBtn = await waitForElement('#btn-avancar', { within: root, timeout: 10000 });
   } catch (e) {
-    console.error('[section-termos] Elements not found:', e);
-    window.toast?.('Falha ao carregar os elementos da seção Termos.', 'error');
+    console.error('[section-intro] Elements not found:', e);
+    window.toast?.('Falha ao carregar os elementos da seção Intro.', 'error');
     return;
   }
 
-  root.classList.add('section-termos'); // Adicionar classe para CSS específico
-
-  [pg1, pg2].forEach((el, i) => {
+  [p1_1, p1_2, p1_3, p2_1, p2_2].forEach(el => {
     if (el) {
-      el.style.opacity = i === 0 ? '1 !important' : '0 !important';
-      el.style.visibility = i === 0 ? 'visible !important' : 'hidden !important';
-      el.style.display = i === 0 ? 'block !important' : 'none !important';
-      el.classList.remove('hidden');
-      console.log(`[section-termos] Página ${i+1} inicializada:`, el.id);
+      el.style.color = '#fff !important';
+      el.style.opacity = '0 !important';
+      el.style.visibility = 'hidden !important';
+      el.style.display = 'none !important';
+      console.log('[section-intro] Texto inicializado:', el.id, el.textContent?.substring(0, 50));
     }
   });
 
@@ -108,98 +109,47 @@
     box-sizing: border-box !important;
   `;
 
-  [nextBtn, prevBtn, avancarBtn].forEach(btn => {
-    if (btn) {
-      btn.classList.add('btn', 'btn-primary', 'btn-stone');
-      btn.disabled = true;
-      btn.style.opacity = '0.5 !important';
-      btn.style.cursor = 'not-allowed !important';
-      btn.style.display = 'inline-block !important';
-      btn.style.margin = '8px !important';
-      btn.style.visibility = 'visible !important';
-      console.log('[section-termos] Botão inicializado:', btn.className, btn.textContent);
-    }
-  });
+  if (avancarBtn) {
+    avancarBtn.classList.add('btn', 'btn-primary', 'btn-stone');
+    avancarBtn.disabled = true;
+    avancarBtn.style.opacity = '0.5 !important';
+    avancarBtn.style.cursor = 'not-allowed !important';
+    avancarBtn.style.display = 'inline-block !important';
+    avancarBtn.style.margin = '8px auto !important';
+    avancarBtn.style.visibility = 'visible !important';
+    avancarBtn.textContent = 'Iniciar';
+    console.log('[section-intro] Botão inicializado:', avancarBtn.className, avancarBtn.textContent);
+  }
 
-  once(nextBtn, 'click', async () => {
-    if (currentTermosPage === 1 && pg2) {
-      pg1.style.display = 'none !important';
-      pg1.style.opacity = '0 !important';
-      pg1.style.visibility = 'hidden !important';
-      pg2.style.display = 'block !important';
-      pg2.style.opacity = '1 !important';
-      pg2.style.visibility = 'visible !important';
-      pg2.classList.remove('hidden');
-      pg2.scrollIntoView({ behavior: 'smooth' });
-      currentTermosPage = 2;
-      console.log('[section-termos] Mostrando termos-pg2');
-      avancarBtn.textContent = 'Aceito e quero continuar';
-      await runTypingChain();
-    }
-  });
-
-  once(prevBtn, 'click', async () => {
-    if (currentTermosPage === 2 && pg1) {
-      pg2.style.display = 'none !important';
-      pg2.style.opacity = '0 !important';
-      pg2.style.visibility = 'hidden !important';
-      pg1.style.display = 'block !important';
-      pg1.style.opacity = '1 !important';
-      pg1.style.visibility = 'visible !important';
-      pg1.classList.remove('hidden');
-      currentTermosPage = 1;
-      console.log('[section-termos] Voltando para termos-pg1');
-      avancarBtn.textContent = 'Avançar';
-      await runTypingChain();
-    }
-  });
-
-  once(avancarBtn, 'click', async () => {
-    if (currentTermosPage === 2) {
-      console.log('[section-termos] Avançando para section-senha');
-      if (typeof window.JC?.show === 'function') {
-        window.JC.show('section-senha');
-      } else {
-        window.location.href = '/senha';
-        console.warn('[section-termos] Fallback navigation to /senha');
-      }
-    } else if (pg2 && currentTermosPage === 1) {
-      pg1.style.display = 'none !important';
-      pg1.style.opacity = '0 !important';
-      pg1.style.visibility = 'hidden !important';
-      pg2.style.display = 'block !important';
-      pg2.style.opacity = '1 !important';
-      pg2.style.visibility = 'visible !important';
-      pg2.classList.remove('hidden');
-      currentTermosPage = 2;
-      console.log('[section-termos] Mostrando termos-pg2 antes de avançar');
-      avancarBtn.textContent = 'Aceito e quero continuar';
-      await runTypingChain();
+  once(avancarBtn, 'click', () => {
+    console.log('[section-intro] Avançando para section-termos');
+    if (typeof window.JC?.show === 'function') {
+      window.JC.show('section-termos');
+    } else {
+      window.location.href = '/termos';
+      console.warn('[section-intro] Fallback navigation to /termos');
     }
   });
 
   const runTypingChain = async () => {
-    console.log('[section-termos] Iniciando datilografia...');
-    const typingElements = root.querySelectorAll(`#termos-pg${currentTermosPage} [data-typing="true"]:not(.typing-done)`);
+    console.log('[section-intro] Iniciando datilografia...');
+    const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
 
     if (!typingElements.length) {
-      console.warn('[section-termos] Nenhum elemento com data-typing="true" encontrado');
-      [nextBtn, prevBtn, avancarBtn].forEach(btn => {
-        if (btn) {
-          btn.disabled = false;
-          btn.style.opacity = '1 !important';
-          btn.style.visibility = 'visible !important';
-          btn.style.cursor = 'pointer !important';
-        }
-      });
+      console.warn('[section-intro] Nenhum elemento com data-typing="true" encontrado');
+      if (avancarBtn) {
+        avancarBtn.disabled = false;
+        avancarBtn.style.opacity = '1 !important';
+        avancarBtn.style.cursor = 'pointer !important';
+      }
       return;
     }
 
-    console.log('[section-termos] Elementos encontrados:', Array.from(typingElements).map(el => el.tagName + (el.id ? `#${el.id}` : '')));
+    console.log('[section-intro] Elementos encontrados:', Array.from(typingElements).map(el => el.id));
 
     // Fallback para window.runTyping
     if (typeof window.runTyping !== 'function') {
-      console.warn('[section-termos] window.runTyping não encontrado, usando fallback');
+      console.warn('[section-intro] window.runTyping não encontrado, usando fallback');
       window.runTyping = (el, text, resolve, options) => {
         let i = 0;
         const speed = options.speed || 20;
@@ -218,7 +168,7 @@
 
     for (const el of typingElements) {
       const text = getText(el);
-      console.log('[section-termos] Datilografando:', el.tagName, text.substring(0, 50));
+      console.log('[section-intro] Datilografando:', el.id, text.substring(0, 50));
       
       try {
         el.textContent = '';
@@ -237,7 +187,7 @@
         el.style.visibility = 'visible !important';
         el.style.display = 'block !important';
       } catch (err) {
-        console.error('[section-termos] Erro na datilografia para', el.tagName, err);
+        console.error('[section-intro] Erro na datilografia para', el.id, err);
         el.textContent = text;
         el.classList.add('typing-done');
         el.style.opacity = '1 !important';
@@ -248,36 +198,33 @@
       try {
         if (typeof window.EffectCoordinator?.speak === 'function') {
           window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
-          console.log('[section-termos] TTS ativado para:', el.tagName);
+          console.log('[section-intro] TTS ativado para:', el.id);
           await new Promise(resolve => setTimeout(resolve, text.length * 30));
         } else {
-          console.warn('[section-termos] window.EffectCoordinator.speak não encontrado');
+          console.warn('[section-intro] window.EffectCoordinator.speak não encontrado');
         }
       } catch (err) {
-        console.error('[section-termos] Erro no TTS para', el.tagName, err);
+        console.error('[section-intro] Erro no TTS para', el.id, err);
       }
       
       await new Promise(resolve => setTimeout(resolve, 300));
     }
     
-    console.log('[section-termos] Datilografia concluída');
-    [nextBtn, prevBtn, avancarBtn].forEach(btn => {
-      if (btn) {
-        btn.disabled = false;
-        btn.style.opacity = '1 !important';
-        btn.style.visibility = 'visible !important';
-        btn.style.cursor = 'pointer !important';
-      }
-    });
+    console.log('[section-intro] Datilografia concluída');
+    if (avancarBtn) {
+      avancarBtn.disabled = false;
+      avancarBtn.style.opacity = '1 !important';
+      avancarBtn.style.cursor = 'pointer !important';
+    }
   };
 
   // Forçar inicialização
-  TERMOS_READY = false;
+  INTRO_READY = false;
   try {
     await runTypingChain();
-    TERMOS_READY = true;
+    INTRO_READY = true;
   } catch (err) {
-    console.error('[section-termos] Erro na datilografia:', err);
+    console.error('[section-intro] Erro na datilografia:', err);
     root.querySelectorAll('[data-typing="true"]').forEach(el => {
       el.textContent = getText(el);
       el.classList.add('typing-done');
@@ -285,25 +232,22 @@
       el.style.visibility = 'visible !important';
       el.style.display = 'block !important';
     });
-    [nextBtn, prevBtn, avancarBtn].forEach(btn => {
-      if (btn) {
-        btn.disabled = false;
-        btn.style.opacity = '1 !important';
-        btn.style.visibility = 'visible !important';
-        btn.style.cursor = 'pointer !important';
-      }
-    });
+    if (avancarBtn) {
+      avancarBtn.disabled = false;
+      avancarBtn.style.opacity = '1 !important';
+      avancarBtn.style.cursor = 'pointer !important';
+    }
   }
 
-  console.log('[section-termos] Elementos encontrados:', {
-    pg1: !!pg1, pg1Id: pg1?.id,
-    pg2: !!pg2, pg2Id: pg2?.id,
-    nextBtn: !!nextBtn, nextClass: nextBtn?.className,
-    prevBtn: !!prevBtn, prevClass: prevBtn?.className,
-    avancarBtn: !!avancarBtn, avancarClass: avancarBtn?.className
+  console.log('[section-intro] Elementos encontrados:', {
+    p1_1: !!p1_1, p1_1Id: p1_1?.id,
+    p1_2: !!p1_2, p1_2Id: p1_2?.id,
+    p1_3: !!p1_3, p1_3Id: p1_3?.id,
+    p2_1: !!p2_1, p2_1Id: p2_1?.id,
+    p2_2: !!p2_2, p2_2Id: p2_2?.id,
+    avancarBtn: !!avancarBtn, avancarId: avancarBtn?.id
   });
 };
-
   const bind = () => {
     document.removeEventListener('sectionLoaded', handler);
     document.removeEventListener('section:shown', handler);
