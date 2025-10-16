@@ -396,28 +396,32 @@
     window.JCTermos.state.listenerAdded = true;
   }
 
-  // Inicialização manual
+  // Inicialização manual com tentativas repetidas
   const bind = () => {
     console.log('[JCTermos] Executando bind');
     document.removeEventListener('sectionLoaded', handler);
     document.removeEventListener('section:shown', handler);
     document.addEventListener('sectionLoaded', handler, { passive: true, once: true });
 
-    setTimeout(() => {
-      const visibleTermos = document.querySelector('#section-termos:not(.hidden)');
-      if (visibleTermos && !window.JCTermos.state.ready && !visibleTermos.dataset.termosInitialized) {
-        console.log('[JCTermos] Seção visível encontrada, disparando handler');
-        handler({ detail: { sectionId: 'section-termos', node: visibleTermos } });
-      } else {
-        console.log('[JCTermos] Nenhuma seção visível ou já inicializada');
-        // Tentar inicialização manual se a seção existir
-        const root = document.getElementById('section-termos');
-        if (root && !window.JCTermos.state.ready && !root.dataset.termosInitialized) {
-          console.log('[JCTermos] Forçando inicialização manual');
-          handler({ detail: { sectionId: 'section-termos', node: root } });
+    const tryInitialize = (attempt = 1, maxAttempts = 5) => {
+      setTimeout(() => {
+        const visibleTermos = document.querySelector('#section-termos:not(.hidden)');
+        if (visibleTermos && !window.JCTermos.state.ready && !visibleTermos.dataset.termosInitialized) {
+          console.log('[JCTermos] Seção visível encontrada, disparando handler');
+          handler({ detail: { sectionId: 'section-termos', node: visibleTermos } });
+        } else if (document.getElementById('section-termos') && !window.JCTermos.state.ready && !document.getElementById('section-termos').dataset.termosInitialized) {
+          console.log('[JCTermos] Forçando inicialização manual (tentativa ' + attempt + ')');
+          handler({ detail: { sectionId: 'section-termos', node: document.getElementById('section-termos') } });
+        } else if (attempt < maxAttempts) {
+          console.log('[JCTermos] Nenhuma seção visível ou já inicializada, tentando novamente...');
+          tryInitialize(attempt + 1, maxAttempts);
+        } else {
+          console.error('[JCTermos] Falha ao inicializar após ' + maxAttempts + ' tentativas');
         }
-      }
-    }, 2000);
+      }, 2000 * attempt);
+    };
+
+    tryInitialize();
   };
 
   if (document.readyState === 'loading') {
