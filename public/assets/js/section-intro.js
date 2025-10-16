@@ -125,8 +125,8 @@
       p1_1 = p1_1 || createFallbackElement('intro-p1-1');
       p1_2 = p1_2 || createFallbackElement('intro-p1-2');
       p1_3 = p1_3 || createFallbackElement('intro-p1-3');
-      p2_1 = p1_1 || createFallbackElement('intro-p2-1');
-      p2_2 = p1_2 || createFallbackElement('intro-p2-2');
+      p2_1 = p2_1 || createFallbackElement('intro-p2-1');
+      p2_2 = p2_2 || createFallbackElement('intro-p2-2');
       avancarBtn = avancarBtn || document.createElement('button');
       avancarBtn.id = 'btn-avancar';
       root.appendChild(avancarBtn);
@@ -226,7 +226,7 @@
         console.warn('[JCIntro] window.runTyping não encontrado, usando fallback');
         window.runTyping = (el, text, resolve, options) => {
           let i = 0;
-          const speed = options.speed || 50;
+          const speed = options.speed || 100; // Aumentado de 50ms para 100ms
           const type = () => {
             if (i < text.length) {
               el.textContent += text.charAt(i);
@@ -253,7 +253,7 @@
           el.style.display = 'block';
           el.style.visibility = 'hidden';
           await new Promise(resolve => window.runTyping(el, text, resolve, {
-            speed: Number(el.dataset.speed || 50),
+            speed: Number(el.dataset.speed || 100), // Aumentado de 50ms para 100ms
             cursor: String(el.dataset.cursor || 'true') === 'true'
           }));
           el.classList.add('typing-done');
@@ -262,11 +262,25 @@
           el.style.visibility = 'visible';
           el.style.display = 'block';
           if (typeof window.EffectCoordinator?.speak === 'function') {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'pt-BR';
+            utterance.rate = 1.1;
+            utterance.pitch = 1.0;
+            console.log('[JCIntro] TTS iniciado para:', el.id);
             window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
-            console.log('[JCIntro] TTS ativado para:', el.id);
-            await new Promise(resolve => setTimeout(resolve, text.length * 30));
+            // Esperar o TTS terminar
+            await new Promise(resolve => {
+              utterance.onend = () => {
+                console.log('[JCIntro] TTS concluído para:', el.id);
+                resolve();
+              };
+              // Fallback para garantir que não fique preso
+              setTimeout(resolve, text.length * 50); // Aumentado de 30ms para 50ms por caractere
+            });
           } else {
             console.warn('[JCIntro] window.EffectCoordinator.speak não encontrado');
+            // Fallback para aguardar um tempo proporcional ao texto
+            await new Promise(resolve => setTimeout(resolve, text.length * 50));
           }
         } catch (err) {
           console.error('[JCIntro] Erro na datilografia para', el.id, err);
