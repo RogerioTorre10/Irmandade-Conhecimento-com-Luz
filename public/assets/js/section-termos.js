@@ -53,7 +53,7 @@ const handler = async (evt) => {
     try {
       root = await waitForElement('#section-termos', { 
         within: document.getElementById('jornada-content-wrapper') || document, 
-        timeout: 10000 
+        timeout: 15000 
       });
     } catch (e) {
       window.toast?.('Erro: Seção section-termos não carregada.', 'error');
@@ -66,11 +66,11 @@ const handler = async (evt) => {
 
   let pg1, pg2, nextBtn, prevBtn, avancarBtn;
   try {
-    pg1 = await waitForElement('#termos-pg1', { within: root, timeout: 10000 });
-    pg2 = await waitForElement('#termos-pg2', { within: root, timeout: 10000 });
-    nextBtn = await waitForElement('.nextBtn[data-action="termos-next"]', { within: root, timeout: 10000 });
-    prevBtn = await waitForElement('.prevBtn[data-action="termos-prev"]', { within: root, timeout: 10000 });
-    avancarBtn = await waitForElement('.avancarBtn[data-action="avancar"]', { within: root, timeout: 10000 });
+    pg1 = await waitForElement('#termos-pg1', { within: root, timeout: 15000 });
+    pg2 = await waitForElement('#termos-pg2', { within: root, timeout: 15000 });
+    nextBtn = await waitForElement('.nextBtn[data-action="termos-next"]', { within: root, timeout: 15000 });
+    prevBtn = await waitForElement('.prevBtn[data-action="termos-prev"]', { within: root, timeout: 15000 });
+    avancarBtn = await waitForElement('.avancarBtn[data-action="avancar"]', { within: root, timeout: 15000 });
   } catch (e) {
     console.error('[section-termos] Elements not found:', e);
     window.toast?.('Falha ao carregar os elementos da seção Termos.', 'error');
@@ -209,6 +209,7 @@ const handler = async (evt) => {
             i++;
             setTimeout(type, speed);
           } else {
+            el.textContent = text; // Garantir texto completo
             resolve();
           }
         };
@@ -236,17 +237,9 @@ const handler = async (evt) => {
         el.style.opacity = '1 !important';
         el.style.visibility = 'visible !important';
         el.style.display = 'block !important';
-      } catch (err) {
-        console.error('[section-termos] Erro na datilografia para', el.tagName, err);
-        el.textContent = text;
-        el.classList.add('typing-done');
-        el.style.opacity = '1 !important';
-        el.style.visibility = 'visible !important';
-        el.style.display = 'block !important';
-      }
-      
-      try {
+        // Chamada única para TTS
         if (typeof window.EffectCoordinator?.speak === 'function') {
+          window.EffectCoordinator.cancel(); // Cancelar qualquer TTS em andamento
           window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
           console.log('[section-termos] TTS ativado para:', el.tagName);
           await new Promise(resolve => setTimeout(resolve, text.length * 30));
@@ -254,7 +247,12 @@ const handler = async (evt) => {
           console.warn('[section-termos] window.EffectCoordinator.speak não encontrado');
         }
       } catch (err) {
-        console.error('[section-termos] Erro no TTS para', el.tagName, err);
+        console.error('[section-termos] Erro na datilografia para', el.tagName, err);
+        el.textContent = text;
+        el.classList.add('typing-done');
+        el.style.opacity = '1 !important';
+        el.style.visibility = 'visible !important';
+        el.style.display = 'block !important';
       }
       
       await new Promise(resolve => setTimeout(resolve, 300));
@@ -272,10 +270,10 @@ const handler = async (evt) => {
   };
 
   // Forçar inicialização
-  TERMOS_READY = false;
+  window.TERMOS_READY = false;
   try {
     await runTypingChain();
-    TERMOS_READY = true;
+    window.TERMOS_READY = true;
   } catch (err) {
     console.error('[section-termos] Erro na datilografia:', err);
     root.querySelectorAll('[data-typing="true"]').forEach(el => {
