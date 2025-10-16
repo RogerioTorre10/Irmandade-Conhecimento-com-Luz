@@ -48,6 +48,12 @@ const handler = async (evt) => {
   const { sectionId, node } = fromDetail(evt?.detail);
   if (sectionId !== 'section-termos') return;
 
+  // Verificar se já foi inicializado
+  if (window.TERMOS_READY) {
+    console.log('[section-termos] Já inicializado, ignorando...');
+    return;
+  }
+
   let root = node || document.getElementById('section-termos');
   if (!root) {
     try {
@@ -122,7 +128,7 @@ const handler = async (evt) => {
   });
 
   once(nextBtn, 'click', async () => {
-    if (currentTermosPage === 1 && pg2) {
+    if (window.currentTermosPage === 1 && pg2) {
       pg1.style.display = 'none !important';
       pg1.style.opacity = '0 !important';
       pg1.style.visibility = 'hidden !important';
@@ -131,7 +137,7 @@ const handler = async (evt) => {
       pg2.style.visibility = 'visible !important';
       pg2.classList.remove('hidden');
       pg2.scrollIntoView({ behavior: 'smooth' });
-      currentTermosPage = 2;
+      window.currentTermosPage = 2;
       console.log('[section-termos] Mostrando termos-pg2');
       avancarBtn.textContent = 'Aceito e quero continuar';
       await runTypingChain();
@@ -139,7 +145,7 @@ const handler = async (evt) => {
   });
 
   once(prevBtn, 'click', async () => {
-    if (currentTermosPage === 2 && pg1) {
+    if (window.currentTermosPage === 2 && pg1) {
       pg2.style.display = 'none !important';
       pg2.style.opacity = '0 !important';
       pg2.style.visibility = 'hidden !important';
@@ -147,7 +153,7 @@ const handler = async (evt) => {
       pg1.style.opacity = '1 !important';
       pg1.style.visibility = 'visible !important';
       pg1.classList.remove('hidden');
-      currentTermosPage = 1;
+      window.currentTermosPage = 1;
       console.log('[section-termos] Voltando para termos-pg1');
       avancarBtn.textContent = 'Avançar';
       await runTypingChain();
@@ -155,7 +161,7 @@ const handler = async (evt) => {
   });
 
   once(avancarBtn, 'click', async () => {
-    if (currentTermosPage === 2) {
+    if (window.currentTermosPage === 2) {
       console.log('[section-termos] Avançando para section-senha');
       if (typeof window.JC?.show === 'function') {
         window.JC.show('section-senha');
@@ -163,7 +169,7 @@ const handler = async (evt) => {
         window.location.href = '/senha';
         console.warn('[section-termos] Fallback navigation to /senha');
       }
-    } else if (pg2 && currentTermosPage === 1) {
+    } else if (pg2 && window.currentTermosPage === 1) {
       pg1.style.display = 'none !important';
       pg1.style.opacity = '0 !important';
       pg1.style.visibility = 'hidden !important';
@@ -171,7 +177,7 @@ const handler = async (evt) => {
       pg2.style.opacity = '1 !important';
       pg2.style.visibility = 'visible !important';
       pg2.classList.remove('hidden');
-      currentTermosPage = 2;
+      window.currentTermosPage = 2;
       console.log('[section-termos] Mostrando termos-pg2 antes de avançar');
       avancarBtn.textContent = 'Aceito e quero continuar';
       await runTypingChain();
@@ -180,7 +186,7 @@ const handler = async (evt) => {
 
   const runTypingChain = async () => {
     console.log('[section-termos] Iniciando datilografia...');
-    const typingElements = root.querySelectorAll(`#termos-pg${currentTermosPage} [data-typing="true"]:not(.typing-done)`);
+    const typingElements = root.querySelectorAll(`#termos-pg${window.currentTermosPage} [data-typing="true"]:not(.typing-done)`);
 
     if (!typingElements.length) {
       console.warn('[section-termos] Nenhum elemento com data-typing="true" encontrado');
@@ -202,7 +208,7 @@ const handler = async (evt) => {
       console.warn('[section-termos] window.runTyping não encontrado, usando fallback');
       window.runTyping = (el, text, resolve, options) => {
         let i = 0;
-        const speed = options.speed || 50; // Ajustado para 50ms
+        const speed = options.speed || 50;
         const type = () => {
           if (i < text.length) {
             el.textContent += text.charAt(i);
@@ -229,7 +235,7 @@ const handler = async (evt) => {
         el.style.display = 'block !important';
         el.style.visibility = 'hidden !important';
         await new Promise(resolve => window.runTyping(el, text, resolve, {
-          speed: Number(el.dataset.speed || 50), // Ajustado para 50ms
+          speed: Number(el.dataset.speed || 50),
           cursor: String(el.dataset.cursor || 'true') === 'true'
         }));
         el.classList.add('typing-done');
@@ -270,6 +276,7 @@ const handler = async (evt) => {
 
   // Forçar inicialização
   window.TERMOS_READY = false;
+  window.currentTermosPage = window.currentTermosPage || 1; // Inicializar página
   try {
     await runTypingChain();
     window.TERMOS_READY = true;
@@ -300,6 +307,12 @@ const handler = async (evt) => {
     avancarBtn: !!avancarBtn, avancarClass: avancarBtn?.className
   });
 };
+
+// Registrar handler apenas uma vez
+if (!window.TERMOS_LISTENER) {
+  window.addEventListener('sectionLoaded', handler);
+  window.TERMOS_LISTENER = true;
+}
   const bind = () => {
     document.removeEventListener('sectionLoaded', handler);
     document.removeEventListener('section:shown', handler);
