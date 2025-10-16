@@ -30,7 +30,7 @@
     el.addEventListener(ev, h);
   };
 
-  async function waitForElement(selector, { within = document, timeout = 10000, step = 50 } = {}) {
+  async function waitForElement(selector, { within = document, timeout = 5000, step = 50 } = {}) {
     console.log('[JCTermos] Aguardando elemento:', selector);
     const start = performance.now();
     return new Promise((resolve, reject) => {
@@ -118,7 +118,7 @@
       visibility: visible;
       position: relative;
       z-index: 2;
-      overflow: hidden;
+      overflow-y: scroll;
       min-height: 80vh;
       height: 80vh;
       box-sizing: border-box;
@@ -127,11 +127,11 @@
     let pg1, pg2, nextBtn, prevBtn, avancarBtn;
     try {
       console.log('[JCTermos] Buscando elementos...');
-      pg1 = await waitForElement('#termos-pg1', { within: root, timeout: 15000 });
-      pg2 = await waitForElement('#termos-pg2', { within: root, timeout: 15000 });
-      nextBtn = await waitForElement('.nextBtn[data-action="termos-next"]', { within: root, timeout: 15000 });
-      prevBtn = await waitForElement('.prevBtn[data-action="termos-prev"]', { within: root, timeout: 15000 });
-      avancarBtn = await waitForElement('.avancarBtn[data-action="avancar"]', { within: root, timeout: 15000 });
+      pg1 = await waitForElement('#termos-pg1', { within: root, timeout: 5000 });
+      pg2 = await waitForElement('#termos-pg2', { within: root, timeout: 5000 });
+      nextBtn = await waitForElement('.nextBtn[data-action="termos-next"]', { within: root, timeout: 5000 });
+      prevBtn = await waitForElement('.prevBtn[data-action="termos-prev"]', { within: root, timeout: 5000 });
+      avancarBtn = await waitForElement('.avancarBtn[data-action="avancar"]', { within: root, timeout: 5000 });
     } catch (e) {
       console.error('[JCTermos] Elements not found:', e);
       window.toast?.('Falha ao carregar os elementos da seção Termos.', 'error');
@@ -166,7 +166,20 @@
         el.style.display = i === 0 ? 'block' : 'none';
         el.style.opacity = '1';
         el.style.visibility = 'visible';
+        el.style.overflow = 'visible'; // Evitar overflow que cause jumping
+        el.style.minHeight = '60vh'; // Reservar espaço para evitar jumping
         console.log('[JCTermos] Página inicializada:', el.id);
+      }
+    });
+
+    [pg1, pg2].forEach(pg => {
+      if (pg) {
+        pg.querySelectorAll('[data-typing="true"]').forEach(el => {
+          el.style.opacity = '0';
+          el.style.visibility = 'hidden';
+          el.style.display = 'none';
+          console.log('[JCTermos] Texto inicializado:', el.id);
+        });
       }
     });
 
@@ -300,6 +313,7 @@
     };
 
     once(nextBtn, 'click', async () => {
+      speechSynthesis.cancel(); // Cancelar TTS anterior
       if (window.JCTermos.state.currentPage === 1 && pg2) {
         pg1.style.display = 'none';
         pg2.style.display = 'block';
@@ -310,6 +324,7 @@
     });
 
     once(prevBtn, 'click', async () => {
+      speechSynthesis.cancel(); // Cancelar TTS anterior
       if (window.JCTermos.state.currentPage === 2 && pg1) {
         pg2.style.display = 'none';
         pg1.style.display = 'block';
@@ -320,6 +335,7 @@
     });
 
     once(avancarBtn, 'click', async () => {
+      speechSynthesis.cancel(); // Cancelar TTS ao avançar
       if (window.JCTermos.state.currentPage === 2) {
         console.log('[JCTermos] Avançando para section-senha');
         if (typeof window.JC?.show === 'function') {
