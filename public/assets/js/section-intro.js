@@ -179,7 +179,7 @@
     }
 
     once(avancarBtn, 'click', (e) => {
-  if (e.isTrusted) { // Verificar se é um clique real, não simulado
+  if (e.isTrusted) { // Verificar se é um clique real
     console.log('[JCIntro] Avançando para section-termos');
     if (typeof window.JC?.show === 'function') {
       window.JC.show('section-termos');
