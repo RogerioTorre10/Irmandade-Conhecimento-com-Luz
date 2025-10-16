@@ -131,91 +131,87 @@ const handler = async (evt) => {
   });
 
   const runTypingChain = async () => {
-    console.log('[section-intro] Iniciando datilografia...');
-    const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
+  console.log('[section-intro] Iniciando datilografia...');
+  const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
 
-    if (!typingElements.length) {
-      console.warn('[section-intro] Nenhum elemento com data-typing="true" encontrado');
-      if (avancarBtn) {
-        avancarBtn.disabled = false;
-        avancarBtn.style.opacity = '1 !important';
-        avancarBtn.style.cursor = 'pointer !important';
-      }
-      return;
-    }
-
-    console.log('[section-intro] Elementos encontrados:', Array.from(typingElements).map(el => el.id));
-
-    // Fallback para window.runTyping
-    if (typeof window.runTyping !== 'function') {
-      console.warn('[section-intro] window.runTyping não encontrado, usando fallback');
-      window.runTyping = (el, text, resolve, options) => {
-        let i = 0;
-        const speed = options.speed || 20;
-        const type = () => {
-          if (i < text.length) {
-            el.textContent += text.charAt(i);
-            i++;
-            setTimeout(type, speed);
-          } else {
-            resolve();
-          }
-        };
-        type();
-      };
-    }
-
-    for (const el of typingElements) {
-      const text = getText(el);
-      console.log('[section-intro] Datilografando:', el.id, text.substring(0, 50));
-      
-      try {
-        el.textContent = '';
-        el.classList.add('typing-active', 'lumen-typing');
-        el.style.color = '#fff !important';
-        el.style.opacity = '0 !important';
-        el.style.display = 'block !important';
-        el.style.visibility = 'hidden !important';
-        await new Promise(resolve => window.runTyping(el, text, resolve, {
-          speed: Number(el.dataset.speed || 20),
-          cursor: String(el.dataset.cursor || 'true') === 'true'
-        }));
-        el.classList.add('typing-done');
-        el.classList.remove('typing-active');
-        el.style.opacity = '1 !important';
-        el.style.visibility = 'visible !important';
-        el.style.display = 'block !important';
-      } catch (err) {
-        console.error('[section-intro] Erro na datilografia para', el.id, err);
-        el.textContent = text;
-        el.classList.add('typing-done');
-        el.style.opacity = '1 !important';
-        el.style.visibility = 'visible !important';
-        el.style.display = 'block !important';
-      }
-      
-      try {
-        if (typeof window.EffectCoordinator?.speak === 'function') {
-          window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
-          console.log('[section-intro] TTS ativado para:', el.id);
-          await new Promise(resolve => setTimeout(resolve, text.length * 30));
-        } else {
-          console.warn('[section-intro] window.EffectCoordinator.speak não encontrado');
-        }
-      } catch (err) {
-        console.error('[section-intro] Erro no TTS para', el.id, err);
-      }
-      
-      await new Promise(resolve => setTimeout(resolve, 300));
-    }
-    
-    console.log('[section-intro] Datilografia concluída');
+  if (!typingElements.length) {
+    console.warn('[section-intro] Nenhum elemento com data-typing="true" encontrado');
     if (avancarBtn) {
       avancarBtn.disabled = false;
       avancarBtn.style.opacity = '1 !important';
       avancarBtn.style.cursor = 'pointer !important';
     }
-  };
+    return;
+  }
+
+  console.log('[section-intro] Elementos encontrados:', Array.from(typingElements).map(el => el.id));
+
+  // Fallback para window.runTyping
+  if (typeof window.runTyping !== 'function') {
+    console.warn('[section-intro] window.runTyping não encontrado, usando fallback');
+    window.runTyping = (el, text, resolve, options) => {
+      let i = 0;
+      const speed = options.speed || 20;
+      const type = () => {
+        if (i < text.length) {
+          el.textContent += text.charAt(i);
+          i++;
+          setTimeout(type, speed);
+        } else {
+          resolve();
+        }
+      };
+      type();
+    };
+  }
+
+  for (const el of typingElements) {
+    const text = getText(el);
+    console.log('[section-intro] Datilografando:', el.id, text.substring(0, 50));
+    
+    try {
+      el.textContent = '';
+      el.classList.add('typing-active', 'lumen-typing');
+      el.style.color = '#fff !important';
+      el.style.opacity = '0 !important';
+      el.style.display = 'block !important';
+      el.style.visibility = 'hidden !important';
+      await new Promise(resolve => window.runTyping(el, text, resolve, {
+        speed: Number(el.dataset.speed || 20),
+        cursor: String(el.dataset.cursor || 'true') === 'true'
+      }));
+      el.classList.add('typing-done');
+      el.classList.remove('typing-active');
+      el.style.opacity = '1 !important';
+      el.style.visibility = 'visible !important';
+      el.style.display = 'block !important';
+      // Chamada única para TTS
+      if (typeof window.EffectCoordinator?.speak === 'function') {
+        window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
+        console.log('[section-intro] TTS ativado para:', el.id);
+        await new Promise(resolve => setTimeout(resolve, text.length * 30));
+      } else {
+        console.warn('[section-intro] window.EffectCoordinator.speak não encontrado');
+      }
+    } catch (err) {
+      console.error('[section-intro] Erro na datilografia para', el.id, err);
+      el.textContent = text;
+      el.classList.add('typing-done');
+      el.style.opacity = '1 !important';
+      el.style.visibility = 'visible !important';
+      el.style.display = 'block !important';
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, 300));
+  }
+  
+  console.log('[section-intro] Datilografia concluída');
+  if (avancarBtn) {
+    avancarBtn.disabled = false;
+    avancarBtn.style.opacity = '1 !important';
+    avancarBtn.style.cursor = 'pointer !important';
+  }
+};
 
   // Forçar inicialização
   INTRO_READY = false;
