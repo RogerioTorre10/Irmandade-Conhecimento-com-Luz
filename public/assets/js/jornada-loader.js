@@ -34,7 +34,7 @@ function checkCriticalElements(section, sectionId) {
         section.appendChild(el);
         console.warn(`[carregarEtapa] Created placeholder for ${selector}`);
       }
-      if (!el && selector.startsWith('.nextBtn') || selector.startsWith('.prevBtn') || selector.startsWith('.avancarBtn')) {
+      if (!el && (selector.startsWith('.nextBtn') || selector.startsWith('.prevBtn') || selector.startsWith('.avancarBtn'))) {
         el = document.createElement('button');
         el.classList.add('btn', 'btn-primary', 'btn-stone');
         el.dataset.action = selector.includes('next') ? 'termos-next' : selector.includes('prev') ? 'termos-prev' : 'avancar';
@@ -56,13 +56,18 @@ function checkCriticalElements(section, sectionId) {
     const id = `section-${nome}`;
     console.log('[carregarEtapa] Starting load for', nome, 'ID:', id);
 
-    if (document.getElementById(id)) {
-      console.log(`[carregarEtapa] Section #${id} already in DOM. Skipping.`);
-      const section = document.getElementById(id);
+    const existingSection = document.getElementById(id);
+    if (existingSection && existingSection.dataset.initialized) {
+      console.log(`[carregarEtapa] Section #${id} already initialized. Skipping.`);
+      return existingSection;
+    }
+
+    if (existingSection) {
+      console.log(`[carregarEtapa] Section #${id} already in DOM. Triggering sectionLoaded.`);
       return new Promise(resolve => {
         requestAnimationFrame(() => {
-          document.dispatchEvent(new CustomEvent('sectionLoaded', { detail: { sectionId: id, name: nome, node: section } }));
-          resolve(section);
+          document.dispatchEvent(new CustomEvent('sectionLoaded', { detail: { sectionId: id, name: nome, node: existingSection } }));
+          resolve(existingSection);
         });
       });
     }
@@ -89,6 +94,7 @@ function checkCriticalElements(section, sectionId) {
 
     section.id = id;
     section.classList.add('section');
+    section.dataset.initialized = 'true';
     const criticalElements = checkCriticalElements(section, id);
 
     const wrapper = document.getElementById('jornada-content-wrapper');
@@ -110,6 +116,9 @@ function checkCriticalElements(section, sectionId) {
       });
     });
   }
+
+  window.carregarEtapa = carregarEtapa;
+})();
 
   window.carregarEtapa = carregarEtapa;
 })();
