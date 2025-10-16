@@ -93,27 +93,52 @@
   
 <!-- Inicialização -->
 <script>
-  // Esperar todos os scripts carregarem
-  window.addEventListener('load', () => {
-    try {
-      if (typeof window.JC?.init === 'function') {
-        window.JC.init();
-        console.log('JC.init executado com sucesso');
+  // Função para aguardar scripts
+  const waitForScripts = (callback, maxAttempts = 10, interval = 500) => {
+    let attempts = 0;
+    const check = () => {
+      if (typeof window.JC?.init === 'function' && typeof window.carregarEtapa === 'function') {
+        console.log('[Init] Scripts prontos, executando callback');
+        callback();
+      } else if (attempts < maxAttempts) {
+        attempts++;
+        console.log(`[Init] Aguardando scripts (tentativa ${attempts}/${maxAttempts})...`);
+        setTimeout(check, interval);
       } else {
-        console.error('JC.init não definido. Verifique se jornada-controller.js está carregado.');
-        // Fallback para carregar intro
+        console.error('[Init] Falha ao carregar scripts após várias tentativas');
+        // Fallback para carregar termos diretamente
         if (typeof window.carregarEtapa === 'function') {
-          window.carregarEtapa('intro');
+          console.log('[Init] Fallback: carregando section-termos diretamente');
+          window.carregarEtapa('termos');
+        } else {
+          console.error('[Init] window.carregarEtapa não disponível');
         }
       }
-    } catch (e) {
-      console.error('Falha ao iniciar jornada:', e);
-    }
+    };
+    check();
+  };
+
+  // Inicializar após o carregamento completo
+  window.addEventListener('load', () => {
+    console.log('[Init] Evento load disparado');
+    waitForScripts(() => {
+      try {
+        window.JC.init();
+        console.log('[Init] JC.init executado com sucesso');
+      } catch (e) {
+        console.error('[Init] Falha ao executar JC.init:', e);
+        // Fallback para carregar termos
+        if (typeof window.carregarEtapa === 'function') {
+          window.carregarEtapa('termos');
+          console.log('[Init] Fallback: section-termos carregada');
+        }
+      }
+    });
   });
 </script>
 
-  <noscript>
-    <p style="text-align:center; padding:12px">Ative o JavaScript para usar esta página.</p>
-  </noscript>
+<noscript>
+  <p style="text-align:center; padding:12px">Ative o JavaScript para usar esta página.</p>
+</noscript>
 </body>
 </html>
