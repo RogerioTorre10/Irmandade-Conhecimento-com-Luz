@@ -134,13 +134,11 @@
           setTimeout(check, interval);
         } else {
           console.error('[Init] Falha ao carregar scripts após várias tentativas');
-          // Fallback para carregar termos diretamente
           if (typeof window.carregarEtapa === 'function') {
             console.log('[Init] Fallback: carregando section-termos diretamente');
             window.carregarEtapa('termos');
           } else {
             console.error('[Init] window.carregarEtapa não disponível');
-            // Fallback para carregar intro
             if (typeof window.carregarEtapa === 'function') {
               window.carregarEtapa('intro');
             }
@@ -151,7 +149,6 @@
     check();
   };
 
-  // Inicializar após o carregamento completo
   window.addEventListener('load', () => {
     console.log('[Init] Evento load disparado');
     waitForScripts(() => {
@@ -160,7 +157,6 @@
         console.log('[Init] JC.init executado com sucesso');
       } catch (e) {
         console.error('[Init] Falha ao executar JC.init:', e);
-        // Fallback para carregar termos
         if (typeof window.carregarEtapa === 'function') {
           window.carregarEtapa('termos');
           console.log('[Init] Fallback: section-termos carregada');
