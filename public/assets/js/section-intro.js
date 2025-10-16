@@ -85,7 +85,12 @@
       } catch (e) {
         window.toast?.('Erro: Seção section-intro não carregada.', 'error');
         console.error('[JCIntro] Section not found:', e);
-        return;
+        // Fallback para criar seção
+        const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
+        root = document.createElement('section');
+        root.id = 'section-intro';
+        wrapper.appendChild(root);
+        console.log('[JCIntro] Seção #section-intro criada como fallback');
       }
     }
 
@@ -105,20 +110,24 @@
     } catch (e) {
       console.error('[JCIntro] Elements not found:', e);
       window.toast?.('Falha ao carregar os elementos da seção Intro.', 'error');
-      // Fallback para mostrar elementos
-      root.querySelectorAll('[data-typing="true"]').forEach(el => {
-        el.style.opacity = '1';
-        el.style.visibility = 'visible';
-        el.style.display = 'block';
-      });
-      const fallbackBtn = root.querySelector('#btn-avancar');
-      if (fallbackBtn) {
-        fallbackBtn.style.opacity = '1';
-        fallbackBtn.style.visibility = 'visible';
-        fallbackBtn.style.display = 'inline-block';
-        fallbackBtn.disabled = false;
-      }
-      return;
+      // Fallback para criar elementos
+      const createFallbackElement = (id) => {
+        const el = document.createElement('div');
+        el.id = id;
+        el.setAttribute('data-typing', 'true');
+        el.textContent = `Placeholder para ${id}`;
+        root.appendChild(el);
+        return el;
+      };
+      p1_1 = p1_1 || createFallbackElement('intro-p1-1');
+      p1_2 = p1_2 || createFallbackElement('intro-p1-2');
+      p1_3 = p1_3 || createFallbackElement('intro-p1-3');
+      p2_1 = p2_1 || createFallbackElement('intro-p2-1');
+      p2_2 = p2_2 || createFallbackElement('intro-p2-2');
+      avancarBtn = avancarBtn || document.createElement('button');
+      avancarBtn.id = 'btn-avancar';
+      root.appendChild(avancarBtn);
+      console.log('[JCIntro] Elementos criados como fallback');
     }
 
     console.log('[JCIntro] Elementos carregados:', { p1_1, p1_2, p1_3, p2_1, p2_2, avancarBtn });
@@ -333,7 +342,7 @@
     window.JCIntro.state.LISTENER_ADDED = true;
   }
 
-  // Inicialização manual caso o evento sectionLoaded não seja disparado
+  // Inicialização manual
   const bind = () => {
     console.log('[JCIntro] Executando bind');
     document.removeEventListener('sectionLoaded', handler);
@@ -347,8 +356,13 @@
         handler({ detail: { sectionId: 'section-intro', node: visibleIntro } });
       } else {
         console.log('[JCIntro] Nenhuma seção visível ou já inicializada');
+        // Tentar inicialização manual
+        if (document.getElementById('section-intro') && !window.JCIntro.state.INTRO_READY) {
+          console.log('[JCIntro] Forçando inicialização manual');
+          handler({ detail: { sectionId: 'section-intro', node: document.getElementById('section-intro') } });
+        }
       }
-    }, 500); // Aumentado para 500ms para dar tempo ao DOM
+    }, 1000); // Aumentado para 1000ms para dar tempo ao DOM
   };
 
   if (document.readyState === 'loading') {
