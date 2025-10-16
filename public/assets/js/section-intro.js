@@ -178,15 +178,19 @@
       console.log('[JCIntro] Botão inicializado:', avancarBtn.className, avancarBtn.textContent);
     }
 
-    once(avancarBtn, 'click', () => {
-      console.log('[JCIntro] Avançando para section-termos');
-      if (typeof window.JC?.show === 'function') {
-        window.JC.show('section-termos');
-      } else {
-        window.location.href = '/termos';
-        console.warn('[JCIntro] Fallback navigation to /termos');
-      }
-    });
+    once(avancarBtn, 'click', (e) => {
+  if (e.isTrusted) { // Verificar se é um clique real, não simulado
+    console.log('[JCIntro] Avançando para section-termos');
+    if (typeof window.JC?.show === 'function') {
+      window.JC.show('section-termos');
+    } else {
+      window.location.href = '/termos';
+      console.warn('[JCIntro] Fallback navigation to /termos');
+    }
+  } else {
+    console.log('[JCIntro] Clique simulado ignorado');
+  }
+});
 
     const runTypingChain = async () => {
       window.JCIntro.state.TYPING_COUNT++;
