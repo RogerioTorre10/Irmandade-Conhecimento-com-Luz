@@ -15,16 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 </head>
-
-<body class="epic min-h-screen bg-slate-900 text-slate-100">
-  <div class="language-selector">
-    <select id="language-select">
-      <option value="pt-BR">Português (BR)</option>
-      <option value="en-US">English (US)</option>
-      <option value="es-ES">Español (ES)</option>
-    </select>
-  </div>
-  <style>
+<style>
   /* Header + chama */
     .site-header{display:flex;align-items:center;justify-content:center;padding:16px;background:transparent}
     .chama-icone{position:relative;width:18px;height:36px;display:flex;align-items:flex-end;margin-right:12px}
@@ -51,7 +42,15 @@
     @keyframes aura{0%,100%{opacity:.75}50%{opacity:1}}
     @media (prefers-reduced-motion: reduce){.chama-vela .lingua,.chama-vela .brasa,.chama-vela .brilho{animation:none!important}}
  </style>
-     <header class="site-header">
+<body class="epic min-h-screen bg-slate-900 text-slate-100">
+  <div class="language-selector">
+    <select id="language-select">
+      <option value="pt-BR">Português (BR)</option>
+      <option value="en-US">English (US)</option>
+      <option value="es-ES">Español (ES)</option>
+    </select>
+  </div>
+  <header class="site-header">
       <div id="chama-header" class="chama-icone" aria-hidden="true">
        <div class="chama-vela chama-lg">
         <div class="brasa"></div>
