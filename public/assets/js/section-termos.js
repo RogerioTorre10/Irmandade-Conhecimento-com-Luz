@@ -403,7 +403,7 @@
     document.removeEventListener('section:shown', handler);
     document.addEventListener('sectionLoaded', handler, { passive: true, once: true });
 
-    const tryInitialize = (attempt = 1, maxAttempts = 5) => {
+    const tryInitialize = (attempt = 1, maxAttempts = 10) => {
       setTimeout(() => {
         const visibleTermos = document.querySelector('#section-termos:not(.hidden)');
         if (visibleTermos && !window.JCTermos.state.ready && !visibleTermos.dataset.termosInitialized) {
