@@ -24,9 +24,67 @@
       <option value="es-ES">Español (ES)</option>
     </select>
   </div>
-  <header class="site-header">
-    <div id="chama-header" class="chama-icone" aria-hidden="true">
-      <div class="chama-vela chama-lg">
+  <style>
+    /* Garantir visibilidade das chamas */
+    .chama-vela, .chama-md, .chama-lg, .brasa, .lingua, .brilho {
+     display: block !important;
+     visibility: visible !important;
+     opacity: 1 !important;
+     position: relative;
+     z-index: 10;
+   }
+
+   /* Estilizar as chamas (ajuste conforme necessário) */
+    .chama-vela {
+     width: 40px;
+     height: 60px;
+     background: none;
+   }
+
+   .brasa {
+    width: 100%;
+    height: 10px;
+    background: #ff4500;
+    border-radius: 50%;
+  }
+
+    .lingua {
+     width: 20px;
+     height: 30px;
+     background: #ffa500;
+     border-radius: 50% 50% 0 0;
+     position: absolute;
+     top: -20px;
+     left: 50%;
+     transform: translateX(-50%);
+   }
+
+     .brilho {
+      width: 50px;
+      height: 50px;
+      background: radial-gradient(circle, rgba(255, 165, 0, 0.5), transparent);
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* Evitar content jumping */
+     #jornada-content-wrapper {
+      min-height: 80vh;
+      overflow-y: scroll;
+      box-sizing: border-box;
+    }
+
+     #section-termos, #termos-pg1, #termos-pg2, [data-typing="true"], .nextBtn, .prevBtn, .avancarBtn {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+    </style>  
+     <header class="site-header">
+      <div id="chama-header" class="chama-icone" aria-hidden="true">
+       <div class="chama-vela chama-lg">
         <div class="brasa"></div>
         <div class="lingua"></div>
         <div class="lingua"></div>
