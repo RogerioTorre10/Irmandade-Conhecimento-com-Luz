@@ -130,7 +130,7 @@
       pg1 = await waitForElement('#termos-pg1', { within: root, timeout: 2000 });
       pg2 = await waitForElement('#termos-pg2', { within: root, timeout: 2000 });
       nextBtn = await waitForElement('.nextBtn[data-action="termos-next"]', { within: root, timeout: 2000 });
-      prevBtn = await waitForElement('.prevBtn[data-action="termos-prev"]', { within: root, timeout: 2002 });
+      prevBtn = await waitForElement('.prevBtn[data-action="termos-prev"]', { within: root, timeout: 2000 });
       avancarBtn = await waitForElement('.avancarBtn[data-action="avancar"]', { within: root, timeout: 2000 });
     } catch (e) {
       console.error('[JCTermos] Elements not found:', e);
@@ -267,11 +267,10 @@
           el.style.visibility = 'hidden';
           currentPg.style.opacity = '1';
           currentPg.style.visibility = 'visible';
-          const typingPromise = new Promise(resolve => window.runTyping(el, text, resolve, {
+          await new Promise(resolve => window.runTyping(el, text, resolve, {
             speed: Number(el.dataset.speed || 100),
             cursor: String(el.dataset.cursor || 'true') === 'true'
           }));
-          await typingPromise;
           el.classList.add('typing-done');
           el.classList.remove('typing-active');
           el.style.opacity = '1';
@@ -290,11 +289,11 @@
                 console.log('[JCTermos] TTS concluído para:', el.id);
                 resolve();
               };
-              setTimeout(resolve, text.length * 50);
+              setTimeout(resolve, text.length * 70); // Aumentado para 70ms por caractere para parágrafos longos
             });
           } else {
             console.warn('[JCTermos] window.EffectCoordinator.speak não encontrado');
-            await new Promise(resolve => setTimeout(resolve, text.length * 50));
+            await new Promise(resolve => setTimeout(resolve, text.length * 70));
           }
         } catch (err) {
           console.error('[JCTermos] Erro na datilografia para', el.id, err);
@@ -306,7 +305,7 @@
         }
       }
       
-      console.log('[JCTermos] Datilografia e TTS concluídos na página atual');
+      console.log('[JCTermos] Datilografia concluída na página atual');
       [nextBtn, prevBtn, avancarBtn].forEach(btn => {
         if (btn) {
           btn.disabled = false;
@@ -330,7 +329,7 @@
     once(prevBtn, 'click', async (e) => {
       if (e.isTrusted) { // Verificar se é um clique real
         speechSynthesis.cancel(); // Cancelar TTS anterior
-        console.log('[JCTermos] Redirecionando para página inicial');
+        console.log('[JCTermos] Redirecionando para site fora da jornada');
         window.location.href = '/'; // Ajuste para a URL do site Jornada Conhecimento com Luz
       } else {
         console.log('[JCTermos] Clique simulado ignorado');
@@ -455,3 +454,23 @@
     bind();
   }
 })();
+</xaiArtifact>
+
+---
+
+### Instruções para Teste
+
+1. **Atualizar o script inline no HTML**:
+   - Substitua o `<script>` no final do `jornada-conhecimento-com-luz1.html` pelo código fornecido.
+
+2. **Atualizar `section-termos.js`**:
+   - Copie e cole o código acima no arquivo `section-termos.js`, substituindo a versão anterior.
+
+3. **Verificar a ordem dos scripts**:
+   - No HTML, garanta a ordem:
+     ```html
+     <script src="jornada-typing-bridge.js"></script>
+     <script src="carregarEtapa.js"></script>
+     <script src="jornada-controller.js"></script>
+     <script src="section-intro.js"></script>
+     <script src="section-termos.js"></script>
