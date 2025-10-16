@@ -454,23 +454,3 @@
     bind();
   }
 })();
-</xaiArtifact>
-
----
-
-### Instruções para Teste
-
-1. **Atualizar o script inline no HTML**:
-   - Substitua o `<script>` no final do `jornada-conhecimento-com-luz1.html` pelo código fornecido.
-
-2. **Atualizar `section-termos.js`**:
-   - Copie e cole o código acima no arquivo `section-termos.js`, substituindo a versão anterior.
-
-3. **Verificar a ordem dos scripts**:
-   - No HTML, garanta a ordem:
-     ```html
-     <script src="jornada-typing-bridge.js"></script>
-     <script src="carregarEtapa.js"></script>
-     <script src="jornada-controller.js"></script>
-     <script src="section-intro.js"></script>
-     <script src="section-termos.js"></script>
