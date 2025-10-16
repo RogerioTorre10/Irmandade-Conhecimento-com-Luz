@@ -119,6 +119,3 @@ function checkCriticalElements(section, sectionId) {
 
   window.carregarEtapa = carregarEtapa;
 })();
-
-  window.carregarEtapa = carregarEtapa;
-})();
