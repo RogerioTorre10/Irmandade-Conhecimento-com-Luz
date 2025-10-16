@@ -6,13 +6,13 @@
     intro:    '/html/section-intro.html',
     termos:   '/html/section-termos.html',
     senha:    '/html/section-senha.html',
-    filme 1:    '/assets/img/conhecimento-com-luz-jardim.mp4',
+    filme1:    '/assets/img/conhecimento-com-luz-jardim.mp4',
     guia:     '/html/section-guia.html',
-    filme 2:    '/assets/img/conhecimento-com-luz-jardim.mp4',
+    filme2:    '/assets/img/conhecimento-com-luz-jardim.mp4',
     selfie:   '/html/section-selfie.html',
-    filme 3:    '/assets/img/filme-0-ao-encontro-da-jornada.mp4',
+    filme3:    '/assets/img/filme-0-ao-encontro-da-jornada.mp4',
     perguntas:'/html/section-perguntas.html', 
-    filme 4:    '/assets/img/filme-5-fim-da-jornada.mp4',
+    filme4:    '/assets/img/filme-5-fim-da-jornada.mp4',
     final:    '/html/section-final.html'
     };
 
