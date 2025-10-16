@@ -5,7 +5,9 @@
   window.__introBound = true;
 
   let INTRO_READY = false;
+  let INTRO_RUNNING = false;
 
+  
   const once = (el, ev, fn) => {
     if (!el) return;
     const h = (e) => {
@@ -47,6 +49,15 @@ const handler = async (evt) => {
   const { sectionId, node } = fromDetail(evt?.detail);
   if (sectionId !== 'section-intro') return;
 
+  if (INTRO_RUNNING || window.INTRO_READY) {
+  console.log('[section-intro] Já em execução ou inicializado, ignorando...');
+  return;
+}
+
+  INTRO_RUNNING = true;
+  window.INTRO_READY = false;
+
+  
   // Verificar se já foi inicializado
   if (window.INTRO_READY) {
     console.log('[section-intro] Já inicializado, ignorando...');
@@ -239,9 +250,12 @@ const handler = async (evt) => {
       avancarBtn.style.opacity = '1 !important';
       avancarBtn.style.cursor = 'pointer !important';
     }
-  }
+   }
+    finally {
+     INTRO_RUNNING = false;
+   }
 
-  console.log('[section-intro] Elementos encontrados:', {
+    console.log('[section-intro] Elementos encontrados:', {
     p1_1: !!p1_1, p1_1Id: p1_1?.id,
     p1_2: !!p1_2, p1_2Id: p1_2?.id,
     p1_3: !!p1_3, p1_3Id: p1_3?.id,
@@ -258,17 +272,17 @@ if (!window.INTRO_LISTENER) {
 }
 
   const bind = () => {
-    document.removeEventListener('sectionLoaded', handler);
-    document.removeEventListener('section:shown', handler);
-    document.addEventListener('sectionLoaded', handler, { passive: true });
+   document.removeEventListener('section:shown', handler);
+   document.addEventListener('section:shown', handler, { passive: true });
 
-    setTimeout(() => {
-      const visibleIntro = document.querySelector('#section-intro:not(.hidden)');
-      if (visibleIntro) {
-        handler({ detail: { sectionId: 'section-intro', node: visibleIntro } });
-      }
-    }, 100);
-  };
+   if (!window.INTRO_READY && !window.INTRO_RUNNING) {
+  setTimeout(() => {
+    const visibleIntro = document.querySelector('#section-intro:not(.hidden)');
+    if (visibleIntro) {
+      handler({ detail: { sectionId: 'section-intro', node: visibleIntro } });
+    }
+  }, 100);
+}
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bind, { once: true });
