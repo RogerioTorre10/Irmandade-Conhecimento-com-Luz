@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  // Definição de URLs para seções
+  // jornada-loader.js: Definição de URLs para seções
  const etapas = {
     intro:    '/html/section-intro.html',
     termos:   '/html/section-termos.html',
