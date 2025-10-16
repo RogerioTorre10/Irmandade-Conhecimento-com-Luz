@@ -30,7 +30,7 @@
     el.addEventListener(ev, h);
   };
 
-  async function waitForElement(selector, { within = document, timeout = 5000, step = 50 } = {}) {
+  async function waitForElement(selector, { within = document, timeout = 3000, step = 50 } = {}) {
     console.log('[JCTermos] Aguardando elemento:', selector);
     const start = performance.now();
     return new Promise((resolve, reject) => {
@@ -127,11 +127,11 @@
     let pg1, pg2, nextBtn, prevBtn, avancarBtn;
     try {
       console.log('[JCTermos] Buscando elementos...');
-      pg1 = await waitForElement('#termos-pg1', { within: root, timeout: 5000 });
-      pg2 = await waitForElement('#termos-pg2', { within: root, timeout: 5000 });
-      nextBtn = await waitForElement('.nextBtn[data-action="termos-next"]', { within: root, timeout: 5000 });
-      prevBtn = await waitForElement('.prevBtn[data-action="termos-prev"]', { within: root, timeout: 5000 });
-      avancarBtn = await waitForElement('.avancarBtn[data-action="avancar"]', { within: root, timeout: 5000 });
+      pg1 = await waitForElement('#termos-pg1', { within: root, timeout: 3000 });
+      pg2 = await waitForElement('#termos-pg2', { within: root, timeout: 3000 });
+      nextBtn = await waitForElement('.nextBtn[data-action="termos-next"]', { within: root, timeout: 3000 });
+      prevBtn = await waitForElement('.prevBtn[data-action="termos-prev"]', { within: root, timeout: 3000 });
+      avancarBtn = await waitForElement('.avancarBtn[data-action="avancar"]', { within: root, timeout: 3000 });
     } catch (e) {
       console.error('[JCTermos] Elements not found:', e);
       window.toast?.('Falha ao carregar os elementos da seção Termos.', 'error');
@@ -166,8 +166,8 @@
         el.style.display = i === 0 ? 'block' : 'none';
         el.style.opacity = '1';
         el.style.visibility = 'visible';
-        el.style.overflow = 'visible'; // Evitar overflow que cause jumping
-        el.style.minHeight = '60vh'; // Reservar espaço para evitar jumping
+        el.style.overflow = 'visible';
+        el.style.minHeight = '60vh';
         console.log('[JCTermos] Página inicializada:', el.id);
       }
     });
@@ -334,16 +334,20 @@
       }
     });
 
-    once(avancarBtn, 'click', async () => {
-      speechSynthesis.cancel(); // Cancelar TTS ao avançar
-      if (window.JCTermos.state.currentPage === 2) {
-        console.log('[JCTermos] Avançando para section-senha');
-        if (typeof window.JC?.show === 'function') {
-          window.JC.show('section-senha');
-        } else {
-          window.location.href = '/senha';
-          console.warn('[JCTermos] Fallback navigation to /senha');
+    once(avancarBtn, 'click', async (e) => {
+      if (e.isTrusted) { // Verificar se é um clique real
+        speechSynthesis.cancel(); // Cancelar TTS ao avançar
+        if (window.JCTermos.state.currentPage === 2) {
+          console.log('[JCTermos] Avançando para section-senha');
+          if (typeof window.JC?.show === 'function') {
+            window.JC.show('section-senha');
+          } else {
+            window.location.href = '/senha';
+            console.warn('[JCTermos] Fallback navigation to /senha');
+          }
         }
+      } else {
+        console.log('[JCTermos] Clique simulado ignorado');
       }
     });
 
@@ -434,7 +438,7 @@
         } else {
           console.error('[JCTermos] Falha ao inicializar após ' + maxAttempts + ' tentativas');
         }
-      }, 2000 * attempt);
+      }, 1000 * attempt);
     };
 
     tryInitialize();
