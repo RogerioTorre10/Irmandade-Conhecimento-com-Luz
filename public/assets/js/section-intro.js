@@ -257,17 +257,17 @@ if (!window.INTRO_LISTENER) {
   window.INTRO_LISTENER = true;
 }
   const bind = () => {
+   document.removeEventListener('sectionLoaded', handler);
    document.removeEventListener('section:shown', handler);
-   document.addEventListener('section:shown', handler, { passive: true });
+   document.addEventListener('sectionLoaded', handler, { passive: true });
 
-   if (!window.INTRO_READY && !window.INTRO_RUNNING) {
-  setTimeout(() => {
-    const visibleIntro = document.querySelector('#section-intro:not(.hidden)');
-    if (visibleIntro) {
-      handler({ detail: { sectionId: 'section-intro', node: visibleIntro } });
-    }
-  }, 100);
-}
+   setTimeout(() => {
+  const visibleIntro = document.querySelector('#section-intro:not(.hidden)');
+  if (visibleIntro) {
+    handler({ detail: { sectionId: 'section-intro', node: visibleIntro } });
+  }
+}, 100);
+
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bind, { once: true });
