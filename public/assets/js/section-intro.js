@@ -69,8 +69,8 @@
       return;
     }
 
-    if (window.JCIntro.state.INTRO_READY) {
-      console.log('[JCIntro] Já inicializado (INTRO_READY), ignorando...');
+    if (window.JCIntro.state.INTRO_READY || (node && node.dataset.introInitialized)) {
+      console.log('[JCIntro] Já inicializado (INTRO_READY ou data-intro-initialized), ignorando...');
       return;
     }
 
@@ -338,7 +338,7 @@
   // Registrar handler
   if (!window.JCIntro.state.LISTENER_ADDED) {
     console.log('[JCIntro] Registrando listener para sectionLoaded');
-    window.addEventListener('sectionLoaded', handler);
+    window.addEventListener('sectionLoaded', handler, { once: true });
     window.JCIntro.state.LISTENER_ADDED = true;
   }
 
@@ -347,22 +347,17 @@
     console.log('[JCIntro] Executando bind');
     document.removeEventListener('sectionLoaded', handler);
     document.removeEventListener('section:shown', handler);
-    document.addEventListener('sectionLoaded', handler, { passive: true });
+    document.addEventListener('sectionLoaded', handler, { passive: true, once: true });
 
     setTimeout(() => {
       const visibleIntro = document.querySelector('#section-intro:not(.hidden)');
-      if (visibleIntro && !window.JCIntro.state.INTRO_READY) {
+      if (visibleIntro && !window.JCIntro.state.INTRO_READY && !visibleIntro.dataset.introInitialized) {
         console.log('[JCIntro] Seção visível encontrada, disparando handler');
         handler({ detail: { sectionId: 'section-intro', node: visibleIntro } });
       } else {
         console.log('[JCIntro] Nenhuma seção visível ou já inicializada');
-        // Tentar inicialização manual
-        if (document.getElementById('section-intro') && !window.JCIntro.state.INTRO_READY) {
-          console.log('[JCIntro] Forçando inicialização manual');
-          handler({ detail: { sectionId: 'section-intro', node: document.getElementById('section-intro') } });
-        }
       }
-    }, 1000); // Aumentado para 1000ms para dar tempo ao DOM
+    }, 1000);
   };
 
   if (document.readyState === 'loading') {
