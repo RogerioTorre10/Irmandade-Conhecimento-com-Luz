@@ -94,15 +94,15 @@
 <!-- Inicialização -->
 <script>
   // Função para aguardar scripts
-  const waitForScripts = (callback, maxAttempts = 20, interval = 1000) => {
+  const waitForScripts = (callback, maxAttempts = 30, interval = 1000) => {
     let attempts = 0;
     const check = () => {
+      console.log(`[Init] Verificando scripts (tentativa ${attempts + 1}/${maxAttempts})...`);
       if (typeof window.JC?.init === 'function' && typeof window.carregarEtapa === 'function') {
         console.log('[Init] Scripts prontos, executando callback');
         callback();
       } else if (attempts < maxAttempts) {
         attempts++;
-        console.log(`[Init] Aguardando scripts (tentativa ${attempts}/${maxAttempts})...`);
         setTimeout(check, interval);
       } else {
         console.error('[Init] Falha ao carregar scripts após várias tentativas');
@@ -110,6 +110,8 @@
         if (typeof window.carregarEtapa === 'function') {
           console.log('[Init] Fallback: carregando section-termos diretamente');
           window.carregarEtapa('termos');
+        } else {
+          console.error('[Init] window.carregarEtapa não disponível');
         }
       }
     };
