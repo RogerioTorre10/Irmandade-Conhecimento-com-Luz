@@ -1,17 +1,29 @@
 (function () {
   'use strict';
 
+  // Namespace para isolar a seção
+  window.JCIntro = window.JCIntro || {};
+
   // Verificar se o script já foi incluído
   if (document.querySelector('script[src*="section-intro.js"]')) {
-    console.log('[section-intro] Script já incluído, ignorando...');
+    console.log('[JCIntro] Script já incluído, ignorando...');
     return;
   }
 
-  if (window.__introBound) return;
-  window.__introBound = true;
+  // Verificar inicialização
+  if (window.JCIntro.__bound) {
+    console.log('[JCIntro] Já inicializado, ignorando...');
+    return;
+  }
+  window.JCIntro.__bound = true;
 
-  let INTRO_READY = false;
-    
+  // Estado da seção
+  window.JCIntro.state = {
+    INTRO_READY: false,
+    LISTENER_ADDED: false
+  };
+
+  // Funções utilitárias
   const once = (el, ev, fn) => {
     if (!el) return;
     const h = (e) => {
@@ -37,7 +49,7 @@
       };
       tick();
     });
-  };
+  }
 
   function getText(el) {
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
@@ -49,14 +61,14 @@
     return { sectionId, node };
   }
 
+  // Handler principal
   const handler = async (evt) => {
-    console.log('[section-intro] Handler disparado:', evt?.detail);
+    console.log('[JCIntro] Handler disparado:', evt?.detail);
     const { sectionId, node } = fromDetail(evt?.detail);
     if (sectionId !== 'section-intro') return;
 
-    // Verificar se já foi inicializado
-    if (window.INTRO_READY || node?.dataset?.introInitialized) {
-      console.log('[section-intro] Já inicializado, ignorando...');
+    if (window.JCIntro.state.INTRO_READY || node?.dataset?.introInitialized) {
+      console.log('[JCIntro] Já inicializado, ignorando...');
       return;
     }
 
@@ -69,12 +81,11 @@
         });
       } catch (e) {
         window.toast?.('Erro: Seção section-intro não carregada.', 'error');
-        console.error('[section-intro] Section not found:', e);
+        console.error('[JCIntro] Section not found:', e);
         return;
       }
     }
 
-    // Marcar a seção como inicializada
     root.dataset.introInitialized = 'true';
     root.classList.add('section-intro');
 
@@ -87,7 +98,7 @@
       p2_2 = await waitForElement('#intro-p2-2', { within: root, timeout: 15000 });
       avancarBtn = await waitForElement('#btn-avancar', { within: root, timeout: 15000 });
     } catch (e) {
-      console.error('[section-intro] Elements not found:', e);
+      console.error('[JCIntro] Elements not found:', e);
       window.toast?.('Falha ao carregar os elementos da seção Intro.', 'error');
       return;
     }
@@ -98,7 +109,7 @@
         el.style.opacity = '0 !important';
         el.style.visibility = 'hidden !important';
         el.style.display = 'none !important';
-        console.log('[section-intro] Texto inicializado:', el.id, el.textContent?.substring(0, 50));
+        console.log('[JCIntro] Texto inicializado:', el.id, el.textContent?.substring(0, 50));
       }
     });
 
@@ -132,24 +143,23 @@
       avancarBtn.style.margin = '8px auto !important';
       avancarBtn.style.visibility = 'visible !important';
       avancarBtn.textContent = 'Iniciar';
-      console.log('[section-intro] Botão inicializado:', avancarBtn.className, avancarBtn.textContent);
+      console.log('[JCIntro] Botão inicializado:', avancarBtn.className, avancarBtn.textContent);
     }
 
     once(avancarBtn, 'click', () => {
-      console.log('[section-intro] Avançando para section-termos');
+      console.log('[JCIntro] Avançando para section-termos');
       if (typeof window.JC?.show === 'function') {
         window.JC.show('section-termos');
       } else {
         window.location.href = '/termos';
-        console.warn('[section-intro] Fallback navigation to /termos');
+        console.warn('[JCIntro] Fallback navigation to /termos');
       }
     });
 
     const runTypingChain = async () => {
-      console.log('[section-intro] runTypingChain chamado');
-      // Verificar lock do TypingBridge
+      console.log('[JCIntro] runTypingChain chamado');
       if (window.__typingLock) {
-        console.log('[section-intro] Typing lock ativo, aguardando...');
+        console.log('[JCIntro] Typing lock ativo, aguardando...');
         await new Promise(resolve => {
           const checkLock = () => {
             if (!window.__typingLock) {
@@ -162,11 +172,11 @@
         });
       }
 
-      console.log('[section-intro] Iniciando datilografia...');
+      console.log('[JCIntro] Iniciando datilografia...');
       const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
 
       if (!typingElements.length) {
-        console.warn('[section-intro] Nenhum elemento com data-typing="true" encontrado');
+        console.warn('[JCIntro] Nenhum elemento com data-typing="true" encontrado');
         if (avancarBtn) {
           avancarBtn.disabled = false;
           avancarBtn.style.opacity = '1 !important';
@@ -175,11 +185,11 @@
         return;
       }
 
-      console.log('[section-intro] Elementos encontrados:', Array.from(typingElements).map(el => el.id));
+      console.log('[JCIntro] Elementos encontrados:', Array.from(typingElements).map(el => el.id));
 
       // Fallback para window.runTyping
       if (typeof window.runTyping !== 'function') {
-        console.warn('[section-intro] window.runTyping não encontrado, usando fallback');
+        console.warn('[JCIntro] window.runTyping não encontrado, usando fallback');
         window.runTyping = (el, text, resolve, options) => {
           let i = 0;
           const speed = options.speed || 50;
@@ -189,7 +199,7 @@
               i++;
               setTimeout(type, speed);
             } else {
-              el.textContent = text; // Garantir texto completo
+              el.textContent = text;
               resolve();
             }
           };
@@ -199,7 +209,7 @@
 
       for (const el of typingElements) {
         const text = getText(el);
-        console.log('[section-intro] Datilografando:', el.id, text.substring(0, 50));
+        console.log('[JCIntro] Datilografando:', el.id, text.substring(0, 50));
         
         try {
           el.textContent = '';
@@ -217,16 +227,15 @@
           el.style.opacity = '1 !important';
           el.style.visibility = 'visible !important';
           el.style.display = 'block !important';
-          // Chamada única para TTS
           if (typeof window.EffectCoordinator?.speak === 'function') {
             window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
-            console.log('[section-intro] TTS ativado para:', el.id);
+            console.log('[JCIntro] TTS ativado para:', el.id);
             await new Promise(resolve => setTimeout(resolve, text.length * 30));
           } else {
-            console.warn('[section-intro] window.EffectCoordinator.speak não encontrado');
+            console.warn('[JCIntro] window.EffectCoordinator.speak não encontrado');
           }
         } catch (err) {
-          console.error('[section-intro] Erro na datilografia para', el.id, err);
+          console.error('[JCIntro] Erro na datilografia para', el.id, err);
           el.textContent = text;
           el.classList.add('typing-done');
           el.style.opacity = '1 !important';
@@ -237,7 +246,7 @@
         await new Promise(resolve => setTimeout(resolve, 300));
       }
       
-      console.log('[section-intro] Datilografia concluída');
+      console.log('[JCIntro] Datilografia concluída');
       if (avancarBtn) {
         avancarBtn.disabled = false;
         avancarBtn.style.opacity = '1 !important';
@@ -245,13 +254,12 @@
       }
     };
 
-    // Forçar inicialização
-    window.INTRO_READY = false;
+    window.JCIntro.state.INTRO_READY = false;
     try {
       await runTypingChain();
-      window.INTRO_READY = true;
+      window.JCIntro.state.INTRO_READY = true;
     } catch (err) {
-      console.error('[section-intro] Erro na datilografia:', err);
+      console.error('[JCIntro] Erro na datilografia:', err);
       root.querySelectorAll('[data-typing="true"]').forEach(el => {
         el.textContent = getText(el);
         el.classList.add('typing-done');
@@ -266,7 +274,7 @@
       }
     }
 
-    console.log('[section-intro] Elementos encontrados:', {
+    console.log('[JCIntro] Elementos encontrados:', {
       p1_1: !!p1_1, p1_1Id: p1_1?.id,
       p1_2: !!p1_2, p1_2Id: p1_2?.id,
       p1_3: !!p1_3, p1_3Id: p1_3?.id,
@@ -276,14 +284,32 @@
     });
   };
 
-  // Registrar handler apenas uma vez
-  if (!window.INTRO_LISTENER) {
+  // Método para limpar a seção
+  window.JCIntro.destroy = () => {
+    console.log('[JCIntro] Destruindo seção intro');
+    document.removeEventListener('sectionLoaded', handler);
+    document.removeEventListener('section:shown', handler);
+    const root = document.getElementById('section-intro');
+    if (root) {
+      root.dataset.introInitialized = '';
+      root.querySelectorAll('[data-typing="true"]').forEach(el => {
+        el.classList.remove('typing-active', 'typing-done', 'lumen-typing');
+      });
+    }
+    window.JCIntro.state.INTRO_READY = false;
+    window.JCIntro.state.LISTENER_ADDED = false;
+    if (typeof window.EffectCoordinator?.stopAll === 'function') {
+      window.EffectCoordinator.stopAll();
+    }
+  };
+
+  // Registrar handler
+  if (!window.JCIntro.state.LISTENER_ADDED) {
     window.addEventListener('sectionLoaded', handler, { once: true });
-    window.INTRO_LISTENER = true;
+    window.JCIntro.state.LISTENER_ADDED = true;
   }
 
   const bind = () => {
-    // Remover qualquer listener antigo
     document.removeEventListener('sectionLoaded', handler);
     document.removeEventListener('section:shown', handler);
     document.addEventListener('sectionLoaded', handler, { passive: true, once: true });
