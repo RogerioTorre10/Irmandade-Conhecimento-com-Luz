@@ -130,7 +130,7 @@
       pg1 = await waitForElement('#termos-pg1', { within: root, timeout: 2000 });
       pg2 = await waitForElement('#termos-pg2', { within: root, timeout: 2000 });
       nextBtn = await waitForElement('.nextBtn[data-action="termos-next"]', { within: root, timeout: 2000 });
-      prevBtn = await waitForElement('.prevBtn[data-action="termos-prev"]', { within: root, timeout: 2000 });
+      prevBtn = await waitForElement('.prevBtn[data-action="termos-prev"]', { within: root, timeout: 2002 });
       avancarBtn = await waitForElement('.avancarBtn[data-action="avancar"]', { within: root, timeout: 2000 });
     } catch (e) {
       console.error('[JCTermos] Elements not found:', e);
@@ -267,10 +267,11 @@
           el.style.visibility = 'hidden';
           currentPg.style.opacity = '1';
           currentPg.style.visibility = 'visible';
-          await new Promise(resolve => window.runTyping(el, text, resolve, {
+          const typingPromise = new Promise(resolve => window.runTyping(el, text, resolve, {
             speed: Number(el.dataset.speed || 100),
             cursor: String(el.dataset.cursor || 'true') === 'true'
           }));
+          await typingPromise;
           el.classList.add('typing-done');
           el.classList.remove('typing-active');
           el.style.opacity = '1';
@@ -305,7 +306,7 @@
         }
       }
       
-      console.log('[JCTermos] Datilografia concluída na página atual');
+      console.log('[JCTermos] Datilografia e TTS concluídos na página atual');
       [nextBtn, prevBtn, avancarBtn].forEach(btn => {
         if (btn) {
           btn.disabled = false;
