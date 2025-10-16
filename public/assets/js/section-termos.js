@@ -174,7 +174,7 @@
     [pg1, pg2].forEach(pg => {
       if (pg) {
         pg.querySelectorAll('[data-typing="true"]').forEach(el => {
-          el.textContent = ''; // Limpar texto inicialmente
+          el.textContent = '';
           el.style.opacity = '0';
           el.style.visibility = 'hidden';
           el.style.display = 'none';
@@ -303,8 +303,6 @@
           el.style.visibility = 'visible';
           el.style.display = 'block';
         }
-        
-        await new Promise(resolve => setTimeout(resolve, 300));
       }
       
       console.log('[JCTermos] Datilografia concluída na página atual');
@@ -328,14 +326,13 @@
       }
     });
 
-    once(prevBtn, 'click', async () => {
-      speechSynthesis.cancel(); // Cancelar TTS anterior
-      if (window.JCTermos.state.currentPage === 2 && pg1) {
-        pg2.style.display = 'none';
-        pg1.style.display = 'block';
-        avancarBtn.textContent = 'Avançar';
-        window.JCTermos.state.currentPage = 1;
-        await runTypingChain();
+    once(prevBtn, 'click', async (e) => {
+      if (e.isTrusted) { // Verificar se é um clique real
+        speechSynthesis.cancel(); // Cancelar TTS anterior
+        console.log('[JCTermos] Redirecionando para página inicial');
+        window.location.href = '/'; // Ajuste para a URL do site Jornada Conhecimento com Luz
+      } else {
+        console.log('[JCTermos] Clique simulado ignorado');
       }
     });
 
