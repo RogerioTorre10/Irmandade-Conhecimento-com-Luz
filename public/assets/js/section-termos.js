@@ -30,7 +30,7 @@
     el.addEventListener(ev, h);
   };
 
-  async function waitForElement(selector, { within = document, timeout = 3000, step = 50 } = {}) {
+  async function waitForElement(selector, { within = document, timeout = 2000, step = 50 } = {}) {
     console.log('[JCTermos] Aguardando elemento:', selector);
     const start = performance.now();
     return new Promise((resolve, reject) => {
@@ -84,7 +84,7 @@
       try {
         root = await waitForElement('#section-termos', { 
           within: document.getElementById('jornada-content-wrapper') || document, 
-          timeout: 15000 
+          timeout: 10000 
         });
       } catch (e) {
         window.toast?.('Erro: Seção section-termos não carregada.', 'error');
@@ -127,11 +127,11 @@
     let pg1, pg2, nextBtn, prevBtn, avancarBtn;
     try {
       console.log('[JCTermos] Buscando elementos...');
-      pg1 = await waitForElement('#termos-pg1', { within: root, timeout: 3000 });
-      pg2 = await waitForElement('#termos-pg2', { within: root, timeout: 3000 });
-      nextBtn = await waitForElement('.nextBtn[data-action="termos-next"]', { within: root, timeout: 3000 });
-      prevBtn = await waitForElement('.prevBtn[data-action="termos-prev"]', { within: root, timeout: 3000 });
-      avancarBtn = await waitForElement('.avancarBtn[data-action="avancar"]', { within: root, timeout: 3000 });
+      pg1 = await waitForElement('#termos-pg1', { within: root, timeout: 2000 });
+      pg2 = await waitForElement('#termos-pg2', { within: root, timeout: 2000 });
+      nextBtn = await waitForElement('.nextBtn[data-action="termos-next"]', { within: root, timeout: 2000 });
+      prevBtn = await waitForElement('.prevBtn[data-action="termos-prev"]', { within: root, timeout: 2000 });
+      avancarBtn = await waitForElement('.avancarBtn[data-action="avancar"]', { within: root, timeout: 2000 });
     } catch (e) {
       console.error('[JCTermos] Elements not found:', e);
       window.toast?.('Falha ao carregar os elementos da seção Termos.', 'error');
@@ -164,9 +164,8 @@
       if (el) {
         el.classList.remove('hidden');
         el.style.display = i === 0 ? 'block' : 'none';
-        el.style.opacity = '1';
-        el.style.visibility = 'visible';
-        el.style.overflow = 'visible';
+        el.style.opacity = '0';
+        el.style.visibility = 'hidden';
         el.style.minHeight = '60vh';
         console.log('[JCTermos] Página inicializada:', el.id);
       }
@@ -175,6 +174,7 @@
     [pg1, pg2].forEach(pg => {
       if (pg) {
         pg.querySelectorAll('[data-typing="true"]').forEach(el => {
+          el.textContent = ''; // Limpar texto inicialmente
           el.style.opacity = '0';
           el.style.visibility = 'hidden';
           el.style.display = 'none';
@@ -227,6 +227,8 @@
             btn.style.cursor = 'pointer';
           }
         });
+        currentPg.style.opacity = '1';
+        currentPg.style.visibility = 'visible';
         return;
       }
 
@@ -263,6 +265,8 @@
           el.style.opacity = '0';
           el.style.display = 'block';
           el.style.visibility = 'hidden';
+          currentPg.style.opacity = '1';
+          currentPg.style.visibility = 'visible';
           await new Promise(resolve => window.runTyping(el, text, resolve, {
             speed: Number(el.dataset.speed || 100),
             cursor: String(el.dataset.cursor || 'true') === 'true'
@@ -273,6 +277,7 @@
           el.style.visibility = 'visible';
           el.style.display = 'block';
           if (typeof window.EffectCoordinator?.speak === 'function') {
+            speechSynthesis.cancel(); // Cancelar qualquer TTS anterior
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'pt-BR';
             utterance.rate = 1.1;
