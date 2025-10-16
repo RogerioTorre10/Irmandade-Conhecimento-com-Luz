@@ -19,75 +19,8 @@
   }
 
   async function applyTypingAndTTS(sectionId, root) {
-    console.log('[JC.applyTypingAndTTS] Processing typing and TTS for:', sectionId);
-    const typingElements = sectionId === 'section-intro' 
-      ? [root.querySelector('#intro-p1'), root.querySelector('#intro-p2')]
-      : [root.querySelector('#termos-p1'), root.querySelector('#termos-p2')];
-    const validElements = typingElements.filter(el => {
-      if (!el) {
-        console.error('[JC.applyTypingAndTTS] Element not found for:', sectionId, 'Selector:', typingElements.map(e => e?.id));
-        return false;
-      }
-      return el.dataset.typing === 'true' && !el.classList.contains('typing-done');
-    });
-    console.log('[JC.applyTypingAndTTS] Typing elements:', validElements.length, validElements.map(el => el?.id));
-
-    if (validElements.length > 0 && typeof window.runTyping === 'function') {
-      console.log('[JC.applyTypingAndTTS] Starting typing animation');
-      try {
-        for (const el of validElements) {
-          if (el.classList.contains('typing-done')) {
-            console.log('[JC.applyTypingAndTTS] Skipping already processed:', el.id);
-            continue;
-          }
-          const text = getText(el);
-          console.log('[JC.applyTypingAndTTS] Typing:', el.id, text.substring(0, 30) + '...');
-          el.textContent = '';
-          el.classList.add('typing-active');
-          el.style.direction = 'ltr';
-          el.style.textAlign = 'left';
-          el.style.color = '#fff';
-          await new Promise((resolve) => {
-            window.runTyping(el, text, resolve, {
-              speed: Number(el.dataset.speed || 36),
-              cursor: String(el.dataset.cursor || 'true') === 'true'
-            });
-          });
-          el.classList.add('typing-done');
-          el.style.opacity = '1 !important';
-          el.style.color = '#fff !important';
-          console.log('[JC.applyTypingAndTTS] Typing completed:', el.id);
-
-          if (typeof window.EffectCoordinator?.speak === 'function') {
-            window.EffectCoordinator.speak(text, { rate: 1.03, pitch: 1.0 });
-            console.log('[JC.applyTypingAndTTS] TTS activated for:', el.id, text.substring(0, 50) + '...');
-            await new Promise(resolve => setTimeout(resolve, text.length * 50));
-          } else {
-            console.warn('[JC.applyTypingAndTTS] EffectCoordinator.speak not available');
-          }
-        }
-      } catch (err) {
-        console.error('[JC.applyTypingAndTTS] Typing error:', err);
-        validElements.forEach(el => {
-          el.textContent = getText(el);
-          el.classList.add('typing-done');
-          el.style.opacity = '1 !important';
-          el.style.color = '#fff !important';
-          el.style.direction = 'ltr';
-          el.style.textAlign = 'left';
-        });
-      }
-    } else {
-      console.warn('[JC.applyTypingAndTTS] No valid typing elements or runTyping not available');
-      validElements.forEach(el => {
-        el.textContent = getText(el);
-        el.classList.add('typing-done');
-        el.style.opacity = '1 !important';
-        el.style.color = '#fff !important';
-        el.style.direction = 'ltr';
-        el.style.textAlign = 'left';
-      });
-    }
+    console.log('[JC.applyTypingAndTTS] Desativado para:', sectionId);
+    // Não aplicar efeitos, deixar para section-intro.js e section-termos.js
   }
 
   function attachButtonEvents(sectionId, root) {
@@ -140,7 +73,7 @@
         position: relative !important;
         z-index: 2 !important;
       `;
-      applyTypingAndTTS(sectionId, root);
+      // Não chamar applyTypingAndTTS, deixar para section-intro.js e section-termos.js
       attachButtonEvents(sectionId, root);
     }
   }
