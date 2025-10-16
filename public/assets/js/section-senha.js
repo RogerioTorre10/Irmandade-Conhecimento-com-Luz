@@ -100,6 +100,8 @@
     console.log('[JCSenha] Root encontrado:', root);
     root.dataset.senhaInitialized = 'true';
     root.classList.add('section-senha');
+    root.classList.remove('hidden');
+    root.setAttribute('aria-hidden', 'false');
 
     // Aplicar estilos ao root
     root.style.cssText = `
@@ -328,9 +330,11 @@
       if (senhaInput.type === 'password') {
         senhaInput.type = 'text';
         toggleBtn.textContent = '🙈';
+        console.log('[JCSenha] Senha visível');
       } else {
         senhaInput.type = 'password';
         toggleBtn.textContent = '👁️';
+        console.log('[JCSenha] Senha oculta');
       }
     });
 
