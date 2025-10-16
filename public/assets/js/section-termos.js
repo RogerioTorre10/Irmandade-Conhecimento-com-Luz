@@ -202,7 +202,7 @@ const handler = async (evt) => {
       console.warn('[section-termos] window.runTyping não encontrado, usando fallback');
       window.runTyping = (el, text, resolve, options) => {
         let i = 0;
-        const speed = options.speed || 20;
+        const speed = options.speed || 50; // Ajustado para 50ms
         const type = () => {
           if (i < text.length) {
             el.textContent += text.charAt(i);
@@ -229,7 +229,7 @@ const handler = async (evt) => {
         el.style.display = 'block !important';
         el.style.visibility = 'hidden !important';
         await new Promise(resolve => window.runTyping(el, text, resolve, {
-          speed: Number(el.dataset.speed || 20),
+          speed: Number(el.dataset.speed || 50), // Ajustado para 50ms
           cursor: String(el.dataset.cursor || 'true') === 'true'
         }));
         el.classList.add('typing-done');
@@ -239,7 +239,6 @@ const handler = async (evt) => {
         el.style.display = 'block !important';
         // Chamada única para TTS
         if (typeof window.EffectCoordinator?.speak === 'function') {
-          window.EffectCoordinator.cancel(); // Cancelar qualquer TTS em andamento
           window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
           console.log('[section-termos] TTS ativado para:', el.tagName);
           await new Promise(resolve => setTimeout(resolve, text.length * 30));
