@@ -3,18 +3,23 @@
 
   // Namespace isolado da seção
   window.JCIntro = window.JCIntro || {};
+
+  // Evita dupla inicialização do arquivo inteiro
   if (window.JCIntro.__bound) {
     console.log('[JCIntro] Já inicializado, ignorando...');
     return;
   }
   window.JCIntro.__bound = true;
 
+  // Estado local da seção
   window.JCIntro.state = {
     INTRO_READY: false,
     LISTENER_ADDED: false,
   };
 
-  // Utilitários
+  // ============================
+  // Utilitários básicos
+  // ============================
   const once = (el, ev, fn) => {
     if (!el) return;
     const h = (e) => { el.removeEventListener(ev, h); fn(e); };
@@ -22,6 +27,7 @@
   };
 
   const waitForElement = (selector, { within = document, timeout = 10000, step = 50 } = {}) => {
+    console.log('[JCIntro] Aguardando elemento:', selector);
     const start = performance.now();
     return new Promise((resolve, reject) => {
       const tick = () => {
@@ -30,8 +36,14 @@
           const wrap = document.getElementById('jornada-content-wrapper');
           if (wrap) el = wrap.querySelector(selector);
         }
-        if (el) return resolve(el);
-        if (performance.now() - start >= timeout) return reject(new Error(`timeout waiting ${selector}`));
+        if (el) {
+          console.log('[JCIntro] Elemento encontrado:', selector);
+          return resolve(el);
+        }
+        if (performance.now() - start >= timeout) {
+          console.error('[JCIntro] Timeout aguardando:', selector);
+          return reject(new Error(`timeout waiting ${selector}`));
+        }
         setTimeout(tick, step);
       };
       tick();
@@ -46,18 +58,164 @@
     return { sectionId, node };
   };
 
-  // Handler principal
+  // ============================
+  // Datilografia + TTS (sincronizados)
+  // ============================
+  function typeParagraph(el, fullText, opts = {}) {
+    const speed = Number(opts.speed || el.dataset.speed || 62); // ~humano (55–70ms)
+    const withCursor = String(el.dataset.cursor || 'true') === 'true';
+    const speakTogether = true;        // true = TTS acompanha a digitação; false = TTS só depois
+    const startTTSAtRatio = 0.18;      // inicia TTS quando ~18% já foi digitado
+
+    // Guarda global de TTS para não repetir leitura
+    window.__JC_SpeakGuard = window.__JC_SpeakGuard || new Set();
+
+    // Cursor "blink" simples (opcional)
+    let cursorTimer = null;
+    const toggleCursor = () => {
+      if (!withCursor) return;
+      el.classList.toggle('typing-cursor');
+    };
+
+    return new Promise((resolve) => {
+      let i = 0;
+      el.textContent = '';
+      el.classList.add('typing-active', 'lumen-typing');
+      el.style.display = 'block';
+      el.style.visibility = 'hidden';
+      el.style.opacity = '0';
+
+      if (withCursor) cursorTimer = setInterval(toggleCursor, 450);
+
+      let spoke = false;
+      const maybeStartSpeak = () => {
+        if (spoke || !speakTogether) return;
+        const ratio = fullText.length ? i / fullText.length : 1;
+        if (ratio >= startTTSAtRatio) {
+          // Evita sobreposição com parágrafo anterior
+          if (typeof window.EffectCoordinator?.stopAll === 'function') {
+            window.EffectCoordinator.stopAll();
+          }
+          const guardKey = `intro:${el.id}`;
+          if (!window.__JC_SpeakGuard.has(guardKey)) {
+            window.__JC_SpeakGuard.add(guardKey);
+            if (typeof window.EffectCoordinator?.speak === 'function') {
+              window.EffectCoordinator.speak(fullText, { rate: 1.05, pitch: 1.0 });
+            }
+          }
+          spoke = true;
+        }
+      };
+
+      const tick = () => {
+        if (i < fullText.length) {
+          el.textContent += fullText.charAt(i++);
+          if ((i & 1) === 0) maybeStartSpeak(); // checa a cada 2 chars
+          setTimeout(tick, speed);
+        } else {
+          // Flush final para garantir texto completo
+          el.textContent = fullText;
+
+          // Se preferir TTS só após digitar tudo (speakTogether=false), fala aqui uma única vez
+          if (!speakTogether) {
+            if (typeof window.EffectCoordinator?.stopAll === 'function') {
+              window.EffectCoordinator.stopAll();
+            }
+            const guardKey = `intro:${el.id}`;
+            if (!window.__JC_SpeakGuard.has(guardKey)) {
+              window.__JC_SpeakGuard.add(guardKey);
+              if (typeof window.EffectCoordinator?.speak === 'function') {
+                window.EffectCoordinator.speak(fullText, { rate: 1.05, pitch: 1.0 });
+              }
+            }
+          }
+
+          if (cursorTimer) clearInterval(cursorTimer);
+          el.classList.add('typing-done');
+          el.classList.remove('typing-active');
+          el.classList.remove('typing-cursor');
+          el.style.opacity = '1';
+          el.style.visibility = 'visible';
+          el.style.display = 'block';
+          resolve();
+        }
+      };
+
+      tick();
+    });
+  }
+
+  const runTypingChain = async () => {
+    console.log('[JCIntro] runTypingChain (sequencial + TTS único)');
+    // Normaliza lock global
+    window.G = window.G || {};
+    const locked = (window.G.__typingLock === true) || (window.__typingLock === true);
+    if (locked) {
+      console.log('[JCIntro] Aguardando liberação de __typingLock...');
+      await new Promise((resolve) => {
+        const chk = () => {
+          const free = !(window.G.__typingLock === true) && !(window.__typingLock === true);
+          if (free) resolve(); else setTimeout(chk, 80);
+        };
+        chk();
+      });
+    }
+
+    const root = document.getElementById('section-intro');
+    const list = root ? root.querySelectorAll('[data-typing="true"]:not(.typing-done)') : [];
+    if (!list || !list.length) {
+      console.warn('[JCIntro] Nenhum elemento com data-typing="true"');
+      const btn = root?.querySelector('#btn-avancar');
+      if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer'; }
+      return;
+    }
+
+    // Orquestração: um parágrafo por vez
+    for (const el of list) {
+      const text = getText(el);
+      try {
+        await typeParagraph(el, text, { speed: el.dataset.speed });
+      } catch (err) {
+        console.error('[JCIntro] Erro na datilografia:', el?.id, err);
+        // Fallback: entrega o texto completo
+        el.textContent = text;
+        el.classList.add('typing-done');
+        el.classList.remove('typing-active');
+        el.style.opacity = '1';
+        el.style.visibility = 'visible';
+        el.style.display = 'block';
+      }
+      // Pequena pausa entre parágrafos
+      await new Promise((r) => setTimeout(r, 320));
+    }
+
+    // Tudo concluído → libera botão
+    const avancarBtn = root?.querySelector('#btn-avancar');
+    if (avancarBtn) {
+      avancarBtn.disabled = false;
+      avancarBtn.style.opacity = '1';
+      avancarBtn.style.cursor = 'pointer';
+    }
+  };
+
+  // ============================
+  // Handler principal da seção
+  // ============================
   const handler = async (evt) => {
+    console.log('[JCIntro] Handler disparado:', evt?.detail);
     const { sectionId, node } = fromDetail(evt?.detail || {});
     if (sectionId !== 'section-intro') return;
 
+    // Já inicializado?
     if (window.JCIntro.state.INTRO_READY || (node && node.dataset.introInitialized)) {
       console.log('[JCIntro] Já inicializado, ignorando...');
       return;
     }
 
+    // Root da seção
     let root = node || document.getElementById('section-intro');
     if (!root) {
+      console.log('[JCIntro] Tentando localizar #section-intro...');
       try {
         root = await waitForElement('#section-intro', {
           within: document.getElementById('jornada-content-wrapper') || document,
@@ -72,13 +230,16 @@
       }
     }
 
+    // Marca como inicializado e aplica classe de sandbox (CSS isolado)
     root.dataset.introInitialized = 'true';
     root.classList.add('section-intro', 'intro-sandbox');
+
+    // Visibilidade essencial (aparência vem do CSS dedicado)
     root.style.display = 'block';
     root.style.opacity = '1';
     root.style.visibility = 'visible';
 
-    // Busca elementos
+    // Busca elementos esperados
     let p1_1, p1_2, p1_3, p2_1, p2_2, avancarBtn;
     try {
       p1_1 = await waitForElement('#intro-p1-1', { within: root });
@@ -103,15 +264,17 @@
       }
     }
 
-    // Estado inicial dos textos
-    [p1_1, p1_2, p1_3, p2_1, p2_2].forEach((el) => {
+    // Estado inicial dos parágrafos (invisíveis até tipar)
+    ;[p1_1, p1_2, p1_3, p2_1, p2_2].forEach((el) => {
       if (!el) return;
       el.style.opacity = '0';
       el.style.visibility = 'hidden';
       el.style.display = 'none';
+      // Garanta atributo para seleção
+      if (!el.hasAttribute('data-typing')) el.setAttribute('data-typing', 'true');
     });
 
-    // Botão
+    // Botão Avançar (inicialmente travado)
     if (avancarBtn) {
       avancarBtn.classList.add('btn', 'btn-primary', 'btn-stone');
       avancarBtn.disabled = true;
@@ -123,7 +286,7 @@
       if (!avancarBtn.textContent) avancarBtn.textContent = 'Iniciar';
     }
 
-    // Clique avançar: usa JC.show se existir; senão, evento neutro; por fim, fallback de URL
+    // Navegação segura e desacoplada
     once(avancarBtn, 'click', () => {
       console.log('[JCIntro] Avançar clicado → section-termos');
       if (window.JC && typeof window.JC.show === 'function') {
@@ -140,66 +303,9 @@
       }
     });
 
-    // Datilografia segura
-    const runTypingChain = async () => {
-      window.G = window.G || {};
-      const locked = (window.G.__typingLock === true) || (window.__typingLock === true);
-      if (locked) {
-        await new Promise((resolve) => {
-          const chk = () => {
-            const free = !(window.G.__typingLock === true) && !(window.__typingLock === true);
-            if (free) resolve(); else setTimeout(chk, 80);
-          };
-          chk();
-        });
-      }
-
-      const list = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
-      if (!list.length) {
-        if (avancarBtn) { avancarBtn.disabled = false; avancarBtn.style.opacity = '1'; avancarBtn.style.cursor = 'pointer'; }
-        return;
-      }
-
-      if (typeof window.runTyping !== 'function') {
-        window.runTyping = (el, text, done, opts) => {
-          let i = 0; const speed = Number(opts?.speed || 50);
-          const go = () => { if (i < text.length) { el.textContent += text[i++]; setTimeout(go, speed); } else { el.textContent = text; done(); } };
-          go();
-        };
-      }
-
-      for (const el of list) {
-        const text = getText(el);
-        el.textContent = '';
-        el.classList.add('typing-active', 'lumen-typing');
-        el.style.display = 'block';
-        el.style.visibility = 'hidden';
-        el.style.opacity = '0';
-
-        await new Promise((resolve) => window.runTyping(el, text, resolve, {
-          speed: Number(el.dataset.speed || 50),
-          cursor: String(el.dataset.cursor || 'true') === 'true',
-        }));
-
-        el.classList.add('typing-done');
-        el.classList.remove('typing-active');
-        el.style.opacity = '1';
-        el.style.visibility = 'visible';
-        el.style.display = 'block';
-
-        if (typeof window.EffectCoordinator?.speak === 'function') {
-          window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
-          await new Promise((r) => setTimeout(r, text.length * 25));
-        }
-
-        await new Promise((r) => setTimeout(r, 250));
-      }
-
-      if (avancarBtn) { avancarBtn.disabled = false; avancarBtn.style.opacity = '1'; avancarBtn.style.cursor = 'pointer'; }
-    };
-
+    // Rodar datilografia
+    window.JCIntro.state.INTRO_READY = false;
     try {
-      window.JCIntro.state.INTRO_READY = false;
       await runTypingChain();
       window.JCIntro.state.INTRO_READY = true;
       console.log('[JCIntro] Intro pronta');
@@ -216,37 +322,52 @@
     }
   }; // ← fecha handler
 
-  // Destroy
+  // ============================
+  // Destroy (idempotente)
+  // ============================
   window.JCIntro.destroy = () => {
-    console.log('[JCIntro] Destroy');
-    document.removeEventListener('sectionLoaded', handler);
-    document.removeEventListener('section:shown', handler);
+    console.log('[JCIntro] Destroy intro');
+    document.removeEventListener('sectionLoaded', handler, { passive: true });
+    document.removeEventListener('section:shown', handler, { passive: true });
+
     const root = document.getElementById('section-intro');
     if (root) {
       delete root.dataset.introInitialized;
       root.querySelectorAll('[data-typing="true"]').forEach((el) => {
-        el.classList.remove('typing-active', 'typing-done', 'lumen-typing');
+        el.classList.remove('typing-active', 'typing-done', 'lumen-typing', 'typing-cursor');
       });
     }
+
     window.JCIntro.state.INTRO_READY = false;
     window.JCIntro.state.LISTENER_ADDED = false;
+
     window.G = window.G || {};
     window.G.__typingLock = false;
-    if (typeof window.EffectCoordinator?.stopAll === 'function') window.EffectCoordinator.stopAll();
+
+    if (typeof window.EffectCoordinator?.stopAll === 'function') {
+      window.EffectCoordinator.stopAll();
+    }
   };
 
-  // Listeners estáveis
+  // ============================
+  // Listeners estáveis (document-level)
+  // ============================
   if (!window.JCIntro.state.LISTENER_ADDED) {
+    console.log('[JCIntro] Registrando listeners (sectionLoaded/section:shown)');
     document.addEventListener('sectionLoaded', handler, { passive: true });
-    document.addEventListener('section:shown', handler, { passive: true });
+    document.addEventListener('section:shown', handler, { passive: true }); // alias opcional
     window.JCIntro.state.LISTENER_ADDED = true;
   }
 
-  // Bind inicial
+  // ============================
+  // Bind inicial sem "tempo mágico"
+  // ============================
   const bind = () => {
+    console.log('[JCIntro] Bind inicial');
     queueMicrotask(() => {
       const visibleIntro = document.querySelector('#section-intro:not(.hidden)');
       if (visibleIntro && !visibleIntro.dataset.introInitialized) {
+        console.log('[JCIntro] Intro visível no carregamento → handler');
         handler({ detail: { sectionId: 'section-intro', node: visibleIntro } });
       }
     });
