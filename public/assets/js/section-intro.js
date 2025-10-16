@@ -1,6 +1,12 @@
 (function () {
   'use strict';
 
+  // Verificar se o script já foi incluído
+  if (document.querySelector('script[src*="section-intro.js"]')) {
+    console.log('[section-intro] Script já incluído, ignorando...');
+    return;
+  }
+
   if (window.__introBound) return;
   window.__introBound = true;
 
@@ -43,231 +49,252 @@
     return { sectionId, node };
   }
 
-const handler = async (evt) => {
-  const { sectionId, node } = fromDetail(evt?.detail);
-  if (sectionId !== 'section-intro') return;
+  const handler = async (evt) => {
+    console.log('[section-intro] Handler disparado:', evt?.detail);
+    const { sectionId, node } = fromDetail(evt?.detail);
+    if (sectionId !== 'section-intro') return;
 
-  // Verificar se já foi inicializado
-  if (window.INTRO_READY) {
-    console.log('[section-intro] Já inicializado, ignorando...');
-    return;
-  }
-
-  let root = node || document.getElementById('section-intro');
-  if (!root) {
-    try {
-      root = await waitForElement('#section-intro', { 
-        within: document.getElementById('jornada-content-wrapper') || document, 
-        timeout: 15000 
-      });
-    } catch (e) {
-      window.toast?.('Erro: Seção section-intro não carregada.', 'error');
-      console.error('[section-intro] Section not found:', e);
+    // Verificar se já foi inicializado
+    if (window.INTRO_READY || node?.dataset?.introInitialized) {
+      console.log('[section-intro] Já inicializado, ignorando...');
       return;
     }
-  }
 
-  root.classList.add('section-intro');
-
-  let p1_1, p1_2, p1_3, p2_1, p2_2, avancarBtn;
-  try {
-    p1_1 = await waitForElement('#intro-p1-1', { within: root, timeout: 15000 });
-    p1_2 = await waitForElement('#intro-p1-2', { within: root, timeout: 15000 });
-    p1_3 = await waitForElement('#intro-p1-3', { within: root, timeout: 15000 });
-    p2_1 = await waitForElement('#intro-p2-1', { within: root, timeout: 15000 });
-    p2_2 = await waitForElement('#intro-p2-2', { within: root, timeout: 15000 });
-    avancarBtn = await waitForElement('#btn-avancar', { within: root, timeout: 15000 });
-  } catch (e) {
-    console.error('[section-intro] Elements not found:', e);
-    window.toast?.('Falha ao carregar os elementos da seção Intro.', 'error');
-    return;
-  }
-
-  [p1_1, p1_2, p1_3, p2_1, p2_2].forEach(el => {
-    if (el) {
-      el.style.color = '#fff !important';
-      el.style.opacity = '0 !important';
-      el.style.visibility = 'hidden !important';
-      el.style.display = 'none !important';
-      console.log('[section-intro] Texto inicializado:', el.id, el.textContent?.substring(0, 50));
+    let root = node || document.getElementById('section-intro');
+    if (!root) {
+      try {
+        root = await waitForElement('#section-intro', { 
+          within: document.getElementById('jornada-content-wrapper') || document, 
+          timeout: 15000 
+        });
+      } catch (e) {
+        window.toast?.('Erro: Seção section-intro não carregada.', 'error');
+        console.error('[section-intro] Section not found:', e);
+        return;
+      }
     }
-  });
 
-  root.style.cssText = `
-    background: transparent !important;
-    padding: 24px !important;
-    border-radius: 12px !important;
-    width: 100% !important;
-    max-width: 600px !important;
-    margin: 12px auto !important;
-    text-align: center !important;
-    box-shadow: none !important;
-    border: none !important;
-    display: block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    position: relative !important;
-    z-index: 2 !important;
-    overflow: hidden !important;
-    min-height: 80vh !important;
-    height: 80vh !important;
-    box-sizing: border-box !important;
-  `;
+    // Marcar a seção como inicializada
+    root.dataset.introInitialized = 'true';
+    root.classList.add('section-intro');
 
-  if (avancarBtn) {
-    avancarBtn.classList.add('btn', 'btn-primary', 'btn-stone');
-    avancarBtn.disabled = true;
-    avancarBtn.style.opacity = '0.5 !important';
-    avancarBtn.style.cursor = 'not-allowed !important';
-    avancarBtn.style.display = 'inline-block !important';
-    avancarBtn.style.margin = '8px auto !important';
-    avancarBtn.style.visibility = 'visible !important';
-    avancarBtn.textContent = 'Iniciar';
-    console.log('[section-intro] Botão inicializado:', avancarBtn.className, avancarBtn.textContent);
-  }
-
-  once(avancarBtn, 'click', () => {
-    console.log('[section-intro] Avançando para section-termos');
-    if (typeof window.JC?.show === 'function') {
-      window.JC.show('section-termos');
-    } else {
-      window.location.href = '/termos';
-      console.warn('[section-intro] Fallback navigation to /termos');
+    let p1_1, p1_2, p1_3, p2_1, p2_2, avancarBtn;
+    try {
+      p1_1 = await waitForElement('#intro-p1-1', { within: root, timeout: 15000 });
+      p1_2 = await waitForElement('#intro-p1-2', { within: root, timeout: 15000 });
+      p1_3 = await waitForElement('#intro-p1-3', { within: root, timeout: 15000 });
+      p2_1 = await waitForElement('#intro-p2-1', { within: root, timeout: 15000 });
+      p2_2 = await waitForElement('#intro-p2-2', { within: root, timeout: 15000 });
+      avancarBtn = await waitForElement('#btn-avancar', { within: root, timeout: 15000 });
+    } catch (e) {
+      console.error('[section-intro] Elements not found:', e);
+      window.toast?.('Falha ao carregar os elementos da seção Intro.', 'error');
+      return;
     }
-  });
 
-  const runTypingChain = async () => {
-    console.log('[section-intro] Iniciando datilografia...');
-    const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
+    [p1_1, p1_2, p1_3, p2_1, p2_2].forEach(el => {
+      if (el) {
+        el.style.color = '#fff !important';
+        el.style.opacity = '0 !important';
+        el.style.visibility = 'hidden !important';
+        el.style.display = 'none !important';
+        console.log('[section-intro] Texto inicializado:', el.id, el.textContent?.substring(0, 50));
+      }
+    });
 
-    if (!typingElements.length) {
-      console.warn('[section-intro] Nenhum elemento com data-typing="true" encontrado');
+    root.style.cssText = `
+      background: transparent !important;
+      padding: 24px !important;
+      border-radius: 12px !important;
+      width: 100% !important;
+      max-width: 600px !important;
+      margin: 12px auto !important;
+      text-align: center !important;
+      box-shadow: none !important;
+      border: none !important;
+      display: block !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      position: relative !important;
+      z-index: 2 !important;
+      overflow: hidden !important;
+      min-height: 80vh !important;
+      height: 80vh !important;
+      box-sizing: border-box !important;
+    `;
+
+    if (avancarBtn) {
+      avancarBtn.classList.add('btn', 'btn-primary', 'btn-stone');
+      avancarBtn.disabled = true;
+      avancarBtn.style.opacity = '0.5 !important';
+      avancarBtn.style.cursor = 'not-allowed !important';
+      avancarBtn.style.display = 'inline-block !important';
+      avancarBtn.style.margin = '8px auto !important';
+      avancarBtn.style.visibility = 'visible !important';
+      avancarBtn.textContent = 'Iniciar';
+      console.log('[section-intro] Botão inicializado:', avancarBtn.className, avancarBtn.textContent);
+    }
+
+    once(avancarBtn, 'click', () => {
+      console.log('[section-intro] Avançando para section-termos');
+      if (typeof window.JC?.show === 'function') {
+        window.JC.show('section-termos');
+      } else {
+        window.location.href = '/termos';
+        console.warn('[section-intro] Fallback navigation to /termos');
+      }
+    });
+
+    const runTypingChain = async () => {
+      console.log('[section-intro] runTypingChain chamado');
+      // Verificar lock do TypingBridge
+      if (window.__typingLock) {
+        console.log('[section-intro] Typing lock ativo, aguardando...');
+        await new Promise(resolve => {
+          const checkLock = () => {
+            if (!window.__typingLock) {
+              resolve();
+            } else {
+              setTimeout(checkLock, 100);
+            }
+          };
+          checkLock();
+        });
+      }
+
+      console.log('[section-intro] Iniciando datilografia...');
+      const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
+
+      if (!typingElements.length) {
+        console.warn('[section-intro] Nenhum elemento com data-typing="true" encontrado');
+        if (avancarBtn) {
+          avancarBtn.disabled = false;
+          avancarBtn.style.opacity = '1 !important';
+          avancarBtn.style.cursor = 'pointer !important';
+        }
+        return;
+      }
+
+      console.log('[section-intro] Elementos encontrados:', Array.from(typingElements).map(el => el.id));
+
+      // Fallback para window.runTyping
+      if (typeof window.runTyping !== 'function') {
+        console.warn('[section-intro] window.runTyping não encontrado, usando fallback');
+        window.runTyping = (el, text, resolve, options) => {
+          let i = 0;
+          const speed = options.speed || 50;
+          const type = () => {
+            if (i < text.length) {
+              el.textContent += text.charAt(i);
+              i++;
+              setTimeout(type, speed);
+            } else {
+              el.textContent = text; // Garantir texto completo
+              resolve();
+            }
+          };
+          type();
+        };
+      }
+
+      for (const el of typingElements) {
+        const text = getText(el);
+        console.log('[section-intro] Datilografando:', el.id, text.substring(0, 50));
+        
+        try {
+          el.textContent = '';
+          el.classList.add('typing-active', 'lumen-typing');
+          el.style.color = '#fff !important';
+          el.style.opacity = '0 !important';
+          el.style.display = 'block !important';
+          el.style.visibility = 'hidden !important';
+          await new Promise(resolve => window.runTyping(el, text, resolve, {
+            speed: Number(el.dataset.speed || 50),
+            cursor: String(el.dataset.cursor || 'true') === 'true'
+          }));
+          el.classList.add('typing-done');
+          el.classList.remove('typing-active');
+          el.style.opacity = '1 !important';
+          el.style.visibility = 'visible !important';
+          el.style.display = 'block !important';
+          // Chamada única para TTS
+          if (typeof window.EffectCoordinator?.speak === 'function') {
+            window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
+            console.log('[section-intro] TTS ativado para:', el.id);
+            await new Promise(resolve => setTimeout(resolve, text.length * 30));
+          } else {
+            console.warn('[section-intro] window.EffectCoordinator.speak não encontrado');
+          }
+        } catch (err) {
+          console.error('[section-intro] Erro na datilografia para', el.id, err);
+          el.textContent = text;
+          el.classList.add('typing-done');
+          el.style.opacity = '1 !important';
+          el.style.visibility = 'visible !important';
+          el.style.display = 'block !important';
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+      
+      console.log('[section-intro] Datilografia concluída');
       if (avancarBtn) {
         avancarBtn.disabled = false;
         avancarBtn.style.opacity = '1 !important';
         avancarBtn.style.cursor = 'pointer !important';
       }
-      return;
-    }
+    };
 
-    console.log('[section-intro] Elementos encontrados:', Array.from(typingElements).map(el => el.id));
-
-    // Fallback para window.runTyping
-    if (typeof window.runTyping !== 'function') {
-      console.warn('[section-intro] window.runTyping não encontrado, usando fallback');
-      window.runTyping = (el, text, resolve, options) => {
-        let i = 0;
-        const speed = options.speed || 50;
-        const type = () => {
-          if (i < text.length) {
-            el.textContent += text.charAt(i);
-            i++;
-            setTimeout(type, speed);
-          } else {
-            el.textContent = text; // Garantir texto completo
-            resolve();
-          }
-        };
-        type();
-      };
-    }
-
-    for (const el of typingElements) {
-      const text = getText(el);
-      console.log('[section-intro] Datilografando:', el.id, text.substring(0, 50));
-      
-      try {
-        el.textContent = '';
-        el.classList.add('typing-active', 'lumen-typing');
-        el.style.color = '#fff !important';
-        el.style.opacity = '0 !important';
-        el.style.display = 'block !important';
-        el.style.visibility = 'hidden !important';
-        await new Promise(resolve => window.runTyping(el, text, resolve, {
-          speed: Number(el.dataset.speed || 50),
-          cursor: String(el.dataset.cursor || 'true') === 'true'
-        }));
-        el.classList.add('typing-done');
-        el.classList.remove('typing-active');
-        el.style.opacity = '1 !important';
-        el.style.visibility = 'visible !important';
-        el.style.display = 'block !important';
-        // Chamada única para TTS
-        if (typeof window.EffectCoordinator?.speak === 'function') {
-          window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
-          console.log('[section-intro] TTS ativado para:', el.id);
-          await new Promise(resolve => setTimeout(resolve, text.length * 30));
-        } else {
-          console.warn('[section-intro] window.EffectCoordinator.speak não encontrado');
-        }
-      } catch (err) {
-        console.error('[section-intro] Erro na datilografia para', el.id, err);
-        el.textContent = text;
+    // Forçar inicialização
+    window.INTRO_READY = false;
+    try {
+      await runTypingChain();
+      window.INTRO_READY = true;
+    } catch (err) {
+      console.error('[section-intro] Erro na datilografia:', err);
+      root.querySelectorAll('[data-typing="true"]').forEach(el => {
+        el.textContent = getText(el);
         el.classList.add('typing-done');
         el.style.opacity = '1 !important';
         el.style.visibility = 'visible !important';
         el.style.display = 'block !important';
+      });
+      if (avancarBtn) {
+        avancarBtn.disabled = false;
+        avancarBtn.style.opacity = '1 !important';
+        avancarBtn.style.cursor = 'pointer !important';
       }
-      
-      await new Promise(resolve => setTimeout(resolve, 300));
     }
-    
-    console.log('[section-intro] Datilografia concluída');
-    if (avancarBtn) {
-      avancarBtn.disabled = false;
-      avancarBtn.style.opacity = '1 !important';
-      avancarBtn.style.cursor = 'pointer !important';
-    }
+
+    console.log('[section-intro] Elementos encontrados:', {
+      p1_1: !!p1_1, p1_1Id: p1_1?.id,
+      p1_2: !!p1_2, p1_2Id: p1_2?.id,
+      p1_3: !!p1_3, p1_3Id: p1_3?.id,
+      p2_1: !!p2_1, p2_1Id: p2_1?.id,
+      p2_2: !!p2_2, p2_2Id: p2_2?.id,
+      avancarBtn: !!avancarBtn, avancarId: avancarBtn?.id
+    });
   };
 
-  // Forçar inicialização
-  window.INTRO_READY = false;
-  try {
-    await runTypingChain();
-    window.INTRO_READY = true;
-  } catch (err) {
-    console.error('[section-intro] Erro na datilografia:', err);
-    root.querySelectorAll('[data-typing="true"]').forEach(el => {
-      el.textContent = getText(el);
-      el.classList.add('typing-done');
-      el.style.opacity = '1 !important';
-      el.style.visibility = 'visible !important';
-      el.style.display = 'block !important';
-    });
-    if (avancarBtn) {
-      avancarBtn.disabled = false;
-      avancarBtn.style.opacity = '1 !important';
-      avancarBtn.style.cursor = 'pointer !important';
-    }
+  // Registrar handler apenas uma vez
+  if (!window.INTRO_LISTENER) {
+    window.addEventListener('sectionLoaded', handler, { once: true });
+    window.INTRO_LISTENER = true;
   }
 
-  console.log('[section-intro] Elementos encontrados:', {
-    p1_1: !!p1_1, p1_1Id: p1_1?.id,
-    p1_2: !!p1_2, p1_2Id: p1_2?.id,
-    p1_3: !!p1_3, p1_3Id: p1_3?.id,
-    p2_1: !!p2_1, p2_1Id: p2_1?.id,
-    p2_2: !!p2_2, p2_2Id: p2_2?.id,
-    avancarBtn: !!avancarBtn, avancarId: avancarBtn?.id
-  });
-};
-
-// Registrar handler apenas uma vez
-if (!window.INTRO_LISTENER) {
-  window.addEventListener('sectionLoaded', handler);
-  window.INTRO_LISTENER = true;
-}
   const bind = () => {
-   document.removeEventListener('sectionLoaded', handler);
-   document.removeEventListener('section:shown', handler);
-   document.addEventListener('sectionLoaded', handler, { passive: true });
+    // Remover qualquer listener antigo
+    document.removeEventListener('sectionLoaded', handler);
+    document.removeEventListener('section:shown', handler);
+    document.addEventListener('sectionLoaded', handler, { passive: true, once: true });
 
-   setTimeout(() => {
-  const visibleIntro = document.querySelector('#section-intro:not(.hidden)');
-  if (visibleIntro) {
-    handler({ detail: { sectionId: 'section-intro', node: visibleIntro } });
-  }
-}, 100);
-
+    setTimeout(() => {
+      const visibleIntro = document.querySelector('#section-intro:not(.hidden)');
+      if (visibleIntro && !visibleIntro.dataset.introInitialized) {
+        handler({ detail: { sectionId: 'section-intro', node: visibleIntro } });
+      }
+    }, 100);
+  };
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bind, { once: true });
