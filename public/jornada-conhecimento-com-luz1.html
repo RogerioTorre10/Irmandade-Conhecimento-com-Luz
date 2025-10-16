@@ -127,20 +127,23 @@
       if (typeof window.JC?.init === 'function' && typeof window.carregarEtapa === 'function') {
         console.log('[Init] Scripts prontos, executando callback');
         callback();
-      } else if (attempts < maxAttempts) {
-        attempts++;
-        setTimeout(check, interval);
       } else {
-        console.error('[Init] Falha ao carregar scripts após várias tentativas');
-        // Fallback para carregar termos diretamente
-        if (typeof window.carregarEtapa === 'function') {
-          console.log('[Init] Fallback: carregando section-termos diretamente');
-          window.carregarEtapa('termos');
+        console.log('[Init] Status: JC.init', typeof window.JC?.init, 'carregarEtapa', typeof window.carregarEtapa);
+        if (attempts < maxAttempts) {
+          attempts++;
+          setTimeout(check, interval);
         } else {
-          console.error('[Init] window.carregarEtapa não disponível');
-          // Fallback para carregar intro
+          console.error('[Init] Falha ao carregar scripts após várias tentativas');
+          // Fallback para carregar termos diretamente
           if (typeof window.carregarEtapa === 'function') {
-            window.carregarEtapa('intro');
+            console.log('[Init] Fallback: carregando section-termos diretamente');
+            window.carregarEtapa('termos');
+          } else {
+            console.error('[Init] window.carregarEtapa não disponível');
+            // Fallback para carregar intro
+            if (typeof window.carregarEtapa === 'function') {
+              window.carregarEtapa('intro');
+            }
           }
         }
       }
