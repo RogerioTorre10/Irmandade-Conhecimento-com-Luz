@@ -62,7 +62,7 @@
   // Datilografia + TTS (sincronizados)
   // ============================
   function typeParagraph(el, fullText, opts = {}) {
-    const speed = Number(opts.speed || el.dataset.speed || 62); // ~humano (55–70ms)
+    const speed = Number(opts.speed || el.dataset.speed || 70); // ~humano (55–70ms)
     const withCursor = String(el.dataset.cursor || 'true') === 'true';
     const speakTogether = true;        // true = TTS acompanha a digitação; false = TTS só depois
     const startTTSAtRatio = 0.18;      // inicia TTS quando ~18% já foi digitado
