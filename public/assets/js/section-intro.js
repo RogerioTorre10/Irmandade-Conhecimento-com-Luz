@@ -192,120 +192,117 @@
   }
 });
 
-    const runTypingChain = async () => {
-      window.JCIntro.state.TYPING_COUNT++;
-      console.log(`[JCIntro] runTypingChain chamado (${window.JCIntro.state.TYPING_COUNT}x)`);
-      if (window.__typingLock) {
-        console.log('[JCIntro] Typing lock ativo, aguardando...');
-        await new Promise(resolve => {
-          const checkLock = () => {
-            if (!window.__typingLock) {
-              console.log('[JCIntro] Lock liberado, prosseguindo...');
-              resolve();
-            } else {
-              setTimeout(checkLock, 100);
-            }
-          };
-          checkLock();
-        });
-      }
-
-      console.log('[JCIntro] Iniciando datilografia...');
-      const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
-
-      if (!typingElements.length) {
-        console.warn('[JCIntro] Nenhum elemento com data-typing="true" encontrado');
-        if (avancarBtn) {
-          avancarBtn.disabled = false;
-          avancarBtn.style.opacity = '1';
-          avancarBtn.style.cursor = 'pointer';
+   const runTypingChain = async () => {
+  window.JCIntro.state.TYPING_COUNT++;
+  console.log(`[JCIntro] runTypingChain chamado (${window.JCIntro.state.TYPING_COUNT}x)`);
+  if (window.__typingLock) {
+    console.log('[JCIntro] Typing lock ativo, aguardando...');
+    await new Promise(resolve => {
+      const checkLock = () => {
+        if (!window.__typingLock) {
+          console.log('[JCIntro] Lock liberado, prosseguindo...');
+          resolve();
+        } else {
+          setTimeout(checkLock, 100);
         }
-        return;
-      }
+      };
+      checkLock();
+    });
+  }
 
-      console.log('[JCIntro] Elementos encontrados:', Array.from(typingElements).map(el => el.id));
+  console.log('[JCIntro] Iniciando datilografia...');
+  const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
 
-      // Fallback para window.runTyping
-      if (typeof window.runTyping !== 'function') {
-        console.warn('[JCIntro] window.runTyping não encontrado, usando fallback');
-        window.runTyping = (el, text, resolve, options) => {
-          let i = 0;
-          const speed = options.speed || 100; // Aumentado de 50ms para 100ms
-          const type = () => {
-            if (i < text.length) {
-              el.textContent += text.charAt(i);
-              i++;
-              setTimeout(type, speed);
-            } else {
-              el.textContent = text;
-              resolve();
-            }
-          };
-          type();
-        };
-      }
+  if (!typingElements.length) {
+    console.warn('[JCIntro] Nenhum elemento com data-typing="true" encontrado');
+    if (avancarBtn) {
+      avancarBtn.disabled = false;
+      avancarBtn.style.opacity = '1';
+      avancarBtn.style.cursor = 'pointer';
+    }
+    return;
+  }
 
-      for (const el of typingElements) {
-        const text = getText(el);
-        console.log('[JCIntro] Datilografando:', el.id, text.substring(0, 50));
-        
-        try {
-          el.textContent = '';
-          el.classList.add('typing-active', 'lumen-typing');
-          el.style.color = '#fff';
-          el.style.opacity = '0';
-          el.style.display = 'block';
-          el.style.visibility = 'hidden';
-          await new Promise(resolve => window.runTyping(el, text, resolve, {
-            speed: Number(el.dataset.speed || 100), // Aumentado de 50ms para 100ms
-            cursor: String(el.dataset.cursor || 'true') === 'true'
-          }));
-          el.classList.add('typing-done');
-          el.classList.remove('typing-active');
-          el.style.opacity = '1';
-          el.style.visibility = 'visible';
-          el.style.display = 'block';
-          if (typeof window.EffectCoordinator?.speak === 'function') {
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'pt-BR';
-            utterance.rate = 1.1;
-            utterance.pitch = 1.0;
-            console.log('[JCIntro] TTS iniciado para:', el.id);
-            window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
-            // Esperar o TTS terminar
-            await new Promise(resolve => {
-              utterance.onend = () => {
-                console.log('[JCIntro] TTS concluído para:', el.id);
-                resolve();
-              };
-              // Fallback para garantir que não fique preso
-              setTimeout(resolve, text.length * 50); // Aumentado de 30ms para 50ms por caractere
-            });
-          } else {
-            console.warn('[JCIntro] window.EffectCoordinator.speak não encontrado');
-            // Fallback para aguardar um tempo proporcional ao texto
-            await new Promise(resolve => setTimeout(resolve, text.length * 50));
-          }
-        } catch (err) {
-          console.error('[JCIntro] Erro na datilografia para', el.id, err);
+  console.log('[JCIntro] Elementos encontrados:', Array.from(typingElements).map(el => el.id));
+
+  // Fallback para window.runTyping
+  if (typeof window.runTyping !== 'function') {
+    console.warn('[JCIntro] window.runTyping não encontrado, usando fallback');
+    window.runTyping = (el, text, resolve, options) => {
+      let i = 0;
+      const speed = options.speed || 100;
+      const type = () => {
+        if (i < text.length) {
+          el.textContent += text.charAt(i);
+          i++;
+          setTimeout(type, speed);
+        } else {
           el.textContent = text;
-          el.classList.add('typing-done');
-          el.style.opacity = '1';
-          el.style.visibility = 'visible';
-          el.style.display = 'block';
+          resolve();
         }
-        
-        await new Promise(resolve => setTimeout(resolve, 300));
-      }
-      
-      console.log('[JCIntro] Datilografia concluída');
-      if (avancarBtn) {
-        avancarBtn.disabled = false;
-        avancarBtn.style.opacity = '1';
-        avancarBtn.style.cursor = 'pointer';
-      }
+      };
+      type();
     };
+  }
 
+  for (const el of typingElements) {
+    const text = getText(el);
+    console.log('[JCIntro] Datilografando:', el.id, text.substring(0, 50));
+    
+    try {
+      el.textContent = '';
+      el.classList.add('typing-active', 'lumen-typing');
+      el.style.color = '#fff';
+      el.style.opacity = '0';
+      el.style.display = 'block';
+      el.style.visibility = 'hidden';
+      await new Promise(resolve => window.runTyping(el, text, resolve, {
+        speed: Number(el.dataset.speed || 100),
+        cursor: String(el.dataset.cursor || 'true') === 'true'
+      }));
+      el.classList.add('typing-done');
+      el.classList.remove('typing-active');
+      el.style.opacity = '1';
+      el.style.visibility = 'visible';
+      el.style.display = 'block';
+      if (typeof window.EffectCoordinator?.speak === 'function') {
+        speechSynthesis.cancel(); // Cancelar qualquer TTS anterior
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'pt-BR';
+        utterance.rate = 1.1;
+        utterance.pitch = 1.0;
+        console.log('[JCIntro] TTS iniciado para:', el.id);
+        window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
+        await new Promise(resolve => {
+          utterance.onend = () => {
+            console.log('[JCIntro] TTS concluído para:', el.id);
+            resolve();
+          };
+          setTimeout(resolve, text.length * 50);
+        });
+      } else {
+        console.warn('[JCIntro] window.EffectCoordinator.speak não encontrado');
+        await new Promise(resolve => setTimeout(resolve, text.length * 50));
+      }
+    } catch (err) {
+      console.error('[JCIntro] Erro na datilografia para', el.id, err);
+      el.textContent = text;
+      el.classList.add('typing-done');
+      el.style.opacity = '1';
+      el.style.visibility = 'visible';
+      el.style.display = 'block';
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, 300));
+  }
+  
+  console.log('[JCIntro] Datilografia concluída');
+  if (avancarBtn) {
+    avancarBtn.disabled = false;
+    avancarBtn.style.opacity = '1';
+    avancarBtn.style.cursor = 'pointer';
+  }
+};
     window.JCIntro.state.INTRO_READY = false;
     console.log('[JCIntro] Iniciando runTypingChain...');
     try {
