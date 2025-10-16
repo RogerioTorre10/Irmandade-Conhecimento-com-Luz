@@ -1,10 +1,10 @@
 (function () {
   'use strict';
 
-  // Namespace isolado da seção Intro
+  // Namespace isolado da seção
   window.JCIntro = window.JCIntro || {};
 
-  // Evita reinicialização
+  // Evita dupla inicialização do arquivo inteiro
   if (window.JCIntro.__bound) {
     console.log('[JCIntro] Já inicializado, ignorando...');
     return;
@@ -60,25 +60,22 @@
     return { sectionId, node };
   }
 
-  // ============================================
-  // Handler principal da seção Intro
-  // ============================================
+  // Handler principal de ativação da seção
   const handler = async (evt) => {
     console.log('[JCIntro] Handler disparado:', evt?.detail);
-
-    const { sectionId, node } = fromDetail(evt?.detail || {});
+    const { sectionId, node } = fromDetail(evt?.detail);
     if (sectionId !== 'section-intro') {
-      console.log('[JCIntro] Ignorando, sectionId não é section-intro:', sectionId);
+      // Ignora eventos de outras sections
       return;
     }
 
-    // Previne reentrada
+    // Já inicializado?
     if (window.JCIntro.state.INTRO_READY || (node && node.dataset.introInitialized)) {
       console.log('[JCIntro] Já inicializado (INTRO_READY ou data-intro-initialized), ignorando...');
       return;
     }
 
-    // Localiza ou cria root
+    // Root da seção
     let root = node || document.getElementById('section-intro');
     if (!root) {
       console.log('[JCIntro] Tentando localizar #section-intro...');
@@ -89,7 +86,8 @@
         });
       } catch (e) {
         window.toast?.('Erro: Seção section-intro não carregada.', 'error');
-        console.error('[JCIntro] Section not found, criando fallback:', e);
+        console.error('[JCIntro] Section not found:', e);
+        // Fallback: cria seção para não travar a jornada
         const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
         root = document.createElement('section');
         root.id = 'section-intro';
@@ -100,12 +98,11 @@
 
     console.log('[JCIntro] Root encontrado:', root);
     root.dataset.introInitialized = 'true';
-    root.classList.add('section-intro', 'intro-sandbox');
+    root.classList.add('section-intro', 'intro-sandbox'); // classe para isolamento visual via CSS dedicado
 
-    // Busca elementos
     let p1_1, p1_2, p1_3, p2_1, p2_2, avancarBtn;
     try {
-      console.log('[JCIntro] Buscando elementos...');
+      console.log('[JCIntro] Buscando elementos da intro...');
       p1_1 = await waitForElement('#intro-p1-1', { within: root, timeout: 15000 });
       p1_2 = await waitForElement('#intro-p1-2', { within: root, timeout: 15000 });
       p1_3 = await waitForElement('#intro-p1-3', { within: root, timeout: 15000 });
@@ -113,7 +110,9 @@
       p2_2 = await waitForElement('#intro-p2-2', { within: root, timeout: 15000 });
       avancarBtn = await waitForElement('#btn-avancar', { within: root, timeout: 15000 });
     } catch (e) {
-      console.error('[JCIntro] Elements not found, criando fallbacks:', e);
+      console.error('[JCIntro] Elements not found:', e);
+      window.toast?.('Falha ao carregar os elementos da seção Intro.', 'error');
+      // Fallback: cria placeholders para não travar
       const createFallbackElement = (id) => {
         const el = document.createElement('div');
         el.id = id;
@@ -127,27 +126,30 @@
       p1_3 = p1_3 || createFallbackElement('intro-p1-3');
       p2_1 = p2_1 || createFallbackElement('intro-p2-1');
       p2_2 = p2_2 || createFallbackElement('intro-p2-2');
-      if (!avancarBtn) {
-        avancarBtn = document.createElement('button');
-        avancarBtn.id = 'btn-avancar';
-        avancarBtn.textContent = 'Iniciar';
-        root.appendChild(avancarBtn);
-      }
+      avancarBtn = avancarBtn || document.createElement('button');
+      avancarBtn.id = 'btn-avancar';
+      root.appendChild(avancarBtn);
       console.log('[JCIntro] Elementos criados como fallback');
     }
 
     console.log('[JCIntro] Elementos carregados:', { p1_1, p1_2, p1_3, p2_1, p2_2, avancarBtn });
 
-    // Inicializa textos "ocultos" para a datilografia
+    // Estado visual inicial dos textos
     [p1_1, p1_2, p1_3, p2_1, p2_2].forEach(el => {
-      if (!el) return;
-      el.style.opacity = '0';
-      el.style.visibility = 'hidden';
-      el.style.display = 'none';
-      console.log('[JCIntro] Texto inicializado:', el.id, el.textContent?.substring(0, 50));
+      if (el) {
+        el.style.opacity = '0';
+        el.style.visibility = 'hidden';
+        el.style.display = 'none';
+        console.log('[JCIntro] Texto inicializado:', el.id, el.textContent?.substring(0, 50));
+      }
     });
 
-    // Botão Avançar (desabilitado até concluir a datilografia)
+    // Aparência principal deve vir do CSS (.intro-sandbox); mantemos inline só o essencial
+    root.style.display = 'block';
+    root.style.opacity = '1';
+    root.style.visibility = 'visible';
+
+    // Botão avançar
     if (avancarBtn) {
       avancarBtn.classList.add('btn', 'btn-primary', 'btn-stone');
       avancarBtn.disabled = true;
@@ -156,16 +158,221 @@
       avancarBtn.style.display = 'inline-block';
       avancarBtn.style.margin = '8px auto';
       avancarBtn.style.visibility = 'visible';
-      avancarBtn.textContent = avancarBtn.textContent || 'Iniciar';
+      avancarBtn.textContent = 'Iniciar';
       console.log('[JCIntro] Botão inicializado:', avancarBtn.className, avancarBtn.textContent);
     }
 
-    // Navegação: prioriza controller; senão evento neutro; por fim fallback de URL
+    // Navegação segura e desacoplada
     once(avancarBtn, 'click', () => {
       console.log('[JCIntro] Avançando para section-termos');
       if (typeof window.JC?.show === 'function') {
         window.JC.show('section-termos');
+      } else {
+        // Evento neutro que o controller pode ouvir
+        document.dispatchEvent(new CustomEvent('section:navigate', {
+          detail: { to: 'section-termos', from: 'section-intro' }
+        }));
+        // Fallback final (evita travar)
+        setTimeout(() => {
+          if (!document.getElementById('section-termos')) {
+            window.location.href = '/termos';
+            console.warn('[JCIntro] Fallback navigation to /termos');
+          }
+        }, 400);
+      }
+    });
+
+    // Cadeia de datilografia com lock unificado
+    const runTypingChain = async () => {
+      console.log('[JCIntro] runTypingChain chamado');
+
+      // Normaliza lock global
+      window.G = window.G || {};
+      const isLocked = (window.G.__typingLock === true) || (window.__typingLock === true);
+      if (isLocked) {
+        console.log('[JCIntro] Typing lock ativo, aguardando...');
+        await new Promise(resolve => {
+          const checkLock = () => {
+            const unlocked = !(window.G.__typingLock === true) && !(window.__typingLock === true);
+            if (unlocked) {
+              console.log('[JCIntro] Lock liberado, prosseguindo...');
+              resolve();
+            } else {
+              setTimeout(checkLock, 100);
+            }
+          };
+          checkLock();
+        });
+      }
+
+      console.log('[JCIntro] Iniciando datilografia...');
+      const typingElements = root.querySelectorAll('[data-typing="true"]:not(.typing-done)');
+
+      if (!typingElements.length) {
+        console.warn('[JCIntro] Nenhum elemento com data-typing="true" encontrado');
+        if (avancarBtn) {
+          avancarBtn.disabled = false;
+          avancarBtn.style.opacity = '1';
+          avancarBtn.style.cursor = 'pointer';
+        }
         return;
       }
-      // Evento neutro (permite orquestrador decidir)
-      document
+
+      console.log('[JCIntro] Elementos a datilografar:', Array.from(typingElements).map(el => el.id));
+
+      // Fallback do runTyping (caso módulo externo esteja ausente)
+      if (typeof window.runTyping !== 'function') {
+        console.warn('[JCIntro] window.runTyping não encontrado, usando fallback local');
+        window.runTyping = (el, text, resolve, options) => {
+          let i = 0;
+          const speed = Number(options.speed || 50);
+          const type = () => {
+            if (i < text.length) {
+              el.textContent += text.charAt(i);
+              i++;
+              setTimeout(type, speed);
+            } else {
+              el.textContent = text;
+              resolve();
+            }
+          };
+          type();
+        };
+      }
+
+      for (const el of typingElements) {
+        const text = getText(el);
+        console.log('[JCIntro] Datilografando:', el.id, text.substring(0, 50));
+
+        try {
+          el.textContent = '';
+          el.classList.add('typing-active', 'lumen-typing');
+          el.style.opacity = '0';
+          el.style.display = 'block';
+          el.style.visibility = 'hidden';
+
+          await new Promise(resolve => window.runTyping(el, text, resolve, {
+            speed: Number(el.dataset.speed || 50),
+            cursor: String(el.dataset.cursor || 'true') === 'true'
+          }));
+
+          el.classList.add('typing-done');
+          el.classList.remove('typing-active');
+          el.style.opacity = '1';
+          el.style.visibility = 'visible';
+          el.style.display = 'block';
+
+          if (typeof window.EffectCoordinator?.speak === 'function') {
+            window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
+            console.log('[JCIntro] TTS ativado para:', el.id);
+            await new Promise(resolve => setTimeout(resolve, text.length * 30));
+          } else {
+            console.warn('[JCIntro] window.EffectCoordinator.speak não encontrado');
+          }
+        } catch (err) {
+          console.error('[JCIntro] Erro na datilografia para', el.id, err);
+          el.textContent = text;
+          el.classList.add('typing-done');
+          el.style.opacity = '1';
+          el.style.visibility = 'visible';
+          el.style.display = 'block';
+        }
+
+        // Respiro entre blocos
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+
+      console.log('[JCIntro] Datilografia concluída');
+      if (avancarBtn) {
+        avancarBtn.disabled = false;
+        avancarBtn.style.opacity = '1';
+        avancarBtn.style.cursor = 'pointer';
+      }
+    };
+
+    // Rodar a cadeia de datilografia com proteção
+    window.JCIntro.state.INTRO_READY = false;
+    console.log('[JCIntro] Iniciando runTypingChain...');
+    try {
+      await runTypingChain();
+      window.JCIntro.state.INTRO_READY = true;
+      console.log('[JCIntro] Inicialização concluída');
+    } catch (err) {
+      console.error('[JCIntro] Erro na datilografia:', err);
+      root.querySelectorAll('[data-typing="true"]').forEach(el => {
+        el.textContent = getText(el);
+        el.classList.add('typing-done');
+        el.style.opacity = '1';
+        el.style.visibility = 'visible';
+        el.style.display = 'block';
+      });
+      if (avancarBtn) {
+        avancarBtn.disabled = false;
+        avancarBtn.style.opacity = '1';
+        avancarBtn.style.cursor = 'pointer';
+      }
+    }
+
+    console.log('[JCIntro] Elementos (final):', {
+      p1_1: !!p1_1, p1_1Id: p1_1?.id,
+      p1_2: !!p1_2, p1_2Id: p1_2?.id,
+      p1_3: !!p1_3, p1_3Id: p1_3?.id,
+      p2_1: !!p2_1, p2_1Id: p2_1?.id,
+      p2_2: !!p2_2, p2_2Id: p2_2?.id,
+      avancarBtn: !!avancarBtn, avancarId: avancarBtn?.id
+    });
+  };
+
+  // Destroy completo e idempotente
+  window.JCIntro.destroy = () => {
+    console.log('[JCIntro] Destruindo seção intro');
+    document.removeEventListener('sectionLoaded', handler, { passive: true });
+    document.removeEventListener('section:shown', handler, { passive: true });
+
+    const root = document.getElementById('section-intro');
+    if (root) {
+      delete root.dataset.introInitialized;
+      root.querySelectorAll('[data-typing="true"]').forEach(el => {
+        el.classList.remove('typing-active', 'typing-done', 'lumen-typing');
+      });
+    }
+
+    window.JCIntro.state.INTRO_READY = false;
+    window.JCIntro.state.LISTENER_ADDED = false;
+
+    if (typeof window.EffectCoordinator?.stopAll === 'function') {
+      window.EffectCoordinator.stopAll();
+    }
+
+    window.G = window.G || {};
+    window.G.__typingLock = false;
+  };
+
+  // Registrar listeners estáveis (no document)
+  if (!window.JCIntro.state.LISTENER_ADDED) {
+    console.log('[JCIntro] Registrando listeners de seção (document-level)');
+    document.addEventListener('sectionLoaded', handler, { passive: true });
+    document.addEventListener('section:shown', handler, { passive: true }); // alias opcional
+    window.JCIntro.state.LISTENER_ADDED = true;
+  }
+
+  // Bind inicial sem tempo mágico (microtask)
+  const bind = () => {
+    console.log('[JCIntro] Executando bind inicial');
+    queueMicrotask(() => {
+      const visibleIntro = document.querySelector('#section-intro:not(.hidden)');
+      if (visibleIntro && !visibleIntro.dataset.introInitialized) {
+        console.log('[JCIntro] Seção visível encontrada, disparando handler');
+        handler({ detail: { sectionId: 'section-intro', node: visibleIntro } });
+      }
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    console.log('[JCIntro] Aguardando DOMContentLoaded');
+    document.addEventListener('DOMContentLoaded', bind, { once: true });
+  } else {
+    console.log('[JCIntro] DOM já carregado, chamando bind');
+    bind();
+  }
+})();
