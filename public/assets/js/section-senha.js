@@ -353,4 +353,375 @@
 
       if (!typingElements.length) {
         console.warn('[JCSenha] Nenhum elemento com data-typing="true" encontrado');
-        [avancarBtn
+        [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
+          if (btn && getComputedStyle(btn).opacity === '1') {
+            btn.disabled = false;
+            btn.style.cursor = 'pointer';
+            btn.style.pointerEvents = 'auto';
+          }
+        });
+        if (senhaInput && getComputedStyle(senhaInput).opacity === '1') {
+          senhaInput.disabled = false;
+          senhaInput.style.pointerEvents = 'auto';
+          senhaInput.style.cursor = 'text';
+        }
+        root.style.opacity = '1 !important';
+        root.style.visibility = 'visible !important';
+        root.style.display = 'flex !important';
+        window.JCSenha.state.navigationLocked = false;
+        return;
+      }
+
+      console.log('[JCSenha] Elementos encontrados:', Array.from(typingElements).map(el => el.id));
+
+      if (typeof window.runTyping !== 'function') {
+        console.warn('[JCSenha] window.runTyping não encontrado, usando fallback');
+        window.runTyping = (el, text, resolve, options) => {
+          let i = 0;
+          const speed = options.speed || 100;
+          const cursor = options.cursor !== 'false';
+          el.style.position = 'relative';
+          el.style.whiteSpace = 'pre-wrap';
+          const type = () => {
+            if (i < text.length) {
+              el.textContent = text.substring(0, i + 1);
+              if (cursor) {
+                el.style.borderRight = '2px solid #fff';
+              }
+              i++;
+              setTimeout(type, speed);
+            } else {
+              el.textContent = text;
+              el.style.borderRight = 'none';
+              resolve();
+            }
+          };
+          type();
+        };
+      }
+
+      for (const el of typingElements) {
+        const text = getText(el);
+        console.log('[JCSenha] Datilografando:', el.id, text.substring(0, 50));
+        
+        try {
+          el.textContent = '';
+          el.classList.add('typing-active', 'lumen-typing');
+          el.style.color = '#fff';
+          el.style.opacity = '1 !important';
+          el.style.display = 'block !important';
+          el.style.visibility = 'visible !important';
+          await new Promise(resolve => window.runTyping(el, text, resolve, {
+            speed: Number(el.dataset.speed || 100),
+            cursor: String(el.dataset.cursor || 'true') === 'true'
+          }));
+          el.classList.add('typing-done');
+          el.classList.remove('typing-active');
+          el.style.opacity = '1 !important';
+          el.style.visibility = 'visible !important';
+          el.style.display = 'block !important';
+          if (typeof window.EffectCoordinator?.speak === 'function') {
+            speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'pt-BR';
+            utterance.rate = 1.1;
+            utterance.pitch = 1.0;
+            console.log('[JCSenha] TTS iniciado para:', el.id);
+            window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
+            utterance.onend = () => {
+              console.log('[JCSenha] TTS concluído para:', el.id);
+            };
+          } else {
+            console.warn('[JCSenha] window.EffectCoordinator.speak não encontrado');
+          }
+        } catch (err) {
+          console.error('[JCSenha] Erro na datilografia para', el.id, err);
+          el.textContent = text;
+          el.classList.add('typing-done');
+          el.style.opacity = '1 !important';
+          el.style.visibility = 'visible !important';
+          el.style.display = 'block !important';
+        }
+      }
+      
+      console.log('[JCSenha] Datilografia e TTS concluídos');
+      [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
+        if (btn && getComputedStyle(btn).opacity === '1') {
+          btn.disabled = false;
+          btn.style.cursor = 'pointer';
+          btn.style.pointerEvents = 'auto';
+          btn.style.opacity = '1 !important';
+          btn.style.visibility = 'visible !important';
+          btn.style.display = 'inline-block !important';
+        }
+      });
+      if (senhaInput && getComputedStyle(senhaInput).opacity === '1') {
+        senhaInput.disabled = false;
+        senhaInput.style.pointerEvents = 'auto';
+        senhaInput.style.cursor = 'text';
+        senhaInput.style.opacity = '1 !important';
+        senhaInput.style.visibility = 'visible !important';
+        senhaInput.style.display = 'block !important';
+      }
+      window.JCSenha.state.navigationLocked = false;
+    };
+
+    const blockAutoNavigation = (e) => {
+      if (!e.isTrusted || window.JCSenha.state.navigationLocked) {
+        console.log('[JCSenha] Navegação automática bloqueada:', e.type, e.target);
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof window.JC?.show === 'function') {
+          const originalShow = window.JC.show;
+          window.JC.show = (...args) => {
+            if (window.JCSenha.state.navigationLocked) {
+              console.log('[JCSenha] window.JC.show bloqueado:', args);
+              return;
+            }
+            originalShow(...args);
+          };
+        }
+      }
+    };
+
+    const forceVisibility = () => {
+      if (!root || !document.body.contains(root)) {
+        console.warn('[JCSenha] Root não encontrado no DOM, recriando...');
+        const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
+        root = document.createElement('section');
+        root.id = 'section-senha';
+        root.dataset.senhaInitialized = 'true';
+        root.classList.add('section-senha');
+        root.classList.remove('hidden');
+        root.setAttribute('aria-hidden', 'false');
+        root.style.cssText = `
+          background: transparent;
+          padding: 24px;
+          border-radius: 12px;
+          width: 100%;
+          max-width: 600px;
+          margin: 12px auto;
+          text-align: center;
+          box-shadow: none;
+          border: none;
+          display: flex !important;
+          flex-direction: column;
+          align-items: center;
+          opacity: 1 !important;
+          visibility: visible !important;
+          position: static;
+          z-index: 1000;
+          overflow-y: hidden;
+          overflow-x: hidden;
+          max-height: 100vh;
+          box-sizing: border-box;
+          transition: none;
+        `;
+        wrapper.appendChild(root);
+        root.appendChild(textContainer);
+        root.appendChild(inputContainer);
+        root.appendChild(avancarBtn);
+        root.appendChild(prevBtn);
+      }
+      root.style.opacity = '1 !important';
+      root.style.visibility = 'visible !important';
+      root.style.display = 'flex !important';
+      [textContainer, inputContainer, instr1, instr2, instr3, instr4, senhaInput, toggleBtn, avancarBtn, prevBtn].forEach(el => {
+        if (el) {
+          el.style.opacity = '1 !important';
+          el.style.visibility = 'visible !important';
+          el.style.display = el.tagName === 'BUTTON' || el.tagName === 'INPUT' ? 'inline-block !important' : 'block !important';
+          console.log('[JCSenha] Visibilidade forçada para:', el.id || el.className, getComputedStyle(el).opacity);
+        }
+      });
+      console.log('[JCSenha] Visibilidade forçada');
+    };
+
+    // Observar mudanças no DOM
+    const observeVisibility = () => {
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach(mutation => {
+          console.log('[JCSenha] Mutação detectada:', mutation.type, mutation.target.id || mutation.target.className);
+          if (mutation.type === 'attributes' && (mutation.target === root || root.contains(mutation.target))) {
+            if (mutation.attributeName === 'style' || mutation.attributeName === 'class') {
+              console.log('[JCSenha] Estilo ou classe alterada em:', mutation.target.id || mutation.target.className);
+              forceVisibility();
+            }
+          } else if (mutation.type === 'childList' && !document.body.contains(root)) {
+            console.warn('[JCSenha] Root removido do DOM, recriando...');
+            forceVisibility();
+          }
+        });
+      });
+      observer.observe(document.body, { attributes: true, childList: true, subtree: true });
+      return observer;
+    };
+
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        console.log('[JCSenha] Clique no botão olho mágico');
+        if (senhaInput.type === 'password') {
+          senhaInput.type = 'text';
+          toggleBtn.textContent = '🙈';
+          console.log('[JCSenha] Senha visível');
+        } else {
+          senhaInput.type = 'password';
+          toggleBtn.textContent = '👁️';
+          console.log('[JCSenha] Senha oculta');
+        }
+      });
+    }
+
+    if (avancarBtn) {
+      avancarBtn.addEventListener('click', async (e) => {
+        if (e.isTrusted && !window.JCSenha.state.navigationLocked && window.JCSenha.state.ready) {
+          speechSynthesis.cancel();
+          const senha = senhaInput?.value?.trim() || '';
+          console.log('[JCSenha] Enviando senha:', senha);
+          if (typeof window.JC?.show === 'function') {
+            window.JC.show('section-guia');
+          } else {
+            window.location.href = '/guia';
+            console.warn('[JCSenha] Fallback navigation to /guia');
+          }
+        } else {
+          console.log('[JCSenha] Clique simulado, seção não pronta ou navegação bloqueada, ignorado');
+        }
+      });
+      avancarBtn.addEventListener('click', blockAutoNavigation, { capture: true });
+    }
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', async (e) => {
+        if (e.isTrusted && !window.JCSenha.state.navigationLocked) {
+          speechSynthesis.cancel();
+          console.log('[JCSenha] Redirecionando para site fora da jornada');
+          window.location.href = '/';
+        } else {
+          console.log('[JCSenha] Clique simulado ou navegação bloqueada, ignorado');
+        }
+      });
+      prevBtn.addEventListener('click', blockAutoNavigation, { capture: true });
+    }
+
+    window.addEventListener('sectionLoaded', blockAutoNavigation, { capture: true });
+    window.addEventListener('section:shown', blockAutoNavigation, { capture: true });
+
+    window.JCSenha.state.ready = false;
+    console.log('[JCSenha] Iniciando runTypingChain...');
+    try {
+      mutationObserver = observeVisibility();
+      visibilityInterval = setInterval(forceVisibility, 50);
+      await runTypingChain();
+      window.JCSenha.state.ready = true;
+      console.log('[JCSenha] Inicialização concluída');
+    } catch (err) {
+      console.error('[JCSenha] Erro na datilografia:', err);
+      textContainer.querySelectorAll('[data-typing="true"]').forEach(el => {
+        el.textContent = getText(el);
+        el.classList.add('typing-done');
+        el.style.opacity = '1 !important';
+        el.style.visibility = 'visible !important';
+        el.style.display = 'block !important';
+      });
+      [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
+        if (btn && getComputedStyle(btn).opacity === '1') {
+          btn.disabled = false;
+          btn.style.cursor = 'pointer';
+          btn.style.pointerEvents = 'auto';
+          btn.style.opacity = '1 !important';
+          btn.style.visibility = 'visible !important';
+          btn.style.display = 'inline-block !important';
+        }
+      });
+      if (senhaInput && getComputedStyle(senhaInput).opacity === '1') {
+        senhaInput.disabled = false;
+        senhaInput.style.pointerEvents = 'auto';
+        senhaInput.style.cursor = 'text';
+        senhaInput.style.opacity = '1 !important';
+        senhaInput.style.visibility = 'visible !important';
+        senhaInput.style.display = 'block !important';
+      }
+      window.JCSenha.state.navigationLocked = false;
+    }
+
+    console.log('[JCSenha] Elementos encontrados:', {
+      instr1: !!instr1, instr1Id: instr1?.id,
+      instr2: !!instr2, instr2Id: instr2?.id,
+      instr3: !!instr3, instr3Id: instr3?.id,
+      instr4: !!instr4, instr4Id: instr4?.id,
+      textContainer: !!textContainer, textContainerId: textContainer?.id,
+      inputContainer: !!inputContainer, inputContainerId: inputContainer?.id,
+      senhaInput: !!senhaInput, senhaInputId: senhaInput?.id,
+      toggleBtn: !!toggleBtn, toggleBtnAction: toggleBtn?.dataset?.action,
+      avancarBtn: !!avancarBtn, avancarBtnAction: avancarBtn?.dataset?.action,
+      prevBtn: !!prevBtn, prevBtnAction: prevBtn?.dataset?.action
+    });
+  };
+
+  window.JCSenha.destroy = () => {
+    console.log('[JCSenha] Destruindo seção senha');
+    clearInterval(visibilityInterval);
+    if (mutationObserver) mutationObserver.disconnect();
+    document.removeEventListener('sectionLoaded', handler);
+    document.removeEventListener('section:shown', handler);
+    window.removeEventListener('sectionLoaded', blockAutoNavigation, { capture: true });
+    window.removeEventListener('section:shown', blockAutoNavigation, { capture: true });
+    const root = document.getElementById('section-senha');
+    if (root) {
+      root.dataset.senhaInitialized = '';
+      root.querySelectorAll('[data-typing="true"]').forEach(el => {
+        el.classList.remove('typing-active', 'typing-done', 'lumen-typing');
+      });
+    }
+    window.JCSenha.state.ready = false;
+    window.JCSenha.state.listenerAdded = false;
+    window.JCSenha.state.navigationLocked = true;
+    window.JCSenha.state.HANDLER_COUNT = 0;
+    window.JCSenha.state.TYPING_COUNT = 0;
+    if (typeof window.EffectCoordinator?.stopAll === 'function') {
+      window.EffectCoordinator.stopAll();
+    }
+  };
+
+  if (!window.JCSenha.state.listenerAdded) {
+    console.log('[JCSenha] Registrando listener para sectionLoaded');
+    window.addEventListener('sectionLoaded', handler, { once: true });
+    window.JCSenha.state.listenerAdded = true;
+  }
+
+  const bind = () => {
+    console.log('[JCSenha] Executando bind');
+    document.removeEventListener('sectionLoaded', handler);
+    document.removeEventListener('section:shown', handler);
+    document.addEventListener('sectionLoaded', handler, { passive: true, once: true });
+
+    const tryInitialize = (attempt = 1, maxAttempts = 15) => {
+      setTimeout(() => {
+        const visibleSenha = document.querySelector('#section-senha:not(.hidden)');
+        if (visibleSenha && !window.JCSenha.state.ready && !visibleSenha.dataset.senhaInitialized) {
+          console.log('[JCSenha] Seção visível encontrada, disparando handler');
+          handler({ detail: { sectionId: 'section-senha', node: visibleSenha } });
+        } else if (document.getElementById('section-senha') && !window.JCSenha.state.ready && !document.getElementById('section-senha').dataset.senhaInitialized) {
+          console.log('[JCSenha] Forçando inicialização manual (tentativa ' + attempt + ')');
+          handler({ detail: { sectionId: 'section-senha', node: document.getElementById('section-senha') } });
+        } else if (attempt < maxAttempts) {
+          console.log('[JCSenha] Nenhuma seção visível ou já inicializada, tentando novamente...');
+          tryInitialize(attempt + 1, maxAttempts);
+        } else {
+          console.error('[JCSenha] Falha ao inicializar após ' + maxAttempts + ' tentativas');
+        }
+      }, 1000 * attempt);
+    };
+
+    tryInitialize();
+  };
+
+  if (document.readyState === 'loading') {
+    console.log('[JCSenha] Aguardando DOMContentLoaded');
+    document.addEventListener('DOMContentLoaded', bind, { once: true });
+  } else {
+    console.log('[JCSenha] DOM já carregado, chamando bind');
+    bind();
+  }
+})();
