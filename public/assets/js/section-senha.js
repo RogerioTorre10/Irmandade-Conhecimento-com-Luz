@@ -41,6 +41,13 @@
         }
         if (el) {
           console.log('[JCSenha] Elemento encontrado:', selector);
+          while (el.parentElement && el.parentElement !== within && el.parentElement !== document.body) {
+            console.log('[JCSenha] Verificando pai:', el.parentElement.tagName, el.parentElement.id);
+            el.parentElement.style.display = 'block !important';
+            el.parentElement.style.opacity = '1 !important';
+            el.parentElement.style.visibility = 'visible !important';
+            el = el.parentElement;
+          }
           return resolve(el);
         }
         if (performance.now() - start >= timeout) {
@@ -63,22 +70,25 @@
     return { sectionId, node };
   }
 
-  // Injetar estilos globais para garantir visibilidade
+  // Injetar estilos globais
   const styleSheet = document.createElement('style');
   styleSheet.textContent = `
-    #section-senha, #section-senha *, #senha-text-container, #senha-input-container {
+    #section-senha, #section-senha *, #senha-text-container, #senha-text-container *, #senha-input-container, #senha-input-container * {
       opacity: 1 !important;
       visibility: visible !important;
       display: flex !important;
       position: static !important;
       transform: none !important;
       transition: none !important;
+      pointer-events: none;
     }
     #senha-text-container > div {
       text-align: left !important;
+      direction: ltr !important;
       display: block !important;
+      pointer-events: none;
     }
-    .hidden {
+    .hidden, [class*="hidden"], #jornada-content-wrapper.hidden {
       display: flex !important;
       opacity: 1 !important;
       visibility: visible !important;
@@ -120,7 +130,7 @@
       }
     }
 
-    console.log('[JCSenha] Root encontrado:', root);
+    console.log('[JCSenha] Root encontrado:', root, 'parent:', root.parentElement?.id || root.parentElement?.tagName);
     root.dataset.senhaInitialized = 'true';
     root.classList.add('section-senha');
     root.classList.remove('hidden');
@@ -162,6 +172,7 @@
         width: 100%;
         max-width: 600px;
         text-align: left !important;
+        direction: ltr !important;
         overflow: hidden;
         box-sizing: border-box;
         opacity: 1 !important;
@@ -260,13 +271,14 @@
 
     [instr1, instr2, instr3, instr4].forEach((el) => {
       if (el) {
-        el.textContent = '';
+        el.textContent = getText(el) || `Placeholder para ${el.id}`;
         el.setAttribute('data-typing', 'true');
         el.style.cssText = `
           opacity: 1 !important;
           visibility: visible !important;
           display: block !important;
           text-align: left !important;
+          direction: ltr !important;
           width: 100%;
           max-width: 600px;
           box-sizing: border-box;
@@ -502,7 +514,7 @@
 
     const blockAutoNavigation = (e) => {
       if (!e.isTrusted || window.JCSenha.state.navigationLocked) {
-        console.log('[JCSenha] Navegação automática bloqueada:', e.type, e.target);
+        console.log('[JCSenha] Navegação automática bloqueada:', e.type, e.target, e);
         e.preventDefault();
         e.stopPropagation();
         if (typeof window.JC?.show === 'function') {
@@ -522,6 +534,9 @@
       if (!root || !document.body.contains(root)) {
         console.warn('[JCSenha] Root não encontrado no DOM, recriando...');
         const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
+        wrapper.style.display = 'block !important';
+        wrapper.style.opacity = '1 !important';
+        wrapper.style.visibility = 'visible !important';
         root = document.createElement('section');
         root.id = 'section-senha';
         root.dataset.senhaInitialized = 'true';
@@ -566,23 +581,22 @@
           el.style.opacity = '1 !important';
           el.style.visibility = 'visible !important';
           el.style.display = el.tagName === 'BUTTON' || el.tagName === 'INPUT' ? 'inline-block !important' : 'block !important';
-          console.log('[JCSenha] Visibilidade forçada para:', el.id || el.className, 'opacity:', getComputedStyle(el).opacity, 'display:', getComputedStyle(el).display);
+          console.log('[JCSenha] Visibilidade forçada para:', el.id || el.className, 'opacity:', getComputedStyle(el).opacity, 'display:', getComputedStyle(el).display, 'parent:', el.parentElement?.id || el.parentElement?.tagName);
         }
       });
-      console.log('[JCSenha] Visibilidade forçada');
+      console.log('[JCSenha] Visibilidade forçada, root presente:', document.body.contains(root));
     };
 
-    // Observar mudanças no DOM
     const observeVisibility = () => {
       const observer = new MutationObserver((mutations) => {
         mutations.forEach(mutation => {
           console.log('[JCSenha] Mutação detectada:', {
             type: mutation.type,
-            target: mutation.target.id || mutation.target.className,
+            target: mutation.target.id || mutation.target.className || mutation.target.tagName,
             attributeName: mutation.attributeName,
             oldValue: mutation.oldValue,
-            addedNodes: mutation.addedNodes.length,
-            removedNodes: mutation.removedNodes.length
+            addedNodes: Array.from(mutation.addedNodes).map(n => n.id || n.className || n.tagName),
+            removedNodes: Array.from(mutation.removedNodes).map(n => n.id || n.className || n.tagName)
           });
           if (mutation.type === 'attributes' && (mutation.target === root || root.contains(mutation.target))) {
             if (mutation.attributeName === 'style' || mutation.attributeName === 'class') {
@@ -753,6 +767,7 @@
           tryInitialize(attempt + 1, maxAttempts);
         } else {
           console.error('[JCSenha] Falha ao inicializar após ' + maxAttempts + ' tentativas');
+          window.toast?.('Erro: Não foi possível inicializar a seção Senha.', 'error');
         }
       }, 1000 * attempt);
     };
