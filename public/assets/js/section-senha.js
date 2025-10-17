@@ -107,12 +107,16 @@
       color: #fff;
     }
     #section-senha .typing-active {
-      border-right: 2px solid #fff;
-      white-space: pre-wrap;
-      position: relative;
+      border-right: none; /* Sobrescrever typing-caret do jornada-typing-bridge.js */
     }
     #section-senha .typing-done {
       border-right: none;
+    }
+    #section-senha .typing-caret {
+      display: inline-block;
+      width: 0.6ch;
+      margin-left: 2px;
+      animation: blink 1s step-end infinite;
     }
     #section-senha .senha-input-group {
       position: relative;
@@ -177,6 +181,10 @@
       return;
     }
 
+    // Desativar window.runTyping temporariamente para evitar conflitos
+    const originalRunTyping = window.runTyping;
+    window.runTyping = null;
+
     let root;
     try {
       root = node || await waitForElement('#section-senha', {
@@ -199,6 +207,11 @@
     root.classList.remove('hidden');
     root.setAttribute('aria-hidden', 'false');
 
+    // Forçar visibilidade
+    root.style.display = 'flex';
+    root.style.opacity = '1';
+    root.style.visibility = 'visible';
+
     // Verificar se o HTML carregado tem a estrutura esperada
     let textContainer = root.querySelector('#senha-text-container');
     let instr1 = root.querySelector('#senha-instr1');
@@ -208,12 +221,12 @@
     let inputContainer = root.querySelector('#senha-input-container');
     let senhaInput = root.querySelector('#senha-input');
     let toggleBtn = root.querySelector('.btn-toggle-senha');
-    let avancarBtn = root.querySelector('#btn-senha-avancar');
+    let avancarBtn = root.querySelector('#btn-senha-avancar');
     let prevBtn = root.querySelector('#btn-senha-prev');
     let actionsContainer = root.querySelector('.parchment-actions-rough');
 
     // Criar estrutura HTML se ausente
-    if (!textContainer || !instr1 || !instr2 || !instr3 || !instr4 || !inputContainer || !senhaInput || !toggleBtn || !avancarBtn || !prevBtn || !actionsContainer) {
+    if (!instr1 || !instr2 || !instr3 || !instr4 || !inputContainer || !senhaInput || !toggleBtn || !avancarBtn || !prevBtn || !actionsContainer) {
       console.log('[JCSenha] Estrutura HTML incompleta, criando fallback');
       root.innerHTML = ''; // Limpar conteúdo carregado para evitar duplicatas
       const parchmentRough = document.createElement('div');
@@ -299,42 +312,23 @@
       actionsContainer: !!actionsContainer
     });
 
+    // Forçar visibilidade dos elementos
+    [instr1, instr2, instr3, instr4].forEach(el => {
+      if (el) {
+        el.style.textAlign = 'left';
+        el.style.direction = 'ltr';
+        el.style.display = 'block';
+        el.style.opacity = '1';
+        el.style.visibility = 'visible';
+      }
+    });
+
     // Atualiza fundo do canvas
     window.JSecoes?.updateCanvasBackground('section-senha');
 
     // Atualiza aria-pergunta
     const aria = document.getElementById('aria-pergunta');
     if (aria) aria.textContent = 'Digite a palavra-chave para acessar a jornada.';
-
-    // Função de datilografia local
-    const runTyping = (el, text, resolve, options) => {
-      let i = 0;
-      const speed = options.speed || 100;
-      const cursor = options.cursor !== 'false';
-      el.style.position = 'relative';
-      el.style.whiteSpace = 'pre-wrap';
-      el.style.textAlign = 'left';
-      el.style.direction = 'ltr';
-      el.textContent = '';
-      const type = () => {
-        if (i < text.length) {
-          el.textContent = text.substring(0, i + 1);
-          if (cursor) {
-            el.style.borderRight = '2px solid #fff';
-          }
-          el.classList.add('typing-active');
-          i++;
-          setTimeout(type, speed);
-        } else {
-          el.textContent = text;
-          el.style.borderRight = 'none';
-          el.classList.add('typing-done');
-          el.classList.remove('typing-active');
-          resolve();
-        }
-      };
-      type();
-    };
 
     // Função de datilografia
     const runTypingChain = async () => {
@@ -369,7 +363,7 @@
         const text = getText(el);
         console.log('[JCSenha] Datilografando:', el.id, text.substring(0, 50));
         try {
-          await new Promise(resolve => runTyping(el, text, resolve, {
+          await new Promise(resolve => window.runTyping(el, text, resolve, {
             speed: 100,
             cursor: true
           }));
@@ -514,12 +508,18 @@
       root.classList.add('active');
       root.classList.remove('hidden');
       root.setAttribute('aria-hidden', 'false');
+      root.style.display = 'flex';
+      root.style.opacity = '1';
+      root.style.visibility = 'visible';
       window.JC?.show('section-senha');
       await runTypingChain();
       console.log('[JCSenha] Inicialização concluída');
     } catch (err) {
       console.error('[JCSenha] Erro na inicialização:', err);
       enableControls();
+    } finally {
+      // Restaurar window.runTyping
+      window.runTyping = originalRunTyping;
     }
   };
 
@@ -564,7 +564,6 @@
     document.removeEventListener('sectionLoaded', handler);
     document.removeEventListener('section:shown', handler);
     document.addEventListener('sectionLoaded', handler, { passive: true, once: true });
-    // Remover tryInitialize para evitar inicialização automática
   };
 
   if (document.readyState === 'loading') {
