@@ -123,18 +123,22 @@
     let attempts = 0;
     const check = () => {
       console.log(`[Init] Verificando scripts (tentativa ${attempts + 1}/${maxAttempts})...`);
-      if (typeof window.JC?.init === 'function' && typeof window.carregarEtapa === 'function' && document.getElementById('section-senha')) {
-        console.log('[Init] Scripts prontos e section-senha encontrada, executando callback');
+      if (typeof window.JC?.init === 'function' && typeof window.carregarEtapa === 'function') {
+        console.log('[Init] Scripts prontos, executando callback');
         callback();
       } else {
-        console.log('[Init] Status: JC.init', typeof window.JC?.init, 'carregarEtapa', typeof window.carregarEtapa, 'section-senha', !!document.getElementById('section-senha'));
+        console.log('[Init] Status: JC.init', typeof window.JC?.init, 'carregarEtapa', typeof window.carregarEtapa);
         if (attempts < maxAttempts) {
           attempts++;
           setTimeout(check, interval);
         } else {
           console.error('[Init] Falha ao carregar scripts após várias tentativas');
-          window.toast?.('Erro: Não foi possível inicializar a jornada.', 'error');
-          console.log('[Init] Evitando carregamento automático de section-termos');
+          if (typeof window.JC?.show === 'function') {
+            console.log('[Init] Forçando section-senha');
+            window.JC.show('section-senha');
+          } else {
+            console.error('[Init] window.JC.show não disponível');
+          }
         }
       }
     };
