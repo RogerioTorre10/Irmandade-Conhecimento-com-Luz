@@ -152,9 +152,8 @@
         window.JC.init();
         console.log('[Init] JC.init executado com sucesso');
         window.JC.show('section-senha'); // Forçar section-senha
-      } catch (e) {
-        console.error('[Init] Falha ao executar JC.init:', e);
-        console.log('[Init] Evitando carregamento automático de section-termos');
+      } else {
+        console.log('[Init] Clique simulado, seção não pronta ou navegação bloqueada, ignorado');
       }
     });
   });
