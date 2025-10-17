@@ -30,43 +30,6 @@
     el.addEventListener(ev, h);
   };
 
-  async function waitForElement(selector, { within = document, timeout = 5000, step = 50 } = {}) {
-    console.log('[JCSenha] Aguardando elemento:', selector);
-    const start = performance.now();
-    return new Promise((resolve, reject) => {
-      const tick = () => {
-        let el = within.querySelector(selector);
-        if (!el && within !== document) {
-          el = document.querySelector(selector);
-        }
-        if (el) {
-          console.log('[JCSenha] Elemento encontrado:', selector);
-          while (el.parentElement && el.parentElement !== within && el.parentElement !== document.body) {
-            console.log('[JCSenha] Verificando pai:', el.parentElement.tagName, el.parentElement.id);
-            el.parentElement.style.cssText = `
-              display: block !important;
-              opacity: 1 !important;
-              visibility: visible !important;
-              transform: none !important;
-              margin: 0 auto !important;
-              width: 100% !important;
-              position: static !important;
-            `;
-            el.parentElement.classList.remove('hidden');
-            el = el.parentElement;
-          }
-          return resolve(el);
-        }
-        if (performance.now() - start >= timeout) {
-          console.error('[JCSenha] Timeout aguardando:', selector);
-          return reject(new Error(`timeout waiting ${selector}`));
-        }
-        setTimeout(tick, step);
-      };
-      tick();
-    });
-  }
-
   function getText(el) {
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
   }
@@ -77,45 +40,51 @@
     return { sectionId, node };
   }
 
-  // Injetar estilos globais
+  // Função para observar visibilidade (movida para o topo)
+  function observeVisibility(root) {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach(mutation => {
+        console.log('[JCSenha] Mutação detectada:', {
+          type: mutation.type,
+          target: mutation.target.id || mutation.target.className || mutation.target.tagName,
+          attributeName: mutation.attributeName,
+          oldValue: mutation.oldValue
+        });
+      });
+    });
+    observer.observe(document.body, { attributes: true, childList: true, subtree: true, attributeOldValue: true });
+    return observer;
+  }
+
+  // Injetar estilos essenciais
   const styleSheet = document.createElement('style');
   styleSheet.id = 'jcsenha-styles';
   styleSheet.textContent = `
-    #section-senha, #section-senha *, #senha-text-container, #senha-text-container *, #senha-input-container, #senha-input-container *,
-    #jornada-content-wrapper, #jornada-canvas, #jornada-canvas.pergaminho.pergaminho-v,
-    .parchment-rough, .pergaminho, .pergaminho-v, .senha-wrap, .parchment-inner-rough,
-    .parchment-title-rough, .parchment-text-rough, .parchment-actions-rough {
-      opacity: 1 !important;
-      visibility: visible !important;
-      display: flex !important;
-      position: static !important;
-      transform: none !important;
-      transition: none !important;
-      margin: 0 auto !important;
-      width: 100% !important;
-      max-width: 600px !important;
-      overflow: hidden !important;
+    #section-senha {
+      max-height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 24px;
+      max-width: 600px;
+      margin: 0 auto;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+    #section-senha.active {
+      display: flex;
+    }
+    .senha-wrap, .parchment-inner-rough, .parchment-rough {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
     }
     #senha-text-container > div, #senha-instr1, #senha-instr2, #senha-instr3, #senha-instr4 {
-      text-align: left !important;
-      direction: ltr !important;
-      display: block !important;
-      pointer-events: none;
-    }
-    .hidden, [class*="hidden"], #jornada-content-wrapper.hidden, #jornada-canvas.hidden,
-    .parchment-rough.hidden, .pergaminho.hidden, .pergaminho-v.hidden {
-      display: flex !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-      transform: none !important;
-      margin: 0 auto !important;
-      width: 100% !important;
-    }
-    .chama-vela, .chama-vela *, .flame-corner, #chama-header {
-      position: static !important;
-      transform: none !important;
-      margin: 0 !important;
-      display: inline-block !important;
+      text-align: left;
+      display: block;
+      margin-bottom: 12px;
+      color: #fff;
     }
     .typing-active {
       border-right: 2px solid #fff;
@@ -123,7 +92,52 @@
       position: relative;
     }
     .typing-done {
-      border-right: none !important;
+      border-right: none;
+    }
+    .senha-input-group {
+      position: relative;
+      width: 80%;
+      max-width: 400px;
+      margin: 16px auto;
+    }
+    #senha-input {
+      width: 100%;
+      padding: 8px 40px 8px 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: transparent;
+    }
+    .btn-toggle-senha {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    .parchment-actions-rough {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 400px;
+      margin-top: 16px;
+    }
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      opacity: 0.5;
+      transition: opacity 0.3s;
+    }
+    .btn:not(:disabled) {
+      opacity: 1;
+    }
+    .btn:disabled {
+      cursor: default;
+      pointer-events: none;
     }
   `;
   document.head.appendChild(styleSheet);
@@ -144,24 +158,14 @@
     }
 
     let root = node || document.getElementById('section-senha');
+    const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
     if (!root) {
-      console.log('[JCSenha] Tentando localizar #section-senha...');
-      try {
-        root = await waitForElement('#section-senha', {
-          within: document.getElementById('jornada-content-wrapper') || document,
-          timeout: 10000
-        });
-      } catch (e) {
-        window.toast?.('Erro: Seção section-senha não carregada.', 'error');
-        console.error('[JCSenha] Section not found:', e);
-        const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
-        root = document.createElement('section');
-        root.id = 'section-senha';
-        root.className = 'section parchment-wrap-rough';
-        root.setAttribute('data-section', 'senha');
-        wrapper.appendChild(root);
-        console.log('[JCSenha] Seção #section-senha criada como fallback');
-      }
+      console.log('[JCSenha] Criando #section-senha como fallback');
+      root = document.createElement('section');
+      root.id = 'section-senha';
+      root.className = 'section parchment-wrap-rough';
+      root.setAttribute('data-section', 'senha');
+      wrapper.appendChild(root);
     }
 
     console.log('[JCSenha] Root encontrado:', root, 'parent:', root.parentElement?.id || root.parentElement?.tagName);
@@ -170,236 +174,80 @@
     root.classList.remove('hidden');
     root.setAttribute('aria-hidden', 'false');
 
-    // Aplicar estilos ao root
-    root.style.cssText = `
-      background: transparent;
-      padding: 24px;
-      border-radius: 12px;
-      width: 100% !important;
-      max-width: 600px !important;
-      margin: 12px auto !important;
-      text-align: center;
-      box-shadow: none;
-      border: none;
-      display: flex !important;
-      flex-direction: column;
-      align-items: center;
-      opacity: 1 !important;
-      visibility: visible !important;
-      position: static;
-      z-index: 1000;
-      overflow-y: hidden;
-      overflow-x: hidden;
-      max-height: 100vh;
-      box-sizing: border-box;
-      transform: none !important;
-      transition: none !important;
-    `;
+    // Limpar conteúdo anterior para evitar duplicatas
+    root.innerHTML = '';
 
-    let parchmentRough, parchmentInnerRough, senhaWrap, textContainer, instr1, instr2, instr3, instr4, senhaInput, toggleBtn, avancarBtn, prevBtn, inputContainer, actionsContainer;
-    let visibilityInterval, mutationObserver;
-    try {
-      console.log('[JCSenha] Buscando elementos...');
-      parchmentRough = await waitForElement('.parchment-rough.pergaminho.pergaminho-v', { within: root, timeout: 5000 }) || document.createElement('div');
-      parchmentRough.className = 'parchment-rough pergaminho pergaminho-v';
-      parchmentInnerRough = await waitForElement('.parchment-inner-rough', { within: parchmentRough || root, timeout: 5000 }) || document.createElement('div');
-      parchmentInnerRough.className = 'parchment-inner-rough';
-      senhaWrap = await waitForElement('.senha-wrap', { within: parchmentInnerRough || root, timeout: 5000 }) || document.createElement('div');
-      senhaWrap.className = 'senha-wrap';
-      textContainer = await waitForElement('#senha-text-container', { within: senhaWrap || root, timeout: 5000 }) || document.createElement('div');
-      textContainer.id = 'senha-text-container';
+    // Criar estrutura HTML
+    const parchmentRough = document.createElement('div');
+    parchmentRough.className = 'parchment-rough pergaminho pergaminho-v';
+    const parchmentInnerRough = document.createElement('div');
+    parchmentInnerRough.className = 'parchment-inner-rough';
+    const senhaWrap = document.createElement('div');
+    senhaWrap.className = 'senha-wrap';
+    const textContainer = document.createElement('div');
+    textContainer.id = 'senha-text-container';
 
-      instr1 = await waitForElement('#senha-instr1', { within: senhaWrap || root, timeout: 5000 }) || document.createElement('h2');
-      instr1.id = 'senha-instr1';
-      instr1.className = 'parchment-title-rough';
-      instr1.dataset.text = 'Bem-vindo à Jornada Essencial';
-      instr2 = await waitForElement('#senha-instr2', { within: senhaWrap || root, timeout: 5000 }) || document.createElement('p');
-      instr2.id = 'senha-instr2';
-      instr2.className = 'parchment-text-rough';
-      instr2.dataset.text = 'Digite a palavra-chave para acessar a jornada.';
-      instr3 = await waitForElement('#senha-instr3', { within: senhaWrap || root, timeout: 5000 }) || document.createElement('p');
-      instr3.id = 'senha-instr3';
-      instr3.className = 'parchment-text-rough';
-      instr3.dataset.text = 'Esta senha é um convite para a sua transformação.';
-      instr4 = await waitForElement('#senha-instr4', { within: senhaWrap || root, timeout: 5000 }) || document.createElement('p');
-      instr4.id = 'senha-instr4';
-      instr4.className = 'parchment-text-rough';
-      instr4.dataset.text = 'Prepare-se para uma experiência única!';
+    const instr1 = document.createElement('h2');
+    instr1.id = 'senha-instr1';
+    instr1.className = 'parchment-title-rough';
+    instr1.dataset.text = 'Bem-vindo à Jornada Essencial';
+    const instr2 = document.createElement('p');
+    instr2.id = 'senha-instr2';
+    instr2.className = 'parchment-text-rough';
+    instr2.dataset.text = 'Digite a palavra-chave para acessar a jornada.';
+    const instr3 = document.createElement('p');
+    instr3.id = 'senha-instr3';
+    instr3.className = 'parchment-text-rough';
+    instr3.dataset.text = 'Esta senha é um convite para a sua transformação.';
+    const instr4 = document.createElement('p');
+    instr4.id = 'senha-instr4';
+    instr4.className = 'parchment-text-rough';
+    instr4.dataset.text = 'Prepare-se para uma experiência única!';
 
-      inputContainer = await waitForElement('.senha-input-group', { within: senhaWrap || root, timeout: 5000 }) || document.createElement('div');
-      inputContainer.className = 'senha-input-group';
-      inputContainer.id = 'senha-input-container';
-      senhaInput = await waitForElement('#senha-input', { within: inputContainer || root, timeout: 5000 }) || document.createElement('input');
-      senhaInput.id = 'senha-input';
-      toggleBtn = await waitForElement('.btn-toggle-senha', { within: inputContainer || root, timeout: 5000 }) || document.createElement('button');
-      toggleBtn.className = 'btn-toggle-senha';
-      avancarBtn = await waitForElement('#btn-senha-avancar', { within: root, timeout: 5000 }) || document.createElement('button');
-      avancarBtn.id = 'btn-senha-avancar';
-      prevBtn = await waitForElement('#btn-senha-prev', { within: root, timeout: 5000 }) || document.createElement('button');
-      prevBtn.id = 'btn-senha-prev';
-      actionsContainer = await waitForElement('.parchment-actions-rough', { within: senhaWrap || root, timeout: 5000 }) || document.createElement('div');
-      actionsContainer.className = 'parchment-actions-rough';
+    const inputContainer = document.createElement('div');
+    inputContainer.className = 'senha-input-group';
+    inputContainer.id = 'senha-input-container';
+    const senhaInput = document.createElement('input');
+    senhaInput.id = 'senha-input';
+    senhaInput.type = 'password';
+    senhaInput.placeholder = 'Digite a Palavra-Chave';
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = 'btn-toggle-senha';
+    toggleBtn.textContent = '👁️';
+    const avancarBtn = document.createElement('button');
+    avancarBtn.id = 'btn-senha-avancar';
+    avancarBtn.className = 'btn btn-primary btn-stone';
+    avancarBtn.textContent = 'Acessar Jornada';
+    avancarBtn.disabled = true;
+    const prevBtn = document.createElement('button');
+    prevBtn.id = 'btn-senha-prev';
+    prevBtn.className = 'btn btn-primary btn-stone';
+    prevBtn.textContent = 'Voltar';
+    prevBtn.disabled = true;
+    const actionsContainer = document.createElement('div');
+    actionsContainer.className = 'parchment-actions-rough';
 
-      root.appendChild(parchmentRough);
-      parchmentRough.appendChild(parchmentInnerRough);
-      parchmentInnerRough.appendChild(senhaWrap);
-      senhaWrap.appendChild(textContainer);
-      textContainer.appendChild(instr1);
-      textContainer.appendChild(instr2);
-      textContainer.appendChild(instr3);
-      textContainer.appendChild(instr4);
-      senhaWrap.appendChild(inputContainer);
-      inputContainer.appendChild(senhaInput);
-      inputContainer.appendChild(toggleBtn);
-      actionsContainer.appendChild(prevBtn);
-      actionsContainer.appendChild(avancarBtn);
-      senhaWrap.appendChild(actionsContainer);
-    } catch (e) {
-      console.error('[JCSenha] Elements not found:', e);
-      window.toast?.('Falha ao carregar os elementos da seção Senha.', 'error');
-      const createFallbackElement = (id, isButton = false, isInput = false, isContainer = false, isHeading = false) => {
-        const el = document.createElement(isButton ? 'button' : isInput ? 'input' : isHeading ? 'h2' : 'div');
-        el.id = id;
-        if (!isButton && !isInput && !isContainer && !isHeading) {
-          el.setAttribute('data-typing', 'true');
-          el.className = 'parchment-text-rough';
-          el.dataset.text = `Placeholder para ${id}`;
-        } else if (isButton) {
-          el.classList.add('btn', 'btn-primary', 'btn-stone');
-          el.setAttribute('data-action', id.includes('avancar') ? 'avancar' : id.includes('prev') ? 'senha-prev' : 'toggle-senha');
-          el.textContent = id.includes('avancar') ? 'Acessar Jornada' : id.includes('prev') ? 'Voltar' : '👁️';
-        } else if (isInput) {
-          el.type = 'password';
-          el.className = 'input';
-          el.placeholder = 'Digite a Palavra-Chave';
-        } else if (isContainer) {
-          el.className = id === 'senha-input-container' ? 'senha-input-group' : id === 'parchment-rough' ? 'parchment-rough pergaminho pergaminho-v' : id === 'parchment-inner-rough' ? 'parchment-inner-rough' : id === 'senha-wrap' ? 'senha-wrap' : 'parchment-actions-rough';
-          el.id = id;
-        } else if (isHeading) {
-          el.className = 'parchment-title-rough';
-          el.setAttribute('data-typing', 'true');
-          el.dataset.text = `Placeholder para ${id}`;
-        }
-        return el;
-      };
-      parchmentRough = parchmentRough || createFallbackElement('parchment-rough', false, false, true);
-      parchmentInnerRough = parchmentInnerRough || createFallbackElement('parchment-inner-rough', false, false, true);
-      senhaWrap = senhaWrap || createFallbackElement('senha-wrap', false, false, true);
-      textContainer = textContainer || createFallbackElement('senha-text-container', false, false, true);
-      instr1 = instr1 || createFallbackElement('senha-instr1', false, false, false, true);
-      instr2 = instr2 || createFallbackElement('senha-instr2');
-      instr3 = instr3 || createFallbackElement('senha-instr3');
-      instr4 = instr4 || createFallbackElement('senha-instr4');
-      inputContainer = inputContainer || createFallbackElement('senha-input-container', false, false, true);
-      senhaInput = senhaInput || createFallbackElement('senha-input', false, true);
-      toggleBtn = toggleBtn || createFallbackElement('btn-toggle-senha', true);
-      avancarBtn = avancarBtn || createFallbackElement('btn-senha-avancar', true);
-      prevBtn = prevBtn || createFallbackElement('btn-senha-prev', true);
-      actionsContainer = actionsContainer || createFallbackElement('parchment-actions-rough', false, false, true);
-      root.appendChild(parchmentRough);
-      parchmentRough.appendChild(parchmentInnerRough);
-      parchmentInnerRough.appendChild(senhaWrap);
-      senhaWrap.appendChild(textContainer);
-      textContainer.appendChild(instr1);
-      textContainer.appendChild(instr2);
-      textContainer.appendChild(instr3);
-      textContainer.appendChild(instr4);
-      senhaWrap.appendChild(inputContainer);
-      inputContainer.appendChild(senhaInput);
-      inputContainer.appendChild(toggleBtn);
-      actionsContainer.appendChild(prevBtn);
-      actionsContainer.appendChild(avancarBtn);
-      senhaWrap.appendChild(actionsContainer);
-      console.log('[JCSenha] Elementos criados como fallback');
-    }
+    root.appendChild(parchmentRough);
+    parchmentRough.appendChild(parchmentInnerRough);
+    parchmentInnerRough.appendChild(senhaWrap);
+    senhaWrap.appendChild(textContainer);
+    textContainer.appendChild(instr1);
+    textContainer.appendChild(instr2);
+    textContainer.appendChild(instr3);
+    textContainer.appendChild(instr4);
+    senhaWrap.appendChild(inputContainer);
+    inputContainer.appendChild(senhaInput);
+    inputContainer.appendChild(toggleBtn);
+    actionsContainer.appendChild(prevBtn);
+    actionsContainer.appendChild(avancarBtn);
+    senhaWrap.appendChild(actionsContainer);
 
-    console.log('[JCSenha] Elementos carregados:', { parchmentRough, parchmentInnerRough, senhaWrap, textContainer, instr1, instr2, instr3, instr4, inputContainer, senhaInput, toggleBtn, avancarBtn, prevBtn, actionsContainer });
+    // Atualiza fundo do canvas
+    window.JSecoes?.updateCanvasBackground('section-senha');
 
-    // Definir textos padrão
-    instr1.dataset.text = instr1.dataset.text || 'Bem-vindo à Jornada Essencial';
-    instr2.dataset.text = instr2.dataset.text || 'Digite a palavra-chave para acessar a jornada.';
-    instr3.dataset.text = instr3.dataset.text || 'Esta senha é um convite para a sua transformação.';
-    instr4.dataset.text = instr4.dataset.text || 'Prepare-se para uma experiência única!';
-
-    [instr1, instr2, instr3, instr4].forEach((el) => {
-      if (el) {
-        el.textContent = ''; // Limpa texto inicial para datilografia
-        el.setAttribute('data-typing', 'true');
-        el.style.cssText = `
-          opacity: 1 !important;
-          visibility: visible !important;
-          display: ${el.tagName === 'H2' ? 'block' : 'block'} !important;
-          text-align: left !important;
-          direction: ltr !important;
-          width: 100% !important;
-          max-width: 600px !important;
-          box-sizing: border-box;
-          white-space: pre-wrap;
-          overflow: hidden;
-          pointer-events: none;
-          cursor: default;
-          transform: none !important;
-          margin: 0 auto !important;
-        `;
-        console.log('[JCSenha] Texto inicializado:', el.id, getText(el));
-      }
-    });
-
-    [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
-      if (btn) {
-        btn.classList.add('btn', 'btn-primary', 'btn-stone');
-        btn.disabled = true;
-        btn.style.cssText = `
-          opacity: 1 !important;
-          cursor: default;
-          display: inline-block !important;
-          margin: 8px !important;
-          visibility: visible !important;
-          pointer-events: none;
-          overflow: hidden;
-          transform: none !important;
-        `;
-        console.log('[JCSenha] Botão inicializado:', btn.className, btn.textContent);
-      }
-    });
-
-    if (inputContainer) {
-      inputContainer.style.cssText = `
-        position: relative;
-        display: block !important;
-        margin: 8px auto !important;
-        width: 80% !important;
-        max-width: 400px !important;
-        overflow: hidden;
-        box-sizing: border-box;
-        opacity: 1 !important;
-        visibility: visible !important;
-        transform: none !important;
-      `;
-    }
-
-    if (senhaInput) {
-      senhaInput.type = 'password';
-      senhaInput.placeholder = 'Digite a Palavra-Chave';
-      senhaInput.className = 'input';
-      senhaInput.style.cssText = `
-        display: block !important;
-        padding: 8px 40px 8px 8px;
-        width: 100% !important;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        background: transparent;
-        box-sizing: border-box;
-        overflow: hidden;
-        opacity: 1 !important;
-        visibility: visible !important;
-        pointer-events: auto !important;
-        cursor: text !important;
-        transform: none !important;
-      `;
-      senhaInput.disabled = true; // Desabilitado até datilografia concluir
-      console.log('[JCSenha] Input inicializado:', senhaInput.id);
-    }
+    // Atualiza aria-pergunta
+    const aria = document.getElementById('aria-pergunta');
+    if (aria) aria.textContent = 'Digite a palavra-chave para acessar a jornada.';
 
     // Função de datilografia
     const runTypingChain = async () => {
@@ -430,7 +278,6 @@
 
       console.log('[JCSenha] Elementos encontrados:', Array.from(typingElements).map(el => el.id));
 
-      // Fallback para runTyping
       if (typeof window.runTyping !== 'function') {
         console.warn('[JCSenha] window.runTyping não encontrado, usando fallback');
         window.runTyping = (el, text, resolve, options) => {
@@ -439,12 +286,14 @@
           const cursor = options.cursor !== 'false';
           el.style.position = 'relative';
           el.style.whiteSpace = 'pre-wrap';
+          el.textContent = '';
           const type = () => {
             if (i < text.length) {
               el.textContent = text.substring(0, i + 1);
               if (cursor) {
                 el.style.borderRight = '2px solid #fff';
               }
+              el.classList.add('typing-active');
               i++;
               setTimeout(type, speed);
             } else {
@@ -455,8 +304,6 @@
               resolve();
             }
           };
-          el.textContent = '';
-          el.classList.add('typing-active');
           type();
         };
       }
@@ -465,10 +312,6 @@
         const text = getText(el);
         console.log('[JCSenha] Datilografando:', el.id, text.substring(0, 50));
         try {
-          el.style.color = '#fff';
-          el.style.opacity = '1 !important';
-          el.style.display = 'block !important';
-          el.style.visibility = 'visible !important';
           await new Promise(resolve => window.runTyping(el, text, resolve, {
             speed: Number(el.dataset.speed || 100),
             cursor: String(el.dataset.cursor || 'true') === 'true'
@@ -478,9 +321,6 @@
           el.textContent = text;
           el.classList.add('typing-done');
           el.classList.remove('typing-active');
-          el.style.opacity = '1 !important';
-          el.style.visibility = 'visible !important';
-          el.style.display = 'block !important';
         }
       }
 
@@ -491,23 +331,19 @@
     // Habilitar controles após datilografia
     const enableControls = () => {
       [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
-        if (btn && getComputedStyle(btn).opacity === '1' && getComputedStyle(btn).display !== 'none') {
-          btn.disabled = false;
-          btn.style.cursor = 'pointer';
-          btn.style.pointerEvents = 'auto !important';
-          btn.style.opacity = '1 !important';
-          btn.style.visibility = 'visible !important';
-          btn.style.display = 'inline-block !important';
-        }
+        btn.disabled = false;
+        btn.style.cursor = 'pointer';
+        btn.style.pointerEvents = 'auto';
+        btn.style.opacity = '1';
+        btn.style.visibility = 'visible';
+        btn.style.display = 'inline-block';
       });
-      if (senhaInput && getComputedStyle(senhaInput).opacity === '1' && getComputedStyle(senhaInput).display !== 'none') {
-        senhaInput.disabled = false;
-        senhaInput.style.pointerEvents = 'auto !important';
-        senhaInput.style.cursor = 'text !important';
-        senhaInput.style.opacity = '1 !important';
-        senhaInput.style.visibility = 'visible !important';
-        senhaInput.style.display = 'block !important';
-      }
+      senhaInput.disabled = false;
+      senhaInput.style.pointerEvents = 'auto';
+      senhaInput.style.cursor = 'text';
+      senhaInput.style.opacity = '1';
+      senhaInput.style.visibility = 'visible';
+      senhaInput.style.display = 'block';
       window.JCSenha.state.navigationLocked = false;
       window.JCSenha.state.ready = true;
       console.log('[JCSenha] Controles habilitados');
@@ -560,147 +396,67 @@
       };
     }
 
+    // Eventos de navegação
+    toggleBtn.addEventListener('click', () => {
+      console.log('[JCSenha] Clique no botão olho mágico');
+      senhaInput.type = senhaInput.type === 'password' ? 'text' : 'password';
+      toggleBtn.textContent = senhaInput.type === 'password' ? '👁️' : '🙈';
+      console.log('[JCSenha] Senha:', senhaInput.type === 'password' ? 'oculta' : 'visível');
+    });
+
+    avancarBtn.addEventListener('click', async (e) => {
+      if (e.isTrusted && !window.JCSenha.state.navigationLocked && window.JCSenha.state.ready) {
+        const senha = senhaInput?.value?.trim() || '';
+        console.log('[JCSenha] Enviando senha:', senha);
+        if (senha) {
+          if (typeof window.JC?.show === 'function') {
+            window.JC.show('section-guia');
+          } else {
+            window.location.href = '/guia';
+            console.warn('[JCSenha] Fallback navigation to /guia');
+          }
+        } else {
+          window.toast?.('Por favor, digite a palavra-chave.', 'error');
+        }
+      } else {
+        console.log('[JCSenha] Clique simulado, seção não pronta ou navegação bloqueada, ignorado');
+      }
+    });
+
+    prevBtn.addEventListener('click', async (e) => {
+      if (e.isTrusted && !window.JCSenha.state.navigationLocked) {
+        console.log('[JCSenha] Redirecionando para section-termos');
+        if (typeof window.JC?.show === 'function') {
+          window.JC.show('section-termos');
+        } else {
+          window.location.href = '/termos';
+          console.warn('[JCSenha] Fallback navigation to /termos');
+        }
+      } else {
+        console.log('[JCSenha] Clique simulado ou navegação bloqueada, ignorado');
+      }
+    });
+
+    senhaInput.addEventListener('input', () => {
+      avancarBtn.disabled = !senhaInput.value.trim();
+      avancarBtn.style.cursor = senhaInput.value.trim() ? 'pointer' : 'default';
+      avancarBtn.style.pointerEvents = senhaInput.value.trim() ? 'auto' : 'none';
+      console.log('[JCSenha] Input atualizado:', { senha: senhaInput.value.trim(), avancarBtnDisabled: avancarBtn.disabled });
+    });
+
+    window.addEventListener('sectionLoaded', blockAutoNavigation, { capture: true });
+    window.addEventListener('section:shown', blockAutoNavigation, { capture: true });
+
     // Inicializa datilografia
     window.JCSenha.state.ready = false;
-    console.log('[JCSenha] Iniciando runTypingChain...');
     try {
-      mutationObserver = observeVisibility();
-      visibilityInterval = setInterval(forceVisibility, 50);
+      window.JCSenha.mutationObserver = observeVisibility(root);
+      window.JCSenha.visibilityInterval = setInterval(() => {}, 50); // Placeholder para visibilidade
       await runTypingChain();
       console.log('[JCSenha] Inicialização concluída');
     } catch (err) {
-      console.error('[JCSenha] Erro na datilografia:', err);
+      console.error('[JCSenha] Erro na inicialização:', err);
       enableControls();
-    }
-
-    const observeVisibility = () => {
-      const observer = new MutationObserver((mutations) => {
-        mutations.forEach(mutation => {
-          console.log('[JCSenha] Mutação detectada:', {
-            type: mutation.type,
-            target: mutation.target.id || mutation.target.className || mutation.target.tagName,
-            attributeName: mutation.attributeName,
-            oldValue: mutation.oldValue,
-            addedNodes: Array.from(mutation.addedNodes).map(n => n.id || n.className || n.tagName),
-            removedNodes: Array.from(mutation.removedNodes).map(n => n.id || n.className || n.tagName)
-          });
-          if (mutation.type === 'attributes' && (
-            mutation.target === root ||
-            root.contains(mutation.target) ||
-            mutation.target.id === 'jornada-content-wrapper' ||
-            mutation.target.id === 'jornada-canvas' ||
-            mutation.target.classList.contains('parchment-rough') ||
-            mutation.target.classList.contains('pergaminho') ||
-            mutation.target.classList.contains('pergaminho-v') ||
-            mutation.target.classList.contains('senha-wrap') ||
-            mutation.target.classList.contains('parchment-inner-rough')
-          )) {
-            if (['style', 'class', 'transform', 'margin', 'width', 'position'].includes(mutation.attributeName)) {
-              console.log('[JCSenha] Estilo ou classe alterada em:', mutation.target.id || mutation.target.className, 'valor antigo:', mutation.oldValue);
-              forceVisibility();
-            }
-          } else if (mutation.type === 'childList' && !document.body.contains(root)) {
-            console.warn('[JCSenha] Root removido do DOM, recriando...');
-            forceVisibility();
-          }
-        });
-      });
-      observer.observe(document.body, { attributes: true, childList: true, subtree: true, attributeOldValue: true });
-      return observer;
-    };
-
-    function forceVisibility() {
-      if (root) {
-        root.style.cssText = `
-          background: transparent;
-          padding: 24px;
-          border-radius: 12px;
-          width: 100% !important;
-          max-width: 600px !important;
-          margin: 12px auto !important;
-          text-align: center;
-          box-shadow: none;
-          border: none;
-          display: flex !important;
-          flex-direction: column;
-          align-items: center;
-          opacity: 1 !important;
-          visibility: visible !important;
-          position: static;
-          z-index: 1000;
-          overflow-y: hidden;
-          overflow-x: hidden;
-          max-height: 100vh;
-          box-sizing: border-box;
-          transform: none !important;
-          transition: none !important;
-        `;
-      }
-      [parchmentRough, parchmentInnerRough, senhaWrap, textContainer, inputContainer, actionsContainer].forEach(el => {
-        if (el) {
-          el.style.cssText = `
-            display: ${el === textContainer || el === inputContainer ? 'block' : 'flex'} !important;
-            opacity: 1 !important;
-            visibility: visible !important;
-            transform: none !important;
-            margin: 0 auto !important;
-            width: 100% !important;
-            max-width: 600px !important;
-            overflow: hidden !important;
-          `;
-        }
-      });
-      [instr1, instr2, instr3, instr4].forEach(el => {
-        if (el) {
-          el.style.cssText = `
-            opacity: 1 !important;
-            visibility: visible !important;
-            display: ${el.tagName === 'H2' ? 'block' : 'block'} !important;
-            text-align: left !important;
-            direction: ltr !important;
-            width: 100% !important;
-            max-width: 600px !important;
-            box-sizing: border-box;
-            white-space: pre-wrap;
-            overflow: hidden;
-            pointer-events: none;
-            cursor: default;
-            transform: none !important;
-            margin: 0 auto !important;
-          `;
-        }
-      });
-      if (senhaInput) {
-        senhaInput.style.cssText = `
-          display: block !important;
-          padding: 8px 40px 8px 8px;
-          width: 100% !important;
-          border: 1px solid #ccc;
-          border-radius: 4px;
-          background: transparent;
-          box-sizing: border-box;
-          overflow: hidden;
-          opacity: 1 !important;
-          visibility: visible !important;
-          pointer-events: auto !important;
-          cursor: text !important;
-          transform: none !important;
-        `;
-      }
-      [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
-        if (btn) {
-          btn.style.cssText = `
-            opacity: 1 !important;
-            cursor: ${btn.disabled ? 'default' : 'pointer'};
-            display: inline-block !important;
-            margin: 8px !important;
-            visibility: visible !important;
-            pointer-events: ${btn.disabled ? 'none' : 'auto'} !important;
-            overflow: hidden;
-            transform: none !important;
-          `;
-        }
-      });
     }
   };
 
@@ -719,6 +475,7 @@
       root.querySelectorAll('[data-typing="true"]').forEach(el => {
         el.classList.remove('typing-active', 'typing-done', 'lumen-typing');
       });
+      root.remove();
     }
     window.JCSenha.state.ready = false;
     window.JCSenha.state.listenerAdded = false;
@@ -728,9 +485,8 @@
     if (typeof window.EffectCoordinator?.stopAll === 'function') {
       window.EffectCoordinator.stopAll();
     }
-    // Restaurar updateCanvasBackground
     if (window.JSecoes) {
-      window.JSecoes.updateCanvasBackground = window.JCSenha.originalUpdateCanvasBackground;
+      window.JSecoes.updateCanvasBackground = originalUpdateCanvasBackground;
     }
     window.JCSenha.__bound = false;
   };
@@ -746,26 +502,6 @@
     document.removeEventListener('sectionLoaded', handler);
     document.removeEventListener('section:shown', handler);
     document.addEventListener('sectionLoaded', handler, { passive: true, once: true });
-    const tryInitialize = (attempt = 1, maxAttempts = 15) => {
-      setTimeout(() => {
-        const visibleSenha = document.querySelector('#section-senha:not(.hidden)');
-        if (visibleSenha && !window.JCSenha.state.ready && !visibleSenha.dataset.senhaInitialized) {
-          console.log('[JCSenha] Seção visível encontrada, disparando handler');
-          handler({ detail: { sectionId: 'section-senha', node: visibleSenha } });
-        } else if (document.getElementById('section-senha') && !window.JCSenha.state.ready && !document.getElementById('section-senha').dataset.senhaInitialized) {
-          console.log('[JCSenha] Forçando inicialização manual (tentativa ' + attempt + ')');
-          handler({ detail: { sectionId: 'section-senha', node: document.getElementById('section-senha') } });
-        } else if (attempt < maxAttempts) {
-          console.log('[JCSenha] Nenhuma seção visível ou já inicializada, tentando novamente...');
-          tryInitialize(attempt + 1, maxAttempts);
-        } else {
-          console.error('[JCSenha] Falha ao inicializar após ' + maxAttempts + ' tentativas');
-          window.toast?.('Erro: Não foi possível inicializar a seção Senha.', 'error');
-          console.log('[JCSenha] Evitando carregamento automático de section-termos');
-        }
-      }, 1000 * attempt);
-    };
-    tryInitialize();
   };
 
   if (document.readyState === 'loading') {
