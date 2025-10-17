@@ -30,7 +30,7 @@
     el.addEventListener(ev, h);
   };
 
-  async function waitForElement(selector, { within = document, timeout = 5000, step = 50 } = {}) {
+  async function waitForElement(selector, { within = document, timeout = 10000, step = 50 } = {}) {
     console.log('[JCSenha] Aguardando elemento:', selector);
     const start = performance.now();
     return new Promise((resolve, reject) => {
@@ -96,7 +96,6 @@
       align-items: center;
       width: 100%;
     }
-    #section-senha #senha-text-container > div,
     #section-senha #senha-instr1,
     #section-senha #senha-instr2,
     #section-senha #senha-instr3,
@@ -196,80 +195,109 @@
 
     console.log('[JCSenha] Root encontrado:', root, 'parent:', root.parentElement?.id || root.parentElement?.tagName);
     root.dataset.senhaInitialized = 'true';
-    root.classList.add('section-senha', 'parchment-wrap-rough');
+    root.classList.add('section-senha', 'parchment-wrap-rough', 'active');
     root.classList.remove('hidden');
     root.setAttribute('aria-hidden', 'false');
 
-    // Verificar se já existe conteúdo para evitar duplicatas
-    if (root.querySelector('.senha-wrap')) {
-      console.log('[JCSenha] Conteúdo já presente, limpando para evitar duplicatas');
-      root.innerHTML = '';
+    // Verificar se o HTML carregado tem a estrutura esperada
+    let textContainer = root.querySelector('#senha-text-container');
+    let instr1 = root.querySelector('#senha-instr1');
+    let instr2 = root.querySelector('#senha-instr2');
+    let instr3 = root.querySelector('#senha-instr3');
+    let instr4 = root.querySelector('#senha-instr4');
+    let inputContainer = root.querySelector('#senha-input-container');
+    let senhaInput = root.querySelector('#senha-input');
+    let toggleBtn = root.querySelector('.btn-toggle-senha');
+    let avancarBtn = root.querySelector('#btn-senha-avancar');
+    let prevBtn = root.querySelector('#btn-senha-prev');
+    let actionsContainer = root.querySelector('.parchment-actions-rough');
+
+    // Criar estrutura HTML se ausente
+    if (!textContainer || !instr1 || !instr2 || !instr3 || !instr4 || !inputContainer || !senhaInput || !toggleBtn || !avancarBtn || !prevBtn || !actionsContainer) {
+      console.log('[JCSenha] Estrutura HTML incompleta, criando fallback');
+      root.innerHTML = ''; // Limpar conteúdo carregado para evitar duplicatas
+      const parchmentRough = document.createElement('div');
+      parchmentRough.className = 'parchment-rough pergaminho pergaminho-v';
+      const parchmentInnerRough = document.createElement('div');
+      parchmentInnerRough.className = 'parchment-inner-rough';
+      const senhaWrap = document.createElement('div');
+      senhaWrap.className = 'senha-wrap';
+      textContainer = document.createElement('div');
+      textContainer.id = 'senha-text-container';
+
+      instr1 = document.createElement('h2');
+      instr1.id = 'senha-instr1';
+      instr1.className = 'parchment-title-rough';
+      instr1.dataset.text = 'Insira sua Palavra-Chave Sagrada.';
+      instr1.setAttribute('data-typing', 'true');
+      instr2 = document.createElement('p');
+      instr2.id = 'senha-instr2';
+      instr2.className = 'parchment-text-rough';
+      instr2.dataset.text = 'A Palavra-Chave garante que apenas você acesse seu progresso.';
+      instr2.setAttribute('data-typing', 'true');
+      instr3 = document.createElement('p');
+      instr3.id = 'senha-instr3';
+      instr3.className = 'parchment-text-rough';
+      instr3.dataset.text = 'Você decide quando iniciar (dentro de 15 dias).';
+      instr3.setAttribute('data-typing', 'true');
+      instr4 = document.createElement('p');
+      instr4.id = 'senha-instr4';
+      instr4.className = 'parchment-text-rough';
+      instr4.dataset.text = '24 horas para concluir após esse primeiro acesso.';
+      instr4.setAttribute('data-typing', 'true');
+
+      inputContainer = document.createElement('div');
+      inputContainer.className = 'senha-input-group';
+      inputContainer.id = 'senha-input-container';
+      senhaInput = document.createElement('input');
+      senhaInput.id = 'senha-input';
+      senhaInput.type = 'password';
+      senhaInput.placeholder = 'Digite a Palavra-Chave';
+      toggleBtn = document.createElement('button');
+      toggleBtn.className = 'btn-toggle-senha';
+      toggleBtn.textContent = '👁️';
+      avancarBtn = document.createElement('button');
+      avancarBtn.id = 'btn-senha-avancar';
+      avancarBtn.className = 'btn btn-primary btn-stone';
+      avancarBtn.textContent = 'Acessar Jornada';
+      avancarBtn.disabled = true;
+      prevBtn = document.createElement('button');
+      prevBtn.id = 'btn-senha-prev';
+      prevBtn.className = 'btn btn-primary btn-stone';
+      prevBtn.textContent = 'Voltar';
+      prevBtn.disabled = true;
+      actionsContainer = document.createElement('div');
+      actionsContainer.className = 'parchment-actions-rough';
+
+      root.appendChild(parchmentRough);
+      parchmentRough.appendChild(parchmentInnerRough);
+      parchmentInnerRough.appendChild(senhaWrap);
+      senhaWrap.appendChild(textContainer);
+      textContainer.appendChild(instr1);
+      textContainer.appendChild(instr2);
+      textContainer.appendChild(instr3);
+      textContainer.appendChild(instr4);
+      senhaWrap.appendChild(inputContainer);
+      inputContainer.appendChild(senhaInput);
+      inputContainer.appendChild(toggleBtn);
+      actionsContainer.appendChild(prevBtn);
+      actionsContainer.appendChild(avancarBtn);
+      senhaWrap.appendChild(actionsContainer);
     }
 
-    // Criar estrutura HTML
-    const parchmentRough = document.createElement('div');
-    parchmentRough.className = 'parchment-rough pergaminho pergaminho-v';
-    const parchmentInnerRough = document.createElement('div');
-    parchmentInnerRough.className = 'parchment-inner-rough';
-    const senhaWrap = document.createElement('div');
-    senhaWrap.className = 'senha-wrap';
-    const textContainer = document.createElement('div');
-    textContainer.id = 'senha-text-container';
-
-    const instr1 = document.createElement('h2');
-    instr1.id = 'senha-instr1';
-    instr1.className = 'parchment-title-rough';
-    instr1.dataset.text = 'Bem-vindo à Jornada Essencial';
-    const instr2 = document.createElement('p');
-    instr2.id = 'senha-instr2';
-    instr2.className = 'parchment-text-rough';
-    instr2.dataset.text = 'Digite a palavra-chave para acessar a jornada.';
-    const instr3 = document.createElement('p');
-    instr3.id = 'senha-instr3';
-    instr3.className = 'parchment-text-rough';
-    instr3.dataset.text = 'Esta senha é um convite para a sua transformação.';
-    const instr4 = document.createElement('p');
-    instr4.id = 'senha-instr4';
-    instr4.className = 'parchment-text-rough';
-    instr4.dataset.text = 'Prepare-se para uma experiência única!';
-
-    const inputContainer = document.createElement('div');
-    inputContainer.className = 'senha-input-group';
-    inputContainer.id = 'senha-input-container';
-    const senhaInput = document.createElement('input');
-    senhaInput.id = 'senha-input';
-    senhaInput.type = 'password';
-    senhaInput.placeholder = 'Digite a Palavra-Chave';
-    const toggleBtn = document.createElement('button');
-    toggleBtn.className = 'btn-toggle-senha';
-    toggleBtn.textContent = '👁️';
-    const avancarBtn = document.createElement('button');
-    avancarBtn.id = 'btn-senha-avancar';
-    avancarBtn.className = 'btn btn-primary btn-stone';
-    avancarBtn.textContent = 'Acessar Jornada';
-    avancarBtn.disabled = true;
-    const prevBtn = document.createElement('button');
-    prevBtn.id = 'btn-senha-prev';
-    prevBtn.className = 'btn btn-primary btn-stone';
-    prevBtn.textContent = 'Voltar';
-    prevBtn.disabled = true;
-    const actionsContainer = document.createElement('div');
-    actionsContainer.className = 'parchment-actions-rough';
-
-    root.appendChild(parchmentRough);
-    parchmentRough.appendChild(parchmentInnerRough);
-    parchmentInnerRough.appendChild(senhaWrap);
-    senhaWrap.appendChild(textContainer);
-    textContainer.appendChild(instr1);
-    textContainer.appendChild(instr2);
-    textContainer.appendChild(instr3);
-    textContainer.appendChild(instr4);
-    senhaWrap.appendChild(inputContainer);
-    inputContainer.appendChild(senhaInput);
-    inputContainer.appendChild(toggleBtn);
-    actionsContainer.appendChild(prevBtn);
-    actionsContainer.appendChild(avancarBtn);
-    senhaWrap.appendChild(actionsContainer);
+    console.log('[JCSenha] Elementos carregados:', {
+      textContainer: !!textContainer,
+      instr1: !!instr1,
+      instr2: !!instr2,
+      instr3: !!instr3,
+      instr4: !!instr4,
+      inputContainer: !!inputContainer,
+      senhaInput: !!senhaInput,
+      toggleBtn: !!toggleBtn,
+      avancarBtn: !!avancarBtn,
+      prevBtn: !!prevBtn,
+      actionsContainer: !!actionsContainer
+    });
 
     // Atualiza fundo do canvas
     window.JSecoes?.updateCanvasBackground('section-senha');
@@ -328,7 +356,7 @@
       }
 
       console.log('[JCSenha] Iniciando datilografia...');
-      const typingElements = textContainer.querySelectorAll('[data-typing="true"]:not(.typing-done)');
+      const typingElements = root.querySelectorAll('#section-senha [data-typing="true"]:not(.typing-done)');
       if (!typingElements.length) {
         console.warn('[JCSenha] Nenhum elemento com data-typing="true" encontrado');
         enableControls();
@@ -452,6 +480,8 @@
       }
     });
 
+    avancarBtn.addEventListener('click', blockAutoNavigation, { capture: true });
+
     prevBtn.addEventListener('click', async (e) => {
       if (e.isTrusted && !window.JCSenha.state.navigationLocked) {
         console.log('[JCSenha] Redirecionando para section-termos');
@@ -466,10 +496,12 @@
       }
     });
 
+    prevBtn.addEventListener('click', blockAutoNavigation, { capture: true });
+
     senhaInput.addEventListener('input', () => {
       avancarBtn.disabled = !senhaInput.value.trim();
       avancarBtn.style.cursor = senhaInput.value.trim() ? 'pointer' : 'default';
-      avancarBtn.style.pointerEvents = seno
+      avancarBtn.style.pointerEvents = senhaInput.value.trim() ? 'auto' : 'none';
       console.log('[JCSenha] Input atualizado:', { senha: senhaInput.value.trim(), avancarBtnDisabled: avancarBtn.disabled });
     });
 
@@ -480,6 +512,8 @@
     window.JCSenha.state.ready = false;
     try {
       root.classList.add('active');
+      root.classList.remove('hidden');
+      root.setAttribute('aria-hidden', 'false');
       window.JC?.show('section-senha');
       await runTypingChain();
       console.log('[JCSenha] Inicialização concluída');
@@ -530,6 +564,7 @@
     document.removeEventListener('sectionLoaded', handler);
     document.removeEventListener('section:shown', handler);
     document.addEventListener('sectionLoaded', handler, { passive: true, once: true });
+    // Remover tryInitialize para evitar inicialização automática
   };
 
   if (document.readyState === 'loading') {
