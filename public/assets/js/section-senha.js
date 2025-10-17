@@ -114,13 +114,13 @@
       text-align: center;
       box-shadow: none;
       border: none;
-      display: flex;
+      display: flex !important;
       flex-direction: column;
       align-items: center;
-      opacity: 1;
-      visibility: visible;
+      opacity: 1 !important;
+      visibility: visible !important;
       position: relative;
-      z-index: 2;
+      z-index: 1000;
       overflow-y: hidden;
       overflow-x: hidden;
       max-height: 100vh;
@@ -129,7 +129,7 @@
     `;
 
     let instr1, instr2, instr3, instr4, senhaInput, toggleBtn, avancarBtn, prevBtn, inputContainer, textContainer;
-    let visibilityInterval;
+    let visibilityInterval, mutationObserver;
     try {
       console.log('[JCSenha] Buscando elementos...');
       textContainer = document.createElement('div');
@@ -137,12 +137,12 @@
       textContainer.style.cssText = `
         width: 100%;
         max-width: 600px;
-        text-align: left;
+        text-align: left !important;
         overflow: hidden;
         box-sizing: border-box;
-        opacity: 1;
-        visibility: visible;
-        display: block;
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: block !important;
       `;
       root.appendChild(textContainer);
 
@@ -159,14 +159,14 @@
       inputContainer.id = 'senha-input-container';
       inputContainer.style.cssText = `
         position: relative;
-        display: block;
+        display: block !important;
         margin: 8px auto;
         width: 80%;
         max-width: 400px;
         overflow: hidden;
         box-sizing: border-box;
-        opacity: 1;
-        visibility: visible;
+        opacity: 1 !important;
+        visibility: visible !important;
       `;
       root.appendChild(inputContainer);
 
@@ -239,16 +239,16 @@
         el.textContent = '';
         el.setAttribute('data-typing', 'true');
         el.style.cssText = `
-          opacity: 1;
-          visibility: visible;
-          display: block;
+          opacity: 1 !important;
+          visibility: visible !important;
+          display: block !important;
           text-align: left !important;
           width: 100%;
           max-width: 600px;
           box-sizing: border-box;
           white-space: pre-wrap;
           overflow: hidden;
-          pointer-events: auto;
+          pointer-events: none;
           cursor: default;
         `;
         console.log('[JCSenha] Texto inicializado:', el.id, getText(el));
@@ -260,11 +260,11 @@
         btn.classList.add('btn', 'btn-primary', 'btn-stone');
         btn.disabled = true;
         btn.style.cssText = `
-          opacity: 1;
+          opacity: 1 !important;
           cursor: default;
-          display: inline-block;
+          display: inline-block !important;
           margin: 8px;
-          visibility: visible;
+          visibility: visible !important;
           pointer-events: none;
           overflow: hidden;
         `;
@@ -275,14 +275,14 @@
     if (inputContainer) {
       inputContainer.style.cssText = `
         position: relative;
-        display: block;
+        display: block !important;
         margin: 8px auto;
         width: 80%;
         max-width: 400px;
         overflow: hidden;
         box-sizing: border-box;
-        opacity: 1;
-        visibility: visible;
+        opacity: 1 !important;
+        visibility: visible !important;
       `;
     }
 
@@ -290,7 +290,7 @@
       senhaInput.type = 'password';
       senhaInput.placeholder = 'Digite a Palavra-Chave';
       senhaInput.style.cssText = `
-        display: block;
+        display: block !important;
         padding: 8px 40px 8px 8px;
         width: 100%;
         border: 1px solid #ccc;
@@ -298,8 +298,8 @@
         background: transparent;
         box-sizing: border-box;
         overflow: hidden;
-        opacity: 1;
-        visibility: visible;
+        opacity: 1 !important;
+        visibility: visible !important;
         pointer-events: none;
         cursor: default;
       `;
@@ -311,7 +311,7 @@
       toggleBtn.classList.add('btn', 'btn-primary', 'btn-stone');
       toggleBtn.disabled = true;
       toggleBtn.style.cssText = `
-        opacity: 1;
+        opacity: 1 !important;
         cursor: default;
         position: absolute;
         right: 8px;
@@ -322,7 +322,7 @@
         padding: 0;
         font-size: 16px;
         line-height: 1;
-        visibility: visible;
+        visibility: visible !important;
         pointer-events: none;
         overflow: hidden;
       `;
@@ -365,8 +365,9 @@
           senhaInput.style.pointerEvents = 'auto';
           senhaInput.style.cursor = 'text';
         }
-        root.style.opacity = '1';
-        root.style.visibility = 'visible';
+        root.style.opacity = '1 !important';
+        root.style.visibility = 'visible !important';
+        root.style.display = 'flex !important';
         window.JCSenha.state.navigationLocked = false;
         return;
       }
@@ -407,18 +408,18 @@
           el.textContent = '';
           el.classList.add('typing-active', 'lumen-typing');
           el.style.color = '#fff';
-          el.style.opacity = '1';
-          el.style.display = 'block';
-          el.style.visibility = 'visible';
+          el.style.opacity = '1 !important';
+          el.style.display = 'block !important';
+          el.style.visibility = 'visible !important';
           await new Promise(resolve => window.runTyping(el, text, resolve, {
             speed: Number(el.dataset.speed || 100),
             cursor: String(el.dataset.cursor || 'true') === 'true'
           }));
           el.classList.add('typing-done');
           el.classList.remove('typing-active');
-          el.style.opacity = '1';
-          el.style.visibility = 'visible';
-          el.style.display = 'block';
+          el.style.opacity = '1 !important';
+          el.style.visibility = 'visible !important';
+          el.style.display = 'block !important';
           if (typeof window.EffectCoordinator?.speak === 'function') {
             speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
@@ -437,9 +438,9 @@
           console.error('[JCSenha] Erro na datilografia para', el.id, err);
           el.textContent = text;
           el.classList.add('typing-done');
-          el.style.opacity = '1';
-          el.style.visibility = 'visible';
-          el.style.display = 'block';
+          el.style.opacity = '1 !important';
+          el.style.visibility = 'visible !important';
+          el.style.display = 'block !important';
         }
       }
       
@@ -449,12 +450,18 @@
           btn.disabled = false;
           btn.style.cursor = 'pointer';
           btn.style.pointerEvents = 'auto';
+          btn.style.opacity = '1 !important';
+          btn.style.visibility = 'visible !important';
+          btn.style.display = 'inline-block !important';
         }
       });
       if (senhaInput) {
         senhaInput.disabled = false;
         senhaInput.style.pointerEvents = 'auto';
         senhaInput.style.cursor = 'text';
+        senhaInput.style.opacity = '1 !important';
+        senhaInput.style.visibility = 'visible !important';
+        senhaInput.style.display = 'block !important';
       }
       window.JCSenha.state.navigationLocked = false;
     };
@@ -478,17 +485,36 @@
     };
 
     const forceVisibility = () => {
-      root.style.opacity = '1';
-      root.style.visibility = 'visible';
-      root.style.display = 'flex';
+      if (root) {
+        root.style.opacity = '1 !important';
+        root.style.visibility = 'visible !important';
+        root.style.display = 'flex !important';
+      }
       [textContainer, inputContainer, instr1, instr2, instr3, instr4, senhaInput, toggleBtn, avancarBtn, prevBtn].forEach(el => {
         if (el) {
-          el.style.opacity = '1';
-          el.style.visibility = 'visible';
-          el.style.display = el.tagName === 'BUTTON' || el.tagName === 'INPUT' ? 'inline-block' : 'block';
+          el.style.opacity = '1 !important';
+          el.style.visibility = 'visible !important';
+          el.style.display = el.tagName === 'BUTTON' || el.tagName === 'INPUT' ? 'inline-block !important' : 'block !important';
         }
       });
       console.log('[JCSenha] Visibilidade forçada');
+    };
+
+    // Observar mudanças no DOM que afetem visibilidade
+    const observeVisibility = () => {
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach(mutation => {
+          if (mutation.type === 'attributes') {
+            if (mutation.target === root || root.contains(mutation.target)) {
+              if (mutation.attributeName === 'style' || mutation.attributeName === 'class') {
+                forceVisibility();
+              }
+            }
+          }
+        });
+      });
+      observer.observe(root, { attributes: true, subtree: true });
+      return observer;
     };
 
     if (toggleBtn) {
@@ -544,6 +570,10 @@
     window.JCSenha.state.ready = false;
     console.log('[JCSenha] Iniciando runTypingChain...');
     try {
+      // Iniciar observador de mutação
+      mutationObserver = observeVisibility();
+      // Iniciar intervalo de visibilidade
+      visibilityInterval = setInterval(forceVisibility, 100);
       await runTypingChain();
       window.JCSenha.state.ready = true;
       console.log('[JCSenha] Inicialização concluída');
@@ -552,27 +582,30 @@
       textContainer.querySelectorAll('[data-typing="true"]').forEach(el => {
         el.textContent = getText(el);
         el.classList.add('typing-done');
-        el.style.opacity = '1';
-        el.style.visibility = 'visible';
-        el.style.display = 'block';
+        el.style.opacity = '1 !important';
+        el.style.visibility = 'visible !important';
+        el.style.display = 'block !important';
       });
       [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
         if (btn) {
           btn.disabled = false;
           btn.style.cursor = 'pointer';
           btn.style.pointerEvents = 'auto';
+          btn.style.opacity = '1 !important';
+          btn.style.visibility = 'visible !important';
+          btn.style.display = 'inline-block !important';
         }
       });
       if (senhaInput) {
         senhaInput.disabled = false;
         senhaInput.style.pointerEvents = 'auto';
         senhaInput.style.cursor = 'text';
+        senhaInput.style.opacity = '1 !important';
+        senhaInput.style.visibility = 'visible !important';
+        senhaInput.style.display = 'block !important';
       }
       window.JCSenha.state.navigationLocked = false;
     }
-
-    // Forçar visibilidade a cada 500ms para contrariar mudanças externas
-    visibilityInterval = setInterval(forceVisibility, 500);
 
     console.log('[JCSenha] Elementos encontrados:', {
       instr1: !!instr1, instr1Id: instr1?.id,
@@ -591,6 +624,7 @@
   window.JCSenha.destroy = () => {
     console.log('[JCSenha] Destruindo seção senha');
     clearInterval(visibilityInterval);
+    if (mutationObserver) mutationObserver.disconnect();
     document.removeEventListener('sectionLoaded', handler);
     document.removeEventListener('section:shown', handler);
     window.removeEventListener('sectionLoaded', blockAutoNavigation, { capture: true });
