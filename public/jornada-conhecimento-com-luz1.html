@@ -123,47 +123,22 @@
     let attempts = 0;
     const check = () => {
       console.log(`[Init] Verificando scripts (tentativa ${attempts + 1}/${maxAttempts})...`);
-      if (typeof window.JC?.init === 'function' && typeof window.carregarEtapa === 'function' && document.getElementById('section-senha')) {
-        console.log('[Init] Scripts prontos e section-senha encontrada, executando callback');
+      if (typeof window.JC?.init === 'function' && typeof window.carregarEtapa === 'function') {
+        console.log('[Init] Scripts prontos, executando callback');
         callback();
       } else {
-        console.log('[Init] Status: JC.init', typeof window.JC?.init, 'carregarEtapa', typeof window.carregarEtapa, 'section-senha', !!document.getElementById('section-senha'));
+        console.log('[Init] Status: JC.init', typeof window.JC?.init, 'carregarEtapa', typeof window.carregarEtapa);
         if (attempts < maxAttempts) {
           attempts++;
           setTimeout(check, interval);
         } else {
           console.error('[Init] Falha ao carregar scripts após várias tentativas');
-          window.toast?.('Erro: Não foi possível inicializar a jornada.', 'error');
-          console.log('[Init] Evitando carregamento automático de section-termos');
-          // Fallback: Injetar section-senha.html
-          const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
-          const sectionSenha = document.createElement('section');
-          sectionSenha.id = 'section-senha';
-          sectionSenha.className = 'section parchment-wrap-rough';
-          sectionSenha.setAttribute('data-section', 'senha');
-          sectionSenha.innerHTML = `
-            <div class="parchment-rough pergaminho pergaminho-v">
-              <div class="parchment-inner-rough">
-                <div class="senha-wrap">
-                  <h2 class="parchment-title-rough" id="senha-instr1" data-typing="true" data-text="Insira sua Palavra-Chave Sagrada.">Insira sua Palavra-Chave Sagrada.</h2>
-                  <p class="parchment-text-rough" id="senha-instr2" data-typing="true" data-text="A Palavra-Chave garante que apenas você acesse seu progresso.">A Palavra-Chave garante que apenas você acesse seu progresso.</p>
-                  <p class="parchment-text-rough" id="senha-instr3" data-typing="true" data-text="Você decide quando iniciar (dentro de 15 dias).">Você decide quando iniciar (dentro de 15 dias).</p>
-                  <p class="parchment-text-rough" id="senha-instr4" data-typing="true" data-text="24 horas para concluir após esse primeiro acesso.">24 horas para concluir após esse primeiro acesso.</p>
-                  <div class="senha-input-group" id="senha-input-container">
-                    <input id="senha-input" type="password" class="input" placeholder="Digite a Palavra-Chave" required>
-                    <button class="btn-toggle-senha" data-action="toggle-senha">👁️</button>
-                  </div>
-                  <div class="parchment-actions-rough">
-                    <button id="btn-senha-prev" class="btn btn-primary btn-stone" data-action="senha-prev">Voltar</button>
-                    <button id="btn-senha-avancar" class="btn btn-primary btn-stone" data-action="avancar">Acessar Jornada</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          `;
-          wrapper.appendChild(sectionSenha);
-          console.log('[Init] section-senha injetada como fallback');
-          callback();
+          if (typeof window.JC?.show === 'function') {
+            console.log('[Init] Forçando section-senha');
+            window.JC.show('section-senha');
+          } else {
+            console.error('[Init] window.JC.show não disponível');
+          }
         }
       }
     };
@@ -176,11 +151,9 @@
       try {
         window.JC.init();
         console.log('[Init] JC.init executado com sucesso');
-        window.JC.show('section-senha');
-      } catch (e) {
-        console.error('[Init] Falha ao executar JC.init:', e);
-        console.log('[Init] Evitando carregamento automático de section-termos');
-        window.JC.show('section-senha');
+        window.JC.show('section-senha'); // Forçar section-senha
+      } else {
+        console.log('[Init] Clique simulado, seção não pronta ou navegação bloqueada, ignorado');
       }
     });
   });
