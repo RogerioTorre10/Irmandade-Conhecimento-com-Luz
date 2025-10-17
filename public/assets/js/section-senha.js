@@ -149,6 +149,10 @@
         const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
         root = document.createElement('section');
         root.id = 'section-senha';
+        root.dataset.section = 'senha';
+        root.classList.add('section', 'parchment-wrap-rough');
+        root.classList.remove('hidden');
+        root.setAttribute('aria-hidden', 'false');
         wrapper.appendChild(root);
         console.log('[JCSenha] Seção #section-senha criada como fallback');
       }
@@ -186,7 +190,7 @@
       transition: none !important;
     `;
 
-    let parchmentRough, senhaWrap, parchmentInnerRough, instr1, instr2, instr3, instr4, senhaInput, toggleBtn, avancarBtn, prevBtn, inputContainer, textContainer;
+    let parchmentRough, parchmentInnerRough, senhaWrap, instr1, instr2, instr3, instr4, senhaInput, toggleBtn, avancarBtn, prevBtn, inputContainer, textContainer, actionsContainer;
     let visibilityInterval, mutationObserver;
     try {
       console.log('[JCSenha] Buscando elementos...');
@@ -219,36 +223,36 @@
       senhaInput.id = 'senha-input';
       toggleBtn = await waitForElement('.btn-toggle-senha', { within: inputContainer || root, timeout: 5000 }) || document.createElement('button');
       toggleBtn.className = 'btn-toggle-senha';
-      avancarBtn = await waitForElement('#btn-senha-avancar', { within: root, timeout: 5000 }) || document.createElement('button');
+      actionsContainer = await waitForElement('.parchment-actions-rough', { within: senhaWrap || root, timeout: 5000 }) || document.createElement('div');
+      actionsContainer.className = 'parchment-actions-rough';
+      avancarBtn = await waitForElement('#btn-senha-avancar', { within: actionsContainer || root, timeout: 5000 }) || document.createElement('button');
       avancarBtn.id = 'btn-senha-avancar';
-      prevBtn = await waitForElement('#btn-senha-prev', { within: root, timeout: 5000 }) || document.createElement('button');
+      prevBtn = await waitForElement('#btn-senha-prev', { within: actionsContainer || root, timeout: 5000 }) || document.createElement('button');
       prevBtn.id = 'btn-senha-prev';
 
       root.appendChild(parchmentRough);
       parchmentRough.appendChild(parchmentInnerRough);
       parchmentInnerRough.appendChild(senhaWrap);
-      senhaWrap.appendChild(textContainer);
-      textContainer.appendChild(instr1);
-      textContainer.appendChild(instr2);
-      textContainer.appendChild(instr3);
-      textContainer.appendChild(instr4);
+      senhaWrap.appendChild(instr1);
+      senhaWrap.appendChild(instr2);
+      senhaWrap.appendChild(instr3);
+      senhaWrap.appendChild(instr4);
       senhaWrap.appendChild(inputContainer);
       inputContainer.appendChild(senhaInput);
       inputContainer.appendChild(toggleBtn);
-      const actionsContainer = document.createElement('div');
-      actionsContainer.className = 'parchment-actions-rough';
+      senhaWrap.appendChild(actionsContainer);
       actionsContainer.appendChild(prevBtn);
       actionsContainer.appendChild(avancarBtn);
-      senhaWrap.appendChild(actionsContainer);
     } catch (e) {
       console.error('[JCSenha] Elements not found:', e);
       window.toast?.('Falha ao carregar os elementos da seção Senha.', 'error');
-      const createFallbackElement = (id, isButton = false, isInput = false, isContainer = false, isHeading = false) => {
+      // Fallback similar, mas com classes do HTML
+      const createFallbackElement = (id, isButton = false, isInput = false, isHeading = false, className = '') => {
         const el = document.createElement(isButton ? 'button' : isInput ? 'input' : isHeading ? 'h2' : 'div');
         el.id = id;
-        if (!isButton && !isInput && !isContainer && !isHeading) {
+        if (className) el.className = className;
+        if (!isButton && !isInput && !isHeading) {
           el.setAttribute('data-typing', 'true');
-          el.className = 'parchment-text-rough';
           el.textContent = `Placeholder para ${id}`;
         } else if (isButton) {
           el.classList.add('btn', 'btn-primary', 'btn-stone');
@@ -258,9 +262,6 @@
           el.type = 'password';
           el.className = 'input';
           el.placeholder = 'Digite a Palavra-Chave';
-        } else if (isContainer) {
-          el.className = id === 'senha-input-container' ? 'senha-input-group' : 'parchment-rough pergaminho pergaminho-v';
-          el.id = id;
         } else if (isHeading) {
           el.className = 'parchment-title-rough';
           el.setAttribute('data-typing', 'true');
@@ -268,39 +269,36 @@
         }
         return el;
       };
-      parchmentRough = parchmentRough || createFallbackElement('parchment-rough', false, false, true);
-      parchmentInnerRough = parchmentInnerRough || createFallbackElement('parchment-inner-rough', false, false, true);
-      senhaWrap = senhaWrap || createFallbackElement('senha-wrap', false, false, true);
-      textContainer = textContainer || createFallbackElement('senha-text-container', false, false, true);
-      instr1 = instr1 || createFallbackElement('senha-instr1', false, false, false, true);
-      instr2 = instr2 || createFallbackElement('senha-instr2');
-      instr3 = instr3 || createFallbackElement('senha-instr3');
-      instr4 = instr4 || createFallbackElement('senha-instr4');
-      inputContainer = inputContainer || createFallbackElement('senha-input-container', false, false, true);
-      senhaInput = senhaInput || createFallbackElement('senha-input', false, true);
-      toggleBtn = toggleBtn || createFallbackElement('btn-toggle-senha', true);
-      avancarBtn = avancarBtn || createFallbackElement('btn-senha-avancar', true);
-      prevBtn = prevBtn || createFallbackElement('btn-senha-prev', true);
+      parchmentRough = parchmentRough || createFallbackElement('parchment-rough', false, false, false, 'parchment-rough pergaminho pergaminho-v');
+      parchmentInnerRough = parchmentInnerRough || createFallbackElement('parchment-inner-rough', false, false, false, 'parchment-inner-rough');
+      senhaWrap = senhaWrap || createFallbackElement('senha-wrap', false, false, false, 'senha-wrap');
+      instr1 = instr1 || createFallbackElement('senha-instr1', false, false, true, 'parchment-title-rough');
+      instr2 = instr2 || createFallbackElement('senha-instr2', false, false, false, 'parchment-text-rough');
+      instr3 = instr3 || createFallbackElement('senha-instr3', false, false, false, 'parchment-text-rough');
+      instr4 = instr4 || createFallbackElement('senha-instr4', false, false, false, 'parchment-text-rough');
+      inputContainer = inputContainer || createFallbackElement('senha-input-container', false, false, false, 'senha-input-group');
+      senhaInput = senhaInput || createFallbackElement('senha-input', false, true, false, 'input');
+      toggleBtn = toggleBtn || createFallbackElement('btn-toggle-senha', true, false, false, 'btn-toggle-senha');
+      actionsContainer = actionsContainer || createFallbackElement('actions-container', false, false, false, 'parchment-actions-rough');
+      avancarBtn = avancarBtn || createFallbackElement('btn-senha-avancar', true, false, false, 'btn btn-primary btn-stone');
+      prevBtn = prevBtn || createFallbackElement('btn-senha-prev', true, false, false, 'btn btn-primary btn-stone');
       root.appendChild(parchmentRough);
       parchmentRough.appendChild(parchmentInnerRough);
       parchmentInnerRough.appendChild(senhaWrap);
-      senhaWrap.appendChild(textContainer);
-      textContainer.appendChild(instr1);
-      textContainer.appendChild(instr2);
-      textContainer.appendChild(instr3);
-      textContainer.appendChild(instr4);
+      senhaWrap.appendChild(instr1);
+      senhaWrap.appendChild(instr2);
+      senhaWrap.appendChild(instr3);
+      senhaWrap.appendChild(instr4);
       senhaWrap.appendChild(inputContainer);
       inputContainer.appendChild(senhaInput);
       inputContainer.appendChild(toggleBtn);
-      const actionsContainer = document.createElement('div');
-      actionsContainer.className = 'parchment-actions-rough';
+      senhaWrap.appendChild(actionsContainer);
       actionsContainer.appendChild(prevBtn);
       actionsContainer.appendChild(avancarBtn);
-      senhaWrap.appendChild(actionsContainer);
       console.log('[JCSenha] Elementos criados como fallback');
     }
 
-    console.log('[JCSenha] Elementos carregados:', { parchmentRough, parchmentInnerRough, senhaWrap, textContainer, instr1, instr2, instr3, instr4, inputContainer, senhaInput, toggleBtn, avancarBtn, prevBtn });
+    console.log('[JCSenha] Elementos carregados:', { parchmentRough, parchmentInnerRough, senhaWrap, instr1, instr2, instr3, instr4, inputContainer, senhaInput, toggleBtn, actionsContainer, avancarBtn, prevBtn });
 
     [instr1, instr2, instr3, instr4].forEach((el) => {
       if (el) {
@@ -309,7 +307,7 @@
         el.style.cssText = `
           opacity: 1 !important;
           visibility: visible !important;
-          display: ${el.tagName === 'H2' ? 'block' : 'block'} !important;
+          display: block !important;
           text-align: left !important;
           direction: ltr !important;
           width: 100% !important;
@@ -405,6 +403,15 @@
       console.log('[JCSenha] Toggle botão inicializado:', toggleBtn.className);
     }
 
+    if (actionsContainer) {
+      actionsContainer.style.cssText = `
+        display: flex !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+      `;
+    }
+
     const runTypingChain = async () => {
       window.JCSenha.state.TYPING_COUNT++;
       console.log(`[JCSenha] runTypingChain chamado (${window.JCSenha.state.TYPING_COUNT}x)`);
@@ -424,7 +431,7 @@
       }
 
       console.log('[JCSenha] Iniciando datilografia...');
-      const typingElements = textContainer.querySelectorAll('[data-typing="true"]:not(.typing-done)');
+      const typingElements = [instr1, instr2, instr3, instr4];
 
       if (!typingElements.length) {
         console.warn('[JCSenha] Nenhum elemento com data-typing="true" encontrado');
@@ -453,7 +460,7 @@
         return;
       }
 
-      console.log('[JCSenha] Elementos encontrados:', Array.from(typingElements).map(el => el.id));
+      console.log('[JCSenha] Elementos encontrados:', typingElements.map(el => el.id));
 
       if (typeof window.runTyping !== 'function') {
         console.warn('[JCSenha] window.runTyping não encontrado, usando fallback');
@@ -465,14 +472,13 @@
           el.style.whiteSpace = 'pre-wrap';
           const type = () => {
             if (i < text.length) {
-              el.textContent = text.substring(0, i + 1);
+              el.textContent += text.charAt(i);
               if (cursor) {
                 el.style.borderRight = '2px solid #fff';
               }
               i++;
               setTimeout(type, speed);
             } else {
-              el.textContent = text;
               el.style.borderRight = 'none';
               resolve();
             }
@@ -608,8 +614,8 @@
         console.warn('[JCSenha] Root não encontrado no DOM, recriando...');
         root = document.createElement('section');
         root.id = 'section-senha';
-        root.dataset.senhaInitialized = 'true';
-        root.classList.add('section-senha', 'parchment-wrap-rough');
+        root.dataset.section = 'senha';
+        root.classList.add('section', 'parchment-wrap-rough');
         root.classList.remove('hidden');
         root.setAttribute('aria-hidden', 'false');
         root.style.cssText = `
@@ -640,19 +646,16 @@
         root.appendChild(parchmentRough);
         parchmentRough.appendChild(parchmentInnerRough);
         parchmentInnerRough.appendChild(senhaWrap);
-        senhaWrap.appendChild(textContainer);
-        textContainer.appendChild(instr1);
-        textContainer.appendChild(instr2);
-        textContainer.appendChild(instr3);
-        textContainer.appendChild(instr4);
+        senhaWrap.appendChild(instr1);
+        senhaWrap.appendChild(instr2);
+        senhaWrap.appendChild(instr3);
+        senhaWrap.appendChild(instr4);
         senhaWrap.appendChild(inputContainer);
         inputContainer.appendChild(senhaInput);
         inputContainer.appendChild(toggleBtn);
-        const actionsContainer = document.createElement('div');
-        actionsContainer.className = 'parchment-actions-rough';
+        senhaWrap.appendChild(actionsContainer);
         actionsContainer.appendChild(prevBtn);
         actionsContainer.appendChild(avancarBtn);
-        senhaWrap.appendChild(actionsContainer);
       }
       root.style.cssText = `
         background: transparent;
@@ -679,7 +682,7 @@
         transition: none !important;
       `;
       root.classList.remove('hidden');
-      [parchmentRough, parchmentInnerRough, senhaWrap, textContainer, inputContainer, instr1, instr2, instr3, instr4, senhaInput, toggleBtn, avancarBtn, prevBtn].forEach(el => {
+      [parchmentRough, parchmentInnerRough, senhaWrap, instr1, instr2, instr3, instr4, inputContainer, senhaInput, toggleBtn, actionsContainer, avancarBtn, prevBtn].forEach(el => {
         if (el) {
           el.style.cssText = el.style.cssText.replace(/transform:.*?;/g, 'transform: none !important;')
             .replace(/margin:.*?;/g, 'margin: 0 auto !important;')
@@ -708,17 +711,7 @@
             addedNodes: Array.from(mutation.addedNodes).map(n => n.id || n.className || n.tagName),
             removedNodes: Array.from(mutation.removedNodes).map(n => n.id || n.className || n.tagName)
           });
-          if (mutation.type === 'attributes' && (
-            mutation.target === root ||
-            root.contains(mutation.target) ||
-            mutation.target.id === 'jornada-content-wrapper' ||
-            mutation.target.id === 'jornada-canvas' ||
-            mutation.target.classList.contains('parchment-rough') ||
-            mutation.target.classList.contains('pergaminho') ||
-            mutation.target.classList.contains('pergaminho-v') ||
-            mutation.target.classList.contains('senha-wrap') ||
-            mutation.target.classList.contains('parchment-inner-rough')
-          )) {
+          if (mutation.type === 'attributes' && (mutation.target === root || root.contains(mutation.target) || mutation.target.id === 'jornada-content-wrapper' || mutation.target.id === 'jornada-canvas')) {
             if (['style', 'class', 'transform', 'margin', 'width', 'position'].includes(mutation.attributeName)) {
               console.log('[JCSenha] Estilo ou classe alterada em:', mutation.target.id || mutation.target.className, 'valor antigo:', mutation.oldValue);
               forceVisibility();
@@ -804,12 +797,14 @@
       console.log('[JCSenha] Inicialização concluída');
     } catch (err) {
       console.error('[JCSenha] Erro na datilografia:', err);
-      textContainer.querySelectorAll('[data-typing="true"]').forEach(el => {
-        el.textContent = getText(el);
-        el.classList.add('typing-done');
-        el.style.opacity = '1 !important';
-        el.style.visibility = 'visible !important';
-        el.style.display = 'block !important';
+      [instr1, instr2, instr3, instr4].forEach(el => {
+        if (el) {
+          el.textContent = getText(el);
+          el.classList.add('typing-done');
+          el.style.opacity = '1 !important';
+          el.style.visibility = 'visible !important';
+          el.style.display = 'block !important';
+        }
       });
       [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
         if (btn && getComputedStyle(btn).opacity === '1' && getComputedStyle(btn).display !== 'none') {
@@ -836,7 +831,6 @@
       parchmentRough: !!parchmentRough, parchmentRoughClass: parchmentRough?.className,
       parchmentInnerRough: !!parchmentInnerRough, parchmentInnerRoughClass: parchmentInnerRough?.className,
       senhaWrap: !!senhaWrap, senhaWrapClass: senhaWrap?.className,
-      textContainer: !!textContainer, textContainerId: textContainer?.id,
       instr1: !!instr1, instr1Id: instr1?.id,
       instr2: !!instr2, instr2Id: instr2?.id,
       instr3: !!instr3, instr3Id: instr3?.id,
@@ -844,6 +838,7 @@
       inputContainer: !!inputContainer, inputContainerId: inputContainer?.id,
       senhaInput: !!senhaInput, senhaInputId: senhaInput?.id,
       toggleBtn: !!toggleBtn, toggleBtnAction: toggleBtn?.dataset?.action,
+      actionsContainer: !!actionsContainer, actionsContainerClass: actionsContainer?.className,
       avancarBtn: !!avancarBtn, avancarBtnAction: avancarBtn?.dataset?.action,
       prevBtn: !!prevBtn, prevBtnAction: prevBtn?.dataset?.action
     });
