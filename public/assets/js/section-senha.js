@@ -43,9 +43,14 @@
           console.log('[JCSenha] Elemento encontrado:', selector);
           while (el.parentElement && el.parentElement !== within && el.parentElement !== document.body) {
             console.log('[JCSenha] Verificando pai:', el.parentElement.tagName, el.parentElement.id);
-            el.parentElement.style.display = 'block !important';
-            el.parentElement.style.opacity = '1 !important';
-            el.parentElement.style.visibility = 'visible !important';
+            el.parentElement.style.cssText = `
+              display: block !important;
+              opacity: 1 !important;
+              visibility: visible !important;
+              transform: none !important;
+              margin: 0 !important;
+              width: 100% !important;
+            `;
             el = el.parentElement;
           }
           return resolve(el);
@@ -80,6 +85,9 @@
       position: static !important;
       transform: none !important;
       transition: none !important;
+      margin: 12px auto !important;
+      width: 100% !important;
+      max-width: 600px !important;
       pointer-events: none;
     }
     #senha-text-container > div {
@@ -88,10 +96,13 @@
       display: block !important;
       pointer-events: none;
     }
-    .hidden, [class*="hidden"], #jornada-content-wrapper.hidden {
+    .hidden, [class*="hidden"], #jornada-content-wrapper, #jornada-content-wrapper.hidden {
       display: flex !important;
       opacity: 1 !important;
       visibility: visible !important;
+      transform: none !important;
+      margin: 0 !important;
+      width: 100% !important;
     }
   `;
   document.head.appendChild(styleSheet);
@@ -141,9 +152,9 @@
       background: transparent;
       padding: 24px;
       border-radius: 12px;
-      width: 100%;
-      max-width: 600px;
-      margin: 12px auto;
+      width: 100% !important;
+      max-width: 600px !important;
+      margin: 12px auto !important;
       text-align: center;
       box-shadow: none;
       border: none;
@@ -169,8 +180,8 @@
       textContainer = document.createElement('div');
       textContainer.id = 'senha-text-container';
       textContainer.style.cssText = `
-        width: 100%;
-        max-width: 600px;
+        width: 100% !important;
+        max-width: 600px !important;
         text-align: left !important;
         direction: ltr !important;
         overflow: hidden;
@@ -178,6 +189,8 @@
         opacity: 1 !important;
         visibility: visible !important;
         display: block !important;
+        margin: 0 auto !important;
+        transform: none !important;
       `;
       root.appendChild(textContainer);
 
@@ -195,13 +208,14 @@
       inputContainer.style.cssText = `
         position: relative;
         display: block !important;
-        margin: 8px auto;
-        width: 80%;
-        max-width: 400px;
+        margin: 8px auto !important;
+        width: 80% !important;
+        max-width: 400px !important;
         overflow: hidden;
         box-sizing: border-box;
         opacity: 1 !important;
         visibility: visible !important;
+        transform: none !important;
       `;
       root.appendChild(inputContainer);
 
@@ -246,7 +260,7 @@
       };
       textContainer = textContainer || createFallbackElement('senha-text-container', false, false, true);
       instr1 = instr1 || createFallbackElement('senha-instr1');
-      instr2 = instr2 || createFallbackElement('senha-instr2');
+      instr2 = instr上昇2 || createFallbackElement('senha-instr2');
       instr3 = instr3 || createFallbackElement('senha-instr3');
       instr4 = instr4 || createFallbackElement('senha-instr4');
       inputContainer = inputContainer || createFallbackElement('senha-input-container', false, false, true);
@@ -279,14 +293,15 @@
           display: block !important;
           text-align: left !important;
           direction: ltr !important;
-          width: 100%;
-          max-width: 600px;
+          width: 100% !important;
+          max-width: 600px !important;
           box-sizing: border-box;
           white-space: pre-wrap;
           overflow: hidden;
           pointer-events: none;
           cursor: default;
           transform: none !important;
+          margin: 0 auto !important;
         `;
         console.log('[JCSenha] Texto inicializado:', el.id, getText(el));
       }
@@ -300,7 +315,7 @@
           opacity: 1 !important;
           cursor: default;
           display: inline-block !important;
-          margin: 8px;
+          margin: 8px !important;
           visibility: visible !important;
           pointer-events: none;
           overflow: hidden;
@@ -314,9 +329,9 @@
       inputContainer.style.cssText = `
         position: relative;
         display: block !important;
-        margin: 8px auto;
-        width: 80%;
-        max-width: 400px;
+        margin: 8px auto !important;
+        width: 80% !important;
+        max-width: 400px !important;
         overflow: hidden;
         box-sizing: border-box;
         opacity: 1 !important;
@@ -331,7 +346,7 @@
       senhaInput.style.cssText = `
         display: block !important;
         padding: 8px 40px 8px 8px;
-        width: 100%;
+        width: 100% !important;
         border: 1px solid #ccc;
         border-radius: 4px;
         background: transparent;
@@ -492,7 +507,7 @@
       
       console.log('[JCSenha] Datilografia e TTS concluídos');
       [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
-        if (btn && getComputedStyle(btn).opacity === '1') {
+        if (btn && getComputedStyle(btn).opacity === '1' && getComputedStyle(btn).display !== 'none') {
           btn.disabled = false;
           btn.style.cursor = 'pointer';
           btn.style.pointerEvents = 'auto';
@@ -501,7 +516,7 @@
           btn.style.display = 'inline-block !important';
         }
       });
-      if (senhaInput && getComputedStyle(senhaInput).opacity === '1') {
+      if (senhaInput && getComputedStyle(senhaInput).opacity === '1' && getComputedStyle(senhaInput).display !== 'none') {
         senhaInput.disabled = false;
         senhaInput.style.pointerEvents = 'auto';
         senhaInput.style.cursor = 'text';
@@ -534,9 +549,14 @@
       if (!root || !document.body.contains(root)) {
         console.warn('[JCSenha] Root não encontrado no DOM, recriando...');
         const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
-        wrapper.style.display = 'block !important';
-        wrapper.style.opacity = '1 !important';
-        wrapper.style.visibility = 'visible !important';
+        wrapper.style.cssText = `
+          display: block !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          transform: none !important;
+          margin: 0 !important;
+          width: 100% !important;
+        `;
         root = document.createElement('section');
         root.id = 'section-senha';
         root.dataset.senhaInitialized = 'true';
@@ -547,9 +567,9 @@
           background: transparent;
           padding: 24px;
           border-radius: 12px;
-          width: 100%;
-          max-width: 600px;
-          margin: 12px auto;
+          width: 100% !important;
+          max-width: 600px !important;
+          margin: 12px auto !important;
           text-align: center;
           box-shadow: none;
           border: none;
@@ -573,15 +593,40 @@
         root.appendChild(avancarBtn);
         root.appendChild(prevBtn);
       }
-      root.style.opacity = '1 !important';
-      root.style.visibility = 'visible !important';
-      root.style.display = 'flex !important';
+      root.style.cssText = `
+        background: transparent;
+        padding: 24px;
+        border-radius: 12px;
+        width: 100% !important;
+        max-width: 600px !important;
+        margin: 12px auto !important;
+        text-align: center;
+        box-shadow: none;
+        border: none;
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        opacity: 1 !important;
+        visibility: visible !important;
+        position: static;
+        z-index: 1000;
+        overflow-y: hidden;
+        overflow-x: hidden;
+        max-height: 100vh;
+        box-sizing: border-box;
+        transform: none !important;
+        transition: none !important;
+      `;
       [textContainer, inputContainer, instr1, instr2, instr3, instr4, senhaInput, toggleBtn, avancarBtn, prevBtn].forEach(el => {
         if (el) {
+          el.style.cssText = el.style.cssText.replace(/transform:.*?;/g, 'transform: none !important;');
           el.style.opacity = '1 !important';
           el.style.visibility = 'visible !important';
           el.style.display = el.tagName === 'BUTTON' || el.tagName === 'INPUT' ? 'inline-block !important' : 'block !important';
-          console.log('[JCSenha] Visibilidade forçada para:', el.id || el.className, 'opacity:', getComputedStyle(el).opacity, 'display:', getComputedStyle(el).display, 'parent:', el.parentElement?.id || el.parentElement?.tagName);
+          el.style.margin = el.tagName === 'BUTTON' ? '8px !important' : '0 auto !important';
+          el.style.width = '100% !important';
+          el.style.maxWidth = el.id === 'senha-input-container' ? '400px !important' : '600px !important';
+          console.log('[JCSenha] Visibilidade forçada para:', el.id || el.className, 'opacity:', getComputedStyle(el).opacity, 'display:', getComputedStyle(el).display, 'transform:', getComputedStyle(el).transform, 'parent:', el.parentElement?.id || el.parentElement?.tagName);
         }
       });
       console.log('[JCSenha] Visibilidade forçada, root presente:', document.body.contains(root));
@@ -599,7 +644,7 @@
             removedNodes: Array.from(mutation.removedNodes).map(n => n.id || n.className || n.tagName)
           });
           if (mutation.type === 'attributes' && (mutation.target === root || root.contains(mutation.target))) {
-            if (mutation.attributeName === 'style' || mutation.attributeName === 'class') {
+            if (['style', 'class', 'transform', 'margin', 'width'].includes(mutation.attributeName)) {
               console.log('[JCSenha] Estilo ou classe alterada em:', mutation.target.id || mutation.target.className, 'valor antigo:', mutation.oldValue);
               forceVisibility();
             }
@@ -681,7 +726,7 @@
         el.style.display = 'block !important';
       });
       [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
-        if (btn && getComputedStyle(btn).opacity === '1') {
+        if (btn && getComputedStyle(btn).opacity === '1' && getComputedStyle(btn).display !== 'none') {
           btn.disabled = false;
           btn.style.cursor = 'pointer';
           btn.style.pointerEvents = 'auto';
@@ -690,7 +735,7 @@
           btn.style.display = 'inline-block !important';
         }
       });
-      if (senhaInput && getComputedStyle(senhaInput).opacity === '1') {
+      if (senhaInput && getComputedStyle(senhaInput).opacity === '1' && getComputedStyle(senhaInput).display !== 'none') {
         senhaInput.disabled = false;
         senhaInput.style.pointerEvents = 'auto';
         senhaInput.style.cursor = 'text';
