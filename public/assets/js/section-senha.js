@@ -63,8 +63,9 @@
     return { sectionId, node };
   }
 
-  // Injetar estilos essenciais (reduzidos para evitar conflitos)
+  // Injetar estilos essenciais
   const styleSheet = document.createElement('style');
+  styleSheet.id = 'jcsenha-styles';
   styleSheet.textContent = `
     #section-senha {
       max-height: 100vh;
@@ -73,6 +74,12 @@
       padding: 24px;
       max-width: 600px;
       margin: 0 auto;
+      display: none;
+    }
+    #section-senha.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     .senha-wrap, .parchment-inner-rough {
       display: flex;
@@ -168,16 +175,20 @@
       root = document.createElement('section');
       root.id = 'section-senha';
       root.className = 'section';
-      wrapper.innerHTML = ''; // Limpa conteúdo anterior para evitar duplicatas
-      wrapper.appendChild(root);
+      wrapper.appendChild(root); // Adiciona sem limpar outras seções
     }
 
     console.log('[JCSenha] Root encontrado:', root);
     root.dataset.senhaInitialized = 'true';
     root.classList.add('section-senha');
 
-    // Limpa e constrói estrutura limpa
-    root.innerHTML = ''; // Limpa qualquer duplicata anterior
+    // Verifica se já existe conteúdo para evitar duplicatas
+    if (root.querySelector('.senha-wrap')) {
+      console.log('[JCSenha] Conteúdo já presente, limpando para evitar duplicatas');
+      root.innerHTML = '';
+    }
+
+    // Constrói estrutura
     const senhaWrap = document.createElement('div');
     senhaWrap.className = 'senha-wrap';
     const textContainer = document.createElement('div');
@@ -236,11 +247,19 @@
     senhaWrap.appendChild(actionsContainer);
     root.appendChild(senhaWrap);
 
+    // Atualiza fundo do canvas (respeitando jornada-secoes.js)
+    window.JSecoes?.updateCanvasBackground('section-senha');
+
+    // Atualiza aria-pergunta
+    const aria = document.getElementById('aria-pergunta');
+    if (aria) aria.textContent = 'Digite a palavra-chave para acessar a jornada.';
+
     // Efeitos
     const runReadingEffect = (el) => {
       if (!el) return;
       el.classList.add('reading-highlight');
       setTimeout(() => el.classList.remove('reading-highlight'), 2000);
+      console.log('[JCSenha] Efeito de leitura aplicado:', el.id);
     };
 
     const runTypingChain = async () => {
@@ -255,20 +274,25 @@
 
       const typingElements = textContainer.querySelectorAll('[data-typing="true"]:not(.typing-done)');
       if (!typingElements.length) {
+        console.log('[JCSenha] Nenhum elemento para datilografia, habilitando controles');
         enableControls();
         return;
       }
 
-      // Fallback para runTyping se não existir
+      // Fallback para runTyping
       if (typeof window.runTyping !== 'function') {
+        console.warn('[JCSenha] window.runTyping não encontrado, usando fallback');
         window.runTyping = (el, text, cb) => {
           el.textContent = '';
           let i = 0;
           const type = () => {
             if (i < text.length) {
               el.textContent += text[i++];
+              el.classList.add('typing-active');
               setTimeout(type, 50);
             } else {
+              el.classList.remove('typing-active');
+              el.classList.add('typing-done');
               cb();
             }
           };
@@ -278,25 +302,25 @@
 
       for (const el of typingElements) {
         const text = getText(el);
-        el.textContent = '';
-        el.classList.add('typing-active');
+        console.log('[JCSenha] Datilografando:', el.id, text.substring(0, 50));
         await new Promise(resolve => window.runTyping(el, text, () => {
-          el.classList.remove('typing-active');
-          el.classList.add('typing-done');
           runReadingEffect(el);
           if (window.EffectCoordinator?.speak) {
-            window.EffectCoordinator.speak(text);
+            window.EffectCoordinator.speak(text, { lang: 'pt-BR', rate: 1.1, pitch: 1.0 });
           }
           resolve();
         }));
       }
 
+      console.log('[JCSenha] Datilografia concluída');
       enableControls();
     };
 
     const enableControls = () => {
       [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
         btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.pointerEvents = 'auto';
       });
       senhaInput.disabled = false;
       window.JCSenha.state.navigationLocked = false;
@@ -308,23 +332,36 @@
     toggleBtn.addEventListener('click', () => {
       senhaInput.type = senhaInput.type === 'password' ? 'text' : 'password';
       toggleBtn.textContent = senhaInput.type === 'password' ? '👁️' : '🙈';
+      console.log('[JCSenha] Toggle senha:', senhaInput.type);
     });
 
     avancarBtn.addEventListener('click', async () => {
-      if (!senhaInput.value.trim()) return window.toast?.('Digite a palavra-chave.');
-      // Validação simulada - substitua pela real
+      if (!senhaInput.value.trim()) {
+        window.toast?.('Digite a palavra-chave.', 'error');
+        return;
+      }
+      console.log('[JCSenha] Avançando para section-guia');
       window.JC?.show('section-guia') || (window.location.href = '/guia');
     });
 
-    prevBtn.addEventListener('click', () => window.location.href = '/');
+    prevBtn.addEventListener('click', () => {
+      console.log('[JCSenha] Voltando para section-termos');
+      window.JC?.show('section-termos') || (window.location.href = '/termos');
+    });
 
     senhaInput.addEventListener('input', () => {
       avancarBtn.disabled = !senhaInput.value.trim();
+      avancarBtn.style.opacity = senhaInput.value.trim() ? '1' : '0.5';
+      avancarBtn.style.pointerEvents = senhaInput.value.trim() ? 'auto' : 'none';
     });
 
     // Inicializa
-    await runTypingChain();
-    console.log('[JCSenha] Inicialização concluída');
+    root.classList.add('active'); // Garante visibilidade
+    window.JC?.show('section-senha'); // Respeita a navegação do JC
+    runTypingChain().catch(err => {
+      console.error('[JCSenha] Erro na datilografia:', err);
+      enableControls();
+    });
   };
 
   // Destroy para limpeza
@@ -334,18 +371,20 @@
     if (window.JCSenha.observer) window.JCSenha.observer.disconnect();
     const root = document.getElementById('section-senha');
     if (root) root.remove();
-    document.querySelector('#jcsenha-styles')?.remove(); // Remove stylesheet se ID adicionado
+    document.querySelector('#jcsenha-styles')?.remove();
     window.JCSenha.state = { ready: false, listenerAdded: false, navigationLocked: true, HANDLER_COUNT: 0, TYPING_COUNT: 0 };
+    window.JCSenha.__bound = false;
   };
 
   // Bind
   const bind = () => {
+    console.log('[JCSenha] Executando bind');
     document.addEventListener('sectionLoaded', handler, { once: true });
-    setTimeout(() => handler({ detail: { sectionId: 'section-senha' } }), 1000);
+    document.addEventListener('section:shown', handler, { once: true });
   };
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bind);
+    document.addEventListener('DOMContentLoaded', bind, { once: true });
   } else {
     bind();
   }
