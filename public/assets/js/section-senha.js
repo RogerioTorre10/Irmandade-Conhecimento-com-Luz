@@ -554,10 +554,11 @@
   };
 
   if (!window.JCSenha.state.listenerAdded) {
-    console.log('[JCSenha] Registrando listener para sectionLoaded');
-    window.addEventListener('sectionLoaded', handler);
-    window.JCSenha.state.listenerAdded = true;
-  }
+  console.log('[JCSenha] Registrando listener para section:shown');
+  window.addEventListener('section:shown', handler);
+  window.JCSenha.state.listenerAdded = true;
+}
+
 
   const bind = () => {
     console.log('[JCSenha] Executando bind');
