@@ -36,7 +36,7 @@
       const tick = () => {
         let el = within.querySelector(selector);
         if (!el && within !== document) {
-          el = document.querySelector(selector); // Busca global como fallback
+          el = document.querySelector(selector);
         }
         if (el) {
           console.log('[JCSenha] Elemento encontrado:', selector);
@@ -88,7 +88,6 @@
       } catch (e) {
         window.toast?.('Erro: Seção section-senha não carregada.', 'error');
         console.error('[JCSenha] Section not found:', e);
-        // Fallback para criar seção
         const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
         root = document.createElement('section');
         root.id = 'section-senha';
@@ -119,10 +118,9 @@
       visibility: visible;
       position: relative;
       z-index: 2;
-      overflow-y: auto;
+      overflow-y: hidden;
       overflow-x: hidden;
-      min-height: auto;
-      height: auto;
+      max-height: 100vh;
       box-sizing: border-box;
       transition: none;
     `;
@@ -142,7 +140,6 @@
     } catch (e) {
       console.error('[JCSenha] Elements not found:', e);
       window.toast?.('Falha ao carregar os elementos da seção Senha.', 'error');
-      // Fallback para criar elementos
       const createFallbackElement = (id, isButton = false, isInput = false, isContainer = false) => {
         const el = document.createElement(isButton ? 'button' : isInput ? 'input' : 'div');
         el.id = id;
@@ -172,7 +169,6 @@
       toggleBtn = toggleBtn || createFallbackElement('btn-toggle-senha', true);
       avancarBtn = avancarBtn || createFallbackElement('btn-senha-avancar', true);
       prevBtn = prevBtn || createFallbackElement('btn-senha-prev', true);
-      // Garantir que senhaInput e toggleBtn estejam dentro do inputContainer
       inputContainer.appendChild(senhaInput);
       inputContainer.appendChild(toggleBtn);
       console.log('[JCSenha] Elementos criados como fallback');
@@ -186,7 +182,10 @@
         el.style.opacity = '0';
         el.style.visibility = 'hidden';
         el.style.display = 'none';
-        el.style.textAlign = 'left';
+        el.style.textAlign = 'left !important';
+        el.style.width = '100%';
+        el.style.maxWidth = '600px';
+        el.style.boxSizing = 'border-box';
         console.log('[JCSenha] Texto inicializado:', el.id, getText(el));
       }
     });
@@ -200,7 +199,7 @@
         btn.style.display = 'inline-block';
         btn.style.margin = '8px';
         btn.style.visibility = 'visible';
-        btn.style.pointerEvents = 'auto';
+        btn.style.pointerEvents = 'none';
         console.log('[JCSenha] Botão inicializado:', btn.className, btn.textContent);
       }
     });
@@ -240,7 +239,7 @@
       toggleBtn.style.fontSize = '16px';
       toggleBtn.style.lineHeight = '1';
       toggleBtn.style.visibility = 'visible';
-      toggleBtn.style.pointerEvents = 'auto';
+      toggleBtn.style.pointerEvents = 'none';
       console.log('[JCSenha] Toggle botão inicializado:', toggleBtn.className);
     }
 
@@ -292,6 +291,7 @@
           const speed = options.speed || 100;
           const cursor = options.cursor !== 'false';
           el.style.position = 'relative';
+          el.style.whiteSpace = 'pre-wrap';
           const type = () => {
             if (i < text.length) {
               el.textContent = text.substring(0, i + 1);
@@ -321,7 +321,9 @@
           el.style.opacity = '0';
           el.style.display = 'block';
           el.style.visibility = 'hidden';
-          el.style.textAlign = 'left';
+          el.style.textAlign = 'left !important';
+          el.style.width = '100%';
+          el.style.maxWidth = '600px';
           root.style.opacity = '1';
           root.style.visibility = 'visible';
           await new Promise(resolve => window.runTyping(el, text, resolve, {
@@ -376,6 +378,15 @@
       }
     };
 
+    // Bloquear navegação automática
+    const blockAutoNavigation = (e) => {
+      if (!e.isTrusted) {
+        console.log('[JCSenha] Navegação automática bloqueada');
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+
     if (toggleBtn) {
       toggleBtn.addEventListener('click', () => {
         console.log('[JCSenha] Clique no botão olho mágico');
@@ -407,6 +418,8 @@
           console.log('[JCSenha] Clique simulado ou seção não pronta, ignorado');
         }
       });
+      // Bloquear eventos automáticos
+      avancarBtn.addEventListener('click', blockAutoNavigation, { capture: true });
     }
 
     if (prevBtn) {
@@ -419,7 +432,12 @@
           console.log('[JCSenha] Clique simulado ignorado');
         }
       });
+      prevBtn.addEventListener('click', blockAutoNavigation, { capture: true });
     }
+
+    // Bloquear navegação automática em eventos globais
+    window.addEventListener('sectionLoaded', blockAutoNavigation, { capture: true });
+    window.addEventListener('section:shown', blockAutoNavigation, { capture: true });
 
     window.JCSenha.state.ready = false;
     console.log('[JCSenha] Iniciando runTypingChain...');
@@ -466,6 +484,8 @@
     console.log('[JCSenha] Destruindo seção senha');
     document.removeEventListener('sectionLoaded', handler);
     document.removeEventListener('section:shown', handler);
+    window.removeEventListener('sectionLoaded', blockAutoNavigation, { capture: true });
+    window.removeEventListener('section:shown', blockAutoNavigation, { capture: true });
     const root = document.getElementById('section-senha');
     if (root) {
       root.dataset.senhaInitialized = '';
