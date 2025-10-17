@@ -63,6 +63,29 @@
     return { sectionId, node };
   }
 
+  // Injetar estilos globais para garantir visibilidade
+  const styleSheet = document.createElement('style');
+  styleSheet.textContent = `
+    #section-senha, #section-senha *, #senha-text-container, #senha-input-container {
+      opacity: 1 !important;
+      visibility: visible !important;
+      display: flex !important;
+      position: static !important;
+      transform: none !important;
+      transition: none !important;
+    }
+    #senha-text-container > div {
+      text-align: left !important;
+      display: block !important;
+    }
+    .hidden {
+      display: flex !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+  `;
+  document.head.appendChild(styleSheet);
+
   // Handler principal
   const handler = async (evt) => {
     window.JCSenha.state.HANDLER_COUNT++;
@@ -125,7 +148,8 @@
       overflow-x: hidden;
       max-height: 100vh;
       box-sizing: border-box;
-      transition: none;
+      transform: none !important;
+      transition: none !important;
     `;
 
     let instr1, instr2, instr3, instr4, senhaInput, toggleBtn, avancarBtn, prevBtn, inputContainer, textContainer;
@@ -250,6 +274,7 @@
           overflow: hidden;
           pointer-events: none;
           cursor: default;
+          transform: none !important;
         `;
         console.log('[JCSenha] Texto inicializado:', el.id, getText(el));
       }
@@ -267,6 +292,7 @@
           visibility: visible !important;
           pointer-events: none;
           overflow: hidden;
+          transform: none !important;
         `;
         console.log('[JCSenha] Botão inicializado:', btn.className, btn.textContent);
       }
@@ -283,6 +309,7 @@
         box-sizing: border-box;
         opacity: 1 !important;
         visibility: visible !important;
+        transform: none !important;
       `;
     }
 
@@ -302,6 +329,7 @@
         visibility: visible !important;
         pointer-events: none;
         cursor: default;
+        transform: none !important;
       `;
       senhaInput.disabled = true;
       console.log('[JCSenha] Input inicializado:', senhaInput.id);
@@ -316,7 +344,7 @@
         position: absolute;
         right: 8px;
         top: 50%;
-        transform: translateY(-50%);
+        transform: translateY(-50%) !important;
         border: none;
         background: transparent;
         padding: 0;
@@ -358,12 +386,18 @@
             btn.disabled = false;
             btn.style.cursor = 'pointer';
             btn.style.pointerEvents = 'auto';
+            btn.style.opacity = '1 !important';
+            btn.style.visibility = 'visible !important';
+            btn.style.display = 'inline-block !important';
           }
         });
         if (senhaInput && getComputedStyle(senhaInput).opacity === '1') {
           senhaInput.disabled = false;
           senhaInput.style.pointerEvents = 'auto';
           senhaInput.style.cursor = 'text';
+          senhaInput.style.opacity = '1 !important';
+          senhaInput.style.visibility = 'visible !important';
+          senhaInput.style.display = 'block !important';
         }
         root.style.opacity = '1 !important';
         root.style.visibility = 'visible !important';
@@ -515,7 +549,8 @@
           overflow-x: hidden;
           max-height: 100vh;
           box-sizing: border-box;
-          transition: none;
+          transform: none !important;
+          transition: none !important;
         `;
         wrapper.appendChild(root);
         root.appendChild(textContainer);
@@ -531,7 +566,7 @@
           el.style.opacity = '1 !important';
           el.style.visibility = 'visible !important';
           el.style.display = el.tagName === 'BUTTON' || el.tagName === 'INPUT' ? 'inline-block !important' : 'block !important';
-          console.log('[JCSenha] Visibilidade forçada para:', el.id || el.className, getComputedStyle(el).opacity);
+          console.log('[JCSenha] Visibilidade forçada para:', el.id || el.className, 'opacity:', getComputedStyle(el).opacity, 'display:', getComputedStyle(el).display);
         }
       });
       console.log('[JCSenha] Visibilidade forçada');
@@ -541,10 +576,17 @@
     const observeVisibility = () => {
       const observer = new MutationObserver((mutations) => {
         mutations.forEach(mutation => {
-          console.log('[JCSenha] Mutação detectada:', mutation.type, mutation.target.id || mutation.target.className);
+          console.log('[JCSenha] Mutação detectada:', {
+            type: mutation.type,
+            target: mutation.target.id || mutation.target.className,
+            attributeName: mutation.attributeName,
+            oldValue: mutation.oldValue,
+            addedNodes: mutation.addedNodes.length,
+            removedNodes: mutation.removedNodes.length
+          });
           if (mutation.type === 'attributes' && (mutation.target === root || root.contains(mutation.target))) {
             if (mutation.attributeName === 'style' || mutation.attributeName === 'class') {
-              console.log('[JCSenha] Estilo ou classe alterada em:', mutation.target.id || mutation.target.className);
+              console.log('[JCSenha] Estilo ou classe alterada em:', mutation.target.id || mutation.target.className, 'valor antigo:', mutation.oldValue);
               forceVisibility();
             }
           } else if (mutation.type === 'childList' && !document.body.contains(root)) {
@@ -553,7 +595,7 @@
           }
         });
       });
-      observer.observe(document.body, { attributes: true, childList: true, subtree: true });
+      observer.observe(document.body, { attributes: true, childList: true, subtree: true, attributeOldValue: true });
       return observer;
     };
 
@@ -667,6 +709,7 @@
     document.removeEventListener('section:shown', handler);
     window.removeEventListener('sectionLoaded', blockAutoNavigation, { capture: true });
     window.removeEventListener('section:shown', blockAutoNavigation, { capture: true });
+    if (styleSheet) styleSheet.remove();
     const root = document.getElementById('section-senha');
     if (root) {
       root.dataset.senhaInitialized = '';
