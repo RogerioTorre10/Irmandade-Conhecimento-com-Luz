@@ -96,7 +96,7 @@
       overflow: hidden !important;
       pointer-events: none;
     }
-    #senha-text-container > div {
+    #senha-text-container > div, #senha-instr1, #senha-instr2, #senha-instr3, #senha-instr4 {
       text-align: left !important;
       direction: ltr !important;
       display: block !important;
@@ -149,6 +149,8 @@
         const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
         root = document.createElement('section');
         root.id = 'section-senha';
+        root.className = 'section parchment-wrap-rough';
+        root.setAttribute('data-section', 'senha');
         wrapper.appendChild(root);
         console.log('[JCSenha] Seção #section-senha criada como fallback');
       }
@@ -186,7 +188,7 @@
       transition: none !important;
     `;
 
-    let parchmentRough, parchmentInnerRough, senhaWrap, instr1, instr2, instr3, instr4, senhaInput, toggleBtn, avancarBtn, prevBtn, inputContainer, actionsContainer;
+    let parchmentRough, parchmentInnerRough, senhaWrap, textContainer, instr1, instr2, instr3, instr4, senhaInput, toggleBtn, avancarBtn, prevBtn, inputContainer, actionsContainer;
     let visibilityInterval, mutationObserver;
     try {
       console.log('[JCSenha] Buscando elementos...');
@@ -196,6 +198,8 @@
       parchmentInnerRough.className = 'parchment-inner-rough';
       senhaWrap = await waitForElement('.senha-wrap', { within: parchmentInnerRough || root, timeout: 5000 }) || document.createElement('div');
       senhaWrap.className = 'senha-wrap';
+      textContainer = await waitForElement('#senha-text-container', { within: senhaWrap || root, timeout: 5000 }) || document.createElement('div');
+      textContainer.id = 'senha-text-container';
 
       instr1 = await waitForElement('#senha-instr1', { within: senhaWrap || root, timeout: 5000 }) || document.createElement('h2');
       instr1.id = 'senha-instr1';
@@ -217,35 +221,34 @@
       senhaInput.id = 'senha-input';
       toggleBtn = await waitForElement('.btn-toggle-senha', { within: inputContainer || root, timeout: 5000 }) || document.createElement('button');
       toggleBtn.className = 'btn-toggle-senha';
+      avancarBtn = await waitForElement('#btn-senha-avancar', { within: root, timeout: 5000 }) || document.createElement('button');
+      avancarBtn.id = 'btn-senha-avancar';
+      prevBtn = await waitForElement('#btn-senha-prev', { within: root, timeout: 5000 }) || document.createElement('button');
+      prevBtn.id = 'btn-senha-prev';
       actionsContainer = await waitForElement('.parchment-actions-rough', { within: senhaWrap || root, timeout: 5000 }) || document.createElement('div');
       actionsContainer.className = 'parchment-actions-rough';
-      avancarBtn = await waitForElement('#btn-senha-avancar', { within: actionsContainer || root, timeout: 5000 }) || document.createElement('button');
-      avancarBtn.id = 'btn-senha-avancar';
-      prevBtn = await waitForElement('#btn-senha-prev', { within: actionsContainer || root, timeout: 5000 }) || document.createElement('button');
-      prevBtn.id = 'btn-senha-prev';
 
       root.appendChild(parchmentRough);
       parchmentRough.appendChild(parchmentInnerRough);
       parchmentInnerRough.appendChild(senhaWrap);
-      senhaWrap.appendChild(instr1);
-      senhaWrap.appendChild(instr2);
-      senhaWrap.appendChild(instr3);
-      senhaWrap.appendChild(instr4);
+      senhaWrap.appendChild(textContainer);
+      textContainer.appendChild(instr1);
+      textContainer.appendChild(instr2);
+      textContainer.appendChild(instr3);
+      textContainer.appendChild(instr4);
       senhaWrap.appendChild(inputContainer);
       inputContainer.appendChild(senhaInput);
       inputContainer.appendChild(toggleBtn);
-      senhaWrap.appendChild(actionsContainer);
       actionsContainer.appendChild(prevBtn);
       actionsContainer.appendChild(avancarBtn);
+      senhaWrap.appendChild(actionsContainer);
     } catch (e) {
       console.error('[JCSenha] Elements not found:', e);
       window.toast?.('Falha ao carregar os elementos da seção Senha.', 'error');
-      // Fallback com classes do HTML
-      const createFallbackElement = (id, isButton = false, isInput = false, isHeading = false, className = '') => {
-        const el = document.createElement(isButton ? 'button' : isInput ? 'input' : isHeading ? 'h2' : 'p' : 'div');
+      const createFallbackElement = (id, isButton = false, isInput = false, isContainer = false, isHeading = false) => {
+        const el = document.createElement(isButton ? 'button' : isInput ? 'input' : isHeading ? 'h2' : 'div');
         el.id = id;
-        if (className) el.className = className;
-        if (!isButton && !isInput && !isHeading) {
+        if (!isButton && !isInput && !isContainer && !isHeading) {
           el.setAttribute('data-typing', 'true');
           el.className = 'parchment-text-rough';
           el.textContent = `Placeholder para ${id}`;
@@ -257,6 +260,9 @@
           el.type = 'password';
           el.className = 'input';
           el.placeholder = 'Digite a Palavra-Chave';
+        } else if (isContainer) {
+          el.className = id === 'senha-input-container' ? 'senha-input-group' : id === 'parchment-rough' ? 'parchment-rough pergaminho pergaminho-v' : id === 'parchment-inner-rough' ? 'parchment-inner-rough' : id === 'senha-wrap' ? 'senha-wrap' : 'parchment-actions-rough';
+          el.id = id;
         } else if (isHeading) {
           el.className = 'parchment-title-rough';
           el.setAttribute('data-typing', 'true');
@@ -264,36 +270,38 @@
         }
         return el;
       };
-      parchmentRough = parchmentRough || createFallbackElement('parchment-rough', false, false, false, 'parchment-rough pergaminho pergaminho-v');
-      parchmentInnerRough = parchmentInnerRough || createFallbackElement('parchment-inner-rough', false, false, false, 'parchment-inner-rough');
-      senhaWrap = senhaWrap || createFallbackElement('senha-wrap', false, false, false, 'senha-wrap');
-      instr1 = instr1 || createFallbackElement('senha-instr1', false, false, true, 'parchment-title-rough');
-      instr2 = instr2 || createFallbackElement('senha-instr2', false, false, false, 'parchment-text-rough');
-      instr3 = instr3 || createFallbackElement('senha-instr3', false, false, false, 'parchment-text-rough');
-      instr4 = instr4 || createFallbackElement('senha-instr4', false, false, false, 'parchment-text-rough');
-      inputContainer = inputContainer || createFallbackElement('senha-input-container', false, false, false, 'senha-input-group');
-      senhaInput = senhaInput || createFallbackElement('senha-input', false, true, false, 'input');
-      toggleBtn = toggleBtn || createFallbackElement('btn-toggle-senha', true, false, false, 'btn-toggle-senha');
-      actionsContainer = actionsContainer || createFallbackElement('actions-container', false, false, false, 'parchment-actions-rough');
-      avancarBtn = avancarBtn || createFallbackElement('btn-senha-avancar', true, false, false, 'btn btn-primary btn-stone');
-      prevBtn = prevBtn || createFallbackElement('btn-senha-prev', true, false, false, 'btn btn-primary btn-stone');
+      parchmentRough = parchmentRough || createFallbackElement('parchment-rough', false, false, true);
+      parchmentInnerRough = parchmentInnerRough || createFallbackElement('parchment-inner-rough', false, false, true);
+      senhaWrap = senhaWrap || createFallbackElement('senha-wrap', false, false, true);
+      textContainer = textContainer || createFallbackElement('senha-text-container', false, false, true);
+      instr1 = instr1 || createFallbackElement('senha-instr1', false, false, false, true);
+      instr2 = instr2 || createFallbackElement('senha-instr2');
+      instr3 = instr3 || createFallbackElement('senha-instr3');
+      instr4 = instr4 || createFallbackElement('senha-instr4');
+      inputContainer = inputContainer || createFallbackElement('senha-input-container', false, false, true);
+      senhaInput = senhaInput || createFallbackElement('senha-input', false, true);
+      toggleBtn = toggleBtn || createFallbackElement('btn-toggle-senha', true);
+      avancarBtn = avancarBtn || createFallbackElement('btn-senha-avancar', true);
+      prevBtn = prevBtn || createFallbackElement('btn-senha-prev', true);
+      actionsContainer = actionsContainer || createFallbackElement('parchment-actions-rough', false, false, true);
       root.appendChild(parchmentRough);
       parchmentRough.appendChild(parchmentInnerRough);
       parchmentInnerRough.appendChild(senhaWrap);
-      senhaWrap.appendChild(instr1);
-      senhaWrap.appendChild(instr2);
-      senhaWrap.appendChild(instr3);
-      senhaWrap.appendChild(instr4);
+      senhaWrap.appendChild(textContainer);
+      textContainer.appendChild(instr1);
+      textContainer.appendChild(instr2);
+      textContainer.appendChild(instr3);
+      textContainer.appendChild(instr4);
       senhaWrap.appendChild(inputContainer);
       inputContainer.appendChild(senhaInput);
       inputContainer.appendChild(toggleBtn);
-      senhaWrap.appendChild(actionsContainer);
       actionsContainer.appendChild(prevBtn);
       actionsContainer.appendChild(avancarBtn);
+      senhaWrap.appendChild(actionsContainer);
       console.log('[JCSenha] Elementos criados como fallback');
     }
 
-    console.log('[JCSenha] Elementos carregados:', { parchmentRough, parchmentInnerRough, senhaWrap, instr1, instr2, instr3, instr4, inputContainer, senhaInput, toggleBtn, actionsContainer, avancarBtn, prevBtn });
+    console.log('[JCSenha] Elementos carregados:', { parchmentRough, parchmentInnerRough, senhaWrap, textContainer, instr1, instr2, instr3, instr4, inputContainer, senhaInput, toggleBtn, avancarBtn, prevBtn, actionsContainer });
 
     [instr1, instr2, instr3, instr4].forEach((el) => {
       if (el) {
@@ -302,7 +310,7 @@
         el.style.cssText = `
           opacity: 1 !important;
           visibility: visible !important;
-          display: block !important;
+          display: ${el.tagName === 'H2' ? 'block' : 'block'} !important;
           text-align: left !important;
           direction: ltr !important;
           width: 100% !important;
@@ -319,7 +327,7 @@
       }
     });
 
-    [avancarBtn, prevBtn].forEach(btn => {
+    [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
       if (btn) {
         btn.classList.add('btn', 'btn-primary', 'btn-stone');
         btn.disabled = true;
@@ -367,45 +375,12 @@
         overflow: hidden;
         opacity: 1 !important;
         visibility: visible !important;
-        pointer-events: none;
-        cursor: default;
+        pointer-events: auto !important;
+        cursor: text !important;
         transform: none !important;
       `;
-      senhaInput.disabled = true;
+      senhaInput.disabled = false;
       console.log('[JCSenha] Input inicializado:', senhaInput.id);
-    }
-
-    if (toggleBtn) {
-      toggleBtn.classList.add('btn', 'btn-primary', 'btn-stone');
-      toggleBtn.disabled = true;
-      toggleBtn.style.cssText = `
-        opacity: 1 !important;
-        cursor: default;
-        position: absolute;
-        right: 8px;
-        top: 50%;
-        transform: translateY(-50%) !important;
-        border: none;
-        background: transparent;
-        padding: 0;
-        font-size: 16px;
-        line-height: 1;
-        visibility: visible !important;
-        pointer-events: none;
-        overflow: hidden;
-      `;
-      toggleBtn.textContent = '👁️';
-      console.log('[JCSenha] Toggle botão inicializado:', toggleBtn.className);
-    }
-
-    if (actionsContainer) {
-      actionsContainer.style.cssText = `
-        display: flex !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-        transform: none !important;
-        margin: 0 auto !important;
-      `;
     }
 
     const runTypingChain = async () => {
@@ -427,7 +402,7 @@
       }
 
       console.log('[JCSenha] Iniciando datilografia...');
-      const typingElements = [instr1, instr2, instr3, instr4];
+      const typingElements = textContainer.querySelectorAll('[data-typing="true"]:not(.typing-done)');
 
       if (!typingElements.length) {
         console.warn('[JCSenha] Nenhum elemento com data-typing="true" encontrado');
@@ -435,7 +410,7 @@
           if (btn && getComputedStyle(btn).opacity === '1' && getComputedStyle(btn).display !== 'none') {
             btn.disabled = false;
             btn.style.cursor = 'pointer';
-            btn.style.pointerEvents = 'auto';
+            btn.style.pointerEvents = 'auto !important';
             btn.style.opacity = '1 !important';
             btn.style.visibility = 'visible !important';
             btn.style.display = 'inline-block !important';
@@ -443,8 +418,8 @@
         });
         if (senhaInput && getComputedStyle(senhaInput).opacity === '1' && getComputedStyle(senhaInput).display !== 'none') {
           senhaInput.disabled = false;
-          senhaInput.style.pointerEvents = 'auto';
-          senhaInput.style.cursor = 'text';
+          senhaInput.style.pointerEvents = 'auto !important';
+          senhaInput.style.cursor = 'text !important';
           senhaInput.style.opacity = '1 !important';
           senhaInput.style.visibility = 'visible !important';
           senhaInput.style.display = 'block !important';
@@ -456,7 +431,7 @@
         return;
       }
 
-      console.log('[JCSenha] Elementos encontrados:', typingElements.map(el => el.id));
+      console.log('[JCSenha] Elementos encontrados:', Array.from(typingElements).map(el => el.id));
 
       if (typeof window.runTyping !== 'function') {
         console.warn('[JCSenha] window.runTyping não encontrado, usando fallback');
@@ -468,13 +443,14 @@
           el.style.whiteSpace = 'pre-wrap';
           const type = () => {
             if (i < text.length) {
-              el.textContent += text.charAt(i);
+              el.textContent = text.substring(0, i + 1);
               if (cursor) {
                 el.style.borderRight = '2px solid #fff';
               }
               i++;
               setTimeout(type, speed);
             } else {
+              el.textContent = text;
               el.style.borderRight = 'none';
               resolve();
             }
@@ -532,7 +508,7 @@
         if (btn && getComputedStyle(btn).opacity === '1' && getComputedStyle(btn).display !== 'none') {
           btn.disabled = false;
           btn.style.cursor = 'pointer';
-          btn.style.pointerEvents = 'auto';
+          btn.style.pointerEvents = 'auto !important';
           btn.style.opacity = '1 !important';
           btn.style.visibility = 'visible !important';
           btn.style.display = 'inline-block !important';
@@ -540,8 +516,8 @@
       });
       if (senhaInput && getComputedStyle(senhaInput).opacity === '1' && getComputedStyle(senhaInput).display !== 'none') {
         senhaInput.disabled = false;
-        senhaInput.style.pointerEvents = 'auto';
-        senhaInput.style.cursor = 'text';
+        senhaInput.style.pointerEvents = 'auto !important';
+        senhaInput.style.cursor = 'text !important';
         senhaInput.style.opacity = '1 !important';
         senhaInput.style.visibility = 'visible !important';
         senhaInput.style.display = 'block !important';
@@ -550,176 +526,31 @@
     };
 
     const blockAutoNavigation = (e) => {
-      if (!e.isTrusted || window.JCSenha.state.navigationLocked) {
-        console.log('[JCSenha] Navegação automática bloqueada:', e.type, e.target, e);
+      if (!e.isTrusted) {
+        console.log('[JCSenha] Navegação automática bloqueada (não confiável):', e.type, e.target, e);
         e.preventDefault();
         e.stopPropagation();
-        if (typeof window.JC?.show === 'function') {
-          const originalShow = window.JC.show;
-          window.JC.show = (...args) => {
-            if (window.JCSenha.state.navigationLocked) {
-              console.log('[JCSenha] window.JC.show bloqueado:', args);
-              return;
-            }
-            originalShow(...args);
-          };
-        }
-        if (typeof window.carregarEtapa === 'function') {
-          const originalCarregarEtapa = window.carregarEtapa;
-          window.carregarEtapa = (...args) => {
-            if (window.JCSenha.state.navigationLocked) {
-              console.log('[JCSenha] window.carregarEtapa bloqueado:', args);
-              return;
-            }
-            originalCarregarEtapa(...args);
-          };
-        }
       }
-    };
-
-    const forceVisibility = () => {
-      const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
-      wrapper.style.cssText = `
-        display: flex !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-        transform: none !important;
-        margin: 0 auto !important;
-        width: 100% !important;
-        max-width: 600px !important;
-        position: static !important;
-        overflow: hidden !important;
-      `;
-      wrapper.classList.remove('hidden');
-      const canvas = document.getElementById('jornada-canvas');
-      if (canvas) {
-        canvas.style.cssText = `
-          display: flex !important;
-          opacity: 1 !important;
-          visibility: visible !important;
-          transform: none !important;
-          margin: 0 auto !important;
-          width: 100% !important;
-          max-width: 600px !important;
-          position: static !important;
-          overflow: hidden !important;
-        `;
-        canvas.classList.remove('hidden');
-      }
-      if (!root || !document.body.contains(root)) {
-        console.warn('[JCSenha] Root não encontrado no DOM, recriando...');
-        root = document.createElement('section');
-        root.id = 'section-senha';
-        root.dataset.section = 'senha';
-        root.classList.add('section', 'parchment-wrap-rough');
-        root.classList.remove('hidden');
-        root.setAttribute('aria-hidden', 'false');
-        root.style.cssText = `
-          background: transparent;
-          padding: 24px;
-          border-radius: 12px;
-          width: 100% !important;
-          max-width: 600px !important;
-          margin: 12px auto !important;
-          text-align: center;
-          box-shadow: none;
-          border: none;
-          display: flex !important;
-          flex-direction: column;
-          align-items: center;
-          opacity: 1 !important;
-          visibility: visible !important;
-          position: static;
-          z-index: 1000;
-          overflow-y: hidden;
-          overflow-x: hidden;
-          max-height: 100vh;
-          box-sizing: border-box;
-          transform: none !important;
-          transition: none !important;
-        `;
-        wrapper.appendChild(root);
-        root.appendChild(parchmentRough);
-        parchmentRough.appendChild(parchmentInnerRough);
-        parchmentInnerRough.appendChild(senhaWrap);
-        senhaWrap.appendChild(instr1);
-        senhaWrap.appendChild(instr2);
-        senhaWrap.appendChild(instr3);
-        senhaWrap.appendChild(instr4);
-        senhaWrap.appendChild(inputContainer);
-        inputContainer.appendChild(senhaInput);
-        inputContainer.appendChild(toggleBtn);
-        senhaWrap.appendChild(actionsContainer);
-        actionsContainer.appendChild(prevBtn);
-        actionsContainer.appendChild(avancarBtn);
-      }
-      root.style.cssText = `
-        background: transparent;
-        padding: 24px;
-        border-radius: 12px;
-        width: 100% !important;
-        max-width: 600px !important;
-        margin: 12px auto !important;
-        text-align: center;
-        box-shadow: none;
-        border: none;
-        display: flex !important;
-        flex-direction: column;
-        align-items: center;
-        opacity: 1 !important;
-        visibility: visible !important;
-        position: static;
-        z-index: 1000;
-        overflow-y: hidden;
-        overflow-x: hidden;
-        max-height: 100vh;
-        box-sizing: border-box;
-        transform: none !important;
-        transition: none !important;
-      `;
-      root.classList.remove('hidden');
-      [parchmentRough, parchmentInnerRough, senhaWrap, instr1, instr2, instr3, instr4, inputContainer, senhaInput, toggleBtn, actionsContainer, avancarBtn, prevBtn].forEach(el => {
-        if (el) {
-          el.style.cssText = el.style.cssText.replace(/transform:.*?;/g, 'transform: none !important;')
-            .replace(/margin:.*?;/g, 'margin: 0 auto !important;')
-            .replace(/width:.*?;/g, 'width: 100% !important;');
-          el.style.opacity = '1 !important';
-          el.style.visibility = 'visible !important';
-          el.style.display = el.tagName === 'BUTTON' || el.tagName === 'INPUT' ? 'inline-block !important' : 'block !important';
-          el.style.margin = el.tagName === 'BUTTON' ? '8px !important' : '0 auto !important';
-          el.style.width = '100% !important';
-          el.style.maxWidth = el.id === 'senha-input-container' ? '400px !important' : '600px !important';
-          el.classList.remove('hidden');
-          console.log('[JCSenha] Visibilidade forçada para:', el.id || el.className, 'opacity:', getComputedStyle(el).opacity, 'display:', getComputedStyle(el).display, 'transform:', getComputedStyle(el).transform, 'parent:', el.parentElement?.id || el.parentElement?.tagName);
-        }
-      });
-      console.log('[JCSenha] Visibilidade forçada, root presente:', document.body.contains(root));
-    };
-
-    const observeVisibility = () => {
-      const observer = new MutationObserver((mutations) => {
-        mutations.forEach(mutation => {
-          console.log('[JCSenha] Mutação detectada:', {
-            type: mutation.type,
-            target: mutation.target.id || mutation.target.className || mutation.target.tagName,
-            attributeName: mutation.attributeName,
-            oldValue: mutation.oldValue,
-            addedNodes: Array.from(mutation.addedNodes).map(n => n.id || n.className || n.tagName),
-            removedNodes: Array.from(mutation.removedNodes).map(n => n.id || n.className || n.tagName)
-          });
-          if (mutation.type === 'attributes' && (mutation.target === root || root.contains(mutation.target) || mutation.target.id === 'jornada-content-wrapper' || mutation.target.id === 'jornada-canvas')) {
-            if (['style', 'class', 'transform', 'margin', 'width', 'position'].includes(mutation.attributeName)) {
-              console.log('[JCSenha] Estilo ou classe alterada em:', mutation.target.id || mutation.target.className, 'valor antigo:', mutation.oldValue);
-              forceVisibility();
-            }
-          } else if (mutation.type === 'childList' && !document.body.contains(root)) {
-            console.warn('[JCSenha] Root removido do DOM, recriando...');
-            forceVisibility();
+      if (typeof window.JC?.show === 'function') {
+        const originalShow = window.JC.show;
+        window.JC.show = (...args) => {
+          if (window.JCSenha.state.navigationLocked) {
+            console.log('[JCSenha] window.JC.show bloqueado:', args);
+            return;
           }
-        });
-      });
-      observer.observe(document.body, { attributes: true, childList: true, subtree: true, attributeOldValue: true });
-      return observer;
+          originalShow(...args);
+        };
+      }
+      if (typeof window.carregarEtapa === 'function') {
+        const originalCarregarEtapa = window.carregarEtapa;
+        window.carregarEtapa = (...args) => {
+          if (window.JCSenha.state.navigationLocked) {
+            console.log('[JCSenha] window.carregarEtapa bloqueado:', args);
+            return;
+          }
+          originalCarregarEtapa(...args);
+        };
+      }
     };
 
     // Bloquear updateCanvasBackground
@@ -733,17 +564,21 @@
       originalUpdateCanvasBackground(sectionId);
     };
 
+    // Remover toggleSenha do jornada-secoes.js
+    if (window.JSecoes && window.JSecoes.toggleSenha) {
+      console.log('[JCSenha] Removendo toggleSenha do jornada-secoes.js para evitar conflitos');
+      window.JSecoes.toggleSenha = () => {
+        console.log('[JCSenha] toggleSenha do jornada-secoes.js bloqueado, usando section-senha.js');
+      };
+    }
+
     if (toggleBtn) {
-      toggleBtn.addEventListener('click', () => {
+      toggleBtn.addEventListener('click', (e) => {
         console.log('[JCSenha] Clique no botão olho mágico');
-        if (senhaInput.type === 'password') {
-          senhaInput.type = 'text';
-          toggleBtn.textContent = '🙈';
-          console.log('[JCSenha] Senha visível');
-        } else {
-          senhaInput.type = 'password';
-          toggleBtn.textContent = '👁️';
-          console.log('[JCSenha] Senha oculta');
+        if (senhaInput) {
+          senhaInput.type = senhaInput.type === 'password' ? 'text' : 'password';
+          toggleBtn.textContent = senhaInput.type === 'password' ? '👁️' : '🙈';
+          console.log('[JCSenha] Senha:', senhaInput.type === 'password' ? 'oculta' : 'visível');
         }
       });
     }
@@ -793,20 +628,18 @@
       console.log('[JCSenha] Inicialização concluída');
     } catch (err) {
       console.error('[JCSenha] Erro na datilografia:', err);
-      [instr1, instr2, instr3, instr4].forEach(el => {
-        if (el) {
-          el.textContent = getText(el);
-          el.classList.add('typing-done');
-          el.style.opacity = '1 !important';
-          el.style.visibility = 'visible !important';
-          el.style.display = 'block !important';
-        }
+      textContainer.querySelectorAll('[data-typing="true"]').forEach(el => {
+        el.textContent = getText(el);
+        el.classList.add('typing-done');
+        el.style.opacity = '1 !important';
+        el.style.visibility = 'visible !important';
+        el.style.display = 'block !important';
       });
       [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
         if (btn && getComputedStyle(btn).opacity === '1' && getComputedStyle(btn).display !== 'none') {
           btn.disabled = false;
           btn.style.cursor = 'pointer';
-          btn.style.pointerEvents = 'auto';
+          btn.style.pointerEvents = 'auto !important';
           btn.style.opacity = '1 !important';
           btn.style.visibility = 'visible !important';
           btn.style.display = 'inline-block !important';
@@ -814,8 +647,8 @@
       });
       if (senhaInput && getComputedStyle(senhaInput).opacity === '1' && getComputedStyle(senhaInput).display !== 'none') {
         senhaInput.disabled = false;
-        senhaInput.style.pointerEvents = 'auto';
-        senhaInput.style.cursor = 'text';
+        senhaInput.style.pointerEvents = 'auto !important';
+        senhaInput.style.cursor = 'text !important';
         senhaInput.style.opacity = '1 !important';
         senhaInput.style.visibility = 'visible !important';
         senhaInput.style.display = 'block !important';
@@ -823,10 +656,58 @@
       window.JCSenha.state.navigationLocked = false;
     }
 
+    const observeVisibility = () => {
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach(mutation => {
+          console.log('[JCSenha] Mutação detectada:', {
+            type: mutation.type,
+            target: mutation.target.id || mutation.target.className || mutation.target.tagName,
+            attributeName: mutation.attributeName,
+            oldValue: mutation.oldValue,
+            addedNodes: Array.from(mutation.addedNodes).map(n => n.id || n.className || n.tagName),
+            removedNodes: Array.from(mutation.removedNodes).map(n => n.id || n.className || n.tagName)
+          });
+          if (mutation.type === 'attributes' && (
+            mutation.target === root ||
+            root.contains(mutation.target) ||
+            mutation.target.id === 'jornada-content-wrapper' ||
+            mutation.target.id === 'jornada-canvas' ||
+            mutation.target.classList.contains('parchment-rough') ||
+            mutation.target.classList.contains('pergaminho') ||
+            mutation.target.classList.contains('pergaminho-v') ||
+            mutation.target.classList.contains('senha-wrap') ||
+            mutation.target.classList.contains('parchment-inner-rough')
+          )) {
+            if (['style', 'class', 'transform', 'margin', 'width', 'position'].includes(mutation.attributeName)) {
+              console.log('[JCSenha] Estilo ou classe alterada em:', mutation.target.id || mutation.target.className, 'valor antigo:', mutation.oldValue);
+              forceVisibility();
+            }
+          } else if (mutation.type === 'childList' && !document.body.contains(root)) {
+            console.warn('[JCSenha] Root removido do DOM, recriando...');
+            forceVisibility();
+          }
+        });
+      });
+      observer.observe(document.body, { attributes: true, childList: true, subtree: true, attributeOldValue: true });
+      return observer;
+    };
+
+    // Bloquear updateCanvasBackground
+    const originalUpdateCanvasBackground = window.JSecoes?.updateCanvasBackground || (() => {});
+    window.JSecoes = window.JSecoes || {};
+    window.JSecoes.updateCanvasBackground = (sectionId) => {
+      if (sectionId === 'section-senha') {
+        console.log('[JCSenha] Bloqueando updateCanvasBackground para section-senha');
+        return;
+      }
+      originalUpdateCanvasBackground(sectionId);
+    };
+
     console.log('[JCSenha] Elementos encontrados:', {
       parchmentRough: !!parchmentRough, parchmentRoughClass: parchmentRough?.className,
       parchmentInnerRough: !!parchmentInnerRough, parchmentInnerRoughClass: parchmentInnerRough?.className,
       senhaWrap: !!senhaWrap, senhaWrapClass: senhaWrap?.className,
+      textContainer: !!textContainer, textContainerId: textContainer?.id,
       instr1: !!instr1, instr1Id: instr1?.id,
       instr2: !!instr2, instr2Id: instr2?.id,
       instr3: !!instr3, instr3Id: instr3?.id,
@@ -834,9 +715,9 @@
       inputContainer: !!inputContainer, inputContainerId: inputContainer?.id,
       senhaInput: !!senhaInput, senhaInputId: senhaInput?.id,
       toggleBtn: !!toggleBtn, toggleBtnAction: toggleBtn?.dataset?.action,
-      actionsContainer: !!actionsContainer, actionsContainerClass: actionsContainer?.className,
       avancarBtn: !!avancarBtn, avancarBtnAction: avancarBtn?.dataset?.action,
-      prevBtn: !!prevBtn, prevBtnAction: prevBtn?.dataset?.action
+      prevBtn: !!prevBtn, prevBtnAction: prevBtn?.dataset?.action,
+      actionsContainer: !!actionsContainer, actionsContainerClass: actionsContainer?.className
     });
   };
 
