@@ -48,8 +48,9 @@
               opacity: 1 !important;
               visibility: visible !important;
               transform: none !important;
-              margin: 0 !important;
+              margin: 0 auto !important;
               width: 100% !important;
+              position: static !important;
             `;
             el = el.parentElement;
           }
@@ -78,16 +79,18 @@
   // Injetar estilos globais
   const styleSheet = document.createElement('style');
   styleSheet.textContent = `
-    #section-senha, #section-senha *, #senha-text-container, #senha-text-container *, #senha-input-container, #senha-input-container * {
+    #section-senha, #section-senha *, #senha-text-container, #senha-text-container *, #senha-input-container, #senha-input-container *,
+    #jornada-content-wrapper, #jornada-canvas, #jornada-canvas.pergaminho.pergaminho-v {
       opacity: 1 !important;
       visibility: visible !important;
       display: flex !important;
       position: static !important;
       transform: none !important;
       transition: none !important;
-      margin: 12px auto !important;
+      margin: 0 auto !important;
       width: 100% !important;
       max-width: 600px !important;
+      overflow: hidden !important;
       pointer-events: none;
     }
     #senha-text-container > div {
@@ -96,13 +99,19 @@
       display: block !important;
       pointer-events: none;
     }
-    .hidden, [class*="hidden"], #jornada-content-wrapper, #jornada-content-wrapper.hidden {
+    .hidden, [class*="hidden"], #jornada-content-wrapper.hidden, #jornada-canvas.hidden {
       display: flex !important;
       opacity: 1 !important;
       visibility: visible !important;
       transform: none !important;
-      margin: 0 !important;
+      margin: 0 auto !important;
       width: 100% !important;
+    }
+    .chama-vela, .chama-vela *, .flame-corner, #chama-header {
+      position: static !important;
+      transform: none !important;
+      margin: 0 !important;
+      display: inline-block !important;
     }
   `;
   document.head.appendChild(styleSheet);
@@ -260,7 +269,7 @@
       };
       textContainer = textContainer || createFallbackElement('senha-text-container', false, false, true);
       instr1 = instr1 || createFallbackElement('senha-instr1');
-      instr2 = instr上昇2 || createFallbackElement('senha-instr2');
+      instr2 = instr2 || createFallbackElement('senha-instr2');
       instr3 = instr3 || createFallbackElement('senha-instr3');
       instr4 = instr4 || createFallbackElement('senha-instr4');
       inputContainer = inputContainer || createFallbackElement('senha-input-container', false, false, true);
@@ -409,7 +418,7 @@
       if (!typingElements.length) {
         console.warn('[JCSenha] Nenhum elemento com data-typing="true" encontrado');
         [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
-          if (btn && getComputedStyle(btn).opacity === '1') {
+          if (btn && getComputedStyle(btn).opacity === '1' && getComputedStyle(btn).display !== 'none') {
             btn.disabled = false;
             btn.style.cursor = 'pointer';
             btn.style.pointerEvents = 'auto';
@@ -418,7 +427,7 @@
             btn.style.display = 'inline-block !important';
           }
         });
-        if (senhaInput && getComputedStyle(senhaInput).opacity === '1') {
+        if (senhaInput && getComputedStyle(senhaInput).opacity === '1' && getComputedStyle(senhaInput).display !== 'none') {
           senhaInput.disabled = false;
           senhaInput.style.pointerEvents = 'auto';
           senhaInput.style.cursor = 'text';
@@ -542,21 +551,48 @@
             originalShow(...args);
           };
         }
+        if (typeof window.carregarEtapa === 'function') {
+          const originalCarregarEtapa = window.carregarEtapa;
+          window.carregarEtapa = (...args) => {
+            if (window.JCSenha.state.navigationLocked) {
+              console.log('[JCSenha] window.carregarEtapa bloqueado:', args);
+              return;
+            }
+            originalCarregarEtapa(...args);
+          };
+        }
       }
     };
 
     const forceVisibility = () => {
-      if (!root || !document.body.contains(root)) {
-        console.warn('[JCSenha] Root não encontrado no DOM, recriando...');
-        const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
-        wrapper.style.cssText = `
-          display: block !important;
+      const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
+      wrapper.style.cssText = `
+        display: flex !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        margin: 0 auto !important;
+        width: 100% !important;
+        max-width: 600px !important;
+        position: static !important;
+        overflow: hidden !important;
+      `;
+      const canvas = document.getElementById('jornada-canvas');
+      if (canvas) {
+        canvas.style.cssText = `
+          display: flex !important;
           opacity: 1 !important;
           visibility: visible !important;
           transform: none !important;
-          margin: 0 !important;
+          margin: 0 auto !important;
           width: 100% !important;
+          max-width: 600px !important;
+          position: static !important;
+          overflow: hidden !important;
         `;
+      }
+      if (!root || !document.body.contains(root)) {
+        console.warn('[JCSenha] Root não encontrado no DOM, recriando...');
         root = document.createElement('section');
         root.id = 'section-senha';
         root.dataset.senhaInitialized = 'true';
@@ -619,7 +655,9 @@
       `;
       [textContainer, inputContainer, instr1, instr2, instr3, instr4, senhaInput, toggleBtn, avancarBtn, prevBtn].forEach(el => {
         if (el) {
-          el.style.cssText = el.style.cssText.replace(/transform:.*?;/g, 'transform: none !important;');
+          el.style.cssText = el.style.cssText.replace(/transform:.*?;/g, 'transform: none !important;')
+            .replace(/margin:.*?;/g, 'margin: 0 auto !important;')
+            .replace(/width:.*?;/g, 'width: 100% !important;');
           el.style.opacity = '1 !important';
           el.style.visibility = 'visible !important';
           el.style.display = el.tagName === 'BUTTON' || el.tagName === 'INPUT' ? 'inline-block !important' : 'block !important';
@@ -643,8 +681,8 @@
             addedNodes: Array.from(mutation.addedNodes).map(n => n.id || n.className || n.tagName),
             removedNodes: Array.from(mutation.removedNodes).map(n => n.id || n.className || n.tagName)
           });
-          if (mutation.type === 'attributes' && (mutation.target === root || root.contains(mutation.target))) {
-            if (['style', 'class', 'transform', 'margin', 'width'].includes(mutation.attributeName)) {
+          if (mutation.type === 'attributes' && (mutation.target === root || root.contains(mutation.target) || mutation.target.id === 'jornada-content-wrapper' || mutation.target.id === 'jornada-canvas')) {
+            if (['style', 'class', 'transform', 'margin', 'width', 'position'].includes(mutation.attributeName)) {
               console.log('[JCSenha] Estilo ou classe alterada em:', mutation.target.id || mutation.target.className, 'valor antigo:', mutation.oldValue);
               forceVisibility();
             }
@@ -656,6 +694,17 @@
       });
       observer.observe(document.body, { attributes: true, childList: true, subtree: true, attributeOldValue: true });
       return observer;
+    };
+
+    // Bloquear updateCanvasBackground temporariamente
+    const originalUpdateCanvasBackground = window.JSecoes?.updateCanvasBackground || (() => {});
+    window.JSecoes = window.JSecoes || {};
+    window.JSecoes.updateCanvasBackground = (sectionId) => {
+      if (sectionId === 'section-senha') {
+        console.log('[JCSenha] Bloqueando updateCanvasBackground para section-senha');
+        return;
+      }
+      originalUpdateCanvasBackground(sectionId);
     };
 
     if (toggleBtn) {
@@ -741,7 +790,7 @@
         senhaInput.style.cursor = 'text';
         senhaInput.style.opacity = '1 !important';
         senhaInput.style.visibility = 'visible !important';
-        senhaInput.style.display = 'block !important';
+        sanaInput.style.display = 'block !important';
       }
       window.JCSenha.state.navigationLocked = false;
     }
@@ -784,6 +833,10 @@
     if (typeof window.EffectCoordinator?.stopAll === 'function') {
       window.EffectCoordinator.stopAll();
     }
+    // Restaurar updateCanvasBackground
+    if (window.JSecoes) {
+      window.JSecoes.updateCanvasBackground = originalUpdateCanvasBackground;
+    }
   };
 
   if (!window.JCSenha.state.listenerAdded) {
@@ -813,6 +866,7 @@
         } else {
           console.error('[JCSenha] Falha ao inicializar após ' + maxAttempts + ' tentativas');
           window.toast?.('Erro: Não foi possível inicializar a seção Senha.', 'error');
+          console.log('[JCSenha] Evitando carregamento automático de section-termos');
         }
       }, 1000 * attempt);
     };
