@@ -15,7 +15,7 @@
   window.JCSenha.state = {
     ready: false,
     listenerAdded: false,
-    navigationLocked: true, // Bloquear navegação até interação do usuário
+    navigationLocked: true,
     HANDLER_COUNT: 0,
     TYPING_COUNT: 0
   };
@@ -139,6 +139,9 @@
         text-align: left;
         overflow: hidden;
         box-sizing: border-box;
+        opacity: 1;
+        visibility: visible;
+        display: block;
       `;
       root.appendChild(textContainer);
 
@@ -151,7 +154,6 @@
       instr4 = await waitForElement('#senha-instr4', { within: root, timeout: 5000 }) || document.createElement('div');
       instr4.id = 'senha-instr4';
 
-      // Criar inputContainer programaticamente
       inputContainer = document.createElement('div');
       inputContainer.id = 'senha-input-container';
       inputContainer.style.cssText = `
@@ -162,6 +164,8 @@
         max-width: 400px;
         overflow: hidden;
         box-sizing: border-box;
+        opacity: 1;
+        visibility: visible;
       `;
       root.appendChild(inputContainer);
 
@@ -174,7 +178,6 @@
       prevBtn = await waitForElement('#btn-senha-prev', { within: root, timeout: 5000 }) || document.createElement('button');
       prevBtn.id = 'btn-senha-prev';
 
-      // Anexar elementos ao DOM
       textContainer.appendChild(instr1);
       textContainer.appendChild(instr2);
       textContainer.appendChild(instr3);
@@ -235,15 +238,16 @@
         el.textContent = '';
         el.setAttribute('data-typing', 'true');
         el.style.cssText = `
-          opacity: 0;
-          visibility: hidden;
-          display: none;
+          opacity: 1;
+          visibility: visible;
+          display: block;
           text-align: left !important;
           width: 100%;
           max-width: 600px;
           box-sizing: border-box;
           white-space: pre-wrap;
           overflow: hidden;
+          pointer-events: auto;
         `;
         console.log('[JCSenha] Texto inicializado:', el.id, getText(el));
       }
@@ -254,7 +258,7 @@
         btn.classList.add('btn', 'btn-primary', 'btn-stone');
         btn.disabled = true;
         btn.style.cssText = `
-          opacity: 0.5;
+          opacity: 1;
           cursor: not-allowed;
           display: inline-block;
           margin: 8px;
@@ -275,6 +279,8 @@
         max-width: 400px;
         overflow: hidden;
         box-sizing: border-box;
+        opacity: 1;
+        visibility: visible;
       `;
     }
 
@@ -290,6 +296,8 @@
         background: transparent;
         box-sizing: border-box;
         overflow: hidden;
+        opacity: 1;
+        visibility: visible;
       `;
       senhaInput.disabled = true;
       console.log('[JCSenha] Input inicializado:', senhaInput.id);
@@ -299,7 +307,7 @@
       toggleBtn.classList.add('btn', 'btn-primary', 'btn-stone');
       toggleBtn.disabled = true;
       toggleBtn.style.cssText = `
-        opacity: 0.5;
+        opacity: 1;
         cursor: not-allowed;
         position: absolute;
         right: 8px;
@@ -344,7 +352,6 @@
         [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
           if (btn) {
             btn.disabled = false;
-            btn.style.opacity = '1';
             btn.style.cursor = 'pointer';
             btn.style.pointerEvents = 'auto';
           }
@@ -354,7 +361,7 @@
         }
         root.style.opacity = '1';
         root.style.visibility = 'visible';
-        window.JCSenha.state.navigationLocked = false; // Liberar navegação após datilografia
+        window.JCSenha.state.navigationLocked = false;
         return;
       }
 
@@ -394,9 +401,9 @@
           el.textContent = '';
           el.classList.add('typing-active', 'lumen-typing');
           el.style.color = '#fff';
-          el.style.opacity = '0';
           el.style.display = 'block';
-          el.style.visibility = 'hidden';
+          el.style.visibility = 'visible';
+          el.style.opacity = '1';
           await new Promise(resolve => window.runTyping(el, text, resolve, {
             speed: Number(el.dataset.speed || 100),
             cursor: String(el.dataset.cursor || 'true') === 'true'
@@ -414,16 +421,11 @@
             utterance.pitch = 1.0;
             console.log('[JCSenha] TTS iniciado para:', el.id);
             window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
-            await new Promise(resolve => {
-              utterance.onend = () => {
-                console.log('[JCSenha] TTS concluído para:', el.id);
-                resolve();
-              };
-              setTimeout(resolve, text.length * 70);
-            });
+            utterance.onend = () => {
+              console.log('[JCSenha] TTS concluído para:', el.id);
+            };
           } else {
             console.warn('[JCSenha] window.EffectCoordinator.speak não encontrado');
-            await new Promise(resolve => setTimeout(resolve, text.length * 70));
           }
         } catch (err) {
           console.error('[JCSenha] Erro na datilografia para', el.id, err);
@@ -439,7 +441,6 @@
       [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
         if (btn) {
           btn.disabled = false;
-          btn.style.opacity = '1';
           btn.style.cursor = 'pointer';
           btn.style.pointerEvents = 'auto';
         }
@@ -447,10 +448,9 @@
       if (senhaInput) {
         senhaInput.disabled = false;
       }
-      window.JCSenha.state.navigationLocked = false; // Liberar navegação após datilografia
+      window.JCSenha.state.navigationLocked = false;
     };
 
-    // Bloquear navegação automática
     const blockAutoNavigation = (e) => {
       if (!e.isTrusted || window.JCSenha.state.navigationLocked) {
         console.log('[JCSenha] Navegação automática bloqueada');
@@ -474,7 +474,7 @@
         console.log('[JCSenha] Clique no botão olho mágico');
         if (senhaInput.type === 'password') {
           senhaInput.type = 'text';
-          toggleBtn.textContent = '😎';
+          toggleBtn.textContent = '🙈';
           console.log('[JCSenha] Senha visível');
         } else {
           senhaInput.type = 'password';
@@ -516,7 +516,6 @@
       prevBtn.addEventListener('click', blockAutoNavigation, { capture: true });
     }
 
-    // Bloquear navegação automática em eventos globais
     window.addEventListener('sectionLoaded', blockAutoNavigation, { capture: true });
     window.addEventListener('section:shown', blockAutoNavigation, { capture: true });
 
@@ -538,7 +537,6 @@
       [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
         if (btn) {
           btn.disabled = false;
-          btn.style.opacity = '1';
           btn.style.cursor = 'pointer';
           btn.style.pointerEvents = 'auto';
         }
