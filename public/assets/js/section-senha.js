@@ -177,6 +177,7 @@
         el.style.opacity = '0';
         el.style.visibility = 'hidden';
         el.style.display = 'none';
+        el.style.textAlign = 'left'; // Garantir alinhamento à esquerda para datilografia
         console.log('[JCSenha] Texto inicializado:', el.id, getText(el));
       }
     });
@@ -200,8 +201,19 @@
       senhaInput.style.margin = '8px auto';
       senhaInput.style.padding = '8px';
       senhaInput.style.width = '80%';
+      senhaInput.style.border = '1px solid rgba(255, 255, 255, 0.3)'; // Borda translúcida
+      senhaInput.style.borderRadius = '4px';
+      senhaInput.style.background = 'rgba(255, 255, 255, 0.1)';
       senhaInput.disabled = true;
       console.log('[JCSenha] Input inicializado:', senhaInput.id);
+    }
+
+    if (toggleBtn) {
+      toggleBtn.style.border = '1px solid rgba(255, 255, 255, 0.3)'; // Borda translúcida para o ícone
+      toggleBtn.style.borderRadius = '4px';
+      toggleBtn.style.padding = '8px';
+      toggleBtn.style.background = 'transparent';
+      toggleBtn.style.marginLeft = '8px';
     }
 
     const runTypingChain = async () => {
@@ -251,13 +263,18 @@
         window.runTyping = (el, text, resolve, options) => {
           let i = 0;
           const speed = options.speed || 100;
+          const cursor = options.cursor !== 'false';
           const type = () => {
             if (i < text.length) {
-              el.textContent += text.charAt(i);
+              el.textContent = text.substring(0, i + 1);
+              if (cursor) {
+                el.style.borderRight = '2px solid #fff'; // Cursor piscante à direita
+              }
               i++;
               setTimeout(type, speed);
             } else {
               el.textContent = text;
+              el.style.borderRight = 'none'; // Remover cursor ao final
               resolve();
             }
           };
@@ -276,6 +293,7 @@
           el.style.opacity = '0';
           el.style.display = 'block';
           el.style.visibility = 'hidden';
+          el.style.textAlign = 'left'; // Garantir alinhamento à esquerda
           root.style.opacity = '1';
           root.style.visibility = 'visible';
           await new Promise(resolve => window.runTyping(el, text, resolve, {
@@ -300,7 +318,7 @@
                 console.log('[JCSenha] TTS concluído para:', el.id);
                 resolve();
               };
-              setTimeout(resolve, text.length * 70); // 70ms por caractere para parágrafos longos
+              setTimeout(resolve, text.length * 70); // 70ms por caractere
             });
           } else {
             console.warn('[JCSenha] window.EffectCoordinator.speak não encontrado');
@@ -328,9 +346,18 @@
       if (senhaInput) {
         senhaInput.disabled = false;
       }
+      // Garantir que nenhuma navegação automática ocorra
+      if (avancarBtn) {
+        avancarBtn.removeEventListener('click', autoNavigate);
+      }
     };
 
-    // Evento para toggleBtn (sem once, para múltiplos cliques)
+    // Função para evitar navegação automática
+    const autoNavigate = (e) => {
+      console.log('[JCSenha] Navegação automática bloqueada');
+    };
+
+    // Evento para toggleBtn
     if (toggleBtn) {
       toggleBtn.addEventListener('click', () => {
         console.log('[JCSenha] Clique no botão olho mágico');
@@ -349,11 +376,11 @@
     // Evento para avancarBtn
     if (avancarBtn) {
       avancarBtn.addEventListener('click', async (e) => {
-        if (e.isTrusted) {
+        if (e.isTrusted && window.JCSenha.state.ready) {
           speechSynthesis.cancel(); // Cancelar TTS ao enviar
           const senha = senhaInput?.value?.trim() || '';
           console.log('[JCSenha] Enviando senha:', senha);
-          // Aqui você pode adicionar lógica para validar a senha (ex.: API call)
+          // Adicionar lógica de validação de senha aqui (ex.: API call)
           if (typeof window.JC?.show === 'function') {
             window.JC.show('section-guia'); // Próxima seção
           } else {
@@ -361,7 +388,7 @@
             console.warn('[JCSenha] Fallback navigation to /guia');
           }
         } else {
-          console.log('[JCSenha] Clique simulado ignorado');
+          console.log('[JCSenha] Clique simulado ou seção não pronta, ignorado');
         }
       });
     }
