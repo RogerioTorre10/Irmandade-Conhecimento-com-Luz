@@ -119,32 +119,34 @@
       visibility: visible;
       position: relative;
       z-index: 2;
-      overflow-y: scroll;
+      overflow-y: auto;
       overflow-x: hidden;
-      min-height: 80vh;
-      height: 80vh;
+      min-height: auto;
+      height: auto;
       box-sizing: border-box;
+      transition: none; /* Evitar oscilações */
     `;
 
-    let instr1, instr2, instr3, instr4, senhaInput, toggleBtn, avancarBtn, prevBtn;
+    let instr1, instr2, instr3, instr4, senhaInput, toggleBtn, avancarBtn, prevBtn, inputContainer;
     try {
       console.log('[JCSenha] Buscando elementos...');
       instr1 = await waitForElement('#senha-instr1', { within: root, timeout: 2000 });
       instr2 = await waitForElement('#senha-instr2', { within: root, timeout: 2000 });
       instr3 = await waitForElement('#senha-instr3', { within: root, timeout: 2000 });
       instr4 = await waitForElement('#senha-instr4', { within: root, timeout: 2000 });
-      senhaInput = await waitForElement('#senha-input', { within: root, timeout: 2000 });
-      toggleBtn = await waitForElement('.btn-toggle-senha', { within: root, timeout: 2000 });
+      inputContainer = await waitForElement('#senha-input-container', { within: root, timeout: 2000 });
+      senhaInput = await waitForElement('#senha-input', { within: inputContainer || root, timeout: 2000 });
+      toggleBtn = await waitForElement('.btn-toggle-senha', { within: inputContainer || root, timeout: 2000 });
       avancarBtn = await waitForElement('#btn-senha-avancar', { within: root, timeout: 2000 });
       prevBtn = await waitForElement('#btn-senha-prev', { within: root, timeout: 2000 });
     } catch (e) {
       console.error('[JCSenha] Elements not found:', e);
       window.toast?.('Falha ao carregar os elementos da seção Senha.', 'error');
       // Fallback para criar elementos
-      const createFallbackElement = (id, isButton = false, isInput = false) => {
+      const createFallbackElement = (id, isButton = false, isInput = false, isContainer = false) => {
         const el = document.createElement(isButton ? 'button' : isInput ? 'input' : 'div');
         el.id = id;
-        if (!isButton && !isInput) {
+        if (!isButton && !isInput && !isContainer) {
           el.setAttribute('data-typing', 'true');
           el.textContent = `Placeholder para ${id}`;
         } else if (isButton) {
@@ -154,10 +156,13 @@
         } else if (isInput) {
           el.type = 'password';
           el.placeholder = 'Digite a Palavra-Chave';
+        } else if (isContainer) {
+          el.style.position = 'relative';
         }
         root.appendChild(el);
         return el;
       };
+      inputContainer = inputContainer || createFallbackElement('senha-input-container', false, false, true);
       instr1 = instr1 || createFallbackElement('senha-instr1');
       instr2 = instr2 || createFallbackElement('senha-instr2');
       instr3 = instr3 || createFallbackElement('senha-instr3');
@@ -166,10 +171,12 @@
       toggleBtn = toggleBtn || createFallbackElement('btn-toggle-senha', true);
       avancarBtn = avancarBtn || createFallbackElement('btn-senha-avancar', true);
       prevBtn = prevBtn || createFallbackElement('btn-senha-prev', true);
+      inputContainer.appendChild(senhaInput);
+      inputContainer.appendChild(toggleBtn);
       console.log('[JCSenha] Elementos criados como fallback');
     }
 
-    console.log('[JCSenha] Elementos carregados:', { instr1, instr2, instr3, instr4, senhaInput, toggleBtn, avancarBtn, prevBtn });
+    console.log('[JCSenha] Elementos carregados:', { instr1, instr2, instr3, instr4, inputContainer, senhaInput, toggleBtn, avancarBtn, prevBtn });
 
     [instr1, instr2, instr3, instr4].forEach((el) => {
       if (el) {
@@ -177,12 +184,12 @@
         el.style.opacity = '0';
         el.style.visibility = 'hidden';
         el.style.display = 'none';
-        el.style.textAlign = 'left'; // Garantir alinhamento à esquerda para datilografia
+        el.style.textAlign = 'left'; // Alinhamento à esquerda para datilografia
         console.log('[JCSenha] Texto inicializado:', el.id, getText(el));
       }
     });
 
-    [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
+    [avancarBtn, prevBtn].forEach(btn => {
       if (btn) {
         btn.classList.add('btn', 'btn-primary', 'btn-stone');
         btn.disabled = true;
@@ -196,24 +203,43 @@
       }
     });
 
+    if (inputContainer) {
+      inputContainer.style.position = 'relative';
+      inputContainer.style.display = 'block';
+      inputContainer.style.margin = '8px auto';
+      inputContainer.style.width = '80%';
+      inputContainer.style.maxWidth = '400px';
+    }
+
     if (senhaInput) {
       senhaInput.style.display = 'block';
-      senhaInput.style.margin = '8px auto';
-      senhaInput.style.padding = '8px';
-      senhaInput.style.width = '80%';
-      senhaInput.style.border = '1px solid rgba(255, 255, 255, 0.3)'; // Borda translúcida
+      senhaInput.style.padding = '8px 40px 8px 8px'; // Espaço para o ícone à direita
+      senhaInput.style.width = '100%';
+      senhaInput.style.border = '1px solid #ccc';
       senhaInput.style.borderRadius = '4px';
-      senhaInput.style.background = 'rgba(255, 255, 255, 0.1)';
+      senhaInput.style.background = 'transparent';
+      senhaInput.style.boxSizing = 'border-box';
       senhaInput.disabled = true;
       console.log('[JCSenha] Input inicializado:', senhaInput.id);
     }
 
     if (toggleBtn) {
-      toggleBtn.style.border = '1px solid rgba(255, 255, 255, 0.3)'; // Borda translúcida para o ícone
-      toggleBtn.style.borderRadius = '4px';
-      toggleBtn.style.padding = '8px';
+      toggleBtn.classList.add('btn', 'btn-primary', 'btn-stone');
+      toggleBtn.disabled = true;
+      toggleBtn.style.opacity = '0.5';
+      toggleBtn.style.cursor = 'not-allowed';
+      toggleBtn.style.position = 'absolute';
+      toggleBtn.style.right = '8px';
+      toggleBtn.style.top = '50%';
+      toggleBtn.style.transform = 'translateY(-50%)';
+      toggleBtn.style.border = 'none'; // Sem borda translúcida
       toggleBtn.style.background = 'transparent';
-      toggleBtn.style.marginLeft = '8px';
+      toggleBtn.style.padding = '0';
+      toggleBtn.style.fontSize = '16px';
+      toggleBtn.style.lineHeight = '1';
+      toggleBtn.style.visibility = 'visible';
+      toggleBtn.style.pointerEvents = 'auto';
+      console.log('[JCSenha] Toggle botão inicializado:', toggleBtn.className);
     }
 
     const runTypingChain = async () => {
@@ -264,6 +290,7 @@
           let i = 0;
           const speed = options.speed || 100;
           const cursor = options.cursor !== 'false';
+          el.style.position = 'relative';
           const type = () => {
             if (i < text.length) {
               el.textContent = text.substring(0, i + 1);
@@ -274,7 +301,7 @@
               setTimeout(type, speed);
             } else {
               el.textContent = text;
-              el.style.borderRight = 'none'; // Remover cursor ao final
+              el.style.borderRight = 'none'; // Remover cursor
               resolve();
             }
           };
@@ -293,7 +320,7 @@
           el.style.opacity = '0';
           el.style.display = 'block';
           el.style.visibility = 'hidden';
-          el.style.textAlign = 'left'; // Garantir alinhamento à esquerda
+          el.style.textAlign = 'left'; // Forçar alinhamento à esquerda
           root.style.opacity = '1';
           root.style.visibility = 'visible';
           await new Promise(resolve => window.runTyping(el, text, resolve, {
@@ -318,7 +345,7 @@
                 console.log('[JCSenha] TTS concluído para:', el.id);
                 resolve();
               };
-              setTimeout(resolve, text.length * 70); // 70ms por caractere
+              setTimeout(resolve, text.length * 70);
             });
           } else {
             console.warn('[JCSenha] window.EffectCoordinator.speak não encontrado');
@@ -346,15 +373,6 @@
       if (senhaInput) {
         senhaInput.disabled = false;
       }
-      // Garantir que nenhuma navegação automática ocorra
-      if (avancarBtn) {
-        avancarBtn.removeEventListener('click', autoNavigate);
-      }
-    };
-
-    // Função para evitar navegação automática
-    const autoNavigate = (e) => {
-      console.log('[JCSenha] Navegação automática bloqueada');
     };
 
     // Evento para toggleBtn
@@ -439,6 +457,7 @@
       instr2: !!instr2, instr2Id: instr2?.id,
       instr3: !!instr3, instr3Id: instr3?.id,
       instr4: !!instr4, instr4Id: instr4?.id,
+      inputContainer: !!inputContainer, inputContainerId: inputContainer?.id,
       senhaInput: !!senhaInput, senhaInputId: senhaInput?.id,
       toggleBtn: !!toggleBtn, toggleBtnAction: toggleBtn?.dataset?.action,
       avancarBtn: !!avancarBtn, avancarBtnAction: avancarBtn?.dataset?.action,
