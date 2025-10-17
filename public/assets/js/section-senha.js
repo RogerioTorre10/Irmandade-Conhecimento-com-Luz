@@ -94,7 +94,6 @@
       width: 100% !important;
       max-width: 600px !important;
       overflow: hidden !important;
-      pointer-events: none;
     }
     #senha-text-container > div, #senha-instr1, #senha-instr2, #senha-instr3, #senha-instr4 {
       text-align: left !important;
@@ -116,6 +115,19 @@
       transform: none !important;
       margin: 0 !important;
       display: inline-block !important;
+    }
+    .typing-active {
+      border-right: 2px solid #fff;
+      white-space: pre-wrap;
+      position: relative;
+    }
+    .typing-done {
+      border-right: none !important;
+      background-color: transparent !important;
+    }
+    .reading-highlight {
+      background-color: #ffff99 !important;
+      transition: background-color 0.5s ease;
     }
   `;
   document.head.appendChild(styleSheet);
@@ -303,9 +315,14 @@
 
     console.log('[JCSenha] Elementos carregados:', { parchmentRough, parchmentInnerRough, senhaWrap, textContainer, instr1, instr2, instr3, instr4, inputContainer, senhaInput, toggleBtn, avancarBtn, prevBtn, actionsContainer });
 
+    // Definir textos iniciais
+    instr1.textContent = getText(instr1) || 'Bem-vindo à Jornada Essencial';
+    instr2.textContent = getText(instr2) || 'Digite a palavra-chave para acessar a jornada.';
+    instr3.textContent = getText(instr3) || 'Esta senha é um convite para a sua transformação.';
+    instr4.textContent = getText(instr4) || 'Prepare-se para uma experiência única!';
+
     [instr1, instr2, instr3, instr4].forEach((el) => {
       if (el) {
-        el.textContent = getText(el) || `Placeholder para ${el.id}`;
         el.setAttribute('data-typing', 'true');
         el.style.cssText = `
           opacity: 1 !important;
@@ -379,9 +396,19 @@
         cursor: text !important;
         transform: none !important;
       `;
-      senhaInput.disabled = false;
+      senhaInput.disabled = true; // Inicialmente desabilitado até a datilografia terminar
       console.log('[JCSenha] Input inicializado:', senhaInput.id);
     }
+
+    // Função para efeito de leitura (destaque)
+    const runReadingEffect = (el) => {
+      if (!el) return;
+      el.classList.add('reading-highlight');
+      setTimeout(() => {
+        el.classList.remove('reading-highlight');
+      }, 2000); // Remove destaque após 2 segundos
+      console.log('[JCSenha] Efeito de leitura aplicado:', el.id);
+    };
 
     const runTypingChain = async () => {
       window.JCSenha.state.TYPING_COUNT++;
@@ -406,28 +433,7 @@
 
       if (!typingElements.length) {
         console.warn('[JCSenha] Nenhum elemento com data-typing="true" encontrado');
-        [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
-          if (btn && getComputedStyle(btn).opacity === '1' && getComputedStyle(btn).display !== 'none') {
-            btn.disabled = false;
-            btn.style.cursor = 'pointer';
-            btn.style.pointerEvents = 'auto !important';
-            btn.style.opacity = '1 !important';
-            btn.style.visibility = 'visible !important';
-            btn.style.display = 'inline-block !important';
-          }
-        });
-        if (senhaInput && getComputedStyle(senhaInput).opacity === '1' && getComputedStyle(senhaInput).display !== 'none') {
-          senhaInput.disabled = false;
-          senhaInput.style.pointerEvents = 'auto !important';
-          senhaInput.style.cursor = 'text !important';
-          senhaInput.style.opacity = '1 !important';
-          senhaInput.style.visibility = 'visible !important';
-          senhaInput.style.display = 'block !important';
-        }
-        root.style.opacity = '1 !important';
-        root.style.visibility = 'visible !important';
-        root.style.display = 'flex !important';
-        window.JCSenha.state.navigationLocked = false;
+        enableControls();
         return;
       }
 
@@ -479,6 +485,7 @@
           el.style.opacity = '1 !important';
           el.style.visibility = 'visible !important';
           el.style.display = 'block !important';
+          runReadingEffect(el); // Aplica efeito de leitura após datilografia
           if (typeof window.EffectCoordinator?.speak === 'function') {
             speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
@@ -500,10 +507,16 @@
           el.style.opacity = '1 !important';
           el.style.visibility = 'visible !important';
           el.style.display = 'block !important';
+          runReadingEffect(el);
         }
       }
       
       console.log('[JCSenha] Datilografia e TTS concluídos');
+      enableControls();
+    };
+
+    // Função para habilitar controles
+    const enableControls = () => {
       [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
         if (btn && getComputedStyle(btn).opacity === '1' && getComputedStyle(btn).display !== 'none') {
           btn.disabled = false;
@@ -522,7 +535,11 @@
         senhaInput.style.visibility = 'visible !important';
         senhaInput.style.display = 'block !important';
       }
+      root.style.opacity = '1 !important';
+      root.style.visibility = 'visible !important';
+      root.style.display = 'flex !important';
       window.JCSenha.state.navigationLocked = false;
+      console.log('[JCSenha] Controles habilitados');
     };
 
     const blockAutoNavigation = (e) => {
@@ -573,6 +590,7 @@
     }
 
     if (toggleBtn) {
+      toggleBtn.textContent = '👁️';
       toggleBtn.addEventListener('click', (e) => {
         console.log('[JCSenha] Clique no botão olho mágico');
         if (senhaInput) {
@@ -584,16 +602,27 @@
     }
 
     if (avancarBtn) {
+      avancarBtn.textContent = 'Acessar Jornada';
       avancarBtn.addEventListener('click', async (e) => {
         if (e.isTrusted && !window.JCSenha.state.navigationLocked && window.JCSenha.state.ready) {
           speechSynthesis.cancel();
           const senha = senhaInput?.value?.trim() || '';
           console.log('[JCSenha] Enviando senha:', senha);
-          if (typeof window.JC?.show === 'function') {
-            window.JC.show('section-guia');
+          if (senha) {
+            // Simula validação da senha (substitua pela lógica real)
+            const isValid = true; // Exemplo: validar com API ou lógica específica
+            if (isValid) {
+              if (typeof window.JC?.show === 'function') {
+                window.JC.show('section-guia');
+              } else {
+                window.location.href = '/guia';
+                console.warn('[JCSenha] Fallback navigation to /guia');
+              }
+            } else {
+              window.toast?.('Palavra-chave inválida. Tente novamente.', 'error');
+            }
           } else {
-            window.location.href = '/guia';
-            console.warn('[JCSenha] Fallback navigation to /guia');
+            window.toast?.('Por favor, digite a palavra-chave.', 'error');
           }
         } else {
           console.log('[JCSenha] Clique simulado, seção não pronta ou navegação bloqueada, ignorado');
@@ -603,6 +632,7 @@
     }
 
     if (prevBtn) {
+      prevBtn.textContent = 'Voltar';
       prevBtn.addEventListener('click', async (e) => {
         if (e.isTrusted && !window.JCSenha.state.navigationLocked) {
           speechSynthesis.cancel();
@@ -613,6 +643,16 @@
         }
       });
       prevBtn.addEventListener('click', blockAutoNavigation, { capture: true });
+    }
+
+    if (senhaInput) {
+      senhaInput.addEventListener('input', () => {
+        const senha = senhaInput.value.trim();
+        avancarBtn.disabled = !senha; // Habilita botão avançar apenas se houver texto
+        avancarBtn.style.cursor = senha ? 'pointer' : 'default';
+        avancarBtn.style.pointerEvents = senha ? 'auto !important' : 'none';
+        console.log('[JCSenha] Input atualizado:', { senha, avancarBtnDisabled: avancarBtn.disabled });
+      });
     }
 
     window.addEventListener('sectionLoaded', blockAutoNavigation, { capture: true });
@@ -634,26 +674,9 @@
         el.style.opacity = '1 !important';
         el.style.visibility = 'visible !important';
         el.style.display = 'block !important';
+        runReadingEffect(el);
       });
-      [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
-        if (btn && getComputedStyle(btn).opacity === '1' && getComputedStyle(btn).display !== 'none') {
-          btn.disabled = false;
-          btn.style.cursor = 'pointer';
-          btn.style.pointerEvents = 'auto !important';
-          btn.style.opacity = '1 !important';
-          btn.style.visibility = 'visible !important';
-          btn.style.display = 'inline-block !important';
-        }
-      });
-      if (senhaInput && getComputedStyle(senhaInput).opacity === '1' && getComputedStyle(senhaInput).display !== 'none') {
-        senhaInput.disabled = false;
-        senhaInput.style.pointerEvents = 'auto !important';
-        senhaInput.style.cursor = 'text !important';
-        senhaInput.style.opacity = '1 !important';
-        senhaInput.style.visibility = 'visible !important';
-        senhaInput.style.display = 'block !important';
-      }
-      window.JCSenha.state.navigationLocked = false;
+      enableControls();
     }
 
     const observeVisibility = () => {
@@ -692,33 +715,99 @@
       return observer;
     };
 
-    // Bloquear updateCanvasBackground
-    const originalUpdateCanvasBackground = window.JSecoes?.updateCanvasBackground || (() => {});
-    window.JSecoes = window.JSecoes || {};
-    window.JSecoes.updateCanvasBackground = (sectionId) => {
-      if (sectionId === 'section-senha') {
-        console.log('[JCSenha] Bloqueando updateCanvasBackground para section-senha');
-        return;
+    function forceVisibility() {
+      if (root) {
+        root.style.cssText = `
+          background: transparent;
+          padding: 24px;
+          border-radius: 12px;
+          width: 100% !important;
+          max-width: 600px !important;
+          margin: 12px auto !important;
+          text-align: center;
+          box-shadow: none;
+          border: none;
+          display: flex !important;
+          flex-direction: column;
+          align-items: center;
+          opacity: 1 !important;
+          visibility: visible !important;
+          position: static;
+          z-index: 1000;
+          overflow-y: hidden;
+          overflow-x: hidden;
+          max-height: 100vh;
+          box-sizing: border-box;
+          transform: none !important;
+          transition: none !important;
+        `;
       }
-      originalUpdateCanvasBackground(sectionId);
-    };
-
-    console.log('[JCSenha] Elementos encontrados:', {
-      parchmentRough: !!parchmentRough, parchmentRoughClass: parchmentRough?.className,
-      parchmentInnerRough: !!parchmentInnerRough, parchmentInnerRoughClass: parchmentInnerRough?.className,
-      senhaWrap: !!senhaWrap, senhaWrapClass: senhaWrap?.className,
-      textContainer: !!textContainer, textContainerId: textContainer?.id,
-      instr1: !!instr1, instr1Id: instr1?.id,
-      instr2: !!instr2, instr2Id: instr2?.id,
-      instr3: !!instr3, instr3Id: instr3?.id,
-      instr4: !!instr4, instr4Id: instr4?.id,
-      inputContainer: !!inputContainer, inputContainerId: inputContainer?.id,
-      senhaInput: !!senhaInput, senhaInputId: senhaInput?.id,
-      toggleBtn: !!toggleBtn, toggleBtnAction: toggleBtn?.dataset?.action,
-      avancarBtn: !!avancarBtn, avancarBtnAction: avancarBtn?.dataset?.action,
-      prevBtn: !!prevBtn, prevBtnAction: prevBtn?.dataset?.action,
-      actionsContainer: !!actionsContainer, actionsContainerClass: actionsContainer?.className
-    });
+      [parchmentRough, parchmentInnerRough, senhaWrap, textContainer, inputContainer, actionsContainer].forEach(el => {
+        if (el) {
+          el.style.cssText = `
+            display: ${el === textContainer || el === inputContainer ? 'block' : 'flex'} !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: none !important;
+            margin: 0 auto !important;
+            width: 100% !important;
+            max-width: 600px !important;
+            overflow: hidden !important;
+          `;
+        }
+      });
+      [instr1, instr2, instr3, instr4].forEach(el => {
+        if (el) {
+          el.style.cssText = `
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: ${el.tagName === 'H2' ? 'block' : 'block'} !important;
+            text-align: left !important;
+            direction: ltr !important;
+            width: 100% !important;
+            max-width: 600px !important;
+            box-sizing: border-box;
+            white-space: pre-wrap;
+            overflow: hidden;
+            pointer-events: none;
+            cursor: default;
+            transform: none !important;
+            margin: 0 auto !important;
+          `;
+        }
+      });
+      if (senhaInput) {
+        senhaInput.style.cssText = `
+          display: block !important;
+          padding: 8px 40px 8px 8px;
+          width: 100% !important;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          background: transparent;
+          box-sizing: border-box;
+          overflow: hidden;
+          opacity: 1 !important;
+          visibility: visible !important;
+          pointer-events: auto !important;
+          cursor: text !important;
+          transform: none !important;
+        `;
+      }
+      [avancarBtn, prevBtn, toggleBtn].forEach(btn => {
+        if (btn) {
+          btn.style.cssText = `
+            opacity: 1 !important;
+            cursor: ${btn.disabled ? 'default' : 'pointer'};
+            display: inline-block !important;
+            margin: 8px !important;
+            visibility: visible !important;
+            pointer-events: ${btn.disabled ? 'none' : 'auto'} !important;
+            overflow: hidden;
+            transform: none !important;
+          `;
+        }
+      });
+    }
   };
 
   window.JCSenha.destroy = () => {
@@ -734,7 +823,7 @@
     if (root) {
       root.dataset.senhaInitialized = '';
       root.querySelectorAll('[data-typing="true"]').forEach(el => {
-        el.classList.remove('typing-active', 'typing-done', 'lumen-typing');
+        el.classList.remove('typing-active', 'typing-done', 'lumen-typing', 'reading-highlight');
       });
     }
     window.JCSenha.state.ready = false;
