@@ -40,7 +40,7 @@
     return { sectionId, node };
   }
 
-  // Injetar estilos essenciais
+  // Injetar estilos isolados
   const styleSheet = document.createElement('style');
   styleSheet.id = 'jcsenha-styles';
   styleSheet.textContent = `
@@ -54,44 +54,58 @@
       display: none;
       flex-direction: column;
       align-items: center;
+      text-align: left;
+      direction: ltr;
     }
     #section-senha.active {
       display: flex;
     }
-    .senha-wrap, .parchment-inner-rough, .parchment-rough {
+    #section-senha .senha-wrap {
       display: flex;
       flex-direction: column;
       align-items: center;
       width: 100%;
     }
-    #senha-text-container > div, #senha-instr1, #senha-instr2, #senha-instr3, #senha-instr4 {
+    #section-senha .parchment-rough,
+    #section-senha .parchment-inner-rough {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+    #section-senha #senha-text-container > div,
+    #section-senha #senha-instr1,
+    #section-senha #senha-instr2,
+    #section-senha #senha-instr3,
+    #section-senha #senha-instr4 {
       text-align: left;
+      direction: ltr;
       display: block;
       margin-bottom: 12px;
       color: #fff;
     }
-    .typing-active {
+    #section-senha .typing-active {
       border-right: 2px solid #fff;
       white-space: pre-wrap;
       position: relative;
     }
-    .typing-done {
+    #section-senha .typing-done {
       border-right: none;
     }
-    .senha-input-group {
+    #section-senha .senha-input-group {
       position: relative;
       width: 80%;
       max-width: 400px;
       margin: 16px auto;
     }
-    #senha-input {
+    #section-senha #senha-input {
       width: 100%;
       padding: 8px 40px 8px 8px;
       border: 1px solid #ccc;
       border-radius: 4px;
       background: transparent;
     }
-    .btn-toggle-senha {
+    #section-senha .btn-toggle-senha {
       position: absolute;
       right: 8px;
       top: 50%;
@@ -101,14 +115,14 @@
       cursor: pointer;
       font-size: 18px;
     }
-    .parchment-actions-rough {
+    #section-senha .parchment-actions-rough {
       display: flex;
       justify-content: space-between;
       width: 100%;
       max-width: 400px;
       margin-top: 16px;
     }
-    .btn {
+    #section-senha .btn {
       padding: 8px 16px;
       border: none;
       border-radius: 4px;
@@ -116,10 +130,10 @@
       opacity: 0.5;
       transition: opacity 0.3s;
     }
-    .btn:not(:disabled) {
+    #section-senha .btn:not(:disabled) {
       opacity: 1;
     }
-    .btn:disabled {
+    #section-senha .btn:disabled {
       cursor: default;
       pointer-events: none;
     }
