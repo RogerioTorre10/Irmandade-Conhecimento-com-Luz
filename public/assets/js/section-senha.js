@@ -120,6 +120,7 @@
       position: relative;
       z-index: 2;
       overflow-y: scroll;
+      overflow-x: hidden;
       min-height: 80vh;
       height: 80vh;
       box-sizing: border-box;
