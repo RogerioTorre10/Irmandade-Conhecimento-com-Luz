@@ -326,44 +326,54 @@
       }
     };
 
-    once(toggleBtn, 'click', () => {
-      if (senhaInput.type === 'password') {
-        senhaInput.type = 'text';
-        toggleBtn.textContent = '🙈';
-        console.log('[JCSenha] Senha visível');
-      } else {
-        senhaInput.type = 'password';
-        toggleBtn.textContent = '👁️';
-        console.log('[JCSenha] Senha oculta');
-      }
-    });
-
-    once(avancarBtn, 'click', async (e) => {
-      if (e.isTrusted) {
-        speechSynthesis.cancel(); // Cancelar TTS ao enviar
-        const senha = senhaInput?.value?.trim() || '';
-        console.log('[JCSenha] Enviando senha:', senha);
-        // Aqui você pode adicionar lógica para validar a senha (ex.: API call)
-        if (typeof window.JC?.show === 'function') {
-          window.JC.show('section-guia'); // Próxima seção
+    // Evento para toggleBtn (sem once, para múltiplos cliques)
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        console.log('[JCSenha] Clique no botão olho mágico');
+        if (senhaInput.type === 'password') {
+          senhaInput.type = 'text';
+          toggleBtn.textContent = '🙈';
+          console.log('[JCSenha] Senha visível');
         } else {
-          window.location.href = '/guia';
-          console.warn('[JCSenha] Fallback navigation to /guia');
+          senhaInput.type = 'password';
+          toggleBtn.textContent = '👁️';
+          console.log('[JCSenha] Senha oculta');
         }
-      } else {
-        console.log('[JCSenha] Clique simulado ignorado');
-      }
-    });
+      });
+    }
 
-    once(prevBtn, 'click', async (e) => {
-      if (e.isTrusted) {
-        speechSynthesis.cancel(); // Cancelar TTS ao voltar
-        console.log('[JCSenha] Redirecionando para site fora da jornada');
-        window.location.href = '/'; // Ajuste para a URL do site Jornada Conhecimento com Luz
-      } else {
-        console.log('[JCSenha] Clique simulado ignorado');
-      }
-    });
+    // Evento para avancarBtn
+    if (avancarBtn) {
+      avancarBtn.addEventListener('click', async (e) => {
+        if (e.isTrusted) {
+          speechSynthesis.cancel(); // Cancelar TTS ao enviar
+          const senha = senhaInput?.value?.trim() || '';
+          console.log('[JCSenha] Enviando senha:', senha);
+          // Aqui você pode adicionar lógica para validar a senha (ex.: API call)
+          if (typeof window.JC?.show === 'function') {
+            window.JC.show('section-guia'); // Próxima seção
+          } else {
+            window.location.href = '/guia';
+            console.warn('[JCSenha] Fallback navigation to /guia');
+          }
+        } else {
+          console.log('[JCSenha] Clique simulado ignorado');
+        }
+      });
+    }
+
+    // Evento para prevBtn
+    if (prevBtn) {
+      prevBtn.addEventListener('click', async (e) => {
+        if (e.isTrusted) {
+          speechSynthesis.cancel(); // Cancelar TTS ao voltar
+          console.log('[JCSenha] Redirecionando para site fora da jornada');
+          window.location.href = '/'; // Ajuste para a URL do site Jornada Conhecimento com Luz
+        } else {
+          console.log('[JCSenha] Clique simulado ignorado');
+        }
+      });
+    }
 
     window.JCSenha.state.ready = false;
     console.log('[JCSenha] Iniciando runTypingChain...');
