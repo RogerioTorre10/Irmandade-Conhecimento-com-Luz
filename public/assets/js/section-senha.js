@@ -30,6 +30,29 @@
     el.addEventListener(ev, h);
   };
 
+  async function waitForElement(selector, { within = document, timeout = 5000, step = 50 } = {}) {
+    console.log('[JCSenha] Aguardando elemento:', selector);
+    const start = performance.now();
+    return new Promise((resolve, reject) => {
+      const tick = () => {
+        let el = within.querySelector(selector);
+        if (!el && within !== document) {
+          el = document.querySelector(selector);
+        }
+        if (el) {
+          console.log('[JCSenha] Elemento encontrado:', selector);
+          return resolve(el);
+        }
+        if (performance.now() - start >= timeout) {
+          console.error('[JCSenha] Timeout aguardando:', selector);
+          return reject(new Error(`timeout waiting ${selector}`));
+        }
+        setTimeout(tick, step);
+      };
+      tick();
+    });
+  }
+
   function getText(el) {
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
   }
@@ -155,10 +178,15 @@
       return;
     }
 
-    let root = node || document.getElementById('section-senha');
-    const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
-    if (!root) {
+    let root;
+    try {
+      root = node || await waitForElement('#section-senha', {
+        within: document.getElementById('jornada-content-wrapper') || document,
+        timeout: 10000
+      });
+    } catch (e) {
       console.log('[JCSenha] Criando #section-senha como fallback');
+      const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
       root = document.createElement('section');
       root.id = 'section-senha';
       root.className = 'section parchment-wrap-rough';
@@ -172,8 +200,11 @@
     root.classList.remove('hidden');
     root.setAttribute('aria-hidden', 'false');
 
-    // Limpar conteúdo anterior para evitar duplicatas
-    root.innerHTML = '';
+    // Verificar se já existe conteúdo para evitar duplicatas
+    if (root.querySelector('.senha-wrap')) {
+      console.log('[JCSenha] Conteúdo já presente, limpando para evitar duplicatas');
+      root.innerHTML = '';
+    }
 
     // Criar estrutura HTML
     const parchmentRough = document.createElement('div');
@@ -254,6 +285,8 @@
       const cursor = options.cursor !== 'false';
       el.style.position = 'relative';
       el.style.whiteSpace = 'pre-wrap';
+      el.style.textAlign = 'left';
+      el.style.direction = 'ltr';
       el.textContent = '';
       const type = () => {
         if (i < text.length) {
@@ -436,7 +469,7 @@
     senhaInput.addEventListener('input', () => {
       avancarBtn.disabled = !senhaInput.value.trim();
       avancarBtn.style.cursor = senhaInput.value.trim() ? 'pointer' : 'default';
-      avancarBtn.style.pointerEvents = senhaInput.value.trim() ? 'auto' : 'none';
+      avancarBtn.style.pointerEvents = seno
       console.log('[JCSenha] Input atualizado:', { senha: senhaInput.value.trim(), avancarBtnDisabled: avancarBtn.disabled });
     });
 
