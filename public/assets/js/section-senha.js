@@ -218,6 +218,15 @@
     let instr2 = root.querySelector('#senha-instr2');
     let instr3 = root.querySelector('#senha-instr3');
     let instr4 = root.querySelector('#senha-instr4');
+    const instrs = [instr1, instr2, instr3, instr4];
+      for (const el of instrs) {
+      if (el && el.dataset.typing === 'true') {
+      const text = getText(el);
+      window.runTyping(el, text, () => {
+      window.EffectCoordinator?.speak(text);
+    }, { speed: 36, cursor: true });
+   }
+  }
     let inputContainer = root.querySelector('#senha-input-container');
     let senhaInput = root.querySelector('#senha-input');
     let toggleBtn = root.querySelector('.btn-toggle-senha');
@@ -297,6 +306,39 @@
       actionsContainer.appendChild(avancarBtn);
       senhaWrap.appendChild(actionsContainer);
     }
+      prevBtn.disabled = false;
+      avancarBtn.disabled = false;
+
+      prevBtn.addEventListener('click', () => {
+      window.JC?.show('section-termos');
+  });
+    // Agrupar input e botão de toggle
+     inputContainer.appendChild(senhaInput);
+     inputContainer.appendChild(toggleBtn);
+
+   // Agrupar botões de ação
+     actionsContainer.className = 'parchment-actions-rough';
+     actionsContainer.appendChild(prevBtn);
+     actionsContainer.appendChild(avancarBtn);
+
+   // Inserir no container principal
+     const senhaWrap = root.querySelector('.senha-wrap') || root;
+     senhaWrap.appendChild(inputContainer);
+     senhaWrap.appendChild(actionsContainer);
+
+
+      avancarBtn.addEventListener('click', () => {
+      const senha = senhaInput.value.trim();
+      if (senha.length >= 3) {
+      window.JC?.show('section-filme');
+    } else {
+      window.toast?.('Digite uma Palavra-Chave válida.', 'warning');
+    }
+   });
+      toggleBtn.addEventListener('click', () => {
+      senhaInput.type = senhaInput.type === 'password' ? 'text' : 'password';
+   });
+
 
     console.log('[JCSenha] Elementos carregados:', {
       textContainer: !!textContainer,
