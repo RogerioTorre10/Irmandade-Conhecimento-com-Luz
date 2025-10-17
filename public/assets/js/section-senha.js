@@ -40,22 +40,6 @@
     return { sectionId, node };
   }
 
-  // Função para observar visibilidade (movida para o topo)
-  function observeVisibility(root) {
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach(mutation => {
-        console.log('[JCSenha] Mutação detectada:', {
-          type: mutation.type,
-          target: mutation.target.id || mutation.target.className || mutation.target.tagName,
-          attributeName: mutation.attributeName,
-          oldValue: mutation.oldValue
-        });
-      });
-    });
-    observer.observe(document.body, { attributes: true, childList: true, subtree: true, attributeOldValue: true });
-    return observer;
-  }
-
   // Injetar estilos essenciais
   const styleSheet = document.createElement('style');
   styleSheet.id = 'jcsenha-styles';
@@ -249,6 +233,34 @@
     const aria = document.getElementById('aria-pergunta');
     if (aria) aria.textContent = 'Digite a palavra-chave para acessar a jornada.';
 
+    // Função de datilografia local
+    const runTyping = (el, text, resolve, options) => {
+      let i = 0;
+      const speed = options.speed || 100;
+      const cursor = options.cursor !== 'false';
+      el.style.position = 'relative';
+      el.style.whiteSpace = 'pre-wrap';
+      el.textContent = '';
+      const type = () => {
+        if (i < text.length) {
+          el.textContent = text.substring(0, i + 1);
+          if (cursor) {
+            el.style.borderRight = '2px solid #fff';
+          }
+          el.classList.add('typing-active');
+          i++;
+          setTimeout(type, speed);
+        } else {
+          el.textContent = text;
+          el.style.borderRight = 'none';
+          el.classList.add('typing-done');
+          el.classList.remove('typing-active');
+          resolve();
+        }
+      };
+      type();
+    };
+
     // Função de datilografia
     const runTypingChain = async () => {
       window.JCSenha.state.TYPING_COUNT++;
@@ -278,43 +290,13 @@
 
       console.log('[JCSenha] Elementos encontrados:', Array.from(typingElements).map(el => el.id));
 
-      if (typeof window.runTyping !== 'function') {
-        console.warn('[JCSenha] window.runTyping não encontrado, usando fallback');
-        window.runTyping = (el, text, resolve, options) => {
-          let i = 0;
-          const speed = options.speed || 100;
-          const cursor = options.cursor !== 'false';
-          el.style.position = 'relative';
-          el.style.whiteSpace = 'pre-wrap';
-          el.textContent = '';
-          const type = () => {
-            if (i < text.length) {
-              el.textContent = text.substring(0, i + 1);
-              if (cursor) {
-                el.style.borderRight = '2px solid #fff';
-              }
-              el.classList.add('typing-active');
-              i++;
-              setTimeout(type, speed);
-            } else {
-              el.textContent = text;
-              el.style.borderRight = 'none';
-              el.classList.add('typing-done');
-              el.classList.remove('typing-active');
-              resolve();
-            }
-          };
-          type();
-        };
-      }
-
       for (const el of typingElements) {
         const text = getText(el);
         console.log('[JCSenha] Datilografando:', el.id, text.substring(0, 50));
         try {
-          await new Promise(resolve => window.runTyping(el, text, resolve, {
-            speed: Number(el.dataset.speed || 100),
-            cursor: String(el.dataset.cursor || 'true') === 'true'
+          await new Promise(resolve => runTyping(el, text, resolve, {
+            speed: 100,
+            cursor: true
           }));
         } catch (err) {
           console.error('[JCSenha] Erro na datilografia para', el.id, err);
@@ -450,8 +432,8 @@
     // Inicializa datilografia
     window.JCSenha.state.ready = false;
     try {
-      window.JCSenha.mutationObserver = observeVisibility(root);
-      window.JCSenha.visibilityInterval = setInterval(() => {}, 50); // Placeholder para visibilidade
+      root.classList.add('active');
+      window.JC?.show('section-senha');
       await runTypingChain();
       console.log('[JCSenha] Inicialização concluída');
     } catch (err) {
@@ -463,7 +445,6 @@
   window.JCSenha.destroy = () => {
     console.log('[JCSenha] Destruindo seção senha');
     clearInterval(window.JCSenha.visibilityInterval);
-    if (window.JCSenha.mutationObserver) window.JCSenha.mutationObserver.disconnect();
     document.removeEventListener('sectionLoaded', handler);
     document.removeEventListener('section:shown', handler);
     window.removeEventListener('sectionLoaded', blockAutoNavigation, { capture: true });
