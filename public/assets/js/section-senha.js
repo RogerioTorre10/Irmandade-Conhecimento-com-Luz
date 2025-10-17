@@ -129,6 +129,7 @@
     `;
 
     let instr1, instr2, instr3, instr4, senhaInput, toggleBtn, avancarBtn, prevBtn, inputContainer, textContainer;
+    let visibilityInterval;
     try {
       console.log('[JCSenha] Buscando elementos...');
       textContainer = document.createElement('div');
@@ -248,6 +249,7 @@
           white-space: pre-wrap;
           overflow: hidden;
           pointer-events: auto;
+          cursor: default;
         `;
         console.log('[JCSenha] Texto inicializado:', el.id, getText(el));
       }
@@ -259,7 +261,7 @@
         btn.disabled = true;
         btn.style.cssText = `
           opacity: 1;
-          cursor: not-allowed;
+          cursor: default;
           display: inline-block;
           margin: 8px;
           visibility: visible;
@@ -298,6 +300,8 @@
         overflow: hidden;
         opacity: 1;
         visibility: visible;
+        pointer-events: none;
+        cursor: default;
       `;
       senhaInput.disabled = true;
       console.log('[JCSenha] Input inicializado:', senhaInput.id);
@@ -308,7 +312,7 @@
       toggleBtn.disabled = true;
       toggleBtn.style.cssText = `
         opacity: 1;
-        cursor: not-allowed;
+        cursor: default;
         position: absolute;
         right: 8px;
         top: 50%;
@@ -358,6 +362,8 @@
         });
         if (senhaInput) {
           senhaInput.disabled = false;
+          senhaInput.style.pointerEvents = 'auto';
+          senhaInput.style.cursor = 'text';
         }
         root.style.opacity = '1';
         root.style.visibility = 'visible';
@@ -401,9 +407,9 @@
           el.textContent = '';
           el.classList.add('typing-active', 'lumen-typing');
           el.style.color = '#fff';
+          el.style.opacity = '1';
           el.style.display = 'block';
           el.style.visibility = 'visible';
-          el.style.opacity = '1';
           await new Promise(resolve => window.runTyping(el, text, resolve, {
             speed: Number(el.dataset.speed || 100),
             cursor: String(el.dataset.cursor || 'true') === 'true'
@@ -447,6 +453,8 @@
       });
       if (senhaInput) {
         senhaInput.disabled = false;
+        senhaInput.style.pointerEvents = 'auto';
+        senhaInput.style.cursor = 'text';
       }
       window.JCSenha.state.navigationLocked = false;
     };
@@ -467,6 +475,20 @@
           };
         }
       }
+    };
+
+    const forceVisibility = () => {
+      root.style.opacity = '1';
+      root.style.visibility = 'visible';
+      root.style.display = 'flex';
+      [textContainer, inputContainer, instr1, instr2, instr3, instr4, senhaInput, toggleBtn, avancarBtn, prevBtn].forEach(el => {
+        if (el) {
+          el.style.opacity = '1';
+          el.style.visibility = 'visible';
+          el.style.display = el.tagName === 'BUTTON' || el.tagName === 'INPUT' ? 'inline-block' : 'block';
+        }
+      });
+      console.log('[JCSenha] Visibilidade forçada');
     };
 
     if (toggleBtn) {
@@ -543,9 +565,14 @@
       });
       if (senhaInput) {
         senhaInput.disabled = false;
+        senhaInput.style.pointerEvents = 'auto';
+        senhaInput.style.cursor = 'text';
       }
       window.JCSenha.state.navigationLocked = false;
     }
+
+    // Forçar visibilidade a cada 500ms para contrariar mudanças externas
+    visibilityInterval = setInterval(forceVisibility, 500);
 
     console.log('[JCSenha] Elementos encontrados:', {
       instr1: !!instr1, instr1Id: instr1?.id,
@@ -563,6 +590,7 @@
 
   window.JCSenha.destroy = () => {
     console.log('[JCSenha] Destruindo seção senha');
+    clearInterval(visibilityInterval);
     document.removeEventListener('sectionLoaded', handler);
     document.removeEventListener('section:shown', handler);
     window.removeEventListener('sectionLoaded', blockAutoNavigation, { capture: true });
