@@ -152,7 +152,7 @@
           el.textContent = id.includes('avancar') ? 'Acessar Jornada' : id.includes('prev') ? 'Voltar' : '👁️';
         } else if (isInput) {
           el.type = 'password';
-          el.placeholder = 'Digite sua senha';
+          el.placeholder = 'Digite a Palavra-Chave';
         }
         root.appendChild(el);
         return el;
@@ -189,6 +189,7 @@
         btn.style.display = 'inline-block';
         btn.style.margin = '8px';
         btn.style.visibility = 'visible';
+        btn.style.pointerEvents = 'auto';
         console.log('[JCSenha] Botão inicializado:', btn.className, btn.textContent);
       }
     });
@@ -230,6 +231,7 @@
             btn.disabled = false;
             btn.style.opacity = '1';
             btn.style.cursor = 'pointer';
+            btn.style.pointerEvents = 'auto';
           }
         });
         if (senhaInput) {
@@ -242,7 +244,7 @@
 
       console.log('[JCSenha] Elementos encontrados:', Array.from(typingElements).map(el => el.id));
 
-      // Fallback para window.runTyping
+      // Verificar dependências
       if (typeof window.runTyping !== 'function') {
         console.warn('[JCSenha] window.runTyping não encontrado, usando fallback');
         window.runTyping = (el, text, resolve, options) => {
@@ -319,6 +321,7 @@
           btn.disabled = false;
           btn.style.opacity = '1';
           btn.style.cursor = 'pointer';
+          btn.style.pointerEvents = 'auto';
         }
       });
       if (senhaInput) {
@@ -395,6 +398,7 @@
           btn.disabled = false;
           btn.style.opacity = '1';
           btn.style.cursor = 'pointer';
+          btn.style.pointerEvents = 'auto';
         }
       });
       if (senhaInput) {
@@ -449,7 +453,7 @@
     document.removeEventListener('section:shown', handler);
     document.addEventListener('sectionLoaded', handler, { passive: true, once: true });
 
-    const tryInitialize = (attempt = 1, maxAttempts = 10) => {
+    const tryInitialize = (attempt = 1, maxAttempts = 15) => {
       setTimeout(() => {
         const visibleSenha = document.querySelector('#section-senha:not(.hidden)');
         if (visibleSenha && !window.JCSenha.state.ready && !visibleSenha.dataset.senhaInitialized) {
