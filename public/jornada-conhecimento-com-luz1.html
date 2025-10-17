@@ -123,25 +123,17 @@
     let attempts = 0;
     const check = () => {
       console.log(`[Init] Verificando scripts (tentativa ${attempts + 1}/${maxAttempts})...`);
-      if (typeof window.JC?.init === 'function' && typeof window.carregarEtapa === 'function') {
-        console.log('[Init] Scripts prontos, executando callback');
+      if (typeof window.JC?.init === 'function' && typeof window.carregarEtapa === 'function' && document.getElementById('section-senha')) {
+        console.log('[Init] Scripts prontos e section-senha encontrada, executando callback');
         callback();
       } else {
-        console.log('[Init] Status: JC.init', typeof window.JC?.init, 'carregarEtapa', typeof window.carregarEtapa);
+        console.log('[Init] Status: JC.init', typeof window.JC?.init, 'carregarEtapa', typeof window.carregarEtapa, 'section-senha', !!document.getElementById('section-senha'));
         if (attempts < maxAttempts) {
           attempts++;
           setTimeout(check, interval);
         } else {
           console.error('[Init] Falha ao carregar scripts após várias tentativas');
-          if (typeof window.carregarEtapa === 'function') {
-            console.log('[Init] Fallback: carregando section-termos diretamente');
-            window.carregarEtapa('termos');
-          } else {
-            console.error('[Init] window.carregarEtapa não disponível');
-            if (typeof window.carregarEtapa === 'function') {
-              window.carregarEtapa('intro');
-            }
-          }
+          window.toast?.('Erro: Não foi possível inicializar a jornada.', 'error');
         }
       }
     };
@@ -154,14 +146,10 @@
       try {
         window.JC.init();
         console.log('[Init] JC.init executado com sucesso');
+        window.JC.show('section-senha'); // Forçar section-senha
       } catch (e) {
         console.error('[Init] Falha ao executar JC.init:', e);
-        if (typeof window.carregarEtapa === 'function') {
-          window.carregarEtapa('termos');
-          console.log('[Init] Fallback: section-termos carregada');
-        } else {
-          console.error('[Init] window.carregarEtapa não disponível');
-        }
+        console.log('[Init] Evitando carregamento automático de section-termos');
       }
     });
   });
