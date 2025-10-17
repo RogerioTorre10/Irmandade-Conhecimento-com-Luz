@@ -555,7 +555,7 @@
 
   if (!window.JCSenha.state.listenerAdded) {
     console.log('[JCSenha] Registrando listener para sectionLoaded');
-    window.addEventListener('sectionLoaded', handler, { once: true });
+    window.addEventListener('sectionLoaded', handler);
     window.JCSenha.state.listenerAdded = true;
   }
 
