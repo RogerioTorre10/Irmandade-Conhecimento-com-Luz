@@ -134,6 +134,7 @@
         } else {
           console.error('[Init] Falha ao carregar scripts após várias tentativas');
           window.toast?.('Erro: Não foi possível inicializar a jornada.', 'error');
+          console.log('[Init] Evitando carregamento automático de section-termos');
         }
       }
     };
