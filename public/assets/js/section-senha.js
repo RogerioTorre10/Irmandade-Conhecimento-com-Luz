@@ -149,10 +149,6 @@
         const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
         root = document.createElement('section');
         root.id = 'section-senha';
-        root.dataset.section = 'senha';
-        root.classList.add('section', 'parchment-wrap-rough');
-        root.classList.remove('hidden');
-        root.setAttribute('aria-hidden', 'false');
         wrapper.appendChild(root);
         console.log('[JCSenha] Seção #section-senha criada como fallback');
       }
@@ -190,7 +186,7 @@
       transition: none !important;
     `;
 
-    let parchmentRough, parchmentInnerRough, senhaWrap, instr1, instr2, instr3, instr4, senhaInput, toggleBtn, avancarBtn, prevBtn, inputContainer, textContainer, actionsContainer;
+    let parchmentRough, parchmentInnerRough, senhaWrap, instr1, instr2, instr3, instr4, senhaInput, toggleBtn, avancarBtn, prevBtn, inputContainer, actionsContainer;
     let visibilityInterval, mutationObserver;
     try {
       console.log('[JCSenha] Buscando elementos...');
@@ -200,8 +196,6 @@
       parchmentInnerRough.className = 'parchment-inner-rough';
       senhaWrap = await waitForElement('.senha-wrap', { within: parchmentInnerRough || root, timeout: 5000 }) || document.createElement('div');
       senhaWrap.className = 'senha-wrap';
-      textContainer = await waitForElement('#senha-text-container', { within: senhaWrap || root, timeout: 5000 }) || document.createElement('div');
-      textContainer.id = 'senha-text-container';
 
       instr1 = await waitForElement('#senha-instr1', { within: senhaWrap || root, timeout: 5000 }) || document.createElement('h2');
       instr1.id = 'senha-instr1';
@@ -246,13 +240,14 @@
     } catch (e) {
       console.error('[JCSenha] Elements not found:', e);
       window.toast?.('Falha ao carregar os elementos da seção Senha.', 'error');
-      // Fallback similar, mas com classes do HTML
+      // Fallback com classes do HTML
       const createFallbackElement = (id, isButton = false, isInput = false, isHeading = false, className = '') => {
-        const el = document.createElement(isButton ? 'button' : isInput ? 'input' : isHeading ? 'h2' : 'div');
+        const el = document.createElement(isButton ? 'button' : isInput ? 'input' : isHeading ? 'h2' : 'p' : 'div');
         el.id = id;
         if (className) el.className = className;
         if (!isButton && !isInput && !isHeading) {
           el.setAttribute('data-typing', 'true');
+          el.className = 'parchment-text-rough';
           el.textContent = `Placeholder para ${id}`;
         } else if (isButton) {
           el.classList.add('btn', 'btn-primary', 'btn-stone');
@@ -409,6 +404,7 @@
         opacity: 1 !important;
         visibility: visible !important;
         transform: none !important;
+        margin: 0 auto !important;
       `;
     }
 
