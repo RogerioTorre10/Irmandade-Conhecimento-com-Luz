@@ -10,72 +10,40 @@
   window.JCSenha.__bound = true;
   window.JCSenha.state = {
     ready: false,
-    listenerAdded: false,
-    HANDLER_COUNT: 0,
-    TYPING_COUNT: 0
+    listenerAdded: false
   };
 
   function getText(el) {
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
   }
 
-  async function waitForElement(selector, { within = document, timeout = 10000, step = 50 } = {}) {
-    const start = performance.now();
-    return new Promise((resolve, reject) => {
-      const tick = () => {
-        let el = within.querySelector(selector) || document.querySelector(selector);
-        if (el) return resolve(el);
-        if (performance.now() - start >= timeout) return reject(new Error(`Timeout waiting for ${selector}`));
-        setTimeout(tick, step);
-      };
-      tick();
-    });
-  }
-
   const handler = async (evt) => {
     const { sectionId } = evt?.detail || {};
     if (sectionId !== 'section-senha') return;
 
-    window.JCSenha.state.HANDLER_COUNT++;
-    if (window.JCSenha.state.ready) return;
+    const root = document.getElementById('section-senha');
+    if (!root || root.dataset.senhaInitialized === 'true') return;
 
-    let root;
-    try {
-      root = await waitForElement('#section-senha', {
-        within: document.getElementById('jornada-content-wrapper') || document
-      });
-    } catch (e) {
-      console.error('[JCSenha] Seção não encontrada, criando fallback');
-      root = document.createElement('section');
-      root.id = 'section-senha';
-      root.className = 'section parchment-wrap-rough';
-      root.setAttribute('data-section', 'senha');
-      document.getElementById('jornada-content-wrapper')?.appendChild(root);
-    }
-
+    console.log('[JCSenha] Root encontrado:', root);
     root.dataset.senhaInitialized = 'true';
     root.classList.remove('hidden');
     root.setAttribute('aria-hidden', 'false');
     root.style.display = 'flex';
     root.style.opacity = '1';
     root.style.visibility = 'visible';
+    root.style.zIndex = '9999';
 
-    const instrs = ['senha-instr1', 'senha-instr2', 'senha-instr3', 'senha-instr4']
-      .map(id => root.querySelector(`#${id}`))
-      .filter(el => el && el.dataset.typing === 'true');
-
-    for (const el of instrs) {
-      const text = getText(el);
-      window.runTyping(el, text, () => {
-        window.EffectCoordinator?.speak(text);
-      }, { speed: 36, cursor: true });
-    }
-
+    // Localizar elementos
+    let instr1 = root.querySelector('#senha-instr1');
+    let instr2 = root.querySelector('#senha-instr2');
+    let instr3 = root.querySelector('#senha-instr3');
+    let instr4 = root.querySelector('#senha-instr4');
     let senhaInput = root.querySelector('#senha-input');
     let toggleBtn = root.querySelector('.btn-toggle-senha');
     let avancarBtn = root.querySelector('#btn-senha-avancar');
     let prevBtn = root.querySelector('#btn-senha-prev');
 
+    // Criar elementos se não existirem
     if (!senhaInput || !toggleBtn || !avancarBtn || !prevBtn) {
       const inputContainer = document.createElement('div');
       inputContainer.className = 'senha-input-group';
@@ -113,10 +81,25 @@
       senhaWrap.appendChild(actionsContainer);
     }
 
+    // ✅ Forçar datilografia e leitura
+    const instrs = [instr1, instr2, instr3, instr4];
+    for (const el of instrs) {
+      if (el && el.dataset.typing === 'true') {
+        el.classList.remove('typing-done');
+        el.textContent = '';
+        const text = getText(el);
+        window.runTyping(el, text, () => {
+          window.EffectCoordinator?.speak(text);
+        }, { speed: 36, cursor: true });
+      }
+    }
+
+    // Mostrar/ocultar senha
     toggleBtn.addEventListener('click', () => {
       senhaInput.type = senhaInput.type === 'password' ? 'text' : 'password';
     });
 
+    // Navegação
     prevBtn.addEventListener('click', () => {
       window.JC?.show('section-termos');
     });
