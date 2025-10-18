@@ -1,14 +1,15 @@
-// section-senha.js — 18/out (Lumen v6)
-// - Fallback com timeout para runTyping (força datilografia local se travar/bugar)
-// - Lock de TTS por toda a sequência; abre só no momento da fala do parágrafo
-// - Sequência estrita: digita -> fala -> pausa -> próximo
-// - Digitação LTR e alinhada à esquerda; restaura estilos ao final
-// - Reage a reinjeções (MutationObserver) e reexecuta com segurança
+// section-senha.js — 18/out (Lumen v7)
+// - Usa APENAS datilografia local (ignora runTyping) para garantir animação visível
+// - Re-digita SEMPRE (não respeita "typing-done" anterior)
+// - Bloqueia TTS geral na sequência; libera só na hora de falar o parágrafo
+// - LTR + alinhamento à esquerda durante digitação (restaura ao final)
+// - Observa reinjeções e re-aplica sequência com segurança
+
 (function () {
   'use strict';
 
   if (window.JCSenha?.__bound) {
-    console.log('[JCSenha] v6 já ativo. Reforçando início, se visível.');
+    console.log('[JCSenha] v7 já ativo. Reforçando sequência, se visível.');
     const root0 = document.getElementById('section-senha');
     if (root0 && !root0.classList.contains('hidden') && root0.getAttribute('aria-hidden') !== 'true') {
       window.JCSenha?.__kick && window.JCSenha.__kick();
@@ -17,10 +18,9 @@
   }
 
   // ===== Config =====
-  const TYPING_MS = 60;          // velocidade (ms/char)
-  const PAUSE_BETWEEN_P = 150;   // respiro entre parágrafos
-  const BRIDGE_TIMEOUT = 1200;   // tempo máx. para confiar no runTyping antes do fallback
-  const EST_WPM = 160;           // estimativa para fallback de TTS
+  const TYPING_MS = 60;          // ms por caractere (ajuste fino da velocidade)
+  const PAUSE_BETWEEN_P = 160;   // respiro entre parágrafos
+  const EST_WPM = 160;           // fallback para estimar duração do TTS
   const EST_CPS = 13;
 
   window.JCSenha = window.JCSenha || {};
@@ -67,16 +67,19 @@
     const tc = (el.textContent || '').trim();
     const src = ds || tc;
     if (!src) return false;
-    el.dataset.text = src;
+    el.dataset.text = src; // fonte oficial
     return true;
   }
 
   function prepareTyping(el) {
     if (!el) return false;
+    // guardar estilos para restaurar
     if (!('prevAlign' in el.dataset)) el.dataset.prevAlign = el.style.textAlign || '';
     if (!('prevDir' in el.dataset))   el.dataset.prevDir   = el.getAttribute('dir') || '';
+    // força LTR + alinhamento à esquerda
     el.style.textAlign = 'left';
     el.setAttribute('dir', 'ltr');
+    // garante que vamos ver a digitação
     el.textContent = '';
     el.classList.remove('typing-done');
     el.classList.add('typing-active');
@@ -88,6 +91,7 @@
     if (!el) return;
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
+    // restauro estilos originais
     el.style.textAlign = el.dataset.prevAlign || '';
     if (el.dataset.prevDir) el.setAttribute('dir', el.dataset.prevDir); else el.removeAttribute('dir');
   }
@@ -114,7 +118,8 @@
     await sleep(estSpeakMs(text));
   }
 
-  async function localType(el, text, speed) {
+  // Datilografia local — SEM usar runTyping
+  async function localType(el, text, speed = TYPING_MS) {
     return new Promise(resolve => {
       let i = 0;
       el.textContent = '';
@@ -122,69 +127,28 @@
         if (i < text.length) {
           el.textContent += text.charAt(i++);
           setTimeout(tick, speed);
-        } else resolve();
+        } else {
+          resolve();
+        }
       };
       tick();
     });
   }
 
-  // runTyping com watchdog: se não “andar” em BRIDGE_TIMEOUT, cai no localType
-  async function typeOnce(el, speed = TYPING_MS) {
+  async function typeOnce(el) {
     if (!el) return '';
     const text = (el.dataset?.text || '').trim();
     if (!text) return '';
 
-    // mantém lock de TTS ligado; vamos abrir só na hora de falar
+    // mantém lock de TTS ligado; abrimos só na hora de falar
     window.G = window.G || {};
     if (!window.G.__typingLock) window.G.__typingLock = true;
 
     prepareTyping(el);
-
-    let usedFallback = false;
-    let finished = false;
-
-    if (typeof window.runTyping === 'function') {
-      await Promise.race([
-        new Promise((resolve) => {
-          try {
-            window.runTyping(
-              el,
-              text,
-              () => { finished = true; resolve(); },
-              { speed, cursor: true }
-            );
-          } catch (e) {
-            console.warn('[JCSenha] runTyping erro, fallback local.', e);
-            usedFallback = true;
-            resolve();
-          }
-        }),
-        (async () => {
-          await sleep(BRIDGE_TIMEOUT);
-          if (!finished) {
-            usedFallback = true;
-          }
-        })()
-      ]);
-    } else {
-      usedFallback = true;
-    }
-
-    if (usedFallback) {
-      await localType(el, text, speed);
-    }
-
+    await localType(el, text, TYPING_MS);
     restoreTyping(el);
-    return text;
-  }
 
-  async function waitBridge(ms = 2000) {
-    const t0 = Date.now();
-    while (Date.now() - t0 < ms) {
-      if (window.runTyping) return true;
-      await sleep(100);
-    }
-    return true;
+    return text;
   }
 
   function armObserver(root) {
@@ -213,7 +177,7 @@
     const { p1, p2, p3, p4, input, next, prev } = pick(root);
     const seq = [p1, p2, p3, p4].filter(Boolean);
 
-    // Travar botões e mutar TTS geral
+    // Travar botões e mutar TTS geral durante a sequência
     prev?.setAttribute('disabled', 'true');
     next?.setAttribute('disabled', 'true');
     window.G = window.G || {};
@@ -227,13 +191,11 @@
       delete p?.dataset?.spoken;
     });
 
-    await waitBridge();
-
-    // Sequência estrita
+    // Sequência estrita: digita -> fala -> pausa -> próximo
     for (const p of seq) {
-      const text = await typeOnce(p, TYPING_MS);
+      const text = await typeOnce(p);
 
-      // abrir o lock SÓ para nossa fala deste parágrafo
+      // abre o lock SÓ para nossa fala deste parágrafo
       const wasLocked = window.G.__typingLock;
       window.G.__typingLock = false;
       if (text && !p.dataset.spoken) {
@@ -241,12 +203,12 @@
         p.dataset.spoken = 'true';
       }
       // fecha lock novamente antes do próximo parágrafo
-      window.G.__typingLock = true;
+      window.G.__typingLock = wasLocked || true;
 
       await sleep(PAUSE_BETWEEN_P);
     }
 
-    // Final: libera lock global ao estado anterior
+    // Final: restaura lock global ao estado anterior
     window.G.__typingLock = prevLock;
 
     prev?.removeAttribute('disabled');
@@ -306,9 +268,9 @@
     if (!root) return;
     const { p1, p2, p3, p4 } = pick(root);
     [p1, p2, p3, p4].filter(Boolean).forEach(p => {
-      if (ensureDataText(p) && !p.classList.contains('typing-done')) {
-        p.textContent = '';
-      }
+      if (ensureDataText(p)) p.textContent = ''; // força re-digitar
+      p?.classList.remove('typing-done', 'typing-active');
+      delete p?.dataset?.spoken;
     });
     initFor(root);
   };
@@ -317,7 +279,7 @@
   if (!window.JCSenha.state.listenerAdded) {
     document.addEventListener('section:shown', (evt) => {
       if (evt?.detail?.sectionId === 'section-senha') {
-        console.log('[JCSenha] section:shown → init (v6)');
+        console.log('[JCSenha] section:shown → init (v7)');
         window.JCSenha.__kick();
       }
     });
@@ -328,7 +290,7 @@
   const tryImmediate = () => {
     const root = document.querySelector(sel.root);
     if (root && visible(root)) {
-      console.log('[JCSenha] Boot imediato (v6).');
+      console.log('[JCSenha] Boot imediato (v7).');
       window.JCSenha.__kick();
     }
   };
@@ -342,7 +304,7 @@
   setTimeout(() => {
     const root = document.querySelector(sel.root);
     if (root && visible(root) && !root.querySelector('.typing-active') && !root.querySelector('.typing-done')) {
-      console.log('[JCSenha] Watchdog v6 — iniciando sequência.');
+      console.log('[JCSenha] Watchdog v7 — iniciando sequência.');
       window.JCSenha.__kick();
     }
   }, 900);
