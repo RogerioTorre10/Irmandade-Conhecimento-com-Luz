@@ -32,6 +32,22 @@
     });
   };
 
+  async function waitForDependencies() {
+    const maxAttempts = 20;
+    let attempts = 0;
+    while (
+      (!window.runTyping || typeof window.runTyping !== 'function') ||
+      (!window.typeText || typeof window.typeText !== 'function')
+    ) {
+      if (attempts++ >= maxAttempts) {
+        console.warn('[JCSenha] runTyping ou typeText não disponíveis após várias tentativas');
+        return false;
+      }
+      await new Promise(r => setTimeout(r, 200));
+    }
+    return true;
+  }
+
   function getText(el) {
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
   }
@@ -39,7 +55,7 @@
   async function applyTyping(el) {
     if (!el || el.dataset.typing !== 'true') return;
     const text = getText(el);
-    el.removeAttribute('data-text'); // impede reescrita automática
+    el.removeAttribute('data-text');
     el.textContent = '';
     el.classList.remove('typing-done');
     el.classList.remove('typing-active');
@@ -59,6 +75,9 @@
 
     const root = document.getElementById('section-senha');
     if (!root || root.dataset.senhaInitialized === 'true') return;
+
+    const ready = await waitForDependencies();
+    if (!ready) return;
 
     console.log('[JCSenha] Root encontrado:', root);
     root.dataset.senhaInitialized = 'true';
