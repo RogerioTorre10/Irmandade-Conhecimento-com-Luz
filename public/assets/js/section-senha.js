@@ -1,8 +1,9 @@
-// section-senha.js — 18/out (patch Lumen v2)
-// - Datilografia sequencial (p1→p2→p3→p4), sem depender de data-typing
-// - Leitura (speak) 1x por parágrafo
-// - Olho mágico + botões estáveis
-// - Idempotente entre reaberturas
+// section-senha.js — 18/out (patch Lumen v3)
+// - Bloqueia TTS antes da digitação (G.__typingLock)
+// - Normaliza parágrafos (usa data-text; se vier inteiro, converte p/ datilografar)
+// - Datilografia sequencial p1→p2→p3→p4 com speak 1x no fim de cada parágrafo
+// - Observa reinjeções (MutationObserver) e retoma com segurança
+// - Botões só liberam ao final; olho mágico estável; idempotente
 
 (function () {
   'use strict';
@@ -17,14 +18,44 @@
   window.JCSenha.state = {
     ready: false,
     listenerAdded: false,
-    typingInProgress: false
+    typingInProgress: false,
+    observer: null
   };
 
-  // Utils
+  // ---------- Utils ----------
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-  const getText = (el) => (el?.dataset?.text ?? el?.textContent ?? '').trim();
+  const textOf = (el) => {
+    if (!el) return '';
+    const ds = el.dataset?.text;
+    const tc = el.textContent || '';
+    // Preferimos data-text; se não existir, usa textContent
+    return (ds && ds.trim().length ? ds : tc).trim();
+  };
 
-  // Fallback local de digitação (se runTyping não existir)
+  // Prepara o elemento para datilografia:
+  // - garante data-text como fonte
+  // - apaga conteúdo visual (para digitar)
+  function normalizeParagraph(el) {
+    if (!el) return false;
+    const current = el.textContent?.trim() || '';
+    const ds = el.dataset?.text?.trim() || '';
+    const source = ds || current;
+
+    if (!source) return false;
+
+    // Sempre manter a fonte no data-text
+    el.dataset.text = source;
+
+    // Se ainda não foi digitado, limpar visual para datilografar
+    if (!el.classList.contains('typing-done')) {
+      el.textContent = '';
+      el.classList.remove('typing-active', 'typing-done');
+      delete el.dataset.spoken;
+    }
+    return true;
+  }
+
+  // Fallback local de digitação se runTyping não existir
   async function localType(el, text, speed = 36) {
     return new Promise(resolve => {
       let i = 0;
@@ -34,7 +65,6 @@
           el.textContent += text.charAt(i++);
           setTimeout(tick, speed);
         } else {
-          el.classList.add('typing-done');
           resolve();
         }
       };
@@ -44,18 +74,22 @@
 
   async function typeOnce(el, { speed = 36, speak = true } = {}) {
     if (!el) return;
-    const text = getText(el);
-    // Sempre normaliza o estado visual
-    el.removeAttribute('data-text');
-    el.classList.remove('typing-done', 'typing-active');
-    el.textContent = '';
+    // Fonte SEMPRE vem do data-text
+    const text = (el.dataset?.text || '').trim();
+    if (!text) return;
 
-    await sleep(120);
+    // trava TTS global de terceiros
+    window.G = window.G || {};
+    const prevLock = !!window.G.__typingLock;
+    window.G.__typingLock = true;
+
+    // Não zerar data-text! (é a nossa fonte garantida)
+    el.classList.add('typing-active');
+    el.classList.remove('typing-done');
 
     let usedFallback = false;
 
     if (typeof window.runTyping === 'function') {
-      // Usa seu TypingBridge quando disponível
       await new Promise((resolve) => {
         try {
           window.runTyping(
@@ -78,23 +112,30 @@
       await localType(el, text, speed);
     }
 
-    // Fala 1x por parágrafo (com pequena proteção contra duplicidade)
+    el.classList.remove('typing-active');
+    el.classList.add('typing-done');
+
+    // libera TTS global ANTES de falar este parágrafo
+    window.G.__typingLock = prevLock;
+
+    // Fala 1x por parágrafo, somente após concluir
     if (speak && text && window.EffectCoordinator?.speak && !el.dataset.spoken) {
       try {
         window.EffectCoordinator.speak(text);
         el.dataset.spoken = 'true';
       } catch {}
     }
+
+    await sleep(80);
   }
 
-  async function waitForDependencies(maxMs = 4000) {
+  async function waitForTypingBridge(maxMs = 3000) {
     const t0 = Date.now();
     while (Date.now() - t0 < maxMs) {
-      // Mesmo que runTyping não chegue, seguimos (temos fallback).
-      if (window.runTyping || Date.now() - t0 > 800) return true;
+      if (window.runTyping) return true;
       await sleep(100);
     }
-    return true;
+    return true; // seguimos com fallback
   }
 
   function pickElements(root) {
@@ -117,30 +158,54 @@
     const { instr1, instr2, instr3, instr4, input, btnNext, btnPrev } = pickElements(root);
     const seq = [instr1, instr2, instr3, instr4].filter(Boolean);
 
-    // Se não houver textos, não bloqueia a navegação
-    if (seq.length === 0) {
-      btnPrev?.removeAttribute('disabled');
-      btnNext?.removeAttribute('disabled');
-      window.JCSenha.state.typingInProgress = false;
-      return;
-    }
+    // Desabilita navegação durante a digitação
+    btnPrev?.setAttribute('disabled', 'true');
+    btnNext?.setAttribute('disabled', 'true');
+
+    // Normaliza todos antes (evita TTS prematuro)
+    seq.forEach(normalizeParagraph);
+
+    await waitForTypingBridge();
 
     for (const el of seq) {
-      // Só digita se ainda não foi concluído anteriormente
+      // Só digita se ainda não concluído
       if (!el.classList.contains('typing-done')) {
         await typeOnce(el, { speed: 36, speak: true });
       }
-      await sleep(120);
     }
 
-    // Libera navegação ao final
+    // Libera navegação e foca input
     btnPrev?.removeAttribute('disabled');
     btnNext?.removeAttribute('disabled');
-
-    // Foco no input
     try { input?.focus(); } catch {}
 
     window.JCSenha.state.typingInProgress = false;
+  }
+
+  function armObserver(root) {
+    // Observa reinjeções no section (oscilação)
+    try {
+      if (window.JCSenha.state.observer) {
+        window.JCSenha.state.observer.disconnect();
+      }
+      const obs = new MutationObserver((mutations) => {
+        // Se algo relevante mudou, retomamos a sequência (sem duplicar fala porque marcamos spoken)
+        let needRetype = false;
+        for (const m of mutations) {
+          if (m.type === 'childList' || m.type === 'subtree' || m.addedNodes?.length) {
+            needRetype = true; break;
+          }
+        }
+        if (needRetype && !window.JCSenha.state.typingInProgress) {
+          // Re-normaliza e roda novamente
+          const { instr1, instr2, instr3, instr4 } = pickElements(root);
+          [instr1, instr2, instr3, instr4].filter(Boolean).forEach(normalizeParagraph);
+          runTypingSequence(root);
+        }
+      });
+      obs.observe(root, { childList: true, subtree: true, characterData: true });
+      window.JCSenha.state.observer = obs;
+    } catch {}
   }
 
   const onShown = async (evt) => {
@@ -150,15 +215,7 @@
     const root = document.getElementById('section-senha');
     if (!root) return;
 
-    // Em reaberturas, apenas relança a sequência se necessário
-    if (root.dataset.senhaInitialized === 'true') {
-      runTypingSequence(root);
-      return;
-    }
-
-    await waitForDependencies();
-
-    // Blindagem visual (sem brigar com showSection)
+    // Blindagem visual leve (sem brigar com showSection)
     root.classList.remove('hidden');
     root.setAttribute('aria-hidden', 'false');
     root.style.removeProperty('display');
@@ -166,41 +223,47 @@
     root.style.removeProperty('visibility');
     root.style.zIndex = 'auto';
 
-    const { input, toggle, btnNext, btnPrev } = pickElements(root);
+    if (root.dataset.senhaInitialized === 'true') {
+      // Reabertura: apenas roda (pega reinjeções)
+      runTypingSequence(root);
+      return;
+    }
 
-    // Estado inicial dos botões — travados até concluir a sequência
+    const { input, toggle, btnNext, btnPrev, instr1, instr2, instr3, instr4 } = pickElements(root);
+
+    // Estado inicial dos botões: travados
     btnPrev?.setAttribute('disabled', 'true');
     btnNext?.setAttribute('disabled', 'true');
 
     // Olho mágico
-    if (toggle) {
-      toggle.addEventListener('click', () => {
-        if (!input) return;
-        input.type = input.type === 'password' ? 'text' : 'password';
-      });
-    }
+    toggle?.addEventListener('click', () => {
+      if (!input) return;
+      input.type = input.type === 'password' ? 'text' : 'password';
+    });
 
     // Navegação
-    if (btnPrev) {
-      btnPrev.addEventListener('click', () => {
-        try { window.JC?.show('section-termos'); } catch {}
-      });
-    }
+    btnPrev?.addEventListener('click', () => {
+      try { window.JC?.show('section-termos'); } catch {}
+    });
 
-    if (btnNext) {
-      btnNext.addEventListener('click', () => {
-        if (!input) return;
-        const senha = (input.value || '').trim();
-        if (senha.length >= 3) {
-          try { window.JC?.show('section-filme'); } catch {}
-        } else {
-          window.toast?.('Digite uma Palavra-Chave válida.', 'warning');
-          try { input.focus(); } catch {}
-        }
-      });
-    }
+    btnNext?.addEventListener('click', () => {
+      if (!input) return;
+      const senha = (input.value || '').trim();
+      if (senha.length >= 3) {
+        try { window.JC?.show('section-filme'); } catch {}
+      } else {
+        window.toast?.('Digite uma Palavra-Chave válida.', 'warning');
+        try { input.focus(); } catch {}
+      }
+    });
 
-    // Marca como inicializada e inicia sequência
+    // Normaliza imediatamente todos os parágrafos (evita TTS precoce)
+    [instr1, instr2, instr3, instr4].filter(Boolean).forEach(normalizeParagraph);
+
+    // Observa reinjeções/oscilações
+    armObserver(root);
+
+    // Marca e executa
     root.dataset.senhaInitialized = 'true';
     runTypingSequence(root);
 
