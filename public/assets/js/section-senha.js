@@ -17,6 +17,37 @@
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
   }
 
+  function waitForRender(el, timeout = 3000) {
+    return new Promise((resolve) => {
+      const start = performance.now();
+      const tick = () => {
+        const visible = el && el.offsetParent !== null;
+        if (visible || performance.now() - start > timeout) {
+          resolve();
+        } else {
+          requestAnimationFrame(tick);
+        }
+      };
+      tick();
+    });
+  }
+
+  async function applyTypingWithDelay(el) {
+    if (!el || el.dataset.typing !== 'true') return;
+    const text = getText(el);
+    el.classList.remove('typing-done');
+    el.classList.remove('typing-active');
+    el.textContent = '';
+    await waitForRender(el);
+    if (typeof window.runTyping === 'function') {
+      window.runTyping(el, text, () => {
+        window.EffectCoordinator?.speak(text);
+      }, { speed: 36, cursor: true });
+    } else {
+      el.textContent = text;
+    }
+  }
+
   const handler = async (evt) => {
     const { sectionId } = evt?.detail || {};
     if (sectionId !== 'section-senha') return;
@@ -81,26 +112,9 @@
       senhaWrap.appendChild(actionsContainer);
     }
 
-    // ✅ Forçar datilografia e leitura com delay
+    // ✅ Aplicar datilografia com delay inteligente
     const instrs = [instr1, instr2, instr3, instr4];
-    for (const el of instrs) {
-      if (el && el.dataset.typing === 'true') {
-        const text = getText(el);
-        el.classList.remove('typing-done');
-        el.classList.remove('typing-active');
-        el.textContent = '';
-        setTimeout(() => {
-          if (typeof window.runTyping === 'function') {
-            window.runTyping(el, text, () => {
-              window.EffectCoordinator?.speak(text);
-            }, { speed: 36, cursor: true });
-          } else {
-            console.warn('[JCSenha] runTyping não disponível, fallback aplicado');
-            el.textContent = text;
-          }
-        }, 100);
-      }
-    }
+    instrs.forEach(el => applyTypingWithDelay(el));
 
     // Mostrar/ocultar senha
     toggleBtn.addEventListener('click', () => {
