@@ -13,32 +13,37 @@
     listenerAdded: false
   };
 
-  function getText(el) {
-    return (el?.dataset?.text ?? el?.textContent ?? '').trim();
-  }
-
-  function waitForRender(el, timeout = 3000) {
+  // ✅ Efeito datilografia restaurado
+  window.typeText = function (el, text, speed = 36, cursor = true) {
     return new Promise((resolve) => {
-      const start = performance.now();
+      let i = 0;
+      el.textContent = '';
       const tick = () => {
-        const visible = el && el.offsetParent !== null;
-        if (visible || performance.now() - start > timeout) {
-          resolve();
+        if (i < text.length) {
+          el.textContent += text.charAt(i);
+          i++;
+          setTimeout(tick, speed);
         } else {
-          requestAnimationFrame(tick);
+          el.classList.add('typing-done');
+          resolve();
         }
       };
       tick();
     });
+  };
+
+  function getText(el) {
+    return (el?.dataset?.text ?? el?.textContent ?? '').trim();
   }
 
-  async function applyTypingWithDelay(el) {
+  async function applyTyping(el) {
     if (!el || el.dataset.typing !== 'true') return;
     const text = getText(el);
+    el.removeAttribute('data-text'); // impede reescrita automática
+    el.textContent = '';
     el.classList.remove('typing-done');
     el.classList.remove('typing-active');
-    el.textContent = '';
-    await waitForRender(el);
+    await new Promise(r => setTimeout(r, 300));
     if (typeof window.runTyping === 'function') {
       window.runTyping(el, text, () => {
         window.EffectCoordinator?.speak(text);
@@ -74,59 +79,23 @@
     let avancarBtn = root.querySelector('#btn-senha-avancar');
     let prevBtn = root.querySelector('#btn-senha-prev');
 
-    // Criar elementos se não existirem
-    if (!senhaInput || !toggleBtn || !avancarBtn || !prevBtn) {
-      const inputContainer = document.createElement('div');
-      inputContainer.className = 'senha-input-group';
-      inputContainer.id = 'senha-input-container';
-
-      senhaInput = document.createElement('input');
-      senhaInput.id = 'senha-input';
-      senhaInput.type = 'password';
-      senhaInput.placeholder = 'Digite a Palavra-Chave';
-
-      toggleBtn = document.createElement('button');
-      toggleBtn.className = 'btn-toggle-senha';
-      toggleBtn.textContent = '👁️';
-
-      avancarBtn = document.createElement('button');
-      avancarBtn.id = 'btn-senha-avancar';
-      avancarBtn.className = 'btn btn-primary btn-stone';
-      avancarBtn.textContent = 'Acessar Jornada';
-
-      prevBtn = document.createElement('button');
-      prevBtn.id = 'btn-senha-prev';
-      prevBtn.className = 'btn btn-primary btn-stone';
-      prevBtn.textContent = 'Voltar';
-
-      inputContainer.appendChild(senhaInput);
-      inputContainer.appendChild(toggleBtn);
-
-      const actionsContainer = document.createElement('div');
-      actionsContainer.className = 'parchment-actions-rough';
-      actionsContainer.appendChild(prevBtn);
-      actionsContainer.appendChild(avancarBtn);
-
-      const senhaWrap = root.querySelector('.senha-wrap') || root;
-      senhaWrap.appendChild(inputContainer);
-      senhaWrap.appendChild(actionsContainer);
+    // Aplicar datilografia com segurança
+    const instrs = [instr1, instr2, instr3, instr4];
+    for (const el of instrs) {
+      applyTyping(el);
     }
 
-    // ✅ Aplicar datilografia com delay inteligente
-    const instrs = [instr1, instr2, instr3, instr4];
-    instrs.forEach(el => applyTypingWithDelay(el));
-
     // Mostrar/ocultar senha
-    toggleBtn.addEventListener('click', () => {
+    toggleBtn?.addEventListener('click', () => {
       senhaInput.type = senhaInput.type === 'password' ? 'text' : 'password';
     });
 
     // Navegação
-    prevBtn.addEventListener('click', () => {
+    prevBtn?.addEventListener('click', () => {
       window.JC?.show('section-termos');
     });
 
-    avancarBtn.addEventListener('click', () => {
+    avancarBtn?.addEventListener('click', () => {
       const senha = senhaInput.value.trim();
       if (senha.length >= 3) {
         window.JC?.show('section-filme');
