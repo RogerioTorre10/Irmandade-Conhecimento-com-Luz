@@ -1,43 +1,43 @@
-// section-senha.js — v13 (ultrarrápido: start imediato + anti-invasão)
-// - Dispara imediatamente (no load, microtask e rAF) e em section:shown
-// - Sem probe/intervalos: zero espera pra começar
-// - Anti-invasão: aborta se outra seção for mostrada
+// section-senha.js — v14 (start instantâneo + back fix + olho mágico + leitura)
+// - rAF loop até 2s caça elementos e inicia imediatamente (sem delays perceptíveis)
+// - Anti-invasão: aborta se outra seção assumir (section:shown != section-senha)
 // - Datilografia local (E→D) + Leitura por parágrafo (aguarda Promise; senão, estima)
 // - Botões habilitados e olho mágico ativo
+// - Botão Voltar redireciona para o site (data-back-href > root data > JC.homeUrl > referrer > "/")
 
 (function () {
   'use strict';
 
-  if (window.JCSenha?.__bound_v13) {
-    // rearmar se já carregado
-    window.JCSenha.__kick?.(/*force*/true);
+  if (window.JCSenha?.__bound_v14) {
+    window.JCSenha.__kick?.(true);
     return;
   }
 
   // ===== Config =====
-  const TYPE_MS = 55;          // ms/char (datilografia)
-  const PAUSE_BETWEEN_P = 90;  // pausa curtinha entre parágrafos
-  const EST_WPM = 160;         // fallback p/ TTS
+  const TYPE_MS = 55;          // ms/char (ajuste fino)
+  const PAUSE_BETWEEN_P = 90;  // pausa curta entre parágrafos
+  const EST_WPM = 160;         // fallback TTS
   const EST_CPS = 13;
+  const EAGER_RAF_MS = 2000;   // janela máx. para "caçar" parágrafos via rAF (start imediato)
 
   // ===== Estado / Namespace =====
   window.JCSenha = window.JCSenha || {};
-  window.JCSenha.__bound_v13 = true;
+  window.JCSenha.__bound_v14 = true;
   window.JCSenha.state = {
     running: false,
-    observer: null,
-    abortId: 0
+    abortId: 0,
+    observer: null
   };
 
   // ===== Utils =====
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
   const qs = (s, r=document) => r.querySelector(s);
 
-  // CSS para garantir E→D durante digitação (vence centralização do pai)
+  // CSS: garante E→D durante a digitação mesmo com containers centralizados
   (function injectCSS(){
-    if (document.getElementById('jc-senha-align-patch-v13')) return;
+    if (document.getElementById('jc-senha-align-patch-v14')) return;
     const s = document.createElement('style');
-    s.id='jc-senha-align-patch-v13';
+    s.id='jc-senha-align-patch-v14';
     s.textContent = `
       #section-senha .typing-active{
         text-align:left !important; direction:ltr !important;
@@ -134,14 +134,14 @@
       if(window.EffectCoordinator?.speak){
         const r=window.EffectCoordinator.speak(text);
         if(r && typeof r.then==='function'){
-          await Promise.race([r, (async()=>{while(!myAbort.cancelled()) await sleep(20);})()]);
+          await Promise.race([r, (async()=>{while(!myAbort.cancelled()) await sleep(15);})()]);
           return;
         }
       }
     }catch{}
     const ms = estSpeakMs(text);
     const t0 = Date.now();
-    while(!myAbort.cancelled() && (Date.now()-t0)<ms) await sleep(20);
+    while(!myAbort.cancelled() && (Date.now()-t0)<ms) await sleep(15);
   }
 
   function makeAbortToken(){
@@ -165,6 +165,7 @@
 
   function bindControls(root){
     const { input, toggle, next, prev } = pick(root);
+
     // Habilita botões já
     prev?.removeAttribute('disabled');
     next?.removeAttribute('disabled');
@@ -178,11 +179,29 @@
       toggle.__senhaBound = true;
     }
 
-    // Navegação
+    // Voltar → site Jornada Conhecimento (com cascata de destinos)
     if (prev && !prev.__senhaBound) {
-      prev.addEventListener('click', () => { try { window.JC?.show?.('section-termos'); } catch {} });
+      prev.addEventListener('click', () => {
+        const rootEl = qs('#section-senha');
+        const candidates = [
+          prev.dataset?.backHref,
+          prev.getAttribute?.('data-href'),
+          rootEl?.dataset?.backHref,
+          window.JC?.homeUrl,
+          (document.referrer && new URL(document.referrer).origin === window.location.origin ? document.referrer : null),
+          '/'
+        ].filter(Boolean);
+        const target = candidates[0];
+        try {
+          window.top.location.assign(target);
+        } catch {
+          window.location.href = target;
+        }
+      });
       prev.__senhaBound = true;
     }
+
+    // Avançar (mantive sua lógica)
     if (next && !next.__senhaBound) {
       next.addEventListener('click', () => {
         if (!input) return;
@@ -200,10 +219,10 @@
     window.JCSenha.state.running = true;
     const myAbort = makeAbortToken();
 
-    // Normaliza e limpa visual (start imediato)
     const seq = getSeq(root);
     if (seq.length === 0) { window.JCSenha.state.running=false; return; }
 
+    // Normaliza e limpa visual (start já)
     seq.forEach(p=>{
       if(ensureDataText(p)) p.textContent='';
       p.classList.remove('typing-done','typing-active');
@@ -214,7 +233,6 @@
       p.style.marginLeft='0'; p.style.marginRight='auto';
     });
 
-    // Sequência: digita -> fala -> pausa -> próximo (abortável)
     for (const p of seq){
       if (myAbort.cancelled()) break;
       const text = await typeOnce(p, myAbort);
@@ -225,7 +243,7 @@
         p.dataset.spoken='true';
       }
       const t0=Date.now();
-      while(!myAbort.cancelled() && (Date.now()-t0)<PAUSE_BETWEEN_P) await sleep(10);
+      while(!myAbort.cancelled() && (Date.now()-t0)<PAUSE_BETWEEN_P) await sleep(8);
     }
 
     window.JCSenha.state.running = false;
@@ -235,7 +253,6 @@
     try{
       if (window.JCSenha.state.observer) window.JCSenha.state.observer.disconnect();
       const obs=new MutationObserver(()=>{
-        // Se reinjetar e não estiver rodando, dispara já
         if (!window.JCSenha.state.running) runSequence(root);
       });
       obs.observe(root,{childList:true,subtree:true});
@@ -243,11 +260,12 @@
     }catch{}
   }
 
-  function tryKick(force=false){
+  // Kick sem esperar nada: rAF loop caça parágrafos até 2s
+  function eagerKick(){
     const root = qs(sel.root);
-    if(!root) return false;
+    if (!root) return;
 
-    // Garante visível (sem brigar com controlador)
+    // garantir visibilidade estrutural
     root.classList.remove('hidden');
     root.setAttribute('aria-hidden','false');
     root.style.removeProperty('display');
@@ -256,32 +274,44 @@
 
     bindControls(root);
     armObserver(root);
-    runSequence(root);
-    return true;
+
+    const t0 = performance.now();
+    const hunt = () => {
+      if (getSeq(root).length > 0) {
+        runSequence(root);
+        return;
+      }
+      if ((performance.now() - t0) < EAGER_RAF_MS) {
+        requestAnimationFrame(hunt);
+      } else {
+        // como fallback extremo, tenta assim mesmo
+        runSequence(root);
+      }
+    };
+    requestAnimationFrame(hunt);
   }
 
   // API pública
-  window.JCSenha.__kick = (force=false)=>tryKick(force);
+  window.JCSenha.__kick = ()=>eagerKick();
 
-  // Eventos oficiais: iniciar na hora; abortar quando outra seção aparece
+  // Eventos oficiais
   document.addEventListener('section:shown', (evt)=>{
     const id = evt?.detail?.sectionId;
     if(!id) return;
+    // se outra seção aparecer, aborta; se senha aparecer, inicia JÁ
     if (id === 'section-senha') {
-      // cancela qualquer execução antiga e dispara JÁ
       window.JCSenha.state.abortId++;
-      tryKick(true);
+      eagerKick();
     } else {
-      // outra seção assumiu → aborta datilografia/leitura aqui
       window.JCSenha.state.abortId++;
     }
   });
 
-  // Disparos imediatos (sem depender de nada)
-  tryKick(true);
-  Promise.resolve().then(()=>tryKick(true));
+  // Disparos imediatos: no load, microtask e rAF
+  eagerKick();
+  Promise.resolve().then(()=>eagerKick());
   if (typeof requestAnimationFrame === 'function') {
-    requestAnimationFrame(()=>tryKick(true));
+    requestAnimationFrame(()=>eagerKick());
   }
 
 })();
