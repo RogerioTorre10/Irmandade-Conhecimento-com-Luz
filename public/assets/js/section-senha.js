@@ -1,9 +1,9 @@
-// section-senha.js — 18/out (patch Lumen v3)
-// - Bloqueia TTS antes da digitação (G.__typingLock)
-// - Normaliza parágrafos (usa data-text; se vier inteiro, converte p/ datilografar)
-// - Datilografia sequencial p1→p2→p3→p4 com speak 1x no fim de cada parágrafo
-// - Observa reinjeções (MutationObserver) e retoma com segurança
-// - Botões só liberam ao final; olho mágico estável; idempotente
+// section-senha.js — 18/out (patch Lumen v4)
+// - Mute TTS e normalização ANTES de qualquer leitura
+// - Digitação LTR e alinhada à esquerda (evita crescer a partir do centro)
+// - Velocidade ajustável (DEFAULT_TYPING_MS)
+// - Espera TTS de cada parágrafo terminar antes do próximo
+// - Observa reinjeções e re-aplica datilografia sem duplicar leituras
 
 (function () {
   'use strict';
@@ -12,6 +12,12 @@
     console.log('[JCSenha] Já inicializado, ignorando...');
     return;
   }
+
+  // ========= Config =========
+  const DEFAULT_TYPING_MS = 55;      // ms por caractere (ajuste fino aqui)
+  const MIN_PAUSE_BETWEEN_P = 120;   // respiro entre parágrafos
+  const EST_WPM = 155;               // fallback de TTS ~155 palavras/min
+  const EST_CHARS_PER_SEC = 13;      // fallback alternativo (~13 cps)
 
   window.JCSenha = window.JCSenha || {};
   window.JCSenha.__bound = true;
@@ -22,41 +28,76 @@
     observer: null
   };
 
-  // ---------- Utils ----------
+  // -------- Utils ----------
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-  const textOf = (el) => {
-    if (!el) return '';
-    const ds = el.dataset?.text;
-    const tc = el.textContent || '';
-    // Preferimos data-text; se não existir, usa textContent
-    return (ds && ds.trim().length ? ds : tc).trim();
-  };
 
-  // Prepara o elemento para datilografia:
-  // - garante data-text como fonte
-  // - apaga conteúdo visual (para digitar)
-  function normalizeParagraph(el) {
+  function estimateSpeakMs(text) {
+    const t = (text || '').trim();
+    if (!t) return 300;
+    const words = t.split(/\s+/).length;
+    const byWpm = (words / EST_WPM) * 60_000;          // ms
+    const byCps = (t.length / EST_CHARS_PER_SEC) * 1e3;
+    // pega o MAIOR para não cortar leitura curta
+    return Math.max(byWpm, byCps, 700);
+  }
+
+  async function speakOnce(text) {
+    if (!text) return;
+    try {
+      if (window.EffectCoordinator?.speak) {
+        const ret = window.EffectCoordinator.speak(text);
+        if (ret && typeof ret.then === 'function') {
+          // seu speak retorna Promise → aguardamos o término real
+          await ret;
+          return;
+        }
+      }
+    } catch {}
+    // fallback: estimar duração
+    await sleep(estimateSpeakMs(text));
+  }
+
+  // texto base SEMPRE vem de data-text; se não existir, extrai de textContent
+  function ensureDataText(el) {
     if (!el) return false;
-    const current = el.textContent?.trim() || '';
-    const ds = el.dataset?.text?.trim() || '';
-    const source = ds || current;
-
+    const ds = el.dataset?.text?.trim();
+    const tc = (el.textContent || '').trim();
+    const source = ds || tc;
     if (!source) return false;
-
-    // Sempre manter a fonte no data-text
-    el.dataset.text = source;
-
-    // Se ainda não foi digitado, limpar visual para datilografar
-    if (!el.classList.contains('typing-done')) {
-      el.textContent = '';
-      el.classList.remove('typing-active', 'typing-done');
-      delete el.dataset.spoken;
-    }
+    el.dataset.text = source;  // mantém como fonte
     return true;
   }
 
-  // Fallback local de digitação se runTyping não existir
-  async function localType(el, text, speed = 36) {
+  function prepareForTyping(el) {
+    if (!el) return false;
+    // guarda estado visual para restaurar depois
+    if (!('prevAlign' in el.dataset)) el.dataset.prevAlign = el.style.textAlign || '';
+    if (!('prevDir' in el.dataset))   el.dataset.prevDir   = el.getAttribute('dir') || '';
+
+    // força LTR + alinhado à esquerda para crescer “da esquerda → direita”
+    el.style.textAlign = 'left';
+    el.setAttribute('dir', 'ltr');
+
+    // limpa conteúdo visível para digitar
+    el.textContent = '';
+    el.classList.remove('typing-done');
+    el.classList.add('typing-active');
+    delete el.dataset.spoken;
+    return true;
+  }
+
+  function restoreAfterTyping(el) {
+    if (!el) return;
+    el.classList.remove('typing-active');
+    el.classList.add('typing-done');
+
+    // restaura estilo visual original
+    el.style.textAlign = el.dataset.prevAlign || '';
+    if (el.dataset.prevDir) el.setAttribute('dir', el.dataset.prevDir); else el.removeAttribute('dir');
+  }
+
+  // Fallback local (se TypingBridge ausente)
+  async function localType(el, text, speed = DEFAULT_TYPING_MS) {
     return new Promise(resolve => {
       let i = 0;
       el.textContent = '';
@@ -72,23 +113,19 @@
     });
   }
 
-  async function typeOnce(el, { speed = 36, speak = true } = {}) {
-    if (!el) return;
-    // Fonte SEMPRE vem do data-text
+  async function typeOnce(el, { speed = DEFAULT_TYPING_MS } = {}) {
+    if (!el) return '';
     const text = (el.dataset?.text || '').trim();
-    if (!text) return;
+    if (!text) return '';
 
-    // trava TTS global de terceiros
+    // trava TTS global
     window.G = window.G || {};
     const prevLock = !!window.G.__typingLock;
     window.G.__typingLock = true;
 
-    // Não zerar data-text! (é a nossa fonte garantida)
-    el.classList.add('typing-active');
-    el.classList.remove('typing-done');
+    prepareForTyping(el);
 
     let usedFallback = false;
-
     if (typeof window.runTyping === 'function') {
       await new Promise((resolve) => {
         try {
@@ -112,33 +149,23 @@
       await localType(el, text, speed);
     }
 
-    el.classList.remove('typing-active');
-    el.classList.add('typing-done');
-
-    // libera TTS global ANTES de falar este parágrafo
+    restoreAfterTyping(el);
+    // libera lock de TTS (agora podemos falar este parágrafo)
     window.G.__typingLock = prevLock;
 
-    // Fala 1x por parágrafo, somente após concluir
-    if (speak && text && window.EffectCoordinator?.speak && !el.dataset.spoken) {
-      try {
-        window.EffectCoordinator.speak(text);
-        el.dataset.spoken = 'true';
-      } catch {}
-    }
-
-    await sleep(80);
+    return text;
   }
 
-  async function waitForTypingBridge(maxMs = 3000) {
+  async function waitForTypingBridge(maxMs = 2500) {
     const t0 = Date.now();
     while (Date.now() - t0 < maxMs) {
       if (window.runTyping) return true;
       await sleep(100);
     }
-    return true; // seguimos com fallback
+    return true;
   }
 
-  function pickElements(root) {
+  function els(root) {
     return {
       instr1: root.querySelector('#senha-instr1'),
       instr2: root.querySelector('#senha-instr2'),
@@ -151,30 +178,59 @@
     };
   }
 
-  async function runTypingSequence(root) {
+  async function runSequence(root) {
     if (window.JCSenha.state.typingInProgress) return;
     window.JCSenha.state.typingInProgress = true;
 
-    const { instr1, instr2, instr3, instr4, input, btnNext, btnPrev } = pickElements(root);
+    const { instr1, instr2, instr3, instr4, input, btnNext, btnPrev } = els(root);
     const seq = [instr1, instr2, instr3, instr4].filter(Boolean);
 
-    // Desabilita navegação durante a digitação
+    // Desliga botões durante a sequência
     btnPrev?.setAttribute('disabled', 'true');
     btnNext?.setAttribute('disabled', 'true');
 
-    // Normaliza todos antes (evita TTS prematuro)
-    seq.forEach(normalizeParagraph);
+    // MUTE GERAL DE TTS ANTES DE QUALQUER COISA
+    window.G = window.G || {};
+    const prevLock = !!window.G.__typingLock;
+    window.G.__typingLock = true;
 
+    // Normaliza fonte dos textos ANTES de qualquer leitor varrer
+    seq.forEach((p) => {
+      if (ensureDataText(p)) {
+        // se houver texto visível, limpa já para evitar leitura precoce
+        if ((p.textContent || '').trim()) p.textContent = '';
+      }
+    });
+
+    // Pronto, agora tornamos visível sem risco de leitura fora de hora
     await waitForTypingBridge();
 
-    for (const el of seq) {
-      // Só digita se ainda não concluído
-      if (!el.classList.contains('typing-done')) {
-        await typeOnce(el, { speed: 36, speak: true });
+    // Sequência: digita → fala → pausa → próximo
+    for (const p of seq) {
+      if (!p) continue;
+
+      // se já estava pronto (ex: reabertura), respeita spoken
+      if (!p.classList.contains('typing-done')) {
+        const text = await typeOnce(p, { speed: DEFAULT_TYPING_MS });
+        if (text && !p.dataset.spoken) {
+          await speakOnce(text);
+          p.dataset.spoken = 'true';
+        }
+      } else {
+        // já digitado; se nunca falou, fala e marca
+        const text = (p.dataset?.text || p.textContent || '').trim();
+        if (text && !p.dataset.spoken) {
+          await speakOnce(text);
+          p.dataset.spoken = 'true';
+        }
       }
+      await sleep(MIN_PAUSE_BETWEEN_P);
     }
 
-    // Libera navegação e foca input
+    // Libera TTS global ao final da sequência completa
+    window.G.__typingLock = prevLock;
+
+    // Habilita navegação e foca input
     btnPrev?.removeAttribute('disabled');
     btnNext?.removeAttribute('disabled');
     try { input?.focus(); } catch {}
@@ -183,27 +239,28 @@
   }
 
   function armObserver(root) {
-    // Observa reinjeções no section (oscilação)
     try {
       if (window.JCSenha.state.observer) {
         window.JCSenha.state.observer.disconnect();
       }
       const obs = new MutationObserver((mutations) => {
-        // Se algo relevante mudou, retomamos a sequência (sem duplicar fala porque marcamos spoken)
-        let needRetype = false;
+        let need = false;
         for (const m of mutations) {
-          if (m.type === 'childList' || m.type === 'subtree' || m.addedNodes?.length) {
-            needRetype = true; break;
-          }
+          if (m.type === 'childList' || m.addedNodes?.length) { need = true; break; }
         }
-        if (needRetype && !window.JCSenha.state.typingInProgress) {
-          // Re-normaliza e roda novamente
-          const { instr1, instr2, instr3, instr4 } = pickElements(root);
-          [instr1, instr2, instr3, instr4].filter(Boolean).forEach(normalizeParagraph);
-          runTypingSequence(root);
+        if (need && !window.JCSenha.state.typingInProgress) {
+          const { instr1, instr2, instr3, instr4 } = els(root);
+          [instr1, instr2, instr3, instr4].filter(Boolean).forEach((p) => {
+            if (ensureDataText(p)) {
+              if ((p.textContent || '').trim() && !p.classList.contains('typing-done')) {
+                p.textContent = '';
+              }
+            }
+          });
+          runSequence(root);
         }
       });
-      obs.observe(root, { childList: true, subtree: true, characterData: true });
+      obs.observe(root, { childList: true, subtree: true });
       window.JCSenha.state.observer = obs;
     } catch {}
   }
@@ -215,7 +272,7 @@
     const root = document.getElementById('section-senha');
     if (!root) return;
 
-    // Blindagem visual leve (sem brigar com showSection)
+    // Blindagem visual leve
     root.classList.remove('hidden');
     root.setAttribute('aria-hidden', 'false');
     root.style.removeProperty('display');
@@ -223,15 +280,9 @@
     root.style.removeProperty('visibility');
     root.style.zIndex = 'auto';
 
-    if (root.dataset.senhaInitialized === 'true') {
-      // Reabertura: apenas roda (pega reinjeções)
-      runTypingSequence(root);
-      return;
-    }
+    const { input, toggle, btnNext, btnPrev, instr1, instr2, instr3, instr4 } = els(root);
 
-    const { input, toggle, btnNext, btnPrev, instr1, instr2, instr3, instr4 } = pickElements(root);
-
-    // Estado inicial dos botões: travados
+    // Botões travados inicialmente
     btnPrev?.setAttribute('disabled', 'true');
     btnNext?.setAttribute('disabled', 'true');
 
@@ -257,18 +308,23 @@
       }
     });
 
-    // Normaliza imediatamente todos os parágrafos (evita TTS precoce)
-    [instr1, instr2, instr3, instr4].filter(Boolean).forEach(normalizeParagraph);
+    // Antes de qualquer coisa, garantir que NENHUM texto esteja visível
+    [instr1, instr2, instr3, instr4].filter(Boolean).forEach((p) => {
+      if (ensureDataText(p)) p.textContent = '';
+    });
 
-    // Observa reinjeções/oscilações
     armObserver(root);
 
-    // Marca e executa
+    if (root.dataset.senhaInitialized === 'true') {
+      runSequence(root);
+      return;
+    }
+
     root.dataset.senhaInitialized = 'true';
-    runTypingSequence(root);
+    runSequence(root);
 
     window.JCSenha.state.ready = true;
-    console.log('[JCSenha] Seção senha inicializada.');
+    console.log('[JCSenha] Seção senha inicializada (v4).');
   };
 
   if (!window.JCSenha.state.listenerAdded) {
