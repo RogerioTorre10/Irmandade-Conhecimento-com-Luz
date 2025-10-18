@@ -119,45 +119,97 @@
   
 <!-- Inicialização -->
 <script>
-  const waitForScripts = (callback, maxAttempts = 50, interval = 1000) => {
-    let attempts = 0;
-    const check = () => {
-      console.log(`[Init] Verificando scripts (tentativa ${attempts + 1}/${maxAttempts})...`);
-      if (typeof window.JC?.init === 'function' && typeof window.carregarEtapa === 'function') {
-        console.log('[Init] Scripts prontos, executando callback');
-        callback();
-      } else {
-        console.log('[Init] Status: JC.init', typeof window.JC?.init, 'carregarEtapa', typeof window.carregarEtapa);
-        if (attempts < maxAttempts) {
-          attempts++;
-          setTimeout(check, interval);
-        } else {
-          console.error('[Init] Falha ao carregar scripts após várias tentativas');
-          if (typeof window.JC?.show === 'function') {
-            console.log('[Init] Forçando section-senha');
-            window.JC.show('section-senha');
-          } else {
-            console.error('[Init] window.JC.show não disponível');
-          }
-        }
-      }
-    };
-    check();
-  };
-
   window.addEventListener('load', () => {
     console.log('[Init] Evento load disparado');
+
+    let initialized = false;
+
+    const waitForScripts = (callback, maxAttempts = 50, interval = 1000) => {
+      let attempts = 0;
+      const check = () => {
+        if (initialized) return;
+
+        console.log(`[Init] Verificando scripts (tentativa ${attempts + 1}/${maxAttempts})...`);
+        const ready = typeof window.JC?.init === 'function' && typeof window.carregarEtapa === 'function';
+
+        if (ready) {
+          initialized = true;
+          console.log('[Init] Scripts prontos, executando callback');
+          callback();
+        } else {
+          console.log('[Init] Status: JC.init', typeof window.JC?.init, 'carregarEtapa', typeof window.carregarEtapa);
+          if (attempts < maxAttempts) {
+            attempts++;
+            setTimeout(check, interval);
+          } else {
+            console.error('[Init] Falha ao carregar scripts após várias tentativas');
+            if (typeof window.JC?.show === 'function') {
+              console.log('[Init] Forçando section-senha');
+              window.JC.show('section-senha');
+              forceSectionVisible('section-senha');
+            } else {
+              console.error('[Init] window.JC.show não disponível');
+            }
+          }
+        }
+      };
+      check();
+    };
+
+    const forceSectionVisible = (sectionId) => {
+      const el = document.getElementById(sectionId);
+      if (!el) {
+        console.warn(`[Init] Seção ${sectionId} não encontrada para forçar visibilidade`);
+        return;
+      }
+
+      el.classList.remove('hidden');
+      el.setAttribute('aria-hidden', 'false');
+      el.style.display = 'flex';
+      el.style.opacity = '1';
+      el.style.visibility = 'visible';
+      el.style.zIndex = '9999';
+      el.style.transition = 'none';
+      el.style.transform = 'none';
+
+      console.log(`[Init] Visibilidade forçada para ${sectionId}`);
+    };
+
     waitForScripts(() => {
       try {
         window.JC.init();
         console.log('[Init] JC.init executado com sucesso');
-        window.JC.show('section-senha'); // Forçar section-senha
-      } else {
-        console.log('[Init] Clique simulado, seção não pronta ou navegação bloqueada, ignorado');
+        window.JC.show('section-senha');
+
+        // Blindagem visual após 3 segundos
+        setTimeout(() => {
+          forceSectionVisible('section-senha');
+        }, 3000);
+      } catch (e) {
+        console.error('[Init] Erro ao executar JC.init:', e);
       }
     });
+
+    // Blindagem contínua para todas as seções visíveis
+    const observer = new MutationObserver(() => {
+      const sections = document.querySelectorAll('section[data-section]');
+      sections.forEach(sec => {
+        if (sec.classList.contains('hidden') || sec.getAttribute('aria-hidden') === 'true') {
+          console.log('[Init] Blindando visualmente seção:', sec.id);
+          sec.classList.remove('hidden');
+          sec.setAttribute('aria-hidden', 'false');
+          sec.style.display = 'flex';
+          sec.style.opacity = '1';
+          sec.style.visibility = 'visible';
+          sec.style.zIndex = '9999';
+        }
+      });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
   });
 </script>
+
 
 <noscript>
   <p style="text-align:center; padding:12px">Ative o JavaScript para usar esta página.</p>
