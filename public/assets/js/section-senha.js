@@ -81,16 +81,24 @@
       senhaWrap.appendChild(actionsContainer);
     }
 
-    // ✅ Forçar datilografia e leitura
+    // ✅ Forçar datilografia e leitura com delay
     const instrs = [instr1, instr2, instr3, instr4];
     for (const el of instrs) {
       if (el && el.dataset.typing === 'true') {
-        el.classList.remove('typing-done');
-        el.textContent = '';
         const text = getText(el);
-        window.runTyping(el, text, () => {
-          window.EffectCoordinator?.speak(text);
-        }, { speed: 36, cursor: true });
+        el.classList.remove('typing-done');
+        el.classList.remove('typing-active');
+        el.textContent = '';
+        setTimeout(() => {
+          if (typeof window.runTyping === 'function') {
+            window.runTyping(el, text, () => {
+              window.EffectCoordinator?.speak(text);
+            }, { speed: 36, cursor: true });
+          } else {
+            console.warn('[JCSenha] runTyping não disponível, fallback aplicado');
+            el.textContent = text;
+          }
+        }, 100);
       }
     }
 
