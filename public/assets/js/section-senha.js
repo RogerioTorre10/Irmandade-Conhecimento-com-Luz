@@ -1,15 +1,19 @@
-// section-senha.js — 18/out (Lumen v7)
-// - Usa APENAS datilografia local (ignora runTyping) para garantir animação visível
-// - Re-digita SEMPRE (não respeita "typing-done" anterior)
-// - Bloqueia TTS geral na sequência; libera só na hora de falar o parágrafo
-// - LTR + alinhamento à esquerda durante digitação (restaura ao final)
-// - Observa reinjeções e re-aplica sequência com segurança
+// section-senha.js — 18/out (Lumen v4.1 • prelock fix)
+// - PRELOCK de TTS no carregamento (evita "1ª tela só leitura")
+// - Seção fica invisível até normalizar parágrafos; depois exibe e datilografa
+// - Digitação LTR (esquerda→direita), sincronizada: digita → fala → próximo
+// - Observa reinjeções e reaplica com segurança
 
 (function () {
   'use strict';
 
+  // ========= PRELOCK GLOBAL =========
+  // Bloqueia qualquer TTS oportunista ANTES de eventos/HTML
+  window.G = window.G || {};
+  window.G.__typingLock = true;
+
   if (window.JCSenha?.__bound) {
-    console.log('[JCSenha] v7 já ativo. Reforçando sequência, se visível.');
+    console.log('[JCSenha] v4.1 já ativo — reforçando, se visível.');
     const root0 = document.getElementById('section-senha');
     if (root0 && !root0.classList.contains('hidden') && root0.getAttribute('aria-hidden') !== 'true') {
       window.JCSenha?.__kick && window.JCSenha.__kick();
@@ -17,10 +21,10 @@
     return;
   }
 
-  // ===== Config =====
-  const TYPING_MS = 60;          // ms por caractere (ajuste fino da velocidade)
-  const PAUSE_BETWEEN_P = 160;   // respiro entre parágrafos
-  const EST_WPM = 160;           // fallback para estimar duração do TTS
+  // ====== Config ======
+  const DEFAULT_TYPING_MS = 55;    // ms/char
+  const MIN_PAUSE_BETWEEN_P = 120; // pausa entre parágrafos
+  const EST_WPM = 155;             // fallback TTS
   const EST_CPS = 13;
 
   window.JCSenha = window.JCSenha || {};
@@ -28,37 +32,31 @@
   window.JCSenha.state = {
     typingInProgress: false,
     listenerAdded: false,
-    observer: null,
+    observer: null
   };
 
-  // ===== Utils =====
+  // -------- Utils ----------
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
   const visible = (el) => !!el && !el.classList.contains('hidden') && el.getAttribute('aria-hidden') !== 'true';
 
-  const sel = {
-    root:   '#section-senha',
-    p1:     '#senha-instr1',
-    p2:     '#senha-instr2',
-    p3:     '#senha-instr3',
-    p4:     '#senha-instr4',
-    input:  '#senha-input',
-    toggle: '.btn-toggle-senha, [data-action="toggle-password"]',
-    next:   '#btn-senha-avancar',
-    prev:   '#btn-senha-prev'
-  };
+  function estimateSpeakMs(text) {
+    const t = (text || '').trim();
+    if (!t) return 300;
+    const words = t.split(/\s+/).length;
+    const byWpm = (words / EST_WPM) * 60000;
+    const byCps = (t.length / EST_CPS) * 1000;
+    return Math.max(byWpm, byCps, 700);
+  }
 
-  function pick(root) {
-    return {
-      root,
-      p1: root.querySelector(sel.p1),
-      p2: root.querySelector(sel.p2),
-      p3: root.querySelector(sel.p3),
-      p4: root.querySelector(sel.p4),
-      input: root.querySelector(sel.input),
-      toggle: root.querySelector(sel.toggle),
-      next: root.querySelector(sel.next),
-      prev: root.querySelector(sel.prev),
-    };
+  async function speakOnce(text) {
+    if (!text) return;
+    try {
+      if (window.EffectCoordinator?.speak) {
+        const ret = window.EffectCoordinator.speak(text);
+        if (ret && typeof ret.then === 'function') { await ret; return; }
+      }
+    } catch {}
+    await sleep(estimateSpeakMs(text));
   }
 
   function ensureDataText(el) {
@@ -79,7 +77,7 @@
     // força LTR + alinhamento à esquerda
     el.style.textAlign = 'left';
     el.setAttribute('dir', 'ltr');
-    // garante que vamos ver a digitação
+    // garante visual limpo p/ datilografia
     el.textContent = '';
     el.classList.remove('typing-done');
     el.classList.add('typing-active');
@@ -91,35 +89,12 @@
     if (!el) return;
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
-    // restauro estilos originais
     el.style.textAlign = el.dataset.prevAlign || '';
     if (el.dataset.prevDir) el.setAttribute('dir', el.dataset.prevDir); else el.removeAttribute('dir');
   }
 
-  function estSpeakMs(text) {
-    const t = (text || '').trim();
-    if (!t) return 300;
-    const words = t.split(/\s+/).length;
-    const byWpm = (words / EST_WPM) * 60000;
-    const byCps = (t.length / EST_CPS) * 1000;
-    return Math.max(byWpm, byCps, 700);
-  }
-
-  async function speakOnce(text) {
-    if (!text) return;
-    try {
-      if (window.EffectCoordinator?.speak) {
-        const r = window.EffectCoordinator.speak(text);
-        if (r && typeof r.then === 'function') {
-          await r; return;
-        }
-      }
-    } catch {}
-    await sleep(estSpeakMs(text));
-  }
-
-  // Datilografia local — SEM usar runTyping
-  async function localType(el, text, speed = TYPING_MS) {
+  // Datilografia local (sem depender de runTyping — mais previsível)
+  async function localType(el, text, speed = DEFAULT_TYPING_MS) {
     return new Promise(resolve => {
       let i = 0;
       el.textContent = '';
@@ -127,41 +102,109 @@
         if (i < text.length) {
           el.textContent += text.charAt(i++);
           setTimeout(tick, speed);
-        } else {
-          resolve();
-        }
+        } else resolve();
       };
       tick();
     });
   }
 
-  async function typeOnce(el) {
+  async function typeOnce(el, { speed = DEFAULT_TYPING_MS } = {}) {
     if (!el) return '';
     const text = (el.dataset?.text || '').trim();
     if (!text) return '';
 
-    // mantém lock de TTS ligado; abrimos só na hora de falar
-    window.G = window.G || {};
-    if (!window.G.__typingLock) window.G.__typingLock = true;
+    // mantém lock de TTS ligado até terminar digitação
+    const prevLock = !!window.G.__typingLock;
+    window.G.__typingLock = true;
 
     prepareTyping(el);
-    await localType(el, text, TYPING_MS);
+    await localType(el, text, speed);
     restoreTyping(el);
+
+    // libera lock só agora para falar este parágrafo
+    window.G.__typingLock = prevLock;
 
     return text;
   }
 
+  function els(root) {
+    return {
+      instr1: root.querySelector('#senha-instr1'),
+      instr2: root.querySelector('#senha-instr2'),
+      instr3: root.querySelector('#senha-instr3'),
+      instr4: root.querySelector('#senha-instr4'),
+      input:  root.querySelector('#senha-input'),
+      toggle: root.querySelector('.btn-toggle-senha, [data-action="toggle-password"]'),
+      btnNext: root.querySelector('#btn-senha-avancar'),
+      btnPrev: root.querySelector('#btn-senha-prev')
+    };
+  }
+
+  async function runSequence(root) {
+    if (window.JCSenha.state.typingInProgress) return;
+    window.JCSenha.state.typingInProgress = true;
+
+    const { instr1, instr2, instr3, instr4, input, btnNext, btnPrev } = els(root);
+    const seq = [instr1, instr2, instr3, instr4].filter(Boolean);
+
+    // Travar botões e manter mute global até final da sequência completa
+    btnPrev?.setAttribute('disabled', 'true');
+    btnNext?.setAttribute('disabled', 'true');
+
+    const prevGlobalLock = !!window.G.__typingLock;
+    window.G.__typingLock = true;
+
+    // Normaliza fonte e ZERA visual antes de qualquer leitor
+    seq.forEach(p => {
+      if (ensureDataText(p)) p.textContent = '';
+      p?.classList.remove('typing-done', 'typing-active');
+      delete p?.dataset?.spoken;
+    });
+
+    // Agora a seção pode ficar visível (texto ainda vazio)
+    root.style.visibility = 'visible';
+
+    // Sequência estrita: digita → fala → pausa → próximo
+    for (const p of seq) {
+      const text = await typeOnce(p, { speed: DEFAULT_TYPING_MS });
+      // abre global lock só para nossa fala deste parágrafo
+      const wasLocked = !!window.G.__typingLock;
+      window.G.__typingLock = false;
+      if (text && !p.dataset.spoken) {
+        await speakOnce(text);
+        p.dataset.spoken = 'true';
+      }
+      // fecha lock novamente antes do próximo
+      window.G.__typingLock = wasLocked || true;
+
+      await sleep(MIN_PAUSE_BETWEEN_P);
+    }
+
+    // Libera lock global ao estado anterior
+    window.G.__typingLock = prevGlobalLock;
+
+    // Libera navegação e foca input
+    btnPrev?.removeAttribute('disabled');
+    btnNext?.removeAttribute('disabled');
+    try { input?.focus(); } catch {}
+
+    window.JCSenha.state.typingInProgress = false;
+  }
+
   function armObserver(root) {
     try {
-      if (window.JCSenha.state.observer) window.JCSenha.state.observer.disconnect();
-      const obs = new MutationObserver((muts) => {
+      if (window.JCSenha.state.observer) {
+        window.JCSenha.state.observer.disconnect();
+      }
+      const obs = new MutationObserver((mutations) => {
         if (window.JCSenha.state.typingInProgress) return;
-        for (const m of muts) {
-          if (m.type === 'childList' && (m.addedNodes?.length || m.removedNodes?.length)) {
-            console.log('[JCSenha] Reinjeção detectada — retomando sequência.');
-            window.JCSenha.__kick();
-            break;
-          }
+        let need = false;
+        for (const m of mutations) {
+          if (m.type === 'childList' && (m.addedNodes?.length || m.removedNodes?.length)) { need = true; break; }
+        }
+        if (need) {
+          console.log('[JCSenha] Reinjeção detectada — retomando sequência.');
+          window.JCSenha.__kick();
         }
       });
       obs.observe(root, { childList: true, subtree: true });
@@ -169,106 +212,54 @@
     } catch {}
   }
 
-  async function runSequence(root) {
-    if (!root) return;
-    if (window.JCSenha.state.typingInProgress) return;
-    window.JCSenha.state.typingInProgress = true;
-
-    const { p1, p2, p3, p4, input, next, prev } = pick(root);
-    const seq = [p1, p2, p3, p4].filter(Boolean);
-
-    // Travar botões e mutar TTS geral durante a sequência
-    prev?.setAttribute('disabled', 'true');
-    next?.setAttribute('disabled', 'true');
-    window.G = window.G || {};
-    const prevLock = !!window.G.__typingLock;
-    window.G.__typingLock = true;
-
-    // Normaliza e limpa conteúdo VISUAL antes de qualquer leitor
-    seq.forEach(p => {
-      if (ensureDataText(p)) p.textContent = '';
-      p?.classList.remove('typing-done', 'typing-active');
-      delete p?.dataset?.spoken;
-    });
-
-    // Sequência estrita: digita -> fala -> pausa -> próximo
-    for (const p of seq) {
-      const text = await typeOnce(p);
-
-      // abre o lock SÓ para nossa fala deste parágrafo
-      const wasLocked = window.G.__typingLock;
-      window.G.__typingLock = false;
-      if (text && !p.dataset.spoken) {
-        await speakOnce(text);
-        p.dataset.spoken = 'true';
-      }
-      // fecha lock novamente antes do próximo parágrafo
-      window.G.__typingLock = wasLocked || true;
-
-      await sleep(PAUSE_BETWEEN_P);
-    }
-
-    // Final: restaura lock global ao estado anterior
-    window.G.__typingLock = prevLock;
-
-    prev?.removeAttribute('disabled');
-    next?.removeAttribute('disabled');
-    try { input?.focus(); } catch {}
-
-    window.JCSenha.state.typingInProgress = false;
-  }
-
-  function bindControls(root) {
-    const { input, toggle, next, prev } = pick(root);
-
-    if (toggle && !toggle.__senhaBound) {
-      toggle.addEventListener('click', () => {
-        if (!input) return;
-        input.type = input.type === 'password' ? 'text' : 'password';
-      });
-      toggle.__senhaBound = true;
-    }
-
-    if (prev && !prev.__senhaBound) {
-      prev.addEventListener('click', () => { try { window.JC?.show?.('section-termos'); } catch {} });
-      prev.__senhaBound = true;
-    }
-
-    if (next && !next.__senhaBound) {
-      next.addEventListener('click', () => {
-        if (!input) return;
-        const senha = (input.value || '').trim();
-        if (senha.length >= 3) {
-          try { window.JC?.show?.('section-filme'); } catch {}
-        } else {
-          window.toast?.('Digite uma Palavra-Chave válida.', 'warning');
-          try { input.focus(); } catch {}
-        }
-      });
-      next.__senhaBound = true;
-    }
-  }
-
   async function initFor(root) {
     if (!root) return;
-    // garante visível
+
+    // Deixa invisível até normalizar (evita "1ª tela só leitura")
+    root.style.visibility = 'hidden';
+
+    // Garante visível/ativo estruturalmente (sem brigar com showSection)
     root.classList.remove('hidden');
     root.setAttribute('aria-hidden', 'false');
     root.style.removeProperty('display');
     root.style.removeProperty('opacity');
-    root.style.removeProperty('visibility');
+    root.style.removeProperty('visibility'); // vis será controlado explicitamente acima
 
-    bindControls(root);
+    // Vincula controles
+    const { input, toggle, btnNext, btnPrev } = els(root);
+    toggle?.addEventListener('click', () => {
+      if (!input) return;
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }, { once: false });
+
+    btnPrev?.addEventListener('click', () => { try { window.JC?.show('section-termos'); } catch {} });
+    btnNext?.addEventListener('click', () => {
+      if (!input) return;
+      const senha = (input.value || '').trim();
+      if (senha.length >= 3) {
+        try { window.JC?.show('section-filme'); } catch {}
+      } else {
+        window.toast?.('Digite uma Palavra-Chave válida.', 'warning');
+        try { input.focus(); } catch {}
+      }
+    });
+
+    // Observa reinjeções
     armObserver(root);
+
+    // Roda sequência
     await runSequence(root);
   }
 
+  // Disparador principal
   window.JCSenha.__kick = function () {
-    const root = document.querySelector(sel.root);
+    const root = document.getElementById('section-senha');
     if (!root) return;
-    const { p1, p2, p3, p4 } = pick(root);
-    [p1, p2, p3, p4].filter(Boolean).forEach(p => {
-      if (ensureDataText(p)) p.textContent = ''; // força re-digitar
+    // Re-normaliza e mantém invisível até limpar tudo
+    root.style.visibility = 'hidden';
+    const { instr1, instr2, instr3, instr4 } = els(root);
+    [instr1, instr2, instr3, instr4].filter(Boolean).forEach(p => {
+      if (ensureDataText(p)) p.textContent = '';
       p?.classList.remove('typing-done', 'typing-active');
       delete p?.dataset?.spoken;
     });
@@ -279,7 +270,7 @@
   if (!window.JCSenha.state.listenerAdded) {
     document.addEventListener('section:shown', (evt) => {
       if (evt?.detail?.sectionId === 'section-senha') {
-        console.log('[JCSenha] section:shown → init (v7)');
+        console.log('[JCSenha] section:shown → init (v4.1)');
         window.JCSenha.__kick();
       }
     });
@@ -288,9 +279,9 @@
 
   // Boot imediato se já visível
   const tryImmediate = () => {
-    const root = document.querySelector(sel.root);
+    const root = document.getElementById('section-senha');
     if (root && visible(root)) {
-      console.log('[JCSenha] Boot imediato (v7).');
+      console.log('[JCSenha] Boot imediato (v4.1)');
       window.JCSenha.__kick();
     }
   };
@@ -300,11 +291,11 @@
     tryImmediate();
   }
 
-  // Watchdog
+  // Watchdog extra
   setTimeout(() => {
-    const root = document.querySelector(sel.root);
+    const root = document.getElementById('section-senha');
     if (root && visible(root) && !root.querySelector('.typing-active') && !root.querySelector('.typing-done')) {
-      console.log('[JCSenha] Watchdog v7 — iniciando sequência.');
+      console.log('[JCSenha] Watchdog v4.1 — iniciando sequência.');
       window.JCSenha.__kick();
     }
   }, 900);
