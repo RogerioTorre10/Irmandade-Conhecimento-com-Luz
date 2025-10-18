@@ -1,13 +1,13 @@
-// section-senha.js — MODO MINÍMO (só datilografia) — 18/out
-// - Sem TTS/leitura
-// - Sem olho mágico
-// - Tipagem local (sempre), LTR e alinhada à esquerda
-// - Reage a reinjeções simples
+// section-senha.js — MÍNIMO + TTS (start imediato) — 18/out
+// - Datilografia local (sempre), esquerda→direita (força !important)
+// - Início imediato ao receber section:shown (sem esperas longas)
+// - TTS após cada parágrafo (aguarda Promise; se não houver, estima)
+// - Sem olho mágico (por enquanto)
+
 (function () {
   'use strict';
 
-  if (window.JCSenha?.__bound_min) {
-    // Se já estiver ativo, só tenta rodar de novo se a seção estiver visível
+  if (window.JCSenha?.__bound_min_tts) {
     const root0 = document.getElementById('section-senha');
     if (root0 && !root0.classList.contains('hidden') && root0.getAttribute('aria-hidden') !== 'true') {
       window.JCSenha?.__kick && window.JCSenha.__kick();
@@ -16,12 +16,14 @@
   }
 
   // ===== Config =====
-  const TYPING_MS = 60;      // velocidade ms/char (ajuste aqui)
+  const TYPING_MS = 60;       // ms/caractere (ajuste fino)
   const PAUSE_BETWEEN_P = 120;
+  const EST_WPM = 160;        // fallback para estimar duração do TTS
+  const EST_CPS = 13;
 
-  // ===== Namespace/Estado =====
+  // ===== Estado/Namespace =====
   window.JCSenha = window.JCSenha || {};
-  window.JCSenha.__bound_min = true;
+  window.JCSenha.__bound_min_tts = true;
   window.JCSenha.state = {
     typing: false,
     observer: null
@@ -49,7 +51,6 @@
     };
   }
 
-  // Pega a fonte do texto e a coloca em data-text
   function ensureDataText(el) {
     if (!el) return false;
     const ds = el.dataset?.text?.trim();
@@ -60,16 +61,17 @@
     return true;
   }
 
-  // Prepara p/ digitar: forçar LTR + align left e limpar visual
+  // força LTR + align-left (com !important) e limpa visual
   function prepareTyping(el) {
     if (!el) return false;
     if (!('prevAlign' in el.dataset)) el.dataset.prevAlign = el.style.textAlign || '';
     if (!('prevDir' in el.dataset))   el.dataset.prevDir   = el.getAttribute('dir') || '';
-    el.style.textAlign = 'left';
+    el.style.setProperty('text-align', 'left', 'important');
     el.setAttribute('dir', 'ltr');
     el.textContent = '';
     el.classList.remove('typing-done');
     el.classList.add('typing-active');
+    delete el.dataset.spoken;
     return true;
   }
 
@@ -77,11 +79,11 @@
     if (!el) return;
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
+    // restaura estado visual original
     el.style.textAlign = el.dataset.prevAlign || '';
     if (el.dataset.prevDir) el.setAttribute('dir', el.dataset.prevDir); else el.removeAttribute('dir');
   }
 
-  // Datilografia local simples
   async function localType(el, text, speed = TYPING_MS) {
     return new Promise(resolve => {
       let i = 0;
@@ -96,14 +98,36 @@
     });
   }
 
-  async function typeOnce(el) {
-    if (!el) return;
-    const text = (el.dataset?.text || '').trim();
+  function estSpeakMs(text) {
+    const t = (text || '').trim();
+    if (!t) return 300;
+    const words = t.split(/\s+/).length;
+    const byWpm = (words / EST_WPM) * 60000;
+    const byCps = (t.length / EST_CPS) * 1000;
+    return Math.max(byWpm, byCps, 700);
+  }
+
+  async function speakOnce(text) {
     if (!text) return;
+    try {
+      if (window.EffectCoordinator?.speak) {
+        const r = window.EffectCoordinator.speak(text);
+        if (r && typeof r.then === 'function') {
+          await r; return;
+        }
+      }
+    } catch {}
+    await sleep(estSpeakMs(text));
+  }
+
+  async function typeOnce(el) {
+    if (!el) return '';
+    const text = (el.dataset?.text || '').trim();
+    if (!text) return '';
     prepareTyping(el);
     await localType(el, text, TYPING_MS);
     restoreTyping(el);
-    await sleep(20);
+    return text;
   }
 
   async function runSequence(root) {
@@ -113,15 +137,20 @@
     const { p1, p2, p3, p4 } = pick(root);
     const seq = [p1, p2, p3, p4].filter(Boolean);
 
-    // Normaliza fonte e limpa visual ANTES
+    // Normaliza fonte e limpa visual ANTES (início imediato)
     seq.forEach(p => {
       if (ensureDataText(p)) p.textContent = '';
       p?.classList.remove('typing-done', 'typing-active');
+      delete p?.dataset?.spoken;
     });
 
-    // Sequência simples: p1 -> p2 -> p3 -> p4
+    // Sequência: digita → fala → pausa → próximo
     for (const p of seq) {
-      await typeOnce(p);
+      const text = await typeOnce(p);
+      if (text && !p.dataset.spoken) {
+        await speakOnce(text);
+        p.dataset.spoken = 'true';
+      }
       await sleep(PAUSE_BETWEEN_P);
     }
 
@@ -135,7 +164,7 @@
         if (window.JCSenha.state.typing) return;
         for (const m of muts) {
           if (m.type === 'childList' && (m.addedNodes?.length || m.removedNodes?.length)) {
-            console.log('[JCSenha:min] Reinjeção detectada — reexecutando datilografia.');
+            console.log('[JCSenha:min+tts] Reinjeção detectada — reexecutando.');
             window.JCSenha.__kick();
             break;
           }
@@ -148,7 +177,8 @@
 
   async function initFor(root) {
     if (!root) return;
-    // Garantir visível (sem interferir no controlador)
+
+    // Garante visível e pronto (sem atrasos)
     root.classList.remove('hidden');
     root.setAttribute('aria-hidden', 'false');
     root.style.removeProperty('display');
@@ -159,7 +189,7 @@
     await runSequence(root);
   }
 
-  // Exposto para reexecutar quando necessário
+  // reexecuta sob demanda
   window.JCSenha.__kick = function () {
     const root = document.querySelector(sel.root);
     if (!root) return;
@@ -167,39 +197,33 @@
     [p1, p2, p3, p4].filter(Boolean).forEach(p => {
       if (ensureDataText(p)) p.textContent = '';
       p?.classList.remove('typing-done', 'typing-active');
+      delete p?.dataset?.spoken;
     });
     initFor(root);
   };
 
-  // 1) Reage ao evento oficial, se existir
+  // Dispara IMEDIATAMENTE quando a seção aparecer
   document.addEventListener('section:shown', (evt) => {
     if (evt?.detail?.sectionId === 'section-senha') {
-      console.log('[JCSenha:min] section:shown → datilografia');
+      console.log('[JCSenha:min+tts] section:shown → start imediato');
       window.JCSenha.__kick();
     }
   });
 
-  // 2) Boot imediato se já estiver visível
-  const tryImmediate = () => {
-    const root = document.querySelector(sel.root);
-    if (root && isVisible(root)) {
-      console.log('[JCSenha:min] Boot imediato.');
-      window.JCSenha.__kick();
-    }
-  };
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', tryImmediate);
-  } else {
-    tryImmediate();
+  // Se já estiver visível, roda agora
+  const rootInit = document.querySelector(sel.root);
+  if (rootInit && isVisible(rootInit)) {
+    console.log('[JCSenha:min+tts] Boot imediato.');
+    window.JCSenha.__kick();
   }
 
-  // 3) Watchdog leve
+  // Watchdog super curto (só 200ms) — caso algum evento se perca
   setTimeout(() => {
     const root = document.querySelector(sel.root);
     if (root && isVisible(root) && !root.querySelector('.typing-active') && !root.querySelector('.typing-done')) {
-      console.log('[JCSenha:min] Watchdog → iniciando datilografia.');
+      console.log('[JCSenha:min+tts] Watchdog 200ms → start.');
       window.JCSenha.__kick();
     }
-  }, 900);
+  }, 200);
 
 })();
