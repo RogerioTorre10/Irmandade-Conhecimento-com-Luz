@@ -1,344 +1,227 @@
+// section-guia.js — v13 (glam + start imediato + alias escolha + seleção robusta)
 (function () {
   'use strict';
+  if (window.__guiaBound_v13) return;
+  window.__guiaBound_v13 = true;
 
-  if (window.__guiaBound) {
-    window.__guiaKick?.(/*force*/true);
-    return;
+  // ===== Config =====
+  const TYPING_SPEED = 30;              // respeita seu data-speed, mas mantém um padrão
+  const SPEAK_RATE   = 1.06;
+  const NEXT_SECTION_DEFAULT = 'section-selfie';
+
+  // ===== Estado =====
+  let ABORT = 0;                        // aborta quando outra seção entra
+  let guiaAtual = null;
+
+  // ===== Utils =====
+  const qs  = (s, r=document) => r.querySelector(s);
+  const qsa = (s, r=document) => Array.from(r.querySelectorAll(s));
+  const sleep = (ms) => new Promise(r=>setTimeout(r,ms));
+  const aborted = (id) => id !== ABORT;
+
+  function speak(text, myId){
+    if (!text || aborted(myId)) return;
+    try {
+      const p = window.EffectCoordinator?.speak?.(text, { rate: SPEAK_RATE });
+      if (p && typeof p.then === 'function') return p;
+    } catch {}
+    // Fallback: estimativa de duração só pra dar respiro (não bloqueia UI)
+    const ms = Math.max(text.split(/\s+/).length / 160 * 60000, text.length/13*1000, 600);
+    return sleep(ms);
   }
-  window.__guiaBound = true;
 
-  let GUIA_READY = false;
-  let guiaSelecionado = false;
-  let selectedGuia = null;
-
-  const once = (el, ev, fn) => {
-    if (!el) {
-      console.warn('[section-guia.js] Elemento para evento não encontrado:', ev);
-      return;
-    }
-    const h = (e) => {
-      el.removeEventListener(ev, h);
-      fn(e);
-    };
-    el.addEventListener(ev, h);
-  };
-
-  function waitForElement(selector, { within = document, timeout = 2000 } = {}) {
-    return new Promise((resolve, reject) => {
-      let el = within.querySelector(selector);
-      if (el) {
-        console.log(`[waitForElement] Elemento ${selector} encontrado imediatamente`);
-        return resolve(el);
-      }
-
-      const observer = new MutationObserver((mutations, obs) => {
-        el = within.querySelector(selector);
-        if (el) {
-          console.log(`[waitForElement] Elemento ${selector} encontrado após mutação`);
-          obs.disconnect();
-          resolve(el);
-        }
-      });
-
-      observer.observe(within, { childList: true, subtree: true });
-
-      setTimeout(() => {
-        observer.disconnect();
-        const fallbackEl = document.querySelector(selector);
-        if (fallbackEl) {
-          console.log(`[waitForElement] Elemento ${selector} encontrado via fallback global`);
-          resolve(fallbackEl);
-        } else {
-          console.error(`[waitForElement] Timeout após ${timeout}ms para ${selector}`);
-          reject(new Error(`timeout waiting ${selector}`));
-        }
-      }, timeout);
+  function typeLocal(el, text, speed){
+    return new Promise(resolve=>{
+      el.textContent = '';
+      let i = 0;
+      const tick = () => {
+        if (i < text.length) {
+          el.textContent += text.charAt(i++);
+          setTimeout(tick, speed);
+        } else resolve();
+      };
+      tick();
     });
   }
 
-  function getText(el) {
-    return (el?.dataset?.text ?? el?.textContent ?? '').trim();
-  }
-
-  function fromDetail(detail = {}) {
-    const sectionId = detail.sectionId || detail.id || window.__currentSectionId;
-    const node = detail.node || detail.root || null;
-    return { sectionId, node };
-  }
-
-  const enableSelectButton = (btn) => {
-    btn.disabled = false;
-    btn.classList.remove('disabled-temp');
-    btn.style.opacity = '1';
-    btn.style.cursor = 'pointer';
-  };
-
-  async function typeOnce(el, speed = 30) {
-    if (!el) return;
-    const text = getText(el);
-    if (!text) return;
-
-    console.log('[section-guia.js] Iniciando datilografia para:', text);
-    el.textContent = '';
+  async function runTyping(el, text, myId){
+    if (!el || !text) return;
+    el.classList.remove('typing-done','typing-active');
     el.classList.add('typing-active');
-    for (let i = 0; i < text.length; i++) {
-      el.textContent += text.charAt(i);
-      await new Promise(r => setTimeout(r, speed));
-    }
-    el.classList.remove('typing-active');
-    el.classList.add('typing-done');
-    console.log('[section-guia.js] Datilografia concluída para:', text);
-  }
+    el.style.setProperty('text-align','left','important');
+    el.setAttribute('dir','ltr');
 
-  async function loadAndSetupGuia(root, btn) {
-    const guiaContainer = root.querySelector('.guia-container');
-    const guiaError = root.querySelector('#guia-error');
-    const guiaOptions = root.querySelectorAll('.guia-options button[data-guia]');
-    const guiaNameInput = root.querySelector('#guiaNameInput');
-
-    if (!guiaSelecionado) {
-      btn.disabled = true;
-      btn.classList.add('disabled-temp');
-      btn.style.opacity = '0.5';
-      btn.style.cursor = 'not-allowed';
-    }
-
-    const guias = Array.from(root.querySelectorAll('.guia-container p[data-guia]')).map(p => ({
-      id: p.dataset.guia,
-      description: getText(p)
-    }));
-
-    if (guias.length > 0) {
-      console.log('[section-guia.js] Guias encontrados no HTML:', guias);
-      for (const p of root.querySelectorAll('.guia-container p[data-guia]')) {
-        await typeOnce(p, 30);
-        if (window.EffectCoordinator?.speak) {
-          console.log('[section-guia.js] Iniciando TTS para:', getText(p));
-          await window.EffectCoordinator.speak(getText(p), { rate: 1.06 });
-          console.log('[section-guia.js] TTS concluído para:', getText(p));
-        }
-        await new Promise(r => setTimeout(r, 50));
-      }
-
-      guiaOptions.forEach(btn => {
-        btn.addEventListener('click', () => {
-          selectedGuia = btn.dataset.guia;
-          guiaSelecionado = true;
-          console.log('[section-guia.js] Guia selecionado:', selectedGuia);
-          enableSelectButton(root.querySelector('#btn-selecionar-guia'));
-          document.dispatchEvent(new CustomEvent('guiaSelected', { detail: { guia: selectedGuia } }));
-        }, { once: true });
+    const speed = Number(el.dataset.speed || TYPING_SPEED);
+    if (typeof window.runTyping === 'function') {
+      await new Promise(res=>{
+        try { window.runTyping(el, text, res, { speed, cursor: el.dataset.cursor !== 'false' }); }
+        catch { el.textContent = text; res(); }
       });
     } else {
-      console.warn('[section-guia.js] Nenhum guia encontrado no HTML. Avance sem seleção.');
-      guiaError && (guiaError.style.display = 'block');
-      window.toast?.('Nenhum guia disponível. Use o botão Pular.', 'error');
-      guiaSelecionado = true;
-      enableSelectButton(btn);
+      await typeLocal(el, text, speed);
     }
-
-    if (guiaNameInput) {
-      guiaNameInput.addEventListener('input', () => {
-        const nameValid = guiaNameInput.value.trim().length >= 2;
-        if (nameValid && selectedGuia) {
-          enableSelectButton(root.querySelector('#btn-selecionar-guia'));
-        } else {
-          btn.disabled = true;
-          btn.classList.add('disabled-temp');
-          btn.style.opacity = '0.5';
-          btn.style.cursor = 'not-allowed';
-        }
-      });
-    }
+    if (aborted(myId)) return;
+    el.classList.remove('typing-active');
+    el.classList.add('typing-done');
+    await speak(text, myId);
   }
 
-  async function handler(evt) {
-    const { sectionId, node } = fromDetail(evt?.detail);
-    if (sectionId !== 'section-guia') return;
-
-    console.log('[section-guia.js] Ativando guia');
-    let root = node || document.getElementById('section-guia') || document.getElementById('jornada-content-wrapper');
-    if (!root) {
-      try {
-        root = await waitForElement('#section-guia:not(.hidden), #jornada-content-wrapper:not(.hidden)', { timeout: 3000 });
-        console.log('[section-guia.js] Root encontrado:', root.outerHTML.slice(0, 200) + '...');
-      } catch {
-        console.error('[section-guia.js] Root da guia não encontrado');
-        window.toast?.('Guia ainda não montou no DOM.', 'error');
-        return;
-      }
-    }
-
+  function persistChoice(guia, nome){
     try {
-      if (typeof window.JC?.show === 'function') {
-        window.JC.show('section-guia');
-      } else {
-        root.classList.remove('hidden');
-        root.style.display = 'block';
-      }
-    } catch (err) {
-      console.warn('[section-guia.js] Falha ao exibir seção:', err);
-      root.classList.remove('hidden');
-      root.style.display = 'block';
-    }
-
-    let title, btnSelecionar, btnSkip;
-    try {
-      title = await waitForElement('h2[data-typing="true"]', { within: root, timeout: 1500 });
-      btnSelecionar = await waitForElement('#btn-selecionar-guia', { within: root, timeout: 1500 });
-      btnSkip = await waitForElement('#btn-skip-guia', { within: root, timeout: 1500 });
-    } catch (e) {
-      console.error('[section-guia.js] Falha ao esperar pelos elementos essenciais:', e);
-      window.toast?.('Falha ao carregar a seção Guia. Usando fallback.', 'error');
-      title = root.querySelector('h2[data-typing="true"]') || root.appendChild(Object.assign(document.createElement('h2'), { textContent: 'Escolha seu Guia ✨', dataset: { typing: 'true' } }));
-      btnSelecionar = root.querySelector('#btn-selecionar-guia') || root.appendChild(Object.assign(document.createElement('button'), { id: 'btn-selecionar-guia', textContent: 'Selecionar Guia', className: 'btn btn-primary' }));
-      btnSkip = root.querySelector('#btn-skip-guia') || root.appendChild(Object.assign(document.createElement('button'), { id: 'btn-skip-guia', textContent: 'Pular e Continuar', className: 'btn btn-secondary' }));
-    }
-
-    console.log('[section-guia.js] Elementos encontrados:', { title: !!title, btnSelecionar: !!btnSelecionar, btnSkip: !!btnSkip });
-
-    btnSelecionar.classList.add('hidden');
-    btnSkip.classList.add('hidden');
-    const showBtn = () => {
-      console.log('[section-guia.js] Mostrando botões');
-      btnSelecionar.classList.remove('hidden');
-      btnSelecionar.style.display = 'inline-block';
-      btnSkip.classList.remove('hidden');
-      btnSkip.style.display = 'inline-block';
-    };
-
-    const speed = Number(title.dataset.speed || 30);
-    const text = getText(title) || title.dataset.text;
-    const cursor = String(title.dataset.cursor || 'true') === 'true';
-
-    if (GUIA_READY) {
-      console.log('[section-guia.js] Guia já preparado');
-      showBtn();
-      loadAndSetupGuia(root, btnSelecionar);
-      return;
-    }
-
-    window.EffectCoordinator?.stopAll?.();
-
-    const runTypingChain = async () => {
-      console.log('[section-guia.js] Iniciando runTypingChain com texto:', text);
-      title.textContent = '';
-      if (typeof window.runTyping === 'function') {
-        try {
-          await new Promise((resolve) => {
-            window.runTyping(title, text, resolve, { speed, cursor });
-          });
-          console.log('[section-guia.js] Typing concluído para título');
-          if (window.EffectCoordinator?.speak) {
-            console.log('[section-guia.js] Iniciando TTS para título:', text);
-            await window.EffectCoordinator.speak(text, { rate: 1.06 });
-            console.log('[section-guia.js] TTS concluído para título');
-          }
-        } catch (err) {
-          console.warn('[section-guia.js] Erro no runTyping:', err);
-          title.textContent = text;
-        }
-      } else {
-        console.log('[section-guia.js] Fallback: sem efeitos para título');
-        await typeOnce(title, speed);
-        if (window.EffectCoordinator?.speak) {
-          console.log('[section-guia.js] Iniciando TTS para título:', text);
-          await window.EffectCoordinator.speak(text, { rate: 1.06 });
-          console.log('[section-guia.js] TTS concluído para título');
-        }
-      }
-      showBtn();
-    };
-
-    try {
-      await runTypingChain();
-      GUIA_READY = true;
-      await loadAndSetupGuia(root, btnSelecionar);
-    } catch (err) {
-      console.warn('[section-guia.js] Typing chain falhou', err);
-      title.textContent = text;
-      showBtn();
-      GUIA_READY = true;
-      await loadAndSetupGuia(root, btnSelecionar);
-    }
-
-    const goNext = (e) => {
-      const nameInput = root.querySelector('#guiaNameInput');
-      const name = nameInput ? nameInput.value.trim() : '';
-      if (e.currentTarget.id === 'btn-selecionar-guia' && (!guiaSelecionado || name.length < 2)) {
-        console.warn('[section-guia.js] Tentativa de avançar sem guia selecionado ou nome válido.');
-        window.toast?.('Por favor, selecione um guia e digite um nome com pelo menos 2 caracteres.', 'warn');
-        return;
-      }
-
-      console.log(`[section-guia.js] Botão ${e.currentTarget.id} clicado, avançando...`);
-      const nextSection = 'section-selfie';
-      try {
-        if (window.JC?.goNext) {
-          window.JC.goNext(nextSection, { guia: selectedGuia, name });
-        } else if (typeof window.showSection === 'function') {
-          window.showSection(nextSection);
-        } else {
-          console.warn('[section-guia.js] Nenhum método de navegação encontrado.');
-        }
-      } catch (err) {
-        console.error('[section-guia.js] Erro ao avançar:', err);
-      }
-    };
-
-    const freshBtnSelecionar = btnSelecionar.cloneNode(true);
-    btnSelecionar.replaceWith(freshBtnSelecionar);
-    once(freshBtnSelecionar, 'click', goNext);
-
-    const freshBtnSkip = btnSkip.cloneNode(true);
-    btnSkip.replaceWith(freshBtnSkip);
-    once(freshBtnSkip, 'click', goNext);
-  }
-
-  function armObserver(root) {
-    try {
-      if (window.__guiaObserver) window.__guiaObserver.disconnect();
-      const obs = new MutationObserver((mutations) => {
-        if (!GUIA_READY && mutations.some(m => m.target === root || m.addedNodes.length > 0)) {
-          handler({ detail: { sectionId: 'section-guia', node: root } });
-        }
-      });
-      obs.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style'] });
-      window.__guiaObserver = obs;
+      sessionStorage.setItem('jornada.guia', guia || '');
+      sessionStorage.setItem('jornada.nome', nome || '');
     } catch {}
   }
 
-  function tryKick(force = false) {
-    let root = document.getElementById('section-guia') || document.getElementById('jornada-content-wrapper');
-    if (!root) {
-      console.error('[section-guia.js] Root não encontrado');
-      return false;
+  function restoreChoice(){
+    try {
+      return {
+        guia: sessionStorage.getItem('jornada.guia') || '',
+        nome: sessionStorage.getItem('jornada.nome') || ''
+      };
+    } catch { return { guia:'', nome:'' }; }
+  }
+
+  function highlightChoice(root, guia){
+    const items = qsa('[data-guia]', root);
+    items.forEach(el=>{
+      if (el.dataset.guia === guia) el.classList.add('guia-selected');
+      else el.classList.remove('guia-selected');
+    });
+  }
+
+  function enable(btn){ if (btn){ btn.disabled = false; btn.style.opacity='1'; btn.style.cursor='pointer'; btn.classList.remove('disabled-temp'); } }
+  function disable(btn){ if (btn){ btn.disabled = true;  btn.style.opacity='0.5'; btn.style.cursor='not-allowed'; btn.classList.add('disabled-temp'); } }
+
+  function nextSectionId(root){
+    const selBtn = qs('#btn-selecionar-guia', root);
+    const skipBtn = qs('#btn-skip-guia', root);
+    return selBtn?.dataset?.nextSection
+        || skipBtn?.dataset?.nextSection
+        || root?.dataset?.nextSection
+        || NEXT_SECTION_DEFAULT;
+  }
+
+  function bindSelectionUI(root){
+    const btnSelect = qs('#btn-selecionar-guia', root);
+    const btnSkip   = qs('#btn-skip-guia', root);
+    const nameInput = qs('#guiaNameInput', root);
+
+    // inicial
+    const saved = restoreChoice();
+    if (saved.nome && nameInput) nameInput.value = saved.nome;
+    if (saved.guia) { guiaAtual = saved.guia; highlightChoice(root, guiaAtual); enable(btnSelect); }
+    else disable(btnSelect);
+
+    // clique nas linhas <p data-guia>
+    qsa('.guia-container [data-guia]', root).forEach(el=>{
+      if (el.__bound) return;
+      el.addEventListener('click', ()=>{
+        guiaAtual = el.dataset.guia;
+        highlightChoice(root, guiaAtual);
+        enable(btnSelect);
+        try { document.dispatchEvent(new CustomEvent('guiaSelected', { detail: { guia: guiaAtual } })); } catch {}
+      });
+      el.__bound = true;
+    });
+
+    // botões “Escolher X”
+    qsa('[data-action="select-guia"][data-guia]', root).forEach(btn=>{
+      if (btn.__bound) return;
+      btn.addEventListener('click', ()=>{
+        guiaAtual = btn.dataset.guia;
+        highlightChoice(root, guiaAtual);
+        enable(btnSelect);
+        try { document.dispatchEvent(new CustomEvent('guiaSelected', { detail: { guia: guiaAtual } })); } catch {}
+      });
+      btn.__bound = true;
+    });
+
+    // Selecionar Guia
+    if (btnSelect && !btnSelect.__bound){
+      btnSelect.addEventListener('click', ()=>{
+        const nome = nameInput?.value?.trim() || '';
+        if (!guiaAtual){
+          window.toast?.('Selecione um guia ou toque em “Pular e Continuar”.', 'warning');
+          return;
+        }
+        persistChoice(guiaAtual, nome);
+        const nextId = nextSectionId(root);
+        try { window.JC?.show?.(nextId); } catch {}
+      });
+      btnSelect.__bound = true;
     }
 
+    // Pular e Continuar
+    if (btnSkip && !btnSkip.__bound){
+      btnSkip.addEventListener('click', ()=>{
+        const nome = nameInput?.value?.trim() || '';
+        persistChoice(guiaAtual || '', nome);
+        const nextId = nextSectionId(root);
+        try { window.JC?.show?.(nextId); } catch {}
+      });
+      btnSkip.__bound = true;
+    }
+  }
+
+  async function activate(root){
+    if (!root) return;
+    const myId = ++ABORT;
+
+    // Garante exibição
     root.classList.remove('hidden');
-    root.setAttribute('aria-hidden', 'false');
+    root.setAttribute('aria-hidden','false');
     root.style.removeProperty('display');
-    root.style.removeProperty('opacity');
-    root.style.removeProperty('visibility');
 
-    armObserver(root);
-    handler({ detail: { sectionId: 'section-guia', node: root } });
-    return true;
-  }
-
-  window.__guiaKick = tryKick;
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', tryKick, { once: true });
-  } else {
-    tryKick();
-  }
-
-  document.addEventListener('section:shown', (evt) => {
-    const { sectionId, node } = fromDetail(evt?.detail);
-    if (sectionId === 'section-guia') {
-      GUIA_READY = false;
-      tryKick(true);
+    // Datilografia + fala do título
+    let title = qs('h2[data-typing="true"]', root);
+    if (!title) {
+      title = document.createElement('h2');
+      title.dataset.typing = 'true';
+      title.dataset.text = 'Escolha seu Guia ✨';
+      title.textContent = 'Escolha seu Guia ✨';
+      qs('.conteudo-pergaminho', root)?.prepend(title) || root.prepend(title);
     }
-  }, { passive: true });
+    const text = (title.dataset.text || title.textContent || '').trim();
+    await runTyping(title, text, myId);
+    if (aborted(myId)) return;
+
+    // Liga a UI (botões/seleção/navegação)
+    bindSelectionUI(root);
+  }
+
+  // handler do evento — aceita section-guia e o alias section-escolha
+  async function onShown(evt){
+    const id = evt?.detail?.sectionId || evt?.detail?.id;
+    if (id !== 'section-guia' && id !== 'section-escolha') { ABORT++; return; }
+
+    // Usa o nó entregue pelo loader se vier, senão resolve pelo DOM
+    let root = evt?.detail?.node || evt?.detail?.root || qs('#section-guia');
+    if (!root) {
+      // o loader às vezes injeta um #section-escolha vazio; aproveitamos como wrapper
+      const wrapper = qs('#section-escolha') || qs('#jornada-content-wrapper') || document.body;
+      root = qs('#section-guia', wrapper);
+      if (!root) {
+        root = document.createElement('div');
+        root.id = 'section-guia';
+        root.className = 'j-section';
+        wrapper.appendChild(root);
+        // injeta seu HTML mínimo caso esteja totalmente vazio
+        if (!root.innerHTML.trim()) {
+          root.innerHTML = `
+            <div class="conteudo-pergaminho">
+              <h2 data-typing="true" data-text="Escolha seu Guia ✨" data-speed="30" data-cursor="true">Escolha seu Guia ✨</h2>
+              <div class="guia-container"></div>
+            </div>`;
+          // reaproveita elementos existentes se houver
+          const src = qs('#jornada-content-wrapper .guia-container') || qs('.guia-container');
+          if (src) root.querySelector('.guia-container')?.replaceWith(src.cloneNode(true));
+        }
+      }
+    }
+
+    await activate(root);
+  }
+
+  document.addEventListener('section:shown', onShown);
 })();
