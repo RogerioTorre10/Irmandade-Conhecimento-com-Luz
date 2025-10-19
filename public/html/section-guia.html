@@ -127,4 +127,31 @@
   50% { opacity: 0; }
   100% { opacity: 0.75; }
 }
+ /* Glam: realce do item escolhido */
+.guia-container [data-guia] {
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+.guia-container [data-guia]:hover {
+  background: #f3f4f6;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 10px rgba(0,0,0,.06);
+  cursor: pointer;
+}
+.guia-container .guia-selected {
+  background: linear-gradient(180deg, #eef2ff 0%, #ffffff 100%);
+  box-shadow: 0 6px 24px rgba(37,99,235,.25);
+  border: 1px solid rgba(37,99,235,.35);
+}
+
+/* Botões: leve “lift” ao pairar */
+.guia-options .btn, .guia-actions .btn {
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.guia-options .btn:hover, .guia-actions .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.12);
+}
+ 
 </style>
