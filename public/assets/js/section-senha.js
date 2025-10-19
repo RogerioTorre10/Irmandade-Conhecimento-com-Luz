@@ -1,47 +1,47 @@
-// section-senha.js — v15 (start imediato + transição ao avançar + anti-invasão)
-// - Inicia efeitos imediatamente ao mostrar a seção (sem probes demorados)
-// - Datilografia local (E→D) + Leitura por parágrafo (aguarda Promise; fallback por estimativa)
-// - Botões habilitados + Olho mágico
-// - Anti-invasão: aborta datilografia/tts se outra seção assumir
-// - Ao clicar "Avançar": toca o vídeo de transição (/assets/img/irmandade-no-jardim.mp4) e só depois navega
-//   • ID da próxima seção pode ser configurado: data-next-section no botão OU no #section-senha
-//   • Padrão: 'section-escolha' (troque se o seu ID for outro)
+// section-senha.js — v16 (start instantâneo de verdade + eager hunt + transição)
+// - Dispara já (força visibilidade e não espera "estar visível")
+// - rAF a cada frame (até 800ms) + MutationObserver global para iniciar assim que #senha-instr* surgir
+// - Anti-invasão: aborta efeitos se outra seção assumir
+// - Datilografia local (E→D) + Leitura por parágrafo (Promise/estimativa)
+// - Botões habilitados + Olho mágico; "Avançar" toca vídeo e depois navega
 
 (function () {
   'use strict';
 
-  if (window.JCSenha?.__bound_v15) {
+  if (window.JCSenha?.__bound_v16) {
     window.JCSenha.__kick?.();
     return;
   }
 
   // ===== Config =====
-  const TYPE_MS = 55;          // ms por caractere
-  const PAUSE_BETWEEN_P = 90;  // pausa entre parágrafos
-  const EST_WPM = 160;         // fallback TTS
+  const TYPE_MS = 55;
+  const PAUSE_BETWEEN_P = 90;
+  const EST_WPM = 160;
   const EST_CPS = 13;
+  const EAGER_RAF_MAX = 800; // ms
+
   const TRANSITION_SRC = '/assets/img/irmandade-no-jardim.mp4';
-  const NEXT_SECTION_DEFAULT = 'section-escolha'; // ajuste aqui se o ID for diferente
+  const NEXT_SECTION_DEFAULT = 'section-escolha';
 
   // ===== Estado / Namespace =====
   window.JCSenha = window.JCSenha || {};
-  window.JCSenha.__bound_v15 = true;
+  window.JCSenha.__bound_v16 = true;
   window.JCSenha.state = {
     running: false,
     abortId: 0,
-    observer: null
+    sectionObs: null,
+    docObs: null
   };
 
   // ===== Utils =====
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
   const qs = (s, r=document) => r.querySelector(s);
-  const isVisible = (el) => !!el && !el.classList.contains('hidden') && el.getAttribute('aria-hidden') !== 'true';
 
-  // CSS: garante E→D durante digitação contra centralização do pai
+  // CSS: garante E→D durante digitação
   (function injectCSS(){
-    if (document.getElementById('jc-senha-align-patch-v15')) return;
+    if (document.getElementById('jc-senha-align-patch-v16')) return;
     const s = document.createElement('style');
-    s.id='jc-senha-align-patch-v15';
+    s.id='jc-senha-align-patch-v16';
     s.textContent = `
       #section-senha .typing-active{
         text-align:left !important; direction:ltr !important;
@@ -138,14 +138,14 @@
       if(window.EffectCoordinator?.speak){
         const r=window.EffectCoordinator.speak(text);
         if(r && typeof r.then==='function'){
-          await Promise.race([r, (async()=>{while(!myAbort.cancelled()) await sleep(15);})()]);
+          await Promise.race([r, (async()=>{while(!myAbort.cancelled()) await sleep(12);})()]);
           return;
         }
       }
     }catch{}
     const ms = estSpeakMs(text);
     const t0 = Date.now();
-    while(!myAbort.cancelled() && (Date.now()-t0)<ms) await sleep(15);
+    while(!myAbort.cancelled() && (Date.now()-t0)<ms) await sleep(12);
   }
 
   function makeAbortToken(){
@@ -167,68 +167,64 @@
     return [p1,p2,p3,p4].filter(Boolean);
   }
 
-  // ---------- TRANSIÇÃO (vídeo) AO AVANÇAR ----------
+  // ---------- TRANSIÇÃO (vídeo) ----------
   function playTransitionThen(nextStep){
-    // Se já existir um overlay de transição, apenas aguarde
     if (document.getElementById('senha-transition-overlay')) return;
-
     const overlay = document.createElement('div');
     overlay.id = 'senha-transition-overlay';
-    overlay.style.cssText = `
-      position:fixed; inset:0; background:#000; z-index:999999;
-      display:flex; align-items:center; justify-content:center;
-    `;
+    overlay.style.cssText = `position:fixed; inset:0; background:#000; z-index:999999; display:flex; align-items:center; justify-content:center;`;
     const video = document.createElement('video');
     video.src = TRANSITION_SRC;
-    video.autoplay = true;
-    video.muted = true;            // garante autoplay
-    video.playsInline = true;
-    video.controls = false;
-    // cobre a tela inteira
+    video.autoplay = true; video.muted = true; video.playsInline = true; video.controls = false;
     video.style.cssText = 'width:100%; height:100%; object-fit:cover;';
-
     overlay.appendChild(video);
     document.body.appendChild(overlay);
-
-    let done = false;
-    const cleanup = () => {
-      if (done) return;
-      done = true;
-      try { video.pause(); } catch {}
-      overlay.remove();
-      if (typeof nextStep === 'function') nextStep();
-    };
-
+    let done=false;
+    const cleanup=()=>{ if(done) return; done=true; try{ video.pause(); }catch{} overlay.remove(); nextStep?.(); };
     video.addEventListener('ended', cleanup, { once:true });
-    video.addEventListener('error', () => setTimeout(cleanup, 1500), { once:true });
-    // Fallback caso o navegador barre autoplay (mesmo com muted)
-    setTimeout(() => { if (!done) cleanup(); }, 8000);
-
-    // tenta tocar (alguns browsers exigem gesture; muted ajuda)
-    Promise.resolve().then(() => video.play?.()).catch(() => {
-      // se falhar, tenta cleanup rápido
-      setTimeout(cleanup, 1200);
-    });
+    video.addEventListener('error', () => setTimeout(cleanup, 1200), { once:true });
+    setTimeout(()=>{ if(!done) cleanup(); }, 8000);
+    Promise.resolve().then(()=>video.play?.()).catch(()=>setTimeout(cleanup, 800));
   }
 
-  // ---------- OBS / CONTROLES ----------
-  function armObserver(root){
+  // ---------- OBSERVERS & CONTROLES ----------
+  function armSectionObserver(root){
     try{
-      if (window.JCSenha.state.observer) window.JCSenha.state.observer.disconnect();
+      if (window.JCSenha.state.sectionObs) window.JCSenha.state.sectionObs.disconnect();
       const obs=new MutationObserver(()=>{
         if (!window.JCSenha.state.running) runSequence(root);
       });
       obs.observe(root,{childList:true,subtree:true});
-      window.JCSenha.state.observer = obs;
+      window.JCSenha.state.sectionObs = obs;
+    }catch{}
+  }
+
+  function armDocObserver(){
+    try{
+      if (window.JCSenha.state.docObs) window.JCSenha.state.docObs.disconnect();
+      const obs=new MutationObserver((muts)=>{
+        // assim que QUALQUER parágrafo da senha pingar no DOM, dispara
+        for (const m of muts){
+          if (!(m.addedNodes && m.addedNodes.length)) continue;
+          for (const n of m.addedNodes){
+            if (!(n instanceof Element)) continue;
+            if (n.matches?.('#senha-instr1, #senha-instr2, #senha-instr3, #senha-instr4') ||
+                n.querySelector?.('#senha-instr1, #senha-instr2, #senha-instr3, #senha-instr4')) {
+              window.JCSenha.__kick();
+              return;
+            }
+          }
+        }
+      });
+      obs.observe(document.documentElement, { childList:true, subtree:true });
+      window.JCSenha.state.docObs = obs;
     }catch{}
   }
 
   function bindControls(root){
     const { input, toggle, next, prev } = pick(root);
-
-    // Habilita botões imediatamente
-    prev?.removeAttribute('disabled');
-    next?.removeAttribute('disabled');
+    // Habilita botões
+    prev?.removeAttribute('disabled'); next?.removeAttribute('disabled');
 
     // Olho mágico
     if (toggle && !toggle.__senhaBound) {
@@ -239,7 +235,7 @@
       toggle.__senhaBound = true;
     }
 
-    // Voltar → site Jornada Conhecimento (mantém do v14)
+    // Voltar (mesma lógica do v14/v15)
     if (prev && !prev.__senhaBound) {
       prev.addEventListener('click', () => {
         const rootEl = qs(sel.root);
@@ -257,14 +253,14 @@
       prev.__senhaBound = true;
     }
 
-    // Avançar → toca transição e só depois navega
+    // Avançar → transição + navega
     if (next && !next.__senhaBound) {
       next.addEventListener('click', () => {
         if (!input) return;
-        const senha = (input.value || '').trim();
+        const senha=(input.value||'').trim();
         if (senha.length < 3) {
           window.toast?.('Digite uma Palavra-Chave válida.', 'warning');
-          try { input.focus(); } catch {}
+          try{ input.focus(); }catch{}
           return;
         }
         const rootEl = qs(sel.root);
@@ -272,27 +268,23 @@
           next.dataset?.nextSection ||
           rootEl?.dataset?.nextSection ||
           NEXT_SECTION_DEFAULT;
-
-        // toca a transição e navega
-        playTransitionThen(() => {
-          try { window.JC?.show?.(nextId); } catch {}
-        });
+        playTransitionThen(() => { try { window.JC?.show?.(nextId); } catch {} });
       });
       next.__senhaBound = true;
     }
   }
 
-  // ---------- SEQUÊNCIA (datilografia + leitura) ----------
+  // ---------- SEQUÊNCIA ----------
   async function runSequence(root){
     if(!root || window.JCSenha.state.running) return;
 
     window.JCSenha.state.running = true;
     const myAbort = makeAbortToken();
 
-    // Normaliza e limpa visual (start imediato)
     const seq = getSeq(root);
     if (seq.length === 0) { window.JCSenha.state.running=false; return; }
 
+    // Normaliza e limpa visual
     seq.forEach(p=>{
       if(ensureDataText(p)) p.textContent='';
       p.classList.remove('typing-done','typing-active');
@@ -319,11 +311,12 @@
     window.JCSenha.state.running = false;
   }
 
+  // ---------- KICK (start imediato, sem depender de visibilidade) ----------
   function tryKick(){
     const root = qs(sel.root);
-    if(!root || !isVisible(root)) return false;
+    if(!root) return false;
 
-    // Garante visível estruturalmente
+    // FORÇA visibilidade estrutural: sem esperar controlador
     root.classList.remove('hidden');
     root.setAttribute('aria-hidden','false');
     root.style.removeProperty('display');
@@ -331,21 +324,33 @@
     root.style.removeProperty('visibility');
 
     bindControls(root);
-    armObserver(root);
-    runSequence(root);
+    armSectionObserver(root);
+
+    // Eager hunt por até 800ms: dispara assim que qualquer parágrafo existir
+    const t0 = performance.now();
+    const hunt = () => {
+      const seq = getSeq(root);
+      if (seq.length > 0) { runSequence(root); return; }
+      if ((performance.now() - t0) < EAGER_RAF_MAX) {
+        requestAnimationFrame(hunt);
+      }
+    };
+    requestAnimationFrame(hunt);
+
+    // Observador global: se os parágrafos chegarem depois do frame, ele inicia
+    armDocObserver();
     return true;
   }
 
   // API pública
   window.JCSenha.__kick = tryKick;
 
-  // Eventos: inicia na hora; aborta quando outra seção aparece
+  // Eventos oficiais: inicia na hora; aborta quando outra seção aparece
   document.addEventListener('section:shown', (evt)=>{
     const id = evt?.detail?.sectionId;
     if(!id) return;
     if (id === 'section-senha') {
-      // aborta execuções antigas e dispara já
-      window.JCSenha.state.abortId++;
+      window.JCSenha.state.abortId++; // reseta rodadas antigas
       tryKick();
     } else {
       // outra seção assumiu → aborta datilografia/leitura aqui
@@ -353,14 +358,11 @@
     }
   });
 
-  // Disparos imediatos
-  if (!tryKick()) {
-    // se ainda não deu (ex.: DOM chegando), tenta no próximo frame
-    if (typeof requestAnimationFrame === 'function') {
-      requestAnimationFrame(() => tryKick());
-    } else {
-      setTimeout(() => tryKick(), 0);
-    }
+  // Disparos imediatos (no carregamento do script)
+  tryKick();
+  Promise.resolve().then(()=>tryKick());
+  if (typeof requestAnimationFrame === 'function') {
+    requestAnimationFrame(()=>tryKick());
   }
 
 })();
