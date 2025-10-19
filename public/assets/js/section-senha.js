@@ -47,18 +47,19 @@
   };
 
   function pick(root){
-    return {
-      root,
-      p1: root.querySelector(SEL.p1),
-      p2: root.querySelector(SEL.p2),
-      p3: root.querySelector(SEL.p3),
-      p4: root.querySelector(SEL.p4),
-      input: root.querySelector(SEL.input),
-      toggle: root.querySelector(SEL.toggle),
-      next: root.querySelector(SEL.next),
-      prev: root.querySelector(SEL.prev),
-    };
-  }
+  return {
+    root,
+    p1: root.querySelector(sel.p1),
+    p2: root.querySelector(sel.p2),
+    p3: root.querySelector(sel.p3),
+    p4: root.querySelector(sel.p4),
+    input: root.querySelector(sel.input),
+    toggle: root.querySelector(sel.toggle),
+    next: root.querySelector(sel.next),
+    prev: root.querySelector(sel.prev),
+  };
+}
+
 
   function isVisible(el) {
     if (!el) return false;
