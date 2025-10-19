@@ -1,35 +1,59 @@
-// section-guia.js — v13 (glam + start imediato + alias escolha + seleção robusta)
+// section-guia.js — v14 (datilografia + leitura + botões operantes, sem mexer no seu HTML/estilos)
 (function () {
   'use strict';
-  if (window.__guiaBound_v13) return;
-  window.__guiaBound_v13 = true;
+  if (window.__guiaBound_v14) return;
+  window.__guiaBound_v14 = true;
 
   // ===== Config =====
-  const TYPING_SPEED = 30;              // respeita seu data-speed, mas mantém um padrão
-  const SPEAK_RATE   = 1.06;
-  const NEXT_SECTION_DEFAULT = 'section-selfie';
+  const TYPING_SPEED_DEFAULT = 30;       // respeita data-speed do <h2>, cai aqui se faltar
+  const SPEAK_RATE = 1.06;               // leve boost na fala
+  const NEXT_SECTION_DEFAULT = 'section-selfie'; // pode sobrescrever via data-next-section
 
   // ===== Estado =====
-  let ABORT = 0;                        // aborta quando outra seção entra
+  let ABORT_TOKEN = 0;
   let guiaAtual = null;
 
   // ===== Utils =====
   const qs  = (s, r=document) => r.querySelector(s);
   const qsa = (s, r=document) => Array.from(r.querySelectorAll(s));
-  const sleep = (ms) => new Promise(r=>setTimeout(r,ms));
-  const aborted = (id) => id !== ABORT;
+  const sleep = (ms) => new Promise(r=>setTimeout(r, ms));
+  const aborted = (my) => my !== ABORT_TOKEN;
 
-  function speak(text, myId){
-    if (!text || aborted(myId)) return;
-    try {
-      const p = window.EffectCoordinator?.speak?.(text, { rate: SPEAK_RATE });
-      if (p && typeof p.then === 'function') return p;
-    } catch {}
-    // Fallback: estimativa de duração só pra dar respiro (não bloqueia UI)
-    const ms = Math.max(text.split(/\s+/).length / 160 * 60000, text.length/13*1000, 600);
-    return sleep(ms);
+  function getNextSectionId(root){
+    const btnSel  = qs('#btn-selecionar-guia', root);
+    const btnSkip = qs('#btn-skip-guia', root);
+    return btnSel?.dataset?.nextSection
+        || btnSkip?.dataset?.nextSection
+        || root?.dataset?.nextSection
+        || NEXT_SECTION_DEFAULT;
   }
 
+  function persistChoice(guia, nome){
+    try {
+      sessionStorage.setItem('jornada.guia', guia || '');
+      sessionStorage.setItem('jornada.nome', nome || '');
+    } catch {}
+  }
+  function restoreChoice(){
+    try {
+      return {
+        guia: sessionStorage.getItem('jornada.guia') || '',
+        nome: sessionStorage.getItem('jornada.nome') || ''
+      };
+    } catch { return { guia:'', nome:'' }; }
+  }
+
+  function enable(el){ if(el){ el.disabled = false; el.style.pointerEvents = ''; el.style.opacity=''; }}
+  function disable(el){ if(el){ el.disabled = true;  el.style.pointerEvents = 'none'; /* mantém textura */ }}
+
+  function highlightChoice(root, guia){
+    qsa('[data-guia]', root).forEach(el=>{
+      if (el.dataset.guia === guia) el.classList.add('guia-selected');
+      else el.classList.remove('guia-selected');
+    });
+  }
+
+  // ---- Efeito datilografia + leitura ----
   function typeLocal(el, text, speed){
     return new Promise(resolve=>{
       el.textContent = '';
@@ -44,85 +68,62 @@
     });
   }
 
-  async function runTyping(el, text, myId){
+  async function runTypingAndSpeak(el, text, myId){
     if (!el || !text) return;
+
+    // aplicar suas classes de cursor sem mexer no CSS existente
     el.classList.remove('typing-done','typing-active');
     el.classList.add('typing-active');
     el.style.setProperty('text-align','left','important');
     el.setAttribute('dir','ltr');
 
-    const speed = Number(el.dataset.speed || TYPING_SPEED);
+    const speed = Number(el.dataset.speed || TYPING_SPEED_DEFAULT);
+    // usa seu runTyping se existir; senão, fallback local
     if (typeof window.runTyping === 'function') {
       await new Promise(res=>{
-        try { window.runTyping(el, text, res, { speed, cursor: el.dataset.cursor !== 'false' }); }
-        catch { el.textContent = text; res(); }
+        try {
+          window.runTyping(el, text, res, { speed, cursor: el.dataset.cursor !== 'false' });
+        } catch {
+          el.textContent = text; res();
+        }
       });
     } else {
       await typeLocal(el, text, speed);
     }
     if (aborted(myId)) return;
+
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
-    await speak(text, myId);
-  }
 
-  function persistChoice(guia, nome){
+    // leitura (TTS) se disponível; senão, não bloqueia
     try {
-      sessionStorage.setItem('jornada.guia', guia || '');
-      sessionStorage.setItem('jornada.nome', nome || '');
+      const p = window.EffectCoordinator?.speak?.(text, { rate: SPEAK_RATE });
+      if (p && typeof p.then === 'function') { await p; }
     } catch {}
   }
 
-  function restoreChoice(){
-    try {
-      return {
-        guia: sessionStorage.getItem('jornada.guia') || '',
-        nome: sessionStorage.getItem('jornada.nome') || ''
-      };
-    } catch { return { guia:'', nome:'' }; }
-  }
-
-  function highlightChoice(root, guia){
-    const items = qsa('[data-guia]', root);
-    items.forEach(el=>{
-      if (el.dataset.guia === guia) el.classList.add('guia-selected');
-      else el.classList.remove('guia-selected');
-    });
-  }
-
-  function enable(btn){ if (btn){ btn.disabled = false; btn.style.opacity='1'; btn.style.cursor='pointer'; btn.classList.remove('disabled-temp'); } }
-  function disable(btn){ if (btn){ btn.disabled = true;  btn.style.opacity='0.5'; btn.style.cursor='not-allowed'; btn.classList.add('disabled-temp'); } }
-
-  function nextSectionId(root){
-    const selBtn = qs('#btn-selecionar-guia', root);
-    const skipBtn = qs('#btn-skip-guia', root);
-    return selBtn?.dataset?.nextSection
-        || skipBtn?.dataset?.nextSection
-        || root?.dataset?.nextSection
-        || NEXT_SECTION_DEFAULT;
-  }
-
-  function bindSelectionUI(root){
-    const btnSelect = qs('#btn-selecionar-guia', root);
-    const btnSkip   = qs('#btn-skip-guia', root);
+  // ---- Bind da UI (sem remover classes/estilos existentes) ----
+  function bindUI(root){
     const nameInput = qs('#guiaNameInput', root);
+    const btnSel    = qs('#btn-selecionar-guia', root);
+    const btnSkip   = qs('#btn-skip-guia', root);
 
-    // inicial
+    // restaurar escolha prévia
     const saved = restoreChoice();
     if (saved.nome && nameInput) nameInput.value = saved.nome;
-    if (saved.guia) { guiaAtual = saved.guia; highlightChoice(root, guiaAtual); enable(btnSelect); }
-    else disable(btnSelect);
+    if (saved.guia) { guiaAtual = saved.guia; highlightChoice(root, guiaAtual); enable(btnSel); }
+    else disable(btnSel);
 
     // clique nas linhas <p data-guia>
-    qsa('.guia-container [data-guia]', root).forEach(el=>{
-      if (el.__bound) return;
-      el.addEventListener('click', ()=>{
-        guiaAtual = el.dataset.guia;
+    qsa('.guia-container [data-guia]', root).forEach(p=>{
+      if (p.__bound) return;
+      p.addEventListener('click', ()=>{
+        guiaAtual = p.dataset.guia;
         highlightChoice(root, guiaAtual);
-        enable(btnSelect);
-        try { document.dispatchEvent(new CustomEvent('guiaSelected', { detail: { guia: guiaAtual } })); } catch {}
+        enable(btnSel);
+        try{ document.dispatchEvent(new CustomEvent('guiaSelected', { detail:{ guia: guiaAtual }})); }catch{}
       });
-      el.__bound = true;
+      p.__bound = true;
     });
 
     // botões “Escolher X”
@@ -131,33 +132,30 @@
       btn.addEventListener('click', ()=>{
         guiaAtual = btn.dataset.guia;
         highlightChoice(root, guiaAtual);
-        enable(btnSelect);
-        try { document.dispatchEvent(new CustomEvent('guiaSelected', { detail: { guia: guiaAtual } })); } catch {}
+        enable(btnSel);
+        try{ document.dispatchEvent(new CustomEvent('guiaSelected', { detail:{ guia: guiaAtual }})); }catch{}
       });
       btn.__bound = true;
     });
 
-    // Selecionar Guia
-    if (btnSelect && !btnSelect.__bound){
-      btnSelect.addEventListener('click', ()=>{
+    // Selecionar Guia (só avança se houve escolha)
+    if (btnSel && !btnSel.__bound){
+      btnSel.addEventListener('click', ()=>{
+        if (!guiaAtual) { window.toast?.('Selecione um guia ou toque em “Pular e Continuar”.','warning'); return; }
         const nome = nameInput?.value?.trim() || '';
-        if (!guiaAtual){
-          window.toast?.('Selecione um guia ou toque em “Pular e Continuar”.', 'warning');
-          return;
-        }
         persistChoice(guiaAtual, nome);
-        const nextId = nextSectionId(root);
+        const nextId = getNextSectionId(root);
         try { window.JC?.show?.(nextId); } catch {}
       });
-      btnSelect.__bound = true;
+      btnSel.__bound = true;
     }
 
-    // Pular e Continuar
+    // Pular e Continuar (sempre permite)
     if (btnSkip && !btnSkip.__bound){
       btnSkip.addEventListener('click', ()=>{
         const nome = nameInput?.value?.trim() || '';
         persistChoice(guiaAtual || '', nome);
-        const nextId = nextSectionId(root);
+        const nextId = getNextSectionId(root);
         try { window.JC?.show?.(nextId); } catch {}
       });
       btnSkip.__bound = true;
@@ -166,62 +164,74 @@
 
   async function activate(root){
     if (!root) return;
-    const myId = ++ABORT;
+    const myId = ++ABORT_TOKEN;
 
-    // Garante exibição
+    // garante exibição (sem tirar classes que dão textura)
     root.classList.remove('hidden');
     root.setAttribute('aria-hidden','false');
     root.style.removeProperty('display');
 
-    // Datilografia + fala do título
+    // datilografia + leitura do título
     let title = qs('h2[data-typing="true"]', root);
     if (!title) {
+      // fallback mínimo sem quebrar visual
       title = document.createElement('h2');
       title.dataset.typing = 'true';
       title.dataset.text = 'Escolha seu Guia ✨';
       title.textContent = 'Escolha seu Guia ✨';
-      qs('.conteudo-pergaminho', root)?.prepend(title) || root.prepend(title);
+      (qs('.conteudo-pergaminho', root) || root).prepend(title);
     }
     const text = (title.dataset.text || title.textContent || '').trim();
-    await runTyping(title, text, myId);
+    await runTypingAndSpeak(title, text, myId);
     if (aborted(myId)) return;
 
-    // Liga a UI (botões/seleção/navegação)
-    bindSelectionUI(root);
+    // liga UI
+    bindUI(root);
+
+    // garante que os botões fiquem com pointer ativo (sem mexer nas classes visuais)
+    enable(qs('#btn-selecionar-guia', root));
+    enable(qs('#btn-skip-guia', root));
   }
 
-  // handler do evento — aceita section-guia e o alias section-escolha
-  async function onShown(evt){
+  // Handler principal — aceita 'section-guia' e 'section-escolha' (alias)
+  async function onSectionShown(evt){
     const id = evt?.detail?.sectionId || evt?.detail?.id;
-    if (id !== 'section-guia' && id !== 'section-escolha') { ABORT++; return; }
+    if (id !== 'section-guia' && id !== 'section-escolha') { ABORT_TOKEN++; return; }
 
-    // Usa o nó entregue pelo loader se vier, senão resolve pelo DOM
+    // pega o root correto:
     let root = evt?.detail?.node || evt?.detail?.root || qs('#section-guia');
-    if (!root) {
-      // o loader às vezes injeta um #section-escolha vazio; aproveitamos como wrapper
+    if (!root || root.id !== 'section-guia') {
+      // caso o loader tenha criado #section-escolha "vazio", usamos como wrapper
       const wrapper = qs('#section-escolha') || qs('#jornada-content-wrapper') || document.body;
-      root = qs('#section-guia', wrapper);
-      if (!root) {
-        root = document.createElement('div');
-        root.id = 'section-guia';
-        root.className = 'j-section';
-        wrapper.appendChild(root);
-        // injeta seu HTML mínimo caso esteja totalmente vazio
-        if (!root.innerHTML.trim()) {
-          root.innerHTML = `
-            <div class="conteudo-pergaminho">
-              <h2 data-typing="true" data-text="Escolha seu Guia ✨" data-speed="30" data-cursor="true">Escolha seu Guia ✨</h2>
-              <div class="guia-container"></div>
-            </div>`;
-          // reaproveita elementos existentes se houver
-          const src = qs('#jornada-content-wrapper .guia-container') || qs('.guia-container');
-          if (src) root.querySelector('.guia-container')?.replaceWith(src.cloneNode(true));
-        }
+      root = qs('#section-guia', wrapper) || qs('#section-guia') || root;
+      // se ainda não tiver, cria um container #section-guia para não ficar “vazio”
+      if (!root || root.id !== 'section-guia') {
+        const sec = document.createElement('div');
+        sec.id = 'section-guia';
+        sec.className = 'j-section';
+        wrapper.appendChild(sec);
+        // reaproveita seu bloco se existir no wrapper principal
+        const existing = qs('#jornada-content-wrapper .conteudo-pergaminho') || qs('.conteudo-pergaminho');
+        sec.innerHTML = existing ? existing.parentElement.outerHTML : `
+          <div class="conteudo-pergaminho">
+            <h2 data-typing="true" data-text="Escolha seu Guia ✨" data-speed="30" data-cursor="true">Escolha seu Guia ✨</h2>
+          </div>`;
+        root = sec;
       }
     }
-
     await activate(root);
   }
 
-  document.addEventListener('section:shown', onShown);
+  // Anti-invasão: se outra seção assumir, aborta efeitos
+  document.addEventListener('section:shown', (e)=>{
+    const id = e?.detail?.sectionId || e?.detail?.id;
+    if (id && id !== 'section-guia' && id !== 'section-escolha') ABORT_TOKEN++;
+  });
+
+  document.addEventListener('section:shown', onSectionShown);
+
+  // Se a guia já estiver na tela quando este script carregar:
+  if (qs('#section-guia') && !qs('#section-guia').classList.contains('hidden')) {
+    activate(qs('#section-guia'));
+  }
 })();
