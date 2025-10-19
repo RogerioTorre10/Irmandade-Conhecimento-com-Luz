@@ -1,50 +1,43 @@
-// section-senha.js — v18 (start imediato confiável + anti-invasão + transição)
-// Foco: iniciar SEMPRE no section:shown, sem depender de visibilidade ou hunting demorado.
+// section-senha.js — v13 (ultrarrápido: start imediato + anti-invasão)
+// - Dispara imediatamente (no load, microtask e rAF) e em section:shown
+// - Sem probe/intervalos: zero espera pra começar
+// - Anti-invasão: aborta se outra seção for mostrada
+// - Datilografia local (E→D) + Leitura por parágrafo (aguarda Promise; senão, estima)
+// - Botões habilitados e olho mágico ativo
 
 (function () {
   'use strict';
 
-  if (window.JCSenha?.__bound_v18) {
-    // Rearma se já estiver carregado
-    window.JCSenha.__startNow?.();
+  if (window.JCSenha?.__bound_v13) {
+    // rearmar se já carregado
+    window.JCSenha.__kick?.(/*force*/true);
     return;
   }
 
   // ===== Config =====
-  const TYPE_MS = 50;            // ms por caractere (sensação de resposta rápida)
-  const PAUSE_BETWEEN_P = 80;    // respiro curto entre parágrafos
-  const EST_WPM = 160;           // fallback TTS
-  const EST_CPS = 13;            // fallback TTS
-  const TRANSITION_SRC = '/assets/img/irmandade-no-jardim.mp4';
-  const NEXT_SECTION_DEFAULT = 'section-escolha';
+  const TYPE_MS = 55;          // ms/char (datilografia)
+  const PAUSE_BETWEEN_P = 90;  // pausa curtinha entre parágrafos
+  const EST_WPM = 160;         // fallback p/ TTS
+  const EST_CPS = 13;
 
   // ===== Estado / Namespace =====
   window.JCSenha = window.JCSenha || {};
-  window.JCSenha.__bound_v18 = true;
+  window.JCSenha.__bound_v13 = true;
   window.JCSenha.state = {
     running: false,
-    abortId: 0,
-    rootObs: null,
-    kickWatch: null
+    observer: null,
+    abortId: 0
   };
 
   // ===== Utils =====
-  const qs = (s, r = document) => r.querySelector(s);
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-  const SEL = {
-    root: '#section-senha',
-    ids: ['#senha-instr1', '#senha-instr2', '#senha-instr3', '#senha-instr4'],
-    input: '#senha-input',
-    toggle: '.btn-toggle-senha, [data-action="toggle-password"]',
-    next: '#btn-senha-avancar',
-    prev: '#btn-senha-prev'
-  };
+  const qs = (s, r=document) => r.querySelector(s);
 
   // CSS para garantir E→D durante digitação (vence centralização do pai)
   (function injectCSS(){
-    if (document.getElementById('jc-senha-align-patch-v18')) return;
+    if (document.getElementById('jc-senha-align-patch-v13')) return;
     const s = document.createElement('style');
-    s.id = 'jc-senha-align-patch-v18';
+    s.id='jc-senha-align-patch-v13';
     s.textContent = `
       #section-senha .typing-active{
         text-align:left !important; direction:ltr !important;
@@ -54,169 +47,165 @@
     document.head.appendChild(s);
   })();
 
+  const sel = {
+    root:  '#section-senha',
+    p1:    '#senha-instr1',
+    p2:    '#senha-instr2',
+    p3:    '#senha-instr3',
+    p4:    '#senha-instr4',
+    input: '#senha-input',
+    toggle: '.btn-toggle-senha, [data-action="toggle-password"]',
+    next:  '#btn-senha-avancar',
+    prev:  '#btn-senha-prev'
+  };
+
+  function pick(root){
+    return {
+      root,
+      p1: root.querySelector(sel.p1),
+      p2: root.querySelector(sel.p2),
+      p3: root.querySelector(sel.p3),
+      p4: root.querySelector(sel.p4),
+      input: root.querySelector(sel.input),
+      toggle: root.querySelector(sel.toggle),
+      next: root.querySelector(sel.next),
+      prev: root.querySelector(sel.prev),
+    };
+  }
+
   function ensureDataText(el){
-    if (!el) return false;
-    const ds = (el.dataset?.text || '').trim();
-    const tc = (el.textContent || '').trim();
-    const src = ds || tc;
-    if (!src) return false;
-    el.dataset.text = src;
+    if(!el) return false;
+    const ds=(el.dataset?.text||'').trim();
+    const tc=(el.textContent||'').trim();
+    const src=ds||tc;
+    if(!src) return false;
+    el.dataset.text=src;
     return true;
   }
 
   function prepareTyping(el){
-    if (!el) return;
-    if (!('prevAlign' in el.dataset)) el.dataset.prevAlign = el.style.textAlign || '';
-    if (!('prevDir'   in el.dataset)) el.dataset.prevDir   = el.getAttribute('dir') || '';
+    if(!el) return false;
+    if(!('prevAlign' in el.dataset)) el.dataset.prevAlign=el.style.textAlign||'';
+    if(!('prevDir' in el.dataset))   el.dataset.prevDir  =el.getAttribute('dir')||'';
     el.style.setProperty('text-align','left','important');
     el.setAttribute('dir','ltr');
-    el.style.display = 'block';
-    el.style.width = '100%';
-    el.style.marginLeft = '0';
-    el.style.marginRight = 'auto';
+    el.style.display='block';
+    el.style.width='100%';
+    el.style.marginLeft='0';
+    el.style.marginRight='auto';
+    el.textContent='';
     el.classList.remove('typing-done');
     el.classList.add('typing-active');
-    el.textContent = '';
     delete el.dataset.spoken;
+    return true;
   }
 
   function restoreTyping(el){
-    if (!el) return;
+    if(!el) return;
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
     el.style.textAlign = el.dataset.prevAlign || '';
-    if (el.dataset.prevDir) el.setAttribute('dir', el.dataset.prevDir); else el.removeAttribute('dir');
+    if(el.dataset.prevDir) el.setAttribute('dir', el.dataset.prevDir); else el.removeAttribute('dir');
   }
 
-  async function localType(el, text, speed, abort){
-    el.textContent = '';
-    for (let i = 0; i < text.length; i++){
-      if (abort()) { restoreTyping(el); return; }
-      el.textContent += text[i];
-      await new Promise(r => setTimeout(r, speed));
-    }
+  async function localType(el, text, speed, myAbort){
+    return new Promise(resolve=>{
+      let i=0; el.textContent='';
+      const tick=()=>{ 
+        if(myAbort.cancelled()) { restoreTyping(el); return resolve(); }
+        if(i < text.length){ el.textContent += text.charAt(i++); setTimeout(tick, speed); }
+        else resolve();
+      };
+      tick();
+    });
   }
 
   function estSpeakMs(text){
-    const t = (text || '').trim(); if (!t) return 300;
-    const words = t.split(/\s+/).length;
-    const byWpm = (words / EST_WPM) * 60000;
-    const byCps = (t.length / EST_CPS) * 1000;
-    return Math.max(byWpm, byCps, 600);
+    const t=(text||'').trim(); if(!t) return 300;
+    const words=t.split(/\s+/).length;
+    const byWpm=(words/EST_WPM)*60000;
+    const byCps=(t.length/EST_CPS)*1000;
+    return Math.max(byWpm, byCps, 700);
   }
 
-  async function speakOnce(text, abort){
-    if (!text || abort()) return;
+  async function speakOnce(text, myAbort){
+    if(!text || myAbort.cancelled()) return;
     try{
-      if (window.EffectCoordinator?.speak){
-        const p = window.EffectCoordinator.speak(text);
-        if (p && typeof p.then === 'function'){
-          await Promise.race([p, (async()=>{ while(!abort()) await sleep(15); })()]);
+      if(window.EffectCoordinator?.speak){
+        const r=window.EffectCoordinator.speak(text);
+        if(r && typeof r.then==='function'){
+          await Promise.race([r, (async()=>{while(!myAbort.cancelled()) await sleep(20);})()]);
           return;
         }
       }
     }catch{}
     const ms = estSpeakMs(text);
     const t0 = Date.now();
-    while(!abort() && (Date.now() - t0) < ms) await sleep(15);
+    while(!myAbort.cancelled() && (Date.now()-t0)<ms) await sleep(20);
   }
 
-  async function typeOnce(el, abort){
-    if (!el || abort()) return '';
-    const text = (el.dataset?.text || '').trim();
-    if (!text) return '';
+  function makeAbortToken(){
+    const myId = ++window.JCSenha.state.abortId;
+    return { id: myId, cancelled: ()=> myId !== window.JCSenha.state.abortId };
+  }
+
+  async function typeOnce(el, myAbort){
+    if(!el || myAbort.cancelled()) return '';
+    const text=(el.dataset?.text||'').trim(); if(!text) return '';
     prepareTyping(el);
-    await localType(el, text, TYPE_MS, abort);
-    if (!abort()) restoreTyping(el);
-    return abort() ? '' : text;
+    await localType(el, text, TYPE_MS, myAbort);
+    if(!myAbort.cancelled()) restoreTyping(el);
+    return myAbort.cancelled()? '' : text;
   }
 
   function getSeq(root){
-    return SEL.ids.map(sel => qs(sel, root)).filter(Boolean);
+    const {p1,p2,p3,p4} = pick(root);
+    return [p1,p2,p3,p4].filter(Boolean);
   }
 
-  // ---------- Transição (vídeo) ----------
-  function playTransitionThen(next){
-    if (qs('#senha-transition-overlay')) return;
-    const overlay = document.createElement('div');
-    overlay.id = 'senha-transition-overlay';
-    overlay.style.cssText = 'position:fixed; inset:0; background:#000; z-index:999999; display:flex; align-items:center; justify-content:center;';
-    const video = document.createElement('video');
-    video.src = TRANSITION_SRC; video.autoplay = true; video.muted = true; video.playsInline = true; video.controls = false;
-    video.style.cssText = 'width:100%; height:100%; object-fit:cover;';
-    overlay.appendChild(video);
-    document.body.appendChild(overlay);
-    let done = false;
-    const cleanup = () => { if (done) return; done = true; try{ video.pause(); }catch{} overlay.remove(); next?.(); };
-    video.addEventListener('ended', cleanup, { once:true });
-    video.addEventListener('error', () => setTimeout(cleanup, 1000), { once:true });
-    setTimeout(() => { if (!done) cleanup(); }, 8000);
-    Promise.resolve().then(()=>video.play?.()).catch(()=>setTimeout(cleanup, 800));
-  }
-
-  // ---------- Controles ----------
   function bindControls(root){
-    const input  = qs(SEL.input, root);
-    const toggle = qs(SEL.toggle, root);
-    const next   = qs(SEL.next, root);
-    const prev   = qs(SEL.prev, root);
-
+    const { input, toggle, next, prev } = pick(root);
+    // Habilita botões já
     prev?.removeAttribute('disabled');
     next?.removeAttribute('disabled');
 
-    if (toggle && !toggle.__senhaBound){
-      toggle.addEventListener('click', () => { if (!input) return; input.type = input.type === 'password' ? 'text' : 'password'; });
+    // Olho mágico
+    if (toggle && !toggle.__senhaBound) {
+      toggle.addEventListener('click', () => {
+        if (!input) return;
+        input.type = input.type === 'password' ? 'text' : 'password';
+      });
       toggle.__senhaBound = true;
     }
 
-    if (prev && !prev.__senhaBound){
-      prev.addEventListener('click', () => {
-        const rootEl = qs(SEL.root);
-        const candidates = [
-          prev.dataset?.backHref,
-          prev.getAttribute?.('data-href'),
-          rootEl?.dataset?.backHref,
-          window.JC?.homeUrl,
-          (document.referrer && new URL(document.referrer).origin === window.location.origin ? document.referrer : null),
-          '/'
-        ].filter(Boolean);
-        const target = candidates[0];
-        try { window.top.location.assign(target); } catch { window.location.href = target; }
-      });
+    // Navegação
+    if (prev && !prev.__senhaBound) {
+      prev.addEventListener('click', () => { try { window.JC?.show?.('section-termos'); } catch {} });
       prev.__senhaBound = true;
     }
-
-    if (next && !next.__senhaBound){
+    if (next && !next.__senhaBound) {
       next.addEventListener('click', () => {
         if (!input) return;
-        const senha = (input.value || '').trim();
-        if (senha.length < 3){
-          window.toast?.('Digite uma Palavra-Chave válida.', 'warning');
-          try { input.focus(); } catch {}
-          return;
-        }
-        const rootEl = qs(SEL.root);
-        const nextId = next.dataset?.nextSection || rootEl?.dataset?.nextSection || NEXT_SECTION_DEFAULT;
-        playTransitionThen(() => { try { window.JC?.show?.(nextId); } catch {} });
+        const senha=(input.value||'').trim();
+        if (senha.length >= 3) { try { window.JC?.show?.('section-filme'); } catch {} }
+        else { window.toast?.('Digite uma Palavra-Chave válida.', 'warning'); try{ input.focus(); }catch{} }
       });
       next.__senhaBound = true;
     }
   }
 
-  // ---------- Sequência (datilografia + leitura) ----------
   async function runSequence(root){
-    if (!root || window.JCSenha.state.running) return;
+    if(!root || window.JCSenha.state.running) return;
 
     window.JCSenha.state.running = true;
-    const myId = ++window.JCSenha.state.abortId;
-    const abort = () => myId !== window.JCSenha.state.abortId;
+    const myAbort = makeAbortToken();
 
+    // Normaliza e limpa visual (start imediato)
     const seq = getSeq(root);
-    if (seq.length === 0){ window.JCSenha.state.running = false; return; }
+    if (seq.length === 0) { window.JCSenha.state.running=false; return; }
 
-    // Normaliza antes de começar
-    seq.forEach(p => {
-      if (ensureDataText(p)) p.textContent = '';
+    seq.forEach(p=>{
+      if(ensureDataText(p)) p.textContent='';
       p.classList.remove('typing-done','typing-active');
       delete p.dataset.spoken;
       p.style.display='block'; p.style.width='100%';
@@ -225,28 +214,40 @@
       p.style.marginLeft='0'; p.style.marginRight='auto';
     });
 
+    // Sequência: digita -> fala -> pausa -> próximo (abortável)
     for (const p of seq){
-      if (abort()) break;
-      const text = await typeOnce(p, abort);
-      if (abort()) break;
+      if (myAbort.cancelled()) break;
+      const text = await typeOnce(p, myAbort);
+      if (myAbort.cancelled()) break;
       if (text && !p.dataset.spoken){
-        await speakOnce(text, abort);
-        if (abort()) break;
-        p.dataset.spoken = 'true';
+        await speakOnce(text, myAbort);
+        if (myAbort.cancelled()) break;
+        p.dataset.spoken='true';
       }
-      const t0 = Date.now();
-      while(!abort() && (Date.now()-t0) < PAUSE_BETWEEN_P) await sleep(8);
+      const t0=Date.now();
+      while(!myAbort.cancelled() && (Date.now()-t0)<PAUSE_BETWEEN_P) await sleep(10);
     }
 
     window.JCSenha.state.running = false;
   }
 
-  // ---------- Starter super-confiável ----------
-  function startNow(){
-    const root = qs(SEL.root);
-    if (!root) return;
+  function armObserver(root){
+    try{
+      if (window.JCSenha.state.observer) window.JCSenha.state.observer.disconnect();
+      const obs=new MutationObserver(()=>{
+        // Se reinjetar e não estiver rodando, dispara já
+        if (!window.JCSenha.state.running) runSequence(root);
+      });
+      obs.observe(root,{childList:true,subtree:true});
+      window.JCSenha.state.observer = obs;
+    }catch{}
+  }
 
-    // Força estrutura mínima e não espera "visível"
+  function tryKick(force=false){
+    const root = qs(sel.root);
+    if(!root) return false;
+
+    // Garante visível (sem brigar com controlador)
     root.classList.remove('hidden');
     root.setAttribute('aria-hidden','false');
     root.style.removeProperty('display');
@@ -254,69 +255,33 @@
     root.style.removeProperty('visibility');
 
     bindControls(root);
-
-    // Se já existem parágrafos, começa imediatamente
-    if (getSeq(root).length){
-      runSequence(root);
-      return;
-    }
-
-    // Senão, observa SOMENTE o root pra disparar assim que os parágrafos entrarem
-    try {
-      if (window.JCSenha.state.rootObs) window.JCSenha.state.rootObs.disconnect();
-      const obs = new MutationObserver((muts) => {
-        for (const m of muts){
-          if (m.type !== 'childList' || !(m.addedNodes && m.addedNodes.length)) continue;
-          // Se qualquer um dos #senha-instr* aparecer (ou dentro do nó adicionado), dispara
-          for (const n of m.addedNodes){
-            if (!(n instanceof Element)) continue;
-            if (
-              n.matches?.(SEL.ids.join(',')) ||
-              n.querySelector?.(SEL.ids.join(','))
-            ){
-              obs.disconnect();
-              runSequence(root);
-              return;
-            }
-          }
-        }
-      });
-      obs.observe(root, { childList:true, subtree:true });
-      window.JCSenha.state.rootObs = obs;
-    } catch {}
-
-    // Watchdog leve (só por segurança): tenta 6x em 2s, mas não segura início
-    let tries = 0;
-    clearInterval(window.JCSenha.state.kickWatch);
-    window.JCSenha.state.kickWatch = setInterval(() => {
-      if (++tries > 6) { clearInterval(window.JCSenha.state.kickWatch); return; }
-      if (!window.JCSenha.state.running && getSeq(root).length){
-        clearInterval(window.JCSenha.state.kickWatch);
-        runSequence(root);
-      }
-    }, 300);
+    armObserver(root);
+    runSequence(root);
+    return true;
   }
 
-  // ---------- Eventos ----------
-  // Inicia IMEDIATO ao mostrar a seção senha
-  document.addEventListener('section:shown', (evt) => {
+  // API pública
+  window.JCSenha.__kick = (force=false)=>tryKick(force);
+
+  // Eventos oficiais: iniciar na hora; abortar quando outra seção aparece
+  document.addEventListener('section:shown', (evt)=>{
     const id = evt?.detail?.sectionId;
-    if (!id) return;
-    if (id === 'section-senha'){
-      // Zera execuções anteriores e dispara já
+    if(!id) return;
+    if (id === 'section-senha') {
+      // cancela qualquer execução antiga e dispara JÁ
       window.JCSenha.state.abortId++;
-      startNow();
+      tryKick(true);
     } else {
-      // Outra seção assumiu → aborta na hora
+      // outra seção assumiu → aborta datilografia/leitura aqui
       window.JCSenha.state.abortId++;
     }
   });
 
-  // Chutes imediatos (no load)
-  window.JCSenha.__startNow = startNow;
-  // Se o script entrar depois do evento, ainda assim chuta agora:
-  startNow();
-  // E no próximo microtask, de novo (para pegar DOM recém-injetado):
-  Promise.resolve().then(() => startNow());
+  // Disparos imediatos (sem depender de nada)
+  tryKick(true);
+  Promise.resolve().then(()=>tryKick(true));
+  if (typeof requestAnimationFrame === 'function') {
+    requestAnimationFrame(()=>tryKick(true));
+  }
 
 })();
