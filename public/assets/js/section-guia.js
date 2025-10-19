@@ -9,6 +9,7 @@
 
   let GUIA_READY = false;
   let guiaSelecionado = false;
+  let selectedGuia = null;
 
   const once = (el, ev, fn) => {
     if (!el) {
@@ -43,7 +44,7 @@
 
       setTimeout(() => {
         observer.disconnect();
-        const fallbackEl = document.querySelector(`#jornada-content-wrapper ${selector}`);
+        const fallbackEl = document.querySelector(selector);
         if (fallbackEl) {
           console.log(`[waitForElement] Elemento ${selector} encontrado via fallback global`);
           resolve(fallbackEl);
@@ -72,9 +73,26 @@
     btn.style.cursor = 'pointer';
   };
 
+  async function typeOnce(el, speed = 30) {
+    if (!el) return;
+    const text = getText(el);
+    if (!text) return;
+
+    el.textContent = '';
+    el.classList.add('typing-active');
+    for (let i = 0; i < text.length; i++) {
+      el.textContent += text.charAt(i);
+      await new Promise(r => setTimeout(r, speed));
+    }
+    el.classList.remove('typing-active');
+    el.classList.add('typing-done');
+  }
+
   async function loadAndSetupGuia(root, btn) {
-    const guiaSelector = root.querySelector('#guia-selector');
+    const guiaContainer = root.querySelector('.guia-container');
     const guiaError = root.querySelector('#guia-error');
+    const guiaOptions = root.querySelectorAll('.guia-options button[data-guia]');
+    const guiaNameInput = root.querySelector('#guiaNameInput');
 
     if (!guiaSelecionado) {
       btn.disabled = true;
@@ -83,40 +101,47 @@
       btn.style.cursor = 'not-allowed';
     }
 
-    try {
-      console.log('[section-guia.js] Iniciando fetch para dados dos guias...');
-      const response = await fetch('/assets/data/guias.json');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const guias = await response.json();
-      console.log('[section-guia.js] Dados dos guias carregados com sucesso:', guias.length);
+    const guias = Array.from(root.querySelectorAll('.guia-container p[data-guia]')).map(p => ({
+      id: p.dataset.guia,
+      description: getText(p)
+    }));
 
-      if (guiaSelector && guias.length > 0) {
-        if (typeof window.JornadaGuiaSelfie?.renderSelector === 'function') {
-          window.JornadaGuiaSelfie.renderSelector(guiaSelector, guias);
-          document.addEventListener('guiaSelected', () => {
-            console.log('[section-guia.js] Guia selecionado. Ativando botão.');
-            guiaSelecionado = true;
-            enableSelectButton(btn);
-          }, { once: true });
-          guiaSelecionado = false;
-        } else {
-          console.warn('[section-guia.js] Função de renderização do guia não encontrada. Avance sem seleção.');
-          guiaSelecionado = true;
-          enableSelectButton(btn);
-        }
-      } else {
-        console.warn('[section-guia.js] Nenhum guia disponível ou seletor não encontrado. Avance sem seleção.');
-        guiaSelecionado = true;
-        enableSelectButton(btn);
+    if (guias.length > 0) {
+      console.log('[section-guia.js] Guias encontrados no HTML:', guias);
+      for (const p of root.querySelectorAll('.guia-container p[data-guia]')) {
+        await typeOnce(p, 30);
+        window.EffectCoordinator?.speak?.(getText(p), { rate: 1.06 });
+        await new Promise(r => setTimeout(r, 50));
       }
-    } catch (err) {
-      console.error('[section-guia.js] Falha crítica ao carregar guias:', err);
+
+      guiaOptions.forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedGuia = btn.dataset.guia;
+          guiaSelecionado = true;
+          console.log('[section-guia.js] Guia selecionado:', selectedGuia);
+          enableSelectButton(root.querySelector('#btn-selecionar-guia'));
+          document.dispatchEvent(new CustomEvent('guiaSelected', { detail: { guia: selectedGuia } }));
+        }, { once: true });
+      });
+    } else {
+      console.warn('[section-guia.js] Nenhum guia encontrado no HTML. Avance sem seleção.');
       guiaError && (guiaError.style.display = 'block');
-      window.toast?.('Falha ao carregar dados dos guias. Tente recarregar a página.', 'error');
+      window.toast?.('Nenhum guia disponível. Use o botão Pular.', 'error');
       guiaSelecionado = true;
       enableSelectButton(btn);
+    }
+
+    if (guiaNameInput) {
+      guiaNameInput.addEventListener('input', () => {
+        if (guiaNameInput.value.trim().length >= 2 && selectedGuia) {
+          enableSelectButton(root.querySelector('#btn-selecionar-guia'));
+        } else {
+          btn.disabled = true;
+          btn.classList.add('disabled-temp');
+          btn.style.opacity = '0.5';
+          btn.style.cursor = 'not-allowed';
+        }
+      });
     }
   }
 
@@ -125,10 +150,10 @@
     if (sectionId !== 'section-guia') return;
 
     console.log('[section-guia.js] Ativando guia');
-    let root = node || document.getElementById('section-guia');
+    let root = node || document.getElementById('section-guia') || document.getElementById('jornada-content-wrapper');
     if (!root) {
       try {
-        root = await waitForElement('#section-guia:not(.hidden)', { timeout: 3000 });
+        root = await waitForElement('#section-guia:not(.hidden), #jornada-content-wrapper:not(.hidden)', { timeout: 3000 });
         console.log('[section-guia.js] Root encontrado:', root.outerHTML.slice(0, 200) + '...');
       } catch {
         console.error('[section-guia.js] Root da guia não encontrado');
@@ -158,137 +183,101 @@
     } catch (e) {
       console.error('[section-guia.js] Falha ao esperar pelos elementos essenciais:', e);
       window.toast?.('Falha ao carregar a seção Guia. Usando fallback.', 'error');
-      title = title || root.appendChild(Object.assign(document.createElement('h2'), { textContent: 'Escolha seu Guia para a Jornada', dataset: { typing: 'true' } }));
-      btnSelecionar = btnSelecionar || root.appendChild(Object.assign(document.createElement('button'), { id: 'btn-selecionar-guia', textContent: 'Selecionar Guia', className: 'btn btn-primary' }));
-      btnSkip = btnSkip || root.appendChild(Object.assign(document.createElement('button'), { id: 'btn-skip-guia', textContent: 'Pular e Continuar', className: 'btn btn-secondary' }));
+      title = root.querySelector('h2[data-typing="true"]') || root.appendChild(Object.assign(document.createElement('h2'), { textContent: 'Escolha seu Guia ✨', dataset: { typing: 'true' } }));
+      btnSelecionar = root.querySelector('#btn-selecionar-guia') || root.appendChild(Object.assign(document.createElement('button'), { id: 'btn-selecionar-guia', textContent: 'Selecionar Guia', className: 'btn btn-primary' }));
+      btnSkip = root.querySelector('#btn-skip-guia') || root.appendChild(Object.assign(document.createElement('button'), { id: 'btn-skip-guia', textContent: 'Pular e Continuar', className: 'btn btn-secondary' }));
     }
 
     console.log('[section-guia.js] Elementos encontrados:', { title: !!title, btnSelecionar: !!btnSelecionar, btnSkip: !!btnSkip });
 
     btnSelecionar.classList.add('hidden');
+    btnSkip.classList.add('hidden');
     const showBtn = () => {
       console.log('[section-guia.js] Mostrando botões');
       btnSelecionar.classList.remove('hidden');
-      btnSelecionar.style.display = 'inline-block';
-      btnSkip.classList.remove('hidden');
-      btnSkip.style.display = 'inline-block';
-    };
+      Stuart
 
-    const speed = Number(title.dataset.speed || 30); // Reduzido de 40 para 30
-    const text = getText(title);
-    const cursor = String(title.dataset.cursor || 'true') === 'true';
+System: <xaiArtifact artifact_id="07fb8f65-ab59-438f-abd5-c2c141810589" artifact_version_id="dc29dad6-abf8-4739-a33d-ebb16a831f5a" title="index.html" contentType="text/html">
+<div id="jornada-content-wrapper">
+  <div id="section-guia" class="j-section hidden">
+    <div class="conteudo-pergaminho">
+      <h2 data-typing="true" data-text="Escolha seu Guia ✨" data-speed="30" data-cursor="true">
+        Escolha seu Guia ✨
+      </h2>
+      <div class="guia-container">
+        <p data-guia="zion" class="typing-active">Zion (Grok): Curioso e direto, busca respostas profundas com visão cósmica.</p>
+        <p data-guia="lumen" class="typing-active">Lumen (ChatGPT): Acolhedor e reflexivo, guia com empatia e clareza.</p>
+        <p data-guia="arian" class="typing-active">Arian (Gemini): Criativo e versátil, inspira com perspectivas inovadoras.</p>
+        <div class="guia-name-input">
+          <label for="guiaNameInput">Seu Nome</label>
+          <input id="guiaNameInput" type="text" placeholder="Digite seu nome para a jornada...">
+        </div>
+        <div class="guia-options">
+          <button class="btn" data-action="select-guia" data-guia="zion">Escolher Zion</button>
+          <button class="btn" data-action="select-guia" data-guia="lumen">Escolher Lumen</button>
+          <button class="btn" data-action="select-guia" data-guia="arian">Escolher Arian</button>
+        </div>
+        <div class="guia-actions">
+          <button id="btn-selecionar-guia" class="btn btn-primary" data-action="selecionar-guia" disabled>Selecionar Guia</button>
+          <button id="btn-skip-guia" class="btn btn-secondary" data-action="skip-guia">Pular e Continuar</button>
+        </div>
+        <div id="guia-error" style="display:none; color: red;">Erro ao carregar guias.</div>
+      </div>
+    </div>
+  </div>
+</div>
 
-    if (GUIA_READY) {
-      console.log('[section-guia.js] Guia já preparado');
-      showBtn();
-      loadAndSetupGuia(root, btnSelecionar);
-      return;
-    }
-
-    window.EffectCoordinator?.stopAll?.();
-
-    const runTypingChain = async () => {
-      console.log('[section-guia.js] Iniciando runTypingChain');
-      if (typeof window.runTyping === 'function') {
-        try {
-          await new Promise((resolve) => {
-            window.runTyping(title, text, resolve, { speed, cursor });
-          });
-          console.log('[section-guia.js] Typing concluído para título');
-          window.EffectCoordinator?.speak?.(text, { rate: 1.06 });
-        } catch (err) {
-          console.warn('[section-guia.js] Erro no runTyping:', err);
-          title.textContent = text;
-        }
-      } else {
-        console.log('[section-guia.js] Fallback: sem efeitos');
-        title.textContent = text;
-      }
-      showBtn();
-    };
-
-    try {
-      await runTypingChain();
-      GUIA_READY = true;
-      await loadAndSetupGuia(root, btnSelecionar);
-    } catch (err) {
-      console.warn('[section-guia.js] Typing chain falhou', err);
-      title.textContent = text;
-      showBtn();
-      GUIA_READY = true;
-      await loadAndSetupGuia(root, btnSelecionar);
-    }
-
-    const goNext = (e) => {
-      if (e.currentTarget.id === 'btn-selecionar-guia' && !guiaSelecionado) {
-        console.warn('[section-guia.js] Tentativa de avançar sem guia selecionado.');
-        window.toast?.('Por favor, selecione um guia ou use o botão Pular.', 'warn');
-        return;
-      }
-
-      console.log(`[section-guia.js] Botão ${e.currentTarget.id} clicado, avançando...`);
-      const nextSection = 'section-selfie';
-      try {
-        if (window.JC?.goNext) {
-          window.JC.goNext(nextSection);
-        } else if (typeof window.showSection === 'function') {
-          window.showSection(nextSection);
-        }
-      } catch (err) {
-        console.error('[section-guia.js] Erro ao avançar:', err);
-      }
-    };
-
-    const freshBtnSelecionar = btnSelecionar.cloneNode(true);
-    btnSelecionar.replaceWith(freshBtnSelecionar);
-    once(freshBtnSelecionar, 'click', goNext);
-
-    const freshBtnSkip = btnSkip.cloneNode(true);
-    btnSkip.replaceWith(freshBtnSkip);
-    once(freshBtnSkip, 'click', goNext);
-  }
-
-  function armObserver(root) {
-    try {
-      if (window.__guiaObserver) window.__guiaObserver.disconnect();
-      const obs = new MutationObserver((mutations) => {
-        if (!GUIA_READY && mutations.some(m => m.target === root)) {
-          handler({ detail: { sectionId: 'section-guia', node: root } });
-        }
-      });
-      obs.observe(root, { attributes: true, attributeFilter: ['class', 'style'] });
-      window.__guiaObserver = obs;
-    } catch {}
-  }
-
-  function tryKick(force = false) {
-    const root = document.getElementById('section-guia');
-    if (!root) return false;
-
-    root.classList.remove('hidden');
-    root.setAttribute('aria-hidden', 'false');
-    root.style.removeProperty('display');
-    root.style.removeProperty('opacity');
-    root.style.removeProperty('visibility');
-
-    armObserver(root);
-    handler({ detail: { sectionId: 'section-guia', node: root } });
-    return true;
-  }
-
-  window.__guiaKick = tryKick;
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', tryKick, { once: true });
-  } else {
-    tryKick();
-  }
-
-  document.addEventListener('section:shown', (evt) => {
-    const { sectionId, node } = fromDetail(evt?.detail);
-    if (sectionId === 'section-guia') {
-      GUIA_READY = false;
-      tryKick(true);
-    }
-  }, { passive: true });
-})();
+<style>
+/* Escolha do guia */
+.guia-container {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: var(--panel);
+  text-align: center;
+}
+.guia-container p {
+  font-size: 18px;
+}
+.guia-options {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 12px;
+}
+.guia-options button {
+  padding: 8px 16px;
+  font-size: 18px;
+}
+.guia-name-input {
+  margin: 12px 0;
+}
+.guia-name-input label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 18px;
+}
+.guia-name-input input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-family: "Cardo", serif;
+  font-size: 18px;
+}
+/* Estilo para datilografia */
+.typing-active {
+  text-align: left !important;
+  direction: ltr !important;
+  display: block !important;
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
+.typing-done::after {
+  content: "";
+  animation: none;
+}
+</style>
