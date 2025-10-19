@@ -12,7 +12,7 @@
   const EST_WPM = 160;         // fallback p/ TTS
   const EST_CPS = 13;
   const TRANSITION_SRC = '/assets/img/irmandade-no-jardim.mp4';
-  const NEXT_SECTION_DEFAULT = 'section-escolha';
+  const NEXT_SECTION_DEFAULT = 'section-guia';
 
   // ===== Estado / Namespace =====
   window.JCSenha = window.JCSenha || {};
