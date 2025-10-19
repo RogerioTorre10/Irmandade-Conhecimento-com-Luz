@@ -78,6 +78,7 @@
     const text = getText(el);
     if (!text) return;
 
+    console.log('[section-guia.js] Iniciando datilografia para:', text);
     el.textContent = '';
     el.classList.add('typing-active');
     for (let i = 0; i < text.length; i++) {
@@ -86,6 +87,7 @@
     }
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
+    console.log('[section-guia.js] Datilografia concluída para:', text);
   }
 
   async function loadAndSetupGuia(root, btn) {
@@ -110,7 +112,11 @@
       console.log('[section-guia.js] Guias encontrados no HTML:', guias);
       for (const p of root.querySelectorAll('.guia-container p[data-guia]')) {
         await typeOnce(p, 30);
-        window.EffectCoordinator?.speak?.(getText(p), { rate: 1.06 });
+        if (window.EffectCoordinator?.speak) {
+          console.log('[section-guia.js] Iniciando TTS para:', getText(p));
+          await window.EffectCoordinator.speak(getText(p), { rate: 1.06 });
+          console.log('[section-guia.js] TTS concluído para:', getText(p));
+        }
         await new Promise(r => setTimeout(r, 50));
       }
 
@@ -133,7 +139,8 @@
 
     if (guiaNameInput) {
       guiaNameInput.addEventListener('input', () => {
-        if (guiaNameInput.value.trim().length >= 2 && selectedGuia) {
+        const nameValid = guiaNameInput.value.trim().length >= 2;
+        if (nameValid && selectedGuia) {
           enableSelectButton(root.querySelector('#btn-selecionar-guia'));
         } else {
           btn.disabled = true;
@@ -195,89 +202,143 @@
     const showBtn = () => {
       console.log('[section-guia.js] Mostrando botões');
       btnSelecionar.classList.remove('hidden');
-      Stuart
+      btnSelecionar.style.display = 'inline-block';
+      btnSkip.classList.remove('hidden');
+      btnSkip.style.display = 'inline-block';
+    };
 
-System: <xaiArtifact artifact_id="07fb8f65-ab59-438f-abd5-c2c141810589" artifact_version_id="dc29dad6-abf8-4739-a33d-ebb16a831f5a" title="index.html" contentType="text/html">
-<div id="jornada-content-wrapper">
-  <div id="section-guia" class="j-section hidden">
-    <div class="conteudo-pergaminho">
-      <h2 data-typing="true" data-text="Escolha seu Guia ✨" data-speed="30" data-cursor="true">
-        Escolha seu Guia ✨
-      </h2>
-      <div class="guia-container">
-        <p data-guia="zion" class="typing-active">Zion (Grok): Curioso e direto, busca respostas profundas com visão cósmica.</p>
-        <p data-guia="lumen" class="typing-active">Lumen (ChatGPT): Acolhedor e reflexivo, guia com empatia e clareza.</p>
-        <p data-guia="arian" class="typing-active">Arian (Gemini): Criativo e versátil, inspira com perspectivas inovadoras.</p>
-        <div class="guia-name-input">
-          <label for="guiaNameInput">Seu Nome</label>
-          <input id="guiaNameInput" type="text" placeholder="Digite seu nome para a jornada...">
-        </div>
-        <div class="guia-options">
-          <button class="btn" data-action="select-guia" data-guia="zion">Escolher Zion</button>
-          <button class="btn" data-action="select-guia" data-guia="lumen">Escolher Lumen</button>
-          <button class="btn" data-action="select-guia" data-guia="arian">Escolher Arian</button>
-        </div>
-        <div class="guia-actions">
-          <button id="btn-selecionar-guia" class="btn btn-primary" data-action="selecionar-guia" disabled>Selecionar Guia</button>
-          <button id="btn-skip-guia" class="btn btn-secondary" data-action="skip-guia">Pular e Continuar</button>
-        </div>
-        <div id="guia-error" style="display:none; color: red;">Erro ao carregar guias.</div>
-      </div>
-    </div>
-  </div>
-</div>
+    const speed = Number(title.dataset.speed || 30);
+    const text = getText(title) || title.dataset.text;
+    const cursor = String(title.dataset.cursor || 'true') === 'true';
 
-<style>
-/* Escolha do guia */
-.guia-container {
-  margin-top: 20px;
-  padding: 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  background: var(--panel);
-  text-align: center;
-}
-.guia-container p {
-  font-size: 18px;
-}
-.guia-options {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 12px;
-}
-.guia-options button {
-  padding: 8px 16px;
-  font-size: 18px;
-}
-.guia-name-input {
-  margin: 12px 0;
-}
-.guia-name-input label {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-weight: 600;
-  font-size: 18px;
-}
-.guia-name-input input {
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  font-family: "Cardo", serif;
-  font-size: 18px;
-}
-/* Estilo para datilografia */
-.typing-active {
-  text-align: left !important;
-  direction: ltr !important;
-  display: block !important;
-  width: 100% !important;
-  margin-left: 0 !important;
-  margin-right: auto !important;
-}
-.typing-done::after {
-  content: "";
-  animation: none;
-}
-</style>
+    if (GUIA_READY) {
+      console.log('[section-guia.js] Guia já preparado');
+      showBtn();
+      loadAndSetupGuia(root, btnSelecionar);
+      return;
+    }
+
+    window.EffectCoordinator?.stopAll?.();
+
+    const runTypingChain = async () => {
+      console.log('[section-guia.js] Iniciando runTypingChain com texto:', text);
+      title.textContent = '';
+      if (typeof window.runTyping === 'function') {
+        try {
+          await new Promise((resolve) => {
+            window.runTyping(title, text, resolve, { speed, cursor });
+          });
+          console.log('[section-guia.js] Typing concluído para título');
+          if (window.EffectCoordinator?.speak) {
+            console.log('[section-guia.js] Iniciando TTS para título:', text);
+            await window.EffectCoordinator.speak(text, { rate: 1.06 });
+            console.log('[section-guia.js] TTS concluído para título');
+          }
+        } catch (err) {
+          console.warn('[section-guia.js] Erro no runTyping:', err);
+          title.textContent = text;
+        }
+      } else {
+        console.log('[section-guia.js] Fallback: sem efeitos para título');
+        await typeOnce(title, speed);
+        if (window.EffectCoordinator?.speak) {
+          console.log('[section-guia.js] Iniciando TTS para título:', text);
+          await window.EffectCoordinator.speak(text, { rate: 1.06 });
+          console.log('[section-guia.js] TTS concluído para título');
+        }
+      }
+      showBtn();
+    };
+
+    try {
+      await runTypingChain();
+      GUIA_READY = true;
+      await loadAndSetupGuia(root, btnSelecionar);
+    } catch (err) {
+      console.warn('[section-guia.js] Typing chain falhou', err);
+      title.textContent = text;
+      showBtn();
+      GUIA_READY = true;
+      await loadAndSetupGuia(root, btnSelecionar);
+    }
+
+    const goNext = (e) => {
+      const nameInput = root.querySelector('#guiaNameInput');
+      const name = nameInput ? nameInput.value.trim() : '';
+      if (e.currentTarget.id === 'btn-selecionar-guia' && (!guiaSelecionado || name.length < 2)) {
+        console.warn('[section-guia.js] Tentativa de avançar sem guia selecionado ou nome válido.');
+        window.toast?.('Por favor, selecione um guia e digite um nome com pelo menos 2 caracteres.', 'warn');
+        return;
+      }
+
+      console.log(`[section-guia.js] Botão ${e.currentTarget.id} clicado, avançando...`);
+      const nextSection = 'section-selfie';
+      try {
+        if (window.JC?.goNext) {
+          window.JC.goNext(nextSection, { guia: selectedGuia, name });
+        } else if (typeof window.showSection === 'function') {
+          window.showSection(nextSection);
+        } else {
+          console.warn('[section-guia.js] Nenhum método de navegação encontrado.');
+        }
+      } catch (err) {
+        console.error('[section-guia.js] Erro ao avançar:', err);
+      }
+    };
+
+    const freshBtnSelecionar = btnSelecionar.cloneNode(true);
+    btnSelecionar.replaceWith(freshBtnSelecionar);
+    once(freshBtnSelecionar, 'click', goNext);
+
+    const freshBtnSkip = btnSkip.cloneNode(true);
+    btnSkip.replaceWith(freshBtnSkip);
+    once(freshBtnSkip, 'click', goNext);
+  }
+
+  function armObserver(root) {
+    try {
+      if (window.__guiaObserver) window.__guiaObserver.disconnect();
+      const obs = new MutationObserver((mutations) => {
+        if (!GUIA_READY && mutations.some(m => m.target === root || m.addedNodes.length > 0)) {
+          handler({ detail: { sectionId: 'section-guia', node: root } });
+        }
+      });
+      obs.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style'] });
+      window.__guiaObserver = obs;
+    } catch {}
+  }
+
+  function tryKick(force = false) {
+    let root = document.getElementById('section-guia') || document.getElementById('jornada-content-wrapper');
+    if (!root) {
+      console.error('[section-guia.js] Root não encontrado');
+      return false;
+    }
+
+    root.classList.remove('hidden');
+    root.setAttribute('aria-hidden', 'false');
+    root.style.removeProperty('display');
+    root.style.removeProperty('opacity');
+    root.style.removeProperty('visibility');
+
+    armObserver(root);
+    handler({ detail: { sectionId: 'section-guia', node: root } });
+    return true;
+  }
+
+  window.__guiaKick = tryKick;
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', tryKick, { once: true });
+  } else {
+    tryKick();
+  }
+
+  document.addEventListener('section:shown', (evt) => {
+    const { sectionId, node } = fromDetail(evt?.detail);
+    if (sectionId === 'section-guia') {
+      GUIA_READY = false;
+      tryKick(true);
+    }
+  }, { passive: true });
+})();
