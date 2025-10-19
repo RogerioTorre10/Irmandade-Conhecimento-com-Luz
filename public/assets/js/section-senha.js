@@ -1,10 +1,3 @@
-// section-senha.js — v13.2 (base v13 + transição + voltar para site)
-// - Mantém start imediato (load, microtask, rAF) e anti-invasão
-// - Datilografia local (E→D) + Leitura por parágrafo
-// - Botões habilitados e olho mágico ativo
-// - "Avançar" toca vídeo de transição e só depois navega (padrão: section-escolha)
-// - "Voltar" leva para o site (ver cascata abaixo)
-
 (function () {
   'use strict';
 
@@ -14,12 +7,12 @@
   }
 
   // ===== Config =====
-  const TYPE_MS = 55;          // ms/char (datilografia) — você pode ajustar
-  const PAUSE_BETWEEN_P = 90;  // pausa curtinha entre parágrafos
+  const TYPE_MS = 55;          // ms/char (datilografia)
+  const PAUSE_BETWEEN_P = 50;  // pausa reduzida entre parágrafos (era 90)
   const EST_WPM = 160;         // fallback p/ TTS
   const EST_CPS = 13;
   const TRANSITION_SRC = '/assets/img/irmandade-no-jardim.mp4';
-  const NEXT_SECTION_DEFAULT = 'section-escolha'; // ajuste aqui ou via data-next-section
+  const NEXT_SECTION_DEFAULT = 'section-escolha';
 
   // ===== Estado / Namespace =====
   window.JCSenha = window.JCSenha || {};
@@ -34,7 +27,7 @@
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
   const qs = (s, r=document) => r.querySelector(s);
 
-  // CSS para garantir E→D durante digitação (vence centralização do pai)
+  // CSS para garantir E→D durante digitação
   (function injectCSS(){
     if (document.getElementById('jc-senha-align-patch-v13_2')) return;
     const s = document.createElement('style');
@@ -164,7 +157,6 @@
     return [p1,p2,p3,p4].filter(Boolean);
   }
 
-  // ---- Transição (vídeo) ao avançar ----
   function playTransitionThen(nextStep){
     if (document.getElementById('senha-transition-overlay')) return;
     const overlay = document.createElement('div');
@@ -196,11 +188,9 @@
 
   function bindControls(root){
     const { input, toggle, next, prev } = pick(root);
-    // Habilita botões já
     prev?.removeAttribute('disabled');
     next?.removeAttribute('disabled');
 
-    // Olho mágico
     if (toggle && !toggle.__senhaBound) {
       toggle.addEventListener('click', () => {
         if (!input) return;
@@ -209,7 +199,6 @@
       toggle.__senhaBound = true;
     }
 
-    // Voltar → site (cascata: data-back-href > root data > JC.homeUrl > referrer mesmo host > "/")
     if (prev && !prev.__senhaBound) {
       prev.addEventListener('click', () => {
         const rootEl = qs(sel.root);
@@ -227,7 +216,6 @@
       prev.__senhaBound = true;
     }
 
-    // Avançar → valida senha, toca vídeo e só então navega para a próxima seção
     if (next && !next.__senhaBound) {
       next.addEventListener('click', () => {
         if (!input) return;
@@ -257,7 +245,6 @@
     window.JCSenha.state.running = true;
     const myAbort = makeAbortToken();
 
-    // Normaliza e limpa visual (start imediato)
     const seq = getSeq(root);
     if (seq.length === 0) { window.JCSenha.state.running=false; return; }
 
@@ -271,7 +258,6 @@
       p.style.marginLeft='0'; p.style.marginRight='auto';
     });
 
-    // Sequência: digita -> fala -> pausa -> próximo (abortável)
     for (const p of seq){
       if (myAbort.cancelled()) break;
       const text = await typeOnce(p, myAbort);
@@ -291,20 +277,20 @@
   function armObserver(root){
     try{
       if (window.JCSenha.state.observer) window.JCSenha.state.observer.disconnect();
-      const obs=new MutationObserver(()=>{
-        // Se reinjetar e não estiver rodando, dispara já
-        if (!window.JCSenha.state.running) runSequence(root);
+      const obs=new MutationObserver((mutations)=>{
+        if (!window.JCSenha.state.running && mutations.some(m => m.target === root)) {
+          runSequence(root);
+        }
       });
-      obs.observe(root,{childList:true,subtree:true});
+      obs.observe(root, {attributes: true, attributeFilter: ['class', 'style']});
       window.JCSenha.state.observer = obs;
     }catch{}
   }
 
-  function tryKick(force=false){
+  function tryKick(){
     const root = qs(sel.root);
     if(!root) return false;
 
-    // Garante visível (sem brigar com controlador)
     root.classList.remove('hidden');
     root.setAttribute('aria-hidden','false');
     root.style.removeProperty('display');
@@ -318,27 +304,24 @@
   }
 
   // API pública
-  window.JCSenha.__kick = (force=false)=>tryKick(force);
+  window.JCSenha.__kick = tryKick;
 
-  // Eventos oficiais: iniciar na hora; abortar quando outra seção aparece
+  // Inicialização única no DOMContentLoaded ou imediata se já carregado
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', tryKick, {once: true});
+  } else {
+    tryKick();
+  }
+
+  // Eventos oficiais: iniciar/abortar com base na seção
   document.addEventListener('section:shown', (evt)=>{
     const id = evt?.detail?.sectionId;
     if(!id) return;
     if (id === 'section-senha') {
-      // cancela qualquer execução antiga e dispara JÁ
       window.JCSenha.state.abortId++;
-      tryKick(true);
+      tryKick();
     } else {
-      // outra seção assumiu → aborta datilografia/leitura aqui
       window.JCSenha.state.abortId++;
     }
   });
-
-  // Disparos imediatos (sem depender de nada)
-  tryKick(true);
-  Promise.resolve().then(()=>tryKick(true));
-  if (typeof requestAnimationFrame === 'function') {
-    requestAnimationFrame(()=>tryKick(true));
-  }
-
 })();
