@@ -1,28 +1,29 @@
-// section-senha.js — v13 (ultrarrápido: start imediato + anti-invasão)
-// - Dispara imediatamente (no load, microtask e rAF) e em section:shown
-// - Sem probe/intervalos: zero espera pra começar
-// - Anti-invasão: aborta se outra seção for mostrada
-// - Datilografia local (E→D) + Leitura por parágrafo (aguarda Promise; senão, estima)
+// section-senha.js — v13.2 (base v13 + transição + voltar para site)
+// - Mantém start imediato (load, microtask, rAF) e anti-invasão
+// - Datilografia local (E→D) + Leitura por parágrafo
 // - Botões habilitados e olho mágico ativo
+// - "Avançar" toca vídeo de transição e só depois navega (padrão: section-escolha)
+// - "Voltar" leva para o site (ver cascata abaixo)
 
 (function () {
   'use strict';
 
-  if (window.JCSenha?.__bound_v13) {
-    // rearmar se já carregado
+  if (window.JCSenha?.__bound_v13_2) {
     window.JCSenha.__kick?.(/*force*/true);
     return;
   }
 
   // ===== Config =====
-  const TYPE_MS = 55;          // ms/char (datilografia)
+  const TYPE_MS = 55;          // ms/char (datilografia) — você pode ajustar
   const PAUSE_BETWEEN_P = 90;  // pausa curtinha entre parágrafos
   const EST_WPM = 160;         // fallback p/ TTS
   const EST_CPS = 13;
+  const TRANSITION_SRC = '/assets/img/irmandade-no-jardim.mp4';
+  const NEXT_SECTION_DEFAULT = 'section-escolha'; // ajuste aqui ou via data-next-section
 
   // ===== Estado / Namespace =====
   window.JCSenha = window.JCSenha || {};
-  window.JCSenha.__bound_v13 = true;
+  window.JCSenha.__bound_v13_2 = true;
   window.JCSenha.state = {
     running: false,
     observer: null,
@@ -35,9 +36,9 @@
 
   // CSS para garantir E→D durante digitação (vence centralização do pai)
   (function injectCSS(){
-    if (document.getElementById('jc-senha-align-patch-v13')) return;
+    if (document.getElementById('jc-senha-align-patch-v13_2')) return;
     const s = document.createElement('style');
-    s.id='jc-senha-align-patch-v13';
+    s.id='jc-senha-align-patch-v13_2';
     s.textContent = `
       #section-senha .typing-active{
         text-align:left !important; direction:ltr !important;
@@ -163,6 +164,36 @@
     return [p1,p2,p3,p4].filter(Boolean);
   }
 
+  // ---- Transição (vídeo) ao avançar ----
+  function playTransitionThen(nextStep){
+    if (document.getElementById('senha-transition-overlay')) return;
+    const overlay = document.createElement('div');
+    overlay.id = 'senha-transition-overlay';
+    overlay.style.cssText = `
+      position:fixed; inset:0; background:#000; z-index:999999;
+      display:flex; align-items:center; justify-content:center;`;
+    const video = document.createElement('video');
+    video.src = TRANSITION_SRC;
+    video.autoplay = true; video.muted = true; video.playsInline = true; video.controls = false;
+    video.style.cssText = 'width:100%; height:100%; object-fit:cover;';
+    overlay.appendChild(video);
+    document.body.appendChild(overlay);
+
+    let done = false;
+    const cleanup = () => {
+      if (done) return; done = true;
+      try { video.pause(); } catch {}
+      overlay.remove();
+      if (typeof nextStep === 'function') nextStep();
+    };
+
+    video.addEventListener('ended', cleanup, { once:true });
+    video.addEventListener('error', () => setTimeout(cleanup, 1200), { once:true });
+    setTimeout(() => { if (!done) cleanup(); }, 8000);
+
+    Promise.resolve().then(()=>video.play?.()).catch(()=>setTimeout(cleanup, 800));
+  }
+
   function bindControls(root){
     const { input, toggle, next, prev } = pick(root);
     // Habilita botões já
@@ -178,17 +209,43 @@
       toggle.__senhaBound = true;
     }
 
-    // Navegação
+    // Voltar → site (cascata: data-back-href > root data > JC.homeUrl > referrer mesmo host > "/")
     if (prev && !prev.__senhaBound) {
-      prev.addEventListener('click', () => { try { window.JC?.show?.('section-termos'); } catch {} });
+      prev.addEventListener('click', () => {
+        const rootEl = qs(sel.root);
+        const candidates = [
+          prev.dataset?.backHref,
+          prev.getAttribute?.('data-href'),
+          rootEl?.dataset?.backHref,
+          window.JC?.homeUrl,
+          (document.referrer && (()=>{ try{ return new URL(document.referrer).origin === window.location.origin; }catch{ return false; } })() ? document.referrer : null),
+          '/'
+        ].filter(Boolean);
+        const target = candidates[0];
+        try { window.top.location.assign(target); } catch { window.location.href = target; }
+      });
       prev.__senhaBound = true;
     }
+
+    // Avançar → valida senha, toca vídeo e só então navega para a próxima seção
     if (next && !next.__senhaBound) {
       next.addEventListener('click', () => {
         if (!input) return;
         const senha=(input.value||'').trim();
-        if (senha.length >= 3) { try { window.JC?.show?.('section-filme'); } catch {} }
-        else { window.toast?.('Digite uma Palavra-Chave válida.', 'warning'); try{ input.focus(); }catch{} }
+        if (senha.length < 3) {
+          window.toast?.('Digite uma Palavra-Chave válida.', 'warning');
+          try{ input.focus(); }catch{}
+          return;
+        }
+        const rootEl = qs(sel.root);
+        const nextId =
+          next.dataset?.nextSection ||
+          rootEl?.dataset?.nextSection ||
+          NEXT_SECTION_DEFAULT;
+
+        playTransitionThen(() => {
+          try { window.JC?.show?.(nextId); } catch {}
+        });
       });
       next.__senhaBound = true;
     }
