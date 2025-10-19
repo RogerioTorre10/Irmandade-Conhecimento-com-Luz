@@ -1,13 +1,70 @@
 <div id="jornada-content-wrapper">
-  <div class="guia-wrap">
-    <h2 data-typing="true" data-text="Escolha seu Guia para a Jornada" data-speed="40" data-cursor="true">
-      Escolha seu Guia para a Jornada
-    </h2>
-    <div id="guia-selector" class="guia-selecao"></div>
-    <div class="guia-actions">
-      <button id="btn-selecionar-guia" class="btn btn-primary" data-action="selecionar-guia" disabled>Selecionar Guia</button>
-      <button id="btn-skip-guia" class="btn btn-secondary" data-action="skip-guia">Pular e Continuar</button>
+  <div id="section-guia" class="j-section hidden">
+    <div class="conteudo-pergaminho">
+      <h2 data-typing="true" data-text="Escolha seu Guia ✨" data-speed="30" data-cursor="true">
+        Escolha seu Guia ✨
+      </h2>
+      <div class="guia-container">
+        <p data-guia="zion">Zion (Grok): Curioso e direto, busca respostas profundas com visão cósmica.</p>
+        <p data-guia="lumen">Lumen (ChatGPT): Acolhedor e reflexivo, guia com empatia e clareza.</p>
+        <p data-guia="arian">Arian (Gemini): Criativo e versátil, inspira com perspectivas inovadoras.</p>
+        <div class="guia-name-input">
+          <label for="guiaNameInput">Seu Nome</label>
+          <input id="guiaNameInput" type="text" placeholder="Digite seu nome para a jornada...">
+        </div>
+        <div class="guia-options">
+          <button class="btn" data-action="select-guia" data-guia="zion">Escolher Zion</button>
+          <button class="btn" data-action="select-guia" data-guia="lumen">Escolher Lumen</button>
+          <button class="btn" data-action="select-guia" data-guia="arian">Escolher Arian</button>
+        </div>
+        <div class="guia-actions">
+          <button id="btn-selecionar-guia" class="btn btn-primary" data-action="selecionar-guia" disabled>Selecionar Guia</button>
+          <button id="btn-skip-guia" class="btn btn-secondary" data-action="skip-guia">Pular e Continuar</button>
+        </div>
+        <div id="guia-error" style="display:none; color: red;">Erro ao carregar guias.</div>
+      </div>
     </div>
-    <div id="guia-error" style="display:none; color: red;">Erro ao carregar guias.</div>
   </div>
 </div>
+
+<style>
+/* Escolha do guia */
+.guia-container {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: var(--panel);
+  text-align: center;
+}
+.guia-container p {
+  font-size: 18px;
+}
+.guia-options {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 12px;
+}
+.guia-options button {
+  padding: 8px 16px;
+  font-size: 18px;
+}
+.guia-name-input {
+  margin: 12px 0;
+}
+.guia-name-input label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 18px;
+}
+.guia-name-input input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-family: "Cardo", serif;
+  font-size: 18px;
+}
+</style>
