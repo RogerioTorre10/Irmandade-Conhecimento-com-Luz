@@ -254,3 +254,26 @@
     if (root && !root.classList.contains('hidden')) activate(root);
   });
 })();
+// [ADICIONE] perto das Utils:
+function applyGuiaTheme(root, guiaId, guias) {
+  const g = (guias || []).find(x => x.id === guiaId);
+  const header = root.querySelector('.guia-header-moldura');
+  if (!g || !header) return;
+
+  // leve e elegante: moldura + leve vinheta
+  header.style.backgroundImage = `
+    linear-gradient(to bottom, rgba(0,0,0,.12), rgba(0,0,0,.18)),
+    url('${g.bgImage}')
+  `;
+  header.style.backgroundSize = 'cover';
+  header.style.backgroundPosition = 'center';
+}
+
+// [SUBSTITUA] a highlightChoice existente por esta versão que também aplica o tema:
+function highlightChoice(root, guia, guias) {
+  qsa('[data-guia]', root).forEach(el => {
+    el.classList.toggle('guia-selected', el.dataset.guia === guia);
+  });
+  applyGuiaTheme(root, guia, window.__GUIAS_CACHE || []);
+}
+
