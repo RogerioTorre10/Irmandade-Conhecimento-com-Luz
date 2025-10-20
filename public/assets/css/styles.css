@@ -744,3 +744,55 @@ TÍTULO: ESTILOS DA SEÇÃO GUIA (Sobrescrita para Moldura)
   margin-top: 30px; 
   position: relative; /* Ajusta a posição para não ficar "colado" no rodapé */
 }
+/* =============================================================================
+TÍTULO: ESTILOS DA SEÇÃO GUIA (AJUSTE FINO DO INPUT)
+============================================================================= */
+
+/* 1. Ajuste do Container da Moldura para centralizar melhor */
+.guia-header-moldura {
+  /* Mantém as regras existentes */
+  padding: 30px 40px 20px 40px; 
+  text-align: center;
+  position: relative;
+  z-index: 10;
+}
+
+/* 2. Ajuste do LABEL ("Insira seu nome") */
+.guia-name-input label {
+  /* Fundo de cor de madeira/tinta para contraste */
+  background-color: #3e2723 !important; 
+  color: #fff !important;
+  padding: 8px 18px !important; /* Aumenta o padding para visibilidade */
+  border-radius: 6px !important;
+  display: block !important; /* Transforma em bloco para ocupar a largura necessária */
+  width: fit-content; /* Ocupa apenas a largura do texto */
+  margin: 0 auto 10px auto !important; /* Centraliza acima do input */
+  font-family: 'ManufacturingConsent', sans-serif !important;
+  font-size: 1.2em !important;
+  font-variant: small-caps;
+}
+
+/* 3. Ajuste Crítico do INPUT (A área do nome ROGERIO) */
+.guia-name-input input {
+  /* Diminui a largura para caber no espaço interno da moldura */
+  width: 65% !important; 
+  max-width: 250px !important; /* Limita a largura máxima */
+
+  /* Estilo que imita o papel/pergaminho */
+  background-color: rgba(255, 255, 255, 0.95) !important; /* Fundo muito claro */
+  color: #3e2723 !important; /* Cor da "tinta" (sépia) */
+  
+  /* Remove a borda azul escura/escura do seu styles.css, substituindo por uma borda suave */
+  border: 1px solid #c8a488 !important; 
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15); /* Sombra interna sutil */
+
+  padding: 12px !important;
+  font-size: 18px !important;
+  font-family: 'Cardo', serif !important;
+  
+  /* Garante que o texto fique centralizado */
+  text-align: center !important; 
+  
+  /* Margem para não tocar as laterais da moldura */
+  margin: 0 auto !important;
+}
