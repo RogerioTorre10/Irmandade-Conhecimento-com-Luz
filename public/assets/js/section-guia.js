@@ -150,26 +150,38 @@
       btnSel.__bound = true;
     }
     
-    btnSelecionarGuia.addEventListener('click', () => {
-    if (!guiaAtual) return;
-    const nome = nameInput?.value?.trim() || '';
-    persistChoice(guiaAtual, nome);
+    document.querySelectorAll('[data-action="select-guia"]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const guia = btn.dataset.guia;
+    const nome = document.querySelector('#guiaNameInput')?.value?.trim() || '';
 
-  // Transição para vídeo
+    // Salva escolha
+    sessionStorage.setItem('jornada.guia', guia);
+    sessionStorage.setItem('jornada.nome', nome);
+
+    // Cria vídeo de transição
     const video = document.createElement('video');
     video.src = 'public/assets/img/conhecimento-com-luz-jardim.mp4';
     video.autoplay = true;
     video.controls = false;
     video.style.width = '100%';
     video.style.height = 'auto';
-    document.body.innerHTML = ''; // limpa a tela
+    video.style.position = 'fixed';
+    video.style.top = '0';
+    video.style.left = '0';
+    video.style.zIndex = '9999';
+    video.style.backgroundColor = '#000';
+
+    document.body.innerHTML = '';
     document.body.appendChild(video);
 
-  // Após o vídeo, redireciona para a página selfie
+    // Após o vídeo, vai para a página selfie
     video.addEventListener('ended', () => {
-    window.location.href = '#section-selfie';
-   });
+      window.location.href = '#section-selfie';
+    });
   });
+});
+
 
 
     // Pular e Continuar (sempre permite)
