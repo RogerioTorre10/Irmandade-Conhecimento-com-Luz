@@ -182,8 +182,6 @@
   });
 });
 
-
-
     // Pular e Continuar (sempre permite)
     if (btnSkip && !btnSkip.__bound){
       btnSkip.addEventListener('click', ()=>{
