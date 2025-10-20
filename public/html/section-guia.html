@@ -1,17 +1,34 @@
 <div id="jornada-content-wrapper">
-  <div id="section-guia" class="j-section">
+  <section id="section-guia" class="j-section pergaminho pergaminho-v section-guia" aria-hidden="false">
     <div class="conteudo-pergaminho">
-      
-      <div class="guia-header-moldura"> 
-          <h2 data-typing="true" data-text="Escolha seu Guia ✨" data-speed="30" data-cursor="true">
-            Escolha seu Guia ✨
-          </h2>
+      <div class="guia-header-moldura">
+        <h2 data-typing="true" data-text="Escolha seu Guia ✨" data-speed="30" data-cursor="true">
+          Escolha seu Guia ✨
+        </h2>
 
-          <div class="guia-name-input">
-            <label for="guiaNameInput">Insira seu nome</label>
-            <input id="guiaNameInput" type="text" placeholder="Digite seu nome para a jornada...">
-          </div>
+        <div class="guia-name-input">
+          <label for="guiaNameInput">Insira seu nome</label>
+          <input id="guiaNameInput" type="text" placeholder="Digite seu nome para a jornada..." autocomplete="name" />
+        </div>
       </div>
+
+      <!-- Texto datilografado dos guias (o JS preenche) -->
+      <div class="guia-descricao-medieval" data-typing="true"></div>
+
+      <!-- Botões gerados pelo JS (Escolher Lumen/Zion/Arian) -->
+      <div class="guia-options"></div>
+
+      <!-- Ações -->
+      <div class="guia-actions">
+        <button id="btn-selecionar-guia" class="btn btn-primary btn-stone" data-action="selecionar-guia" disabled>
+          Selecionar Guia
+        </button>
+        <button id="btn-skip-guia" class="btn btn-secondary btn-stone" data-action="skip-guia">
+          Pular e Continuar
+        </button>
       </div>
-  </div>
+
+      <div id="guia-error" style="display:none; color:#ff6b6b; margin-top:8px;">Erro ao carregar guias.</div>
+    </div>
+  </section>
 </div>
