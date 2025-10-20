@@ -2,6 +2,11 @@
   <div id="section-guia" class="j-section">
     <div class="conteudo-pergaminho">
 
+      <!-- Título com datilografia e leitura -->
+      <h2 data-typing="true" data-text="Escolha seu Guia ✨" data-speed="30" data-cursor="true">
+        Escolha seu Guia ✨
+      </h2>
+
       <!-- Nome primeiro -->
       <div class="guia-name-input">
         <label for="guiaNameInput">Insira seu nome</label>
@@ -25,7 +30,6 @@
       <!-- Botões de ação -->
       <div class="guia-actions">
         <button id="btn-selecionar-guia" class="btn btn-primary" data-action="selecionar-guia" disabled>Selecionar Guia</button>
-        <button id="btn-skip-guia" class="btn btn-secondary" data-action="skip-guia">Pular e Continuar</button>
       </div>
 
       <!-- Erro -->
@@ -33,6 +37,7 @@
     </div>
   </div>
 </div>
+
 <style>
 /* Caixa medieval */
 .guia-descricao-medieval {
@@ -75,4 +80,23 @@
   gap: 12px;
   margin-top: 20px;
 }
+  /* Botões com textura de pedra */
+.btn {
+  background-image: url('public/assets/img/textura-pedra.jpg');
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  font-weight: bold;
+  border: 2px solid #4b5563;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 18px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+}
+
 </style>
