@@ -1,23 +1,21 @@
 <div id="jornada-content-wrapper">
   <div id="section-guia" class="j-section">
     <div class="conteudo-pergaminho">
-      <!-- Título com datilografia -->
-      <h2 data-typing="true" data-text="Escolha seu Guia ✨" data-speed="30" data-cursor="true">
-        Escolha seu Guia ✨
-      </h2>
+      
+      <div class="guia-header-moldura"> 
+          <h2 data-typing="true" data-text="Escolha seu Guia ✨" data-speed="30" data-cursor="true">
+            Escolha seu Guia ✨
+          </h2>
 
-      <!-- Nome primeiro -->
-      <div class="guia-name-input">
-        <label for="guiaNameInput">Insira seu nome</label>
-        <input id="guiaNameInput" type="text" placeholder="Digite seu nome para a jornada...">
+          <div class="guia-name-input">
+            <label for="guiaNameInput">Insira seu nome</label>
+            <input id="guiaNameInput" type="text" placeholder="Digite seu nome para a jornada...">
+          </div>
       </div>
-
-      <!-- Caixa medieval para descrição dos guias (carregada dinamicamente) -->
       <div class="guia-descricao-medieval"></div>
 
-      <!-- Botões de escolha (carregados dinamicamente) -->
       <div class="guia-options"></div>
-
+        
       <!-- Botões de ação -->
       <div class="guia-actions">
         <button id="btn-selecionar-guia" class="btn btn-primary" data-action="seleciexport default {
@@ -119,152 +117,154 @@ onar-guia" disabled>Selecionar Guia</button>
 </div>
 
 <style>
-/* Escolha do guia */
-.guia-container {
-  margin-top: 20px;
-  padding: 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  background: var(--panel, #f9fafb);
-  text-align: center;
-}
-.guia-options {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 20px;
-}
-.guia-options button {
-  padding: 8px 16px;
-  font-size: 18px;
-  border: 2px solid #4b5563;
-  border-radius: 10px;
-  background-image: url('/assets/img/textura-pedra.jpg'); /* Ajuste para /public/assets/ se necessário */
-  background-size: cover;
-  background-position: center;
-  background-color: #4b5563; /* Fallback se a textura não carregar */
-  color: #fff;
-  font-weight: bold;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-.guia-options button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
-}
-.guia-options button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+  /* Importe a fonte Cardo para o tema medieval/vocacional */
+  @import url('https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap');
+  /* Outras fontes medievais para títulos, se quiser: 'Uncial Antiqua', 'Almendra', 'Cinzel' */
 
-/* Nome primeiro */
-.guia-name-input {
-  margin: 20px 0;
-  text-align: center;
-}
-.guia-name-input label {
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 8px;
-  display: block;
-  font-family: 'Cardo', serif;
-}
-.guia-name-input input {
-  width: 100%;
-  max-width: 400px;
-  padding: 12px;
-  font-size: 18px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-family: 'Cardo', serif;
-}
+  #section-guia {
+    /* Fundo da seção: pode ser uma cor sólida ou textura de parede/madeira */
+    background-color: #f7f3e8; /* Cor de pergaminho claro */
+    padding: 20px;
+    min-height: 100vh;
+    font-family: 'Cardo', serif;
+  }
 
-/* Caixa medieval */
-.guia-descricao-medieval {
-  background-color: #000;
-  color: #fff;
-  border: 4px solid #8b5e3c;
-  border-image: url('/assets/img/moldura-medieval.svg') 30 round; /* Nova moldura SVG */
-  border-image-slice: 30;
-  border-image-repeat: round;
-  padding: 20px;
-  margin: 20px 0;
-  font-family: 'Cardo', serif;
-  font-size: 18px;
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.5);
-  background-color: #1a1a1a; /* Fallback se a moldura não carregar */
-}
-.guia-descricao-medieval p {
-  margin: 10px 0;
-  padding: 8px 10px;
-  border-radius: 10px;
-  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
-}
-.guia-descricao-medieval p:hover {
-  background: #f3f4f6;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 10px rgba(0,0,0,.06);
-  cursor: pointer;
-}
-.guia-descricao-medieval .guia-selected {
-  background: linear-gradient(180deg, #eef2ff 0%, #ffffff 100%);
-  color: #000;
-  box-shadow: 0 6px 24px rgba(37,99,235,.25);
-  border: 1px solid rgba(37,99,235,.35);
-}
+  .conteudo-pergaminho {
+    max-width: 850px;
+    margin: 20px auto;
+    padding: 30px;
+    background-color: #fffaf0; /* Um branco cremoso */
+    border: 1px solid #c8a488; /* Borda de pergaminho sutil */
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    color: #3e2723; /* Cor da tinta (sépia) */
+  }
 
-/* Botões de ação */
-.guia-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 20px;
-}
-.btn-primary {
-  background: #2563eb;
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 10px;
-  border: none;
-  font-family: 'Cardo', serif;
-  font-size: 18px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
-}
+  /*
+  ===================================================================
+  === NOVO ESTILO: MOLDURA PARA O TÍTULO E CAMPO DE NOME (Usando PNG)
+  ===================================================================
+  */
+  .guia-header-moldura {
+    /* Remove a borda padrão para dar lugar à imagem */
+    border: none; 
+    border-radius: 0; 
+    box-shadow: 0 0 20px rgba(0,0,0,0.5); /* Mantém a sombra */
+    
+    /* Usa o PNG como imagem de fundo (Moldura) */
+    background-image: url('/assets/img/moldura-medieval.png'); 
+    background-size: 100% 100%; /* Estica a imagem para cobrir a área */
+    background-repeat: no-repeat;
+    background-color: transparent; 
 
-/* Estilo para datilografia */
-.typing-active {
-  text-align: left !important;
-  direction: ltr !important;
-  display: block !important;
-  width: 100% !important;
-  margin-left: 0 !important;
-  margin-right: auto !important;
-  position: relative;
-}
-.typing-active::after {
-  content: "▌";
-  margin-left: 2px;
-  opacity: 0.75;
-  animation: lumenBlink 1s steps(2, end) infinite;
-}
-.typing-done::after {
-  content: "";
-  animation: none;
-}
-@keyframes lumenBlink {
-  0% { opacity: 0.75; }
-  50% { opacity: 0; }
-  100% { opacity: 0.75; }
-}
+    /* Padding interno para que o conteúdo não toque a borda da moldura PNG */
+    padding: 30px 40px 20px 40px; 
+    
+    margin: 10px auto 20px auto; /* Centraliza a moldura na página */
+    max-width: 600px; /* Limita a largura da moldura (ajuste conforme necessário) */
+    font-family: 'Cardo', serif;
+    color: #fff; /* Cor do texto dentro da moldura */
+    text-align: center;
+  }
+
+  /* Estilo para o Título H2 com Tinta Dourada/Iluminura dentro da Moldura */
+  .guia-header-moldura h2 {
+    font-family: 'Cardo', serif; /* Mantenha Cardo ou use 'Uncial Antiqua' se quiser mais temático */
+    color: #FFD700; /* Ouro */
+    text-shadow: 1px 1px 2px #8B4513; 
+    font-size: 2.2em;
+    text-align: center !important;
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+
+  /* Estilo do Input de Nome dentro da Moldura */
+  .guia-name-input {
+    text-align: center;
+  }
+  .guia-name-input label {
+    background-color: #8B4513; /* Marrom de madeira */
+    color: #fff;
+    padding: 5px 15px;
+    border-radius: 5px;
+    display: inline-block;
+    margin-bottom: 8px;
+    font-family: 'Cardo', serif; 
+    border: 1px solid #6d3a20;
+    font-weight: bold;
+  }
+  .guia-name-input input {
+    width: 80%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 2px solid #8B4513;
+    font-family: 'Cardo', serif;
+    font-size: 16px;
+    background-color: rgba(255, 255, 255, 0.9); /* Fundo claro semi-transparente */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+    color: #3e2723;
+  }
+  
+  /* =================================================================== */
+  
+  
+  /* Caixa medieval para descrição dos guias (carregada dinamicamente) */
+  .guia-descricao-medieval {
+    margin: 30px 0 20px 0; /* Ajuste a margem superior para o espaçamento */
+    padding: 20px;
+    border: 2px solid #c8a488;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  
+  /* Estilo para cada opção de Guia */
+  .guia-descricao-medieval p {
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 6px;
+    transition: transform .25s ease, background .15s ease, box-shadow .25s ease;
+    border: 1px dashed transparent; /* Borda inicial invisível */
+  }
+  .guia-descricao-medieval p:hover {
+    background: #f3f4f6;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 10px rgba(0,0,0,.06);
+    cursor: pointer;
+  }
+  .guia-descricao-medieval .guia-selected {
+    /* Efeito de iluminação para a seleção */
+    background: linear-gradient(180deg, #eef2ff 0%, #ffffff 100%);
+    color: #000;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.7), 0 6px 24px rgba(37,99,235,.25); /* Ouro + Sombra Azul */
+    border: 2px solid #FFD700; /* Borda dourada forte */
+    transform: scale(1.02); 
+  }
+
+  /* Botões de ação */
+  .guia-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  .btn-primary {
+    background: #2563eb;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 10px;
+    border: none;
+    font-family: 'Cardo', serif;
+    font-size: 18px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 </style>
