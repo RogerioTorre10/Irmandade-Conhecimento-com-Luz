@@ -896,4 +896,60 @@ TÍTULO: ESTILOS DA SEÇÃO GUIA (AJUSTE FINO DO NOME DENTRO DA MOLDURA)
     border: 1px solid #c8a488 !important;
     margin: 0 auto 0 auto !important;
 }
+/* ==== GUIA: ajustes visuais mínimos ==== */
+.guia-descricao-medieval {
+  margin: 10px auto 0;
+  max-width: 540px;
+}
+.guia-descricao-medieval p {
+  margin: 6px 0;
+  font-size: 15px;
+  line-height: 1.45;
+  cursor: pointer;           /* permite clicar no parágrafo para selecionar */
+  transition: transform .15s ease, text-shadow .15s ease;
+}
+.guia-descricao-medieval p:hover { transform: translateX(2px); }
+
+.guia-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+  max-width: 540px;
+  margin-left: auto; margin-right: auto;
+}
+.guia-options .btn {
+  padding: 10px 14px;
+}
+
+.guia-selected {
+  text-shadow: 0 0 10px rgba(255,196,0,.75);
+  transform: translateX(2px);
+}
+
+/* Botão secundário com a mesma “pedra” */
+.btn.btn-secondary.btn-stone {
+  background: linear-gradient(to bottom, #939393, #6e6e6e), url('/assets/img/textura-de-pedra.jpg') center/cover;
+  border: 3px solid #444;
+}
+
+/* Campo de nome dentro da moldura – prioridade alta, mantendo leveza */
+.guia-header-moldura .guia-name-input input {
+  width: 60% !important;
+  max-width: 260px !important;
+  background-color: rgba(255,255,255,.98) !important;
+  color: #3e2723 !important;
+  border: 1px solid #c8a488 !important;
+  text-align: center !important;
+}
+
+/* Moldura aplicada como background do cabeçalho */
+.guia-header-moldura {
+  background-image: url('/assets/img/moldura-medieval.png');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-color: transparent;
+  padding: 30px 40px 20px;
+  margin: 10px auto 20px;
+}
 
