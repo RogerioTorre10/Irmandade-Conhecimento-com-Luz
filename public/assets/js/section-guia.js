@@ -312,6 +312,18 @@
       btnSel.__bound = true;
     }
   }
+  // Pular e Continuar (sempre permite)
+    if (btnSkip && !btnSkip.__bound){
+      btnSkip.addEventListener('click', ()=>{
+        // ATENÇÃO: ALTERAÇÃO AQUI
+        const nome = nameInput?.value?.trim().toUpperCase() || ''; // <--- AQUI!
+        // FIM DA ALTERAÇÃO
+        persistChoice(guiaAtual || '', nome);
+        const nextId = getNextSectionId(root);
+        try { window.JC?.show?.(nextId); } catch {}
+      });
+      btnSkip.__bound = true;
+    }
 
   async function activate(root) {
     if (!root) {
