@@ -299,16 +299,15 @@
     });
 
     // Selecionar Guia
-    if (btnSel && !btnSel.__bound) {
-      btnSel.addEventListener('click', () => {
-        if (!guiaAtual || nameInput.value.trim() === '') {
-          qs('#guia-error').style.display = 'block';
-          window.toast?.('Selecione um guia e insira um nome.', 'warning');
-          console.warn('Tentativa de selecionar guia sem guia ou nome válido.');
-          return;
-        }
-        persistChoice(guiaAtual, nameInput.value.trim());
-        playTransitionVideo();
+    if (btnSel && !btnSel.__bound){
+      btnSel.addEventListener('click', ()=>{
+        if (!guiaAtual) { window.toast?.('Selecione um guia ou toque em “Pular e Continuar”.','warning'); return; }
+        // ATENÇÃO: ALTERAÇÃO AQUI
+        const nome = nameInput?.value?.trim().toUpperCase() || ''; // <--- AQUI!
+        // FIM DA ALTERAÇÃO
+        persistChoice(guiaAtual, nome);
+        const nextId = getNextSectionId(root);
+        try { window.JC?.show?.(nextId); } catch {}
       });
       btnSel.__bound = true;
     }
