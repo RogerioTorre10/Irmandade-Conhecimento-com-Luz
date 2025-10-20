@@ -844,3 +844,56 @@ TÍTULO: ESTILOS DA SEÇÃO GUIA (Sobrescrita para Moldura)
   /* Margem para não tocar as laterais da moldura */
   margin: 0 auto !important;
 }
+/* =============================================================================
+TÍTULO: ESTILOS DA SEÇÃO GUIA (AJUSTE FINO DO NOME DENTRO DA MOLDURA)
+============================================================================= */
+
+/* 1. Ajuste do LABEL ("Insira seu nome") */
+.guia-header-moldura .guia-name-input label {
+  /* Alinhamento */
+  display: block; 
+  width: fit-content; 
+  margin: 0 auto 10px auto; /* Centraliza acima do input */
+
+  /* Estilo do Texto/Fundo */
+  background-color: #3e2723; /* Marrom escuro para ser a "placa" */
+  color: #fff;
+  padding: 8px 18px; /* Aumenta o tamanho visual */
+  border-radius: 6px;
+  font-family: 'ManufacturingConsent', sans-serif;
+  font-size: 1.2em; /* Aumenta a fonte */
+  font-variant: small-caps;
+}
+
+/* 2. Ajuste Crítico do INPUT (A área do nome ROGERIO) */
+.guia-header-moldura .guia-name-input input {
+  /* Dimensões: O principal para caber na moldura */
+  width: 60%; 
+  max-width: 250px; 
+  margin: 0 auto 0 auto; /* Centraliza o input */
+
+  /* Visual: Faz parecer parte da moldura, como um papel claro sobre a mesa escura */
+  background-color: rgba(255, 255, 255, 0.98); /* Fundo branco quase opaco */
+  color: #3e2723; /* Cor da "tinta" (sépia) */
+  
+  /* Borda sutil de papel */
+  border: 1px solid #c8a488; 
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2), inset 0 1px 3px rgba(0, 0, 0, 0.15); 
+
+  /* Alinhamento e Espaçamento */
+  padding: 12px;
+  font-size: 18px;
+  text-align: center;
+  font-family: 'Cardo', serif;
+}
+
+/* 3. Se houver problemas de prioridade, use !important (Apenas se as regras acima não funcionarem) */
+.guia-header-moldura .guia-name-input input {
+    width: 60% !important; 
+    max-width: 250px !important; 
+    background-color: rgba(255, 255, 255, 0.98) !important;
+    color: #3e2723 !important;
+    border: 1px solid #c8a488 !important;
+    margin: 0 auto 0 auto !important;
+}
+
