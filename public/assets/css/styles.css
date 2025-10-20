@@ -2,6 +2,707 @@
 TÍTULO: ESTILOS DA SEÇÃO GUIA (AJUSTE FINO DO INPUT)
 ============================================================================= */
 
+/* 1. Ajuste do Container da Moldura para/* =============================================================================
+TÍTULO: VARIÁVEIS E RESET BÁSICO
+SUBTÍTULO: Cores, raios e box-sizing global
+============================================================================= */
+:root {
+  --bg: #0b1020;
+  --fg: #eef2ff;
+  --muted: #aab4d4;
+  --primary: #6aa7ff;
+  --card: #121832;
+  --card-2: #0e1428;
+  --radius: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.5;
+  font-family: 'Cardo', Georgia, 'Times New Roman', serif;
+}
+
+/* =============================================================================
+TÍTULO: FONTES ÉPICAS — IRMANDADE
+============================================================================= */
+@font-face {
+  font-family: 'ManufacturingConsent';
+  src: url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'BerkshireSwash';
+  src: url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+body.epic {
+  font-family: 'Cardo', Georgia, 'Times New Roman', serif;
+  line-height: 1.55;
+}
+
+.epic h1, .epic h2, .epic h3 {
+  font-family: 'ManufacturingConsent', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: .02em;
+  font-variant: small-caps;
+}
+
+p, li {
+  font-family: 'BerkshireSwash', cursive;
+}
+
+/* =============================================================================
+TÍTULO: ESTRUTURA GERAL
+============================================================================= */
+.site-header {
+  padding: 24px 16px;
+  text-align: center;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1300;
+}
+
+.site-header h1 {
+  color: #fff;
+  font-size: 32px;
+  display: block;
+  visibility: visible;
+  opacity: 1;
+  margin: 0;
+  text-shadow: 0 0 10px hsla(28, 96%, 60%, .7);
+}
+
+.site-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24px 16px;
+  text-align: center;
+  background: var(--bg);
+  z-index: 1000;
+  border-top: 1px solid rgba(255,255,255,.1);
+  display: block;
+  opacity: 0.6;
+  color: #fff;
+  font-size: 14px;
+}
+
+.container {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* =============================================================================
+TÍTULO: PERGAMINHO
+============================================================================= */
+.card.pergaminho {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  position: relative;
+}
+
+.pergaminho {
+  position: relative;
+  padding: 24px 20px;
+  width: 100%; /* Ocupa largura total */
+  max-width: 600px !important; /* Limita largura */
+  margin: 12px auto;
+  min-height: 80vh;
+  height: 80vh !important;
+  box-sizing: border-box;
+  overflow: hidden !important;
+  contain: layout; /* Isola layout para evitar expansão */
+}
+
+@media (min-width: 768px) {
+  .pergaminho {
+    padding: 40px 48px;
+  }
+}
+
+.pergaminho::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%; /* Tamanho fixo */
+  background-attachment: fixed; /* Imóvel */
+  border-radius: 16px;
+  opacity: .98;
+  filter: drop-shadow(0 12px 32px rgba(0,0,0,.45));
+}
+
+.pergaminho > * {
+  position: relative;
+  z-index: 1;
+}
+
+.pergaminho-v::before {
+  background-image: url('/assets/img/pergaminho-rasgado-vert.png');
+}
+
+.pergaminho-h::before {
+  background-image: url('/assets/img/pergaminho-rasgado-horiz.png');
+}
+
+.pergaminho-v.section-intro::before,
+.pergaminho-v.section-termos::before {
+  background-size: 100% 100% !important; /* Reforça tamanho fixo */
+  background-attachment: fixed !important; /* Imóvel */
+}
+
+.parchment-rough {
+  background: transparent !important;
+  border-radius: 16px;
+  height: 100% !important;
+  width: 100% !important;
+}
+
+.parchment-inner-rough {
+  background: transparent !important;
+  box-shadow: none;
+  overflow: hidden !important;
+  height: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box;
+}
+.section-intro .parchment-inner-rough,
+.section-termos .parchment-inner-rough {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100% !important;
+}
+
+.intro-wrap {
+  height: 100% !important;
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+.parchment-title-rough {
+  color: #fff;
+  font-size: 20px;
+  margin-bottom: 12px;
+  opacity: 0 !important;
+  display: none !important;
+  visibility: hidden !important;
+}
+.section-intro .parchment-title-rough,
+.section-termos .parchment-title-rough,
+.section-intro .parchment-text-rough,
+.section-termos .parchment-text-rough {
+  opacity: 0 !important;
+  display: none !important;
+  visibility: hidden !important;
+}
+
+.parchment-title-rough.typing-active,
+.parchment-title-rough.typing-done,
+.section-intro .parchment-title-rough.typing-active,
+.section-intro .parchment-title-rough.typing-done,
+.section-termos .parchment-title-rough.typing-active,
+.section-termos .parchment-title-rough.typing-done,
+.section-intro .parchment-text-rough.typing-active,
+.section-intro .parchment-text-rough.typing-done,
+.section-termos .parchment-text-rough.typing-active,
+.section-termos .parchment-text-rough.typing-done {
+  opacity: 1 !important;
+  display: block !important;
+  visibility: visible !important;
+}
+
+.parchment-text-rough {
+  color: #fff;
+  font-size: 13px;
+  margin-bottom: 8px;
+  line-height: 1.4;
+  opacity: 0 !important;
+  display: none !important;
+  visibility: hidden !important;
+}
+
+.parchment-text-rough.typing-active,
+.parchment-text-rough.typing-done {
+  opacity: 1 !important;
+  display: block !important;
+  visibility: visible !important;
+}
+
+.parchment-input-rough {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.15);
+  background: #0c1330;
+  color: #fff;
+  font-family: 'Cardo', serif;
+}
+
+.parchment-actions-rough {
+  display: flex !important;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  position: sticky;
+  bottom: 0;
+  background: transparent !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+.section-intro .parchment-actions-rough,
+.section-termos .parchment-actions-rough {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: flex !important;
+}
+/* =============================================================================
+TÍTULO: CAMPOS E SENHA
+============================================================================= */
+.input, textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.15);
+  background: #0c1330;
+  color: var(--fg);
+}
+
+.senha-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+  margin: 16px auto;
+}
+
+.senha-input-group {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 16px;
+}
+
+.senha-eye, .btn-toggle-senha {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.senha-eye:hover, .btn-toggle-senha:hover {
+  color: var(--fg);
+}
+
+/* =============================================================================
+TÍTULO: BOTÕES
+============================================================================= */
+.btn.btn-primary.btn-stone,
+.nextBtn, .prevBtn, .avancarBtn, #btn-senha-avancar, #btn-avancar {
+  padding: 8px 16px;
+  background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
+  background-blend-mode: overlay;
+  color: #fff !important;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: 'ManufacturingConsent', sans-serif;
+  border: 3px solid #4a4a4a;
+  box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+  opacity: 1;
+  visibility: visible;
+  display: block;
+  cursor: pointer;
+  margin: 8px auto;
+  min-width: 150px;
+  text-align: center;
+}
+
+.btn.btn-primary.btn-stone:hover,
+.nextBtn:hover, .prevBtn:hover, .avancarBtn:hover, #btn-senha-avancar:hover, #btn-avancar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.7);
+}
+
+.btn:disabled,
+.nextBtn:disabled, .prevBtn:disabled, .avancarBtn:disabled, #btn-senha-avancar:disabled, #btn-avancar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =============================================================================
+TÍTULO: JORNADA ESPECÍFICA
+============================================================================= */
+#section-conteudo {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  background: transparent;
+  padding: 0;
+  display: block;
+}
+
+#jornada-content-wrapper {
+  display: block;
+  visibility: visible;
+  opacity: 1;
+}
+
+#section-intro, #section-termos, #section-senha, #sec-final {
+  background: transparent;
+  padding: 24px;
+  border-radius: 12px;
+  max-width: 600px;
+  text-align: center;
+  box-shadow: none;
+  border: none;
+  display: block;
+  opacity: 1;
+  visibility: visible;
+  z-index: 2;
+  overflow: hidden;
+  max-height: 80vh;
+}
+
+#section-intro.pergaminho-v::before,
+#section-termos.pergaminho-v::before,
+#section-senha.pergaminho-v::before,
+#sec-final.pergaminho-v::before {
+  background-image: url('/assets/img/pergaminho-rasgado-vert.png');
+  background-size: cover;
+  min-height: 80vh;
+}
+
+#sec-perguntas.pergaminho-h::before,
+#sec-wizard.pergaminho-h::before {
+  background-image: url('/assets/img/pergaminho-rasgado-horiz.png');
+  background-size: cover;
+  min-height: 80vh;
+}
+
+.intro-paragraph,
+.parchment-text-rough,
+#termos-pg1, #termos-pg2, #section-senha h2, #section-senha p,
+#sec-wizard #q-text, #sec-final p {
+  font-size: 13px;
+  margin-bottom: 8px;
+  color: #fff;
+  opacity: 0;
+  visibility: visible;
+  display: block;
+  font-family: 'BerkshireSwash', cursive;
+  text-align: left;
+  background: transparent;
+  line-height: 1.4;
+}
+
+.parchment-title-rough,
+#termos-pg1 h2, #termos-pg2 h3, #section-senha h2, #sec-wizard h2, #sec-final h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #fff;
+  opacity: 0;
+}
+
+.typing-active {
+  text-align: left;
+}
+
+.typing-done,
+[data-typing="true"].typing-done {
+  opacity: 1;
+  color: #fff;
+}
+
+/* =============================================================================
+TÍTULO: CHAMAS
+============================================================================= */
+.flame-corner,
+#flame-top-left,
+#flame-bottom-right,
+#chama-header {
+  display: block;
+  visibility: visible;
+  opacity: 1;
+  position: fixed;
+  pointer-events: none;
+  z-index: 1200;
+}
+
+.flame-top-left {
+  top: 80px;
+  left: 20px;
+  --altura: 67.5px;
+  --largura: 45px;
+}
+
+.flame-bottom-right {
+  bottom: 20px;
+  right: 20px;
+  --altura: 90px;
+  --largura: 60px;
+}
+
+#chama-header {
+  margin-right: 12px;
+  order: -1;
+}
+
+#chama-header .chama-vela {
+  --largura: 30px;
+  --altura: 60px;
+}
+
+.chama-icone {
+  position: relative;
+  width: 24px;
+  height: 36px;
+  filter: drop-shadow(0 0 14px rgba(255,196,0,.75));
+  display: flex;
+  visibility: visible;
+  opacity: 1;
+}
+
+.chama-icone .halo {
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  transform: translateX(-50%);
+  width: 86%;
+  height: 88%;
+  border-radius: 62% 62% 28% 28% / 88% 88% 22% 22%;
+  background: radial-gradient(ellipse at 50% 30%, #fff 0%, #ffe7b0 38%, rgba(255,170,30,.95) 60%, rgba(255,140,0,0) 78%);
+  animation: flameSway 1.8s ease-in-out infinite;
+}
+
+.chama-icone .gota {
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  transform: translateX(-50%);
+  width: 66%;
+  height: 68%;
+  border-radius: 60% 60% 26% 26% / 86% 86% 18% 18%;
+  background: radial-gradient(ellipse at 50% 35%, rgba(255,255,255,.98) 0%, rgba(255,225,150,.95) 45%, rgba(255,165,50,.85) 66%, rgba(255,140,0,0) 82%);
+}
+
+.chama-icone .brasa {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, rgba(255,255,255,.95) 0%, rgba(255,205,120,.85) 42%, rgba(255,140,0,0) 72%);
+  animation: brasaPulse 1.8s ease-in-out infinite;
+}
+
+.chama-icone.chama-sm {
+  width: 16px;
+  height: 24px;
+}
+
+.chama-icone.chama-md {
+  width: 22px;
+  height: 34px;
+}
+
+.chama-icone.chama-lg {
+  width: 30px;
+  height: 48px;
+}
+
+.chama-icone[data-intensidade="fraca"] {
+  filter: drop-shadow(0 0 8px rgba(255,196,0,.45));
+}
+
+.chama-icone[data-intensidade="media"] {
+  filter: drop-shadow(0 0 14px rgba(255,196,0,.75));
+}
+
+.chama-icone[data-intensidade="forte"] {
+  filter: drop-shadow(0 0 20px rgba(255,196,0,.95));
+}
+
+@keyframes flameSway {
+  0%, 100% { transform: translateX(-50%) scaleY(1); }
+  50% { transform: translateX(-51%) scaleY(1.06); }
+}
+
+@keyframes brasaPulse {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: .75; }
+  50% { transform: translateX(-50%) scale(1.06); opacity: 1; }
+}
+
+/* =============================================================================
+TÍTULO: DATILOGRAFIA
+============================================================================= */
+.lumen-typing {
+  white-space: pre-wrap;
+  position: relative;
+}
+
+.lumen-typing::after {
+  content: "▌";
+  margin-left: 2px;
+  opacity: .75;
+  animation: lumenBlink 1s steps(2,end) infinite;
+}
+
+.lumen-typing.typing-done::after {
+  content: "";
+  animation: none;
+}
+
+@keyframes lumenBlink {
+  50% { opacity: 0; }
+}
+
+[data-typing="true"] {
+  min-height: 20px;
+  display: block;
+  visibility: visible;
+  position: relative;
+  opacity: 0;
+  color: #fff;
+}
+
+[data-typing="true"].typing-done {
+  opacity: 1;
+}
+
+/* =============================================================================
+TÍTULO: NAVEGAÇÃO/LINKS E LINGUAGEM
+============================================================================= */
+.language-selector {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1400;
+}
+
+#language-select {
+  padding: 8px 12px;
+  font-size: 16px;
+  border-radius: 6px;
+  background: #1a1a2e;
+  color: #fff;
+  border: 1px solid #333;
+  min-width: 140px;
+  font-family: 'Cardo', serif;
+}
+
+/* =============================================================================
+TÍTULO: TOAST
+============================================================================= */
+#toast {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  background: #111;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.35);
+  font-size: 16px;
+  z-index: 4000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease;
+}
+
+#toast.show {
+  opacity: 1;
+}
+ centralizar melhor */
+.guia-header-moldura {
+  /* Mantém as regras existentes */
+  padding: 30px 40px 20px 40px; 
+  text-align: center;
+  position: relative;
+  z-index: 10;
+}
+
+/* 2. Ajuste do LABEL ("Insira seu nome") */
+.guia-name-input label {
+  /* Fundo de cor de madeira/tinta para contraste */
+  background-color: #3e2723 !important; 
+  color: #fff !important;
+  padding: 8px 18px !important; /* Aumenta o padding para visibilidade */
+  border-radius: 6px !important;
+  display: block !important; /* Transforma em bloco para ocupar a largura necessária */
+  width: fit-content; /* Ocupa apenas a largura do texto */
+  margin: 0 auto 10px auto !important; /* Centraliza acima do input */
+  font-family: 'ManufacturingConsent', sans-serif !important;
+  font-size: 1.2em !important;
+  font-variant: small-caps;
+}
+
+/* 3. Ajuste Crítico do INPUT (A área do nome ROGERIO) */
+.guia-name-input input {
+  /* Diminui a largura para caber no espaço interno da moldura */
+  width: 65% !important; 
+  max-width: 250px !important; /* Limita a largura máxima */
+
+  /* Estilo que imita o papel/pergaminho */
+  background-color: rgba(255, 255, 255, 0.95) !important; /* Fundo muito claro */
+  color: #3e2723 !important; /* Cor da "tinta" (sépia) */
+  
+  /* Remove a borda azul escura/escura do seu styles.css, substituindo por uma borda suave */
+  border: 1px solid #c8a488 !important; 
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15); /* Sombra interna sutil */
+
+  padding: 12px !important;
+  font-size: 18px !important;
+  font-family: 'Cardo', serif !important;
+  
+  /* Garante que o texto fique centralizado */
+  text-align: center !important; 
+  
+  /* Margem para não tocar as laterais da moldura */
+  margin: 0 auto !important;
+}
+/* =============================================================================
+TÍTULO: ESTILOS DA SEÇÃO GUIA (AJUSTE FINO DO INPUT)
+============================================================================= */
+
 /* 1. Ajuste do Container da Moldura para centralizar melhor */
 .guia-header-moldura {
   /* Mantém as regras existentes */
