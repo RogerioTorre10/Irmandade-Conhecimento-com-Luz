@@ -647,3 +647,100 @@ TÍTULO: TOAST
 #toast.show {
   opacity: 1;
 }
+/* =============================================================================
+TÍTULO: ESTILOS DA SEÇÃO GUIA (Sobrescrita para Moldura)
+============================================================================= */
+
+/* 1. Reset e Fundo do Pergaminho */
+#section-guia {
+  /* Alinha a seção para que o pergaminho-v possa funcionar como plano de fundo */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+}
+
+/* Garante que o conteúdo fique centrado na área visível do pergaminho (imagem) */
+.conteudo-pergaminho {
+  width: 100%;
+  max-width: 500px; /* Largura do conteúdo interno do pergaminho */
+  padding: 40px; 
+  /* Remove qualquer fundo branco ou sombra que interfira no visual do pergaminho (imagem_2e5a7f.jpg) */
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  color: #fff; /* Mantém a cor de texto branca */
+  font-family: 'BerkshireSwash', cursive; /* Usa a fonte do seu styles.css */
+}
+
+/* 2. NOVO CONTAINER DA MOLDURA (GUIA HEADER) */
+.guia-header-moldura {
+  /* Usa o PNG para a moldura externa */
+  background-image: url('/assets/img/moldura-medieval.png'); 
+  background-size: 100% 100%; 
+  background-repeat: no-repeat;
+  background-color: transparent; 
+
+  /* O padding é crucial para garantir que o conteúdo fique dentro da área do PNG */
+  padding: 30px 40px 20px 40px; 
+  
+  margin: 10px auto 20px auto; 
+  text-align: center;
+  /* Garante que a moldura apareça no topo da camada do pergaminho */
+  position: relative;
+  z-index: 10;
+}
+
+/* 3. Título (H2) dentro da Moldura */
+.guia-header-moldura h2 {
+  /* Usa a fonte de títulos do seu styles.css para consistência */
+  font-family: 'ManufacturingConsent', sans-serif !important; 
+  
+  color: #FFD700 !important; /* Dourado */
+  text-shadow: 0 0 8px rgba(255,196,0,.75); /* Brilho suave da chama */
+  font-size: 2.2em;
+  margin-top: 0;
+  margin-bottom: 20px;
+  /* Garante que a animação de digitação funcione corretamente */
+  opacity: 0; 
+  display: block;
+}
+
+/* 4. Campo de Nome dentro da Moldura */
+.guia-name-input {
+    margin: 15px 0 0 0;
+}
+.guia-name-input label {
+  /* Estilo que remete a uma placa, mantendo o contraste */
+  background-color: #3e2723; /* Marrom escuro */
+  color: #fff;
+  padding: 5px 15px;
+  border-radius: 5px;
+  display: inline-block;
+  margin-bottom: 8px;
+  font-family: 'ManufacturingConsent', sans-serif;
+  font-size: 1.1em;
+  font-variant: small-caps;
+}
+.guia-name-input input {
+  /* Sobrescreve o estilo base do seu input, mas mantendo o tema escuro */
+  width: 90%;
+  max-width: 300px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--muted);
+  background: var(--card); /* Fundo escuro do seu styles.css */
+  color: var(--fg);
+  font-family: 'Cardo', serif;
+  font-size: 16px;
+  text-align: center;
+}
+
+/* 5. Ações (Botões) - Apenas ajuste de margem para o novo layout */
+.guia-actions {
+  margin-top: 30px; 
+  position: relative; /* Ajusta a posição para não ficar "colado" no rodapé */
+}
