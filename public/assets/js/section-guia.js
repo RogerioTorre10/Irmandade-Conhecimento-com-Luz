@@ -149,6 +149,28 @@
       });
       btnSel.__bound = true;
     }
+    
+    btnSelecionarGuia.addEventListener('click', () => {
+    if (!guiaAtual) return;
+    const nome = nameInput?.value?.trim() || '';
+    persistChoice(guiaAtual, nome);
+
+  // Transição para vídeo
+    const video = document.createElement('video');
+    video.src = 'public/assets/img/conhecimento-com-luz-jardim.mp4';
+    video.autoplay = true;
+    video.controls = false;
+    video.style.width = '100%';
+    video.style.height = 'auto';
+    document.body.innerHTML = ''; // limpa a tela
+    document.body.appendChild(video);
+
+  // Após o vídeo, redireciona para a página selfie
+    video.addEventListener('ended', () => {
+    window.location.href = '#section-selfie';
+   });
+  });
+
 
     // Pular e Continuar (sempre permite)
     if (btnSkip && !btnSkip.__bound){
