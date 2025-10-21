@@ -1,0 +1,47 @@
+/* ========== SEÇÃO INTRO ========== */
+
+/* Título principal */
+.intro-title {
+  font-family: 'ManufacturingConsent', serif;
+  font-size: 36px;
+  text-align: center;
+  color: var(--primary);
+  margin-top: 40px;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
+}
+
+/* Texto de introdução */
+.intro-text {
+  font-family: 'Cardo', serif;
+  font-size: 18px;
+  color: var(--fg);
+  line-height: 1.6;
+  margin: 20px auto;
+  max-width: 640px;
+  text-align: center;
+}
+
+/* Botão iniciar jornada */
+.intro-actions .btn-iniciar {
+  padding: 10px 20px;
+  font-size: 18px;
+  font-family: 'ManufacturingConsent', sans-serif;
+  background: linear-gradient(to bottom, #6aa7ff, #3b82f6);
+  color: #fff;
+  border-radius: 10px;
+  border: 2px solid #1e3a8a;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.intro-actions .btn-iniciar:hover {
+  transform: scale(1.05);
+}
+
+/* Pergaminho visual */
+.section-intro.pergaminho-v::before {
+  background-image: url('/assets/img/pergaminho-rasgado-vert.png');
+  background-size: 100% 100%;
+  background-attachment: fixed;
+}
