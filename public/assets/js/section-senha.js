@@ -22,6 +22,7 @@
   window.JCSenha.state = {
     running: false,
     transitioning: false,
+    initialized: false,
     observer: null,
     abortId: 0
   };
@@ -187,9 +188,9 @@
   function forceRedirect(){
     console.log('Forçando redirecionamento para:', NEXT_PAGE);
     try {
-      window.location.assign(NEXT_PAGE);
+      window.location.replace(NEXT_PAGE); // Usar replace para evitar histórico
     } catch (e) {
-      console.warn('window.location.assign falhou para:', NEXT_PAGE, 'tentando fallback:', FALLBACK_PAGE);
+      console.warn('window.location.replace falhou para:', NEXT_PAGE, 'tentando fallback:', FALLBACK_PAGE);
       try {
         window.location.href = FALLBACK_PAGE;
       } catch (e) {
@@ -206,6 +207,7 @@
     }
     window.JCSenha.state.transitioning = true;
     console.log('Iniciando transição de vídeo:', TRANSITION_SRC);
+    document.body.style.background = 'white'; // Fundo branco no body
     const overlay = document.createElement('div');
     overlay.id = 'senha-transition-overlay';
     overlay.style.cssText = `
@@ -231,6 +233,7 @@
       if (done) return; done = true;
       try { video.pause(); } catch {}
       overlay.remove();
+      document.body.style.background = ''; // Resetar fundo
       console.log('Transição concluída, executando próximo passo.');
       if (typeof nextStep === 'function') nextStep();
       window.JCSenha.state.transitioning = false;
@@ -281,6 +284,14 @@
         console.log('Botão toggle clicado, tipo do input:', input.type);
       });
       toggle.__senhaBound = true;
+    }
+
+    if (input && !input.__senhaBound) {
+      input.addEventListener('input', () => {
+        console.log('Input #senha-input alterado, valor:', input.value);
+        // Sem validação em tempo real para evitar loops
+      });
+      input.__senhaBound = true;
     }
 
     if (prev && !prev.__senhaBound) {
@@ -382,8 +393,8 @@
   }
 
   function tryKick(){
-    if (window.JCSenha.state.transitioning) {
-      console.warn('Transição em andamento, ignorando tryKick.');
+    if (window.JCSenha.state.transitioning || window.JCSenha.state.initialized) {
+      console.warn('Transição em andamento ou já inicializado, ignorando tryKick.');
       return false;
     }
     const root = qs(sel.root);
@@ -393,6 +404,7 @@
     }
 
     console.log('Iniciando section-senha...');
+    window.JCSenha.state.initialized = true;
     root.classList.remove('hidden');
     root.setAttribute('aria-hidden','false');
     root.style.removeProperty('display');
@@ -422,7 +434,7 @@
   window.JCSenha.__sectionShownHandler = (evt) => {
     const id = evt?.detail?.sectionId;
     if(!id) return;
-    if (id === 'section-senha' && !window.JCSenha.state.transitioning) {
+    if (id === 'section-senha' && !window.JCSenha.state.transitioning && !window.JCSenha.state.initialized) {
       window.JCSenha.state.abortId++;
       console.log('section:shown para section-senha, esperando 11000ms...');
       sleep(11000).then(tryKick);
