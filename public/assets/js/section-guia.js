@@ -1,9 +1,9 @@
-// section-guia.js — v19
+// section-guia.js — v20 (obrigatório escolher guia; nome + guia validados)
 (function () {
   'use strict';
-  if (window.__guiaBound_v19) { console.warn('section-guia.js já carregado (v19).'); return; }
-  window.__guiaBound_v19 = true;
-  console.log('section-guia.js v19 inicializado.');
+  if (window.__guiaBound_v20) { console.warn('section-guia.js já carregado (v20).'); return; }
+  window.__guiaBound_v20 = true;
+  console.log('[Guia] v20 inicializado');
 
   // ===== Config =====
   const TYPING_SPEED_DEFAULT = 30;
@@ -11,13 +11,6 @@
   const NEXT_PAGE = 'selfie.html';
   const TRANSITION_VIDEO = '/assets/img/conhecimento-com-luz-jardim.mp4';
   const GUIAS_JSON = '/assets/data/guias.json';
-
-  // Fallback
-  const FALLBACK_GUIAS = [
-    { id: 'zion',  nome: 'Zion',  descricao: 'O Guia da Consciência Pura (Grok)',   bgImage: '/assets/img/irmandade-quarteto-bg-zion.png'  },
-    { id: 'lumen', nome: 'Lumen', descricao: 'O Guia da Iluminação (GPT-5)',        bgImage: '/assets/img/irmandade-quarteto-bg-lumen.png' },
-    { id: 'arian', nome: 'Arian', descricao: 'O Guia da Transformação (Gemini)',    bgImage: '/assets/img/irmandade-quarteto-bg-arian.png'}
-  ];
 
   // ===== Estado =====
   let ABORT_TOKEN = 0;
@@ -29,47 +22,36 @@
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
   const aborted = (my) => my !== ABORT_TOKEN;
 
-  function persistChoice(guia, nome) {
-    try {
+  function persistChoice(guia, nome){
+    try{
       sessionStorage.setItem('jornada.guia', guia || '');
-      sessionStorage.setItem('jornada.nome', nome || '');
-      console.log('[Guia] Persistido:', { guia, nome });
-    } catch(e){ console.error('[Guia] Persistência falhou:', e); }
+      sessionStorage.setItem('jornada.nome', (nome || '').toUpperCase());
+      console.log('[Guia] Persistido:', { guia, nome: (nome||'').toUpperCase() });
+    }catch(e){ console.error('[Guia] Persistência falhou:', e); }
   }
-  function restoreChoice() {
-    try {
+  function restoreChoice(){
+    try{
       return {
         guia: sessionStorage.getItem('jornada.guia') || '',
         nome: sessionStorage.getItem('jornada.nome') || ''
       };
-    } catch(e){ return { guia:'', nome:'' }; }
+    }catch(e){ return { guia:'', nome:'' }; }
   }
-
   function enable(el){ if(el){ el.disabled=false; el.style.pointerEvents=''; el.style.opacity=''; } }
-  function disable(el){ if(el){ el.disabled=true;  el.style.pointerEvents='none'; el.style.opacity='0.5'; } }
+  function disable(el){ if(el){ el.disabled=true; el.style.pointerEvents='none'; el.style.opacity='0.5'; } }
 
-  function highlightChoice(root, guiaAtual, window.__GUIAS_CACHE) {
-    qsa('[data-guia]', root).forEach(el => {
-      el.classList.toggle('guia-selected', el.dataset.guia === guia);
-    });
+  function highlightChoice(root, guia){
+    qsa('[data-guia]', root).forEach(el => el.classList.toggle('guia-selected', el.dataset.guia === guia));
   }
 
-  // Próxima seção (fallbacks)
   function getNextSectionId(root){
-    // 1) se houver atributo data-next-section no container
-    const attr = root?.dataset?.nextSection || '';
-    if (attr) return attr;
-
-    // 2) se existir função do controlador, usa
+    const hinted = root?.dataset?.nextSection || '';
+    if (hinted) return hinted;
     if (window.JC?.goNext) return window.JC.goNext();
-
-    // 3) fallback: transição de vídeo ou redireciona
     if (TRANSITION_VIDEO) { playTransitionVideo(); return null; }
-    window.location.href = NEXT_PAGE;
-    return null;
+    window.location.href = NEXT_PAGE; return null;
   }
 
-  // Loader de guias
   async function loadGuias(){
     try{
       const res = await fetch(GUIAS_JSON);
@@ -77,45 +59,32 @@
       return await res.json();
     }catch(e){
       console.error('[Guia] Falha ao carregar JSON:', e);
-      return FALLBACK_GUIAS;
+      const fallback = [
+        { id:'zion',  nome:'Zion',  descricao:'O Guia da Consciência Pura (Grok)', bgImage:'/assets/img/irmandade-quarteto-bg-zion.png' },
+        { id:'lumen', nome:'Lumen', descricao:'O Guia da Iluminação (GPT-5)',     bgImage:'/assets/img/irmandade-quarteto-bg-lumen.png' },
+        { id:'arian', nome:'Arian', descricao:'O Guia da Transformação (Gemini)',  bgImage:'/assets/img/irmandade-quarteto-bg-arian.png' }
+      ];
+      qs('#guia-error')?.style && (qs('#guia-error').style.display='block');
+      return fallback;
     }
   }
 
-  function renderGuias(guias, root) {
-  const btns = qs('.guia-options', root);
-  btns.innerHTML = '';
-  guias.forEach(g => {
-    const b = document.createElement('button');
-    b.className = 'btn btn-stone-espinhos';
-    b.dataset.action = 'select-guia';
-    b.dataset.guia = g.id;
-    b.textContent = g.nome;
-    btns.appendChild(b);
-  });
-  const caixa = qs('#guiaTexto', root);
-  const texto = guias.map(g => `${g.nome} — ${g.descricao}`).join('\n');
-  if (caixa) {
-    caixa.dataset.text = texto;
-    runTypingAndSpeak(caixa, texto, ABORT_TOKEN);
-  }
-}
-
-
-  // Datilografia local (fallback)
   function typeLocal(el, text, speed){
     return new Promise(res=>{
       el.textContent=''; let i=0;
-      (function tick(){ if(i<text.length){ el.textContent += text.charAt(i++); setTimeout(tick, speed); } else { res(); } })();
+      (function tick(){
+        if(i<text.length){ el.textContent += text.charAt(i++); setTimeout(tick, speed); }
+        else res();
+      })();
     });
   }
 
   async function runTypingAndSpeak(el, text, myId){
     if(!el || !text) return;
-    el.classList.remove('typing-done','typing-active');
-    el.classList.add('typing-active');
-    el.style.setProperty('text-align','left','important');
-
+    el.classList.remove('typing-done','typing-active','lumen-typing');
+    el.classList.add('typing-active','lumen-typing');
     const speed = Number(el.dataset.speed || TYPING_SPEED_DEFAULT);
+
     if (typeof window.runTyping === 'function'){
       await new Promise(done=>{
         try { window.runTyping(el, text, done, { speed, cursor: el.dataset.cursor !== 'false' }); }
@@ -128,7 +97,6 @@
 
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
-
     try { await window.EffectCoordinator?.speak?.(text, { rate: SPEAK_RATE }); } catch{}
   }
 
@@ -141,76 +109,78 @@
     v.addEventListener('error', ()=> window.location.href = NEXT_PAGE);
   }
 
-  // ===== Bind UI =====
+  function renderButtons(guias, root){
+    const opts = qs('.guia-options', root);
+    if (!opts) return;
+    opts.innerHTML = '';
+    guias.forEach(g=>{
+      const b = document.createElement('button');
+      b.className = 'btn btn-stone-espinhos';
+      b.dataset.action = 'select-guia';
+      b.dataset.guia = g.id;
+      b.textContent = g.nome;
+      opts.appendChild(b);
+    });
+  }
+
   async function bindUI(root){
     const nameInput = qs('#guiaNameInput', root);
     const btnSel    = qs('#btn-selecionar-guia', root);
-    const btnSkip   = qs('#btn-skip-guia', root);
 
     const guias = await loadGuias();
-    window.__GUIAS_CACHE = guias;  // cache global simples
-    renderGuias(guias, root);
+    window.__GUIAS_CACHE = guias;
+    renderButtons(guias, root);
 
-    // Restaurar estado
+    // Texto datilografado dentro da moldura
+    const textoGuias = guias.map(g => `${g.nome} — ${g.descricao}`).join('\n');
+    const caixa = qs('#guiaTexto', root);
+    if (caixa) {
+      caixa.dataset.text = textoGuias;
+      await runTypingAndSpeak(caixa, textoGuias, ABORT_TOKEN);
+    }
+
+    // Restaurar estado salvo
     const saved = restoreChoice();
     if (saved.nome && nameInput) nameInput.value = saved.nome;
-    if (saved.guia) { guiaAtual = saved.guia; highlightChoice(root, guiaAtual, window.__GUIAS_CACHE); }
+    if (saved.guia) { guiaAtual = saved.guia; highlightChoice(root, guiaAtual); }
 
-    // Habilita/Desabilita Selecionar
-    const refreshButton = () => {
+    // Habilita somente com nome + guia
+    const refreshButton = ()=>{
       const ok = !!(guiaAtual && (nameInput?.value?.trim()?.length));
       ok ? enable(btnSel) : disable(btnSel);
     };
     refreshButton();
 
-    // Clique nas descrições
-    qsa('.guia-descricao-medieval [data-guia]', root).forEach(p=>{
-      if (p.__bound) return;
-      p.addEventListener('click', ()=>{
-        guiaAtual = p.dataset.guia;
-        highlightChoice(root, guiaAtual, window.__GUIAS_CACHE);
-        refreshButton();
-        document.dispatchEvent(new CustomEvent('guiaSelected', { detail:{ guia: guiaAtual }}));
-      });
-      p.__bound = true;
-    });
-
-    // Clique nos botões “Escolher X”
+    // Clique nos botões
     qsa('[data-action="select-guia"][data-guia]', root).forEach(btn=>{
       if (btn.__bound) return;
       btn.addEventListener('click', ()=>{
         guiaAtual = btn.dataset.guia;
-        highlightChoice(root, guiaAtual, window.__GUIAS_CACHE);
+        highlightChoice(root, guiaAtual);
         refreshButton();
         document.dispatchEvent(new CustomEvent('guiaSelected', { detail:{ guia: guiaAtual }}));
       });
       btn.__bound = true;
     });
 
-    // Digitação do nome
-    nameInput?.addEventListener('input', refreshButton);
+    // Nome: enter confirma
+    if (nameInput && !nameInput.__bound){
+      nameInput.addEventListener('input', refreshButton);
+      nameInput.addEventListener('keydown', (ev)=>{ if (ev.key==='Enter' && !btnSel.disabled) btnSel.click(); });
+      nameInput.__bound = true;
+    }
 
     // Selecionar Guia
     if (btnSel && !btnSel.__bound){
       btnSel.addEventListener('click', ()=>{
-        if (!guiaAtual) { window.toast?.('Selecione um guia ou toque em “Pular e Continuar”.','warning'); return; }
-        const nome = (nameInput?.value || '').trim().toUpperCase();
+        const nome = (qs('#guiaNameInput', root)?.value || '').trim().toUpperCase();
+        if (!nome)     { window.toast?.('Digite seu NOME para continuar.','warning'); return; }
+        if (!guiaAtual){ window.toast?.('Selecione um GUIA para continuar.','warning'); return; }
         persistChoice(guiaAtual, nome);
         const next = getNextSectionId(root);
         if (next) { try { window.JC?.show?.(next); } catch {} }
       });
       btnSel.__bound = true;
-    }
-
-    // Pular e Continuar — agora com escopo correto
-    if (btnSkip && !btnSkip.__bound){
-      btnSkip.addEventListener('click', ()=>{
-        const nome = (nameInput?.value || '').trim().toUpperCase();
-        persistChoice(guiaAtual || '', nome);
-        const next = getNextSectionId(root);
-        if (next) { try { window.JC?.show?.(next); } catch {} }
-      });
-      btnSkip.__bound = true;
     }
   }
 
@@ -222,21 +192,18 @@
     root.setAttribute('aria-hidden','false');
     root.style.removeProperty('display');
 
-    let title = qs('h2[data-typing="true"]', root);
-    if (!title){
-      title = document.createElement('h2');
-      title.dataset.typing = 'true';
-      title.dataset.text = 'Escolha seu Guia ✨';
-      (qs('.conteudo-pergaminho', root) || root).prepend(title);
+    // 1) Datilografa "Insira seu nome" no pergaminho
+    const tituloNome = qs('h3.titulo-pergaminho[data-typing="true"]', root);
+    if (tituloNome){
+      const t = (tituloNome.dataset.text || tituloNome.textContent || 'Insira seu nome').trim();
+      await runTypingAndSpeak(tituloNome, t, my);
+      if (aborted(my)) return;
     }
-    const text = (title.dataset.text || title.textContent || '').trim();
-    await runTypingAndSpeak(title, text, my);
-    if (aborted(my)) return;
 
+    // 2) Liga UI + datilografa os guias dentro da moldura
     await bindUI(root);
   }
 
-  // ===== Listeners =====
   document.addEventListener('section:shown', (e)=>{
     const id = e?.detail?.sectionId || e?.detail?.id;
     if (id === 'section-guia' || id === 'section-escolha') {
@@ -252,26 +219,3 @@
     if (root && !root.classList.contains('hidden')) activate(root);
   });
 })();
-// [ADICIONE] perto das Utils:
-function applyGuiaTheme(root, guiaId, guias) {
-  const g = (guias || []).find(x => x.id === guiaId);
-  const header = root.querySelector('.guia-header-moldura');
-  if (!g || !header) return;
-
-  // leve e elegante: moldura + leve vinheta
-  header.style.backgroundImage = `
-    linear-gradient(to bottom, rgba(0,0,0,.12), rgba(0,0,0,.18)),
-    url('${g.bgImage}')
-  `;
-  header.style.backgroundSize = 'cover';
-  header.style.backgroundPosition = 'center';
-}
-
-// [SUBSTITUA] a highlightChoice existente por esta versão que também aplica o tema:
-function highlightChoice(root, guiaAtual, window.__GUIAS_CACHE) {
-  qsa('[data-guia]', root).forEach(el => {
-    el.classList.toggle('guia-selected', el.dataset.guia === guia);
-  });
-  applyGuiaTheme(root, guia, window.__GUIAS_CACHE || []);
-}
-
