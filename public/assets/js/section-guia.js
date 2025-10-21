@@ -1,12 +1,12 @@
-// section-guia.js — v19 (corrige datilografia, renderização e moldura)
+// section-guia.js — v20 (corrige erro assíncrono, datilografia e renderização)
 (function () {
   'use strict';
-  if (window.__guiaBound_v19) {
-    console.warn('section-guia.js já foi carregado (v19).');
+  if (window.__guiaBound_v20) {
+    console.warn('section-guia.js já foi carregado (v20).');
     return;
   }
-  window.__guiaBound_v19 = true;
-  console.log('section-guia.js v19 inicializado.');
+  window.__guiaBound_v20 = true;
+  console.log('section-guia.js v20 inicializado.');
 
   // ===== Config =====
   const TYPING_SPEED_DEFAULT = 30;
@@ -88,14 +88,14 @@
   // ---- Carregar guias do JSON ----
   async function loadGuias() {
     try {
-      const response = await fetch(GUIAS_JSON);
+      const response = await fetch(GUIAS_JSON, { cache: 'no-cache' });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const guias = await response.json();
       console.log('Guias carregados:', guias);
       return guias;
     } catch (e) {
       console.error('Erro ao carregar guias:', e);
-      qs('#guia-error').style.display = 'block';
+      qs('#guia-error') && (qs('#guia-error').style.display = 'block');
       console.log('Usando guias fallback:', FALLBACK_GUIAS);
       return FALLBACK_GUIAS;
     }
@@ -104,6 +104,10 @@
   function renderGuias(guias, root) {
     const descContainer = qs('.guia-descricao-medieval', root);
     const btnContainer = qs('.guia-options', root);
+    if (!descContainer || !btnContainer) {
+      console.error('Contêineres não encontrados:', { descContainer, btnContainer });
+      return;
+    }
     descContainer.innerHTML = '';
     btnContainer.innerHTML = '';
     console.log('Renderizando guias:', guias);
@@ -232,7 +236,7 @@
     const guias = await loadGuias();
     if (guias.length === 0) {
       console.error('Nenhum guia disponível para renderizar.');
-      qs('#guia-error').style.display = 'block';
+      qs('#guia-error') && (qs('#guia-error').style.display = 'block');
       return;
     }
     renderGuias(guias, root);
@@ -302,7 +306,7 @@
     if (btnSel && !btnSel.__bound) {
       btnSel.addEventListener('click', () => {
         if (!guiaAtual || nameInput.value.trim() === '') {
-          qs('#guia-error').style.display = 'block';
+          qs('#guia-error') && (qs('#guia-error').style.display = 'block');
           window.toast?.('Selecione um guia e insira um nome.', 'warning');
           console.warn('Tentativa de selecionar guia sem guia ou nome válido.');
           return;
@@ -384,8 +388,8 @@
         root = sec;
       }
     }
-    // Atraso mínimo para garantir que o DOM esteja pronto
-    await sleep(100);
+    // Atraso maior para evitar problemas de timing
+    await sleep(500);
     await activate(root);
   }
 
