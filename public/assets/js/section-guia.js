@@ -121,7 +121,7 @@
 
       // Adicionar botão
       const btn = document.createElement('button');
-      btn.className = 'btn';
+      btn.className = 'btn btn-primary btn-stone';
       btn.dataset.action = 'select-guia';
       btn.dataset.guia = guia.id;
       btn.textContent = `Escolher ${guia.nome}`;
