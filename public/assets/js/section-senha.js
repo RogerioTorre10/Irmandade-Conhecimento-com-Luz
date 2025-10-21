@@ -7,11 +7,11 @@
   }
 
   // ===== Config =====
-  const TYPE_MS = 55;          // ms/char (datilografia)
-  const PAUSE_BETWEEN_P = 50;  // pausa reduzida entre parágrafos (era 90)
+  const TYPE_MS = 50;          // ms/char (alinhado com section-guia)
+  const PAUSE_BETWEEN_P = 100; // pausa entre parágrafos
   const EST_WPM = 160;         // fallback p/ TTS
   const EST_CPS = 13;
-  const TRANSITION_SRC = '/assets/img/irmandade-no-jardim.mp4';
+  const TRANSITION_SRC = '/assets/img/filme-senha.mp4';
   const NEXT_SECTION_DEFAULT = 'section-guia';
 
   // ===== Estado / Namespace =====
@@ -126,7 +126,7 @@
     if(!text || myAbort.cancelled()) return;
     try{
       if(window.EffectCoordinator?.speak){
-        const r=window.EffectCoordinator.speak(text);
+        const r=window.EffectCoordinator.speak(text, { rate: 1.06 });
         if(r && typeof r.then==='function'){
           await Promise.race([r, (async()=>{while(!myAbort.cancelled()) await sleep(20);})()]);
           return;
@@ -190,6 +190,8 @@
     const { input, toggle, next, prev } = pick(root);
     prev?.removeAttribute('disabled');
     next?.removeAttribute('disabled');
+    input?.removeAttribute('disabled');
+    toggle?.removeAttribute('disabled');
 
     if (toggle && !toggle.__senhaBound) {
       toggle.addEventListener('click', () => {
@@ -210,7 +212,7 @@
           (document.referrer && (()=>{ try{ return new URL(document.referrer).origin === window.location.origin; }catch{ return false; } })() ? document.referrer : null),
           '/'
         ].filter(Boolean);
-        const target = candidates[0];
+        const target = candidates[0] || '/';
         try { window.top.location.assign(target); } catch { window.location.href = target; }
       });
       prev.__senhaBound = true;
@@ -232,7 +234,12 @@
           NEXT_SECTION_DEFAULT;
 
         playTransitionThen(() => {
-          try { window.JC?.show?.(nextId); } catch {}
+          try { 
+            window.JC?.show?.(nextId);
+          } catch {
+            console.warn('JC não disponível, redirecionando para:', nextId);
+            window.location.href = 'jornada-conhecimento-com-luz1.html#section-guia';
+          }
         });
       });
       next.__senhaBound = true;
@@ -271,6 +278,14 @@
       while(!myAbort.cancelled() && (Date.now()-t0)<PAUSE_BETWEEN_P) await sleep(10);
     }
 
+    if (!myAbort.cancelled()) {
+      const { input, toggle, next, prev } = pick(root);
+      if (input) input.removeAttribute('disabled');
+      if (toggle) toggle.removeAttribute('disabled');
+      if (next) next.removeAttribute('disabled');
+      if (prev) prev.removeAttribute('disabled');
+    }
+
     window.JCSenha.state.running = false;
   }
 
@@ -284,13 +299,19 @@
       });
       obs.observe(root, {attributes: true, attributeFilter: ['class', 'style']});
       window.JCSenha.state.observer = obs;
-    }catch{}
+    }catch(e){
+      console.error('Erro ao configurar MutationObserver:', e);
+    }
   }
 
   function tryKick(){
     const root = qs(sel.root);
-    if(!root) return false;
+    if(!root) {
+      console.warn('Root #section-senha não encontrado.');
+      return false;
+    }
 
+    console.log('Iniciando section-senha...');
     root.classList.remove('hidden');
     root.setAttribute('aria-hidden','false');
     root.style.removeProperty('display');
@@ -306,11 +327,15 @@
   // API pública
   window.JCSenha.__kick = tryKick;
 
-  // Inicialização única no DOMContentLoaded ou imediata se já carregado
+  // Inicialização com espera maior
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', tryKick, {once: true});
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOMContentLoaded disparado, esperando 300ms...');
+      sleep(300).then(tryKick);
+    }, {once: true});
   } else {
-    tryKick();
+    console.log('DOM já carregado, esperando 300ms...');
+    sleep(300).then(tryKick);
   }
 
   // Eventos oficiais: iniciar/abortar com base na seção
@@ -319,9 +344,11 @@
     if(!id) return;
     if (id === 'section-senha') {
       window.JCSenha.state.abortId++;
-      tryKick();
+      console.log('section:shown para section-senha, esperando 300ms...');
+      sleep(300).then(tryKick);
     } else {
       window.JCSenha.state.abortId++;
+      console.log('section:shown ignorado para:', id);
     }
   });
 })();
