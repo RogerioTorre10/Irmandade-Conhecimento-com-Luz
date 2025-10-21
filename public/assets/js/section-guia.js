@@ -24,6 +24,7 @@
   // ===== Estado =====
   let ABORT_TOKEN = 0;
   let guiaAtual = null;
+  let guiasRendered = false;
 
   // ===== Utils =====
   const qs = (s, r = document) => r.querySelector(s);
@@ -119,6 +120,7 @@
         return;
       }
     }
+    guiasRendered = true;
     console.log('Guias renderizados em:', container);
   }
 
@@ -221,15 +223,15 @@
   async function bindUI(root, myId) {
     console.log('Vinculando UI para:', root);
     const nameInput = qs('#guiaNameInput', root);
-    const btnSel = qs('#btn-selecionar-guia', root);
+    const buttons = qsa('.guia-options button[data-guia]', root);
 
     const guias = await loadGuias();
     if (guias.length === 0) {
       console.error('Nenhum guia disponível para renderizar.');
       qs('#guia-error').style.display = 'block';
+      buttons.forEach(btn => enable(btn));
       return;
     }
-    await renderGuias(guias, root, myId);
 
     const saved = restoreChoice();
     if (saved.nome && nameInput) {
@@ -239,21 +241,23 @@
     if (saved.guia) {
       guiaAtual = saved.guia;
       highlightChoice(root, guiaAtual);
-      enable(btnSel);
+      buttons.forEach(btn => enable(btn));
     } else {
-      disable(btnSel);
+      buttons.forEach(btn => disable(btn));
     }
 
     if (nameInput) {
-      nameInput.addEventListener('input', () => {
+      nameInput.addEventListener('input', async () => {
         const nome = nameInput.value.trim();
         const isValid = nome.length >= 2 && /^[a-zA-Z\s]+$/.test(nome);
-        if (isValid && guiaAtual) {
-          enable(btnSel);
-          console.log('Botão Selecionar Guia habilitado.');
-        } else {
-          disable(btnSel);
-          console.log('Botão Selecionar Guia desabilitado.');
+        if (isValid && !guiasRendered) {
+          await renderGuias(guias, root, myId);
+          buttons.forEach(btn => enable(btn));
+        } else if (!isValid) {
+          const container = qs('.guia-descricao-medieval', root);
+          container.innerHTML = '';
+          guiasRendered = false;
+          buttons.forEach(btn => disable(btn));
         }
       });
     }
@@ -263,7 +267,7 @@
       item.addEventListener('click', () => {
         guiaAtual = item.dataset.guia;
         highlightChoice(root, guiaAtual);
-        enable(btnSel);
+        buttons.forEach(btn => enable(btn));
         try {
           document.dispatchEvent(new CustomEvent('guiaSelected', { detail: { guia: guiaAtual } }));
           console.log('Evento guiaSelected disparado:', guiaAtual);
@@ -274,7 +278,7 @@
       item.__bound = true;
     });
 
-    qsa('[data-action="select-guia"][data-guia]', root).forEach(btn => {
+    buttons.forEach(btn => {
       if (btn.__bound) return;
       btn.addEventListener('click', () => {
         guiaAtual = btn.dataset.guia;
@@ -285,19 +289,6 @@
       });
       btn.__bound = true;
     });
-
-    if (btnSel && !btnSel.__bound) {
-      btnSel.addEventListener('click', () => {
-        if (!guiaAtual) {
-          window.toast?.('Por favor, selecione um guia.', 'warning');
-          return;
-        }
-        const nome = nameInput?.value?.trim().toUpperCase() || '';
-        persistChoice(guiaAtual, nome);
-        playTransitionVideo();
-      });
-      btnSel.__bound = true;
-    }
   }
 
   async function activate(root) {
@@ -316,6 +307,7 @@
     if (!title) {
       console.warn('Título com datilografia não encontrado, criando fallback.');
       title = document.createElement('h2');
+      title.className = 'titulo-pergaminho';
       title.dataset.typing = 'true';
       title.dataset.text = 'Insira seu nome';
       title.textContent = 'Insira seu nome';
@@ -328,10 +320,7 @@
       return;
     }
 
-    const descContainer = qs('.guia-descricao-medieval', root);
-    descContainer.innerHTML = '';
     await bindUI(root, myId);
-    enable(qs('#btn-selecionar-guia', root));
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -371,9 +360,8 @@
         wrapper.appendChild(sec);
         sec.innerHTML = `
           <div class="conteudo-pergaminho">
-            <h2 data-typing="true" data-text="Insira seu nome" data-speed="30" data-cursor="true">Insira seu nome</h2>
+            <h2 class="titulo-pergaminho" data-typing="true" data-text="Insira seu nome" data-speed="30" data-cursor="true">Insira seu nome</h2>
             <div class="guia-name-input">
-              <label for="guiaNameInput">Insira seu nome</label>
               <input id="guiaNameInput" class="input-espinhos" type="text" placeholder="Digite seu nome para a jornada..." aria-label="Digite seu nome para a jornada">
             </div>
             <div class="moldura-grande">
@@ -383,9 +371,6 @@
               <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="zion" aria-label="Escolher o guia Zion">Escolher Zion</button>
               <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="lumen" aria-label="Escolher o guia Lumen">Escolher Lumen</button>
               <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="arian" aria-label="Escolher o guia Arian">Escolher Arian</button>
-            </div>
-            <div class="guia-actions">
-              <button id="btn-selecionar-guia" class="btn btn-primary btn-stone-espinhos" data-action="selecionar-guia" disabled aria-label="Confirmar seleção do guia">Selecionar Guia</button>
             </div>
             <div id="guia-error" style="display: none; color: #ff3333; font-family: 'Cardo', serif;">Não foi possível carregar os guias. Escolha um guia padrão abaixo.</div>
           </div>`;
