@@ -63,6 +63,48 @@
     return { sectionId, node };
   }
 
+  // Função de transição com vídeo
+  function playTransitionThen(nextStep) {
+    if (document.getElementById('termos-transition-overlay')) return;
+    console.log('[JCTermos] Iniciando transição de vídeo: /assets/img/filme-senha.mp4');
+    const overlay = document.createElement('div');
+    overlay.id = 'termos-transition-overlay';
+    overlay.style.cssText = `
+      position:fixed; inset:0; background:#000; z-index:999999;
+      display:flex; align-items:center; justify-content:center;`;
+    const video = document.createElement('video');
+    video.src = '/assets/img/filme-senha.mp4';
+    video.autoplay = true;
+    video.muted = true;
+    video.playsInline = true;
+    video.controls = false;
+    video.style.cssText = 'width:100%; height:100%; object-fit:cover;';
+    overlay.appendChild(video);
+    document.body.appendChild(overlay);
+
+    let done = false;
+    const cleanup = () => {
+      if (done) return;
+      done = true;
+      try { video.pause(); } catch {}
+      overlay.remove();
+      console.log('[JCTermos] Transição concluída, executando próximo passo.');
+      if (typeof nextStep === 'function') nextStep();
+    };
+
+    video.addEventListener('ended', cleanup, { once: true });
+    video.addEventListener('error', () => {
+      console.error('[JCTermos] Erro ao reproduzir vídeo: /assets/img/filme-senha.mp4');
+      setTimeout(cleanup, 1200);
+    }, { once: true });
+    setTimeout(() => { if (!done) cleanup(); }, 8000);
+
+    Promise.resolve().then(() => video.play?.()).catch(() => {
+      console.warn('[JCTermos] Erro ao iniciar vídeo, usando fallback.');
+      setTimeout(cleanup, 800);
+    });
+  }
+
   // Handler principal
   const handler = async (evt) => {
     window.JCTermos.state.HANDLER_COUNT++;
@@ -340,13 +382,15 @@
       if (e.isTrusted) { // Verificar se é um clique real
         speechSynthesis.cancel(); // Cancelar TTS ao avançar
         if (window.JCTermos.state.currentPage === 2) {
-          console.log('[JCTermos] Avançando para section-senha');
-          if (typeof window.JC?.show === 'function') {
-            window.JC.show('section-senha');
-          } else {
-            window.location.href = '/senha';
-            console.warn('[JCTermos] Fallback navigation to /senha');
-          }
+          console.log('[JCTermos] Avançando para section-senha com transição de vídeo');
+          playTransitionThen(() => {
+            if (typeof window.JC?.show === 'function') {
+              window.JC.show('section-senha');
+            } else {
+              window.location.href = 'jornada-conhecimento-com-luz1.html#section-senha';
+              console.warn('[JCTermos] Fallback navigation to jornada-conhecimento-com-luz1.html#section-senha');
+            }
+          });
         }
       } else {
         console.log('[JCTermos] Clique simulado ignorado');
