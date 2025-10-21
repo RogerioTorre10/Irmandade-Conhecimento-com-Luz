@@ -952,4 +952,91 @@ TÍTULO: ESTILOS DA SEÇÃO GUIA (AJUSTE FINO DO NOME DENTRO DA MOLDURA)
   padding: 30px 40px 20px;
   margin: 10px auto 20px;
 }
+/* ===== Pergaminho: título + campo ===== */
+.titulo-pergaminho {
+  text-align: center;
+  margin: 8px auto 6px;
+  font-size: 22px;
+  line-height: 1.15;
+}
+
+.guia-name-input.on-pergaminho {
+  display: flex;
+  justify-content: center;
+  margin: 6px 0 14px;
+}
+
+/* Campo com borda-espinhos (leve) */
+.input-espinhos {
+  width: min(62%, 360px);
+  padding: 12px 14px;
+  background-color: rgba(255,255,255,.98);
+  color: #3e2723;
+  font-size: 16px;
+  border: 14px solid transparent;
+  -webkit-border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
+          border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
+  border-radius: 2px; /* deixa os cantos sutis */
+  outline: none;
+}
+
+/* Moldura grande para o bloco de texto dos guias */
+.moldura-grande {
+  margin: 8px auto 12px;
+  width: min(92%, 720px);
+  min-height: 160px;
+  padding: 26px 28px;
+  background:
+    url('/assets/img/moldura-medieval.png') center/100% 100% no-repeat,
+    transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guia-descricao-medieval {
+  width: 100%;
+  max-width: 640px;
+  text-align: left;
+}
+.guia-descricao-medieval p {
+  margin: 6px 0;
+  font-size: 15.5px;
+  line-height: 1.45;
+}
+
+/* Grid dos botões */
+.guia-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  width: min(92%, 720px);
+  margin: 4px auto 10px;
+}
+
+/* Botão pedra + borda espinhos */
+.btn-stone-espinhos {
+  padding: 11px 14px;
+  font-weight: 600;
+  color: #fff;
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,.15), rgba(0,0,0,.22)),
+    url('/assets/img/textura-de-pedra.jpg') center/cover no-repeat;
+  border: 12px solid transparent;
+  -webkit-border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
+          border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
+  border-radius: 3px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.35));
+  transition: transform .12s ease, filter .12s ease;
+}
+.btn-stone-espinhos:hover { transform: translateY(-1px); filter: drop-shadow(0 4px 8px rgba(0,0,0,.45)); }
+.btn-stone-espinhos:disabled { opacity: .55; filter: grayscale(.3); cursor: not-allowed; }
+
+.guia-selected { text-shadow: 0 0 10px rgba(255,196,0,.75); }
+
+/* Melhora contraste do H2 dentro da moldura, se usar imagem */
+.guia-header-moldura h2,
+.moldura-grande h2 {
+  text-shadow: 0 1px 0 rgba(0,0,0,.6), 0 0 12px rgba(0,0,0,.25);
+}
 
