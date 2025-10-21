@@ -81,31 +81,25 @@
     }
   }
 
-  function renderGuias(guias, root){
-  const opts = qs('.guia-options', root);
-  if (!opts) return;
-  opts.innerHTML = '';
+  function renderGuias(guias, root) {
+  const btns = qs('.guia-options', root);
+  btns.innerHTML = '';
   guias.forEach(g => {
     const b = document.createElement('button');
     b.className = 'btn btn-stone-espinhos';
     b.dataset.action = 'select-guia';
     b.dataset.guia = g.id;
-    b.textContent = g.nome;     // rótulo curto nos botões
-    opts.appendChild(b);
+    b.textContent = g.nome;
+    btns.appendChild(b);
   });
+  const caixa = qs('#guiaTexto', root);
+  const texto = guias.map(g => `${g.nome} — ${g.descricao}`).join('\n');
+  if (caixa) {
+    caixa.dataset.text = texto;
+    runTypingAndSpeak(caixa, texto, ABORT_TOKEN);
+  }
 }
-  
-  // Prepara o texto (nomes + descrições) para datilografia dentro da moldura
-  const textoGuias = (guias || [])
-  .map(g => `${g.nome} — ${g.descricao}`)
-  .join('\n');
 
-   const caixa = qs('#guiaTexto', root);
-   if (caixa) {
-   // Se o TypingBridge aceitar \n, usamos direto; senão, caímos no fallback local
-   caixa.dataset.text = textoGuias;
-   await runTypingAndSpeak(caixa, textoGuias, ABORT_TOKEN);
- }
 
   // Datilografia local (fallback)
   function typeLocal(el, text, speed){
