@@ -43,6 +43,10 @@
         visibility: visible !important;
         opacity: 1 !important;
       }
+      #section-senha .typing-done {
+        visibility: visible !important;
+        opacity: 1 !important;
+      }
     `;
     document.head.appendChild(s);
   })();
@@ -108,8 +112,9 @@
     el.classList.add('typing-done');
     el.style.textAlign = el.dataset.prevAlign || '';
     if(el.dataset.prevDir) el.setAttribute('dir', el.dataset.prevDir); else el.removeAttribute('dir');
-    el.style.visibility = '';
-    el.style.opacity = '';
+    el.style.visibility = 'visible'; // Garantir visibilidade após datilografia
+    el.style.opacity = '1'; // Garantir visibilidade após datilografia
+    console.log('Estilos restaurados para:', el.id, { visibility: el.style.visibility, opacity: el.style.opacity });
   }
 
   async function localType(el, text, speed, myAbort){
@@ -125,7 +130,7 @@
   }
 
   function estSpeakMs(text){
-    const t=(text||'').trim(); if(!t) return 1000; // Aumentado mínimo para 1000ms
+    const t=(text||'').trim(); if(!t) return 1000;
     const words=t.split(/\s+/).length;
     const byWpm=(words/EST_WPM)*60000;
     const byCps=(t.length/EST_CPS)*1000;
@@ -359,7 +364,7 @@
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       console.log('DOMContentLoaded disparado, esperando 9000ms...');
-      sleep(9000).then(tryKick); // Aumentado para 9000ms para esperar o vídeo
+      sleep(9000).then(tryKick);
     }, {once: true});
   } else {
     console.log('DOM já carregado, esperando 9000ms...');
@@ -373,7 +378,7 @@
     if (id === 'section-senha') {
       window.JCSenha.state.abortId++;
       console.log('section:shown para section-senha, esperando 9000ms...');
-      sleep(9000).then(tryKick); // Aumentado para 9000ms para esperar o vídeo
+      sleep(9000).then(tryKick);
     } else {
       window.JCSenha.state.abortId++;
       console.log('section:shown ignorado para:', id);
