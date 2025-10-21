@@ -104,33 +104,23 @@ async function carregarGuias(root) {
 
 
 function renderGuias(root, guias = []) {
-  const container = root.querySelector('.guia-options');
+  const containerDescricao = root.querySelector('.guia-descricao');
+  const containerOpcoes = root.querySelector('.guia-options');
   const inputNome = root.querySelector('#guiaNameInput');
-  const descricao = root.querySelector('.guia-descricao-medieval');
 
-  if (!container || !inputNome || !descricao) {
+  if (!containerDescricao || !containerOpcoes || !inputNome) {
     console.warn('[Guia] Elementos não encontrados');
     return;
   }
 
-  container.innerHTML = '';
-  descricao.innerHTML = '';
+  containerDescricao.innerHTML = '';
+  containerOpcoes.innerHTML = '';
 
   guias.forEach(guia => {
-    // Descrição visual
-    const bloco = document.createElement('div');
-    bloco.className = 'guia-card parchment-card-rough';
-    bloco.style.backgroundImage = `url('${guia.bgImage}')`;
-    bloco.style.backgroundSize = 'cover';
-    bloco.style.padding = '16px';
-    bloco.style.marginBottom = '12px';
-    bloco.innerHTML = `
-      <h3 class="guia-nome">${guia.nome}</h3>
-      <p class="guia-descricao">${guia.descricao}</p>
-    `;
-    descricao.appendChild(bloco);
+    const p = document.createElement('p');
+    p.textContent = `${guia.nome}: ${guia.descricao}`;
+    containerDescricao.appendChild(p);
 
-    // Botão de ação
     const btn = document.createElement('button');
     btn.className = 'btn btn-primary btn-stone';
     btn.textContent = `Escolher ${guia.nome}`;
@@ -154,9 +144,16 @@ function renderGuias(root, guias = []) {
       }
     });
 
-    container.appendChild(btn);
+    containerOpcoes.appendChild(btn);
+  });
+
+  // Aplica datilografia nos parágrafos
+  const paragrafos = containerDescricao.querySelectorAll('p');
+  paragrafos.forEach(p => {
+    window.JORNADA_TYPO?.typeText(p, p.textContent, 30, true);
   });
 }
+
 
 
 
