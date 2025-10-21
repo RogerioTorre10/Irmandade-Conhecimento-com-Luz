@@ -1,0 +1,30 @@
+/* Estilo para a borda do botão ou contêiner dos botões */
+.borda-conhecimento-luz {
+    /* Cor de fundo opcional para ver a borda */
+    background-color: #f7f7f7;
+    
+    /* A principal cor da borda, baseada na moldura (um tom de ouro/ocre) */
+    border: 3px solid #b8860b; /* Exemplo: #b8860b é "Goldenrod" */
+    
+    /* Um "brilho" interno para simular a profundidade da moldura */
+    box-shadow: 0 0 0 5px #ffdead, /* Off-white interno para o destaque */
+                0 0 0 8px #b8860b; /* Repetição do ouro para espessura */
+                
+    /* Arredondamento suave das pontas, se desejar um toque moderno */
+    border-radius: 8px;
+    
+    /* Preenchimento interno para os botões não tocarem a borda */
+    padding: 10px 15px; 
+    
+    /* Garantir que a borda e o padding sejam incluídos na largura/altura */
+    box-sizing: border-box;
+}
+
+/* Estilo que simula uma borda com mais "relevo" (opção alternativa) */
+.borda-relevo-conhecimento-luz {
+    border-style: outset; /* ou 'groove' */
+    border-width: 5px;
+    border-color: #b8860b #ccad71 #ccad71 #b8860b; /* Cores diferentes para relevo 3D */
+    padding: 10px;
+    border-radius: 5px;
+}
