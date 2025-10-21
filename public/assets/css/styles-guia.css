@@ -79,6 +79,7 @@
   max-width: 300px;
   margin: 10px auto;
   display: block;
+  text-transform: uppercase; /* Forçar letras maiúsculas */
 }
 
 .input-espinhos::placeholder {
