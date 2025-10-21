@@ -86,68 +86,72 @@
   }
 
   // ---- Carregar guias do JSON ----
-  async function loadGuias() {
-    try {
-      const response = await fetch(GUIAS_JSON, { cache: 'no-cache' });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const guias = await response.json();
-      console.log('Guias carregados:', guias);
-      return guias;
-    } catch (e) {
-      console.error('Erro ao carregar guias:', e);
-      qs('#guia-error') && (qs('#guia-error').style.display = 'block');
-      console.log('Usando guias fallback:', FALLBACK_GUIAS);
-      return FALLBACK_GUIAS;
-    }
+ async function carregarGuias(root) {
+  try {
+    const res = await fetch('/assets/data/guias.json');
+    const guias = await res.json();
+    renderGuias(root, guias);
+  } catch (err) {
+    console.error('[Guia] Erro ao carregar guias.json', err);
+    toast('Não foi possível carregar os guias', 'error');
+  }
+}
+
+function renderGuias(root, guias = []) {
+  const container = root.querySelector('.guia-options');
+  const inputNome = root.querySelector('#guiaNameInput');
+  const descricao = root.querySelector('.guia-descricao-medieval');
+
+  if (!container || !inputNome || !descricao) {
+    console.warn('[Guia] Elementos não encontrados');
+    return;
   }
 
- function renderGuias(root, guias = []) {
-  const containerDescricao = qs('.guia-descricao-medieval', root);
-  const containerOpcoes = qs('.guia-options', root);
-  if (!containerDescricao || !containerOpcoes) return;
-
-  containerDescricao.innerHTML = '';
-  containerOpcoes.innerHTML = '';
+  container.innerHTML = '';
+  descricao.innerHTML = '';
 
   guias.forEach(guia => {
-    // Descrição do guia
-    const desc = document.createElement('div');
-    desc.className = 'guia-card parchment-card-rough';
-    desc.innerHTML = `
+    // Descrição visual
+    const bloco = document.createElement('div');
+    bloco.className = 'guia-card parchment-card-rough';
+    bloco.style.backgroundImage = `url('${guia.bgImage}')`;
+    bloco.style.backgroundSize = 'cover';
+    bloco.style.padding = '16px';
+    bloco.style.marginBottom = '12px';
+    bloco.innerHTML = `
       <h3 class="guia-nome">${guia.nome}</h3>
       <p class="guia-descricao">${guia.descricao}</p>
     `;
-    containerDescricao.appendChild(desc);
+    descricao.appendChild(bloco);
 
-    // Botão do guia
+    // Botão de ação
     const btn = document.createElement('button');
     btn.className = 'btn btn-primary btn-stone';
     btn.textContent = `Escolher ${guia.nome}`;
-    btn.dataset.action = 'iniciar-filme';
     btn.dataset.guia = guia.id;
 
-    root.querySelectorAll('[data-action="select-guia"]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const nome = qs('#guiaNameInput', root)?.value?.trim();
-    const guia = btn.dataset.guia;
-    if (!nome || nome.length < 2) {
-      toast('Digite seu nome para continuar', 'warn');
-      return;
-    }
+    btn.addEventListener('click', () => {
+      const nome = inputNome.value.trim();
+      if (nome.length < 2) {
+        toast('Digite seu nome para continuar', 'warn');
+        inputNome.focus();
+        return;
+      }
 
-    sessionStorage.setItem('jornada.nome', nome);
-    sessionStorage.setItem('jornada.guia', guia);
+      sessionStorage.setItem('jornada.nome', nome);
+      sessionStorage.setItem('jornada.guia', guia.id);
 
-    if (window.JORNADA_NAV?.goAcolhimento) {
-      window.JORNADA_NAV.goAcolhimento();
-    }
-  });
-});
-
-
-    containerOpcoes.appendChild(btn);
+      if (window.JORNADA_NAV?.goAcolhimento) {
+        window.JORNADA_NAV.goAcolhimento();
+      } else {
+        toast('Navegação não disponível', 'error');
+      }
     });
-  }
+
+    container.appendChild(btn);
+  });
+}
+
 
 
   // ---- Efeito datilografia + leitura ----
