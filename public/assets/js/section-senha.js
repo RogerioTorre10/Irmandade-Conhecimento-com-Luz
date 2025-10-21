@@ -48,6 +48,7 @@
         opacity: 1 !important;
       }
       #section-senha .typing-done {
+        text-align: center !important;
         visibility: visible !important;
         opacity: 1 !important;
       }
@@ -114,11 +115,11 @@
     if(!el) return;
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
-    el.style.textAlign = el.dataset.prevAlign || '';
+    el.style.textAlign = 'center'; // Centralizar após datilografia
     if(el.dataset.prevDir) el.setAttribute('dir', el.dataset.prevDir); else el.removeAttribute('dir');
     el.style.visibility = 'visible';
     el.style.opacity = '1';
-    console.log('Estilos restaurados para:', el.id, { visibility: el.style.visibility, opacity: el.style.opacity });
+    console.log('Estilos restaurados para:', el.id, { textAlign: el.style.textAlign, visibility: el.style.visibility, opacity: el.style.opacity });
   }
 
   async function localType(el, text, speed, myAbort){
@@ -188,7 +189,7 @@
   function forceRedirect(){
     console.log('Forçando redirecionamento para:', NEXT_PAGE);
     try {
-      window.location.replace(NEXT_PAGE); // Usar replace para evitar histórico
+      window.location.replace(NEXT_PAGE);
     } catch (e) {
       console.warn('window.location.replace falhou para:', NEXT_PAGE, 'tentando fallback:', FALLBACK_PAGE);
       try {
@@ -207,7 +208,7 @@
     }
     window.JCSenha.state.transitioning = true;
     console.log('Iniciando transição de vídeo:', TRANSITION_SRC);
-    document.body.style.background = 'white'; // Fundo branco no body
+    document.body.style.background = 'white';
     const overlay = document.createElement('div');
     overlay.id = 'senha-transition-overlay';
     overlay.style.cssText = `
@@ -233,7 +234,7 @@
       if (done) return; done = true;
       try { video.pause(); } catch {}
       overlay.remove();
-      document.body.style.background = ''; // Resetar fundo
+      document.body.style.background = '';
       console.log('Transição concluída, executando próximo passo.');
       if (typeof nextStep === 'function') nextStep();
       window.JCSenha.state.transitioning = false;
