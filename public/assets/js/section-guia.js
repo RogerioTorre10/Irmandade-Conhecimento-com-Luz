@@ -48,7 +48,7 @@
   function enable(el){ if(el){ el.disabled=false; el.style.pointerEvents=''; el.style.opacity=''; } }
   function disable(el){ if(el){ el.disabled=true;  el.style.pointerEvents='none'; el.style.opacity='0.5'; } }
 
-  function highlightChoice(root, guia) {
+  function highlightChoice(root, guiaAtual, window.__GUIAS_CACHE) {
     qsa('[data-guia]', root).forEach(el => {
       el.classList.toggle('guia-selected', el.dataset.guia === guia);
     });
