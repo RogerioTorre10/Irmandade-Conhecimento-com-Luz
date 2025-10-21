@@ -745,298 +745,33 @@ TÍTULO: ESTILOS DA SEÇÃO GUIA (Sobrescrita para Moldura)
   position: relative;
   z-index: 10;
 }
-
-/* 3. Título (H2) dentro da Moldura */
-.guia-header-moldura h2 {
-  /* Usa a fonte de títulos do seu styles.css para consistência */
-  font-family: 'ManufacturingConsent', sans-serif !important; 
-  
-  color: #FFD700 !important; /* Dourado */
-  text-shadow: 0 0 8px rgba(255,196,0,.75); /* Brilho suave da chama */
-  font-size: 2.2em;
-  margin-top: 0;
-  margin-bottom: 20px;
-  /* Garante que a animação de digitação funcione corretamente */
-  opacity: 0; 
-  display: block;
-}
-
-/* 4. Campo de Nome dentro da Moldura */
-.guia-name-input {
-    margin: 15px 0 0 0;
-}
-.guia-name-input label {
-  /* Estilo que remete a uma placa, mantendo o contraste */
-  background-color: #3e2723; /* Marrom escuro */
-  color: #fff;
-  padding: 5px 15px;
-  border-radius: 5px;
-  display: inline-block;
-  margin-bottom: 8px;
-  font-family: 'ManufacturingConsent', sans-serif;
-  font-size: 1.1em;
-  font-variant: small-caps;
-}
-.guia-name-input input {
-  /* Sobrescreve o estilo base do seu input, mas mantendo o tema escuro */
-  width: 90%;
-  max-width: 300px;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid var(--muted);
-  background: var(--card); /* Fundo escuro do seu styles.css */
-  color: var(--fg);
-  font-family: 'Cardo', serif;
-  font-size: 16px;
-  text-align: center;
-}
-
-/* 5. Ações (Botões) - Apenas ajuste de margem para o novo layout */
-.guia-actions {
-  margin-top: 30px; 
-  position: relative; /* Ajusta a posição para não ficar "colado" no rodapé */
-}
-/* 1. Ajuste do Container da Moldura para centralizar melhor */
-.guia-header-moldura {
-  /* Mantém as regras existentes */
-  padding: 30px 40px 20px 40px; 
-  text-align: center;
-  position: relative;
-  z-index: 10;
-}
-
-/* 2. Ajuste do LABEL ("Insira seu nome") */
-.guia-name-input label {
-  /* Fundo de cor de madeira/tinta para contraste */
-  background-color: #3e2723 !important; 
-  color: #fff !important;
-  padding: 8px 18px !important; /* Aumenta o padding para visibilidade */
-  border-radius: 6px !important;
-  display: block !important; /* Transforma em bloco para ocupar a largura necessária */
-  width: fit-content; /* Ocupa apenas a largura do texto */
-  margin: 0 auto 10px auto !important; /* Centraliza acima do input */
-  font-family: 'ManufacturingConsent', sans-serif !important;
-  font-size: 1.2em !important;
-  font-variant: small-caps;
-}
-
-/* 3. Ajuste Crítico do INPUT (A área do nome ROGERIO) */
-.guia-name-input input {
-  /* Diminui a largura para caber no espaço interno da moldura */
-  width: 65% !important; 
-  max-width: 250px !important; /* Limita a largura máxima */
-
-  /* Estilo que imita o papel/pergaminho */
-  background-color: rgba(255, 255, 255, 0.95) !important; /* Fundo muito claro */
-  color: #3e2723 !important; /* Cor da "tinta" (sépia) */
-  
-  /* Remove a borda azul escura/escura do seu styles.css, substituindo por uma borda suave */
-  border: 1px solid #c8a488 !important; 
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15); /* Sombra interna sutil */
-
-  padding: 12px !important;
-  font-size: 18px !important;
-  font-family: 'Cardo', serif !important;
-  
-  /* Garante que o texto fique centralizado */
-  text-align: center !important; 
-  
-  /* Margem para não tocar as laterais da moldura */
-  margin: 0 auto !important;
-}
-/* =============================================================================
-TÍTULO: ESTILOS DA SEÇÃO GUIA (AJUSTE FINO DO NOME DENTRO DA MOLDURA)
-============================================================================= */
-
-/* 1. Ajuste do LABEL ("Insira seu nome") */
-.guia-header-moldura .guia-name-input label {
-  /* Alinhamento */
-  display: block; 
-  width: fit-content; 
-  margin: 0 auto 10px auto; /* Centraliza acima do input */
-
-  /* Estilo do Texto/Fundo */
-  background-color: #3e2723; /* Marrom escuro para ser a "placa" */
-  color: #fff;
-  padding: 8px 18px; /* Aumenta o tamanho visual */
-  border-radius: 6px;
-  font-family: 'ManufacturingConsent', sans-serif;
-  font-size: 1.2em; /* Aumenta a fonte */
-  font-variant: small-caps;
-}
-
-/* 2. Ajuste Crítico do INPUT (A área do nome ROGERIO) */
-.guia-header-moldura .guia-name-input input {
-  /* Dimensões: O principal para caber na moldura */
-  width: 60%; 
-  max-width: 250px; 
-  margin: 0 auto 0 auto; /* Centraliza o input */
-
-  /* Visual: Faz parecer parte da moldura, como um papel claro sobre a mesa escura */
-  background-color: rgba(255, 255, 255, 0.98); /* Fundo branco quase opaco */
-  color: #3e2723; /* Cor da "tinta" (sépia) */
-  
-  /* Borda sutil de papel */
-  border: 1px solid #c8a488; 
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2), inset 0 1px 3px rgba(0, 0, 0, 0.15); 
-
-  /* Alinhamento e Espaçamento */
-  padding: 12px;
-  font-size: 18px;
-  text-align: center;
-  font-family: 'Cardo', serif;
-}
-
-/* 3. Se houver problemas de prioridade, use !important (Apenas se as regras acima não funcionarem) */
-.guia-header-moldura .guia-name-input input {
-    width: 60% !important; 
-    max-width: 250px !important; 
-    background-color: rgba(255, 255, 255, 0.98) !important;
-    color: #3e2723 !important;
-    border: 1px solid #c8a488 !important;
-    margin: 0 auto 0 auto !important;
-}
-/* ==== GUIA: ajustes visuais mínimos ==== */
-.guia-descricao-medieval {
-  margin: 10px auto 0;
-  max-width: 540px;
-}
-.guia-descricao-medieval p {
-  margin: 6px 0;
-  font-size: 15px;
-  line-height: 1.45;
-  cursor: pointer;           /* permite clicar no parágrafo para selecionar */
-  transition: transform .15s ease, text-shadow .15s ease;
-}
-.guia-descricao-medieval p:hover { transform: translateX(2px); }
-
-.guia-options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 10px;
-  margin-top: 14px;
-  max-width: 540px;
-  margin-left: auto; margin-right: auto;
-}
-.guia-options .btn {
-  padding: 10px 14px;
-}
-
-.guia-selected {
-  text-shadow: 0 0 10px rgba(255,196,0,.75);
-  transform: translateX(2px);
-}
-
-/* Botão secundário com a mesma “pedra” */
-.btn.btn-secondary.btn-stone {
-  background: linear-gradient(to bottom, #939393, #6e6e6e), url('/assets/img/textura-de-pedra.jpg') center/cover;
-  border: 3px solid #444;
-}
-
-/* Campo de nome dentro da moldura – prioridade alta, mantendo leveza */
-.guia-header-moldura .guia-name-input input {
-  width: 60% !important;
-  max-width: 260px !important;
-  background-color: rgba(255,255,255,.98) !important;
-  color: #3e2723 !important;
-  border: 1px solid #c8a488 !important;
-  text-align: center !important;
-}
-
-/* Moldura aplicada como background do cabeçalho */
-.guia-header-moldura {
-  background-image: url('/assets/img/moldura-medieval.png');
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  background-color: transparent;
-  padding: 30px 40px 20px;
-  margin: 10px auto 20px;
-}
-/* ===== Pergaminho: título + campo ===== */
-.titulo-pergaminho {
-  text-align: center;
-  margin: 8px auto 6px;
-  font-size: 22px;
-  line-height: 1.15;
-}
-
-.guia-name-input.on-pergaminho {
-  display: flex;
-  justify-content: center;
-  margin: 6px 0 14px;
-}
-
-/* Campo com borda-espinhos (leve) */
+.titulo-pergaminho { text-align:center; font-size:22px; margin:8px auto; }
 .input-espinhos {
-  width: min(62%, 360px);
-  padding: 12px 14px;
-  background-color: rgba(255,255,255,.98);
-  color: #3e2723;
-  font-size: 16px;
-  border: 14px solid transparent;
-  -webkit-border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
-          border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
-  border-radius: 2px; /* deixa os cantos sutis */
-  outline: none;
+  width:min(62%,360px);
+  padding:12px 14px;
+  background:rgba(255,255,255,.98);
+  color:#3e2723;
+  border:14px solid transparent;
+  border-image:url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
+  border-radius:2px;
 }
-
-/* Moldura grande para o bloco de texto dos guias */
 .moldura-grande {
-  margin: 8px auto 12px;
-  width: min(92%, 720px);
-  min-height: 160px;
-  padding: 26px 28px;
-  background:
-    url('/assets/img/moldura-medieval.png') center/100% 100% no-repeat,
-    transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin:8px auto 12px;
+  width:min(92%,720px);
+  min-height:160px;
+  padding:26px 28px;
+  background:url('/assets/img/moldura-medieval.png') center/100% 100% no-repeat;
 }
-
-.guia-descricao-medieval {
-  width: 100%;
-  max-width: 640px;
-  text-align: left;
-}
-.guia-descricao-medieval p {
-  margin: 6px 0;
-  font-size: 15.5px;
-  line-height: 1.45;
-}
-
-/* Grid dos botões */
-.guia-options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 10px;
-  width: min(92%, 720px);
-  margin: 4px auto 10px;
-}
-
-/* Botão pedra + borda espinhos */
 .btn-stone-espinhos {
-  padding: 11px 14px;
-  font-weight: 600;
-  color: #fff;
+  padding:11px 14px;
   background:
-    linear-gradient(to bottom, rgba(255,255,255,.15), rgba(0,0,0,.22)),
+    linear-gradient(to bottom,rgba(255,255,255,.15),rgba(0,0,0,.22)),
     url('/assets/img/textura-de-pedra.jpg') center/cover no-repeat;
-  border: 12px solid transparent;
-  -webkit-border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
-          border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
-  border-radius: 3px;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,.35));
-  transition: transform .12s ease, filter .12s ease;
+  border:12px solid transparent;
+  border-image:url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
+  border-radius:3px;
+  color:#fff;
 }
-.btn-stone-espinhos:hover { transform: translateY(-1px); filter: drop-shadow(0 4px 8px rgba(0,0,0,.45)); }
-.btn-stone-espinhos:disabled { opacity: .55; filter: grayscale(.3); cursor: not-allowed; }
 
-.guia-selected { text-shadow: 0 0 10px rgba(255,196,0,.75); }
 
-/* Melhora contraste do H2 dentro da moldura, se usar imagem */
-.guia-header-moldura h2,
-.moldura-grande h2 {
-  text-shadow: 0 1px 0 rgba(0,0,0,.6), 0 0 12px rgba(0,0,0,.25);
-}
 
