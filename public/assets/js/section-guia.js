@@ -241,7 +241,10 @@
     if (saved.guia) {
       guiaAtual = saved.guia;
       highlightChoice(root, guiaAtual);
-      buttons.forEach(btn => enable(btn));
+      if (saved.nome && /^[a-zA-Z\s]{2,}$/.test(saved.nome)) {
+        await renderGuias(guias, root, myId);
+        buttons.forEach(btn => enable(btn));
+      }
     } else {
       buttons.forEach(btn => disable(btn));
     }
@@ -251,6 +254,7 @@
         const nome = nameInput.value.trim();
         const isValid = nome.length >= 2 && /^[a-zA-Z\s]+$/.test(nome);
         if (isValid && !guiasRendered) {
+          nameInput.disabled = true; // Bloqueia input após nome válido
           await renderGuias(guias, root, myId);
           buttons.forEach(btn => enable(btn));
         } else if (!isValid) {
@@ -320,6 +324,11 @@
       return;
     }
 
+    const nameInput = qs('#guiaNameInput', root);
+    if (nameInput) {
+      enable(nameInput);
+    }
+
     await bindUI(root, myId);
   }
 
@@ -356,23 +365,23 @@
         console.warn('Criando contêiner #section-guia como fallback.');
         const sec = document.createElement('div');
         sec.id = 'section-guia';
-        sec.className = 'j-section';
+        sec.className = 'j-section pergaminho pergaminho-v epic';
         wrapper.appendChild(sec);
         sec.innerHTML = `
           <div class="conteudo-pergaminho">
             <h2 class="titulo-pergaminho" data-typing="true" data-text="Insira seu nome" data-speed="30" data-cursor="true">Insira seu nome</h2>
             <div class="guia-name-input">
-              <input id="guiaNameInput" class="input-espinhos" type="text" placeholder="Digite seu nome para a jornada..." aria-label="Digite seu nome para a jornada">
+              <input id="guiaNameInput" class="input-espinhos" type="text" placeholder="Digite seu nome para a jornada..." aria-label="Digite seu nome para a jornada" disabled>
             </div>
             <div class="moldura-grande">
               <div class="guia-descricao-medieval"></div>
             </div>
             <div class="guia-options">
-              <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="zion" aria-label="Escolher o guia Zion">Escolher Zion</button>
-              <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="lumen" aria-label="Escolher o guia Lumen">Escolher Lumen</button>
-              <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="arian" aria-label="Escolher o guia Arian">Escolher Arian</button>
+              <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="zion" aria-label="Escolher o guia Zion" disabled>Escolher Zion</button>
+              <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="lumen" aria-label="Escolher o guia Lumen" disabled>Escolher Lumen</button>
+              <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="arian" aria-label="Escolher o guia Arian" disabled>Escolher Arian</button>
             </div>
-            <div id="guia-error" style="display: none; color: #ff3333; font-family: 'Cardo', serif;">Não foi possível carregar os guias. Escolha um guia padrão abaixo.</div>
+            <div id="guia-error" style="display: none; color: #ff3333; font-family: 'BerkshireSwash', cursive;">Não foi possível carregar os guias. Escolha um guia padrão abaixo.</div>
           </div>`;
         root = sec;
       }
