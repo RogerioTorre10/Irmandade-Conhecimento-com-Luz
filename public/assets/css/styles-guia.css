@@ -40,6 +40,7 @@
   background-size: cover;
   background-position: center;
   background-color: var(--card-2);
+  background-blend-mode: overlay;
   color: var(--fg);
   font-family: 'ManufacturingConsent', sans-serif;
   font-weight: bold;
@@ -70,6 +71,7 @@
   background-size: cover;
   background-position: center;
   background-color: var(--card-2);
+  background-blend-mode: overlay;
   color: var(--fg);
   font-family: 'BerkshireSwash', cursive;
   border-radius: var(--radius);
