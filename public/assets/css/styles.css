@@ -699,79 +699,84 @@ TÍTULO: TOAST
   /* Margem para não tocar as laterais da moldura */
   margin: 0 auto !important;
 }
-/* =============================================================================
-TÍTULO: ESTILOS DA SEÇÃO GUIA (Sobrescrita para Moldura)
-============================================================================= */
+/* ================================
+   SECTION GUIA – Layout e Estilos
+   ================================ */
 
-/* 1. Reset e Fundo do Pergaminho */
-#section-guia {
-  /* Alinha a seção para que o pergaminho-v possa funcionar como plano de fundo */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  padding: 0;
-  margin: 0;
-  height: 100%;
+/* Pergaminho: título datilografado */
+.titulo-pergaminho{
+  text-align:center;
+  margin:8px auto 6px;
+  font-size:22px;
+  line-height:1.15;
+  color:#fff;
 }
 
-/* Garante que o conteúdo fique centrado na área visível do pergaminho (imagem) */
-.conteudo-pergaminho {
-  width: 100%;
-  max-width: 500px; /* Largura do conteúdo interno do pergaminho */
-  padding: 40px; 
-  /* Remove qualquer fundo branco ou sombra que interfira no visual do pergaminho (imagem_2e5a7f.jpg) */
-  background-color: transparent !important;
-  box-shadow: none !important;
-  border: none !important;
-  color: #fff; /* Mantém a cor de texto branca */
-  font-family: 'BerkshireSwash', cursive; /* Usa a fonte do seu styles.css */
-}
-
-/* 2. NOVO CONTAINER DA MOLDURA (GUIA HEADER) */
-.guia-header-moldura {
-  /* Usa o PNG para a moldura externa */
-  background-image: url('/assets/img/moldura-medieval.png'); 
-  background-size: 100% 100%; 
-  background-repeat: no-repeat;
-  background-color: transparent; 
-
-  /* O padding é crucial para garantir que o conteúdo fique dentro da área do PNG */
-  padding: 30px 40px 20px 40px; 
-  
-  margin: 10px auto 20px auto; 
-  text-align: center;
-  /* Garante que a moldura apareça no topo da camada do pergaminho */
-  position: relative;
-  z-index: 10;
-}
-.titulo-pergaminho { text-align:center; font-size:22px; margin:8px auto; }
-.input-espinhos {
+/* Campo de nome com borda de espinhos */
+.guia-name-input.on-pergaminho{ display:flex; justify-content:center; margin:6px 0 14px; }
+.input-espinhos{
   width:min(62%,360px);
   padding:12px 14px;
   background:rgba(255,255,255,.98);
   color:#3e2723;
+  font-size:16px;
+  text-align:center;
+  outline:none;
   border:14px solid transparent;
-  border-image:url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
+  -webkit-border-image:url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
+          border-image:url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
   border-radius:2px;
 }
-.moldura-grande {
+
+/* Moldura grande onde ocorre a datilografia dos guias */
+.moldura-grande{
   margin:8px auto 12px;
   width:min(92%,720px);
   min-height:160px;
   padding:26px 28px;
-  background:url('/assets/img/moldura-medieval.png') center/100% 100% no-repeat;
+  background:url('/assets/img/moldura-medieval.png') center/100% 100% no-repeat transparent;
+  display:flex; align-items:center; justify-content:center;
 }
-.btn-stone-espinhos {
+.guia-descricao-medieval{ width:100%; max-width:640px; text-align:left; color:#fff; }
+.guia-descricao-medieval p{ margin:6px 0; font-size:15.5px; line-height:1.45; }
+
+/* Grid dos botões */
+.guia-options{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:10px;
+  width:min(92%,720px);
+  margin:4px auto 10px;
+}
+
+/* Botão com textura de pedra + borda de espinhos */
+.btn-stone-espinhos{
   padding:11px 14px;
+  font-weight:600;
+  color:#fff;
   background:
-    linear-gradient(to bottom,rgba(255,255,255,.15),rgba(0,0,0,.22)),
+    linear-gradient(to bottom, rgba(255,255,255,.15), rgba(0,0,0,.22)),
     url('/assets/img/textura-de-pedra.jpg') center/cover no-repeat;
   border:12px solid transparent;
-  border-image:url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
+  -webkit-border-image:url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
+          border-image:url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
   border-radius:3px;
-  color:#fff;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.35));
+  transition:transform .12s ease, filter .12s ease, opacity .12s ease;
 }
+.btn-stone-espinhos:hover{ transform:translateY(-1px); filter:drop-shadow(0 4px 8px rgba(0,0,0,.45)); }
+.btn-stone-espinhos:disabled{ opacity:.55; filter:grayscale(.3); cursor:not-allowed; }
+
+/* Destaque de escolha */
+.guia-selected{ text-shadow:0 0 10px rgba(255,196,0,.75); }
+
+/* Suporte ao efeito de datilografia (caso seu global não injete) */
+[data-typing="true"]{ min-height:20px; display:block; position:relative; opacity:0; }
+[data-typing="true"].typing-done{ opacity:1; }
+.lumen-typing{ white-space:pre-wrap; position:relative; }
+.lumen-typing::after{ content:"▌"; margin-left:2px; opacity:.75; animation:lumenBlink 1s steps(2,end) infinite; }
+.lumen-typing.typing-done::after{ content:""; animation:none; }
+@keyframes lumenBlink{ 50%{ opacity:0; } }
 
 
 
