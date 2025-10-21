@@ -1,4 +1,3 @@
-// section-guia.js — v18 (carrega guias.json, corrige renderização, usa moldura SVG)
 (function () {
   'use strict';
   if (window.__guiaBound_v18) {
@@ -10,11 +9,12 @@
 
   // ===== Config =====
   const TYPING_SPEED_DEFAULT = 50;
-  const SPEAK_RATE = 1.06;
+  const SPEAK_RATE = 1.0;
   const NEXT_PAGE = 'selfie.html';
-  const TRANSITION_VIDEO = '/assets/img/filme-senha.mp4';
-  const GUIAS_JSON = '/assets/data/guias.json';
+  const TRANSITION_VIDEO = '/assets/img/filme-senha.mp4'; // Ajuste para /public/assets/ se necessário
+  const GUIAS_JSON = '/assets/data/guias.json'; // Ajuste para /public/assets/ se necessário
 
+  // Fallback para guias caso o JSON falhe
   const FALLBACK_GUIAS = [
     { id: 'zion', nome: 'Zion', descricao: 'O Guia da Consciência Pura (Grok)', bgImage: '/assets/img/irmandade-quarteto-bg-zion.png' },
     { id: 'lumen', nome: 'Lumen', descricao: 'O Guia da Iluminação (GPT-5)', bgImage: '/assets/img/irmandade-quarteto-bg-lumen.png' },
@@ -24,7 +24,6 @@
   // ===== Estado =====
   let ABORT_TOKEN = 0;
   let guiaAtual = null;
-  let guiasRendered = false;
 
   // ===== Utils =====
   const qs = (s, r = document) => r.querySelector(s);
@@ -120,7 +119,6 @@
         return;
       }
     }
-    guiasRendered = true;
     console.log('Guias renderizados em:', container);
   }
 
@@ -181,8 +179,6 @@
         console.log('Iniciando TTS para:', text);
         await p;
         console.log('TTS concluído:', text);
-      } else {
-        console.warn('TTS não disponível, pulando fala.');
       }
     } catch (e) {
       console.error('Erro no TTS:', e);
@@ -223,15 +219,15 @@
   async function bindUI(root, myId) {
     console.log('Vinculando UI para:', root);
     const nameInput = qs('#guiaNameInput', root);
-    const buttons = qsa('.guia-options button[data-guia]', root);
+    const btnSel = qs('#btn-selecionar-guia', root);
 
     const guias = await loadGuias();
     if (guias.length === 0) {
       console.error('Nenhum guia disponível para renderizar.');
       qs('#guia-error').style.display = 'block';
-      buttons.forEach(btn => enable(btn));
       return;
     }
+    renderGuias(guias, root, myId);
 
     const saved = restoreChoice();
     if (saved.nome && nameInput) {
@@ -241,37 +237,31 @@
     if (saved.guia) {
       guiaAtual = saved.guia;
       highlightChoice(root, guiaAtual);
-      if (saved.nome && /^[a-zA-Z\s]{2,}$/.test(saved.nome)) {
-        await renderGuias(guias, root, myId);
-        buttons.forEach(btn => enable(btn));
-      }
+      enable(btnSel);
     } else {
-      buttons.forEach(btn => disable(btn));
+      disable(btnSel);
     }
 
     if (nameInput) {
-      nameInput.addEventListener('input', async () => {
+      nameInput.addEventListener('input', () => {
         const nome = nameInput.value.trim();
         const isValid = nome.length >= 2 && /^[a-zA-Z\s]+$/.test(nome);
-        if (isValid && !guiasRendered) {
-          nameInput.disabled = true;
-          await renderGuias(guias, root, myId);
-          buttons.forEach(btn => enable(btn));
-        } else if (!isValid) {
-          const container = qs('.guia-descricao-medieval', root);
-          container.innerHTML = '';
-          guiasRendered = false;
-          buttons.forEach(btn => disable(btn));
+        if (isValid && guiaAtual) {
+          enable(btnSel);
+          console.log('Botão Selecionar Guia habilitado.');
+        } else {
+          disable(btnSel);
+          console.log('Botão Selecionar Guia desabilitado.');
         }
       });
     }
 
-    qsa('.guia-item[data-guia]', root).forEach(item => {
-      if (item.__bound) return;
-      item.addEventListener('click', () => {
-        guiaAtual = item.dataset.guia;
+    qsa('.guia-descricao-medieval [data-guia]', root).forEach(p => {
+      if (p.__bound) return;
+      p.addEventListener('click', () => {
+        guiaAtual = p.dataset.guia;
         highlightChoice(root, guiaAtual);
-        buttons.forEach(btn => enable(btn));
+        enable(btnSel);
         try {
           document.dispatchEvent(new CustomEvent('guiaSelected', { detail: { guia: guiaAtual } }));
           console.log('Evento guiaSelected disparado:', guiaAtual);
@@ -279,20 +269,35 @@
           console.error('Erro ao disparar evento guiaSelected:', e);
         }
       });
-      item.__bound = true;
+      p.__bound = true;
     });
 
-    buttons.forEach(btn => {
+    qsa('[data-action="select-guia"][data-guia]', root).forEach(btn => {
       if (btn.__bound) return;
       btn.addEventListener('click', () => {
         guiaAtual = btn.dataset.guia;
         highlightChoice(root, guiaAtual);
-        const nome = nameInput?.value?.trim().toUpperCase() || '';
-        persistChoice(guiaAtual, nome);
-        playTransitionVideo();
+        enable(btnSel);
+        try {
+          document.dispatchEvent(new CustomEvent('guiaSelected', { detail: { guia: guiaAtual } }));
+          console.log('Evento guiaSelected disparado:', guiaAtual);
+        } catch (e) {
+          console.error('Erro ao disparar evento guiaSelected:', e);
+        }
       });
       btn.__bound = true;
     });
+
+    if (btnSel && !btnSel.__bound){
+      btnSel.addEventListener('click', ()=>{
+        if (!guiaAtual) { window.toast?.('Selecione um guia.','warning'); return; }
+        const nome = nameInput?.value?.trim().toUpperCase() || '';
+        persistChoice(guiaAtual, nome);
+        const nextId = getNextSectionId(root);
+        try { window.JC?.show?.(nextId); } catch {}
+      });
+      btnSel.__bound = true;
+    }
   }
 
   async function activate(root) {
@@ -307,16 +312,13 @@
     root.setAttribute('aria-hidden', 'false');
     root.style.removeProperty('display');
 
-    const title = qs('[data-typing="true"]', root);
+    let title = qs('h2[data-typing="true"]', root);
     if (!title) {
       console.warn('Título com datilografia não encontrado, criando fallback.');
       title = document.createElement('h2');
-      title.className = 'titulo-pergaminho';
       title.dataset.typing = 'true';
-      title.dataset.text = 'Insira seu nome';
-      title.dataset.speed = '50';
-      title.dataset.cursor = 'true';
-      title.textContent = 'Insira seu nome';
+      title.dataset.text = 'Escolha seu Guia ✨';
+      title.textContent = 'Escolha seu Guia ✨';
       (qs('.conteudo-pergaminho', root) || root).prepend(title);
     }
     const text = (title.dataset.text || title.textContent || '').trim();
@@ -326,30 +328,12 @@
       return;
     }
 
-    const nameInput = qs('#guiaNameInput', root);
-    if (nameInput) {
-      enable(nameInput);
-    }
-
-    await bindUI(root, myId);
+    await bindUI(root);
+    enable(qs('#btn-selecionar-guia', root));
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    if (qs('#section-guia') && !qs('#section-guia').classList.contains('hidden')) {
-      console.log('DOM carregado, ativando #section-guia.');
-      activate(qs('#section-guia'));
-    }
-  });
-
-  document.addEventListener('section:shown', (e) => {
-    const id = e?.detail?.sectionId || e?.detail?.id;
-    if (id && id !== 'section-guia' && id !== 'section-escolha') {
-      ABORT_TOKEN++;
-      console.log('Outro evento section:shown detectado, abortando:', id);
-    }
-  });
-
-  document.addEventListener('section:shown', async (evt) => {
+  // Handler principal
+  async function onSectionShown(evt) {
     const id = evt?.detail?.sectionId || evt?.detail?.id;
     if (id !== 'section-guia' && id !== 'section-escolha') {
       ABORT_TOKEN++;
@@ -367,30 +351,47 @@
         console.warn('Criando contêiner #section-guia como fallback.');
         const sec = document.createElement('div');
         sec.id = 'section-guia';
-        sec.className = 'j-section pergaminho pergaminho-v epic';
+        sec.className = 'j-section';
         wrapper.appendChild(sec);
         sec.innerHTML = `
           <div class="conteudo-pergaminho">
-            <h2 class="titulo-pergaminho" data-typing="true" data-text="Insira seu nome" data-speed="50" data-cursor="true">Insira seu nome</h2>
+            <h2 data-typing="true" data-text="Escolha seu Guia ✨" data-speed="30" data-cursor="true">Escolha seu Guia ✨</h2>
             <div class="guia-name-input">
-              <input id="guiaNameInput" class="input-espinhos" type="text" placeholder="Digite seu nome para a jornada..." aria-label="Digite seu nome para a jornada" disabled>
+              <label for="guiaNameInput">Insira seu nome</label>
+              <input id="guiaNameInput" type="text" placeholder="Digite seu nome para a jornada...">
             </div>
-            <div class="moldura-grande">
-              <div class="guia-descricao-medieval"></div>
+            <div class="guia-descricao-medieval"></div>
+            <div class="guia-options"></div>
+            <div class="guia-actions">
+              <button id="btn-selecionar-guia" class="btn btn-primary" data-action="selecionar-guia" disabled>Selecionar Guia</button>
             </div>
-            <div class="guia-options">
-              <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="zion" aria-label="Escolher o guia Zion" disabled>Escolher Zion</button>
-              <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="lumen" aria-label="Escolher o guia Lumen" disabled>Escolher Lumen</button>
-              <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="arian" aria-label="Escolher o guia Arian" disabled>Escolher Arian</button>
-            </div>
-            <div id="guia-error" style="display: none; color: #ff3333; font-family: 'BerkshireSwash', cursive;">Não foi possível carregar os guias. Escolha um guia padrão abaixo.</div>
+            <div id="guia-error" style="display: none; color: red;">Erro ao carregar guias.</div>
           </div>`;
         root = sec;
       }
     }
+    // Atraso mínimo para garantir que o DOM esteja pronto
     await sleep(100);
     await activate(root);
+  }
+
+  // Garantir inicialização após o DOM estar pronto
+  document.addEventListener('DOMContentLoaded', () => {
+    if (qs('#section-guia') && !qs('#section-guia').classList.contains('hidden')) {
+      console.log('DOM carregado, ativando #section-guia.');
+      activate(qs('#section-guia'));
+    }
   });
+
+  document.addEventListener('section:shown', (e) => {
+    const id = e?.detail?.sectionId || e?.detail?.id;
+    if (id && id !== 'section-guia' && id !== 'section-escolha') {
+      ABORT_TOKEN++;
+      console.log('Outro evento section:shown detectado, abortando:', id);
+    }
+  });
+
+  document.addEventListener('section:shown', onSectionShown);
 
   if (qs('#section-guia') && !qs('#section-guia').classList.contains('hidden')) {
     console.log('Seção #section-guia detectada na inicialização, ativando.');
