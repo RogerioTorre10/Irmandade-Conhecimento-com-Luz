@@ -12,7 +12,7 @@
   const EST_WPM = 160;         // fallback p/ TTS
   const EST_CPS = 13;
   const TRANSITION_SRC = '/assets/img/filme-senha.mp4';
-  const NEXT_PAGE = 'jornada-conhecimento-com-luz1.html#section-guia';
+  const NEXT_PAGE = '/jornada-conhecimento-com-luz1.html#section-guia'; // Ajustado com barra inicial
 
   // ===== Estado / Namespace =====
   window.JCSenha = window.JCSenha || {};
@@ -190,15 +190,15 @@
     const overlay = document.createElement('div');
     overlay.id = 'senha-transition-overlay';
     overlay.style.cssText = `
-      position:fixed; inset:0; background:#000; z-index:999999;
-      display:flex; align-items:center; justify-content:center;`;
+      position: fixed; inset: 0; background: #000; z-index: 999999;
+      display: flex; align-items: center; justify-content: center;`;
     const video = document.createElement('video');
     video.src = TRANSITION_SRC;
     video.autoplay = true;
     video.muted = true;
     video.playsInline = true;
     video.controls = false;
-    video.style.cssText = 'width:100%; height:100%; object-fit:cover;';
+    video.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
     
     // Limpar DOM e listeners para evitar loops
     document.body.innerHTML = '';
@@ -217,18 +217,28 @@
     };
 
     video.addEventListener('ended', () => {
-      console.log('Vídeo terminou, limpando e prosseguindo.');
+      console.log('Vídeo terminou, limpando e redirecionando para:', NEXT_PAGE);
       cleanup();
+      window.location.href = NEXT_PAGE; // Forçar redirecionamento
     }, { once: true });
     video.addEventListener('error', () => {
       console.error('Erro ao reproduzir vídeo:', TRANSITION_SRC);
-      setTimeout(cleanup, 1200);
+      console.log('Redirecionando para:', NEXT_PAGE, '(fallback devido a erro no vídeo)');
+      cleanup();
+      window.location.href = NEXT_PAGE; // Forçar redirecionamento
     }, { once: true });
-    setTimeout(() => { if (!done) cleanup(); }, 8000);
+    setTimeout(() => {
+      if (!done) {
+        console.log('Timeout do vídeo atingido, forçando redirecionamento para:', NEXT_PAGE);
+        cleanup();
+        window.location.href = NEXT_PAGE; // Forçar redirecionamento
+      }
+    }, 8000);
 
     Promise.resolve().then(() => video.play?.()).catch(() => {
-      console.warn('Erro ao iniciar vídeo, usando fallback.');
-      setTimeout(cleanup, 800);
+      console.warn('Erro ao iniciar vídeo, redirecionando para:', NEXT_PAGE);
+      cleanup();
+      window.location.href = NEXT_PAGE; // Forçar redirecionamento
     });
   }
 
@@ -286,7 +296,7 @@
         console.log('Botão Avançar clicado, senha válida:', senha);
         playTransitionThen(() => {
           console.log('Navegação para:', NEXT_PAGE);
-          window.location.href = NEXT_PAGE;
+          window.location.href = NEXT_PAGE; // Forçar redirecionamento
         });
       });
       next.__senhaBound = true;
@@ -344,7 +354,7 @@
       if (input) input.removeAttribute('disabled');
       if (toggle) toggle.removeAttribute('disabled');
       if (next) next.removeAttribute('disabled');
-      if (prev) prev.removeAttribute('disabled');
+      if (prev) next.removeAttribute('disabled');
       console.log('Sequência de datilografia concluída, habilitando controles.');
     }
 
@@ -377,7 +387,7 @@
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       console.log('DOMContentLoaded disparado, esperando 10000ms...');
-      sleep(10000).then(tryKick); // Aumentado para 10s
+      sleep(10000).then(tryKick);
     }, {once: true});
   } else {
     console.log('DOM já carregado, esperando 10000ms...');
