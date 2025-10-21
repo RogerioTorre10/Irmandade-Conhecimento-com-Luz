@@ -13,6 +13,7 @@
   const EST_CPS = 13;
   const TRANSITION_SRC = '/assets/img/filme-senha.mp4';
   const NEXT_PAGE = '/jornada-conhecimento-com-luz1.html#section-guia'; // Ajustado com barra inicial
+  const FALLBACK_PAGE = '/selfie.html'; // Fallback alternativo
 
   // ===== Estado / Namespace =====
   window.JCSenha = window.JCSenha || {};
@@ -190,8 +191,8 @@
     const overlay = document.createElement('div');
     overlay.id = 'senha-transition-overlay';
     overlay.style.cssText = `
-      position: fixed; inset: 0; background: #000; z-index: 999999;
-      display: flex; align-items: center; justify-content: center;`;
+      position: fixed; inset: 0; background: white; z-index: 999999;
+      display: flex; align-items: center; justify-content: center;`; // Fundo branco para evitar blackout
     const video = document.createElement('video');
     video.src = TRANSITION_SRC;
     video.autoplay = true;
@@ -216,29 +217,39 @@
       if (typeof nextStep === 'function') nextStep();
     };
 
+    const forceRedirect = () => {
+      console.log('Forçando redirecionamento para:', NEXT_PAGE);
+      try {
+        window.location.assign(NEXT_PAGE);
+      } catch {
+        console.warn('window.location.assign falhou, tentando fallback:', FALLBACK_PAGE);
+        window.location.href = FALLBACK_PAGE;
+      }
+    };
+
     video.addEventListener('ended', () => {
       console.log('Vídeo terminou, limpando e redirecionando para:', NEXT_PAGE);
       cleanup();
-      window.location.href = NEXT_PAGE; // Forçar redirecionamento
+      forceRedirect();
     }, { once: true });
     video.addEventListener('error', () => {
       console.error('Erro ao reproduzir vídeo:', TRANSITION_SRC);
       console.log('Redirecionando para:', NEXT_PAGE, '(fallback devido a erro no vídeo)');
       cleanup();
-      window.location.href = NEXT_PAGE; // Forçar redirecionamento
+      forceRedirect();
     }, { once: true });
     setTimeout(() => {
       if (!done) {
         console.log('Timeout do vídeo atingido, forçando redirecionamento para:', NEXT_PAGE);
         cleanup();
-        window.location.href = NEXT_PAGE; // Forçar redirecionamento
+        forceRedirect();
       }
     }, 8000);
 
     Promise.resolve().then(() => video.play?.()).catch(() => {
       console.warn('Erro ao iniciar vídeo, redirecionando para:', NEXT_PAGE);
       cleanup();
-      window.location.href = NEXT_PAGE; // Forçar redirecionamento
+      forceRedirect();
     });
   }
 
@@ -296,7 +307,7 @@
         console.log('Botão Avançar clicado, senha válida:', senha);
         playTransitionThen(() => {
           console.log('Navegação para:', NEXT_PAGE);
-          window.location.href = NEXT_PAGE; // Forçar redirecionamento
+          forceRedirect();
         });
       });
       next.__senhaBound = true;
@@ -354,7 +365,7 @@
       if (input) input.removeAttribute('disabled');
       if (toggle) toggle.removeAttribute('disabled');
       if (next) next.removeAttribute('disabled');
-      if (prev) next.removeAttribute('disabled');
+      if (prev) prev.removeAttribute('disabled');
       console.log('Sequência de datilografia concluída, habilitando controles.');
     }
 
@@ -386,12 +397,12 @@
   // Inicialização com espera maior para sincronizar com vídeo
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      console.log('DOMContentLoaded disparado, esperando 10000ms...');
-      sleep(10000).then(tryKick);
+      console.log('DOMContentLoaded disparado, esperando 11000ms...');
+      sleep(11000).then(tryKick); // Aumentado para 11s
     }, {once: true});
   } else {
-    console.log('DOM já carregado, esperando 10000ms...');
-    sleep(10000).then(tryKick);
+    console.log('DOM já carregado, esperando 11000ms...');
+    sleep(11000).then(tryKick);
   }
 
   // Eventos oficiais: iniciar/abortar com base na seção
@@ -400,8 +411,8 @@
     if(!id) return;
     if (id === 'section-senha') {
       window.JCSenha.state.abortId++;
-      console.log('section:shown para section-senha, esperando 10000ms...');
-      sleep(10000).then(tryKick);
+      console.log('section:shown para section-senha, esperando 11000ms...');
+      sleep(11000).then(tryKick);
     } else {
       window.JCSenha.state.abortId++;
       console.log('section:shown ignorado para:', id);
