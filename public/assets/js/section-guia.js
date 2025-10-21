@@ -86,16 +86,22 @@
   }
 
   // ---- Carregar guias do JSON ----
- async function carregarGuias(root) {
+ async function loadGuias() {
+  const res = await fetch('/assets/data/guias.json');
+  if (!res.ok) throw new Error('Falha ao buscar guias.json');
+  return await res.json();
+}
+
+async function carregarGuias(root) {
   try {
-    const res = await fetch('/assets/data/guias.json');
-    const guias = await res.json();
+    const guias = await loadGuias();
     renderGuias(root, guias);
   } catch (err) {
     console.error('[Guia] Erro ao carregar guias.json', err);
     toast('Não foi possível carregar os guias', 'error');
   }
 }
+
 
 function renderGuias(root, guias = []) {
   const container = root.querySelector('.guia-options');
