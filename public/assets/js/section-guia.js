@@ -126,24 +126,24 @@
     btn.dataset.action = 'iniciar-filme';
     btn.dataset.guia = guia.id;
 
-    btn.addEventListener('click', () => {
-      const nome = qs('#nomeInput', root)?.value?.trim() || '';
-      if (nome.length < 2) {
-        toast('Digite seu nome antes de continuar', 'warn');
-        return;
-      }
+    root.querySelectorAll('[data-action="select-guia"]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const nome = qs('#guiaNameInput', root)?.value?.trim();
+    const guia = btn.dataset.guia;
+    if (!nome || nome.length < 2) {
+      toast('Digite seu nome para continuar', 'warn');
+      return;
+    }
 
-      // Salva nome e guia no sessionStorage
-      sessionStorage.setItem('jornada.nome', nome);
-      sessionStorage.setItem('jornada.guia', guia.id);
+    sessionStorage.setItem('jornada.nome', nome);
+    sessionStorage.setItem('jornada.guia', guia);
 
-      // Avança para a próxima etapa
-      if (window.JORNADA_NAV?.goAcolhimento) {
-        window.JORNADA_NAV.goAcolhimento();
-      } else {
-        toast('Navegação não disponível', 'error');
-      }
-    });
+    if (window.JORNADA_NAV?.goAcolhimento) {
+      window.JORNADA_NAV.goAcolhimento();
+    }
+  });
+});
+
 
     containerOpcoes.appendChild(btn);
     });
