@@ -112,8 +112,8 @@
     el.classList.add('typing-done');
     el.style.textAlign = el.dataset.prevAlign || '';
     if(el.dataset.prevDir) el.setAttribute('dir', el.dataset.prevDir); else el.removeAttribute('dir');
-    el.style.visibility = 'visible'; // Garantir visibilidade após datilografia
-    el.style.opacity = '1'; // Garantir visibilidade após datilografia
+    el.style.visibility = 'visible';
+    el.style.opacity = '1';
     console.log('Estilos restaurados para:', el.id, { visibility: el.style.visibility, opacity: el.style.opacity });
   }
 
@@ -197,7 +197,9 @@
     video.controls = false;
     video.style.cssText = 'width:100%; height:100%; object-fit:cover;';
     overlay.appendChild(video);
+    document.body.innerHTML = ''; // Limpar DOM para evitar loop
     document.body.appendChild(overlay);
+    console.log('Vídeo adicionado ao DOM.');
 
     let done = false;
     const cleanup = () => {
@@ -227,6 +229,8 @@
     next?.removeAttribute('disabled');
     input?.removeAttribute('disabled');
     toggle?.removeAttribute('disabled');
+
+    console.log('Controles vinculados:', { input: !!input, toggle: !!toggle, next: !!next, prev: !!prev });
 
     if (toggle && !toggle.__senhaBound) {
       toggle.addEventListener('click', () => {
