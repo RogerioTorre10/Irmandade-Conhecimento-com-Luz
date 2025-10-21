@@ -157,7 +157,7 @@
     // Restaurar estado
     const saved = restoreChoice();
     if (saved.nome && nameInput) nameInput.value = saved.nome;
-    if (saved.guia) { guiaAtual = saved.guia; highlightChoice(root, guiaAtual); }
+    if (saved.guia) { guiaAtual = saved.guia; highlightChoice(root, guiaAtual, window.__GUIAS_CACHE); }
 
     // Habilita/Desabilita Selecionar
     const refreshButton = () => {
@@ -171,7 +171,7 @@
       if (p.__bound) return;
       p.addEventListener('click', ()=>{
         guiaAtual = p.dataset.guia;
-        highlightChoice(root, guiaAtual);
+        highlightChoice(root, guiaAtual, window.__GUIAS_CACHE);
         refreshButton();
         document.dispatchEvent(new CustomEvent('guiaSelected', { detail:{ guia: guiaAtual }}));
       });
@@ -183,7 +183,7 @@
       if (btn.__bound) return;
       btn.addEventListener('click', ()=>{
         guiaAtual = btn.dataset.guia;
-        highlightChoice(root, guiaAtual);
+        highlightChoice(root, guiaAtual, window.__GUIAS_CACHE);
         refreshButton();
         document.dispatchEvent(new CustomEvent('guiaSelected', { detail:{ guia: guiaAtual }}));
       });
@@ -271,7 +271,7 @@ function applyGuiaTheme(root, guiaId, guias) {
 }
 
 // [SUBSTITUA] a highlightChoice existente por esta versão que também aplica o tema:
-function highlightChoice(root, guia, guias) {
+function highlightChoice(root, guiaAtual, window.__GUIAS_CACHE) {
   qsa('[data-guia]', root).forEach(el => {
     el.classList.toggle('guia-selected', el.dataset.guia === guia);
   });
