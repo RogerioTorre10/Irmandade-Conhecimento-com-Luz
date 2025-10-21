@@ -101,34 +101,54 @@
     }
   }
 
-  function renderGuias(guias, root) {
-    const descContainer = qs('.guia-descricao-medieval', root);
-    const btnContainer = qs('.guia-options', root);
-    if (!descContainer || !btnContainer) {
-      console.error('Contêineres não encontrados:', { descContainer, btnContainer });
-      return;
-    }
-    descContainer.innerHTML = '';
-    btnContainer.innerHTML = '';
-    console.log('Renderizando guias:', guias);
+ function renderGuias(root, guias = []) {
+  const containerDescricao = qs('.guia-descricao-medieval', root);
+  const containerOpcoes = qs('.guia-options', root);
+  if (!containerDescricao || !containerOpcoes) return;
 
-    guias.forEach(guia => {
-      // Adicionar descrição
-      const p = document.createElement('p');
-      p.dataset.guia = guia.id;
-      p.textContent = `${guia.nome}: ${guia.descricao}`;
-      descContainer.appendChild(p);
+  containerDescricao.innerHTML = '';
+  containerOpcoes.innerHTML = '';
 
-      // Adicionar botão
-      const btn = document.createElement('button');
-      btn.className = 'btn btn-primary btn-stone';
-      btn.dataset.action = 'select-guia';
-      btn.dataset.guia = guia.id;
-      btn.textContent = `Escolher ${guia.nome}`;
-      btnContainer.appendChild(btn);
+  guias.forEach(guia => {
+    // Descrição do guia
+    const desc = document.createElement('div');
+    desc.className = 'guia-card parchment-card-rough';
+    desc.innerHTML = `
+      <h3 class="guia-nome">${guia.nome}</h3>
+      <p class="guia-descricao">${guia.descricao}</p>
+    `;
+    containerDescricao.appendChild(desc);
+
+    // Botão do guia
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-primary btn-stone';
+    btn.textContent = `Escolher ${guia.nome}`;
+    btn.dataset.action = 'iniciar-filme';
+    btn.dataset.guia = guia.id;
+
+    btn.addEventListener('click', () => {
+      const nome = qs('#nomeInput', root)?.value?.trim() || '';
+      if (nome.length < 2) {
+        toast('Digite seu nome antes de continuar', 'warn');
+        return;
+      }
+
+      // Salva nome e guia no sessionStorage
+      sessionStorage.setItem('jornada.nome', nome);
+      sessionStorage.setItem('jornada.guia', guia.id);
+
+      // Avança para a próxima etapa
+      if (window.JORNADA_NAV?.goAcolhimento) {
+        window.JORNADA_NAV.goAcolhimento();
+      } else {
+        toast('Navegação não disponível', 'error');
+      }
     });
-    console.log('Guias renderizados em:', descContainer, btnContainer);
+
+    containerOpcoes.appendChild(btn);
+    });
   }
+
 
   // ---- Efeito datilografia + leitura ----
   function typeLocal(el, text, speed) {
