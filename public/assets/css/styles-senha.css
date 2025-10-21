@@ -7,7 +7,84 @@
   text-align: center;
   color: var(--primary);
   margin-top: 30px;
-  text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+  text-shadow: 1px 1px 4/* ========== SEÇÃO SENHA ========== */
+
+.senha-input {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 20px 0;
+  padding: 8px;
+  border: 2px solid var(--card-2);
+  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
+  background-image: url('/assets/img/textura-de-pedra.jpg');
+  background-size: cover;
+  background-position: center;
+  background-color: var(--card-2);
+  background-blend-mode: overlay;
+  border-radius: var(--radius);
+  max-width: 340px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.senha-input input {
+  padding: 8px;
+  font-size: 16px;
+  border: none;
+  background: transparent;
+  color: var(--fg);
+  font-family: 'BerkshireSwash', cursive;
+  width: 100%;
+  max-width: 300px;
+}
+
+.senha-input input::placeholder {
+  color: var(--muted);
+  opacity: 0.8;
+}
+
+.senha-input button {
+  padding: 8px;
+  font-size: 16px;
+  border: none;
+  background: transparent;
+  color: var(--fg);
+  font-family: 'ManufacturingConsent', sans-serif;
+  cursor: pointer;
+  pointer-events: auto; /* Garantir interatividade */
+}
+
+.senha-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.senha-actions button {
+  padding: 8px 16px;
+  font-size: 18px;
+  border: 2px solid var(--card-2);
+  border-radius: var(--radius);
+  background-image: url('/assets/img/textura-de-pedra.jpg');
+  background-size: cover;
+  background-position: center;
+  background-color: var(--card-2);
+  background-blend-mode: overlay;
+  color: var(--fg);
+  font-family: 'ManufacturingConsent', sans-serif;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
+}
+
+.senha-actions button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+}px rgba(0,0,0,0.5);
 }
 
 /* Campo de senha */
