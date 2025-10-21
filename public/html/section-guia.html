@@ -1,33 +1,39 @@
 <div id="jornada-content-wrapper">
-  <div id="section-guia" class="j-section">
-    <div class="conteudo-pergaminho">
-      <!-- Título com datilografia -->
-      <h2 data-typing="true" data-text="Escolha seu Guia ✨" data-speed="30" data-cursor="true">
-        Escolha seu Guia ✨
-      </h2>
+  <div id="section-guia" class="j-section section parchment-v">
+  <div class="conteudo-pergaminho parchment-inner-rough">
 
-      <!-- Nome primeiro -->
-      <div class="guia-name-input">
-        <label for="guiaNameInput">Insira seu nome</label>
-        <input id="guiaNameInput" type="text" placeholder="Digite seu nome para a jornada..." required>
-      </div>
+    <!-- Título com datilografia -->
+    <h2 class="parchment-title-rough typing-active" data-typing="true" data-text="Escolha seu Guia" data-speed="30" data-cursor="true">
+      Escolha seu Guia
+    </h2>
 
-      <!-- Caixa medieval para descrição dos guias (carregada dinamicamente) -->
-      <div class="guia-descricao-medieval"></div>
-
-      <!-- Botões de escolha (carregados dinamicamente) -->
-      <div class="guia-options"></div>
-
-      <!-- Botões de ação -->
-      <div class="guia-actions">
-        <button id="btn-selecionar-guia" class="btn btn-primary" data-action="selecionar-guia" disabled>Selecionar Guia</button>
-      </div>
-
-      <!-- Erro -->
-      <div id="guia-error" style="display: none; color: red;">Erro ao carregar guias. Por favor, tente novamente.</div>
+    <!-- Campo para digitar o nome -->
+    <div class="guia-name-input parchment-input-rough">
+      <label for="guiaNameInput" class="parchment-title-rough">Insira seu nome</label>
+      <input id="guiaNameInput" type="text" placeholder="Digite seu nome para a jornada..." required>
     </div>
+
+    <!-- Moldura medieval para descrição dos guias -->
+    <div class="guia-descricao-medieval parchment-text-rough"></div>
+
+    <!-- Botões de escolha dos guias -->
+    <div class="guia-options parchment-actions-rough"></div>
+
+    <!-- Botão de ação principal -->
+    <div class="guia-actions parchment-actions-rough">
+      <button id="btn-selecionar-guia" class="btn btn-primary btn-stone" data-action="selecionar-guia" disabled>
+        Selecionar Guia
+      </button>
+    </div>
+
+    <!-- Mensagem de erro -->
+    <div id="guia-error" style="display: none; color: red;">
+      Erro ao carregar guias. Por favor, tente novamente.
+    </div>
+
   </div>
 </div>
+
 
 <style>
 /* Escolha do guia */
