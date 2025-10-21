@@ -1,46 +1,22 @@
 <link rel="stylesheet" href="/assets/css/styles-base.css">
 <link rel="stylesheet" href="/assets/css/styles-senha.css">
-<div id="jornada-content-wrapper">
-  <section id="section-senha" class="j-section pergaminho pergaminho-v section-senha epic" aria-hidden="false">
-    <div class="conteudo-pergaminho">
-      <h2 class="titulo-pergaminho"
-          id="senha-instr1"
-          data-typing="true"
-          data-text="Digite a Palavra-Chave"
-          data-speed="50"
-          data-cursor="true">
-      </h2>
-      <p id="senha-instr2"
-         data-typing="true"
-         data-text="A Palavra-Chave é o segredo que abrirá as portas da sua jornada."
-         data-speed="50"
-         data-cursor="true">
-      </p>
-      <p id="senha-instr3"
-         data-typing="true"
-         data-text="Escolha com cuidado, pois ela reflete sua intenção."
-         data-speed="50"
-         data-cursor="true">
-      </p>
-      <p id="senha-instr4"
-         data-typing="true"
-         data-text="Pronto? Digite agora e avance."
-         data-speed="50"
-         data-cursor="true">
-      </p>
-      <div class="senha-input on-pergaminho">
-        <input id="senha-input"
-               class="input-espinhos"
-               type="password"
-               placeholder="Digite a Palavra-Chave..."
-               aria-label="Digite a Palavra-Chave para a jornada"
-               disabled />
-        <button class="btn btn-toggle-senha" data-action="toggle-password" aria-label="Alternar visibilidade da Palavra-Chave" disabled>👁️</button>
-      </div>
-      <div class="senha-actions">
-        <button id="btn-senha-prev" class="btn btn-stone-espinhos" aria-label="Voltar para a seção anterior" disabled>Voltar</button>
-        <button id="btn-senha-avancar" class="btn btn-stone-espinhos" data-next-section="section-guia" aria-label="Avançar para a próxima seção" disabled>Avançar</button>
+<section id="section-senha" data-section="senha" class="section parchment-wrap-rough hidden" aria-hidden="true">
+  <div class="parchment-rough pergaminho pergaminho-v">
+    <div class="parchment-inner-rough">
+      <div class="senha-wrap">
+        <h2 class="parchment-title-rough" id="senha-instr1" data-typing="true" data-text="I.">Insira sua Palavra-Chave Sagrada.</h2>
+        <p class="parchment-text-rough" id="senha-instr2" data-typing="true" data-text="A.">A Palavra-Chave garante que apenas você acesse seu progresso.</p>
+        <p class="parchment-text-rough" id="senha-instr3" data-typing="true" data-text="V (15 dias).">Você decide quando iniciar (dentro de 15 dias).</p>
+        <p class="parchment-text-rough" id="senha-instr4" data-typing="true" data-text="24.">24 horas para concluir após esse primeiro acesso.</p>
+        <div class="senha-input-group">
+          <input id="senha-input" type="password" class="input" placeholder="Digite a Palavra-Chave" required>
+          <button class="btn-toggle-senha">👁️</button>
+        </div>
+        <div class="parchment-actions-rough">
+         <button id="btn-senha-prev" class="btn btn-primary btn-stone" data-action="senha-prev">Voltar</button>
+         <button id="btn-senha-avancar" class="btn btn-primary btn-stone" data-action="avancar">Acessar Jornada</button>
+        </div>
       </div>
     </div>
-  </section>
-</div>
+  </div>
+</section>
