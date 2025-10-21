@@ -2,7 +2,8 @@
 
 .senha-input {
   display: flex;
-  gap: 10px;
+  gap: 5px; /* Reduzido para alinhar botão dentro do container */
+  align-items: center; /* Alinhar verticalmente */
   justify-content: center;
   margin: 20px 0;
   padding: 8px;
@@ -28,6 +29,7 @@
   font-family: 'BerkshireSwash', cursive;
   width: 100%;
   max-width: 300px;
+  caret-color: var(--fg); /* Garantir cursor visível */
 }
 
 .senha-input input::placeholder {
@@ -69,7 +71,7 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
-  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch; /* Corrigido para espinhos */
+  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
 }
 
 .senha-actions button:hover {
