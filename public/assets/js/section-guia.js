@@ -251,19 +251,31 @@ function renderGuias(root, guias = []) {
   }
 
   // ---- Bind da UI ----
-  async function bindUI(root) {
-    console.log('Vinculando UI para:', root);
-    const nameInput = qs('#guiaNameInput', root);
-    const btnSel = qs('#btn-selecionar-guia', root);
+async function bindUI(root) {
+  console.log('[Guia] Vinculando UI para:', root);
+  if (!root || !(root instanceof HTMLElement)) {
+    console.warn('[Guia] Root inválido');
+    return;
+  }
 
-    // Carregar e renderizar guias
-    const guias = await loadGuias();
-    if (guias.length === 0) {
-      console.error('Nenhum guia disponível para renderizar.');
-      qs('#guia-error') && (qs('#guia-error').style.display = 'block');
+  const nameInput = qs('#guiaNameInput', root);
+  const btnSel = qs('#btn-selecionar-guia', root); // pode remover se não estiver mais usando
+
+  try {
+    const guias = await loadGuias(); // carrega de /assets/data/guias.json
+    if (!Array.isArray(guias) || guias.length === 0) {
+      console.error('[Guia] Nenhum guia disponível para renderizar.');
+      const erro = qs('#guia-error', root);
+      if (erro) erro.style.display = 'block';
       return;
     }
-    renderGuias(guias, root);
+
+    renderGuias(guias, root); // passa os dados e o root corretamente
+  } catch (err) {
+    console.error('[Guia] Erro ao carregar guias:', err);
+    toast('Erro ao carregar os guias. Tente novamente.', 'error');
+  }
+}
 
     // Restaurar escolha prévia
     const saved = restoreChoice();
