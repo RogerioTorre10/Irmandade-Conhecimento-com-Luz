@@ -7,11 +7,11 @@
   }
 
   // ===== Config =====
-  const TYPE_MS = 50;          // ms/char (alinhado com section-guia)
-  const PAUSE_BETWEEN_P = 100; // pausa entre parágrafos
+  const TYPE_MS = 55;          // ms/char (datilografia)
+  const PAUSE_BETWEEN_P = 50;  // pausa reduzida entre parágrafos (era 90)
   const EST_WPM = 160;         // fallback p/ TTS
   const EST_CPS = 13;
-  const TRANSITION_SRC = '/assets/img/filme-senha.mp4';
+  const TRANSITION_SRC = '/assets/img/irmandade-no-jardim.mp4';
   const NEXT_SECTION_DEFAULT = 'section-guia';
 
   // ===== Estado / Namespace =====
@@ -126,18 +126,13 @@
     if(!text || myAbort.cancelled()) return;
     try{
       if(window.EffectCoordinator?.speak){
-        const r=window.EffectCoordinator.speak(text, { rate: 1.06 });
+        const r=window.EffectCoordinator.speak(text);
         if(r && typeof r.then==='function'){
-          console.log('Iniciando TTS para:', text);
           await Promise.race([r, (async()=>{while(!myAbort.cancelled()) await sleep(20);})()]);
-          console.log('TTS concluído:', text);
           return;
         }
       }
-    }catch(e){
-      console.error('Erro no TTS:', e);
-    }
-    console.warn('TTS não disponível, usando estimativa para:', text);
+    }catch{}
     const ms = estSpeakMs(text);
     const t0 = Date.now();
     while(!myAbort.cancelled() && (Date.now()-t0)<ms) await sleep(20);
@@ -151,13 +146,9 @@
   async function typeOnce(el, myAbort){
     if(!el || myAbort.cancelled()) return '';
     const text=(el.dataset?.text||'').trim(); if(!text) return '';
-    console.log('Iniciando datilografia para:', text);
     prepareTyping(el);
     await localType(el, text, TYPE_MS, myAbort);
-    if(!myAbort.cancelled()) {
-      restoreTyping(el);
-      console.log('Datilografia concluída:', text);
-    }
+    if(!myAbort.cancelled()) restoreTyping(el);
     return myAbort.cancelled()? '' : text;
   }
 
@@ -168,7 +159,6 @@
 
   function playTransitionThen(nextStep){
     if (document.getElementById('senha-transition-overlay')) return;
-    console.log('Iniciando transição de vídeo:', TRANSITION_SRC);
     const overlay = document.createElement('div');
     overlay.id = 'senha-transition-overlay';
     overlay.style.cssText = `
@@ -176,10 +166,7 @@
       display:flex; align-items:center; justify-content:center;`;
     const video = document.createElement('video');
     video.src = TRANSITION_SRC;
-    video.autoplay = true;
-    video.muted = true;
-    video.playsInline = true;
-    video.controls = false;
+    video.autoplay = true; video.muted = true; video.playsInline = true; video.controls = false;
     video.style.cssText = 'width:100%; height:100%; object-fit:cover;';
     overlay.appendChild(video);
     document.body.appendChild(overlay);
@@ -189,29 +176,20 @@
       if (done) return; done = true;
       try { video.pause(); } catch {}
       overlay.remove();
-      console.log('Transição concluída, executando próximo passo.');
       if (typeof nextStep === 'function') nextStep();
     };
 
     video.addEventListener('ended', cleanup, { once:true });
-    video.addEventListener('error', () => {
-      console.error('Erro ao reproduzir vídeo:', TRANSITION_SRC);
-      setTimeout(cleanup, 1200);
-    }, { once:true });
+    video.addEventListener('error', () => setTimeout(cleanup, 1200), { once:true });
     setTimeout(() => { if (!done) cleanup(); }, 8000);
 
-    Promise.resolve().then(()=>video.play?.()).catch(() => {
-      console.warn('Erro ao iniciar vídeo, usando fallback.');
-      setTimeout(cleanup, 800);
-    });
+    Promise.resolve().then(()=>video.play?.()).catch(()=>setTimeout(cleanup, 800));
   }
 
   function bindControls(root){
     const { input, toggle, next, prev } = pick(root);
     prev?.removeAttribute('disabled');
     next?.removeAttribute('disabled');
-    input?.removeAttribute('disabled');
-    toggle?.removeAttribute('disabled');
 
     if (toggle && !toggle.__senhaBound) {
       toggle.addEventListener('click', () => {
@@ -223,7 +201,6 @@
 
     if (prev && !prev.__senhaBound) {
       prev.addEventListener('click', () => {
-        console.log('Botão Voltar clicado.');
         const rootEl = qs(sel.root);
         const candidates = [
           prev.dataset?.backHref,
@@ -233,7 +210,7 @@
           (document.referrer && (()=>{ try{ return new URL(document.referrer).origin === window.location.origin; }catch{ return false; } })() ? document.referrer : null),
           '/'
         ].filter(Boolean);
-        const target = candidates[0] || '/';
+        const target = candidates[0];
         try { window.top.location.assign(target); } catch { window.location.href = target; }
       });
       prev.__senhaBound = true;
@@ -248,7 +225,6 @@
           try{ input.focus(); }catch{}
           return;
         }
-        console.log('Botão Avançar clicado, senha válida:', senha);
         const rootEl = qs(sel.root);
         const nextId =
           next.dataset?.nextSection ||
@@ -256,12 +232,7 @@
           NEXT_SECTION_DEFAULT;
 
         playTransitionThen(() => {
-          try { 
-            window.JC?.show?.(nextId);
-          } catch {
-            console.warn('JC não disponível, redirecionando para:', nextId);
-            window.location.href = 'jornada-conhecimento-com-luz1.html#section-guia';
-          }
+          try { window.JC?.show?.(nextId); } catch {}
         });
       });
       next.__senhaBound = true;
@@ -269,31 +240,22 @@
   }
 
   async function runSequence(root){
-    if(!root || window.JCSenha.state.running) {
-      console.warn('runSequence ignorado: root ausente ou já em execução.');
-      return;
-    }
+    if(!root || window.JCSenha.state.running) return;
 
     window.JCSenha.state.running = true;
     const myAbort = makeAbortToken();
 
     const seq = getSeq(root);
-    if (seq.length === 0) {
-      console.warn('Nenhum parágrafo encontrado para datilografia.');
-      window.JCSenha.state.running=false;
-      return;
-    }
+    if (seq.length === 0) { window.JCSenha.state.running=false; return; }
 
     seq.forEach(p=>{
       if(ensureDataText(p)) p.textContent='';
       p.classList.remove('typing-done','typing-active');
       delete p.dataset.spoken;
-      p.style.display='block';
-      p.style.width='100%';
+      p.style.display='block'; p.style.width='100%';
       p.style.setProperty('text-align','left','important');
       p.setAttribute('dir','ltr');
-      p.style.marginLeft='0';
-      p.style.marginRight='auto';
+      p.style.marginLeft='0'; p.style.marginRight='auto';
     });
 
     for (const p of seq){
@@ -309,15 +271,6 @@
       while(!myAbort.cancelled() && (Date.now()-t0)<PAUSE_BETWEEN_P) await sleep(10);
     }
 
-    if (!myAbort.cancelled()) {
-      const { input, toggle, next, prev } = pick(root);
-      if (input) input.removeAttribute('disabled');
-      if (toggle) toggle.removeAttribute('disabled');
-      if (next) next.removeAttribute('disabled');
-      if (prev) prev.removeAttribute('disabled');
-      console.log('Sequência de datilografia concluída, habilitando controles.');
-    }
-
     window.JCSenha.state.running = false;
   }
 
@@ -326,25 +279,18 @@
       if (window.JCSenha.state.observer) window.JCSenha.state.observer.disconnect();
       const obs=new MutationObserver((mutations)=>{
         if (!window.JCSenha.state.running && mutations.some(m => m.target === root)) {
-          console.log('MutationObserver detectou mudança, iniciando runSequence.');
           runSequence(root);
         }
       });
       obs.observe(root, {attributes: true, attributeFilter: ['class', 'style']});
       window.JCSenha.state.observer = obs;
-    }catch(e){
-      console.error('Erro ao configurar MutationObserver:', e);
-    }
+    }catch{}
   }
 
   function tryKick(){
     const root = qs(sel.root);
-    if(!root) {
-      console.warn('Root #section-senha não encontrado.');
-      return false;
-    }
+    if(!root) return false;
 
-    console.log('Iniciando section-senha...');
     root.classList.remove('hidden');
     root.setAttribute('aria-hidden','false');
     root.style.removeProperty('display');
@@ -352,8 +298,7 @@
     root.style.removeProperty('visibility');
 
     bindControls(root);
-    // Desativar MutationObserver temporariamente para evitar interferências
-    // armObserver(root);
+    armObserver(root);
     runSequence(root);
     return true;
   }
@@ -361,15 +306,11 @@
   // API pública
   window.JCSenha.__kick = tryKick;
 
-  // Inicialização com espera
+  // Inicialização única no DOMContentLoaded ou imediata se já carregado
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('DOMContentLoaded disparado, esperando 500ms...');
-      sleep(500).then(tryKick);
-    }, {once: true});
+    document.addEventListener('DOMContentLoaded', tryKick, {once: true});
   } else {
-    console.log('DOM já carregado, esperando 500ms...');
-    sleep(500).then(tryKick);
+    tryKick();
   }
 
   // Eventos oficiais: iniciar/abortar com base na seção
@@ -378,11 +319,9 @@
     if(!id) return;
     if (id === 'section-senha') {
       window.JCSenha.state.abortId++;
-      console.log('section:shown para section-senha, esperando 500ms...');
-      sleep(500).then(tryKick);
+      tryKick();
     } else {
       window.JCSenha.state.abortId++;
-      console.log('section:shown ignorado para:', id);
     }
   });
 })();
