@@ -1,0 +1,72 @@
+/* ========== SEÇÃO SENHA ========== */
+
+/* Título da seção */
+.senha-title {
+  font-family: 'ManufacturingConsent', serif;
+  font-size: 30px;
+  text-align: center;
+  color: var(--primary);
+  margin-top: 30px;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+}
+
+/* Campo de senha */
+.senha-input-container {
+  margin: 20px auto;
+  max-width: 400px;
+  text-align: center;
+}
+
+.senha-input-container label {
+  display: block;
+  font-family: 'Cardo', serif;
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: var(--fg);
+}
+
+.senha-input-container input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 2px solid #4b5563;
+  background-color: #1f2937;
+  color: #fff;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Botão de acesso */
+.senha-actions .btn-acessar {
+  padding: 10px 24px;
+  font-size: 18px;
+  font-family: 'ManufacturingConsent', sans-serif;
+  background: linear-gradient(to bottom, #f59e0b, #b45309);
+  color: #fff;
+  border-radius: 10px;
+  border: 2px solid #78350f;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  margin-top: 20px;
+}
+
+.senha-actions .btn-acessar:hover {
+  transform: scale(1.05);
+}
+
+/* Mensagem de erro */
+.senha-erro {
+  color: #f87171;
+  font-size: 14px;
+  margin-top: 12px;
+  text-align: center;
+  display: none;
+}
+
+/* Pergaminho visual */
+.section-senha.pergaminho-v::before {
+  background-image: url('/assets/img/pergaminho-rasgado-vert.png');
+  background-size: 100% 100%;
+  background-attachment: fixed;
+}
