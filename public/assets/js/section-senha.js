@@ -182,7 +182,10 @@
   }
 
   function playTransitionThen(nextStep){
-    if (document.getElementById('senha-transition-overlay')) return;
+    if (document.getElementById('senha-transition-overlay')) {
+      console.warn('Transição já em andamento, ignorando.');
+      return;
+    }
     console.log('Iniciando transição de vídeo:', TRANSITION_SRC);
     const overlay = document.createElement('div');
     overlay.id = 'senha-transition-overlay';
@@ -196,9 +199,12 @@
     video.playsInline = true;
     video.controls = false;
     video.style.cssText = 'width:100%; height:100%; object-fit:cover;';
-    overlay.appendChild(video);
-    document.body.innerHTML = ''; // Limpar DOM para evitar loop
+    
+    // Limpar DOM e listeners para evitar loops
+    document.body.innerHTML = '';
+    document.removeEventListener('section:shown', window.JCSenha.__sectionShownHandler);
     document.body.appendChild(overlay);
+    overlay.appendChild(video);
     console.log('Vídeo adicionado ao DOM.');
 
     let done = false;
@@ -210,14 +216,17 @@
       if (typeof nextStep === 'function') nextStep();
     };
 
-    video.addEventListener('ended', cleanup, { once:true });
+    video.addEventListener('ended', () => {
+      console.log('Vídeo terminou, limpando e prosseguindo.');
+      cleanup();
+    }, { once: true });
     video.addEventListener('error', () => {
       console.error('Erro ao reproduzir vídeo:', TRANSITION_SRC);
       setTimeout(cleanup, 1200);
-    }, { once:true });
+    }, { once: true });
     setTimeout(() => { if (!done) cleanup(); }, 8000);
 
-    Promise.resolve().then(()=>video.play?.()).catch(() => {
+    Promise.resolve().then(() => video.play?.()).catch(() => {
       console.warn('Erro ao iniciar vídeo, usando fallback.');
       setTimeout(cleanup, 800);
     });
@@ -367,25 +376,26 @@
   // Inicialização com espera maior para sincronizar com vídeo
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      console.log('DOMContentLoaded disparado, esperando 9000ms...');
-      sleep(9000).then(tryKick);
+      console.log('DOMContentLoaded disparado, esperando 10000ms...');
+      sleep(10000).then(tryKick); // Aumentado para 10s
     }, {once: true});
   } else {
-    console.log('DOM já carregado, esperando 9000ms...');
-    sleep(9000).then(tryKick);
+    console.log('DOM já carregado, esperando 10000ms...');
+    sleep(10000).then(tryKick);
   }
 
   // Eventos oficiais: iniciar/abortar com base na seção
-  document.addEventListener('section:shown', (evt)=>{
+  window.JCSenha.__sectionShownHandler = (evt) => {
     const id = evt?.detail?.sectionId;
     if(!id) return;
     if (id === 'section-senha') {
       window.JCSenha.state.abortId++;
-      console.log('section:shown para section-senha, esperando 9000ms...');
-      sleep(9000).then(tryKick);
+      console.log('section:shown para section-senha, esperando 10000ms...');
+      sleep(10000).then(tryKick);
     } else {
       window.JCSenha.state.abortId++;
       console.log('section:shown ignorado para:', id);
     }
-  });
+  };
+  document.addEventListener('section:shown', window.JCSenha.__sectionShownHandler);
 })();
