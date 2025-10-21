@@ -1,34 +1,44 @@
-<div id="jornada-content-wrapper">
-  <section id="section-guia" class="j-section pergaminho pergaminho-v section-guia" aria-hidden="false">
-    <div class="conteudo-pergaminho">
-      <div class="guia-header-moldura">
-        <h2 data-typing="true" data-text="Escolha seu Guia ✨" data-speed="30" data-cursor="true">
-          Escolha seu Guia ✨
-        </h2>
+<section id="section-guia" class="j-section pergaminho section-guia" aria-hidden="false">
+  <div class="conteudo-pergaminho">
 
-        <div class="guia-name-input">
-          <label for="guiaNameInput">Insira seu nome</label>
-          <input id="guiaNameInput" type="text" placeholder="Digite seu nome para a jornada..." autocomplete="name" />
-        </div>
-      </div>
+    <!-- TÍTULO NO PERGAMINHO (datilografado) -->
+    <h3 class="titulo-pergaminho"
+        data-typing="true"
+        data-text="Insira seu nome"
+        data-speed="32"
+        data-cursor="true">
+      Insira seu nome
+    </h3>
 
-      <!-- Texto datilografado dos guias (o JS preenche) -->
-      <div class="guia-descricao-medieval" data-typing="true"></div>
-
-      <!-- Botões gerados pelo JS (Escolher Lumen/Zion/Arian) -->
-      <div class="guia-options"></div>
-
-      <!-- Ações -->
-      <div class="guia-actions">
-        <button id="btn-selecionar-guia" class="btn btn-primary btn-stone" data-action="selecionar-guia" disabled>
-          Selecionar Guia
-        </button>
-        <button id="btn-skip-guia" class="btn btn-secondary btn-stone" data-action="skip-guia">
-          Pular e Continuar
-        </button>
-      </div>
-
-      <div id="guia-error" style="display:none; color:#ff6b6b; margin-top:8px;">Erro ao carregar guias.</div>
+    <!-- CAMPO DE NOME COM BORDA ESPINHOS -->
+    <div class="guia-name-input on-pergaminho">
+      <input id="guiaNameInput"
+             class="input-espinhos"
+             type="text"
+             placeholder="Digite seu nome para a jornada..."
+             autocomplete="name" />
     </div>
-  </section>
-</div>
+
+    <!-- MOLDURA GRANDE (datilografia dos guias acontece aqui dentro) -->
+    <div class="moldura-grande">
+      <div class="guia-descricao-medieval"
+           id="guiaTexto"
+           data-typing="true"
+           data-speed="28"
+           data-cursor="true"></div>
+    </div>
+
+    <!-- BOTÕES (textura de pedra + borda espinhos) -->
+    <div class="guia-options">
+      <!-- Preenchidos pelo JS para garantir rótulos/ids corretos -->
+    </div>
+
+    <div class="guia-actions">
+      <button id="btn-selecionar-guia" class="btn btn-stone-espinhos" data-action="selecionar-guia" disabled>
+        Selecionar Guia
+      </button>
+      </div>
+
+    <div id="guia-error" style="display:none; color:#ff6b6b; margin-top:8px;">Erro ao carregar guias.</div>
+  </div>
+</section>
