@@ -12,14 +12,16 @@
   const EST_WPM = 160;         // fallback p/ TTS
   const EST_CPS = 13;
   const TRANSITION_SRC = '/assets/img/filme-senha.mp4';
-  const NEXT_PAGE = '/jornada-conhecimento-com-luz1.html#section-guia'; // Ajustado com barra inicial
-  const FALLBACK_PAGE = '/selfie.html'; // Fallback alternativo
+  const NEXT_PAGE = '/jornada-conhecimento-com-luz1.html#section-guia';
+  const FALLBACK_PAGE = '/selfie.html';
+  const ULTIMATE_FALLBACK = '/';
 
   // ===== Estado / Namespace =====
   window.JCSenha = window.JCSenha || {};
   window.JCSenha.__bound_v13_2 = true;
   window.JCSenha.state = {
     running: false,
+    transitioning: false,
     observer: null,
     abortId: 0
   };
@@ -182,17 +184,33 @@
     return [p1,p2,p3,p4].filter(Boolean);
   }
 
+  function forceRedirect(){
+    console.log('Forçando redirecionamento para:', NEXT_PAGE);
+    try {
+      window.location.assign(NEXT_PAGE);
+    } catch (e) {
+      console.warn('window.location.assign falhou para:', NEXT_PAGE, 'tentando fallback:', FALLBACK_PAGE);
+      try {
+        window.location.href = FALLBACK_PAGE;
+      } catch (e) {
+        console.error('Fallback falhou, tentando última opção:', ULTIMATE_FALLBACK);
+        window.location.href = ULTIMATE_FALLBACK;
+      }
+    }
+  }
+
   function playTransitionThen(nextStep){
-    if (document.getElementById('senha-transition-overlay')) {
-      console.warn('Transição já em andamento, ignorando.');
+    if (document.getElementById('senha-transition-overlay') || window.JCSenha.state.transitioning) {
+      console.warn('Transição já em andamento ou flag transitioning ativa, ignorando.');
       return;
     }
+    window.JCSenha.state.transitioning = true;
     console.log('Iniciando transição de vídeo:', TRANSITION_SRC);
     const overlay = document.createElement('div');
     overlay.id = 'senha-transition-overlay';
     overlay.style.cssText = `
       position: fixed; inset: 0; background: white; z-index: 999999;
-      display: flex; align-items: center; justify-content: center;`; // Fundo branco para evitar blackout
+      display: flex; align-items: center; justify-content: center;`;
     const video = document.createElement('video');
     video.src = TRANSITION_SRC;
     video.autoplay = true;
@@ -215,16 +233,7 @@
       overlay.remove();
       console.log('Transição concluída, executando próximo passo.');
       if (typeof nextStep === 'function') nextStep();
-    };
-
-    const forceRedirect = () => {
-      console.log('Forçando redirecionamento para:', NEXT_PAGE);
-      try {
-        window.location.assign(NEXT_PAGE);
-      } catch {
-        console.warn('window.location.assign falhou, tentando fallback:', FALLBACK_PAGE);
-        window.location.href = FALLBACK_PAGE;
-      }
+      window.JCSenha.state.transitioning = false;
     };
 
     video.addEventListener('ended', () => {
@@ -373,6 +382,10 @@
   }
 
   function tryKick(){
+    if (window.JCSenha.state.transitioning) {
+      console.warn('Transição em andamento, ignorando tryKick.');
+      return false;
+    }
     const root = qs(sel.root);
     if(!root) {
       console.warn('Root #section-senha não encontrado.');
@@ -398,7 +411,7 @@
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       console.log('DOMContentLoaded disparado, esperando 11000ms...');
-      sleep(11000).then(tryKick); // Aumentado para 11s
+      sleep(11000).then(tryKick);
     }, {once: true});
   } else {
     console.log('DOM já carregado, esperando 11000ms...');
@@ -409,7 +422,7 @@
   window.JCSenha.__sectionShownHandler = (evt) => {
     const id = evt?.detail?.sectionId;
     if(!id) return;
-    if (id === 'section-senha') {
+    if (id === 'section-senha' && !window.JCSenha.state.transitioning) {
       window.JCSenha.state.abortId++;
       console.log('section:shown para section-senha, esperando 11000ms...');
       sleep(11000).then(tryKick);
