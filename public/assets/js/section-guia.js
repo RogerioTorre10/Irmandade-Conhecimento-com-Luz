@@ -82,27 +82,19 @@
   }
 
   function renderGuias(guias, root){
-    const desc = qs('.guia-descricao-medieval', root);
-    const opts = qs('.guia-options', root);
-    if (!desc || !opts) return;
+  const opts = qs('.guia-options', root);
+  if (!opts) return;
+  opts.innerHTML = '';
+  guias.forEach(g => {
+    const b = document.createElement('button');
+    b.className = 'btn btn-stone-espinhos';
+    b.dataset.action = 'select-guia';
+    b.dataset.guia = g.id;
+    b.textContent = g.nome;     // rótulo curto nos botões
+    opts.appendChild(b);
+  });
+}
 
-    desc.innerHTML = '';
-    opts.innerHTML = '';
-
-    guias.forEach(g => {
-      const p = document.createElement('p');
-      p.dataset.guia = g.id;
-      p.textContent   = `${g.nome}: ${g.descricao}`;
-      desc.appendChild(p);
-
-      const b = document.createElement('button');
-      b.className = 'btn btn-primary btn-stone';
-      b.dataset.action = 'select-guia';
-      b.dataset.guia = g.id;
-      b.textContent = `Escolher ${g.nome}`;
-      opts.appendChild(b);
-    });
-  }
 
   // Datilografia local (fallback)
   function typeLocal(el, text, speed){
