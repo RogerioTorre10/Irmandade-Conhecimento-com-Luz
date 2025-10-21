@@ -1,6 +1,13 @@
 /* ========== SEÇÃO GUIA ========== */
 
-/* Moldura medieval para descrição */
+@font-face {
+  font-family: 'ManufacturingConsent';
+  src: url('/assets/fonts/ManufacturingConsent.woff2') format('woff2'),
+       url('/assets/fonts/ManufacturingConsent.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .guia-descricao-medieval {
   background-color: #000;
   color: #fff;
@@ -12,17 +19,27 @@
   font-size: 18px;
   border-radius: 12px;
   box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  animation: glow 3s ease-in-out infinite;
 }
 
-/* Botões de escolha dos guias */
-.guia-options {
+.guia-item {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 10px;
-  justify-content: center;
-  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 10px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 8px;
 }
 
-.guia-options button {
+.guia-item p {
+  margin: 0;
+  font-size: 16px;
+  color: #fff;
+}
+
+.guia-item button {
   padding: 8px 16px;
   font-size: 18px;
   border: 2px solid #4b5563;
@@ -39,20 +56,26 @@
   border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
 }
 
-.guia-options button:hover {
+.guia-item button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0,0,0,0.4);
 }
 
-/* Botão principal */
-.btn.btn-primary.btn-stone {
+.guia-selected {
+  background: rgba(255, 215, 0, 0.2);
+  border: 2px solid gold;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.btn.btn-primary.btn-stone-espinhos {
   padding: 8px 16px;
   background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
   background-blend-mode: overlay;
   color: #fff !important;
   border-radius: 8px;
   font-size: 16px;
-  font-family: 'ManufacturingConsent', sans-serif;
+  font-family: 'ManufacturingConsent', 'Times New Roman', serif;
   border: 3px solid #4a4a4a;
   box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);
   text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
@@ -65,7 +88,7 @@
   text-align: center;
 }
 
-.btn.btn-primary.btn-stone:hover {
+.btn.btn-primary.btn-stone-espinhos:hover {
   transform: scale(1.05);
   box-shadow: 0 8px 16px rgba(0,0,0,0.7);
 }
@@ -75,7 +98,6 @@
   cursor: not-allowed;
 }
 
-/* Efeito de datilografia */
 .typing-active {
   text-align: left !important;
   direction: ltr !important;
@@ -102,4 +124,9 @@
   0% { opacity: 0.75; }
   50% { opacity: 0; }
   100% { opacity: 0.75; }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+  50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.3); }
 }
