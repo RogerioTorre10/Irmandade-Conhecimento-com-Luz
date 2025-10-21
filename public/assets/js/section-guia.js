@@ -9,7 +9,7 @@
   console.log('section-guia.js v18 inicializado.');
 
   // ===== Config =====
-  const TYPING_SPEED_DEFAULT = 30;
+  const TYPING_SPEED_DEFAULT = 50;
   const SPEAK_RATE = 1.06;
   const NEXT_PAGE = 'selfie.html';
   const TRANSITION_VIDEO = '/assets/img/filme-senha.mp4';
@@ -110,7 +110,7 @@
       p.className = 'guia-item';
       p.dataset.guia = guia.id;
       p.dataset.typing = 'true';
-      p.dataset.speed = '28';
+      p.dataset.speed = '50';
       p.dataset.cursor = 'true';
       p.textContent = `${guia.nome}: ${guia.descricao}`;
       container.appendChild(p);
@@ -254,7 +254,7 @@
         const nome = nameInput.value.trim();
         const isValid = nome.length >= 2 && /^[a-zA-Z\s]+$/.test(nome);
         if (isValid && !guiasRendered) {
-          nameInput.disabled = true; // Bloqueia input após nome válido
+          nameInput.disabled = true;
           await renderGuias(guias, root, myId);
           buttons.forEach(btn => enable(btn));
         } else if (!isValid) {
@@ -314,6 +314,8 @@
       title.className = 'titulo-pergaminho';
       title.dataset.typing = 'true';
       title.dataset.text = 'Insira seu nome';
+      title.dataset.speed = '50';
+      title.dataset.cursor = 'true';
       title.textContent = 'Insira seu nome';
       (qs('.conteudo-pergaminho', root) || root).prepend(title);
     }
@@ -369,7 +371,7 @@
         wrapper.appendChild(sec);
         sec.innerHTML = `
           <div class="conteudo-pergaminho">
-            <h2 class="titulo-pergaminho" data-typing="true" data-text="Insira seu nome" data-speed="30" data-cursor="true">Insira seu nome</h2>
+            <h2 class="titulo-pergaminho" data-typing="true" data-text="Insira seu nome" data-speed="50" data-cursor="true">Insira seu nome</h2>
             <div class="guia-name-input">
               <input id="guiaNameInput" class="input-espinhos" type="text" placeholder="Digite seu nome para a jornada..." aria-label="Digite seu nome para a jornada" disabled>
             </div>
