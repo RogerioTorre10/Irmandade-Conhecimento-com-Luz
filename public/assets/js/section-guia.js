@@ -151,6 +151,7 @@
     const btnSkip   = qs('#btn-skip-guia', root);
 
     const guias = await loadGuias();
+    window.__GUIAS_CACHE = guias;  // cache global simples
     renderGuias(guias, root);
 
     // Restaurar estado
