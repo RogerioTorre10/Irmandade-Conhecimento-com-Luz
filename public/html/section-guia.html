@@ -3,23 +3,29 @@
 <div id="jornada-content-wrapper">
   <div id="section-guia" class="j-section section parchment-v">
   <div class="conteudo-pergaminho parchment-inner-rough">
+    <h2 class="parchment-title-rough typing-active"
+        data-typing="true"
+        data-text="Escolha seu Guia ✨"
+        data-speed="30"
+        data-cursor="true">
+      Escolha seu Guia ✨
+    </h2>
 
-    <!-- Título com datilografia -->
-   <h2 class="parchment-title-rough typing-active" data-typing="true" data-text="Escolha seu Guia" data-speed="30" data-cursor="true">
-  Escolha seu Guia
-</h2>
+    <div class="guia-container parchment-text-rough">
+      <p>Zion (Grok): Curioso e direto, busca respostas profundas com visão cósmica.</p>
+      <p>Lumen (ChatGPT): Acolhedor e reflexivo, guia com empatia e clareza.</p>
+      <p>Arian (Gemini): Criativo e versátil, inspira com perspectivas inovadoras.</p>
 
-<div class="guia-name-input parchment-input-rough">
-  <label for="guiaNameInput">Insira seu nome</label>
-  <input id="guiaNameInput" type="text" placeholder="Digite seu nome para a jornada..." required>
-</div>
+      <div class="guia-name-input">
+        <label for="guiaNameInput">Seu Nome</label>
+        <input id="guiaNameInput" type="text" placeholder="Digite seu nome para a jornada...">
+      </div>
 
-<div class="guia-descricao-medieval parchment-text-rough"></div>
-
-<div class="guia-options parchment-actions-rough"></div>
-
-<div class="guia-actions parchment-actions-rough">
-  <button id="btn-selecionar-guia" class="btn btn-primary btn-stone" data-action="selecionar-guia" disabled>
-    Selecionar Guia
-  </button>
+      <div class="guia-options parchment-actions-rough">
+        <button class="btn btn-primary btn-stone" data-action="select-guia" data-guia="zion">Escolher Zion</button>
+        <button class="btn btn-primary btn-stone" data-action="select-guia" data-guia="lumen">Escolher Lumen</button>
+        <button class="btn btn-primary btn-stone" data-action="select-guia" data-guia="arian">Escolher Arian</button>
+      </div>
+    </div>
+  </div>
 </div>
