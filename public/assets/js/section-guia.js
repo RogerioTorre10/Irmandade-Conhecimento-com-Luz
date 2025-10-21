@@ -99,23 +99,26 @@
     }
   }
 
-  function renderGuias(guias, root) {
+  async function renderGuias(guias, root, myId) {
     const container = qs('.guia-descricao-medieval', root);
     container.innerHTML = '';
     console.log('Renderizando guias:', guias);
 
-    guias.forEach(guia => {
-      const div = document.createElement('div');
-      div.className = 'guia-item';
-      div.dataset.guia = guia.id;
-      div.innerHTML = `
-        <p>${guia.nome}: ${guia.descricao}</p>
-        <K        <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="${guia.id}">
-          Escolher ${guia.nome}
-        </button>
-      `;
-      container.appendChild(div);
-    });
+    for (const guia of guias) {
+      const p = document.createElement('p');
+      p.className = 'guia-item';
+      p.dataset.guia = guia.id;
+      p.dataset.typing = 'true';
+      p.dataset.speed = '28';
+      p.dataset.cursor = 'true';
+      p.textContent = `${guia.nome}: ${guia.descricao}`;
+      container.appendChild(p);
+      await runTypingAndSpeak(p, p.textContent, myId);
+      if (aborted(myId)) {
+        console.log('Renderização de guias abortada.');
+        return;
+      }
+    }
     console.log('Guias renderizados em:', container);
   }
 
@@ -215,7 +218,7 @@
     });
   }
 
-  async function bindUI(root) {
+  async function bindUI(root, myId) {
     console.log('Vinculando UI para:', root);
     const nameInput = qs('#guiaNameInput', root);
     const btnSel = qs('#btn-selecionar-guia', root);
@@ -226,7 +229,7 @@
       qs('#guia-error').style.display = 'block';
       return;
     }
-    renderGuias(guias, root);
+    await renderGuias(guias, root, myId);
 
     const saved = restoreChoice();
     if (saved.nome && nameInput) {
@@ -309,13 +312,13 @@
     root.setAttribute('aria-hidden', 'false');
     root.style.removeProperty('display');
 
-    let title = qs('[data-typing="true"]', root);
+    const title = qs('[data-typing="true"]', root);
     if (!title) {
       console.warn('Título com datilografia não encontrado, criando fallback.');
       title = document.createElement('h2');
       title.dataset.typing = 'true';
-      title.dataset.text = 'Escolha seu Guia ✨';
-      title.textContent = 'Escolha seu Guia ✨';
+      title.dataset.text = 'Insira seu nome';
+      title.textContent = 'Insira seu nome';
       (qs('.conteudo-pergaminho', root) || root).prepend(title);
     }
     const text = (title.dataset.text || title.textContent || '').trim();
@@ -327,7 +330,7 @@
 
     const descContainer = qs('.guia-descricao-medieval', root);
     descContainer.innerHTML = '';
-    await bindUI(root);
+    await bindUI(root, myId);
     enable(qs('#btn-selecionar-guia', root));
   }
 
@@ -368,16 +371,23 @@
         wrapper.appendChild(sec);
         sec.innerHTML = `
           <div class="conteudo-pergaminho">
-            <h2 data-typing="true" data-text="Escolha seu Guia ✨" data-speed="30" data-cursor="true">Escolha seu Guia ✨</h2>
+            <h2 data-typing="true" data-text="Insira seu nome" data-speed="30" data-cursor="true">Insira seu nome</h2>
             <div class="guia-name-input">
               <label for="guiaNameInput">Insira seu nome</label>
-              <input id="guiaNameInput" type="text" placeholder="Digite seu nome para a jornada...">
+              <input id="guiaNameInput" class="input-espinhos" type="text" placeholder="Digite seu nome para a jornada..." aria-label="Digite seu nome para a jornada">
             </div>
-            <div class="guia-descricao-medieval"></div>
+            <div class="moldura-grande">
+              <div class="guia-descricao-medieval"></div>
+            </div>
+            <div class="guia-options">
+              <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="zion" aria-label="Escolher o guia Zion">Escolher Zion</button>
+              <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="lumen" aria-label="Escolher o guia Lumen">Escolher Lumen</button>
+              <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="arian" aria-label="Escolher o guia Arian">Escolher Arian</button>
+            </div>
             <div class="guia-actions">
-              <button id="btn-selecionar-guia" class="btn btn-primary btn-stone-espinhos" data-action="selecionar-guia" disabled>Selecionar Guia</button>
+              <button id="btn-selecionar-guia" class="btn btn-primary btn-stone-espinhos" data-action="selecionar-guia" disabled aria-label="Confirmar seleção do guia">Selecionar Guia</button>
             </div>
-            <div id="guia-error" style="display: none; color: red;">Não foi possível carregar os guias. Escolha um guia padrão abaixo.</div>
+            <div id="guia-error" style="display: none; color: #ff3333; font-family: 'Cardo', serif;">Não foi possível carregar os guias. Escolha um guia padrão abaixo.</div>
           </div>`;
         root = sec;
       }
