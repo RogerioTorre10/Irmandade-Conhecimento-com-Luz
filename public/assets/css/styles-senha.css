@@ -5,11 +5,7 @@
   gap: 10px;
   justify-content: center;
   margin: 20px 0;
-}
-
-.senha-input input {
   padding: 8px;
-  font-size: 16px;
   border: 2px solid var(--card-2);
   border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
   background-image: url('/assets/img/textura-de-pedra.jpg');
@@ -17,9 +13,19 @@
   background-position: center;
   background-color: var(--card-2);
   background-blend-mode: overlay;
+  border-radius: var(--radius);
+  max-width: 340px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.senha-input input {
+  padding: 8px;
+  font-size: 16px;
+  border: none;
+  background: transparent;
   color: var(--fg);
   font-family: 'BerkshireSwash', cursive;
-  border-radius: var(--radius);
   width: 100%;
   max-width: 300px;
 }
@@ -32,16 +38,10 @@
 .senha-input button {
   padding: 8px;
   font-size: 16px;
-  border: 2px solid var(--card-2);
-  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
-  background-image: url('/assets/img/textura-de-pedra.jpg');
-  background-size: cover;
-  background-position: center;
-  background-color: var(--card-2);
-  background-blend-mode: overlay;
+  border: none;
+  background: transparent;
   color: var(--fg);
   font-family: 'ManufacturingConsent', sans-serif;
-  border-radius: var(--radius);
   cursor: pointer;
 }
 
