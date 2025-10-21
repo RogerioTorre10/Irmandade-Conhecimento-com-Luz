@@ -1,23 +1,49 @@
-<section id="section-guia" class="j-section pergaminho section-guia">
-  <div class="conteudo-pergaminho">
+<div id="jornada-content-wrapper">
+  <section id="section-guia" class="j-section pergaminho section-guia" aria-hidden="false">
+    <div class="conteudo-pergaminho">
 
-    <h3 class="titulo-pergaminho" data-typing="true" data-text="Insira seu nome" data-speed="32" data-cursor="true"></h3>
+      <!-- 1) Texto datilografado direto no pergaminho -->
+      <h3 class="titulo-pergaminho"
+          data-typing="true"
+          data-text="Insira seu nome"
+          data-speed="32"
+          data-cursor="true">
+      </h3>
 
-    <div class="guia-name-input on-pergaminho">
-      <input id="guiaNameInput" class="input-espinhos"
-             type="text"
-             placeholder="Digite seu nome para a jornada..."
-             autocomplete="name" />
+      <!-- 2) Campo de nome com borda de espinhos -->
+      <div class="guia-name-input on-pergaminho">
+        <input id="guiaNameInput"
+               class="input-espinhos"
+               type="text"
+               placeholder="Digite seu nome para a jornada..."
+               autocomplete="name" />
+      </div>
+
+      <!-- 3) Moldura grande com datilografia dos guias dentro -->
+      <div class="moldura-grande">
+        <div id="guiaTexto"
+             class="guia-descricao-medieval"
+             data-typing="true"
+             data-speed="28"
+             data-cursor="true"></div>
+      </div>
+
+      <!-- 4) Botões de escolha (pedra + borda espinhos) -->
+      <div class="guia-options"></div>
+
+      <!-- 5) Ação única: escolha é obrigatória -->
+      <div class="guia-actions">
+        <button id="btn-selecionar-guia"
+                class="btn btn-stone-espinhos"
+                data-action="selecionar-guia"
+                disabled>
+          Selecionar Guia
+        </button>
+      </div>
+
+      <div id="guia-error" style="display:none; color:#ff6b6b; margin-top:8px;">
+        Erro ao carregar guias.
+      </div>
     </div>
-
-    <div class="moldura-grande">
-      <div class="guia-descricao-medieval" id="guiaTexto" data-typing="true" data-speed="28" data-cursor="true"></div>
-    </div>
-
-    <div class="guia-options"></div>
-
-    <div class="guia-actions">
-      <button id="btn-selecionar-guia" class="btn btn-stone-espinhos" data-action="selecionar-guia" disabled>Selecionar Guia</button>
-    </div>
-  </div>
-</section>
+  </section>
+</div>
