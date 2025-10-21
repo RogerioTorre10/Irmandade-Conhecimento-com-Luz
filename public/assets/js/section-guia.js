@@ -94,7 +94,18 @@
     opts.appendChild(b);
   });
 }
+  
+  // Prepara o texto (nomes + descrições) para datilografia dentro da moldura
+  const textoGuias = (guias || [])
+  .map(g => `${g.nome} — ${g.descricao}`)
+  .join('\n');
 
+   const caixa = qs('#guiaTexto', root);
+   if (caixa) {
+   // Se o TypingBridge aceitar \n, usamos direto; senão, caímos no fallback local
+   caixa.dataset.text = textoGuias;
+   await runTypingAndSpeak(caixa, textoGuias, ABORT_TOKEN);
+ }
 
   // Datilografia local (fallback)
   function typeLocal(el, text, speed){
