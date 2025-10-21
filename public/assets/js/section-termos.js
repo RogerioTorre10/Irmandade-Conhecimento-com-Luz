@@ -92,7 +92,10 @@
       if (typeof nextStep === 'function') nextStep();
     };
 
-    video.addEventListener('ended', cleanup, { once: true });
+    video.addEventListener('ended', () => {
+      console.log('[JCTermos] Vídeo terminou, limpando e prosseguindo.');
+      cleanup();
+    }, { once: true });
     video.addEventListener('error', () => {
       console.error('[JCTermos] Erro ao reproduzir vídeo: /assets/img/filme-senha.mp4');
       setTimeout(cleanup, 1200);
