@@ -106,6 +106,7 @@
     }
 
     // Preencher nomes e dados do guia
+    const nameInput = qs('#nameInput', root);
     const nameSlot = qs('#userNameSlot', root);
     const guideNameSlot = qs('#guideNameSlot', root);
     const guiaBg = qs('#guideBg', root);
@@ -114,6 +115,15 @@
       guia: sessionStorage.getItem('jornada.guia') || 'zion'
     };
 
+    if (nameInput) {
+      nameInput.value = saved.nome.toUpperCase();
+      nameInput.addEventListener('input', () => {
+        const newName = nameInput.value.trim().toUpperCase();
+        sessionStorage.setItem('jornada.nome', newName);
+        if (nameSlot) nameSlot.textContent = newName || 'USUÁRIO';
+        console.log('[Selfie] Nome atualizado:', newName);
+      });
+    }
     if (nameSlot) {
       nameSlot.textContent = saved.nome.toUpperCase();
       console.log('[Selfie] Nome do usuário definido:', saved.nome);
@@ -150,6 +160,11 @@
               img.src = event.target.result;
               img.style.display = 'block';
               console.log('[Selfie] Imagem selecionada:', file.name);
+              // Mostrar flame-layer ao carregar imagem
+              const flameLayer = qs('.flame-layer', root);
+              if (flameLayer) {
+                flameLayer.style.opacity = '1';
+              }
             }
           };
           reader.readAsDataURL(file);
@@ -171,6 +186,10 @@
         if (img && img.src) {
           console.log('[Selfie] Pré-visualização atualizada!');
           window.toast?.('Pré-visualização atualizada!');
+          const flameLayer = qs('.flame-layer', root);
+          if (flameLayer) {
+            flameLayer.style.opacity = '1';
+          }
         } else {
           console.log('[Selfie] Nenhuma imagem selecionada.');
           window.toast?.('Selecione uma imagem primeiro.');
@@ -210,9 +229,9 @@
         ctx.font = 'bold 2.5rem Cardo, serif';
         ctx.fillStyle = '#f7d37a';
         ctx.textAlign = 'center';
-        ctx.fillText(guideNameSlot.textContent || 'GUIA', canvas.width / 2, canvas.height * 0.02 + 30);
+        ctx.fillText(guideNameSlot.textContent || 'GUIA', canvas.width / 2, canvas.height * 0.035);
         ctx.font = 'bold 2rem Cardo, serif';
-        ctx.fillText(nameSlot.textContent || 'USUÁRIO', canvas.width / 2, canvas.height * 0.98 - 10);
+        ctx.fillText(nameSlot.textContent || 'USUÁRIO', canvas.width / 2, canvas.height * 0.945);
 
         const link = document.createElement('a');
         link.download = 'selfie-irmandade.png';
@@ -239,8 +258,8 @@
             video.src = '';
             video.load();
           });
-          window.JC.goNext();
-          console.log('[Selfie] Navegação para próxima seção');
+          window.JC.show('section-perguntas'); // Navegar para a próxima seção na ordem
+          console.log('[Selfie] Navegação para section-perguntas');
         } else {
           console.error('[Selfie] window.JC não definido');
           window.toast?.('Erro ao navegar para próxima seção.');
@@ -251,7 +270,7 @@
     console.log('[Selfie] Bloco de captura e navegação carregado');
   }
 
-  document.addEventListener('sectionLoaded', (e) => {
+  document.addEventListener('section:shown', (e) => {
     const id = e.detail.sectionId;
     if (id !== 'section-selfie') return;
 
