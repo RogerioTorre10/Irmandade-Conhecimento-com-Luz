@@ -168,6 +168,15 @@
     video.style.zIndex = '9999';
     video.style.backgroundColor = '#000';
 
+    // Esconder a seção senha antes de exibir o vídeo
+    const senhaSection = document.getElementById('section-senha');
+    if (senhaSection) {
+      senhaSection.classList.add('hidden');
+      senhaSection.style.display = 'none';
+      senhaSection.setAttribute('aria-hidden', 'true');
+      console.log('[JCSenha] Seção senha escondida');
+    }
+
     document.body.appendChild(video);
     console.log('[JCSenha] Vídeo adicionado ao DOM.');
 
