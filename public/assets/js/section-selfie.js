@@ -6,6 +6,7 @@
 
   // Utils
   const qs = (s, r = document) => r.querySelector(s);
+  const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
   async function typeLocal(el, text, speed) {
@@ -88,19 +89,26 @@
 
   async function initSelfie(root) {
     // Esconder outras seções
-    const sections = document.querySelectorAll('.j-section');
+    const sections = qsa('.j-section');
     sections.forEach(section => {
-      section.classList.add('hidden');
-      section.style.display = 'none';
-      section.setAttribute('aria-hidden', 'true');
-      console.log(`[Selfie] Seção ${section.id} escondida`);
+      if (section.id !== 'section-selfie') {
+        section.classList.add('hidden');
+        section.style.display = 'none';
+        section.setAttribute('aria-hidden', 'true');
+        console.log(`[Selfie] Seção ${section.id} escondida`);
+      }
     });
+
+    // Definir currentSection para evitar fallback
+    if (window.JC) {
+      window.JC.currentSection = 'section-selfie';
+      console.log('[Selfie] Definido window.JC.currentSection como section-selfie');
+    }
 
     // Preencher nomes e dados do guia
     const nameSlot = qs('#userNameSlot', root);
     const guideNameSlot = qs('#guideNameSlot', root);
-    const guiaBg = qs('#guia-bg-png', root);
-    const guiaDescricao = qs('#guia-descricao', root);
+    const guiaBg = qs('#guideBg', root);
     const saved = {
       nome: sessionStorage.getItem('jornada.nome') || 'USUÁRIO',
       guia: sessionStorage.getItem('jornada.guia') || 'zion'
@@ -116,40 +124,68 @@
     }
 
     const guias = await loadGuias();
-    const selectedGuia = guias.find(g => g.id === saved.guia) || guias[0];
+    const selectedGuia = guias.find(g => g.id === saved.guia.toLowerCase()) || guias[0];
     if (guiaBg && selectedGuia.bgImage) {
       guiaBg.src = selectedGuia.bgImage;
       console.log('[Selfie] Fundo do guia definido:', selectedGuia.bgImage);
     }
-    if (guiaDescricao && selectedGuia.descricao) {
-      guiaDescricao.textContent = selectedGuia.descricao;
-      console.log('[Selfie] Descrição do guia definida:', selectedGuia.descricao);
+
+    // Datilografia no título e parágrafo
+    const elements = qsa('[data-typing="true"]', root);
+    for (const el of elements) {
+      const text = (el.dataset.text || el.textContent || '').trim();
+      await runTypingAndSpeak(el, text);
     }
 
-    // Datilografia no título
-    const title = qs('[data-typing="true"]', root);
-    if (title) {
-      const text = (title.dataset.text || title.textContent || '').trim();
-      await runTypingAndSpeak(title, text);
+    // Atualizar selfieImage com o arquivo selecionado
+    const selfieInput = qs('#selfieInput', root);
+    if (selfieInput) {
+      selfieInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const img = qs('#selfieImage', root);
+            if (img) {
+              img.src = event.target.result;
+              img.style.display = 'block';
+              console.log('[Selfie] Imagem selecionada:', file.name);
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      });
     }
 
     document.addEventListener('click', (e) => {
-      const btn = e.target.closest('#captureBtn, #btnSkipSelfie, #section-selfie [data-action="avancar"]');
+      const btn = e.target.closest('#previewBtn, #captureBtn, #btnSkipSelfie, #btnStartJourney');
       if (!btn) return;
 
       e.preventDefault();
       const now = performance.now();
 
-      if (btn.id === 'captureBtn') {
+      if (btn.id === 'previewBtn') {
+        if (now - lastPreview < 1000) return;
+        lastPreview = now;
+        const img = qs('#selfieImage', root);
+        if (img && img.src) {
+          console.log('[Selfie] Pré-visualização atualizada!');
+          window.toast?.('Pré-visualização atualizada!');
+        } else {
+          console.log('[Selfie] Nenhuma imagem selecionada.');
+          window.toast?.('Selecione uma imagem primeiro.');
+        }
+
+      } else if (btn.id === 'captureBtn') {
         if (now - lastCapture < 1000) return;
         lastCapture = now;
 
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        const img = document.getElementById('selfieImage');
-        const bg = document.getElementById('guia-bg-png');
-        const nameSlot = document.getElementById('userNameSlot');
-        const guideNameSlot = document.getElementById('guideNameSlot');
+        const img = qs('#selfieImage', root);
+        const bg = qs('#guideBg', root);
+        const nameSlot = qs('#userNameSlot', root);
+        const guideNameSlot = qs('#guideNameSlot', root);
 
         if (!img || !img.src || !bg || !nameSlot || !guideNameSlot) {
           window.toast?.('Erro ao capturar imagem: selecione uma imagem válida.');
@@ -161,9 +197,9 @@
         canvas.height = bg.naturalHeight || bg.height;
         ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
-        const scale = parseFloat(document.getElementById('selfieScale')?.value || 1);
-        const offsetX = parseFloat(document.getElementById('selfieOffsetX')?.value || 0);
-        const offsetY = parseFloat(document.getElementById('selfieOffsetY')?.value || 0);
+        const scale = parseFloat(qs('#selfieScale', root)?.value || 1);
+        const offsetX = parseFloat(qs('#selfieOffsetX', root)?.value || 0);
+        const offsetY = parseFloat(qs('#selfieOffsetY', root)?.value || 0);
 
         ctx.save();
         ctx.translate(15 + offsetX, 35 + offsetY);
@@ -188,17 +224,17 @@
           localStorage.setItem('JORNADA_SELFIE', link.href);
         } catch (_) {}
 
-        const avancarBtn = qs('#section-selfie [data-action="avancar"]');
+        const avancarBtn = qs('#btnStartJourney', root);
         if (avancarBtn) {
           avancarBtn.disabled = false;
           console.log('[Selfie] Botão de avançar ativado após captura');
-          window.toast?.('Imagem capturada! Clique em Avançar para continuar.');
+          window.toast?.('Imagem capturada! Clique em Entrar na Jornada para continuar.');
         }
 
-      } else if (btn.id === 'btnSkipSelfie' || btn.dataset.action === 'avancar') {
+      } else if (btn.id === 'btnSkipSelfie' || btn.id === 'btnStartJourney') {
         if (window.JC) {
           speechSynthesis.cancel();
-          document.querySelectorAll('video').forEach(video => {
+          qsa('video').forEach(video => {
             video.pause();
             video.src = '';
             video.load();
@@ -211,26 +247,6 @@
         }
       }
     });
-
-    // Atualizar selfieImage com o arquivo selecionado
-    const selfieInput = qs('#selfieInput', root);
-    if (selfieInput) {
-      selfieInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = (event) => {
-            const img = qs('#selfieImage', root);
-            if (img) {
-              img.src = event.target.result;
-              img.style.display = 'block';
-              console.log('[Selfie] Imagem selecionada:', file.name);
-            }
-          };
-          reader.readAsDataURL(file);
-        }
-      });
-    }
 
     console.log('[Selfie] Bloco de captura e navegação carregado');
   }
