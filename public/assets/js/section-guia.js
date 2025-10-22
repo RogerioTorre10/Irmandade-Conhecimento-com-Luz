@@ -217,14 +217,14 @@
     video.style.zIndex = '9999';
     video.style.backgroundColor = '#000';
 
-    // Esconder section-guia antes do vídeo
-    const guiaSection = document.getElementById('section-guia');
-    if (guiaSection) {
-      guiaSection.classList.add('hidden');
-      guiaSection.style.display = 'none';
-      guiaSection.setAttribute('aria-hidden', 'true');
-      console.log('[section-guia] Seção guia escondida');
-    }
+    // Esconder todas as seções antes do vídeo
+    const sections = document.querySelectorAll('.j-section');
+    sections.forEach(section => {
+      section.classList.add('hidden');
+      section.style.display = 'none';
+      section.setAttribute('aria-hidden', 'true');
+      console.log(`[section-guia] Seção ${section.id} escondida`);
+    });
 
     document.body.appendChild(video);
     console.log('Vídeo adicionado ao DOM.');
@@ -233,8 +233,21 @@
       console.log('Vídeo terminado, redirecionando para:', NEXT_PAGE);
       video.remove();
       try {
-        window.location.href = NEXT_PAGE;
-        console.log('[section-guia] Redirecionamento para selfie.html iniciado');
+        // Verificar se selfie.html existe
+        fetch(NEXT_PAGE, { method: 'HEAD' })
+          .then(response => {
+            if (response.ok) {
+              window.location.href = NEXT_PAGE;
+              console.log('[section-guia] Redirecionamento para selfie.html iniciado');
+            } else {
+              console.error('[section-guia] selfie.html não encontrado, status:', response.status);
+              window.toast?.('Erro: página selfie não encontrada.', 'error');
+            }
+          })
+          .catch(e => {
+            console.error('[section-guia] Erro ao verificar selfie.html:', e);
+            window.toast?.('Erro ao carregar a página selfie.', 'error');
+          });
       } catch (e) {
         console.error('[section-guia] Erro ao redirecionar para selfie.html:', e);
         window.toast?.('Erro ao carregar a página selfie.', 'error');
@@ -246,8 +259,20 @@
       video.remove();
       console.log('Redirecionando para:', NEXT_PAGE, '(fallback devido a erro no vídeo)');
       try {
-        window.location.href = NEXT_PAGE;
-        console.log('[section-guia] Redirecionamento para selfie.html iniciado (fallback)');
+        fetch(NEXT_PAGE, { method: 'HEAD' })
+          .then(response => {
+            if (response.ok) {
+              window.location.href = NEXT_PAGE;
+              console.log('[section-guia] Redirecionamento para selfie.html iniciado (fallback)');
+            } else {
+              console.error('[section-guia] selfie.html não encontrado, status:', response.status);
+              window.toast?.('Erro: página selfie não encontrada.', 'error');
+            }
+          })
+          .catch(e => {
+            console.error('[section-guia] Erro ao verificar selfie.html:', e);
+            window.toast?.('Erro ao carregar a página selfie.', 'error');
+          });
       } catch (e) {
         console.error('[section-guia] Erro ao redirecionar para selfie.html:', e);
         window.toast?.('Erro ao carregar a página selfie.', 'error');
