@@ -5,9 +5,9 @@
   padding: 8px;
   border: 2px solid var(--card-2);
   border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
-  background-image: url('/assets/img/textura-de-pedra.jpg');
-  background-size: cover;
-  background-position: center;
+  background-image: url('/assets/img/textura-de-pedra.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
   background-color: var(--card-2);
   background-blend-mode: overlay;
   border-radius: var(--radius);
@@ -70,7 +70,7 @@
   max-width: 420px;
 }
 
-.senha-actions .btn-stone,
+.senha-actions .btn.btn-stone,
 .senha-actions #btn-senha-prev,
 .senha-actions #btn-senha-avancar {
   padding: 8px 16px;
@@ -94,14 +94,14 @@
   pointer-events: auto !important;
 }
 
-.senha-actions .btn-stone:hover,
+.senha-actions .btn.btn-stone:hover,
 .senha-actions #btn-senha-prev:hover,
 .senha-actions #btn-senha-avancar:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0,0,0,0.4);
 }
 
-.senha-actions .btn-stone:disabled,
+.senha-actions .btn.btn-stone:disabled,
 .senha-actions #btn-senha-prev:disabled,
 .senha-actions #btn-senha-avancar:disabled {
   opacity: 0.5;
