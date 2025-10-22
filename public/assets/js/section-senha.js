@@ -12,7 +12,7 @@
   const EST_WPM = 160;         // fallback p/ TTS
   const EST_CPS = 13;
   const TRANSITION_SRC = '/assets/img/filme-senha.mp4';
-  const NEXT_PAGE = '/jornada-conhecimento-com-luz1.html#section-guia';
+  const NEXT_PAGE = '/jornada-conhecimento-com-luz1.html';
   const FALLBACK_PAGE = '/selfie.html';
   const ULTIMATE_FALLBACK = '/';
 
@@ -48,7 +48,7 @@
         opacity: 1 !important;
       }
       #section-senha .typing-done {
-        text-align: center !important;
+        text-align: left !important;
         visibility: visible !important;
         opacity: 1 !important;
       }
@@ -115,7 +115,7 @@
     if(!el) return;
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
-    el.style.textAlign = 'center'; // Centralizar após datilografia
+    el.style.textAlign = 'left'; // Manter alinhamento à esquerda
     if(el.dataset.prevDir) el.setAttribute('dir', el.dataset.prevDir); else el.removeAttribute('dir');
     el.style.visibility = 'visible';
     el.style.opacity = '1';
@@ -188,17 +188,24 @@
 
   function forceRedirect(){
     console.log('Forçando redirecionamento para:', NEXT_PAGE);
-    try {
-      window.location.replace(NEXT_PAGE);
-    } catch (e) {
-      console.warn('window.location.replace falhou para:', NEXT_PAGE, 'tentando fallback:', FALLBACK_PAGE);
+    setTimeout(() => {
       try {
-        window.location.href = FALLBACK_PAGE;
+        window.location.replace(NEXT_PAGE);
       } catch (e) {
-        console.error('Fallback falhou, tentando última opção:', ULTIMATE_FALLBACK);
-        window.location.href = ULTIMATE_FALLBACK;
+        console.warn('window.location.replace falhou para:', NEXT_PAGE, 'tentando assign:', FALLBACK_PAGE);
+        try {
+          window.location.assign(FALLBACK_PAGE);
+        } catch (e) {
+          console.warn('window.location.assign falhou, tentando href:', FALLBACK_PAGE);
+          try {
+            window.location.href = FALLBACK_PAGE;
+          } catch (e) {
+            console.error('Fallback falhou, tentando última opção:', ULTIMATE_FALLBACK);
+            window.location.href = ULTIMATE_FALLBACK;
+          }
+        }
       }
-    }
+    }, 100); // Pequeno atraso para garantir execução
   }
 
   function playTransitionThen(nextStep){
@@ -214,6 +221,11 @@
     overlay.style.cssText = `
       position: fixed; inset: 0; background: white; z-index: 999999;
       display: flex; align-items: center; justify-content: center;`;
+    const loader = document.createElement('div');
+    loader.textContent = 'Carregando...';
+    loader.style.cssText = `
+      color: #333; font-family: 'BerkshireSwash', cursive; font-size: 24px;
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);`;
     const video = document.createElement('video');
     video.src = TRANSITION_SRC;
     video.autoplay = true;
@@ -227,7 +239,8 @@
     document.removeEventListener('section:shown', window.JCSenha.__sectionShownHandler);
     document.body.appendChild(overlay);
     overlay.appendChild(video);
-    console.log('Vídeo adicionado ao DOM.');
+    overlay.appendChild(loader);
+    console.log('Vídeo e loader adicionados ao DOM.');
 
     let done = false;
     const cleanup = () => {
