@@ -14,7 +14,7 @@
   const TRANSITION_SRC = '/assets/img/filme-senha.mp4';
   const NEXT_PAGE = '/jornada-conhecimento-com-luz1.html';
   const FALLBACK_PAGE = '/selfie.html';
-  const ULTIMATE_FALLBACK = '/';
+  const HOME_PAGE = '/';
 
   // ===== Estado / Namespace =====
   window.JCSenha = window.JCSenha || {};
@@ -115,7 +115,7 @@
     if(!el) return;
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
-    el.style.textAlign = 'left'; // Manter alinhamento à esquerda
+    el.style.textAlign = 'left';
     if(el.dataset.prevDir) el.setAttribute('dir', el.dataset.prevDir); else el.removeAttribute('dir');
     el.style.visibility = 'visible';
     el.style.opacity = '1';
@@ -200,12 +200,12 @@
           try {
             window.location.href = FALLBACK_PAGE;
           } catch (e) {
-            console.error('Fallback falhou, tentando última opção:', ULTIMATE_FALLBACK);
-            window.location.href = ULTIMATE_FALLBACK;
+            console.error('Fallback falhou, tentando última opção:', HOME_PAGE);
+            window.location.href = HOME_PAGE;
           }
         }
       }
-    }, 100); // Pequeno atraso para garantir execução
+    }, 100);
   }
 
   function playTransitionThen(nextStep){
@@ -303,25 +303,14 @@
     if (input && !input.__senhaBound) {
       input.addEventListener('input', () => {
         console.log('Input #senha-input alterado, valor:', input.value);
-        // Sem validação em tempo real para evitar loops
       });
       input.__senhaBound = true;
     }
 
     if (prev && !prev.__senhaBound) {
       prev.addEventListener('click', () => {
-        console.log('Botão Voltar clicado.');
-        const rootEl = qs(sel.root);
-        const candidates = [
-          prev.dataset?.backHref,
-          prev.getAttribute?.('data-href'),
-          rootEl?.dataset?.backHref,
-          window.JC?.homeUrl,
-          (document.referrer && (()=>{ try{ return new URL(document.referrer).origin === window.location.origin; }catch{ return false; } })() ? document.referrer : null),
-          '/'
-        ].filter(Boolean);
-        const target = candidates[0] || '/';
-        try { window.top.location.assign(target); } catch { window.location.href = target; }
+        console.log('Botão Voltar clicado, redirecionando para:', HOME_PAGE);
+        try { window.top.location.assign(HOME_PAGE); } catch { window.location.href = HOME_PAGE; }
       });
       prev.__senhaBound = true;
     }
@@ -391,7 +380,7 @@
       }
       const t0=Date.now();
       while(!myAbort.cancelled() && (Date.now()-t0)<PAUSE_BETWEEN_P) await sleep(10);
-      await sleep(200); // Atraso extra para efeito visual
+      await sleep(200);
     }
 
     if (!myAbort.cancelled()) {
