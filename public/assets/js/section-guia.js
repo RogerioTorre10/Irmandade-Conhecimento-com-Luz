@@ -188,32 +188,34 @@
     }
   }
 
-  function playTransitionVideo() {
+  async function playTransitionVideo() {
     console.log('Iniciando transição de vídeo:', TRANSITION_VIDEO);
     const video = document.createElement('video');
+    video.id = 'transition-video';
     video.src = TRANSITION_VIDEO;
     video.autoplay = true;
     video.muted = true;
     video.controls = false;
     video.style.width = '100%';
-    video.style.height = 'auto';
+    video.style.height = '100vh';
     video.style.position = 'fixed';
     video.style.top = '0';
     video.style.left = '0';
     video.style.zIndex = '9999';
     video.style.backgroundColor = '#000';
 
-    document.body.innerHTML = '';
     document.body.appendChild(video);
     console.log('Vídeo adicionado ao DOM.');
 
     video.addEventListener('ended', () => {
       console.log('Vídeo terminado, redirecionando para:', NEXT_PAGE);
+      video.remove();
       window.location.href = NEXT_PAGE;
-    });
+    }, { once: true });
 
     video.addEventListener('error', e => {
       console.error('Erro ao reproduzir vídeo:', e);
+      video.remove();
       console.log('Redirecionando para:', NEXT_PAGE, '(fallback devido a erro no vídeo)');
       window.location.href = NEXT_PAGE;
     });
@@ -247,8 +249,8 @@
 
     if (nameInput) {
       nameInput.addEventListener('input', () => {
-        const nome = nameInput.value.trim().toUpperCase(); // Converter para maiúsculas
-        nameInput.value = nome; // Atualizar o input com maiúsculas
+        const nome = nameInput.value.trim().toUpperCase();
+        nameInput.value = nome;
         const isValid = nome.length >= 2 && /^[a-zA-Z\s]+$/.test(nome);
         if (isValid && !guiasRendered) {
           nameInput.disabled = true;
@@ -303,6 +305,8 @@
     root.classList.remove('hidden');
     root.setAttribute('aria-hidden', 'false');
     root.style.removeProperty('display');
+    root.style.removeProperty('opacity');
+    root.style.removeProperty('visibility');
 
     const title = qs('[data-typing="true"]', root);
     if (!title) {
@@ -329,25 +333,9 @@
     await bindUI(root, myId);
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    if (qs('#section-guia') && !qs('#section-guia').classList.contains('hidden')) {
-      console.log('DOM carregado, ativando #section-guia.');
-      activate(qs('#section-guia'));
-    }
-  });
-
-  document.addEventListener('section:shown', (e) => {
-    const id = e?.detail?.sectionId || e?.detail?.id;
-    if (id && id !== 'section-guia' && id !== 'section-escolha') {
-      ABORT_TOKEN++;
-      console.log('Outro evento section:shown detectado, abortando:', id);
-    }
-  });
-
   document.addEventListener('section:shown', async (evt) => {
     const id = evt?.detail?.sectionId || evt?.detail?.id;
     if (id !== 'section-guia' && id !== 'section-escolha') {
-      ABORT_TOKEN++;
       console.log('Evento section:shown ignorado, ID não corresponde:', id);
       return;
     }
