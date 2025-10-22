@@ -1,10 +1,6 @@
 /* ========== SEÇÃO SENHA (ajustado) ========== */
 .senha-input {
-  display: grid;
-  grid-template-columns: 1fr auto;   /* input | botão 👁️ */
-  gap: 8px;
-  align-items: center;
-
+  position: relative; /* Para posicionar o botão olho dentro do input */
   margin: 20px auto;
   padding: 8px;
   border: 2px solid var(--card-2);
@@ -15,12 +11,12 @@
   background-color: var(--card-2);
   background-blend-mode: overlay;
   border-radius: var(--radius);
-  max-width: 420px;                  /* um pouco mais largo para caber input + botão */
+  max-width: 420px;
   text-align: left;
 }
 
 .senha-input input {
-  padding: 8px 10px;
+  padding: 8px 40px 8px 10px; /* Espaço à direita para o ícone */
   font-size: 16px;
   border: none;
   background: transparent;
@@ -35,14 +31,16 @@
   opacity: 0.8;
 }
 
-.senha-input button {
-  position: static;                  /* 👈 não absoluto; fica fora do input */
-  transform: none;
-  padding: 6px 10px;
-  min-width: 44px;
-  min-height: 36px;
-  font-size: 16px;
-  border: 2px solid var(--card-2);
+.senha-input .btn-toggle-senha {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 4px;
+  min-width: 32px;
+  min-height: 32px;
+  font-size: 14px;
+  border: none;
   border-radius: var(--radius);
   background-image: url('/assets/img/textura-de-pedra.jpg') !important;
   background-size: cover !important;
@@ -52,7 +50,10 @@
   color: var(--fg);
   font-family: 'ManufacturingConsent', sans-serif;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Botões lado a lado com textura de pedra */
@@ -66,7 +67,9 @@
   max-width: 420px;
 }
 
-.btn-stone {
+.btn-stone,
+#btn-senha-prev,
+#btn-senha-avancar {
   padding: 8px 16px;
   font-size: 18px;
   border: 2px solid var(--card-2);
@@ -82,20 +85,29 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
-  width: 140px;                      /* largura consistente */
+  width: 140px;
   text-align: center;
 }
 
-.btn-stone:hover {
+.btn-stone:hover,
+#btn-senha-prev:hover,
+#btn-senha-avancar:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+}
+
+.btn-stone:disabled,
+#btn-senha-prev:disabled,
+#btn-senha-avancar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Mantém conteúdo estável e centralizado antes/depois da datilografia */
 .conteudo-pergaminho {
   text-align: center;
   margin: 0 auto;
-  max-width: 720px;                  /* pouquinho maior */
+  max-width: 720px;
 }
 .conteudo-pergaminho h2,
 .conteudo-pergaminho p {
