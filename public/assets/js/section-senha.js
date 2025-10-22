@@ -1,5 +1,15 @@
 (function () {
   'use strict';
+  
+  const MOD = 'section-senha.js';
+  const SECTION_ID = 'section-senha';
+  const NEXT_SECTION_ID = 'section-guia';      // Próxima seção (navegação interna)
+  const HOME_PAGE = '/';                       // Voltar para Home
+  const HIDE = 'hidden';
+
+  // Vídeo de transição (ajuste se o teu caminho for diferente)
+  const TRANSITION_SRC = '/assets/img/filme-senha.mp4';
+  const TRANSITION_TIMEOUT_MS = 8000;          // timeout de segurança
 
   if (window.JCSenha?.__bound) {
     console.log('[JCSenha] Já inicializado, ignorando...');
