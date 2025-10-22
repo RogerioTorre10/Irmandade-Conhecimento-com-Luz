@@ -1,15 +1,16 @@
 (function () {
   'use strict';
-
+  
   const MOD = 'section-senha.js';
   const SECTION_ID = 'section-senha';
-  const NEXT_PAGE = '/jornada-conhecimento-com-luz1.html';
-  const HOME_PAGE = '/';
+  const NEXT_SECTION_ID = 'section-guia';      // Próxima seção (navegação interna)
+  const HOME_PAGE = '/';                       // Voltar para Home
   const HIDE = 'hidden';
-  const INITIAL_TYPING_DELAY_MS = 9000; // Aumentado para 9s para sincronizar com vídeo
+  const INITIAL_TYPING_DELAY_MS = 8500;       // Atraso inicial ajustado para após o vídeo (8s + 0.5s de margem)
+
+  // Vídeo de transição (ajuste se o teu caminho for diferente)
   const TRANSITION_SRC = '/assets/img/filme-senha.mp4';
-  const TRANSITION_TIMEOUT_MS = 8000;
-  const FALLBACK_PAGE = '/selfie.html';
+  const TRANSITION_TIMEOUT_MS = 8000;          // Timeout de segurança
 
   if (window.JCSenha?.__bound) {
     console.log('[JCSenha] Já inicializado, ignorando...');
@@ -22,14 +23,11 @@
     ready: false,
     listenerAdded: false,
     typingInProgress: false,
-    videoDone: false,
-    initialized: false,
     observer: null
   };
 
   // ---------- Utils ----------
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-  const qs = (s, r=document) => r.querySelector(s);
   const textOf = (el) => {
     if (!el) return '';
     const ds = el.dataset?.text;
@@ -37,6 +35,7 @@
     return (ds && ds.trim().length ? ds : tc).trim();
   };
 
+  // Prepara o elemento para datilografia
   function normalizeParagraph(el) {
     if (!el) return false;
     const current = el.textContent?.trim() || '';
@@ -46,7 +45,6 @@
     if (!source) return false;
 
     el.dataset.text = source;
-
     if (!el.classList.contains('typing-done')) {
       el.textContent = '';
       el.classList.remove('typing-active', 'typing-done');
@@ -55,6 +53,7 @@
     return true;
   }
 
+  // Fallback local de digitação
   async function localType(el, text, speed = 36) {
     return new Promise(resolve => {
       let i = 0;
@@ -129,7 +128,25 @@
       if (window.runTyping) return true;
       await sleep(100);
     }
-    return true;
+    return true; // Segue com fallback
+  }
+
+  // Tenta detectar o término do vídeo
+  async function waitForVideoEnd(videoElementId = 'transition-video') {
+    const video = document.getElementById(videoElementId);
+    if (!video) {
+      console.log('[JCSenha] Vídeo de transição não encontrado, usando timeout padrão');
+      return sleep(TRANSITION_TIMEOUT_MS);
+    }
+
+    return new Promise((resolve) => {
+      video.addEventListener('ended', () => {
+        console.log('[JCSenha] Vídeo terminou');
+        resolve();
+      }, { once: true });
+      // Timeout de segurança
+      setTimeout(resolve, TRANSITION_TIMEOUT_MS);
+    });
   }
 
   function pickElements(root) {
@@ -138,109 +155,17 @@
       instr2: root.querySelector('#senha-instr2'),
       instr3: root.querySelector('#senha-instr3'),
       instr4: root.querySelector('#senha-instr4'),
-      input:  root.querySelector('#senha-input'),
+      input: root.querySelector('#senha-input'),
       toggle: root.querySelector('.btn-toggle-senha'),
       btnNext: root.querySelector('#btn-senha-avancar'),
       btnPrev: root.querySelector('#btn-senha-prev')
     };
   }
 
-  function forceRedirect() {
-    console.log('Forçando redirecionamento para:', NEXT_PAGE);
-    setTimeout(() => {
-      try {
-        window.location.replace(NEXT_PAGE);
-      } catch (e) {
-        console.warn('window.location.replace falhou para:', NEXT_PAGE, 'tentando assign:', FALLBACK_PAGE);
-        try {
-          window.location.assign(FALLBACK_PAGE);
-        } catch (e) {
-          console.warn('window.location.assign falhou, tentando href:', HOME_PAGE);
-          window.location.href = HOME_PAGE;
-        }
-      }
-    }, 100);
-  }
-
-  function playTransitionThen(nextStep) {
-    if (document.getElementById('senha-transition-overlay') || window.JCSenha.state.transitioning) {
-      console.warn('Transição já em andamento ou flag transitioning ativa, ignorando.');
-      return;
-    }
-    window.JCSenha.state.transitioning = true;
-    console.log('Iniciando transição de vídeo:', TRANSITION_SRC);
-    document.body.style.background = 'white';
-    const overlay = document.createElement('div');
-    overlay.id = 'senha-transition-overlay';
-    overlay.style.cssText = `
-      position: fixed; inset: 0; background: white; z-index: 999999;
-      display: flex; align-items: center; justify-content: center;`;
-    const loader = document.createElement('div');
-    loader.textContent = 'Carregando...';
-    loader.style.cssText = `
-      color: #333; font-family: 'BerkshireSwash', cursive; font-size: 24px;
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);`;
-    const video = document.createElement('video');
-    video.src = TRANSITION_SRC;
-    video.autoplay = true;
-    video.muted = true;
-    video.playsInline = true;
-    video.controls = false;
-    video.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
-    
-    document.body.innerHTML = '';
-    document.removeEventListener('section:shown', window.JCSenha.__sectionShownHandler);
-    document.body.appendChild(overlay);
-    overlay.appendChild(video);
-    overlay.appendChild(loader);
-    console.log('Vídeo e loader adicionados ao DOM.');
-
-    let done = false;
-    const cleanup = () => {
-      if (done) return; done = true;
-      try { video.pause(); } catch {}
-      overlay.remove();
-      document.body.style.background = '';
-      console.log('Transição concluída, executando próximo passo.');
-      if (typeof nextStep === 'function') nextStep();
-      window.JCSenha.state.transitioning = false;
-      window.JCSenha.state.videoDone = true;
-    };
-
-    video.addEventListener('ended', () => {
-      console.log('Vídeo terminou, limpando e redirecionando para:', NEXT_PAGE);
-      cleanup();
-      forceRedirect();
-    }, { once: true });
-    video.addEventListener('error', () => {
-      console.error('Erro ao reproduzir vídeo:', TRANSITION_SRC);
-      console.log('Redirecionando para:', NEXT_PAGE, '(fallback devido a erro no vídeo)');
-      cleanup();
-      forceRedirect();
-    }, { once: true });
-    setTimeout(() => {
-      if (!done) {
-        console.log('Timeout do vídeo atingido, forçando redirecionamento para:', NEXT_PAGE);
-        cleanup();
-        forceRedirect();
-      }
-    }, TRANSITION_TIMEOUT_MS);
-
-    Promise.resolve().then(() => video.play?.()).catch(() => {
-      console.warn('Erro ao iniciar vídeo, redirecionando para:', NEXT_PAGE);
-      cleanup();
-      forceRedirect();
-    });
-  }
-
   async function runTypingSequence(root) {
-    if (window.JCSenha.state.typingInProgress) {
-      console.warn('[JCSenha] Digitação já em andamento, ignorando.');
-      return;
-    }
+    if (window.JCSenha.state.typingInProgress) return;
     window.JCSenha.state.typingInProgress = true;
 
-    console.log('[JCSenha] Iniciando sequência de datilografia...');
     const { instr1, instr2, instr3, instr4, input, btnNext, btnPrev } = pickElements(root);
     const seq = [instr1, instr2, instr3, instr4]
       .filter(Boolean)
@@ -250,17 +175,18 @@
         return aRect.left - bRect.left || aRect.top - bRect.top;
       });
 
+    // Desabilita navegação e input durante a digitação
     btnPrev?.setAttribute('disabled', 'true');
     btnNext?.setAttribute('disabled', 'true');
-    input?.setAttribute('disabled', 'true');
+    input?.setAttribute('disabled', 'true'); // Desabilita input temporariamente
 
+    // Normaliza todos antes
     seq.forEach(normalizeParagraph);
 
-    // Espera o vídeo terminar
-    if (!window.JCSenha.state.videoDone) {
-      console.log('[JCSenha] Aguardando vídeo de transição...');
-      await sleep(INITIAL_TYPING_DELAY_MS);
-    }
+    // Aguarda o término do vídeo
+    await waitForVideoEnd();
+    // Atraso adicional para garantir visibilidade
+    await sleep(INITIAL_TYPING_DELAY_MS - TRANSITION_TIMEOUT_MS);
 
     await waitForTypingBridge();
 
@@ -270,16 +196,21 @@
       }
     }
 
+    // Libera navegação e input
     btnPrev?.removeAttribute('disabled');
     btnNext?.removeAttribute('disabled');
     if (input) {
       input.removeAttribute('disabled');
-      try { input.focus(); } catch {}
-      console.log('[JCSenha] Input #senha-input habilitado.');
+      input.removeAttribute('readonly');
+      try {
+        input.focus();
+        console.log('[JCSenha] Foco aplicado ao input');
+      } catch (e) {
+        console.error('[JCSenha] Falha ao focar input:', e);
+      }
     }
 
     window.JCSenha.state.typingInProgress = false;
-    console.log('[JCSenha] Sequência de datilografia concluída.');
   }
 
   function armObserver(root) {
@@ -294,7 +225,7 @@
             needRetype = true; break;
           }
         }
-        if (needRetype && !window.JCSenha.state.typingInProgress && window.JCSenha.state.videoDone) {
+        if (needRetype && !window.JCSenha.state.typingInProgress) {
           const { instr1, instr2, instr3, instr4 } = pickElements(root);
           [instr1, instr2, instr3, instr4].filter(Boolean).forEach(normalizeParagraph);
           runTypingSequence(root);
@@ -307,18 +238,12 @@
 
   const onShown = async (evt) => {
     const { sectionId } = evt?.detail || {};
-    if (sectionId !== SECTION_ID || window.JCSenha.state.initialized) {
-      console.log('[JCSenha] section:shown ignorado para:', sectionId);
-      return;
-    }
+    if (sectionId !== 'section-senha') return;
 
-    const root = qs('#section-senha');
-    if (!root) {
-      console.warn('[JCSenha] Root #section-senha não encontrado.');
-      return;
-    }
+    const root = document.getElementById('section-senha');
+    if (!root) return;
 
-    root.classList.remove(HIDE);
+    root.classList.remove('hidden');
     root.setAttribute('aria-hidden', 'false');
     root.style.removeProperty('display');
     root.style.removeProperty('opacity');
@@ -330,53 +255,45 @@
       return;
     }
 
-    const { input, toggle, btnNext, btnPrev } = pickElements(root);
+    const { input, toggle, btnNext, btnPrev, instr1, instr2, instr3, instr4 } = pickElements(root);
 
     btnPrev?.setAttribute('disabled', 'true');
     btnNext?.setAttribute('disabled', 'true');
-    input?.setAttribute('disabled', 'true');
+    input?.setAttribute('disabled', 'true'); // Desabilita input inicialmente
 
     toggle?.addEventListener('click', () => {
-      if (!input) {
-        console.error('[JCSenha] Input #senha-input não encontrado para toggle.');
-        return;
-      }
+      if (!input) return;
       input.type = input.type === 'password' ? 'text' : 'password';
-      console.log('[JCSenha] Botão toggle clicado, tipo do input:', input.type);
     });
 
     btnPrev?.addEventListener('click', () => {
-      console.log('[JCSenha] Botão Voltar clicado, redirecionando para:', HOME_PAGE);
-      setTimeout(() => {
-        try { window.location.replace(HOME_PAGE); } catch { window.location.href = HOME_PAGE; }
-      }, 100);
+      try { window.JC?.show('section-termos'); } catch {}
     });
 
     btnNext?.addEventListener('click', () => {
-      if (!input) {
-        console.error('[JCSenha] Input #senha-input não encontrado para avançar.');
-        return;
-      }
+      if (!input) return;
       const senha = (input.value || '').trim();
       if (senha.length >= 3) {
-        console.log('[JCSenha] Botão Avançar clicado, senha válida:', senha);
-        playTransitionThen(() => {
-          console.log('[JCSenha] Navegação para:', NEXT_PAGE);
-          forceRedirect();
-        });
+        try { window.JC?.show('section-filme'); } catch {}
       } else {
         window.toast?.('Digite uma Palavra-Chave válida.', 'warning');
         try { input.focus(); } catch {}
       }
     });
 
-    const { instr1, instr2, instr3, instr4 } = pickElements(root);
-    [instr1, instr2, instr3, instr4].filter(Boolean).forEach(normalizeParagraph);
+    // Garante que o input seja editável após inicialização
+    if (input) {
+      input.removeAttribute('disabled');
+      input.removeAttribute('readonly');
+      input.addEventListener('input', () => {
+        console.log('[JCSenha] Input alterado:', input.value);
+      });
+    }
 
+    [instr1, instr2, instr3, instr4].filter(Boolean).forEach(normalizeParagraph);
     armObserver(root);
 
     root.dataset.senhaInitialized = 'true';
-    window.JCSenha.state.initialized = true;
     runTypingSequence(root);
 
     window.JCSenha.state.ready = true;
@@ -384,13 +301,7 @@
   };
 
   if (!window.JCSenha.state.listenerAdded) {
-    window.JCSenha.__sectionShownHandler = onShown;
-    document.addEventListener('section:shown', window.JCSenha.__sectionShownHandler);
+    document.addEventListener('section:shown', onShown);
     window.JCSenha.state.listenerAdded = true;
   }
-
-  // Forçar vídeo como concluído se já carregado
-  setTimeout(() => {
-    window.JCSenha.state.videoDone = true;
-  }, INITIAL_TYPING_DELAY_MS);
 })();
