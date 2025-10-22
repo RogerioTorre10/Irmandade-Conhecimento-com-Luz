@@ -3,14 +3,12 @@
   
   const MOD = 'section-senha.js';
   const SECTION_ID = 'section-senha';
-  const NEXT_SECTION_ID = 'section-guia';      // Próxima seção (navegação interna)
+  const NEXT_SECTION_ID = 'section-guia';      // Próxima seção
   const HOME_PAGE = '/';                       // Voltar para Home
   const HIDE = 'hidden';
-  const INITIAL_TYPING_DELAY_MS = 8500;       // Atraso inicial ajustado para após o vídeo (8s + 0.5s de margem)
-
-  // Vídeo de transição (ajuste se o teu caminho for diferente)
+  const INITIAL_TYPING_DELAY_MS = 8500;       // Atraso inicial ajustado
   const TRANSITION_SRC = '/assets/img/filme-senha.mp4';
-  const TRANSITION_TIMEOUT_MS = 8000;          // Timeout de segurança
+  const TRANSITION_TIMEOUT_MS = 8000;
 
   if (window.JCSenha?.__bound) {
     console.log('[JCSenha] Já inicializado, ignorando...');
@@ -35,7 +33,6 @@
     return (ds && ds.trim().length ? ds : tc).trim();
   };
 
-  // Prepara o elemento para datilografia
   function normalizeParagraph(el) {
     if (!el) return false;
     const current = el.textContent?.trim() || '';
@@ -53,7 +50,6 @@
     return true;
   }
 
-  // Fallback local de digitação
   async function localType(el, text, speed = 36) {
     return new Promise(resolve => {
       let i = 0;
@@ -128,10 +124,9 @@
       if (window.runTyping) return true;
       await sleep(100);
     }
-    return true; // Segue com fallback
+    return true;
   }
 
-  // Tenta detectar o término do vídeo
   async function waitForVideoEnd(videoElementId = 'transition-video') {
     const video = document.getElementById(videoElementId);
     if (!video) {
@@ -144,8 +139,48 @@
         console.log('[JCSenha] Vídeo terminou');
         resolve();
       }, { once: true });
-      // Timeout de segurança
       setTimeout(resolve, TRANSITION_TIMEOUT_MS);
+    });
+  }
+
+  function playTransitionVideo(nextSectionId) {
+    console.log('[JCSenha] Iniciando transição de vídeo:', TRANSITION_SRC);
+    const video = document.createElement('video');
+    video.id = 'transition-video';
+    video.src = TRANSITION_SRC;
+    video.autoplay = true;
+    video.muted = true;
+    video.controls = false;
+    video.style.width = '100%';
+    video.style.height = '100vh';
+    video.style.position = 'fixed';
+    video.style.top = '0';
+    video.style.left = '0';
+    video.style.zIndex = '9999';
+    video.style.backgroundColor = '#000';
+
+    document.body.appendChild(video);
+    console.log('[JCSenha] Vídeo adicionado ao DOM.');
+
+    video.addEventListener('ended', () => {
+      console.log('[JCSenha] Vídeo terminado, carregando:', nextSectionId);
+      video.remove();
+      try {
+        window.JC?.show(nextSectionId);
+      } catch (e) {
+        console.error('[JCSenha] Erro ao carregar próxima seção:', e);
+      }
+    }, { once: true });
+
+    video.addEventListener('error', (e) => {
+      console.error('[JCSenha] Erro ao reproduzir vídeo:', e);
+      video.remove();
+      console.log('[JCSenha] Redirecionando para:', nextSectionId, '(fallback devido a erro no vídeo)');
+      try {
+        window.JC?.show(nextSectionId);
+      } catch (e) {
+        console.error('[JCSenha] Erro ao carregar próxima seção:', e);
+      }
     });
   }
 
@@ -175,17 +210,13 @@
         return aRect.left - bRect.left || aRect.top - bRect.top;
       });
 
-    // Desabilita navegação e input durante a digitação
     btnPrev?.setAttribute('disabled', 'true');
     btnNext?.setAttribute('disabled', 'true');
-    input?.setAttribute('disabled', 'true'); // Desabilita input temporariamente
+    input?.setAttribute('disabled', 'true');
 
-    // Normaliza todos antes
     seq.forEach(normalizeParagraph);
 
-    // Aguarda o término do vídeo
     await waitForVideoEnd();
-    // Atraso adicional para garantir visibilidade
     await sleep(INITIAL_TYPING_DELAY_MS - TRANSITION_TIMEOUT_MS);
 
     await waitForTypingBridge();
@@ -196,7 +227,6 @@
       }
     }
 
-    // Libera navegação e input
     btnPrev?.removeAttribute('disabled');
     btnNext?.removeAttribute('disabled');
     if (input) {
@@ -259,7 +289,7 @@
 
     btnPrev?.setAttribute('disabled', 'true');
     btnNext?.setAttribute('disabled', 'true');
-    input?.setAttribute('disabled', 'true'); // Desabilita input inicialmente
+    input?.setAttribute('disabled', 'true');
 
     toggle?.addEventListener('click', () => {
       if (!input) return;
@@ -274,14 +304,13 @@
       if (!input) return;
       const senha = (input.value || '').trim();
       if (senha.length >= 3) {
-        try { window.JC?.show('section-filme'); } catch {}
+        playTransitionVideo(NEXT_SECTION_ID); // Exibe vídeo antes de ir para section-guia
       } else {
         window.toast?.('Digite uma Palavra-Chave válida.', 'warning');
         try { input.focus(); } catch {}
       }
     });
 
-    // Garante que o input seja editável após inicialização
     if (input) {
       input.removeAttribute('disabled');
       input.removeAttribute('readonly');
