@@ -110,9 +110,18 @@
 
     if (speak && text && window.EffectCoordinator?.speak && !el.dataset.spoken) {
       try {
-        window.EffectCoordinator.speak(text);
+        const p = window.EffectCoordinator.speak(text);
+        console.log('[JCSenha] Iniciando TTS para:', text);
+        if (p && typeof p.then === 'function') {
+          await p;
+          console.log('[JCSenha] TTS concluído:', text);
+        } else {
+          console.warn('[JCSenha] TTS não retornou Promise, pulando espera.');
+        }
         el.dataset.spoken = 'true';
-      } catch {}
+      } catch (e) {
+        console.error('[JCSenha] Erro no TTS:', e);
+      }
     }
 
     await sleep(80);
