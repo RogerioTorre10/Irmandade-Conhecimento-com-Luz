@@ -1,322 +1,271 @@
-// /assets/js/section-senha.js  · seguro, idempotente, sem loops
 (function () {
   'use strict';
 
-  const MOD = 'section-senha.js';
-  const SECTION_ID = 'section-senha';
-  const NEXT_SECTION_ID = 'section-guia';      // Próxima seção (navegação interna)
-  const HOME_PAGE = '/';                       // Voltar para Home
-  const HIDE = 'hidden';
-
-  // Vídeo de transição (ajuste se o teu caminho for diferente)
-  const TRANSITION_SRC = '/assets/img/filme-senha.mp4';
-  const TRANSITION_TIMEOUT_MS = 8000;          // timeout de segurança
-
-  // Evita reinicialização
-  if (window.JCSenha && window.JCSenha.__bound) {
-    console.log(`[${MOD}] Já inicializado, ignorando`);
+  if (window.JCSenha?.__bound) {
+    console.log('[JCSenha] Já inicializado, ignorando...');
     return;
   }
 
-  window.JCSenha = {
-    __bound: true,
-    state: {
-      prepared: false,
-      validated: false,
-      transitioning: false,
-      navigated: false
-    }
+  window.JCSenha = window.JCSenha || {};
+  window.JCSenha.__bound = true;
+  window.JCSenha.state = {
+    ready: false,
+    listenerAdded: false,
+    typingInProgress: false,
+    observer: null
   };
 
-  // ------------------------------
-  // Utils
-  // ------------------------------
-  const $  = (sel, root = document) => root.querySelector(sel);
-  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+  // ---------- Utils ----------
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  const textOf = (el) => {
+    if (!el) return '';
+    const ds = el.dataset?.text;
+    const tc = el.textContent || '';
+    // Preferimos data-text; se não existir, usa textContent
+    return (ds && ds.trim().length ? ds : tc).trim();
+  };
 
-  function ensureTyping(node) {
-    try {
-      if (node && node.dataset && node.dataset.text && typeof window.applyTyping === 'function') {
-        window.applyTyping(node);
-      }
-    } catch (e) {
-      console.warn(`[${MOD}] TypingBridge indisponível`, e);
+  // Prepara o elemento para datilografia:
+  // - garante data-text como fonte
+  // - apaga conteúdo visual (para digitar)
+  function normalizeParagraph(el) {
+    if (!el) return false;
+    const current = el.textContent?.trim() || '';
+    const ds = el.dataset?.text?.trim() || '';
+    const source = ds || current;
+
+    if (!source) return false;
+
+    // Sempre manter a fonte no data-text
+    el.dataset.text = source;
+
+    // Se ainda não foi digitado, limpar visual para datilografar
+    if (!el.classList.contains('typing-done')) {
+      el.textContent = '';
+      el.classList.remove('typing-active', 'typing-done');
+      delete el.dataset.spoken;
     }
+    return true;
   }
 
-  // Aceita #input-senha ou #senha-input (compatibilidade)
-  function getPasswordInput(root) {
-    return $('#input-senha', root) || $('#senha-input', root);
+  // Fallback local de digitação se runTyping não existir
+  async function localType(el, text, speed = 36) {
+    return new Promise(resolve => {
+      let i = 0;
+      el.textContent = '';
+      const tick = () => {
+        if (i < text.length) {
+          el.textContent += text.charAt(i++);
+          setTimeout(tick, speed);
+        } else {
+          resolve();
+        }
+      };
+      tick();
+    });
   }
 
-  // ------------------------------
-  // Validação (troque pela tua regra/API quando quiser)
-  // ------------------------------
-  function validatePassword(value) {
-    const v = (value || '').trim();
-    // regra mínima para UI: 3+ chars
-    return v.length >= 3;
-  }
+  async function typeOnce(el, { speed = 36, speak = true } = {}) {
+    if (!el) return;
+    // Fonte SEMPRE vem do data-text
+    const text = (el.dataset?.text || '').trim();
+    if (!text) return;
 
-  // ------------------------------
-  // Navegação interna segura
-  // ------------------------------
-  function goNextSectionInternal() {
-    if (window.JCSenha.state.navigated) {
-      console.log(`[${MOD}] Navegação já feita — ignorando`);
-      return;
-    }
-    window.JCSenha.state.navigated = true;
+    // trava TTS global de terceiros
+    window.G = window.G || {};
+    const prevLock = !!window.G.__typingLock;
+    window.G.__typingLock = true;
 
-    try {
-      document.dispatchEvent(new CustomEvent('sectionCompleted', { detail: { sectionId: SECTION_ID } }));
-    } catch (e) {
-      console.warn(`[${MOD}] Falha ao despachar sectionCompleted`, e);
-    }
+    // Não zerar data-text! (é a nossa fonte garantida)
+    el.classList.add('typing-active');
+    el.classList.remove('typing-done');
 
-    if (window.JC && typeof window.JC.goNext === 'function') {
-      try {
-        console.log(`[${MOD}] Navegando via JC.goNext()`);
-        window.JC.goNext();
-        return;
-      } catch (e) {
-        console.warn(`[${MOD}] Erro em JC.goNext`, e);
-      }
-    }
+    let usedFallback = false;
 
-    if (typeof window.showSection === 'function') {
-      try {
-        console.log(`[${MOD}] Fallback interno: showSection('${NEXT_SECTION_ID}')`);
-        window.showSection(NEXT_SECTION_ID);
-      } catch (e) {
-        console.error(`[${MOD}] showSection falhou`, e);
-      }
+    if (typeof window.runTyping === 'function') {
+      await new Promise((resolve) => {
+        try {
+          window.runTyping(
+            el,
+            text,
+            () => resolve(),
+            { speed, cursor: true }
+          );
+        } catch (e) {
+          console.warn('[JCSenha] runTyping falhou, usando fallback local', e);
+          usedFallback = true;
+          resolve();
+        }
+      });
     } else {
-      console.warn(`[${MOD}] Sem JC.goNext/showSection disponíveis no momento`);
+      usedFallback = true;
     }
+
+    if (usedFallback) {
+      await localType(el, text, speed);
+    }
+
+    el.classList.remove('typing-active');
+    el.classList.add('typing-done');
+
+    // libera TTS global ANTES de falar este parágrafo
+    window.G.__typingLock = prevLock;
+
+    // Fala 1x por parágrafo, somente após concluir
+    if (speak && text && window.EffectCoordinator?.speak && !el.dataset.spoken) {
+      try {
+        window.EffectCoordinator.speak(text);
+        el.dataset.spoken = 'true';
+      } catch {}
+    }
+
+    await sleep(80);
   }
 
-  function whenJCReady(timeoutMs = 2000) {
-    return new Promise((resolve) => {
-      if (window.JC && typeof window.JC.init === 'function') return resolve(true);
-      let elapsed = 0;
-      const step = 100;
-      const t = setInterval(() => {
-        elapsed += step;
-        if (window.JC && typeof window.JC.init === 'function') {
-          clearInterval(t);
-          resolve(true);
-        } else if (elapsed >= timeoutMs) {
-          clearInterval(t);
-          resolve(false);
+  async function waitForTypingBridge(maxMs = 3000) {
+    const t0 = Date.now();
+    while (Date.now() - t0 < maxMs) {
+      if (window.runTyping) return true;
+      await sleep(100);
+    }
+    return true; // seguimos com fallback
+  }
+
+  function pickElements(root) {
+    return {
+      instr1: root.querySelector('#senha-instr1'),
+      instr2: root.querySelector('#senha-instr2'),
+      instr3: root.querySelector('#senha-instr3'),
+      instr4: root.querySelector('#senha-instr4'),
+      input:  root.querySelector('#senha-input'),
+      toggle: root.querySelector('.btn-toggle-senha'),
+      btnNext: root.querySelector('#btn-senha-avancar'),
+      btnPrev: root.querySelector('#btn-senha-prev')
+    };
+  }
+
+  async function runTypingSequence(root) {
+    if (window.JCSenha.state.typingInProgress) return;
+    window.JCSenha.state.typingInProgress = true;
+
+    const { instr1, instr2, instr3, instr4, input, btnNext, btnPrev } = pickElements(root);
+    const seq = [instr1, instr2, instr3, instr4].filter(Boolean);
+
+    // Desabilita navegação durante a digitação
+    btnPrev?.setAttribute('disabled', 'true');
+    btnNext?.setAttribute('disabled', 'true');
+
+    // Normaliza todos antes (evita TTS prematuro)
+    seq.forEach(normalizeParagraph);
+
+    await waitForTypingBridge();
+
+    for (const el of seq) {
+      // Só digita se ainda não concluído
+      if (!el.classList.contains('typing-done')) {
+        await typeOnce(el, { speed: 36, speak: true });
+      }
+    }
+
+    // Libera navegação e foca input
+    btnPrev?.removeAttribute('disabled');
+    btnNext?.removeAttribute('disabled');
+    try { input?.focus(); } catch {}
+
+    window.JCSenha.state.typingInProgress = false;
+  }
+
+  function armObserver(root) {
+    // Observa reinjeções no section (oscilação)
+    try {
+      if (window.JCSenha.state.observer) {
+        window.JCSenha.state.observer.disconnect();
+      }
+      const obs = new MutationObserver((mutations) => {
+        // Se algo relevante mudou, retomamos a sequência (sem duplicar fala porque marcamos spoken)
+        let needRetype = false;
+        for (const m of mutations) {
+          if (m.type === 'childList' || m.type === 'subtree' || m.addedNodes?.length) {
+            needRetype = true; break;
+          }
         }
-      }, step);
-    });
+        if (needRetype && !window.JCSenha.state.typingInProgress) {
+          // Re-normaliza e roda novamente
+          const { instr1, instr2, instr3, instr4 } = pickElements(root);
+          [instr1, instr2, instr3, instr4].filter(Boolean).forEach(normalizeParagraph);
+          runTypingSequence(root);
+        }
+      });
+      obs.observe(root, { childList: true, subtree: true, characterData: true });
+      window.JCSenha.state.observer = obs;
+    } catch {}
   }
 
-  // ------------------------------
-  // Transição com vídeo (overlay, sem recarregar página)
-  // ------------------------------
-  function playTransitionThen(cb) {
-    if (window.JCSenha.state.transitioning) {
-      console.log(`[${MOD}] Já em transição — ignorando novo pedido`);
+  const onShown = async (evt) => {
+    const { sectionId } = evt?.detail || {};
+    if (sectionId !== 'section-senha') return;
+
+    const root = document.getElementById('section-senha');
+    if (!root) return;
+
+    // Blindagem visual leve (sem brigar com showSection)
+    root.classList.remove('hidden');
+    root.setAttribute('aria-hidden', 'false');
+    root.style.removeProperty('display');
+    root.style.removeProperty('opacity');
+    root.style.removeProperty('visibility');
+    root.style.zIndex = 'auto';
+
+    if (root.dataset.senhaInitialized === 'true') {
+      // Reabertura: apenas roda (pega reinjeções)
+      runTypingSequence(root);
       return;
     }
-    window.JCSenha.state.transitioning = true;
 
-    const overlay = document.createElement('div');
-    overlay.setAttribute('data-senha-overlay', 'true');
-    Object.assign(overlay.style, {
-      position: 'fixed',
-      inset: '0',
-      background: 'black',
-      display: 'grid',
-      placeItems: 'center',
-      zIndex: '999999'
+    const { input, toggle, btnNext, btnPrev, instr1, instr2, instr3, instr4 } = pickElements(root);
+
+    // Estado inicial dos botões: travados
+    btnPrev?.setAttribute('disabled', 'true');
+    btnNext?.setAttribute('disabled', 'true');
+
+    // Olho mágico
+    toggle?.addEventListener('click', () => {
+      if (!input) return;
+      input.type = input.type === 'password' ? 'text' : 'password';
     });
 
-    const video = document.createElement('video');
-    video.playsInline = true;
-    video.autoplay = true;
-    video.muted = true; // se precisar som, mude para false (atenção ao autoplay)
-    video.src = TRANSITION_SRC;
-    video.style.maxWidth = '100%';
-    video.style.maxHeight = '100%';
-
-    const loader = document.createElement('div');
-    loader.textContent = 'Carregando…';
-    Object.assign(loader.style, {
-      position: 'absolute',
-      bottom: '24px',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      color: 'white',
-      fontFamily: 'Cardo, serif',
-      fontSize: '18px',
-      opacity: '0.8'
+    // Navegação
+    btnPrev?.addEventListener('click', () => {
+      try { window.JC?.show('section-termos'); } catch {}
     });
 
-    // NÃO limpar body — evita reset e loops; apenas sobrepõe
-    document.body.appendChild(overlay);
-    overlay.appendChild(video);
-    overlay.appendChild(loader);
-    console.log(`[${MOD}] Overlay e vídeo adicionados ao DOM`);
-
-    let done = false;
-    function cleanup() {
-      if (done) return;
-      done = true;
-      try { overlay.remove(); } catch {}
-      window.JCSenha.state.transitioning = false;
-    }
-
-    function finish() {
-      cleanup();
-      try { cb && cb(); } catch (e) { console.error(`[${MOD}] Erro no callback pós-transição`, e); }
-    }
-
-    const timeout = setTimeout(() => {
-      console.warn(`[${MOD}] Timeout da transição (${TRANSITION_TIMEOUT_MS}ms) — navegando internamente`);
-      finish();
-    }, TRANSITION_TIMEOUT_MS);
-
-    video.addEventListener('ended', () => {
-      console.log(`[${MOD}] Vídeo terminou — navegando internamente`);
-      clearTimeout(timeout);
-      finish();
-    }, { once: true });
-
-    video.addEventListener('error', () => {
-      console.error(`[${MOD}] Erro ao reproduzir vídeo: ${TRANSITION_SRC} — navegando internamente`);
-      clearTimeout(timeout);
-      finish();
-    }, { once: true });
-
-    Promise.resolve().then(() => video.play?.()).catch(() => {
-      console.warn(`[${MOD}] Falha ao iniciar play() — navegando internamente`);
-      clearTimeout(timeout);
-      finish();
+    btnNext?.addEventListener('click', () => {
+      if (!input) return;
+      const senha = (input.value || '').trim();
+      if (senha.length >= 3) {
+        try { window.JC?.show('section-filme'); } catch {}
+      } else {
+        window.toast?.('Digite uma Palavra-Chave válida.', 'warning');
+        try { input.focus(); } catch {}
+      }
     });
+
+    // Normaliza imediatamente todos os parágrafos (evita TTS precoce)
+    [instr1, instr2, instr3, instr4].filter(Boolean).forEach(normalizeParagraph);
+
+    // Observa reinjeções/oscilações
+    armObserver(root);
+
+    // Marca e executa
+    root.dataset.senhaInitialized = 'true';
+    runTypingSequence(root);
+
+    window.JCSenha.state.ready = true;
+    console.log('[JCSenha] Seção senha inicializada.');
+  };
+
+  if (!window.JCSenha.state.listenerAdded) {
+    document.addEventListener('section:shown', onShown);
+    window.JCSenha.state.listenerAdded = true;
   }
-
-  // ------------------------------
-  // Preparação da seção (bindings idempotentes)
-  // ------------------------------
-  function prepare(root) {
-    if (!root || window.JCSenha.state.prepared) return;
-    window.JCSenha.state.prepared = true;
-
-    console.log(`[${MOD}] Preparando seção…`);
-
-    // reset typing dentro da seção
-    $$('[data-typing="true"]', root).forEach(el => {
-    el.classList.remove('typing-done');  // 🔁 permite rodar de novo
-    if (!el.dataset.text && el.textContent) el.dataset.text = el.textContent.trim();
-    el.textContent = '';                 // começa do zero
-  });
-    // Título/sub com TypingBridge (se marcado)
-    ensureTyping($('#senha-title', root));
-    ensureTyping($('#senha-sub', root));
-
-    const input = getPasswordInput(root);
-    const btnValidar = $('#btn-validar-senha', root);
-    const btnPular   = $('#btn-skip-senha', root);
-    const btnVoltar  = $('#btn-voltar-senha', root);
-    const btnEye     = $('#btn-eye-senha', root);
-    const msgErro    = $('#senha-error', root);
-
-    function showError(text) {
-      if (!msgErro) return;
-      msgErro.textContent = text || 'Senha inválida.';
-      msgErro.classList.remove(HIDE);
-      setTimeout(() => msgErro.classList.add(HIDE), 2500);
-    }
-
-    // Voltar → Home
-      if (btnVoltar) {
-      btnVoltar.addEventListener('click', () => {
-      if (window.JCSenha.state.transitioning) return;
-      window.location.assign('/');
-  });
-}
-
-    // Rebind seguro (evita listeners duplicados)
-    [btnValidar, btnPular, btnVoltar, btnEye].forEach((btn) => {
-      if (!btn) return;
-      if (btn.__senhaBound) return;
-      btn.__senhaBound = true;
-    });
-
-    // 👁️ Alternar visibilidade da senha (olho fora do input)
-    if (btnEye && input) {
-      btnEye.addEventListener('click', () => {
-        const isPwd = input.type === 'password';
-        input.type = isPwd ? 'text' : 'password';
-        btnEye.setAttribute('aria-pressed', String(isPwd));
-      });
-    }
-
-    // Validar / Avançar (tocar vídeo e navegar internamente ao final)
-    if (btnValidar) {
-      btnValidar.addEventListener('click', async () => {
-        if (window.JCSenha.state.transitioning || window.JCSenha.state.navigated) return;
-        const value = (input?.value || '').trim();
-        if (!validatePassword(value)) {
-          showError('Senha incorreta. Tente novamente.');
-          try { input?.focus(); } catch {}
-          return;
-        }
-        window.JCSenha.state.validated = true;
-        await whenJCReady(2000);
-
-        playTransitionThen(() => {
-  console.log('[section-senha] Transição concluída — próxima seção');
-  goNextSectionInternal();  // usa JC.goNext() ou showSection('section-guia')
-});
-});
-}
-
-    // Pular (sem validação; opcional do teu fluxo)
-    if (btnPular) {
-      btnPular.addEventListener('click', async () => {
-        if (window.JCSenha.state.transitioning || window.JCSenha.state.navigated) return;
-        await whenJCReady(1500);
-        playTransitionThen(() => {
-          console.log(`[${MOD}] Pulo com transição — seguindo para próxima seção`);
-          goNextSectionInternal();
-        });
-      });
-    }
-
-    // Voltar (com textura de pedra; leva para HOME)
-    if (btnVoltar) {
-      btnVoltar.addEventListener('click', () => {
-        if (window.JCSenha.state.transitioning) return;
-        console.log(`[${MOD}] Voltar acionado — indo para Home`);
-        try { window.location.assign(HOME_PAGE); } catch (e) {
-          console.warn(`[${MOD}] Falha ao voltar para Home`, e);
-        }
-      });
-    }
-  }
-
-  // ------------------------------
-  // Eventos de ciclo de vida
-  // ------------------------------
-  document.addEventListener('sectionLoaded', (e) => {
-    const detail = e.detail || {};
-    if (detail.sectionId !== SECTION_ID || !detail.hasNode) return;
-    const node = document.getElementById(SECTION_ID);
-    console.log(`[${MOD}] sectionLoaded:`, detail);
-    node && node.classList.remove(HIDE);
-    prepare(node);
-  });
-
-  window.addEventListener('DOMContentLoaded', () => {
-    const node = document.getElementById(SECTION_ID);
-    if (node && !node.classList.contains(HIDE)) {
-      console.log(`[${MOD}] DOMContentLoaded: preparando seção já visível`);
-      prepare(node);
-    }
-  });
 })();
