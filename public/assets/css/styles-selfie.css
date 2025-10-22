@@ -5,63 +5,140 @@
   max-width: 720px;
 }
 
-.selfie-wrap h2 {
-  font-family: 'ManufacturingConsent', sans-serif;
-  font-size: 24px;
-  color: var(--fg);
-  text-align: left;
-  margin: 0 auto;
-  max-width: 560px;
+.selfie-row {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 16px;
+  align-items: start;
 }
 
-.selfie-card {
-  background-color: var(--card);
-  border: 4px solid #8b5e3c;
-  border-image: url('/assets/img/moldura-medieval.png') 30 round;
-  padding: 20px;
-  margin: 20px auto;
-  border-radius: var(--radius);
-  box-shadow: 0 0 20px rgba(0,0,0,0.5);
-  animation: glow 3s ease-in-out infinite;
-  max-width: 560px;
+@media (max-width: 860px) {
+  .selfie-row {
+    grid-template-columns: 1fr;
+  }
+  .selfie-right {
+    max-width: 100%;
+    margin-top: 16px;
+  }
+  .guide-card {
+    max-width: 100%;
+  }
+  .flame-svg {
+    width: 50%;
+    height: 50%;
+  }
+  .guide-name {
+    font-size: clamp(20px, 4vw, 36px);
+  }
+  .user-name {
+    font-size: clamp(18px, 3.6vw, 32px);
+  }
+}
+
+.selfie-left .selfie-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.selfie-left label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 18px;
+  font-family: 'ManufacturingConsent', sans-serif;
+  color: var(--fg);
+}
+
+.selfie-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 16px;
+  font-family: 'BerkshireSwash', cursive;
+}
+
+.selfie-right {
   position: relative;
 }
 
-#guia-bg-png {
+.guide-card {
+  position: relative;
+  width: min(720px, 92vw);
+  aspect-ratio: 2/3;
+  margin: 24px auto;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #0f3b2f;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+  border: 2px solid var(--card-2);
+  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch !important;
+}
+
+.guide-bg {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: auto;
-  display: block;
+  height: 100%;
+  object-fit: cover;
 }
 
-#guia-descricao {
-  font-family: 'BerkshireSwash', cursive;
-  font-size: 16px;
-  color: var(--fg);
+.flame-layer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: opacity 900ms ease-in-out;
+  pointer-events: none;
+}
+
+.flame-svg {
+  width: 40%;
+  height: 60%;
+  transform: translateY(6%);
+  filter: drop-shadow(0 8px 28px rgba(255,180,0,0.45));
+}
+
+.guide-name {
+  position: absolute;
+  top: 3.5%;
+  left: 0;
+  right: 0;
   text-align: center;
-  margin: 10px 0;
-}
-
-.user-name-slot,
-.guide-name-slot {
-  font-family: 'BerkshireSwash', cursive;
-  font-size: 18px;
+  font-family: 'Cardo', serif;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  font-size: clamp(28px, 5vw, 56px);
   color: #f7d37a;
-  text-align: center;
-  margin: 5px 0;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
-.selfie-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: center;
-  margin: 20px auto;
-  max-width: 420px;
+.user-name {
+  position: absolute;
+  bottom: 4.5%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: 'Cardo', serif;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  font-size: clamp(26px, 4.6vw, 52px);
+  color: #f6cf6a;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
 .selfie-controls input[type="file"],
-.selfie-controls input[type="number"],
-.selfie-controls input[type="range"] {
+.selfie-controls input[type="text"],
+.selfie-controls input[type="range"],
+.selfie-controls input[type="number"] {
   padding: 8px;
   font-size: 16px;
   border: 2px solid var(--card-2);
@@ -76,8 +153,8 @@
   font-family: 'BerkshireSwash', cursive;
 }
 
-.selfie-controls input[type="number"],
-.selfie-controls input[type="range"] {
+.selfie-controls input[type="range"],
+.selfie-controls input[type="number"] {
   width: 100px;
 }
 
@@ -87,8 +164,7 @@
   display: none;
 }
 
-.selfie-controls #captureBtn,
-.selfie-controls #btnSkipSelfie {
+.selfie-actions .btn.btn-stone {
   padding: 8px 16px;
   font-size: 18px;
   border: 2px solid var(--card-2);
@@ -99,7 +175,7 @@
   background-position: center !important;
   background-color: var(--card-2) !important;
   background-blend-mode: overlay !important;
-  color: #ffd700; /* Dourado para consistência */
+  color: #ffd700;
   text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
   font-family: 'ManufacturingConsent', sans-serif;
   font-weight: bold;
@@ -111,8 +187,7 @@
   position: relative;
 }
 
-.selfie-controls #captureBtn::before,
-.selfie-controls #btnSkipSelfie::before {
+.selfie-actions .btn.btn-stone::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -121,23 +196,30 @@
   z-index: -1;
 }
 
-.selfie-controls #captureBtn:hover,
-.selfie-controls #btnSkipSelfie:hover {
+.selfie-actions .btn.btn-stone:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0,0,0,0.4);
 }
 
-.selfie-controls #captureBtn:disabled,
-.selfie-controls #btnSkipSelfie:disabled {
+.selfie-actions .btn.btn-stone:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
 }
 
-#selfieError {
-  color: #ff3333;
+.selfie-error {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 18px;
+  text-align: center;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 8px;
+  display: none;
   font-family: 'BerkshireSwash', cursive;
-  margin-top: 8px;
 }
 
 @keyframes glow {
