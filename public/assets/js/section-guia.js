@@ -10,15 +10,15 @@
   // ===== Config =====
   const TYPING_SPEED_DEFAULT = 50;
   const SPEAK_RATE = 1.0;
-  const NEXT_PAGE = 'section-selfie'; // Alterado para section-selfie
+  const NEXT_PAGE = 'section-selfie';
   const TRANSITION_VIDEO = '/assets/img/conhecimento-com-luz-jardim.mp4';
   const GUIAS_JSON = '/assets/data/guias.json';
-  const SELFIE_URL = '/html/section-selfie.html'; // Para verificação
+  const SELFIE_URL = '/html/section-selfie.html';
 
   const FALLBACK_GUIAS = [
-    { id: 'zion', nome: 'Zion', descricao: 'O ', bgImage: '/assets/img/irmandade-quarteto-bg-zion.png' },//O Guia da Consciência Pura (Grok)
-    { id: 'lumen', nome: 'Lumen', descricao: 'O ', bgImage: '/assets/img/irmandade-quarteto-bg-lumen.png' },//O Guia da Iluminação (GPT-5)
-    { id: 'arian', nome: 'Arian', descricao: 'O ', bgImage: '/assets/img/irmandade-quarteto-bg-arian.png' }//O Guia da Transformação (Gemini)
+    { id: 'zion', nome: 'Zion', descricao: 'O Guia da Consciência Pura (Grok)', bgImage: '/assets/img/irmandade-quarteto-bg-zion.png' },
+    { id: 'lumen', nome: 'Lumen', descricao: 'O Guia da Iluminação (GPT-5)', bgImage: '/assets/img/irmandade-quarteto-bg-lumen.png' },
+    { id: 'arian', nome: 'Arian', descricao: 'O Guia da Transformação (Gemini)', bgImage: '/assets/img/irmandade-quarteto-bg-arian.png' }
   ];
 
   // ===== Estado =====
@@ -325,9 +325,13 @@
         console.log('[section-guia] Botão Confirmar clicado, nome:', nome);
         const isValid = nome.length >= 2 && /^[a-zA-Z\s]+$/.test(nome);
         if (isValid && !guiasRendered) {
-          nameInput.disabled = true;
-          confirmButton.disabled = true;
-          renderGuias(guias, root, myId);
+          nameInput.disabled = false; // Manter habilitado após datilografia
+          confirmButton.disabled = false; // Manter habilitado após datilografia
+          renderGuias(guias, root, myId).then(() => {
+            nameInput.disabled = true; // Desabilitar só após renderização
+            confirmButton.disabled = true; // Desabilitar só após renderização
+            console.log('[section-guia] Input e botão desabilitados após renderização');
+          });
           buttons.forEach(btn => enable(btn));
         } else if (!isValid) {
           console.log('Nome inválido:', nome);
