@@ -5,12 +5,23 @@
     <h2 data-typing="true" data-text="O Encontro: Crie sua Selfie com o Guia" data-speed="40" data-cursor="true">
       O Encontro: Crie sua Selfie com o Guia
     </h2>
-    <div id="card-guide" class="selfie-card"></div>
+    <div id="card-guide" class="selfie-card">
+      <img id="guia-bg-png" src="" alt="Fundo do guia">
+      <div id="guia-descricao" class="guia-descricao"></div>
+      <div id="userNameSlot" class="user-name-slot"></div>
+      <div id="guideNameSlot" class="guide-name-slot"></div>
+    </div>
     <div class="selfie-controls">
       <input type="file" id="selfieInput" accept="image/*">
+      <input type="range" id="selfieScale" min="0.5" max="2" step="0.1" value="1" aria-label="Escala da imagem">
+      <input type="number" id="selfieOffsetX" value="0" aria-label="Deslocamento X da imagem">
+      <input type="number" id="selfieOffsetY" value="0" aria-label="Deslocamento Y da imagem">
+      <img id="selfieImage" style="display: none;" alt="Imagem da selfie">
       <button id="captureBtn" class="btn btn-primary" data-action="capture">Gerar Imagem</button>
       <button id="btnSkipSelfie" class="btn btn-secondary" data-action="skip-selfie">Pular e Continuar</button>
     </div>
-    <div id="selfieError" style="display:none; color: red;">Erro ao processar imagem.</div>
+    <div id="selfieError" style="display:none; color: #ff3333; font-family: 'BerkshireSwash', cursive;">
+      Erro ao processar imagem.
+    </div>
   </div>
 </div>
