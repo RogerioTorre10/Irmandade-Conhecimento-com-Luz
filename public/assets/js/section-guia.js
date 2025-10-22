@@ -16,9 +16,9 @@
   const SELFIE_URL = '/html/section-selfie.html'; // Para verificação
 
   const FALLBACK_GUIAS = [
-    { id: 'zion', nome: 'Zion', descricao: 'O Guia da Consciência Pura (Grok)', bgImage: '/assets/img/irmandade-quarteto-bg-zion.png' },
-    { id: 'lumen', nome: 'Lumen', descricao: 'O Guia da Iluminação (GPT-5)', bgImage: '/assets/img/irmandade-quarteto-bg-lumen.png' },
-    { id: 'arian', nome: 'Arian', descricao: 'O Guia da Transformação (Gemini)', bgImage: '/assets/img/irmandade-quarteto-bg-arian.png' }
+    { id: 'zion', nome: 'Zion', descricao: 'O ', bgImage: '/assets/img/irmandade-quarteto-bg-zion.png' },//O Guia da Consciência Pura (Grok)
+    { id: 'lumen', nome: 'Lumen', descricao: 'O ', bgImage: '/assets/img/irmandade-quarteto-bg-lumen.png' },//O Guia da Iluminação (GPT-5)
+    { id: 'arian', nome: 'Arian', descricao: 'O ', bgImage: '/assets/img/irmandade-quarteto-bg-arian.png' }//O Guia da Transformação (Gemini)
   ];
 
   // ===== Estado =====
