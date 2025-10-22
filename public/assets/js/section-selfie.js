@@ -69,22 +69,41 @@
     }
   }
 
-  function initSelfie(root) {
-    // Esconder section-guia
-    const guiaSection = document.getElementById('section-guia');
-    if (guiaSection) {
-      guiaSection.classList.add('hidden');
-      guiaSection.style.display = 'none';
-      guiaSection.setAttribute('aria-hidden', 'true');
-      console.log('[Selfie] Seção guia escondida');
+  async function loadGuias() {
+    try {
+      const response = await fetch('/assets/data/guias.json');
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const guias = await response.json();
+      console.log('[Selfie] Guias carregados:', guias);
+      return guias;
+    } catch (e) {
+      console.error('[Selfie] Erro ao carregar guias:', e);
+      return [
+        { id: 'zion', nome: 'Zion', descricao: 'O Guia da Consciência Pura (Grok)', bgImage: '/assets/img/irmandade-quarteto-bg-zion.png' },
+        { id: 'lumen', nome: 'Lumen', descricao: 'O Guia da Iluminação (GPT-5)', bgImage: '/assets/img/irmandade-quarteto-bg-lumen.png' },
+        { id: 'arian', nome: 'Arian', descricao: 'O Guia da Transformação (Gemini)', bgImage: '/assets/img/irmandade-quarteto-bg-arian.png' }
+      ];
     }
+  }
 
-    // Preencher nomes
+  async function initSelfie(root) {
+    // Esconder outras seções
+    const sections = document.querySelectorAll('.j-section');
+    sections.forEach(section => {
+      section.classList.add('hidden');
+      section.style.display = 'none';
+      section.setAttribute('aria-hidden', 'true');
+      console.log(`[Selfie] Seção ${section.id} escondida`);
+    });
+
+    // Preencher nomes e dados do guia
     const nameSlot = qs('#userNameSlot', root);
     const guideNameSlot = qs('#guideNameSlot', root);
+    const guiaBg = qs('#guia-bg-png', root);
+    const guiaDescricao = qs('#guia-descricao', root);
     const saved = {
       nome: sessionStorage.getItem('jornada.nome') || 'USUÁRIO',
-      guia: sessionStorage.getItem('jornada.guia') || 'GUIA'
+      guia: sessionStorage.getItem('jornada.guia') || 'zion'
     };
 
     if (nameSlot) {
@@ -96,11 +115,22 @@
       console.log('[Selfie] Nome do guia definido:', saved.guia);
     }
 
+    const guias = await loadGuias();
+    const selectedGuia = guias.find(g => g.id === saved.guia) || guias[0];
+    if (guiaBg && selectedGuia.bgImage) {
+      guiaBg.src = selectedGuia.bgImage;
+      console.log('[Selfie] Fundo do guia definido:', selectedGuia.bgImage);
+    }
+    if (guiaDescricao && selectedGuia.descricao) {
+      guiaDescricao.textContent = selectedGuia.descricao;
+      console.log('[Selfie] Descrição do guia definida:', selectedGuia.descricao);
+    }
+
     // Datilografia no título
     const title = qs('[data-typing="true"]', root);
     if (title) {
       const text = (title.dataset.text || title.textContent || '').trim();
-      runTypingAndSpeak(title, text);
+      await runTypingAndSpeak(title, text);
     }
 
     document.addEventListener('click', (e) => {
@@ -121,8 +151,8 @@
         const nameSlot = document.getElementById('userNameSlot');
         const guideNameSlot = document.getElementById('guideNameSlot');
 
-        if (!img || !bg || !nameSlot || !guideNameSlot) {
-          window.toast?.('Erro ao capturar imagem.');
+        if (!img || !img.src || !bg || !nameSlot || !guideNameSlot) {
+          window.toast?.('Erro ao capturar imagem: selecione uma imagem válida.');
           console.log('[Selfie] Elementos de imagem, fundo ou nomes não encontrados');
           return;
         }
@@ -181,6 +211,26 @@
         }
       }
     });
+
+    // Atualizar selfieImage com o arquivo selecionado
+    const selfieInput = qs('#selfieInput', root);
+    if (selfieInput) {
+      selfieInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const img = qs('#selfieImage', root);
+            if (img) {
+              img.src = event.target.result;
+              img.style.display = 'block';
+              console.log('[Selfie] Imagem selecionada:', file.name);
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
 
     console.log('[Selfie] Bloco de captura e navegação carregado');
   }
