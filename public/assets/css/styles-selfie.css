@@ -30,14 +30,24 @@
 #guia-bg-png {
   width: 100%;
   height: auto;
+  display: block;
 }
 
-#userNameSlot,
-#guideNameSlot {
+#guia-descricao {
+  font-family: 'BerkshireSwash', cursive;
+  font-size: 16px;
+  color: var(--fg);
+  text-align: center;
+  margin: 10px 0;
+}
+
+.user-name-slot,
+.guide-name-slot {
   font-family: 'BerkshireSwash', cursive;
   font-size: 18px;
   color: #f7d37a;
   text-align: center;
+  margin: 5px 0;
 }
 
 .selfie-controls {
@@ -49,7 +59,9 @@
   max-width: 420px;
 }
 
-.selfie-controls input[type="file"] {
+.selfie-controls input[type="file"],
+.selfie-controls input[type="number"],
+.selfie-controls input[type="range"] {
   padding: 8px;
   font-size: 16px;
   border: 2px solid var(--card-2);
@@ -64,6 +76,17 @@
   font-family: 'BerkshireSwash', cursive;
 }
 
+.selfie-controls input[type="number"],
+.selfie-controls input[type="range"] {
+  width: 100px;
+}
+
+.selfie-controls #selfieImage {
+  max-width: 100px;
+  max-height: 100px;
+  display: none;
+}
+
 .selfie-controls #captureBtn,
 .selfie-controls #btnSkipSelfie {
   padding: 8px 16px;
@@ -76,7 +99,7 @@
   background-position: center !important;
   background-color: var(--card-2) !important;
   background-blend-mode: overlay !important;
-  color: #ffffff;
+  color: #ffd700; /* Dourado para consistência */
   text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
   font-family: 'ManufacturingConsent', sans-serif;
   font-weight: bold;
