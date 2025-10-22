@@ -41,8 +41,8 @@
   background-position: center !important;
   background-color: var(--card-2) !important;
   background-blend-mode: overlay !important;
-  color: #ffffff;
-  text-shadow: 0 0 10px rgba(0, 0, 0, 0.9); /* Sombra ainda mais forte */
+  color: #ffd700; /* Dourado para maior contraste */
+  text-shadow: 0 0 12px rgba(0, 0, 0, 0.9); /* Sombra mais forte */
   font-family: 'ManufacturingConsent', sans-serif;
   font-weight: bold;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
@@ -57,7 +57,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7); /* Fundo mais escuro para contraste */
+  background: rgba(0, 0, 0, 0.8); /* Fundo mais opaco */
   border-radius: var(--radius);
   z-index: -1;
 }
