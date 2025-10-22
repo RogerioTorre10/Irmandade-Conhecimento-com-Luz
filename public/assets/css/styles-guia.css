@@ -30,8 +30,7 @@
   max-width: 720px;
 }
 
-.guia-options .btn-stone-espinhos,
-.guia-name-input #btn-confirmar-nome {
+.guia-options .btn-stone-espinhos {
   padding: 8px 16px;
   font-size: 18px;
   border: 2px solid var(--card-2);
@@ -41,8 +40,8 @@
   background-position: center !important;
   background-color: var(--card-2) !important;
   background-blend-mode: overlay !important;
-  color: var(--primary);
-  text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+  color: #ffffff; /* Cor branca para maior contraste */
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.7); /* Sombra mais forte */
   font-family: 'ManufacturingConsent', sans-serif;
   font-weight: bold;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
@@ -52,14 +51,12 @@
   text-align: center;
 }
 
-.guia-options .btn-stone-espinhos:hover,
-.guia-name-input #btn-confirmar-nome:hover {
+.guia-options .btn-stone-espinhos:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0,0,0,0.4);
 }
 
-.guia-options .btn-stone-espinhos:disabled,
-.guia-name-input #btn-confirmar-nome:disabled {
+.guia-options .btn-stone-espinhos:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
@@ -85,10 +82,10 @@
   padding: 8px 10px;
   font-size: 16px;
   border: 2px solid var(--card-2);
-  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
-  background-image: url('/assets/img/textura-de-pedra.jpg');
-  background-size: cover;
-  background-position: center;
+  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch !important; /* Borda medieval-espinho */
+  background-image: url('/assets/img/textura-de-pedra.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
   background-color: var(--card-2);
   background-blend-mode: overlay;
   border-radius: var(--radius);
@@ -102,6 +99,40 @@
 .guia-name-input .input-espinhos::placeholder {
   color: var(--muted);
   opacity: 0.8;
+}
+
+.guia-name-input #btn-confirmar-nome {
+  padding: 2px;
+  min-width: 24px; /* Tamanho menor, igual ao Olho Mágico */
+  min-height: 24px;
+  font-size: 12px;
+  border: none;
+  border-radius: var(--radius);
+  background-image: url('/assets/img/textura-de-pedra.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-color: var(--card-2) !important;
+  background-blend-mode: overlay !important;
+  color: var(--fg);
+  font-family: 'ManufacturingConsent', sans-serif;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guia-name-input #btn-confirmar-nome:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.guia-name-input #btn-confirmar-nome:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 @keyframes glow {
