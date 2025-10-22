@@ -11,7 +11,7 @@
   const TYPING_SPEED_DEFAULT = 50;
   const SPEAK_RATE = 1.0;
   const NEXT_PAGE = 'selfie.html';
-  const TRANSITION_VIDEO = '/assets/img/filme-senha.mp4';
+  const TRANSITION_VIDEO = '/assets/img/conhecimento-com-luz-jardim.mp4';
   const GUIAS_JSON = '/assets/data/guias.json';
 
   const FALLBACK_GUIAS = [
@@ -104,6 +104,7 @@
     container.innerHTML = '';
     console.log('Renderizando guias:', guias);
 
+    const elements = [];
     for (const guia of guias) {
       const p = document.createElement('p');
       p.className = 'guia-item';
@@ -111,9 +112,22 @@
       p.dataset.typing = 'true';
       p.dataset.speed = '50';
       p.dataset.cursor = 'true';
-      p.textContent = `${guia.nome}: ${guia.descricao}`;
+      p.dataset.text = `${guia.nome}: ${guia.descricao}`;
+      p.textContent = '';
       container.appendChild(p);
-      await runTypingAndSpeak(p, p.textContent, myId);
+      elements.push(p);
+    }
+
+    // Ordenar elementos por posição (esquerda para direita, cima para baixo)
+    const sortedElements = elements.sort((a, b) => {
+      const aRect = a.getBoundingClientRect();
+      const bRect = b.getBoundingClientRect();
+      return aRect.left - bRect.left || aRect.top - bRect.top;
+    });
+
+    for (const el of sortedElements) {
+      const text = el.dataset.text || '';
+      await runTypingAndSpeak(el, text, myId);
       if (aborted(myId)) {
         console.log('Renderização de guias abortada.');
         return;
@@ -248,19 +262,19 @@
     }
 
     if (nameInput) {
-      nameInput.addEventListener('input', () => {
-        const nome = nameInput.value.trim().toUpperCase();
-        nameInput.value = nome;
-        const isValid = nome.length >= 2 && /^[a-zA-Z\s]+$/.test(nome);
-        if (isValid && !guiasRendered) {
-          nameInput.disabled = true;
-          renderGuias(guias, root, myId);
-          buttons.forEach(btn => enable(btn));
-        } else if (!isValid) {
-          const container = qs('.guia-descricao-medieval', root);
-          container.innerHTML = '';
-          guiasRendered = false;
-          buttons.forEach(btn => disable(btn));
+      nameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const nome = nameInput.value.trim().toUpperCase();
+          nameInput.value = nome;
+          const isValid = nome.length >= 2 && /^[a-zA-Z\s]+$/.test(nome);
+          if (isValid && !guiasRendered) {
+            nameInput.disabled = true;
+            renderGuias(guias, root, myId);
+            buttons.forEach(btn => enable(btn));
+          } else if (!isValid) {
+            console.log('Nome inválido:', nome);
+            window.toast?.('Digite um nome válido (mínimo 2 letras, apenas letras e espaços).', 'warning');
+          }
         }
       });
     }
