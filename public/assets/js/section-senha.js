@@ -42,13 +42,13 @@
         direction: ltr !important;
         display: block !important;
         width: 100% !important;
-        margin-left: 0 !important;
-        margin-right: auto !important;
+        margin: 0 auto !important;
         visibility: visible !important;
         opacity: 1 !important;
       }
       #section-senha .typing-done {
         text-align: left !important;
+        margin: 0 auto !important;
         visibility: visible !important;
         opacity: 1 !important;
       }
@@ -100,8 +100,7 @@
     el.setAttribute('dir','ltr');
     el.style.display='block';
     el.style.width='100%';
-    el.style.marginLeft='0';
-    el.style.marginRight='auto';
+    el.style.margin='0 auto';
     el.style.visibility='visible';
     el.style.opacity='1';
     el.textContent='';
@@ -116,10 +115,11 @@
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
     el.style.textAlign = 'left';
+    el.style.margin = '0 auto';
     if(el.dataset.prevDir) el.setAttribute('dir', el.dataset.prevDir); else el.removeAttribute('dir');
     el.style.visibility = 'visible';
     el.style.opacity = '1';
-    console.log('Estilos restaurados para:', el.id, { textAlign: el.style.textAlign, visibility: el.style.visibility, opacity: el.style.opacity });
+    console.log('Estilos restaurados para:', el.id, { textAlign: el.style.textAlign, margin: el.style.margin, visibility: el.style.visibility, opacity: el.style.opacity });
   }
 
   async function localType(el, text, speed, myAbort){
@@ -310,7 +310,9 @@
     if (prev && !prev.__senhaBound) {
       prev.addEventListener('click', () => {
         console.log('Botão Voltar clicado, redirecionando para:', HOME_PAGE);
-        try { window.top.location.assign(HOME_PAGE); } catch { window.location.href = HOME_PAGE; }
+        setTimeout(() => {
+          try { window.location.replace(HOME_PAGE); } catch { window.location.href = HOME_PAGE; }
+        }, 100);
       });
       prev.__senhaBound = true;
     }
@@ -362,9 +364,8 @@
       p.style.display='block';
       p.style.width='100%';
       p.style.setProperty('text-align','left','important');
+      p.style.setProperty('margin','0 auto','important');
       p.setAttribute('dir','ltr');
-      p.style.marginLeft='0';
-      p.style.marginRight='auto';
       p.style.visibility='visible';
       p.style.opacity='1';
     });
