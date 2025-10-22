@@ -10,9 +10,10 @@
   // ===== Config =====
   const TYPING_SPEED_DEFAULT = 50;
   const SPEAK_RATE = 1.0;
-  const NEXT_PAGE = 'selfie.html';
+  const NEXT_PAGE = 'section-selfie'; // Alterado para section-selfie
   const TRANSITION_VIDEO = '/assets/img/conhecimento-com-luz-jardim.mp4';
   const GUIAS_JSON = '/assets/data/guias.json';
+  const SELFIE_URL = '/html/section-selfie.html'; // Para verificação
 
   const FALLBACK_GUIAS = [
     { id: 'zion', nome: 'Zion', descricao: 'O Guia da Consciência Pura (Grok)', bgImage: '/assets/img/irmandade-quarteto-bg-zion.png' },
@@ -226,36 +227,36 @@
       console.log(`[section-guia] Seção ${section.id} escondida`);
     });
 
-    // Impedir redirecionamento para section-intro
+    // Definir currentSection para evitar fallback
     if (window.JC) {
       window.JC.currentSection = 'section-guia';
-      console.log('[section-guia] Definido window.JC.currentSection como section-guia para evitar fallback');
+      console.log('[section-guia] Definido window.JC.currentSection como section-guia');
     }
 
     document.body.appendChild(video);
     console.log('Vídeo adicionado ao DOM.');
 
     video.addEventListener('ended', () => {
-      console.log('Vídeo terminado, redirecionando para:', NEXT_PAGE);
+      console.log('Vídeo terminado, navegando para:', NEXT_PAGE);
       video.remove();
       try {
-        // Verificar se selfie.html existe
-        fetch(NEXT_PAGE, { method: 'HEAD' })
+        // Verificar se section-selfie pode ser carregada
+        fetch(SELFIE_URL, { method: 'HEAD' })
           .then(response => {
             if (response.ok) {
-              window.location.href = NEXT_PAGE;
-              console.log('[section-guia] Redirecionamento para selfie.html iniciado');
+              window.JC.show(NEXT_PAGE);
+              console.log('[section-guia] Navegação para section-selfie iniciada');
             } else {
-              console.error('[section-guia] selfie.html não encontrado, status:', response.status);
+              console.error('[section-guia] section-selfie não encontrado, status:', response.status);
               window.toast?.('Erro: página selfie não encontrada.', 'error');
             }
           })
           .catch(e => {
-            console.error('[section-guia] Erro ao verificar selfie.html:', e);
+            console.error('[section-guia] Erro ao verificar section-selfie:', e);
             window.toast?.('Erro ao carregar a página selfie.', 'error');
           });
       } catch (e) {
-        console.error('[section-guia] Erro ao redirecionar para selfie.html:', e);
+        console.error('[section-guia] Erro ao navegar para section-selfie:', e);
         window.toast?.('Erro ao carregar a página selfie.', 'error');
       }
     }, { once: true });
@@ -263,24 +264,24 @@
     video.addEventListener('error', e => {
       console.error('Erro ao reproduzir vídeo:', e);
       video.remove();
-      console.log('Redirecionando para:', NEXT_PAGE, '(fallback devido a erro no vídeo)');
+      console.log('Navegando para:', NEXT_PAGE, '(fallback devido a erro no vídeo)');
       try {
-        fetch(NEXT_PAGE, { method: 'HEAD' })
+        fetch(SELFIE_URL, { method: 'HEAD' })
           .then(response => {
             if (response.ok) {
-              window.location.href = NEXT_PAGE;
-              console.log('[section-guia] Redirecionamento para selfie.html iniciado (fallback)');
+              window.JC.show(NEXT_PAGE);
+              console.log('[section-guia] Navegação para section-selfie iniciada (fallback)');
             } else {
-              console.error('[section-guia] selfie.html não encontrado, status:', response.status);
+              console.error('[section-guia] section-selfie não encontrado, status:', response.status);
               window.toast?.('Erro: página selfie não encontrada.', 'error');
             }
           })
           .catch(e => {
-            console.error('[section-guia] Erro ao verificar selfie.html:', e);
+            console.error('[section-guia] Erro ao verificar section-selfie:', e);
             window.toast?.('Erro ao carregar a página selfie.', 'error');
           });
       } catch (e) {
-        console.error('[section-guia] Erro ao redirecionar para selfie.html:', e);
+        console.error('[section-guia] Erro ao navegar para section-selfie:', e);
         window.toast?.('Erro ao carregar a página selfie.', 'error');
       }
     });
