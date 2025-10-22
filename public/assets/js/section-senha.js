@@ -208,6 +208,12 @@
 
     console.log(`[${MOD}] Preparando seção…`);
 
+    // reset typing dentro da seção
+    $$('[data-typing="true"]', root).forEach(el => {
+    el.classList.remove('typing-done');  // 🔁 permite rodar de novo
+    if (!el.dataset.text && el.textContent) el.dataset.text = el.textContent.trim();
+    el.textContent = '';                 // começa do zero
+  });
     // Título/sub com TypingBridge (se marcado)
     ensureTyping($('#senha-title', root));
     ensureTyping($('#senha-sub', root));
@@ -225,6 +231,14 @@
       msgErro.classList.remove(HIDE);
       setTimeout(() => msgErro.classList.add(HIDE), 2500);
     }
+
+    // Voltar → Home
+      if (btnVoltar) {
+      btnVoltar.addEventListener('click', () => {
+      if (window.JCSenha.state.transitioning) return;
+      window.location.assign('/');
+  });
+}
 
     // Rebind seguro (evita listeners duplicados)
     [btnValidar, btnPular, btnVoltar, btnEye].forEach((btn) => {
@@ -256,11 +270,11 @@
         await whenJCReady(2000);
 
         playTransitionThen(() => {
-          console.log(`[${MOD}] Transição concluída — seguindo para próxima seção`);
-          goNextSectionInternal();
-        });
-      });
-    }
+  console.log('[section-senha] Transição concluída — próxima seção');
+  goNextSectionInternal();  // usa JC.goNext() ou showSection('section-guia')
+});
+});
+}
 
     // Pular (sem validação; opcional do teu fluxo)
     if (btnPular) {
