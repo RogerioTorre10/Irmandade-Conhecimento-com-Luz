@@ -34,8 +34,8 @@
   function persistChoice(guia, nome) {
     try {
       sessionStorage.setItem('jornada.guia', guia || '');
-      sessionStorage.setItem('jornada.nome', nome || '');
-      console.log('Escolha persistida:', { guia, nome });
+      sessionStorage.setItem('jornada.nome', (nome || '').toUpperCase());
+      console.log('Escolha persistida:', { guia, nome: (nome || '').toUpperCase() });
     } catch (e) {
       console.error('Erro ao persistir escolha:', e);
     }
@@ -118,7 +118,6 @@
       elements.push(p);
     }
 
-    // Ordenar elementos por posição (esquerda para direita, cima para baixo)
     const sortedElements = elements.sort((a, b) => {
       const aRect = a.getBoundingClientRect();
       const bRect = b.getBoundingClientRect();
@@ -238,6 +237,7 @@
   async function bindUI(root, myId) {
     console.log('Vinculando UI para:', root);
     const nameInput = qs('#guiaNameInput', root);
+    const confirmButton = qs('#btn-confirmar-nome', root);
     const buttons = qsa('.guia-options button[data-guia]', root);
 
     const guias = await loadGuias();
@@ -261,22 +261,28 @@
       buttons.forEach(btn => disable(btn));
     }
 
-    if (nameInput) {
-      nameInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          const nome = nameInput.value.trim().toUpperCase();
-          nameInput.value = nome;
-          const isValid = nome.length >= 2 && /^[a-zA-Z\s]+$/.test(nome);
-          if (isValid && !guiasRendered) {
-            nameInput.disabled = true;
-            renderGuias(guias, root, myId);
-            buttons.forEach(btn => enable(btn));
-          } else if (!isValid) {
-            console.log('Nome inválido:', nome);
-            window.toast?.('Digite um nome válido (mínimo 2 letras, apenas letras e espaços).', 'warning');
-          }
+    if (nameInput && confirmButton) {
+      nameInput.addEventListener('input', () => {
+        nameInput.value = nameInput.value.toUpperCase();
+        console.log('[section-guia] Nome alterado:', nameInput.value);
+      });
+
+      confirmButton.addEventListener('click', () => {
+        const nome = nameInput.value.trim().toUpperCase();
+        console.log('[section-guia] Botão Confirmar clicado, nome:', nome);
+        const isValid = nome.length >= 2 && /^[a-zA-Z\s]+$/.test(nome);
+        if (isValid && !guiasRendered) {
+          nameInput.disabled = true;
+          confirmButton.disabled = true;
+          renderGuias(guias, root, myId);
+          buttons.forEach(btn => enable(btn));
+        } else if (!isValid) {
+          console.log('Nome inválido:', nome);
+          window.toast?.('Digite um nome válido (mínimo 2 letras, apenas letras e espaços).', 'warning');
         }
       });
+    } else {
+      console.error('[section-guia] Input #guiaNameInput ou botão #btn-confirmar-nome não encontrado', { nameInput, confirmButton });
     }
 
     qsa('.guia-item[data-guia]', root).forEach(item => {
@@ -370,7 +376,8 @@
           <div class="conteudo-pergaminho">
             <h2 class="titulo-pergaminho" data-typing="true" data-text="Insira seu nome" data-speed="50" data-cursor="true">Insira seu nome</h2>
             <div class="guia-name-input">
-              <input id="guiaNameInput" class="input-espinhos" type="text" placeholder="Digite seu nome para a jornada..." aria-label="Digite seu nome para a jornada" disabled>
+              <input id="guiaNameInput" class="input-espinhos" type="text" placeholder="Digite seu nome para a jornada..." aria-label="Digite seu nome para a jornada">
+              <button id="btn-confirmar-nome" class="btn btn-stone-espinhos" aria-label="Confirmar nome">Confirmar</button>
             </div>
             <div class="moldura-grande">
               <div class="guia-descricao-medieval"></div>
