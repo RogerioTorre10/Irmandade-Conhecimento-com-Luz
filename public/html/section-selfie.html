@@ -2,58 +2,44 @@
 <link rel="stylesheet" href="/assets/css/styles-selfie.css">
 <div id="jornada-content-wrapper">
   <div id="section-selfie" class="j-section pergaminho pergaminho-v epic">
-    <div class="conteudo-pergaminho">
-      <h2 data-typing="true" data-text="Entre na Irmandade ✨" data-speed="40" data-cursor="true">
-        Entre na Irmandade ✨
-      </h2>
-      <p data-typing="true" data-text="Faça uma foto ou envie da galeria. Ajuste e gere sua imagem com seu guia." data-speed="40" data-cursor="true">
-        Faça uma foto ou envie da galeria. Ajuste e gere sua imagem com seu guia.
-      </p>
-      <div class="selfie-row">
-        <div class="selfie-left">
-          <label class="btn" for="selfieInput">📸 Tirar Foto</label>
-          <input id="selfieInput" type="file" accept="image/*" capture="user" style="display:none" />
-          <div class="selfie-controls">
-            <label>Nome <input id="nameInput" type="text" placeholder="Digite seu nome"></label>
-            <label>Zoom <input id="selfieScale" type="range" min="0.8" max="2.5" step="0.01" value="1"></label>
-            <label>Horizontal <input id="selfieOffsetX" type="range" min="-50" max="50" step="1" value="0"></label>
-            <label>Vertical <input id="selfieOffsetY" type="range" min="-50" max="50" step="1" value="0"></label>
-            <small class="muted">Dica: alinhe seu rosto na chama ao lado do guia.</small>
-          </div>
-          <div class="selfie-actions">
-            <button id="previewBtn" class="btn btn-stone">✨ Ver Prévia</button>
-            <button id="captureBtn" class="btn btn-stone">⬇️ Confirmar e Baixar</button>
-            <button id="btnSkipSelfie" class="btn btn-stone" data-action="skip-selfie">Pular Foto</button>
-            <button id="btnStartJourney" class="btn btn-stone" data-action="avancar">Entrar na Jornada</button>
-          </div>
-        </div>
-        <div class="selfie-right">
-          <section id="card-guide" class="guide-card" data-guide="ZION" aria-label="Guia">
-            <img class="guide-bg" id="guideBg" src="" alt="Guia Background">
-            <div class="flame-layer" aria-hidden="true">
-              <svg class="flame-svg" viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
-                <defs>
-                  <clipPath id="flameClip">
-                    <path d="M50,20 C42,35 34,45 33,58 C32,73 41,82 50,92 C59,82 68,73 67,58 C66,45 58,35 50,20 Z" />
-                  </clipPath>
-                  <radialGradient id="flameGlow" cx="50%" cy="70%" r="55%">
-                    <stop offset="0%" stop-color="rgba(255, 224, 130, 1)"/>
-                    <stop offset="55%" stop-color="rgba(255, 180, 0, 0.9)"/>
-                    <stop offset="100%" stop-color="rgba(255, 180, 0, 0)"/>
-                  </radialGradient>
-                </defs>
-                <image id="selfieImage" href="" x="15" y="35" width="70" height="90" clip-path="url(#flameClip)" preserveAspectRatio="xMidYMid slice" />
-                <ellipse cx="50" cy="95" rx="28" ry="40" fill="url(#flameGlow)"></ellipse>
-                <path d="M50,20 C42,35 34,45 33,58 C32,73 41,82 50,92 C59,82 68,73 67,58 C66,45 58,35 50,20 Z" fill="none" stroke="rgba(255,200,0,.85)" stroke-width="1.6"/>
-              </svg>
-            </div>
-            <div class="guide-name" id="guideNameSlot"></div>
-            <div class="user-name" id="userNameSlot"></div>
-          </section>
-          <div id="selfieError" class="selfie-error">Erro ao carregar a pré-visualização. Tente novamente ou pule.</div>
-          <small class="muted">Pré-visualização</small>
-        </div>
+  <div class="conteudo-pergaminho">
+    <!-- Título -->
+    <h2 class="titulo-selfie">Tirar Foto</h2>
+
+    <!-- Nome -->
+    <div class="selfie-nome">
+      <label for="nameInput">Nome</label>
+      <input id="nameInput" type="text" placeholder="Digite seu nome" />
+    </div>
+
+    <!-- Controles e botões -->
+    <div class="selfie-controles-e-botoes">
+      <div class="selfie-controles">
+        <label>Zoom <input id="selfieScale" type="range" min="0.8" max="2.5" step="0.01" value="1" /></label>
+        <label>Horizontal <input id="selfieOffsetX" type="range" min="-50" max="50" step="1" value="0" /></label>
+        <label>Vertical <input id="selfieOffsetY" type="range" min="-50" max="50" step="1" value="0" /></label>
+      </div>
+
+      <div class="selfie-botoes-principais">
+        <button id="captureBtn" class="btn btn-stone">Confirmar e Baixar</button>
+        <button id="btnSkipSelfie" class="btn btn-stone" data-action="skip-selfie">Pular Foto</button>
+        <button id="btnStartJourney" class="btn btn-stone" data-action="avancar">Entrar na Jornada</button>
       </div>
     </div>
+
+    <!-- Ver Prévia -->
+    <div class="selfie-previa-btn">
+      <button id="previewBtn" class="btn btn-stone">Ver Prévia</button>
+    </div>
+
+    <!-- Prévia da selfie -->
+    <div class="selfie-preview">
+      <section id="card-guide" class="guide-card" data-guide="ZION" aria-label="Guia">
+        <!-- Mantenha aqui o conteúdo SVG e imagem da selfie -->
+      </section>
+    </div>
+  </div>
+</div>
+
   </div>
 </div>
