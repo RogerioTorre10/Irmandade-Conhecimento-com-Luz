@@ -1,451 +1,308 @@
+// /assets/js/section-senha.js  · seguro, idempotente, sem loops
 (function () {
   'use strict';
 
-  if (window.JCSenha?.__bound_v13_2) {
-    window.JCSenha.__kick?.(/*force*/true);
+  const MOD = 'section-senha.js';
+  const SECTION_ID = 'section-senha';
+  const NEXT_SECTION_ID = 'section-guia';      // Próxima seção (navegação interna)
+  const HOME_PAGE = '/';                       // Voltar para Home
+  const HIDE = 'hidden';
+
+  // Vídeo de transição (ajuste se o teu caminho for diferente)
+  const TRANSITION_SRC = '/assets/img/filme-senha.mp4';
+  const TRANSITION_TIMEOUT_MS = 8000;          // timeout de segurança
+
+  // Evita reinicialização
+  if (window.JCSenha && window.JCSenha.__bound) {
+    console.log(`[${MOD}] Já inicializado, ignorando`);
     return;
   }
 
-  // ===== Config =====
-  const TYPE_MS = 50;          // ms/char (alinhado com section-guia)
-  const PAUSE_BETWEEN_P = 100; // pausa entre parágrafos
-  const EST_WPM = 160;         // fallback p/ TTS
-  const EST_CPS = 13;
-  const TRANSITION_SRC = '/assets/img/filme-senha.mp4';
-  const NEXT_PAGE = '/jornada-conhecimento-com-luz1.html';
-  const FALLBACK_PAGE = '/selfie.html';
-  const HOME_PAGE = '/';
-
-  // ===== Estado / Namespace =====
-  window.JCSenha = window.JCSenha || {};
-  window.JCSenha.__bound_v13_2 = true;
-  window.JCSenha.state = {
-    running: false,
-    transitioning: false,
-    initialized: false,
-    observer: null,
-    abortId: 0
+  window.JCSenha = {
+    __bound: true,
+    state: {
+      prepared: false,
+      validated: false,
+      transitioning: false,
+      navigated: false
+    }
   };
 
-  // ===== Utils =====
-  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-  const qs = (s, r=document) => r.querySelector(s);
+  // ------------------------------
+  // Utils
+  // ------------------------------
+  const $  = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-  // CSS para garantir E→D durante digitação
-  (function injectCSS(){
-    if (document.getElementById('jc-senha-align-patch-v13_2')) return;
-    const s = document.createElement('style');
-    s.id='jc-senha-align-patch-v13_2';
-    s.textContent = `
-      #section-senha .typing-active {
-        text-align: left !important;
-        direction: ltr !important;
-        display: block !important;
-        width: 100% !important;
-        margin: 0 auto !important;
-        visibility: visible !important;
-        opacity: 1 !important;
+  function ensureTyping(node) {
+    try {
+      if (node && node.dataset && node.dataset.text && typeof window.applyTyping === 'function') {
+        window.applyTyping(node);
       }
-      #section-senha .typing-done {
-        text-align: left !important;
-        margin: 0 auto !important;
-        visibility: visible !important;
-        opacity: 1 !important;
+    } catch (e) {
+      console.warn(`[${MOD}] TypingBridge indisponível`, e);
+    }
+  }
+
+  // Aceita #input-senha ou #senha-input (compatibilidade)
+  function getPasswordInput(root) {
+    return $('#input-senha', root) || $('#senha-input', root);
+  }
+
+  // ------------------------------
+  // Validação (troque pela tua regra/API quando quiser)
+  // ------------------------------
+  function validatePassword(value) {
+    const v = (value || '').trim();
+    // regra mínima para UI: 3+ chars
+    return v.length >= 3;
+  }
+
+  // ------------------------------
+  // Navegação interna segura
+  // ------------------------------
+  function goNextSectionInternal() {
+    if (window.JCSenha.state.navigated) {
+      console.log(`[${MOD}] Navegação já feita — ignorando`);
+      return;
+    }
+    window.JCSenha.state.navigated = true;
+
+    try {
+      document.dispatchEvent(new CustomEvent('sectionCompleted', { detail: { sectionId: SECTION_ID } }));
+    } catch (e) {
+      console.warn(`[${MOD}] Falha ao despachar sectionCompleted`, e);
+    }
+
+    if (window.JC && typeof window.JC.goNext === 'function') {
+      try {
+        console.log(`[${MOD}] Navegando via JC.goNext()`);
+        window.JC.goNext();
+        return;
+      } catch (e) {
+        console.warn(`[${MOD}] Erro em JC.goNext`, e);
       }
-    `;
-    document.head.appendChild(s);
-  })();
+    }
 
-  const sel = {
-    root:  '#section-senha',
-    p1:    '#senha-instr1',
-    p2:    '#senha-instr2',
-    p3:    '#senha-instr3',
-    p4:    '#senha-instr4',
-    input: '#senha-input',
-    toggle: '.btn-toggle-senha, [data-action="toggle-password"]',
-    next:  '#btn-senha-avancar',
-    prev:  '#btn-senha-prev'
-  };
-
-  function pick(root){
-    return {
-      root,
-      p1: root.querySelector(sel.p1),
-      p2: root.querySelector(sel.p2),
-      p3: root.querySelector(sel.p3),
-      p4: root.querySelector(sel.p4),
-      input: root.querySelector(sel.input),
-      toggle: root.querySelector(sel.toggle),
-      next: root.querySelector(sel.next),
-      prev: root.querySelector(sel.prev),
-    };
+    if (typeof window.showSection === 'function') {
+      try {
+        console.log(`[${MOD}] Fallback interno: showSection('${NEXT_SECTION_ID}')`);
+        window.showSection(NEXT_SECTION_ID);
+      } catch (e) {
+        console.error(`[${MOD}] showSection falhou`, e);
+      }
+    } else {
+      console.warn(`[${MOD}] Sem JC.goNext/showSection disponíveis no momento`);
+    }
   }
 
-  function ensureDataText(el){
-    if(!el) return false;
-    const ds=(el.dataset?.text||'').trim();
-    const tc=(el.textContent||'').trim();
-    const src=ds||tc;
-    if(!src) return false;
-    el.dataset.text=src;
-    return true;
-  }
-
-  function prepareTyping(el){
-    if(!el) return false;
-    if(!('prevAlign' in el.dataset)) el.dataset.prevAlign=el.style.textAlign||'';
-    if(!('prevDir' in el.dataset))   el.dataset.prevDir  =el.getAttribute('dir')||'';
-    el.style.setProperty('text-align','left','important');
-    el.setAttribute('dir','ltr');
-    el.style.display='block';
-    el.style.width='100%';
-    el.style.margin='0 auto';
-    el.style.visibility='visible';
-    el.style.opacity='1';
-    el.textContent='';
-    el.classList.remove('typing-done');
-    el.classList.add('typing-active');
-    delete el.dataset.spoken;
-    return true;
-  }
-
-  function restoreTyping(el){
-    if(!el) return;
-    el.classList.remove('typing-active');
-    el.classList.add('typing-done');
-    el.style.textAlign = 'left';
-    el.style.margin = '0 auto';
-    if(el.dataset.prevDir) el.setAttribute('dir', el.dataset.prevDir); else el.removeAttribute('dir');
-    el.style.visibility = 'visible';
-    el.style.opacity = '1';
-    console.log('Estilos restaurados para:', el.id, { textAlign: el.style.textAlign, margin: el.style.margin, visibility: el.style.visibility, opacity: el.style.opacity });
-  }
-
-  async function localType(el, text, speed, myAbort){
-    return new Promise(resolve=>{
-      let i=0; el.textContent='';
-      const tick=()=>{ 
-        if(myAbort.cancelled()) { restoreTyping(el); return resolve(); }
-        if(i < text.length){ el.textContent += text.charAt(i++); setTimeout(tick, speed); }
-        else resolve();
-      };
-      tick();
+  function whenJCReady(timeoutMs = 2000) {
+    return new Promise((resolve) => {
+      if (window.JC && typeof window.JC.init === 'function') return resolve(true);
+      let elapsed = 0;
+      const step = 100;
+      const t = setInterval(() => {
+        elapsed += step;
+        if (window.JC && typeof window.JC.init === 'function') {
+          clearInterval(t);
+          resolve(true);
+        } else if (elapsed >= timeoutMs) {
+          clearInterval(t);
+          resolve(false);
+        }
+      }, step);
     });
   }
 
-  function estSpeakMs(text){
-    const t=(text||'').trim(); if(!t) return 1000;
-    const words=t.split(/\s+/).length;
-    const byWpm=(words/EST_WPM)*60000;
-    const byCps=(t.length/EST_CPS)*1000;
-    return Math.max(byWpm, byCps, 1000);
-  }
-
-  async function speakOnce(text, myAbort){
-    if(!text || myAbort.cancelled()) return;
-    try{
-      if(window.EffectCoordinator?.speak){
-        const r=window.EffectCoordinator.speak(text, { rate: 1.0 });
-        if(r && typeof r.then==='function'){
-          console.log('Iniciando TTS para:', text);
-          await Promise.race([r, (async()=>{while(!myAbort.cancelled()) await sleep(20);})()]);
-          console.log('TTS concluído:', text);
-          return;
-        }
-      }
-    }catch(e){
-      console.error('Erro no TTS:', e);
-    }
-    console.warn('TTS não disponível, usando estimativa para:', text);
-    const ms = estSpeakMs(text);
-    const t0 = Date.now();
-    while(!myAbort.cancelled() && (Date.now()-t0)<ms) await sleep(20);
-  }
-
-  function makeAbortToken(){
-    const myId = ++window.JCSenha.state.abortId;
-    return { id: myId, cancelled: ()=> myId !== window.JCSenha.state.abortId };
-  }
-
-  async function typeOnce(el, myAbort){
-    if(!el || myAbort.cancelled()) return '';
-    const text=(el.dataset?.text||'').trim(); if(!text) return '';
-    console.log('Iniciando datilografia para:', text);
-    prepareTyping(el);
-    await localType(el, text, TYPE_MS, myAbort);
-    if(!myAbort.cancelled()) {
-      restoreTyping(el);
-      console.log('Datilografia concluída:', text);
-    }
-    return myAbort.cancelled()? '' : text;
-  }
-
-  function getSeq(root){
-    const {p1,p2,p3,p4} = pick(root);
-    return [p1,p2,p3,p4].filter(Boolean);
-  }
-
-  function forceRedirect(){
-    console.log('Forçando redirecionamento para:', NEXT_PAGE);
-    setTimeout(() => {
-      try {
-        window.location.replace(NEXT_PAGE);
-      } catch (e) {
-        console.warn('window.location.replace falhou para:', NEXT_PAGE, 'tentando assign:', FALLBACK_PAGE);
-        try {
-          window.location.assign(FALLBACK_PAGE);
-        } catch (e) {
-          console.warn('window.location.assign falhou, tentando href:', FALLBACK_PAGE);
-          try {
-            window.location.href = FALLBACK_PAGE;
-          } catch (e) {
-            console.error('Fallback falhou, tentando última opção:', HOME_PAGE);
-            window.location.href = HOME_PAGE;
-          }
-        }
-      }
-    }, 100);
-  }
-
-  function playTransitionThen(nextStep){
-    if (document.getElementById('senha-transition-overlay') || window.JCSenha.state.transitioning) {
-      console.warn('Transição já em andamento ou flag transitioning ativa, ignorando.');
+  // ------------------------------
+  // Transição com vídeo (overlay, sem recarregar página)
+  // ------------------------------
+  function playTransitionThen(cb) {
+    if (window.JCSenha.state.transitioning) {
+      console.log(`[${MOD}] Já em transição — ignorando novo pedido`);
       return;
     }
     window.JCSenha.state.transitioning = true;
-    console.log('Iniciando transição de vídeo:', TRANSITION_SRC);
-    document.body.style.background = 'white';
+
     const overlay = document.createElement('div');
-    overlay.id = 'senha-transition-overlay';
-    overlay.style.cssText = `
-      position: fixed; inset: 0; background: white; z-index: 999999;
-      display: flex; align-items: center; justify-content: center;`;
-    const loader = document.createElement('div');
-    loader.textContent = 'Carregando...';
-    loader.style.cssText = `
-      color: #333; font-family: 'BerkshireSwash', cursive; font-size: 24px;
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);`;
+    overlay.setAttribute('data-senha-overlay', 'true');
+    Object.assign(overlay.style, {
+      position: 'fixed',
+      inset: '0',
+      background: 'black',
+      display: 'grid',
+      placeItems: 'center',
+      zIndex: '999999'
+    });
+
     const video = document.createElement('video');
-    video.src = TRANSITION_SRC;
-    video.autoplay = true;
-    video.muted = true;
     video.playsInline = true;
-    video.controls = false;
-    video.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
-    
-    // Limpar DOM e listeners para evitar loops
-    document.body.innerHTML = '';
-    document.removeEventListener('section:shown', window.JCSenha.__sectionShownHandler);
+    video.autoplay = true;
+    video.muted = true; // se precisar som, mude para false (atenção ao autoplay)
+    video.src = TRANSITION_SRC;
+    video.style.maxWidth = '100%';
+    video.style.maxHeight = '100%';
+
+    const loader = document.createElement('div');
+    loader.textContent = 'Carregando…';
+    Object.assign(loader.style, {
+      position: 'absolute',
+      bottom: '24px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      color: 'white',
+      fontFamily: 'Cardo, serif',
+      fontSize: '18px',
+      opacity: '0.8'
+    });
+
+    // NÃO limpar body — evita reset e loops; apenas sobrepõe
     document.body.appendChild(overlay);
     overlay.appendChild(video);
     overlay.appendChild(loader);
-    console.log('Vídeo e loader adicionados ao DOM.');
+    console.log(`[${MOD}] Overlay e vídeo adicionados ao DOM`);
 
     let done = false;
-    const cleanup = () => {
-      if (done) return; done = true;
-      try { video.pause(); } catch {}
-      overlay.remove();
-      document.body.style.background = '';
-      console.log('Transição concluída, executando próximo passo.');
-      if (typeof nextStep === 'function') nextStep();
+    function cleanup() {
+      if (done) return;
+      done = true;
+      try { overlay.remove(); } catch {}
       window.JCSenha.state.transitioning = false;
-    };
+    }
+
+    function finish() {
+      cleanup();
+      try { cb && cb(); } catch (e) { console.error(`[${MOD}] Erro no callback pós-transição`, e); }
+    }
+
+    const timeout = setTimeout(() => {
+      console.warn(`[${MOD}] Timeout da transição (${TRANSITION_TIMEOUT_MS}ms) — navegando internamente`);
+      finish();
+    }, TRANSITION_TIMEOUT_MS);
 
     video.addEventListener('ended', () => {
-      console.log('Vídeo terminou, limpando e redirecionando para:', NEXT_PAGE);
-      cleanup();
-      forceRedirect();
+      console.log(`[${MOD}] Vídeo terminou — navegando internamente`);
+      clearTimeout(timeout);
+      finish();
     }, { once: true });
+
     video.addEventListener('error', () => {
-      console.error('Erro ao reproduzir vídeo:', TRANSITION_SRC);
-      console.log('Redirecionando para:', NEXT_PAGE, '(fallback devido a erro no vídeo)');
-      cleanup();
-      forceRedirect();
+      console.error(`[${MOD}] Erro ao reproduzir vídeo: ${TRANSITION_SRC} — navegando internamente`);
+      clearTimeout(timeout);
+      finish();
     }, { once: true });
-    setTimeout(() => {
-      if (!done) {
-        console.log('Timeout do vídeo atingido, forçando redirecionamento para:', NEXT_PAGE);
-        cleanup();
-        forceRedirect();
-      }
-    }, 8000);
 
     Promise.resolve().then(() => video.play?.()).catch(() => {
-      console.warn('Erro ao iniciar vídeo, redirecionando para:', NEXT_PAGE);
-      cleanup();
-      forceRedirect();
+      console.warn(`[${MOD}] Falha ao iniciar play() — navegando internamente`);
+      clearTimeout(timeout);
+      finish();
     });
   }
 
-  function bindControls(root){
-    const { input, toggle, next, prev } = pick(root);
-    prev?.removeAttribute('disabled');
-    next?.removeAttribute('disabled');
-    input?.removeAttribute('disabled');
-    toggle?.removeAttribute('disabled');
+  // ------------------------------
+  // Preparação da seção (bindings idempotentes)
+  // ------------------------------
+  function prepare(root) {
+    if (!root || window.JCSenha.state.prepared) return;
+    window.JCSenha.state.prepared = true;
 
-    console.log('Controles vinculados:', { input: !!input, toggle: !!toggle, next: !!next, prev: !!prev });
+    console.log(`[${MOD}] Preparando seção…`);
 
-    if (toggle && !toggle.__senhaBound) {
-      toggle.addEventListener('click', () => {
-        if (!input) {
-          console.error('Input #senha-input não encontrado para toggle.');
-          return;
-        }
-        input.type = input.type === 'password' ? 'text' : 'password';
-        console.log('Botão toggle clicado, tipo do input:', input.type);
-      });
-      toggle.__senhaBound = true;
+    // Título/sub com TypingBridge (se marcado)
+    ensureTyping($('#senha-title', root));
+    ensureTyping($('#senha-sub', root));
+
+    const input = getPasswordInput(root);
+    const btnValidar = $('#btn-validar-senha', root);
+    const btnPular   = $('#btn-skip-senha', root);
+    const btnVoltar  = $('#btn-voltar-senha', root);
+    const btnEye     = $('#btn-eye-senha', root);
+    const msgErro    = $('#senha-error', root);
+
+    function showError(text) {
+      if (!msgErro) return;
+      msgErro.textContent = text || 'Senha inválida.';
+      msgErro.classList.remove(HIDE);
+      setTimeout(() => msgErro.classList.add(HIDE), 2500);
     }
 
-    if (input && !input.__senhaBound) {
-      input.addEventListener('input', () => {
-        console.log('Input #senha-input alterado, valor:', input.value);
+    // Rebind seguro (evita listeners duplicados)
+    [btnValidar, btnPular, btnVoltar, btnEye].forEach((btn) => {
+      if (!btn) return;
+      if (btn.__senhaBound) return;
+      btn.__senhaBound = true;
+    });
+
+    // 👁️ Alternar visibilidade da senha (olho fora do input)
+    if (btnEye && input) {
+      btnEye.addEventListener('click', () => {
+        const isPwd = input.type === 'password';
+        input.type = isPwd ? 'text' : 'password';
+        btnEye.setAttribute('aria-pressed', String(isPwd));
       });
-      input.__senhaBound = true;
     }
 
-    if (prev && !prev.__senhaBound) {
-      prev.addEventListener('click', () => {
-        console.log('Botão Voltar clicado, redirecionando para:', HOME_PAGE);
-        setTimeout(() => {
-          try { window.location.replace(HOME_PAGE); } catch { window.location.href = HOME_PAGE; }
-        }, 100);
-      });
-      prev.__senhaBound = true;
-    }
+    // Validar / Avançar (tocar vídeo e navegar internamente ao final)
+    if (btnValidar) {
+      btnValidar.addEventListener('click', async () => {
+        if (window.JCSenha.state.transitioning || window.JCSenha.state.navigated) return;
+        const value = (input?.value || '').trim();
+        if (!validatePassword(value)) {
+          showError('Senha incorreta. Tente novamente.');
+          try { input?.focus(); } catch {}
+          return;
+        }
+        window.JCSenha.state.validated = true;
+        await whenJCReady(2000);
 
-    if (next && !next.__senhaBound) {
-      next.addEventListener('click', () => {
-        if (!input) {
-          console.error('Input #senha-input não encontrado para avançar.');
-          return;
-        }
-        const senha=(input.value||'').trim();
-        if (senha.length < 3) {
-          window.toast?.('Digite uma Palavra-Chave válida.', 'warning');
-          try{ input.focus(); }catch{}
-          return;
-        }
-        console.log('Botão Avançar clicado, senha válida:', senha);
         playTransitionThen(() => {
-          console.log('Navegação para:', NEXT_PAGE);
-          forceRedirect();
+          console.log(`[${MOD}] Transição concluída — seguindo para próxima seção`);
+          goNextSectionInternal();
         });
       });
-      next.__senhaBound = true;
+    }
+
+    // Pular (sem validação; opcional do teu fluxo)
+    if (btnPular) {
+      btnPular.addEventListener('click', async () => {
+        if (window.JCSenha.state.transitioning || window.JCSenha.state.navigated) return;
+        await whenJCReady(1500);
+        playTransitionThen(() => {
+          console.log(`[${MOD}] Pulo com transição — seguindo para próxima seção`);
+          goNextSectionInternal();
+        });
+      });
+    }
+
+    // Voltar (com textura de pedra; leva para HOME)
+    if (btnVoltar) {
+      btnVoltar.addEventListener('click', () => {
+        if (window.JCSenha.state.transitioning) return;
+        console.log(`[${MOD}] Voltar acionado — indo para Home`);
+        try { window.location.assign(HOME_PAGE); } catch (e) {
+          console.warn(`[${MOD}] Falha ao voltar para Home`, e);
+        }
+      });
     }
   }
 
-  async function runSequence(root){
-    if(!root || window.JCSenha.state.running) {
-      console.warn('runSequence ignorado: root ausente ou já em execução.');
-      return;
+  // ------------------------------
+  // Eventos de ciclo de vida
+  // ------------------------------
+  document.addEventListener('sectionLoaded', (e) => {
+    const detail = e.detail || {};
+    if (detail.sectionId !== SECTION_ID || !detail.hasNode) return;
+    const node = document.getElementById(SECTION_ID);
+    console.log(`[${MOD}] sectionLoaded:`, detail);
+    node && node.classList.remove(HIDE);
+    prepare(node);
+  });
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const node = document.getElementById(SECTION_ID);
+    if (node && !node.classList.contains(HIDE)) {
+      console.log(`[${MOD}] DOMContentLoaded: preparando seção já visível`);
+      prepare(node);
     }
-
-    window.JCSenha.state.running = true;
-    const myAbort = makeAbortToken();
-
-    const seq = getSeq(root);
-    if (seq.length === 0) {
-      console.warn('Nenhum parágrafo encontrado para datilografia:', sel);
-      window.JCSenha.state.running=false;
-      return;
-    }
-
-    console.log('Parágrafos encontrados para datilografia:', seq.map(p => p.id));
-
-    seq.forEach(p=>{
-      if(ensureDataText(p)) p.textContent='';
-      p.classList.remove('typing-done','typing-active');
-      delete p.dataset.spoken;
-      p.style.display='block';
-      p.style.width='100%';
-      p.style.setProperty('text-align','left','important');
-      p.style.setProperty('margin','0 auto','important');
-      p.setAttribute('dir','ltr');
-      p.style.visibility='visible';
-      p.style.opacity='1';
-    });
-
-    for (const p of seq){
-      if (myAbort.cancelled()) break;
-      const text = await typeOnce(p, myAbort);
-      if (myAbort.cancelled()) break;
-      if (text && !p.dataset.spoken){
-        await speakOnce(text, myAbort);
-        if (myAbort.cancelled()) break;
-        p.dataset.spoken='true';
-      }
-      const t0=Date.now();
-      while(!myAbort.cancelled() && (Date.now()-t0)<PAUSE_BETWEEN_P) await sleep(10);
-      await sleep(200);
-    }
-
-    if (!myAbort.cancelled()) {
-      const { input, toggle, next, prev } = pick(root);
-      if (input) input.removeAttribute('disabled');
-      if (toggle) toggle.removeAttribute('disabled');
-      if (next) next.removeAttribute('disabled');
-      if (prev) prev.removeAttribute('disabled');
-      console.log('Sequência de datilografia concluída, habilitando controles.');
-    }
-
-    window.JCSenha.state.running = false;
-  }
-
-  function tryKick(){
-    if (window.JCSenha.state.transitioning || window.JCSenha.state.initialized) {
-      console.warn('Transição em andamento ou já inicializado, ignorando tryKick.');
-      return false;
-    }
-    const root = qs(sel.root);
-    if(!root) {
-      console.warn('Root #section-senha não encontrado.');
-      return false;
-    }
-
-    console.log('Iniciando section-senha...');
-    window.JCSenha.state.initialized = true;
-    root.classList.remove('hidden');
-    root.setAttribute('aria-hidden','false');
-    root.style.removeProperty('display');
-    root.style.removeProperty('opacity');
-    root.style.removeProperty('visibility');
-
-    bindControls(root);
-    runSequence(root);
-    return true;
-  }
-
-  // API pública
-  window.JCSenha.__kick = tryKick;
-
-  // Inicialização com espera maior para sincronizar com vídeo
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('DOMContentLoaded disparado, esperando 11000ms...');
-      sleep(11000).then(tryKick);
-    }, {once: true});
-  } else {
-    console.log('DOM já carregado, esperando 11000ms...');
-    sleep(11000).then(tryKick);
-  }
-
-  // Eventos oficiais: iniciar/abortar com base na seção
-  window.JCSenha.__sectionShownHandler = (evt) => {
-    const id = evt?.detail?.sectionId;
-    if(!id) return;
-    if (id === 'section-senha' && !window.JCSenha.state.transitioning && !window.JCSenha.state.initialized) {
-      window.JCSenha.state.abortId++;
-      console.log('section:shown para section-senha, esperando 11000ms...');
-      sleep(11000).then(tryKick);
-    } else {
-      window.JCSenha.state.abortId++;
-      console.log('section:shown ignorado para:', id);
-    }
-  };
-  document.addEventListener('section:shown', window.JCSenha.__sectionShownHandler);
+  });
 })();
