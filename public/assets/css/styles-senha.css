@@ -55,7 +55,7 @@
   align-items: center;
   justify-content: center;
   opacity: 1 !important;
-  z-index: 10; /* Garante que o botão esteja acima do input */
+  z-index: 10;
   pointer-events: auto !important;
 }
 
