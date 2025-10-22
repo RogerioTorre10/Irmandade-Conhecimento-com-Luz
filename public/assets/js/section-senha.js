@@ -6,6 +6,7 @@
   const NEXT_SECTION_ID = 'section-guia';      // Próxima seção (navegação interna)
   const HOME_PAGE = '/';                       // Voltar para Home
   const HIDE = 'hidden';
+  const INITIAL_TYPING_DELAY_MS = 2000;       // Atraso inicial para sincronizar com vídeo
 
   // Vídeo de transição (ajuste se o teu caminho for diferente)
   const TRANSITION_SRC = '/assets/img/filme-senha.mp4';
@@ -159,7 +160,14 @@
     window.JCSenha.state.typingInProgress = true;
 
     const { instr1, instr2, instr3, instr4, input, btnNext, btnPrev } = pickElements(root);
-    const seq = [instr1, instr2, instr3, instr4].filter(Boolean);
+    // Ordena parágrafos pela posição x (esquerda para direita)
+    const seq = [instr1, instr2, instr3, instr4]
+      .filter(Boolean)
+      .sort((a, b) => {
+        const aRect = a.getBoundingClientRect();
+        const bRect = b.getBoundingClientRect();
+        return aRect.left - bRect.left || aRect.top - bRect.top;
+      });
 
     // Desabilita navegação durante a digitação
     btnPrev?.setAttribute('disabled', 'true');
@@ -167,6 +175,9 @@
 
     // Normaliza todos antes (evita TTS prematuro)
     seq.forEach(normalizeParagraph);
+
+    // Atraso inicial para sincronizar com o vídeo
+    await sleep(INITIAL_TYPING_DELAY_MS);
 
     await waitForTypingBridge();
 
