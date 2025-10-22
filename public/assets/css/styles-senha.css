@@ -54,6 +54,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 1 !important;
+  z-index: 10; /* Garante que o botão esteja acima do input */
+  pointer-events: auto !important;
 }
 
 /* Botões lado a lado com textura de pedra */
@@ -88,6 +91,7 @@
   width: 140px;
   text-align: center;
   position: relative !important;
+  pointer-events: auto !important;
 }
 
 .senha-actions .btn-stone:hover,
@@ -102,6 +106,7 @@
 .senha-actions #btn-senha-avancar:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  pointer-events: none !important;
 }
 
 /* Mantém conteúdo estável e centralizado antes/depois da datilografia */
