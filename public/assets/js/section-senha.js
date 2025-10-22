@@ -201,7 +201,7 @@
     if (window.JCSenha.state.typingInProgress) return;
     window.JCSenha.state.typingInProgress = true;
 
-    const { instr1, instr2, instr3, instr4, input, btnNext, btnPrev } = pickElements(root);
+    const { instr1, instr2, instr3, instr4, input, btnNext, btnPrev, toggle } = pickElements(root);
     const seq = [instr1, instr2, instr3, instr4]
       .filter(Boolean)
       .sort((a, b) => {
@@ -213,6 +213,7 @@
     btnPrev?.setAttribute('disabled', 'true');
     btnNext?.setAttribute('disabled', 'true');
     input?.setAttribute('disabled', 'true');
+    toggle?.setAttribute('disabled', 'true');
 
     seq.forEach(normalizeParagraph);
 
@@ -229,8 +230,10 @@
 
     btnPrev?.removeAttribute('disabled');
     btnNext?.removeAttribute('disabled');
+    input?.removeAttribute('disabled');
+    toggle?.removeAttribute('disabled');
+
     if (input) {
-      input.removeAttribute('disabled');
       input.removeAttribute('readonly');
       try {
         input.focus();
@@ -293,6 +296,7 @@
     btnPrev?.setAttribute('disabled', 'true');
     btnNext?.setAttribute('disabled', 'true');
     input?.setAttribute('disabled', 'true');
+    toggle?.setAttribute('disabled', 'true');
 
     if (toggle && input) {
       toggle.addEventListener('click', () => {
@@ -344,6 +348,12 @@
       });
     } else {
       console.error('[JCSenha] Input #senha-input não encontrado na inicialização');
+    }
+
+    if (toggle) {
+      toggle.removeAttribute('disabled');
+    } else {
+      console.error('[JCSenha] Botão .btn-toggle-senha não encontrado na inicialização');
     }
 
     [instr1, instr2, instr3, instr4].filter(Boolean).forEach(normalizeParagraph);
