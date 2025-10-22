@@ -1,47 +1,83 @@
 /* ========== SEÇÃO SELFIE ========== */
-.guia-descricao-medieval {
-  background-color: var(--card);
+.selfie-wrap {
+  text-align: center;
+  margin: 20px auto;
+  max-width: 720px;
+}
+
+.selfie-wrap h2 {
+  font-family: 'ManufacturingConsent', sans-serif;
+  font-size: 24px;
   color: var(--fg);
+  text-align: left;
+  margin: 0 auto;
+  max-width: 560px;
+}
+
+.selfie-card {
+  background-color: var(--card);
   border: 4px solid #8b5e3c;
   border-image: url('/assets/img/moldura-medieval.png') 30 round;
   padding: 20px;
   margin: 20px auto;
-  font-family: 'BerkshireSwash', cursive;
-  font-size: 18px;
   border-radius: var(--radius);
   box-shadow: 0 0 20px rgba(0,0,0,0.5);
   animation: glow 3s ease-in-out infinite;
   max-width: 560px;
+  position: relative;
 }
 
-.guia-item {
-  margin-bottom: 10px;
-  font-size: 16px;
-  color: var(--fg);
-  text-align: left;
+#guia-bg-png {
+  width: 100%;
+  height: auto;
 }
 
-.guia-options {
+#userNameSlot,
+#guideNameSlot {
+  font-family: 'BerkshireSwash', cursive;
+  font-size: 18px;
+  color: #f7d37a;
+  text-align: center;
+}
+
+.selfie-controls {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   justify-content: center;
   margin: 20px auto;
-  max-width: 720px;
+  max-width: 420px;
 }
 
-.guia-options .btn.btn-stone-espinhos {
+.selfie-controls input[type="file"] {
+  padding: 8px;
+  font-size: 16px;
+  border: 2px solid var(--card-2);
+  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch !important;
+  background-image: url('/assets/img/textura-de-pedra.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-color: var(--card-2);
+  background-blend-mode: overlay;
+  border-radius: var(--radius);
+  color: var(--fg);
+  font-family: 'BerkshireSwash', cursive;
+}
+
+.selfie-controls #captureBtn,
+.selfie-controls #btnSkipSelfie {
   padding: 8px 16px;
   font-size: 18px;
   border: 2px solid var(--card-2);
+  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch !important;
   border-radius: var(--radius);
   background-image: url('/assets/img/textura-de-pedra.jpg') !important;
   background-size: cover !important;
   background-position: center !important;
   background-color: var(--card-2) !important;
   background-blend-mode: overlay !important;
-  color: #ffffff; /* Cor branca para contraste */
-  text-shadow: 0 0 8px rgba(0, 0, 0, 0.8); /* Sombra mais forte */
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
   font-family: 'ManufacturingConsent', sans-serif;
   font-weight: bold;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
@@ -52,106 +88,33 @@
   position: relative;
 }
 
-.guia-options .btn.btn-stone-espinhos::before {
+.selfie-controls #captureBtn::before,
+.selfie-controls #btnSkipSelfie::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5); /* Fundo semi-opaco para contraste */
+  background: rgba(0, 0, 0, 0.7);
   border-radius: var(--radius);
   z-index: -1;
 }
 
-.guia-options .btn.btn-stone-espinhos:hover {
+.selfie-controls #captureBtn:hover,
+.selfie-controls #btnSkipSelfie:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0,0,0,0.4);
 }
 
-.guia-options .btn.btn-stone-espinhos:disabled {
+.selfie-controls #captureBtn:disabled,
+.selfie-controls #btnSkipSelfie:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
 }
 
-.guia-selected {
-  background: rgba(255, 215, 0, 0.2);
-  border: 2px solid gold;
-  padding: 5px;
-  border-radius: var(--radius);
-}
-
-.guia-name-input {
-  position: relative;
-  margin: 20px auto;
-  max-width: 420px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.guia-name-input .input-espinhos {
-  padding: 8px 10px;
-  font-size: 16px;
-  border: 2px solid var(--card-2);
-  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch !important;
-  background-image: url('/assets/img/textura-de-pedra.jpg') !important;
-  background-size: cover !important;
-  background-position: center !important;
-  background-color: var(--card-2);
-  background-blend-mode: overlay;
-  border-radius: var(--radius);
-  width: 100%;
-  color: var(--fg);
+#selfieError {
+  color: #ff3333;
   font-family: 'BerkshireSwash', cursive;
-  caret-color: var(--fg);
-  text-transform: uppercase;
-}
-
-.guia-name-input .input-espinhos::placeholder {
-  color: var(--muted);
-  opacity: 0.8;
-}
-
-.guia-name-input #btn-confirmar-nome {
-  padding: 2px;
-  min-width: 24px;
-  min-height: 24px;
-  font-size: 12px;
-  border: none;
-  border-radius: var(--radius);
-  background-image: url('/assets/img/textura-de-pedra.jpg') !important;
-  background-size: cover !important;
-  background-position: center !important;
-  background-color: var(--card-2) !important;
-  background-blend-mode: overlay !important;
-  color: var(--fg);
-  font-family: 'ManufacturingConsent', sans-serif;
-  font-weight: bold;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.guia-name-input #btn-confirmar-nome::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.3); /* Fundo semi-opaco para consistência */
-  border-radius: var(--radius);
-  z-index: -1;
-}
-
-.guia-name-input #btn-confirmar-nome:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-}
-
-.guia-name-input #btn-confirmar-nome:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
+  margin-top: 8px;
 }
 
 @keyframes glow {
