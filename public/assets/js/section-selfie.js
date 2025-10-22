@@ -4,29 +4,113 @@
   let lastPreview = 0;
   let lastCapture = 0;
 
-  function initSelfie() {
+  // Utils
+  const qs = (s, r = document) => r.querySelector(s);
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  async function typeLocal(el, text, speed) {
+    return new Promise(resolve => {
+      el.textContent = '';
+      let i = 0;
+      const tick = () => {
+        if (i < text.length) {
+          el.textContent += text.charAt(i++);
+          setTimeout(tick, speed);
+        } else {
+          resolve();
+        }
+      };
+      tick();
+    });
+  }
+
+  async function runTypingAndSpeak(el, text) {
+    if (!el || !text) {
+      console.error('[Selfie] Elemento ou texto ausente para datilografia:', { el, text });
+      return;
+    }
+
+    console.log('[Selfie] Iniciando datilografia para:', text);
+    el.classList.remove('typing-done', 'typing-active');
+    el.classList.add('typing-active');
+    el.style.setProperty('text-align', 'left', 'important');
+    el.setAttribute('dir', 'ltr');
+
+    const speed = Number(el.dataset.speed || 40);
+    if (typeof window.runTyping === 'function') {
+      await new Promise(res => {
+        try {
+          window.runTyping(el, text, res, { speed, cursor: el.dataset.cursor !== 'false' });
+        } catch (e) {
+          console.error('[Selfie] Erro no runTyping:', e);
+          el.textContent = text;
+          res();
+        }
+      });
+    } else {
+      await typeLocal(el, text, speed);
+    }
+
+    el.classList.remove('typing-active');
+    el.classList.add('typing-done');
+    console.log('[Selfie] Datilografia concluída:', text);
+
+    try {
+      const p = window.EffectCoordinator?.speak?.(text, { rate: 1.0 });
+      if (p && typeof p.then === 'function') {
+        console.log('[Selfie] Iniciando TTS para:', text);
+        await p;
+        console.log('[Selfie] TTS concluído:', text);
+      } else {
+        console.warn('[Selfie] TTS não disponível, pulando fala.');
+      }
+    } catch (e) {
+      console.error('[Selfie] Erro no TTS:', e);
+    }
+  }
+
+  function initSelfie(root) {
+    // Esconder section-guia
+    const guiaSection = document.getElementById('section-guia');
+    if (guiaSection) {
+      guiaSection.classList.add('hidden');
+      guiaSection.style.display = 'none';
+      guiaSection.setAttribute('aria-hidden', 'true');
+      console.log('[Selfie] Seção guia escondida');
+    }
+
+    // Preencher nomes
+    const nameSlot = qs('#userNameSlot', root);
+    const guideNameSlot = qs('#guideNameSlot', root);
+    const saved = {
+      nome: sessionStorage.getItem('jornada.nome') || 'USUÁRIO',
+      guia: sessionStorage.getItem('jornada.guia') || 'GUIA'
+    };
+
+    if (nameSlot) {
+      nameSlot.textContent = saved.nome.toUpperCase();
+      console.log('[Selfie] Nome do usuário definido:', saved.nome);
+    }
+    if (guideNameSlot) {
+      guideNameSlot.textContent = saved.guia.toUpperCase();
+      console.log('[Selfie] Nome do guia definido:', saved.guia);
+    }
+
+    // Datilografia no título
+    const title = qs('[data-typing="true"]', root);
+    if (title) {
+      const text = (title.dataset.text || title.textContent || '').trim();
+      runTypingAndSpeak(title, text);
+    }
+
     document.addEventListener('click', (e) => {
-      const btn = e.target.closest('#previewBtn, #captureBtn, #btnSkipSelfie, #section-selfie [data-action="avancar"]');
+      const btn = e.target.closest('#captureBtn, #btnSkipSelfie, #section-selfie [data-action="avancar"]');
       if (!btn) return;
 
       e.preventDefault();
       const now = performance.now();
 
-      if (btn.id === 'previewBtn') {
-        if (now - lastPreview < 1000) return;
-        lastPreview = now;
-        const img = document.getElementById('selfieImage');
-        const preview = document.querySelector('.selfie-preview');
-        if (img && img.src && preview) {
-          preview.style.opacity = '1';
-          window.toast?.('Pré-visualização atualizada!');
-          console.log('[Selfie] Pré-visualização atualizada!');
-        } else {
-          window.toast?.('Selecione uma imagem primeiro.');
-          console.log('[Selfie] Nenhuma imagem ou preview encontrado.');
-        }
-
-      } else if (btn.id === 'captureBtn') {
+      if (btn.id === 'captureBtn') {
         if (now - lastCapture < 1000) return;
         lastCapture = now;
 
@@ -74,7 +158,7 @@
           localStorage.setItem('JORNADA_SELFIE', link.href);
         } catch (_) {}
 
-        const avancarBtn = document.querySelector('#section-selfie [data-action="avancar"]');
+        const avancarBtn = qs('#section-selfie [data-action="avancar"]');
         if (avancarBtn) {
           avancarBtn.disabled = false;
           console.log('[Selfie] Botão de avançar ativado após captura');
@@ -111,6 +195,6 @@
       return;
     }
 
-    initSelfie();
+    initSelfie(root);
   });
 })();
