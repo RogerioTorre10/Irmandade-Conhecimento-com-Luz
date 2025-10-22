@@ -153,6 +153,10 @@
   font-family: 'BerkshireSwash', cursive;
 }
 
+.selfie-controls #nameInput {
+  text-transform: uppercase;
+}
+
 .selfie-controls input[type="range"],
 .selfie-controls input[type="number"] {
   width: 100px;
