@@ -217,20 +217,41 @@
     video.style.zIndex = '9999';
     video.style.backgroundColor = '#000';
 
+    // Esconder section-guia antes do vídeo
+    const guiaSection = document.getElementById('section-guia');
+    if (guiaSection) {
+      guiaSection.classList.add('hidden');
+      guiaSection.style.display = 'none';
+      guiaSection.setAttribute('aria-hidden', 'true');
+      console.log('[section-guia] Seção guia escondida');
+    }
+
     document.body.appendChild(video);
     console.log('Vídeo adicionado ao DOM.');
 
     video.addEventListener('ended', () => {
       console.log('Vídeo terminado, redirecionando para:', NEXT_PAGE);
       video.remove();
-      window.location.href = NEXT_PAGE;
+      try {
+        window.location.href = NEXT_PAGE;
+        console.log('[section-guia] Redirecionamento para selfie.html iniciado');
+      } catch (e) {
+        console.error('[section-guia] Erro ao redirecionar para selfie.html:', e);
+        window.toast?.('Erro ao carregar a página selfie.', 'error');
+      }
     }, { once: true });
 
     video.addEventListener('error', e => {
       console.error('Erro ao reproduzir vídeo:', e);
       video.remove();
       console.log('Redirecionando para:', NEXT_PAGE, '(fallback devido a erro no vídeo)');
-      window.location.href = NEXT_PAGE;
+      try {
+        window.location.href = NEXT_PAGE;
+        console.log('[section-guia] Redirecionamento para selfie.html iniciado (fallback)');
+      } catch (e) {
+        console.error('[section-guia] Erro ao redirecionar para selfie.html:', e);
+        window.toast?.('Erro ao carregar a página selfie.', 'error');
+      }
     });
   }
 
