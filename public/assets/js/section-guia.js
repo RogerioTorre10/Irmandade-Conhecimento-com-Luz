@@ -226,6 +226,12 @@
       console.log(`[section-guia] Seção ${section.id} escondida`);
     });
 
+    // Impedir redirecionamento para section-intro
+    if (window.JC) {
+      window.JC.currentSection = 'section-guia';
+      console.log('[section-guia] Definido window.JC.currentSection como section-guia para evitar fallback');
+    }
+
     document.body.appendChild(video);
     console.log('Vídeo adicionado ao DOM.');
 
