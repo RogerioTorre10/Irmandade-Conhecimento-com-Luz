@@ -1,6 +1,6 @@
 /* ========== SEÇÃO SENHA (ajustado) ========== */
 .senha-input {
-  position: relative; /* Para posicionar o botão olho dentro do input */
+  position: relative;
   margin: 20px auto;
   padding: 8px;
   border: 2px solid var(--card-2);
@@ -16,7 +16,7 @@
 }
 
 .senha-input input {
-  padding: 8px 40px 8px 10px; /* Espaço à direita para o ícone */
+  padding: 8px 40px 8px 10px;
   font-size: 16px;
   border: none;
   background: transparent;
@@ -58,18 +58,18 @@
 
 /* Botões lado a lado com textura de pedra */
 .senha-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: nowrap;
+  display: flex !important;
+  gap: 10px !important;
+  justify-content: center !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
   margin: 20px auto;
   max-width: 420px;
 }
 
-.btn-stone,
-#btn-senha-prev,
-#btn-senha-avancar {
+.senha-actions .btn-stone,
+.senha-actions #btn-senha-prev,
+.senha-actions #btn-senha-avancar {
   padding: 8px 16px;
   font-size: 18px;
   border: 2px solid var(--card-2);
@@ -87,18 +87,19 @@
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   width: 140px;
   text-align: center;
+  position: relative !important;
 }
 
-.btn-stone:hover,
-#btn-senha-prev:hover,
-#btn-senha-avancar:hover {
+.senha-actions .btn-stone:hover,
+.senha-actions #btn-senha-prev:hover,
+.senha-actions #btn-senha-avancar:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0,0,0,0.4);
 }
 
-.btn-stone:disabled,
-#btn-senha-prev:disabled,
-#btn-senha-avancar:disabled {
+.senha-actions .btn-stone:disabled,
+.senha-actions #btn-senha-prev:disabled,
+.senha-actions #btn-senha-avancar:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
