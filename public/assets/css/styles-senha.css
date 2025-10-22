@@ -1,7 +1,7 @@
 /* ========== SEÇÃO SENHA ========== */
 
 .senha-input {
-  position: relative; /* Para posicionar o botão dentro do input */
+  position: relative;
   margin: 20px auto;
   padding: 8px;
   border: 2px solid var(--card-2);
@@ -17,7 +17,7 @@
 }
 
 .senha-input input {
-  padding: 8px 32px 8px 8px; /* Espaço à direita para o botão */
+  padding: 8px 32px 8px 8px;
   font-size: 16px;
   border: none;
   background: transparent;
@@ -54,6 +54,9 @@
   justify-content: center;
   align-items: center;
   margin-top: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 340px;
 }
 
 .btn-stone {
@@ -61,17 +64,19 @@
   font-size: 18px;
   border: 2px solid var(--card-2);
   border-radius: var(--radius);
-  background-image: url('/assets/img/textura-de-pedra.jpg');
-  background-size: cover;
-  background-position: center;
-  background-color: var(--card-2);
-  background-blend-mode: overlay;
+  background-image: url('/assets/img/textura-de-pedra.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-color: var(--card-2) !important;
+  background-blend-mode: overlay !important;
   color: var(--fg);
   font-family: 'ManufacturingConsent', sans-serif;
   font-weight: bold;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+  width: 120px; /* Largura fixa para alinhamento */
+  text-align: center;
 }
 
 .btn-stone:hover {
@@ -86,8 +91,10 @@
 }
 
 .conteudo-pergaminho h2, .conteudo-pergaminho p {
+  text-align: left !important;
   visibility: visible !important;
   opacity: 1 !important;
   margin-left: auto;
   margin-right: auto;
+  max-width: 500px;
 }
