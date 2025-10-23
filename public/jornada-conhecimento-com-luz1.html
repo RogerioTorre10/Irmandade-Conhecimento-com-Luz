@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8" />
@@ -7,41 +7,17 @@
   <meta name="description" content="Jornada guiada com estilo pergaminho vertical e horizontal conforme a etapa.">
 
   <!-- CSS -->
+  <link rel="stylesheet" href="/assets/css/styles-base.css" />
   <link rel="stylesheet" href="/assets/css/styles.css" />
   <link rel="stylesheet" href="/assets/css/chama.css" />
+  <!-- Carregar styles-intro.css dinamicamente ou garantir que esteja incluído -->
+  <link rel="stylesheet" href="/assets/css/styles-intro.css" />
 
   <!-- Fonte Cardo -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 </head>
-<style>
-  /* Header + chama */
-    .site-header{display:flex;align-items:center;justify-content:center;padding:16px;background:transparent}
-    .chama-icone{position:relative;width:18px;height:36px;display:flex;align-items:center;margin-right:12px;z-index: 10}
-    .chama-icone>*{position:static}
-    .site-header h1{font-family:"ManufacturingConsent",cursive;font-size:32px;color:#fff;text-shadow:0 0 10px hsla(28,96%,60%,.7);margin:0;line-height: 1.2}
-
-    /* Chama */
-    .chama-vela{--altura:45px;--largura:30px;--pulso:1.2s;--glow:8px;--hue:28;--satur:96%;--light:58%;--op:.98;position:relative;width:var(--largura);height:var(--altura);display:inline-block;filter:drop-shadow(0 0 var(--glow) hsla(var(--hue),var(--satur),60%,.75))}
-    .chama-vela.chama-md{--largura:40px;--altura:90px}
-    .chama-vela.chama-lg{--largura:30px;--altura:60px}
-    .chama-vela .brasa{position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:calc(var(--largura)*1.4);height:10px;border-radius:50% 50% 40% 40%;background:radial-gradient(circle at 50% 40%,hsla(var(--hue),var(--satur),95%,.95) 0%,hsla(var(--hue),var(--satur),70%,.85) 50%,transparent 80%);filter:blur(1px);animation:brasaPulse var(--pulso) ease-in-out infinite;opacity:var(--op)}
-    .chama-vela .lingua{position:absolute;left:50%;bottom:2px;transform:translateX(-50%);width:calc(var(--largura)*1.0);height:calc(var(--altura)*1.0);border-radius:50% 50% 4% 4%;background:radial-gradient(ellipse at center,rgba(255,190,0,.95) 0%,rgba(255,69,0,.75) 50%,rgba(230,10,10,.3) 70%,transparent 100%);mix-blend-mode:screen;filter:blur(.7px);transform-origin:50% 100%;animation:velaWaver 1.2s ease-in-out infinite;opacity:var(--op);-webkit-mask:radial-gradient(60% 90% at 50% 4%,#000 65%,transparent 69%)}
-    .chama-vela .lingua:nth-child(2){width:calc(var(--largura)*.92);height:calc(var(--altura)*.95);animation-duration:1.5s;animation-delay:.08s;filter:blur(.6px)}
-    .chama-vela .lingua:nth-child(3){width:calc(var(--largura)*.78);height:calc(var(--altura)*.85);animation-duration:1.8s;animation-delay:.15s;filter:blur(.5px)}
-    .chama-vela .brilho{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:calc(var(--largura)*1.7);height:calc(var(--altura)*1.5);background:radial-gradient(circle,hsla(var(--hue),var(--satur),72%,.55) 0%,transparent 70%);filter:blur(9px);mix-blend-mode:screen;animation:aura var(--pulso) ease-in-out infinite;opacity:.85;pointer-events:none}
-    .chama-vela.fraca{--altura:35px;--largura:25px;--pulso:1.6s;--glow:5px;--hue:36;--satur:86%;--light:66%;--op:.70}
-    .chama-vela.media{--altura:45px;--largura:30px;--pulso:1.2s;--glow:8px;--hue:28;--satur:96%;--light:58%;--op:.98}
-    .chama-vela.forte{--altura:55px;--largura:35px;--pulso:.7s;--glow:11px;--hue:20;--satur:100%;--light:52%;--op:1}
-    .flame-corner{position:fixed;z-index:1200;pointer-events:none}
-    .flame-bottom-right{bottom:20px;right:20px}
-    #chama-header .chama-vela{--largura:30px;--altura:60px}
-    @keyframes velaWaver{0%,100%{transform:translateX(-50%) scaleY(1.00) skewX(0deg)}25%{transform:translateX(calc(-50% + .7px)) scaleY(1.12) skewX(1.4deg)}50%{transform:translateX(-50%) scaleY(1.20) skewX(2.2deg)}75%{transform:translateX(calc(-50% - .6px)) scaleY(1.10) skewX(1.2deg)}}
-    @keyframes brasaPulse{0%,100%{transform:translateX(-50%) scale(1);opacity:.85}50%{transform:translateX(-50%) scale(1.14);opacity:1}}
-    @keyframes aura{0%,100%{opacity:.75}50%{opacity:1}}
-    @media (prefers-reduced-motion: reduce){.chama-vela .lingua,.chama-vela .brasa,.chama-vela .brilho{animation:none!important}}
- </style>
 <body class="epic min-h-screen bg-slate-900 text-slate-100">
   <div class="language-selector">
     <select id="language-select">
@@ -51,8 +27,8 @@
     </select>
   </div>
   <header class="site-header">
-      <div id="chama-header" class="chama-icone" aria-hidden="true">
-       <div class="chama-vela chama-lg">
+    <div id="chama-header" class="chama-icone" aria-hidden="true">
+      <div class="chama-vela chama-lg">
         <div class="brasa"></div>
         <div class="lingua"></div>
         <div class="lingua"></div>
@@ -88,146 +64,137 @@
       </div>
     </div>
   </main>
-
   <footer class="site-footer">
     <small>© 2025 Irmandade Conhecimento com Luz</small>
     <div id="envTag" style="margin-top:6px;opacity:.6;font-size:18px;"></div>
   </footer>
 
   <!-- Scripts -->
-  <!-- Configuração e utilitários -->
-<script src="/assets/js/i18n.js" defer></script>
-<script src="/assets/js/config.js" defer></script>
-<script src="/assets/js/toast-safe.js" defer></script>
-<script src="/assets/js/jornada-shims.js" defer></script>
-<script src="/assets/js/jornada-utils.js" defer></script>
-<script src="/assets/js/api.js" defer></script>
+  <script src="/assets/js/i18n.js" defer></script>
+  <script src="/assets/js/config.js" defer></script>
+  <script src="/assets/js/toast-safe.js" defer></script>
+  <script src="/assets/js/jornada-shims.js" defer></script>
+  <script src="/assets/js/jornada-utils.js" defer></script>
+  <script src="/assets/js/api.js" defer></script>
+  <script src="/assets/js/jornada-core.js" defer></script>
+  <script src="/assets/js/jornada-loader.js" defer></script>
+  <script src="/assets/js/jornada-render.js" defer></script>
+  <script src="/assets/js/jornada-secoes.js" defer></script>
+  <script src="/assets/js/jornada-chama.js" defer></script>
+  <script src="/assets/js/jornada-auth.js" defer></script>
+  <script src="/assets/js/jornada-paper-qa.js" defer></script>
+  <script src="/assets/js/jornada-typing-font.js" defer></script>
+  <script src="/assets/js/jornada-typing-bridge.js" defer></script>
+  <script src="/assets/js/jornada-controller.js" defer></script>
+  <script src="/assets/js/jornada-micro.js" defer></script>
+  <script src="/assets/js/jornada-bootstrap.js" defer></script>
+  <script src="/assets/js/navigation.js" defer></script>
+  <script src="/assets/js/journey.js" defer></script>
+  <script src="/assets/js/main.js" defer></script>
+  <script src="/assets/js/video-transicao.js" defer></script>
+  <script src="/assets/js/section-intro.js" defer></script>
+  <script src="/assets/js/section-termos.js" defer></script>
+  <script src="/assets/js/section-senha.js" defer></script>
+  <script src="/assets/js/section-guia.js" defer></script>
+  <script src="/assets/js/section-selfie.js" defer></script>
+  <script src="/assets/js/section-perguntas.js" defer></script>
+  <script src="/assets/js/section-final.js" defer></script>
 
-<!-- Núcleo da jornada -->
-<script src="/assets/js/jornada-core.js" defer></script>
-<script src="/assets/js/jornada-loader.js" defer></script>
-<script src="/assets/js/jornada-render.js" defer></script>
-<script src="/assets/js/jornada-secoes.js" defer></script>
-<script src="/assets/js/jornada-chama.js" defer></script>
-<script src="/assets/js/jornada-auth.js" defer></script>
-<script src="/assets/js/jornada-paper-qa.js" defer></script>
-<script src="/assets/js/jornada-typing-font.js" defer></script>
-<script src="/assets/js/jornada-typing-bridge.js" defer></script>
-<script src="/assets/js/jornada-controller.js" defer></script>
-<script src="/assets/js/jornada-micro.js" defer></script>
-<script src="/assets/js/jornada-bootstrap.js" defer></script>
+  <!-- Inicialização -->
+  <script>
+    window.addEventListener('load', () => {
+      console.log('[Init] Evento load disparado');
 
-<!-- Navegação e jornada -->
-<script src="/assets/js/navigation.js" defer></script>
-<script src="/assets/js/journey.js" defer></script>
-<script src="/assets/js/main.js" defer></script>
-<script src="/assets/js/video-transicao.js" defer></script>
+      let initialized = false;
 
-<!-- Seções -->
-<script src="/assets/js/section-intro.js" defer></script>
-<script src="/assets/js/section-termos.js" defer></script>
-<script src="/assets/js/section-senha.js" defer></script>
-<script src="/assets/js/section-guia.js" defer></script>
-<script src="/assets/js/section-selfie.js" defer></script>
-<script src="/assets/js/section-perguntas.js" defer></script>
-<script src="/assets/js/section-final.js" defer></script>
+      const waitForScripts = (callback, maxAttempts = 50, interval = 1000) => {
+        let attempts = 0;
+        const check = () => {
+          if (initialized) return;
 
-<!-- Inicialização -->
-<script>
-  window.addEventListener('load', () => {
-    console.log('[Init] Evento load disparado');
+          console.log(`[Init] Verificando scripts (tentativa ${attempts + 1}/${maxAttempts})...`);
+          const ready = typeof window.JC?.init === 'function' && typeof window.carregarEtapa === 'function';
 
-    let initialized = false;
-
-    const waitForScripts = (callback, maxAttempts = 50, interval = 1000) => {
-      let attempts = 0;
-      const check = () => {
-        if (initialized) return;
-
-        console.log(`[Init] Verificando scripts (tentativa ${attempts + 1}/${maxAttempts})...`);
-        const ready = typeof window.JC?.init === 'function' && typeof window.carregarEtapa === 'function';
-
-        if (ready) {
-          initialized = true;
-          console.log('[Init] Scripts prontos, executando callback');
-          callback();
-        } else {
-          console.log('[Init] Status: JC.init', typeof window.JC?.init, 'carregarEtapa', typeof window.carregarEtapa);
-          if (attempts < maxAttempts) {
-            attempts++;
-            setTimeout(check, interval);
+          if (ready) {
+            initialized = true;
+            console.log('[Init] Scripts prontos, executando callback');
+            callback();
           } else {
-            console.error('[Init] Falha ao carregar scripts após várias tentativas');
-            if (typeof window.JC?.show === 'function') {
-              console.log('[Init] Forçando section-senha');
-              window.JC.show('section-senha');
-              forceSectionVisible('section-senha');
+            console.log('[Init] Status: JC.init', typeof window.JC?.init, 'carregarEtapa', typeof window.carregarEtapa);
+            if (attempts < maxAttempts) {
+              attempts++;
+              setTimeout(check, interval);
             } else {
-              console.error('[Init] window.JC.show não disponível');
+              console.error('[Init] Falha ao carregar scripts após várias tentativas');
+              if (typeof window.JC?.show === 'function') {
+                console.log('[Init] Forçando section-intro');
+                window.JC.show('section-intro');
+                forceSectionVisible('section-intro');
+              } else {
+                console.error('[Init] window.JC.show não disponível');
+              }
             }
           }
-        }
+        };
+        check();
       };
-      check();
-    };
 
-    const forceSectionVisible = (sectionId) => {
-      const el = document.getElementById(sectionId);
-      if (!el) {
-        console.warn(`[Init] Seção ${sectionId} não encontrada para forçar visibilidade`);
-        return;
-      }
+      const forceSectionVisible = (sectionId) => {
+        const el = document.getElementById(sectionId);
+        if (!el) {
+          console.warn(`[Init] Seção ${sectionId} não encontrada para forçar visibilidade`);
+          return;
+        }
 
-      el.classList.remove('hidden');
-      el.setAttribute('aria-hidden', 'false');
-      el.style.display = 'flex';
-      el.style.opacity = '1';
-      el.style.visibility = 'visible';
-      el.style.zIndex = '9999';
-      el.style.transition = 'none';
-      el.style.transform = 'none';
+        el.classList.remove('hidden');
+        el.setAttribute('aria-hidden', 'false');
+        el.style.display = 'block'; // Alterado de flex para block
+        el.style.opacity = '1';
+        el.style.visibility = 'visible';
+        el.style.zIndex = '2'; // Reduzido para evitar conflitos
+        el.style.transition = 'opacity 0.3s ease'; // Adicionado para suavizar
 
-      console.log(`[Init] Visibilidade forçada para ${sectionId}`);
-    };
+        console.log(`[Init] Visibilidade forçada para ${sectionId}`);
+      };
 
-    waitForScripts(() => {
-      try {
-        window.JC.init();
-        console.log('[Init] JC.init executado com sucesso');
-        window.JC.show('section-senha');
+      waitForScripts(() => {
+        try {
+          window.JC.init();
+          console.log('[Init] JC.init executado com sucesso');
+          window.JC.show('section-intro'); // Alterado para iniciar com section-intro
 
-        // Blindagem visual após 3 segundos
-        setTimeout(() => {
-          forceSectionVisible('section-senha');
-        }, 3000);
-      } catch (e) {
-        console.error('[Init] Erro ao executar JC.init:', e);
-      }
-    });
-
-    // Blindagem contínua para todas as seções visíveis
-    const observer = new MutationObserver(() => {
-      const sections = document.querySelectorAll('section[data-section]');
-      sections.forEach(sec => {
-        if (sec.classList.contains('hidden') || sec.getAttribute('aria-hidden') === 'true') {
-          console.log('[Init] Blindando visualmente seção:', sec.id);
-          sec.classList.remove('hidden');
-          sec.setAttribute('aria-hidden', 'false');
-          sec.style.display = 'flex';
-          sec.style.opacity = '1';
-          sec.style.visibility = 'visible';
-          sec.style.zIndex = '9999';
+          // Blindagem visual após 3 segundos
+          setTimeout(() => {
+            forceSectionVisible('section-intro');
+          }, 3000);
+        } catch (e) {
+          console.error('[Init] Erro ao executar JC.init:', e);
         }
       });
+
+      // Blindagem contínua para todas as seções visíveis
+      const observer = new MutationObserver(() => {
+        const sections = document.querySelectorAll('section[data-section]');
+        sections.forEach(sec => {
+          if (sec.classList.contains('hidden') || sec.getAttribute('aria-hidden') === 'true') {
+            console.log('[Init] Blindando visualmente seção:', sec.id);
+            sec.classList.remove('hidden');
+            sec.setAttribute('aria-hidden', 'false');
+            sec.style.display = 'block';
+            sec.style.opacity = '1';
+            sec.style.visibility = 'visible';
+            sec.style.zIndex = '2';
+            sec.style.transition = 'opacity 0.3s ease';
+          }
+        });
+      });
+
+      observer.observe(document.body, { childList: true, subtree: true });
     });
+  </script>
 
-    observer.observe(document.body, { childList: true, subtree: true });
-  });
-</script>
-
-
-<noscript>
-  <p style="text-align:center; padding:12px">Ative o JavaScript para usar esta página.</p>
-</noscript>
+  <noscript>
+    <p style="text-align:center; padding:12px">Ative o JavaScript para usar esta página.</p>
+  </noscript>
 </body>
 </html>
