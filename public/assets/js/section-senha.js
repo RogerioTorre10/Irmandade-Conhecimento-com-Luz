@@ -7,7 +7,7 @@
   const HOME_PAGE = '/';
   const HIDE = 'hidden';
   const INITIAL_TYPING_DELAY_MS = 8500;
-  const TRANSITION_SRC = '/assets/img/filme-senha.mp4';
+  const TRANSITION_SRC = '/assets/img/filme-senha-confirmada.mp4';
   const TRANSITION_TIMEOUT_MS = 8000;
   const TTS_FALLBACK_DELAY_MS = 2000; // Atraso fixo como fallback para TTS
 
