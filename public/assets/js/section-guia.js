@@ -135,6 +135,7 @@
     }
     guiasRendered = true;
     console.log('Guias renderizados em:', container);
+    return Promise.resolve(); // Garantir que a promise seja retornada
   }
 
   function typeLocal(el, text, speed) {
@@ -325,12 +326,16 @@
         console.log('[section-guia] Botão Confirmar clicado, nome:', nome);
         const isValid = nome.length >= 2 && /^[a-zA-Z\s]+$/.test(nome);
         if (isValid && !guiasRendered) {
-          nameInput.disabled = false; // Manter habilitado após datilografia
-          confirmButton.disabled = false; // Manter habilitado após datilografia
+          nameInput.disabled = false; // Manter habilitado durante a datilografia
+          confirmButton.disabled = false; // Manter habilitado durante a datilografia
           renderGuias(guias, root, myId).then(() => {
             nameInput.disabled = true; // Desabilitar só após renderização
             confirmButton.disabled = true; // Desabilitar só após renderização
             console.log('[section-guia] Input e botão desabilitados após renderização');
+          }).catch(e => {
+            console.error('[section-guia] Erro ao renderizar guias:', e);
+            nameInput.disabled = false;
+            confirmButton.disabled = false;
           });
           buttons.forEach(btn => enable(btn));
         } else if (!isValid) {
