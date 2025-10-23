@@ -23,7 +23,7 @@
     listenerAdded: false,
     typingInProgress: false,
     observer: null,
-    initialized: false // Novo estado para controle do observer
+    initialized: false
   };
 
   // ---------- Utils ----------
@@ -175,6 +175,12 @@
       console.log('[JCSenha] Seção senha escondida');
     }
 
+    // Definir currentSection para evitar reinicialização
+    if (window.JC) {
+      window.JC.currentSection = SECTION_ID;
+      console.log('[JCSenha] Definido window.JC.currentSection como', SECTION_ID);
+    }
+
     document.body.appendChild(video);
     console.log('[JCSenha] Vídeo adicionado ao DOM.');
 
@@ -183,6 +189,7 @@
       video.remove();
       try {
         window.JC?.show(nextSectionId);
+        console.log('[JCSenha] Navegação para', nextSectionId, 'iniciada');
       } catch (e) {
         console.error('[JCSenha] Erro ao carregar próxima seção:', e);
       }
@@ -194,6 +201,7 @@
       console.log('[JCSenha] Redirecionando para:', nextSectionId, '(fallback devido a erro no vídeo)');
       try {
         window.JC?.show(nextSectionId);
+        console.log('[JCSenha] Navegação para', nextSectionId, 'iniciada (fallback)');
       } catch (e) {
         console.error('[JCSenha] Erro ao carregar próxima seção:', e);
       }
@@ -286,6 +294,7 @@
       });
       obs.observe(root, { childList: true, subtree: true, characterData: true });
       window.JCSenha.state.observer = obs;
+      console.log('[JCSenha] Observer configurado');
     } catch (e) {
       console.error('[JCSenha] Erro no observer:', e);
     }
@@ -386,6 +395,11 @@
 
     window.JCSenha.state.ready = true;
     console.log('[JCSenha] Seção senha inicializada.');
+    // Desconectar o observer após a inicialização
+    if (window.JCSenha.state.observer) {
+      window.JCSenha.state.observer.disconnect();
+      console.log('[JCSenha] Observer desconectado após inicialização');
+    }
   };
 
   if (!window.JCSenha.state.listenerAdded) {
