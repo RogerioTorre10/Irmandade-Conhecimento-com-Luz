@@ -13,7 +13,7 @@
 
   // Estado da seção
   window.JCTermos.state = {
-    ready: false,
+    ready: false;
     currentPage: 1,
     listenerAdded: false,
     HANDLER_COUNT: 0,
@@ -221,86 +221,34 @@
         pg.querySelectorAll('[data-typing="true"]').forEach(el => {
           el.textContent = '';
           el.style.opacity = '0';
-          el.style.visibility = 'hidden';
-          el.style.display = 'none';
-          console.log('[JCTermos] Texto inicializado:', el.id);
         });
       }
     });
 
+    nextBtn.disabled = true;
+    prevBtn.disabled = true;
+    avancarBtn.disabled = true;
     [nextBtn, prevBtn, avancarBtn].forEach(btn => {
       if (btn) {
-        btn.classList.add('btn', 'btn-primary', 'btn-stone');
-        btn.disabled = true;
-        btn.style.opacity = '0.5';
-        btn.style.cursor = 'not-allowed';
-        btn.style.display = 'inline-block';
-        btn.style.margin = '8px';
-        btn.style.visibility = 'visible';
-        console.log('[JCTermos] Botão inicializado:', btn.className, btn.textContent);
+        btn.style.opacity = '0';
+        btn.style.cursor = 'default';
       }
     });
 
     const runTypingChain = async () => {
-      window.JCTermos.state.TYPING_COUNT++;
-      console.log(`[JCTermos] runTypingChain chamado (${window.JCTermos.state.TYPING_COUNT}x) na página ${window.JCTermos.state.currentPage}`);
-      if (window.__typingLock) {
-        console.log('[JCTermos] Typing lock ativo, aguardando...');
-        await new Promise(resolve => {
-          const checkLock = () => {
-            if (!window.__typingLock) {
-              console.log('[JCTermos] Lock liberado, prosseguindo...');
-              resolve();
-            } else {
-              setTimeout(checkLock, 100);
-            }
-          };
-          checkLock();
-        });
-      }
-
-      console.log('[JCTermos] Iniciando datilografia na página atual...');
       const currentPg = window.JCTermos.state.currentPage === 1 ? pg1 : pg2;
-      const typingElements = currentPg.querySelectorAll('[data-typing="true"]:not(.typing-done)');
+      if (!currentPg) return;
 
-      if (!typingElements.length) {
-        console.warn('[JCTermos] Nenhum elemento com data-typing="true" encontrado na página atual');
-        [nextBtn, prevBtn, avancarBtn].forEach(btn => {
-          if (btn) {
-            btn.disabled = false;
-            btn.style.opacity = '1';
-            btn.style.cursor = 'pointer';
-          }
-        });
-        currentPg.style.opacity = '1';
-        currentPg.style.visibility = 'visible';
-        return;
-      }
+      window.JCTermos.state.TYPING_COUNT++;
+      console.log(`[JCTermos] Iniciando datilografia na página ${window.JCTermos.state.currentPage} (${window.JCTermos.state.TYPING_COUNT}x)`);
+      currentPg.style.opacity = '1';
+      currentPg.style.visibility = 'visible';
+      currentPg.style.display = 'block';
 
-      console.log('[JCTermos] Elementos encontrados na página:', Array.from(typingElements).map(el => el.id));
-
-      // Fallback para window.runTyping
-      if (typeof window.runTyping !== 'function') {
-        console.warn('[JCTermos] window.runTyping não encontrado, usando fallback');
-        window.runTyping = (el, text, resolve, options) => {
-          let i = 0;
-          const speed = options.speed || 100;
-          const type = () => {
-            if (i < text.length) {
-              el.textContent += text.charAt(i);
-              i++;
-              setTimeout(type, speed);
-            } else {
-              el.textContent = text;
-              resolve();
-            }
-          };
-          type();
-        };
-      }
-
-      for (const el of typingElements) {
+      const elements = Array.from(currentPg.querySelectorAll('[data-typing="true"]'));
+      for (const el of elements) {
         const text = getText(el);
+        if (!text) continue;
         console.log('[JCTermos] Datilografando:', el.id, text.substring(0, 50));
         
         try {
