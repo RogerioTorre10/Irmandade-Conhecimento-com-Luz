@@ -1,256 +1,307 @@
-[cite_start]/* ========== VARIÁVEIS GLOBAIS ========== [cite: 1, 2] */
-:root {
-  [cite_start]--bg: #0b1020; [cite: 1]
-  [cite_start]--fg: #eef2ff; [cite: 1]
-  [cite_start]--muted: #aab4d4; [cite: 1]
-  [cite_start]--primary: #6aa7ff; [cite: 1]
-  [cite_start]--card: #121832; [cite: 1]
-  [cite_start]--card-2: #0e1428; [cite: 1]
-  [cite_start]--radius: 16px; [cite: 2]
+/* =============================================================================
+TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
+============================================================================= */
+
+/* ========== JORNADA ESPECÍFICA ========== */
+#section-conteudo {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  background: transparent;
+  padding: 0;
+  display: block;
 }
 
-[cite_start]/* ========== RESET BÁSICO ========== [cite: 2, 3] */
-* {
-  [cite_start]box-sizing: border-box; [cite: 2]
+#jornada-content-wrapper {
+  display: block;
+  visibility: visible;
+  opacity: 1;
 }
 
-html, body {
-  [cite_start]height: 100%; [cite: 3]
-  [cite_start]margin: 0; [cite: 3]
-  [cite_start]background: var(--bg); [cite: 3]
-  [cite_start]color: var(--fg); [cite: 3]
-  [cite_start]line-height: 1.5; [cite: 3]
-  [cite_start]font-family: 'Cardo', Georgia, 'Times New Roman', serif; [cite: 3]
+#section-intro, #section-termos, #section-senha, #sec-final {
+  background: transparent;
+  padding: 24px;
+  border-radius: 12px;
+  max-width: 600px;
+  text-align: center;
+  box-shadow: none;
+  border: none;
+  display: block;
+  opacity: 1;
+  visibility: visible;
+  z-index: 2;
+  overflow: hidden;
+  max-height: 80vh;
 }
 
-[cite_start]/* ========== FONTES PERSONALIZADAS ========== [cite: 4, 5, 6] */
-@font-face {
-  font-family: 'ManufacturingConsent';
-  [cite_start]src: url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype'); [cite: 4]
-  [cite_start]font-weight: 400; [cite: 4]
-  [cite_start]font-style: normal; [cite: 4]
-  [cite_start]font-display: swap; [cite: 4]
+#section-intro.pergaminho-v::before,
+#section-termos.pergaminho-v::before,
+#section-senha.pergaminho-v::before,
+#sec-final.pergaminho-v::before {
+  background-image: url('/assets/img/pergaminho-rasgado-vert.png');
+  background-size: cover;
+  min-height: 80vh;
 }
 
-@font-face {
-  font-family: 'BerkshireSwash';
-  [cite_start]src: url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype'); [cite: 5]
-  [cite_start]font-weight: 400; [cite: 5]
-  [cite_start]font-style: normal; [cite: 5]
-  [cite_start]font-display: swap; [cite: 5]
-}
-
-[cite_start]/* ========== TIPOGRAFIA GLOBAL ========== [cite: 6, 7, 8, 9] */
-body.epic {
-  [cite_start]font-family: 'Cardo', Georgia, serif; [cite: 6]
-  [cite_start]line-height: 1.55; [cite: 7]
-}
-
-.epic h1, .epic h2, .epic h3 {
-  [cite_start]font-family: 'ManufacturingConsent', ui-sans-serif, system-ui, "Segoe UI", Roboto, Arial, sans-serif; [cite: 7]
-  [cite_start]font-weight: 700; [cite: 7]
-  [cite_start]letter-spacing: .02em; [cite: 8]
-  [cite_start]font-variant: small-caps; [cite: 8]
-}
-
-p, li {
-  [cite_start]font-family: 'BerkshireSwash', cursive; [cite: 9]
-}
-
-.muted {
-  [cite_start]color: var(--muted); [cite: 62]
-  [cite_start]font-family: 'BerkshireSwash', cursive; [cite: 62]
-}
-
-[cite_start]/* ========== BOTÕES COMPARTILHADOS ========== [cite: 9, 10, 11] */
-.btn {
-  [cite_start]padding: 8px 16px; [cite: 9]
-  [cite_start]border-radius: 8px; [cite: 9]
-  [cite_start]font-size: 16px; [cite: 9]
-  [cite_start]font-family: 'ManufacturingConsent', sans-serif; [cite: 9]
-  [cite_start]cursor: pointer; [cite: 9]
-  [cite_start]text-align: center; [cite: 10]
-  [cite_start]display: block; [cite: 10]
-  [cite_start]margin: 8px auto; [cite: 10]
-  [cite_start]min-width: 150px; [cite: 10]
-}
-
-.btn:disabled {
-  [cite_start]opacity: 0.5; [cite: 11]
-  [cite_start]cursor: not-allowed; [cite: 11]
-}
-
-[cite_start]/* ========== DATILOGRAFIA ========== [cite: 12, 13, 14, 15] */
-.typing-active {
-  [cite_start]text-align: left !important; [cite: 12]
-  [cite_start]direction: ltr !important; [cite: 12]
-  [cite_start]display: block !important; [cite: 12]
-  [cite_start]width: 100% !important; [cite: 12]
-  [cite_start]margin-left: 0 !important; [cite: 12]
-  [cite_start]margin-right: auto !important; [cite: 12]
-  [cite_start]position: relative; [cite: 12]
-}
-
-.typing-active::after {
-  [cite_start]content: "▋"; [cite: 13] /* Cursor "base" */
-  [cite_start]margin-left: 2px; [cite: 13]
-  [cite_start]opacity: 0.75; [cite: 13]
-  [cite_start]animation: lumenBlink 1s steps(2, end) infinite; [cite: 13]
-}
-
-.typing-done::after {
-  [cite_start]content: ""; [cite: 14]
-  [cite_start]animation: none; [cite: 14]
-}
-
-@keyframes lumenBlink {
-  0% { opacity: 0.75; [cite_start]} [cite: 15]
-  50% { opacity: 0; [cite_start]} [cite: 15]
-  100% { opacity: 0.75; [cite_start]} [cite: 15]
-}
-
-[cite_start]/* Suporte à datilografia no elemento pai [cite: 56, 139, 140] */
-[data-typing="true"] {
-  [cite_start]min-height: 20px; [cite: 56, 139]
-  [cite_start]display: block; [cite: 56, 139]
-  [cite_start]position: relative; [cite: 56, 139]
-  [cite_start]opacity: 0; [cite: 56, 139]
-  [cite_start]visibility: visible; [cite: 139]
-  [cite_start]color: #fff; [cite: 139]
-}
-
-[data-typing="true"].typing-done {
-  [cite_start]opacity: 1; [cite: 56, 140]
-}
-
-[cite_start]/* Opcional: Efeito 'lumen' (substituto do .typing-active em alguns casos) [cite: 137, 138] */
-.lumen-typing {
-  [cite_start]white-space: pre-wrap; [cite: 137]
-  [cite_start]position: relative; [cite: 137]
-}
-
-.lumen-typing::after {
-  [cite_start]content: "▌"; [cite: 137]
-  [cite_start]margin-left: 2px; [cite: 137]
-  [cite_start]opacity: .75; [cite: 137]
-  [cite_start]animation: lumenBlink 1s steps(2,end) infinite; [cite: 137]
-}
-
-.lumen-typing.typing-done::after {
-  [cite_start]content: ""; [cite: 138]
-  [cite_start]animation: none; [cite: 138]
-}
-
-[cite_start]/* ========== CHAMAS E DECORAÇÕES (BASE) ========== [cite: 16, 17, 18, 19, 20, 21, 22, 23, 24] */
-.flame-corner,
-#flame-top-left,
-#flame-bottom-right,
-#chama-header {
-  [cite_start]display: block; [cite: 16]
-  [cite_start]visibility: visible; [cite: 16]
-  [cite_start]opacity: 1; [cite: 16]
-  [cite_start]position: fixed; [cite: 16]
-  [cite_start]pointer-events: none; [cite: 16]
-  [cite_start]z-index: 1200; [cite: 16]
-}
-
-.chama-icone {
-  [cite_start]position: relative; [cite: 17]
-  [cite_start]width: 24px; [cite: 17]
-  [cite_start]height: 36px; [cite: 17]
-  [cite_start]filter: drop-shadow(0 0 14px rgba(255,196,0,.75)); [cite: 17]
-  [cite_start]display: flex; [cite: 17]
-  [cite_start]visibility: visible; [cite: 17]
-  [cite_start]opacity: 1; [cite: 17]
-}
-
-.chama-icone .halo {
-  [cite_start]position: absolute; [cite: 18]
-  [cite_start]left: 50%; [cite: 18]
-  [cite_start]bottom: 2px; [cite: 18]
-  [cite_start]transform: translateX(-50%); [cite: 18]
-  [cite_start]width: 86%; [cite: 18]
-  [cite_start]height: 88%; [cite: 18]
-  [cite_start]border-radius: 62% 62% 28% 28% / 88% 88% 22% 22%; [cite: 18]
-  [cite_start]background: radial-gradient(ellipse at 50% 30%, #fff 0%, #ffe7b0 38%, rgba(255,170,30,.95) 60%, rgba(255,140,0,0) 78%); [cite: 19]
-  [cite_start]animation: flameSway 1.8s ease-in-out infinite; [cite: 20]
-}
-
-.chama-icone .brasa {
-  [cite_start]position: absolute; [cite: 20]
-  [cite_start]left: 50%; [cite: 21]
-  [cite_start]bottom: 0; [cite: 21]
-  [cite_start]transform: translateX(-50%); [cite: 21]
-  [cite_start]width: 70%; [cite: 21]
-  [cite_start]height: 8px; [cite: 21]
-  [cite_start]border-radius: 50%; [cite: 21]
-  [cite_start]background: radial-gradient(circle at 50% 40%, rgba(255,255,255,.95) 0%, rgba(255,205,120,.85) 42%, rgba(255,140,0,0) 72%); [cite: 21]
-  [cite_start]animation: brasaPulse 1.8s ease-in-out infinite; [cite: 22]
-}
-
-@keyframes flameSway {
-  0%, 100% { transform: translateX(-50%) scaleY(1); [cite_start]} [cite: 23]
-  50% { transform: translateX(-51%) scaleY(1.06); [cite_start]} [cite: 23]
-}
-
-@keyframes brasaPulse {
-  0%, 100% { transform: translateX(-50%) scale(1); opacity: .75; [cite_start]} [cite: 24]
-  50% { transform: translateX(-50%) scale(1.06); opacity: 1; [cite_start]} [cite: 24]
-}
-
-[cite_start]/* ========== PERGAMINHO (BASE) ========== [cite: 25, 26, 27, 28, 29] */
-.card.pergaminho {
-  [cite_start]background: transparent; [cite: 25]
-  [cite_start]border: 0; [cite: 25]
-  [cite_start]box-shadow: none; [cite: 25]
-  [cite_start]position: relative; [cite: 25]
-}
-
-.pergaminho {
-  [cite_start]position: relative; [cite: 26]
-  [cite_start]padding: 24px 20px; [cite: 26]
-  [cite_start]width: 100%; [cite: 26]
-  [cite_start]max-width: 600px !important; [cite: 26]
-  [cite_start]margin: 12px auto; [cite: 26]
-  [cite_start]min-height: 80vh; [cite: 26]
-  [cite_start]height: 80vh !important; [cite: 26]
-  [cite_start]box-sizing: border-box; [cite: 26]
-  [cite_start]overflow: hidden !important; [cite: 26]
-  [cite_start]contain: layout; [cite: 26]
-}
-
-.pergaminho::before {
-  [cite_start]content: ""; [cite: 27]
-  [cite_start]position: absolute; [cite: 27]
-  [cite_start]inset: 0; [cite: 27]
-  [cite_start]z-index: 0; [cite: 27]
-  [cite_start]background-repeat: no-repeat; [cite: 27]
-  [cite_start]background-position: center; [cite: 27]
-  [cite_start]background-size: 100% 100%; [cite: 27]
-  [cite_start]background-attachment: fixed; [cite: 27]
-  [cite_start]border-radius: 16px; [cite: 27]
-  [cite_start]opacity: .98; [cite: 28]
-  [cite_start]filter: drop-shadow(0 12px 32px rgba(0,0,0,.45)); [cite: 28]
-}
-
-.pergaminho > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* Rasgo vertical */
-.pergaminho-v::before {
-  [cite_start]background-image: url('/assets/img/pergaminho-rasgado-vert.png'); [cite: 29]
-}
-
-/* Rasgo horizontal */
-.pergaminho-h::before {
+#sec-perguntas.pergaminho-h::before,
+#sec-wizard.pergaminho-h::before {
   background-image: url('/assets/img/pergaminho-rasgado-horiz.png');
+  background-size: cover;
+  min-height: 80vh;
 }
 
-/* Ajustes para seções específicas com pergaminho-v (reforço) */
-.section-intro.pergaminho-v::before,
-.section-termos.pergaminho-v::before {
-  [cite_start]background-size: 100% 100% !important; [cite: 30]
-  [cite_start]background-attachment: fixed !important; [cite: 30]
+.intro-paragraph,
+.parchment-text-rough,
+#termos-pg1, #termos-pg2, #section-senha h2, #section-senha p,
+#sec-wizard #q-text, #sec-final p {
+  font-size: 13px;
+  margin-bottom: 8px;
+  color: #fff;
+  opacity: 0;
+  visibility: visible;
+  display: block;
+  font-family: 'BerkshireSwash', cursive;
+  text-align: left;
+  background: transparent;
+  line-height: 1.4;
+}
+
+.parchment-title-rough,
+#termos-pg1 h2, #termos-pg2 h3, #section-senha h2, #sec-wizard h2, #sec-final h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #fff;
+  opacity: 0;
+}
+
+.parchment-rough {
+  background: transparent !important;
+  border-radius: 16px;
+  height: 100% !important;
+  width: 100% !important;
+}
+
+.parchment-inner-rough {
+  background: transparent !important;
+  box-shadow: none;
+  overflow: hidden !important;
+  height: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+.section-intro .parchment-inner-rough,
+.section-termos .parchment-inner-rough {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100% !important;
+}
+
+.intro-wrap {
+  height: 100% !important;
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+.parchment-title-rough {
+  color: #fff;
+  font-size: 20px;
+  margin-bottom: 12px;
+  opacity: 0 !important;
+  display: none !important;
+  visibility: hidden !important;
+}
+
+.section-intro .parchment-title-rough,
+.section-termos .parchment-title-rough,
+.section-intro .parchment-text-rough,
+.section-termos .parchment-text-rough {
+  opacity: 0 !important;
+  display: none !important;
+  visibility: hidden !important;
+}
+
+.parchment-title-rough.typing-active,
+.parchment-title-rough.typing-done,
+.section-intro .parchment-title-rough.typing-active,
+.section-intro .parchment-title-rough.typing-done,
+.section-termos .parchment-title-rough.typing-active,
+.section-termos .parchment-title-rough.typing-done,
+.section-intro .parchment-text-rough.typing-active,
+.section-intro .parchment-text-rough.typing-done,
+.section-termos .parchment-text-rough.typing-active,
+.section-termos .parchment-text-rough.typing-done {
+  opacity: 1 !important;
+  display: block !important;
+  visibility: visible !important;
+}
+
+.parchment-text-rough {
+  color: #fff;
+  font-size: 13px;
+  margin-bottom: 8px;
+  line-height: 1.4;
+  opacity: 0 !important;
+  display: none !important;
+  visibility: hidden !important;
+}
+
+.parchment-text-rough.typing-active,
+.parchment-text-rough.typing-done {
+  opacity: 1 !important;
+  display: block !important;
+  visibility: visible !important;
+}
+
+.parchment-input-rough {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.15);
+  background: #0c1330;
+  color: #fff;
+  font-family: 'Cardo', serif;
+}
+
+.parchment-actions-rough {
+  display: flex !important;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  position: sticky;
+  bottom: 0;
+  background: transparent !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.section-intro .parchment-actions-rough,
+.section-termos .parchment-actions-rough {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: flex !important;
+}
+
+/* ========== SEÇÃO GUIA – LAYOUT E ESTILOS ========== */
+.guia-header-moldura {
+  padding: 30px 40px 20px 40px;
+  text-align: center;
+  position: relative;
+  z-index: 10;
+}
+
+.guia-name-input label {
+  background-color: #3e2723 !important;
+  color: #fff !important;
+  padding: 8px 18px !important;
+  border-radius: 6px !important;
+  display: block !important;
+  width: fit-content;
+  margin: 0 auto 10px auto !important;
+  font-family: 'ManufacturingConsent', sans-serif !important;
+  font-size: 1.2em !important;
+  font-variant: small-caps;
+}
+
+.guia-name-input input {
+  width: 65% !important;
+  max-width: 250px !important;
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  color: #3e2723 !important;
+  border: 1px solid #c8a488 !important;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15);
+  padding: 12px !important;
+  font-size: 18px !important;
+  font-family: 'Cardo', serif !important;
+  text-align: center !important;
+  margin: 0 auto !important;
+}
+
+.titulo-pergaminho {
+  text-align: center;
+  margin: 8px auto 6px;
+  font-size: 22px;
+  line-height: 1.15;
+  color: #fff;
+}
+
+.guia-name-input.on-pergaminho {
+  display: flex;
+  justify-content: center;
+  margin: 6px 0 14px;
+}
+
+.input-espinhos {
+  width: min(62%, 360px);
+  padding: 12px 14px;
+  background: rgba(255,255,255,.98);
+  color: #3e2723;
+  font-size: 16px;
+  text-align: center;
+  outline: none;
+  border: 14px solid transparent;
+  -webkit-border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
+  border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
+  border-radius: 2px;
+}
+
+.moldura-grande {
+  margin: 8px auto 12px;
+  width: min(92%, 720px);
+  min-height: 160px;
+  padding: 26px 28px;
+  background: url('/assets/img/moldura-medieval.png') center/100% 100% no-repeat transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guia-descricao-medieval {
+  width: 100%;
+  max-width: 640px;
+  text-align: left;
+  color: #fff;
+}
+
+.guia-descricao-medieval p {
+  margin: 6px 0;
+  font-size: 15.5px;
+  line-height: 1.45;
+}
+
+.guia-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  width: min(92%, 720px);
+  margin: 4px auto 10px;
+}
+
+.btn-stone-espinhos {
+  padding: 11px 14px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(to bottom, rgba(255,255,255,.15), rgba(0,0,0,.22)), url('/assets/img/textura-de-pedra.jpg') center/cover no-repeat;
+  border: 12px solid transparent;
+  -webkit-border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
+  border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
+  border-radius: 3px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.35));
+  transition: transform .12s ease, filter .12s ease, opacity .12s ease;
+}
+
+.btn-stone-espinhos:hover {
+  transform: translateY(-1px);
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,.45));
+}
+
+.btn-stone-espinhos:disabled {
+  opacity: .55;
+  filter: grayscale(.3);
+  cursor: not-allowed;
+}
+
+.guia-selected {
+  text-shadow: 0 0 10px rgba(255,196,0,.75);
 }
