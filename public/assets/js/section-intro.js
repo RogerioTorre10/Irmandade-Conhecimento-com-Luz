@@ -7,10 +7,7 @@
   const TRANSITION_SRC = '/assets/img/filme-pergaminho-ao-vento.mp4';
   const TRANSITION_TIMEOUT_MS = 8000;
   const TTS_FALLBACK_DELAY_MS = 2000;
-
- (function () {
-  'use strict';
-
+ 
   if (window.__introBound) return;
   window.__introBound = true;
 
