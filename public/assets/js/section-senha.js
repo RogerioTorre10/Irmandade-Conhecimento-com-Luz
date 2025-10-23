@@ -1,6 +1,6 @@
 (function () {
   'use strict';
-  
+
   const MOD = 'section-senha.js';
   const SECTION_ID = 'section-senha';
   const NEXT_SECTION_ID = 'section-guia';
@@ -199,13 +199,8 @@
       console.error('[JCSenha] Erro ao reproduzir vídeo:', e);
       video.remove();
       console.log('[JCSenha] Redirecionando para:', nextSectionId, '(fallback devido a erro no vídeo)');
-      try {
-        window.JC?.show(nextSectionId);
-        console.log('[JCSenha] Navegação para', nextSectionId, 'iniciada (fallback)');
-      } catch (e) {
-        console.error('[JCSenha] Erro ao carregar próxima seção:', e);
-      }
-    });
+      window.JC?.show(nextSectionId);
+    }, { once: true });
   }
 
   function pickElements(root) {
@@ -216,23 +211,18 @@
       instr4: root.querySelector('#senha-instr4'),
       input: root.querySelector('#senha-input'),
       toggle: root.querySelector('.btn-toggle-senha'),
-      btnNext: root.querySelector('#btn-senha-avancar'),
-      btnPrev: root.querySelector('#btn-senha-prev')
+      btnPrev: root.querySelector('#btn-senha-prev'),
+      btnNext: root.querySelector('#btn-senha-avancar')
     };
   }
 
   async function runTypingSequence(root) {
-    if (window.JCSenha.state.typingInProgress) return;
-    window.JCSenha.state.typingInProgress = true;
-
-    const { instr1, instr2, instr3, instr4, input, btnNext, btnPrev, toggle } = pickElements(root);
-    const seq = [instr1, instr2, instr3, instr4]
-      .filter(Boolean)
-      .sort((a, b) => {
-        const aRect = a.getBoundingClientRect();
-        const bRect = b.getBoundingClientRect();
-        return aRect.left - bRect.left || aRect.top - bRect.top;
-      });
+    const { instr1, instr2, instr3, instr4, input, toggle, btnPrev, btnNext } = pickElements(root);
+    const seq = [instr1, instr2, instr3, instr4].filter(Boolean).sort((a, b) => {
+      const aRect = a.getBoundingClientRect();
+      const bRect = b.getBoundingClientRect();
+      return aRect.left - bRect.left || aRect.top - bRect.top;
+    });
 
     btnPrev?.setAttribute('disabled', 'true');
     btnNext?.setAttribute('disabled', 'true');
@@ -240,9 +230,6 @@
     toggle?.setAttribute('disabled', 'true');
 
     seq.forEach(normalizeParagraph);
-
-    await waitForVideoEnd();
-    await sleep(INITIAL_TYPING_DELAY_MS - TRANSITION_TIMEOUT_MS);
 
     await waitForTypingBridge();
 
