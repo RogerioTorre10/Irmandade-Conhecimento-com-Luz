@@ -10,7 +10,6 @@
   <link rel="stylesheet" href="/assets/css/styles-base.css" />
   <link rel="stylesheet" href="/assets/css/styles.css" />
   <link rel="stylesheet" href="/assets/css/chama.css" />
-  <!-- Carregar styles-intro.css dinamicamente ou garantir que esteja incluído -->
   <link rel="stylesheet" href="/assets/css/styles-intro.css" />
 
   <!-- Fonte Cardo -->
@@ -148,11 +147,11 @@
 
         el.classList.remove('hidden');
         el.setAttribute('aria-hidden', 'false');
-        el.style.display = 'block'; // Alterado de flex para block
+        el.style.display = 'block';
         el.style.opacity = '1';
         el.style.visibility = 'visible';
-        el.style.zIndex = '2'; // Reduzido para evitar conflitos
-        el.style.transition = 'opacity 0.3s ease'; // Adicionado para suavizar
+        el.style.zIndex = '2';
+        el.style.transition = 'opacity 0.3s ease';
 
         console.log(`[Init] Visibilidade forçada para ${sectionId}`);
       };
@@ -161,9 +160,8 @@
         try {
           window.JC.init();
           console.log('[Init] JC.init executado com sucesso');
-          window.JC.show('section-intro'); // Alterado para iniciar com section-intro
+          window.JC.show('section-intro');
 
-          // Blindagem visual após 3 segundos
           setTimeout(() => {
             forceSectionVisible('section-intro');
           }, 3000);
@@ -172,7 +170,6 @@
         }
       });
 
-      // Blindagem contínua para todas as seções visíveis
       const observer = new MutationObserver(() => {
         const sections = document.querySelectorAll('section[data-section]');
         sections.forEach(sec => {
