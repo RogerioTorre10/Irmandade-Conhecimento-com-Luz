@@ -8,7 +8,6 @@
   const TRANSITION_TIMEOUT_MS = 8000;
   const TTS_FALLBACK_DELAY_MS = 2000;
 
-  // Evitar múltiplas inicializações
   if (window.JCTermos?.__bound) {
     console.log('[JCTermos] Já inicializado, ignorando...');
     return;
@@ -241,12 +240,12 @@
     root.dataset.termosInitialized = 'true';
     ensureSectionVisible(root);
 
-    // Elementos
+    // Elementos - COMPATÍVEL COM SEU HTML
     const pg1 = root.querySelector('#termos-pg1');
     const pg2 = root.querySelector('#termos-pg2');
-    const nextBtn = root.querySelector('.nextBtn');
-    const prevBtn = root.querySelector('.prevBtn');
-    const avancarBtn = root.querySelector('.avancarBtn');
+    const nextBtn = root.querySelector('[data-action="termos-next"]');
+    const prevBtn = root.querySelector('[data-action="termos-prev"]');
+    const avancarBtn = root.querySelector('[data-action="avancar"]');
 
     window.JCTermos.state.pg1 = pg1;
     window.JCTermos.state.pg2 = pg2;
