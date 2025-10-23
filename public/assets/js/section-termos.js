@@ -8,7 +8,6 @@
   const TRANSITION_TIMEOUT_MS = 8000;
   const TTS_FALLBACK_DELAY_MS = 2000;
 
-  // Evitar múltiplas inicializações
   if (window.JCTermos?.__bound) {
     console.log('[JCTermos] Já inicializado, ignorando...');
     return;
@@ -21,7 +20,6 @@
     currentPage: 1,
     listenerAdded: false,
     typingInProgress: false,
-    observer: null,
     initialized: false,
     pg1: null,
     pg2: null,
@@ -191,6 +189,15 @@
     console.log('[JCTermos] Blindagem aplicada');
   }
 
+  // ---------- MOSTRAR/ESCONDER PÁGINA ----------
+  function showPage(pageEl, show) {
+    if (!pageEl) return;
+    pageEl.style.display = show ? 'block' : 'none';
+    pageEl.style.opacity = show ? '1' : '0';
+    pageEl.style.visibility = show ? 'visible' : 'hidden';
+    if (show) pageEl.scrollTop = 0;
+  }
+
   // ---------- DATILOGRAFIA ----------
   async function runTypingSequence(pageEl) {
     if (!pageEl) return;
@@ -214,23 +221,12 @@
     window.JCTermos.state.typingInProgress = false;
   }
 
-  // ---------- MOSTRAR PÁGINA ----------
-  function showPage(pageEl, isVisible) {
-    if (!pageEl) return;
-    pageEl.style.display = isVisible ? 'block' : 'none';
-    pageEl.style.opacity = isVisible ? '1' : '0';
-    pageEl.style.visibility = isVisible ? 'visible' : 'hidden';
-    if (isVisible) {
-      pageEl.scrollTop = 0;
-    }
-  }
-
   // ---------- HANDLER ----------
   const handler = async (evt) => {
     const { sectionId, node } = evt?.detail || {};
     if (sectionId !== SECTION_ID) return;
 
-    if (window.JCTermos.state.ready || (node && node.dataset.termosInitialized)) {
+    if (window.JCTermos.state.initialized) {
       console.log('[JCTermos] Já inicializado');
       return;
     }
@@ -257,11 +253,11 @@
     window.JCTermos.state.prevBtn = prevBtn;
     window.JCTermos.state.avancarBtn = avancarBtn;
 
-    // Inicializar pg1
+    // Forçar visibilidade
     showPage(pg1, true);
     showPage(pg2, false);
 
-    // Desabilitar botões
+    // Desabilitar todos
     [nextBtn, prevBtn, avancarBtn].forEach(btn => {
       if (btn) {
         btn.disabled = true;
@@ -289,6 +285,12 @@
       showPage(pg2, true);
       window.JCTermos.state.currentPage = 2;
 
+      // Forçar visibilidade e rolagem
+      pg2.scrollTop = 0;
+      pg2.style.display = 'block';
+      pg2.style.opacity = '1';
+      pg2.style.visibility = 'visible';
+
       await runTypingSequence(pg2);
 
       // Habilitar botões da pg2
@@ -308,23 +310,22 @@
       window.location.href = '/';
     });
 
-    // Botão "Aceito e quero continuar"
+    // Botão "Aceito"
     avancarBtn?.addEventListener('click', () => {
       if (avancarBtn.disabled) return;
       speechSynthesis.cancel();
       playTransitionVideo(NEXT_SECTION_ID);
     });
 
-    window.JCTermos.state.ready = true;
     window.JCTermos.state.initialized = true;
-    console.log('[JCTermos] Termos 100% FUNCIONAL!');
+    console.log('[JCTermos] TERMOS 2 FUNCIONANDO 100%!');
   };
 
   // ---------- LIMPEZA ----------
   window.JCTermos.destroy = () => {
     console.log('[JCTermos] Destruindo...');
     document.removeEventListener('sectionLoaded', handler);
-    window.JCTermos.state = { ready: false, currentPage: 1, listenerAdded: false, typingInProgress: false, observer: null, initialized: false };
+    window.JCTermos.state = { ready: false, currentPage: 1, listenerAdded: false, typingInProgress: false, initialized: false };
   };
 
   // ---------- REGISTRO ----------
@@ -333,25 +334,17 @@
     window.JCTermos.state.listenerAdded = true;
   }
 
-  const bind = () => {
-    document.removeEventListener('sectionLoaded', handler);
-    document.addEventListener('sectionLoaded', handler, { passive: true, once: true });
-    const tryInit = (attempt = 1, max = 10) => {
-      setTimeout(() => {
-        const visible = document.querySelector(`#${SECTION_ID}:not(.hidden)`);
-        if (visible && !visible.dataset.termosInitialized) {
-          handler({ detail: { sectionId: SECTION_ID, node: visible } });
-        } else if (attempt < max) {
-          tryInit(attempt + 1, max);
-        }
-      }, 1000 * attempt);
-    };
-    tryInit();
+  // Forçar inicialização
+  const forceInit = () => {
+    const root = document.getElementById(SECTION_ID);
+    if (root && !root.dataset.termosInitialized) {
+      handler({ detail: { sectionId: SECTION_ID, node: root } });
+    }
   };
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bind, { once: true });
+    document.addEventListener('DOMContentLoaded', forceInit, { once: true });
   } else {
-    bind();
+    setTimeout(forceInit, 500);
   }
 })();
