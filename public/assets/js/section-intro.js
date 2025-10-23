@@ -8,6 +8,7 @@
   const TRANSITION_TIMEOUT_MS = 8000;
   const TTS_FALLBACK_DELAY_MS = 2000;
 
+  // Evitar múltiplas inicializações
   if (window.JCIntro?.__bound) {
     console.log('[JCIntro] Já inicializado, ignorando...');
     return;
@@ -23,21 +24,19 @@
     initialized: false
   };
 
-  // Utils
+  // ---------- UTILIDADES ----------
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  
   const textOf = (el) => {
     if (!el) return '';
-    const ds = el.dataset?.text;
-    const tc = el.textContent || '';
-    return (ds && ds.trim().length ? ds : tc).trim();
+    const ds = el.dataset?.text?.trim();
+    const tc = el.textContent?.trim() || '';
+    return ds || tc;
   };
 
   function normalizeParagraph(el) {
     if (!el) return false;
-    const current = el.textContent?.trim() || '';
-    const ds = el.dataset?.text?.trim() || '';
-    const source = ds || current;
-
+    const source = textOf(el);
     if (!source) return false;
 
     el.dataset.text = source;
@@ -67,9 +66,10 @@
 
   async function typeOnce(el, { speed = 20, speak = true } = {}) {
     if (!el) return;
-    const text = (el.dataset?.text || '').trim();
+    const text = textOf(el);
     if (!text) return;
 
+    // Bloqueio global de datilografia
     window.G = window.G || {};
     const prevLock = !!window.G.__typingLock;
     window.G.__typingLock = true;
@@ -83,12 +83,7 @@
     if (typeof window.runTyping === 'function') {
       await new Promise((resolve) => {
         try {
-          window.runTyping(
-            el,
-            text,
-            () => resolve(),
-            { speed, cursor: true }
-          );
+          window.runTyping(el, text, () => resolve(), { speed, cursor: true });
         } catch (e) {
           console.warn('[JCIntro] runTyping falhou, usando fallback local', e);
           usedFallback = true;
@@ -105,15 +100,15 @@
 
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
-
     window.G.__typingLock = prevLock;
 
+    // Leitura em voz alta (TTS)
     if (speak && text && window.EffectCoordinator?.speak && !el.dataset.spoken) {
       try {
         window.EffectCoordinator.speak(text, { lang: 'pt-BR', rate: 1.1, pitch: 1.0 });
         console.log('[JCIntro] Iniciando TTS para:', text);
         await sleep(TTS_FALLBACK_DELAY_MS);
-        console.log('[JCIntro] TTS assumido como concluído:', text);
+        console.log('[JCIntro] TTS concluído (fallback):', text);
         el.dataset.spoken = 'true';
       } catch (e) {
         console.error('[JCIntro] Erro no TTS:', e);
@@ -132,14 +127,17 @@
     return true;
   }
 
+  // ---------- TRANSIÇÃO DE VÍDEO ----------
   function playTransitionVideo(nextSectionId) {
     if (document.getElementById('intro-transition-overlay')) return;
+
     console.log('[JCIntro] Iniciando transição de vídeo:', TRANSITION_SRC);
     const overlay = document.createElement('div');
     overlay.id = 'intro-transition-overlay';
     overlay.style.cssText = `
       position: fixed; inset: 0; background: #000; z-index: 999999;
       display: flex; align-items: center; justify-content: center;`;
+    
     const video = document.createElement('video');
     video.src = TRANSITION_SRC;
     video.autoplay = true;
@@ -156,32 +154,29 @@
       done = true;
       try { video.pause(); } catch {}
       overlay.remove();
-      console.log('[JCIntro] Transição concluída, navegando para:', nextSectionId);
+      console.log('[JCIntro] Transição concluída, indo para:', nextSectionId);
       if (typeof window.JC?.show === 'function') {
         window.JC.show(nextSectionId);
       } else {
         window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
-        console.warn('[JCIntro] Fallback navigation to:', nextSectionId);
       }
     };
 
-    video.addEventListener('ended', () => {
-      console.log('[JCIntro] Vídeo terminou, limpando e prosseguindo.');
-      cleanup();
-    }, { once: true });
+    video.addEventListener('ended', cleanup, { once: true });
     video.addEventListener('error', () => {
-      console.error('[JCIntro] Erro ao reproduzir vídeo:', TRANSITION_SRC);
+      console.error('[JCIntro] Erro no vídeo:', TRANSITION_SRC);
       setTimeout(cleanup, 1200);
     }, { once: true });
     setTimeout(() => { if (!done) cleanup(); }, TRANSITION_TIMEOUT_MS);
 
     Promise.resolve().then(() => video.play?.()).catch(() => {
-      console.warn('[JCIntro] Erro ao iniciar vídeo, usando fallback.');
+      console.warn('[JCIntro] Falha ao iniciar vídeo, usando fallback.');
       setTimeout(cleanup, 800);
     });
   }
 
-  function ensureSectionVisible(root, sectionId) {
+  // ---------- BLINDAGEM VISUAL ----------
+  function ensureSectionVisible(root) {
     if (!root) return;
     root.classList.remove('hidden');
     root.setAttribute('aria-hidden', 'false');
@@ -190,30 +185,31 @@
     root.style.visibility = 'visible';
     root.style.zIndex = '2';
     root.style.transition = 'opacity 0.3s ease';
-    console.log(`[JCIntro] Visibilidade forçada para ${sectionId}`);
+    console.log('[JCIntro] Blindagem aplicada: seção visível');
   }
 
+  // ---------- ELEMENTOS ----------
   function pickElements(root) {
     return {
-      title: root.querySelector('.intro-title'),
       texts: root.querySelectorAll('.parchment-text-rough.lumen-typing'),
       btnAvancar: root.querySelector('#btn-avancar')
     };
   }
 
+  // ---------- DATILOGRAFIA ----------
   async function runTypingSequence(root) {
-    const { title, texts, btnAvancar } = pickElements(root);
+    const { texts, btnAvancar } = pickElements(root);
     window.JCIntro.state.typingInProgress = true;
 
-    const seq = [...texts].filter(Boolean).sort((a, b) => {
+    const seq = Array.from(texts).sort((a, b) => {
       const aRect = a.getBoundingClientRect();
       const bRect = b.getBoundingClientRect();
-      return aRect.left - bRect.left || aRect.top - bRect.top;
+      return aRect.top - bRect.top || aRect.left - bRect.left;
     });
 
-    btnAvancar?.disabled = true;
-    btnAvancar?.style.opacity = '0';
-    btnAvancar?.style.cursor = 'default';
+    btnAvancar?.setAttribute('disabled', 'true');
+    btnAvancar && (btnAvancar.style.opacity = '0');
+    btnAvancar && (btnAvancar.style.cursor = 'default');
 
     seq.forEach(normalizeParagraph);
     await waitForTypingBridge();
@@ -225,7 +221,7 @@
     }
 
     if (btnAvancar) {
-      btnAvancar.disabled = false;
+      btnAvancar.removeAttribute('disabled');
       btnAvancar.style.opacity = '1';
       btnAvancar.style.cursor = 'pointer';
     }
@@ -234,6 +230,7 @@
     window.JCIntro.state.initialized = true;
   }
 
+  // ---------- OBSERVER (BLINDAGEM) ----------
   function armObserver(root) {
     if (window.JCIntro.state.observer) {
       window.JCIntro.state.observer.disconnect();
@@ -241,27 +238,25 @@
     const obs = new MutationObserver((mutations) => {
       let needRetype = false;
       for (const m of mutations) {
-        if (m.type === 'childList' || m.type === 'subtree' || m.addedNodes?.length) {
+        if (m.type === 'childList' || m.addedNodes?.length) {
           needRetype = true;
           break;
         }
       }
       if (needRetype && !window.JCIntro.state.typingInProgress && !window.JCIntro.state.initialized) {
-        console.log('[JCIntro] Observer detectou mudanças, reiniciando datilografia');
+        console.log('[JCIntro] Mudança detectada, reiniciando datilografia');
         runTypingSequence(root);
       }
     });
     obs.observe(root, { childList: true, subtree: true, characterData: true });
     window.JCIntro.state.observer = obs;
-    console.log('[JCIntro] Observer configurado');
+    console.log('[JCIntro] Observer de blindagem ativado');
   }
 
+  // ---------- HANDLER PRINCIPAL ----------
   const handler = async (evt) => {
     const { sectionId, node } = evt?.detail || {};
-    if (sectionId !== SECTION_ID) {
-      console.log('[JCIntro] Ignorando, sectionId não é section-intro:', sectionId);
-      return;
-    }
+    if (sectionId !== SECTION_ID) return;
 
     if (window.JCIntro.state.ready || (node && node.dataset.introInitialized)) {
       console.log('[JCIntro] Já inicializado, ignorando...');
@@ -270,64 +265,49 @@
 
     let root = node || document.getElementById(SECTION_ID);
     if (!root) {
-      console.log('[JCIntro] Tentando localizar #section-intro...');
+      console.warn('[JCIntro] #section-intro não encontrado, tentando fallback...');
       try {
         root = await new Promise((resolve, reject) => {
           const start = Date.now();
           const tick = () => {
             const el = document.querySelector(`#jornada-content-wrapper #${SECTION_ID}`);
             if (el) return resolve(el);
-            if (Date.now() - start >= 10000) return reject(new Error('timeout waiting #section-intro'));
+            if (Date.now() - start >= 10000) return reject();
             setTimeout(tick, 50);
           };
           tick();
         });
-      } catch (e) {
-        window.toast?.('Erro: Seção section-intro não carregada.', 'error');
-        console.error('[JCIntro] Section not found:', e);
+      } catch {
+        console.error('[JCIntro] Falha crítica: seção não carregada');
+        window.toast?.('Erro ao carregar introdução.', 'error');
         return;
       }
     }
 
-    console.log('[JCIntro] Root encontrado:', root);
     root.dataset.introInitialized = 'true';
-    root.classList.add('section-intro');
+    ensureSectionVisible(root);
 
-    ensureSectionVisible(root, SECTION_ID);
-
-    const { title, texts, btnAvancar } = pickElements(root);
-
-    [title, ...texts].forEach(el => {
-      if (el) {
-        el.classList.remove('hidden');
-        el.style.display = 'block';
-        el.style.opacity = '0';
-        el.style.visibility = 'hidden';
-      }
-    });
+    const { btnAvancar } = pickElements(root);
 
     btnAvancar?.addEventListener('click', () => {
-      if (!btnAvancar.disabled) {
-        speechSynthesis.cancel();
-        console.log('[JCIntro] Botão Avançar clicado');
-        playTransitionVideo(NEXT_SECTION_ID);
-      }
+      if (btnAvancar.disabled) return;
+      console.log('[JCIntro] Botão "Iniciar" clicado');
+      speechSynthesis.cancel();
+      playTransitionVideo(NEXT_SECTION_ID);
     });
 
     armObserver(root);
     runTypingSequence(root);
 
     window.JCIntro.state.ready = true;
-    console.log('[JCIntro] Seção intro inicializada.');
+    console.log('[JCIntro] Introdução inicializada com sucesso!');
   };
 
-  // Método para limpar a seção
+  // ---------- LIMPEZA ----------
   window.JCIntro.destroy = () => {
     console.log('[JCIntro] Destruindo seção intro');
     document.removeEventListener('sectionLoaded', handler);
-    if (window.JCIntro.state.observer) {
-      window.JCIntro.state.observer.disconnect();
-    }
+    if (window.JCIntro.state.observer) window.JCIntro.state.observer.disconnect();
     const root = document.getElementById(SECTION_ID);
     if (root) {
       root.dataset.introInitialized = '';
@@ -335,52 +315,39 @@
         el.classList.remove('typing-active', 'typing-done', 'lumen-typing');
       });
     }
-    window.JCIntro.state.ready = false;
-    window.JCIntro.state.listenerAdded = false;
-    window.JCIntro.state.typingInProgress = false;
-    window.JCIntro.state.initialized = false;
-    if (typeof window.EffectCoordinator?.stopAll === 'function') {
-      window.EffectCoordinator.stopAll();
-    }
+    window.JCIntro.state = { ready: false, listenerAdded: false, typingInProgress: false, observer: null, initialized: false };
+    if (typeof window.EffectCoordinator?.stopAll === 'function') window.EffectCoordinator.stopAll();
   };
 
+  // ---------- REGISTRO ----------
   if (!window.JCIntro.state.listenerAdded) {
-    console.log('[JCIntro] Registrando listener para sectionLoaded');
     document.addEventListener('sectionLoaded', handler, { once: true });
     window.JCIntro.state.listenerAdded = true;
   }
 
+  // Inicialização manual com fallback
   const bind = () => {
-    console.log('[JCIntro] Executando bind');
     document.removeEventListener('sectionLoaded', handler);
     document.addEventListener('sectionLoaded', handler, { passive: true, once: true });
 
-    const tryInitialize = (attempt = 1, maxAttempts = 10) => {
+    const tryInit = (attempt = 1, max = 10) => {
       setTimeout(() => {
-        const visibleIntro = document.querySelector(`#${SECTION_ID}:not(.hidden)`);
-        if (visibleIntro && !window.JCIntro.state.ready && !visibleIntro.dataset.introInitialized) {
-          console.log('[JCIntro] Seção visível encontrada, disparando handler');
-          handler({ detail: { sectionId: SECTION_ID, node: visibleIntro } });
-        } else if (document.getElementById(SECTION_ID) && !window.JCIntro.state.ready && !document.getElementById(SECTION_ID).dataset.introInitialized) {
-          console.log('[JCIntro] Forçando inicialização manual (tentativa ' + attempt + ')');
+        const visible = document.querySelector(`#${SECTION_ID}:not(.hidden)`);
+        if (visible && !visible.dataset.introInitialized) {
+          handler({ detail: { sectionId: SECTION_ID, node: visible } });
+        } else if (document.getElementById(SECTION_ID) && !document.getElementById(SECTION_ID).dataset.introInitialized) {
           handler({ detail: { sectionId: SECTION_ID, node: document.getElementById(SECTION_ID) } });
-        } else if (attempt < maxAttempts) {
-          console.log('[JCIntro] Nenhuma seção visível ou já inicializada, tentando novamente...');
-          tryInitialize(attempt + 1, maxAttempts);
-        } else {
-          console.error('[JCIntro] Falha ao inicializar após ' + maxAttempts + ' tentativas');
+        } else if (attempt < max) {
+          tryInit(attempt + 1, max);
         }
       }, 1000 * attempt);
     };
-
-    tryInitialize();
+    tryInit();
   };
 
   if (document.readyState === 'loading') {
-    console.log('[JCIntro] Aguardando DOMContentLoaded');
     document.addEventListener('DOMContentLoaded', bind, { once: true });
   } else {
-    console.log('[JCIntro] DOM já carregado, chamando bind');
     bind();
   }
 })();
