@@ -1,24 +1,27 @@
 <link rel="stylesheet" href="/assets/css/styles-base.css">
 <link rel="stylesheet" href="/assets/css/styles-selfie.css">
-<div id="section-selfie" class="j-section pergaminho pergaminho-v epic">
+<div id="section-selfie" class="j-section pergaminho pergaminho-v epic selfie-page">
   <div class="conteudo-pergaminho">
-    <!-- Título -->
+    
+    <!-- Título centralizado -->
     <h2 class="titulo-selfie">Tirar Foto</h2>
 
-    <!-- Nome -->
+    <!-- Campo de nome centralizado -->
     <div class="selfie-nome">
       <label for="nameInput">Nome</label>
       <input id="nameInput" type="text" placeholder="Digite seu nome" />
     </div>
 
-    <!-- Controles e botões -->
+    <!-- Controles e botões lado a lado -->
     <div class="selfie-controles-e-botoes">
+      <!-- Controles à esquerda -->
       <div class="selfie-controles">
         <label>Zoom <input id="selfieScale" type="range" min="0.8" max="2.5" step="0.01" value="1" /></label>
         <label>Horizontal <input id="selfieOffsetX" type="range" min="-50" max="50" step="1" value="0" /></label>
         <label>Vertical <input id="selfieOffsetY" type="range" min="-50" max="50" step="1" value="0" /></label>
       </div>
 
+      <!-- Botões à direita -->
       <div class="selfie-botoes-principais">
         <button id="captureBtn" class="btn btn-stone">Confirmar e Baixar</button>
         <button id="btnSkipSelfie" class="btn btn-stone" data-action="skip-selfie">Pular Foto</button>
@@ -26,12 +29,12 @@
       </div>
     </div>
 
-    <!-- Ver Prévia -->
+    <!-- Botão Ver Prévia centralizado -->
     <div class="selfie-previa-btn">
       <button id="previewBtn" class="btn btn-stone">Ver Prévia</button>
     </div>
 
-    <!-- Moldura com prévia da selfie -->
+    <!-- Moldura da selfie centralizada -->
     <div class="selfie-preview">
       <section id="card-guide" class="guide-card" data-guide="ZION" aria-label="Guia">
         <img class="guide-bg" id="guideBg" src="" alt="Guia Background" />
@@ -56,5 +59,7 @@
         <div class="user-name" id="userNameSlot"></div>
       </section>
     </div>
+
   </div>
 </div>
+
