@@ -2,7 +2,7 @@
 
 /* Título da seção */
 .termos-title {
-  font-family: 'ManufacturingConsent', serif;
+  font-family: 'ManufacturingConsent', sans-serif;
   font-size: 32px;
   text-align: center;
   color: var(--primary);
@@ -41,11 +41,4 @@
 
 .termos-actions .btn-continuar:hover {
   transform: scale(1.05);
-}
-
-/* Pergaminho visual */
-.section-termos.pergaminho-v::before {
-  background-image: url('/assets/img/pergaminho-rasgado-vert.png');
-  background-size: 100% 100%;
-  background-attachment: fixed;
 }
