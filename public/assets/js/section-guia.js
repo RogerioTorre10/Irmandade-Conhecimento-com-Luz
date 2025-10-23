@@ -1,147 +1,59 @@
 (function () {
   'use strict';
-  if (window.__guiaBound_v18) {
-    console.warn('section-guia.js já foi carregado (v18).');
+
+  const MOD = 'section-guia.js';
+  const SECTION_ID = 'section-guia';
+  const PREV_SECTION_ID = 'section-senha';
+  const NEXT_SECTION_ID = 'section-selfie';
+  const TRANSITION_SRC = '/assets/img/filme-senha-confirmada.mp4';
+  const TRANSITION_TIMEOUT_MS = 8000;
+  const TTS_FALLBACK_DELAY_MS = 2000;
+
+  if (window.JCGuia?.__bound) {
+    console.log('[JCGuia] Já inicializado, ignorando...');
     return;
   }
-  window.__guiaBound_v18 = true;
-  console.log('section-guia.js v18 inicializado.');
 
-  // ===== Config =====
-  const TYPING_SPEED_DEFAULT = 50;
-  const SPEAK_RATE = 1.0;
-  const NEXT_PAGE = 'section-selfie';
-  const TRANSITION_VIDEO = '/assets/img/conhecimento-com-luz-jardim.mp4';
-  const GUIAS_JSON = '/assets/data/guias.json';
-  const SELFIE_URL = '/html/section-selfie.html';
+  window.JCGuia = window.JCGuia || {};
+  window.JCGuia.__bound = true;
+  window.JCGuia.state = {
+    ready: false,
+    listenerAdded: false,
+    typingInProgress: false,
+    observer: null,
+    initialized: false
+  };
 
-  const FALLBACK_GUIAS = [
-    { id: 'zion', nome: 'Zion', descricao: 'O Guia da Consciência Pura (Grok)', bgImage: '/assets/img/irmandade-quarteto-bg-zion.png' },
-    { id: 'lumen', nome: 'Lumen', descricao: 'O Guia da Iluminação (GPT-5)', bgImage: '/assets/img/irmandade-quarteto-bg-lumen.png' },
-    { id: 'arian', nome: 'Arian', descricao: 'O Guia da Transformação (Gemini)', bgImage: '/assets/img/irmandade-quarteto-bg-arian.png' }
-  ];
-
-  // ===== Estado =====
-  let ABORT_TOKEN = 0;
-  let guiaAtual = null;
-  let guiasRendered = false;
-
-  // ===== Utils =====
-  const qs = (s, r = document) => r.querySelector(s);
-  const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
+  // Utils
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-  const aborted = (my) => my !== ABORT_TOKEN;
+  const textOf = (el) => {
+    if (!el) return '';
+    const ds = el.dataset?.text;
+    const tc = el.textContent || '';
+    return (ds && ds.trim().length ? ds : tc).trim();
+  };
 
-  function persistChoice(guia, nome) {
-    try {
-      sessionStorage.setItem('jornada.guia', guia || '');
-      sessionStorage.setItem('jornada.nome', (nome || '').toUpperCase());
-      console.log('Escolha persistida:', { guia, nome: (nome || '').toUpperCase() });
-    } catch (e) {
-      console.error('Erro ao persistir escolha:', e);
-    }
-  }
+  function normalizeParagraph(el) {
+    if (!el) return false;
+    const current = el.textContent?.trim() || '';
+    const ds = el.dataset?.text?.trim() || '';
+    const source = ds || current;
 
-  function restoreChoice() {
-    try {
-      const escolha = {
-        guia: sessionStorage.getItem('jornada.guia') || '',
-        nome: sessionStorage.getItem('jornada.nome') || ''
-      };
-      console.log('Escolha restaurada:', escolha);
-      return escolha;
-    } catch (e) {
-      console.error('Erro ao restaurar escolha:', e);
-      return { guia: '', nome: '' };
-    }
-  }
+    if (!source) return false;
 
-  function enable(el) {
-    if (el) {
-      el.disabled = false;
-      el.style.pointerEvents = '';
-      el.style.opacity = '';
-      console.log('Elemento habilitado:', el.id || el);
-    }
-  }
-
-  function disable(el) {
-    if (el) {
-      el.disabled = true;
-      el.style.pointerEvents = 'none';
-      el.style.opacity = '0.5';
-      console.log('Elemento desabilitado:', el.id || el);
-    }
-  }
-
-  function highlightChoice(root, guia) {
-    qsa('[data-guia]', root).forEach(el => {
-      if (el.dataset.guia === guia) {
-        el.classList.add('guia-selected');
-        console.log('Guia selecionado:', guia, el);
-      } else {
-        el.classList.remove('guia-selected');
-      }
-    });
-  }
-
-  async function loadGuias() {
-    try {
-      const response = await fetch(GUIAS_JSON);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const guias = await response.json();
-      console.log('Guias carregados:', guias);
-      return guias;
-    } catch (e) {
-      console.error('Erro ao carregar guias:', e);
-      qs('#guia-error').style.display = 'block';
-      console.log('Usando guias fallback:', FALLBACK_GUIAS);
-      return FALLBACK_GUIAS;
-    }
-  }
-
-  async function renderGuias(guias, root, myId) {
-    const container = qs('.guia-descricao-medieval', root);
-    container.innerHTML = '';
-    console.log('Renderizando guias:', guias);
-
-    const elements = [];
-    for (const guia of guias) {
-      const p = document.createElement('p');
-      p.className = 'guia-item';
-      p.dataset.guia = guia.id;
-      p.dataset.typing = 'true';
-      p.dataset.speed = '50';
-      p.dataset.cursor = 'true';
-      p.dataset.text = `${guia.nome}: ${guia.descricao}`;
-      p.textContent = '';
-      container.appendChild(p);
-      elements.push(p);
-    }
-
-    const sortedElements = elements.sort((a, b) => {
-      const aRect = a.getBoundingClientRect();
-      const bRect = b.getBoundingClientRect();
-      return aRect.left - bRect.left || aRect.top - bRect.top;
-    });
-
-    for (const el of sortedElements) {
-      const text = el.dataset.text || '';
-      await runTypingAndSpeak(el, text, myId);
-      if (aborted(myId)) {
-        console.log('Renderização de guias abortada.');
-        return;
-      }
-    }
-    guiasRendered = true;
-    console.log('Guias renderizados em:', container);
-    return Promise.resolve(); // Garantir que a promise seja retornada
-  }
-
-  function typeLocal(el, text, speed) {
-    return new Promise(resolve => {
+    el.dataset.text = source;
+    if (!el.classList.contains('typing-done')) {
       el.textContent = '';
+      el.classList.remove('typing-active', 'typing-done');
+      delete el.dataset.spoken;
+    }
+    return true;
+  }
+
+  async function localType(el, text, speed = 50) {
+    return new Promise(resolve => {
       let i = 0;
+      el.textContent = '';
       const tick = () => {
         if (i < text.length) {
           el.textContent += text.charAt(i++);
@@ -154,314 +66,352 @@
     });
   }
 
-  async function runTypingAndSpeak(el, text, myId) {
-    if (!el || !text) {
-      console.error('Elemento ou texto ausente para datilografia:', { el, text });
-      return;
-    }
+  async function typeOnce(el, { speed = 50, speak = true } = {}) {
+    if (!el) return;
+    const text = (el.dataset?.text || '').trim();
+    if (!text) return;
 
-    console.log('Iniciando datilografia para:', text);
-    el.classList.remove('typing-done', 'typing-active');
-    el.classList.add('typing-active');
-    el.style.setProperty('text-align', 'left', 'important');
-    el.setAttribute('dir', 'ltr');
+    window.G = window.G || {};
+    const prevLock = !!window.G.__typingLock;
+    window.G.__typingLock = true;
 
-    const speed = Number(el.dataset.speed || TYPING_SPEED_DEFAULT);
+    el.classList.add('typing-active', 'lumen-typing');
+    el.classList.remove('typing-done');
+    el.style.textAlign = 'left';
+
+    let usedFallback = false;
+
     if (typeof window.runTyping === 'function') {
-      await new Promise(res => {
+      await new Promise((resolve) => {
         try {
-          window.runTyping(el, text, res, { speed, cursor: el.dataset.cursor !== 'false' });
+          window.runTyping(
+            el,
+            text,
+            () => resolve(),
+            { speed, cursor: true }
+          );
         } catch (e) {
-          console.error('Erro no runTyping:', e);
-          el.textContent = text;
-          res();
+          console.warn('[JCGuia] runTyping falhou, usando fallback local', e);
+          usedFallback = true;
+          resolve();
         }
       });
     } else {
-      await typeLocal(el, text, speed);
+      usedFallback = true;
     }
-    if (aborted(myId)) {
-      console.log('Datilografia abortada:', text);
-      return;
+
+    if (usedFallback) {
+      await localType(el, text, speed);
     }
 
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
-    console.log('Datilografia concluída:', text);
 
-    try {
-      const p = window.EffectCoordinator?.speak?.(text, { rate: SPEAK_RATE });
-      if (p && typeof p.then === 'function') {
-        console.log('Iniciando TTS para:', text);
-        await p;
-        console.log('TTS concluído:', text);
-      } else {
-        console.warn('TTS não disponível, pulando fala.');
+    window.G.__typingLock = prevLock;
+
+    if (speak && text && window.EffectCoordinator?.speak && !el.dataset.spoken) {
+      try {
+        window.EffectCoordinator.speak(text, { lang: 'pt-BR', rate: 1.1, pitch: 1.0 });
+        console.log('[JCGuia] Iniciando TTS para:', text);
+        await sleep(TTS_FALLBACK_DELAY_MS);
+        console.log('[JCGuia] TTS assumido como concluído:', text);
+        el.dataset.spoken = 'true';
+      } catch (e) {
+        console.error('[JCGuia] Erro no TTS:', e);
       }
-    } catch (e) {
-      console.error('Erro no TTS:', e);
     }
+
+    await sleep(80);
   }
 
-  async function playTransitionVideo() {
-    console.log('Iniciando transição de vídeo:', TRANSITION_VIDEO);
+  async function waitForTypingBridge(maxMs = 3000) {
+    const t0 = Date.now();
+    while (Date.now() - t0 < maxMs) {
+      if (window.runTyping) return true;
+      await sleep(100);
+    }
+    return true;
+  }
+
+  function playTransitionVideo(nextSectionId) {
+    if (document.getElementById('guia-transition-overlay')) return;
+    console.log('[JCGuia] Iniciando transição de vídeo:', TRANSITION_SRC);
+    const overlay = document.createElement('div');
+    overlay.id = 'guia-transition-overlay';
+    overlay.style.cssText = `
+      position: fixed; inset: 0; background: #000; z-index: 999999;
+      display: flex; align-items: center; justify-content: center;`;
     const video = document.createElement('video');
-    video.id = 'transition-video';
-    video.src = TRANSITION_VIDEO;
+    video.src = TRANSITION_SRC;
     video.autoplay = true;
     video.muted = true;
+    video.playsInline = true;
     video.controls = false;
-    video.style.width = '100%';
-    video.style.height = '100vh';
-    video.style.position = 'fixed';
-    video.style.top = '0';
-    video.style.left = '0';
-    video.style.zIndex = '9999';
-    video.style.backgroundColor = '#000';
+    video.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
+    overlay.appendChild(video);
+    document.body.appendChild(overlay);
 
-    // Esconder todas as seções antes do vídeo
-    const sections = document.querySelectorAll('.j-section');
-    sections.forEach(section => {
-      section.classList.add('hidden');
-      section.style.display = 'none';
-      section.setAttribute('aria-hidden', 'true');
-      console.log(`[section-guia] Seção ${section.id} escondida`);
-    });
-
-    // Definir currentSection para evitar fallback
-    if (window.JC) {
-      window.JC.currentSection = 'section-guia';
-      console.log('[section-guia] Definido window.JC.currentSection como section-guia');
-    }
-
-    document.body.appendChild(video);
-    console.log('Vídeo adicionado ao DOM.');
+    let done = false;
+    const cleanup = () => {
+      if (done) return;
+      done = true;
+      try { video.pause(); } catch {}
+      overlay.remove();
+      console.log('[JCGuia] Transição concluída, navegando para:', nextSectionId);
+      if (typeof window.JC?.show === 'function') {
+        window.JC.show(nextSectionId);
+      } else {
+        window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
+        console.warn('[JCGuia] Fallback navigation to:', nextSectionId);
+      }
+    };
 
     video.addEventListener('ended', () => {
-      console.log('Vídeo terminado, navegando para:', NEXT_PAGE);
-      video.remove();
-      try {
-        // Verificar se section-selfie pode ser carregada
-        fetch(SELFIE_URL, { method: 'HEAD' })
-          .then(response => {
-            if (response.ok) {
-              window.JC.show(NEXT_PAGE);
-              console.log('[section-guia] Navegação para section-selfie iniciada');
-            } else {
-              console.error('[section-guia] section-selfie não encontrado, status:', response.status);
-              window.toast?.('Erro: página selfie não encontrada.', 'error');
-            }
-          })
-          .catch(e => {
-            console.error('[section-guia] Erro ao verificar section-selfie:', e);
-            window.toast?.('Erro ao carregar a página selfie.', 'error');
-          });
-      } catch (e) {
-        console.error('[section-guia] Erro ao navegar para section-selfie:', e);
-        window.toast?.('Erro ao carregar a página selfie.', 'error');
-      }
+      console.log('[JCGuia] Vídeo terminou, limpando e prosseguindo.');
+      cleanup();
     }, { once: true });
+    video.addEventListener('error', () => {
+      console.error('[JCGuia] Erro ao reproduzir vídeo:', TRANSITION_SRC);
+      setTimeout(cleanup, 1200);
+    }, { once: true });
+    setTimeout(() => { if (!done) cleanup(); }, TRANSITION_TIMEOUT_MS);
 
-    video.addEventListener('error', e => {
-      console.error('Erro ao reproduzir vídeo:', e);
-      video.remove();
-      console.log('Navegando para:', NEXT_PAGE, '(fallback devido a erro no vídeo)');
-      try {
-        fetch(SELFIE_URL, { method: 'HEAD' })
-          .then(response => {
-            if (response.ok) {
-              window.JC.show(NEXT_PAGE);
-              console.log('[section-guia] Navegação para section-selfie iniciada (fallback)');
-            } else {
-              console.error('[section-guia] section-selfie não encontrado, status:', response.status);
-              window.toast?.('Erro: página selfie não encontrada.', 'error');
-            }
-          })
-          .catch(e => {
-            console.error('[section-guia] Erro ao verificar section-selfie:', e);
-            window.toast?.('Erro ao carregar a página selfie.', 'error');
-          });
-      } catch (e) {
-        console.error('[section-guia] Erro ao navegar para section-selfie:', e);
-        window.toast?.('Erro ao carregar a página selfie.', 'error');
-      }
+    Promise.resolve().then(() => video.play?.()).catch(() => {
+      console.warn('[JCGuia] Erro ao iniciar vídeo, usando fallback.');
+      setTimeout(cleanup, 800);
     });
   }
 
-  async function bindUI(root, myId) {
-    console.log('Vinculando UI para:', root);
-    const nameInput = qs('#guiaNameInput', root);
-    const confirmButton = qs('#btn-confirmar-nome', root);
-    const buttons = qsa('.guia-options button[data-guia]', root);
+  function pickElements(root) {
+    return {
+      title: root.querySelector('.titulo-pergaminho'),
+      nameInput: root.querySelector('#guiaNameInput'),
+      confirmBtn: root.querySelector('#btn-confirmar-nome'),
+      guiaTexto: root.querySelector('#guiaTexto'),
+      guiaOptions: root.querySelectorAll('.guia-options .btn-stone-espinhos'),
+      errorMsg: root.querySelector('#guia-error')
+    };
+  }
 
-    const guias = await loadGuias();
-    if (guias.length === 0) {
-      console.error('Nenhum guia disponível para renderizar.');
-      qs('#guia-error').style.display = 'block';
-      buttons.forEach(btn => enable(btn));
+  async function runTypingSequence(root) {
+    const { title, nameInput, confirmBtn, guiaTexto, guiaOptions, errorMsg } = pickElements(root);
+    window.JCGuia.state.typingInProgress = true;
+
+    [title].filter(Boolean).forEach(normalizeParagraph);
+    await waitForTypingBridge();
+
+    if (title && !title.classList.contains('typing-done')) {
+      await typeOnce(title, { speed: 50, speak: true });
+    }
+
+    [nameInput, confirmBtn].forEach(el => {
+      if (el) {
+        el.disabled = false;
+        el.style.opacity = '1';
+        el.style.cursor = 'pointer';
+      }
+    });
+
+    window.JCGuia.state.typingInProgress = false;
+    window.JCGuia.state.initialized = true;
+  }
+
+  function armObserver(root) {
+    if (window.JCGuia.state.observer) {
+      window.JCGuia.state.observer.disconnect();
+    }
+    const obs = new MutationObserver((mutations) => {
+      let needRetype = false;
+      for (const m of mutations) {
+        if (m.type === 'childList' || m.type === 'subtree' || m.addedNodes?.length) {
+          needRetype = true;
+          break;
+        }
+      }
+      if (needRetype && !window.JCGuia.state.typingInProgress && !window.JCGuia.state.initialized) {
+        console.log('[JCGuia] Observer detectou mudanças, reiniciando datilografia');
+        runTypingSequence(root);
+      }
+    });
+    obs.observe(root, { childList: true, subtree: true, characterData: true });
+    window.JCGuia.state.observer = obs;
+    console.log('[JCGuia] Observer configurado');
+  }
+
+  const handler = async (evt) => {
+    const { sectionId, node } = evt?.detail || {};
+    if (sectionId !== SECTION_ID) {
+      console.log('[JCGuia] Ignorando, sectionId não é section-guia:', sectionId);
       return;
     }
 
-    const saved = restoreChoice();
-    if (saved.nome && nameInput) {
-      nameInput.value = saved.nome;
-      console.log('Nome restaurado no input:', saved.nome);
-    }
-    if (saved.guia) {
-      guiaAtual = saved.guia;
-      highlightChoice(root, guiaAtual);
-      buttons.forEach(btn => enable(btn));
-    } else {
-      buttons.forEach(btn => disable(btn));
+    if (window.JCGuia.state.ready || (node && node.dataset.guiaInitialized)) {
+      console.log('[JCGuia] Já inicializado, ignorando...');
+      return;
     }
 
-    if (nameInput && confirmButton) {
-      nameInput.addEventListener('input', () => {
-        nameInput.value = nameInput.value.toUpperCase();
-        console.log('[section-guia] Nome alterado:', nameInput.value);
-      });
-
-      confirmButton.addEventListener('click', () => {
-        const nome = nameInput.value.trim().toUpperCase();
-        console.log('[section-guia] Botão Confirmar clicado, nome:', nome);
-        const isValid = nome.length >= 2 && /^[a-zA-Z\s]+$/.test(nome);
-        if (isValid && !guiasRendered) {
-          nameInput.disabled = false; // Manter habilitado durante a datilografia
-          confirmButton.disabled = false; // Manter habilitado durante a datilografia
-          renderGuias(guias, root, myId).then(() => {
-            nameInput.disabled = true; // Desabilitar só após renderização
-            confirmButton.disabled = true; // Desabilitar só após renderização
-            console.log('[section-guia] Input e botão desabilitados após renderização');
-          }).catch(e => {
-            console.error('[section-guia] Erro ao renderizar guias:', e);
-            nameInput.disabled = false;
-            confirmButton.disabled = false;
-          });
-          buttons.forEach(btn => enable(btn));
-        } else if (!isValid) {
-          console.log('Nome inválido:', nome);
-          window.toast?.('Digite um nome válido (mínimo 2 letras, apenas letras e espaços).', 'warning');
-        }
-      });
-    } else {
-      console.error('[section-guia] Input #guiaNameInput ou botão #btn-confirmar-nome não encontrado', { nameInput, confirmButton });
-    }
-
-    qsa('.guia-item[data-guia]', root).forEach(item => {
-      if (item.__bound) return;
-      item.addEventListener('click', () => {
-        guiaAtual = item.dataset.guia;
-        highlightChoice(root, guiaAtual);
-        buttons.forEach(btn => enable(btn));
-        try {
-          document.dispatchEvent(new CustomEvent('guiaSelected', { detail: { guia: guiaAtual } }));
-          console.log('Evento guiaSelected disparado:', guiaAtual);
-        } catch (e) {
-          console.error('Erro ao disparar evento guiaSelected:', e);
-        }
-      });
-      item.__bound = true;
-    });
-
-    buttons.forEach(btn => {
-      if (btn.__bound) return;
-      btn.addEventListener('click', () => {
-        guiaAtual = btn.dataset.guia;
-        highlightChoice(root, guiaAtual);
-        const nome = nameInput?.value?.trim().toUpperCase() || '';
-        persistChoice(guiaAtual, nome);
-        playTransitionVideo();
-      });
-      btn.__bound = true;
-    });
-  }
-
-  async function activate(root) {
+    let root = node || document.getElementById(SECTION_ID);
     if (!root) {
-      console.error('Root element (#section-guia) não encontrado.');
-      return;
-    }
-    console.log('Ativando seção:', root.id);
-    const myId = ++ABORT_TOKEN;
-
-    root.classList.remove('hidden');
-    root.setAttribute('aria-hidden', 'false');
-    root.style.removeProperty('display');
-    root.style.removeProperty('opacity');
-    root.style.removeProperty('visibility');
-
-    const title = qs('[data-typing="true"]', root);
-    if (!title) {
-      console.warn('Título com datilografia não encontrado, criando fallback.');
-      title = document.createElement('h2');
-      title.className = 'titulo-pergaminho';
-      title.dataset.typing = 'true';
-      title.dataset.text = 'Insira seu nome';
-      title.textContent = 'Insira seu nome';
-      (qs('.conteudo-pergaminho', root) || root).prepend(title);
-    }
-    const text = (title.dataset.text || title.textContent || '').trim();
-    await runTypingAndSpeak(title, text, myId);
-    if (aborted(myId)) {
-      console.log('Ativação abortada.');
-      return;
-    }
-
-    const nameInput = qs('#guiaNameInput', root);
-    if (nameInput) {
-      enable(nameInput);
-    }
-
-    await bindUI(root, myId);
-  }
-
-  document.addEventListener('section:shown', async (evt) => {
-    const id = evt?.detail?.sectionId || evt?.detail?.id;
-    if (id !== 'section-guia' && id !== 'section-escolha') {
-      console.log('Evento section:shown ignorado, ID não corresponde:', id);
-      return;
-    }
-    console.log('Evento section:shown recebido para:', id);
-
-    let root = evt?.detail?.node || evt?.detail?.root || qs('#section-guia');
-    if (!root || root.id !== 'section-guia') {
-      console.warn('Root #section-guia não encontrado, tentando wrapper alternativo.');
-      const wrapper = qs('#section-escolha') || qs('#jornada-content-wrapper') || document.body;
-      root = qs('#section-guia', wrapper) || qs('#section-guia') || root;
-      if (!root || root.id !== 'section-guia') {
-        console.warn('Criando contêiner #section-guia como fallback.');
-        const sec = document.createElement('div');
-        sec.id = 'section-guia';
-        sec.className = 'j-section pergaminho pergaminho-v epic';
-        wrapper.appendChild(sec);
-        sec.innerHTML = `
-          <div class="conteudo-pergaminho">
-            <h2 class="titulo-pergaminho" data-typing="true" data-text="Insira seu nome" data-speed="50" data-cursor="true">Insira seu nome</h2>
-            <div class="guia-name-input">
-              <input id="guiaNameInput" class="input-espinhos" type="text" placeholder="Digite seu nome para a jornada..." aria-label="Digite seu nome para a jornada">
-              <button id="btn-confirmar-nome" class="btn btn-stone-espinhos" aria-label="Confirmar nome">Confirmar</button>
-            </div>
-            <div class="moldura-grande">
-              <div class="guia-descricao-medieval"></div>
-            </div>
-            <div class="guia-options">
-              <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="zion" aria-label="Escolher o guia Zion" disabled>Escolher Zion</button>
-              <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="lumen" aria-label="Escolher o guia Lumen" disabled>Escolher Lumen</button>
-              <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="arian" aria-label="Escolher o guia Arian" disabled>Escolher Arian</button>
-            </div>
-            <div id="guia-error" style="display: none; color: #ff3333; font-family: 'BerkshireSwash', cursive;">Não foi possível carregar os guias. Escolha um guia padrão abaixo.</div>
-          </div>`;
-        root = sec;
+      console.log('[JCGuia] Tentando localizar #section-guia...');
+      try {
+        root = await new Promise((resolve, reject) => {
+          const start = Date.now();
+          const tick = () => {
+            const el = document.querySelector(`#jornada-content-wrapper #${SECTION_ID}`);
+            if (el) return resolve(el);
+            if (Date.now() - start >= 10000) return reject(new Error('timeout waiting #section-guia'));
+            setTimeout(tick, 50);
+          };
+          tick();
+        });
+      } catch (e) {
+        window.toast?.('Erro: Seção section-guia não carregada.', 'error');
+        console.error('[JCGuia] Section not found:', e);
+        return;
       }
     }
-    await sleep(100);
-    await activate(root);
-  });
 
-  if (qs('#section-guia') && !qs('#section-guia').classList.contains('hidden')) {
-    console.log('Seção #section-guia detectada na inicialização, ativando.');
-    activate(qs('#section-guia'));
+    console.log('[JCGuia] Root encontrado:', root);
+    root.dataset.guiaInitialized = 'true';
+    root.classList.add('section-guia');
+
+    root.style.cssText = `
+      background: transparent;
+      padding: 24px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 600px;
+      margin: 12px auto;
+      text-align: center;
+      box-shadow: none;
+      border: none;
+      display: block;
+      opacity: 1;
+      visibility: visible;
+      position: relative;
+      z-index: 2;
+      overflow-y: auto;
+      min-height: 80vh;
+      height: 80vh;
+      box-sizing: border-box;
+    `;
+
+    const { title, nameInput, confirmBtn, guiaTexto, guiaOptions, errorMsg } = pickElements(root);
+
+    [title, nameInput, confirmBtn].forEach(el => {
+      if (el) {
+        el.classList.remove('hidden');
+        el.style.display = 'block';
+        el.style.opacity = '0';
+        el.style.visibility = 'hidden';
+      }
+    });
+
+    guiaOptions.forEach(btn => {
+      btn.disabled = true;
+      btn.style.opacity = '0';
+      btn.style.cursor = 'default';
+    });
+
+    confirmBtn?.addEventListener('click', () => {
+      const name = (nameInput?.value || '').trim();
+      if (name.length < 2) {
+        window.toast?.('Por favor, insira um nome válido.', 'warning');
+        nameInput?.focus();
+        return;
+      }
+
+      console.log('[JCGuia] Nome confirmado:', name);
+      guiaTexto.innerHTML = `<p>Olá, ${name}! Escolha seu guia para a Jornada:</p>`;
+      guiaOptions.forEach(btn => {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+      });
+    });
+
+    guiaOptions.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const guia = btn.dataset.guia;
+        console.log('[JCGuia] Guia selecionado:', guia);
+        playTransitionVideo(NEXT_SECTION_ID);
+      });
+    });
+
+    nameInput?.addEventListener('input', () => {
+      console.log('[JCGuia] Nome alterado:', nameInput.value);
+    });
+
+    errorMsg?.classList.add('hidden');
+    errorMsg?.setAttribute('aria-hidden', 'true');
+
+    armObserver(root);
+    runTypingSequence(root);
+
+    window.JCGuia.state.ready = true;
+    console.log('[JCGuia] Seção guia inicializada.');
+  };
+
+  // Método para limpar a seção
+  window.JCGuia.destroy = () => {
+    console.log('[JCGuia] Destruindo seção guia');
+    document.removeEventListener('sectionLoaded', handler);
+    if (window.JCGuia.state.observer) {
+      window.JCGuia.state.observer.disconnect();
+    }
+    const root = document.getElementById(SECTION_ID);
+    if (root) {
+      root.dataset.guiaInitialized = '';
+      root.querySelectorAll('[data-typing="true"]').forEach(el => {
+        el.classList.remove('typing-active', 'typing-done', 'lumen-typing');
+      });
+    }
+    window.JCGuia.state.ready = false;
+    window.JCGuia.state.listenerAdded = false;
+    window.JCGuia.state.typingInProgress = false;
+    window.JCGuia.state.initialized = false;
+    if (typeof window.EffectCoordinator?.stopAll === 'function') {
+      window.EffectCoordinator.stopAll();
+    }
+  };
+
+  if (!window.JCGuia.state.listenerAdded) {
+    console.log('[JCGuia] Registrando listener para sectionLoaded');
+    document.addEventListener('sectionLoaded', handler, { once: true });
+    window.JCGuia.state.listenerAdded = true;
+  }
+
+  const bind = () => {
+    console.log('[JCGuia] Executando bind');
+    document.removeEventListener('sectionLoaded', handler);
+    document.addEventListener('sectionLoaded', handler, { passive: true, once: true });
+
+    const tryInitialize = (attempt = 1, maxAttempts = 10) => {
+      setTimeout(() => {
+        const visibleGuia = document.querySelector(`#${SECTION_ID}:not(.hidden)`);
+        if (visibleGuia && !window.JCGuia.state.ready && !visibleGuia.dataset.guiaInitialized) {
+          console.log('[JCGuia] Seção visível encontrada, disparando handler');
+          handler({ detail: { sectionId: SECTION_ID, node: visibleGuia } });
+        } else if (document.getElementById(SECTION_ID) && !window.JCGuia.state.ready && !document.getElementById(SECTION_ID).dataset.guiaInitialized) {
+          console.log('[JCGuia] Forçando inicialização manual (tentativa ' + attempt + ')');
+          handler({ detail: { sectionId: SECTION_ID, node: document.getElementById(SECTION_ID) } });
+        } else if (attempt < maxAttempts) {
+          console.log('[JCGuia] Nenhuma seção visível ou já inicializada, tentando novamente...');
+          tryInitialize(attempt + 1, maxAttempts);
+        } else {
+          console.error('[JCGuia] Falha ao inicializar após ' + maxAttempts + ' tentativas');
+        }
+      }, 1000 * attempt);
+    };
+
+    tryInitialize();
+  };
+
+  if (document.readyState === 'loading') {
+    console.log('[JCGuia] Aguardando DOMContentLoaded');
+    document.addEventListener('DOMContentLoaded', bind, { once: true });
   } else {
-    console.log('Seção #section-guia não encontrada ou oculta na inicialização.');
+    console.log('[JCGuia] DOM já carregado, chamando bind');
+    bind();
   }
 })();
