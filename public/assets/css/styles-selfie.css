@@ -134,3 +134,65 @@
   cursor: not-allowed;
   pointer-events: none;
 }
+/* Centralização do título e nome */
+.titulo-selfie,
+.selfie-nome {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+/* Nome input estilizado */
+.selfie-nome input {
+  padding: 10px;
+  font-size: 18px;
+  border-radius: var(--radius);
+  border: 2px solid var(--card-2);
+  background: var(--card-2);
+  color: var(--fg);
+  font-family: 'BerkshireSwash', cursive;
+  text-transform: uppercase;
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+/* Controles e botões lado a lado */
+.selfie-controles-e-botoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+/* Controles à esquerda */
+.selfie-controles {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Botões à direita */
+.selfie-botoes-principais {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+/* Botão Ver Prévia centralizado */
+.selfie-previa-btn {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+/* Moldura da selfie centralizada */
+.selfie-preview {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
