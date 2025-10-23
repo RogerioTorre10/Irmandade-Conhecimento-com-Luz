@@ -1,65 +1,68 @@
 <link rel="stylesheet" href="/assets/css/styles-base.css">
-<link rel="stylesheet" href="/assets/css/styles-selfie.css">
-<div id="section-selfie" class="j-section pergaminho pergaminho-v epic selfie-page">
-  <div class="conteudo-pergaminho">
-    
-    <!-- Título centralizado -->
-    <h2 class="titulo-selfie">Tirar Foto</h2>
+<link rel="stylesheet" href="/assets/css/styles.css">
+<div id="jornada-content-wrapper">
+  <div id="section-selfie" class="j-section pergaminho pergaminho-v epic selfie-page">
+    <div class="conteudo-pergaminho">
+      <!-- Título centralizado -->
+      <h2 class="titulo-selfie">Tirar Foto</h2>
 
-    <!-- Campo de nome centralizado -->
-    <div class="selfie-nome">
-      <label for="nameInput">Nome</label>
-      <input id="nameInput" type="text" placeholder="Digite seu nome" />
-    </div>
-
-    <!-- Controles e botões lado a lado -->
-    <div class="selfie-controles-e-botoes">
-      <!-- Controles à esquerda -->
-      <div class="selfie-controles">
-        <label>Zoom <input id="selfieScale" type="range" min="0.8" max="2.5" step="0.01" value="1" /></label>
-        <label>Horizontal <input id="selfieOffsetX" type="range" min="-50" max="50" step="1" value="0" /></label>
-        <label>Vertical <input id="selfieOffsetY" type="range" min="-50" max="50" step="1" value="0" /></label>
+      <!-- Campo de nome centralizado -->
+      <div class="selfie-nome">
+        <label for="nameInput">Nome</label>
+        <input id="nameInput" type="text" placeholder="Digite seu nome" class="selfie-name-input" />
       </div>
 
-      <!-- Botões à direita -->
-      <div class="selfie-botoes-principais">
-        <button id="captureBtn" class="btn btn-stone">Confirmar e Baixar</button>
-        <button id="btnSkipSelfie" class="btn btn-stone" data-action="skip-selfie">Pular Foto</button>
-        <button id="btnStartJourney" class="btn btn-stone" data-action="avancar">Entrar na Jornada</button>
-      </div>
-    </div>
-
-    <!-- Botão Ver Prévia centralizado -->
-    <div class="selfie-previa-btn">
-      <button id="previewBtn" class="btn btn-stone">Ver Prévia</button>
-    </div>
-
-    <!-- Moldura da selfie centralizada -->
-    <div class="selfie-preview">
-      <section id="card-guide" class="guide-card" data-guide="ZION" aria-label="Guia">
-        <img class="guide-bg" id="guideBg" src="" alt="Guia Background" />
-        <div class="flame-layer" aria-hidden="true">
-          <svg class="flame-svg" viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
-            <defs>
-              <clipPath id="flameClip">
-                <path d="M50,20 C42,35 34,45 33,58 C32,73 41,82 50,92 C59,82 68,73 67,58 C66,45 58,35 50,20 Z" />
-              </clipPath>
-              <radialGradient id="flameGlow" cx="50%" cy="70%" r="55%">
-                <stop offset="0%" stop-color="rgba(255, 224, 130, 1)" />
-                <stop offset="55%" stop-color="rgba(255, 180, 0, 0.9)" />
-                <stop offset="100%" stop-color="rgba(255, 180, 0, 0)" />
-              </radialGradient>
-            </defs>
-            <image id="selfieImage" href="" x="15" y="35" width="70" height="90" clip-path="url(#flameClip)" preserveAspectRatio="xMidYMid slice" />
-            <ellipse cx="50" cy="95" rx="28" ry="40" fill="url(#flameGlow)" />
-            <path d="M50,20 C42,35 34,45 33,58 C32,73 41,82 50,92 C59,82 68,73 67,58 C66,45 58,35 50,20 Z" fill="none" stroke="rgba(255,200,0,.85)" stroke-width="1.6" />
-          </svg>
+      <!-- Controles e botões lado a lado -->
+      <div class="selfie-controles-e-botoes">
+        <!-- Controles à esquerda -->
+        <div class="selfie-controles">
+          <label>Zoom <input id="selfieScale" type="range" min="0.8" max="2.5" step="0.01" value="1" /></label>
+          <label>Horizontal <input id="selfieOffsetX" type="range" min="-50" max="50" step="1" value="0" /></label>
+          <label>Vertical <input id="selfieOffsetY" type="range" min="-50" max="50" step="1" value="0" /></label>
+          <small class="muted">Dica: alinhe seu rosto na chama ao lado do guia.</small>
         </div>
-        <div class="guide-name" id="guideNameSlot"></div>
-        <div class="user-name" id="userNameSlot"></div>
-      </section>
-    </div>
 
+        <!-- Botões à direita -->
+        <div class="selfie-botoes-principais">
+          <button id="captureBtn" class="btn btn-stone">Confirmar e Baixar</button>
+          <button id="btnSkipSelfie" class="btn btn-stone" data-action="skip-selfie">Pular Foto</button>
+          <button id="btnStartJourney" class="btn btn-stone" data-action="avancar">Entrar na Jornada</button>
+        </div>
+      </div>
+
+      <!-- Botão Ver Prévia centralizado -->
+      <div class="selfie-previa-btn">
+        <button id="previewBtn" class="btn btn-stone">Ver Prévia</button>
+      </div>
+
+      <!-- Moldura da selfie centralizada -->
+      <div class="selfie-preview">
+        <section id="card-guide" class="guide-card" data-guide="ZION" aria-label="Guia">
+          <img class="guide-bg" id="guideBg" src="" alt="Guia Background" />
+          <div class="flame-layer" aria-hidden="true">
+            <svg class="flame-svg" viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <clipPath id="flameClip">
+                  <path d="M50,20 C42,35 34,45 33,58 C32,73 41,82 50,92 C59,82 68,73 67,58 C66,45 58,35 50,20 Z" />
+                </clipPath>
+                <radialGradient id="flameGlow" cx="50%" cy="70%" r="55%">
+                  <stop offset="0%" stop-color="rgba(255, 224, 130, 1)" />
+                  <stop offset="55%" stop-color="rgba(255, 180, 0, 0.9)" />
+                  <stop offset="100%" stop-color="rgba(255, 180, 0, 0)" />
+                </radialGradient>
+              </defs>
+              <image id="selfieImage" href="" x="15" y="35" width="70" height="90" clip-path="url(#flameClip)" preserveAspectRatio="xMidYMid slice" />
+              <ellipse cx="50" cy="95" rx="28" ry="40" fill="url(#flameGlow)" />
+              <path d="M50,20 C42,35 34,45 33,58 C32,73 41,82 50,92 C59,82 68,73 67,58 C66,45 58,35 50,20 Z" fill="none" stroke="rgba(255,200,0,.85)" stroke-width="1.6" />
+            </svg>
+          </div>
+          <div class="guide-name" id="guideNameSlot"></div>
+          <div class="user-name" id="userNameSlot"></div>
+        </section>
+      </div>
+
+      <div id="selfieError" class="selfie-error">Erro ao carregar a pré-visualização. Tente novamente ou pule.</div>
+      <small class="muted">Pré-visualização</small>
+    </div>
   </div>
 </div>
-
