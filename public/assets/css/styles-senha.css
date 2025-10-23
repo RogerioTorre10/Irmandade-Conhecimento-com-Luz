@@ -70,11 +70,11 @@
   max-width: 420px;
 }
 
-.senha-actions .btn.btn-stone,
+.senha-actions .btn.btn-primary.btn-stone,
 .senha-actions #btn-senha-prev,
 .senha-actions #btn-senha-avancar {
-  padding: 8px 16px;
-  font-size: 18px;
+  padding: 8px 16px !important;
+  font-size: 18px !important;
   border: 2px solid var(--card-2) !important;
   border-radius: var(--radius) !important;
   background-image: url('/assets/img/textura-de-pedra.jpg') !important;
@@ -83,29 +83,29 @@
   background-color: var(--card-2) !important;
   background-blend-mode: overlay !important;
   color: var(--fg) !important;
-  font-family: 'ManufacturingConsent', sans-serif;
-  font-weight: bold;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  width: 140px;
-  text-align: center;
+  font-family: 'ManufacturingConsent', sans-serif !important;
+  font-weight: bold !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+  cursor: pointer !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+  width: 140px !important;
+  text-align: center !important;
   position: relative !important;
   pointer-events: auto !important;
 }
 
-.senha-actions .btn.btn-stone:hover,
+.senha-actions .btn.btn-primary.btn-stone:hover,
 .senha-actions #btn-senha-prev:hover,
 .senha-actions #btn-senha-avancar:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4) !important;
 }
 
-.senha-actions .btn.btn-stone:disabled,
+.senha-actions .btn.btn-primary.btn-stone:disabled,
 .senha-actions #btn-senha-prev:disabled,
 .senha-actions #btn-senha-avancar:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
   pointer-events: none !important;
 }
 
@@ -119,13 +119,13 @@
 .conteudo-pergaminho p {
   text-align: left !important;
   visibility: visible !important;
-  opacity: 0 !important;
+  opacity: 1 !important;
   margin: 0 auto !important;
   max-width: 560px;
 }
 
-.conteudo-pergaminho .parchment-title-rough.lumen-typing,
-.conteudo-pergaminho .lumen-typing {
+.section-senha .parchment-title-rough.lumen-typing,
+.section-senha .lumen-typing {
   font-family: 'BerkshireSwash', cursive;
   font-size: 13px;
   color: #fff;
@@ -134,13 +134,13 @@
   text-align: left !important;
 }
 
-.conteudo-pergaminho .parchment-title-rough.lumen-typing {
+.section-senha .parchment-title-rough.lumen-typing {
   font-size: 20px;
   font-family: 'ManufacturingConsent', sans-serif;
 }
 
-.conteudo-pergaminho .lumen-typing.typing-active,
-.conteudo-pergaminho .lumen-typing.typing-done {
+.section-senha .lumen-typing.typing-active,
+.section-senha .lumen-typing.typing-done {
   opacity: 1 !important;
   display: block !important;
   visibility: visible !important;
