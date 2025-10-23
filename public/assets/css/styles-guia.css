@@ -1,162 +1,130 @@
 /* ========== SEÇÃO GUIA ========== */
-.guia-descricao-medieval {
-  background-color: var(--card);
-  color: var(--fg);
-  border: 4px solid #8b5e3c;
-  border-image: url('/assets/img/moldura-medieval.png') 30 round;
-  padding: 20px;
-  margin: 20px auto;
-  font-family: 'BerkshireSwash', cursive;
-  font-size: 18px;
-  border-radius: var(--radius);
-  box-shadow: 0 0 20px rgba(0,0,0,0.5);
-  animation: glow 3s ease-in-out infinite;
-  max-width: 560px;
+.section-guia {
+  background: transparent !important;
+  padding: 24px;
+  border-radius: 12px;
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  box-shadow: none;
+  border: none;
+  display: block;
+  opacity: 1;
+  visibility: visible;
+  z-index: 2;
+  overflow-y: auto;
+  min-height: 80vh;
+  height: 80vh;
+  box-sizing: border-box;
 }
 
-.guia-item {
-  margin-bottom: 10px;
-  font-size: 16px;
-  color: var(--fg);
-  text-align: left;
-}
-
-.guia-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: center;
-  margin: 20px auto;
+.conteudo-pergaminho {
+  text-align: center;
+  margin: 0 auto;
   max-width: 720px;
 }
 
-.guia-options .btn.btn-stone-espinhos {
-  padding: 8px 16px;
-  font-size: 18px;
-  border: 2px solid var(--card-2);
-  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch !important;
-  border-radius: var(--radius);
-  background-image: url('/assets/img/textura-de-pedra.jpg') !important;
-  background-size: cover !important;
-  background-position: center !important;
-  background-color: var(--card-2) !important;
-  background-blend-mode: overlay !important;
-  color: #ffd700; /* Dourado para maior contraste */
-  text-shadow: 0 0 12px rgba(0, 0, 0, 0.9); /* Sombra mais forte */
+.titulo-pergaminho {
   font-family: 'ManufacturingConsent', sans-serif;
-  font-weight: bold;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  min-width: 140px;
-  text-align: center;
-  position: relative;
+  font-size: 20px;
+  color: #fff;
+  margin: 0 auto 12px;
+  text-align: left !important;
+  opacity: 0;
+  visibility: visible;
+  display: block;
 }
 
-.guia-options .btn.btn-stone-espinhos::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.8); /* Fundo mais opaco */
-  border-radius: var(--radius);
-  z-index: -1;
+.titulo-pergaminho.lumen-typing.typing-active,
+.titulo-pergaminho.lumen-typing.typing-done {
+  opacity: 1 !important;
+  display: block !important;
+  visibility: visible !important;
 }
 
-.guia-options .btn.btn-stone-espinhos:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
-}
-
-.guia-options .btn.btn-stone-espinhos:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.guia-selected {
-  background: rgba(255, 215, 0, 0.2);
-  border: 2px solid gold;
-  padding: 5px;
-  border-radius: var(--radius);
-}
-
-.guia-name-input {
-  position: relative;
-  margin: 20px auto;
-  max-width: 420px;
+.guia-name-input.on-pergaminho {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
   align-items: center;
+  margin: 6px 0 14px;
 }
 
-.guia-name-input .input-espinhos {
-  padding: 8px 10px;
+.input-espinhos {
+  width: min(62%, 360px);
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.98);
+  color: #3e2723;
   font-size: 16px;
-  border: 2px solid var(--card-2);
-  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch !important;
-  background-image: url('/assets/img/textura-de-pedra.jpg') !important;
-  background-size: cover !important;
-  background-position: center !important;
-  background-color: var(--card-2);
-  background-blend-mode: overlay;
-  border-radius: var(--radius);
-  width: 100%;
-  color: var(--fg);
-  font-family: 'BerkshireSwash', cursive;
-  caret-color: var(--fg);
-  text-transform: uppercase;
+  text-align: center;
+  outline: none;
+  border: 14px solid transparent;
+  border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
+  border-radius: 2px;
+  font-family: 'Cardo', serif;
 }
 
-.guia-name-input .input-espinhos::placeholder {
-  color: var(--muted);
-  opacity: 0.8;
-}
-
-.guia-name-input .btn#btn-confirmar-nome {
-  padding: 2px;
-  min-width: 24px;
-  min-height: 24px;
-  font-size: 12px;
-  border: none;
-  border-radius: var(--radius);
-  background-image: url('/assets/img/textura-de-pedra.jpg') !important;
-  background-size: cover !important;
-  background-position: center !important;
-  background-color: var(--card-2) !important;
-  background-blend-mode: overlay !important;
-  color: var(--fg);
-  font-family: 'ManufacturingConsent', sans-serif;
-  font-weight: bold;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+.moldura-grande {
+  margin: 8px auto 12px;
+  width: min(92%, 720px);
+  min-height: 160px;
+  padding: 26px 28px;
+  background: url('/assets/img/moldura-medieval.png') center/100% 100% no-repeat transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
 }
 
-.guia-name-input .btn#btn-confirmar-nome::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: var(--radius);
-  z-index: -1;
+.guia-descricao-medieval {
+  width: 100%;
+  max-width: 640px;
+  text-align: left !important;
+  color: #fff;
+  font-family: 'BerkshireSwash', cursive;
+  font-size: 15.5px;
+  line-height: 1.45;
 }
 
-.guia-name-input .btn#btn-confirmar-nome:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+.guia-descricao-medieval p {
+  margin: 6px 0;
 }
 
-.guia-name-input .btn#btn-confirmar-nome:disabled {
-  opacity: 0.5;
+.guia-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  width: min(92%, 720px);
+  margin: 4px auto 10px;
+}
+
+.guia-options .btn-stone-espinhos {
+  padding: 11px 14px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0.22)), url('/assets/img/textura-de-pedra.jpg') center/cover no-repeat;
+  border: 12px solid transparent;
+  border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
+  border-radius: 3px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+  transition: transform 0.12s ease, filter 0.12s ease, opacity 0.12s ease;
+  font-family: 'ManufacturingConsent', sans-serif;
+  cursor: pointer;
+}
+
+.guia-options .btn-stone-espinhos:hover {
+  transform: translateY(-1px);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45));
+}
+
+.guia-options .btn-stone-espinhos:disabled {
+  opacity: 0.55;
+  filter: grayscale(0.3);
   cursor: not-allowed;
-  pointer-events: none;
 }
 
-@keyframes glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-  50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.3); }
+#guia-error {
+  color: #ff3333;
+  margin-top: 8px;
+  font-family: 'BerkshireSwash', cursive;
+  font-size: 14px;
+  text-align: center;
 }
