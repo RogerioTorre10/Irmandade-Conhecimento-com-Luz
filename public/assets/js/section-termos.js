@@ -8,6 +8,7 @@
   const TRANSITION_TIMEOUT_MS = 8000;
   const TTS_FALLBACK_DELAY_MS = 2000;
 
+  // Evitar múltiplas inicializações
   if (window.JCTermos?.__bound) {
     console.log('[JCTermos] Já inicializado, ignorando...');
     return;
@@ -285,12 +286,6 @@
       showPage(pg2, true);
       window.JCTermos.state.currentPage = 2;
 
-      // Forçar visibilidade e rolagem
-      pg2.scrollTop = 0;
-      pg2.style.display = 'block';
-      pg2.style.opacity = '1';
-      pg2.style.visibility = 'visible';
-
       await runTypingSequence(pg2);
 
       // Habilitar botões da pg2
@@ -318,7 +313,16 @@
     });
 
     window.JCTermos.state.initialized = true;
-    console.log('[JCTermos] TERMOS 2 FUNCIONANDO 100%!');
+    console.log('[JCTermos] TERMOS 1 E 2 FUNCIONANDO 100%!');
+  };
+
+  // ---------- FORÇA INICIALIZAÇÃO ----------
+  const forceInit = () => {
+    const root = document.getElementById(SECTION_ID);
+    if (root && !root.dataset.termosInitialized) {
+      console.log('[JCTermos] Forçando inicialização manual');
+      handler({ detail: { sectionId: SECTION_ID, node: root } });
+    }
   };
 
   // ---------- LIMPEZA ----------
@@ -334,17 +338,12 @@
     window.JCTermos.state.listenerAdded = true;
   }
 
-  // Forçar inicialização
-  const forceInit = () => {
-    const root = document.getElementById(SECTION_ID);
-    if (root && !root.dataset.termosInitialized) {
-      handler({ detail: { sectionId: SECTION_ID, node: root } });
-    }
-  };
-
+  // Forçar inicialização com fallback
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', forceInit, { once: true });
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(forceInit, 800);
+    }, { once: true });
   } else {
-    setTimeout(forceInit, 500);
+    setTimeout(forceInit, 800);
   }
 })();
