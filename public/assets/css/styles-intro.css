@@ -66,15 +66,3 @@
   visibility: visible !important;
   text-align: left !important;
 }
-
-.parchment-actions-rough {
-  display: flex !important;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 12px;
-  position: sticky;
-  bottom: 0;
-  background: transparent !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
