@@ -18,11 +18,12 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
   opacity: 1;
 }
 
-#section-intro, #section-termos, #section-senha, #sec-final {
+#section-termos, #section-senha, #sec-final {
   background: transparent;
   padding: 24px;
   border-radius: 12px;
   max-width: 600px;
+  margin: 0 auto;
   text-align: center;
   box-shadow: none;
   border: none;
@@ -31,10 +32,9 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
   visibility: visible;
   z-index: 2;
   overflow: hidden;
-  max-height: 80vh;
+  min-height: 80vh;
 }
 
-#section-intro.pergaminho-v::before,
 #section-termos.pergaminho-v::before,
 #section-senha.pergaminho-v::before,
 #sec-final.pergaminho-v::before {
@@ -50,8 +50,6 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
   min-height: 80vh;
 }
 
-.intro-paragraph,
-.parchment-text-rough,
 #termos-pg1, #termos-pg2, #section-senha h2, #section-senha p,
 #sec-wizard #q-text, #sec-final p {
   font-size: 13px;
@@ -66,7 +64,6 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
   line-height: 1.4;
 }
 
-.parchment-title-rough,
 #termos-pg1 h2, #termos-pg2 h3, #section-senha h2, #sec-wizard h2, #sec-final h2 {
   font-size: 18px;
   margin-bottom: 10px;
@@ -91,18 +88,11 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
   box-sizing: border-box;
 }
 
-.section-intro .parchment-inner-rough,
 .section-termos .parchment-inner-rough {
   display: flex;
   flex-direction: column;
   justify-content: center;
   height: 100% !important;
-}
-
-.intro-wrap {
-  height: 100% !important;
-  width: 100% !important;
-  overflow: hidden !important;
 }
 
 .parchment-title-rough {
@@ -115,9 +105,7 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
   text-align: left !important;
 }
 
-.section-intro .parchment-title-rough,
 .section-termos .parchment-title-rough,
-.section-intro .parchment-text-rough,
 .section-termos .parchment-text-rough {
   opacity: 0 !important;
   display: none !important;
@@ -127,12 +115,8 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
 
 .parchment-title-rough.typing-active,
 .parchment-title-rough.typing-done,
-.section-intro .parchment-title-rough.typing-active,
-.section-intro .parchment-title-rough.typing-done,
 .section-termos .parchment-title-rough.typing-active,
 .section-termos .parchment-title-rough.typing-done,
-.section-intro .parchment-text-rough.typing-active,
-.section-intro .parchment-text-rough.typing-done,
 .section-termos .parchment-text-rough.typing-active,
 .section-termos .parchment-text-rough.typing-done {
   opacity: 1 !important;
@@ -182,7 +166,6 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
   visibility: visible !important;
 }
 
-.section-intro .parchment-actions-rough,
 .section-termos .parchment-actions-rough {
   opacity: 1 !important;
   visibility: visible !important;
