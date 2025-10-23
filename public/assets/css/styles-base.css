@@ -104,20 +104,13 @@ p, li {
 }
 
 /* ========== PERGAMINHO ========== */
-.card.pergaminho {
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  position: relative;
-}
-
 .pergaminho {
   position: relative;
   padding: 24px 20px;
   width: 100%;
   max-width: 600px !important;
   margin: 12px auto;
-  min-height: 80vh;
+  min-height: 80vh !important;
   height: 80vh !important;
   box-sizing: border-box;
   overflow: hidden !important;
@@ -135,13 +128,13 @@ p, li {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background-repeat: no-repeat;
-  background-position: center;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
   background-size: 100% 100% !important;
   background-attachment: fixed !important;
-  border-radius: 16px;
-  opacity: .98;
-  filter: drop-shadow(0 12px 32px rgba(0,0,0,.45));
+  border-radius: 16px !important;
+  opacity: .98 !important;
+  filter: drop-shadow(0 12px 32px rgba(0,0,0,.45)) !important;
 }
 
 .pergaminho > * {
@@ -335,7 +328,7 @@ p, li {
   height: 8px;
   border-radius: 50%;
   background: radial-gradient(circle at 50% 40%, rgba(255,255,255,.95) 0%, rgba(255,205,120,.85) 42%, rgba(255,140,0,0) 72%);
-  animation: brasaPulse 1.8s ease-in-out infinite;
+  animation sprakPulse 1.8s ease-in-out infinite;
 }
 
 .chama-icone.chama-sm {
