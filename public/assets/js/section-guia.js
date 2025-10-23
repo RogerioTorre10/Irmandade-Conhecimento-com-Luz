@@ -182,6 +182,18 @@
     });
   }
 
+  function ensureSectionVisible(root, sectionId) {
+    if (!root) return;
+    root.classList.remove('hidden');
+    root.setAttribute('aria-hidden', 'false');
+    root.style.display = 'block';
+    root.style.opacity = '1';
+    root.style.visibility = 'visible';
+    root.style.zIndex = '2';
+    root.style.transition = 'opacity 0.3s ease';
+    console.log(`[JCGuia] Visibilidade forçada para ${sectionId}`);
+  }
+
   function pickElements(root) {
     return {
       title: root.querySelector('.titulo-pergaminho'),
@@ -208,8 +220,14 @@
       if (el) {
         el.disabled = false;
         el.style.opacity = '1';
-        el.style.cursor = 'pointer';
+        el.style.cursor = el.tagName === 'INPUT' ? 'text' : 'pointer';
       }
+    });
+
+    guiaOptions.forEach(btn => {
+      btn.disabled = true;
+      btn.style.opacity = '0';
+      btn.style.cursor = 'default';
     });
 
     window.JCGuia.state.typingInProgress = false;
@@ -275,26 +293,7 @@
     root.dataset.guiaInitialized = 'true';
     root.classList.add('section-guia');
 
-    root.style.cssText = `
-      background: transparent;
-      padding: 24px;
-      border-radius: 12px;
-      width: 100%;
-      max-width: 600px;
-      margin: 12px auto;
-      text-align: center;
-      box-shadow: none;
-      border: none;
-      display: block;
-      opacity: 1;
-      visibility: visible;
-      position: relative;
-      z-index: 2;
-      overflow-y: auto;
-      min-height: 80vh;
-      height: 80vh;
-      box-sizing: border-box;
-    `;
+    ensureSectionVisible(root, SECTION_ID);
 
     const { title, nameInput, confirmBtn, guiaTexto, guiaOptions, errorMsg } = pickElements(root);
 
@@ -314,27 +313,31 @@
     });
 
     confirmBtn?.addEventListener('click', () => {
-      const name = (nameInput?.value || '').trim();
-      if (name.length < 2) {
-        window.toast?.('Por favor, insira um nome válido.', 'warning');
-        nameInput?.focus();
-        return;
-      }
+      if (!confirmBtn.disabled) {
+        const name = (nameInput?.value || '').trim();
+        if (name.length < 2) {
+          window.toast?.('Por favor, insira um nome válido.', 'warning');
+          nameInput?.focus();
+          return;
+        }
 
-      console.log('[JCGuia] Nome confirmado:', name);
-      guiaTexto.innerHTML = `<p>Olá, ${name}! Escolha seu guia para a Jornada:</p>`;
-      guiaOptions.forEach(btn => {
-        btn.disabled = false;
-        btn.style.opacity = '1';
-        btn.style.cursor = 'pointer';
-      });
+        console.log('[JCGuia] Nome confirmado:', name);
+        guiaTexto.innerHTML = `<p>Olá, ${name}! Escolha seu guia para a Jornada:</p>`;
+        guiaOptions.forEach(btn => {
+          btn.disabled = false;
+          btn.style.opacity = '1';
+          btn.style.cursor = 'pointer';
+        });
+      }
     });
 
     guiaOptions.forEach(btn => {
       btn.addEventListener('click', () => {
-        const guia = btn.dataset.guia;
-        console.log('[JCGuia] Guia selecionado:', guia);
-        playTransitionVideo(NEXT_SECTION_ID);
+        if (!btn.disabled) {
+          const guia = btn.dataset.guia;
+          console.log('[JCGuia] Guia selecionado:', guia);
+          playTransitionVideo(NEXT_SECTION_ID);
+        }
       });
     });
 
