@@ -8,78 +8,26 @@
 .selfie-nome {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center; /* Centralizar o label e input */
   margin-bottom: 16px;
 }
 
-.selfie-controles-e-botoes {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 24px;
+.selfie-nome label {
+  font-size: 18px;
+  font-family: 'ManufacturingConsent', sans-serif;
+  color: var(--fg);
+  margin-bottom: 6px;
 }
 
-.selfie-controles {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.selfie-botoes-principais {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  flex-wrap: wrap;
-  align-items: flex-end;
-}
-
-.selfie-previa-btn {
-  text-align: center;
-  margin-bottom: 24px;
-}
-
-.selfie-preview {
-  display: flex;
-  justify-content: center;
-  margin-top: 16px;
-}
-
-.flame-layer {
-  position: relative;
-  width: 100%;
-  max-width: 320px;
-  aspect-ratio: 2 / 3;
-  margin: 0 auto;
-  opacity: 1;
-  transition: opacity 900ms ease-in-out;
-  pointer-events: none;
-}
-
-.flame-svg {
-  width: 100%;
-  height: 100%;
-  transform: translateY(6%);
-  filter: drop-shadow(0 8px 28px rgba(255,180,0,0.45));
-}
-/* Centralização do título, nome e botão de prévia */
-.titulo-selfie,
-.selfie-nome,
-.selfie-previa-btn {
-  text-align: center;
-  margin-bottom: 24px;
-}
-
-/* Estilo do input de nome */
 .selfie-nome input {
   padding: 8px;
   font-size: 18px;
   border: 2px solid var(--card-2);
-  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch !important;
-  background-image: url('/assets/img/textura-de-pedra.jpg') !important;
-  background-size: cover !important;
-  background-position: center !important;
+  -webkit-border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
+  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
+  background-image: url('/assets/img/textura-de-pedra.jpg');
+  background-size: cover;
+  background-position: center;
   background-color: var(--card-2);
   background-blend-mode: overlay;
   border-radius: var(--radius);
@@ -88,21 +36,85 @@
   text-transform: uppercase;
   width: 100%;
   max-width: 300px;
-  margin: 0 auto;
 }
 
-/* Botões com textura de pedra */
-.btn.btn-stone {
+.selfie-controles-e-botoes {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.selfie-controles {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.selfie-controles label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 18px;
+  font-family: 'ManufacturingConsent', sans-serif;
+  color: var(--fg);
+}
+
+.selfie-controles input[type="range"],
+.selfie-controles input[type="number"] {
+  padding: 8px;
+  font-size: 16px;
+  border: 2px solid var(--card-2);
+  -webkit-border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
+  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
+  background-image: url('/assets/img/textura-de-pedra.jpg');
+  background-size: cover;
+  background-position: center;
+  background-color: var(--card-2);
+  background-blend-mode: overlay;
+  border-radius: var(--radius);
+  color: var(--fg);
+  font-family: 'BerkshireSwash', cursive;
+}
+
+.selfie-controles input[type="range"] {
+  width: 100px;
+}
+
+.selfie-controles input[type="number"] {
+  width: 100px;
+}
+
+.selfie-botoes-principais {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.selfie-previa-btn {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.selfie-previa-btn .btn.btn-stone {
   padding: 8px 16px;
   font-size: 18px;
   border: 2px solid var(--card-2);
-  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch !important;
-  border-radius: var(--radius);
-  background-image: url('/assets/img/textura-de-pedra.jpg') !important;
-  background-size: cover !important;
-  background-position: center !important;
-  background-color: var(--card-2) !important;
-  background-blend-mode: overlay !important;
+  -webkit-border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
+  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
+  background-image: url('/assets/img/textura-de-pedra.jpg');
+  background-size: cover;
+  background-position: center;
+  background-color: var(--card-2);
+  background-blend-mode: overlay;
   color: #ffd700;
   text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
   font-family: 'ManufacturingConsent', sans-serif;
@@ -115,7 +127,7 @@
   position: relative;
 }
 
-.btn.btn-stone::before {
+.selfie-previa-btn .btn.btn-stone::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -124,75 +136,173 @@
   z-index: -1;
 }
 
-.btn.btn-stone:hover {
+.selfie-previa-btn .btn.btn-stone:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0,0,0,0.4);
 }
 
-.btn.btn-stone:disabled {
+.selfie-previa-btn .btn.btn-stone:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
 }
-/* Centralização do título e nome */
-.titulo-selfie,
-.selfie-nome {
-  text-align: center;
-  margin-bottom: 24px;
-}
 
-/* Nome input estilizado */
-.selfie-nome input {
-  padding: 10px;
+.selfie-botoes-principais .btn.btn-stone {
+  padding: 8px 16px;
   font-size: 18px;
-  border-radius: var(--radius);
   border: 2px solid var(--card-2);
-  background: var(--card-2);
-  color: var(--fg);
-  font-family: 'BerkshireSwash', cursive;
-  text-transform: uppercase;
-  width: 100%;
-  max-width: 300px;
-  margin: 0 auto;
-}
-
-/* Controles e botões lado a lado */
-.selfie-controles-e-botoes {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 24px;
-}
-
-/* Controles à esquerda */
-.selfie-controles {
-  flex: 1;
-  min-width: 200px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* Botões à direita */
-.selfie-botoes-principais {
-  flex: 1;
-  min-width: 200px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  align-items: flex-end;
-}
-
-/* Botão Ver Prévia centralizado */
-.selfie-previa-btn {
+  -webkit-border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
+  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
+  background-image: url('/assets/img/textura-de-pedra.jpg');
+  background-size: cover;
+  background-position: center;
+  background-color: var(--card-2);
+  background-blend-mode: overlay;
+  color: #ffd700;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+  font-family: 'ManufacturingConsent', sans-serif;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  min-width: 140px;
   text-align: center;
-  margin-bottom: 24px;
+  position: relative;
 }
 
-/* Moldura da selfie centralizada */
+.selfie-botoes-principais .btn.btn-stone::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: var(--radius);
+  z-index: -1;
+}
+
+.selfie-botoes-principais .btn.btn-stone:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+}
+
+.selfie-botoes-principais .btn.btn-stone:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .selfie-preview {
   display: flex;
   justify-content: center;
   margin-top: 16px;
+}
+
+.guide-card {
+  position: relative;
+  width: min(720px, 92vw);
+  aspect-ratio: 2/3;
+  margin: 0 auto;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #0f3b2f;
+  box-shadow: 0 20px 60px rgba(0,0,0,.45);
+  border: 2px solid var(--card-2);
+  -webkit-border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
+  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
+}
+
+.guide-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.flame-layer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: opacity 900ms ease-in-out;
+  pointer-events: none;
+}
+
+.flame-svg {
+  width: 40%;
+  height: 60%;
+  transform: translateY(6%);
+  filter: drop-shadow(0 8px 28px rgba(255,180,0,0.45));
+}
+
+.guide-name {
+  position: absolute;
+  top: 3.5%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: "Cardo", serif;
+  font-weight: 700;
+  letter-spacing: .06em;
+  font-size: clamp(28px, 5vw, 56px);
+  color: #f7d37a;
+  text-shadow: 0 2px 8px rgba(0,0,0,.4);
+  text-transform: uppercase;
+}
+
+.user-name {
+  position: absolute;
+  bottom: 4.5%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: "Cardo", serif;
+  font-weight: 700;
+  letter-spacing: .06em;
+  font-size: clamp(26px, 4.6vw, 52px);
+  color: #f6cf6a;
+  text-shadow: 0 2px 8px rgba(0,0,0,.4);
+  text-transform: uppercase;
+}
+
+.selfie-error {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 18px;
+  text-align: center;
+  padding: 10px;
+  background: rgba(0,0,0,0.7);
+  border-radius: 8px;
+  display: none;
+}
+
+@media (max-width: 860px) {
+  .selfie-controles-e-botoes {
+    flex-direction: column;
+    align-items: center;
+  }
+  .selfie-controles,
+  .selfie-botoes-principais {
+    width: 100%;
+    align-items: center;
+  }
+  .selfie-botoes-principais {
+    align-items: flex-end;
+  }
+  .guide-card {
+    max-width: 100%;
+  }
+  .flame-svg {
+    width: 50%;
+    height: 50%;
+  }
+  .guide-name {
+    font-size: clamp(20px, 4vw, 36px);
+  }
+  .user-name {
+    font-size: clamp(18px, 3.6vw, 32px);
+  }
 }
