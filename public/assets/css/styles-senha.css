@@ -1,4 +1,4 @@
-/* ========== SEÇÃO SENHA (ajustado) ========== */
+/* ========== SEÇÃO SENHA ========== */
 .senha-input {
   position: relative;
   margin: 20px auto;
@@ -16,7 +16,7 @@
 }
 
 .senha-input input {
-  padding: 8px 32px 8px 10px; /* Reduzido para acomodar botão menor */
+  padding: 8px 32px 8px 10px;
   font-size: 16px;
   border: none;
   background: transparent;
@@ -37,9 +37,9 @@
   top: 50%;
   transform: translateY(-50%);
   padding: 2px;
-  min-width: 24px; /* Reduzido */
-  min-height: 24px; /* Reduzido */
-  font-size: 12px; /* Reduzido */
+  min-width: 24px;
+  min-height: 24px;
+  font-size: 12px;
   border: none;
   border-radius: var(--radius);
   background-image: url('/assets/img/textura-de-pedra.jpg') !important;
@@ -59,9 +59,9 @@
   pointer-events: auto !important;
 }
 
-/* Botões lado a lado com textura de pedra */
 .senha-actions {
   display: flex !important;
+  flex-direction: row !important;
   gap: 10px !important;
   justify-content: center !important;
   align-items: center !important;
@@ -75,14 +75,14 @@
 .senha-actions #btn-senha-avancar {
   padding: 8px 16px;
   font-size: 18px;
-  border: 2px solid var(--card-2);
-  border-radius: var(--radius);
+  border: 2px solid var(--card-2) !important;
+  border-radius: var(--radius) !important;
   background-image: url('/assets/img/textura-de-pedra.jpg') !important;
   background-size: cover !important;
   background-position: center !important;
   background-color: var(--card-2) !important;
   background-blend-mode: overlay !important;
-  color: var(--fg);
+  color: var(--fg) !important;
   font-family: 'ManufacturingConsent', sans-serif;
   font-weight: bold;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
@@ -109,17 +109,39 @@
   pointer-events: none !important;
 }
 
-/* Mantém conteúdo estável e centralizado antes/depois da datilografia */
 .conteudo-pergaminho {
   text-align: center;
   margin: 0 auto;
   max-width: 720px;
 }
+
 .conteudo-pergaminho h2,
 .conteudo-pergaminho p {
   text-align: left !important;
   visibility: visible !important;
-  opacity: 1 !important;
+  opacity: 0 !important;
   margin: 0 auto !important;
   max-width: 560px;
+}
+
+.conteudo-pergaminho .parchment-title-rough.lumen-typing,
+.conteudo-pergaminho .lumen-typing {
+  font-family: 'BerkshireSwash', cursive;
+  font-size: 13px;
+  color: #fff;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  text-align: left !important;
+}
+
+.conteudo-pergaminho .parchment-title-rough.lumen-typing {
+  font-size: 20px;
+  font-family: 'ManufacturingConsent', sans-serif;
+}
+
+.conteudo-pergaminho .lumen-typing.typing-active,
+.conteudo-pergaminho .lumen-typing.typing-done {
+  opacity: 1 !important;
+  display: block !important;
+  visibility: visible !important;
 }
