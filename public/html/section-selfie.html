@@ -1,7 +1,6 @@
 <link rel="stylesheet" href="/assets/css/styles-base.css">
 <link rel="stylesheet" href="/assets/css/styles-selfie.css">
-<div id="jornada-content-wrapper">
-  <div id="section-selfie" class="j-section pergaminho pergaminho-v epic">
+<div id="section-selfie" class="j-section pergaminho pergaminho-v epic">
   <div class="conteudo-pergaminho">
     <!-- Título -->
     <h2 class="titulo-selfie">Tirar Foto</h2>
@@ -32,14 +31,30 @@
       <button id="previewBtn" class="btn btn-stone">Ver Prévia</button>
     </div>
 
-    <!-- Prévia da selfie -->
+    <!-- Moldura com prévia da selfie -->
     <div class="selfie-preview">
       <section id="card-guide" class="guide-card" data-guide="ZION" aria-label="Guia">
-        <!-- Mantenha aqui o conteúdo SVG e imagem da selfie -->
+        <img class="guide-bg" id="guideBg" src="" alt="Guia Background" />
+        <div class="flame-layer" aria-hidden="true">
+          <svg class="flame-svg" viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <clipPath id="flameClip">
+                <path d="M50,20 C42,35 34,45 33,58 C32,73 41,82 50,92 C59,82 68,73 67,58 C66,45 58,35 50,20 Z" />
+              </clipPath>
+              <radialGradient id="flameGlow" cx="50%" cy="70%" r="55%">
+                <stop offset="0%" stop-color="rgba(255, 224, 130, 1)" />
+                <stop offset="55%" stop-color="rgba(255, 180, 0, 0.9)" />
+                <stop offset="100%" stop-color="rgba(255, 180, 0, 0)" />
+              </radialGradient>
+            </defs>
+            <image id="selfieImage" href="" x="15" y="35" width="70" height="90" clip-path="url(#flameClip)" preserveAspectRatio="xMidYMid slice" />
+            <ellipse cx="50" cy="95" rx="28" ry="40" fill="url(#flameGlow)" />
+            <path d="M50,20 C42,35 34,45 33,58 C32,73 41,82 50,92 C59,82 68,73 67,58 C66,45 58,35 50,20 Z" fill="none" stroke="rgba(255,200,0,.85)" stroke-width="1.6" />
+          </svg>
+        </div>
+        <div class="guide-name" id="guideNameSlot"></div>
+        <div class="user-name" id="userNameSlot"></div>
       </section>
     </div>
-  </div>
-</div>
-
   </div>
 </div>
