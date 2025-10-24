@@ -39,6 +39,9 @@ function attachButtonEvents(sectionId, root) {
   const buttons = root.querySelectorAll('[data-action]');
   console.log('[JC.attachButtonEvents] Buttons found:', buttons.length, Array.from(buttons).map(btn => btn.id || btn.dataset.action));
   buttons.forEach(btn => {
+    // Evitar múltiplos listeners
+    if (btn.dataset.hasEvents) return;
+    btn.dataset.hasEvents = 'true';
     const action = btn.dataset.action;
     btn.disabled = false;
     btn.classList.add('btn', 'btn-primary', 'btn-stone');
@@ -55,7 +58,7 @@ function attachButtonEvents(sectionId, root) {
           window.location.href = '/termos';
         }
       }
-    }, 300); // 300ms de debounce
+    }, 300);
     btn.addEventListener('click', handleClick);
     btn.addEventListener('mouseover', () => {
       btn.style.transform = 'scale(1.05)';
