@@ -108,44 +108,82 @@
     });
   }
 
-  // Handler principal
-  const handler = async (evt) => {
-    window.JCTermos.state.HANDLER_COUNT++;
-    console.log(`[JCTermos] Handler disparado (${window.JCTermos.state.HANDLER_COUNT}x):`, evt?.detail);
-    const { sectionId, node } = fromDetail(evt?.detail);
-    if (sectionId !== 'section-termos') {
-      console.log('[JCTermos] Ignorando, sectionId não é section-termos:', sectionId);
-      return;
-    }
+  // No início do section-termos.js
+if (window.JCTermos?.__bound) {
+  console.log('[JCTermos] Já inicializado, ignorando...');
+  return;
+}
 
-    if (window.JCTermos.state.ready || (node && node.dataset.termosInitialized)) {
-      console.log('[JCTermos] Já inicializado (ready ou data-termos-initialized), ignorando...');
-      return;
-    }
+window.JCTermos = window.JCTermos || {};
+window.JCTermos.__bound = true;
+window.JCTermos.state = {
+  ready: false,
+  listenerAdded: false,
+  typingInProgress: false,
+  observer: null,
+  initialized: false,
+  HANDLER_COUNT: 0 // Manter o contador, se necessário
+};
 
-    let root = node || document.getElementById('section-termos');
-    if (!root) {
-      console.log('[JCTermos] Tentando localizar #section-termos...');
-      try {
-        root = await waitForElement('#section-termos', { 
-          within: document.getElementById('jornada-content-wrapper') || document, 
-          timeout: 10000 
-        });
-      } catch (e) {
-        window.toast?.('Erro: Seção section-termos não carregada.', 'error');
-        console.error('[JCTermos] Section not found:', e);
-        // Fallback para criar seção
-        const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
-        root = document.createElement('section');
-        root.id = 'section-termos';
-        wrapper.appendChild(root);
-        console.log('[JCTermos] Seção #section-termos criada como fallback');
-      }
-    }
+// Função onShown (antigo handler)
+const onShown = async (evt) => {
+  window.JCTermos.state.HANDLER_COUNT++;
+  const { sectionId, node } = evt?.detail || {};
+  if (sectionId !== 'section-termos') {
+    console.log('[JCTermos] Ignorando, sectionId não é section-termos:', sectionId);
+    return;
+  }
 
-    console.log('[JCTermos] Root encontrado:', root);
-    root.dataset.termosInitialized = 'true';
-    root.classList.add('section-termos');
+  if (window.JCTermos.state.ready || node?.dataset.termosInitialized === 'true') {
+    console.log('[JCTermos] Já inicializado, ignorando...');
+    return;
+  }
+
+  let root = node || document.getElementById('section-termos');
+  if (!root) {
+    console.error('[JCTermos] Root #section-termos não encontrado');
+    window.toast?.('Erro: Seção Termos não carregada.', 'error');
+    return;
+  }
+
+  console.log('[JCTermos] Root encontrado:', root);
+  root.dataset.termosInitialized = 'true';
+  root.classList.remove('hidden');
+  root.setAttribute('aria-hidden', 'false');
+  root.style.removeProperty('display');
+  root.style.removeProperty('opacity');
+  root.style.removeProperty('visibility');
+  root.style.zIndex = 'auto';
+
+  // Aguardar vídeo de transição antes de iniciar datilografia
+  await waitForVideoEnd('videoTransicao');
+  await sleep(1000); // Delay adicional para garantir visibilidade
+
+  const { pg1, pg2, nextBtn, prevBtn, avancarBtn } = pickElements(root);
+  [pg1, pg2].filter(Boolean).forEach(normalizeParagraph);
+
+  // Configurar botões
+  [nextBtn, prevBtn, avancarBtn].forEach(btn => {
+    if (btn) {
+      btn.setAttribute('disabled', 'true');
+      btn.style.opacity = '0';
+      btn.style.visibility = 'hidden';
+    }
+  });
+
+  armObserver(root);
+  await runTypingSequence(root);
+
+  window.JCTermos.state.ready = true;
+  console.log('[JCTermos] Seção termos inicializada.');
+};
+
+// Registrar listener para section:shown
+if (!window.JCTermos.state.listenerAdded) {
+  console.log('[JCTermos] Registrando listener para section:shown');
+  document.addEventListener('section:shown', onShown, { once: true });
+  window.JCTermos.state.listenerAdded = true;
+}
 
     // Aplicar estilos ao root
     root.style.cssText = `
