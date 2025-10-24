@@ -232,6 +232,7 @@ if (!window.JCTermos.state.listenerAdded) {
         }
         root.appendChild(el);
         return el;
+      }
       };
       pg1 = pg1 || createFallbackElement('termos-pg1');
       pg2 = pg2 || createFallbackElement('termos-pg2');
