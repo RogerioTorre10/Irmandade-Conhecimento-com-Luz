@@ -464,18 +464,27 @@
     document.removeEventListener('section:shown', onShown);
     document.addEventListener('section:shown', onShown, { passive: true });
 
-    const tryInitialize = (attempt = 1, maxAttempts = 20) => {
-      setTimeout(() => {
-        const root = document.getElementById('section-senha');
-        console.log('[JCSenha] Tentativa de inicialização:', attempt, { root: !!root });
-        if (root && !window.JCSenha.state.ready && !root.dataset.senhaInitialized) {
-          console.log('[JCSenha] Seção encontrada, disparando onShown');
-          onShown({ detail: { sectionId: 'section-senha' } });
-        } else if (attempt < maxAttempts) {
-          console.log('[JCSenha] Seção não encontrada ou já inicializada, tentando novamente...');
-          tryInitialize(attempt + 1, maxAttempts);
-        } else {
-          console.error('[JCSenha] Falha ao inicializar após', maxAttempts, 'tentativas');
+    const tryInitialize = (attempt = 1, maxAttempts = 10, options = {}) => {
+  // Evitar reinicialização se já concluído
+  if (window.JCSenha?.state?.ready || document.getElementById('section-senha')?.dataset.senhaInitialized === 'true') {
+    console.log('[JCSenha] Seção já inicializada, ignorando tentativa', attempt);
+    return;
+  }
+  const visibleSenha = document.querySelector('#section-senha:not(.hidden)');
+  const section = document.getElementById('section-senha');
+  if (visibleSenha && !visibleSenha.dataset.senhaInitialized) {
+    console.log('[JCSenha] Seção visível encontrada, disparando handler');
+    handler({ detail: { sectionId: 'section-senha', node: visibleSenha } });
+  } else if (section && !section.dataset.senhaInitialized) {
+    console.log('[JCSenha] Forçando inicialização manual (tentativa ' + attempt + ')');
+    handler({ detail: { sectionId: 'section-senha', node: section } });
+  } else if (attempt < maxAttempts) {
+    console.log('[JCSenha] Nenhuma seção visível ou já inicializada, tentando novamente...');
+    setTimeout(() => tryInitialize(attempt + 1, maxAttempts, options), 100); // Delay fixo
+  } else {
+    console.error('[JCSenha] Falha ao inicializar após', maxAttempts, 'tentativas');
+  }
+};
           const wrapper = document.getElementById('jornada-content-wrapper');
           if (wrapper) {
             wrapper.querySelectorAll('[data-typing="true"]').forEach(el => {
