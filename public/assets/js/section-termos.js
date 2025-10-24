@@ -245,105 +245,59 @@
               });
             }
 
+            console.log('[JCTermos] Aguardando conclusão do vídeo de transição (8000ms)...');
+            await new Promise(resolve => setTimeout(resolve, 8000)); // Esperar o vídeo de transição
+
             console.log('[JCTermos] Iniciando datilografia na página atual...');
             const currentPg = window.JCTermos.state.currentPage === 1 ? pg1 : pg2;
             const typingElements = currentPg.querySelectorAll('[data-typing="true"]:not(.typing-done)');
-
             if (!typingElements.length) {
-              console.warn('[JCTermos] Nenhum elemento com data-typing="true" encontrado na página atual');
-              [nextBtn, prevBtn, avancarBtn].forEach(btn => {
-                if (btn) {
-                  btn.disabled = false;
-                  btn.style.opacity = '1';
-                  btn.style.cursor = 'pointer';
-                }
-              });
-              currentPg.style.opacity = '1';
-              currentPg.style.visibility = 'visible';
+              console.warn('[JCTermos] Nenhum elemento com data-typing="true" encontrado');
               resolve();
               return;
             }
-
-            console.log('[JCTermos] Elementos encontrados na página:', Array.from(typingElements).map(el => el.id));
-
-            // Fallback para window.runTyping
-            if (typeof window.runTyping !== 'function') {
-              console.warn('[JCTermos] window.runTyping não encontrado, usando fallback');
-              window.runTyping = (el, text, resolve, options) => {
-                let i = 0;
-                const speed = options.speed || 100;
-                console.log('[JCTermos] Iniciando datilografia fallback para:', el.id);
-                const type = () => {
-                  if (i < text.length) {
-                    el.textContent += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                  } else {
-                    el.textContent = text;
-                    console.log('[JCTermos] Datilografia fallback concluída para:', el.id);
-                    resolve();
-                  }
-                };
-                type();
-              };
-            }
-
             for (const el of typingElements) {
               const text = getText(el);
               console.log('[JCTermos] Datilografando:', el.id, text.substring(0, 50));
-              
-              try {
-                el.textContent = '';
-                el.classList.add('typing-active', 'lumen-typing');
-                el.style.color = '#fff';
-                el.style.opacity = '0';
-                el.style.display = 'block';
-                el.style.visibility = 'hidden';
-                currentPg.style.opacity = '1';
-                currentPg.style.visibility = 'visible';
-                await new Promise(resolve => window.runTyping(el, text, resolve, {
-                  speed: Number(el.dataset.speed || 100),
-                  cursor: String(el.dataset.cursor || 'true') === 'true'
-                }));
-                el.classList.add('typing-done');
-                el.classList.remove('typing-active');
-                el.style.opacity = '1';
-                el.style.visibility = 'visible';
-                el.style.display = 'block';
-                if (typeof window.EffectCoordinator?.speak === 'function') {
-                  speechSynthesis.cancel();
-                  const utterance = new SpeechSynthesisUtterance(text);
-                  utterance.lang = 'pt-BR';
-                  utterance.rate = 1.1;
-                  utterance.pitch = 1.0;
-                  console.log('[JCTermos] TTS iniciado para:', el.id);
-                  window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
-                  await new Promise(resolve => {
-                    utterance.onend = () => {
-                      console.log('[JCTermos] TTS concluído para:', el.id);
+              el.textContent = '';
+              el.classList.add('typing-active', 'lumen-typing');
+              el.style.color = '#fff';
+              el.style.opacity = '0';
+              el.style.display = 'block';
+              el.style.visibility = 'hidden';
+              currentPg.style.opacity = '1';
+              currentPg.style.visibility = 'visible';
+              await new Promise(resolve => {
+                if (typeof window.runTyping !== 'function') {
+                  console.warn('[JCTermos] window.runTyping não encontrado, usando fallback');
+                  let i = 0;
+                  const type = () => {
+                    if (i < text.length) {
+                      el.textContent += text.charAt(i++);
+                      setTimeout(type, 100);
+                    } else {
                       resolve();
-                    };
-                    setTimeout(resolve, text.length * 70);
-                  });
+                    }
+                  };
+                  type();
                 } else {
-                  console.warn('[JCTermos] window.EffectCoordinator.speak não encontrado');
-                  await new Promise(resolve => setTimeout(resolve, text.length * 70));
+                  window.runTyping(el, text, resolve, {
+                    speed: Number(el.dataset.speed || 100),
+                    cursor: String(el.dataset.cursor || 'true') === 'true'
+                  });
                 }
-              } catch (err) {
-                console.error('[JCTermos] Erro na datilografia para', el.id, err);
-                el.textContent = text;
-                el.classList.add('typing-done');
-                el.style.opacity = '1';
-                el.style.visibility = 'visible';
-                el.style.display = 'block';
-              }
+              });
+              el.classList.add('typing-done');
+              el.classList.remove('typing-active');
+              el.style.opacity = '1';
+              el.style.visibility = 'visible';
+              el.style.display = 'block';
             }
-            
-            console.log('[JCTermos] Datilografia concluída na página atual');
             resolve();
           }),
           timeoutPromise
         ]);
+        console.log('[JCTermos] Datilografia concluída na página atual');
         [nextBtn, prevBtn, avancarBtn].forEach(btn => {
           if (btn) {
             btn.disabled = false;
@@ -390,6 +344,9 @@
         if (window.JCTermos.state.currentPage === 2) {
           console.log('[JCTermos] Avançando para section-senha com transição de vídeo');
           window.JCTermos.destroy(); // Limpar estado antes de avançar
+          // Limpar o conteúdo anterior
+          const wrapper = document.getElementById('jornada-content-wrapper');
+          if (wrapper) wrapper.innerHTML = '';
           playTransitionThen(() => {
             if (typeof window.JC?.show === 'function') {
               window.JC.show('section-senha');
@@ -477,7 +434,7 @@
     document.removeEventListener('section:shown', handler);
     document.addEventListener('sectionLoaded', handler, { passive: true, once: true });
 
-    const tryInitialize = (attempt = 1, maxAttempts = 10) => {
+    const tryInitialize = (attempt = 1, maxAttempts = 20) => {
       setTimeout(() => {
         const visibleTermos = document.querySelector('#section-termos:not(.hidden)');
         if (visibleTermos && !window.JCTermos.state.ready && !visibleTermos.dataset.termosInitialized) {
@@ -486,23 +443,4 @@
         } else if (document.getElementById('section-termos') && !window.JCTermos.state.ready && !document.getElementById('section-termos').dataset.termosInitialized) {
           console.log('[JCTermos] Forçando inicialização manual (tentativa ' + attempt + ')');
           handler({ detail: { sectionId: 'section-termos', node: document.getElementById('section-termos') } });
-        } else if (attempt < maxAttempts) {
-          console.log('[JCTermos] Nenhuma seção visível ou já inicializada, tentando novamente...');
-          tryInitialize(attempt + 1, maxAttempts);
-        } else {
-          console.error('[JCTermos] Falha ao inicializar após ' + maxAttempts + ' tentativas');
-        }
-      }, 1000 * attempt);
-    };
-
-    tryInitialize();
-  };
-
-  if (document.readyState === 'loading') {
-    console.log('[JCTermos] Aguardando DOMContentLoaded');
-    document.addEventListener('DOMContentLoaded', bind, { once: true });
-  } else {
-    console.log('[JCTermos] DOM já carregado, chamando bind');
-    bind();
-  }
-})();
+        } else if (attempt < maxAttempts
