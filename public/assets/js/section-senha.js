@@ -471,59 +471,202 @@
     window.JCSenha.state.listenerAdded = true;
   }
 
-  const bind = () => {
-    console.log('[JCSenha] Executando bind');
-    document.removeEventListener('section:shown', onShown);
-    document.addEventListener('section:shown', onShown, { passive: true });
+  const handler = onShown; // Alias para manter consistência com section-guia.js
 
-    const tryInitialize = (attempt = 1, maxAttempts = 10, options = {}) => {
-  // Evitar reinicialização se já concluído
-  if (window.JCSenha?.state?.ready || document.getElementById('section-senha')?.dataset.senhaInitialized === 'true') {
-    console.log('[JCSenha] Seção já inicializada, ignorando tentativa', attempt);
-    return;
+const bind = () => {
+  console.log('[JCSenha] Executando bind');
+  // Evitar múltiplos listeners
+  if (window.JCSenha.state.listenerAdded) {
+    document.removeEventListener('section:shown', handler);
   }
-  const visibleSenha = document.querySelector('#section-senha:not(.hidden)');
-  const section = document.getElementById('section-senha');
-  if (visibleSenha && !visibleSenha.dataset.senhaInitialized) {
-    console.log('[JCSenha] Seção visível encontrada, disparando handler');
-    handler({ detail: { sectionId: 'section-senha', node: visibleSenha } });
-  } else if (section && !section.dataset.senhaInitialized) {
-    console.log('[JCSenha] Forçando inicialização manual (tentativa ' + attempt + ')');
-    handler({ detail: { sectionId: 'section-senha', node: section } });
-  } else if (attempt < maxAttempts) {
-    console.log('[JCSenha] Nenhuma seção visível ou já inicializada, tentando novamente...');
-    setTimeout(() => tryInitialize(attempt + 1, maxAttempts, options), 100); // Delay fixo
-  } else {
-    console.error('[JCSenha] Falha ao inicializar após', maxAttempts, 'tentativas');
-  }
-};
-          const wrapper = document.getElementById('jornada-content-wrapper');
-          if (wrapper) {
-            wrapper.querySelectorAll('[data-typing="true"]').forEach(el => {
-              el.textContent = textOf(el);
-              el.classList.add('typing-done');
-              el.style.opacity = '1';
-              el.style.visibility = 'visible';
-              el.style.display = 'block';
-            });
-            wrapper.querySelectorAll('.btn').forEach(btn => {
-              btn.disabled = false;
-              btn.style.opacity = '1';
-              btn.style.cursor = 'pointer';
-            });
-          }
-        }
-      }, 1000 * attempt);
-    };
+  document.addEventListener('section:shown', handler, { passive: true, once: true });
+  window.JCSenha.state.listenerAdded = true;
 
-    tryInitialize();
+  const tryInitialize = (attempt = 1, maxAttempts = 10, options = {}) => {
+    // Evitar reinicialização se já concluído
+    if (window.JCSenha.state.ready || document.getElementById('section-senha')?.dataset.senhaInitialized === 'true') {
+      console.log('[JCSenha] Seção já inicializada, ignorando tentativa', attempt);
+      return;
+    }
+    const visibleSenha = document.querySelector('#section-senha:not(.hidden)');
+    const section = document.getElementById('section-senha');
+    if (visibleSenha && !visibleSenha.dataset.senhaInitialized) {
+      console.log('[JCSenha] Seção visível encontrada, disparando handler');
+      handler({ detail: { sectionId: 'section-senha', node: visibleSenha } });
+    } else if (section && !section.dataset.senhaInitialized) {
+      console.log('[JCSenha] Forçando inicialização manual (tentativa ' + attempt + ')');
+      handler({ detail: { sectionId: 'section-senha', node: section } });
+    } else if (attempt < maxAttempts) {
+      console.log('[JCSenha] Nenhuma seção visível ou já inicializada, tentando novamente...');
+      setTimeout(() => tryInitialize(attempt + 1, maxAttempts, options), 100); // Delay fixo de 100ms
+    } else {
+      console.error('[JCSenha] Falha ao inicializar após', maxAttempts, 'tentativas');
+    }
   };
 
-  if (document.readyState === 'loading') {
-    console.log('[JCSenha] Aguardando DOMContentLoaded');
-    document.addEventListener('DOMContentLoaded', bind, { once: true });
+  // Iniciar tentativa de inicialização apenas se não inicializado
+  if (!window.JCSenha.state.ready && !document.getElementById('section-senha')?.dataset.senhaInitialized) {
+    tryInitialize();
   } else {
-    console.log('[JCSenha] DOM já carregado, chamando bind');
-    bind();
+    console.log('[JCSenha] Já inicializado ou seção não presente, pulando tryInitialize');
   }
-})();
+};
+
+// Atualizar onShown para incluir a lógica do wrapper
+const onShown = async (evt) => {
+  const { sectionId } = evt?.detail || {};
+  if (sectionId !== 'section-senha') {
+    console.log('[JCSenha] Ignorando, sectionId não é section-senha:', sectionId);
+    return;
+  }
+
+  let root;
+  try {
+    root = await waitForElement('#section-senha', { 
+      within: document.getElementById('jornada-content-wrapper') || document, 
+      timeout: 10000 
+    });
+  } catch (e) {
+    console.error('[JCSenha] Root #section-senha não encontrado:', e);
+    window.toast?.('Erro: Seção Senha não carregada.', 'error');
+    return;
+  }
+
+  // Evitar reinicialização
+  if (window.JCSenha.state.ready || root.dataset.senhaInitialized === 'true') {
+    console.log('[JCSenha] Já inicializado, ignorando...');
+    return;
+  }
+
+  root.classList.remove('hidden');
+  root.setAttribute('aria-hidden', 'false');
+  root.style.removeProperty('display');
+  root.style.removeProperty('opacity');
+  root.style.removeProperty('visibility');
+  root.style.zIndex = 'auto';
+
+  // Lógica do wrapper movida para cá
+  const wrapper = document.getElementById('jornada-content-wrapper');
+  if (wrapper) {
+    wrapper.querySelectorAll('[data-typing="true"]').forEach(el => {
+      if (!el.classList.contains('typing-done')) {
+        el.textContent = textOf(el);
+        el.classList.add('typing-done');
+        el.style.opacity = '1';
+        el.style.visibility = 'visible';
+        el.style.display = 'block';
+      }
+    });
+    wrapper.querySelectorAll('.btn').forEach(btn => {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
+    });
+  }
+
+  let input, toggle, btnNext, btnPrev, instr1, instr2, instr3, instr4;
+  try {
+    instr1 = await waitForElement('#senha-instr1', { within: root, timeout: 5000 });
+    instr2 = await waitForElement('#senha-instr2', { within: root, timeout: 5000 });
+    instr3 = await waitForElement('#senha-instr3', { within: root, timeout: 5000 });
+    instr4 = await waitForElement('#senha-instr4', { within: root, timeout: 5000 });
+    input = await waitForElement('#senha-input', { within: root, timeout: 5000 });
+    toggle = await waitForElement('.btn-toggle-senha', { within: root, timeout: 5000 });
+    btnNext = await waitForElement('#btn-senha-avancar', { within: root, timeout: 5000 });
+    btnPrev = await waitForElement('#btn-senha-prev', { within: root, timeout: 5000 });
+  } catch (e) {
+    console.error('[JCSenha] Falha ao carregar elementos:', e);
+    window.toast?.('Erro: Elementos da seção Senha não encontrados.', 'error');
+    return;
+  }
+
+  console.log('[JCSenha] Elementos carregados:', { instr1, instr2, instr3, instr4, input, toggle, btnNext, btnPrev });
+
+  btnPrev?.setAttribute('disabled', 'true');
+  btnNext?.setAttribute('disabled', 'true');
+  input?.setAttribute('disabled', 'true');
+  toggle?.setAttribute('disabled', 'true');
+
+  if (toggle && input) {
+    toggle.addEventListener('click', () => {
+      console.log('[JCSenha] Clique no Olho Mágico, tipo atual:', input.type);
+      input.type = input.type === 'password' ? 'text' : 'password';
+      console.log('[JCSenha] Novo tipo do input:', input.type);
+    });
+  } else {
+    console.error('[JCSenha] Erro: toggle ou input não encontrados', { toggle, input });
+  }
+
+  btnPrev?.addEventListener('click', () => {
+    console.log('[JCSenha] Botão Voltar clicado');
+    try {
+      window.JC?.show('section-termos');
+    } catch (e) {
+      console.error('[JCSenha] Erro ao navegar para section-termos:', e);
+    }
+  });
+
+  btnNext?.addEventListener('click', () => {
+    console.log('[JCSenha] Botão Avançar clicado, valor do input:', input?.value);
+    if (!input) {
+      console.error('[JCSenha] Input #senha-input não encontrado');
+      window.toast?.('Erro: campo de senha não encontrado.', 'error');
+      return;
+    }
+    const senha = (input.value || '').trim();
+    if (senha.length >= 3) {
+      console.log('[JCSenha] Senha válida, iniciando transição');
+      playTransitionVideo(NEXT_SECTION_ID);
+    } else {
+      console.log('[JCSenha] Senha inválida, length:', senha.length);
+      window.toast?.('Digite uma Palavra-Chave válida.', 'warning');
+      try {
+        input.focus();
+        console.log('[JCSenha] Foco reaplicado ao input');
+      } catch (e) {
+        console.error('[JCSenha] Falha ao focar input:', e);
+      }
+    }
+  });
+
+  if (input) {
+    input.removeAttribute('disabled');
+    input.removeAttribute('readonly');
+    input.addEventListener('input', () => {
+      console.log('[JCSenha] Input alterado:', input.value);
+    });
+  } else {
+    console.error('[JCSenha] Input #senha-input não encontrado na inicialização');
+  }
+
+  if (toggle) {
+    toggle.removeAttribute('disabled');
+  } else {
+    console.error('[JCSenha] Botão .btn-toggle-senha não encontrado na inicialização');
+  }
+
+  [instr1, instr2, instr3, instr4].filter(Boolean).forEach(normalizeParagraph);
+  armObserver(root);
+
+  root.dataset.senhaInitialized = 'true';
+  window.JCSenha.state.ready = true;
+  console.log('[JCSenha] Seção senha inicializada.');
+  if (window.JCSenha.state.observer) {
+    window.JCSenha.state.observer.disconnect();
+    console.log('[JCSenha] Observer desconectado após inicialização');
+  }
+
+  runTypingSequence(root);
+};
+
+// Remover o listener incorreto de sectionLoaded
+document.removeEventListener('sectionLoaded', handler);
+
+// Garantir que o bind só seja chamado uma vez
+if (document.readyState === 'loading') {
+  console.log('[JCSenha] Aguardando DOMContentLoaded');
+  document.addEventListener('DOMContentLoaded', bind, { once: true });
+} else {
+  console.log('[JCSenha] DOM já carregado, chamando bind');
+  bind();
+}
