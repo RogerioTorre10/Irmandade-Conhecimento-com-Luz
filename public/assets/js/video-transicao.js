@@ -4,13 +4,52 @@
   const log = (...args) => console.log('[VIDEO_TRANSICAO]', ...args);
   let isPlaying = false;
 
-window.playTransitionVideo = function(videoSrc = '/assets/videos/conhecimento-com-luz-jardim.mp4', nextSection) {
-  if (isPlaying) {
-    log('Já está reproduzindo um vídeo, ignorando:', videoSrc);
-    return;
-  }
-  isPlaying = true;
+function playTransitionVideo(src, nextSectionId) {
+  console.log('[VIDEO_TRANSICAO] Tentando reproduzir:', src);
+  const video = document.createElement('video');
+  video.id = 'videoTransicao';
+  video.src = src;
+  video.autoplay = true;
+  video.muted = true;
+  video.playsInline = true;
+  video.controls = false;
+  video.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; object-fit: cover; background: #000;';
 
+  let done = false;
+  const cleanup = () => {
+    if (done) return;
+    done = true;
+    try { video.pause(); } catch {}
+    video.remove();
+    console.log('[VIDEO_TRANSICAO] Transição concluída, navegando para:', nextSectionId);
+    if (typeof window.JC?.show === 'function') {
+      window.JC.show(nextSectionId);
+    } else {
+      console.warn('[VIDEO_TRANSICAO] Fallback navigation to:', nextSectionId);
+      window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
+    }
+  };
+
+  video.addEventListener('loadeddata', () => {
+    console.log('[VIDEO_TRANSICAO] Vídeo carregado, iniciando reprodução');
+    video.play().catch(e => {
+      console.warn('[VIDEO_TRANSICAO] Erro ao iniciar vídeo:', e);
+      setTimeout(cleanup, 2000); // Delay de 2s no fallback
+    });
+  }, { once: true });
+
+  video.addEventListener('ended', () => {
+    console.log('[VIDEO_TRANSICAO] Vídeo finalizado:', src);
+    cleanup();
+  }, { once: true });
+
+  video.addEventListener('error', (e) => {
+    console.error('[VIDEO_TRANSICAO] Erro ao carregar vídeo:', src, e);
+    setTimeout(cleanup, 2000); // Delay de 2s no fallback
+  }, { once: true });
+
+  document.body.appendChild(video);
+}
   let overlay = document.getElementById('videoOverlay');
   let video = document.getElementById('videoTransicao');
   let fallback = document.getElementById('videoFallback');
