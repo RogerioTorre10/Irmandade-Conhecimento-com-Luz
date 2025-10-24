@@ -64,6 +64,7 @@
     });
   }
 
+ 
   async function typeOnce(el, { speed = 20, speak = true } = {}) {
     if (!el) return;
     const text = textOf(el);
