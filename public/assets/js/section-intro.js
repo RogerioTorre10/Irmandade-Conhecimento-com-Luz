@@ -128,14 +128,14 @@
   }
 
   // ---------- TRANSIÇÃO DE VÍDEO ----------
-  function playTransitionVideo(nextSectionId) {
-    if (document.getElementById('intro-transition-overlay')) return;
-    console.log('[JCIntro] Iniciando transição de vídeo:', TRANSITION_SRC);
-    if (typeof window.playTransitionVideo === 'function') {
+  function playTransitionVideo(src, nextSectionId) {
+  console.log('[JCIntro] Iniciando transição de vídeo:', src);
+  if (typeof window.playTransitionVideo === 'function') {
     window.playTransitionVideo(src, nextSectionId);
   } else {
     console.warn('[JCIntro] window.playTransitionVideo não encontrado, usando fallback');
     setTimeout(() => {
+      console.log('[JCIntro] Fallback: navegando para:', nextSectionId);
       if (typeof window.JC?.show === 'function') {
         window.JC.show(nextSectionId);
       } else {
@@ -144,7 +144,14 @@
       }
     }, 2000); // Delay de 2s para simular transição
   }
+}
 
+// Exemplo de listener do botão "Iniciar" (perto da linha 297)
+const btnIniciar = document.querySelector('#btn-avancar');
+btnIniciar?.addEventListener('click', () => {
+  console.log('[JCIntro] Botão "Iniciar" clicado');
+  playTransitionVideo('/assets/img/filme-pergaminho-ao-vento.mp4', 'section-termos');
+});
     const video = document.createElement('video');
     video.src = TRANSITION_SRC;
     video.autoplay = true;
