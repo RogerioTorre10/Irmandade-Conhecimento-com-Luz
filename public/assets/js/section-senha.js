@@ -11,6 +11,13 @@
   const TRANSITION_TIMEOUT_MS = 8000;
   const TTS_FALLBACK_DELAY_MS = 3000;
 
+  if (!window.JCSenha?.state?.listenerAdded) {
+  console.log('[JCSenha] Registrando listener para sectionLoaded');
+  document.addEventListener('sectionLoaded', handler, { once: true });
+  window.JCSenha = window.JCSenha || {};
+  window.JCSenha.state = window.JCSenha.state || {};
+  window.JCSenha.state.listenerAdded = true;
+}
   if (window.JCSenha?.__bound) {
     console.log('[JCSenha] Já inicializado, ignorando...');
     return;
