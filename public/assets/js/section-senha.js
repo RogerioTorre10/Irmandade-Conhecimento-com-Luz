@@ -197,13 +197,18 @@
     video.style.zIndex = '9999';
     video.style.backgroundColor = '#000';
 
-    const senhaSection = document.getElementById('section-senha');
-    if (senhaSection) {
-      senhaSection.classList.add('hidden');
-      senhaSection.style.display = 'none';
-      senhaSection.setAttribute('aria-hidden', 'true');
-      console.log('[JCSenha] Seção senha escondida');
-    }
+   function hideSection() {
+  const section = document.querySelector('#section-senha');
+  const focusedButton = document.querySelector('#btn-senha-avancar:focus, #btn-senha-prev:focus');
+  if (focusedButton) {
+    focusedButton.blur();
+    console.log('[JCSenha] Foco removido de botão ativo');
+  }
+  section.classList.add('hidden');
+  section.setAttribute('aria-hidden', 'true');
+  section.setAttribute('inert', ''); // Adiciona inert para acessibilidade
+  console.log('[JCSenha] Seção senha escondida');
+}
 
     if (window.JC) {
       window.JC.currentSection = SECTION_ID;
