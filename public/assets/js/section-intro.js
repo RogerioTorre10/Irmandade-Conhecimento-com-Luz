@@ -130,15 +130,21 @@
   // ---------- TRANSIÇÃO DE VÍDEO ----------
   function playTransitionVideo(nextSectionId) {
     if (document.getElementById('intro-transition-overlay')) return;
-
     console.log('[JCIntro] Iniciando transição de vídeo:', TRANSITION_SRC);
-    window.playTransitionVideo(TRANSITION_SRC, nextSectionId);
-    const overlay = document.createElement('div');
-    overlay.id = 'intro-transition-overlay';
-    overlay.style.cssText = `
-      position: fixed; inset: 0; background: #000; z-index: 999999;
-      display: flex; align-items: center; justify-content: center;`;
-    
+    if (typeof window.playTransitionVideo === 'function') {
+    window.playTransitionVideo(src, nextSectionId);
+  } else {
+    console.warn('[JCIntro] window.playTransitionVideo não encontrado, usando fallback');
+    setTimeout(() => {
+      if (typeof window.JC?.show === 'function') {
+        window.JC.show(nextSectionId);
+      } else {
+        console.warn('[JCIntro] Fallback navigation to:', nextSectionId);
+        window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
+      }
+    }, 2000); // Delay de 2s para simular transição
+  }
+
     const video = document.createElement('video');
     video.src = TRANSITION_SRC;
     video.autoplay = true;
@@ -148,7 +154,7 @@
     video.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
     overlay.appendChild(video);
     document.body.appendChild(overlay);
-
+}
     let done = false;
     const cleanup = () => {
       if (done) return;
