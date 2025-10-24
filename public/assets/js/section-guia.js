@@ -133,54 +133,59 @@
     return true;
   }
 
-  function playTransitionVideo(nextSectionId) {
-    if (document.getElementById('guia-transition-overlay')) return;
-    console.log('[JCGuia] Iniciando transição de vídeo:', TRANSITION_SRC);
-    const overlay = document.createElement('div');
-    overlay.id = 'guia-transition-overlay';
-    overlay.style.cssText = `
-      position: fixed; inset: 0; background: #000; z-index: 999999;
-      display: flex; align-items: center; justify-content: center;`;
-    const video = document.createElement('video');
-    video.src = TRANSITION_SRC;
-    video.autoplay = true;
-    video.muted = true;
-    video.playsInline = true;
-    video.controls = false;
-    video.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
-    overlay.appendChild(video);
-    document.body.appendChild(overlay);
-
-    let done = false;
-    const cleanup = () => {
-      if (done) return;
-      done = true;
-      try { video.pause(); } catch {}
-      overlay.remove();
-      console.log('[JCGuia] Transição concluída, navegando para:', nextSectionId);
-      if (typeof window.JC?.show === 'function') {
-        window.JC.show(nextSectionId);
-      } else {
-        window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
-        console.warn('[JCGuia] Fallback navigation to:', nextSectionId);
-      }
-    };
-
-    video.addEventListener('ended', () => {
-      console.log('[JCGuia] Vídeo terminou, limpando e prosseguindo.');
-      cleanup();
-    }, { once: true });
-    video.addEventListener('error', () => {
-      console.error('[JCGuia] Erro ao reproduzir vídeo:', TRANSITION_SRC);
-      setTimeout(cleanup, 1200);
-    }, { once: true });
-    setTimeout(() => { if (!done) cleanup(); }, TRANSITION_TIMEOUT_MS);
-
-    Promise.resolve().then(() => video.play?.()).catch(() => {
-      console.warn('[JCGuia] Erro ao iniciar vídeo, usando fallback.');
-      setTimeout(cleanup, 800);
-    });
+ function playTransitionVideo(nextSectionId) {
+  if (document.getElementById('guia-transition-overlay')) {
+    console.log('[JCGuia] Overlay de transição já presente, ignorando');
+    return;
   }
+  console.log('[JCGuia] Iniciando transição de vídeo:', TRANSITION_SRC);
+  const overlay = document.createElement('div');
+  overlay.id = 'guia-transition-overlay';
+  overlay.style.cssText = `
+    position: fixed; inset: 0; background: #000; z-index: 999999;
+    display: flex; align-items: center; justify-content: center;`;
+  const video = document.createElement('video');
+  video.src = TRANSITION_SRC;
+  video.autoplay = true;
+  video.muted = true;
+  video.playsInline = true;
+  video.controls = false;
+  video.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
+  overlay.appendChild(video);
+  document.body.appendChild(overlay);
+
+  let done = false;
+  const cleanup = () => {
+    if (done) return;
+    done = true;
+    try { video.pause(); } catch {}
+    overlay.remove();
+    console.log('[JCGuia] Transição concluída, navegando para:', nextSectionId);
+    if (typeof window.JC?.show === 'function') {
+      window.JC.show(nextSectionId);
+    } else {
+      console.warn('[JCGuia] Fallback navigation to:', nextSectionId);
+      window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
+    }
+  };
+
+  video.addEventListener('loadeddata', () => {
+    console.log('[JCGuia] Vídeo carregado, iniciando reprodução');
+    video.play().catch(e => {
+      console.warn('[JCGuia] Erro ao iniciar vídeo:', e);
+      cleanup();
+    });
+  }, { once: true });
+  video.addEventListener('ended', () => {
+    console.log('[JCGuia] Vídeo terminou, limpando e prosseguindo.');
+    cleanup();
+  }, { once: true });
+  video.addEventListener('error', (e) => {
+    console.error('[JCGuia] Erro ao carregar vídeo:', TRANSITION_SRC, e);
+    cleanup();
+  }, { once: true });
+  setTimeout(() => { if (!done) cleanup(); }, TRANSITION_TIMEOUT_MS);
+}
 
   function ensureSectionVisible(root, sectionId) {
     if (!root) return;
