@@ -520,7 +520,7 @@ const onShown = async (evt) => {
     return;
   }
 };
-  let root;
+  
   try {
     root = await waitForElement('#section-senha', { 
       within: document.getElementById('jornada-content-wrapper') || document, 
