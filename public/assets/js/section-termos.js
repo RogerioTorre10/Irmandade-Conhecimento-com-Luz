@@ -274,7 +274,7 @@
                 console.log('[JCTermos] Timeout de transição atingido (8000ms)');
                 document.removeEventListener('transition:ended', onTransitionEnd);
                 resolve();
-              }, 8000);
+              }, 2000);
             });
 
             console.log('[JCTermos] Iniciando datilografia na página atual...');
