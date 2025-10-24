@@ -101,22 +101,23 @@
   };
 
   document.addEventListener('click', (e) => {
-    const btn = e.target.closest('#skipVideo');
-    if (btn) {
-      const overlay = document.getElementById('videoOverlay');
-      const video = document.getElementById('videoTransicao');
-      if (overlay && video) {
-        log('Vídeo pulado pelo usuário');
-        video.pause();
-        video.src = '';
-        overlay.classList.add('hidden');
-        overlay.style.display = 'none';
-        isPlaying = false;
-        window.JC.goNext();
-        log('Avançando para próxima seção após skip');
-      }
+  const btn = e.target.closest('#skipVideo');
+  if (btn && !btn.dataset.clicked) {
+    btn.dataset.clicked = 'true';
+    const overlay = document.getElementById('videoOverlay');
+    const video = document.getElementById('videoTransicao');
+    if (overlay && video) {
+      log('Vídeo pulado pelo usuário');
+      video.pause();
+      video.src = '';
+      overlay.classList.add('hidden');
+      overlay.style.display = 'none';
+      isPlaying = false;
+      window.JC.goNext();
+      log('Avançando para próxima seção após skip');
+      setTimeout(() => delete btn.dataset.clicked, 1000); // Reativar após 1s
     }
-  });
-
+  }
+});
   log('jornada-video-transicao.js carregado');
 })();
