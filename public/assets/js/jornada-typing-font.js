@@ -2,7 +2,6 @@
    jornada-typing-font.js — typewriter global
    Expondo: window.JORNADA_TYPO
    ============================================ */
-import i18n from '/assets/js/i18n.js';
 const paperLog = (...args) => console.log('[JORNADA_TYPING_FONT]', ...args);
 
 ;(function () {
