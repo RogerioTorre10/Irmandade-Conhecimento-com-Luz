@@ -209,6 +209,37 @@
       errorMsg: root.querySelector('#guia-error')
     };
   }
+  async function startTypingSequence() {
+  const elements = {
+    instr1: document.querySelector('#senha-instr1'),
+    instr2: document.querySelector('#senha-instr2'),
+    instr3: document.querySelector('#senha-instr3'),
+    instr4: document.querySelector('#senha-instr4'),
+    input: document.querySelector('#senha-input')
+  };
+  const verified = {};
+  for (const [key, el] of Object.entries(elements)) {
+    verified[key] = !!el && !el.classList.contains('typing-done') && !el.dataset.spoken;
+  }
+  console.log('[JCSenha] Elementos verificados:', verified);
+  if (!Object.values(verified).some(v => v)) {
+    console.log('[JCSenha] Todos os elementos já processados, ignorando sequência');
+    return;
+  }
+  for (const [key, el] of Object.entries(elements)) {
+    if (verified[key]) {
+      await window.runTyping?.(el, el.dataset.text, () => {}, { speed: 50, cursor: true });
+      if (window.EffectCoordinator?.speak && !el.dataset.spoken) {
+        window.EffectCoordinator.speak(el.dataset.text, { lang: 'pt-BR', rate: 1.1 });
+        el.dataset.spoken = 'true';
+      }
+    }
+  }
+  if (elements.input) {
+    elements.input.focus();
+    console.log('[JCSenha] Foco aplicado ao input');
+  }
+}
 
   async function runTypingSequence(root) {
     const { title, nameInput, confirmBtn, guiaTexto, guiaOptions, errorMsg } = pickElements(root);
