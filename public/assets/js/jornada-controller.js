@@ -3,6 +3,8 @@
   window.JC = window.JC || {};
   const existingJC = { ...window.JC };
 
+  console.log('[JC.init] Initializing controller...');
+
   const sectionOrder = [
     'section-intro',
     'section-termos',
@@ -20,12 +22,13 @@
 
   async function applyTypingAndTTS(sectionId, root) {
     console.log('[JC.applyTypingAndTTS] Desativado para:', sectionId);
+    // Não aplicar efeitos, deixar para section-intro.js e section-termos.js
   }
 
   function attachButtonEvents(sectionId, root) {
     console.log('[JC.attachButtonEvents] Attaching buttons for:', sectionId);
     const buttons = root.querySelectorAll('[data-action]');
-    console.log('[JC.attachButtonEvents] Buttons found:', buttons.length, Array.from(buttons).map(btn => btn.id || btn.dataset.action));
+    console.log('[JC.attachButtonEvents] Buttons found:', buttons.length, Array.from(buttons).map(btn => btn.id));
     buttons.forEach(btn => {
       const action = btn.dataset.action;
       btn.disabled = false;
@@ -97,18 +100,6 @@
     }
   }
 
-  function goNext() {
-    const currentIndex = sectionOrder.indexOf(window.JC.currentSection || 'section-intro');
-    const nextSection = sectionOrder[currentIndex + 1];
-    console.log('[JC.goNext] Navigating to:', nextSection);
-    if (nextSection) {
-      show(nextSection);
-    } else {
-      console.warn('[JC.goNext] No next section, redirecting to /termos');
-      window.location.href = '/termos';
-    }
-  }
-
   function setOrder(order) {
     console.log('[JC.setOrder] Setting section order:', order);
     sectionOrder.length = 0;
@@ -118,23 +109,18 @@
   function init() {
     console.log('[JC.init] Controller initialized successfully');
     window.JC = {
-      ...existingJC,
-      init,
       show,
-      goNext,
       setOrder,
       attachButtonEvents,
       handleSectionLogic
     };
-    window.JC.currentSection = 'section-intro';
-    window.JC.show('section-intro');
   }
 
+  // Reagir automaticamente ao evento de exibição de seção
   document.addEventListener('section:shown', (e) => {
     const sectionId = e.detail.sectionId;
     const node = e.detail.node;
     if (node) {
-      window.JC.currentSection = sectionId;
       attachButtonEvents(sectionId, node);
       handleSectionLogic(sectionId, node);
     }
@@ -142,3 +128,4 @@
 
   init();
 })();
+
