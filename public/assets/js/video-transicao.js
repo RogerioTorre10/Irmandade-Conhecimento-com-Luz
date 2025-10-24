@@ -31,7 +31,7 @@
       const skipButton = document.createElement('button');
       skipButton.id = 'skipVideo';
       skipButton.textContent = 'Pular';
-      skipButton.style.cssText = 'position: absolute; top: 10px; right: 10px; padding: 8px; background: #fff; color: #000;';
+      skipButton.style.cssText = 'position: absolute; top: 10px; right: 10px; padding: 12px 20px; background: #fff; color: #000; font-size: 16px;';
       overlay.appendChild(video);
       overlay.appendChild(fallback);
       overlay.appendChild(skipButton);
@@ -62,7 +62,10 @@
       }
     };
 
-    video.src = src;
+    // Verificar se é dispositivo móvel
+    const isMobile = /Mobi|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    video.src = isMobile ? src.replace('.mp4', '-mobile.mp4') : src; // Usar versão mobile, se disponível
+    video.setAttribute('playsinline', ''); // Garantir reprodução inline
     video.autoplay = true;
     video.muted = true;
     video.playsInline = true;
@@ -77,36 +80,35 @@
         fallback.classList.remove('hidden');
         video.classList.add('hidden');
         window.toast?.('Erro ao reproduzir vídeo de transição. Usando fallback.', 'error');
-        setTimeout(cleanup, 2000); // Delay de 2s no fallback
+        setTimeout(cleanup, 2000);
       });
     }, { once: true });
 
     video.addEventListener('ended', () => {
-      log('Vídeo finalizado:', src);
+      log('Vídeo finalizado:', video.src);
       cleanup();
     }, { once: true });
 
     video.addEventListener('error', (e) => {
-      console.error('[VIDEO_TRANSICAO] Erro ao carregar vídeo:', src, e);
+      console.error('[VIDEO_TRANSICAO] Erro ao carregar vídeo:', video.src, e);
       fallback.classList.remove('hidden');
       video.classList.add('hidden');
       window.toast?.('Erro ao carregar vídeo de transição. Usando fallback.', 'error');
-      setTimeout(cleanup, 2000); // Delay de 2s no fallback
+      setTimeout(cleanup, 2000);
     }, { once: true });
 
     // Verificação via fetch
-    fetch(src, { method: 'HEAD' })
+    fetch(video.src, { method: 'HEAD' })
       .then(response => {
         if (!response.ok) throw new Error('Vídeo não encontrado');
-        log('Iniciando reprodução:', src);
+        log('Iniciando reprodução:', video.src);
       })
       .catch(e => {
-        console.error('[VIDEO_TRANSICAO] Erro ao verificar vídeo:', src, e);
+        console.error('[VIDEO_TRANSICAO] Erro ao verificar vídeo:', video.src, e);
         window.toast?.('Vídeo de transição não encontrado.', 'error');
-        setTimeout(cleanup, 2000); // Delay de 2s no fallback
+        setTimeout(cleanup, 2000);
       });
 
-    // Listener para o botão de pular
     const skipButton = overlay.querySelector('#skipVideo');
     if (skipButton) {
       skipButton.addEventListener('click', () => {
@@ -114,7 +116,7 @@
           skipButton.dataset.clicked = 'true';
           log('Vídeo pulado pelo usuário');
           cleanup();
-          setTimeout(() => delete skipButton.dataset.clicked, 1000); // Reativar após 1s
+          setTimeout(() => delete skipButton.dataset.clicked, 1000);
         }
       }, { once: true });
     }
