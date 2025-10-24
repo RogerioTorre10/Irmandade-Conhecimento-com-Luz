@@ -105,95 +105,106 @@
   <script src="/assets/js/section-final.js" defer></script>
 
   <!-- Inicialização -->
-  <script>
-    window.addEventListener('load', () => {
-      console.log('[Init] Evento load disparado');
+ <script>
+  window.addEventListener('load', () => {
+    console.log('[Init] Evento load disparado');
 
-      let initialized = false;
+    let initialized = false;
 
-      const waitForScripts = (callback, maxAttempts = 50, interval = 1000) => {
-        let attempts = 0;
-        const check = () => {
-          if (initialized) return;
+    const waitForScripts = (callback, maxAttempts = 100, interval = 500) => {
+      let attempts = 0;
+      const check = () => {
+        if (initialized) return;
 
-          console.log(`[Init] Verificando scripts (tentativa ${attempts + 1}/${maxAttempts})...`);
-          const ready = typeof window.JC?.init === 'function' && typeof window.carregarEtapa === 'function';
+        console.log(`[Init] Verificando scripts (tentativa ${attempts + 1}/${maxAttempts})...`, {
+          JC: !!window.JC,
+          JCInit: typeof window.JC?.init,
+          carregarEtapa: typeof window.carregarEtapa
+        });
 
-          if (ready) {
-            initialized = true;
-            console.log('[Init] Scripts prontos, executando callback');
-            callback();
+        const ready = typeof window.JC?.init === 'function' && typeof window.carregarEtapa === 'function';
+
+        if (ready) {
+          initialized = true;
+          console.log('[Init] Scripts prontos, executando callback');
+          callback();
+        } else {
+          console.log('[Init] Status: JC.init', typeof window.JC?.init, 'carregarEtapa', typeof window.carregarEtapa);
+          if (attempts < maxAttempts) {
+            attempts++;
+            setTimeout(check, interval);
           } else {
-            console.log('[Init] Status: JC.init', typeof window.JC?.init, 'carregarEtapa', typeof window.carregarEtapa);
-            if (attempts < maxAttempts) {
-              attempts++;
-              setTimeout(check, interval);
+            console.error('[Init] Falha ao carregar scripts após várias tentativas');
+            if (typeof window.carregarEtapa === 'function') {
+              console.log('[Init] Forçando section-intro via carregarEtapa');
+              window.carregarEtapa('intro').then(section => {
+                if (section) {
+                  console.log('[Init] Fallback: section-intro carregada');
+                  forceSectionVisible('section-intro');
+                } else {
+                  console.error('[Init] Fallback: falha ao carregar section-intro');
+                }
+              });
             } else {
-              console.error('[Init] Falha ao carregar scripts após várias tentativas');
-              if (typeof window.JC?.show === 'function') {
-                console.log('[Init] Forçando section-intro');
-                window.JC.show('section-intro');
-                forceSectionVisible('section-intro');
-              } else {
-                console.error('[Init] window.JC.show não disponível');
-              }
+              console.error('[Init] window.carregarEtapa não disponível');
             }
           }
-        };
-        check();
-      };
-
-      const forceSectionVisible = (sectionId) => {
-        const el = document.getElementById(sectionId);
-        if (!el) {
-          console.warn(`[Init] Seção ${sectionId} não encontrada para forçar visibilidade`);
-          return;
         }
-
-        el.classList.remove('hidden');
-        el.setAttribute('aria-hidden', 'false');
-        el.style.display = 'block';
-        el.style.opacity = '1';
-        el.style.visibility = 'visible';
-        el.style.zIndex = '2';
-        el.style.transition = 'opacity 0.3s ease';
-
-        console.log(`[Init] Visibilidade forçada para ${sectionId}`);
       };
+      check();
+    };
 
-      waitForScripts(() => {
-        try {
-          window.JC.init();
-          console.log('[Init] JC.init executado com sucesso');
-          window.JC.show('section-intro');
+    const forceSectionVisible = (sectionId) => {
+      const el = document.getElementById(sectionId);
+      if (!el) {
+        console.warn(`[Init] Seção ${sectionId} não encontrada para forçar visibilidade`);
+        return;
+      }
 
-          setTimeout(() => {
-            forceSectionVisible('section-intro');
-          }, 3000);
-        } catch (e) {
-          console.error('[Init] Erro ao executar JC.init:', e);
+      el.classList.remove('hidden');
+      el.setAttribute('aria-hidden', 'false');
+      el.style.display = 'block';
+      el.style.opacity = '1';
+      el.style.visibility = 'visible';
+      el.style.zIndex = '2';
+      el.style.transition = 'opacity 0.3s ease';
+
+      console.log(`[Init] Visibilidade forçada para ${sectionId}`);
+    };
+
+    waitForScripts(() => {
+      try {
+        window.JC.init();
+        console.log('[Init] JC.init executado com sucesso');
+      } catch (e) {
+        console.error('[Init] Erro ao executar JC.init:', e);
+        if (typeof window.carregarEtapa === 'function') {
+          window.carregarEtapa('intro').then(section => {
+            if (section) forceSectionVisible('section-intro');
+          });
         }
-      });
-
-      const observer = new MutationObserver(() => {
-        const sections = document.querySelectorAll('section[data-section]');
-        sections.forEach(sec => {
-          if (sec.classList.contains('hidden') || sec.getAttribute('aria-hidden') === 'true') {
-            console.log('[Init] Blindando visualmente seção:', sec.id);
-            sec.classList.remove('hidden');
-            sec.setAttribute('aria-hidden', 'false');
-            sec.style.display = 'block';
-            sec.style.opacity = '1';
-            sec.style.visibility = 'visible';
-            sec.style.zIndex = '2';
-            sec.style.transition = 'opacity 0.3s ease';
-          }
-        });
-      });
-
-      observer.observe(document.body, { childList: true, subtree: true });
+      }
     });
-  </script>
+
+    const observer = new MutationObserver(() => {
+      const sections = document.querySelectorAll('section[data-section]');
+      sections.forEach(sec => {
+        if (sec.classList.contains('hidden') || sec.getAttribute('aria-hidden') === 'true') {
+          console.log('[Init] Blindando visualmente seção:', sec.id);
+          sec.classList.remove('hidden');
+          sec.setAttribute('aria-hidden', 'false');
+          sec.style.display = 'block';
+          sec.style.opacity = '1';
+          sec.style.visibility = 'visible';
+          sec.style.zIndex = '2';
+          sec.style.transition = 'opacity 0.3s ease';
+        }
+      });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
+</script>
 
   <noscript>
     <p style="text-align:center; padding:12px">Ative o JavaScript para usar esta página.</p>
