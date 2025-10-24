@@ -1,109 +1,128 @@
 (function () {
   'use strict';
 
-  const JC = window.JC = window.JC || {};
+  console.log('[JC.init] Initializing controller...');
 
-  JC.currentSection = null;
+  const sectionOrder = [
+    'section-intro',
+    'section-termos',
+    'section-senha',
+    'section-filme',
+    'section-guia',
+    'section-selfie',
+    'section-perguntas',
+    'section-final'
+  ];
 
-  JC.show = async (sectionId) => {
-    console.log('[JC.show] Iniciando exibição para:', sectionId);
+  function getText(el) {
+    return (el?.dataset?.text ?? el?.textContent ?? '').trim();
+  }
 
-    if (JC.currentSection === sectionId) {
-      console.log('[JC.show] Já está na seção:', sectionId);
-      return;
-    }
+  async function applyTypingAndTTS(sectionId, root) {
+    console.log('[JC.applyTypingAndTTS] Desativado para:', sectionId);
+    // Não aplicar efeitos, deixar para section-intro.js e section-termos.js
+  }
 
-    JC.currentSection = sectionId;
-
-    const wrapper = document.getElementById('jornada-content-wrapper');
-    if (!wrapper) {
-      console.error('[JC.show] #jornada-content-wrapper não encontrado');
-      window.toast?.('Erro: Container de conteúdo não encontrado.', 'error');
-      return;
-    }
-
-    // Esconder todas as seções
-    wrapper.querySelectorAll('section').forEach(sec => {
-      sec.classList.add('hidden');
-      sec.setAttribute('aria-hidden', 'true');
-      sec.style.display = 'none';
-      sec.style.opacity = '0';
-      sec.style.visibility = 'hidden';
-    });
-
-    // Carregar seção
-    let section = document.getElementById(sectionId);
-    if (!section) {
-      console.log('[JC.show] Seção não encontrada, tentando carregar:', sectionId);
-      try {
-        await window.carregarEtapa(sectionId);
-        section = document.getElementById(sectionId);
-      } catch (e) {
-        console.error('[JC.show] Falha ao carregar seção:', sectionId, e);
-        window.toast?.(`Erro: Não foi possível carregar a seção ${sectionId}.`, 'error');
-        return;
-      }
-    }
-
-    if (!section) {
-      console.error('[JC.show] Seção ainda não encontrada após carregar:', sectionId);
-      window.toast?.(`Erro: Seção ${sectionId} não encontrada.`, 'error');
-      return;
-    }
-
-    section.classList.remove('hidden');
-    section.setAttribute('aria-hidden', 'false');
-    section.style.display = 'block';
-    section.style.opacity = '1';
-    section.style.visibility = 'visible';
-
-    // Disparar evento
-    const event = new CustomEvent('section:shown', {
-      detail: { sectionId, node: section }
-    });
-    document.dispatchEvent(event);
-
-    console.log('[JC.show] Evento section:shown disparado para:', sectionId);
-    console.log('[JC.show] Conteúdo de #jornada-content-wrapper:', wrapper.innerHTML.substring(0, 100) + '...');
-  };
-
-  JC.handleSectionLogic = (sectionId) => {
-    console.log('[JC.handleSectionLogic] Processando lógica para:', sectionId);
-    // Aqui você pode adicionar lógica específica por seção, ex:
-    // if (sectionId === 'section-senha') { iniciarSenha(); }
-  };
-
-  JC.attachButtonEvents = (sectionId) => {
-    console.log('[JC.attachButtonEvents] Anexando botões para:', sectionId);
-    const buttons = document.querySelectorAll(`#${sectionId} [data-action]`);
-    console.log('[JC.attachButtonEvents] Botões encontrados:', buttons.length);
-
+  function attachButtonEvents(sectionId, root) {
+    console.log('[JC.attachButtonEvents] Attaching buttons for:', sectionId);
+    const buttons = root.querySelectorAll('[data-action]');
+    console.log('[JC.attachButtonEvents] Buttons found:', buttons.length, Array.from(buttons).map(btn => btn.id));
     buttons.forEach(btn => {
-      const action = btn.getAttribute('data-action');
-      if (!action) return;
-
+      const action = btn.dataset.action;
+      btn.disabled = false;
+      btn.classList.add('btn', 'btn-primary', 'btn-stone');
       btn.addEventListener('click', () => {
-        console.log(`[JC] Botão clicado: ${action}`);
-        // Aqui você pode mapear ações específicas
-        // Exemplo: if (action === 'avancar') { JC.show('section-next'); }
+        console.log('[JC.attachButtonEvents] Button clicked:', action, btn.id);
+        if (action === 'avancar') {
+          const currentIndex = sectionOrder.indexOf(sectionId);
+          const nextSection = sectionOrder[currentIndex + 1];
+          console.log('[JC.attachButtonEvents] Navigating to:', nextSection);
+          if (nextSection) {
+            JC.show(nextSection);
+          } else {
+            console.warn('[JC.attachButtonEvents] No next section, redirecting to /termos');
+            window.location.href = '/termos';
+          }
+        }
+      });
+      btn.addEventListener('mouseover', () => {
+        btn.style.transform = 'scale(1.05)';
+        btn.style.boxShadow = '0 8px 16px rgba(0,0,0,0.7)';
+      });
+      btn.addEventListener('mouseout', () => {
+        btn.style.transform = 'scale(1)';
+        btn.style.boxShadow = 'inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6)';
       });
     });
-  };
+  }
 
-  JC.init = () => {
-    console.log('[JC] Controller inicializado');
+  function handleSectionLogic(sectionId, root) {
+    console.log('[JC.handleSectionLogic] Processing logic for:', sectionId);
+    if (sectionId === 'section-intro' || sectionId === 'section-termos') {
+      root.style.cssText = `
+        background: transparent !important;
+        padding: 30px !important;
+        border-radius: 12px !important;
+        max-width: 600px !important;
+        text-align: center !important;
+        box-shadow: none !important;
+        border: none !important;
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        position: relative !important;
+        z-index: 2 !important;
+      `;
+      attachButtonEvents(sectionId, root);
+    }
+  }
 
-    const sectionId = JC.currentSection || 'section-intro';
-    JC.attachButtonEvents(sectionId);
-    JC.handleSectionLogic(sectionId);
-  };
+  async function show(sectionId) {
+    console.log('[JC.show] Starting display for:', sectionId);
+    try {
+      const cleanId = sectionId.replace(/^section-/, '');
+      console.log('[JC.show] Starting carregarEtapa for:', cleanId);
+      const section = await window.carregarEtapa(cleanId);
+      console.log('[JC.show] carregarEtapa completed, element #', sectionId, ':', !!section);
+      if (section) {
+        console.log('[JC.show] Content of #jornada-content-wrapper:', document.getElementById('jornada-content-wrapper')?.innerHTML.slice(0, 120) + '...');
+        handleSectionLogic(sectionId, section);
+        document.dispatchEvent(new CustomEvent('section:shown', { detail: { sectionId, node: section } }));
+        console.log('[JC.show] Event section:shown fired for:', sectionId);
+        console.log('[JC.show] Displayed successfully:', sectionId);
+      } else {
+        console.error('[JC.show] Section element is null for:', sectionId);
+      }
+    } catch (err) {
+      console.error('[JC.show] Error showing section:', sectionId, err);
+    }
+  }
+
+  function setOrder(order) {
+    console.log('[JC.setOrder] Setting section order:', order);
+    sectionOrder.length = 0;
+    sectionOrder.push(...order);
+  }
+
+  function init() {
+    console.log('[JC.init] Controller initialized successfully');
+    window.JC = {
+      show,
+      setOrder,
+      attachButtonEvents,
+      handleSectionLogic
+    };
+  }
 
   // Reagir automaticamente ao evento de exibição de seção
   document.addEventListener('section:shown', (e) => {
     const sectionId = e.detail.sectionId;
-    JC.attachButtonEvents(sectionId);
-    JC.handleSectionLogic(sectionId);
+    const node = e.detail.node;
+    if (node) {
+      attachButtonEvents(sectionId, node);
+      handleSectionLogic(sectionId, node);
+    }
   });
 
-  console.log('[JC] Controller carregado');
+  init();
 })();
