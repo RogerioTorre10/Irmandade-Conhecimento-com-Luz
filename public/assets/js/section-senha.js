@@ -175,6 +175,7 @@
 
   function playTransitionVideo(nextSectionId) {
     console.log('[JCSenha] Iniciando transição de vídeo:', TRANSITION_SRC);
+    window.playTransitionVideo(TRANSITION_SRC, nextSectionId);
     const video = document.createElement('video');
     video.id = 'transition-video';
     video.src = TRANSITION_SRC;
