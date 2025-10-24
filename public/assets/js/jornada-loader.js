@@ -18,55 +18,48 @@
     final: '/html/section-final.html'
   };
 
-  function checkCriticalElements(section, sectionId) {
-    const cleanId = sectionId.replace(/^section-/, '');
-    const criticalSelectors = {
-      intro: ['#intro-p1-1', '#intro-p1-2', '#intro-p1-3', '#intro-p2-1', '#intro-p2-2', '#btn-avancar'],
-      termos: ['#termos-pg1', '#termos-pg2', '.nextBtn[data-action="termos-next"]', '.prevBtn[data-action="termos-prev"]', '.avancarBtn[data-action="avancar"]']
-    }[cleanId] || [];
+ function checkCriticalElements(section, sectionId) {
+  const criticalSelectors = {
+    'section-intro': ['#intro-p1-1', '#intro-p1-2', '#intro-p1-3', '#intro-p2-1', '#intro-p2-2', '#btn-avancar'],
+    'section-termos': ['#termos-pg1', '#termos-pg2', '.nextBtn[data-action="termos-next"]', '.prevBtn[data-action="termos-prev"]', '.avancarBtn[data-action="avancar"]']
+  }[sectionId] || [];
 
-    // Garante que o container de ações exista
-    if (!section.querySelector('.parchment-actions-rough')) {
-      const actions = document.createElement('div');
-      actions.className = 'parchment-actions-rough';
-      section.appendChild(actions);
+  const found = {};
+  for (const selector of criticalSelectors) {
+    let el = section.querySelector(selector);
+    if (!el && selector.startsWith('#termos-pg')) {
+      el = document.createElement('div');
+      el.id = selector.slice(1);
+      el.classList.add('parchment-text-rough', 'lumen-typing');
+      el.dataset.typing = 'true';
+      el.textContent = `Placeholder para ${selector}`;
+      el.style.opacity = '1';
+      el.style.visibility = 'visible';
+      el.style.display = 'block';
+      section.appendChild(el);
+      console.warn(`[carregarEtapa] Created placeholder for ${selector}`);
     }
-
-    const found = {};
-    for (const selector of criticalSelectors) {
-      let el = section.querySelector(selector);
-
-      // Criar placeholders para textos
-      if (!el && selector.startsWith('#termos-pg')) {
-        el = document.createElement('div');
-        el.id = selector.slice(1);
-        el.classList.add('parchment-text-rough', 'lumen-typing');
-        el.dataset.typing = 'true';
-        el.textContent = `Placeholder para ${selector}`;
-        section.appendChild(el);
-        console.warn(`[carregarEtapa] Created placeholder for ${selector}`);
-      }
-
-      // Criar botões se faltarem
-      if (!el && (selector.includes('next') || selector.includes('prev') || selector.includes('avancar'))) {
-        el = document.createElement('button');
-        el.classList.add('btn', 'btn-primary', 'btn-stone');
-        el.dataset.action = selector.includes('next') ? 'termos-next' : selector.includes('prev') ? 'termos-prev' : 'avancar';
-        el.textContent = selector.includes('next') ? 'Próxima página' : selector.includes('prev') ? 'Voltar' : 'Aceito e quero continuar';
-        section.querySelector('.parchment-actions-rough')?.appendChild(el);
-        console.warn(`[carregarEtapa] Created placeholder for ${selector}`);
-      }
-
-      found[selector] = !!el;
-      if (found[selector]) {
-        console.log(`[carregarEtapa] Critical element ${selector} FOUND.`);
-      } else {
-        console.warn(`[carregarEtapa] Critical element ${selector} NOT found.`);
-      }
+    if (!el && (selector.startsWith('.nextBtn') || selector.startsWith('.prevBtn') || selector.startsWith('.avancarBtn'))) {
+      el = document.createElement('button');
+      el.classList.add('btn', 'btn-primary', 'btn-stone');
+      el.dataset.action = selector.includes('next') ? 'termos-next' : selector.includes('prev') ? 'termos-prev' : 'avancar';
+      el.textContent = selector.includes('next') ? 'Próxima página' : selector.includes('prev') ? 'Voltar' : 'Aceito e quero continuar';
+      el.style.opacity = '1';
+      el.style.visibility = 'visible';
+      el.style.display = 'inline-block';
+      section.querySelector('.parchment-actions-rough')?.appendChild(el) || section.appendChild(el);
+      console.warn(`[carregarEtapa] Created placeholder for ${selector}`);
     }
-
-    return found;
+    found[selector] = !!el;
+    if (found[selector]) {
+      console.log(`[carregarEtapa] Critical element ${selector} FOUND.`);
+    } else {
+      console.warn(`[carregarEtapa] Critical element ${selector} NOT found.`);
+    }
   }
+  console.log('[carregarEtapa] Critical elements check:', found);
+  return found;
+}
 
   async function carregarEtapa(nome) {
     const id = `section-${nome}`;
