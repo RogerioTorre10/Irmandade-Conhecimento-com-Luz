@@ -207,7 +207,7 @@ if (!window.JCTermos.state.listenerAdded) {
       box-sizing: border-box;
     `;
 
-    let pg1, pg2, nextBtn, prevBtn, avancarBtn;
+   // let pg1, pg2, nextBtn, prevBtn, avancarBtn;
     try {
       console.log('[JCTermos] Buscando elementos...');
       pg1 = await waitForElement('#termos-pg1', { within: root, timeout: 2000 });
