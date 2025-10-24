@@ -354,8 +354,7 @@ const handler = async (evt) => {
 
     window.JCGuia.state.ready = true;
     console.log('[JCGuia] Seção guia inicializada.');
-  };
-
+ 
   // Método para limpar a seção
   window.JCGuia.destroy = () => {
     console.log('[JCGuia] Destruindo seção guia');
