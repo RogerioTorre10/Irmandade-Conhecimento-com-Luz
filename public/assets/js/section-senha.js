@@ -202,16 +202,28 @@ console.error('[JCSenha] Erro no fallback:', err);
 }, { once: true });
 }
 function pickElements(root) {
-return {
-instr1: root.querySelector('#senha-instr1'),
-instr2: root.querySelector('#senha-instr2'),
-instr3: root.querySelector('#senha-instr3'),
-instr4: root.querySelector('#senha-instr4'),
-input: root.querySelector('#senha-input'),
-toggle: root.querySelector('.btn-toggle-senha'),
-btnNext: root.querySelector('#btn-senha-avancar'),
-btnPrev: root.querySelector('#btn-senha-prev')
-};
+  const elements = {
+    instr1: root.querySelector('#senha-instr1'),
+    instr2: root.querySelector('#senha-instr2'),
+    instr3: root.querySelector('#senha-instr3'),
+    instr4: root.querySelector('#senha-instr4'),
+    input: root.querySelector('#senha-input'),
+    toggle: root.querySelector('.btn-toggle-senha'),
+    btnNext: root.querySelector('#btn-senha-avancar'),
+    btnPrev: root.querySelector('#btn-senha-prev')
+  };
+  console.log('[JCSenha] Elementos verificados:', {
+    instr1: !!elements.instr1,
+    instr2: !!elements.instr2,
+    instr3: !!elements.instr3,
+    instr4: !!elements.instr4,
+    input: !!elements.input,
+    toggle: !!elements.toggle,
+    btnNext: !!elements.btnNext,
+    btnPrev: !!elements.btnPrev
+  });
+  return elements;
+}
 }
 async function runTypingSequence(root) {
 window.JCSenha.state.typingInProgress = true;
