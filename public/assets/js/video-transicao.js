@@ -64,7 +64,7 @@
   let video = document.getElementById('videoTransicao');
   let fallback = document.getElementById('videoFallback');
 
-  if (!overlay || !video) {
+  if (!overlay || !video)  {
     log('Criando elementos de vídeo dinamicamente');
     overlay = document.createElement('div');
     overlay.id = 'videoOverlay';
@@ -84,10 +84,10 @@
     overlay.appendChild(fallback);
     overlay.appendChild(skipButton);
     document.body.appendChild(overlay);
+  } else {
+   log('Tentando reproduzir:', videoSrc);
   }
-
-  log('Tentando reproduzir:', videoSrc);
-
+  
   try {
     fetch(videoSrc, { method: 'HEAD' })
       .then(response => {
@@ -190,6 +190,5 @@
       setTimeout(() => delete btn.dataset.clicked, 1000); // Reativar após 1s
     }
   }
-});
   log('jornada-video-transicao.js carregado');
 })();
