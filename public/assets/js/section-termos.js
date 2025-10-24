@@ -1,6 +1,14 @@
 (function () {
   'use strict';
 
+  const MOD = 'section-termos.js';
+  const SECTION_ID = 'section-termos';
+  const PREV_SECTION_ID = 'section-intro';
+  const NEXT_SECTION_ID = 'section-senha';
+  const TRANSITION_SRC = '/assets/img/filme-senha.mp4';
+  const TRANSITION_TIMEOUT_MS = 8000;
+  const TTS_FALLBACK_DELAY_MS = 2000;
+
   // Namespace para isolar a seção
   window.JCTermos = window.JCTermos || {};
 
@@ -59,12 +67,6 @@
 
   function getText(el) {
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
-  }
-
-  function fromDetail(detail = {}) {
-    const sectionId = detail.sectionId || detail.id || window.__currentSectionId;
-    const node = detail.node || detail.root || null;
-    return { sectionId, node };
   }
 
   function normalizeParagraph(el) {
@@ -182,7 +184,7 @@
     const video = document.getElementById(videoElementId);
     if (!video) {
       console.log('[JCTermos] Vídeo de transição não encontrado, usando timeout padrão');
-      return sleep(8000);
+      return sleep(TRANSITION_TIMEOUT_MS);
     }
 
     return new Promise((resolve) => {
@@ -190,37 +192,39 @@
         console.log('[JCTermos] Vídeo terminou');
         resolve();
       }, { once: true });
-      setTimeout(resolve, 8000);
+      setTimeout(resolve, TRANSITION_TIMEOUT_MS);
     });
   }
 
-  // Função de transição com vídeo
-  function playTransitionThen(nextStep) {
-    if (document.getElementById('termos-transition-overlay')) {
-      console.log('[JCTermos] Overlay de transição já presente, ignorando');
-      return;
-    }
-    console.log('[JCTermos] Iniciando transição de vídeo: /assets/img/filme-senha.mp4');
+  function playTransitionVideo(nextSectionId) {
+    console.log('[JCTermos] Iniciando transição de vídeo:', TRANSITION_SRC);
     if (typeof window.playTransitionVideo === 'function') {
-      window.playTransitionVideo('/assets/img/filme-senha.mp4', 'section-senha');
+      window.playTransitionVideo(TRANSITION_SRC, nextSectionId);
     } else {
       console.warn('[JCTermos] window.playTransitionVideo não encontrado, usando fallback');
       setTimeout(() => {
-        console.log('[JCTermos] Fallback: executando próximo passo');
-        if (typeof nextStep === 'function') {
-          nextStep();
-        } else if (typeof window.JC?.show === 'function') {
-          window.JC.show('section-senha');
+        console.log('[JCTermos] Fallback: navegando para:', nextSectionId);
+        if (typeof window.JC?.show === 'function') {
+          window.JC.show(nextSectionId);
         } else {
-          console.warn('[JCTermos] Fallback navigation to section-senha');
-          window.location.href = 'jornada-conhecimento-com-luz1.html#section-senha';
+          console.warn('[JCTermos] Fallback navigation to:', nextSectionId);
+          window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
         }
       }, 2000);
     }
   }
 
-  // Função de datilografia
-  async function runTypingSequence(root) {
+  function pickElements(root) {
+    return {
+      pg1: root.querySelector('#termos-pg1'),
+      pg2: root.querySelector('#termos-pg2'),
+      nextBtn: root.querySelector('.nextBtn[data-action="termos-next"]'),
+      prevBtn: root.querySelector('.prevBtn[data-action="termos-prev"]'),
+      avancarBtn: root.querySelector('.avancarBtn[data-action="avancar"]')
+    };
+  }
+
+  function runTypingSequence(root) {
     window.JCTermos.state.typingInProgress = true;
     console.log('[JCTermos] Iniciando sequência de datilografia');
 
@@ -238,7 +242,7 @@
 
     seq.forEach(normalizeParagraph);
 
-    await waitForVideoEnd('videoTransicao');
+    await waitForVideoEnd();
     await sleep(1000);
 
     await waitForTypingBridge();
@@ -279,21 +283,10 @@
     console.log('[JCTermos] Datilografia concluída na página atual');
   }
 
-  function pickElements(root) {
-    return {
-      pg1: root.querySelector('#termos-pg1'),
-      pg2: root.querySelector('#termos-pg2'),
-      nextBtn: root.querySelector('.nextBtn[data-action="termos-next"]'),
-      prevBtn: root.querySelector('.prevBtn[data-action="termos-prev"]'),
-      avancarBtn: root.querySelector('.avancarBtn[data-action="avancar"]')
-    };
-  }
-
-  // Handler principal
   const onShown = async (evt) => {
     window.JCTermos.state.HANDLER_COUNT++;
-    const { sectionId, node } = fromDetail(evt?.detail);
-    if (sectionId !== 'section-termos') {
+    const { sectionId, node } = evt?.detail || {};
+    if (sectionId !== SECTION_ID) {
       console.log('[JCTermos] Ignorando, sectionId não é section-termos:', sectionId);
       return;
     }
@@ -303,7 +296,7 @@
       return;
     }
 
-    let root = node || document.getElementById('section-termos');
+    let root = node || document.getElementById(SECTION_ID);
     if (!root) {
       console.error('[JCTermos] Root #section-termos não encontrado');
       window.toast?.('Erro: Seção Termos não carregada.', 'error');
@@ -328,10 +321,19 @@
       visibility: visible;
       position: relative;
       z-index: 2;
-      overflow-y: scroll;
-      min-height: 80vh;
-      height: 80vh;
+      overflow-y: auto;
+      min-height: calc(100vh - 100px);
+      height: auto;
       box-sizing: border-box;
+      @media (max-width: 768px) {
+        padding: 16px;
+        margin: 8px auto;
+        font-size: 14px;
+      }
+      @media (max-width: 480px) {
+        padding: 12px;
+        font-size: 12px;
+      }
     `;
 
     let pg1, pg2, nextBtn, prevBtn, avancarBtn;
@@ -396,10 +398,12 @@
       if (btn) {
         btn.classList.add('btn', 'btn-primary', 'btn-stone');
         btn.disabled = true;
+        btn.style.padding = '12px 20px'; // Ajuste para toque no celular
+        btn.style.fontSize = '16px';
         btn.style.opacity = '0.5';
         btn.style.cursor = 'not-allowed';
         btn.style.display = 'inline-block';
-        btn.style.margin = '8px';
+        btn.style.margin = '10px';
         btn.style.visibility = 'visible';
         console.log('[JCTermos] Botão inicializado:', btn.className, btn.textContent);
       }
@@ -451,17 +455,21 @@
         speechSynthesis.cancel();
         if (window.JCTermos.state.currentPage === 2) {
           console.log('[JCTermos] Avançando para section-senha com transição de vídeo');
-          playTransitionThen(() => {
-            if (typeof window.JC?.show === 'function') {
-              window.JC.show('section-senha');
-            } else {
-              console.warn('[JCTermos] Fallback navigation to section-senha');
-              window.location.href = 'jornada-conhecimento-com-luz1.html#section-senha';
-            }
-          });
+          playTransitionVideo(NEXT_SECTION_ID);
         }
       } else {
         console.log('[JCTermos] Clique simulado ignorado');
+      }
+    });
+
+    // Adicionar suporte a toque no celular
+    [nextBtn, prevBtn, avancarBtn].forEach(btn => {
+      if (btn) {
+        btn.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          btn.click();
+          console.log('[JCTermos] Toque detectado em:', btn.id);
+        }, { passive: false });
       }
     });
 
@@ -506,7 +514,7 @@
   window.JCTermos.destroy = () => {
     console.log('[JCTermos] Destruindo seção termos');
     document.removeEventListener('section:shown', onShown);
-    const root = document.getElementById('section-termos');
+    const root = document.getElementById(SECTION_ID);
     if (root) {
       root.dataset.termosInitialized = '';
       root.querySelectorAll('[data-typing="true"]').forEach(el => {
@@ -539,20 +547,20 @@
 
     const tryInitialize = (attempt = 1, maxAttempts = 10) => {
       setTimeout(() => {
-        const visibleTermos = document.querySelector('#section-termos:not(.hidden)');
+        const visibleTermos = document.querySelector(`#${SECTION_ID}:not(.hidden)`);
         if (visibleTermos && !window.JCTermos.state.ready && !visibleTermos.dataset.termosInitialized) {
           console.log('[JCTermos] Seção visível encontrada, disparando handler');
-          onShown({ detail: { sectionId: 'section-termos', node: visibleTermos } });
-        } else if (document.getElementById('section-termos') && !window.JCTermos.state.ready && !document.getElementById('section-termos').dataset.termosInitialized) {
+          onShown({ detail: { sectionId: SECTION_ID, node: visibleTermos } });
+        } else if (document.getElementById(SECTION_ID) && !window.JCTermos.state.ready && !document.getElementById(SECTION_ID).dataset.termosInitialized) {
           console.log('[JCTermos] Forçando inicialização manual (tentativa ' + attempt + ')');
-          onShown({ detail: { sectionId: 'section-termos', node: document.getElementById('section-termos') } });
+          onShown({ detail: { sectionId: SECTION_ID, node: document.getElementById(SECTION_ID) } });
         } else if (attempt < maxAttempts) {
           console.log('[JCTermos] Nenhuma seção visível ou já inicializada, tentando novamente...');
           tryInitialize(attempt + 1, maxAttempts);
         } else {
-          console.error('[JCTermos] Falha ao inicializar após ' + maxAttempts + ' tentativas');
+          console.error('[JCTermos] Falha ao inicializar após', maxAttempts, 'tentativas');
         }
-      }, 100); // Delay fixo
+      }, 100);
     };
 
     tryInitialize();
