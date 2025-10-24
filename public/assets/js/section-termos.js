@@ -100,7 +100,7 @@
     el.style.color = '#fff';
     el.style.opacity = '0';
     el.style.display = 'block';
-    el.style.visibility = 'hidden';
+    el.style.visibility = 'visible'; // Garantir visibilidade inicial
 
     let usedFallback = false;
 
@@ -224,7 +224,7 @@
     };
   }
 
-  function runTypingSequence(root) {
+  async function runTypingSequence(root) {
     window.JCTermos.state.typingInProgress = true;
     console.log('[JCTermos] Iniciando sequência de datilografia');
 
@@ -251,11 +251,13 @@
       console.warn('[JCTermos] Nenhum elemento com data-typing="true" encontrado na página atual');
       currentPg.style.opacity = '1';
       currentPg.style.visibility = 'visible';
+      currentPg.style.display = 'block';
       [nextBtn, prevBtn, avancarBtn].forEach(btn => {
         if (btn) {
           btn.disabled = false;
           btn.style.opacity = '1';
           btn.style.cursor = 'pointer';
+          btn.style.visibility = 'visible';
         }
       });
       window.JCTermos.state.typingInProgress = false;
@@ -272,11 +274,13 @@
         btn.disabled = false;
         btn.style.opacity = '1';
         btn.style.cursor = 'pointer';
+        btn.style.visibility = 'visible';
       }
     });
 
     currentPg.style.opacity = '1';
     currentPg.style.visibility = 'visible';
+    currentPg.style.display = 'block';
 
     window.JCTermos.state.typingInProgress = false;
     window.JCTermos.state.initialized = true;
@@ -375,8 +379,8 @@
       if (el) {
         el.classList.remove('hidden');
         el.style.display = i === 0 ? 'block' : 'none';
-        el.style.opacity = '0';
-        el.style.visibility = 'hidden';
+        el.style.opacity = '1'; // Garantir visibilidade inicial
+        el.style.visibility = 'visible';
         el.style.minHeight = '60vh';
         console.log('[JCTermos] Página inicializada:', el.id);
       }
@@ -388,7 +392,7 @@
           el.textContent = '';
           el.style.opacity = '0';
           el.style.visibility = 'hidden';
-          el.style.display = 'none';
+          el.style.display = 'block'; // Garantir display inicial
           console.log('[JCTermos] Texto inicializado:', el.id);
         });
       }
@@ -398,7 +402,7 @@
       if (btn) {
         btn.classList.add('btn', 'btn-primary', 'btn-stone');
         btn.disabled = true;
-        btn.style.padding = '12px 20px'; // Ajuste para toque no celular
+        btn.style.padding = '12px 20px';
         btn.style.fontSize = '16px';
         btn.style.opacity = '0.5';
         btn.style.cursor = 'not-allowed';
@@ -434,6 +438,8 @@
       if (window.JCTermos.state.currentPage === 1 && pg2) {
         pg1.style.display = 'none';
         pg2.style.display = 'block';
+        pg2.style.opacity = '1';
+        pg2.style.visibility = 'visible';
         avancarBtn.textContent = 'Aceito e quero continuar';
         window.JCTermos.state.currentPage = 2;
         await runTypingChain();
@@ -441,7 +447,7 @@
     });
 
     once(prevBtn, 'click', async (e) => {
-      if (e.isTrusted) {
+      if (e.istrusted) {
         speechSynthesis.cancel();
         console.log('[JCTermos] Redirecionando para site fora da jornada');
         window.location.href = '/';
@@ -462,7 +468,6 @@
       }
     });
 
-    // Adicionar suporte a toque no celular
     [nextBtn, prevBtn, avancarBtn].forEach(btn => {
       if (btn) {
         btn.addEventListener('touchstart', (e) => {
@@ -497,6 +502,7 @@
           btn.disabled = false;
           btn.style.opacity = '1';
           btn.style.cursor = 'pointer';
+          btn.style.visibility = 'visible';
         }
       });
     }
