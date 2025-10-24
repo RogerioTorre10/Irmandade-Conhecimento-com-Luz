@@ -101,7 +101,7 @@
       console.error('[JCTermos] Erro ao reproduzir vídeo:', e);
       cleanup();
     }, { once: true });
-    setTimeout(() => { if (!done) cleanup(); }, 2000); // Timeout reduzido para 3s
+    setTimeout(() => { if (!done) cleanup(); }, 8000); // Timeout reduzido para 3s
 
     Promise.resolve().then(() => video.play?.()).catch((e) => {
       console.warn('[JCTermos] Erro ao iniciar vídeo:', e);
@@ -387,8 +387,9 @@
       }
     });
 
-    once(avancarBtn, 'click', async (e) => {
-  if (e.isTrusted) {
+   once(avancarBtn, 'click', async (e) => {
+  if (e.isTrusted && !avancarBtn.dataset.clicked) {
+    avancarBtn.dataset.clicked = 'true';
     speechSynthesis.cancel();
     if (window.JCTermos.state.currentPage === 2) {
       console.log('[JCTermos] Avançando para section-senha com transição de vídeo');
@@ -397,16 +398,17 @@
       if (wrapper) wrapper.innerHTML = '';
       playTransitionThen(() => {
         if (typeof window.JC?.show === 'function') {
-          window.JC.currentSection = 'section-termos'; // Definir seção atual
+          window.JC.currentSection = 'section-termos';
           window.JC.show('section-senha');
         } else {
           window.location.href = 'jornada-conhecimento-com-luz1.html#section-senha';
           console.warn('[JCTermos] Fallback navigation to jornada-conhecimento-com-luz1.html#section-senha');
         }
+        setTimeout(() => delete avancarBtn.dataset.clicked, 1000);
       });
     }
   } else {
-    console.log('[JCTermos] Clique simulado ignorado');
+    console.log('[JCTermos] Clique simulado ou duplicado ignorado');
   }
 });
 
