@@ -25,7 +25,7 @@
   function attachButtonEvents(sectionId, root) {
     console.log('[JC.attachButtonEvents] Attaching buttons for:', sectionId);
     const buttons = root.querySelectorAll('[data-action]');
-    console.log('[JC.attachButtonEvents] Buttons found:', buttons.length, Array.from(buttons).map(btn => btn.id));
+    console.log('[JC.attachButtonEvents] Buttons found:', buttons.length, Array.from(buttons).map(btn => btn.id || btn.dataset.action));
     buttons.forEach(btn => {
       const action = btn.dataset.action;
       btn.disabled = false;
@@ -126,6 +126,7 @@
       attachButtonEvents,
       handleSectionLogic
     };
+    window.JC.currentSection = 'section-intro';
     window.JC.show('section-intro');
   }
 
@@ -133,7 +134,7 @@
     const sectionId = e.detail.sectionId;
     const node = e.detail.node;
     if (node) {
-      window.JC.currentSection = sectionId; // Atualizar seção atual
+      window.JC.currentSection = sectionId;
       attachButtonEvents(sectionId, node);
       handleSectionLogic(sectionId, node);
     }
