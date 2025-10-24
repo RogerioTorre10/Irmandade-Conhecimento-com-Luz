@@ -388,26 +388,27 @@
     });
 
     once(avancarBtn, 'click', async (e) => {
-      if (e.isTrusted) {
-        speechSynthesis.cancel();
-        if (window.JCTermos.state.currentPage === 2) {
-          console.log('[JCTermos] Avançando para section-senha com transição de vídeo');
-          window.JCTermos.destroy(); // Limpar estado antes de avançar
-          const wrapper = document.getElementById('jornada-content-wrapper');
-          if (wrapper) wrapper.innerHTML = '';
-          playTransitionThen(() => {
-            if (typeof window.JC?.show === 'function') {
-              window.JC.show('section-senha');
-            } else {
-              window.location.href = 'jornada-conhecimento-com-luz1.html#section-senha';
-              console.warn('[JCTermos] Fallback navigation to jornada-conhecimento-com-luz1.html#section-senha');
-            }
-          });
+  if (e.isTrusted) {
+    speechSynthesis.cancel();
+    if (window.JCTermos.state.currentPage === 2) {
+      console.log('[JCTermos] Avançando para section-senha com transição de vídeo');
+      window.JCTermos.destroy();
+      const wrapper = document.getElementById('jornada-content-wrapper');
+      if (wrapper) wrapper.innerHTML = '';
+      playTransitionThen(() => {
+        if (typeof window.JC?.show === 'function') {
+          window.JC.currentSection = 'section-termos'; // Definir seção atual
+          window.JC.show('section-senha');
+        } else {
+          window.location.href = 'jornada-conhecimento-com-luz1.html#section-senha';
+          console.warn('[JCTermos] Fallback navigation to jornada-conhecimento-com-luz1.html#section-senha');
         }
-      } else {
-        console.log('[JCTermos] Clique simulado ignorado');
-      }
-    });
+      });
+    }
+  } else {
+    console.log('[JCTermos] Clique simulado ignorado');
+  }
+});
 
     window.JCTermos.state.ready = false;
     console.log('[JCTermos] Iniciando runTypingChain na página 1...');
