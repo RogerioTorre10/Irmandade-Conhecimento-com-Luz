@@ -170,7 +170,7 @@
     }
     log('Avançando para próxima seção (erro inesperado)');
   }
-};
+
 
   document.addEventListener('click', (e) => {
   const btn = e.target.closest('#skipVideo');
