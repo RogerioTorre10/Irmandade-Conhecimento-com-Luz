@@ -17,7 +17,9 @@
     currentPage: 1,
     listenerAdded: false,
     HANDLER_COUNT: 0,
-    TYPING_COUNT: 0
+    TYPING_COUNT: 0,
+    typingInProgress: false,
+    initialized: false
   };
 
   // Funções utilitárias
@@ -29,6 +31,8 @@
     };
     el.addEventListener(ev, h);
   };
+
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
   async function waitForElement(selector, { within = document, timeout = 2000, step = 50 } = {}) {
     console.log('[JCTermos] Aguardando elemento:', selector);
@@ -63,129 +67,252 @@
     return { sectionId, node };
   }
 
-  // Função de transição com vídeo
-  function playTransitionThen(nextStep) {
-    if (document.getElementById('termos-transition-overlay')) return;
-    console.log('[JCTermos] Iniciando transição de vídeo: /assets/img/filme-senha.mp4');
-    const overlay = document.createElement('div');
-    overlay.id = 'termos-transition-overlay';
-    overlay.style.cssText = `
-      position:fixed; inset:0; background:#000; z-index:999999;
-      display:flex; align-items:center; justify-content:center;`;
-    const video = document.createElement('video');
-    video.src = '/assets/img/filme-senha.mp4';
-    video.autoplay = true;
-    video.muted = true;
-    video.playsInline = true;
-    video.controls = false;
-    video.style.cssText = 'width:100%; height:100%; object-fit:cover;';
-    overlay.appendChild(video);
-    document.body.appendChild(overlay);
+  function normalizeParagraph(el) {
+    if (!el) return false;
+    const source = getText(el);
+    if (!source) return false;
 
-    let done = false;
-    const cleanup = () => {
-      if (done) return;
-      done = true;
-      try { video.pause(); } catch {}
-      overlay.remove();
-      console.log('[JCTermos] Transição concluída, executando próximo passo.');
-      if (typeof nextStep === 'function') nextStep();
-    };
+    el.dataset.text = source;
+    if (!el.classList.contains('typing-done')) {
+      el.textContent = '';
+      el.classList.remove('typing-active', 'typing-done');
+      delete el.dataset.spoken;
+    }
+    return true;
+  }
 
-    video.addEventListener('ended', () => {
-      console.log('[JCTermos] Vídeo terminou, limpando e prosseguindo.');
-      cleanup();
-    }, { once: true });
-    video.addEventListener('error', () => {
-      console.error('[JCTermos] Erro ao reproduzir vídeo: /assets/img/filme-senha.mp4');
-      setTimeout(cleanup, 1200);
-    }, { once: true });
-    setTimeout(() => { if (!done) cleanup(); }, 8000);
+  async function typeOnce(el, { speed = 20, speak = true } = {}) {
+    if (!el) return;
+    const text = getText(el);
+    if (!text) {
+      console.warn('[JCTermos] Texto vazio para elemento:', el);
+      return;
+    }
 
-    Promise.resolve().then(() => video.play?.()).catch(() => {
-      console.warn('[JCTermos] Erro ao iniciar vídeo, usando fallback.');
-      setTimeout(cleanup, 800);
+    window.G = window.G || {};
+    const prevLock = !!window.G.__typingLock;
+    window.G.__typingLock = true;
+
+    el.classList.add('typing-active', 'lumen-typing');
+    el.classList.remove('typing-done');
+    el.style.color = '#fff';
+    el.style.opacity = '0';
+    el.style.display = 'block';
+    el.style.visibility = 'hidden';
+
+    let usedFallback = false;
+
+    if (typeof window.runTyping === 'function') {
+      await new Promise((resolve) => {
+        try {
+          window.runTyping(el, text, resolve, {
+            speed: Number(el.dataset.speed || speed),
+            cursor: String(el.dataset.cursor || 'true') === 'true'
+          });
+        } catch (err) {
+          console.warn('[JCTermos] runTyping falhou, usando fallback', err);
+          usedFallback = true;
+          resolve();
+        }
+      });
+    } else {
+      usedFallback = true;
+    }
+
+    if (usedFallback) {
+      let i = 0;
+      el.textContent = '';
+      const type = () => {
+        if (i < text.length) {
+          el.textContent += text.charAt(i++);
+          setTimeout(type, speed);
+        }
+      };
+      await new Promise(resolve => {
+        const typeWrapper = () => {
+          type();
+          resolve();
+        };
+        typeWrapper();
+      });
+    }
+
+    el.classList.add('typing-done');
+    el.classList.remove('typing-active');
+    el.style.opacity = '1';
+    el.style.visibility = 'visible';
+    window.G.__typingLock = prevLock;
+
+    if (speak && typeof window.EffectCoordinator?.speak === 'function' && !el.dataset.spoken) {
+      try {
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'pt-BR';
+        utterance.rate = 1.1;
+        utterance.pitch = 1.0;
+        console.log('[JCTermos] TTS iniciado para:', text);
+        window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
+        await new Promise(resolve => {
+          utterance.onend = () => {
+            console.log('[JCTermos] TTS concluído para:', text);
+            resolve();
+          };
+          setTimeout(resolve, text.length * 70);
+        });
+        el.dataset.spoken = 'true';
+      } catch (err) {
+        console.error('[JCTermos] Erro no TTS:', err);
+      }
+    }
+
+    await sleep(80);
+  }
+
+  async function waitForTypingBridge(maxMs = 3000) {
+    const t0 = Date.now();
+    while (Date.now() - t0 < maxMs) {
+      if (window.runTyping) return true;
+      await sleep(100);
+    }
+    console.warn('[JCTermos] window.runTyping não encontrado após', maxMs, 'ms');
+    return true;
+  }
+
+  async function waitForVideoEnd(videoElementId = 'videoTransicao') {
+    const video = document.getElementById(videoElementId);
+    if (!video) {
+      console.log('[JCTermos] Vídeo de transição não encontrado, usando timeout padrão');
+      return sleep(8000);
+    }
+
+    return new Promise((resolve) => {
+      video.addEventListener('ended', () => {
+        console.log('[JCTermos] Vídeo terminou');
+        resolve();
+      }, { once: true });
+      setTimeout(resolve, 8000);
     });
   }
 
-  // No início do section-termos.js
-if (window.JCTermos?.__bound) {
-  console.log('[JCTermos] Já inicializado, ignorando...');
-  return;
-}
-
-window.JCTermos = window.JCTermos || {};
-window.JCTermos.__bound = true;
-window.JCTermos.state = {
-  ready: false,
-  listenerAdded: false,
-  typingInProgress: false,
-  observer: null,
-  initialized: false,
-  HANDLER_COUNT: 0 // Manter o contador, se necessário
-};
-
-// Função onShown (antigo handler)
-const onShown = async (evt) => {
-  window.JCTermos.state.HANDLER_COUNT++;
-  const { sectionId, node } = evt?.detail || {};
-  if (sectionId !== 'section-termos') {
-    console.log('[JCTermos] Ignorando, sectionId não é section-termos:', sectionId);
-    return;
-  }
-
-  if (window.JCTermos.state.ready || node?.dataset.termosInitialized === 'true') {
-    console.log('[JCTermos] Já inicializado, ignorando...');
-    return;
-  }
-
-  let root = node || document.getElementById('section-termos');
-  if (!root) {
-    console.error('[JCTermos] Root #section-termos não encontrado');
-    window.toast?.('Erro: Seção Termos não carregada.', 'error');
-    return;
-  }
-
-  console.log('[JCTermos] Root encontrado:', root);
-  root.dataset.termosInitialized = 'true';
-  root.classList.remove('hidden');
-  root.setAttribute('aria-hidden', 'false');
-  root.style.removeProperty('display');
-  root.style.removeProperty('opacity');
-  root.style.removeProperty('visibility');
-  root.style.zIndex = 'auto';
-
-  // Aguardar vídeo de transição antes de iniciar datilografia
-  await waitForVideoEnd('videoTransicao');
-  await sleep(1000); // Delay adicional para garantir visibilidade
-
-  const { pg1, pg2, nextBtn, prevBtn, avancarBtn } = pickElements(root);
-  [pg1, pg2].filter(Boolean).forEach(normalizeParagraph);
-
-  // Configurar botões
-  [nextBtn, prevBtn, avancarBtn].forEach(btn => {
-    if (btn) {
-      btn.setAttribute('disabled', 'true');
-      btn.style.opacity = '0';
-      btn.style.visibility = 'hidden';
+  // Função de transição com vídeo
+  function playTransitionThen(nextStep) {
+    if (document.getElementById('termos-transition-overlay')) {
+      console.log('[JCTermos] Overlay de transição já presente, ignorando');
+      return;
     }
-  });
+    console.log('[JCTermos] Iniciando transição de vídeo: /assets/img/filme-senha.mp4');
+    if (typeof window.playTransitionVideo === 'function') {
+      window.playTransitionVideo('/assets/img/filme-senha.mp4', 'section-senha');
+    } else {
+      console.warn('[JCTermos] window.playTransitionVideo não encontrado, usando fallback');
+      setTimeout(() => {
+        console.log('[JCTermos] Fallback: executando próximo passo');
+        if (typeof nextStep === 'function') {
+          nextStep();
+        } else if (typeof window.JC?.show === 'function') {
+          window.JC.show('section-senha');
+        } else {
+          console.warn('[JCTermos] Fallback navigation to section-senha');
+          window.location.href = 'jornada-conhecimento-com-luz1.html#section-senha';
+        }
+      }, 2000);
+    }
+  }
 
-  armObserver(root);
-  await runTypingSequence(root);
+  // Função de datilografia
+  async function runTypingSequence(root) {
+    window.JCTermos.state.typingInProgress = true;
+    console.log('[JCTermos] Iniciando sequência de datilografia');
 
-  window.JCTermos.state.ready = true;
-  console.log('[JCTermos] Seção termos inicializada.');
-};
+    const { pg1, pg2, nextBtn, prevBtn, avancarBtn } = pickElements(root);
+    const currentPg = window.JCTermos.state.currentPage === 1 ? pg1 : pg2;
+    const seq = Array.from(currentPg.querySelectorAll('[data-typing="true"]:not(.typing-done)')).sort((a, b) => {
+      const aRect = a.getBoundingClientRect();
+      const bRect = b.getBoundingClientRect();
+      return aRect.left - bRect.left || aRect.top - bRect.top;
+    });
 
-// Registrar listener para section:shown
-if (!window.JCTermos.state.listenerAdded) {
-  console.log('[JCTermos] Registrando listener para section:shown');
-  document.addEventListener('section:shown', onShown, { once: true });
-  window.JCTermos.state.listenerAdded = true;
-}
+    nextBtn?.setAttribute('disabled', 'true');
+    prevBtn?.setAttribute('disabled', 'true');
+    avancarBtn?.setAttribute('disabled', 'true');
 
-    // Aplicar estilos ao root
+    seq.forEach(normalizeParagraph);
+
+    await waitForVideoEnd('videoTransicao');
+    await sleep(1000);
+
+    await waitForTypingBridge();
+
+    if (!seq.length) {
+      console.warn('[JCTermos] Nenhum elemento com data-typing="true" encontrado na página atual');
+      currentPg.style.opacity = '1';
+      currentPg.style.visibility = 'visible';
+      [nextBtn, prevBtn, avancarBtn].forEach(btn => {
+        if (btn) {
+          btn.disabled = false;
+          btn.style.opacity = '1';
+          btn.style.cursor = 'pointer';
+        }
+      });
+      window.JCTermos.state.typingInProgress = false;
+      window.JCTermos.state.initialized = true;
+      return;
+    }
+
+    for (const el of seq) {
+      await typeOnce(el, { speed: 20, speak: true });
+    }
+
+    [nextBtn, prevBtn, avancarBtn].forEach(btn => {
+      if (btn) {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+      }
+    });
+
+    currentPg.style.opacity = '1';
+    currentPg.style.visibility = 'visible';
+
+    window.JCTermos.state.typingInProgress = false;
+    window.JCTermos.state.initialized = true;
+    console.log('[JCTermos] Datilografia concluída na página atual');
+  }
+
+  function pickElements(root) {
+    return {
+      pg1: root.querySelector('#termos-pg1'),
+      pg2: root.querySelector('#termos-pg2'),
+      nextBtn: root.querySelector('.nextBtn[data-action="termos-next"]'),
+      prevBtn: root.querySelector('.prevBtn[data-action="termos-prev"]'),
+      avancarBtn: root.querySelector('.avancarBtn[data-action="avancar"]')
+    };
+  }
+
+  // Handler principal
+  const onShown = async (evt) => {
+    window.JCTermos.state.HANDLER_COUNT++;
+    const { sectionId, node } = fromDetail(evt?.detail);
+    if (sectionId !== 'section-termos') {
+      console.log('[JCTermos] Ignorando, sectionId não é section-termos:', sectionId);
+      return;
+    }
+
+    if (window.JCTermos.state.ready || node?.dataset.termosInitialized === 'true') {
+      console.log('[JCTermos] Já inicializado, ignorando...');
+      return;
+    }
+
+    let root = node || document.getElementById('section-termos');
+    if (!root) {
+      console.error('[JCTermos] Root #section-termos não encontrado');
+      window.toast?.('Erro: Seção Termos não carregada.', 'error');
+      return;
+    }
+
+    console.log('[JCTermos] Root encontrado:', root);
+    root.dataset.termosInitialized = 'true';
+
     root.style.cssText = `
       background: transparent;
       padding: 24px;
@@ -207,7 +334,7 @@ if (!window.JCTermos.state.listenerAdded) {
       box-sizing: border-box;
     `;
 
-   // let pg1, pg2, nextBtn, prevBtn, avancarBtn;
+    let pg1, pg2, nextBtn, prevBtn, avancarBtn;
     try {
       console.log('[JCTermos] Buscando elementos...');
       pg1 = await waitForElement('#termos-pg1', { within: root, timeout: 2000 });
@@ -218,7 +345,6 @@ if (!window.JCTermos.state.listenerAdded) {
     } catch (e) {
       console.error('[JCTermos] Elements not found:', e);
       window.toast?.('Falha ao carregar os elementos da seção Termos.', 'error');
-      // Fallback para criar elementos
       const createFallbackElement = (id, isButton = false) => {
         const el = document.createElement(isButton ? 'button' : 'div');
         el.id = id;
@@ -232,7 +358,6 @@ if (!window.JCTermos.state.listenerAdded) {
         }
         root.appendChild(el);
         return el;
-      }
       };
       pg1 = pg1 || createFallbackElement('termos-pg1');
       pg2 = pg2 || createFallbackElement('termos-pg2');
@@ -297,152 +422,11 @@ if (!window.JCTermos.state.listenerAdded) {
           checkLock();
         });
       }
-      async function runTypingSequence(root) {
-  window.JCTermos.state.typingInProgress = true;
-  console.log('[JCTermos] Iniciando sequência de datilografia');
-
-  const { pg1, pg2, nextBtn, prevBtn, avancarBtn } = pickElements(root);
-
-  const seq = [pg1, pg2].filter(Boolean).sort((a, b) => {
-    const aRect = a.getBoundingClientRect();
-    const bRect = b.getBoundingClientRect();
-    return aRect.left - bRect.left || aRect.top - bRect.top;
-  });
-
-  nextBtn?.setAttribute('disabled', 'true');
-  prevBtn?.setAttribute('disabled', 'true');
-  avancarBtn?.setAttribute('disabled', 'true');
-
-  seq.forEach(normalizeParagraph);
-
-  // Aguardar vídeo de transição
-  await waitForVideoEnd('videoTransicao'); // Usa a mesma função de section-senha.js
-  await sleep(1000); // Delay adicional para garantir visibilidade
-
-  await waitForTypingBridge();
-
-  for (const el of seq) {
-    if (!el.classList.contains('typing-done')) {
-      const text = (el.dataset?.text || el.textContent || '').trim();
-      if (text) {
-        await typeOnce(el, { speed: 20, speak: true });
-      } else {
-        console.warn('[JCTermos] Texto vazio para elemento:', el);
-      }
-    }
-  }
-
-  nextBtn?.removeAttribute('disabled');
-  prevBtn?.removeAttribute('disabled');
-  avancarBtn?.removeAttribute('disabled');
-
-  window.JCTermos.state.typingInProgress = false;
-  window.JCTermos.state.initialized = true;
-}
-
-      console.log('[JCTermos] Iniciando datilografia na página atual...');
-      const currentPg = window.JCTermos.state.currentPage === 1 ? pg1 : pg2;
-      const typingElements = currentPg.querySelectorAll('[data-typing="true"]:not(.typing-done)');
-
-      if (!typingElements.length) {
-        console.warn('[JCTermos] Nenhum elemento com data-typing="true" encontrado na página atual');
-        [nextBtn, prevBtn, avancarBtn].forEach(btn => {
-          if (btn) {
-            btn.disabled = false;
-            btn.style.opacity = '1';
-            btn.style.cursor = 'pointer';
-          }
-        });
-        currentPg.style.opacity = '1';
-        currentPg.style.visibility = 'visible';
-        return;
-      }
-
-      console.log('[JCTermos] Elementos encontrados na página:', Array.from(typingElements).map(el => el.id));
-
-      // Fallback para window.runTyping
-      if (typeof window.runTyping !== 'function') {
-        console.warn('[JCTermos] window.runTyping não encontrado, usando fallback');
-        window.runTyping = (el, text, resolve, options) => {
-          let i = 0;
-          const speed = options.speed || 100;
-          const type = () => {
-            if (i < text.length) {
-              el.textContent += text.charAt(i);
-              i++;
-              setTimeout(type, speed);
-            } else {
-              el.textContent = text;
-              resolve();
-            }
-          };
-          type();
-        };
-      }
-
-      for (const el of typingElements) {
-        const text = getText(el);
-        console.log('[JCTermos] Datilografando:', el.id, text.substring(0, 50));
-        
-        try {
-          el.textContent = '';
-          el.classList.add('typing-active', 'lumen-typing');
-          el.style.color = '#fff';
-          el.style.opacity = '0';
-          el.style.display = 'block';
-          el.style.visibility = 'hidden';
-          currentPg.style.opacity = '1';
-          currentPg.style.visibility = 'visible';
-          await new Promise(resolve => window.runTyping(el, text, resolve, {
-            speed: Number(el.dataset.speed || 100),
-            cursor: String(el.dataset.cursor || 'true') === 'true'
-          }));
-          el.classList.add('typing-done');
-          el.classList.remove('typing-active');
-          el.style.opacity = '1';
-          el.style.visibility = 'visible';
-          el.style.display = 'block';
-          if (typeof window.EffectCoordinator?.speak === 'function') {
-            speechSynthesis.cancel(); // Cancelar qualquer TTS anterior
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'pt-BR';
-            utterance.rate = 1.1;
-            utterance.pitch = 1.0;
-            console.log('[JCTermos] TTS iniciado para:', el.id);
-            window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
-            await new Promise(resolve => {
-              utterance.onend = () => {
-                console.log('[JCTermos] TTS concluído para:', el.id);
-                resolve();
-              };
-              setTimeout(resolve, text.length * 70); // Aumentado para 70ms por caractere para parágrafos longos
-            });
-          } else {
-            console.warn('[JCTermos] window.EffectCoordinator.speak não encontrado');
-            await new Promise(resolve => setTimeout(resolve, text.length * 70));
-          }
-        } catch (err) {
-          console.error('[JCTermos] Erro na datilografia para', el.id, err);
-          el.textContent = text;
-          el.classList.add('typing-done');
-          el.style.opacity = '1';
-          el.style.visibility = 'visible';
-          el.style.display = 'block';
-        }
-      }
-      
-      console.log('[JCTermos] Datilografia concluída na página atual');
-      [nextBtn, prevBtn, avancarBtn].forEach(btn => {
-        if (btn) {
-          btn.disabled = false;
-          btn.style.opacity = '1';
-          btn.style.cursor = 'pointer';
-        }
-      });
+      await runTypingSequence(root);
     };
 
     once(nextBtn, 'click', async () => {
-      speechSynthesis.cancel(); // Cancelar TTS anterior
+      speechSynthesis.cancel();
       if (window.JCTermos.state.currentPage === 1 && pg2) {
         pg1.style.display = 'none';
         pg2.style.display = 'block';
@@ -453,26 +437,26 @@ if (!window.JCTermos.state.listenerAdded) {
     });
 
     once(prevBtn, 'click', async (e) => {
-      if (e.isTrusted) { // Verificar se é um clique real
-        speechSynthesis.cancel(); // Cancelar TTS anterior
+      if (e.isTrusted) {
+        speechSynthesis.cancel();
         console.log('[JCTermos] Redirecionando para site fora da jornada');
-        window.location.href = '/'; // Ajuste para a URL do site Jornada Conhecimento com Luz
+        window.location.href = '/';
       } else {
         console.log('[JCTermos] Clique simulado ignorado');
       }
     });
 
     once(avancarBtn, 'click', async (e) => {
-      if (e.isTrusted) { // Verificar se é um clique real
-        speechSynthesis.cancel(); // Cancelar TTS ao avançar
+      if (e.isTrusted) {
+        speechSynthesis.cancel();
         if (window.JCTermos.state.currentPage === 2) {
           console.log('[JCTermos] Avançando para section-senha com transição de vídeo');
           playTransitionThen(() => {
             if (typeof window.JC?.show === 'function') {
               window.JC.show('section-senha');
             } else {
+              console.warn('[JCTermos] Fallback navigation to section-senha');
               window.location.href = 'jornada-conhecimento-com-luz1.html#section-senha';
-              console.warn('[JCTermos] Fallback navigation to jornada-conhecimento-com-luz1.html#section-senha');
             }
           });
         }
@@ -521,8 +505,7 @@ if (!window.JCTermos.state.listenerAdded) {
   // Método para limpar a seção
   window.JCTermos.destroy = () => {
     console.log('[JCTermos] Destruindo seção termos');
-    document.removeEventListener('sectionLoaded', handler);
-    document.removeEventListener('section:shown', handler);
+    document.removeEventListener('section:shown', onShown);
     const root = document.getElementById('section-termos');
     if (root) {
       root.dataset.termosInitialized = '';
@@ -534,6 +517,8 @@ if (!window.JCTermos.state.listenerAdded) {
     window.JCTermos.state.listenerAdded = false;
     window.JCTermos.state.HANDLER_COUNT = 0;
     window.JCTermos.state.TYPING_COUNT = 0;
+    window.JCTermos.state.typingInProgress = false;
+    window.JCTermos.state.initialized = false;
     if (typeof window.EffectCoordinator?.stopAll === 'function') {
       window.EffectCoordinator.stopAll();
     }
@@ -541,34 +526,33 @@ if (!window.JCTermos.state.listenerAdded) {
 
   // Registrar handler
   if (!window.JCTermos.state.listenerAdded) {
-    console.log('[JCTermos] Registrando listener para sectionLoaded');
-    window.addEventListener('sectionLoaded', handler, { once: true });
+    console.log('[JCTermos] Registrando listener para section:shown');
+    document.addEventListener('section:shown', onShown, { once: true });
     window.JCTermos.state.listenerAdded = true;
   }
 
   // Inicialização manual com tentativas repetidas
   const bind = () => {
     console.log('[JCTermos] Executando bind');
-    document.removeEventListener('sectionLoaded', handler);
-    document.removeEventListener('section:shown', handler);
-    document.addEventListener('sectionLoaded', handler, { passive: true, once: true });
+    document.removeEventListener('section:shown', onShown);
+    document.addEventListener('section:shown', onShown, { passive: true, once: true });
 
     const tryInitialize = (attempt = 1, maxAttempts = 10) => {
       setTimeout(() => {
         const visibleTermos = document.querySelector('#section-termos:not(.hidden)');
         if (visibleTermos && !window.JCTermos.state.ready && !visibleTermos.dataset.termosInitialized) {
           console.log('[JCTermos] Seção visível encontrada, disparando handler');
-          handler({ detail: { sectionId: 'section-termos', node: visibleTermos } });
+          onShown({ detail: { sectionId: 'section-termos', node: visibleTermos } });
         } else if (document.getElementById('section-termos') && !window.JCTermos.state.ready && !document.getElementById('section-termos').dataset.termosInitialized) {
           console.log('[JCTermos] Forçando inicialização manual (tentativa ' + attempt + ')');
-          handler({ detail: { sectionId: 'section-termos', node: document.getElementById('section-termos') } });
+          onShown({ detail: { sectionId: 'section-termos', node: document.getElementById('section-termos') } });
         } else if (attempt < maxAttempts) {
           console.log('[JCTermos] Nenhuma seção visível ou já inicializada, tentando novamente...');
           tryInitialize(attempt + 1, maxAttempts);
         } else {
           console.error('[JCTermos] Falha ao inicializar após ' + maxAttempts + ' tentativas');
         }
-      }, 1000 * attempt);
+      }, 100); // Delay fixo
     };
 
     tryInitialize();
