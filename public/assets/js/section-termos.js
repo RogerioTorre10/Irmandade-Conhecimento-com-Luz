@@ -101,7 +101,7 @@
       console.error('[JCTermos] Erro ao reproduzir vídeo:', e);
       cleanup();
     }, { once: true });
-    setTimeout(() => { if (!done) cleanup(); }, 3000); // Timeout reduzido para 3s
+    setTimeout(() => { if (!done) cleanup(); }, 2000); // Timeout reduzido para 3s
 
     Promise.resolve().then(() => video.play?.()).catch((e) => {
       console.warn('[JCTermos] Erro ao iniciar vídeo:', e);
