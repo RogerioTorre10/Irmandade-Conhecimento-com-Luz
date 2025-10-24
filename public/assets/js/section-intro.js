@@ -26,7 +26,7 @@
 
   // ---------- UTILIDADES ----------
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-  
+
   const textOf = (el) => {
     if (!el) return '';
     const ds = el.dataset?.text?.trim();
@@ -64,13 +64,11 @@
     });
   }
 
- 
   async function typeOnce(el, { speed = 20, speak = true } = {}) {
     if (!el) return;
     const text = textOf(el);
     if (!text) return;
 
-    // Bloqueio global de datilografia
     window.G = window.G || {};
     const prevLock = !!window.G.__typingLock;
     window.G.__typingLock = true;
@@ -103,7 +101,6 @@
     el.classList.add('typing-done');
     window.G.__typingLock = prevLock;
 
-    // Leitura em voz alta (TTS)
     if (speak && text && window.EffectCoordinator?.speak && !el.dataset.spoken) {
       try {
         window.EffectCoordinator.speak(text, { lang: 'pt-BR', rate: 1.1, pitch: 1.0 });
@@ -128,66 +125,39 @@
     return true;
   }
 
+  async function waitForVideoEnd(videoElementId = 'videoTransicao') {
+    const video = document.getElementById(videoElementId);
+    if (!video) {
+      console.log('[JCIntro] Vídeo de transição não encontrado, usando timeout padrão');
+      return sleep(TRANSITION_TIMEOUT_MS);
+    }
+
+    return new Promise((resolve) => {
+      video.addEventListener('ended', () => {
+        console.log('[JCIntro] Vídeo terminou');
+        resolve();
+      }, { once: true });
+      setTimeout(resolve, TRANSITION_TIMEOUT_MS);
+    });
+  }
+
   // ---------- TRANSIÇÃO DE VÍDEO ----------
   function playTransitionVideo(src, nextSectionId) {
-  console.log('[JCIntro] Iniciando transição de vídeo:', src);
-  if (typeof window.playTransitionVideo === 'function') {
-    window.playTransitionVideo(src, nextSectionId);
-  } else {
-    console.warn('[JCIntro] window.playTransitionVideo não encontrado, usando fallback');
-    setTimeout(() => {
-      console.log('[JCIntro] Fallback: navegando para:', nextSectionId);
-      if (typeof window.JC?.show === 'function') {
-        window.JC.show(nextSectionId);
-      } else {
-        console.warn('[JCIntro] Fallback navigation to:', nextSectionId);
-        window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
-      }
-    }, 2000); // Delay de 2s para simular transição
-  }
-}
-
-// Exemplo de listener do botão "Iniciar" (perto da linha 297)
-const btnIniciar = document.querySelector('#btn-avancar');
-btnIniciar?.addEventListener('click', () => {
-  console.log('[JCIntro] Botão "Iniciar" clicado');
-  playTransitionVideo('/assets/img/filme-pergaminho-ao-vento.mp4', 'section-termos');
-});
-    const video = document.createElement('video');
-    video.src = TRANSITION_SRC;
-    video.autoplay = true;
-    video.muted = true;
-    video.playsInline = true;
-    video.controls = false;
-    video.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
-    overlay.appendChild(video);
-    document.body.appendChild(overlay);
-    let done = false;
-}
-    const cleanup =  () => {
-      if (done) return;
-      done = true;
-      try { video.pause(); } catch {}
-      overlay.remove();
-      console.log('[JCIntro] Transição concluída, indo para:', nextSectionId);
-      if (typeof window.JC?.show === 'function') {
-        window.JC.show(nextSectionId);
-      } else {
-        window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
-      }
-    }();
-
-    video.addEventListener('ended', cleanup, { once: true });
-    video.addEventListener('error', () => {
-      console.error('[JCIntro] Erro no vídeo:', TRANSITION_SRC);
-      setTimeout(cleanup, 1200);
-    }, { once: true });
-    setTimeout(() => { if (!done) cleanup(); }, TRANSITION_TIMEOUT_MS);
-
-    Promise.resolve().then(() => video.play?.()).catch(() => {
-      console.warn('[JCIntro] Falha ao iniciar vídeo, usando fallback.');
-      setTimeout(cleanup, 800);
-    });
+    console.log('[JCIntro] Iniciando transição de vídeo:', src);
+    if (typeof window.playTransitionVideo === 'function') {
+      window.playTransitionVideo(src, nextSectionId);
+    } else {
+      console.warn('[JCIntro] window.playTransitionVideo não encontrado, usando fallback');
+      setTimeout(() => {
+        console.log('[JCIntro] Fallback: navegando para:', nextSectionId);
+        if (typeof window.JC?.show === 'function') {
+          window.JC.show(nextSectionId);
+        } else {
+          console.warn('[JCIntro] Fallback navigation to:', nextSectionId);
+          window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
+        }
+      }, 2000);
+    }
   }
 
   // ---------- BLINDAGEM VISUAL ----------
@@ -308,7 +278,7 @@ btnIniciar?.addEventListener('click', () => {
       if (btnAvancar.disabled) return;
       console.log('[JCIntro] Botão "Iniciar" clicado');
       speechSynthesis.cancel();
-      playTransitionVideo(NEXT_SECTION_ID);
+      playTransitionVideo(TRANSITION_SRC, NEXT_SECTION_ID);
     });
 
     armObserver(root);
@@ -336,14 +306,16 @@ btnIniciar?.addEventListener('click', () => {
 
   // ---------- REGISTRO ----------
   if (!window.JCIntro.state.listenerAdded) {
-    document.addEventListener('sectionLoaded', handler, { once: true });
+    console.log('[JCIntro] Registrando listener para section:shown'); // Corrigido para section:shown
+    document.addEventListener('section:shown', handler, { once: true });
     window.JCIntro.state.listenerAdded = true;
   }
 
   // Inicialização manual com fallback
   const bind = () => {
-    document.removeEventListener('sectionLoaded', handler);
-    document.addEventListener('sectionLoaded', handler, { passive: true, once: true });
+    console.log('[JCIntro] Executando bind');
+    document.removeEventListener('section:shown', handler);
+    document.addEventListener('section:shown', handler, { passive: true, once: true });
 
     const tryInit = (attempt = 1, max = 10) => {
       setTimeout(() => {
@@ -355,14 +327,16 @@ btnIniciar?.addEventListener('click', () => {
         } else if (attempt < max) {
           tryInit(attempt + 1, max);
         }
-      }, 1000 * attempt);
+      }, 100); // Delay fixo de 100ms
     };
     tryInit();
   };
 
   if (document.readyState === 'loading') {
+    console.log('[JCIntro] Aguardando DOMContentLoaded');
     document.addEventListener('DOMContentLoaded', bind, { once: true });
   } else {
+    console.log('[JCIntro] DOM já carregado, chamando bind');
     bind();
   }
 })();
