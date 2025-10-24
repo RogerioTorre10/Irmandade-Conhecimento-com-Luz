@@ -261,80 +261,45 @@
     console.log('[JCGuia] Observer configurado');
   }
 
-  const handler = async (evt) => {
-    const { sectionId, node } = evt?.detail || {};
-    if (sectionId !== SECTION_ID) {
-      console.log('[JCGuia] Ignorando, sectionId não é section-guia:', sectionId);
-      return;
-    }
+const handler = async (evt) => {
+  const { sectionId, node } = evt?.detail || {};
+  if (sectionId !== 'section-senha') {
+    console.log('[JCSenha] Ignorando, sectionId não é section-senha:', sectionId);
+    return;
+  }
+  if (window.JCSenha?.state?.ready || node?.dataset.senhaInitialized) {
+    console.log('[JCSenha] Já inicializado, ignorando...');
+    return;
+  }
+  let root = node || document.getElementById('section-senha');
+  if (!root) {
+    console.error('[JCSenha] Seção section-senha não encontrada');
+    return;
+  }
+  console.log('[JCSenha] Root encontrado:', root);
+  root.dataset.senhaInitialized = 'true';
+  window.JCSenha.state.ready = true;
 
-    if (window.JCGuia.state.ready || (node && node.dataset.guiaInitialized)) {
-      console.log('[JCGuia] Já inicializado, ignorando...');
-      return;
-    }
-
-    let root = node || document.getElementById(SECTION_ID);
-    if (!root) {
-      console.log('[JCGuia] Tentando localizar #section-guia...');
-      try {
-        root = await new Promise((resolve, reject) => {
-          const start = Date.now();
-          const tick = () => {
-            const el = document.querySelector(`#jornada-content-wrapper #${SECTION_ID}`);
-            if (el) return resolve(el);
-            if (Date.now() - start >= 10000) return reject(new Error('timeout waiting #section-guia'));
-            setTimeout(tick, 50);
-          };
-          tick();
-        });
-      } catch (e) {
-        window.toast?.('Erro: Seção section-guia não carregada.', 'error');
-        console.error('[JCGuia] Section not found:', e);
-        return;
-      }
-    }
-
-    console.log('[JCGuia] Root encontrado:', root);
-    root.dataset.guiaInitialized = 'true';
-    root.classList.add('section-guia');
-
-    ensureSectionVisible(root, SECTION_ID);
-
-    const { title, nameInput, confirmBtn, guiaTexto, guiaOptions, errorMsg } = pickElements(root);
-
-    [title, nameInput, confirmBtn].forEach(el => {
-      if (el) {
-        el.classList.remove('hidden');
-        el.style.display = 'block';
-        el.style.opacity = '0';
-        el.style.visibility = 'hidden';
-      }
+  // Lógica de inicialização do wrapper
+  const wrapper = document.getElementById('jornada-content-wrapper');
+  if (wrapper) {
+    wrapper.querySelectorAll('[data-typing="true"]').forEach(el => {
+      el.textContent = textOf(el);
+      el.classList.add('typing-done');
+      el.style.opacity = '1';
+      el.style.visibility = 'visible';
+      el.style.display = 'block';
     });
-
-    guiaOptions.forEach(btn => {
-      btn.disabled = true;
-      btn.style.opacity = '0';
-      btn.style.cursor = 'default';
+    wrapper.querySelectorAll('.btn').forEach(btn => {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
     });
+  }
 
-    confirmBtn?.addEventListener('click', () => {
-      if (!confirmBtn.disabled) {
-        const name = (nameInput?.value || '').trim();
-        if (name.length < 2) {
-          window.toast?.('Por favor, insira um nome válido.', 'warning');
-          nameInput?.focus();
-          return;
-        }
-
-        console.log('[JCGuia] Nome confirmado:', name);
-        guiaTexto.innerHTML = `<p>Olá, ${name}! Escolha seu guia para a Jornada:</p>`;
-        guiaOptions.forEach(btn => {
-          btn.disabled = false;
-          btn.style.opacity = '1';
-          btn.style.cursor = 'pointer';
-        });
-      }
-    });
+  // Resto da lógica de inicialização (ex.: configurar typing, TTS, etc.)
+  // ...
+};
 
     guiaOptions.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -389,50 +354,52 @@
     window.JCGuia.state.listenerAdded = true;
   }
 
- const bind = () => {
-  console.log('[JCGuia] Executando bind');
+const bind = () => {
+  console.log('[JCSenha] Executando bind');
   // Evitar múltiplos listeners
-  if (window.JCGuia.state.listenerAdded) {
-    document.removeEventListener('sectionLoaded', handler);
+  if (window.JCSenha?.state?.listenerAdded) {
+    document.removeEventListener('section:shown', handler); // Usar handler em vez de onShown
   }
-  document.addEventListener('sectionLoaded', handler, { passive: true, once: true });
-  window.JCGuia.state.listenerAdded = true;
+  document.addEventListener('section:shown', handler, { passive: true, once: true });
+  window.JCSenha = window.JCSenha || {};
+  window.JCSenha.state = window.JCSenha.state || {};
+  window.JCSenha.state.listenerAdded = true;
 
-  const tryInitialize = (attempt = 1, maxAttempts = 10) => {
+  const tryInitialize = (attempt = 1, maxAttempts = 10, options = {}) => {
     // Evitar reinicialização se já concluído
-    if (window.JCGuia.state.ready || window.JCGuia.state.initialized) {
-      console.log('[JCGuia] Seção já inicializada, ignorando tryInitialize');
+    if (window.JCSenha?.state?.ready || document.getElementById('section-senha')?.dataset.senhaInitialized === 'true') {
+      console.log('[JCSenha] Seção já inicializada, ignorando tentativa', attempt);
       return;
     }
-    const visibleGuia = document.querySelector(`#${SECTION_ID}:not(.hidden)`);
-    const section = document.getElementById(SECTION_ID);
-    if (visibleGuia && !visibleGuia.dataset.guiaInitialized) {
-      console.log('[JCGuia] Seção visível encontrada, disparando handler');
-      handler({ detail: { sectionId: SECTION_ID, node: visibleGuia } });
-    } else if (section && !section.dataset.guiaInitialized) {
-      console.log('[JCGuia] Forçando inicialização manual (tentativa ' + attempt + ')');
-      handler({ detail: { sectionId: SECTION_ID, node: section } });
+    const visibleSenha = document.querySelector('#section-senha:not(.hidden)');
+    const section = document.getElementById('section-senha');
+    if (visibleSenha && !visibleSenha.dataset.senhaInitialized) {
+      console.log('[JCSenha] Seção visível encontrada, disparando handler');
+      handler({ detail: { sectionId: 'section-senha', node: visibleSenha } });
+    } else if (section && !section.dataset.senhaInitialized) {
+      console.log('[JCSenha] Forçando inicialização manual (tentativa ' + attempt + ')');
+      handler({ detail: { sectionId: 'section-senha', node: section } });
     } else if (attempt < maxAttempts) {
-      console.log('[JCGuia] Nenhuma seção visível ou já inicializada, tentando novamente...');
-      setTimeout(() => tryInitialize(attempt + 1, maxAttempts), 100); // Delay fixo de 100ms
+      console.log('[JCSenha] Nenhuma seção visível ou já inicializada, tentando novamente...');
+      setTimeout(() => tryInitialize(attempt + 1, maxAttempts, options), 100); // Delay fixo de 100ms
     } else {
-      console.error('[JCGuia] Falha ao inicializar após ' + maxAttempts + ' tentativas');
+      console.error('[JCSenha] Falha ao inicializar após', maxAttempts, 'tentativas');
     }
   };
 
   // Iniciar tentativa de inicialização apenas se não inicializado
-  if (!window.JCGuia.state.ready && !document.getElementById(SECTION_ID)?.dataset.guiaInitialized) {
+  if (!window.JCSenha?.state?.ready && !document.getElementById('section-senha')?.dataset.senhaInitialized) {
     tryInitialize();
   } else {
-    console.log('[JCGuia] Já inicializado ou seção não presente, pulando tryInitialize');
+    console.log('[JCSenha] Já inicializado ou seção não presente, pulando tryInitialize');
   }
 };
 
 // Garantir que o bind só seja chamado uma vez
 if (document.readyState === 'loading') {
-  console.log('[JCGuia] Aguardando DOMContentLoaded');
+  console.log('[JCSenha] Aguardando DOMContentLoaded');
   document.addEventListener('DOMContentLoaded', bind, { once: true });
 } else {
-  console.log('[JCGuia] DOM já carregado, chamando bind');
+  console.log('[JCSenha] DOM já carregado, chamando bind');
   bind();
 }
