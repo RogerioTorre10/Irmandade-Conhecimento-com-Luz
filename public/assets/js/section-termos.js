@@ -258,6 +258,48 @@
           checkLock();
         });
       }
+      async function runTypingSequence(root) {
+  window.JCTermos.state.typingInProgress = true;
+  console.log('[JCTermos] Iniciando sequência de datilografia');
+
+  const { pg1, pg2, nextBtn, prevBtn, avancarBtn } = pickElements(root);
+
+  const seq = [pg1, pg2].filter(Boolean).sort((a, b) => {
+    const aRect = a.getBoundingClientRect();
+    const bRect = b.getBoundingClientRect();
+    return aRect.left - bRect.left || aRect.top - bRect.top;
+  });
+
+  nextBtn?.setAttribute('disabled', 'true');
+  prevBtn?.setAttribute('disabled', 'true');
+  avancarBtn?.setAttribute('disabled', 'true');
+
+  seq.forEach(normalizeParagraph);
+
+  // Aguardar vídeo de transição
+  await waitForVideoEnd('videoTransicao'); // Usa a mesma função de section-senha.js
+  await sleep(1000); // Delay adicional para garantir visibilidade
+
+  await waitForTypingBridge();
+
+  for (const el of seq) {
+    if (!el.classList.contains('typing-done')) {
+      const text = (el.dataset?.text || el.textContent || '').trim();
+      if (text) {
+        await typeOnce(el, { speed: 20, speak: true });
+      } else {
+        console.warn('[JCTermos] Texto vazio para elemento:', el);
+      }
+    }
+  }
+
+  nextBtn?.removeAttribute('disabled');
+  prevBtn?.removeAttribute('disabled');
+  avancarBtn?.removeAttribute('disabled');
+
+  window.JCTermos.state.typingInProgress = false;
+  window.JCTermos.state.initialized = true;
+}
 
       console.log('[JCTermos] Iniciando datilografia na página atual...');
       const currentPg = window.JCTermos.state.currentPage === 1 ? pg1 : pg2;
