@@ -384,37 +384,50 @@
     window.JCGuia.state.listenerAdded = true;
   }
 
-  const bind = () => {
-    console.log('[JCGuia] Executando bind');
+ const bind = () => {
+  console.log('[JCGuia] Executando bind');
+  // Evitar múltiplos listeners
+  if (window.JCGuia.state.listenerAdded) {
     document.removeEventListener('sectionLoaded', handler);
-    document.addEventListener('sectionLoaded', handler, { passive: true, once: true });
+  }
+  document.addEventListener('sectionLoaded', handler, { passive: true, once: true });
+  window.JCGuia.state.listenerAdded = true;
 
-    const tryInitialize = (attempt = 1, maxAttempts = 10) => {
-      setTimeout(() => {
-        const visibleGuia = document.querySelector(`#${SECTION_ID}:not(.hidden)`);
-        if (visibleGuia && !window.JCGuia.state.ready && !visibleGuia.dataset.guiaInitialized) {
-          console.log('[JCGuia] Seção visível encontrada, disparando handler');
-          handler({ detail: { sectionId: SECTION_ID, node: visibleGuia } });
-        } else if (document.getElementById(SECTION_ID) && !window.JCGuia.state.ready && !document.getElementById(SECTION_ID).dataset.guiaInitialized) {
-          console.log('[JCGuia] Forçando inicialização manual (tentativa ' + attempt + ')');
-          handler({ detail: { sectionId: SECTION_ID, node: document.getElementById(SECTION_ID) } });
-        } else if (attempt < maxAttempts) {
-          console.log('[JCGuia] Nenhuma seção visível ou já inicializada, tentando novamente...');
-          tryInitialize(attempt + 1, maxAttempts);
-        } else {
-          console.error('[JCGuia] Falha ao inicializar após ' + maxAttempts + ' tentativas');
-        }
-      }, 1000 * attempt);
-    };
-
-    tryInitialize();
+  const tryInitialize = (attempt = 1, maxAttempts = 10) => {
+    // Evitar reinicialização se já concluído
+    if (window.JCGuia.state.ready || window.JCGuia.state.initialized) {
+      console.log('[JCGuia] Seção já inicializada, ignorando tryInitialize');
+      return;
+    }
+    const visibleGuia = document.querySelector(`#${SECTION_ID}:not(.hidden)`);
+    const section = document.getElementById(SECTION_ID);
+    if (visibleGuia && !visibleGuia.dataset.guiaInitialized) {
+      console.log('[JCGuia] Seção visível encontrada, disparando handler');
+      handler({ detail: { sectionId: SECTION_ID, node: visibleGuia } });
+    } else if (section && !section.dataset.guiaInitialized) {
+      console.log('[JCGuia] Forçando inicialização manual (tentativa ' + attempt + ')');
+      handler({ detail: { sectionId: SECTION_ID, node: section } });
+    } else if (attempt < maxAttempts) {
+      console.log('[JCGuia] Nenhuma seção visível ou já inicializada, tentando novamente...');
+      setTimeout(() => tryInitialize(attempt + 1, maxAttempts), 100); // Delay fixo de 100ms
+    } else {
+      console.error('[JCGuia] Falha ao inicializar após ' + maxAttempts + ' tentativas');
+    }
   };
 
-  if (document.readyState === 'loading') {
-    console.log('[JCGuia] Aguardando DOMContentLoaded');
-    document.addEventListener('DOMContentLoaded', bind, { once: true });
+  // Iniciar tentativa de inicialização apenas se não inicializado
+  if (!window.JCGuia.state.ready && !document.getElementById(SECTION_ID)?.dataset.guiaInitialized) {
+    tryInitialize();
   } else {
-    console.log('[JCGuia] DOM já carregado, chamando bind');
-    bind();
+    console.log('[JCGuia] Já inicializado ou seção não presente, pulando tryInitialize');
   }
-})();
+};
+
+// Garantir que o bind só seja chamado uma vez
+if (document.readyState === 'loading') {
+  console.log('[JCGuia] Aguardando DOMContentLoaded');
+  document.addEventListener('DOMContentLoaded', bind, { once: true });
+} else {
+  console.log('[JCGuia] DOM já carregado, chamando bind');
+  bind();
+}
