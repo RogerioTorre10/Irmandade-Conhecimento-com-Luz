@@ -26,38 +26,47 @@
     // Não aplicar efeitos, deixar para section-intro.js e section-termos.js
   }
 
-  function attachButtonEvents(sectionId, root) {
-    console.log('[JC.attachButtonEvents] Attaching buttons for:', sectionId);
-    const buttons = root.querySelectorAll('[data-action]');
-    console.log('[JC.attachButtonEvents] Buttons found:', buttons.length, Array.from(buttons).map(btn => btn.id));
-    buttons.forEach(btn => {
-      const action = btn.dataset.action;
-      btn.disabled = false;
-      btn.classList.add('btn', 'btn-primary', 'btn-stone');
-      btn.addEventListener('click', () => {
-        console.log('[JC.attachButtonEvents] Button clicked:', action, btn.id);
-        if (action === 'avancar') {
-          const currentIndex = sectionOrder.indexOf(sectionId);
-          const nextSection = sectionOrder[currentIndex + 1];
-          console.log('[JC.attachButtonEvents] Navigating to:', nextSection);
-          if (nextSection) {
-            JC.show(nextSection);
-          } else {
-            console.warn('[JC.attachButtonEvents] No next section, redirecting to /termos');
-            window.location.href = '/termos';
-          }
+function debounce(func, wait) {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
+
+function attachButtonEvents(sectionId, root) {
+  console.log('[JC.attachButtonEvents] Attaching buttons for:', sectionId);
+  const buttons = root.querySelectorAll('[data-action]');
+  console.log('[JC.attachButtonEvents] Buttons found:', buttons.length, Array.from(buttons).map(btn => btn.id || btn.dataset.action));
+  buttons.forEach(btn => {
+    const action = btn.dataset.action;
+    btn.disabled = false;
+    btn.classList.add('btn', 'btn-primary', 'btn-stone');
+    const handleClick = debounce(() => {
+      console.log('[JC.attachButtonEvents] Button clicked:', action, btn.id || btn.dataset.action);
+      if (action === 'avancar' || action === 'termos-next' || action === 'select-guia') {
+        const currentIndex = sectionOrder.indexOf(sectionId);
+        const nextSection = sectionOrder[currentIndex + 1];
+        console.log('[JC.attachButtonEvents] Navigating to:', nextSection);
+        if (nextSection) {
+          JC.show(nextSection);
+        } else {
+          console.warn('[JC.attachButtonEvents] No next section, redirecting to /termos');
+          window.location.href = '/termos';
         }
-      });
-      btn.addEventListener('mouseover', () => {
-        btn.style.transform = 'scale(1.05)';
-        btn.style.boxShadow = '0 8px 16px rgba(0,0,0,0.7)';
-      });
-      btn.addEventListener('mouseout', () => {
-        btn.style.transform = 'scale(1)';
-        btn.style.boxShadow = 'inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6)';
-      });
+      }
+    }, 300); // 300ms de debounce
+    btn.addEventListener('click', handleClick);
+    btn.addEventListener('mouseover', () => {
+      btn.style.transform = 'scale(1.05)';
+      btn.style.boxShadow = '0 8px 16px rgba(0,0,0,0.7)';
     });
-  }
+    btn.addEventListener('mouseout', () => {
+      btn.style.transform = 'scale(1)';
+      btn.style.boxShadow = 'inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6)';
+    });
+  });
+}
 
   function handleSectionLogic(sectionId, root) {
     console.log('[JC.handleSectionLogic] Processing logic for:', sectionId);
