@@ -1,32 +1,42 @@
 (function () {
   'use strict';
 
-  // jornada-loader.js: Definição de URLs para seções
- const etapas = {
-    intro:    '/html/section-intro.html',
-    filme1:    '/assets/img/filme-pergaminho-ao-vento.mp4',
-    termos:   '/html/section-termos.html',
-    filme2:   '/assets/img/filme-senha.mp4',
-    senha:    '/html/section-senha.html',
-    filme3:    '/assets/img/filme-senha-confirmada.mp4',
-    guia:     '/html/section-guia.html',
-    filme4:    '/assets/img/conhecimento-com-luz-jardim.mp4',
-    selfie:   '/html/section-selfie.html',
-    filme5:    '/assets/img/filme-0-ao-encontro-da-jornada.mp4',
-    perguntas:'/html/section-perguntas.html', 
-    filme6:    '/assets/img/filme-5-fim-da-jornada.mp4',
-    final:    '/html/section-final.html'
-    };
+  // Mapeamento de URLs para cada etapa
+  const etapas = {
+    intro: '/html/section-intro.html',
+    filme1: '/assets/img/filme-pergaminho-ao-vento.mp4',
+    termos: '/html/section-termos.html',
+    filme2: '/assets/img/filme-senha.mp4',
+    senha: '/html/section-senha.html',
+    filme3: '/assets/img/filme-senha-confirmada.mp4',
+    guia: '/html/section-guia.html',
+    filme4: '/assets/img/conhecimento-com-luz-jardim.mp4',
+    selfie: '/html/section-selfie.html',
+    filme5: '/assets/img/filme-0-ao-encontro-da-jornada.mp4',
+    perguntas: '/html/section-perguntas.html',
+    filme6: '/assets/img/filme-5-fim-da-jornada.mp4',
+    final: '/html/section-final.html'
+  };
 
-function checkCriticalElements(section, sectionId) {
+  function checkCriticalElements(section, sectionId) {
+    const cleanId = sectionId.replace(/^section-/, '');
     const criticalSelectors = {
-      'section-intro': ['#intro-p1-1', '#intro-p1-2', '#intro-p1-3', '#intro-p2-1', '#intro-p2-2', '#btn-avancar'],
-      'section-termos': ['#termos-pg1', '#termos-pg2', '.nextBtn[data-action="termos-next"]', '.prevBtn[data-action="termos-prev"]', '.avancarBtn[data-action="avancar"]']
-    }[sectionId] || [];
+      intro: ['#intro-p1-1', '#intro-p1-2', '#intro-p1-3', '#intro-p2-1', '#intro-p2-2', '#btn-avancar'],
+      termos: ['#termos-pg1', '#termos-pg2', '.nextBtn[data-action="termos-next"]', '.prevBtn[data-action="termos-prev"]', '.avancarBtn[data-action="avancar"]']
+    }[cleanId] || [];
+
+    // Garante que o container de ações exista
+    if (!section.querySelector('.parchment-actions-rough')) {
+      const actions = document.createElement('div');
+      actions.className = 'parchment-actions-rough';
+      section.appendChild(actions);
+    }
 
     const found = {};
     for (const selector of criticalSelectors) {
       let el = section.querySelector(selector);
+
+      // Criar placeholders para textos
       if (!el && selector.startsWith('#termos-pg')) {
         el = document.createElement('div');
         el.id = selector.slice(1);
@@ -36,7 +46,9 @@ function checkCriticalElements(section, sectionId) {
         section.appendChild(el);
         console.warn(`[carregarEtapa] Created placeholder for ${selector}`);
       }
-      if (!el && (selector.startsWith('.nextBtn') || selector.startsWith('.prevBtn') || selector.startsWith('.avancarBtn'))) {
+
+      // Criar botões se faltarem
+      if (!el && (selector.includes('next') || selector.includes('prev') || selector.includes('avancar'))) {
         el = document.createElement('button');
         el.classList.add('btn', 'btn-primary', 'btn-stone');
         el.dataset.action = selector.includes('next') ? 'termos-next' : selector.includes('prev') ? 'termos-prev' : 'avancar';
@@ -44,6 +56,7 @@ function checkCriticalElements(section, sectionId) {
         section.querySelector('.parchment-actions-rough')?.appendChild(el);
         console.warn(`[carregarEtapa] Created placeholder for ${selector}`);
       }
+
       found[selector] = !!el;
       if (found[selector]) {
         console.log(`[carregarEtapa] Critical element ${selector} FOUND.`);
@@ -51,6 +64,7 @@ function checkCriticalElements(section, sectionId) {
         console.warn(`[carregarEtapa] Critical element ${selector} NOT found.`);
       }
     }
+
     return found;
   }
 
@@ -59,7 +73,7 @@ function checkCriticalElements(section, sectionId) {
     console.log('[carregarEtapa] Starting load for', nome, 'ID:', id);
 
     const existingSection = document.getElementById(id);
-    if (existingSection && existingSection.dataset.initialized) {
+    if (existingSection?.dataset?.initialized) {
       console.log(`[carregarEtapa] Section #${id} already initialized. Skipping.`);
       return existingSection;
     }
@@ -81,15 +95,17 @@ function checkCriticalElements(section, sectionId) {
       console.error('[carregarEtapa] HTTP failure loading stage:', res.status, url);
       throw new Error(`HTTP ${res.status} at ${url}`);
     }
+
     const html = await res.text();
     console.log('[carregarEtapa] Fetched HTML:', html.slice(0, 120) + '...');
 
     const container = document.createElement('div');
     container.innerHTML = html;
-    let section = container.querySelector('#' + id);
+    let section = container.querySelector('#' + id) || container.querySelector('section');
+
     if (!section) {
-      console.warn('[carregarEtapa] Section #' + id + ' not found in HTML. Using first element or creating new.');
-      section = container.firstElementChild || document.createElement('section');
+      console.warn('[carregarEtapa] Section #' + id + ' not found in HTML. Creating fallback.');
+      section = document.createElement('section');
       section.id = id;
       section.innerHTML = container.innerHTML;
     }
@@ -97,6 +113,7 @@ function checkCriticalElements(section, sectionId) {
     section.id = id;
     section.classList.add('section');
     section.dataset.initialized = 'true';
+
     const criticalElements = checkCriticalElements(section, id);
 
     const wrapper = document.getElementById('jornada-content-wrapper');
