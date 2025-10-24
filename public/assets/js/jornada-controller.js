@@ -4,6 +4,7 @@
   const existingJC = { ...window.JC };
 
   console.log('[JC.init] Initializing controller...');
+  console.log('[JC] Estado inicial de JC:', window.JC); // Log para depuração
 
   const sectionOrder = [
     'section-intro',
@@ -106,14 +107,12 @@
     sectionOrder.push(...order);
   }
 
+  // Função init pública: agora ela será incluída no JC e pode ser chamada externamente
   function init() {
     console.log('[JC.init] Controller initialized successfully');
-    window.JC = {
-      show,
-      setOrder,
-      attachButtonEvents,
-      handleSectionLogic
-    };
+    // Aqui você pode adicionar lógica global de inicialização, ex.: carregar a primeira seção
+    // Exemplo: JC.show('section-intro'); // Descomente se quiser auto-iniciar
+    console.log('[JC.init] Inicialização global executada');
   }
 
   // Reagir automaticamente ao evento de exibição de seção
@@ -126,6 +125,15 @@
     }
   });
 
-  init();
-})();
+  // Agora define JC incluindo a função init
+  window.JC = {
+    init,  // <-- Isso corrige o problema: init agora é pública em JC.init
+    show,
+    setOrder,
+    attachButtonEvents,
+    handleSectionLogic
+  };
 
+  console.log('[JC] Estado final de JC:', window.JC); // Log para depuração
+  console.log('[JC] JC.init disponível:', typeof window.JC.init); // Deve ser 'function'
+})();
