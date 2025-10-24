@@ -164,7 +164,7 @@ btnIniciar?.addEventListener('click', () => {
     document.body.appendChild(overlay);
     let done = false;
 }
-    const cleanup = () => {
+    const cleanup =  () => {
       if (done) return;
       done = true;
       try { video.pause(); } catch {}
@@ -175,7 +175,7 @@ btnIniciar?.addEventListener('click', () => {
       } else {
         window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
       }
-    };
+    }();
 
     video.addEventListener('ended', cleanup, { once: true });
     video.addEventListener('error', () => {
