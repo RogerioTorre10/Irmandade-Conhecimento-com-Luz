@@ -422,8 +422,7 @@ const bind = () => {
     tryInitialize();
   } else {
     console.log('[JCSenha] Já inicializado ou seção não presente, pulando tryInitialize');
-  }
-};
+}
 
 // Garantir que o bind só seja chamado uma vez
 if (document.readyState === 'loading') {
