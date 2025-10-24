@@ -519,7 +519,7 @@ const onShown = async (evt) => {
     console.log('[JCSenha] Ignorando, sectionId não é section-senha:', sectionId);
     return;
   }
-
+};
   let root;
   try {
     root = await waitForElement('#section-senha', { 
