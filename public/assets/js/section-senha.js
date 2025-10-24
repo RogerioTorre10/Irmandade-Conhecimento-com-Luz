@@ -1,6 +1,6 @@
 (function () {
   'use strict';
-  
+
   const MOD = 'section-senha.js';
   const SECTION_ID = 'section-senha';
   const NEXT_SECTION_ID = 'section-guia';
@@ -11,13 +11,7 @@
   const TRANSITION_TIMEOUT_MS = 8000;
   const TTS_FALLBACK_DELAY_MS = 3000;
 
-  if (!window.JCSenha?.state?.listenerAdded) {
-  console.log('[JCSenha] Registrando listener para sectionLoaded');
-  document.addEventListener('sectionLoaded', handler, { once: true });
-  window.JCSenha = window.JCSenha || {};
-  window.JCSenha.state = window.JCSenha.state || {};
-  window.JCSenha.state.listenerAdded = true;
-}
+  // Evitar múltiplas inicializações
   if (window.JCSenha?.__bound) {
     console.log('[JCSenha] Já inicializado, ignorando...');
     return;
@@ -35,6 +29,7 @@
 
   // ---------- Utils ----------
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
   const textOf = (el) => {
     if (!el) return '';
     const ds = el.dataset?.text;
@@ -115,12 +110,7 @@
     if (typeof window.runTyping === 'function') {
       await new Promise((resolve) => {
         try {
-          window.runTyping(
-            el,
-            text,
-            () => resolve(),
-            { speed, cursor: true }
-          );
+          window.runTyping(el, text, () => resolve(), { speed, cursor: true });
         } catch (e) {
           console.warn('[JCSenha] runTyping falhou, usando fallback local', e);
           usedFallback = true;
@@ -137,12 +127,12 @@
 
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
-
     window.G.__typingLock = prevLock;
 
     if (speak && text && window.EffectCoordinator?.speak && !el.dataset.spoken) {
       try {
-        window.EffectCoordinator.speak(text);
+        speechSynthesis.cancel(); // Cancelar TTS anterior
+        window.EffectCoordinator.speak(text, { lang: 'pt-BR', rate: 1.1, pitch: 1.0 });
         console.log('[JCSenha] Iniciando TTS para:', text);
         await sleep(TTS_FALLBACK_DELAY_MS);
         console.log('[JCSenha] TTS assumido como concluído após atraso:', text);
@@ -161,10 +151,11 @@
       if (window.runTyping) return true;
       await sleep(100);
     }
+    console.warn('[JCSenha] window.runTyping não encontrado após', maxMs, 'ms');
     return true;
   }
 
-  async function waitForVideoEnd(videoElementId = 'transition-video') {
+  async function waitForVideoEnd(videoElementId = 'videoTransicao') {
     const video = document.getElementById(videoElementId);
     if (!video) {
       console.log('[JCSenha] Vídeo de transição não encontrado, usando timeout padrão');
@@ -180,65 +171,37 @@
     });
   }
 
+  function hideSection() {
+    const section = document.querySelector('#section-senha');
+    const focusedButton = document.querySelector('#btn-senha-avancar:focus, #btn-senha-prev:focus');
+    if (focusedButton) {
+      focusedButton.blur();
+      console.log('[JCSenha] Foco removido de botão ativo');
+    }
+    if (section) {
+      section.classList.add('hidden');
+      section.setAttribute('aria-hidden', 'true');
+      section.setAttribute('inert', '');
+      console.log('[JCSenha] Seção senha escondida');
+    }
+  }
+
   function playTransitionVideo(nextSectionId) {
     console.log('[JCSenha] Iniciando transição de vídeo:', TRANSITION_SRC);
-    window.playTransitionVideo(TRANSITION_SRC, nextSectionId);
-    const video = document.createElement('video');
-    video.id = 'transition-video';
-    video.src = TRANSITION_SRC;
-    video.autoplay = true;
-    video.muted = true;
-    video.controls = false;
-    video.style.width = '100%';
-    video.style.height = '100vh';
-    video.style.position = 'fixed';
-    video.style.top = '0';
-    video.style.left = '0';
-    video.style.zIndex = '9999';
-    video.style.backgroundColor = '#000';
-
-   function hideSection() {
-  const section = document.querySelector('#section-senha');
-  const focusedButton = document.querySelector('#btn-senha-avancar:focus, #btn-senha-prev:focus');
-  if (focusedButton) {
-    focusedButton.blur();
-    console.log('[JCSenha] Foco removido de botão ativo');
-  }
-  section.classList.add('hidden');
-  section.setAttribute('aria-hidden', 'true');
-  section.setAttribute('inert', ''); // Adiciona inert para acessibilidade
-  console.log('[JCSenha] Seção senha escondida');
-}
-
-    if (window.JC) {
-      window.JC.currentSection = SECTION_ID;
-      console.log('[JCSenha] Definido window.JC.currentSection como', SECTION_ID);
+    if (typeof window.playTransitionVideo === 'function') {
+      window.playTransitionVideo(TRANSITION_SRC, nextSectionId);
+    } else {
+      console.warn('[JCSenha] window.playTransitionVideo não encontrado, usando fallback');
+      setTimeout(() => {
+        console.log('[JCSenha] Fallback: navegando para:', nextSectionId);
+        if (typeof window.JC?.show === 'function') {
+          window.JC.show(nextSectionId);
+        } else {
+          console.warn('[JCSenha] Fallback navigation to:', nextSectionId);
+          window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
+        }
+      }, 2000);
     }
-
-    document.body.appendChild(video);
-    console.log('[JCSenha] Vídeo adicionado ao DOM.');
-
-    video.addEventListener('ended', () => {
-      console.log('[JCSenha] Vídeo terminado, carregando:', nextSectionId);
-      video.remove();
-      try {
-        window.JC?.show(nextSectionId);
-        console.log('[JCSenha] Navegação para', nextSectionId, 'iniciada');
-      } catch (e) {
-        console.error('[JCSenha] Erro ao carregar próxima seção:', e);
-      }
-    }, { once: true });
-
-    video.addEventListener('error', (e) => {
-      console.error('[JCSenha] Erro ao reproduzir vídeo:', e);
-      video.remove();
-      console.log('[JCSenha] Redirecionando para:', nextSectionId, '(fallback devido a erro no vídeo)');
-      try {
-        window.JC?.show(nextSectionId);
-      } catch (err) {
-        console.error('[JCSenha] Erro no fallback:', err);
-      }
-    }, { once: true });
   }
 
   function pickElements(root) {
@@ -344,8 +307,16 @@
   }
 
   const onShown = async (evt) => {
-    const { sectionId } = evt?.detail || {};
-    if (sectionId !== 'section-senha') return;
+    const { sectionId, node } = evt?.detail || {};
+    if (sectionId !== SECTION_ID) {
+      console.log('[JCSenha] Ignorando, sectionId não é section-senha:', sectionId);
+      return;
+    }
+
+    if (window.JCSenha.state.ready || node?.dataset.senhaInitialized === 'true') {
+      console.log('[JCSenha] Já inicializado, ignorando...');
+      return;
+    }
 
     let root;
     try {
@@ -365,11 +336,6 @@
     root.style.removeProperty('opacity');
     root.style.removeProperty('visibility');
     root.style.zIndex = 'auto';
-
-    if (root.dataset.senhaInitialized === 'true') {
-      runTypingSequence(root);
-      return;
-    }
 
     let input, toggle, btnNext, btnPrev, instr1, instr2, instr3, instr4;
     try {
@@ -423,6 +389,7 @@
       const senha = (input.value || '').trim();
       if (senha.length >= 3) {
         console.log('[JCSenha] Senha válida, iniciando transição');
+        hideSection();
         playTransitionVideo(NEXT_SECTION_ID);
       } else {
         console.log('[JCSenha] Senha inválida, length:', senha.length);
@@ -456,217 +423,67 @@
     armObserver(root);
 
     root.dataset.senhaInitialized = 'true';
-    runTypingSequence(root);
-
     window.JCSenha.state.ready = true;
     console.log('[JCSenha] Seção senha inicializada.');
     if (window.JCSenha.state.observer) {
       window.JCSenha.state.observer.disconnect();
       console.log('[JCSenha] Observer desconectado após inicialização');
     }
+
+    await runTypingSequence(root);
   };
 
+  const handler = onShown; // Alias para consistência com section-guia.js
+
+  // Remover listeners incorretos
+  document.removeEventListener('sectionLoaded', handler);
+
+  // Registrar handler para section:shown
   if (!window.JCSenha.state.listenerAdded) {
-    document.addEventListener('section:shown', onShown);
+    console.log('[JCSenha] Registrando listener para section:shown');
+    document.addEventListener('section:shown', handler, { once: true });
     window.JCSenha.state.listenerAdded = true;
   }
 
-  const handler = onShown; // Alias para manter consistência com section-guia.js
-
-const bind = () => {
-  console.log('[JCSenha] Executando bind');
-  // Evitar múltiplos listeners
-  if (window.JCSenha.state.listenerAdded) {
-    document.removeEventListener('section:shown', handler);
-  }
-  document.addEventListener('section:shown', handler, { passive: true, once: true });
-  window.JCSenha.state.listenerAdded = true;
-
-  const tryInitialize = (attempt = 1, maxAttempts = 10, options = {}) => {
-    // Evitar reinicialização se já concluído
-    if (window.JCSenha.state.ready || document.getElementById('section-senha')?.dataset.senhaInitialized === 'true') {
-      console.log('[JCSenha] Seção já inicializada, ignorando tentativa', attempt);
-      return;
+  // Inicialização manual com fallback
+  const bind = () => {
+    console.log('[JCSenha] Executando bind');
+    if (window.JCSenha.state.listenerAdded) {
+      document.removeEventListener('section:shown', handler);
     }
-    const visibleSenha = document.querySelector('#section-senha:not(.hidden)');
-    const section = document.getElementById('section-senha');
-    if (visibleSenha && !visibleSenha.dataset.senhaInitialized) {
-      console.log('[JCSenha] Seção visível encontrada, disparando handler');
-      handler({ detail: { sectionId: 'section-senha', node: visibleSenha } });
-    } else if (section && !section.dataset.senhaInitialized) {
-      console.log('[JCSenha] Forçando inicialização manual (tentativa ' + attempt + ')');
-      handler({ detail: { sectionId: 'section-senha', node: section } });
-    } else if (attempt < maxAttempts) {
-      console.log('[JCSenha] Nenhuma seção visível ou já inicializada, tentando novamente...');
-      setTimeout(() => tryInitialize(attempt + 1, maxAttempts, options), 100); // Delay fixo de 100ms
+    document.addEventListener('section:shown', handler, { passive: true, once: true });
+    window.JCSenha.state.listenerAdded = true;
+
+    const tryInitialize = (attempt = 1, maxAttempts = 10) => {
+      setTimeout(() => {
+        const visibleSenha = document.querySelector(`#${SECTION_ID}:not(.hidden)`);
+        if (visibleSenha && !window.JCSenha.state.ready && !visibleSenha.dataset.senhaInitialized) {
+          console.log('[JCSenha] Seção visível encontrada, disparando handler');
+          handler({ detail: { sectionId: SECTION_ID, node: visibleSenha } });
+        } else if (document.getElementById(SECTION_ID) && !window.JCSenha.state.ready && !document.getElementById(SECTION_ID).dataset.senhaInitialized) {
+          console.log('[JCSenha] Forçando inicialização manual (tentativa ' + attempt + ')');
+          handler({ detail: { sectionId: SECTION_ID, node: document.getElementById(SECTION_ID) } });
+        } else if (attempt < maxAttempts) {
+          console.log('[JCSenha] Nenhuma seção visível ou já inicializada, tentando novamente...');
+          tryInitialize(attempt + 1, maxAttempts);
+        } else {
+          console.error('[JCSenha] Falha ao inicializar após', maxAttempts, 'tentativas');
+        }
+      }, 100); // Delay fixo de 100ms
+    };
+
+    if (!window.JCSenha.state.ready && !document.getElementById(SECTION_ID)?.dataset.senhaInitialized) {
+      tryInitialize();
     } else {
-      console.error('[JCSenha] Falha ao inicializar após', maxAttempts, 'tentativas');
+      console.log('[JCSenha] Já inicializado ou seção não presente, pulando tryInitialize');
     }
   };
 
-  // Iniciar tentativa de inicialização apenas se não inicializado
-  if (!window.JCSenha.state.ready && !document.getElementById('section-senha')?.dataset.senhaInitialized) {
-    tryInitialize();
+  if (document.readyState === 'loading') {
+    console.log('[JCSenha] Aguardando DOMContentLoaded');
+    document.addEventListener('DOMContentLoaded', bind, { once: true });
   } else {
-    console.log('[JCSenha] Já inicializado ou seção não presente, pulando tryInitialize');
+    console.log('[JCSenha] DOM já carregado, chamando bind');
+    bind();
   }
-};
-
-// Atualizar onShown para incluir a lógica do wrapper
-const onShown = async (evt) => {
-  const { sectionId } = evt?.detail || {};
-  if (sectionId !== 'section-senha') {
-    console.log('[JCSenha] Ignorando, sectionId não é section-senha:', sectionId);
-    return;
-  }
-};
-  
-  try {
-    root = await waitForElement('#section-senha', { 
-      within: document.getElementById('jornada-content-wrapper') || document, 
-      timeout: 10000 
-    });
-  } catch (e) {
-    console.error('[JCSenha] Root #section-senha não encontrado:', e);
-    window.toast?.('Erro: Seção Senha não carregada.', 'error');
-    return;
-  }
-
-  // Evitar reinicialização
-  if (window.JCSenha.state.ready || root.dataset.senhaInitialized === 'true') {
-    console.log('[JCSenha] Já inicializado, ignorando...');
-    return;
-  }
-
-  root.classList.remove('hidden');
-  root.setAttribute('aria-hidden', 'false');
-  root.style.removeProperty('display');
-  root.style.removeProperty('opacity');
-  root.style.removeProperty('visibility');
-  root.style.zIndex = 'auto';
-
-  // Lógica do wrapper movida para cá
-  const wrapper = document.getElementById('jornada-content-wrapper');
-  if (wrapper) {
-    wrapper.querySelectorAll('[data-typing="true"]').forEach(el => {
-      if (!el.classList.contains('typing-done')) {
-        el.textContent = textOf(el);
-        el.classList.add('typing-done');
-        el.style.opacity = '1';
-        el.style.visibility = 'visible';
-        el.style.display = 'block';
-      }
-    });
-    wrapper.querySelectorAll('.btn').forEach(btn => {
-      btn.disabled = false;
-      btn.style.opacity = '1';
-      btn.style.cursor = 'pointer';
-    });
-  }
-
-  let input, toggle, btnNext, btnPrev, instr1, instr2, instr3, instr4;
-  try {
-    instr1 = await waitForElement('#senha-instr1', { within: root, timeout: 5000 });
-    instr2 = await waitForElement('#senha-instr2', { within: root, timeout: 5000 });
-    instr3 = await waitForElement('#senha-instr3', { within: root, timeout: 5000 });
-    instr4 = await waitForElement('#senha-instr4', { within: root, timeout: 5000 });
-    input = await waitForElement('#senha-input', { within: root, timeout: 5000 });
-    toggle = await waitForElement('.btn-toggle-senha', { within: root, timeout: 5000 });
-    btnNext = await waitForElement('#btn-senha-avancar', { within: root, timeout: 5000 });
-    btnPrev = await waitForElement('#btn-senha-prev', { within: root, timeout: 5000 });
-  } catch (e) {
-    console.error('[JCSenha] Falha ao carregar elementos:', e);
-    window.toast?.('Erro: Elementos da seção Senha não encontrados.', 'error');
-    return;
-  }
-
-  console.log('[JCSenha] Elementos carregados:', { instr1, instr2, instr3, instr4, input, toggle, btnNext, btnPrev });
-
-  btnPrev?.setAttribute('disabled', 'true');
-  btnNext?.setAttribute('disabled', 'true');
-  input?.setAttribute('disabled', 'true');
-  toggle?.setAttribute('disabled', 'true');
-
-  if (toggle && input) {
-    toggle.addEventListener('click', () => {
-      console.log('[JCSenha] Clique no Olho Mágico, tipo atual:', input.type);
-      input.type = input.type === 'password' ? 'text' : 'password';
-      console.log('[JCSenha] Novo tipo do input:', input.type);
-    });
-  } else {
-    console.error('[JCSenha] Erro: toggle ou input não encontrados', { toggle, input });
-  }
-
-  btnPrev?.addEventListener('click', () => {
-    console.log('[JCSenha] Botão Voltar clicado');
-    try {
-      window.JC?.show('section-termos');
-    } catch (e) {
-      console.error('[JCSenha] Erro ao navegar para section-termos:', e);
-    }
-  });
-
-  btnNext?.addEventListener('click', () => {
-    console.log('[JCSenha] Botão Avançar clicado, valor do input:', input?.value);
-    if (!input) {
-      console.error('[JCSenha] Input #senha-input não encontrado');
-      window.toast?.('Erro: campo de senha não encontrado.', 'error');
-      return;
-    }
-    const senha = (input.value || '').trim();
-    if (senha.length >= 3) {
-      console.log('[JCSenha] Senha válida, iniciando transição');
-      playTransitionVideo(NEXT_SECTION_ID);
-    } else {
-      console.log('[JCSenha] Senha inválida, length:', senha.length);
-      window.toast?.('Digite uma Palavra-Chave válida.', 'warning');
-      try {
-        input.focus();
-        console.log('[JCSenha] Foco reaplicado ao input');
-      } catch (e) {
-        console.error('[JCSenha] Falha ao focar input:', e);
-      }
-    }
-  });
-
-  if (input) {
-    input.removeAttribute('disabled');
-    input.removeAttribute('readonly');
-    input.addEventListener('input', () => {
-      console.log('[JCSenha] Input alterado:', input.value);
-    });
-  } else {
-    console.error('[JCSenha] Input #senha-input não encontrado na inicialização');
-  }
-
-  if (toggle) {
-    toggle.removeAttribute('disabled');
-  } else {
-    console.error('[JCSenha] Botão .btn-toggle-senha não encontrado na inicialização');
-  }
-
-  [instr1, instr2, instr3, instr4].filter(Boolean).forEach(normalizeParagraph);
-  armObserver(root);
-
-  root.dataset.senhaInitialized = 'true';
-  window.JCSenha.state.ready = true;
-  console.log('[JCSenha] Seção senha inicializada.');
-  if (window.JCSenha.state.observer) {
-    window.JCSenha.state.observer.disconnect();
-    console.log('[JCSenha] Observer desconectado após inicialização');
-  }
-
-  runTypingSequence(root);
-};
-
-// Remover o listener incorreto de sectionLoaded
-document.removeEventListener('sectionLoaded', handler);
-
-// Garantir que o bind só seja chamado uma vez
-if (document.readyState === 'loading') {
-  console.log('[JCSenha] Aguardando DOMContentLoaded');
-  document.addEventListener('DOMContentLoaded', bind, { once: true });
-} else {
-  console.log('[JCSenha] DOM já carregado, chamando bind');
-  bind();
-}
+})();
