@@ -1,4 +1,6 @@
 (function() {
+  'use strict';
+
   const log = (...args) => console.log('[VIDEO_TRANSICAO]', ...args);
   let isPlaying = false;
 
@@ -9,17 +11,32 @@
     }
     isPlaying = true;
 
-    const overlay = document.getElementById('videoOverlay');
-    const video = document.getElementById('videoTransicao');
-    const fallback = document.getElementById('videoFallback');
+    let overlay = document.getElementById('videoOverlay');
+    let video = document.getElementById('videoTransicao');
+    let fallback = document.getElementById('videoFallback');
+
     if (!overlay || !video) {
-      console.error('[VIDEO_TRANSICAO] Elementos de vídeo não encontrados', { overlay: !!overlay, video: !!video });
-      window.toast && window.toast('Erro ao reproduzir vídeo de transição.');
-      isPlaying = false;
-      window.JC.goNext();
-      log('Avançando para próxima seção (sem elementos de vídeo)');
-      return;
+      log('Criando elementos de vídeo dinamicamente');
+      overlay = document.createElement('div');
+      overlay.id = 'videoOverlay';
+      overlay.style.cssText = 'position: fixed; inset: 0; background: #000; z-index: 9999; display: none;';
+      video = document.createElement('video');
+      video.id = 'videoTransicao';
+      video.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
+      fallback = document.createElement('div');
+      fallback.id = 'videoFallback';
+      fallback.classList.add('hidden');
+      fallback.style.display = 'none';
+      const skipButton = document.createElement('button');
+      skipButton.id = 'skipVideo';
+      skipButton.textContent = 'Pular';
+      skipButton.style.cssText = 'position: absolute; top: 10px; right: 10px; padding: 8px; background: #fff; color: #000;';
+      overlay.appendChild(video);
+      overlay.appendChild(fallback);
+      overlay.appendChild(skipButton);
+      document.body.appendChild(overlay);
     }
+
     log('Tentando reproduzir:', videoSrc);
 
     try {
@@ -50,6 +67,7 @@
             }, 3000);
           };
           overlay.classList.remove('hidden');
+          overlay.style.display = 'block';
           video.play().catch(e => {
             console.error('[VIDEO_TRANSICAO] Erro ao iniciar reprodução:', videoSrc, e);
             fallback.classList.remove('hidden');
@@ -92,6 +110,7 @@
         video.pause();
         video.src = '';
         overlay.classList.add('hidden');
+        overlay.style.display = 'none';
         isPlaying = false;
         window.JC.goNext();
         log('Avançando para próxima seção após skip');
