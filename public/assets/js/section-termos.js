@@ -1,151 +1,84 @@
 (function () {
   'use strict';
 
-  const MOD = 'section-termos.js';
-  const SECTION_ID = 'section-termos';
-  const NEXT_SECTION_ID = 'section-senha';
-  const TRANSITION_SRC = '/assets/img/filme-senha.mp4';
-  const TRANSITION_TIMEOUT_MS = 8000;
-  const TTS_FALLBACK_DELAY_MS = 2000;
+  // Namespace para isolar a seção
+  window.JCTermos = window.JCTermos || {};
 
-  if (window.JCTermos?.__bound) {
+  // Verificar inicialização
+  if (window.JCTermos.__bound) {
     console.log('[JCTermos] Já inicializado, ignorando...');
     return;
   }
-
-  window.JCTermos = window.JCTermos || {};
   window.JCTermos.__bound = true;
+
+  // Estado da seção
   window.JCTermos.state = {
     ready: false,
     currentPage: 1,
     listenerAdded: false,
-    typingInProgress: false,
-    initialized: false,
-    pg1: null,
-    pg2: null,
-    nextBtn: null,
-    prevBtn: null,
-    avancarBtn: null
+    HANDLER_COUNT: 0,
+    TYPING_COUNT: 0
   };
 
-  // ---------- UTILIDADES ----------
-  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-  
-  const textOf = (el) => {
-    if (!el) return '';
-    const ds = el.dataset?.text?.trim();
-    const tc = el.textContent?.trim() || '';
-    return ds || tc;
+  // Funções utilitárias
+  const once = (el, ev, fn) => {
+    if (!el) return;
+    const h = (e) => {
+      el.removeEventListener(ev, h);
+      fn(e);
+    };
+    el.addEventListener(ev, h);
   };
 
-  function normalizeParagraph(el) {
-    if (!el) return false;
-    const source = textOf(el);
-    if (!source) return false;
-
-    el.dataset.text = source;
-    if (!el.classList.contains('typing-done')) {
-      el.textContent = '';
-      el.classList.remove('typing-active', 'typing-done');
-      delete el.dataset.spoken;
-    }
-    return true;
-  }
-
-  async function localType(el, text, speed = 20) {
-    return new Promise(resolve => {
-      let i = 0;
-      el.textContent = '';
+  async function waitForElement(selector, { within = document, timeout = 5000, step = 100 } = {}) {
+    console.log('[JCTermos] Aguardando elemento:', selector);
+    const start = performance.now();
+    return new Promise((resolve, reject) => {
       const tick = () => {
-        if (i < text.length) {
-          el.textContent += text.charAt(i++);
-          setTimeout(tick, speed);
-        } else {
-          resolve();
+        let el = within.querySelector(selector);
+        if (!el && within !== document) {
+          el = document.querySelector(`#jornada-content-wrapper ${selector}`);
         }
+        if (el) {
+          console.log('[JCTermos] Elemento encontrado:', selector);
+          return resolve(el);
+        }
+        if (performance.now() - start >= timeout) {
+          console.error('[JCTermos] Timeout aguardando:', selector);
+          return reject(new Error(`timeout waiting ${selector}`));
+        }
+        setTimeout(tick, step);
       };
       tick();
     });
   }
 
-  async function typeOnce(el, { speed = 20, speak = true } = {}) {
-    if (!el) return;
-    const text = textOf(el);
-    if (!text) return;
-
-    window.G = window.G || {};
-    const prevLock = !!window.G.__typingLock;
-    window.G.__typingLock = true;
-
-    el.classList.add('typing-active', 'lumen-typing');
-    el.classList.remove('typing-done');
-    el.style.textAlign = 'left';
-
-    let usedFallback = false;
-
-    if (typeof window.runTyping === 'function') {
-      await new Promise((resolve) => {
-        try {
-          window.runTyping(el, text, () => resolve(), { speed, cursor: true });
-        } catch (e) {
-          console.warn('[JCTermos] runTyping falhou, usando fallback', e);
-          usedFallback = true;
-          resolve();
-        }
-      });
-    } else {
-      usedFallback = true;
-    }
-
-    if (usedFallback) {
-      await localType(el, text, speed);
-    }
-
-    el.classList.remove('typing-active');
-    el.classList.add('typing-done');
-    window.G.__typingLock = prevLock;
-
-    if (speak && text && window.EffectCoordinator?.speak && !el.dataset.spoken) {
-      try {
-        window.EffectCoordinator.speak(text, { lang: 'pt-BR', rate: 1.1, pitch: 1.0 });
-        console.log('[JCTermos] TTS iniciado:', text);
-        await sleep(TTS_FALLBACK_DELAY_MS);
-        el.dataset.spoken = 'true';
-      } catch (e) {
-        console.error('[JCTermos] Erro TTS:', e);
-      }
-    }
-
-    await sleep(80);
+  function getText(el) {
+    return (el?.dataset?.text ?? el?.textContent ?? '').trim();
   }
 
-  async function waitForTypingBridge(maxMs = 3000) {
-    const t0 = Date.now();
-    while (Date.now() - t0 < maxMs) {
-      if (window.runTyping) return true;
-      await sleep(100);
-    }
-    return true;
+  function fromDetail(detail = {}) {
+    const sectionId = detail.sectionId || detail.id || window.__currentSectionId;
+    const node = detail.node || detail.root || null;
+    return { sectionId, node };
   }
 
-  // ---------- TRANSIÇÃO ----------
-  function playTransitionVideo(nextSectionId) {
+  // Função de transição com vídeo
+  function playTransitionThen(nextStep) {
     if (document.getElementById('termos-transition-overlay')) return;
-
-    console.log('[JCTermos] Iniciando transição para:', nextSectionId);
+    console.log('[JCTermos] Iniciando transição de vídeo: /assets/img/filme-senha.mp4');
     const overlay = document.createElement('div');
     overlay.id = 'termos-transition-overlay';
     overlay.style.cssText = `
-      position: fixed; inset: 0; background: #000; z-index: 999999;
-      display: flex; align-items: center; justify-content: center;`;
-    
+      position:fixed; inset:0; background:#000; z-index:999999;
+      display:flex; align-items:center; justify-content:center;`;
     const video = document.createElement('video');
-    video.src = TRANSITION_SRC;
+    video.src = '/assets/img/filme-senha.mp4';
     video.autoplay = true;
     video.muted = true;
     video.playsInline = true;
     video.controls = false;
-    video.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
+    video.style.cssText = 'width:100%; height:100%; object-fit:cover;';
     overlay.appendChild(video);
     document.body.appendChild(overlay);
 
@@ -155,194 +88,421 @@
       done = true;
       try { video.pause(); } catch {}
       overlay.remove();
-      console.log('[JCTermos] Transição concluída');
-      if (typeof window.JC?.show === 'function') {
-        window.JC.show(nextSectionId);
-      } else {
-        window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
+      console.log('[JCTermos] Transição concluída, executando próximo passo.');
+      if (typeof nextStep === 'function') nextStep();
+    };
+
+    video.addEventListener('ended', () => {
+      console.log('[JCTermos] Vídeo terminou, limpando e prosseguindo.');
+      cleanup();
+    }, { once: true });
+    video.addEventListener('error', (e) => {
+      console.error('[JCTermos] Erro ao reproduzir vídeo:', e);
+      cleanup();
+    }, { once: true });
+    setTimeout(() => { if (!done) cleanup(); }, 3000); // Timeout reduzido para 3s
+
+    Promise.resolve().then(() => video.play?.()).catch((e) => {
+      console.warn('[JCTermos] Erro ao iniciar vídeo:', e);
+      cleanup();
+    });
+  }
+
+  // Handler principal
+  const handler = async (evt) => {
+    window.JCTermos.state.HANDLER_COUNT++;
+    console.log(`[JCTermos] Handler disparado (${window.JCTermos.state.HANDLER_COUNT}x):`, {
+      sectionId: evt?.detail?.sectionId,
+      node: !!evt?.detail?.node,
+      ready: window.JCTermos.state.ready,
+      currentPage: window.JCTermos.state.currentPage
+    });
+    const { sectionId, node } = fromDetail(evt?.detail);
+    if (sectionId !== 'section-termos') {
+      console.log('[JCTermos] Ignorando, sectionId não é section-termos:', sectionId);
+      return;
+    }
+
+    if (window.JCTermos.state.ready || (node && node.dataset.termosInitialized)) {
+      console.log('[JCTermos] Já inicializado, ignorando...');
+      return;
+    }
+
+    let root = node || document.getElementById('section-termos');
+    if (!root) {
+      console.log('[JCTermos] Tentando localizar #section-termos...');
+      try {
+        root = await waitForElement('#section-termos', { 
+          within: document.getElementById('jornada-content-wrapper') || document, 
+          timeout: 10000 
+        });
+      } catch (e) {
+        window.toast?.('Erro: Seção Termos não carregada.', 'error');
+        console.error('[JCTermos] Section not found:', e);
+        return;
+      }
+    }
+
+    console.log('[JCTermos] Root encontrado:', root);
+    root.dataset.termosInitialized = 'true';
+    root.classList.add('section-termos');
+
+    // Aplicar estilos ao root
+    root.style.cssText = `
+      background: transparent;
+      padding: 24px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 600px;
+      margin: 12px auto;
+      text-align: center;
+      box-shadow: none;
+      border: none;
+      display: block;
+      opacity: 1;
+      visibility: visible;
+      position: relative;
+      z-index: 2;
+      overflow-y: scroll;
+      min-height: 80vh;
+      height: 80vh;
+      box-sizing: border-box;
+    `;
+
+    let pg1, pg2, nextBtn, prevBtn, avancarBtn;
+    try {
+      console.log('[JCTermos] Buscando elementos...');
+      pg1 = await waitForElement('#termos-pg1', { within: root, timeout: 5000 });
+      pg2 = await waitForElement('#termos-pg2', { within: root, timeout: 5000 });
+      nextBtn = await waitForElement('.nextBtn[data-action="termos-next"]', { within: root, timeout: 5000 });
+      prevBtn = await waitForElement('.prevBtn[data-action="termos-prev"]', { within: root, timeout: 5000 });
+      avancarBtn = await waitForElement('.avancarBtn[data-action="avancar"]', { within: root, timeout: 5000 });
+    } catch (e) {
+      console.error('[JCTermos] Falha ao carregar elementos:', e);
+      window.toast?.('Erro: Elementos da seção Termos não encontrados.', 'error');
+      return;
+    }
+
+    console.log('[JCTermos] Elementos carregados:', { pg1, pg2, nextBtn, prevBtn, avancarBtn });
+
+    [pg1, pg2].forEach((el, i) => {
+      if (el) {
+        el.classList.remove('hidden');
+        el.style.display = i === 0 ? 'block' : 'none';
+        el.style.opacity = '0';
+        el.style.visibility = 'hidden';
+        el.style.minHeight = '60vh';
+        console.log('[JCTermos] Página inicializada:', el.id);
+      }
+    });
+
+    [pg1, pg2].forEach(pg => {
+      if (pg) {
+        pg.querySelectorAll('[data-typing="true"]').forEach(el => {
+          el.textContent = '';
+          el.style.opacity = '0';
+          el.style.visibility = 'hidden';
+          el.style.display = 'none';
+          console.log('[JCTermos] Texto inicializado:', el.id);
+        });
+      }
+    });
+
+    [nextBtn, prevBtn, avancarBtn].forEach(btn => {
+      if (btn) {
+        btn.classList.add('btn', 'btn-primary', 'btn-stone');
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+        btn.style.display = 'inline-block';
+        btn.style.margin = '8px';
+        btn.style.visibility = 'visible';
+        console.log('[JCTermos] Botão inicializado:', btn.className, btn.textContent);
+      }
+    });
+
+    const runTypingChain = async () => {
+      window.JCTermos.state.TYPING_COUNT++;
+      console.log(`[JCTermos] runTypingChain chamado (${window.JCTermos.state.TYPING_COUNT}x) na página ${window.JCTermos.state.currentPage}`);
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Timeout em runTypingChain')), 10000);
+      });
+      try {
+        await Promise.race([
+          new Promise(async (resolve) => {
+            if (window.__typingLock) {
+              console.log('[JCTermos] Typing lock ativo, aguardando...');
+              await new Promise(resolveLock => {
+                const checkLock = () => {
+                  if (!window.__typingLock) {
+                    console.log('[JCTermos] Lock liberado, prosseguindo...');
+                    resolveLock();
+                  } else {
+                    setTimeout(checkLock, 100);
+                  }
+                };
+                checkLock();
+              });
+            }
+
+            console.log('[JCTermos] Iniciando datilografia na página atual...');
+            const currentPg = window.JCTermos.state.currentPage === 1 ? pg1 : pg2;
+            const typingElements = currentPg.querySelectorAll('[data-typing="true"]:not(.typing-done)');
+
+            if (!typingElements.length) {
+              console.warn('[JCTermos] Nenhum elemento com data-typing="true" encontrado na página atual');
+              [nextBtn, prevBtn, avancarBtn].forEach(btn => {
+                if (btn) {
+                  btn.disabled = false;
+                  btn.style.opacity = '1';
+                  btn.style.cursor = 'pointer';
+                }
+              });
+              currentPg.style.opacity = '1';
+              currentPg.style.visibility = 'visible';
+              resolve();
+              return;
+            }
+
+            console.log('[JCTermos] Elementos encontrados na página:', Array.from(typingElements).map(el => el.id));
+
+            // Fallback para window.runTyping
+            if (typeof window.runTyping !== 'function') {
+              console.warn('[JCTermos] window.runTyping não encontrado, usando fallback');
+              window.runTyping = (el, text, resolve, options) => {
+                let i = 0;
+                const speed = options.speed || 100;
+                console.log('[JCTermos] Iniciando datilografia fallback para:', el.id);
+                const type = () => {
+                  if (i < text.length) {
+                    el.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                  } else {
+                    el.textContent = text;
+                    console.log('[JCTermos] Datilografia fallback concluída para:', el.id);
+                    resolve();
+                  }
+                };
+                type();
+              };
+            }
+
+            for (const el of typingElements) {
+              const text = getText(el);
+              console.log('[JCTermos] Datilografando:', el.id, text.substring(0, 50));
+              
+              try {
+                el.textContent = '';
+                el.classList.add('typing-active', 'lumen-typing');
+                el.style.color = '#fff';
+                el.style.opacity = '0';
+                el.style.display = 'block';
+                el.style.visibility = 'hidden';
+                currentPg.style.opacity = '1';
+                currentPg.style.visibility = 'visible';
+                await new Promise(resolve => window.runTyping(el, text, resolve, {
+                  speed: Number(el.dataset.speed || 100),
+                  cursor: String(el.dataset.cursor || 'true') === 'true'
+                }));
+                el.classList.add('typing-done');
+                el.classList.remove('typing-active');
+                el.style.opacity = '1';
+                el.style.visibility = 'visible';
+                el.style.display = 'block';
+                if (typeof window.EffectCoordinator?.speak === 'function') {
+                  speechSynthesis.cancel();
+                  const utterance = new SpeechSynthesisUtterance(text);
+                  utterance.lang = 'pt-BR';
+                  utterance.rate = 1.1;
+                  utterance.pitch = 1.0;
+                  console.log('[JCTermos] TTS iniciado para:', el.id);
+                  window.EffectCoordinator.speak(text, { rate: 1.1, pitch: 1.0 });
+                  await new Promise(resolve => {
+                    utterance.onend = () => {
+                      console.log('[JCTermos] TTS concluído para:', el.id);
+                      resolve();
+                    };
+                    setTimeout(resolve, text.length * 70);
+                  });
+                } else {
+                  console.warn('[JCTermos] window.EffectCoordinator.speak não encontrado');
+                  await new Promise(resolve => setTimeout(resolve, text.length * 70));
+                }
+              } catch (err) {
+                console.error('[JCTermos] Erro na datilografia para', el.id, err);
+                el.textContent = text;
+                el.classList.add('typing-done');
+                el.style.opacity = '1';
+                el.style.visibility = 'visible';
+                el.style.display = 'block';
+              }
+            }
+            
+            console.log('[JCTermos] Datilografia concluída na página atual');
+            resolve();
+          }),
+          timeoutPromise
+        ]);
+        [nextBtn, prevBtn, avancarBtn].forEach(btn => {
+          if (btn) {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+          }
+        });
+      } catch (err) {
+        console.error('[JCTermos] Erro em runTypingChain:', err);
+        [nextBtn, prevBtn, avancarBtn].forEach(btn => {
+          if (btn) {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+          }
+        });
       }
     };
 
-    video.addEventListener('ended', cleanup, { once: true });
-    video.addEventListener('error', () => {
-      console.error('[JCTermos] Erro no vídeo:', TRANSITION_SRC);
-      setTimeout(cleanup, 1200);
-    }, { once: true });
-    setTimeout(() => { if (!done) cleanup(); }, TRANSITION_TIMEOUT_MS);
-
-    Promise.resolve().then(() => video.play?.()).catch(() => {
-      console.warn('[JCTermos] Falha ao iniciar vídeo, usando fallback.');
-      setTimeout(cleanup, 800);
-    });
-  }
-
-  // ---------- BLINDAGEM ----------
-  function ensureSectionVisible(root) {
-    if (!root) return;
-    root.classList.remove('hidden');
-    root.setAttribute('aria-hidden', 'false');
-    root.style.display = 'block';
-    root.style.opacity = '1';
-    root.style.visibility = 'visible';
-    root.style.zIndex = '2';
-    root.style.transition = 'opacity 0.3s ease';
-    console.log('[JCTermos] Blindagem aplicada');
-  }
-
-  // ---------- MOSTRAR/ESCONDER PÁGINA ----------
-  function showPage(pageEl, show) {
-    if (!pageEl) return;
-    pageEl.style.display = show ? 'block' : 'none';
-    pageEl.style.opacity = show ? '1' : '0';
-    pageEl.style.visibility = show ? 'visible' : 'hidden';
-    if (show) pageEl.scrollTop = 0;
-  }
-
-  // ---------- DATILOGRAFIA ----------
-  async function runTypingSequence(pageEl) {
-    if (!pageEl) return;
-    window.JCTermos.state.typingInProgress = true;
-
-    const elements = Array.from(pageEl.querySelectorAll('[data-typing="true"]')).sort((a, b) => {
-      const aRect = a.getBoundingClientRect();
-      const bRect = b.getBoundingClientRect();
-      return aRect.top - bRect.top || aRect.left - bRect.left;
-    });
-
-    elements.forEach(normalizeParagraph);
-    await waitForTypingBridge();
-
-    for (const el of elements) {
-      if (!el.classList.contains('typing-done')) {
-        await typeOnce(el, { speed: 20, speak: true });
-      }
-    }
-
-    window.JCTermos.state.typingInProgress = false;
-  }
-
-  // ---------- HANDLER ----------
-  const handler = async (evt) => {
-    const { sectionId, node } = evt?.detail || {};
-    if (sectionId !== SECTION_ID) return;
-
-    if (window.JCTermos.state.initialized) {
-      console.log('[JCTermos] Já inicializado');
-      return;
-    }
-
-    let root = node || document.getElementById(SECTION_ID);
-    if (!root) {
-      console.error('[JCTermos] #section-termos não encontrado');
-      return;
-    }
-
-    root.dataset.termosInitialized = 'true';
-    ensureSectionVisible(root);
-
-    // Elementos - COMPATÍVEL COM SEU HTML
-    const pg1 = root.querySelector('#termos-pg1');
-    const pg2 = root.querySelector('#termos-pg2');
-    const nextBtn = root.querySelector('[data-action="termos-next"]');
-    const prevBtn = root.querySelector('[data-action="termos-prev"]');
-    const avancarBtn = root.querySelector('[data-action="avancar"]');
-
-    window.JCTermos.state.pg1 = pg1;
-    window.JCTermos.state.pg2 = pg2;
-    window.JCTermos.state.nextBtn = nextBtn;
-    window.JCTermos.state.prevBtn = prevBtn;
-    window.JCTermos.state.avancarBtn = avancarBtn;
-
-    // Forçar visibilidade
-    showPage(pg1, true);
-    showPage(pg2, false);
-
-    // Desabilitar todos
-    [nextBtn, prevBtn, avancarBtn].forEach(btn => {
-      if (btn) {
-        btn.disabled = true;
-        btn.style.opacity = '0';
-        btn.style.cursor = 'default';
-      }
-    });
-
-    // Datilografia pg1
-    await runTypingSequence(pg1);
-
-    // Habilitar "Próxima página"
-    if (nextBtn) {
-      nextBtn.disabled = false;
-      nextBtn.style.opacity = '1';
-      nextBtn.style.cursor = 'pointer';
-    }
-
-    // Botão "Próxima página"
-    nextBtn?.addEventListener('click', async () => {
-      if (nextBtn.disabled) return;
+    once(nextBtn, 'click', async () => {
       speechSynthesis.cancel();
+      if (window.JCTermos.state.currentPage === 1 && pg2) {
+        pg1.style.display = 'none';
+        pg2.style.display = 'block';
+        avancarBtn.textContent = 'Aceito e quero continuar';
+        window.JCTermos.state.currentPage = 2;
+        await runTypingChain();
+      }
+    });
 
-      showPage(pg1, false);
-      showPage(pg2, true);
-      window.JCTermos.state.currentPage = 2;
+    once(prevBtn, 'click', async (e) => {
+      if (e.isTrusted) {
+        speechSynthesis.cancel();
+        console.log('[JCTermos] Redirecionando para site fora da jornada');
+        window.location.href = '/';
+      } else {
+        console.log('[JCTermos] Clique simulado ignorado');
+      }
+    });
 
-      await runTypingSequence(pg2);
+    once(avancarBtn, 'click', async (e) => {
+      if (e.isTrusted) {
+        speechSynthesis.cancel();
+        if (window.JCTermos.state.currentPage === 2) {
+          console.log('[JCTermos] Avançando para section-senha com transição de vídeo');
+          window.JCTermos.destroy(); // Limpar estado antes de avançar
+          playTransitionThen(() => {
+            if (typeof window.JC?.show === 'function') {
+              window.JC.show('section-senha');
+            } else {
+              window.location.href = 'jornada-conhecimento-com-luz1.html#section-senha';
+              console.warn('[JCTermos] Fallback navigation to jornada-conhecimento-com-luz1.html#section-senha');
+            }
+          });
+        }
+      } else {
+        console.log('[JCTermos] Clique simulado ignorado');
+      }
+    });
 
-      // Habilitar botões da pg2
-      [prevBtn, avancarBtn].forEach(btn => {
+    window.JCTermos.state.ready = false;
+    console.log('[JCTermos] Iniciando runTypingChain na página 1...');
+    try {
+      await runTypingChain();
+      window.JCTermos.state.ready = true;
+      console.log('[JCTermos] Inicialização concluída');
+    } catch (err) {
+      console.error('[JCTermos] Erro na datilografia:', err);
+      [pg1, pg2].forEach(pg => {
+        if (pg) {
+          pg.querySelectorAll('[data-typing="true"]').forEach(el => {
+            el.textContent = getText(el);
+            el.classList.add('typing-done');
+            el.style.opacity = '1';
+            el.style.visibility = 'visible';
+            el.style.display = 'block';
+          });
+        }
+      });
+      [nextBtn, prevBtn, avancarBtn].forEach(btn => {
         if (btn) {
           btn.disabled = false;
           btn.style.opacity = '1';
           btn.style.cursor = 'pointer';
         }
       });
-    });
+    }
 
-    // Botão "Voltar"
-    prevBtn?.addEventListener('click', () => {
-      if (prevBtn.disabled) return;
-      speechSynthesis.cancel();
-      window.location.href = '/';
+    console.log('[JCTermos] Elementos encontrados:', {
+      pg1: !!pg1, pg1Id: pg1?.id,
+      pg2: !!pg2, pg2Id: pg2?.id,
+      nextBtn: !!nextBtn, nextBtnAction: nextBtn?.dataset?.action,
+      prevBtn: !!prevBtn, prevBtnAction: prevBtn?.dataset?.action,
+      avancarBtn: !!avancarBtn, avancarBtnAction: avancarBtn?.dataset?.action
     });
-
-    // Botão "Aceito"
-    avancarBtn?.addEventListener('click', () => {
-      if (avancarBtn.disabled) return;
-      speechSynthesis.cancel();
-      playTransitionVideo(NEXT_SECTION_ID);
-    });
-
-    window.JCTermos.state.initialized = true;
-    console.log('[JCTermos] TERMOS 1 E 2 FUNCIONANDO 100%!');
   };
 
-  // ---------- FORÇA INICIALIZAÇÃO ----------
-  const forceInit = () => {
-    const root = document.getElementById(SECTION_ID);
-    if (root && !root.dataset.termosInitialized) {
-      console.log('[JCTermos] Forçando inicialização manual');
-      handler({ detail: { sectionId: SECTION_ID, node: root } });
+  // Método para limpar a seção
+  window.JCTermos.destroy = () => {
+    console.log('[JCTermos] Destruindo seção termos');
+    document.removeEventListener('sectionLoaded', handler);
+    document.removeEventListener('section:shown', handler);
+    const root = document.getElementById('section-termos');
+    if (root) {
+      root.dataset.termosInitialized = '';
+      root.querySelectorAll('[data-typing="true"]').forEach(el => {
+        el.classList.remove('typing-active', 'typing-done', 'lumen-typing');
+      });
+    }
+    window.JCTermos.state.ready = false;
+    window.JCTermos.state.listenerAdded = false;
+    window.JCTermos.state.HANDLER_COUNT = 0;
+    window.JCTermos.state.TYPING_COUNT = 0;
+    window.__typingLock = false; // Resetar o lock
+    if (typeof window.EffectCoordinator?.stopAll === 'function') {
+      window.EffectCoordinator.stopAll();
     }
   };
 
-  // ---------- LIMPEZA ----------
-  window.JCTermos.destroy = () => {
-    console.log('[JCTermos] Destruindo...');
-    document.removeEventListener('sectionLoaded', handler);
-    window.JCTermos.state = { ready: false, currentPage: 1, listenerAdded: false, typingInProgress: false, initialized: false };
-  };
-
-  // ---------- REGISTRO ----------
+  // Registrar handler
   if (!window.JCTermos.state.listenerAdded) {
-    document.addEventListener('sectionLoaded', handler, { once: true });
+    console.log('[JCTermos] Registrando listener para sectionLoaded');
+    window.addEventListener('sectionLoaded', handler, { once: true });
     window.JCTermos.state.listenerAdded = true;
   }
 
-  // Forçar inicialização com fallback
+  // Inicialização manual com tentativas repetidas
+  const bind = () => {
+    console.log('[JCTermos] Executando bind');
+    document.removeEventListener('sectionLoaded', handler);
+    document.removeEventListener('section:shown', handler);
+    document.addEventListener('sectionLoaded', handler, { passive: true, once: true });
+
+    const tryInitialize = (attempt = 1, maxAttempts = 10) => {
+      setTimeout(() => {
+        const visibleTermos = document.querySelector('#section-termos:not(.hidden)');
+        if (visibleTermos && !window.JCTermos.state.ready && !visibleTermos.dataset.termosInitialized) {
+          console.log('[JCTermos] Seção visível encontrada, disparando handler');
+          handler({ detail: { sectionId: 'section-termos', node: visibleTermos } });
+        } else if (document.getElementById('section-termos') && !window.JCTermos.state.ready && !document.getElementById('section-termos').dataset.termosInitialized) {
+          console.log('[JCTermos] Forçando inicialização manual (tentativa ' + attempt + ')');
+          handler({ detail: { sectionId: 'section-termos', node: document.getElementById('section-termos') } });
+        } else if (attempt < maxAttempts) {
+          console.log('[JCTermos] Nenhuma seção visível ou já inicializada, tentando novamente...');
+          tryInitialize(attempt + 1, maxAttempts);
+        } else {
+          console.error('[JCTermos] Falha ao inicializar após ' + maxAttempts + ' tentativas');
+        }
+      }, 1000 * attempt);
+    };
+
+    tryInitialize();
+  };
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(forceInit, 800);
-    }, { once: true });
+    console.log('[JCTermos] Aguardando DOMContentLoaded');
+    document.addEventListener('DOMContentLoaded', bind, { once: true });
   } else {
-    setTimeout(forceInit, 800);
+    console.log('[JCTermos] DOM já carregado, chamando bind');
+    bind();
   }
 })();
