@@ -1,7 +1,8 @@
 (function () {
   'use strict';
-
-  console.log('[JC.init] Initializing controller...');
+  // Preservar JC existente
+  window.JC = window.JC || {};
+  const existingJC = { ...window.JC };
 
   const sectionOrder = [
     'section-intro',
@@ -20,7 +21,6 @@
 
   async function applyTypingAndTTS(sectionId, root) {
     console.log('[JC.applyTypingAndTTS] Desativado para:', sectionId);
-    // Não aplicar efeitos, deixar para section-intro.js e section-termos.js
   }
 
   function attachButtonEvents(sectionId, root) {
@@ -106,12 +106,17 @@
 
   function init() {
     console.log('[JC.init] Controller initialized successfully');
+    // Mesclar com JC existente
     window.JC = {
+      ...existingJC,
+      init,
       show,
       setOrder,
       attachButtonEvents,
       handleSectionLogic
     };
+    // Iniciar com section-intro
+    window.JC.show('section-intro');
   }
 
   // Reagir automaticamente ao evento de exibição de seção
