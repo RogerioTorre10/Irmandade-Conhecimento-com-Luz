@@ -162,8 +162,8 @@ btnIniciar?.addEventListener('click', () => {
     video.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
     overlay.appendChild(video);
     document.body.appendChild(overlay);
-}
     let done = false;
+}
     const cleanup = () => {
       if (done) return;
       done = true;
