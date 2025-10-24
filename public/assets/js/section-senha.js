@@ -179,6 +179,7 @@
       console.log('[JCSenha] Foco removido de botão ativo');
     }
     if (section) {
+      console.log('[JCSenha] hideSection chamado por:', new Error().stack);
       section.classList.add('hidden');
       section.setAttribute('aria-hidden', 'true');
       section.setAttribute('inert', '');
