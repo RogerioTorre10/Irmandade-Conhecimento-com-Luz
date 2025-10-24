@@ -132,6 +132,7 @@
     if (document.getElementById('intro-transition-overlay')) return;
 
     console.log('[JCIntro] Iniciando transição de vídeo:', TRANSITION_SRC);
+    window.playTransitionVideo(TRANSITION_SRC, nextSectionId);
     const overlay = document.createElement('div');
     overlay.id = 'intro-transition-overlay';
     overlay.style.cssText = `
