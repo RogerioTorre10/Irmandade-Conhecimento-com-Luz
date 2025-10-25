@@ -176,7 +176,7 @@
     });
   }
 
- / Exportar JC
+ // Exportar JC
   window.JC = window.JC || {};
   window.JC.show = show;
   window.JC.setOrder = function (order) {
