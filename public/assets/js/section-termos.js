@@ -542,31 +542,42 @@
   }
 
   // Inicialização manual com tentativas repetidas
-  const bind = () => {
-    console.log('[JCTermos] Executando bind');
-    document.removeEventListener('section:shown', onShown);
-    document.addEventListener('section:shown', onShown, { passive: true, once: true });
+const bind = () => {
+  console.log('[JCTermos] Executando bind');
+  document.removeEventListener('section:shown', onShown);
+  document.addEventListener('section:shown', onShown, { passive: true, once: true });
 
-    const tryInitialize = (attempt = 1, maxAttempts = 10) => {
-      setTimeout(() => {
-        const visibleTermos = document.querySelector(`#${SECTION_ID}:not(.hidden)`);
-        if (visibleTermos && !window.JCTermos.state.ready && !visibleTermos.dataset.termosInitialized) {
-          console.log('[JCTermos] Seção visível encontrada, disparando handler');
-          onShown({ detail: { sectionId: SECTION_ID, node: visibleTermos } });
-        } else if (document.getElementById(SECTION_ID) && !window.JCTermos.state.ready && !document.getElementById(SECTION_ID).dataset.termosInitialized) {
-          console.log('[JCTermos] Forçando inicialização manual (tentativa ' + attempt + ')');
-          onShown({ detail: { sectionId: SECTION_ID, node: document.getElementById(SECTION_ID) } });
-        } else if (attempt < maxAttempts) {
-          console.log('[JCTermos] Nenhuma seção visível ou já inicializada, tentando novamente...');
-          tryInitialize(attempt + 1, maxAttempts);
-        } else {
-          console.error('[JCTermos] Falha ao inicializar após', maxAttempts, 'tentativas');
+  const tryInitialize = (attempt = 1, maxAttempts = 20) => { // Aumentado para 20
+    setTimeout(() => {
+      const visibleTermos = document.querySelector(`#${SECTION_ID}:not(.hidden)`);
+      if (visibleTermos && !window.JCTermos.state.ready && !visibleTermos.dataset.termosInitialized) {
+        console.log('[JCTermos] Seção visível encontrada, disparando handler');
+        onShown({ detail: { sectionId: SECTION_ID, node: visibleTermos } });
+      } else if (document.getElementById(SECTION_ID) && !window.JCTermos.state.ready && !document.getElementById(SECTION_ID).dataset.termosInitialized) {
+        console.log('[JCTermos] Forçando inicialização manual (tentativa ' + attempt + ')');
+        onShown({ detail: { sectionId: SECTION_ID, node: document.getElementById(SECTION_ID) } });
+      } else if (attempt < maxAttempts) {
+        console.log('[JCTermos] Nenhuma seção visível ou já inicializada, tentando novamente...');
+        tryInitialize(attempt + 1, maxAttempts);
+      } else {
+        console.error('[JCTermos] Falha ao inicializar após', maxAttempts, 'tentativas');
+        // Fallback: criar seção placeholder
+        const wrapper = document.getElementById('jornada-content-wrapper');
+        if (wrapper) {
+          const fallbackSection = document.createElement('section');
+          fallbackSection.id = SECTION_ID;
+          fallbackSection.classList.add('section');
+          fallbackSection.innerHTML = `<div>Placeholder para ${SECTION_ID}</div>`;
+          wrapper.innerHTML = '';
+          wrapper.appendChild(fallbackSection);
+          onShown({ detail: { sectionId: SECTION_ID, node: fallbackSection } });
         }
-      }, 100);
-    };
-
-    tryInitialize();
+      }
+    }, 50); // Reduzido para 50ms
   };
+
+  tryInitialize();
+};
 
   if (document.readyState === 'loading') {
     console.log('[JCTermos] Aguardando DOMContentLoaded');
