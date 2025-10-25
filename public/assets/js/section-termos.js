@@ -5,8 +5,8 @@
   const SECTION_ID = 'section-termos';
   const PREV_SECTION_ID = 'section-intro';
   const NEXT_SECTION_ID = 'section-senha';
-  const TRANSITION_SRC = '/assets/videos/filme-senha.mp4'; // Ajustado para caminho correto
-  const TRANSITION_TIMEOUT_MS = 8000;
+  const TRANSITION_SRC = '/assets/videos/filme-senha.mp4';
+  const TRANSITION_TIMEOUT_MS = 1000; // Reduzido para 1s
   const TTS_FALLBACK_DELAY_MS = 2000;
 
   // Namespace para isolar a seção
@@ -67,7 +67,7 @@
 
   function getText(el) {
     const text = (el?.dataset?.text ?? el?.textContent ?? '').trim();
-    return text || 'Placeholder de texto'; // Fallback para texto vazio
+    return text || 'Placeholder de texto';
   }
 
   function normalizeParagraph(el) {
@@ -89,9 +89,7 @@
       el.textContent = 'Placeholder de texto';
       el.classList.add('typing-done');
       el.classList.remove('typing-active', 'hidden');
-      el.style.opacity = '1';
-      el.style.visibility = 'visible';
-      el.style.display = 'block';
+      el.style.cssText = 'opacity: 1 !important; visibility: visible !important; display: block !important;';
       return;
     }
 
@@ -101,10 +99,7 @@
 
     el.classList.add('typing-active', 'lumen-typing');
     el.classList.remove('typing-done', 'hidden');
-    el.style.color = '#fff';
-    el.style.opacity = '1';
-    el.style.display = 'block';
-    el.style.visibility = 'visible';
+    el.style.cssText = 'color: #fff; opacity: 1 !important; visibility: visible !important; display: block !important;';
 
     let usedFallback = false;
 
@@ -145,9 +140,7 @@
 
     el.classList.add('typing-done');
     el.classList.remove('typing-active', 'hidden');
-    el.style.opacity = '1';
-    el.style.visibility = 'visible';
-    el.style.display = 'block';
+    el.style.cssText = 'opacity: 1 !important; visibility: visible !important; display: block !important;';
     window.G.__typingLock = prevLock;
 
     if (speak && typeof window.EffectCoordinator?.speak === 'function' && !el.dataset.spoken) {
@@ -189,7 +182,7 @@
     const video = document.getElementById(videoElementId);
     if (!video) {
       console.log('[JCTermos] Vídeo de transição não encontrado, usando timeout padrão');
-      return sleep(TRANSITION_TIMEOUT_MS);
+      return sleep(1000); // Reduzido para 1s
     }
 
     return new Promise((resolve) => {
@@ -197,7 +190,7 @@
         console.log('[JCTermos] Vídeo terminou');
         resolve();
       }, { once: true });
-      setTimeout(resolve, TRANSITION_TIMEOUT_MS);
+      setTimeout(resolve, 1000); // Reduzido para 1s
     });
   }
 
@@ -215,7 +208,7 @@
           console.warn('[JCTermos] Fallback navigation to:', nextSectionId);
           window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
         }
-      }, 2000);
+      }, 1000); // Reduzido para 1s
     }
   }
 
@@ -248,22 +241,18 @@
     seq.forEach(normalizeParagraph);
 
     await waitForVideoEnd();
-    await sleep(1000);
+    await sleep(200); // Reduzido para 0.2s
 
     await waitForTypingBridge();
 
     if (!seq.length) {
       console.warn('[JCTermos] Nenhum elemento com data-typing="true" encontrado na página atual');
       currentPg.classList.remove('hidden');
-      currentPg.style.opacity = '1';
-      currentPg.style.visibility = 'visible';
-      currentPg.style.display = 'block';
+      currentPg.style.cssText = 'opacity: 1 !important; visibility: visible !important; display: block !important;';
       [nextBtn, prevBtn, avancarBtn].forEach(btn => {
         if (btn) {
           btn.disabled = false;
-          btn.style.opacity = '1';
-          btn.style.cursor = 'pointer';
-          btn.style.visibility = 'visible';
+          btn.style.cssText = 'opacity: 1 !important; visibility: visible !important; display: inline-block !important;';
         }
       });
       window.JCTermos.state.typingInProgress = false;
@@ -278,16 +267,12 @@
     [nextBtn, prevBtn, avancarBtn].forEach(btn => {
       if (btn) {
         btn.disabled = false;
-        btn.style.opacity = '1';
-        btn.style.cursor = 'pointer';
-        btn.style.visibility = 'visible';
+        btn.style.cssText = 'opacity: 1 !important; visibility: visible !important; display: inline-block !important;';
       }
     });
 
     currentPg.classList.remove('hidden');
-    currentPg.style.opacity = '1';
-    currentPg.style.visibility = 'visible';
-    currentPg.style.display = 'block';
+    currentPg.style.cssText = 'opacity: 1 !important; visibility: visible !important; display: block !important;';
 
     window.JCTermos.state.typingInProgress = false;
     window.JCTermos.state.initialized = true;
@@ -318,12 +303,6 @@
     root.dataset.termosInitialized = 'true';
     root.classList.remove('hidden');
     root.setAttribute('aria-hidden', 'false');
-    root.style.display = 'block';
-    root.style.opacity = '1';
-    root.style.visibility = 'visible';
-    root.style.zIndex = '2';
-    root.style.transition = 'opacity 0.3s ease';
-
     root.style.cssText = `
       background: transparent;
       padding: 24px;
@@ -335,23 +314,14 @@
       box-shadow: none;
       border: none;
       display: block;
-      opacity: 1;
-      visibility: visible;
+      opacity: 1 !important;
+      visibility: visible !important;
       position: relative;
       z-index: 2;
       overflow-y: auto;
       min-height: calc(100vh - 100px);
       height: auto;
       box-sizing: border-box;
-      @media (max-width: 768px) {
-        padding: 16px;
-        margin: 8px auto;
-        font-size: 14px;
-      }
-      @media (max-width: 480px) {
-        padding: 12px;
-        font-size: 12px;
-      }
     `;
 
     let pg1, pg2, nextBtn, prevBtn, avancarBtn;
@@ -392,10 +362,7 @@
     [pg1, pg2].forEach((el, i) => {
       if (el) {
         el.classList.remove('hidden');
-        el.style.display = i === 0 ? 'block' : 'none';
-        el.style.opacity = '1';
-        el.style.visibility = 'visible';
-        el.style.minHeight = '60vh';
+        el.style.cssText = `display: ${i === 0 ? 'block' : 'none'} !important; opacity: 1 !important; visibility: visible !important; min-height: 60vh;`;
         console.log('[JCTermos] Página inicializada:', el.id);
       }
     });
@@ -404,9 +371,7 @@
       if (pg) {
         pg.querySelectorAll('[data-typing="true"]').forEach(el => {
           normalizeParagraph(el);
-          el.style.display = 'block';
-          el.style.opacity = '1';
-          el.style.visibility = 'visible';
+          el.style.cssText = 'opacity: 1 !important; visibility: visible !important; display: block !important;';
           console.log('[JCTermos] Texto inicializado:', el.id);
         });
       }
@@ -416,13 +381,7 @@
       if (btn) {
         btn.classList.add('btn', 'btn-primary', 'btn-stone');
         btn.disabled = true;
-        btn.style.padding = '12px 20px';
-        btn.style.fontSize = '16px';
-        btn.style.opacity = '0.5';
-        btn.style.cursor = 'not-allowed';
-        btn.style.display = 'inline-block';
-        btn.style.margin = '10px';
-        btn.style.visibility = 'visible';
+        btn.style.cssText = 'padding: 12px 20px; font-size: 16px; opacity: 0.5; cursor: not-allowed; display: inline-block !important; margin: 10px; visibility: visible !important;';
         console.log('[JCTermos] Botão inicializado:', btn.className, btn.textContent);
       }
     });
@@ -450,10 +409,8 @@
     once(nextBtn, 'click', async () => {
       speechSynthesis.cancel();
       if (window.JCTermos.state.currentPage === 1 && pg2) {
-        pg1.style.display = 'none';
-        pg2.style.display = 'block';
-        pg2.style.opacity = '1';
-        pg2.style.visibility = 'visible';
+        pg1.style.cssText = 'display: none !important;';
+        pg2.style.cssText = 'display: block !important; opacity: 1 !important; visibility: visible !important; min-height: 60vh;';
         avancarBtn.textContent = 'Aceito e quero continuar';
         window.JCTermos.state.currentPage = 2;
         await runTypingChain();
@@ -506,18 +463,14 @@
             el.textContent = getText(el);
             el.classList.add('typing-done');
             el.classList.remove('hidden');
-            el.style.opacity = '1';
-            el.style.visibility = 'visible';
-            el.style.display = 'block';
+            el.style.cssText = 'opacity: 1 !important; visibility: visible !important; display: block !important;';
           });
         }
       });
       [nextBtn, prevBtn, avancarBtn].forEach(btn => {
         if (btn) {
           btn.disabled = false;
-          btn.style.opacity = '1';
-          btn.style.cursor = 'pointer';
-          btn.style.visibility = 'visible';
+          btn.style.cssText = 'opacity: 1 !important; visibility: visible !important; display: inline-block !important;';
         }
       });
     }
@@ -525,6 +478,8 @@
     console.log('[JCTermos] Elementos encontrados:', {
       pg1: !!pg1, pg1Id: pg1?.id,
       pg2: !!pg2, pg2Id: pg2?.id,
+      nextBtn: !!nextBtn, nextBtnAction: nextBtn?.dataset?.action,
+      prevBtn: !!pg2, pg2Id: pg2?.id,
       nextBtn: !!nextBtn, nextBtnAction: nextBtn?.dataset?.action,
       prevBtn: !!prevBtn, prevBtnAction: prevBtn?.dataset?.action,
       avancarBtn: !!avancarBtn, avancarBtnAction: avancarBtn?.dataset?.action
