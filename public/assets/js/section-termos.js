@@ -6,7 +6,7 @@
   const PREV_SECTION_ID = 'section-intro';
   const NEXT_SECTION_ID = 'section-senha';
   const TRANSITION_SRC = '/assets/videos/filme-senha.mp4';
-  const TRANSITION_TIMEOUT_MS = 500; // Reduzido para 0.5s
+  const TRANSITION_TIMEOUT_MS = 500; // Mantido 0.5s
   const TTS_FALLBACK_DELAY_MS = 2000;
 
   // Namespace para isolar a seção
@@ -67,11 +67,15 @@
 
   function getText(el) {
     const text = (el?.dataset?.text ?? el?.textContent ?? '').trim();
+    console.log('[JCTermos] getText:', el?.id, 'Text:', text);
     return text || 'Placeholder de texto';
   }
 
   function normalizeParagraph(el) {
-    if (!el) return false;
+    if (!el) {
+      console.warn('[JCTermos] Elemento nulo em normalizeParagraph');
+      return false;
+    }
     const source = getText(el);
     el.dataset.text = source;
     if (!el.classList.contains('typing-done')) {
@@ -82,16 +86,21 @@
   }
 
   async function typeOnce(el, { speed = 20, speak = true } = {}) {
-    if (!el) return;
+    if (!el) {
+      console.warn('[JCTermos] Elemento nulo em typeOnce');
+      return;
+    }
     const text = getText(el);
     if (!text) {
       console.warn('[JCTermos] Texto vazio para elemento:', el?.id);
       el.textContent = 'Placeholder de texto';
       el.classList.add('typing-done');
       el.classList.remove('typing-active', 'hidden');
-      el.style.cssText = 'opacity: 1 !important; visibility: visible !important; display: block !important;';
+      el.style.cssText = 'opacity: 1 !important; visibility: visible !important; display: block !important; color: #fff !important;';
       return;
     }
+
+    console.log('[JCTermos] Iniciando datilografia para elemento:', el?.id, 'Texto:', text);
 
     window.G = window.G || {};
     const prevLock = !!window.G.__typingLock;
@@ -99,7 +108,7 @@
 
     el.classList.add('typing-active', 'lumen-typing');
     el.classList.remove('typing-done', 'hidden');
-    el.style.cssText = 'color: #fff; opacity: 1 !important; visibility: visible !important; display: block !important;';
+    el.style.cssText = 'color: #fff !important; opacity: 1 !important; visibility: visible !important; display: block !important;';
 
     let usedFallback = false;
 
@@ -140,7 +149,7 @@
 
     el.classList.add('typing-done');
     el.classList.remove('typing-active', 'hidden');
-    el.style.cssText = 'opacity: 1 !important; visibility: visible !important; display: block !important;';
+    el.style.cssText = 'opacity: 1 !important; visibility: visible !important; display: block !important; color: #fff !important;';
     window.G.__typingLock = prevLock;
 
     if (speak && typeof window.EffectCoordinator?.speak === 'function' && !el.dataset.spoken) {
@@ -182,7 +191,7 @@
     const video = document.getElementById(videoElementId);
     if (!video) {
       console.log('[JCTermos] Vídeo de transição não encontrado, usando timeout padrão');
-      return sleep(500); // Reduzido para 0.5s
+      return sleep(500);
     }
 
     return new Promise((resolve) => {
@@ -190,7 +199,7 @@
         console.log('[JCTermos] Vídeo terminou');
         resolve();
       }, { once: true });
-      setTimeout(resolve, 500); // Reduzido para 0.5s
+      setTimeout(resolve, 500);
     });
   }
 
@@ -208,7 +217,7 @@
           console.warn('[JCTermos] Fallback navigation to:', nextSectionId);
           window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
         }
-      }, 500); // Reduzido para 0.5s
+      }, 500);
     }
   }
 
@@ -227,12 +236,21 @@
     console.log('[JCTermos] Iniciando sequência de datilografia');
 
     const { pg1, pg2, nextBtn, prevBtn, avancarBtn } = pickElements(root);
+    if (!pg1 || !pg2) {
+      console.error('[JCTermos] Páginas #termos-pg1 ou #termos-pg2 não encontradas');
+      window.JCTermos.state.typingInProgress = false;
+      window.JCTermos.state.initialized = true;
+      return;
+    }
+
     const currentPg = window.JCTermos.state.currentPage === 1 ? pg1 : pg2;
     const seq = Array.from(currentPg.querySelectorAll('[data-typing="true"]:not(.typing-done)')).sort((a, b) => {
       const aRect = a.getBoundingClientRect();
       const bRect = b.getBoundingClientRect();
       return aRect.left - bRect.left || aRect.top - bRect.top;
     });
+
+    console.log('[JCTermos] Elementos para datilografia:', seq.length, seq.map(el => el.id));
 
     nextBtn?.setAttribute('disabled', 'true');
     prevBtn?.setAttribute('disabled', 'true');
@@ -241,7 +259,7 @@
     seq.forEach(normalizeParagraph);
 
     await waitForVideoEnd();
-    await sleep(100); // Reduzido para 0.1s
+    await sleep(100);
 
     await waitForTypingBridge();
 
@@ -261,7 +279,15 @@
     }
 
     for (const el of seq) {
-      await typeOnce(el, { speed: 20, speak: true });
+      try {
+        await typeOnce(el, { speed: 20, speak: true });
+      } catch (err) {
+        console.error('[JCTermos] Erro durante datilografia do elemento:', el?.id, err);
+        el.textContent = getText(el);
+        el.classList.add('typing-done');
+        el.classList.remove('typing-active', 'hidden');
+        el.style.cssText = 'opacity: 1 !important; visibility: visible !important; display: block !important;';
+      }
     }
 
     [nextBtn, prevBtn, avancarBtn].forEach(btn => {
@@ -289,7 +315,9 @@
 
     if (window.JCTermos.state.ready || node?.dataset.termosInitialized === 'true') {
       console.log('[JCTermos] Já inicializado, ignorando...');
-      return;
+      // Forçar reinicialização para evitar skipping
+      window.JCTermos.state.ready = false;
+      node.dataset.termosInitialized = '';
     }
 
     let root = node || document.getElementById(SECTION_ID);
@@ -371,7 +399,7 @@
       if (pg) {
         pg.querySelectorAll('[data-typing="true"]').forEach(el => {
           normalizeParagraph(el);
-          el.style.cssText = 'opacity: 1 !important; visibility: visible !important; display: block !important;';
+          el.style.cssText = 'opacity: 1 !important; visibility: visible !important; display: block !important; color: #fff !important;';
           console.log('[JCTermos] Texto inicializado:', el.id);
         });
       }
