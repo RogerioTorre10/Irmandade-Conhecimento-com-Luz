@@ -1,26 +1,9 @@
 (function () {
   'use strict';
 
-  const log = (...args) => console.log('[carregarEtapa]', ...args); // Restaurado
+  const log = (...args) => console.log('[carregarEtapa]', ...args);
 
-  // Mapeamento de URLs para cada etapa
-  const etapas = {
-    intro: '/html/section-intro.html',
-    filme1: '/assets/img/filme-pergaminho-ao-vento.mp4',
-    termos: '/html/section-termos.html',
-    filme2: '/assets/img/filme-senha.mp4',
-    senha: '/html/section-senha.html',
-    filme3: '/assets/img/filme-senha-confirmada.mp4',
-    guia: '/html/section-guia.html',
-    filme4: '/assets/img/conhecimento-com-luz-jardim.mp4',
-    selfie: '/html/section-selfie.html',
-    filme5: '/assets/img/filme-0-ao-encontro-da-jornada.mp4',
-    perguntas: '/html/section-perguntas.html',
-    filme6: '/assets/img/filme-5-fim-da-jornada.mp4',
-    final: '/html/section-final.html'
-  };
-
-    async function carregarEtapa(sectionId) {
+  async function carregarEtapa(sectionId) {
     log('Starting load for', sectionId, 'ID:', `section-${sectionId}`);
     const sectionSelector = `#section-${sectionId}`;
     let section = document.querySelector(sectionSelector);
@@ -48,6 +31,29 @@
       const html = await response.text();
       log('Fetched HTML:', html.slice(0, 120) + '...');
 
+      if (!html.includes(`id="section-${sectionId}"`)) {
+        console.warn('[carregarEtapa] HTML does not contain expected section:', sectionId);
+        const fallbackSection = document.createElement('section');
+        fallbackSection.id = `section-${sectionId}`;
+        fallbackSection.classList.add('section');
+        fallbackSection.innerHTML = `<div>Placeholder para ${sectionId}</div>`;
+        section = fallbackSection;
+      } else {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        section = tempDiv.querySelector(sectionSelector) || tempDiv.querySelector('section');
+        if (!section) {
+          console.warn('[carregarEtapa] Section #' + sectionId + ' not found in HTML. Creating fallback.');
+          section = document.createElement('section');
+          section.id = `section-${sectionId}`;
+          section.innerHTML = `<div>Placeholder para ${sectionId}</div>`;
+        }
+      }
+
+      section.id = `section-${sectionId}`;
+      section.classList.add('section');
+      section.dataset.initialized = 'true';
+
       const criticalElements = {
         [`#${sectionId}-pg1`]: false,
         [`#${sectionId}-pg2`]: sectionId === 'termos',
@@ -56,10 +62,8 @@
         '.avancarBtn[data-action="avancar"]': sectionId === 'termos'
       };
 
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = html;
       Object.keys(criticalElements).forEach(selector => {
-        criticalElements[selector] = !!tempDiv.querySelector(selector);
+        criticalElements[selector] = !!section.querySelector(selector);
         log('Critical element', selector, criticalElements[selector] ? 'FOUND' : 'NOT FOUND');
       });
       log('Critical elements check:', criticalElements);
@@ -67,8 +71,7 @@
       const wrapper = document.getElementById('jornada-content-wrapper');
       if (!wrapper) throw new Error('jornada-content-wrapper not found');
       wrapper.innerHTML = '';
-      wrapper.appendChild(tempDiv.firstElementChild);
-      section = wrapper.querySelector(sectionSelector);
+      wrapper.appendChild(section);
       log('Injected into wrapper:', section?.outerHTML.slice(0, 120) + '...');
       log('Section', sectionSelector, 'present:', !!section);
       log('Critical elements present:', criticalElements);
@@ -81,7 +84,21 @@
       });
     } catch (e) {
       console.error('[carregarEtapa] Error loading section:', sectionId, e);
-      return null;
+      const fallbackSection = document.createElement('section');
+      fallbackSection.id = `section-${sectionId}`;
+      fallbackSection.classList.add('section');
+      fallbackSection.innerHTML = `<div>Erro ao carregar ${sectionId}. Tente novamente.</div>`;
+      const wrapper = document.getElementById('jornada-content-wrapper');
+      if (wrapper) {
+        wrapper.innerHTML = '';
+        wrapper.appendChild(fallbackSection);
+      }
+      return new Promise(resolve => {
+        requestAnimationFrame(() => {
+          document.dispatchEvent(new CustomEvent('sectionLoaded', { detail: { sectionId, name: sectionId, node: fallbackSection } }));
+          resolve(fallbackSection);
+        });
+      });
     }
   }
 
