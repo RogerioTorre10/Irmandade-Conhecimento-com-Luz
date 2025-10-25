@@ -31,23 +31,16 @@
       const html = await response.text();
       log('Fetched HTML:', html.slice(0, 120) + '...');
 
-      if (!html.includes(`id="section-${sectionId}"`)) {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html;
+      section = tempDiv.querySelector(sectionSelector) || tempDiv.querySelector('section');
+
+      if (!section || !html.includes(`id="section-${sectionId}"`)) {
         console.warn('[carregarEtapa] HTML does not contain expected section:', sectionId);
-        const fallbackSection = document.createElement('section');
-        fallbackSection.id = `section-${sectionId}`;
-        fallbackSection.classList.add('section');
-        fallbackSection.innerHTML = `<div>Placeholder para ${sectionId}</div>`;
-        section = fallbackSection;
-      } else {
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
-        section = tempDiv.querySelector(sectionSelector) || tempDiv.querySelector('section');
-        if (!section) {
-          console.warn('[carregarEtapa] Section #' + sectionId + ' not found in HTML. Creating fallback.');
-          section = document.createElement('section');
-          section.id = `section-${sectionId}`;
-          section.innerHTML = `<div>Placeholder para ${sectionId}</div>`;
-        }
+        section = document.createElement('section');
+        section.id = `section-${sectionId}`;
+        section.classList.add('section', 'pergaminho', 'pergaminho-v');
+        section.innerHTML = `<div id="${sectionId}-pg1" data-typing="true">Placeholder para ${sectionId}</div>`;
       }
 
       section.id = `section-${sectionId}`;
@@ -86,8 +79,8 @@
       console.error('[carregarEtapa] Error loading section:', sectionId, e);
       const fallbackSection = document.createElement('section');
       fallbackSection.id = `section-${sectionId}`;
-      fallbackSection.classList.add('section');
-      fallbackSection.innerHTML = `<div>Erro ao carregar ${sectionId}. Tente novamente.</div>`;
+      fallbackSection.classList.add('section', 'pergaminho', 'pergaminho-v');
+      fallbackSection.innerHTML = `<div id="${sectionId}-pg1" data-typing="true">Erro ao carregar ${sectionId}. Tente novamente.</div>`;
       const wrapper = document.getElementById('jornada-content-wrapper');
       if (wrapper) {
         wrapper.innerHTML = '';
