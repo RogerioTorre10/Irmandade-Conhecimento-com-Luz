@@ -26,8 +26,6 @@
       video.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
       fallback = document.createElement('div');
       fallback.id = 'videoFallback';
-      fallback.classList.add('hidden');
-      fallback.style.display = 'none';
       fallback.style.cssText = 'width: 100%; height: 100%; background: #000; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px;';
       fallback.textContent = 'Carregando transição...';
       const skipButton = document.createElement('button');
@@ -85,7 +83,7 @@
         fallback.classList.remove('hidden');
         video.classList.add('hidden');
         window.toast?.('Erro ao reproduzir vídeo de transição. Usando fallback.', 'error');
-        setTimeout(cleanup, 2000);
+        setTimeout(cleanup, 1000); // Reduzido para 1s
       });
     }, { once: true });
 
@@ -104,13 +102,13 @@
           fallback.classList.remove('hidden');
           video.classList.add('hidden');
           window.toast?.('Erro ao carregar vídeo alternativo. Usando fallback.', 'error');
-          setTimeout(cleanup, 2000);
+          setTimeout(cleanup, 1000); // Reduzido para 1s
         });
       } else {
         fallback.classList.remove('hidden');
         video.classList.add('hidden');
         window.toast?.('Erro ao carregar vídeo de transição. Usando fallback.', 'error');
-        setTimeout(cleanup, 2000);
+        setTimeout(cleanup, 1000); // Reduzido para 1s
       }
     }, { once: true });
 
@@ -127,7 +125,7 @@
           video.src = fallbackSrc;
         } else {
           window.toast?.('Vídeo de transição não encontrado.', 'error');
-          setTimeout(cleanup, 2000);
+          setTimeout(cleanup, 1000); // Reduzido para 1s
         }
       });
 
