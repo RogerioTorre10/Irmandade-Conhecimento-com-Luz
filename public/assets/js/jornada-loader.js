@@ -10,15 +10,18 @@
   // jornada-loader.js: Definição de URLs para seções
  const etapas = {
     intro:    '/html/section-intro.html',
-    termos:   '/html/section-termos.html',
-    senha:    '/html/section-senha.html',
-    filme1:    '/assets/img/conhecimento-com-luz-jardim.mp4',
+    filme1:    '/assets/img/filme-pergaminho-ao-vento.mp4',
+    termos1:   '/html/section-termos1.html',
+    termos2:   '/html/section-termos2.html',
+    filme2:    '/assets/img/filme-senha.mp4',
+    senha:    '/html/section-senha.html',
+    filme3:    '/assets/img/filme-senha-confirmada.mp4',
     guia:     '/html/section-guia.html',
-    filme2:    '/assets/img/conhecimento-com-luz-jardim.mp4',
+    filme4:    '/assets/img/conhecimento-com-luz-jardim.mp4',
     selfie:   '/html/section-selfie.html',
-    filme3:    '/assets/img/filme-0-ao-encontro-da-jornada.mp4',
+    filme5:    '/assets/img/filme-0-ao-encontro-da-jornada.mp4',
     perguntas:'/html/section-perguntas.html', 
-    filme4:    '/assets/img/filme-5-fim-da-jornada.mp4',
+    filme6:    '/assets/img/filme-5-fim-da-jornada.mp4',
     final:    '/html/section-final.html'
     };
 
