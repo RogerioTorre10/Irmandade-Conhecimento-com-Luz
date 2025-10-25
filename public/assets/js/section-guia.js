@@ -1,13 +1,10 @@
 (function () {
   'use strict';
 
-  const MOD = 'section-guia.js';
+ const MOD = 'section-guia.js';
   const SECTION_ID = 'section-guia';
-  const PREV_SECTION_ID = 'section-senha';
   const NEXT_SECTION_ID = 'section-selfie';
-  const TRANSITION_SRC = '/assets/video/filme-eu-na-irmandade.mp4';
-  const TRANSITION_TIMEOUT_MS = 8000;
-  const TTS_FALLBACK_DELAY_MS = 2000;
+  const VIDEO_SRC = '/assets/video/filme-eu-na-irmandade.mp4';
 
   // Evitar múltiplas inicializações
   if (window.JCGuia?.__bound) {
@@ -147,23 +144,23 @@
     });
   }
 
-  function playTransitionVideo(nextSectionId) {
-    console.log('[JCGuia] Iniciando transição de vídeo:', TRANSITION_SRC);
-    if (typeof window.playTransitionVideo === 'function') {
-      window.playTransitionVideo(TRANSITION_SRC, nextSectionId);
-    } else {
-      console.warn('[JCGuia] window.playTransitionVideo não encontrado, usando fallback');
-      setTimeout(() => {
-        console.log('[JCGuia] Fallback: navegando para:', nextSectionId);
-        if (typeof window.JC?.show === 'function') {
-          window.JC.show(nextSectionId);
-        } else {
-          console.warn('[JCGuia] Fallback navigation to:', nextSectionId);
-          window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
-        }
-      }, 2000);
-    }
+ function playTransitionVideo(nextSectionId) {
+  console.log('[JCGuia] Iniciando transição de vídeo:', VIDEO_SRC);
+  if (typeof window.playTransitionVideo === 'function') {
+    window.playTransitionVideo(VIDEO_SRC, nextSectionId);
+  } else {
+    console.warn('[JCGuia] window.playTransitionVideo não encontrado, usando fallback');
+    setTimeout(() => {
+      console.log('[JCGuia] Fallback: navegando para:', nextSectionId);
+      if (typeof window.JC?.show === 'function') {
+        window.JC.show(nextSectionId);
+      } else {
+        console.warn('[JCGuia] Fallback navigation to:', nextSectionId);
+        window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
+      }
+    }, 2000);
   }
+}
 
   function ensureSectionVisible(root, sectionId) {
     if (!root) return;
