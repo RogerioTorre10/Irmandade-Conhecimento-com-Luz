@@ -1,13 +1,11 @@
 (function () {
   const SECTION_ID = 'section-termos2';
   const NEXT_SECTION_ID = 'section-senha';
-  const VIDEO_SRC = '/assets/img/filme-senha.mp4';
-
+  const VIDEO_SRC = '/assets/videos/filme-senha.mp4';
   const state = { initialized: false };
-
   const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-  async function typeText(el, speed = 20) {
+  async function typeText(el, speed = 40) {
     const text = el.dataset.text?.trim() || el.textContent?.trim() || '';
     if (!text) return;
     el.textContent = '';
@@ -20,15 +18,16 @@
     el.classList.add('typing-done');
     if (window.EffectCoordinator?.speak) {
       try {
-        window.EffectCoordinator.speak(text, { lang: 'pt-BR', rate: 1.1, pitch: 1.0 });
-        await sleep(2000);
+        await window.EffectCoordinator.speak(text, { lang: 'pt-BR', rate: 1.1 });
+        await sleep(1000);
       } catch {}
     }
   }
 
   async function runTyping(root) {
-    const elements = root.querySelectorAll('[data-typing="true"]');
-    const btn = root.querySelector('[data-action="avancar"]');
+    const pg2 = root.querySelector('#termos-pg2');
+    const elements = pg2?.querySelectorAll('[data-typing="true"]') || [];
+    const btn = root.querySelector('[data-action="avancar"]') || root.querySelector('.avancarBtn');
     btn?.setAttribute('disabled', 'true');
     btn?.style.setProperty('opacity', '0');
     for (const el of elements) await typeText(el);
@@ -46,10 +45,7 @@
 
   async function init(root) {
     if (state.initialized) return;
-    root.classList.remove('hidden');
-    root.setAttribute('aria-hidden', 'false');
-    root.style.display = 'block';
-    const btn = root.querySelector('[data-action="avancar"]');
+    const btn = root.querySelector('[data-action="avancar"]') || root.querySelector('.avancarBtn');
     btn?.addEventListener('click', () => {
       speechSynthesis.cancel();
       playVideo(NEXT_SECTION_ID);
@@ -60,7 +56,7 @@
 
   document.addEventListener('section:shown', evt => {
     if (evt.detail?.sectionId !== SECTION_ID) return;
-    const root = evt.detail.node || document.getElementById(SECTION_ID);
+    const root = evt.detail.node || document.getElementById('section-termos');
     if (root) init(root);
   });
 })();
