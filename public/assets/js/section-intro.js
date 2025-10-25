@@ -4,7 +4,6 @@
   const SECTION_ID = 'section-intro';
   const NEXT_SECTION_ID = 'section-termos1';
   const VIDEO_SRC = '/assets/videos/filme-pergaminho-ao-vento.mp4';
-
   const state = { initialized: false };
   const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -21,7 +20,7 @@
     el.classList.add('typing-done');
     if (window.EffectCoordinator?.speak) {
       try {
-        window.EffectCoordinator.speak(text, { lang: 'pt-BR', rate: 1.1 });
+        await window.EffectCoordinator.speak(text, { lang: 'pt-BR', rate: 1.1 });
         await sleep(1000);
       } catch {}
     }
@@ -62,3 +61,4 @@
     if (root) init(root);
   });
 })();
+
