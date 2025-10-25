@@ -93,7 +93,13 @@ function attachButtonEvents(sectionId, root) {
   }
 
   async function show(sectionId) {
-      console.log('[JC.show] Starting display for:', sectionId, new Error().stack);    try {
+  if (currentSection === sectionId) {
+    console.log('[JC.show] Seção já exibida, ignorando:', sectionId);
+    return;
+  }
+  currentSection = sectionId;
+  console.log('[JC.show] Starting display for:', sectionId, new Error().stack);
+    try {
       const cleanId = sectionId.replace(/^section-/, '');
       console.log('[JC.show] Starting carregarEtapa for:', cleanId);
       const section = await window.carregarEtapa(cleanId);
