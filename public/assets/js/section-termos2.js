@@ -1,4 +1,6 @@
 (function () {
+  'use strict';
+  
   const SECTION_ID = 'section-termos2';
   const NEXT_SECTION_ID = 'section-senha';
   const VIDEO_SRC = '/assets/videos/filme-senha.mp4';
