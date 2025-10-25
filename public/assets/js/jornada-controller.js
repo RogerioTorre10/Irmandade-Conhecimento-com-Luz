@@ -26,7 +26,7 @@
     // Não aplicar efeitos, deixar para section-intro.js e section-termos.js
   }
 
-function debounce(func, wait) {
+  function debounce(func, wait) {
   let timeout;
   return function (...args) {
     clearTimeout(timeout);
@@ -34,7 +34,7 @@ function debounce(func, wait) {
   };
 }
 
-function attachButtonEvents(sectionId, root) {
+  function attachButtonEvents(sectionId, root) {
   console.log('[JC.attachButtonEvents] Attaching buttons for:', sectionId);
   const buttons = root.querySelectorAll('[data-action]');
   console.log('[JC.attachButtonEvents] Buttons found:', buttons.length, Array.from(buttons).map(btn => btn.id || btn.dataset.action));
@@ -92,7 +92,7 @@ function attachButtonEvents(sectionId, root) {
     }
   }
 
-  async function show(sectionId) {
+  function show(sectionId) {
   if (currentSection === sectionId) {
     console.log('[JC.show] Seção já exibida, ignorando:', sectionId);
     return;
