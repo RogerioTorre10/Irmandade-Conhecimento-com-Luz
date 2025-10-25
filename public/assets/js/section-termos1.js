@@ -1,4 +1,6 @@
 (function () {
+  'use strict'; 
+  
   const SECTION_ID = 'section-termos1';
   const NEXT_SECTION_ID = 'section-termos2';
   const state = { initialized: false };
