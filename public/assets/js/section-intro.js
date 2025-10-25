@@ -20,7 +20,7 @@
     if (window.EffectCoordinator?.speak) {
       try {
         window.EffectCoordinator.speak(text, { lang: 'pt-BR', rate: 1.1 });
-        await sleep(2000);
+        await sleep(1000);
       } catch {}
     }
   }
