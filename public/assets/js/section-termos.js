@@ -6,7 +6,7 @@
   const PREV_SECTION_ID = 'section-intro';
   const NEXT_SECTION_ID = 'section-senha';
   const TRANSITION_SRC = '/assets/videos/filme-senha.mp4';
-  const TRANSITION_TIMEOUT_MS = 1000; // Reduzido para 1s
+  const TRANSITION_TIMEOUT_MS = 500; // Reduzido para 0.5s
   const TTS_FALLBACK_DELAY_MS = 2000;
 
   // Namespace para isolar a seção
@@ -182,7 +182,7 @@
     const video = document.getElementById(videoElementId);
     if (!video) {
       console.log('[JCTermos] Vídeo de transição não encontrado, usando timeout padrão');
-      return sleep(1000); // Reduzido para 1s
+      return sleep(500); // Reduzido para 0.5s
     }
 
     return new Promise((resolve) => {
@@ -190,7 +190,7 @@
         console.log('[JCTermos] Vídeo terminou');
         resolve();
       }, { once: true });
-      setTimeout(resolve, 1000); // Reduzido para 1s
+      setTimeout(resolve, 500); // Reduzido para 0.5s
     });
   }
 
@@ -208,7 +208,7 @@
           console.warn('[JCTermos] Fallback navigation to:', nextSectionId);
           window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
         }
-      }, 1000); // Reduzido para 1s
+      }, 500); // Reduzido para 0.5s
     }
   }
 
@@ -241,7 +241,7 @@
     seq.forEach(normalizeParagraph);
 
     await waitForVideoEnd();
-    await sleep(200); // Reduzido para 0.2s
+    await sleep(100); // Reduzido para 0.1s
 
     await waitForTypingBridge();
 
@@ -478,8 +478,6 @@
     console.log('[JCTermos] Elementos encontrados:', {
       pg1: !!pg1, pg1Id: pg1?.id,
       pg2: !!pg2, pg2Id: pg2?.id,
-      nextBtn: !!nextBtn, nextBtnAction: nextBtn?.dataset?.action,
-      prevBtn: !!pg2, pg2Id: pg2?.id,
       nextBtn: !!nextBtn, nextBtnAction: nextBtn?.dataset?.action,
       prevBtn: !!prevBtn, prevBtnAction: prevBtn?.dataset?.action,
       avancarBtn: !!avancarBtn, avancarBtnAction: avancarBtn?.dataset?.action
