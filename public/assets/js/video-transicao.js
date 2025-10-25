@@ -62,12 +62,7 @@
       }
     };
 
-    // Verificar se é dispositivo móvel
-    const isMobile = /Mobi|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
-    let videoSrc = isMobile ? src.replace('.mp4', '-mobile.mp4') : src;
-    const fallbackSrc = src.replace('/assets/img/', '/assets/videos/');
-    video.src = videoSrc;
-
+    video.src = src; // Usar caminho original
     video.setAttribute('playsinline', '');
     video.autoplay = true;
     video.muted = true;
@@ -83,7 +78,7 @@
         fallback.classList.remove('hidden');
         video.classList.add('hidden');
         window.toast?.('Erro ao reproduzir vídeo de transição. Usando fallback.', 'error');
-        setTimeout(cleanup, 1000); // Reduzido para 1s
+        setTimeout(cleanup, 1000); // Mantido 1s
       });
     }, { once: true });
 
@@ -94,22 +89,10 @@
 
     video.addEventListener('error', (e) => {
       console.error('[VIDEO_TRANSICAO] Erro ao carregar vídeo:', video.src, e);
-      if (video.src === videoSrc && videoSrc !== fallbackSrc) {
-        log('Tentando caminho alternativo:', fallbackSrc);
-        video.src = fallbackSrc;
-        video.play().catch(e => {
-          console.warn('[VIDEO_TRANSICAO] Erro ao iniciar vídeo alternativo:', e);
-          fallback.classList.remove('hidden');
-          video.classList.add('hidden');
-          window.toast?.('Erro ao carregar vídeo alternativo. Usando fallback.', 'error');
-          setTimeout(cleanup, 1000); // Reduzido para 1s
-        });
-      } else {
-        fallback.classList.remove('hidden');
-        video.classList.add('hidden');
-        window.toast?.('Erro ao carregar vídeo de transição. Usando fallback.', 'error');
-        setTimeout(cleanup, 1000); // Reduzido para 1s
-      }
+      fallback.classList.remove('hidden');
+      video.classList.add('hidden');
+      window.toast?.('Erro ao carregar vídeo de transição. Usando fallback.', 'error');
+      setTimeout(cleanup, 1000); // Mantido 1s
     }, { once: true });
 
     // Verificação via fetch
@@ -120,13 +103,8 @@
       })
       .catch(e => {
         console.error('[VIDEO_TRANSICAO] Erro ao verificar vídeo:', video.src, e);
-        if (video.src === videoSrc && videoSrc !== fallbackSrc) {
-          log('Tentando caminho alternativo via fetch:', fallbackSrc);
-          video.src = fallbackSrc;
-        } else {
-          window.toast?.('Vídeo de transição não encontrado.', 'error');
-          setTimeout(cleanup, 1000); // Reduzido para 1s
-        }
+        window.toast?.('Vídeo de transição não encontrado.', 'error');
+        setTimeout(cleanup, 1000); // Mantido 1s
       });
 
     const skipButton = overlay.querySelector('#skipVideo');
