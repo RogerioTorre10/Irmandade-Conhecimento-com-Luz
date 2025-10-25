@@ -4,13 +4,9 @@
   const MOD = 'section-senha.js';
   const SECTION_ID = 'section-senha';
   const NEXT_SECTION_ID = 'section-guia';
-  const HOME_PAGE = '/';
-  const HIDE = 'hidden';
-  const INITIAL_TYPING_DELAY_MS = 12000;
-  const TRANSITION_SRC = '/assets/video/filme-senha-confirmada.mp4';
-  const TRANSITION_TIMEOUT_MS = 8000;
-  const TTS_FALLBACK_DELAY_MS = 3000;
-
+  const VIDEO_SRC = '/assets/video/filme-senha-confirmada.mp4';
+  
+  
   // Evitar múltiplas inicializações
   if (window.JCSenha?.__bound) {
     console.log('[JCSenha] Já inicializado, ignorando...');
@@ -188,22 +184,22 @@
   }
 
   function playTransitionVideo(nextSectionId) {
-    console.log('[JCSenha] Iniciando transição de vídeo:', TRANSITION_SRC);
-    if (typeof window.playTransitionVideo === 'function') {
-      window.playTransitionVideo(TRANSITION_SRC, nextSectionId);
-    } else {
-      console.warn('[JCSenha] window.playTransitionVideo não encontrado, usando fallback');
-      setTimeout(() => {
-        console.log('[JCSenha] Fallback: navegando para:', nextSectionId);
-        if (typeof window.JC?.show === 'function') {
-          window.JC.show(nextSectionId);
-        } else {
-          console.warn('[JCSenha] Fallback navigation to:', nextSectionId);
-          window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
-        }
-      }, 2000);
-    }
+  console.log('[JCSenha] Iniciando transição de vídeo:', VIDEO_SRC);
+  if (typeof window.playTransitionVideo === 'function') {
+    window.playTransitionVideo(VIDEO_SRC, nextSectionId);
+  } else {
+    console.warn('[JCSenha] window.playTransitionVideo não encontrado, usando fallback');
+    setTimeout(() => {
+      console.log('[JCSenha] Fallback: navegando para:', nextSectionId);
+      if (typeof window.JC?.show === 'function') {
+        window.JC.show(nextSectionId);
+      } else {
+        console.warn('[JCSenha] Fallback navigation to:', nextSectionId);
+        window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
+      }
+    }, 2000);
   }
+}
 
   function pickElements(root) {
     const elements = {
