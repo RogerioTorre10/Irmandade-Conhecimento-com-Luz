@@ -5,7 +5,7 @@
   const SECTION_ID = 'section-termos';
   const PREV_SECTION_ID = 'section-intro';
   const NEXT_SECTION_ID = 'section-senha';
-  const TRANSITION_SRC = '/assets/img/filme-senha.mp4';
+  const TRANSITION_SRC = '/assets/videos/filme-senha.mp4'; // Ajustado para caminho correto
   const TRANSITION_TIMEOUT_MS = 8000;
   const TTS_FALLBACK_DELAY_MS = 2000;
 
@@ -66,22 +66,17 @@
   }
 
   function getText(el) {
-    return (el?.dataset?.text ?? el?.textContent ?? '').trim();
+    const text = (el?.dataset?.text ?? el?.textContent ?? '').trim();
+    return text || 'Placeholder de texto'; // Fallback para texto vazio
   }
 
   function normalizeParagraph(el) {
     if (!el) return false;
     const source = getText(el);
-    if (!source) {
-      console.warn('[JCTermos] Texto vazio para elemento:', el?.id);
-      return false;
-    }
-
     el.dataset.text = source;
     if (!el.classList.contains('typing-done')) {
       el.textContent = '';
       el.classList.remove('typing-active', 'typing-done', 'hidden');
-      delete el.dataset.spoken;
     }
     return true;
   }
@@ -91,6 +86,12 @@
     const text = getText(el);
     if (!text) {
       console.warn('[JCTermos] Texto vazio para elemento:', el?.id);
+      el.textContent = 'Placeholder de texto';
+      el.classList.add('typing-done');
+      el.classList.remove('typing-active', 'hidden');
+      el.style.opacity = '1';
+      el.style.visibility = 'visible';
+      el.style.display = 'block';
       return;
     }
 
@@ -101,7 +102,7 @@
     el.classList.add('typing-active', 'lumen-typing');
     el.classList.remove('typing-done', 'hidden');
     el.style.color = '#fff';
-    el.style.opacity = '1'; // Garantir visibilidade
+    el.style.opacity = '1';
     el.style.display = 'block';
     el.style.visibility = 'visible';
 
@@ -404,6 +405,8 @@
         pg.querySelectorAll('[data-typing="true"]').forEach(el => {
           normalizeParagraph(el);
           el.style.display = 'block';
+          el.style.opacity = '1';
+          el.style.visibility = 'visible';
           console.log('[JCTermos] Texto inicializado:', el.id);
         });
       }
