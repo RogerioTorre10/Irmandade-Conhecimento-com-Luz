@@ -5,7 +5,7 @@
   const SECTION_ID = 'section-guia';
   const PREV_SECTION_ID = 'section-senha';
   const NEXT_SECTION_ID = 'section-selfie';
-  const TRANSITION_SRC = '/assets/img/filme-senha-confirmada.mp4';
+  const TRANSITION_SRC = '/assets/video/filme-eu-na-irmandade.mp4';
   const TRANSITION_TIMEOUT_MS = 8000;
   const TTS_FALLBACK_DELAY_MS = 2000;
 
