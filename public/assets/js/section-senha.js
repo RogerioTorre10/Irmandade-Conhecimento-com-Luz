@@ -7,7 +7,7 @@
   const HOME_PAGE = '/';
   const HIDE = 'hidden';
   const INITIAL_TYPING_DELAY_MS = 12000;
-  const TRANSITION_SRC = '/assets/img/filme-senha-confirmada.mp4';
+  const TRANSITION_SRC = '/assets/video/filme-senha-confirmada.mp4';
   const TRANSITION_TIMEOUT_MS = 8000;
   const TTS_FALLBACK_DELAY_MS = 3000;
 
