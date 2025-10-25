@@ -5,12 +5,18 @@
 
   const sectionOrder = [
     'section-intro',
-    'section-termos',
+    'section-filme1',
+    'section-termos1',
+    'section-termos2',
+    'section-filme2',
     'section-senha',
-    'section-filme',
+    'section-filme3',
     'section-guia',
+    'section-filme4',
     'section-selfie',
+    'section-filme5',
     'section-perguntas',
+    'section-filme6',
     'section-final'
   ];
 
