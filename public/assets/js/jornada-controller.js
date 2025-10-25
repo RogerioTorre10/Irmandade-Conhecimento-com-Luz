@@ -20,32 +20,19 @@
     'section-final'
   ];
 
-  function getText(el) {
-    return (el?.dataset?.text ?? el?.textContent ?? '').trim();
-  }
-
-  async function applyTypingAndTTS(sectionId, root) {
-    console.log('[JC.applyTypingAndTTS] Desativado para:', sectionId);
-  }
-
   function attachButtonEvents(sectionId, root) {
-    console.log('[JC.attachButtonEvents] Attaching buttons for:', sectionId);
     const buttons = root.querySelectorAll('[data-action]');
-    console.log('[JC.attachButtonEvents] Buttons found:', buttons.length, Array.from(buttons).map(btn => btn.id || btn.dataset.action));
     buttons.forEach(btn => {
       const action = btn.dataset.action;
       btn.disabled = false;
       btn.classList.add('btn', 'btn-primary', 'btn-stone');
       btn.addEventListener('click', () => {
-        console.log('[JC.attachButtonEvents] Button clicked:', action, btn.id);
         if (action === 'avancar') {
           const currentIndex = sectionOrder.indexOf(sectionId);
           const nextSection = sectionOrder[currentIndex + 1];
-          console.log('[JC.attachButtonEvents] Navigating to:', nextSection);
           if (nextSection) {
             JC.show(nextSection);
           } else {
-            console.warn('[JC.attachButtonEvents] No next section, redirecting to /termos');
             window.location.href = '/termos';
           }
         }
@@ -62,8 +49,11 @@
   }
 
   function handleSectionLogic(sectionId, root) {
-    console.log('[JC.handleSectionLogic] Processing logic for:', sectionId);
-    if (sectionId === 'section-intro' || sectionId === 'section-termos') {
+    if (
+      sectionId === 'section-intro' ||
+      sectionId === 'section-termos1' ||
+      sectionId === 'section-termos2'
+    ) {
       root.style.cssText = `
         background: transparent !important;
         padding: 30px !important;
@@ -83,20 +73,14 @@
   }
 
   async function show(sectionId) {
-    console.log('[JC.show] Starting display for:', sectionId);
     try {
       const cleanId = sectionId.replace(/^section-/, '');
-      console.log('[JC.show] Starting carregarEtapa for:', cleanId);
       const section = await window.carregarEtapa(cleanId);
-      console.log('[JC.show] carregarEtapa completed, element #', sectionId, ':', !!section);
       if (section) {
-        console.log('[JC.show] Content of #jornada-content-wrapper:', document.getElementById('jornada-content-wrapper')?.innerHTML.slice(0, 120) + '...');
         handleSectionLogic(sectionId, section);
-        document.dispatchEvent(new CustomEvent('section:shown', { detail: { sectionId, node: section } }));
-        console.log('[JC.show] Event section:shown fired for:', sectionId);
-        console.log('[JC.show] Displayed successfully:', sectionId);
-      } else {
-        console.error('[JC.show] Section element is null for:', sectionId);
+        document.dispatchEvent(new CustomEvent('section:shown', {
+          detail: { sectionId, node: section }
+        }));
       }
     } catch (err) {
       console.error('[JC.show] Error showing section:', sectionId, err);
@@ -106,23 +90,19 @@
   function goNext() {
     const currentIndex = sectionOrder.indexOf(window.JC.currentSection || 'section-intro');
     const nextSection = sectionOrder[currentIndex + 1];
-    console.log('[JC.goNext] Navigating to:', nextSection);
     if (nextSection) {
       show(nextSection);
     } else {
-      console.warn('[JC.goNext] No next section, redirecting to /termos');
       window.location.href = '/termos';
     }
   }
 
   function setOrder(order) {
-    console.log('[JC.setOrder] Setting section order:', order);
     sectionOrder.length = 0;
     sectionOrder.push(...order);
   }
 
   function init() {
-    console.log('[JC.init] Controller initialized successfully');
     window.JC = {
       ...existingJC,
       init,
@@ -136,7 +116,7 @@
     window.JC.show('section-intro');
   }
 
-  document.addEventListener('section:shown', (e) => {
+  document.addEventListener('section:shown', e => {
     const sectionId = e.detail.sectionId;
     const node = e.detail.node;
     if (node) {
