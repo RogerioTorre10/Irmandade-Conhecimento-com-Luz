@@ -92,55 +92,97 @@
     }
   }
 
-  function show(sectionId) {
-  if (currentSection === sectionId) {
-    console.log('[JC.show] Seção já exibida, ignorando:', sectionId);
-    return;
-  }
-  currentSection = sectionId;
-  console.log('[JC.show] Starting display for:', sectionId, new Error().stack);
+ async function show(sectionId) { // Adicionado async
+    if (currentSection === sectionId) {
+      console.log('[JC.show] Seção já exibida, ignorando:', sectionId);
+      return;
+    }
+    currentSection = sectionId;
+    console.log('[JC.show] Starting display for:', sectionId, new Error().stack);
+
     try {
-      const cleanId = sectionId.replace(/^section-/, '');
-      console.log('[JC.show] Starting carregarEtapa for:', cleanId);
-      const section = await window.carregarEtapa(cleanId);
+      console.log('[JC.show] Starting carregarEtapa for:', sectionId);
+      const section = await window.carregarEtapa(sectionId); // await agora válido
       console.log('[JC.show] carregarEtapa completed, element #', sectionId, ':', !!section);
+
+      const wrapper = document.getElementById('jornada-content-wrapper');
+      console.log('[JC.show] Content of #jornada-content-wrapper:', wrapper?.innerHTML);
+
       if (section) {
-        console.log('[JC.show] Content of #jornada-content-wrapper:', document.getElementById('jornada-content-wrapper')?.innerHTML.slice(0, 120) + '...');
         handleSectionLogic(sectionId, section);
         document.dispatchEvent(new CustomEvent('section:shown', { detail: { sectionId, node: section } }));
         console.log('[JC.show] Event section:shown fired for:', sectionId);
         console.log('[JC.show] Displayed successfully:', sectionId);
       } else {
-        console.error('[JC.show] Section element is null for:', sectionId);
+        console.error('[JC.show] Failed to load section:', sectionId);
       }
-    } catch (err) {
-      console.error('[JC.show] Error showing section:', sectionId, err);
+    } catch (e) {
+      console.error('[JC.show] Error in show:', sectionId, e);
     }
   }
 
-  function setOrder(order) {
+  function handleSectionLogic(sectionId, root) {
+    console.log('[JC.handleSectionLogic] Processing logic for:', sectionId);
+    attachButtonEvents(sectionId, root);
+  }
+
+  function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+  }
+
+  function attachButtonEvents(sectionId, root) {
+    console.log('[JC.attachButtonEvents] Attaching buttons for:', sectionId);
+    const buttons = root.querySelectorAll('[data-action]');
+    console.log('[JC.attachButtonEvents] Buttons found:', buttons.length, Array.from(buttons).map(btn => btn.id || btn.dataset.action));
+    buttons.forEach(btn => {
+      if (btn.dataset.hasEvents) return;
+      btn.dataset.hasEvents = 'true';
+      const action = btn.dataset.action;
+      btn.disabled = false;
+      btn.classList.add('btn', 'btn-primary', 'btn-stone');
+      const handleClick = debounce(() => {
+        console.log('[JC.attachButtonEvents] Button clicked:', action, btn.id || btn.dataset.action);
+        if (action === 'avancar' || action === 'termos-next' || action === 'select-guia') {
+          const sectionOrder = ['section-intro', 'section-termos', 'section-senha', 'section-guia', 'section-perguntas', 'section-final'];
+          const currentIndex = sectionOrder.indexOf(sectionId);
+          const nextSection = sectionOrder[currentIndex + 1];
+          console.log('[JC.attachButtonEvents] Navigating to:', nextSection);
+          if (nextSection) {
+            window.JC.show(nextSection);
+          } else {
+            console.warn('[JC.attachButtonEvents] No next section, redirecting to /termos');
+            window.location.href = '/termos';
+          }
+        }
+      }, 300);
+      btn.addEventListener('click', handleClick);
+      btn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        btn.click();
+        console.log('[JC.attachButtonEvents] Toque detectado em:', btn.id || btn.dataset.action);
+      }, { passive: false });
+      btn.addEventListener('mouseover', () => {
+        btn.style.transform = 'scale(1.05)';
+        btn.style.boxShadow = '0 8px 16px rgba(0,0,0,0.7)';
+      });
+      btn.addEventListener('mouseout', () => {
+        btn.style.transform = 'scale(1)';
+        btn.style.boxShadow = 'inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6)';
+      });
+    });
+  }
+
+  // Exportar JC
+  window.JC = window.JC || {};
+  window.JC.show = show;
+  window.JC.setOrder = function (order) {
     console.log('[JC.setOrder] Setting section order:', order);
-    sectionOrder.length = 0;
-    sectionOrder.push(...order);
-  }
-
-  // Função init pública: agora ela será incluída no JC e pode ser chamada externamente
-  function init() {
-    console.log('[JC.init] Controller initialized successfully');
-    // Aqui você pode adicionar lógica global de inicialização, ex.: carregar a primeira seção
-    // Exemplo: JC.show('section-intro'); // Descomente se quiser auto-iniciar
-    console.log('[JC.init] Inicialização global executada');
-  }
-
-  // Reagir automaticamente ao evento de exibição de seção
-  document.addEventListener('section:shown', (e) => {
-    const sectionId = e.detail.sectionId;
-    const node = e.detail.node;
-    if (node) {
-      attachButtonEvents(sectionId, node);
-      handleSectionLogic(sectionId, node);
-    }
-  });
+    window.JC.sectionOrder = order;
+  };
 
   // Agora define JC incluindo a função init
   window.JC = {
