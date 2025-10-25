@@ -1,0 +1,58 @@
+(function () {
+  const SECTION_ID = 'section-termos1';
+  const NEXT_SECTION_ID = 'section-termos2';
+  const VIDEO_SRC = null;
+
+  const state = { initialized: false };
+
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  async function typeText(el, speed = 20) {
+    const text = el.dataset.text?.trim() || el.textContent?.trim() || '';
+    if (!text) return;
+    el.textContent = '';
+    el.classList.add('typing-active');
+    for (let i = 0; i < text.length; i++) {
+      el.textContent += text.charAt(i);
+      await sleep(speed);
+    }
+    el.classList.remove('typing-active');
+    el.classList.add('typing-done');
+    if (window.EffectCoordinator?.speak) {
+      try {
+        window.EffectCoordinator.speak(text, { lang: 'pt-BR', rate: 1.1, pitch: 1.0 });
+        await sleep(2000);
+      } catch {}
+    }
+  }
+
+  async function runTyping(root) {
+    const elements = root.querySelectorAll('[data-typing="true"]');
+    const btn = root.querySelector('[data-action="avancar"]');
+    btn?.setAttribute('disabled', 'true');
+    btn?.style.setProperty('opacity', '0');
+    for (const el of elements) await typeText(el);
+    btn?.removeAttribute('disabled');
+    btn?.style.setProperty('opacity', '1');
+  }
+
+  async function init(root) {
+    if (state.initialized) return;
+    root.classList.remove('hidden');
+    root.setAttribute('aria-hidden', 'false');
+    root.style.display = 'block';
+    const btn = root.querySelector('[data-action="avancar"]');
+    btn?.addEventListener('click', () => {
+      speechSynthesis.cancel();
+      window.JC?.show?.(NEXT_SECTION_ID);
+    });
+    await runTyping(root);
+    state.initialized = true;
+  }
+
+  document.addEventListener('section:shown', evt => {
+    if (evt.detail?.sectionId !== SECTION_ID) return;
+    const root = evt.detail.node || document.getElementById(SECTION_ID);
+    if (root) init(root);
+  });
+})();
