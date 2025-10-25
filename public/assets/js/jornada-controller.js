@@ -176,23 +176,14 @@
     });
   }
 
-  // Exportar JC
+ / Exportar JC
   window.JC = window.JC || {};
   window.JC.show = show;
   window.JC.setOrder = function (order) {
     console.log('[JC.setOrder] Setting section order:', order);
     window.JC.sectionOrder = order;
   };
+  window.JC.init = init;
 
-  // Agora define JC incluindo a função init
-  window.JC = {
-    init,  // <-- Isso corrige o problema: init agora é pública em JC.init
-    show,
-    setOrder,
-    attachButtonEvents,
-    handleSectionLogic
-  };
-
-  console.log('[JC] Estado final de JC:', window.JC); // Log para depuração
-  console.log('[JC] JC.init disponível:', typeof window.JC.init); // Deve ser 'function'
+  console.log('[jornada-controller.js] Loaded');
 })();
