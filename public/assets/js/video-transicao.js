@@ -5,25 +5,23 @@
   let isPlaying = false;
 
   function playTransitionVideo(src, nextSectionId) {
-    function playVideo(nextId) {
-    if (typeof window.playTransitionVideo === 'function') {
-    window.playTransitionVideo(VIDEO_SRC, nextId);
-    } else {
-    console.warn('[Fallback] playTransitionVideo não disponível, navegando direto para a próxima seção');
-    window.JC?.show?.(nextId); // ✅ navega corretamente sem tentar carregar HTML como vídeo
-    }
-   }
+    log('Recebido src:', src, 'nextSectionId:', nextSectionId);
     if (!src.endsWith('.mp4')) {
-    console.warn('[VIDEO_TRANSICAO] Caminho inválido para vídeo:', src);
-    return;
-   }    
+      console.warn('[VIDEO_TRANSICAO] Caminho inválido para vídeo:', src);
+      log('Navegando diretamente para:', nextSectionId);
+      if (typeof window.JC?.show === 'function') {
+        window.JC.show(nextSectionId);
+      } else {
+        window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
+      }
+      return;
+    }
     if (isPlaying) {
       log('Já reproduzindo vídeo, ignorando...');
       return;
     }
     isPlaying = true;
 
-    log('Tentando reproduzir:', src);
     let overlay = document.getElementById('videoOverlay');
     let video = document.getElementById('videoTransicao');
     let fallback = document.getElementById('videoFallback');
@@ -74,49 +72,47 @@
       }
     };
 
-    video.src = src; // Usar caminho original
-    video.setAttribute('playsinline', '');
-    video.autoplay = true;
-    video.muted = true;
-    video.playsInline = true;
-    video.controls = false;
-
-    video.addEventListener('loadeddata', () => {
-      log('Vídeo carregado, iniciando reprodução:', video.src);
-      overlay.classList.remove('hidden');
-      overlay.style.display = 'block';
-      video.play().catch(e => {
-        console.warn('[VIDEO_TRANSICAO] Erro ao iniciar vídeo:', e);
-        fallback.classList.remove('hidden');
-        video.classList.add('hidden');
-        window.toast?.('Erro ao reproduzir vídeo de transição. Usando fallback.', 'error');
-        setTimeout(cleanup, 1000); // Mantido 1s
-      });
-    }, { once: true });
-
-    video.addEventListener('ended', () => {
-      log('Vídeo finalizado:', video.src);
-      cleanup();
-    }, { once: true });
-
-    video.addEventListener('error', (e) => {
-      console.error('[VIDEO_TRANSICAO] Erro ao carregar vídeo:', video.src, e);
-      fallback.classList.remove('hidden');
-      video.classList.add('hidden');
-      window.toast?.('Erro ao carregar vídeo de transição. Usando fallback.', 'error');
-      setTimeout(cleanup, 1000); // Mantido 1s
-    }, { once: true });
-
-    // Verificação via fetch
-    fetch(video.src, { method: 'HEAD' })
+    fetch(src, { method: 'HEAD' })
       .then(response => {
         if (!response.ok) throw new Error('Vídeo não encontrado');
-        log('Iniciando reprodução:', video.src);
+        log('Vídeo verificado com sucesso:', src);
+        video.src = src;
+        video.setAttribute('playsinline', '');
+        video.autoplay = true;
+        video.muted = true;
+        video.playsInline = true;
+        video.controls = false;
+
+        video.addEventListener('loadeddata', () => {
+          log('Vídeo carregado, iniciando reprodução:', src);
+          overlay.classList.remove('hidden');
+          overlay.style.display = 'block';
+          video.play().catch(e => {
+            console.warn('[VIDEO_TRANSICAO] Erro ao iniciar vídeo:', e);
+            fallback.classList.remove('hidden');
+            video.classList.add('hidden');
+            window.toast?.('Erro ao reproduzir vídeo de transição. Usando fallback.', 'error');
+            setTimeout(cleanup, 1000);
+          });
+        }, { once: true });
+
+        video.addEventListener('ended', () => {
+          log('Vídeo finalizado:', src);
+          cleanup();
+        }, { once: true });
+
+        video.addEventListener('error', (e) => {
+          console.error('[VIDEO_TRANSICAO] Erro ao carregar vídeo:', src, e);
+          fallback.classList.remove('hidden');
+          video.classList.add('hidden');
+          window.toast?.('Erro ao carregar vídeo de transição. Usando fallback.', 'error');
+          setTimeout(cleanup, 1000);
+        }, { once: true });
       })
       .catch(e => {
-        console.error('[VIDEO_TRANSICAO] Erro ao verificar vídeo:', video.src, e);
+        console.error('[VIDEO_TRANSICAO] Erro ao verificar vídeo:', src, e);
         window.toast?.('Vídeo de transição não encontrado.', 'error');
-        setTimeout(cleanup, 1000); // Mantido 1s
+        cleanup();
       });
 
     const skipButton = overlay.querySelector('#skipVideo');
@@ -132,8 +128,6 @@
     }
   }
 
-  // Exportar a função globalmente
   window.playTransitionVideo = playTransitionVideo;
-
   log('jornada-video-transicao.js carregado');
 })();
