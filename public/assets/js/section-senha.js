@@ -1,12 +1,14 @@
 <script>
 (function () {
-  'use strict';
+  'use strict'; 
 
-  const MOD = 'section-guia.js';
-  const SECTION_ID = 'section-guia';
-  const NEXT_SECTION_ID = 'section-selfie';
-  const VIDEO_SRC = '/assets/video/filme-eu-na-irmandade.mp4';
+  const MOD = 'section-senha.js';
+  const SECTION_ID = 'section-senha';
+   const NEXT_SECTION_ID = 'section-guia';
+  const VIDEO_SRC = '/assets/video/filme-senha-confirmada.mp4';
   const HIDE_CLASS = 'hidden';
+  
+
 
   // Timings
   const TYPING_SPEED = 36;
