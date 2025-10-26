@@ -3,7 +3,6 @@
 (function () {
   'use strict';
 
-  // ===== Config =====
   const MOD = 'section-guia.js';
   const SECTION_ID = 'section-guia';
   const NEXT_SECTION_ID = 'section-selfie';
