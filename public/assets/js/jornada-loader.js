@@ -40,12 +40,11 @@
     const url = etapas[nome] || `/assets/html/section-${nome}.html`;
     if (url.endsWith('.mp4')) {
       return new Promise(resolve => {
-        window.playTransitionVideo(url, id, () => {
-          document.dispatchEvent(new CustomEvent('sectionLoaded', {
-            detail: { sectionId: id, name: nome, node: null }
-          }));
-          resolve(null);
-        });
+        window.playTransitionVideo(url, id);
+        document.dispatchEvent(new CustomEvent('sectionLoaded', {
+          detail: { sectionId: id, name: nome, node: null }
+        }));
+        resolve(null);
       });
     }
 
