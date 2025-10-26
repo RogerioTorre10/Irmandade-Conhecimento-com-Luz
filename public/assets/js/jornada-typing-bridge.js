@@ -131,19 +131,25 @@
   // ===== FUNÇÕES TTS AUXILIARES (Para o EffectCoordinator) =====
   global.EffectCoordinator = global.EffectCoordinator || {};
   
-  global.EffectCoordinator.speak = (text, options = {}) => {
-    if (!('speechSynthesis' in window) || !text) return;
-    if (global.isMuted) return; // Se estiver mutado, não faz nada
-
-    const utt = new SpeechSynthesisUtterance(text.trim());
-    utt.lang = i18n.lang || 'pt-BR';
-    utt.rate = options.rate || 1.03;
-    utt.pitch = options.pitch || 1.0;
-    utt.volume = 1;
-    
-    speechSynthesis.speak(utt);
-    typingLog('TTS disparado:', text.substring(0, 30) + '...');
-  };
+ let ultimoTexto = '';
+let ultimoTempo = 0;
+global.EffectCoordinator.speak = (text, options = {}) => {
+  if (!('speechSynthesis' in window) || !text || global.isMuted) return;
+  const agora = Date.now();
+  if (text === ultimoTexto && agora - ultimoTempo < 1000) {
+    typingLog('TTS ignorado, texto repetido:', text.substring(0, 30) + '...');
+    return;
+  }
+  ultimoTexto = text;
+  ultimoTempo = agora;
+  const utt = new SpeechSynthesisUtterance(text.trim());
+  utt.lang = i18n.lang || 'pt-BR';
+  utt.rate = options.rate || 1.03;
+  utt.pitch = options.pitch || 1.0;
+  utt.volume = 1;
+  speechSynthesis.speak(utt);
+  typingLog('TTS disparado:', text.substring(0, 30) + '...');
+};
 
   global.EffectCoordinator.stopAll = () => {
     if ('speechSynthesis' in window) {
