@@ -373,31 +373,31 @@
     document.removeEventListener('section:shown', handler);
     document.addEventListener('section:shown', handler, { passive: true, once: true });
 
-    function isVisible(el) {
-    if (!el) return false;
-    const style = window.getComputedStyle(el);
-    return (
+   function isVisible(el) {
+  if (!el) return false;
+  const style = window.getComputedStyle(el);
+  return (
     style.display !== 'none' &&
     style.visibility !== 'hidden' &&
     style.opacity !== '0' &&
     el.offsetParent !== null
-   );
-  }
-
-    const tryInitialize = (attempt = 1, maxAttempts = 10) => {
-      setTimeout(() => {
-        const guiaEl = document.getElementById(SECTION_ID);
-if (isVisible(guiaEl) && !window.JCGuia.state.ready && !guiaEl.dataset.guiaInitialized) {
-  console.log(`[JCGuia] Seção visível detectada, disparando handler`);
-  handler({ detail: { sectionId: SECTION_ID, node: guiaEl } });
-} else if (attempt < maxAttempts) {
-  console.warn(`[JCGuia] Nenhuma seção visível ou já inicializada (tentativa ${attempt}/${maxAttempts})`);
-  tryInitialize(attempt + 1, maxAttempts);
-} else {
-  console.error(`[JCGuia] Falha ao inicializar após ${maxAttempts} tentativas`);
+  );
 }
-      }, 100); // Delay fixo de 100ms
-    };
+
+const tryInitialize = (attempt = 1, maxAttempts = 10) => {
+  setTimeout(() => {
+    const el = document.getElementById(SECTION_ID);
+    if (isVisible(el) && !window.JCGuia.state.ready && !el.dataset.guiaInitialized) {
+      console.log(`[JCGuia] Seção visível detectada, disparando handler`);
+      handler({ detail: { sectionId: SECTION_ID, node: el } });
+    } else if (attempt < maxAttempts) {
+      console.warn(`[JCGuia] Nenhuma seção visível ou já inicializada (tentativa ${attempt}/${maxAttempts})`);
+      tryInitialize(attempt + 1, maxAttempts);
+    } else {
+      console.error(`[JCGuia] Falha ao inicializar após ${maxAttempts} tentativas`);
+    }
+  }, 100);
+};
 
     if (!window.JCGuia.state.ready && !document.getElementById(SECTION_ID)?.dataset.guiaInitialized) {
       tryInitialize();
