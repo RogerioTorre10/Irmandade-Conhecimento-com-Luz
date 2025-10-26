@@ -4,14 +4,14 @@
   const log = (...args) => console.log('[VIDEO_TRANSICAO]', ...args);
   let isPlaying = false;
 
-  function playTransitionVideo(src, nextSectionId) {
-  log('Recebido src:', src, 'nextSectionId:', nextSectionId);
+ function playTransitionVideo(src, nextSectionId) {
+  console.log('[VIDEO_TRANSICAO] Recebido src:', src, 'nextSectionId:', nextSectionId, { caller: new Error().stack });
   if (src.startsWith('/')) {
     src = `https://irmandade-conhecimento-com-luz.onrender.com${src}`;
   }
   if (!src.endsWith('.mp4')) {
     console.warn('[VIDEO_TRANSICAO] Caminho inválido para vídeo:', src);
-    log('Navegando diretamente para:', nextSectionId);
+    console.log('[VIDEO_TRANSICAO] Navegando diretamente para:', nextSectionId);
     if (typeof window.JC?.show === 'function') {
       window.JC.show(nextSectionId);
     } else {
@@ -20,7 +20,7 @@
     return;
   }
   if (isPlaying) {
-    log('Já reproduzindo vídeo, ignorando...');
+    console.log('[VIDEO_TRANSICAO] Já reproduzindo vídeo, ignorando...');
     return;
   }
   isPlaying = true;
@@ -105,22 +105,21 @@
       }, { once: true });
 
       video.addEventListener('error', (e) => {
-        if (done) {
-          log('Erro ignorado, vídeo já foi limpo');
-          return;
-        }
-        console.error('[VIDEO_TRANSICAO] Erro ao carregar vídeo:', src, {
-          error: e,
-          videoSrc: video.src,
-          readyState: video.readyState,
-          networkState: video.networkState
-        });
-        fallback.classList.remove('hidden');
-        video.classList.add('hidden');
-        window.toast?.('Erro ao carregar vídeo de transição. Usando fallback.', 'error');
-        setTimeout(cleanup, 1000);
-      }, { once: true });
-    })
+    if (done) {
+      console.log('[VIDEO_TRANSICAO] Erro ignorado, vídeo já foi limpo');
+      return;
+    }
+    console.error('[VIDEO_TRANSICAO] Erro ao carregar vídeo:', src, {
+      error: e,
+      videoSrc: video.src,
+      readyState: video.readyState,
+      networkState: video.networkState
+    });
+    fallback.classList.remove('hidden');
+    video.classList.add('hidden');
+    window.toast?.('Erro ao carregar vídeo de transição. Usando fallback.', 'error');
+    setTimeout(cleanup, 1000);
+  }, { once: true });
     .catch(e => {
       console.error('[VIDEO_TRANSICAO] Erro ao verificar vídeo:', src, e);
       window.toast?.('Vídeo de transição não encontrado.', 'error');
