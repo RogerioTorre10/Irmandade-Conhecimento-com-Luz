@@ -91,9 +91,15 @@
  function registerCanvasListeners() {
   document.removeEventListener('sectionLoaded', updateCanvasBackground);
   document.removeEventListener('section:shown', updateCanvasBackground);
-  document.addEventListener('sectionLoaded', (e) => updateCanvasBackground(e.detail.sectionId));
-  document.addEventListener('section:shown', (e) => updateCanvasBackground(e.detail.sectionId));
-  log('Canvas listeners registrados');
+  document.addEventListener('sectionLoaded', (e) => {
+    typingLog('sectionLoaded disparado:', e.detail.sectionId);
+    updateCanvasBackground(e.detail.sectionId);
+  });
+  document.addEventListener('section:shown', (e) => {
+    typingLog('section:shown disparado:', e.detail.sectionId);
+    updateCanvasBackground(e.detail.sectionId);
+  });
+  typingLog('Canvas listeners registrados');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
