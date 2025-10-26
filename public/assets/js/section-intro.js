@@ -5,7 +5,10 @@
   const SECTION_ID = 'section-intro';
   const NEXT_SECTION_ID = 'section-termos1';
   const VIDEO_SRC = '/assets/videos/filme-pergaminho-ao-vento.mp4';
-  
+
+  const state = { initialized: false };
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+ 
   async function typeText(el, speed = 36) {
     const text = el.dataset.text?.trim() || el.textContent?.trim() || '';
     if (!text) return;
