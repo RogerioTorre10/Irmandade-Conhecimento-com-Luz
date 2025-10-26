@@ -88,8 +88,10 @@
       log('Canvas atualizado para (V):', sectionId);
     }
   }
-  
- function registerCanvasListeners() {
+  // ✅ Fallback seguro para evitar erro de referência
+   window.typingLog = window.typingLog || function () {};
+
+  function registerCanvasListeners() {
   document.removeEventListener('sectionLoaded', updateCanvasBackground);
   document.removeEventListener('section:shown', updateCanvasBackground);
   document.addEventListener('sectionLoaded', (e) => {
