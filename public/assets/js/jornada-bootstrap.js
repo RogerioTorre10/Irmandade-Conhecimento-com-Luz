@@ -39,13 +39,19 @@
     console.log('[BOOT] JC disponível, iniciando...');
     window.JC.setOrder([
       'section-intro',
-      'section-termos',
-      'section-senha',
-      'section-filme',
-      'section-guia',
-      'section-selfie',
-      'section-perguntas',
-      'section-final'
+    'section-filme1',
+    'section-termos1',
+    'section-termos2',
+    'section-filme2',
+    'section-senha',
+    'section-filme3',
+    'section-guia',
+    'section-filme4',
+    'section-selfie',
+    'section-filme5',
+    'section-perguntas',
+    'section-filme6',
+    'section-final'
     ]);
 
     // Inicia a jornada
