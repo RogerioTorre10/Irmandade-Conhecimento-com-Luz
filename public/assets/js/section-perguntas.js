@@ -1,17 +1,16 @@
-// /assets/js/jornada-perguntas.js
 (function () {
   'use strict';
 
-  const NS = '[PERGUNTAS]';
-  const log = (...a) => console.log(NS, ...a);
-  const warn = (...a) => console.warn(NS, ...a);
-  const err = (...a) => console.error(NS, ...a);
-
-  // Ajuste aqui se os IDs forem diferentes
+  const MOD = 'section-perguntas.js';
   const SECTION_ID = 'section-perguntas';
-  const ROOT_SEL = '#perguntas-root';
+  const NEXT_SECTION_ID = 'section-final';
+  const VIDEO_SRC = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
 
-  // Estado simples desta seção
+  const log = (...a) => console.log('[PERGUNTAS]', ...a);
+  const warn = (...a) => console.warn('[PERGUNTAS]', ...a);
+  const err = (...a) => console.error('[PERGUNTAS]', ...a);
+  const $ = (sel, root = document) => root.querySelector(sel);
+
   const State = {
     mounted: false,
     running: false,
@@ -19,40 +18,35 @@
     meta: null,
   };
 
-  // Helpers DOM
-  const $ = (sel, root = document) => root.querySelector(sel);
-
-  // Navegação segura
   function goNext() {
-    if (window.JC?.goNext) return window.JC.goNext();
-    if (typeof window.showSection === 'function' && document.getElementById('section-final')) {
-      return window.showSection('section-final');
+    if (typeof window.playTransitionVideo === 'function' && VIDEO_SRC) {
+      window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
+    } else if (window.JC?.goNext) {
+      window.JC.goNext();
+    } else if (typeof window.showSection === 'function' && document.getElementById(NEXT_SECTION_ID)) {
+      window.showSection(NEXT_SECTION_ID);
+    } else {
+      document.dispatchEvent(new CustomEvent('qa:completed', {
+        detail: { answers: State.answers, meta: State.meta }
+      }));
     }
-    // fallback: emitir evento
-    document.dispatchEvent(new CustomEvent('qa:completed', { detail: { answers: State.answers, meta: State.meta } }));
   }
 
-  // Normaliza API do Paper QA (tentando funções conhecidas)
   async function startQA(root) {
-    if (!root) { warn('Root para perguntas não encontrado.'); return; }
-    if (State.running) { log('Fluxo QA já em execução.'); return; }
+    if (!root) return warn('Root para perguntas não encontrado.');
+    if (State.running) return log('Fluxo QA já em execução.');
     State.running = true;
 
-    // Metadados úteis
-    const guia = (window.JC?.state?.guia) || {};
+    const guia = window.JC?.state?.guia || {};
     const selfie = window.__SELFIE_DATA_URL__ || null;
     const startedAt = new Date().toISOString();
 
-    // Opções padrão que passaremos ao motor
     const opts = {
       container: root,
       guia,
       selfie,
       i18n: window.i18n || null,
-      onProgress: (p) => {
-        // você pode usar p.current, p.total, p.key etc.
-        // log('Progresso QA:', p);
-      },
+      onProgress: (p) => {},
       onComplete: (result) => {
         try {
           const finishedAt = new Date().toISOString();
@@ -62,13 +56,10 @@
             finishedAt,
             guia,
             selfieUsed: !!selfie,
-            version: (window.APP_CONFIG?.version || 'v1'),
+            version: window.APP_CONFIG?.version || 'v1'
           };
-
-          // Exportar global para o final
           window.__QA_ANSWERS__ = State.answers;
           window.__QA_META__ = State.meta;
-
           log('QA finalizado. Respostas salvas em __QA_ANSWERS__.');
           window.toast?.('Jornada de perguntas concluída!');
           goNext();
@@ -81,7 +72,6 @@
       }
     };
 
-    // Tentativas de integração — escolha suave de APIs
     try {
       if (window.JornadaPaperQA?.mount) {
         log('Usando JornadaPaperQA.mount');
@@ -98,7 +88,6 @@
         await window.JornadaPaperQA.begin?.();
       } else {
         warn('API do JornadaPaperQA não encontrada. Disparando evento qa:start.');
-        // como último recurso, emita um evento para outro script iniciar
         document.dispatchEvent(new CustomEvent('qa:start', { detail: opts }));
       }
     } catch (e) {
@@ -108,30 +97,21 @@
     }
   }
 
-  // Bind da seção
   function bindSection(node) {
-    if (State.mounted) {
-      log('Seção já montada; ignorando novo bind.');
-      return;
-    }
-    const root = $(ROOT_SEL, node) || node;
-    if (!root) {
-      warn('Contêiner de perguntas não encontrado, verifique o seletor:', ROOT_SEL);
-      return;
-    }
+    if (State.mounted) return log('Seção já montada; ignorando novo bind.');
+    const root = $('#perguntas-root', node) || node;
+    if (!root) return warn('Container de perguntas não encontrado.');
     State.mounted = true;
-    log('Montando seção de perguntas…');
+    log('Montando seção de perguntas...');
     startQA(root);
   }
 
-  // Entrada: quando a seção é carregada
   document.addEventListener('sectionLoaded', (e) => {
     if (e?.detail?.sectionId !== SECTION_ID) return;
     const node = e.detail.node || document.getElementById(SECTION_ID);
     bindSection(node);
   });
 
-  // Expor uma API mínima para reset/start manual (opcional)
   window.JPerguntas = {
     reset() {
       State.mounted = false;
@@ -144,4 +124,6 @@
       bindSection(root || document.getElementById(SECTION_ID));
     }
   };
+
+  log('Carregado');
 })();
