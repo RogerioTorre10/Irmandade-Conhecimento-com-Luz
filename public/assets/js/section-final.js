@@ -119,5 +119,61 @@
   }
 
   function finishFlow() {
-    // Li
+    // Limpa estados temporários (se desejar)
+    try {
+      // Atenção: se você NÃO quiser limpar para analytics, remova estas linhas
+      // delete window.__SELFIE_DATA_URL__;
+      // delete window.__QA_ANSWERS__;
+      // delete window.__QA_META__;
+    } catch {}
 
+    // Navegar para “fim”/“home”/“obrigado”
+    if (window.JC?.finish) return window.JC.finish();
+    if (window.JC?.show && document.getElementById('section-home')) return window.JC.show('section-home');
+    if (typeof window.showSection === 'function' && document.getElementById('section-home')) return window.showSection('section-home');
+
+    // Último recurso: âncora
+    window.location.hash = '#section-home';
+  }
+
+  function bindSection(node) {
+    const btnDl = $(BTN_DL_SEL, node);
+    const btnEnd = $(BTN_END_SEL, node);
+
+    if (btnDl) {
+      btnDl.addEventListener('click', async () => {
+        // Se ainda não gerou, tenta gerar primeiro
+        if (!S.pdfUrl && !S.hqUrl) {
+          await generateArtifacts();
+        }
+        downloadAll();
+      });
+    }
+
+    if (btnEnd) {
+      btnEnd.addEventListener('click', () => {
+        // Usuário optou por encerrar sem baixar
+        finishFlow();
+      });
+    }
+
+    // Pré-gerar automaticamente ao entrar na seção (pode desativar se preferir)
+    generateArtifacts();
+  }
+
+  document.addEventListener('sectionLoaded', (e) => {
+    if (e?.detail?.sectionId !== SECTION_ID) return;
+    const node = e.detail.node || document.getElementById(SECTION_ID);
+    if (!node) return;
+    log('Seção final carregada, iniciando consolidação…');
+    enableDownloadButton(false); // desabilita até gerar
+    bindSection(node);
+  });
+
+  // API opcional
+  window.JFinal = {
+    generate: generateArtifacts,
+    download: downloadAll,
+    finish: finishFlow,
+  };
+})();
