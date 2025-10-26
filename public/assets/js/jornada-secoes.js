@@ -88,9 +88,19 @@
     }
   }
   
+ function registerCanvasListeners() {
+  document.removeEventListener('sectionLoaded', updateCanvasBackground);
+  document.removeEventListener('section:shown', updateCanvasBackground);
   document.addEventListener('sectionLoaded', (e) => updateCanvasBackground(e.detail.sectionId));
   document.addEventListener('section:shown', (e) => updateCanvasBackground(e.detail.sectionId));
+  log('Canvas listeners registrados');
+}
 
+document.addEventListener('DOMContentLoaded', () => {
+  initSecoes();
+  registerCanvasListeners();
+});
+  
   // Funções de blocos e devolutivas
   function loadDynamicBlocks() {
     // ... (mantido)
@@ -197,9 +207,7 @@
     });
     log('Secoes inicializado');
   }
-
-  document.addEventListener('DOMContentLoaded', initSecoes);
-
+  
   function startJourney() {
     const next = 'section-senha'; // Alterado para section-senha
     if (global.JC && typeof global.JC.show === 'function') {
