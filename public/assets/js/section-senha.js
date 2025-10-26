@@ -451,21 +451,28 @@
     document.addEventListener('section:shown', handler, { passive: true, once: true });
     window.JCSenha.state.listenerAdded = true;
 
+    function isVisible(el) {
+    if (!el) return false;
+    const style = window.getComputedStyle(el);
+    return (
+    style.display !== 'none' &&
+    style.visibility !== 'hidden' &&
+    style.opacity !== '0' &&
+    el.offsetParent !== null
+    );
+   }
     const tryInitialize = (attempt = 1, maxAttempts = 10) => {
       setTimeout(() => {
-        const visibleSenha = document.querySelector(`#${SECTION_ID}:not(.hidden)`);
-        if (visibleSenha && !window.JCSenha.state.ready && !visibleSenha.dataset.senhaInitialized) {
-          console.log('[JCSenha] Seção visível encontrada, disparando handler');
-          handler({ detail: { sectionId: SECTION_ID, node: visibleSenha } });
-        } else if (document.getElementById(SECTION_ID) && !window.JCSenha.state.ready && !document.getElementById(SECTION_ID).dataset.senhaInitialized) {
-          console.log('[JCSenha] Forçando inicialização manual (tentativa ' + attempt + ')');
-          handler({ detail: { sectionId: SECTION_ID, node: document.getElementById(SECTION_ID) } });
-        } else if (attempt < maxAttempts) {
-          console.log('[JCSenha] Nenhuma seção visível ou já inicializada, tentando novamente...');
-          tryInitialize(attempt + 1, maxAttempts);
-        } else {
-          console.error('[JCSenha] Falha ao inicializar após', maxAttempts, 'tentativas');
-        }
+        const senhaEl = document.getElementById(SECTION_ID);
+if (isVisible(senhaEl) && !window.JCSenha.state.ready && !senhaEl.dataset.senhaInitialized) {
+  console.log(`[JCSenha] Seção visível detectada, disparando handler`);
+  handler({ detail: { sectionId: SECTION_ID, node: senhaEl } });
+} else if (attempt < maxAttempts) {
+  console.warn(`[JCSenha] Nenhuma seção visível ou já inicializada (tentativa ${attempt}/${maxAttempts})`);
+  tryInitialize(attempt + 1, maxAttempts);
+} else {
+  console.error(`[JCSenha] Falha ao inicializar após ${maxAttempts} tentativas`);
+}
       }, 100); // Delay fixo de 100ms
     };
 
