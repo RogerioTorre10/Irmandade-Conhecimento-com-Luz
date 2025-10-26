@@ -5,6 +5,10 @@
   let isPlaying = false;
 
   function playTransitionVideo(src, nextSectionId) {
+   if (!src.endsWith('.mp4')) {
+    console.warn('[VIDEO_TRANSICAO] Caminho inválido para vídeo:', src);
+    return;
+ }    
     if (isPlaying) {
       log('Já reproduzindo vídeo, ignorando...');
       return;
