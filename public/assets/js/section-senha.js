@@ -451,7 +451,7 @@
     document.addEventListener('section:shown', handler, { passive: true, once: true });
     window.JCSenha.state.listenerAdded = true;
 
-   function isVisible(el) {
+  function isVisible(el) {
   if (!el) return false;
   const style = window.getComputedStyle(el);
   return (
@@ -476,6 +476,7 @@ const tryInitialize = (attempt = 1, maxAttempts = 10) => {
     }
   }, 100);
 };
+
 
     if (!window.JCSenha.state.ready && !document.getElementById(SECTION_ID)?.dataset.senhaInitialized) {
       tryInitialize();
