@@ -3,18 +3,18 @@
 
   const etapas = {
     intro: '/html/section-intro.html',
-    filme1: '/assets/img/filme-pergaminho-ao-vento.mp4',
+    filme1: '/assets/videos/filme-pergaminho-ao-vento.mp4',
     termos1: '/html/section-termos1.html',
     termos2: '/html/section-termos2.html',
-    filme2: '/assets/img/filme-senha.mp4',
+    filme2: '/assets/videos/filme-senha.mp4',
     senha: '/html/section-senha.html',
-    filme3: '/assets/img/filme-senha-confirmada.mp4',
+    filme3: '/assets/videos/filme-senha-confirmada.mp4',
     guia: '/html/section-guia.html',
-    filme4: '/assets/img/conhecimento-com-luz-jardim.mp4',
+    filme4: '/assets/videos/conhecimento-com-luz-jardim.mp4',
     selfie: '/html/section-selfie.html',
-    filme5: '/assets/img/filme-0-ao-encontro-da-jornada.mp4',
+    filme5: '/assets/videos/filme-0-ao-encontro-da-jornada.mp4',
     perguntas: '/html/section-perguntas.html',
-    filme6: '/assets/img/filme-5-fim-da-jornada.mp4',
+    filme6: '/assets/videos/filme-5-fim-da-jornada.mp4',
     final: '/html/section-final.html'
   };
 
@@ -22,6 +22,7 @@
     const id = `section-${nome}`;
     const existingSection = document.getElementById(id);
     if (existingSection && existingSection.dataset.initialized) {
+      console.log('[Loader] Seção já inicializada, ignorando:', id);
       return existingSection;
     }
 
@@ -37,6 +38,17 @@
     }
 
     const url = etapas[nome] || `/assets/html/section-${nome}.html`;
+    if (url.endsWith('.mp4')) {
+      return new Promise(resolve => {
+        window.playTransitionVideo(url, id, () => {
+          document.dispatchEvent(new CustomEvent('sectionLoaded', {
+            detail: { sectionId: id, name: nome, node: null }
+          }));
+          resolve(null);
+        });
+      });
+    }
+
     const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status} at ${url}`);
     const html = await res.text();
