@@ -1,6 +1,7 @@
 (function (global) {
   'use strict';
-
+  
+  console.log('[Secoes] Carregando jornada-secoes.js');
   if (global.__SecoesReady) {
     console.log('[Secoes] Já carregado, ignorando');
     return;
