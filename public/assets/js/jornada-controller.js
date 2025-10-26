@@ -9,10 +9,13 @@
     'section-termos2',
     'section-senha',
     'section-guia',
+    'section-card',
     'section-selfie',
     'section-perguntas',
     'section-final'
   ];
+
+  let lastShownSection = null;
 
   function attachButtonEvents(sectionId, root) {
     const buttons = root.querySelectorAll('[data-action]');
@@ -24,10 +27,8 @@
         if (action === 'avancar') {
           const currentIndex = sectionOrder.indexOf(sectionId);
           const nextSection = sectionOrder[currentIndex + 1];
-          if (nextSection) {
-            JC.show(nextSection);
-          } else {
-            window.location.href = '/termos';
+          if (nextSection && nextSection !== window.JC.currentSection) {
+            window.JC.show(nextSection);
           }
         }
       });
@@ -67,6 +68,11 @@
   }
 
   async function show(sectionId) {
+    if (sectionId === window.JC.currentSection) {
+      console.log('[JC.show] Seção já ativa, ignorando:', sectionId);
+      return;
+    }
+
     try {
       const cleanId = sectionId.replace(/^section-/, '');
       const section = await window.carregarEtapa(cleanId);
@@ -77,17 +83,15 @@
         }));
       }
     } catch (err) {
-      console.error('[JC.show] Error showing section:', sectionId, err);
+      console.error('[JC.show] Erro ao mostrar seção:', sectionId, err);
     }
   }
 
   function goNext() {
     const currentIndex = sectionOrder.indexOf(window.JC.currentSection || 'section-intro');
     const nextSection = sectionOrder[currentIndex + 1];
-    if (nextSection) {
+    if (nextSection && nextSection !== window.JC.currentSection) {
       show(nextSection);
-    } else {
-      window.location.href = '/termos';
     }
   }
 
@@ -113,6 +117,9 @@
   document.addEventListener('section:shown', e => {
     const sectionId = e.detail.sectionId;
     const node = e.detail.node;
+    if (sectionId === lastShownSection) return;
+    lastShownSection = sectionId;
+
     if (node) {
       window.JC.currentSection = sectionId;
       attachButtonEvents(sectionId, node);
