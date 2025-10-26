@@ -5,10 +5,18 @@
   let isPlaying = false;
 
   function playTransitionVideo(src, nextSectionId) {
-   if (!src.endsWith('.mp4')) {
+    function playVideo(nextId) {
+    if (typeof window.playTransitionVideo === 'function') {
+    window.playTransitionVideo(VIDEO_SRC, nextId);
+    } else {
+    console.warn('[Fallback] playTransitionVideo não disponível, navegando direto para a próxima seção');
+    window.JC?.show?.(nextId); // ✅ navega corretamente sem tentar carregar HTML como vídeo
+    }
+   }
+    if (!src.endsWith('.mp4')) {
     console.warn('[VIDEO_TRANSICAO] Caminho inválido para vídeo:', src);
     return;
- }    
+   }    
     if (isPlaying) {
       log('Já reproduzindo vídeo, ignorando...');
       return;
