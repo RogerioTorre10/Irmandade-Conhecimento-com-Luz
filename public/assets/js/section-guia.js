@@ -373,21 +373,29 @@
     document.removeEventListener('section:shown', handler);
     document.addEventListener('section:shown', handler, { passive: true, once: true });
 
+    function isVisible(el) {
+    if (!el) return false;
+    const style = window.getComputedStyle(el);
+    return (
+    style.display !== 'none' &&
+    style.visibility !== 'hidden' &&
+    style.opacity !== '0' &&
+    el.offsetParent !== null
+   );
+  }
+
     const tryInitialize = (attempt = 1, maxAttempts = 10) => {
       setTimeout(() => {
-        const visibleGuia = document.querySelector(`#${SECTION_ID}:not(.hidden)`);
-        if (visibleGuia && !window.JCGuia.state.ready && !visibleGuia.dataset.guiaInitialized) {
-          console.log('[JCGuia] Seção visível encontrada, disparando handler');
-          handler({ detail: { sectionId: SECTION_ID, node: visibleGuia } });
-        } else if (document.getElementById(SECTION_ID) && !window.JCGuia.state.ready && !document.getElementById(SECTION_ID).dataset.guiaInitialized) {
-          console.log('[JCGuia] Forçando inicialização manual (tentativa ' + attempt + ')');
-          handler({ detail: { sectionId: SECTION_ID, node: document.getElementById(SECTION_ID) } });
-        } else if (attempt < maxAttempts) {
-          console.log('[JCGuia] Nenhuma seção visível ou já inicializada, tentando novamente...');
-          tryInitialize(attempt + 1, maxAttempts);
-        } else {
-          console.error('[JCGuia] Falha ao inicializar após', maxAttempts, 'tentativas');
-        }
+        const guiaEl = document.getElementById(SECTION_ID);
+if (isVisible(guiaEl) && !window.JCGuia.state.ready && !guiaEl.dataset.guiaInitialized) {
+  console.log(`[JCGuia] Seção visível detectada, disparando handler`);
+  handler({ detail: { sectionId: SECTION_ID, node: guiaEl } });
+} else if (attempt < maxAttempts) {
+  console.warn(`[JCGuia] Nenhuma seção visível ou já inicializada (tentativa ${attempt}/${maxAttempts})`);
+  tryInitialize(attempt + 1, maxAttempts);
+} else {
+  console.error(`[JCGuia] Falha ao inicializar após ${maxAttempts} tentativas`);
+}
       }, 100); // Delay fixo de 100ms
     };
 
