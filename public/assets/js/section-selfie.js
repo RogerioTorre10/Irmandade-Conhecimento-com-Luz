@@ -4,7 +4,7 @@
   const MOD = 'section-selfie.js';
   const SECTION_ID = 'section-selfie';
   const NEXT_SECTION_ID = 'section-card';
-  const VIDEO_SRC ='/assets/videos/filme-0-ao-encontro-da-jornada.mp4;
+  const VIDEO_SRC = '/assets/video/filme-eu-na-irmandade.mp4';
   
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
