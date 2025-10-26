@@ -142,15 +142,22 @@
   }
 
   function proceedAfterSelfie() {
-    const intro = window.JORNADA_VIDEOS?.intro || '';
-    if (!intro || window.__introPlayed) {
-      proceedToQuestions();
-      return;
-    }
-    window.__introPlayed = true;
-    const _play = getPlayTransitionFn();
-    _play(intro, () => proceedToQuestions());
+  log('JORNADA_VIDEOS:', window.JORNADA_VIDEOS);
+  const intro = window.JORNADA_VIDEOS?.intro || '';
+  if (!intro || window.__introPlayed) {
+    proceedToQuestions();
+    return;
   }
+  if (!intro.endsWith('.mp4')) {
+    log('URL de vídeo inválido:', intro);
+    window.__introPlayed = true;
+    proceedToQuestions();
+    return;
+  }
+  window.__introPlayed = true;
+  const _play = getPlayTransitionFn();
+  _play(intro, () => proceedToQuestions());
+}
 
   function proceedToQuestions() {
     global.JC.show('section-perguntas');
