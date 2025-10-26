@@ -6,13 +6,16 @@
 
   function playTransitionVideo(src, nextSectionId) {
   log('Recebido src:', src, 'nextSectionId:', nextSectionId);
+  if (src.startsWith('/')) {
+    src = `https://irmandade-conhecimento-com-luz.onrender.com${src}`;
+  }
   if (!src.endsWith('.mp4')) {
     console.warn('[VIDEO_TRANSICAO] Caminho inválido para vídeo:', src);
     log('Navegando diretamente para:', nextSectionId);
     if (typeof window.JC?.show === 'function') {
       window.JC.show(nextSectionId);
     } else {
-      window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
+      window.location.href = `#${nextSectionId}`;
     }
     return;
   }
@@ -68,7 +71,7 @@
       window.JC.show(nextSectionId);
     } else {
       console.warn('[VIDEO_TRANSICAO] Fallback navigation to:', nextSectionId);
-      window.location.href = `jornada-conhecimento-com-luz1.html#${nextSectionId}`;
+      window.location.href = `#${nextSectionId}`;
     }
   };
 
@@ -102,7 +105,16 @@
       }, { once: true });
 
       video.addEventListener('error', (e) => {
-        console.error('[VIDEO_TRANSICAO] Erro ao carregar vídeo:', src, e);
+        if (done) {
+          log('Erro ignorado, vídeo já foi limpo');
+          return;
+        }
+        console.error('[VIDEO_TRANSICAO] Erro ao carregar vídeo:', src, {
+          error: e,
+          videoSrc: video.src,
+          readyState: video.readyState,
+          networkState: video.networkState
+        });
         fallback.classList.remove('hidden');
         video.classList.add('hidden');
         window.toast?.('Erro ao carregar vídeo de transição. Usando fallback.', 'error');
