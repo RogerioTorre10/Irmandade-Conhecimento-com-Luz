@@ -14,10 +14,19 @@
   let isTransitioning = false;
   
   // Garante que a função de playTransition seja encontrada (do video-transicao.js)
-  const getPlayTransitionFn = () => global.playTransition || global.JSecoes?.playTransition || function(src, onEnd) { 
-    log('playTransition indisponível. Avançando diretamente.'); 
-    onEnd && onEnd();
+  const getPlayTransitionFn = () =>
+  global.playTransitionVideo ||
+  global.JSecoes?.playTransition ||
+  function (src, onEnd) {
+    if (!src || !src.endsWith('.mp4')) {
+      log('playTransition (fallback): caminho inválido para vídeo:', src);
+      onEnd?.();
+      return;
+    }
+    log('playTransition indisponível. Avançando diretamente.');
+    onEnd?.();
   };
+
   
   // Função para análise de sentimento (usada por handleInput)
   function analyzeSentiment(text) {
