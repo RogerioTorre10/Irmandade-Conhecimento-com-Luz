@@ -1,156 +1,182 @@
+// /assets/js/video-transicao.js
 (function () {
   'use strict';
 
-  const log = (...args) => console.log('[VIDEO_TRANSICAO]', ...args);
+  const NS = '[VIDEO_TRANSICAO]';
+  const log = (...a) => console.log(NS, ...a);
+  const warn = (...a) => console.warn(NS, ...a);
+
   let isPlaying = false;
+  let cleaned = false;
 
-  function playTransitionVideo(src, nextSectionId) {
-    log('Recebido src:', src, 'nextSectionId:', nextSectionId, { caller: new Error().stack });
-    if (src.startsWith('/')) {
-      src = `https://irmandade-conhecimento-com-luz.onrender.com${src}`;
-    }
-    if (!src.endsWith('.mp4')) {
-      console.warn('[VIDEO_TRANSICAO] Caminho inválido para vídeo:', src);
-      log('Navegando diretamente para:', nextSectionId);
-      if (typeof window.JC?.show === 'function') {
-        window.JC.show(nextSectionId);
-      } else {
-        window.location.href = `#${nextSectionId}`;
-      }
-      return;
-    }
-    if (isPlaying) {
-      log('Já reproduzindo vídeo, ignorando...');
-      return;
-    }
-    isPlaying = true;
+  // Utilidades
+  const isMp4 = (src) => /\.mp4(\?|#|$)/i.test(src || '');
+  const resolveHref = (src) => {
+    try { return new URL(src, window.location.origin).href; }
+    catch { return src; }
+  };
 
-    let overlay = document.getElementById('videoOverlay');
-    let video = document.getElementById('videoTransicao');
-    let fallback = document.getElementById('videoFallback');
-
-    if (!overlay || !video) {
-      log('Criando elementos de vídeo dinamicamente');
-      overlay = document.createElement('div');
-      overlay.id = 'videoOverlay';
-      overlay.style.cssText = 'position: fixed; inset: 0; background: #000; z-index: 9999; display: none;';
-      video = document.createElement('video');
-      video.id = 'videoTransicao';
-      video.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
-      fallback = document.createElement('div');
-      fallback.id = 'videoFallback';
-      fallback.style.cssText = 'width: 100%; height: 100%; background: #000; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px;';
-      fallback.textContent = 'Carregando transição...';
-      const skipButton = document.createElement('button');
-      skipButton.id = 'skipVideo';
-      skipButton.textContent = 'Pular';
-      skipButton.style.cssText = 'position: absolute; top: 10px; right: 10px; padding: 12px 20px; background: #fff; color: #000; font-size: 16px;';
-      overlay.appendChild(video);
-      overlay.appendChild(fallback);
-      overlay.appendChild(skipButton);
-      document.body.appendChild(overlay);
-    }
-
-    let done = false;
-    const cleanup = () => {
-      if (done) return;
-      done = true;
-      try {
-        video.pause();
-        video.src = '';
-      } catch (e) {
-        console.error('[VIDEO_TRANSICAO] Erro ao pausar vídeo:', e);
-      }
-      overlay.classList.add('hidden');
-      overlay.style.display = 'none';
-      fallback.classList.add('hidden');
-      video.classList.remove('hidden');
-      isPlaying = false;
-      log('Transição concluída, navegando para:', nextSectionId);
-      if (typeof window.JC?.show === 'function') {
-        window.JC.show(nextSectionId);
-      } else {
-        console.warn('[VIDEO_TRANSICAO] Fallback navigation to:', nextSectionId);
-        window.location.href = `#${nextSectionId}`;
-      }
-    };
-
-    fetch(src, { method: 'HEAD' })
-      .then(response => {
-        if (!response.ok) throw new Error('Vídeo não encontrado');
-        log('Vídeo verificado com sucesso:', src);
-        video.src = src;
-        video.setAttribute('playsinline', '');
-        video.autoplay = true;
-        video.muted = true;
-        video.playsInline = true;
-        video.controls = false;
-
-        video.addEventListener('loadeddata', () => {
-          log('Vídeo carregado, iniciando reprodução:', src);
-          overlay.classList.remove('hidden');
-          overlay.style.display = 'block';
-          video.play().catch(e => {
-            console.warn('[VIDEO_TRANSICAO] Erro ao iniciar vídeo:', e);
-            fallback.classList.remove('hidden');
-            video.classList.add('hidden');
-            window.toast?.('Erro ao reproduzir vídeo de transição. Usando fallback.', 'error');
-            setTimeout(cleanup, 1000);
-          });
-        }, { once: true });
-
-        video.addEventListener('ended', () => {
-          log('Vídeo finalizado:', src);
-          cleanup();
-        }, { once: true });
-
-        video.addEventListener('error', (e) => {
-          if (done) {
-            log('Erro ignorado, vídeo já foi limpo');
-            return;
-          }
-          console.error('[VIDEO_TRANSICAO] Erro ao carregar vídeo:', src, {
-            error: e,
-            videoSrc: video.src,
-            readyState: video.readyState,
-            networkState: video.networkState
-          });
-          fallback.classList.remove('hidden');
-          video.classList.add('hidden');
-          window.toast?.('Erro ao carregar vídeo de transição. Usando fallback.', 'error');
-          setTimeout(cleanup, 1000);
-        }, { once: true });
-      })
-      .catch(e => {
-        console.error('[VIDEO_TRANSICAO] Erro ao verificar vídeo:', src, e);
-        window.toast?.('Vídeo de transição não encontrado.', 'error');
-        cleanup();
-      });
-
-    const skipButton = overlay.querySelector('#skipVideo');
-    if (skipButton) {
-      skipButton.addEventListener('click', () => {
-        if (!skipButton.dataset.clicked) {
-          skipButton.dataset.clicked = 'true';
-          log('Vídeo pulado pelo usuário');
-          cleanup();
-          setTimeout(() => delete skipButton.dataset.clicked, 1000);
-        }
-      }, { once: true });
+  function navigateTo(nextSectionId) {
+    if (!nextSectionId) return;
+    log('Transição concluída, navegando para:', nextSectionId);
+    if (window.JC?.show) {
+      window.JC.show(nextSectionId);
+    } else if (typeof window.showSection === 'function') {
+      window.showSection(nextSectionId);
+    } else {
+      window.location.hash = `#${nextSectionId}`;
     }
   }
 
-  window.playTransitionVideo = playTransitionVideo;
-  log('jornada-video-transicao.js carregado');
-
-  // Debug JC.show
-  window.JC = window.JC || {};
-  window.JC.show = (function (originalShow) {
-    return function (sectionId) {
-      log('[JC.show] Exibindo seção:', sectionId, { caller: new Error().stack });
-      if (typeof originalShow === 'function') {
-        originalShow(sectionId);
-      }
+  function safeOnce(fn) {
+    let done = false;
+    return (...args) => {
+      if (done) return;
+      done = true;
+      try { fn(...args); } catch (e) { warn('Erro no safeOnce:', e); }
     };
-  })(window.JC.show);
+  }
+
+  function buildOverlay() {
+    const overlay = document.createElement('div');
+    overlay.id = 'vt-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.style.cssText = [
+      'position:fixed','inset:0','z-index:99999',
+      'background:rgba(0,0,0,.8)','display:flex',
+      'align-items:center','justify-content:center'
+    ].join(';');
+
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'width:100%;max-width:1200px;aspect-ratio:16/9;background:#000;position:relative;';
+
+    const video = document.createElement('video');
+    video.id = 'vt-video';
+    video.playsInline = true;
+    video.autoplay = false;
+    video.controls = false;
+    video.muted = false; // ajuste conforme quiser iniciar com som
+    video.style.cssText = 'width:100%;height:100%;object-fit:cover;background:#000;';
+
+    const skip = document.createElement('button');
+    skip.textContent = 'Pular';
+    skip.setAttribute('aria-label', 'Pular vídeo');
+    skip.style.cssText = [
+      'position:absolute','right:12px','top:12px','z-index:2',
+      'padding:8px 12px','border:0','border-radius:10px',
+      'background:rgba(255,255,255,.15)','backdrop-filter:blur(6px)',
+      'color:#fff','font-weight:700','cursor:pointer'
+    ].join(';');
+
+    wrap.appendChild(video);
+    wrap.appendChild(skip);
+    overlay.appendChild(wrap);
+    document.body.appendChild(overlay);
+
+    return { overlay, wrap, video, skip };
+  }
+
+  function cleanup(overlay) {
+    if (cleaned) return;
+    cleaned = true;
+    try {
+      document.removeEventListener('keydown', onKeydown, true);
+      if (overlay?.parentNode) overlay.parentNode.removeChild(overlay);
+    } catch {}
+    isPlaying = false;
+    log('Overlay removido e estado resetado');
+  }
+
+  function onKeydown(e) {
+    if (e.key === 'Escape') {
+      log('Vídeo pulado pelo usuário (Esc)');
+      const overlay = document.getElementById('vt-overlay');
+      cleanup(overlay);
+    }
+  }
+
+  /**
+   * Reproduz um vídeo MP4 de transição. Se `src` não for MP4,
+   * não tenta reproduzir: navega direto para `nextSectionId`.
+   *
+   * @param {string} src - caminho do vídeo (relativo ou absoluto)
+   * @param {string} nextSectionId - id da próxima seção/âncora/página
+   */
+  function playTransitionVideo(src, nextSectionId) {
+    log('Recebido src:', src, 'nextSectionId:', nextSectionId, { caller: new Error().stack });
+
+    if (!src || !isMp4(src)) {
+      warn('Fonte não é MP4 (ou ausente). Pulando player e navegando diretamente…');
+      navigateTo(nextSectionId);
+      return;
+    }
+
+    if (isPlaying) {
+      log('Já reproduzindo vídeo, ignorando chamada duplicada…');
+      return;
+    }
+    isPlaying = true;
+    cleaned = false;
+
+    const href = resolveHref(src);
+    log('Vídeo resolvido para:', href);
+
+    const { overlay, video, skip } = buildOverlay();
+
+    // Eventos (garantir disparo único)
+    const finishAndGo = safeOnce(() => {
+      cleanup(overlay);
+      navigateTo(nextSectionId);
+    });
+
+    // Skip por clique no botão ou clique no fundo escuro
+    skip.addEventListener('click', finishAndGo);
+    overlay.addEventListener('click', (e) => {
+      // clique fora do vídeo
+      if (e.target === overlay) finishAndGo();
+    });
+    document.addEventListener('keydown', onKeydown, true);
+
+    // Preparar e reproduzir
+    const onCanPlay = safeOnce(() => {
+      log('Vídeo carregado, iniciando reprodução:', href);
+      video.play().catch(err => {
+        warn('Falha ao dar play (autoplay bloqueado?):', err);
+        // Tenta iniciar com mute true se o navegador exigir interação
+        video.muted = true;
+        video.play().catch(() => {
+          warn('Play ainda bloqueado — permitindo pular/navegar…');
+        });
+      });
+    });
+
+    const onEnded = safeOnce(() => {
+      log('Vídeo finalizado:', href);
+      finishAndGo();
+    });
+
+    const onError = safeOnce((ev) => {
+      warn('Erro ao carregar vídeo:', href, ev);
+      // Em caso de erro, limpa e avança
+      finishAndGo();
+    });
+
+    video.addEventListener('canplaythrough', onCanPlay, { once: true });
+    video.addEventListener('loadeddata', onCanPlay, { once: true });
+    video.addEventListener('ended', onEnded, { once: true });
+    video.addEventListener('error', onError, { once: true });
+
+    // Carrega a fonte
+    video.src = href;
+    video.load();
+  }
+
+  // API pública
+  window.playTransitionVideo = playTransitionVideo;
+
+  // Opcional: helper para “transição sem vídeo” (HTML/section)
+  window.playTransition = function(nextSectionId) {
+    log('Transição simples (sem vídeo) para:', nextSectionId);
+    navigateTo(nextSectionId);
+  };
 })();
