@@ -451,30 +451,31 @@
     document.addEventListener('section:shown', handler, { passive: true, once: true });
     window.JCSenha.state.listenerAdded = true;
 
-    function isVisible(el) {
-    if (!el) return false;
-    const style = window.getComputedStyle(el);
-    return (
+   function isVisible(el) {
+  if (!el) return false;
+  const style = window.getComputedStyle(el);
+  return (
     style.display !== 'none' &&
     style.visibility !== 'hidden' &&
     style.opacity !== '0' &&
     el.offsetParent !== null
-    );
-   }
-    const tryInitialize = (attempt = 1, maxAttempts = 10) => {
-      setTimeout(() => {
-        const senhaEl = document.getElementById(SECTION_ID);
-if (isVisible(senhaEl) && !window.JCSenha.state.ready && !senhaEl.dataset.senhaInitialized) {
-  console.log(`[JCSenha] Seção visível detectada, disparando handler`);
-  handler({ detail: { sectionId: SECTION_ID, node: senhaEl } });
-} else if (attempt < maxAttempts) {
-  console.warn(`[JCSenha] Nenhuma seção visível ou já inicializada (tentativa ${attempt}/${maxAttempts})`);
-  tryInitialize(attempt + 1, maxAttempts);
-} else {
-  console.error(`[JCSenha] Falha ao inicializar após ${maxAttempts} tentativas`);
+  );
 }
-      }, 100); // Delay fixo de 100ms
-    };
+
+const tryInitialize = (attempt = 1, maxAttempts = 10) => {
+  setTimeout(() => {
+    const el = document.getElementById(SECTION_ID);
+    if (isVisible(el) && !window.JCSenha.state.ready && !el.dataset.senhaInitialized) {
+      console.log(`[JCSenha] Seção visível detectada, disparando handler`);
+      handler({ detail: { sectionId: SECTION_ID, node: el } });
+    } else if (attempt < maxAttempts) {
+      console.warn(`[JCSenha] Nenhuma seção visível ou já inicializada (tentativa ${attempt}/${maxAttempts})`);
+      tryInitialize(attempt + 1, maxAttempts);
+    } else {
+      console.error(`[JCSenha] Falha ao inicializar após ${maxAttempts} tentativas`);
+    }
+  }, 100);
+};
 
     if (!window.JCSenha.state.ready && !document.getElementById(SECTION_ID)?.dataset.senhaInitialized) {
       tryInitialize();
