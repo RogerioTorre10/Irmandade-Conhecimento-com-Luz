@@ -10,26 +10,7 @@
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
   const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-// helper: espera o vídeo acabar
-async function waitForTransitionUnlock(timeoutMs = 15000) {
-  if (!window.__TRANSITION_LOCK) return;
-  let resolved = false;
-  const p = new Promise(resolve => {
-    const onEnd = () => { if (!resolved) { resolved = true; document.removeEventListener('transition:ended', onEnd); resolve(); } };
-    document.addEventListener('transition:ended', onEnd, { once: true });
-  });
-  const t = new Promise((resolve) => setTimeout(resolve, timeoutMs));
-  await Promise.race([p, t]); // não fica preso para sempre
-}
-
-// … dentro do initOnce(root) ANTES de começar a digitar:
-await waitForTransitionUnlock();
-
-// agora sim, rode a sequência:
-// for (const el of items) await typeOnce(el, ...);
-
-
-  
+ 
   async function typeLocal(el, text, speed) {
     return new Promise(resolve => {
       el.textContent = '';
