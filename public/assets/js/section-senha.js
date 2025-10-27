@@ -2,18 +2,17 @@
   'use strict';
 
   // ===== Config =====
-  const MOD = 'section-senha.js';
-  const SECTION_ID = 'section-senha';
-  const PREV_SECTION_ID = 'section-termo2';
-  const NEXT_SECTION_ID = 'section-guia';
-    const HIDE_CLASS = 'hidden';
+  const SECTION_ID       = 'section-senha';
+  const PREV_SECTION_ID  = 'section-termos2';
+  const NEXT_SECTION_ID  = 'section-guia';
+  const HIDE_CLASS       = 'hidden';
 
   // Timings
-  const TYPING_SPEED = 36;
+  const TYPING_SPEED     = 36;
   const INITIAL_DELAY_MS = 200;
-  const TTS_LATCH_MS   = 600;
+  const TTS_LATCH_MS     = 600;
 
-  // ===== Evita rebind =====
+  // Evita rebind
   if (window.JCSenha?.__bound) {
     console.log('[JCSenha] já carregado');
     return;
@@ -26,7 +25,7 @@
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
   const q = (sel, root = document) => root.querySelector(sel);
 
-  async function waitForElement(selector, { within = document, timeout = 6000, step = 100 } = {}) {
+  async function waitForElement(selector, { within = document, timeout = 8000, step = 100 } = {}) {
     const t0 = performance.now();
     return new Promise((resolve, reject) => {
       const loop = () => {
@@ -68,13 +67,12 @@
     return new Promise(resolve => {
       let i = 0;
       el.textContent = '';
-      const tick = () => {
+      (function tick() {
         if (i < text.length) {
           el.textContent += text.charAt(i++);
           setTimeout(tick, speed);
         } else resolve();
-      };
-      tick();
+      })();
     });
   }
 
@@ -124,46 +122,11 @@
     }
     await sleep(80);
   }
-   btn.addEventListener('click', () => {
-      if (window.speechSynthesis?.cancel) speechSynthesis.cancel();
-      if (typeof window.playTransitionVideo === 'function') {
-        window.playTransitionVideo('/assets/videos/filme-senha-confirmada.mp4', NEXT_SECTION_ID);
-      } else {
-        window.JC?.show?.(NEXT_SECTION_ID) ?? (location.hash = `#${NEXT_SECTION_ID}`);
-      }
-    }, { once: true });
-  }
-  const playTransitionVideo = (nextId) => {
-    console.log('[JCSenha] transição vídeo →', VIDEO_SRC);
-    if (typeof window.playTransitionVideo === 'function') {
-      window.playTransitionVideo(VIDEO_SRC, nextId);
-    } else if (window.JC?.show) {
-      window.JC.show(nextId);
-    } else {
-      location.hash = `#${nextId}`;
-    }
-  };
 
-  // ===== Core =====
-  function pick(root) {
-    return {
-      root,
-      instr1: q('#senha-instr1', root),
-      instr2: q('#senha-instr2', root),
-      instr3: q('#senha-instr3', root),
-      instr4: q('#senha-instr4', root),
-      input:  q('#senha-input', root),
-      toggle: q('.btn-toggle-senha', root),
-      btnPrev: q('#btn-senha-prev', root),
-      btnNext: q('#btn-senha-avancar', root),
-      errorMsg: q('#senha-error', root)
-    };
-  }
-
-  function setDisabled(el, v) {
-    if (!el) return;
-    if (v) el.setAttribute('disabled', 'true'); else el.removeAttribute('disabled');
-    if (el.classList) el.classList.toggle('is-disabled', !!v);
+  function getTransitionSrc(root, btn) {
+    return (btn?.dataset?.transitionSrc)
+        || (root?.dataset?.transitionSrc)
+        || '/assets/videos/filme-senha-confirmada.mp4';
   }
 
   function saveSenha(value) {
@@ -176,33 +139,30 @@
     } catch {}
   }
 
+  // ===== Core =====
   async function initOnce(root) {
     if (!root || root.dataset.senhaInitialized === 'true') return;
     root.dataset.senhaInitialized = 'true';
     ensureVisible(root);
 
-    let instr1, instr2, instr3, instr4, input, toggle, btnPrev, btnNext;
+    let instr1, instr2, instr3, instr4, input, toggle, btnNext, btnPrev;
     try {
       instr1 = await waitForElement('#senha-instr1', { within: root });
       instr2 = await waitForElement('#senha-instr2', { within: root });
       instr3 = await waitForElement('#senha-instr3', { within: root });
       instr4 = await waitForElement('#senha-instr4', { within: root });
-      input  = await waitForElement('#senha-input', { within: root });
+      input  = await waitForElement('#senha-input',  { within: root });
       toggle = await waitForElement('.btn-toggle-senha', { within: root });
       btnNext= await waitForElement('#btn-senha-avancar', { within: root });
-      btnPrev= await waitForElement('#btn-senha-prev', { within: root });
+      btnPrev= await waitForElement('#btn-senha-prev',    { within: root });
     } catch (e) {
       console.error('[JCSenha] Elementos não encontrados:', e);
       window.toast?.('Erro: elementos da seção Senha não carregados.', 'error');
       return;
     }
 
-    const els = { instr1, instr2, instr3, instr4, input, toggle, btnPrev, btnNext };
-
-    setDisabled(btnPrev, true);
-    setDisabled(btnNext, true);
-    setDisabled(input,  true);
-    setDisabled(toggle, true);
+    // trava durante a narrativa
+    [btnPrev, btnNext, input, toggle].forEach(el => el?.setAttribute('disabled','true'));
 
     const seq = [instr1, instr2, instr3, instr4].filter(Boolean);
     seq.forEach(normalizeParagraph);
@@ -214,23 +174,24 @@
       }
     }
 
-    setDisabled(input, false);
-    setDisabled(toggle, false);
-    setDisabled(btnPrev, false);
-    setDisabled(btnNext, false);
+    // libera
+    [btnPrev, btnNext, input, toggle].forEach(el => el?.removeAttribute('disabled'));
     input.focus();
 
-      toggle.addEventListener('click', () => {
+    // olho mágico
+    toggle.addEventListener('click', () => {
       const was = input.type;
       input.type = input.type === 'password' ? 'text' : 'password';
       console.log('[JCSenha] Olho mágico:', was, '→', input.type);
     });
 
+    // voltar
     btnPrev.addEventListener('click', () => {
-    if (window.JC?.show) window.JC.show(PREV_SECTION_ID);
-    else history.back();
-   });
+      if (window.speechSynthesis?.cancel) speechSynthesis.cancel();
+      window.JC?.show?.(PREV_SECTION_ID) ?? history.back();
+    });
 
+    // avançar (valida + toca vídeo de transição)
     btnNext.addEventListener('click', () => {
       const value = (input.value || '').trim();
       if (!value) {
@@ -240,10 +201,14 @@
       }
       saveSenha(value);
       input.type = 'password';
-      setDisabled(btnNext, true);
-      setDisabled(input, true);
-      setDisabled(toggle, true);
-      playTransitionVideo(NEXT_SECTION_ID);
+      [btnNext, input, toggle].forEach(el => el?.setAttribute('disabled','true'));
+
+      const src = getTransitionSrc(root, btnNext);
+      if (typeof window.playTransitionVideo === 'function') {
+        window.playTransitionVideo(src, NEXT_SECTION_ID);
+      } else {
+        window.JC?.show?.(NEXT_SECTION_ID) ?? (location.hash = `#${NEXT_SECTION_ID}`);
+      }
     });
 
     window.JCSenha.state.ready = true;
@@ -251,26 +216,23 @@
   }
 
   // ===== Eventos =====
-  const onSectionShown = (evt) => {
+  function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
     if (sectionId !== SECTION_ID) return;
-    const root = node || document.getElementById(SECTION_ID);
-    initOnce(root);
-  };
+    initOnce(node || document.getElementById(SECTION_ID));
+  }
 
-  const bind = () => {
+  function bind() {
     if (!window.JCSenha.state.listenerOn) {
       document.addEventListener('section:shown', onSectionShown, { passive: true });
       window.JCSenha.state.listenerOn = true;
     }
     const now = document.getElementById(SECTION_ID);
     if (now && !now.classList.contains(HIDE_CLASS)) initOnce(now);
-  };
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bind, { once: true });
-  } else {
-    bind();
   }
+
+  document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', bind, { once: true })
+    : bind();
 
 })();
