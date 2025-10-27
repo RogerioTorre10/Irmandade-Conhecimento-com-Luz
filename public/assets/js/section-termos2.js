@@ -3,7 +3,7 @@
 
   const MOD = 'section-termos2.js';
   const SECTION_ID = 'section-termos2';
-  const NEXT_SECTION_ID = 'section-senha';       // fluxo: termos2 → senha
+  const NEXT_SECTION_ID = 'section-senha';
   const HIDE_CLASS = 'hidden';
   const TYPING_SPEED = 34;
   const TTS_LATCH_MS = 600;
@@ -17,14 +17,8 @@
 
   async function localType(el, text, speed = TYPING_SPEED) {
     return new Promise(resolve => {
-      let i = 0;
-      el.textContent = '';
-      (function tick() {
-        if (i < text.length) {
-          el.textContent += text.charAt(i++);
-          setTimeout(tick, speed);
-        } else resolve();
-      })();
+      let i = 0; el.textContent = '';
+      (function tick() { if (i < text.length) { el.textContent += text.charAt(i++); setTimeout(tick, speed); } else resolve(); })();
     });
   }
 
@@ -33,25 +27,20 @@
     const text = (el.dataset?.text || el.textContent || '').trim();
     if (!text) return;
 
-    el.classList.add('typing-active');
-    el.classList.remove('typing-done');
+    el.classList.add('typing-active'); el.classList.remove('typing-done');
 
     let usedFallback = false;
     if (typeof window.runTyping === 'function') {
-      await new Promise(res => {
-        try { window.runTyping(el, text, () => res(), { speed, cursor: true }); }
-        catch { usedFallback = true; res(); }
-      });
+      await new Promise(res => { try { window.runTyping(el, text, () => res(), { speed, cursor: true }); } catch { usedFallback = true; res(); } });
     } else usedFallback = true;
 
     if (usedFallback) await localType(el, text, speed);
 
-    el.classList.remove('typing-active');
-    el.classList.add('typing-done');
+    el.classList.remove('typing-active'); el.classList.add('typing-done');
 
     if (speak && text && !el.dataset.spoken) {
       try {
-        if (window.speechSynthesis?.cancel) speechSynthesis.cancel();
+        speechSynthesis.cancel?.();
         if (window.EffectCoordinator?.speak) {
           await window.EffectCoordinator.speak(text, { lang: 'pt-BR', rate: 1.05, pitch: 1.0 });
           await sleep(TTS_LATCH_MS);
@@ -72,14 +61,19 @@
   }
 
   function pick(root) {
-    // 🔁 NOVO: tenta usar #termos2; se não existir, usa o próprio root
     const scope = root.querySelector('#termos2') || root;
     return {
       root,
       scope,
-      btn: scope.querySelector('[data-action="avancar"]') || root.querySelector('.avancarBtn') || root.querySelector('#btn-termos2-avancar'),
-      back: scope.querySelector('[data-action="voltar"]') || root.querySelector('#btn-termos2-voltar')
+      btn:  scope.querySelector('[data-action="avancar"]') || root.querySelector('.avancarBtn') || root.querySelector('#btn-termos2-avancar'),
+      back: scope.querySelector('[data-action="voltar"]')  || root.querySelector('#btn-termos2-voltar')
     };
+  }
+
+  function getTransitionSrc(root, btn) {
+    return (btn?.dataset?.transitionSrc)
+        || (root?.dataset?.transitionSrc)
+        || '/assets/videos/filme-senha.mp4';
   }
 
   async function initOnce(root) {
@@ -93,7 +87,6 @@
     btn?.classList?.add('is-hidden');
 
     const items = scope.querySelectorAll('[data-typing="true"]');
-
     for (const el of items) {
       if (!el.classList.contains('typing-done')) {
         await typeOnce(el, { speed: TYPING_SPEED, speak: true });
@@ -107,13 +100,15 @@
     btn?.focus?.();
 
     back?.addEventListener('click', () => {
-      if (window.speechSynthesis?.cancel) speechSynthesis.cancel();
+      speechSynthesis.cancel?.();
       window.JC?.show?.('section-termos1') ?? history.back();
     });
+
     btn?.addEventListener('click', () => {
-      if (window.speechSynthesis?.cancel) speechSynthesis.cancel();
+      speechSynthesis.cancel?.();
+      const src = getTransitionSrc(root, btn);
       if (typeof window.playTransitionVideo === 'function') {
-        window.playTransitionVideo('/assets/video/filme-senha.mp4', NEXT_SECTION_ID);
+        window.playTransitionVideo(src, NEXT_SECTION_ID);
       } else {
         window.JC?.show?.(NEXT_SECTION_ID) ?? (location.hash = `#${NEXT_SECTION_ID}`);
       }
