@@ -1,30 +1,112 @@
 <link rel="stylesheet" href="/assets/css/styles-base.css">
 <link rel="stylesheet" href="/assets/css/styles-guia.css">
-<section id="section-guia" data-section="guia" class="pergaminho pergaminho-v section-guia epic hidden" aria-hidden="true">
+
+<section
+  id="section-guia"
+  data-section="guia"
+  class="pergaminho pergaminho-v section-guia epic hidden"
+  aria-hidden="true"
+  data-transition-src="/assets/videos/filme-eu-na-irmandade.mp4"
+>
   <div class="parchment-inner-rough">
     <div class="conteudo-pergaminho">
-      <h2 class="titulo-pergaminho" data-typing="true" data-text="Escolha seu Guia" data-speed="50" data-cursor="true"></h2>
-       <h2 class="titulo-pergaminho" data-typing="true" data-text="Insira seu nome" data-speed="50" data-cursor="true"></h2>
 
+      <!-- Título 1 (pode datilografar) -->
+      <h2
+        class="titulo-pergaminho"
+        data-typing="true"
+        data-speed="50"
+        data-cursor="true"
+        data-text="Escolha seu Guia"
+      ></h2>
+
+      <!-- Título 2 (datilografia + leitura desejadas) -->
+      <h2
+        id="guia-title"
+        class="titulo-pergaminho"
+        data-typing="true"
+        data-speed="50"
+        data-cursor="true"
+        data-text="Insira seu nome"
+      ></h2>
+
+      <!-- Bloco de nome + confirmar -->
       <div class="guia-name-input on-pergaminho">
-        <input id="guiaNameInput" class="input-espinhos" type="text" placeholder="NOME" autocomplete="name" aria-label="Digite seu nome para a jornada" />
-        <button id="btn-confirmar-nome" class="btn btn-stone-espinhos" aria-label="Confirmar">Confirmar</button>
+        <label class="sr-only" for="guiaNameInput">Seu Nome</label>
+        <input
+          id="guiaNameInput"
+          class="input-espinhos"
+          type="text"
+          placeholder="NOME"
+          autocomplete="name"
+          aria-label="Digite seu nome para a jornada"
+        />
+        <button
+          id="btn-confirmar-nome"
+          class="btn btn-stone-espinhos"
+          aria-label="Confirmar nome para habilitar os guias"
+        >
+          Confirmar
+        </button>
       </div>
-      <div class="guia-container">
+
+      <!-- Texto introdutório do container (datilografia + TTS após confirmar) -->
+      <div class="moldura-grande">
+        <div
+          id="guiaTexto"
+          class="guia-descricao-medieval"
+          data-text="Olá, {{nome}}! Escolha seu guia para a Jornada:"
+        ></div>
+      </div>
+
+      <!-- Opções de guia -->
+      <div class="guia-options" role="group" aria-label="Opções de Guias">
+        <button
+          id="btn-guia-zion"
+          class="btn btn-stone-espinhos"
+          data-action="select-guia"
+          data-guia="zion"
+          aria-label="Escolher o guia Zion"
+          disabled
+        >
+          <span class="label">Zion</span>
+        </button>
+
+        <button
+          id="btn-guia-lumen"
+          class="btn btn-stone-espinhos"
+          data-action="select-guia"
+          data-guia="lumen"
+          aria-label="Escolher o guia Lumen"
+          disabled
+        >
+          <span class="label">Lumen</span>
+        </button>
+
+        <button
+          id="btn-guia-arian"
+          class="btn btn-stone-espinhos"
+          data-action="select-guia"
+          data-guia="arian"
+          aria-label="Escolher o guia Arian"
+          disabled
+        >
+          <span class="label">Arian</span>
+        </button>
+      </div>
+
+      <!-- Descrições (mantidas como referência/SEO; ocultas no fluxo) -->
+      <div class="sr-only" aria-hidden="true">
         <p data-guia="zion">Zion (Grok): Curioso e direto, busca respostas profundas com visão cósmica.</p>
         <p data-guia="lumen">Lumen (ChatGPT): Acolhedor e reflexivo, guia com empatia e clareza.</p>
         <p data-guia="arian">Arian (Gemini): Criativo e versátil, inspira com perspectivas inovadoras.</p>
-        <div class="guia-name-input">
-        <label for="guiaNameInput">Seu Nome</label>
-      <div class="moldura-grande">
-        <div id="guiaTexto" class="guia-descricao-medieval"></div>
       </div>
-      <div class="guia-options">
-        <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="zion" aria-label="Escolher o guia Zion" disabled>Escolher Zion</button>
-        <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="lumen" aria-label="Escolher o guia Lumen" disabled>Escolher Lumen</button>
-        <button class="btn btn-stone-espinhos" data-action="select-guia" data-guia="arian" aria-label="Escolher o guia Arian" disabled>Escolher Arian</button>
+
+      <!-- Mensagem de erro -->
+      <div id="guia-error" class="hidden" aria-hidden="true">
+        Não foi possível carregar os guias. Tente novamente.
       </div>
-      <div id="guia-error" class="hidden" aria-hidden="true">Não foi possível carregar os guias. Escolha um guia padrão abaixo.</div>
+
     </div>
   </div>
 </section>
