@@ -213,16 +213,26 @@
     setDisabled(btnNext, false);
     input.focus();
 
+    btn.addEventListener('click', () => {
+      if (window.speechSynthesis?.cancel) speechSynthesis.cancel();
+      if (typeof window.playTransitionVideo === 'function') {
+        window.playTransitionVideo('/assets/videos/filme-senha-confirmada.mp4', NEXT_SECTION_ID);
+      } else {
+        window.JC?.show?.(NEXT_SECTION_ID) ?? (location.hash = `#${NEXT_SECTION_ID}`);
+      }
+    }, { once: true });
+  }
+    
     toggle.addEventListener('click', () => {
       const was = input.type;
       input.type = input.type === 'password' ? 'text' : 'password';
       console.log('[JCSenha] Olho mágico:', was, '→', input.type);
     });
 
-    btnPrev.addEventListener('click', () => {
-      if (window.JC?.show) window.JC.show(PREV_SECTION_ID);
-      else history.back();
-    });
+    //btnPrev.addEventListener('click', () => {
+    //  if (window.JC?.show) window.JC.show(PREV_SECTION_ID);
+    //  else history.back();
+    //});
 
     btnNext.addEventListener('click', () => {
       const value = (input.value || '').trim();
