@@ -3,7 +3,7 @@
   background: transparent !important;
   padding: 24px;
   border-radius: 12px;
-  max-width: 600px;
+  max-width: 720px;              /* + respiro para o pergaminho vertical */
   margin: 0 auto;
   text-align: left !important;
   box-shadow: none;
@@ -16,12 +16,15 @@
   min-height: 80vh;
 }
 
-.section-intro .parchment-inner-rough {
+/* Corrige o seletor: antes era .section-intro ... */
+#section-intro .parchment-inner-rough {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  height: 100% !important;
+  min-height: 80vh;
   text-align: left !important;
+  /* pan sutil do pergaminho durante a intro */
+  animation: introPan 9s ease-in-out 1;
 }
 
 .intro-wrap {
@@ -31,6 +34,7 @@
   text-align: left !important;
 }
 
+/* Título com fade suave */
 .intro-title {
   font-family: 'ManufacturingConsent', sans-serif;
   font-size: 36px;
@@ -39,14 +43,18 @@
   margin-top: 40px;
   margin-bottom: 20px;
   text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
+  opacity: 0;
+  transform: translateY(6px);
+  animation: introTitleIn 600ms ease forwards;
 }
 
+/* Texto-base da intro (começa invisível para o typing) */
 .parchment-text-rough {
   font-family: 'BerkshireSwash', cursive;
   font-size: 13px;
   margin-bottom: 8px;
   color: #fff;
-  opacity: 0;
+  opacity: 0;                          /* hidden até o typing */
   visibility: visible;
   display: block;
   text-align: left !important;
@@ -59,10 +67,47 @@
   direction: ltr !important;
 }
 
+/* Quando o JS marca typing/done, mostramos */
 .parchment-text-rough.typing-active,
 .parchment-text-rough.typing-done {
   opacity: 1 !important;
   display: block !important;
   visibility: visible !important;
   text-align: left !important;
+  transition: opacity .25s ease;
+}
+
+/* Área de ações */
+#section-intro .parchment-actions-rough {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+/* Utilitários usados pelo JS */
+.is-hidden { opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+.is-disabled { opacity: .6; pointer-events: none; }
+.btn-ready-pulse { animation: btnReady .6s ease-out 1; }
+
+/* Mimos */
+@keyframes btnReady {
+  0% { transform: scale(0.98); filter: brightness(0.9); }
+  60% { transform: scale(1.02); filter: brightness(1.1); }
+  100% { transform: scale(1); filter: none; }
+}
+@keyframes introTitleIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes introPan {
+  0%   { transform: translateY(4px); }
+  50%  { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+
+/* Responsivo */
+@media (max-width: 480px) {
+  #section-intro { padding: 16px; max-width: 92vw; }
+  .intro-title { font-size: 28px; margin-top: 24px; }
+  .parchment-text-rough { font-size: 12.5px; }
 }
