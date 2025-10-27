@@ -43,8 +43,9 @@
     overlay.setAttribute('role', 'dialog');
     overlay.style.cssText = [
       'position:fixed','inset:0','z-index:99999',
-      'background:rgba(0,0,0,.8)','display:flex',
-      'align-items:center','justify-content:center'
+      'background:rgba(0,0,0,.92)','display:flex',
+      'align-items:center','justify-content:center',
+      'opacity:0','transition:opacity .2s ease'
     ].join(';');
 
     const wrap = document.createElement('div');
@@ -55,7 +56,7 @@
     video.playsInline = true;
     video.autoplay = false;
     video.controls = false;
-    video.muted = false; // ajuste conforme quiser iniciar com som
+    video.muted = true; // autoplay confiável
     video.style.cssText = 'width:100%;height:100%;object-fit:cover;background:#000;';
 
     const skip = document.createElement('button');
@@ -73,18 +74,10 @@
     overlay.appendChild(wrap);
     document.body.appendChild(overlay);
 
-    return { overlay, wrap, video, skip };
-  }
+    // fade-in
+    requestAnimationFrame(() => { overlay.style.opacity = '1'; });
 
-  function cleanup(overlay) {
-    if (cleaned) return;
-    cleaned = true;
-    try {
-      document.removeEventListener('keydown', onKeydown, true);
-      if (overlay?.parentNode) overlay.parentNode.removeChild(overlay);
-    } catch {}
-    isPlaying = false;
-    log('Overlay removido e estado resetado');
+    return { overlay, wrap, video, skip };
   }
 
   function onKeydown(e) {
@@ -95,6 +88,22 @@
     }
   }
 
+  function cleanup(overlay) {
+    if (cleaned) return;
+    cleaned = true;
+    try {
+      document.removeEventListener('keydown', onKeydown, true);
+      // 🔓 solta lock + evento
+      window.__TRANSITION_LOCK = false;
+      document.dispatchEvent(new CustomEvent('transition:ended'));
+      // restaura scroll
+      document.documentElement.style.overflow = '';
+      if (overlay?.parentNode) overlay.parentNode.removeChild(overlay);
+    } catch {}
+    isPlaying = false;
+    log('Overlay removido e estado resetado');
+  }
+
   /**
    * Reproduz um vídeo MP4 de transição. Se `src` não for MP4,
    * não tenta reproduzir: navega direto para `nextSectionId`.
@@ -103,49 +112,49 @@
    * @param {string} nextSectionId - id da próxima seção/âncora/página
    */
   function playTransitionVideo(src, nextSectionId) {
-    log('Recebido src:', src, 'nextSectionId:', nextSectionId, { caller: new Error().stack });
+    log('Recebido src:', src, 'nextSectionId:', nextSectionId);
 
     if (!src || !isMp4(src)) {
       warn('Fonte não é MP4 (ou ausente). Pulando player e navegando diretamente…');
       navigateTo(nextSectionId);
       return;
     }
-
     if (isPlaying) {
       log('Já reproduzindo vídeo, ignorando chamada duplicada…');
       return;
     }
+
     isPlaying = true;
     cleaned = false;
+
+    // 🔒 liga lock global + evento + cancela TTS + trava scroll
+    window.__TRANSITION_LOCK = true;
+    document.dispatchEvent(new CustomEvent('transition:started'));
+    try { window.speechSynthesis?.cancel(); } catch {}
+    const prevOverflow = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = 'hidden';
 
     const href = resolveHref(src);
     log('Vídeo resolvido para:', href);
 
     const { overlay, video, skip } = buildOverlay();
 
-    // Eventos (garantir disparo único)
     const finishAndGo = safeOnce(() => {
       cleanup(overlay);
       navigateTo(nextSectionId);
     });
 
-    // Skip por clique no botão ou clique no fundo escuro
     skip.addEventListener('click', finishAndGo);
-    overlay.addEventListener('click', (e) => {
-      // clique fora do vídeo
-      if (e.target === overlay) finishAndGo();
-    });
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) finishAndGo(); });
     document.addEventListener('keydown', onKeydown, true);
 
-    // Preparar e reproduzir
     const onCanPlay = safeOnce(() => {
       log('Vídeo carregado, iniciando reprodução:', href);
       video.play().catch(err => {
-        warn('Falha ao dar play (autoplay bloqueado?):', err);
-        // Tenta iniciar com mute true se o navegador exigir interação
+        warn('Falha ao dar play (autoplay?):', err);
         video.muted = true;
         video.play().catch(() => {
-          warn('Play ainda bloqueado — permitindo pular/navegar…');
+          warn('Play ainda bloqueado — permite pular/navegar.');
         });
       });
     });
@@ -157,7 +166,6 @@
 
     const onError = safeOnce((ev) => {
       warn('Erro ao carregar vídeo:', href, ev);
-      // Em caso de erro, limpa e avança
       finishAndGo();
     });
 
@@ -166,7 +174,6 @@
     video.addEventListener('ended', onEnded, { once: true });
     video.addEventListener('error', onError, { once: true });
 
-    // Carrega a fonte
     video.src = href;
     video.load();
   }
@@ -174,8 +181,8 @@
   // API pública
   window.playTransitionVideo = playTransitionVideo;
 
-  // Opcional: helper para “transição sem vídeo” (HTML/section)
-  window.playTransition = function(nextSectionId) {
+  // Transição simples (sem vídeo)
+  window.playTransition = function (nextSectionId) {
     log('Transição simples (sem vídeo) para:', nextSectionId);
     navigateTo(nextSectionId);
   };
