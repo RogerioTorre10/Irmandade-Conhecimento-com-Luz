@@ -5,70 +5,26 @@
   const SECTION_ID = 'section-termos1';
   const NEXT_SECTION_ID = 'section-termos2';     // fluxo: termos1 → termos2
   const HIDE_CLASS = 'hidden';
-
   const TYPING_SPEED = 34;
-  const INITIAL_DELAY = 200;
   const TTS_LATCH_MS = 600;
 
-  if (window.JCTermos1?.__bound) {
-    console.log('[JCTermos1] já carregado');
-    return;
-  }
+  if (window.JCTermos1?.__bound) return;
   window.JCTermos1 = window.JCTermos1 || {};
   window.JCTermos1.__bound = true;
   window.JCTermos1.state = { ready: false, listenerOn: false };
 
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-  const q = (sel, root = document) => root.querySelector(sel);
-
-  async function waitForElement(selector, { within = document, timeout = 6000, step = 100 } = {}) {
-    const t0 = performance.now();
-    return new Promise((resolve, reject) => {
-      const loop = () => {
-        const el = within.querySelector(selector);
-        if (el) return resolve(el);
-        if (performance.now() - t0 >= timeout) return reject(new Error(`Timeout: ${selector}`));
-        setTimeout(loop, step);
-      };
-      loop();
-    });
-  }
-
-  const ensureVisible = (el) => {
-    if (!el) return;
-    el.classList.remove(HIDE_CLASS);
-    el.setAttribute('aria-hidden', 'false');
-    el.style.removeProperty('display');
-    el.style.removeProperty('opacity');
-    el.style.removeProperty('visibility');
-  };
-
-  function normalizeParagraph(el) {
-    if (!el) return false;
-    const current = (el.textContent || '').trim();
-    const ds = (el.dataset?.text || '').trim();
-    const source = ds || current;
-    if (!source) return false;
-    el.dataset.text = source;
-    if (!el.classList.contains('typing-done')) {
-      el.textContent = '';
-      el.classList.remove('typing-active', 'typing-done');
-      delete el.dataset.spoken;
-    }
-    return true;
-  }
 
   async function localType(el, text, speed = TYPING_SPEED) {
     return new Promise(resolve => {
       let i = 0;
       el.textContent = '';
-      const tick = () => {
+      (function tick() {
         if (i < text.length) {
           el.textContent += text.charAt(i++);
           setTimeout(tick, speed);
         } else resolve();
-      };
-      tick();
+      })();
     });
   }
 
@@ -77,32 +33,21 @@
     const text = (el.dataset?.text || el.textContent || '').trim();
     if (!text) return;
 
-    window.G = window.G || {};
-    const prevLock = !!window.G.__typingLock;
-    window.G.__typingLock = true;
-
     el.classList.add('typing-active');
     el.classList.remove('typing-done');
 
     let usedFallback = false;
     if (typeof window.runTyping === 'function') {
-      await new Promise((resolve) => {
-        try {
-          window.runTyping(el, text, () => resolve(), { speed, cursor: true });
-        } catch (e) {
-          console.warn('[JCTermos1] runTyping falhou, fallback local', e);
-          usedFallback = true;
-          resolve();
-        }
+      await new Promise(res => {
+        try { window.runTyping(el, text, () => res(), { speed, cursor: true }); }
+        catch { usedFallback = true; res(); }
       });
-    } else {
-      usedFallback = true;
-    }
+    } else usedFallback = true;
+
     if (usedFallback) await localType(el, text, speed);
 
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
-    window.G.__typingLock = prevLock;
 
     if (speak && text && !el.dataset.spoken) {
       try {
@@ -112,28 +57,29 @@
           await sleep(TTS_LATCH_MS);
           el.dataset.spoken = 'true';
         }
-      } catch (e) {
-        console.error('[JCTermos1] Erro no TTS:', e);
-      }
+      } catch {}
     }
     await sleep(80);
   }
 
-  function pick(root) {
-    return {
-      root,
-      p1: q('#termos1-p1', root),
-      p2: q('#termos1-p2', root),
-      p3: q('#termos1-p3', root), // opcional
-      btn: q('#btn-termos1-avancar', root) || q('[data-action="avancar"]', root),
-      back: q('#btn-termos1-voltar', root) || q('[data-action="voltar"]', root)
-    };
+  function ensureVisible(el) {
+    if (!el) return;
+    el.classList.remove(HIDE_CLASS);
+    el.setAttribute('aria-hidden', 'false');
+    el.style.removeProperty('display');
+    el.style.removeProperty('opacity');
+    el.style.removeProperty('visibility');
   }
 
-  function setDisabled(el, v) {
-    if (!el) return;
-    if (v) el.setAttribute('disabled', 'true'); else el.removeAttribute('disabled');
-    el.classList?.toggle('is-disabled', !!v);
+  function pick(root) {
+    // 🔁 NOVO: tenta usar #termos1; se não existir, usa o próprio root
+    const scope = root.querySelector('#termos1') || root;
+    return {
+      root,
+      scope,
+      btn: scope.querySelector('[data-action="avancar"]') || root.querySelector('.nextBtn') || root.querySelector('#btn-termos1-avancar'),
+      back: scope.querySelector('[data-action="voltar"]') || root.querySelector('#btn-termos1-voltar')
+    };
   }
 
   async function initOnce(root) {
@@ -141,75 +87,58 @@
     root.dataset.termos1Initialized = 'true';
     ensureVisible(root);
 
-    // Essenciais
-    let p1, p2, btn;
-    try {
-      p1 = await waitForElement('#termos1-p1', { within: root });
-      p2 = await waitForElement('#termos1-p2', { within: root });
-      btn = await waitForElement('#btn-termos1-avancar, [data-action="avancar"]', { within: root });
-    } catch (e) {
-      console.error('[JCTermos1] Elementos essenciais não encontrados:', e);
-      window.toast?.('Erro: elementos da seção Termos 1 não carregados.', 'error');
-      return;
-    }
+    const { scope, btn, back } = pick(root);
 
-    const p3 = q('#termos1-p3', root);
-    const back = q('#btn-termos1-voltar, [data-action="voltar"]', root);
-    const seq = [p1, p2, p3].filter(Boolean);
-
-    seq.forEach(normalizeParagraph);
-    setDisabled(btn, true);
+    // desabilita e esconde até terminar a digitação
+    btn?.setAttribute('disabled', 'true');
     btn?.classList?.add('is-hidden');
-    if (back) setDisabled(back, false);
 
-    for (const el of seq) {
+    // pega todos os elementos datilografáveis dentro do escopo
+    const items = scope.querySelectorAll('[data-typing="true"]');
+
+    for (const el of items) {
       if (!el.classList.contains('typing-done')) {
         await typeOnce(el, { speed: TYPING_SPEED, speak: true });
       }
     }
 
-    setDisabled(btn, false);
+    // libera botão
+    btn?.removeAttribute('disabled');
     btn?.classList?.remove('is-hidden');
     btn?.classList?.add('btn-ready-pulse');
     setTimeout(() => btn?.classList?.remove('btn-ready-pulse'), 700);
-    btn?.focus();
+    btn?.focus?.();
 
+    // navegação
     back?.addEventListener('click', () => {
       if (window.speechSynthesis?.cancel) speechSynthesis.cancel();
-      if (window.JC?.show) window.JC.show('section-intro');
-      else history.back();
+      window.JC?.show?.('section-intro') ?? history.back();
     });
-
     btn?.addEventListener('click', () => {
       if (window.speechSynthesis?.cancel) speechSynthesis.cancel();
-      if (window.JC?.show) window.JC.show(NEXT_SECTION_ID);
-      else location.hash = `#${NEXT_SECTION_ID}`;
+      window.JC?.show?.(NEXT_SECTION_ID) ?? (location.hash = `#${NEXT_SECTION_ID}`);
     });
 
     window.JCTermos1.state.ready = true;
     console.log('[JCTermos1] pronto');
   }
 
-  const onSectionShown = (evt) => {
+  function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
     if (sectionId !== SECTION_ID) return;
-    const root = node || document.getElementById(SECTION_ID);
-    initOnce(root);
-  };
+    initOnce(node || document.getElementById(SECTION_ID));
+  }
 
-  const bind = () => {
+  function bind() {
     if (!window.JCTermos1.state.listenerOn) {
       document.addEventListener('section:shown', onSectionShown, { passive: true });
       window.JCTermos1.state.listenerOn = true;
     }
     const now = document.getElementById(SECTION_ID);
     if (now && !now.classList.contains(HIDE_CLASS)) initOnce(now);
-  };
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bind, { once: true });
-  } else {
-    bind();
   }
 
+  document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', bind, { once: true })
+    : bind();
 })();
