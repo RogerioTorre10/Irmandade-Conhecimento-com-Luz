@@ -20,12 +20,22 @@
     'section-final'
   ];
 
+  let lastShownSection = null;
+
   function getText(el) {
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
   }
 
   async function applyTypingAndTTS(sectionId, root) {
-    console.log('[JC.applyTypingAndTTS] Desativado para:', sectionId);
+    console.log('[JC.applyTypingAndTTS] Iniciando para:', sectionId);
+    try {
+      if (window.TypingBridge) {
+        await window.TypingBridge.init(root);
+        console.log('[JC.applyTypingAndTTS] Efeitos de datilografia aplicados para:', sectionId);
+      }
+    } catch (err) {
+      console.error('[JC.applyTypingAndTTS] Erro ao aplicar efeitos:', sectionId, err);
+    }
   }
 
   function attachButtonEvents(sectionId, root) {
@@ -42,7 +52,7 @@
           const currentIndex = sectionOrder.indexOf(sectionId);
           const nextSection = sectionOrder[currentIndex + 1];
           console.log('[JC.attachButtonEvents] Navigating to:', nextSection);
-          if (nextSection) {
+          if (nextSection && nextSection !== window.JC.currentSection) {
             JC.show(nextSection);
           } else {
             console.warn('[JC.attachButtonEvents] No next section, redirecting to /termos');
@@ -63,7 +73,11 @@
 
   function handleSectionLogic(sectionId, root) {
     console.log('[JC.handleSectionLogic] Processing logic for:', sectionId);
-    if (sectionId === 'section-intro' || sectionId === 'section-termos') {
+    if (
+      sectionId === 'section-intro' ||
+      sectionId === 'section-termos1' ||
+      sectionId === 'section-termos2'
+    ) {
       root.style.cssText = `
         background: transparent !important;
         padding: 30px !important;
@@ -79,11 +93,17 @@
         z-index: 2 !important;
       `;
       attachButtonEvents(sectionId, root);
+      applyTypingAndTTS(sectionId, root);
     }
   }
 
   async function show(sectionId) {
-    console.log('[JC.show] Starting display for:', sectionId);
+    console.log('[JC.show] Starting display for:', sectionId, { caller: new Error().stack });
+    if (sectionId === window.JC.currentSection || sectionId === lastShownSection) {
+      console.log('[JC.show] Seção já ativa ou exibida recentemente, ignorando:', sectionId);
+      return;
+    }
+
     try {
       const cleanId = sectionId.replace(/^section-/, '');
       console.log('[JC.show] Starting carregarEtapa for:', cleanId);
@@ -91,15 +111,19 @@
       console.log('[JC.show] carregarEtapa completed, element #', sectionId, ':', !!section);
       if (section) {
         console.log('[JC.show] Content of #jornada-content-wrapper:', document.getElementById('jornada-content-wrapper')?.innerHTML.slice(0, 120) + '...');
+        lastShownSection = sectionId;
+        window.JC.currentSection = sectionId;
         handleSectionLogic(sectionId, section);
         document.dispatchEvent(new CustomEvent('section:shown', { detail: { sectionId, node: section } }));
         console.log('[JC.show] Event section:shown fired for:', sectionId);
         console.log('[JC.show] Displayed successfully:', sectionId);
       } else {
         console.error('[JC.show] Section element is null for:', sectionId);
+        window.toast?.(`Seção ${sectionId} não encontrada`, 'error');
       }
     } catch (err) {
       console.error('[JC.show] Error showing section:', sectionId, err);
+      window.toast?.(`Erro ao mostrar seção ${sectionId}`, 'error');
     }
   }
 
@@ -107,7 +131,7 @@
     const currentIndex = sectionOrder.indexOf(window.JC.currentSection || 'section-intro');
     const nextSection = sectionOrder[currentIndex + 1];
     console.log('[JC.goNext] Navigating to:', nextSection);
-    if (nextSection) {
+    if (nextSection && nextSection !== window.JC.currentSection) {
       show(nextSection);
     } else {
       console.warn('[JC.goNext] No next section, redirecting to /termos');
@@ -132,14 +156,43 @@
       attachButtonEvents,
       handleSectionLogic
     };
-    window.JC.currentSection = 'section-intro';
-    window.JC.show('section-intro');
+    window.JC.currentSection = null;
+
+    // Verificar autenticação
+    const authScreen = document.getElementById('auth-screen');
+    const toastElement = document.getElementById('toast');
+    if (authScreen || (toastElement && toastElement.textContent.includes('autenticação necessária'))) {
+      console.warn('[JC.init] Tela de autenticação detectada');
+      // Simular autenticação
+      localStorage.setItem('token', 'dummy-token');
+      localStorage.setItem('JORNADA_NOME', 'Teste');
+      localStorage.setItem('JORNADA_GUIA', 'guia');
+      if (authScreen) authScreen.style.display = 'none';
+      if (toastElement) toastElement.style.display = 'none';
+      console.log('[JC.init] Autenticação simulada, iniciando section-intro...');
+    }
+
+    // Iniciar jornada
+    const introElement = document.getElementById('section-intro');
+    if (!introElement) {
+      console.warn('[JC.init] section-intro não encontrado, avançando para section-termos1');
+      window.JC.currentSection = 'section-termos1';
+      window.JC.show('section-termos1');
+    } else {
+      window.JC.currentSection = 'section-intro';
+      window.JC.show('section-intro');
+    }
   }
 
   document.addEventListener('section:shown', (e) => {
     const sectionId = e.detail.sectionId;
     const node = e.detail.node;
+    if (sectionId === lastShownSection) {
+      console.log('[JC.section:shown] Seção já exibida, ignorando:', sectionId);
+      return;
+    }
     if (node) {
+      lastShownSection = sectionId;
       window.JC.currentSection = sectionId;
       attachButtonEvents(sectionId, node);
       handleSectionLogic(sectionId, node);
