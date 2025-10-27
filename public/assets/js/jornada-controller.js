@@ -15,7 +15,7 @@
   ];
 
   let lastShownSection = null;
-  let isTransitioning = false; // Nova variável para evitar chamadas durante transições
+  let isTransitioning = false;
 
   function getText(el) {
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
@@ -116,6 +116,13 @@
       } else {
         console.error('[JC.show] Section element is null for:', sectionId);
         window.toast?.(`Seção ${sectionId} não encontrada`, 'error');
+        // Tentar próxima seção
+        const currentIndex = sectionOrder.indexOf(sectionId);
+        const nextSection = sectionOrder[currentIndex + 1];
+        if (nextSection) {
+          console.warn('[JC.show] Avançando para próxima seção:', nextSection);
+          show(nextSection);
+        }
       }
     } catch (err) {
       console.error('[JC.show] Error showing section:', sectionId, err);
