@@ -1,4 +1,4 @@
-/* ========== SEÇÃO GUIA ========== */
+/* ====== SEÇÃO GUIA ====== */
 .section-guia {
   background: transparent !important;
   padding: 24px;
@@ -50,8 +50,8 @@
 }
 
 .input-espinhos {
-  width: min(62%, 360px);
-  padding: 12px 14px;
+  width: min(70%, 420px);
+  padding: 10px 12px;
   background: rgba(255, 255, 255, 0.98);
   color: #3e2723;
   font-size: 16px;
@@ -59,7 +59,7 @@
   outline: none;
   border: 14px solid transparent;
   border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
-  border-radius: 2px;
+  border-radius: 4px;
   font-family: 'Cardo', serif;
 }
 
@@ -76,12 +76,14 @@
 
 .guia-descricao-medieval {
   width: 100%;
-  max-width: 640px;
+  max-width: 760px;
   text-align: left !important;
   color: #fff;
   font-family: 'BerkshireSwash', cursive;
   font-size: 15.5px;
   line-height: 1.45;
+  margin: 0 auto;
+  padding: 12px 18px;
 }
 
 .guia-descricao-medieval p {
@@ -90,24 +92,29 @@
 
 .guia-options {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
   width: min(92%, 720px);
   margin: 4px auto 10px;
+  justify-content: center;
 }
 
 .guia-options .btn-stone-espinhos {
-  padding: 11px 14px;
+  padding: 8px 12px;
   font-weight: 600;
+  font-size: 15px;
   color: #fff;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0.22)), url('/assets/img/textura-de-pedra.jpg') center/cover no-repeat;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0.22)),
+              url('/assets/img/textura-de-pedra.jpg') center/cover no-repeat;
   border: 12px solid transparent;
   border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
-  border-radius: 3px;
+  border-radius: 4px;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
   transition: transform 0.12s ease, filter 0.12s ease, opacity 0.12s ease;
   font-family: 'ManufacturingConsent', sans-serif;
   cursor: pointer;
+  width: 140px;
+  text-align: center;
 }
 
 .guia-options .btn-stone-espinhos:hover {
