@@ -4,7 +4,6 @@
   const MOD = 'section-termos2.js';
   const SECTION_ID = 'section-termos2';
   const NEXT_SECTION_ID = 'section-senha';       // fluxo: termos2 → senha
-  const VIDEO_SRC = '/assets/videos/filme-senha.mp4';
   const HIDE_CLASS = 'hidden';
   const TYPING_SPEED = 34;
   const TTS_LATCH_MS = 600;
