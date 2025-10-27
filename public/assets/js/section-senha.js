@@ -6,8 +6,7 @@
   const SECTION_ID = 'section-senha';
   const PREV_SECTION_ID = 'section-termo2';
   const NEXT_SECTION_ID = 'section-guia';
-  const VIDEO_SRC = '/assets/video/filme-senha-confirmada.mp4';
-  const HIDE_CLASS = 'hidden';
+    const HIDE_CLASS = 'hidden';
 
   // Timings
   const TYPING_SPEED = 36;
