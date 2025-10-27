@@ -1,19 +1,18 @@
-<script>
 (function () {
-  'use strict'; 
+  'use strict';
 
+  // ===== Config =====
   const MOD = 'section-senha.js';
   const SECTION_ID = 'section-senha';
-   const NEXT_SECTION_ID = 'section-guia';
+  const PREV_SECTION_ID = 'section-termo2';
+  const NEXT_SECTION_ID = 'section-guia';
   const VIDEO_SRC = '/assets/video/filme-senha-confirmada.mp4';
   const HIDE_CLASS = 'hidden';
-  
-
 
   // Timings
   const TYPING_SPEED = 36;
-  const INITIAL_DELAY_MS = 200;   // antes de começar a datilografia
-  const TTS_LATCH_MS   = 600;     // “janela” pra TTS marcar como falado
+  const INITIAL_DELAY_MS = 200;
+  const TTS_LATCH_MS   = 600;
 
   // ===== Evita rebind =====
   if (window.JCSenha?.__bound) {
@@ -22,10 +21,7 @@
   }
   window.JCSenha = window.JCSenha || {};
   window.JCSenha.__bound = true;
-  window.JCSenha.state = {
-    ready: false,
-    listenerOn: false
-  };
+  window.JCSenha.state = { ready: false, listenerOn: false };
 
   // ===== Utils =====
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
@@ -60,7 +56,7 @@
     const ds = (el.dataset?.text || '').trim();
     const source = ds || current;
     if (!source) return false;
-    el.dataset.text = source;           // garante fonte no data-text
+    el.dataset.text = source;
     if (!el.classList.contains('typing-done')) {
       el.textContent = '';
       el.classList.remove('typing-active', 'typing-done');
@@ -77,9 +73,7 @@
         if (i < text.length) {
           el.textContent += text.charAt(i++);
           setTimeout(tick, speed);
-        } else {
-          resolve();
-        }
+        } else resolve();
       };
       tick();
     });
@@ -90,7 +84,6 @@
     const text = (el.dataset?.text || el.textContent || '').trim();
     if (!text) return;
 
-    // trava de digitação compatível com seu ecossistema
     window.G = window.G || {};
     const prevLock = !!window.G.__typingLock;
     window.G.__typingLock = true;
@@ -112,7 +105,6 @@
     } else {
       usedFallback = true;
     }
-
     if (usedFallback) await localType(el, text, speed);
 
     el.classList.remove('typing-active');
@@ -157,7 +149,7 @@
       toggle: q('.btn-toggle-senha', root),
       btnPrev: q('#btn-senha-prev', root),
       btnNext: q('#btn-senha-avancar', root),
-      errorMsg: q('#senha-error', root) // opcional
+      errorMsg: q('#senha-error', root)
     };
   }
 
@@ -169,9 +161,8 @@
 
   function saveSenha(value) {
     try {
-      if (window.JC?.data) {
-        window.JC.data.senha = value;
-      } else {
+      if (window.JC?.data) window.JC.data.senha = value;
+      else {
         window.JCData = window.JCData || {};
         window.JCData.senha = value;
       }
@@ -183,7 +174,6 @@
     root.dataset.senhaInitialized = 'true';
     ensureVisible(root);
 
-    // Aguarda elementos mínimos
     let instr1, instr2, instr3, instr4, input, toggle, btnPrev, btnNext;
     try {
       instr1 = await waitForElement('#senha-instr1', { within: root });
@@ -202,46 +192,38 @@
 
     const els = { instr1, instr2, instr3, instr4, input, toggle, btnPrev, btnNext };
 
-    // Desabilita controles durante a narrativa
     setDisabled(btnPrev, true);
     setDisabled(btnNext, true);
     setDisabled(input,  true);
     setDisabled(toggle, true);
 
-    // Normaliza blocos de texto e ordena por posição visual
     const seq = [instr1, instr2, instr3, instr4].filter(Boolean);
     seq.forEach(normalizeParagraph);
 
     await sleep(INITIAL_DELAY_MS);
-
-    // Datilografia sequencial com TTS
     for (const el of seq) {
       if (!el.classList.contains('typing-done')) {
         await typeOnce(el, { speed: TYPING_SPEED, speak: true });
       }
     }
 
-    // Habilita interação
     setDisabled(input, false);
     setDisabled(toggle, false);
     setDisabled(btnPrev, false);
     setDisabled(btnNext, false);
     input.focus();
 
-    // Olho mágico
     toggle.addEventListener('click', () => {
       const was = input.type;
       input.type = input.type === 'password' ? 'text' : 'password';
       console.log('[JCSenha] Olho mágico:', was, '→', input.type);
     });
 
-    // Voltar
     btnPrev.addEventListener('click', () => {
       if (window.JC?.show) window.JC.show(PREV_SECTION_ID);
       else history.back();
     });
 
-    // Avançar (valida e segue)
     btnNext.addEventListener('click', () => {
       const value = (input.value || '').trim();
       if (!value) {
@@ -249,16 +231,11 @@
         input.focus();
         return;
       }
-      // (Opcional) regras mínimas – descomente se quiser
-      // if (value.length < 4) { window.toast?.('Use pelo menos 4 caracteres.', 'warning'); return; }
-
       saveSenha(value);
-      // segurança visual
       input.type = 'password';
       setDisabled(btnNext, true);
       setDisabled(input, true);
       setDisabled(toggle, true);
-
       playTransitionVideo(NEXT_SECTION_ID);
     });
 
@@ -276,14 +253,11 @@
 
   const bind = () => {
     if (!window.JCSenha.state.listenerOn) {
-      document.addEventListener('section:shown', onSectionShown, { passive: true }); // persistente
+      document.addEventListener('section:shown', onSectionShown, { passive: true });
       window.JCSenha.state.listenerOn = true;
     }
-    // Se já visível, inicializa imediatamente
     const now = document.getElementById(SECTION_ID);
-    if (now && !now.classList.contains(HIDE_CLASS)) {
-      initOnce(now);
-    }
+    if (now && !now.classList.contains(HIDE_CLASS)) initOnce(now);
   };
 
   if (document.readyState === 'loading') {
@@ -293,4 +267,3 @@
   }
 
 })();
-</script>
