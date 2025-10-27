@@ -142,7 +142,7 @@
       b.setAttribute('aria-label', label);
     });
   }
-
+  
   async function initOnce(root) {
     if (!root || root.dataset.guiaInitialized === 'true') return;
     root.dataset.guiaInitialized = 'true';
@@ -205,6 +205,10 @@ if (els.guiaTexto) {
       }
     }, { once: true });
 
+    // antes de salvar o guia ou tocar o vídeo
+     document.querySelector('.moldura-grande')?.classList.add('fade-out');
+     document.querySelector('.guia-descricao-medieval')?.classList.add('fade-out');
+    
     // clique nas opções → registra guia e toca transição
     if (els.guiaOptions?.length) {
       els.guiaOptions.forEach(btn => {
