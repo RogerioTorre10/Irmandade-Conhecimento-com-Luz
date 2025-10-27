@@ -1,76 +1,169 @@
 /* /assets/js/api.js
    Expondo: window.API com health(), gerarPDFEHQ(), etc.
-   Compatível com o micro-boot (usa API_PRIMARY / API_FALLBACK).
+   Compatível com micro-boot (usa APP_CONFIG.API_BASE / API_FALLBACK).
 */
 (function () {
   'use strict';
 
-  // ---------- Descoberta de bases ----------
+  // ---------- Config / Descoberta ----------
   const APP = (window.APP_CONFIG || {});
-  // Base principal (prod ou local via config.local.js)
-  const API_PRIMARY  = String(APP.API_BASE || 'https://conhecimento-com-luz-api.onrender.com').replace(/\/+$/,'');
-  // Fallback (pode ser o mesmo endpoint; ajuste aqui se tiver um espelho)
+  const API_PRIMARY  = String(APP.API_BASE     || 'https://conhecimento-com-luz-api.onrender.com').replace(/\/+$/,'');
   const API_FALLBACK = String(APP.API_FALLBACK || API_PRIMARY).replace(/\/+$/,'');
 
-  // ---------- Helpers HTTP ----------
-  async function getJSON(base, path) {
-    const url = base + path;
-    const r = await fetch(url, { method: 'GET', headers: { 'Accept': 'application/json' } });
-    if (!r.ok) throw new Error(`GET ${url} -> ${r.status}`);
-    return r.headers.get('content-type')?.includes('application/json') ? r.json() : { ok: true };
+  // Candidatos conhecidos para health (ordem de tentativa)
+  const HEALTH_PATHS = ['/health', '/healthz', '/status', '/.well-known/health', '/api/health'];
+
+  // Candidatos comuns para geração de PDF/HQ
+  const PDF_PATHS = ['/generate-pdf-hq', '/generate-pdf', '/pdf/generate', '/generate'];
+
+  // ---------- Utils ----------
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  function join(...parts) {
+    return parts
+      .filter(Boolean)
+      .map((p, i) => (i === 0 ? String(p).replace(/\/+$/,'') : String(p).replace(/^\/+/,'')))
+      .join('/');
   }
 
-  async function postJSON(base, path, body) {
-    const url = base + path;
-    const r = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, application/pdf' },
-      body: JSON.stringify(body || {}),
-    });
-    if (!r.ok) throw new Error(`POST ${url} -> ${r.status}`);
+  function withTimeout(ms, controller = new AbortController()) {
+    const t = setTimeout(() => controller.abort(), ms);
+    return { controller, clear: () => clearTimeout(t) };
+  }
+
+  function pickFilenameFromHeaders(r, fallback) {
+    const cd = r.headers.get('content-disposition') || '';
+    const m = cd.match(/filename\*?=(?:UTF-8'')?["']?([^"';]+)["']?/i);
+    if (m && m[1]) return decodeURIComponent(m[1]);
+    return fallback;
+  }
+
+  async function handleBody(r) {
+    if (r.status === 204) return null;
     const ct = r.headers.get('content-type') || '';
     if (ct.includes('application/pdf')) return r.blob();
     if (ct.includes('application/json')) return r.json();
     return r.text();
   }
 
+  // ---------- HTTP helpers ----------
+  async function getJSON(base, path, { timeout = 4000 } = {}) {
+    const url = join(base, path);
+    const { controller, clear } = withTimeout(timeout);
+    try {
+      const r = await fetch(url, { method: 'GET', cache: 'no-store', headers: { 'Accept': 'application/json' }, signal: controller.signal });
+      if (!r.ok) throw new Error(`GET ${url} -> ${r.status}`);
+      const ct = r.headers.get('content-type') || '';
+      clear();
+      return ct.includes('application/json') ? r.json() : { ok: true };
+    } finally { clear(); }
+  }
+
+  async function postJSON(base, path, body, { timeout = 15000 } = {}) {
+    const url = join(base, path);
+    const { controller, clear } = withTimeout(timeout);
+    try {
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json, application/pdf'
+        },
+        body: JSON.stringify(body || {}),
+        signal: controller.signal
+      });
+      if (!r.ok) throw new Error(`POST ${url} -> ${r.status}`);
+      const data = await handleBody(r);
+      // anexa possível filename vindo do servidor
+      const filename = pickFilenameFromHeaders(r, null);
+      clear();
+      return { data, filename };
+    } finally { clear(); }
+  }
+
   // ---------- API pública ----------
   async function health() {
-    // Tenta principal; se falhar, tenta fallback. Sempre retorna { ok: boolean, base: string }
+    // Tenta PRIMARY primeiro, depois FALLBACK; em cada base, varre HEALTH_PATHS
+    const tryBase = async (base) => {
+      for (const p of HEALTH_PATHS) {
+        try {
+          await getJSON(base, p, { timeout: 3000 });
+          // sucesso: fixa window.API_BASE nessa base
+          window.API_BASE = base;
+          console.info('[API Health] OK:', join(base, p));
+          return { ok: true, base, path: p };
+        } catch { /* tenta próximo */ }
+      }
+      throw new Error(`Health não encontrado em ${base}`);
+    };
+
     try {
-      await getJSON(API_PRIMARY, '/health');
-      return { ok: true, base: API_PRIMARY };
+      return await tryBase(API_PRIMARY);
     } catch (_) {
       try {
-        await getJSON(API_FALLBACK, '/health');
-        return { ok: true, base: API_FALLBACK };
-      } catch (e) {
-        return { ok: false, base: API_FALLBACK, error: String(e && e.message || e) };
+        return await tryBase(API_FALLBACK);
+      } catch (e2) {
+        const tried = [API_PRIMARY, API_FALLBACK].map(b => HEALTH_PATHS.map(p => join(b,p))).flat();
+        const msg = `Health indisponível. Tentativas: ${tried.join(', ')}`;
+        console.warn('[API Health]', msg);
+        return { ok: false, base: API_FALLBACK, error: msg };
       }
     }
   }
 
-  // Gera PDF + HQ no backend — ajuste o path se seu servidor usar outro
+  // Gera PDF/HQ. Tenta caminhos comuns; baixa se vier PDF.
   async function gerarPDFEHQ(payload) {
-    // Usa a base escolhida pelo micro-boot (se já setou), senão cai no PRIMARY
     const base = (window.API_BASE || API_PRIMARY).replace(/\/+$/,'');
-    // Endpoints comuns: /generate, /generate-pdf, /pdf/generate — personalize se preciso
-    // Aqui usamos /generate-pdf-hq por padrão:
-    const blob = await postJSON(base, '/generate-pdf-hq', payload || {});
-    // Se veio blob (PDF), baixa no navegador
-    if (blob instanceof Blob) {
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `jornada-${new Date().toISOString().slice(0,10)}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
-      return { ok: true, downloaded: true };
+    let lastErr = null;
+
+    for (const path of PDF_PATHS) {
+      try {
+        const { data, filename } = await postJSON(base, path, payload || {}, { timeout: 30000 });
+
+        // Caso o backend retorne um objeto com { url } para download direto
+        if (data && typeof data === 'object' && data.url && typeof data.url === 'string') {
+          triggerDownloadURL(data.url);
+          return { ok: true, downloaded: true, via: 'url', path, base };
+        }
+
+        // Se veio PDF (Blob), baixa
+        if (data instanceof Blob) {
+          const fname = filename || `jornada-${new Date().toISOString().slice(0,10)}.pdf`;
+          triggerDownloadBlob(data, fname);
+          return { ok: true, downloaded: true, via: 'blob', path, base, filename: fname };
+        }
+
+        // Se veio JSON/texto, devolve para o chamador
+        return { ok: true, data, via: 'json/text', path, base };
+      } catch (e) {
+        lastErr = e;
+        await sleep(120); // pequeno backoff entre tentativas
+      }
     }
-    return { ok: true, data: blob };
+
+    return { ok: false, base, error: String(lastErr && lastErr.message || lastErr) };
   }
 
-  // Exposição compatível com o micro-boot
+  function triggerDownloadBlob(blob, filename) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename || 'arquivo.pdf';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+  }
+
+  function triggerDownloadURL(url) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.rel = 'noopener';
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => a.remove(), 0);
+  }
+
+  // ---------- Exposição ----------
   window.API = {
     API_PRIMARY,
     API_FALLBACK,
@@ -78,8 +171,7 @@
     gerarPDFEHQ,
   };
 
-  // Compat: alguns trechos leem window.API_BASE depois do health()
-  // (o micro-boot seta isso, mas se chamarem direto daqui, fica coerente)
+  // Compat: garante coerência mesmo se chamarem antes do micro-boot setar
   window.API_BASE = window.API_BASE || API_PRIMARY;
 
   console.log('[API] pronto · PRIMARY=', API_PRIMARY, '· FALLBACK=', API_FALLBACK);
