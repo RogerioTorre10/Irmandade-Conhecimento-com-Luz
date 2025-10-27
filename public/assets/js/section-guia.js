@@ -1,5 +1,3 @@
-<!-- /assets/js/section-guia.js (versão limpa/estável) -->
-<script>
 (function () {
   'use strict';
 
@@ -9,7 +7,6 @@
   const VIDEO_SRC = '/assets/video/filme-eu-na-irmandade.mp4';
   const HIDE_CLASS = 'hidden';
 
-  // Evita rebind
   if (window.JCGuia?.__bound) {
     console.log('[JCGuia] já carregado');
     return;
@@ -17,13 +14,7 @@
   window.JCGuia = window.JCGuia || {};
   window.JCGuia.__bound = true;
 
-  // ===== State =====
-  const State = {
-    ready: false,
-    listenerOn: false
-  };
-
-  // ===== Utils =====
+  const State = { ready: false, listenerOn: false };
   const q = (sel, root = document) => root.querySelector(sel);
   const qa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
@@ -39,14 +30,10 @@
 
   const typeOnce = async (el, text, speed = 45) => {
     if (!el || !text) return;
-    // Se existir bridge oficial, usa; senão, fallback simples
     if (typeof window.runTyping === 'function') {
       await new Promise(res => {
-        try {
-          window.runTyping(el, text, () => res(), { speed, cursor: true });
-        } catch {
-          res();
-        }
+        try { window.runTyping(el, text, () => res(), { speed, cursor: true }); }
+        catch { res(); }
       });
     } else {
       el.textContent = '';
@@ -68,7 +55,6 @@
     }
   };
 
-  // ===== Core =====
   const pick = (root) => ({
     root,
     title: q('.titulo-pergaminho', root),
@@ -84,12 +70,10 @@
     if (root.dataset.guiaInitialized === 'true') return;
     root.dataset.guiaInitialized = 'true';
 
-    // Aparência/visibilidade
     ensureVisible(root);
 
     const els = pick(root);
 
-    // Estado inicial
     if (els.errorMsg) {
       els.errorMsg.classList.add(HIDE_CLASS);
       els.errorMsg.setAttribute('aria-hidden', 'true');
@@ -100,13 +84,11 @@
       els.guiaOptions.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; });
     }
 
-    // Título datilografado (respeita data-text ou conteúdo atual)
     if (els.title && !els.title.classList.contains('typing-done')) {
       const txt = (els.title.dataset?.text || els.title.textContent || '').trim();
       await typeOnce(els.title, txt);
     }
 
-    // Confirmar nome → libera botões de guia
     if (els.confirmBtn) {
       els.confirmBtn.addEventListener('click', () => {
         const name = (els.nameInput?.value || '').trim();
@@ -124,7 +106,6 @@
       }, { once: true });
     }
 
-    // Clique nos guias → transição
     if (els.guiaOptions?.length) {
       els.guiaOptions.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -140,7 +121,6 @@
     console.log('[JCGuia] pronto');
   };
 
-  // Handler de evento do controlador
   const onSectionShown = (evt) => {
     const { sectionId, node } = evt?.detail || {};
     if (sectionId !== SECTION_ID) return;
@@ -148,13 +128,11 @@
     initOnce(root);
   };
 
-  // Bind de listeners (persistentes, sem "once")
   const bind = () => {
     if (!State.listenerOn) {
       document.addEventListener('section:shown', onSectionShown, { passive: true });
       State.listenerOn = true;
     }
-    // Se já está visível agora, inicializa imediatamente
     const now = document.getElementById(SECTION_ID);
     if (now && !now.classList.contains(HIDE_CLASS)) {
       initOnce(now);
@@ -168,4 +146,3 @@
   }
 
 })();
-</script>
