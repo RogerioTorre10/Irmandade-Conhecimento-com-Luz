@@ -311,3 +311,46 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
   color: #fff;
   font-size: 14px;
 }
+
+/* ==== Halo vivo das chamas ==== */
+/* Ajuste estes seletores conforme os seus: */
+.chama, .chama-esq, .chama-dir, .torch {
+  position: relative;
+  filter:
+    drop-shadow(0 0 10px rgba(255,170,40,.85))
+    drop-shadow(0 0 22px rgba(255,130,10,.55));
+  animation: flamePulse 2.4s ease-in-out infinite;
+}
+
+/* anel energético girando em volta da chama */
+.chama::after, .chama-esq::after, .chama-dir::after, .torch::after{
+  content:"";
+  position:absolute; inset:-10px;
+  border-radius: 50%;
+  background:
+    conic-gradient(from 0deg,
+      rgba(255,210,90,.0) 0deg,
+      rgba(255,210,90,.75) 80deg,
+      rgba(255,230,150,.9) 120deg,
+      rgba(255,170,60,.7) 160deg,
+      rgba(255,210,90,.0) 220deg 360deg);
+  mix-blend-mode: screen;
+  pointer-events:none;
+  animation: ringSpin 5s linear infinite;
+  /* suaviza para não cobrir a chama toda */
+  mask: radial-gradient(circle, rgba(0,0,0,0) 58%, rgba(0,0,0,1) 61%);
+}
+
+@keyframes flamePulse{
+  0%,100%{ filter: drop-shadow(0 0 8px rgba(255,170,40,.8)) drop-shadow(0 0 18px rgba(255,130,10,.5)); transform: translateY(0); }
+  50%    { filter: drop-shadow(0 0 16px rgba(255,190,60,.95)) drop-shadow(0 0 32px rgba(255,150,30,.7)); transform: translateY(-1px); }
+}
+
+@keyframes ringSpin{
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .chama, .chama-esq, .chama-dir, .torch { animation:none; }
+  .chama::after, .chama-esq::after, .chama-dir::after, .torch::after { animation:none; }
+}
