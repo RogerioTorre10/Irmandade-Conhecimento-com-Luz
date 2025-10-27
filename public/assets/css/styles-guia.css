@@ -1,130 +1,238 @@
-/* ========== SEÇÃO GUIA ========== */
-.section-guia {
+/* ========== SECTION GUIA ========== */
+
+#section-guia {
   background: transparent !important;
-  padding: 24px;
-  border-radius: 12px;
-  max-width: 600px;
-  margin: 0 auto;
+  min-height: 85vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 40px;
+  padding-bottom: 60px;
+}
+
+.section-guia .parchment-inner-rough {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
   text-align: center;
-  box-shadow: none;
-  border: none;
-  display: block;
-  opacity: 1;
-  visibility: visible;
-  z-index: 2;
-  overflow-y: auto;
-  min-height: 80vh;
-  height: 80vh;
-  box-sizing: border-box;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
 }
 
 .conteudo-pergaminho {
-  text-align: center;
-  margin: 0 auto;
-  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  gap: 16px;
+  margin-top: -20px; /* sobe tudo um pouco */
 }
 
 .titulo-pergaminho {
-  font-family: 'ManufacturingConsent', sans-serif;
-  font-size: 20px;
-  color: #fff;
-  margin: 0 auto 12px;
-  text-align: left !important;
-  opacity: 0;
-  visibility: visible;
-  display: block;
-}
-
-.titulo-pergaminho.lumen-typing.typing-active,
-.titulo-pergaminho.lumen-typing.typing-done {
-  opacity: 1 !important;
-  display: block !important;
-  visibility: visible !important;
+  font-family: 'ManufacturingConsent', serif;
+  color: #fff8dc;
+  font-size: 28px;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
+  margin: 6px 0;
 }
 
 .guia-name-input.on-pergaminho {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  margin: 6px 0 14px;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
 }
 
 .input-espinhos {
-  width: min(62%, 360px);
-  padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.98);
-  color: #3e2723;
-  font-size: 16px;
-  text-align: center;
-  outline: none;
-  border: 14px solid transparent;
-  border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
-  border-radius: 2px;
   font-family: 'Cardo', serif;
+  font-size: 18px;
+  text-align: center;
+  padding: 8px 16px;
+  border: 2px solid #4a3212;
+  border-radius: 6px;
+  background-color: rgba(255, 248, 220, 0.85);
+  color: #2a1a05;
+  width: 260px;
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
 }
 
-.moldura-grande {
-  margin: 8px auto 12px;
-  width: min(92%, 720px);
-  min-height: 160px;
-  padding: 26px 28px;
-  background: url('/assets/img/moldura-medieval.png') center/100% 100% no-repeat transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.guia-descricao-medieval {
-  width: 100%;
-  max-width: 640px;
-  text-align: left !important;
-  color: #fff;
-  font-family: 'BerkshireSwash', cursive;
-  font-size: 15.5px;
-  line-height: 1.45;
-}
-
-.guia-descricao-medieval p {
-  margin: 6px 0;
-}
-
-.guia-options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 10px;
-  width: min(92%, 720px);
-  margin: 4px auto 10px;
-}
-
-.guia-options .btn-stone-espinhos {
-  padding: 11px 14px;
-  font-weight: 600;
-  color: #fff;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0.22)), url('/assets/img/textura-de-pedra.jpg') center/cover no-repeat;
-  border: 12px solid transparent;
-  border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
-  border-radius: 3px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
-  transition: transform 0.12s ease, filter 0.12s ease, opacity 0.12s ease;
-  font-family: 'ManufacturingConsent', sans-serif;
+.btn-stone-espinhos {
+  background: #3b2c1b;
+  color: #f5deb3;
+  font-family: 'ManufacturingConsent', serif;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
   cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
-
-.guia-options .btn-stone-espinhos:hover {
-  transform: translateY(-1px);
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45));
+.btn-stone-espinhos:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.6);
 }
-
-.guia-options .btn-stone-espinhos:disabled {
-  opacity: 0.55;
-  filter: grayscale(0.3);
+.btn-stone-espinhos:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
-#guia-error {
-  color: #ff3333;
-  margin-top: 8px;
+/* Moldura do texto do guia */
+.moldura-grande {
+  background: url('/assets/img/moldura-textura.png') no-repeat center/contain;
+  padding: 16px 24px;
+  width: 95%;
+  max-width: 680px;
+  min-height: 140px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 16px auto;
+}
+
+.guia-descricao-medieval {
   font-family: 'BerkshireSwash', cursive;
-  font-size: 14px;
+  font-size: 18px;
+  color: #f0e8d2;
+  line-height: 1.5;
   text-align: center;
+  max-width: 640px;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+.guia-descricao-medieval.typing-active,
+.guia-descricao-medieval.typing-done {
+  opacity: 1 !important;
+}
+
+/* Botões dos guias */
+.guia-options {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 8px;
+  margin-bottom: 40px;
+}
+
+.guia-options .btn-stone-espinhos {
+  min-width: 180px;
+  font-size: 20px;
+}
+
+/* Erro */
+#guia-error {
+  color: #ffaaaa;
+  font-family: 'Cardo', serif;
+  font-size: 14px;
+  text-shadow: 1px 1px 2px #000;
+  margin-top: 12px;
+}
+
+/* Ajuste para telas menores */
+@media (max-height: 720px) {
+  .conteudo-pergaminho {
+    margin-top: -10px;
+    gap: 10px;
+  }
+  .guia-options {
+    margin-bottom: 20px;
+  }
+}
+/* ===== EFEITO DOURADO PULSANTE (após datilografia) ===== */
+.moldura-grande.glow {
+  position: relative;
+  box-shadow: 0 0 12px 4px rgba(255, 215, 0, 0.5);
+  animation: moldura-glow 2.8s infinite ease-in-out;
+  transition: box-shadow 0.6s ease-in-out;
+}
+
+@keyframes moldura-glow {
+  0%   { box-shadow: 0 0 6px 2px rgba(255, 215, 0, 0.25); }
+  50%  { box-shadow: 0 0 20px 8px rgba(255, 230, 120, 0.75); }
+  100% { box-shadow: 0 0 6px 2px rgba(255, 215, 0, 0.25); }
+}
+
+/* Efeito sutil no texto quando o brilho está ativo */
+.guia-descricao-medieval.glow {
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.7),
+               0 0 16px rgba(255, 240, 180, 0.4);
+  color: #fff3b0;
+  transition: text-shadow 0.6s ease-in-out, color 0.6s ease-in-out;
+}
+
+/* Quando o guia é escolhido ou a transição inicia, o brilho se apaga */
+.moldura-grande.glow.fade-out {
+  animation: none;
+  box-shadow: 0 0 0 0 transparent !important;
+}
+.guia-descricao-medieval.glow.fade-out {
+  text-shadow: none;
+  color: #f0e8d2;
+}
+/* ==== Traço dourado animado — moldura e botões ==== */
+:root{
+  --gold1:#fff3b0; --gold2:#ffd700; --gold3:#ffdf6b;
+  --stroke-w:3px; --stroke-dur:4.5s;
+}
+
+/* Moldura com traço animado */
+.moldura-grande{
+  position: relative;
+  border-radius: 14px;
+  box-shadow: 0 0 10px rgba(255,215,0,.18);
+}
+.moldura-grande::before{
+  content:"";
+  position:absolute; inset:0;
+  padding: var(--stroke-w);
+  border-radius: inherit;
+  background: conic-gradient(from 0deg,
+    transparent 0deg, var(--gold1) 20deg, var(--gold2) 120deg,
+    var(--gold3) 180deg, var(--gold2) 240deg, var(--gold1) 320deg, transparent 360deg);
+  /* máscara -> exibe só a borda */
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  filter: drop-shadow(0 0 6px rgba(255,215,0,.55));
+  pointer-events:none;
+  animation: stroke-spin var(--stroke-dur) linear infinite;
+}
+
+/* Botões com traço animado */
+.btn-stone-espinhos{
+  position: relative;
+  border-radius: 10px;
+  overflow: visible;
+}
+.btn-stone-espinhos::before{
+  content:"";
+  position:absolute; inset:-2px;
+  padding: var(--stroke-w);
+  border-radius: inherit;
+  background: conic-gradient(from 0deg,
+    transparent 0deg, var(--gold1) 40deg, var(--gold2) 140deg,
+    var(--gold3) 200deg, var(--gold2) 300deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  filter: drop-shadow(0 0 5px rgba(255,200,0,.55));
+  pointer-events:none;
+  animation: stroke-spin calc(var(--stroke-dur) * .85) linear infinite;
+}
+
+/* Animação base do traço */
+@keyframes stroke-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Opção para desligar: adicione .no-anim ao elemento */
+.no-anim::before{ animation:none !important; }
+
+/* Respeita quem prefere menos movimento */
+@media (prefers-reduced-motion: reduce){
+  .moldura-grande::before,
+  .btn-stone-espinhos::before{ animation:none; }
 }
