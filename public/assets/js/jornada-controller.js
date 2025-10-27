@@ -24,18 +24,28 @@
   async function applyTypingAndTTS(sectionId, root) {
     console.log('[JC.applyTypingAndTTS] Iniciando para:', sectionId);
     try {
-      if (window.TypingBridge) {
-        const typingElements = root.querySelectorAll('[data-typing="true"]');
-        console.log('[JC.applyTypingAndTTS] Elementos de datilografia encontrados:', typingElements.length);
-        if (typingElements.length === 0) {
-          console.warn('[JC.applyTypingAndTTS] Nenhum elemento com data-typing encontrado em:', sectionId);
-          return;
-        }
-        await window.TypingBridge.init(root);
-        console.log('[JC.applyTypingAndTTS] Efeitos de datilografia aplicados para:', sectionId);
-      } else {
-        console.warn('[JC.applyTypingAndTTS] TypingBridge não disponível');
+      let attempts = 0;
+      const maxAttempts = 100; // Aumentado para garantir carregamento
+      while (!window.TypingBridge && attempts < maxAttempts) {
+        console.log('[JC.applyTypingAndTTS] Aguardando TypingBridge...');
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
       }
+      if (!window.TypingBridge) {
+        console.warn('[JC.applyTypingAndTTS] TypingBridge não disponível após tentativas:', sectionId);
+        return;
+      }
+      const typingElements = root.querySelectorAll('[data-typing="true"]');
+      console.log('[JC.applyTypingAndTTS] Elementos de datilografia encontrados:', typingElements.length);
+      if (typingElements.length === 0) {
+        console.warn('[JC.applyTypingAndTTS] Nenhum elemento com data-typing encontrado em:', sectionId);
+        return;
+      }
+      for (const element of typingElements) {
+        const text = getText(element);
+        await window.runTyping(element, text, () => {}, { speed: 36, cursor: true });
+      }
+      console.log('[JC.applyTypingAndTTS] Efeitos de datilografia aplicados para:', sectionId);
     } catch (err) {
       console.error('[JC.applyTypingAndTTS] Erro ao aplicar efeitos:', sectionId, err);
     }
@@ -162,7 +172,7 @@
     sectionOrder.push(...order);
   }
 
-  function init() {
+  async function init() {
     console.log('[JC.init] Controller initialized successfully');
     window.JC = {
       ...existingJC,
@@ -174,6 +184,18 @@
       handleSectionLogic
     };
     window.JC.currentSection = null;
+
+    // Aguardar TypingBridge
+    let attempts = 0;
+    const maxAttempts = 100;
+    while (!window.TypingBridge && attempts < maxAttempts) {
+      console.log('[JC.init] Aguardando TypingBridge...');
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+    }
+    if (!window.TypingBridge) {
+      console.warn('[JC.init] TypingBridge não disponível após tentativas');
+    }
 
     // Verificar autenticação
     const authScreen = document.getElementById('auth-screen');
