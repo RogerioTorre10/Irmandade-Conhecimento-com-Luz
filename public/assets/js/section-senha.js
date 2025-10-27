@@ -26,7 +26,7 @@
   const q = (sel, root = document) => root.querySelector(sel);
 
  // 🔒 Espera qualquer vídeo de transição terminar
-  async function waitForTransitionUnlock(timeoutMs = 20000) {
+  async function waitForTransitionUnlock(timeoutMs = 50000) {
     if (!window.__TRANSITION_LOCK) return;
     let resolved = false;
     const p = new Promise(resolve => {
