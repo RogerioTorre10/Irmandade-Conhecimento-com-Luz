@@ -25,8 +25,16 @@
     console.log('[JC.applyTypingAndTTS] Iniciando para:', sectionId);
     try {
       if (window.TypingBridge) {
+        const typingElements = root.querySelectorAll('[data-typing="true"]');
+        console.log('[JC.applyTypingAndTTS] Elementos de datilografia encontrados:', typingElements.length);
+        if (typingElements.length === 0) {
+          console.warn('[JC.applyTypingAndTTS] Nenhum elemento com data-typing encontrado em:', sectionId);
+          return;
+        }
         await window.TypingBridge.init(root);
         console.log('[JC.applyTypingAndTTS] Efeitos de datilografia aplicados para:', sectionId);
+      } else {
+        console.warn('[JC.applyTypingAndTTS] TypingBridge não disponível');
       }
     } catch (err) {
       console.error('[JC.applyTypingAndTTS] Erro ao aplicar efeitos:', sectionId, err);
