@@ -21,6 +21,23 @@
   window.JCSenha.__bound = true;
   window.JCSenha.state = { ready: false, listenerOn: false };
 
+  // ===== Utils =====
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  const q = (sel, root = document) => root.querySelector(sel);
+
+  async function waitForElement(selector, { within = document, timeout = 8000, step = 100 } = {}) {
+    const t0 = performance.now();
+    return new Promise((resolve, reject) => {
+      const loop = () => {
+        const el = within.querySelector(selector);
+        if (el) return resolve(el);
+        if (performance.now() - t0 >= timeout) return reject(new Error(`Timeout: ${selector}`));
+        setTimeout(loop, step);
+      };
+      loop();
+    });
+  }
+
 // helper: espera o vídeo acabar
 async function waitForTransitionUnlock(timeoutMs = 15000) {
   if (!window.__TRANSITION_LOCK) return;
@@ -40,23 +57,6 @@ await waitForTransitionUnlock();
 // for (const el of items) await typeOnce(el, ...);
 
   
-  // ===== Utils =====
-  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-  const q = (sel, root = document) => root.querySelector(sel);
-
-  async function waitForElement(selector, { within = document, timeout = 8000, step = 100 } = {}) {
-    const t0 = performance.now();
-    return new Promise((resolve, reject) => {
-      const loop = () => {
-        const el = within.querySelector(selector);
-        if (el) return resolve(el);
-        if (performance.now() - t0 >= timeout) return reject(new Error(`Timeout: ${selector}`));
-        setTimeout(loop, step);
-      };
-      loop();
-    });
-  }
-
   const ensureVisible = (el) => {
     if (!el) return;
     el.classList.remove(HIDE_CLASS);
