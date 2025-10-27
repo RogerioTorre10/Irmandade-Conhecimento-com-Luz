@@ -30,6 +30,18 @@
     el.style.removeProperty('visibility');
   }
 
+  // 🔒 Espera qualquer vídeo de transição terminar
+  async function waitForTransitionUnlock(timeoutMs = 10000) {
+    if (!window.__TRANSITION_LOCK) return;
+    let resolved = false;
+    const p = new Promise(resolve => {
+      const onEnd = () => { if (!resolved) { resolved = true; document.removeEventListener('transition:ended', onEnd); resolve(); } };
+      document.addEventListener('transition:ended', onEnd, { once: true });
+    });
+    const t = new Promise(resolve => setTimeout(resolve, timeoutMs));
+    await Promise.race([p, t]); // não fica preso para sempre
+  }
+
   async function localType(el, text, speed = TYPING_SPEED) {
     return new Promise(resolve => {
       let i = 0; el.textContent = '';
