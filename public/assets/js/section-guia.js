@@ -4,7 +4,6 @@
   const MOD = 'section-guia.js';
   const SECTION_ID = 'section-guia';
   const NEXT_SECTION_ID = 'section-selfie';
-  const VIDEO_SRC = '/assets/video/filme-eu-na-irmandade.mp4';
   const HIDE_CLASS = 'hidden';
 
   if (window.JCGuia?.__bound) {
@@ -45,7 +44,17 @@
     el.classList.add('typing-done');
   };
 
+  btn.addEventListener('click', () => {
+      if (window.speechSynthesis?.cancel) speechSynthesis.cancel();
+      if (typeof window.playTransitionVideo === 'function') {
+        window.playTransitionVideo('/assets/videos/filme-eu-na-irmandade.mp4', NEXT_SECTION_ID);
+      } else {
+        window.JC?.show?.(NEXT_SECTION_ID) ?? (location.hash = `#${NEXT_SECTION_ID}`);
+      }
+    }, { once: true });
+  }
   const playTransitionVideo = (nextId) => {
+    console.log('[JCSenha] transição vídeo →', VIDEO_SRC);
     if (typeof window.playTransitionVideo === 'function') {
       window.playTransitionVideo(VIDEO_SRC, nextId);
     } else if (window.JC?.show) {
