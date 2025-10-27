@@ -7,12 +7,10 @@
   const NEXT_SECTION_ID  = 'section-guia';
   const HIDE_CLASS       = 'hidden';
 
-  // Timings
   const TYPING_SPEED     = 36;
   const INITIAL_DELAY_MS = 200;
   const TTS_LATCH_MS     = 600;
 
-  // Evita rebind
   if (window.JCSenha?.__bound) {
     console.log('[JCSenha] já carregado');
     return;
@@ -25,18 +23,6 @@
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
   const q = (sel, root = document) => root.querySelector(sel);
 
- // 🔒 Espera qualquer vídeo de transição terminar
-  async function waitForTransitionUnlock(timeoutMs = 50000) {
-    if (!window.__TRANSITION_LOCK) return;
-    let resolved = false;
-    const p = new Promise(resolve => {
-      const onEnd = () => { if (!resolved) { resolved = true; document.removeEventListener('transition:ended', onEnd); resolve(); } };
-      document.addEventListener('transition:ended', onEnd, { once: true });
-    });
-    const t = new Promise(resolve => setTimeout(resolve, timeoutMs));
-    await Promise.race([p, t]); // não fica preso para sempre
-  }
-  
   async function waitForElement(selector, { within = document, timeout = 8000, step = 100 } = {}) {
     const t0 = performance.now();
     return new Promise((resolve, reject) => {
@@ -49,8 +35,8 @@
       loop();
     });
   }
-  
-  const ensureVisible = (el) => {
+
+  function ensureVisible(el) {
     if (!el) return;
     el.classList.remove(HIDE_CLASS);
     el.setAttribute('aria-hidden', 'false');
@@ -58,7 +44,25 @@
     el.style.removeProperty('opacity');
     el.style.removeProperty('visibility');
     el.style.zIndex = 'auto';
-  };
+  }
+
+  // 🔒 Espera qualquer vídeo de transição terminar
+  async function waitForTransitionUnlock(timeoutMs = 20000) {
+    if (!window.__TRANSITION_LOCK) return;
+    let resolved = false;
+    const p = new Promise(resolve => {
+      const onEnd = () => {
+        if (!resolved) {
+          resolved = true;
+          document.removeEventListener('transition:ended', onEnd);
+          resolve();
+        }
+      };
+      document.addEventListener('transition:ended', onEnd, { once: true });
+    });
+    const t = new Promise(resolve => setTimeout(resolve, timeoutMs));
+    await Promise.race([p, t]); // evita ficar preso para sempre
+  }
 
   function normalizeParagraph(el) {
     if (!el) return false;
@@ -107,8 +111,7 @@
           window.runTyping(el, text, () => resolve(), { speed, cursor: true });
         } catch (e) {
           console.warn('[JCSenha] runTyping falhou, fallback local', e);
-          usedFallback = true;
-          resolve();
+          usedFallback = true; resolve();
         }
       });
     } else {
@@ -124,7 +127,7 @@
       try {
         if (window.EffectCoordinator?.speak) {
           speechSynthesis.cancel();
-          window.EffectCoordinator.speak(text, { lang: 'pt-BR', rate: 1.08, pitch: 1.0 });
+          await window.EffectCoordinator.speak(text, { lang: 'pt-BR', rate: 1.08, pitch: 1.0 });
           await sleep(TTS_LATCH_MS);
           el.dataset.spoken = 'true';
         }
@@ -172,6 +175,9 @@
       window.toast?.('Erro: elementos da seção Senha não carregados.', 'error');
       return;
     }
+
+    // 🔒 Aguarda terminar qualquer transição (ex.: filme da Termos2)
+    await waitForTransitionUnlock();
 
     // trava durante a narrativa
     [btnPrev, btnNext, input, toggle].forEach(el => el?.setAttribute('disabled','true'));
