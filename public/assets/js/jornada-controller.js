@@ -15,6 +15,7 @@
   ];
 
   let lastShownSection = null;
+  let isTransitioning = false; // Nova variável para evitar chamadas durante transições
 
   function getText(el) {
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
@@ -42,7 +43,7 @@
       btn.classList.add('btn', 'btn-primary', 'btn-stone');
       btn.addEventListener('click', () => {
         console.log('[JC.attachButtonEvents] Button clicked:', action, btn.id);
-        if (action === 'avancar') {
+        if (action === 'avancar' && !isTransitioning) {
           const currentIndex = sectionOrder.indexOf(sectionId);
           const nextSection = sectionOrder[currentIndex + 1];
           console.log('[JC.attachButtonEvents] Navigating to:', nextSection);
@@ -93,11 +94,12 @@
 
   async function show(sectionId) {
     console.log('[JC.show] Starting display for:', sectionId, { caller: new Error().stack });
-    if (sectionId === window.JC.currentSection || sectionId === lastShownSection) {
-      console.log('[JC.show] Seção já ativa ou exibida recentemente, ignorando:', sectionId);
+    if (sectionId === window.JC.currentSection || sectionId === lastShownSection || isTransitioning) {
+      console.log('[JC.show] Seção já ativa, exibida recentemente ou em transição, ignorando:', sectionId);
       return;
     }
 
+    isTransitioning = true;
     try {
       const cleanId = sectionId.replace(/^section-/, '');
       console.log('[JC.show] Starting carregarEtapa for:', cleanId);
@@ -118,10 +120,16 @@
     } catch (err) {
       console.error('[JC.show] Error showing section:', sectionId, err);
       window.toast?.(`Erro ao mostrar seção ${sectionId}`, 'error');
+    } finally {
+      isTransitioning = false;
     }
   }
 
   function goNext() {
+    if (isTransitioning) {
+      console.log('[JC.goNext] Transição em andamento, ignorando');
+      return;
+    }
     const currentIndex = sectionOrder.indexOf(window.JC.currentSection || 'section-intro');
     const nextSection = sectionOrder[currentIndex + 1];
     console.log('[JC.goNext] Navigating to:', nextSection);
@@ -181,8 +189,8 @@
   document.addEventListener('section:shown', (e) => {
     const sectionId = e.detail.sectionId;
     const node = e.detail.node;
-    if (sectionId === lastShownSection) {
-      console.log('[JC.section:shown] Seção já exibida, ignorando:', sectionId);
+    if (sectionId === lastShownSection || isTransitioning) {
+      console.log('[JC.section:shown] Seção já exibida ou em transição, ignorando:', sectionId);
       return;
     }
     if (node) {
