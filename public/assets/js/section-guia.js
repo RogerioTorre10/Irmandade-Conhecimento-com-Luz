@@ -185,6 +185,19 @@
         els.guiaTexto.textContent = ''; // limpa pra datilografia
         await typeOnce(els.guiaTexto, msg, { speed: 38, speak: true });
       }
+      // Texto do container (datilografia + leitura)
+if (els.guiaTexto) {
+  const base = (els.guiaTexto.dataset?.text || els.guiaTexto.textContent || 'Escolha seu guia para a Jornada.').trim();
+  const msg  = base.replace(/\{\{\s*(nome|name)\s*\}\}/gi, name);
+  els.guiaTexto.textContent = '';
+  await typeOnce(els.guiaTexto, msg, { speed: 38, speak: true });
+
+  // ✨ Ativa o brilho dourado após o texto
+  const moldura = els.guiaTexto.closest('.moldura-grande');
+  moldura?.classList.add('glow');
+  els.guiaTexto?.classList.add('glow');
+}
+
 
       // habilita as opções
       if (els.guiaOptions?.length) {
