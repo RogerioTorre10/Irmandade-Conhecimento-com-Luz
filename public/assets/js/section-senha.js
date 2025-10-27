@@ -25,6 +25,18 @@
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
   const q = (sel, root = document) => root.querySelector(sel);
 
+ // 🔒 Espera qualquer vídeo de transição terminar
+  async function waitForTransitionUnlock(timeoutMs = 10000) {
+    if (!window.__TRANSITION_LOCK) return;
+    let resolved = false;
+    const p = new Promise(resolve => {
+      const onEnd = () => { if (!resolved) { resolved = true; document.removeEventListener('transition:ended', onEnd); resolve(); } };
+      document.addEventListener('transition:ended', onEnd, { once: true });
+    });
+    const t = new Promise(resolve => setTimeout(resolve, timeoutMs));
+    await Promise.race([p, t]); // não fica preso para sempre
+  }
+  
   async function waitForElement(selector, { within = document, timeout = 8000, step = 100 } = {}) {
     const t0 = performance.now();
     return new Promise((resolve, reject) => {
