@@ -113,44 +113,32 @@
     }
   }
 
- // substitua sua captureToCanvas por esta
 function captureToCanvas(video, canvas){
-  // saída no mesmo aspecto do card (2:3)
-  const OUT_W = 768;
-  const OUT_H = 1152;
-
-  // mede vídeo
+  const OUT_W = 768, OUT_H = 1152;
   const vw = video.videoWidth  || 1280;
   const vh = video.videoHeight || 720;
-
-  // prepara canvas de saída
-  canvas.width = OUT_W;
-  canvas.height = OUT_H;
+  canvas.width = OUT_W; canvas.height = OUT_H;
   const ctx = canvas.getContext('2d');
 
-  // aplicamos o mesmo "zoom" do stage (zoom.all * zoom.x/y)
-  const sx = (window.JCSelfieZoom?.all ?? 1) * (window.JCSelfieZoom?.x ?? 1);
-  const sy = (window.JCSelfieZoom?.all ?? 1) * (window.JCSelfieZoom?.y ?? 1);
+  const z = (window.JCSelfieZoom || { all:1, x:1, y:1 });
+  const sx = z.all * z.x, sy = z.all * z.y;
 
-  // área de desenho: centralizamos, com pivot ~60% vertical (combina com mask-position)
+  const cssPivot = getComputedStyle(document.documentElement).getPropertyValue('--chama-pivot-y').trim();
+  const pivotY = cssPivot ? parseFloat(cssPivot) : 0.58;
+  const cx = vw / 2, cy = vh * pivotY;
+
   ctx.save();
-  const cx = vw / 2;
-  const cy = vh * 0.60; // ligeiro bias pra baixo
-  ctx.translate(OUT_W/2, OUT_H*0.60);
+  ctx.translate(OUT_W/2, OUT_H * pivotY);
   ctx.scale(sx, sy);
-
-  // escala base para cobrir a área 2:3 sem faixas
   const scaleBase = Math.max(OUT_W / vw, OUT_H / vh);
   ctx.scale(scaleBase, scaleBase);
-
-  // leva o vídeo para o centro do canvas
   ctx.translate(-cx, -cy);
   ctx.drawImage(video, 0, 0, vw, vh);
   ctx.restore();
 
-  // retorna em JPEG
   return canvas.toDataURL('image/jpeg', 0.92);
 }
+
 
 
   // ---------- init ----------
