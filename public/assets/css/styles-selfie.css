@@ -210,3 +210,46 @@
 .selfie-page {
   background: none !important;
 }
+/* ===== Garantir visibilidade dos controles e botões ===== */
+.selfie-controls,
+.selfie-actions {
+  position: relative;
+  z-index: 5; /* acima do vídeo e da máscara */
+}
+
+/* Corrige espaçamento entre os elementos */
+.selfie-controls {
+  margin-top: 12px;
+  margin-bottom: 8px;
+}
+
+.selfie-actions {
+  margin-top: 16px;
+}
+
+/* Efeitos medievais nos botões */
+.selfie-actions .btn,
+.selfie-controls .btn {
+  background: radial-gradient(circle at 50% 30%, #402b1c, #1a0f09);
+  border: 2px solid #a87a4a;
+  color: #fbe8c6;
+  font-family: 'Cardo', serif;
+  font-weight: bold;
+  padding: 8px 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 6px rgba(255,180,90,0.5);
+  transition: all 0.2s ease;
+}
+
+.selfie-actions .btn:hover,
+.selfie-controls .btn:hover {
+  background: radial-gradient(circle at 50% 20%, #6b4a2e, #281a0f);
+  box-shadow: 0 0 10px rgba(255,210,120,0.8);
+  transform: scale(1.03);
+}
+
+/* Sliders visíveis e harmônicos */
+.selfie-controls input[type="range"] {
+  accent-color: #e6b873;
+  width: 220px;
+}
