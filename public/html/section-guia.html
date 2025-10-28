@@ -1,128 +1,43 @@
 <link rel="stylesheet" href="/assets/css/styles-base.css">
 <link rel="stylesheet" href="/assets/css/styles-guia.css">
 
-<section>
-  <div id="jornada-content-wrapper">
-  <div id="section-guia" class="j-section">
-  <class="pergaminho pergaminho-v section-guia epic hidden">
-  <aria-hidden="true">
-  <data-transition-src="/assets/videos/filme-eu-na-irmandade.mp4">
- 
+<section
+  id="section-guia"
+  data-section="guia"
+  class="pergaminho pergaminho-v section-guia epic hidden"
+  aria-hidden="true"
+  data-transition-src="/assets/videos/filme-eu-na-irmandade.mp4"
+>
+  <div class="parchment-inner-rough">
     <div class="conteudo-pergaminho">
       <!-- Título com datilografia -->
-      <h2 data-typing="true" data-text="Escolha seu Guia" data-speed="30" data-cursor="true">
-        Escolha seu Guia 
-      </h2>
+      <h2 class="titulo-pergaminho"
+          data-typing="true" data-speed="30" data-cursor="true"
+          data-text="Escolha seu Guia"></h2>
 
       <!-- Nome primeiro -->
-      <div class="guia-name-input">
-        <label for="guiaNameInput">Insira seu nome</label>
-        <input id="guiaNameInput" type="text" placeholder="Digite seu nome para a jornada...">
+      <div class="guia-name-input on-pergaminho">
+        <label class="sr-only" for="guiaNameInput">Insira seu nome</label>
+        <input id="guiaNameInput" class="input-espinhos" type="text"
+               placeholder="NOME" autocomplete="name"
+               aria-label="Digite seu nome para a jornada" />
+        <button id="btn-confirmar-nome" class="btn btn-stone-espinhos"
+                aria-label="Confirmar nome">Confirmar</button>
       </div>
 
-      <!-- Caixa medieval para descrição dos guias (carregada dinamicamente) -->
-      <div class="guia-descricao-medieval"></div>
-
-      <!-- Botões de escolha (carregados dinamicamente) -->
-      <div class="guia-options"></div>
-
-      <!-- Botões de ação -->
-      <div class="guia-actions">
-        <button id="btn-selecionar-guia" class="btn btn-primary" data-action="seleciexport default {
-  "version": "1.0",
-  "metadata": {
-    "apiVersion": "2023-10-01",
-    "endpointPrefix": "jornada",
-    "serviceFullName": "Jornada Guia Service",
-    "serviceId": "Guia",
-    "signatureVersion": "v4",
-    "protocol": "json"
-  },
-  "operations": {
-    "LoadGuias": {
-      "name": "LoadGuias",
-      "http": {
-        "method": "GET",
-        "requestUri": "/assets/data/guias.json"
-      },
-      "input": {
-        "shape": "LoadGuiasInput"
-      },
-      "output": {
-        "shape": "LoadGuiasOutput"
-      },
-      "errors": [
-        {
-          "shape": "ResourceNotFoundException"
-        },
-        {
-          "shape": "InternalServerError"
-        }
-      ]
-    }
-  },
-  "shapes": {
-    "LoadGuiasInput": {
-      "type": "structure",
-      "members": {}
-    },
-    "LoadGuiasOutput": {
-      "type": "structure",
-      "members": {
-        "guias": {
-          "shape": "GuiaList"
-        }
-      }
-    },
-    "GuiaList": {
-      "type": "list",
-      "member": {
-        "shape": "Guia"
-      }
-    },
-    "Guia": {
-      "type": "structure",
-      "members": {
-        "id": {
-          "type": "string"
-        },
-        "nome": {
-          "type": "string"
-        },
-        "descricao": {
-          "type": "string"
-        },
-        "bgImage": {
-          "type": "string"
-        }
-      }
-    },
-    "ResourceNotFoundException": {
-      "type": "structure",
-      "members": {
-        "message": {
-          "type": "string"
-        }
-      },
-      "exception": true
-    },
-    "InternalServerError": {
-      "type": "structure",
-      "members": {
-        "message": {
-          "type": "string"
-        }
-      },
-      "exception": true
-    }
-  }
-}
-onar-guia" disabled>Selecionar Guia</button>
+      <!-- Caixa medieval para descrição (datilografia + TTS) -->
+      <div class="moldura-grande">
+        <div id="guiaTexto" class="guia-descricao-medieval"
+             data-text="Olá, {{nome}}! Escolha seu guia para a Jornada."></div>
       </div>
+
+      <!-- Botões de escolha (preenchidos via JSON) -->
+      <div class="guia-options" role="group" aria-label="Opções de Guias"></div>
 
       <!-- Erro -->
-      <div id="guia-error" style="display: none; color: red;">Erro ao carregar guias. Por favor, tente novamente.</div>
+      <div id="guia-error" class="hidden" aria-hidden="true">
+        Erro ao carregar guias. Por favor, tente novamente.
+      </div>
     </div>
   </div>
-</div>
-  </section>
+</section>
