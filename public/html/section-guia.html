@@ -1,115 +1,128 @@
 <link rel="stylesheet" href="/assets/css/styles-base.css">
 <link rel="stylesheet" href="/assets/css/styles-guia.css">
 
-<section
-  id="section-guia"
-  data-section="guia"
-  class="pergaminho pergaminho-v section-guia epic hidden"
-  aria-hidden="true"
-  data-transition-src="/assets/videos/filme-eu-na-irmandade.mp4"
->
-  <div class="parchment-inner-rough">
+<section>
+  <div id="jornada-content-wrapper">
+  <div id="section-guia" class="j-section">
+  <class="pergaminho pergaminho-v section-guia epic hidden">
+  <aria-hidden="true">
+  <data-transition-src="/assets/videos/filme-eu-na-irmandade.mp4">
+ 
     <div class="conteudo-pergaminho">
+      <!-- Título com datilografia -->
+      <h2 data-typing="true" data-text="Escolha seu Guia" data-speed="30" data-cursor="true">
+        Escolha seu Guia 
+      </h2>
 
-      <!-- Título 1 (pode datilografar) -->
-      <h2
-        class="titulo-pergaminho"
-        data-typing="true"
-        data-speed="50"
-        data-cursor="true"
-        data-text="Escolha seu Guia"
-      ></h2>
-
-      <!-- Título 2 (datilografia + leitura desejadas) -->
-      <h2
-        id="guia-title"
-        class="titulo-pergaminho"
-        data-typing="true"
-        data-speed="50"
-        data-cursor="true"
-        data-text="Insira seu nome"
-      ></h2>
-
-      <!-- Bloco de nome + confirmar -->
-      <div class="guia-name-input on-pergaminho">
-        <label class="sr-only" for="guiaNameInput">Seu Nome</label>
-        <input
-          id="guiaNameInput"
-          class="input-espinhos"
-          type="text"
-          placeholder="NOME"
-          autocomplete="name"
-          aria-label="Digite seu nome para a jornada"
-        />
-        <button
-          id="btn-confirmar-nome"
-          class="btn btn-stone-espinhos"
-          aria-label="Confirmar nome para habilitar os guias"
-        >
-          Confirmar
-        </button>
+      <!-- Nome primeiro -->
+      <div class="guia-name-input">
+        <label for="guiaNameInput">Insira seu nome</label>
+        <input id="guiaNameInput" type="text" placeholder="Digite seu nome para a jornada...">
       </div>
 
-      <!-- Texto introdutório do container (datilografia + TTS após confirmar) -->
-      <div class="moldura-grande">
-        <div
-          id="guiaTexto"
-          class="guia-descricao-medieval"
-          data-text="Olá, {{nome}}! Escolha seu guia para a Jornada:"
-          data-text="Zion (Grok): Curioso e direto, busca respostas profundas com visão cósmica."
-          data-text="Lumen (ChatGPT): Acolhedor e reflexivo, guia com empatia e clareza."  
-          data-text="Arian (Gemini): Criativo e versátil, inspira com perspectivas inovadoras."
-          ></div>
+      <!-- Caixa medieval para descrição dos guias (carregada dinamicamente) -->
+      <div class="guia-descricao-medieval"></div>
+
+      <!-- Botões de escolha (carregados dinamicamente) -->
+      <div class="guia-options"></div>
+
+      <!-- Botões de ação -->
+      <div class="guia-actions">
+        <button id="btn-selecionar-guia" class="btn btn-primary" data-action="seleciexport default {
+  "version": "1.0",
+  "metadata": {
+    "apiVersion": "2023-10-01",
+    "endpointPrefix": "jornada",
+    "serviceFullName": "Jornada Guia Service",
+    "serviceId": "Guia",
+    "signatureVersion": "v4",
+    "protocol": "json"
+  },
+  "operations": {
+    "LoadGuias": {
+      "name": "LoadGuias",
+      "http": {
+        "method": "GET",
+        "requestUri": "/assets/data/guias.json"
+      },
+      "input": {
+        "shape": "LoadGuiasInput"
+      },
+      "output": {
+        "shape": "LoadGuiasOutput"
+      },
+      "errors": [
+        {
+          "shape": "ResourceNotFoundException"
+        },
+        {
+          "shape": "InternalServerError"
+        }
+      ]
+    }
+  },
+  "shapes": {
+    "LoadGuiasInput": {
+      "type": "structure",
+      "members": {}
+    },
+    "LoadGuiasOutput": {
+      "type": "structure",
+      "members": {
+        "guias": {
+          "shape": "GuiaList"
+        }
+      }
+    },
+    "GuiaList": {
+      "type": "list",
+      "member": {
+        "shape": "Guia"
+      }
+    },
+    "Guia": {
+      "type": "structure",
+      "members": {
+        "id": {
+          "type": "string"
+        },
+        "nome": {
+          "type": "string"
+        },
+        "descricao": {
+          "type": "string"
+        },
+        "bgImage": {
+          "type": "string"
+        }
+      }
+    },
+    "ResourceNotFoundException": {
+      "type": "structure",
+      "members": {
+        "message": {
+          "type": "string"
+        }
+      },
+      "exception": true
+    },
+    "InternalServerError": {
+      "type": "structure",
+      "members": {
+        "message": {
+          "type": "string"
+        }
+      },
+      "exception": true
+    }
+  }
+}
+onar-guia" disabled>Selecionar Guia</button>
       </div>
 
-      <!-- Opções de guia -->
-      <div class="guia-options" role="group" aria-label="Opções de Guias">
-        <button
-          id="btn-guia-zion"
-          class="btn btn-stone-espinhos"
-          data-action="select-guia"
-          data-guia="zion"
-          aria-label="Escolher o guia Zion"
-          disabled
-        >
-          <span class="label">Zion</span>
-        </button>
-
-        <button
-          id="btn-guia-lumen"
-          class="btn btn-stone-espinhos"
-          data-action="select-guia"
-          data-guia="lumen"
-          aria-label="Escolher o guia Lumen"
-          disabled
-        >
-          <span class="label">Lumen</span>
-        </button>
-
-        <button
-          id="btn-guia-arian"
-          class="btn btn-stone-espinhos"
-          data-action="select-guia"
-          data-guia="arian"
-          aria-label="Escolher o guia Arian"
-          disabled
-        >
-          <span class="label">Arian</span>
-        </button>
-      </div>
-
-      <!-- Descrições (mantidas como referência/SEO; ocultas no fluxo) -->
-      <div class="sr-only" aria-hidden="true">
-        <p data-guia="zion">Zion (Grok): Curioso e direto, busca respostas profundas com visão cósmica.</p>
-        <p data-guia="lumen">Lumen (ChatGPT): Acolhedor e reflexivo, guia com empatia e clareza.</p>
-        <p data-guia="arian">Arian (Gemini): Criativo e versátil, inspira com perspectivas inovadoras.</p>
-      </div>
-
-      <!-- Mensagem de erro -->
-      <div id="guia-error" class="hidden" aria-hidden="true">
-        Não foi possível carregar os guias. Tente novamente.
-      </div>
-
+      <!-- Erro -->
+      <div id="guia-error" style="display: none; color: red;">Erro ao carregar guias. Por favor, tente novamente.</div>
     </div>
   </div>
-</section>
+</div>
+  </section>
