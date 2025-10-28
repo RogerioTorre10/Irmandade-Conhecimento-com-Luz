@@ -113,21 +113,45 @@
     }
   }
 
-  function captureToCanvas(video, canvas){
-    const vw = video.videoWidth || 1280;
-    const vh = video.videoHeight || 720;
-    canvas.width = vw; canvas.height = vh;
-    const ctx = canvas.getContext('2d');
-    // captura com zoom aplicado
-    ctx.save();
-    const cx = vw/2, cy = vh/2;
-    ctx.translate(cx, cy);
-    ctx.scale(zoom.all*zoom.x, zoom.all*zoom.y);
-    ctx.translate(-cx, -cy);
-    ctx.drawImage(video, 0, 0, vw, vh);
-    ctx.restore();
-    return canvas.toDataURL('image/jpeg', 0.92);
-  }
+ // substitua sua captureToCanvas por esta
+function captureToCanvas(video, canvas){
+  // saída no mesmo aspecto do card (2:3)
+  const OUT_W = 768;
+  const OUT_H = 1152;
+
+  // mede vídeo
+  const vw = video.videoWidth  || 1280;
+  const vh = video.videoHeight || 720;
+
+  // prepara canvas de saída
+  canvas.width = OUT_W;
+  canvas.height = OUT_H;
+  const ctx = canvas.getContext('2d');
+
+  // aplicamos o mesmo "zoom" do stage (zoom.all * zoom.x/y)
+  const sx = (window.JCSelfieZoom?.all ?? 1) * (window.JCSelfieZoom?.x ?? 1);
+  const sy = (window.JCSelfieZoom?.all ?? 1) * (window.JCSelfieZoom?.y ?? 1);
+
+  // área de desenho: centralizamos, com pivot ~60% vertical (combina com mask-position)
+  ctx.save();
+  const cx = vw / 2;
+  const cy = vh * 0.60; // ligeiro bias pra baixo
+  ctx.translate(OUT_W/2, OUT_H*0.60);
+  ctx.scale(sx, sy);
+
+  // escala base para cobrir a área 2:3 sem faixas
+  const scaleBase = Math.max(OUT_W / vw, OUT_H / vh);
+  ctx.scale(scaleBase, scaleBase);
+
+  // leva o vídeo para o centro do canvas
+  ctx.translate(-cx, -cy);
+  ctx.drawImage(video, 0, 0, vw, vh);
+  ctx.restore();
+
+  // retorna em JPEG
+  return canvas.toDataURL('image/jpeg', 0.92);
+}
+
 
   // ---------- init ----------
   async function initOnce(root){
@@ -197,6 +221,8 @@
       zoom.x   = Number(zoomX?.value || 1);
       zoom.y   = Number(zoomY?.value || 1);
       applyZoom(videoEl, canvasEl);
+      window.JCSelfieZoom = { all: zoom.all, x: zoom.x, y: zoom.y };
+
     }
     zoomAll?.addEventListener('input', onZoomChange);
     zoomX?.addEventListener('input', onZoomChange);
