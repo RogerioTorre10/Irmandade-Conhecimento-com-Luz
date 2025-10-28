@@ -1,3 +1,17 @@
-const el = document.querySelector('.flame-stage');
-el && (el.style.webkitMaskImage = "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 900'><path fill='black' d='M300,40 C260,120 340,150 300,250 C270,320 210,330 200,430 C190,535 260,620 300,700 C340,620 410,535 400,430 C390,330 330,320 300,250 C260,150 340,120 300,40 Z'/></svg>\")");
-el && (el.style.maskImage = el.style.webkitMaskImage);
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Chama única 2:3 para máscara do card/selfie -->
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="600" height="900" viewBox="0 0 600 900" version="1.1">
+  <title>chama-card</title>
+  <desc>Flama única simétrica para máscara (preto = área visível)</desc>
+  <path fill="#000000" d="
+    M300,40
+    C260,120 340,150 300,250
+    C270,320 210,330 200,430
+    C190,535 260,620 300,700
+    C340,620 410,535 400,430
+    C390,330 330,320 300,250
+    C260,150 340,120 300,40
+    Z
+  "/>
+</svg>
