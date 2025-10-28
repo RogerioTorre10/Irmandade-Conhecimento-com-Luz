@@ -1,4 +1,4 @@
-* === Override definitivo da máscara da chama (única, 2:3) === */
+
 .selfie-page .flame-stage {
   /* data-URL inline para driblar cache e garantir a forma correta */
   --flameMask: url("data:image/svg+xml;utf8,\
@@ -13,4 +13,5 @@
     430 C390,330 330,
     320 300,250 C260,
     150 340,120 300,40 Z'/>\
-</svg>");
+</svg>")
+};
