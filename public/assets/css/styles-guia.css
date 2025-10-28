@@ -135,3 +135,12 @@
   font-size: 14px;
   text-align: center;
 }
+
+.guia-options .btn .label {
+  position: relative;
+  z-index: 2;
+  font-family: 'BerkshireSwash', cursive;
+  color: #fff8dc;
+  text-shadow: 0 0 8px rgba(255,215,0,.8);
+}
+
