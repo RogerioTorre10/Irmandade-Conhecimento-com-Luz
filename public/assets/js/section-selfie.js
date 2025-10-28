@@ -4,13 +4,15 @@
   const MOD = 'section-selfie.js';
   const SECTION_ID = 'section-selfie';
   const NEXT_SECTION_ID = 'section-card';
-  const VIDEO_SRC = '/assets/video/filme-eu-na-irmandade.mp4';
-  
-  const qs = (s, r = document) => r.querySelector(s);
-  const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
 
- 
+  // fallback caso não exista data-attr na section/botão
+  const DEFAULT_VIDEO_SRC = '/assets/video/filme-eu-na-irmandade.mp4';
+
+  const qs  = (s, r = document) => r.querySelector(s);
+  const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  // ------- helpers de tipagem/tts (originais) -------
   async function typeLocal(el, text, speed) {
     return new Promise(resolve => {
       el.textContent = '';
@@ -19,9 +21,7 @@
         if (i < text.length) {
           el.textContent += text.charAt(i++);
           setTimeout(tick, speed);
-        } else {
-          resolve();
-        }
+        } else resolve();
       };
       tick();
     });
@@ -58,26 +58,90 @@
     } catch (_) {}
   }
 
+  // ------- TRANSIÇÃO POR VÍDEO -------
+  function getTransitionSrc(root, btn) {
+    // prioridade: botão > section > default
+    const fromBtn = btn?.dataset?.transitionSrc;
+    const fromSection = root?.dataset?.transitionSrc;
+    return (fromBtn && fromBtn.trim()) || (fromSection && fromSection.trim()) || DEFAULT_VIDEO_SRC;
+  }
+
+  async function waitForTransitionUnlock(timeoutMs = 20000) {
+    if (!window.__TRANSITION_LOCK) return;
+    let done = false;
+    await Promise.race([
+      new Promise(res => {
+        const onEnd = () => { if (!done){ done = true; document.removeEventListener('transition:ended', onEnd); res(); } };
+        document.addEventListener('transition:ended', onEnd, { once: true });
+      }),
+      new Promise(res => setTimeout(res, timeoutMs))
+    ]);
+  }
+
+  function dispatchTransitionEvent(name, detail = {}) {
+    document.dispatchEvent(new CustomEvent(`transition:${name}`, { detail }));
+  }
+
+  function safeCleanupMedia() {
+    try { speechSynthesis?.cancel?.(); } catch {}
+    try {
+      qsa('video').forEach(v => { v.pause(); v.src = ''; v.load(); });
+    } catch {}
+  }
+
+  function goToSection(nextId) {
+    if (window.JC?.show) window.JC.show(nextId);
+    else location.hash = `#${nextId}`;
+  }
+
+  function playTransition(root, btn, nextId = NEXT_SECTION_ID) {
+    const src = getTransitionSrc(root, btn);
+
+    // evita reentrância
+    if (window.__TRANSITION_LOCK) return;
+    window.__TRANSITION_LOCK = true;
+    dispatchTransitionEvent('started', { src, nextId });
+
+    safeCleanupMedia();
+
+    if (typeof window.playTransitionVideo === 'function' && src) {
+      try {
+        window.playTransitionVideo(src, nextId);
+      } catch (e) {
+        console.warn('[TRANSITION] playTransitionVideo falhou, fallback direto:', e);
+        window.__TRANSITION_LOCK = false;
+        dispatchTransitionEvent('ended', { fallback: true });
+        goToSection(nextId);
+      }
+    } else {
+      // fallback sem player
+      window.__TRANSITION_LOCK = false;
+      dispatchTransitionEvent('ended', { noPlayer: true });
+      goToSection(nextId);
+    }
+  }
+
+  // ------- INIT SELFIE (base do seu arquivo) -------
   async function initSelfie(root) {
-    const sections = qsa('.j-section');
-    sections.forEach(section => {
+    // isola seção
+    qsa('.j-section').forEach(section => {
       if (section.id !== SECTION_ID) {
         section.classList.add('hidden');
         section.style.display = 'none';
         section.setAttribute('aria-hidden', 'true');
       }
     });
+    window.JC && (window.JC.currentSection = SECTION_ID);
 
-    if (window.JC) {
-      window.JC.currentSection = SECTION_ID;
-    }
+    // aguarda transição anterior (se houver)
+    await waitForTransitionUnlock();
 
+    // nome (maiúsculas via sessionStorage como no seu fluxo)
     const nameInput = qs('#nameInput', root);
     const saved = {
       nome: sessionStorage.getItem('jornada.nome') || 'USUÁRIO',
       guia: sessionStorage.getItem('jornada.guia') || 'zion'
     };
-
     if (nameInput) {
       nameInput.value = saved.nome.toUpperCase();
       nameInput.addEventListener('input', () => {
@@ -86,12 +150,14 @@
       });
     }
 
+    // datilografia + TTS
     const elements = qsa('[data-typing="true"]', root);
     for (const el of elements) {
       const text = (el.dataset.text || el.textContent || '').trim();
       await runTypingAndSpeak(el, text);
     }
 
+    // upload de selfie (fluxo atual)
     const selfieInput = qs('#selfieInput', root);
     if (selfieInput) {
       selfieInput.addEventListener('change', (e) => {
@@ -110,19 +176,17 @@
       });
     }
 
+    // ações (preview / capture / skip / start)
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('#previewBtn, #captureBtn, #btnSkipSelfie, #btnStartJourney');
       if (!btn) return;
-
       e.preventDefault();
+
       const img = qs('#selfieImage', root);
 
       if (btn.id === 'previewBtn') {
-        if (img?.src) {
-          window.toast?.('Pré-visualização atualizada!');
-        } else {
-          window.toast?.('Selecione uma imagem primeiro.');
-        }
+        if (img?.src) window.toast?.('Pré-visualização atualizada!');
+        else window.toast?.('Selecione uma imagem primeiro.');
       }
 
       if (btn.id === 'captureBtn') {
@@ -137,7 +201,7 @@
         canvas.height = 480;
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        const scale = parseFloat(qs('#selfieScale', root)?.value || 1);
+        const scale   = parseFloat(qs('#selfieScale', root)?.value || 1);
         const offsetX = parseFloat(qs('#selfieOffsetX', root)?.value || 0);
         const offsetY = parseFloat(qs('#selfieOffsetY', root)?.value || 0);
 
@@ -147,14 +211,13 @@
         ctx.drawImage(img, 0, 0, 70, 90);
         ctx.restore();
 
+        const dataURL = canvas.toDataURL('image/png');
+        try { localStorage.setItem('JORNADA_SELFIE', dataURL); } catch (_) {}
+
         const link = document.createElement('a');
         link.download = 'selfie-irmandade.png';
-        link.href = canvas.toDataURL('image/png');
+        link.href = dataURL;
         link.click();
-
-        try {
-          localStorage.setItem('JORNADA_SELFIE', link.href);
-        } catch (_) {}
 
         const avancarBtn = qs('#btnStartJourney', root);
         if (avancarBtn) {
@@ -164,18 +227,8 @@
       }
 
       if (btn.id === 'btnSkipSelfie' || btn.id === 'btnStartJourney') {
-        speechSynthesis.cancel();
-        qsa('video').forEach(video => {
-          video.pause();
-          video.src = '';
-          video.load();
-        });
-
-        if (typeof window.playTransitionVideo === 'function' && VIDEO_SRC) {
-          window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
-        } else {
-          window.JC?.show?.(NEXT_SECTION_ID);
-        }
+        // encerra vozes/mídias e inicia transição
+        playTransition(root, btn, NEXT_SECTION_ID);
       }
     });
 
@@ -185,11 +238,20 @@
   document.addEventListener('section:shown', (e) => {
     const id = e.detail.sectionId;
     if (id !== SECTION_ID) return;
-
     const root = e.detail.node;
     if (!root) return;
-
     initSelfie(root);
+  });
+
+  // se já estiver visível no load
+  if (document.getElementById(SECTION_ID) && !document.getElementById(SECTION_ID).classList.contains('hidden')) {
+    initSelfie(document.getElementById(SECTION_ID));
+  }
+
+  // listener opcional: quando o player terminar a transição, libera lock
+  document.addEventListener('transitionVideo:ended', () => {
+    window.__TRANSITION_LOCK = false;
+    dispatchTransitionEvent('ended', { from: MOD });
   });
 
   console.log(`[${MOD}] carregado`);
