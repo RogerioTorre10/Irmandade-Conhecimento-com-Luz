@@ -95,34 +95,35 @@
   transform-origin: 50% 60%;    /* pivô um pouco abaixo do centro (combina com a chama) */
 }
 
-/* ===== Selfie: stage e máscara da chama (2:3) ===== */
-.selfie-page .flame-stage{
+.selfie-page .flame-stage {
   position: relative;
   width: min(92vw, 620px);
-  height: min(92vw * 1.5, 930px); /* 2:3 */
+  height: min(92vw * 1.5, 930px);
   max-height: min(70vh, 720px);
-  margin: 0 auto;
+  margin: 24px auto;
   border-radius: 16px;
   overflow: hidden;
   background: #000;
   box-shadow: 0 0 14px rgba(0,0,0,.6);
 
-  /* máscara usando o SVG do repo (com cache-bust) */
-  -webkit-mask-image: url('/assets/img/chama-card.png?v=6');
-          mask-image: url('/assets/img/chama-card.png?v=6');
+  -webkit-mask-image: var(--chama-mask-src);
+          mask-image: var(--chama-mask-src);
+  -webkit-mask-mode: alpha;
+          mask-mode: alpha;
   -webkit-mask-repeat: no-repeat;
           mask-repeat: no-repeat;
-  -webkit-mask-size: contain;
-          mask-size: contain;
-  -webkit-mask-position: center;
-          mask-position: center;
+  -webkit-mask-size: var(--chama-size-w) var(--chama-size-h);
+          mask-size: var(--chama-size-w) var(--chama-size-h);
+  -webkit-mask-position: var(--chama-pos-x) var(--chama-pos-y);
+          mask-position: var(--chama-pos-x) var(--chama-pos-y);
 }
 
-/* vídeo/canvas ocupam todo o stage; recorte vem da máscara acima */
 .selfie-page #selfieVideo,
-.selfie-page #selfieCanvas{
-  position:absolute; inset:0;
-  width:100%; height:100%;
+.selfie-page #selfieCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   transform-origin: 50% 60%;
 }
@@ -181,8 +182,12 @@
 .selfie-zoom label{ font-size:.95rem; opacity:.9; }
 
 /* Ações */
-.selfie-actions{
-  display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
+.selfie-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 18px;
 }
 .selfie-status{
   margin-top:8px; text-align:center; min-height:1.2em;
@@ -191,4 +196,17 @@
 
 @media (max-width:480px){
   .selfie-container{ width:288px; height:356px; }
+}
+
+:root {
+  --chama-mask-src: url('/assets/img/chama-card.png?v=1');
+  --chama-size-w: 64%;
+  --chama-size-h: 92%;
+  --chama-pos-x: 50%;
+  --chama-pos-y: 58%;
+  --chama-pivot-y: 0.58;
+}
+/* remove fundo duplicado e destaca só o pergaminho */
+.selfie-page {
+  background: none !important;
 }
