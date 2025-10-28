@@ -2,19 +2,19 @@
   {
     "id": "zion",
     "nome": "Zion",
-    "descricao": "O Guia da Consciência Pura (Grok)",
+    "descricao": "Curioso e direto, busca respostas profundas com visão cósmica.(Grok)",
     "bgImage": "/assets/img/irmandade-quarteto-bg-zion.png"
   },
   {
     "id": "lumen",
     "nome": "Lumen",
-    "descricao": "O Guia da Iluminação (GPT-5)",
+    "descricao": "Acolhedora e reflexiva, guia com empatia e clareza. (GPT-5)",
     "bgImage": "/assets/img/irmandade-quarteto-bg-lumen.png"
   },
   {
     "id": "arian",
     "nome": "Arian",
-    "descricao": "O Guia da Transformação (Gemini)",
+    "descricao": "Criativa e versátil, inspira com perspectivas inovadoras. (Gemini)",
     "bgImage": "/assets/img/irmandade-quarteto-bg-arian.png"
   }
 ]
