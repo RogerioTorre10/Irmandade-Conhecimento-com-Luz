@@ -253,6 +253,124 @@
     window.__TRANSITION_LOCK = false;
     dispatchTransitionEvent('ended', { from: MOD });
   });
-
+  
   console.log(`[${MOD}] carregado`);
+})();
+
+// === PATCH VISIBILIDADE + TEXTO + BOTOES ===
+(function ensureSelfieReady(){
+  const ROOT_ID = 'section-selfie';
+
+  function show(el){ if(!el) return; el.classList.remove('hidden'); el.style.removeProperty('display'); el.setAttribute('aria-hidden','false'); }
+
+  async function typeSafe(el, txt){
+    if(!el) return;
+    const msg = (txt || el.dataset?.text || el.textContent || '').trim();
+    if(!msg) return;
+    try{
+      if(typeof window.runTyping === 'function'){
+        await new Promise(res => window.runTyping(el, msg, res, { speed: Number(el.dataset.speed||34), cursor:true }));
+      } else {
+        el.textContent=''; let i=0, sp=Number(el.dataset.speed||34);
+        await new Promise(res => { (function tick(){ if(i<msg.length){ el.textContent+=msg.charAt(i++); setTimeout(tick, sp);} else res(); })(); });
+      }
+      // TTS (opcional)
+      try{ await window.EffectCoordinator?.speak?.(msg, { lang:'pt-BR', rate:1.05 }); }catch{}
+    }catch(_){ el.textContent = msg; }
+    el.classList.add('typing-done');
+  }
+
+  async function boot(){
+    const root = document.getElementById(ROOT_ID);
+    if(!root) return;
+
+    // Seção visível
+    show(root);
+
+    // Cabeçalho + botão skip
+    show(root.querySelector('.selfie-header'));
+    show(root.querySelector('#btnSkipSelfie'));
+
+    // Texto orientativo com NOME
+    const nome = (window.JC?.data?.nome || sessionStorage.getItem('jornada.nome') || 'AMIGO(A)').toString().toUpperCase();
+    const txtEl = root.querySelector('#selfieTexto');
+    if(txtEl){
+      txtEl.style.opacity = '1';
+      const base = (txtEl.dataset?.text || '').replace(/\{\{\s*(NOME|nome|name)\s*\}\}/g, nome);
+      await typeSafe(txtEl, base);
+    }
+
+    // Mostrar grid/câmera/controles
+    ['.selfie-grid','.selfie-controls','.selfie-actions','.ranges','.selfie-preview-wrap']
+      .forEach(sel => show(root.querySelector(sel)));
+    ['#startCamBtn','#btn-selfie-preview','#btn-selfie-confirm','#btn-selfie-next']
+      .forEach(sel => { const b = root.querySelector(sel); if(b) show(b); });
+
+    // Se o script principal não rodou ainda, garante handlers mínimos:
+    const startBtn  = root.querySelector('#startCamBtn');
+    const prevBtn   = root.querySelector('#btn-selfie-preview');
+    const confBtn   = root.querySelector('#btn-selfie-confirm');
+    const nextBtn   = root.querySelector('#btn-selfie-next');
+    const videoEl   = root.querySelector('#selfieVideo');
+    const canvasEl  = root.querySelector('#selfieCanvas');
+    const preview   = root.querySelector('#selfiePreview');
+
+    // Habilita depois que a câmera iniciar
+    if(startBtn && !startBtn.dataset._bind){
+      startBtn.dataset._bind = '1';
+      startBtn.addEventListener('click', async () => {
+        try{
+          const stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user' }, audio:false });
+          videoEl.srcObject = stream;
+          await videoEl.play();
+          prevBtn && (prevBtn.disabled = false);
+          confBtn && (confBtn.disabled = false);
+        }catch(e){
+          console.warn('[Selfie] getUserMedia falhou:', e);
+          const err = root.querySelector('#selfie-error'); if(err){ err.textContent='Não foi possível acessar a câmera.'; show(err); }
+        }
+      });
+    }
+
+    // Prévia simples (fallback)
+    if(prevBtn && !prevBtn.dataset._bind){
+      prevBtn.dataset._bind = '1';
+      prevBtn.addEventListener('click', () => {
+        if(!videoEl?.srcObject) return;
+        const vw = videoEl.videoWidth||640, vh = videoEl.videoHeight||480;
+        canvasEl.width = vw; canvasEl.height = vh;
+        const ctx = canvasEl.getContext('2d'); ctx.drawImage(videoEl,0,0,vw,vh);
+        const dataUrl = canvasEl.toDataURL('image/jpeg',0.9);
+        if(preview){ preview.src = dataUrl; show(preview.closest('.selfie-preview-wrap')); }
+        window.JC = window.JC || {}; window.JC.data = window.JC.data || {};
+        window.JC.data.selfiePreview = dataUrl;
+      });
+    }
+
+    // Confirmar
+    if(confBtn && !confBtn.dataset._bind){
+      confBtn.dataset._bind = '1';
+      confBtn.addEventListener('click', ()=>{
+        const dataUrl = window.JC?.data?.selfiePreview;
+        if(!dataUrl){ window.toast?.('Gere uma prévia antes de confirmar.', 'warning'); return; }
+        window.JC.data.selfie = dataUrl;
+        nextBtn && (nextBtn.disabled = false);
+        window.toast?.('Foto confirmada! Pode iniciar a próxima etapa.', 'success');
+      });
+    }
+  }
+
+  // Rodar quando a seção for mostrada e também como fallback no load
+  document.addEventListener('section:shown', (e)=>{
+    if(e?.detail?.sectionId === 'section-selfie') boot();
+  });
+  if(document.readyState !== 'loading'){
+    const s = document.getElementById(ROOT_ID);
+    if(s && !s.classList.contains('hidden')) boot();
+  } else {
+    document.addEventListener('DOMContentLoaded', ()=> {
+      const s = document.getElementById(ROOT_ID);
+      if(s && !s.classList.contains('hidden')) boot();
+    }, { once:true });
+  }
 })();
