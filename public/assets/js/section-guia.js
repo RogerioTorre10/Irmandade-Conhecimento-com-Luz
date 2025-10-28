@@ -4,21 +4,26 @@
   const SECTION_ID      = 'section-guia';
   const NEXT_SECTION_ID = 'section-selfie';
   const HIDE_CLASS      = 'hidden';
+  const TYPING_SPEED    = 42;
+  const TTS_LATCH_MS    = 600;
+  const DATA_URL        = '/assets/data/guias.json'; // <<< JSON
 
-  const TYPING_SPEED = 42;
-  const TTS_LATCH_MS = 600;
-
-  if (window.JCGuia?.__bound) {
-    console.log('[JCGuia] já carregado');
-    return;
-  }
+  if (window.JCGuia?.__bound) { console.log('[JCGuia] já carregado'); return; }
   window.JCGuia = window.JCGuia || {};
   window.JCGuia.__bound = true;
-  const State = { ready: false, listenerOn: false };
 
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
   const q  = (sel, root = document) => root.querySelector(sel);
   const qa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+  // ===== Espera lock de transição (vídeo) =====
+  async function waitForTransitionUnlock(timeoutMs = 20000) {
+    if (!window.__TRANSITION_LOCK) return;
+    await Promise.race([
+      new Promise(res => document.addEventListener('transition:ended', () => res(), { once: true })),
+      new Promise(res => setTimeout(res, timeoutMs))
+    ]);
+  }
 
   function ensureVisible(el) {
     if (!el) return;
@@ -29,18 +34,7 @@
     el.style.removeProperty('visibility');
   }
 
-  // 🔒 Espera qualquer vídeo de transição terminar
-  async function waitForTransitionUnlock(timeoutMs = 20000) {
-    if (!window.__TRANSITION_LOCK) return;
-    let resolved = false;
-    const p = new Promise(resolve => {
-      const onEnd = () => { if (!resolved) { resolved = true; document.removeEventListener('transition:ended', onEnd); resolve(); } };
-      document.addEventListener('transition:ended', onEnd, { once: true });
-    });
-    const t = new Promise(resolve => setTimeout(resolve, timeoutMs));
-    await Promise.race([p, t]);
-  }
-
+  // ===== Datilografia + TTS =====
   async function localType(el, text, speed = TYPING_SPEED) {
     return new Promise(resolve => {
       let i = 0; el.textContent = '';
@@ -53,17 +47,13 @@
     const msg = (text || el.dataset?.text || el.textContent || '').trim();
     if (!msg) return;
 
-    el.classList.add('typing-active');
-    el.classList.remove('typing-done');
-
+    el.classList.add('typing-active'); el.classList.remove('typing-done');
     let usedFallback = false;
     if (typeof window.runTyping === 'function') {
       await new Promise(res => { try { window.runTyping(el, msg, () => res(), { speed, cursor: true }); } catch { usedFallback = true; res(); } });
     } else usedFallback = true;
     if (usedFallback) await localType(el, msg, speed);
-
-    el.classList.remove('typing-active');
-    el.classList.add('typing-done');
+    el.classList.remove('typing-active'); el.classList.add('typing-done');
 
     if (speak && msg && !el.dataset.spoken) {
       try {
@@ -84,91 +74,83 @@
         || '/assets/videos/filme-eu-na-irmandade.mp4';
   }
 
-  function resolveGuideLabel(btn) {
-    // prioridade: data-label > data-guia normalizado > id conhecido > texto existente
-    const dataLabel = btn.dataset.label && btn.dataset.label.trim();
-    if (dataLabel) return dataLabel;
-
-    const guia = (btn.dataset.guia || '').trim().toLowerCase();
-    if (guia) return guia.charAt(0).toUpperCase() + guia.slice(1);
-
-    const id = (btn.id || '').toLowerCase();
-    if (id.includes('zion'))  return 'Zion';
-    if (id.includes('lumen')) return 'Lumen';
-    if (id.includes('arian') || id.includes('ariane') || id.includes('arian_') || id.includes('arian-btn')) return 'Arian';
-    if (id.includes('arian')) return 'Arian'; // redundância segura
-
-    const current = (btn.textContent || '').trim();
-    return current || 'Guia';
-  }
-
   function pick(root) {
-    const scope = root.querySelector('#guia') || root;
     return {
       root,
-      scope,
-      // título/pergunta (ex.: "Insira seu nome")
-      title: q('.titulo-pergaminho, [data-role="guia-title"], #guia-title', scope),
-      // input + confirmar
-      nameInput:  q('#guiaNameInput', scope),
-      confirmBtn: q('#btn-confirmar-nome', scope),
-      // texto com datilografia/leitura (aparece após confirmar)
-      guiaTexto:  q('#guiaTexto, [data-role="guia-texto"]', scope),
-      // botões dos guias
-      guiaOptions: qa('.guia-options button, .guia-options [data-guia], [data-role="guia-option"]', scope),
-      // fallback avançar (se existir)
-      advanceBtn: q('[data-action="avancar"], #btn-guia-avancar', scope),
-      // mensagem de erro
-      errorMsg:   q('#guia-error', scope)
+      title:      q('.titulo-pergaminho', root),
+      nameInput:  q('#guiaNameInput', root),
+      confirmBtn: q('#btn-confirmar-nome', root),
+      moldura:    q('.moldura-grande', root),
+      guiaTexto:  q('#guiaTexto', root),
+      optionsBox: q('.guia-options', root),
+      errorBox:   q('#guia-error', root)
     };
   }
 
-  function setButtonsLabels(btns) {
-    if (!btns?.length) return;
-    btns.forEach(b => {
-      const label = resolveGuideLabel(b);
-      // Mantém ícones/spans internos; garante um texto visível principal
-      if (!b.querySelector('.label')) {
-        const span = document.createElement('span');
-        span.className = 'label';
-        span.textContent = label;
-        // se botão já tem conteúdo, preserva e apenas garante o rótulo no fim
-        if (b.childNodes.length) b.appendChild(document.createTextNode(' '));
-        b.appendChild(span);
-      } else {
-        b.querySelector('.label').textContent = label;
+  async function loadGuias() {
+    const r = await fetch(DATA_URL, { cache: 'no-store' });
+    if (!r.ok) throw new Error(`GET ${DATA_URL} -> ${r.status}`);
+    return r.json();
+  }
+
+  function renderButtons(optionsBox, guias) {
+    optionsBox.innerHTML = '';
+    guias.forEach(g => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-stone-espinhos no-anim';
+      btn.dataset.action = 'select-guia';
+      btn.dataset.guia = g.id;
+      btn.setAttribute('aria-label', `Escolher o guia ${g.nome}`);
+      btn.disabled = true;
+      btn.innerHTML = `<span class="label">${g.nome}</span>`;
+      // background opcional via bgImage
+      if (g.bgImage) {
+        btn.style.backgroundImage = `url('${g.bgImage}')`;
+        btn.style.backgroundSize = 'cover';
+        btn.style.backgroundPosition = 'center';
       }
-      // também espelha em aria-label
-      b.setAttribute('aria-label', label);
+      optionsBox.appendChild(btn);
     });
   }
-  
+
+  function findGuia(guias, id) {
+    id = (id || '').toLowerCase();
+    return guias.find(g => (g.id || '').toLowerCase() === id);
+  }
+
   async function initOnce(root) {
     if (!root || root.dataset.guiaInitialized === 'true') return;
     root.dataset.guiaInitialized = 'true';
 
-    // 🔒 aguarda término de transição anterior
     await waitForTransitionUnlock();
-
     ensureVisible(root);
+
     const els = pick(root);
 
-    // estado inicial
-    els.errorMsg?.classList.add(HIDE_CLASS);
-    els.errorMsg?.setAttribute('aria-hidden', 'true');
-
-    // título/pergunta (datilografia + leitura)
+    // título com datilografia
     if (els.title && !els.title.classList.contains('typing-done')) {
-      await typeOnce(els.title, null, { speed: TYPING_SPEED, speak: true });
+      await typeOnce(els.title, null, { speed: 34, speak: true });
     }
 
-    // prepara botões de guia desativados até confirmar nome
-    if (els.guiaOptions?.length) {
-      setButtonsLabels(els.guiaOptions); // garante rótulos: Zion/Lumen/Arian
-      els.guiaOptions.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; b.style.cursor = 'not-allowed'; });
+    // carrega JSON e cria botões
+    let guias = [];
+    try {
+      guias = await loadGuias(); // [{id, nome, descricao, bgImage}, ...]
+      renderButtons(els.optionsBox, guias);
+      els.errorBox?.classList.add(HIDE_CLASS);
+      els.errorBox?.setAttribute('aria-hidden', 'true');
+    } catch (e) {
+      console.error('[JCGuia] Erro ao carregar guias:', e);
+      els.errorBox?.classList.remove(HIDE_CLASS);
+      els.errorBox?.setAttribute('aria-hidden', 'false');
     }
 
-    // confirma nome → habilita texto e opções
+    // estado inicial: botões desativados até confirmar nome
+    const guideButtons = qa('button[data-action="select-guia"]', els.optionsBox);
+    guideButtons.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; b.style.cursor = 'not-allowed'; });
+
+    // confirmar nome → habilita texto e opções
     els.confirmBtn?.addEventListener('click', async () => {
       const name = (els.nameInput?.value || '').trim();
       if (name.length < 2) {
@@ -177,75 +159,63 @@
         return;
       }
 
-      // Texto do container (datilografia + leitura), personalizando com o nome
+      // texto do container (datilografia + TTS), com nome
       if (els.guiaTexto) {
-        // prioriza data-text; se tiver {{nome}}, substitui
         const base = (els.guiaTexto.dataset?.text || els.guiaTexto.textContent || 'Escolha seu guia para a Jornada.').trim();
         const msg  = base.replace(/\{\{\s*(nome|name)\s*\}\}/gi, name);
-        els.guiaTexto.textContent = ''; // limpa pra datilografia
+        els.guiaTexto.textContent = '';
         await typeOnce(els.guiaTexto, msg, { speed: 38, speak: true });
+
+        // ✨ ativa brilho dourado da moldura (opcional)
+        els.moldura?.classList.add('glow');
+        els.guiaTexto?.classList.add('glow');
       }
-      // Texto do container (datilografia + leitura)
-if (els.guiaTexto) {
-  const base = (els.guiaTexto.dataset?.text || els.guiaTexto.textContent || 'Escolha seu guia para a Jornada.').trim();
-  const msg  = base.replace(/\{\{\s*(nome|name)\s*\}\}/gi, name);
-  els.guiaTexto.textContent = '';
-  await typeOnce(els.guiaTexto, msg, { speed: 38, speak: true });
 
-  // ✨ Ativa o brilho dourado após o texto
-  const moldura = els.guiaTexto.closest('.moldura-grande');
-  moldura?.classList.add('glow');
-  els.guiaTexto?.classList.add('glow');
-}
-
-
-      // habilita as opções
-      if (els.guiaOptions?.length) {
-        els.guiaOptions.forEach(b => { b.disabled = false; b.style.opacity = '1'; b.style.cursor = 'pointer'; });
-      }
+      // habilita opções
+      guideButtons.forEach(b => { b.disabled = false; b.style.opacity = '1'; b.style.cursor = 'pointer'; });
     }, { once: true });
 
-    // antes de salvar o guia ou tocar o vídeo
-     document.querySelector('.moldura-grande')?.classList.add('fade-out');
-     document.querySelector('.guia-descricao-medieval')?.classList.add('fade-out');
-    
-    // clique nas opções → registra guia e toca transição
-    if (els.guiaOptions?.length) {
-      els.guiaOptions.forEach(btn => {
-        btn.addEventListener('click', () => {
-          if (btn.disabled) return;
-          const guia = (btn.dataset.guia || btn.getAttribute('data-value') || resolveGuideLabel(btn)).trim();
-          try {
-            window.JC = window.JC || {};
-            window.JC.data = window.JC.data || {};
-            window.JC.data.guia = guia;
-          } catch {}
+    // hover/foco → mostrar descrição do guia (datilografia + TTS)
+    guideButtons.forEach(btn => {
+      const preview = async () => {
+        const g = findGuia(guias, btn.dataset.guia);
+        if (!g || !els.guiaTexto) return;
+        // não espeta se ainda estiver tocando TTS de outra frase
+        els.guiaTexto.dataset.spoken = '';
+        await typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: true });
+      };
+      btn.addEventListener('mouseenter', preview);
+      btn.addEventListener('focus', preview);
+    });
 
-          const src = getTransitionSrc(root, btn);
-          if (typeof window.playTransitionVideo === 'function') {
-            window.playTransitionVideo(src, NEXT_SECTION_ID);
-          } else {
-            window.JC?.show?.(NEXT_SECTION_ID) ?? (location.hash = `#${NEXT_SECTION_ID}`);
-          }
-        });
-      });
-    }
+    // clique → salva, apaga brilho e toca transição
+    guideButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.disabled) return;
+        const g = findGuia(guias, btn.dataset.guia) || { id: btn.dataset.guia, nome: btn.textContent.trim() };
 
-    // fallback "avançar" (se existir)
-    if (els.advanceBtn && !els.advanceBtn.__wired) {
-      els.advanceBtn.__wired = true;
-      els.advanceBtn.addEventListener('click', () => {
-        const src = getTransitionSrc(root, els.advanceBtn);
+        // apaga brilho
+        els.moldura?.classList.add('fade-out');
+        els.guiaTexto?.classList.add('fade-out');
+
+        // persiste
+        try {
+          window.JC = window.JC || {};
+          window.JC.data = window.JC.data || {};
+          window.JC.data.guia = g.id || g.nome;
+        } catch {}
+
+        // transição
+        const src = getTransitionSrc(root, btn);
         if (typeof window.playTransitionVideo === 'function') {
           window.playTransitionVideo(src, NEXT_SECTION_ID);
         } else {
           window.JC?.show?.(NEXT_SECTION_ID) ?? (location.hash = `#${NEXT_SECTION_ID}`);
         }
       });
-    }
+    });
 
-    State.ready = true;
-    console.log('[JCGuia] pronto');
+    console.log('[JCGuia] pronto (dinâmico via guias.json)');
   }
 
   function onSectionShown(evt) {
@@ -255,10 +225,7 @@ if (els.guiaTexto) {
   }
 
   function bind() {
-    if (!State.listenerOn) {
-      document.addEventListener('section:shown', onSectionShown, { passive: true });
-      State.listenerOn = true;
-    }
+    document.addEventListener('section:shown', onSectionShown, { passive: true });
     const now = document.getElementById(SECTION_ID);
     if (now && !now.classList.contains(HIDE_CLASS)) initOnce(now);
   }
