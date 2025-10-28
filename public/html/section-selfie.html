@@ -1,31 +1,56 @@
-<!-- /public/html/section-selfie.html -->
 <link rel="stylesheet" href="/assets/css/styles-base.css">
 <link rel="stylesheet" href="/assets/css/styles-selfie.css">
 
-<section id="section-selfie" class="j-section pergaminho pergaminho-h epic selfie-page hidden" aria-labelledby="selfie-title">
+<section
+  id="section-selfie"
+  class="j-section pergaminho pergaminho-h epic selfie-page hidden"
+  data-section="selfie"
+  aria-labelledby="selfie-title"
+  data-transition-src="/assets/videos/filme-selfie-card.mp4"
+>
   <div class="conteudo-pergaminho">
+    <!-- Cabeçalho -->
     <header class="selfie-header">
-      <h2 id="selfie-title" class="titulo-selfie" data-typing="true" data-text="Tirar sua Foto ✨" data-speed="28" data-cursor="true">
-        Tirar sua Foto ✨
-      </h2>
-      <p class="sub" aria-live="polite">Sua imagem vai aparecer no cartão da próxima etapa.</p>
+      <h2
+        id="selfie-title"
+        class="titulo-pergaminho"
+        data-typing="true"
+        data-text="Tirar sua Foto ✨"
+        data-speed="30"
+        data-cursor="true"
+      ></h2>
+
+      <button
+        id="btnSkipSelfie"
+        class="btn btn-ghost-top"
+        aria-label="Não quero foto / Iniciar"
+        data-transition-src="/assets/videos/filme-skip-card.mp4"
+      >
+        Não quero foto / Iniciar
+      </button>
     </header>
 
+    <!-- Texto orientativo -->
+    <div class="moldura-orientacao">
+      <div
+        id="selfieTexto"
+        class="texto-orientacao"
+        data-text="{{NOME}}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras."
+        data-speed="36"
+      ></div>
+    </div>
+
+    <!-- Container da câmera -->
     <div class="selfie-grid">
-      <!-- Pré-visualização / Câmera -->
-      <div class="selfie-preview" aria-live="polite">
-        <div class="preview-stage">
-          <video id="selfieVideo" playsinline autoplay muted class="stage-video hidden"></video>
-          <canvas id="selfieCanvas" class="stage-canvas hidden"></canvas>
-          <img id="selfiePreview" alt="Pré‑visualização da foto" class="stage-image hidden" />
-          <!-- Overlays opcionais -->
-          <div class="overlay">
-            <div id="guideNameSlot" class="guide-name"></div>
-            <div id="userNameSlot" class="user-name"></div>
-          </div>
+      <div class="selfie-preview">
+        <div class="flame-stage">
+          <video id="selfieVideo" playsinline autoplay muted></video>
+          <canvas id="selfieCanvas" class="hidden"></canvas>
+          <div class="flame-mask"></div>
         </div>
+
         <div class="preview-hints">
-          <small>Use a luz frontal do seu ambiente. Centralize o rosto.</small>
+          <small>Certifique-se de que o rosto está centralizado na chama.</small>
         </div>
       </div>
 
@@ -33,51 +58,55 @@
       <aside class="selfie-controls">
         <div class="field-row">
           <label for="nameInput">Seu Nome</label>
-          <input id="nameInput" type="text" placeholder="Digite seu nome" autocomplete="name" />
+          <input
+            id="nameInput"
+            type="text"
+            placeholder="NOME"
+            autocomplete="name"
+            class="input-espinhos"
+          />
         </div>
 
         <div class="controls-group">
-          <div class="btn-row">
-            <button id="startCamBtn" class="btn btn-primary" type="button">Ativar Câmera</button>
-            <button id="stopCamBtn" class="btn btn-ghost" type="button">Parar</button>
-          </div>
+          <button id="startCamBtn" class="btn btn-stone-espinhos">Ativar Câmera</button>
 
-          <div class="btn-row">
-            <label class="file-btn">
-              <input id="uploadSelfie" type="file" accept="image/*" hidden />
-              <span class="btn btn-secondary">Enviar Foto</span>
+          <div class="ranges">
+            <label>Zoom
+              <input id="zoomAll" type="range" min="1" max="2.5" step="0.01" value="1" />
             </label>
-            <button id="captureBtn" class="btn btn-success" type="button">Capturar</button>
-            <button id="previewBtn" class="btn btn-ghost" type="button">Pré‑visualizar</button>
+            <label>Zoom Horizontal
+              <input id="zoomX" type="range" min="1" max="2.5" step="0.01" value="1" />
+            </label>
+            <label>Zoom Vertical
+              <input id="zoomY" type="range" min="1" max="2.5" step="0.01" value="1" />
+            </label>
           </div>
 
-          <details class="tweakers">
-            <summary>Ajustes finos</summary>
-            <div class="slider">
-              <label for="selfieScale">Zoom</label>
-              <input id="selfieScale" type="range" min="0.6" max="2.0" step="0.01" value="1" />
-            </div>
-            <div class="slider">
-              <label for="selfieOffsetX">Deslocar X</label>
-              <input id="selfieOffsetX" type="range" min="-200" max="200" step="1" value="0" />
-            </div>
-            <div class="slider">
-              <label for="selfieOffsetY">Deslocar Y</label>
-              <input id="selfieOffsetY" type="range" min="-200" max="200" step="1" value="0" />
-            </div>
-          </details>
-        </div>
-
-        <div class="card-next">
-          <h3>Pronto para seguir?</h3>
-          <p>Seu retrato vai ser usado no cartão da próxima página.</p>
-          <button class="btn btn-hero" data-action="avancar" type="button">Ir para o Cartão ➜</button>
-        </div>
-
-        <div class="skip">
-          <button id="btnSkipSelfie" class="btn btn-link" type="button">Pular por enquanto</button>
+          <div class="btn-row">
+            <button id="btn-selfie-preview" class="btn btn-stone-espinhos" disabled>Prévia</button>
+            <button id="btn-selfie-confirm" class="btn btn-stone-espinhos" disabled>Confirmar</button>
+            <button
+              id="btn-selfie-next"
+              class="btn btn-stone-espinhos"
+              disabled
+              data-transition-src="/assets/videos/filme-selfie-card.mp4"
+            >
+              Iniciar Jornada
+            </button>
+          </div>
         </div>
       </aside>
+    </div>
+
+    <!-- Pré-visualização -->
+    <div class="selfie-preview-wrap">
+      <div class="preview-frame">
+        <img id="selfiePreview" alt="Pré-visualização da foto" />
+      </div>
+    </div>
+
+    <div id="selfie-error" class="hidden" aria-hidden="true">
+      Não foi possível acessar a câmera. Verifique as permissões do navegador.
     </div>
   </div>
 </section>
