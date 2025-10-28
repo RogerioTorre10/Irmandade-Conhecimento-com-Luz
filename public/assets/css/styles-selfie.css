@@ -75,115 +75,81 @@
   justify-items: center;
 }
 
+/* ===== Container da câmera ===== */
 .flame-stage{
   position: relative;
-  width: min(90vw, 620px);
-  height: min(60vh, 420px);
-  background: #000;
+  width: min(92vw, 620px);
+  height: min(92vw * 1.5, 930px); /* 2:3 approx (W:H = 1:1.5) */
+  max-height: min(70vh, 720px);
   border-radius: 16px;
   overflow: hidden;
+  background: #000;
   box-shadow: 0 0 14px rgba(0,0,0,.6);
 }
 
+/* vídeo/canvas ocupam todo o stage; recorte pela máscara */
 #selfieVideo, #selfieCanvas{
   position:absolute; inset:0;
   width:100%; height:100%;
-  object-fit: cover; /* permite zoom sem deformar muito */
-  transform-origin: center center;
+  object-fit: cover;            /* mantém proporção */
+  transform-origin: 50% 60%;    /* pivô um pouco abaixo do centro (combina com a chama) */
 }
 
-.hidden{ display:none !important; }
+/* Máscara: usa o MESMO SVG do card */
+.flame-stage{
+  --flameMask: url('/assets/img/chama-card.svg');
+  -webkit-mask-image: var(--flameMask);
+          mask-image: var(--flameMask);
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+  -webkit-mask-size: 64% 92%;   /* largura e altura da chama dentro do stage */
+          mask-size: 64% 92%;
+  -webkit-mask-position: 50% 58%; /* ligeiro bias para baixo, como no card */
+          mask-position: 50% 58%;
+}
 
-/* Máscara em forma de chama usando mask-image (SVG embutido) */
+/* brilho da chama (decorativo, não interfere na máscara) */
 .flame-mask{
   position:absolute; inset:0; pointer-events:none;
   background:
-    radial-gradient(ellipse at 50% 85%, rgba(255,170,60,.5), rgba(255,120,10,.0) 60%),
-    radial-gradient(circle at 50% 10%, rgba(255,220,160,.95), rgba(255,130,30,.0) 55%);
+    radial-gradient(ellipse at 50% 80%, rgba(255,180,70,.45), rgba(255,140,30,0) 60%),
+    radial-gradient(circle at 50% 18%, rgba(255,230,160,.85), rgba(255,160,40,0) 58%);
   mix-blend-mode: screen;
 }
-.flame-stage{
-  /* máscara que “recorta” em forma de chama */
-  --flameMask: url("data:image/svg+xml;utf8,\
-  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 150'>\
-    <path d='M50 2 C35 25 65 32 49 60 C41 75 25 72 23 92 C21 114 38 130 50 148 C62 130 79 114 77 92 C75 72 59 75 51 60 C35 30 65 25 50 2 Z' fill='black'/>\
-  </svg>");
-  -webkit-mask-image: var(--flameMask);
-          mask-image: var(--flameMask);
-  -webkit-mask-size: 90% 100%;
-          mask-size: 90% 100%;
-  -webkit-mask-position: center;
-          mask-position: center;
-  -webkit-mask-repeat: no-repeat;
-          mask-repeat: no-repeat;
-  background-color: #000; /* área fora da chama fica escura */
+
+/* Header: título e "Não quero foto" alinhados lado a lado */
+.selfie-header{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.selfie-header .btn-ghost-top{
+  white-space: nowrap;
 }
 
-/* Controles */
-.selfie-controls{
-  display: grid;
-  grid-template-columns: auto;
-  gap: 10px;
-  align-items: center;
-  justify-items: center;
+/* Garantir que controles/ações apareçam */
+.selfie-controls, .selfie-actions {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 .ranges{
-  display:flex;
-  gap:16px;
-  flex-wrap:wrap;
-  justify-content:center;
+  display:flex; gap:16px; flex-wrap:wrap; justify-content:center;
 }
-.range{
-  display:flex; flex-direction:column; align-items:center; gap:6px;
-  font-family: 'Cardo', serif; color:#f1e6c7;
-}
+.range{ display:flex; flex-direction:column; align-items:center; gap:6px; color:#f1e6c7; }
 .range input[type="range"]{ width: 220px; }
 
-/* Ações */
-.selfie-actions{
-  display:flex;
-  justify-content:center;
-  gap: 18px;
-  margin-top: 8px;
-}
-
-/* Pré-visualização */
-.selfie-preview-wrap{
-  display:flex; justify-content:center; margin-top:12px;
-}
-.preview-frame{
-  width: min(90vw, 520px);
-  height: auto;
-  border: 2px solid rgba(255,215,0,.4);
-  border-radius: 12px;
-  padding: 8px;
-  background: rgba(0,0,0,.2);
-}
-#selfiePreview{
-  display:block; width:100%; height:auto; border-radius:8px;
-}
-
-
-/* SAFETY: garante que blocos essenciais não fiquem ocultos por herança */
+/* Safety: nada some por herança */
 .selfie-header,
 .moldura-orientacao,
 .selfie-grid,
 .selfie-controls,
 .selfie-actions,
-.selfie-preview-wrap {
-  display: block;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-.selfie-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
-.btn[disabled] { opacity: .6; cursor: not-allowed; }
-/* Safety: garante exibição dos blocos essenciais */
-.selfie-header,
-.moldura-orientacao,
-.selfie-grid,
-.selfie-controls,
-.selfie-actions,
-.selfie-preview-wrap {
-  opacity: 1 !important;
-  visibility: visible !important;
-}
+.selfie-preview-wrap { opacity:1!important; visibility:visible!important; }
+
+/* Remove qualquer "fundo do card" que possa ter vazado para a selfie */
+.selfie-page{ background-image:none!important; }
+
