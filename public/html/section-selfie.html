@@ -82,6 +82,35 @@
             </label>
           </div>
 
+          <!-- === SELFIE: Container com máscara da chama === -->
+<div id="selfie-container" class="selfie-container masked">
+  <!-- Moldura por cima -->
+  <img id="selfie-frame" src="/assets/img/chama-card.png" alt="Moldura da Chama" />
+
+  <!-- Vídeo da câmera (ao vivo) -->
+  <video id="selfie-video" autoplay playsinline muted></video>
+
+  <!-- Canvas para prévia/captura -->
+  <canvas id="selfie-canvas" style="display:none;"></canvas>
+</div>
+
+<!-- Controles de zoom (vertical/horizontal) -->
+<div class="selfie-zoom">
+  <label for="zoom-x">Zoom horizontal (X)</label>
+  <input id="zoom-x" type="range" min="0.8" max="1.6" step="0.01" value="1">
+  <label for="zoom-y">Zoom vertical (Y)</label>
+  <input id="zoom-y" type="range" min="0.8" max="1.6" step="0.01" value="1">
+</div>
+
+<!-- Ações -->
+<div class="selfie-actions">
+  <button id="btn-selfie-previa" class="btn btn-primary">Prévia</button>
+  <button id="btn-selfie-refazer" class="btn btn-secondary" disabled>Não confirmar</button>
+  <button id="btn-selfie-confirmar" class="btn btn-primary" disabled>Confirmar</button>
+</div>
+
+<div id="selfie-status" class="selfie-status" aria-live="polite"></div>
+
           <div class="btn-row">
             <button id="btn-selfie-preview" class="btn btn-stone-espinhos" disabled>Prévia</button>
             <button id="btn-selfie-confirm" class="btn btn-stone-espinhos" disabled>Confirmar</button>
