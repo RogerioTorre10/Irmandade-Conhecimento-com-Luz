@@ -95,18 +95,34 @@
   transform-origin: 50% 60%;    /* pivô um pouco abaixo do centro (combina com a chama) */
 }
 
-/* Máscara: usa o MESMO SVG do card */
-.flame-stage{
-  --flameMask: url('/assets/img/chama-card.svg');
+/* === Override definitivo da máscara da chama (única, 2:3) === */
+.selfie-page .flame-stage {
+  /* data-URL inline para driblar cache e garantir a forma correta */
+  --flameMask: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 900'>\
+  <path fill='black' 
+ d='M300,40 C260,120 340,
+    150 300,250 C270,
+    320 210,330 200,
+    430 C190,535 260,
+    620 300,700 C340,
+    620 410,535 400,
+    430 C390,330 330,
+    320 300,250 C260,
+    150 340,120 300,40 Z'/>\
+</svg>");
   -webkit-mask-image: var(--flameMask);
           mask-image: var(--flameMask);
+
+  /* ajuste fino da área da chama dentro do stage */
+  -webkit-mask-size: 64% 92%;
+          mask-size: 64% 92%;
+  -webkit-mask-position: 50% 58%;
+          mask-position: 50% 58%;
   -webkit-mask-repeat: no-repeat;
           mask-repeat: no-repeat;
-  -webkit-mask-size: 64% 92%;   /* largura e altura da chama dentro do stage */
-          mask-size: 64% 92%;
-  -webkit-mask-position: 50% 58%; /* ligeiro bias para baixo, como no card */
-          mask-position: 50% 58%;
 }
+
 
 /* brilho da chama (decorativo, não interfere na máscara) */
 .flame-mask{
