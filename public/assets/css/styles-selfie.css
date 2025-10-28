@@ -108,8 +108,8 @@
   box-shadow: 0 0 14px rgba(0,0,0,.6);
 
   /* máscara usando o SVG do repo (com cache-bust) */
-  -webkit-mask-image: url('/assets/img/chama-card.svg?v=6');
-          mask-image: url('/assets/img/chama-card.svg?v=6');
+  -webkit-mask-image: url('/assets/img/chama-card.png?v=6');
+          mask-image: url('/assets/img/chama-card.png?v=6');
   -webkit-mask-repeat: no-repeat;
           mask-repeat: no-repeat;
   -webkit-mask-size: 64% 92%;
