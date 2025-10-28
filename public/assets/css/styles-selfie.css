@@ -47,14 +47,14 @@
 .btn-ghost-top:hover{ background: rgba(255,255,255,.08); }
 
 /* Moldura do texto orientativo */
-.moldura-orientacao{
-  width: 100%;
-  max-width: 900px;
-  margin: 6px auto 16px;
-  padding: 14px 18px;
-  border-radius: 12px;
-  background: rgba(0,0,0,.28);
-  box-shadow: inset 0 0 12px rgba(255,215,0,.2);
+.selfie-container{
+  position: relative;
+  width: 340px; height: 420px;
+  margin: 18px auto 10px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 0 24px rgba(255,200,120,.4), inset 0 0 30px rgba(255,180,90,.15);
 }
 .texto-orientacao{
   font-family: 'BerkshireSwash', cursive;
@@ -112,10 +112,10 @@
           mask-image: url('/assets/img/chama-card.png?v=6');
   -webkit-mask-repeat: no-repeat;
           mask-repeat: no-repeat;
-  -webkit-mask-size: 64% 92%;
-          mask-size: 64% 92%;
-  -webkit-mask-position: 50% 58%;
-          mask-position: 50% 58%;
+  -webkit-mask-size: contain;
+          mask-size: contain;
+  -webkit-mask-position: center;
+          mask-position: center;
 }
 
 /* vídeo/canvas ocupam todo o stage; recorte vem da máscara acima */
@@ -125,6 +125,16 @@
   width:100%; height:100%;
   object-fit: cover;
   transform-origin: 50% 60%;
+}
+
+/* Vídeo como "fundo vivo" (espelhado) */
+.selfie-container video{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+  filter: brightness(1.05) contrast(1.08);
+  z-index:2;
 }
 
 /* brilho decorativo (não interfere na máscara) */
@@ -161,3 +171,24 @@
 /* Remove qualquer "fundo do card" que possa ter vazado para a selfie */
 .selfie-page{ background-image:none!important; }
 
+/* Canvas de prévia fica oculto até ser exibido pelo JS */
+.selfie-container canvas{ display:none; }
+
+.selfie-zoom{
+  display:flex; gap:10px; align-items:center; justify-content:center;
+  flex-wrap:wrap; margin:6px 0 8px;
+}
+.selfie-zoom label{ font-size:.95rem; opacity:.9; }
+
+/* Ações */
+.selfie-actions{
+  display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
+}
+.selfie-status{
+  margin-top:8px; text-align:center; min-height:1.2em;
+  color:#ffd79a; text-shadow:0 0 6px rgba(255,180,50,.35);
+}
+
+@media (max-width:480px){
+  .selfie-container{ width:288px; height:356px; }
+}
