@@ -94,25 +94,30 @@
   }
 
   function renderButtons(optionsBox, guias) {
-    optionsBox.innerHTML = '';
-    guias.forEach(g => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'btn btn-stone-espinhos no-anim';
-      btn.dataset.action = 'select-guia';
-      btn.dataset.guia = g.id;
-      btn.setAttribute('aria-label', `Escolher o guia ${g.nome}`);
-      btn.disabled = true;
-      btn.innerHTML = `<span class="label">${g.nome}</span>`;
-      // background opcional via bgImage
-      if (g.bgImage) {
-        btn.style.backgroundImage = `url('${g.bgImage}')`;
-        btn.style.backgroundSize = 'cover';
-        btn.style.backgroundPosition = 'center';
-      }
-      optionsBox.appendChild(btn);
-    });
-  }
+  optionsBox.innerHTML = '';
+  guias.forEach(g => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn btn-stone-espinhos no-anim';
+    btn.dataset.action = 'select-guia';
+    btn.dataset.guia = g.id;
+    btn.setAttribute('aria-label', `Escolher o guia ${g.nome}`);
+    btn.disabled = true;
+
+    // ✅ Nome visível no botão
+    btn.innerHTML = `<span class="label">${g.nome}</span>`;
+
+    // plano de fundo opcional
+    if (g.bgImage) {
+      btn.style.backgroundImage = `url('${g.bgImage}')`;
+      btn.style.backgroundSize = 'cover';
+      btn.style.backgroundPosition = 'center';
+    }
+
+    optionsBox.appendChild(btn);
+  });
+}
+
 
   function findGuia(guias, id) {
     id = (id || '').toLowerCase();
@@ -127,6 +132,18 @@
     ensureVisible(root);
 
     const els = pick(root);
+
+    // ===== Nome sempre em MAIÚSCULAS =====
+   if (els.nameInput) {
+    els.nameInput.addEventListener('input', () => {
+    const start = els.nameInput.selectionStart;
+    const end = els.nameInput.selectionEnd;
+    els.nameInput.value = els.nameInput.value.toUpperCase();
+    // mantém o cursor na posição correta
+    els.nameInput.setSelectionRange(start, end);
+  });
+}
+
 
     // título com datilografia
     if (els.title && !els.title.classList.contains('typing-done')) {
