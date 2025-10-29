@@ -254,6 +254,10 @@
   background: rgba(255, 230, 190, 0.3);
   transform: scale(1.05);
 }
+.selfie-actions button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 
 /* Sliders visíveis e harmônicos */
 .selfie-controls input[type="range"] {
