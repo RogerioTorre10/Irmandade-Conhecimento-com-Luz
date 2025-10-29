@@ -76,23 +76,27 @@
 }
 
 /* ===== Container da câmera ===== */
-.flame-stage{
+.flame-stage {
   position: relative;
-  width: min(92vw, 620px);
-  height: min(92vw * 1.5, 930px); /* 2:3 approx (W:H = 1:1.5) */
-  max-height: min(70vh, 720px);
+  width: 340px;
+  height: 420px;
+  margin: 18px auto;
   border-radius: 16px;
   overflow: hidden;
   background: #000;
-  box-shadow: 0 0 14px rgba(0,0,0,.6);
+  box-shadow: 0 0 24px rgba(255,200,120,.4);
 }
 
-/* vídeo/canvas ocupam todo o stage; recorte pela máscara */
-#selfieVideo, #selfieCanvas{
-  position:absolute; inset:0;
-  width:100%; height:100%;
-  object-fit: cover;            /* mantém proporção */
-  transform-origin: 50% 60%;    /* pivô um pouco abaixo do centro (combina com a chama) */
+/* ===== VÍDEO E CANVAS (aqui vai a máscara!) ===== */
+#selfieVideo,
+#selfieCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1); /* espelha a câmera */
+  z-index: 1;
 }
 
 .selfie-page .flame-stage {
@@ -106,17 +110,19 @@
   background: radial-gradient(circle at center, rgba(255,255,255,0.15), rgba(0,0,0,0.7));
   overflow: hidden;
 
-  -webkit-mask-image: var(--chama-mask-src);
-          mask-image: var(--chama-mask-src);
-  -webkit-mask-mode: alpha;
-          mask-mode: alpha;
+  .masked-canvas {
+  -webkit-mask-image: url('/assets/img/chama-card.png?v=1');
+  mask-image: url('/assets/img/chama-card.png?v=1');
+  -webkit-mask-size: 68% 94%;
+  mask-size: 68% 94%;
+  -webkit-mask-position: 50% 58%;
+  mask-position: 50% 58%;
   -webkit-mask-repeat: no-repeat;
-          mask-repeat: no-repeat;
-  -webkit-mask-size: var(--chama-size-w) var(--chama-size-h);
-          mask-size: var(--chama-size-w) var(--chama-size-h);
-  -webkit-mask-position: var(--chama-pos-x) var(--chama-pos-y);
-          mask-position: var(--chama-pos-x) var(--chama-pos-y);
-
+  mask-repeat: no-repeat;
+  -webkit-mask-mode: alpha;
+  mask-mode: alpha;
+  z-index: 2;
+}
   z-index: 2;
   border-radius: 20px;
   box-shadow: 0 0 15px rgba(255, 190, 100, 0.25);
@@ -189,9 +195,10 @@
 .selfie-actions {
   display: flex;
   justify-content: center;
-  align-items: center;
   gap: 16px;
-  margin-top: 18px;
+  margin-top: 20px;
+  z-index: 10 !important;
+  position: relative;
 }
 .selfie-status{
   margin-top:8px; text-align:center; min-height:1.2em;
@@ -236,18 +243,16 @@
   background: rgba(255, 220, 160, 0.15);
   border: 1px solid rgba(255, 220, 180, 0.4);
   color: #fff8e6;
-  font-family: 'Cardo', serif;
-  font-size: 0.9rem;
-  padding: 8px 18px;
+  padding: 10px 20px;
   border-radius: 12px;
+  font-family: 'Cardo', serif;
   box-shadow: 0 0 10px rgba(255, 200, 120, 0.2);
-  transition: all 0.2s ease;
+  transition: all 0.2s;
 }
 
-.selfie-actions button:hover {
-  background: rgba(255, 230, 190, 0.25);
-  box-shadow: 0 0 15px rgba(255, 220, 120, 0.35);
-  transform: scale(1.03);
+.selfie-actions button:hover:not(:disabled) {
+  background: rgba(255, 230, 190, 0.3);
+  transform: scale(1.05);
 }
 
 /* Sliders visíveis e harmônicos */
