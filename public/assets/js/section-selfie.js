@@ -223,44 +223,49 @@
     else if (global.showSection) global.showSection('section-card');
   }
 
-  // ---------- Forçar Ordem ----------
-  function enforceOrder(section) {
-    const order = [
-      '.selfie-header',
-      '#selfieOrientWrap',
-      '#selfieControls',
-      '#selfieButtons'
-    ];
-    order.reduce((prev, sel) => {
-      const curr = section.querySelector(sel);
-      if (curr && prev && curr.previousElementSibling !== prev) {
-        curr.remove();
-        placeAfter(prev, curr);
-      }
-      return curr;
-    }, null);
-  }
+  // ---------- Forçar Ordem (VERSÃO MELHORADA) ----------
+function enforceOrder(section) {
+  const order = [
+    '.selfie-header',
+    '#selfieOrientWrap',  // ← TEXTO AQUI
+    '#selfieControls',    // ← CONTROLES DEPOIS
+    '#selfieButtons'
+  ];
 
-  // ---------- Init ----------
-  async function play(section) {
-    // 1. Header
-    const header = ensureHeader(section);
-    const title = header.querySelector('h2');
-    if (title.dataset.typing === 'true') {
-      await runTyping(title);
-      speak(title.dataset.text);
+  let prev = null;
+  order.forEach(sel => {
+    const el = section.querySelector(sel);
+    if (el && prev && el.previousElementSibling !== prev) {
+      el.remove();
+      placeAfter(prev, el);
     }
+    prev = el;
+  });
+}
 
-    // 2. Texto com typing + TTS
-    await ensureTexto(section);
-
-    // 3. Controles e Botões
-    ensureControls(section);
-    ensureButtons(section);
-
-    // 4. Forçar ordem final
-    enforceOrder(section);
+// ---------- Init (Play) ----------
+async function play(section) {
+  // 1. Header com typing
+  const header = ensureHeader(section);
+  const title = header.querySelector('h2');
+  if (title.dataset.typing === 'true') {
+    await runTyping(title);
+    speak(title.dataset.text);
   }
+
+  // 2. Texto com typing + TTS (AGORA VEM ANTES!)
+  await ensureTexto(section);
+
+  // 3. Controles (só depois do texto!)
+  ensureControls(section);
+
+  // 4. Botões
+  ensureButtons(section);
+
+  // 5. FORÇA A ORDEM FINAL (garante 100%)
+  await sleep(50); // dá tempo do DOM se assentar
+  enforceOrder(section);
+}
 
   async function init() {
     try {
