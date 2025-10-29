@@ -115,48 +115,60 @@
     return head;
   }
 
-  // ---------- Texto Orientação (COM PROTEÇÃO TOTAL) ----------
+  // ---------- Texto Orientação (DATILOGRAFIA GARANTIDA) ----------
 async function ensureTexto(section) {
   const upper = getUpperName();
   let wrap = section.querySelector('#selfieOrientWrap');
   if (!wrap) {
     wrap = document.createElement('div');
     wrap.id = 'selfieOrientWrap';
-    wrap.style.cssText = 'display:flex;justify-content:center;margin:16px 0 12px;pointer-events:none;';
+    wrap.style.cssText = 'display:flex;justify-content:center;margin:16px 0 12px;';
     section.appendChild(wrap);
   } else {
-    // Limpa qualquer conteúdo anterior (evita duplicação)
-    wrap.innerHTML = '';
+    wrap.innerHTML = ''; // limpa tudo
   }
 
-  let p = document.createElement('p');
+  const p = document.createElement('p');
   p.id = 'selfieTexto';
   p.style.cssText = `
     background:rgba(0,0,0,.35);color:#f9e7c2;padding:12px 16px;border-radius:12px;
     text-align:center;font-family:Cardo,serif;font-size:15px;margin:0 auto;width:92%;max-width:820px;
     opacity:0; transition:opacity .4s ease;
-    pointer-events:none; /* evita clique acidental */
-    white-space: nowrap; overflow: hidden; /* essencial pro typing */
+    white-space: nowrap; overflow: hidden;
     display: inline-block;
+    pointer-events: none;
   `;
-  p.dataset.text = `${upper}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`;
+
+  const fullText = `${upper}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`;
+  p.dataset.text = fullText;
   p.dataset.speed = "32";
+
   wrap.appendChild(p);
 
-  // Força o texto a ficar vazio antes de começar
-  p.textContent = '';
-  await sleep(100);
+  // --- GARANTE QUE O DOM ESTEJA PRONTO ---
+  await sleep(50);
   p.style.opacity = '1';
+  p.textContent = ''; // garante vazio
 
-  // Typing PROTEGIDO: desativa outros observers
-  const observer = new MutationObserver(() => {});
-  observer.observe(p, { childList: true, subtree: true });
+  // --- DATILOGRAFIA COM requestAnimationFrame (IMPARÁVEL) ---
+  await new Promise(resolve => {
+    requestAnimationFrame(() => {
+      const chars = [...fullText];
+      let i = 0;
+      const speed = 32;
+      const interval = setInterval(() => {
+        if (i < chars.length) {
+          p.textContent += chars[i++];
+        } else {
+          clearInterval(interval);
+          resolve();
+        }
+      }, speed);
+    });
+  });
 
-  await runTyping(p);
-  speak(p.dataset.text);
-
-  // Desconecta observer após typing
-  observer.disconnect();
+  // --- TTS depois do typing ---
+  speak(fullText);
 
   return p;
 }
@@ -294,29 +306,20 @@ function startOrderObserver(section) {
 
 // ---------- Init (Play) — VERSÃO FINAL ----------
 async function play(section) {
-  // 1. Header
   const header = ensureHeader(section);
   const title = header.querySelector('h2');
   if (title.dataset.typing === 'true') {
-    await runTyping(title);
+    await runTyping(title); // se ainda usar em outro lugar
     speak(title.dataset.text);
   }
 
-  // 2. Texto (agora protegido)
+  // TEXTO VEM ANTES DE TUDO
   await ensureTexto(section);
 
-  // 3. Controles e Botões
   ensureControls(section);
   ensureButtons(section);
 
-  // 4. Ativa proteção contra mudanças
   startOrderObserver(section);
-
-  // 5. Força ordem várias vezes
-  enforceOrder(section);
-  await sleep(100);
-  enforceOrder(section);
-  await sleep(200);
   enforceOrder(section);
 }
 
