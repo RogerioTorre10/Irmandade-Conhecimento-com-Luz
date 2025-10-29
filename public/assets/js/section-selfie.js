@@ -1,18 +1,54 @@
-/* /assets/js/section-selfie.js — FASE 1.1
-   Datilografia + Leitura garantida (TTS fallback).
-   Ordem de TTS: window.TTS.speak -> TypingBridge.speak -> speechSynthesis.
+/* /assets/js/section-selfie.js — FASE 1.2
+   Datilografia + Leitura com nome do participante integrado.
+   - busca nome em window.JC.data.nome (ou participantName) e localStorage
+   - normaliza para MAIÚSCULAS
+   - usa no texto de orientação
+   - mantém TTS com fallback (window.TTS -> TypingBridge -> Web Speech)
 */
 (function (global) {
   'use strict';
 
   const NS = (global.JCSelfie = global.JCSelfie || {});
   if (NS.__phase1_bound) {
-    console.log('[Selfie:F1.1] Já inicializado, ignorando.');
+    console.log('[Selfie:F1.2] Já inicializado, ignorando.');
     return;
   }
   NS.__phase1_bound = true;
 
-  // ---------- Utils ----------
+  // ---------- Nome do participante (única fonte da verdade) ----------
+  function getUpperName() {
+    // 1) tenta no estado global
+    const jc = (global.JC && global.JC.data) ? global.JC.data : {};
+    let name = jc.nome || jc.participantName;
+
+    // 2) tenta no localStorage (se você estiver salvando lá em alguma página)
+    if (!name) {
+      try {
+        const ls = localStorage.getItem('jc.nome') || localStorage.getItem('jc.participantName');
+        if (ls) name = ls;
+      } catch {}
+    }
+
+    // 3) fallback
+    if (!name || typeof name !== 'string') name = 'AMOR';
+
+    // padroniza MAIÚSCULAS
+    const upper = name.toUpperCase().trim();
+
+    // sincroniza de volta (padrão único)
+    try {
+      global.JC = global.JC || {};
+      global.JC.data = global.JC.data || {};
+      global.JC.data.nome = upper;
+      global.JC.data.participantName = upper; // manter compatibilidade
+      // opcional: gravar para refresh
+      try { localStorage.setItem('jc.nome', upper); } catch {}
+    } catch {}
+
+    return upper;
+  }
+
+  // ---------- Utils DOM ----------
   function waitForElement(selector, { tries = 80, interval = 120 } = {}) {
     return new Promise((resolve, reject) => {
       let n = 0;
@@ -45,75 +81,44 @@
 
   async function speakWithWebSpeech(text) {
     if (!('speechSynthesis' in global)) throw new Error('speechSynthesis indisponível');
-    // interrompe qualquer fala atual
     try { speechSynthesis.cancel(); } catch {}
     const utter = new SpeechSynthesisUtterance(text);
     const voices = await waitVoices();
-    // tenta pt-BR -> pt-PT -> default
     const pick = voices.find(v => /pt[-_]?BR/i.test(v.lang))
               || voices.find(v => /pt([-_]?PT)?/i.test(v.lang))
               || voices[0];
     if (pick) utter.voice = pick;
-    utter.rate = 1.0;
-    utter.pitch = 1.0;
-    utter.volume = 1.0;
-    return new Promise(res => {
-      utter.onend = res;
-      speechSynthesis.speak(utter);
-    });
+    utter.rate = 1.0; utter.pitch = 1.0; utter.volume = 1.0;
+    return new Promise(res => { utter.onend = res; speechSynthesis.speak(utter); });
   }
 
   async function trySpeak(text, label = '') {
     if (!text || (global.isMuted === true)) {
-      console.log('[Selfie:F1.1] TTS ignorado (sem texto ou isMuted).');
+      console.log('[Selfie:F1.2] TTS ignorado (sem texto ou isMuted).');
       return;
     }
-    // 1) TTS módulo próprio (se existir)
+    // 1) TTS módulo próprio
     if (global.TTS && typeof global.TTS.speak === 'function') {
-      console.log('[Selfie:F1.1] TTS via window.TTS.speak()', label);
+      console.log('[Selfie:F1.2] TTS via window.TTS.speak()', label);
       try { await global.TTS.speak(text); return; } catch (e) { console.warn('TTS(window.TTS) falhou', e); }
     }
-    // 2) TypingBridge.speak (se existir)
+    // 2) TypingBridge.speak
     if (global.TypingBridge && typeof global.TypingBridge.speak === 'function') {
-      console.log('[Selfie:F1.1] TTS via TypingBridge.speak()', label);
+      console.log('[Selfie:F1.2] TTS via TypingBridge.speak()', label);
       try { await global.TypingBridge.speak(text); return; } catch (e) { console.warn('TTS(TypingBridge) falhou', e); }
     }
     // 3) Web Speech API
     try {
-      console.log('[Selfie:F1.1] TTS via Web Speech API', label);
+      console.log('[Selfie:F1.2] TTS via Web Speech API', label);
       await speakWithWebSpeech(text);
     } catch (e) {
-      console.warn('[Selfie:F1.1] Web Speech TTS falhou:', e);
+      console.warn('[Selfie:F1.2] Web Speech TTS falhou:', e);
     }
   }
 
   // ---------- Typing ----------
   function estimateTypingMs(text, speed) {
     return Math.max(400, text.length * speed) + 300;
-  }
-
-  async function runTyping(el) {
-    if (!el) return;
-    const text = (el.getAttribute('data-text') || el.textContent || '').trim();
-    const speed = Number(el.getAttribute('data-speed') || 30);
-    const cursor = el.getAttribute('data-cursor') !== 'false';
-    const wantsTTS = el.getAttribute('data-tts') !== 'false'; // pode desativar com data-tts="false"
-
-    // Se houver TypingBridge, usa; senão, fallback vanilla
-    if (global.TypingBridge && typeof global.TypingBridge.runTyping === 'function') {
-      try {
-        global.TypingBridge.runTyping(el, { speed, cursor });
-        await new Promise(r => setTimeout(r, estimateTypingMs(text, speed)));
-      } catch (e) {
-        console.warn('[Selfie:F1.1] TypingBridge falhou, usando fallback:', e);
-        await fallbackType(el, text, speed, cursor);
-      }
-    } else {
-      await fallbackType(el, text, speed, cursor);
-    }
-
-    // dispara TTS após digitação
-    if (wantsTTS) await trySpeak(text, '[runTyping]');
   }
 
   async function fallbackType(el, text, speed, cursor) {
@@ -135,8 +140,31 @@
     });
   }
 
-  // ---------- DOM helpers ----------
+  async function runTyping(el) {
+    if (!el) return;
+    const text = (el.getAttribute('data-text') || el.textContent || '').trim();
+    const speed = Number(el.getAttribute('data-speed') || 30);
+    const cursor = el.getAttribute('data-cursor') !== 'false';
+    const wantsTTS = el.getAttribute('data-tts') !== 'false';
+
+    if (global.TypingBridge && typeof global.TypingBridge.runTyping === 'function') {
+      try {
+        global.TypingBridge.runTyping(el, { speed, cursor });
+        await new Promise(r => setTimeout(r, estimateTypingMs(text, speed)));
+      } catch (e) {
+        console.warn('[Selfie:F1.2] TypingBridge falhou, usando fallback:', e);
+        await fallbackType(el, text, speed, cursor);
+      }
+    } else {
+      await fallbackType(el, text, speed, cursor);
+    }
+
+    if (wantsTTS) await trySpeak(text, '[runTyping]');
+  }
+
+  // ---------- Geração de elementos com o nome ----------
   function ensureOrientationParagraph(section) {
+    const upperName = getUpperName();
     let orient = section.querySelector('#selfieTexto');
     if (!orient) {
       const container = section.querySelector('.parchment-inner-rough') || section;
@@ -149,19 +177,21 @@
       orient.setAttribute('data-cursor', 'true');
       orient.setAttribute('data-speed', '28');
       orient.setAttribute('data-tts', 'true');
-      const nome = (global.JC && global.JC.data && global.JC.data.participantName) ? global.JC.data.participantName : 'AMOR';
-      orient.setAttribute('data-text', `${nome}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`);
+      orient.setAttribute('data-text',
+        `${upperName}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`
+      );
       orient.style.cssText = 'background:rgba(0,0,0,.35);color:#f9e7c2;padding:12px 16px;border-radius:12px;text-align:center;font-family:Cardo,serif;font-size:15px;margin:0 auto 10px;width:90%;';
       block.appendChild(orient);
       const header = section.querySelector('.selfie-header') || section.firstElementChild;
       (header?.nextSibling ? container.insertBefore(block, header.nextSibling) : container.appendChild(block));
     } else {
-      // garante atributos pro typing/tts
+      // atualiza texto com o nome (sempre MAIÚSCULAS)
+      const baseText = orient.getAttribute('data-text') || orient.textContent || '';
+      const msg = baseText.replace(/\{\{\s*(nome|name)\s*\}\}/gi, getUpperName());
       orient.setAttribute('data-typing', 'true');
-      orient.setAttribute('data-cursor', 'true');
+      orient.setAttribute('data-tts', 'true');
       orient.setAttribute('data-speed', orient.getAttribute('data-speed') || '28');
-      if (!orient.hasAttribute('data-text')) orient.setAttribute('data-text', orient.textContent.trim());
-      if (!orient.hasAttribute('data-tts')) orient.setAttribute('data-tts', 'true');
+      orient.setAttribute('data-text', msg || `${getUpperName()}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`);
     }
     return orient;
   }
@@ -181,11 +211,12 @@
       h2.setAttribute('data-cursor', 'true');
       h2.setAttribute('data-speed', '40');
       h2.setAttribute('data-text', h2.textContent.trim() || 'Tirar sua Foto ✨');
-      h2.setAttribute('data-tts', 'true'); // ler também o título
+      h2.setAttribute('data-tts', 'true');
     }
     return h2;
   }
 
+  // ---------- Fase 1.2 ----------
   async function playPhase1(section) {
     try {
       if (!isVisible(section)) {
@@ -196,10 +227,10 @@
         return;
       }
       if (section.__selfie_phase1_done) {
-        console.log('[Selfie:F1.1] Já concluído nesta seção.');
+        console.log('[Selfie:F1.2] Já concluído nesta seção.');
         return;
       }
-      console.log('[Selfie:F1.1] Iniciando datilografia + TTS…');
+      console.log('[Selfie:F1.2] Iniciando datilografia + TTS com nome…');
 
       const titleEl  = ensureTitleTyping(section);
       const orientEl = ensureOrientationParagraph(section);
@@ -213,9 +244,9 @@
       const ev = new CustomEvent('selfie:phase1:done', { detail: { sectionId: 'section-selfie' } });
       section.dispatchEvent(ev);
       document.dispatchEvent(ev);
-      console.log('[Selfie:F1.1] Concluído (typing + leitura).');
+      console.log('[Selfie:F1.2] Concluído (typing + leitura com nome).');
     } catch (e) {
-      console.warn('[Selfie:F1.1] Erro na fase 1.1:', e);
+      console.warn('[Selfie:F1.2] Erro na fase 1.2:', e);
     }
   }
 
@@ -224,7 +255,7 @@
       const section = await waitForElement('#section-selfie');
       playPhase1(section);
     } catch (e) {
-      console.warn('[Selfie:F1.1] #section-selfie não encontrado:', e.message);
+      console.warn('[Selfie:F1.2] #section-selfie não encontrado:', e.message);
     }
   }
 
