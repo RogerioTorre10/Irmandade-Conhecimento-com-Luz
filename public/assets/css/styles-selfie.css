@@ -221,13 +221,18 @@
 .selfie-page {
   background: none !important;
 }
-/* ===== Garantir visibilidade dos controles e botões ===== */
+/* FORÇA VISIBILIDADE DOS CONTROLES */
 .selfie-controls,
 .selfie-actions {
-  position: relative;
-  z-index: 5; /* acima do vídeo e da máscara */
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin: 20px 0;
+  z-index: 10;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
-
 /* Corrige espaçamento entre os elementos */
 .selfie-controls {
   margin-top: 12px;
@@ -237,17 +242,38 @@
 .selfie-actions {
   margin-top: 16px;
 }
+.ranges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+}
+
+.ranges label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #f1e6c7;
+  font-size: 0.9rem;
+}
+
+.ranges input[type="range"] {
+  width: 200px;
+  accent-color: #e6b873;
+}
+
 
 /* Efeitos medievais nos botões */
 .selfie-actions button {
-  background: rgba(255, 220, 160, 0.15);
-  border: 1px solid rgba(255, 220, 180, 0.4);
+  min-width: 120px;
+  padding: 10px 16px;
+  background: rgba(255, 220, 160, 0.2);
+  border: 1px solid rgba(255, 220, 180, 0.5);
   color: #fff8e6;
-  padding: 10px 20px;
   border-radius: 12px;
   font-family: 'Cardo', serif;
-  box-shadow: 0 0 10px rgba(255, 200, 120, 0.2);
-  transition: all 0.2s;
+  box-shadow: 0 0 10px rgba(255, 200, 120, 0.3);
+  transition: all 0.3s;
 }
 
 .selfie-actions button:hover:not(:disabled) {
