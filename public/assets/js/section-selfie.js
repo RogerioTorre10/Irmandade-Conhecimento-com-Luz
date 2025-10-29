@@ -115,7 +115,7 @@
     return head;
   }
 
-  // ---------- Texto Orientação (DATILOGRAFIA GARANTIDA) ----------
+  // ---------- Texto Orientação (TYPING 100% FORÇADO) ----------
 async function ensureTexto(section) {
   const upper = getUpperName();
   let wrap = section.querySelector('#selfieOrientWrap');
@@ -124,38 +124,40 @@ async function ensureTexto(section) {
     wrap.id = 'selfieOrientWrap';
     wrap.style.cssText = 'display:flex;justify-content:center;margin:16px 0 12px;';
     section.appendChild(wrap);
-  } else {
-    wrap.innerHTML = ''; // limpa tudo
   }
+
+  // REMOVE QUALQUER P ANTERIOR
+  const existing = section.querySelector('#selfieTexto');
+  if (existing) existing.remove();
 
   const p = document.createElement('p');
   p.id = 'selfieTexto';
   p.style.cssText = `
     background:rgba(0,0,0,.35);color:#f9e7c2;padding:12px 16px;border-radius:12px;
     text-align:center;font-family:Cardo,serif;font-size:15px;margin:0 auto;width:92%;max-width:820px;
-    opacity:0; transition:opacity .4s ease;
-    white-space: nowrap; overflow: hidden;
-    display: inline-block;
-    pointer-events: none;
+    opacity:0; transition:opacity .5s ease;
+    white-space: nowrap; overflow: hidden; display: inline-block;
   `;
 
   const fullText = `${upper}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`;
+  
+  // NÃO COLOCA TEXTO NO HTML!
+  p.textContent = '';
   p.dataset.text = fullText;
-  p.dataset.speed = "32";
+  p.dataset.speed = "30";
 
   wrap.appendChild(p);
 
-  // --- GARANTE QUE O DOM ESTEJA PRONTO ---
-  await sleep(50);
+  // GARANTE DOM PRONTO
+  await sleep(80);
   p.style.opacity = '1';
-  p.textContent = ''; // garante vazio
 
-  // --- DATILOGRAFIA COM requestAnimationFrame (IMPARÁVEL) ---
+  // TYPING COM requestAnimationFrame + PROTEÇÃO
   await new Promise(resolve => {
     requestAnimationFrame(() => {
       const chars = [...fullText];
       let i = 0;
-      const speed = 32;
+      const speed = 30;
       const interval = setInterval(() => {
         if (i < chars.length) {
           p.textContent += chars[i++];
@@ -164,12 +166,18 @@ async function ensureTexto(section) {
           resolve();
         }
       }, speed);
+
+      // PROTEGE DE OUTROS SCRIPTS
+      const protector = setInterval(() => {
+        if (p.textContent.length > fullText.length) {
+          p.textContent = fullText.substring(0, i);
+        }
+      }, 10);
+      setTimeout(() => clearInterval(protector), 5000);
     });
   });
 
-  // --- TTS depois do typing ---
   speak(fullText);
-
   return p;
 }
   // ---------- Controles ----------
