@@ -264,3 +264,11 @@
   accent-color: #e6b873;
   width: 200px;
 }
+/* Botões pulsando quando prontos */
+.btn-ready-pulse {
+  animation: pulse 0.9s ease-in-out;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); }
+}
