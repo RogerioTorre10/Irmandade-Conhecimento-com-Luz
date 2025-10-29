@@ -1,54 +1,41 @@
-/* /assets/js/section-selfie.js — FASE 1.2
-   Datilografia + Leitura com nome do participante integrado.
-   - busca nome em window.JC.data.nome (ou participantName) e localStorage
-   - normaliza para MAIÚSCULAS
-   - usa no texto de orientação
-   - mantém TTS com fallback (window.TTS -> TypingBridge -> Web Speech)
+/* /assets/js/section-selfie.js — FASE 2
+   - Fase 1.2: datilografia + TTS com nome (mantido)
+   - + Controles de ZOOM (geral, horizontal X, vertical Y)
+   - Persistência em localStorage e export em window.JCSelfieZoom
 */
 (function (global) {
   'use strict';
 
   const NS = (global.JCSelfie = global.JCSelfie || {});
-  if (NS.__phase1_bound) {
-    console.log('[Selfie:F1.2] Já inicializado, ignorando.');
+  if (NS.__phase2_bound) {
+    console.log('[Selfie:F2] Já inicializado, ignorando.');
     return;
   }
-  NS.__phase1_bound = true;
+  NS.__phase2_bound = true;
 
-  // ---------- Nome do participante (única fonte da verdade) ----------
+  // ---------- Nome do participante ----------
   function getUpperName() {
-    // 1) tenta no estado global
     const jc = (global.JC && global.JC.data) ? global.JC.data : {};
     let name = jc.nome || jc.participantName;
-
-    // 2) tenta no localStorage (se você estiver salvando lá em alguma página)
     if (!name) {
       try {
         const ls = localStorage.getItem('jc.nome') || localStorage.getItem('jc.participantName');
         if (ls) name = ls;
       } catch {}
     }
-
-    // 3) fallback
     if (!name || typeof name !== 'string') name = 'AMOR';
-
-    // padroniza MAIÚSCULAS
     const upper = name.toUpperCase().trim();
-
-    // sincroniza de volta (padrão único)
     try {
       global.JC = global.JC || {};
       global.JC.data = global.JC.data || {};
       global.JC.data.nome = upper;
-      global.JC.data.participantName = upper; // manter compatibilidade
-      // opcional: gravar para refresh
+      global.JC.data.participantName = upper;
       try { localStorage.setItem('jc.nome', upper); } catch {}
     } catch {}
-
     return upper;
   }
 
-  // ---------- Utils DOM ----------
+  // ---------- Utils ----------
   function waitForElement(selector, { tries = 80, interval = 120 } = {}) {
     return new Promise((resolve, reject) => {
       let n = 0;
@@ -94,25 +81,22 @@
 
   async function trySpeak(text, label = '') {
     if (!text || (global.isMuted === true)) {
-      console.log('[Selfie:F1.2] TTS ignorado (sem texto ou isMuted).');
+      console.log('[Selfie:F2] TTS ignorado (sem texto ou isMuted).');
       return;
     }
-    // 1) TTS módulo próprio
     if (global.TTS && typeof global.TTS.speak === 'function') {
-      console.log('[Selfie:F1.2] TTS via window.TTS.speak()', label);
+      console.log('[Selfie:F2] TTS via window.TTS.speak()', label);
       try { await global.TTS.speak(text); return; } catch (e) { console.warn('TTS(window.TTS) falhou', e); }
     }
-    // 2) TypingBridge.speak
     if (global.TypingBridge && typeof global.TypingBridge.speak === 'function') {
-      console.log('[Selfie:F1.2] TTS via TypingBridge.speak()', label);
+      console.log('[Selfie:F2] TTS via TypingBridge.speak()', label);
       try { await global.TypingBridge.speak(text); return; } catch (e) { console.warn('TTS(TypingBridge) falhou', e); }
     }
-    // 3) Web Speech API
     try {
-      console.log('[Selfie:F1.2] TTS via Web Speech API', label);
+      console.log('[Selfie:F2] TTS via Web Speech API', label);
       await speakWithWebSpeech(text);
     } catch (e) {
-      console.warn('[Selfie:F1.2] Web Speech TTS falhou:', e);
+      console.warn('[Selfie:F2] Web Speech TTS falhou:', e);
     }
   }
 
@@ -152,17 +136,16 @@
         global.TypingBridge.runTyping(el, { speed, cursor });
         await new Promise(r => setTimeout(r, estimateTypingMs(text, speed)));
       } catch (e) {
-        console.warn('[Selfie:F1.2] TypingBridge falhou, usando fallback:', e);
+        console.warn('[Selfie:F2] TypingBridge falhou, fallback:', e);
         await fallbackType(el, text, speed, cursor);
       }
     } else {
       await fallbackType(el, text, speed, cursor);
     }
-
     if (wantsTTS) await trySpeak(text, '[runTyping]');
   }
 
-  // ---------- Geração de elementos com o nome ----------
+  // ---------- DOM builders (título + orientação) ----------
   function ensureOrientationParagraph(section) {
     const upperName = getUpperName();
     let orient = section.querySelector('#selfieTexto');
@@ -185,13 +168,12 @@
       const header = section.querySelector('.selfie-header') || section.firstElementChild;
       (header?.nextSibling ? container.insertBefore(block, header.nextSibling) : container.appendChild(block));
     } else {
-      // atualiza texto com o nome (sempre MAIÚSCULAS)
       const baseText = orient.getAttribute('data-text') || orient.textContent || '';
-      const msg = baseText.replace(/\{\{\s*(nome|name)\s*\}\}/gi, getUpperName());
+      const msg = baseText.replace(/\{\{\s*(nome|name)\s*\}\}/gi, upperName);
       orient.setAttribute('data-typing', 'true');
       orient.setAttribute('data-tts', 'true');
       orient.setAttribute('data-speed', orient.getAttribute('data-speed') || '28');
-      orient.setAttribute('data-text', msg || `${getUpperName()}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`);
+      orient.setAttribute('data-text', msg || `${upperName}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`);
     }
     return orient;
   }
@@ -216,21 +198,128 @@
     return h2;
   }
 
-  // ---------- Fase 1.2 ----------
-  async function playPhase1(section) {
+  // ---------- CONTROLES DE ZOOM ----------
+  function loadZoom() {
+    try {
+      const raw = localStorage.getItem('jc.selfie.zoom');
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    return { all: 1.0, x: 1.0, y: 1.0 };
+  }
+  function saveZoom(z) {
+    try { localStorage.setItem('jc.selfie.zoom', JSON.stringify(z)); } catch {}
+  }
+  function getTransformTarget() {
+    // Preferência: vídeo da câmera
+    return document.getElementById('selfieVideo')
+        || document.getElementById('selfieStage') // fallback no container
+        || null;
+  }
+  function applyZoom(z) {
+    const target = getTransformTarget();
+    if (!target) return;
+    const sx = Number(z.all) * Number(z.x);
+    const sy = Number(z.all) * Number(z.y);
+    const styleTarget = (target.tagName === 'VIDEO' ? target : target);
+    styleTarget.style.transformOrigin = 'center';
+    styleTarget.style.transform = `scale(${sx}, ${sy})`;
+    global.JCSelfieZoom = { all: Number(z.all), x: Number(z.x), y: Number(z.y) };
+  }
+
+  function ensureControls(section) {
+    let bar = section.querySelector('#selfieControls');
+    if (bar) return bar;
+
+    // pequena folha de estilo para a barra
+    if (!document.getElementById('selfieControlsStyle')) {
+      const css = document.createElement('style');
+      css.id = 'selfieControlsStyle';
+      css.textContent = `
+        #selfieControls {
+          margin: 8px auto 10px; width: 92%; max-width: 680px;
+          background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.08);
+          border-radius: 12px; padding: 10px 12px;
+          color: #f9e7c2; font-family: Cardo, serif; font-size: 14px;
+        }
+        #selfieControls .row { display: grid; grid-template-columns: 140px 1fr 64px; gap: 8px; align-items: center; margin: 6px 0; }
+        #selfieControls label { opacity: .9; }
+        #selfieControls input[type="range"] { width: 100%; }
+        #selfieControls .val { text-align: right; font-variant-numeric: tabular-nums; }
+      `;
+      document.head.appendChild(css);
+    }
+
+    bar = document.createElement('div');
+    bar.id = 'selfieControls';
+    // valores iniciais
+    const z = loadZoom();
+
+    bar.innerHTML = `
+      <div class="row">
+        <label for="zoomAll">Zoom Geral</label>
+        <input id="zoomAll" type="range" min="0.5" max="2.0" step="0.01" value="${z.all}">
+        <span class="val" id="zoomAllVal">${z.all.toFixed(2)}×</span>
+      </div>
+      <div class="row">
+        <label for="zoomX">Zoom Horizontal</label>
+        <input id="zoomX" type="range" min="0.5" max="2.0" step="0.01" value="${z.x}">
+        <span class="val" id="zoomXVal">${z.x.toFixed(2)}×</span>
+      </div>
+      <div class="row">
+        <label for="zoomY">Zoom Vertical</label>
+        <input id="zoomY" type="range" min="0.5" max="2.0" step="0.01" value="${z.y}">
+        <span class="val" id="zoomYVal">${z.y.toFixed(2)}×</span>
+      </div>
+    `;
+
+    // insere após o parágrafo de orientação
+    const orientBlock = section.querySelector('#selfieTexto')?.parentElement || section;
+    orientBlock.parentElement.insertBefore(bar, orientBlock.nextSibling);
+
+    // listeners
+    const inpAll = bar.querySelector('#zoomAll');
+    const inpX   = bar.querySelector('#zoomX');
+    const inpY   = bar.querySelector('#zoomY');
+    const valAll = bar.querySelector('#zoomAllVal');
+    const valX   = bar.querySelector('#zoomXVal');
+    const valY   = bar.querySelector('#zoomYVal');
+
+    function update() {
+      const z2 = { all: Number(inpAll.value), x: Number(inpX.value), y: Number(inpY.value) };
+      valAll.textContent = `${z2.all.toFixed(2)}×`;
+      valX.textContent   = `${z2.x.toFixed(2)}×`;
+      valY.textContent   = `${z2.y.toFixed(2)}×`;
+      applyZoom(z2);
+      saveZoom(z2);
+    }
+
+    inpAll.addEventListener('input', update);
+    inpX.addEventListener('input', update);
+    inpY.addEventListener('input', update);
+
+    // aplica valores iniciais no alvo
+    applyZoom(z);
+    global.JCSelfieZoom = { all: z.all, x: z.x, y: z.y };
+
+    console.log('[Selfie:F2] Controles de zoom prontos:', global.JCSelfieZoom);
+    return bar;
+  }
+
+  // ---------- Fase 2 pipeline ----------
+  async function playPhase(section) {
     try {
       if (!isVisible(section)) {
         const mo = new MutationObserver(() => {
-          if (isVisible(section)) { mo.disconnect(); playPhase1(section); }
+          if (isVisible(section)) { mo.disconnect(); playPhase(section); }
         });
         mo.observe(section, { attributes: true, attributeFilter: ['class', 'style', 'aria-hidden'] });
         return;
       }
-      if (section.__selfie_phase1_done) {
-        console.log('[Selfie:F1.2] Já concluído nesta seção.');
+      if (section.__selfie_phase2_done) {
+        console.log('[Selfie:F2] Já concluído nesta seção.');
         return;
       }
-      console.log('[Selfie:F1.2] Iniciando datilografia + TTS com nome…');
+      console.log('[Selfie:F2] Iniciando… (typing + TTS + controles)');
 
       const titleEl  = ensureTitleTyping(section);
       const orientEl = ensureOrientationParagraph(section);
@@ -240,22 +329,25 @@
       await runTyping(titleEl);
       await runTyping(orientEl);
 
-      section.__selfie_phase1_done = true;
-      const ev = new CustomEvent('selfie:phase1:done', { detail: { sectionId: 'section-selfie' } });
+      // cria barra de controles
+      ensureControls(section);
+
+      section.__selfie_phase2_done = true;
+      const ev = new CustomEvent('selfie:phase2:done', { detail: { sectionId: 'section-selfie' } });
       section.dispatchEvent(ev);
       document.dispatchEvent(ev);
-      console.log('[Selfie:F1.2] Concluído (typing + leitura com nome).');
+      console.log('[Selfie:F2] Concluído (com controles de zoom).');
     } catch (e) {
-      console.warn('[Selfie:F1.2] Erro na fase 1.2:', e);
+      console.warn('[Selfie:F2] Erro na fase 2:', e);
     }
   }
 
   async function init() {
     try {
       const section = await waitForElement('#section-selfie');
-      playPhase1(section);
+      playPhase(section);
     } catch (e) {
-      console.warn('[Selfie:F1.2] #section-selfie não encontrado:', e.message);
+      console.warn('[Selfie:F2] #section-selfie não encontrado:', e.message);
     }
   }
 
