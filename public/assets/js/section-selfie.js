@@ -115,32 +115,27 @@
     return head;
   }
 
-  // ---------- Texto Orientação (TYPING 100% FORÇADO) ----------
-async function ensureTexto(section) {
-  const upper = getUpperName();
-  let wrap = section.querySelector('#selfieOrientWrap');
-  if (!wrap) {
-    wrap = document.createElement('div');
-    wrap.id = 'selfieOrientWrap';
-    wrap.style.cssText = 'display:flex;justify-content:center;margin:16px 0 12px;';
-    section.appendChild(wrap);
+ // ---------- Texto orientação ----------
+  function ensureTexto(section){
+    const upper=getUpperName();
+    let wrap=section.querySelector('#selfieOrientWrap');
+    if(!wrap){
+      wrap=document.createElement('div');
+      wrap.id='selfieOrientWrap';
+      wrap.style.cssText='display:flex;justify-content:center;margin:6px 0 8px;';
+      section.appendChild(wrap);
+    }
+    let p=section.querySelector('#selfieTexto');
+    if(!p){
+      p=document.createElement('p');
+      p.id='selfieTexto';
+      p.style.cssText='background:rgba(0,0,0,.35);color:#f9e7c2;padding:10px 14px;border-radius:12px;text-align:center;font-family:Cardo,serif;font-size:15px;margin:0 auto;width:92%;max-width:820px;';
+      p.dataset.text=`${upper}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`;
+      wrap.appendChild(p);
+    }
+    return p;
   }
-
-  // REMOVE QUALQUER P ANTERIOR
-  const existing = section.querySelector('#selfieTexto');
-  if (existing) existing.remove();
-
-  const p = document.createElement('p');
-  p.id = 'selfieTexto';
-  p.style.cssText = `
-    background:rgba(0,0,0,.35);color:#f9e7c2;padding:12px 16px;border-radius:12px;
-    text-align:center;font-family:Cardo,serif;font-size:15px;margin:0 auto;width:92%;max-width:820px;
-    opacity:0; transition:opacity .5s ease;
-    white-space: nowrap; overflow: hidden; display: inline-block;
-  `;
-
-  const fullText = `${upper}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`;
-  
+   
   // NÃO COLOCA TEXTO NO HTML!
   p.textContent = '';
   p.dataset.text = fullText;
