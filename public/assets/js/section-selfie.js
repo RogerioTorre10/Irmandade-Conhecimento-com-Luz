@@ -166,6 +166,71 @@ async function play(section) {
   }
 }
 
+// 1) CSS que força visibilidade do texto, mesmo se .lumen-typing tiver regras globais
+ensureStyleOnce('selfieVisibility-hotfix', `
+  /* força visibilidade nesta página */
+  #section-selfie #selfieTexto {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+    min-height: 48px !important;     /* evita colapso de altura */
+    max-height: none !important;      /* cancela clamps */
+    overflow: visible !important;     /* nada de cortar o texto */
+  }
+  #section-selfie .lumen-typing {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+`);
+
+// 2) (garante que ensureTexto aplique estilos de segurança)
+function ensureTexto(section) {
+  const upper = getUpperName();
+
+  let wrap = section.querySelector('#selfieOrientWrap');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = 'selfieOrientWrap';
+    wrap.style.cssText = 'display:flex;justify-content:center;margin:6px 0 8px;';
+    section.appendChild(wrap);
+  }
+
+  let p = section.querySelector('#selfieTexto');
+  if (!p) {
+    p = document.createElement('p');
+    p.id = 'selfieTexto';
+    p.className = 'parchment-text-rough lumen-typing';
+    p.style.cssText = [
+      'background:rgba(0,0,0,.35)','color:#f9e7c2','padding:10px 14px',
+      'border-radius:12px','text-align:center','font-family:Cardo,serif',
+      'font-size:15px','margin:0 auto','width:92%','max-width:820px',
+      // safety:
+      'opacity:1','visibility:visible','min-height:48px','max-height:none','overflow:visible'
+    ].join(';');
+    wrap.appendChild(p);
+  }
+
+  const msg = `${upper}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`;
+  p.dataset.text = msg;
+  p.dataset.typing = 'true';
+  p.dataset.tts = 'true';
+  p.dataset.speed = p.dataset.speed || '28';
+  p.dataset.voice = p.dataset.voice || 'lumen';
+  p.textContent = msg; // base visível
+
+  // DEBUG rápido: loga estilos computados
+  setTimeout(() => {
+    const cs = getComputedStyle(p);
+    console.log('[Selfie][Texto] visible?', {
+      opacity: cs.opacity, display: cs.display, visibility: cs.visibility,
+      height: p.offsetHeight, clientHeight: p.clientHeight
+    });
+  }, 50);
+
+  return p;
+}
+
+   
   // ---------- Controles ----------
   function ensureControls(section) {
     ensureStyleOnce('selfieControls-css', `
@@ -267,6 +332,22 @@ async function play(section) {
       await fallbackTyping(p, +(p.dataset.speed || 28));
     }
   }
+   try {
+  const hasBridge = (window.TypingBridge && typeof window.TypingBridge.runTyping === 'function');
+  if (hasBridge) {
+    window.G = window.G || {}; window.G.__typingLock = false;
+    await window.TypingBridge.runTyping(p);
+  } else {
+    await fallbackTyping(p, +(p.dataset.speed || 28));
+    p.classList.add('typing-done');
+    p.style.opacity = '1'; p.style.visibility = 'visible';
+  }
+} catch (e) {
+  console.warn('[Selfie] Bridge falhou; usando fallback', e);
+  await fallbackTyping(p, +(p.dataset.speed || 28));
+  p.classList.add('typing-done');
+  p.style.opacity = '1'; p.style.visibility = 'visible';
+}
 
   // ---------- Init ----------
   async function init() {
