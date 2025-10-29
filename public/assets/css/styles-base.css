@@ -310,3 +310,28 @@ p, li {
 #toast.show {
   opacity: 1;
 }
+/* ===== Correções globais para compatibilidade com as seções ===== */
+
+/* Permitir camadas com máscara (chama) renderizarem corretamente */
+.pergaminho,
+.pergaminho-v,
+.parchment-inner-rough {
+  overflow: visible !important;
+}
+
+/* Corrigir contexto de empilhamento de elementos interativos */
+section, .j-section {
+  position: relative;
+  z-index: 1;
+}
+
+/* Botões padrão com leve sombra e transição suave */
+.btn {
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
