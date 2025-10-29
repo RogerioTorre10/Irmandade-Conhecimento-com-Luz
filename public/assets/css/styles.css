@@ -311,3 +311,24 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
   color: #fff;
   font-size: 14px;
 }
+/* ===== Correção global para evitar fundo duplo ===== */
+
+/* Evita fundo duplicado nas seções com vídeo (como a selfie) */
+section.selfie-page {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* Garante contraste e hierarquia correta */
+.selfie-page .parchment-inner-rough {
+  background: transparent !important;
+  box-shadow: none !important;
+  z-index: 2;
+}
+
+/* Remove texturas ou overlays que possam interferir na câmera */
+.selfie-page::before,
+.selfie-page::after {
+  display: none !important;
+  content: none !important;
+}
