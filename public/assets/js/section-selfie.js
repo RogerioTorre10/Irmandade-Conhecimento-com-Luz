@@ -203,15 +203,16 @@ function captureToCanvas(video, canvas){
       applyZoom(videoEl, canvasEl);
     });
 
-    // ajustes de zoom
-    function onZoomChange(){
-      zoom.all = Number(zoomAll?.value || 1);
-      zoom.x   = Number(zoomX?.value || 1);
-      zoom.y   = Number(zoomY?.value || 1);
-      applyZoom(videoEl, canvasEl);
-      window.JCSelfieZoom = { all: zoom.all, x: zoom.x, y: zoom.y };
+    // Sincroniza o zoom com a posição da chama
+function onZoomChange() {
+  zoom.all = Number(zoomAll?.value || 1);
+  zoom.x   = Number(zoomX?.value || 1);
+  zoom.y   = Number(zoomY?.value || 1);
+  applyZoom(videoEl, canvasEl);
+  window.JCSelfieZoom = { all: zoom.all, x: zoom.x, y: zoom.y };
+  console.log('[JCSelfie] Zoom atualizado:', window.JCSelfieZoom);
+}
 
-    }
     zoomAll?.addEventListener('input', onZoomChange);
     zoomX?.addEventListener('input', onZoomChange);
     zoomY?.addEventListener('input', onZoomChange);
