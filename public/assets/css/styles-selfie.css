@@ -39,6 +39,11 @@
   gap: 16px;
   margin-bottom: 10px;
 }
+
+/* /assets/css/styles-selfie.css (ou styles-base.css se preferir) */
+#section-selfie .selfie-header { margin-top: -6px; }
+#section-selfie #selfieOrientWrap { margin-top: 4px; }
+
 .titulo-pergaminho{
   margin: 0;
   font-size: 30px;
