@@ -253,6 +253,17 @@
     if (e.detail?.sectionId === SECTION_ID) initOnce(e.detail.node || document.getElementById(SECTION_ID));
   });
 
+// FORÇA EXIBIÇÃO IMEDIATA
+setTimeout(() => {
+  const els = document.querySelectorAll('#section-selfie, #section-selfie *');
+  els.forEach(el => {
+    el.style.display = 'block';
+    el.style.opacity = '1';
+    el.style.visibility = 'visible';
+  });
+  console.log('FORÇA VISUAL APLICADA');
+}, 100);
+
   const current = document.getElementById(SECTION_ID);
   if (current && !current.classList.contains(HIDE_CLASS)) initOnce(current);
 
