@@ -115,43 +115,51 @@
     return head;
   }
 
-  // ---------- Texto Orientação ----------
-  async function ensureTexto(section) {
-    const upper = getUpperName();
-    let wrap = section.querySelector('#selfieOrientWrap');
-    if (!wrap) {
-      wrap = document.createElement('div');
-      wrap.id = 'selfieOrientWrap';
-      wrap.style.cssText = 'display:flex;justify-content:center;margin:6px 0 8px;';
-      section.appendChild(wrap);
-    }
-
-    let p = section.querySelector('#selfieTexto');
-    if (!p) {
-      p = document.createElement('p');
-      p.id = 'selfieTexto';
-      p.style.cssText = `
-        background:rgba(0,0,0,.35);color:#f9e7c2;padding:10px 14px;border-radius:12px;
-        text-align:center;font-family:Cardo,serif;font-size:15px;margin:0 auto;width:92%;max-width:820px;
-        opacity:0; transition:opacity .3s;
-      `;
-      p.dataset.text = `${upper}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`;
-      p.dataset.speed = "30";
-      wrap.appendChild(p);
-    }
-
-    // Ativa typing + TTS
-    p.style.opacity = '0';
-    await sleep(100);
-    p.style.opacity = '1';
-    await runTyping(p);
-
-    // TTS: lê o texto completo
-    speak(p.dataset.text);
-
-    return p;
+  // ---------- Texto Orientação (COM PROTEÇÃO TOTAL) ----------
+async function ensureTexto(section) {
+  const upper = getUpperName();
+  let wrap = section.querySelector('#selfieOrientWrap');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = 'selfieOrientWrap';
+    wrap.style.cssText = 'display:flex;justify-content:center;margin:16px 0 12px;pointer-events:none;';
+    section.appendChild(wrap);
+  } else {
+    // Limpa qualquer conteúdo anterior (evita duplicação)
+    wrap.innerHTML = '';
   }
 
+  let p = document.createElement('p');
+  p.id = 'selfieTexto';
+  p.style.cssText = `
+    background:rgba(0,0,0,.35);color:#f9e7c2;padding:12px 16px;border-radius:12px;
+    text-align:center;font-family:Cardo,serif;font-size:15px;margin:0 auto;width:92%;max-width:820px;
+    opacity:0; transition:opacity .4s ease;
+    pointer-events:none; /* evita clique acidental */
+    white-space: nowrap; overflow: hidden; /* essencial pro typing */
+    display: inline-block;
+  `;
+  p.dataset.text = `${upper}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`;
+  p.dataset.speed = "32";
+  wrap.appendChild(p);
+
+  // Força o texto a ficar vazio antes de começar
+  p.textContent = '';
+  await sleep(100);
+  p.style.opacity = '1';
+
+  // Typing PROTEGIDO: desativa outros observers
+  const observer = new MutationObserver(() => {});
+  observer.observe(p, { childList: true, subtree: true });
+
+  await runTyping(p);
+  speak(p.dataset.text);
+
+  // Desconecta observer após typing
+  observer.disconnect();
+
+  return p;
+}
   // ---------- Controles ----------
   function ensureControls(section) {
     if (section.querySelector('#selfieControls')) return;
@@ -223,29 +231,70 @@
     else if (global.showSection) global.showSection('section-card');
   }
 
-  // ---------- Forçar Ordem (VERSÃO MELHORADA) ----------
+ // ---------- Forçar Ordem (COM MUTATIONOBSERVER + DELAY FORÇADO) ----------
 function enforceOrder(section) {
   const order = [
     '.selfie-header',
-    '#selfieOrientWrap',  // ← TEXTO AQUI
-    '#selfieControls',    // ← CONTROLES DEPOIS
+    '#selfieOrientWrap',
+    '#selfieControls',
     '#selfieButtons'
   ];
 
-  let prev = null;
-  order.forEach(sel => {
-    const el = section.querySelector(sel);
-    if (el && prev && el.previousElementSibling !== prev) {
-      el.remove();
-      placeAfter(prev, el);
+  // Função que roda múltiplas vezes até estabilizar
+  let attempts = 0;
+  const maxAttempts = 10;
+
+  const tryEnforce = () => {
+    let prev = null;
+    let changed = false;
+
+    order.forEach(sel => {
+      const el = section.querySelector(sel);
+      if (el && prev && el.previousElementSibling !== prev) {
+        el.remove();
+        placeAfter(prev, el);
+        changed = true;
+      }
+      prev = el;
+    });
+
+    attempts++;
+    if (changed && attempts < maxAttempts) {
+      setTimeout(tryEnforce, 50);
     }
-    prev = el;
-  });
+  };
+
+  // Primeira tentativa imediata
+  tryEnforce();
+
+  // Última tentativa com delay (captura mudanças tardias)
+  setTimeout(tryEnforce, 300);
 }
 
-// ---------- Init (Play) ----------
+// Observer global: qualquer mudança no DOM, reforça ordem
+let orderObserver = null;
+function startOrderObserver(section) {
+  if (orderObserver) orderObserver.disconnect();
+
+  orderObserver = new MutationObserver(() => {
+    enforceOrder(section);
+  });
+
+  orderObserver.observe(section, {
+    childList: true,
+    subtree: true,
+    attributes: false
+  });
+
+  // Para após 3 segundos
+  setTimeout(() => {
+    if (orderObserver) orderObserver.disconnect();
+  }, 3000);
+}
+
+// ---------- Init (Play) — VERSÃO FINAL ----------
 async function play(section) {
-  // 1. Header com typing
+  // 1. Header
   const header = ensureHeader(section);
   const title = header.querySelector('h2');
   if (title.dataset.typing === 'true') {
@@ -253,17 +302,21 @@ async function play(section) {
     speak(title.dataset.text);
   }
 
-  // 2. Texto com typing + TTS (AGORA VEM ANTES!)
+  // 2. Texto (agora protegido)
   await ensureTexto(section);
 
-  // 3. Controles (só depois do texto!)
+  // 3. Controles e Botões
   ensureControls(section);
-
-  // 4. Botões
   ensureButtons(section);
 
-  // 5. FORÇA A ORDEM FINAL (garante 100%)
-  await sleep(50); // dá tempo do DOM se assentar
+  // 4. Ativa proteção contra mudanças
+  startOrderObserver(section);
+
+  // 5. Força ordem várias vezes
+  enforceOrder(section);
+  await sleep(100);
+  enforceOrder(section);
+  await sleep(200);
   enforceOrder(section);
 }
 
