@@ -1,14 +1,15 @@
-/* /assets/js/section-selfie.js — FASE 3 (corrigido)
+/* /assets/js/section-selfie.js — FASE 3.1 (texto no topo + botões finos)
    - Typing + TTS com nome
    - Controles de ZOOM (all/x/y)
-   - Botões (Skip, Prévia, Tirar outra, Confirmar) + área de prévia
+   - Botões (Prévia / Tirar outra / Confirmar) + “Não quero foto / Iniciar”
+   - Fix: orientação sempre no TOPO; botões slim e alinhados
 */
 (function (global) {
   'use strict';
 
   const NS = (global.JCSelfie = global.JCSelfie || {});
-  if (NS.__phase3_bound) return;
-  NS.__phase3_bound = true;
+  if (NS.__phase31_bound) return;
+  NS.__phase31_bound = true;
 
   // ---------- Nome ----------
   function getUpperName() {
@@ -45,6 +46,11 @@
     if (!el) return false;
     const s = getComputedStyle(el);
     return s.display !== 'none' && s.visibility !== 'hidden' && !el.classList.contains('hidden') && el.offsetParent !== null;
+  }
+  function placeAfter(ref, node) {
+    if (!ref || !ref.parentElement) return;
+    if (ref.nextSibling) ref.parentElement.insertBefore(node, ref.nextSibling);
+    else ref.parentElement.appendChild(node);
   }
   function toast(msg){ if(global.toast) return global.toast(msg); console.log('[Toast]',msg); alert(msg); }
 
@@ -103,21 +109,24 @@
     if(wantsTTS) await trySpeak(text,'[runTyping]');
   }
 
-  // ---------- Orientação + Título ----------
+  // ---------- Título + “Skip” ----------
   function ensureTitle(section){
     let head = section.querySelector('.selfie-header');
     let h2   = section.querySelector('.selfie-header h2');
     if(!head){
       head=document.createElement('header'); head.className='selfie-header';
-      head.style.display='flex'; head.style.alignItems='center'; head.style.gap='10px';
+      head.style.display='flex'; head.style.alignItems='center'; head.style.justifyContent='space-between';
+      head.style.gap='10px'; head.style.marginBottom='6px';
       section.prepend(head);
     }
     if(!h2){
       h2=document.createElement('h2'); h2.textContent='Tirar sua Foto ✨';
       head.appendChild(h2);
       const skip=document.createElement('button');
-      skip.id='btn-skip-selfie'; skip.className='btn btn-stone-espinhos'; skip.textContent='Não quero foto / Iniciar';
-      skip.addEventListener('click', onSkip); head.appendChild(skip);
+      skip.id='btn-skip-selfie'; skip.className='btn btn-stone-espinhos';
+      skip.textContent='Não quero foto / Iniciar';
+      skip.style.minWidth='200px'; skip.addEventListener('click', onSkip);
+      head.appendChild(skip);
     }
     if(!h2.hasAttribute('data-typing')){
       h2.setAttribute('data-typing','true'); h2.setAttribute('data-cursor','true');
@@ -127,27 +136,40 @@
     return h2;
   }
 
+  // ---------- Orientação SEMPRE no topo ----------
   function ensureOrientation(section){
     const upperName=getUpperName();
-    // preferir um contêiner interno do pergaminho se existir
     const container = section.querySelector('.conteudo-pergaminho') || section.querySelector('.parchment-inner-rough') || section;
+
+    // wrap
     let wrap = section.querySelector('#selfieOrientWrap');
     if(!wrap){
       wrap=document.createElement('div'); wrap.id='selfieOrientWrap';
-      wrap.style.display='flex'; wrap.style.justifyContent='center'; wrap.style.marginTop='8px';
-      // inserir logo após o cabeçalho
-      const header = section.querySelector('.selfie-header');
-      if(header?.nextSibling) container.insertBefore(wrap, header.nextSibling); else container.appendChild(wrap);
+      wrap.style.display='flex'; wrap.style.justifyContent='center';
+      wrap.style.margin='6px 0 8px';
     }
+    // texto
     let p = section.querySelector('#selfieTexto');
     if(!p){
       p=document.createElement('p'); p.id='selfieTexto';
-      p.style.cssText='background:rgba(0,0,0,.35);color:#f9e7c2;padding:12px 16px;border-radius:12px;text-align:center;font-family:Cardo,serif;font-size:15px;margin:0 auto 10px;width:90%;';
-      wrap.appendChild(p);
+      p.style.cssText='background:rgba(0,0,0,.35);color:#f9e7c2;padding:10px 14px;border-radius:12px;text-align:center;font-family:Cardo,serif;font-size:15px;margin:0 auto;width:92%;max-width:820px;';
     }
+    if(!p.parentElement) wrap.appendChild(p);
+
     const base = p.getAttribute('data-text') || p.textContent || `${upperName}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`;
     const msg  = base.replace(/\{\{\s*(nome|name)\s*\}\}/gi, upperName);
     p.setAttribute('data-typing','true'); p.setAttribute('data-cursor','true'); p.setAttribute('data-tts','true'); p.setAttribute('data-speed','28'); p.setAttribute('data-text', msg);
+
+    // garantir ordem: HEAD -> ORIENT -> CONTROLS -> BUTTONS -> PREVIEW
+    const head = section.querySelector('.selfie-header');
+    if (!wrap.parentElement) placeAfter(head, wrap); // logo abaixo do header
+    else {
+      // se wrap estiver fora do topo, recoloca
+      const controls = section.querySelector('#selfieControls');
+      if (controls && wrap.compareDocumentPosition(controls) & Node.DOCUMENT_POSITION_FOLLOWING) {
+        wrap.remove(); placeAfter(head, wrap);
+      }
+    }
     return p;
   }
 
@@ -168,10 +190,10 @@
     if(!document.getElementById(cssId)){
       const css=document.createElement('style'); css.id=cssId;
       css.textContent=`
-        #selfieControls{margin:8px auto 10px;width:92%;max-width:680px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 12px;color:#f9e7c2;font-family:Cardo,serif;font-size:14px}
-        #selfieControls .row{display:grid;grid-template-columns:140px 1fr 64px;gap:8px;align-items:center;margin:6px 0}
-        #selfieControls input[type="range"]{width:100%}
-        #selfieControls .val{text-align:right;font-variant-numeric:tabular-nums}
+        #section-selfie #selfieControls{margin:6px auto 10px;width:92%;max-width:820px;background:rgba(0,0,0,.32);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:8px 10px;color:#f9e7c2;font-family:Cardo,serif;font-size:14px}
+        #section-selfie #selfieControls .row{display:grid;grid-template-columns:130px 1fr 56px;gap:8px;align-items:center;margin:4px 0}
+        #section-selfie #selfieControls input[type="range"]{width:100%; height: 4px}
+        #section-selfie #selfieControls .val{text-align:right;font-variant-numeric:tabular-nums}
       `;
       document.head.appendChild(css);
     }
@@ -182,8 +204,9 @@
       <div class="row"><label for="zoomX">Zoom Horizontal</label><input id="zoomX" type="range" min="0.5" max="2.0" step="0.01" value="${z.x}"><span class="val" id="zoomXVal">${z.x.toFixed(2)}×</span></div>
       <div class="row"><label for="zoomY">Zoom Vertical</label><input id="zoomY" type="range" min="0.5" max="2.0" step="0.01" value="${z.y}"><span class="val" id="zoomYVal">${z.y.toFixed(2)}×</span></div>
     `;
-    const anchor = section.querySelector('#selfieOrientWrap') || section.querySelector('.selfie-header') || section;
-    anchor.parentElement.insertBefore(bar, anchor.nextSibling);
+    // sempre depois da ORIENTAÇÃO
+    const orientWrap = section.querySelector('#selfieOrientWrap');
+    if (orientWrap) placeAfter(orientWrap, bar); else section.appendChild(bar);
 
     const inpAll=bar.querySelector('#zoomAll'), inpX=bar.querySelector('#zoomX'), inpY=bar.querySelector('#zoomY');
     const valAll=bar.querySelector('#zoomAllVal'), valX=bar.querySelector('#zoomXVal'), valY=bar.querySelector('#zoomYVal');
@@ -194,21 +217,21 @@
     }
     inpAll.addEventListener('input', update);
     inpX.addEventListener('input', update);
-    inpY.addEventListener('input', update); // <- CORRIGIDO (tinha faltado o ".")
+    inpY.addEventListener('input', update); // (fix do typo)
     applyZoom(z); global.JCSelfieZoom={all:z.all,x:z.x,y:z.y};
   }
 
-  // ---------- Botões + Prévia ----------
+  // ---------- Botões slim + Prévia ----------
   function ensureButtons(section){
     if(section.querySelector('#selfieButtons')) return;
 
     if(!document.getElementById('selfieButtonsStyle')){
       const css=document.createElement('style'); css.id='selfieButtonsStyle';
       css.textContent=`
-        #selfieButtons{display:flex;gap:10px;justify-content:center;align-items:center;margin:10px auto;width:92%;max-width:680px;flex-wrap:wrap}
-        #selfieButtons .btn{min-width:160px}
-        #selfiePreview{display:none;margin:6px auto 0;width:92%;max-width:680px;background:rgba(0,0,0,.25);padding:10px;border-radius:12px;text-align:center}
-        #selfiePreview img{max-width:100%;height:auto;display:inline-block;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+        #section-selfie #selfieButtons{display:flex;gap:8px;justify-content:center;align-items:center;margin:8px auto 10px;width:92%;max-width:820px;flex-wrap:wrap}
+        #section-selfie #selfieButtons .btn{min-width:150px;height:36px;line-height:36px;padding:0 12px;font-size:14px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+        #section-selfie #selfiePreview{display:none;margin:6px auto 0;width:92%;max-width:820px;background:rgba(0,0,0,.22);padding:8px;border-radius:12px;text-align:center}
+        #section-selfie #selfiePreview img{max-width:100%;height:auto;display:inline-block;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
       `;
       document.head.appendChild(css);
     }
@@ -220,12 +243,14 @@
       <button id="btn-selfie-retake"  class="btn btn-stone-espinhos" disabled>Tirar outra Selfie</button>
       <button id="btn-selfie-confirm" class="btn btn-stone-espinhos" disabled>Confirmar / Iniciar</button>
     `;
-    const after = section.querySelector('#selfieControls') || section.querySelector('#selfieOrientWrap') || section;
-    after.parentElement.insertBefore(buttons, after.nextSibling);
+
+    // sempre após CONTROLS
+    const controls = section.querySelector('#selfieControls');
+    if (controls) placeAfter(controls, buttons); else section.appendChild(buttons);
 
     const preview=document.createElement('div'); preview.id='selfiePreview';
     preview.innerHTML=`<img id="selfiePreviewImg" alt="Prévia da selfie">`;
-    buttons.parentElement.insertBefore(preview, buttons.nextSibling);
+    placeAfter(buttons, preview);
 
     buttons.querySelector('#btn-selfie-preview').addEventListener('click', ()=>doPreview());
     buttons.querySelector('#btn-selfie-retake').addEventListener('click', ()=>clearPreview());
@@ -277,7 +302,7 @@
       mo.observe(section,{attributes:true,attributeFilter:['class','style','aria-hidden']});
       return;
     }
-    if(section.__selfie_phase3_done) return;
+    if(section.__selfie_phase31_done) return;
 
     const title = ensureTitle(section);
     const orient= ensureOrientation(section);
@@ -289,8 +314,8 @@
     ensureZoomControls(section);
     ensureButtons(section);
 
-    section.__selfie_phase3_done=true;
-    const ev=new CustomEvent('selfie:phase3:done',{detail:{sectionId:'section-selfie'}});
+    section.__selfie_phase31_done=true;
+    const ev=new CustomEvent('selfie:phase3.1:done',{detail:{sectionId:'section-selfie'}});
     section.dispatchEvent(ev); document.dispatchEvent(ev);
   }
 
