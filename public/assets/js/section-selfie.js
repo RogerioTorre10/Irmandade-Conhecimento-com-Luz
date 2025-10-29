@@ -6,12 +6,33 @@
 (function (global) {
   'use strict';
 
+   
   const NS = (global.JCSelfie = global.JCSelfie || {});
   if (NS.__phase34_bound) return;
   NS.__phase34_bound = true;
 
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+   // ESCUDO VISUAL — evita que o texto seja ocultado por resets de transição
+(function ensureSelfieTextVisible() {
+  const style = document.createElement('style');
+  style.id = 'selfieTextForce';
+  style.textContent = `
+    #section-selfie #selfieTexto,
+    #section-selfie .lumen-typing,
+    #section-selfie .parchment-text-rough {
+      opacity: 1 !important;
+      visibility: visible !important;
+      display: block !important;
+      max-height: none !important;
+      overflow: visible !important;
+      transition: none !important;
+    }
+  `;
+  document.head.appendChild(style);
+})();
+
+   
   // ---------- Nome ----------
   function getUpperName() {
     const jc = (global.JC && global.JC.data) ? global.JC.data : {};
@@ -360,8 +381,18 @@ function ensureTexto(section) {
   }
 
   document.addEventListener('sectionLoaded', (e) => {
-    if (e?.detail?.sectionId === 'section-selfie') init();
-  });
+    if (e?.detail?.sectionId === 'section-selfie') {
+  setTimeout(() => {
+    const t = document.querySelector('#selfieTexto');
+    if (t) {
+      t.style.opacity = '1';
+      t.style.visibility = 'visible';
+      t.style.display = 'block';
+      console.log('[Selfie] Reforço visual aplicado (texto visível).');
+    }
+  }, 500);
+  init();
+}
   if (document.readyState !== 'loading') init();
   else document.addEventListener('DOMContentLoaded', init);
 
