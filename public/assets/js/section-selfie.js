@@ -89,37 +89,82 @@
   }
 
   // ---------- Texto orientação (com atributos pro TypingBridge) ----------
-  function ensureTexto(section) {
-    const upper = getUpperName();
+ function ensureTexto(section) {
+  const upper = getUpperName();
 
-    let wrap = section.querySelector('#selfieOrientWrap');
-    if (!wrap) {
-      wrap = document.createElement('div');
-      wrap.id = 'selfieOrientWrap';
-      wrap.style.cssText = 'display:flex;justify-content:center;margin:6px 0 8px;';
-      section.appendChild(wrap);
-    }
-
-    let p = section.querySelector('#selfieTexto');
-    if (!p) {
-      p = document.createElement('p');
-      p.id = 'selfieTexto';
-      p.className = 'parchment-text-rough lumen-typing'; // ajuda o TypingBridge a estilizar
-      p.style.cssText = 'background:rgba(0,0,0,.35);color:#f9e7c2;padding:10px 14px;border-radius:12px;text-align:center;font-family:Cardo,serif;font-size:15px;margin:0 auto;width:92%;max-width:820px;';
-      wrap.appendChild(p);
-    }
-
-    // Mensagem e dataset para TypingBridge
-    const msg = `${upper}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`;
-    p.dataset.text = msg;
-    p.dataset.typing = 'true';
-    p.dataset.speed = p.dataset.speed || '28';
-    p.dataset.tts = 'true';            // pedir leitura
-    p.dataset.voice = p.dataset.voice || 'lumen'; // voz padrão (ajuste conforme teu TTS)
-    p.textContent = msg;               // conteúdo base (o TypingBridge pode sobrescrever)
-
-    return p;
+  let wrap = section.querySelector('#selfieOrientWrap');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = 'selfieOrientWrap';
+    wrap.style.cssText = 'display:flex;justify-content:center;margin:6px 0 8px;';
+    section.appendChild(wrap);
   }
+
+  let p = section.querySelector('#selfieTexto');
+  if (!p) {
+    p = document.createElement('p');
+    p.id = 'selfieTexto';
+    p.className = 'parchment-text-rough lumen-typing';
+    p.style.cssText = [
+      'background:rgba(0,0,0,.35)',
+      'color:#f9e7c2',
+      'padding:10px 14px',
+      'border-radius:12px',
+      'text-align:center',
+      'font-family:Cardo,serif',
+      'font-size:15px',
+      'margin:0 auto',
+      'width:92%',
+      'max-width:820px',
+      // força visibilidade para o caso em que o Bridge não rodar:
+      'opacity:1',
+      'visibility:visible'
+    ].join(';');
+    wrap.appendChild(p);
+  }
+
+  const msg = `${upper}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`;
+  p.dataset.text = msg;
+  p.setAttribute('data-typing', 'true');
+  p.setAttribute('data-tts', 'true');
+  p.setAttribute('data-speed', p.dataset.speed || '28');
+  p.setAttribute('data-voice', p.dataset.voice || 'lumen');
+
+  // texto base já visível (se o Bridge assumir, ele sobrescreve)
+  p.textContent = msg;
+
+  return p;
+}
+
+async function play(section) {
+  ensureHeader(section);
+  const p = ensureTexto(section);
+
+  // Render do layout primeiro (nada espera o TTS)
+  ensureControls(section);
+  ensureButtons(section);
+  enforceOrder(section);
+
+  // Se houver Bridge, usamos; senão, fallback + “typing-done” visível
+  try {
+    const hasBridge = (window.TypingBridge && typeof window.TypingBridge.runTyping === 'function');
+    if (hasBridge) {
+      window.G = window.G || {}; window.G.__typingLock = false;
+      await window.TypingBridge.runTyping(p);
+    } else {
+      await fallbackTyping(p, +(p.dataset.speed || 28));
+      p.classList.add('typing-done');
+      p.style.opacity = '1';
+      p.style.visibility = 'visible';
+    }
+  } catch (e) {
+    console.warn('[Selfie] Bridge falhou; forçando fallback', e);
+    await fallbackTyping(p, +(p.dataset.speed || 28));
+    p.classList.add('typing-done');
+    p.style.opacity = '1';
+    p.style.visibility = 'visible';
+  }
+}
 
   // ---------- Controles ----------
   function ensureControls(section) {
