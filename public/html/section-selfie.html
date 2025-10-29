@@ -1,141 +1,180 @@
-<link rel="stylesheet" href="/assets/css/styles-base.css">
-<link rel="stylesheet" href="/assets/css/styles-selfie.css">
+<section id="section-selfie" data-section="selfie" class="pergaminho pergaminho-v selfie-page hidden" aria-hidden="true">
+  <div class="parchment-inner-rough">
 
-<section
-  id="section-selfie"
-  class="j-section pergaminho pergaminho-h epic selfie-page hidden"
-  data-section="selfie"
-  aria-labelledby="selfie-title"
-  data-transition-src="/assets/videos/filme-selfie-card.mp4"
->
-  <div class="conteudo-pergaminho">
-    <!-- Cabeçalho -->
-    <header class="selfie-header">
-      <h2
-        id="selfie-title"
-        class="titulo-pergaminho"
-        data-typing="true"
-        data-text="Tirar sua Foto ✨"
-        data-speed="30"
-        data-cursor="true"
-      ></h2>
-
-      <button
-        id="btnSkipSelfie"
-        class="btn btn-ghost-top"
-        aria-label="Não quero foto / Iniciar"
-        data-transition-src="/assets/videos/filme-selfie-card.mp4"
-      >
-        Não quero foto / Iniciar
-      </button>
+    <!-- TÍTULO + SKIP -->
+    <header class="selfie-header" style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+      <h2 data-typing="true" data-cursor="true" data-speed="40" data-text="Tirar sua Foto ✨">Tirar sua Foto ✨</h2>
+      <button id="btn-skip-selfie" class="btn btn-ghost-top" data-action="skip" style="white-space:nowrap;">Não quero foto / Iniciar</button>
     </header>
 
-    <!-- Texto orientativo -->
-    <div class="moldura-orientacao">
-      <div
-        id="selfieTexto"
-        class="texto-orientacao"
-        data-text="{{NOME}}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras."
-        data-speed="36"
-      ></div>
+    <!-- TEXTO ORIENTAÇÃO -->
+    <div class="moldura-orientacao" style="display:flex;justify-content:center;">
+      <p id="selfieTexto" class="texto-orientacao" data-typing="true" data-cursor="true" data-speed="28"
+         style="background:rgba(0,0,0,.35);color:#f9e7c2;padding:12px 16px;border-radius:12px;text-align:center;font-family:'Cardo',serif;font-size:15px;margin:0 auto 10px;width:90%;">
+         data-text="{{NOME}}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.
+      </p>
     </div>
 
-    <!-- Container da câmera -->
-    <div class="selfie-grid">
-      <div class="selfie-preview">
-        <div class="flame-stage">
-          <video id="selfieVideo" playsinline autoplay muted></video>
-          <canvas id="selfieCanvas" class="hidden"></canvas>
-          <div class="flame-mask"></div>
-        </div>
-
-        <div class="preview-hints">
-          <small>Certifique-se de que o rosto está centralizado na chama.</small>
-        </div>
-      </div>
-
-      <!-- Controles -->
-      <aside class="selfie-controls">
-        <div class="field-row">
-          <label for="nameInput">Seu Nome</label>
-          <input
-            id="nameInput"
-            type="text"
-            placeholder="NOME"
-            autocomplete="name"
-            class="input-espinhos"
-          />
-        </div>
-
-        <div class="controls-group">
-          <button id="startCamBtn" class="btn btn-stone-espinhos">Ativar Câmera</button>
-
-          <div class="ranges">
-            <label>Zoom
-              <input id="zoomAll" type="range" min="1" max="2.5" step="0.01" value="1" />
-            </label>
-            <label>Zoom Horizontal
-              <input id="zoomX" type="range" min="1" max="2.5" step="0.01" value="1" />
-            </label>
-            <label>Zoom Vertical
-              <input id="zoomY" type="range" min="1" max="2.5" step="0.01" value="1" />
-            </label>
-          </div>
-
-          <!-- === SELFIE: Container com máscara da chama === -->
-<div id="selfie-container" class="selfie-container masked">
-  <!-- Moldura por cima -->
-  <img id="selfie-frame" src="/assets/img/chama-card.png" alt="Moldura da Chama" />
-
-  <!-- Vídeo da câmera (ao vivo) -->
-  <video id="selfie-video" autoplay playsinline muted></video>
-
-  <!-- Canvas para prévia/captura -->
-  <canvas id="selfie-canvas" style="display:none;"></canvas>
-</div>
-
-<!-- Controles de zoom (vertical/horizontal) -->
-<div class="selfie-zoom">
-  <label for="zoom-x">Zoom horizontal (X)</label>
-  <input id="zoom-x" type="range" min="0.8" max="1.6" step="0.01" value="1">
-  <label for="zoom-y">Zoom vertical (Y)</label>
-  <input id="zoom-y" type="range" min="0.8" max="1.6" step="0.01" value="1">
-</div>
-
-<!-- Ações -->
-<div class="selfie-actions">
-  <button id="btn-selfie-previa" class="btn btn-primary">Prévia</button>
-  <button id="btn-selfie-refazer" class="btn btn-secondary" disabled>Não confirmar</button>
-  <button id="btn-selfie-confirmar" class="btn btn-primary" disabled>Confirmar</button>
-</div>
-
-<div id="selfie-status" class="selfie-status" aria-live="polite"></div>
-
-          <div class="btn-row">
-            <button id="btn-selfie-preview" class="btn btn-stone-espinhos" disabled>Prévia</button>
-            <button id="btn-selfie-confirm" class="btn btn-stone-espinhos" disabled>Confirmar</button>
-            <button
-              id="btn-selfie-next"
-              class="btn btn-stone-espinhos"
-              disabled
-              data-transition-src="/assets/videos/filme-selfie-card.mp4"
-            >
-              Iniciar Jornada
-            </button>
-          </div>
-        </div>
-      </aside>
+    <!-- STAGE COM MÁSCARA INLINE (sem depender de CSS externo) -->
+    <div id="selfieStage"
+         class="flame-stage"
+         style="
+            position:relative; width:min(92vw,620px); height:min(92vw * 1.5, 930px); max-height:min(70vh,720px);
+            margin:18px auto 12px; border-radius:16px; overflow:hidden; background:#000; box-shadow:0 0 14px rgba(0,0,0,.6);
+            -webkit-mask-image:url('/assets/img/chama-card.png');
+                    mask-image:url('/assets/img/chama-card.png');
+            -webkit-mask-mode:alpha;        mask-mode:alpha;
+            -webkit-mask-repeat:no-repeat;  mask-repeat:no-repeat;
+            -webkit-mask-size:68% 94%;      mask-size:68% 94%;
+            -webkit-mask-position:50% 58%;  mask-position:50% 58%;
+         ">
+      <video id="selfieVideo" autoplay playsinline
+             style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform-origin:50% 60%;"></video>
+      <canvas id="selfieCanvas"
+              style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;"></canvas>
+      <!-- brilho opcional -->
+      <div class="flame-mask" style="position:absolute;inset:0;pointer-events:none;
+           background:
+            radial-gradient(ellipse at 50% 80%, rgba(255,180,70,.35), rgba(255,140,30,0) 60%),
+            radial-gradient(circle at 50% 18%, rgba(255,230,160,.75), rgba(255,160,40,0) 58%);
+           mix-blend-mode:screen;"></div>
     </div>
 
-    <!-- Pré-visualização -->
-    <div class="selfie-preview-wrap">
-      <div class="preview-frame">
-        <img id="selfiePreview" alt="Pré-visualização da foto" />
-      </div>
+    <!-- AJUSTES (SLIDERS) -->
+    <div class="selfie-controls" style="position:relative;z-index:5; display:flex;justify-content:center;gap:16px;flex-wrap:wrap;">
+      <label style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#f1e6c7;">
+        Zoom geral
+        <input id="zoomAll" type="range" min="0.8" max="1.6" step="0.01" value="1" style="width:220px;accent-color:#e6b873;">
+      </label>
+      <label style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#f1e6c7;">
+        Zoom horizontal
+        <input id="zoomX" type="range" min="0.8" max="1.4" step="0.01" value="1" style="width:220px;accent-color:#e6b873;">
+      </label>
+      <label style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#f1e6c7;">
+        Zoom vertical
+        <input id="zoomY" type="range" min="0.8" max="1.4" step="0.01" value="1" style="width:220px;accent-color:#e6b873;">
+      </label>
     </div>
 
-    <div id="selfie-error" class="hidden" aria-hidden="true">
-      Não foi possível acessar a câmera. Verifique as permissões do navegador.
+    <!-- AÇÕES -->
+    <div class="selfie-actions" style="position:relative;z-index:5; display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:16px;">
+      <button id="btn-preview-selfie" class="btn btn-stone" data-action="preview"
+              style="background:rgba(255,220,160,.15);border:1px solid rgba(255,220,180,.4);color:#fff8e6;font-family:'Cardo',serif;padding:8px 18px;border-radius:12px;">
+        Prévia
+      </button>
+      <button id="btn-send-selfie" class="btn btn-stone" data-action="send" disabled
+              style="background:rgba(255,220,160,.15);border:1px solid rgba(255,220,180,.4);color:#fff8e6;font-family:'Cardo',serif;padding:8px 18px;border-radius:12px;opacity:.6;">
+        Enviar Foto
+      </button>
+      <button id="btn-start-next" class="btn btn-primary" data-action="next" disabled
+              style="background:radial-gradient(circle at 50% 30%, #6b4a2e, #281a0f);border:2px solid #a87a4a;color:#fbe8c6;font-family:'Cardo',serif;padding:8px 20px;border-radius:12px;opacity:.6;">
+        Iniciar
+      </button>
     </div>
+
   </div>
+
+  <!-- JS LOCAL (scoped) — liga câmera, sliders e captura 2:3 alinhada ao pivot 58% -->
+  <script>
+  (function(){
+    const video  = document.getElementById('selfieVideo');
+    const canvas = document.getElementById('selfieCanvas');
+    const btnPrev= document.getElementById('btn-preview-selfie');
+    const btnSend= document.getElementById('btn-send-selfie');
+    const btnNext= document.getElementById('btn-start-next');
+    const zoomAll= document.getElementById('zoomAll');
+    const zoomX  = document.getElementById('zoomX');
+    const zoomY  = document.getElementById('zoomY');
+
+    const zoom = { all:1, x:1, y:1 };
+    window.JCSelfieZoom = { all:1, x:1, y:1 };
+
+    // Liga câmera
+    navigator.mediaDevices && navigator.mediaDevices.getUserMedia
+      ? navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio:false })
+          .then(stream => { video.srcObject = stream; })
+          .catch(err => console.warn('[Selfie] getUserMedia erro:', err))
+      : console.warn('[Selfie] getUserMedia indisponível');
+
+    function onZoomChange(){
+      zoom.all = Number(zoomAll?.value || 1);
+      zoom.x   = Number(zoomX?.value   || 1);
+      zoom.y   = Number(zoomY?.value   || 1);
+      // aplica visualmente (escala no vídeo)
+      const sx = zoom.all * zoom.x, sy = zoom.all * zoom.y;
+      video.style.transform = `scale(${sx}, ${sy})`;
+      // expõe para a captura
+      window.JCSelfieZoom = { all: zoom.all, x: zoom.x, y: zoom.y };
+    }
+    zoomAll.addEventListener('input', onZoomChange);
+    zoomX  .addEventListener('input', onZoomChange);
+    zoomY  .addEventListener('input', onZoomChange);
+    onZoomChange();
+
+    // Captura 2:3 (768x1152) com pivot 58% (casado com a máscara inline 50% 58%)
+    function captureToCanvas(){
+      const OUT_W = 768, OUT_H = 1152;
+      const vw = video.videoWidth  || 1280;
+      const vh = video.videoHeight || 720;
+
+      canvas.width = OUT_W; canvas.height = OUT_H;
+      const ctx = canvas.getContext('2d');
+
+      const z = window.JCSelfieZoom || { all:1, x:1, y:1 };
+      const sx = z.all * z.x, sy = z.all * z.y;
+
+      const cx = vw / 2;
+      const cy = vh * 0.58; // pivot vertical
+
+      ctx.save();
+      ctx.translate(OUT_W/2, OUT_H*0.58);
+      ctx.scale(sx, sy);
+      const base = Math.max(OUT_W / vw, OUT_H / vh);
+      ctx.scale(base, base);
+      ctx.translate(-cx, -cy);
+      ctx.drawImage(video, 0, 0, vw, vh);
+      ctx.restore();
+
+      return canvas.toDataURL('image/jpeg', 0.92);
+    }
+
+    // Prévia
+    btnPrev.addEventListener('click', () => {
+      const dataUrl = captureToCanvas();
+      // exibe temporariamente no próprio <video> via background (simples) ou crie um modal/preview
+      canvas.style.display = 'block';
+      const img = new Image();
+      img.onload = () => {
+        const c = canvas.getContext('2d');
+        c.clearRect(0,0,canvas.width,canvas.height);
+        c.drawImage(img,0,0);
+      };
+      img.src = dataUrl;
+      btnSend.disabled = false; btnSend.style.opacity = 1;
+    });
+
+    // Enviar (salva em memória global p/ página card)
+    btnSend.addEventListener('click', () => {
+      try{
+        const dataUrl = canvas.style.display === 'block' ? canvas.toDataURL('image/jpeg',0.92) : captureToCanvas();
+        window.JC = window.JC || {};
+        window.JC.data = window.JC.data || {};
+        window.JC.data.selfie = dataUrl; // ← disponível para o section-card
+        btnNext.disabled = false; btnNext.style.opacity = 1;
+        console.log('[Selfie] Foto armazenada em window.JC.data.selfie');
+      }catch(e){ console.warn('[Selfie] Falha ao enviar:', e); }
+    });
+
+    // Next (vai pra card ou guia, conforme o teu fluxo)
+    document.getElementById('btn-start-next').addEventListener('click', () => {
+      if (window.showSection) window.showSection('section-card'); // ajuste o id de destino
+    });
+
+    // Skip
+    document.getElementById('btn-skip-selfie').addEventListener('click', () => {
+      if (window.showSection) window.showSection('section-card'); // pular sem selfie
+    });
+  })();
+  </script>
+
 </section>
