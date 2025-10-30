@@ -158,12 +158,13 @@ async function ensureTexto(section) {
 
   wrap.appendChild(p);
 
-  // Mostra + digita
-  requestAnimationFrame(() => {
+    // Mostra + digita (com microdelay para garantir render)
+  setTimeout(() => {
     p.style.opacity = '1';
     startTyping(p, fullText, 30);
     speak(fullText);
-  });
+  }, 150);
+
 
   return p;
 }
