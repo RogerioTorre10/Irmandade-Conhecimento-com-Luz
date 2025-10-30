@@ -107,7 +107,7 @@
       head.className = 'selfie-header';
       head.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin:-6px 0 4px;';
       head.innerHTML = `
-        <h2 data-text="Tirar sua Foto ✨" data-typing="true" data-speed="40">Tirar sua Foto ✨</h2>
+        <h2 data-text="Tirar sua Foto" data-typing="true" data-speed="40">Tirar sua Foto ✨</h2>
         <button id="btn-skip-selfie" class="btn btn-stone-espinhos">Não quero foto / Iniciar</button>`;
       head.querySelector('#btn-skip-selfie').onclick = onSkip;
       section.prepend(head);
@@ -115,45 +115,55 @@
     return head;
   }
 
- // ---------- Texto Orientação (CORRIGIDO: NÃO BLOQUEIA MAIS) ----------
+ // ---------- Texto Orientação (PERFEITO: ESQUERDA, QUEBRA LINHA, SEM FUNDO) ----------
 async function ensureTexto(section) {
-  const upper = getUpperName(); // já é síncrono e seguro
+  const upper = getUpperName();
   let wrap = section.querySelector('#selfieOrientWrap');
   if (!wrap) {
     wrap = document.createElement('div');
     wrap.id = 'selfieOrientWrap';
-    wrap.style.cssText = 'display:flex;justify-content:center;margin:16px 0 12px;';
+    wrap.style.cssText = `
+      margin: 16px auto 12px;
+      width: 92%;
+      max-width: 820px;
+      text-align: left;
+      padding: 0 12px;
+      box-sizing: border-box;
+    `;
     section.appendChild(wrap);
   }
 
-  // REMOVE apenas o p antigo
   const existing = wrap.querySelector('#selfieTexto');
   if (existing) existing.remove();
 
   const p = document.createElement('p');
   p.id = 'selfieTexto';
   p.style.cssText = `
-    background:rgba(0,0,0,.35);color:#f9e7c2;padding:12px 16px;border-radius:12px;
-    text-align:center;font-family:Cardo,serif;font-size:15px;margin:0 auto;width:92%;max-width:820px;
-    opacity:0; transition:opacity .5s ease;
-    white-space: nowrap; overflow: hidden; display: inline-block;
+    color: #f9e7c2;
+    font-family: Cardo, serif;
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 0;
+    opacity: 0;
+    transition: opacity .5s ease;
+    text-align: left;
+    white-space: normal;
+    word-wrap: break-word;
   `;
 
   const fullText = `${upper}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`;
   p.dataset.text = fullText;
   p.dataset.speed = "30";
-  p.textContent = ''; // começa vazio
+  p.textContent = '';
 
   wrap.appendChild(p);
 
-  // Mostra imediatamente (sem await)
+  // Mostra + digita
   requestAnimationFrame(() => {
     p.style.opacity = '1';
+    startTyping(p, fullText, 30);
+    speak(fullText);
   });
-
-  // Inicia datilografia EM PARALELO (não bloqueia)
-  startTyping(p, fullText, 30);
-  speak(fullText); // TTS em paralelo
 
   return p;
 }
