@@ -1,20 +1,17 @@
-/* /assets/js/section-selfie.js — FASE 4.3
-   - UX mobile e máscara corrigidas
-   - Botões redefinidos e dinâmicos:
-     • Prévia → ativa câmera; depois vira “Prévia/Repetir”
-     • Foto → captura frame
-     • Iniciar → confirma e segue (antes: Confirmar/Iniciar)
-     • Header: “Não quero Foto” (antes: Não quero Foto / Iniciar)
-   - Container de enquadramento mantido (guia)
-   - Máscara responsiva (MASK_URL + MASK_SIZE)
+/* /assets/js/section-selfie.js — FASE 4.4 (sem máscara, com enquadramento por container)
+   - Remove totalmente o uso de mask-image (mobile-safe)
+   - Mantém 3 botões: Prévia/Repetir · Foto · Iniciar
+   - Prévia fixa no rodapé com "aspect-ratio" 3:4 (a mesma métrica do CARD)
+   - Captura em canvas com recorte tipo "cover" (sem distorcer) para caber no CARD
+   - Botões responsivos (mobile): menores e lado a lado sem quebrar layout
    - Transição de vídeo preservada
 */
 (function (global) {
   'use strict';
 
   const NS = (global.JCSelfie = global.JCSelfie || {});
-  if (NS.__phase43_bound) return; // idempotente
-  NS.__phase43_bound = true;
+  if (NS.__phase44_bound) return; // idempotente
+  NS.__phase44_bound = true;
 
   // ---- Constantes de integração ----
   const MOD = 'section-selfie.js';
@@ -22,15 +19,17 @@
   const NEXT_SECTION_ID = 'section-card';
   const VIDEO_SRC = '/assets/video/filme-eu-na-irmandade.mp4';
 
-  // Ajuste aqui sua máscara e escala padrão
-  const MASK_URL = '/assets/img/chama-mask.png'; // PNG/SVG com fundo TRANSPARENTE e silhueta BRANCA
-  const MASK_SIZE = '80%'; // tamanho relativo da máscara dentro da prévia (mobile-friendly)
+  // Preview/CARD: proporção 3:4 (vertical). Ajuste aqui se o CARD mudar.
+  const PREVIEW_MIN_H = 240;            // px
+  const PREVIEW_MAX_H = 420;            // px
+  const PREVIEW_VH   = 38;              // % da viewport height
+  const PREVIEW_AR_W = 3;               // aspect-ratio width
+  const PREVIEW_AR_H = 4;               // aspect-ratio height
 
   const sleep = ms => new Promise(r => setTimeout(r, ms));
 
   // Estado de câmera
   let stream = null;
-  let usingFront = true;
   let videoEl = null;
   let canvasEl = null;
   let previewWrap = null;
@@ -146,7 +145,7 @@
     const p = document.createElement('p');
     p.id = 'selfieTexto';
     p.style.cssText = `color:#f9e7c2;font-family:Cardo,serif;font-size:15px;line-height:1.5;margin:0;opacity:0;transition:opacity .5s ease;text-align:left;white-space:normal;word-wrap:break-word;`;
-    const fullText = `${upper}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`;
+    const fullText = `${upper}, posicione-se em frente à câmera e centralize o rosto dentro do enquadramento. Use boa luz e evite sombras.`;
     p.dataset.text = fullText; p.dataset.speed = '30'; p.textContent = '';
     wrap.appendChild(p);
     setTimeout(() => { p.style.opacity = '1'; startTyping(p, fullText, 30); speak(fullText); }, 150);
@@ -167,8 +166,8 @@
       #selfieControls input[type=range]{width:100%;height:4px;border-radius:2px;background:#555;outline:none}
       #selfieControls input[type=range]::-webkit-slider-thumb{background:#f9e7c2;border-radius:50%;width:14px;height:14px}
       #selfieButtons{position:relative;z-index:60}
-      #selfieFrameBox{position:relative;margin:6px auto 6px;width:92%;max-width:820px;height:clamp(140px, 16vh, 220px);border:1px dashed rgba(249,231,194,.35);border-radius:12px;pointer-events:none;}
-      #selfieFrameBox .guide{position:absolute;inset:6px;background-repeat:no-repeat;background-position:center;background-size:contain;opacity:.75;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6));}
+      #selfieFrameBox{position:relative;margin:6px auto 6px;width:92%;max-width:820px;aspect-ratio:${PREVIEW_AR_W}/${PREVIEW_AR_H};border:1px dashed rgba(249,231,194,.35);border-radius:12px;pointer-events:none;}
+      #selfieFrameBox .guide{position:absolute;inset:6px;border-radius:10px;opacity:.55}
     `;
     document.head.appendChild(style);
 
@@ -196,15 +195,15 @@
     };
     zoomAll.oninput = update; zoomX.oninput = update; zoomY.oninput = update; update();
 
-    // Guia
+    // Guia simples com a mesma razão 3:4 (apenas retângulo)
     let fb = document.querySelector('#selfieFrameBox');
     if (!fb) {
       fb = document.createElement('div');
       fb.id = 'selfieFrameBox';
+      fb.innerHTML = '<div class="guide"></div>';
       section.appendChild(fb);
     }
     fb.style.position = 'relative'; fb.style.zIndex = '60';
-    fb.innerHTML = `<div class="guide" style="background-image:url(${MASK_URL})"></div>`;
   }
 
   function applyPreviewTransform(a=1, x=1, y=1) {
@@ -220,9 +219,13 @@
     if (!div) {
       const css = document.createElement('style');
       css.textContent = `
-        #selfieButtons{display:grid;grid-template-columns:repeat(3, minmax(140px,1fr));gap:8px;margin:8px auto;width:92%;max-width:820px}
-        #selfieButtons .btn{height:36px;line-height:36px;padding:0 10px;font-size:14px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.25);transition:all .2s}
+        #selfieButtons{display:grid;grid-template-columns:repeat(3, minmax(110px,1fr));gap:8px;margin:8px auto;width:92%;max-width:820px}
+        #selfieButtons .btn{height:34px;line-height:34px;padding:0 8px;font-size:13px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.25);transition:all .2s}
         #selfieButtons .btn:disabled{opacity:.5;cursor:not-allowed}
+        @media (max-width: 480px){
+          #selfieButtons{gap:6px}
+          #selfieButtons .btn{height:32px;line-height:32px;font-size:12px;padding:0 6px}
+        }
       `;
       document.head.appendChild(css);
       div = document.createElement('div');
@@ -241,11 +244,8 @@
       const btnConfirm = div.querySelector('#btn-confirm');
 
       btnPreview.onclick = async () => {
-        // Inicia/repete a câmera
-        await startCamera(true);
-        // Troca rótulo após primeira execução
+        await startCamera();
         if (btnPreview.textContent !== 'Prévia/Repetir') btnPreview.textContent = 'Prévia/Repetir';
-        // Habilita os outros botões
         btnShot.disabled = false;
         btnConfirm.disabled = false;
       };
@@ -257,33 +257,26 @@
     div.style.zIndex = '60';
   }
 
-  // ---------- Prévia (rodapé) + Máscara responsiva ----------
+  // ---------- Prévia (rodapé) sem máscara (enquadramento por container) ----------
   function ensurePreview(section) {
     if (section.querySelector('#selfiePreviewWrap')) return;
 
     const style = document.createElement('style');
     style.textContent = `
-      #selfiePreviewWrap{position:fixed;left:0;right:0;bottom:12px;width:100%;max-height:clamp(240px, 38vh, 420px);background:rgba(0,0,0,.55);backdrop-filter:blur(2px);border-top:1px solid rgba(255,255,255,.08);z-index:40}
-      #selfiePreview{position:relative;margin:8px auto;width:92%;max-width:820px;height:calc(clamp(240px, 38vh, 420px) - 16px);overflow:hidden;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#000}
-      #selfieViewport{position:absolute;inset:0}
+      #selfiePreviewWrap{position:fixed;left:0;right:0;bottom:12px;width:100%;max-height:clamp(${PREVIEW_MIN_H}px, ${PREVIEW_VH}vh, ${PREVIEW_MAX_H}px);background:rgba(0,0,0,.55);backdrop-filter:blur(2px);border-top:1px solid rgba(255,255,255,.08);z-index:40}
+      #selfiePreview{position:relative;margin:8px auto;width:92%;max-width:820px;height:calc(clamp(${PREVIEW_MIN_H}px, ${PREVIEW_VH}vh, ${PREVIEW_MAX_H}px) - 16px);overflow:hidden;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#000;aspect-ratio:${PREVIEW_AR_W}/${PREVIEW_AR_H}}
+      #selfieViewport{position:absolute;inset:0;overflow:hidden}
       #selfieVideo,#selfieCanvas{position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);min-width:100%;min-height:100%;}
-      .masked #selfieVideo, .masked #selfieCanvas{
-        -webkit-mask-image: url(${MASK_URL});
-        mask-image: url(${MASK_URL});
-        -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
-        -webkit-mask-position: center; mask-position: center;
-        -webkit-mask-size: ${MASK_SIZE} auto; mask-size: ${MASK_SIZE} auto;
-      }
     `;
     document.head.appendChild(style);
 
     previewWrap = document.createElement('div');
     previewWrap.id = 'selfiePreviewWrap';
     previewWrap.innerHTML = `
-      <div id="selfiePreview" class="masked">
+      <div id="selfiePreview">
         <div id="selfieViewport">
           <video id="selfieVideo" autoplay playsinline muted></video>
-          <canvas id="selfieCanvas"></canvas>
+          <canvas id="selfieCanvas" style="display:none"></canvas>
         </div>
       </div>`;
     section.appendChild(previewWrap);
@@ -294,18 +287,19 @@
   }
 
   // ---------- Câmera ----------
-  async function startCamera(useFront = true) {
+  async function startCamera() {
     stopCamera();
-    usingFront = !!useFront;
     if (!navigator.mediaDevices?.getUserMedia) { toast('Câmera não suportada neste dispositivo.'); return; }
     const constraints = {
       audio: false,
-      video: { facingMode: useFront ? 'user' : { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+      video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }
     };
     try {
       stream = await navigator.mediaDevices.getUserMedia(constraints);
+      videoEl.style.display = 'block';
+      canvasEl.style.display = 'none';
       videoEl.srcObject = stream;
-      // Clique no vídeo captura
+      // Clique no vídeo também captura
       videoEl.addEventListener('click', capturePhoto, { once:false });
     } catch (e) {
       console.error('getUserMedia error', e);
@@ -318,32 +312,45 @@
     if (videoEl) videoEl.srcObject = null;
   }
 
+  // --- Helper: desenhar vídeo no canvas com recorte tipo "cover" ---
+  function drawCover(video, ctx, cw, ch) {
+    const vw = video.videoWidth || 1280;
+    const vh = video.videoHeight || 720;
+    const arVideo = vw / vh;
+    const arCanvas = cw / ch;
+    let sx, sy, sw, sh;
+    if (arVideo > arCanvas) {
+      // vídeo mais "largo" que o canvas → corta nas laterais
+      sh = vh;
+      sw = Math.floor(vh * arCanvas);
+      sx = Math.floor((vw - sw) / 2);
+      sy = 0;
+    } else {
+      // vídeo mais "alto" → corta em cima/baixo
+      sw = vw;
+      sh = Math.floor(vw / arCanvas);
+      sx = 0;
+      sy = Math.floor((vh - sh) / 2);
+    }
+    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, cw, ch);
+  }
+
   // ---------- Captura ----------
   function capturePhoto() {
     if (!videoEl) return;
-    const vw = videoEl.videoWidth || 1280;
-    const vh = videoEl.videoHeight || 720;
-    const maxW = 1080; // limite
-    const scale = Math.min(1, maxW / vw);
-    const w = Math.floor(vw * scale);
-    const h = Math.floor(vh * scale);
+    // Canvas do tamanho exato do container (CARD metric)
+    const cw = Math.floor(previewBox.clientWidth);
+    const ch = Math.floor(previewBox.clientHeight);
+    canvasEl.width = cw; canvasEl.height = ch;
 
-    canvasEl.width = w; canvasEl.height = h;
     const ctx = canvasEl.getContext('2d');
-    ctx.drawImage(videoEl, 0, 0, w, h);
+    drawCover(videoEl, ctx, cw, ch);
 
     const dataUrl = canvasEl.toDataURL('image/jpeg', 0.92);
-    const img = new Image();
-    img.onload = () => { videoEl.style.display = 'none'; canvasEl.style.display = 'block'; };
-    img.src = dataUrl;
+    videoEl.style.display = 'none';
+    canvasEl.style.display = 'block';
 
     NS._lastCapture = dataUrl;
-  }
-
-  function retakePhoto() {
-    if (!videoEl) return;
-    canvasEl.style.display = 'none';
-    videoEl.style.display = 'block';
   }
 
   // ---- Navegação/Transição ----
