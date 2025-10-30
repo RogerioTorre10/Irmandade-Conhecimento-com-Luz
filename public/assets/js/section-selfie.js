@@ -239,9 +239,9 @@ update();
     <video id="selfieVideo" playsinline autoplay muted></video>
     <canvas id="selfieCanvas"></canvas>
     <!-- Guia da chama para enquadro -->
-    <img id="selfieGuide" alt="guia" src="/assets/img/chama-card.png"/>
+    <img id="selfieGuide" alt="guia" url="/assets/img/chama-card.png"/>
     <!-- Máscara/moldura final -->
-    <img id="selfieMask" alt="moldura" src="/assets/img/chama-card.png"/>
+    <img id="selfieMask" alt="moldura" url="/assets/img/chama-card.png"/>
   `;
   section.appendChild(wrap);
 }
