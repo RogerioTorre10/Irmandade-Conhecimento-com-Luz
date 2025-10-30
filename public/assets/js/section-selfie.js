@@ -115,63 +115,69 @@
     return head;
   }
 
-  // ---------- Texto Orientação (TYPING 100% FORÇADO) ----------
+ // ---------- Texto Orientação (NOME DINÂMICO + TYPING 100%) ----------
 async function ensureTexto(section) {
-  const upper = getUpperName(); // nome do participante em caixa alta
-  const wrapId = 'selfieOrientWrap';
-  let wrap = section.querySelector(`#${wrapId}`);
+  // 1. AGUARDA O NOME ESTAR PRONTO (máx 3s)
+  let upper = getUpperName();
+  let attempts = 0;
+  while ((!upper || upper === 'AMOR') && attempts < 30) {
+    await sleep(100);
+    upper = getUpperName();
+    attempts++;
+  }
+  if (!upper || upper === 'AMOR') upper = 'AMOR'; // fallback
+
+  // 2. CRIA O WRAP (se não existir)
+  let wrap = section.querySelector('#selfieOrientWrap');
   if (!wrap) {
     wrap = document.createElement('div');
-    wrap.id = wrapId;
+    wrap.id = 'selfieOrientWrap';
     wrap.style.cssText = 'display:flex;justify-content:center;margin:16px 0 12px;';
     section.appendChild(wrap);
+  } else {
+    wrap.innerHTML = ''; // limpa tudo
   }
 
-  const existing = section.querySelector('#selfieTexto');
-  if (existing) existing.remove();
-
+  // 3. CRIA O <p> VAZIO
   const p = document.createElement('p');
   p.id = 'selfieTexto';
-  p.style.opacity = '0';
-  p.dataset.typing = "true";
-  p.dataset.speed = "30";
+  p.style.cssText = `
+    background:rgba(0,0,0,.35);color:#f9e7c2;padding:12px 16px;border-radius:12px;
+    text-align:center;font-family:Cardo,serif;font-size:15px;margin:0 auto;width:92%;max-width:820px;
+    opacity:0; transition:opacity .5s ease;
+    white-space: nowrap; overflow: hidden; display: inline-block;
+  `;
 
   const fullText = `${upper}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`;
   p.dataset.text = fullText;
+  p.dataset.speed = "30";
+  p.textContent = ''; // VAZIO!
 
   wrap.appendChild(p);
-  await sleep(80);
+
+  // 4. AGUARDA DOM + ANIMAÇÃO
+  await sleep(100);
   p.style.opacity = '1';
-  await runTyping(p); // chama o efeito datilografia
-  speak(fullText);    // mantém o efeito de leitura
-}
 
-  // TYPING COM requestAnimationFrame + PROTEÇÃO
+  // 5. DATILOGRAFIA COM TEXTO PRONTO
+  const chars = [...fullText];
+  let i = 0;
+  const speed = 30;
+
   await new Promise(resolve => {
-    requestAnimationFrame(() => {
-      const chars = [...fullText];
-      let i = 0;
-      const speed = 30;
-      const interval = setInterval(() => {
-        if (i < chars.length) {
-          p.textContent += chars[i++];
-        } else {
-          clearInterval(interval);
-          resolve();
-        }
-      }, speed);
-
-      // PROTEGE DE OUTROS SCRIPTS
-      const protector = setInterval(() => {
-        if (p.textContent.length > fullText.length) {
-          p.textContent = fullText.substring(0, i);
-        }
-      }, 10);
-      setTimeout(() => clearInterval(protector), 5000);
-    });
+    const interval = setInterval(() => {
+      if (i < chars.length) {
+        p.textContent += chars[i++];
+      } else {
+        clearInterval(interval);
+        resolve();
+      }
+    }, speed);
   });
 
+  // 6. TTS
   speak(fullText);
+
   return p;
 }
   // ---------- Controles ----------
