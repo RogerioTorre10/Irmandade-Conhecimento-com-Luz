@@ -1,273 +1,357 @@
-// /assets/js/section-selfie.js
-(function () {
+/* /assets/js/section-selfie.js — FASE 3.3+ (CORRIGIDO)
+   - Garante render de controles e botões mesmo com TTS ativo
+   - Ordem fixa e compacta (Header → Texto → Controles → Botões → Prévia)
+   - Datilografia + TTS 100% funcionais
+*/
+(function (global) {
   'use strict';
 
-  const SECTION_ID       = 'section-selfie';
-  const NEXT_SECTION_ID  = 'section-card'; // ajuste se desejar
-  const HIDE_CLASS       = 'hidden';
-  const DEFAULT_VIDEO_SRC = '/assets/videos/filme-selfie-card.mp4';
+  const NS = (global.JCSelfie = global.JCSelfie || {});
+  if (NS.__phase33_fixed) return;
+  NS.__phase33_fixed = true;
 
-  if (window.JCSelfie?.__bound) { console.log('[JCSelfie] já carregado'); return; }
-  window.JCSelfie = window.JCSelfie || {};
-  window.JCSelfie.__bound = true;
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-  // ---------- utils ----------
-  const q  = (s, r=document) => r.querySelector(s);
-  const qa = (s, r=document) => Array.from(r.querySelectorAll(s));
-  const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
-
-  function show(el){ if(!el) return; el.classList.remove(HIDE_CLASS); el.style.removeProperty('display'); el.style.removeProperty('opacity'); el.style.removeProperty('visibility'); el.setAttribute('aria-hidden','false'); }
-
-  function getTransitionSrc(root, btn){
-    const fromBtn = btn?.dataset?.transitionSrc;
-    const fromSec = root?.dataset?.transitionSrc;
-    return (fromBtn && fromBtn.trim()) || (fromSec && fromSec.trim()) || DEFAULT_VIDEO_SRC;
-  }
-
-  async function waitForTransitionUnlock(timeoutMs=20000){
-    if (!window.__TRANSITION_LOCK) return;
-    await Promise.race([
-      new Promise(res => document.addEventListener('transition:ended', res, { once:true })),
-      new Promise(res => setTimeout(res, timeoutMs))
-    ]);
-  }
-
-  function playTransition(root, btn, nextId=NEXT_SECTION_ID){
-    const src = getTransitionSrc(root, btn);
-    if (window.__TRANSITION_LOCK) return;
-    window.__TRANSITION_LOCK = true;
-    document.dispatchEvent(new CustomEvent('transition:started', { detail:{src,nextId} }));
-    try { speechSynthesis?.cancel?.(); } catch {}
-
-    if (typeof window.playTransitionVideo === 'function'){
-      try { window.playTransitionVideo(src, nextId); return; }
-      catch(e){ console.warn('[Selfie] playTransitionVideo falhou', e); }
+  // ---------- Nome ----------
+  function getUpperName() {
+    const jc = (global.JC && global.JC.data) ? global.JC.data : {};
+    let name = jc.nome || jc.participantName;
+    if (!name) {
+      try {
+        const ls = localStorage.getItem('jc.nome') || localStorage.getItem('jc.participantName');
+        if (ls) name = ls;
+      } catch {}
     }
-    window.__TRANSITION_LOCK = false;
-    document.dispatchEvent(new CustomEvent('transition:ended', { detail:{fallback:true} }));
-    window.JC?.show?.(nextId) ?? (location.hash = `#${nextId}`);
+    if (!name || typeof name !== 'string') name = 'AMOR';
+    const upper = name.toUpperCase().trim();
+    try {
+      global.JC = global.JC || {}; 
+      global.JC.data = global.JC.data || {};
+      global.JC.data.nome = upper; 
+      global.JC.data.participantName = upper;
+      try { localStorage.setItem('jc.nome', upper); } catch {}
+    } catch {}
+    return upper;
   }
 
-  // ---------- typing + TTS ----------
-  async function localType(el, text, speed=34){
-    el.textContent = '';
-    let i=0; await new Promise(res => (function tick(){ if(i<text.length){ el.textContent += text.charAt(i++); setTimeout(tick, speed);} else res(); })());
-  }
-  async function typeOnce(el, text, {speed=34, speak=true}={}){
-    if(!el) return;
-    const msg = (text || el.dataset?.text || el.textContent || '').trim();
-    if(!msg) return;
-
-    el.classList.add('typing-active'); el.classList.remove('typing-done');
-
-    let usedFallback=false;
-    if (typeof window.runTyping === 'function'){
-      await new Promise(res=>{ try{ window.runTyping(el, msg, res, {speed, cursor:true}); }catch{ usedFallback=true; res(); }});
-    } else usedFallback=true;
-    if (usedFallback) await localType(el, msg, speed);
-
-    el.classList.remove('typing-active'); el.classList.add('typing-done');
-
-    if (speak){
-      try{
-        await window.EffectCoordinator?.speak?.(msg, { lang:'pt-BR', rate:1.05, pitch:1.0 });
-      }catch{}
-    }
-  }
-
-  async function initSelfieText(root){
-    const el = q('#selfieTexto', root);
-    if(!el) return;
-    show(el);
-    const nome = (window.JC?.data?.nome || sessionStorage.getItem('jornada.nome') || 'AMIGO(A)').toString().toUpperCase();
-    const fallback = `${nome}, posicione-se em frente à câmera. Centralize o rosto dentro da chama, use luz frontal e ajuste o zoom.`;
-    const base = (el.dataset?.text && el.dataset.text.trim()) ? el.dataset.text.trim() : fallback;
-    el.dataset.text = base; // garante dataset para próximas execuções
-    const msg = base.replace(/\{\{\s*(NOME|nome|name)\s*\}\}/g, nome);
-    await typeOnce(el, msg, { speed: Number(el.dataset.speed||34), speak:true });
-  }
-
-  // ---------- câmera / zoom ----------
-  let stream = null;
-  const zoom = { all:1, x:1, y:1 };
-
-  function applyZoom(video, canvas){
-    const sx = zoom.all * zoom.x;
-    const sy = zoom.all * zoom.y;
-    if(video)  video.style.transform = `scale(${sx},${sy})`;
-    if(canvas) canvas.style.transform = `scale(${sx},${sy})`;
-  }
-
-  async function startCamera(videoEl, errEl){
-    try{
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode:'user', width:{ideal:1280}, height:{ideal:720} }, audio:false
-      });
-      videoEl.srcObject = stream;
-      await videoEl.play();
-      return true;
-    }catch(e){
-      console.warn('[Selfie] getUserMedia erro:', e);
-      if (errEl){ errEl.textContent = 'Não foi possível acessar a câmera. Verifique as permissões.'; show(errEl); }
-      return false;
-    }
-  }
-
-function captureToCanvas(video, canvas){
-  const OUT_W = 768, OUT_H = 1152;
-  const vw = video.videoWidth  || 1280;
-  const vh = video.videoHeight || 720;
-  canvas.width = OUT_W; canvas.height = OUT_H;
-  const ctx = canvas.getContext('2d');
-
-  const z = (window.JCSelfieZoom || { all:1, x:1, y:1 });
-  const sx = z.all * z.x, sy = z.all * z.y;
-
-  const cssPivot = getComputedStyle(document.documentElement).getPropertyValue('--chama-pivot-y').trim();
-  const pivotY = cssPivot ? parseFloat(cssPivot) : 0.58;
-  const cx = vw / 2, cy = vh * pivotY;
-
-  ctx.save();
-  ctx.translate(OUT_W/2, OUT_H * pivotY);
-  ctx.scale(sx, sy);
-  const scaleBase = Math.max(OUT_W / vw, OUT_H / vh);
-  ctx.scale(scaleBase, scaleBase);
-  ctx.translate(-cx, -cy);
-  ctx.drawImage(video, 0, 0, vw, vh);
-  ctx.restore();
-
-  return canvas.toDataURL('image/jpeg', 0.92);
-}
-
-
-
-  // ---------- init ----------
-  async function initOnce(root){
-    if (!root || root.dataset.selfieInitialized === 'true') return;
-    root.dataset.selfieInitialized = 'true';
-
-    await waitForTransitionUnlock();
-
-    // força visibilidade dos blocos principais
-    show(root);
-    ['.selfie-header','.moldura-orientacao','.selfie-grid','.selfie-controls','.selfie-actions','.selfie-preview-wrap']
-      .forEach(sel => show(q(sel, root)));
-
-    const title      = q('.titulo-pergaminho', root);
-    const errBox     = q('#selfie-error', root);
-    const videoEl    = q('#selfieVideo', root);
-    const canvasEl   = q('#selfieCanvas', root);
-    const previewImg = q('#selfiePreview', root);
-
-    const btnSkip    = q('#btnSkipSelfie', root) || q('#btn-selfie-skip', root);
-    const btnStart   = q('#startCamBtn', root)   || q('#btn-selfie-start', root);
-    const btnPreview = q('#btn-selfie-preview', root);
-    const btnConfirm = q('#btn-selfie-confirm', root);
-    const btnNext    = q('#btn-selfie-next', root);
-
-    const zoomAll    = q('#zoomAll', root);
-    const zoomX      = q('#zoomX', root);
-    const zoomY      = q('#zoomY', root);
-
-    // título + texto
-    if (title && !title.classList.contains('typing-done')) {
-      await typeOnce(title, null, { speed: Number(title.dataset.speed||32), speak:true });
-    }
-    await initSelfieText(root);
-
-    // nome maiúsculo (se existir campo)
-    const nameInput = q('#nameInput', root);
-    if (nameInput){
-      const saved = (window.JC?.data?.nome || sessionStorage.getItem('jornada.nome') || '').toString().toUpperCase();
-      if (saved) nameInput.value = saved;
-      nameInput.addEventListener('input', ()=>{
-        const start = nameInput.selectionStart, end = nameInput.selectionEnd;
-        nameInput.value = nameInput.value.toUpperCase();
-        nameInput.setSelectionRange(start,end);
-        sessionStorage.setItem('jornada.nome', nameInput.value);
-        window.JC = window.JC || {}; window.JC.data = window.JC.data || {};
-        window.JC.data.nome = nameInput.value;
-      });
-    }
-
-    // iniciar câmera
-    btnStart?.addEventListener('click', async ()=>{
-      const ok = await startCamera(videoEl, errBox);
-      if (!ok) return;
-      btnPreview && (btnPreview.disabled = false);
-      btnConfirm && (btnConfirm.disabled = false);
-      // aplica zoom inicial
-      zoom.all = Number(zoomAll?.value || 1);
-      zoom.x   = Number(zoomX?.value || 1);
-      zoom.y   = Number(zoomY?.value || 1);
-      applyZoom(videoEl, canvasEl);
-    });
-
-    // Sincroniza o zoom com a posição da chama
-function onZoomChange() {
-  zoom.all = Number(zoomAll?.value || 1);
-  zoom.x   = Number(zoomX?.value || 1);
-  zoom.y   = Number(zoomY?.value || 1);
-  applyZoom(videoEl, canvasEl);
-  window.JCSelfieZoom = { all: zoom.all, x: zoom.x, y: zoom.y };
-  console.log('[JCSelfie] Zoom atualizado:', window.JCSelfieZoom);
-}
-
-    zoomAll?.addEventListener('input', onZoomChange);
-    zoomX?.addEventListener('input', onZoomChange);
-    zoomY?.addEventListener('input', onZoomChange);
-
-    // prévia
-    btnPreview?.addEventListener('click', ()=>{
-      if (!videoEl?.srcObject) { window.toast?.('Ative a câmera primeiro.', 'warning'); return; }
-      const dataUrl = captureToCanvas(videoEl, canvasEl);
-      previewImg.src = dataUrl;
-      show(previewImg.closest('.selfie-preview-wrap'));
-      window.JC = window.JC || {}; window.JC.data = window.JC.data || {};
-      window.JC.data.selfiePreview = dataUrl;
-      window.toast?.('Prévia gerada.', 'success');
-    });
-
-    // confirmar
-    btnConfirm?.addEventListener('click', ()=>{
-      const dataUrl = window.JC?.data?.selfiePreview;
-      if (!dataUrl) { window.toast?.('Gere uma prévia antes de confirmar.', 'warning'); return; }
-      window.JC.data.selfie = dataUrl;
-      if (btnNext){ btnNext.disabled = false; btnNext.classList.add('btn-ready-pulse'); setTimeout(()=>btnNext.classList.remove('btn-ready-pulse'), 900); }
-      window.toast?.('Foto confirmada! Você pode iniciar a próxima etapa.', 'success');
-    });
-
-    // avançar / pular com vídeo de transição
-    btnNext?.addEventListener('click', ()=> playTransition(root, btnNext, NEXT_SECTION_ID));
-    btnSkip?.addEventListener('click', ()=> playTransition(root, btnSkip, NEXT_SECTION_ID));
-
-    // limpar câmera ao sair da seção
-    document.addEventListener('section:shown', (e)=>{
-      if (e?.detail?.sectionId !== SECTION_ID && stream){
-        stream.getTracks().forEach(t=>t.stop());
-        stream = null;
-      }
-    }, { passive:true });
-
-    console.log('[JCSelfie] pronto');
-  }
-
-  function onSectionShown(evt){
-    const { sectionId, node } = evt?.detail || {};
-    if (sectionId !== SECTION_ID) return;
-    initOnce(node || document.getElementById(SECTION_ID));
-  }
-
-  document.addEventListener('section:shown', onSectionShown, { passive:true });
-
-  // fallback: se já estiver visível
-  const now = document.getElementById(SECTION_ID);
-  if (now && !now.classList.contains(HIDE_CLASS)) initOnce(now);
-
-  // libera lock quando player terminar
-  document.addEventListener('transitionVideo:ended', ()=>{
-    window.__TRANSITION_LOCK = false;
-    document.dispatchEvent(new CustomEvent('transition:ended', { detail:{ from:'selfie' } }));
+  // ---------- Utils ----------
+  const waitForElement = (sel, opt={}) => new Promise((res, rej) => {
+    let t = 0;
+    const i = setInterval(() => {
+      const e = document.querySelector(sel);
+      if (e) { clearInterval(i); res(e); }
+      else if (++t > 100) { clearInterval(i); rej(new Error('Timeout waiting for ' + sel)); }
+    }, opt.interval || 80);
   });
 
-})();
+  const placeAfter = (ref, node) => {
+    if (!ref || !ref.parentElement) return;
+    if (ref.nextSibling) {
+      ref.parentElement.insertBefore(node, ref.nextSibling);
+    } else {
+      ref.parentElement.appendChild(node);
+    }
+  };
+
+  const toast = msg => {
+    if (global.toast) return global.toast(msg);
+    console.log('[Toast]', msg);
+    alert(msg);
+  };
+
+  // ---------- Typing Effect ----------
+  async function runTyping(el) {
+    if (!el) return;
+    const text = (el.dataset.text || el.textContent || '').trim();
+    if (!text) return;
+
+    el.textContent = '';
+    el.style.opacity = '1';
+    const speed = +el.dataset.speed || 35;
+    const chars = [...text];
+    let i = 0;
+
+    return new Promise(resolve => {
+      const interval = setInterval(() => {
+        if (i < chars.length) {
+          el.textContent += chars[i++];
+        } else {
+          clearInterval(interval);
+          resolve();
+        }
+      }, speed);
+    });
+  }
+
+  // ---------- TTS (Leitura de Voz) ----------
+  function speak(text) {
+    if (!text) return;
+    if (global.speak) {
+      global.speak(text);
+    } else if ('speechSynthesis' in window) {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'pt-BR';
+      utter.rate = 0.9;
+      utter.pitch = 1;
+      window.speechSynthesis.speak(utter);
+    } else {
+      console.log('[TTS Fallback]', text);
+    }
+  }
+
+  // ---------- Header ----------
+  function ensureHeader(section) {
+    let head = section.querySelector('.selfie-header');
+    if (!head) {
+      head = document.createElement('header');
+      head.className = 'selfie-header';
+      head.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin:-6px 0 4px;';
+      head.innerHTML = `
+        <h2 data-text="Tirar sua Foto ✨" data-typing="true" data-speed="40">Tirar sua Foto ✨</h2>
+        <button id="btn-skip-selfie" class="btn btn-stone-espinhos">Não quero foto / Iniciar</button>`;
+      head.querySelector('#btn-skip-selfie').onclick = onSkip;
+      section.prepend(head);
+    }
+    return head;
+  }
+
+  // ---------- Texto Orientação (TYPING 100% FORÇADO) ----------
+async function ensureTexto(section) {
+  const upper = getUpperName();
+  let wrap = section.querySelector('#selfieOrientWrap');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = 'selfieOrientWrap';
+    wrap.style.cssText = 'display:flex;justify-content:center;margin:16px 0 12px;';
+    section.appendChild(wrap);
+  }
+
+  // REMOVE QUALQUER P ANTERIOR
+  const existing = section.querySelector('#selfieTexto');
+  if (existing) existing.remove();
+
+  const p = document.createElement('p');
+  p.id = 'selfieTexto';
+  p.style.cssText = `
+    background:rgba(0,0,0,.35);color:#f9e7c2;padding:12px 16px;border-radius:12px;
+    text-align:center;font-family:Cardo,serif;font-size:15px;margin:0 auto;width:92%;max-width:820px;
+    opacity:0; transition:opacity .5s ease;
+    white-space: nowrap; overflow: hidden; display: inline-block;
+  `;
+
+  const fullText = `${upper}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`;
+  
+  // NÃO COLOCA TEXTO NO HTML!
+  p.textContent = '';
+  p.dataset.text = fullText;
+  p.dataset.speed = "30";
+
+  wrap.appendChild(p);
+
+  // GARANTE DOM PRONTO
+  await sleep(80);
+  p.style.opacity = '1';
+
+  // TYPING COM requestAnimationFrame + PROTEÇÃO
+  await new Promise(resolve => {
+    requestAnimationFrame(() => {
+      const chars = [...fullText];
+      let i = 0;
+      const speed = 30;
+      const interval = setInterval(() => {
+        if (i < chars.length) {
+          p.textContent += chars[i++];
+        } else {
+          clearInterval(interval);
+          resolve();
+        }
+      }, speed);
+
+      // PROTEGE DE OUTROS SCRIPTS
+      const protector = setInterval(() => {
+        if (p.textContent.length > fullText.length) {
+          p.textContent = fullText.substring(0, i);
+        }
+      }, 10);
+      setTimeout(() => clearInterval(protector), 5000);
+    });
+  });
+
+  speak(fullText);
+  return p;
+}
+  // ---------- Controles ----------
+  function ensureControls(section) {
+    if (section.querySelector('#selfieControls')) return;
+
+    const style = document.createElement('style');
+    style.textContent = `
+      #selfieControls{margin:6px auto 8px;width:92%;max-width:820px;background:rgba(0,0,0,.32);
+      border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:8px 10px;color:#f9e7c2;
+      font-family:Cardo,serif;font-size:14px}
+      #selfieControls .row{display:grid;grid-template-columns:130px 1fr 56px;gap:8px;align-items:center;margin:4px 0}
+      #selfieControls input[type=range]{width:100%;height:4px;border-radius:2px;background:#555;outline:none;}
+      #selfieControls input[type=range]::-webkit-slider-thumb{background:#f9e7c2;border-radius:50%;width:14px;height:14px;}
+    `;
+    document.head.appendChild(style);
+
+    const c = document.createElement('div');
+    c.id = 'selfieControls';
+    c.innerHTML = `
+      <div class="row"><label>Zoom Geral</label><input id="zoomAll" type="range" min="0.5" max="2" step="0.01" value="1"><span id="zoomAllVal">1.00×</span></div>
+      <div class="row"><label>Zoom Horizontal</label><input id="zoomX" type="range" min="0.5" max="2" step="0.01" value="1"><span id="zoomXVal">1.00×</span></div>
+      <div class="row"><label>Zoom Vertical</label><input id="zoomY" type="range" min="0.5" max="2" step="0.01" value="1"><span id="zoomYVal">1.00×</span></div>`;
+    section.appendChild(c);
+
+    const zoomAll = c.querySelector('#zoomAll');
+    const zoomX = c.querySelector('#zoomX');
+    const zoomY = c.querySelector('#zoomY');
+    const zoomAllVal = c.querySelector('#zoomAllVal');
+    const zoomXVal = c.querySelector('#zoomXVal');
+    const zoomYVal = c.querySelector('#zoomYVal');
+
+    const update = () => {
+      const a = +zoomAll.value, x = +zoomX.value, y = +zoomY.value;
+      zoomAllVal.textContent = a.toFixed(2) + '×';
+      zoomXVal.textContent = x.toFixed(2) + '×';
+      zoomYVal.textContent = y.toFixed(2) + '×';
+    };
+    zoomAll.oninput = update;
+    zoomX.oninput = update;
+    zoomY.oninput = update;
+    update();
+  }
+
+  // ---------- Botões ----------
+  function ensureButtons(section) {
+    if (section.querySelector('#selfieButtons')) return;
+
+    const css = document.createElement('style');
+    css.textContent = `
+      #selfieButtons{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+      gap:8px;margin:8px auto;width:92%;max-width:820px}
+      #selfieButtons .btn{height:36px;line-height:36px;padding:0 10px;font-size:14px;border-radius:10px;
+      box-shadow:0 2px 8px rgba(0,0,0,.25);transition:all .2s}
+      #selfieButtons .btn:disabled{opacity:0.5;cursor:not-allowed}
+    `;
+    document.head.appendChild(css);
+
+    const div = document.createElement('div');
+    div.id = 'selfieButtons';
+    div.innerHTML = `
+      <button id="btn-prev" class="btn btn-stone-espinhos">Prévia</button>
+      <button id="btn-retake" class="btn btn-stone-espinhos" disabled>Tirar outra</button>
+      <button id="btn-confirm" class="btn btn-stone-espinhos" disabled>Confirmar / Iniciar</button>`;
+    section.appendChild(div);
+  }
+
+  // ---------- Pular Selfie ----------
+  function onSkip() {
+    if (global.JC?.show) global.JC.show('section-card');
+    else if (global.showSection) global.showSection('section-card');
+  }
+
+ // ---------- Forçar Ordem (COM MUTATIONOBSERVER + DELAY FORÇADO) ----------
+function enforceOrder(section) {
+  const order = [
+    '.selfie-header',
+    '#selfieOrientWrap',
+    '#selfieControls',
+    '#selfieButtons'
+  ];
+
+  // Função que roda múltiplas vezes até estabilizar
+  let attempts = 0;
+  const maxAttempts = 10;
+
+  const tryEnforce = () => {
+    let prev = null;
+    let changed = false;
+
+    order.forEach(sel => {
+      const el = section.querySelector(sel);
+      if (el && prev && el.previousElementSibling !== prev) {
+        el.remove();
+        placeAfter(prev, el);
+        changed = true;
+      }
+      prev = el;
+    });
+
+    attempts++;
+    if (changed && attempts < maxAttempts) {
+      setTimeout(tryEnforce, 50);
+    }
+  };
+
+  // Primeira tentativa imediata
+  tryEnforce();
+
+  // Última tentativa com delay (captura mudanças tardias)
+  setTimeout(tryEnforce, 300);
+}
+
+// Observer global: qualquer mudança no DOM, reforça ordem
+let orderObserver = null;
+function startOrderObserver(section) {
+  if (orderObserver) orderObserver.disconnect();
+
+  orderObserver = new MutationObserver(() => {
+    enforceOrder(section);
+  });
+
+  orderObserver.observe(section, {
+    childList: true,
+    subtree: true,
+    attributes: false
+  });
+
+  // Para após 3 segundos
+  setTimeout(() => {
+    if (orderObserver) orderObserver.disconnect();
+  }, 3000);
+}
+
+// ---------- Init (Play) — VERSÃO FINAL ----------
+async function play(section) {
+  const header = ensureHeader(section);
+  const title = header.querySelector('h2');
+  if (title.dataset.typing === 'true') {
+    await runTyping(title); // se ainda usar em outro lugar
+    speak(title.dataset.text);
+  }
+
+  // TEXTO VEM ANTES DE TUDO
+  await ensureTexto(section);
+
+  ensureControls(section);
+  ensureButtons(section);
+
+  startOrderObserver(section);
+  enforceOrder(section);
+}
+
+  async function init() {
+    try {
+      const section = await waitForElement('#section-selfie');
+      await play(section);
+    } catch (err) {
+      console.error('Erro ao carregar section-selfie:', err);
+    }
+  }
+
+  // Escuta evento de carregamento da seção
+  document.addEventListener('sectionLoaded', e => {
+    if (e?.detail?.sectionId === 'section-selfie') {
+      init();
+    }
+  });
+
+  // Ou DOM pronto
+  if (document.readyState !== 'loading') {
+    init();
+  } else {
+    document.addEventListener('DOMContentLoaded', init);
+  }
+
+})(window);
