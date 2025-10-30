@@ -118,33 +118,42 @@
  // ---------- Texto Orientação (NOME DINÂMICO + TYPING 100%) ----------
 async function ensureTexto(section) {
   const upper = getUpperName(); // nome do participante em caixa alta
-  const wrapId = 'selfieOrientWrap';
-  let wrap = section.querySelector(`#${wrapId}`);
-  if (!wrap) {
-    wrap = document.createElement('div');
-    wrap.id = wrapId;
-    wrap.style.cssText = 'display:flex;justify-content:center;margin:16px 0 12px;';
-    section.appendChild(wrap);
-  }
 
   const existing = section.querySelector('#selfieTexto');
   if (existing) existing.remove();
 
   const p = document.createElement('p');
   p.id = 'selfieTexto';
-  p.style.opacity = '0';
-  p.dataset.typing = "true";
-  p.dataset.speed = "30";
+  p.style.cssText = `
+    background: none;
+    color: #f9e7c2;
+    padding: 12px 16px;
+    border-radius: 12px;
+    text-align: center;
+    font-family: Cardo, serif;
+    font-size: 15px;
+    margin: 0 auto;
+    width: 92%;
+    max-width: 820px;
+    opacity: 0;
+    transition: opacity .5s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    display: inline-block;
+  `;
 
   const fullText = `${upper}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`;
+  p.dataset.typing = "true";
   p.dataset.text = fullText;
+  p.dataset.speed = "30";
 
-  wrap.appendChild(p);
+  section.appendChild(p);
   await sleep(80);
   p.style.opacity = '1';
-  await runTyping(p); // chama o efeito datilografia
-  speak(fullText);    // mantém o efeito de leitura
+  await runTyping(p);
+  speak(fullText);
 }
+
 
   // ---------- Controles ----------
   function ensureControls(section) {
