@@ -224,18 +224,21 @@
 
   // ---------- Prévia (vídeo/canvas/máscara) ----------
   function ensurePreview(section){
-    if (section.querySelector('#selfiePreview')) return;
+  if (section.querySelector('#selfiePreview')) return;
 
-    const wrap = document.createElement('div');
-    wrap.id = 'selfiePreview';
-    wrap.className = 'offline';
-    wrap.innerHTML = `
-      <video id="selfieVideo" playsinline autoplay muted></video>
-      <canvas id="selfieCanvas"></canvas>
-      <img id="selfieMask" alt="moldura" src="/assets/img/chama-card.png"/>
-    `;
-    section.appendChild(wrap);
-  }
+  const wrap = document.createElement('div');
+  wrap.id = 'selfiePreview';
+  wrap.className = 'offline';
+  wrap.innerHTML = `
+    <video id="selfieVideo" playsinline autoplay muted></video>
+    <canvas id="selfieCanvas"></canvas>
+    <!-- Guia da chama para enquadro -->
+    <img id="selfieGuide" alt="guia" src="/assets/img/chama-card.png"/>
+    <!-- Máscara/moldura final -->
+    <img id="selfieMask" alt="moldura" src="/assets/img/chama-card.png"/>
+  `;
+  section.appendChild(wrap);
+}
 
   // ---------- Câmera ----------
   let __selfieStream = null;
