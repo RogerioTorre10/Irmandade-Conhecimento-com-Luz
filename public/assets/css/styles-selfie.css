@@ -1,4 +1,4 @@
-/* ===== SECTION SELFIE ===== */
+/* ===== SECTION SELFIE - EXCLUSIVO ===== */
 
 #section-selfie {
   background: transparent !important;
@@ -6,16 +6,13 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding-top: 36px;
-  padding-bottom: 20px !important;
+  padding: 36px 16px 20px !important;
   position: relative !important;
   overflow: visible !important;
   z-index: 1 !important;
 }
 
-
-
-.section-selfie .parchment-inner-rough {
+.parchment-inner-rough {
   width: 100%;
   max-width: 980px;
   margin: 0 auto;
@@ -23,363 +20,165 @@
   flex-direction: column;
   align-items: center;
 }
-/* Slim buttons para toda a section-selfie */
-#section-selfie .btn {
-  min-width: 150px;
-  height: 36px;
-  line-height: 36px;
-  padding: 0 12px;
-  font-size: 14px;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,.25);
-}
 
-.conteudo-pergaminho { width: 100%; }
-
-/* Cabeçalho */
-.selfie-header{
-  display:flex;
+/* ===== HEADER ===== */
+.selfie-header {
+  display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  margin-bottom: 10px;
+  margin: -6px 0 10px;
+  width: 92%;
+  max-width: 820px;
 }
 
-/* /assets/css/styles-selfie.css (ou styles-base.css se preferir) */
-#section-selfie .selfie-header { margin-top: -6px; }
-#section-selfie #selfieOrientWrap { margin-top: 4px; }
-
-.titulo-pergaminho{
+.selfie-header h2 {
   margin: 0;
   font-size: 30px;
   color: #fff8dc;
   text-shadow: 2px 2px 6px rgba(0,0,0,.6);
+  font-family: 'Berkshire Swash', cursive;
 }
 
-.btn-ghost-top{
-  background: transparent;
-  border: 2px solid rgba(255,255,255,.35);
-  color: #fff;
-  border-radius: 10px;
-  padding: 8px 12px;
-  opacity: .9;
-}
-.btn-ghost-top:hover{ background: rgba(255,255,255,.08); }
-
-/* Moldura do texto orientativo */
-.selfie-container{
-  position: relative;
-  width: 340px; height: 420px;
-  margin: 18px auto 10px;
-  border-radius: 16px;
-  overflow: hidden;
-  background: #000;
-  box-shadow: 0 0 24px rgba(255,200,120,.4), inset 0 0 30px rgba(255,180,90,.15);
-}
-.texto-orientacao{
-  font-family: 'BerkshireSwash', cursive;
-  color: #fff0d0;
-  font-size: 18px;
-  line-height: 1.5;
-  opacity: 0;
-}
-.texto-orientacao.typing-active,
-.texto-orientacao.typing-done{ opacity: 1 !important; }
-
-/* Área de captura */
-.selfie-capture-wrap{
-  display:grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-  align-items: start;
-  justify-items: center;
-}
-
-/* ===== Container da câmera ===== */
-.flame-stage {
-  position: relative;
-  width: 340px;
-  height: 420px;
-  margin: 18px auto;
-  border-radius: 16px;
-  overflow: hidden;
-  background: #000;
-  box-shadow: 0 0 24px rgba(255,200,120,.4);
-}
-
-/* ===== VÍDEO E CANVAS (aqui vai a máscara!) ===== */
-#selfieVideo,
-#selfieCanvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scaleX(-1); /* espelha a câmera */
-  z-index: 1;
-}
-
-.selfie-page .flame-stage {
-  position: relative;
-  width: 100%;
-  height: 420px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: radial-gradient(circle at center, rgba(255,255,255,0.15), rgba(0,0,0,0.7));
-  overflow: hidden;
-
-  #selfieCanvas {
-  -webkit-mask-image: url('/assets/img/chama-card.png?v=1') !important;
-  mask-image: url('/assets/img/chama-card.png?v=1') !important;
-  -webkit-mask-size: 68% 94% !important;
-  mask-size: 68% 94% !important;
-  -webkit-mask-position: 50% 58% !important;
-  mask-position: 50% 58% !important;
-  -webkit-mask-repeat: no-repeat !important;
-  mask-repeat: no-repeat !important;
-  -webkit-mask-mode: alpha !important;
-  mask-mode: alpha !important;
-}
-  z-index: 2;
-  border-radius: 20px;
-  box-shadow: 0 0 15px rgba(255, 190, 100, 0.25);
-}
-
-.selfie-page #selfieVideo,
-.selfie-page #selfieCanvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform-origin: 50% 60%;
-}
-
-/* Vídeo como "fundo vivo" (espelhado) */
-.selfie-container video{
-  position:absolute; inset:0;
-  width:100%; height:100%;
-  object-fit: cover;
-  transform: scaleX(-1);
-  filter: brightness(1.05) contrast(1.08);
-  z-index:2;
-}
-
-/* brilho decorativo (não interfere na máscara) */
-.selfie-page .flame-mask{
-  position:absolute; inset:0; pointer-events:none;
-  background:
-    radial-gradient(ellipse at 50% 80%, rgba(255,180,70,.45), rgba(255,140,30,0) 60%),
-    radial-gradient(circle  at 50% 18%, rgba(255,230,160,.85), rgba(255,160,40,0) 58%);
-  mix-blend-mode: screen;
-}
-
-/* header: título + "Não quero foto" lado a lado */
-.selfie-page .selfie-header{
-  display:flex; align-items:center; justify-content:space-between; gap:16px;
-}
-.selfie-page .btn-ghost-top{ white-space:nowrap; }
-
-/* garantir visibilidade dos blocos */
-.selfie-page .moldura-orientacao,
-.selfie-page .selfie-grid,
-.selfie-page .selfie-controls,
-.selfie-page .selfie-actions,
-.selfie-page .selfie-preview-wrap{
-  opacity:1!important; visibility:visible!important;
-}
-
-/* ranges e botões organizados */
-.selfie-page .selfie-controls{ display:flex; flex-wrap:wrap; gap:14px; justify-content:center; }
-.selfie-page .ranges{ display:flex; flex-wrap:wrap; gap:16px; justify-content:center; }
-.selfie-page .ranges label{ display:flex; flex-direction:column; align-items:center; gap:6px; color:#f1e6c7; }
-.selfie-page .ranges input[type="range"]{ width:220px; }
-
-
-/* Remove qualquer "fundo do card" que possa ter vazado para a selfie */
-.selfie-page{ background-image:none!important; }
-
-/* Canvas de prévia fica oculto até ser exibido pelo JS */
-.selfie-container canvas{ display:none; }
-
-.selfie-zoom{
-  display:flex; gap:10px; align-items:center; justify-content:center;
-  flex-wrap:wrap; margin:6px 0 8px;
-}
-.selfie-zoom label{ font-size:.95rem; opacity:.9; }
-
-/* Ações */
-.selfie-actions {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 20px;
-  z-index: 10 !important;
-  position: relative;
-}
-.selfie-status{
-  margin-top:8px; text-align:center; min-height:1.2em;
-  color:#ffd79a; text-shadow:0 0 6px rgba(255,180,50,.35);
-}
-
-@media (max-width:480px){
-  .selfie-container{ width:288px; height:356px; }
-}
-
-:root {
-  --chama-mask-src: url('/assets/img/chama-card.png?v=1');
-  --chama-size-w: 68%;
-  --chama-size-h: 94%;
-  --chama-pos-x: 50%;
-  --chama-pos-y: 58%;
-  --chama-pivot-y: 0.58;
-}
-/* remove fundo duplicado e destaca só o pergaminho */
-.selfie-page {
-  background: none !important;
-}
-/* FORÇA VISIBILIDADE DOS CONTROLES */
-.selfie-controls,
-.selfie-actions {
-  display: flex !important;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  margin: 20px 0;
-  z-index: 10;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-/* Corrige espaçamento entre os elementos */
-.selfie-controls {
-  margin-top: 12px;
-  margin-bottom: 8px;
-}
-
-.selfie-actions {
-  margin-top: 16px;
-}
-.ranges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  justify-content: center;
-}
-
-.ranges label {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: #f1e6c7;
-  font-size: 0.9rem;
-}
-
-.ranges input[type="range"] {
-  width: 200px;
-  accent-color: #e6b873;
-}
-
-
-/* Efeitos medievais nos botões */
-.selfie-actions button {
-  min-width: 120px;
-  padding: 10px 16px;
-  background: rgba(255, 220, 160, 0.2);
-  border: 1px solid rgba(255, 220, 180, 0.5);
-  color: #fff8e6;
-  border-radius: 12px;
+/* BOTÃO DO TOPO - TEXTURA MEDIEVAL */
+#btn-skip-selfie {
+  min-width: 150px;
+  height: 36px;
+  line-height: 36px;
+  padding: 0 14px;
+  font-size: 14px;
   font-family: 'Cardo', serif;
-  box-shadow: 0 0 10px rgba(255, 200, 120, 0.3);
-  transition: all 0.3s;
+  color: #f9e7c2;
+  background: rgba(139, 69, 19, 0.3) !important;
+  border: 1px solid rgba(255, 215, 0, 0.3) !important;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  backdrop-filter: blur(1px);
+  transition: all .2s ease;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
-.selfie-actions button:hover:not(:disabled) {
-  background: rgba(255, 230, 190, 0.3);
-  transform: scale(1.05);
+#btn-skip-selfie:hover {
+  background: rgba(139, 69, 19, 0.5) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.4);
 }
-.selfie-actions button:disabled {
-  opacity: 0.4;
+
+/* ===== TEXTO ORIENTAÇÃO ===== */
+#selfieOrientWrap {
+  margin: 16px auto 14px !important;
+  width: 92% !important;
+  max-width: 820px !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+#selfieTexto {
+  background: rgba(0,0,0,.35) !important;
+  color: #f9e7c2 !important;
+  padding: 12px 16px !important;
+  border-radius: 12px !important;
+  text-align: left !important;
+  font-family: Cardo, serif !important;
+  font-size: 15px !important;
+  line-height: 1.5 !important;
+  margin: 0 !important;
+  width: 100% !important;
+  max-width: 820px !important;
+  opacity: 0 !important;
+  transition: opacity .5s ease !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,.3) !important;
+  pointer-events: none !important;
+}
+
+/* ===== CONTROLES DE ZOOM ===== */
+#selfieControls {
+  margin: 6px auto 8px;
+  width: 92%;
+  max-width: 820px;
+  padding: 8px 10px;
+  color: #f9e7c2;
+  font-family: Cardo, serif;
+  font-size: 14px;
+  background: transparent !important;
+  border: none !important;
+}
+
+#selfieControls .row {
+  display: grid;
+  grid-template-columns: 130px 1fr 56px;
+  gap: 8px;
+  align-items: center;
+  margin: 4px 0;
+}
+
+#selfieControls input[type=range] {
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,.2);
+  outline: none;
+}
+
+#selfieControls input[type=range]::-webkit-slider-thumb {
+  background: #f9e7c2;
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  box-shadow: 0 0 6px rgba(249,231,194,.8);
+}
+
+/* ===== BOTÕES DE AÇÃO ===== */
+#selfieButtons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  margin: 8px auto;
+  width: 92%;
+  max-width: 820px;
+}
+
+#selfieButtons .btn {
+  height: 36px;
+  line-height: 36px;
+  padding: 0 10px;
+  font-size: 14px;
+  border-radius: 10px;
+  background: rgba(139, 69, 19, 0.3) !important;
+  border: 1px solid rgba(255,215,0,.3);
+  color: #f9e7c2;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  transition: all .2s;
+  backdrop-filter: blur(1px);
+  font-family: 'Cardo', serif;
+  cursor: pointer;
+}
+
+#selfieButtons .btn:hover:not(:disabled) {
+  background: rgba(139, 69, 19, 0.5) !important;
+  transform: translateY(-1px);
+}
+
+#selfieButtons .btn:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-/* Sliders visíveis e harmônicos */
-.selfie-controls input[type="range"] {
-  accent-color: #e6b873;
-  width: 200px;
-}
-/* Botões pulsando quando prontos */
-.btn-ready-pulse {
-  animation: pulse 0.9s ease-in-out;
-}
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.08); box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); }
-}
-.selfie-controls,
-.selfie-actions,
-.moldura-orientacao,
-.flame-stage,
-#selfieVideo,
-#selfieCanvas {
-  display: flex !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  z-index: 10 !important;
-}
-/* Força botões */
-.selfie-actions button,
-.selfie-controls input,
-.selfie-controls label {
-  display: inline-block !important;
-  opacity: 1 !important;
-  pointer-events: auto !important;
-}
-/* WRAP DO TEXTO */
-  #selfieOrientWrap {
-    display: flex !important;
-    justify-content: center !important;
-    margin: 16px auto 14px !important;
-    width: 94% !important;
-    max-width: 840px !important;
-    position: relative !important;
-    z-index: 20 !important;
-    order: 1 !important;
-    flex: 0 0 auto !important;
-  }
-
-  /* TEXTO EM SI */
-  #selfieTexto {
-    background: rgba(0,0,0,.38) !important;
-    color: #f9e7c2 !important;
-    padding: 12px 16px !important;
-    border-radius: 12px !important;
-    text-align: center !important;
-    font-family: Cardo, serif !important;
-    font-size: 15px !important;
-    margin: 0 auto !important;
-    width: 100% !important;
-    max-width: 820px !important;
-    opacity: 1 !important;
-    transition: opacity .5s ease !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    display: inline-block !important;
-    position: relative !important;
-    z-index: 21 !important;
-    pointer-events: none !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,.3) !important;
-  }
-
-  /* CONTROLES E BOTÕES */
-  #selfieControls {
-    order: 2 !important;
-    z-index: 10 !important;
-  }
+/* ===== RESPONSIVO ===== */
+@media (max-width: 480px) {
+  #selfieOrientWrap,
+  #selfieControls,
   #selfieButtons {
-    order: 3 !important;
-    z-index: 10 !important;
+    width: 95% !important;
+    padding: 0 8px !important;
   }
-
-  
+  #selfieTexto {
+    font-size: 14px !important;
+  }
+  .selfie-header h2 {
+    font-size: 26px;
+  }
+}
