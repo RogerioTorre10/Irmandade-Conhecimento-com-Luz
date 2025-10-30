@@ -181,17 +181,23 @@
     const zoomYVal = c.querySelector('#zoomYVal');
 
     const update = () => {
-      const a = +zoomAll.value, x = +zoomX.value, y = +zoomY.value;
-      zoomAllVal.textContent = a.toFixed(2) + '×';
-      zoomXVal.textContent = x.toFixed(2) + '×';
-      zoomYVal.textContent = y.toFixed(2) + '×';
-      // pontos para você plugar na transformação do vídeo/canvas no futuro
-    };
-    zoomAll.oninput = update;
-    zoomX.oninput = update;
-    zoomY.oninput = update;
-    update();
+  const a = +zoomAll.value, x = +zoomX.value, y = +zoomY.value;
+  zoomAllVal.textContent = a.toFixed(2) + '×';
+  zoomXVal.textContent = x.toFixed(2) + '×';
+  zoomYVal.textContent = y.toFixed(2) + '×';
+
+  // Aplica zoom no preview em tempo real
+  const preview = section.querySelector('#selfiePreview');
+  if (preview){
+    preview.style.setProperty('--zoomAll', a);
+    preview.style.setProperty('--zoomX', x);
+    preview.style.setProperty('--zoomY', y);
   }
+};
+zoomAll.oninput = update;
+zoomX.oninput = update;
+zoomY.oninput = update;
+update();
 
   // ---------- Botões ----------
   function ensureButtons(section) {
