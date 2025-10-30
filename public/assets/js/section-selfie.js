@@ -12,27 +12,44 @@
 
   const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-  // ---------- Nome ----------
-  function getUpperName() {
-    const jc = (global.JC && global.JC.data) ? global.JC.data : {};
-    let name = jc.nome || jc.participantName;
-    if (!name) {
-      try {
-        const ls = localStorage.getItem('jc.nome') || localStorage.getItem('jc.participantName');
-        if (ls) name = ls;
-      } catch {}
-    }
-    if (!name || typeof name !== 'string') name = 'AMOR';
-    const upper = name.toUpperCase().trim();
+  // ---------- Nome (robusto) ----------
+function getUpperName() {
+  const G = (window.JC && window.JC.data) ? window.JC.data : {};
+
+  // 1) JC.data
+  let name = G.nome || G.participantName;
+
+  // 2) localStorage
+  if (!name) {
     try {
-      global.JC = global.JC || {}; 
-      global.JC.data = global.JC.data || {};
-      global.JC.data.nome = upper; 
-      global.JC.data.participantName = upper;
-      try { localStorage.setItem('jc.nome', upper); } catch {}
+      name = localStorage.getItem('jc.nome') ||
+             localStorage.getItem('jc.participantName') ||
+             localStorage.getItem('participantName');
     } catch {}
-    return upper;
   }
+
+  // 3) query string (?name=...)
+  if (!name) {
+    try {
+      const u = new URL(window.location.href);
+      const qn = u.searchParams.get('name') || u.searchParams.get('nome');
+      if (qn) name = qn;
+    } catch {}
+  }
+
+  if (!name || typeof name !== 'string') name = 'AMOR';
+  const upper = name.toUpperCase().trim();
+
+  // Sincroniza de volta (pra próximas seções)
+  try {
+    window.JC = window.JC || {}; window.JC.data = window.JC.data || {};
+    window.JC.data.nome = upper; window.JC.data.participantName = upper;
+    try { localStorage.setItem('jc.nome', upper); } catch {}
+  } catch {}
+
+  return upper;
+}
+
 
   // ---------- Utils ----------
   const waitForElement = (sel, opt={}) => new Promise((res, rej) => {
@@ -115,9 +132,10 @@
     return head;
   }
 
-  // ---------- Texto Orientação (TYPING 100% FORÇADO) ----------
+ // ---------- Texto Orientação (com name + typing bridge) ----------
 async function ensureTexto(section) {
   const upper = getUpperName();
+
   let wrap = section.querySelector('#selfieOrientWrap');
   if (!wrap) {
     wrap = document.createElement('div');
@@ -126,60 +144,72 @@ async function ensureTexto(section) {
     section.appendChild(wrap);
   }
 
-  // REMOVE QUALQUER P ANTERIOR
-  const existing = section.querySelector('#selfieTexto');
-  if (existing) existing.remove();
+  // remove P anterior pra evitar lixo de estilos
+  const old = section.querySelector('#selfieTexto');
+  if (old) old.remove();
 
   const p = document.createElement('p');
   p.id = 'selfieTexto';
+  p.className = 'parchment-text-rough lumen-typing';
   p.style.cssText = `
     background:rgba(0,0,0,.35);color:#f9e7c2;padding:12px 16px;border-radius:12px;
     text-align:center;font-family:Cardo,serif;font-size:15px;margin:0 auto;width:92%;max-width:820px;
-    opacity:0; transition:opacity .5s ease;
-    white-space: nowrap; overflow: hidden; display: inline-block;
-  `;
+    opacity:1;visibility:visible;min-height:48px;max-height:none;overflow:visible;display:block;`;
 
   const fullText = `${upper}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`;
-  
-  // NÃO COLOCA TEXTO NO HTML!
-  p.textContent = '';
-  p.dataset.text = fullText;
-  p.dataset.speed = "30";
 
+  // dataset pro TypingBridge
+  p.dataset.text  = fullText;
+  p.dataset.speed = '28';
+  p.dataset.tts   = 'true';
+  p.dataset.voice = 'lumen';
+
+  // conteúdo inicial (bridge pode sobrescrever)
+  p.textContent = fullText;
   wrap.appendChild(p);
 
-  // GARANTE DOM PRONTO
-  await sleep(80);
-  p.style.opacity = '1';
+  // força visibilidade contra resets de transição/CSS globais
+  const shield = document.getElementById('selfieTextForce') || (() => {
+    const s = document.createElement('style'); s.id = 'selfieTextForce';
+    s.textContent = `
+      #section-selfie #selfieTexto,
+      #section-selfie .lumen-typing { opacity:1!important; visibility:visible!important;
+        display:block!important; max-height:none!important; overflow:visible!important; transition:none!important; }`;
+    document.head.appendChild(s); return s;
+  })();
 
-  // TYPING COM requestAnimationFrame + PROTEÇÃO
-  await new Promise(resolve => {
-    requestAnimationFrame(() => {
+  // DATILOGRAFIA
+  try {
+    const hasBridge = (window.TypingBridge && typeof window.TypingBridge.runTyping === 'function');
+    if (hasBridge) {
+      window.G = window.G || {}; window.G.__typingLock = false;
+      p.textContent = ''; // deixa a digitação começar do zero
+      await window.TypingBridge.runTyping(p);
+    } else {
+      // fallback (suave)
+      p.textContent = '';
       const chars = [...fullText];
-      let i = 0;
-      const speed = 30;
-      const interval = setInterval(() => {
-        if (i < chars.length) {
+      const speed = +p.dataset.speed || 28;
+      await new Promise(resolve => {
+        let i = 0;
+        const iv = setInterval(() => {
           p.textContent += chars[i++];
-        } else {
-          clearInterval(interval);
-          resolve();
-        }
-      }, speed);
+          if (i >= chars.length) { clearInterval(iv); resolve(); }
+        }, speed);
+      });
+    }
+  } finally {
+    // fala no final
+    if (window.speak) window.speak(fullText);
+    else if ('speechSynthesis' in window) {
+      const u = new SpeechSynthesisUtterance(fullText);
+      u.lang = 'pt-BR'; u.rate = 0.95; u.pitch = 1; speechSynthesis.speak(u);
+    }
+  }
 
-      // PROTEGE DE OUTROS SCRIPTS
-      const protector = setInterval(() => {
-        if (p.textContent.length > fullText.length) {
-          p.textContent = fullText.substring(0, i);
-        }
-      }, 10);
-      setTimeout(() => clearInterval(protector), 5000);
-    });
-  });
-
-  speak(fullText);
   return p;
 }
+
   // ---------- Controles ----------
   function ensureControls(section) {
     if (section.querySelector('#selfieControls')) return;
@@ -313,23 +343,31 @@ function startOrderObserver(section) {
 }
 
 // ---------- Init (Play) — VERSÃO FINAL ----------
+// ---------- Play (ordem: Header → Texto → Controles → Botões) ----------
 async function play(section) {
   const header = ensureHeader(section);
+  // Se o título tiver data-typing, mantém o do Zion
   const title = header.querySelector('h2');
-  if (title.dataset.typing === 'true') {
-    await runTyping(title); // se ainda usar em outro lugar
-    speak(title.dataset.text);
+  if (title && title.dataset && title.dataset.typing === 'true') {
+    // usa runTyping local do arquivo
+    if (typeof runTyping === 'function') {
+      await runTyping(title);
+      speak(title.dataset.text || title.textContent);
+    }
   }
 
-  // TEXTO VEM ANTES DE TUDO
-  await ensureTexto(section);
+  await ensureTexto(section); // texto primeiro (já com name)
 
   ensureControls(section);
   ensureButtons(section);
 
-  startOrderObserver(section);
-  enforceOrder(section);
+  // reforço pós-transição (se algum CSS tentar esconder de novo)
+  setTimeout(() => {
+    const t = section.querySelector('#selfieTexto');
+    if (t) { t.style.opacity = '1'; t.style.visibility = 'visible'; t.style.display = 'block'; }
+  }, 500);
 }
+
 
   async function init() {
     try {
