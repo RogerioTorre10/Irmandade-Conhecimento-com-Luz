@@ -296,24 +296,22 @@ async function play(section) {
     speak(title.dataset.text);
   }
 
-  // TEXTO VEM ANTES DE TUDO
-  await ensureTexto(section);
+ async function init() {
+  try {
+    const section = await waitForElement('#section-selfie');
+    if (!section) throw new Error('Section não encontrada');
 
-  ensureControls(section);
-  ensureButtons(section);
-
-  startOrderObserver(section);
-  enforceOrder(section);
+    await ensureTexto(section); // insere o texto com datilografia
+    ensureControls(section);    // sliders
+    ensureButtons(section);     // botões
+    startOrderObserver(section);
+    enforceOrder(section);
+  } catch (err) {
+    console.error('Erro ao carregar section-selfie:', err);
+    toast('Algo deu errado ao carregar a seção. Tente recarregar.');
+  }
 }
 
-  async function init() {
-    try {
-      const section = await waitForElement('#section-selfie');
-      await play(section);
-    } catch (err) {
-      console.error('Erro ao carregar section-selfie:', err);
-    }
-  }
 
   // Escuta evento de carregamento da seção
   document.addEventListener('sectionLoaded', e => {
