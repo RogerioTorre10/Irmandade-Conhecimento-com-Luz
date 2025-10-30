@@ -1,6 +1,5 @@
 /* =======================================================
-   STYLES-SELFIE.CSS — versão completa unificada
-   Inclui textura medieval espinhos e ajustes visuais
+   STYLES-SELFIE.CSS — versão completa com brilho pulsante
    ======================================================= */
 
 /* Reset básico */
@@ -138,9 +137,10 @@
   letter-spacing: .3px;
   position: relative;
   cursor: pointer;
+  overflow: hidden;
 }
 
-/* Borda/reluz interno */
+/* Borda e relevo interno */
 #btn-skip-selfie.btn-stone-espinhos::after,
 #selfieButtons .btn.btn-stone-espinhos::after {
   content: '';
@@ -153,17 +153,36 @@
   pointer-events: none;
 }
 
-/* Hover e active */
-#btn-skip-selfie.btn-stone-espinhos:hover:not(:disabled),
-#selfieButtons .btn.btn-stone-espinhos:hover:not(:disabled) {
-  filter: brightness(1.06);
-  transform: translateY(-1px);
+/* ✨ Brilho pulsante dourado */
+@keyframes brilhoDivino {
+  0%, 100% {
+    box-shadow:
+      0 0 6px rgba(255, 230, 120, 0.4),
+      0 0 12px rgba(255, 200, 50, 0.25),
+      inset 0 0 2px rgba(255, 255, 200, 0.15);
+  }
+  50% {
+    box-shadow:
+      0 0 10px rgba(255, 240, 160, 0.65),
+      0 0 16px rgba(255, 220, 120, 0.45),
+      inset 0 0 4px rgba(255, 255, 230, 0.25);
+  }
 }
 
+/* Hover: ativa o brilho pulsante */
+#btn-skip-selfie.btn-stone-espinhos:hover:not(:disabled),
+#selfieButtons .btn.btn-stone-espinhos:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  animation: brilhoDivino 1.8s ease-in-out infinite;
+}
+
+/* Active */
 #btn-skip-selfie.btn-stone-espinhos:active:not(:disabled),
 #selfieButtons .btn.btn-stone-espinhos:active:not(:disabled) {
   transform: translateY(0);
   filter: brightness(0.98);
+  animation: none;
 }
 
 /* Estado desabilitado */
@@ -172,4 +191,9 @@
   opacity: .7;
   filter: grayscale(.15);
   cursor: not-allowed;
+  animation: none;
 }
+
+/* =======================================================
+   FIM DO STYLES-SELFIE.CSS
+   ======================================================= */
