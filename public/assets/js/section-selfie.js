@@ -22,7 +22,7 @@
         if (ls) name = ls;
       } catch {}
     }
-    if (!name || typeof name !== 'string') name = 'AMOR';
+    if (!name || typeof name !== 'string') name = 'ANJO';
     const upper = name.toUpperCase().trim();
     try {
       global.JC = global.JC || {}; 
@@ -115,9 +115,9 @@
     return head;
   }
 
-  // ---------- Texto Orientação (TYPING 100% FORÇADO) ----------
+ // ---------- Texto Orientação (CORRIGIDO: NÃO BLOQUEIA MAIS) ----------
 async function ensureTexto(section) {
-  const upper = getUpperName();
+  const upper = getUpperName(); // já é síncrono e seguro
   let wrap = section.querySelector('#selfieOrientWrap');
   if (!wrap) {
     wrap = document.createElement('div');
@@ -126,8 +126,8 @@ async function ensureTexto(section) {
     section.appendChild(wrap);
   }
 
-  // REMOVE QUALQUER P ANTERIOR
-  const existing = section.querySelector('#selfieTexto');
+  // REMOVE apenas o p antigo
+  const existing = wrap.querySelector('#selfieTexto');
   if (existing) existing.remove();
 
   const p = document.createElement('p');
@@ -140,45 +140,37 @@ async function ensureTexto(section) {
   `;
 
   const fullText = `${upper}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`;
-  
-  // NÃO COLOCA TEXTO NO HTML!
-  p.textContent = '';
   p.dataset.text = fullText;
   p.dataset.speed = "30";
+  p.textContent = ''; // começa vazio
 
   wrap.appendChild(p);
 
-  // GARANTE DOM PRONTO
-  await sleep(80);
-  p.style.opacity = '1';
-
-  // TYPING COM requestAnimationFrame + PROTEÇÃO
-  await new Promise(resolve => {
-    requestAnimationFrame(() => {
-      const chars = [...fullText];
-      let i = 0;
-      const speed = 30;
-      const interval = setInterval(() => {
-        if (i < chars.length) {
-          p.textContent += chars[i++];
-        } else {
-          clearInterval(interval);
-          resolve();
-        }
-      }, speed);
-
-      // PROTEGE DE OUTROS SCRIPTS
-      const protector = setInterval(() => {
-        if (p.textContent.length > fullText.length) {
-          p.textContent = fullText.substring(0, i);
-        }
-      }, 10);
-      setTimeout(() => clearInterval(protector), 5000);
-    });
+  // Mostra imediatamente (sem await)
+  requestAnimationFrame(() => {
+    p.style.opacity = '1';
   });
 
-  speak(fullText);
+  // Inicia datilografia EM PARALELO (não bloqueia)
+  startTyping(p, fullText, 30);
+  speak(fullText); // TTS em paralelo
+
   return p;
+}
+
+// Função separada para datilografia (não bloqueia)
+function startTyping(el, text, speed) {
+  const chars = [...text];
+  let i = 0;
+  el.textContent = '';
+
+  const interval = setInterval(() => {
+    if (i < chars.length) {
+      el.textContent += chars[i++];
+    } else {
+      clearInterval(interval);
+    }
+  }, speed);
 }
   // ---------- Controles ----------
   function ensureControls(section) {
@@ -317,16 +309,17 @@ async function play(section) {
   const header = ensureHeader(section);
   const title = header.querySelector('h2');
   if (title.dataset.typing === 'true') {
-    await runTyping(title); // se ainda usar em outro lugar
+    runTyping(title); // sem await
     speak(title.dataset.text);
   }
 
-  // TEXTO VEM ANTES DE TUDO
-  await ensureTexto(section);
+  // CRIA TUDO EM PARALELO
+  ensureTexto(section);     // ← não await
+  ensureControls(section);  // ← imediato
+  ensureButtons(section);   // ← imediato
 
-  ensureControls(section);
-  ensureButtons(section);
-
+  // Força ordem APÓS tudo estar no DOM
+  await sleep(100);
   startOrderObserver(section);
   enforceOrder(section);
 }
