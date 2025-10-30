@@ -2,13 +2,18 @@
 
 #section-selfie {
   background: transparent !important;
-  min-height: 85vh;
+  min-height: 600px !important;
   display: flex;
   justify-content: center;
   align-items: flex-start;
   padding-top: 36px;
-  padding-bottom: 48px;
+  padding-bottom: 20px !important;
+  position: relative !important;
+  overflow: visible !important;
+  z-index: 1 !important;
 }
+
+
 
 .section-selfie .parchment-inner-rough {
   width: 100%;
@@ -331,3 +336,50 @@
   opacity: 1 !important;
   pointer-events: auto !important;
 }
+/* WRAP DO TEXTO */
+  #selfieOrientWrap {
+    display: flex !important;
+    justify-content: center !important;
+    margin: 16px auto 14px !important;
+    width: 94% !important;
+    max-width: 840px !important;
+    position: relative !important;
+    z-index: 20 !important;
+    order: 1 !important;
+    flex: 0 0 auto !important;
+  }
+
+  /* TEXTO EM SI */
+  #selfieTexto {
+    background: rgba(0,0,0,.38) !important;
+    color: #f9e7c2 !important;
+    padding: 12px 16px !important;
+    border-radius: 12px !important;
+    text-align: center !important;
+    font-family: Cardo, serif !important;
+    font-size: 15px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 820px !important;
+    opacity: 1 !important;
+    transition: opacity .5s ease !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    display: inline-block !important;
+    position: relative !important;
+    z-index: 21 !important;
+    pointer-events: none !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,.3) !important;
+  }
+
+  /* CONTROLES E BOTÕES */
+  #selfieControls {
+    order: 2 !important;
+    z-index: 10 !important;
+  }
+  #selfieButtons {
+    order: 3 !important;
+    z-index: 10 !important;
+  }
+
+  
