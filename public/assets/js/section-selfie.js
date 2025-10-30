@@ -115,7 +115,6 @@
     return head;
   }
 
- // ---------- Texto Orientação (NOME DINÂMICO + TYPING 100%) ----------
 // ---------- Texto Orientação (NOME DINÂMICO + TYPING 100%) ----------
 async function ensureTexto(section) {
   // 1. AGUARDA O NOME ESTAR PRONTO (máx 3s)
@@ -257,12 +256,21 @@ async function ensureTexto(section) {
 
  // ---------- Forçar Ordem (COM MUTATIONOBSERVER + DELAY FORÇADO) ----------
 function enforceOrder(section) {
-  const order = [
-    '.selfie-header',
-    '#selfieOrientWrap',
-    '#selfieControls',
-    '#selfieButtons'
-  ];
+  const wrap = section.querySelector('#selfieOrientWrap');
+  const controls = section.querySelector('#selfieControls');
+  const buttons = section.querySelector('#selfieButtons');
+
+  if (wrap && controls && wrap.nextElementSibling !== controls) {
+    section.insertBefore(wrap, controls);
+  }
+  if (controls && buttons && controls.nextElementSibling !== buttons) {
+    section.insertBefore(controls, buttons);
+  }
+
+  // Força layout
+  section.style.display = 'block';
+  void section.offsetHeight;
+}
 
   // Função que roda múltiplas vezes até estabilizar
   let attempts = 0;
