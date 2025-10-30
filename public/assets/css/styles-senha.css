@@ -4,7 +4,6 @@
   margin: 20px auto;
   padding: 8px;
   border: 2px solid var(--card-2);
-  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
   background-image: url('/assets/img/textura-de-pedra.jpg') !important;
   background-size: cover !important;
   background-position: center !important;
