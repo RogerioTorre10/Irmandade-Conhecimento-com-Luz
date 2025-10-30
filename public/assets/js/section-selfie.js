@@ -17,7 +17,7 @@
   const SECTION_ID = 'section-selfie';
   const NEXT_SECTION_ID = 'section-card';
   const VIDEO_SRC = '/assets/video/filme-eu-na-irmandade.mp4';
-  const MASK_URL = '/assets/img/chama-mask.png'; // troque pela sua nova máscara se quiser
+  const MASK_URL = '/assets/img/chama-card.png'; // troque pela sua nova máscara se quiser
 
   const sleep = ms => new Promise(r => setTimeout(r, ms));
 
