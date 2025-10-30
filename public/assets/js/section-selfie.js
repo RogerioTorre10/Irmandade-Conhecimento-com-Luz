@@ -91,7 +91,7 @@
       head.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin:-6px 0 4px;';
       head.innerHTML = `
         <h2 data-text="Tirar sua Foto" data-typing="true" data-speed="40">Tirar sua Foto ✨</h2>
-        <button id="btn-skip-selfie" class="btn btn-stone-espinhos">Não quero foto / Iniciar</button>
+        <button id="btn-skip-selfie" class="btn btn-stone">Não quero foto / Iniciar</button>
       `;
       head.querySelector('#btn-skip-selfie').onclick = onSkip;
       section.prepend(head);
