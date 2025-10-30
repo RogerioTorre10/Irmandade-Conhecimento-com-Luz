@@ -246,6 +246,15 @@
 }
 
 /* ===== Fix 2: textura de pedra no botão do topo (override seguro) ===== */
+:root { --btn-stone-img: url('/assets/img/textura-de-pedra.jpg'); }
+
+#btn-skip-selfie.btn-stone-espinhos{
+  background: transparent !important;
+  background-image: var(--btn-stone-img) !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  border: none !important;
+}
 #btn-skip-selfie.btn-stone {
   background:
     linear-gradient(to bottom, #a0a0a0, #808080),
