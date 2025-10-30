@@ -388,9 +388,14 @@ update();
     startOrderObserver(section);
     enforceOrder(section);
 
-    // Câmera + eventos
-    await startCamera(section);
-
+     // Câmera + eventos (somente se o container existe)
+ if (section.querySelector('#selfiePreview')) {
+   await startCamera(section);
+ } else {
+   console.warn('[Selfie] #selfiePreview não encontrado — recriando…');
+   ensurePreview(section);
+   await startCamera(section);
+ }
     const btnPrev = section.querySelector('#btn-prev');
     const btnRetake = section.querySelector('#btn-retake');
     const btnConfirm = section.querySelector('#btn-confirm');
