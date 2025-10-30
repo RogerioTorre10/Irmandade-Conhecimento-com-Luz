@@ -3,9 +3,22 @@
    Inclui import do módulo universal de brilho e texturas
    ======================================================= */
 
-/* Importa o módulo com efeitos visuais universais */
-@import url('/assets/css/brilho-texturas.css');
+/* =======================================================
+   ISOLAMENTO DO MÓDULO DE BRILHO
+   ======================================================= */
 
+/* Escopo limitado — evita afetar textos e containers */
+#section-selfie,
+#section-guia,
+#section-card,
+#section-final {
+  all: revert-layer; /* reseta heranças globais */
+}
+
+/* Importa o módulo dentro de um layer isolado */
+@layer brilho {
+  @import url('/assets/css/brilho-texturas.css');
+}
 
 /* ========== VARIÁVEIS GLOBAIS ========== */
 :root {
