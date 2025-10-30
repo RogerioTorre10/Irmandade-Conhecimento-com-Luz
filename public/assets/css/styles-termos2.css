@@ -42,6 +42,96 @@
 .termos-actions .btn-continuar:hover {
   transform: scale(1.05);
 }
+/* Mimos */
+@keyframes btnReady {
+  0% { transform: scale(0.98); filter: brightness(0.9); }
+  60% { transform: scale(1.02); filter: brightness(1.1); }
+  100% { transform: scale(1); filter: none; }
+}
+@keyframes introTitleIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes introPan {
+  0%   { transform: translateY(4px); }
+  50%  { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+
+/* Responsivo */
+@media (max-width: 480px) {
+  #section-intro { padding: 16px; max-width: 92vw; }
+  .intro-title { font-size: 28px; margin-top: 24px; }
+  .parchment-text-rough { font-size: 12.5px; }
+}
+/* Cursor de datilografia — habilitado por data-cursor="true" */
+#section-intro [data-typing="true"][data-cursor="true"] {
+  position: relative;
+  display: inline-block;                 /* garante área para o cursor */
+  padding-right: 0.35em;                 /* respiro para o cursor */
+}
+
+/* Mostra o cursor enquanto digita */
+#section-intro [data-typing="true"][data-cursor="true"].typing-active::after {
+  content: '';
+  position: absolute;
+  right: 0.05em;
+  bottom: 0.12em;
+  width: 0.5ch;
+  height: 1.1em;
+  background: linear-gradient(180deg, #ffd36b 0%, #ffbf3b 80%, #b27a1a 100%); /* dourado */
+  border-radius: 2px;
+  opacity: 0.95;
+  animation: caretBlink 1s steps(1, end) infinite;
+  box-shadow: 0 0 6px rgba(255, 200, 80, 0.9);
+}
+
+/* Some quando terminou a digitação */
+#section-intro [data-typing="true"][data-cursor="true"].typing-done::after {
+  content: none;
+}
+
+@keyframes caretBlink {
+  0%, 45%   { opacity: 0.95; }
+  50%, 100% { opacity: 0; }
+}
+/* Halo dourado no pergaminho enquanto há um bloco datilografando */
+#section-intro:has(.typing-active) .parchment-inner-rough {
+  outline: 2px solid rgba(255, 204, 102, 0.25);                /* aro leve */
+  outline-offset: 6px;
+  box-shadow:
+    0 0 0 2px rgba(255, 204, 102, 0.15) inset,
+    0 0 22px rgba(255, 204, 102, 0.40),
+    0 0 40px rgba(255, 153, 0, 0.25);
+  animation: parchmentGlow 1.8s ease-in-out infinite;
+}
+
+/* Ao terminar tudo, volta suave ao normal */
+#section-intro:not(:has(.typing-active)) .parchment-inner-rough {
+  transition: box-shadow .35s ease, outline-color .35s ease;
+}
+
+@keyframes parchmentGlow {
+  0%   { box-shadow:
+          0 0 0 2px rgba(255, 204, 102, 0.15) inset,
+          0 0 18px rgba(255, 204, 102, 0.35),
+          0 0 32px rgba(255, 153, 0, 0.18); }
+  50%  { box-shadow:
+          0 0 0 2px rgba(255, 204, 102, 0.18) inset,
+          0 0 26px rgba(255, 204, 102, 0.50),
+          0 0 52px rgba(255, 153, 0, 0.30); }
+  100% { box-shadow:
+          0 0 0 2px rgba(255, 204, 102, 0.15) inset,
+          0 0 18px rgba(255, 204, 102, 0.35),
+          0 0 32px rgba(255, 153, 0, 0.18); }
+}
+/* Cursor slim nos parágrafos de texto */
+#section-intro .parchment-text-rough[data-cursor="true"].typing-active::after {
+  width: 2px;
+  height: 1em;
+  border-radius: 1px;
+  right: 0;
+}
+
 /* =======================================================
    BRILHO + TEXTURAS — módulo universal (espinhos e pedra)
    Seguro para usar junto do styles-base.css
