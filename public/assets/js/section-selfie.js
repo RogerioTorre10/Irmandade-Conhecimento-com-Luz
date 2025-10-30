@@ -1,23 +1,30 @@
-/* /assets/js/section-selfie.js — FASE 4.2
-   - Correções sobre a 4.1
-   - Remove o botão "Trocar câmera" (apenas 3 botões: Prévia, Tirar outra, Confirmar/Iniciar)
-   - Adiciona container de enquadramento fixo (#selfieFrameBox)
-   - Usa máscara nova configurável (MASK_URL)
-   - Mantém vídeo de transição ao Confirmar/Pular
+/* /assets/js/section-selfie.js — FASE 4.3
+   - UX mobile e máscara corrigidas
+   - Botões redefinidos e dinâmicos:
+     • Prévia → ativa câmera; depois vira “Prévia/Repetir”
+     • Foto → captura frame
+     • Iniciar → confirma e segue (antes: Confirmar/Iniciar)
+     • Header: “Não quero Foto” (antes: Não quero Foto / Iniciar)
+   - Container de enquadramento mantido (guia)
+   - Máscara responsiva (MASK_URL + MASK_SIZE)
+   - Transição de vídeo preservada
 */
 (function (global) {
   'use strict';
 
   const NS = (global.JCSelfie = global.JCSelfie || {});
-  if (NS.__phase42_bound) return; // idempotente
-  NS.__phase42_bound = true;
+  if (NS.__phase43_bound) return; // idempotente
+  NS.__phase43_bound = true;
 
   // ---- Constantes de integração ----
   const MOD = 'section-selfie.js';
   const SECTION_ID = 'section-selfie';
   const NEXT_SECTION_ID = 'section-card';
   const VIDEO_SRC = '/assets/video/filme-eu-na-irmandade.mp4';
-  const MASK_URL = '/assets/img/chama-card.png'; // troque pela sua nova máscara se quiser
+
+  // Ajuste aqui sua máscara e escala padrão
+  const MASK_URL = '/assets/img/chama-mask.png'; // PNG/SVG com fundo TRANSPARENTE e silhueta BRANCA
+  const MASK_SIZE = '80%'; // tamanho relativo da máscara dentro da prévia (mobile-friendly)
 
   const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -113,9 +120,12 @@
       head.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin:-6px 0 4px;position:relative;z-index:60;';
       head.innerHTML = `
         <h2 data-text="Tirar sua Foto" data-typing="true" data-speed="40">Tirar sua Foto ✨</h2>
-        <button id="btn-skip-selfie" class="btn btn-stone-espinhos">Não quero foto / Iniciar</button>`;
+        <button id="btn-skip-selfie" class="btn btn-stone-espinhos">Não quero Foto</button>`;
       head.querySelector('#btn-skip-selfie').onclick = onSkip;
       section.prepend(head);
+    } else {
+      const skip = head.querySelector('#btn-skip-selfie');
+      if (skip) skip.textContent = 'Não quero Foto';
     }
     return head;
   }
@@ -157,8 +167,8 @@
       #selfieControls input[type=range]{width:100%;height:4px;border-radius:2px;background:#555;outline:none}
       #selfieControls input[type=range]::-webkit-slider-thumb{background:#f9e7c2;border-radius:50%;width:14px;height:14px}
       #selfieButtons{position:relative;z-index:60}
-      #selfieFrameBox{position:relative;margin:6px auto 6px;width:92%;max-width:820px;height:120px;border:1px dashed rgba(249,231,194,.45);border-radius:12px;pointer-events:none;}
-      #selfieFrameBox::before{content:'';position:absolute;inset:6px;opacity:.7;background-repeat:no-repeat;background-position:center;background-size:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6));-webkit-mask-image:none;}
+      #selfieFrameBox{position:relative;margin:6px auto 6px;width:92%;max-width:820px;height:clamp(140px, 16vh, 220px);border:1px dashed rgba(249,231,194,.35);border-radius:12px;pointer-events:none;}
+      #selfieFrameBox .guide{position:absolute;inset:6px;background-repeat:no-repeat;background-position:center;background-size:contain;opacity:.75;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6));}
     `;
     document.head.appendChild(style);
 
@@ -186,36 +196,15 @@
     };
     zoomAll.oninput = update; zoomX.oninput = update; zoomY.oninput = update; update();
 
-    // aplica imagem guia no FrameBox
+    // Guia
     let fb = document.querySelector('#selfieFrameBox');
     if (!fb) {
       fb = document.createElement('div');
       fb.id = 'selfieFrameBox';
       section.appendChild(fb);
     }
-    fb.style.setProperty('--mask-url', `url(${MASK_URL})`);
-    fb.style.position = 'relative';
-    fb.style.zIndex = '60';
-    fb.style.height = '150px';
-    fb.style.border = '1px dashed rgba(249,231,194,.35)';
-    fb.style.borderRadius = '12px';
-    fb.style.pointerEvents = 'none';
-    fb.style.setProperty('--bg', `url(${MASK_URL})`);
-    fb.style.setProperty('background', 'transparent');
-    fb.style.setProperty('mask-position', 'center');
-    fb.style.setProperty('mask-size', 'contain');
-    fb.style.setProperty('mask-repeat', 'no-repeat');
-    fb.style.setProperty('webkitMaskPosition', 'center');
-    fb.style.setProperty('webkitMaskSize', 'contain');
-    fb.style.setProperty('webkitMaskRepeat', 'no-repeat');
-    fb.style.setProperty('backgroundImage', 'none');
-    fb.style.setProperty('filter', 'drop-shadow(0 2px 6px rgba(0,0,0,.6))');
-    // imagem visível como guia
-    fb.style.setProperty('box-shadow','inset 0 0 0 9999px rgba(0,0,0,0)');
-    fb.style.setProperty('position','relative');
-    fb.style.setProperty('overflow','hidden');
-    fb.style.setProperty('--guide-opacity','0.75');
-    fb.innerHTML = '<div style="position:absolute;inset:6px;background-image:var(--bg);background-repeat:no-repeat;background-position:center;background-size:contain;opacity:var(--guide-opacity);"></div>';
+    fb.style.position = 'relative'; fb.style.zIndex = '60';
+    fb.innerHTML = `<div class="guide" style="background-image:url(${MASK_URL})"></div>`;
   }
 
   function applyPreviewTransform(a=1, x=1, y=1) {
@@ -225,7 +214,7 @@
     canvasEl.style.transform = `translate(-50%, -50%) scaleX(${sx}) scaleY(${sy})`;
   }
 
-  // ---------- Botões (3 fixos) ----------
+  // ---------- Botões (dinâmica nova) ----------
   function ensureButtons(section) {
     let div = section.querySelector('#selfieButtons');
     if (!div) {
@@ -239,42 +228,51 @@
       div = document.createElement('div');
       div.id = 'selfieButtons';
       div.innerHTML = `
-        <button id="btn-prev" class="btn btn-stone-espinhos">Prévia</button>
-        <button id="btn-retake" class="btn btn-stone-espinhos" disabled>Tirar outra</button>
-        <button id="btn-confirm" class="btn btn-stone-espinhos" disabled>Confirmar / Iniciar</button>`;
+        <button id="btn-preview" class="btn btn-stone-espinhos">Prévia</button>
+        <button id="btn-shot" class="btn btn-stone-espinhos" disabled>Foto</button>
+        <button id="btn-confirm" class="btn btn-stone-espinhos" disabled>Iniciar</button>`;
       section.appendChild(div);
     }
-    // segurança extra: nunca duplica
+
     if (!NS._buttonsReady) {
       NS._buttonsReady = true;
-      const btnPrev = div.querySelector('#btn-prev');
-      const btnRetake = div.querySelector('#btn-retake');
+      const btnPreview = div.querySelector('#btn-preview');
+      const btnShot = div.querySelector('#btn-shot');
       const btnConfirm = div.querySelector('#btn-confirm');
-      if (btnPrev) btnPrev.onclick = () => startCamera(true);
-      if (btnRetake) btnRetake.onclick = () => retakePhoto();
-      if (btnConfirm) btnConfirm.onclick = () => confirmPhoto();
+
+      btnPreview.onclick = async () => {
+        // Inicia/repete a câmera
+        await startCamera(true);
+        // Troca rótulo após primeira execução
+        if (btnPreview.textContent !== 'Prévia/Repetir') btnPreview.textContent = 'Prévia/Repetir';
+        // Habilita os outros botões
+        btnShot.disabled = false;
+        btnConfirm.disabled = false;
+      };
+      btnShot.onclick = () => capturePhoto();
+      btnConfirm.onclick = () => confirmPhoto();
     }
+
     div.style.position = 'relative';
     div.style.zIndex = '60';
   }
 
-  // ---------- Prévia (rodapé) + Máscara ----------
+  // ---------- Prévia (rodapé) + Máscara responsiva ----------
   function ensurePreview(section) {
     if (section.querySelector('#selfiePreviewWrap')) return;
 
     const style = document.createElement('style');
     style.textContent = `
-      #selfiePreviewWrap{position:fixed;left:0;right:0;bottom:12px;width:100%;max-height:36vh;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);border-top:1px solid rgba(255,255,255,.08);z-index:40}
-      #selfiePreview{position:relative;margin:8px auto;width:92%;max-width:820px;height:calc(36vh - 16px);overflow:hidden;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#000}
+      #selfiePreviewWrap{position:fixed;left:0;right:0;bottom:12px;width:100%;max-height:clamp(240px, 38vh, 420px);background:rgba(0,0,0,.55);backdrop-filter:blur(2px);border-top:1px solid rgba(255,255,255,.08);z-index:40}
+      #selfiePreview{position:relative;margin:8px auto;width:92%;max-width:820px;height:calc(clamp(240px, 38vh, 420px) - 16px);overflow:hidden;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#000}
       #selfieViewport{position:absolute;inset:0}
-      #selfieVideo,#selfieCanvas{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);min-width:100%;min-height:100%;}
-      /* Máscara real */
+      #selfieVideo,#selfieCanvas{position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);min-width:100%;min-height:100%;}
       .masked #selfieVideo, .masked #selfieCanvas{
         -webkit-mask-image: url(${MASK_URL});
         mask-image: url(${MASK_URL});
         -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
         -webkit-mask-position: center; mask-position: center;
-        -webkit-mask-size: contain; mask-size: contain;
+        -webkit-mask-size: ${MASK_SIZE} auto; mask-size: ${MASK_SIZE} auto;
       }
     `;
     document.head.appendChild(style);
@@ -307,9 +305,8 @@
     try {
       stream = await navigator.mediaDevices.getUserMedia(constraints);
       videoEl.srcObject = stream;
-      enableButtons({ preview:true, retake:false, confirm:false });
-      // clique no vídeo captura
-      videoEl.addEventListener('click', capturePhoto);
+      // Clique no vídeo captura
+      videoEl.addEventListener('click', capturePhoto, { once:false });
     } catch (e) {
       console.error('getUserMedia error', e);
       toast('Não foi possível acessar a câmera. Verifique permissões.');
@@ -340,7 +337,6 @@
     img.onload = () => { videoEl.style.display = 'none'; canvasEl.style.display = 'block'; };
     img.src = dataUrl;
 
-    enableButtons({ preview:false, retake:true, confirm:true });
     NS._lastCapture = dataUrl;
   }
 
@@ -348,7 +344,6 @@
     if (!videoEl) return;
     canvasEl.style.display = 'none';
     videoEl.style.display = 'block';
-    enableButtons({ preview:true, retake:false, confirm:false });
   }
 
   // ---- Navegação/Transição ----
@@ -372,15 +367,6 @@
       try { localStorage.setItem('jc.selfieDataUrl', dataUrl); } catch {}
     } catch {}
     playTransitionThenGo(NEXT_SECTION_ID);
-  }
-
-  function enableButtons(state) {
-    const btnPrev = document.getElementById('btn-prev');
-    const btnRetake = document.getElementById('btn-retake');
-    const btnConfirm = document.getElementById('btn-confirm');
-    if (btnPrev) btnPrev.disabled = state.preview === false;
-    if (btnRetake) btnRetake.disabled = state.retake === false;
-    if (btnConfirm) btnConfirm.disabled = state.confirm === false;
   }
 
   // ---------- Pular Selfie ----------
@@ -432,9 +418,6 @@
     await sleep(100);
     startOrderObserver(section);
     enforceOrder(section);
-
-    // Estado inicial: sem câmera ligada
-    enableButtons({ preview:true, retake:false, confirm:false });
   }
 
   async function init() {
