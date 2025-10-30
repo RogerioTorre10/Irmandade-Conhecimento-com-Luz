@@ -117,8 +117,7 @@
 
  // ---------- Texto Orientação (NOME DINÂMICO + TYPING 100%) ----------
 async function ensureTexto(section) {
-  const upper = getUpperName(); // nome do participante em caixa alta
-
+  const upper = getUpperName(); // nome do participante
   const existing = section.querySelector('#selfieTexto');
   if (existing) existing.remove();
 
@@ -148,11 +147,12 @@ async function ensureTexto(section) {
   p.dataset.speed = "30";
 
   section.appendChild(p);
-  await sleep(80);
+  await sleep(80); // garante que o DOM esteja pronto
   p.style.opacity = '1';
-  await runTyping(p);
-  speak(fullText);
+  await runTyping(p); // ativa o efeito datilografia
+  speak(fullText);    // mantém o efeito de leitura
 }
+
 
 
   // ---------- Controles ----------
