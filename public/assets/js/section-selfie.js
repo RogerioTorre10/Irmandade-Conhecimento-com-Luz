@@ -1,22 +1,14 @@
-/* /assets/js/section-selfie.js — FASE 4.1
-   - Base 4.0 + correções
-   - ✅ Máscara real (apenas silhueta visível) via CSS mask-image (com fallback overlay)
-   - ✅ Z-index ajustado (botões acima; prévia não cobre clique)
-   - ✅ Prévia levemente mais alta (bottom: 8px)
-   - ✅ Vídeo de transição integrado (constantes MOD/SECTION_ID/NEXT_SECTION_ID/VIDEO_SRC)
+/* /assets/js/section-selfie.js — FASE 4.0
+   - Mantém v3.3+ (header, texto, controles, botões, ordem, TTS, tipo)
+   - ADICIONA: Câmera frontal, prévia (rodapé), captura, refazer, confirmar, trocar câmera
+   - Salva em JC.data.selfieDataUrl e localStorage ('jc.selfieDataUrl')
 */
 (function (global) {
   'use strict';
 
   const NS = (global.JCSelfie = global.JCSelfie || {});
-  if (NS.__phase41_bound) return; // idempotente
-  NS.__phase41_bound = true;
-
-  // ---- Constantes de integração ----
-  const MOD = 'section-selfie.js';
-  const SECTION_ID = 'section-selfie';
-  const NEXT_SECTION_ID = 'section-card';
-  const VIDEO_SRC = '/assets/video/filme-eu-na-irmandade.mp4';
+  if (NS.__phase40_bound) return; // idempotente
+  NS.__phase40_bound = true;
 
   const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -26,7 +18,6 @@
   let videoEl = null;
   let canvasEl = null;
   let previewWrap = null;
-  let previewBox = null;
 
   // ---------- Nome ----------
   function getUpperName() {
@@ -38,7 +29,7 @@
         if (ls) name = ls;
       } catch {}
     }
-    if (!name || typeof name !== 'string') name = 'AMOR';
+    if (!name || typeof name !== 'string') name = 'ANJO';
     const upper = name.toUpperCase().trim();
     try {
       global.JC = global.JC || {}; 
@@ -98,9 +89,12 @@
     } else if ('speechSynthesis' in window) {
       const utter = new SpeechSynthesisUtterance(text);
       utter.lang = 'pt-BR';
-      utter.rate = 0.9; utter.pitch = 1;
+      utter.rate = 0.9;
+      utter.pitch = 1;
       window.speechSynthesis.speak(utter);
-    } else { console.log('[TTS Fallback]', text); }
+    } else {
+      console.log('[TTS Fallback]', text);
+    }
   }
 
   // ---------- Header ----------
@@ -109,7 +103,7 @@
     if (!head) {
       head = document.createElement('header');
       head.className = 'selfie-header';
-      head.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin:-6px 0 4px;position:relative;z-index:60;';
+      head.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin:-6px 0 4px;';
       head.innerHTML = `
         <h2 data-text="Tirar sua Foto" data-typing="true" data-speed="40">Tirar sua Foto ✨</h2>
         <button id="btn-skip-selfie" class="btn btn-stone-espinhos">Não quero foto / Iniciar</button>`;
@@ -126,7 +120,7 @@
     if (!wrap) {
       wrap = document.createElement('div');
       wrap.id = 'selfieOrientWrap';
-      wrap.style.cssText = `margin:16px auto 12px;width:92%;max-width:820px;text-align:left;padding:0 12px;box-sizing:border-box;position:relative;z-index:60;`;
+      wrap.style.cssText = `margin:16px auto 12px;width:92%;max-width:820px;text-align:left;padding:0 12px;box-sizing:border-box;`;
       section.appendChild(wrap);
     }
     const existing = wrap.querySelector('#selfieTexto');
@@ -151,11 +145,10 @@
     if (section.querySelector('#selfieControls')) return;
     const style = document.createElement('style');
     style.textContent = `
-      #selfieControls{margin:6px auto 8px;width:92%;max-width:820px;background:rgba(0,0,0,.32);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:8px 10px;color:#f9e7c2;font-family:Cardo,serif;font-size:14px;position:relative;z-index:60}
+      #selfieControls{margin:6px auto 8px;width:92%;max-width:820px;background:rgba(0,0,0,.32);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:8px 10px;color:#f9e7c2;font-family:Cardo,serif;font-size:14px}
       #selfieControls .row{display:grid;grid-template-columns:130px 1fr 56px;gap:8px;align-items:center;margin:4px 0}
       #selfieControls input[type=range]{width:100%;height:4px;border-radius:2px;background:#555;outline:none}
       #selfieControls input[type=range]::-webkit-slider-thumb{background:#f9e7c2;border-radius:50%;width:14px;height:14px}
-      #selfieButtons{position:relative;z-index:60}
     `;
     document.head.appendChild(style);
 
@@ -186,9 +179,9 @@
 
   function applyPreviewTransform(a=1, x=1, y=1) {
     if (!videoEl) return;
-    const sx = a * x; const sy = a * y;
+    const sx = a * x;
+    const sy = a * y;
     videoEl.style.transform = `translate(-50%, -50%) scaleX(${sx}) scaleY(${sy})`;
-    canvasEl.style.transform = `translate(-50%, -50%) scaleX(${sx}) scaleY(${sy})`;
   }
 
   // ---------- Botões ----------
@@ -211,31 +204,19 @@
         <button id="btn-switch" class="btn btn-stone-espinhos" disabled>Trocar câmera</button>`;
       section.appendChild(div);
     }
-    div.style.position = 'relative';
-    div.style.zIndex = '60';
   }
 
-  // ---------- Prévia (rodapé) + Máscara ----------
+  // ---------- Prévia (rodapé) ----------
   function ensurePreview(section) {
     if (section.querySelector('#selfiePreviewWrap')) return;
 
     const style = document.createElement('style');
     style.textContent = `
-      #selfiePreviewWrap{position:fixed;left:0;right:0;bottom:8px;width:100%;max-height:38vh;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);border-top:1px solid rgba(255,255,255,.08);z-index:40}
-      #selfiePreview{position:relative;margin:8px auto;width:92%;max-width:820px;height:calc(38vh - 16px);overflow:hidden;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#000}
-      #selfieViewport{position:absolute;inset:0}
-      #selfieVideo,#selfieCanvas{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);min-width:100%;min-height:100%;}
-      #maskFrame{display:none;position:absolute;inset:0;pointer-events:none;background-repeat:no-repeat;background-position:center;background-size:contain;}
-      /* Botões acima da prévia */
-      #selfieButtons{position:relative;z-index:60}
-      /* Máscara real */
-      .masked #selfieVideo, .masked #selfieCanvas{
-        -webkit-mask-image: url(/assets/img/chama-mask.png);
-        mask-image: url(/assets/img/chama-mask.png);
-        -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
-        -webkit-mask-position: center; mask-position: center;
-        -webkit-mask-size: contain; mask-size: contain;
-      }
+      #selfiePreviewWrap{position:fixed;left:0;right:0;bottom:0;width:100%;max-height:42vh;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);border-top:1px solid rgba(255,255,255,.08);z-index:9999}
+      #selfiePreview{position:relative;margin:8px auto;width:92%;max-width:820px;height:calc(42vh - 16px);overflow:hidden;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#000}
+      #selfieVideo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);min-width:100%;min-height:100%;}
+      #selfieCanvas{display:none}
+      #maskFrame{position:absolute;inset:0;pointer-events:none;background-repeat:no-repeat;background-position:center;background-size:contain;}
     `;
     document.head.appendChild(style);
 
@@ -243,27 +224,18 @@
     previewWrap.id = 'selfiePreviewWrap';
     previewWrap.innerHTML = `
       <div id="selfiePreview">
-        <div id="selfieViewport">
-          <video id="selfieVideo" autoplay playsinline muted></video>
-          <canvas id="selfieCanvas"></canvas>
-        </div>
+        <video id="selfieVideo" autoplay playsinline muted></video>
+        <canvas id="selfieCanvas"></canvas>
         <div id="maskFrame"></div>
       </div>`;
     section.appendChild(previewWrap);
 
-    previewBox = previewWrap.querySelector('#selfiePreview');
     videoEl = previewWrap.querySelector('#selfieVideo');
     canvasEl = previewWrap.querySelector('#selfieCanvas');
 
-    // Ativa máscara via CSS.supports, senão usa overlay (fallback)
-    const supportsMask = CSS && (CSS.supports('(-webkit-mask-image: url("/assets/img/chama-mask.png"))') || CSS.supports('(mask-image: url("/assets/img/chama-mask.png"))'));
-    if (supportsMask) {
-      previewBox.classList.add('masked');
-    } else {
-      const mask = previewWrap.querySelector('#maskFrame');
-      mask.style.display = 'block';
-      mask.style.backgroundImage = 'url(/assets/img/chama-card.png)'; // fallback overlay
-    }
+    // Moldura/chama
+    const mask = previewWrap.querySelector('#maskFrame');
+    mask.style.backgroundImage = 'url(/assets/img/chama-card.png)';
   }
 
   // ---------- Câmera ----------
@@ -322,19 +294,6 @@
     enableButtons({ preview:true, retake:false, confirm:false, switch:true });
   }
 
-  // ---- Navegação/Transição ----
-  function goNext(id) {
-    if (global.JC?.show) global.JC.show(id);
-    else if (global.showSection) global.showSection(id);
-  }
-  function playTransitionThenGo(id) {
-    if (global.VideoTransicao?.play) {
-      try {
-        global.VideoTransicao.play({ src: VIDEO_SRC, onEnd: () => goNext(id) });
-      } catch { goNext(id); }
-    } else { goNext(id); }
-  }
-
   function confirmPhoto() {
     const dataUrl = NS._lastCapture;
     if (!dataUrl) { toast('Tire uma foto primeiro.'); return; }
@@ -343,7 +302,8 @@
       global.JC.data.selfieDataUrl = dataUrl;
       try { localStorage.setItem('jc.selfieDataUrl', dataUrl); } catch {}
     } catch {}
-    playTransitionThenGo(NEXT_SECTION_ID);
+    if (global.JC?.show) global.JC.show('section-card');
+    else if (global.showSection) global.showSection('section-card');
   }
 
   function enableButtons(state) {
@@ -358,7 +318,10 @@
   }
 
   // ---------- Pular Selfie ----------
-  function onSkip() { playTransitionThenGo(NEXT_SECTION_ID); }
+  function onSkip() {
+    if (global.JC?.show) global.JC.show('section-card');
+    else if (global.showSection) global.showSection('section-card');
+  }
 
   // ---------- Forçar Ordem ----------
   function enforceOrder(section) {
@@ -426,18 +389,18 @@
 
   async function init() {
     try {
-      const section = await waitForElement('#' + SECTION_ID);
+      const section = await waitForElement('#section-selfie');
       await play(section);
     } catch (err) {
-      console.error('Erro ao carregar ' + MOD + ':', err);
+      console.error('Erro ao carregar section-selfie:', err);
     }
   }
 
   // Encerrar câmera ao trocar de seção
-  document.addEventListener('sectionWillHide', e => { if (e?.detail?.sectionId === SECTION_ID) stopCamera(); });
+  document.addEventListener('sectionWillHide', e => { if (e?.detail?.sectionId === 'section-selfie') stopCamera(); });
 
   // Eventos de ciclo de vida
-  document.addEventListener('sectionLoaded', e => { if (e?.detail?.sectionId === SECTION_ID) init(); });
+  document.addEventListener('sectionLoaded', e => { if (e?.detail?.sectionId === 'section-selfie') init(); });
   if (document.readyState !== 'loading') init();
   else document.addEventListener('DOMContentLoaded', init);
 
