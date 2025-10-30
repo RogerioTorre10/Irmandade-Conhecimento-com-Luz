@@ -343,7 +343,6 @@ function startOrderObserver(section) {
 }
 
 // ---------- Init (Play) — VERSÃO FINAL ----------
-// ---------- Play (ordem: Header → Texto → Controles → Botões) ----------
 async function play(section) {
   const header = ensureHeader(section);
   // Se o título tiver data-typing, mantém o do Zion
@@ -368,7 +367,6 @@ async function play(section) {
   }, 500);
 }
 
-
   async function init() {
     try {
       const section = await waitForElement('#section-selfie');
@@ -391,5 +389,164 @@ async function play(section) {
   } else {
     document.addEventListener('DOMContentLoaded', init);
   }
+/* ==== PATCH 3.6 — SelfieText Guardian (antivanish) ==== */
+(function (global) {
+  'use strict';
+
+  if (global.__SelfieGuardianBound) return;
+  global.__SelfieGuardianBound = true;
+
+  // Util: nome robusto
+  function getUpperName() {
+    const G = (global.JC && global.JC.data) ? global.JC.data : {};
+    let name = G.nome || G.participantName;
+    try {
+      if (!name) name = localStorage.getItem('jc.nome') || localStorage.getItem('participantName');
+      if (!name) {
+        const u = new URL(location.href);
+        name = u.searchParams.get('name') || u.searchParams.get('nome');
+      }
+    } catch {}
+    if (!name || typeof name !== 'string') name = 'AMOR';
+    const upper = name.toUpperCase().trim();
+    try {
+      global.JC = global.JC || {}; global.JC.data = global.JC.data || {};
+      global.JC.data.nome = upper; localStorage.setItem('jc.nome', upper);
+    } catch {}
+    return upper;
+  }
+
+  // Estilo escudo (não deixa sumir)
+  (function ensureShield(){
+    if (document.getElementById('selfieTextForce')) return;
+    const s = document.createElement('style');
+    s.id = 'selfieTextForce';
+    s.textContent = `
+      #section-selfie #selfieTexto,
+      #section-selfie .lumen-typing {
+        opacity:1 !important; visibility:visible !important; display:block !important;
+        max-height:none !important; overflow:visible !important; transition:none !important;
+      }
+    `;
+    document.head.appendChild(s);
+  })();
+
+  // Cria/repõe bloco de texto (com datilografia)
+  async function mountText(section) {
+    if (!section) return;
+    let wrap = section.querySelector('#selfieOrientWrap');
+    if (!wrap) {
+      wrap = document.createElement('div');
+      wrap.id = 'selfieOrientWrap';
+      wrap.style.cssText = 'display:flex;justify-content:center;margin:14px 0 10px;';
+      section.insertBefore(wrap, section.firstChild.nextSibling); // logo abaixo do header
+    }
+
+    // recria sempre que precisar
+    const prev = section.querySelector('#selfieTexto');
+    if (prev) prev.remove();
+
+    const p = document.createElement('p');
+    p.id = 'selfieTexto';
+    p.className = 'parchment-text-rough lumen-typing';
+    p.style.cssText = 'background:rgba(0,0,0,.35);color:#f9e7c2;padding:12px 16px;border-radius:12px;text-align:center;font-family:Cardo,serif;font-size:15px;margin:0 auto;width:92%;max-width:820px;opacity:1;visibility:visible;';
+    const msg = `${getUpperName()}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras.`;
+    p.dataset.text = msg; p.dataset.speed = '28'; p.dataset.tts = 'true'; p.dataset.voice = 'lumen';
+    wrap.appendChild(p);
+
+    // Datilografia
+    try {
+      if (global.TypingBridge && typeof global.TypingBridge.runTyping === 'function') {
+        global.G = global.G || {}; global.G.__typingLock = false;
+        p.textContent = '';
+        await global.TypingBridge.runTyping(p);
+      } else {
+        // fallback manual
+        p.textContent = '';
+        const chars = [...msg]; const speed = +p.dataset.speed || 28;
+        await new Promise(res => {
+          let i = 0; const iv = setInterval(() => {
+            p.textContent += chars[i++]; if (i >= chars.length) { clearInterval(iv); res(); }
+          }, speed);
+        });
+      }
+    } finally {
+      // Fala (opcional)
+      if (global.speak) global.speak(msg);
+      else if ('speechSynthesis' in global) {
+        const u = new SpeechSynthesisUtterance(msg); u.lang='pt-BR'; u.rate=0.95; speechSynthesis.speak(u);
+      }
+      // visibilidade segura
+      p.style.opacity = '1'; p.style.visibility = 'visible'; p.style.display = 'block';
+    }
+    return p;
+  }
+
+  // Garante controles/botoes (caso tenham sumido)
+  function ensureControlsAndButtons(section) {
+    if (!section) return;
+    const controls = section.querySelector('#selfieControls');
+    const buttons  = section.querySelector('#selfieButtons');
+    if (!controls && global.JCSelfie && typeof global.JCSelfie.ensureControls === 'function') {
+      try { global.JCSelfie.ensureControls(section); } catch {}
+    }
+    if (!buttons && global.JCSelfie && typeof global.JCSelfie.ensureButtons === 'function') {
+      try { global.JCSelfie.ensureButtons(section); } catch {}
+    }
+  }
+
+  // Guardião: observa remoções/ocultações e repara
+  function startGuardian(section) {
+    if (!section || section.__selfieGuardian) return;
+    section.__selfieGuardian = true;
+
+    // Reforço periódico leve (3s)
+    const tick = setInterval(() => {
+      const t = section.querySelector('#selfieTexto');
+      if (!t || getComputedStyle(t).display === 'none' || getComputedStyle(t).opacity === '0') {
+        mountText(section);
+      }
+      ensureControlsAndButtons(section);
+    }, 3000);
+    section.__selfieGuardianTick = tick;
+
+    // Observer de mutações
+    const ob = new MutationObserver(() => {
+      const t = section.querySelector('#selfieTexto');
+      if (!t) mountText(section);
+      else {
+        t.style.opacity='1'; t.style.visibility='visible'; t.style.display='block';
+      }
+      ensureControlsAndButtons(section);
+    });
+    ob.observe(section, { childList:true, subtree:true, attributes:true, attributeFilter:['class','style'] });
+    section.__selfieGuardianObserver = ob;
+
+    // Reforços pós-eventos comuns de transição
+    const reinforce = () => {
+      const t = section.querySelector('#selfieTexto');
+      if (!t) mountText(section);
+      else { t.style.opacity='1'; t.style.visibility='visible'; t.style.display='block'; }
+    };
+    document.addEventListener('visibilitychange', reinforce);
+    window.addEventListener('resize', reinforce);
+    setTimeout(reinforce, 500);
+    setTimeout(reinforce, 1200);
+  }
+
+  async function boot() {
+    const section = document.querySelector('#section-selfie');
+    if (!section) return;
+    await mountText(section);
+    ensureControlsAndButtons(section);
+    startGuardian(section);
+  }
+
+  // Aciona no carregamento da seção
+  document.addEventListener('sectionLoaded', (e) => {
+    if (e?.detail?.sectionId === 'section-selfie') boot();
+  });
+  if (document.readyState !== 'loading') boot();
+  else document.addEventListener('DOMContentLoaded', boot);
 
 })(window);
