@@ -131,21 +131,26 @@
       stage.appendChild(flameLayer);
     }
 
-    // SVG + image da selfie
-    let selfieSvgImage = stage.querySelector('#selfieImage');
-    if (!selfieSvgImage) {
-      flameLayer.innerHTML = `
-        <svg viewBox="0 0 1000 1200" xmlns="http://www.w3.org/2000/svg" role="img">
-          <defs>
-            <mask id="flameMask" maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
-              <image href="/assets/img/chama-card.png" x="0" y="0" width="1" height="1" preserveAspectRatio="xMidYMid meet"/>
-            </mask>
-          </defs>
-          <image id="selfieImage" x="0" y="0" width="1000" height="1200" preserveAspectRatio="xMidYMid slice"
-                 href="${PLACEHOLDER_SELFIE}" mask="url(#flameMask)"/>
-        </svg>`;
-      selfieSvgImage = flameLayer.querySelector('#selfieImage');
-    }
+    
+   // SVG + image da selfie
+   let flameSelfie = stage.querySelector('.flame-selfie');
+   if (!flameSelfie) {
+     flameLayer.innerHTML = `
+      <img class="flame-selfie" id="selfieImage"
+         src="${PLACEHOLDER_SELFIE}"
+         alt="Selfie ou Placeholder"
+         loading="lazy" />`;
+    flameSelfie = flameLayer.querySelector('.flame-selfie');
+  }
+    const url = readSelfieUrlOrPlaceholder();
+    if (flameSelfie && url) {
+    flameSelfie.src = url;
+    flameLayer?.classList.add('show');
+    flameSelfie.addEventListener?.('error', () => {
+    flameSelfie.src = PLACEHOLDER_SELFIE;
+    flameLayer?.classList.add('show');
+  });
+ }
 
     // Rodapé com nome do participante
     let footer = stage.querySelector('.card-footer');
