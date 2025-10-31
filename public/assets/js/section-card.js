@@ -117,29 +117,48 @@ await waitForTransitionUnlock();
 
     const elements = qsa('[data-typing="true"]', root);
    // --- Selfie vinda da seção anterior (section-selfie) ---
-const selfieImg = qs('#selfieImage', root);
-const flameLayer = qs('.flame-layer', root);
+const selfieImg   = qs('#selfieImage', root);
+const flameLayer  = qs('.flame-layer', root);
+const nameSlot    = qs('#cardParticipantName', root);   // <span id="cardParticipantName"> no rodapé
+const guideName   = qs('#cardGuideName', root);         // opcional, se tiver
 
-// Tenta pegar a selfie nas duas fontes que usamos no fluxo
-const selfieUrl =
+    // Tenta pegar a selfie nas duas fontes que usamos no fluxo
+ const selfieUrl =
   (window.JC?.data?.selfieDataUrl) ||
   localStorage.getItem('jc.selfieDataUrl') ||
-  sessionStorage.getItem('jc.selfieDataUrl');
+  sessionStorage.getItem('jc.selfieDataUrl') ||
+  '/assets/img/irmandade-card-placeholder.jpg';  // <-- CRIE esse arquivo
 
-if (selfieImg && selfieUrl) {
+
+ if (selfieImg) {
   selfieImg.setAttribute('href', selfieUrl);
-  // Mostra o brilho/chama quando a selfie existir
+  // Acende o glow da chama mesmo com placeholder (se preferir, só com selfie real)
   if (flameLayer) flameLayer.style.opacity = '1';
 }
 
 // Ajuste dos nomes (prioriza sessão e cai para JC.data)
-const nomeUpper =
-  (sessionStorage.getItem('jornada.nome') ||
-   window.JC?.data?.nome ||
-   'USUÁRIO').toUpperCase();
+const nomeUpper = (
+  sessionStorage.getItem('jornada.nome') ||
+  window.JC?.data?.nome ||
+  'AMOR'
+).toUpperCase();
 
 if (nameSlot) nameSlot.textContent = nomeUpper;
 
+// 3) Nome do guia (se tiver no layout do card)
+const guiaUpper = (
+  sessionStorage.getItem('jornada.guia') ||
+  window.JC?.data?.guia ||
+  'ZION'
+).toUpperCase();
+
+if (guideName) guideName.textContent = guiaUpper;
+
+// 4) Marca que o CARD foi exibido (usaremos para bloquear a próxima seção)
+window.JC = window.JC || {};
+JC.flags = JC.flags || {};
+JC.flags.cardShown = true;
+    
 // Garante o guia selecionado em caixa alta
 const guiaSel = (sessionStorage.getItem('jornada.guia') || 'zion').toUpperCase();
 if (guideNameSlot) guideNameSlot.textContent = guiaSel;
@@ -159,6 +178,22 @@ const btn = qs('#btnStartJourney', root) || qs('#btnNext', root);
           video.load();
         });
 
+       // onde você tem algo como:
+btn.addEventListener('click', () => {
+  // marque como visto/confirmado
+  window.JC = window.JC || {};
+  JC.flags = JC.flags || {};
+  JC.flags.cardConfirmed = true;
+
+  // segue sua lógica de transição:
+  if (VideoTransicao?.play) {
+    VideoTransicao.play({ src: '/assets/videos/filme-card-dourado.mp4', onEnd: () => goNext('section-perguntas') });
+  } else {
+    goNext('section-perguntas');
+  }
+});
+
+        
         if (typeof window.playTransitionVideo === 'function' && VIDEO_SRC) {
           window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
         } else {
