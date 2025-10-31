@@ -355,29 +355,47 @@
     inset 0 -10px 24px rgba(0,0,0,.35),
     0 0 0 1px rgba(255,215,160,.08);
 }
-/* --- SUBIR O CARD (pode cobrir o pergaminho à vontade) --- */
+/* --- Reservar espaço p/ rodapé (nome + botão) --- */
 #section-card .card-stage,
 #section-eu-na-irmandade .card-stage {
-  /* puxe o card para cima; ajuste fino se quiser mais/menos */
-  margin-top: clamp(-32px, -4vw, -72px);
+  position: relative;
+  margin-top: clamp(-28px, -4vw, -64px); /* puxe o card pra cima */
+  min-height: clamp(560px, 66vw, 920px);
+  padding-bottom: clamp(120px, 14vh, 180px); /* ← espaço pro rodapé */
+  overflow: hidden;
   z-index: 1;
-  min-height: clamp(520px, 66vw, 880px); /* dá corpo pro palco */
 }
 
-/* --- CHAMA MAIS ALTA (perto do peito) --- */
+/* BG do guia — garante visual consistente */
+#guideBg {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  object-fit: cover;
+}
+
+/* Chama mais alta (perto do peito) */
 #section-card .flame-layer,
 #section-eu-na-irmandade .flame-layer {
-  bottom: clamp(120px, 18%, 180px);   /* ↑ aumente p/ subir mais */
-  width: clamp(220px, 46%, 520px);
+  left: 50%;
+  transform: translateX(-50%);
+  position: absolute;
+  bottom: clamp(140px, 20vh, 200px);  /* ↑ ajuste fino aqui */
+  width: clamp(240px, 46%, 540px);
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
 }
+#section-card .flame-layer.show,
+#section-eu-na-irmandade .flame-layer.show { opacity: 1; }
 
-/* --- RODAPÉ COM NOME DO PARTICIPANTE --- */
+/* Rodapé (nome) sempre acima do BG */
 #section-card .card-footer,
 #section-eu-na-irmandade .card-footer {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: clamp(12px, 2.6vw, 22px);
+  bottom: clamp(56px, 8vh, 96px); /* fica acima do limite inferior */
   z-index: 3;
   text-align: center;
 }
@@ -391,9 +409,19 @@
 }
 #section-card #userNameSlot,
 #section-eu-na-irmandade #userNameSlot {
-  font-family: "ManufacturingConsent", "Cardo", serif;
+  font-family: "ManufacturingConsent","Cardo",serif;
   font-size: clamp(14px, 2.2vw, 22px);
-  letter-spacing: 0.08em;
+  letter-spacing: .08em;
   color: #f5e6c8;
   text-shadow: 0 2px 6px rgba(0,0,0,.5);
 }
+
+/* Área dos botões da seção (se estiver fora do palco) */
+#section-card .card-actions,
+#section-eu-na-irmandade .card-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: clamp(10px, 2vh, 18px);
+}
+
