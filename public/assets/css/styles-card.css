@@ -356,31 +356,24 @@
     0 0 0 1px rgba(255,215,160,.08);
 }
 /* --- Reservar espaço p/ rodapé (nome + botão) --- */
+/* Palco alto e subido (cobre o pergaminho) */
 #section-card .card-stage,
 #section-eu-na-irmandade .card-stage {
   position: relative;
-  margin-top: clamp(-28px, -4vw, -64px); /* puxe o card pra cima */
+  margin-top: min(-4vw, -48px);
   min-height: clamp(560px, 66vw, 920px);
-  padding-bottom: clamp(120px, 14vh, 180px); /* ← espaço pro rodapé */
+  padding-bottom: clamp(120px, 16vh, 200px); /* reserva pro rodapé */
   overflow: hidden;
   z-index: 1;
 }
 
-/* BG do guia — garante visual consistente */
-#guideBg {
-  display: block !important;
-  width: 100% !important;
-  height: auto !important;
-  object-fit: cover;
-}
-
-/* Chama mais alta (perto do peito) */
+/* Chama perto do peito */
 #section-card .flame-layer,
 #section-eu-na-irmandade .flame-layer {
+  position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  position: absolute;
-  bottom: clamp(140px, 20vh, 200px);  /* ↑ ajuste fino aqui */
+  bottom: clamp(140px, 20vh, 200px);
   width: clamp(240px, 46%, 540px);
   z-index: 2;
   opacity: 0;
@@ -389,13 +382,13 @@
 #section-card .flame-layer.show,
 #section-eu-na-irmandade .flame-layer.show { opacity: 1; }
 
-/* Rodapé (nome) sempre acima do BG */
+/* Rodapé: nome visível acima do limite inferior */
 #section-card .card-footer,
 #section-eu-na-irmandade .card-footer {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: clamp(56px, 8vh, 96px); /* fica acima do limite inferior */
+  bottom: clamp(56px, 8vh, 96px);
   z-index: 3;
   text-align: center;
 }
