@@ -319,3 +319,8 @@
 }
 .flame-layer { transition: opacity 600ms ease-in-out; } /* era 900ms */
 .flame-svg { filter: drop-shadow(0 10px 36px rgba(255,180,0,.55)); }
+
+/* Mostra a camada da chama quando o JS marcar que a imagem está pronta */
+.flame-layer.show {
+  opacity: 1;
+}
