@@ -1,10 +1,10 @@
-/* /assets/js/section-selfie.js — FASE 4.6 (FINAL + FILME DE TRANSIÇÃO)
+/* /assets/js/section-selfie.js — FASE 4.6 (FINAL + FORCE + EVENTO)
    - Botão "Não quero Foto" → filme + card
    - Botão "Iniciar" → filme + card
-   - Filme roda com VideoTransicao OU fallback manual
-   - Nunca trava, nunca dá erro
-   - Selfie salva ou skip com flag
-   - Layout perfeito, mobile/desktop
+   - forceShowSection('section-card') → card aparece AGORA
+   - sectionLoaded disparado manualmente
+   - Tudo exposto no JCSelfie para debug
+   - ORBE DOURADO como placeholder
    - TÁ LINDO, TÁ PRONTO, TÁ CAMPEÃO!
 */
 (function (global) {
@@ -18,7 +18,7 @@
   const MOD = 'section-selfie.js';
   const SECTION_ID = 'section-selfie';
   const NEXT_SECTION_ID = 'section-card';
-  const VIDEO_SRC = '/assets/videos/filme-card-dourado.mp4';
+  const VIDEO_SRC = '/assets/videos/filme-selfie-card.mp4';
 
   const PREVIEW_MIN_H = 240;
   const PREVIEW_MAX_H = 420;
@@ -100,7 +100,7 @@
     }
   }
 
-  // ---------- HEADER (COM BOTÃO INDESTRUTÍVEL) ----------
+  // ---------- HEADER ----------
   function ensureHeader(section) {
     let head = section.querySelector('.selfie-header');
     if (head) {
@@ -310,117 +310,71 @@
 
   function capturePhoto(){ if(!videoEl) return; const cw=Math.floor(previewBox.clientWidth), ch=Math.floor(previewBox.clientHeight); canvasEl.width=cw; canvasEl.height=ch; const ctx=canvasEl.getContext('2d'); drawCover(videoEl, ctx, cw, ch); const dataUrl=canvasEl.toDataURL('image/jpeg', 0.92); videoEl.style.display='none'; canvasEl.style.display='block'; NS._lastCapture=dataUrl; }
 
-  // ---------- NAVEGAÇÃO COM FILME ----------
+  // ---------- NAVEGAÇÃO ----------
   function goNext(id) {
-  console.log(`[SELFIE] Forçando exibição de: ${id}`);
-  
-  // Tenta JC.show com force
-  if (global.JC?.show) {
-    try {
-      global.JC.show(id, { force: true }); // força reload
-    } catch (e) {
-      console.warn('[SELFIE] JC.show falhou, tentando fallback');
+    console.log(`[SELFIE] Tentando exibir: ${id}`);
+    if (global.JC?.show) {
+      try { global.JC.show(id, { force: true }); } catch (e) { forceShowSection(id); }
+    } else if (global.showSection) {
+      global.showSection(id);
+    } else {
       forceShowSection(id);
     }
-  } else if (global.showSection) {
-    global.showSection(id);
-  } else {
-    forceShowSection(id);
   }
-}
-
-// NOVA FUNÇÃO: FORCE O CARD A APARECER
-function forceShowSection(id) {
-  const el = document.getElementById(id);
-  if (!el) {
-    console.error(`[SELFIE] Seção ${id} não encontrada no DOM`);
-    return;
-  }
-  
-  // Remove classes de "inativa"
-  el.style.display = 'block';
-  el.classList.remove('hidden', 'inactive');
-  el.classList.add('active');
-  
-  // Dispara evento manual de carregamento
-  el.dispatchEvent(new CustomEvent('sectionLoaded', {
-    detail: { sectionId: id, node: el },
-    bubbles: true
-  }));
-  
-  // Scroll suave
-  el.scrollIntoView({ behavior: 'smooth' });
-  
-  console.log(`[SELFIE] Card forçado com sucesso: ${id}`);
-}
 
   function playTransitionAndGo(nextId) {
     const videoSrc = VIDEO_SRC;
-
     if (global.VideoTransicao?.play) {
       try {
-        global.VideoTransicao.play({
-          src: videoSrc,
-          onEnd: () => goNext(nextId)
-        });
+        global.VideoTransicao.play({ src: videoSrc, onEnd: () => goNext(nextId) });
         return;
-      } catch (e) {
-        console.warn('VideoTransicao falhou, usando fallback', e);
-      }
+      } catch (e) { console.warn('VideoTransicao falhou', e); }
     }
 
     const video = document.createElement('video');
     video.src = videoSrc;
-    video.style.cssText = `
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-      object-fit: cover; z-index: 9999; background: #000;
-    `;
-    video.muted = true;
-    video.playsInline = true;
+    video.style.cssText = `position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:9999;background:#000;`;
+    video.muted = true; video.playsInline = true;
 
-    const onEnd = () => {
-      video.remove();
-      goNext(nextId);
-    };
-
+    const onEnd = () => { video.remove(); goNext(nextId); };
     video.addEventListener('ended', onEnd);
-    video.addEventListener('error', () => {
-      console.warn('Vídeo falhou, indo direto');
-      video.remove();
-      goNext(nextId);
-    });
-
+    video.addEventListener('error', () => { video.remove(); goNext(nextId); });
     document.body.appendChild(video);
-    video.play().catch(() => {
-      console.warn('Play bloqueado, indo direto');
-      video.remove();
-      goNext(nextId);
-    });
+    video.play().catch(() => { video.remove(); goNext(nextId); });
   }
 
-  // Pular selfie + filme
+  function forceShowSection(id) {
+    const el = document.getElementById(id);
+    if (!el) { console.error(`[SELFIE] Seção ${id} não encontrada`); return; }
+
+    el.style.display = 'block';
+    el.classList.remove('hidden', 'inactive');
+    el.classList.add('active');
+
+    // DISPARA sectionLoaded MANUALMENTE!
+    el.dispatchEvent(new CustomEvent('sectionLoaded', {
+      detail: { sectionId: id, node: el },
+      bubbles: true
+    }));
+
+    el.scrollIntoView({ behavior: 'smooth' });
+    console.log(`[SELFIE] Card forçado: ${id}`);
+  }
+
   function skipAndPlayTransition() {
     try {
-      if (global.JC?.data) {
-        delete global.JC.data.selfieDataUrl;
-        global.JC.data.selfieSkipped = true;
-      }
+      if (global.JC?.data) { delete global.JC.data.selfieDataUrl; global.JC.data.selfieSkipped = true; }
       localStorage.removeItem('jc.selfieDataUrl');
     } catch (e) {}
     stopCamera();
     playTransitionAndGo(NEXT_SECTION_ID);
   }
 
-  // Confirmar foto + filme
   function confirmAndPlayTransition() {
     const dataUrl = NS._lastCapture;
-    if (!dataUrl) {
-      toast('Tire uma foto primeiro.');
-      return;
-    }
+    if (!dataUrl) { toast('Tire uma foto primeiro.'); return; }
     try {
-      global.JC = global.JC || {};
-      global.JC.data = global.JC.data || {};
+      global.JC = global.JC || {}; global.JC.data = global.JC.data || {};
       global.JC.data.selfieDataUrl = dataUrl;
       try { localStorage.setItem('jc.selfieDataUrl', dataUrl); } catch {}
     } catch (e) {}
@@ -439,7 +393,10 @@ function forceShowSection(id) {
   document.addEventListener('sectionLoaded', e=>{ if(e?.detail?.sectionId===SECTION_ID) init(); });
   if (document.readyState !== 'loading') init(); else document.addEventListener('DOMContentLoaded', init);
 
+  // === EXPÕE FUNÇÕES PARA DEBUG ===
+  NS.forceShowSection = forceShowSection;
   NS.playTransitionAndGo = playTransitionAndGo;
   NS.skipAndPlayTransition = skipAndPlayTransition;
-   
+  // =================================
+
 })(window);
