@@ -116,12 +116,40 @@ await waitForTransitionUnlock();
     }
 
     const elements = qsa('[data-typing="true"]', root);
+   // --- Selfie vinda da seção anterior (section-selfie) ---
+const selfieImg = qs('#selfieImage', root);
+const flameLayer = qs('.flame-layer', root);
+
+// Tenta pegar a selfie nas duas fontes que usamos no fluxo
+const selfieUrl =
+  (window.JC?.data?.selfieDataUrl) ||
+  localStorage.getItem('jc.selfieDataUrl') ||
+  sessionStorage.getItem('jc.selfieDataUrl');
+
+if (selfieImg && selfieUrl) {
+  selfieImg.setAttribute('href', selfieUrl);
+  // Mostra o brilho/chama quando a selfie existir
+  if (flameLayer) flameLayer.style.opacity = '1';
+}
+
+// Ajuste dos nomes (prioriza sessão e cai para JC.data)
+const nomeUpper =
+  (sessionStorage.getItem('jornada.nome') ||
+   window.JC?.data?.nome ||
+   'USUÁRIO').toUpperCase();
+
+if (nameSlot) nameSlot.textContent = nomeUpper;
+
+// Garante o guia selecionado em caixa alta
+const guiaSel = (sessionStorage.getItem('jornada.guia') || 'zion').toUpperCase();
+if (guideNameSlot) guideNameSlot.textContent = guiaSel;
+
     for (const el of elements) {
       const text = (el.dataset.text || el.textContent || '').trim();
       await runTypingAndSpeak(el, text);
     }
 
-    const btn = qs('#btnStartJourney', root);
+const btn = qs('#btnStartJourney', root) || qs('#btnNext', root);
     if (btn) {
       btn.addEventListener('click', () => {
         speechSynthesis.cancel();
