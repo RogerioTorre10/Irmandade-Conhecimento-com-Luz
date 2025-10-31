@@ -1,16 +1,25 @@
+/* /assets/js/section-card.js — versão unificada com suporte a selfie, placeholder e card do guia */
 (function () {
   'use strict';
 
   const MOD = 'section-card.js';
-  // Alinha com seu HTML:
   const SECTION_ID = 'section-eu-na-irmandade';
   const NEXT_SECTION_ID = 'section-perguntas';
   const VIDEO_SRC = '/assets/videos/filme-card-dourado.mp4';
 
+  // Caminhos fixos dos cards e placeholder
+  const CARD_BG = {
+    arian: '/assets/img/irmandade-quarteto-bg-arian.png',
+    lumen: '/assets/img/irmandade-quarteto-bg-lumen.png',
+    zion:  '/assets/img/irmandade-quarteto-bg-zion.png'
+  };
+  const PLACEHOLDER_SELFIE = '/assets/img/irmandade-card-placeholder.jpg';
+
+  // Atalhos rápidos
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-  // Espera o "transition lock" liberar (se houver vídeo/efeito rodando)
+  // ---- Funções utilitárias ----
   async function waitForTransitionUnlock(timeoutMs = 15000) {
     if (!window.__TRANSITION_LOCK) return;
     let resolved = false;
@@ -71,89 +80,76 @@
     } catch (_) {}
   }
 
-  async function loadGuias() {
-    try {
-      const response = await fetch('/assets/data/guias.json');
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return await response.json();
-    } catch (e) {
-      console.error(`[${MOD}] Erro ao carregar guias:`, e);
-      return [
-        { id: 'zion', nome: 'Zion', bgImage: '/assets/img/irmandade-quarteto-bg-zion.png' },
-        { id: 'lumen', nome: 'Lumen', bgImage: '/assets/img/irmandade-quarteto-bg-lumen.png' },
-        { id: 'arian', nome: 'Arian', bgImage: '/assets/img/irmandade-quarteto-bg-arian.png' }
-      ];
-    }
+  // ---- Leitura e seleção dos dados ----
+  function getSelectedGuide() {
+    const id = (sessionStorage.getItem('jornada.guia') || 'zion').toLowerCase();
+    const nome = id === 'arian' ? 'Arian' : id === 'lumen' ? 'Lumen' : 'Zion';
+    return { id, nome, bgImage: CARD_BG[id] || CARD_BG.zion };
   }
 
-  function readSelfieDataUrl() {
-    // Tenta múltiplas chaves plausíveis
+  function setSvgImageHref(imgEl, url) {
+    try { imgEl.setAttribute('href', url); } catch {}
+    try { imgEl.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', url); } catch {}
+  }
+
+  function readSelfieUrlOrPlaceholder() {
     const keys = [
       'jornada.selfieDataUrl', 'selfie.dataUrl', 'selfieDataUrl',
       'jornada.selfie', 'selfie.image', 'selfieImageData'
     ];
     for (const k of keys) {
-      const v = sessionStorage.getItem(k);
-      if (v && /^data:image\//.test(v)) return v;
+      try {
+        const v = sessionStorage.getItem(k);
+        if (v && /^data:image\//.test(v)) return v;
+      } catch {}
     }
-    return '';
+    return PLACEHOLDER_SELFIE;
   }
 
+  // ---- Inicialização do card ----
   async function initCard(root) {
-    const nameInput = qs('#nameInput', root);
     const nameSlot = qs('#userNameSlot', root);
     const guideNameSlot = qs('#guideNameSlot', root);
     const guiaBg = qs('#guideBg', root);
-    const selfieImg = qs('#selfieImage', root);
     const flameLayer = qs('.flame-layer', root);
+    const selfieSvgImage = qs('#selfieImage', root);
 
-    const saved = {
-      nome: (sessionStorage.getItem('jornada.nome') || 'USUÁRIO').toUpperCase(),
-      guia: (sessionStorage.getItem('jornada.guia') || 'zion').toLowerCase()
-    };
+    // Nome herdado da página guia
+    const nome = (sessionStorage.getItem('jornada.nome') || 'USUÁRIO').toUpperCase();
+    if (nameSlot) nameSlot.textContent = nome;
 
-    if (nameInput) {
-      nameInput.value = saved.nome;
-      nameInput.addEventListener('input', () => {
-        const newName = (nameInput.value || '').trim().toUpperCase();
-        sessionStorage.setItem('jornada.nome', newName);
-        if (nameSlot) nameSlot.textContent = newName || 'USUÁRIO';
+    // Guia e BG
+    const guia = getSelectedGuide();
+    if (guiaBg && guia.bgImage) {
+      guiaBg.src = guia.bgImage;
+      guiaBg.alt = `${guia.nome} — Card da Irmandade`;
+    }
+    if (guideNameSlot) guideNameSlot.textContent = guia.nome.toUpperCase();
+
+    // Selfie ou placeholder
+    const url = readSelfieUrlOrPlaceholder();
+    if (selfieSvgImage && url) {
+      setSvgImageHref(selfieSvgImage, url);
+      flameLayer?.classList.add('show');
+      selfieSvgImage.addEventListener?.('error', () => {
+        setSvgImageHref(selfieSvgImage, PLACEHOLDER_SELFIE);
+        flameLayer?.classList.add('show');
       });
     }
-    if (nameSlot) nameSlot.textContent = saved.nome;
 
-    // Carrega guias e aplica BG + nome correto do guia
-    const guias = await loadGuias();
-    const selectedGuia = guias.find(g => g.id === saved.guia) || guias[0];
-
-    if (guiaBg && selectedGuia?.bgImage) guiaBg.src = selectedGuia.bgImage;
-    if (guideNameSlot) guideNameSlot.textContent = (selectedGuia?.nome || saved.guia).toUpperCase();
-
-    // Aplica selfie dentro do clipPath (se existir)
-    const dataUrl = readSelfieDataUrl();
-    if (selfieImg && dataUrl) {
-      selfieImg.setAttribute('href', dataUrl);
-      // Mostra a camada da chama quando a imagem estiver pronta
-      // (image em <svg> não tem onload confiável em todos os browsers, então libera direto)
-      if (flameLayer) flameLayer.classList.add('show');
-    }
-
-    // Aguarda fim de transição antes da digitação (evita atropelar vídeo/efeito)
+    // Espera a transição acabar e aplica efeitos de texto
     await waitForTransitionUnlock();
-
-    // Digitação dos elementos marcados
     const elements = qsa('[data-typing="true"]', root);
     for (const el of elements) {
       const text = (el.dataset.text || el.textContent || '').trim();
       await runTypingAndSpeak(el, text);
     }
 
-    // BOTÃO → avançar (alinha com seu HTML: #btnNext)
+    // Botão continuar (id #btnNext)
     const btn = qs('#btnNext', root);
     if (btn) {
       btn.addEventListener('click', () => {
         try { speechSynthesis.cancel(); } catch {}
-        // Para e esvazia quaisquer <video> que estejam rodando
         qsa('video').forEach(video => { try { video.pause(); video.src = ''; video.load(); } catch {} });
 
         if (typeof window.playTransitionVideo === 'function' && VIDEO_SRC) {
@@ -164,9 +160,10 @@
       });
     }
 
-    console.log(`[${MOD}] Bloco de card carregado`);
+    console.log(`[${MOD}] Card exibido com guia ${guia.nome} e participante ${nome}`);
   }
 
+  // ---- Escuta de evento da jornada ----
   document.addEventListener('section:shown', (e) => {
     const id = e.detail.sectionId;
     if (id !== SECTION_ID) return;
