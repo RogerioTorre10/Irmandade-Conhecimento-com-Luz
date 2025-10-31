@@ -211,6 +211,19 @@
       console.log('[JC.init] Autenticação simulada, iniciando section-intro...');
     }
 
+    // Bloqueia perguntas se o card não foi confirmado
+      if (targetId === 'section-perguntas') {
+      window.JC = window.JC || {};
+      const ok = JC.flags?.cardConfirmed === true;
+      if (!ok) {
+      console.warn('[Guard] Perguntas bloqueadas: recarregar CARD');
+      if (window.JC?.show) window.JC.show('section-card');
+      else if (window.showSection) window.showSection('section-card');
+      return;
+    }
+  }
+
+
     // Iniciar jornada
     const introElement = document.getElementById('section-intro');
     if (!introElement) {
