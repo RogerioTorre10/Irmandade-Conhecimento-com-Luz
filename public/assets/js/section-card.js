@@ -204,15 +204,30 @@ btn.addEventListener('click', () => {
     console.log(`[${MOD}] Bloco de card carregado`);
   }
 
-  document.addEventListener('section:shown', (e) => {
-    const id = e.detail.sectionId;
-    if (id !== SECTION_ID) return;
+ // NO FINAL DO section-card.js, SUBSTITUA OS EVENT LISTENERS por:
+document.addEventListener('section:shown', (e) => {
+  const id = e.detail.sectionId;
+  if (id !== SECTION_ID) return;
+  console.log(`[CARD] Seção mostrada: ${id}`);
+  const root = e.detail.node;
+  if (root) initCard(root);
+});
 
-    const root = e.detail.node;
-    if (!root) return;
+// NOVO: Listener mais agressivo
+document.addEventListener('sectionLoaded', (e) => {
+  const id = e.detail.sectionId;
+  if (id === SECTION_ID) {
+    console.log(`[CARD] Seção carregada: ${id}`);
+    const root = e.detail.node || document.getElementById(id);
+    if (root) initCard(root);
+  }
+});
 
-    initCard(root);
-  });
+// FORCE no DOM direto
+const cardSection = document.getElementById(SECTION_ID);
+if (cardSection) {
+  cardSection.addEventListener('click', () => initCard(cardSection), { once: true });
+}
 
   console.log(`[${MOD}] carregado`);
 })();
