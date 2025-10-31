@@ -5,7 +5,7 @@
   const MOD = 'section-card.js';
   const SECTION_ID = 'section-eu-na-irmandade';
   const NEXT_SECTION_ID = 'section-perguntas';
-  const VIDEO_SRC = '/assets/videos/filme-card-dourado.mp4';
+  const VIDEO_SRC = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
 
   // Caminhos fixos dos cards e placeholder
   const CARD_BG = {
