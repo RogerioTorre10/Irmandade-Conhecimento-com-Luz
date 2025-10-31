@@ -312,19 +312,46 @@
 
   // ---------- NAVEGAÇÃO COM FILME ----------
   function goNext(id) {
-  // Força a exibição do card
+  console.log(`[SELFIE] Forçando exibição de: ${id}`);
+  
+  // Tenta JC.show com force
   if (global.JC?.show) {
-    global.JC.show(id);
+    try {
+      global.JC.show(id, { force: true }); // força reload
+    } catch (e) {
+      console.warn('[SELFIE] JC.show falhou, tentando fallback');
+      forceShowSection(id);
+    }
   } else if (global.showSection) {
     global.showSection(id);
   } else {
-    // Fallback DOM (nunca falha)
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-      el.style.display = 'block';
-    }
+    forceShowSection(id);
   }
+}
+
+// NOVA FUNÇÃO: FORCE O CARD A APARECER
+function forceShowSection(id) {
+  const el = document.getElementById(id);
+  if (!el) {
+    console.error(`[SELFIE] Seção ${id} não encontrada no DOM`);
+    return;
+  }
+  
+  // Remove classes de "inativa"
+  el.style.display = 'block';
+  el.classList.remove('hidden', 'inactive');
+  el.classList.add('active');
+  
+  // Dispara evento manual de carregamento
+  el.dispatchEvent(new CustomEvent('sectionLoaded', {
+    detail: { sectionId: id, node: el },
+    bubbles: true
+  }));
+  
+  // Scroll suave
+  el.scrollIntoView({ behavior: 'smooth' });
+  
+  console.log(`[SELFIE] Card forçado com sucesso: ${id}`);
 }
 
   function playTransitionAndGo(nextId) {
