@@ -242,7 +242,40 @@
         }
       });
     });
-
+// --- Layout dos botões (Lumen, Zion, Arian) lado a lado ---
+if (!document.getElementById('guia-buttons-layout')) {
+  const css = document.createElement('style');
+  css.id = 'guia-buttons-layout';
+  css.textContent = `
+    #section-guia .guia-options{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:clamp(8px,2.4vw,16px);
+      flex-wrap:nowrap;
+      margin:10px auto;
+      width:92%;
+      max-width:820px;
+    }
+    #section-guia .guia-options button{
+      flex:1 1 0;
+      min-width:90px;
+      max-width:240px;
+      height:clamp(30px,6.2vw,36px);
+      line-height:clamp(30px,6.2vw,36px);
+      padding:0 clamp(6px,2vw,12px);
+      font-size:clamp(11px,2.6vw,14px);
+      border-radius:10px;
+      box-shadow:0 2px 8px rgba(0,0,0,.25);
+      white-space:nowrap;
+    }
+    @media (max-width:380px){
+      #section-guia .guia-options button{min-width:84px;font-size:12px;}
+    }
+  `;
+  document.head.appendChild(css);
+}
+  
     console.log('[JCGuia] pronto (JSON + maiúsculas + TTS + transição)');
   }
 
