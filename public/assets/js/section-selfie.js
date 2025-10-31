@@ -275,14 +275,9 @@
   function goNext(id){ if(global.JC?.show) global.JC.show(id); else if(global.showSection) global.showSection(id); }
   function playTransitionThenGo(id){ if(global.VideoTransicao?.play){ try{ global.VideoTransicao.play({ src: VIDEO_SRC, onEnd: ()=>goNext(id) }); } catch { goNext(id); } } else { goNext(id); } }
   function confirmPhoto(){ const dataUrl=NS._lastCapture; if(!dataUrl){ toast('Tire uma foto primeiro.'); return; } try{ global.JC=global.JC||{}; global.JC.data=global.JC.data||{}; global.JC.data.selfieDataUrl=dataUrl; try{ localStorage.setItem('jc.selfieDataUrl', dataUrl);}catch{} }catch{} playTransitionThenGo(NEXT_SECTION_ID); }
-  
-   function onSkip() {
-  if (global.JC?.show) global.JC.show('section-card');
-  else if (global.showSection) global.showSection('section-card');
- }
-  global.onSkip = onSkip; /
+  function onSkip(){ playTransitionThenGo(NEXT_SECTION_ID); }
 
- // ---------- Ordem ----------
+  // ---------- Ordem ----------
   function enforceOrder(section){ const order=['.selfie-header','#selfieOrientWrap','#selfieControls','#selfieButtons','#selfiePreviewWrap']; let attempts=0,max=10; const tryEnforce=()=>{ let prev=null,chg=false; order.forEach(sel=>{ const el=section.querySelector(sel); if(el && prev && el.previousElementSibling!==prev){ el.remove(); placeAfter(prev,el); chg=true; } prev=el||prev; }); attempts++; if(chg && attempts<max) setTimeout(tryEnforce,50); }; tryEnforce(); setTimeout(tryEnforce,300); }
   let orderObserver=null; function startOrderObserver(section){ if(orderObserver) orderObserver.disconnect(); orderObserver=new MutationObserver(()=>enforceOrder(section)); orderObserver.observe(section,{childList:true,subtree:true}); setTimeout(()=>{ if(orderObserver) orderObserver.disconnect(); },3000); }
 
