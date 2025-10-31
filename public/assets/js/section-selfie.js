@@ -101,25 +101,81 @@
     }
   }
 
-  // ---------- Header ----------
-  function ensureHeader(section) {
-    let head = section.querySelector('.selfie-header');
-    if (!head) {
-      head = document.createElement('header');
-      head.className = 'selfie-header';
-      head.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin:-6px 0 4px;position:relative;z-index:60;';
-      head.innerHTML = `
-        <h2 data-text="Tirar sua Foto" data-typing="true" data-speed="40">Tirar sua Foto ✨</h2>
-        <button id="btn-skip-selfie" class="btn btn-stone btn-stone-espinhos">Não quero Foto</button>`;
-      head.querySelector('#btn-skip-selfie').onclick = onSkip;
-      section.prepend(head);
-    } else {
-      const skip = head.querySelector('#btn-skip-selfie');
-      if (skip) { skip.textContent = 'Não quero Foto'; skip.classList.add('btn-stone'); }
+ // ---------- Header ----------
+function ensureHeader(section) {
+  let head = section.querySelector('.selfie-header');
+  if (!head) {
+    // Cria o header
+    head = document.createElement('header');
+    head.className = 'selfie-header';
+    head.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin:-6px 0 4px;position:relative;z-index:60;';
+
+    // Injeta o HTML
+    head.innerHTML = `
+      <h2 data-text="Tirar sua Foto" data-typing="true" data-speed="40">Tirar sua Foto</h2>
+      <button id="btn-skip-selfie" class="btn btn-stone btn-stone-espinhos">Não quero Foto</button>`;
+
+    // === ESTILOS DO BOTÃO (só uma vez) ===
+    const style = document.createElement('style');
+    style.textContent = `
+      .btn-stone, .btn-stone-espinhos {
+        background: linear-gradient(145deg, #4a4a4a, #2d2d2d);
+        border: 1px solid #666;
+        color: #f9e7c2;
+        font-family: 'Cardo', serif;
+        font-weight: bold;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+        box-shadow: 0 3px 6px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.1);
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        min-height: 36px;
+        cursor: pointer;
+      }
+      .btn-stone-espinhos::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,50 L10,45 L20,55 L30,48 L40,52 L50,45 L60,55 L70,48 L80,52 L90,45 L100,50 L90,55 L80,48 L70,52 L60,45 L50,55 L40,48 L30,52 L20,45 L10,55 Z" fill="rgba(139,69,19,0.3)" stroke="rgba(160,82,45,0.5)" stroke-width="1"/></svg>') repeat;
+        background-size: 20px;
+        pointer-events: none;
+        opacity: 0.6;
+      }
+      .btn-stone:hover, .btn-stone-espinhos:hover {
+        background: linear-gradient(145deg, #5a5a5a, #3d3d3d);
+      }
+      .btn-stone:active, .btn-stone-espinhos:active {
+        transform: translateY(1px);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+      }
+    `;
+    document.head.appendChild(style);
+    // =====================================
+
+    // Atribui o clique APÓS o DOM estar no lugar
+    const skipBtn = head.querySelector('#btn-skip-selfie');
+    if (skipBtn) {
+      skipBtn.onclick = onSkip;
     }
-    return head;
+
+    // Insere no início da seção
+    section.prepend(head);
+  } else {
+    // Caso o header já exista (raro), garante o texto e a classe
+    const skip = head.querySelector('#btn-skip-selfie');
+    if (skip) {
+      skip.textContent = 'Não quero Foto';
+      skip.classList.add('btn-stone', 'btn-stone-espinhos');
+      skip.onclick = onSkip; // reatribui por segurança
+    }
   }
 
+  return head;
+}
+   
   // ---------- Texto ----------
   async function ensureTexto(section) {
     const upper = getUpperName();
