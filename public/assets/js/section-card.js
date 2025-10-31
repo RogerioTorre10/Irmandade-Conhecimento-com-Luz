@@ -183,8 +183,15 @@
       actions.appendChild(btn);
     }
 
-    return { stage, guideBg, guideNameSlot, flameLayer, selfieSvgImage, userNameSlot: userNameSlot, btnNext: btn };
-  }
+     return {
+     stage,
+     guideBg,
+     guideNameSlot,
+     flameLayer,
+     flameSelfie: flameLayer.querySelector('.flame-selfie'),
+     userNameSlot,
+     btnNext
+   };
 
   // ---------------- Inicialização ----------------
   async function initCard(root) {
@@ -195,7 +202,7 @@
     const guia = await resolveSelectedGuide();
 
     // Garante estrutura e pega refs
-    const { guideBg, guideNameSlot, flameLayer, selfieSvgImage, userNameSlot, btnNext } = ensureStructure(section);
+       const { guideBg, guideNameSlot, flameLayer, flameSelfie, userNameSlot, btnNext } = ensureStructure(section);
 
     // Aplica BG do guia (preferência por <img>; se não existir, aplica como background do stage)
     if (guideBg && guideBg.tagName === 'IMG') {
