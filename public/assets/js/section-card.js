@@ -2,32 +2,32 @@
   'use strict';
 
   const MOD = 'section-card.js';
-  const SECTION_ID = 'section-card';
+  // Alinha com seu HTML:
+  const SECTION_ID = 'section-eu-na-irmandade';
   const NEXT_SECTION_ID = 'section-perguntas';
   const VIDEO_SRC = '/assets/videos/filme-card-dourado.mp4';
 
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-// helper: espera o vídeo acabar
-async function waitForTransitionUnlock(timeoutMs = 15000) {
-  if (!window.__TRANSITION_LOCK) return;
-  let resolved = false;
-  const p = new Promise(resolve => {
-    const onEnd = () => { if (!resolved) { resolved = true; document.removeEventListener('transition:ended', onEnd); resolve(); } };
-    document.addEventListener('transition:ended', onEnd, { once: true });
-  });
-  const t = new Promise((resolve) => setTimeout(resolve, timeoutMs));
-  await Promise.race([p, t]); // não fica preso para sempre
-}
+  // Espera o "transition lock" liberar (se houver vídeo/efeito rodando)
+  async function waitForTransitionUnlock(timeoutMs = 15000) {
+    if (!window.__TRANSITION_LOCK) return;
+    let resolved = false;
+    const p = new Promise(resolve => {
+      const onEnd = () => {
+        if (!resolved) {
+          resolved = true;
+          document.removeEventListener('transition:ended', onEnd);
+          resolve();
+        }
+      };
+      document.addEventListener('transition:ended', onEnd, { once: true });
+    });
+    const t = new Promise((resolve) => setTimeout(resolve, timeoutMs));
+    await Promise.race([p, t]);
+  }
 
-// … dentro do initOnce(root) ANTES de começar a digitar:
-await waitForTransitionUnlock();
-
-// agora sim, rode a sequência:
-// for (const el of items) await typeOnce(el, ...);
-
-  
   async function runTypingAndSpeak(el, text) {
     if (!el || !text) return;
 
@@ -86,113 +86,76 @@ await waitForTransitionUnlock();
     }
   }
 
+  function readSelfieDataUrl() {
+    // Tenta múltiplas chaves plausíveis
+    const keys = [
+      'jornada.selfieDataUrl', 'selfie.dataUrl', 'selfieDataUrl',
+      'jornada.selfie', 'selfie.image', 'selfieImageData'
+    ];
+    for (const k of keys) {
+      const v = sessionStorage.getItem(k);
+      if (v && /^data:image\//.test(v)) return v;
+    }
+    return '';
+  }
+
   async function initCard(root) {
     const nameInput = qs('#nameInput', root);
     const nameSlot = qs('#userNameSlot', root);
     const guideNameSlot = qs('#guideNameSlot', root);
     const guiaBg = qs('#guideBg', root);
+    const selfieImg = qs('#selfieImage', root);
+    const flameLayer = qs('.flame-layer', root);
 
     const saved = {
-      nome: sessionStorage.getItem('jornada.nome') || 'USUÁRIO',
-      guia: sessionStorage.getItem('jornada.guia') || 'zion'
+      nome: (sessionStorage.getItem('jornada.nome') || 'USUÁRIO').toUpperCase(),
+      guia: (sessionStorage.getItem('jornada.guia') || 'zion').toLowerCase()
     };
 
     if (nameInput) {
-      nameInput.value = saved.nome.toUpperCase();
+      nameInput.value = saved.nome;
       nameInput.addEventListener('input', () => {
-        const newName = nameInput.value.trim().toUpperCase();
+        const newName = (nameInput.value || '').trim().toUpperCase();
         sessionStorage.setItem('jornada.nome', newName);
         if (nameSlot) nameSlot.textContent = newName || 'USUÁRIO';
       });
     }
+    if (nameSlot) nameSlot.textContent = saved.nome;
 
-    if (nameSlot) nameSlot.textContent = saved.nome.toUpperCase();
-    if (guideNameSlot) guideNameSlot.textContent = saved.guia.toUpperCase();
-
+    // Carrega guias e aplica BG + nome correto do guia
     const guias = await loadGuias();
-    const selectedGuia = guias.find(g => g.id === saved.guia.toLowerCase()) || guias[0];
-    if (guiaBg && selectedGuia.bgImage) {
-      guiaBg.src = selectedGuia.bgImage;
+    const selectedGuia = guias.find(g => g.id === saved.guia) || guias[0];
+
+    if (guiaBg && selectedGuia?.bgImage) guiaBg.src = selectedGuia.bgImage;
+    if (guideNameSlot) guideNameSlot.textContent = (selectedGuia?.nome || saved.guia).toUpperCase();
+
+    // Aplica selfie dentro do clipPath (se existir)
+    const dataUrl = readSelfieDataUrl();
+    if (selfieImg && dataUrl) {
+      selfieImg.setAttribute('href', dataUrl);
+      // Mostra a camada da chama quando a imagem estiver pronta
+      // (image em <svg> não tem onload confiável em todos os browsers, então libera direto)
+      if (flameLayer) flameLayer.classList.add('show');
     }
 
+    // Aguarda fim de transição antes da digitação (evita atropelar vídeo/efeito)
+    await waitForTransitionUnlock();
+
+    // Digitação dos elementos marcados
     const elements = qsa('[data-typing="true"]', root);
-   // --- Selfie vinda da seção anterior (section-selfie) ---
-const selfieImg   = qs('#selfieImage', root);
-const flameLayer  = qs('.flame-layer', root);
-const nameSlot    = qs('#cardParticipantName', root);   // <span id="cardParticipantName"> no rodapé
-const guideName   = qs('#cardGuideName', root);         // opcional, se tiver
-
-    // Tenta pegar a selfie nas duas fontes que usamos no fluxo
- const selfieUrl =
-  (window.JC?.data?.selfieDataUrl) ||
-  localStorage.getItem('jc.selfieDataUrl') ||
-  sessionStorage.getItem('jc.selfieDataUrl') ||
-  '/assets/img/irmandade-card-placeholder.jpg'
-
- if (selfieImg) {
-  selfieImg.setAttribute('href', selfieUrl);
-  // Acende o glow da chama mesmo com placeholder (se preferir, só com selfie real)
-  if (flameLayer) flameLayer.style.opacity = '1';
-}
-
-// Ajuste dos nomes (prioriza sessão e cai para JC.data)
-const nomeUpper = (
-  sessionStorage.getItem('jornada.nome') ||
-  window.JC?.data?.nome ||
-  'AMOR'
-).toUpperCase();
-
-if (nameSlot) nameSlot.textContent = nomeUpper;
-
-// 3) Nome do guia (se tiver no layout do card)
-const guiaUpper = (
-  sessionStorage.getItem('jornada.guia') ||
-  window.JC?.data?.guia ||
-  'ZION'
-).toUpperCase();
-
-if (guideName) guideName.textContent = guiaUpper;
-
-// 4) Marca que o CARD foi exibido (usaremos para bloquear a próxima seção)
-window.JC = window.JC || {};
-JC.flags = JC.flags || {};
-JC.flags.cardShown = true;
-    
-// Garante o guia selecionado em caixa alta
-const guiaSel = (sessionStorage.getItem('jornada.guia') || 'zion').toUpperCase();
-if (guideNameSlot) guideNameSlot.textContent = guiaSel;
-
     for (const el of elements) {
       const text = (el.dataset.text || el.textContent || '').trim();
       await runTypingAndSpeak(el, text);
     }
 
-const btn = qs('#btnStartJourney', root) || qs('#btnNext', root);
+    // BOTÃO → avançar (alinha com seu HTML: #btnNext)
+    const btn = qs('#btnNext', root);
     if (btn) {
       btn.addEventListener('click', () => {
-        speechSynthesis.cancel();
-        qsa('video').forEach(video => {
-          video.pause();
-          video.src = '';
-          video.load();
-        });
+        try { speechSynthesis.cancel(); } catch {}
+        // Para e esvazia quaisquer <video> que estejam rodando
+        qsa('video').forEach(video => { try { video.pause(); video.src = ''; video.load(); } catch {} });
 
-       // onde você tem algo como:
-btn.addEventListener('click', () => {
-  // marque como visto/confirmado
-  window.JC = window.JC || {};
-  JC.flags = JC.flags || {};
-  JC.flags.cardConfirmed = true;
-
-  // segue sua lógica de transição:
-  if (VideoTransicao?.play) {
-    VideoTransicao.play({ src: '/assets/videos/filme-card-dourado.mp4', onEnd: () => goNext('section-perguntas') });
-  } else {
-    goNext('section-perguntas');
-  }
-});
-
-        
         if (typeof window.playTransitionVideo === 'function' && VIDEO_SRC) {
           window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
         } else {
@@ -204,30 +167,13 @@ btn.addEventListener('click', () => {
     console.log(`[${MOD}] Bloco de card carregado`);
   }
 
- // NO FINAL DO section-card.js, SUBSTITUA OS EVENT LISTENERS por:
-document.addEventListener('section:shown', (e) => {
-  const id = e.detail.sectionId;
-  if (id !== SECTION_ID) return;
-  console.log(`[CARD] Seção mostrada: ${id}`);
-  const root = e.detail.node;
-  if (root) initCard(root);
-});
-
-// NOVO: Listener mais agressivo
-document.addEventListener('sectionLoaded', (e) => {
-  const id = e.detail.sectionId;
-  if (id === SECTION_ID) {
-    console.log(`[CARD] Seção carregada: ${id}`);
-    const root = e.detail.node || document.getElementById(id);
-    if (root) initCard(root);
-  }
-});
-
-// FORCE no DOM direto
-const cardSection = document.getElementById(SECTION_ID);
-if (cardSection) {
-  cardSection.addEventListener('click', () => initCard(cardSection), { once: true });
-}
+  document.addEventListener('section:shown', (e) => {
+    const id = e.detail.sectionId;
+    if (id !== SECTION_ID) return;
+    const root = e.detail.node;
+    if (!root) return;
+    initCard(root);
+  });
 
   console.log(`[${MOD}] carregado`);
 })();
