@@ -293,5 +293,24 @@
   document.addEventListener('sectionWillHide', e=>{ if(e?.detail?.sectionId===SECTION_ID) stopCamera(); });
   document.addEventListener('sectionLoaded', e=>{ if(e?.detail?.sectionId===SECTION_ID) init(); });
   if (document.readyState !== 'loading') init(); else document.addEventListener('DOMContentLoaded', init);
+// --- Skip: garante função global + delegação robusta ---
+function onSkip(){ 
+  playTransitionThenGo(NEXT_SECTION_ID); 
+}
+window.onSkip = onSkip; // expõe para o DOM
+
+// prende UMA VEZ um listener delegado, caso o botão seja recriado
+if (!window.__bindSkipOnce) {
+  window.__bindSkipOnce = true;
+  document.addEventListener('click', function(e){
+    const t = e.target && e.target.closest && e.target.closest('#btn-skip-selfie');
+    if (t) {
+      e.preventDefault();
+      e.stopPropagation();
+      onSkip();
+    }
+  }, true);
+}
+
 
 })(window);
