@@ -18,7 +18,7 @@
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-  // ---------------- Utilitários ----------------
+   // ---------- Utilitários ----------
   async function waitForTransitionUnlock(timeoutMs = 12000) {
     if (!window.__TRANSITION_LOCK) return;
     let done = false;
@@ -46,18 +46,18 @@
     try { await window.EffectCoordinator?.speak?.(text, { rate: 1.0 }); } catch {}
   }
 
-  function setSvgImageHref(imgEl, url) {
-    try { imgEl.setAttribute('href', url); } catch {}
-    try { imgEl.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', url); } catch {}
-  }
-
   function readSelfieUrlOrPlaceholder() {
     const keys = ['jornada.selfieDataUrl','selfie.dataUrl','selfieDataUrl','jornada.selfie','selfie.image','selfieImageData'];
-    for (const k of keys) { try { const v = sessionStorage.getItem(k); if (v && /^data:image\//.test(v)) return v; } catch {} }
+    for (const k of keys) {
+      try {
+        const v = sessionStorage.getItem(k);
+        if (v && /^data:image\//.test(v)) return v;
+      } catch {}
+    }
     return PLACEHOLDER_SELFIE;
   }
 
-  // ---------------- JSON dos guias ----------------
+  // ---------- JSON dos guias ----------
   async function loadGuiasJson() {
     if (GUIAS_CACHE) return GUIAS_CACHE;
     try {
@@ -70,6 +70,7 @@
         nome: g.nome || g.name || '',
         bgImage: g.bgImage || g.bg || ''
       }));
+      console.log(`[${MOD}] guias.json carregado:`, GUIAS_CACHE);
     } catch (e) {
       console.warn(`[${MOD}] Falha ao carregar ${GUIAS_JSON}:`, e);
       GUIAS_CACHE = [];
@@ -85,9 +86,9 @@
     return { id: selId, nome: titleize(selId), bgImage: CARD_BG[selId] || CARD_BG.zion };
   }
 
-  // ---------------- Compat layer: acha ou cria estrutura ----------------
+  // ---------- Compat layer: acha OU cria estrutura mínima ----------
   function ensureStructure(root) {
-    // container base (card-stage)
+    // 1) palco/base
     let stage = root.querySelector('.card-stage, .card-stage-wrap, .card-container, .card');
     if (!stage) {
       stage = document.createElement('div');
@@ -96,7 +97,7 @@
     }
     stage.style.position = stage.style.position || 'relative';
 
-    // BG do guia: tenta vários seletores; se não existir, cria <img id="guideBg">
+    // 2) BG do guia
     let guideBg = stage.querySelector('#guideBg, .guide-bg, .card-bg img, img.card-bg');
     if (!guideBg) {
       guideBg = document.createElement('img');
@@ -109,21 +110,21 @@
       stage.appendChild(guideBg);
     }
 
-    // Nome do guia (topo)
-    let guideNameSlot = stage.querySelector('#guideNameSlot, .card-guide-name #guideNameSlot, .card-guide-name span');
+    // 3) Nome do guia (topo)
     let guideNameWrap = stage.querySelector('.card-guide-name');
     if (!guideNameWrap) {
       guideNameWrap = document.createElement('div');
       guideNameWrap.className = 'card-guide-name';
       stage.appendChild(guideNameWrap);
     }
+    let guideNameSlot = stage.querySelector('#guideNameSlot') || guideNameWrap.querySelector('span');
     if (!guideNameSlot) {
       guideNameSlot = document.createElement('span');
       guideNameSlot.id = 'guideNameSlot';
       guideNameWrap.appendChild(guideNameSlot);
     }
 
-    // Camada da chama
+    // 4) Camada da chama
     let flameLayer = stage.querySelector('.flame-layer');
     if (!flameLayer) {
       flameLayer = document.createElement('div');
@@ -131,28 +132,18 @@
       stage.appendChild(flameLayer);
     }
 
-    
-   // SVG + image da selfie
-   let flameSelfie = stage.querySelector('.flame-selfie');
-   if (!flameSelfie) {
-     flameLayer.innerHTML = `
-      <img class="flame-selfie" id="selfieImage"
-         src="${PLACEHOLDER_SELFIE}"
-         alt="Selfie ou Placeholder"
-         loading="lazy" />`;
-    flameSelfie = flameLayer.querySelector('.flame-selfie');
-  }
-    const url = readSelfieUrlOrPlaceholder();
-    if (flameSelfie && url) {
-    flameSelfie.src = url;
-    flameLayer?.classList.add('show');
-    flameSelfie.addEventListener?.('error', () => {
-    flameSelfie.src = PLACEHOLDER_SELFIE;
-    flameLayer?.classList.add('show');
-  });
- }
+    // 5) Selfie/placeholder com CSS mask (SEM SVG)
+    let flameSelfie = stage.querySelector('.flame-selfie');
+    if (!flameSelfie) {
+      flameLayer.innerHTML = `
+        <img class="flame-selfie" id="selfieImage"
+             src="${PLACEHOLDER_SELFIE}"
+             alt="Selfie ou Placeholder"
+             loading="lazy" />`;
+      flameSelfie = flameLayer.querySelector('.flame-selfie');
+    }
 
-    // Rodapé com nome do participante
+    // 6) Rodapé (nome do participante)
     let footer = stage.querySelector('.card-footer');
     if (!footer) {
       footer = document.createElement('div');
@@ -172,62 +163,74 @@
       badge.appendChild(userNameSlot);
     }
 
-    // Botão continuar
-    let btn = root.querySelector('#btnNext, .btn-next-card');
-    if (!btn) {
+    // 7) Ações (botão continuar)
+    let btnNext = root.querySelector('#btnNext, .btn-next-card');
+    if (!btnNext) {
       const actions = root.querySelector('.card-actions') || root.appendChild(Object.assign(document.createElement('div'), {className:'card-actions'}));
-      btn = document.createElement('button');
-      btn.id = 'btnNext';
-      btn.className = 'btn btn-stone';
-      btn.textContent = 'Continuar';
-      actions.appendChild(btn);
+      btnNext = document.createElement('button');
+      btnNext.id = 'btnNext';
+      btnNext.className = 'btn btn-stone';
+      btnNext.textContent = 'Continuar';
+      actions.appendChild(btnNext);
     }
 
-     return {
-     stage,
-     guideBg,
-     guideNameSlot,
-     flameLayer,
-     flameSelfie: flameLayer.querySelector('.flame-selfie'),
-     userNameSlot,
-     btnNext
-   };
+    return { stage, guideBg, guideNameSlot, flameLayer, flameSelfie, userNameSlot, btnNext };
+  }
 
-  // ---------------- Inicialização ----------------
+  // ---------- Inicialização ----------
   async function initCard(root) {
-    // Se a seção veio embrulhada, tenta achar o nó da própria seção
+    // detecta a seção alvo
     const section = SECTION_IDS.map(id => root.id === id ? root : qs(`#${id}`, root) || qs(`#${id}`)).find(Boolean) || root;
 
     const nome = (sessionStorage.getItem('jornada.nome') || 'USUÁRIO').toUpperCase();
     const guia = await resolveSelectedGuide();
 
-    // Garante estrutura e pega refs
-       const { guideBg, guideNameSlot, flameLayer, flameSelfie, userNameSlot, btnNext } = ensureStructure(section);
+    // Garante estrutura mínima
+    const { stage, guideBg, guideNameSlot, flameLayer, flameSelfie, userNameSlot, btnNext } = ensureStructure(section);
 
-    // Aplica BG do guia (preferência por <img>; se não existir, aplica como background do stage)
+    // Altura mínima do palco (evita achatamento por CSS externo)
+    if (stage && !stage.style.minHeight) stage.style.minHeight = '52vh';
+
+    // BG do guia → preferir <img>; se falhar, pintar no stage
     if (guideBg && guideBg.tagName === 'IMG') {
       guideBg.src = guia.bgImage;
       guideBg.alt = `${guia.nome} — Card da Irmandade`;
+      const applyFallbackBG = () => {
+        // se não carregou, pinta o plano de fundo do stage
+        if (!guideBg.naturalWidth) {
+          stage.style.backgroundImage = `url("${guia.bgImage}")`;
+          stage.style.backgroundSize = 'cover';
+          stage.style.backgroundPosition = 'center';
+        }
+      };
+      if (guideBg.complete) {
+        applyFallbackBG();
+      } else {
+        guideBg.addEventListener('load', applyFallbackBG, { once: true });
+        guideBg.addEventListener('error', applyFallbackBG, { once: true });
+      }
     } else {
-      // fallback: usar background no container
-      section.style.backgroundImage = `url("${guia.bgImage}")`;
-      section.style.backgroundSize = 'cover';
-      section.style.backgroundPosition = 'center';
+      stage.style.backgroundImage = `url("${guia.bgImage}")`;
+      stage.style.backgroundSize = 'cover';
+      stage.style.backgroundPosition = 'center';
     }
-    if (guideNameSlot) guideNameSlot.textContent = (guia.nome || '').toUpperCase();
-    if (userNameSlot) userNameSlot.textContent = nome;
 
-    // Selfie (ou placeholder) na chama
+    // Nome do guia e do participante
+    if (guideNameSlot) guideNameSlot.textContent = (guia.nome || '').toUpperCase();
+    if (userNameSlot)  userNameSlot.textContent  = nome;
+
+    // Selfie/placeholder + exibir camada
     const url = readSelfieUrlOrPlaceholder();
-    if (selfieSvgImage) {
-      setSvgImageHref(selfieSvgImage, url);
+    if (flameSelfie && url) {
+      flameSelfie.src = url;
       flameLayer?.classList.add('show');
-      selfieSvgImage.addEventListener?.('error', () => {
-        setSvgImageHref(selfieSvgImage, PLACEHOLDER_SELFIE);
+      flameSelfie.addEventListener?.('error', () => {
+        flameSelfie.src = PLACEHOLDER_SELFIE;
         flameLayer?.classList.add('show');
       });
     }
 
+    // Espera transição e aplica datilografia/TTS
     await waitForTransitionUnlock();
     const typings = qsa('[data-typing="true"]', section);
     for (const el of typings) {
@@ -235,6 +238,7 @@
       await runTypingAndSpeak(el, text);
     }
 
+    // Botão continuar
     if (btnNext) {
       btnNext.onclick = () => {
         try { speechSynthesis.cancel(); } catch {}
@@ -250,7 +254,7 @@
     console.log(`[${MOD}] Card exibido · guia=${guia.id} (${guia.nome}) · participante=${nome}`);
   }
 
-  // ---------------- Escutas ----------------
+  // ---------- Escutas ----------
   document.addEventListener('section:shown', (e) => {
     const id = e.detail.sectionId;
     if (!SECTION_IDS.includes(id)) return;
@@ -258,11 +262,12 @@
     initCard(root);
   });
 
-  // Fallback para render direto
+  // Fallback: se a seção já estiver visível sem evento
   document.addEventListener('DOMContentLoaded', () => {
     const visible = SECTION_IDS.map(id => qs(`#${id}`)).find(el => el && (el.offsetParent !== null || el.style.display !== 'none'));
     if (visible) initCard(visible);
   });
 
-  console.log(`[${MOD}] carregado (robusto)`);
+  console.log(`[${MOD}] carregado (CSS mask; guias.json; robusto)`);
 })();
+
