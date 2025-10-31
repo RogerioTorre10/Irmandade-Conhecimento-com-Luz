@@ -324,3 +324,34 @@
 .flame-layer.show {
   opacity: 1;
 }
+/* ---- Chama com recorte via máscara ---- */
+.flame-layer {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: clamp(60px, 9%, 90px);
+  width: clamp(200px, 46%, 520px);
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+}
+.flame-layer.show { opacity: 1; }
+
+.flame-selfie {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  -webkit-mask-image: url("/assets/img/chama-card.png");
+  mask-image: url("/assets/img/chama-card.png");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center bottom;
+  mask-position: center bottom;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  mask-mode: alpha;
+  box-shadow:
+    inset 0 -10px 24px rgba(0,0,0,.35),
+    0 0 0 1px rgba(255,215,160,.08);
+}
