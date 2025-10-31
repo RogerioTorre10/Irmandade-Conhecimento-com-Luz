@@ -412,4 +412,7 @@
   document.addEventListener('sectionLoaded', e=>{ if(e?.detail?.sectionId===SECTION_ID) init(); });
   if (document.readyState !== 'loading') init(); else document.addEventListener('DOMContentLoaded', init);
 
+  NS.playTransitionAndGo = playTransitionAndGo;
+  NS.skipAndPlayTransition = skipAndPlayTransition;
+   
 })(window);
