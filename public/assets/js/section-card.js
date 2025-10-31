@@ -77,14 +77,51 @@
     }
     return GUIAS_CACHE;
   }
+function readSelectedGuideId() {
+  // 1) DOM: <section id="card-guide" data-guide="ZION">
+  const dom = document.querySelector('#card-guide');
+  let v = dom?.getAttribute('data-guide');
+
+  // 2) sessionStorage (tentamos várias chaves usuais)
+  const keys = [
+    'jornada.guia', 'guia', 'guia.id', 'selected.guia',
+    'guiaSelecionado', 'guiaChoice', 'jc.guia'
+  ];
+  for (const k of keys) {
+    try {
+      const s = sessionStorage.getItem(k);
+      if (!v && s) v = s;
+    } catch {}
+  }
+
+  // 3) default
+  if (!v) v = 'zion';
+
+  // normaliza
+  v = String(v).trim().toLowerCase();
+  // sinônimos comuns
+  const map = { arion: 'arian', árion: 'arian' };
+  v = map[v] || v;
+
+  // id válido
+  if (!['zion','lumen','arian'].includes(v)) v = 'zion';
+
+  console.log('[section-card.js] guia selecionado (normalizado):', v);
+  return v;
+}
+
+  
   function titleize(id){ const m={arian:'Arian',lumen:'Lumen',zion:'Zion'}; return m[id] || (id? id[0].toUpperCase()+id.slice(1):''); }
   async function resolveSelectedGuide() {
-    const selId = (sessionStorage.getItem('jornada.guia') || 'zion').toLowerCase();
-    const guias = await loadGuiasJson();
-    const j = guias.find(g => g.id === selId);
-    if (j && (j.bgImage || j.nome)) return { id: selId, nome: j.nome || titleize(selId), bgImage: j.bgImage || CARD_BG[selId] || CARD_BG.zion };
-    return { id: selId, nome: titleize(selId), bgImage: CARD_BG[selId] || CARD_BG.zion };
+  const selId = readSelectedGuideId();  // <— usa a função nova
+  const guias = await loadGuiasJson();
+  const j = guias.find(g => String(g.id || '').toLowerCase() === selId);
+  if (j && (j.bgImage || j.nome)) {
+    return { id: selId, nome: j.nome || titleize(selId), bgImage: j.bgImage || CARD_BG[selId] || CARD_BG.zion };
   }
+  return { id: selId, nome: titleize(selId), bgImage: CARD_BG[selId] || CARD_BG.zion };
+}
+
 
   // ---------- Compat layer: acha OU cria estrutura mínima ----------
   function ensureStructure(root) {
