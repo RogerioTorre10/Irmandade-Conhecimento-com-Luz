@@ -345,4 +345,13 @@ function ensureHeader(section) {
   document.addEventListener('sectionLoaded', e=>{ if(e?.detail?.sectionId===SECTION_ID) init(); });
   if (document.readyState !== 'loading') init(); else document.addEventListener('DOMContentLoaded', init);
 
+   // Garante que o botão sempre tenha o evento (útil em SPA com reload de seção)
+  setTimeout(() => {
+  const btn = document.getElementById('btn-skip-selfie');
+  if (btn && !btn.dataset.hasClick) {
+    btn.onclick = onSkip;
+    btn.dataset.hasClick = 'true';
+  }
+}, 300);
+   
 })(window);
