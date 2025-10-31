@@ -1,10 +1,11 @@
-/* /assets/js/section-selfie.js — FASE 4.6 (COMPLETO)
+/* /assets/js/section-selfie.js — FASE 4.6 (COMPLETO + FIX)
    - Layout estável no mobile/desktop, sem sobreposição
    - Botões na MESMA linha (com folga central); auto‑ajuste em telas pequenas
-   - Prévia fixa no rodapé com aspect‑ratio 3:4; seção ganha padding-bottom para não "invadir" a prévia
+   - Prévia fixa no rodapé com aspect‑ratio 3:4; seção ganha padding-bottom
    - Sem máscara (container faz o enquadramento)
    - Header: botão "Não quero Foto" com textura de pedra + espinhos
-   - Fluxo dos botões: Prévia → ativa/repete câmera; Foto → captura; Iniciar → confirma + transição
+   - Fluxo: Prévia → ativa câmera; Foto → captura; Iniciar → confirma
+   - Botão "Não quero Foto" → VAI DIRETO PRO CARD (sem esperar nada)
    - Vídeo de transição: /assets/videos/filme-selfie-card.mp4
 */
 (function (global) {
@@ -14,16 +15,16 @@
   if (NS.__phase46_bound) return; // idempotente
   NS.__phase46_bound = true;
 
-  // ---- Integração ----
+  // ---- Config ----
   const MOD = 'section-selfie.js';
   const SECTION_ID = 'section-selfie';
   const NEXT_SECTION_ID = 'section-card';
   const VIDEO_SRC = '/assets/videos/filme-selfie-card.mp4';
 
   // Métrica do CARD (prévia): 3:4
-  const PREVIEW_MIN_H = 240;   // px
-  const PREVIEW_MAX_H = 420;   // px
-  const PREVIEW_VH   = 38;     // % da viewport
+  const PREVIEW_MIN_H = 240;
+  const PREVIEW_MAX_H = 420;
+  const PREVIEW_VH = 38;
   const PREVIEW_AR_W = 3;
   const PREVIEW_AR_H = 4;
 
@@ -33,7 +34,7 @@
   let stream = null;
   let videoEl = null;
   let canvasEl = null;
-  let previewBox = null; // #selfiePreview
+  let previewBox = null;
 
   // ---------- Nome ----------
   function getUpperName() {
@@ -48,9 +49,9 @@
     if (!name || typeof name !== 'string') name = 'AMOR';
     const upper = name.toUpperCase().trim();
     try {
-      global.JC = global.JC || {}; 
+      global.JC = global.JC || {};
       global.JC.data = global.JC.data || {};
-      global.JC.data.nome = upper; 
+      global.JC.data.nome = upper;
       global.JC.data.participantName = upper;
       try { localStorage.setItem('jc.nome', upper); } catch {}
     } catch {}
@@ -58,7 +59,7 @@
   }
 
   // ---------- Utils ----------
-  const waitForElement = (sel, opt={}) => new Promise((res, rej) => {
+  const waitForElement = (sel, opt = {}) => new Promise((res, rej) => {
     let t = 0;
     const i = setInterval(() => {
       const e = document.querySelector(sel);
@@ -101,81 +102,94 @@
     }
   }
 
- // ---------- Header ----------
-function ensureHeader(section) {
-  let head = section.querySelector('.selfie-header');
-  if (!head) {
-    // Cria o header
+  // ---------- HEADER (SIMPLIFICADO E INDESTRUTÍVEL) ----------
+  function ensureHeader(section) {
+    let head = section.querySelector('.selfie-header');
+    if (head) {
+      const btn = head.querySelector('#btn-skip-selfie');
+      if (btn) {
+        btn.onclick = goToCardNow;
+        return head;
+      }
+    }
+
     head = document.createElement('header');
     head.className = 'selfie-header';
     head.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin:-6px 0 4px;position:relative;z-index:60;';
 
-    // Injeta o HTML
     head.innerHTML = `
       <h2 data-text="Tirar sua Foto" data-typing="true" data-speed="40">Tirar sua Foto</h2>
-      <button id="btn-skip-selfie" class="btn btn-stone btn-stone-espinhos">Não quero Foto</button>`;
+      <button id="btn-skip-selfie" class="btn">Não quero Foto</button>
+    `;
 
-    // === ESTILOS DO BOTÃO (só uma vez) ===
+    // ESTILO DO BOTÃO (só uma vez, direto no ID)
     const style = document.createElement('style');
     style.textContent = `
-      .btn-stone, .btn-stone-espinhos {
+      #btn-skip-selfie {
         background: linear-gradient(145deg, #4a4a4a, #2d2d2d);
         border: 1px solid #666;
         color: #f9e7c2;
         font-family: 'Cardo', serif;
         font-weight: bold;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.6);
-        box-shadow: 0 3px 6px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.1);
-        transition: all 0.2s ease;
-        position: relative;
-        overflow: hidden;
+        font-size: 14px;
         padding: 8px 16px;
         border-radius: 8px;
-        font-size: 14px;
-        min-height: 36px;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.4);
         cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+        overflow: hidden;
+        min-height: 36px;
       }
-      .btn-stone-espinhos::before {
+      #btn-skip-selfie::before {
         content: '';
         position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,50 L10,45 L20,55 L30,48 L40,52 L50,45 L60,55 L70,48 L80,52 L90,45 L100,50 L90,55 L80,48 L70,52 L60,45 L50,55 L40,48 L30,52 L20,45 L10,55 Z" fill="rgba(139,69,19,0.3)" stroke="rgba(160,82,45,0.5)" stroke-width="1"/></svg>') repeat;
-        background-size: 20px;
-        pointer-events: none;
+        inset: 0;
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M0,50 L10,45 L20,55 L30,48 L40,52 L50,45 L60,55 L70,48 L80,52 L90,45 L100,50 L90,55 L80,48 L70,52 L60,45 L50,55 L40,48 L30,52 L20,45 L10,55 Z" fill="rgba(139,69,19,0.3)" stroke="rgba(160,82,45,0.5)" stroke-width="1"/></svg>') repeat;
+        background-size: 18px;
         opacity: 0.6;
+        pointer-events: none;
       }
-      .btn-stone:hover, .btn-stone-espinhos:hover {
-        background: linear-gradient(145deg, #5a5a5a, #3d3d3d);
-      }
-      .btn-stone:active, .btn-stone-espinhos:active {
-        transform: translateY(1px);
-        box-shadow: 0 1px 3px rgba(0,0,0,0.4);
-      }
+      #btn-skip-selfie:hover { background: linear-gradient(145deg, #5a5a5a, #3d3d3d); }
+      #btn-skip-selfie:active { transform: translateY(1px); box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
     `;
     document.head.appendChild(style);
-    // =====================================
 
-    // Atribui o clique APÓS o DOM estar no lugar
-    const skipBtn = head.querySelector('#btn-skip-selfie');
-    if (skipBtn) {
-      skipBtn.onclick = onSkip;
-    }
+    const btn = head.querySelector('#btn-skip-selfie');
+    btn.onclick = goToCardNow;
 
-    // Insere no início da seção
     section.prepend(head);
-  } else {
-    // Caso o header já exista (raro), garante o texto e a classe
-    const skip = head.querySelector('#btn-skip-selfie');
-    if (skip) {
-      skip.textContent = 'Não quero Foto';
-      skip.classList.add('btn-stone', 'btn-stone-espinhos');
-      skip.onclick = onSkip; // reatribui por segurança
+    return head;
+  }
+
+  // FUNÇÃO PURA: VAI PRO CARD AGORA
+  function goToCardNow() {
+    // Limpa selfie
+    try {
+      if (global.JC?.data) {
+        delete global.JC.data.selfieDataUrl;
+        global.JC.data.selfieSkipped = true;
+      }
+      localStorage.removeItem('jc.selfieDataUrl');
+    } catch (e) {}
+
+    // Para câmera
+    if (typeof stopCamera === 'function') stopCamera();
+
+    // Vai pro card (com ou sem transição)
+    const nextId = NEXT_SECTION_ID;
+    if (typeof playTransitionThenGo === 'function') {
+      playTransitionThenGo(nextId);
+    } else if (global.JC?.show) {
+      global.JC.show(nextId);
+    } else if (global.showSection) {
+      global.showSection(nextId);
+    } else {
+      const el = document.getElementById(nextId);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
     }
   }
 
-  return head;
-}
-   
   // ---------- Texto ----------
   async function ensureTexto(section) {
     const upper = getUpperName();
@@ -240,7 +254,7 @@ function ensureHeader(section) {
 
   function applyPreviewTransform(a=1,x=1,y=1){ if(!videoEl||!canvasEl) return; const sx=a*x, sy=a*y; videoEl.style.transform=`translate(-50%,-50%) scaleX(${sx}) scaleY(${sy})`; canvasEl.style.transform=`translate(-50%,-50%) scaleX(${sx}) scaleY(${sy})`; }
 
-  // ---------- Botões (uma linha, com folga central) ----------
+  // ---------- Botões ----------
   function ensureButtons(section) {
     let div = section.querySelector('#selfieButtons');
     if (!div) {
@@ -280,7 +294,7 @@ function ensureHeader(section) {
     div.style.zIndex = '60';
   }
 
-  // ---------- Prévia fixa (rodapé) ----------
+  // ---------- Prévia fixa ----------
   function ensurePreview(section) {
     if (section.querySelector('#selfiePreviewWrap')) return;
     const style = document.createElement('style');
@@ -322,7 +336,7 @@ function ensureHeader(section) {
   }
   function stopCamera(){ if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; } if(videoEl) videoEl.srcObject=null; }
 
-  // --- Desenho cover no canvas (ratio 3:4 sem distorcer) ---
+  // --- Desenho cover no canvas ---
   function drawCover(video, ctx, cw, ch){ const vw=video.videoWidth||1280, vh=video.videoHeight||720; const arV=vw/vh, arC=cw/ch; let sx,sy,sw,sh; if(arV>arC){ sh=vh; sw=Math.floor(vh*arC); sx=Math.floor((vw-sw)/2); sy=0; } else { sw=vw; sh=Math.floor(vw/arC); sx=0; sy=Math.floor((vh-sh)/2); } ctx.drawImage(video, sx, sy, sw, sh, 0, 0, cw, ch); }
 
   function capturePhoto(){ if(!videoEl) return; const cw=Math.floor(previewBox.clientWidth), ch=Math.floor(previewBox.clientHeight); canvasEl.width=cw; canvasEl.height=ch; const ctx=canvasEl.getContext('2d'); drawCover(videoEl, ctx, cw, ch); const dataUrl=canvasEl.toDataURL('image/jpeg', 0.92); videoEl.style.display='none'; canvasEl.style.display='block'; NS._lastCapture=dataUrl; }
@@ -331,7 +345,6 @@ function ensureHeader(section) {
   function goNext(id){ if(global.JC?.show) global.JC.show(id); else if(global.showSection) global.showSection(id); }
   function playTransitionThenGo(id){ if(global.VideoTransicao?.play){ try{ global.VideoTransicao.play({ src: VIDEO_SRC, onEnd: ()=>goNext(id) }); } catch { goNext(id); } } else { goNext(id); } }
   function confirmPhoto(){ const dataUrl=NS._lastCapture; if(!dataUrl){ toast('Tire uma foto primeiro.'); return; } try{ global.JC=global.JC||{}; global.JC.data=global.JC.data||{}; global.JC.data.selfieDataUrl=dataUrl; try{ localStorage.setItem('jc.selfieDataUrl', dataUrl);}catch{} }catch{} playTransitionThenGo(NEXT_SECTION_ID); }
-  function onSkip(){ playTransitionThenGo(NEXT_SECTION_ID); }
 
   // ---------- Ordem ----------
   function enforceOrder(section){ const order=['.selfie-header','#selfieOrientWrap','#selfieControls','#selfieButtons','#selfiePreviewWrap']; let attempts=0,max=10; const tryEnforce=()=>{ let prev=null,chg=false; order.forEach(sel=>{ const el=section.querySelector(sel); if(el && prev && el.previousElementSibling!==prev){ el.remove(); placeAfter(prev,el); chg=true; } prev=el||prev; }); attempts++; if(chg && attempts<max) setTimeout(tryEnforce,50); }; tryEnforce(); setTimeout(tryEnforce,300); }
@@ -345,13 +358,4 @@ function ensureHeader(section) {
   document.addEventListener('sectionLoaded', e=>{ if(e?.detail?.sectionId===SECTION_ID) init(); });
   if (document.readyState !== 'loading') init(); else document.addEventListener('DOMContentLoaded', init);
 
-   // Garante que o botão sempre tenha o evento (útil em SPA com reload de seção)
-  setTimeout(() => {
-  const btn = document.getElementById('btn-skip-selfie');
-  if (btn && !btn.dataset.hasClick) {
-    btn.onclick = onSkip;
-    btn.dataset.hasClick = 'true';
-  }
-}, 300);
-   
 })(window);
