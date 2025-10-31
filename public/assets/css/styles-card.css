@@ -306,3 +306,11 @@
     font-size: clamp(18px, 3.6vw, 32px);
   }
 }
+/* Faz a .titulo-selfie herdar o mesmo estilo da .titulo-card */
+.titulo-selfie { composes: titulo-card; } /* se não usar preprocessor, use o fallback: */
+.titulo-selfie {
+  text-align: center;
+  font-size: clamp(28px, 5vw, 56px);
+  margin-bottom: 24px;
+  font-family: 'ManufacturingConsent', sans-serif;
+}
