@@ -1,13 +1,17 @@
-/* /assets/js/section-card.js — versão com suporte a /assets/data/guias.json + fallbacks */
+/* /assets/js/section-card.js — compatível com section-card e section-eu-na-irmandade; usa /assets/data/guias.json */
 (function () {
   'use strict';
 
   const MOD = 'section-card.js';
-  const SECTION_ID = 'section-eu-na-irmandade';
-  const NEXT_SECTION_ID = 'section-perguntas';
-  const VIDEO_SRC = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
 
-  // Caminhos fixos dos cards (fallback) e placeholder
+  // Aceita ambos IDs: o controller usa "section-card"; em versões anteriores usamos "section-eu-na-irmandade"
+  const SECTION_IDS = ['section-card', 'section-eu-na-irmandade'];
+
+  // Próxima etapa e vídeo de transição
+  const NEXT_SECTION_ID = 'section-perguntas';
+  const VIDEO_SRC = '/assets/videos/filme-card-dourado.mp4';
+
+  // Fallbacks fixos
   const CARD_BG = {
     arian: '/assets/img/irmandade-quarteto-bg-arian.png',
     lumen: '/assets/img/irmandade-quarteto-bg-lumen.png',
@@ -15,11 +19,10 @@
   };
   const PLACEHOLDER_SELFIE = '/assets/img/irmandade-card-placeholder.jpg';
 
-  // JSON com metadados dos guias (preferencial)
+  // JSON preferencial (conforme seu arquivo)
   const GUIAS_JSON = '/assets/data/guias.json';
-  let GUIAS_CACHE = null; // cache leve em memória
+  let GUIAS_CACHE = null;
 
-  // Atalhos
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
 
@@ -54,7 +57,7 @@
       await new Promise(res => {
         try {
           window.runTyping(el, text, res, { speed, cursor: el.dataset.cursor !== 'false' });
-        } catch (e) {
+        } catch {
           el.textContent = text;
           res();
         }
@@ -80,7 +83,7 @@
     try {
       const p = window.EffectCoordinator?.speak?.(text, { rate: 1.0 });
       if (p && typeof p.then === 'function') await p;
-    } catch (_) {}
+    } catch {}
   }
 
   function setSvgImageHref(imgEl, url) {
@@ -102,29 +105,20 @@
     return PLACEHOLDER_SELFIE;
   }
 
-  // ---------- JSON dos guias (preferencial) ----------
+  // ---------- JSON dos guias ----------
   async function loadGuiasJson() {
     if (GUIAS_CACHE) return GUIAS_CACHE;
     try {
       const res = await fetch(GUIAS_JSON, { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      // Normaliza para array de objetos {id, nome, bgImage}
-      if (Array.isArray(data)) {
-        GUIAS_CACHE = data.map(g => ({
-          id: String(g.id || '').toLowerCase(),
-          nome: g.nome || g.name || '',
-          bgImage: g.bgImage || g.bg || ''
-        }));
-      } else if (data && typeof data === 'object' && data.guias) {
-        GUIAS_CACHE = (data.guias || []).map(g => ({
-          id: String(g.id || '').toLowerCase(),
-          nome: g.nome || g.name || '',
-          bgImage: g.bgImage || g.bg || ''
-        }));
-      } else {
-        GUIAS_CACHE = [];
-      }
+      // Aceita array direto ou {guias:[...]}
+      const arr = Array.isArray(data) ? data : (Array.isArray(data.guias) ? data.guias : []);
+      GUIAS_CACHE = arr.map(g => ({
+        id: String(g.id || '').toLowerCase(),
+        nome: g.nome || g.name || '',
+        bgImage: g.bgImage || g.bg || ''
+      }));
     } catch (e) {
       console.warn(`[${MOD}] Falha ao carregar ${GUIAS_JSON}:`, e);
       GUIAS_CACHE = [];
@@ -132,30 +126,27 @@
     return GUIAS_CACHE;
   }
 
+  function titleizeId(id) {
+    const map = { arian: 'Arian', lumen: 'Lumen', zion: 'Zion' };
+    return map[id] || (id ? id[0].toUpperCase() + id.slice(1) : '');
+  }
+
   async function resolveSelectedGuide() {
     const selId = (sessionStorage.getItem('jornada.guia') || 'zion').toLowerCase();
-    // 1) tenta via JSON
     const guias = await loadGuiasJson();
     const fromJson = guias.find(g => g.id === selId);
     if (fromJson && (fromJson.bgImage || fromJson.nome)) {
       return {
         id: selId,
-        nome: (fromJson.nome || capitalize(selId)),
+        nome: fromJson.nome || titleizeId(selId),
         bgImage: fromJson.bgImage || CARD_BG[selId] || CARD_BG.zion
       };
     }
-    // 2) fallback fixo
     return {
       id: selId,
-      nome: capitalize(selId),
+      nome: titleizeId(selId),
       bgImage: CARD_BG[selId] || CARD_BG.zion
     };
-  }
-
-  function capitalize(id) {
-    if (!id) return '';
-    const map = { arian: 'Arian', lumen: 'Lumen', zion: 'Zion' };
-    return map[id] || (id.charAt(0).toUpperCase() + id.slice(1));
   }
 
   // ---------- Inicialização do Card ----------
@@ -166,11 +157,11 @@
     const flameLayer = qs('.flame-layer', root);
     const selfieSvgImage = qs('#selfieImage', root);
 
-    // Nome herdado
+    // Nome (herdado da página guia)
     const nome = (sessionStorage.getItem('jornada.nome') || 'USUÁRIO').toUpperCase();
     if (nameSlot) nameSlot.textContent = nome;
 
-    // Guia (JSON preferencial + fallback)
+    // Guia via JSON (preferência) + fallback
     const guia = await resolveSelectedGuide();
     if (guiaBg && guia.bgImage) {
       guiaBg.src = guia.bgImage;
@@ -189,7 +180,7 @@
       });
     }
 
-    // Respeita transição (vídeo/efeitos) e aplica digitação/voz
+    // Aguarda transição (vídeo/effects) e aplica datilografia/TTS
     await waitForTransitionUnlock();
     const elements = qsa('[data-typing="true"]', root);
     for (const el of elements) {
@@ -197,7 +188,7 @@
       await runTypingAndSpeak(el, text);
     }
 
-    // Continuar → vídeo de transição + próxima seção
+    // Botão continuar
     const btn = qs('#btnNext', root);
     if (btn) {
       btn.addEventListener('click', () => {
@@ -215,14 +206,21 @@
     console.log(`[${MOD}] Card exibido · guia=${guia.id} (${guia.nome}) · participante=${nome}`);
   }
 
-  // ---------- Escuta do evento de seção ----------
+  // ---------- Escutas ----------
+  // Evento padrão do controller
   document.addEventListener('section:shown', (e) => {
     const id = e.detail.sectionId;
-    if (id !== SECTION_ID) return;
-    const root = e.detail.node;
+    if (!SECTION_IDS.includes(id)) return;
+    const root = e.detail.node || qs(`#${id}`) || qs('#jornada-content-wrapper');
     if (!root) return;
     initCard(root);
   });
 
-  console.log(`[${MOD}] carregado (com suporte a ${GUIAS_JSON})`);
+  // Fallback: se a seção já estiver no DOM visível sem disparar evento
+  document.addEventListener('DOMContentLoaded', () => {
+    const visible = SECTION_IDS.map(id => qs(`#${id}`)).find(el => el && el.offsetParent !== null);
+    if (visible) initCard(visible);
+  });
+
+  console.log(`[${MOD}] carregado (IDs aceitos: ${SECTION_IDS.join(', ')})`);
 })();
