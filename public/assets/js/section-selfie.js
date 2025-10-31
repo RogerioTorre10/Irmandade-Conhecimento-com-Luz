@@ -18,7 +18,7 @@
   const MOD = 'section-selfie.js';
   const SECTION_ID = 'section-selfie';
   const NEXT_SECTION_ID = 'section-card';
-  const VIDEO_SRC = '/assets/videos/filme-selfie-card.mp4';
+  const VIDEO_SRC = '/assets/videos/filme-card-dourado.mp4';
 
   const PREVIEW_MIN_H = 240;
   const PREVIEW_MAX_H = 420;
