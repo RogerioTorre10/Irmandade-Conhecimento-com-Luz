@@ -312,9 +312,20 @@
 
   // ---------- NAVEGAÇÃO COM FILME ----------
   function goNext(id) {
-    if (global.JC?.show) global.JC.show(id);
-    else if (global.showSection) global.showSection(id);
+  // Força a exibição do card
+  if (global.JC?.show) {
+    global.JC.show(id);
+  } else if (global.showSection) {
+    global.showSection(id);
+  } else {
+    // Fallback DOM (nunca falha)
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+      el.style.display = 'block';
+    }
   }
+}
 
   function playTransitionAndGo(nextId) {
     const videoSrc = VIDEO_SRC;
