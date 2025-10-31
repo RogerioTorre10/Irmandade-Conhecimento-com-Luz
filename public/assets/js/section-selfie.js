@@ -1,18 +1,17 @@
-/* /assets/js/section-selfie.js — FASE 4.6 (COMPLETO + FIX)
-   - Layout estável no mobile/desktop, sem sobreposição
-   - Botões na MESMA linha (com folga central); auto‑ajuste em telas pequenas
-   - Prévia fixa no rodapé com aspect‑ratio 3:4; seção ganha padding-bottom
-   - Sem máscara (container faz o enquadramento)
-   - Header: botão "Não quero Foto" com textura de pedra + espinhos
-   - Fluxo: Prévia → ativa câmera; Foto → captura; Iniciar → confirma
-   - Botão "Não quero Foto" → VAI DIRETO PRO CARD (sem esperar nada)
-   - Vídeo de transição: /assets/videos/filme-selfie-card.mp4
+/* /assets/js/section-selfie.js — FASE 4.6 (FINAL + FILME DE TRANSIÇÃO)
+   - Botão "Não quero Foto" → filme + card
+   - Botão "Iniciar" → filme + card
+   - Filme roda com VideoTransicao OU fallback manual
+   - Nunca trava, nunca dá erro
+   - Selfie salva ou skip com flag
+   - Layout perfeito, mobile/desktop
+   - TÁ LINDO, TÁ PRONTO, TÁ CAMPEÃO!
 */
 (function (global) {
   'use strict';
 
   const NS = (global.JCSelfie = global.JCSelfie || {});
-  if (NS.__phase46_bound) return; // idempotente
+  if (NS.__phase46_bound) return;
   NS.__phase46_bound = true;
 
   // ---- Config ----
@@ -21,7 +20,6 @@
   const NEXT_SECTION_ID = 'section-card';
   const VIDEO_SRC = '/assets/videos/filme-selfie-card.mp4';
 
-  // Métrica do CARD (prévia): 3:4
   const PREVIEW_MIN_H = 240;
   const PREVIEW_MAX_H = 420;
   const PREVIEW_VH = 38;
@@ -102,13 +100,13 @@
     }
   }
 
-  // ---------- HEADER (SIMPLIFICADO E INDESTRUTÍVEL) ----------
+  // ---------- HEADER (COM BOTÃO INDESTRUTÍVEL) ----------
   function ensureHeader(section) {
     let head = section.querySelector('.selfie-header');
     if (head) {
       const btn = head.querySelector('#btn-skip-selfie');
       if (btn) {
-        btn.onclick = goToCardNow;
+        btn.onclick = skipAndPlayTransition;
         return head;
       }
     }
@@ -122,7 +120,6 @@
       <button id="btn-skip-selfie" class="btn">Não quero Foto</button>
     `;
 
-    // ESTILO DO BOTÃO (só uma vez, direto no ID)
     const style = document.createElement('style');
     style.textContent = `
       #btn-skip-selfie {
@@ -156,38 +153,10 @@
     document.head.appendChild(style);
 
     const btn = head.querySelector('#btn-skip-selfie');
-    btn.onclick = goToCardNow;
+    btn.onclick = skipAndPlayTransition;
 
     section.prepend(head);
     return head;
-  }
-
-  // FUNÇÃO PURA: VAI PRO CARD AGORA
-  function goToCardNow() {
-    // Limpa selfie
-    try {
-      if (global.JC?.data) {
-        delete global.JC.data.selfieDataUrl;
-        global.JC.data.selfieSkipped = true;
-      }
-      localStorage.removeItem('jc.selfieDataUrl');
-    } catch (e) {}
-
-    // Para câmera
-    if (typeof stopCamera === 'function') stopCamera();
-
-    // Vai pro card (com ou sem transição)
-    const nextId = NEXT_SECTION_ID;
-    if (typeof playTransitionThenGo === 'function') {
-      playTransitionThenGo(nextId);
-    } else if (global.JC?.show) {
-      global.JC.show(nextId);
-    } else if (global.showSection) {
-      global.showSection(nextId);
-    } else {
-      const el = document.getElementById(nextId);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }
   }
 
   // ---------- Texto ----------
@@ -287,7 +256,7 @@
         btnShot.disabled = false; btnConfirm.disabled = false;
       };
       btnShot.onclick = () => capturePhoto();
-      btnConfirm.onclick = () => confirmPhoto();
+      btnConfirm.onclick = () => confirmAndPlayTransition();
     }
 
     div.style.position = 'relative';
@@ -341,10 +310,84 @@
 
   function capturePhoto(){ if(!videoEl) return; const cw=Math.floor(previewBox.clientWidth), ch=Math.floor(previewBox.clientHeight); canvasEl.width=cw; canvasEl.height=ch; const ctx=canvasEl.getContext('2d'); drawCover(videoEl, ctx, cw, ch); const dataUrl=canvasEl.toDataURL('image/jpeg', 0.92); videoEl.style.display='none'; canvasEl.style.display='block'; NS._lastCapture=dataUrl; }
 
-  // ---------- Navegação ----------
-  function goNext(id){ if(global.JC?.show) global.JC.show(id); else if(global.showSection) global.showSection(id); }
-  function playTransitionThenGo(id){ if(global.VideoTransicao?.play){ try{ global.VideoTransicao.play({ src: VIDEO_SRC, onEnd: ()=>goNext(id) }); } catch { goNext(id); } } else { goNext(id); } }
-  function confirmPhoto(){ const dataUrl=NS._lastCapture; if(!dataUrl){ toast('Tire uma foto primeiro.'); return; } try{ global.JC=global.JC||{}; global.JC.data=global.JC.data||{}; global.JC.data.selfieDataUrl=dataUrl; try{ localStorage.setItem('jc.selfieDataUrl', dataUrl);}catch{} }catch{} playTransitionThenGo(NEXT_SECTION_ID); }
+  // ---------- NAVEGAÇÃO COM FILME ----------
+  function goNext(id) {
+    if (global.JC?.show) global.JC.show(id);
+    else if (global.showSection) global.showSection(id);
+  }
+
+  function playTransitionAndGo(nextId) {
+    const videoSrc = VIDEO_SRC;
+
+    if (global.VideoTransicao?.play) {
+      try {
+        global.VideoTransicao.play({
+          src: videoSrc,
+          onEnd: () => goNext(nextId)
+        });
+        return;
+      } catch (e) {
+        console.warn('VideoTransicao falhou, usando fallback', e);
+      }
+    }
+
+    const video = document.createElement('video');
+    video.src = videoSrc;
+    video.style.cssText = `
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      object-fit: cover; z-index: 9999; background: #000;
+    `;
+    video.muted = true;
+    video.playsInline = true;
+
+    const onEnd = () => {
+      video.remove();
+      goNext(nextId);
+    };
+
+    video.addEventListener('ended', onEnd);
+    video.addEventListener('error', () => {
+      console.warn('Vídeo falhou, indo direto');
+      video.remove();
+      goNext(nextId);
+    });
+
+    document.body.appendChild(video);
+    video.play().catch(() => {
+      console.warn('Play bloqueado, indo direto');
+      video.remove();
+      goNext(nextId);
+    });
+  }
+
+  // Pular selfie + filme
+  function skipAndPlayTransition() {
+    try {
+      if (global.JC?.data) {
+        delete global.JC.data.selfieDataUrl;
+        global.JC.data.selfieSkipped = true;
+      }
+      localStorage.removeItem('jc.selfieDataUrl');
+    } catch (e) {}
+    stopCamera();
+    playTransitionAndGo(NEXT_SECTION_ID);
+  }
+
+  // Confirmar foto + filme
+  function confirmAndPlayTransition() {
+    const dataUrl = NS._lastCapture;
+    if (!dataUrl) {
+      toast('Tire uma foto primeiro.');
+      return;
+    }
+    try {
+      global.JC = global.JC || {};
+      global.JC.data = global.JC.data || {};
+      global.JC.data.selfieDataUrl = dataUrl;
+      try { localStorage.setItem('jc.selfieDataUrl', dataUrl); } catch {}
+    } catch (e) {}
+    playTransitionAndGo(NEXT_SECTION_ID);
+  }
 
   // ---------- Ordem ----------
   function enforceOrder(section){ const order=['.selfie-header','#selfieOrientWrap','#selfieControls','#selfieButtons','#selfiePreviewWrap']; let attempts=0,max=10; const tryEnforce=()=>{ let prev=null,chg=false; order.forEach(sel=>{ const el=section.querySelector(sel); if(el && prev && el.previousElementSibling!==prev){ el.remove(); placeAfter(prev,el); chg=true; } prev=el||prev; }); attempts++; if(chg && attempts<max) setTimeout(tryEnforce,50); }; tryEnforce(); setTimeout(tryEnforce,300); }
