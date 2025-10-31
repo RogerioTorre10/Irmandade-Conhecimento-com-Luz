@@ -1,32 +1,27 @@
-/* /assets/js/section-card.js — compatível com section-card e section-eu-na-irmandade; usa /assets/data/guias.json */
+/* /assets/js/section-card.js — compatível com section-card e section-eu-na-irmandade */
 (function () {
   'use strict';
 
   const MOD = 'section-card.js';
-
-  // Aceita ambos IDs: o controller usa "section-card"; em versões anteriores usamos "section-eu-na-irmandade"
   const SECTION_IDS = ['section-card', 'section-eu-na-irmandade'];
-
-  // Próxima etapa e vídeo de transição
   const NEXT_SECTION_ID = 'section-perguntas';
   const VIDEO_SRC = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
 
-  // Fallbacks fixos
+  // Fallbacks fixos (CASO O JSON FALHE)
   const CARD_BG = {
     arian: '/assets/img/irmandade-quarteto-bg-arian.png',
     lumen: '/assets/img/irmandade-quarteto-bg-lumen.png',
     zion:  '/assets/img/irmandade-quarteto-bg-zion.png'
   };
-  const PLACEHOLDER_SELFIE = '/assets/img/irmandade-card-placeholder.jpg';
+  const PLACEHOLDER_SELFIE = '/assets/img/irmandade-card-placeholder.jpg'; // ORBE DOURADO
 
-  // JSON preferencial (conforme seu arquivo)
   const GUIAS_JSON = '/assets/data/guias.json';
   let GUIAS_CACHE = null;
 
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-  // ---------- Utilitários ----------
+  // ---------- UTILITÁRIOS ----------
   async function waitForTransitionUnlock(timeoutMs = 15000) {
     if (!window.__TRANSITION_LOCK) return;
     let resolved = false;
@@ -94,74 +89,87 @@
   function readSelfieUrlOrPlaceholder() {
     const keys = [
       'jornada.selfieDataUrl', 'selfie.dataUrl', 'selfieDataUrl',
-      'jornada.selfie', 'selfie.image', 'selfieImageData'
+      'jornada.selfie', 'selfie.image', 'selfieImageData',
+      'jc.selfieDataUrl' // ← compatibilidade com section-selfie.js
     ];
     for (const k of keys) {
       try {
-        const v = sessionStorage.getItem(k);
+        const v = sessionStorage.getItem(k) || localStorage.getItem(k);
         if (v && /^data:image\//.test(v)) return v;
       } catch {}
     }
-    return PLACEHOLDER_SELFIE;
+    return PLACEHOLDER_SELFIE; // ORBE DOURADO
   }
 
-  // ---------- JSON dos guias ----------
+  // ---------- CARREGA GUIAS.JSON ----------
   async function loadGuiasJson() {
     if (GUIAS_CACHE) return GUIAS_CACHE;
+
     try {
-      const res = await fetch(GUIAS_JSON, { cache: 'no-store' });
+      const res = await fetch(GUIAS_JSON + '?t=' + Date.now(), { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      // Aceita array direto ou {guias:[...]}
+
       const arr = Array.isArray(data) ? data : (Array.isArray(data.guias) ? data.guias : []);
       GUIAS_CACHE = arr.map(g => ({
-        id: String(g.id || '').toLowerCase(),
-        nome: g.nome || g.name || '',
-        bgImage: g.bgImage || g.bg || ''
-      }));
+        id: String(g.id || '').toLowerCase().trim(),
+        nome: (g.nome || g.name || '').trim(),
+        bgImage: (g.bgImage || g.bg || '').trim()
+      })).filter(g => g.id && g.nome);
+
+      console.log(`[${MOD}] guias.json carregado:`, GUIAS_CACHE);
     } catch (e) {
       console.warn(`[${MOD}] Falha ao carregar ${GUIAS_JSON}:`, e);
-      GUIAS_CACHE = [];
+      GUIAS_CACHE = [
+        { id: 'zion', nome: 'Zion', bgImage: CARD_BG.zion },
+        { id: 'lumen', nome: 'Lumen', bgImage: CARD_BG.lumen },
+        { id: 'arian', nome: 'Arian', bgImage: CARD_BG.arian }
+      ];
     }
     return GUIAS_CACHE;
   }
 
   function titleizeId(id) {
     const map = { arian: 'Arian', lumen: 'Lumen', zion: 'Zion' };
-    return map[id] || (id ? id[0].toUpperCase() + id.slice(1) : '');
+    return map[id] || (id ? id[0].toUpperCase() + id.slice(1) : 'Guia');
   }
 
   async function resolveSelectedGuide() {
-    const selId = (sessionStorage.getItem('jornada.guia') || 'zion').toLowerCase();
+    const selId = (sessionStorage.getItem('jornada.guia') || 'zion').toLowerCase().trim();
     const guias = await loadGuiasJson();
     const fromJson = guias.find(g => g.id === selId);
-    if (fromJson && (fromJson.bgImage || fromJson.nome)) {
-      return {
-        id: selId,
-        nome: fromJson.nome || titleizeId(selId),
-        bgImage: fromJson.bgImage || CARD_BG[selId] || CARD_BG.zion
-      };
+
+    if (fromJson && fromJson.bgImage) {
+      return { id: selId, nome: fromJson.nome, bgImage: fromJson.bgImage };
     }
+
     return {
       id: selId,
-      nome: titleizeId(selId),
+      nome: fromJson?.nome || titleizeId(selId),
       bgImage: CARD_BG[selId] || CARD_BG.zion
     };
   }
 
-  // ---------- Inicialização do Card ----------
+  // ---------- INICIALIZAÇÃO DO CARD ----------
   async function initCard(root) {
-    const nameSlot = qs('#userNameSlot', root);
-    const guideNameSlot = qs('#guideNameSlot', root);
+    if (!root) return;
+
+    const nameSlot = qs('#userNameSlot', root) || qs('#cardParticipantName', root);
+    const guideNameSlot = qs('#guideNameSlot', root) || qs('#cardGuideName', root);
     const guiaBg = qs('#guideBg', root);
     const flameLayer = qs('.flame-layer', root);
     const selfieSvgImage = qs('#selfieImage', root);
 
-    // Nome (herdado da página guia)
-    const nome = (sessionStorage.getItem('jornada.nome') || 'USUÁRIO').toUpperCase();
+    // NOME DO PARTICIPANTE
+    const nome = (
+      sessionStorage.getItem('jornada.nome') ||
+      localStorage.getItem('jc.nome') ||
+      window.JC?.data?.nome ||
+      'AMOR'
+    ).toUpperCase().trim();
     if (nameSlot) nameSlot.textContent = nome;
 
-    // Guia via JSON (preferência) + fallback
+    // GUIA SELECIONADO
     const guia = await resolveSelectedGuide();
     if (guiaBg && guia.bgImage) {
       guiaBg.src = guia.bgImage;
@@ -169,58 +177,83 @@
     }
     if (guideNameSlot) guideNameSlot.textContent = guia.nome.toUpperCase();
 
-    // Selfie (ou placeholder) na chama
+    // SELFIE OU ORBE DOURADO
     const url = readSelfieUrlOrPlaceholder();
     if (selfieSvgImage && url) {
       setSvgImageHref(selfieSvgImage, url);
-      flameLayer?.classList.add('show');
-      selfieSvgImage.addEventListener?.('error', () => {
+      if (flameLayer) flameLayer.style.opacity = '1';
+      selfieSvgImage.onerror = () => {
         setSvgImageHref(selfieSvgImage, PLACEHOLDER_SELFIE);
-        flameLayer?.classList.add('show');
-      });
+        if (flameLayer) flameLayer.style.opacity = '1';
+      };
     }
 
-    // Aguarda transição (vídeo/effects) e aplica datilografia/TTS
+    // DATILOGRAFIA + VOZ
     await waitForTransitionUnlock();
     const elements = qsa('[data-typing="true"]', root);
     for (const el of elements) {
       const text = (el.dataset.text || el.textContent || '').trim();
-      await runTypingAndSpeak(el, text);
+      if (text) await runTypingAndSpeak(el, text);
     }
 
-    // Botão continuar
-    const btn = qs('#btnNext', root);
+    // BOTÃO CONTINUAR
+    const btn = qs('#btnNext', root) || qs('#btnStartJourney', root);
     if (btn) {
-      btn.addEventListener('click', () => {
+      btn.onclick = () => {
         try { speechSynthesis.cancel(); } catch {}
         qsa('video').forEach(v => { try { v.pause(); v.src = ''; v.load(); } catch {} });
 
         if (typeof window.playTransitionVideo === 'function' && VIDEO_SRC) {
           window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
+        } else if (window.JC?.show) {
+          window.JC.show(NEXT_SECTION_ID);
         } else {
-          window.JC?.show?.(NEXT_SECTION_ID);
+          forceShowSection(NEXT_SECTION_ID);
         }
-      });
+      };
     }
 
-    console.log(`[${MOD}] Card exibido · guia=${guia.id} (${guia.nome}) · participante=${nome}`);
+    console.log(`[${MOD}] Card inicializado → ${nome} com ${guia.nome}`);
   }
 
-  // ---------- Escutas ----------
-  // Evento padrão do controller
+  // ---------- FORÇA EXIBIÇÃO (FALLBACK) ----------
+  function forceShowSection(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.display = 'block';
+      el.scrollIntoView({ behavior: 'smooth' });
+      el.dispatchEvent(new CustomEvent('sectionLoaded', {
+        detail: { sectionId: id, node: el },
+        bubbles: true
+      }));
+    }
+  }
+
+  // ---------- EVENTOS ----------
   document.addEventListener('section:shown', (e) => {
     const id = e.detail.sectionId;
-    if (!SECTION_IDS.includes(id)) return;
-    const root = e.detail.node || qs(`#${id}`) || qs('#jornada-content-wrapper');
-    if (!root) return;
-    initCard(root);
+    if (SECTION_IDS.includes(id)) {
+      const root = e.detail.node || document.getElementById(id);
+      if (root) initCard(root);
+    }
   });
 
-  // Fallback: se a seção já estiver no DOM visível sem disparar evento
+  document.addEventListener('sectionLoaded', (e) => {
+    const id = e.detail.sectionId;
+    if (SECTION_IDS.includes(id)) {
+      const root = e.detail.node || document.getElementById(id);
+      if (root) initCard(root);
+    }
+  });
+
+  // Fallback: se já estiver no DOM
   document.addEventListener('DOMContentLoaded', () => {
-    const visible = SECTION_IDS.map(id => qs(`#${id}`)).find(el => el && el.offsetParent !== null);
-    if (visible) initCard(visible);
+    setTimeout(() => {
+      const visible = SECTION_IDS.map(id => document.getElementById(id))
+        .find(el => el && el.offsetParent !== null);
+      if (visible) initCard(visible);
+    }, 500);
   });
 
-  console.log(`[${MOD}] carregado (IDs aceitos: ${SECTION_IDS.join(', ')})`);
+  console.log(`[${MOD}] carregado — guias.json: ${GUIAS_JSON}`);
 })();
