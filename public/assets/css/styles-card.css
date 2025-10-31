@@ -314,3 +314,8 @@
   margin-bottom: 24px;
   font-family: 'ManufacturingConsent', sans-serif;
 }
+.guide-card {
+  width: min(640px, 92vw); /* 720px -> 640px p/ reduzir um pouco no mobile */
+}
+.flame-layer { transition: opacity 600ms ease-in-out; } /* era 900ms */
+.flame-svg { filter: drop-shadow(0 10px 36px rgba(255,180,0,.55)); }
