@@ -77,35 +77,55 @@
     }
     return GUIAS_CACHE;
   }
-function readSelectedGuideId() {
-  // 1) DOM: <section id="card-guide" data-guide="ZION">
-  const dom = document.querySelector('#card-guide');
-  let v = dom?.getAttribute('data-guide');
-
-  // 2) sessionStorage (tentamos várias chaves usuais)
+function readParticipantName() {
   const keys = [
-    'jornada.guia', 'guia', 'guia.id', 'selected.guia',
-    'guiaSelecionado', 'guiaChoice', 'jc.guia'
+    'jornada.nome', 'jc.nome', 'participantName', 'jornada.participantName',
+    'nomeParticipante', 'jc.participant'
   ];
   for (const k of keys) {
     try {
-      const s = sessionStorage.getItem(k);
+      const v = sessionStorage.getItem(k) || localStorage.getItem(k);
+      if (v && String(v).trim()) return String(v).trim();
+    } catch {}
+  }
+  // tenta no DOM (campo de nome na seção guia)
+  const input = document.querySelector('#guiaNameInput, #nomeParticipante');
+  if (input && input.value) return String(input.value).trim();
+  return 'USUÁRIO';
+}
+
+function readSelectedGuideId() {
+  // 1) DOM: qualquer elemento com [data-guide]
+  let v = (document.querySelector('#card-guide,[data-guide]')?.getAttribute('data-guide')) || '';
+
+  // 2) URL ?guia=lumen (se existir)
+  if (!v) {
+    try {
+      const u = new URL(location.href);
+      v = u.searchParams.get('guia') || '';
+    } catch {}
+  }
+
+  // 3) session/local (varias chaves comuns)
+  const keys = [
+    'jornada.guia','guia','guia.id','selected.guia',
+    'guiaSelecionado','guiaChoice','jc.guia','jornada.guia.id'
+  ];
+  for (const k of keys) {
+    try {
+      const s = sessionStorage.getItem(k) || localStorage.getItem(k);
       if (!v && s) v = s;
     } catch {}
   }
 
-  // 3) default
-  if (!v) v = 'zion';
-
-  // normaliza
-  v = String(v).trim().toLowerCase();
-  // sinônimos comuns
+  // default + normalização
+  v = String(v || 'zion').trim().toLowerCase();
   const map = { arion: 'arian', árion: 'arian' };
   v = map[v] || v;
-
-  // id válido
   if (!['zion','lumen','arian'].includes(v)) v = 'zion';
 
+  // persistimos na chave canônica para as próximas telas
+  try { sessionStorage.setItem('jornada.guia', v); } catch {}
   console.log('[section-card.js] guia selecionado (normalizado):', v);
   return v;
 }
@@ -113,7 +133,7 @@ function readSelectedGuideId() {
   
   function titleize(id){ const m={arian:'Arian',lumen:'Lumen',zion:'Zion'}; return m[id] || (id? id[0].toUpperCase()+id.slice(1):''); }
   async function resolveSelectedGuide() {
-  const selId = readSelectedGuideId();  // <— usa a função nova
+  const selId = readSelectedGuideId();   // ← aqui
   const guias = await loadGuiasJson();
   const j = guias.find(g => String(g.id || '').toLowerCase() === selId);
   if (j && (j.bgImage || j.nome)) {
@@ -121,6 +141,7 @@ function readSelectedGuideId() {
   }
   return { id: selId, nome: titleize(selId), bgImage: CARD_BG[selId] || CARD_BG.zion };
 }
+
 
 
   // ---------- Compat layer: acha OU cria estrutura mínima ----------
@@ -218,6 +239,7 @@ function readSelectedGuideId() {
   async function initCard(root) {
     // detecta a seção alvo
     const section = SECTION_IDS.map(id => root.id === id ? root : qs(`#${id}`, root) || qs(`#${id}`)).find(Boolean) || root;
+    const nome = readParticipantName().toUpperCase();
 
     const nome = (sessionStorage.getItem('jornada.nome') || 'USUÁRIO').toUpperCase();
     const guia = await resolveSelectedGuide();
@@ -251,6 +273,10 @@ function readSelectedGuideId() {
       stage.style.backgroundSize = 'cover';
       stage.style.backgroundPosition = 'center';
     }
+      stage.style.minHeight = stage.style.minHeight || '66vw';
+      stage.style.paddingBottom = stage.style.paddingBottom || '16vh';
+      stage.style.marginTop = stage.style.marginTop || 'min(-4vw, -48px)';
+    
 
     // Nome do guia e do participante
     if (guideNameSlot) guideNameSlot.textContent = (guia.nome || '').toUpperCase();
