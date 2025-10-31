@@ -127,8 +127,7 @@ const guideName   = qs('#cardGuideName', root);         // opcional, se tiver
   (window.JC?.data?.selfieDataUrl) ||
   localStorage.getItem('jc.selfieDataUrl') ||
   sessionStorage.getItem('jc.selfieDataUrl') ||
-  '/assets/img/irmandade-card-placeholder.jpg';  // <-- CRIE esse arquivo
-
+  '/assets/img/irmandade-card-placeholder.jpg'
 
  if (selfieImg) {
   selfieImg.setAttribute('href', selfieUrl);
