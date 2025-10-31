@@ -18,6 +18,15 @@
     meta: null,
   };
 
+  window.JC = window.JC || {};
+  if (!JC.flags?.cardConfirmed) {
+  console.warn('[Guard] Entrou em Perguntas sem confirmar CARD -> redirecionando');
+  if (window.JC?.show) window.JC.show('section-card');
+  else if (window.showSection) window.showSection('section-card');
+  return;
+ }
+
+
   function goNext() {
     if (typeof window.playTransitionVideo === 'function' && VIDEO_SRC) {
       window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
