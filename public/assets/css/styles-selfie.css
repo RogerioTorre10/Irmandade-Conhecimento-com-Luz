@@ -275,13 +275,3 @@
   z-index: 1;
   pointer-events: none;
 }
-/* Garante que o header e o botão fiquem clicáveis acima de qualquer overlay */
-#section-selfie .selfie-header { position: relative; z-index: 1000; }
-#section-selfie #btn-skip-selfie { position: relative; z-index: 1001; pointer-events: auto; }
-
-/* Se existir algum overlay “película” cobrindo tudo, ele não bloqueia cliques */
-#section-selfie .pelicula, 
-#section-selfie .overlay-blocker, 
-#section-selfie .mask-layer {
-  pointer-events: none !important;
-}
