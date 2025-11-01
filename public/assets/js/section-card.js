@@ -15,6 +15,7 @@
   const PLACEHOLDER_SELFIE = '/assets/img/irmandade-card-placeholder.jpg';
   const GUIAS_JSON = '/assets/data/guias.json';
   let GUIAS_CACHE = null;
+  const LENS_ENABLED = false; // desligado no card
 
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -124,13 +125,19 @@
       guideNameWrap.appendChild(guideNameSlot);
     }
 
-    // Camada da chama
-    let flameLayer = stage.querySelector('.flame-layer');
-    if (!flameLayer) {
-      flameLayer = document.createElement('div');
-      flameLayer.className = 'flame-layer';
-      stage.appendChild(flameLayer);
-    }
+    // Camada da chama (lente)
+let flameLayer = stage.querySelector('.flame-layer');
+
+if (LENS_ENABLED) {
+  if (!flameLayer) {
+    flameLayer = document.createElement('div');
+    flameLayer.className = 'flame-layer';
+    stage.appendChild(flameLayer);
+  }
+} else {
+  if (flameLayer) flameLayer.remove();
+}
+
 
     // SVG + image da selfie
     let selfieSvgImage = stage.querySelector('#selfieImage');
