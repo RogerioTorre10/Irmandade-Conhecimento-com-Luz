@@ -1,10 +1,3 @@
-/* ========== SECTION-CARD — pergaminho desligado e card como fundo ========== */
-
-/* Desliga o pergaminho só aqui */
-#section-card.pergaminho::before {
-  display: none !important;
-}
-
 /* Superfície que substitui o pergaminho visualmente (com a mesma textura) */
 #section-card .card-surface {
   position: relative;
@@ -12,9 +5,6 @@
   min-height: clamp(820px, 92vh, 1100px);
   margin: clamp(8px, 2vh, 16px) auto;
   border-radius: 18px;
-
-  /* Use a sua textura vertical do pergaminho */
-  background: url("/assets/img/pergaminho-rasgado-vert.png") center/cover no-repeat;
 
   /* leve profundidade */
   box-shadow: 0 8px 40px rgba(0,0,0,.35);
@@ -31,16 +21,7 @@
   transform: translateX(-50%);
   width: clamp(260px, 46vw, 560px);
   border-radius: 16px;
-
-  /* vidro leitoso sutil */
-  background: rgba(255,255,255,.10);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  box-shadow: inset 0 0 40px rgba(0,0,0,.22);
-  pointer-events: none;
-  overflow: hidden;
-}
-
+ 
 /* ✨ Aura dourada sutil pulsante */
 #section-card .card-frame::before {
   content: "";
