@@ -8,23 +8,10 @@
         Eu na Irmandade
       </h2>
 
-      <!-- Camada levemente translúcida com a máscara da chama -->
-      <div class="flame-layer show" aria-hidden="true">
-        <img
-          class="flame-selfie"
-          id="selfieImage"
-          src="/assets/img/irmandade-card-placeholder.jpg"
-          alt="Selfie ou Placeholder" />
-      </div>
+      <!-- SOMENTE O CARD (sem selfie, sem placeholder, sem nome) -->
+      <div class="card-frame" aria-hidden="true"></div>
 
-      <!-- Nome do participante -->
-      <div class="card-footer">
-        <span class="card-name-badge">
-          <span id="userNameSlot">USUÁRIO</span>
-        </span>
-      </div>
-
-      <!-- Botão continuar -->
+      <!-- Botão segue aqui, apenas para navegação -->
       <button id="btnStartJourney" class="btn btn-stone" data-action="avancar">
         Continuar
       </button>
