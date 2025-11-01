@@ -3,12 +3,16 @@
 
 /* desce o palco para não cortar o topo do BG (ZION) */
 #section-card .card-stage{
-  margin-top: 0; /* antes tinha margem negativa */
-  min-height: clamp(560px, 66vw, 920px);
-  padding-bottom: clamp(120px, 16vh, 200px);
-  overflow: hidden;
+  #section-card .card-stage {
+  margin-top: 0;
+  min-height: clamp(600px, 70vw, 1000px);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
   position: relative;
-  z-index: 5;
+  overflow: hidden;
 }
 
 /* BG sempre visível */
@@ -21,57 +25,70 @@
 
 /* máscara/leitoso — menor e mais baixa (abaixo do queixo) */
 #section-card .flame-layer{
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
-  bottom: clamp(90px, 14vh, 150px);   /* ↓ move para baixo */
-  width: clamp(200px, 40%, 480px);    /* ↓ levemente menor */
-  z-index:6;
-  opacity:0;
-  pointer-events:none;
-  transition: opacity .6s ease-in-out;
+ #section-card .flame-layer {
+  position: relative;
+  width: clamp(260px, 48%, 520px);
+  aspect-ratio: 3 / 4;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 0 18px rgba(255, 200, 150, 0.25),
+              0 0 60px rgba(0, 0, 0, 0.3) inset;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: clamp(60px, 12vh, 120px); /* espaço p/ nome e botão */
+  transition: transform .6s ease, opacity .6s ease;
+  overflow: hidden;
 }
-#section-card .flame-layer.show{ opacity:1 !important; }
+#section-card .flame-layer.show {
+  opacity: 1;
+  transform: translateY(0);
+}
 
-#section-card .flame-selfie{
-  display:block;
-  width:100%;
-  height:auto;
-  object-fit:cover;
-  -webkit-mask-image:url("/assets/img/chama-card.png");
-  mask-image:url("/assets/img/chama-card.png");
-  -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
-  -webkit-mask-position:50% 88%;    /* ↓ empurra o recorte mais para baixo */
-  mask-position:50% 88%;
-  -webkit-mask-size:contain; mask-size:contain;
-  mask-mode:alpha;
-  box-shadow:
-    inset 0 -10px 24px rgba(0,0,0,.35),
-    0 0 0 1px rgba(255,215,160,.08);
+#section-card .flame-selfie {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  -webkit-mask-image: url("/assets/img/chama-card.png");
+  mask-image: url("/assets/img/chama-card.png");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: cover;
+  mask-size: cover;
+  mask-mode: alpha;
+  z-index: 1;
 }
 
 /* rodapé (nome) */
 #section-card .card-footer{
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
-  bottom: clamp(56px, 8vh, 96px);
-  z-index:7;
-  text-align:center;
+  #section-card .card-footer {
+  position: relative;
+  z-index: 6;
+  text-align: center;
+  margin-top: auto;
 }
-#section-card .card-name-badge{
-  background: rgba(30,20,10,.55);
-  border: 1px solid rgba(255,215,128,.5);
-  border-radius:10px;
-  padding:4px 12px;
-  display:inline-block;
+
+#section-card .card-name-badge {
+  background: rgba(30, 20, 10, .55);
+  border: 1px solid rgba(255, 215, 128, .5);
+  border-radius: 10px;
+  padding: 4px 12px;
+  display: inline-block;
 }
-#section-card #userNameSlot{
-  font-family:"ManufacturingConsent","Cardo",serif;
+
+#section-card #userNameSlot {
+  font-family: "ManufacturingConsent", "Cardo", serif;
   font-size: clamp(14px, 2.2vw, 22px);
-  letter-spacing:.08em;
-  color:#f5e6c8;
-  text-shadow:0 2px 6px rgba(0,0,0,.5);
+  letter-spacing: .08em;
+  color: #f5e6c8;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, .5);
 }
 
 /* garante que o pergaminho fique por baixo */
@@ -85,6 +102,27 @@
   padding-bottom: clamp(120px, 16vh, 200px);
   position: relative;
   overflow: hidden;
+}
+
+  #section-card #btnStartJourney {
+  margin-top: 12px;
+  position: relative;
+  z-index: 6;
+  background: rgba(255, 240, 210, 0.8);
+  border: 1px solid rgba(120, 90, 60, 0.5);
+  padding: 6px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .3s;
+}
+#section-card #btnStartJourney:hover {
+  background: rgba(255, 240, 210, 1);
+}
+
+/* Mantém o pergaminho no fundo */
+.pergaminho::before {
+  z-index: 0 !important;
+  pointer-events: none !important;
 }
 
 /* camada da chama */
@@ -157,110 +195,7 @@
 
 
 
-#section-card {
-  position: relative;
-  z-index: 2;
-}
 
-#section-card .card-stage {
-  margin-top: 0;
-  min-height: clamp(600px, 70vw, 1000px);
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Card translúcido principal */
-#section-card .flame-layer {
-  position: relative;
-  width: clamp(260px, 48%, 520px);
-  aspect-ratio: 3 / 4;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  box-shadow: 0 0 18px rgba(255, 200, 150, 0.25),
-              0 0 60px rgba(0, 0, 0, 0.3) inset;
-  z-index: 5;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  padding-bottom: clamp(60px, 12vh, 120px); /* espaço p/ nome e botão */
-  transition: transform .6s ease, opacity .6s ease;
-  overflow: hidden;
-}
-
-#section-card .flame-layer.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-#section-card .flame-selfie {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  -webkit-mask-image: url("/assets/img/chama-card.png");
-  mask-image: url("/assets/img/chama-card.png");
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: cover;
-  mask-size: cover;
-  mask-mode: alpha;
-  z-index: 1;
-}
-
-/* Nome e botão agora dentro do card */
-#section-card .card-footer {
-  position: relative;
-  z-index: 6;
-  text-align: center;
-  margin-top: auto;
-}
-
-#section-card .card-name-badge {
-  background: rgba(30, 20, 10, .55);
-  border: 1px solid rgba(255, 215, 128, .5);
-  border-radius: 10px;
-  padding: 4px 12px;
-  display: inline-block;
-}
-
-#section-card #userNameSlot {
-  font-family: "ManufacturingConsent", "Cardo", serif;
-  font-size: clamp(14px, 2.2vw, 22px);
-  letter-spacing: .08em;
-  color: #f5e6c8;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, .5);
-}
-
-#section-card #btnStartJourney {
-  margin-top: 12px;
-  position: relative;
-  z-index: 6;
-  background: rgba(255, 240, 210, 0.8);
-  border: 1px solid rgba(120, 90, 60, 0.5);
-  padding: 6px 18px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background .3s;
-}
-#section-card #btnStartJourney:hover {
-  background: rgba(255, 240, 210, 1);
-}
-
-/* Mantém o pergaminho no fundo */
-.pergaminho::before {
-  z-index: 0 !important;
-  pointer-events: none !important;
-}
 /* --- PRINT RULES: esconder botões e elementos de navegação --- */
 @media print {
   /* esconde o botão de seguir e quaisquer botões/controles */
