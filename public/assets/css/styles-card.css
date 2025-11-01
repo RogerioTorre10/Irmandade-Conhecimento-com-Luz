@@ -54,3 +54,56 @@
 /* —— KILL de qualquer lente remanescente (por JS antigo) —— */
 #section-card .lens,
 #section-card .flame-layer { display:none !important; }
+/* ===== SECTION-CARD · VISIBILIDADE FORÇADA (hotfix) ===== */
+#section-card { 
+  position: relative !important;
+  min-height: 100vh !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+#section-card.pergaminho::before {
+  z-index: 0 !important;           /* pergaminho ao fundo */
+  pointer-events: none !important;
+}
+
+#section-card .conteudo-pergaminho,
+#section-card .card-stage {
+  position: relative !important;
+  z-index: 5 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* card sempre acima do pergaminho */
+#section-card .card-frame {
+  z-index: 6 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+/* neutraliza classes globais que escondem seções */
+#section-card.section,
+#section-card.is-hidden,
+#section-card.hidden { 
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  transform: none !important;
+}
+
+/* desativa quaisquer animações/transições que possam manter opacity:0 */
+#section-card, 
+#section-card * {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* mata qualquer lente herdada */
+#section-card .flame-layer,
+#section-card .lens { display: none !important; }
