@@ -1,111 +1,105 @@
-/* ===== CARD PURO + AURA PULSANTE — v1.5 ===== */
+/* ========== SECTION-CARD — pergaminho desligado e card como fundo ========== */
 
-/* controla quão perto o card encosta do topo/base do pergaminho */
-#section-card .conteudo-pergaminho {
-  position: relative;
-  --card-inset: clamp(14px, 3.2vh, 28px); /* ↓ encosta mais em cima/baixo */
+/* Desliga o pergaminho só aqui */
+#section-card.pergaminho::before {
+  display: none !important;
 }
 
-#section-card .card-stage {
+/* Superfície que substitui o pergaminho visualmente (com a mesma textura) */
+#section-card .card-surface {
+  position: relative;
+  width: clamp(320px, 72vw, 820px);
   min-height: clamp(820px, 92vh, 1100px);
-  padding: 0;
-  display: grid;
-  place-items: center;
-  position: relative;
-  overflow: visible;
+  margin: clamp(8px, 2vh, 16px) auto;
+  border-radius: 18px;
+
+  /* Use a sua textura vertical do pergaminho */
+  background: url("/assets/img/pergaminho-rasgado-vert.png") center/cover no-repeat;
+
+  /* leve profundidade */
+  box-shadow: 0 8px 40px rgba(0,0,0,.35);
+  overflow: hidden;
 }
 
-/* CARD ocupando quase todo o pergaminho */
-#section-card .card-frame{
-  position:absolute;
-  top: var(--card-inset);
-  bottom: var(--card-inset);          /* ← encosta na parte inferior */
-  left:50%;
-  transform:translateX(-50%);
-  width: clamp(280px, 46vw, 560px);
-  border-radius:16px;
+/* CARD interno ocupando quase toda a superfície */
+#section-card .card-frame {
+  --inset: clamp(16px, 3vh, 28px);       /* ajuste fino: encosta topo/base */
+  position: absolute;
+  top: var(--inset);
+  bottom: var(--inset);                  /* <-- encosta na borda inferior */
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(260px, 46vw, 560px);
+  border-radius: 16px;
 
   /* vidro leitoso sutil */
   background: rgba(255,255,255,.10);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-
-  /* leve sombra interna p/ profundidade */
   box-shadow: inset 0 0 40px rgba(0,0,0,.22);
-  z-index:5;
-  pointer-events:none; /* não atrapalha cliques */
-  overflow:hidden;
+  pointer-events: none;
+  overflow: hidden;
 }
 
-/* ✨ Aura dourada pulsante */
-#section-card .card-frame::before{
-  content:"";
-  position:absolute;
-  inset:-2px;                           /* micro expansão da borda */
-  border-radius:inherit;
-  pointer-events:none;
-  /* brilho base */
+/* ✨ Aura dourada sutil pulsante */
+#section-card .card-frame::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  pointer-events: none;
   box-shadow:
-    0 0 0 2px rgba(255,215,128,.28),
-    0 0 22px rgba(255,200,90,.25),
-    0 0 70px rgba(255,190,70,.18);
-  opacity:.75;
-  animation:aura-gold 3.4s ease-in-out infinite;
+    0 0 0 1px rgba(255,220,150,.22),
+    0 0 16px rgba(255,205,110,.22),
+    0 0 60px rgba(255,195,90,.14);
+  opacity: .6;
+  animation: aura-gold 3.4s ease-in-out infinite;
 }
 
-@keyframes aura-gold{
-  0%{
+@keyframes aura-gold {
+  0% {
     box-shadow:
       0 0 0 1px rgba(255,220,150,.22),
       0 0 16px rgba(255,205,110,.22),
       0 0 60px rgba(255,195,90,.14);
-    opacity:.60;
+    opacity: .6;
   }
-  50%{
+  50% {
     box-shadow:
       0 0 0 3px rgba(255,230,170,.42),
       0 0 34px rgba(255,215,140,.45),
       0 0 110px rgba(255,205,100,.30);
-    opacity:.95;
+    opacity: .95;
   }
-  100%{
+  100% {
     box-shadow:
       0 0 0 1px rgba(255,220,150,.22),
       0 0 16px rgba(255,205,110,.22),
       0 0 60px rgba(255,195,90,.14);
-    opacity:.60;
+    opacity: .6;
   }
 }
 
-/* Botão de navegação (fora da impressão) — NÃO empurra o card */
-#section-card #btnStartJourney{
-  position:absolute;
-  left:50%; transform:translateX(-50%);
-  bottom: calc(var(--card-inset) / 2);
-  z-index:6;
+/* Botão dentro da superfície (sem sair na impressão) */
+#section-card #btnStartJourney {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: clamp(18px, 2.8vh, 28px);
+  z-index: 6;
   background: rgba(255,240,210,.85);
-  border:1px solid rgba(120,90,60,.5);
-  border-radius:8px; padding:6px 18px;
-  transition: background .3s; cursor:pointer;
+  border: 1px solid rgba(120,90,60,.5);
+  border-radius: 8px;
+  padding: 6px 18px;
+  transition: background .3s;
+  cursor: pointer;
 }
-#section-card #btnStartJourney:hover{ background: rgba(255,240,210,1); }
+#section-card #btnStartJourney:hover { background: rgba(255,240,210,1); }
+@media print { #section-card #btnStartJourney { display: none !important; } }
 
-@media print{
-  #section-card #btnStartJourney{ display:none !important; }
-}
-
-/* 🔧 Caso haja "texto fantasma" no rodapé (ex.: ZION via pseudo-elemento) */
+/* Esconde qualquer resíduo de caption/labels (ex.: “ZION” no rodapé) */
 #section-card .card-footer,
-#section-card #userNameSlot,
 #section-card .guia-nome,
-#section-card .guide-name{ display:none !important; }
-
-#section-card .conteudo-pergaminho::after{
-  content:none !important; /* neutraliza qualquer conteúdo injetado por CSS */
-}
-
-/* pergaminho sempre por baixo */
-.pergaminho::before{
-  z-index:0 !important;
-  pointer-events:none !important;
-}
+#section-card .guide-name,
+#section-card .watermark,
+#section-card .caption { display: none !important; }
