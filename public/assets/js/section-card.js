@@ -1,4 +1,4 @@
-/* /assets/js/section-card.js — robusto: auto-cria estrutura se faltar */
+/* /assets/js/section-card.js — v3.1 robusto e sem lente */
 (function () {
   'use strict';
 
@@ -15,7 +15,9 @@
   const PLACEHOLDER_SELFIE = '/assets/img/irmandade-card-placeholder.jpg';
   const GUIAS_JSON = '/assets/data/guias.json';
   let GUIAS_CACHE = null;
-  const LENS_ENABLED = false; // desligado no card
+
+  // 🚫 Lente desligada
+  const LENS_ENABLED = false;
 
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -87,9 +89,8 @@
     return { id: selId, nome: titleize(selId), bgImage: CARD_BG[selId] || CARD_BG.zion };
   }
 
-  // ---------------- Compat layer: acha ou cria estrutura ----------------
+  // ---------------- Estrutura segura ----------------
   function ensureStructure(root) {
-    // container base (card-stage)
     let stage = root.querySelector('.card-stage, .card-stage-wrap, .card-container, .card');
     if (!stage) {
       stage = document.createElement('div');
@@ -98,7 +99,6 @@
     }
     stage.style.position = stage.style.position || 'relative';
 
-    // BG do guia: tenta vários seletores; se não existir, cria <img id="guideBg">
     let guideBg = stage.querySelector('#guideBg, .guide-bg, .card-bg img, img.card-bg');
     if (!guideBg) {
       guideBg = document.createElement('img');
@@ -111,51 +111,37 @@
       stage.appendChild(guideBg);
     }
 
-    // Nome do guia (topo)
-    let guideNameSlot = stage.querySelector('#guideNameSlot, .card-guide-name #guideNameSlot, .card-guide-name span');
     let guideNameWrap = stage.querySelector('.card-guide-name');
     if (!guideNameWrap) {
       guideNameWrap = document.createElement('div');
       guideNameWrap.className = 'card-guide-name';
       stage.appendChild(guideNameWrap);
     }
+    let guideNameSlot = guideNameWrap.querySelector('#guideNameSlot');
     if (!guideNameSlot) {
       guideNameSlot = document.createElement('span');
       guideNameSlot.id = 'guideNameSlot';
       guideNameWrap.appendChild(guideNameSlot);
     }
 
-    // Camada da chama (lente)
-let flameLayer = stage.querySelector('.flame-layer');
-
-if (LENS_ENABLED) {
-  if (!flameLayer) {
-    flameLayer = document.createElement('div');
-    flameLayer.className = 'flame-layer';
-    stage.appendChild(flameLayer);
-  }
-} else {
-  if (flameLayer) flameLayer.remove();
-}
-
-
-    // SVG + image da selfie
-    let selfieSvgImage = stage.querySelector('#selfieImage');
-    if (!selfieSvgImage) {
-      flameLayer.innerHTML = `
-        <svg viewBox="0 0 1000 1200" xmlns="http://www.w3.org/2000/svg" role="img">
-          <defs>
-            <mask id="flameMask" maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
-              <image href="/assets/img/chama-card.png" x="0" y="0" width="1" height="1" preserveAspectRatio="xMidYMid meet"/>
-            </mask>
-          </defs>
-          <image id="selfieImage" x="0" y="0" width="1000" height="1200" preserveAspectRatio="xMidYMid slice"
-                 href="${PLACEHOLDER_SELFIE}" mask="url(#flameMask)"/>
-        </svg>`;
-      selfieSvgImage = flameLayer.querySelector('#selfieImage');
+    // 🔥 Lente desativada completamente
+    let flameLayer = stage.querySelector('.flame-layer');
+    if (flameLayer) {
+      flameLayer.remove();
     }
 
-    // Rodapé com nome do participante
+    // SVG + imagem selfie (sem lente)
+    let selfieSvgImage = stage.querySelector('#selfieImage');
+    if (!selfieSvgImage) {
+      const svgWrap = document.createElement('div');
+      svgWrap.className = 'selfie-wrap';
+      svgWrap.innerHTML = `
+        <img id="selfieImage" alt="Participante" src="${PLACEHOLDER_SELFIE}" style="width:100%;border-radius:12px;object-fit:cover;">
+      `;
+      stage.appendChild(svgWrap);
+      selfieSvgImage = svgWrap.querySelector('#selfieImage');
+    }
+
     let footer = stage.querySelector('.card-footer');
     if (!footer) {
       footer = document.createElement('div');
@@ -175,7 +161,6 @@ if (LENS_ENABLED) {
       badge.appendChild(userNameSlot);
     }
 
-    // Botão continuar
     let btn = root.querySelector('#btnNext, .btn-next-card');
     if (!btn) {
       const actions = root.querySelector('.card-actions') || root.appendChild(Object.assign(document.createElement('div'), {className:'card-actions'}));
@@ -186,43 +171,32 @@ if (LENS_ENABLED) {
       actions.appendChild(btn);
     }
 
-    return { stage, guideBg, guideNameSlot, flameLayer, selfieSvgImage, userNameSlot: userNameSlot, btnNext: btn };
+    return { stage, guideBg, guideNameSlot, selfieSvgImage, userNameSlot, btnNext: btn };
   }
 
   // ---------------- Inicialização ----------------
   async function initCard(root) {
-    // Se a seção veio embrulhada, tenta achar o nó da própria seção
     const section = SECTION_IDS.map(id => root.id === id ? root : qs(`#${id}`, root) || qs(`#${id}`)).find(Boolean) || root;
 
     const nome = (sessionStorage.getItem('jornada.nome') || 'USUÁRIO').toUpperCase();
     const guia = await resolveSelectedGuide();
+    const { guideBg, guideNameSlot, selfieSvgImage, userNameSlot, btnNext } = ensureStructure(section);
 
-    // Garante estrutura e pega refs
-    const { guideBg, guideNameSlot, flameLayer, selfieSvgImage, userNameSlot, btnNext } = ensureStructure(section);
-
-    // Aplica BG do guia (preferência por <img>; se não existir, aplica como background do stage)
+    // aplica fundo e nomes
     if (guideBg && guideBg.tagName === 'IMG') {
       guideBg.src = guia.bgImage;
       guideBg.alt = `${guia.nome} — Card da Irmandade`;
     } else {
-      // fallback: usar background no container
       section.style.backgroundImage = `url("${guia.bgImage}")`;
       section.style.backgroundSize = 'cover';
       section.style.backgroundPosition = 'center';
     }
+
     if (guideNameSlot) guideNameSlot.textContent = (guia.nome || '').toUpperCase();
     if (userNameSlot) userNameSlot.textContent = nome;
 
-    // Selfie (ou placeholder) na chama
     const url = readSelfieUrlOrPlaceholder();
-    if (selfieSvgImage) {
-      setSvgImageHref(selfieSvgImage, url);
-      flameLayer?.classList.add('show');
-      selfieSvgImage.addEventListener?.('error', () => {
-        setSvgImageHref(selfieSvgImage, PLACEHOLDER_SELFIE);
-        flameLayer?.classList.add('show');
-      });
-    }
+    if (selfieSvgImage) selfieSvgImage.src = url;
 
     await waitForTransitionUnlock();
     const typings = qsa('[data-typing="true"]', section);
@@ -254,11 +228,10 @@ if (LENS_ENABLED) {
     initCard(root);
   });
 
-  // Fallback para render direto
   document.addEventListener('DOMContentLoaded', () => {
     const visible = SECTION_IDS.map(id => qs(`#${id}`)).find(el => el && (el.offsetParent !== null || el.style.display !== 'none'));
     if (visible) initCard(visible);
   });
 
-  console.log(`[${MOD}] carregado (robusto)`);
+  console.log(`[${MOD}] carregado (v3.1 sem lente)`);
 })();
