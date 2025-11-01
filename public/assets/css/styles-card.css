@@ -1,66 +1,56 @@
-/* ======= SECTION-CARD · Modo “só o CARD” (sem lente) — v2.1 ======= */
+/* ===== SECTION-CARD — CARD único com aura, sem lente ===== */
 
-/* 1) Some com a lente, se ainda existir no DOM */
-#section-card .lens { display: none !important; }
+/* sobrepõe base.css caso esteja linkado em outro lugar */
+#section-card, #section-card .conteudo-pergaminho { margin:0 !important; padding:0 !important; }
+#section-card { position:relative; min-height:100vh; }
+#section-card.pergaminho::before { z-index:0 !important; pointer-events:none !important; }
 
-/* 2) CARD único ocupando quase todo o pergaminho */
-#section-card .card-frame,
-#section-card .flame-layer { /* cobre também a estrutura antiga, se usada */
-  --inset: clamp(12px, 2.6vh, 22px);             /* respiro topo/rodapé */
-  position: absolute !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  top: var(--inset) !important;
-  bottom: var(--inset) !important;               /* encosta embaixo */
-  width: clamp(260px, 46vw, 560px) !important;
-  border-radius: 18px !important;
-
-  /* Centro transparente (sem vidro/lente) */
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-
-  /* borda fininha dourada + leve sombra interna para contraste */
-  border: 1px solid rgba(255, 225, 180, 0.38) !important;
-  box-shadow:
-    inset 0 0 20px rgba(0,0,0,0.18) !important;
-
-  pointer-events: none !important;
-  z-index: 6 !important;
-  opacity: 1 !important;
-  visibility: visible !important;
+#section-card .conteudo-pergaminho{
+  position:relative;
+  width:clamp(320px,72vw,820px);
+  min-height:clamp(820px,92vh,1100px);
+  margin:0 auto;
+  /* respiro top/bottom do card */
+  --inset: clamp(12px, 2.6vh, 22px);
 }
 
-/* 3) Aura dourada sutil pulsante ao redor do CARD */
-#section-card .card-frame::after,
-#section-card .flame-layer::after {
-  content: "";
-  position: absolute; inset: -2px;
-  border-radius: inherit;
-  pointer-events: none;
+/* —— CARD único (centro transparente) —— */
+#section-card .card-frame{
+  position:absolute;
+  left:50%; transform:translateX(-50%);
+  top:var(--inset); bottom:var(--inset);      /* encosta no topo/rodapé do pergaminho */
+  width:clamp(260px,46vw,560px);
+  border-radius:18px;
+
+  background:transparent;                     /* sem lente */
+  border:1px solid rgba(255,225,180,.38);
+  box-shadow: inset 0 0 20px rgba(0,0,0,.18); /* leve contraste interno */
+  pointer-events:none; z-index:6;
+}
+
+/* ✨ aura dourada sutil pulsante */
+#section-card .card-frame::after{
+  content:""; position:absolute; inset:-2px; border-radius:inherit; pointer-events:none;
   box-shadow:
     0 0 0 2px rgba(255,220,150,.32),
     0 0 28px rgba(255,205,110,.36),
     0 0 120px rgba(255,195,90,.24);
-  opacity: .9;
-  animation: aura-gold-card 3.6s ease-in-out infinite;
+  opacity:.9; animation:aura-gold 3.6s ease-in-out infinite;
 }
-@keyframes aura-gold-card{
+@keyframes aura-gold{
   0%  { box-shadow:0 0 0 1px rgba(255,220,150,.26),0 0 18px rgba(255,205,110,.26),0 0 80px rgba(255,195,90,.18); opacity:.75; }
   50% { box-shadow:0 0 0 3px rgba(255,235,180,.52),0 0 38px rgba(255,215,140,.56),0 0 160px rgba(255,205,100,.34); opacity:1; }
   100%{ box-shadow:0 0 0 1px rgba(255,220,150,.26),0 0 18px rgba(255,205,110,.26),0 0 80px rgba(255,195,90,.18); opacity:.75; }
 }
 
-/* 4) Garantias de camada: pergaminho no fundo, conteúdo acima */
-#section-card { position: relative; min-height: 100vh; }
-#section-card.pergaminho::before { z-index: 0 !important; pointer-events: none !important; }
-#section-card .conteudo-pergaminho { position: relative !important; z-index: 5 !important; }
-
-/* 5) Botão flutuante (não imprime) */
+/* Botão flutuante (não empurra o card; não imprime) */
 #section-card #btnStartJourney{
-  position: absolute !important;
-  left: 50% !important; transform: translateX(-50%) !important;
-  bottom: calc(var(--inset) + 12px) !important;
-  z-index: 8 !important;
+  position:absolute; left:50%; transform:translateX(-50%);
+  bottom: calc(var(--inset) + 12px);
+  z-index:8;
 }
-@media print { #section-card #btnStartJourney { display: none !important; } }
+@media print { #section-card #btnStartJourney{ display:none !important; } }
+
+/* —— KILL de qualquer lente remanescente (por JS antigo) —— */
+#section-card .lens,
+#section-card .flame-layer { display:none !important; }
