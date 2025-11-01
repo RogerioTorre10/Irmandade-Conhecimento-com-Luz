@@ -1,51 +1,39 @@
-/* ===== SECTION-CARD · FORÇA VISÍVEL (ativa com data-force-visible="on") ===== */
-#section-card[data-force-visible="on"] {
-  position: relative !important;
-  z-index: 9999 !important;
-  min-height: 100vh !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: block !important;
-  transform: none !important;
-}
+/* ======= SECTION-CARD · Modo “só o CARD” (sem lente) — v2.1 ======= */
 
-/* pergaminho NÃO tampa o conteúdo */
-#section-card[data-force-visible="on"].pergaminho::before {
-  z-index: 0 !important;
-  pointer-events: none !important;
-}
+/* 1) Some com a lente, se ainda existir no DOM */
+#section-card .lens { display: none !important; }
 
-/* miolo acima do pergaminho */
-#section-card[data-force-visible="on"] .conteudo-pergaminho,
-#section-card[data-force-visible="on"] .card-stage {
-  position: relative !important;
-  z-index: 10000 !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: block !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  min-height: 80vh !important;
-}
-
-/* card sempre visível e dimensionado (com borda/aurinha pra você ver) */
-#section-card[data-force-visible="on"] .card-frame {
+/* 2) CARD único ocupando quase todo o pergaminho */
+#section-card .card-frame,
+#section-card .flame-layer { /* cobre também a estrutura antiga, se usada */
+  --inset: clamp(12px, 2.6vh, 22px);             /* respiro topo/rodapé */
   position: absolute !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
-  top: clamp(12px, 2.6vh, 22px) !important;
-  bottom: clamp(12px, 2.6vh, 22px) !important;
+  top: var(--inset) !important;
+  bottom: var(--inset) !important;               /* encosta embaixo */
   width: clamp(260px, 46vw, 560px) !important;
   border-radius: 18px !important;
+
+  /* Centro transparente (sem vidro/lente) */
   background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  /* borda fininha dourada + leve sombra interna para contraste */
   border: 1px solid rgba(255, 225, 180, 0.38) !important;
-  box-shadow: inset 0 0 20px rgba(0,0,0,0.18) !important;
-  z-index: 10001 !important;
+  box-shadow:
+    inset 0 0 20px rgba(0,0,0,0.18) !important;
+
+  pointer-events: none !important;
+  z-index: 6 !important;
   opacity: 1 !important;
   visibility: visible !important;
-  display: block !important;
 }
-#section-card[data-force-visible="on"] .card-frame::after {
+
+/* 3) Aura dourada sutil pulsante ao redor do CARD */
+#section-card .card-frame::after,
+#section-card .flame-layer::after {
   content: "";
   position: absolute; inset: -2px;
   border-radius: inherit;
@@ -55,29 +43,24 @@
     0 0 28px rgba(255,205,110,.36),
     0 0 120px rgba(255,195,90,.24);
   opacity: .9;
-  animation: aura-gold-force 3.2s ease-in-out infinite;
+  animation: aura-gold-card 3.6s ease-in-out infinite;
 }
-@keyframes aura-gold-force{
+@keyframes aura-gold-card{
   0%  { box-shadow:0 0 0 1px rgba(255,220,150,.26),0 0 18px rgba(255,205,110,.26),0 0 80px rgba(255,195,90,.18); opacity:.75; }
   50% { box-shadow:0 0 0 3px rgba(255,235,180,.52),0 0 38px rgba(255,215,140,.56),0 0 160px rgba(255,205,100,.34); opacity:1; }
   100%{ box-shadow:0 0 0 1px rgba(255,220,150,.26),0 0 18px rgba(255,205,110,.26),0 0 80px rgba(255,195,90,.18); opacity:.75; }
 }
 
-/* mata qualquer lente/overlay/ghost */
-#section-card[data-force-visible="on"] .flame-layer,
-#section-card[data-force-visible="on"] .lens,
-#section-card[data-force-visible="on"] .caption,
-#section-card[data-force-visible="on"] figcaption {
-  display: none !important;
-}
+/* 4) Garantias de camada: pergaminho no fundo, conteúdo acima */
+#section-card { position: relative; min-height: 100vh; }
+#section-card.pergaminho::before { z-index: 0 !important; pointer-events: none !important; }
+#section-card .conteudo-pergaminho { position: relative !important; z-index: 5 !important; }
 
-/* esconde possíveis overlays globais de transição que ficaram por cima */
-.video-transicao,
-.transition-overlay,
-#video-transicao,
-#transition-overlay {
-  display: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
+/* 5) Botão flutuante (não imprime) */
+#section-card #btnStartJourney{
+  position: absolute !important;
+  left: 50% !important; transform: translateX(-50%) !important;
+  bottom: calc(var(--inset) + 12px) !important;
+  z-index: 8 !important;
 }
+@media print { #section-card #btnStartJourney { display: none !important; } }
