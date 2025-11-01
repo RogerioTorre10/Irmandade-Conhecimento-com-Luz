@@ -1,8 +1,9 @@
-/* ===== CARD “PURO” — sem selfie/placeholder/nome ===== */
+/* ===== CARD PURO + AURA PULSANTE — v1.5 ===== */
 
+/* controla quão perto o card encosta do topo/base do pergaminho */
 #section-card .conteudo-pergaminho {
   position: relative;
-  --card-inset: clamp(28px, 6vh, 72px); /* margem superior e inferior do card */
+  --card-inset: clamp(14px, 3.2vh, 28px); /* ↓ encosta mais em cima/baixo */
 }
 
 #section-card .card-stage {
@@ -11,50 +12,100 @@
   display: grid;
   place-items: center;
   position: relative;
+  overflow: visible;
 }
 
-/* O CARD: ocupa quase todo o pergaminho (controlado por --card-inset) */
-#section-card .card-frame {
-  position: absolute;
+/* CARD ocupando quase todo o pergaminho */
+#section-card .card-frame{
+  position:absolute;
   top: var(--card-inset);
-  bottom: var(--card-inset);          /* ↓ encosta perto da borda inferior */
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: var(--card-inset);          /* ← encosta na parte inferior */
+  left:50%;
+  transform:translateX(-50%);
   width: clamp(280px, 46vw, 560px);
-  border-radius: 16px;
+  border-radius:16px;
 
-  /* visual translúcido “leitoso” sem imagem */
-  background: rgba(255,255,255,0.10);
+  /* vidro leitoso sutil */
+  background: rgba(255,255,255,.10);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 
-  /* leve moldura/auréola */
+  /* leve sombra interna p/ profundidade */
+  box-shadow: inset 0 0 40px rgba(0,0,0,.22);
+  z-index:5;
+  pointer-events:none; /* não atrapalha cliques */
+  overflow:hidden;
+}
+
+/* ✨ Aura dourada pulsante */
+#section-card .card-frame::before{
+  content:"";
+  position:absolute;
+  inset:-2px;                           /* micro expansão da borda */
+  border-radius:inherit;
+  pointer-events:none;
+  /* brilho base */
   box-shadow:
-    0 0 18px rgba(255,200,150,.25),
-    inset 0 0 40px rgba(0,0,0,.22);
-  z-index: 5;
-  pointer-events: none; /* não interfere em cliques */
+    0 0 0 2px rgba(255,215,128,.28),
+    0 0 22px rgba(255,200,90,.25),
+    0 0 70px rgba(255,190,70,.18);
+  opacity:.75;
+  animation:aura-gold 3.4s ease-in-out infinite;
 }
 
-/* Botão de navegação (não imprime) */
-#section-card #btnStartJourney {
-  position: absolute;
-  left: 50%; transform: translateX(-50%);
+@keyframes aura-gold{
+  0%{
+    box-shadow:
+      0 0 0 1px rgba(255,220,150,.22),
+      0 0 16px rgba(255,205,110,.22),
+      0 0 60px rgba(255,195,90,.14);
+    opacity:.60;
+  }
+  50%{
+    box-shadow:
+      0 0 0 3px rgba(255,230,170,.42),
+      0 0 34px rgba(255,215,140,.45),
+      0 0 110px rgba(255,205,100,.30);
+    opacity:.95;
+  }
+  100%{
+    box-shadow:
+      0 0 0 1px rgba(255,220,150,.22),
+      0 0 16px rgba(255,205,110,.22),
+      0 0 60px rgba(255,195,90,.14);
+    opacity:.60;
+  }
+}
+
+/* Botão de navegação (fora da impressão) — NÃO empurra o card */
+#section-card #btnStartJourney{
+  position:absolute;
+  left:50%; transform:translateX(-50%);
   bottom: calc(var(--card-inset) / 2);
-  z-index: 6;
+  z-index:6;
   background: rgba(255,240,210,.85);
-  border: 1px solid rgba(120,90,60,.5);
-  border-radius: 8px;
-  padding: 6px 18px;
-  transition: background .3s;
-  cursor: pointer;
+  border:1px solid rgba(120,90,60,.5);
+  border-radius:8px; padding:6px 18px;
+  transition: background .3s; cursor:pointer;
 }
-#section-card #btnStartJourney:hover { background: rgba(255,240,210,1); }
+#section-card #btnStartJourney:hover{ background: rgba(255,240,210,1); }
 
-/* Não imprimir controles/botões */
-@media print {
-  #section-card #btnStartJourney { display: none !important; }
+@media print{
+  #section-card #btnStartJourney{ display:none !important; }
 }
 
-/* Pergaminho sempre ao fundo */
-.pergaminho::before { z-index: 0 !important; pointer-events: none !important; }
+/* 🔧 Caso haja "texto fantasma" no rodapé (ex.: ZION via pseudo-elemento) */
+#section-card .card-footer,
+#section-card #userNameSlot,
+#section-card .guia-nome,
+#section-card .guide-name{ display:none !important; }
+
+#section-card .conteudo-pergaminho::after{
+  content:none !important; /* neutraliza qualquer conteúdo injetado por CSS */
+}
+
+/* pergaminho sempre por baixo */
+.pergaminho::before{
+  z-index:0 !important;
+  pointer-events:none !important;
+}
