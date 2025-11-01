@@ -19,7 +19,6 @@
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-  // ---------- Utils ----------
   async function waitForTransitionUnlock(timeoutMs = 12000) {
     if (!window.__TRANSITION_LOCK) return;
     let done = false;
@@ -58,11 +57,10 @@
     return PLACEHOLDER_SELFIE;
   }
 
-  // ---------- Guias JSON ----------
   async function loadGuiasJson() {
     if (GUIAS_CACHE) return GUIAS_CACHE;
     try {
-      const r = await fetch('/assets/data/guias.json', { cache: 'no-store' });
+      const r = await fetch(GUIAS_JSON, { cache: 'no-store' });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const data = await r.json();
       const arr = Array.isArray(data) ? data : (Array.isArray(data.guias) ? data.guias : []);
@@ -72,7 +70,7 @@
         bgImage: g.bgImage || g.bg || ''
       }));
     } catch (e) {
-      console.warn(`[${MOD}] Falha ao carregar /assets/data/guias.json:`, e);
+      console.warn(`[${MOD}] Falha ao carregar ${GUIAS_JSON}:`, e);
       GUIAS_CACHE = [];
     }
     return GUIAS_CACHE;
@@ -80,7 +78,7 @@
 
   function titleize(id){ const m={arian:'Arian',lumen:'Lumen',zion:'Zion'}; return m[id] || (id? id[0].toUpperCase()+id.slice(1):''); }
 
-  // ✅ Blindado: sempre retorna imagem válida
+  // Sempre devolve imagem válida
   async function resolveSelectedGuide() {
     const selId = (sessionStorage.getItem('jornada.guia') || 'zion').toLowerCase();
     const guias = await loadGuiasJson();
@@ -96,30 +94,27 @@
     };
   }
 
-  // ---------- Remove imagens quebradas/indevidas ----------
+  // ----- limpeza de imagens inválidas (sem tocar nos elementos do card) -----
   function isBadSrc(src) {
-    if (!src) return true;
+    if (!src) return false;          // <== não remove imagens sem src; o JS ainda vai setar
     src = String(src).trim();
     if (src === 'null' || src === 'undefined' || src === '#') return true;
     if (/^data:image\//.test(src)) return false;
     if (/^https?:\/\//.test(src)) return false;
     if (src.includes('/')) return false;
     if (/\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(src)) return false;
-    return true;
+    return true; // ex.: "zion"
   }
 
   function cleanupBrokenImages(root) {
-    qsa('img', root).forEach(img => {
+    qsa('img:not(#guideBg):not(#selfieImage)', root).forEach(img => {
       const src = img.getAttribute('src') || img.getAttribute('href');
-      if (isBadSrc(src)) {
-        img.remove();
-      } else {
-        img.addEventListener?.('error', () => img.remove());
-      }
+      if (isBadSrc(src)) img.remove();
+      else img.addEventListener?.('error', () => img.remove());
     });
   }
 
-  // ---------- Compat layer: monta estrutura ----------
+  // ---------------- Compat layer ----------------
   function ensureStructure(root) {
     let stage = root.querySelector('.card-stage, .card-stage-wrap, .card-container, .card');
     if (!stage) {
@@ -136,7 +131,8 @@
       guideBg.alt = 'Card da Irmandade';
       guideBg.style.display = 'block';
       guideBg.style.width = '100%';
-      guideBg.style.height = 'auto';
+      guideBg.style.height = '100%';
+      guideBg.style.objectFit = 'cover';
       guideBg.loading = 'lazy';
       stage.appendChild(guideBg);
     }
@@ -208,20 +204,16 @@
     return { stage, guideBg, guideNameSlot, flameLayer, selfieSvgImage, userNameSlot, btnNext: btn };
   }
 
-  // ---------- Inicialização ----------
+  // ---------------- Inicialização ----------------
   async function initCard(root) {
     const section = SECTION_IDS.map(id => root.id === id ? root : qs(`#${id}`, root) || qs(`#${id}`)).find(Boolean) || root;
 
-    // Nome do participante já armazenado na página Guia
     const nome = (sessionStorage.getItem('jornada.nome') || 'USUÁRIO').toUpperCase();
     const guia = await resolveSelectedGuide();
 
     const { guideBg, guideNameSlot, flameLayer, selfieSvgImage, userNameSlot, btnNext } = ensureStructure(section);
 
-    // Limpa imagens inválidas (elimina ícone transparente)
-    cleanupBrokenImages(section);
-
-    // BG do guia
+    // 1) Configura BG do guia
     if (guideBg && guideBg.tagName === 'IMG') {
       guideBg.src = guia.bgImage;
       guideBg.alt = `${guia.nome} — Card da Irmandade`;
@@ -233,16 +225,9 @@
     }
 
     if (guideNameSlot) guideNameSlot.textContent = (guia.nome || '').toUpperCase();
-    if (userNameSlot) userNameSlot.textContent = nome; // ✅ nome no rodapé
+    if (userNameSlot) userNameSlot.textContent = nome;
 
-    // Mensagem datilografada (dinâmica com nome e guia)
-    const intro = qs('#cardIntro', section);
-    if (intro) {
-      const texto = `Eu na Irmandade — ${guia.nome}. Bem-vindo, ${nome}.`;
-      intro.setAttribute('data-text', texto);
-    }
-
-    // Selfie (ou placeholder) na chama
+    // 2) Configura selfie
     const url = readSelfieUrlOrPlaceholder();
     if (selfieSvgImage) {
       setSvgImageHref(selfieSvgImage, url);
@@ -253,7 +238,16 @@
       });
     }
 
-    // Datilografia
+    // 3) Agora sim: limpa imagens estranhas no container
+    cleanupBrokenImages(section);
+
+    // 4) Mensagem datilografada (se existir)
+    const intro = qs('#cardIntro', section);
+    if (intro) {
+      const texto = `Eu na Irmandade — ${guia.nome}. Bem-vindo, ${nome}.`;
+      intro.setAttribute('data-text', texto);
+    }
+
     await waitForTransitionUnlock();
     const typings = qsa('[data-typing="true"]', section);
     for (const el of typings) {
@@ -261,7 +255,6 @@
       await runTypingAndSpeak(el, text);
     }
 
-    // Botão continuar
     if (btnNext) {
       btnNext.onclick = () => {
         try { speechSynthesis.cancel(); } catch {}
@@ -277,7 +270,7 @@
     console.log(`[${MOD}] Card exibido · guia=${guia.id} (${guia.nome}) · participante=${nome}`);
   }
 
-  // ---------- Escutas ----------
+  // ---------------- Escutas ----------------
   document.addEventListener('section:shown', (e) => {
     const id = e.detail.sectionId;
     if (!SECTION_IDS.includes(id)) return;
