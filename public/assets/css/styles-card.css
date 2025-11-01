@@ -1,442 +1,78 @@
-.titulo-card {
-  text-align: center;
-  font-size: clamp(28px, 5vw, 56px);
-  margin-bottom: 24px;
-  font-family: 'ManufacturingConsent', sans-serif;
-}
+/* SECTION-CARD — compacto v1.1 */
+#section-card { position: relative; z-index: 2; }
 
-.card-nome {
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* Centralizar o label e input */
-  margin-bottom: 16px;
-}
-
-.card-nome label {
-  font-size: 18px;
-  font-family: 'ManufacturingConsent', sans-serif;
-  color: var(--fg);
-  margin-bottom: 6px;
-}
-
-.card-nome input {
-  padding: 8px;
-  font-size: 18px;
-  border: 2px solid var(--card-2);
-  -webkit-border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
-  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
-  background-image: url('/assets/img/textura-de-pedra.jpg');
-  background-size: cover;
-  background-position: center;
-  background-color: var(--card-2);
-  background-blend-mode: overlay;
-  border-radius: var(--radius);
-  color: var(--fg);
-  font-family: 'BerkshireSwash', cursive;
-  text-transform: uppercase;
-  width: 100%;
-  max-width: 300px;
-}
-
-.card-controles-e-botoes {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.card-controles {
-  flex: 1;
-  min-width: 200px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.card-controles label {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-weight: 600;
-  font-size: 18px;
-  font-family: 'ManufacturingConsent', sans-serif;
-  color: var(--fg);
-}
-
-.card-controles input[type="range"],
-.card-controles input[type="number"] {
-  padding: 8px;
-  font-size: 16px;
-  border: 2px solid var(--card-2);
-  -webkit-border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
-  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
-  background-image: url('/assets/img/textura-de-pedra.jpg');
-  background-size: cover;
-  background-position: center;
-  background-color: var(--card-2);
-  background-blend-mode: overlay;
-  border-radius: var(--radius);
-  color: var(--fg);
-  font-family: 'BerkshireSwash', cursive;
-}
-
-.card-controles input[type="range"] {
-  width: 100px;
-}
-
-.card-controles input[type="number"] {
-  width: 100px;
-}
-
-.card-botoes-principais {
-  flex: 1;
-  min-width: 200px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: flex-end;
-}
-
-.card-previa-btn {
-  text-align: center;
-  margin-bottom: 24px;
-}
-
-.card-previa-btn .btn.btn-stone {
-  padding: 8px 16px;
-  font-size: 18px;
-  border: 2px solid var(--card-2);
-  -webkit-border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
-  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
-  background-image: url('/assets/img/textura-de-pedra.jpg');
-  background-size: cover;
-  background-position: center;
-  background-color: var(--card-2);
-  background-blend-mode: overlay;
-  color: #ffd700;
-  text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
-  font-family: 'ManufacturingConsent', sans-serif;
-  font-weight: bold;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  min-width: 140px;
-  text-align: center;
-  position: relative;
-}
-
-.card-previa-btn .btn.btn-stone::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: var(--radius);
-  z-index: -1;
-}
-
-.card-previa-btn .btn.btn-stone:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
-}
-
-.card-previa-btn .btn.btn-stone:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.card-botoes-principais .btn.btn-stone {
-  padding: 8px 16px;
-  font-size: 18px;
-  border: 2px solid var(--card-2);
-  -webkit-border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
-  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
-  background-image: url('/assets/img/textura-de-pedra.jpg');
-  background-size: cover;
-  background-position: center;
-  background-color: var(--card-2);
-  background-blend-mode: overlay;
-  color: #ffd700;
-  text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
-  font-family: 'ManufacturingConsent', sans-serif;
-  font-weight: bold;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  min-width: 140px;
-  text-align: center;
-  position: relative;
-}
-
-.card-botoes-principais .btn.btn-stone::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: var(--radius);
-  z-index: -1;
-}
-
-.card-botoes-principais .btn.btn-stone:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
-}
-
-.card-botoes-principais .btn.btn-stone:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.card-preview {
-  display: flex;
-  justify-content: center;
-  margin-top: 16px;
-}
-
-.guide-card {
-  position: relative;
-  width: min(720px, 92vw);
-  aspect-ratio: 2/3;
-  margin: 0 auto;
-  border-radius: var(--radius);
+/* desce o palco para não cortar o topo do BG (ZION) */
+#section-card .card-stage{
+  margin-top: 0; /* antes tinha margem negativa */
+  min-height: clamp(560px, 66vw, 920px);
+  padding-bottom: clamp(120px, 16vh, 200px);
   overflow: hidden;
-  background: #0f3b2f;
-  box-shadow: 0 20px 60px rgba(0,0,0,.45);
-  border: 2px solid var(--card-2);
-  -webkit-border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
-  border-image: url('/assets/img/moldura-medieval-espinhos.png') 30 stretch;
+  position: relative;
+  z-index: 5;
 }
 
-.guide-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+/* BG sempre visível */
+#section-card #guideBg{
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover;
 }
 
-.flame-layer {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  opacity: 0;
-  transition: opacity 900ms ease-in-out;
-  pointer-events: none;
+/* máscara/leitoso — menor e mais baixa (abaixo do queixo) */
+#section-card .flame-layer{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  bottom: clamp(90px, 14vh, 150px);   /* ↓ move para baixo */
+  width: clamp(200px, 40%, 480px);    /* ↓ levemente menor */
+  z-index:6;
+  opacity:0;
+  pointer-events:none;
+  transition: opacity .6s ease-in-out;
 }
+#section-card .flame-layer.show{ opacity:1 !important; }
 
-.flame-svg {
-  width: 40%;
-  height: 60%;
-  transform: translateY(6%);
-  filter: drop-shadow(0 8px 28px rgba(255,180,0,0.45));
-}
-
-.guide-name {
-  position: absolute;
-  top: 3.5%;
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-family: "Cardo", serif;
-  font-weight: 700;
-  letter-spacing: .06em;
-  font-size: clamp(28px, 5vw, 56px);
-  color: #f7d37a;
-  text-shadow: 0 2px 8px rgba(0,0,0,.4);
-  text-transform: uppercase;
-}
-
-.user-name {
-  position: absolute;
-  bottom: 4.5%;
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-family: "Cardo", serif;
-  font-weight: 700;
-  letter-spacing: .06em;
-  font-size: clamp(26px, 4.6vw, 52px);
-  color: #f6cf6a;
-  text-shadow: 0 2px 8px rgba(0,0,0,.4);
-  text-transform: uppercase;
-}
-
-.card-error {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #fff;
-  font-size: 18px;
-  text-align: center;
-  padding: 10px;
-  background: rgba(0,0,0,0.7);
-  border-radius: 8px;
-  display: none;
-}
-
-@media (max-width: 860px) {
-  .card-controles-e-botoes {
-    flex-direction: column;
-    align-items: center;
-  }
-  .card-controles,
-  .card-botoes-principais {
-    width: 100%;
-    align-items: center;
-  }
-  .card-botoes-principais {
-    align-items: flex-end;
-  }
-  .guide-card {
-    max-width: 100%;
-  }
-  .flame-svg {
-    width: 50%;
-    height: 50%;
-  }
-  .guide-name {
-    font-size: clamp(20px, 4vw, 36px);
-  }
-  .user-name {
-    font-size: clamp(18px, 3.6vw, 32px);
-  }
-}
-/* Faz a .titulo-selfie herdar o mesmo estilo da .titulo-card */
-.titulo-selfie { composes: titulo-card; } /* se não usar preprocessor, use o fallback: */
-.titulo-selfie {
-  text-align: center;
-  font-size: clamp(28px, 5vw, 56px);
-  margin-bottom: 24px;
-  font-family: 'ManufacturingConsent', sans-serif;
-}
-.guide-card {
-  width: min(640px, 92vw); /* 720px -> 640px p/ reduzir um pouco no mobile */
-}
-.flame-layer { transition: opacity 600ms ease-in-out; } /* era 900ms */
-.flame-svg { filter: drop-shadow(0 10px 36px rgba(255,180,0,.55)); }
-
-/* Mostra a camada da chama quando o JS marcar que a imagem está pronta */
-.flame-layer.show {
-  opacity: 1;
-}
-/* ---- Chama com recorte via máscara ---- */
-.flame-layer {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: clamp(60px, 9%, 90px);
-  width: clamp(200px, 46%, 520px);
-  z-index: 2;
-  opacity: 0;
-  pointer-events: none;
-}
-.flame-layer.show { opacity: 1; }
-
-.flame-selfie {
-  display: block;
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-  -webkit-mask-image: url("/assets/img/chama-card.png");
-  mask-image: url("/assets/img/chama-card.png");
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center bottom;
-  mask-position: center bottom;
-  -webkit-mask-size: contain;
-  mask-size: contain;
-  mask-mode: alpha;
+#section-card .flame-selfie{
+  display:block;
+  width:100%;
+  height:auto;
+  object-fit:cover;
+  -webkit-mask-image:url("/assets/img/chama-card.png");
+  mask-image:url("/assets/img/chama-card.png");
+  -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
+  -webkit-mask-position:50% 88%;    /* ↓ empurra o recorte mais para baixo */
+  mask-position:50% 88%;
+  -webkit-mask-size:contain; mask-size:contain;
+  mask-mode:alpha;
   box-shadow:
     inset 0 -10px 24px rgba(0,0,0,.35),
     0 0 0 1px rgba(255,215,160,.08);
 }
-/* --- Reservar espaço p/ rodapé (nome + botão) --- */
-/* Palco alto e subido (cobre o pergaminho) */
-#section-card .card-stage,
-#section-eu-na-irmandade .card-stage {
-  position: relative;
-  margin-top: min(-4vw, -48px);
-  min-height: clamp(560px, 66vw, 920px);
-  padding-bottom: clamp(120px, 16vh, 200px); /* reserva pro rodapé */
-  overflow: hidden;
-  z-index: 1;
-}
 
-/* Chama perto do peito */
-#section-card .flame-layer,
-#section-eu-na-irmandade .flame-layer {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: clamp(140px, 20vh, 200px);
-  width: clamp(240px, 46%, 540px);
-  z-index: 2;
-  opacity: 0;
-  pointer-events: none;
-}
-#section-card .flame-layer.show,
-#section-eu-na-irmandade .flame-layer.show { opacity: 1; }
-
-/* Rodapé: nome visível acima do limite inferior */
-#section-card .card-footer,
-#section-eu-na-irmandade .card-footer {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+/* rodapé (nome) */
+#section-card .card-footer{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
   bottom: clamp(56px, 8vh, 96px);
-  z-index: 3;
-  text-align: center;
+  z-index:7;
+  text-align:center;
 }
-#section-card .card-name-badge,
-#section-eu-na-irmandade .card-name-badge {
-  background: rgba(30, 20, 10, 0.55);
-  border: 1px solid rgba(255, 215, 128, 0.5);
-  border-radius: 10px;
-  padding: 4px 12px;
-  display: inline-block;
+#section-card .card-name-badge{
+  background: rgba(30,20,10,.55);
+  border: 1px solid rgba(255,215,128,.5);
+  border-radius:10px;
+  padding:4px 12px;
+  display:inline-block;
 }
-#section-card #userNameSlot,
-#section-eu-na-irmandade #userNameSlot {
-  font-family: "ManufacturingConsent","Cardo",serif;
+#section-card #userNameSlot{
+  font-family:"ManufacturingConsent","Cardo",serif;
   font-size: clamp(14px, 2.2vw, 22px);
-  letter-spacing: .08em;
-  color: #f5e6c8;
-  text-shadow: 0 2px 6px rgba(0,0,0,.5);
+  letter-spacing:.08em;
+  color:#f5e6c8;
+  text-shadow:0 2px 6px rgba(0,0,0,.5);
 }
 
-/* Área dos botões da seção (se estiver fora do palco) */
-#section-card .card-actions,
-#section-eu-na-irmandade .card-actions {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: clamp(10px, 2vh, 18px);
-}
-/* Garantir que a seção esteja visível e acima do pergaminho */
-#section-card { display: block !important; position: relative; z-index: 2; }
-
-/* O overlay do pergaminho deve ficar por baixo do card */
-.pergaminho::before { z-index: 0 !important; pointer-events: none !important; }
-#section-card .card-stage { position: relative; z-index: 5; }
-
-/* Corpo do card + espaço para rodapé */
-#section-card .card-stage {
-  margin-top: min(-4vw, -48px);
-  min-height: clamp(560px, 66vw, 920px);
-  padding-bottom: clamp(120px, 16vh, 200px);
-  overflow: hidden;
-}
-
-/* BG sempre visível (mesmo sem a <img>) */
-#section-card #guideBg { display:block !important; width:100% !important; height:auto !important; object-fit:cover; }
-
-/* Chama e nome acima do BG */
-#section-card .flame-layer { position:absolute; left:50%; transform:translateX(-50%); bottom: clamp(140px, 20vh, 200px); width: clamp(240px,46%,540px); z-index:6; opacity:0; pointer-events:none; }
-#section-card .flame-layer.show { opacity:1 !important; }
-#section-card .card-footer { position:absolute; left:50%; transform:translateX(-50%); bottom: clamp(56px, 8vh, 96px); z-index:7; text-align:center; }
-
+/* garante que o pergaminho fique por baixo */
+.pergaminho::before{ z-index:0 !important; pointer-events:none !important; }
