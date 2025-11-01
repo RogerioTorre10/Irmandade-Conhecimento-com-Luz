@@ -62,7 +62,7 @@
   async function loadGuiasJson() {
     if (GUIAS_CACHE) return GUIAS_CACHE;
     try {
-      const r = await fetch(GUIAS_JSON, { cache: 'no-store' });
+      const r = await fetch('/assets/data/guias.json', { cache: 'no-store' });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const data = await r.json();
       const arr = Array.isArray(data) ? data : (Array.isArray(data.guias) ? data.guias : []);
@@ -72,7 +72,7 @@
         bgImage: g.bgImage || g.bg || ''
       }));
     } catch (e) {
-      console.warn(`[${MOD}] Falha ao carregar ${GUIAS_JSON}:`, e);
+      console.warn(`[${MOD}] Falha ao carregar /assets/data/guias.json:`, e);
       GUIAS_CACHE = [];
     }
     return GUIAS_CACHE;
@@ -105,7 +105,6 @@
     if (/^https?:\/\//.test(src)) return false;
     if (src.includes('/')) return false;
     if (/\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(src)) return false;
-    // Ex.: "zion", "lumen", "ZION" etc. → inválido como caminho
     return true;
   }
 
@@ -213,12 +212,13 @@
   async function initCard(root) {
     const section = SECTION_IDS.map(id => root.id === id ? root : qs(`#${id}`, root) || qs(`#${id}`)).find(Boolean) || root;
 
+    // Nome do participante já armazenado na página Guia
     const nome = (sessionStorage.getItem('jornada.nome') || 'USUÁRIO').toUpperCase();
     const guia = await resolveSelectedGuide();
 
     const { guideBg, guideNameSlot, flameLayer, selfieSvgImage, userNameSlot, btnNext } = ensureStructure(section);
 
-    // Faxina de imgs quebradas ANTES de aplicar conteúdos
+    // Limpa imagens inválidas (elimina ícone transparente)
     cleanupBrokenImages(section);
 
     // BG do guia
@@ -233,7 +233,14 @@
     }
 
     if (guideNameSlot) guideNameSlot.textContent = (guia.nome || '').toUpperCase();
-    if (userNameSlot) userNameSlot.textContent = nome;
+    if (userNameSlot) userNameSlot.textContent = nome; // ✅ nome no rodapé
+
+    // Mensagem datilografada (dinâmica com nome e guia)
+    const intro = qs('#cardIntro', section);
+    if (intro) {
+      const texto = `Eu na Irmandade — ${guia.nome}. Bem-vindo, ${nome}.`;
+      intro.setAttribute('data-text', texto);
+    }
 
     // Selfie (ou placeholder) na chama
     const url = readSelfieUrlOrPlaceholder();
@@ -246,6 +253,7 @@
       });
     }
 
+    // Datilografia
     await waitForTransitionUnlock();
     const typings = qsa('[data-typing="true"]', section);
     for (const el of typings) {
@@ -253,6 +261,7 @@
       await runTypingAndSpeak(el, text);
     }
 
+    // Botão continuar
     if (btnNext) {
       btnNext.onclick = () => {
         try { speechSynthesis.cancel(); } catch {}
