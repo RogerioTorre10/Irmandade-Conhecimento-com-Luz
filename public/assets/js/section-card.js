@@ -276,7 +276,17 @@ function readSelectedGuideId() {
       stage.style.minHeight = stage.style.minHeight || '66vw';
       stage.style.paddingBottom = stage.style.paddingBottom || '16vh';
       stage.style.marginTop = stage.style.marginTop || 'min(-4vw, -48px)';
-    
+
+    // Fallback: pinta o fundo do palco com o BG do guia SEMPRE
+      stage.style.backgroundImage    = `url("${guia.bgImage}")`;
+      stage.style.backgroundSize     = 'cover';
+      stage.style.backgroundPosition = 'center';
+
+    /* mantém também a <img>, se existir */
+      if (guideBg && guideBg.tagName === 'IMG') {
+      guideBg.src = guia.bgImage;
+      guideBg.alt = `${guia.nome} — Card da Irmandade`;
+    }
 
     // Nome do guia e do participante
     if (guideNameSlot) guideNameSlot.textContent = (guia.nome || '').toUpperCase();
