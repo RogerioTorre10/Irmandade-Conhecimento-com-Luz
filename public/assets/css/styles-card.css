@@ -417,4 +417,26 @@
   gap: 12px;
   margin-top: clamp(10px, 2vh, 18px);
 }
+/* Garantir que a seção esteja visível e acima do pergaminho */
+#section-card { display: block !important; position: relative; z-index: 2; }
+
+/* O overlay do pergaminho deve ficar por baixo do card */
+.pergaminho::before { z-index: 0 !important; pointer-events: none !important; }
+#section-card .card-stage { position: relative; z-index: 5; }
+
+/* Corpo do card + espaço para rodapé */
+#section-card .card-stage {
+  margin-top: min(-4vw, -48px);
+  min-height: clamp(560px, 66vw, 920px);
+  padding-bottom: clamp(120px, 16vh, 200px);
+  overflow: hidden;
+}
+
+/* BG sempre visível (mesmo sem a <img>) */
+#section-card #guideBg { display:block !important; width:100% !important; height:auto !important; object-fit:cover; }
+
+/* Chama e nome acima do BG */
+#section-card .flame-layer { position:absolute; left:50%; transform:translateX(-50%); bottom: clamp(140px, 20vh, 200px); width: clamp(240px,46%,540px); z-index:6; opacity:0; pointer-events:none; }
+#section-card .flame-layer.show { opacity:1 !important; }
+#section-card .card-footer { position:absolute; left:50%; transform:translateX(-50%); bottom: clamp(56px, 8vh, 96px); z-index:7; text-align:center; }
 
