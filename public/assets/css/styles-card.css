@@ -1,86 +1,61 @@
-/* Superfície que substitui o pergaminho visualmente (com a mesma textura) */
-#section-card .card-surface {
+.pergaminho {
+  background: url('pergaminho-bg.jpg') no-repeat center center;
+  background-size: contain;
+  padding: 40px 30px; /* espaçamento geral do pergaminho */
+  max-width: 400px;
+  margin: 0 auto;
   position: relative;
-  width: clamp(320px, 72vw, 820px);
-  min-height: clamp(820px, 92vh, 1100px);
-  margin: clamp(8px, 2vh, 16px) auto;
-  border-radius: 18px;
+}
 
-  /* leve profundidade */
-  box-shadow: 0 8px 40px rgba(0,0,0,.35);
+.card {
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 12px;
   overflow: hidden;
+  text-align: center;
+  color: white;
+  font-family: 'Cinzel', serif;
+  position: relative;
+  height: 100%; /* ocupa todo o espaço disponível */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* empurra conteúdo para cima e baixo */
+  padding-bottom: 0; /* remove padding inferior do card */
 }
 
-/* CARD interno ocupando quase toda a superfície */
-#section-card .card-frame {
-  --inset: clamp(16px, 3vh, 28px);       /* ajuste fino: encosta topo/base */
+.card img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.card h1 {
+  margin: 0;
+  padding: 15px;
+  font-size: 2.5rem;
+  background: linear-gradient(to bottom, transparent, #000);
+  text-shadow: 0 0 10px gold;
+}
+
+/* A CHAVE: esticar o card até quase a borda inferior */
+.pergaminho::before {
+  content: '';
   position: absolute;
-  top: var(--inset);
-  bottom: var(--inset);                  /* <-- encosta na borda inferior */
-  left: 50%;
-  transform: translateX(-50%);
-  width: clamp(260px, 46vw, 560px);
-  border-radius: 16px;
- 
-/* ✨ Aura dourada sutil pulsante */
-#section-card .card-frame::before {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px; /* ajuste conforme o "rasgo" do pergaminho */
+  background: linear-gradient(to bottom, transparent, #8b6f47);
   pointer-events: none;
-  box-shadow:
-    0 0 0 1px rgba(255,220,150,.22),
-    0 0 16px rgba(255,205,110,.22),
-    0 0 60px rgba(255,195,90,.14);
-  opacity: .6;
-  animation: aura-gold 3.4s ease-in-out infinite;
+  z-index: 1;
 }
 
-@keyframes aura-gold {
-  0% {
-    box-shadow:
-      0 0 0 1px rgba(255,220,150,.22),
-      0 0 16px rgba(255,205,110,.22),
-      0 0 60px rgba(255,195,90,.14);
-    opacity: .6;
-  }
-  50% {
-    box-shadow:
-      0 0 0 3px rgba(255,230,170,.42),
-      0 0 34px rgba(255,215,140,.45),
-      0 0 110px rgba(255,205,100,.30);
-    opacity: .95;
-  }
-  100% {
-    box-shadow:
-      0 0 0 1px rgba(255,220,150,.22),
-      0 0 16px rgba(255,205,110,.22),
-      0 0 60px rgba(255,195,90,.14);
-    opacity: .6;
-  }
-}
-
-/* Botão dentro da superfície (sem sair na impressão) */
-#section-card #btnStartJourney {
+.card::after {
+  content: '';
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: clamp(18px, 2.8vh, 28px);
-  z-index: 6;
-  background: rgba(255,240,210,.85);
-  border: 1px solid rgba(120,90,60,.5);
-  border-radius: 8px;
-  padding: 6px 18px;
-  transition: background .3s;
-  cursor: pointer;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px; /* sobrepõe o fundo do card até o limite */
+  background: inherit;
+  z-index: 2;
 }
-#section-card #btnStartJourney:hover { background: rgba(255,240,210,1); }
-@media print { #section-card #btnStartJourney { display: none !important; } }
-
-/* Esconde qualquer resíduo de caption/labels (ex.: “ZION” no rodapé) */
-#section-card .card-footer,
-#section-card .guia-nome,
-#section-card .guide-name,
-#section-card .watermark,
-#section-card .caption { display: none !important; }
