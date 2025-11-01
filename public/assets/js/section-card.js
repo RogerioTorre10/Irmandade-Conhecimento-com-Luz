@@ -5,7 +5,8 @@
   const MOD = 'section-card.js';
   const SECTION_IDS = ['section-card', 'section-eu-na-irmandade'];
   const NEXT_SECTION_ID = 'section-perguntas';
-  const VIDEO_SRC = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
+  const VIDEO_SRC = '/assets/videos/filme-card-dourado.mp4';
+
   const CARD_BG = {
     arian: '/assets/img/irmandade-quarteto-bg-arian.png',
     lumen: '/assets/img/irmandade-quarteto-bg-lumen.png',
@@ -18,7 +19,7 @@
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-   // ---------- Utilitários ----------
+  // ---------------- Utilitários ----------------
   async function waitForTransitionUnlock(timeoutMs = 12000) {
     if (!window.__TRANSITION_LOCK) return;
     let done = false;
@@ -46,18 +47,18 @@
     try { await window.EffectCoordinator?.speak?.(text, { rate: 1.0 }); } catch {}
   }
 
+  function setSvgImageHref(imgEl, url) {
+    try { imgEl.setAttribute('href', url); } catch {}
+    try { imgEl.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', url); } catch {}
+  }
+
   function readSelfieUrlOrPlaceholder() {
     const keys = ['jornada.selfieDataUrl','selfie.dataUrl','selfieDataUrl','jornada.selfie','selfie.image','selfieImageData'];
-    for (const k of keys) {
-      try {
-        const v = sessionStorage.getItem(k);
-        if (v && /^data:image\//.test(v)) return v;
-      } catch {}
-    }
+    for (const k of keys) { try { const v = sessionStorage.getItem(k); if (v && /^data:image\//.test(v)) return v; } catch {} }
     return PLACEHOLDER_SELFIE;
   }
 
-  // ---------- JSON dos guias ----------
+  // ---------------- JSON dos guias ----------------
   async function loadGuiasJson() {
     if (GUIAS_CACHE) return GUIAS_CACHE;
     try {
@@ -70,83 +71,24 @@
         nome: g.nome || g.name || '',
         bgImage: g.bgImage || g.bg || ''
       }));
-      console.log(`[${MOD}] guias.json carregado:`, GUIAS_CACHE);
     } catch (e) {
       console.warn(`[${MOD}] Falha ao carregar ${GUIAS_JSON}:`, e);
       GUIAS_CACHE = [];
     }
     return GUIAS_CACHE;
   }
-function readParticipantName() {
-  const keys = [
-    'jornada.nome', 'jc.nome', 'participantName', 'jornada.participantName',
-    'nomeParticipante', 'jc.participant'
-  ];
-  for (const k of keys) {
-    try {
-      const v = sessionStorage.getItem(k) || localStorage.getItem(k);
-      if (v && String(v).trim()) return String(v).trim();
-    } catch {}
-  }
-  // tenta no DOM (campo de nome na seção guia)
-  const input = document.querySelector('#guiaNameInput, #nomeParticipante');
-  if (input && input.value) return String(input.value).trim();
-  return 'USUÁRIO';
-}
-
-function readSelectedGuideId() {
-  // 1) DOM: qualquer elemento com [data-guide]
-  let v = (document.querySelector('#card-guide,[data-guide]')?.getAttribute('data-guide')) || '';
-
-  // 2) URL ?guia=lumen (se existir)
-  if (!v) {
-    try {
-      const u = new URL(location.href);
-      v = u.searchParams.get('guia') || '';
-    } catch {}
-  }
-
-  // 3) session/local (varias chaves comuns)
-  const keys = [
-    'jornada.guia','guia','guia.id','selected.guia',
-    'guiaSelecionado','guiaChoice','jc.guia','jornada.guia.id'
-  ];
-  for (const k of keys) {
-    try {
-      const s = sessionStorage.getItem(k) || localStorage.getItem(k);
-      if (!v && s) v = s;
-    } catch {}
-  }
-
-  // default + normalização
-  v = String(v || 'zion').trim().toLowerCase();
-  const map = { arion: 'arian', árion: 'arian' };
-  v = map[v] || v;
-  if (!['zion','lumen','arian'].includes(v)) v = 'zion';
-
-  // persistimos na chave canônica para as próximas telas
-  try { sessionStorage.setItem('jornada.guia', v); } catch {}
-  console.log('[section-card.js] guia selecionado (normalizado):', v);
-  return v;
-}
-
-  
   function titleize(id){ const m={arian:'Arian',lumen:'Lumen',zion:'Zion'}; return m[id] || (id? id[0].toUpperCase()+id.slice(1):''); }
   async function resolveSelectedGuide() {
-  const selId = readSelectedGuideId();   // ← aqui
-  const guias = await loadGuiasJson();
-  const j = guias.find(g => String(g.id || '').toLowerCase() === selId);
-  if (j && (j.bgImage || j.nome)) {
-    return { id: selId, nome: j.nome || titleize(selId), bgImage: j.bgImage || CARD_BG[selId] || CARD_BG.zion };
+    const selId = (sessionStorage.getItem('jornada.guia') || 'zion').toLowerCase();
+    const guias = await loadGuiasJson();
+    const j = guias.find(g => g.id === selId);
+    if (j && (j.bgImage || j.nome)) return { id: selId, nome: j.nome || titleize(selId), bgImage: j.bgImage || CARD_BG[selId] || CARD_BG.zion };
+    return { id: selId, nome: titleize(selId), bgImage: CARD_BG[selId] || CARD_BG.zion };
   }
-  return { id: selId, nome: titleize(selId), bgImage: CARD_BG[selId] || CARD_BG.zion };
-}
 
-
-
-  // ---------- Compat layer: acha OU cria estrutura mínima ----------
+  // ---------------- Compat layer: acha ou cria estrutura ----------------
   function ensureStructure(root) {
-    // 1) palco/base
+    // container base (card-stage)
     let stage = root.querySelector('.card-stage, .card-stage-wrap, .card-container, .card');
     if (!stage) {
       stage = document.createElement('div');
@@ -155,7 +97,7 @@ function readSelectedGuideId() {
     }
     stage.style.position = stage.style.position || 'relative';
 
-    // 2) BG do guia
+    // BG do guia: tenta vários seletores; se não existir, cria <img id="guideBg">
     let guideBg = stage.querySelector('#guideBg, .guide-bg, .card-bg img, img.card-bg');
     if (!guideBg) {
       guideBg = document.createElement('img');
@@ -168,21 +110,21 @@ function readSelectedGuideId() {
       stage.appendChild(guideBg);
     }
 
-    // 3) Nome do guia (topo)
+    // Nome do guia (topo)
+    let guideNameSlot = stage.querySelector('#guideNameSlot, .card-guide-name #guideNameSlot, .card-guide-name span');
     let guideNameWrap = stage.querySelector('.card-guide-name');
     if (!guideNameWrap) {
       guideNameWrap = document.createElement('div');
       guideNameWrap.className = 'card-guide-name';
       stage.appendChild(guideNameWrap);
     }
-    let guideNameSlot = stage.querySelector('#guideNameSlot') || guideNameWrap.querySelector('span');
     if (!guideNameSlot) {
       guideNameSlot = document.createElement('span');
       guideNameSlot.id = 'guideNameSlot';
       guideNameWrap.appendChild(guideNameSlot);
     }
 
-    // 4) Camada da chama
+    // Camada da chama
     let flameLayer = stage.querySelector('.flame-layer');
     if (!flameLayer) {
       flameLayer = document.createElement('div');
@@ -190,18 +132,23 @@ function readSelectedGuideId() {
       stage.appendChild(flameLayer);
     }
 
-    // 5) Selfie/placeholder com CSS mask (SEM SVG)
-    let flameSelfie = stage.querySelector('.flame-selfie');
-    if (!flameSelfie) {
+    // SVG + image da selfie
+    let selfieSvgImage = stage.querySelector('#selfieImage');
+    if (!selfieSvgImage) {
       flameLayer.innerHTML = `
-        <img class="flame-selfie" id="selfieImage"
-             src="${PLACEHOLDER_SELFIE}"
-             alt="Selfie ou Placeholder"
-             loading="lazy" />`;
-      flameSelfie = flameLayer.querySelector('.flame-selfie');
+        <svg viewBox="0 0 1000 1200" xmlns="http://www.w3.org/2000/svg" role="img">
+          <defs>
+            <mask id="flameMask" maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
+              <image href="/assets/img/chama-card.png" x="0" y="0" width="1" height="1" preserveAspectRatio="xMidYMid meet"/>
+            </mask>
+          </defs>
+          <image id="selfieImage" x="0" y="0" width="1000" height="1200" preserveAspectRatio="xMidYMid slice"
+                 href="${PLACEHOLDER_SELFIE}" mask="url(#flameMask)"/>
+        </svg>`;
+      selfieSvgImage = flameLayer.querySelector('#selfieImage');
     }
 
-    // 6) Rodapé (nome do participante)
+    // Rodapé com nome do participante
     let footer = stage.querySelector('.card-footer');
     if (!footer) {
       footer = document.createElement('div');
@@ -221,89 +168,55 @@ function readSelectedGuideId() {
       badge.appendChild(userNameSlot);
     }
 
-    // 7) Ações (botão continuar)
-    let btnNext = root.querySelector('#btnNext, .btn-next-card');
-    if (!btnNext) {
+    // Botão continuar
+    let btn = root.querySelector('#btnNext, .btn-next-card');
+    if (!btn) {
       const actions = root.querySelector('.card-actions') || root.appendChild(Object.assign(document.createElement('div'), {className:'card-actions'}));
-      btnNext = document.createElement('button');
-      btnNext.id = 'btnNext';
-      btnNext.className = 'btn btn-stone';
-      btnNext.textContent = 'Continuar';
-      actions.appendChild(btnNext);
+      btn = document.createElement('button');
+      btn.id = 'btnNext';
+      btn.className = 'btn btn-stone';
+      btn.textContent = 'Continuar';
+      actions.appendChild(btn);
     }
 
-    return { stage, guideBg, guideNameSlot, flameLayer, flameSelfie, userNameSlot, btnNext };
+    return { stage, guideBg, guideNameSlot, flameLayer, selfieSvgImage, userNameSlot: userNameSlot, btnNext: btn };
   }
 
-  // ---------- Inicialização ----------
+  // ---------------- Inicialização ----------------
   async function initCard(root) {
-    // detecta a seção alvo
+    // Se a seção veio embrulhada, tenta achar o nó da própria seção
     const section = SECTION_IDS.map(id => root.id === id ? root : qs(`#${id}`, root) || qs(`#${id}`)).find(Boolean) || root;
-    const nome = readParticipantName().toUpperCase();
 
     const nome = (sessionStorage.getItem('jornada.nome') || 'USUÁRIO').toUpperCase();
     const guia = await resolveSelectedGuide();
 
-    // Garante estrutura mínima
-    const { stage, guideBg, guideNameSlot, flameLayer, flameSelfie, userNameSlot, btnNext } = ensureStructure(section);
+    // Garante estrutura e pega refs
+    const { guideBg, guideNameSlot, flameLayer, selfieSvgImage, userNameSlot, btnNext } = ensureStructure(section);
 
-    // Altura mínima do palco (evita achatamento por CSS externo)
-    if (stage && !stage.style.minHeight) stage.style.minHeight = '52vh';
-
-    // BG do guia → preferir <img>; se falhar, pintar no stage
+    // Aplica BG do guia (preferência por <img>; se não existir, aplica como background do stage)
     if (guideBg && guideBg.tagName === 'IMG') {
       guideBg.src = guia.bgImage;
       guideBg.alt = `${guia.nome} — Card da Irmandade`;
-      const applyFallbackBG = () => {
-        // se não carregou, pinta o plano de fundo do stage
-        if (!guideBg.naturalWidth) {
-          stage.style.backgroundImage = `url("${guia.bgImage}")`;
-          stage.style.backgroundSize = 'cover';
-          stage.style.backgroundPosition = 'center';
-        }
-      };
-      if (guideBg.complete) {
-        applyFallbackBG();
-      } else {
-        guideBg.addEventListener('load', applyFallbackBG, { once: true });
-        guideBg.addEventListener('error', applyFallbackBG, { once: true });
-      }
     } else {
-      stage.style.backgroundImage = `url("${guia.bgImage}")`;
-      stage.style.backgroundSize = 'cover';
-      stage.style.backgroundPosition = 'center';
+      // fallback: usar background no container
+      section.style.backgroundImage = `url("${guia.bgImage}")`;
+      section.style.backgroundSize = 'cover';
+      section.style.backgroundPosition = 'center';
     }
-      stage.style.minHeight = stage.style.minHeight || '66vw';
-      stage.style.paddingBottom = stage.style.paddingBottom || '16vh';
-      stage.style.marginTop = stage.style.marginTop || 'min(-4vw, -48px)';
-
-    // Fallback: pinta o fundo do palco com o BG do guia SEMPRE
-      stage.style.backgroundImage    = `url("${guia.bgImage}")`;
-      stage.style.backgroundSize     = 'cover';
-      stage.style.backgroundPosition = 'center';
-
-    /* mantém também a <img>, se existir */
-      if (guideBg && guideBg.tagName === 'IMG') {
-      guideBg.src = guia.bgImage;
-      guideBg.alt = `${guia.nome} — Card da Irmandade`;
-    }
-
-    // Nome do guia e do participante
     if (guideNameSlot) guideNameSlot.textContent = (guia.nome || '').toUpperCase();
-    if (userNameSlot)  userNameSlot.textContent  = nome;
+    if (userNameSlot) userNameSlot.textContent = nome;
 
-    // Selfie/placeholder + exibir camada
+    // Selfie (ou placeholder) na chama
     const url = readSelfieUrlOrPlaceholder();
-    if (flameSelfie && url) {
-      flameSelfie.src = url;
+    if (selfieSvgImage) {
+      setSvgImageHref(selfieSvgImage, url);
       flameLayer?.classList.add('show');
-      flameSelfie.addEventListener?.('error', () => {
-        flameSelfie.src = PLACEHOLDER_SELFIE;
+      selfieSvgImage.addEventListener?.('error', () => {
+        setSvgImageHref(selfieSvgImage, PLACEHOLDER_SELFIE);
         flameLayer?.classList.add('show');
       });
     }
 
-    // Espera transição e aplica datilografia/TTS
     await waitForTransitionUnlock();
     const typings = qsa('[data-typing="true"]', section);
     for (const el of typings) {
@@ -311,7 +224,6 @@ function readSelectedGuideId() {
       await runTypingAndSpeak(el, text);
     }
 
-    // Botão continuar
     if (btnNext) {
       btnNext.onclick = () => {
         try { speechSynthesis.cancel(); } catch {}
@@ -327,7 +239,7 @@ function readSelectedGuideId() {
     console.log(`[${MOD}] Card exibido · guia=${guia.id} (${guia.nome}) · participante=${nome}`);
   }
 
-  // ---------- Escutas ----------
+  // ---------------- Escutas ----------------
   document.addEventListener('section:shown', (e) => {
     const id = e.detail.sectionId;
     if (!SECTION_IDS.includes(id)) return;
@@ -335,72 +247,11 @@ function readSelectedGuideId() {
     initCard(root);
   });
 
-  // Fallback: se a seção já estiver visível sem evento
+  // Fallback para render direto
   document.addEventListener('DOMContentLoaded', () => {
     const visible = SECTION_IDS.map(id => qs(`#${id}`)).find(el => el && (el.offsetParent !== null || el.style.display !== 'none'));
     if (visible) initCard(visible);
   });
 
-// === Fallback visual de emergência ===
-document.addEventListener('DOMContentLoaded', async () => {
-  try {
-    const sec = document.querySelector('#section-card');
-    if (!sec) return;
-
-    // Garante que a seção está visível
-    sec.style.display = 'block';
-    sec.style.zIndex = '2';
-    sec.style.position = 'relative';
-
-    // Cria palco se não existir
-    let stage = sec.querySelector('.card-stage');
-    if (!stage) {
-      stage = document.createElement('div');
-      stage.className = 'card-stage';
-      stage.style.position = 'relative';
-      stage.style.minHeight = '66vw';
-      stage.style.background = '#000 url("/assets/img/irmandade-quarteto-bg-zion.png") center/cover no-repeat';
-      sec.appendChild(stage);
-      console.warn('[section-card.js] stage recriado manualmente');
-    }
-
-    // Garante fundo
-    if (!stage.style.backgroundImage) {
-      stage.style.backgroundImage = 'url("/assets/img/irmandade-quarteto-bg-zion.png")';
-      stage.style.backgroundSize = 'cover';
-      stage.style.backgroundPosition = 'center';
-    }
-
-    // Garante chama e rodapé
-    if (!stage.querySelector('.flame-layer')) {
-      const flame = document.createElement('div');
-      flame.className = 'flame-layer show';
-      flame.innerHTML = `<img src="/assets/img/irmandade-card-placeholder.jpg" style="width:45%;border-radius:50%;opacity:0.9;">`;
-      flame.style.position = 'absolute';
-      flame.style.left = '50%';
-      flame.style.bottom = '160px';
-      flame.style.transform = 'translateX(-50%)';
-      stage.appendChild(flame);
-    }
-
-    if (!stage.querySelector('.card-footer')) {
-      const foot = document.createElement('div');
-      foot.className = 'card-footer';
-      foot.innerHTML = `<span class="card-name-badge"><span id="userNameSlot">USUÁRIO</span></span>`;
-      foot.style.position = 'absolute';
-      foot.style.left = '50%';
-      foot.style.bottom = '72px';
-      foot.style.transform = 'translateX(-50%)';
-      stage.appendChild(foot);
-    }
-
-    console.log('[section-card.js] Fallback visual aplicado com sucesso.');
-  } catch (err) {
-    console.error('[section-card.js] Fallback visual falhou', err);
-  }
-});
-
-
-  console.log(`[${MOD}] carregado (CSS mask; guias.json; robusto)`);
+  console.log(`[${MOD}] carregado (robusto)`);
 })();
-
