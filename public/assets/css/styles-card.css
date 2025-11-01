@@ -1,66 +1,78 @@
-/* ======= SECTION-CARD · Modo “só o CARD” (sem lente) — v2.1 ======= */
+/* SECTION-CARD — compacto v1.1 */
+#section-card { position: relative; z-index: 2; }
 
-/* 1) Some com a lente, se ainda existir no DOM */
-#section-card .lens { display: none !important; }
+/* desce o palco para não cortar o topo do BG (ZION) */
+#section-card .card-stage{
+  margin-top: 0; /* antes tinha margem negativa */
+  min-height: clamp(560px, 66vw, 920px);
+  padding-bottom: clamp(120px, 16vh, 200px);
+  overflow: hidden;
+  position: relative;
+  z-index: 5;
+}
 
-/* 2) CARD único ocupando quase todo o pergaminho */
-#section-card .card-frame,
-#section-card .flame-layer { /* cobre também a estrutura antiga, se usada */
-  --inset: clamp(12px, 2.6vh, 22px);             /* respiro topo/rodapé */
-  position: absolute !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  top: var(--inset) !important;
-  bottom: var(--inset) !important;               /* encosta embaixo */
-  width: clamp(260px, 46vw, 560px) !important;
-  border-radius: 18px !important;
+/* BG sempre visível */
+#section-card #guideBg{
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover;
+}
 
-  /* Centro transparente (sem vidro/lente) */
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+/* máscara/leitoso — menor e mais baixa (abaixo do queixo) */
+#section-card .flame-layer{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  bottom: clamp(90px, 14vh, 150px);   /* ↓ move para baixo */
+  width: clamp(200px, 40%, 480px);    /* ↓ levemente menor */
+  z-index:6;
+  opacity:0;
+  pointer-events:none;
+  transition: opacity .6s ease-in-out;
+}
+#section-card .flame-layer.show{ opacity:1 !important; }
 
-  /* borda fininha dourada + leve sombra interna para contraste */
-  border: 1px solid rgba(255, 225, 180, 0.38) !important;
+#section-card .flame-selfie{
+  display:block;
+  width:100%;
+  height:auto;
+  object-fit:cover;
+  -webkit-mask-image:url("/assets/img/chama-card.png");
+  mask-image:url("/assets/img/chama-card.png");
+  -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
+  -webkit-mask-position:50% 88%;    /* ↓ empurra o recorte mais para baixo */
+  mask-position:50% 88%;
+  -webkit-mask-size:contain; mask-size:contain;
+  mask-mode:alpha;
   box-shadow:
-    inset 0 0 20px rgba(0,0,0,0.18) !important;
-
-  pointer-events: none !important;
-  z-index: 6 !important;
-  opacity: 1 !important;
-  visibility: visible !important;
+    inset 0 -10px 24px rgba(0,0,0,.35),
+    0 0 0 1px rgba(255,215,160,.08);
 }
 
-/* 3) Aura dourada sutil pulsante ao redor do CARD */
-#section-card .card-frame::after,
-#section-card .flame-layer::after {
-  content: "";
-  position: absolute; inset: -2px;
-  border-radius: inherit;
-  pointer-events: none;
-  box-shadow:
-    0 0 0 2px rgba(255,220,150,.32),
-    0 0 28px rgba(255,205,110,.36),
-    0 0 120px rgba(255,195,90,.24);
-  opacity: .9;
-  animation: aura-gold-card 3.6s ease-in-out infinite;
+/* rodapé (nome) */
+#section-card .card-footer{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  bottom: clamp(56px, 8vh, 96px);
+  z-index:7;
+  text-align:center;
 }
-@keyframes aura-gold-card{
-  0%  { box-shadow:0 0 0 1px rgba(255,220,150,.26),0 0 18px rgba(255,205,110,.26),0 0 80px rgba(255,195,90,.18); opacity:.75; }
-  50% { box-shadow:0 0 0 3px rgba(255,235,180,.52),0 0 38px rgba(255,215,140,.56),0 0 160px rgba(255,205,100,.34); opacity:1; }
-  100%{ box-shadow:0 0 0 1px rgba(255,220,150,.26),0 0 18px rgba(255,205,110,.26),0 0 80px rgba(255,195,90,.18); opacity:.75; }
+#section-card .card-name-badge{
+  background: rgba(30,20,10,.55);
+  border: 1px solid rgba(255,215,128,.5);
+  border-radius:10px;
+  padding:4px 12px;
+  display:inline-block;
+}
+#section-card #userNameSlot{
+  font-family:"ManufacturingConsent","Cardo",serif;
+  font-size: clamp(14px, 2.2vw, 22px);
+  letter-spacing:.08em;
+  color:#f5e6c8;
+  text-shadow:0 2px 6px rgba(0,0,0,.5);
 }
 
-/* 4) Garantias de camada: pergaminho no fundo, conteúdo acima */
-#section-card { position: relative; min-height: 100vh; }
-#section-card.pergaminho::before { z-index: 0 !important; pointer-events: none !important; }
-#section-card .conteudo-pergaminho { position: relative !important; z-index: 5 !important; }
-
-/* 5) Botão flutuante (não imprime) */
-#section-card #btnStartJourney{
-  position: absolute !important;
-  left: 50% !important; transform: translateX(-50%) !important;
-  bottom: calc(var(--inset) + 12px) !important;
-  z-index: 8 !important;
-}
-@media print { #section-card #btnStartJourney { display: none !important; } }
+/* garante que o pergaminho fique por baixo */
+.pergaminho::before{ z-index:0 !important; pointer-events:none !important; }
