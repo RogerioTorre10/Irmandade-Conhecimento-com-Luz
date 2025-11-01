@@ -217,6 +217,30 @@
       };
     }
 
+    // --- hotfix de visibilidade ---
+const wrappers = [
+  document.getElementById('jornada-content-wrapper'),
+  section
+].filter(Boolean);
+
+wrappers.forEach(node => {
+  try {
+    node.hidden = false;
+    node.style.removeProperty('display');
+    node.style.removeProperty('opacity');
+    node.style.removeProperty('visibility');
+    node.classList.remove('hidden','is-hidden','offstage','leaving','entering');
+  } catch {}
+});
+
+const stage = section.querySelector('.conteudo-pergaminho, .card-stage');
+[stage, section].forEach(el => {
+  if (!el) return;
+  el.style.opacity = '1';
+  el.style.visibility = 'visible';
+  el.style.display = 'block';
+});
+       
     console.log(`[${MOD}] Card exibido · guia=${guia.id} (${guia.nome}) · participante=${nome}`);
   }
 
