@@ -261,3 +261,27 @@
   z-index: 0 !important;
   pointer-events: none !important;
 }
+/* --- PRINT RULES: esconder botões e elementos de navegação --- */
+@media print {
+  /* esconde o botão de seguir e quaisquer botões/controles */
+  #section-card #btnStartJourney,
+  #section-card .btn,
+  #section-card .controls,
+  .no-print {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* garante cores/tom do pergaminho e máscara */
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* opcional: centraliza o card na página impressa */
+  #section-card .card-stage {
+    margin: 0 auto !important;
+    justify-content: center !important;
+  }
+}
+
