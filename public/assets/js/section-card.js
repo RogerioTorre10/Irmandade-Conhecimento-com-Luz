@@ -341,6 +341,66 @@ function readSelectedGuideId() {
     if (visible) initCard(visible);
   });
 
+// === Fallback visual de emergência ===
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const sec = document.querySelector('#section-card');
+    if (!sec) return;
+
+    // Garante que a seção está visível
+    sec.style.display = 'block';
+    sec.style.zIndex = '2';
+    sec.style.position = 'relative';
+
+    // Cria palco se não existir
+    let stage = sec.querySelector('.card-stage');
+    if (!stage) {
+      stage = document.createElement('div');
+      stage.className = 'card-stage';
+      stage.style.position = 'relative';
+      stage.style.minHeight = '66vw';
+      stage.style.background = '#000 url("/assets/img/irmandade-quarteto-bg-zion.png") center/cover no-repeat';
+      sec.appendChild(stage);
+      console.warn('[section-card.js] stage recriado manualmente');
+    }
+
+    // Garante fundo
+    if (!stage.style.backgroundImage) {
+      stage.style.backgroundImage = 'url("/assets/img/irmandade-quarteto-bg-zion.png")';
+      stage.style.backgroundSize = 'cover';
+      stage.style.backgroundPosition = 'center';
+    }
+
+    // Garante chama e rodapé
+    if (!stage.querySelector('.flame-layer')) {
+      const flame = document.createElement('div');
+      flame.className = 'flame-layer show';
+      flame.innerHTML = `<img src="/assets/img/irmandade-card-placeholder.jpg" style="width:45%;border-radius:50%;opacity:0.9;">`;
+      flame.style.position = 'absolute';
+      flame.style.left = '50%';
+      flame.style.bottom = '160px';
+      flame.style.transform = 'translateX(-50%)';
+      stage.appendChild(flame);
+    }
+
+    if (!stage.querySelector('.card-footer')) {
+      const foot = document.createElement('div');
+      foot.className = 'card-footer';
+      foot.innerHTML = `<span class="card-name-badge"><span id="userNameSlot">USUÁRIO</span></span>`;
+      foot.style.position = 'absolute';
+      foot.style.left = '50%';
+      foot.style.bottom = '72px';
+      foot.style.transform = 'translateX(-50%)';
+      stage.appendChild(foot);
+    }
+
+    console.log('[section-card.js] Fallback visual aplicado com sucesso.');
+  } catch (err) {
+    console.error('[section-card.js] Fallback visual falhou', err);
+  }
+});
+
+
   console.log(`[${MOD}] carregado (CSS mask; guias.json; robusto)`);
 })();
 
