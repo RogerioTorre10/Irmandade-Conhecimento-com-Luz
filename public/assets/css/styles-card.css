@@ -78,3 +78,55 @@
 #section-card figcaption { display: none !important; }
 #section-card .conteudo-pergaminho::after,
 #section-card .conteudo-pergaminho::before { content: none !important; }
+/* ===== Ajuste da vitrine leitosa (abaixo do queixo / altura do peito) ===== */
+
+
+/* Caso o card ainda use a estrutura .flame-layer ou .flame-selfie */
+#section-card .flame-layer,
+#section-card .card-frame {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(260px, 46vw, 560px);
+  top: clamp(220px, 28vh, 300px);    /* ↓ Desce a vitrine até o peito */
+  height: clamp(280px, 40vh, 420px); /* altura ajustável da lente */
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  overflow: hidden;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Máscara translúcida com leve brilho */
+#section-card .flame-layer::before,
+#section-card .card-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at 50% 40%,
+    rgba(255, 230, 150, 0.15) 0%,
+    rgba(255, 230, 150, 0.05) 40%,
+    rgba(255, 255, 255, 0.0) 100%
+  );
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+/* Mantém a aura dourada sutil */
+#section-card .flame-layer::after,
+#section-card .card-frame::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  box-shadow:
+    0 0 0 1px rgba(255,220,150,.22),
+    0 0 16px rgba(255,205,110,.22),
+    0 0 60px rgba(255,195,90,.14);
+  animation: aura-gold 3.4s ease-in-out infinite;
+}
+
