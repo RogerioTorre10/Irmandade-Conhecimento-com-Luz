@@ -1,109 +1,83 @@
-/* ===== SECTION-CARD — CARD único com aura, sem lente ===== */
-
-/* sobrepõe base.css caso esteja linkado em outro lugar */
-#section-card, #section-card .conteudo-pergaminho { margin:0 !important; padding:0 !important; }
-#section-card { position:relative; min-height:100vh; }
-#section-card.pergaminho::before { z-index:0 !important; pointer-events:none !important; }
-
-#section-card .conteudo-pergaminho{
-  position:relative;
-  width:clamp(320px,72vw,820px);
-  min-height:clamp(820px,92vh,1100px);
-  margin:0 auto;
-  /* respiro top/bottom do card */
-  --inset: clamp(12px, 2.6vh, 22px);
-}
-
-/* —— CARD único (centro transparente) —— */
-#section-card .card-frame{
-  position:absolute;
-  left:50%; transform:translateX(-50%);
-  top:var(--inset); bottom:var(--inset);      /* encosta no topo/rodapé do pergaminho */
-  width:clamp(260px,46vw,560px);
-  border-radius:18px;
-
-  background:transparent;                     /* sem lente */
-  border:1px solid rgba(255,225,180,.38);
-  box-shadow: inset 0 0 20px rgba(0,0,0,.18); /* leve contraste interno */
-  pointer-events:none; z-index:6;
-}
-
-/* ✨ aura dourada sutil pulsante */
-#section-card .card-frame::after{
-  content:""; position:absolute; inset:-2px; border-radius:inherit; pointer-events:none;
-  box-shadow:
-    0 0 0 2px rgba(255,220,150,.32),
-    0 0 28px rgba(255,205,110,.36),
-    0 0 120px rgba(255,195,90,.24);
-  opacity:.9; animation:aura-gold 3.6s ease-in-out infinite;
-}
-@keyframes aura-gold{
-  0%  { box-shadow:0 0 0 1px rgba(255,220,150,.26),0 0 18px rgba(255,205,110,.26),0 0 80px rgba(255,195,90,.18); opacity:.75; }
-  50% { box-shadow:0 0 0 3px rgba(255,235,180,.52),0 0 38px rgba(255,215,140,.56),0 0 160px rgba(255,205,100,.34); opacity:1; }
-  100%{ box-shadow:0 0 0 1px rgba(255,220,150,.26),0 0 18px rgba(255,205,110,.26),0 0 80px rgba(255,195,90,.18); opacity:.75; }
-}
-
-/* Botão flutuante (não empurra o card; não imprime) */
-#section-card #btnStartJourney{
-  position:absolute; left:50%; transform:translateX(-50%);
-  bottom: calc(var(--inset) + 12px);
-  z-index:8;
-}
-@media print { #section-card #btnStartJourney{ display:none !important; } }
-
-/* —— KILL de qualquer lente remanescente (por JS antigo) —— */
-#section-card .lens,
-#section-card .flame-layer { display:none !important; }
-/* ===== SECTION-CARD · VISIBILIDADE FORÇADA (hotfix) ===== */
-#section-card { 
+/* ===== SECTION-CARD · FORÇA VISÍVEL (ativa com data-force-visible="on") ===== */
+#section-card[data-force-visible="on"] {
   position: relative !important;
+  z-index: 9999 !important;
   min-height: 100vh !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: block !important;
-}
-
-#section-card.pergaminho::before {
-  z-index: 0 !important;           /* pergaminho ao fundo */
-  pointer-events: none !important;
-}
-
-#section-card .conteudo-pergaminho,
-#section-card .card-stage {
-  position: relative !important;
-  z-index: 5 !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: block !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* card sempre acima do pergaminho */
-#section-card .card-frame {
-  z-index: 6 !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: block !important;
-}
-
-/* neutraliza classes globais que escondem seções */
-#section-card.section,
-#section-card.is-hidden,
-#section-card.hidden { 
   opacity: 1 !important;
   visibility: visible !important;
   display: block !important;
   transform: none !important;
 }
 
-/* desativa quaisquer animações/transições que possam manter opacity:0 */
-#section-card, 
-#section-card * {
-  animation: none !important;
-  transition: none !important;
+/* pergaminho NÃO tampa o conteúdo */
+#section-card[data-force-visible="on"].pergaminho::before {
+  z-index: 0 !important;
+  pointer-events: none !important;
 }
 
-/* mata qualquer lente herdada */
-#section-card .flame-layer,
-#section-card .lens { display: none !important; }
+/* miolo acima do pergaminho */
+#section-card[data-force-visible="on"] .conteudo-pergaminho,
+#section-card[data-force-visible="on"] .card-stage {
+  position: relative !important;
+  z-index: 10000 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 80vh !important;
+}
+
+/* card sempre visível e dimensionado (com borda/aurinha pra você ver) */
+#section-card[data-force-visible="on"] .card-frame {
+  position: absolute !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  top: clamp(12px, 2.6vh, 22px) !important;
+  bottom: clamp(12px, 2.6vh, 22px) !important;
+  width: clamp(260px, 46vw, 560px) !important;
+  border-radius: 18px !important;
+  background: transparent !important;
+  border: 1px solid rgba(255, 225, 180, 0.38) !important;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.18) !important;
+  z-index: 10001 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+#section-card[data-force-visible="on"] .card-frame::after {
+  content: "";
+  position: absolute; inset: -2px;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 2px rgba(255,220,150,.32),
+    0 0 28px rgba(255,205,110,.36),
+    0 0 120px rgba(255,195,90,.24);
+  opacity: .9;
+  animation: aura-gold-force 3.2s ease-in-out infinite;
+}
+@keyframes aura-gold-force{
+  0%  { box-shadow:0 0 0 1px rgba(255,220,150,.26),0 0 18px rgba(255,205,110,.26),0 0 80px rgba(255,195,90,.18); opacity:.75; }
+  50% { box-shadow:0 0 0 3px rgba(255,235,180,.52),0 0 38px rgba(255,215,140,.56),0 0 160px rgba(255,205,100,.34); opacity:1; }
+  100%{ box-shadow:0 0 0 1px rgba(255,220,150,.26),0 0 18px rgba(255,205,110,.26),0 0 80px rgba(255,195,90,.18); opacity:.75; }
+}
+
+/* mata qualquer lente/overlay/ghost */
+#section-card[data-force-visible="on"] .flame-layer,
+#section-card[data-force-visible="on"] .lens,
+#section-card[data-force-visible="on"] .caption,
+#section-card[data-force-visible="on"] figcaption {
+  display: none !important;
+}
+
+/* esconde possíveis overlays globais de transição que ficaram por cima */
+.video-transicao,
+.transition-overlay,
+#video-transicao,
+#transition-overlay {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
