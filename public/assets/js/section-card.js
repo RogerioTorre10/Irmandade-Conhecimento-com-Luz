@@ -19,7 +19,7 @@
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-  // ---------------- Utilitários ----------------
+  // ---------- Utils ----------
   async function waitForTransitionUnlock(timeoutMs = 12000) {
     if (!window.__TRANSITION_LOCK) return;
     let done = false;
@@ -58,7 +58,7 @@
     return PLACEHOLDER_SELFIE;
   }
 
-  // ---------------- JSON dos guias ----------------
+  // ---------- Guias JSON ----------
   async function loadGuiasJson() {
     if (GUIAS_CACHE) return GUIAS_CACHE;
     try {
@@ -78,23 +78,16 @@
     return GUIAS_CACHE;
   }
 
-  function titleize(id) {
-    const m = { arian: 'Arian', lumen: 'Lumen', zion: 'Zion' };
-    return m[id] || (id ? id[0].toUpperCase() + id.slice(1) : '');
-  }
+  function titleize(id){ const m={arian:'Arian',lumen:'Lumen',zion:'Zion'}; return m[id] || (id? id[0].toUpperCase()+id.slice(1):''); }
 
-  // ✅ corrigido: garante sempre imagem válida (sem quadro transparente)
+  // ✅ Blindado: sempre retorna imagem válida
   async function resolveSelectedGuide() {
     const selId = (sessionStorage.getItem('jornada.guia') || 'zion').toLowerCase();
     const guias = await loadGuiasJson();
     const j = guias.find(g => g.id === selId);
 
-    const fallback = `/assets/img/${selId}.png`;
-    const bgImage =
-      (j && j.bgImage) ||
-      CARD_BG[selId] ||
-      CARD_BG.zion ||
-      fallback;
+    const fallback = CARD_BG[selId] || CARD_BG.zion || `/assets/img/${selId}.png`;
+    const bgImage = (j && j.bgImage) || fallback;
 
     return {
       id: selId,
@@ -103,7 +96,31 @@
     };
   }
 
-  // ---------------- Compat layer: acha ou cria estrutura ----------------
+  // ---------- Remove imagens quebradas/indevidas ----------
+  function isBadSrc(src) {
+    if (!src) return true;
+    src = String(src).trim();
+    if (src === 'null' || src === 'undefined' || src === '#') return true;
+    if (/^data:image\//.test(src)) return false;
+    if (/^https?:\/\//.test(src)) return false;
+    if (src.includes('/')) return false;
+    if (/\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(src)) return false;
+    // Ex.: "zion", "lumen", "ZION" etc. → inválido como caminho
+    return true;
+  }
+
+  function cleanupBrokenImages(root) {
+    qsa('img', root).forEach(img => {
+      const src = img.getAttribute('src') || img.getAttribute('href');
+      if (isBadSrc(src)) {
+        img.remove();
+      } else {
+        img.addEventListener?.('error', () => img.remove());
+      }
+    });
+  }
+
+  // ---------- Compat layer: monta estrutura ----------
   function ensureStructure(root) {
     let stage = root.querySelector('.card-stage, .card-stage-wrap, .card-container, .card');
     if (!stage) {
@@ -192,7 +209,7 @@
     return { stage, guideBg, guideNameSlot, flameLayer, selfieSvgImage, userNameSlot, btnNext: btn };
   }
 
-  // ---------------- Inicialização ----------------
+  // ---------- Inicialização ----------
   async function initCard(root) {
     const section = SECTION_IDS.map(id => root.id === id ? root : qs(`#${id}`, root) || qs(`#${id}`)).find(Boolean) || root;
 
@@ -201,17 +218,24 @@
 
     const { guideBg, guideNameSlot, flameLayer, selfieSvgImage, userNameSlot, btnNext } = ensureStructure(section);
 
+    // Faxina de imgs quebradas ANTES de aplicar conteúdos
+    cleanupBrokenImages(section);
+
+    // BG do guia
     if (guideBg && guideBg.tagName === 'IMG') {
       guideBg.src = guia.bgImage;
       guideBg.alt = `${guia.nome} — Card da Irmandade`;
+      guideBg.addEventListener?.('error', () => { guideBg.src = CARD_BG.zion; });
     } else {
       section.style.backgroundImage = `url("${guia.bgImage}")`;
       section.style.backgroundSize = 'cover';
       section.style.backgroundPosition = 'center';
     }
+
     if (guideNameSlot) guideNameSlot.textContent = (guia.nome || '').toUpperCase();
     if (userNameSlot) userNameSlot.textContent = nome;
 
+    // Selfie (ou placeholder) na chama
     const url = readSelfieUrlOrPlaceholder();
     if (selfieSvgImage) {
       setSvgImageHref(selfieSvgImage, url);
@@ -244,6 +268,7 @@
     console.log(`[${MOD}] Card exibido · guia=${guia.id} (${guia.nome}) · participante=${nome}`);
   }
 
+  // ---------- Escutas ----------
   document.addEventListener('section:shown', (e) => {
     const id = e.detail.sectionId;
     if (!SECTION_IDS.includes(id)) return;
