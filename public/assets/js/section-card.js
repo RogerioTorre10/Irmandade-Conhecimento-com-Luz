@@ -218,19 +218,15 @@
     }
 
     // --- hotfix de visibilidade ---
-const wrappers = [
-  document.getElementById('jornada-content-wrapper'),
-  section
-].filter(Boolean);
+// força atributo e limpa classes/estilos que escondem
+section.setAttribute('data-force-visible', 'on');
 
-wrappers.forEach(node => {
-  try {
-    node.hidden = false;
-    node.style.removeProperty('display');
-    node.style.removeProperty('opacity');
-    node.style.removeProperty('visibility');
-    node.classList.remove('hidden','is-hidden','offstage','leaving','entering');
-  } catch {}
+[document.getElementById('jornada-content-wrapper'), section].filter(Boolean).forEach(node => {
+  node.hidden = false;
+  node.style.removeProperty('display');
+  node.style.removeProperty('opacity');
+  node.style.removeProperty('visibility');
+  node.classList.remove('hidden','is-hidden','offstage','leaving','entering');
 });
 
 const stage = section.querySelector('.conteudo-pergaminho, .card-stage');
@@ -239,23 +235,12 @@ const stage = section.querySelector('.conteudo-pergaminho, .card-stage');
   el.style.opacity = '1';
   el.style.visibility = 'visible';
   el.style.display = 'block';
+  el.style.transform = 'none';
 });
-       
-    console.log(`[${MOD}] Card exibido · guia=${guia.id} (${guia.nome}) · participante=${nome}`);
-  }
 
-  // ---------------- Escutas ----------------
-  document.addEventListener('section:shown', (e) => {
-    const id = e.detail.sectionId;
-    if (!SECTION_IDS.includes(id)) return;
-    const root = e.detail.node || qs(`#${id}`) || qs('#jornada-content-wrapper') || document.body;
-    initCard(root);
-  });
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const visible = SECTION_IDS.map(id => qs(`#${id}`)).find(el => el && (el.offsetParent !== null || el.style.display !== 'none'));
-    if (visible) initCard(visible);
-  });
-
+// remove qualquer lente/overlay residual criada por scripts antigos
+section.querySelectorAll('.flame-layer, .lens, .transition-overlay, #transition-overlay, .video-transicao, #video-transicao')
+  .forEach(n => { try { n.remove(); } catch {} });
+ 
   console.log(`[${MOD}] carregado (v3.1 sem lente)`);
 })();
