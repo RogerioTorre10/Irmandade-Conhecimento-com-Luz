@@ -77,18 +77,34 @@
     }
     return GUIAS_CACHE;
   }
-  function titleize(id){ const m={arian:'Arian',lumen:'Lumen',zion:'Zion'}; return m[id] || (id? id[0].toUpperCase()+id.slice(1):''); }
+
+  function titleize(id) {
+    const m = { arian: 'Arian', lumen: 'Lumen', zion: 'Zion' };
+    return m[id] || (id ? id[0].toUpperCase() + id.slice(1) : '');
+  }
+
+  // ✅ corrigido: garante sempre imagem válida (sem quadro transparente)
   async function resolveSelectedGuide() {
     const selId = (sessionStorage.getItem('jornada.guia') || 'zion').toLowerCase();
     const guias = await loadGuiasJson();
     const j = guias.find(g => g.id === selId);
-    if (j && (j.bgImage || j.nome)) return { id: selId, nome: j.nome || titleize(selId), bgImage: j.bgImage || CARD_BG[selId] || CARD_BG.zion };
-    return { id: selId, nome: titleize(selId), bgImage: CARD_BG[selId] || CARD_BG.zion };
+
+    const fallback = `/assets/img/${selId}.png`;
+    const bgImage =
+      (j && j.bgImage) ||
+      CARD_BG[selId] ||
+      CARD_BG.zion ||
+      fallback;
+
+    return {
+      id: selId,
+      nome: (j && (j.nome || titleize(selId))) || titleize(selId),
+      bgImage
+    };
   }
 
   // ---------------- Compat layer: acha ou cria estrutura ----------------
   function ensureStructure(root) {
-    // container base (card-stage)
     let stage = root.querySelector('.card-stage, .card-stage-wrap, .card-container, .card');
     if (!stage) {
       stage = document.createElement('div');
@@ -97,7 +113,6 @@
     }
     stage.style.position = stage.style.position || 'relative';
 
-    // BG do guia: tenta vários seletores; se não existir, cria <img id="guideBg">
     let guideBg = stage.querySelector('#guideBg, .guide-bg, .card-bg img, img.card-bg');
     if (!guideBg) {
       guideBg = document.createElement('img');
@@ -110,7 +125,6 @@
       stage.appendChild(guideBg);
     }
 
-    // Nome do guia (topo)
     let guideNameSlot = stage.querySelector('#guideNameSlot, .card-guide-name #guideNameSlot, .card-guide-name span');
     let guideNameWrap = stage.querySelector('.card-guide-name');
     if (!guideNameWrap) {
@@ -124,7 +138,6 @@
       guideNameWrap.appendChild(guideNameSlot);
     }
 
-    // Camada da chama
     let flameLayer = stage.querySelector('.flame-layer');
     if (!flameLayer) {
       flameLayer = document.createElement('div');
@@ -132,7 +145,6 @@
       stage.appendChild(flameLayer);
     }
 
-    // SVG + image da selfie
     let selfieSvgImage = stage.querySelector('#selfieImage');
     if (!selfieSvgImage) {
       flameLayer.innerHTML = `
@@ -148,7 +160,6 @@
       selfieSvgImage = flameLayer.querySelector('#selfieImage');
     }
 
-    // Rodapé com nome do participante
     let footer = stage.querySelector('.card-footer');
     if (!footer) {
       footer = document.createElement('div');
@@ -168,7 +179,6 @@
       badge.appendChild(userNameSlot);
     }
 
-    // Botão continuar
     let btn = root.querySelector('#btnNext, .btn-next-card');
     if (!btn) {
       const actions = root.querySelector('.card-actions') || root.appendChild(Object.assign(document.createElement('div'), {className:'card-actions'}));
@@ -179,26 +189,22 @@
       actions.appendChild(btn);
     }
 
-    return { stage, guideBg, guideNameSlot, flameLayer, selfieSvgImage, userNameSlot: userNameSlot, btnNext: btn };
+    return { stage, guideBg, guideNameSlot, flameLayer, selfieSvgImage, userNameSlot, btnNext: btn };
   }
 
   // ---------------- Inicialização ----------------
   async function initCard(root) {
-    // Se a seção veio embrulhada, tenta achar o nó da própria seção
     const section = SECTION_IDS.map(id => root.id === id ? root : qs(`#${id}`, root) || qs(`#${id}`)).find(Boolean) || root;
 
     const nome = (sessionStorage.getItem('jornada.nome') || 'USUÁRIO').toUpperCase();
     const guia = await resolveSelectedGuide();
 
-    // Garante estrutura e pega refs
     const { guideBg, guideNameSlot, flameLayer, selfieSvgImage, userNameSlot, btnNext } = ensureStructure(section);
 
-    // Aplica BG do guia (preferência por <img>; se não existir, aplica como background do stage)
     if (guideBg && guideBg.tagName === 'IMG') {
       guideBg.src = guia.bgImage;
       guideBg.alt = `${guia.nome} — Card da Irmandade`;
     } else {
-      // fallback: usar background no container
       section.style.backgroundImage = `url("${guia.bgImage}")`;
       section.style.backgroundSize = 'cover';
       section.style.backgroundPosition = 'center';
@@ -206,7 +212,6 @@
     if (guideNameSlot) guideNameSlot.textContent = (guia.nome || '').toUpperCase();
     if (userNameSlot) userNameSlot.textContent = nome;
 
-    // Selfie (ou placeholder) na chama
     const url = readSelfieUrlOrPlaceholder();
     if (selfieSvgImage) {
       setSvgImageHref(selfieSvgImage, url);
@@ -239,7 +244,6 @@
     console.log(`[${MOD}] Card exibido · guia=${guia.id} (${guia.nome}) · participante=${nome}`);
   }
 
-  // ---------------- Escutas ----------------
   document.addEventListener('section:shown', (e) => {
     const id = e.detail.sectionId;
     if (!SECTION_IDS.includes(id)) return;
@@ -247,7 +251,6 @@
     initCard(root);
   });
 
-  // Fallback para render direto
   document.addEventListener('DOMContentLoaded', () => {
     const visible = SECTION_IDS.map(id => qs(`#${id}`)).find(el => el && (el.offsetParent !== null || el.style.display !== 'none'));
     if (visible) initCard(visible);
