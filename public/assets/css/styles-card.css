@@ -1,188 +1,80 @@
-/* =====================  styles-card.css — v2.0  ===================== */
+/* ====== UNHIDE HOTFIX — section-card ====== */
+#section-card { position: relative; min-height: 100vh; }
+#section-card.pergaminho::before { z-index: 0 !important; pointer-events: none !important; }
 
-/* ---- isolamento: zera heranças incômodas só nesta seção ---- */
-#section-card,
-#section-card .conteudo-pergaminho {
+/* palco visível acima do pergaminho */
+#section-card .conteudo-pergaminho,
+#section-card .card-stage {
+  position: relative !important;
+  z-index: 5 !important;
   margin: 0 !important;
   padding: 0 !important;
 }
 
-/* altura mínima para termos topo/rodapé do pergaminho à vista */
-#section-card {
-  position: relative;
-  min-height: 100vh;
-}
-#section-card.pergaminho::before {
-  z-index: 0 !important;        /* pergaminho sempre por baixo */
-  pointer-events: none !important;
-}
-
-/* palco interno centralizado */
-#section-card .conteudo-pergaminho {
-  position: relative;
-  width: clamp(320px, 72vw, 820px);
-  min-height: clamp(820px, 92vh, 1100px);
-  margin: 0 auto !important;
-
-  /* controles de respiro e posição da lente */
-  --card-inset: clamp(12px, 2.6vh, 22px);      /* margem topo/rodapé do CARD */
-  --lens-top:   clamp(260px, 34vh, 360px);     /* onde a lente começa (peito) */
-  --lens-h:     clamp(240px, 34vh, 360px);     /* altura da lente translúcida */
+/* garante exibição do card e da lente */
+#section-card .card-frame,
+#section-card .lens,
+#section-card .flame-layer {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: absolute !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: clamp(260px, 46vw, 560px) !important;
+  border-radius: 18px !important;
+  z-index: 6 !important;
 }
 
-/* =====================  CARD  ===================== */
-/* Usamos .card-frame; se o HTML antigo usar .flame-layer, também aplica */
+/* card encostando top/rodapé do pergaminho */
 #section-card .card-frame,
 #section-card .flame-layer {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  top: var(--card-inset);
-  bottom: var(--card-inset);                    /* encosta perto do rodapé */
-  width: clamp(260px, 46vw, 560px);
-  border-radius: 18px;
-
-  /* base do “vidro” do card (muito sutil; a lente vem por cima) */
+  top: clamp(12px, 2.6vh, 22px) !important;
+  bottom: clamp(12px, 2.6vh, 22px) !important;
   background: rgba(255,255,255,.06);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-
-  /* leve profundidade interna */
   box-shadow: inset 0 0 40px rgba(0,0,0,.20);
-  overflow: hidden;
-  pointer-events: none;                          /* não captura clique */
-  z-index: 5;
 }
 
-/* ✨ AURA DOURADA SUTIL PULSANTE (visível!) */
+/* aura dourada pulsante visível */
 #section-card .card-frame::after,
 #section-card .flame-layer::after {
   content: "";
-  position: absolute;
-  inset: -2px;
+  position: absolute; inset: -2px;
   border-radius: inherit;
-  pointer-events: none;
   box-shadow:
     0 0 0 2px rgba(255,220,150,.32),
     0 0 28px rgba(255,205,110,.36),
     0 0 120px rgba(255,195,90,.24);
   opacity: .85;
   animation: aura-gold 3.6s ease-in-out infinite;
+  pointer-events: none;
 }
 @keyframes aura-gold{
-  0%{
-    box-shadow:
-      0 0 0 1px rgba(255,220,150,.26),
-      0 0 18px rgba(255,205,110,.26),
-      0 0 80px rgba(255,195,90,.18);
-    opacity:.70;
-  }
-  50%{
-    box-shadow:
-      0 0 0 3px rgba(255,235,180,.50),
-      0 0 38px rgba(255,215,140,.55),
-      0 0 160px rgba(255,205,100,.34);
-    opacity:1;
-  }
-  100%{
-    box-shadow:
-      0 0 0 1px rgba(255,220,150,.26),
-      0 0 18px rgba(255,205,110,.26),
-      0 0 80px rgba(255,195,90,.18);
-    opacity:.70;
-  }
+  0%{ box-shadow:0 0 0 1px rgba(255,220,150,.26),0 0 18px rgba(255,205,110,.26),0 0 80px rgba(255,195,90,.18); opacity:.7;}
+  50%{box-shadow:0 0 0 3px rgba(255,235,180,.5),0 0 38px rgba(255,215,140,.55),0 0 160px rgba(255,205,100,.34); opacity:1;}
+  100%{box-shadow:0 0 0 1px rgba(255,220,150,.26),0 0 18px rgba(255,205,110,.26),0 0 80px rgba(255,195,90,.18); opacity:.7;}
 }
 
-/* =====================  LENTE TRANSLÚCIDA (vidro místico)  ===================== */
-/* A lente fica “dentro” do card, na região do peito */
+/* lente translúcida (altura do peito) */
 #section-card .lens {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  top: var(--lens-top);
-  height: var(--lens-h);
-  width: calc(clamp(260px, 46vw, 560px) - 24px); /* ligeiramente menor que o card */
-  border-radius: 20px;
-
-  /* vidro translúcido bonito */
+  top: clamp(260px, 34vh, 360px) !important;
+  height: clamp(240px, 34vh, 360px) !important;
+  width: calc(clamp(260px, 46vw, 560px) - 24px) !important;
   background: rgba(255,255,255,0.18);
   backdrop-filter: blur(12px) saturate(140%);
   -webkit-backdrop-filter: blur(12px) saturate(140%);
-  border: 1px solid rgba(255, 225, 180, 0.35);
-
-  /* brilho suave interno */
-  box-shadow:
-    0 0 30px rgba(255, 210, 150, 0.20),
-    inset 0 0 25px rgba(255, 255, 255, 0.08);
-
-  z-index: 6;
-  pointer-events: none;
-  transition: transform .6s ease, opacity .6s ease;
+  border: 1px solid rgba(255,225,180,.35);
+  box-shadow: 0 0 30px rgba(255,210,150,.20), inset 0 0 25px rgba(255,255,255,.08);
+  z-index: 7 !important;
 }
 
-/* Highlight suave sobre a lente */
-#section-card .lens::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:inherit;
-  background:
-    radial-gradient(circle at 50% 40%,
-      rgba(255,230,160,.22) 0%,
-      rgba(255,230,160,.08) 42%,
-      rgba(255,255,255,0) 100%);
-  pointer-events:none;
-}
-
-/* Caso você ainda esteja usando a antiga selfie/placeholder dentro do card,
-   este seletor mantém a máscara centralizada sem atrapalhar a lente */
-#section-card .flame-selfie{
-  position:absolute; inset:0;
-  width:100%; height:100%;
-  object-fit:cover;
-  -webkit-mask-image:url("/assets/img/chama-card.png");
-  mask-image:url("/assets/img/chama-card.png");
-  -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
-  -webkit-mask-size:cover;       mask-size:cover;
-  -webkit-mask-position:50% 72%; mask-position:50% 72%;
-  mask-mode:alpha;
-}
-
-/* =====================  Botão  ===================== */
+/* botão flutuante (não imprime) */
 #section-card #btnStartJourney{
-  position:absolute;
-  left:50%; transform:translateX(-50%);
-  bottom: calc(var(--card-inset) + 12px);
-  z-index: 7;
-  background: rgba(255,240,210,.88);
-  border: 1px solid rgba(120,90,60,.5);
-  border-radius: 8px;
-  padding: 6px 18px;
-  transition: background .3s;
-  cursor: pointer;
+  position: absolute !important;
+  left: 50% !important; transform: translateX(-50%) !important;
+  bottom: calc(clamp(12px, 2.6vh, 22px) + 12px) !important;
+  z-index: 8 !important;
 }
-#section-card #btnStartJourney:hover{ background: rgba(255,240,210,1); }
-@media print{ #section-card #btnStartJourney{ display:none !important; } }
-
-/* =====================  Limpeza de resíduos (captions etc.)  ===================== */
-#section-card .card-footer,
-#section-card .guia-nome,
-#section-card .guide-name,
-#section-card .caption,
-#section-card figcaption {
-  display: none !important;
-}
-#section-card .conteudo-pergaminho::before,
-#section-card .conteudo-pergaminho::after {
-  content: none !important;
-}
-
-/* =====================  Título ===================== */
-#section-card .titulo-selfie{
-  text-align:center;
-  font-size: clamp(28px, 5vw, 56px);
-  margin: 12px 0 14px 0;
-  font-family: "ManufacturingConsent", serif;
-  color: #f5e6c8;
-  text-shadow: 0 2px 6px rgba(0,0,0,.5);
-}
+@media print { #section-card #btnStartJourney { display: none !important; } }
