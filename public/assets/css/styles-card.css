@@ -1,95 +1,88 @@
-#section-card {
-  position: relative;
-  z-index: 2;
+/* ===== CARD ESTENDIDO NO PERGAMINHO — v1.4 ===== */
+#section-card .conteudo-pergaminho {
+  position: relative;         /* ancora absoluto */
+  /* controla top e bottom do card (ajuste fino aqui) */
+  --card-inset: clamp(28px, 6vh, 72px);
 }
 
+/* palco alto para permitir card encostar em cima/baixo */
 #section-card .card-stage {
-  margin-top: 0;
-  min-height: clamp(800px, 90vh, 1080px); /* ↑ aumenta o palco total */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  position: relative;
-  overflow: visible;
-  padding: clamp(40px, 6vh, 80px) 0; /* aproxima topo e base do pergaminho */
+  min-height: clamp(820px, 92vh, 1100px);
+  padding: 0;
 }
 
-/* camada translúcida (mantida igual à original “boa”) */
+/* CARD: ocupa quase toda a altura do pergaminho */
 #section-card .flame-layer {
-  position: relative;
-  width: clamp(280px, 45%, 520px);
-  bottom: auto;
+  position: absolute;
+  top: var(--card-inset);
+  bottom: var(--card-inset);    /* ↓ encosta na base do pergaminho */
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(280px, 46vw, 560px);
+  border-radius: 16px;
+  background: rgba(255,255,255,.10);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 0 18px rgba(255,200,150,.25),
+              inset 0 0 40px rgba(0,0,0,.25);
+  z-index: 5;
+  overflow: hidden;
+  pointer-events: none;         /* não captura clique */
   opacity: 1;
-  transform: none;
-  z-index: 6;
-  pointer-events: none;
 }
-#section-card .flame-layer.show { opacity: 1; }
 
+/* mantém o “lente/leitoso” no meio (abaixo do queixo) */
 #section-card .flame-selfie {
-  display: block;
-  width: 100%;
-  height: auto;
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
   object-fit: cover;
   -webkit-mask-image: url("/assets/img/chama-card.png");
   mask-image: url("/assets/img/chama-card.png");
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: contain;
-  mask-size: contain;
-  -webkit-mask-position: 50% 88%; /* mantém o enquadro leitoso original */
-  mask-position: 50% 88%;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-size: cover;     mask-size: cover;
+  /* ↓ centraliza o recorte um pouco abaixo do centro */
+  -webkit-mask-position: 50% 72%;
+  mask-position: 50% 72%;
   mask-mode: alpha;
-  box-shadow:
-    inset 0 -10px 24px rgba(0, 0, 0, .35),
-    0 0 0 1px rgba(255, 215, 160, .08);
 }
 
-/* nome dentro do card */
+/* Nome e botão VISUALMENTE dentro do card */
 #section-card .card-footer {
-  margin-top: clamp(16px, 2vh, 28px);
-  position: relative;
-  z-index: 7;
-  text-align: center;
+  position: absolute;
+  left: 50%; transform: translateX(-50%);
+  bottom: calc(var(--card-inset) + 90px); /* fica dentro do card */
+  z-index: 6; text-align: center;
 }
 #section-card .card-name-badge {
-  background: rgba(30, 20, 10, .55);
-  border: 1px solid rgba(255, 215, 128, .5);
-  border-radius: 10px;
-  padding: 4px 12px;
-  display: inline-block;
+  background: rgba(30,20,10,.55);
+  border: 1px solid rgba(255,215,128,.5);
+  border-radius: 10px; padding: 4px 12px;
 }
 #section-card #userNameSlot {
-  font-family: "ManufacturingConsent", "Cardo", serif;
+  font-family: "ManufacturingConsent","Cardo",serif;
   font-size: clamp(14px, 2.2vw, 22px);
-  letter-spacing: .08em;
-  color: #f5e6c8;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, .5);
+  letter-spacing: .08em; color: #f5e6c8;
+  text-shadow: 0 2px 6px rgba(0,0,0,.5);
 }
 
-/* botão (visível apenas na tela) */
+/* Botão posicionado dentro do card (mas fora da impressão) */
 #section-card #btnStartJourney {
-  margin-top: clamp(20px, 3vh, 40px);
-  background: rgba(255, 240, 210, 0.85);
-  border: 1px solid rgba(120, 90, 60, 0.5);
-  border-radius: 8px;
-  padding: 6px 18px;
-  cursor: pointer;
-  transition: background .3s;
-  z-index: 10;
+  position: absolute;
+  left: 50%; transform: translateX(-50%);
+  bottom: calc(var(--card-inset) + 28px);
+  z-index: 6;
+  background: rgba(255,240,210,.85);
+  border: 1px solid rgba(120,90,60,.5);
+  border-radius: 8px; padding: 6px 18px;
+  transition: background .3s; cursor: pointer;
 }
-#section-card #btnStartJourney:hover {
-  background: rgba(255, 240, 210, 1);
-}
+#section-card #btnStartJourney:hover { background: rgba(255,240,210,1); }
 
-/* esconde o botão na impressão */
+/* Não imprimir controles/botões */
 @media print {
-  #section-card #btnStartJourney { display: none !important; }
+  #section-card #btnStartJourney,
+  .no-print { display: none !important; }
 }
 
-/* garante o pergaminho por baixo */
-.pergaminho::before {
-  z-index: 0 !important;
-  pointer-events: none !important;
-}
+/* pergaminho sempre ao fundo */
+.pergaminho::before { z-index: 0 !important; pointer-events: none !important; }
