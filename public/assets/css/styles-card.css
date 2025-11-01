@@ -1,88 +1,60 @@
-/* ===== CARD ESTENDIDO NO PERGAMINHO — v1.4 ===== */
+/* ===== CARD “PURO” — sem selfie/placeholder/nome ===== */
+
 #section-card .conteudo-pergaminho {
-  position: relative;         /* ancora absoluto */
-  /* controla top e bottom do card (ajuste fino aqui) */
-  --card-inset: clamp(28px, 6vh, 72px);
+  position: relative;
+  --card-inset: clamp(28px, 6vh, 72px); /* margem superior e inferior do card */
 }
 
-/* palco alto para permitir card encostar em cima/baixo */
 #section-card .card-stage {
   min-height: clamp(820px, 92vh, 1100px);
   padding: 0;
+  display: grid;
+  place-items: center;
+  position: relative;
 }
 
-/* CARD: ocupa quase toda a altura do pergaminho */
-#section-card .flame-layer {
+/* O CARD: ocupa quase todo o pergaminho (controlado por --card-inset) */
+#section-card .card-frame {
   position: absolute;
   top: var(--card-inset);
-  bottom: var(--card-inset);    /* ↓ encosta na base do pergaminho */
+  bottom: var(--card-inset);          /* ↓ encosta perto da borda inferior */
   left: 50%;
   transform: translateX(-50%);
   width: clamp(280px, 46vw, 560px);
   border-radius: 16px;
-  background: rgba(255,255,255,.10);
+
+  /* visual translúcido “leitoso” sem imagem */
+  background: rgba(255,255,255,0.10);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  box-shadow: 0 0 18px rgba(255,200,150,.25),
-              inset 0 0 40px rgba(0,0,0,.25);
+
+  /* leve moldura/auréola */
+  box-shadow:
+    0 0 18px rgba(255,200,150,.25),
+    inset 0 0 40px rgba(0,0,0,.22);
   z-index: 5;
-  overflow: hidden;
-  pointer-events: none;         /* não captura clique */
-  opacity: 1;
+  pointer-events: none; /* não interfere em cliques */
 }
 
-/* mantém o “lente/leitoso” no meio (abaixo do queixo) */
-#section-card .flame-selfie {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  -webkit-mask-image: url("/assets/img/chama-card.png");
-  mask-image: url("/assets/img/chama-card.png");
-  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
-  -webkit-mask-size: cover;     mask-size: cover;
-  /* ↓ centraliza o recorte um pouco abaixo do centro */
-  -webkit-mask-position: 50% 72%;
-  mask-position: 50% 72%;
-  mask-mode: alpha;
-}
-
-/* Nome e botão VISUALMENTE dentro do card */
-#section-card .card-footer {
-  position: absolute;
-  left: 50%; transform: translateX(-50%);
-  bottom: calc(var(--card-inset) + 90px); /* fica dentro do card */
-  z-index: 6; text-align: center;
-}
-#section-card .card-name-badge {
-  background: rgba(30,20,10,.55);
-  border: 1px solid rgba(255,215,128,.5);
-  border-radius: 10px; padding: 4px 12px;
-}
-#section-card #userNameSlot {
-  font-family: "ManufacturingConsent","Cardo",serif;
-  font-size: clamp(14px, 2.2vw, 22px);
-  letter-spacing: .08em; color: #f5e6c8;
-  text-shadow: 0 2px 6px rgba(0,0,0,.5);
-}
-
-/* Botão posicionado dentro do card (mas fora da impressão) */
+/* Botão de navegação (não imprime) */
 #section-card #btnStartJourney {
   position: absolute;
   left: 50%; transform: translateX(-50%);
-  bottom: calc(var(--card-inset) + 28px);
+  bottom: calc(var(--card-inset) / 2);
   z-index: 6;
   background: rgba(255,240,210,.85);
   border: 1px solid rgba(120,90,60,.5);
-  border-radius: 8px; padding: 6px 18px;
-  transition: background .3s; cursor: pointer;
+  border-radius: 8px;
+  padding: 6px 18px;
+  transition: background .3s;
+  cursor: pointer;
 }
 #section-card #btnStartJourney:hover { background: rgba(255,240,210,1); }
 
 /* Não imprimir controles/botões */
 @media print {
-  #section-card #btnStartJourney,
-  .no-print { display: none !important; }
+  #section-card #btnStartJourney { display: none !important; }
 }
 
-/* pergaminho sempre ao fundo */
+/* Pergaminho sempre ao fundo */
 .pergaminho::before { z-index: 0 !important; pointer-events: none !important; }
