@@ -1,48 +1,48 @@
-/* ========== SECTION-CARD — pergaminho desligado e card como fundo ========== */
-
-/* Desliga o pergaminho só aqui */
-#section-card.pergaminho::before {
-  display: none !important;
+/* =====================  SECTION-CARD — FIX v1.6  ===================== */
+/* 1) Zera heranças do base.css só aqui */
+#section-card,
+#section-card .conteudo-pergaminho,
+#section-card .card-stage {
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-/* Superfície que substitui o pergaminho visualmente (com a mesma textura) */
-#section-card .card-surface {
+/* 2) Garante altura total da área do pergaminho */
+#section-card { position: relative; min-height: 100vh; }
+#section-card.pergaminho::before { z-index: 0 !important; pointer-events: none !important; }
+
+/* 3) Superfície interna (para ancorar o card) */
+#section-card .conteudo-pergaminho {
   position: relative;
   width: clamp(320px, 72vw, 820px);
-  min-height: clamp(820px, 92vh, 1100px);
-  margin: clamp(8px, 2vh, 16px) auto;
-  border-radius: 18px;
-
-  /* Use a sua textura vertical do pergaminho */
-  background: url("/assets/img/pergaminho-rasgado-vert.png") center/cover no-repeat;
-
-  /* leve profundidade */
-  box-shadow: 0 8px 40px rgba(0,0,0,.35);
-  overflow: hidden;
+  margin: 0 auto !important;
 }
 
-/* CARD interno ocupando quase toda a superfície */
-#section-card .card-frame {
-  --inset: clamp(16px, 3vh, 28px);       /* ajuste fino: encosta topo/base */
+/* 4) CARD “puro” encostando topo/rodapé do pergaminho */
+#section-card .card-frame,
+#section-card .flame-layer { /* se estiver usando a antiga .flame-layer, também pega */
+  --inset: clamp(12px, 2.5vh, 22px);
   position: absolute;
   top: var(--inset);
-  bottom: var(--inset);                  /* <-- encosta na borda inferior */
+  bottom: var(--inset);               /* ← encosta embaixo */
   left: 50%;
   transform: translateX(-50%);
   width: clamp(260px, 46vw, 560px);
   border-radius: 16px;
 
-  /* vidro leitoso sutil */
+  /* vidro leitoso */
   background: rgba(255,255,255,.10);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   box-shadow: inset 0 0 40px rgba(0,0,0,.22);
   pointer-events: none;
   overflow: hidden;
+  z-index: 5;
 }
 
-/* ✨ Aura dourada sutil pulsante */
-#section-card .card-frame::before {
+/* 5) Aura dourada sutil pulsante */
+#section-card .card-frame::before,
+#section-card .flame-layer::before {
   content: "";
   position: absolute;
   inset: -2px;
@@ -55,51 +55,26 @@
   opacity: .6;
   animation: aura-gold 3.4s ease-in-out infinite;
 }
-
 @keyframes aura-gold {
-  0% {
-    box-shadow:
-      0 0 0 1px rgba(255,220,150,.22),
-      0 0 16px rgba(255,205,110,.22),
-      0 0 60px rgba(255,195,90,.14);
-    opacity: .6;
-  }
-  50% {
-    box-shadow:
-      0 0 0 3px rgba(255,230,170,.42),
-      0 0 34px rgba(255,215,140,.45),
-      0 0 110px rgba(255,205,100,.30);
-    opacity: .95;
-  }
-  100% {
-    box-shadow:
-      0 0 0 1px rgba(255,220,150,.22),
-      0 0 16px rgba(255,205,110,.22),
-      0 0 60px rgba(255,195,90,.14);
-    opacity: .6;
-  }
+  0%   { box-shadow: 0 0 0 1px rgba(255,220,150,.22), 0 0 16px rgba(255,205,110,.22), 0 0 60px rgba(255,195,90,.14); opacity:.6; }
+  50%  { box-shadow: 0 0 0 3px rgba(255,230,170,.42), 0 0 34px rgba(255,215,140,.45), 0 0 110px rgba(255,205,100,.30); opacity:.95; }
+  100% { box-shadow: 0 0 0 1px rgba(255,220,150,.22), 0 0 16px rgba(255,205,110,.22), 0 0 60px rgba(255,195,90,.14); opacity:.6; }
 }
 
-/* Botão dentro da superfície (sem sair na impressão) */
+/* 6) Botão flutuante (não imprime) — não empurra o card */
 #section-card #btnStartJourney {
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: clamp(18px, 2.8vh, 28px);
+  left: 50%; transform: translateX(-50%);
+  bottom: calc(var(--inset) / 1.2);
   z-index: 6;
-  background: rgba(255,240,210,.85);
-  border: 1px solid rgba(120,90,60,.5);
-  border-radius: 8px;
-  padding: 6px 18px;
-  transition: background .3s;
-  cursor: pointer;
 }
-#section-card #btnStartJourney:hover { background: rgba(255,240,210,1); }
 @media print { #section-card #btnStartJourney { display: none !important; } }
 
-/* Esconde qualquer resíduo de caption/labels (ex.: “ZION” no rodapé) */
+/* 7) Some com o “ZION”/resíduos sob a imagem (captions/pseudo-elementos) */
 #section-card .card-footer,
 #section-card .guia-nome,
 #section-card .guide-name,
-#section-card .watermark,
-#section-card .caption { display: none !important; }
+#section-card .caption,
+#section-card figcaption { display: none !important; }
+#section-card .conteudo-pergaminho::after,
+#section-card .conteudo-pergaminho::before { content: none !important; }
