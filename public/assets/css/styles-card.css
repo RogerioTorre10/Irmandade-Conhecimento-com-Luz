@@ -76,3 +76,81 @@
 
 /* garante que o pergaminho fique por baixo */
 .pergaminho::before{ z-index:0 !important; pointer-events:none !important; }
+
+#section-card { position: relative; z-index: 2; }
+
+#section-card .card-stage {
+  margin-top: 20px; /* ↓ desce o card para não cortar o topo do guia */
+  min-height: clamp(560px, 66vw, 920px);
+  padding-bottom: clamp(120px, 16vh, 200px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* camada da chama */
+#section-card .flame-layer {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: clamp(90px, 14vh, 150px); /* ↓ move abaixo do queixo */
+  width: clamp(200px, 40%, 480px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .6s ease-in-out;
+  z-index: 6;
+}
+#section-card .flame-layer.show { opacity: 1; }
+
+#section-card .flame-selfie {
+  display: block;
+  width: 100%;
+  object-fit: cover;
+  -webkit-mask-image: url("/assets/img/chama-card.png");
+  mask-image: url("/assets/img/chama-card.png");
+  -webkit-mask-position: 50% 88%; /* ↓ desce o enquadro */
+  mask-position: 50% 88%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  mask-mode: alpha;
+  box-shadow:
+    inset 0 -10px 24px rgba(0, 0, 0, .35),
+    0 0 0 1px rgba(255, 215, 160, .08);
+}
+
+/* Rodapé e nome */
+#section-card .card-footer {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: clamp(56px, 8vh, 96px);
+  z-index: 7;
+  text-align: center;
+}
+#section-card .card-name-badge {
+  background: rgba(30, 20, 10, .55);
+  border: 1px solid rgba(255, 215, 128, .5);
+  border-radius: 10px;
+  padding: 4px 12px;
+  display: inline-block;
+}
+#section-card #userNameSlot {
+  font-family: "ManufacturingConsent", "Cardo", serif;
+  font-size: clamp(14px, 2.2vw, 22px);
+  letter-spacing: .08em;
+  color: #f5e6c8;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, .5);
+}
+
+/* botão */
+#section-card .btn-stone {
+  margin-top: clamp(20px, 4vh, 40px);
+  z-index: 10;
+}
+
+/* pergaminho sempre no fundo */
+.pergaminho::before {
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
