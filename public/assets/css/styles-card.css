@@ -141,3 +141,41 @@
   border-radius:12px;
   box-shadow:0 0 18px rgba(255,215,120,.25);
 }
+/* === Ajuste fino MOBILE (até 600px) — descer placeholder p/ altura do peito === */
+@media (max-width: 600px) {
+  /* Base mobile: desce e reduz um pouco */
+  #section-card .flame-layer {
+    /* fallback em vh + preferir svh quando disponível */
+    bottom: clamp(14px, 3.8vh, 36px);
+    bottom: clamp(14px, 3.2svh, 36px);
+    width: min(76%, 320px);
+  }
+
+  /* Zion costuma enquadrar mais alto — desce um pouco mais no mobile */
+  #section-card.guide-zion .flame-layer {
+    bottom: clamp(12px, 2.8vh, 32px);
+    bottom: clamp(12px, 2.4svh, 32px);
+    width: min(74%, 305px);
+  }
+
+  /* Lumen e Arian (se precisar, ajuste fino aqui também) */
+  #section-card.guide-lumen .flame-layer {
+    bottom: clamp(14px, 3.2svh, 34px);
+    width: min(76%, 315px);
+  }
+  #section-card.guide-arian .flame-layer {
+    bottom: clamp(10px, 2.6svh, 30px);
+    width: min(72%, 300px);
+  }
+
+  /* Nome do participante: acompanha a descida (fica dentro do card, acima do botão) */
+  #section-card .card-footer {
+    bottom: clamp(120px, 20svh, 210px);
+  }
+
+  /* Botão mantém folga do rodapé */
+  #section-card #btnStartJourney,
+  #section-card #btnNext {
+    bottom: clamp(10px, 2.2svh, 24px);
+  }
+}
