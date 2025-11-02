@@ -318,4 +318,100 @@
   });
 
   console.log(`[${MOD}] carregado (robusto)`);
+
+// === GUARDIÃO DE EMERGÊNCIA: renderiza o card se ficar "vazio" ===
+(function emergencyCardGuard() {
+  const MOD = 'section-card.guard';
+
+  async function getGuideDataSafe() {
+    try {
+      const id = (typeof readSelectedGuideId === 'function') ? readSelectedGuideId() : (sessionStorage.getItem('jornada.guia') || 'zion');
+      const data = (typeof loadGuiasJson === 'function') ? await loadGuiasJson() : [];
+      const found = data.find(g => String(g.id || '').toLowerCase() === String(id).toLowerCase());
+      const map = { arian:'/assets/img/irmandade-quarteto-bg-arian.png', lumen:'/assets/img/irmandade-quarteto-bg-lumen.png', zion:'/assets/img/irmandade-quarteto-bg-zion.png' };
+      return {
+        id: (found?.id || id || 'zion').toLowerCase(),
+        nome: found?.nome || (id[0].toUpperCase()+id.slice(1)),
+        bgImage: found?.bgImage || map[(id||'zion').toLowerCase()] || map.zion
+      };
+    } catch {
+      return { id:'zion', nome:'Zion', bgImage:'/assets/img/irmandade-quarteto-bg-zion.png' };
+    }
+  }
+
+  function readNameSafe() {
+    const keys = ['jornada.nome','jc.nome','participantName','jornada.participantName','nomeParticipante','jc.participant'];
+    for (const k of keys) {
+      try {
+        const v = sessionStorage.getItem(k) || localStorage.getItem(k);
+        if (v && String(v).trim()) return String(v).trim();
+      } catch {}
+    }
+    const input = document.querySelector('#guiaNameInput, #nomeParticipante');
+    if (input?.value) return String(input.value).trim();
+    return 'USUÁRIO';
+  }
+
+  async function renderFallbackIfEmpty() {
+    const sec = document.querySelector('#section-card');
+    if (!sec) return;
+
+    // já tem palco e conteúdo?
+    const stage = sec.querySelector('.card-stage');
+    const hasVisual = !!(stage && (stage.style.backgroundImage || stage.querySelector('#guideBg')));
+    if (hasVisual) return;
+
+    // constrói visual mínimo
+    const guia = await getGuideDataSafe();
+    const nome = readNameSafe().toUpperCase();
+
+    let s = stage || document.createElement('div');
+    s.className = 'card-stage';
+    s.style.position = 'relative';
+    s.style.minHeight = s.style.minHeight || '66vw';
+    s.style.paddingBottom = s.style.paddingBottom || '16vh';
+    s.style.marginTop = s.style.marginTop || 'min(-4vw, -48px)';
+    s.style.backgroundImage = `url("${guia.bgImage}")`;
+    s.style.backgroundSize = 'cover';
+    s.style.backgroundPosition = 'center';
+
+    if (!stage) sec.appendChild(s);
+
+    // chama
+    if (!s.querySelector('.flame-layer')) {
+      const flame = document.createElement('div');
+      flame.className = 'flame-layer show';
+      flame.innerHTML = `<img class="flame-selfie" src="/assets/img/irmandade-card-placeholder.jpg" alt="" />`;
+      flame.style.position = 'absolute';
+      flame.style.left = '50%';
+      flame.style.transform = 'translateX(-50%)';
+      flame.style.bottom = '18vh';
+      flame.style.width = '46%';
+      s.appendChild(flame);
+    }
+
+    // rodapé
+    if (!s.querySelector('.card-footer')) {
+      const foot = document.createElement('div');
+      foot.className = 'card-footer';
+      foot.style.position = 'absolute';
+      foot.style.left = '50%';
+      foot.style.transform = 'translateX(-50%)';
+      foot.style.bottom = '8vh';
+      foot.innerHTML = `<span class="card-name-badge"><span id="userNameSlot">${nome}</span></span>`;
+      s.appendChild(foot);
+    }
+
+    console.warn(`[${MOD}] Fallback visual aplicado (guia=${guia.id}, nome=${nome}).`);
+  }
+
+  // roda logo após o section:shown (com pequeno atraso) e também no DOMContentLoaded
+  document.addEventListener('section:shown', (e) => {
+    if (e.detail?.sectionId !== 'section-card') return;
+    setTimeout(renderFallbackIfEmpty, 50);
+  });
+  document.addEventListener('DOMContentLoaded', () => setTimeout(renderFallbackIfEmpty, 80));
+})();
+
+  
 })();
