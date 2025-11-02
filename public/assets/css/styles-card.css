@@ -104,3 +104,7 @@
   position: relative;
   overflow: hidden;
 }
+#section-card #jornada-content-wrapper {
+  position: relative;
+  z-index: 2;     /* acima do pergaminho::before */
+}
