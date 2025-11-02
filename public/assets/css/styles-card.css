@@ -93,3 +93,14 @@
   #section-card .flame-layer { bottom: 14vh; width: 68%; }
   #section-card #userNameSlot { font-size: clamp(13px, 4vw, 18px); }
 }
+/* Card acima do pergaminho */
+#section-card { position: relative; z-index: 2; }
+.pergaminho::before { z-index: 0 !important; pointer-events: none !important; }
+
+/* Caso o BG demore, o palco ainda tem altura e não "some" */
+#section-card .card-stage {
+  min-height: clamp(560px, 66vw, 920px);
+  padding-bottom: clamp(120px, 16vh, 200px);
+  position: relative;
+  overflow: hidden;
+}
