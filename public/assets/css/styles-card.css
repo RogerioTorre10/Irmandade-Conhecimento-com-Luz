@@ -174,4 +174,17 @@
     padding: 5px 10px;
   }
 }
+/* === MOBILE (até 600px) — descer o BG do guia === */
+@media (max-width: 600px) {
+  /* base */
+  #section-card #guideBg{
+    transform: translateY(2.5svh);   /* move a imagem para BAIXO */
+    will-change: transform;
+  }
+
+  /* ZION costuma “subir” mais: desce um pouco extra */
+  #section-card.guide-zion #guideBg{
+    transform: translateY(4svh);
+  }
+}
 
