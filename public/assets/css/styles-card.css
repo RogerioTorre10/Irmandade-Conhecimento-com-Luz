@@ -40,7 +40,7 @@
 #section-card #guideBg { display:block !important; width:100% !important; height:auto !important; object-fit:cover; }
 
 /* Chama e nome acima do BG */
-#section-card .flame-layer { position:absolute; left:50%; transform:translateX(-50%); bottom: clamp(140px, 20vh, 200px); width: clamp(240px,46%,540px); z-index:6; opacity:0; pointer-events:none; }
+#section-card .flame-layer { position:absolute; left:50%; transform:translateX(-50%); bottom: clamp(60px, 10vh, 120px); width: clamp(240px,46%,540px); z-index:6; opacity:0; pointer-events:none; }
 #section-card .flame-layer.show { opacity:1 !important; }
 #section-card .card-footer { position:absolute; left:50%; transform:translateX(-50%); bottom: clamp(56px, 8vh, 96px); z-index:7; text-align:center; }
 
