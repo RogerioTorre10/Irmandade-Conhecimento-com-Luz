@@ -12,7 +12,7 @@
     lumen: '/assets/img/irmandade-quarteto-bg-lumen.png',
     zion:  '/assets/img/irmandade-quarteto-bg-zion.png'
   };
-  const PLACEHOLDER_SELFIE = '/assets/img/irmandade-card-placeholder.jpg';
+  const PLACEHOLDER_SELFIE = '/assets/img/irmandade-card-placeholder.png';
   const GUIAS_JSON = '/assets/data/guias.json';
   let GUIAS_CACHE = null;
 
