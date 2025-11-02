@@ -94,6 +94,22 @@
     };
   }
 
+  function readParticipantName() {
+   const keys = [
+    'jornada.nome', 'jc.nome', 'participantName',
+    'jornada.participantName', 'nomeParticipante', 'jc.participant'
+  ];
+  for (const k of keys) {
+    try {
+      const v = sessionStorage.getItem(k) || localStorage.getItem(k);
+      if (v && String(v).trim()) return String(v).trim();
+    } catch {}
+  }
+  const input = document.querySelector('#guiaNameInput, #nomeParticipante');
+  if (input && input.value) return String(input.value).trim();
+  return 'USUÁRIO';
+ }
+  
   // ----- limpeza de imagens inválidas (sem tocar nos elementos do card) -----
   function isBadSrc(src) {
     if (!src) return false;          // <== não remove imagens sem src; o JS ainda vai setar
