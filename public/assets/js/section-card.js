@@ -18,6 +18,11 @@
 
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
+  
+  function getCardContainer(root) {
+  // preferimos renderizar dentro do wrapper oficial
+  return root.querySelector('#jornada-content-wrapper') || root;
+} 
 
   async function waitForTransitionUnlock(timeoutMs = 12000) {
     if (!window.__TRANSITION_LOCK) return;
@@ -222,7 +227,7 @@
 
   // ---------------- Inicialização ----------------
   async function initCard(root) {
-    const section = SECTION_IDS.map(id => root.id === id ? root : qs(`#${id}`, root) || qs(`#${id}`)).find(Boolean) || root;
+  const section = getCardContainer(root);
 
     // nome herdado e normalizado
   const nome = readParticipantName().toUpperCase();
