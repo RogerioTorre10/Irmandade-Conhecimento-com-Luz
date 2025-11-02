@@ -1,11 +1,10 @@
-/* /assets/js/section-card.js — robusto: auto-cria estrutura se faltar + valida nome */
+/* /assets/js/section-card.js — robusto: auto-cria estrutura se faltar */
 (function () {
   'use strict';
 
   const MOD = 'section-card.js';
   const SECTION_IDS = ['section-card', 'section-eu-na-irmandade'];
   const NEXT_SECTION_ID = 'section-perguntas';
-  const PREV_SECTION_ID = 'section-guia';
   const VIDEO_SRC = '/assets/videos/filme-card-dourado.mp4';
 
   const CARD_BG = {
@@ -20,7 +19,6 @@
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-  // -------- Utils --------
   async function waitForTransitionUnlock(timeoutMs = 12000) {
     if (!window.__TRANSITION_LOCK) return;
     let done = false;
@@ -59,43 +57,6 @@
     return PLACEHOLDER_SELFIE;
   }
 
-  // -------- Nome do participante: validar/sanitizar --------
-  function sanitizeName(name) {
-    if (!name || typeof name !== 'string') return '';
-    // normaliza espaços e remove múltiplos
-    let n = name.replace(/\s+/g, ' ').trim();
-    // limita tamanho razoável
-    if (n.length > 60) n = n.slice(0, 60);
-    return n;
-  }
-
-  function isValidName(name) {
-    // Letras (com acentos), espaços, hífen, apóstrofo, ponto — 2 a 60 chars
-    return /^[A-Za-zÀ-ÖØ-öø-ÿ'’\-\.\s]{2,60}$/u.test(name);
-  }
-
-  function getParticipantNameValidated() {
-    // procura em várias chaves para compatibilidade
-    const keys = [
-      'jornada.nome', 'jc.nome', 'participantName',
-      'jornada.participante', 'jornada.guia.nome'
-    ];
-    let raw = '';
-    for (const k of keys) {
-      try { const v = sessionStorage.getItem(k); if (v) { raw = v; break; } } catch {}
-    }
-    let n = sanitizeName(raw);
-    if (!n || !isValidName(n)) {
-      return { ok: false, name: '', reason: 'missing_or_invalid' };
-    }
-    // título-caso leve (mantendo maiúsculas de siglas se houver)
-    const titled = n.split(' ').map(p => p ? (p[0].toUpperCase() + p.slice(1).toLowerCase()) : '').join(' ');
-    // persiste normalizado para uso futuro
-    try { sessionStorage.setItem('jornada.nome', titled); } catch {}
-    return { ok: true, name: titled };
-  }
-
-  // -------- Guias JSON --------
   async function loadGuiasJson() {
     if (GUIAS_CACHE) return GUIAS_CACHE;
     try {
@@ -117,26 +78,34 @@
 
   function titleize(id){ const m={arian:'Arian',lumen:'Lumen',zion:'Zion'}; return m[id] || (id? id[0].toUpperCase()+id.slice(1):''); }
 
+  // Sempre devolve imagem válida
   async function resolveSelectedGuide() {
     const selId = (sessionStorage.getItem('jornada.guia') || 'zion').toLowerCase();
     const guias = await loadGuiasJson();
     const j = guias.find(g => g.id === selId);
+
     const fallback = CARD_BG[selId] || CARD_BG.zion || `/assets/img/${selId}.png`;
     const bgImage = (j && j.bgImage) || fallback;
-    return { id: selId, nome: (j && (j.nome || titleize(selId))) || titleize(selId), bgImage };
+
+    return {
+      id: selId,
+      nome: (j && (j.nome || titleize(selId))) || titleize(selId),
+      bgImage
+    };
   }
 
-  // -------- limpeza de imagens estranhas --------
+  // ----- limpeza de imagens inválidas (sem tocar nos elementos do card) -----
   function isBadSrc(src) {
-    if (!src) return false; // não remove sem src: será preenchido
+    if (!src) return false;          // <== não remove imagens sem src; o JS ainda vai setar
     src = String(src).trim();
     if (src === 'null' || src === 'undefined' || src === '#') return true;
     if (/^data:image\//.test(src)) return false;
     if (/^https?:\/\//.test(src)) return false;
     if (src.includes('/')) return false;
     if (/\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(src)) return false;
-    return true;
+    return true; // ex.: "zion"
   }
+
   function cleanupBrokenImages(root) {
     qsa('img:not(#guideBg):not(#selfieImage)', root).forEach(img => {
       const src = img.getAttribute('src') || img.getAttribute('href');
@@ -145,11 +114,13 @@
     });
   }
 
-  // -------- compat: estrutura --------
+  // ---------------- Compat layer ----------------
   function ensureStructure(root) {
     let stage = root.querySelector('.card-stage, .card-stage-wrap, .card-container, .card');
     if (!stage) {
-      stage = document.createElement('div'); stage.className = 'card-stage'; root.appendChild(stage);
+      stage = document.createElement('div');
+      stage.className = 'card-stage';
+      root.appendChild(stage);
     }
     stage.style.position = stage.style.position || 'relative';
 
@@ -168,11 +139,23 @@
 
     let guideNameSlot = stage.querySelector('#guideNameSlot, .card-guide-name #guideNameSlot, .card-guide-name span');
     let guideNameWrap = stage.querySelector('.card-guide-name');
-    if (!guideNameWrap) { guideNameWrap = document.createElement('div'); guideNameWrap.className = 'card-guide-name'; stage.appendChild(guideNameWrap); }
-    if (!guideNameSlot) { guideNameSlot = document.createElement('span'); guideNameSlot.id = 'guideNameSlot'; guideNameWrap.appendChild(guideNameSlot); }
+    if (!guideNameWrap) {
+      guideNameWrap = document.createElement('div');
+      guideNameWrap.className = 'card-guide-name';
+      stage.appendChild(guideNameWrap);
+    }
+    if (!guideNameSlot) {
+      guideNameSlot = document.createElement('span');
+      guideNameSlot.id = 'guideNameSlot';
+      guideNameWrap.appendChild(guideNameSlot);
+    }
 
     let flameLayer = stage.querySelector('.flame-layer');
-    if (!flameLayer) { flameLayer = document.createElement('div'); flameLayer.className = 'flame-layer'; stage.appendChild(flameLayer); }
+    if (!flameLayer) {
+      flameLayer = document.createElement('div');
+      flameLayer.className = 'flame-layer';
+      stage.appendChild(flameLayer);
+    }
 
     let selfieSvgImage = stage.querySelector('#selfieImage');
     if (!selfieSvgImage) {
@@ -190,44 +173,47 @@
     }
 
     let footer = stage.querySelector('.card-footer');
-    if (!footer) { footer = document.createElement('div'); footer.className = 'card-footer'; stage.appendChild(footer); }
+    if (!footer) {
+      footer = document.createElement('div');
+      footer.className = 'card-footer';
+      stage.appendChild(footer);
+    }
     let badge = footer.querySelector('.card-name-badge');
-    if (!badge) { badge = document.createElement('span'); badge.className = 'card-name-badge'; footer.appendChild(badge); }
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'card-name-badge';
+      footer.appendChild(badge);
+    }
     let userNameSlot = footer.querySelector('#userNameSlot');
-    if (!userNameSlot) { userNameSlot = document.createElement('span'); userNameSlot.id = 'userNameSlot'; badge.appendChild(userNameSlot); }
+    if (!userNameSlot) {
+      userNameSlot = document.createElement('span');
+      userNameSlot.id = 'userNameSlot';
+      badge.appendChild(userNameSlot);
+    }
 
     let btn = root.querySelector('#btnNext, .btn-next-card');
     if (!btn) {
       const actions = root.querySelector('.card-actions') || root.appendChild(Object.assign(document.createElement('div'), {className:'card-actions'}));
       btn = document.createElement('button');
-      btn.id = 'btnNext'; btn.className = 'btn btn-stone'; btn.textContent = 'Continuar'; actions.appendChild(btn);
+      btn.id = 'btnNext';
+      btn.className = 'btn btn-stone';
+      btn.textContent = 'Continuar';
+      actions.appendChild(btn);
     }
 
     return { stage, guideBg, guideNameSlot, flameLayer, selfieSvgImage, userNameSlot, btnNext: btn };
   }
 
-  // -------- inicialização --------
+  // ---------------- Inicialização ----------------
   async function initCard(root) {
     const section = SECTION_IDS.map(id => root.id === id ? root : qs(`#${id}`, root) || qs(`#${id}`)).find(Boolean) || root;
 
-    // 1) Valida nome (redireciona para section-guia se faltar)
-    const pv = getParticipantNameValidated();
-    if (!pv.ok) {
-      try { alert('Para seguir, informe seu nome na página do Guia.'); } catch {}
-      if (typeof window.playTransitionVideo === 'function') {
-        window.playTransitionVideo(null, PREV_SECTION_ID);
-      } else {
-        window.JC?.show?.(PREV_SECTION_ID);
-      }
-      return; // interrompe render deste card até ter nome válido
-    }
-    const nome = pv.name.toUpperCase();
-
-    // 2) Resolve guia e estrutura
+    const nome = (sessionStorage.getItem('jornada.nome') || 'USUÁRIO').toUpperCase();
     const guia = await resolveSelectedGuide();
+
     const { guideBg, guideNameSlot, flameLayer, selfieSvgImage, userNameSlot, btnNext } = ensureStructure(section);
 
-    // 3) BG do guia
+    // 1) Configura BG do guia
     if (guideBg && guideBg.tagName === 'IMG') {
       guideBg.src = guia.bgImage;
       guideBg.alt = `${guia.nome} — Card da Irmandade`;
@@ -235,4 +221,67 @@
     } else {
       section.style.backgroundImage = `url("${guia.bgImage}")`;
       section.style.backgroundSize = 'cover';
-      section.style
+      section.style.backgroundPosition = 'center';
+    }
+
+    if (guideNameSlot) guideNameSlot.textContent = (guia.nome || '').toUpperCase();
+    if (userNameSlot) userNameSlot.textContent = nome;
+
+    // 2) Configura selfie
+    const url = readSelfieUrlOrPlaceholder();
+    if (selfieSvgImage) {
+      setSvgImageHref(selfieSvgImage, url);
+      flameLayer?.classList.add('show');
+      selfieSvgImage.addEventListener?.('error', () => {
+        setSvgImageHref(selfieSvgImage, PLACEHOLDER_SELFIE);
+        flameLayer?.classList.add('show');
+      });
+    }
+
+    // 3) Agora sim: limpa imagens estranhas no container
+    cleanupBrokenImages(section);
+
+    // 4) Mensagem datilografada (se existir)
+    const intro = qs('#cardIntro', section);
+    if (intro) {
+      const texto = `Eu na Irmandade — ${guia.nome}. Bem-vindo, ${nome}.`;
+      intro.setAttribute('data-text', texto);
+    }
+
+    await waitForTransitionUnlock();
+    const typings = qsa('[data-typing="true"]', section);
+    for (const el of typings) {
+      const text = (el.dataset.text || el.textContent || '').trim();
+      await runTypingAndSpeak(el, text);
+    }
+
+    if (btnNext) {
+      btnNext.onclick = () => {
+        try { speechSynthesis.cancel(); } catch {}
+        qsa('video').forEach(v => { try { v.pause(); v.src=''; v.load(); } catch {} });
+        if (typeof window.playTransitionVideo === 'function' && VIDEO_SRC) {
+          window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
+        } else {
+          window.JC?.show?.(NEXT_SECTION_ID);
+        }
+      };
+    }
+
+    console.log(`[${MOD}] Card exibido · guia=${guia.id} (${guia.nome}) · participante=${nome}`);
+  }
+
+  // ---------------- Escutas ----------------
+  document.addEventListener('section:shown', (e) => {
+    const id = e.detail.sectionId;
+    if (!SECTION_IDS.includes(id)) return;
+    const root = e.detail.node || qs(`#${id}`) || qs('#jornada-content-wrapper') || document.body;
+    initCard(root);
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const visible = SECTION_IDS.map(id => qs(`#${id}`)).find(el => el && (el.offsetParent !== null || el.style.display !== 'none'));
+    if (visible) initCard(visible);
+  });
+
+  console.log(`[${MOD}] carregado (robusto)`);
+})();
