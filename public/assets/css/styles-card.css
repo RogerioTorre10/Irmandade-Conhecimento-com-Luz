@@ -40,10 +40,26 @@
 #section-card #guideBg { display:block !important; width:100% !important; height:auto !important; object-fit:cover; }
 
 /* Chama e nome acima do BG */
-#section-card .flame-layer { position:absolute; left:50%; transform:translateX(-50%); bottom: clamp(60px, 10vh, 120px); width: clamp(240px,46%,540px); z-index:6; opacity:0; pointer-events:none; }
+#section-card .flame-layer {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: clamp(30px, 6vh, 80px);   /* ↓ já descido antes, mantém assim */
+  width: clamp(240px, 46%, 540px);
+  z-index: 6;
+  opacity: 0;
+  pointer-events: none;
+}
 #section-card .flame-layer.show { opacity:1 !important; }
-#section-card .card-footer { position:absolute; left:50%; transform:translateX(-50%); bottom: clamp(56px, 8vh, 96px); z-index:7; text-align:center; }
-
+#section-card .card-footer {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(var(--inset) + 52px);  /*  ~40px acima do botão  */
+  z-index: 7;
+  text-align: center;
+  pointer-events: none;                /* não bloquear o clique no botão */
+}
   
   border: 1px solid rgba(255, 225, 180, 0.38) !important;
   box-shadow:
@@ -81,10 +97,18 @@
 #section-card .conteudo-pergaminho { position: relative !important; z-index: 5 !important; }
 
 /* 5) Botão flutuante (não imprime) */
-#section-card #btnStartJourney{
-  position: absolute !important;
-  left: 50% !important; transform: translateX(-50%) !important;
-  bottom: calc(var(--inset) + 12px) !important;
-  z-index: 8 !important;
+#section-card #btnStartJourney,
+#section-card #btnNext {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(var(--inset) + 12px); /* botão é a referência de base */
+  z-index: 8;
+  pointer-events: auto;              /* garante clique mesmo com footer acima */
 }
 @media print { #section-card #btnStartJourney { display: none !important; } }
+@media (max-height: 720px) {
+  #section-card .card-footer {
+    bottom: calc(var(--inset) + 44px);
+  }
+}
