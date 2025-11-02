@@ -55,16 +55,33 @@
     try { await window.EffectCoordinator?.speak?.(text, { rate: 1.0 }); } catch {}
   }
 
-  function readSelfieUrlOrPlaceholder() {
-    const keys = ['jornada.selfieDataUrl','selfie.dataUrl','selfieDataUrl','jornada.selfie','selfie.image','selfieImageData'];
-    for (const k of keys) {
-      try {
-        const v = sessionStorage.getItem(k);
-        if (v && /^data:image\//.test(v)) return v;
-      } catch {}
-    }
-    return PLACEHOLDER_SELFIE;
+ function readSelfieUrlOrPlaceholder() {
+  const CANDIDATES = [
+    // sessão
+    'jornada.selfieDataUrl','selfie.dataUrl','selfieDataUrl',
+    'jornada.selfie','selfie.image','selfieImageData',
+    // persistente (alguns fluxos salvam aqui)
+    'jc.selfie','jc.selfieDataUrl','jc.selfie.image',
+    'user.selfie','user.selfieDataUrl'
+  ];
+
+  // 1) tenta sessionStorage
+  for (const k of CANDIDATES) {
+    try {
+      const v = sessionStorage.getItem(k);
+      if (v && /^data:image\//.test(v)) return v;
+    } catch {}
   }
+  // 2) tenta localStorage
+  for (const k of CANDIDATES) {
+    try {
+      const v = localStorage.getItem(k);
+      if (v && /^data:image\//.test(v)) return v;
+    } catch {}
+  }
+  return PLACEHOLDER_SELFIE;
+}
+
 
   // ---------- JSON dos guias ----------
   async function loadGuiasJson() {
