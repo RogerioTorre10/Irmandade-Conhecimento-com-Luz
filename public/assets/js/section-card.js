@@ -224,6 +224,24 @@
   async function initCard(root) {
     const section = SECTION_IDS.map(id => root.id === id ? root : qs(`#${id}`, root) || qs(`#${id}`)).find(Boolean) || root;
 
+    // nome herdado e normalizado
+  const nome = readParticipantName().toUpperCase();
+
+   // garante estrutura mínima e que esteja DENTRO do card
+  const { stage, guideBg, guideNameSlot, flameLayer, flameSelfie, userNameSlot, btnNext } = ensureStructure(section);
+
+   // escreve o nome no rodapé (dentro do card)
+  if (userNameSlot) userNameSlot.textContent = nome;
+
+   // ativa a chama (selfie/placeholder) e mostra o container
+  const url = readSelfieUrlOrPlaceholder();
+  if (flameSelfie && url) {
+  flameSelfie.src = url;
+  flameLayer?.classList.add('show');
+ }
+
+
+
     const nome = (sessionStorage.getItem('jornada.nome') || 'USUÁRIO').toUpperCase();
     const guia = await resolveSelectedGuide();
 
