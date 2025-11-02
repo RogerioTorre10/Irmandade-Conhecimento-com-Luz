@@ -309,23 +309,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     sec.style.position = 'relative';
 
     // Cria palco se não existir
-    let stage = sec.querySelector('.card-stage');
-    if (!stage) {
-      stage = document.createElement('div');
-      stage.className = 'card-stage';
-      stage.style.position = 'relative';
-      stage.style.minHeight = '66vw';
-      stage.style.background = '#000 url("/assets/img/irmandade-quarteto-bg-zion.png") center/cover no-repeat';
-      sec.appendChild(stage);
-      console.warn('[section-card.js] stage recriado manualmente');
-    }
+    const sel = (sessionStorage.getItem('jornada.guia') || 'zion').toLowerCase();
+const MAP = {
+  arian: '/assets/img/irmandade-quarteto-bg-arian.png',
+  lumen: '/assets/img/irmandade-quarteto-bg-lumen.png',
+  zion:  '/assets/img/irmandade-quarteto-bg-zion.png'
+};
+const safeBg = MAP[sel] || MAP.zion;
 
-    // Garante fundo
-    if (!stage.style.backgroundImage) {
-      stage.style.backgroundImage = 'url("/assets/img/irmandade-quarteto-bg-zion.png")';
-      stage.style.backgroundSize = 'cover';
-      stage.style.backgroundPosition = 'center';
-    }
+if (!stage) {
+  stage = document.createElement('div');
+  stage.className = 'card-stage';
+  stage.style.position = 'relative';
+  stage.style.minHeight = '66vw';
+  stage.style.background = `#000 url("${safeBg}") center/cover no-repeat`;
+  sec.appendChild(stage);
+  console.warn('[section-card.js] stage recriado manualmente');
+}
+
+// Garante fundo se ainda não houver um
+if (!stage.style.backgroundImage) {
+  stage.style.backgroundImage = `url("${safeBg}")`;
+  stage.style.backgroundSize = 'cover';
+  stage.style.backgroundPosition = 'center';
+}
+
 
     // Garante chama e rodapé
     if (!stage.querySelector('.flame-layer')) {
