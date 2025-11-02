@@ -1,22 +1,24 @@
-<!-- ================================
-     SECTION-CARD — v1.3 (com mensagem)
-================================ -->
 <link rel="stylesheet" href="/assets/css/styles-base.css">
 <link rel="stylesheet" href="/assets/css/styles-card.css">
-
 <div id="jornada-content-wrapper">
-  <section id="section-card" class="j-section pergaminho pergaminho-v epic">
+<div id="section-card" class="j-section pergaminho pergaminho-v epic">
+    <div class="conteudo-pergaminho">
+      <h2 data-typing="true" data-text="Eu na Irmandade" data-speed="40" data-cursor="true" class="titulo-selfie">
+        Eu na Irmandade
+         </h2>
+          <div class="card-stage">
+           <img id="guideBg" class="guide-bg" src="" alt="Guia Background"/>
 
-    <div class="conteudo-pergaminho card-stage">
-      <!-- Mensagem exibida com efeito datilografia.
-           O texto será preenchido dinamicamente no JS com o nome do participante. -->
-      <h2 id="cardIntro"
-          data-typing="true"
-          data-speed="40"
-          data-cursor="true">
-        <!-- O JS define data-text antes de rodar o typing -->
-      </h2>
+            <!-- container da chama DENTRO do card -->
+           <div class="flame-layer" aria-hidden="true">
+          <img class="flame-selfie" id="selfieImage"
+         src="/assets/img/irmandade-card-placeholder.jpg" alt="Selfie ou Placeholder"/>
+          </div>
+           <div class="card-footer">
+          <span class="card-name-badge">
+        <span id="userNameSlot">USUÁRIO</span>
+      </span>
     </div>
-
-  </section>
-</div>
+     <button id="btnStartJourney" class="btn btn-stone" data-action="avancar">Continuar</button>
+    </div>
+  </div>
