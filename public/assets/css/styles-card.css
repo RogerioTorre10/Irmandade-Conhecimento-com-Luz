@@ -3,34 +3,20 @@
 /* 1) Some com a lente, se ainda existir no DOM */
 #section-card .lens { display: none !important; }
 
-#section-card .flame-layer {
+#section-card .card-footer{
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: clamp(28px, 5.6vh, 68px);
-  width: clamp(200px, 38%, 420px);
-  z-index: 6;
-  opacity: 0;
+  bottom: clamp(180px, 26vh, 300px); /* sobe a plaquinha pra dentro do card */
+  z-index: 7;
+  text-align: center;
   pointer-events: none;
 }
 
-/* Ajustes finos por guia */
-#section-card.guide-zion .flame-layer {
-  bottom: clamp(40px, 7.2vh, 86px);
-  width: clamp(180px, 34%, 380px);
-}
-
-/* LUMEN – foco no busto, guia mais próximo do centro */
-#section-card.guide-lumen .flame-layer {
-  bottom: clamp(30px, 6vh, 78px);
-  width: clamp(190px, 36%, 400px);
-}
-
-/* ARIAN – figura mais ampla, cruz central mais baixa */
-#section-card.guide-arian .flame-layer {
-  bottom: clamp(20px, 4.8vh, 64px);
-  width: clamp(210px, 40%, 440px);
-}
+/* fino por guia (porque o enquadramento muda) */
+#section-card.guide-zion .card-footer{  bottom: clamp(200px, 30vh, 320px); }
+#section-card.guide-lumen .card-footer{ bottom: clamp(185px, 28vh, 300px); }
+#section-card.guide-arian .card-footer{ bottom: clamp(170px, 25vh, 280px); }
 
 
   /* Centro transparente (sem vidro/lente) */
@@ -50,7 +36,7 @@
 #section-card .card-stage {
   margin-top: min(-4vw, -48px);
   min-height: clamp(560px, 66vw, 920px);
-  padding-bottom: clamp(120px, 16vh, 200px);
+  padding-bottom: clamp(40px, 8vh, 120px);
   overflow: hidden;
 }
 
@@ -115,12 +101,12 @@
 /* 5) Botão flutuante (não imprime) */
 #section-card #btnStartJourney,
 #section-card #btnNext{
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   bottom: calc(var(--inset, 16px) + 12px);
-  z-index:8;
-  pointer-events:auto;
+  z-index: 8;
+  pointer-events: auto;
 }
 @media print { #section-card #btnStartJourney { display: none !important; } }
 @media (max-height: 720px) {
@@ -128,19 +114,21 @@
     bottom: calc(var(--inset) + 44px);
   }
 }
-#section-card .card-name-badge {
+#section-card .card-name-badge{
   display: inline-block;
   padding: 6px 14px;
   border-radius: 10px;
-  border: 1px solid rgba(255, 225, 180, 0.45);
-  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255,225,180,.45);
+  background: rgba(0,0,0,.40);
   backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
   color: #f6e7c6;
   font-weight: 600;
-  letter-spacing: 0.6px;
+  letter-spacing: .6px;
   text-transform: uppercase;
   text-shadow: 0 1px 2px rgba(0,0,0,.6);
 }
+
 /* Compacta em telas menores */
  @media (max-height: 720px) {
   #section-card .flame-layer { bottom: clamp(18px, 4vh, 54px); }
