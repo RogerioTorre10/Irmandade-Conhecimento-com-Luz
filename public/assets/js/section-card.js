@@ -20,9 +20,11 @@
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
   
   function getCardContainer(root) {
-  // preferimos renderizar dentro do wrapper oficial
-  return root.querySelector('#jornada-content-wrapper') || root;
-} 
+  const section = root && (root.id === 'section-card' ? root : document.getElementById('section-card'));
+  if (!section) return null;
+  return section.querySelector('#jornada-content-wrapper') || section;
+}
+
 
   async function waitForTransitionUnlock(timeoutMs = 12000) {
     if (!window.__TRANSITION_LOCK) return;
@@ -227,7 +229,7 @@
 
   // ---------------- Inicialização ----------------
   async function initCard(root) {
-  const section = getCardContainer(root);
+  const section = getCardContainer(root) || root;
 
     // nome herdado e normalizado
   const nome = readParticipantName().toUpperCase();
@@ -310,17 +312,38 @@
   }
 
   // ---------------- Escutas ----------------
-  document.addEventListener('section:shown', (e) => {
-    const id = e.detail.sectionId;
-    if (!SECTION_IDS.includes(id)) return;
-    const root = e.detail.node || qs(`#${id}`) || qs('#jornada-content-wrapper') || document.body;
-    initCard(root);
-  });
+ document.addEventListener('section:shown', (e) => {
+  if (!e?.detail || e.detail.sectionId !== 'section-card') return;
+  // pega a seção real do DOM
+  const root = document.getElementById('section-card');
+  // injeta dentro do wrapper interno (não no root da seção)
+  const container = getCardContainer(root);
+  if (!container) return;
+  setTimeout(() => initCard(root), 0);
+});
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const visible = SECTION_IDS.map(id => qs(`#${id}`)).find(el => el && (el.offsetParent !== null || el.style.display !== 'none'));
-    if (visible) initCard(visible);
-  });
+document.addEventListener('DOMContentLoaded', () => {
+  const tryOnce = () => {
+    const root = document.getElementById('section-card');
+    if (!root) return;
+    const container = getCardContainer(root);
+    if (!container) return;
+    initCard(root);
+  };
+  setTimeout(tryOnce, 0);
+  setTimeout(tryOnce, 120);
+});
+
+// utilitário para forçar render onde interessa
+window.__forceInitCard = function () {
+  const root = document.getElementById('section-card');
+  const container = getCardContainer(root);
+  if (!root || !container) {
+    console.warn('[section-card] não achei #section-card ou #jornada-content-wrapper');
+    return;
+  }
+  initCard(root);
+};
 
   console.log(`[${MOD}] carregado (robusto)`);
 
