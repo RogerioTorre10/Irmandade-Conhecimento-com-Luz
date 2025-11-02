@@ -106,5 +106,10 @@
 }
 #section-card #jornada-content-wrapper {
   position: relative;
-  z-index: 2;     /* acima do pergaminho::before */
+  z-index: 2; /* acima do pergaminho::before */
 }
+.pergaminho::before {
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+
