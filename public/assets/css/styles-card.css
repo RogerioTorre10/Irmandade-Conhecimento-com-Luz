@@ -3,17 +3,32 @@
 /* 1) Some com a lente, se ainda existir no DOM */
 #section-card .lens { display: none !important; }
 
-/* 2) CARD único ocupando quase todo o pergaminho */
-#section-card .card-frame,
-#section-card .flame-layer { /* cobre também a estrutura antiga, se usada */
-  --inset: clamp(12px, 2.6vh, 22px);             /* respiro topo/rodapé */
-  position: absolute !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  top: var(--inset) !important;
-  bottom: var(--inset) !important;               /* encosta embaixo */
-  width: clamp(260px, 46vw, 560px) !important;
-  border-radius: 18px !important;
+#section-card .flame-layer{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  bottom: clamp(26px, 5.5vh, 70px);   /* ↓ mais baixo */
+  width: clamp(190px, 36%, 400px);    /* ↓ menor */
+  z-index:6;
+  opacity:0;
+  pointer-events:none;
+}
+
+/* Ajustes finos por guia */
+#section-card.guide-zion .flame-layer{
+  bottom: clamp(24px, 5vh, 64px);
+  width: clamp(185px, 34%, 390px);
+}
+
+#section-card.guide-lumen .flame-layer{
+  bottom: clamp(30px, 6.2vh, 82px);
+  width: clamp(195px, 38%, 410px);
+}
+
+#section-card.guide-arian .flame-layer{
+  bottom: clamp(22px, 4.8vh, 60px);
+  width: clamp(180px, 33%, 380px);
+}
 
   /* Centro transparente (sem vidro/lente) */
   background: transparent !important;
@@ -51,14 +66,14 @@
   pointer-events: none;
 }
 #section-card .flame-layer.show { opacity:1 !important; }
-#section-card .card-footer {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: calc(var(--inset) + 52px);  /*  ~40px acima do botão  */
-  z-index: 7;
-  text-align: center;
-  pointer-events: none;                /* não bloquear o clique no botão */
+#section-card .card-footer{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  bottom: calc(var(--inset, 16px) + 52px);
+  z-index:7;
+  text-align:center;
+  pointer-events:none;
 }
   
   border: 1px solid rgba(255, 225, 180, 0.38) !important;
@@ -98,13 +113,13 @@
 
 /* 5) Botão flutuante (não imprime) */
 #section-card #btnStartJourney,
-#section-card #btnNext {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: calc(var(--inset) + 12px); /* botão é a referência de base */
-  z-index: 8;
-  pointer-events: auto;              /* garante clique mesmo com footer acima */
+#section-card #btnNext{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  bottom: calc(var(--inset, 16px) + 12px);
+  z-index:8;
+  pointer-events:auto;
 }
 @media print { #section-card #btnStartJourney { display: none !important; } }
 @media (max-height: 720px) {
@@ -112,17 +127,17 @@
     bottom: calc(var(--inset) + 44px);
   }
 }
-#section-card .card-name-badge {
-  display: inline-block;
+#section-card .card-name-badge{
+  display:inline-block;
   padding: 6px 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 225, 180, 0.45);
-  background: rgba(0, 0, 0, 0.35);
+  border-radius:10px;
+  border:1px solid rgba(255,225,180,.45);
+  background: rgba(0,0,0,.35);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
-  color: #f6e7c6;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  text-shadow: 0 1px 2px rgba(0,0,0,.6);
+  color:#f6e7c6;
+  font-weight:600;
+  letter-spacing:.5px;
+  text-transform:uppercase;
+  text-shadow:0 1px 2px rgba(0,0,0,.6);
 }
