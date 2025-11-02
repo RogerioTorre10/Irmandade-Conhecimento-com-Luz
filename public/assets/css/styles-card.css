@@ -174,17 +174,54 @@
     padding: 5px 10px;
   }
 }
-/* === MOBILE (até 600px) — descer o BG do guia === */
+/* ========= MOBILE FIX (até 600px) ========= */
 @media (max-width: 600px) {
-  /* base */
-  #section-card #guideBg{
-    transform: translateY(2.5svh);   /* move a imagem para BAIXO */
-    will-change: transform;
+  /* 0) RESET do BG: remove qualquer translate acidental do guideBg */
+  #section-card #guideBg { transform: none !important; }
+
+  /* 1) Placeholder ancorado pelo TOPO (estável no mobile) */
+  #section-card .flame-layer {
+    top: 60%;                      /* ~altura do peito */
+    left: 50%;
+    transform: translate(-50%, -50%);  /* centraliza no ponto de ancoragem */
+    bottom: auto !important;           /* NÃO ancorar pelo rodapé no mobile */
+    width: min(80%, 320px);
+    z-index: 6 !important;
+    opacity: 1 !important;
   }
 
-  /* ZION costuma “subir” mais: desce um pouco extra */
-  #section-card.guide-zion #guideBg{
-    transform: translateY(4svh);
+  /* 1.1) Ajustes finos por guia */
+  #section-card.guide-zion  .flame-layer { top: 63%; width: min(78%, 310px); }
+  #section-card.guide-lumen .flame-layer { top: 61%; width: min(80%, 315px); }
+  #section-card.guide-arian .flame-layer { top: 59%; width: min(77%, 305px); }
+
+  /* 2) Nome do participante: dentro do card, com folga saudável */
+  #section-card .card-footer {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 72px) !important;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 7;
+    pointer-events: none;
+    text-align: center;
+  }
+  #section-card .card-name-badge {
+    font-size: 0.95rem;
+    padding: 6px 12px;
+  }
+
+  /* 3) Botão SEM cobrir o rodapé do pergaminho */
+  #section-card #btnStartJourney,
+  #section-card #btnNext {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 16px) !important;
+    left: 50%; transform: translateX(-50%);
+    z-index: 8;
+  }
+
+  /* 4) Palco com respiro mais compacto para caber tudo */
+  #section-card .card-stage {
+    padding-bottom: clamp(28px, 6svh, 80px) !important;
+    min-height: 100svh; /* viewport estável no mobile */
   }
 }
+
 
