@@ -193,7 +193,10 @@
 
     const nome = (sessionStorage.getItem('jornada.nome') || 'USUÁRIO').toUpperCase();
     const guia = await resolveSelectedGuide();
-
+    
+    ['zion','lumen','arian'].forEach(g => section.classList.remove(`guide-${g}`));
+    section.classList.add(`guide-${guia.id}`);
+    
     // Garante estrutura mínima
     const { stage, guideBg, guideNameSlot, flameLayer, flameSelfie, userNameSlot, btnNext } = ensureStructure(section);
 
