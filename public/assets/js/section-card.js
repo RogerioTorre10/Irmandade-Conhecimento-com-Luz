@@ -249,15 +249,29 @@
     if (userNameSlot)  userNameSlot.textContent  = nome;
 
     // Selfie/placeholder + exibir camada
-    const url = readSelfieUrlOrPlaceholder();
-    if (flameSelfie && url) {
-      flameSelfie.src = url;
-      flameLayer?.classList.add('show');
-      flameSelfie.addEventListener?.('error', () => {
-        flameSelfie.src = PLACEHOLDER_SELFIE;
-        flameLayer?.classList.add('show');
-      });
-    }
+const url = readSelfieUrlOrPlaceholder();
+if (flameSelfie && url) {
+  const isPlaceholder = url === PLACEHOLDER_SELFIE;
+  flameSelfie.src = url;
+
+  // garante visibilidade
+  flameSelfie.addEventListener?.('load', () => {
+    flameLayer?.classList.add('show');
+  });
+  flameLayer?.classList.add('show');
+
+  // se falhar o carregamento, volta pro placeholder
+  flameSelfie.addEventListener?.('error', () => {
+    flameSelfie.src = PLACEHOLDER_SELFIE;
+    flameLayer?.classList.add('show');
+    flameLayer?.classList.add('placeholder-only');
+  });
+
+  // adiciona classe especial se for placeholder desde o início
+  if (isPlaceholder) {
+    flameLayer?.classList.add('placeholder-only');
+  }
+}
 
     // Espera transição e aplica datilografia/TTS
     await waitForTransitionUnlock();
