@@ -162,7 +162,7 @@
     text-align: center;
     z-index: 6 !important;
     opacity: 1 !important;
-    pointer-events: none;
+    pointer-events: none !important;
   }
 
  /* 1.1) Ajustes finos por guia */
@@ -191,7 +191,7 @@
   position: relative;
   border-radius: 12px;
   left: 0%;
-  transform: none;
+  transform: none !important;
 }
   /* 4) Nome e botão — posições ajustadas */
   #section-card .card-footer {
@@ -210,7 +210,7 @@
     transform: translateX(-50%);
     z-index: 15;
     position: absolute;
-    pointer-events: auto;
+    pointer-events: none !important;
   }
 
   /* 5) Palco com altura segura e respiro */
