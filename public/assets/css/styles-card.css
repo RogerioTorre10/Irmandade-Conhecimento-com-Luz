@@ -153,7 +153,7 @@
   /* 1) Camada da chama centralizada e estável */
   #section-card .flame-layer {
     position: absolute;
-    top: 59.5%;
+    top: 59%;
     left: 0;
     right: 0;
     transform: translateY(-50%);
@@ -189,12 +189,13 @@
   width: min(78%, 310px);
   height: auto;
   position: relative;
+  border-radius: 12px;
   left: 0%;
   transform: none;
 }
   /* 4) Nome e botão — posições ajustadas */
   #section-card .card-footer {
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 60px) !important;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 56px) !important;
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
@@ -207,7 +208,7 @@
     bottom: calc(env(safe-area-inset-bottom, 0px) + 18px) !important;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 12;
+    z-index: 15;
     position: absolute;
     pointer-events: auto;
   }
