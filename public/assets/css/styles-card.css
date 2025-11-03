@@ -181,11 +181,13 @@
 
   /* 1) Placeholder ancorado pelo TOPO (estável no mobile) */
   #section-card .flame-layer {
-    top: 70%;                      /* ~altura do peito */
-    left: 50%;
-    transform: translate(-50%, -50%);  /* centraliza no ponto de ancoragem */
+    top: 58.5%;                      /* ~altura do peito */
+    left: 0%;
+    right: 0;
+    transform:  translateY(-50%);  /* centraliza no ponto de ancoragem */
     bottom: auto !important;           /* NÃO ancorar pelo rodapé no mobile */
-    width: min(80%, 320px);
+    width: auto;
+    text-align: center;
     z-index: 6 !important;
     opacity: 1 !important;
   }
@@ -234,11 +236,13 @@
 }
 /* Centralização precisa do placeholder */
 #section-card .flame-layer.placeholder-only {
-  left: 50%;
-  transform: translate(-50%, -50%);
-  top: 70%;              /* mantém alinhado ao peito */
+  top: 58.5%; 
+  left: 0%;
+  right: 0;
+  transform: translateY(-50%);
   bottom: auto !important;
   margin: 0 auto;
+  width: auto;  
   text-align: center;
 }
 
