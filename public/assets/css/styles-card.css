@@ -158,7 +158,7 @@
     right: 0;
     transform: translateY(-50%);
     bottom: auto !important;
-    width:  min(80%, 320px);
+    width:  auto;
     text-align: center;
     z-index: 6 !important;
     opacity: 1 !important;
@@ -166,9 +166,9 @@
   }
 
  /* 1.1) Ajustes finos por guia */
-  #section-card.guide-zion  .flame-layer { top: 70%; width: min(78%, 310px); }
-  #section-card.guide-lumen .flame-layer { top: 70%; width: min(78%, 310px); }
-  #section-card.guide-arian .flame-layer { top: 70%; width: min(78%, 310px); }
+  #section-card.guide-zion  .flame-layer { top: 70%; width: auto; }
+  #section-card.guide-lumen .flame-layer { top: 70%; width: auto; }
+  #section-card.guide-arian .flame-layer { top: 70%; width: auto; }
 
   /* 2) Placeholder menor quando não há selfie */
   #section-card .flame-layer.placeholder-only .flame-selfie {
