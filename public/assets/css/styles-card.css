@@ -153,22 +153,22 @@
   /* 1) Camada da chama centralizada e estável */
   #section-card .flame-layer {
     position: absolute;
-    top: 59%;
+    top: 80%;
     left: 0;
     right: 0;
     transform: translateY(-50%);
     bottom: auto !important;
-    width: auto;
+    width:  min(80%, 320px);
     text-align: center;
     z-index: 6 !important;
     opacity: 1 !important;
     pointer-events: none;
   }
 
-  /* 1.1) Ajuste fino por guia */
-  #section-card.guide-zion  .flame-layer { top: 70%;}
-  #section-card.guide-lumen .flame-layer { top: 70%;}
-  #section-card.guide-arian .flame-layer { top: 70%;}
+ /* 1.1) Ajustes finos por guia */
+  #section-card.guide-zion  .flame-layer { top: 70%; width: min(78%, 310px); }
+  #section-card.guide-lumen .flame-layer { top: 70%; width: min(78%, 310px); }
+  #section-card.guide-arian .flame-layer { top: 70%; width: min(78%, 310px); }
 
   /* 2) Placeholder menor quando não há selfie */
   #section-card .flame-layer.placeholder-only .flame-selfie {
