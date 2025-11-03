@@ -162,6 +162,7 @@
     text-align: center;
     z-index: 6 !important;
     opacity: 1 !important;
+    pointer-events: none;
   }
 
   /* 1.1) Ajuste fino por guia */
@@ -182,7 +183,7 @@
 
   /* 3) Centralização extra de segurança */
   #section-card .flame-layer .flame-selfie {
-     display: block;
+  display: block;
   margin-left: auto;
   margin-right: auto;
   width: min(78%, 310px);
@@ -193,7 +194,7 @@
 }
   /* 4) Nome e botão — posições ajustadas */
   #section-card .card-footer {
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 84px) !important;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 60px) !important;
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
@@ -206,13 +207,14 @@
     bottom: calc(env(safe-area-inset-bottom, 0px) + 18px) !important;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 8;
+    z-index: 12;
     position: absolute;
+    pointer-events: auto;
   }
 
   /* 5) Palco com altura segura e respiro */
   #section-card .card-stage {
-    padding-bottom: clamp(28px, 6svh, 80px) !important;
+    padding-bottom: clamp(44px, 9svh, 120px) !important;
     min-height: 100svh;
   }
 }
