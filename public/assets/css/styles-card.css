@@ -10,7 +10,7 @@
   bottom: calc(var(--inset, 16px) + 56px);
   z-index:7;
   text-align:center;
-  pointer-events:none;
+  pointer-events: auto !important;
 }
 
 /* fino por guia (porque o enquadramento muda) */
@@ -58,7 +58,7 @@
   width: clamp(200px, 38%, 420px);
   z-index: 6 !important;     /* ↑ acima do BG */
   opacity: 0;
-  pointer-events: none;
+  pointer-events: auto !important;
   transition: opacity .6s ease;
 }
   border: 1px solid rgba(255, 225, 180, 0.38) !important;
@@ -77,7 +77,7 @@
   content: "";
   position: absolute; inset: -2px;
   border-radius: inherit;
-  pointer-events: none;
+  pointer-events: auto !important;
   box-shadow:
     0 0 0 2px rgba(255,220,150,.32),
     0 0 28px rgba(255,205,110,.36),
@@ -104,7 +104,7 @@
   transform: translateX(-50%);
   bottom: calc(var(--inset, 16px) + 12px);
   z-index: 8;
-  pointer-events: auto;
+  pointer-events: auto !important;
 }
 @media print { #section-card #btnStartJourney { display: none !important; } }
 @media (max-height: 720px) {
