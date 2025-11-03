@@ -177,7 +177,7 @@
 /* ========= MOBILE FIX (até 600px) ========= */
 @media (max-width: 600px) {
   /* 0) RESET do BG: remove qualquer translate acidental do guideBg */
-  #section-card #guideBg { transform: none !important; }
+  #section-card #guideBg { transform: translateY(3.5svh); }
 
   /* 1) Placeholder ancorado pelo TOPO (estável no mobile) */
   #section-card .flame-layer {
