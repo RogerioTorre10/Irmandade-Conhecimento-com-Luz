@@ -245,5 +245,10 @@
   width: auto;  
   text-align: center;
 }
-
+ #section-card .flame-layer .flame-selfie{
+    display: block;
+    margin: 0 auto;             /* centralizado */
+    width: min(78%, 310px);     /* tamanho com selfie */
+    height: auto;
+  }
 
