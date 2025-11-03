@@ -181,7 +181,7 @@
 
   /* 1) Placeholder ancorado pelo TOPO (estável no mobile) */
   #section-card .flame-layer {
-    top: 49%;                      /* ~altura do peito */
+    top: 70%;                      /* ~altura do peito */
     left: 50%;
     transform: translate(-50%, -50%);  /* centraliza no ponto de ancoragem */
     bottom: auto !important;           /* NÃO ancorar pelo rodapé no mobile */
@@ -191,9 +191,9 @@
   }
 
   /* 1.1) Ajustes finos por guia */
-  #section-card.guide-zion  .flame-layer { top: 49%; width: min(67%, 300px); }
-  #section-card.guide-lumen .flame-layer { top: 49%; width: min(67%, 300px); }
-  #section-card.guide-arian .flame-layer { top: 49%; width: min(67%, 300px); }
+  #section-card.guide-zion  .flame-layer { top: 70%; width: min(67%, 300px); }
+  #section-card.guide-lumen .flame-layer { top: 70%; width: min(67%, 300px); }
+  #section-card.guide-arian .flame-layer { top: 70%; width: min(67%, 300px); }
 
   /* 2) Nome do participante: dentro do card, com folga saudável */
   #section-card .card-footer {
