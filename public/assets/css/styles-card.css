@@ -172,7 +172,7 @@
 
   /* 2) Placeholder menor quando não há selfie */
   #section-card .flame-layer.placeholder-only .flame-selfie {
-    width: min(40%, 310px);
+    width: min(60%, 310px);
     height: auto;
     border-radius: 14px;
     transform: scale(0.94);
@@ -186,7 +186,7 @@
   display: block;
   margin-left: auto;
   margin-right: auto;
-  width: min(40%, 310px);
+  width: min(60%, 310px);
   height: auto;
   position: relative;
   border-radius: 12px;
