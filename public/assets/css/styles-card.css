@@ -165,9 +165,9 @@
   }
 
   /* 1.1) Ajuste fino por guia */
-  #section-card.guide-zion  .flame-layer { top: 70%; }
-  #section-card.guide-lumen .flame-layer { top: 68%; }
-  #section-card.guide-arian .flame-layer { top: 66%; }
+  #section-card.guide-zion  .flame-layer { top: 80%; width: min(67%, 300px); }
+  #section-card.guide-lumen .flame-layer { top: 80%; width: min(67%, 300px); }
+  #section-card.guide-arian .flame-layer { top: 80%; width: min(67%, 300px); }
 
   /* 2) Placeholder menor quando não há selfie */
   #section-card .flame-layer.placeholder-only .flame-selfie {
