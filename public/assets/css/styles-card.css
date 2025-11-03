@@ -181,11 +181,11 @@
 
   /* 1) Placeholder ancorado pelo TOPO (estável no mobile) */
   #section-card .flame-layer {
-    top: 40%;                      /* ~altura do peito */
+    top: 70%;                      /* ~altura do peito */
     left: 50%;
     transform: translate(-50%, -50%);  /* centraliza no ponto de ancoragem */
     bottom: auto !important;           /* NÃO ancorar pelo rodapé no mobile */
-    width: min(90%, 250px);
+    width: min(80%, 320px);
     z-index: 6 !important;
     opacity: 1 !important;
   }
@@ -222,6 +222,15 @@
     padding-bottom: clamp(28px, 6svh, 80px) !important;
     min-height: 100svh; /* viewport estável no mobile */
   }
+}
+/* === Ajuste do placeholder QUANDO o participante NÃO tira selfie === */
+#section-card .flame-layer.placeholder-only .flame-selfie {
+  width: min(68%, 280px);       /* reduz levemente a largura */
+  height: auto;
+  opacity: 0.95;                /* leve transparência opcional */
+  border-radius: 14px;
+  transform: scale(0.94);       /* diminui o tamanho geral */
+  transition: transform 0.4s ease, opacity 0.4s ease;
 }
 
 
