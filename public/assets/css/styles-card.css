@@ -182,12 +182,15 @@
 
   /* 3) Centralização extra de segurança */
   #section-card .flame-layer .flame-selfie {
-    display: block;
-    margin: 0 auto;
-    width: min(78%, 310px);
-    height: auto;
-  }
-
+     display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: min(78%, 310px);
+  height: auto;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
   /* 4) Nome e botão — posições ajustadas */
   #section-card .card-footer {
     bottom: calc(env(safe-area-inset-bottom, 0px) + 84px) !important;
