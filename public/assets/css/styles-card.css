@@ -141,114 +141,77 @@
   border-radius:12px;
   box-shadow:0 0 18px rgba(255,215,120,.25);
 }
-/* === Ajuste final MOBILE (até 600px) === */
+
+/* ==================== MOBILE AJUSTADO — SECTION-CARD ==================== */
 @media (max-width: 600px) {
 
-  /* 🔥 Placeholder (selfie/cruz) — desce ligeiramente e ajusta tamanho */
+  /* 0) Fundo ligeiramente deslocado pra baixo (evita corte do topo) */
+  #section-card #guideBg {
+    transform: translateY(3.5svh);
+  }
+
+  /* 1) Camada da chama centralizada e estável */
   #section-card .flame-layer {
-    bottom: clamp(8px, 1.8svh, 22px);   /* ↓ desce um pouco */
-    width: min(80%, 320px);
-  }
-
-  /* Zion – rosto mais alto → desce um pouco mais */
-  #section-card.guide-zion .flame-layer {
-    bottom: clamp(6px, 1.6svh, 20px);
-    width: min(78%, 310px);
-  }
-
-  /* Nome do participante dentro do card */
-  #section-card .card-footer {
-    bottom: clamp(100px, 16svh, 190px); /* ↓ desce o nome pra dentro da cruz */
-  }
-
-  /* Botão visível e separado */
-  #section-card #btnStartJourney,
-  #section-card #btnNext {
-    bottom: clamp(8px, 2svh, 20px);     /* botão fica mais livre do rodapé */
-    transform: translate(-50%, 0);
-  }
-
-  /* Ajuste opcional — diminui um pouco a fonte do nome no mobile */
-  #section-card .card-name-badge {
-    font-size: 0.9rem;
-    padding: 5px 10px;
-  }
-}
-/* ========= MOBILE FIX (até 600px) ========= */
-@media (max-width: 600px) {
-  /* 0) RESET do BG: remove qualquer translate acidental do guideBg */
-  #section-card #guideBg { transform: translateY(3.5svh); }
-
-  /* 1) Placeholder ancorado pelo TOPO (estável no mobile) */
-  #section-card .flame-layer {
-    top: 58.5%;                      /* ~altura do peito */
-    left: 0%;
+    position: absolute;
+    top: 58.5%;
+    left: 0;
     right: 0;
-    transform:  translateY(-50%);  /* centraliza no ponto de ancoragem */
-    bottom: auto !important;           /* NÃO ancorar pelo rodapé no mobile */
+    transform: translateY(-50%);
+    bottom: auto !important;
     width: auto;
     text-align: center;
     z-index: 6 !important;
     opacity: 1 !important;
   }
 
-  /* 1.1) Ajustes finos por guia */
-  #section-card.guide-zion  .flame-layer { top: 70%; width: min(67%, 300px); }
-  #section-card.guide-lumen .flame-layer { top: 70%; width: min(67%, 300px); }
-  #section-card.guide-arian .flame-layer { top: 70%; width: min(67%, 300px); }
+  /* 1.1) Ajuste fino por guia */
+  #section-card.guide-zion  .flame-layer { top: 70%; }
+  #section-card.guide-lumen .flame-layer { top: 68%; }
+  #section-card.guide-arian .flame-layer { top: 66%; }
 
-  /* 2) Nome do participante: dentro do card, com folga saudável */
-  #section-card .card-footer {
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 72px) !important;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 7;
-    pointer-events: none;
-    text-align: center;
-  }
-  #section-card .card-name-badge {
-    font-size: 0.95rem;
-    padding: 6px 12px;
+  /* 2) Placeholder menor quando não há selfie */
+  #section-card .flame-layer.placeholder-only .flame-selfie {
+    width: min(68%, 280px);
+    height: auto;
+    border-radius: 14px;
+    transform: scale(0.94);
+    opacity: 0.95;
+    margin: 0 auto;
+    transition: transform 0.4s ease, opacity 0.4s ease;
   }
 
-  /* 3) Botão SEM cobrir o rodapé do pergaminho */
-  #section-card #btnStartJourney,
-  #section-card #btnNext {
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 16px) !important;
-    left: 50%; transform: translateX(-50%);
-    z-index: 8;
-  }
-
-  /* 4) Palco com respiro mais compacto para caber tudo */
-  #section-card .card-stage {
-    padding-bottom: clamp(28px, 6svh, 80px) !important;
-    min-height: 100svh; /* viewport estável no mobile */
-  }
-}
-/* === Ajuste do placeholder QUANDO o participante NÃO tira selfie === */
-#section-card .flame-layer.placeholder-only .flame-selfie {
-  width: min(68%, 280px);       /* reduz levemente a largura */
-  height: auto;
-  opacity: 0.95;                /* leve transparência opcional */
-  border-radius: 14px;
-  transform: scale(0.94);       /* diminui o tamanho geral */
-  transition: transform 0.4s ease, opacity 0.4s ease;
-}
-/* Centralização precisa do placeholder */
-#section-card .flame-layer.placeholder-only {
-  top: 58.5%; 
-  left: 0%;
-  right: 0;
-  transform: translateY(-50%);
-  bottom: auto !important;
-  margin: 0 auto;
-  width: auto;  
-  text-align: center;
-}
- #section-card .flame-layer .flame-selfie{
+  /* 3) Centralização extra de segurança */
+  #section-card .flame-layer .flame-selfie {
     display: block;
-    margin: 0 auto;             /* centralizado */
-    width: min(78%, 310px);     /* tamanho com selfie */
+    margin: 0 auto;
+    width: min(78%, 310px);
     height: auto;
   }
+
+  /* 4) Nome e botão — posições ajustadas */
+  #section-card .card-footer {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 84px) !important;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 7;
+    pointer-events: none;
+  }
+
+  #section-card #btnStartJourney,
+  #section-card #btnNext {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 18px) !important;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 8;
+    position: absolute;
+  }
+
+  /* 5) Palco com altura segura e respiro */
+  #section-card .card-stage {
+    padding-bottom: clamp(28px, 6svh, 80px) !important;
+    min-height: 100svh;
+  }
+}
+
 
