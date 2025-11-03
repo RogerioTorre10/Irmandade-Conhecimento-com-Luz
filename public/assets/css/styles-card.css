@@ -14,9 +14,9 @@
 }
 
 /* fino por guia (porque o enquadramento muda) */
-#section-card.guide-zion .card-footer{  bottom: clamp(200px, 30vh, 320px); }
-#section-card.guide-lumen .card-footer{ bottom: clamp(185px, 28vh, 300px); }
-#section-card.guide-arian .card-footer{ bottom: clamp(170px, 25vh, 280px); }
+#section-card.guide-zion .card-footer{  bottom: clamp(190px, 30vh, 320px); }
+#section-card.guide-lumen .card-footer{ bottom: clamp(190px, 28vh, 300px); }
+#section-card.guide-arian .card-footer{ bottom: clamp(190px, 25vh, 280px); }
 
 
   /* Centro transparente (sem vidro/lente) */
