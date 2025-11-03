@@ -181,11 +181,11 @@
 
   /* 1) Placeholder ancorado pelo TOPO (estável no mobile) */
   #section-card .flame-layer {
-    top: 90%;                      /* ~altura do peito */
+    top: 40%;                      /* ~altura do peito */
     left: 50%;
     transform: translate(-50%, -50%);  /* centraliza no ponto de ancoragem */
     bottom: auto !important;           /* NÃO ancorar pelo rodapé no mobile */
-    width: min(40%, 300px);
+    width: min(90%, 250px);
     z-index: 6 !important;
     opacity: 1 !important;
   }
