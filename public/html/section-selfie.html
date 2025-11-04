@@ -42,25 +42,33 @@
     </div>
 
     <!-- Controles principais -->
-    <div class="selfie-controls">
-      <div class="ranges">
-        <label>Zoom Geral
-          <input id="zoomAll" type="range" min="1" max="2.5" step="0.01" value="1" />
-        </label>
-        <label>Zoom Horizontal
-          <input id="zoomX" type="range" min="1" max="2.5" step="0.01" value="1" />
-        </label>
-        <label>Zoom Vertical
-          <input id="zoomY" type="range" min="1" max="2.5" step="0.01" value="1" />
-        </label>
-      </div>
+ <div class="selfie-controls">
 
-      <div class="btn-row">
-        <button id="startCamBtn" class="btn btn-stone-espinhos">Ativar Câmera</button>
-        <button id="btn-selfie-previa" class="btn btn-stone-espinhos" disabled>Prévia</button>
-        <button id="btn-selfie-confirm" class="btn btn-stone-espinhos" disabled>Confirmar</button>
-      </div>
+  <div class="ranges-panel">
+    <div class="range-row">
+      <span class="range-label">Zoom Geral</span>
+      <input id="zoomAll" type="range" min="1" max="2.5" step="0.01" value="1">
+      <span class="range-val" id="zoomAllVal">1.00×</span>
     </div>
+    <div class="range-row">
+      <span class="range-label">Zoom Horizontal</span>
+      <input id="zoomX" type="range" min="1" max="2.5" step="0.01" value="1">
+      <span class="range-val" id="zoomXVal">1.00×</span>
+    </div>
+    <div class="range-row">
+      <span class="range-label">Zoom Vertical</span>
+      <input id="zoomY" type="range" min="1" max="2.5" step="0.01" value="1">
+      <span class="range-val" id="zoomYVal">1.00×</span>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button id="startCamBtn" class="btn btn-stone-espinhos">Ativar Câmera</button>
+    <button id="btn-selfie-previa" class="btn btn-stone-espinhos" disabled>Prévia</button>
+    <button id="btn-selfie-confirm" class="btn btn-stone-espinhos" disabled>Confirmar</button>
+  </div>
+
+</div>
 
     <!-- Container de vídeo e chama -->
     <div class="selfie-preview">
