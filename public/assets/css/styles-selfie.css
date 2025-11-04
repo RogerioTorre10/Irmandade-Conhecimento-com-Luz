@@ -275,3 +275,37 @@
   z-index: 1;
   pointer-events: none;
 }
+/* Painel de sliders igual ao 1º print */
+.ranges-panel{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding:14px 16px;
+  border-radius:12px;
+  background:rgba(0,0,0,.25);
+  box-shadow:0 6px 16px rgba(0,0,0,.35) inset, 0 2px 8px rgba(0,0,0,.25);
+  max-width:520px;
+  margin:10px auto 14px;
+}
+.range-row{
+  display:grid;
+  grid-template-columns: 150px 1fr 56px;
+  align-items:center;
+  gap:10px;
+}
+.range-label{ opacity:.9; font-weight:600; }
+.range-val{ text-align:right; font-variant-numeric: tabular-nums; }
+
+/* Barra de botões logo abaixo do painel */
+.selfie-controls .btn-row{
+  display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
+  margin-top:6px; margin-bottom:12px;
+}
+
+/* Mostrar título e texto orientativo */
+.titulo-pergaminho{ display:block; }
+.moldura-orientacao .texto-orientacao{ display:block; }
+
+/* Esconde mensagens até serem usadas por JS */
+#selfie-error, .selfie-status{ display:none; }
+.hidden{ display:none !important; } /* garante o efeito "hidden" global */
