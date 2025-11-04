@@ -100,12 +100,13 @@
 #section-card #btnStartJourney,
 #section-card #btnNext{
   position: absolute;
+  bottom: clamp(12px, 4vh, 32px); /* Bem abaixo do card */
   left: 50%;
   transform: translateX(-50%);
-  bottom: calc(var(--inset, 16px) + 62px);
   z-index: 8;
-  pointer-events: auto !important;
+  pointer-events: auto;
 }
+
 @media print { #section-card #btnStartJourney { display: none !important; } }
 @media (max-height: 720px) {
   #section-card .card-footer {
