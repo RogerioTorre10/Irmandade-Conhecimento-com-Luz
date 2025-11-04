@@ -156,11 +156,8 @@
 }
 /* Ajuste fino do placeholder dentro do card no desktop */
 #section-card .flame-layer.placeholder-only {
-  height: auto;
-  min-height: clamp(180px, 32vh, 280px); /* garante espaço vertical */
-  bottom: clamp(72px, 12vh, 120px);
-  transform: translateX(-50%) translateY(-8%);
-  position: absolute;
+  bottom: clamp(36px, 6vh, 72px); /* Subiu um pouco */
+  transform: translateX(-50%) translateY(-4%); /* Leve subida */
 }
 
 /* Posiciona o container "USUÁRIO" na base do placeholder */
