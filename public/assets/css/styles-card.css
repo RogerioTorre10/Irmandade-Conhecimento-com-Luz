@@ -99,7 +99,7 @@
 /* 5) Botão flutuante (não imprime) */
 #section-card #btnStartJourney,
 #section-card #btnNext{
-  bottom: clamp(36px, 6vh, 24px); /* Subiu em relação à base */
+  bottom: clamp(36px, 6vh, 10px); /* Subiu em relação à base */
   left: 50%;
   transform: translateX(-50%);
   z-index: 8;
