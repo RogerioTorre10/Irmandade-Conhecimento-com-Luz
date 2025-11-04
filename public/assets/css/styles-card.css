@@ -154,6 +154,21 @@
   opacity: 0.95;
   transition: transform 0.4s ease, opacity 0.4s ease;
 }
+/* Ajuste fino do placeholder dentro do card no desktop */
+#section-card .flame-layer.placeholder-only {
+  bottom: clamp(36px, 6vh, 72px); /* Subiu um pouco */
+  transform: translateX(-50%) translateY(-4%); /* Leve subida */
+}
+
+/* Posiciona o container "USUÁRIO" na base do placeholder */
+#section-card .flame-layer.placeholder-only .card-name-badge {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 7;
+}
+
 
 /* ==================== MOBILE AJUSTADO — SECTION-CARD ==================== */
 @media (max-width: 600px) {
