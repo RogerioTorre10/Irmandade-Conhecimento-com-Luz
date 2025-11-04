@@ -4,43 +4,49 @@
 <section id="section-selfie" class="j-section pergaminho pergaminho-h epic selfie-page hidden" data-section="selfie">
   <div class="conteudo-pergaminho">
 
-    <!-- Cabeçalho -->
     <header class="selfie-header">
       <h2 id="selfie-title" data-typing="true" data-text="Tirar sua Foto" data-speed="30"></h2>
-      <button id="btn-skip-selfie" class="btn" data-transition-src="/assets/videos/filme-selfie-card.mp4">
-        Não quero foto / Iniciar
-      </button>
+      <button id="btn-skip-selfie" class="btn-stone-espinhos">Não quero foto / Iniciar</button>
     </header>
 
-    <!-- Texto de orientação -->
     <div id="selfieOrientWrap">
       <p id="selfieTexto" data-speed="36"></p>
     </div>
 
-    <!-- Zoom (apenas visual, valor fixo depois) -->
+    <!-- 3 ZOOMS -->
     <div class="ranges-panel">
       <div class="range-row">
-        <span class="range-label">Zoom</span>
-        <input id="zoomAll" type="range" min="0.5" max="1.5" step="0.01" value="0.8">
-        <span class="range-val" id="zoomAllVal">0.80×</span>
+        <span class="range-label">Zoom Geral</span>
+        <input id="zoomAll" type="range" min="0.4" max="1.2" step="0.01" value="0.6">
+        <span class="range-val" id="zoomAllVal">0.60×</span>
+      </div>
+      <div class="range-row">
+        <span class="range-label">Zoom Horizontal</span>
+        <input id="zoomX" type="range" min="0.8" max="1.4" step="0.01" value="1.0">
+        <span class="range-val" id="zoomXVal">1.00×</span>
+      </div>
+      <div class="range-row">
+        <span class="range-label">Zoom Vertical</span>
+        <input id="zoomY" type="range" min="0.8" max="1.4" step="0.01" value="1.0">
+        <span class="range-val" id="zoomYVal">1.00×</span>
       </div>
     </div>
 
-    <!-- Botões -->
+    <!-- BOTÕES COM MOLDURA -->
     <div class="btn-row">
-      <button id="startCamBtn" class="btn">Abrir Câmera</button>
-      <button id="btn-selfie-capture" class="btn" disabled>Capturar</button>
-      <button id="btn-selfie-confirm" class="btn" disabled>Confirmar</button>
+      <button id="startCamBtn" class="btn-stone-espinhos">Abrir Câmera</button>
+      <button id="btn-selfie-capture" class="btn-stone-espinhos" disabled>Capturar</button>
+      <button id="btn-selfie-confirm" class="btn-stone-espinhos" disabled>Confirmar</button>
     </div>
 
-    <!-- Preview da câmera -->
+    <!-- PREVIEW -->
     <div class="selfie-preview-wrap">
       <div class="preview-frame">
         <img id="selfiePreview" src="/assets/img/orbe-dourado-placeholder.jpg" alt="Pré-visualização">
         <video id="selfieVideo" autoplay playsinline muted style="display:none"></video>
         <canvas id="selfieCanvas" style="display:none"></canvas>
       </div>
-      <small class="preview-hint">Posicione o rosto no centro. O zoom será ajustado automaticamente.</small>
+      <small class="preview-hint">Afaste um pouco o celular. O enquadramento será ajustado automaticamente.</small>
     </div>
 
     <div id="selfie-error" class="hidden">
