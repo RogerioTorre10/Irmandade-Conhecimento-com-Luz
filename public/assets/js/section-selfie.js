@@ -1,14 +1,11 @@
-/* section-selfie.js — FINAL: ZOOM FIXO 0.75, SEM MOLDURA */
+/* section-selfie.js — FINAL CORRIGIDO */
 (function (global) {
   'use strict';
   const NS = (global.JCSelfie = global.JCSelfie || {});
   if (NS.__final) return;
   NS.__final = true;
 
-  const SECTION_ID = 'section-selfie';
-  const NEXT_ID = 'section-card';
-  const TRANSITION_VIDEO = '/assets/videos/filme-card-dourado.mp4';
-  const FINAL_ZOOM = 0.75; // Zoom ideal para o card
+  const FINAL_ZOOM = 0.65; // Ideal pro card
 
   let stream = null, videoEl, canvasEl, previewImg;
   let lastCapture = null;
@@ -44,10 +41,16 @@
   }
 
   function updateZoom() {
-    const zoom = +document.getElementById('zoomAll').value;
-    document.getElementById('zoomAllVal').textContent = zoom.toFixed(2) + '×';
+    const a = +document.getElementById('zoomAll').value;
+    const x = +document.getElementById('zoomX').value;
+    const y = +document.getElementById('zoomY').value;
+    document.getElementById('zoomAllVal').textContent = a.toFixed(2) + '×';
+    document.getElementById('zoomXVal').textContent = x.toFixed(2) + '×';
+    document.getElementById('zoomYVal').textContent = y.toFixed(2) + '×';
+
+    const sx = a * x, sy = a * y;
     [videoEl, canvasEl].forEach(el => {
-      if (el) el.style.transform = `translate(-50%,-50%) scale(${zoom})`;
+      if (el) el.style.transform = `translate(-50%,-50%) scaleX(${sx}) scaleY(${sy})`;
     });
   }
 
@@ -63,6 +66,7 @@
       canvasEl.style.display = 'none';
       previewImg.style.display = 'none';
       document.getElementById('btn-selfie-capture').disabled = false;
+      updateZoom();
     } catch (e) {
       toast('Câmera bloqueada. Ative as permissões.');
       document.getElementById('selfie-error').style.display = 'block';
@@ -79,13 +83,11 @@
     const canvas = canvasEl;
     const video = videoEl;
     const ctx = canvas.getContext('2d');
-    const container = canvas.parentElement;
-    const w = container.clientWidth;
-    const h = container.clientHeight;
+    const w = canvas.parentElement.clientWidth;
+    const h = canvas.parentElement.clientHeight;
 
     canvas.width = w; canvas.height = h;
 
-    // Aplica zoom FIXO para o card
     const scale = FINAL_ZOOM;
     const sw = w / scale, sh = h / scale;
     const sx = (video.videoWidth - sw) / 2;
@@ -99,8 +101,8 @@
     document.getElementById('btn-selfie-confirm').disabled = false;
   }
 
-  function playTransitionAndGo(savePhoto = false) {
-    if (savePhoto && lastCapture) {
+  function playTransitionAndGo(save = false) {
+    if (save && lastCapture) {
       global.JC = global.JC || {}; global.JC.data = global.JC.data || {};
       global.JC.data.selfieDataUrl = lastCapture;
       try { localStorage.setItem('jc.selfieDataUrl', lastCapture); } catch {}
@@ -109,15 +111,15 @@
     }
 
     if (global.VideoTransicao?.play) {
-      global.VideoTransicao.play({ src: TRANSITION_VIDEO, onEnd: () => goTo(NEXT_ID) });
+      global.VideoTransicao.play({ src: '/assets/videos/filme-card-dourado.mp4', onEnd: () => goTo('section-card') });
     } else {
       const v = document.createElement('video');
-      v.src = TRANSITION_VIDEO;
+      v.src = '/assets/videos/filme-card-dourado.mp4';
       v.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:9999;background:#000;';
       v.muted = v.playsInline = true;
-      v.onended = () => { v.remove(); goTo(NEXT_ID); };
+      v.onended = () => { v.remove(); goTo('section-card'); };
       document.body.appendChild(v);
-      v.play().catch(() => { v.remove(); goTo(NEXT_ID); });
+      v.play().catch(() => { v.remove(); goTo('section-card'); });
     }
   }
 
@@ -136,9 +138,8 @@
     }
   }
 
-  // INIT
   document.addEventListener('sectionLoaded', e => {
-    if (e.detail?.sectionId !== SECTION_ID) return;
+    if (e.detail?.sectionId !== 'section-selfie') return;
 
     videoEl = document.getElementById('selfieVideo');
     canvasEl = document.getElementById('selfieCanvas');
@@ -150,28 +151,21 @@
 
     setTimeout(() => {
       typeWriter(title, title.dataset.text, 40);
-      const fullText = `${name}, posicione o rosto no centro. A foto será ajustada automaticamente.`;
+      const fullText = `${name}, afaste um pouco o celular. O enquadramento será ajustado automaticamente.`;
       typeWriter(texto, fullText, 36);
       speak(fullText);
     }, 300);
 
-    document.getElementById('zoomAll').oninput = updateZoom;
+    document.querySelectorAll('input[type=range]').forEach(input => input.oninput = updateZoom);
     updateZoom();
 
     document.getElementById('startCamBtn').onclick = startCamera;
     document.getElementById('btn-selfie-capture').onclick = capture;
     document.getElementById('btn-selfie-confirm').onclick = () => playTransitionAndGo(true);
     document.getElementById('btn-skip-selfie').onclick = () => { stopCamera(); playTransitionAndGo(false); };
-
-    document.addEventListener('sectionWillHide', ev => {
-      if (ev.detail?.sectionId === SECTION_ID) stopCamera();
-    });
   });
 
-  if (document.readyState !== 'loading') {
-    const section = document.getElementById(SECTION_ID);
-    if (section && section.classList.contains('active')) {
-      setTimeout(() => document.dispatchEvent(new CustomEvent('sectionLoaded', { detail: { sectionId: SECTION_ID } })), 100);
-    }
-  }
+  document.addEventListener('sectionWillHide', e => {
+    if (e.detail?.sectionId === 'section-selfie') stopCamera();
+  });
 })(window);
