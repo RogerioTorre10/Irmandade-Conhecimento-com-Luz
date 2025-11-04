@@ -100,7 +100,7 @@
 #section-card #btnStartJourney,
 #section-card #btnNext{
   position: absolute;
-  bottom: clamp(12px, 4vh, 32px); /* Bem abaixo do card */
+  bottom: clamp(12px, 4vh, 72px); /* Bem abaixo do card */
   left: 50%;
   transform: translateX(-50%);
   z-index: 8;
