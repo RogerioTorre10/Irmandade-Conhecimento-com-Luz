@@ -1,125 +1,69 @@
-/* ======= SECTION-CARD · Modo “só o CARD” (sem lente) — v2.1 ======= */
-
-/* 1) Some com a lente, se ainda existir no DOM */
-#section-card .lens { display: none !important; }
-
-#section-card .card-footer{
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
-  bottom: calc(var(--inset, 16px) + 56px);
-  z-index:7;
-  text-align:center;
-  pointer-events: auto !important;
+/* ===================== CARD BASE ===================== */
+#section-card {
+  position: relative;
+  display: block;
+  min-height: 100vh;
+  background: transparent;
+  z-index: 2;
 }
 
-/* fino por guia (porque o enquadramento muda) */
-#section-card.guide-zion .card-footer{  bottom: clamp(190px, 30vh, 320px); }
-#section-card.guide-lumen .card-footer{ bottom: clamp(190px, 28vh, 300px); }
-#section-card.guide-arian .card-footer{ bottom: clamp(190px, 25vh, 280px); }
+/* ===================== BACKGROUND ===================== */
+#guideBg {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+  position: relative;
+  z-index: 1;
+}
 
-
-  /* Centro transparente (sem vidro/lente) */
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-
-  /* borda fininha dourada + leve sombra interna para contraste */
-/* Garantir que a seção esteja visível e acima do pergaminho */
-#section-card { display: block !important; position: relative; z-index: 2; }
-
-/* O overlay do pergaminho deve ficar por baixo do card */
-.pergaminho::before { z-index: 0 !important; pointer-events: none !important; }
-#section-card .card-stage { position: relative; z-index: 5; }
-
-/* Corpo do card + espaço para rodapé */
-#section-card .card-stage {
-  margin-top: min(-4vw, -48px);
+/* ===================== CARD STAGE ===================== */
+.card-stage {
+  position: relative;
+  margin-top: -48px;
+  padding-bottom: 120px;
   min-height: clamp(560px, 66vw, 920px);
-  padding-bottom: clamp(40px, 8vh, 120px);
-  overflow: hidden;
+  overflow: visible;
+  z-index: 2;
 }
 
-/* BG sempre visível (mesmo sem a <img>) */
-#section-card #guideBg {
-  position: relative;   /* cria contexto */
-  z-index: 4;           /* abaixo da chama */
-  display:block !important;
-  width:100% !important;
-  height:auto !important;
-  object-fit:cover;
-}
-/* Chama e nome acima do BG */
-#section-card .flame-layer{
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
-  bottom: clamp(28px, 5.6vh, 68px);
-  width: clamp(150px, 38%, 350px);
-  z-index: 6 !important;     /* ↑ acima do BG */
-  opacity: 0;
-  pointer-events: auto !important;
-  transition: opacity .6s ease;
-}
-  border: 1px solid rgba(255, 225, 180, 0.38) !important;
-  box-shadow:
-    inset 0 0 20px rgba(0,0,0,0.18) !important;
-
-  pointer-events: none !important;
-  z-index: 6 !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-
-/* 3) Aura dourada sutil pulsante ao redor do CARD */
-#section-card .card-frame::after,
-#section-card .flame-layer::after {
-  content: "";
-  position: absolute; inset: -2px;
-  border-radius: inherit;
-  pointer-events: auto !important;
-  box-shadow:
-    0 0 0 2px rgba(255,220,150,.32),
-    0 0 28px rgba(255,205,110,.36),
-    0 0 120px rgba(255,195,90,.24);
-  opacity: .9;
-  animation: aura-gold-card 3.6s ease-in-out infinite;
-}
-@keyframes aura-gold-card{
-  0%  { box-shadow:0 0 0 1px rgba(255,220,150,.26),0 0 18px rgba(255,205,110,.26),0 0 80px rgba(255,195,90,.18); opacity:.75; }
-  50% { box-shadow:0 0 0 3px rgba(255,235,180,.52),0 0 38px rgba(255,215,140,.56),0 0 160px rgba(255,205,100,.34); opacity:1; }
-  100%{ box-shadow:0 0 0 1px rgba(255,220,150,.26),0 0 18px rgba(255,205,110,.26),0 0 80px rgba(255,195,90,.18); opacity:.75; }
-}
-
-/* 4) Garantias de camada: pergaminho no fundo, conteúdo acima */
-#section-card { position: relative; min-height: 100vh; }
-#section-card.pergaminho::before { z-index: 0 !important; pointer-events: none !important; }
-#section-card .conteudo-pergaminho { position: relative !important; z-index: 5 !important; }
-
-/* 5) Botão flutuante (não imprime) */
-#section-card #btnStartJourney,
-#section-card #btnNext{
+/* ===================== FLAME LAYER ===================== */
+.flame-layer {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: calc(var(--inset, 16px) + 12px);
-  z-index: 8;
-  pointer-events: auto !important;
+  bottom: clamp(48px, 8vh, 120px);
+  width: clamp(180px, 38%, 360px);
+  z-index: 3;
+  pointer-events: none;
 }
-@media print { #section-card #btnStartJourney { display: none !important; } }
-@media (max-height: 720px) {
-  #section-card .card-footer {
-    bottom: calc(var(--inset) + 44px);
-  }
+
+.flame-selfie {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 0 18px rgba(255,215,120,.25);
 }
-#section-card .card-name-badge{
+
+/* ===================== CARD FOOTER ===================== */
+.card-footer {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: clamp(24px, 6vh, 72px);
+  text-align: center;
+  z-index: 4;
+  pointer-events: auto;
+}
+
+.card-name-badge {
   display: inline-block;
   padding: 6px 14px;
   border-radius: 10px;
   border: 1px solid rgba(255,225,180,.45);
   background: rgba(0,0,0,.40);
   backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
   color: #f6e7c6;
   font-weight: 600;
   letter-spacing: .6px;
@@ -127,136 +71,48 @@
   text-shadow: 0 1px 2px rgba(0,0,0,.6);
 }
 
-/* Compacta em telas menores */
- @media (max-height: 720px) {
-  #section-card .flame-layer { bottom: clamp(18px, 4vh, 64px); }
-  #section-card .card-footer { bottom: calc(var(--inset, 16px) + 72px); }
-}
-#section-card .flame-layer.show { opacity:1 !important; }
-#section-card .flame-selfie{
-  display:block;
-  width:100%;
-  height:auto;
-  object-fit:cover;
-  border-radius:12px;
-  box-shadow:0 0 18px rgba(255,215,120,.25);
-}
-/* Ajuste do placeholder no desktop por guia */
-#section-card.guide-zion .flame-layer.placeholder-only .flame-selfie,
-#section-card.guide-lumen .flame-layer.placeholder-only .flame-selfie,
-#section-card.guide-arian .flame-layer.placeholder-only .flame-selfie {
-  width: clamp(180px, 28%, 320px);
-  height: auto;
-  border-radius: 14px;
-  margin: 0 auto;
-  transform: scale(0.96);
-  opacity: 0.95;
-  transition: transform 0.4s ease, opacity 0.4s ease;
-}
-
-/* 🔼 Subida mais precisa do placeholder */
-#section-card .flame-layer.placeholder-only {
-  bottom: clamp(72px, 12vh, 120px); /* Subiu mais */
-  transform: translateX(-50%) translateY(-8%); /* Leve subida vertical */
-}
-
-/* 📛 Nome "USUÁRIO" alinhado à base do placeholder */
-#section-card .flame-layer.placeholder-only .card-name-badge {
+/* ===================== BOTÃO CONTINUAR ===================== */
+#btnStartJourney {
   position: absolute;
-  bottom: 8px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 7;
+  bottom: clamp(12px, 4vh, 48px);
+  z-index: 5;
   pointer-events: auto;
+  visibility: visible;
+  opacity: 1;
 }
 
-/* ⬇️ Botão "Continuar" fora do card */
-#section-card #btnNext {
-  position: absolute;
-  bottom: clamp(12px, 4vh, 32px); /* Bem abaixo do card */
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 8;
-  pointer-events: auto;
-}
-
-
-/* ==================== MOBILE AJUSTADO — SECTION-CARD ==================== */
+/* ===================== MOBILE AJUSTES ===================== */
 @media (max-width: 600px) {
-
-  /* 0) Fundo ligeiramente deslocado pra baixo (evita corte do topo) */
-  #section-card #guideBg {
-    transform: translateY(3.5svh);
-  }
-
-  /* 1) Camada da chama centralizada e estável */
-  #section-card .flame-layer {
-    position: absolute;
-    top: 80%;
+  .flame-layer {
+    top: 70%;
     left: 0;
     right: 0;
     transform: translateY(-50%);
-    bottom: auto !important;
-    width:  auto;
+    bottom: auto;
+    width: auto;
     text-align: center;
-    z-index: 6 !important;
-    opacity: 1 !important;
-    pointer-events: none !important;
   }
 
- /* 1.1) Ajustes finos por guia */
-  #section-card.guide-zion  .flame-layer { top: 70%; width: auto; }
-  #section-card.guide-lumen .flame-layer { top: 70%; width: auto; }
-  #section-card.guide-arian .flame-layer { top: 70%; width: auto; }
-
-  /* 2) Placeholder menor quando não há selfie */
-  #section-card .flame-layer.placeholder-only .flame-selfie {
+  .flame-selfie {
     width: min(60%, 310px);
-    height: auto;
-    border-radius: 14px;
-    transform: scale(0.94);
-    opacity: 0.95;
     margin: 0 auto;
-    transition: transform 0.4s ease, opacity 0.4s ease;
+    border-radius: 14px;
   }
 
-  /* 3) Centralização extra de segurança */
-  #section-card .flame-layer .flame-selfie {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: min(60%, 310px);
-  height: auto;
-  position: relative;
-  border-radius: 12px;
-  left: 0%;
-  transform: none !important;
-}
-  /* 4) Nome e botão — posições ajustadas */
-  #section-card .card-footer {
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 72px) !important;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    z-index: 7;
-    pointer-events: none;
+  .card-footer {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 72px);
+    pointer-events: auto;
   }
 
-  #section-card #btnStartJourney,
-  #section-card #btnNext {
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 18px) !important;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 15;
-    position: absolute;
-    pointer-events: none !important;
+  #btnStartJourney {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+    z-index: 10;
   }
 
-  /* 5) Palco com altura segura e respiro */
-  #section-card .card-stage {
-    padding-bottom: clamp(44px, 9svh, 120px) !important;
+  .card-stage {
+    padding-bottom: clamp(44px, 9svh, 120px);
     min-height: 100svh;
   }
 }
-
-
