@@ -100,7 +100,7 @@
 #section-card #btnNext,
 #section-card #btnStartJourney {
   position: absolute;
-  bottom: clamp(36px, 6vh, 64px); /* altura ajustável */
+  bottom: clamp(36px, 6vh, 24px); /* altura ajustável */
   left: 50%;
   transform: translateX(-50%);
   z-index: 999; /* bem acima de tudo */
