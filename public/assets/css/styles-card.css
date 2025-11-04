@@ -55,7 +55,7 @@
   left:50%;
   transform:translateX(-50%);
   bottom: clamp(28px, 5.6vh, 68px);
-  width: clamp(180px, 38%, 320px);
+  width: clamp(150px, 38%, 250px);
   z-index: 6 !important;     /* ↑ acima do BG */
   opacity: 0;
   pointer-events: auto !important;
