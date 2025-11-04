@@ -166,7 +166,7 @@
 /* Posiciona o container "USUÁRIO" na base do placeholder */
 #section-card .flame-layer.placeholder-only .card-name-badge {
   position: absolute;
-  bottom: -16px;
+  bottom: -20px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 7;
@@ -218,7 +218,7 @@
   display: block;
   margin-left: auto;
   margin-right: auto;
-  width: min(60%, 310px);
+  width: auto;
   height: auto;
   position: relative;
   border-radius: 12px;
