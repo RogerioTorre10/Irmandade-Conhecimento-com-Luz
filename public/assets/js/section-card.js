@@ -189,17 +189,41 @@
       badge.appendChild(userNameSlot);
     }
 
-    // 7) Ações (botão continuar)
-    let btnNext = root.querySelector('#btnNext, .btn-next-card');
-    if (!btnNext) {
-      const actions = root.querySelector('.card-actions') || root.appendChild(Object.assign(document.createElement('div'), {className:'card-actions'}));
-      btnNext = document.createElement('button');
-      btnNext.id = 'btnNext';
-      btnNext.className = 'btn btn-stone';
-      btnNext.textContent = 'Continuar';
-      actions.appendChild(btnNext);
-    }
+   // 7) Ações (botão continuar)
+let btnNext = root.querySelector('#btnNext, .btn-next-card');
+if (!btnNext) {
+  const actions = root.querySelector('.card-actions') ||
+    root.appendChild(Object.assign(document.createElement('div'), { className: 'card-actions' }));
 
+  btnNext = document.createElement('button');
+  btnNext.id = 'btnNext';
+  btnNext.className = 'btn btn-stone';
+  btnNext.textContent = 'Continuar';
+  actions.appendChild(btnNext);
+}
+
+// --- garante que o botão fique habilitado e clicável ---
+btnNext.disabled = false;
+btnNext.removeAttribute('aria-disabled');
+btnNext.style.pointerEvents = 'auto';
+btnNext.style.opacity = '1';
+btnNext.style.cursor = 'pointer';
+btnNext.style.zIndex = '9999';
+
+// --- adiciona o evento de clique para ir à próxima seção ---
+btnNext.addEventListener('click', (ev) => {
+  ev.stopPropagation();   // evita interferência de camadas acima
+  ev.preventDefault();
+  console.log('[section-card.js] Botão Continuar clicado!');
+  if (typeof playTransitionThenGo === 'function') {
+    playTransitionThenGo('section-perguntas'); // ou o ID da próxima seção
+  } else if (window.JC?.nextSection) {
+    JC.nextSection('section-perguntas');
+  } else {
+    console.warn('Função de transição não encontrada.');
+  }
+});
+    
     return { stage, guideBg, guideNameSlot, flameLayer, flameSelfie, userNameSlot, btnNext };
   }
 
