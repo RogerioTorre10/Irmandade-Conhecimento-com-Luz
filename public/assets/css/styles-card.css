@@ -99,11 +99,11 @@
 /* 5) Botão flutuante (não imprime) */
 #section-card #btnStartJourney,
 #section-card #btnNext{
-  position: absolute;
+  bottom: clamp(36px, 6vh, 64px); /* Subiu em relação à base */
   left: 50%;
   transform: translateX(-50%);
-  bottom: clamp(12px, 4vh, 32px)
   z-index: 8;
+  position: absolute;
   pointer-events: auto;
 }
 @media print { #section-card #btnStartJourney { display: none !important; } }
