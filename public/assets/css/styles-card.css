@@ -7,7 +7,7 @@
   position:absolute;
   left:50%;
   transform:translateX(-50%);
-  bottom: calc(var(--inset, 16px) + 72px);
+  bottom: calc(var(--inset, 16px) + 56px);
   z-index:7;
   text-align:center;
   pointer-events: auto !important;
@@ -129,8 +129,8 @@
 
 /* Compacta em telas menores */
  @media (max-height: 720px) {
-  #section-card .flame-layer { bottom: clamp(18px, 4vh, 54px); }
-  #section-card .card-footer { bottom: calc(var(--inset, 16px) + 46px); }
+  #section-card .flame-layer { bottom: clamp(18px, 4vh, 64px); }
+  #section-card .card-footer { bottom: calc(var(--inset, 16px) + 72px); }
 }
 #section-card .flame-layer.show { opacity:1 !important; }
 #section-card .flame-selfie{
