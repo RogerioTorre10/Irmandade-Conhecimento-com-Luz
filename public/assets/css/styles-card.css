@@ -167,8 +167,8 @@
 #section-card .flame-layer.placeholder-only .card-name-badge {
   position: absolute;
   bottom: -20px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: auto;
+  transform: auto;
   z-index: 7;
   pointer-events: auto;
 }
