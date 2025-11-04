@@ -141,41 +141,6 @@
   border-radius:12px;
   box-shadow:0 0 18px rgba(255,215,120,.25);
 }
-/* ==================== AJUSTES DESKTOP — HARMONIA PERFEITA (min-width: 601px) ==================== */
-@media (min-width: 601px) {
-
-  /* 1) Subir o placeholder (flame-layer) — mais alto e harmonioso */
-  #section-card .flame-layer {
-    bottom: clamp(110px, 16vh, 190px);
-    transform: translateX(-50%) translateY(-18%);
-    width: clamp(180px, 40%, 420px);
-  }
-
-  /* 2) Placeholder-only: centraliza e alinha na base */
-  #section-card .flame-layer.placeholder-only {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    padding-bottom: 14px;
-  }
-
-  /* 3) Nome do usuário: desce até "encostar" na base da selfie */
-  #section-card .card-footer {
-    bottom: clamp(56px, 8vh, 200px);
-    transform: translateX(-50%) translateY(-50%);
-    margin-top: -18px;
-    pointer-events: auto;
-  }
-
-  /* 4) Botão Continuar: logo abaixo do nome */
-  #section-card #btnNext,
-  #section-card #btnStartJourney {
-    bottom: clamp(18px, 3vh, 64px);
-    transform: translateX(-50%);
-    z-index: 10;
-    opacity: 1;
-    pointer-events: auto;
-  }
 
   /* ==================== AJUSTES POR GUIA (DESKTOP) ==================== */
   #section-card.guide-zion .flame-layer   { bottom: clamp(120px, 17vh, 200px); }
