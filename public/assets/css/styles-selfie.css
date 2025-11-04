@@ -1,8 +1,7 @@
 /* =======================================================
-   STYLES-SELFIE.CSS — versão completa com brilho pulsante
+   STYLES-SELFIE.CSS — VERSÃO LIMPA, FUNCIONAL E MEDIEVAL
    ======================================================= */
 
-/* Reset básico */
 #section-selfie {
   display: flex;
   flex-direction: column;
@@ -10,11 +9,12 @@
   justify-content: flex-start;
   width: 100%;
   min-height: 100vh;
-  background:  transparent !important;
+  background: transparent !important;
   padding: 10px 0 30px;
   box-sizing: border-box;
 }
 
+/* Cabeçalho */
 .selfie-header {
   width: 92%;
   max-width: 820px;
@@ -30,6 +30,8 @@
   font-size: 22px;
   margin: 0;
   text-shadow: 0 1px 3px rgba(0,0,0,0.75);
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 
 /* Texto de orientação */
@@ -50,99 +52,108 @@
   margin: 0;
   opacity: 0;
   transition: opacity .5s ease;
-  text-align: left;
   white-space: normal;
   word-wrap: break-word;
 }
 
-/* Controles de zoom */
-#selfieControls {
-  margin: 6px auto 8px;
-  width: 92%;
-  max-width: 820px;
+/* Painel de Zoom */
+.ranges-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 12px;
   background: rgba(0,0,0,.32);
   border: 1px solid rgba(255,255,255,.07);
-  border-radius: 12px;
-  padding: 8px 10px;
+  max-width: 520px;
+  margin: 10px auto 14px;
   color: #f9e7c2;
   font-family: 'Cardo', serif;
   font-size: 14px;
 }
 
-#selfieControls .row {
+.range-row {
   display: grid;
-  grid-template-columns: 130px 1fr 56px;
-  gap: 8px;
+  grid-template-columns: 150px 1fr 56px;
   align-items: center;
-  margin: 4px 0;
+  gap: 10px;
 }
 
-#selfieControls input[type=range] {
+.range-label {
+  opacity: .9;
+  font-weight: 600;
+}
+
+.range-val {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+input[type=range] {
   width: 100%;
   height: 4px;
   border-radius: 2px;
   background: #555;
   outline: none;
+  -webkit-appearance: none;
 }
 
-#selfieControls input[type=range]::-webkit-slider-thumb {
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
   background: #f9e7c2;
   border-radius: 50%;
   width: 14px;
   height: 14px;
+  cursor: pointer;
 }
 
-/* Botões principais */
-#selfieButtons {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 8px;
-  margin: 8px auto;
-  width: 92%;
-  max-width: 820px;
+/* Botões */
+.btn-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 6px auto 12px;
+  max-width: 520px;
 }
 
-#selfieButtons .btn {
+.btn {
   height: 36px;
   line-height: 36px;
-  padding: 0 10px;
+  padding: 0 16px;
   font-size: 14px;
+  font-family: 'Cardo', serif;
+  font-weight: 700;
+  letter-spacing: .3px;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0,0,0,.25);
   transition: all .2s;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  min-width: 120px;
 }
 
-#selfieButtons .btn:disabled {
+.btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  filter: grayscale(.15);
 }
 
-/* ====== TEXTURA MEDIEVAL ESPINHOS – UNIFICADA ====== */
-:root {
-  --espinhos-img: url('/assets/img/moldura-medieval-espinhos.png');
-}
-
-/* Aplica textura tanto no botão do topo quanto nos botões da grade */
-#btn-skip-selfie.btn-stone-espinhos,
-#selfieButtons .btn.btn-stone-espinhos {
+/* TEXTURA MEDIEVAL ESPINHOS */
+.btn-stone-espinhos,
+#btn-skip-selfie.btn-stone-espinhos {
   background: transparent !important;
-  background-image: var(--espinhos-img) !important;
+  background-image: url('/assets/img/moldura-medieval-espinhos.png') !important;
   background-size: 100% 100% !important;
   background-repeat: no-repeat !important;
   border: none !important;
   color: #f9e7c2 !important;
   text-shadow: 0 1px 1px rgba(0,0,0,.75);
-  font-family: 'Cardo', serif;
-  font-weight: 700;
-  letter-spacing: .3px;
-  position: relative;
-  cursor: pointer;
-  overflow: hidden;
 }
 
-/* Borda e relevo interno */
-#btn-skip-selfie.btn-stone-espinhos::after,
-#selfieButtons .btn.btn-stone-espinhos::after {
+.btn-stone-espinhos::after,
+#btn-skip-selfie.btn-stone-espinhos::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -153,159 +164,87 @@
   pointer-events: none;
 }
 
-/* ✨ Brilho pulsante dourado */
+/* Brilho pulsante */
 @keyframes brilhoDivino {
-  0%, 100% {
-    box-shadow:
-      0 0 6px rgba(255, 230, 120, 0.4),
-      0 0 12px rgba(255, 200, 50, 0.25),
-      inset 0 0 2px rgba(255, 255, 200, 0.15);
-  }
-  50% {
-    box-shadow:
-      0 0 10px rgba(255, 240, 160, 0.65),
-      0 0 16px rgba(255, 220, 120, 0.45),
-      inset 0 0 4px rgba(255, 255, 230, 0.25);
-  }
+  0%, 100% { box-shadow: 0 0 6px rgba(255, 230, 120, 0.4), inset 0 0 2px rgba(255, 255, 200, 0.15); }
+  50% { box-shadow: 0 0 10px rgba(255, 240, 160, 0.65), inset 0 0 4px rgba(255, 255, 230, 0.25); }
 }
 
-/* Hover: ativa o brilho pulsante */
-#btn-skip-selfie.btn-stone-espinhos:hover:not(:disabled),
-#selfieButtons .btn.btn-stone-espinhos:hover:not(:disabled) {
+.btn-stone-espinhos:hover:not(:disabled),
+#btn-skip-selfie.btn-stone-espinhos:hover:not(:disabled) {
   filter: brightness(1.08);
   transform: translateY(-1px);
   animation: brilhoDivino 1.8s ease-in-out infinite;
 }
 
-/* Active */
-#btn-skip-selfie.btn-stone-espinhos:active:not(:disabled),
-#selfieButtons .btn.btn-stone-espinhos:active:not(:disabled) {
+.btn-stone-espinhos:active:not(:disabled),
+#btn-skip-selfie.btn-stone-espinhos:active:not(:disabled) {
   transform: translateY(0);
   filter: brightness(0.98);
   animation: none;
 }
 
-/* Estado desabilitado */
-#btn-skip-selfie.btn-stone-espinhos:disabled,
-#selfieButtons .btn.btn-stone-espinhos:disabled {
-  opacity: .7;
-  filter: grayscale(.15);
-  cursor: not-allowed;
-  animation: none;
+/* Preview da Selfie */
+.selfie-preview-wrap {
+  width: 92%;
+  max-width: 820px;
+  margin: 0 auto 8px;
+  position: relative;
 }
 
-/* ===== Selfie: guia da chama + zoom com sliders ===== */
-#selfiePreview{
-  --zoomAll: 1;
-  --zoomX: 1;
-  --zoomY: 1;
+.preview-frame {
+  position: relative;
+  width: 100%;
+  padding-bottom: 133.33%; /* 3:4 */
+  background: #000;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 4px 16px rgba(0,0,0,.4);
 }
 
-/* Aplica zoom ao vídeo/canvas mantendo centro */
-#selfieVideo,
-#selfieCanvas{
-  transform-origin: center center;
-  /* escala combinada: geral * por eixo */
-  transform:
-    scaleX(calc(var(--zoomAll) * var(--zoomX)))
-    scaleY(calc(var(--zoomAll) * var(--zoomY)));
+#selfiePreview {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  object-fit: contain;
+  z-index: 1;
 }
 
-/* Guia da chama (silhueta visível para posicionar o rosto) */
-#selfieGuide{
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  pointer-events: none;
-  object-fit: contain;          /* mantém proporção da arte */
-  opacity: .30;                 /* visível mas não atrapalha */
-  filter: drop-shadow(0 0 10px rgba(255,215,0,.35));
+#selfieVideo, #selfieCanvas {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 100%; min-height: 100%;
+  object-fit: cover;
 }
 
-/* Máscara de acabamento (moldura final) */
-#selfieMask{
-  position: absolute; inset: 0;
+#selfieGuide, #selfieMask {
+  position: absolute;
+  inset: 0;
   width: 100%; height: 100%;
   pointer-events: none;
   object-fit: contain;
-  opacity: .65;                 /* um pouco mais forte que o guia */
+  z-index: 2;
 }
 
-/* Legenda quando a câmera está bloqueada */
-#selfiePreview.offline::before {
-  content: "Pré-visualização da foto";
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
+#selfieGuide { opacity: 0.30; filter: drop-shadow(0 0 10px rgba(255,215,0,.35)); }
+#selfieMask { opacity: 0.65; }
+
+.preview-hint {
+  display: block;
+  text-align: center;
+  color: #f9e7c2;
   font-family: 'Cardo', serif;
-  color: #f9e7c2; background: rgba(0,0,0,.35);
-  text-shadow: 0 1px 2px rgba(0,0,0,.8);
-  letter-spacing: .4px; font-size: 15px;
-}
-/* ===== Fix 1: retirar película (fundo escuro) do container da seção ===== */
-#section-selfie {
-  background: transparent !important;   /* antes tinha rgba(0,0,0,.4) */
+  font-size: 13px;
+  margin: 4px 0 12px;
+  opacity: .8;
 }
 
-/* ===== Fix 2: textura de pedra no botão do topo (override seguro) ===== */
-:root { --btn-stone-img: url('/assets/img/textura-de-pedra.jpg'); }
-
-#btn-skip-selfie.btn-stone-espinhos{
-  background: transparent !important;
-  background-image: var(--btn-stone-img) !important;
-  background-size: cover !important;
-  background-repeat: no-repeat !important;
-  border: none !important;
+#selfie-error {
+  color: #ff6b6b;
+  font-size: 14px;
+  text-align: center;
+  margin: 10px auto;
+  max-width: 520px;
+  display: none;
 }
-#btn-skip-selfie.btn-stone {
-  background:
-    linear-gradient(to bottom, #a0a0a0, #808080),
-    url('/assets/img/textura-de-pedra.jpg') center/cover !important;
-  background-blend-mode: overlay;
-  border: 3px solid #4a4a4a !important;
-  color: #fff !important;
-  text-shadow: 1px 1px 3px rgba(0,0,0,.7);
-  border-radius: 8px;
-  box-shadow:
-    inset 0 3px 6px rgba(0,0,0,.4),
-    0 6px 12px rgba(0,0,0,.6);
-}
-
-/* ===== Fix 3: limitar overlays ao preview, sem cobrir a página ===== */
-#selfiePreview { position: relative; z-index: 0; }
-#selfiePreview.offline::before {
-  z-index: 1;
-  pointer-events: none;
-}
-/* Painel de sliders igual ao 1º print */
-.ranges-panel{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  padding:14px 16px;
-  border-radius:12px;
-  background:rgba(0,0,0,.25);
-  box-shadow:0 6px 16px rgba(0,0,0,.35) inset, 0 2px 8px rgba(0,0,0,.25);
-  max-width:520px;
-  margin:10px auto 14px;
-}
-.range-row{
-  display:grid;
-  grid-template-columns: 150px 1fr 56px;
-  align-items:center;
-  gap:10px;
-}
-.range-label{ opacity:.9; font-weight:600; }
-.range-val{ text-align:right; font-variant-numeric: tabular-nums; }
-
-/* Barra de botões logo abaixo do painel */
-.selfie-controls .btn-row{
-  display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
-  margin-top:6px; margin-bottom:12px;
-}
-
-/* Mostrar título e texto orientativo */
-.titulo-pergaminho{ display:block; }
-.moldura-orientacao .texto-orientacao{ display:block; }
-
-/* Esconde mensagens até serem usadas por JS */
-#selfie-error, .selfie-status{ display:none; }
-.hidden{ display:none !important; } /* garante o efeito "hidden" global */
