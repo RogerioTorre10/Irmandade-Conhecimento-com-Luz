@@ -96,15 +96,17 @@
 #section-card.pergaminho::before { z-index: 0 !important; pointer-events: none !important; }
 #section-card .conteudo-pergaminho { position: relative !important; z-index: 5 !important; }
 
-/* 5) Botão flutuante (não imprime) */
-#section-card #btnStartJourney,
-#section-card #btnNext{
-  bottom: clamp(36px, 6vh, 10px); /* Subiu em relação à base */
+/* 🔧 Garante que o botão esteja acima e clicável */
+#section-card #btnNext,
+#section-card #btnStartJourney {
+  position: absolute;
+  bottom: clamp(36px, 6vh, 64px); /* altura ajustável */
   left: 50%;
   transform: translateX(-50%);
-  z-index: 8;
-  position: absolute;
-  pointer-events: auto;
+  z-index: 999; /* bem acima de tudo */
+  pointer-events: auto !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 @media print { #section-card #btnStartJourney { display: none !important; } }
 @media (max-height: 720px) {
