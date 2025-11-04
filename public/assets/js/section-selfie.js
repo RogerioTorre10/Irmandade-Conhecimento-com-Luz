@@ -55,7 +55,11 @@
     } catch {}
     return upper;
   }
-
+   
+    const nomeInput = document.getElementById('nameInput');
+    sessionStorage.setItem('jornada.nome', nomeInput.value.trim().toUpperCase());
+    sessionStorage.setItem('jornada.guia', guiaSelecionado); // Ex: 'arian', 'lumen', 'zion'
+  
   // ---------- Utils ----------
   const waitForElement = (sel, opt = {}) => new Promise((res, rej) => {
     let t = 0;
@@ -389,6 +393,10 @@
   async function play(section){ const header=ensureHeader(section); const title=header.querySelector('h2'); if(title.dataset.typing==='true'){ runTyping(title); speak(title.dataset.text); } ensureTexto(section); ensureControls(section); ensureButtons(section); ensurePreview(section); await sleep(100); startOrderObserver(section); enforceOrder(section); }
   async function init(){ try{ const section=await waitForElement('#'+SECTION_ID); await play(section);} catch(err){ console.error('Erro ao carregar '+MOD+':', err);} }
 
+  const nomeInput = document.getElementById('nameInput');
+  sessionStorage.setItem('jornada.nome', nomeInput.value.trim().toUpperCase());
+  sessionStorage.setItem('jornada.guia', guiaSelecionado); // Ex: 'arian', 'lumen', 'zion'
+   
   document.addEventListener('sectionWillHide', e=>{ if(e?.detail?.sectionId===SECTION_ID) stopCamera(); });
   document.addEventListener('sectionLoaded', e=>{ if(e?.detail?.sectionId===SECTION_ID) init(); });
   if (document.readyState !== 'loading') init(); else document.addEventListener('DOMContentLoaded', init);
