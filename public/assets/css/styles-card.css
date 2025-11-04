@@ -102,9 +102,9 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: calc(var(--inset, 16px) + 12px);
+  bottom: clamp(12px, 4vh, 32px)
   z-index: 8;
-  pointer-events: auto !important;
+  pointer-events: auto;
 }
 @media print { #section-card #btnStartJourney { display: none !important; } }
 @media (max-height: 720px) {
@@ -155,18 +155,19 @@
   transition: transform 0.4s ease, opacity 0.4s ease;
 }
 /* Ajuste fino do placeholder dentro do card no desktop */
-#section-card .flame-layer.placeholder-only {
-  bottom: clamp(36px, 6vh, 72px); /* Subiu um pouco */
-  transform: translateX(-50%) translateY(-4%); /* Leve subida */
+ #section-card .flame-layer.placeholder-only {
+  bottom: clamp(72px, 12vh, 120px); /* Subiu mais */
+  transform: translateX(-50%) translateY(-8%); /* Leve subida vertical */
 }
 
 /* Posiciona o container "USUÁRIO" na base do placeholder */
 #section-card .flame-layer.placeholder-only .card-name-badge {
   position: absolute;
-  bottom: 12px;
+  bottom: 8px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 7;
+  pointer-events: auto;
 }
 
 
