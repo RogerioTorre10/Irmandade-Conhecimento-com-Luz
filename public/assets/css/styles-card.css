@@ -99,7 +99,7 @@
 /* 5) Botão flutuante (não imprime) */
 #section-card #btnStartJourney,
 #section-card #btnNext{
-  bottom: clamp(36px, 6vh, 64px); /* Subiu em relação à base */
+  bottom: clamp(36px, 6vh, 54px); /* Subiu em relação à base */
   left: 50%;
   transform: translateX(-50%);
   z-index: 8;
@@ -156,8 +156,11 @@
 }
 /* Ajuste fino do placeholder dentro do card no desktop */
 #section-card .flame-layer.placeholder-only {
-  bottom: clamp(36px, 6vh, 72px); /* Subiu um pouco */
-  transform: translateX(-50%) translateY(-4%); /* Leve subida */
+  height: auto;
+  min-height: clamp(180px, 32vh, 280px); /* garante espaço vertical */
+  bottom: clamp(72px, 12vh, 120px);
+  transform: translateX(-50%) translateY(-8%);
+  position: absolute;
 }
 
 /* Posiciona o container "USUÁRIO" na base do placeholder */
