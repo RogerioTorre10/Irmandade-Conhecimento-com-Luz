@@ -10,13 +10,7 @@
   // Navegação/fluxo
   const NEXT_SECTION_ID = 'section-perguntas';
   const VIDEO_SRC = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
-  
-  const PREVIEW_MIN_H = 240;
-  const PREVIEW_MAX_H = 420;
-  const PREVIEW_VH = 38;
-  const PREVIEW_AR_W = 3;
-  const PREVIEW_AR_H = 4;
-  
+    
   // Imagens fallback e placeholder
   const CARD_BG = {
     arian: '/assets/img/irmandade-quarteto-bg-arian.png',
