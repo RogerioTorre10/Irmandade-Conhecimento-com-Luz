@@ -62,33 +62,23 @@
     </div>
   </div>
 
-  <div class="btn-row">
-    <button id="startCamBtn" class="btn btn-stone-espinhos">Ativar Câmera</button>
-    <button id="btn-selfie-previa" class="btn btn-stone-espinhos" disabled>Prévia</button>
-    <button id="btn-selfie-confirm" class="btn btn-stone-espinhos" disabled>Confirmar</button>
+  <div class="btn-row">       
+    <button id="btn-selfie-previa" class="btn btn-stone-espinhos" disabled>Prévia/Nova Foto</button>
+    <button id="startCamBtn" class="btn btn-stone-espinhos">Foto</button>
+   <button id="btn-selfie-confirm" class="btn btn-stone-espinhos" disabled>Confirmar</button>
   </div>
-
 </div>
 
     <!-- Container de vídeo e chama -->
-    <div class="selfie-preview">
-      <div class="flame-stage">
-        <video id="selfieVideo" playsinline autoplay muted></video>
-        <canvas id="selfieCanvas" class="hidden"></canvas>
-        <img id="selfieMask" alt="Máscara" src="/assets/img/chama-card.png" />
-      </div>
+    <div class="selfie-preview-wrap">
+      <div class="preview-frame">
+       <img id="selfiePreview" alt="Pré-visualização da foto" />
+        </div>
+        </div>
       <small class="preview-hint">Certifique-se de que o rosto está centralizado no quadro.</small>
     </div>
-
-    <!-- Campo de nome e status -->
-    <div class="selfie-nome">
-      <label for="inputNome">Seu Nome</label>
-      <input id="inputNome" type="text" placeholder="NOME" readonly />
-    </div>
-
     <div id="selfie-error" class="hidden" aria-hidden="true">
       Não foi possível acessar a câmera. Verifique as permissões do navegador.
     </div>
-
   </div>
 </section>
