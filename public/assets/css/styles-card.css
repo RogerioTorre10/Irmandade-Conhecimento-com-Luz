@@ -141,7 +141,43 @@
   border-radius:12px;
   box-shadow:0 0 18px rgba(255,215,120,.25);
 }
+/* Ajuste do placeholder no desktop por guia */
+#section-card.guide-zion .flame-layer.placeholder-only .flame-selfie,
+#section-card.guide-lumen .flame-layer.placeholder-only .flame-selfie,
+#section-card.guide-arian .flame-layer.placeholder-only .flame-selfie {
+  width: clamp(180px, 28%, 320px);
+  height: auto;
+  border-radius: 14px;
+  margin: 0 auto;
+  transform: scale(0.96);
+  opacity: 0.95;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+/* 🔼 Subida mais precisa do placeholder */
+#section-card .flame-layer.placeholder-only {
+  bottom: clamp(72px, 12vh, 120px); /* Subiu mais */
+  transform: translateX(-50%) translateY(-8%); /* Leve subida vertical */
+}
 
+/* 📛 Nome "USUÁRIO" alinhado à base do placeholder */
+#section-card .flame-layer.placeholder-only .card-name-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 7;
+  pointer-events: auto;
+}
+
+/* ⬇️ Botão "Continuar" fora do card */
+#section-card #btnNext {
+  position: absolute;
+  bottom: clamp(12px, 4vh, 32px); /* Bem abaixo do card */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 8;
+  pointer-events: auto;
+}
 
 /* ==================== MOBILE AJUSTADO — SECTION-CARD ==================== */
 @media (max-width: 600px) {
