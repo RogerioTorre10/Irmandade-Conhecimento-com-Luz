@@ -1,61 +1,141 @@
 <link rel="stylesheet" href="/assets/css/styles-base.css">
 <link rel="stylesheet" href="/assets/css/styles-selfie.css">
 
-<section id="section-selfie" class="j-section pergaminho pergaminho-h epic selfie-page" data-section="selfie" aria-labelledby="selfie-title" data-transition-src="/assets/videos/filme-selfie-card.mp4">
-
+<section
+  id="section-selfie"
+  class="j-section pergaminho pergaminho-h epic selfie-page hidden"
+  data-section="selfie"
+  aria-labelledby="selfie-title"
+  data-transition-src="/assets/videos/filme-selfie-card.mp4"
+>
   <div class="conteudo-pergaminho">
-
-    <!-- Título -->
+    <!-- Cabeçalho -->
     <header class="selfie-header">
-      <h2 id="selfie-title" class="titulo-pergaminho" data-typing="true" data-text="Tirar sua Foto" data-speed="30" data-cursor="true"></h2>
+      <h2
+        id="selfie-title"
+        class="titulo-pergaminho"
+        data-typing="true"
+        data-text="Tirar sua Foto ✨"
+        data-speed="30"
+        data-cursor="true"
+      ></h2>
+
+      <button
+        id="btnSkipSelfie"
+        class="btn btn-ghost-top"
+        aria-label="Não quero foto / Iniciar"
+        data-transition-src="/assets/videos/filme-selfie-card.mp4"
+      >
+        Não quero foto / Iniciar
+      </button>
     </header>
 
-    <!-- Orientação -->
-    <div class="texto-orientacao">
-      <p id="selfieTexto" data-text="{{NOME}}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras." data-speed="36"></p>
+    <!-- Texto orientativo -->
+    <div class="moldura-orientacao">
+      <div
+        id="selfieTexto"
+        class="texto-orientacao"
+        data-text="{{NOME}}, posicione-se em frente à câmera e centralize o rosto dentro da chama. Use boa luz e evite sombras."
+        data-speed="36"
+      ></div>
     </div>
 
-    <!-- Moldura da câmera -->
-    <div class="selfie-preview">
-      <div class="flame-stage">
-        <video id="selfieVideo" autoplay playsinline muted></video>
-        <canvas id="selfieCanvas" class="hidden"></canvas>
-        <div class="flame-mask"></div>
+    <!-- Container da câmera -->
+    <div class="selfie-grid">
+      <div class="selfie-preview">
+        <div class="flame-stage">
+          <video id="selfieVideo" playsinline autoplay muted></video>
+          <canvas id="selfieCanvas" class="hidden"></canvas>
+          <div class="flame-mask"></div>
+        </div>
+
+        <div class="preview-hints">
+          <small>Certifique-se de que o rosto está centralizado na chama.</small>
+        </div>
+      </div>
+
+      <!-- Controles -->
+      <aside class="selfie-controls">
+        <div class="field-row">
+          <label for="nameInput">Seu Nome</label>
+          <input
+            id="nameInput"
+            type="text"
+            placeholder="NOME"
+            autocomplete="name"
+            class="input-espinhos"
+          />
+        </div>
+
+        <div class="controls-group">
+          <button id="startCamBtn" class="btn btn-stone-espinhos">Ativar Câmera</button>
+
+          <div class="ranges">
+            <label>Zoom
+              <input id="zoomAll" type="range" min="1" max="2.5" step="0.01" value="1" />
+            </label>
+            <label>Zoom Horizontal
+              <input id="zoomX" type="range" min="1" max="2.5" step="0.01" value="1" />
+            </label>
+            <label>Zoom Vertical
+              <input id="zoomY" type="range" min="1" max="2.5" step="0.01" value="1" />
+            </label>
+          </div>
+
+          <!-- === SELFIE: Container com máscara da chama === -->
+<div id="selfie-container" class="selfie-container masked">
+  <!-- Moldura por cima -->
+  <img id="selfie-frame" src="/assets/img/chama-card.png" alt="Moldura da Chama" />
+
+  <!-- Vídeo da câmera (ao vivo) -->
+  <video id="selfie-video" autoplay playsinline muted></video>
+
+  <!-- Canvas para prévia/captura -->
+  <canvas id="selfie-canvas" style="display:none;"></canvas>
+</div>
+
+<!-- Controles de zoom (vertical/horizontal) -->
+<div class="selfie-zoom">
+  <label for="zoom-x">Zoom horizontal (X)</label>
+  <input id="zoom-x" type="range" min="0.8" max="1.6" step="0.01" value="1">
+  <label for="zoom-y">Zoom vertical (Y)</label>
+  <input id="zoom-y" type="range" min="0.8" max="1.6" step="0.01" value="1">
+</div>
+
+<!-- Ações -->
+<div class="selfie-actions">
+  <button id="btn-selfie-previa" class="btn btn-primary">Prévia</button>
+  <button id="btn-selfie-refazer" class="btn btn-secondary" disabled>Não confirmar</button>
+  <button id="btn-selfie-confirmar" class="btn btn-primary" disabled>Confirmar</button>
+</div>
+
+<div id="selfie-status" class="selfie-status" aria-live="polite"></div>
+
+          <div class="btn-row">
+            <button id="btn-selfie-preview" class="btn btn-stone-espinhos" disabled>Prévia</button>
+            <button id="btn-selfie-confirm" class="btn btn-stone-espinhos" disabled>Confirmar</button>
+            <button
+              id="btn-selfie-next"
+              class="btn btn-stone-espinhos"
+              disabled
+              data-transition-src="/assets/videos/filme-selfie-card.mp4"
+            >
+              Iniciar Jornada
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Pré-visualização -->
+    <div class="selfie-preview-wrap">
+      <div class="preview-frame">
+        <img id="selfiePreview" alt="Pré-visualização da foto" />
       </div>
     </div>
 
-    <!-- Controles -->
-    <aside class="selfie-controls">
-      <div class="field-row">
-        <label for="nameInput">Seu Nome</label>
-        <input id="nameInput" type="text" placeholder="NOME" autocomplete="name" class="input-espinhos" />
-      </div>
-
-      <div class="ranges">
-        <label for="zoomAll">Zoom Geral</label>
-        <input id="zoomAll" type="range" min="1" max="2.5" step="0.01" value="1" />
-
-        <label for="zoomX">Zoom Horizontal</label>
-        <input id="zoomX" type="range" min="1" max="2.5" step="0.01" value="1" />
-
-        <label for="zoomY">Zoom Vertical</label>
-        <input id="zoomY" type="range" min="1" max="2.5" step="0.01" value="1" />
-      </div>
-
-      <div class="selfie-actions">
-        <button id="btnStartCam" class="btn btn-stone">Ativar Câmera</button>
-        <button id="btnPreviewSelfie" class="btn btn-primary" disabled>Prévia</button>
-        <button id="btnConfirmSelfie" class="btn btn-primary" disabled>Confirmar</button>
-        <button id="btnNextSelfie" class="btn btn-stone" data-transition-src="/assets/videos/filme-selfie-card.mp4" disabled>Iniciar Jornada</button>
-      </div>
-
-      <div id="selfie-status" class="selfie-status" aria-live="polite"></div>
-    </aside>
-
-    <!-- Erro de câmera -->
     <div id="selfie-error" class="hidden" aria-hidden="true">
       Não foi possível acessar a câmera. Verifique as permissões do navegador.
     </div>
-
   </div>
 </section>
