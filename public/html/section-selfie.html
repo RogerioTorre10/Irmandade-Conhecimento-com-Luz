@@ -9,76 +9,60 @@
   data-transition-src="/assets/videos/filme-selfie-card.mp4"
 >
   <div class="conteudo-pergaminho">
-    
+
     <!-- Cabeçalho -->
     <header class="selfie-header">
-      <h2
-        id="selfie-title"
-        class="titulo-pergaminho"
-        data-typing="true"
-        data-text="Tirar sua Foto ✨"
-        data-speed="30"
-        data-cursor="true"
-      ></h2>
-
-      <button
-        id="btnSkipSelfie"
-        class="btn btn-ghost-top"
-        aria-label="Não quero foto / Iniciar"
-        data-transition-src="/assets/videos/filme-selfie-card.mp4"
-      >
+      <h2 id="selfie-title" data-typing="true" data-text="Tirar sua Foto" data-speed="30"></h2>
+      <button id="btn-skip-selfie" class="btn btn-stone-espinhos" data-transition-src="/assets/videos/filme-selfie-card.mp4">
         Não quero foto / Iniciar
       </button>
     </header>
 
-    <!-- Texto orientativo -->
-    <div class="moldura-orientacao">
-      <div
-        id="selfieTexto"
-        class="texto-orientacao"
-        data-text="{{NOME}}, posicione-se em frente à câmera e centralize o rosto dentro do enquadramento. Use boa luz e evite sombras."
-        data-speed="36"
-      ></div>
+    <!-- Texto de orientação -->
+    <div id="selfieOrientWrap">
+      <p id="selfieTexto" data-speed="36"></p>
     </div>
 
-    <!-- Controles principais -->
- <div class="selfie-controls">
-
-  <div class="ranges-panel">
-    <div class="range-row">
-      <span class="range-label">Zoom Geral</span>
-      <input id="zoomAll" type="range" min="1" max="2.5" step="0.01" value="1">
-      <span class="range-val" id="zoomAllVal">1.00×</span>
+    <!-- Controles de Zoom -->
+    <div class="ranges-panel">
+      <div class="range-row">
+        <span class="range-label">Zoom Geral</span>
+        <input id="zoomAll" type="range" min="1" max="2.5" step="0.01" value="1">
+        <span class="range-val" id="zoomAllVal">1.00×</span>
+      </div>
+      <div class="range-row">
+        <span class="range-label">Zoom Horizontal</span>
+        <input id="zoomX" type="range" min="1" max="2.5" step="0.01" value="1">
+        <span class="range-val" id="zoomXVal">1.00×</span>
+      </div>
+      <div class="range-row">
+        <span class="range-label">Zoom Vertical</span>
+        <input id="zoomY" type="range" min="1" max="2.5" step="0.01" value="1">
+        <span class="range-val" id="zoomYVal">1.00×</span>
+      </div>
     </div>
-    <div class="range-row">
-      <span class="range-label">Zoom Horizontal</span>
-      <input id="zoomX" type="range" min="1" max="2.5" step="0.01" value="1">
-      <span class="range-val" id="zoomXVal">1.00×</span>
-    </div>
-    <div class="range-row">
-      <span class="range-label">Zoom Vertical</span>
-      <input id="zoomY" type="range" min="1" max="2.5" step="0.01" value="1">
-      <span class="range-val" id="zoomYVal">1.00×</span>
-    </div>
-  </div>
 
-  <div class="btn-row">       
-    <button id="btn-selfie-previa" class="btn btn-stone-espinhos" disabled>Prévia/Nova Foto</button>
-    <button id="startCamBtn" class="btn btn-stone-espinhos">Foto</button>
-   <button id="btn-selfie-confirm" class="btn btn-stone-espinhos" disabled>Confirmar</button>
-  </div>
-</div>
+    <!-- Botões de ação -->
+    <div class="btn-row">
+      <button id="btn-selfie-previa" class="btn btn-stone-espinhos" disabled>Prévia/Nova Foto</button>
+      <button id="startCamBtn" class="btn btn-stone-espinhos">Foto</button>
+      <button id="btn-selfie-confirm" class="btn btn-stone-espinhos" disabled>Confirmar</button>
+    </div>
 
-    <!-- Container de vídeo e chama -->
+    <!-- Preview com moldura -->
     <div class="selfie-preview-wrap">
       <div class="preview-frame">
-       <img id="selfiePreview" alt="Pré-visualização da foto" />
-        </div>
-        </div>
-      <small class="preview-hint">Certifique-se de que o rosto está centralizado no quadro.</small>
+        <img id="selfiePreview" src="/assets/img/orbe-dourado-placeholder.jpg" alt="Pré-visualização">
+        <video id="selfieVideo" autoplay playsinline muted style="display:none"></video>
+        <canvas id="selfieCanvas" style="display:none"></canvas>
+        <img id="selfieGuide" src="/assets/img/guia-chama-selfie.png" alt="Guia">
+        <img id="selfieMask" src="/assets/img/moldura-medieval-espinhos.png" alt="Moldura">
+      </div>
+      <small class="preview-hint">Centralize o rosto na chama dourada.</small>
     </div>
+
     <div id="selfie-error" class="hidden" aria-hidden="true">
-      Não foi possível acessar a câmera. Verifique as permissões do navegador.
+      Não foi possível acessar a câmera. Verifique as permissões.
     </div>
   </div>
 </section>
