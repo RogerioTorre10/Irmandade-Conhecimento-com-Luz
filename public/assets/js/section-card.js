@@ -9,7 +9,7 @@
 
   // Navegação/fluxo
   const NEXT_SECTION_ID = 'section-perguntas';
-  const VIDEO_SRC = '/assets/videos/filme-card-dourado.mp4';
+  const VIDEO_SRC = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
 
   // Imagens fallback e placeholder
   const CARD_BG = {
