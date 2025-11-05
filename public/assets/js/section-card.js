@@ -48,26 +48,25 @@
   }
 
   // === CRIA O HTML DO CARD SE NÃO EXISTIR ===
-  let _structureEnsured = false;
-  function ensureCardStructure() {
-    if (_structureEnsured) return;
+  document.addEventListener('DOMContentLoaded', () => {
+  const sec = document.getElementById('section-card');
+  if (!sec) return;
 
-    const sec = d.getElementById('section-card');
-    if (!sec) return;
+  const conteudo = sec.querySelector('#section-conteudo') || sec;
 
-    const conteudo = sec.querySelector('#section-conteudo') || sec;
-    if (conteudo.querySelector('.card-stage')) {
-      _structureEnsured = true;
-      return;
-    }
+  // SE NÃO TEM .card-stage → INJETA TUDO!
+  if (!conteudo.querySelector('.card-stage')) {
+    console.warn('[CARD] HTML incompleto! Forçando injeção total...');
 
-    console.warn(`[${MOD}] HTML do card ausente! Criando fallback...`);
+    const fullCardHTML = `
+      <h2 data-typing="true" data-text="Eu na Irmandade" data-speed="40" data-cursor="true" class="titulo-selfie">
+        Eu na Irmandade
+      </h2>
 
-    const cardHTML = `
       <div class="card-stage">
         <img id="guideBg" class="guide-bg" src="/assets/img/irmandade-quarteto-bg-zion.png" alt="Fundo do Guia" />
         <div class="flame-layer">
-          <img id="selfieImage" class="flame-selfie" src="${PLACEHOLDER_SELFIE}" alt="Sua foto" />
+          <img id="selfieImage" class="flame-selfie" src="/assets/img/irmandade-card-placeholder.jpg" alt="Sua foto" />
         </div>
         <div class="card-footer">
           <span class="card-name-badge">
@@ -78,9 +77,15 @@
       </div>
     `;
 
-    conteudo.insertAdjacentHTML('beforeend', cardHTML);
-    _structureEnsured = true;
+    conteudo.innerHTML = fullCardHTML;
+
+    // Força renderização
+    setTimeout(() => {
+      renderCard();
+      initCardSafe();
+    }, 100);
   }
+});
 
   // === NAVEGAÇÃO ===
   function resolveGoNext() {
