@@ -1,14 +1,3 @@
-/* /assets/js/section-card.js — REWRITE v3 (estável)
-   Objetivo: restaurar a lógica da página CARD de forma idempotente e previsível.
-
-   Principais pontos:
-   • Inicializa sozinho (no load) e também expõe hooks manuais: window.JCCard.init(), window.__forceInitCard()
-   • Lê dados de várias fontes (window.JC.data → sessionStorage → localStorage)
-   • Cria a estrutura do card no contêiner correto (#section-conteudo, .conteudo-pergaminho, .card-wrap, ou o próprio #section-card)
-   • Injeta CSS de proteção para elevar o palco sobre o pergaminho e neutralizar overlays
-   • Renderiza BG do guia, selfie (ou placeholder) e nome; liga o botão Continuar ao fluxo real
-   • Idempotente: não duplica DOM, não entra em loop, pode ser chamado várias vezes
-*/
 (function (global) {
   'use strict';
 
