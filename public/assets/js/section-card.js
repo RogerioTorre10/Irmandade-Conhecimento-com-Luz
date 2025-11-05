@@ -1,4 +1,4 @@
-/* /assets/js/section-card.js — versão consolidada (CSS mask + guias.json + fallbacks) */
+/* /assets/js/section-card.js — VERSÃO FINAL: Card + Início da Jornada */
 (function () {
   'use strict';
 
@@ -6,12 +6,10 @@
 
   // IDs aceitos para a seção
   const SECTION_IDS = ['section-card', 'section-eu-na-irmandade'];
-
-  // Navegação/fluxo
   const NEXT_SECTION_ID = 'section-perguntas';
   const VIDEO_SRC = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
-    
-  // Imagens fallback e placeholder
+
+  // Imagens fallback
   const CARD_BG = {
     arian: '/assets/img/irmandade-quarteto-bg-arian.png',
     lumen: '/assets/img/irmandade-quarteto-bg-lumen.png',
@@ -19,16 +17,15 @@
   };
   const PLACEHOLDER_SELFIE = '/assets/img/irmandade-card-placeholder.jpg';
 
-  // Fonte preferencial de dados do guia
   const GUIAS_JSON = '/assets/data/guias.json';
   let GUIAS_CACHE = null;
 
-  // Helpers de DOM
+  // Helpers
   const qs  = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
 
   // ---------- Utilitários ----------
-  async function waitForTransitionUnlock(timeoutMs = 12000) {
+  async function waitForTransitionUnlock(timeoutMs = 12000) shuffle {
     if (!window.__TRANSITION_LOCK) return;
     let done = false;
     const p = new Promise(res => {
@@ -55,33 +52,28 @@
     try { await window.EffectCoordinator?.speak?.(text, { rate: 1.0 }); } catch {}
   }
 
- function readSelfieUrlOrPlaceholder() {
-  const CANDIDATES = [
-    // sessão
-    'jornada.selfieDataUrl','selfie.dataUrl','selfieDataUrl',
-    'jornada.selfie','selfie.image','selfieImageData',
-    // persistente (alguns fluxos salvam aqui)
-    'jc.selfie','jc.selfieDataUrl','jc.selfie.image',
-    'user.selfie','user.selfieDataUrl'
-  ];
+  function readSelfieUrlOrPlaceholder() {
+    const CANDIDATES = [
+      'jornada.selfieDataUrl','selfie.dataUrl','selfieDataUrl',
+      'jornada.selfie','selfie.image','selfieImageData',
+      'jc.selfie','jc.selfieDataUrl','jc.selfie.image',
+      'user.selfie','user.selfieDataUrl'
+    ];
 
-  // 1) tenta sessionStorage
-  for (const k of CANDIDATES) {
-    try {
-      const v = sessionStorage.getItem(k);
-      if (v && /^data:image\//.test(v)) return v;
-    } catch {}
+    for (const k of CANDIDATES) {
+      try {
+        const v = sessionStorage.getItem(k);
+        if (v && /^data:image\//.test(v)) return v;
+      } catch {}
+    }
+    for (const k of CANDIDATES) {
+      try {
+        const v = localStorage.getItem(k);
+        if (v && /^data:image\//.test(v)) return v;
+      } catch {}
+    }
+    return PLACEHOLDER_SELFIE;
   }
-  // 2) tenta localStorage
-  for (const k of CANDIDATES) {
-    try {
-      const v = localStorage.getItem(k);
-      if (v && /^data:image\//.test(v)) return v;
-    } catch {}
-  }
-  return PLACEHOLDER_SELFIE;
-}
-
 
   // ---------- JSON dos guias ----------
   async function loadGuiasJson() {
@@ -103,28 +95,34 @@
     }
     return GUIAS_CACHE;
   }
-  function titleize(id){ const m={arian:'Arian',lumen:'Lumen',zion:'Zion'}; return m[id] || (id? id[0].toUpperCase()+id.slice(1):''); }
+
+  function titleize(id) {
+    const m = { arian: 'Arian', lumen: 'Lumen', zion: 'Zion' };
+    return m[id] || (id ? id[0].toUpperCase() + id.slice(1) : '');
+  }
+
   async function resolveSelectedGuide() {
     const selId = (sessionStorage.getItem('jornada.guia') || 'zion').toLowerCase();
     const guias = await loadGuiasJson();
     const j = guias.find(g => g.id === selId);
-    if (j && (j.bgImage || j.nome)) return { id: selId, nome: j.nome || titleize(selId), bgImage: j.bgImage || CARD_BG[selId] || CARD_BG.zion };
+    if (j && (j.bgImage || j.nome)) {
+      return { id: selId, nome: j.nome || titleize(selId), bgImage: j.bgImage || CARD_BG[selId] || CARD_BG.zion };
+    }
     return { id: selId, nome: titleize(selId), bgImage: CARD_BG[selId] || CARD_BG.zion };
   }
 
-  // ---------- Compat layer: acha OU cria estrutura mínima ----------
+  // ---------- Estrutura do Card ----------
   function ensureStructure(root) {
-    // 1) palco/base
-    let stage = root.querySelector('.card-stage, .card-stage-wrap, .card-container, .card');
+    let stage = root.querySelector('.card-stage');
     if (!stage) {
       stage = document.createElement('div');
       stage.className = 'card-stage';
       root.appendChild(stage);
     }
-    stage.style.position = stage.style.position || 'relative';
+    stage.style.position = 'relative';
+    if (!stage.style.minHeight) stage.style.minHeight = '52vh';
 
-    // 2) BG do guia
-    let guideBg = stage.querySelector('#guideBg, .guide-bg, .card-bg img, img.card-bg');
+    let guideBg = stage.querySelector('#guideBg');
     if (!guideBg) {
       guideBg = document.createElement('img');
       guideBg.id = 'guideBg';
@@ -136,7 +134,6 @@
       stage.appendChild(guideBg);
     }
 
-    // 3) Nome do guia (topo)
     let guideNameWrap = stage.querySelector('.card-guide-name');
     if (!guideNameWrap) {
       guideNameWrap = document.createElement('div');
@@ -150,7 +147,6 @@
       guideNameWrap.appendChild(guideNameSlot);
     }
 
-    // 4) Camada da chama
     let flameLayer = stage.querySelector('.flame-layer');
     if (!flameLayer) {
       flameLayer = document.createElement('div');
@@ -158,18 +154,12 @@
       stage.appendChild(flameLayer);
     }
 
-    // 5) Selfie/placeholder com CSS mask (SEM SVG)
     let flameSelfie = stage.querySelector('.flame-selfie');
     if (!flameSelfie) {
-      flameLayer.innerHTML = `
-        <img class="flame-selfie" id="selfieImage"
-             src="${PLACEHOLDER_SELFIE}"
-             alt="Selfie ou Placeholder"
-             loading="lazy" />`;
+      flameLayer.innerHTML = `<img class="flame-selfie" id="selfieImage" src="${PLACEHOLDER_SELFIE}" alt="Selfie" loading="lazy">`;
       flameSelfie = flameLayer.querySelector('.flame-selfie');
     }
 
-    // 6) Rodapé (nome do participante)
     let footer = stage.querySelector('.card-footer');
     if (!footer) {
       footer = document.createElement('div');
@@ -189,158 +179,138 @@
       badge.appendChild(userNameSlot);
     }
 
-   // 7) Ações (botão continuar)
-let btnNext = root.querySelector('#btnNext, .btn-next-card');
-if (!btnNext) {
-  const actions = root.querySelector('.card-actions') ||
-    root.appendChild(Object.assign(document.createElement('div'), { className: 'card-actions' }));
+    let btnNext = root.querySelector('#btnNext');
+    if (!btnNext) {
+      const actions = root.querySelector('.card-actions') || root.appendChild(Object.assign(document.createElement('div'), { className: 'card-actions' }));
+      btnNext = document.createElement('button');
+      btnNext.id = 'btnNext';
+      btnNext.className = 'btn btn-stone';
+      btnNext.textContent = 'Continuar';
+      actions.appendChild(btnNext);
+    }
 
-  btnNext = document.createElement('button');
-  btnNext.id = 'btnNext';
-  btnNext.className = 'btn btn-stone';
-  btnNext.textContent = 'Continuar';
-  actions.appendChild(btnNext);
-}
+    btnNext.disabled = false;
+    btnNext.style.pointerEvents = 'auto';
+    btnNext.style.opacity = '1';
+    btnNext.style.cursor = 'pointer';
+    btnNext.style.zIndex = '9999';
 
-// --- garante que o botão fique habilitado e clicável ---
-btnNext.disabled = false;
-btnNext.removeAttribute('aria-disabled');
-btnNext.style.pointerEvents = 'auto';
-btnNext.style.opacity = '1';
-btnNext.style.cursor = 'pointer';
-btnNext.style.zIndex = '9999';
+    btnNext.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      ev.preventDefault();
+      console.log('[section-card.js] Botão Continuar clicado!');
+      if (typeof playTransitionThenGo === 'function') {
+        playTransitionThenGo(NEXT_SECTION_ID);
+      } else if (window.JC?.nextSection) {
+        window.JC.nextSection(NEXT_SECTION_ID);
+      } else {
+        console.warn('Transição não encontrada.');
+      }
+    });
 
-// --- adiciona o evento de clique para ir à próxima seção ---
-btnNext.addEventListener('click', (ev) => {
-  ev.stopPropagation();   // evita interferência de camadas acima
-  ev.preventDefault();
-  console.log('[section-card.js] Botão Continuar clicado!');
-  if (typeof playTransitionThenGo === 'function') {
-    playTransitionThenGo('section-perguntas'); // ou o ID da próxima seção
-  } else if (window.JC?.nextSection) {
-    JC.nextSection('section-perguntas');
-  } else {
-    console.warn('Função de transição não encontrada.');
-  }
-});
-    
     return { stage, guideBg, guideNameSlot, flameLayer, flameSelfie, userNameSlot, btnNext };
+  }
+
+  // ---------- Leitura Robusta do Nome ----------
+  function getParticipantName() {
+    const CHAVES = [
+      'jornada.nome', 'jornada.participante', 'nomeParticipante',
+      'user.name', 'participante.nome', 'jornada.selfie.nome',
+      'selfie.nome', 'jc.nome'
+    ];
+    let nome = 'USUÁRIO';
+
+    for (const chave of CHAVES) {
+      const valor = sessionStorage.getItem(chave) || localStorage.getItem(chave);
+      if (valor && valor.trim() && !valor.includes('USUÁRIO')) {
+        nome = valor.trim();
+        console.log(`[${MOD}] Nome encontrado em: ${chave} → ${nome}`);
+        break;
+      }
+    }
+
+    return nome.toUpperCase();
+  }
+
+  // ---------- Iniciar Jornada ----------
+  function iniciarJornada(guiaId, nome) {
+    const wrapper = document.getElementById('jornada-content-wrapper');
+    if (!wrapper) return;
+
+    console.log(`[${MOD}] Iniciando jornada: guia=${guiaId}, nome=${nome}`);
+
+    if (window.Jornada?.iniciar) {
+      window.Jornada.iniciar(guiaId, nome.toLowerCase());
+    } else if (window.JC?.iniciarJornada) {
+      window.JC.iniciarJornada(guiaId, nome);
+    } else if (window.iniciarEtapa) {
+      window.iniciarEtapa(guiaId);
+    } else {
+      // Fallback visual
+      wrapper.innerHTML = `
+        <div style="padding:40px; text-align:center; background:rgba(255,255,220,0.95); border-radius:15px; font-family:Georgia; margin:20px;">
+          <h2>Olá, <strong>${nome}</strong>!</h2>
+          <p>Você foi chamado pela <strong>${titleize(guiaId)}</strong> para a Jornada da Chama Eterna.</p>
+          <p><em>A luz que você carrega já começou a brilhar.</em></p>
+        </div>
+      `;
+    }
   }
 
   // ---------- Inicialização ----------
   async function initCard(root) {
-    // detecta a seção alvo
     const section = SECTION_IDS.map(id => root.id === id ? root : qs(`#${id}`, root) || qs(`#${id}`)).find(Boolean) || root;
 
-    const nome = (sessionStorage.getItem('jornada.nome') || 'USUÁRIO').toUpperCase();
+    const nome = getParticipantName();
     const guia = await resolveSelectedGuide();
-    
+
     ['zion','lumen','arian'].forEach(g => section.classList.remove(`guide-${g}`));
     section.classList.add(`guide-${guia.id}`);
-    
-    // Garante estrutura mínima
-    const { stage, guideBg, guideNameSlot, flameLayer, flameSelfie, userNameSlot, btnNext } = ensureStructure(section);
 
-    // Altura mínima do palco (evita achatamento por CSS externo)
-    if (stage && !stage.style.minHeight) stage.style.minHeight = '52vh';
+    const { guideBg, guideNameSlot, flameLayer, flameSelfie, userNameSlot } = ensureStructure(section);
 
-    // BG do guia → preferir <img>; se falhar, pintar no stage
-    if (guideBg && guideBg.tagName === 'IMG') {
+    // BG
+    if (guideBg.tagName === 'IMG') {
       guideBg.src = guia.bgImage;
       guideBg.alt = `${guia.nome} — Card da Irmandade`;
-      const applyFallbackBG = () => {
-        // se não carregou, pinta o plano de fundo do stage
+      const applyFallback = () => {
         if (!guideBg.naturalWidth) {
-          stage.style.backgroundImage = `url("${guia.bgImage}")`;
-          stage.style.backgroundSize = 'cover';
-          stage.style.backgroundPosition = 'center';
+          guideBg.closest('.card-stage').style.backgroundImage = `url("${guia.bgImage}")`;
+          guideBg.closest('.card-stage').style.backgroundSize = 'cover';
         }
       };
-      if (guideBg.complete) {
-        applyFallbackBG();
-      } else {
-        guideBg.addEventListener('load', applyFallbackBG, { once: true });
-        guideBg.addEventListener('error', applyFallbackBG, { once: true });
-      }
-    } else {
-      stage.style.backgroundImage = `url("${guia.bgImage}")`;
-      stage.style.backgroundSize = 'cover';
-      stage.style.backgroundPosition = 'center';
+      guideBg.complete ? applyFallback() : guideBg.onload = guideBg.onerror = applyFallback;
     }
 
-    // Nome do guia e do participante
+    // Nomes
     if (guideNameSlot) guideNameSlot.textContent = (guia.nome || '').toUpperCase();
-    if (userNameSlot)  userNameSlot.textContent  = nome;
+    if (userNameSlot) userNameSlot.textContent = nome;
 
-    // Selfie/placeholder + exibir camada
-const url = readSelfieUrlOrPlaceholder();
-if (flameSelfie && url) {
-  const isPlaceholder = url === PLACEHOLDER_SELFIE;
-  flameSelfie.src = url;
+    // Selfie
+    const url = readSelfieUrlOrPlaceholder();
+    if (flameSelfie && url) {
+      const isPlaceholder = url === PLACEHOLDER_SELFIE;
+      flameSelfie.src = url;
+      flameSelfie.onload = () => flameLayer.classList.add('show');
+      flameSelfie.onerror = () => {
+        flameSelfie.src = PLACEHOLDER_SELFIE;
+        flameLayer.classList.add('show', 'placeholder-only');
+      };
+      if (isPlaceholder) flameLayer.classList.add('placeholder-only');
+      flameLayer.classList.add('show');
+    }
 
-  // garante visibilidade
-  flameSelfie.addEventListener?.('load', () => {
-    flameLayer?.classList.add('show');
-  });
-  flameLayer?.classList.add('show');
-
-  // se falhar o carregamento, volta pro placeholder
-  flameSelfie.addEventListener?.('error', () => {
-    flameSelfie.src = PLACEHOLDER_SELFIE;
-    flameLayer?.classList.add('show');
-    flameLayer?.classList.add('placeholder-only');
-  });
-
-  // adiciona classe especial se for placeholder desde o início
-  if (isPlaceholder) {
-    flameLayer?.classList.add('placeholder-only');
-  }
-}
-
-    // Espera transição e aplica datilografia/TTS
     await waitForTransitionUnlock();
-    const typings = qsa('[data-typing="true"]', section);
-    for (const el of typings) {
+    for (const el of qsa('[data-typing="true"]', section)) {
       const text = (el.dataset.text || el.textContent || '').trim();
       await runTypingAndSpeak(el, text);
     }
 
-    // Botão continuar
-    if (btnNext) {
-      btnNext.onclick = () => {
-        try { speechSynthesis.cancel(); } catch {}
-        qsa('video').forEach(v => { try { v.pause(); v.src=''; v.load(); } catch {} });
-        if (typeof window.playTransitionVideo === 'function' && VIDEO_SRC) {
-          window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
-        } else {
-          window.JC?.show?.(NEXT_SECTION_ID);
-        }
-      };
-    }
-
     console.log(`[${MOD}] Card exibido · guia=${guia.id} (${guia.nome}) · participante=${nome}`);
+
+    // === INICIAR JORNADA (era feito na selfie) ===
+    setTimeout(() => iniciarJornada(guia.id, nome), 600);
   }
-  
-    // === INICIAR JORNADA APÓS CARD PRONTO ===
-    setTimeout(() => {
-      // Tenta todos os nomes possíveis que o seu projeto usa
-      if (window.Jornada?.iniciar) {
-        window.Jornada.iniciar(guia.id, nome);
-      } else if (window.JC?.iniciarJornada) {
-        window.JC.iniciarJornada(guia.id, nome);
-      } else if (window.iniciarEtapa) {
-        window.iniciarEtapa(guia.id);
-      } else {
-        // fallback visual (caso ainda não encontre)
-        document.getElementById('jornada-content-wrapper').innerHTML = `
-          <div style="padding:40px; text-align:center; font-family:Georgia; color:#333; background:rgba(255,255,200,0.9); border-radius:15px;">
-            <h2>Bem-vindo, <strong>${nome}</strong>!</h2>
-            <p>Você foi chamado pela <strong>${guia.nome}</strong> para a Irmandade da Chama Eterna.</p>
-            <p><em>"Que a luz que você carrega ilumine o caminho dos que virão."</em></p>
-          </div>
-        `;
-      }
-    }, 500);
 
   // ---------- Escutas ----------
   document.addEventListener('section:shown', (e) => {
@@ -350,78 +320,10 @@ if (flameSelfie && url) {
     initCard(root);
   });
 
-  // Fallback: se a seção já estiver visível sem evento
   document.addEventListener('DOMContentLoaded', () => {
-    const visible = SECTION_IDS.map(id => qs(`#${id}`)).find(el => el && (el.offsetParent !== null || el.style.display !== 'none'));
+    const visible = SECTION_IDS.map(id => qs(`#${id}`)).find(el => el && el.offsetParent !== null);
     if (visible) initCard(visible);
   });
 
-  // === Fallback visual de emergência ===
-document.addEventListener('DOMContentLoaded', async () => {
-  try {
-    const sec = document.querySelector('#section-card');
-    if (!sec) return;
-
-    // Garante que a seção está visível
-    sec.style.display = 'block';
-    sec.style.zIndex = '2';
-    sec.style.position = 'relative';
-
-    // Cria palco se não existir
-    const sel = (sessionStorage.getItem('jornada.guia') || 'zion').toLowerCase();
-const MAP = {
-  arian: '/assets/img/irmandade-quarteto-bg-arian.png',
-  lumen: '/assets/img/irmandade-quarteto-bg-lumen.png',
-  zion:  '/assets/img/irmandade-quarteto-bg-zion.png'
-};
-const safeBg = MAP[sel] || MAP.zion;
-
-if (!stage) {
-  stage = document.createElement('div');
-  stage.className = 'card-stage';
-  stage.style.position = 'relative';
-  stage.style.minHeight = '66vw';
-  stage.style.background = `#000 url("${safeBg}") center/cover no-repeat`;
-  sec.appendChild(stage);
-  console.warn('[section-card.js] stage recriado manualmente');
-}
-
-// Garante fundo se ainda não houver um
-if (!stage.style.backgroundImage) {
-  stage.style.backgroundImage = `url("${safeBg}")`;
-  stage.style.backgroundSize = 'cover';
-  stage.style.backgroundPosition = 'center';
-}
-
-
-    // Garante chama e rodapé
-    if (!stage.querySelector('.flame-layer')) {
-      const flame = document.createElement('div');
-      flame.className = 'flame-layer show';
-      flame.innerHTML = `<img src="/assets/img/irmandade-card-placeholder.jpg" style="width:45%;border-radius:50%;opacity:0.9;">`;
-      flame.style.position = 'absolute';
-      flame.style.left = '50%';
-      flame.style.bottom = '160px';
-      flame.style.transform = 'translateX(-50%)';
-      stage.appendChild(flame);
-    }
-
-    if (!stage.querySelector('.card-footer')) {
-      const foot = document.createElement('div');
-      foot.className = 'card-footer';
-      foot.innerHTML = `<span class="card-name-badge"><span id="userNameSlot">USUÁRIO</span></span>`;
-      foot.style.position = 'absolute';
-      foot.style.left = '50%';
-      foot.style.bottom = '72px';
-      foot.style.transform = 'translateX(-50%)';
-      stage.appendChild(foot);
-    }
-
-    console.log('[section-card.js] Fallback visual aplicado com sucesso.');
-  } catch (err) {
-    console.error('[section-card.js] Fallback visual falhou', err);
-  }
-});
-
-  console.log(`[${MOD}] carregado (CSS mask; guias.json; robusto)`);
+  console.log(`[${MOD}] carregado e pronto para iniciar a jornada`);
 })();
