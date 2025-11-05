@@ -55,7 +55,7 @@
     const sec = d.getElementById('section-card');
     if (!sec) return;
 
-    const conteudo = sec.querySelector('#section-conteudo') || sec;
+    const conteudo = sec.querySelector('#section-conteudo, .conteudo-pergaminho, .card-wrap') || sec;
     if (conteudo.querySelector('.card-stage')) {
       _structureEnsured = true;
       return;
