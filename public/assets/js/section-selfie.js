@@ -1,25 +1,36 @@
-/* section-selfie.js — FINAL CORRIGIDO */
+/* section-selfie.js — VERSÃO FINAL 100% FUNCIONAL */
 (function (global) {
   'use strict';
   const NS = (global.JCSelfie = global.JCSelfie || {});
   if (NS.__final) return;
   NS.__final = true;
 
-  const FINAL_ZOOM = 0.65; // Ideal pro card
-
+  const FINAL_ZOOM = 0.65;
   let stream = null, videoEl, canvasEl, previewImg;
   let lastCapture = null;
 
   const toast = msg => global.toast?.(msg) || alert(msg);
 
-  function getName() {
+  // === NOME + GUIA ===
+  function getUserData() {
     const jc = global.JC?.data || {};
-    let name = jc.nome || jc.participantName || localStorage.getItem('jc.nome') || 'AMOR';
-    name = name.toUpperCase().trim();
+    let nome = jc.nome || jc.participantName || localStorage.getItem('jc.nome') || 'AMOR';
+    let guia = sessionStorage.getItem('jornada.guia') || 'zion'; // pega do sessionStorage
+
+    nome = nome.toUpperCase().trim();
+    guia = guia.toLowerCase().trim();
+
+    // Garante no JC
     global.JC = global.JC || {}; global.JC.data = global.JC.data || {};
-    global.JC.data.nome = name;
-    try { localStorage.setItem('jc.nome', name); } catch {}
-    return name;
+    global.JC.data.nome = nome;
+    global.JC.data.guia = guia;
+
+    try {
+      localStorage.setItem('jc.nome', nome);
+      sessionStorage.setItem('jornada.guia', guia);
+    } catch {}
+
+    return { nome, guia };
   }
 
   function typeWriter(el, text, speed = 35) {
@@ -40,17 +51,23 @@
     }
   }
 
+  // === ZOOM X/Y FUNCIONANDO ===
   function updateZoom() {
-    const a = +document.getElementById('zoomAll').value;
+    const all = +document.getElementById('zoomAll').value;
     const x = +document.getElementById('zoomX').value;
     const y = +document.getElementById('zoomY').value;
-    document.getElementById('zoomAllVal').textContent = a.toFixed(2) + '×';
+
+    document.getElementById('zoomAllVal').textContent = all.toFixed(2) + '×';
     document.getElementById('zoomXVal').textContent = x.toFixed(2) + '×';
     document.getElementById('zoomYVal').textContent = y.toFixed(2) + '×';
 
-    const sx = a * x, sy = a * y;
+    const scaleX = all * x;
+    const scaleY = all * y;
+
     [videoEl, canvasEl].forEach(el => {
-      if (el) el.style.transform = `translate(-50%,-50%) scaleX(${sx}) scaleY(${sy})`;
+      if (el) {
+        el.style.transform = `translate(-50%, -50%) scaleX(${scaleX}) scaleY(${scaleY})`;
+      }
     });
   }
 
@@ -103,7 +120,6 @@
 
   function playTransitionAndGo(save = false) {
     if (save && lastCapture) {
-      global.JC = global.JC || {}; global.JC.data = global.JC.data || {};
       global.JC.data.selfieDataUrl = lastCapture;
       try { localStorage.setItem('jc.selfieDataUrl', lastCapture); } catch {}
     } else {
@@ -138,6 +154,7 @@
     }
   }
 
+  // === INIT ===
   document.addEventListener('sectionLoaded', e => {
     if (e.detail?.sectionId !== 'section-selfie') return;
 
@@ -147,16 +164,25 @@
 
     const title = document.getElementById('selfie-title');
     const texto = document.getElementById('selfieTexto');
-    const name = getName();
+    const { nome, guia } = getUserData();
 
     setTimeout(() => {
       typeWriter(title, title.dataset.text, 40);
-      const fullText = `${name}, afaste um pouco o celular. O enquadramento será ajustado automaticamente.`;
+
+      const guiaNome = {
+        arian: 'Arian',
+        lumen: 'Lumen',
+        zion: 'Zion'
+      }[guia] || 'Guia';
+
+      const fullText = `${nome}, afaste um pouco o celular e posicione o rosto no centro. ${guiaNome} te guiará.`;
       typeWriter(texto, fullText, 36);
       speak(fullText);
     }, 300);
 
-    document.querySelectorAll('input[type=range]').forEach(input => input.oninput = updateZoom);
+    document.querySelectorAll('input[type=range]').forEach(input => {
+      input.oninput = updateZoom;
+    });
     updateZoom();
 
     document.getElementById('startCamBtn').onclick = startCamera;
@@ -168,4 +194,11 @@
   document.addEventListener('sectionWillHide', e => {
     if (e.detail?.sectionId === 'section-selfie') stopCamera();
   });
+
+  // Força init se já estiver carregado
+  if (document.getElementById('section-selfie')?.classList.contains('active')) {
+    setTimeout(() => {
+      document.dispatchEvent(new CustomEvent('sectionLoaded', { detail: { sectionId: 'section-selfie' } }));
+    }, 100);
+  }
 })(window);
