@@ -1,4 +1,4 @@
-/* /assets/js/section-card.js — VERSÃO FINAL 100% FUNCIONAL */
+/* /assets/js/section-card.js — VERSÃO FINAL 100% FUNCIONAL (SEM global) */
 (function () {
   'use strict';
 
@@ -25,14 +25,15 @@
     }
   });
 
-  // === LEITURA DE DADOS ===
+  // === LEITURA DE DADOS (SEM global → window) ===
   function getUserData() {
     let nome = 'AMOR';
     let guia = 'zion';
 
-    if (global.JC?.data) {
-      if (global.JC.data.nome) nome = global.JC.data.nome;
-      if (global.JC.data.guia) guia = global.JC.data.guia;
+    // window.JC (correto no navegador)
+    if (window.JC?.data) {
+      if (window.JC.data.nome) nome = window.JC.data.nome;
+      if (window.JC.data.guia) guia = window.JC.data.guia;
     }
 
     const lsNome = localStorage.getItem('jc.nome');
@@ -46,9 +47,11 @@
     nome = nome.toUpperCase().trim();
     guia = guia.toLowerCase().trim();
 
-    global.JC = global.JC || {}; global.JC.data = global.JC.data || {};
-    global.JC.data.nome = nome;
-    global.JC.data.guia = guia;
+    // Salva em window.JC
+    window.JC = window.JC || {};
+    window.JC.data = window.JC.data || {};
+    window.JC.data.nome = nome;
+    window.JC.data.guia = guia;
 
     try {
       localStorage.setItem('jc.nome', nome);
@@ -79,7 +82,7 @@
     // 2. SELFIE
     const selfieImg = qs('#selfieImage', section);
     if (selfieImg) {
-      const url = global.JC?.data?.selfieDataUrl || localStorage.getItem('jc.selfieDataUrl');
+      const url = window.JC?.data?.selfieDataUrl || localStorage.getItem('jc.selfieDataUrl');
       selfieImg.src = url || PLACEHOLDER_SELFIE;
       const flameLayer = selfieImg.closest('.flame-layer');
       if (flameLayer) {
@@ -107,9 +110,9 @@
       v.src = VIDEO_SRC;
       v.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:9999;background:#000;';
       v.muted = v.playsInline = true;
-      v.onended = () => { v.remove(); global.JC?.show?.(NEXT_SECTION_ID, { force: true }); };
+      v.onended = () => { v.remove(); window.JC?.show?.(NEXT_SECTION_ID, { force: true }); };
       document.body.appendChild(v);
-      v.play().catch(() => { v.remove(); global.JC?.show?.(NEXT_SECTION_ID, { force: true }); });
+      v.play().catch(() => { v.remove(); window.JC?.show?.(NEXT_SECTION_ID, { force: true }); });
     }
   }
 
@@ -117,11 +120,9 @@
   async function initCard(root) {
     renderCard();
 
-    // Botão Continuar
     const btnNext = qs('#btnNext', root);
     if (btnNext) btnNext.onclick = goNext;
 
-    // Datilografia
     const typingEls = qsa('[data-typing="true"]', root);
     for (const el of typingEls) {
       const text = el.dataset.text || el.textContent || '';
@@ -148,7 +149,7 @@
     if (visible) initCard(visible);
   });
 
-  // === FALLBACK VISUAL (SE NADA CARREGAR) ===
+  // === FALLBACK VISUAL ===
   document.addEventListener('DOMContentLoaded', () => {
     const sec = qs('#section-card');
     if (!sec || sec.querySelector('.card-stage')) return;
