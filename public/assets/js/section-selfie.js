@@ -1,4 +1,4 @@
-/* section-selfie.js — VERSÃO FINAL 100% FUNCIONAL */
+/* section-selfie.js — VERSÃO FINAL COM DEBUG E DADOS CORRETOS */
 (function (global) {
   'use strict';
   const NS = (global.JCSelfie = global.JCSelfie || {});
@@ -11,24 +11,50 @@
 
   const toast = msg => global.toast?.(msg) || alert(msg);
 
-  // === NOME + GUIA ===
-  function getUserData() {
-    const jc = global.JC?.data || {};
-    let nome = jc.nome || jc.participantName || localStorage.getItem('jc.nome') || 'AMOR';
-    let guia = sessionStorage.getItem('jornada.guia') || 'zion'; // pega do sessionStorage
+  // === FUNÇÃO DE DEBUG (ativa no console) ===
+  window.DEBUG_JC = () => {
+    console.log('JC.data:', global.JC?.data);
+    console.log('sessionStorage.jornada.guia:', sessionStorage.getItem('jornada.guia'));
+    console.log('localStorage.jc.nome:', localStorage.getItem('jc.nome'));
+  };
 
+  // === LEITURA FORÇADA DE NOME E GUIA ===
+  function getUserData() {
+    let nome = 'AMOR';
+    let guia = 'zion';
+
+    // 1. Tenta do JC.data
+    if (global.JC?.data) {
+      if (global.JC.data.nome) nome = global.JC.data.nome;
+      if (global.JC.data.guia) guia = global.JC.data.guia;
+    }
+
+    // 2. Tenta do localStorage
+    const lsNome = localStorage.getItem('jc.nome');
+    const lsGuia = localStorage.getItem('jc.guia');
+    if (lsNome) nome = lsNome;
+    if (lsGuia) guia = lsGuia;
+
+    // 3. Tenta do sessionStorage (fallback)
+    const ssGuia = sessionStorage.getItem('jornada.guia');
+    if (ssGuia) guia = ssGuia;
+
+    // 4. Normaliza
     nome = nome.toUpperCase().trim();
     guia = guia.toLowerCase().trim();
 
-    // Garante no JC
-    global.JC = global.JC || {}; global.JC.data = global.JC.data || {};
+    // 5. Garante no JC.data
+    global.JC = global.JC || {};
+    global.JC.data = global.JC.data || {};
     global.JC.data.nome = nome;
     global.JC.data.guia = guia;
 
+    // 6. Salva em todos os lugares
     try {
       localStorage.setItem('jc.nome', nome);
+      localStorage.setItem('jc.guia', guia);
       sessionStorage.setItem('jornada.guia', guia);
-    } catch {}
+    } catch (e) {}
 
     return { nome, guia };
   }
@@ -51,7 +77,6 @@
     }
   }
 
-  // === ZOOM X/Y FUNCIONANDO ===
   function updateZoom() {
     const all = +document.getElementById('zoomAll').value;
     const x = +document.getElementById('zoomX').value;
@@ -166,6 +191,11 @@
     const texto = document.getElementById('selfieTexto');
     const { nome, guia } = getUserData();
 
+    // DEBUG NO CONSOLE
+    console.log('%c[SELFIE] Dados carregados:', 'color: gold; font-weight: bold');
+    console.log('Nome:', nome);
+    console.log('Guia:', guia);
+
     setTimeout(() => {
       typeWriter(title, title.dataset.text, 40);
 
@@ -195,8 +225,9 @@
     if (e.detail?.sectionId === 'section-selfie') stopCamera();
   });
 
-  // Força init se já estiver carregado
-  if (document.getElementById('section-selfie')?.classList.contains('active')) {
+  // FORÇA INIT SE JÁ ESTIVER ATIVO
+  const section = document.getElementById('section-selfie');
+  if (section && section.classList.contains('active')) {
     setTimeout(() => {
       document.dispatchEvent(new CustomEvent('sectionLoaded', { detail: { sectionId: 'section-selfie' } }));
     }, 100);
