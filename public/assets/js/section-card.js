@@ -97,15 +97,12 @@
   // DOM / Estrutura
   // ==========================
   function resolveContainer() {
-    const sec = qid('section-card');
-    if (!sec) return null;
-    return (
-      sec.querySelector('#section-conteudo') ||
-      sec.querySelector('.conteudo-pergaminho') ||
-      sec.querySelector('.card-wrap') ||
-      sec
-    );
-  }
+  const sec = qid('section-card');
+  if (!sec) return null;
+  const cand = sec.querySelector('#section-conteudo, .conteudo-pergaminho, .card-wrap, .card-inner, .pergaminho-inner');
+  if (cand) return cand;
+  return sec;
+}
 
   function buildStructureOnce(container) {
     if (!container) return null;
@@ -196,6 +193,18 @@
   } else {
     init();
   }
+
+   // Refaz render 1 segundo depois, caso o DOM ainda estivesse carregando
+setTimeout(() => {
+  try {
+    if (!document.querySelector('#section-card .card-stage')) {
+      console.warn('[CARD] Forçando re-render após atraso...');
+      global.__forceInitCard && global.__forceInitCard();
+    }
+  } catch (err) {
+    console.error('[CARD] Re-render tardio falhou:', err);
+  }
+}, 1000);
 
   console.log(`[${MOD}] bound`);
 })(window);
