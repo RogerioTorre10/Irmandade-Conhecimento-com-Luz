@@ -191,4 +191,21 @@
   padding: 20px 0;
   box-sizing: border-box;
 }
+/* —— CARD acima do pergaminho —— */
+#section-card { position: relative; isolation: isolate; }
+#section-card .card-stage { position: relative; z-index: 20; min-height: clamp(560px, 66vw, 920px); }
+
+#section-card #guideBg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; display: block; }
+#section-card .flame-layer { position: absolute; left: 50%; bottom: clamp(96px, 14vh, 160px); transform: translateX(-50%); width: clamp(240px, 38%, 520px); z-index: 30; }
+#section-card .card-footer { position: absolute; left: 50%; bottom: clamp(56px, 9vh, 96px); transform: translateX(-50%); z-index: 31; }
+#section-card #btnNext { position: absolute; left: 50%; bottom: clamp(16px, 6vh, 40px); transform: translateX(-50%); z-index: 32; }
+
+/* Se o pergaminho usa ::before como película, rebaixe/neutralize */
+.pergaminho::before,
+.pergaminho-v::before,
+#section-card.pergaminho::before,
+#section-card.pergaminho-v::before {
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
 
