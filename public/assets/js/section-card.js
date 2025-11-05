@@ -22,7 +22,104 @@
   // Fonte preferencial de dados do guia
   const GUIAS_JSON = '/assets/data/guias.json';
   let GUIAS_CACHE = null;
+// =============================================
+// CARD DO GUIA: FUNDO + NOME + FOTO + DADOS
+// =============================================
+async function renderCard() {
+  const cardEl = document.getElementById('card-guia'); // <-- seu container do card
+  if (!cardEl) return;
 
+  // 1. PEGA NOME E GUIA (com múltiplos fallbacks)
+  const getData = () => {
+    let nome = 'AMOR';
+    let guia = 'zion';
+
+    // JC.data (prioridade máxima)
+    if (global.JC?.data) {
+      if (global.JC.data.nome) nome = global.JC.data.nome;
+      if (global.JC.data.guia) guia = global.JC.data.guia;
+    }
+
+    // localStorage
+    const lsNome = localStorage.getItem('jc.nome');
+    const lsGuia = localStorage.getItem('jc.guia');
+    if (lsNome) nome = lsNome;
+    if (lsGuia) guia = lsGuia;
+
+    // sessionStorage (fallback)
+    const ssGuia = sessionStorage.getItem('jornada.guia');
+    if (ssGuia) guia = ssGuia;
+
+    nome = nome.toUpperCase().trim();
+    guia = guia.toLowerCase().trim();
+
+    return { nome, guia };
+  };
+
+  const { nome, guia } = getData();
+
+  // 2. FUNDO DO CARD
+  const bgUrl = CARD_BG[guia] || CARD_BG.zion;
+  cardEl.style.backgroundImage = `url('${bgUrl}')`;
+  cardEl.style.backgroundSize = 'cover';
+  cardEl.style.backgroundPosition = 'center';
+
+  // 3. NOME DO PARTICIPANTE
+  const nomeEl = cardEl.querySelector('#card-nome');
+  if (nomeEl) nomeEl.textContent = nome;
+
+  // 4. FOTO DA SELFIE (ou placeholder)
+  const fotoEl = cardEl.querySelector('#card-foto');
+  if (fotoEl) {
+    const selfieUrl = global.JC?.data?.selfieDataUrl || localStorage.getItem('jc.selfieDataUrl');
+    fotoEl.src = selfieUrl || PLACEHOLDER_SELFIE;
+    fotoEl.style.objectFit = 'cover';
+    fotoEl.style.width = '100%';
+    fotoEl.style.height = '100%';
+  }
+
+  // 5. NOME DO GUIA (ex: "Arian")
+  const guiaNomeEl = cardEl.querySelector('#card-guia-nome');
+  if (guiaNomeEl) {
+    const nomes = { arian: 'Arian', lumen: 'Lumen', zion: 'Zion' };
+    guiaNomeEl.textContent = nomes[guia] || 'Guia';
+  }
+
+  // 6. FRASE DO GUIA (do JSON)
+  if (!GUIAS_CACHE) {
+    try {
+      const res = await fetch(GUIAS_JSON);
+      GUIAS_CACHE = await res.json();
+    } catch (e) {
+      console.warn('Falha ao carregar guias.json', e);
+    }
+  }
+
+  if (GUIAS_CACHE) {
+    const guiaData = GUIAS_CACHE[guia] || GUIAS_CACHE.zion;
+    const fraseEl = cardEl.querySelector('#card-frase');
+    if (fraseEl && guiaData?.frase) {
+      fraseEl.textContent = `"${guiaData.frase}"`;
+    }
+  }
+
+  // DEBUG (opcional, remova depois)
+  console.log('%c[CARD] Renderizado:', 'color: gold; font-weight: bold', { nome, guia, bgUrl });
+}
+
+// CHAMA QUANDO O CARD CARREGA
+document.addEventListener('sectionLoaded', e => {
+  if (e.detail?.sectionId === 'section-card') {
+    renderCard();
+  }
+});
+
+// Se já estiver carregado
+if (document.getElementById('section-card')?.classList.contains('active')) {
+  renderCard();
+}
+
+  
   // Helpers de DOM
   const qs  = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
