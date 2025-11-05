@@ -1,27 +1,47 @@
 <link rel="stylesheet" href="/assets/css/styles-base.css">
 <link rel="stylesheet" href="/assets/css/styles-card.css">
+
 <section id="section-card" class="card pergaminho pergaminho-v section">
   <div id="section-conteudo" class="conteudo-pergaminho">
-    <div id="aria-pergunta" class="sr-only" aria-live="polite"></div>
-    <div id="jornada-content-wrapper"></div>  <!-- o card será renderizado aqui -->
-     </div>
-      </section>    
-       <h2 data-typing="true" data-text="Eu na Irmandade" data-speed="40" data-cursor="true" class="titulo-selfie">
-        Eu na Irmandade
-         </h2>
-          <div class="card-stage">
-           <img id="guideBg" class="guide-bg" src="" alt="Guia Background"/>
+    
+    <!-- Título com datilografia -->
+    <h2 
+      data-typing="true" 
+      data-text="Eu na Irmandade" 
+      data-speed="40" 
+      data-cursor="true" 
+      class="titulo-selfie"
+    >Eu na Irmandade</h2>
 
-            <!-- container da chama DENTRO do card -->
-           <div class="flame-layer" aria-hidden="true">
-          <img class="flame-selfie" id="selfieImage"
-         src="/assets/img/irmandade-card-placeholder.jpg" alt="Selfie ou Placeholder"/>
-          </div>
-           <div class="card-footer">
-          <span class="card-name-badge">
-         <span id="userNameSlot">USUÁRIO</span>
+    <!-- CARD COMPLETO -->
+    <div class="card-stage">
+      
+      <!-- Fundo do Guia (Arian, Lumen, Zion) -->
+      <img id="guideBg" class="guide-bg" src="" alt="Fundo do Guia" />
+
+      <!-- Foto do Usuário (Selfie ou Placeholder) -->
+      <div class="flame-layer" aria-hidden="true">
+        <img 
+          class="flame-selfie" 
+          id="selfieImage" 
+          src="/assets/img/irmandade-card-placeholder.jpg" 
+          alt="Sua foto na Irmandade"
+        />
+      </div>
+
+      <!-- Nome do Usuário -->
+      <div class="card-footer">
+        <span class="card-name-badge">
+          <span id="userNameSlot">USUÁRIO</span>
         </span>
-       </div>
-     <button id="btnNext" class="btn btn-stone">Continuar</button>
+      </div>
+
+      <!-- Botão Continuar -->
+      <button id="btnNext" class="btn btn-stone">Continuar</button>
     </div>
+
+    <!-- Acessibilidade -->
+    <div id="aria-pergunta" class="sr-only" aria-live="polite"></div>
+    <div id="jornada-content-wrapper"></div>
   </div>
+</section>
