@@ -86,7 +86,7 @@
 /* ===================== MOBILE AJUSTES ===================== */
 @media (max-width: 600px) {
   .flame-layer {
-    top: 70%;
+    top: 70% !important;          /* ANTES: 50% → cortava o nome */
     left: 0;
     right: 0;
     transform: translateY(-50%);
@@ -99,6 +99,8 @@
     width: min(60%, 310px);
     margin: 0 auto;
     border-radius: 14px;
+    object-fit: cover;
+    object-position: center 35% !important; /* Foca no rosto */
   }
 
   .card-footer {
@@ -106,7 +108,7 @@
     pointer-events: auto;
   }
 
-  #btnStartJourney {
+  #btnNext { /* <-- MUDOU DE #btnStartJourney */
     bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
     z-index: 10;
   }
