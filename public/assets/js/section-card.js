@@ -1,57 +1,79 @@
-(function (global) {
-'use strict';
+// =============================================
+// FALLBACK FORÇADO DA LUMEN (100% GARANTIDO)
+// =============================================
+(function () {
+  'use strict';
 
+  const MOD = 'section-card.js';
+  const d = document;
+  const qid = (id) => d.getElementById(id);
+  const on = (el, ev, fn, opts) => el.addEventListener(ev, fn, opts);
 
-const MOD = 'section-card.js';
-const NS = (global.JCCard = global.JCCard || {});
-if (NS.__bound) return; // evita duplo-bind
-NS.__bound = true;
+  const DEFAULT_NEXT_SECTION_ID = 'section-perguntas';
+  const PLACEHOLDER_SELFIE = '/assets/img/irmandade-card-placeholder.jpg';
+  const CARD_BG = {
+    arian: '/assets/img/irmandade-quarteto-bg-arian.png',
+    lumen: '/assets/img/irmandade-quarteto-bg-lumen.png',
+    zion:  '/assets/img/irmandade-quarteto-bg-zion.png'
+  };
 
+  // === LEITURA DE DADOS ===
+  function getUserData() {
+    let nome = 'AMOR';
+    let guia = 'zion';
+    let selfieDataUrl = null;
 
-// ====== Config ======
-const DEFAULT_NEXT_SECTION_ID = 'section-perguntas';
+    if (window.JC?.data) {
+      nome = window.JC.data.nome || nome;
+      guia = window.JC.data.guia || guia;
+      selfieDataUrl = window.JC.data.selfieDataUrl || null;
+    }
 
+    const lsNome = localStorage.getItem('jc.nome');
+    const lsGuia = localStorage.getItem('jc.guia');
+    const lsSelfie = localStorage.getItem('jc.selfieDataUrl');
+    if (lsNome) nome = lsNome;
+    if (lsGuia) guia = lsGuia;
+    if (lsSelfie) selfieDataUrl = lsSelfie;
 
-// Ajuste os caminhos conforme seu /assets/img/
-const CARD_BG = {
-arian: '/assets/img/irmandade-quarteto-bg-arian.png',
-lumen: '/assets/img/irmandade-quarteto-bg-lumen.png',
-zion:  '/assets/img/irmandade-quarteto-bg-zion.png'
-};
+    const ssGuia = sessionStorage.getItem('jornada.guia');
+    if (ssGuia) guia = ssGuia;
 
+    nome = nome.toUpperCase().trim();
+    guia = guia.toLowerCase().trim();
 
-// Placeholder quando não houver selfie do participante
-const PLACEHOLDER_SELFIE = '/assets/img/irmandade-card-placeholder.jpg';
+    return { nome, guia, selfieDataUrl };
+  }
 
+  // === CRIA O HTML DO CARD SE NÃO EXISTIR ===
+  function ensureCardStructure() {
+    const sec = d.getElementById('section-card');
+    if (!sec) return;
 
-// ====== Utils ======
-const d = document;
-const qs = (sel, root = d) => root.querySelector(sel);
-const qid = (id) => d.getElementById(id);
-const on = (el, evt, fn, opt) => el && el.addEventListener(evt, fn, opt);
+    const conteudo = sec.querySelector('#section-conteudo') || sec;
+    if (conteudo.querySelector('.card-stage')) return;
 
+    console.warn(`[${MOD}] HTML do card ausente! Criando fallback...`);
 
-function pickGuideBg(guia) {
-return CARD_BG[guia] || `/assets/img/bg-${guia}.jpg`;
-}
+    const cardHTML = `
+      <div class="card-stage">
+        <img id="guideBg" class="guide-bg" src="/assets/img/irmandade-quarteto-bg-zion.png" alt="Fundo do Guia" />
+        <div class="flame-layer">
+          <img id="selfieImage" class="flame-selfie" src="${PLACEHOLDER_SELFIE}" alt="Sua foto" />
+        </div>
+        <div class="card-footer">
+          <span class="card-name-badge">
+            <span id="userNameSlot">USUÁRIO</span>
+          </span>
+        </div>
+        <button id="btnNext" class="btn btn-stone" disabled>Continuar</button>
+      </div>
+    `;
 
+    conteudo.insertAdjacentHTML('beforeend', cardHTML);
+  }
 
-function getUserData() {
-const jc = (global.JC && global.JC.data) ? global.JC.data : {};
-
-
-let guia = jc.guia || sessionStorage.getItem('jornada.guia') || 'lumen';
-let nome = jc.nome || jc.participantName || localStorage.getItem('jc.nome') || 'USUÁRIO';
-let selfieDataUrl = jc.selfieDataUrl || localStorage.getItem('jc.selfieDataUrl') || null;
-
-
-guia = String(guia || 'lumen').toLowerCase().trim();
-nome = String(nome || 'USUÁRIO').toUpperCase().trim();
-
-
-return { guia, nome, selfieDataUrl };
-}
-// === NAVEGAÇÃO ===
+  // === NAVEGAÇÃO ===
   function resolveGoNext() {
     return (nextId = DEFAULT_NEXT_SECTION_ID) => {
       try { speechSynthesis.cancel(); } catch {}
@@ -63,35 +85,134 @@ return { guia, nome, selfieDataUrl };
     };
   }
 
-function resolveGoNext() {
-// Preferência: transição com vídeo, depois controlador da jornada, depois hash simples
-if (typeof global.playTransitionThenGo === 'function') {
-return (nextId = DEFAULT_NEXT_SECTION_ID) => global.playTransitionThenGo(nextId);
-}
-if (global.JC && typeof global.JC.go === 'function') {
-return (nextId = DEFAULT_NEXT_SECTION_ID) => global.JC.go(nextId);
-}
-return (nextId = DEFAULT_NEXT_SECTION_ID) => {
-try { location.hash = `#${nextId}`; } catch {}
-console.log(`[${MOD}] Avançar (fallback hash) →`, nextId);
-};
+// =============================================
+// RENDERIZAÇÃO SEGURA (SEM LOOP INFINITO)
+// =============================================
+let _rendering = false;
+
+function renderCard() {
+  if (_rendering) {
+    console.warn('[CARD] Renderização já em andamento, ignorando...');
+    return;
+  }
+  _rendering = true;
+
+  try {
+    const section = d.getElementById('section-card');
+    if (!section) return;
+
+    const { nome, guia, selfieDataUrl } = getUserData();
+
+    // 1. Garante estrutura
+    if (!section.querySelector('.card-stage')) {
+      console.warn(`[${MOD}] Estrutura ausente → criando fallback...`);
+      ensureCardStructure();
+    }
+
+    // 2. Busca elementos (agora garantidos)
+    const guideBg = qid('guideBg');
+    const selfieImage = qid('selfieImage');
+    const nameSlot = qid('userNameSlot');
+    const btnNext = qid('btnNext');
+
+    if (!guideBg || !selfieImage || !nameSlot) {
+      console.error('[CARD] Elementos ainda ausentes após fallback!');
+      return;
+    }
+
+    // 3. Aplica dados
+    const bgUrl = CARD_BG[guia] || CARD_BG.zion;
+    if (guideBg.src !== bgUrl) {
+      guideBg.style.opacity = '0';
+      guideBg.onload = () => guideBg.style.opacity = '1';
+      guideBg.onerror = () => {
+        guideBg.src = CARD_BG.zion;
+        guideBg.style.opacity = '1';
+      };
+      guideBg.src = bgUrl;
+    }
+
+    const finalUrl = selfieDataUrl || PLACEHOLDER_SELFIE;
+    if (selfieImage.src !== finalUrl) {
+      selfieImage.src = finalUrl;
+    }
+    const flameLayer = selfieImage.closest('.flame-layer');
+    if (flameLayer) flameLayer.classList.add('show');
+
+    nameSlot.textContent = nome || 'USUÁRIO';
+
+    if (btnNext) {
+      btnNext.disabled = false;
+      btnNext.style.pointerEvents = 'auto';
+    }
+
+    console.log(`[${MOD}] Renderizado com sucesso!`, { guia, nome, hasSelfie: !!selfieDataUrl });
+  } finally {
+    _rendering = false;
+  }
 }
 
+// =============================================
+// CRIA ESTRUTURA (SÓ UMA VEZ)
+// =============================================
+let _structureEnsured = false;
 
-// ====== Estrutura mínima (fallback) ======
 function ensureCardStructure() {
-// Encontra ou cria a seção
-const section =
-qs('#section-card') ||
-qs('#section-eu-na-irmandade') ||
-(function () {
-const wrap = qs('#jornada-content-wrapper') || d.body;
-const sec = d.createElement('section');
-sec.id = 'section-card';
-sec.className = 'card pergaminho pergaminho-v section';
-wrap.appendChild(sec);
-return sec;
+  if (_structureEnsured) return;
+  _structureEnsured = true;
+
+  const sec = d.getElementById('section-card');
+  if (!sec) return;
+
+  const conteudo = sec.querySelector('#section-conteudo') || sec;
+  if (conteudo.querySelector('.card-stage')) return;
+
+  console.warn(`[${MOD}] Criando HTML do card...`);
+
+  const cardHTML = `
+    <div class="card-stage">
+      <img id="guideBg" class="guide-bg" src="/assets/img/irmandade-quarteto-bg-zion.png" alt="Fundo" />
+      <div class="flame-layer">
+        <img id="selfieImage" class="flame-selfie" src="${PLACEHOLDER_SELFIE}" alt="Selfie" />
+      </div>
+      <div class="card-footer">
+        <span class="card-name-badge">
+          <span id="userNameSlot">USUÁRIO</span>
+        </span>
+      </div>
+      <button id="btnNext" class="btn btn-stone" disabled>Continuar</button>
+    </div>
+  `;
+
+  conteudo.insertAdjacentHTML('beforeend', cardHTML);
+}
+
+  // === INICIALIZAÇÃO SEGURA ===
+  function initCardSafe() {
+    ensureCardStructure();
+    renderCard();
+
+    const btn = qid('btnNext');
+    if (btn) {
+      const goNext = resolveGoNext();
+      on(btn, 'click', () => goNext(DEFAULT_NEXT_SECTION_ID));
+    }
+
+    try {
+      d.dispatchEvent(new CustomEvent('section:card:rendered'));
+    } catch {}
+  }
+
+  // === EVENTOS ===
+  if (d.readyState === 'loading') {
+    on(d, 'DOMContentLoaded', initCardSafe, { once: true });
+  } else {
+    initCardSafe();
+  }
+
+  // === DEBUG ===
+  window.__forceInitCard = initCardSafe;
+  window.__renderCard = renderCard;
+
+  console.log(`[${MOD}] Fallback da Lumen ativado e pronto!`);
 })();
-
-
-})(window);
