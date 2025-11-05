@@ -15,6 +15,7 @@
   display: block;
   position: relative;
   z-index: 1;
+  border-radius: 16px;
 }
 
 /* ===================== CARD STAGE ===================== */
@@ -23,11 +24,11 @@
   margin-top: -48px;
   padding-bottom: 120px;
   min-height: clamp(560px, 66vw, 920px);
-  overflow: visible;
+  overflow: visible !important; /* IMPRESCINDÍVEL: evita corte do ZION */
   z-index: 2;
 }
 
-/* ===================== FLAME LAYER ===================== */
+/* ===================== FLAME LAYER (SELFIE) ===================== */
 .flame-layer {
   position: absolute;
   left: 50%;
@@ -36,17 +37,22 @@
   width: clamp(180px, 38%, 360px);
   z-index: 3;
   pointer-events: none;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 18px rgba(255,215,120,.25);
+  border: 2px solid rgba(255,215,0,.3);
 }
 
 .flame-selfie {
   width: 100%;
-  height: auto;
+  height: 100%;
   object-fit: cover;
+  object-position: center 32%;
+  display: block;
   border-radius: 12px;
-  box-shadow: 0 0 18px rgba(255,215,120,.25);
 }
 
-/* ===================== CARD FOOTER ===================== */
+/* ===================== CARD FOOTER (NOME) ===================== */
 .card-footer {
   position: absolute;
   left: 50%;
@@ -69,10 +75,12 @@
   letter-spacing: .6px;
   text-transform: uppercase;
   text-shadow: 0 1px 2px rgba(0,0,0,.6);
+  font-family: 'Cardo', serif;
+  font-size: 15px;
 }
 
 /* ===================== BOTÃO CONTINUAR ===================== */
-#btnStartJourney {
+#btnNext {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -81,54 +89,76 @@
   pointer-events: auto;
   visibility: visible;
   opacity: 1;
+  min-width: 140px;
+  padding: 10px 24px;
+  font-size: 15px;
 }
 
 /* ===================== MOBILE AJUSTES ===================== */
 @media (max-width: 600px) {
+  .card-stage {
+    margin-top: -32px;
+    padding-bottom: clamp(44px, 9svh, 120px);
+    min-height: 100svh;
+  }
+
   .flame-layer {
-    top: 70% !important;          /* ANTES: 50% → cortava o nome */
+    bottom: auto;
+    top: 70% !important;
     left: 0;
     right: 0;
     transform: translateY(-50%);
-    bottom: auto;
-    width: auto;
+    width: min(60%, 310px);
+    margin: 0 auto;
     text-align: center;
   }
 
   .flame-selfie {
-    width: min(60%, 310px);
-    margin: 0 auto;
-    border-radius: 14px;
+    width: 100%;
+    height: auto;
     object-fit: cover;
-    object-position: center 35% !important; /* Foca no rosto */
+    object-position: center 35% !important;
+    border-radius: 14px;
   }
 
   .card-footer {
     bottom: calc(env(safe-area-inset-bottom, 0px) + 72px);
-    pointer-events: auto;
   }
 
-  #btnNext { /* <-- MUDOU DE #btnStartJourney */
+  .card-name-badge {
+    font-size: 14px;
+    padding: 5px 12px;
+  }
+
+  #btnNext {
     bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
     z-index: 10;
   }
+}
 
-  .card-stage {
-    padding-bottom: clamp(44px, 9svh, 120px);
-    min-height: 100svh;
+/* ===================== DESKTOP ===================== */
+@media (min-width: 601px) {
+  .flame-layer {
+    bottom: clamp(48px, 8vh, 120px);
+    width: clamp(180px, 38%, 360px);
+  }
+
+  .flame-selfie {
+    object-position: center 32%;
   }
 }
+
 /* === PREVIEW — TAMANHO IDEAL PRO CARD GUIA (3:4) === */
 .selfie-preview-wrap {
   width: 92%;
-  max-width: 520px; /* Limita no mobile */
+  max-width: 520px;
   margin: 0 auto 8px;
 }
 
 .preview-frame {
   position: relative;
   width: 100%;
-  padding-bottom: 133.33%; /* 3:4 = 75% de altura */
+  padding-bottom: 133.33%;
   background: #000;
   border-radius: 14px;
   overflow: hidden;
