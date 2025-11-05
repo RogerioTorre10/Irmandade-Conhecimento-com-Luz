@@ -320,6 +320,36 @@ if (flameSelfie && url) {
 
     console.log(`[${MOD}] Card exibido · guia=${guia.id} (${guia.nome}) · participante=${nome}`);
   }
+  
+    // === INICIAR JORNADA APÓS CARD PRONTO ===
+    setTimeout(() => {
+      try {
+        // Tenta iniciar a jornada com o guia e nome
+        if (typeof window.Jornada?.iniciar === 'function') {
+          window.Jornada.iniciar(guia.id, nome);
+        } else if (typeof window.JC?.iniciarJornada === 'function') {
+          window.JC.iniciarJornada(guia.id, nome);
+        } else if (typeof window.iniciarEtapa === 'function') {
+          window.iniciarEtapa(guia.id);
+        } else {
+          // Fallback visual: mostra mensagem de boas-vindas
+          const wrapper = document.getElementById('jornada-content-wrapper');
+          if (wrapper) {
+            wrapper.innerHTML = `
+              <div style="padding: 30px; text-align: center; font-family: serif; color: #333; background: rgba(255,255,255,0.9); border-radius: 12px; margin: 20px;">
+                <h2>Bem-vindo à Jornada do <strong>${guia.nome.toUpperCase()}</strong>!</h2>
+                <p>Olá, <strong>${nome}</strong>!</p>
+                <p><em>"A luz que você carrega ilumina o caminho dos outros."</em></p>
+                <p>Clique em <strong>Continuar</strong> para começar.</p>
+              </div>
+            `;
+          }
+        }
+      } catch (e) {
+        console.error('[section-card.js] Erro ao iniciar jornada:', e);
+      }
+    }, 300); // pequeno delay para garantir DOM pronto
+  }
 
   // ---------- Escutas ----------
   document.addEventListener('section:shown', (e) => {
