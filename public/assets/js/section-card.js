@@ -10,6 +10,13 @@
   if (NS.__bound) return; // evita múltiplos binds
   NS.__bound = true;
 
+  // === ESPERA A FOTO SER CAPTURADA ===
+  window.addEventListener('selfie:captured', (e) => {
+  console.log('%c[SELFIE] Foto capturada! Atualizando card...', 'color: cyan');
+  localStorage.setItem('jc.selfieDataUrl', e.detail.dataUrl);
+  renderCard();
+ });
+  
   // ==========================
   // Config
   // ==========================
