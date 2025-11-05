@@ -1,10 +1,11 @@
 /* ===================== CARD BASE ===================== */
 #section-card {
-  position: relative;
-  display: block;
+  position: relative !important;
+  visibility: visible !important;
+  display: block !important;
   min-height: 100vh;
   background: transparent;
-  z-index: 2;
+  z-index: 10 !important;
 }
 
 /* ===================== BACKGROUND ===================== */
@@ -12,7 +13,7 @@
   width: 100% !important;
   height: 100% !important;
   min-height: 100vh !important;
-  object-fit: cover;
+  object-fit: cover !important;
   top: 0; left: 0;
   border-radius: 16px;
   opacity: 1 !important;
@@ -25,9 +26,9 @@
 /* ===================== CARD STAGE ===================== */
 .card-stage {
   position: relative;
-  width: 92%;
-  max-width: 520px;  
-  margin: 0 auto;
+  width: 92% !important;
+  max-width: 520px !important; 
+  margin: 20px auto !important;
   padding-bottom: 120px;
   min-height: 70vh;
   overflow: visible !important; /* IMPRESCINDÍVEL: evita corte do ZION */
@@ -39,7 +40,7 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: clamp(48px, 8vh, 120px);
+  bottom: clamp(48px, 8vh, 120px)!important;
   width: clamp(180px, 38%, 360px);
   z-index: 3;
   pointer-events: none;
