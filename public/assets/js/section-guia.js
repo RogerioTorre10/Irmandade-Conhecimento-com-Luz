@@ -168,6 +168,10 @@
     const guideButtons = qa('button[data-action="select-guia"]', els.optionsBox);
     guideButtons.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; b.style.cursor = 'not-allowed'; });
 
+    // Após escolher o guia e digitar o nome
+    sessionStorage.setItem('jornada.guia', guiaId);        // ex: 'arian'
+    sessionStorage.setItem('jornada.nome', nomeDigitado);  // ex: 'Gisely'
+    
     // Confirmar nome → habilita texto e opções
     els.confirmBtn?.addEventListener('click', async () => {
       let name = (els.nameInput?.value || '').trim();
@@ -227,11 +231,7 @@
           window.JC = window.JC || {};
           window.JC.data = window.JC.data || {};
           window.JC.data.guia = g.id || g.nome;
-        } catch {}
-
-        // Após escolher o guia e digitar o nome
-          sessionStorage.setItem('jornada.guia', guiaId);        // ex: 'arian'
-          sessionStorage.setItem('jornada.nome', nomeDigitado);  // ex: 'Gisely'
+        } catch {}      
 
         // apaga brilho
         els.moldura?.classList.add('fade-out');
