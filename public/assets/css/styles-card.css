@@ -9,21 +9,25 @@
 
 /* ===================== BACKGROUND ===================== */
 #guideBg {
-  width: 100%;
-  height: auto;
+  width: 100% !important;
+  height: auto !important;
   object-fit: cover;
+  border-radius: 16px;
+  opacity: 1 !important;
+  transition: opacity 0.6s ease
   display: block;
   position: relative;
   z-index: 1;
-  border-radius: 16px;
 }
 
 /* ===================== CARD STAGE ===================== */
 .card-stage {
   position: relative;
-  margin-top: -48px;
+  width: 92%;
+  max-width: 520px;  
+  margin: 0 auto;
   padding-bottom: 120px;
-  min-height: clamp(560px, 66vw, 920px);
+  min-height: 70vh;
   overflow: visible !important; /* IMPRESCINDÍVEL: evita corte do ZION */
   z-index: 2;
 }
@@ -165,3 +169,23 @@
   border: 1px solid rgba(255,255,255,.08);
   box-shadow: 0 4px 16px rgba(0,0,0,.4);
 }
+
+#section-card,
+#section-conteudo,
+.card-stage,
+#guideBg,
+.flame-layer,
+.card-footer,
+#btnNext {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 2 !important;
+}
+
+#section-conteudo {
+  min-height: 100vh;
+  padding: 20px 0;
+  box-sizing: border-box;
+}
+
