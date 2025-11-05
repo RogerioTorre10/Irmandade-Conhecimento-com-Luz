@@ -225,6 +225,23 @@
     if (e.detail?.sectionId === 'section-selfie') stopCamera();
   });
 
+  // === DISPARA EVENTO QUANDO A FOTO FOR SALVA ===
+function confirmAndPlayTransition() {
+  const dataUrl = NS._lastCapture;
+  if (!dataUrl) { toast('Tire uma foto primeiro.'); return; }
+
+  // SALVA
+  window.JC = window.JC || {}; window.JC.data = window.JC.data || {};
+  window.JC.data.selfieDataUrl = dataUrl;
+  try { localStorage.setItem('jc.selfieDataUrl', dataUrl); } catch {}
+
+  // DISPARA EVENTO GLOBAL
+  window.dispatchEvent(new CustomEvent('selfie:captured', { detail: { dataUrl } }));
+
+  // VAI PRO CARD
+  playTransitionAndGo(NEXT_SECTION_ID);
+}
+
   // FORÇA INIT SE JÁ ESTIVER ATIVO
   const section = document.getElementById('section-selfie');
   if (section && section.classList.contains('active')) {
