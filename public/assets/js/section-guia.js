@@ -229,6 +229,10 @@
           window.JC.data.guia = g.id || g.nome;
         } catch {}
 
+        // Após escolher o guia e digitar o nome
+          sessionStorage.setItem('jornada.guia', guiaId);        // ex: 'arian'
+          sessionStorage.setItem('jornada.nome', nomeDigitado);  // ex: 'Gisely'
+
         // apaga brilho
         els.moldura?.classList.add('fade-out');
         els.guiaTexto?.classList.add('fade-out');
