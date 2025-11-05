@@ -116,3 +116,20 @@
     min-height: 100svh;
   }
 }
+/* === PREVIEW — TAMANHO IDEAL PRO CARD GUIA (3:4) === */
+.selfie-preview-wrap {
+  width: 92%;
+  max-width: 520px; /* Limita no mobile */
+  margin: 0 auto 8px;
+}
+
+.preview-frame {
+  position: relative;
+  width: 100%;
+  padding-bottom: 133.33%; /* 3:4 = 75% de altura */
+  background: #000;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 4px 16px rgba(0,0,0,.4);
+}
