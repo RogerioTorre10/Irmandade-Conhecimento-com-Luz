@@ -62,41 +62,59 @@
     return { nome, guia };
   }
 
-  // === RENDERIZA O CARD ===
-  function renderCard() {
-    const section = qs('#section-card') || qs('#section-eu-na-irmandade');
-    if (!section) return;
+ // === RENDERIZA O CARD ===
+function renderCard() {
+  const section = qs('#section-card') || qs('#section-eu-na-irmandade');
+  if (!section) return;
 
-    const { nome, guia } = getUserData();
+  const { nome, guia } = getUserData();
 
-    // 1. FUNDO DO GUIA
-    const guideBg = qs('#guideBg', section);
-    if (guideBg) {
-      const bgUrl = CARD_BG[guia] || CARD_BG.zion;
-      guideBg.src = bgUrl;
+  // 1. FUNDO DO GUIA (COM FALLBACK VISUAL IMEDIATO)
+  const guideBg = qs('#guideBg', section);
+  if (guideBg) {
+    const bgUrl = CARD_BG[guia] || CARD_BG.zion;
+
+    // GARANTE FUNDO VISÍVEL DESDE O INÍCIO
+    if (!guideBg.src || guideBg.src.endsWith('zion.png')) {
+      guideBg.src = CARD_BG.zion; // Zion como base
+    }
+
+    // TROCA PARA O GUIA ESCOLHIDO
+    if (guideBg.src !== bgUrl) {
       guideBg.style.opacity = '0';
-      guideBg.onload = () => guideBg.style.opacity = '1';
-      guideBg.onerror = () => guideBg.src = CARD_BG.zion;
+      guideBg.onload = () => {
+        guideBg.style.opacity = '1';
+        guideBg.onload = null;
+      };
+      guideBg.onerror = () => {
+        console.warn('[CARD] Erro ao carregar fundo, voltando para Zion');
+        guideBg.src = CARD_BG.zion;
+        guideBg.style.opacity = '1';
+      };
+      guideBg.src = bgUrl;
+    } else {
+      guideBg.style.opacity = '1';
     }
-
-    // 2. SELFIE
-    const selfieImg = qs('#selfieImage', section);
-    if (selfieImg) {
-      const url = window.JC?.data?.selfieDataUrl || localStorage.getItem('jc.selfieDataUrl');
-      selfieImg.src = url || PLACEHOLDER_SELFIE;
-      const flameLayer = selfieImg.closest('.flame-layer');
-      if (flameLayer) {
-        flameLayer.classList.add('show');
-        if (!url) flameLayer.classList.add('placeholder-only');
-      }
-    }
-
-    // 3. NOME DO USUÁRIO
-    const nameSlot = qs('#userNameSlot', section);
-    if (nameSlot) nameSlot.textContent = nome;
-
-    console.log('%c[CARD] Renderizado com sucesso!', 'color: gold; font-weight: bold', { nome, guia });
   }
+
+  // 2. SELFIE
+  const selfieImg = qs('#selfieImage', section);
+  if (selfieImg) {
+    const url = window.JC?.data?.selfieDataUrl || localStorage.getItem('jc.selfieDataUrl');
+    const finalUrl = url || PLACEHOLDER_SELFIE;
+    if (selfieImg.src !== finalUrl) {
+      selfieImg.src = finalUrl;
+    }
+    const flameLayer = selfieImg.closest('.flame-layer');
+    if (flameLayer) flameLayer.classList.add('show');
+  }
+
+  // 3. NOME DO USUÁRIO
+  const nameSlot = qs('#userNameSlot', section);
+  if (nameSlot) nameSlot.textContent = nome;
+
+  console.log('%c[CARD] Renderizado com sucesso!', 'color: gold; font-weight: bold', { nome, guia });
+}
 
   // === NAVEGAÇÃO ===
   function goNext() {
