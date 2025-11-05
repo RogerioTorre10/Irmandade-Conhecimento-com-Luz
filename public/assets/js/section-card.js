@@ -85,24 +85,42 @@
     };
   }
 
-  // === RENDERIZAÇÃO ===
-  function renderCard() {
-    const { guia, nome, selfieDataUrl } = getUserData();
+// =============================================
+// RENDERIZAÇÃO SEGURA (SEM LOOP INFINITO)
+// =============================================
+let _rendering = false;
 
+function renderCard() {
+  if (_rendering) {
+    console.warn('[CARD] Renderização já em andamento, ignorando...');
+    return;
+  }
+  _rendering = true;
+
+  try {
+    const section = d.getElementById('section-card');
+    if (!section) return;
+
+    const { nome, guia, selfieDataUrl } = getUserData();
+
+    // 1. Garante estrutura
+    if (!section.querySelector('.card-stage')) {
+      console.warn(`[${MOD}] Estrutura ausente → criando fallback...`);
+      ensureCardStructure();
+    }
+
+    // 2. Busca elementos (agora garantidos)
     const guideBg = qid('guideBg');
     const selfieImage = qid('selfieImage');
     const nameSlot = qid('userNameSlot');
     const btnNext = qid('btnNext');
 
     if (!guideBg || !selfieImage || !nameSlot) {
-      console.warn(`[${MOD}] Estrutura ainda ausente → criando fallback...`);
-      ensureCardStructure();
-      // Tenta de novo
-      setTimeout(renderCard, 100);
+      console.error('[CARD] Elementos ainda ausentes após fallback!');
       return;
     }
 
-    // Fundo
+    // 3. Aplica dados
     const bgUrl = CARD_BG[guia] || CARD_BG.zion;
     if (guideBg.src !== bgUrl) {
       guideBg.style.opacity = '0';
@@ -114,7 +132,6 @@
       guideBg.src = bgUrl;
     }
 
-    // Selfie
     const finalUrl = selfieDataUrl || PLACEHOLDER_SELFIE;
     if (selfieImage.src !== finalUrl) {
       selfieImage.src = finalUrl;
@@ -122,17 +139,53 @@
     const flameLayer = selfieImage.closest('.flame-layer');
     if (flameLayer) flameLayer.classList.add('show');
 
-    // Nome
     nameSlot.textContent = nome || 'USUÁRIO';
 
-    // Botão
     if (btnNext) {
       btnNext.disabled = false;
       btnNext.style.pointerEvents = 'auto';
     }
 
     console.log(`[${MOD}] Renderizado com sucesso!`, { guia, nome, hasSelfie: !!selfieDataUrl });
+  } finally {
+    _rendering = false;
   }
+}
+
+// =============================================
+// CRIA ESTRUTURA (SÓ UMA VEZ)
+// =============================================
+let _structureEnsured = false;
+
+function ensureCardStructure() {
+  if (_structureEnsured) return;
+  _structureEnsured = true;
+
+  const sec = d.getElementById('section-card');
+  if (!sec) return;
+
+  const conteudo = sec.querySelector('#section-conteudo') || sec;
+  if (conteudo.querySelector('.card-stage')) return;
+
+  console.warn(`[${MOD}] Criando HTML do card...`);
+
+  const cardHTML = `
+    <div class="card-stage">
+      <img id="guideBg" class="guide-bg" src="/assets/img/irmandade-quarteto-bg-zion.png" alt="Fundo" />
+      <div class="flame-layer">
+        <img id="selfieImage" class="flame-selfie" src="${PLACEHOLDER_SELFIE}" alt="Selfie" />
+      </div>
+      <div class="card-footer">
+        <span class="card-name-badge">
+          <span id="userNameSlot">USUÁRIO</span>
+        </span>
+      </div>
+      <button id="btnNext" class="btn btn-stone" disabled>Continuar</button>
+    </div>
+  `;
+
+  conteudo.insertAdjacentHTML('beforeend', cardHTML);
+}
 
   // === INICIALIZAÇÃO SEGURA ===
   function initCardSafe() {
