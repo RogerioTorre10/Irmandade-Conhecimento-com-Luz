@@ -1,46 +1,57 @@
 <link rel="stylesheet" href="/assets/css/styles-base.css">
 <link rel="stylesheet" href="/assets/css/styles-card.css">
 
-<section id="section-card" class="card pergaminho pergaminho-v section">
-  <div id="section-conteudo" class="conteudo-pergaminho">
-    
-    <!-- Título com datilografia -->
-   <h2 
-  data-typing="true" 
-  data-text="Eu na Irmandade" 
-  data-speed="40" 
-  data-cursor="true" 
-  class="titulo-selfie"
->Eu na Irmandade</h2>
+<div id="jornada-content-wrapper">
+  <section id="section-card" class="card pergaminho pergaminho-v section">
+    <div id="section-conteudo" class="conteudo-pergaminho">
+      
+      <!-- Título com datilografia -->
+      <h2 
+        data-typing="true" 
+        data-text="Eu na Irmandade" 
+        data-speed="40" 
+        data-cursor="true" 
+        class="titulo-selfie"
+      >Eu na Irmandade</h2>
 
-<!-- CARD COMPLETO -->
-<div class="card-stage">
-  
-  <!-- FUNDO PADRÃO (ZION) COMO FALLBACK VISUAL -->
-<img 
-  id="guideBg" 
-  class="guide-bg" 
-  src="/assets/img/irmandade-quarteto-bg-zion.png" 
-  alt="Fundo do Guia" 
-/>
-  <!-- SELFIE (dentro do placeholder) -->
-  <div class="flame-layer">
-    <img 
-      id="selfieImage" 
-      class="flame-selfie" 
-      src="/assets/img/irmandade-card-placeholder.jpg" 
-      alt="Sua foto na Irmandade"
-    />
-  </div>
+      <!-- CARD COMPLETO -->
+      <div class="card-stage">
+        
+        <!-- FUNDO PADRÃO (ZION) COMO FALLBACK VISUAL -->
+        <img 
+          id="guideBg" 
+          class="guide-bg" 
+          src="/assets/img/irmandade-quarteto-bg-zion.png" 
+          alt="Fundo do Guia" 
+        />
+        
+        <!-- SELFIE -->
+        <div class="flame-layer">
+          <img 
+            id="selfieImage" 
+            class="flame-selfie" 
+            src="/assets/img/irmandade-card-placeholder.jpg" 
+            alt="Sua foto na Irmandade"
+          />
+        </div>
 
-  <!-- NOME DO USUÁRIO -->
-  <div class="card-footer">
-    <span class="card-name-badge">
-      <span id="userNameSlot">USUÁRIO</span>
-    </span>
-  </div>
+        <!-- NOME DO GUIA (TOPO) -->
+        <div class="card-guide-name">
+          <span id="guideNameSlot">LUMEN</span>
+        </div>
 
-  <!-- BOTÃO CONTINUAR -->
-  <button id="btnNext" class="btn btn-stone">Continuar</button>
+        <!-- NOME DO USUÁRIO -->
+        <div class="card-footer">
+          <span class="card-name-badge">
+            <span id="userNameSlot">USUÁRIO</span>
+          </span>
+        </div>
+
+        <!-- BOTÃO CONTINUAR -->
+        <div class="card-actions">
+          <button id="btnNext" class="btn btn-stone">Continuar</button>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
-</section>
