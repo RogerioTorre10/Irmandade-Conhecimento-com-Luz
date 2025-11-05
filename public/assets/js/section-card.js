@@ -323,33 +323,24 @@ if (flameSelfie && url) {
   
     // === INICIAR JORNADA APÓS CARD PRONTO ===
     setTimeout(() => {
-      try {
-        // Tenta iniciar a jornada com o guia e nome
-        if (typeof window.Jornada?.iniciar === 'function') {
-          window.Jornada.iniciar(guia.id, nome);
-        } else if (typeof window.JC?.iniciarJornada === 'function') {
-          window.JC.iniciarJornada(guia.id, nome);
-        } else if (typeof window.iniciarEtapa === 'function') {
-          window.iniciarEtapa(guia.id);
-        } else {
-          // Fallback visual: mostra mensagem de boas-vindas
-          const wrapper = document.getElementById('jornada-content-wrapper');
-          if (wrapper) {
-            wrapper.innerHTML = `
-              <div style="padding: 30px; text-align: center; font-family: serif; color: #333; background: rgba(255,255,255,0.9); border-radius: 12px; margin: 20px;">
-                <h2>Bem-vindo à Jornada do <strong>${guia.nome.toUpperCase()}</strong>!</h2>
-                <p>Olá, <strong>${nome}</strong>!</p>
-                <p><em>"A luz que você carrega ilumina o caminho dos outros."</em></p>
-                <p>Clique em <strong>Continuar</strong> para começar.</p>
-              </div>
-            `;
-          }
-        }
-      } catch (e) {
-        console.error('[section-card.js] Erro ao iniciar jornada:', e);
+      // Tenta todos os nomes possíveis que o seu projeto usa
+      if (window.Jornada?.iniciar) {
+        window.Jornada.iniciar(guia.id, nome);
+      } else if (window.JC?.iniciarJornada) {
+        window.JC.iniciarJornada(guia.id, nome);
+      } else if (window.iniciarEtapa) {
+        window.iniciarEtapa(guia.id);
+      } else {
+        // fallback visual (caso ainda não encontre)
+        document.getElementById('jornada-content-wrapper').innerHTML = `
+          <div style="padding:40px; text-align:center; font-family:Georgia; color:#333; background:rgba(255,255,200,0.9); border-radius:15px;">
+            <h2>Bem-vindo, <strong>${nome}</strong>!</h2>
+            <p>Você foi chamado pela <strong>${guia.nome}</strong> para a Irmandade da Chama Eterna.</p>
+            <p><em>"Que a luz que você carrega ilumine o caminho dos que virão."</em></p>
+          </div>
+        `;
       }
-    }, 300); // pequeno delay para garantir DOM pronto
-  }
+    }, 500);
 
   // ---------- Escutas ----------
   document.addEventListener('section:shown', (e) => {
