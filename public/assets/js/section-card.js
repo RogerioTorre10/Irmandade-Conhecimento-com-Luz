@@ -55,7 +55,7 @@
     const sec = d.getElementById('section-card');
     if (!sec) return;
 
-    const conteudo = sec.querySelector('#section-conteudo, .conteudo-pergaminho, .card-wrap') || sec;
+    const conteudo = sec.querySelector('#section-conteudo') || sec;
     if (conteudo.querySelector('.card-stage')) {
       _structureEnsured = true;
       return;
@@ -177,6 +177,52 @@
   // === EVENTOS ===
   if (d.readyState === 'loading') {
     on(d, 'DOMContentLoaded', initCardSafe, { once: true });
+  } else {
+    initCardSafe();
+  }
+
+  // === DEBUG ===
+  window.__forceInitCard = initCardSafe;
+  window.__renderCard = renderCard;
+
+  console.log(`[${MOD}] Fallback da Lumen ativado e pronto!`);
+}  // === SANDBOX / NEUTRALIZA OVERLAYS DO PERGAMINHO ===
+  function injectCardCSS() {
+    if (document.getElementById('card-hotfix')) return;
+    const css = `#section-card{position:relative;isolation:isolate}
+#section-card .card-stage{position:relative;z-index:20;min-height:clamp(560px,66vw,920px)}
+#section-card #guideBg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;display:block}
+#section-card .flame-layer{position:absolute;left:50%;bottom:clamp(96px,14vh,160px);transform:translateX(-50%);width:clamp(240px,38%,520px);z-index:30}
+#section-card .card-footer{position:absolute;left:50%;bottom:clamp(56px,9vh,96px);transform:translateX(-50%);z-index:31}
+#section-card #btnNext{position:absolute;left:50%;bottom:clamp(16px,6vh,40px);transform:translateX(-50%);z-index:32}
+#section-card, #section-card .conteudo-pergaminho{background:transparent!important}
+#section-card .conteudo-pergaminho > *:not(.card-stage),
+#section-card #section-conteudo > *:not(.card-stage){display:none!important}
+.pergaminho::before,.pergaminho-v::before,#section-card.pergaminho::before,#section-card.pergaminho-v::before{z-index:0!important;pointer-events:none!important}`;
+    const s = document.createElement('style');
+    s.id = 'card-hotfix';
+    s.textContent = css;
+    document.head.appendChild(s);
+  }
+
+  // === INICIALIZAÇÃO SEGURA ===
+  function initCardSafe() {
+    injectCardCSS();
+    ensureCardStructure();
+    renderCard();
+
+    const btn = qid('btnNext');
+    if (btn) {
+      const goNext = resolveGoNext();
+      on(btn, 'click', () => goNext(DEFAULT_NEXT_SECTION_ID));
+    }
+
+    try { document.dispatchEvent(new CustomEvent('section:card:rendered')); } catch {}
+  }
+
+  // === EVENTOS ===
+  if (document.readyState === 'loading') {
+    on(document, 'DOMContentLoaded', initCardSafe, { once: true });
   } else {
     initCardSafe();
   }
