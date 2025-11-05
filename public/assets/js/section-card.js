@@ -10,7 +10,15 @@
   // Navegação/fluxo
   const NEXT_SECTION_ID = 'section-perguntas';
   const VIDEO_SRC = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
-    
+
+  // ADICIONE NO TOPO DO ARQUIVO (depois do IIFE)
+   window.addEventListener('storage', (e) => {
+    if (e.key === 'jc.guia' || e.key === 'jc.nome') {
+    console.log('%c[SYNC] Dados atualizados via storage!', 'color: cyan', e);
+    renderCard(); // RECARREGA O CARD
+   }
+  });
+  
   // Imagens fallback e placeholder
   const CARD_BG = {
     arian: '/assets/img/irmandade-quarteto-bg-arian.png',
