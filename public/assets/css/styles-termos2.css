@@ -1,236 +1,110 @@
-/* ========== SEÇÃO TERMOS 2 ========== */
+/* ==========================================================
+   TERMOS 2 — harmonizado com styles-base.css + brilho-texturas.css
+   ========================================================== */
 
-/* Título da seção */
-.termos-title {
+#section-termos2.pergaminho{
+  min-height: 100svh;
+  padding-top: max(16px, env(safe-area-inset-top));
+  padding-bottom: max(clamp(20px, 6vh, 48px), env(safe-area-inset-bottom));
+  padding-left: max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
+}
+
+#section-termos2 .parchment-inner-rough{
+  width: min(92%, 820px);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 2.6vh, 16px);
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#section-termos2 .termos-title{
   font-family: 'ManufacturingConsent', sans-serif;
-  font-size: 32px;
+  font-size: clamp(22px, 3.4vw, 32px);
   text-align: center;
-  color: var(--primary);
-  margin-top: 30px;
-  text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
-}
-
-/* Texto dos termos */
-.termos-texto {
-  font-family: 'Cardo', serif;
-  font-size: 16px;
-  color: var(--fg);
-  line-height: 1.6;
-  margin: 20px auto;
-  max-width: 680px;
-  text-align: justify;
-  background-color: rgba(18, 24, 50, 0.6);
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 0 12px rgba(0,0,0,0.3);
-}
-
-/* Botão de continuar */
-.termos-actions .btn-continuar {
-  padding: 10px 24px;
-  font-size: 18px;
-  font-family: 'ManufacturingConsent', sans-serif;
-  background: linear-gradient(to bottom, #34d399, #059669);
   color: #fff;
+  margin: 8px 0 4px;
+  text-shadow:
+    0 1px 0 #000,
+    0 2px 4px rgba(0,0,0,.55),
+    0 0 12px var(--aura-gold),
+    0 0 24px var(--aura-amber);
+  filter: drop-shadow(0 0 8px var(--aura-gold-soft));
+}
+
+#section-termos2 .termos-texto{
+  font-family: 'Cardo', serif;
+  font-size: clamp(14px, 1.9vw, 16px);
+  color: #fff;
+  line-height: 1.6;
+  text-align: justify;
+  margin: 6px auto 0;
+  padding: clamp(14px, 2.4vh, 20px);
+  border-radius: 14px;
+  background: rgba(10, 12, 20, .42);
+  box-shadow:
+    inset 0 0 12px rgba(0,0,0,.35),
+    0 0 22px var(--aura-gold),
+    0 0 40px var(--aura-amber);
+  border: 1px solid rgba(255, 220, 150, .35);
+}
+
+#section-termos2 .termos-actions{
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: clamp(12px, 3vh, 18px) auto 0;
+}
+
+#section-termos2 .btn-continuar{
+  min-width: 180px;
+  min-height: 44px;
+  padding: 10px 16px;
+  font-family: 'ManufacturingConsent', sans-serif;
+  font-size: clamp(14px, 2.4vw, 18px);
+  color: #fff;
+  border: 0;
   border-radius: 10px;
-  border: 2px solid #065f46;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
   cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.termos-actions .btn-continuar:hover {
-  transform: scale(1.05);
-}
-/* Mimos */
-@keyframes btnReady {
-  0% { transform: scale(0.98); filter: brightness(0.9); }
-  60% { transform: scale(1.02); filter: brightness(1.1); }
-  100% { transform: scale(1); filter: none; }
-}
-@keyframes introTitleIn {
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes introPan {
-  0%   { transform: translateY(4px); }
-  50%  { transform: translateY(-4px); }
-  100% { transform: translateY(0); }
-}
-
-/* Responsivo */
-@media (max-width: 480px) {
-  #section-intro { padding: 16px; max-width: 92vw; }
-  .intro-title { font-size: 28px; margin-top: 24px; }
-  .parchment-text-rough { font-size: 12.5px; }
-}
-/* Cursor de datilografia — habilitado por data-cursor="true" */
-#section-intro [data-typing="true"][data-cursor="true"] {
-  position: relative;
-  display: inline-block;                 /* garante área para o cursor */
-  padding-right: 0.35em;                 /* respiro para o cursor */
-}
-
-/* Mostra o cursor enquanto digita */
-#section-intro [data-typing="true"][data-cursor="true"].typing-active::after {
-  content: '';
-  position: absolute;
-  right: 0.05em;
-  bottom: 0.12em;
-  width: 0.5ch;
-  height: 1.1em;
-  background: linear-gradient(180deg, #ffd36b 0%, #ffbf3b 80%, #b27a1a 100%); /* dourado */
-  border-radius: 2px;
-  opacity: 0.95;
-  animation: caretBlink 1s steps(1, end) infinite;
-  box-shadow: 0 0 6px rgba(255, 200, 80, 0.9);
-}
-
-/* Some quando terminou a digitação */
-#section-intro [data-typing="true"][data-cursor="true"].typing-done::after {
-  content: none;
-}
-
-@keyframes caretBlink {
-  0%, 45%   { opacity: 0.95; }
-  50%, 100% { opacity: 0; }
-}
-/* Halo dourado no pergaminho enquanto há um bloco datilografando */
-#section-intro:has(.typing-active) .parchment-inner-rough {
-  outline: 2px solid rgba(255, 204, 102, 0.25);                /* aro leve */
-  outline-offset: 6px;
+  background: linear-gradient(to bottom, rgba(90,90,90,.9), rgba(60,60,60,.9));
   box-shadow:
-    0 0 0 2px rgba(255, 204, 102, 0.15) inset,
-    0 0 22px rgba(255, 204, 102, 0.40),
-    0 0 40px rgba(255, 153, 0, 0.25);
-  animation: parchmentGlow 1.8s ease-in-out infinite;
+    0 1px 0 rgba(255,255,255,.15) inset,
+    0 8px 16px rgba(0,0,0,.4),
+    0 0 12px var(--aura-gold-soft),
+    0 0 24px var(--aura-amber);
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+#section-termos2 .btn-continuar:hover{ transform: translateY(-1px); filter: drop-shadow(0 0 16px var(--aura-gold)); }
+#section-termos2 .btn-continuar:active{ transform: translateY(0); }
+#section-termos2 .btn-continuar:focus-visible{
+  outline:2px solid rgba(255, 228, 150, .85);
+  outline-offset:2px;
 }
 
-/* Ao terminar tudo, volta suave ao normal */
-#section-intro:not(:has(.typing-active)) .parchment-inner-rough {
-  transition: box-shadow .35s ease, outline-color .35s ease;
+/* Cursor/typing (opcional) */
+#section-termos2 [data-typing="true"][data-cursor="true"]{
+  position: relative; display: inline-block; padding-right: .35em;
+}
+#section-termos2 [data-typing="true"][data-cursor="true"].typing-active::after{
+  content:''; position:absolute; right:.05em; bottom:.12em;
+  width:.5ch; height:1.1em; border-radius:2px;
+  background: linear-gradient(180deg,#ffd36b 0%,#ffbf3b 80%,#b27a1a 100%);
+  box-shadow:0 0 6px rgba(255,200,80,.9);
+  animation: caretBlink 1s steps(1,end) infinite;
+}
+#section-termos2 [data-typing="true"][data-cursor="true"].typing-done::after{ content:none; }
+@keyframes caretBlink{ 0%,45%{opacity:.95} 50%,100%{opacity:0} }
+
+/* Mobile refinements */
+@media (max-width: 480px){
+  #section-termos2 .termos-texto{ padding: 14px 16px; }
+  #section-termos2 .termos-actions{ gap: 10px; }
+}
+@media (max-width: 360px){
+  #section-termos2 .termos-actions{ justify-content: stretch; }
+  #section-termos2 .btn-continuar{ width:100%; }
 }
 
-@keyframes parchmentGlow {
-  0%   { box-shadow:
-          0 0 0 2px rgba(255, 204, 102, 0.15) inset,
-          0 0 18px rgba(255, 204, 102, 0.35),
-          0 0 32px rgba(255, 153, 0, 0.18); }
-  50%  { box-shadow:
-          0 0 0 2px rgba(255, 204, 102, 0.18) inset,
-          0 0 26px rgba(255, 204, 102, 0.50),
-          0 0 52px rgba(255, 153, 0, 0.30); }
-  100% { box-shadow:
-          0 0 0 2px rgba(255, 204, 102, 0.15) inset,
-          0 0 18px rgba(255, 204, 102, 0.35),
-          0 0 32px rgba(255, 153, 0, 0.18); }
-}
-/* Cursor slim nos parágrafos de texto */
-#section-intro .parchment-text-rough[data-cursor="true"].typing-active::after {
-  width: 2px;
-  height: 1em;
-  border-radius: 1px;
-  right: 0;
-}
-
-/* =======================================================
-   BRILHO + TEXTURAS — módulo universal (espinhos e pedra)
-   Seguro para usar junto do styles-base.css
-   ======================================================= */
-
-/* -------- Variáveis (paths das texturas) -------- */
-:root{
-  --stone-img: url('/assets/img/textura-de-pedra.jpg'); /* usada em utilitário opcional */
-  --btn-gold-outer: rgba(255, 230, 120, 0.40);
-  --btn-gold-mid:   rgba(255, 220, 120, 0.45);
-  --btn-gold-in:    rgba(255, 255, 230, 0.25);
-  --btn-gold-line:  rgba(255, 215,   0, 0.25);
-  --btn-text:       #f9e7c2;
-}
-
-/* -------- Animações compartilhadas -------- */
-@keyframes brilhoDivino {
-  0%,100% {
-    box-shadow:
-      0 0 6px  var(--btn-gold-outer),
-      0 0 12px var(--btn-gold-mid),
-      inset 0 0 2px var(--btn-gold-in);
-  }
-  50% {
-    box-shadow:
-      0 0 10px var(--btn-gold-outer),
-      0 0 16px var(--btn-gold-mid),
-      inset 0 0 4px var(--btn-gold-in);
-  }
-}
-
-@keyframes reflexoDourado {
-  0%   { opacity: 0; transform: translate(-120%, -120%) rotate(25deg); }
-  45%,
-  55%  { opacity: .85; }
-  100% { opacity: 0; transform: translate(120%, 120%) rotate(25deg); }
-}
-
-/* =======================================================
-   B) BOTÃO — TEXTURA DE PEDRA
-   Compatível com seu styles-base.css (não quebra o que já existe)
-   Basta aplicar a classe .btn-stone em qualquer botão.
-   ======================================================= */
-.btn-stone{
-  position: relative;
-  overflow: hidden;
-  display: inline-block;
-  border-radius: 8px;
-  color:#fff; text-shadow: 1px 1px 3px rgba(0,0,0,.7);
-  cursor: pointer;
-  transition: all .25s ease-in-out;
-  /* NÃO definimos background aqui para não conflitar
-     com regras existentes. Use utilitário .stone-texture se precisar. */
-}
-
-/* Utilitário opcional: aplicar textura de pedra caso o botão não tenha */
-.stone-texture{
-  background:
-    linear-gradient(to bottom, #a0a0a0, #808080),
-    var(--stone-img) center/cover;
-  background-blend-mode: overlay;
-  border: 3px solid #4a4a4a;
-  box-shadow:
-    inset 0 3px 6px rgba(0,0,0,.4),
-    0 6px 12px rgba(0,0,0,.6);
-}
-
-/* Aro dourado sutil (para casar com a família de botões) */
-.btn-stone::after{
-  content:'';
-  position:absolute; inset:0; border-radius:8px;
-  box-shadow: inset 0 0 0 1px var(--btn-gold-line);
-  pointer-events:none;
-}
-
-/* Brilho + reflexo no hover (igual aos espinhos) */
-.btn-stone:hover:not(:disabled){
-  transform: translateY(-1px);
-  animation: brilhoDivino 1.8s ease-in-out infinite;
-}
-.btn-stone:hover:not(:disabled)::before{
-  content:'';
-  position:absolute; top:0; left:0;
-  width:60%; height:200%;
-  background: linear-gradient(
-    130deg,
-    rgba(255,255,200,0) 0%,
-    rgba(255,255,180,.6) 50%,
-    rgba(255,255,200,0) 100%
-  );
-  transform: translate(-150%, -150%) rotate(25deg);
-  animation: reflexoDourado 2s linear forwards;
-  pointer-events:none;
-}
-.btn-stone:active:not(:disabled){
-  transform: translateY(0);
-  filter: brightness(.98);
-  animation: none;
-}
-.btn-stone:disabled{
-  opacity:.6; pointer-events:none; animation:none;
-}
+.hidden{ display:none !important; }
