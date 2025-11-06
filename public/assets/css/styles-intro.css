@@ -1,284 +1,83 @@
-/* ========== ESTILOS ESPECÍFICOS PARA SECTION-INTRO ========== */
-#section-intro {
-  background: transparent !important;
-  padding: 24px;
-  border-radius: 12px;
-  max-width: 720px;              /* + respiro para o pergaminho vertical */
-  margin: 0 auto;
-  text-align: left !important;
-  box-shadow: none;
-  border: none;
-  display: block;
-  opacity: 1;
-  visibility: visible;
-  z-index: 2;
-  overflow: hidden;
-  min-height: 80vh;
+/* ============================================================================
+   INTRO.CSS — harmonizado com styles-base.css (pergaminho) e styles.css (typing)
+   ============================================================================ */
+
+/* A seção já usa .pergaminho .pergaminho-v do base.css — aqui só refinamos layout */
+#section-intro.pergaminho {
+  /* garante altura e respiração visual */
+  min-height: 80vh !important;
+  height: auto !important;
+  padding-top: clamp(16px, 4vh, 36px);
+  padding-bottom: clamp(20px, 6vh, 48px);
 }
 
-/* Corrige o seletor: antes era .section-intro ... */
-#section-intro .parchment-inner-rough {
+/* Miolo do pergaminho da intro */
+#section-intro .parchment-inner-rough{
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  min-height: 80vh;
-  text-align: left !important;
-  /* pan sutil do pergaminho durante a intro */
-  animation: introPan 9s ease-in-out 1;
+  gap: clamp(8px, 1.8vh, 14px);
+  align-items: flex-start;        /* textos à esquerda (coerente com typing) */
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
-.intro-wrap {
-  height: 100% !important;
-  width: 100% !important;
-  overflow: hidden !important;
-  text-align: left !important;
-}
-
-/* Título com fade suave */
-.intro-title {
-  font-family: 'ManufacturingConsent', sans-serif;
-  font-size: 36px;
-  text-align: center;
-  color: var(--primary);
-  margin-top: 40px;
-  margin-bottom: 20px;
-  text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
-  opacity: 0;
-  transform: translateY(6px);
-  animation: introTitleIn 600ms ease forwards;
-}
-
-/* Texto-base da intro (começa invisível para o typing) */
-.parchment-text-rough {
-  font-family: 'BerkshireSwash', cursive;
-  font-size: 13px;
-  margin-bottom: 8px;
+/* Título e parágrafos com o “charme” (aura) — pega variáveis do brilho-texturas.css */
+#section-intro .parchment-title-rough{
+  font-size: clamp(20px, 2.6vw, 28px);
+  margin: 0 0 6px 0;
   color: #fff;
-  opacity: 0;                          /* hidden até o typing */
-  visibility: visible;
-  display: block;
-  text-align: left !important;
-  background: transparent;
-  line-height: 1.4;
+}
+#section-intro .parchment-title-rough,
+#section-intro .parchment-text-rough{
+  text-shadow:
+    0 1px 0 #000,
+    0 2px 4px rgba(0,0,0,.55),
+    0 0 12px var(--aura-gold),
+    0 0 24px var(--aura-amber);
+  filter: drop-shadow(0 0 8px var(--aura-gold-soft));
 }
 
-.parchment-text-rough.lumen-typing {
-  text-align: left !important;
-  direction: ltr !important;
+/* Parágrafos datilografados (styles.css já define [data-typing], aqui só dosamos) */
+#section-intro .parchment-text-rough{
+  font-size: clamp(13px, 1.9vw, 16px);
+  line-height: 1.45;
+  color: #fff;
 }
 
-/* Quando o JS marca typing/done, mostramos */
-.parchment-text-rough.typing-active,
-.parchment-text-rough.typing-done {
-  opacity: 1 !important;
-  display: block !important;
-  visibility: visible !important;
-  text-align: left !important;
-  transition: opacity .25s ease;
-}
-
-/* Área de ações */
-#section-intro .parchment-actions-rough {
-  display: flex;
+/* Área do botão “Iniciar” criada pelo JS (section-intro.js) */
+#section-intro .parchment-actions-rough{
+  width: 100%;
+  max-width: 640px;
+  margin: clamp(10px, 3vh, 18px) auto 0;
+  display: flex !important;
   justify-content: center;
   gap: 12px;
-  margin-top: 18px;
+  background: transparent !important;
 }
 
-/* Utilitários usados pelo JS */
-.is-hidden { opacity: 0; pointer-events: none; transition: opacity .25s ease; }
-.is-disabled { opacity: .6; pointer-events: none; }
-.btn-ready-pulse { animation: btnReady .6s ease-out 1; }
-
-/* Mimos */
-@keyframes btnReady {
-  0% { transform: scale(0.98); filter: brightness(0.9); }
-  60% { transform: scale(1.02); filter: brightness(1.1); }
-  100% { transform: scale(1); filter: none; }
-}
-@keyframes introTitleIn {
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes introPan {
-  0%   { transform: translateY(4px); }
-  50%  { transform: translateY(-4px); }
-  100% { transform: translateY(0); }
+/* Botão usando as famílias globais (.btn .btn-primary .btn-stone) */
+#section-intro #btn-avancar{
+  min-width: 180px;
 }
 
-/* Responsivo */
-@media (max-width: 480px) {
-  #section-intro { padding: 16px; max-width: 92vw; }
-  .intro-title { font-size: 28px; margin-top: 24px; }
-  .parchment-text-rough { font-size: 12.5px; }
+/* Pulso quando liberado pelo JS (classe adicionada após a datilografia) */
+#section-intro #btn-avancar.btn-ready-pulse{
+  animation: introBtnPulse .9s ease-out 1;
 }
-/* Cursor de datilografia — habilitado por data-cursor="true" */
-#section-intro [data-typing="true"][data-cursor="true"] {
-  position: relative;
-  display: inline-block;                 /* garante área para o cursor */
-  padding-right: 0.35em;                 /* respiro para o cursor */
+@keyframes introBtnPulse{
+  0%   { transform: scale(.96); filter: drop-shadow(0 0 10px var(--aura-gold)); }
+  60%  { transform: scale(1.04); filter: drop-shadow(0 0 28px var(--aura-gold)); }
+  100% { transform: scale(1.00); filter: drop-shadow(0 0 14px var(--aura-gold)); }
 }
 
-/* Mostra o cursor enquanto digita */
-#section-intro [data-typing="true"][data-cursor="true"].typing-active::after {
-  content: '';
-  position: absolute;
-  right: 0.05em;
-  bottom: 0.12em;
-  width: 0.5ch;
-  height: 1.1em;
-  background: linear-gradient(180deg, #ffd36b 0%, #ffbf3b 80%, #b27a1a 100%); /* dourado */
-  border-radius: 2px;
-  opacity: 0.95;
-  animation: caretBlink 1s steps(1, end) infinite;
-  box-shadow: 0 0 6px rgba(255, 200, 80, 0.9);
+/* Mobile: dá um respiro extra pros textos */
+@media (max-width: 420px){
+  #section-intro .parchment-inner-rough{ gap: 10px; }
 }
 
-/* Some quando terminou a digitação */
-#section-intro [data-typing="true"][data-cursor="true"].typing-done::after {
-  content: none;
-}
-
-@keyframes caretBlink {
-  0%, 45%   { opacity: 0.95; }
-  50%, 100% { opacity: 0; }
-}
-/* Halo dourado no pergaminho enquanto há um bloco datilografando */
-#section-intro:has(.typing-active) .parchment-inner-rough {
-  outline: 2px solid rgba(255, 204, 102, 0.25);                /* aro leve */
-  outline-offset: 6px;
-  box-shadow:
-    0 0 0 2px rgba(255, 204, 102, 0.15) inset,
-    0 0 22px rgba(255, 204, 102, 0.40),
-    0 0 40px rgba(255, 153, 0, 0.25);
-  animation: parchmentGlow 1.8s ease-in-out infinite;
-}
-
-/* Ao terminar tudo, volta suave ao normal */
-#section-intro:not(:has(.typing-active)) .parchment-inner-rough {
-  transition: box-shadow .35s ease, outline-color .35s ease;
-}
-
-@keyframes parchmentGlow {
-  0%   { box-shadow:
-          0 0 0 2px rgba(255, 204, 102, 0.15) inset,
-          0 0 18px rgba(255, 204, 102, 0.35),
-          0 0 32px rgba(255, 153, 0, 0.18); }
-  50%  { box-shadow:
-          0 0 0 2px rgba(255, 204, 102, 0.18) inset,
-          0 0 26px rgba(255, 204, 102, 0.50),
-          0 0 52px rgba(255, 153, 0, 0.30); }
-  100% { box-shadow:
-          0 0 0 2px rgba(255, 204, 102, 0.15) inset,
-          0 0 18px rgba(255, 204, 102, 0.35),
-          0 0 32px rgba(255, 153, 0, 0.18); }
-}
-/* Cursor slim nos parágrafos de texto */
-#section-intro .parchment-text-rough[data-cursor="true"].typing-active::after {
-  width: 2px;
-  height: 1em;
-  border-radius: 1px;
-  right: 0;
-}
-/* =======================================================
-   BRILHO + TEXTURAS — módulo universal (espinhos e pedra)
-   Seguro para usar junto do styles-base.css
-   ======================================================= */
-
-/* -------- Variáveis (paths das texturas) -------- */
-:root{
-  --stone-img: url('/assets/img/textura-de-pedra.jpg'); /* usada em utilitário opcional */
-  --btn-gold-outer: rgba(255, 230, 120, 0.40);
-  --btn-gold-mid:   rgba(255, 220, 120, 0.45);
-  --btn-gold-in:    rgba(255, 255, 230, 0.25);
-  --btn-gold-line:  rgba(255, 215,   0, 0.25);
-  --btn-text:       #f9e7c2;
-}
-
-/* -------- Animações compartilhadas -------- */
-@keyframes brilhoDivino {
-  0%,100% {
-    box-shadow:
-      0 0 6px  var(--btn-gold-outer),
-      0 0 12px var(--btn-gold-mid),
-      inset 0 0 2px var(--btn-gold-in);
-  }
-  50% {
-    box-shadow:
-      0 0 10px var(--btn-gold-outer),
-      0 0 16px var(--btn-gold-mid),
-      inset 0 0 4px var(--btn-gold-in);
-  }
-}
-
-@keyframes reflexoDourado {
-  0%   { opacity: 0; transform: translate(-120%, -120%) rotate(25deg); }
-  45%,
-  55%  { opacity: .85; }
-  100% { opacity: 0; transform: translate(120%, 120%) rotate(25deg); }
-}
-
-/* =======================================================
-   B) BOTÃO — TEXTURA DE PEDRA
-   Compatível com seu styles-base.css (não quebra o que já existe)
-   Basta aplicar a classe .btn-stone em qualquer botão.
-   ======================================================= */
-.btn-stone{
-  position: relative;
-  overflow: hidden;
-  display: inline-block;
-  border-radius: 8px;
-  color:#fff; text-shadow: 1px 1px 3px rgba(0,0,0,.7);
-  cursor: pointer;
-  transition: all .25s ease-in-out;
-  /* NÃO definimos background aqui para não conflitar
-     com regras existentes. Use utilitário .stone-texture se precisar. */
-}
-
-/* Utilitário opcional: aplicar textura de pedra caso o botão não tenha */
-.stone-texture{
-  background:
-    linear-gradient(to bottom, #a0a0a0, #808080),
-    var(--stone-img) center/cover;
-  background-blend-mode: overlay;
-  border: 3px solid #4a4a4a;
-  box-shadow:
-    inset 0 3px 6px rgba(0,0,0,.4),
-    0 6px 12px rgba(0,0,0,.6);
-}
-
-/* Aro dourado sutil (para casar com a família de botões) */
-.btn-stone::after{
-  content:'';
-  position:absolute; inset:0; border-radius:8px;
-  box-shadow: inset 0 0 0 1px var(--btn-gold-line);
-  pointer-events:none;
-}
-
-/* Brilho + reflexo no hover (igual aos espinhos) */
-.btn-stone:hover:not(:disabled){
-  transform: translateY(-1px);
-  animation: brilhoDivino 1.8s ease-in-out infinite;
-}
-.btn-stone:hover:not(:disabled)::before{
-  content:'';
-  position:absolute; top:0; left:0;
-  width:60%; height:200%;
-  background: linear-gradient(
-    130deg,
-    rgba(255,255,200,0) 0%,
-    rgba(255,255,180,.6) 50%,
-    rgba(255,255,200,0) 100%
-  );
-  transform: translate(-150%, -150%) rotate(25deg);
-  animation: reflexoDourado 2s linear forwards;
-  pointer-events:none;
-}
-.btn-stone:active:not(:disabled){
-  transform: translateY(0);
-  filter: brightness(.98);
-  animation: none;
-}
-.btn-stone:disabled{
-  opacity:.6; pointer-events:none; animation:none;
-}
-
+/* Utilitário de segurança: a classe 'hidden' usada pelo JS */
+.hidden { display: none !important; }
