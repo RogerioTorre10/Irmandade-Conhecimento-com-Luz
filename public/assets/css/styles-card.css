@@ -106,7 +106,7 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: clamp(36px, 6vh, 52px);
+  bottom: clamp(96px, 12vh, 140px);
   z-index: 32;                   /* acima de tudo */
 }
 #section-card #btnNext{
