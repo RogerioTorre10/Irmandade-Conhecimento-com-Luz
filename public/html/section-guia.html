@@ -23,20 +23,21 @@
                aria-label="Digite seu nome para a jornada" />
         <button id="btn-confirmar-nome" class="btn btn-stone-espinhos"
                 aria-label="Confirmar nome">Confirmar</button>
+      </div>        
+       <!-- Aviso -->
+      <div id="guia-error" class="guia-notice hidden" role="status" aria-live="polite">
+      <span id="guia-notice-text"
+        data-typing="true"
+        data-speed="30"
+        data-cursor="true"
+        data-text="AO PASSAR SUAVEMENTE POR CIMA DO BOTÃO SERÁ EXIBIDO O PERFIL DO GUIA, CONFIRMA COM DUPLO CLICK!!!
       </div>
 
-      <!-- Caixa medieval para descrição (datilografia + TTS) -->
+         <!-- Caixa medieval para descrição (datilografia + TTS) -->
       <div class="moldura-grande">
         <div id="guiaTexto" class="guia-descricao-medieval"
              data-text="Olá, {{nome}}! Escolha seu guia para a Jornada."></div>
       </div>
-      
-       <!-- Aviso -->
-      <div id="guia-error" class="hidden" aria-hidden="true">
-       data-typing="true" data-speed="30" data-cursor="true"
-          data-text="AO PASSAR LEVEMENTE POR CIMA DO BOTÃO É EXIBIDO O PERFIL DO GUIA, APÓS É SÓ CLICAR!!!
-      </div>
-
       <!-- Botões de escolha (preenchidos via JSON) -->
       <div class="guia-options" role="group" aria-label="Opções de Guias"></div>
      
