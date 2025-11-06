@@ -1,49 +1,57 @@
 <link rel="stylesheet" href="/assets/css/styles-base.css">
 <link rel="stylesheet" href="/assets/css/styles-card.css">
-<link rel="stylesheet" href="/assets/data/guias.json">
 
-<section>
-  <div id="section-card" class="card pergaminho pergaminho-v section"></div>
-  <div id="section-conteudo" class="conteudo-pergaminho"></div>
-    <div id="jornada-content-wrapper"></div>  <!-- o card será renderizado aqui -->
-    
-<!-- Título com datilografia -->
-   <h2 
-  data-typing="true" 
-  data-text="Eu na Irmandade" 
-  data-speed="40" 
-  data-cursor="true" 
-  class="titulo-selfie"
->Eu na Irmandade</h2>
+<div id="jornada-content-wrapper">
+  <section id="section-card" class="card pergaminho pergaminho-v section" data-initialized="true">
+    <div id="section-conteudo" class="conteudo-pergaminho">
 
-<!-- CARD COMPLETO -->
-<div class="card-stage">
-  
-  <!-- FUNDO PADRÃO COMO FALLBACK VISUAL -->
-<img 
-  id="guideBg" 
-  class="guide-bg" 
-  src="/assets/img/irmandade-quarteto-bg-zion.png" 
-  alt="Fundo do Guia" 
-/>
-  <!-- SELFIE (dentro do placeholder) -->
-  <div class="flame-layer" aria-hidden="true">
-    <img 
-      id="selfieImage" 
-      class="flame-selfie" 
-      src="/assets/img/irmandade-card-placeholder.jpg" 
-      alt="Sua foto na Irmandade"
-    />
-  </div>
+      <!-- Título com datilografia -->
+      <h2 
+        data-typing="true" 
+        data-text="Eu na Irmandade" 
+        data-speed="40" 
+        data-cursor="true" 
+        class="titulo-selfie"
+      >Eu na Irmandade</h2>
 
-  <!-- NOME DO USUÁRIO -->
-  <div class="card-footer">
-    <span class="card-name-badge">
-      <span id="userNameSlot">USUÁRIO</span>
-    </span>
-  </div>
+      <!-- CARD COMPLETO -->
+      <div class="card-stage" style="position: relative; min-height: 52vh;">
 
-  <!-- BOTÃO CONTINUAR -->
-  <button id="btnNext" class="btn btn-stone">Continuar</button>
+        <!-- FUNDO DO GUIA -->
+        <img 
+          id="guideBg" 
+          class="guide-bg" 
+          src="/assets/img/irmandade-quarteto-bg-zion.png" 
+          alt="Fundo do Guia" 
+          style="display: block; width: 100%; height: auto;"
+          loading="lazy"
+        />
+
+        
+        <!-- SELFIE -->
+        <div class="flame-layer show placeholder-only" aria-hidden="true">
+          <img 
+            id="selfieImage" 
+            class="flame-selfie" 
+            src="/assets/img/irmandade-card-placeholder.jpg" 
+            alt="Sua foto na Irmandade"
+            loading="lazy"
+          />
+        </div>
+
+        <!-- NOME DO PARTICIPANTE -->
+        <div class="card-footer">
+          <span class="card-name-badge">
+            <span id="userNameSlot">USUÁRIO</span>
+          </span>
+        </div>
+
+        <!-- BOTÃO CONTINUAR -->
+        <div class="card-actions">
+          <button id="btnNext" class="btn btn-stone">Continuar</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
 </div>
-</section>
