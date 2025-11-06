@@ -24,39 +24,42 @@
 
   // === LEITURA FORÇADA DE NOME E GUIA ===
   function getUserData() {
-    let nome = 'AMOR';
-    let guia = 'zion';
+  let nome = 'AMOR';
+  let guia = 'zion';
 
-    if (global.JC?.data) {
-      if (global.JC.data.nome) nome = global.JC.data.nome;
-      if (global.JC.data.guia) guia = global.JC.data.guia;
-    }
+  // 1. PRIORIDADE MÁXIMA: sessionStorage (dados da sessão atual)
+  const ssNome = sessionStorage.getItem('jornada.nome');
+  const ssGuia = sessionStorage.getItem('jornada.guia');
+  if (ssNome && ssNome.trim()) nome = ssNome.trim();
+  if (ssGuia && ssGuia.trim()) guia = ssGuia.trim().toLowerCase();
 
+  // 2. Só usa localStorage se sessionStorage estiver vazio
+  if (!ssNome || !ssGuia) {
     const lsNome = localStorage.getItem('jc.nome');
     const lsGuia = localStorage.getItem('jc.guia');
     if (lsNome) nome = lsNome;
     if (lsGuia) guia = lsGuia;
-
-    const ssGuia = sessionStorage.getItem('jornada.guia');
-    if (ssGuia) guia = ssGuia;
-
-    nome = nome.toUpperCase().trim();
-    guia = guia.toLowerCase().trim();
-
-    global.JC = global.JC || {};
-    global.JC.data = global.JC.data || {};
-    global.JC.data.nome = nome;
-    global.JC.data.guia = guia;
-
-    try {
-      localStorage.setItem('jc.nome', nome);
-      localStorage.setItem('jc.guia', guia);
-      sessionStorage.setItem('jornada.guia', guia);
-      sessionStorage.setItem('jornada.nome', nome);
-    } catch (e) {}
-
-    return { nome, guia };
   }
+
+  // 3. Normaliza
+  nome = nome.toUpperCase().trim();
+  guia = guia.toLowerCase().trim();
+
+  // 4. Atualiza JC.data
+  global.JC = global.JC || {};
+  global.JC.data = global.JC.data || {};
+  global.JC.data.nome = nome;
+  global.JC.data.guia = guia;
+
+  // 5. Salva APENAS no sessionStorage (evita cache permanente)
+  try {
+    sessionStorage.setItem('jornada.nome', nome);
+    sessionStorage.setItem('jornada.guia', guia);
+  } catch (e) {}
+
+  console.log(`%c[SELFIE] Dados finais → Nome: ${nome}, Guia: ${guia}`, 'color: cyan; font-weight: bold');
+  return { nome, guia };
+}
 
   function typeWriter(el, text, speed = 35) {
     el.textContent = ''; el.style.opacity = '1';
