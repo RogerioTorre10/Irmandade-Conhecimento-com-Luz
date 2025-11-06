@@ -109,17 +109,33 @@
 
 .hidden{ display:none !important; }
 
-/* === HALO DOURADO INTENSIFICADO === */
-#section-intro:has(.typing-active) .parchment-inner-rough {
-  outline: 4px solid rgba(255, 210, 80, 0.55);     /* aro mais grosso e definido */
-  outline-offset: 8px;
+/* === HALO DOURADO INTENSIFICADO (isolado do texto) === */
+#section-intro .parchment-inner-rough {
+  position: relative;
+  z-index: 1;
+}
+
+/* camada de brilho por pseudo-elemento */
+#section-intro .parchment-inner-rough::before {
+  content: "";
+  position: absolute;
+  inset: -6px; /* espessura da moldura */
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: -1;
   box-shadow:
-    0 0 0 4px rgba(255, 210, 80, 0.25) inset,
+    0 0 0 4px rgba(255, 210, 80, 0.55) inset,
     0 0 28px rgba(255, 215, 100, 0.65),
     0 0 58px rgba(255, 180, 40, 0.45),
     0 0 90px rgba(255, 200, 80, 0.25);
   animation: parchmentGlow 1.6s ease-in-out infinite;
   transition: all 0.3s ease-in-out;
+  opacity: 0; /* invisível até o typing começar */
+}
+
+/* ativa o brilho apenas quando o texto está datilografando */
+#section-intro:has(.typing-active) .parchment-inner-rough::before {
+  opacity: 1;
 }
 
 @keyframes parchmentGlow {
@@ -145,5 +161,6 @@
       0 0 80px rgba(255, 180, 40, 0.25);
   }
 }
+
 
 
