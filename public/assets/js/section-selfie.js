@@ -1,65 +1,66 @@
-/* section-selfie.js — VERSÃO FINAL: Transição Padrão + Debug + Dados Corretos */
-(function (global) {
+/* section-selfie.js — VERSÃO FINAL: PADRÃO window + Transição + Dados Corretos */
+(function (window) {
   'use strict';
-  const NS = (global.JCSelfie = global.JCSelfie || {});
+
+  const NS = (window.JCSelfie = window.JCSelfie || {});
   if (NS.__final) return;
   NS.__final = true;
 
   // === PADRÃO DE TRANSIÇÃO (igual ao section-card.js) ===
-  const NEXT_SECTION_ID = 'section-card';  // ← PRÓXIMA PÁGINA
-  const VIDEO_SRC = '/assets/videos/filme-card-dourado.mp4'; // ← VÍDEO DE TRANSIÇÃO
+  const NEXT_SECTION_ID = 'section-card';
+  const VIDEO_SRC = '/assets/videos/filme-card-dourado.mp4';
 
   const FINAL_ZOOM = 0.65;
   let stream = null, videoEl, canvasEl, previewImg;
   let lastCapture = null;
 
-  const toast = msg => global.toast?.(msg) || alert(msg);
+  const toast = msg => window.toast?.(msg) || alert(msg);
 
   // === DEBUG NO CONSOLE ===
   window.DEBUG_JC = () => {
-    console.log('JC.data:', global.JC?.data);
+    console.log('JC.data:', window.JC?.data);
     console.log('sessionStorage.jornada.guia:', sessionStorage.getItem('jornada.guia'));
     console.log('localStorage.jc.nome:', localStorage.getItem('jc.nome'));
   };
 
-  // === LEITURA FORÇADA DE NOME E GUIA ===
+  // === LEITURA FORÇADA DE NOME E GUIA (PRIORIDADE: sessionStorage) ===
   function getUserData() {
-  let nome = 'AMOR';
-  let guia = 'zion';
+    let nome = 'AMOR';
+    let guia = 'zion';
 
-  // 1. PRIORIDADE MÁXIMA: sessionStorage (dados da sessão atual)
-  const ssNome = sessionStorage.getItem('jornada.nome');
-  const ssGuia = sessionStorage.getItem('jornada.guia');
-  if (ssNome && ssNome.trim()) nome = ssNome.trim();
-  if (ssGuia && ssGuia.trim()) guia = ssGuia.trim().toLowerCase();
+    // 1. PRIORIDADE: sessionStorage (sessão atual)
+    const ssNome = sessionStorage.getItem('jornada.nome');
+    const ssGuia = sessionStorage.getItem('jornada.guia');
+    if (ssNome && ssNome.trim()) nome = ssNome.trim();
+    if (ssGuia && ssGuia.trim()) guia = ssGuia.trim().toLowerCase();
 
-  // 2. Só usa localStorage se sessionStorage estiver vazio
-  if (!ssNome || !ssGuia) {
-    const lsNome = localStorage.getItem('jc.nome');
-    const lsGuia = localStorage.getItem('jc.guia');
-    if (lsNome) nome = lsNome;
-    if (lsGuia) guia = lsGuia;
+    // 2. Fallback: localStorage (apenas se sessionStorage vazio)
+    if (!ssNome || !ssGuia) {
+      const lsNome = localStorage.getItem('jc.nome');
+      const lsGuia = localStorage.getItem('jc.guia');
+      if (lsNome) nome = lsNome;
+      if (lsGuia) guia = lsGuia;
+    }
+
+    // 3. Normaliza
+    nome = nome.toUpperCase().trim();
+    guia = guia.toLowerCase().trim();
+
+    // 4. Atualiza JC.data
+    window.JC = window.JC || {};
+    window.JC.data = window.JC.data || {};
+    window.JC.data.nome = nome;
+    window.JC.data.guia = guia;
+
+    // 5. Salva APENAS no sessionStorage
+    try {
+      sessionStorage.setItem('jornada.nome', nome);
+      sessionStorage.setItem('jornada.guia', guia);
+    } catch (e) {}
+
+    console.log(`%c[SELFIE] Dados finais → Nome: ${nome}, Guia: ${guia}`, 'color: cyan; font-weight: bold');
+    return { nome, guia };
   }
-
-  // 3. Normaliza
-  nome = nome.toUpperCase().trim();
-  guia = guia.toLowerCase().trim();
-
-  // 4. Atualiza JC.data
-  global.JC = global.JC || {};
-  global.JC.data = global.JC.data || {};
-  global.JC.data.nome = nome;
-  global.JC.data.guia = guia;
-
-  // 5. Salva APENAS no sessionStorage (evita cache permanente)
-  try {
-    sessionStorage.setItem('jornada.nome', nome);
-    sessionStorage.setItem('jornada.guia', guia);
-  } catch (e) {}
-
-  console.log(`%c[SELFIE] Dados finais → Nome: ${nome}, Guia: ${guia}`, 'color: cyan; font-weight: bold');
-  return { nome, guia };
-}
 
   function typeWriter(el, text, speed = 35) {
     el.textContent = ''; el.style.opacity = '1';
@@ -71,7 +72,7 @@
   }
 
   function speak(text) {
-    if (global.speak) global.speak(text);
+    if (window.speak) window.speak(text);
     else if ('speechSynthesis' in window) {
       const u = new SpeechSynthesisUtterance(text);
       u.lang = 'pt-BR'; u.rate = 0.9;
@@ -145,19 +146,18 @@
     document.getElementById('btn-selfie-confirm').disabled = false;
   }
 
-  // === TRANSIÇÃO PADRÃO (igual ao section-card.js) ===
+  // === TRANSIÇÃO PADRÃO ===
   function playTransitionThenGo() {
-    console.log(`[SELFIE] Disparando transição → ${NEXT_SECTION_ID}`);
+    console.log(`[SELFIE] Transição → ${NEXT_SECTION_ID}`);
 
-    if (global.playTransitionVideo) {
-      global.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
-    } else if (global.VideoTransicao?.play) {
-      global.VideoTransicao.play({
+    if (window.playTransitionVideo) {
+      window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
+    } else if (window.VideoTransicao?.play) {
+      window.VideoTransicao.play({
         src: VIDEO_SRC,
         onEnd: () => goTo(NEXT_SECTION_ID)
       });
     } else {
-      // Fallback direto
       const v = document.createElement('video');
       v.src = VIDEO_SRC;
       v.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:9999;background:#000;';
@@ -169,8 +169,8 @@
   }
 
   function goTo(id) {
-    if (global.JC?.show) global.JC.show(id, { force: true });
-    else if (global.showSection) global.showSection(id);
+    if (window.JC?.show) window.JC.show(id, { force: true });
+    else if (window.showSection) window.showSection(id);
     else forceShow(id);
   }
 
@@ -183,22 +183,19 @@
     }
   }
 
-  // === CONFIRMAR E IR PARA O CARD ===
+  // === CONFIRMAR E IR ===
   function confirmAndGo() {
     if (!lastCapture) {
       toast('Tire uma foto primeiro.');
       return;
     }
 
-    // SALVA SELFIE
-    global.JC = global.JC || {}; global.JC.data = global.JC.data || {};
-    global.JC.data.selfieDataUrl = lastCapture;
+    window.JC = window.JC || {}; window.JC.data = window.JC.data || {};
+    window.JC.data.selfieDataUrl = lastCapture;
     try { localStorage.setItem('jc.selfieDataUrl', lastCapture); } catch {}
 
-    // DISPARA EVENTO
     window.dispatchEvent(new CustomEvent('selfie:captured', { detail: { dataUrl: lastCapture } }));
 
-    // VAI PRO CARD COM TRANSIÇÃO
     playTransitionThenGo();
   }
 
@@ -213,10 +210,6 @@
     const title = document.getElementById('selfie-title');
     const texto = document.getElementById('selfieTexto');
     const { nome, guia } = getUserData();
-
-    console.log('%c[SELFIE] Dados carregados:', 'color: gold; font-weight: bold');
-    console.log('Nome:', nome);
-    console.log('Guia:', guia);
 
     setTimeout(() => {
       typeWriter(title, title.dataset.text, 40);
@@ -245,11 +238,11 @@
     if (e.detail?.sectionId === 'section-selfie') stopCamera();
   });
 
-  // FORÇA INIT SE JÁ ESTIVER ATIVO
+  // FORÇA INIT
   const section = document.getElementById('section-selfie');
   if (section && section.classList.contains('active')) {
     setTimeout(() => {
       document.dispatchEvent(new CustomEvent('sectionLoaded', { detail: { sectionId: 'section-selfie' } }));
     }, 100);
   }
-})(window);
+})(window); // ← AGORA É window, NÃO global
