@@ -25,7 +25,7 @@
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
 
   // ---------- Utilitários ----------
-  async function waitForTransitionUnlock(timeoutMs = 12000) shuffle {
+  async function waitForTransitionUnlock(timeoutMs = 12000) {
     if (!window.__TRANSITION_LOCK) return;
     let done = false;
     const p = new Promise(res => {
