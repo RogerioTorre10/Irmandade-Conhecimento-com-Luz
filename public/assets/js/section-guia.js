@@ -11,7 +11,7 @@
   const DATA_URL     = '/assets/data/guias.json';
 
   // NOVO: ajustes de UX
-  const ARM_TIMEOUT_MS = 3000;   // tempo para confirmar após 1º clique
+  const ARM_TIMEOUT_MS = 10000;   // tempo para confirmar após 1º clique
   const HOVER_DELAY_MS = 150;    // atraso para mostrar preview no hover
 
   if (window.JCGuia?.__bound) { console.log('[JCGuia] já carregado'); return; }
@@ -88,7 +88,81 @@
       || (root?.dataset?.transitionSrc)
       || '/assets/videos/filme-eu-na-irmandade.mp4';
   }
+// helper robusto: toca o vídeo de transição (se possível) e depois navega
+function playTransitionSafe(src, nextId) {
+  // 1) Se existir função do seu projeto, usa
+  if (typeof window.playTransitionVideo === 'function') {
+    window.playTransitionVideo(src, nextId);
+    return;
+  }
+  if (typeof window.playTransitionThenGo === 'function') {
+    window.playTransitionThenGo(nextId, src); // aceita ordem (nextId, src) se seu helper for assim
+    return;
+  }
 
+  // 2) Fallback universal: cria overlay <video>, toca e navega ao terminar
+  try {
+    window.__TRANSITION_LOCK = true; // evita duplo clique
+    const v = document.createElement('video');
+    v.src = src || '/assets/videos/filme-eu-na-irmandade.mp4';
+    v.playsInline = true;
+    v.muted = true;
+    v.autoplay = true;
+    v.preload = 'auto';
+    v.style.cssText = `
+      position:fixed;inset:0;z-index:9999;background:#000;
+      width:100%;height:100%;object-fit:cover
+    `;
+    v.addEventListener('ended', () => {
+      v.remove();
+      window.__TRANSITION_LOCK = false;
+      (window.JC && JC.show) ? JC.show(nextId, { force:true }) : (location.hash = '#' + nextId);
+      document.dispatchEvent(new CustomEvent('transition:ended'));
+    }, { once:true });
+    v.addEventListener('error', () => {
+      // se der erro, remove e navega assim mesmo
+      console.warn('[guia] erro no vídeo de transição, seguindo...');
+      v.remove();
+      window.__TRANSITION_LOCK = false;
+      (window.JC && JC.show) ? JC.show(nextId, { force:true }) : (location.hash = '#' + nextId);
+      document.dispatchEvent(new CustomEvent('transition:ended'));
+    }, { once:true });
+
+    document.body.appendChild(v);
+    const p = v.play();
+    if (p && typeof p.catch === 'function') {
+      p.catch(() => {
+        // autoplay bloqueado: navega mesmo assim
+        v.remove();
+        window.__TRANSITION_LOCK = false;
+        (window.JC && JC.show) ? JC.show(nextId, { force:true }) : (location.hash = '#' + nextId);
+        document.dispatchEvent(new CustomEvent('transition:ended'));
+      });
+    }
+  } catch (e) {
+    console.error('[guia] fallback transição falhou', e);
+    window.__TRANSITION_LOCK = false;
+    (window.JC && JC.show) ? JC.show(nextId, { force:true }) : (location.hash = '#' + nextId);
+    document.dispatchEvent(new CustomEvent('transition:ended'));
+  }
+}
+
+// ====== troque a função confirmGuide pela versão abaixo ======
+function confirmGuide(root, guiaId, guiaName) {
+  try {
+    window.JC = window.JC || {};
+    window.JC.data = window.JC.data || {};
+    window.JC.data.guia = guiaId;
+    sessionStorage.setItem('jornada.guia', guiaId);
+    localStorage.setItem('jc.guia', guiaId);
+  } catch {}
+
+  const src = getTransitionSrc(root); // pega do data-transition-src do <section>, se houver
+  playTransitionSafe(src, NEXT_SECTION_ID);
+}
+
+
+  
   function pick(root) {
     return {
       root,
