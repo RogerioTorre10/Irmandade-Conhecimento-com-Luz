@@ -2,9 +2,48 @@
 <link rel="stylesheet" href="/assets/css/styles-card.css">
 <link rel="stylesheet" href="/assets/data/guias.json">
 
-<section id="section-card" class="card pergaminho pergaminho-v section" data-initialized="true">
-    <div id="section-card-wrapper">
-        <p style="color: black; font-size: 24px; text-align: center;">**TESTE: O CARD APARECEU!**</p>
-        </div>
-</section>
+<section>
+  <div id="section-card" class="card pergaminho pergaminho-v section"></div>
+  <div id="section-conteudo" class="conteudo-pergaminho"></div>
+    <div id="jornada-content-wrapper"></div>  <!-- o card será renderizado aqui -->
+    
+<!-- Título com datilografia -->
+   <h2 
+  data-typing="true" 
+  data-text="Eu na Irmandade" 
+  data-speed="40" 
+  data-cursor="true" 
+  class="titulo-selfie"
+>Eu na Irmandade</h2>
 
+<!-- CARD COMPLETO -->
+<div class="card-stage">
+  
+  <!-- FUNDO PADRÃO COMO FALLBACK VISUAL -->
+<img 
+  id="guideBg" 
+  class="guide-bg" 
+  src="/assets/img/irmandade-quarteto-bg-zion.png" 
+  alt="Fundo do Guia" 
+/>
+  <!-- SELFIE (dentro do placeholder) -->
+  <div class="flame-layer" aria-hidden="true">
+    <img 
+      id="selfieImage" 
+      class="flame-selfie" 
+      src="/assets/img/irmandade-card-placeholder.jpg" 
+      alt="Sua foto na Irmandade"
+    />
+  </div>
+
+  <!-- NOME DO USUÁRIO -->
+  <div class="card-footer">
+    <span class="card-name-badge">
+      <span id="userNameSlot">USUÁRIO</span>
+    </span>
+  </div>
+
+  <!-- BOTÃO CONTINUAR -->
+  <button id="btnNext" class="btn btn-stone">Continuar</button>
+</div>
+</section>
