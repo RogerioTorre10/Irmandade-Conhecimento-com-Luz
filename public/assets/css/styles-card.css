@@ -1,65 +1,52 @@
 /* ===================== CARD BASE ===================== */
 #section-card {
-  position: relative !important;
-  visibility: visible !important;
-  display: block !important;
+  position: relative;
+  display: block;
   min-height: 100vh;
   background: transparent;
-  z-index: 10 !important;
+  z-index: 2;
 }
 
 /* ===================== BACKGROUND ===================== */
 #guideBg {
-  width: 100% !important;
-  height: 100% !important;
-  min-height: 100vh !important;
-  object-fit: cover !important;
-  top: 0; left: 0;
-  border-radius: 16px;
-  opacity: 1 !important;
-  transition: opacity 0.8s ease !important;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
   display: block;
-  position: absolute;
+  position: relative;
   z-index: 1;
 }
 
 /* ===================== CARD STAGE ===================== */
 .card-stage {
   position: relative;
-  width: 92% !important;
-  max-width: 520px !important; 
-  margin: 20px auto !important;
+  margin-top: -48px;
   padding-bottom: 120px;
-  min-height: 70vh;
-  overflow: visible !important; /* IMPRESCINDÍVEL: evita corte do ZION */
+  min-height: clamp(560px, 66vw, 920px);
+  overflow: visible;
   z-index: 2;
 }
 
-/* ===================== FLAME LAYER (SELFIE) ===================== */
+/* ===================== FLAME LAYER ===================== */
 .flame-layer {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: clamp(48px, 8vh, 120px)!important;
+  bottom: clamp(48px, 8vh, 120px);
   width: clamp(180px, 38%, 360px);
   z-index: 3;
   pointer-events: none;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 0 18px rgba(255,215,120,.25);
-  border: 2px solid rgba(255,215,0,.3);
 }
 
 .flame-selfie {
   width: 100%;
-  height: 100%;
+  height: auto;
   object-fit: cover;
-  object-position: center 32%;
-  display: block;
   border-radius: 12px;
+  box-shadow: 0 0 18px rgba(255,215,120,.25);
 }
 
-/* ===================== CARD FOOTER (NOME) ===================== */
+/* ===================== CARD FOOTER ===================== */
 .card-footer {
   position: absolute;
   left: 50%;
@@ -82,12 +69,10 @@
   letter-spacing: .6px;
   text-transform: uppercase;
   text-shadow: 0 1px 2px rgba(0,0,0,.6);
-  font-family: 'Cardo', serif;
-  font-size: 15px;
 }
 
 /* ===================== BOTÃO CONTINUAR ===================== */
-#btnNext {
+#btnStartJourney {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -96,117 +81,57 @@
   pointer-events: auto;
   visibility: visible;
   opacity: 1;
-  min-width: 140px;
-  padding: 10px 24px;
-  font-size: 15px;
 }
 
 /* ===================== MOBILE AJUSTES ===================== */
 @media (max-width: 600px) {
-  .card-stage {
-    margin-top: -32px;
-    padding-bottom: clamp(44px, 9svh, 120px);
-    min-height: 100svh;
-  }
-
   .flame-layer {
-    bottom: auto;
-    top: 70% !important;
+    top: 70% !important;          /* ANTES: 50% → cortava o nome */
     left: 0;
     right: 0;
     transform: translateY(-50%);
-    width: min(60%, 310px);
-    margin: 0 auto;
+    bottom: auto;
+    width: auto;
     text-align: center;
   }
 
   .flame-selfie {
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-    object-position: center 35% !important;
+    width: min(60%, 310px);
+    margin: 0 auto;
     border-radius: 14px;
+    object-fit: cover;
+    object-position: center 35% !important; /* Foca no rosto */
   }
 
   .card-footer {
     bottom: calc(env(safe-area-inset-bottom, 0px) + 72px);
+    pointer-events: auto;
   }
 
-  .card-name-badge {
-    font-size: 14px;
-    padding: 5px 12px;
-  }
-
-  #btnNext {
+  #btnNext { /* <-- MUDOU DE #btnStartJourney */
     bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
     z-index: 10;
   }
-}
 
-/* ===================== DESKTOP ===================== */
-@media (min-width: 601px) {
-  .flame-layer {
-    bottom: clamp(48px, 8vh, 120px);
-    width: clamp(180px, 38%, 360px);
-  }
-
-  .flame-selfie {
-    object-position: center 32%;
+  .card-stage {
+    padding-bottom: clamp(44px, 9svh, 120px);
+    min-height: 100svh;
   }
 }
-
 /* === PREVIEW — TAMANHO IDEAL PRO CARD GUIA (3:4) === */
 .selfie-preview-wrap {
   width: 92%;
-  max-width: 520px;
+  max-width: 520px; /* Limita no mobile */
   margin: 0 auto 8px;
 }
 
 .preview-frame {
   position: relative;
   width: 100%;
-  padding-bottom: 133.33%;
+  padding-bottom: 133.33%; /* 3:4 = 75% de altura */
   background: #000;
   border-radius: 14px;
   overflow: hidden;
   border: 1px solid rgba(255,255,255,.08);
   box-shadow: 0 4px 16px rgba(0,0,0,.4);
 }
-
-#section-card,
-#section-conteudo,
-.card-stage,
-#guideBg,
-.flame-layer,
-.card-footer,
-#btnNext {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  z-index: 2 !important;
-  min-height: 100vh !important;
-}
-
-#section-conteudo {
-  min-height: 100vh;
-  padding: 20px 0;
-  box-sizing: border-box;
-}
-/* —— CARD acima do pergaminho —— */
-#section-card { position: relative; isolation: isolate; }
-#section-card .card-stage { position: relative; z-index: 20; min-height: clamp(560px, 66vw, 920px); }
-
-#section-card #guideBg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; display: block; }
-#section-card .flame-layer { position: absolute; left: 50%; bottom: clamp(96px, 14vh, 160px); transform: translateX(-50%); width: clamp(240px, 38%, 520px); z-index: 30; }
-#section-card .card-footer { position: absolute; left: 50%; bottom: clamp(56px, 9vh, 96px); transform: translateX(-50%); z-index: 31; }
-#section-card #btnNext { position: absolute; left: 50%; bottom: clamp(16px, 6vh, 40px); transform: translateX(-50%); z-index: 32; }
-
-/* Se o pergaminho usa ::before como película, rebaixe/neutralize */
-.pergaminho::before,
-.pergaminho-v::before,
-#section-card.pergaminho::before,
-#section-card.pergaminho-v::before {
-  z-index: 0 !important;
-  pointer-events: none !important;
-}
-
