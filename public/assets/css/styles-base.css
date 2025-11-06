@@ -15,12 +15,12 @@
 * {
   box-sizing: border-box;
 }
-
-html, body {
+html, body { min-height: 100%; }
+body {
+  background: #0a0f1a;           /* noite */
+  color: #f2efe6;
   height: 100%;
   margin: 0;
-  background: var(--bg);
-  color: var(--fg);
   line-height: 1.5;
   font-family: 'Cardo', Georgia, 'Times New Roman', serif;
 }
