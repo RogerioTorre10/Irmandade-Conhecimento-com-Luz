@@ -269,6 +269,18 @@ function confirmGuide(root, guiaId, guiaName) {
       localStorage.setItem('jc.guia', guiaId);
     } catch {}
 
+    // === Ajuste da cor da aura conforme o guia ===
+  try {
+   const guiaAtual = (window.JC?.data?.guia || '').toLowerCase();
+  if (guiaAtual) {
+    document.body.dataset.guia = guiaAtual;
+    console.log(`[AURA] Guia ativo: ${guiaAtual} · variações de cor aplicadas`);
+  }
+ } catch (err) {
+   console.warn('[AURA] Falha ao definir cor do guia:', err);
+ }
+
+
     const src = getTransitionSrc(root);
     if (typeof window.playTransitionVideo === 'function') {
       window.playTransitionVideo(src, NEXT_SECTION_ID);
