@@ -1,334 +1,134 @@
-/* =============================================================================
-TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
-============================================================================= */
+/* ============================================================================
+   INTRO.CSS — harmonizado com styles-base.css (pergaminho) e styles.css (typing)
+   ============================================================================ */
 
-/* ========== JORNADA ESPECÍFICA ========== */
-#section-conteudo {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  background: transparent;
-  padding: 0;
-  display: block;
+/* A seção já usa .pergaminho .pergaminho-v do base.css — aqui só refinamos layout */
+#section-intro.pergaminho {
+  /* garante altura e respiração visual */
+  min-height: 80vh !important;
+  height: auto !important;
+  padding-top: clamp(16px, 4vh, 36px);
+  padding-bottom: clamp(20px, 6vh, 48px);
 }
 
-#jornada-content-wrapper {
-  display: block;
-  visibility: visible;
-  opacity: 1;
-}
-
-#section-termos, #section-senha, #sec-final {
-  background: transparent;
-  padding: 24px;
-  border-radius: 12px;
-  max-width: 600px;
-  margin: 0 auto;
-  text-align: center;
-  box-shadow: none;
-  border: none;
-  display: block;
-  opacity: 1;
-  visibility: visible;
-  z-index: 2;
-  overflow: hidden;
-  min-height: 80vh;
-}
-
-#section-termos.pergaminho-v::before,
-#section-senha.pergaminho-v::before,
-#sec-final.pergaminho-v::before {
-  background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important;
-  background-size: cover !important;
-  min-height: 80vh;
-}
-
-#sec-perguntas.pergaminho-h::before,
-#sec-wizard.pergaminho-h::before {
-  background-image: url('/assets/img/pergaminho-rasgado-horiz.png') !important;
-  background-size: cover !important;
-  min-height: 80vh;
-}
-
-#termos-pg1, #termos-pg2, #section-senha h2, #section-senha p,
-#sec-wizard #q-text, #sec-final p {
-  font-size: 13px;
-  margin-bottom: 8px;
-  color: #fff;
-  opacity: 0;
-  visibility: visible;
-  display: block;
-  font-family: 'BerkshireSwash', cursive;
-  text-align: left !important;
-  background: transparent;
-  line-height: 1.4;
-}
-
-#termos-pg1 h2, #termos-pg2 h3, #section-senha h2, #sec-wizard h2, #sec-final h2 {
-  font-size: 18px;
-  margin-bottom: 10px;
-  color: #fff;
-  opacity: 0;
-  text-align: left !important;
-}
-
-.parchment-rough {
-  background: transparent !important;
-  border-radius: 16px;
-  height: 100% !important;
-  width: 100% !important;
-}
-
-.parchment-inner-rough {
-  background: transparent !important;
-  box-shadow: none;
-  overflow: hidden !important;
-  height: 100% !important;
-  width: 100% !important;
-  box-sizing: border-box;
-}
-
-.section-termos .parchment-inner-rough {
+/* Miolo do pergaminho da intro */
+#section-intro .parchment-inner-rough{
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  height: 100% !important;
-}
-
-.parchment-title-rough {
-  color: #fff;
-  font-size: 20px;
-  margin-bottom: 12px;
-  opacity: 0 !important;
-  display: none !important;
-  visibility: hidden !important;
-  text-align: left !important;
-}
-
-.section-termos .parchment-title-rough,
-.section-termos .parchment-text-rough {
-  opacity: 0 !important;
-  display: none !important;
-  visibility: hidden !important;
-  text-align: left !important;
-}
-
-.parchment-title-rough.typing-active,
-.parchment-title-rough.typing-done,
-.section-termos .parchment-title-rough.typing-active,
-.section-termos .parchment-title-rough.typing-done,
-.section-termos .parchment-text-rough.typing-active,
-.section-termos .parchment-text-rough.typing-done {
-  opacity: 1 !important;
-  display: block !important;
-  visibility: visible !important;
-  text-align: left !important;
-}
-
-.parchment-text-rough {
-  color: #fff;
-  font-size: 13px;
-  margin-bottom: 8px;
-  line-height: 1.4;
-  opacity: 0 !important;
-  display: none !important;
-  visibility: hidden !important;
-  text-align: left !important;
-}
-
-.parchment-text-rough.typing-active,
-.parchment-text-rough.typing-done {
-  opacity: 1 !important;
-  display: block !important;
-  visibility: visible !important;
-  text-align: left !important;
-}
-
-.parchment-input-rough {
-  width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,.15);
-  background: #0c1330;
-  color: #fff;
-  font-family: 'Cardo', serif;
-}
-
-.parchment-actions-rough {
-  display: flex !important;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 12px;
-  position: sticky;
-  bottom: 0;
-  background: transparent !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-
-.section-termos .parchment-actions-rough {
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: flex !important;
-}
-
-/* ========== SEÇÃO GUIA – LAYOUT E ESTILOS ========== */
-.guia-header-moldura {
-  padding: 30px 40px 20px 40px;
-  text-align: center;
-  position: relative;
-  z-index: 10;
-}
-
-.guia-name-input label {
-  background-color: #3e2723 !important;
-  color: #fff !important;
-  padding: 8px 18px !important;
-  border-radius: 6px !important;
-  display: block !important;
-  width: fit-content;
-  margin: 0 auto 10px auto !important;
-  font-family: 'ManufacturingConsent', sans-serif !important;
-  font-size: 1.2em !important;
-  font-variant: small-caps;
-}
-
-.guia-name-input input {
-  width: 65% !important;
-  max-width: 250px !important;
-  background-color: rgba(255, 255, 255, 0.95) !important;
-  color: #3e2723 !important;
-  border: 1px solid #c8a488 !important;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15);
-  padding: 12px !important;
-  font-size: 18px !important;
-  font-family: 'Cardo', serif !important;
-  text-align: center !important;
-  margin: 0 auto !important;
-}
-
-.titulo-pergaminho {
-  text-align: center;
-  margin: 8px auto 6px;
-  font-size: 22px;
-  line-height: 1.15;
-  color: #fff;
-}
-
-.guia-name-input.on-pergaminho {
-  display: flex;
-  justify-content: center;
-  margin: 6px 0 14px;
-}
-
-.input-espinhos {
-  width: min(62%, 360px);
-  padding: 12px 14px;
-  background: rgba(255,255,255,.98);
-  color: #3e2723;
-  font-size: 16px;
-  text-align: center;
-  outline: none;
-  border: 14px solid transparent;
-  -webkit-border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
-  border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
-  border-radius: 2px;
-}
-
-.moldura-grande {
-  margin: 8px auto 12px;
-  width: min(92%, 720px);
-  min-height: 160px;
-  padding: 26px 28px;
-  background: url('/assets/img/moldura-medieval.png') center/100% 100% no-repeat transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.guia-descricao-medieval {
+  gap: clamp(8px, 1.8vh, 14px);
+  align-items: flex-start;        /* textos à esquerda (coerente com typing) */
+  justify-content: flex-start;
   width: 100%;
   max-width: 640px;
-  text-align: left !important;
-  color: #fff;
-}
-
-.guia-descricao-medieval p {
-  margin: 6px 0;
-  font-size: 15.5px;
-  line-height: 1.45;
-}
-
-.guia-options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 10px;
-  width: min(92%, 720px);
-  margin: 4px auto 10px;
-}
-
-.btn-stone-espinhos {
-  padding: 11px 14px;
-  font-weight: 600;
-  color: #fff;
-  background: linear-gradient(to bottom, rgba(255,255,255,.15), rgba(0,0,0,.22)), url('/assets/img/textura-de-pedra.jpg') center/cover no-repeat;
-  border: 12px solid transparent;
-  -webkit-border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
-  border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
-  border-radius: 3px;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,.35));
-  transition: transform .12s ease, filter .12s ease, opacity .12s ease;
-}
-
-.btn-stone-espinhos:hover {
-  transform: translateY(-1px);
-  filter: drop-shadow(0 4px 8px rgba(0,0,0,.45));
-}
-
-.btn-stone-espinhos:disabled {
-  opacity: .55;
-  filter: grayscale(.3);
-  cursor: not-allowed;
-}
-
-.guia-selected {
-  text-shadow: 0 0 10px rgba(255,196,0,.75);
-}
-
-/* ========== FOOTER ========== */
-.site-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 24px 16px;
-  text-align: center;
-  background: var(--bg);
-  z-index: 1000;
-  border-top: 1px solid rgba(255,255,255,.1);
-  display: block;
-  opacity: 0.6;
-  color: #fff;
-  font-size: 14px;
-}
-/* ===== Correção global para evitar fundo duplo ===== */
-
-/* Evita fundo duplicado nas seções com vídeo (como a selfie) */
-section.selfie-page {
-  background: none !important;
-  box-shadow: none !important;
-}
-
-/* Garante contraste e hierarquia correta */
-.selfie-page .parchment-inner-rough {
+  margin: 0 auto;
   background: transparent !important;
   box-shadow: none !important;
-  z-index: 2;
 }
 
-/* Remove texturas ou overlays que possam interferir na câmera */
-.selfie-page::before,
-.selfie-page::after {
-  display: none !important;
-  content: none !important;
+/* Título e parágrafos com o “charme” (aura) — pega variáveis do brilho-texturas.css */
+#section-intro .parchment-title-rough{
+  font-size: clamp(20px, 2.6vw, 28px);
+  margin: 0 0 6px 0;
+  color: #fff;
 }
+#section-intro .parchment-title-rough,
+#section-intro .parchment-text-rough{
+  text-shadow:
+    0 1px 0 #000,
+    0 2px 4px rgba(0,0,0,.55),
+    0 0 12px var(--aura-gold),
+    0 0 24px var(--aura-amber);
+  filter: drop-shadow(0 0 8px var(--aura-gold-soft));
+}
+
+/* Parágrafos datilografados (styles.css já define [data-typing], aqui só dosamos) */
+#section-intro .parchment-text-rough{
+  font-size: clamp(13px, 1.9vw, 16px);
+  line-height: 1.45;
+  color: #fff;
+}
+
+/* Área do botão “Iniciar” criada pelo JS (section-intro.js) */
+#section-intro .parchment-actions-rough{
+  width: 100%;
+  max-width: 640px;
+  margin: clamp(10px, 3vh, 18px) auto 0;
+  display: flex !important;
+  justify-content: center;
+  gap: 12px;
+  background: transparent !important;
+}
+
+/* Botão usando as famílias globais (.btn .btn-primary .btn-stone) */
+#section-intro #btn-avancar{
+  min-width: 180px;
+}
+
+/* Pulso quando liberado pelo JS (classe adicionada após a datilografia) */
+#section-intro #btn-avancar.btn-ready-pulse{
+  animation: introBtnPulse .9s ease-out 1;
+}
+@keyframes introBtnPulse{
+  0%   { transform: scale(.96); filter: drop-shadow(0 0 10px var(--aura-gold)); }
+  60%  { transform: scale(1.04); filter: drop-shadow(0 0 28px var(--aura-gold)); }
+  100% { transform: scale(1.00); filter: drop-shadow(0 0 14px var(--aura-gold)); }
+}
+
+/* Mobile: dá um respiro extra pros textos */
+@media (max-width: 420px){
+  #section-intro .parchment-inner-rough{ gap: 10px; }
+}
+
+/* Utilitário de segurança: a classe 'hidden' usada pelo JS */
+.hidden { display: none !important; }
+
+/* ===== Mobile refinements – INTRO ===== */
+
+/* iOS/Android: altura estável e respeito às safe-areas */
+#section-intro.pergaminho{
+  min-height: 100svh;                     /* svh = viewport estável no mobile */
+  padding-top: max(16px, env(safe-area-inset-top));
+  padding-bottom: max(clamp(20px, 6vh, 48px), env(safe-area-inset-bottom));
+  padding-left: max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
+}
+
+/* Conteúdo central: ocupa bem o espaço em telas estreitas */
+#section-intro .parchment-inner-rough{
+  width: min(92%, 640px);
+}
+
+/* Botões com área de toque confortável (mín. 44px) */
+#section-intro .parchment-actions-rough .btn,
+#section-intro #btn-avancar{
+  min-height: 44px;
+  padding: 10px 16px;
+}
+
+/* Layout em celulares até 480px */
+@media (max-width: 480px){
+  #section-intro .parchment-title-rough{
+    font-size: clamp(18px, 6vw, 24px);
+  }
+  #section-intro .parchment-text-rough{
+    font-size: clamp(13px, 4vw, 15px);
+    line-height: 1.5;
+  }
+  #section-intro .parchment-actions-rough{
+    gap: 10px;
+  }
+}
+
+/* Celulares bem estreitos (<= 360px): botão 100% */
+@media (max-width: 360px){
+  #section-intro .parchment-actions-rough{
+    justify-content: stretch;
+  }
+  #section-intro #btn-avancar{
+    width: 100%;
+  }
+}
+
+/* Evita "pulos" durante a datilografia em telas pequenas */
+#section-intro { overflow-anchor: none; }
+
