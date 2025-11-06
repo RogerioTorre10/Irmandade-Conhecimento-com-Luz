@@ -248,20 +248,7 @@
       attachButtonEvents(sectionId, node);
       handleSectionLogic(sectionId, node);
     }
-  });
-  // LIMPA DADOS ANTIGOS AO INICIAR NOVA JORNADA
-     window.addEventListener('load', () => {
-     const LIMPAR_CHAVES = [
-    'jornada.nome', 'jornada.guia', 'jornada.participante',
-    'jornada.selfieDataUrl', 'selfie.dataUrl', 'selfieImageData',
-    'jc.selfie', 'user.name'
-    ];
-     LIMPAR_CHAVES.forEach(key => {
-     sessionStorage.removeItem(key);
-     localStorage.removeItem(key);
-    });
-     console.log('[INIT] Dados antigos limpos para nova jornada');
-  });
+  });  
 
     init();
   })();
