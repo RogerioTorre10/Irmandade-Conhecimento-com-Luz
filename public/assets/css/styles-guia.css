@@ -148,6 +148,39 @@
   letter-spacing: 1.5px;
   font-weight: 600;
 }
+/* LUMEN (verde) */
+body[data-guia="lumen"]{
+  --aura-gold-outer: rgba(140,255,140,.85);
+  --aura-gold:       rgba(120,255,160,.75);
+  --aura-gold-soft:  rgba(160,255,200,.55);
+  --aura-amber:      rgba(180,255,160,.45);
+  --btn-gold-outer:  rgba(180,255,180,.45);
+  --btn-gold-mid:    rgba(120,255,160,.45);
+  --btn-gold-line:   rgba(100,255,150,.3);
+}
+
+/* ZION (azul) */
+body[data-guia="zion"]{
+  --aura-gold-outer: rgba(120,180,255,.85);
+  --aura-gold:       rgba(80,160,255,.8);
+  --aura-gold-soft:  rgba(140,200,255,.55);
+  --aura-amber:      rgba(100,180,255,.45);
+  --btn-gold-outer:  rgba(100,180,255,.45);
+  --btn-gold-mid:    rgba(80,160,255,.45);
+  --btn-gold-line:   rgba(60,150,255,.35);
+}
+
+/* ARIAN (magenta) */
+body[data-guia="arian"]{
+  --aura-gold-outer: rgba(255,120,255,.85);
+  --aura-gold:       rgba(255,140,255,.75);
+  --aura-gold-soft:  rgba(255,160,255,.55);
+  --aura-amber:      rgba(255,100,255,.45);
+  --btn-gold-outer:  rgba(255,140,255,.45);
+  --btn-gold-mid:    rgba(255,160,255,.45);
+  --btn-gold-line:   rgba(255,100,255,.3);
+}
+
 /* =======================================================
    BRILHO + TEXTURAS — módulo universal (espinhos e pedra)
    Seguro para usar junto do styles-base.css
