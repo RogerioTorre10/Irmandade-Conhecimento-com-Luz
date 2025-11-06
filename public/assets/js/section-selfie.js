@@ -1,9 +1,13 @@
-/* section-selfie.js — VERSÃO FINAL COM DEBUG E DADOS CORRETOS */
+/* section-selfie.js — VERSÃO FINAL: Transição Padrão + Debug + Dados Corretos */
 (function (global) {
   'use strict';
   const NS = (global.JCSelfie = global.JCSelfie || {});
   if (NS.__final) return;
   NS.__final = true;
+
+  // === PADRÃO DE TRANSIÇÃO (igual ao section-card.js) ===
+  const NEXT_SECTION_ID = 'section-card';  // ← PRÓXIMA PÁGINA
+  const VIDEO_SRC = '/assets/videos/filme-card-dourado.mp4'; // ← VÍDEO DE TRANSIÇÃO
 
   const FINAL_ZOOM = 0.65;
   let stream = null, videoEl, canvasEl, previewImg;
@@ -11,7 +15,7 @@
 
   const toast = msg => global.toast?.(msg) || alert(msg);
 
-  // === FUNÇÃO DE DEBUG (ativa no console) ===
+  // === DEBUG NO CONSOLE ===
   window.DEBUG_JC = () => {
     console.log('JC.data:', global.JC?.data);
     console.log('sessionStorage.jornada.guia:', sessionStorage.getItem('jornada.guia'));
@@ -23,37 +27,32 @@
     let nome = 'AMOR';
     let guia = 'zion';
 
-    // 1. Tenta do JC.data
     if (global.JC?.data) {
       if (global.JC.data.nome) nome = global.JC.data.nome;
       if (global.JC.data.guia) guia = global.JC.data.guia;
     }
 
-    // 2. Tenta do localStorage
     const lsNome = localStorage.getItem('jc.nome');
     const lsGuia = localStorage.getItem('jc.guia');
     if (lsNome) nome = lsNome;
     if (lsGuia) guia = lsGuia;
 
-    // 3. Tenta do sessionStorage (fallback)
     const ssGuia = sessionStorage.getItem('jornada.guia');
     if (ssGuia) guia = ssGuia;
 
-    // 4. Normaliza
     nome = nome.toUpperCase().trim();
     guia = guia.toLowerCase().trim();
 
-    // 5. Garante no JC.data
     global.JC = global.JC || {};
     global.JC.data = global.JC.data || {};
     global.JC.data.nome = nome;
     global.JC.data.guia = guia;
 
-    // 6. Salva em todos os lugares
     try {
       localStorage.setItem('jc.nome', nome);
       localStorage.setItem('jc.guia', guia);
       sessionStorage.setItem('jornada.guia', guia);
+      sessionStorage.setItem('jornada.nome', nome);
     } catch (e) {}
 
     return { nome, guia };
@@ -143,24 +142,26 @@
     document.getElementById('btn-selfie-confirm').disabled = false;
   }
 
-  function playTransitionAndGo(save = false) {
-    if (save && lastCapture) {
-      global.JC.data.selfieDataUrl = lastCapture;
-      try { localStorage.setItem('jc.selfieDataUrl', lastCapture); } catch {}
-    } else {
-      try { delete global.JC.data.selfieDataUrl; global.JC.data.selfieSkipped = true; } catch {}
-    }
+  // === TRANSIÇÃO PADRÃO (igual ao section-card.js) ===
+  function playTransitionThenGo() {
+    console.log(`[SELFIE] Disparando transição → ${NEXT_SECTION_ID}`);
 
-    if (global.VideoTransicao?.play) {
-      global.VideoTransicao.play({ src: '/assets/videos/filme-card-dourado.mp4', onEnd: () => goTo('section-card') });
+    if (global.playTransitionVideo) {
+      global.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
+    } else if (global.VideoTransicao?.play) {
+      global.VideoTransicao.play({
+        src: VIDEO_SRC,
+        onEnd: () => goTo(NEXT_SECTION_ID)
+      });
     } else {
+      // Fallback direto
       const v = document.createElement('video');
-      v.src = '/assets/videos/filme-card-dourado.mp4';
+      v.src = VIDEO_SRC;
       v.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:9999;background:#000;';
       v.muted = v.playsInline = true;
-      v.onended = () => { v.remove(); goTo('section-card'); };
+      v.onended = () => { v.remove(); goTo(NEXT_SECTION_ID); };
       document.body.appendChild(v);
-      v.play().catch(() => { v.remove(); goTo('section-card'); });
+      v.play().catch(() => { v.remove(); goTo(NEXT_SECTION_ID); });
     }
   }
 
@@ -179,6 +180,25 @@
     }
   }
 
+  // === CONFIRMAR E IR PARA O CARD ===
+  function confirmAndGo() {
+    if (!lastCapture) {
+      toast('Tire uma foto primeiro.');
+      return;
+    }
+
+    // SALVA SELFIE
+    global.JC = global.JC || {}; global.JC.data = global.JC.data || {};
+    global.JC.data.selfieDataUrl = lastCapture;
+    try { localStorage.setItem('jc.selfieDataUrl', lastCapture); } catch {}
+
+    // DISPARA EVENTO
+    window.dispatchEvent(new CustomEvent('selfie:captured', { detail: { dataUrl: lastCapture } }));
+
+    // VAI PRO CARD COM TRANSIÇÃO
+    playTransitionThenGo();
+  }
+
   // === INIT ===
   document.addEventListener('sectionLoaded', e => {
     if (e.detail?.sectionId !== 'section-selfie') return;
@@ -191,7 +211,6 @@
     const texto = document.getElementById('selfieTexto');
     const { nome, guia } = getUserData();
 
-    // DEBUG NO CONSOLE
     console.log('%c[SELFIE] Dados carregados:', 'color: gold; font-weight: bold');
     console.log('Nome:', nome);
     console.log('Guia:', guia);
@@ -199,12 +218,7 @@
     setTimeout(() => {
       typeWriter(title, title.dataset.text, 40);
 
-      const guiaNome = {
-        arian: 'Arian',
-        lumen: 'Lumen',
-        zion: 'Zion'
-      }[guia] || 'Guia';
-
+      const guiaNome = { arian: 'Arian', lumen: 'Lumen', zion: 'Zion' }[guia] || 'Guia';
       const fullText = `${nome}, afaste um pouco o celular e posicione o rosto no centro. ${guiaNome} te guiará.`;
       typeWriter(texto, fullText, 36);
       speak(fullText);
@@ -217,30 +231,16 @@
 
     document.getElementById('startCamBtn').onclick = startCamera;
     document.getElementById('btn-selfie-capture').onclick = capture;
-    document.getElementById('btn-selfie-confirm').onclick = () => playTransitionAndGo(true);
-    document.getElementById('btn-skip-selfie').onclick = () => { stopCamera(); playTransitionAndGo(false); };
+    document.getElementById('btn-selfie-confirm').onclick = confirmAndGo;
+    document.getElementById('btn-skip-selfie').onclick = () => {
+      stopCamera();
+      playTransitionThenGo();
+    };
   });
 
   document.addEventListener('sectionWillHide', e => {
     if (e.detail?.sectionId === 'section-selfie') stopCamera();
   });
-
-  // === DISPARA EVENTO QUANDO A FOTO FOR SALVA ===
-function confirmAndPlayTransition() {
-  const dataUrl = NS._lastCapture;
-  if (!dataUrl) { toast('Tire uma foto primeiro.'); return; }
-
-  // SALVA
-  window.JC = window.JC || {}; window.JC.data = window.JC.data || {};
-  window.JC.data.selfieDataUrl = dataUrl;
-  try { localStorage.setItem('jc.selfieDataUrl', dataUrl); } catch {}
-
-  // DISPARA EVENTO GLOBAL
-  window.dispatchEvent(new CustomEvent('selfie:captured', { detail: { dataUrl } }));
-
-  // VAI PRO CARD
-  playTransitionAndGo(NEXT_SECTION_ID);
-}
 
   // FORÇA INIT SE JÁ ESTIVER ATIVO
   const section = document.getElementById('section-selfie');
