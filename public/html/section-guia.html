@@ -10,6 +10,7 @@
 >
   <div class="parchment-inner-rough">
     <div class="conteudo-pergaminho">
+
       <!-- Título com datilografia -->
       <h2 class="titulo-pergaminho"
           data-typing="true" data-speed="30" data-cursor="true"
@@ -20,26 +21,30 @@
         <label class="sr-only" for="guiaNameInput">Insira seu nome</label>
         <input id="guiaNameInput" class="input-espinhos" type="text"
                placeholder="NOME" autocomplete="name"
-               aria-label="Digite seu nome para a jornada" />
+               aria-label="Digite seu nome para a jornada">
         <button id="btn-confirmar-nome" class="btn btn-stone-espinhos"
                 aria-label="Confirmar nome">Confirmar</button>
-              <!-- Caixa medieval para descrição (datilografia + TTS) -->
+      </div>
+
+      <!-- Caixa medieval para descrição (datilografia + TTS) -->
       <div class="moldura-grande">
         <div id="guiaTexto" class="guia-descricao-medieval"
              data-text="Olá, {{nome}}! Escolha seu guia para a Jornada."></div>
       </div>
-         </div>        
-       <!-- Aviso -->
+
+      <!-- Aviso / status da página guia -->
       <div id="guia-error" class="guia-notice hidden" role="status" aria-live="polite">
-      <span id="guia-notice-text"
-        data-typing="true"
-        data-speed="30"
-        data-cursor="true"
-        data-text="AO PASSAR SUAVEMENTE POR CIMA DO BOTÃO SERÁ EXIBIDO O PERFIL DO GUIA, CONFIRMA COM DUPLO CLICK!!!
+        <span id="guia-notice-text"
+              data-typing="true"
+              data-speed="30"
+              data-cursor="true"
+              data-text="AO PASSAR SUAVEMENTE POR CIMA DO BOTÃO SERÁ EXIBIDO O PERFIL DO GUIA. PARA CONFIRMAR, CLIQUE NOVAMENTE OU USE DUPLO CLIQUE.">
+        </span>
       </div>
+
       <!-- Botões de escolha (preenchidos via JSON) -->
       <div class="guia-options" role="group" aria-label="Opções de Guias"></div>
-     
+
     </div>
   </div>
 </section>
