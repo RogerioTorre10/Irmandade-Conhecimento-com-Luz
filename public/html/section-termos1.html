@@ -33,3 +33,21 @@
     </div>
   </div>
 </section>
+<script>
+(function () {
+  const press = (el) => {
+    el.classList.add('is-pressed');
+    setTimeout(() => el.classList.remove('is-pressed'), 260);
+  };
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('.btn, .btn-stone, .btn-stone-espinhos');
+    if (b) press(b);
+  });
+  document.addEventListener('keydown', (e) => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.btn, .btn-stone, .btn-stone-espinhos')) {
+      press(e.target);
+    }
+  });
+})();
+</script>
+
