@@ -1,137 +1,161 @@
-/* ===================== CARD BASE ===================== */
-#section-card {
-  position: relative;
-  display: block;
-  min-height: 100vh;
-  background: transparent;
-  z-index: 2;
+/* =========================================
+   STYLES-CARD v5 — Desktop + Mobile padrão
+   Seção-alvo: #section-card (HTML atual)
+   ========================================= */
+
+/* ---------- Variáveis básicas ---------- */
+:root{
+  --card-max-w: 560px;
+  --card-stage-pad-bottom: 140px; /* espaço para nome + botão */
+  --badge-fg: #f6e7c6;
+  --badge-bg: rgba(0,0,0,.40);
+  --badge-bd: rgba(255,225,180,.45);
 }
 
-/* ===================== BACKGROUND ===================== */
-#guideBg {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-  display: block;
+/* ---------- Container da seção ---------- */
+#section-card{
   position: relative;
+  isolation: isolate;          /* evita sobreposição do pergaminho */
+  background: transparent;
+  min-height: 100vh;
+  z-index: 10;
+}
+
+/* Se o pergaminho tiver película via ::before, neutraliza */
+#section-card.pergaminho::before,
+#section-card.pergaminho-v::before{
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+
+/* ---------- Palco do card ---------- */
+#section-card .card-stage{
+  position: relative;
+  width: min(92%, var(--card-max-w));
+  margin: 20px auto;
+  min-height: clamp(560px, 66vw, 920px);
+  padding-bottom: var(--card-stage-pad-bottom);
+  overflow: visible;           /* evita corte do BG do guia (Zion) */
+  z-index: 20;                 /* acima do pergaminho */
+}
+
+/* ---------- Fundo do guia ---------- */
+#section-card #guideBg{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+  display: block;
+  opacity: 1;
+  transition: opacity .6s ease;
   z-index: 1;
 }
 
-/* ===================== CARD STAGE ===================== */
-.card-stage {
-  position: relative;
-  margin-top: -48px;
-  padding-bottom: 120px;
-  min-height: clamp(560px, 66vw, 920px);
-  overflow: visible;
-  z-index: 2;
-}
-
-/* ===================== FLAME LAYER ===================== */
-.flame-layer {
+/* ---------- Selfie (3:4 dentro do card) ---------- */
+#section-card .flame-layer{
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: clamp(48px, 8vh, 120px);
-  width: clamp(180px, 38%, 360px);
-  z-index: 3;
+  bottom: clamp(96px, 14vh, 160px);
+  width: clamp(240px, 38%, 520px);   /* responsivo, preserva destaque */
+  aspect-ratio: 3 / 4;               /* mantém 3:4 */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 18px rgba(255,215,120,.25);
+  border: 2px solid rgba(255,215,0,.30);
+  z-index: 30;
   pointer-events: none;
 }
-
-.flame-selfie {
+#section-card .flame-selfie{
   width: 100%;
-  height: auto;
+  height: 100%;
   object-fit: cover;
+  object-position: center 32%;
+  display: block;
   border-radius: 12px;
-  box-shadow: 0 0 18px rgba(255,215,120,.25);
 }
 
-/* ===================== CARD FOOTER ===================== */
-.card-footer {
+/* ---------- Nome do participante ---------- */
+#section-card .card-footer{
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: clamp(24px, 6vh, 72px);
+  bottom: clamp(56px, 9vh, 96px);
+  z-index: 31;
   text-align: center;
-  z-index: 4;
-  pointer-events: auto;
+  pointer-events: none; /* evita bloquear botão */
 }
-
-.card-name-badge {
+#section-card .card-name-badge{
   display: inline-block;
   padding: 6px 14px;
   border-radius: 10px;
-  border: 1px solid rgba(255,225,180,.45);
-  background: rgba(0,0,0,.40);
-  backdrop-filter: blur(2px);
-  color: #f6e7c6;
-  font-weight: 600;
-  letter-spacing: .6px;
+  border: 1px solid var(--badge-bd);
+  background: var(--badge-bg);
+  color: var(--badge-fg);
+  font: 700 clamp(14px, 2.4vw, 22px)/1 "Cardo", serif;
+  letter-spacing: .06em;
   text-transform: uppercase;
   text-shadow: 0 1px 2px rgba(0,0,0,.6);
+  backdrop-filter: blur(2px);
 }
 
-/* ===================== BOTÃO CONTINUAR ===================== */
-#btnStartJourney {
+/* ---------- Botão Continuar ---------- */
+#section-card .card-actions{
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: clamp(12px, 4vh, 48px);
-  z-index: 5;
-  pointer-events: auto;
-  visibility: visible;
-  opacity: 1;
+  bottom: clamp(16px, 6vh, 40px);
+  z-index: 32;                   /* acima de tudo */
+}
+#section-card #btnNext{
+  min-width: 160px;
+  padding: 12px 28px;
+  font-size: clamp(14px, 1.9vw, 16px);
+  pointer-events: auto !important;  /* garante clique */
 }
 
-/* ===================== MOBILE AJUSTES ===================== */
-@media (max-width: 600px) {
-  .flame-layer {
-    top: 70% !important;          /* ANTES: 50% → cortava o nome */
-    left: 0;
-    right: 0;
-    transform: translateY(-50%);
-    bottom: auto;
-    width: auto;
-    text-align: center;
-  }
-
-  .flame-selfie {
-    width: min(60%, 310px);
-    margin: 0 auto;
-    border-radius: 14px;
-    object-fit: cover;
-    object-position: center 35% !important; /* Foca no rosto */
-  }
-
-  .card-footer {
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 72px);
-    pointer-events: auto;
-  }
-
-  #btnNext { /* <-- MUDOU DE #btnStartJourney */
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
-    z-index: 10;
-  }
-
-  .card-stage {
-    padding-bottom: clamp(44px, 9svh, 120px);
+/* =========================================
+   MOBILE (≤ 600px)
+   - Respeita safe-area (iOS)
+   - Selfie sobe um pouco para caber nome + botão
+   ========================================= */
+@media (max-width: 600px){
+  #section-card .card-stage{
+    margin-top: -12px;
     min-height: 100svh;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 120px);
+  }
+
+  #section-card .flame-layer{
+    bottom: auto;
+    top: 58svh;                   /* sobe um pouco no mobile */
+    transform: translate(-50%, -50%);
+    width: min(64%, 320px);
+  }
+
+  #section-card .flame-selfie{ object-position: center 35%; }
+
+  #section-card .card-footer{
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 72px);
+  }
+
+  #section-card #btnNext{
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
   }
 }
-/* === PREVIEW — TAMANHO IDEAL PRO CARD GUIA (3:4) === */
-.selfie-preview-wrap {
-  width: 92%;
-  max-width: 520px; /* Limita no mobile */
-  margin: 0 auto 8px;
-}
 
-.preview-frame {
-  position: relative;
-  width: 100%;
-  padding-bottom: 133.33%; /* 3:4 = 75% de altura */
-  background: #000;
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,.08);
-  box-shadow: 0 4px 16px rgba(0,0,0,.4);
+/* =========================================
+   DESKTOP (≥ 601px)
+   ========================================= */
+@media (min-width: 601px){
+  #section-card .card-stage{
+    width: min(92%, var(--card-max-w));
+    padding-bottom: var(--card-stage-pad-bottom);
+  }
+  #section-card .flame-layer{
+    bottom: clamp(96px, 14vh, 160px);
+    width: clamp(260px, 36%, 520px);
+  }
 }
