@@ -279,6 +279,15 @@ if (!document.getElementById('guia-buttons-layout')) {
     console.log('[JCGuia] pronto (JSON + maiúsculas + TTS + transição)');
   }
 
+  // Após o usuário digitar o nome e escolher o guia
+   const nomeDigitado = document.getElementById('inputNome').value.trim();
+   const guiaEscolhido = 'arian'; // ou 'zion', 'lumen'
+
+   sessionStorage.setItem('jornada.nome', nomeDigitado);
+   sessionStorage.setItem('jornada.guia', guiaEscolhido);
+
+   console.log('Dados salvos no sessionStorage:', { nomeDigitado, guiaEscolhido });
+
   function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
     if (sectionId !== SECTION_ID) return;
