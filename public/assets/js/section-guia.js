@@ -90,11 +90,30 @@
     };
   }
 
-  async function loadGuias() {
-    const r = await fetch(DATA_URL, { cache: 'no-store' });
-    if (!r.ok) throw new Error(`GET ${DATA_URL} -> ${r.status}`);
-    return r.json(); // [{id, nome, descricao, bgImage}]
+async function loadGuias() {
+  const POSSIVEIS_URLS = [
+    '/assets/data/guias.json',
+    '/data/guias.json',
+    './data/guias.json',
+    'https://irmandade-conhecimento-com-luz.onrender.com/assets/data/guias.json'
+  ];
+
+  for (const url of POSSIVEIS_URLS) {
+    try {
+      console.log(`[JCGuia] Tentando carregar: ${url}`);
+      const r = await fetch(url, { cache: 'no-store' });
+      if (r.ok) {
+        const data = await r.json();
+        console.log(`[JCGuia] guias.json carregado com sucesso de: ${url}`, data);
+        return data;
+      }
+    } catch (e) {
+      console.warn(`[JCGuia] Falha em ${url}:`, e);
+    }
   }
+
+  throw new Error('Nenhum caminho para guias.json funcionou');
+}
 
   function renderButtons(optionsBox, guias) {
     optionsBox.innerHTML = '';
