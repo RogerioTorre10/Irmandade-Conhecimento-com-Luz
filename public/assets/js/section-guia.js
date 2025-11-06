@@ -1,4 +1,4 @@
-/* /assets/js/section-guia.js */
+// /assets/js/section-guia.js
 (function () {
   'use strict';
 
@@ -74,7 +74,9 @@
   }
 
   function getTransitionSrc(root, btn) {
-    return (btn?.dataset?.transitionSrc) || (root?.dataset?.transitionSrc) || '/assets/videos/filme-eu-na-irmandade.mp4';
+    return (btn?.dataset?.transitionSrc)
+        || (root?.dataset?.transitionSrc)
+        || '/assets/videos/filme-eu-na-irmandade.mp4';
   }
 
   function pick(root) {
@@ -90,44 +92,27 @@
     };
   }
 
-async function loadGuias() {
-  const POSSIVEIS_URLS = [
-    '/assets/data/guias.json',
-    '/data/guias.json',
-    './data/guias.json',
-    'https://irmandade-conhecimento-com-luz.onrender.com/assets/data/guias.json'
-  ];
-
-  for (const url of POSSIVEIS_URLS) {
-    try {
-      console.log(`[JCGuia] Tentando carregar: ${url}`);
-      const r = await fetch(url, { cache: 'no-store' });
-      if (r.ok) {
-        const data = await r.json();
-        console.log(`[JCGuia] guias.json carregado com sucesso de: ${url}`, data);
-        return data;
-      }
-    } catch (e) {
-      console.warn(`[JCGuia] Falha em ${url}:`, e);
-    }
+  async function loadGuias() {
+    const r = await fetch(DATA_URL, { cache: 'no-store' });
+    if (!r.ok) throw new Error(`GET ${DATA_URL} -> ${r.status}`);
+    return r.json(); // [{id, nome, descricao, bgImage}]
   }
-
-  throw new Error('Nenhum caminho para guias.json funcionou');
-}
 
   function renderButtons(optionsBox, guias) {
     optionsBox.innerHTML = '';
     guias.forEach(g => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'btn btn-stone-espinhos no-anim guia-btn';
+      btn.className = 'btn btn-stone-espinhos no-anim';
       btn.dataset.action = 'select-guia';
       btn.dataset.guia = g.id;
       btn.setAttribute('aria-label', `Escolher o guia ${g.nome}`);
       btn.disabled = true;
 
+      // Nome visível no botão
       btn.innerHTML = `<span class="label">${g.nome}</span>`;
 
+      // Background opcional
       if (g.bgImage) {
         btn.style.backgroundImage = `url('${g.bgImage}')`;
         btn.style.backgroundSize = 'cover';
@@ -152,7 +137,7 @@ async function loadGuias() {
 
     const els = pick(root);
 
-    // ===== Nome sempre MAIÚSCULO =====
+    // ===== Nome sempre MAIÚSCULO (campo) =====
     if (els.nameInput) {
       els.nameInput.addEventListener('input', () => {
         const start = els.nameInput.selectionStart;
@@ -180,41 +165,46 @@ async function loadGuias() {
       els.errorBox?.setAttribute('aria-hidden', 'false');
     }
 
-    const guideButtons = qa('.guia-btn', els.optionsBox);
+    const guideButtons = qa('button[data-action="select-guia"]', els.optionsBox);
     guideButtons.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; b.style.cursor = 'not-allowed'; });
-
+    
     // Confirmar nome → habilita texto e opções
     els.confirmBtn?.addEventListener('click', async () => {
       let name = (els.nameInput?.value || '').trim();
       if (name.length < 2) {
-        window.toast?.('Por favor, insira um nome válido.', "warning"');
+        window.toast?.('Por favor, insira um nome válido.', 'warning');
         els.nameInput?.focus();
         return;
       }
 
+      // Padroniza MAIÚSCULAS
       const upperName = name.toUpperCase();
       els.nameInput.value = upperName;
 
+      // Salva no estado global para uso no card/selfie/PDF
       try {
         window.JC = window.JC || {};
         window.JC.data = window.JC.data || {};
         window.JC.data.nome = upperName;
       } catch {}
 
+      // Texto do container (datilografia + leitura), com nome
       if (els.guiaTexto) {
         const base = (els.guiaTexto.dataset?.text || els.guiaTexto.textContent || 'Escolha seu guia para a Jornada.').trim();
-        const msg = base.replace(/\{\{\s*(nome|name)\s*\}\}/gi, upperName);
+        const msg  = base.replace(/\{\{\s*(nome|name)\s*\}\}/gi, upperName);
         els.guiaTexto.textContent = '';
         await typeOnce(els.guiaTexto, msg, { speed: 38, speak: true });
 
+        // ✨ brilho dourado
         els.moldura?.classList.add('glow');
         els.guiaTexto?.classList.add('glow');
       }
 
+      // habilita opções
       guideButtons.forEach(b => { b.disabled = false; b.style.opacity = '1'; b.style.cursor = 'pointer'; });
     }, { once: true });
 
-    // Hover/Focus → prévia da descrição
+    // Hover/Focus → prévia da descrição do guia (com TTS)
     guideButtons.forEach(btn => {
       const preview = async () => {
         const g = findGuia(guias, btn.dataset.guia);
@@ -226,30 +216,24 @@ async function loadGuias() {
       btn.addEventListener('focus', preview);
     });
 
-    // Clique → escolhe guia, salva e transita
+    // Clique → escolhe guia, apaga brilho e transita
     guideButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         if (btn.disabled) return;
         const g = findGuia(guias, btn.dataset.guia) || { id: btn.dataset.guia, nome: btn.textContent.trim() };
 
-        // SALVA NO sessionStorage
-        const nome = (els.nameInput?.value || 'AMOR').toUpperCase().trim();
-        sessionStorage.setItem('jornada.nome', nome);
-        sessionStorage.setItem('jornada.guia', g.id);
-
-        console.log('%c[DADOS SALVOS] Nome:', 'color: gold', nome, 'Guia:', g.id);
-
-        // Salva no JC.data
+        // salva guia escolhido
         try {
           window.JC = window.JC || {};
           window.JC.data = window.JC.data || {};
-          window.JC.data.guia = g.id;
-        } catch {}
+          window.JC.data.guia = g.id || g.nome;
+        } catch {}      
 
-        // Apaga brilho e transita
+        // apaga brilho
         els.moldura?.classList.add('fade-out');
         els.guiaTexto?.classList.add('fade-out');
 
+        // transição
         const src = getTransitionSrc(root, btn);
         if (typeof window.playTransitionVideo === 'function') {
           window.playTransitionVideo(src, NEXT_SECTION_ID);
@@ -258,47 +242,43 @@ async function loadGuias() {
         }
       });
     });
-
-    // Layout dos botões
-    if (!document.getElementById('guia-buttons-layout')) {
-      const css = document.createElement('style');
-      css.id = 'guia-buttons-layout';
-      css.textContent = `
-        #section-guia .guia-options {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          gap: clamp(8px, 2.4vw, 16px);
-          flex-wrap: nowrap;
-          margin: 10px auto;
-          width: 92%;
-          max-width: 820px;
-        }
-        #section-guia .guia-options button {
-          flex: 1 1 0;
-          min-width: 90px;
-          max-width: 240px;
-          height: clamp(30px, 6.2vw, 36px);
-          line-height: clamp(30px, 6.2vw, 36px);
-          padding: 0 clamp(6px, 2vw, 12px);
-          font-size: clamp(11px, 2.6vw, 14px);
-          border-radius: 10px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
-          white-space: nowrap;
-        }
-        @media (max-width: 380px) {
-          #section-guia .guia-options button {
-            min-width: 84px;
-            font-size: 12px;
-          }
-        }
-      `;
-      document.head.appendChild(css);
+// --- Layout dos botões (Lumen, Zion, Arian) lado a lado ---
+if (!document.getElementById('guia-buttons-layout')) {
+  const css = document.createElement('style');
+  css.id = 'guia-buttons-layout';
+  css.textContent = `
+    #section-guia .guia-options{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:clamp(8px,2.4vw,16px);
+      flex-wrap:nowrap;
+      margin:10px auto;
+      width:92%;
+      max-width:820px;
     }
-
+    #section-guia .guia-options button{
+      flex:1 1 0;
+      min-width:90px;
+      max-width:240px;
+      height:clamp(30px,6.2vw,36px);
+      line-height:clamp(30px,6.2vw,36px);
+      padding:0 clamp(6px,2vw,12px);
+      font-size:clamp(11px,2.6vw,14px);
+      border-radius:10px;
+      box-shadow:0 2px 8px rgba(0,0,0,.25);
+      white-space:nowrap;
+    }
+    @media (max-width:380px){
+      #section-guia .guia-options button{min-width:84px;font-size:12px;}
+    }
+  `;
+  document.head.appendChild(css);
+}
+  
     console.log('[JCGuia] pronto (JSON + maiúsculas + TTS + transição)');
   }
-
+ 
   function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
     if (sectionId !== SECTION_ID) return;
@@ -314,4 +294,5 @@ async function loadGuias() {
   document.readyState === 'loading'
     ? document.addEventListener('DOMContentLoaded', bind, { once: true })
     : bind();
+
 })();
