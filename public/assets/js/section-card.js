@@ -1,323 +1,294 @@
-/* /assets/js/section-card.js — VERSÃO FINAL: Card + Início da Jornada */
+/* /assets/js/section-card.js — v4.2-merge (robusto + compatível)
+   - Mantém sua lógica sem globals, storage sync e transição com vídeo
+   - Alinha com a versão Lumen: auto-monta estrutura se faltar, garante botão, nome no rodapé
+   - Lê dados em ordem: sessionStorage → localStorage → JC.data (com fallbacks)
+   - Suporta #cardName e #userNameSlot (ambos atualizados)
+   - BG: tenta /assets/data/guias.json (se existir); senão usa constantes CARD_BG
+*/
 (function () {
   'use strict';
 
   const MOD = 'section-card.js';
-
-  // IDs aceitos para a seção
   const SECTION_IDS = ['section-card', 'section-eu-na-irmandade'];
   const NEXT_SECTION_ID = 'section-perguntas';
   const VIDEO_SRC = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
 
-  // Imagens fallback
+  // Fallbacks de BG (se guias.json não estiver disponível)
   const CARD_BG = {
     arian: '/assets/img/irmandade-quarteto-bg-arian.png',
     lumen: '/assets/img/irmandade-quarteto-bg-lumen.png',
     zion:  '/assets/img/irmandade-quarteto-bg-zion.png'
   };
+
   const PLACEHOLDER_SELFIE = '/assets/img/irmandade-card-placeholder.jpg';
-
   const GUIAS_JSON = '/assets/data/guias.json';
-  let GUIAS_CACHE = null;
 
-  // Helpers
   const qs  = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const log = (...a) => console.log(`%c[${MOD}]`, 'color:#7dd3fc', ...a);
 
-  // ---------- Utilitários ----------
-  async function waitForTransitionUnlock(timeoutMs = 12000) {
-    if (!window.__TRANSITION_LOCK) return;
-    let done = false;
-    const p = new Promise(res => {
-      const fn = () => { if (!done) { done = true; document.removeEventListener('transition:ended', fn); res(); } };
-      document.addEventListener('transition:ended', fn, { once: true });
-    });
-    const t = new Promise(res => setTimeout(res, timeoutMs));
-    await Promise.race([p, t]);
-  }
+  // Cache opcional de BGs vindos do guias.json
+  let GUIA_BG_CACHE = null;
 
-  async function runTypingAndSpeak(el, text) {
-    if (!el || !text) return;
-    const speed = Number(el.dataset.speed || 40);
-    if (typeof window.runTyping === 'function') {
-      await new Promise(res => {
-        try { window.runTyping(el, text, res, { speed, cursor: el.dataset.cursor !== 'false' }); }
-        catch { el.textContent = text; res(); }
-      });
-    } else {
-      el.textContent = '';
-      let i = 0;
-      await new Promise(res => (function tick(){ (i<text.length) ? (el.textContent+=text[i++], setTimeout(tick, speed)) : res(); })());
-    }
-    try { await window.EffectCoordinator?.speak?.(text, { rate: 1.0 }); } catch {}
-  }
-
-  function readSelfieUrlOrPlaceholder() {
-    const CANDIDATES = [
-      'jornada.selfieDataUrl','selfie.dataUrl','selfieDataUrl',
-      'jornada.selfie','selfie.image','selfieImageData',
-      'jc.selfie','jc.selfieDataUrl','jc.selfie.image',
-      'user.selfie','user.selfieDataUrl'
-    ];
-
-    for (const k of CANDIDATES) {
-      try {
-        const v = sessionStorage.getItem(k);
-        if (v && /^data:image\//.test(v)) return v;
-      } catch {}
-    }
-    for (const k of CANDIDATES) {
-      try {
-        const v = localStorage.getItem(k);
-        if (v && /^data:image\//.test(v)) return v;
-      } catch {}
-    }
-    return PLACEHOLDER_SELFIE;
-  }
-
-  // ---------- JSON dos guias ----------
-  async function loadGuiasJson() {
-    if (GUIAS_CACHE) return GUIAS_CACHE;
+  async function maybeLoadGuias() {
+    if (GUIA_BG_CACHE) return GUIA_BG_CACHE;
     try {
-      const r = await fetch(GUIAS_JSON, { cache: 'no-store' });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      const data = await r.json();
-      const arr = Array.isArray(data) ? data : (Array.isArray(data.guias) ? data.guias : []);
-      GUIAS_CACHE = arr.map(g => ({
-        id: String(g.id || '').toLowerCase(),
-        nome: g.nome || g.name || '',
-        bgImage: g.bgImage || g.bg || ''
-      }));
-      console.log(`[${MOD}] guias.json carregado:`, GUIAS_CACHE);
+      const res = await fetch(GUIAS_JSON, { cache: 'no-store' });
+      if (!res.ok) throw new Error('guias.json não encontrado');
+      const arr = await res.json();
+      GUIA_BG_CACHE = {};
+      for (const g of arr) {
+        const key =
+          (g.id || g.key || (g.nome || '').toLowerCase() || '').toString().toLowerCase();
+        const bg = g.bgImage || g.bg || g.image;
+        if (key && bg) GUIA_BG_CACHE[key] = bg.startsWith('/') ? bg : `/assets/img/${bg}`;
+      }
+      log('guias.json carregado', GUIA_BG_CACHE);
     } catch (e) {
-      console.warn(`[${MOD}] Falha ao carregar ${GUIAS_JSON}:`, e);
-      GUIAS_CACHE = [];
+      // se não existir, seguimos com CARD_BG
+      GUIA_BG_CACHE = {};
+      log('Usando BGs estáticos (sem guias.json)');
     }
-    return GUIAS_CACHE;
+    return GUIA_BG_CACHE;
   }
 
-  function titleize(id) {
-    const m = { arian: 'Arian', lumen: 'Lumen', zion: 'Zion' };
-    return m[id] || (id ? id[0].toUpperCase() + id.slice(1) : '');
-  }
-
-  async function resolveSelectedGuide() {
-    const selId = (sessionStorage.getItem('jornada.guia') || 'zion').toLowerCase();
-    const guias = await loadGuiasJson();
-    const j = guias.find(g => g.id === selId);
-    if (j && (j.bgImage || j.nome)) {
-      return { id: selId, nome: j.nome || titleize(selId), bgImage: j.bgImage || CARD_BG[selId] || CARD_BG.zion };
+  // --- Sincronização mobile (outra aba) ---
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'jc.guia' || e.key === 'jc.nome' || e.key === 'jc.selfieDataUrl') {
+      log('SYNC: dados atualizados', e);
+      renderCard();
     }
-    return { id: selId, nome: titleize(selId), bgImage: CARD_BG[selId] || CARD_BG.zion };
+  });
+
+  // --- Leitura de dados (com fallbacks) ---
+  function getUserData() {
+    let nome = 'AMOR';
+    let guia = 'zion'; // zion como base visual segura
+
+    try {
+      const ssNome = sessionStorage.getItem('jornada.nome');
+      const ssGuia = sessionStorage.getItem('jornada.guia');
+      if (ssNome) nome = ssNome;
+      if (ssGuia) guia = ssGuia;
+
+      const lsNome = localStorage.getItem('jc.nome');
+      const lsGuia = localStorage.getItem('jc.guia');
+      if (lsNome) nome = lsNome;
+      if (lsGuia) guia = lsGuia;
+
+      if (window.JC?.data) {
+        if (window.JC.data.nome) nome = window.JC.data.nome;
+        if (window.JC.data.guia) guia = window.JC.data.guia;
+      }
+    } catch {}
+
+    nome = (nome || 'AMOR').toString().toUpperCase().trim();
+    guia = (guia || 'zion').toString().toLowerCase().trim();
+
+    // Normaliza em JC + persiste para outras telas
+    window.JC = window.JC || {};
+    window.JC.data = window.JC.data || {};
+    window.JC.data.nome = nome;
+    window.JC.data.guia = guia;
+
+    try {
+      localStorage.setItem('jc.nome', nome);
+      localStorage.setItem('jc.guia', guia);
+      sessionStorage.setItem('jornada.guia', guia);
+    } catch {}
+
+    return { nome, guia };
   }
 
-  // ---------- Estrutura do Card ----------
+  // --- Garantir estrutura básica do card quando HTML veio "puro" ---
   function ensureStructure(root) {
-    let stage = root.querySelector('.card-stage');
+    if (!root) return {};
+
+    let stage = qs('.card-stage', root);
     if (!stage) {
       stage = document.createElement('div');
       stage.className = 'card-stage';
+      stage.style.position = 'relative';
       root.appendChild(stage);
     }
-    stage.style.position = 'relative';
-    if (!stage.style.minHeight) stage.style.minHeight = '52vh';
 
-    let guideBg = stage.querySelector('#guideBg');
+    let guideBg = qs('#guideBg', stage);
     if (!guideBg) {
       guideBg = document.createElement('img');
       guideBg.id = 'guideBg';
-      guideBg.alt = 'Card da Irmandade';
-      guideBg.style.display = 'block';
-      guideBg.style.width = '100%';
-      guideBg.style.height = 'auto';
-      guideBg.loading = 'lazy';
+      guideBg.alt = 'Fundo do guia';
+      guideBg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;';
       stage.appendChild(guideBg);
     }
 
-    let guideNameWrap = stage.querySelector('.card-guide-name');
-    if (!guideNameWrap) {
-      guideNameWrap = document.createElement('div');
-      guideNameWrap.className = 'card-guide-name';
-      stage.appendChild(guideNameWrap);
-    }
-    let guideNameSlot = stage.querySelector('#guideNameSlot') || guideNameWrap.querySelector('span');
-    if (!guideNameSlot) {
-      guideNameSlot = document.createElement('span');
-      guideNameSlot.id = 'guideNameSlot';
-      guideNameWrap.appendChild(guideNameSlot);
+    let overlay = qs('#cardOverlay', stage);
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'cardOverlay';
+      overlay.className = 'card-overlay';
+      overlay.style.cssText = 'position:absolute;inset:0;z-index:2;pointer-events:none;';
+      stage.appendChild(overlay);
     }
 
-    let flameLayer = stage.querySelector('.flame-layer');
+    let inner = qs('#cardInner', stage);
+    if (!inner) {
+      inner = document.createElement('div');
+      inner.id = 'cardInner';
+      inner.className = 'card-inner';
+      inner.style.cssText = 'position:relative;z-index:3;';
+      stage.appendChild(inner);
+    }
+
+    // Selfie container (se não houver na página)
+    let flameLayer = qs('.flame-layer', stage);
     if (!flameLayer) {
       flameLayer = document.createElement('div');
       flameLayer.className = 'flame-layer';
+      flameLayer.style.cssText =
+        'position:absolute;left:50%;bottom:160px;transform:translateX(-50%);width:38%;z-index:3;';
+      flameLayer.innerHTML = `<img id="selfieImage" class="flame-selfie" src="${PLACEHOLDER_SELFIE}" alt="Selfie">`;
       stage.appendChild(flameLayer);
     }
 
-    let flameSelfie = stage.querySelector('.flame-selfie');
-    if (!flameSelfie) {
-      flameLayer.innerHTML = `<img class="flame-selfie" id="selfieImage" src="${PLACEHOLDER_SELFIE}" alt="Selfie" loading="lazy">`;
-      flameSelfie = flameLayer.querySelector('.flame-selfie');
-    }
-
-    let footer = stage.querySelector('.card-footer');
+    // Rodapé com nome (#cardName) — compatível com #userNameSlot
+    let footer = qs('.card-footer', stage);
     if (!footer) {
       footer = document.createElement('div');
       footer.className = 'card-footer';
+      footer.style.cssText =
+        'position:absolute;left:50%;bottom:72px;transform:translateX(-50%);z-index:4;';
+      footer.innerHTML =
+        `<span class="card-name-badge"><span id="cardName"></span></span>`;
       stage.appendChild(footer);
-    }
-    let badge = footer.querySelector('.card-name-badge');
-    if (!badge) {
-      badge = document.createElement('span');
-      badge.className = 'card-name-badge';
-      footer.appendChild(badge);
-    }
-    let userNameSlot = footer.querySelector('#userNameSlot');
-    if (!userNameSlot) {
-      userNameSlot = document.createElement('span');
-      userNameSlot.id = 'userNameSlot';
-      badge.appendChild(userNameSlot);
+    } else {
+      // Se o HTML antigo usa #userNameSlot, mantemos e também criamos #cardName se faltar
+      const hasCardName = qs('#cardName', footer);
+      const userSlot = qs('#userNameSlot', footer);
+      if (!hasCardName && !userSlot) {
+        const span = document.createElement('span');
+        span.className = 'card-name-badge';
+        span.innerHTML = `<span id="cardName"></span>`;
+        footer.appendChild(span);
+      }
     }
 
-    let btnNext = root.querySelector('#btnNext');
+    // Botão continuar garantido
+    let actions = qs('.card-actions', root);
+    if (!actions) {
+      actions = document.createElement('div');
+      actions.className = 'card-actions';
+      actions.style.cssText =
+        'position:absolute;left:50%;transform:translateX(-50%);bottom:48px;z-index:6;';
+      root.appendChild(actions);
+    }
+    let btnNext = qs('#btnNext', actions) || qs('.btn-next-card', actions);
     if (!btnNext) {
-      const actions = root.querySelector('.card-actions') || root.appendChild(Object.assign(document.createElement('div'), { className: 'card-actions' }));
       btnNext = document.createElement('button');
       btnNext.id = 'btnNext';
       btnNext.className = 'btn btn-stone';
       btnNext.textContent = 'Continuar';
       actions.appendChild(btnNext);
     }
-
-    btnNext.disabled = false;
     btnNext.style.pointerEvents = 'auto';
-    btnNext.style.opacity = '1';
-    btnNext.style.cursor = 'pointer';
-    btnNext.style.zIndex = '9999';
+    btnNext.disabled = false;
+    btnNext.onclick = goNext;
 
-    btnNext.addEventListener('click', (ev) => {
-      ev.stopPropagation();
-      ev.preventDefault();
-      console.log('[section-card.js] Botão Continuar clicado!');
-      if (typeof playTransitionThenGo === 'function') {
-        playTransitionThenGo(NEXT_SECTION_ID);
-      } else if (window.JC?.nextSection) {
-        window.JC.nextSection(NEXT_SECTION_ID);
-      } else {
-        console.warn('Transição não encontrada.');
-      }
-    });
-
-    return { stage, guideBg, guideNameSlot, flameLayer, flameSelfie, userNameSlot, btnNext };
+    return { stage, guideBg };
   }
 
-  // ---------- Leitura Robusta do Nome ----------
-  function getParticipantName() {
-    const CHAVES = [
-      'jornada.nome', 'jornada.participante', 'nomeParticipante',
-      'user.name', 'participante.nome', 'jornada.selfie.nome',
-      'selfie.nome', 'jc.nome'
-    ];
-    let nome = 'USUÁRIO';
+  // --- Aplica o BG do guia (guias.json > CARD_BG) ---
+  async function applyGuideBG(section, guia) {
+    const guideBg = qs('#guideBg', section);
+    if (!guideBg) return;
 
-    for (const chave of CHAVES) {
-      const valor = sessionStorage.getItem(chave) || localStorage.getItem(chave);
-      if (valor && valor.trim() && !valor.includes('USUÁRIO')) {
-        nome = valor.trim();
-        console.log(`[${MOD}] Nome encontrado em: ${chave} → ${nome}`);
-        break;
-      }
-    }
+    const cache = await maybeLoadGuias();
+    const fromJson = cache[guia];
+    const fromConst = CARD_BG[guia] || CARD_BG.zion;
+    const target = fromJson || fromConst;
 
-    return nome.toUpperCase();
-  }
+    // base segura desde o início
+    if (!guideBg.src) guideBg.src = CARD_BG.zion;
 
-  // ---------- Iniciar Jornada ----------
-  function iniciarJornada(guiaId, nome) {
-    const wrapper = document.getElementById('jornada-content-wrapper');
-    if (!wrapper) return;
-
-    console.log(`[${MOD}] Iniciando jornada: guia=${guiaId}, nome=${nome}`);
-
-    if (window.Jornada?.iniciar) {
-      window.Jornada.iniciar(guiaId, nome.toLowerCase());
-    } else if (window.JC?.iniciarJornada) {
-      window.JC.iniciarJornada(guiaId, nome);
-    } else if (window.iniciarEtapa) {
-      window.iniciarEtapa(guiaId);
+    if (guideBg.src !== target) {
+      guideBg.style.opacity = '0';
+      guideBg.onload = () => { guideBg.style.opacity = '1'; guideBg.onload = null; };
+      guideBg.onerror = () => { guideBg.src = CARD_BG.zion; guideBg.style.opacity = '1'; };
+      guideBg.src = target;
     } else {
-      // Fallback visual
-      wrapper.innerHTML = `
-        <div style="padding:40px; text-align:center; background:rgba(255,255,220,0.95); border-radius:15px; font-family:Georgia; margin:20px;">
-          <h2>Olá, <strong>${nome}</strong>!</h2>
-          <p>Você foi chamado pela <strong>${titleize(guiaId)}</strong> para a Jornada da Chama Eterna.</p>
-          <p><em>A luz que você carrega já começou a brilhar.</em></p>
-        </div>
-      `;
+      guideBg.style.opacity = '1';
     }
   }
 
-  // ---------- Inicialização ----------
-  async function initCard(root) {
-    const section = SECTION_IDS.map(id => root.id === id ? root : qs(`#${id}`, root) || qs(`#${id}`)).find(Boolean) || root;
+  // --- Render do card (idempotente) ---
+  async function renderCard() {
+    const section = qs('#section-card') || qs('#section-eu-na-irmandade');
+    if (!section) return;
 
-    const nome = getParticipantName();
-    const guia = await resolveSelectedGuide();
+    ensureStructure(section);
 
-    ['zion','lumen','arian'].forEach(g => section.classList.remove(`guide-${g}`));
-    section.classList.add(`guide-${guia.id}`);
-
-    const { guideBg, guideNameSlot, flameLayer, flameSelfie, userNameSlot } = ensureStructure(section);
-
-    // BG
-    if (guideBg.tagName === 'IMG') {
-      guideBg.src = guia.bgImage;
-      guideBg.alt = `${guia.nome} — Card da Irmandade`;
-      const applyFallback = () => {
-        if (!guideBg.naturalWidth) {
-          guideBg.closest('.card-stage').style.backgroundImage = `url("${guia.bgImage}")`;
-          guideBg.closest('.card-stage').style.backgroundSize = 'cover';
-        }
-      };
-      guideBg.complete ? applyFallback() : guideBg.onload = guideBg.onerror = applyFallback;
-    }
-
-    // Nomes
-    if (guideNameSlot) guideNameSlot.textContent = (guia.nome || '').toUpperCase();
-    if (userNameSlot) userNameSlot.textContent = nome;
+    const { nome, guia } = getUserData();
+    await applyGuideBG(section, guia);
 
     // Selfie
-    const url = readSelfieUrlOrPlaceholder();
-    if (flameSelfie && url) {
-      const isPlaceholder = url === PLACEHOLDER_SELFIE;
-      flameSelfie.src = url;
-      flameSelfie.onload = () => flameLayer.classList.add('show');
-      flameSelfie.onerror = () => {
-        flameSelfie.src = PLACEHOLDER_SELFIE;
-        flameLayer.classList.add('show', 'placeholder-only');
-      };
-      if (isPlaceholder) flameLayer.classList.add('placeholder-only');
-      flameLayer.classList.add('show');
+    const selfieImg = qs('#selfieImage', section);
+    if (selfieImg) {
+      const url = window.JC?.data?.selfieDataUrl || localStorage.getItem('jc.selfieDataUrl');
+      selfieImg.src = url || PLACEHOLDER_SELFIE;
+      const flameLayer = selfieImg.closest('.flame-layer');
+      if (flameLayer) flameLayer.classList.add('show');
     }
 
-    await waitForTransitionUnlock();
-    for (const el of qsa('[data-typing="true"]', section)) {
-      const text = (el.dataset.text || el.textContent || '').trim();
-      await runTypingAndSpeak(el, text);
-    }
+    // Nome — atualiza #cardName e #userNameSlot (se existirem)
+    const el1 = qs('#cardName', section);
+    const el2 = qs('#userNameSlot', section);
+    if (el1) el1.textContent = nome;
+    if (el2) el2.textContent = nome;
 
-    console.log(`[${MOD}] Card exibido · guia=${guia.id} (${guia.nome}) · participante=${nome}`);
-
-    // === INICIAR JORNADA (era feito na selfie) ===
-    setTimeout(() => iniciarJornada(guia.id, nome), 600);
+    log('Renderizado', { guia, nome });
   }
 
-  // ---------- Escutas ----------
-  document.addEventListener('section:shown', (e) => {
+  // --- Navegação (transição com vídeo ou fallback) ---
+  function goNext() {
+    try { speechSynthesis.cancel(); } catch {}
+    qsa('video').forEach(v => { try { v.pause(); v.src = ''; } catch {} });
+
+    if (typeof window.playTransitionVideo === 'function') {
+      window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
+    } else {
+      const v = document.createElement('video');
+      v.src = VIDEO_SRC;
+      v.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:9999;background:#000;';
+      v.muted = true; v.playsInline = true;
+      v.onended = () => { v.remove(); window.JC?.show?.(NEXT_SECTION_ID, { force: true }); };
+      document.body.appendChild(v);
+      v.play().catch(() => { v.remove(); window.JC?.show?.(NEXT_SECTION_ID, { force: true }); });
+    }
+  }
+
+  // --- Init da seção ---
+  async function initCard(root) {
+    await renderCard();
+
+    // Efeito de datilografia/voz, se disponíveis
+    const typingEls = qsa('[data-typing="true"]', root);
+    for (const el of typingEls) {
+      const text = el.dataset.text || el.textContent || '';
+      if (typeof window.runTyping === 'function') {
+        await new Promise(res => window.runTyping(el, text, res, { speed: 40, cursor: true }));
+      } else {
+        el.textContent = text;
+      }
+      if (typeof window.speak === 'function') window.speak(text);
+    }
+  }
+
+  // --- Eventos do seu app ---
+  document.addEventListener('section:shown', e => {
     const id = e.detail.sectionId;
-    if (!SECTION_IDS.includes(id)) return;
-    const root = e.detail.node || qs(`#${id}`) || qs('#jornada-content-wrapper') || document.body;
-    initCard(root);
+    if (SECTION_IDS.includes(id)) {
+      const root = e.detail.node || qs(`#${id}`) || document.body;
+      initCard(root);
+    }
   });
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -325,5 +296,13 @@
     if (visible) initCard(visible);
   });
 
-  console.log(`[${MOD}] carregado e pronto para iniciar a jornada`);
+  // --- Fallback visual se vier só o <section id="section-card"> vazio ---
+  document.addEventListener('DOMContentLoaded', () => {
+    const sec = qs('#section-card');
+    if (!sec || sec.querySelector('.card-stage')) return;
+    ensureStructure(sec); // monta tudo e deixa pronto
+    renderCard();
+  });
+
+  log('carregado e pronto!');
 })();
