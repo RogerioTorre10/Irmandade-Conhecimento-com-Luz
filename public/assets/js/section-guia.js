@@ -1,4 +1,4 @@
-// /assets/js/section-guia.js
+// /assets/js/section-guia.js — v3.1 (confirmação em 2 passos + aviso com typing/TTS)
 (function () {
   'use strict';
 
@@ -9,6 +9,10 @@
   const TYPING_SPEED = 42;
   const TTS_LATCH_MS = 600;
   const DATA_URL     = '/assets/data/guias.json';
+
+  // NOVO: ajustes de UX
+  const ARM_TIMEOUT_MS = 3000;   // tempo para confirmar após 1º clique
+  const HOVER_DELAY_MS = 150;    // atraso para mostrar preview no hover
 
   if (window.JCGuia?.__bound) { console.log('[JCGuia] já carregado'); return; }
   window.JCGuia = window.JCGuia || {};
@@ -40,7 +44,10 @@
   async function localType(el, text, speed = TYPING_SPEED) {
     return new Promise(resolve => {
       let i = 0; el.textContent = '';
-      (function tick() { if (i < text.length) { el.textContent += text.charAt(i++); setTimeout(tick, speed); } else resolve(); })();
+      (function tick() {
+        if (i < text.length) { el.textContent += text.charAt(i++); setTimeout(tick, speed); }
+        else resolve();
+      })();
     });
   }
 
@@ -53,7 +60,10 @@
 
     let usedFallback = false;
     if (typeof window.runTyping === 'function') {
-      await new Promise(res => { try { window.runTyping(el, msg, () => res(), { speed, cursor: true }); } catch { usedFallback = true; res(); } });
+      await new Promise(res => {
+        try { window.runTyping(el, msg, () => res(), { speed, cursor: true }); }
+        catch { usedFallback = true; res(); }
+      });
     } else usedFallback = true;
 
     if (usedFallback) await localType(el, msg, speed);
@@ -75,8 +85,8 @@
 
   function getTransitionSrc(root, btn) {
     return (btn?.dataset?.transitionSrc)
-        || (root?.dataset?.transitionSrc)
-        || '/assets/videos/filme-eu-na-irmandade.mp4';
+      || (root?.dataset?.transitionSrc)
+      || '/assets/videos/filme-eu-na-irmandade.mp4';
   }
 
   function pick(root) {
@@ -88,7 +98,7 @@
       moldura:    q('.moldura-grande', root),
       guiaTexto:  q('#guiaTexto', root),
       optionsBox: q('.guia-options', root),
-      errorBox:   q('#guia-error', root)
+      errorBox:   q('#guia-error', root) // usaremos como "notice"
     };
   }
 
@@ -103,22 +113,20 @@
     guias.forEach(g => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'btn btn-stone-espinhos no-anim';
+      btn.className = 'btn btn-stone-espinhos no-anim guia-option'; // <- classe para UX
       btn.dataset.action = 'select-guia';
       btn.dataset.guia = g.id;
+      btn.dataset.nome = g.nome;
       btn.setAttribute('aria-label', `Escolher o guia ${g.nome}`);
       btn.disabled = true;
 
-      // Nome visível no botão
       btn.innerHTML = `<span class="label">${g.nome}</span>`;
 
-      // Background opcional
       if (g.bgImage) {
         btn.style.backgroundImage = `url('${g.bgImage}')`;
         btn.style.backgroundSize = 'cover';
         btn.style.backgroundPosition = 'center';
       }
-
       optionsBox.appendChild(btn);
     });
   }
@@ -126,6 +134,97 @@
   function findGuia(guias, id) {
     id = (id || '').toLowerCase();
     return guias.find(g => (g.id || '').toLowerCase() === id);
+  }
+
+  // ====== Aviso (usando #guia-error como container) ======
+  function getNoticeRefs(root) {
+    const box = q('#guia-error', root);
+    if (!box) return { box: null, span: null };
+
+    // se não existir um span interno para datilografia, criamos
+    let span = box.querySelector('#guia-notice-text');
+    if (!span) {
+      span = document.createElement('span');
+      span.id = 'guia-notice-text';
+      box.innerHTML = '';
+      box.appendChild(span);
+    }
+    return { box, span };
+  }
+
+  async function showNotice(root, text, { speak = true } = {}) {
+    const { box, span } = getNoticeRefs(root);
+    if (!box || !span) return;
+    box.classList.remove(HIDE_CLASS);
+    box.setAttribute('aria-hidden', 'false');
+    span.dataset.text = text;
+    span.textContent = '';
+    await typeOnce(span, null, { speed: 30, speak });
+  }
+
+  function hideNotice(root) {
+    const { box, span } = getNoticeRefs(root);
+    if (!box) return;
+    if (span) span.textContent = '';
+    box.classList.add(HIDE_CLASS);
+    box.setAttribute('aria-hidden', 'true');
+  }
+
+  // ====== Confirmação em dois passos ======
+  let armedId = null;
+  let armTimer = null;
+  const hoverTimers = new Map();
+
+  function cancelArm(root) {
+    if (armTimer) clearTimeout(armTimer);
+    armTimer = null;
+    armedId = null;
+    qa('.guia-option.armed').forEach(el => {
+      el.classList.remove('armed');
+      el.setAttribute('aria-pressed', 'false');
+    });
+    hideNotice(root);
+  }
+
+  function confirmGuide(root, guiaId, guiaName) {
+    try {
+      window.JC = window.JC || {};
+      window.JC.data = window.JC.data || {};
+      window.JC.data.guia = guiaId;
+      sessionStorage.setItem('jornada.guia', guiaId);
+      localStorage.setItem('jc.guia', guiaId);
+    } catch {}
+
+    const src = getTransitionSrc(root);
+    if (typeof window.playTransitionVideo === 'function') {
+      window.playTransitionVideo(src, NEXT_SECTION_ID);
+    } else {
+      window.JC?.show?.(NEXT_SECTION_ID) ?? (location.hash = `#${NEXT_SECTION_ID}`);
+    }
+  }
+
+  function armGuide(root, btn, label) {
+    const id = (btn.dataset.guia || '').toLowerCase();
+
+    // se já está armado este mesmo id → confirmar
+    if (armedId === id) {
+      confirmGuide(root, id, label);
+      cancelArm(root);
+      return;
+    }
+
+    armedId = id;
+    qa('.guia-option', root).forEach(el => { el.classList.remove('armed'); el.setAttribute('aria-pressed', 'false'); });
+    btn.classList.add('armed');
+    btn.setAttribute('aria-pressed', 'true');
+
+    showNotice(root, `Você escolheu ${label}. Clique novamente para confirmar.`, { speak: true });
+
+    if (armTimer) clearTimeout(armTimer);
+    armTimer = setTimeout(() => {
+      cancelArm(root);
+      showNotice(root, 'Tempo esgotado. Selecione o guia e clique novamente para confirmar.', { speak: true });
+    }, ARM_TIMEOUT_MS);
   }
 
   async function initOnce(root) {
@@ -157,17 +256,15 @@
     try {
       guias = await loadGuias();
       renderButtons(els.optionsBox, guias);
-      els.errorBox?.classList.add(HIDE_CLASS);
-      els.errorBox?.setAttribute('aria-hidden', 'true');
+      hideNotice(root);
     } catch (e) {
       console.error('[JCGuia] Erro ao carregar guias:', e);
-      els.errorBox?.classList.remove(HIDE_CLASS);
-      els.errorBox?.setAttribute('aria-hidden', 'false');
+      showNotice(root, 'Não foi possível carregar os guias. Tente novamente mais tarde.', { speak: false });
     }
 
     const guideButtons = qa('button[data-action="select-guia"]', els.optionsBox);
     guideButtons.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; b.style.cursor = 'not-allowed'; });
-    
+
     // Confirmar nome → habilita texto e opções
     els.confirmBtn?.addEventListener('click', async () => {
       let name = (els.nameInput?.value || '').trim();
@@ -177,108 +274,97 @@
         return;
       }
 
-      // Padroniza MAIÚSCULAS
       const upperName = name.toUpperCase();
       els.nameInput.value = upperName;
-
-      // Salva no estado global para uso no card/selfie/PDF
       try {
         window.JC = window.JC || {};
         window.JC.data = window.JC.data || {};
         window.JC.data.nome = upperName;
       } catch {}
 
-      // Texto do container (datilografia + leitura), com nome
       if (els.guiaTexto) {
         const base = (els.guiaTexto.dataset?.text || els.guiaTexto.textContent || 'Escolha seu guia para a Jornada.').trim();
         const msg  = base.replace(/\{\{\s*(nome|name)\s*\}\}/gi, upperName);
         els.guiaTexto.textContent = '';
         await typeOnce(els.guiaTexto, msg, { speed: 38, speak: true });
-
-        // ✨ brilho dourado
         els.moldura?.classList.add('glow');
         els.guiaTexto?.classList.add('glow');
       }
 
-      // habilita opções
       guideButtons.forEach(b => { b.disabled = false; b.style.opacity = '1'; b.style.cursor = 'pointer'; });
+      hideNotice(root);
     }, { once: true });
 
-    // Hover/Focus → prévia da descrição do guia (com TTS)
+    // Hover/Focus → prévia com atraso (sem selecionar)
+    const hoverTimers = new Map();
     guideButtons.forEach(btn => {
       const preview = async () => {
+        if (btn.disabled) return;
         const g = findGuia(guias, btn.dataset.guia);
         if (!g || !els.guiaTexto) return;
         els.guiaTexto.dataset.spoken = '';
         await typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: true });
       };
-      btn.addEventListener('mouseenter', preview);
-      btn.addEventListener('focus', preview);
-    });
-
-    // Clique → escolhe guia, apaga brilho e transita
-    guideButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('mouseenter', () => {
         if (btn.disabled) return;
-        const g = findGuia(guias, btn.dataset.guia) || { id: btn.dataset.guia, nome: btn.textContent.trim() };
-
-        // salva guia escolhido
-        try {
-          window.JC = window.JC || {};
-          window.JC.data = window.JC.data || {};
-          window.JC.data.guia = g.id || g.nome;
-        } catch {}      
-
-        // apaga brilho
-        els.moldura?.classList.add('fade-out');
-        els.guiaTexto?.classList.add('fade-out');
-
-        // transição
-        const src = getTransitionSrc(root, btn);
-        if (typeof window.playTransitionVideo === 'function') {
-          window.playTransitionVideo(src, NEXT_SECTION_ID);
-        } else {
-          window.JC?.show?.(NEXT_SECTION_ID) ?? (location.hash = `#${NEXT_SECTION_ID}`);
-        }
+        const t = setTimeout(preview, HOVER_DELAY_MS);
+        hoverTimers.set(btn, t);
+      });
+      btn.addEventListener('mouseleave', () => {
+        const t = hoverTimers.get(btn);
+        if (t) clearTimeout(t);
+        hoverTimers.delete(btn);
+      });
+      btn.addEventListener('focus', () => {
+        // em teclado, mostramos preview sem atraso
+        if (!btn.disabled) preview();
       });
     });
-// --- Layout dos botões (Lumen, Zion, Arian) lado a lado ---
-if (!document.getElementById('guia-buttons-layout')) {
-  const css = document.createElement('style');
-  css.id = 'guia-buttons-layout';
-  css.textContent = `
-    #section-guia .guia-options{
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      gap:clamp(8px,2.4vw,16px);
-      flex-wrap:nowrap;
-      margin:10px auto;
-      width:92%;
-      max-width:820px;
-    }
-    #section-guia .guia-options button{
-      flex:1 1 0;
-      min-width:90px;
-      max-width:240px;
-      height:clamp(30px,6.2vw,36px);
-      line-height:clamp(30px,6.2vw,36px);
-      padding:0 clamp(6px,2vw,12px);
-      font-size:clamp(11px,2.6vw,14px);
-      border-radius:10px;
-      box-shadow:0 2px 8px rgba(0,0,0,.25);
-      white-space:nowrap;
-    }
-    @media (max-width:380px){
-      #section-guia .guia-options button{min-width:84px;font-size:12px;}
-    }
-  `;
-  document.head.appendChild(css);
-}
-  
-    console.log('[JCGuia] pronto (JSON + maiúsculas + TTS + transição)');
+
+    // Clique → arma; segundo clique no mesmo → confirma
+    guideButtons.forEach(btn => {
+      btn.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        if (btn.disabled) return;
+        const label = (btn.dataset.nome || btn.getAttribute('aria-label') || btn.textContent || 'guia').toUpperCase();
+        armGuide(root, btn, label);
+      });
+
+      // Duplo clique confirma direto
+      btn.addEventListener('dblclick', (ev) => {
+        ev.preventDefault();
+        if (btn.disabled) return;
+        const id = (btn.dataset.guia || '').toLowerCase();
+        const label = (btn.dataset.nome || btn.getAttribute('aria-label') || id || 'guia').toUpperCase();
+        confirmGuide(root, id, label);
+        cancelArm(root);
+      });
+
+      // Teclado: Enter/Espaço armam/confirmam
+      btn.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter' || ev.key === ' ') {
+          ev.preventDefault();
+          if (btn.disabled) return;
+          const label = (btn.dataset.nome || btn.getAttribute('aria-label') || btn.textContent || 'guia').toUpperCase();
+          armGuide(root, btn, label);
+        }
+      });
+
+      // ARIA
+      btn.setAttribute('role', 'button');
+      btn.setAttribute('tabindex', '0');
+      btn.setAttribute('aria-pressed', 'false');
+    });
+
+    // Cancela armação ao clicar fora
+    document.addEventListener('click', (e) => {
+      const inside = e.target.closest?.('.guia-option');
+      if (!inside && armedId) cancelArm(root);
+    });
+
+    console.log('[JCGuia] pronto (JSON + maiúsculas + TTS + transição + 2-pass confirm)');
   }
- 
+
   function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
     if (sectionId !== SECTION_ID) return;
