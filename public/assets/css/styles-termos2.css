@@ -108,3 +108,42 @@
 }
 
 .hidden{ display:none !important; }
+
+/* === HALO DOURADO INTENSIFICADO === */
+#section-intro:has(.typing-active) .parchment-inner-rough {
+  outline: 4px solid rgba(255, 210, 80, 0.55);     /* aro mais grosso e definido */
+  outline-offset: 8px;
+  box-shadow:
+    0 0 0 4px rgba(255, 210, 80, 0.25) inset,
+    0 0 28px rgba(255, 215, 100, 0.65),
+    0 0 58px rgba(255, 180, 40, 0.45),
+    0 0 90px rgba(255, 200, 80, 0.25);
+  animation: parchmentGlow 1.6s ease-in-out infinite;
+  transition: all 0.3s ease-in-out;
+}
+
+@keyframes parchmentGlow {
+  0% {
+    box-shadow:
+      0 0 0 4px rgba(255, 210, 80, 0.25) inset,
+      0 0 20px rgba(255, 220, 110, 0.55),
+      0 0 36px rgba(255, 200, 60, 0.38),
+      0 0 80px rgba(255, 180, 40, 0.25);
+  }
+  50% {
+    box-shadow:
+      0 0 0 4px rgba(255, 210, 80, 0.35) inset,
+      0 0 36px rgba(255, 235, 150, 0.75),
+      0 0 72px rgba(255, 210, 80, 0.55),
+      0 0 120px rgba(255, 200, 60, 0.35);
+  }
+  100% {
+    box-shadow:
+      0 0 0 4px rgba(255, 210, 80, 0.25) inset,
+      0 0 20px rgba(255, 220, 110, 0.55),
+      0 0 36px rgba(255, 200, 60, 0.38),
+      0 0 80px rgba(255, 180, 40, 0.25);
+  }
+}
+
+
