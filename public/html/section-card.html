@@ -1,11 +1,12 @@
 <link rel="stylesheet" href="/assets/css/styles-base.css">
 <link rel="stylesheet" href="/assets/css/styles-card.css">
+<link rel="stylesheet" href="/assets/data/guias.json">
 
-  <section id="section-card" class="card pergaminho pergaminho-v section">
-    <div id="section-conteudo" class="conteudo-pergaminho">
-     
-       
-    <!-- Título com datilografia -->
+<section id="section-card" class="card pergaminho pergaminho-v section">
+  <div id="section-conteudo" class="conteudo-pergaminho">
+    <div id="jornada-content-wrapper"></div>  <!-- o card será renderizado aqui -->
+    
+<!-- Título com datilografia -->
    <h2 
   data-typing="true" 
   data-text="Eu na Irmandade" 
@@ -17,11 +18,15 @@
 <!-- CARD COMPLETO -->
 <div class="card-stage">
   
-  <!-- FUNDO DO GUIA -->
-  <img id="guideBg" class="guide-bg" src="" alt="Fundo do Guia" />
-
+  <!-- FUNDO PADRÃO COMO FALLBACK VISUAL -->
+<img 
+  id="guideBg" 
+  class="guide-bg" 
+  src="/assets/img/irmandade-quarteto-bg-zion.png" 
+  alt="Fundo do Guia" 
+/>
   <!-- SELFIE (dentro do placeholder) -->
-  <div class="flame-layer">
+  div class="flame-layer" aria-hidden="true">
     <img 
       id="selfieImage" 
       class="flame-selfie" 
@@ -41,6 +46,3 @@
   <button id="btnNext" class="btn btn-stone">Continuar</button>
 </div>
 </section>
-
-  </section>
-</div>
