@@ -81,3 +81,53 @@
 
 /* Utilitário de segurança: a classe 'hidden' usada pelo JS */
 .hidden { display: none !important; }
+
+/* ===== Mobile refinements – INTRO ===== */
+
+/* iOS/Android: altura estável e respeito às safe-areas */
+#section-intro.pergaminho{
+  min-height: 100svh;                     /* svh = viewport estável no mobile */
+  padding-top: max(16px, env(safe-area-inset-top));
+  padding-bottom: max(clamp(20px, 6vh, 48px), env(safe-area-inset-bottom));
+  padding-left: max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
+}
+
+/* Conteúdo central: ocupa bem o espaço em telas estreitas */
+#section-intro .parchment-inner-rough{
+  width: min(92%, 640px);
+}
+
+/* Botões com área de toque confortável (mín. 44px) */
+#section-intro .parchment-actions-rough .btn,
+#section-intro #btn-avancar{
+  min-height: 44px;
+  padding: 10px 16px;
+}
+
+/* Layout em celulares até 480px */
+@media (max-width: 480px){
+  #section-intro .parchment-title-rough{
+    font-size: clamp(18px, 6vw, 24px);
+  }
+  #section-intro .parchment-text-rough{
+    font-size: clamp(13px, 4vw, 15px);
+    line-height: 1.5;
+  }
+  #section-intro .parchment-actions-rough{
+    gap: 10px;
+  }
+}
+
+/* Celulares bem estreitos (<= 360px): botão 100% */
+@media (max-width: 360px){
+  #section-intro .parchment-actions-rough{
+    justify-content: stretch;
+  }
+  #section-intro #btn-avancar{
+    width: 100%;
+  }
+}
+
+/* Evita "pulos" durante a datilografia em telas pequenas */
+#section-intro { overflow-anchor: none; }
