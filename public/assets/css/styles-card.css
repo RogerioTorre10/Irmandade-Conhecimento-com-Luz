@@ -58,7 +58,7 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: clamp(82px, 12vh, 540px);
+  bottom: clamp(182px, 12vh, 740px);
   width: clamp(240px, 38%, 520px);   /* responsivo, preserva destaque */
   aspect-ratio: 3 / 4;               /* mantém 3:4 */
   border-radius: 12px;
