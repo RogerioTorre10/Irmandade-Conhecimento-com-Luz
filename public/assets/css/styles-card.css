@@ -123,25 +123,32 @@
    ========================================= */
 @media (max-width: 600px){
 
-  /* Palco ocupa a tela com espaço reservado pro rodapé do card */
+  /* Palco ocupa a tela com espaço pro rodapé do card */
   #section-card .card-stage{
+    position: relative;
     margin-top: 0;
     width: 92%;
     max-width: 420px;
     min-height: 100svh;
-    padding-bottom: 150px; /* espaço para selfie + nome + botão */
+    padding-bottom: 190px; /* + espaço: selfie + nome + botão */
+    margin-left: auto;
+    margin-right: auto;
   }
 
-  /* Card do guia (bg) já está como #guideBg ocupando .card-stage */
-
-  /* Selfie menor e mais alta (não encosta no botão) */
+  /* Moldura / container da selfie no card do guia */
   #section-card .flame-layer{
-    top: 50%;           /* testa 53% ou 55% se quiser ajustar fino*/
-    bottom: auto;
+    position: absolute;
+    left: 50%;
+    top: 47%;                         /* sobe a selfie (antes 54%) */
     transform: translate(-50%, -50%);
-    width: min(58%, 220px);            /* reduz um pouco a largura */
+    width: min(52%, 210px);           /* um pouco menor */
     aspect-ratio: 3 / 4;
-    z-index: 30;
+    z-index: 20;                      /* abaixo do nome e botão */
+    pointer-events: none;             /* NÃO bloqueia o clique */
+  }
+
+  #section-card .flame-layer *{
+    pointer-events: none;             /* garante clique livre */
   }
 
   #section-card .flame-selfie{
@@ -154,24 +161,32 @@
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 70px);
-    z-index: 31;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 78px);
+    z-index:  thirtyfive; /* ajuste abaixo, usamos número */
     text-align: center;
     pointer-events: none;
+    padding: 2px 10px;
+    font-size: 12px;
+    line-height: 1.2;
   }
 
-  /* Botão sempre visível no rodapé interno do pergaminho */
+  /* (corrige o valor inválido acima) */
+  #section-card .card-footer{
+    z-index: 35;
+  }
+
+  /* Botão sempre visível no rodapé do pergaminho */
   #section-card .card-actions{
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
-    z-index: 32;                    /* acima do card e da selfie */
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 26px);
+    z-index: 40;                      /* acima de tudo */
   }
 
   #section-card #btnNext{
-    min-width: 160px;
-    padding: 10px 22px;
+    min-width: 170px;
+    padding: 10px 24px;
     font-size: 14px;
     pointer-events: auto !important;
   }
