@@ -318,6 +318,16 @@
       stopCamera();
       playTransitionThenGo();
     });
+     // Garante que o preview fique DEPOIS dos controles/ações
+      const controls = document.querySelector('#section-selfie .selfie-controls');
+      const actions  = document.querySelector('#section-selfie .selfie-actions');
+      const preview  = document.getElementById('selfiePreview');
+      if (preview && (controls || actions)) {
+      const anchor = actions || controls;
+      if (anchor.nextSibling !== preview) {
+      anchor.parentNode.insertBefore(preview, anchor.nextSibling);
+      }
+    }
 
     // Em alguns devices o metadata chega depois — atualiza zoom quando vier
     videoEl?.addEventListener('loadedmetadata', () => {
