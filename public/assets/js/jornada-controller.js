@@ -13,6 +13,8 @@
     'section-perguntas',
     'section-final'
   ];
+    
+  let targetId = 'section-card'; // seção inicial padrão
 
   let lastShownSection = null;
   let isTransitioning = false;
@@ -194,7 +196,8 @@
     options.initialSectionId ||
     options.sectionId ||
     'section-card'; // ou 'section-intro', conforme você usa aí
-};
+    console.log('[JC.init] targetId resolvido para:', targetId);
+    };
     
     // Aguardar TypingBridge
     let attempts = 0;
