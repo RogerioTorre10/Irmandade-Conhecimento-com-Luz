@@ -155,7 +155,7 @@
     padding-bottom: var(--card-stage-pad-bottom);
   }
   #section-card .flame-layer{
-    bottom: clamp(96px, 14vh, 160px);
+    bottom: clamp(96px, 14vh, 360px);
     width: clamp(260px, 36%, 520px);
   }
 }
