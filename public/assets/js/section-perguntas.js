@@ -1,5 +1,6 @@
-/* /assets/js/section-perguntas.js — v2.0
+/* /assets/js/section-perguntas.js — v2.1
    - Bloqueio de "card confirmado" removido
+   - Integra com jornada-paper-qa.js (JCPaperQA / JornadaPaperQA)
    - Mantém fluxo suave: selfie -> card -> perguntas -> final
 */
 
@@ -11,10 +12,10 @@
   const NEXT_SECTION_ID = 'section-final';
   const VIDEO_SRC = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
 
-  const log = (...a) => console.log('[PERGUNTAS]', ...a);
+  const log  = (...a) => console.log('[PERGUNTAS]', ...a);
   const warn = (...a) => console.warn('[PERGUNTAS]', ...a);
-  const err = (...a) => console.error('[PERGUNTAS]', ...a);
-  const $ = (sel, root = document) => root.querySelector(sel);
+  const err  = (...a) => console.error('[PERGUNTAS]', ...a);
+  const $    = (sel, root = document) => root.querySelector(sel);
 
   const State = {
     mounted: false,
@@ -28,16 +29,12 @@
   // -------------------------------
   function goNext() {
     if (typeof window.playTransitionVideo === 'function' && VIDEO_SRC) {
-      // Usa vídeo de transição, se existir
       window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
     } else if (window.JC?.goNext) {
-      // Usa controlador genérico da jornada
       window.JC.goNext();
     } else if (typeof window.showSection === 'function' && document.getElementById(NEXT_SECTION_ID)) {
-      // Fallback simples
       window.showSection(NEXT_SECTION_ID);
     } else {
-      // Último fallback: só avisa que concluiu
       document.dispatchEvent(new CustomEvent('qa:completed', {
         detail: { answers: State.answers, meta: State.meta }
       }));
@@ -66,10 +63,23 @@
 
       const t = new Promise(resolve => setTimeout(resolve, timeoutMs));
 
-      await Promise.race([p, t]); // não trava pra sempre
+      await Promise.race([p, t]);
     } catch {
-      // silêncio elegante: se algo der errado aqui, não bloqueia o fluxo
+      // falha silenciosa — não quebra fluxo
     }
+  }
+
+  // --------------------------------------
+  // Descobrir API das perguntas (jornada-paper-qa)
+  // --------------------------------------
+  function getPaperApi() {
+    // Prioriza os nomes que você já usa no projeto
+    return (
+      window.JCPaperQA ||
+      window.JornadaPaperQA ||
+      window.PaperQA ||
+      null
+    );
   }
 
   // -------------------------------
@@ -80,10 +90,9 @@
     if (State.running) return log('Fluxo QA já em execução.');
     State.running = true;
 
-    // Garante que qualquer transição anterior finalize antes de começar as perguntas
     await waitForTransitionUnlock();
 
-    const guia = window.JC?.state?.guia || {};
+    const guia   = (window.JC && window.JC.state && window.JC.state.guia) ? window.JC.state.guia : {};
     const selfie = window.__SELFIE_DATA_URL__ || null;
     const startedAt = new Date().toISOString();
 
@@ -93,7 +102,7 @@
       selfie,
       i18n: window.i18n || null,
       onProgress: (p) => {
-        // hook opcional para barra de progresso se quiser no futuro
+        // hook opcional para barra de progresso
       },
       onComplete: (result) => {
         try {
@@ -105,20 +114,19 @@
             finishedAt,
             guia,
             selfieUsed: !!selfie,
-            version: window.APP_CONFIG?.version || 'v1'
+            version: (window.APP_CONFIG && window.APP_CONFIG.version) || 'v1'
           };
 
-          // Expor globalmente para o PDF/HQ e jornada-final
           window.__QA_ANSWERS__ = State.answers;
-          window.__QA_META__ = State.meta;
+          window.__QA_META__    = State.meta;
 
           log('QA finalizado. Respostas salvas em __QA_ANSWERS__ / __QA_META__.');
-          window.toast?.('Jornada de perguntas concluída!');
+          if (window.toast) window.toast('Jornada de perguntas concluída!');
 
           goNext();
         } catch (e) {
           err('Falha ao processar resultado do QA:', e);
-          window.toast?.('Ops, algo falhou ao concluir as perguntas.');
+          if (window.toast) window.toast('Ops, algo falhou ao concluir as perguntas.');
         } finally {
           State.running = false;
         }
@@ -126,27 +134,35 @@
     };
 
     try {
-      if (window.JornadaPaperQA?.mount) {
-        log('Usando JornadaPaperQA.mount');
-        await window.JornadaPaperQA.mount(root, opts);
-      } else if (window.JornadaPaperQA?.start) {
-        log('Usando JornadaPaperQA.start');
-        await window.JornadaPaperQA.start(opts);
-      } else if (window.JornadaPaperQA?.run) {
-        log('Usando JornadaPaperQA.run');
-        await window.JornadaPaperQA.run(opts);
-      } else if (window.JornadaPaperQA?.init) {
-        log('Usando JornadaPaperQA.init + .begin');
-        await window.JornadaPaperQA.init(opts);
-        await window.JornadaPaperQA.begin?.();
+      const api = getPaperApi();
+
+      if (api && typeof api.mount === 'function') {
+        log('Usando API mount de jornada-paper-qa');
+        await api.mount(root, opts);
+      } else if (api && typeof api.start === 'function') {
+        log('Usando API start de jornada-paper-qa');
+        await api.start(opts);
+      } else if (api && typeof api.run === 'function') {
+        log('Usando API run de jornada-paper-qa');
+        await api.run(opts);
+      } else if (api && typeof api.init === 'function') {
+        log('Usando API init(+begin) de jornada-paper-qa');
+        await api.init(opts);
+        if (typeof api.begin === 'function') {
+          await api.begin();
+        }
+      } else if (!api) {
+        warn('API do JornadaPaperQA/JCPaperQA não encontrada. Disparando evento qa:start para fallback.');
+        document.dispatchEvent(new CustomEvent('qa:start', { detail: opts }));
       } else {
-        warn('API do JornadaPaperQA não encontrada. Disparando evento qa:start.');
+        warn('API de jornada-paper-qa encontrada mas sem métodos compatíveis. Disparando qa:start fallback.');
         document.dispatchEvent(new CustomEvent('qa:start', { detail: opts }));
       }
+
     } catch (e) {
       State.running = false;
       err('Erro ao iniciar QA:', e);
-      window.toast?.('Não foi possível iniciar as perguntas.');
+      if (window.toast) window.toast('Não foi possível iniciar as perguntas.');
     }
   }
 
@@ -159,7 +175,7 @@
     }
 
     const root = $('#perguntas-root', node) || node;
-    if (!root) return warn('Container de perguntas não encontrado.');
+    if (!root) return warn('Container de perguntas não encontrado (#perguntas-root).');
 
     State.mounted = true;
     log('Montando seção de perguntas...');
@@ -168,9 +184,17 @@
 
   // Quando a seção "perguntas" for carregada pelo controlador da jornada
   document.addEventListener('sectionLoaded', (e) => {
-    if (!e?.detail || e.detail.sectionId !== SECTION_ID) return;
+    if (!e || !e.detail || e.detail.sectionId !== SECTION_ID) return;
     const node = e.detail.node || document.getElementById(SECTION_ID);
     bindSection(node);
+  });
+
+  // Auto-init de segurança se a seção já estiver no DOM sem o evento
+  document.addEventListener('DOMContentLoaded', () => {
+    const sec = document.getElementById(SECTION_ID);
+    if (sec && !State.mounted) {
+      bindSection(sec);
+    }
   });
 
   // API pública opcional
