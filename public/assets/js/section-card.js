@@ -195,20 +195,7 @@
 
     return { stage, guideBg };
   }
-   // Dentro do event listener do botão "Continuar"
-  document.getElementById('btn-continuar-card')?.addEventListener('click', () => {
-  // 1. DEFINE A FLAG
-  window.JC = window.JC || {};
-  window.JC.flags = window.JC.flags || {};
-  window.JC.flags.cardConfirmed = true;
-
-  // 2. SALVA NO LOCALSTORAGE (opcional, mas útil)
-  localStorage.setItem('jornada_card_seen', 'true');
-
-  // 3. NAVEGA
-  window.JC?.goNext?.() || window.showSection?.('section-perguntas');
-});
-
+ 
   // --- Aplica o BG do guia (guias.json > CARD_BG) ---
   async function applyGuideBG(section, guia) {
     const guideBg = qs('#guideBg', section);
