@@ -6,13 +6,12 @@
 <script src="/assets/js/jornada-paper-qa.js"></script>
 <script src="/assets/js/section-perguntas.js"></script>
 
-
 <section id="section-perguntas"
          class="section section-perguntas"
          data-section="perguntas">
   <div class="perguntas-wrap">
 
-    <!-- Cabeçalho: bloco + contador geral -->
+    <!-- Cabeçalho -->
     <div class="perguntas-header">
       <div class="jp-block-label">
         Bloco <span id="jp-block-num">1</span> de <span id="jp-block-max">5</span>
@@ -22,17 +21,14 @@
       </div>
     </div>
 
-    <!-- Pergaminho / área central -->
+    <!-- Pergaminho -->
     <div class="perguntas-pergaminho">
-
-      <!-- Pergunta com datilografia (visível) -->
-      <div id="jp-question-typed"
-           class="jp-question-typed"
-           aria-live="polite">
+      <!-- Pergunta com efeito de leitura -->
+      <div id="jp-question-typed" class="jp-question-typed" aria-live="polite">
         Carregando pergunta...
       </div>
 
-      <!-- Container da resposta: quadro preto medieval -->
+      <!-- Moldura medieval para resposta -->
       <div class="jp-answer-frame">
         <div class="jp-answer-bg"></div>
         <textarea id="jp-answer-input"
@@ -41,34 +37,25 @@
                   placeholder="Digite sua resposta com verdade e calma..."></textarea>
       </div>
 
-      <!-- Devolutiva das IAs (fica oculta até usarmos) -->
+      <!-- Devolutiva das IAs (mantém oculto por enquanto) -->
       <div id="jp-ai-response" class="jp-ai-response" hidden></div>
     </div>
 
     <!-- Controles -->
     <div class="perguntas-controls">
-      <button id="jp-btn-falar"
-              class="btn-perguntas"
-              data-action="start-mic">
+      <button id="jp-btn-falar" class="btn-perguntas" data-action="start-mic">
         🎤 Falar
       </button>
-
-      <button id="jp-btn-apagar"
-              class="btn-perguntas"
-              data-action="clear">
+      <button id="jp-btn-apagar" class="btn-perguntas" data-action="clear">
         🗑 Apagar
       </button>
-
-      <button id="jp-btn-confirmar"
-              class="btn-perguntas btn-confirm"
-              data-action="confirm">
+      <button id="jp-btn-confirmar" class="btn-perguntas btn-confirm" data-action="confirm">
         Confirmar / Próxima
       </button>
     </div>
 
-    <!-- Progresso bloco + geral -->
+    <!-- Progresso -->
     <div class="perguntas-progress">
-
       <div class="jp-block-progress-label">
         Bloco <span id="jp-block-num-2">1</span> — Pergunta
         <span id="jp-block-current">1</span>/<span id="jp-block-total">10</span>
@@ -85,7 +72,7 @@
       </div>
     </div>
 
-    <!-- Containers invisíveis (para integrações internas/API) -->
+    <!-- Containers invisíveis -->
     <div id="jp-question-raw" class="jp-hidden"></div>
     <div id="jp-ai-raw" class="jp-hidden"></div>
 
