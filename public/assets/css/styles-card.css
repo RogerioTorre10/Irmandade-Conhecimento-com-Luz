@@ -132,13 +132,13 @@
     bottom: auto;
     top: 58svh;                   /* sobe um pouco no mobile */
     transform: translate(-50%, -50%);
-    width: min(64%, 320px);
+    width: min(64%, 220px);
   }
 
   #section-card .flame-selfie{ object-position: center 35%; }
 
   #section-card .card-footer{
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 72px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 42px);
   }
 
   #section-card #btnNext{
