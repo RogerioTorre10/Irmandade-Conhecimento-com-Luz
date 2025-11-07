@@ -24,16 +24,7 @@
     startedAt: null
   };
 
-  // Guard: só entra se o CARD foi confirmado
-  window.JC = window.JC || {};
-  if (!window.JC.flags || !window.JC.flags.cardConfirmed) {
-    warn('Perguntas sem CARD confirmado -> voltando.');
-    if (window.JC.show) window.JC.show('section-card');
-    else if (window.showSection) window.showSection('section-card');
-    return;
-  }
-
-  // -------- Data (JORNADA_BLOCKS) --------
+  // ---------- DATA (JORNADA_BLOCKS) ----------
   async function ensureBlocks() {
     if (Array.isArray(window.JORNADA_BLOCKS) && window.JORNADA_BLOCKS.length) {
       State.blocks = window.JORNADA_BLOCKS;
@@ -48,7 +39,8 @@
   function computeTotals() {
     State.totalBlocks = State.blocks.length || 5;
     State.totalQuestions = State.blocks.reduce(
-      (sum, b) => sum + (b.questions?.length || 0), 0
+      (sum, b) => sum + (b.questions?.length || 0),
+      0
     ) || 50;
   }
 
@@ -58,7 +50,7 @@
     return { bloco, pergunta };
   }
 
-  // -------- UI helpers --------
+  // ---------- UI HELPERS ----------
   function setText(sel, val) {
     const el = document.querySelector(sel);
     if (el) el.textContent = String(val);
@@ -148,7 +140,7 @@
     }
   }
 
-  // -------- Respostas + Chama --------
+  // ---------- RESPOSTA + CHAMA ----------
   function saveCurrentAnswer() {
     const { bloco, pergunta } = getCurrent();
     const textarea = $('#jp-answer-input');
@@ -230,17 +222,19 @@
     }
   }
 
-  // -------- Controles --------
+  // ---------- BIND CONTROLES ----------
   function bindUI(root) {
     const btnFalar = $('#jp-btn-falar', root);
     const btnApagar = $('#jp-btn-apagar', root);
     const btnConf = $('#jp-btn-confirmar', root);
     const input = $('#jp-answer-input', root);
 
+    // MIC
     if (input && window.JORNADA_MICRO) {
       window.JORNADA_MICRO.attach(input, { mode: 'append' });
     }
 
+    // chama em tempo real
     if (input && window.JORNADA_CHAMA) {
       input.addEventListener('input', () => {
         const txt = input.value || '';
@@ -279,16 +273,25 @@
     }
   }
 
-  // -------- Init --------
+  // ---------- INIT ----------
   async function init(root) {
     if (State.mounted || State.loading) return;
+
+    // Guard AGORA (no momento da entrada na section, JC já existe)
+    if (!window.JC || !window.JC.flags || !window.JC.flags.cardConfirmed) {
+      warn('CARD não confirmado ao entrar em Perguntas -> volta para section-card');
+      if (window.JC?.show) window.JC.show('section-card');
+      else if (window.showSection) window.showSection('section-card');
+      return;
+    }
+
     State.loading = true;
 
     await ensureBlocks();
     computeTotals();
 
     if (!State.blocks.length) {
-      err('JORNADA_BLOCKS vazio; verifique jornada-paper-qa.js.');
+      err('JORNADA_BLOCKS vazio; confira jornada-paper-qa.js.');
       State.loading = false;
       return;
     }
@@ -303,15 +306,17 @@
 
     State.mounted = true;
     State.loading = false;
-    log(MOD, 'montado.');
+    log(MOD, 'montado com sucesso.');
   }
 
+  // disparado pelo seu controlador
   document.addEventListener('sectionLoaded', (e) => {
     if (e?.detail?.sectionId !== SECTION_ID) return;
     const node = e.detail.node || document.getElementById(SECTION_ID);
     if (node) init(node);
   });
 
+  // fallback se já estiver ativo
   document.addEventListener('DOMContentLoaded', () => {
     const sec = document.getElementById(SECTION_ID);
     if (sec && (sec.classList.contains('active') || window.__currentSectionId === SECTION_ID)) {
@@ -333,5 +338,5 @@
     }
   };
 
-  log(MOD, 'carregado.');
+  log(MOD, 'carregado (base).');
 })();
