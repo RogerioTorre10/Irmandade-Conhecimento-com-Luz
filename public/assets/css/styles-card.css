@@ -136,7 +136,7 @@
 
   /* Selfie menor e mais alta (não encosta no botão) */
   #section-card .flame-layer{
-    top: 54%;           /* testa 53% ou 55% se quiser ajustar fino*/
+    top: 50%;           /* testa 53% ou 55% se quiser ajustar fino*/
     bottom: auto;
     transform: translate(-50%, -50%);
     width: min(58%, 220px);            /* reduz um pouco a largura */
