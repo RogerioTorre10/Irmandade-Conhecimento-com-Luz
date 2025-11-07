@@ -1,8 +1,12 @@
-/* section-perguntas.js — v2
-   Controla os 5 blocos (10 perguntas cada) em uma única seção,
-   usando JORNADA_BLOCKS do jornada-paper-qa.js
-   Estrutura HTML: section-perguntas.html + styles-perguntas.css
+/* section-perguntas.js — v2.1
+   - 5 blocos x 10 perguntas (via JORNADA_BLOCKS)
+   - Botões: Falar / Apagar / Confirmar
+   - Textura de pedra (CSS)
+   - Moldura medieval (CSS)
+   - MIC: JORNADA_MICRO
+   - Chamas dinâmicas: JORNADA_CHAMA
 */
+
 (function () {
   'use strict';
 
@@ -29,16 +33,16 @@
     startedAt: null
   };
 
-  // --- Guard: só entra se o CARD foi confirmado
+  // ========= GUARD =========
   window.JC = window.JC || {};
   if (!window.JC.flags || !window.JC.flags.cardConfirmed) {
-    console.warn('[Guard] Entrou em Perguntas sem confirmar CARD -> redirecionando');
+    warn('Entrou em Perguntas sem CARD confirmado, retornando.');
     if (window.JC.show) window.JC.show('section-card');
     else if (window.showSection) window.showSection('section-card');
     return;
   }
 
-  // --------- Helpers de blocos/perguntas ---------
+  // ========= BLOCS / DATA =========
 
   async function ensureBlocks() {
     if (Array.isArray(window.JORNADA_BLOCKS) && window.JORNADA_BLOCKS.length) {
@@ -52,80 +56,82 @@
   }
 
   function computeTotals() {
-    State.totalBlocks = State.blocks.length;
-    State.totalQuestions = State.blocks.reduce((sum, b) => sum + (b.questions?.length || 0), 0);
-    if (!State.totalQuestions) State.totalQuestions = 50; // fallback simbólico
+    State.totalBlocks = State.blocks.length || 5;
+    State.totalQuestions = State.blocks.reduce(
+      (sum, b) => sum + (b.questions?.length || 0),
+      0
+    ) || 50;
   }
 
   function getCurrent() {
     const bloco = State.blocks[State.blocoIdx];
-    if (!bloco) return { bloco: null, pergunta: null };
-    const pergunta = bloco.questions[State.qIdx];
+    const pergunta = bloco?.questions?.[State.qIdx] || null;
     return { bloco, pergunta };
   }
 
-  // --------- Renderização ---------
-
-  function updateCounters() {
-    const { bloco } = getCurrent();
-
-    // globais
-    setText('#jp-block-num', State.blocoIdx + 1);
-    setText('#jp-block-num-2', State.blocoIdx + 1);
-    setText('#jp-block-max', State.totalBlocks || 5);
-
-    setText('#jp-global-current', State.globalIdx + 1);
-    setText('#jp-global-current-2', State.globalIdx + 1);
-    setText('#jp-global-total', State.totalQuestions);
-    setText('#jp-global-total-2', State.totalQuestions);
-
-    const blocoTotal = bloco?.questions?.length || 10;
-    setText('#jp-block-current', State.qIdx + 1);
-    setText('#jp-block-total', blocoTotal);
-
-    // barras
-    const pctBloco = Math.max(0, Math.min(100, ((State.qIdx + 1) / blocoTotal) * 100));
-    const pctGlobal = Math.max(0, Math.min(100, ((State.globalIdx + 1) / State.totalQuestions) * 100));
-
-    width('#jp-block-progress-fill', pctBloco + '%');
-    width('#jp-global-progress-fill', pctGlobal + '%');
-  }
+  // ========= RENDER / PROGRESS =========
 
   function setText(sel, val) {
     const el = document.querySelector(sel);
     if (el) el.textContent = String(val);
   }
 
-  function width(sel, val) {
+  function setWidth(sel, val) {
     const el = document.querySelector(sel);
     if (el) el.style.width = val;
+  }
+
+  function updateCounters() {
+    const { bloco } = getCurrent();
+    const blocoTotal = bloco?.questions?.length || 10;
+
+    // Bloco
+    setText('#jp-block-num', State.blocoIdx + 1);
+    setText('#jp-block-num-2', State.blocoIdx + 1);
+    setText('#jp-block-max', State.totalBlocks);
+
+    // Global
+    setText('#jp-global-current', State.globalIdx + 1);
+    setText('#jp-global-current-2', State.globalIdx + 1);
+    setText('#jp-global-total', State.totalQuestions);
+    setText('#jp-global-total-2', State.totalQuestions);
+
+    // Dentro do bloco
+    setText('#jp-block-current', State.qIdx + 1);
+    setText('#jp-block-total', blocoTotal);
+
+    const pctBloco = Math.max(0, Math.min(100, ((State.qIdx + 1) / blocoTotal) * 100));
+    const pctGlobal = Math.max(0, Math.min(100, ((State.globalIdx + 1) / State.totalQuestions) * 100));
+
+    setWidth('#jp-block-progress-fill', pctBloco + '%');
+    setWidth('#jp-global-progress-fill', pctGlobal + '%');
   }
 
   async function typeQuestion(text) {
     const box = $('#jp-question-typed');
     const raw = $('#jp-question-raw');
-
     if (!box) return;
+
     if (raw) raw.textContent = text || '';
 
-    // se tiver engine global de datilografia, usa
+    // Usa engine global de datilografia se existir
     if (window.runTyping) {
       box.textContent = text;
       box.classList.add('lumen-typing');
-      await window.runTyping(box);
+      try { await window.runTyping(box); } catch {}
       return;
     }
 
-    // fallback: datilografia simples local
+    // Fallback: datilografia simples
     box.textContent = '';
     let i = 0;
     const speed = 24;
     await new Promise(resolve => {
-      const interval = setInterval(() => {
+      const it = setInterval(() => {
         box.textContent = text.slice(0, i);
         i++;
         if (i > text.length) {
-          clearInterval(interval);
+          clearInterval(it);
           resolve();
         }
       }, speed);
@@ -146,6 +152,7 @@
       aiResp.hidden = true;
       aiResp.textContent = '';
     }
+
     if (textarea) {
       textarea.value = '';
       textarea.focus();
@@ -154,18 +161,28 @@
     const texto = pergunta.label || '[pergunta]';
     await typeQuestion(texto);
     updateCounters();
+
+    // garante chama desta seção visível
+    if (window.JORNADA_CHAMA?.ensureHeroFlame) {
+      window.JORNADA_CHAMA.ensureHeroFlame(SECTION_ID);
+    }
   }
 
-  // --------- Navegação / ações ---------
+  // ========= ANSWERS / FLAME =========
 
   function saveCurrentAnswer() {
     const { bloco, pergunta } = getCurrent();
     const textarea = $('#jp-answer-input');
     if (!bloco || !pergunta || !textarea) return;
 
-    const key = `${bloco.id}:${pergunta.id}`;
+    const key = `${bloco.id || ('b'+State.blocoIdx)}:${pergunta.id || ('q'+State.qIdx)}`;
     const value = (textarea.value || '').trim();
     State.answers[key] = value;
+
+    // Atualiza chamas conforme a resposta
+    if (window.JORNADA_CHAMA && value) {
+      window.JORNADA_CHAMA.updateChamaFromText(value, 'chama-perguntas');
+    }
   }
 
   function nextStep() {
@@ -185,13 +202,13 @@
     }
 
     if (isLastInBloco) {
-      // fim de bloco -> vídeo se existir + próximo bloco
+      // Transição entre blocos com vídeo se definido
       const video = bloco.video_after;
       State.blocoIdx++;
       State.qIdx = 0;
 
       if (video && window.JPaperQA?.loadVideo) {
-        window.JPaperQA.loadVideo(video);
+        try { window.JPaperQA.loadVideo(video); } catch(e){ warn('Erro loadVideo', e); }
       }
     } else {
       State.qIdx++;
@@ -219,10 +236,13 @@
 
     log('Jornada de perguntas concluída.', {
       total: State.totalQuestions,
-      answersKeys: Object.keys(State.answers).length
+      respondidas: Object.keys(State.answers).length
     });
 
-    window.toast?.('Jornada de perguntas concluída!');
+    if (window.JORNADA_CHAMA) {
+      // no final damos uma chama forte de esperança
+      window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'forte');
+    }
 
     if (window.JC?.show && document.getElementById(FINAL_SECTION_ID)) {
       window.JC.show(FINAL_SECTION_ID);
@@ -235,7 +255,7 @@
     }
   }
 
-  // --------- Eventos de UI ---------
+  // ========= UI BIND =========
 
   function bindUI(root) {
     const btnFalar = $('#jp-btn-falar', root);
@@ -243,30 +263,52 @@
     const btnConf = $('#jp-btn-confirmar', root);
     const input = $('#jp-answer-input', root);
 
-    if (btnFalar) {
-      btnFalar.addEventListener('click', () => {
-        // Usa handler global existente no jornada-paper-qa (start-mic)
-        document.dispatchEvent(new CustomEvent('qa:start-mic'));
-        window.toast?.('Função de falar será ativada em breve.');
+    // MIC
+    if (input && window.JORNADA_MICRO) {
+      window.JORNADA_MICRO.attach(input, { mode: 'append' });
+    }
+
+    // variação da chama em tempo real
+    if (input && window.JORNADA_CHAMA) {
+      input.addEventListener('input', () => {
+        const txt = input.value || '';
+        window.JORNADA_CHAMA.updateChamaFromText(txt, 'chama-perguntas');
+      });
+    }
+
+    if (btnFalar && input) {
+      btnFalar.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        if (window.JORNADA_MICRO) {
+          window.JORNADA_MICRO.attach(input, { mode: 'append' });
+          // toggle é pelo próprio botão do widget; aqui só garantimos attach
+        } else {
+          (window.toast || alert)('Reconhecimento de voz não disponível neste navegador.');
+        }
       });
     }
 
     if (btnApagar && input) {
-      btnApagar.addEventListener('click', () => {
+      btnApagar.addEventListener('click', (ev) => {
+        ev.preventDefault();
         input.value = '';
         input.focus();
+        if (window.JORNADA_CHAMA) {
+          window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'media');
+        }
       });
     }
 
     if (btnConf) {
-      btnConf.addEventListener('click', () => {
+      btnConf.addEventListener('click', (ev) => {
+        ev.preventDefault();
         saveCurrentAnswer();
         nextStep();
       });
     }
   }
 
-  // --------- Inicialização ---------
+  // ========= INIT =========
 
   async function init(root) {
     if (State.mounted || State.loading) return;
@@ -276,7 +318,7 @@
     computeTotals();
 
     if (!State.blocks.length) {
-      err('Nenhum bloco de perguntas carregado (JORNADA_BLOCKS vazio).');
+      err('JORNADA_BLOCKS está vazio; verifique jornada-paper-qa.js.');
       State.loading = false;
       return;
     }
@@ -294,13 +336,14 @@
     log(MOD, 'montado com sucesso.');
   }
 
+  // Integra com seu controlador de seções
   document.addEventListener('sectionLoaded', (e) => {
     if (e?.detail?.sectionId !== SECTION_ID) return;
     const node = e.detail.node || document.getElementById(SECTION_ID);
     if (node) init(node);
   });
 
-  // fallback caso a seção já esteja ativa ao carregar o script
+  // Fallback se já estiver ativa
   document.addEventListener('DOMContentLoaded', () => {
     const sec = document.getElementById(SECTION_ID);
     if (sec && (sec.classList.contains('active') || window.__currentSectionId === SECTION_ID)) {
@@ -308,6 +351,7 @@
     }
   });
 
+  // API opcional
   window.JPerguntas = {
     start(root) { init(root || document.getElementById(SECTION_ID)); },
     reset() {
@@ -318,7 +362,7 @@
       State.blocoIdx = 0;
       State.qIdx = 0;
       State.globalIdx = 0;
-      log('Reset concluído.');
+      log('Reset das perguntas concluído.');
     }
   };
 
