@@ -185,6 +185,17 @@
     };
     window.JC.currentSection = null;
 
+    JC.init = async function init(options) {
+  options = options || {};
+
+  // 👇 NOVO: resolve qual seção inicial usar
+  const targetId =
+    options.targetId ||
+    options.initialSectionId ||
+    options.sectionId ||
+    'section-card'; // ou 'section-intro', conforme você usa aí
+};
+    
     // Aguardar TypingBridge
     let attempts = 0;
     const maxAttempts = 100;
