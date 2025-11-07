@@ -47,8 +47,9 @@
       title: 'Block 1 — Roots',
       data_i18n: 'bloco_raizes_title',
       questions: [
-        { id: 'quem_voce_hoje', label: 'Quem você hoje?', data_i18n: 'pergunta_quem_voce_hoje' },
-        { id: 'o_que_te_trouxe', label: 'O que te trouxe?', data_i18n: 'pergunta_o_que_te_trouxe' },
+        { id: 'quem_voce_hoje', label: 'Who are you today?', data_i18n: 'pergunta_quem_voce_hoje' },
+        { id: 'o_que_te_trouxe', label: 'What brought you to this journey?', data_i18n: 'pergunta_o_que_te_trouxe' },
+        { id: 'sonho_espiritual', label: 'What is your greatest spiritual dream?', data_i18n: 'pergunta_sonho_espiritual' }
       ],
       video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
     },
@@ -57,8 +58,9 @@
       title: 'Block 2 — Reflections',
       data_i18n: 'bloco_reflexoes_title',
       questions: [
-        { id: 'desafios_atuais', label: 'desafios atuais?', data_i18n: 'pergunta_desafios_atuais' },
-        { id: 'medo_duvida', label: 'medo duvida?', data_i18n: 'pergunta_medo_duvida' },
+        { id: 'desafios_atuais', label: 'What are your biggest current challenges?', data_i18n: 'pergunta_desafios_atuais' },
+        { id: 'medo_duvida', label: 'How do you deal with fear or doubt?', data_i18n: 'pergunta_medo_duvida' },
+        { id: 'significado_luz', label: 'What does "light" mean to you?', data_i18n: 'pergunta_significado_luz' }
       ],
       video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
     },
@@ -67,8 +69,9 @@
       title: 'Block 3 — Growth',
       data_i18n: 'bloco_crescimento_title',
       questions: [
-        { id: 'mudar_vida', label: 'mudar vida?', data_i18n: 'pergunta_mudar_vida' },
-        { id: 'quem_inspira', label: 'quem inspira?', data_i18n: 'pergunta_quem_inspira' },
+        { id: 'mudar_vida', label: 'What do you want to change in your life?', data_i18n: 'pergunta_mudar_vida' },
+        { id: 'quem_inspira', label: 'Who inspires you and why?', data_i18n: 'pergunta_quem_inspira' },
+        { id: 'pratica_gratidao', label: 'How do you practice gratitude daily?', data_i18n: 'pergunta_pratica_gratidao' }
       ],
       video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4'
     },
@@ -77,8 +80,9 @@
       title: 'Block 4 — Integration',
       data_i18n: 'bloco_integracao_title',
       questions: [
-        { id: 'licao_jornada', label: 'lição jornada?', data_i18n: 'pergunta_licao_jornada' },
-        { id: 'aplicar_futuro', label: 'aplicar futuro?', data_i18n: 'pergunta_aplicar_futuro' },
+        { id: 'licao_jornada', label: 'What lesson do you take from this journey?', data_i18n: 'pergunta_licao_jornada' },
+        { id: 'aplicar_futuro', label: 'How will you apply this in the future?', data_i18n: 'pergunta_aplicar_futuro' },
+        { id: 'mensagem_futuro', label: 'A message for your future self.', data_i18n: 'pergunta_mensagem_futuro' }
       ],
       video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
     },
@@ -87,8 +91,8 @@
       title: 'Block 5 — Synthesis and Delivery',
       data_i18n: 'bloco_sintese_title',
       questions: [
-        { id: 'essencia_hoje', label: 'essencia hoje?', data_i18n: 'pergunta_essencia_hoje' },
-        { id: 'passo_fe', label: 'passo fé?', data_i18n: 'pergunta_passo_fe' }
+        { id: 'essencia_hoje', label: 'Who are you today, in one true sentence?', data_i18n: 'pergunta_essencia_hoje' },
+        { id: 'passo_fe', label: 'What will be your next step of faith and courage?', data_i18n: 'pergunta_passo_fe' }
       ],
       video_after: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
     }
@@ -150,62 +154,6 @@
     }
   ]
 };
-   'en-US': [
-       {
-      id: 'raizes',
-      title: 'Block 1 — Roots',
-      data_i18n: 'bloco_raizes_title',
-      questions: [
-        { id: 'quem_voce_hoje', label: 'Who are you today?', data_i18n: 'pergunta_quem_voce_hoje' },
-        { id: 'o_que_te_trouxe', label: 'What brought you to this journey?', data_i18n: 'pergunta_o_que_te_trouxe' },
-        { id: 'sonho_espiritual', label: 'What is your greatest spiritual dream?', data_i18n: 'pergunta_sonho_espiritual' }
-      ],
-      video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
-    },
-    {
-      id: 'reflexoes',
-      title: 'Block 2 — Reflections',
-      data_i18n: 'bloco_reflexoes_title',
-      questions: [
-        { id: 'desafios_atuais', label: 'What are your biggest current challenges?', data_i18n: 'pergunta_desafios_atuais' },
-        { id: 'medo_duvida', label: 'How do you deal with fear or doubt?', data_i18n: 'pergunta_medo_duvida' },
-        { id: 'significado_luz', label: 'What does "light" mean to you?', data_i18n: 'pergunta_significado_luz' }
-      ],
-      video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
-    },
-    {
-      id: 'crescimento',
-      title: 'Block 3 — Growth',
-      data_i18n: 'bloco_crescimento_title',
-      questions: [
-        { id: 'mudar_vida', label: 'What do you want to change in your life?', data_i18n: 'pergunta_mudar_vida' },
-        { id: 'quem_inspira', label: 'Who inspires you and why?', data_i18n: 'pergunta_quem_inspira' },
-        { id: 'pratica_gratidao', label: 'How do you practice gratitude daily?', data_i18n: 'pergunta_pratica_gratidao' }
-      ],
-      video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4'
-    },
-    {
-      id: 'integracao',
-      title: 'Block 4 — Integration',
-      data_i18n: 'bloco_integracao_title',
-      questions: [
-        { id: 'licao_jornada', label: 'What lesson do you take from this journey?', data_i18n: 'pergunta_licao_jornada' },
-        { id: 'aplicar_futuro', label: 'How will you apply this in the future?', data_i18n: 'pergunta_aplicar_futuro' },
-        { id: 'mensagem_futuro', label: 'A message for your future self.', data_i18n: 'pergunta_mensagem_futuro' }
-      ],
-      video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
-    },
-    {
-      id: 'sintese',
-      title: 'Block 5 — Synthesis and Delivery',
-      data_i18n: 'bloco_sintese_title',
-      questions: [
-        { id: 'essencia_hoje', label: 'Who are you today, in one true sentence?', data_i18n: 'pergunta_essencia_hoje' },
-        { id: 'passo_fe', label: 'What will be your next step of faith and courage?', data_i18n: 'pergunta_passo_fe' }
-      ],
-      video_after: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
-    }
-  ],
 
   let JORNADA_BLOCKS = [];
   global.JORNADA_BLOCKS = global.JORNADA_BLOCKS || [];
@@ -343,116 +291,87 @@
   }
 
   // ===== render =====
-  // No final do arquivo, substitua a função renderQuestions por esta versão melhorada:
+  async function renderQuestions() {
+    setPergaminho('h');
+    const { content } = ensureCanvas();
+    if (!content) {
+      console.error('[JORNADA_PAPER] Container de perguntas não encontrado');
+      global.toast && global.toast('Erro ao carregar perguntas.');
+      return;
+    }
 
-async function renderQuestions() {
-  setPergaminho('h');
-  const { content } = ensureCanvas();
-  if (!content) {
-    console.error('[JORNADA_PAPER] Container de perguntas não encontrado');
-    global.toast && global.toast('Erro ao carregar perguntas.');
-    return;
+    if (!JORNADA_BLOCKS || !Array.isArray(JORNADA_BLOCKS)) {
+      console.error('[JORNADA_PAPER] JORNADA_BLOCKS não está definido ou não é um array');
+      global.toast && global.toast('Erro ao carregar blocos de perguntas.');
+      return;
+    }
+
+    content.innerHTML = '';
+    content.classList.remove('hidden');
+
+    const JC = global.JC || { currentBloco: 0, currentPergunta: 0 };
+
+    JORNADA_BLOCKS.forEach((block, bIdx) => {
+      const bloco = document.createElement('div');
+      bloco.className = 'j-bloco';
+      bloco.dataset.bloco = String(bIdx);
+      bloco.dataset.video = block.video_after || '';
+      bloco.style.display = bIdx === JC.currentBloco ? 'block' : 'none';
+
+      if (block.title) {
+        const title = document.createElement('h3');
+        title.className = 'pergunta-enunciado text';
+        title.dataset.i18n = block.data_i18n;
+        title.dataset.typing = 'true';
+        title.dataset.speed = '36';
+        title.dataset.cursor = 'true';
+        title.textContent = block.title;
+        bloco.appendChild(title);
+      }
+
+      block.questions.forEach((q, qIdx) => {
+        const div = document.createElement('div');
+        div.className = 'j-pergunta';
+        div.dataset.perguntaId = `${block.id}-${qIdx}`;
+        div.style.display = (bIdx === JC.currentBloco && qIdx === JC.currentPergunta) ? 'block' : 'none';
+        div.innerHTML = `
+          <label class="pergunta-enunciado text" data-i18n="${q.data_i18n}" data-typing="true" data-speed="36" data-cursor="true">${q.label}</label>
+          <textarea rows="4" class="input" data-i18n-placeholder="resposta_placeholder" placeholder="Digite sua resposta..."></textarea>
+          <div class="accessibility-controls">
+            <button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>
+            <button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>
+            <button class="btn btn-avancar" data-action="avancar" data-question-id="${block.id}-${qIdx}" data-i18n="btn-avancar">Avançar</button>
+          </div>
+        `;
+        bloco.appendChild(div);
+      });
+
+      content.appendChild(bloco);
+    });
+
+    if (i18n.ready) {
+      i18n.apply(content);
+    } else {
+      console.warn('[JORNADA_PAPER] i18n não pronto, pulando i18n.apply');
+    }
+
+    const currentBloco = content.querySelector(`[data-bloco="${JC.currentBloco}"]`);
+    if (currentBloco) {
+      currentBloco.style.display = 'block';
+      const curId = `${JORNADA_BLOCKS[JC.currentBloco]?.id || 'b'}-${JC.currentPergunta}`;
+      const currentPergunta = currentBloco.querySelector(`[data-perguntaId="${curId}"]`);
+      if (currentPergunta) {
+        currentPergunta.style.display = 'block';
+        currentPergunta.classList.add('active');
+        setTimeout(() => {
+          log('Iniciando typeQuestionsSequentially para bloco', JC.currentBloco);
+          typeQuestionsSequentially(currentBloco);
+        }, 100);
+      }
+    }
+
+    log('Perguntas renderizadas, total de blocos:', JORNADA_BLOCKS.length);
   }
-
-  content.innerHTML = '';
-
-  const JC = global.JC || { currentBloco: 0, currentPergunta: 0 };
-
-  // Header global
-  const header = document.createElement('div');
-  header.className = 'perguntas-header';
-  header.innerHTML = `
-    <span class="jp-block-label" data-i18n="bloco_${JORNADA_BLOCKS[JC.currentBloco]?.id}_title_short">Bloco ${JC.currentBloco + 1}</span>
-    <span class="jp-global-counter">
-      ${JC.currentPergunta + 1}/${JORNADA_BLOCKS[JC.currentBloco]?.questions.length} • 
-      ${getGlobalProgress()}% concluído
-    </span>
-  `;
-  content.appendChild(header);
-
-  // Container principal do pergaminho
-  const pergaminho = document.createElement('div');
-  pergaminho.className = 'pergaminho-container';
-  content.appendChild(pergaminho);
-
-  // Renderiza apenas o bloco/pergunta atual (melhor performance)
-  const currentBlock = JORNADA_BLOCKS[JC.currentBloco];
-  const currentQuestion = currentBlock.questions[JC.currentPergunta];
-
-  pergaminho.innerHTML = `
-    <!-- Caixa invisível superior - Datilografia -->
-    <div class="jp-question-display">
-      <div class="jp-question-typed" id="question-display"></div>
-    </div>
-
-    <!-- Caixa de resposta principal -->
-    <div class="jp-answer-container">
-      <div class="jp-answer-frame">
-        <div class="jp-answer-bg"></div>
-        <textarea 
-          class="jp-answer-input" 
-          name="${currentBlock.id}_${currentQuestion.id}"
-          id="answer-input"
-          placeholder="Sua resposta aparecerá aqui..."
-          maxlength="1000"
-          data-autoresize="true"
-        ></textarea>
-      </div>
-    </div>
-
-    <!-- Caixa invisível inferior - Feedback IA -->
-    <div class="jp-ai-feedback" id="ai-feedback">
-      <div class="jp-ai-text" id="ai-text"></div>
-    </div>
-
-    <!-- Controles -->
-    <div class="perguntas-controls">
-      <button class="btn-perguntas" id="btn-mic" data-action="mic">
-        🎤 Falar
-      </button>
-      <button class="btn-perguntas btn-confirm" id="btn-next" data-action="next">
-        ${JC.currentPergunta < currentBlock.questions.length - 1 ? 'Avançar' : 'Concluir'}
-      </button>
-    </div>
-  `;
-
-  // Carrega resposta salva se existir
-  const savedAnswer = getSavedAnswer(JC.currentBloco, JC.currentPergunta);
-  const answerInput = document.getElementById('answer-input');
-  if (savedAnswer) {
-    answerInput.value = savedAnswer;
-    answerInput.style.height = 'auto';
-    answerInput.scrollTop = answerInput.scrollHeight;
-  }
-
-  // Inicializa datilografia
-  await typeQuestion(currentQuestion);
-  
-  log('Nova estrutura renderizada com sucesso');
-}
-
-function getGlobalProgress() {
-  let total = 0, completed = 0;
-  JORNADA_BLOCKS.forEach(block => {
-    total += block.questions.length;
-    completed += getCompletedQuestions(block.id).length;
-  });
-  return Math.round((completed / total) * 100);
-}
-
-async function typeQuestion(question) {
-  const display = document.getElementById('question-display');
-  const text = i18n.t(question.data_i18n, question.label);
-  
-  // Limpa e inicia datilografia
-  display.innerHTML = '';
-  display.classList.remove('typing-done');
-  
-  await paperTypeText(display, text, 38);
-  
-  // Armazena para acessibilidade
-  document.getElementById('aria-pergunta')?.setAttribute('aria-label', text);
-}
 
   // ===== eventos =====
   function initPaperQAEvents() {
