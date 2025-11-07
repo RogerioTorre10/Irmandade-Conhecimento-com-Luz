@@ -171,4 +171,17 @@
   }
 }
 
+/* Quebra correta de linhas e parágrafos */
+#section-termos1 .termos-texto{
+  white-space: pre-line;        /* respeita \n e <br> */
+  word-break: normal;
+  overflow-wrap: anywhere;      /* evita estourar em telas estreitas */
+}
+
+/* Garantia de parágrafos */
+#section-termos1 .termos-texto p{
+  display: block;
+  margin: .6em 0;
+}
+
 
