@@ -55,10 +55,13 @@
     window.JC.data.nome = nome;
     window.JC.data.guia = guia;
 
+    // Sincroniza também com localStorage para o card reconhecer
     try {
-      sessionStorage.setItem('jornada.nome', nome);
-      sessionStorage.setItem('jornada.guia', guia);
-    } catch {}
+     localStorage.setItem('jc.nome', nome);
+     localStorage.setItem('jc.guia', guia);
+   } catch (e) {
+     console.warn('[SELFIE] Falha ao sincronizar nome com localStorage:', e);
+  }
 
     console.log(`%c[SELFIE] Dados finais → Nome: ${nome}, Guia: ${guia}`, 'color: cyan; font-weight: bold');
     return { nome, guia };
