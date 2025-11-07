@@ -174,11 +174,13 @@ input[type=range]::-webkit-slider-thumb {
 
 /* ===== SELFIE – PREVIEW RESPONSIVO ===== */
 #section-selfie #selfiePreview{
-  position: relative;
+ position: relative;
+  order: 3;                          /* força ficar depois */
+  z-index: 1;                        /* fica abaixo dos botões */
   width: min(92vw, 430px);
-  aspect-ratio: 3 / 4;                 /* portrait, combina com o card */
-  margin: 10px auto 0;
-  background: #000;                     /* fundo preto nas bordas */
+  aspect-ratio: 3 / 4;               /* retrato */
+  margin: 12px auto 0;
+  background: #000;                  /* fundo preto restaurado */
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 12px 30px rgba(0,0,0,.45);
@@ -211,4 +213,34 @@ input[type=range]::-webkit-slider-thumb {
 
 /* botões sempre clicáveis por cima do preview */
 #section-selfie .selfie-actions{ position: relative; z-index: 5; }
+/* ===== FIX: ordem, fundo e clique da pré-visualização ===== */
+
+/* Layout em coluna: título → texto → controles → ações → preview */
+#section-selfie .parchment-inner-rough,
+#section-selfie .conteudo-pergaminho {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Controles + botões SEMPRE por cima do preview (clicáveis) */
+#section-selfie .selfie-controls,
+#section-selfie .selfie-actions {
+  position: relative;
+  z-index: 10;
+}
+
+/* Vídeo/Canvas preenchem o container e NÃO capturam cliques dos controles */
+#section-selfie #selfieVideo,
+#section-selfie #selfieCanvas{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: translate(-50%, -50%);     /* o JS já completa com scale(...) */
+  left: 50%;
+  top: 50%;
+  pointer-events: none;                 /* evita bloquear sliders/botões */
+  z-index: 1;
+}
 
