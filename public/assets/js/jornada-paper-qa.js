@@ -47,9 +47,8 @@
       title: 'Block 1 — Roots',
       data_i18n: 'bloco_raizes_title',
       questions: [
-        { id: 'quem_voce_hoje', label: 'Who are you today?', data_i18n: 'pergunta_quem_voce_hoje' },
-        { id: 'o_que_te_trouxe', label: 'What brought you to this journey?', data_i18n: 'pergunta_o_que_te_trouxe' },
-        { id: 'sonho_espiritual', label: 'What is your greatest spiritual dream?', data_i18n: 'pergunta_sonho_espiritual' }
+        { id: 'quem_voce_hoje', label: 'Quem você hoje?', data_i18n: 'pergunta_quem_voce_hoje' },
+        { id: 'o_que_te_trouxe', label: 'O que te trouxe?', data_i18n: 'pergunta_o_que_te_trouxe' },
       ],
       video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
     },
@@ -58,9 +57,8 @@
       title: 'Block 2 — Reflections',
       data_i18n: 'bloco_reflexoes_title',
       questions: [
-        { id: 'desafios_atuais', label: 'What are your biggest current challenges?', data_i18n: 'pergunta_desafios_atuais' },
-        { id: 'medo_duvida', label: 'How do you deal with fear or doubt?', data_i18n: 'pergunta_medo_duvida' },
-        { id: 'significado_luz', label: 'What does "light" mean to you?', data_i18n: 'pergunta_significado_luz' }
+        { id: 'desafios_atuais', label: 'desafios atuais?', data_i18n: 'pergunta_desafios_atuais' },
+        { id: 'medo_duvida', label: 'medo duvida?', data_i18n: 'pergunta_medo_duvida' },
       ],
       video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
     },
@@ -69,9 +67,8 @@
       title: 'Block 3 — Growth',
       data_i18n: 'bloco_crescimento_title',
       questions: [
-        { id: 'mudar_vida', label: 'What do you want to change in your life?', data_i18n: 'pergunta_mudar_vida' },
-        { id: 'quem_inspira', label: 'Who inspires you and why?', data_i18n: 'pergunta_quem_inspira' },
-        { id: 'pratica_gratidao', label: 'How do you practice gratitude daily?', data_i18n: 'pergunta_pratica_gratidao' }
+        { id: 'mudar_vida', label: 'mudar vida?', data_i18n: 'pergunta_mudar_vida' },
+        { id: 'quem_inspira', label: 'quem inspira?', data_i18n: 'pergunta_quem_inspira' },
       ],
       video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4'
     },
@@ -80,9 +77,8 @@
       title: 'Block 4 — Integration',
       data_i18n: 'bloco_integracao_title',
       questions: [
-        { id: 'licao_jornada', label: 'What lesson do you take from this journey?', data_i18n: 'pergunta_licao_jornada' },
-        { id: 'aplicar_futuro', label: 'How will you apply this in the future?', data_i18n: 'pergunta_aplicar_futuro' },
-        { id: 'mensagem_futuro', label: 'A message for your future self.', data_i18n: 'pergunta_mensagem_futuro' }
+        { id: 'licao_jornada', label: 'lição jornada?', data_i18n: 'pergunta_licao_jornada' },
+        { id: 'aplicar_futuro', label: 'aplicar futuro?', data_i18n: 'pergunta_aplicar_futuro' },
       ],
       video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
     },
@@ -91,8 +87,8 @@
       title: 'Block 5 — Synthesis and Delivery',
       data_i18n: 'bloco_sintese_title',
       questions: [
-        { id: 'essencia_hoje', label: 'Who are you today, in one true sentence?', data_i18n: 'pergunta_essencia_hoje' },
-        { id: 'passo_fe', label: 'What will be your next step of faith and courage?', data_i18n: 'pergunta_passo_fe' }
+        { id: 'essencia_hoje', label: 'essencia hoje?', data_i18n: 'pergunta_essencia_hoje' },
+        { id: 'passo_fe', label: 'passo fé?', data_i18n: 'pergunta_passo_fe' }
       ],
       video_after: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
     }
@@ -154,6 +150,62 @@
     }
   ]
 };
+   'en-US': [
+       {
+      id: 'raizes',
+      title: 'Block 1 — Roots',
+      data_i18n: 'bloco_raizes_title',
+      questions: [
+        { id: 'quem_voce_hoje', label: 'Who are you today?', data_i18n: 'pergunta_quem_voce_hoje' },
+        { id: 'o_que_te_trouxe', label: 'What brought you to this journey?', data_i18n: 'pergunta_o_que_te_trouxe' },
+        { id: 'sonho_espiritual', label: 'What is your greatest spiritual dream?', data_i18n: 'pergunta_sonho_espiritual' }
+      ],
+      video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
+    },
+    {
+      id: 'reflexoes',
+      title: 'Block 2 — Reflections',
+      data_i18n: 'bloco_reflexoes_title',
+      questions: [
+        { id: 'desafios_atuais', label: 'What are your biggest current challenges?', data_i18n: 'pergunta_desafios_atuais' },
+        { id: 'medo_duvida', label: 'How do you deal with fear or doubt?', data_i18n: 'pergunta_medo_duvida' },
+        { id: 'significado_luz', label: 'What does "light" mean to you?', data_i18n: 'pergunta_significado_luz' }
+      ],
+      video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
+    },
+    {
+      id: 'crescimento',
+      title: 'Block 3 — Growth',
+      data_i18n: 'bloco_crescimento_title',
+      questions: [
+        { id: 'mudar_vida', label: 'What do you want to change in your life?', data_i18n: 'pergunta_mudar_vida' },
+        { id: 'quem_inspira', label: 'Who inspires you and why?', data_i18n: 'pergunta_quem_inspira' },
+        { id: 'pratica_gratidao', label: 'How do you practice gratitude daily?', data_i18n: 'pergunta_pratica_gratidao' }
+      ],
+      video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4'
+    },
+    {
+      id: 'integracao',
+      title: 'Block 4 — Integration',
+      data_i18n: 'bloco_integracao_title',
+      questions: [
+        { id: 'licao_jornada', label: 'What lesson do you take from this journey?', data_i18n: 'pergunta_licao_jornada' },
+        { id: 'aplicar_futuro', label: 'How will you apply this in the future?', data_i18n: 'pergunta_aplicar_futuro' },
+        { id: 'mensagem_futuro', label: 'A message for your future self.', data_i18n: 'pergunta_mensagem_futuro' }
+      ],
+      video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
+    },
+    {
+      id: 'sintese',
+      title: 'Block 5 — Synthesis and Delivery',
+      data_i18n: 'bloco_sintese_title',
+      questions: [
+        { id: 'essencia_hoje', label: 'Who are you today, in one true sentence?', data_i18n: 'pergunta_essencia_hoje' },
+        { id: 'passo_fe', label: 'What will be your next step of faith and courage?', data_i18n: 'pergunta_passo_fe' }
+      ],
+      video_after: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
+    }
+  ],
 
   let JORNADA_BLOCKS = [];
   global.JORNADA_BLOCKS = global.JORNADA_BLOCKS || [];
