@@ -291,87 +291,116 @@
   }
 
   // ===== render =====
-  async function renderQuestions() {
-    setPergaminho('h');
-    const { content } = ensureCanvas();
-    if (!content) {
-      console.error('[JORNADA_PAPER] Container de perguntas não encontrado');
-      global.toast && global.toast('Erro ao carregar perguntas.');
-      return;
-    }
+  // No final do arquivo, substitua a função renderQuestions por esta versão melhorada:
 
-    if (!JORNADA_BLOCKS || !Array.isArray(JORNADA_BLOCKS)) {
-      console.error('[JORNADA_PAPER] JORNADA_BLOCKS não está definido ou não é um array');
-      global.toast && global.toast('Erro ao carregar blocos de perguntas.');
-      return;
-    }
-
-    content.innerHTML = '';
-    content.classList.remove('hidden');
-
-    const JC = global.JC || { currentBloco: 0, currentPergunta: 0 };
-
-    JORNADA_BLOCKS.forEach((block, bIdx) => {
-      const bloco = document.createElement('div');
-      bloco.className = 'j-bloco';
-      bloco.dataset.bloco = String(bIdx);
-      bloco.dataset.video = block.video_after || '';
-      bloco.style.display = bIdx === JC.currentBloco ? 'block' : 'none';
-
-      if (block.title) {
-        const title = document.createElement('h3');
-        title.className = 'pergunta-enunciado text';
-        title.dataset.i18n = block.data_i18n;
-        title.dataset.typing = 'true';
-        title.dataset.speed = '36';
-        title.dataset.cursor = 'true';
-        title.textContent = block.title;
-        bloco.appendChild(title);
-      }
-
-      block.questions.forEach((q, qIdx) => {
-        const div = document.createElement('div');
-        div.className = 'j-pergunta';
-        div.dataset.perguntaId = `${block.id}-${qIdx}`;
-        div.style.display = (bIdx === JC.currentBloco && qIdx === JC.currentPergunta) ? 'block' : 'none';
-        div.innerHTML = `
-          <label class="pergunta-enunciado text" data-i18n="${q.data_i18n}" data-typing="true" data-speed="36" data-cursor="true">${q.label}</label>
-          <textarea rows="4" class="input" data-i18n-placeholder="resposta_placeholder" placeholder="Digite sua resposta..."></textarea>
-          <div class="accessibility-controls">
-            <button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>
-            <button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>
-            <button class="btn btn-avancar" data-action="avancar" data-question-id="${block.id}-${qIdx}" data-i18n="btn-avancar">Avançar</button>
-          </div>
-        `;
-        bloco.appendChild(div);
-      });
-
-      content.appendChild(bloco);
-    });
-
-    if (i18n.ready) {
-      i18n.apply(content);
-    } else {
-      console.warn('[JORNADA_PAPER] i18n não pronto, pulando i18n.apply');
-    }
-
-    const currentBloco = content.querySelector(`[data-bloco="${JC.currentBloco}"]`);
-    if (currentBloco) {
-      currentBloco.style.display = 'block';
-      const curId = `${JORNADA_BLOCKS[JC.currentBloco]?.id || 'b'}-${JC.currentPergunta}`;
-      const currentPergunta = currentBloco.querySelector(`[data-perguntaId="${curId}"]`);
-      if (currentPergunta) {
-        currentPergunta.style.display = 'block';
-        currentPergunta.classList.add('active');
-        setTimeout(() => {
-          log('Iniciando typeQuestionsSequentially para bloco', JC.currentBloco);
-          typeQuestionsSequentially(currentBloco);
-        }, 100);
-      }
-    }
-
-    log('Perguntas renderizadas, total de blocos:', JORNADA_BLOCKS.length);
+async function renderQuestions() {
+  setPergaminho('h');
+  const { content } = ensureCanvas();
+  if (!content) {
+    console.error('[JORNADA_PAPER] Container de perguntas não encontrado');
+    global.toast && global.toast('Erro ao carregar perguntas.');
+    return;
   }
+
+  content.innerHTML = '';
+
+  const JC = global.JC || { currentBloco: 0, currentPergunta: 0 };
+
+  // Header global
+  const header = document.createElement('div');
+  header.className = 'perguntas-header';
+  header.innerHTML = `
+    <span class="jp-block-label" data-i18n="bloco_${JORNADA_BLOCKS[JC.currentBloco]?.id}_title_short">Bloco ${JC.currentBloco + 1}</span>
+    <span class="jp-global-counter">
+      ${JC.currentPergunta + 1}/${JORNADA_BLOCKS[JC.currentBloco]?.questions.length} • 
+      ${getGlobalProgress()}% concluído
+    </span>
+  `;
+  content.appendChild(header);
+
+  // Container principal do pergaminho
+  const pergaminho = document.createElement('div');
+  pergaminho.className = 'pergaminho-container';
+  content.appendChild(pergaminho);
+
+  // Renderiza apenas o bloco/pergunta atual (melhor performance)
+  const currentBlock = JORNADA_BLOCKS[JC.currentBloco];
+  const currentQuestion = currentBlock.questions[JC.currentPergunta];
+
+  pergaminho.innerHTML = `
+    <!-- Caixa invisível superior - Datilografia -->
+    <div class="jp-question-display">
+      <div class="jp-question-typed" id="question-display"></div>
+    </div>
+
+    <!-- Caixa de resposta principal -->
+    <div class="jp-answer-container">
+      <div class="jp-answer-frame">
+        <div class="jp-answer-bg"></div>
+        <textarea 
+          class="jp-answer-input" 
+          name="${currentBlock.id}_${currentQuestion.id}"
+          id="answer-input"
+          placeholder="Sua resposta aparecerá aqui..."
+          maxlength="1000"
+          data-autoresize="true"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Caixa invisível inferior - Feedback IA -->
+    <div class="jp-ai-feedback" id="ai-feedback">
+      <div class="jp-ai-text" id="ai-text"></div>
+    </div>
+
+    <!-- Controles -->
+    <div class="perguntas-controls">
+      <button class="btn-perguntas" id="btn-mic" data-action="mic">
+        🎤 Falar
+      </button>
+      <button class="btn-perguntas btn-confirm" id="btn-next" data-action="next">
+        ${JC.currentPergunta < currentBlock.questions.length - 1 ? 'Avançar' : 'Concluir'}
+      </button>
+    </div>
+  `;
+
+  // Carrega resposta salva se existir
+  const savedAnswer = getSavedAnswer(JC.currentBloco, JC.currentPergunta);
+  const answerInput = document.getElementById('answer-input');
+  if (savedAnswer) {
+    answerInput.value = savedAnswer;
+    answerInput.style.height = 'auto';
+    answerInput.scrollTop = answerInput.scrollHeight;
+  }
+
+  // Inicializa datilografia
+  await typeQuestion(currentQuestion);
+  
+  log('Nova estrutura renderizada com sucesso');
+}
+
+function getGlobalProgress() {
+  let total = 0, completed = 0;
+  JORNADA_BLOCKS.forEach(block => {
+    total += block.questions.length;
+    completed += getCompletedQuestions(block.id).length;
+  });
+  return Math.round((completed / total) * 100);
+}
+
+async function typeQuestion(question) {
+  const display = document.getElementById('question-display');
+  const text = i18n.t(question.data_i18n, question.label);
+  
+  // Limpa e inicia datilografia
+  display.innerHTML = '';
+  display.classList.remove('typing-done');
+  
+  await paperTypeText(display, text, 38);
+  
+  // Armazena para acessibilidade
+  document.getElementById('aria-pergunta')?.setAttribute('aria-label', text);
+}
 
   // ===== eventos =====
   function initPaperQAEvents() {
