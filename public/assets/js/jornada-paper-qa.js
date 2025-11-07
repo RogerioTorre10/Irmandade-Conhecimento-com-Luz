@@ -1,7 +1,8 @@
-/* jornada-paper-qa.js — versão FINAL CORRIGIDA (usa window, não global) */
+/* jornada-paper-qa.js — VERSÃO FINAL 100% CORRIGIDA (sem global) */
 (function (win) {
   'use strict';
 
+  // === VERIFICA SE JÁ FOI CARREGADO ===
   if (win.jornadaPaperQALoaded) {
     console.log('[JORNADA_PAPER] Script já carregado, ignorando...');
     return;
@@ -11,6 +12,7 @@
   const log = (...args) => console.log('[JORNADA_PAPER]', ...args);
   const warn = (...args) => console.warn('[JORNADA_PAPER]', ...args);
 
+  // === i18n ===
   const i18n = win.i18n || {
     lang: 'pt-BR',
     ready: false,
@@ -19,16 +21,19 @@
     waitForReady: async () => {}
   };
 
+  // === CONFIGURAÇÃO ===
   const CFG = Object.assign({
     CANVAS_ID: 'jornada-canvas',
     CONTENT_ID: 'jornada-conteudo',
+    PERGAMINHO_VERT: '/assets/img/pergaminho-rasgado-vert.png',
     PERGAMINHO_HORIZ: '/assets/img/pergaminho-rasgado-horiz.png',
     VIDEO_BASE: '/assets/img/'
   }, win.JORNADA_CFG || {});
 
   const VIDEO_BASE = CFG.VIDEO_BASE;
 
-  global.JORNADA_VIDEOS = global.JORNADA_VIDEOS || {
+  // === VÍDEOS GLOBAIS ===
+  win.JORNADA_VIDEOS = win.JORNADA_VIDEOS || {
     intro: VIDEO_BASE + 'filme-0-ao-encontro-da-jornada.mp4',
     afterBlocks: {
       0: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
@@ -38,7 +43,6 @@
     },
     final: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
   };
-  global.JORNADA_FINAL_VIDEO = global.JORNADA_VIDEOS.final;
 
   const blockTranslations = {
     'pt-BR': [
@@ -154,7 +158,7 @@
     }
   ]
 };
-
+  
   let JORNADA_BLOCKS = [];
   win.JORNADA_BLOCKS = [];
 
@@ -205,7 +209,6 @@
 
       const interval = setInterval(() => {
         element.textContent = text.slice(0, i);
-        caret.style.opacity = i < text.length ? '1' : '0';
         i++;
         if (i > text.length) {
           clearInterval(interval);
@@ -242,10 +245,10 @@
   // ===== IA FEEDBACK =====
   async function gerarFeedbackIA(resposta, pergunta) {
     const prompt = `Você é um guia espiritual sábio e compassivo. 
-    Pergunta: "${pergunta}"
-    Resposta: "${resposta}"
-    
-    Dê um feedback curto (1-2 frases), encorajador e poético.`;
+Pergunta: "${pergunta}"
+Resposta: "${resposta}"
+
+Dê um feedback curto (1-2 frases), encorajador e poético.`;
 
     try {
       if (win.JC?.api?.grok) {
@@ -473,5 +476,5 @@
     init: initPaperQA
   };
 
-  log('jornada-paper-qa.js carregado com sucesso (usando window)');
+  log('jornada-paper-qa.js carregado com sucesso (SEM global)');
 })(window);
