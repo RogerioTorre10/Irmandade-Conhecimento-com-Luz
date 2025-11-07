@@ -193,8 +193,12 @@ input[type=range]::-webkit-slider-thumb {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;                    /* cobre como “background-size: cover” */
-  transform-origin: center center;      /* centraliza o zoom */
+  object-fit: cover;
+  transform: translate(-50%, -50%);     /* o JS já completa com scale(...) */
+  left: 50%;
+  top: 50%;
+  pointer-events: none;                 /* evita bloquear sliders/botões */
+  z-index: 1;
 }
 
 #section-selfie #selfieGuide,
@@ -213,6 +217,7 @@ input[type=range]::-webkit-slider-thumb {
 
 /* botões sempre clicáveis por cima do preview */
 #section-selfie .selfie-actions{ position: relative; z-index: 5; }
+
 /* ===== FIX: ordem, fundo e clique da pré-visualização ===== */
 
 /* Layout em coluna: título → texto → controles → ações → preview */
