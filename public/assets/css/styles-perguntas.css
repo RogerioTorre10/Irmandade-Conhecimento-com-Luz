@@ -1,138 +1,214 @@
-/* =========================================
-   SECTION PERGUNTAS — layout unificado
-   5 blocos, pergaminho central, responsivo
-========================================= */
+/* ===========================================================
+   STYLES-PERGUNTAS v1.1
+   Caminho: /assets/css/styles-perguntas.css
+   =========================================================== */
 
 .section-perguntas {
   position: relative;
   min-height: 100vh;
-  padding: 40px 16px 32px;
+  padding: 32px 12px 20px;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  color: #f5e9d6;
   font-family: "Cardo", serif;
+  color: #f5e9d6;
+  background: transparent;
 }
 
 .section-perguntas .perguntas-wrap {
-  position: relative;
-  width: min(960px, 100%);
+  width: min(1024px, 100%);
   margin: 0 auto;
-  padding: 24px 18px 18px;
+  padding: 18px 14px 14px;
   border-radius: 18px;
   background: rgba(0, 0, 0, 0.45);
-  box-shadow: 0 18px 60px rgba(0,0,0,0.8);
+  box-shadow: 0 18px 60px rgba(0,0,0,0.85);
   backdrop-filter: blur(6px);
 }
 
-.section-perguntas .pergaminho-inner {
-  position: relative;
-  padding: 22px 18px 18px;
-  border-radius: 16px;
-  background-image: url("/assets/img/pergaminho-rasgado-horiz.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  min-height: 52vh;
-}
-
-/* título do bloco */
-.section-perguntas .perguntas-title {
-  font-family: "ManufacturingConsent-Regular", "Cardo", serif;
-  font-size: clamp(18px, 3.4vw, 26px);
-  letter-spacing: 0.06em;
-  text-align: center;
-  margin: 0 0 10px;
-  color: #2b1403;
-  text-shadow: 0 0 12px rgba(255, 230, 180, 0.85);
-}
-
-/* enunciado */
-.section-perguntas .pergunta-enunciado {
-  font-size: 15px;
-  line-height: 1.5;
-  margin: 10px 0 6px;
-  color: #1b0e05;
-  font-weight: 600;
-}
-
-/* textarea */
-.section-perguntas .pergunta-resposta {
-  width: 100%;
-  min-height: 96px;
-  padding: 8px 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(40, 22, 8, 0.55);
-  background: rgba(255, 249, 235, 0.9);
-  color: #2b1403;
-  font-size: 14px;
-  resize: vertical;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.18);
-}
-
-/* progresso */
-.section-perguntas .perguntas-progress {
-  margin: 10px 4px 6px;
+/* Cabeçalho */
+.perguntas-header {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.jp-block-label {
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #ffd38a;
+}
+
+.jp-global-counter {
   font-size: 11px;
   color: #f5e9d6;
 }
 
-.section-perguntas .perguntas-progress-bar {
+/* Pergaminho desta fase */
+.perguntas-pergaminho {
+  margin-top: 4px;
+  padding: 12px 10px 10px;
+  border-radius: 16px;
+  background-image: url('/assets/img/pergaminho-rasgado-horiz.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Pergunta datilografada */
+.jp-question-typed {
+  min-height: 42px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #2b1403;
+  font-weight: 600;
+}
+
+/* Quadro medieval preto para resposta */
+.jp-answer-frame {
+  position: relative;
+  margin-top: 4px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  /* moldura medieval */
+  background-image: url('/assets/img/moldura-medieval.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.9);
+}
+
+.jp-answer-bg {
+  position: absolute;
+  inset: 8px;
+  border-radius: 10px;
+  background: radial-gradient(circle at top, rgba(255,255,255,0.06), transparent);
+  pointer-events: none;
+}
+
+.jp-answer-input {
   position: relative;
   width: 100%;
-  height: 6px;
+  min-height: 90px;
+  border: none;
+  outline: none;
+  padding: 8px 8px 8px;
+  border-radius: 8px;
+  background: transparent;
+  color: #f7e9c8;
+  font-size: 13px;
+  line-height: 1.45;
+  resize: vertical;
+  z-index: 5;
+}
+
+/* Devolutiva IA (mantém invisível até usar) */
+.jp-ai-response {
+  margin-top: 8px;
+  padding: 6px 8px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #ffe6a8;
+  background: rgba(0,0,0,0.8);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 210, 140, 0.4);
+}
+
+/* Botões com textura de pedra */
+.perguntas-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-perguntas {
+  padding: 7px 14px;
   border-radius: 999px;
-  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255, 220, 170, 0.6);
+  background-image: url('/assets/img/textura-de-pedra.jpg');
+  background-size: cover;
+  background-position: center;
+  color: #ffd38a;
+  font-size: 11px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.85);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+}
+
+.btn-perguntas.btn-confirm {
+  font-weight: 700;
+  border-color: rgba(255, 230, 180, 0.9);
+}
+
+.btn-perguntas:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.95);
+}
+
+/* Barras de progresso */
+.perguntas-progress {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 10px;
+}
+
+.jp-block-progress-label,
+.jp-global-progress-label {
+  color: #f5e9d6;
+}
+
+.jp-block-progress-bar,
+.jp-global-progress-bar {
+  width: 100%;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.7);
   overflow: hidden;
 }
 
-.section-perguntas .perguntas-progress-fill {
-  position: absolute;
-  inset: 0;
+.jp-progress-fill {
   width: 0%;
+  height: 100%;
   border-radius: inherit;
   background: linear-gradient(to right, #f7d26a, #ff9b3d);
   transition: width 0.25s ease-out;
 }
 
-/* ações */
-.section-perguntas .perguntas-actions {
-  margin-top: 10px;
-  display: flex;
-  justify-content: flex-end;
+/* Invisíveis internos */
+.jp-hidden {
+  display: none !important;
 }
 
-.section-perguntas .btn-next {
-  min-width: 160px;
-  padding: 9px 22px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 220, 170, 0.85);
-  background: linear-gradient(to bottom, #f7d26a, #c47528);
-  color: #1b0e05;
-  font-weight: 600;
-  font-size: 13px;
-  cursor: pointer;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.45);
-}
-
-.section-perguntas .btn-next:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 22px rgba(0,0,0,0.55);
-}
-
-/* MOBILE */
+/* Mobile */
 @media (max-width: 600px) {
   .section-perguntas {
-    padding: 22px 8px 18px;
+    padding: 20px 6px 14px;
   }
+
   .section-perguntas .perguntas-wrap {
-    padding: 16px 10px 12px;
+    padding: 14px 8px 10px;
   }
-  .section-perguntas .pergaminho-inner {
-    padding: 16px 10px 10px;
-    min-height: 60vh;
+
+  .perguntas-pergaminho {
+    padding: 10px 6px 8px;
+  }
+
+  .jp-answer-input {
+    font-size: 12px;
+  }
+
+  .perguntas-controls {
+    justify-content: center;
   }
 }
