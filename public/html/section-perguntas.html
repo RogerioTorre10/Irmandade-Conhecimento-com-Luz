@@ -1,18 +1,32 @@
 <link rel="stylesheet" href="/assets/css/brilho-texturas.css">
 
-<section id="section-perguntas" data-section="perguntas" class="section">
-    <div class="perguntas-wrap">
-        <div id="perguntas-container" class="perguntas-container">
-            <p>Carregando as perguntas da Jornada...</p>
-        </div>
-        
-        <div class="progresso-bar-container">
-            <div id="jprog-fill" class="progresso-bar-fill"></div>
-            <span id="jprog-pct" class="progresso-percent">0% concluído</span>
-        </div>
+<link rel="stylesheet" href="/assets/css/section-perguntas.css">
 
-        <div class="intro-actions">
-            <button id="btn-avancar" class="btn btn-primary" data-action="avancar">Próxima Pergunta / Bloco</button>
-        </div>
+<section id="section-perguntas1"
+         class="section section-perguntas"
+         data-section="perguntas1">
+  <div class="perguntas-wrap">
+    <div class="pergaminho-inner">
+      <div id="perguntas1-root">
+        <p>Carregando as perguntas da Jornada...</p>
+      </div>
     </div>
+
+    <div class="perguntas-progress">
+      <div class="perguntas-progress-bar">
+        <div id="perguntas1-progress-fill" class="perguntas-progress-fill"></div>
+      </div>
+      <div id="perguntas1-progress-text" class="perguntas-progress-text">
+        Bloco 1 de 5 — 0/10 (0%)
+      </div>
+    </div>
+
+    <div class="perguntas-actions">
+      <button id="perguntas1-next"
+              class="btn-next"
+              data-action="next">
+        Próxima pergunta
+      </button>
+    </div>
+  </div>
 </section>
