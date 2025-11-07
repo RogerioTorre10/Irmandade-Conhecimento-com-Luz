@@ -163,17 +163,18 @@
 }
 
 /* Quebra correta de linhas e parágrafos */
-#section-termos1 .termos-texto{
+#section-termos2 .termos-texto{
   white-space: pre-line;        /* respeita \n e <br> */
   word-break: normal;
-  overflow-wrap: anywhere;      /* evita estourar em telas estreitas */
+  overflow-wrap: anywhere;
 }
 
 /* Garantia de parágrafos */
-#section-termos1 .termos-texto p{
+#section-termos2 .termos-texto p{
   display: block;
   margin: .6em 0;
 }
+
 
 
 
