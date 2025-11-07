@@ -8,7 +8,7 @@
 
   const BTN_DL_SEL = '#btn-baixar-pdf-hq';
   const BTN_END_SEL = '#btn-finalizar';
-  const $ = (sel, root = document) => root.querySelector(sel);
+  const $ = (sel, root = document) => (root || document).querySelector(sel);
 
   const S = {
     generating: false,
@@ -16,27 +16,44 @@
     hqUrl: null,
   };
 
-// helper: espera o vídeo acabar
-async function waitForTransitionUnlock(timeoutMs = 15000) {
-  if (!window.__TRANSITION_LOCK) return;
-  let resolved = false;
-  const p = new Promise(resolve => {
-    const onEnd = () => { if (!resolved) { resolved = true; document.removeEventListener('transition:ended', onEnd); resolve(); } };
-    document.addEventListener('transition:ended', onEnd, { once: true });
-  });
-  const t = new Promise((resolve) => setTimeout(resolve, timeoutMs));
-  await Promise.race([p, t]); // não fica preso para sempre
-}
+  /**
+   * Espera o término de uma possível transição com vídeo,
+   * usando o lock global __TRANSITION_LOCK e o evento "transition:ended".
+   * Use esta função APENAS dentro de funções async (não é chamada no topo).
+   */
+  async function waitForTransitionUnlock(timeoutMs = 15000) {
+    if (!window.__TRANSITION_LOCK) return;
 
-// … dentro do initOnce(root) ANTES de começar a digitar:
-await waitForTransitionUnlock();
+    let resolved = false;
 
-// agora sim, rode a sequência:
-// for (const el of items) await typeOnce(el, ...);
+    const p = new Promise((resolve) => {
+      const onEnd = () => {
+        if (resolved) return;
+        resolved = true;
+        document.removeEventListener('transition:ended', onEnd);
+        resolve();
+      };
+      document.addEventListener('transition:ended', onEnd, { once: true });
+    });
 
-  
+    const t = new Promise((resolve) => {
+      setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          resolve();
+        }
+      }, timeoutMs);
+    });
+
+    await Promise.race([p, t]);
+  }
+
   function apiBase() {
-    return (window.APP_CONFIG?.API_BASE) || (window.API?.BASE_URL) || '/api';
+    return (
+      window.APP_CONFIG?.API_BASE ||
+      window.API?.BASE_URL ||
+      '/api'
+    );
   }
 
   function payload() {
@@ -44,7 +61,7 @@ await waitForTransitionUnlock();
     const selfie = window.__SELFIE_DATA_URL__ || null;
     const answers = window.__QA_ANSWERS__ || null;
     const meta = window.__QA_META__ || {};
-    const lang = (window.i18n?.lang) || 'pt';
+    const lang = window.i18n?.lang || 'pt';
     const timeNow = new Date().toISOString();
 
     return {
@@ -54,7 +71,7 @@ await waitForTransitionUnlock();
       meta,
       lang,
       completedAt: timeNow,
-      appVersion: (window.APP_CONFIG?.version || 'v1'),
+      appVersion: window.APP_CONFIG?.version || 'v1',
     };
   }
 
@@ -63,25 +80,36 @@ await waitForTransitionUnlock();
     S.generating = true;
 
     try {
+      const body = payload();
+
       if (window.API?.gerarPDFHQ) {
-        const res = await window.API.gerarPDFHQ(payload());
+        // Usa helper custom se existir
+        const res = await window.API.gerarPDFHQ(body);
         S.pdfUrl = res?.pdfUrl || null;
         S.hqUrl = res?.hqUrl || null;
       } else {
+        // Fallback: POST para API padrão
         const url = apiBase().replace(/\/+$/, '') + '/jornada/finalizar';
+
         const r = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload()),
+          body: JSON.stringify(body),
         });
+
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
+
         const data = await r.json().catch(() => ({}));
         S.pdfUrl = data?.pdfUrl || null;
         S.hqUrl = data?.hqUrl || null;
       }
 
+      // Se nada veio da API, gera um JSON local só pra não quebrar o fluxo
       if (!S.pdfUrl && !S.hqUrl) {
-        const blob = new Blob([JSON.stringify(payload(), null, 2)], { type: 'application/json' });
+        const blob = new Blob(
+          [JSON.stringify(body, null, 2)],
+          { type: 'application/json' }
+        );
         S.pdfUrl = URL.createObjectURL(blob);
       }
 
@@ -103,6 +131,7 @@ await waitForTransitionUnlock();
   function downloadAll() {
     if (S.pdfUrl) triggerDownload(S.pdfUrl, 'jornada.pdf');
     if (S.hqUrl) triggerDownload(S.hqUrl, 'hq.zip');
+
     if (!S.pdfUrl && !S.hqUrl) {
       window.toast?.('Nada para baixar no momento.');
     }
@@ -125,6 +154,7 @@ await waitForTransitionUnlock();
 
   function finishFlow() {
     try {
+      // Caso queira limpar dados locais no futuro:
       // delete window.__SELFIE_DATA_URL__;
       // delete window.__QA_ANSWERS__;
       // delete window.__QA_META__;
@@ -143,13 +173,15 @@ await waitForTransitionUnlock();
     }
   }
 
-  function bindSection(node) {
+  async function bindSection(node) {
     const btnDl = $(BTN_DL_SEL, node);
     const btnEnd = $(BTN_END_SEL, node);
 
     if (btnDl) {
       btnDl.addEventListener('click', async () => {
-        if (!S.pdfUrl && !S.hqUrl) await generateArtifacts();
+        if (!S.pdfUrl && !S.hqUrl) {
+          await generateArtifacts();
+        }
         downloadAll();
       });
     }
@@ -160,15 +192,26 @@ await waitForTransitionUnlock();
       });
     }
 
+    // Garante que qualquer transição anterior terminou antes de gerar
+    await waitForTransitionUnlock();
+    enableDownloadButton(false);
     generateArtifacts();
   }
 
+  // Quando o controlador carregar a section-final
   document.addEventListener('sectionLoaded', (e) => {
     if (e?.detail?.sectionId !== SECTION_ID) return;
     const node = e.detail.node || document.getElementById(SECTION_ID);
     if (!node) return;
-    enableDownloadButton(false);
     bindSection(node);
+  });
+
+  // Fallback: se abrir direto na final
+  document.addEventListener('DOMContentLoaded', () => {
+    const sec = document.getElementById(SECTION_ID);
+    if (sec && (sec.classList.contains('active') || window.__currentSectionId === SECTION_ID)) {
+      bindSection(sec);
+    }
   });
 
   window.JFinal = {
