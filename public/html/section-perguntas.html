@@ -2,31 +2,88 @@
 <link rel="stylesheet" href="/assets/css/brilho-texturas.css">
 <link rel="stylesheet" href="/assets/css/styles-perguntas.css">
 
-<section id="section-perguntas1"
+<section id="section-perguntas"
          class="section section-perguntas"
-         data-section="perguntas1">
+         data-section="perguntas">
   <div class="perguntas-wrap">
-    <div class="pergaminho-inner">
-      <div id="perguntas1-root">
-        <p>Carregando as perguntas da Jornada...</p>
+
+    <!-- Cabeçalho: bloco + contador geral -->
+    <div class="perguntas-header">
+      <div class="jp-block-label">
+        Bloco <span id="jp-block-num">1</span> de <span id="jp-block-max">5</span>
+      </div>
+      <div class="jp-global-counter">
+        Pergunta <span id="jp-global-current">1</span> / <span id="jp-global-total">50</span>
       </div>
     </div>
 
-    <div class="perguntas-progress">
-      <div class="perguntas-progress-bar">
-        <div id="perguntas1-progress-fill" class="perguntas-progress-fill"></div>
+    <!-- Pergaminho / área central -->
+    <div class="perguntas-pergaminho">
+
+      <!-- Pergunta com datilografia (visível) -->
+      <div id="jp-question-typed"
+           class="jp-question-typed"
+           aria-live="polite">
+        Carregando pergunta...
       </div>
-      <div id="perguntas1-progress-text" class="perguntas-progress-text">
-        Bloco 1 de 5 — 0/10 (0%)
+
+      <!-- Container da resposta: quadro preto medieval -->
+      <div class="jp-answer-frame">
+        <div class="jp-answer-bg"></div>
+        <textarea id="jp-answer-input"
+                  class="jp-answer-input"
+                  rows="4"
+                  placeholder="Digite sua resposta com verdade e calma..."></textarea>
       </div>
+
+      <!-- Devolutiva das IAs (fica oculta até usarmos) -->
+      <div id="jp-ai-response" class="jp-ai-response" hidden></div>
     </div>
 
-    <div class="perguntas-actions">
-      <button id="perguntas1-next"
-              class="btn-next"
-              data-action="next">
-        Próxima pergunta
+    <!-- Controles -->
+    <div class="perguntas-controls">
+      <button id="jp-btn-falar"
+              class="btn-perguntas"
+              data-action="start-mic">
+        🎤 Falar
+      </button>
+
+      <button id="jp-btn-apagar"
+              class="btn-perguntas"
+              data-action="clear">
+        🗑 Apagar
+      </button>
+
+      <button id="jp-btn-confirmar"
+              class="btn-perguntas btn-confirm"
+              data-action="confirm">
+        Confirmar / Próxima
       </button>
     </div>
+
+    <!-- Progresso bloco + geral -->
+    <div class="perguntas-progress">
+
+      <div class="jp-block-progress-label">
+        Bloco <span id="jp-block-num-2">1</span> — Pergunta
+        <span id="jp-block-current">1</span>/<span id="jp-block-total">10</span>
+      </div>
+      <div class="jp-block-progress-bar">
+        <div id="jp-block-progress-fill" class="jp-progress-fill"></div>
+      </div>
+
+      <div class="jp-global-progress-label">
+        Total: <span id="jp-global-current-2">1</span>/<span id="jp-global-total-2">50</span>
+      </div>
+      <div class="jp-global-progress-bar">
+        <div id="jp-global-progress-fill" class="jp-progress-fill"></div>
+      </div>
+    </div>
+
+    <!-- Containers invisíveis (para integrações internas/API) -->
+    <div id="jp-question-raw" class="jp-hidden"></div>
+    <div id="jp-ai-raw" class="jp-hidden"></div>
+
   </div>
 </section>
+
