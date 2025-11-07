@@ -1,16 +1,17 @@
-/* jornada-paper-qa.js — versão global (sem ESM) */
-(function (global) {
+/* jornada-paper-qa.js — versão FINAL CORRIGIDA (usa window, não global) */
+(function (win) {
   'use strict';
 
-  if (global.jornadaPaperQALoaded) {
+  if (win.jornadaPaperQALoaded) {
     console.log('[JORNADA_PAPER] Script já carregado, ignorando...');
     return;
   }
-  global.jornadaPaperQALoaded = true;
+  win.jornadaPaperQALoaded = true;
 
   const log = (...args) => console.log('[JORNADA_PAPER]', ...args);
+  const warn = (...args) => console.warn('[JORNADA_PAPER]', ...args);
 
-  const i18n = global.i18n || {
+  const i18n = win.i18n || {
     lang: 'pt-BR',
     ready: false,
     t: (k, fallback) => fallback || k,
@@ -21,10 +22,9 @@
   const CFG = Object.assign({
     CANVAS_ID: 'jornada-canvas',
     CONTENT_ID: 'jornada-conteudo',
-    PERGAMINHO_VERT: '/assets/img/pergaminho-rasgado-vert.png',
     PERGAMINHO_HORIZ: '/assets/img/pergaminho-rasgado-horiz.png',
     VIDEO_BASE: '/assets/img/'
-  }, global.JORNADA_CFG || {});
+  }, win.JORNADA_CFG || {});
 
   const VIDEO_BASE = CFG.VIDEO_BASE;
 
@@ -156,17 +156,14 @@
 };
 
   let JORNADA_BLOCKS = [];
-  global.JORNADA_BLOCKS = global.JORNADA_BLOCKS || [];
+  win.JORNADA_BLOCKS = [];
 
-  // ===== util DOM =====
-  function elCanvas() {
-    return document.getElementById(CFG.CANVAS_ID);
-  }
-  function elContent() {
-    return document.getElementById(CFG.CONTENT_ID);
-  }
+  // ===== UTIL DOM =====
+  function elCanvas() { return document.getElementById(CFG.CANVAS_ID); }
+  function elContent() { return document.getElementById(CFG.CONTENT_ID); }
+
   function ensureCanvas() {
-    if (global.__currentSectionId !== 'section-perguntas') return { root: null, content: null };
+    if (win.__currentSectionId !== 'section-perguntas') return { root: null, content: null };
     let root = elCanvas();
     if (!root) {
       root = document.createElement('section');
@@ -181,7 +178,6 @@
       content.className = 'conteudo-pergaminho';
       root.appendChild(content);
     }
-    log('Canvas garantido:', { root, content });
     return { root, content };
   }
 
@@ -189,53 +185,15 @@
     const { root } = ensureCanvas();
     if (!root) return;
     root.classList.remove('pergaminho-v', 'pergaminho-h');
-    const isV = mode === 'v';
-    root.classList.add(isV ? 'pergaminho-v' : 'pergaminho-h');
-    const imageUrl = isV ? CFG.PERGAMINHO_VERT : CFG.PERGAMINHO_HORIZ;
-    root.style.backgroundImage = `url("${imageUrl}")`;
+    root.classList.add(mode === 'v' ? 'pergaminho-v' : 'pergaminho-h');
+    root.style.backgroundImage = `url("${mode === 'v' ? CFG.PERGAMINHO_VERT : CFG.PERGAMINHO_HORIZ}")`;
     root.style.backgroundRepeat = 'no-repeat';
     root.style.backgroundPosition = 'center';
     root.style.backgroundSize = 'cover';
     root.style.minHeight = '82vh';
-    log('Pergaminho aplicado:', { mode, imageUrl });
   }
 
-  function buildForm(questions = []) {
-    return `
-      <form id="form-perguntas" class="grid gap-3">
-        ${questions.map(q => `
-          <label class="grid gap-1">
-            <span class="font-medium pergunta-enunciado text" id="${q.id}-label" data-i18n="${q.data_i18n}" data-typing="true" data-speed="36" data-cursor="true">${q.label}</span>
-            <textarea name="${q.id}" class="px-3 py-2 rounded border border-gray-300 bg-white/80" data-i18n-placeholder="resposta_placeholder" placeholder="Digite sua resposta..."></textarea>
-          </label>
-        `).join('')}
-      </form>
-    `;
-  }
-
-  // ===== typing helpers (internos ao Paper) =====
-  let __abortTypingPlaceholder = null;
-
-  async function typePlaceholder(inp, text, speed = 22) {
-    if (!inp) return;
-    if (__abortTypingPlaceholder) __abortTypingPlaceholder();
-    let abort = false;
-    __abortTypingPlaceholder = () => (abort = true);
-    inp.placeholder = '';
-    const aria = document.getElementById('aria-pergunta');
-    if (aria) aria.textContent = text;
-    for (let i = 0; i <= text.length; i++) {
-      if (abort) break;
-      inp.placeholder = text.slice(0, i) + (i < text.length ? '▌' : '');
-      await new Promise(r => setTimeout(r, speed));
-    }
-    if (!abort) {
-      inp.placeholder = text;
-    }
-    if (aria) aria.textContent = '';
-    log('Placeholder digitado:', text);
-  }
-
+  // ===== DATILOGRAFIA =====
   async function paperTypeText(element, text, speed = 36) {
     return new Promise(resolve => {
       let i = 0;
@@ -247,8 +205,9 @@
 
       const interval = setInterval(() => {
         element.textContent = text.slice(0, i);
+        caret.style.opacity = i < text.length ? '1' : '0';
         i++;
-        if (i >= text.length) {
+        if (i > text.length) {
           clearInterval(interval);
           caret.remove();
           element.classList.add('typing-done');
@@ -258,212 +217,261 @@
     });
   }
 
-  async function typeQuestionsSequentially(bloco) {
-    const elements = bloco.querySelectorAll('[data-typing="true"]');
-    for (const el of elements) {
-      const key = el.dataset.i18n;
-      const text = i18n.t(key, el.textContent || key);
-      await global.runTyping(el, () => console.log('[JORNADA_PAPER] Datilografia concluída para:', el.id || el.className));
-    }
-    const textareas = bloco.querySelectorAll('.j-pergunta textarea');
-    for (const textarea of textareas) {
-      const key = textarea.dataset.i18nPlaceholder;
-      const text = i18n.t(key, textarea.placeholder || key);
-      await typePlaceholder(textarea, text, 22);
+  // ===== SALVAR/RECUPERAR RESPOSTA =====
+  function saveAnswer(blockIdx, qIdx, answer) {
+    const key = `jornada_answer_${blockIdx}_${qIdx}`;
+    localStorage.setItem(key, answer);
+  }
+
+  function loadAnswer(blockIdx, qIdx) {
+    const key = `jornada_answer_${blockIdx}_${qIdx}`;
+    return localStorage.getItem(key) || '';
+  }
+
+  function getGlobalProgress() {
+    let total = 0, completed = 0;
+    JORNADA_BLOCKS.forEach((block, bIdx) => {
+      total += block.questions.length;
+      block.questions.forEach((_, qIdx) => {
+        if (loadAnswer(bIdx, qIdx)) completed++;
+      });
+    });
+    return total > 0 ? Math.round((completed / total) * 100) : 0;
+  }
+
+  // ===== IA FEEDBACK =====
+  async function gerarFeedbackIA(resposta, pergunta) {
+    const prompt = `Você é um guia espiritual sábio e compassivo. 
+    Pergunta: "${pergunta}"
+    Resposta: "${resposta}"
+    
+    Dê um feedback curto (1-2 frases), encorajador e poético.`;
+
+    try {
+      if (win.JC?.api?.grok) {
+        const res = await fetch('https://api.x.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${win.JC.api.grok}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: 'grok-beta',
+            messages: [{ role: 'user', content: prompt }],
+            max_tokens: 100
+          })
+        });
+        const data = await res.json();
+        return data.choices[0]?.message?.content?.trim() || 'Continue com luz.';
+      }
+
+      if (win.JC?.api?.openai) {
+        const res = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${win.JC.api.openai}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [{ role: 'user', content: prompt }],
+            max_tokens: 100
+          })
+        });
+        const data = await res.json();
+        return data.choices[0]?.message?.content?.trim() || 'Sua alma já sabe.';
+      }
+
+      return 'A luz dentro de você é a resposta.';
+    } catch (e) {
+      warn('Erro IA:', e);
+      return 'Confie no seu caminho.';
     }
   }
 
-  // ===== vídeo =====
-  function loadVideo(videoSrc) {
-    if (global.__currentSectionId !== 'section-perguntas') return;
+  // ===== VÍDEO =====
+  function loadVideo(src) {
+    if (!src || win.__currentSectionId !== 'section-perguntas') return;
     const video = document.querySelector('#videoTransicao');
-    const videoOverlay = document.querySelector('#videoOverlay');
-    if (!video || !videoOverlay) {
-      console.error('[JORNADA_PAPER] #videoTransicao ou #videoOverlay não encontrado');
-      return;
-    }
-    video.src = videoSrc;
+    const overlay = document.querySelector('#videoOverlay');
+    if (!video || !overlay) return;
+
+    video.src = src;
     video.style.zIndex = 2001;
-    videoOverlay.style.zIndex = 2000;
+    overlay.style.zIndex = 2000;
     video.load();
-    video.play().catch(err => console.error('[JORNADA_PAPER] Erro ao reproduzir vídeo:', err));
-    log('Vídeo carregado:', videoSrc);
+    video.play().catch(() => {});
   }
 
-  // ===== render =====
+  // ===== RENDER =====
   async function renderQuestions() {
     setPergaminho('h');
     const { content } = ensureCanvas();
-    if (!content) {
-      console.error('[JORNADA_PAPER] Container de perguntas não encontrado');
-      global.toast && global.toast('Erro ao carregar perguntas.');
-      return;
-    }
-
-    if (!JORNADA_BLOCKS || !Array.isArray(JORNADA_BLOCKS)) {
-      console.error('[JORNADA_PAPER] JORNADA_BLOCKS não está definido ou não é um array');
-      global.toast && global.toast('Erro ao carregar blocos de perguntas.');
+    if (!content || !JORNADA_BLOCKS.length) {
+      warn('Canvas ou blocos não prontos');
       return;
     }
 
     content.innerHTML = '';
-    content.classList.remove('hidden');
+    const JC = win.JC || { currentBloco: 0, currentPergunta: 0 };
+    const block = JORNADA_BLOCKS[JC.currentBloco];
+    const q = block.questions[JC.currentPergunta];
+    const perguntaTexto = i18n.t(q.data_i18n, q.label);
 
-    const JC = global.JC || { currentBloco: 0, currentPergunta: 0 };
+    // HEADER
+    const header = document.createElement('div');
+    header.className = 'perguntas-header';
+    header.innerHTML = `
+      <div>
+        <div class="jp-block-label">Bloco ${JC.currentBloco + 1} de ${JORNADA_BLOCKS.length}</div>
+        <div style="font-size:11px;color:#ffd38a;margin-top:2px">
+          Pergunta ${JC.currentPergunta + 1}/${block.questions.length}
+        </div>
+      </div>
+      <div class="jp-global-counter">${getGlobalProgress()}% concluído</div>
+    `;
+    content.appendChild(header);
 
-    JORNADA_BLOCKS.forEach((block, bIdx) => {
-      const bloco = document.createElement('div');
-      bloco.className = 'j-bloco';
-      bloco.dataset.bloco = String(bIdx);
-      bloco.dataset.video = block.video_after || '';
-      bloco.style.display = bIdx === JC.currentBloco ? 'block' : 'none';
+    // PERGAMINHO
+    const pergaminho = document.createElement('div');
+    pergaminho.className = 'pergaminho-container';
+    content.appendChild(pergaminho);
 
-      if (block.title) {
-        const title = document.createElement('h3');
-        title.className = 'pergunta-enunciado text';
-        title.dataset.i18n = block.data_i18n;
-        title.dataset.typing = 'true';
-        title.dataset.speed = '36';
-        title.dataset.cursor = 'true';
-        title.textContent = block.title;
-        bloco.appendChild(title);
+    pergaminho.innerHTML = `
+      <div class="jp-question-display">
+        <div class="jp-question-typed" id="question-display"></div>
+      </div>
+
+      <div class="jp-answer-container">
+        <div class="jp-answer-frame">
+          <div class="jp-answer-bg"></div>
+          <textarea class="jp-answer-input" id="answer-input" 
+                    placeholder="Digite com verdade e calma..." maxlength="1000"></textarea>
+        </div>
+      </div>
+
+      <div class="jp-ai-feedback" id="ai-feedback">
+        <div class="jp-ai-text" id="ai-text"></div>
+      </div>
+
+      <div class="perguntas-controls">
+        <button class="btn-perguntas" id="btn-speak">Falar</button>
+        <button class="btn-perguntas" id="btn-read">Ler</button>
+        <button class="btn-perguntas btn-confirm" id="btn-next">
+          ${JC.currentPergunta < block.questions.length - 1 ? 'Próxima' : 'Concluir'}
+        </button>
+      </div>
+    `;
+
+    // RESPOSTA SALVA
+    const saved = loadAnswer(JC.currentBloco, JC.currentPergunta);
+    const input = document.getElementById('answer-input');
+    if (saved) input.value = saved;
+
+    // DATILOGRAFIA
+    await paperTypeText(document.getElementById('question-display'), perguntaTexto, 38);
+
+    // LEITURA POR VOZ
+    document.getElementById('btn-read').onclick = () => {
+      if ('speechSynthesis' in window) {
+        const utter = new SpeechSynthesisUtterance(perguntaTexto);
+        utter.lang = i18n.lang || 'pt-BR';
+        utter.rate = 0.9;
+        window.speechSynthesis.speak(utter);
+      }
+    };
+
+    // PRÓXIMA
+    document.getElementById('btn-next').onclick = async () => {
+      const resposta = input.value.trim();
+      if (!resposta && JC.currentPergunta < block.questions.length - 1) {
+        win.toast?.('Escreva sua resposta antes de avançar.');
+        return;
       }
 
-      block.questions.forEach((q, qIdx) => {
-        const div = document.createElement('div');
-        div.className = 'j-pergunta';
-        div.dataset.perguntaId = `${block.id}-${qIdx}`;
-        div.style.display = (bIdx === JC.currentBloco && qIdx === JC.currentPergunta) ? 'block' : 'none';
-        div.innerHTML = `
-          <label class="pergunta-enunciado text" data-i18n="${q.data_i18n}" data-typing="true" data-speed="36" data-cursor="true">${q.label}</label>
-          <textarea rows="4" class="input" data-i18n-placeholder="resposta_placeholder" placeholder="Digite sua resposta..."></textarea>
-          <div class="accessibility-controls">
-            <button class="btn-mic" data-action="start-mic">🎤 Falar Resposta</button>
-            <button class="btn-audio" data-action="read-question">🔊 Ler Pergunta</button>
-            <button class="btn btn-avancar" data-action="avancar" data-question-id="${block.id}-${qIdx}" data-i18n="btn-avancar">Avançar</button>
-          </div>
-        `;
-        bloco.appendChild(div);
-      });
+      saveAnswer(JC.currentBloco, JC.currentPergunta, resposta);
 
-      content.appendChild(bloco);
-    });
-
-    if (i18n.ready) {
-      i18n.apply(content);
-    } else {
-      console.warn('[JORNADA_PAPER] i18n não pronto, pulando i18n.apply');
-    }
-
-    const currentBloco = content.querySelector(`[data-bloco="${JC.currentBloco}"]`);
-    if (currentBloco) {
-      currentBloco.style.display = 'block';
-      const curId = `${JORNADA_BLOCKS[JC.currentBloco]?.id || 'b'}-${JC.currentPergunta}`;
-      const currentPergunta = currentBloco.querySelector(`[data-perguntaId="${curId}"]`);
-      if (currentPergunta) {
-        currentPergunta.style.display = 'block';
-        currentPergunta.classList.add('active');
-        setTimeout(() => {
-          log('Iniciando typeQuestionsSequentially para bloco', JC.currentBloco);
-          typeQuestionsSequentially(currentBloco);
-        }, 100);
+      // FEEDBACK IA
+      if (resposta && (win.JC?.api?.grok || win.JC?.api?.openai)) {
+        const feedbackEl = document.getElementById('ai-feedback');
+        const textEl = document.getElementById('ai-text');
+        feedbackEl.classList.remove('active');
+        textEl.textContent = 'A luz reflete...';
+        feedbackEl.classList.add('active');
+        const feedback = await gerarFeedbackIA(resposta, perguntaTexto);
+        textEl.textContent = feedback;
       }
-    }
 
-    log('Perguntas renderizadas, total de blocos:', JORNADA_BLOCKS.length);
-  }
-
-  // ===== eventos =====
-  function initPaperQAEvents() {
-    document.addEventListener('click', (ev) => {
-      const btn = ev.target.closest('[data-action="read-question"]');
-      if (!btn) return;
-      const pergunta = btn.closest('.j-pergunta')?.querySelector('[data-i18n]');
-      if (!pergunta) return;
-      const key = pergunta.dataset.i18n;
-      const text = i18n.t(key, pergunta.textContent);
-      if ('speechSynthesis' in global) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = i18n.lang || 'pt-BR';
-        global.speechSynthesis.speak(utterance);
+      // AVANÇA
+      if (JC.currentPergunta < block.questions.length - 1) {
+        JC.currentPergunta++;
+      } else if (JC.currentBloco < JORNADA_BLOCKS.length - 1) {
+        JC.currentBloco++;
+        JC.currentPergunta = 0;
+        const nextVideo = JORNADA_BLOCKS[JC.currentBloco - 1]?.video_after;
+        if (nextVideo) loadVideo(nextVideo);
       } else {
-        console.warn('[JORNADA_PAPER] SpeechSynthesis não suportado');
+        document.dispatchEvent(new CustomEvent('qa:completed'));
+        return;
       }
-    });
 
-    document.addEventListener('click', (ev) => {
-      const btn = ev.target.closest('[data-action="start-mic"]');
-      if (!btn) return;
-      log('Microfone acionado (funcionalidade não implementada)');
-      global.toast && global.toast('Microfone não implementado ainda.');
-    });
+      win.JC = JC;
+      renderQuestions();
+    };
 
-    const skipVideoButton = document.querySelector('#skipVideo');
-    if (skipVideoButton) {
-      skipVideoButton.addEventListener('click', () => {
-        log('Vídeo pulado');
-        document.dispatchEvent(new CustomEvent('videoSkipped'));
-      });
-    }
+    log('Pergunta renderizada com sucesso');
   }
 
-  // ===== init =====
+  // ===== INIT =====
   async function loadDynamicBlocks() {
     try {
       await i18n.waitForReady(10000);
-      if (!i18n.ready) throw new Error('i18n não inicializado');
-
       const lang = i18n.lang || 'pt-BR';
       const base = blockTranslations[lang] || blockTranslations['pt-BR'];
-      JORNADA_BLOCKS = base.map(block => ({
-        id: block.id,
-        title: block.title,
-        data_i18n: block.data_i18n,
-        questions: block.questions,
-        video_after: block.video_after,
+      JORNADA_BLOCKS = base.map(b => ({
+        id: b.id,
+        title: b.title,
+        data_i18n: b.data_i18n,
+        questions: b.questions,
+        video_after: b.video_after,
         tipo: 'perguntas'
       }));
-
-      global.JORNADA_BLOCKS = JORNADA_BLOCKS;
-      log('JORNADA_BLOCKS preenchido:', JORNADA_BLOCKS);
+      win.JORNADA_BLOCKS = JORNADA_BLOCKS;
+      log('Blocos carregados:', JORNADA_BLOCKS.length);
       return true;
-    } catch (error) {
-      console.error('[JORNADA_PAPER] Erro ao preencher JORNADA_BLOCKS:', error);
-      JORNADA_BLOCKS = [];
-      global.JORNADA_BLOCKS = [];
-      global.toast && global.toast('Erro ao carregar blocos de perguntas');
+    } catch (e) {
+      warn('Erro ao carregar blocos:', e);
       return false;
     }
   }
 
   async function initPaperQA() {
-    try {
-      await loadDynamicBlocks();
-      console.log('[JORNADA_PAPER] Inicializado com sucesso');
-    } catch (error) {
-      console.error('[JORNADA_PAPER] Erro na inicialização:', error && error.message);
-      global.JORNADA_BLOCKS = [];
-    }
+    await loadDynamicBlocks();
   }
 
-  // Bootstrap de eventos/estado
   document.addEventListener('DOMContentLoaded', () => {
     initPaperQA();
-    initPaperQAEvents();
   });
 
-  // API global
-  global.JPaperQA = {
+  // FORÇA DEV
+  if (location.hostname === 'localhost' || location.hostname.includes('render')) {
+    setTimeout(async () => {
+      if (!win.JORNADA_BLOCKS?.length && win.JPaperQA?.loadDynamicBlocks) {
+        log('Auto-iniciando blocos em dev...');
+        await win.JPaperQA.loadDynamicBlocks();
+      }
+    }, 500);
+  }
+
+  // API GLOBAL
+  win.JPaperQA = {
     loadDynamicBlocks,
     renderQuestions,
     loadVideo,
     setPergaminho,
     ensureCanvas,
-    typeQuestionsSequentially,
-    typePlaceholder,
-    initEvents: initPaperQAEvents,
     init: initPaperQA
   };
 
-  log('Script jornada-paper-qa.js carregado com sucesso');
+  log('jornada-paper-qa.js carregado com sucesso (usando window)');
 })(window);
