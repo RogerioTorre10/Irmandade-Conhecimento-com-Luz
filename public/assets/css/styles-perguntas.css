@@ -119,31 +119,30 @@
 }
 #videoOverlay {
   position: fixed !important;
-  top: 0; left: 0;
-  width: 100vw !important;
-  height: 100vh !important;
-  background: rgba(0,0,0,0.98) !important;
+  top: 0 !important; left: 0 !important;
+  width: 100vw !important; height: 100vh !important;
+  background: rgba(0, 0, 0, 0.98) !important;
   display: flex !important;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999 !important;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.6s ease;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 99999 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.6s ease !important;
 }
 
-#videoOverlay.active,
-#videoOverlay[style*="flex"] {
+#videoOverlay[style*="flex"],
+#videoOverlay.active {
   opacity: 1 !important;
   pointer-events: all !important;
 }
 
 #videoTransicao {
-  max-width: 95% !important;
-  max-height: 95% !important;
-  border: 8px solid #d4af37;
-  border-radius: 12px;
-  box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
+  max-width: 94% !important;
+  max-height: 94% !important;
+  border: 10px solid #d4af37 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 0 40px rgba(212, 175, 55, 0.8) !important;
 }
 
 /* Botões com textura de pedra */
