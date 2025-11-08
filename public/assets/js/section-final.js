@@ -16,50 +16,28 @@
     hqUrl: null,
   };
 
-  // Aguarda fim de possível transição com vídeo (se seu motor usar esse lock/evento)
-  async function waitForTransitionUnlock(timeoutMs = 15000) {
-    if (!window.__TRANSITION_LOCK) return;
+  // ---------- Helpers básicos ----------
 
-    let resolved = false;
-
-    const p = new Promise((resolve) => {
-      const onEnd = () => {
-        if (resolved) return;
-        resolved = true;
-        document.removeEventListener('transition:ended', onEnd);
-        resolve();
-      };
-      document.addEventListener('transition:ended', onEnd, { once: true });
-    });
-
-    const t = new Promise((resolve) => {
-      setTimeout(() => {
-        if (!resolved) {
-          resolved = true;
-          resolve();
-        }
-      }, timeoutMs);
-    });
-
-    await Promise.race([p, t]);
-  }
-
-  // Base da API (configurável)
   function apiBase() {
-    return (
-      window.APP_CONFIG?.API_BASE ||
-      window.API?.BASE_URL ||
-      '/api'
-    );
+    // Ordem de prioridade:
+    // 1) APP_CONFIG.API_BASE definido no HTML
+    // 2) window.API.BASE_URL se existir
+    // 3) Fallback explícito para o backend no Render
+    const base =
+      (window.APP_CONFIG && window.APP_CONFIG.API_BASE) ||
+      (window.API && window.API.BASE_URL) ||
+      'https://lumen-backend-api.onrender.com';
+
+    return String(base).replace(/\/+$/, '');
   }
 
-  // Monta o pacote enviado para gerar PDF/HQ
   function payload() {
-    const guia = window.JC?.state?.guia || {};
+    const guia = (window.JC && window.JC.state && window.JC.state.guia) || {};
     const selfie = window.__SELFIE_DATA_URL__ || null;
     const answers = window.__QA_ANSWERS__ || null;
     const meta = window.__QA_META__ || {};
-    const lang = (window.i18n && (window.i18n.lang || window.i18n.language)) || 'pt';
+    const lang =
+      (window.i18n && (window.i18n.lang || window.i18n.language)) || 'pt-BR';
     const timeNow = new Date().toISOString();
 
     return {
@@ -69,11 +47,44 @@
       meta,
       lang,
       completedAt: timeNow,
-      appVersion: window.APP_CONFIG?.version || 'v1',
+      appVersion: (window.APP_CONFIG && window.APP_CONFIG.version) || 'v1',
     };
   }
 
-  // Gera (ou tenta gerar) PDF/HQ
+  function enableDownloadButton(enabled) {
+    const btn = $(BTN_DL_SEL);
+    if (btn) btn.disabled = !enabled;
+  }
+
+  function triggerDownload(url, filename) {
+    if (!url) return;
+    try {
+      const a = document.createElement('a');
+      a.href = url;
+      if (filename) a.download = filename;
+      a.rel = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (e) {
+      console.warn(`[${MOD}] Falha no download direto, abrindo em nova aba.`, e);
+      window.open(url, '_blank', 'noopener');
+    }
+  }
+
+  function downloadAll() {
+    if (S.pdfUrl) triggerDownload(S.pdfUrl, 'jornada-conhecimento-com-luz.pdf');
+    if (S.hqUrl) triggerDownload(S.hqUrl, 'hq-irmandade.zip');
+
+    if (!S.pdfUrl && !S.hqUrl) {
+      (window.toast || console.log)(
+        'Ainda não há arquivos disponíveis para baixar.'
+      );
+    }
+  }
+
+  // ---------- Geração de PDF/HQ ----------
+
   async function generateArtifacts() {
     if (S.generating) return;
     S.generating = true;
@@ -81,17 +92,17 @@
     try {
       const body = payload();
 
-      // Preferência para helper custom se existir
-      if (window.API?.gerarPDFHQ) {
+      // 1) Se existir helper custom, usa ele
+      if (window.API && typeof window.API.gerarPDFHQ === 'function') {
         const res = await window.API.gerarPDFHQ(body);
-        S.pdfUrl = res?.pdfUrl || null;
-        S.hqUrl = res?.hqUrl || null;
+        S.pdfUrl = res && res.pdfUrl;
+        S.hqUrl = res && res.hqUrl;
       } else {
-        // Fallback: POST padrão
-        const base = apiBase().replace(/\/+$/, '');
-        const url = base + '/jornada/finalizar';
+        // 2) Fallback padrão: POST no backend
+        const base = apiBase();
+        const url = `${base}/jornada/finalizar`;
 
-        console.log(`[${MOD}] Chamando API final:`, url);
+        console.log(`[${MOD}] Chamando API final: ${url}`);
 
         const r = await fetch(url, {
           method: 'POST',
@@ -104,100 +115,83 @@
         }
 
         const data = await r.json().catch(() => ({}));
-        S.pdfUrl = data?.pdfUrl || null;
-        S.hqUrl = data?.hqUrl || null;
+        S.pdfUrl = data && data.pdfUrl;
+        S.hqUrl = data && data.hqUrl;
       }
 
-      // Se a API não retornar links, gera JSON local como fallback simbólico
+      // 3) Se mesmo assim não vier link, gera JSON local de fallback
       if (!S.pdfUrl && !S.hqUrl) {
-        console.warn(`[${MOD}] Nenhum link recebido da API; gerando JSON local de fallback.`);
-        const blob = new Blob(
-          [JSON.stringify(body, null, 2)],
-          { type: 'application/json' }
+        console.warn(
+          `[${MOD}] Nenhum link recebido da API; gerando arquivo local de fallback.`
         );
+        const blob = new Blob([JSON.stringify(body, null, 2)], {
+          type: 'application/json',
+        });
         S.pdfUrl = URL.createObjectURL(blob);
       }
 
-      window.toast?.('Sua devolutiva está pronta para download.');
+      (window.toast || console.log)(
+        'Sua devolutiva está pronta para download.'
+      );
       enableDownloadButton(true);
     } catch (e) {
-      console.error('[FINAL] Falha ao gerar PDF/HQ:', e);
-      window.toast?.('Não foi possível gerar os arquivos agora. Tente novamente mais tarde.');
+      console.error(`[${MOD}] Falha ao gerar PDF/HQ:`, e);
+      (window.toast || console.log)(
+        'Não foi possível gerar os arquivos agora. Tente novamente mais tarde.'
+      );
       enableDownloadButton(false);
     } finally {
       S.generating = false;
     }
   }
 
-  function enableDownloadButton(enabled) {
-    const btn = $(BTN_DL_SEL);
-    if (btn) btn.disabled = !enabled;
-  }
+  // ---------- Finalizar jornada ----------
 
-  function downloadAll() {
-    if (S.pdfUrl) triggerDownload(S.pdfUrl, 'jornada-conhecimento-com-luz.pdf');
-    if (S.hqUrl) triggerDownload(S.hqUrl, 'hq-irmandade.zip');
-
-    if (!S.pdfUrl && !S.hqUrl) {
-      window.toast?.('Ainda não há arquivos disponíveis para baixar.');
-    }
-  }
-
-  function triggerDownload(url, filename) {
-    if (!url) return;
-    try {
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename || '';
-      a.rel = 'noopener';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    } catch (e) {
-      console.warn('[FINAL] Download direto falhou; abrindo em nova aba:', e);
-      window.open(url, '_blank', 'noopener');
-    }
-  }
-
-  // Detecta função global de transição de vídeo usada no resto da jornada
   function getTransitionFn() {
-    if (typeof window.playVideoTransition === 'function') return window.playVideoTransition;
-    if (typeof window.playTransitionThenGo === 'function') return window.playTransitionThenGo;
+    if (typeof window.playVideoTransition === 'function')
+      return window.playVideoTransition;
+    if (typeof window.playTransitionThenGo === 'function')
+      return window.playTransitionThenGo;
     return null;
   }
 
   function finishFlow() {
     try {
-      // Se quiser limpar dados locais depois da finalização, descomente:
+      // Se quiser limpar estado sensível após o fim:
       // delete window.__SELFIE_DATA_URL__;
       // delete window.__QA_ANSWERS__;
       // delete window.__QA_META__;
     } catch (e) {
-      console.warn('[FINAL] Erro ao limpar estado local:', e);
+      console.warn(`[${MOD}] Erro ao limpar estado local:`, e);
     }
 
     const fn = getTransitionFn();
     const hasNext = !!document.getElementById(NEXT_SECTION_ID);
 
-    // 1) Se tiver função de vídeo + fonte, usa filme final + volta para home
+    // 1) Encerrar com vídeo final se disponível
     if (fn && VIDEO_SRC && hasNext) {
-      console.log(`[${MOD}] Encerrando com vídeo final:`, VIDEO_SRC, '→', NEXT_SECTION_ID);
+      console.log(
+        `[${MOD}] Encerrando com vídeo final ${VIDEO_SRC} → ${NEXT_SECTION_ID}`
+      );
       try {
         fn(VIDEO_SRC, NEXT_SECTION_ID);
         return;
       } catch (e) {
-        console.error('[FINAL] Erro na transição com vídeo final:', e);
+        console.error(
+          `[${MOD}] Erro na transição com vídeo final, usando fallback:`,
+          e
+        );
       }
     }
 
-    // 2) Sem vídeo ou falhou: usa controlador da jornada
-    if (window.JC?.finish) {
+    // 2) Sem vídeo ou falhou: utiliza controlador oficial
+    if (window.JC && typeof window.JC.finish === 'function') {
       console.log(`[${MOD}] Encerrando via JC.finish()`);
       window.JC.finish();
       return;
     }
 
-    if (window.JC?.show && hasNext) {
+    if (window.JC && typeof window.JC.show === 'function' && hasNext) {
       console.log(`[${MOD}] Encerrando via JC.show(${NEXT_SECTION_ID})`);
       window.JC.show(NEXT_SECTION_ID);
       return;
@@ -209,12 +203,14 @@
       return;
     }
 
-    // 3) Último recurso: âncora
+    // 3) Último recurso: ancora
     if (hasNext) {
       console.log(`[${MOD}] Encerrando via hash #${NEXT_SECTION_ID}`);
       window.location.hash = `#${NEXT_SECTION_ID}`;
     }
   }
+
+  // ---------- Bind da seção final ----------
 
   async function bindSection(node) {
     const btnDl = $(BTN_DL_SEL, node);
@@ -235,31 +231,33 @@
       });
     }
 
-    // Garante que qualquer transição anterior terminou antes de disparar geração
-    await waitForTransitionUnlock();
     enableDownloadButton(false);
 
-    // Gera automaticamente assim que a seção final é exibida
+    // Geração automática quando entrar na seção final
     generateArtifacts();
   }
 
-  // Quando o controlador carregar a section-final
+  // Chamado pelo controlador quando a section-final é exibida
   document.addEventListener('sectionLoaded', (e) => {
-    if (e?.detail?.sectionId !== SECTION_ID) return;
+    if (!e || e.detail?.sectionId !== SECTION_ID) return;
     const node = e.detail.node || document.getElementById(SECTION_ID);
     if (!node) return;
     bindSection(node);
   });
 
-  // Fallback: se abrir direto na final (hash, etc.)
+  // Fallback: se já estiver ativa ao carregar
   document.addEventListener('DOMContentLoaded', () => {
     const sec = document.getElementById(SECTION_ID);
-    if (sec && (sec.classList.contains('active') || window.__currentSectionId === SECTION_ID)) {
+    if (
+      sec &&
+      (sec.classList.contains('active') ||
+        window.__currentSectionId === SECTION_ID)
+    ) {
       bindSection(sec);
     }
   });
 
-  // Exposição para debug manual no console
+  // Debug manual
   window.JFinal = {
     generate: generateArtifacts,
     download: downloadAll,
