@@ -108,7 +108,19 @@
   object-fit: contain !important;
   box-shadow: 0 0 30px rgba(212,175,55,0.7) !important;
 `;
+// Remove camadas antigas
+video.querySelectorAll('.flame-glow').forEach(el => el.remove());
 
+// Cria camada de brilho pulsante
+const glow = document.createElement('div');
+glow.className = 'flame-glow';
+video.appendChild(glow);
+
+// Força animação
+requestAnimationFrame(() => {
+  video.classList.add('flame-active');
+});
+    
   // Remove qualquer outro conteúdo visível
   document.body.style.overflow = 'hidden';
   document.querySelectorAll('section, div, header, footer').forEach(el => {
