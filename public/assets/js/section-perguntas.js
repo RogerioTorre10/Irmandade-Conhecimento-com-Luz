@@ -97,14 +97,16 @@
   `;
 
   video.style.cssText = `
-  width: 94vw !important;
+  width: 92vw !important;
   height: auto !important;
-  max-width: 94vw !important;
-  max-height: 90vh !important;
+  max-width: 92vw !important;
+  max-height: 88vh !important;
   border: 8px solid #d4af37 !important;
-  border-radius: 12px !important;
-  box-shadow: 0 0 30px rgba(212,175,55,0.7) !important;
+  border-radius: 16px !important;
+  position: relative !important;
+  overflow: hidden !important;
   object-fit: contain !important;
+  box-shadow: 0 0 30px rgba(212,175,55,0.7) !important;
 `;
 
   // Remove qualquer outro conteúdo visível
