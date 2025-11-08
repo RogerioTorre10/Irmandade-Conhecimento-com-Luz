@@ -52,50 +52,37 @@
     return url;
   }
 
+    // Usa a mesma função global do video-transicao.js
+  function getTransitionFn() {
+    if (typeof window.playTransitionThenGo === 'function') return window.playTransitionThenGo;
+    if (typeof window.playVideoTransition === 'function') return window.playVideoTransition;
+    return null;
+  }
+
   function callPlayTransition(videoSrc, nextSectionId, onDone) {
-    const fn = window.playTransitionThenGo;
-    const hasFn = typeof fn === 'function';
+    const fn = getTransitionFn();
+    if (!fn) return false;
+
     const src = resolveVideoSrc(videoSrc);
 
-    if (!hasFn) return false;
-
     try {
-      // Tenta deduzir assinatura:
-      // 2+ args: (src, nextSectionId)
-      // 1 arg: (nextSectionId) ou (src) dependendo da sua implementação atual
-      if (fn.length >= 2 && src) {
-        log('playTransitionThenGo(src, next):', src, '→', nextSectionId);
-        fn(src, nextSectionId);
-      } else if (fn.length === 1) {
-        // Ambíguo: prioriza nextSectionId se existir
-        if (nextSectionId) {
-          log('playTransitionThenGo(nextSectionId):', nextSectionId);
-          fn(nextSectionId);
-        } else if (src) {
-          log('playTransitionThenGo(src):', src);
-          fn(src);
-        } else {
-          log('playTransitionThenGo(FINAL_SECTION_ID fallback):', FINAL_SECTION_ID);
-          fn(FINAL_SECTION_ID);
-        }
-      } else {
-        // Assinatura estranha → tenta só com nextSectionId
-        log('playTransitionThenGo (genérico) →', nextSectionId || FINAL_SECTION_ID);
-        fn(nextSectionId || FINAL_SECTION_ID);
-      }
+      // video-transicao.js (pelo log) recebe: src + nextSectionId
+      fn(src, nextSectionId);
 
       if (typeof onDone === 'function') {
-        // Fallback temporal: garante continuidade após o vídeo.
-        // Ajuste se seus filmes tiverem duração bem diferente.
-        setTimeout(() => { if (!completed) onDone(); }, 6500);
+        // margem de segurança até o fim do filme
+        setTimeout(() => {
+          if (!completed) onDone();
+        }, 6500);
       }
 
       return true;
     } catch (e) {
-      err('Erro em playTransitionThenGo:', e);
+      err('Erro em playTransitionThenGo/playVideoTransition:', e);
       return false;
     }
   }
+
 
   function playBlockTransition(videoSrc, onDone) {
     const src = resolveVideoSrc(videoSrc);
