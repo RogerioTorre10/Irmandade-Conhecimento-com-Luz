@@ -1,4 +1,4 @@
-/* /assets/js/section-perguntas.js — v3.0 FINAL
+/* /assets/js/section-perguntas.js — v3.0 FINAL CORRIGIDO
    - Remove qualquer bloqueio de "card confirmado"
    - Usa window.JPaperQA como fonte oficial das perguntas
    - Mantém fallback via evento qa:start (sem alarmismo)
@@ -17,13 +17,7 @@
   const warn = (...a) => console.warn('[PERGUNTAS]', ...a);
   const err  = (...a) => console.error('[PERGUNTAS]', ...a);
   const $    = (sel, root = document) => root.querySelector(sel);
-  
-  JPaperQA.loadDynamicBlocks().then(() => {
-  console.log('[PERGUNTAS] Blocos carregados, iniciando renderização...');
-  window.JC = window.JC || { currentBloco: 0, currentPergunta: 0 };
-  JPaperQA.renderQuestions();
- });
-   
+
   const State = {
     mounted: false,
     running: false,
@@ -31,37 +25,27 @@
     meta: null,
   };
 
-  // -------------------------------
-  // Navegação para a próxima seção
-  // -------------------------------
   function goNext() {
-    // 1) Preferir vídeo de transição configurado
     if (typeof window.playTransitionVideo === 'function' && VIDEO_SRC) {
       window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
       return;
     }
 
-    // 2) Usar controlador geral da jornada
     if (window.JC?.goNext) {
       window.JC.goNext();
       return;
     }
 
-    // 3) Fallback por ID
     if (typeof window.showSection === 'function' && document.getElementById(NEXT_SECTION_ID)) {
       window.showSection(NEXT_SECTION_ID);
       return;
     }
 
-    // 4) Último recurso: só notifica conclusão
     document.dispatchEvent(new CustomEvent('qa:completed', {
       detail: { answers: State.answers, meta: State.meta }
     }));
   }
 
-  // --------------------------------------
-  // Helper opcional: aguardar transições
-  // --------------------------------------
   async function waitForTransitionUnlock(timeoutMs = 15000) {
     try {
       if (!window.__TRANSITION_LOCK) return;
@@ -81,29 +65,17 @@
 
       const t = new Promise(resolve => setTimeout(resolve, timeoutMs));
       await Promise.race([p, t]);
-    } catch {
-      // qualquer erro aqui é ignorado para não travar o fluxo
-    }
+    } catch {}
   }
 
-  // --------------------------------------
-  // Descobrir API das perguntas
-  // --------------------------------------
   function getPaperApi() {
-    // Padrão oficial da Jornada:
     if (window.JPaperQA) return window.JPaperQA;
-
-    // Fallbacks se em algum momento você expor com outro nome:
     if (window.JCPaperQA) return window.JCPaperQA;
     if (window.JornadaPaperQA) return window.JornadaPaperQA;
     if (window.PaperQA) return window.PaperQA;
-
     return null;
   }
 
-  // -------------------------------
-  // Inicialização do bloco de Q&A
-  // -------------------------------
   async function startQA(root) {
     if (!root) {
       warn('Root para perguntas não encontrado.');
@@ -127,9 +99,7 @@
       guia,
       selfie,
       i18n: window.i18n || null,
-      onProgress: () => {
-        // hook opcional para barra de progresso no futuro
-      },
+      onProgress: () => {},
       onComplete: (result) => {
         try {
           const finishedAt = new Date().toISOString();
@@ -143,7 +113,6 @@
             version: window.APP_CONFIG?.version || 'v1'
           };
 
-          // Exporta para a jornada-final/pdf/hq
           window.__QA_ANSWERS__ = State.answers;
           window.__QA_META__    = State.meta;
 
@@ -181,7 +150,6 @@
           await api.begin();
         }
       } else {
-        // Fluxo padrão: JornadaPaperQA não está em uso direto, então avisa via evento.
         log('API direta não encontrada. Disparando evento qa:start (fluxo padrão da Jornada).');
         document.dispatchEvent(new CustomEvent('qa:start', { detail: opts }));
       }
@@ -193,9 +161,6 @@
     }
   }
 
-  // -------------------------------
-  // Bind da seção às events da jornada
-  // -------------------------------
   function bindSection(node) {
     if (State.mounted) {
       log('Seção perguntas já montada; ignorando novo bind.');
@@ -213,14 +178,12 @@
     startQA(root);
   }
 
-  // Chamado quando o controlador carregar a seção
   document.addEventListener('sectionLoaded', (e) => {
     if (!e?.detail || e.detail.sectionId !== SECTION_ID) return;
     const node = e.detail.node || document.getElementById(SECTION_ID);
     bindSection(node);
   });
 
-  // Segurança extra: se a página já veio com a seção carregada
   document.addEventListener('DOMContentLoaded', () => {
     const sec = document.getElementById(SECTION_ID);
     if (sec && !State.mounted) {
@@ -228,7 +191,6 @@
     }
   });
 
-  // API pública opcional para debug
   window.JPerguntas = {
     reset() {
       State.mounted = false;
