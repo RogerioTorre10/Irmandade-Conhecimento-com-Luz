@@ -83,36 +83,80 @@
   }
 
   function playVideoWithCallback(src, onEnded) {
-    src = resolveVideoSrc(src);
-    if (!src) {
-      if (typeof onEnded === 'function') onEnded();
-      return;
-    }
-
-    const { overlay, video } = ensureVideoOverlay();
-
-    overlay.style.display = 'flex';
-    setTimeout(() => overlay.style.opacity = '1', 50);
-
-    video.src = src;
-    video.load();
-
-    const endHandler = () => {
-      video.onended = null;
-      overlay.style.opacity = '0';
-      setTimeout(() => {
-        overlay.style.display = 'none';
-        if (typeof onEnded === 'function') onEnded();
-      }, 600);
-    };
-
-    video.onended = endHandler;
-
-    video.play().catch(e => {
-      console.error('[PERGUNTAS] Erro ao tocar vídeo:', e);
-      endHandler();
-    });
+  src = resolveVideoSrc(src);
+  if (!src) {
+    if (typeof onEnded === 'function') onEnded();
+    return;
   }
+
+  const { overlay, video } = ensureVideoOverlay();
+
+  // FORÇA ESTILO INLINE (ignora tudo)
+  overlay.style.cssText = `
+    position: fixed !important;
+    top: 0 !important; left: 0 !important;
+    width: 100vw !important; height: 100vh !important;
+    background: rgba(0,0,0,0.98) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 99999 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.6s ease !important;
+  `;
+
+  video.style.cssText = `
+    max-width: 94% !important;
+    max-height: 94% !important;
+    border: 10px solid #d4af37 !important;
+    border-radius: 16px !important;
+    box-shadow: 0 0 40px rgba(212,175,55,0.8) !important;
+  `;
+
+  // Remove qualquer outro conteúdo visível
+  document.body.style.overflow = 'hidden';
+  document.querySelectorAll('section, div, header, footer').forEach(el => {
+    if (el.id !== 'videoOverlay') {
+      el.style.display = 'none';
+    }
+  });
+
+  // Mostra overlay
+  overlay.style.display = 'flex';
+  overlay.style.pointerEvents = 'all';
+
+  // Força render antes de opacity
+  requestAnimationFrame(() => {
+    overlay.style.opacity = '1';
+  });
+
+  video.src = src;
+  video.load();
+
+  const endHandler = () => {
+    video.onended = null;
+    overlay.style.opacity = '0';
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      // Restaura visibilidade
+      document.body.style.overflow = '';
+      document.querySelectorAll('section, div, header, footer').forEach(el => {
+        if (el.id !== 'videoOverlay') {
+          el.style.display = '';
+        }
+      });
+      if (typeof onEnded === 'function') onEnded();
+    }, 600);
+  };
+
+  video.onended = endHandler;
+
+  video.play().catch(e => {
+    console.error('[PERGUNTAS] Erro ao tocar vídeo:', e);
+    endHandler();
+  });
+}
 
   window.playBlockTransition = function(videoSrc, onDone) {
     const src = resolveVideoSrc(videoSrc);
