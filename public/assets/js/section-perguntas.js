@@ -236,7 +236,7 @@
     }
   }
 
-  function nextStep() {
+    function nextStep() {
     if (completed) {
       log('nextStep chamado após conclusão; ignorando.');
       return;
@@ -252,29 +252,39 @@
     const isLastInBloco = State.qIdx >= blocoTotal - 1;
     const isLastOfAll = State.globalIdx >= State.totalQuestions - 1;
 
+    // Última pergunta de todas → fecha jornada
     if (isLastOfAll) {
       finishAll();
       return;
     }
 
+    // Ainda tem perguntas no geral
+    State.globalIdx++;
+
+    // Se terminou o bloco atual
     if (isLastInBloco) {
-      const video = bloco.video_after;
+      const video = bloco.video_after || bloco.transitionVideo || null;
+
       State.blocoIdx++;
       State.qIdx = 0;
-      if (video && window.JPaperQA?.loadVideo) {
-        try {
-          window.JPaperQA.loadVideo(video);
-        } catch (e) {
-          warn('Erro loadVideo', e);
-        }
+
+      // Tenta rodar filme de transição entre blocos
+      const usouVideo = playBlockTransition(video, () => {
+        // Chama a próxima pergunta só depois do filme
+        showCurrentQuestion();
+      });
+
+      // Se não tiver infra de vídeo, segue direto
+      if (!usouVideo) {
+        showCurrentQuestion();
       }
     } else {
+      // Ainda dentro do mesmo bloco → só vai pra próxima
       State.qIdx++;
+      showCurrentQuestion();
     }
-
-    State.globalIdx++;
-    showCurrentQuestion();
   }
+
 
   function finishAll() {
     if (completed) {
