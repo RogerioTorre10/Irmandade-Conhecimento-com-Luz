@@ -1,17 +1,9 @@
-/* /assets/js/section-perguntas.js — v3.0 FINAL CORRIGIDO
-   - Remove qualquer bloqueio de "card confirmado"
-   - Usa window.JPaperQA como fonte oficial das perguntas
-   - Mantém fallback via evento qa:start (sem alarmismo)
-   - Fluxo: selfie -> card -> perguntas -> final
-*/
-
 (function () {
   'use strict';
 
   const MOD = 'section-perguntas.js';
   const SECTION_ID = 'section-perguntas';
-  const NEXT_SECTION_ID = 'section-final';
-  const VIDEO_SRC = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
+  const FINAL_SECTION_ID = 'section-final';
 
   const log  = (...a) => console.log('[PERGUNTAS]', ...a);
   const warn = (...a) => console.warn('[PERGUNTAS]', ...a);
@@ -20,191 +12,331 @@
 
   const State = {
     mounted: false,
-    running: false,
-    answers: null,
+    loading: false,
+    answers: {},
     meta: null,
+    blocks: [],
+    totalBlocks: 0,
+    totalQuestions: 0,
+    blocoIdx: 0,
+    qIdx: 0,
+    globalIdx: 0,
+    startedAt: null
   };
 
-  function goNext() {
-    if (typeof window.playTransitionVideo === 'function' && VIDEO_SRC) {
-      window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
+  // ---------- DATA (JORNADA_BLOCKS) ----------
+  async function ensureBlocks() {
+    if (Array.isArray(window.JORNADA_BLOCKS) && window.JORNADA_BLOCKS.length) {
+      State.blocks = window.JORNADA_BLOCKS;
       return;
     }
-
-    if (window.JC?.goNext) {
-      window.JC.goNext();
-      return;
+    if (window.JPaperQA?.loadDynamicBlocks) {
+      await window.JPaperQA.loadDynamicBlocks();
+      State.blocks = window.JORNADA_BLOCKS || [];
     }
-
-    if (typeof window.showSection === 'function' && document.getElementById(NEXT_SECTION_ID)) {
-      window.showSection(NEXT_SECTION_ID);
-      return;
-    }
-
-    document.dispatchEvent(new CustomEvent('qa:completed', {
-      detail: { answers: State.answers, meta: State.meta }
-    }));
   }
 
-  async function waitForTransitionUnlock(timeoutMs = 15000) {
-    try {
-      if (!window.__TRANSITION_LOCK) return;
-
-      let resolved = false;
-
-      const p = new Promise(resolve => {
-        const onEnd = () => {
-          if (!resolved) {
-            resolved = true;
-            document.removeEventListener('transition:ended', onEnd);
-            resolve();
-          }
-        };
-        document.addEventListener('transition:ended', onEnd, { once: true });
-      });
-
-      const t = new Promise(resolve => setTimeout(resolve, timeoutMs));
-      await Promise.race([p, t]);
-    } catch {}
+  function computeTotals() {
+    State.totalBlocks = State.blocks.length || 5;
+    State.totalQuestions = State.blocks.reduce(
+      (sum, b) => sum + (b.questions?.length || 0),
+      0
+    ) || 50;
   }
 
-  function getPaperApi() {
-    if (window.JPaperQA) return window.JPaperQA;
-    if (window.JCPaperQA) return window.JCPaperQA;
-    if (window.JornadaPaperQA) return window.JornadaPaperQA;
-    if (window.PaperQA) return window.PaperQA;
-    return null;
+  function getCurrent() {
+    const bloco = State.blocks[State.blocoIdx];
+    const pergunta = bloco?.questions?.[State.qIdx] || null;
+    return { bloco, pergunta };
   }
 
-  async function startQA(root) {
-    if (!root) {
-      warn('Root para perguntas não encontrado.');
+  // ---------- UI HELPERS ----------
+  function setText(sel, val) {
+    const el = document.querySelector(sel);
+    if (el) el.textContent = String(val);
+  }
+
+  function setWidth(sel, val) {
+    const el = document.querySelector(sel);
+    if (el) el.style.width = val;
+  }
+
+  function updateCounters() {
+    const { bloco } = getCurrent();
+    const blocoTotal = bloco?.questions?.length || 10;
+
+    setText('#jp-block-num', State.blocoIdx + 1);
+    setText('#jp-block-num-2', State.blocoIdx + 1);
+    setText('#jp-block-max', State.totalBlocks);
+
+    setText('#jp-global-current', State.globalIdx + 1);
+    setText('#jp-global-current-2', State.globalIdx + 1);
+    setText('#jp-global-total', State.totalQuestions);
+    setText('#jp-global-total-2', State.totalQuestions);
+
+    setText('#jp-block-current', State.qIdx + 1);
+    setText('#jp-block-total', blocoTotal);
+
+    const pctBloco = Math.max(0, Math.min(100, ((State.qIdx + 1) / blocoTotal) * 100));
+    const pctGlobal = Math.max(0, Math.min(100, ((State.globalIdx + 1) / State.totalQuestions) * 100));
+
+    setWidth('#jp-block-progress-fill', pctBloco + '%');
+    setWidth('#jp-global-progress-fill', pctGlobal + '%');
+  }
+
+  async function typeQuestion(text) {
+    const box = $('#jp-question-typed');
+    const raw = $('#jp-question-raw');
+    if (!box) return;
+
+    if (raw) raw.textContent = text || '';
+
+    if (window.runTyping) {
+      box.textContent = text;
+      try { await window.runTyping(box); } catch {}
       return;
     }
-    if (State.running) {
-      log('Fluxo QA já em execução, ignorando novo start.');
-      return;
-    }
 
-    State.running = true;
-
-    await waitForTransitionUnlock();
-
-    const guia   = (window.JC?.state?.guia) || {};
-    const selfie = window.__SELFIE_DATA_URL__ || null;
-    const startedAt = new Date().toISOString();
-
-    const opts = {
-      container: root,
-      guia,
-      selfie,
-      i18n: window.i18n || null,
-      onProgress: () => {},
-      onComplete: (result) => {
-        try {
-          const finishedAt = new Date().toISOString();
-
-          State.answers = result?.answers || result || null;
-          State.meta = {
-            startedAt,
-            finishedAt,
-            guia,
-            selfieUsed: !!selfie,
-            version: window.APP_CONFIG?.version || 'v1'
-          };
-
-          window.__QA_ANSWERS__ = State.answers;
-          window.__QA_META__    = State.meta;
-
-          log('QA finalizado. Respostas disponíveis em __QA_ANSWERS__ / __QA_META__.');
-          window.toast?.('Jornada de perguntas concluída!');
-          goNext();
-        } catch (e) {
-          err('Falha ao processar resultado do QA:', e);
-          window.toast?.('Ops, algo falhou ao concluir as perguntas.');
-        } finally {
-          State.running = false;
+    box.textContent = '';
+    let i = 0;
+    const speed = 24;
+    await new Promise(resolve => {
+      const it = setInterval(() => {
+        box.textContent = text.slice(0, i);
+        i++;
+        if (i > text.length) {
+          clearInterval(it);
+          resolve();
         }
+      }, speed);
+    });
+  }
+
+  async function showCurrentQuestion() {
+    const { bloco, pergunta } = getCurrent();
+    const textarea = $('#jp-answer-input');
+    const aiResp = $('#jp-ai-response');
+
+    if (!bloco || !pergunta) {
+      finishAll();
+      return;
+    }
+
+    if (aiResp) {
+      aiResp.hidden = true;
+      aiResp.textContent = '';
+    }
+    if (textarea) {
+      textarea.value = '';
+      textarea.focus();
+    }
+
+    const texto = pergunta.label || '[pergunta]';
+    await typeQuestion(texto);
+    updateCounters();
+
+    if (window.JORNADA_CHAMA?.ensureHeroFlame) {
+      window.JORNADA_CHAMA.ensureHeroFlame(SECTION_ID);
+    }
+  }
+
+  // ---------- RESPOSTA + CHAMA ----------
+  function saveCurrentAnswer() {
+    const { bloco, pergunta } = getCurrent();
+    const textarea = $('#jp-answer-input');
+    if (!bloco || !pergunta || !textarea) return;
+
+    const key = `${bloco.id || ('b'+State.blocoIdx)}:${pergunta.id || ('q'+State.qIdx)}`;
+    const value = (textarea.value || '').trim();
+    State.answers[key] = value;
+
+    if (window.JORNADA_CHAMA && value) {
+      window.JORNADA_CHAMA.updateChamaFromText(value, 'chama-perguntas');
+    }
+  }
+
+  function nextStep() {
+    const { bloco } = getCurrent();
+    if (!bloco) {
+      finishAll();
+      return;
+    }
+
+    const blocoTotal = bloco.questions?.length || 10;
+    const isLastInBloco = State.qIdx >= blocoTotal - 1;
+    const isLastOfAll = State.globalIdx >= State.totalQuestions - 1;
+
+    if (isLastOfAll) {
+      finishAll();
+      return;
+    }
+
+    if (isLastInBloco) {
+      const video = bloco.video_after;
+      State.blocoIdx++;
+      State.qIdx = 0;
+      if (video && window.JPaperQA?.loadVideo) {
+        try { window.JPaperQA.loadVideo(video); } catch(e){ warn('Erro loadVideo', e); }
       }
+    } else {
+      State.qIdx++;
+    }
+
+    State.globalIdx++;
+    showCurrentQuestion();
+  }
+
+  function finishAll() {
+    const finishedAt = new Date().toISOString();
+    const guia = window.JC?.state?.guia || {};
+    const selfie = window.__SELFIE_DATA_URL__ || null;
+
+    State.meta = {
+      startedAt: State.startedAt,
+      finishedAt,
+      guia,
+      selfieUsed: !!selfie,
+      version: window.APP_CONFIG?.version || 'v1'
     };
 
-    try {
-      const api = getPaperApi();
+    window.__QA_ANSWERS__ = State.answers;
+    window.__QA_META__ = State.meta;
 
-      if (api && typeof api.loadDynamicBlocks === 'function') {
-        log('Usando JPaperQA.loadDynamicBlocks');
-        await api.loadDynamicBlocks();
-        window.JC = window.JC || { currentBloco: 0, currentPergunta: 0 };
-        api.renderQuestions();
-      } else if (api && typeof api.mount === 'function') {
-        log('Usando JPaperQA.mount');
-        await api.mount(root, opts);
-      } else if (api && typeof api.start === 'function') {
-        log('Usando JPaperQA.start');
-        await api.start(opts);
-      } else if (api && typeof api.run === 'function') {
-        log('Usando JPaperQA.run');
-        await api.run(opts);
-      } else if (api && typeof api.init === 'function') {
-        log('Usando JPaperQA.init (+begin se existir)');
-        await api.init(opts);
-        if (typeof api.begin === 'function') {
-          await api.begin();
-        }
-      } else {
-        log('API direta não encontrada. Disparando evento qa:start (fluxo padrão da Jornada).');
-        document.dispatchEvent(new CustomEvent('qa:start', { detail: opts }));
-      }
+    log('Jornada de perguntas concluída.', {
+      total: State.totalQuestions,
+      respondidas: Object.keys(State.answers).length
+    });
 
-    } catch (e) {
-      State.running = false;
-      err('Erro ao iniciar QA:', e);
-      window.toast?.('Não foi possível iniciar as perguntas.');
+    if (window.JORNADA_CHAMA) {
+      window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'forte');
+    }
+
+    if (window.JC?.show && document.getElementById(FINAL_SECTION_ID)) {
+      window.JC.show(FINAL_SECTION_ID);
+    } else if (window.showSection && document.getElementById(FINAL_SECTION_ID)) {
+      window.showSection(FINAL_SECTION_ID);
+    } else {
+      document.dispatchEvent(new CustomEvent('qa:completed', {
+        detail: { answers: State.answers, meta: State.meta }
+      }));
     }
   }
 
-  function bindSection(node) {
-    if (State.mounted) {
-      log('Seção perguntas já montada; ignorando novo bind.');
+  // ---------- BIND CONTROLES ----------
+  function bindUI(root) {
+    const btnFalar = $('#jp-btn-falar', root);
+    const btnApagar = $('#jp-btn-apagar', root);
+    const btnConf = $('#jp-btn-confirmar', root);
+    const input = $('#jp-answer-input', root);
+
+    // MIC
+    if (input && window.JORNADA_MICRO) {
+      window.JORNADA_MICRO.attach(input, { mode: 'append' });
+    }
+
+    // chama em tempo real
+    if (input && window.JORNADA_CHAMA) {
+      input.addEventListener('input', () => {
+        const txt = input.value || '';
+        window.JORNADA_CHAMA.updateChamaFromText(txt, 'chama-perguntas');
+      });
+    }
+
+    if (btnFalar && input) {
+      btnFalar.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        if (window.JORNADA_MICRO) {
+          window.JORNADA_MICRO.attach(input, { mode: 'append' });
+        } else {
+          (window.toast || alert)('Reconhecimento de voz não disponível.');
+        }
+      });
+    }
+
+    if (btnApagar && input) {
+      btnApagar.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        input.value = '';
+        input.focus();
+        if (window.JORNADA_CHAMA) {
+          window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'media');
+        }
+      });
+    }
+
+    if (btnConf) {
+      btnConf.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        saveCurrentAnswer();
+        nextStep();
+      });
+    }
+  }
+
+  // ---------- INIT ----------
+  async function init(root) {
+    if (State.mounted || State.loading) return;
+
+    // Guard AGORA (no momento da entrada na section, JC já existe)
+    if (!window.JC || !window.JC.flags || !window.JC.flags.cardConfirmed) {
+      warn('CARD não confirmado ao entrar em Perguntas -> volta para section-card');
+      if (window.JC?.show) window.JC.show('section-card');
+      else if (window.showSection) window.showSection('section-card');
       return;
     }
 
-    const root = $('#perguntas-root', node) || node;
-    if (!root) {
-      warn('Container de perguntas não encontrado (#perguntas-root).');
+    State.loading = true;
+
+    await ensureBlocks();
+    computeTotals();
+
+    if (!State.blocks.length) {
+      err('JORNADA_BLOCKS vazio; confira jornada-paper-qa.js.');
+      State.loading = false;
       return;
     }
+
+    State.startedAt = new Date().toISOString();
+    State.blocoIdx = 0;
+    State.qIdx = 0;
+    State.globalIdx = 0;
+
+    bindUI(root);
+    await showCurrentQuestion();
 
     State.mounted = true;
-    log('Montando seção de perguntas...');
-    startQA(root);
+    State.loading = false;
+    log(MOD, 'montado com sucesso.');
   }
 
+  // disparado pelo seu controlador
   document.addEventListener('sectionLoaded', (e) => {
-    if (!e?.detail || e.detail.sectionId !== SECTION_ID) return;
+    if (e?.detail?.sectionId !== SECTION_ID) return;
     const node = e.detail.node || document.getElementById(SECTION_ID);
-    bindSection(node);
+    if (node) init(node);
   });
 
+  // fallback se já estiver ativo
   document.addEventListener('DOMContentLoaded', () => {
     const sec = document.getElementById(SECTION_ID);
-    if (sec && !State.mounted) {
-      bindSection(sec);
+    if (sec && (sec.classList.contains('active') || window.__currentSectionId === SECTION_ID)) {
+      init(sec);
     }
   });
 
   window.JPerguntas = {
-    reset() {
+    start(root){ init(root || document.getElementById(SECTION_ID)); },
+    reset(){
       State.mounted = false;
-      State.running = false;
-      State.answers = null;
+      State.loading = false;
+      State.answers = {};
       State.meta = null;
+      State.blocoIdx = 0;
+      State.qIdx = 0;
+      State.globalIdx = 0;
       log('Reset concluído.');
-    },
-    start(root) {
-      bindSection(root || document.getElementById(SECTION_ID));
     }
   };
 
-  log('Carregado');
+  log(MOD, 'carregado (base).');
 })();
