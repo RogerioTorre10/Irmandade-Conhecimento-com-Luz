@@ -45,7 +45,63 @@
 
   // Blocos multilíngues
   const blockTranslations = {
-    'pt-BR': [
+     'pt-BR': [
+      {
+        id: 'raizes',
+        title: 'Bloco 1 — Raízes',
+        data_i18n: 'bloco_raizes_title',
+        questions: [
+          { id: 'quem_voce_hoje', label: 'Quem você é hoje?', data_i18n: 'pergunta_quem_voce_hoje' },
+          { id: 'o_que_te_trouxe', label: 'O que te trouxe para essa jornada?', data_i18n: 'pergunta_o_que_te_trouxe' },
+          { id: 'sonho_espiritual', label: 'Qual é o seu maior sonho espiritual?', data_i18n: 'pergunta_sonho_espiritual' }
+        ],
+        video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
+      },
+      {
+        id: 'reflexoes',
+        title: 'Bloco 2 — Reflexões',
+        data_i18n: 'bloco_reflexoes_title',
+        questions: [
+          { id: 'desafios_atuais', label: 'Quais são seus maiores desafios atuais?', data_i18n: 'pergunta_desafios_atuais' },
+          { id: 'medo_duvida', label: 'Como você lida com medo ou dúvida?', data_i18n: 'pergunta_medo_duvida' },
+          { id: 'significado_luz', label: 'O que "luz" significa para você?', data_i18n: 'pergunta_significado_luz' }
+        ],
+        video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
+      },
+      {
+        id: 'crescimento',
+        title: 'Bloco 3 — Crescimento',
+        data_i18n: 'bloco_crescimento_title',
+        questions: [
+          { id: 'mudar_vida', label: 'O que você quer mudar na sua vida?', data_i18n: 'pergunta_mudar_vida' },
+          { id: 'quem_inspira', label: 'Quem te inspira e por quê?', data_i18n: 'pergunta_quem_inspira' },
+          { id: 'pratica_gratidao', label: 'Como você pratica gratidão diariamente?', data_i18n: 'pergunta_pratica_gratidao' }
+        ],
+        video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4'
+      },
+      {
+        id: 'integracao',
+        title: 'Bloco 4 — Integração',
+        data_i18n: 'bloco_integracao_title',
+        questions: [
+          { id: 'licao_jornada', label: 'Qual lição você tira dessa jornada?', data_i18n: 'pergunta_licao_jornada' },
+          { id: 'aplicar_futuro', label: 'Como você aplicará isso no futuro?', data_i18n: 'pergunta_aplicar_futuro' },
+          { id: 'mensagem_futuro', label: 'Uma mensagem para o seu eu futuro.', data_i18n: 'pergunta_mensagem_futuro' }
+        ],
+        video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
+      },
+      {
+        id: 'sintese',
+        title: 'Bloco 5 — Síntese e Entrega',
+        data_i18n: 'bloco_sintese_title',
+        questions: [
+          { id: 'essencia_hoje', label: 'Quem você é hoje, em uma frase verdadeira?', data_i18n: 'pergunta_essencia_hoje' },
+          { id: 'passo_fe', label: 'Qual será seu próximo passo de fé e coragem?', data_i18n: 'pergunta_passo_fe' }
+        ],
+        video_after: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
+      }
+    ],
+    'en-US': [
       {
         id: 'raizes',
         title: 'Block 1 — Roots',
