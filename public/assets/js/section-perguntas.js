@@ -395,12 +395,18 @@
       }
     }
 
-    try {
-      // 1) Filme final + transição oficial
-      if (finalVideo && callPlayTransition(finalVideo, FINAL_SECTION_ID)) {
-        log('Transição final disparada com vídeo:', finalVideo);
+        try {
+      // 1) Se tiver vídeo final e função oficial de transição, usa ela
+      if (finalVideo && typeof window.playVideoTransition === 'function') {
+        log('Transição final via playVideoTransition:', finalVideo, '→', FINAL_SECTION_ID);
+        window.playVideoTransition(finalVideo, FINAL_SECTION_ID);
       }
-      // 2) Sem vídeo, mas temos controlador
+      // 2) Ou se tiver playTransitionThenGo(nextSectionId) configurado
+      else if (typeof window.playTransitionThenGo === 'function') {
+        log('Transição final via playTransitionThenGo →', FINAL_SECTION_ID);
+        window.playTransitionThenGo(FINAL_SECTION_ID);
+      }
+      // 3) Sem vídeo, usa o controlador padrão
       else if (window.JC?.show && finalEl) {
         log('Usando JC.show para seção final.');
         window.JC.show(FINAL_SECTION_ID);
@@ -409,7 +415,7 @@
         log('Usando showSection(FINAL_SECTION_ID).');
         window.showSection(FINAL_SECTION_ID);
       }
-      // 3) Último recurso: âncora
+      // 4) Último recurso: âncora
       else if (finalEl) {
         log('Fallback via hash → section-final.');
         window.location.hash = '#' + FINAL_SECTION_ID;
@@ -420,7 +426,6 @@
     } catch (e) {
       err('Erro ao navegar para página final:', e);
     }
-
 
     try {
       document.dispatchEvent(new CustomEvent('qa:completed', {
