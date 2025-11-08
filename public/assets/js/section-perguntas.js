@@ -184,27 +184,60 @@
     setWidth('#jp-global-progress-fill', pctGlobal + '%');
   }
 
-  async function typeQuestion(text) {
+    async function typeQuestion(text) {
     if (completed) return;
 
     const box = $('#jp-question-typed');
     const raw = $('#jp-question-raw');
     if (!box) return;
 
-    if (raw) raw.textContent = text || '';
+    const pergunta = text || '[pergunta]';
+
+    // Mantém o texto bruto (se você usar em log/IA)
+    if (raw) {
+      raw.textContent = pergunta;
+    }
+
+    // Prepara para o TypingBridge:
+    // - garante que não esteja marcado como concluído
+    // - marca como elegível para datilografia
+    box.classList.remove('typing-done');
+    box.setAttribute('data-typing', 'true');
+
+    // Limpa antes de começar
+    box.textContent = '';
 
     if (window.runTyping) {
-      box.textContent = text;
       try {
+        // O TypingBridge usa o conteúdo atual do elemento como alvo,
+        // então colocamos o texto e deixamos ele animar.
+        box.textContent = pergunta;
         await window.runTyping(box);
       } catch (e) {
-        warn('runTyping falhou; fallback.');
+        console.warn('[PERGUNTAS] runTyping falhou, usando fallback simples.', e);
+        // fallback manual se der erro
+        box.textContent = '';
+        let i = 0;
+        const speed = 24;
+        await new Promise(resolve => {
+          const it = setInterval(() => {
+            if (completed) {
+              clearInterval(it);
+              return resolve();
+            }
+            box.textContent = pergunta.slice(0, i);
+            i++;
+            if (i > pergunta.length) {
+              clearInterval(it);
+              resolve();
+            }
+          }, speed);
+        });
       }
       return;
     }
 
-    // fallback simples
-    box.textContent = '';
+    // Se não existir TypingBridge, usa só a datilografia manual
     let i = 0;
     const speed = 24;
     await new Promise(resolve => {
@@ -213,15 +246,16 @@
           clearInterval(it);
           return resolve();
         }
-        box.textContent = text.slice(0, i);
+        box.textContent = pergunta.slice(0, i);
         i++;
-        if (i > text.length) {
+        if (i > pergunta.length) {
           clearInterval(it);
           resolve();
         }
       }, speed);
     });
   }
+
 
   async function showCurrentQuestion() {
     if (completed) return;
