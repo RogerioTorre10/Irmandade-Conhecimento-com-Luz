@@ -77,6 +77,46 @@
   }
 
   // ---------- UI HELPERS ----------
+   function playBlockTransition(video, onDone) {
+    try {
+      // PRIORIDADE 1: usar o mesmo sistema de transição global (vídeo + go)
+      if (typeof window.playTransitionThenGo === 'function') {
+        // Aqui usamos a própria section-perguntas como destino:
+        // o vídeo roda, e ao terminar o JC/show mantém/perde foco na mesma seção.
+        log('Transição entre blocos via playTransitionThenGo →', SECTION_ID, 'video:', video || '[padrão]');
+        window.playTransitionThenGo(SECTION_ID);
+
+        // Garantia: depois do vídeo, chamamos a próxima pergunta.
+        // (ajuste o timeout para o tempo real do filme, se necessário)
+        if (typeof onDone === 'function') {
+          setTimeout(() => {
+            if (!completed) onDone();
+          }, 6500);
+        }
+        return true;
+      }
+
+      // PRIORIDADE 2: se você tiver um loader de vídeo próprio via JPaperQA
+      if (window.JPaperQA?.loadVideo && video) {
+        log('Transição entre blocos via JPaperQA.loadVideo:', video);
+        const maybe = window.JPaperQA.loadVideo(video);
+        if (maybe && typeof maybe.then === 'function') {
+          maybe.then(() => {
+            if (!completed && typeof onDone === 'function') onDone();
+          });
+        } else if (typeof onDone === 'function') {
+          onDone();
+        }
+        return true;
+      }
+    } catch (e) {
+      warn('Falha na transição de bloco:', e);
+    }
+
+    return false; // se nada rolou, chamamos direto a próxima pergunta
+  }
+
+  
   function setText(sel, val) {
     const el = document.querySelector(sel);
     if (el) el.textContent = String(val);
