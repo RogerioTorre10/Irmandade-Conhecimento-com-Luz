@@ -13,9 +13,8 @@
     'section-perguntas',
     'section-final'
   ];
-    
-  let targetId = 'section-card'; // seção inicial padrão
 
+  let targetId = 'section-card';
   let lastShownSection = null;
   let isTransitioning = false;
 
@@ -27,7 +26,7 @@
     console.log('[JC.applyTypingAndTTS] Iniciando para:', sectionId);
     try {
       let attempts = 0;
-      const maxAttempts = 100; // Aumentado para garantir carregamento
+      const maxAttempts = 100;
       while (!window.TypingBridge && attempts < maxAttempts) {
         console.log('[JC.applyTypingAndTTS] Aguardando TypingBridge...');
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -130,13 +129,18 @@
         lastShownSection = sectionId;
         window.JC.currentSection = sectionId;
         handleSectionLogic(sectionId, section);
+
+        // ✅ Adicionado para ativar section-perguntas.js corretamente
+        document.dispatchEvent(new CustomEvent('sectionLoaded', {
+          detail: { sectionId, node: section }
+        }));
+
         document.dispatchEvent(new CustomEvent('section:shown', { detail: { sectionId, node: section } }));
         console.log('[JC.show] Event section:shown fired for:', sectionId);
         console.log('[JC.show] Displayed successfully:', sectionId);
       } else {
         console.error('[JC.show] Section element is null for:', sectionId);
         window.toast?.(`Seção ${sectionId} não encontrada`, 'error');
-        // Tentar próxima seção
         const currentIndex = sectionOrder.indexOf(sectionId);
         const nextSection = sectionOrder[currentIndex + 1];
         if (nextSection) {
@@ -187,36 +191,11 @@
     };
     window.JC.currentSection = null;
 
-    JC.init = async function init(options) {
-  options = options || {};
-
-  // 👇 NOVO: resolve qual seção inicial usar
-  const targetId =
-    options.targetId ||
-    options.initialSectionId ||
-    options.sectionId ||
-    'section-card'; // ou 'section-intro', conforme você usa aí
-    console.log('[JC.init] targetId resolvido para:', targetId);
-    };
-    
-    // Aguardar TypingBridge
-    let attempts = 0;
-    const maxAttempts = 100;
-    while (!window.TypingBridge && attempts < maxAttempts) {
-      console.log('[JC.init] Aguardando TypingBridge...');
-      await new Promise(resolve => setTimeout(resolve, 100));
-      attempts++;
-    }
-    if (!window.TypingBridge) {
-      console.warn('[JC.init] TypingBridge não disponível após tentativas');
-    }
-
-    // Verificar autenticação
+    // Autenticação simulada
     const authScreen = document.getElementById('auth-screen');
     const toastElement = document.getElementById('toast');
     if (authScreen || (toastElement && toastElement.textContent.includes('autenticação necessária'))) {
       console.warn('[JC.init] Tela de autenticação detectada');
-      // Simular autenticação
       localStorage.setItem('token', 'dummy-token');
       localStorage.setItem('JORNADA_NOME', 'Teste');
       localStorage.setItem('JORNADA_GUIA', 'guia');
@@ -225,9 +204,8 @@
       console.log('[JC.init] Autenticação simulada, iniciando section-intro...');
     }
 
-    // Bloqueia perguntas se o card não foi confirmado
-      if (targetId === 'section-perguntas') {
-      window.JC = window.JC || {};
+    // Bloqueio de perguntas se card não confirmado
+    if (targetId === 'section-perguntas') {
       const ok = JC.flags?.cardConfirmed === true;
       if (!ok) {
       console.warn('[Guard] Perguntas bloqueadas: recarregar CARD');
@@ -236,7 +214,7 @@
       return;
     }
   }
-   
+
     // Iniciar jornada
     const introElement = document.getElementById('section-intro');
     if (!introElement) {
@@ -249,6 +227,7 @@
     }
   }
 
+  // Evento para lógica adicional após exibição de seção
   document.addEventListener('section:shown', (e) => {
     const sectionId = e.detail.sectionId;
     const node = e.detail.node;
@@ -262,7 +241,7 @@
       attachButtonEvents(sectionId, node);
       handleSectionLogic(sectionId, node);
     }
-  });  
+  });
 
-    init();
-  })();
+  init();
+})();
