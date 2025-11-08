@@ -203,7 +203,7 @@
     setWidth('#jp-global-progress-fill', pctGlobal + '%');
   }
 
-  async function typeQuestion(text) {
+   async function typeQuestion(text) {
     if (completed) return;
 
     const box = $('#jp-question-typed');
@@ -212,14 +212,18 @@
 
     const pergunta = text || '[pergunta]';
 
+    // Guarda texto bruto (se usado em outro lugar)
     if (raw) raw.textContent = pergunta;
 
-    // limpa e garante estado neutro
+    // Garante alinhamento da esquerda (esquerda -> direita)
+    box.style.textAlign = 'left';
+
+    // Reseta estado visual
     box.textContent = '';
     box.removeAttribute('data-typing');
     box.classList.remove('typing-done');
 
-    // datilografia VISUAL manual (independente do TypingBridge)
+    // --- DATILOGRAFIA VISUAL MANUAL ---
     let i = 0;
     const speed = 24;
 
@@ -239,9 +243,24 @@
       }, speed);
     });
 
-    // se o TypingBridge usar isso só para leitura/TTS, deixamos o gancho
-    box.setAttribute('data-typing', 'true');
+    // --- EFEITO LEITURA (TypingBridge) ---
+    // Se o jornada-typing-bridge.js estiver carregado e expuser runTyping,
+    // chamamos ele após a datilografia manual só para acionar o "efeito leitura"
+    // (voz / ênfase), sem perder a animação que já mostramos.
+    if (typeof window.runTyping === 'function') {
+      try {
+        box.setAttribute('data-typing', 'true');
+        await window.runTyping(box);
+      } catch (e) {
+        console.warn('[PERGUNTAS] runTyping falhou (efeito leitura opcional):', e);
+      } finally {
+        // garante que o estado finalize
+        box.classList.add('typing-done');
+        box.removeAttribute('data-typing');
+      }
+    }
   }
+
 
   async function showCurrentQuestion() {
     if (completed) return;
@@ -401,15 +420,14 @@
       window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'forte');
     }
 
-    const finalEl = ensureFinalSectionExists();
+        const finalEl = ensureFinalSectionExists();
 
     // tenta vídeo final: usa video_after do último bloco ou JORNADA_FINAL_VIDEO
     const lastBlock = State.blocks[State.blocks.length - 1];
     const finalVideoSrc = resolveVideoSrc(
-      window.JORNADA_FINAL_VIDEO ||
-      (lastBlock && lastBlock.video_after) ||
-      null
+      window.JORNADA_FINAL_VIDEO || FINAL_VIDEO_FALLBACK
     );
+
 
     if (finalVideoSrc) {
       log('Iniciando vídeo final:', finalVideoSrc);
