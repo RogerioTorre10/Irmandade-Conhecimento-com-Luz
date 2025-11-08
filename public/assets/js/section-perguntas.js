@@ -275,39 +275,38 @@
 
   // ---------- INIT ----------
   async function init(root) {
-    if (State.mounted || State.loading) return;
+  if (State.mounted || State.loading) return;
+  State.loading = true;
 
-    // Guard AGORA (no momento da entrada na section, JC já existe)
-    if (!window.JC || !window.JC.flags || !window.JC.flags.cardConfirmed) {
-      warn('CARD não confirmado ao entrar em Perguntas -> volta para section-card');
-      if (window.JC?.show) window.JC.show('section-card');
-      else if (window.showSection) window.showSection('section-card');
-      return;
-    }
+  await ensureBlocks();
+  computeTotals();
 
-    State.loading = true;
-
-    await ensureBlocks();
-    computeTotals();
-
-    if (!State.blocks.length) {
-      err('JORNADA_BLOCKS vazio; confira jornada-paper-qa.js.');
-      State.loading = false;
-      return;
-    }
-
-    State.startedAt = new Date().toISOString();
-    State.blocoIdx = 0;
-    State.qIdx = 0;
-    State.globalIdx = 0;
-
-    bindUI(root);
-    await showCurrentQuestion();
-
-    State.mounted = true;
+  if (!State.blocks.length) {
+    err('JORNADA_BLOCKS vazio; confira jornada-paper-qa.js.');
     State.loading = false;
-    log(MOD, 'montado com sucesso.');
+    return;
   }
+
+  // Se quiser só um aviso suave (sem travar):
+  const hasGuia =
+    (window.JC && window.JC.state && window.JC.state.guia) ||
+    window.sessionStorage?.getItem('jornada.guia');
+  if (!hasGuia) {
+    warn('Nenhum guia/card detectado — seguindo mesmo assim (modo teste).');
+  }
+
+  State.startedAt = new Date().toISOString();
+  State.blocoIdx = 0;
+  State.qIdx = 0;
+  State.globalIdx = 0;
+
+  bindUI(root);
+  await showCurrentQuestion();
+
+  State.mounted = true;
+  State.loading = false;
+  log(MOD, 'montado com sucesso.');
+}
 
   // disparado pelo seu controlador
   document.addEventListener('sectionLoaded', (e) => {
