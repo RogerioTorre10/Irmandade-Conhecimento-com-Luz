@@ -145,6 +145,7 @@
   box-shadow: 0 0 40px rgba(212, 175, 55, 0.8) !important;
 }
 
+
 /* Botões com textura de pedra */
 .perguntas-controls {
   display: flex;
@@ -266,11 +267,14 @@
   }
 
   .jp-answer-input {
-    font-size: 12px;
-  }
+  font-size: 16px !important; /* iOS não dá zoom */
+}
 
   .perguntas-controls {
     justify-content: center;
   }
-}
 
+#videoTransicao {
+  touch-action: none !important; /* Evita zoom acidental */
+}
+}
