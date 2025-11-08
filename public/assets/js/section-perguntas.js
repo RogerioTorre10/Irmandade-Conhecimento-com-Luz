@@ -1,5 +1,5 @@
 /* /assets/js/section-perguntas.js
- * Jornada de Perguntas + Vídeos + Export para API
+ * Jornada de Perguntas + Vídeos + Progresso + Export para API
  */
 
 (function () {
@@ -11,11 +11,10 @@
   }
   window.__PERGUNTAS_BOUND__ = true;
 
- const MOD = 'section-perguntas.js';
- const SECTION_ID = 'section-perguntas';
- const FINAL_SECTION_ID = 'section-final';
- const FINAL_VIDEO_FALLBACK = '/assets/videos/filme-5-fim-da-jornada.mp4'; // filme perguntas -> final
-
+  const MOD = 'section-perguntas.js';
+  const SECTION_ID = 'section-perguntas';
+  const FINAL_SECTION_ID = 'section-final';
+  const FINAL_VIDEO_FALLBACK = '/assets/videos/filme-5-fim-da-jornada.mp4';
 
   const log  = (...a) => console.log('[PERGUNTAS]', ...a);
   const warn = (...a) => console.warn('[PERGUNTAS]', ...a);
@@ -39,7 +38,7 @@
   let completed = false;
 
   // --------------------------------------------------
-  // VÍDEO OVERLAY (entre blocos e final)
+  // OVERLAY DE VÍDEO (entre blocos e final)
   // --------------------------------------------------
 
   function ensureVideoOverlay() {
@@ -50,12 +49,15 @@
       overlay = document.createElement('div');
       overlay.id = 'videoOverlay';
       overlay.style.position = 'fixed';
-      overlay.style.inset = '0';
-      overlay.style.background = 'rgba(0,0,0,0.9)';
+      overlay.style.top = '0';
+      overlay.style.left = '0';
+      overlay.style.width = '100%';
+      overlay.style.height = '100%';
+      overlay.style.background = 'rgba(0,0,0,0.96)';
       overlay.style.display = 'none';
       overlay.style.alignItems = 'center';
       overlay.style.justifyContent = 'center';
-      overlay.style.zIndex = '2000';
+      overlay.style.zIndex = '9999';
       document.body.appendChild(overlay);
     }
 
@@ -66,6 +68,8 @@
       video.preload = 'auto';
       video.style.maxWidth = '100%';
       video.style.maxHeight = '100%';
+      video.style.objectFit = 'cover';
+      video.controls = false;
       overlay.appendChild(video);
     }
 
@@ -83,26 +87,23 @@
 
   function playVideoWithCallback(src, onEnded) {
     src = resolveVideoSrc(src);
-    const { overlay, video } = ensureVideoOverlay();
-
     if (!src) {
-      if (onEnded) onEnded();
+      if (typeof onEnded === 'function') onEnded();
       return;
     }
+
+    const { overlay, video } = ensureVideoOverlay();
 
     overlay.style.display = 'flex';
     video.src = src;
     video.load();
 
-    const prev = video.onended;
-
     video.onended = () => {
       video.onended = null;
-      if (typeof prev === 'function') {
-        try { prev(); } catch (e) { console.error(e); }
-      }
       overlay.style.display = 'none';
-      if (!completed && typeof onEnded === 'function') {
+      // IMPORTANTE: sempre chamar o callback,
+      // inclusive no vídeo final (não depende de "completed")
+      if (typeof onEnded === 'function') {
         onEnded();
       }
     };
@@ -111,14 +112,14 @@
       console.error('[PERGUNTAS] Erro ao tocar vídeo:', e);
       overlay.style.display = 'none';
       video.onended = null;
-      if (onEnded) onEnded();
+      if (typeof onEnded === 'function') onEnded();
     });
   }
 
   function playBlockTransition(videoSrc, onDone) {
     const src = resolveVideoSrc(videoSrc);
     if (!src) {
-      if (onDone) onDone();
+      if (typeof onDone === 'function') onDone();
       return;
     }
     log('Transição entre blocos:', src);
@@ -130,13 +131,11 @@
   // --------------------------------------------------
 
   async function ensureBlocks() {
-    // Se já veio carregado
     if (Array.isArray(window.JORNADA_BLOCKS) && window.JORNADA_BLOCKS.length) {
       State.blocks = window.JORNADA_BLOCKS;
       return;
     }
 
-    // Usa JPaperQA para carregar
     if (window.JPaperQA && typeof window.JPaperQA.loadDynamicBlocks === 'function') {
       try {
         await window.JPaperQA.loadDynamicBlocks();
@@ -167,7 +166,7 @@
   }
 
   // --------------------------------------------------
-  // UI / DATILOGRAFIA
+  // UI / BARRAS / DATILOGRAFIA + LEITURA
   // --------------------------------------------------
 
   function setText(sel, val) {
@@ -184,15 +183,16 @@
     const { bloco } = getCurrent();
     const blocoTotal = bloco?.questions?.length || 1;
 
+    // Texto "Bloco X de Y" continua como está no HTML
     setText('#jp-block-num', State.blocoIdx + 1);
     setText('#jp-block-num-2', State.blocoIdx + 1);
     setText('#jp-block-max', State.totalBlocks || 1);
 
+    // Barra GLOBAL: esquerda = pergunta global atual, direita = total
     setText('#jp-global-current', State.globalIdx + 1);
-    setText('#jp-global-current-2', State.globalIdx + 1);
     setText('#jp-global-total', State.totalQuestions || 1);
-    setText('#jp-global-total-2', State.totalQuestions || 1);
 
+    // Barra BLOCO: esquerda = pergunta dentro do bloco, direita = total do bloco
     setText('#jp-block-current', State.qIdx + 1);
     setText('#jp-block-total', blocoTotal);
 
@@ -203,7 +203,7 @@
     setWidth('#jp-global-progress-fill', pctGlobal + '%');
   }
 
-   async function typeQuestion(text) {
+  async function typeQuestion(text) {
     if (completed) return;
 
     const box = $('#jp-question-typed');
@@ -212,18 +212,17 @@
 
     const pergunta = text || '[pergunta]';
 
-    // Guarda texto bruto (se usado em outro lugar)
     if (raw) raw.textContent = pergunta;
 
-    // Garante alinhamento da esquerda (esquerda -> direita)
+    // garante alinhamento bonito (esquerda -> direita)
     box.style.textAlign = 'left';
 
-    // Reseta estado visual
+    // reseta
     box.textContent = '';
-    box.removeAttribute('data-typing');
     box.classList.remove('typing-done');
+    box.removeAttribute('data-typing');
 
-    // --- DATILOGRAFIA VISUAL MANUAL ---
+    // 1) Datilografia visual manual
     let i = 0;
     const speed = 24;
 
@@ -243,24 +242,20 @@
       }, speed);
     });
 
-    // --- EFEITO LEITURA (TypingBridge) ---
-    // Se o jornada-typing-bridge.js estiver carregado e expuser runTyping,
-    // chamamos ele após a datilografia manual só para acionar o "efeito leitura"
-    // (voz / ênfase), sem perder a animação que já mostramos.
+    // 2) Efeito leitura (TypingBridge) - opcional
+    // Se jornada-typing-bridge expõe runTyping, chamamos depois da animação
     if (typeof window.runTyping === 'function') {
       try {
         box.setAttribute('data-typing', 'true');
         await window.runTyping(box);
       } catch (e) {
-        console.warn('[PERGUNTAS] runTyping falhou (efeito leitura opcional):', e);
+        console.warn('[PERGUNTAS] runTyping (efeito leitura) falhou:', e);
       } finally {
-        // garante que o estado finalize
         box.classList.add('typing-done');
         box.removeAttribute('data-typing');
       }
     }
   }
-
 
   async function showCurrentQuestion() {
     if (completed) return;
@@ -312,7 +307,7 @@
   }
 
   // --------------------------------------------------
-  // NAVEGAÇÃO DAS PERGUNTAS
+  // NAVEGAÇÃO
   // --------------------------------------------------
 
   function nextStep() {
@@ -331,7 +326,6 @@
     const isLastInBloco = State.qIdx >= blocoTotal - 1;
     const isLastOfAll = State.globalIdx >= State.totalQuestions - 1;
 
-    // última pergunta global
     if (isLastOfAll) {
       finishAll();
       return;
@@ -339,7 +333,6 @@
 
     State.globalIdx++;
 
-    // fim de bloco (mas ainda não é o fim de todos)
     if (isLastInBloco) {
       const nextBlocoIdx = State.blocoIdx + 1;
       const video = bloco.video_after || bloco.transitionVideo || null;
@@ -351,14 +344,13 @@
         if (!completed) showCurrentQuestion();
       });
     } else {
-      // dentro do mesmo bloco
       State.qIdx++;
       showCurrentQuestion();
     }
   }
 
   // --------------------------------------------------
-  // SECTION FINAL / EXPORT
+  // FINALIZAÇÃO
   // --------------------------------------------------
 
   function ensureFinalSectionExists() {
@@ -420,14 +412,11 @@
       window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'forte');
     }
 
-        const finalEl = ensureFinalSectionExists();
+    const finalEl = ensureFinalSectionExists();
 
-    // tenta vídeo final: usa video_after do último bloco ou JORNADA_FINAL_VIDEO
-    const lastBlock = State.blocks[State.blocks.length - 1];
     const finalVideoSrc = resolveVideoSrc(
       window.JORNADA_FINAL_VIDEO || FINAL_VIDEO_FALLBACK
     );
-
 
     if (finalVideoSrc) {
       log('Iniciando vídeo final:', finalVideoSrc);
@@ -450,7 +439,6 @@
       }
     }
 
-    // notifica quem quiser ouvir (section-final.js / outros)
     try {
       document.dispatchEvent(new CustomEvent('qa:completed', {
         detail: { answers: State.answers, meta: State.meta }
