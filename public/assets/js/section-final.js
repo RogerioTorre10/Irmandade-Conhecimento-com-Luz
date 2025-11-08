@@ -16,11 +16,7 @@
     hqUrl: null,
   };
 
-  /**
-   * Espera o término de uma possível transição com vídeo,
-   * usando o lock global __TRANSITION_LOCK e o evento "transition:ended".
-   * Use esta função APENAS dentro de funções async (não é chamada no topo).
-   */
+  // Aguarda fim de possível transição com vídeo (se seu motor usar esse lock/evento)
   async function waitForTransitionUnlock(timeoutMs = 15000) {
     if (!window.__TRANSITION_LOCK) return;
 
@@ -48,6 +44,7 @@
     await Promise.race([p, t]);
   }
 
+  // Base da API (configurável)
   function apiBase() {
     return (
       window.APP_CONFIG?.API_BASE ||
@@ -56,12 +53,13 @@
     );
   }
 
+  // Monta o pacote enviado para gerar PDF/HQ
   function payload() {
     const guia = window.JC?.state?.guia || {};
     const selfie = window.__SELFIE_DATA_URL__ || null;
     const answers = window.__QA_ANSWERS__ || null;
     const meta = window.__QA_META__ || {};
-    const lang = window.i18n?.lang || 'pt';
+    const lang = (window.i18n && (window.i18n.lang || window.i18n.language)) || 'pt';
     const timeNow = new Date().toISOString();
 
     return {
@@ -75,6 +73,7 @@
     };
   }
 
+  // Gera (ou tenta gerar) PDF/HQ
   async function generateArtifacts() {
     if (S.generating) return;
     S.generating = true;
@@ -82,14 +81,17 @@
     try {
       const body = payload();
 
+      // Preferência para helper custom se existir
       if (window.API?.gerarPDFHQ) {
-        // Usa helper custom se existir
         const res = await window.API.gerarPDFHQ(body);
         S.pdfUrl = res?.pdfUrl || null;
         S.hqUrl = res?.hqUrl || null;
       } else {
-        // Fallback: POST para API padrão
-        const url = apiBase().replace(/\/+$/, '') + '/jornada/finalizar';
+        // Fallback: POST padrão
+        const base = apiBase().replace(/\/+$/, '');
+        const url = base + '/jornada/finalizar';
+
+        console.log(`[${MOD}] Chamando API final:`, url);
 
         const r = await fetch(url, {
           method: 'POST',
@@ -97,15 +99,18 @@
           body: JSON.stringify(body),
         });
 
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        if (!r.ok) {
+          throw new Error(`HTTP ${r.status}`);
+        }
 
         const data = await r.json().catch(() => ({}));
         S.pdfUrl = data?.pdfUrl || null;
         S.hqUrl = data?.hqUrl || null;
       }
 
-      // Se nada veio da API, gera um JSON local só pra não quebrar o fluxo
+      // Se a API não retornar links, gera JSON local como fallback simbólico
       if (!S.pdfUrl && !S.hqUrl) {
+        console.warn(`[${MOD}] Nenhum link recebido da API; gerando JSON local de fallback.`);
         const blob = new Blob(
           [JSON.stringify(body, null, 2)],
           { type: 'application/json' }
@@ -113,11 +118,12 @@
         S.pdfUrl = URL.createObjectURL(blob);
       }
 
-      window.toast?.('Artefatos prontos para download!');
+      window.toast?.('Sua devolutiva está pronta para download.');
       enableDownloadButton(true);
     } catch (e) {
       console.error('[FINAL] Falha ao gerar PDF/HQ:', e);
-      window.toast?.('Não foi possível gerar os arquivos agora.');
+      window.toast?.('Não foi possível gerar os arquivos agora. Tente novamente mais tarde.');
+      enableDownloadButton(false);
     } finally {
       S.generating = false;
     }
@@ -129,15 +135,16 @@
   }
 
   function downloadAll() {
-    if (S.pdfUrl) triggerDownload(S.pdfUrl, 'jornada.pdf');
-    if (S.hqUrl) triggerDownload(S.hqUrl, 'hq.zip');
+    if (S.pdfUrl) triggerDownload(S.pdfUrl, 'jornada-conhecimento-com-luz.pdf');
+    if (S.hqUrl) triggerDownload(S.hqUrl, 'hq-irmandade.zip');
 
     if (!S.pdfUrl && !S.hqUrl) {
-      window.toast?.('Nada para baixar no momento.');
+      window.toast?.('Ainda não há arquivos disponíveis para baixar.');
     }
   }
 
   function triggerDownload(url, filename) {
+    if (!url) return;
     try {
       const a = document.createElement('a');
       a.href = url;
@@ -147,28 +154,64 @@
       a.click();
       a.remove();
     } catch (e) {
-      console.warn('[FINAL] Download falhou; abrindo em nova aba:', e);
+      console.warn('[FINAL] Download direto falhou; abrindo em nova aba:', e);
       window.open(url, '_blank', 'noopener');
     }
   }
 
+  // Detecta função global de transição de vídeo usada no resto da jornada
+  function getTransitionFn() {
+    if (typeof window.playVideoTransition === 'function') return window.playVideoTransition;
+    if (typeof window.playTransitionThenGo === 'function') return window.playTransitionThenGo;
+    return null;
+  }
+
   function finishFlow() {
     try {
-      // Caso queira limpar dados locais no futuro:
+      // Se quiser limpar dados locais depois da finalização, descomente:
       // delete window.__SELFIE_DATA_URL__;
       // delete window.__QA_ANSWERS__;
       // delete window.__QA_META__;
-    } catch {}
+    } catch (e) {
+      console.warn('[FINAL] Erro ao limpar estado local:', e);
+    }
 
-    if (typeof window.playTransitionVideo === 'function' && VIDEO_SRC) {
-      window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
-    } else if (window.JC?.finish) {
+    const fn = getTransitionFn();
+    const hasNext = !!document.getElementById(NEXT_SECTION_ID);
+
+    // 1) Se tiver função de vídeo + fonte, usa filme final + volta para home
+    if (fn && VIDEO_SRC && hasNext) {
+      console.log(`[${MOD}] Encerrando com vídeo final:`, VIDEO_SRC, '→', NEXT_SECTION_ID);
+      try {
+        fn(VIDEO_SRC, NEXT_SECTION_ID);
+        return;
+      } catch (e) {
+        console.error('[FINAL] Erro na transição com vídeo final:', e);
+      }
+    }
+
+    // 2) Sem vídeo ou falhou: usa controlador da jornada
+    if (window.JC?.finish) {
+      console.log(`[${MOD}] Encerrando via JC.finish()`);
       window.JC.finish();
-    } else if (window.JC?.show && document.getElementById(NEXT_SECTION_ID)) {
+      return;
+    }
+
+    if (window.JC?.show && hasNext) {
+      console.log(`[${MOD}] Encerrando via JC.show(${NEXT_SECTION_ID})`);
       window.JC.show(NEXT_SECTION_ID);
-    } else if (typeof window.showSection === 'function' && document.getElementById(NEXT_SECTION_ID)) {
+      return;
+    }
+
+    if (typeof window.showSection === 'function' && hasNext) {
+      console.log(`[${MOD}] Encerrando via showSection(${NEXT_SECTION_ID})`);
       window.showSection(NEXT_SECTION_ID);
-    } else {
+      return;
+    }
+
+    // 3) Último recurso: âncora
+    if (hasNext) {
+      console.log(`[${MOD}] Encerrando via hash #${NEXT_SECTION_ID}`);
       window.location.hash = `#${NEXT_SECTION_ID}`;
     }
   }
@@ -192,9 +235,11 @@
       });
     }
 
-    // Garante que qualquer transição anterior terminou antes de gerar
+    // Garante que qualquer transição anterior terminou antes de disparar geração
     await waitForTransitionUnlock();
     enableDownloadButton(false);
+
+    // Gera automaticamente assim que a seção final é exibida
     generateArtifacts();
   }
 
@@ -206,7 +251,7 @@
     bindSection(node);
   });
 
-  // Fallback: se abrir direto na final
+  // Fallback: se abrir direto na final (hash, etc.)
   document.addEventListener('DOMContentLoaded', () => {
     const sec = document.getElementById(SECTION_ID);
     if (sec && (sec.classList.contains('active') || window.__currentSectionId === SECTION_ID)) {
@@ -214,6 +259,7 @@
     }
   });
 
+  // Exposição para debug manual no console
   window.JFinal = {
     generate: generateArtifacts,
     download: downloadAll,
