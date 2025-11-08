@@ -383,28 +383,43 @@
       window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'forte');
     }
 
-    const finalEl = ensureFinalSectionExists();
-    const finalVideo = resolveVideoSrc(window.JORNADA_FINAL_VIDEO || null);
+       const finalEl = ensureFinalSectionExists();
+
+    // tenta usar JORNADA_FINAL_VIDEO; se não, usa o video_after do último bloco; se não, deixa sem vídeo
+    let finalVideo = resolveVideoSrc(window.JORNADA_FINAL_VIDEO || null);
+    if (!finalVideo && State.blocks && State.blocks.length) {
+      const last = State.blocks[State.blocks.length - 1];
+      if (last && last.video_after) {
+        finalVideo = resolveVideoSrc(last.video_after);
+      }
+    }
 
     try {
-      // PRIORIDADE: vídeo final + transição oficial
-      if (callPlayTransition(finalVideo, FINAL_SECTION_ID)) {
-        log('Transição final disparada com vídeo:', finalVideo || '(padrão)');
-      } else if (window.JC?.show && finalEl) {
+      // 1) Filme final + transição oficial
+      if (finalVideo && callPlayTransition(finalVideo, FINAL_SECTION_ID)) {
+        log('Transição final disparada com vídeo:', finalVideo);
+      }
+      // 2) Sem vídeo, mas temos controlador
+      else if (window.JC?.show && finalEl) {
         log('Usando JC.show para seção final.');
         window.JC.show(FINAL_SECTION_ID);
-      } else if (typeof window.showSection === 'function' && finalEl) {
+      }
+      else if (typeof window.showSection === 'function' && finalEl) {
         log('Usando showSection(FINAL_SECTION_ID).');
         window.showSection(FINAL_SECTION_ID);
-      } else if (finalEl) {
+      }
+      // 3) Último recurso: âncora
+      else if (finalEl) {
         log('Fallback via hash → section-final.');
         window.location.hash = '#' + FINAL_SECTION_ID;
-      } else {
+      }
+      else {
         warn('section-final não encontrada e não foi possível criar fallback.');
       }
     } catch (e) {
       err('Erro ao navegar para página final:', e);
     }
+
 
     try {
       document.dispatchEvent(new CustomEvent('qa:completed', {
