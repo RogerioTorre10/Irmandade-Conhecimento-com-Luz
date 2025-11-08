@@ -28,7 +28,7 @@
 
   const VIDEO_BASE = CFG.VIDEO_BASE;
 
-  global.JORNADA_VIDEOS = global.JORNADA_VIDEOS || {
+  window.JORNADA_VIDEOS = window.JORNADA_VIDEOS || {
     intro: VIDEO_BASE + 'filme-0-ao-encontro-da-jornada.mp4',
     afterBlocks: {
       0: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
@@ -38,7 +38,7 @@
     },
     final: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
   };
-  global.JORNADA_FINAL_VIDEO = global.JORNADA_VIDEOS.final;
+  window.JORNADA_FINAL_VIDEO = window.JORNADA_VIDEOS.final;
 
   const blockTranslations = {
     'pt-BR': [
