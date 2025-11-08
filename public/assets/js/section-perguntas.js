@@ -555,8 +555,27 @@ requestAnimationFrame(() => {
       });
     }
   }
-
-  // --------------------------------------------------
+    const btnApagar = $('#jp-btn-apagar', root);
+    if (btnApagar && input) {
+    btnApagar.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+    input.value = '';
+    input.focus();
+    if (window.JORNADA_CHAMA) {
+      window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'media');
+    }
+   });
+  }
+    const btnFalar = $('#jp-btn-falar', root);
+    if (btnFalar && input && window.JORNADA_MICRO) {
+    btnFalar.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    window.JORNADA_MICRO.attach(input, { mode: 'append' });
+  });
+ }
+  
+    // --------------------------------------------------
   // INIT
   // --------------------------------------------------
 
