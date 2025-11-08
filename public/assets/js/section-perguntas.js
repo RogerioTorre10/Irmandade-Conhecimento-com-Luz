@@ -38,7 +38,7 @@
   let completed = false;
 
   // --------------------------------------------------
-  // OVERLAY DE VÍDEO (FULLSCREEN)
+  // OVERLAY DE VÍDEO (entre blocos e final)
   // --------------------------------------------------
 
   function ensureVideoOverlay() {
@@ -48,18 +48,16 @@
     if (!overlay) {
       overlay = document.createElement('div');
       overlay.id = 'videoOverlay';
-      Object.assign(overlay.style, {
-        position: 'fixed',
-        top: '0',
-        left: '0',
-        width: '100%',
-        height: '100%',
-        backgroundColor: 'black',
-        display: 'none',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: '9999'
-      });
+      overlay.style.position = 'fixed';
+      overlay.style.top = '0';
+      overlay.style.left = '0';
+      overlay.style.width = '100%';
+      overlay.style.height = '100%';
+      overlay.style.background = 'rgba(0,0,0,0.96)';
+      overlay.style.display = 'none';
+      overlay.style.alignItems = 'center';
+      overlay.style.justifyContent = 'center';
+      overlay.style.zIndex = '9999';
       document.body.appendChild(overlay);
     }
 
@@ -68,13 +66,10 @@
       video.id = 'videoTransicao';
       video.playsInline = true;
       video.preload = 'auto';
+      video.style.maxWidth = '100%';
+      video.style.maxHeight = '100%';
+      video.style.objectFit = 'cover';
       video.controls = false;
-      Object.assign(video.style, {
-        width: '100%',
-        height: '100%',
-        objectFit: 'cover',
-        display: 'block'
-      });
       overlay.appendChild(video);
     }
 
@@ -91,8 +86,8 @@
   }
 
   function playVideoWithCallback(src, onEnded) {
-    const url = resolveVideoSrc(src);
-    if (!url) {
+    src = resolveVideoSrc(src);
+    if (!src) {
       if (typeof onEnded === 'function') onEnded();
       return;
     }
@@ -100,31 +95,35 @@
     const { overlay, video } = ensureVideoOverlay();
 
     overlay.style.display = 'flex';
-    video.src = url;
+    video.src = src;
     video.load();
 
     video.onended = () => {
       video.onended = null;
       overlay.style.display = 'none';
-      if (typeof onEnded === 'function') onEnded();
+      // IMPORTANTE: sempre chamar o callback,
+      // inclusive no vídeo final (não depende de "completed")
+      if (typeof onEnded === 'function') {
+        onEnded();
+      }
     };
 
     video.play().catch(e => {
       console.error('[PERGUNTAS] Erro ao tocar vídeo:', e);
-      video.onended = null;
       overlay.style.display = 'none';
+      video.onended = null;
       if (typeof onEnded === 'function') onEnded();
     });
   }
 
   function playBlockTransition(videoSrc, onDone) {
-    const url = resolveVideoSrc(videoSrc);
-    if (!url) {
+    const src = resolveVideoSrc(videoSrc);
+    if (!src) {
       if (typeof onDone === 'function') onDone();
       return;
     }
-    log('Transição entre blocos:', url);
-    playVideoWithCallback(url, onDone);
+    log('Transição entre blocos:', src);
+    playVideoWithCallback(src, onDone);
   }
 
   // --------------------------------------------------
@@ -167,7 +166,7 @@
   }
 
   // --------------------------------------------------
-  // PROGRESSO + DATILOGRAFIA + LEITURA
+  // UI / BARRAS / DATILOGRAFIA + LEITURA
   // --------------------------------------------------
 
   function setText(sel, val) {
@@ -175,39 +174,36 @@
     if (el) el.textContent = String(val);
   }
 
-  function setWidth(sel, pct) {
+  function setWidth(sel, val) {
     const el = $(sel);
-    if (el) el.style.width = pct;
+    if (el) el.style.width = val;
   }
 
   function updateCounters() {
     const { bloco } = getCurrent();
     const blocoTotal = bloco?.questions?.length || 1;
 
-    // Global
-    setText('#jp-global-current', State.globalIdx + 1);
-    setText('#jp-global-total', State.totalQuestions || 1);
-
-    // Bloco
-    setText('#jp-block-current', State.qIdx + 1);
-    setText('#jp-block-total', blocoTotal);
-
-    // "Bloco X de Y" (seu texto atual)
+    // Texto "Bloco X de Y" continua como está no HTML
     setText('#jp-block-num', State.blocoIdx + 1);
     setText('#jp-block-num-2', State.blocoIdx + 1);
     setText('#jp-block-max', State.totalBlocks || 1);
 
+    // Barra GLOBAL: esquerda = pergunta global atual, direita = total
+    setText('#jp-global-current', State.globalIdx + 1);
+    setText('#jp-global-total', State.totalQuestions || 1);
+
+    // Barra BLOCO: esquerda = pergunta dentro do bloco, direita = total do bloco
+    setText('#jp-block-current', State.qIdx + 1);
+    setText('#jp-block-total', blocoTotal);
+
     const pctBloco = Math.max(0, Math.min(100, ((State.qIdx + 1) / blocoTotal) * 100));
-    const pctGlobal = Math.max(
-      0,
-      Math.min(100, ((State.globalIdx + 1) / (State.totalQuestions || 1)) * 100)
-    );
+    const pctGlobal = Math.max(0, Math.min(100, ((State.globalIdx + 1) / (State.totalQuestions || 1)) * 100));
 
     setWidth('#jp-block-progress-fill', pctBloco + '%');
     setWidth('#jp-global-progress-fill', pctGlobal + '%');
   }
 
-    async function typeQuestion(text) {
+  async function typeQuestion(text) {
     if (completed) return;
 
     const box = $('#jp-question-typed');
@@ -216,23 +212,38 @@
 
     const pergunta = text || '[pergunta]';
 
-    // Guarda texto bruto, se alguém precisar
     if (raw) raw.textContent = pergunta;
 
-    // Deixa alinhado à esquerda
+    // garante alinhamento bonito (esquerda -> direita)
     box.style.textAlign = 'left';
 
-    // Reseta estado
+    // reseta
     box.textContent = '';
     box.classList.remove('typing-done');
     box.removeAttribute('data-typing');
 
-    // 1) DATILOGRAFIA VISUAL (sempre)
-    await manualTyping(box, pergunta);
+    // 1) Datilografia visual manual
+    let i = 0;
+    const speed = 24;
 
-    // 2) EFEITO LEITURA (TypingBridge) - opcional
-    // Aqui o texto já está digitado; se o bridge existir e quiser "ler",
-    // a gente só dá o gancho sem estragar a animação.
+    await new Promise(resolve => {
+      const it = setInterval(() => {
+        if (completed) {
+          clearInterval(it);
+          return resolve();
+        }
+        box.textContent = pergunta.slice(0, i);
+        i++;
+        if (i > pergunta.length) {
+          clearInterval(it);
+          box.classList.add('typing-done');
+          resolve();
+        }
+      }, speed);
+    });
+
+    // 2) Efeito leitura (TypingBridge) - opcional
+    // Se jornada-typing-bridge expõe runTyping, chamamos depois da animação
     if (typeof window.runTyping === 'function') {
       try {
         box.setAttribute('data-typing', 'true');
@@ -243,29 +254,7 @@
         box.classList.add('typing-done');
         box.removeAttribute('data-typing');
       }
-    } else {
-      box.classList.add('typing-done');
     }
-  }
-
-  function manualTyping(box, pergunta) {
-    return new Promise(resolve => {
-      box.textContent = '';
-      let i = 0;
-      const speed = 24;
-      const it = setInterval(() => {
-        if (completed) {
-          clearInterval(it);
-          return resolve();
-        }
-        box.textContent = pergunta.slice(0, i);
-        i++;
-        if (i > pergunta.length) {
-          clearInterval(it);
-          resolve();
-        }
-      }, speed);
-    });
   }
 
   async function showCurrentQuestion() {
@@ -424,6 +413,7 @@
     }
 
     const finalEl = ensureFinalSectionExists();
+
     const finalVideoSrc = resolveVideoSrc(
       window.JORNADA_FINAL_VIDEO || FINAL_VIDEO_FALLBACK
     );
