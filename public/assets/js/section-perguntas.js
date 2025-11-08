@@ -133,7 +133,9 @@
 
       if (api && typeof api.loadDynamicBlocks === 'function') {
         log('Usando JPaperQA.loadDynamicBlocks');
-        await api.loadDynamicBlocks(root, opts);
+        await api.loadDynamicBlocks();
+        window.JC = window.JC || { currentBloco: 0, currentPergunta: 0 };
+        api.renderQuestions();
       } else if (api && typeof api.mount === 'function') {
         log('Usando JPaperQA.mount');
         await api.mount(root, opts);
