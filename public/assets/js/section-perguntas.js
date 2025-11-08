@@ -1,16 +1,12 @@
 /* /assets/js/section-perguntas.js
- * Jornada de Perguntas + Transições + Devolutiva API
- * - Usa JPaperQA.loadDynamicBlocks (dados dos blocos)
- * - Entre blocos: executa vídeo de transição
- * - No final: executa vídeo final e navega para section-final
- * - Exporta __QA_ANSWERS__ e __QA_META__ para o backend/HQ
+ * Jornada de Perguntas + Vídeos + Export para API
  */
 
 (function () {
   'use strict';
 
   if (window.__PERGUNTAS_BOUND__) {
-    console.log('[PERGUNTAS] Script já carregado, ignorando duplicata.');
+    console.log('[PERGUNTAS] Já inicializado, ignorando.');
     return;
   }
   window.__PERGUNTAS_BOUND__ = true;
@@ -22,121 +18,140 @@
   const log  = (...a) => console.log('[PERGUNTAS]', ...a);
   const warn = (...a) => console.warn('[PERGUNTAS]', ...a);
   const err  = (...a) => console.error('[PERGUNTAS]', ...a);
-  const $    = (sel, root = document) => root.querySelector(sel);
+  const $    = (sel, root = document) => (root || document).querySelector(sel);
 
   const State = {
     mounted: false,
     loading: false,
-    answers: {},
-    meta: null,
     blocks: [],
     totalBlocks: 0,
     totalQuestions: 0,
     blocoIdx: 0,
     qIdx: 0,
     globalIdx: 0,
-    startedAt: null
+    startedAt: null,
+    answers: {},
+    meta: null
   };
 
   let completed = false;
 
-  // ---------- Helpers de vídeo ----------
+  // --------------------------------------------------
+  // VÍDEO OVERLAY (entre blocos e final)
+  // --------------------------------------------------
+
+  function ensureVideoOverlay() {
+    let overlay = $('#videoOverlay');
+    let video = $('#videoTransicao');
+
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'videoOverlay';
+      overlay.style.position = 'fixed';
+      overlay.style.inset = '0';
+      overlay.style.background = 'rgba(0,0,0,0.9)';
+      overlay.style.display = 'none';
+      overlay.style.alignItems = 'center';
+      overlay.style.justifyContent = 'center';
+      overlay.style.zIndex = '2000';
+      document.body.appendChild(overlay);
+    }
+
+    if (!video) {
+      video = document.createElement('video');
+      video.id = 'videoTransicao';
+      video.playsInline = true;
+      video.preload = 'auto';
+      video.style.maxWidth = '100%';
+      video.style.maxHeight = '100%';
+      overlay.appendChild(video);
+    }
+
+    return { overlay, video };
+  }
 
   function resolveVideoSrc(src) {
     if (!src) return null;
     let url = String(src).trim();
-    // Corrige base errada /assets/img/ → /assets/videos/ para .mp4
     if (url.startsWith('/assets/img/') && url.endsWith('.mp4')) {
       url = url.replace('/assets/img/', '/assets/videos/');
     }
     return url;
   }
 
-    // Usa a mesma função global do video-transicao.js
-  function getTransitionFn() {
-    if (typeof window.playTransitionThenGo === 'function') return window.playTransitionThenGo;
-    if (typeof window.playVideoTransition === 'function') return window.playVideoTransition;
-    return null;
-  }
+  function playVideoWithCallback(src, onEnded) {
+    src = resolveVideoSrc(src);
+    const { overlay, video } = ensureVideoOverlay();
 
-  function callPlayTransition(videoSrc, nextSectionId, onDone) {
-    const fn = getTransitionFn();
-    if (!fn) return false;
+    if (!src) {
+      if (onEnded) onEnded();
+      return;
+    }
 
-    const src = resolveVideoSrc(videoSrc);
+    overlay.style.display = 'flex';
+    video.src = src;
+    video.load();
 
-    try {
-      // video-transicao.js (pelo log) recebe: src + nextSectionId
-      fn(src, nextSectionId);
+    const prev = video.onended;
 
-      if (typeof onDone === 'function') {
-        // margem de segurança até o fim do filme
-        setTimeout(() => {
-          if (!completed) onDone();
-        }, 6500);
+    video.onended = () => {
+      video.onended = null;
+      if (typeof prev === 'function') {
+        try { prev(); } catch (e) { console.error(e); }
       }
-
-      return true;
-    } catch (e) {
-      err('Erro em playTransitionThenGo/playVideoTransition:', e);
-      return false;
-    }
-  }
-
-
-    function playBlockTransition(videoSrc, onDone) {
-    const src = resolveVideoSrc(videoSrc);
-
-    // PRIORIDADE 1: usa o sistema global de transição com retorno para section-perguntas
-    if (callPlayTransition(src, SECTION_ID, onDone)) {
-      log('Transição entre blocos via vídeo de transição:', src || '(padrão)');
-      return true;
-    }
-
-    // PRIORIDADE 2 (fallback): tenta usar overlay local do JPaperQA, se existir
-    if (window.JPaperQA && typeof window.JPaperQA.loadVideo === 'function' && src) {
-      try {
-        log('Transição entre blocos via JPaperQA.loadVideo:', src);
-        const maybe = window.JPaperQA.loadVideo(src);
-        if (maybe && typeof maybe.then === 'function') {
-          maybe.then(() => { if (!completed && typeof onDone === 'function') onDone(); });
-        } else if (typeof onDone === 'function') {
-          setTimeout(() => { if (!completed) onDone(); }, 100);
-        }
-        return true;
-      } catch (e) {
-        warn('Falha em JPaperQA.loadVideo:', e);
+      overlay.style.display = 'none';
+      if (!completed && typeof onEnded === 'function') {
+        onEnded();
       }
-    }
+    };
 
-    // Se nada funcionou, segue direto
-    return false;
+    video.play().catch(e => {
+      console.error('[PERGUNTAS] Erro ao tocar vídeo:', e);
+      overlay.style.display = 'none';
+      video.onended = null;
+      if (onEnded) onEnded();
+    });
   }
 
+  function playBlockTransition(videoSrc, onDone) {
+    const src = resolveVideoSrc(videoSrc);
+    if (!src) {
+      if (onDone) onDone();
+      return;
+    }
+    log('Transição entre blocos:', src);
+    playVideoWithCallback(src, onDone);
+  }
 
-  // ---------- Blocos / Dados ----------
+  // --------------------------------------------------
+  // BLOCS / PERGUNTAS
+  // --------------------------------------------------
 
   async function ensureBlocks() {
+    // Se já veio carregado
     if (Array.isArray(window.JORNADA_BLOCKS) && window.JORNADA_BLOCKS.length) {
       State.blocks = window.JORNADA_BLOCKS;
       return;
     }
 
+    // Usa JPaperQA para carregar
     if (window.JPaperQA && typeof window.JPaperQA.loadDynamicBlocks === 'function') {
-      const ok = await window.JPaperQA.loadDynamicBlocks();
-      if (ok && Array.isArray(window.JORNADA_BLOCKS) && window.JORNADA_BLOCKS.length) {
-        State.blocks = window.JORNADA_BLOCKS;
-      } else {
-        State.blocks = [];
+      try {
+        await window.JPaperQA.loadDynamicBlocks();
+        if (Array.isArray(window.JORNADA_BLOCKS) && window.JORNADA_BLOCKS.length) {
+          State.blocks = window.JORNADA_BLOCKS;
+          return;
+        }
+      } catch (e) {
+        err('Erro ao carregar blocos via JPaperQA.loadDynamicBlocks:', e);
       }
-      return;
     }
 
     State.blocks = window.JORNADA_BLOCKS || [];
   }
 
   function computeTotals() {
-    State.totalBlocks = State.blocks.length || 0;
+    State.totalBlocks = State.blocks.length;
     State.totalQuestions = State.blocks.reduce(
       (sum, b) => sum + (b.questions?.length || 0),
       0
@@ -149,7 +164,9 @@
     return { bloco, pergunta };
   }
 
-  // ---------- UI helpers ----------
+  // --------------------------------------------------
+  // UI / DATILOGRAFIA
+  // --------------------------------------------------
 
   function setText(sel, val) {
     const el = $(sel);
@@ -184,7 +201,7 @@
     setWidth('#jp-global-progress-fill', pctGlobal + '%');
   }
 
-    async function typeQuestion(text) {
+  async function typeQuestion(text) {
     if (completed) return;
 
     const box = $('#jp-question-typed');
@@ -193,53 +210,17 @@
 
     const pergunta = text || '[pergunta]';
 
-    // Mantém o texto bruto (se você usar em log/IA)
-    if (raw) {
-      raw.textContent = pergunta;
-    }
+    if (raw) raw.textContent = pergunta;
 
-    // Prepara para o TypingBridge:
-    // - garante que não esteja marcado como concluído
-    // - marca como elegível para datilografia
-    box.classList.remove('typing-done');
-    box.setAttribute('data-typing', 'true');
-
-    // Limpa antes de começar
+    // limpa e garante estado neutro
     box.textContent = '';
+    box.removeAttribute('data-typing');
+    box.classList.remove('typing-done');
 
-    if (window.runTyping) {
-      try {
-        // O TypingBridge usa o conteúdo atual do elemento como alvo,
-        // então colocamos o texto e deixamos ele animar.
-        box.textContent = pergunta;
-        await window.runTyping(box);
-      } catch (e) {
-        console.warn('[PERGUNTAS] runTyping falhou, usando fallback simples.', e);
-        // fallback manual se der erro
-        box.textContent = '';
-        let i = 0;
-        const speed = 24;
-        await new Promise(resolve => {
-          const it = setInterval(() => {
-            if (completed) {
-              clearInterval(it);
-              return resolve();
-            }
-            box.textContent = pergunta.slice(0, i);
-            i++;
-            if (i > pergunta.length) {
-              clearInterval(it);
-              resolve();
-            }
-          }, speed);
-        });
-      }
-      return;
-    }
-
-    // Se não existir TypingBridge, usa só a datilografia manual
+    // datilografia VISUAL manual (independente do TypingBridge)
     let i = 0;
     const speed = 24;
+
     await new Promise(resolve => {
       const it = setInterval(() => {
         if (completed) {
@@ -250,12 +231,15 @@
         i++;
         if (i > pergunta.length) {
           clearInterval(it);
+          box.classList.add('typing-done');
           resolve();
         }
       }, speed);
     });
-  }
 
+    // se o TypingBridge usar isso só para leitura/TTS, deixamos o gancho
+    box.setAttribute('data-typing', 'true');
+  }
 
   async function showCurrentQuestion() {
     if (completed) return;
@@ -278,8 +262,7 @@
       textarea.focus();
     }
 
-    const texto = pergunta.label || '[pergunta]';
-    await typeQuestion(texto);
+    await typeQuestion(pergunta.label || '[pergunta]');
     updateCounters();
 
     if (window.JORNADA_CHAMA?.ensureHeroFlame) {
@@ -287,7 +270,9 @@
     }
   }
 
-  // ---------- Captura de respostas ----------
+  // --------------------------------------------------
+  // RESPOSTAS
+  // --------------------------------------------------
 
   function saveCurrentAnswer() {
     if (completed) return;
@@ -305,7 +290,9 @@
     }
   }
 
-  // ---------- Navegação das perguntas ----------
+  // --------------------------------------------------
+  // NAVEGAÇÃO DAS PERGUNTAS
+  // --------------------------------------------------
 
   function nextStep() {
     if (completed) {
@@ -323,38 +310,36 @@
     const isLastInBloco = State.qIdx >= blocoTotal - 1;
     const isLastOfAll = State.globalIdx >= State.totalQuestions - 1;
 
-    // Última de todas → fecha jornada
+    // última pergunta global
     if (isLastOfAll) {
       finishAll();
       return;
     }
 
-    // Ainda existem perguntas globais
     State.globalIdx++;
 
+    // fim de bloco (mas ainda não é o fim de todos)
     if (isLastInBloco) {
       const nextBlocoIdx = State.blocoIdx + 1;
-      const currentVideo = bloco.video_after || null;
+      const video = bloco.video_after || bloco.transitionVideo || null;
 
       State.blocoIdx = nextBlocoIdx;
       State.qIdx = 0;
 
-      // Tenta rodar filme de transição do bloco atual antes de mostrar o próximo
-      const usouVideo = playBlockTransition(currentVideo, () => {
-        showCurrentQuestion();
+      playBlockTransition(video, () => {
+        if (!completed) showCurrentQuestion();
       });
-
-      if (!usouVideo) {
-        showCurrentQuestion();
-      }
     } else {
-      // Próxima dentro do mesmo bloco
+      // dentro do mesmo bloco
       State.qIdx++;
       showCurrentQuestion();
     }
   }
 
-  // ---------- Finalização ----------
+  // --------------------------------------------------
+  // SECTION FINAL / EXPORT
+  // --------------------------------------------------
+
   function ensureFinalSectionExists() {
     let finalEl =
       document.getElementById(FINAL_SECTION_ID) ||
@@ -362,17 +347,15 @@
       document.querySelector('.section-final');
 
     if (!finalEl) {
-      // Container onde ficam as seções "originais" para o JC.show clonar
       const container =
         document.getElementById('jornada-sections') ||
         document.querySelector('.jornada-sections') ||
-        document.body; // fallback seguro
+        document.body;
 
       finalEl = document.createElement('section');
       finalEl.id = FINAL_SECTION_ID;
       finalEl.className = 'section section-final pergaminho';
       finalEl.dataset.section = 'final';
-
       finalEl.innerHTML = `
         <div class="final-wrapper">
           <h2 class="final-title">Gratidão por caminhar com Luz 🙏</h2>
@@ -381,14 +364,12 @@
           </p>
         </div>
       `;
-
       container.appendChild(finalEl);
       log('section-final criada automaticamente (fallback).');
     }
 
     return finalEl;
   }
-
 
   function finishAll() {
     if (completed) return;
@@ -418,41 +399,38 @@
       window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'forte');
     }
 
-      const finalEl = ensureFinalSectionExists();
+    const finalEl = ensureFinalSectionExists();
 
-let finalVideo = resolveVideoSrc(window.JORNADA_FINAL_VIDEO || null);
-if (!finalVideo && State.blocks && State.blocks.length) {
-  const last = State.blocks[State.blocks.length - 1];
-  if (last && last.video_after) {
-    finalVideo = resolveVideoSrc(last.video_after);
-  }
-}
+    // tenta vídeo final: usa video_after do último bloco ou JORNADA_FINAL_VIDEO
+    const lastBlock = State.blocks[State.blocks.length - 1];
+    const finalVideoSrc = resolveVideoSrc(
+      window.JORNADA_FINAL_VIDEO ||
+      (lastBlock && lastBlock.video_after) ||
+      null
+    );
 
-try {
-  if (finalVideo && typeof window.loadVideo === 'function') {
-    log('Transição final via loadVideo:', finalVideo);
-    window.loadVideo(finalVideo);
-    // quando o vídeo terminar, o onended do próprio loadVideo fecha overlay
-    // e a gente mantém a section-final já carregada via JC.show
-    if (window.JC?.show && finalEl) {
-      // pequena folga para trocar a tela depois do vídeo
-      setTimeout(() => window.JC.show(FINAL_SECTION_ID), 6500);
+    if (finalVideoSrc) {
+      log('Iniciando vídeo final:', finalVideoSrc);
+      playVideoWithCallback(finalVideoSrc, () => {
+        if (window.JC?.show && finalEl) {
+          window.JC.show(FINAL_SECTION_ID);
+        } else if (typeof window.showSection === 'function') {
+          window.showSection(FINAL_SECTION_ID);
+        } else {
+          window.location.hash = '#' + FINAL_SECTION_ID;
+        }
+      });
+    } else {
+      if (window.JC?.show && finalEl) {
+        window.JC.show(FINAL_SECTION_ID);
+      } else if (typeof window.showSection === 'function') {
+        window.showSection(FINAL_SECTION_ID);
+      } else {
+        window.location.hash = '#' + FINAL_SECTION_ID;
+      }
     }
-  } else if (window.JC?.show && finalEl) {
-    log('Sem vídeo final, usando JC.show para seção final.');
-    window.JC.show(FINAL_SECTION_ID);
-  } else if (typeof window.showSection === 'function' && finalEl) {
-    window.showSection(FINAL_SECTION_ID);
-  } else if (finalEl) {
-    window.location.hash = '#' + FINAL_SECTION_ID;
-  } else {
-    warn('section-final não encontrada e não foi possível criar fallback.');
-  }
-} catch (e) {
-  err('Erro ao navegar para página final:', e);
-}
 
-
+    // notifica quem quiser ouvir (section-final.js / outros)
     try {
       document.dispatchEvent(new CustomEvent('qa:completed', {
         detail: { answers: State.answers, meta: State.meta }
@@ -462,7 +440,9 @@ try {
     }
   }
 
-  // ---------- Bind de UI ----------
+  // --------------------------------------------------
+  // BIND UI
+  // --------------------------------------------------
 
   function bindUI(root) {
     const btnFalar  = $('#jp-btn-falar', root);
@@ -516,7 +496,9 @@ try {
     }
   }
 
-  // ---------- Init ----------
+  // --------------------------------------------------
+  // INIT
+  // --------------------------------------------------
 
   async function init(root) {
     if (State.mounted || State.loading || completed) return;
@@ -526,10 +508,12 @@ try {
     computeTotals();
 
     if (!State.blocks.length || !State.totalQuestions) {
-      err('JORNADA_BLOCKS vazio; confira jornada-paper-qa.js.');
+      err('Nenhum bloco/pergunta carregado. Verifique jornada-paper-qa.js.');
       State.loading = false;
       return;
     }
+
+    ensureVideoOverlay();
 
     State.startedAt = new Date().toISOString();
     State.blocoIdx = 0;
@@ -541,7 +525,7 @@ try {
 
     State.mounted = true;
     State.loading = false;
-    log(MOD, 'section-perguntas.js montado com sucesso.');
+    log(MOD, MOD + ' montado com sucesso.');
   }
 
   document.addEventListener('sectionLoaded', (e) => {
@@ -558,9 +542,7 @@ try {
   });
 
   window.JPerguntas = {
-    start(root) {
-      init(root || document.getElementById(SECTION_ID));
-    },
+    start(root) { init(root || document.getElementById(SECTION_ID)); },
     reset() {
       State.mounted = false;
       State.loading = false;
@@ -574,5 +556,5 @@ try {
     }
   };
 
-  log(MOD, 'carregado (proteções + transições integradas).');
+  log(MOD, 'carregado');
 })();
