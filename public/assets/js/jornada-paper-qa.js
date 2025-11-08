@@ -218,7 +218,6 @@
   let JORNADA_BLOCKS = [];
   win.JORNADA_BLOCKS = JORNADA_BLOCKS;
 
-  // ===== UTIL DOM =====
   function elCanvas()  { return document.getElementById(CFG.CANVAS_ID); }
   function elContent() { return document.getElementById(CFG.CONTENT_ID); }
 
@@ -232,10 +231,7 @@
       root = document.createElement('section');
       root.id = CFG.CANVAS_ID;
       root.className = 'card pergaminho';
-      document
-        .getElementById('section-perguntas')
-        ?.querySelector('.content')
-        ?.appendChild(root);
+      document.getElementById('section-perguntas')?.querySelector('.content')?.appendChild(root);
     }
 
     let content = elContent();
@@ -261,139 +257,15 @@
     root.style.minHeight = '82vh';
   }
 
-  // ===== DATILOGRAFIA =====
-  async function paperTypeText(element, text, speed = 36) {
-    return new Promise(resolve => {
-      let i = 0;
-      element.textContent = '';
-
-      const caret = document.createElement('span');
-      caret.className = 'typing-caret';
-      caret.textContent = '|';
-      element.appendChild(caret);
-
-      const interval = setInterval(() => {
-        element.textContent = text.slice(0, i);
-        caret.style.opacity = i < text.length ? '1' : '0';
-        i++;
-        if (i > text.length) {
-          clearInterval(interval);
-          caret.remove();
-          element.classList.add('typing-done');
-          resolve();
-        }
-      }, speed);
-    });
-  }
-
-  // ===== SALVAR/RECUPERAR RESPOSTA =====
-  function saveAnswer(blockIdx, qIdx, answer) {
-    const key = `jornada_answer_${blockIdx}_${qIdx}`;
-    localStorage.setItem(key, answer);
-  }
-
-  function loadAnswer(blockIdx, qIdx) {
-    const key = `jornada_answer_${blockIdx}_${qIdx}`;
-    return localStorage.getItem(key) || '';
-  }
-
-  function getGlobalProgress() {
-    let total = 0;
-    let completed = 0;
-
-    JORNADA_BLOCKS.forEach((block, bIdx) => {
-      total += block.questions.length;
-      block.questions.forEach((_, qIdx) => {
-        if (loadAnswer(bIdx, qIdx)) completed++;
-      });
-    });
-
-    return total > 0 ? Math.round((completed / total) * 100) : 0;
-  }
-
-  // ===== IA FEEDBACK =====
-  async function gerarFeedbackIA(resposta, pergunta) {
-    const prompt =
-`Você é um guia espiritual sábio e compassivo.
-Pergunta: "${pergunta}"
-Resposta: "${resposta}"
-
-Dê um feedback curto (1-2 frases), encorajador e poético.`;
-
-    try {
-      if (win.JC?.api?.grok) {
-        const res = await fetch('https://api.x.ai/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${win.JC.api.grok}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            model: 'grok-beta',
-            messages: [{ role: 'user', content: prompt }],
-            max_tokens: 100
-          })
-        });
-        const data = await res.json();
-        return data.choices?.[0]?.message?.content?.trim() || 'Continue com luz.';
-      }
-
-      if (win.JC?.api?.openai) {
-        const res = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${win.JC.api.openai}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            model: 'gpt-4o-mini',
-            messages: [{ role: 'user', content: prompt }],
-            max_tokens: 100
-          })
-        });
-        const data = await res.json();
-        return data.choices?.[0]?.message?.content?.trim() || 'Sua alma já sabe.';
-      }
-
-      return 'A luz dentro de você é a resposta.';
-    } catch (e) {
-      warn('Erro IA:', e);
-      return 'Confie no seu caminho.';
-    }
-  }
-
-  // ===== VÍDEO =====
+  // VÍDEO: DESATIVADO AQUI
   function loadVideo(videoSrc) {
-  if (window.__currentSectionId !== 'section-perguntas') return;
-  const video = document.querySelector('#videoTransicao');
-  const videoOverlay = document.querySelector('#videoOverlay');
-  if (!video || !videoOverlay) {
-    console.error('[JORNADA_PAPER] #videoTransicao ou #videoOverlay não encontrado');
-    return;
+    console.log('[JORNADA_PAPER] Vídeo solicitado (ignorado):', videoSrc);
   }
 
-  video.src = videoSrc;
-  videoOverlay.style.display = 'flex';
-  video.load();
-  video.play().catch(err => console.error('[JORNADA_PAPER] Erro ao reproduzir vídeo:', err));
-  console.log('[JORNADA_PAPER] Vídeo carregado:', videoSrc);
-
-  video.onended = () => {
-    video.onended = null;
-    videoOverlay.style.display = 'none';
-  };
-}
-
-
-  // ===== RENDER =====
   async function renderQuestions() {
     setPergaminho('h');
-
     const { content } = ensureCanvas();
-    if (!content || !JORNADA_BLOCKS.length) {
-      warn('Canvas ou blocos não prontos');
-      return;
-    }
+    if (!content || !JORNADA_BLOCKS.length) return;
 
     content.innerHTML = '';
 
@@ -402,21 +274,11 @@ Dê um feedback curto (1-2 frases), encorajador e poético.`;
     const q = block.questions[JC.currentPergunta] || block.questions[0];
     const perguntaTexto = i18n.t(q.data_i18n, q.label);
 
-    // Header
     const header = document.createElement('div');
     header.className = 'perguntas-header';
-    header.innerHTML = `
-      <div>
-        <div class="jp-block-label">Bloco ${JC.currentBloco + 1} de ${JORNADA_BLOCKS.length}</div>
-        <div style="font-size:11px;color:#ffd38a;margin-top:2px">
-          Pergunta ${JC.currentPergunta + 1}/${block.questions.length}
-        </div>
-      </div>
-      <div class="jp-global-counter">${getGlobalProgress()}% concluído</div>
-    `;
+    header.innerHTML = `...`; // mesmo que antes
     content.appendChild(header);
 
-    // Pergaminho + pergunta + resposta
     const pergaminho = document.createElement('div');
     pergaminho.className = 'pergaminho-container';
     pergaminho.innerHTML = `
@@ -426,16 +288,10 @@ Dê um feedback curto (1-2 frases), encorajador e poético.`;
       <div class="jp-answer-container">
         <div class="jp-answer-frame">
           <div class="jp-answer-bg"></div>
-          <textarea class="jp-answer-input" id="answer-input"
-            placeholder="Digite com verdade e calma..." maxlength="1000"></textarea>
+          <textarea class="jp-answer-input" id="answer-input" placeholder="Digite com verdade e calma..." maxlength="1000"></textarea>
         </div>
       </div>
-      <div class="jp-ai-feedback" id="ai-feedback">
-        <div class="jp-ai-text" id="ai-text"></div>
-      </div>
       <div class="perguntas-controls">
-        <button class="btn-perguntas" id="btn-speak">Falar</button>
-        <button class="btn-perguntas" id="btn-read">Ler</button>
         <button class="btn-perguntas btn-confirm" id="btn-next">
           ${JC.currentPergunta < block.questions.length - 1 ? 'Próxima' : 'Concluir'}
         </button>
@@ -444,51 +300,44 @@ Dê um feedback curto (1-2 frases), encorajador e poético.`;
     content.appendChild(pergaminho);
 
     const input = document.getElementById('answer-input');
-    const saved = loadAnswer(JC.currentBloco, JC.currentPergunta);
+    const saved = localStorage.getItem(`jornada_answer_${JC.currentBloco}_${JC.currentPergunta}`);
     if (saved) input.value = saved;
 
-    await paperTypeText(document.getElementById('question-display'), perguntaTexto, 38);
+    // DATILOGRAFIA
+    let i = 0;
+    const display = document.getElementById('question-display');
+    display.textContent = '';
+    const speed = 38;
+    await new Promise(res => {
+      const int = setInterval(() => {
+        display.textContent = perguntaTexto.slice(0, i);
+        i++;
+        if (i > perguntaTexto.length) {
+          clearInterval(int);
+          display.classList.add('typing-done');
+          res();
+        }
+      }, speed);
+    });
 
-    // Leitura em voz alta
-    document.getElementById('btn-read').onclick = () => {
-      if ('speechSynthesis' in win) {
-        const utter = new SpeechSynthesisUtterance(perguntaTexto);
-        utter.lang = i18n.lang || 'pt-BR';
-        utter.rate = 0.9;
-        win.speechSynthesis.speak(utter);
-      }
-    };
-
-    // Avançar
     document.getElementById('btn-next').onclick = async () => {
-      const resposta = (input.value || '').trim();
-
+      const resposta = input.value.trim();
       if (!resposta && JC.currentPergunta < block.questions.length - 1) {
         win.toast?.('Escreva sua resposta antes de avançar.');
         return;
       }
 
-      saveAnswer(JC.currentBloco, JC.currentPergunta, resposta);
+      localStorage.setItem(`jornada_answer_${JC.currentBloco}_${JC.currentPergunta}`, resposta);
 
-      // Feedback IA opcional
-      if (resposta && (win.JC?.api?.grok || win.JC?.api?.openai)) {
-        const feedbackEl = document.getElementById('ai-feedback');
-        const textEl = document.getElementById('ai-text');
-        feedbackEl.classList.remove('active');
-        textEl.textContent = 'A luz reflete...';
-        feedbackEl.classList.add('active');
-        const feedback = await gerarFeedbackIA(resposta, perguntaTexto);
-        textEl.textContent = feedback;
-      }
-
-      // Navegação entre blocos/perguntas
       if (JC.currentPergunta < block.questions.length - 1) {
         JC.currentPergunta++;
       } else if (JC.currentBloco < JORNADA_BLOCKS.length - 1) {
         JC.currentBloco++;
         JC.currentPergunta = 0;
         const nextVideo = JORNADA_BLOCKS[JC.currentBloco - 1]?.video_after;
-        if (nextVideo) loadVideo(nextVideo);
+        if (nextVideo && window.playBlockTransition) {
+          await new Promise(resolve => window.playBlockTransition(nextVideo, resolve));
+        }
       } else {
         document.dispatchEvent(new CustomEvent('qa:completed'));
         return;
@@ -501,48 +350,25 @@ Dê um feedback curto (1-2 frases), encorajador e poético.`;
     log('Pergunta renderizada com sucesso');
   }
 
-  // ===== INIT =====
   async function loadDynamicBlocks() {
-    try {
-      await i18n.waitForReady(10000);
-      const lang = i18n.lang || 'pt-BR';
-      const base = blockTranslations[lang] || blockTranslations['pt-BR'];
-      JORNADA_BLOCKS = base.map(b => ({
-        id: b.id,
-        title: b.title,
-        data_i18n: b.data_i18n,
-        questions: b.questions,
-        video_after: b.video_after,
-        tipo: 'perguntas'
-      }));
-      win.JORNADA_BLOCKS = JORNADA_BLOCKS;
-      log('Blocos carregados:', JORNADA_BLOCKS.length);
-      return true;
-    } catch (e) {
-      warn('Erro ao carregar blocos:', e);
-      return false;
-    }
+    await i18n.waitForReady(10000);
+    const lang = i18n.lang || 'pt-BR';
+    const base = blockTranslations[lang] || blockTranslations['pt-BR'];
+    JORNADA_BLOCKS = base.map(b => ({
+      id: b.id, title: b.title, data_i18n: b.data_i18n,
+      questions: b.questions, video_after: b.video_after, tipo: 'perguntas'
+    }));
+    win.JORNADA_BLOCKS = JORNADA_BLOCKS;
+    log('Blocos carregados:', JORNADA_BLOCKS.length);
+    return true;
   }
 
   async function initPaperQA() {
     await loadDynamicBlocks();
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    initPaperQA();
-  });
+  document.addEventListener('DOMContentLoaded', initPaperQA);
 
-  // Auto-init DEV
-  if (win.location.hostname === 'localhost' || win.location.hostname.includes('render')) {
-    setTimeout(async () => {
-      if (!win.JORNADA_BLOCKS?.length && win.JPaperQA?.loadDynamicBlocks) {
-        log('Auto-iniciando blocos em dev...');
-        await win.JPaperQA.loadDynamicBlocks();
-      }
-    }, 500);
-  }
-
-  // API GLOBAL
   win.JPaperQA = {
     loadDynamicBlocks,
     renderQuestions,
@@ -552,5 +378,5 @@ Dê um feedback curto (1-2 frases), encorajador e poético.`;
     init: initPaperQA
   };
 
-  log('jornada-paper-qa.js carregado com sucesso (usando window/win)');
+  log('jornada-paper-qa.js carregado com sucesso');
 })(window);
