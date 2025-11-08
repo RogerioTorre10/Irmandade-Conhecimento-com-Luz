@@ -1,7 +1,8 @@
-/* /assets/js/section-perguntas.js — v2.1
-   - Bloqueio de "card confirmado" removido
-   - Integra com jornada-paper-qa.js (JCPaperQA / JornadaPaperQA)
-   - Mantém fluxo suave: selfie -> card -> perguntas -> final
+/* /assets/js/section-perguntas.js — v3.0 FINAL
+   - Remove qualquer bloqueio de "card confirmado"
+   - Usa window.JPaperQA como fonte oficial das perguntas
+   - Mantém fallback via evento qa:start (sem alarmismo)
+   - Fluxo: selfie -> card -> perguntas -> final
 */
 
 (function () {
@@ -28,21 +29,32 @@
   // Navegação para a próxima seção
   // -------------------------------
   function goNext() {
+    // 1) Preferir vídeo de transição configurado
     if (typeof window.playTransitionVideo === 'function' && VIDEO_SRC) {
       window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
-    } else if (window.JC?.goNext) {
-      window.JC.goNext();
-    } else if (typeof window.showSection === 'function' && document.getElementById(NEXT_SECTION_ID)) {
-      window.showSection(NEXT_SECTION_ID);
-    } else {
-      document.dispatchEvent(new CustomEvent('qa:completed', {
-        detail: { answers: State.answers, meta: State.meta }
-      }));
+      return;
     }
+
+    // 2) Usar controlador geral da jornada
+    if (window.JC?.goNext) {
+      window.JC.goNext();
+      return;
+    }
+
+    // 3) Fallback por ID
+    if (typeof window.showSection === 'function' && document.getElementById(NEXT_SECTION_ID)) {
+      window.showSection(NEXT_SECTION_ID);
+      return;
+    }
+
+    // 4) Último recurso: só notifica conclusão
+    document.dispatchEvent(new CustomEvent('qa:completed', {
+      detail: { answers: State.answers, meta: State.meta }
+    }));
   }
 
   // --------------------------------------
-  // Helper opcional: respeitar transições
+  // Helper opcional: aguardar transições
   // --------------------------------------
   async function waitForTransitionUnlock(timeoutMs = 15000) {
     try {
@@ -62,37 +74,45 @@
       });
 
       const t = new Promise(resolve => setTimeout(resolve, timeoutMs));
-
       await Promise.race([p, t]);
     } catch {
-      // falha silenciosa — não quebra fluxo
+      // qualquer erro aqui é ignorado para não travar o fluxo
     }
   }
 
   // --------------------------------------
-  // Descobrir API das perguntas (jornada-paper-qa)
+  // Descobrir API das perguntas
   // --------------------------------------
   function getPaperApi() {
-    // Prioriza os nomes que você já usa no projeto
-    return (
-      window.JCPaperQA ||
-      window.JornadaPaperQA ||
-      window.PaperQA ||
-      null
-    );
+    // Padrão oficial da Jornada:
+    if (window.JPaperQA) return window.JPaperQA;
+
+    // Fallbacks se em algum momento você expor com outro nome:
+    if (window.JCPaperQA) return window.JCPaperQA;
+    if (window.JornadaPaperQA) return window.JornadaPaperQA;
+    if (window.PaperQA) return window.PaperQA;
+
+    return null;
   }
 
   // -------------------------------
   // Inicialização do bloco de Q&A
   // -------------------------------
   async function startQA(root) {
-    if (!root) return warn('Root para perguntas não encontrado.');
-    if (State.running) return log('Fluxo QA já em execução.');
+    if (!root) {
+      warn('Root para perguntas não encontrado.');
+      return;
+    }
+    if (State.running) {
+      log('Fluxo QA já em execução, ignorando novo start.');
+      return;
+    }
+
     State.running = true;
 
     await waitForTransitionUnlock();
 
-    const guia   = (window.JC && window.JC.state && window.JC.state.guia) ? window.JC.state.guia : {};
+    const guia   = (window.JC?.state?.guia) || {};
     const selfie = window.__SELFIE_DATA_URL__ || null;
     const startedAt = new Date().toISOString();
 
@@ -101,8 +121,8 @@
       guia,
       selfie,
       i18n: window.i18n || null,
-      onProgress: (p) => {
-        // hook opcional para barra de progresso
+      onProgress: () => {
+        // hook opcional para barra de progresso no futuro
       },
       onComplete: (result) => {
         try {
@@ -114,19 +134,19 @@
             finishedAt,
             guia,
             selfieUsed: !!selfie,
-            version: (window.APP_CONFIG && window.APP_CONFIG.version) || 'v1'
+            version: window.APP_CONFIG?.version || 'v1'
           };
 
+          // Exporta para a jornada-final/pdf/hq
           window.__QA_ANSWERS__ = State.answers;
           window.__QA_META__    = State.meta;
 
-          log('QA finalizado. Respostas salvas em __QA_ANSWERS__ / __QA_META__.');
-          if (window.toast) window.toast('Jornada de perguntas concluída!');
-
+          log('QA finalizado. Respostas disponíveis em __QA_ANSWERS__ / __QA_META__.');
+          window.toast?.('Jornada de perguntas concluída!');
           goNext();
         } catch (e) {
           err('Falha ao processar resultado do QA:', e);
-          if (window.toast) window.toast('Ops, algo falhou ao concluir as perguntas.');
+          window.toast?.('Ops, algo falhou ao concluir as perguntas.');
         } finally {
           State.running = false;
         }
@@ -136,33 +156,34 @@
     try {
       const api = getPaperApi();
 
-      if (api && typeof api.mount === 'function') {
-        log('Usando API mount de jornada-paper-qa');
+      if (api && typeof api.loadDynamicBlocks === 'function') {
+        log('Usando JPaperQA.loadDynamicBlocks');
+        await api.loadDynamicBlocks(root, opts);
+      } else if (api && typeof api.mount === 'function') {
+        log('Usando JPaperQA.mount');
         await api.mount(root, opts);
       } else if (api && typeof api.start === 'function') {
-        log('Usando API start de jornada-paper-qa');
+        log('Usando JPaperQA.start');
         await api.start(opts);
       } else if (api && typeof api.run === 'function') {
-        log('Usando API run de jornada-paper-qa');
+        log('Usando JPaperQA.run');
         await api.run(opts);
       } else if (api && typeof api.init === 'function') {
-        log('Usando API init(+begin) de jornada-paper-qa');
+        log('Usando JPaperQA.init (+begin se existir)');
         await api.init(opts);
         if (typeof api.begin === 'function') {
           await api.begin();
         }
-      } else if (!api) {
-        warn('API do JornadaPaperQA/JCPaperQA não encontrada. Disparando evento qa:start para fallback.');
-        document.dispatchEvent(new CustomEvent('qa:start', { detail: opts }));
       } else {
-        warn('API de jornada-paper-qa encontrada mas sem métodos compatíveis. Disparando qa:start fallback.');
+        // Fluxo padrão: JornadaPaperQA não está em uso direto, então avisa via evento.
+        log('API direta não encontrada. Disparando evento qa:start (fluxo padrão da Jornada).');
         document.dispatchEvent(new CustomEvent('qa:start', { detail: opts }));
       }
 
     } catch (e) {
       State.running = false;
       err('Erro ao iniciar QA:', e);
-      if (window.toast) window.toast('Não foi possível iniciar as perguntas.');
+      window.toast?.('Não foi possível iniciar as perguntas.');
     }
   }
 
@@ -171,25 +192,29 @@
   // -------------------------------
   function bindSection(node) {
     if (State.mounted) {
-      return log('Seção já montada; ignorando novo bind.');
+      log('Seção perguntas já montada; ignorando novo bind.');
+      return;
     }
 
     const root = $('#perguntas-root', node) || node;
-    if (!root) return warn('Container de perguntas não encontrado (#perguntas-root).');
+    if (!root) {
+      warn('Container de perguntas não encontrado (#perguntas-root).');
+      return;
+    }
 
     State.mounted = true;
     log('Montando seção de perguntas...');
     startQA(root);
   }
 
-  // Quando a seção "perguntas" for carregada pelo controlador da jornada
+  // Chamado quando o controlador carregar a seção
   document.addEventListener('sectionLoaded', (e) => {
-    if (!e || !e.detail || e.detail.sectionId !== SECTION_ID) return;
+    if (!e?.detail || e.detail.sectionId !== SECTION_ID) return;
     const node = e.detail.node || document.getElementById(SECTION_ID);
     bindSection(node);
   });
 
-  // Auto-init de segurança se a seção já estiver no DOM sem o evento
+  // Segurança extra: se a página já veio com a seção carregada
   document.addEventListener('DOMContentLoaded', () => {
     const sec = document.getElementById(SECTION_ID);
     if (sec && !State.mounted) {
@@ -197,7 +222,7 @@
     }
   });
 
-  // API pública opcional
+  // API pública opcional para debug
   window.JPerguntas = {
     reset() {
       State.mounted = false;
