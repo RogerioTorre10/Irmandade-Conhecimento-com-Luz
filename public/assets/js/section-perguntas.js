@@ -1,7 +1,14 @@
+/* /assets/js/section-perguntas.js
+ * Jornada de Perguntas + Transições + Devolutiva API
+ * - Usa JPaperQA.loadDynamicBlocks (dados dos blocos)
+ * - Entre blocos: executa vídeo de transição
+ * - No final: executa vídeo final e navega para section-final
+ * - Exporta __QA_ANSWERS__ e __QA_META__ para o backend/HQ
+ */
+
 (function () {
   'use strict';
 
-  // Evita que o script seja ligado duas vezes (bundle duplicado, etc.)
   if (window.__PERGUNTAS_BOUND__) {
     console.log('[PERGUNTAS] Script já carregado, ignorando duplicata.');
     return;
@@ -31,43 +38,121 @@
     startedAt: null
   };
 
-  // flag para impedir finishAll múltiplo
   let completed = false;
 
-  // ---------- DATA (JORNADA_BLOCKS) ----------
+  // ---------- Helpers de vídeo ----------
+
+  function resolveVideoSrc(src) {
+    if (!src) return null;
+    let url = String(src).trim();
+    // Corrige base errada /assets/img/ → /assets/videos/ para .mp4
+    if (url.startsWith('/assets/img/') && url.endsWith('.mp4')) {
+      url = url.replace('/assets/img/', '/assets/videos/');
+    }
+    return url;
+  }
+
+  function callPlayTransition(videoSrc, nextSectionId, onDone) {
+    const fn = window.playTransitionThenGo;
+    const hasFn = typeof fn === 'function';
+    const src = resolveVideoSrc(videoSrc);
+
+    if (!hasFn) return false;
+
+    try {
+      // Tenta deduzir assinatura:
+      // 2+ args: (src, nextSectionId)
+      // 1 arg: (nextSectionId) ou (src) dependendo da sua implementação atual
+      if (fn.length >= 2 && src) {
+        log('playTransitionThenGo(src, next):', src, '→', nextSectionId);
+        fn(src, nextSectionId);
+      } else if (fn.length === 1) {
+        // Ambíguo: prioriza nextSectionId se existir
+        if (nextSectionId) {
+          log('playTransitionThenGo(nextSectionId):', nextSectionId);
+          fn(nextSectionId);
+        } else if (src) {
+          log('playTransitionThenGo(src):', src);
+          fn(src);
+        } else {
+          log('playTransitionThenGo(FINAL_SECTION_ID fallback):', FINAL_SECTION_ID);
+          fn(FINAL_SECTION_ID);
+        }
+      } else {
+        // Assinatura estranha → tenta só com nextSectionId
+        log('playTransitionThenGo (genérico) →', nextSectionId || FINAL_SECTION_ID);
+        fn(nextSectionId || FINAL_SECTION_ID);
+      }
+
+      if (typeof onDone === 'function') {
+        // Fallback temporal: garante continuidade após o vídeo.
+        // Ajuste se seus filmes tiverem duração bem diferente.
+        setTimeout(() => { if (!completed) onDone(); }, 6500);
+      }
+
+      return true;
+    } catch (e) {
+      err('Erro em playTransitionThenGo:', e);
+      return false;
+    }
+  }
+
+  function playBlockTransition(videoSrc, onDone) {
+    const src = resolveVideoSrc(videoSrc);
+    // PRIORIDADE 1: sistema global de transição, voltando para a mesma SECTION_ID
+    if (callPlayTransition(src, SECTION_ID, onDone)) {
+      log('Transição entre blocos via playTransitionThenGo:', src || '(padrão)');
+      return true;
+    }
+
+    // PRIORIDADE 2: overlay local via JPaperQA.loadVideo (sem trocar seção)
+    if (window.JPaperQA && typeof window.JPaperQA.loadVideo === 'function' && src) {
+      try {
+        log('Transição entre blocos via JPaperQA.loadVideo:', src);
+        const maybe = window.JPaperQA.loadVideo(src);
+        if (maybe && typeof maybe.then === 'function') {
+          maybe.then(() => { if (!completed && typeof onDone === 'function') onDone(); });
+        } else if (typeof onDone === 'function') {
+          // Sem promessa → chama logo em seguida
+          setTimeout(() => { if (!completed) onDone(); }, 100);
+        }
+        return true;
+      } catch (e) {
+        warn('Falha em JPaperQA.loadVideo:', e);
+      }
+    }
+
+    // Se nada deu, segue sem vídeo
+    return false;
+  }
+
+  // ---------- Blocos / Dados ----------
+
   async function ensureBlocks() {
-    // Se já existe JORNADA_BLOCKS preenchido, usa
     if (Array.isArray(window.JORNADA_BLOCKS) && window.JORNADA_BLOCKS.length) {
       State.blocks = window.JORNADA_BLOCKS;
       return;
     }
 
-    // Se existir JPaperQA.loadDynamicBlocks, deixa ele popular os blocos
-    if (window.JPaperQA?.loadDynamicBlocks) {
-      try {
-        const res = await window.JPaperQA.loadDynamicBlocks();
-        // Compatível tanto se ele setar window.JORNADA_BLOCKS
-        // quanto se retornar algo
-        if (Array.isArray(res?.blocks)) {
-          State.blocks = res.blocks;
-        } else {
-          State.blocks = window.JORNADA_BLOCKS || [];
-        }
-      } catch (e) {
-        err('Erro em JPaperQA.loadDynamicBlocks:', e);
-        State.blocks = window.JORNADA_BLOCKS || [];
+    if (window.JPaperQA && typeof window.JPaperQA.loadDynamicBlocks === 'function') {
+      const ok = await window.JPaperQA.loadDynamicBlocks();
+      if (ok && Array.isArray(window.JORNADA_BLOCKS) && window.JORNADA_BLOCKS.length) {
+        State.blocks = window.JORNADA_BLOCKS;
+      } else {
+        State.blocks = [];
       }
       return;
     }
+
+    State.blocks = window.JORNADA_BLOCKS || [];
   }
 
   function computeTotals() {
-    State.totalBlocks = State.blocks.length || 5;
-    State.totalQuestions =
-      State.blocks.reduce(
-        (sum, b) => sum + (b.questions?.length || 0),
-        0
-      ) || 50;
+    State.totalBlocks = State.blocks.length || 0;
+    State.totalQuestions = State.blocks.reduce(
+      (sum, b) => sum + (b.questions?.length || 0),
+      0
+    );
   }
 
   function getCurrent() {
@@ -76,82 +161,43 @@
     return { bloco, pergunta };
   }
 
-  // ---------- UI HELPERS ----------
-   function playBlockTransition(video, onDone) {
-    try {
-      // PRIORIDADE 1: usar o mesmo sistema de transição global (vídeo + go)
-      if (typeof window.playTransitionThenGo === 'function') {
-        // Aqui usamos a própria section-perguntas como destino:
-        // o vídeo roda, e ao terminar o JC/show mantém/perde foco na mesma seção.
-        log('Transição entre blocos via playTransitionThenGo →', SECTION_ID, 'video:', video || '[padrão]');
-        window.playTransitionThenGo(SECTION_ID);
+  // ---------- UI helpers ----------
 
-        // Garantia: depois do vídeo, chamamos a próxima pergunta.
-        // (ajuste o timeout para o tempo real do filme, se necessário)
-        if (typeof onDone === 'function') {
-          setTimeout(() => {
-            if (!completed) onDone();
-          }, 6500);
-        }
-        return true;
-      }
-
-      // PRIORIDADE 2: se você tiver um loader de vídeo próprio via JPaperQA
-      if (window.JPaperQA?.loadVideo && video) {
-        log('Transição entre blocos via JPaperQA.loadVideo:', video);
-        const maybe = window.JPaperQA.loadVideo(video);
-        if (maybe && typeof maybe.then === 'function') {
-          maybe.then(() => {
-            if (!completed && typeof onDone === 'function') onDone();
-          });
-        } else if (typeof onDone === 'function') {
-          onDone();
-        }
-        return true;
-      }
-    } catch (e) {
-      warn('Falha na transição de bloco:', e);
-    }
-
-    return false; // se nada rolou, chamamos direto a próxima pergunta
-  }
-
-  
   function setText(sel, val) {
-    const el = document.querySelector(sel);
+    const el = $(sel);
     if (el) el.textContent = String(val);
   }
 
   function setWidth(sel, val) {
-    const el = document.querySelector(sel);
+    const el = $(sel);
     if (el) el.style.width = val;
   }
 
   function updateCounters() {
     const { bloco } = getCurrent();
-    const blocoTotal = bloco?.questions?.length || 10;
+    const blocoTotal = bloco?.questions?.length || 1;
 
     setText('#jp-block-num', State.blocoIdx + 1);
     setText('#jp-block-num-2', State.blocoIdx + 1);
-    setText('#jp-block-max', State.totalBlocks);
+    setText('#jp-block-max', State.totalBlocks || 1);
 
     setText('#jp-global-current', State.globalIdx + 1);
     setText('#jp-global-current-2', State.globalIdx + 1);
-    setText('#jp-global-total', State.totalQuestions);
-    setText('#jp-global-total-2', State.totalQuestions);
+    setText('#jp-global-total', State.totalQuestions || 1);
+    setText('#jp-global-total-2', State.totalQuestions || 1);
 
     setText('#jp-block-current', State.qIdx + 1);
     setText('#jp-block-total', blocoTotal);
 
     const pctBloco = Math.max(0, Math.min(100, ((State.qIdx + 1) / blocoTotal) * 100));
-    const pctGlobal = Math.max(0, Math.min(100, ((State.globalIdx + 1) / State.totalQuestions) * 100));
+    const pctGlobal = Math.max(0, Math.min(100, ((State.globalIdx + 1) / (State.totalQuestions || 1)) * 100));
 
     setWidth('#jp-block-progress-fill', pctBloco + '%');
     setWidth('#jp-global-progress-fill', pctGlobal + '%');
   }
 
   async function typeQuestion(text) {
-    if (completed) return; // segurança extra
+    if (completed) return;
 
     const box = $('#jp-question-typed');
     const raw = $('#jp-question-raw');
@@ -164,18 +210,18 @@
       try {
         await window.runTyping(box);
       } catch (e) {
-        warn('runTyping falhou, fallback simples.', e);
+        warn('runTyping falhou; fallback.');
       }
       return;
     }
 
-    // fallback datilografia simples
+    // fallback simples
     box.textContent = '';
     let i = 0;
     const speed = 24;
     await new Promise(resolve => {
       const it = setInterval(() => {
-        if (completed) { // se finalizou no meio, aborta
+        if (completed) {
           clearInterval(it);
           return resolve();
         }
@@ -219,7 +265,8 @@
     }
   }
 
-  // ---------- RESPOSTA + CHAMA ----------
+  // ---------- Captura de respostas ----------
+
   function saveCurrentAnswer() {
     if (completed) return;
 
@@ -236,9 +283,11 @@
     }
   }
 
-    function nextStep() {
+  // ---------- Navegação das perguntas ----------
+
+  function nextStep() {
     if (completed) {
-      log('nextStep chamado após conclusão; ignorando.');
+      log('Clique em confirmar após conclusão; ignorado.');
       return;
     }
 
@@ -248,48 +297,79 @@
       return;
     }
 
-    const blocoTotal = bloco.questions?.length || 10;
+    const blocoTotal = bloco.questions?.length || 1;
     const isLastInBloco = State.qIdx >= blocoTotal - 1;
     const isLastOfAll = State.globalIdx >= State.totalQuestions - 1;
 
-    // Última pergunta de todas → fecha jornada
+    // Última de todas → fecha jornada
     if (isLastOfAll) {
       finishAll();
       return;
     }
 
-    // Ainda tem perguntas no geral
+    // Ainda existem perguntas globais
     State.globalIdx++;
 
-    // Se terminou o bloco atual
     if (isLastInBloco) {
-      const video = bloco.video_after || bloco.transitionVideo || null;
+      const nextBlocoIdx = State.blocoIdx + 1;
+      const currentVideo = bloco.video_after || null;
 
-      State.blocoIdx++;
+      State.blocoIdx = nextBlocoIdx;
       State.qIdx = 0;
 
-      // Tenta rodar filme de transição entre blocos
-      const usouVideo = playBlockTransition(video, () => {
-        // Chama a próxima pergunta só depois do filme
+      // Tenta rodar filme de transição do bloco atual antes de mostrar o próximo
+      const usouVideo = playBlockTransition(currentVideo, () => {
         showCurrentQuestion();
       });
 
-      // Se não tiver infra de vídeo, segue direto
       if (!usouVideo) {
         showCurrentQuestion();
       }
     } else {
-      // Ainda dentro do mesmo bloco → só vai pra próxima
+      // Próxima dentro do mesmo bloco
       State.qIdx++;
       showCurrentQuestion();
     }
   }
 
+  // ---------- Finalização ----------
+
+  function ensureFinalSectionExists() {
+    let finalEl =
+      document.getElementById(FINAL_SECTION_ID) ||
+      document.querySelector('[data-section="final"]') ||
+      document.querySelector('.section-final');
+
+    if (!finalEl) {
+      const wrapper =
+        document.getElementById('jornada-content-wrapper') ||
+        document.querySelector('.jornada-wrapper') ||
+        document.body;
+
+      finalEl = document.createElement('section');
+      finalEl.id = FINAL_SECTION_ID;
+      finalEl.className = 'section section-final pergaminho';
+      finalEl.dataset.section = 'final';
+      finalEl.innerHTML = `
+        <div class="final-wrapper">
+          <h2 class="final-title">Gratidão por caminhar com Luz 🙏</h2>
+          <p class="final-text">
+            Suas respostas foram recebidas e a Irmandade está preparando sua devolutiva especial.
+          </p>
+          <p class="final-text">
+            O módulo de PDF/HQ pode ler <code>window.__QA_ANSWERS__</code> e <code>window.__QA_META__</code> já preenchidos.
+          </p>
+        </div>
+      `;
+      wrapper.appendChild(finalEl);
+      log('section-final criada automaticamente (fallback).');
+    }
+
+    return finalEl;
+  }
 
   function finishAll() {
-    if (completed) {
-      return;
-    }
+    if (completed) return;
     completed = true;
 
     const finishedAt = new Date().toISOString();
@@ -304,7 +384,6 @@
       version: window.APP_CONFIG?.version || 'v1'
     };
 
-    // Exporta para o backend / geração de PDF/HQ
     window.__QA_ANSWERS__ = State.answers;
     window.__QA_META__ = State.meta;
 
@@ -317,30 +396,29 @@
       window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'forte');
     }
 
-    // Navegação para a seção final — prioriza transição oficial
-    const finalEl = document.getElementById(FINAL_SECTION_ID);
+    const finalEl = ensureFinalSectionExists();
+    const finalVideo = resolveVideoSrc(window.JORNADA_FINAL_VIDEO || null);
 
     try {
-      if (typeof window.playTransitionThenGo === 'function' && finalEl) {
-        log('Usando playTransitionThenGo para:', FINAL_SECTION_ID);
-        window.playTransitionThenGo(FINAL_SECTION_ID);
+      // PRIORIDADE: vídeo final + transição oficial
+      if (callPlayTransition(finalVideo, FINAL_SECTION_ID)) {
+        log('Transição final disparada com vídeo:', finalVideo || '(padrão)');
       } else if (window.JC?.show && finalEl) {
-        log('Usando JC.show para:', FINAL_SECTION_ID);
+        log('Usando JC.show para seção final.');
         window.JC.show(FINAL_SECTION_ID);
       } else if (typeof window.showSection === 'function' && finalEl) {
-        log('Usando showSection para:', FINAL_SECTION_ID);
+        log('Usando showSection(FINAL_SECTION_ID).');
         window.showSection(FINAL_SECTION_ID);
       } else if (finalEl) {
-        log('Fallback via hash para:', FINAL_SECTION_ID);
+        log('Fallback via hash → section-final.');
         window.location.hash = '#' + FINAL_SECTION_ID;
       } else {
-        warn('section-final não encontrada; mantendo na tela atual.');
+        warn('section-final não encontrada e não foi possível criar fallback.');
       }
     } catch (e) {
       err('Erro ao navegar para página final:', e);
     }
 
-    // Evento único para qualquer listener (backend, HQ, etc.)
     try {
       document.dispatchEvent(new CustomEvent('qa:completed', {
         detail: { answers: State.answers, meta: State.meta }
@@ -350,19 +428,18 @@
     }
   }
 
-  // ---------- BIND CONTROLES ----------
+  // ---------- Bind de UI ----------
+
   function bindUI(root) {
     const btnFalar  = $('#jp-btn-falar', root);
     const btnApagar = $('#jp-btn-apagar', root);
     const btnConf   = $('#jp-btn-confirmar', root);
     const input     = $('#jp-answer-input', root);
 
-    // MIC
     if (input && window.JORNADA_MICRO) {
       window.JORNADA_MICRO.attach(input, { mode: 'append' });
     }
 
-    // Chama em tempo real
     if (input && window.JORNADA_CHAMA) {
       input.addEventListener('input', () => {
         const txt = input.value || '';
@@ -405,7 +482,8 @@
     }
   }
 
-  // ---------- INIT ----------
+  // ---------- Init ----------
+
   async function init(root) {
     if (State.mounted || State.loading || completed) return;
     State.loading = true;
@@ -413,17 +491,10 @@
     await ensureBlocks();
     computeTotals();
 
-    if (!State.blocks.length) {
+    if (!State.blocks.length || !State.totalQuestions) {
       err('JORNADA_BLOCKS vazio; confira jornada-paper-qa.js.');
       State.loading = false;
       return;
-    }
-
-    const hasGuia =
-      (window.JC && window.JC.state && window.JC.state.guia) ||
-      window.sessionStorage?.getItem('jornada.guia');
-    if (!hasGuia) {
-      warn('Nenhum guia/card detectado — seguindo mesmo assim (modo teste).');
     }
 
     State.startedAt = new Date().toISOString();
@@ -436,17 +507,15 @@
 
     State.mounted = true;
     State.loading = false;
-    log(MOD, 'montado com sucesso.');
+    log(MOD, 'section-perguntas.js montado com sucesso.');
   }
 
-  // disparado pelo controlador quando a seção é carregada
   document.addEventListener('sectionLoaded', (e) => {
     if (e?.detail?.sectionId !== SECTION_ID) return;
     const node = e.detail.node || document.getElementById(SECTION_ID);
     if (node) init(node);
   });
 
-  // fallback se já estiver ativa no DOM
   document.addEventListener('DOMContentLoaded', () => {
     const sec = document.getElementById(SECTION_ID);
     if (sec && (sec.classList.contains('active') || window.__currentSectionId === SECTION_ID)) {
@@ -454,7 +523,6 @@
     }
   });
 
-  // Exposto para debug manual
   window.JPerguntas = {
     start(root) {
       init(root || document.getElementById(SECTION_ID));
@@ -472,5 +540,5 @@
     }
   };
 
-  log(MOD, 'carregado (base + proteção concluído).');
+  log(MOD, 'carregado (proteções + transições integradas).');
 })();
