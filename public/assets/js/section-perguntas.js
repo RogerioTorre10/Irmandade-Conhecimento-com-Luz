@@ -48,16 +48,12 @@
     if (!overlay) {
       overlay = document.createElement('div');
       overlay.id = 'videoOverlay';
-      overlay.style.position = 'fixed';
-      overlay.style.top = '0';
-      overlay.style.left = '0';
-      overlay.style.width = '100%';
-      overlay.style.height = '100%';
-      overlay.style.background = 'rgba(0,0,0,0.96)';
-      overlay.style.display = 'none';
-      overlay.style.alignItems = 'center';
-      overlay.style.justifyContent = 'center';
-      overlay.style.zIndex = '9999';
+      overlay.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(0,0,0,0.98); display: none; align-items: center;
+        justify-content: center; z-index: 9999; opacity: 0;
+        pointer-events: none; transition: opacity 0.6s ease;
+      `;
       document.body.appendChild(overlay);
     }
 
@@ -66,9 +62,10 @@
       video.id = 'videoTransicao';
       video.playsInline = true;
       video.preload = 'auto';
-      video.style.maxWidth = '100%';
-      video.style.maxHeight = '100%';
-      video.style.objectFit = 'cover';
+      video.style.cssText = `
+        max-width: 95%; max-height: 95%; border: 8px solid #d4af37;
+        border-radius: 12px; box-shadow: 0 0 30px rgba(212,175,55,0.6);
+      `;
       video.controls = false;
       overlay.appendChild(video);
     }
@@ -95,28 +92,29 @@
     const { overlay, video } = ensureVideoOverlay();
 
     overlay.style.display = 'flex';
+    setTimeout(() => overlay.style.opacity = '1', 50);
+
     video.src = src;
     video.load();
 
-    video.onended = () => {
+    const endHandler = () => {
       video.onended = null;
-      overlay.style.display = 'none';
-      // IMPORTANTE: sempre chamar o callback,
-      // inclusive no vídeo final (não depende de "completed")
-      if (typeof onEnded === 'function') {
-        onEnded();
-      }
+      overlay.style.opacity = '0';
+      setTimeout(() => {
+        overlay.style.display = 'none';
+        if (typeof onEnded === 'function') onEnded();
+      }, 600);
     };
+
+    video.onended = endHandler;
 
     video.play().catch(e => {
       console.error('[PERGUNTAS] Erro ao tocar vídeo:', e);
-      overlay.style.display = 'none';
-      video.onended = null;
-      if (typeof onEnded === 'function') onEnded();
+      endHandler();
     });
   }
 
-  function playBlockTransition(videoSrc, onDone) {
+  window.playBlockTransition = function(videoSrc, onDone) {
     const src = resolveVideoSrc(videoSrc);
     if (!src) {
       if (typeof onDone === 'function') onDone();
@@ -124,7 +122,7 @@
     }
     log('Transição entre blocos:', src);
     playVideoWithCallback(src, onDone);
-  }
+  };
 
   // --------------------------------------------------
   // BLOCS / PERGUNTAS
@@ -183,16 +181,13 @@
     const { bloco } = getCurrent();
     const blocoTotal = bloco?.questions?.length || 1;
 
-    // Texto "Bloco X de Y" continua como está no HTML
     setText('#jp-block-num', State.blocoIdx + 1);
     setText('#jp-block-num-2', State.blocoIdx + 1);
     setText('#jp-block-max', State.totalBlocks || 1);
 
-    // Barra GLOBAL: esquerda = pergunta global atual, direita = total
     setText('#jp-global-current', State.globalIdx + 1);
     setText('#jp-global-total', State.totalQuestions || 1);
 
-    // Barra BLOCO: esquerda = pergunta dentro do bloco, direita = total do bloco
     setText('#jp-block-current', State.qIdx + 1);
     setText('#jp-block-total', blocoTotal);
 
@@ -214,15 +209,11 @@
 
     if (raw) raw.textContent = pergunta;
 
-    // garante alinhamento bonito (esquerda -> direita)
     box.style.textAlign = 'left';
-
-    // reseta
     box.textContent = '';
     box.classList.remove('typing-done');
     box.removeAttribute('data-typing');
 
-    // 1) Datilografia visual manual
     let i = 0;
     const speed = 24;
 
@@ -242,14 +233,22 @@
       }, speed);
     });
 
-    // 2) Efeito leitura (TypingBridge) - opcional
-    // Se jornada-typing-bridge expõe runTyping, chamamos depois da animação
+    // LEITURA AUTOMÁTICA
+    if ('speechSynthesis' in window && pergunta.trim()) {
+      const utter = new SpeechSynthesisUtterance(pergunta);
+      utter.lang = 'pt-BR';
+      utter.rate = 0.9;
+      utter.pitch = 1;
+      speechSynthesis.cancel();
+      setTimeout(() => speechSynthesis.speak(utter), 300);
+    }
+
     if (typeof window.runTyping === 'function') {
       try {
         box.setAttribute('data-typing', 'true');
         await window.runTyping(box);
       } catch (e) {
-        console.warn('[PERGUNTAS] runTyping (efeito leitura) falhou:', e);
+        console.warn('[PERGUNTAS] runTyping falhou:', e);
       } finally {
         box.classList.add('typing-done');
         box.removeAttribute('data-typing');
@@ -340,7 +339,7 @@
       State.blocoIdx = nextBlocoIdx;
       State.qIdx = 0;
 
-      playBlockTransition(video, () => {
+      window.playBlockTransition(video, () => {
         if (!completed) showCurrentQuestion();
       });
     } else {
@@ -354,25 +353,23 @@
   // --------------------------------------------------
 
   function ensureFinalSectionExists() {
-    let finalEl =
-      document.getElementById(FINAL_SECTION_ID) ||
-      document.querySelector('[data-section="final"]') ||
-      document.querySelector('.section-final');
+    let finalEl = document.getElementById(FINAL_SECTION_ID) ||
+                  document.querySelector('[data-section="final"]') ||
+                  document.querySelector('.section-final');
 
     if (!finalEl) {
-      const container =
-        document.getElementById('jornada-sections') ||
-        document.querySelector('.jornada-sections') ||
-        document.body;
+      const container = document.getElementById('jornada-sections') ||
+                        document.querySelector('.jornada-sections') ||
+                        document.body;
 
       finalEl = document.createElement('section');
       finalEl.id = FINAL_SECTION_ID;
       finalEl.className = 'section section-final pergaminho';
       finalEl.dataset.section = 'final';
       finalEl.innerHTML = `
-        <div class="final-wrapper">
-          <h2 class="final-title">Gratidão por caminhar com Luz 🙏</h2>
-          <p class="final-text">
+        <div class="final-wrapper" style="text-align:center; padding:40px; color:#ffd700;">
+          <h2 style="font-size:2.2em; margin-bottom:20px;">Gratidão por caminhar com Luz</h2>
+          <p style="font-size:1.3em; line-height:1.6;">
             Suas respostas foram recebidas com honra. A Irmandade está preparando sua devolutiva especial.
           </p>
         </div>
@@ -382,6 +379,21 @@
     }
 
     return finalEl;
+  }
+
+  function showFinalSection() {
+    const finalEl = ensureFinalSectionExists();
+    const wrapper = document.getElementById('jornada-content-wrapper');
+    if (wrapper) wrapper.innerHTML = '';
+
+    if (window.JC?.show) {
+      window.JC.show(FINAL_SECTION_ID);
+    } else if (typeof window.showSection === 'function') {
+      window.showSection(FINAL_SECTION_ID);
+    } else {
+      document.body.appendChild(finalEl);
+      finalEl.scrollIntoView({ behavior: 'smooth' });
+    }
   }
 
   function finishAll() {
@@ -412,31 +424,15 @@
       window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'forte');
     }
 
-    const finalEl = ensureFinalSectionExists();
-
     const finalVideoSrc = resolveVideoSrc(
       window.JORNADA_FINAL_VIDEO || FINAL_VIDEO_FALLBACK
     );
 
     if (finalVideoSrc) {
       log('Iniciando vídeo final:', finalVideoSrc);
-      playVideoWithCallback(finalVideoSrc, () => {
-        if (window.JC?.show && finalEl) {
-          window.JC.show(FINAL_SECTION_ID);
-        } else if (typeof window.showSection === 'function') {
-          window.showSection(FINAL_SECTION_ID);
-        } else {
-          window.location.hash = '#' + FINAL_SECTION_ID;
-        }
-      });
+      playVideoWithCallback(finalVideoSrc, showFinalSection);
     } else {
-      if (window.JC?.show && finalEl) {
-        window.JC.show(FINAL_SECTION_ID);
-      } else if (typeof window.showSection === 'function') {
-        window.showSection(FINAL_SECTION_ID);
-      } else {
-        window.location.hash = '#' + FINAL_SECTION_ID;
-      }
+      showFinalSection();
     }
 
     try {
@@ -453,10 +449,8 @@
   // --------------------------------------------------
 
   function bindUI(root) {
-    const btnFalar  = $('#jp-btn-falar', root);
-    const btnApagar = $('#jp-btn-apagar', root);
-    const btnConf   = $('#jp-btn-confirmar', root);
-    const input     = $('#jp-answer-input', root);
+    const btnConf = $('#jp-btn-confirmar', root);
+    const input = $('#jp-answer-input', root);
 
     if (input && window.JORNADA_MICRO) {
       window.JORNADA_MICRO.attach(input, { mode: 'append' });
@@ -466,28 +460,6 @@
       input.addEventListener('input', () => {
         const txt = input.value || '';
         window.JORNADA_CHAMA.updateChamaFromText(txt, 'chama-perguntas');
-      });
-    }
-
-    if (btnFalar && input) {
-      btnFalar.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        if (window.JORNADA_MICRO) {
-          window.JORNADA_MICRO.attach(input, { mode: 'append' });
-        } else {
-          (window.toast || alert)('Reconhecimento de voz não disponível.');
-        }
-      });
-    }
-
-    if (btnApagar && input) {
-      btnApagar.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        input.value = '';
-        input.focus();
-        if (window.JORNADA_CHAMA) {
-          window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'media');
-        }
       });
     }
 
@@ -552,13 +524,10 @@
   window.JPerguntas = {
     start(root) { init(root || document.getElementById(SECTION_ID)); },
     reset() {
-      State.mounted = false;
-      State.loading = false;
-      State.answers = {};
-      State.meta = null;
-      State.blocoIdx = 0;
-      State.qIdx = 0;
-      State.globalIdx = 0;
+      Object.assign(State, {
+        mounted: false, loading: false, answers: {}, meta: null,
+        blocoIdx: 0, qIdx: 0, globalIdx: 0
+      });
       completed = false;
       log('Reset concluído.');
     }
