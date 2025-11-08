@@ -5,21 +5,13 @@
 <script src="/assets/js/jornada-micro.js"></script>
 <script src="/assets/js/jornada-paper-qa.js"></script>
 
-
-
 <section id="section-perguntas"
   class="section section-perguntas"
    data-section="perguntas">
     <div class="perguntas-wrap">
      <div id="videoOverlay" class="video-overlay" style="display:none;">
       <video id="videoTransicao" playsinline preload="auto" style="max-width:100%;"></video>
-       </div>
-       
-         <meta name="viewport"
-          content="width=device-width,
-           initial-scale=1.0,
-            maximum-scale=1.0,
-             user-scalable=no">
+       </div>              
          
              <!-- Cabeçalho -->
             <div class="perguntas-header">
@@ -104,5 +96,32 @@
    
   </div>
 </section>
+<script>
+// FORÇA VIEWPORT NO MOBILE (fallback blindado)
+(function () {
+  'use strict';
+  
+  // Só executa uma vez
+  if (window.__VIEWPORT_FORCED__) return;
+  window.__VIEWPORT_FORCED__ = true;
 
+  // Cria meta se não existir
+  if (!document.querySelector('meta[name="viewport"]')) {
+    const meta = document.createElement('meta');
+    meta.name = 'viewport';
+    meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+    document.head.appendChild(meta);
+    console.log('[VIEWPORT] Meta tag adicionada com sucesso');
+  }
+
+  // Força estilo no body (evita rolagem indesejada)
+  document.body.style.margin = '0';
+  document.body.style.padding = '0';
+  document.body.style.overflow = 'hidden';
+  document.documentElement.style.overflow = 'hidden';
+
+  // Garante que vídeos não forcem fullscreen no iOS
+  document.addEventListener('gesturestart', e => e.preventDefault());
+})();
+</script>
 
