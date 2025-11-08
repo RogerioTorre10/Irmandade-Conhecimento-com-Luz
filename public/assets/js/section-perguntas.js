@@ -207,7 +207,7 @@
     setWidth('#jp-global-progress-fill', pctGlobal + '%');
   }
 
-  async function typeQuestion(text) {
+    async function typeQuestion(text) {
     if (completed) return;
 
     const box = $('#jp-question-typed');
@@ -216,29 +216,36 @@
 
     const pergunta = text || '[pergunta]';
 
+    // Guarda texto bruto, se alguém precisar
     if (raw) raw.textContent = pergunta;
 
-    // visual
+    // Deixa alinhado à esquerda
     box.style.textAlign = 'left';
-    box.classList.remove('typing-done');
-    box.setAttribute('data-typing', 'true');
 
-    // PRIORIDADE: TypingBridge (runTyping) controla animação + leitura
+    // Reseta estado
+    box.textContent = '';
+    box.classList.remove('typing-done');
+    box.removeAttribute('data-typing');
+
+    // 1) DATILOGRAFIA VISUAL (sempre)
+    await manualTyping(box, pergunta);
+
+    // 2) EFEITO LEITURA (TypingBridge) - opcional
+    // Aqui o texto já está digitado; se o bridge existir e quiser "ler",
+    // a gente só dá o gancho sem estragar a animação.
     if (typeof window.runTyping === 'function') {
-      box.textContent = pergunta;
       try {
-        await window.runTyping(box); // jornada-typing-bridge cuida da mágica
+        box.setAttribute('data-typing', 'true');
+        await window.runTyping(box);
       } catch (e) {
-        console.warn('[PERGUNTAS] runTyping falhou, usando fallback manual.', e);
-        await manualTyping(box, pergunta);
+        console.warn('[PERGUNTAS] runTyping (efeito leitura) falhou:', e);
+      } finally {
+        box.classList.add('typing-done');
+        box.removeAttribute('data-typing');
       }
     } else {
-      // Fallback: nossa própria datilografia
-      await manualTyping(box, pergunta);
+      box.classList.add('typing-done');
     }
-
-    box.classList.add('typing-done');
-    box.removeAttribute('data-typing');
   }
 
   function manualTyping(box, pergunta) {
