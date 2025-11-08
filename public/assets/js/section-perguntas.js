@@ -43,6 +43,7 @@
 
  function ensureVideoOverlay() {
   let overlay = document.getElementById('videoOverlay');
+  let wrapper = document.getElementById('videoFlameWrapper');
   let video = document.getElementById('videoTransicao');
 
   if (!overlay) {
@@ -51,16 +52,23 @@
     document.body.appendChild(overlay);
   }
 
+  if (!wrapper) {
+    wrapper = document.createElement('div');
+    wrapper.id = 'videoFlameWrapper';
+    wrapper.className = 'flame-wrapper';
+    overlay.appendChild(wrapper);
+  }
+
   if (!video) {
     video = document.createElement('video');
     video.id = 'videoTransicao';
     video.playsInline = true;
     video.preload = 'auto';
     video.controls = false;
-    overlay.appendChild(video);
+    wrapper.appendChild(video);
   }
 
-  return { overlay, video };
+  return { overlay, wrapper, video };
 }
 
   function resolveVideoSrc(src) {
@@ -107,6 +115,27 @@
   overflow: hidden !important;
   object-fit: contain !important;
   box-shadow: 0 0 30px rgba(212,175,55,0.7) !important;
+`;
+
+// ESTILO DO WRAPPER (com chama)
+wrapper.style.cssText = `
+  position: relative;
+  width: 92vw;
+  max-width: 92vw;
+  height: auto;
+  max-height: 88vh;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(212,175,55,0.7);
+`;
+
+// ESTILO DO VÍDEO
+video.style.cssText = `
+  width: 100%;
+  height: auto;
+  max-height: 88vh;
+  display: block;
+  object-fit: contain;
 `;
 // Remove camadas antigas
 video.querySelectorAll('.flame-glow').forEach(el => el.remove());
