@@ -321,18 +321,18 @@
   }
 
   // ---------- Finalização ----------
-
-    function ensureFinalSectionExists() {
+  function ensureFinalSectionExists() {
     let finalEl =
       document.getElementById(FINAL_SECTION_ID) ||
       document.querySelector('[data-section="final"]') ||
       document.querySelector('.section-final');
 
     if (!finalEl) {
-      const wrapper =
-        document.getElementById('jornada-content-wrapper') ||
-        document.querySelector('.jornada-wrapper') ||
-        document.body;
+      // Container onde ficam as seções "originais" para o JC.show clonar
+      const container =
+        document.getElementById('jornada-sections') ||
+        document.querySelector('.jornada-sections') ||
+        document.body; // fallback seguro
 
       finalEl = document.createElement('section');
       finalEl.id = FINAL_SECTION_ID;
@@ -348,12 +348,13 @@
         </div>
       `;
 
-      wrapper.appendChild(finalEl);
+      container.appendChild(finalEl);
       log('section-final criada automaticamente (fallback).');
     }
 
     return finalEl;
   }
+
 
   function finishAll() {
     if (completed) return;
