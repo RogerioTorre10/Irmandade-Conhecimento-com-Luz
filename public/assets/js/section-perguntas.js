@@ -11,9 +11,11 @@
   }
   window.__PERGUNTAS_BOUND__ = true;
 
-  const MOD = 'section-perguntas.js';
-  const SECTION_ID = 'section-perguntas';
-  const FINAL_SECTION_ID = 'section-final';
+ const MOD = 'section-perguntas.js';
+ const SECTION_ID = 'section-perguntas';
+ const FINAL_SECTION_ID = 'section-final';
+ const FINAL_VIDEO_FALLBACK = '/assets/videos/filme-5-fim-da-jornada.mp4'; // filme perguntas -> final
+
 
   const log  = (...a) => console.log('[PERGUNTAS]', ...a);
   const warn = (...a) => console.warn('[PERGUNTAS]', ...a);
