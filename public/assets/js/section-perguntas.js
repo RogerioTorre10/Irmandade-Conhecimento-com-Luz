@@ -418,48 +418,40 @@
       window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'forte');
     }
 
-       const finalEl = ensureFinalSectionExists();
+      const finalEl = ensureFinalSectionExists();
 
-    // tenta usar JORNADA_FINAL_VIDEO; se não, usa o video_after do último bloco; se não, deixa sem vídeo
-    let finalVideo = resolveVideoSrc(window.JORNADA_FINAL_VIDEO || null);
-    if (!finalVideo && State.blocks && State.blocks.length) {
-      const last = State.blocks[State.blocks.length - 1];
-      if (last && last.video_after) {
-        finalVideo = resolveVideoSrc(last.video_after);
-      }
-    }
+let finalVideo = resolveVideoSrc(window.JORNADA_FINAL_VIDEO || null);
+if (!finalVideo && State.blocks && State.blocks.length) {
+  const last = State.blocks[State.blocks.length - 1];
+  if (last && last.video_after) {
+    finalVideo = resolveVideoSrc(last.video_after);
+  }
+}
 
-        try {
-      // 1) Se tiver vídeo final e função oficial de transição, usa ela
-      if (finalVideo && typeof window.playVideoTransition === 'function') {
-        log('Transição final via playVideoTransition:', finalVideo, '→', FINAL_SECTION_ID);
-        window.playVideoTransition(finalVideo, FINAL_SECTION_ID);
-      }
-      // 2) Ou se tiver playTransitionThenGo(nextSectionId) configurado
-      else if (typeof window.playTransitionThenGo === 'function') {
-        log('Transição final via playTransitionThenGo →', FINAL_SECTION_ID);
-        window.playTransitionThenGo(FINAL_SECTION_ID);
-      }
-      // 3) Sem vídeo, usa o controlador padrão
-      else if (window.JC?.show && finalEl) {
-        log('Usando JC.show para seção final.');
-        window.JC.show(FINAL_SECTION_ID);
-      }
-      else if (typeof window.showSection === 'function' && finalEl) {
-        log('Usando showSection(FINAL_SECTION_ID).');
-        window.showSection(FINAL_SECTION_ID);
-      }
-      // 4) Último recurso: âncora
-      else if (finalEl) {
-        log('Fallback via hash → section-final.');
-        window.location.hash = '#' + FINAL_SECTION_ID;
-      }
-      else {
-        warn('section-final não encontrada e não foi possível criar fallback.');
-      }
-    } catch (e) {
-      err('Erro ao navegar para página final:', e);
+try {
+  if (finalVideo && typeof window.loadVideo === 'function') {
+    log('Transição final via loadVideo:', finalVideo);
+    window.loadVideo(finalVideo);
+    // quando o vídeo terminar, o onended do próprio loadVideo fecha overlay
+    // e a gente mantém a section-final já carregada via JC.show
+    if (window.JC?.show && finalEl) {
+      // pequena folga para trocar a tela depois do vídeo
+      setTimeout(() => window.JC.show(FINAL_SECTION_ID), 6500);
     }
+  } else if (window.JC?.show && finalEl) {
+    log('Sem vídeo final, usando JC.show para seção final.');
+    window.JC.show(FINAL_SECTION_ID);
+  } else if (typeof window.showSection === 'function' && finalEl) {
+    window.showSection(FINAL_SECTION_ID);
+  } else if (finalEl) {
+    window.location.hash = '#' + FINAL_SECTION_ID;
+  } else {
+    warn('section-final não encontrada e não foi possível criar fallback.');
+  }
+} catch (e) {
+  err('Erro ao navegar para página final:', e);
+}
+
 
     try {
       document.dispatchEvent(new CustomEvent('qa:completed', {
