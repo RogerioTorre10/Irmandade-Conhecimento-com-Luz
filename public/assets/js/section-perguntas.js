@@ -322,7 +322,7 @@
 
   // ---------- Finalização ----------
 
-  function ensureFinalSectionExists() {
+    function ensureFinalSectionExists() {
     let finalEl =
       document.getElementById(FINAL_SECTION_ID) ||
       document.querySelector('[data-section="final"]') ||
@@ -338,17 +338,16 @@
       finalEl.id = FINAL_SECTION_ID;
       finalEl.className = 'section section-final pergaminho';
       finalEl.dataset.section = 'final';
+
       finalEl.innerHTML = `
         <div class="final-wrapper">
           <h2 class="final-title">Gratidão por caminhar com Luz 🙏</h2>
           <p class="final-text">
-            Suas respostas foram recebidas e a Irmandade está preparando sua devolutiva especial.
-          </p>
-          <p class="final-text">
-            O módulo de PDF/HQ pode ler <code>window.__QA_ANSWERS__</code> e <code>window.__QA_META__</code> já preenchidos.
+            Suas respostas foram recebidas com honra. A Irmandade está preparando sua devolutiva especial.
           </p>
         </div>
       `;
+
       wrapper.appendChild(finalEl);
       log('section-final criada automaticamente (fallback).');
     }
