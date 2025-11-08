@@ -308,7 +308,7 @@ Dê um feedback curto (1-2 frases), encorajador e poético.`;
 
   // ===== VÍDEO =====
   function loadVideo(videoSrc) {
-  if (global.__currentSectionId !== 'section-perguntas') return;
+  if (window.__currentSectionId !== 'section-perguntas') return;
   const video = document.querySelector('#videoTransicao');
   const videoOverlay = document.querySelector('#videoOverlay');
   if (!video || !videoOverlay) {
@@ -320,14 +320,14 @@ Dê um feedback curto (1-2 frases), encorajador e poético.`;
   videoOverlay.style.display = 'flex';
   video.load();
   video.play().catch(err => console.error('[JORNADA_PAPER] Erro ao reproduzir vídeo:', err));
-  log('Vídeo carregado:', videoSrc);
+  console.log('[JORNADA_PAPER] Vídeo carregado:', videoSrc);
 
   video.onended = () => {
     video.onended = null;
     videoOverlay.style.display = 'none';
-    // aqui quem chamou decide o próximo passo (section-perguntas.js já faz isso via callback)
   };
 }
+
 
   // ===== RENDER =====
   async function renderQuestions() {
