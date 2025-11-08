@@ -17,7 +17,13 @@
   const warn = (...a) => console.warn('[PERGUNTAS]', ...a);
   const err  = (...a) => console.error('[PERGUNTAS]', ...a);
   const $    = (sel, root = document) => root.querySelector(sel);
-
+  
+  JPaperQA.loadDynamicBlocks().then(() => {
+  console.log('[PERGUNTAS] Blocos carregados, iniciando renderização...');
+  window.JC = window.JC || { currentBloco: 0, currentPergunta: 0 };
+  JPaperQA.renderQuestions();
+ });
+   
   const State = {
     mounted: false,
     running: false,
