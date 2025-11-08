@@ -41,37 +41,27 @@
   // OVERLAY DE VÍDEO (entre blocos e final)
   // --------------------------------------------------
 
-  function ensureVideoOverlay() {
-    let overlay = $('#videoOverlay');
-    let video = $('#videoTransicao');
+ function ensureVideoOverlay() {
+  let overlay = document.getElementById('videoOverlay');
+  let video = document.getElementById('videoTransicao');
 
-    if (!overlay) {
-      overlay = document.createElement('div');
-      overlay.id = 'videoOverlay';
-      overlay.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(0,0,0,0.98); display: none; align-items: center;
-        justify-content: center; z-index: 9999; opacity: 0;
-        pointer-events: none; transition: opacity 0.6s ease;
-      `;
-      document.body.appendChild(overlay);
-    }
-
-    if (!video) {
-      video = document.createElement('video');
-      video.id = 'videoTransicao';
-      video.playsInline = true;
-      video.preload = 'auto';
-      video.style.cssText = `
-        max-width: 95%; max-height: 95%; border: 8px solid #d4af37;
-        border-radius: 12px; box-shadow: 0 0 30px rgba(212,175,55,0.6);
-      `;
-      video.controls = false;
-      overlay.appendChild(video);
-    }
-
-    return { overlay, video };
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'videoOverlay';
+    document.body.appendChild(overlay);
   }
+
+  if (!video) {
+    video = document.createElement('video');
+    video.id = 'videoTransicao';
+    video.playsInline = true;
+    video.preload = 'auto';
+    video.controls = false;
+    overlay.appendChild(video);
+  }
+
+  return { overlay, video };
+}
 
   function resolveVideoSrc(src) {
     if (!src) return null;
@@ -107,12 +97,15 @@
   `;
 
   video.style.cssText = `
-    max-width: 94% !important;
-    max-height: 94% !important;
-    border: 10px solid #d4af37 !important;
-    border-radius: 16px !important;
-    box-shadow: 0 0 40px rgba(212,175,55,0.8) !important;
-  `;
+  width: 94vw !important;
+  height: auto !important;
+  max-width: 94vw !important;
+  max-height: 90vh !important;
+  border: 8px solid #d4af37 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 0 30px rgba(212,175,55,0.7) !important;
+  object-fit: contain !important;
+`;
 
   // Remove qualquer outro conteúdo visível
   document.body.style.overflow = 'hidden';
