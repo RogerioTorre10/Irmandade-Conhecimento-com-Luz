@@ -84,15 +84,16 @@
   }
 
 
-  function playBlockTransition(videoSrc, onDone) {
+    function playBlockTransition(videoSrc, onDone) {
     const src = resolveVideoSrc(videoSrc);
-    // PRIORIDADE 1: sistema global de transição, voltando para a mesma SECTION_ID
+
+    // PRIORIDADE 1: usa o sistema global de transição com retorno para section-perguntas
     if (callPlayTransition(src, SECTION_ID, onDone)) {
-      log('Transição entre blocos via playTransitionThenGo:', src || '(padrão)');
+      log('Transição entre blocos via vídeo de transição:', src || '(padrão)');
       return true;
     }
 
-    // PRIORIDADE 2: overlay local via JPaperQA.loadVideo (sem trocar seção)
+    // PRIORIDADE 2 (fallback): tenta usar overlay local do JPaperQA, se existir
     if (window.JPaperQA && typeof window.JPaperQA.loadVideo === 'function' && src) {
       try {
         log('Transição entre blocos via JPaperQA.loadVideo:', src);
@@ -100,7 +101,6 @@
         if (maybe && typeof maybe.then === 'function') {
           maybe.then(() => { if (!completed && typeof onDone === 'function') onDone(); });
         } else if (typeof onDone === 'function') {
-          // Sem promessa → chama logo em seguida
           setTimeout(() => { if (!completed) onDone(); }, 100);
         }
         return true;
@@ -109,9 +109,10 @@
       }
     }
 
-    // Se nada deu, segue sem vídeo
+    // Se nada funcionou, segue direto
     return false;
   }
+
 
   // ---------- Blocos / Dados ----------
 
