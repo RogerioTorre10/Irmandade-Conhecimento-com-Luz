@@ -1,4 +1,4 @@
-/* section-final.js — FINAL v1.2 OTIMIZADO (anti-travamento) */
+/* section-final.js — FINAL v1.3 | Vídeo até o fim + borda perfeita */
 (function () {
   'use strict';
 
@@ -10,7 +10,7 @@
   let started = false;
   let videoPlaying = false;
 
-  // Utilitário otimizado com requestIdleCallback ou fallback
+  // Utilitário com requestIdleCallback (evita travamento)
   const sleep = (ms) => new Promise(r => {
     if ('requestIdleCallback' in window) {
       requestIdleCallback(() => setTimeout(r, ms), { timeout: ms + 100 });
@@ -19,7 +19,7 @@
     }
   });
 
-  // Fila de fala para evitar sobreposição
+  // Fila de fala (evita sobreposição)
   const speakQueue = [];
   let speakingInProgress = false;
 
@@ -37,29 +37,27 @@
         utter.rate = 0.95;
         utter.onend = resolve;
         utter.onerror = resolve;
-        speechSynthesis.cancel(); // limpa fila antiga
+        speechSynthesis.cancel();
         speechSynthesis.speak(utter);
       });
-      await sleep(100); // pequena pausa entre falas
+      await sleep(100);
     }
     speakingInProgress = false;
   }
 
-  // Datilografia com throttling + pause on interaction
+  // Datilografia com pausa ao interagir
   let typingPaused = false;
   async function typeText(el, text, delay = 35, withVoice = false) {
     if (!el || !text) return;
     el.textContent = '';
     el.classList.add('typing-active');
 
-    if (withVoice) {
-      speakText(text); // fila, não bloqueia
-    }
+    if (withVoice) speakText(text);
 
     for (let i = 0; i < text.length; i++) {
       if (typingPaused) {
-        await new Promise(r => setTimeout(r, 100)); // espera voltar
-        i--; // repete caractere
+        await new Promise(r => setTimeout(r, 100));
+        i--;
         continue;
       }
       el.textContent += text[i];
@@ -79,7 +77,7 @@
   document.addEventListener('touchend', resumeTyping);
   document.addEventListener('keydown', resumeTyping);
 
-  // Sequência final com controle de fluxo
+  // Sequência final
   async function startFinalSequence() {
     if (started) return;
     started = true;
@@ -111,17 +109,16 @@
       await sleep(350);
     }
 
-    // Libera botões
     document.querySelectorAll('.final-acoes button').forEach(btn => {
       btn.disabled = false;
       btn.style.opacity = '1';
       btn.style.pointerEvents = 'auto';
     });
 
-    console.log('[FINAL] Sequência concluída com sucesso!');
+    console.log('[FINAL] Sequência concluída com luz!');
   }
 
-  // Geração de PDF/HQ (inalterada, mas com feedback visual)
+  // Geração de PDF/HQ
   async function generateArtifacts() {
     const btn = document.getElementById('btnBaixarPDFHQ');
     if (!btn || btn.dataset.loading === '1') return;
@@ -165,72 +162,119 @@
     }
   }
 
-  // VÍDEO FINAL ESTÁVEL (com fallback e preload)
+  // === VÍDEO FINAL: RODA ATÉ O FIM + PREENCHE A BORDA ===
   function playFinalVideo() {
-    if (videoPlaying || window.__finalVideoRunning) {
+    if (window.__finalVideoRunning || videoPlaying) {
       window.location.href = HOME_URL;
       return;
     }
     window.__finalVideoRunning = true;
     videoPlaying = true;
 
-    // Preload do vídeo (evita delay)
+    // Contêiner com borda dourada
+    const container = document.createElement('div');
+    container.id = 'final-video-container';
+    container.style.cssText = `
+      position: fixed !important;
+      top: 50% !important; left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      width: 92vw !important; height: 92vh !important;
+      max-width: 92vw !important; max-height: 92vh !important;
+      z-index: 99999 !important;
+      border: 12px solid #d4af37 !important;
+      border-radius: 16px !important;
+      box-shadow: 0 0 60px rgba(212,175,55,0.9) !important;
+      overflow: hidden !important;
+      background: #000 !important;
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      opacity: 1 !important;
+      transition: opacity 1s ease-out !important;
+    `;
+
+    // Vídeo dentro
     const video = document.createElement('video');
     video.id = 'final-video';
     video.src = VIDEO_SRC;
     video.playsInline = true;
     video.muted = false;
     video.preload = 'auto';
-    video.style.display = 'none';
-    document.body.appendChild(video);
+    video.autoplay = true;
+    video.style.cssText = `
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      display: block !important;
+    `;
 
-    // Estiliza só quando pronto
-    const showVideo = () => {
-      video.style.cssText = `
-        position: fixed !important;
-        top: 50% !important; left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-        width: 92vw !important; height: 92vh !important;
-        max-width: 92vw !important; max-height: 92vh !important;
-        object-fit: contain !important;
-        z-index: 99999 !important;
-        border: 12px solid #d4af37 !important;
-        border-radius: 16px !important;
-        box-shadow: 0 0 60px rgba(212,175,55,0.9) !important;
-        background: #000 !important;
-        display: block !important;
-      `;
+    container.appendChild(video);
+    document.body.appendChild(container);
 
-      document.body.style.overflow = 'hidden';
-      document.querySelectorAll('body > *:not(#final-video)').forEach(el => {
-        el.style.transition = 'opacity 0.6s';
-        el.style.opacity = '0';
-        el.style.pointerEvents = 'none';
-      });
-    };
+    // Overlay escuro
+    const overlay = document.createElement('div');
+    overlay.id = 'final-video-overlay';
+    overlay.style.cssText = `
+      position: fixed !important;
+      top: 0 !important; left: 0 !important;
+      width: 100vw !important; height: 100vh !important;
+      background: rgba(0,0,0,0.95) !important;
+      z-index: 99998 !important;
+      pointer-events: none !important;
+      opacity: 1 !important;
+      transition: opacity 1s ease-out !important;
+    `;
+    document.body.appendChild(overlay);
 
+    // Redireciona APÓS o fim
     const goHome = () => {
-      document.body.style.overflow = '';
-      window.location.href = HOME_URL;
+      container.style.opacity = '0';
+      overlay.style.opacity = '0';
+      setTimeout(() => {
+        window.location.href = HOME_URL;
+      }, 1100);
     };
+
+    video.onended = () => {
+      console.log('[FINAL] Jornada concluída com luz plena.');
+      goHome();
+    };
+
+    // Timeout de segurança (8s)
+    const timeout = setTimeout(() => {
+      console.warn('[FINAL] Timeout: indo pro portal.');
+      goHome();
+    }, 8000);
 
     video.oncanplaythrough = () => {
-      showVideo();
-      video.play().then(() => {
-        console.log('[FINAL] Vídeo iniciado.');
-      }).catch(() => goHome());
+      clearTimeout(timeout);
+      console.log('[FINAL] Vídeo carregado. Rodando até o fim.');
     };
 
-    video.onended = goHome;
-    video.onerror = goHome;
+    video.onerror = () => {
+      clearTimeout(timeout);
+      goHome();
+    };
 
-    // Timeout de segurança
-    setTimeout(() => {
-      if (!video.playing) goHome();
-    }, 6000);
+    // Garante play (mesmo com bloqueio de autoplay)
+    const tryPlay = () => {
+      const p = video.play();
+      if (p && typeof p.catch === 'function') {
+        p.catch(() => {
+          const clicker = document.createElement('div');
+          clicker.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99997;';
+          document.body.appendChild(clicker);
+          clicker.click();
+          setTimeout(() => document.body.removeChild(clicker), 100);
+          video.play();
+        });
+      }
+    };
+
+    video.onloadeddata = tryPlay;
   }
 
-  // Eventos
+  // Eventos de clique
   document.addEventListener('click', (e) => {
     const t = e.target.closest('button') || e.target;
     if (!t) return;
@@ -260,7 +304,7 @@
 
   document.addEventListener('DOMContentLoaded', tryStart);
 
-  // CSS do spinner (adicione no seu CSS ou aqui)
+  // CSS do spinner e transições
   const style = document.createElement('style');
   style.textContent = `
     .spinner {
@@ -271,9 +315,13 @@
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
       margin-right: 8px;
+      vertical-align: middle;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     .final-acoes button:disabled { opacity: 0.6; cursor: not-allowed; }
+    #final-video-container, #final-video-overlay {
+      transition: opacity 1s ease-out !important;
+    }
   `;
   document.head.appendChild(style);
 
