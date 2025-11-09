@@ -502,32 +502,61 @@
   // --------------------------------------------------
 
   function bindUI(root) {
-    const btnConf = $('#jp-btn-confirmar', root);
-    const input = $('#jp-answer-input', root);
+  root = root || document.getElementById(SECTION_ID) || document;
 
-    if (input && window.JORNADA_MICRO) {
+  const btnFalar  = $('#jp-btn-falar', root);
+  const btnApagar = $('#jp-btn-apagar', root);
+  const btnConf   = $('#jp-btn-confirmar', root);
+  const input     = $('#jp-answer-input', root);
+
+  // MICROFONE
+  if (btnFalar && input && window.JORNADA_MICRO) {
+    btnFalar.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
       window.JORNADA_MICRO.attach(input, { mode: 'append' });
-    }
-
-    if (input && window.JORNADA_CHAMA) {
-      input.addEventListener('input', () => {
-        const txt = input.value || '';
-        window.JORNADA_CHAMA.updateChamaFromText(txt, 'chama-perguntas');
-      });
-    }
-
-    if (btnConf) {
-      btnConf.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        if (completed) {
-          log('Clique em confirmar após conclusão; ignorado.');
-          return;
-        }
-        saveCurrentAnswer();
-        nextStep();
-      });
-    }
+    });
   }
+
+  // APAGAR
+  if (btnApagar && input) {
+    btnApagar.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      input.value = '';
+      input.focus();
+      if (window.JORNADA_CHAMA) {
+        window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'media');
+      }
+    });
+  }
+
+  // CONFIRMAR
+  if (btnConf) {
+    btnConf.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      if (completed) {
+        log('Clique em confirmar após conclusão; ignorado.');
+        return;
+      }
+      saveCurrentAnswer();
+      nextStep();
+    });
+  }
+
+  // INPUT CHAMA
+  if (input && window.JORNADA_CHAMA) {
+    input.addEventListener('input', () => {
+      const txt = input.value || '';
+      window.JORNADA_CHAMA.updateChamaFromText(txt, 'chama-perguntas');
+    });
+  }
+
+  // MICROFONE AUTOMÁTICO (opcional)
+  if (input && window.JORNADA_MICRO) {
+    window.JORNADA_MICRO.attach(input, { mode: 'append' });
+  }
+}
 
   // --------------------------------------------------
   // INIT
