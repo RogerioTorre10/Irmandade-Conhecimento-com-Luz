@@ -136,10 +136,9 @@
       btn.dataset.loading = '0';
     }
   }
-
-  // Vídeo final + redirecionamento
+  
  // Vídeo final + redirecionamento robusto
-function playFinalVideo() {
+  function playFinalVideo() {
   if (window.__finalVideoRunning) {
     // se já tentou antes, vai direto pro portal
     window.location.href = HOME_URL;
