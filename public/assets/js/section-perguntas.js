@@ -103,15 +103,27 @@ overlay.style.cssText = `
 
 // ESTILO DO WRAPPER (com chama)
 wrapper.style.cssText = `
-  position: relative; width: 92vw; max-width: 92vw;
-  height: auto; max-height: 88vh; border-radius: 16px;
-  overflow: visible; box-shadow: 0 0 30px rgba(212,175,55,0.7);
+  position: relative;
+  width: 92vw;
+  max-width: 92vw;
+  height: auto;
+  max-height: 88vh;
+  border: 10px solid #d4af37 !important;
+  border-radius: 16px !important;
+  overflow: visible;
+  box-shadow: 0 0 40px rgba(212,175,55,0.8) !important;
+  background: #000;
 `;
 
 // ESTILO DO VÍDEO
 video.style.cssText = `
-  width: 100%; height: auto; max-height: 88vh;
-  display: block; object-fit: contain; border-radius: 16px;
+  width: 100%;
+  height: auto;
+  max-height: 88vh;
+  display: block;
+  object-fit: contain;
+  border-radius: 10px; /* só arredondar dentro */
+  border: none !important;
 `;
 
 // Mostra overlay
