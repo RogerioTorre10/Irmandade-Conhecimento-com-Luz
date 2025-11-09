@@ -41,37 +41,27 @@
   // OVERLAY DE VÍDEO (entre blocos e final)
   // --------------------------------------------------
 
-  function ensureVideoOverlay() {
-    let overlay = $('#videoOverlay');
-    let video = $('#videoTransicao');
+ function ensureVideoOverlay() {
+  let overlay = document.getElementById('videoOverlay');
+  let video = document.getElementById('videoTransicao');
 
-    if (!overlay) {
-      overlay = document.createElement('div');
-      overlay.id = 'videoOverlay';
-      overlay.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(0,0,0,0.98); display: none; align-items: center;
-        justify-content: center; z-index: 9999; opacity: 0;
-        pointer-events: none; transition: opacity 0.6s ease;
-      `;
-      document.body.appendChild(overlay);
-    }
-
-    if (!video) {
-      video = document.createElement('video');
-      video.id = 'videoTransicao';
-      video.playsInline = true;
-      video.preload = 'auto';
-      video.style.cssText = `
-        max-width: 95%; max-height: 95%; border: 8px solid #d4af37;
-        border-radius: 12px; box-shadow: 0 0 30px rgba(212,175,55,0.6);
-      `;
-      video.controls = false;
-      overlay.appendChild(video);
-    }
-
-    return { overlay, video };
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'videoOverlay';
+    document.body.appendChild(overlay);
   }
+
+  if (!video) {
+    video = document.createElement('video');
+    video.id = 'videoTransicao';
+    video.playsInline = true;
+    video.preload = 'auto';
+    video.controls = false;
+    overlay.appendChild(video);
+  }
+
+  return { overlay, video };
+}
 
   function resolveVideoSrc(src) {
     if (!src) return null;
@@ -82,37 +72,84 @@
     return url;
   }
 
-  function playVideoWithCallback(src, onEnded) {
-    src = resolveVideoSrc(src);
-    if (!src) {
-      if (typeof onEnded === 'function') onEnded();
-      return;
-    }
-
-    const { overlay, video } = ensureVideoOverlay();
-
-    overlay.style.display = 'flex';
-    setTimeout(() => overlay.style.opacity = '1', 50);
-
-    video.src = src;
-    video.load();
-
-    const endHandler = () => {
-      video.onended = null;
-      overlay.style.opacity = '0';
-      setTimeout(() => {
-        overlay.style.display = 'none';
-        if (typeof onEnded === 'function') onEnded();
-      }, 600);
-    };
-
-    video.onended = endHandler;
-
-    video.play().catch(e => {
-      console.error('[PERGUNTAS] Erro ao tocar vídeo:', e);
-      endHandler();
-    });
+ function playVideoWithCallback(src, onEnded) {
+  src = resolveVideoSrc(src);
+  if (!src) {
+    if (typeof onEnded === 'function') onEnded();
+    return;
   }
+
+  const { overlay, video } = ensureVideoOverlay();
+
+  // FORÇA ESTILO INLINE (ignora tudo)
+  overlay.style.cssText = `
+    position: fixed !important;
+    top: 0 !important; left: 0 !important;
+    width: 100vw !important; height: 100vh !important;
+    background: rgba(0,0,0,0.98) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 99999 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.6s ease !important;
+  `;
+
+  video.style.cssText = `
+  width: 94vw !important;
+  height: auto !important;
+  max-width: 94vw !important;
+  max-height: 90vh !important;
+  border: 8px solid #d4af37 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 0 30px rgba(212,175,55,0.7) !important;
+  object-fit: contain !important;
+`;
+
+  // Remove qualquer outro conteúdo visível
+  document.body.style.overflow = 'hidden';
+  document.querySelectorAll('section, div, header, footer').forEach(el => {
+    if (el.id !== 'videoOverlay') {
+      el.style.display = 'none';
+    }
+  });
+
+  // Mostra overlay
+  overlay.style.display = 'flex';
+  overlay.style.pointerEvents = 'all';
+
+  // Força render antes de opacity
+  requestAnimationFrame(() => {
+    overlay.style.opacity = '1';
+  });
+
+  video.src = src;
+  video.load();
+
+  const endHandler = () => {
+    video.onended = null;
+    overlay.style.opacity = '0';
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      // Restaura visibilidade
+      document.body.style.overflow = '';
+      document.querySelectorAll('section, div, header, footer').forEach(el => {
+        if (el.id !== 'videoOverlay') {
+          el.style.display = '';
+        }
+      });
+      if (typeof onEnded === 'function') onEnded();
+    }, 600);
+  };
+
+  video.onended = endHandler;
+
+  video.play().catch(e => {
+    console.error('[PERGUNTAS] Erro ao tocar vídeo:', e);
+    endHandler();
+  });
+}
 
   window.playBlockTransition = function(videoSrc, onDone) {
     const src = resolveVideoSrc(videoSrc);
