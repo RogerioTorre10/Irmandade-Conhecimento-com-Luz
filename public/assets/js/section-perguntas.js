@@ -81,108 +81,59 @@ function ensureVideoOverlay() {
     return url;
   }
 
-  function playVideoWithCallback(src, onEnded) {
+ function playVideoWithCallback(src, onEnded) {
   src = resolveVideoSrc(src);
   if (!src) {
     if (typeof onEnded === 'function') onEnded();
     return;
   }
 
-  const { overlay, wrapper, video } = ensureVideoOverlay(); // DESTRUTURA CORRETAMENTE
+  const { overlay, wrapper, video } = ensureVideoOverlay();
 
-// ESTILO DO OVERLAY
-overlay.style.cssText = `
-  position: fixed !important; top: 0 !important; left: 0 !important;
-  width: 100vw !important; height: 100vh !important;
-  background: rgba(0,0,0,0.98) !important;
-  display: flex !important; align-items: center !important;
-  justify-content: center !important; z-index: 99999 !important;
-  opacity: 0 !important; pointer-events: none !important;
-  transition: opacity 0.6s ease !important;
-`;
+  // LIMPA ESTILOS ANTIGOS
+  wrapper.removeAttribute('style');
+  video.removeAttribute('style');
 
-// ESTILO DO WRAPPER (com chama)
-wrapper.style.cssText = `
-  position: relative;
-  width: 92vw;
-  max-width: 92vw;
-  height: auto;
-  max-height: 88vh;
-  border: 10px solid #d4af37 !important;
-  border-radius: 16px !important;
-  overflow: visible;
-  box-shadow: 0 0 40px rgba(212,175,55,0.8) !important;
-  background: #000;
-`;
+  // ESTILO DO OVERLAY
+  overlay.style.cssText = `
+    position: fixed !important; top: 0 !important; left: 0 !important;
+    width: 100vw !important; height: 100vh !important;
+    background: rgba(0,0,0,0.98) !important;
+    display: flex !important; align-items: center !important;
+    justify-content: center !important; z-index: 99999 !important;
+    opacity: 0 !important; pointer-events: none !important;
+    transition: opacity 0.6s ease !important;
+  `;
 
-// ESTILO DO VÍDEO
-video.style.cssText = `
-  width: 100%;
-  height: auto;
-  max-height: 88vh;
-  display: block;
-  object-fit: contain;
-  border-radius: 10px; /* só arredondar dentro */
-  border: none !important;
-`;
+  // ESTILO DO WRAPPER (BORDA DOURADA AQUI!)
+  wrapper.style.cssText = `
+    position: relative;
+    width: 92vw;
+    max-width: 92vw;
+    height: auto;
+    max-height: 88vh;
+    border: 10px solid #d4af37 !important;
+    border-radius: 16px !important;
+    overflow: visible;
+    box-shadow: 0 0 40px rgba(212,175,55,0.8) !important;
+    background: #000;
+  `;
 
-// Mostra overlay
-overlay.style.display = 'flex';
-overlay.style.pointerEvents = 'all';
-requestAnimationFrame(() => { overlay.style.opacity = '1'; });
-
-video.src = src;
-video.load();
-
-// ESTILO DO WRAPPER (com chama)
-wrapper.style.cssText = `
-  position: relative;
-  width: 92vw;
-  max-width: 92vw;
-  height: auto;
-  max-height: 88vh;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 0 30px rgba(212,175,55,0.7);
-`;
-
-// ESTILO DO VÍDEO
-video.style.cssText = `
-  width: 100%;
-  height: auto;
-  max-height: 88vh;
-  display: block;
-  object-fit: contain;
-`;
-// Remove camadas antigas
-video.querySelectorAll('.flame-glow').forEach(el => el.remove());
-
-// Cria camada de brilho pulsante
-const glow = document.createElement('div');
-glow.className = 'flame-glow';
-video.appendChild(glow);
-
-// Força animação
-requestAnimationFrame(() => {
-  video.classList.add('flame-active');
-});
-    
-  // Remove qualquer outro conteúdo visível
-  document.body.style.overflow = 'hidden';
-  document.querySelectorAll('section, div, header, footer').forEach(el => {
-    if (el.id !== 'videoOverlay') {
-      el.style.display = 'none';
-    }
-  });
+  // ESTILO DO VÍDEO
+  video.style.cssText = `
+    width: 100%;
+    height: auto;
+    max-height: 88vh;
+    display: block;
+    object-fit: contain;
+    border-radius: 10px;
+    border: none !important;
+  `;
 
   // Mostra overlay
   overlay.style.display = 'flex';
   overlay.style.pointerEvents = 'all';
-
-  // Força render antes de opacity
-  requestAnimationFrame(() => {
-    overlay.style.opacity = '1';
-  });
+  requestAnimationFrame(() => { overlay.style.opacity = '1'; });
 
   video.src = src;
   video.load();
@@ -192,13 +143,6 @@ requestAnimationFrame(() => {
     overlay.style.opacity = '0';
     setTimeout(() => {
       overlay.style.display = 'none';
-      // Restaura visibilidade
-      document.body.style.overflow = '';
-      document.querySelectorAll('section, div, header, footer').forEach(el => {
-        if (el.id !== 'videoOverlay') {
-          el.style.display = '';
-        }
-      });
       if (typeof onEnded === 'function') onEnded();
     }, 600);
   };
