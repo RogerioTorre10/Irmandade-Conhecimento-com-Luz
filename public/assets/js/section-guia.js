@@ -86,7 +86,7 @@
   function getTransitionSrc(root, btn) {
     return (btn?.dataset?.transitionSrc)
       || (root?.dataset?.transitionSrc)
-      || '/assets/videos/filme-eu-na-irmandade.mp4';
+      || '/assets/videos/filme-conhecimento-com-luz-jardim.mp4';
   }
 // helper robusto: toca o vídeo de transição (se possível) e depois navega
 function playTransitionSafe(src, nextId) {
@@ -104,7 +104,7 @@ function playTransitionSafe(src, nextId) {
   try {
     window.__TRANSITION_LOCK = true; // evita duplo clique
     const v = document.createElement('video');
-    v.src = src || '/assets/videos/filme-eu-na-irmandade.mp4';
+    v.src = src || '/assets/videos/filme-conhecimento-com-luz-jardim.mp4';
     v.playsInline = true;
     v.muted = true;
     v.autoplay = true;
