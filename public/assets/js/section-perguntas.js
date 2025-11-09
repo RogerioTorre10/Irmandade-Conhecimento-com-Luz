@@ -436,12 +436,13 @@ function ensureFinalSectionExists() {
     <video id="final-video" playsinline preload="auto" style="display:none;"></video>
   `;
 
-  const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
-  wrapper.appendChild(finalEl);
-
-  log('section-final criada com HTML completo (fallback FINAL).');
-  return finalEl;
-}
+   const wrapper = document.getElementById('jornada-content-wrapper');
+  if (wrapper) {
+    // Limpa tudo que estava dentro (perguntas, etc)
+    wrapper.innerHTML = '';
+    // Coloca só a tela final dentro do wrapper
+    wrapper.appendChild(finalEl);
+  }
 
 function showFinalSection() {
   const finalEl = ensureFinalSectionExists();
