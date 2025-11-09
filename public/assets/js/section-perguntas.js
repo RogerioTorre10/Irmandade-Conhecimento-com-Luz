@@ -41,7 +41,7 @@
   // OVERLAY DE VÍDEO (entre blocos e final)
   // --------------------------------------------------
 
- function ensureVideoOverlay() {
+function ensureVideoOverlay() {
   let overlay = document.getElementById('videoOverlay');
   let wrapper = document.getElementById('videoFlameWrapper');
   let video = document.getElementById('videoTransicao');
@@ -68,6 +68,7 @@
     wrapper.appendChild(video);
   }
 
+  // RETORNA wrapper, video E overlay
   return { overlay, wrapper, video };
 }
 
@@ -87,35 +88,39 @@
     return;
   }
 
-  const { overlay, video } = ensureVideoOverlay();
+  const { overlay, wrapper, video } = ensureVideoOverlay(); // DESTRUTURA CORRETAMENTE
 
-  // FORÇA ESTILO INLINE (ignora tudo)
-  overlay.style.cssText = `
-    position: fixed !important;
-    top: 0 !important; left: 0 !important;
-    width: 100vw !important; height: 100vh !important;
-    background: rgba(0,0,0,0.98) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    z-index: 99999 !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    transition: opacity 0.6s ease !important;
-  `;
-
-  video.style.cssText = `
-  width: 92vw !important;
-  height: auto !important;
-  max-width: 92vw !important;
-  max-height: 88vh !important;
-  border: 8px solid #d4af37 !important;
-  border-radius: 16px !important;
-  position: relative !important;
-  overflow: hidden !important;
-  object-fit: contain !important;
-  box-shadow: 0 0 30px rgba(212,175,55,0.7) !important;
+// ESTILO DO OVERLAY
+overlay.style.cssText = `
+  position: fixed !important; top: 0 !important; left: 0 !important;
+  width: 100vw !important; height: 100vh !important;
+  background: rgba(0,0,0,0.98) !important;
+  display: flex !important; align-items: center !important;
+  justify-content: center !important; z-index: 99999 !important;
+  opacity: 0 !important; pointer-events: none !important;
+  transition: opacity 0.6s ease !important;
 `;
+
+// ESTILO DO WRAPPER (com chama)
+wrapper.style.cssText = `
+  position: relative; width: 92vw; max-width: 92vw;
+  height: auto; max-height: 88vh; border-radius: 16px;
+  overflow: visible; box-shadow: 0 0 30px rgba(212,175,55,0.7);
+`;
+
+// ESTILO DO VÍDEO
+video.style.cssText = `
+  width: 100%; height: auto; max-height: 88vh;
+  display: block; object-fit: contain; border-radius: 16px;
+`;
+
+// Mostra overlay
+overlay.style.display = 'flex';
+overlay.style.pointerEvents = 'all';
+requestAnimationFrame(() => { overlay.style.opacity = '1'; });
+
+video.src = src;
+video.load();
 
 // ESTILO DO WRAPPER (com chama)
 wrapper.style.cssText = `
