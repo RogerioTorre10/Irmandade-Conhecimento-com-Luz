@@ -265,5 +265,92 @@ body[data-guia="zion"]  .btn-stone-espinhos,
 body[data-guia="arian"] .btn-stone-espinhos {
   transition: all .25s ease-in-out;
 }
+/* =======================================================
+   BRILHO + TEXTURAS — módulo universal (v2)
+   Compatível com styles-base.css · Seguro para toda a jornada
+   ======================================================= */
 
+/* -------- Variáveis (paths + aura) -------- */
+:root{
+  --espinhos-img: url('/assets/img/moldura-medieval-espinhos.png');
+  --stone-img: url('/assets/img/textura-de-pedra.jpg');
+
+  /* Auras reforçadas */
+  --aura-gold-outer: rgba(255, 215, 120, .85);
+  --aura-gold:       rgba(255, 215, 120, .75);
+  --aura-gold-soft:  rgba(255, 215, 120, .45);
+  --aura-amber:      rgba(255, 160, 60,  .65);
+
+  /* Botões */
+  --btn-gold-outer: rgba(255, 230, 120, 0.50);
+  --btn-gold-mid:   rgba(255, 220, 120, 0.55);
+  --btn-gold-in:    rgba(255, 255, 230, 0.30);
+  --btn-gold-line:  rgba(255, 215,   0, 0.32);
+  --btn-text:       #f9e7c2;
+
+  --ink: #f5efe0;
+}
+
+/* -------- Animações compartilhadas -------- */
+@keyframes brilhoDivino {
+  0%,100% {
+    box-shadow:
+      0 0 8px  var(--btn-gold-outer),
+      0 0 16px var(--btn-gold-mid),
+      inset 0 0 3px var(--btn-gold-in);
+  }
+  50% {
+    box-shadow:
+      0 0 14px var(--btn-gold-outer),
+      0 0 24px var(--btn-gold-mid),
+      inset 0 0 5px var(--btn-gold-in);
+  }
+}
+@keyframes reflexoDourado {
+  0%   { opacity: 0; transform: translate(-120%, -120%) rotate(25deg); }
+  45%, 55% { opacity: .95; }
+  100% { opacity: 0; transform: translate(120%, 120%) rotate(25deg); }
+}
+@keyframes aura-pop {
+  0%   { filter: drop-shadow(0 0 12px var(--aura-gold)); }
+  60%  { filter: drop-shadow(0 0 32px var(--aura-gold)); }
+  100% { filter: drop-shadow(0 0 16px var(--aura-gold)); }
+}
+
+/* =======================================================
+   (0) CHARME GLOBAL — títulos, textos datilografados, molduras
+   ======================================================= */
+.charme, .typing-charme, .titulo-pergaminho {
+  color: var(--ink);
+  text-shadow:
+    0 1px 0 #000,
+    0 2px 4px rgba(0,0,0,.55),
+    0 0 12px var(--aura-gold),
+    0 0 24px var(--aura-amber);
+  filter: drop-shadow(0 0 8px var(--aura-gold-soft));
+}
+.typing-active,
+[data-typing="true"].typing-active,
+#guia-notice-text.typing-active {
+  animation: brilhoDivino 1.4s ease-in-out infinite;
+  text-shadow:
+    0 1px 0 #000,
+    0 2px 6px rgba(0,0,0,.55),
+    0 0 16px var(--aura-gold),
+    0 0 36px var(--aura-amber);
+  filter: drop-shadow(0 0 18px var(--aura-gold));
+}
+.typing-done{
+  text-shadow:
+    0 1px 0 #000,
+    0 2px 4px rgba(0,0,0,.55),
+    0 0 14px var(--aura-gold),
+    0 0 28px var(--aura-amber);
+  filter: drop-shadow(0 0 12px var(--aura-gold));
+}
+/* Molduras/caixas “glow” já usadas na jornada */
+.aura, .moldura-grande.glow, .guia-descricao-medieval.glow {
+  box-shadow:
+    inset 0 0 14p...(truncated, mas cole o conteúdo completo que você mandou)
+}
      
