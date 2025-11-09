@@ -385,7 +385,7 @@
     }
   }
 
-    // --------------------------------------------------
+     // --------------------------------------------------
   // FINALIZAÇÃO — FALLBACK LIMPO PARA SECTION-FINAL
   // --------------------------------------------------
 
@@ -397,7 +397,7 @@
       return finalEl;
     }
 
-    // Cria a seção final com o mesmo layout usado em section-final.html
+    // Cria a seção final com o mesmo layout da section-final.html
     finalEl = document.createElement('section');
     finalEl.id = FINAL_SECTION_ID;
     finalEl.className = 'section section-final';
@@ -442,28 +442,22 @@
 
     const wrapper = document.getElementById('jornada-content-wrapper');
     if (wrapper) {
-      // limpa o conteúdo anterior (perguntas) e injeta apenas a tela final
+      // limpa tudo que está dentro e deixa só a final
       wrapper.innerHTML = '';
       wrapper.appendChild(finalEl);
     }
 
-    // Fluxo oficial via controlador
+    // Fluxo oficial controlado pelo JC
     if (window.JC && typeof window.JC.show === 'function') {
       window.JC.show(FINAL_SECTION_ID);
     } else {
-      // Fallback simples: esconde outras seções e mostra só a final
+      // Fallback simples
       document.querySelectorAll('section.section').forEach(sec => {
         sec.style.display = (sec.id === FINAL_SECTION_ID) ? 'block' : 'none';
       });
       finalEl.scrollIntoView({ behavior: 'smooth' });
     }
   }
-
-  // Opcional para debug manual no console:
-  window.__showFinalSection = showFinalSection;
-
-})(); // FIM DO IIFE section-perguntas.js
-
 
   function finishAll() {
     if (completed) return;
