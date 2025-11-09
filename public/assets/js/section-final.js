@@ -31,24 +31,43 @@
     element.classList.remove('typing-active');
     element.classList.add('typing-done');
   }
+    document.addEventListener('sectionLoaded', (e) => {
+    if (e.detail?.sectionId !== SECTION_ID) return;
 
-  // INICIA DATILOGRAFIA
-  async function startFinalSequence() {
-    const title = $('#final-title');
-    const message = $('#final-message');
+    // Espera o DOM
+    setTimeout(() => {
+    startFinalSequence();
+    }, 100);
+  });
+  
+ // INICIA A SEQUÊNCIA DE DATILOGRAFIA
+async function startFinalSequence() {
+  const title = document.getElementById('final-title');
+  const message = document.getElementById('final-message');
 
-    await typeText(title, "Gratidão por Caminhar com Luz 🌟");
-    await new Promise(r => setTimeout(r, 600));
-
-    const paragraphs = message.querySelectorAll('p');
-    for (let p of paragraphs) {
-      await typeText(p, p.textContent);
-      await new Promise(r => setTimeout(r, 400, 400));
-    }
-
-    // Ativa botões
-    document.querySelectorAll('.final-acoes button').forEach(b => b.disabled = false);
+  if (!title || !message) {
+    console.warn('[FINAL] Elementos não encontrados');
+    return;
   }
+
+  // Título
+  await typeText(title, "Gratidão por Caminhar com Luz");
+
+  // Mensagem (parágrafo por parágrafo)
+  const paragraphs = message.querySelectorAll('p');
+  for (let p of paragraphs) {
+    await typeText(p, p.textContent);
+    await new Promise(r => setTimeout(r, 500)); // pausa entre parágrafos
+  }
+
+  // Libera botões
+  document.querySelectorAll('.final-acoes button').forEach(btn => {
+    btn.disabled = false;
+  });
+
+  // Gera PDF/HQ automaticamente
+  generateArtifacts();
+}
 
     // VÍDEO FINAL + VOLTA (TELA CHEIA + BORDA DOURADA)
 function playFinalVideo() {
