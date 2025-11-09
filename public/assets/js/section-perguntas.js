@@ -43,7 +43,6 @@
 
 function ensureVideoOverlay() {
   let overlay = document.getElementById('videoOverlay');
-  let wrapper = document.getElementById('videoFlameWrapper');
   let video = document.getElementById('videoTransicao');
 
   if (!overlay) {
@@ -52,24 +51,16 @@ function ensureVideoOverlay() {
     document.body.appendChild(overlay);
   }
 
-  if (!wrapper) {
-    wrapper = document.createElement('div');
-    wrapper.id = 'videoFlameWrapper';
-    wrapper.className = 'flame-wrapper';
-    overlay.appendChild(wrapper);
-  }
-
   if (!video) {
     video = document.createElement('video');
     video.id = 'videoTransicao';
     video.playsInline = true;
     video.preload = 'auto';
     video.controls = false;
-    wrapper.appendChild(video);
+    overlay.appendChild(video);
   }
 
-  // RETORNA wrapper, video E overlay
-  return { overlay, wrapper, video };
+  return { overlay, video };
 }
 
   function resolveVideoSrc(src) {
@@ -81,17 +72,17 @@ function ensureVideoOverlay() {
     return url;
   }
 
- function playVideoWithCallback(src, onEnded) {
+function playVideoWithCallback(src, onEnded) {
   src = resolveVideoSrc(src);
   if (!src) {
     if (typeof onEnded === 'function') onEnded();
     return;
   }
 
-  const { overlay, wrapper, video } = ensureVideoOverlay();
+  const { overlay, video } = ensureVideoOverlay();
 
   // LIMPA ESTILOS ANTIGOS
-  wrapper.removeAttribute('style');
+  overlay.removeAttribute('style');
   video.removeAttribute('style');
 
   // ESTILO DO OVERLAY
@@ -105,32 +96,17 @@ function ensureVideoOverlay() {
     transition: opacity 0.6s ease !important;
   `;
 
-  // ESTILO DO WRAPPER (BORDA DOURADA AQUI!)
-  wrapper.style.cssText = `
-    position: relative;
-    width: 92vw;
-    max-width: 92vw;
-    height: auto;
-    max-height: 88vh;
+  // ESTILO DO VÍDEO (COM BORDA DOURADA!)
+  video.style.cssText = `
+    width: 92vw !important; height: auto !important;
+    max-width: 92vw !important; max-height: 88vh !important;
     border: 10px solid #d4af37 !important;
     border-radius: 16px !important;
-    overflow: visible;
     box-shadow: 0 0 40px rgba(212,175,55,0.8) !important;
-    background: #000;
+    object-fit: contain !important;
   `;
 
-  // ESTILO DO VÍDEO
-  video.style.cssText = `
-    width: 100%;
-    height: auto;
-    max-height: 88vh;
-    display: block;
-    object-fit: contain;
-    border-radius: 10px;
-    border: none !important;
-  `;
-
-  // Mostra overlay
+  // Mostra
   overlay.style.display = 'flex';
   overlay.style.pointerEvents = 'all';
   requestAnimationFrame(() => { overlay.style.opacity = '1'; });
@@ -146,6 +122,14 @@ function ensureVideoOverlay() {
       if (typeof onEnded === 'function') onEnded();
     }, 600);
   };
+
+  video.onended = endHandler;
+
+  video.play().catch(e => {
+    console.error('[PERGUNTAS] Erro ao tocar vídeo:', e);
+    endHandler();
+  });
+}
 
   video.onended = endHandler;
 
