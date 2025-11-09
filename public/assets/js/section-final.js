@@ -138,53 +138,99 @@
   }
 
   // Vídeo final + redirecionamento
-  function playFinalVideo() {
-    let video = document.getElementById('final-video');
-    if (!video) {
-      video = document.createElement('video');
-      video.id = 'final-video';
-      video.playsInline = true;
-      document.body.appendChild(video);
-    }
-
-    video.src = VIDEO_SRC;
-
-    video.style.cssText = `
-      position: fixed !important;
-      top: 50% !important;
-      left: 50% !important;
-      transform: translate(-50%, -50%) !important;
-      width: 92vw !important;
-      height: 92vh !important;
-      max-width: 92vw !important;
-      max-height: 92vh !important;
-      object-fit: contain !important;
-      z-index: 99999 !important;
-      border: 12px solid #d4af37 !important;
-      border-radius: 16px !important;
-      box-shadow: 0 0 60px rgba(212,175,55,0.9) !important;
-      background: #000 !important;
-    `;
-
-    document.body.style.overflow = 'hidden';
-
-    // Escurece o restante sem destruir a DOM
-    document.querySelectorAll('body > *:not(#final-video)').forEach(el => {
-      if (el.id !== 'final-video') {
-        el.style.opacity = '0';
-        el.style.pointerEvents = 'none';
-      }
-    });
-
-    video.play().catch(err => {
-      console.error('[FINAL] Erro ao reproduzir vídeo final:', err);
-      window.location.href = HOME_URL;
-    });
-
-    video.onended = () => {
-      window.location.href = HOME_URL;
-    };
+ // Vídeo final + redirecionamento robusto
+function playFinalVideo() {
+  if (window.__finalVideoRunning) {
+    // se já tentou antes, vai direto pro portal
+    window.location.href = HOME_URL;
+    return;
   }
+  window.__finalVideoRunning = true;
+
+  let video = document.getElementById('final-video');
+  if (!video) {
+    video = document.createElement('video');
+    video.id = 'final-video';
+    video.playsInline = true;
+    document.body.appendChild(video);
+  }
+
+  video.src = VIDEO_SRC;
+  video.autoplay = false;
+  video.muted = false;
+
+  // Overlay estilizado
+  video.style.cssText = `
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 92vw !important;
+    height: 92vh !important;
+    max-width: 92vw !important;
+    max-height: 92vh !important;
+    object-fit: contain !important;
+    z-index: 99999 !important;
+    border: 12px solid #d4af37 !important;
+    border-radius: 16px !important;
+    box-shadow: 0 0 60px rgba(212,175,55,0.9) !important;
+    background: #000 !important;
+    display: block !important;
+  `;
+
+  // Escurece o restante sem destruir a DOM
+  document.querySelectorAll('body > *:not(#final-video)').forEach(el => {
+    el.style.opacity = '0';
+    el.style.pointerEvents = 'none';
+  });
+  document.body.style.overflow = 'hidden';
+
+  const goHome = () => {
+    window.location.href = HOME_URL;
+  };
+
+  let started = false;
+
+  function tryPlay() {
+    const p = video.play();
+    if (p && typeof p.then === 'function') {
+      p.then(() => {
+        started = true;
+        console.log('[FINAL] Vídeo final reproduzindo...');
+      }).catch(err => {
+        console.error('[FINAL] Erro ao dar play no vídeo final:', err);
+        goHome();
+      });
+    } else {
+      // navegadores antigos
+      started = true;
+    }
+  }
+
+  video.onended = () => {
+    console.log('[FINAL] Vídeo final concluído, indo para o portal.');
+    goHome();
+  };
+
+  video.onerror = (e) => {
+    console.error('[FINAL] Erro ao carregar vídeo final:', e);
+    goHome();
+  };
+
+  video.oncanplay = () => {
+    console.log('[FINAL] Vídeo final pronto para reprodução.');
+    tryPlay();
+  };
+
+  // Segurança: se não começar em 4s, vai pro portal
+  setTimeout(() => {
+    if (!started) {
+      console.warn('[FINAL] Timeout do vídeo final, redirecionando para o portal.');
+      goHome();
+    }
+  }, 4000);
+}
+
 
   // Clicks globais
   document.addEventListener('click', (e) => {
