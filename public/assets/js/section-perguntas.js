@@ -71,12 +71,14 @@
     }
     return url;
   }
-
- function playVideoWithCallback(src, onEnded) {
-  src = resolveVideoSrc(src);
-  if (!src) {
-    if (typeof onEnded === 'function') onEnded();
-    return;
+  
+ function playVideo(src, { onEnded });
+  
+ //function playVideoWithCallback(src, onEnded) {
+ // src = resolveVideoSrc(src);
+ // if (!src) {
+ // if (typeof onEnded === 'function') onEnded();
+ // return;
   }
 
   const { overlay, video } = ensureVideoOverlay();
