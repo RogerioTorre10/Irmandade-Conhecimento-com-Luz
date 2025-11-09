@@ -100,7 +100,7 @@
   border-radius: 8px;
   background: transparent;
   color: #f7e9c8;
-  font-size: 13px;
+  font-size: 16px !important; /* iOS não dá zoom */
   line-height: 1.45;
   resize: vertical;
   z-index: 5;
@@ -143,6 +143,7 @@
   border: 10px solid #d4af37 !important;
   border-radius: 16px !important;
   box-shadow: 0 0 40px rgba(212, 175, 55, 0.8) !important;
+  touch-action: none !important; /* Evita zoom acidental */  
 }
 
 /* EFEITO CHAMA PULSANTE NA BORDA DO VÍDEO */
