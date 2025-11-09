@@ -385,81 +385,85 @@
     }
   }
 
-  // --------------------------------------------------
-  // FINALIZAÇÃO
+    // --------------------------------------------------
+  // FINALIZAÇÃO — FALLBACK LIMPO PARA SECTION-FINAL
   // --------------------------------------------------
 
-  // --------------------------------------------------
-// FINALIZAÇÃO — FALLBACK LIMPO PARA SECTION-FINAL
-// --------------------------------------------------
+  function ensureFinalSectionExists() {
+    let finalEl = document.getElementById(FINAL_SECTION_ID);
 
-function ensureFinalSectionExists() {
-  let finalEl = document.getElementById(FINAL_SECTION_ID);
+    if (finalEl) {
+      log('section-final já existe, usando versão existente.');
+      return finalEl;
+    }
 
-  if (finalEl) {
-    log('section-final já existe, usando versão existente.');
+    // Cria a seção final com o mesmo layout usado em section-final.html
+    finalEl = document.createElement('section');
+    finalEl.id = FINAL_SECTION_ID;
+    finalEl.className = 'section section-final';
+    finalEl.dataset.section = 'final';
+
+    finalEl.innerHTML = `
+      <div class="final-pergaminho-wrapper">
+        <div class="pergaminho-vertical">
+          <div class="pergaminho-content">
+
+            <h1 id="final-title" class="final-title"></h1>
+
+            <div id="final-message" class="final-message">
+              <p>Suas respostas foram recebidas com honra pela Irmandade.</p>
+              <p>Você plantou sementes de confiança, coragem e luz.</p>
+              <p>Continue caminhando. A jornada nunca termina.</p>
+              <p>Volte quando precisar reacender a chama.</p>
+              <p class="final-bold">Você é a luz. Você é a mudança.</p>
+            </div>
+
+            <div class="final-acoes">
+              <button id="btnBaixarPDFHQ" class="btn btn-gold" disabled>Baixar PDF e HQ</button>
+              <button id="btnVoltarInicio" class="btn btn-light">Voltar ao Início</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <video id="final-video" playsinline preload="auto" style="display:none;"></video>
+    `;
+
+    const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
+    wrapper.appendChild(finalEl);
+
+    log('section-final criada com HTML completo (fallback FINAL).');
     return finalEl;
   }
 
-  // Cria a seção final com o mesmo layout da section-final.html
-  finalEl = document.createElement('section');
-  finalEl.id = FINAL_SECTION_ID;
-  finalEl.className = 'section section-final';
-  finalEl.dataset.section = 'final';
+  function showFinalSection() {
+    const finalEl = ensureFinalSectionExists();
 
-  finalEl.innerHTML = `
-    <div class="final-pergaminho-wrapper">
-      <div class="pergaminho-vertical">
-        <div class="pergaminho-content">
+    const wrapper = document.getElementById('jornada-content-wrapper');
+    if (wrapper) {
+      // limpa o conteúdo anterior (perguntas) e injeta apenas a tela final
+      wrapper.innerHTML = '';
+      wrapper.appendChild(finalEl);
+    }
 
-          <!-- Título será datilografado pelo section-final.js -->
-          <h1 id="final-title" class="final-title"></h1>
-
-          <!-- Mensagem: textos base; o JS lê e faz datilografia -->
-          <div id="final-message" class="final-message">
-            <p>Suas respostas foram recebidas com honra pela Irmandade.</p>
-            <p>Você plantou sementes de confiança, coragem e luz.</p>
-            <p>Continue caminhando. A jornada nunca termina.</p>
-            <p>Volte quando precisar reacender a chama.</p>
-            <p class="final-bold">Você é a luz. Você é a mudança.</p>
-          </div>
-
-          <div class="final-acoes">
-            <button id="btnBaixarPDFHQ" class="btn btn-gold" disabled>Baixar PDF e HQ</button>
-            <button id="btnVoltarInicio" class="btn btn-light">Voltar ao Início</button>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <video id="final-video" playsinline preload="auto" style="display:none;"></video>
-  `;
-
-   const wrapper = document.getElementById('jornada-content-wrapper');
-  if (wrapper) {
-    // Limpa tudo que estava dentro (perguntas, etc)
-    wrapper.innerHTML = '';
-    // Coloca só a tela final dentro do wrapper
-    wrapper.appendChild(finalEl);
+    // Fluxo oficial via controlador
+    if (window.JC && typeof window.JC.show === 'function') {
+      window.JC.show(FINAL_SECTION_ID);
+    } else {
+      // Fallback simples: esconde outras seções e mostra só a final
+      document.querySelectorAll('section.section').forEach(sec => {
+        sec.style.display = (sec.id === FINAL_SECTION_ID) ? 'block' : 'none';
+      });
+      finalEl.scrollIntoView({ behavior: 'smooth' });
+    }
   }
 
-function showFinalSection() {
-  const finalEl = ensureFinalSectionExists();
+  // Opcional para debug manual no console:
+  window.__showFinalSection = showFinalSection;
 
-  // NÃO destrói outras seções, deixa o JC controlar a visibilidade
-  // e não força position: fixed aqui — o CSS styles-final.css cuida disso.
+})(); // FIM DO IIFE section-perguntas.js
 
-  if (window.JC && typeof window.JC.show === 'function') {
-    window.JC.show(FINAL_SECTION_ID);
-  } else {
-    // Fallback simples: esconde outras e mostra a final
-    document.querySelectorAll('section.section').forEach(sec => {
-      sec.style.display = (sec.id === FINAL_SECTION_ID) ? 'block' : 'none';
-    });
-    finalEl.scrollIntoView({ behavior: 'smooth' });
-  }
-}
 
   function finishAll() {
     if (completed) return;
