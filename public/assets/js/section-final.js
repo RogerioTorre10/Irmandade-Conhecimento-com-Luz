@@ -23,27 +23,52 @@
   const speakQueue = [];
   let speakingInProgress = false;
 
-  async function speakText(text) {
-    if (!('speechSynthesis' in window) || !text) return;
-    speakQueue.push(text);
-    if (speakingInProgress) return;
-    speakingInProgress = true;
+  // === FALA SINCRONIZADA: espera o fim antes de continuar ===
+async function speakText(text) {
+  if (!('speechSynthesis' in window) || !text) return Promise.resolve();
 
-    while (speakQueue.length > 0) {
-      const current = speakQueue.shift();
-      await new Promise(resolve => {
-        const utter = new SpeechSynthesisUtterance(current);
-        utter.lang = 'pt-BR';
-        utter.rate = 0.95;
-        utter.onend = resolve;
-        utter.onerror = resolve;
-        speechSynthesis.cancel();
-        speechSynthesis.speak(utter);
-      });
-      await sleep(100);
+  return new Promise((resolve) => {
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'pt-BR';
+    utter.rate = 0.95;
+    utter.volume = 1;
+
+    utter.onend = () => {
+      setTimeout(resolve, 200); // pequena pausa natural
+    };
+    utter.onerror = () => {
+      setTimeout(resolve, 200);
+    };
+
+    speechSynthesis.cancel(); // limpa fila
+    speechSynthesis.speak(utter);
+  });
+}
+
+// === DATILOGRAFIA + VOZ SINCRONIZADA ===
+async function typeAndSpeak(el, text, typeDelay = 35) {
+  if (!el || !text) return;
+
+  el.textContent = '';
+  el.classList.add('typing-active');
+
+  // 1. DIGITA
+  for (let i = 0; i < text.length; i++) {
+    if (typingPaused) {
+      await new Promise(r => setTimeout(r, 100));
+      i--;
+      continue;
     }
-    speakingInProgress = false;
+    el.textContent += text[i];
+    await sleep(typeDelay);
   }
+
+  el.classList.remove('typing-active');
+  el.classList.add('typing-done');
+
+  // 2. SÓ FALA DEPOIS DE TERMINAR DE DIGITAR
+  await speakText(text);
+}
 
   // Datilografia com pausa ao interagir
   let typingPaused = false;
@@ -78,45 +103,55 @@
   document.addEventListener('keydown', resumeTyping);
 
   // Sequência final
-  async function startFinalSequence() {
-    if (started) return;
-    started = true;
+  // === SEQUÊNCIA FINAL PERFEITA: PARÁGRAFO POR PARÁGRAFO, COM VOZ SINCRONIZADA ===
+async function startFinalSequence() {
+  if (started) return;
+  started = true;
 
-    const section = document.getElementById(SECTION_ID);
-    if (!section) {
-      started = false;
-      return;
+  const section = document.getElementById(SECTION_ID);
+  if (!section) {
+    started = false;
+    return;
+  }
+
+  const titleEl = document.getElementById('final-title');
+  const messageEl = document.getElementById('final-message');
+
+  if (!titleEl || !messageEl) {
+    console.warn('[FINAL] Elementos não encontrados.');
+    return;
+  }
+
+  // === 1. TÍTULO ===
+  await typeAndSpeak(titleEl, 'Gratidão por Caminhar com Luz', 40);
+  await sleep(800); // pausa sagrada
+
+  // === 2. PARÁGRAFOS (UM POR VEZ) ===
+  const ps = messageEl.querySelectorAll('p');
+  for (const p of ps) {
+    const txt = (p.getAttribute('data-original') || p.textContent || '').trim();
+    if (!p.getAttribute('data-original')) {
+      p.setAttribute('data-original', txt);
     }
 
-    const titleEl = document.getElementById('final-title');
-    const messageEl = document.getElementById('final-message');
+    // DIGITA + FALA + ESPERA
+    await typeAndSpeak(p, txt, 22);
+    await sleep(500); // pausa entre parágrafos
+  }
 
-    if (!titleEl || !messageEl) {
-      console.warn('[FINAL] Elementos não encontrados.');
-      return;
-    }
-
-    await typeText(titleEl, 'Gratidão por Caminhar com Luz', 40, true);
-    await sleep(600);
-
-    const ps = messageEl.querySelectorAll('p');
-    for (const p of ps) {
-      const txt = (p.getAttribute('data-original') || p.textContent || '').trim();
-      if (!p.getAttribute('data-original')) {
-        p.setAttribute('data-original', txt);
-      }
-      await typeText(p, txt, 22, true);
-      await sleep(350);
-    }
-
-    document.querySelectorAll('.final-acoes button').forEach(btn => {
+  // === 3. LIBERA BOTÕES COM ANIMAÇÃO ===
+  const buttons = document.querySelectorAll('.final-acoes button');
+  buttons.forEach((btn, i) => {
+    setTimeout(() => {
       btn.disabled = false;
       btn.style.opacity = '1';
+      btn.style.transform = 'translateY(0)';
       btn.style.pointerEvents = 'auto';
-    });
+    }, i * 200);
+  });
 
-    console.log('[FINAL] Sequência concluída com luz!');
-  }
+  console.log('[FINAL] Jornada textual concluída com luz plena!');
+}
 
   // Geração de PDF/HQ
   async function generateArtifacts() {
