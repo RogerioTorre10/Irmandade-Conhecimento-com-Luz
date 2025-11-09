@@ -72,13 +72,11 @@
     return url;
   }
   
- function playVideo(src, { onEnded });
-  
- //function playVideoWithCallback(src, onEnded) {
- // src = resolveVideoSrc(src);
- // if (!src) {
- // if (typeof onEnded === 'function') onEnded();
- // return;
+ function playVideoWithCallback(src, onEnded) {
+  src = resolveVideoSrc(src);
+  if (!src) {
+    if (typeof onEnded === 'function') onEnded();
+    return;
   }
 
   const { overlay, video } = ensureVideoOverlay();
