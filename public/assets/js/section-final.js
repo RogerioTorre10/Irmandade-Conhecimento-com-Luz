@@ -1,268 +1,128 @@
+/* section-final.js */
 (function () {
   'use strict';
 
-  const MOD = 'section-final.js';
   const SECTION_ID = 'section-final';
-  const NEXT_SECTION_ID = 'section-home';
   const VIDEO_SRC = '/assets/videos/filme-5-fim-da-jornada.mp4';
+  const HOME_URL = 'https://irmandade-conhecimento-com-luz.onrender.com/jornada-conhecimento-com-luz1.html';
 
-  const BTN_DL_SEL = '#btn-baixar-pdf-hq';
-  const BTN_END_SEL = '#btn-finalizar';
   const $ = (sel, root = document) => (root || document).querySelector(sel);
 
-  const S = {
-    generating: false,
-    pdfUrl: null,
-    hqUrl: null,
-  };
+  // DATILOGRAFIA + VOZ
+  async function typeText(element, text, delay = 40) {
+    element.textContent = '';
+    element.classList.remove('typing-done');
+    element.classList.add('typing-active');
 
-  // ---------- Helpers básicos ----------
+    for (let i = 0; i < text.length; i++) {
+      element.textContent += text[i];
+      if ('speechSynthesis' in window && i % 3 === 0) {
+        const chunk = text.slice(0, i + 1).split(' ').slice(-3).join(' ');
+        if (chunk) {
+          const utter = new SpeechSynthesisUtterance(chunk);
+          utter.lang = 'pt-BR';
+          utter.rate = 0.9;
+          speechSynthesis.speak(utter);
+        }
+      }
+      await new Promise(r => setTimeout(r, delay));
+    }
 
-  function apiBase() {
-    // Ordem de prioridade:
-    // 1) APP_CONFIG.API_BASE definido no HTML
-    // 2) window.API.BASE_URL se existir
-    // 3) Fallback explícito para o backend no Render
-    const base =
-      (window.APP_CONFIG && window.APP_CONFIG.API_BASE) ||
-      (window.API && window.API.BASE_URL) ||
-      'https://lumen-backend-api.onrender.com';
-
-    return String(base).replace(/\/+$/, '');
+    element.classList.remove('typing-active');
+    element.classList.add('typing-done');
   }
 
-  function payload() {
-    const guia = (window.JC && window.JC.state && window.JC.state.guia) || {};
-    const selfie = window.__SELFIE_DATA_URL__ || null;
-    const answers = window.__QA_ANSWERS__ || null;
-    const meta = window.__QA_META__ || {};
-    const lang =
-      (window.i18n && (window.i18n.lang || window.i18n.language)) || 'pt-BR';
-    const timeNow = new Date().toISOString();
+  // INICIA DATILOGRAFIA
+  async function startFinalSequence() {
+    const title = $('#final-title');
+    const message = $('#final-message');
 
-    return {
-      guide: guia,
-      selfieDataUrl: selfie,
-      answers,
-      meta,
-      lang,
-      completedAt: timeNow,
-      appVersion: (window.APP_CONFIG && window.APP_CONFIG.version) || 'v1',
+    await typeText(title, "Gratidão por Caminhar com Luz 🌟");
+    await new Promise(r => setTimeout(r, 600));
+
+    const paragraphs = message.querySelectorAll('p');
+    for (let p of paragraphs) {
+      await typeText(p, p.textContent);
+      await new Promise(r => setTimeout(r, 400, 400));
+    }
+
+    // Ativa botões
+    document.querySelectorAll('.final-acoes button').forEach(b => b.disabled = false);
+  }
+
+  // VÍDEO FINAL + VOLTA
+  function playFinalVideo() {
+    const video = $('#final-video');
+    video.src = VIDEO_SRC;
+    video.style.display = 'block';
+    video.style.position = 'fixed';
+    video.style.top = '0'; video.style.left = '0';
+    video.style.width = '100vw'; video.style.height = '100vh';
+    video.style.objectFit = 'contain';
+    video.style.zIndex = '99999';
+    video.style.background = '#000';
+
+    video.play();
+
+    video.onended = () => {
+      setTimeout(() => {
+        window.location.href = HOME_URL;
+      }, 800);
     };
   }
 
-  function enableDownloadButton(enabled) {
-    const btn = $(BTN_DL_SEL);
-    if (btn) btn.disabled = !enabled;
-  }
-
-  function triggerDownload(url, filename) {
-    if (!url) return;
-    try {
-      const a = document.createElement('a');
-      a.href = url;
-      if (filename) a.download = filename;
-      a.rel = 'noopener';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    } catch (e) {
-      console.warn(`[${MOD}] Falha no download direto, abrindo em nova aba.`, e);
-      window.open(url, '_blank', 'noopener');
-    }
-  }
-
-  function downloadAll() {
-    if (S.pdfUrl) triggerDownload(S.pdfUrl, 'jornada-conhecimento-com-luz.pdf');
-    if (S.hqUrl) triggerDownload(S.hqUrl, 'hq-irmandade.zip');
-
-    if (!S.pdfUrl && !S.hqUrl) {
-      (window.toast || console.log)(
-        'Ainda não há arquivos disponíveis para baixar.'
-      );
-    }
-  }
-
-  // ---------- Geração de PDF/HQ ----------
-
-  async function generateArtifacts() {
-    if (S.generating) return;
-    S.generating = true;
+  // DOWNLOAD PDF/HQ
+  async function downloadPDFHQ() {
+    const btn = $('#btnBaixarPDFHQ');
+    btn.disabled = true;
+    btn.textContent = 'Gerando...';
 
     try {
-      const body = payload();
+      const payload = {
+        answers: window.__QA_ANSWERS__,
+        meta: window.__QA_META__,
+        lang: 'pt-BR'
+      };
 
-      // 1) Se existir helper custom, usa ele
-      if (window.API && typeof window.API.gerarPDFHQ === 'function') {
-        const res = await window.API.gerarPDFHQ(body);
-        S.pdfUrl = res && res.pdfUrl;
-        S.hqUrl = res && res.hqUrl;
-      } else {
-        // 2) Fallback padrão: POST no backend
-        const base = apiBase();
-        const url = `${base}/jornada/finalizar`;
+      const res = await fetch('https://lumen-backend-api.onrender.com/api/jornada/finalizar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
 
-        console.log(`[${MOD}] Chamando API final: ${url}`);
-
-        const r = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        });
-
-        if (!r.ok) {
-          throw new Error(`HTTP ${r.status}`);
-        }
-
-        const data = await r.json().catch(() => ({}));
-        S.pdfUrl = data && data.pdfUrl;
-        S.hqUrl = data && data.hqUrl;
-      }
-
-      // 3) Se mesmo assim não vier link, gera JSON local de fallback
-      if (!S.pdfUrl && !S.hqUrl) {
-        console.warn(
-          `[${MOD}] Nenhum link recebido da API; gerando arquivo local de fallback.`
-        );
-        const blob = new Blob([JSON.stringify(body, null, 2)], {
-          type: 'application/json',
-        });
-        S.pdfUrl = URL.createObjectURL(blob);
-      }
-
-      (window.toast || console.log)(
-        'Sua devolutiva está pronta para download.'
-      );
-      enableDownloadButton(true);
+      const data = await res.json();
+      if (data.pdfUrl) window.open(data.pdfUrl, '_blank');
+      if (data.hqUrl) window.open(data.hqUrl, '_blank');
     } catch (e) {
-      console.error(`[${MOD}] Falha ao gerar PDF/HQ:`, e);
-      (window.toast || console.log)(
-        'Não foi possível gerar os arquivos agora. Tente novamente mais tarde.'
-      );
-      enableDownloadButton(false);
+      alert('Erro ao gerar arquivos. Tente novamente.');
     } finally {
-      S.generating = false;
+      btn.disabled = false;
+      btn.textContent = 'Baixar PDF e HQ';
     }
   }
 
-  // ---------- Finalizar jornada ----------
-
-  function getTransitionFn() {
-    if (typeof window.playVideoTransition === 'function')
-      return window.playVideoTransition;
-    if (typeof window.playTransitionThenGo === 'function')
-      return window.playTransitionThenGo;
-    return null;
-  }
-
-  function finishFlow() {
-    try {
-      // Se quiser limpar estado sensível após o fim:
-      // delete window.__SELFIE_DATA_URL__;
-      // delete window.__QA_ANSWERS__;
-      // delete window.__QA_META__;
-    } catch (e) {
-      console.warn(`[${MOD}] Erro ao limpar estado local:`, e);
-    }
-
-    const fn = getTransitionFn();
-    const hasNext = !!document.getElementById(NEXT_SECTION_ID);
-
-    // 1) Encerrar com vídeo final se disponível
-    if (fn && VIDEO_SRC && hasNext) {
-      console.log(
-        `[${MOD}] Encerrando com vídeo final ${VIDEO_SRC} → ${NEXT_SECTION_ID}`
-      );
-      try {
-        fn(VIDEO_SRC, NEXT_SECTION_ID);
-        return;
-      } catch (e) {
-        console.error(
-          `[${MOD}] Erro na transição com vídeo final, usando fallback:`,
-          e
-        );
-      }
-    }
-
-    // 2) Sem vídeo ou falhou: utiliza controlador oficial
-    if (window.JC && typeof window.JC.finish === 'function') {
-      console.log(`[${MOD}] Encerrando via JC.finish()`);
-      window.JC.finish();
-      return;
-    }
-
-    if (window.JC && typeof window.JC.show === 'function' && hasNext) {
-      console.log(`[${MOD}] Encerrando via JC.show(${NEXT_SECTION_ID})`);
-      window.JC.show(NEXT_SECTION_ID);
-      return;
-    }
-
-    if (typeof window.showSection === 'function' && hasNext) {
-      console.log(`[${MOD}] Encerrando via showSection(${NEXT_SECTION_ID})`);
-      window.showSection(NEXT_SECTION_ID);
-      return;
-    }
-
-    // 3) Último recurso: ancora
-    if (hasNext) {
-      console.log(`[${MOD}] Encerrando via hash #${NEXT_SECTION_ID}`);
-      window.location.hash = `#${NEXT_SECTION_ID}`;
-    }
-  }
-
-  // ---------- Bind da seção final ----------
-
-  async function bindSection(node) {
-    const btnDl = $(BTN_DL_SEL, node);
-    const btnEnd = $(BTN_END_SEL, node);
-
-    if (btnDl) {
-      btnDl.addEventListener('click', async () => {
-        if (!S.pdfUrl && !S.hqUrl) {
-          await generateArtifacts();
-        }
-        downloadAll();
-      });
-    }
-
-    if (btnEnd) {
-      btnEnd.addEventListener('click', () => {
-        finishFlow();
-      });
-    }
-
-    enableDownloadButton(false);
-
-    // Geração automática quando entrar na seção final
-    generateArtifacts();
-  }
-
-  // Chamado pelo controlador quando a section-final é exibida
+  // BIND
   document.addEventListener('sectionLoaded', (e) => {
-    if (!e || e.detail?.sectionId !== SECTION_ID) return;
-    const node = e.detail.node || document.getElementById(SECTION_ID);
+    if (e.detail?.sectionId !== SECTION_ID) return;
+    const node = e.detail.node || $('#' + SECTION_ID);
     if (!node) return;
-    bindSection(node);
+
+    // Desativa botões até datilografia
+    document.querySelectorAll('.final-acoes button').forEach(b => b.disabled = true);
+
+    $('#btnBaixarPDFHQ').addEventListener('click', downloadPDFHQ);
+    $('#btnVoltarInicio').addEventListener('click', playFinalVideo);
+
+    startFinalSequence();
   });
 
-  // Fallback: se já estiver ativa ao carregar
+  // Fallback DOM
   document.addEventListener('DOMContentLoaded', () => {
-    const sec = document.getElementById(SECTION_ID);
-    if (
-      sec &&
-      (sec.classList.contains('active') ||
-        window.__currentSectionId === SECTION_ID)
-    ) {
-      bindSection(sec);
+    const sec = $('#' + SECTION_ID);
+    if (sec && sec.classList.contains('active')) {
+      startFinalSequence();
     }
   });
 
-  // Debug manual
-  window.JFinal = {
-    generate: generateArtifacts,
-    download: downloadAll,
-    finish: finishFlow,
-  };
-
-  console.log(`[${MOD}] carregado`);
+  console.log('[FINAL] Carregado com sucesso');
 })();
