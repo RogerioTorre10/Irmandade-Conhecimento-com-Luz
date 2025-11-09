@@ -51,25 +51,54 @@
   }
 
   // VÍDEO FINAL + VOLTA
-  function playFinalVideo() {
-    const video = $('#final-video');
-    video.src = VIDEO_SRC;
-    video.style.display = 'block';
-    video.style.position = 'fixed';
-    video.style.top = '0'; video.style.left = '0';
-    video.style.width = '100vw'; video.style.height = '100vh';
-    video.style.objectFit = 'contain';
-    video.style.zIndex = '99999';
-    video.style.background = '#000';
+  // VÍDEO FINAL + VOLTA (TELA CHEIA + BORDA DOURADA)
+function playFinalVideo() {
+  const video = $('#final-video');
+  if (!video) return;
 
-    video.play();
+  // Força o vídeo correto
+  video.src = VIDEO_SRC;
 
-    video.onended = () => {
-      setTimeout(() => {
-        window.location.href = HOME_URL;
-      }, 800);
-    };
-  }
+  // ESTILO TELA CHEIA + BORDA DOURADA (IGUAL AOS OUTROS)
+  video.style.cssText = `
+    position: fixed !important;
+    top: 0 !important; left: 0 !important;
+    width: 100vw !important; height: 100vh !important;
+    z-index: 99999 !important;
+    object-fit: contain !important;
+    background: #000 !important;
+    display: block !important;
+    border: 10px solid #d4af37 !important;
+    border-radius: 16px !important;
+    box-shadow: 0 0 40px rgba(212, 175, 55, 0.8) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  `;
+
+  // Remove tudo atrás
+  document.body.style.overflow = 'hidden';
+  document.querySelectorAll('section, div').forEach(el => {
+    if (el.id !== 'final-video') {
+      el.style.display = 'none';
+    }
+  });
+
+  // Toca
+  video.play();
+
+  // Ao terminar → volta à página inicial
+  video.onended = () => {
+    setTimeout(() => {
+      window.location.href = HOME_URL;
+    }, 800);
+  };
+
+  // Erro de carregamento
+  video.onerror = () => {
+    alert('Erro ao carregar o vídeo final. Redirecionando...');
+    window.location.href = HOME_URL;
+  };
+}
 
   // DOWNLOAD PDF/HQ
   async function downloadPDFHQ() {
