@@ -389,77 +389,74 @@
   // FINALIZAÇÃO
   // --------------------------------------------------
 
-  function ensureFinalSectionExists() {
-  let finalEl = document.getElementById(FINAL_SECTION_ID);
-  
-  if (!finalEl) {
-    // CRIA A SEÇÃO COMPLETA COM HTML
-    finalEl = document.createElement('section');
-    finalEl.id = FINAL_SECTION_ID;
-    finalEl.className = 'section section-final';
-    finalEl.dataset.section = 'final';
-    
-    finalEl.innerHTML = `
-      <div class="final-pergaminho-wrapper">
-        <div class="pergaminho-vertical">
-          <div class="pergaminho-content">
-            <h1 id="final-title" class="final-title typing-text" data-typing="true">
-              Gratidão por Caminhar com Luz
-            </h1>
-            <div id="final-message" class="final-message typing-text" data-typing="true">
-              <p>Suas respostas foram recebidas com honra pela Irmandade.</p>
-              <p>Você plantou sementes de confiança, coragem e luz.</p>
-              <p>Continue caminhando. A jornada nunca termina.</p>
-              <p class="final-bold">Você é a luz. Você é a mudança.</p>
-            </div>
-            <div class="final-acoes">
-              <button id="btnBaixarPDFHQ" class="btn btn-gold" disabled>Baixar PDF e HQ</button>
-              <button id="btnVoltarInicio" class="btn btn-light">Voltar ao Início</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <video id="final-video" playsinline preload="auto" style="display:none;"></video>
-    `;
+  // --------------------------------------------------
+// FINALIZAÇÃO — FALLBACK LIMPO PARA SECTION-FINAL
+// --------------------------------------------------
 
-    // ADICIONA NO CORPO (OU NO WRAPPER, SE EXISTIR)
-    const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
-    wrapper.appendChild(finalEl);
-    
-    log('section-final criada com HTML completo (fallback seguro).');
+function ensureFinalSectionExists() {
+  let finalEl = document.getElementById(FINAL_SECTION_ID);
+
+  if (finalEl) {
+    log('section-final já existe, usando versão existente.');
+    return finalEl;
   }
 
+  // Cria a seção final com o mesmo layout da section-final.html
+  finalEl = document.createElement('section');
+  finalEl.id = FINAL_SECTION_ID;
+  finalEl.className = 'section section-final';
+  finalEl.dataset.section = 'final';
+
+  finalEl.innerHTML = `
+    <div class="final-pergaminho-wrapper">
+      <div class="pergaminho-vertical">
+        <div class="pergaminho-content">
+
+          <!-- Título será datilografado pelo section-final.js -->
+          <h1 id="final-title" class="final-title"></h1>
+
+          <!-- Mensagem: textos base; o JS lê e faz datilografia -->
+          <div id="final-message" class="final-message">
+            <p>Suas respostas foram recebidas com honra pela Irmandade.</p>
+            <p>Você plantou sementes de confiança, coragem e luz.</p>
+            <p>Continue caminhando. A jornada nunca termina.</p>
+            <p>Volte quando precisar reacender a chama.</p>
+            <p class="final-bold">Você é a luz. Você é a mudança.</p>
+          </div>
+
+          <div class="final-acoes">
+            <button id="btnBaixarPDFHQ" class="btn btn-gold" disabled>Baixar PDF e HQ</button>
+            <button id="btnVoltarInicio" class="btn btn-light">Voltar ao Início</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <video id="final-video" playsinline preload="auto" style="display:none;"></video>
+  `;
+
+  const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
+  wrapper.appendChild(finalEl);
+
+  log('section-final criada com HTML completo (fallback FINAL).');
   return finalEl;
 }
 
-  function showFinalSection() {
+function showFinalSection() {
   const finalEl = ensureFinalSectionExists();
-  
-  // LIMPA TUDO E FORÇA TELA CHEIA
-  const wrapper = document.getElementById('jornada-content-wrapper');
-  if (wrapper) wrapper.innerHTML = '';
-  
-  // Remove qualquer seção antiga
-  document.querySelectorAll('section').forEach(sec => {
-    if (sec.id !== FINAL_SECTION_ID) sec.remove();
-  });
 
-  // Garante que o body não role
-  document.body.style.overflow = 'hidden';
+  // NÃO destrói outras seções, deixa o JC controlar a visibilidade
+  // e não força position: fixed aqui — o CSS styles-final.css cuida disso.
 
-  // Adiciona no body com posição fixa
-  document.body.appendChild(finalEl);
-  finalEl.style.position = 'fixed';
-  finalEl.style.top = '0';
-  finalEl.style.left = '0';
-  finalEl.style.width = '100vw';
-  finalEl.style.height = '100vh';
-  finalEl.style.margin = '0';
-  finalEl.style.padding = '0';
-
-  // Mostra com JC se existir
-  if (window.JC?.show) {
+  if (window.JC && typeof window.JC.show === 'function') {
     window.JC.show(FINAL_SECTION_ID);
+  } else {
+    // Fallback simples: esconde outras e mostra a final
+    document.querySelectorAll('section.section').forEach(sec => {
+      sec.style.display = (sec.id === FINAL_SECTION_ID) ? 'block' : 'none';
+    });
+    finalEl.scrollIntoView({ behavior: 'smooth' });
   }
 }
 
