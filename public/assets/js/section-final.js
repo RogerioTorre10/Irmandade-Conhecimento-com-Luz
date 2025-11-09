@@ -50,8 +50,7 @@
     document.querySelectorAll('.final-acoes button').forEach(b => b.disabled = false);
   }
 
-  // VÍDEO FINAL + VOLTA
-  // VÍDEO FINAL + VOLTA (TELA CHEIA + BORDA DOURADA)
+    // VÍDEO FINAL + VOLTA (TELA CHEIA + BORDA DOURADA)
 function playFinalVideo() {
   const video = $('#final-video');
   if (!video) return;
