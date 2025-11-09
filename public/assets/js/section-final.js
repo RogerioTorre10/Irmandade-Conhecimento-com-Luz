@@ -102,8 +102,7 @@ async function typeAndSpeak(el, text, typeDelay = 35) {
   document.addEventListener('touchend', resumeTyping);
   document.addEventListener('keydown', resumeTyping);
 
-  // Sequência final
-  // === SEQUÊNCIA FINAL PERFEITA: PARÁGRAFO POR PARÁGRAFO, COM VOZ SINCRONIZADA ===
+ // === SEQUÊNCIA FINAL: TEXTO INVISÍVEL + BOTÕES SÓ NO FIM ===
 async function startFinalSequence() {
   if (started) return;
   started = true;
@@ -122,24 +121,32 @@ async function startFinalSequence() {
     return;
   }
 
+  // === GARANTE QUE BOTÕES ESTÃO DESABILITADOS ===
+  document.querySelectorAll('.final-acoes button').forEach(btn => {
+    btn.disabled = true;
+    btn.style.opacity = '0';
+    btn.style.transform = 'translateY(20px)';
+    btn.style.pointerEvents = 'none';
+  });
+
   // === 1. TÍTULO ===
+  titleEl.style.opacity = '1';
   await typeAndSpeak(titleEl, 'Gratidão por Caminhar com Luz', 40);
-  await sleep(800); // pausa sagrada
+  await sleep(800);
 
   // === 2. PARÁGRAFOS (UM POR VEZ) ===
   const ps = messageEl.querySelectorAll('p');
   for (const p of ps) {
-    const txt = (p.getAttribute('data-original') || p.textContent || '').trim();
-    if (!p.getAttribute('data-original')) {
-      p.setAttribute('data-original', txt);
-    }
+    const txt = p.getAttribute('data-original')?.trim();
+    if (!txt) continue;
 
-    // DIGITA + FALA + ESPERA
+    p.textContent = ''; // limpa (nunca teve texto visível)
+    p.style.opacity = '1'; // só agora aparece
     await typeAndSpeak(p, txt, 22);
-    await sleep(500); // pausa entre parágrafos
+    await sleep(500);
   }
 
-  // === 3. LIBERA BOTÕES COM ANIMAÇÃO ===
+  // === 3. SÓ AGORA LIBERA OS BOTÕES ===
   const buttons = document.querySelectorAll('.final-acoes button');
   buttons.forEach((btn, i) => {
     setTimeout(() => {
@@ -147,10 +154,10 @@ async function startFinalSequence() {
       btn.style.opacity = '1';
       btn.style.transform = 'translateY(0)';
       btn.style.pointerEvents = 'auto';
-    }, i * 200);
+    }, i * 250);
   });
 
-  console.log('[FINAL] Jornada textual concluída com luz plena!');
+  console.log('[FINAL] Jornada completa. Botões liberados com luz!');
 }
 
   // Geração de PDF/HQ
