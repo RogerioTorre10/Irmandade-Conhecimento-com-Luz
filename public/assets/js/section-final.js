@@ -102,20 +102,38 @@
   }
 
   // BIND
-  document.addEventListener('sectionLoaded', (e) => {
-    if (e.detail?.sectionId !== SECTION_ID) return;
-    const node = e.detail.node || $('#' + SECTION_ID);
-    if (!node) return;
-
-    // Desativa botões até datilografia
-    document.querySelectorAll('.final-acoes button').forEach(b => b.disabled = true);
-
-    $('#btnBaixarPDFHQ').addEventListener('click', downloadPDFHQ);
-    $('#btnVoltarInicio').addEventListener('click', playFinalVideo);
-
-    startFinalSequence();
+  async function bindSection(node) {
+  // Espera o DOM estar pronto
+  await new Promise(resolve => {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', resolve);
+    } else {
+      resolve();
+    }
   });
 
+  const btnDownload = $('#btnBaixarPDFHQ', node);
+  const btnVoltar = $('#btnVoltarInicio', node);
+
+  if (btnDownload) {
+    btnDownload.disabled = true;
+    btnDownload.addEventListener('click', async () => {
+      btnDownload.disabled = true;
+      btnDownload.textContent = 'Gerando...';
+      await generateArtifacts();
+      downloadAll();
+      btnDownload.textContent = 'Baixar PDF e HQ';
+      btnDownload.disabled = false;
+    });
+  }
+
+  if (btnVoltar) {
+    btnVoltar.addEventListener('click', playFinalVideo);
+  }
+
+  // Geração automática
+  generateArtifacts();
+}
   // Fallback DOM
   document.addEventListener('DOMContentLoaded', () => {
     const sec = $('#' + SECTION_ID);
