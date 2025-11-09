@@ -41,27 +41,37 @@
   // OVERLAY DE VÍDEO (entre blocos e final)
   // --------------------------------------------------
 
-function ensureVideoOverlay() {
-  let overlay = document.getElementById('videoOverlay');
-  let video = document.getElementById('videoTransicao');
+  function ensureVideoOverlay() {
+    let overlay = $('#videoOverlay');
+    let video = $('#videoTransicao');
 
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'videoOverlay';
-    document.body.appendChild(overlay);
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'videoOverlay';
+      overlay.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(0,0,0,0.98); display: none; align-items: center;
+        justify-content: center; z-index: 9999; opacity: 0;
+        pointer-events: none; transition: opacity 0.6s ease;
+      `;
+      document.body.appendChild(overlay);
+    }
+
+    if (!video) {
+      video = document.createElement('video');
+      video.id = 'videoTransicao';
+      video.playsInline = true;
+      video.preload = 'auto';
+      video.style.cssText = `
+        max-width: 95%; max-height: 95%; border: 8px solid #d4af37;
+        border-radius: 12px; box-shadow: 0 0 30px rgba(212,175,55,0.6);
+      `;
+      video.controls = false;
+      overlay.appendChild(video);
+    }
+
+    return { overlay, video };
   }
-
-  if (!video) {
-    video = document.createElement('video');
-    video.id = 'videoTransicao';
-    video.playsInline = true;
-    video.preload = 'auto';
-    video.controls = false;
-    overlay.appendChild(video);
-  }
-
-  return { overlay, video };
-}
 
   function resolveVideoSrc(src) {
     if (!src) return null;
@@ -72,72 +82,37 @@ function ensureVideoOverlay() {
     return url;
   }
 
-function playVideoWithCallback(src, onEnded) {
-  src = resolveVideoSrc(src);
-  if (!src) {
-    if (typeof onEnded === 'function') onEnded();
-    return;
-  }
-
-  const { overlay, video } = ensureVideoOverlay();
-
-  // LIMPA ESTILOS ANTIGOS
-  overlay.removeAttribute('style');
-  video.removeAttribute('style');
-
-  // ESTILO DO OVERLAY
-  overlay.style.cssText = `
-    position: fixed !important; top: 0 !important; left: 0 !important;
-    width: 100vw !important; height: 100vh !important;
-    background: rgba(0,0,0,0.98) !important;
-    display: flex !important; align-items: center !important;
-    justify-content: center !important; z-index: 99999 !important;
-    opacity: 0 !important; pointer-events: none !important;
-    transition: opacity 0.6s ease !important;
-  `;
-
-  // ESTILO DO VÍDEO (COM BORDA DOURADA!)
-  video.style.cssText = `
-    width: 92vw !important; height: auto !important;
-    max-width: 92vw !important; max-height: 88vh !important;
-    border: 10px solid #d4af37 !important;
-    border-radius: 16px !important;
-    box-shadow: 0 0 40px rgba(212,175,55,0.8) !important;
-    object-fit: contain !important;
-  `;
-
-  // Mostra
-  overlay.style.display = 'flex';
-  overlay.style.pointerEvents = 'all';
-  requestAnimationFrame(() => { overlay.style.opacity = '1'; });
-
-  video.src = src;
-  video.load();
-
-  const endHandler = () => {
-    video.onended = null;
-    overlay.style.opacity = '0';
-    setTimeout(() => {
-      overlay.style.display = 'none';
+  function playVideoWithCallback(src, onEnded) {
+    src = resolveVideoSrc(src);
+    if (!src) {
       if (typeof onEnded === 'function') onEnded();
-    }, 600);
-  };
+      return;
+    }
 
-  video.onended = endHandler;
+    const { overlay, video } = ensureVideoOverlay();
 
-  video.play().catch(e => {
-    console.error('[PERGUNTAS] Erro ao tocar vídeo:', e);
-    endHandler();
-  });
-}
+    overlay.style.display = 'flex';
+    setTimeout(() => overlay.style.opacity = '1', 50);
 
-  video.onended = endHandler;
+    video.src = src;
+    video.load();
 
-  video.play().catch(e => {
-    console.error('[PERGUNTAS] Erro ao tocar vídeo:', e);
-    endHandler();
-  });
-}
+    const endHandler = () => {
+      video.onended = null;
+      overlay.style.opacity = '0';
+      setTimeout(() => {
+        overlay.style.display = 'none';
+        if (typeof onEnded === 'function') onEnded();
+      }, 600);
+    };
+
+    video.onended = endHandler;
+
+    video.play().catch(e => {
+      console.error('[PERGUNTAS] Erro ao tocar vídeo:', e);
+      endHandler();
+    });
+  }
 
   window.playBlockTransition = function(videoSrc, onDone) {
     const src = resolveVideoSrc(videoSrc);
@@ -473,55 +448,35 @@ function playVideoWithCallback(src, onEnded) {
   // BIND UI
   // --------------------------------------------------
 
- function bindUI(root) {
-  root = root || document.getElementById(SECTION_ID) || document;
+  function bindUI(root) {
+    const btnConf = $('#jp-btn-confirmar', root);
+    const input = $('#jp-answer-input', root);
 
-  const btnFalar  = $('#jp-btn-falar', root);
-  const btnApagar = $('#jp-btn-apagar', root);
-  const btnConf   = $('#jp-btn-confirmar', root);
-  const input     = $('#jp-answer-input', root);
-
-  if (btnFalar && input && window.JORNADA_MICRO) {
-    btnFalar.addEventListener('click', (ev) => {
-      ev.preventDefault();
+    if (input && window.JORNADA_MICRO) {
       window.JORNADA_MICRO.attach(input, { mode: 'append' });
-    });
+    }
+
+    if (input && window.JORNADA_CHAMA) {
+      input.addEventListener('input', () => {
+        const txt = input.value || '';
+        window.JORNADA_CHAMA.updateChamaFromText(txt, 'chama-perguntas');
+      });
+    }
+
+    if (btnConf) {
+      btnConf.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        if (completed) {
+          log('Clique em confirmar após conclusão; ignorado.');
+          return;
+        }
+        saveCurrentAnswer();
+        nextStep();
+      });
+    }
   }
 
-  if (btnApagar && input) {
-    btnApagar.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      input.value = '';
-      input.focus();
-      if (window.JORNADA_CHAMA) {
-        window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'media');
-      }
-    });
-  }
-
-  if (btnConf) {
-    btnConf.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      if (completed) return;
-      saveCurrentAnswer();
-      nextStep();
-    });
-  }
-
-  if (input && window.JORNADA_CHAMA) {
-    input.addEventListener('input', () => {
-      window.JORNADA_CHAMA.updateChamaFromText(input.value || '', 'chama-perguntas');
-    });
-  }
-}
-
-  // MICROFONE AUTOMÁTICO (opcional)
-  if (input && window.JORNADA_MICRO) {
-    window.JORNADA_MICRO.attach(input, { mode: 'append' });
-  }
-}
-  
-    // --------------------------------------------------
+  // --------------------------------------------------
   // INIT
   // --------------------------------------------------
 
