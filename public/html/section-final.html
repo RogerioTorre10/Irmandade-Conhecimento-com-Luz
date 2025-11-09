@@ -1,28 +1,35 @@
+<link rel="stylesheet" href="/assets/css/style-base.css">
 <link rel="stylesheet" href="/assets/css/brilho-texturas.css">
+<link rel="stylesheet" href="/assets/css/section-final.css">
 
-<section id="section-final" class="final-bloco hidden">
-  <h1>Parabéns! Você finalizou a Jornada Essencial 🎉</h1>
-  <p>Suas respostas foram registradas localmente. Se desejar, você pode revisar antes de encerrar.</p>
+<section id="section-final" class="section section-final hidden">
+  <div class="final-pergaminho-wrapper">
+    <div class="pergaminho-vertical">
+      <div class="pergaminho-content">
+        
+        <!-- TÍTULO DATILOGRAFADO -->
+        <h1 id="final-title" class="final-title typing-text" data-typing="true">
+          Gratidão por Caminhar com Luz
+        </h1>
 
-  <section class="jornada-final">
-    <header>
-      <h2>🏁 Fim da Jornada</h2>
-      <p>Parabéns por completar este ciclo!</p>
-    </header>
+        <!-- TEXTO DE AGRADECIMENTO -->
+        <div id="final-message" class="final-message typing-text" data-typing="true">
+          <p>Suas respostas foram recebidas com honra pela Irmandade.</p>
+          <p>Você plantou sementes de confiança, coragem e luz.</p>
+          <p>Continue caminhando. A jornada nunca termina.</p>
+          <p>Volte quando precisar reacender a chama.</p>
+          <p class="final-bold">Você é a luz. Você é a mudança.</p>
+        </div>
 
-    <div class="conteudo">
-      <p>Sua caminhada foi registrada. Continue praticando e volte sempre que precisar.</p>
+        <!-- AÇÕES -->
+        <div class="final-acoes">
+          <button id="btnBaixarPDFHQ" class="btn btn-gold">Baixar PDF e HQ</button>
+          <button id="btnVoltarInicio" class="btn btn-light">Voltar ao Início</button>
+        </div>
+      </div>
     </div>
-
-    <footer>
-      <button id="btnReiniciar" class="btn">Reiniciar Jornada</button>
-      <a href="/indexmaster.html" class="btn">Voltar à Página Inicial</a>
-    </footer>
-  </section>
-
-  <div class="final-acoes">
-    <button id="btnRevisar" class="btn">Revisar respostas</button>
-    <button id="btnLimparRespostas" class="btn">Limpar respostas</button>
-    <button id="btnBaixarPDFHQ" class="btn btn-primary">Baixar PDF e HQ</button>
   </div>
+
+  <!-- VÍDEO FINAL (OCULTO) -->
+  <video id="final-video" playsinline preload="auto" style="display:none;"></video>
 </section>
