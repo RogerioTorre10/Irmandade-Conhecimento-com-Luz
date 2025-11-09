@@ -390,33 +390,47 @@
   // --------------------------------------------------
 
   function ensureFinalSectionExists() {
-    let finalEl = document.getElementById(FINAL_SECTION_ID) ||
-                  document.querySelector('[data-section="final"]') ||
-                  document.querySelector('.section-final');
-
-    if (!finalEl) {
-      const container = document.getElementById('jornada-sections') ||
-                        document.querySelector('.jornada-sections') ||
-                        document.body;
-
-      finalEl = document.createElement('section');
-      finalEl.id = FINAL_SECTION_ID;
-      finalEl.className = 'section section-final pergaminho';
-      finalEl.dataset.section = 'final';
-      finalEl.innerHTML = `
-        <div class="final-wrapper" style="text-align:center; padding:40px; color:#ffd700;">
-          <h2 style="font-size:2.2em; margin-bottom:20px;">Gratidão por caminhar com Luz</h2>
-          <p style="font-size:1.3em; line-height:1.6;">
-            Suas respostas foram recebidas com honra. A Irmandade está preparando sua devolutiva especial.
-          </p>
+  let finalEl = document.getElementById(FINAL_SECTION_ID);
+  
+  if (!finalEl) {
+    // CRIA A SEÇÃO COMPLETA COM HTML
+    finalEl = document.createElement('section');
+    finalEl.id = FINAL_SECTION_ID;
+    finalEl.className = 'section section-final';
+    finalEl.dataset.section = 'final';
+    
+    finalEl.innerHTML = `
+      <div class="final-pergaminho-wrapper">
+        <div class="pergaminho-vertical">
+          <div class="pergaminho-content">
+            <h1 id="final-title" class="final-title typing-text" data-typing="true">
+              Gratidão por Caminhar com Luz
+            </h1>
+            <div id="final-message" class="final-message typing-text" data-typing="true">
+              <p>Suas respostas foram recebidas com honra pela Irmandade.</p>
+              <p>Você plantou sementes de confiança, coragem e luz.</p>
+              <p>Continue caminhando. A jornada nunca termina.</p>
+              <p class="final-bold">Você é a luz. Você é a mudança.</p>
+            </div>
+            <div class="final-acoes">
+              <button id="btnBaixarPDFHQ" class="btn btn-gold" disabled>Baixar PDF e HQ</button>
+              <button id="btnVoltarInicio" class="btn btn-light">Voltar ao Início</button>
+            </div>
+          </div>
         </div>
-      `;
-      container.appendChild(finalEl);
-      log('section-final criada automaticamente (fallback).');
-    }
+      </div>
+      <video id="final-video" playsinline preload="auto" style="display:none;"></video>
+    `;
 
-    return finalEl;
+    // ADICIONA NO CORPO (OU NO WRAPPER, SE EXISTIR)
+    const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
+    wrapper.appendChild(finalEl);
+    
+    log('section-final criada com HTML completo (fallback seguro).');
   }
+
+  return finalEl;
+}
 
   function showFinalSection() {
   const finalEl = ensureFinalSectionExists();
