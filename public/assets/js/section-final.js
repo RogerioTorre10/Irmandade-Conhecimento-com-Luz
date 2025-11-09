@@ -4,7 +4,7 @@
 
   const SECTION_ID = 'section-final';
   const VIDEO_SRC = '/assets/videos/filme-5-fim-da-jornada.mp4';
-  const HOME_URL = 'https://irmandade-conhecimento-com-luz.onrender.com/jornada-conhecimento-com-luz1.html';
+  const HOME_URL = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
 
   let isSpeaking = false;
   let started = false;
