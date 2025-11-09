@@ -481,20 +481,16 @@ function playVideoWithCallback(src, onEnded) {
   const btnConf   = $('#jp-btn-confirmar', root);
   const input     = $('#jp-answer-input', root);
 
-  // MICROFONE
   if (btnFalar && input && window.JORNADA_MICRO) {
     btnFalar.addEventListener('click', (ev) => {
       ev.preventDefault();
-      ev.stopPropagation();
       window.JORNADA_MICRO.attach(input, { mode: 'append' });
     });
   }
 
-  // APAGAR
   if (btnApagar && input) {
     btnApagar.addEventListener('click', (ev) => {
       ev.preventDefault();
-      ev.stopPropagation();
       input.value = '';
       input.focus();
       if (window.JORNADA_CHAMA) {
@@ -503,26 +499,21 @@ function playVideoWithCallback(src, onEnded) {
     });
   }
 
-  // CONFIRMAR
   if (btnConf) {
     btnConf.addEventListener('click', (ev) => {
       ev.preventDefault();
-      if (completed) {
-        log('Clique em confirmar após conclusão; ignorado.');
-        return;
-      }
+      if (completed) return;
       saveCurrentAnswer();
       nextStep();
     });
   }
 
-  // INPUT CHAMA
   if (input && window.JORNADA_CHAMA) {
     input.addEventListener('input', () => {
-      const txt = input.value || '';
-      window.JORNADA_CHAMA.updateChamaFromText(txt, 'chama-perguntas');
+      window.JORNADA_CHAMA.updateChamaFromText(input.value || '', 'chama-perguntas');
     });
   }
+}
 
   // MICROFONE AUTOMÁTICO (opcional)
   if (input && window.JORNADA_MICRO) {
