@@ -382,19 +382,35 @@
   }
 
   function showFinalSection() {
-    const finalEl = ensureFinalSectionExists();
-    const wrapper = document.getElementById('jornada-content-wrapper');
-    if (wrapper) wrapper.innerHTML = '';
+  const finalEl = ensureFinalSectionExists();
+  
+  // LIMPA TUDO E FORÇA TELA CHEIA
+  const wrapper = document.getElementById('jornada-content-wrapper');
+  if (wrapper) wrapper.innerHTML = '';
+  
+  // Remove qualquer seção antiga
+  document.querySelectorAll('section').forEach(sec => {
+    if (sec.id !== FINAL_SECTION_ID) sec.remove();
+  });
 
-    if (window.JC?.show) {
-      window.JC.show(FINAL_SECTION_ID);
-    } else if (typeof window.showSection === 'function') {
-      window.showSection(FINAL_SECTION_ID);
-    } else {
-      document.body.appendChild(finalEl);
-      finalEl.scrollIntoView({ behavior: 'smooth' });
-    }
+  // Garante que o body não role
+  document.body.style.overflow = 'hidden';
+
+  // Adiciona no body com posição fixa
+  document.body.appendChild(finalEl);
+  finalEl.style.position = 'fixed';
+  finalEl.style.top = '0';
+  finalEl.style.left = '0';
+  finalEl.style.width = '100vw';
+  finalEl.style.height = '100vh';
+  finalEl.style.margin = '0';
+  finalEl.style.padding = '0';
+
+  // Mostra com JC se existir
+  if (window.JC?.show) {
+    window.JC.show(FINAL_SECTION_ID);
   }
+}
 
   function finishAll() {
     if (completed) return;
