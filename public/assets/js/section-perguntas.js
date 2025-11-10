@@ -214,38 +214,51 @@
     if (el) el.style.width = val;
   }
 
-    function updateCounters() {
+     function updateCounters() {
     const { bloco } = getCurrent();
     const blocoTotal = bloco?.questions?.length || 1;
 
-    // --- BLOCO (1 a 5) ---
+    // ---------- BLOCO (Régua superior: 1 a 5) ----------
     if (State.totalBlocks > 0) {
       const blocoAtual = State.blocoIdx + 1;
       const pctBlocos = Math.max(0, Math.min(100,
         (blocoAtual / State.totalBlocks) * 100
       ));
 
+      // texto "X de Y"
       setText('#progress-block-value', `${blocoAtual} de ${State.totalBlocks}`);
-      setWidth('#progress-block-fill', pctBlocos + '%');
+
+      // barra dourada
+      const fillBloco = document.querySelector('#progress-block-fill');
+      if (fillBloco) {
+        fillBloco.style.width = pctBlocos + '%';
+      }
     }
 
-    // --- PERGUNTAS DO BLOCO ATUAL (1 a 10) ---
+    // ---------- PERGUNTA DO BLOCO (Régua do meio: 1 a 10) ----------
     {
       const perguntaAtual = State.qIdx + 1;
       const pctPerguntas = Math.max(0, Math.min(100,
         (perguntaAtual / blocoTotal) * 100
       ));
 
+      // texto "X / Y"
       setText('#progress-question-value', `${perguntaAtual} / ${blocoTotal}`);
-      setWidth('#progress-question-fill', pctPerguntas + '%');
+
+      // barra prateada
+      const fillPerg = document.querySelector('#progress-question-fill');
+      if (fillPerg) {
+        fillPerg.style.width = pctPerguntas + '%';
+      }
     }
 
-    // --- TOTAL GERAL (1 a 50) / AMPULHETA ---
+    // ---------- TOTAL GERAL (Ampulheta: 1 a 50) ----------
     if (State.totalQuestions > 0) {
       const globalAtual = State.globalIdx + 1;
       setText('#progress-total-value', `${globalAtual} / ${State.totalQuestions}`);
     }
   }
+
 
   async function typeQuestion(text) {
     if (completed) return;
