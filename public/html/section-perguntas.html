@@ -8,7 +8,7 @@
 <section id="section-perguntas" class="section section-perguntas" data-section="perguntas">
   <div class="perguntas-wrap">
 
-    <!-- RÉGUA SUPERIOR: BLOCOS (1 de 5) -->
+    <!-- RÉGUA SUPERIOR: BLOCOS -->
     <div class="progress-block-container">
       <div class="progress-label">Bloco</div>
       <div class="progress-bar gold">
@@ -17,13 +17,13 @@
       <span id="progress-block-value" class="progress-value">1 de 5</span>
     </div>
 
-    <!-- AMPULHETA ANIMADA (TOTAL GERAL) -->
+    <!-- AMPULHETA ANIMADA -->
     <div class="progress-total-container">
       <div class="hourglass-animated">⏳</div>
       <span id="progress-total-value" class="progress-value">1 / 50</span>
     </div>
 
-    <!-- PERGAMINHO DA PERGUNTA -->
+    <!-- PERGAMINHO -->
     <div class="perguntas-pergaminho">
       <div id="jp-question-typed" class="jp-question-typed" aria-live="polite">
         Carregando pergunta...
@@ -36,7 +36,7 @@
                   placeholder="Digite sua resposta com verdade e calma..."></textarea>
       </div>
 
-      <!-- RÉGUA INTERMEDIÁRIA: PERGUNTAS DO BLOCO (1 / 10) -->
+      <!-- RÉGUA INTERMEDIÁRIA: PERGUNTAS -->
       <div class="progress-question-container">
         <div class="progress-label">Pergunta</div>
         <div class="progress-bar silver">
@@ -45,7 +45,6 @@
         <span id="progress-question-value" class="progress-value">1 / 10</span>
       </div>
 
-      <!-- DEVOLUTIVA IA (oculta) -->
       <div id="jp-ai-response" class="jp-ai-response" hidden></div>
     </div>
 
@@ -58,7 +57,6 @@
   </div>
 </section>
 
-<!-- ESTILOS "CHIC" + AMPULHETA ANIMADA -->
 <style>
   :root {
     --gold: #d4af37;
@@ -67,7 +65,6 @@
     --text: #f5e9d6;
   }
 
-  /* === CONTAINERS === */
   .progress-block-container,
   .progress-question-container {
     display: flex;
@@ -104,10 +101,8 @@
     z-index: 100;
   }
 
-  /* === AMPULHETA ANIMADA === */
   .hourglass-animated {
     font-size: 1.6rem;
-    display: inline-block;
     animation: spin 3s infinite linear;
     filter: drop-shadow(0 0 12px #ffda6b);
   }
@@ -117,7 +112,6 @@
     50% { transform: rotate(180deg); }
   }
 
-  /* === BARRAS === */
   .progress-bar {
     flex: 1;
     height: 11px;
@@ -173,7 +167,13 @@
     font-weight: bold;
   }
 
-  /* Mobile */
+  .jp-question-typed {
+    min-height: 42px;
+    font-size: 14px;
+    color: #2b1403;
+    font-weight: 600;
+  }
+
   @media (max-width: 480px) {
     .progress-block-container { top: 8px; left: 3%; width: 94%; font-size: 0.8rem; }
     .progress-total-container { top: 8px; right: 10px; font-size: 0.9rem; }
