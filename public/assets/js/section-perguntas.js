@@ -227,7 +227,7 @@
 
       // texto "X de Y"
       setText('#progress-block-value', `${blocoAtual} de ${State.totalBlocks}`);
-
+      setWidth('#progress-block-fill', pctBlocos + '%');
       // barra dourada
       const fillBloco = document.querySelector('#progress-block-fill');
       if (fillBloco) {
@@ -244,7 +244,7 @@
 
       // texto "X / Y"
       setText('#progress-question-value', `${perguntaAtual} / ${blocoTotal}`);
-
+      setWidth('#progress-question-fill', pctPerguntas + '%');
       // barra prateada
       const fillPerg = document.querySelector('#progress-question-fill');
       if (fillPerg) {
@@ -255,8 +255,7 @@
     // ---------- TOTAL GERAL (Ampulheta: 1 a 50) ----------
     if (State.totalQuestions > 0) {
       const globalAtual = State.globalIdx + 1;
-      setText('#progress-total-value', `${globalAtual} / ${State.totalQuestions}`);
-    }
+      setText('#progress-total-value', `${globalAtual} / ${State.totalQuestions}`);    }
   }
 
 
