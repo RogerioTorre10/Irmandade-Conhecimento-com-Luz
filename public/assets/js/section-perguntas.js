@@ -407,6 +407,11 @@
       State.qIdx++;
       showCurrentQuestion();
     }
+    
+      const fill = document.querySelector('#progress-block-fill');
+      fill.style.boxShadow = '0 0 20px #ffd700, 0 0 30px #ff0';
+      setTimeout(() => fill.style.boxShadow = 'var(--shadow)', 800);
+    
   }
 
      // --------------------------------------------------
