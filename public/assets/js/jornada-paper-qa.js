@@ -303,9 +303,11 @@
     const saved = localStorage.getItem(`jornada_answer_${JC.currentBloco}_${JC.currentPergunta}`);
     if (saved) input.value = saved;
 
-// === ATUALIZA AS 3 BARRAS DE PROGRESSO ===
-function updateProgress(block = 1, question = 1, totalBlocks = 5, questionsPerBlock = 10) {
-  const totalQuestions = totalBlocks * questionsPerBlock;
+// === ATUALIZA TODAS AS BARRAS ===
+function updateProgress(block = 1, question = 1) {
+  const totalBlocks = 5;
+  const questionsPerBlock = 10;
+  const totalQuestions = 50;
   const currentTotal = ((block - 1) * questionsPerBlock) + question;
 
   // Bloco
@@ -318,11 +320,11 @@ function updateProgress(block = 1, question = 1, totalBlocks = 5, questionsPerBl
   document.getElementById('progress-question-fill').style.width = `${questionPercent}%`;
   document.getElementById('progress-question-value').textContent = `${question} / ${questionsPerBlock}`;
 
-  // Total
+  // Total com ampulheta
   document.getElementById('progress-total-value').textContent = `${currentTotal} / ${totalQuestions}`;
 }
 
-// CHAME ASSIM:
+// CHAME SEMPRE QUE MUDAR DE PERGUNTA:
 updateProgress(currentBlock, currentQuestion);
     
     // DATILOGRAFIA
