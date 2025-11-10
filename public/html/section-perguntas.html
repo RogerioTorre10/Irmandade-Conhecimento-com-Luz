@@ -5,148 +5,76 @@
 <script src="/assets/js/jornada-micro.js"></script>
 <script src="/assets/js/jornada-paper-qa.js"></script>
 
-<section id="section-perguntas" class="section section-perguntas" data-section="perguntas">
+<section id="section-perguntas"
+         class="section section-perguntas"
+         data-section="perguntas">
   <div class="perguntas-wrap">
 
-    <!-- RÉGUA SUPERIOR — BLOCO (1–5) -->
-    <div class="progress-top">
-      <div class="progress-bar gold">
-        <div id="progress-block-fill" class="progress-fill"></div>
+    <!-- Cabeçalho -->
+    <div class="perguntas-header">
+      <div class="jp-block-label">
+        Bloco <span id="jp-block-num">1</span> de <span id="jp-block-max">5</span>
       </div>
-      <span id="progress-block-value" class="progress-value">1 de 5</span>
-    </div>
-
-    <!-- RÉGUA DO MEIO — PERGUNTA DENTRO DO BLOCO (1–10) -->
-    <div class="progress-middle">
-      <div class="progress-bar silver">
-        <div id="progress-question-fill" class="progress-fill"></div>
+      <div class="jp-global-counter">
+        Pergunta <span id="jp-global-current">1</span> / <span id="jp-global-total">50</span>
       </div>
-      <span id="progress-question-value" class="progress-value">1 / 10</span>
     </div>
 
-    <!-- AMPULHETA SUPERIOR DIREITA — TOTAL (1–50) -->
-    <div class="progress-total">
-      <img src="/assets/img/ampulheta-icon.png" alt="Ampulheta" class="progress-icon"/>
-      <span id="progress-total-value" class="progress-value">1 / 50</span>
+    <!-- Pergaminho -->
+    <div class="perguntas-pergaminho">
+      <!-- Pergunta com efeito de leitura -->
+      <div id="jp-question-typed" class="jp-question-typed" aria-live="polite">
+        Carregando pergunta...
+      </div>
+
+      <!-- Moldura medieval para resposta -->
+      <div class="jp-answer-frame">
+        <div class="jp-answer-bg"></div>
+        <textarea id="jp-answer-input"
+                  class="jp-answer-input"
+                  rows="4"
+                  placeholder="Digite sua resposta com verdade e calma..."></textarea>
+      </div>
+
+      <!-- Devolutiva das IAs (mantém oculto por enquanto) -->
+      <div id="jp-ai-response" class="jp-ai-response" hidden></div>
     </div>
 
-    <!-- CONTEÚDO DA PERGUNTA -->
-    <div class="jp-question-box">
-      <div id="jp-question-typed" class="jp-question-typed"></div>
-      <div id="jp-question-raw" hidden></div>
+    <!-- Controles -->
+    <div class="perguntas-controls">
+      <button id="jp-btn-falar" class="btn-perguntas" data-action="start-mic">
+        🎤 Falar
+      </button>
+      <button id="jp-btn-apagar" class="btn-perguntas" data-action="clear">
+        🗑 Apagar
+      </button>
+      <button id="jp-btn-confirmar" class="btn-perguntas btn-confirm" data-action="confirm">
+        Confirmar / Próxima
+      </button>
     </div>
 
-    <!-- CAMPO DE RESPOSTA -->
-    <textarea id="jp-answer-input" class="jp-answer-input" placeholder="Escreva sua resposta..."></textarea>
+    <!-- Progresso -->
+    <div class="perguntas-progress">
+      <div class="jp-block-progress-label">
+        Bloco <span id="jp-block-num-2">1</span> — Pergunta
+        <span id="jp-block-current">1</span>/<span id="jp-block-total">10</span>
+      </div>
+      <div class="jp-block-progress-bar">
+        <div id="jp-block-progress-fill" class="jp-progress-fill"></div>
+      </div>
 
-    <!-- BOTÕES -->
-    <div class="jp-actions">
-      <button id="jp-btn-falar" class="btn btn-light">🎙️ Falar</button>
-      <button id="jp-btn-apagar" class="btn btn-gray">Apagar</button>
-      <button id="jp-btn-confirmar" class="btn btn-gold">Confirmar</button>
+      <div class="jp-global-progress-label">
+        Total: <span id="jp-global-current-2">1</span>/<span id="jp-global-total-2">50</span>
+      </div>
+      <div class="jp-global-progress-bar">
+        <div id="jp-global-progress-fill" class="jp-progress-fill"></div>
+      </div>
     </div>
 
-    <!-- CAIXA DE RESPOSTA DA IA -->
-    <div id="jp-ai-response" class="jp-ai-response" hidden></div>
+    <!-- Containers invisíveis -->
+    <div id="jp-question-raw" class="jp-hidden"></div>
+    <div id="jp-ai-raw" class="jp-hidden"></div>
+
   </div>
 </section>
 
-
-<!-- === ESTILO DAS 3 BARRAS === -->
-<style>
-  :root {
-    --gold-gradient: linear-gradient(90deg, #d4af37, #ffd700, #ffcc33);
-    --silver-gradient: linear-gradient(90deg, #d3d3d3, #b0b0b0, #f0f0f0);
-  }
-
-  /* BLOCO SUPERIOR */
-  .progress-top {
-    position: absolute;
-    top: 20px;
-    left: 5%;
-    width: 90%;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: 'Cinzel', serif;
-    color: #e8c87d;
-    text-shadow: 0 1px 3px #000;
-    z-index: 100;
-  }
-
-  .progress-label {
-    min-width: 70px;
-    font-weight: 600;
-  }
-
-  .progress-bar {
-    flex: 1;
-    height: 8px;
-    border-radius: 5px;
-    background: rgba(0,0,0,0.4);
-    overflow: hidden;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
-    border: 1px solid rgba(255,255,255,0.2);
-  }
-
-  .progress-fill {
-    height: 100%;
-    width: 20%;
-    transition: width 0.6s ease-in-out;
-    border-radius: 5px;
-    box-shadow: 0 0 12px rgba(255,215,0,0.6);
-  }
-
-  .progress-bar.gold .progress-fill { background: var(--gold-gradient); }
-  .progress-bar.silver .progress-fill { background: var(--silver-gradient); }
-
-  .progress-value {
-    min-width: 70px;
-    text-align: right;
-    font-weight: bold;
-    color: #ffd700;
-    text-shadow: 0 1px 2px #000;
-  }
-
-  /* RÉGUA DO MEIO */
-  .progress-middle {
-    margin-top: 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: 'Cinzel', serif;
-    color: #c5c5c5;
-    text-shadow: 0 1px 2px #000;
-  }
-
-  /* AMPULHETA */
-  .progress-total {
-    position: absolute;
-    top: 18px;
-    right: 24px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: #ffd700;
-    font-weight: 700;
-    font-size: 1rem;
-    text-shadow: 0 1px 3px #000;
-  }
-
-  .ampulheta {
-    display: inline-block;
-    animation: spinHourglass 3s infinite linear;
-    filter: drop-shadow(0 0 8px #ffda6b);
-  }
-
-  @keyframes spinHourglass {
-    0%, 100% { transform: rotate(0deg); }
-    50% { transform: rotate(180deg); }
-  }
-
-  @media (max-width: 480px) {
-    .progress-top { top: 10px; left: 4%; width: 92%; font-size: 0.8rem; }
-    .progress-total { top: 12px; right: 12px; font-size: 0.9rem; }
-    .progress-bar { height: 6px; }
-  }
-</style>
