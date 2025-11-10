@@ -1,4 +1,4 @@
-/* section-selfie.js — VERSÃO FINAL: PADRÃO window + Transição + Dados Corretos */
+/* section-selfie.js — VERSÃO FINAL CORRIGIDA: SEM REPETIÇÃO DE TEXTO */
 (function (window) {
   'use strict';
 
@@ -6,35 +6,30 @@
   if (NS.__final) return;
   NS.__final = true;
 
-  // === PADRÃO DE TRANSIÇÃO (igual ao section-card.js) ===
   const NEXT_SECTION_ID = 'section-card';
   const VIDEO_SRC = '/assets/videos/filme-card-dourado.mp4';
-
   const FINAL_ZOOM = 0.65;
+
   let stream = null, videoEl, canvasEl, previewImg;
   let lastCapture = null;
 
   const toast = msg => window.toast?.(msg) || alert(msg);
 
-  // === DEBUG NO CONSOLE ===
   window.DEBUG_JC = () => {
     console.log('JC.data:', window.JC?.data);
     console.log('sessionStorage.jornada.guia:', sessionStorage.getItem('jornada.guia'));
     console.log('localStorage.jc.nome:', localStorage.getItem('jc.nome'));
   };
 
-  // === LEITURA FORÇADA DE NOME E GUIA (PRIORIDADE: sessionStorage) ===
   function getUserData() {
     let nome = 'AMOR';
     let guia = 'zion';
 
-    // 1. PRIORIDADE: sessionStorage (sessão atual)
     const ssNome = sessionStorage.getItem('jornada.nome');
     const ssGuia = sessionStorage.getItem('jornada.guia');
     if (ssNome && ssNome.trim()) nome = ssNome.trim();
     if (ssGuia && ssGuia.trim()) guia = ssGuia.trim().toLowerCase();
 
-    // 2. Fallback: localStorage (apenas se sessionStorage vazio)
     if (!ssNome || !ssGuia) {
       const lsNome = localStorage.getItem('jc.nome');
       const lsGuia = localStorage.getItem('jc.guia');
@@ -42,17 +37,14 @@
       if (lsGuia) guia = lsGuia;
     }
 
-    // 3. Normaliza
     nome = nome.toUpperCase().trim();
     guia = guia.toLowerCase().trim();
 
-    // 4. Atualiza JC.data
     window.JC = window.JC || {};
     window.JC.data = window.JC.data || {};
     window.JC.data.nome = nome;
     window.JC.data.guia = guia;
 
-    // 5. Salva APENAS no sessionStorage
     try {
       sessionStorage.setItem('jornada.nome', nome);
       sessionStorage.setItem('jornada.guia', guia);
@@ -63,7 +55,9 @@
   }
 
   function typeWriter(el, text, speed = 35) {
-    el.textContent = ''; el.style.opacity = '1';
+    if (!el) return;
+    el.textContent = '';
+    el.style.opacity = '1';
     let i = 0;
     const timer = setInterval(() => {
       if (i < text.length) el.textContent += text[i++];
@@ -146,17 +140,10 @@
     document.getElementById('btn-selfie-confirm').disabled = false;
   }
 
-  // === TRANSIÇÃO PADRÃO ===
   function playTransitionThenGo() {
     console.log(`[SELFIE] Transição → ${NEXT_SECTION_ID}`);
-
     if (window.playTransitionVideo) {
       window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
-    } else if (window.VideoTransicao?.play) {
-      window.VideoTransicao.play({
-        src: VIDEO_SRC,
-        onEnd: () => goTo(NEXT_SECTION_ID)
-      });
     } else {
       const v = document.createElement('video');
       v.src = VIDEO_SRC;
@@ -170,7 +157,6 @@
 
   function goTo(id) {
     if (window.JC?.show) window.JC.show(id, { force: true });
-    else if (window.showSection) window.showSection(id);
     else forceShow(id);
   }
 
@@ -183,7 +169,6 @@
     }
   }
 
-  // === CONFIRMAR E IR ===
   function confirmAndGo() {
     if (!lastCapture) {
       toast('Tire uma foto primeiro.');
@@ -195,11 +180,10 @@
     try { localStorage.setItem('jc.selfieDataUrl', lastCapture); } catch {}
 
     window.dispatchEvent(new CustomEvent('selfie:captured', { detail: { dataUrl: lastCapture } }));
-
     playTransitionThenGo();
   }
 
-  // === INIT ===
+  // === INIT COM ANTI-REPETIÇÃO ===
   document.addEventListener('sectionLoaded', e => {
     if (e.detail?.sectionId !== 'section-selfie') return;
 
@@ -212,12 +196,25 @@
     const { nome, guia } = getUserData();
 
     setTimeout(() => {
-      typeWriter(title, title.dataset.text, 40);
+      // TÍTULO: só uma vez
+      if (title && !title.classList.contains('typed')) {
+        const titleText = (title.dataset.text || 'Prepare sua selfie').trim();
+        title.textContent = '';
+        typeWriter(title, titleText, 40);
+        title.classList.add('typed');
+      }
 
-      const guiaNome = { arian: 'Arian', lumen: 'Lumen', zion: 'Zion' }[guia] || 'Guia';
-      const fullText = `${nome}, afaste um pouco o celular e posicione o rosto no centro. ${guiaNome} te guiará.`;
-      typeWriter(texto, fullText, 36);
-      speak(fullText);
+      // TEXTO PERSONALIZADO: só uma vez
+      if (texto && !texto.classList.contains('typed')) {
+        const guiaNomeMap = { arian: 'Arian', lumen: 'Lumen', zion: 'Zion' };
+        const guiaNome = guiaNomeMap[guia] || 'Guia';
+        const fullText = `${nome}, afaste um pouco o celular e posicione o rosto no centro. ${guiaNome} te guiará.`;
+
+        texto.textContent = '';
+        typeWriter(texto, fullText, 36);
+        speak(fullText);
+        texto.classList.add('typed');
+      }
     }, 300);
 
     document.querySelectorAll('input[type=range]').forEach(input => {
@@ -238,11 +235,10 @@
     if (e.detail?.sectionId === 'section-selfie') stopCamera();
   });
 
-  // FORÇA INIT
   const section = document.getElementById('section-selfie');
   if (section && section.classList.contains('active')) {
     setTimeout(() => {
       document.dispatchEvent(new CustomEvent('sectionLoaded', { detail: { sectionId: 'section-selfie' } }));
     }, 100);
   }
-})(window); // ← AGORA É window, NÃO global
+})(window);
