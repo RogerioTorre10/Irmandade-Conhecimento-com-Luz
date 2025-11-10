@@ -303,6 +303,28 @@
     const saved = localStorage.getItem(`jornada_answer_${JC.currentBloco}_${JC.currentPergunta}`);
     if (saved) input.value = saved;
 
+// === ATUALIZA AS 3 BARRAS DE PROGRESSO ===
+function updateProgress(block = 1, question = 1, totalBlocks = 5, questionsPerBlock = 10) {
+  const totalQuestions = totalBlocks * questionsPerBlock;
+  const currentTotal = ((block - 1) * questionsPerBlock) + question;
+
+  // Bloco
+  const blockPercent = (block / totalBlocks) * 100;
+  document.getElementById('progress-block-fill').style.width = `${blockPercent}%`;
+  document.getElementById('progress-block-value').textContent = `${block} de ${totalBlocks}`;
+
+  // Pergunta do bloco
+  const questionPercent = (question / questionsPerBlock) * 100;
+  document.getElementById('progress-question-fill').style.width = `${questionPercent}%`;
+  document.getElementById('progress-question-value').textContent = `${question} / ${questionsPerBlock}`;
+
+  // Total
+  document.getElementById('progress-total-value').textContent = `${currentTotal} / ${totalQuestions}`;
+}
+
+// CHAME ASSIM:
+updateProgress(currentBlock, currentQuestion);
+    
     // DATILOGRAFIA
     let i = 0;
     const display = document.getElementById('question-display');
@@ -349,7 +371,7 @@
 
     log('Pergunta renderizada com sucesso');
   }
-
+ 
   async function loadDynamicBlocks() {
     await i18n.waitForReady(10000);
     const lang = i18n.lang || 'pt-BR';
