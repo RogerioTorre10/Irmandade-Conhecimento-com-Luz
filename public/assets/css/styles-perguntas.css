@@ -361,3 +361,127 @@
   0%, 100% { transform: rotate(0deg); }
   50% { transform: rotate(180deg); }
 }
+/* ... [MANTENHA TODO O CONTEÚDO EXISTENTE DO styles-perguntas.css] ... */
+
+/* ===========================================================
+   ESTILOS PARA AS 3 BARRAS DE PROGRESSO LÚDICAS
+   =========================================================== */
+:root {
+  --gold-gradient: linear-gradient(90deg, #d4af37, #ffd700, #ffcc33);
+  --silver-gradient: linear-gradient(90deg, #d3d3d3, #b0b0b0, #f0f0f0);
+}
+
+/* BLOCO SUPERIOR: Caminho da Iluminação (Blocos 1-5) */
+.progress-top {
+  /* Posicionamento ABSOLUTO para ficar acima de tudo no container principal */
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 1000px; /* Limite máximo para não esticar demais */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Cinzel', serif;
+  color: #e8c87d;
+  text-shadow: 0 1px 3px #000;
+  z-index: 100; /* Garante que fique acima do .perguntas-wrap */
+}
+
+.progress-label {
+  min-width: 70px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  border-radius: 5px;
+  background: rgba(0,0,0,0.4);
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%; /* Inicia em 0% */
+  transition: width 0.6s ease-in-out;
+  border-radius: 5px;
+}
+
+/* Efeito Lúdico: Brilho para o Gold (Caminho da Iluminação) */
+.progress-bar.gold .progress-fill {
+  background: var(--gold-gradient);
+  box-shadow: 0 0 12px rgba(255,215,0,0.6), inset 0 0 4px rgba(255,255,255,0.5);
+}
+
+/* Efeito Lúdico: Aparência de Prata/Pergaminho para o Silver (Perguntas) */
+.progress-bar.silver .progress-fill {
+  background: var(--silver-gradient);
+  box-shadow: 0 0 8px rgba(180, 180, 180, 0.4), inset 0 0 3px rgba(255,255,255,0.3);
+}
+
+.progress-value {
+  min-width: 40px; /* Reduzido para caber melhor */
+  text-align: right;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 0 1px 2px #000;
+}
+
+/* RÉGUA DO MEIO: Desvendando o Pergaminho (Perguntas 1-10) */
+.progress-middle {
+  /* Posicionado dentro do .perguntas-wrap, abaixo do answer-frame */
+  margin-top: 12px;
+  margin-bottom: 8px; /* Espaço antes da devolutiva da IA */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Cinzel', serif;
+  color: #c5c5c5;
+  text-shadow: 0 1px 2px #000;
+}
+
+/* AMPULHETA: O Tempo da Reflexão (Total 1-50) */
+.progress-total {
+  position: absolute;
+  top: 18px; /* Ajustado para ficar próximo ao topo, como o seletor de idiomas */
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #ffd700;
+  font-weight: 700;
+  font-size: 1rem;
+  text-shadow: 0 1px 3px #000;
+  z-index: 101; /* Fica acima de todas as outras barras */
+}
+
+.ampulheta {
+  display: inline-block;
+  animation: spinHourglass 8s infinite linear; /* Reduzido a frequência da animação */
+  filter: drop-shadow(0 0 8px #ffda6b);
+  font-size: 1.2rem;
+}
+
+@keyframes spinHourglass {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(180deg); }
+}
+
+@media (max-width: 480px) {
+  .progress-top { top: 10px; left: 4%; width: 92%; font-size: 0.8rem; }
+  .progress-total { top: 12px; right: 12px; font-size: 0.9rem; }
+  .progress-bar { height: 6px; }
+}
+
+/* Corrigindo a duplicação no CSS original que pode atrapalhar */
+/* Remova ou substitua essas regras de progresso do CSS original */
+.perguntas-progress,
+.jp-global-progress,
+.jp-block-progress {
+  display: none !important; /* Desativamos as regras antigas */
+}
