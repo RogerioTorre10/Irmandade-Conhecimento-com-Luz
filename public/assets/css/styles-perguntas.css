@@ -334,3 +334,30 @@
   touch-action: none !important; /* Evita zoom acidental */
 }
 }
+.progress-bar.gold .progress-fill {
+  background: var(--gold-gradient);
+  animation: brilho-dourado 3s ease-in-out infinite;
+}
+
+@keyframes brilho-dourado {
+  0%, 100% { box-shadow: 0 0 10px rgba(255,215,0,0.5); }
+  50% { box-shadow: 0 0 20px rgba(255,235,100,0.8); }
+}
+.progress-bar.silver .progress-fill {
+  background: var(--silver-gradient);
+  animation: brilho-prata 3s ease-in-out infinite;
+}
+
+@keyframes brilho-prata {
+  0%, 100% { box-shadow: 0 0 8px rgba(200,200,200,0.4); }
+  50% { box-shadow: 0 0 16px rgba(255,255,255,0.7); }
+}
+.ampulheta {
+  animation: girar-ampulheta 4s linear infinite;
+  filter: drop-shadow(0 0 6px #ffda6b);
+}
+
+@keyframes girar-ampulheta {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(180deg); }
+}
