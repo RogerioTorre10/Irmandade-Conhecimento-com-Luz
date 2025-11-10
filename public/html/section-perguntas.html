@@ -8,6 +8,11 @@
 <section id="section-perguntas" class="section section-perguntas" data-section="perguntas">
   <div class="perguntas-wrap">
 
+    <div class="progress-bar gold">
+     <div id="progress-block-fill" class="progress-fill"></div>
+      </div>
+       <span id="progress-block-value" class="progress-value">1 de 5</span>
+
     <!-- === VÍDEO DE TRANSIÇÃO === -->
     <div id="videoOverlay" class="video-overlay" style="display:none;">
       <video id="videoTransicao" playsinline preload="auto" style="max-width:100%;"></video>
@@ -42,8 +47,12 @@
                   rows="4"
                   placeholder="Digite sua resposta com verdade e calma..."></textarea>
       </div>
+         <div class="progress-bar silver">
+            <div id="progress-question-fill" class="progress-fill"></div>
+            </div>
+           <span id="progress-question-value" class="progress-value">1 / 10</span>
 
-      <!-- === RÉGUA INTERMEDIÁRIA — PERGUNTAS (1 a 10) === -->
+        <!-- === RÉGUA INTERMEDIÁRIA — PERGUNTAS (1 a 10) === -->
       <div class="progress-middle">
         <div class="progress-label">Pergunta</div>
         <div class="progress-bar silver">
