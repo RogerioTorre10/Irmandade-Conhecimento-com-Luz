@@ -6,45 +6,25 @@
 <script src="/assets/js/jornada-paper-qa.js"></script>
 
 <section id="section-perguntas" class="section section-perguntas" data-section="perguntas">
+  <div class="progress-total">
+    <span class="ampulheta">⏳</span>
+    <span id="progress-total-value" class="progress-value">1 / 50</span>
+  </div>
+
   <div class="perguntas-wrap">
 
-    <!-- === VÍDEO DE TRANSIÇÃO === -->
-    <div id="videoOverlay" class="video-overlay" style="display:none;">
-      <video id="videoTransicao" playsinline preload="auto" style="max-width:100%;"></video>
-    </div>
-
-    <!-- === RÉGUA SUPERIOR — BLOCOS (1 a 5) === -->
     <div class="progress-top">
-      <div class="progress-label">Blocos</div>
-      <div class="progress-bar gold" id="block-bar">
+      <div class="progress-label">Blocos: O Caminho</div>
+      <div class="progress-bar gold">
         <div id="progress-block-fill" class="progress-fill"></div>
-        <div class="glow-line"></div>
       </div>
       <span id="progress-block-value" class="progress-value">1 de 5</span>
     </div>
 
-    <!-- === AMPULHETA TOTAL COM AREIA === -->
-    <div class="progress-total">
-      <div class="hourglass-container">
-        <span class="ampulheta">hourglass</span>
-        <div class="sand-fill" id="sand-fill"></div>
-      </div>
-      <span id="progress-total-value" class="progress-value">1 / 50</span>
+    <div id="videoOverlay" class="video-overlay" style="display:none;">
+      <video id="videoTransicao" playsinline preload="auto" style="max-width:100%;"></video>
     </div>
 
-    <!-- === TERMÔMETRO — PERGUNTAS DO BLOCO === -->
-    <div class="thermometer-container">
-      <div class="thermometer">
-        <div class="mercury" id="progress-question-mercury"></div>
-        <div class="glow" id="question-glow"></div>
-        <div class="marks">
-          <span>10</span><span>5</span><span>0</span>
-        </div>
-      </div>
-      <div class="progress-label thermo-label">Pergunta <span id="progress-question-value">1</span> / 10</div>
-    </div>
-
-    <!-- === PERGAMINHO === -->
     <div class="perguntas-pergaminho">
       <div id="jp-question-typed" class="jp-question-typed" aria-live="polite">
         Carregando pergunta...
@@ -52,207 +32,30 @@
 
       <div class="jp-answer-frame">
         <div class="jp-answer-bg"></div>
-        <textarea id="jp-answer-input" class="jp-answer-input" rows="4"
+        <textarea id="jp-answer-input"
+                  class="jp-answer-input"
+                  rows="4"
                   placeholder="Digite sua resposta com verdade e calma..."></textarea>
+      </div>
+
+      <div class="progress-middle">
+        <div class="progress-label">Perguntas no Bloco</div>
+        <div class="progress-bar silver">
+          <div id="progress-question-fill" class="progress-fill"></div>
+        </div>
+        <span id="progress-question-value" class="progress-value">1 / 10</span>
       </div>
 
       <div id="jp-ai-response" class="jp-ai-response" hidden></div>
     </div>
 
-    <!-- === CONTROLES === -->
     <div class="perguntas-controls">
-      <button id="jp-btn-falar" class="btn-perguntas" data-action="start-mic">Falar</button>
-      <button id="jp-btn-apagar" class="btn-perguntas" data-action="clear">Apagar</button>
+      <button id="jp-btn-falar" class="btn-perguntas" data-action="start-mic">🎙️ Falar</button>
+      <button id="jp-btn-apagar" class="btn-perguntas" data-action="clear">🗑️ Apagar</button>
       <button id="jp-btn-confirmar" class="btn-perguntas btn-confirm" data-action="confirm">
-        Confirmar / Próxima
+        ✅ Confirmar / Próxima
       </button>
     </div>
 
   </div>
 </section>
-
-<!-- === ESTILOS LÚDICOS — CARREGADOS POR ÚLTIMO === -->
-<style>
-  /* === FORÇA TOTAL SOBRE TUDO === */
-  #section-perguntas * {
-    all: unset !important;
-  }
-
-  #section-perguntas {
-    all: revert !important;
-  }
-
-  /* === RECONSTRÓI DO ZERO === */
-  #section-perguntas .progress-top {
-    position: absolute !important;
-    top: 20px !important;
-    left: 5% !important;
-    width: 90% !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    font-family: 'Cinzel', serif !important;
-    color: #e8c87d !important;
-    text-shadow: 0 1px 3px #000 !important;
-    z-index: 1000 !important;
-  }
-
-  #section-perguntas .progress-label {
-    min-width: 70px !important;
-    font-weight: 600 !important;
-    color: #ffd700 !important;
-  }
-
-  #section-perguntas .progress-bar.gold {
-    flex: 1 !important;
-    height: 12px !important;
-    border-radius: 8px !important;
-    background: #1a1a1a !important;
-    overflow: hidden !important;
-    border: 2px solid #b8860b !important;
-    box-shadow: 0 0 15px rgba(255,215,0,0.5) !important;
-  }
-
-  #progress-block-fill {
-    height: 100% !important;
-    width: 40% !important;
-    background: linear-gradient(90deg, #b8860b, #ffd700, #ffcc33, #b8860b) !important;
-    border-radius: 8px !important;
-    position: relative !important;
-    overflow: hidden !important;
-  }
-
-  #progress-block-fill::after {
-    content: '' !important;
-    position: absolute !important;
-    top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent) !important;
-    animation: shimmer 2s infinite !important;
-  }
-
-  /* === AMPULHETA === */
-  #section-perguntas .progress-total {
-    position: absolute !important;
-    top: 18px !important;
-    right: 24px !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    color: #ffd700 !important;
-    font-weight: 700 !important;
-    font-size: 1.1rem !important;
-  }
-
-  .ampulheta {
-    font-size: 32px !important;
-    animation: spinHourglass 3s infinite linear !important;
-    filter: drop-shadow(0 0 10px #ffda6b) !important;
-  }
-
-  #sand-fill {
-    position: absolute !important;
-    bottom: 6px !important;
-    left: 7px !important;
-    width: 18px !important;
-    height: 28% !important;
-    background: linear-gradient(to top, #d4af37, #ffd700) !important;
-    border-radius: 3px !important;
-  }
-
-  /* === TERMÔMETRO === */
-  .thermometer-container {
-    display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
-    margin: 20px 0 !important;
-    color: #ffd700 !important;
-    font-family: 'Cinzel', serif !important;
-  }
-
-  .thermometer {
-    width: 70px !important;
-    height: 200px !important;
-    background: rgba(0,0,0,0.6) !important;
-    border-radius: 35px !important;
-    overflow: hidden !important;
-    border: 4px solid #444 !important;
-    box-shadow: 0 0 25px rgba(0,255,136,0.4) !important;
-  }
-
-  #progress-question-mercury {
-    height: 30% !important;
-    background: linear-gradient(to top, #ff3366, #00ff88) !important;
-    border-radius: 35px !important;
-    box-shadow: 0 0 30px #00ff88 !important;
-  }
-
-  #question-glow {
-    height: 50px !important;
-    background: radial-gradient(ellipse at center, #00ff8833 0%, transparent 70%) !important;
-    opacity: 0.8 !important;
-  }
-
-  .marks span {
-    font-size: 0.8rem !important;
-    color: #aaa !important;
-  }
-
-  /* === ANIMAÇÕES === */
-  @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-  }
-
-  @keyframes spinHourglass {
-    0%, 100% { transform: rotate(0deg); }
-    50% { transform: rotate(180deg); }
-  }
-</style>
-
-<!-- === SCRIPTS === -->
-<script src="/assets/js/jornada-chama.js"></script>
-<script src="/assets/js/jornada-micro.js"></script>
-<script src="/assets/js/jornada-paper-qa.js"></script>
-
-<!-- === JS DO PROGRESSO === -->
-<script>
-  let currentQuestion = 1;
-  const totalQuestions = 50;
-  const questionsPerBlock = 10;
-
-  function updateProgress() {
-    const blockNum = Math.floor((currentQuestion - 1) / questionsPerBlock) + 1;
-    const questionInBlock = ((currentQuestion - 1) % questionsPerBlock) + 1;
-    const totalPercent = (currentQuestion / totalQuestions) * 100;
-    const blockPercent = (blockNum / 5) * 100;
-    const questionPercent = (questionInBlock / questionsPerBlock) * 100;
-
-    requestAnimationFrame(() => {
-      const fill = document.getElementById('progress-block-fill');
-      if (fill) fill.style福.width = blockPercent + '%';
-      const value = document.getElementById('progress-block-value');
-      if (value) value.textContent = `${blockNum} de 5`;
-
-      const sand = document.getElementById('sand-fill');
-      if (sand) sand.style.height = totalPercent + '%';
-      const total = document.getElementById('progress-total-value');
-      if (total) total.textContent = `${currentQuestion} / 50`;
-
-      const mercury = document.getElementById('progress-question-mercury');
-      if (mercury) mercury.style.height = questionPercent + '%';
-      const glow = document.getElementById('question-glow');
-      if ( |glow) glow.style.height = (questionPercent > 10 ? 50 : questionPercent * 5) + 'px';
-      const qValue = document.getElementById('progress-question-value');
-      if (qValue) qValue.textContent = questionInBlock;
-    });
-  }
-
-  document.getElementById('jp-btn-confirmar')?.addEventListener('click', () => {
-    if (currentQuestion < totalQuestions) {
-      currentQuestion++;
-      updateProgress();
-    }
-  });
-
-  updateProgress();
-</script>
