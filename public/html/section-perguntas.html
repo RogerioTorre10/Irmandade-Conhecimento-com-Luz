@@ -76,3 +76,108 @@
 
   </div>
 </section>
+
+<!-- === CSS DAS BARRAS (ADICIONE NO styles-perguntas.css) === -->
+<style>
+  /* CONTAINER DAS 3 BARRAS */
+  .progress-container {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-family: 'Cinzel', serif;
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  /* BARRAS COMUNS */
+  .progress-block, .progress-question {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #d4a574;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 5px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid #8b6f47;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ffd700, #ffb84d);
+    border-radius: 3px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+  }
+
+  .progress-value {
+    font-weight: bold;
+    min-width: 50px;
+    text-align: right;
+  }
+
+  /* TOTAL COM AMPULHETA */
+  .progress-total {
+    position: absolute;
+    top: -55px;
+    right: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+    color: #ffd700;
+    font-weight: bold;
+    text-shadow: 0 1px 3px #000;
+  }
+
+  .ampulheta {
+    font-size: 1.5rem;
+    animation: sandfall 2.5s infinite linear;
+  }
+
+  @keyframes sandfall {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(180deg); }
+  }
+
+  /* RESPONSIVO */
+  @media (max-width: 480px) {
+    .progress-container { top: 10px; left: 10px; right: 10px; gap: 8px; }
+    .progress-block, .progress-question { font-size: 0.75rem; }
+    .progress-total { top: -50px; right: 10px; font-size: 1rem; }
+    .ampulheta { font-size: 1.3rem; }
+  }
+</style>
+
+<!-- === VIEWPORT FORÇADO (MANTIDO) === -->
+<script>
+  (function () {
+    'use strict';
+    if (window.__VIEWPORT_FORCED__) return;
+    window.__VIEWPORT_FORCED__ = true;
+
+    if (!document.querySelector('meta[name="viewport"]')) {
+      const meta = document.createElement('meta');
+      meta.name = 'viewport';
+      meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+      document.head.appendChild(meta);
+    }
+
+    document.body.style.margin = '0';
+    document.body.style.padding = '0';
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+
+    document.addEventListener('gesturestart', e => e.preventDefault());
+  })();
+</script>
