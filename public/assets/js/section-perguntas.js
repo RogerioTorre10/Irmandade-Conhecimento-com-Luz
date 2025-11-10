@@ -214,29 +214,37 @@
     if (el) el.style.width = val;
   }
 
-  function updateCounters() {
+    function updateCounters() {
     const { bloco } = getCurrent();
     const blocoTotal = bloco?.questions?.length || 1;
 
-    setText('#jp-block-num', State.blocoIdx + 1);
-    setText('#jp-block-num-2', State.blocoIdx + 1);
-    setText('#jp-block-max', State.totalBlocks || 1);
+    // --- BLOCO (1 a 5) ---
+    if (State.totalBlocks > 0) {
+      const blocoAtual = State.blocoIdx + 1;
+      const pctBlocos = Math.max(0, Math.min(100,
+        (blocoAtual / State.totalBlocks) * 100
+      ));
 
-    setText('#jp-global-current', State.globalIdx + 1);
-    setText('#jp-global-total', State.totalQuestions || 1);
+      setText('#progress-block-value', `${blocoAtual} de ${State.totalBlocks}`);
+      setWidth('#progress-block-fill', pctBlocos + '%');
+    }
 
-    setText('#jp-block-current', State.qIdx + 1);
-    setText('#jp-block-total', blocoTotal);
+    // --- PERGUNTAS DO BLOCO ATUAL (1 a 10) ---
+    {
+      const perguntaAtual = State.qIdx + 1;
+      const pctPerguntas = Math.max(0, Math.min(100,
+        (perguntaAtual / blocoTotal) * 100
+      ));
 
-    const pctBloco = Math.max(0, Math.min(100, ((State.qIdx + 1) / blocoTotal) * 100));
-    const pctGlobal = Math.max(0, Math.min(100, ((State.globalIdx + 1) / (State.totalQuestions || 1)) * 100));
+      setText('#progress-question-value', `${perguntaAtual} / ${blocoTotal}`);
+      setWidth('#progress-question-fill', pctPerguntas + '%');
+    }
 
-    setWidth('#jp-block-progress-fill', pctBloco + '%');
-    setWidth('#jp-global-progress-fill', pctGlobal + '%');
-    setWidth('#progress-question-fill', pctBloco + '%'); 
-    setText('#progress-question-value', `${State.qIdx + 1} / ${blocoTotal}`);
-    setText('#progress-block-value', `${State.blocoIdx + 1} de ${State.totalBlocks}`);
-    setText('#progress-total-value', `${State.globalIdx + 1} / ${State.totalQuestions}`);
+    // --- TOTAL GERAL (1 a 50) / AMPULHETA ---
+    if (State.totalQuestions > 0) {
+      const globalAtual = State.globalIdx + 1;
+      setText('#progress-total-value', `${globalAtual} / ${State.totalQuestions}`);
+    }
   }
 
   async function typeQuestion(text) {
