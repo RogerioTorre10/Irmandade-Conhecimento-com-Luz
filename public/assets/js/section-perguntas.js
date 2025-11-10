@@ -411,8 +411,11 @@
       const fill = document.querySelector('#progress-block-fill');
       fill.style.boxShadow = '0 0 20px #ffd700, 0 0 30px #ff0';
       setTimeout(() => fill.style.boxShadow = 'var(--shadow)', 800);
-    
-  }
+
+      const audio = new Audio('/assets/sfx/bloco-complete.mp3');
+      audio.volume = 0.3;
+      audio.play().catch(() => {});
+     }
 
      // --------------------------------------------------
   // FINALIZAÇÃO — FALLBACK LIMPO PARA SECTION-FINAL
