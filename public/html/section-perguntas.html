@@ -13,33 +13,19 @@
       <video id="videoTransicao" playsinline preload="auto" style="max-width:100%;"></video>
     </div>
 
-    <!-- === 3 BARRAS DE PROGRESSO (CHIC & ANIMADAS) === -->
-    <div class="progress-container">
-
-      <!-- 1. BLOCO (TOPO) -->
-      <div class="progress-block">
-        <span class="progress-label">Bloco</span>
-        <div class="progress-bar">
-          <div id="progress-block-fill" class="progress-fill" style="width: 20%"></div>
-        </div>
-        <span id="progress-block-value" class="progress-value">1 de 5</span>
+    <!-- === RÉGUA SUPERIOR — BLOCOS (1 a 5) === -->
+    <div class="progress-top">
+      <div class="progress-label">Blocos</div>
+      <div class="progress-bar gold">
+        <div id="progress-block-fill" class="progress-fill"></div>
       </div>
+      <span id="progress-block-value" class="progress-value">1 de 5</span>
+    </div>
 
-      <!-- 2. PERGUNTA DO BLOCO (MEIO) -->
-      <div class="progress-question">
-        <span class="progress-label">Pergunta</span>
-        <div class="progress-bar">
-          <div id="progress-question-fill" class="progress-fill" style="width: 10%"></div>
-        </div>
-        <span id="progress-question-value" class="progress-value">1 / 10</span>
-      </div>
-
-      <!-- 3. TOTAL GERAL (CANTO DIREITO + AMPULHETA) -->
-      <div class="progress-total">
-        <span class="ampulheta">Hourglass</span>
-        <span id="progress-total-value" class="progress-value">1 / 50</span>
-      </div>
-
+    <!-- === AMPULHETA TOTAL (CANTO DIREITO) === -->
+    <div class="progress-total">
+      <span class="ampulheta">⏳</span>
+      <span id="progress-total-value" class="progress-value">1 / 50</span>
     </div>
 
     <!-- === PERGAMINHO DA PERGUNTA === -->
@@ -57,132 +43,126 @@
                   placeholder="Digite sua resposta com verdade e calma..."></textarea>
       </div>
 
+      <!-- === RÉGUA INTERMEDIÁRIA — PERGUNTAS (1 a 10) === -->
+      <div class="progress-middle">
+        <div class="progress-label">Pergunta</div>
+        <div class="progress-bar silver">
+          <div id="progress-question-fill" class="progress-fill"></div>
+        </div>
+        <span id="progress-question-value" class="progress-value">1 / 10</span>
+      </div>
+
       <!-- === DEVOLUTIVA DA IA (OCULTA) === -->
       <div id="jp-ai-response" class="jp-ai-response" hidden></div>
     </div>
 
     <!-- === CONTROLES === -->
     <div class="perguntas-controls">
-      <button id="jp-btn-falar" class="btn-perguntas" data-action="start-mic">Microphone Falar</button>
-      <button id="jp-btn-apagar" class="btn-perguntas" data-action="clear">Trash Apagar</button>
+      <button id="jp-btn-falar" class="btn-perguntas" data-action="start-mic">🎙️ Falar</button>
+      <button id="jp-btn-apagar" class="btn-perguntas" data-action="clear">🗑️ Apagar</button>
       <button id="jp-btn-confirmar" class="btn-perguntas btn-confirm" data-action="confirm">
-        Confirmar / Próxima
+        ✅ Confirmar / Próxima
       </button>
     </div>
-
-    <!-- === DADOS INVISÍVEIS === -->
-    <div id="jp-question-raw" class="jp-hidden"></div>
-    <div id="jp-ai-raw" class="jp-hidden"></div>
 
   </div>
 </section>
 
-<!-- === CSS DAS BARRAS (EMBUTIDO PARA GARANTIR VISUALIZAÇÃO) === -->
+<!-- === ESTILO DAS 3 BARRAS === -->
 <style>
-  /* CONTAINER PRINCIPAL */
-  .progress-container {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    right: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    font-family: 'Cinzel', serif;
-    z-index: 200;
-    pointer-events: none;
+  :root {
+    --gold-gradient: linear-gradient(90deg, #d4af37, #ffd700, #ffcc33);
+    --silver-gradient: linear-gradient(90deg, #d3d3d3, #b0b0b0, #f0f0f0);
   }
 
-  /* BARRAS DE BLOCO E PERGUNTA */
-  .progress-block, .progress-question {
+  /* BLOCO SUPERIOR */
+  .progress-top {
+    position: absolute;
+    top: 20px;
+    left: 5%;
+    width: 90%;
     display: flex;
     align-items: center;
-    gap: 12px;
-    font-size: 0.95rem;
-    color: #d4a574;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    gap: 10px;
+    font-family: 'Cinzel', serif;
+    color: #e8c87d;
+    text-shadow: 0 1px 3px #000;
+    z-index: 100;
+  }
+
+  .progress-label {
+    min-width: 70px;
     font-weight: 600;
   }
 
   .progress-bar {
     flex: 1;
-    height: 7px;
-    background: rgba(0,0,0,0.5);
-    border-radius: 4px;
+    height: 8px;
+    border-radius: 5px;
+    background: rgba(0,0,0,0.4);
     overflow: hidden;
-    border: 1px solid #8b6f47;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.6);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.2);
   }
 
   .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #ffd700, #ffcc33, #ffb84d);
-    border-radius: 4px;
-    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 0 12px rgba(255, 215, 0, 0.8);
+    width: 20%;
+    transition: width 0.6s ease-in-out;
+    border-radius: 5px;
+    box-shadow: 0 0 12px rgba(255,215,0,0.6);
   }
 
+  .progress-bar.gold .progress-fill { background: var(--gold-gradient); }
+  .progress-bar.silver .progress-fill { background: var(--silver-gradient); }
+
   .progress-value {
-    min-width: 60px;
+    min-width: 70px;
     text-align: right;
     font-weight: bold;
     color: #ffd700;
     text-shadow: 0 1px 2px #000;
   }
 
-  /* TOTAL COM AMPULHETA */
-  .progress-total {
-    position: absolute;
-    top: -70px;
-    right: 20px;
+  /* RÉGUA DO MEIO */
+  .progress-middle {
+    margin-top: 12px;
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 1.2rem;
+    font-family: 'Cinzel', serif;
+    color: #c5c5c5;
+    text-shadow: 0 1px 2px #000;
+  }
+
+  /* AMPULHETA */
+  .progress-total {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
     color: #ffd700;
-    font-weight: bold;
+    font-weight: 700;
+    font-size: 1rem;
     text-shadow: 0 1px 3px #000;
   }
 
   .ampulheta {
-    font-size: 1.7rem;
-    animation: sandfall 2.5s infinite linear;
-    filter: drop-shadow(0 0 6px #ffcc00);
+    display: inline-block;
+    animation: spinHourglass 3s infinite linear;
+    filter: drop-shadow(0 0 8px #ffda6b);
   }
 
-  @keyframes sandfall {
+  @keyframes spinHourglass {
     0%, 100% { transform: rotate(0deg); }
     50% { transform: rotate(180deg); }
   }
 
-  /* RESPONSIVO */
   @media (max-width: 480px) {
-    .progress-container { top: 12px; left: 12px; right: 12px; gap: 10px; }
-    .progress-block, .progress-question { font-size: 0.8rem; gap: 8px; }
+    .progress-top { top: 10px; left: 4%; width: 92%; font-size: 0.8rem; }
+    .progress-total { top: 12px; right: 12px; font-size: 0.9rem; }
     .progress-bar { height: 6px; }
-    .progress-total { top: -60px; right: 12px; font-size: 1rem; }
-    .ampulheta { font-size: 1.4rem; }
   }
 </style>
-
-<!-- === VIEWPORT FORÇADO === -->
-<script>
-  (function () {
-    'use strict';
-    if (window.__VIEWPORT_FORCED__) return;
-    window.__VIEWPORT_FORCED__ = true;
-
-    if (!document.querySelector('meta[name="viewport"]')) {
-      const meta = document.createElement('meta');
-      meta.name = 'viewport';
-      meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
-      document.head.appendChild(meta);
-    }
-
-    document.body.style.margin = '0';
-    document.body.style.padding = '0';
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
-    document.addEventListener('gesturestart', e => e.preventDefault());
-  })();
-</script>
