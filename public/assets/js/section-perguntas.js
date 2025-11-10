@@ -233,6 +233,10 @@
 
     setWidth('#jp-block-progress-fill', pctBloco + '%');
     setWidth('#jp-global-progress-fill', pctGlobal + '%');
+    setWidth('#progress-question-fill', pctBloco + '%'); 
+    setText('#progress-question-value', `${State.qIdx + 1} / ${blocoTotal}`);
+    setText('#progress-block-value', `${State.blocoIdx + 1} de ${State.totalBlocks}`);
+    setText('#progress-total-value', `${State.globalIdx + 1} / ${State.totalQuestions}`);
   }
 
   async function typeQuestion(text) {
