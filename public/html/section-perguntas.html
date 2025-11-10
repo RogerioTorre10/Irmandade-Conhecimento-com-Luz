@@ -5,32 +5,50 @@
 <script src="/assets/js/jornada-micro.js"></script>
 <script src="/assets/js/jornada-paper-qa.js"></script>
 
-<section id="section-perguntas"
-  class="section section-perguntas"
-   data-section="perguntas">
-    <div class="perguntas-wrap">
-     <div id="videoOverlay" class="video-overlay" style="display:none;">
+<section id="section-perguntas" class="section section-perguntas" data-section="perguntas">
+  <div class="perguntas-wrap">
+
+    <!-- === VÍDEO DE TRANSIÇÃO === -->
+    <div id="videoOverlay" class="video-overlay" style="display:none;">
       <video id="videoTransicao" playsinline preload="auto" style="max-width:100%;"></video>
-       </div>              
-         
-             <!-- Cabeçalho -->
-            <div class="perguntas-header">
-           <div class="jp-block-label">
-           Bloco <span id="jp-block-num">1</span> de <span id="jp-block-max">5</span>
-         </div>
-        <div class="jp-global-counter">
-        Pergunta <span id="jp-global-current">1</span> / <span id="jp-global-total">50</span>
-      </div>
     </div>
 
-    <!-- Pergaminho -->
+    <!-- === 3 BARRAS DE PROGRESSO (CHIC & ANIMADAS) === -->
+    <div class="progress-container">
+
+      <!-- 1. BLOCO (TOPO) -->
+      <div class="progress-block">
+        <span class="progress-label">Bloco</span>
+        <div class="progress-bar">
+          <div id="progress-block-fill" class="progress-fill" style="width: 20%"></div>
+        </div>
+        <span id="progress-block-value" class="progress-value">1 de 5</span>
+      </div>
+
+      <!-- 2. PERGUNTA DO BLOCO (MEIO) -->
+      <div class="progress-question">
+        <span class="progress-label">Pergunta</span>
+        <div class="progress-bar">
+          <div id="progress-question-fill" class="progress-fill" style="width: 10%"></div>
+        </div>
+        <span id="progress-question-value" class="progress-value">1 / 10</span>
+      </div>
+
+      <!-- 3. TOTAL GERAL (CANTO DIREITO + AMPULHETA) -->
+      <div class="progress-total">
+        <span class="ampulheta">Hourglass</span>
+        <span id="progress-total-value" class="progress-value">1 / 50</span>
+      </div>
+
+    </div>
+
+    <!-- === PERGAMINHO DA PERGUNTA === -->
     <div class="perguntas-pergaminho">
-      <!-- Pergunta com efeito de leitura -->
       <div id="jp-question-typed" class="jp-question-typed" aria-live="polite">
         Carregando pergunta...
       </div>
 
-      <!-- Moldura medieval para resposta -->
+      <!-- === CAIXA DE RESPOSTA === -->
       <div class="jp-answer-frame">
         <div class="jp-answer-bg"></div>
         <textarea id="jp-answer-input"
@@ -39,89 +57,22 @@
                   placeholder="Digite sua resposta com verdade e calma..."></textarea>
       </div>
 
-      <!-- Devolutiva das IAs (mantém oculto por enquanto) -->
+      <!-- === DEVOLUTIVA DA IA (OCULTA) === -->
       <div id="jp-ai-response" class="jp-ai-response" hidden></div>
     </div>
 
-    <!-- Controles -->
+    <!-- === CONTROLES === -->
     <div class="perguntas-controls">
-      <button id="jp-btn-falar" class="btn-perguntas" data-action="start-mic">
-        🎤 Falar
-      </button>
-      <button id="jp-btn-apagar" class="btn-perguntas" data-action="clear">
-        🗑 Apagar
-      </button>
+      <button id="jp-btn-falar" class="btn-perguntas" data-action="start-mic">Microphone Falar</button>
+      <button id="jp-btn-apagar" class="btn-perguntas" data-action="clear">Trash Apagar</button>
       <button id="jp-btn-confirmar" class="btn-perguntas btn-confirm" data-action="confirm">
         Confirmar / Próxima
       </button>
     </div>
 
-    <!-- Progresso -->
-    <div class="perguntas-progress">
-      <div class="jp-block-progress-label">
-        Bloco <span id="jp-block-num-2">1</span> — Pergunta
-        <span id="jp-block-current">1</span>/<span id="jp-block-total">10</span>
-      </div>
-      <div class="jp-block-progress-bar">
-        <div id="jp-block-progress-fill" class="jp-progress-fill"></div>
-      </div>
-
-      <div class="jp-global-progress-label">
-        Total: <span id="jp-global-current-2">1</span>/<span id="jp-global-total-2">50</span>
-      </div>
-      <div class="jp-global-progress-bar">
-        <div id="jp-global-progress-fill" class="jp-progress-fill"></div>
-      </div>
-    </div>
-
-    <!-- Containers invisíveis -->
+    <!-- === DADOS INVISÍVEIS === -->
     <div id="jp-question-raw" class="jp-hidden"></div>
     <div id="jp-ai-raw" class="jp-hidden"></div>
-      
-    <div class="jp-global-progress">
-    <span id="jp-global-current"></span>
-    <div class="jp-progress-track">
-    <div id="jp-global-progress-fill" class="jp-progress-fill"></div>
-  </div>
-  <span id="jp-global-total"></span>
-</div>
 
-<div class="jp-block-progress">
-  <span id="jp-block-current"></span>
-  <div class="jp-progress-track">
-    <div id="jp-block-progress-fill" class="jp-progress-fill"></div>
-  </div>
-  <span id="jp-block-total"></span>
-</div>
-   
   </div>
 </section>
-<script>
-// FORÇA VIEWPORT NO MOBILE (fallback blindado)
-(function () {
-  'use strict';
-  
-  // Só executa uma vez
-  if (window.__VIEWPORT_FORCED__) return;
-  window.__VIEWPORT_FORCED__ = true;
-
-  // Cria meta se não existir
-  if (!document.querySelector('meta[name="viewport"]')) {
-    const meta = document.createElement('meta');
-    meta.name = 'viewport';
-    meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
-    document.head.appendChild(meta);
-    console.log('[VIEWPORT] Meta tag adicionada com sucesso');
-  }
-
-  // Força estilo no body (evita rolagem indesejada)
-  document.body.style.margin = '0';
-  document.body.style.padding = '0';
-  document.body.style.overflow = 'hidden';
-  document.documentElement.style.overflow = 'hidden';
-
-  // Garante que vídeos não forcem fullscreen no iOS
-  document.addEventListener('gesturestart', e => e.preventDefault());
-})();
-</script>
-
