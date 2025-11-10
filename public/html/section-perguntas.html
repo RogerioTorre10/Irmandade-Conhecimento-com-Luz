@@ -71,20 +71,18 @@
   </div>
 </section>
 
-<!-- === ESTILOS FORÇADOS (SOBRESCREVEM TUDO) === -->
+<!-- === ESTILOS LÚDICOS — CARREGADOS POR ÚLTIMO === -->
 <style>
-  /* === FORÇA SOBRE CSS EXTERNO === */
-  #section-perguntas .progress-top,
-  #section-perguntas .progress-total,
-  #section-perguntas .thermometer-container,
-  #section-perguntas .progress-bar,
-  #section-perguntas .progress-fill,
-  #section-perguntas .progress-value {
+  /* === FORÇA TOTAL SOBRE TUDO === */
+  #section-perguntas * {
     all: unset !important;
-    display: revert !important;
   }
 
-  /* === RÉGUA DOS BLOCOS === */
+  #section-perguntas {
+    all: revert !important;
+  }
+
+  /* === RECONSTRÓI DO ZERO === */
   #section-perguntas .progress-top {
     position: absolute !important;
     top: 20px !important;
@@ -96,42 +94,40 @@
     font-family: 'Cinzel', serif !important;
     color: #e8c87d !important;
     text-shadow: 0 1px 3px #000 !important;
-    z-index: 100 !important;
+    z-index: 1000 !important;
   }
 
   #section-perguntas .progress-label {
     min-width: 70px !important;
     font-weight: 600 !important;
+    color: #ffd700 !important;
   }
 
   #section-perguntas .progress-bar.gold {
     flex: 1 !important;
-    height: 10px !important;
-    border-radius: 6px !important;
-    background: rgba(0,0,0,0.5) !important;
+    height: 12px !important;
+    border-radius: 8px !important;
+    background: #1a1a1a !important;
     overflow: hidden !important;
-    box-shadow: inset 0 2px 6px rgba(0,0,0,0.7) !important;
-    border: 1px solid rgba(255,215,0,0.3) !important;
-    position: relative !important;
+    border: 2px solid #b8860b !important;
+    box-shadow: 0 0 15px rgba(255,215,0,0.5) !important;
   }
 
   #progress-block-fill {
     height: 100% !important;
-    width: 20% !important;
-    background: linear-gradient(90deg, #b8860b, #ffd700, #b8860b) !important;
-    border-radius: 6px !important;
+    width: 40% !important;
+    background: linear-gradient(90deg, #b8860b, #ffd700, #ffcc33, #b8860b) !important;
+    border-radius: 8px !important;
     position: relative !important;
     overflow: hidden !important;
-    transform: translateZ(0) !important;
-    will-change: width !important;
   }
 
-  #section-perguntas .glow-line {
+  #progress-block-fill::after {
+    content: '' !important;
     position: absolute !important;
     top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent) !important;
-    animation: shimmer 2.5s infinite !important;
-    pointer-events: none !important;
+    animation: shimmer 2s infinite !important;
   }
 
   /* === AMPULHETA === */
@@ -144,95 +140,61 @@
     gap: 8px !important;
     color: #ffd700 !important;
     font-weight: 700 !important;
-    font-size: 1rem !important;
-    text-shadow: 0 1px 3px #000 !important;
+    font-size: 1.1rem !important;
   }
 
-  #section-perguntas .hourglass-container {
-    position: relative !important;
-    width: 28px !important;
-    height: 38px !important;
-  }
-
-  #section-perguntas .ampulheta {
-    font-size: 28px !important;
+  .ampulheta {
+    font-size: 32px !important;
     animation: spinHourglass 3s infinite linear !important;
-    filter: drop-shadow(0 0 8px #ffda6b) !important;
-    display: block !important;
+    filter: drop-shadow(0 0 10px #ffda6b) !important;
   }
 
   #sand-fill {
     position: absolute !important;
-    bottom: 5px !important;
-    left: 6px !important;
-    width: 16px !important;
-    height: 0% !important;
+    bottom: 6px !important;
+    left: 7px !important;
+    width: 18px !important;
+    height: 28% !important;
     background: linear-gradient(to top, #d4af37, #ffd700) !important;
-    border-radius: 2px !important;
-    transform: translateZ(0) !important;
-    will-change: height !important;
+    border-radius: 3px !important;
   }
 
   /* === TERMÔMETRO === */
-  #section-perguntas .thermometer-container {
+  .thermometer-container {
     display: flex !important;
     align-items: center !important;
     gap: 12px !important;
-    margin: 16px 0 !important;
+    margin: 20px 0 !important;
+    color: #ffd700 !important;
     font-family: 'Cinzel', serif !important;
-    color: #e8c87d !important;
   }
 
-  #section-perguntas .thermometer {
-    position: relative !important;
-    width: 60px !important;
-    height: 180px !important;
-    background: rgba(255,255,255,0.1) !important;
-    border-radius: 30px !important;
+  .thermometer {
+    width: 70px !important;
+    height: 200px !important;
+    background: rgba(0,0,0,0.6) !important;
+    border-radius: 35px !important;
     overflow: hidden !important;
-    border: 3px solid rgba(255,255,255,0.2) !important;
-    box-shadow: 0 0 20px rgba(0, 255, 136, 0.3), inset 0 0 15px rgba(0,0,0,0.5) !important;
+    border: 4px solid #444 !important;
+    box-shadow: 0 0 25px rgba(0,255,136,0.4) !important;
   }
 
   #progress-question-mercury {
-    position: absolute !important;
-    bottom: 0 !important;
-    width: 100% !important;
-    height: 0% !important;
+    height: 30% !important;
     background: linear-gradient(to top, #ff3366, #00ff88) !important;
-    border-radius: 30px !important;
-    transform: translateZ(0) !important;
-    will-change: height !important;
-    box-shadow: 0 0 25px #00ff88 !important;
+    border-radius: 35px !important;
+    box-shadow: 0 0 30px #00ff88 !important;
   }
 
   #question-glow {
-    position: absolute !important;
-    bottom: 0 !important;
-    width: 100% !important;
-    height: 40px !important;
+    height: 50px !important;
     background: radial-gradient(ellipse at center, #00ff8833 0%, transparent 70%) !important;
-    opacity: 0.7 !important;
-    pointer-events: none !important;
+    opacity: 0.8 !important;
   }
 
-  #section-perguntas .marks {
-    position: absolute !important;
-    right: -24px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    height: 160px !important;
-    font-size: 0.7rem !important;
+  .marks span {
+    font-size: 0.8rem !important;
     color: #aaa !important;
-  }
-
-  #section-perguntas .thermo-label {
-    font-weight: 600 !important;
-    color: #ffd700 !important;
-    text-shadow: 0 1px 2px #000 !important;
   }
 
   /* === ANIMAÇÕES === */
@@ -245,44 +207,46 @@
     0%, 100% { transform: rotate(0deg); }
     50% { transform: rotate(180deg); }
   }
-
-  @media (max-width: 480px) {
-    #section-perguntas .progress-top { top: 10px !important; left: 4% !important; width: 92% !important; }
-    #section-perguntas .progress-total { top: 12px !important; right: 12px !important; }
-    #section-perguntas .thermometer { width: 50px !important; height: 150px !important; }
-    #section-perguntas .marks { right: -20px !important; height: 130px !important; font-size: 0.6rem !important; }
-  }
 </style>
 
-<!-- === JS DE PROGRESSO (NÃO TOCA NO DATILOGRAFIA) === -->
+<!-- === SCRIPTS === -->
+<script src="/assets/js/jornada-chama.js"></script>
+<script src="/assets/js/jornada-micro.js"></script>
+<script src="/assets/js/jornada-paper-qa.js"></script>
+
+<!-- === JS DO PROGRESSO === -->
 <script>
   let currentQuestion = 1;
   const totalQuestions = 50;
   const questionsPerBlock = 10;
-  const totalBlocks = 5;
 
   function updateProgress() {
     const blockNum = Math.floor((currentQuestion - 1) / questionsPerBlock) + 1;
     const questionInBlock = ((currentQuestion - 1) % questionsPerBlock) + 1;
     const totalPercent = (currentQuestion / totalQuestions) * 100;
-    const blockPercent = (blockNum / totalBlocks) * 100;
+    const blockPercent = (blockNum / 5) * 100;
     const questionPercent = (questionInBlock / questionsPerBlock) * 100;
 
     requestAnimationFrame(() => {
-      document.getElementById('progress-block-fill').style.width = blockPercent + '%';
-      document.getElementById('progress-block-value').textContent = `${blockNum} de 5`;
+      const fill = document.getElementById('progress-block-fill');
+      if (fill) fill.style福.width = blockPercent + '%';
+      const value = document.getElementById('progress-block-value');
+      if (value) value.textContent = `${blockNum} de 5`;
 
-      document.getElementById('sand-fill').style.height = totalPercent + '%';
-      document.getElementById('progress-total-value').textContent = `${currentQuestion} / 50`;
+      const sand = document.getElementById('sand-fill');
+      if (sand) sand.style.height = totalPercent + '%';
+      const total = document.getElementById('progress-total-value');
+      if (total) total.textContent = `${currentQuestion} / 50`;
 
-      document.getElementById('progress-question-mercury').style.height = questionPercent + '%';
+      const mercury = document.getElementById('progress-question-mercury');
+      if (mercury) mercury.style.height = questionPercent + '%';
       const glow = document.getElementById('question-glow');
-      glow.style.height = (questionPercent > 10 ? 40 : questionPercent * 4) + 'px';
-      document.getElementById('progress-question-value').textContent = questionInBlock;
+      if ( |glow) glow.style.height = (questionPercent > 10 ? 50 : questionPercent * 5) + 'px';
+      const qValue = document.getElementById('progress-question-value');
+      if (qValue) qValue.textContent = questionInBlock;
     });
   }
 
-  // Conecta com seu botão
   document.getElementById('jp-btn-confirmar')?.addEventListener('click', () => {
     if (currentQuestion < totalQuestions) {
       currentQuestion++;
