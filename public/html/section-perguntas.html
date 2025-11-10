@@ -8,74 +8,49 @@
 <section id="section-perguntas" class="section section-perguntas" data-section="perguntas">
   <div class="perguntas-wrap">
 
-    <div class="progress-bar gold">
-     <div id="progress-block-fill" class="progress-fill"></div>
-      </div>
-       <span id="progress-block-value" class="progress-value">1 de 5</span>
-
-    <!-- === VÍDEO DE TRANSIÇÃO === -->
-    <div id="videoOverlay" class="video-overlay" style="display:none;">
-      <video id="videoTransicao" playsinline preload="auto" style="max-width:100%;"></video>
-    </div>
-
-    <!-- === RÉGUA SUPERIOR — BLOCOS (1 a 5) === -->
+    <!-- RÉGUA SUPERIOR — BLOCO (1–5) -->
     <div class="progress-top">
-      <div class="progress-label">Blocos</div>
       <div class="progress-bar gold">
         <div id="progress-block-fill" class="progress-fill"></div>
       </div>
       <span id="progress-block-value" class="progress-value">1 de 5</span>
     </div>
 
-    <!-- === AMPULHETA TOTAL (CANTO DIREITO) === -->
+    <!-- RÉGUA DO MEIO — PERGUNTA DENTRO DO BLOCO (1–10) -->
+    <div class="progress-middle">
+      <div class="progress-bar silver">
+        <div id="progress-question-fill" class="progress-fill"></div>
+      </div>
+      <span id="progress-question-value" class="progress-value">1 / 10</span>
+    </div>
+
+    <!-- AMPULHETA SUPERIOR DIREITA — TOTAL (1–50) -->
     <div class="progress-total">
-      <span class="ampulheta">⏳</span>
+      <img src="/assets/img/ampulheta-icon.png" alt="Ampulheta" class="progress-icon"/>
       <span id="progress-total-value" class="progress-value">1 / 50</span>
     </div>
 
-    <!-- === PERGAMINHO DA PERGUNTA === -->
-    <div class="perguntas-pergaminho">
-      <div id="jp-question-typed" class="jp-question-typed" aria-live="polite">
-        Carregando pergunta...
-      </div>
-
-      <!-- === CAIXA DE RESPOSTA === -->
-      <div class="jp-answer-frame">
-        <div class="jp-answer-bg"></div>
-        <textarea id="jp-answer-input"
-                  class="jp-answer-input"
-                  rows="4"
-                  placeholder="Digite sua resposta com verdade e calma..."></textarea>
-      </div>
-         <div class="progress-bar silver">
-            <div id="progress-question-fill" class="progress-fill"></div>
-            </div>
-           <span id="progress-question-value" class="progress-value">1 / 10</span>
-
-        <!-- === RÉGUA INTERMEDIÁRIA — PERGUNTAS (1 a 10) === -->
-      <div class="progress-middle">
-        <div class="progress-label">Pergunta</div>
-        <div class="progress-bar silver">
-          <div id="progress-question-fill" class="progress-fill"></div>
-        </div>
-        <span id="progress-question-value" class="progress-value">1 / 10</span>
-      </div>
-
-      <!-- === DEVOLUTIVA DA IA (OCULTA) === -->
-      <div id="jp-ai-response" class="jp-ai-response" hidden></div>
+    <!-- CONTEÚDO DA PERGUNTA -->
+    <div class="jp-question-box">
+      <div id="jp-question-typed" class="jp-question-typed"></div>
+      <div id="jp-question-raw" hidden></div>
     </div>
 
-    <!-- === CONTROLES === -->
-    <div class="perguntas-controls">
-      <button id="jp-btn-falar" class="btn-perguntas" data-action="start-mic">🎙️ Falar</button>
-      <button id="jp-btn-apagar" class="btn-perguntas" data-action="clear">🗑️ Apagar</button>
-      <button id="jp-btn-confirmar" class="btn-perguntas btn-confirm" data-action="confirm">
-        ✅ Confirmar / Próxima
-      </button>
+    <!-- CAMPO DE RESPOSTA -->
+    <textarea id="jp-answer-input" class="jp-answer-input" placeholder="Escreva sua resposta..."></textarea>
+
+    <!-- BOTÕES -->
+    <div class="jp-actions">
+      <button id="jp-btn-falar" class="btn btn-light">🎙️ Falar</button>
+      <button id="jp-btn-apagar" class="btn btn-gray">Apagar</button>
+      <button id="jp-btn-confirmar" class="btn btn-gold">Confirmar</button>
     </div>
 
+    <!-- CAIXA DE RESPOSTA DA IA -->
+    <div id="jp-ai-response" class="jp-ai-response" hidden></div>
   </div>
 </section>
+
 
 <!-- === ESTILO DAS 3 BARRAS === -->
 <style>
