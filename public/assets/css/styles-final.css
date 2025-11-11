@@ -12,27 +12,19 @@
 }
 
 .final-pergaminho-wrapper {
-  max-width: 100vw !important;
+  width: 100%; height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 !important;
+  padding: 20px;
   box-sizing: border-box;
-  overflow: hidden !important;
 }
 
-.pergaminho-vertical {  
+.pergaminho-vertical {
   background: center/contain no-repeat;
   background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important;
-  background-size: contain !important;
-  background-repeat: no-repeat !important;
-  background-position: center top !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  box-sizing: border-box !important;
-  overflow: hidden !important;
+  width: 90vw; max-width: 500px;
   height: 90vh; max-height: 800px;
-  margin: 40px auto 80px; 
   padding: 60px 40px;
   border-radius: 20px;
   box-shadow: 0 0 60px rgba(212,175,55,0.8);
@@ -48,12 +40,6 @@
   justify-content: center;
   gap: 20px;
   height: 100%;
-}
-
-  #section-final .final-scroll,
-  #section-final .final-pergaminho {
-  left: auto;
-  right: auto;
 }
 
 .final-title {
@@ -103,26 +89,3 @@
   color: #ffd700;
   border: 1px solid #d4af37;
 }
-const finalCSS = document.createElement('style');
-finalCSS.textContent = `
-  #final-title, #final-message p {
-    opacity: 0;
-    transition: opacity 0.6s ease;
-  }
-  #final-title.typing-active, #final-message p.typing-active {
-    opacity: 1 !important;
-  }
-  .final-acoes button {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.6s ease;
-    pointer-events: none;
-  }
-  .final-acoes button:not(:disabled) {
-    opacity: 1 !important;
-    transform: translateY(0) !important;
-    pointerEvents: auto !important;
-  }
-`;
-document.head.appendChild(finalCSS);
-
