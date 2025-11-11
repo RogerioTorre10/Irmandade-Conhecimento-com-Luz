@@ -49,7 +49,7 @@
 
 /* Pergaminho desta fase */
 .perguntas-pergaminho {
-  margin-top: 10px;
+  margin-top: 12px;
   padding: 12px 10px 10px;
   border-radius: 16px;
   background-image: url('/assets/img/pergaminho-rasgado-horiz.png');
@@ -61,8 +61,8 @@
 /* Pergunta datilografada */
 .jp-question-typed {
   min-height: 42px;
-  margin-bottom: 12px;
-  font-size: 16px;
+  margin-bottom: 14px;
+  font-size: 20px;
   line-height: 1.5;
   color: #2b1403;
   font-weight: 600;
@@ -72,8 +72,8 @@
 .jp-answer-frame {
   position: relative;
   margin-top: 4px;
-  padding: 12px 14px;
-  border-radius: 14px;
+  padding: 10px 12px;
+  border-radius: 12px;
   /* moldura medieval */
   background-image: url('/assets/img/moldura-medieval.png');
   background-size: cover;
