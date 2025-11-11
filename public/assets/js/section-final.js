@@ -300,21 +300,31 @@ async function startFinalSequence() {
 
     // Garante play (mesmo com bloqueio de autoplay)
     const tryPlay = () => {
-      const p = video.play();
-      if (p && typeof p.catch === 'function') {
-        p.catch(() => {
-          const clicker = document.createElement('div');
-          clicker.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99997;';
-          document.body.appendChild(clicker);
-          clicker.click();
-          setTimeout(() => document.body.removeChild(clicker), 100);
-          video.play();
+  const p = video.play();
+  if (p && typeof p.catch === 'function') {
+    p.catch(() => {
+      // Cria um "click fantasma" para desbloquear autoplay
+      const clicker = document.createElement('div');
+      clicker.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99997;opacity:0;';
+      document.body.appendChild(clicker);
+      clicker.click();
+      setTimeout(() => {
+        if (clicker.parentNode) document.body.removeChild(clicker);
+        // Tenta novamente após o click
+        video.play().catch(() => {
+          console.warn('[FINAL] Autoplay bloqueado mesmo após click. Redirecionando...');
+          window.location.href = HOME_URL;
         });
-      }
-    };
-
-    video.onloadeddata = tryPlay;
+      }, 100);
+    });
   }
+};
+
+video.onloadeddata = tryPlay;
+video.onerror = () => {
+  console.error('[FINAL] Erro ao carregar vídeo.');
+  window.location.href = HOME_URL;
+};
 
   // Eventos de clique
   document.addEventListener('click', (e) => {
