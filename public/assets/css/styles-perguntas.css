@@ -49,7 +49,7 @@
 
 /* Pergaminho desta fase */
 .perguntas-pergaminho {
-  margin-top: 4px;
+  margin-top: 10px;
   padding: 12px 10px 10px;
   border-radius: 16px;
   background-image: url('/assets/img/pergaminho-rasgado-horiz.png');
@@ -61,8 +61,8 @@
 /* Pergunta datilografada */
 .jp-question-typed {
   min-height: 42px;
-  margin-bottom: 10px;
-  font-size: 14px;
+  margin-bottom: 12px;
+  font-size: 16px;
   line-height: 1.5;
   color: #2b1403;
   font-weight: 600;
@@ -435,8 +435,8 @@
 /* RÉGUA DO MEIO: Desvendando o Pergaminho (Perguntas 1-10) */
 .progress-middle {
   /* Posicionado dentro do .perguntas-wrap, abaixo do answer-frame */
-  margin-top: 12px;
-  margin-bottom: 8px; /* Espaço antes da devolutiva da IA */
+  margin-top: 26px;
+  margin-bottom: 0; /* Espaço antes da devolutiva da IA */
   display: flex;
   align-items: center;
   gap: 10px;
@@ -466,6 +466,17 @@
   filter: drop-shadow(0 0 8px #ffda6b);
   font-size: 1.2rem;
 }
+.jp-answer-frame .jp-mic {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 26px;
+  height: 26px;
+  z-index: 20;
+  pointer-events: auto !important;
+  cursor: pointer;
+}
+
 
 @keyframes spinHourglass {
   0%, 100% { transform: rotate(0deg); }
