@@ -649,6 +649,34 @@
       log('Reset concluído.');
     }
   };
+  
+  (function () {
+    try {
+    const labelEl = document.querySelector('.jp-block-label');
+    if (!labelEl) return;
+
+    // tenta descobrir o bloco atual (ex.: "2 de 5")
+    const counterEl = document.querySelector('.jp-block-counter');
+    let current = 1;
+    if (counterEl) {
+      const m = counterEl.textContent.match(/(\d+)/);
+      if (m) current = parseInt(m[1], 10) || 1;
+    }
+
+    const nomes = {
+      1: 'O CAMINHO',
+      2: 'A VERDADE',
+      3: 'A VIDA',
+      4: 'A MISSÃO',
+      5: 'A ALIANÇA'
+    };
+
+    const titulo = nomes[current] || 'O CAMINHO';
+    labelEl.textContent = `BLOCO ${current}: ${titulo}`;
+  } catch (e) {
+    console.warn('[PERGUNTAS][BLOCO] Não foi possível ajustar o título dinâmico:', e);
+  }
+})();  
 
   log(MOD, 'carregado');
 })();
