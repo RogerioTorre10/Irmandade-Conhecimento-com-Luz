@@ -485,3 +485,41 @@
 .jp-block-progress {
   display: none !important; /* Desativamos as regras antigas */
 }
+/* Charm visual da barra inline */
+#progress-inline.progress-inline{
+  width: 100%;
+  max-width: 720px;
+  margin: 8px auto 16px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: radial-gradient(circle at top, rgba(255,255,255,0.16), rgba(0,0,0,0.52));
+  box-shadow: 0 0 10px rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  backdrop-filter: blur(4px);
+  z-index: 12;
+}
+
+#progress-inline .inline{
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.9;
+}
+
+#progress-inline .j-progress__fill,
+#progress-inline .progress-bar,
+#progress-inline .j-progress-bar-fill{
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+#progress-inline .j-progress,
+#progress-inline .j-progress-meta{
+  font-size: 10px;
+  opacity: 0.85;
+  white-space: nowrap;
+}
