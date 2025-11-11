@@ -12,18 +12,25 @@
 }
 
 .final-pergaminho-wrapper {
-  width: 100%; height: 100%;
+  max-width: 100vw !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 0 !important;
   box-sizing: border-box;
+  overflow: hidden !important;
 }
 
-.pergaminho-vertical {
+.pergaminho-vertical {  
   background: center/contain no-repeat;
   background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important;
-  width: 90vw; max-width: 540px;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center top !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
   height: 90vh; max-height: 800px;
   margin: 40px auto 80px; 
   padding: 60px 40px;
@@ -118,3 +125,4 @@ finalCSS.textContent = `
   }
 `;
 document.head.appendChild(finalCSS);
+
