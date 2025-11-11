@@ -23,8 +23,9 @@
 .pergaminho-vertical {
   background: center/contain no-repeat;
   background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important;
-  width: 90vw; max-width: 500px;
+  width: 90vw; max-width: 540px;
   height: 90vh; max-height: 800px;
+  margin: 40px auto 80px; 
   padding: 60px 40px;
   border-radius: 20px;
   box-shadow: 0 0 60px rgba(212,175,55,0.8);
@@ -40,6 +41,12 @@
   justify-content: center;
   gap: 20px;
   height: 100%;
+}
+
+  #section-final .final-scroll,
+  #section-final .final-pergaminho {
+  left: auto;
+  right: auto;
 }
 
 .final-title {
