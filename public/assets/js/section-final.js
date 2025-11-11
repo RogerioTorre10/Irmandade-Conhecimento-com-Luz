@@ -298,33 +298,45 @@ async function startFinalSequence() {
       goHome();
     };
 
-    // Garante play (mesmo com bloqueio de autoplay)
-    const tryPlay = () => {
-  const p = video.play();
-  if (p && typeof p.catch === 'function') {
-    p.catch(() => {
-      // Cria um "click fantasma" para desbloquear autoplay
-      const clicker = document.createElement('div');
-      clicker.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99997;opacity:0;';
-      document.body.appendChild(clicker);
-      clicker.click();
-      setTimeout(() => {
-        if (clicker.parentNode) document.body.removeChild(clicker);
-        // Tenta novamente após o click
-        video.play().catch(() => {
-          console.warn('[FINAL] Autoplay bloqueado mesmo após click. Redirecionando...');
-          window.location.href = HOME_URL;
-        });
-      }, 100);
-    });
-  }
-};
+  // FORÇA INÍCIO DA SEQUÊNCIA — INDEPENDENTE DE EVENTOS
+let startAttempts = 0;
+const MAX_ATTEMPTS = 25;
 
-video.onloadeddata = tryPlay;
-video.onerror = () => {
-  console.error('[FINAL] Erro ao carregar vídeo.');
-  window.location.href = HOME_URL;
-};
+function forceStartSequence() {
+  if (started) return;
+
+  const sec = document.getElementById(SECTION_ID);
+  const title = document.getElementById('final-title');
+  const message = document.getElementById('final-message');
+
+  // Verifica se DOM está pronto e elementos estão vazios (prontos para datilografia)
+  if (sec && title && message && title.textContent.trim() === '' && message.textContent.trim() === '') {
+    console.log('[FINAL] DOM pronto — iniciando sequência forçada');
+    startFinalSequence();
+    return;
+  }
+
+  startAttempts++;
+  if (startAttempts < MAX_ATTEMPTS) {
+    setTimeout(forceStartSequence, 200);
+  } else {
+    console.warn('[FINAL] Elementos não encontrados após tentativas. Forçando texto estático.');
+    if (title && message) {
+      title.textContent = 'Gratidão por Caminhar com Luz';
+      message.innerHTML = `
+        <p>Suas respostas foram recebidas com honra pela Irmandade.</p>
+        <p>Você plantou sementes de confiança, coragem e luz.</p>
+        <p>Continue caminhando. A jornada nunca termina.</p>
+        <p>Volte quando precisar reacender a chama.</p>
+        <p class="final-bold">Você é a luz. Você é a mudança.</p>
+      `;
+      document.querySelectorAll('.final-acoes button').forEach(b => b.disabled = false);
+    }
+  }
+}
+
+// INICIA IMEDIATAMENTE APÓS CARREGAR
+setTimeout(forceStartSequence, 150);
 
   // Eventos de clique
   document.addEventListener('click', (e) => {
@@ -342,19 +354,7 @@ video.onerror = () => {
     }
   });
 
-  // Inicialização
-  function tryStart() {
-    if (document.getElementById(SECTION_ID) && !started) {
-      startFinalSequence();
-    }
-  }
-
-  document.addEventListener('section:shown', (e) => {
-    const id = e.detail?.sectionId || e.detail?.id || e.detail;
-    if (id === SECTION_ID) tryStart();
-  });
-
-  document.addEventListener('DOMContentLoaded', tryStart);
+  
 
   // CSS do spinner e transições
   const style = document.createElement('style');
