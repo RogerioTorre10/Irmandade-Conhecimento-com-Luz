@@ -1,4 +1,4 @@
-/* section-final.js — FINAL v1.3 | Vídeo até o fim + borda perfeita */
+/* section-final.js — FINAL v1.1 alinhado com JC.show */
 (function () {
   'use strict';
 
@@ -8,83 +8,33 @@
 
   let isSpeaking = false;
   let started = false;
-  let videoPlaying = false;
 
-  // Utilitário com requestIdleCallback (evita travamento)
-  const sleep = (ms) => new Promise(r => {
-    if ('requestIdleCallback' in window) {
-      requestIdleCallback(() => setTimeout(r, ms), { timeout: ms + 100 });
-    } else {
-      setTimeout(r, ms);
-    }
-  });
+  // Utilitário simples
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-  // Fila de fala (evita sobreposição)
-  const speakQueue = [];
-  let speakingInProgress = false;
-
-  // === FALA SINCRONIZADA: espera o fim antes de continuar ===
-async function speakText(text) {
-  if (!('speechSynthesis' in window) || !text) return Promise.resolve();
-
-  return new Promise((resolve) => {
+  // Leitura em voz alta (sem loop infinito)
+  function speakText(text) {
+    if (!('speechSynthesis' in window) || isSpeaking || !text) return;
+    isSpeaking = true;
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'pt-BR';
     utter.rate = 0.95;
-    utter.volume = 1;
-
-    utter.onend = () => {
-      setTimeout(resolve, 200); // pequena pausa natural
-    };
-    utter.onerror = () => {
-      setTimeout(resolve, 200);
-    };
-
-    speechSynthesis.cancel(); // limpa fila
+    utter.onend = () => { isSpeaking = false; };
     speechSynthesis.speak(utter);
-  });
-}
-
-// === DATILOGRAFIA + VOZ SINCRONIZADA ===
-async function typeAndSpeak(el, text, typeDelay = 35) {
-  if (!el || !text) return;
-
-  el.textContent = '';
-  el.classList.add('typing-active');
-
-  // 1. DIGITA
-  for (let i = 0; i < text.length; i++) {
-    if (typingPaused) {
-      await new Promise(r => setTimeout(r, 100));
-      i--;
-      continue;
-    }
-    el.textContent += text[i];
-    await sleep(typeDelay);
   }
 
-  el.classList.remove('typing-active');
-  el.classList.add('typing-done');
-
-  // 2. SÓ FALA DEPOIS DE TERMINAR DE DIGITAR
-  await speakText(text);
-}
-
-  // Datilografia com pausa ao interagir
-  let typingPaused = false;
+  // Datilografia genérica
   async function typeText(el, text, delay = 35, withVoice = false) {
     if (!el || !text) return;
     el.textContent = '';
     el.classList.add('typing-active');
 
-    if (withVoice) speakText(text);
+    if (withVoice) {
+      // dispara uma vez no começo
+      speakText(text);
+    }
 
     for (let i = 0; i < text.length; i++) {
-      if (typingPaused) {
-        await new Promise(r => setTimeout(r, 100));
-        i--;
-        continue;
-      }
       el.textContent += text[i];
       await sleep(delay);
     }
@@ -93,83 +43,58 @@ async function typeAndSpeak(el, text, typeDelay = 35) {
     el.classList.add('typing-done');
   }
 
-  // Pausa datilografia ao interagir
-  const pauseTyping = () => { typingPaused = true; };
-  const resumeTyping = () => { typingPaused = false; };
-  document.addEventListener('mousedown', pauseTyping);
-  document.addEventListener('touchstart', pauseTyping);
-  document.addEventListener('mouseup', resumeTyping);
-  document.addEventListener('touchend', resumeTyping);
-  document.addEventListener('keydown', resumeTyping);
+  // Sequência final (título + parágrafos)
+  async function startFinalSequence() {
+    if (started) return;
+    started = true;
 
- // === SEQUÊNCIA FINAL: TEXTO INVISÍVEL + BOTÕES SÓ NO FIM ===
-async function startFinalSequence() {
-  if (started) return;
-  started = true;
+    const section = document.getElementById(SECTION_ID);
+    if (!section) {
+      started = false;
+      return;
+    }
 
-  const section = document.getElementById(SECTION_ID);
-  if (!section) {
-    started = false;
-    return;
-  }
+    const titleEl = document.getElementById('final-title');
+    const messageEl = document.getElementById('final-message');
 
-  const titleEl = document.getElementById('final-title');
-  const messageEl = document.getElementById('final-message');
+    if (!titleEl || !messageEl) {
+      console.warn('[FINAL] Elementos de título ou mensagem não encontrados.');
+      return;
+    }
 
-  if (!titleEl || !messageEl) {
-    console.warn('[FINAL] Elementos não encontrados.');
-    return;
-  }
+    // Título
+    await typeText(titleEl, 'Gratidão por Caminhar com Luz', 40, true);
 
-  // === GARANTE QUE BOTÕES ESTÃO DESABILITADOS ===
-  document.querySelectorAll('.final-acoes button').forEach(btn => {
-    btn.disabled = true;
-    btn.style.opacity = '0';
-    btn.style.transform = 'translateY(20px)';
-    btn.style.pointerEvents = 'none';
-  });
+    // Parágrafos
+    const ps = messageEl.querySelectorAll('p');
+    for (const p of ps) {
+      const txt = (p.getAttribute('data-original') || p.textContent || '').trim();
+      if (!p.getAttribute('data-original')) {
+        p.setAttribute('data-original', txt);
+      }
+      await typeText(p, txt, 22, true);
+      await sleep(250);
+    }
 
-  // === 1. TÍTULO ===
-  titleEl.style.opacity = '1';
-  await typeAndSpeak(titleEl, 'Gratidão por Caminhar com Luz', 40);
-  await sleep(800);
-
-  // === 2. PARÁGRAFOS (UM POR VEZ) ===
-  const ps = messageEl.querySelectorAll('p');
-  for (const p of ps) {
-    const txt = p.getAttribute('data-original')?.trim();
-    if (!txt) continue;
-
-    p.textContent = ''; // limpa (nunca teve texto visível)
-    p.style.opacity = '1'; // só agora aparece
-    await typeAndSpeak(p, txt, 22);
-    await sleep(500);
-  }
-
-  // === 3. SÓ AGORA LIBERA OS BOTÕES ===
-  const buttons = document.querySelectorAll('.final-acoes button');
-  buttons.forEach((btn, i) => {
-    setTimeout(() => {
+    // Libera botões
+    document.querySelectorAll('.final-acoes button').forEach(btn => {
       btn.disabled = false;
-      btn.style.opacity = '1';
-      btn.style.transform = 'translateY(0)';
-      btn.style.pointerEvents = 'auto';
-    }, i * 250);
-  });
+    });
 
-  console.log('[FINAL] Jornada completa. Botões liberados com luz!');
-}
+    console.log('[FINAL] Sequência concluída, botões liberados.');
+  }
 
-  // Geração de PDF/HQ
+  // Geração de PDF/HQ (placeholder integrado ao backend)
   async function generateArtifacts() {
     const btn = document.getElementById('btnBaixarPDFHQ');
     if (!btn || btn.dataset.loading === '1') return;
 
     btn.dataset.loading = '1';
-    const original = btn.innerHTML;
-    btn.innerHTML = '<span class="spinner"></span> Gerando sua Jornada...';
+    const original = btn.textContent;
+    btn.textContent = 'Gerando sua Jornada...';
     btn.disabled = true;
 
+    // TODO: substituir pelos dados reais da jornada
     const payload = {
       answers: { teste: 'Resposta de teste' },
       meta: { finishedAt: new Date().toISOString() },
@@ -183,164 +108,87 @@ async function startFinalSequence() {
         body: JSON.stringify(payload)
       });
 
-      if (!res.ok) throw new Error('HTTP ' + res.status);
+      if (!res.ok) {
+        throw new Error('HTTP ' + res.status);
+      }
 
       const data = await res.json().catch(() => ({}));
       let opened = false;
 
-      if (data.pdfUrl) { window.open(data.pdfUrl, '_blank'); opened = true; }
-      if (data.hqUrl) { window.open(data.hqUrl, '_blank'); opened = true; }
+      if (data.pdfUrl) {
+        window.open(data.pdfUrl, '_blank');
+        opened = true;
+      }
+      if (data.hqUrl) {
+        window.open(data.hqUrl, '_blank');
+        opened = true;
+      }
 
       if (!opened) {
-        alert('Jornada finalizada! PDF/HQ em breve...');
+        alert('Sua jornada foi concluída.\nA geração automática de PDF/HQ ainda está em ajuste.');
       }
     } catch (e) {
-      console.error('[FINAL] Erro:', e);
-      alert('Erro temporário. Tente novamente.');
+      console.error('[FINAL] Erro ao gerar artefatos:', e);
+      alert('Erro ao gerar PDF/HQ. Tente novamente em instantes.');
     } finally {
-      btn.innerHTML = original;
+      btn.textContent = original;
       btn.disabled = false;
       btn.dataset.loading = '0';
     }
   }
 
-  // === VÍDEO FINAL: RODA ATÉ O FIM + PREENCHE A BORDA ===
+  // Vídeo final + redirecionamento
   function playFinalVideo() {
-    if (window.__finalVideoRunning || videoPlaying) {
-      window.location.href = HOME_URL;
-      return;
+    let video = document.getElementById('final-video');
+    if (!video) {
+      video = document.createElement('video');
+      video.id = 'final-video';
+      video.playsInline = true;
+      document.body.appendChild(video);
     }
-    window.__finalVideoRunning = true;
-    videoPlaying = true;
 
-    // Contêiner com borda dourada
-    const container = document.createElement('div');
-    container.id = 'final-video-container';
-    container.style.cssText = `
+    video.src = VIDEO_SRC;
+
+    video.style.cssText = `
       position: fixed !important;
-      top: 50% !important; left: 50% !important;
+      top: 50% !important;
+      left: 50% !important;
       transform: translate(-50%, -50%) !important;
-      width: 92vw !important; height: 92vh !important;
-      max-width: 92vw !important; max-height: 92vh !important;
+      width: 92vw !important;
+      height: 92vh !important;
+      max-width: 92vw !important;
+      max-height: 92vh !important;
+      object-fit: contain !important;
       z-index: 99999 !important;
       border: 12px solid #d4af37 !important;
       border-radius: 16px !important;
       box-shadow: 0 0 60px rgba(212,175,55,0.9) !important;
-      overflow: hidden !important;
       background: #000 !important;
-      display: flex !important;
-      justify-content: center !important;
-      align-items: center !important;
-      opacity: 1 !important;
-      transition: opacity 1s ease-out !important;
     `;
 
-    // Vídeo dentro
-    const video = document.createElement('video');
-    video.id = 'final-video';
-    video.src = VIDEO_SRC;
-    video.playsInline = true;
-    video.muted = false;
-    video.preload = 'auto';
-    video.autoplay = true;
-    video.style.cssText = `
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: cover !important;
-      display: block !important;
-    `;
+    document.body.style.overflow = 'hidden';
 
-    container.appendChild(video);
-    document.body.appendChild(container);
+    // Escurece o restante sem destruir a DOM
+    document.querySelectorAll('body > *:not(#final-video)').forEach(el => {
+      if (el.id !== 'final-video') {
+        el.style.opacity = '0';
+        el.style.pointerEvents = 'none';
+      }
+    });
 
-    // Overlay escuro
-    const overlay = document.createElement('div');
-    overlay.id = 'final-video-overlay';
-    overlay.style.cssText = `
-      position: fixed !important;
-      top: 0 !important; left: 0 !important;
-      width: 100vw !important; height: 100vh !important;
-      background: rgba(0,0,0,0.95) !important;
-      z-index: 99998 !important;
-      pointer-events: none !important;
-      opacity: 1 !important;
-      transition: opacity 1s ease-out !important;
-    `;
-    document.body.appendChild(overlay);
-
-    // Redireciona APÓS o fim
-    const goHome = () => {
-      container.style.opacity = '0';
-      overlay.style.opacity = '0';
-      setTimeout(() => {
-        window.location.href = HOME_URL;
-      }, 1100);
-    };
+    video.play().catch(err => {
+      console.error('[FINAL] Erro ao reproduzir vídeo final:', err);
+      window.location.href = HOME_URL;
+    });
 
     video.onended = () => {
-      console.log('[FINAL] Jornada concluída com luz plena.');
-      goHome();
+      window.location.href = HOME_URL;
     };
-
-    // Timeout de segurança (8s)
-    const timeout = setTimeout(() => {
-      console.warn('[FINAL] Timeout: indo pro portal.');
-      goHome();
-    }, 8000);
-
-    video.oncanplaythrough = () => {
-      clearTimeout(timeout);
-      console.log('[FINAL] Vídeo carregado. Rodando até o fim.');
-    };
-
-    video.onerror = () => {
-      clearTimeout(timeout);
-      goHome();
-    };
-
-  // FORÇA INÍCIO DA SEQUÊNCIA — INDEPENDENTE DE EVENTOS
-let startAttempts = 0;
-const MAX_ATTEMPTS = 25;
-
-function forceStartSequence() {
-  if (started) return;
-
-  const sec = document.getElementById(SECTION_ID);
-  const title = document.getElementById('final-title');
-  const message = document.getElementById('final-message');
-
-  // Verifica se DOM está pronto e elementos estão vazios (prontos para datilografia)
-  if (sec && title && message && title.textContent.trim() === '' && message.textContent.trim() === '') {
-    console.log('[FINAL] DOM pronto — iniciando sequência forçada');
-    startFinalSequence();
-    return;
   }
 
-  startAttempts++;
-  if (startAttempts < MAX_ATTEMPTS) {
-    setTimeout(forceStartSequence, 200);
-  } else {
-    console.warn('[FINAL] Elementos não encontrados após tentativas. Forçando texto estático.');
-    if (title && message) {
-      title.textContent = 'Gratidão por Caminhar com Luz';
-      message.innerHTML = `
-        <p>Suas respostas foram recebidas com honra pela Irmandade.</p>
-        <p>Você plantou sementes de confiança, coragem e luz.</p>
-        <p>Continue caminhando. A jornada nunca termina.</p>
-        <p>Volte quando precisar reacender a chama.</p>
-        <p class="final-bold">Você é a luz. Você é a mudança.</p>
-      `;
-      document.querySelectorAll('.final-acoes button').forEach(b => b.disabled = false);
-    }
-  }
-}
-
-// INICIA IMEDIATAMENTE APÓS CARREGAR
-setTimeout(forceStartSequence, 150);
-
-  // Eventos de clique
+  // Clicks globais
   document.addEventListener('click', (e) => {
-    const t = e.target.closest('button') || e.target;
+    const t = e.target;
     if (!t) return;
 
     if (t.id === 'btnBaixarPDFHQ') {
@@ -354,27 +202,24 @@ setTimeout(forceStartSequence, 150);
     }
   });
 
-  
-
-  // CSS do spinner e transições
-  const style = document.createElement('style');
-  style.textContent = `
-    .spinner {
-      display: inline-block;
-      width: 12px; height: 12px;
-      border: 2px solid #d4af37;
-      border-top-color: transparent;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-right: 8px;
-      vertical-align: middle;
+  // Dispara quando a seção final é mostrada pelo controller
+  function tryStart() {
+    const sec = document.getElementById(SECTION_ID);
+    if (sec && !started) {
+      startFinalSequence();
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .final-acoes button:disabled { opacity: 0.6; cursor: not-allowed; }
-    #final-video-container, #final-video-overlay {
-      transition: opacity 1s ease-out !important;
-    }
-  `;
-  document.head.appendChild(style);
+  }
 
+  // Integrar com o evento real do JC.show: "section:shown"
+  document.addEventListener('section:shown', (e) => {
+    const d = e.detail || {};
+    const id = d.sectionId || d.id || d;
+    if (id === SECTION_ID) {
+      console.log('[FINAL] section:shown recebido, iniciando sequência final.');
+      tryStart();
+    }
+  });
+
+  // Fallback: se já estiver na página final direta
+  document.addEventListener('DOMContentLoaded', tryStart);
 })();
