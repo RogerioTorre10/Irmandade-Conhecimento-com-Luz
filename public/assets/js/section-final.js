@@ -1,4 +1,4 @@
-/* section-final.js — FINAL v1.4 | Vídeo até o fim + borda perfeita + CORRIGIDO */
+/* section-final.js — FINAL v1.5 | PERFEITO: VISUAL + LÓGICA + ESTABILIDADE */
 (function () {
   'use strict';
 
@@ -6,20 +6,12 @@
   const VIDEO_SRC = '/assets/videos/filme-5-fim-da-jornada.mp4';
   const HOME_URL = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
 
-  let isSpeaking = false;
   let started = false;
   let videoPlaying = false;
 
-  // Utilitário com requestIdleCallback (evita travamento)
-  const sleep = (ms) => new Promise(r => {
-    if ('requestIdleCallback' in window) {
-      requestIdleCallback(() => setTimeout(r, ms), { timeout: ms + 100 });
-    } else {
-      setTimeout(r, ms);
-    }
-  });
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-  // Fila de fala (evita sobreposição)
+  // Fila de fala
   const speakQueue = [];
   let speakingInProgress = false;
 
@@ -45,7 +37,7 @@
     speakingInProgress = false;
   }
 
-  // Datilografia com pausa ao interagir
+  // Datilografia
   let typingPaused = false;
   async function typeText(el, text, delay = 35, withVoice = false) {
     if (!el || !text) return;
@@ -68,13 +60,12 @@
     el.classList.add('typing-done');
   }
 
-  // === FUNÇÃO CORRIGIDA: typeAndSpeak ===
   async function typeAndSpeak(el, text, delay = 35) {
-    await typeText(el, text, delay, false); // digita
-    await speakText(text);                  // fala depois
+    await typeText(el, text, delay, false);
+    await speakText(text);
   }
 
-  // Pausa datilografia ao interagir
+  // Pausa ao interagir
   const pauseTyping = () => { typingPaused = true; };
   const resumeTyping = () => { typingPaused = false; };
   document.addEventListener('mousedown', pauseTyping);
@@ -83,16 +74,36 @@
   document.addEventListener('touchend', resumeTyping);
   document.addEventListener('keydown', resumeTyping);
 
-  // === SEQUÊNCIA FINAL: TEXTO INVISÍVEL + BOTÕES SÓ NO FIM ===
+  // === FORÇA ESCONDER TUDO ANTES DE COMEÇAR ===
+  function hideAllExceptFinal() {
+    document.querySelectorAll('body > *').forEach(el => {
+      if (el.id !== SECTION_ID && el.id !== 'final-video-container' && el.id !== 'final-video-overlay') {
+        el.style.display = 'none';
+        el.style.opacity = '0';
+        el.style.visibility = 'hidden';
+      }
+    });
+    document.body.style.overflow = 'hidden';
+  }
+
   async function startFinalSequence() {
     if (started) return;
     started = true;
 
     const section = document.getElementById(SECTION_ID);
     if (!section) {
-      started = false;
+      console.warn('[FINAL] Seção não encontrada. Aguardando...');
+      setTimeout(startFinalSequence, 500);
       return;
     }
+
+    // === FORÇA ESCONDER TUDO ===
+    hideAllExceptFinal();
+
+    // Garante que a seção final esteja visível
+    section.style.display = 'flex';
+    section.style.opacity = '1';
+    section.style.zIndex = '99999';
 
     const titleEl = document.getElementById('final-title');
     const messageEl = document.getElementById('final-message');
@@ -102,7 +113,7 @@
       return;
     }
 
-    // === GARANTE QUE BOTÕES ESTÃO DESABILITADOS ===
+    // Desabilita botões
     document.querySelectorAll('.final-acoes button').forEach(btn => {
       btn.disabled = true;
       btn.style.opacity = '0';
@@ -111,24 +122,25 @@
     });
 
     try {
-      // === 1. TÍTULO ===
+      // TÍTULO
       titleEl.style.opacity = '1';
       await typeAndSpeak(titleEl, 'Gratidão por Caminhar com Luz', 40);
       await sleep(800);
 
-      // === 2. PARÁGRAFOS (UM POR VEZ) ===
+      // PARÁGRAFOS
       const ps = messageEl.querySelectorAll('p');
       for (const p of ps) {
-        const txt = p.getAttribute('data-original')?.trim();
-        if (!txt) continue;
-
+        const txt = p.getAttribute('data-original')?.trim() || p.textContent.trim();
+        if (!p.getAttribute('data-original')) {
+          p.setAttribute('data-original', txt);
+        }
         p.textContent = '';
         p.style.opacity = '1';
         await typeAndSpeak(p, txt, 22);
         await sleep(500);
       }
 
-      // === 3. SÓ AGORA LIBERA OS BOTÕES ===
+      // LIBERA BOTÕES
       const buttons = document.querySelectorAll('.final-acoes button');
       buttons.forEach((btn, i) => {
         setTimeout(() => {
@@ -141,7 +153,7 @@
 
       console.log('[FINAL] Jornada completa. Botões liberados com luz!');
     } catch (err) {
-      console.error('[FINAL] Erro na sequência:', err);
+      console.error('[FINAL] Erro:', err);
     }
   }
 
@@ -155,28 +167,21 @@
     btn.innerHTML = '<span class="spinner"></span> Gerando sua Jornada...';
     btn.disabled = true;
 
-    const payload = {
-      answers: { teste: 'Resposta de teste' },
-      meta: { finishedAt: new Date().toISOString() },
-      lang: 'pt-BR'
-    };
-
     try {
       const res = await fetch('https://lumen-backend-api.onrender.com/api/jornada/finalizar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          answers: window.__QA_ANSWERS__ || { teste: 'finalizado' },
+          meta: { finishedAt: new Date().toISOString() },
+          lang: 'pt-BR'
+        })
       });
 
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-
       const data = await res.json().catch(() => ({}));
-      let opened = false;
-
-      if (data.pdfUrl) { window.open(data.pdfUrl, '_blank'); opened = true; }
-      if (data.hqUrl) { window.open(data.hqUrl, '_blank'); opened = true; }
-
-      if (!opened) {
+      if (data.pdfUrl) window.open(data.pdfUrl, '_blank');
+      if (data.hqUrl) window.open(data.hqUrl, '_blank');
+      if (!data.pdfUrl && !data.hqUrl) {
         alert('Jornada finalizada! PDF/HQ em breve...');
       }
     } catch (e) {
@@ -189,166 +194,88 @@
     }
   }
 
-  // === VÍDEO FINAL: RODA ATÉ O FIM + PREENCHE A BORDA ===
+  // Vídeo final com borda perfeita
   function playFinalVideo() {
-    if (window.__finalVideoRunning || videoPlaying) {
-      window.location.href = HOME_URL;
-      return;
-    }
-    window.__finalVideoRunning = true;
+    if (videoPlaying) return;
     videoPlaying = true;
 
-    // Contêiner com borda dourada
     const container = document.createElement('div');
     container.id = 'final-video-container';
     container.style.cssText = `
-      position: fixed !important;
-      top: 50% !important; left: 50% !important;
-      transform: translate(-50%, -50%) !important;
-      width: 92vw !important; height: 92vh !important;
-      max-width: 92vw !important; max-height: 92vh !important;
-      z-index: 99999 !important;
-      border: 12px solid #d4af37 !important;
-      border-radius: 16px !important;
-      box-shadow: 0 0 60px rgba(212,175,55,0.9) !important;
-      overflow: hidden !important;
-      background: #000 !important;
-      display: flex !important;
-      justify-content: center !important;
-      align-items: center !important;
-      opacity: 1 !important;
-      transition: opacity 1s ease-out !important;
+      position: fixed !important; top: 50% !important; left: 50% !important;
+      transform: translate(-50%, -50%) !important; width: 92vw !important; height: 92vh !important;
+      max-width: 92vw !important; max-height: 92vh !important; z-index: 99999 !important;
+      border: 12px solid #d4af37 !important; border-radius: 16px !important;
+      box-shadow: 0 0 60px rgba(212,175,55,0.9) !important; overflow: hidden !important;
+      background: #000 !important; display: flex !important; justify-content: center !important; align-items: center !important;
     `;
 
-    // Vídeo dentro
     const video = document.createElement('video');
     video.id = 'final-video';
     video.src = VIDEO_SRC;
     video.playsInline = true;
-    video.muted = false;
     video.preload = 'auto';
     video.autoplay = true;
-    video.style.cssText = `
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: contain !important;
-      display: block !important;
+    video.style.cssText = `width: 100% !important; height: 100% !important; object-fit: contain !important;`;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'final-video-overlay';
+    overlay.style.cssText = `
+      position: fixed !important; top: 0 !important; left: 0 !important;
+      width: 100vw !important; height: 100vh !important; background: rgba(0,0,0,0.95) !important;
+      z-index: 99998 !important; pointer-events: none !important;
     `;
 
     container.appendChild(video);
     document.body.appendChild(container);
-
-    // Overlay escuro
-    const overlay = document.createElement('div');
-    overlay.id = 'final-video-overlay';
-    overlay.style.cssText = `
-      position: fixed !important;
-      top: 0 !important; left: 0 !important;
-      width: 100vw !important; height: 100vh !important;
-      background: rgba(0,0,0,0.95) !important;
-      z-index: 99998 !important;
-      pointer-events: none !important;
-      opacity: 1 !important;
-      transition: opacity 1s ease-out !important;
-    `;
     document.body.appendChild(overlay);
 
-    // Redireciona APÓS o fim
     const goHome = () => {
       container.style.opacity = '0';
       overlay.style.opacity = '0';
-      setTimeout(() => {
-        window.location.href = HOME_URL;
-      }, 1100);
+      setTimeout(() => window.location.href = HOME_URL, 1100);
     };
 
-    video.onended = () => {
-      console.log('[FINAL] Jornada concluída com luz plena.');
-      goHome();
-    };
-
-    // Timeout de segurança (8s)
-    const timeout = setTimeout(() => {
-      console.warn('[FINAL] Timeout: indo pro portal.');
-      goHome();
-    }, 8000);
-
-    video.oncanplaythrough = () => {
-      clearTimeout(timeout);
-      console.log('[FINAL] Vídeo carregado. Rodando até o fim.');
-    };
-
-    video.onerror = () => {
-      clearTimeout(timeout);
-      goHome();
-    };
-
-    // Garante play (mesmo com bloqueio de autoplay)
-    const tryPlay = () => {
-      const p = video.play();
-      if (p && typeof p.catch === 'function') {
-        p.catch(() => {
-          const clicker = document.createElement('div');
-          clicker.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99997;';
-          document.body.appendChild(clicker);
-          clicker.click();
-          setTimeout(() => document.body.removeChild(clicker), 100);
-          video.play();
-        });
-      }
-    };
-
-    video.onloadeddata = tryPlay;
+    video.onended = goHome;
+    setTimeout(goHome, 8000); // segurança
   }
 
-  // Eventos de clique
+  // Eventos
   document.addEventListener('click', (e) => {
     const t = e.target.closest('button') || e.target;
-    if (!t) return;
-
-    if (t.id === 'btnBaixarPDFHQ') {
-      e.preventDefault();
-      generateArtifacts();
-    }
-
-    if (t.id === 'btnVoltarInicio') {
-      e.preventDefault();
-      playFinalVideo();
-    }
+    if (t.id === 'btnBaixarPDFHQ') { e.preventDefault(); generateArtifacts(); }
+    if (t.id === 'btnVoltarInicio') { e.preventDefault(); playFinalVideo(); }
   });
 
-  // Inicialização
+  // === INICIALIZAÇÃO FORTE: DOM + EVENTO + POLLING ===
   function tryStart() {
-    if (document.getElementById(SECTION_ID) && !started) {
+    if (started) return;
+    const sec = document.getElementById(SECTION_ID);
+    if (sec && sec.offsetParent !== null) {
       startFinalSequence();
+    } else {
+      setTimeout(tryStart, 300);
     }
   }
 
+  // 1. DOM carregado
+  document.addEventListener('DOMContentLoaded', tryStart);
+
+  // 2. Evento do JC (se existir)
   document.addEventListener('section:shown', (e) => {
-    const id = e.detail?.sectionId || e.detail?.id || e.detail;
+    const id = e.detail?.sectionId || e.detail;
     if (id === SECTION_ID) tryStart();
   });
 
-  document.addEventListener('DOMContentLoaded', tryStart);
+  // 3. Polling de segurança
+  setTimeout(tryStart, 1000);
 
-  // CSS do spinner e transições
+  // CSS
   const style = document.createElement('style');
   style.textContent = `
-    .spinner {
-      display: inline-block;
-      width: 12px; height: 12px;
-      border: 2px solid #d4af37;
-      border-top-color: transparent;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-right: 8px;
-      vertical-align: middle;
-    }
+    .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid #d4af37; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .final-acoes button:disabled { opacity: 0.6; cursor: not-allowed; }
-    #final-video-container, #final-video-overlay {
-      transition: opacity 1s ease-out !important;
-    }
+    #section-final { position: fixed !important; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, #1a1a2e, #0a0a1a); }
   `;
   document.head.appendChild(style);
 
