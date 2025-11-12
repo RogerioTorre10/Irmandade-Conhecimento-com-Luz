@@ -1,3 +1,4 @@
+/* styles-final.css */
 #section-final {
   position: fixed;
   top: 0; left: 0;
@@ -7,38 +8,35 @@
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  padding: 25px; /* ← ESPAÇO EXTRA NAS BORDAS */
-  box-sizing: border-box;
   overflow: hidden;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+#section-final.show {
+  opacity: 1;
 }
 
 .final-pergaminho-wrapper {
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
+  box-sizing: border-box;
 }
 
 .pergaminho-vertical {
   background: center/contain no-repeat url('/assets/img/pergaminho-rasgado-vert.png');
-  width: 78vw;           /* MENOR E MAIS SEGURO */
-  max-width: 420px;      /* LIMITE NO DESKTOP */
-  height: 84vh;
-  max-height: 700px;
-  padding: 70px 48px;    /* ESPAÇO INTERNO IDEAL */
-  border-radius: 24px;
-  box-shadow: 0 0 90px rgba(212,175,55,1.1);
+  width: 90vw;
+  max-width: 500px;
+  height: 90vh;
+  max-height: 800px;
+  padding: 60px 40px;
+  border-radius: 20px;
+  box-shadow: 0 0 60px rgba(212,175,55,0.8);
   position: relative;
-  background-color: rgba(245, 235, 200, 0.22);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 0 auto;        /* CENTRALIZA HORIZONTALMENTE */
-  backdrop-filter: blur(1.5px);
-  overflow: hidden;
+  background-color: rgba(245, 235, 200, 0.1);
 }
 
 .pergaminho-content {
@@ -48,41 +46,48 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 26px;
+  gap: 22px;
   height: 100%;
   overflow: hidden;
 }
 
 .final-title {
-  font-size: 2.3em;
-  margin: 0 0 10px 0;
-  line-height: 1.2;
+  font-size: 2.4em;
+  text-shadow: 0 0 20px gold;
+  margin: 0;
+  min-height: 1.2em;
 }
 
 .final-message p {
-  font-size: 1.28em;
-  line-height: 1.7;
-  margin: 8px 0;
+  font-size: 1.3em;
+  line-height: 1.6;
+  margin: 10px 0;
+  text-shadow: 0 0 10px rgba(255,215,0,0.5);
   opacity: 0;
-  visibility: hidden;
-  transform: translateY(15px);
-  transition: all 0.8s ease;
+  transform: translateY(10px);
+  transition: all 0.6s ease;
 }
 
 .final-message p.revealed {
   opacity: 1;
-  visibility: visible;
   transform: translateY(0);
 }
 
+.final-bold {
+  font-weight: bold;
+  font-size: 1.5em !important;
+  color: #ffeb3b;
+}
+
+/* BOTÕES */
 .final-acoes {
-  margin-top: 20px;
+  margin-top: 30px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
   opacity: 0;
   transform: translateY(20px);
-  transition: all 1s ease;
+  transition: all 0.8s ease;
 }
 
 .final-acoes.show {
@@ -90,71 +95,47 @@
   transform: translateY(0);
 }
 
-/* RESPONSIVO */
-@media (max-width: 480px) {
-  .pergaminho-vertical {
-    width: 88vw;
-    max-width: 380px;
-    height: 88vh;
-    max-height: 660px;
-    padding: 55px 35px;
-  }
-  .final-title { font-size: 1.9em; }
-  .final-message p { font-size: 1.15em; line-height: 1.6; }
-}
-
 .btn-gold, .btn-light {
-  padding: 15px 28px;
-  border-radius: 14px;
+  padding: 14px 24px;
+  border-radius: 12px;
   font-weight: bold;
-  font-size: 1.15em;
   border: none;
   cursor: pointer;
-  transition: all 0.4s ease;
-  position: relative;
-  overflow: hidden;
-  z-index: 1;
+  transition: all 0.3s;
+  font-size: 1.1em;
 }
 
 .btn-gold {
-  background: linear-gradient(45deg, #b8860b, #ffd700, #b8860b);
-  background-size: 200% 200%;
+  background: linear-gradient(45deg, #d4af37, #f4e04d);
   color: #000;
-  box-shadow: 
-    0 0 20px rgba(255,215,0,0.6),
-    0 0 40px rgba(255,215,0,0.4),
-    inset 0 0 15px rgba(255,255,255,0.3);
-  text-shadow: 0 0 8px rgba(255,215,0,0.8);
-  animation: goldPulse 3s infinite;
+  box-shadow: 0 0 20px gold;
 }
 
 .btn-gold:hover:not(:disabled) {
-  transform: translateY(-4px) scale(1.03);
-  box-shadow: 
-    0 0 35px gold,
-    0 0 60px rgba(255,215,0,0.8),
-    inset 0 0 20px rgba(255,255,255,0.5);
-  background-position: 100% 0;
+  transform: translateY(-3px);
+  box-shadow: 0 0 30px gold;
 }
 
 .btn-light {
-  background: rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.1);
   color: #ffd700;
-  border: 2px solid #d4af37;
-  backdrop-filter: blur(8px);
-  text-shadow: 0 0 6px rgba(255,215,0,0.6);
+  border: 1px solid #d4af37;
+  backdrop-filter: blur(5px);
 }
 
 .btn-light:hover {
   background: #d4af37;
   color: #000;
-  box-shadow: 0 0 25px rgba(212,175,55,0.8);
-  transform: translateY(-2px);
 }
 
-/* ANIMAÇÃO DE PULSO DOURADO */
-@keyframes goldPulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(255,215,0,0.6), 0 0 40px rgba(255,215,0,0.4); }
-  50% { box-shadow: 0 0 30px gold, 0 0 60px rgba(255,215,0,0.7); }
+/* Responsivo */
+@media (max-width: 480px) {
+  .pergaminho-vertical {
+    padding: 40px 25px;
+    width: 95vw;
+    height: 95vh;
+  }
+  .final-title { font-size: 2em; }
+  .final-message p { font-size: 1.1em; }
+  .final-bold { font-size: 1.3em !important; }
 }
-
