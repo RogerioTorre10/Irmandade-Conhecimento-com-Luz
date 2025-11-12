@@ -65,9 +65,8 @@
   text-shadow: 0 0 10px rgba(255,215,0,0.5);
   opacity: 0;
   visibility: hidden;
-  transform: translateY(10px);
-  transition: all 0.6s ease;
-}
+  transform: translateY(15px);
+  transition: opacity 0.6s ease, transform 0.6s ease, visibility 0.6s;}
 
 .final-message p.revealed {
   opacity: 1;
