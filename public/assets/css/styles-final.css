@@ -3,12 +3,18 @@
   position: fixed;
   top: 0; left: 0;
   width: 100vw; height: 100vh;
-  background: #0a0a1a;
+  background: radial-gradient(circle at center, #1a1a2e, #0a0a1a);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
   overflow: hidden;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+#section-final.show {
+  opacity: 1;
 }
 
 .final-pergaminho-wrapper {
@@ -21,14 +27,16 @@
 }
 
 .pergaminho-vertical {
-  background: center/contain no-repeat;
-  background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important;
-  width: 90vw; max-width: 500px;
-  height: 90vh; max-height: 800px;
+  background: center/contain no-repeat url('/assets/img/pergaminho-rasgado-vert.png');
+  width: 90vw;
+  max-width: 500px;
+  height: 90vh;
+  max-height: 800px;
   padding: 60px 40px;
   border-radius: 20px;
   box-shadow: 0 0 60px rgba(212,175,55,0.8);
   position: relative;
+  background-color: rgba(245, 235, 200, 0.1);
 }
 
 .pergaminho-content {
@@ -38,14 +46,16 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 20px;
+  gap: 22px;
   height: 100%;
+  overflow: hidden;
 }
 
 .final-title {
   font-size: 2.4em;
   text-shadow: 0 0 20px gold;
   margin: 0;
+  min-height: 1.2em;
 }
 
 .final-message p {
@@ -53,6 +63,14 @@
   line-height: 1.6;
   margin: 10px 0;
   text-shadow: 0 0 10px rgba(255,215,0,0.5);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.6s ease;
+}
+
+.final-message p.revealed {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .final-bold {
@@ -67,6 +85,14 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s ease;
+}
+
+.final-acoes.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .btn-gold, .btn-light {
@@ -76,38 +102,40 @@
   border: none;
   cursor: pointer;
   transition: all 0.3s;
+  font-size: 1.1em;
 }
 
 .btn-gold {
-  background: #d4af37;
+  background: linear-gradient(45deg, #d4af37, #f4e04d);
   color: #000;
   box-shadow: 0 0 20px gold;
+}
+
+.btn-gold:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 0 30px gold;
 }
 
 .btn-light {
   background: rgba(255,255,255,0.1);
   color: #ffd700;
   border: 1px solid #d4af37;
+  backdrop-filter: blur(5px);
 }
-const finalCSS = document.createElement('style');
-finalCSS.textContent = `
-  #final-title, #final-message p {
-    opacity: 0;
-    transition: opacity 0.6s ease;
+
+.btn-light:hover {
+  background: #d4af37;
+  color: #000;
+}
+
+/* Responsivo */
+@media (max-width: 480px) {
+  .pergaminho-vertical {
+    padding: 40px 25px;
+    width: 95vw;
+    height: 95vh;
   }
-  #final-title.typing-active, #final-message p.typing-active {
-    opacity: 1 !important;
-  }
-  .final-acoes button {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.6s ease;
-    pointer-events: none;
-  }
-  .final-acoes button:not(:disabled) {
-    opacity: 1 !important;
-    transform: translateY(0) !important;
-    pointerEvents: auto !important;
-  }
-`;
-document.head.appendChild(finalCSS);
+  .final-title { font-size: 2em; }
+  .final-message p { font-size: 1.1em; }
+  .final-bold { font-size: 1.3em !important; }
+}
