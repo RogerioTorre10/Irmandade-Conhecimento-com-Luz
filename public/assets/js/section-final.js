@@ -140,97 +140,105 @@
   }
 
   // === FILME FINAL COM LOADING DOURADO ===
-  function playFinalVideo() {
-    let video = document.getElementById('final-video');
-    if (!video) {
-      video = Object.assign(document.createElement('video'), { 
-        id: 'final-video', 
-        playsInline: true,
-        muted: true
-      });
-      document.body.appendChild(video);
-    }
-
-    video.src = VIDEO_SRC;
-    video.style.cssText = `
-      position: fixed !important; top: 50% !important; left: 50% !important;
-      transform: translate(-50%, -50%) !important; width: 94vw !important; height: 94vh !important;
-      max-width: 94vw !important; max-height: 94vh !important; object-fit: contain !important;
-      z-index: 999999 !important; border: 14px solid #d4af37 !important;
-      border-radius: 20px !important; box-shadow: 0 0 80px rgba(212,175,55,1) !important;
-      background: #000 !important;
-    `;
-
-    document.body.style.overflow = 'hidden';
-    document.querySelectorAll('body > *').forEach(el => {
-      if (el.id !== 'final-video') el.style.opacity = '0';
+ function playFinalVideo() {
+  let video = document.getElementById('final-video');
+  if (!video) {
+    video = Object.assign(document.createElement('video'), { 
+      id: 'final-video', 
+      playsInline: true,
+      muted: false,        // SOM LIGADO (se o usuário já interagiu)
+      preload: 'auto',
+      controls: false
     });
-
-    // LOADING DOURADO
-    const loading = document.createElement('div');
-    loading.id = 'final-video-loading';
-    loading.innerHTML = `
-      <div style="
-        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        color: #ffd700; font-family: 'BerkshireSwash', cursive; font-size: 1.5em;
-        text-align: center; z-index: 9999999; text-shadow: 0 0 20px gold;
-        animation: pulse 2s infinite;
-      ">
-        <div>Carregando a luz final</div>
-        <div style="margin-top: 15px; font-size: 2.2em;">Loading</div>
-      </div>
-      <style>
-        @keyframes pulse { 0%,100% { opacity: 0.7; } 50% { opacity: 1; } }
-      </style>
-    `;
-    document.body.appendChild(loading);
-
-    let hasPlayed = false;
-
-    const startVideo = () => {
-      if (hasPlayed) return;
-      hasPlayed = true;
-      loading.remove();
-      video.play().catch(() => {});
-      video.onended = () => {
-        window.location.href = HOME_URL;
-      };
-    };
-
-    const onCanPlay = () => {
-      console.log('[FILME] Luz carregada → iniciando');
-      video.removeEventListener('canplaythrough', onCanPlay);
-      startVideo();
-    };
-
-    const onError = () => {
-      console.warn('[FILME] A luz está oculta');
-      loading.innerHTML = `
-        <div style="color: #ffd700; font-family: 'BerkshireSwash'; text-shadow: 0 0 15px gold; text-align: center;">
-          A luz está temporariamente oculta.<br><br>
-          <button onclick="window.location.href='${HOME_URL}'" 
-                  style="padding: 14px 28px; background: #d4af37; color: #000; border: none; border-radius: 14px; font-weight: bold; cursor: pointer; font-size: 1.1em;">
-            Voltar ao Portal da Luz
-          </button>
-        </div>
-      `;
-    };
-
-    video.addEventListener('canplaythrough', onCanPlay);
-    video.addEventListener('error', onError);
-
-    video.load();
-
-    // TIMEOUT DE SEGURANÇA
-    setTimeout(() => {
-      if (!hasPlayed) onError();
-    }, 15000);
-
-    // TENTA INICIAR RÁPIDO
-    setTimeout(() => {
-      if (video.readyState >= 3) onCanPlay();
-    }, 500);
+    document.body.appendChild(video);
   }
+
+  // GARANTE O CAMINHO CORRETO
+  const finalVideoSrc = '/assets/videos/filme-5-fim-da-jornada.mp4';
+  console.log('[FILME] Carregando:', finalVideoSrc);
+  video.src = finalVideoSrc;
+
+  // ESTILO VISUAL PERFEITO
+  video.style.cssText = `
+    position: fixed !important; 
+    top: 50% !important; left: 50% !important;
+    transform: translate(-50%, -50%) !important; 
+    width: 96vw !important; height: 96vh !important;
+    max-width: 96vw !important; max-height: 96vh !important; 
+    object-fit: cover !important;
+    z-index: 999999 !important; 
+    border: 16px solid #d4af37 !important;
+    border-radius: 24px !important; 
+    box-shadow: 0 0 100px rgba(212,175,55,1.3) !important;
+    background: #000 !important;
+  `;
+
+  // ESCONDE TUDO
+  document.body.style.overflow = 'hidden';
+  document.querySelectorAll('body > *').forEach(el => {
+    if (el.id !== 'final-video') el.style.opacity = '0';
+  });
+
+  // LOADING DOURADO
+  const loading = document.createElement('div');
+  loading.id = 'final-video-loading';
+  loading.innerHTML = `
+    <div style="
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      color: #ffd700; font-family: 'BerkshireSwash', cursive; font-size: 1.6em;
+      text-align: center; z-index: 9999999; text-shadow: 0 0 25px gold;
+      animation: glow 2s infinite;
+    ">
+      <div>A luz se revela</div>
+      <div style="margin-top: 18px; font-size: 2.4em;">Loading</div>
+    </div>
+    <style>@keyframes glow { 0%,100% { text-shadow: 0 0 20px gold; } 50% { text-shadow: 0 0 40px gold; } }</style>
+  `;
+  document.body.appendChild(loading);
+
+  let hasPlayed = false;
+
+  const startVideo = () => {
+    if (hasPlayed) return;
+    hasPlayed = true;
+    loading.remove();
+    video.muted = false; // SOM LIGADO APÓS INTERAÇÃO
+    video.play().catch(err => {
+      console.warn('[FILME] Erro ao tocar:', err);
+      // fallback: vai pro portal
+      setTimeout(() => window.location.href = HOME_URL, 1000);
+    });
+    video.onended = () => {
+      window.location.href = HOME_URL;
+    };
+  };
+
+  const onCanPlay = () => {
+    console.log('[FILME] Vídeo pronto → iniciando');
+    video.removeEventListener('canplaythrough', onCanPlay);
+    startVideo();
+  };
+
+  const onError = () => {
+    console.warn('[FILME] Falha no carregamento');
+    loading.innerHTML = `
+      <div style="color: #ffd700; font-family: 'BerkshireSwash'; text-shadow: 0 0 20px gold; text-align: center;">
+        A luz está em silêncio.<br><br>
+        <button onclick="window.location.href='${HOME_URL}'" 
+                style="padding: 14px 30px; background: #d4af37; color: #000; border: none; border-radius: 14px; font-weight: bold; cursor: pointer;">
+          Voltar ao Portal
+        </button>
+      </div>
+    `;
+  };
+
+  video.addEventListener('canplaythrough', onCanPlay);
+  video.addEventListener('error', onError);
+  video.load();
+
+  // TIMEOUT DE SEGURANÇA
+  setTimeout(() => !hasPlayed && onError(), 15000);
+}
 
   // === EVENTOS ===
   document.addEventListener('click', (e) => {
