@@ -64,13 +64,12 @@
   margin: 10px 0;
   text-shadow: 0 0 10px rgba(255,215,0,0.5);
   opacity: 0;
-  visibility: hidden;
-  transform: translateY(15px);
-  transition: opacity 0.6s ease, transform 0.6s ease, visibility 0.6s;}
+  transform: translateY(10px);
+  transition: all 0.6s ease;
+}
 
 .final-message p.revealed {
   opacity: 1;
-  visibility: visible;
   transform: translateY(0);
 }
 
@@ -139,12 +138,4 @@
   .final-title { font-size: 2em; }
   .final-message p { font-size: 1.1em; }
   .final-bold { font-size: 1.3em !important; }
-}
-.final-message p.revealed {
-  animation: glow 1.5s ease-out;
-}
-@keyframes glow {
-  0% { text-shadow: 0 0 10px gold; }
-  50% { text-shadow: 0 0 30px gold, 0 0 40px gold; }
-  100% { text-shadow: 0 0 10px rgba(255,215,0,0.5); }
 }
