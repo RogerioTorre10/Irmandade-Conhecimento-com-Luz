@@ -1,44 +1,33 @@
 <link rel="stylesheet" href="/assets/css/style-base.css">
 <link rel="stylesheet" href="/assets/css/brilho-texturas.css">
 <link rel="stylesheet" href="/assets/css/styles-final.css">
-<style>
-    /* FORÇA O PERGAMINHO A APARECER MESMO SEM CSS */
-    #section-final { display: none !important; }
-    #section-final.show { display: flex !important; }
-  </style>
 
-<section id="section-final" class="jornada-container" style="display: none;">
-  <div class="jornada-pergaminho">
-    <h1 id="final-title" class="jornada-title">Gratidão por Caminhar com Luz</h1>
-      
-    <!-- TEXTO DE AGRADECIMENTO -->      
-     <div id="final-message" class="jornada-text">
-      <p data-original="Suas respostas foram recebidas com honra pela Irmandade.">Suas respostas foram recebidas com honra pela Irmandade.</p>
-      <p data-original="Você plantou sementes de confiança, coragem e luz.">Você plantou sementes de confiança, coragem e luz.</p>
-      <p data-original="Continue caminhando. A jornada nunca termina.">Continue caminhando. A jornada nunca termina.</p>
-      <p data-original="Volte quando precisar reacender a chama.">Volte quando precisar reacender a chama.</p>
-      <p data-original="Você é a luz. Você é a mudança." class="final-bold">Você é a luz. Você é a mudança.</p>
-    </div>
+<section id="section-final" class="section section-final" style="display: none;">
+  <div class="final-pergaminho-wrapper">
+    <div class="pergaminho-vertical">
+      <div class="pergaminho-content">
+        
+        <!-- TÍTULO DATILOGRAFADO -->
+        <h1 id="final-title" class="final-title typing-text"></h1>
 
-    <div class="final-acoes">
-      <button id="btnBaixarPDFHQ" class="jornada-btn" disabled>Baixar PDF e HQ</button>
-      <button id="btnVoltarInicio" class="jornada-btn">Voltar ao Início</button>
+        <!-- TEXTO DE AGRADECIMENTO -->
+        <div id="final-message" class="final-message typing-text" data-typing="true">
+          <p data-original="Suas respostas foram recebidas com honra pela Irmandade.">Suas respostas foram recebidas com honra pela Irmandade.</p>
+          <p data-original="Você plantou sementes de confiança, coragem e luz.">Você plantou sementes de confiança, coragem e luz.</p>
+          <p data-original="Continue caminhando. A jornada nunca termina.">Continue caminhando. A jornada nunca termina.</p>
+          <p data-original="Volte quando precisar reacender a chama.">Volte quando precisar reacender a chama.</p>
+          <p class="final-bold" data-original="Você é a luz. Você é a mudança.">Você é a luz. Você é a mudança.</p>
+        </div>
+
+        <!-- AÇÕES -->
+        <div class="final-acoes">
+          <button id="btnBaixarPDFHQ" class="btn btn-gold" disabled>Baixar PDF e HQ</button>
+          <button id="btnVoltarInicio" class="btn btn-light">Voltar ao Início</button>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- VÍDEO FINAL (OCULTO) -->
+  <video id="final-video" playsinline preload="auto" style="display:none;"></video>
 </section>
-
-<!-- JS OBRIGATÓRIO -->
-<script src="/assets/js/section-final.js"></script>
-<script>
-  // FORÇA O INÍCIO APÓS CARREGAR (PARA TESTES)
-  document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-      document.dispatchEvent(new CustomEvent('section:shown', { 
-        detail: { sectionId: 'section-final' } 
-      }));
-    }, 800);
-  });
-</script>
-
-</body>
-</html>
