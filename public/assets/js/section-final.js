@@ -78,45 +78,63 @@
   document.addEventListener('keydown', resumeTyping);
 
   // Sequência final
-  async function startFinalSequence() {
-    if (started) return;
-    started = true;
+  // === SEQUÊNCIA FINAL: TEXTO INVISÍVEL + BOTÕES SÓ NO FIM ===
+async function startFinalSequence() {
+  if (started) return;
+  started = true;
 
-    const section = document.getElementById(SECTION_ID);
-    if (!section) {
-      started = false;
-      return;
-    }
+  const section = document.getElementById(SECTION_ID);
+  if (!section) {
+    started = false;
+    return;
+  }
 
-    const titleEl = document.getElementById('final-title');
-    const messageEl = document.getElementById('final-message');
+  const titleEl = document.getElementById('final-title');
+  const messageEl = document.getElementById('final-message');
 
-    if (!titleEl || !messageEl) {
-      console.warn('[FINAL] Elementos não encontrados.');
-      return;
-    }
+  if (!titleEl || !messageEl) {
+    console.warn('[FINAL] Elementos não encontrados.');
+    return;
+  }
 
-    await typeText(titleEl, 'Gratidão por Caminhar com Luz', 40, true);
-    await sleep(600);
+  // === GARANTE QUE BOTÕES ESTÃO DESABILITADOS ===
+  document.querySelectorAll('.final-acoes button').forEach(btn => {
+    btn.disabled = true;
+    btn.style.opacity = '0';
+    btn.style.transform = 'translateY(20px)';
+    btn.style.pointerEvents = 'none';
+  });
 
-    const ps = messageEl.querySelectorAll('p');
-    for (const p of ps) {
-      const txt = (p.getAttribute('data-original') || p.textContent || '').trim();
-      if (!p.getAttribute('data-original')) {
-        p.setAttribute('data-original', txt);
-      }
-      await typeText(p, txt, 22, true);
-      await sleep(350);
-    }
+  // === 1. TÍTULO ===
+  titleEl.style.opacity = '1';
+  await typeAndSpeak(titleEl, 'Gratidão por Caminhar com Luz', 40);
+  await sleep(800);
 
-    document.querySelectorAll('.final-acoes button').forEach(btn => {
+  // === 2. PARÁGRAFOS (UM POR VEZ) ===
+  const ps = messageEl.querySelectorAll('p');
+  for (const p of ps) {
+    const txt = p.getAttribute('data-original')?.trim();
+    if (!txt) continue;
+
+    p.textContent = ''; // limpa (nunca teve texto visível)
+    p.style.opacity = '1'; // só agora aparece
+    await typeAndSpeak(p, txt, 22);
+    await sleep(500);
+  }
+
+  // === 3. SÓ AGORA LIBERA OS BOTÕES ===
+  const buttons = document.querySelectorAll('.final-acoes button');
+  buttons.forEach((btn, i) => {
+    setTimeout(() => {
       btn.disabled = false;
       btn.style.opacity = '1';
+      btn.style.transform = 'translateY(0)';
       btn.style.pointerEvents = 'auto';
-    });
+    }, i * 250);
+  });
 
-    console.log('[FINAL] Sequência concluída com luz!');
-  }
+  console.log('[FINAL] Jornada completa. Botões liberados com luz!');
+}
 
   // Geração de PDF/HQ
   async function generateArtifacts() {
