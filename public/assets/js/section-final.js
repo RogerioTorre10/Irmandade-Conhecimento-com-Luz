@@ -140,7 +140,7 @@
   }
 
   // === FILME FINAL COM LOADING DOURADO ===
- function playFinalVideo() {
+function playFinalVideo() {
   let video = document.getElementById('final-video');
   if (!video) {
     video = Object.assign(document.createElement('video'), { 
