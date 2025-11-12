@@ -462,6 +462,11 @@
   const finalEl = ensureFinalSectionExists();
   const wrapper = document.getElementById('jornada-content-wrapper');
 
+ function showFinalSection() {
+  const finalEl = ensureFinalSectionExists();
+
+  const wrapper = document.getElementById('jornada-content-wrapper');
+
   // SÓ LIMPA SE AINDA NÃO TIVER A SECTION-FINAL
   if (wrapper && !wrapper.querySelector('#section-final')) {
     wrapper.innerHTML = '';
@@ -473,10 +478,13 @@
     window.JC.show(FINAL_SECTION_ID);
   } else {
     document.querySelectorAll('section.section').forEach(sec => {
-      sec.style.display = sec.id === FINAL_SECTION_ID ? 'block' : 'none';
+      sec.style.display = sec.id === FINAL_SECTION_ID ? 'flex' : 'none';
     });
+    finalEl.scrollIntoView({ behavior: 'smooth' });
   }
 
+  log('section-final exibida com segurança (fallback inteligente)');
+}
   // FORÇA O EVENTO PARA INICIAR A DIGITAÇÃO
   setTimeout(() => {
     document.dispatchEvent(new CustomEvent('section:shown', {
