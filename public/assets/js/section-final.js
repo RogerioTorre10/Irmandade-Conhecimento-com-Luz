@@ -167,5 +167,14 @@
     const sec = document.getElementById(SECTION_ID);
     if (sec && sec.style.display !== 'none') startFinalSequence();
   });
+  
+ // FORÇA INÍCIO SE A SEÇÃO JÁ ESTIVER VISÍVEL
+  setTimeout(() => {
+   const sec = document.getElementById('section-final');
+   if (sec && !sec.classList.contains('sequence-started')) {
+     sec.classList.add('sequence-started');
+     startFinalSequence();
+   }
+ }, 500);  
 
 })();
