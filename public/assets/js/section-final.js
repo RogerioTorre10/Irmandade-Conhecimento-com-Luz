@@ -73,7 +73,6 @@
   await typeText(titleEl, 'Gratidão por Caminhar com Luz', 45, true);
   await sleep(600);
 
-  // PARÁGRAFOS
  // PARÁGRAFOS
 const ps = messageEl.querySelectorAll('p');
 for (let i = 0; i < ps.length; i++) {
