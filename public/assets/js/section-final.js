@@ -24,22 +24,22 @@
     speechSynthesis.speak(utter);
   }
 
-  async function typeText(el, text, delay = 35, withVoice = false) {
-    if (!el || !text) return;
-    el.textContent = '';
-    el.classList.add('typing-active');
+ async function typeText(el, text, delay = 35, withVoice = false) {
+  if (!el || !text) return;
+  el.textContent = '';
+  el.classList.add('typing-active');
 
-    if (withVoice) speakText(text);
+  if (withVoice) speakText(text);
 
-    for (let i = 0; i < text.length; i++) {
-      el.textContent += text[i];
-      if (i % 3 === 0) await sleep(delay);
-    }
-
-    el.classList.remove('typing-active');
-    el.classList.add('typing-done');
-    return sleep(100);
+  for (let i = 0; i < text.length; i++) {
+    el.textContent += text[i];
+    if (i % 3 === 0) await sleep(delay);
   }
+
+  el.classList.remove('typing-active');
+  el.classList.add('typing-done');
+  return sleep(100);
+}
 
   async function startFinalSequence() {
   if (started) return;
