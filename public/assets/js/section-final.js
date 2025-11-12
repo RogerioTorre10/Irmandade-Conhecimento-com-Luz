@@ -1,4 +1,4 @@
-/* section-final.js — FINAL v1.3 | Vídeo até o fim + borda perfeita */
+/* section-final.js — FINAL v1.4 | Vídeo até o fim + borda perfeita + CORRIGIDO */
 (function () {
   'use strict';
 
@@ -68,6 +68,12 @@
     el.classList.add('typing-done');
   }
 
+  // === FUNÇÃO CORRIGIDA: typeAndSpeak ===
+  async function typeAndSpeak(el, text, delay = 35) {
+    await typeText(el, text, delay, false); // digita
+    await speakText(text);                  // fala depois
+  }
+
   // Pausa datilografia ao interagir
   const pauseTyping = () => { typingPaused = true; };
   const resumeTyping = () => { typingPaused = false; };
@@ -77,64 +83,67 @@
   document.addEventListener('touchend', resumeTyping);
   document.addEventListener('keydown', resumeTyping);
 
-  // Sequência final
   // === SEQUÊNCIA FINAL: TEXTO INVISÍVEL + BOTÕES SÓ NO FIM ===
-async function startFinalSequence() {
-  if (started) return;
-  started = true;
+  async function startFinalSequence() {
+    if (started) return;
+    started = true;
 
-  const section = document.getElementById(SECTION_ID);
-  if (!section) {
-    started = false;
-    return;
+    const section = document.getElementById(SECTION_ID);
+    if (!section) {
+      started = false;
+      return;
+    }
+
+    const titleEl = document.getElementById('final-title');
+    const messageEl = document.getElementById('final-message');
+
+    if (!titleEl || !messageEl) {
+      console.warn('[FINAL] Elementos não encontrados.');
+      return;
+    }
+
+    // === GARANTE QUE BOTÕES ESTÃO DESABILITADOS ===
+    document.querySelectorAll('.final-acoes button').forEach(btn => {
+      btn.disabled = true;
+      btn.style.opacity = '0';
+      btn.style.transform = 'translateY(20px)';
+      btn.style.pointerEvents = 'none';
+    });
+
+    try {
+      // === 1. TÍTULO ===
+      titleEl.style.opacity = '1';
+      await typeAndSpeak(titleEl, 'Gratidão por Caminhar com Luz', 40);
+      await sleep(800);
+
+      // === 2. PARÁGRAFOS (UM POR VEZ) ===
+      const ps = messageEl.querySelectorAll('p');
+      for (const p of ps) {
+        const txt = p.getAttribute('data-original')?.trim();
+        if (!txt) continue;
+
+        p.textContent = '';
+        p.style.opacity = '1';
+        await typeAndSpeak(p, txt, 22);
+        await sleep(500);
+      }
+
+      // === 3. SÓ AGORA LIBERA OS BOTÕES ===
+      const buttons = document.querySelectorAll('.final-acoes button');
+      buttons.forEach((btn, i) => {
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.style.opacity = '1';
+          btn.style.transform = 'translateY(0)';
+          btn.style.pointerEvents = 'auto';
+        }, i * 250);
+      });
+
+      console.log('[FINAL] Jornada completa. Botões liberados com luz!');
+    } catch (err) {
+      console.error('[FINAL] Erro na sequência:', err);
+    }
   }
-
-  const titleEl = document.getElementById('final-title');
-  const messageEl = document.getElementById('final-message');
-
-  if (!titleEl || !messageEl) {
-    console.warn('[FINAL] Elementos não encontrados.');
-    return;
-  }
-
-  // === GARANTE QUE BOTÕES ESTÃO DESABILITADOS ===
-  document.querySelectorAll('.final-acoes button').forEach(btn => {
-    btn.disabled = true;
-    btn.style.opacity = '0';
-    btn.style.transform = 'translateY(20px)';
-    btn.style.pointerEvents = 'none';
-  });
-
-  // === 1. TÍTULO ===
-  titleEl.style.opacity = '1';
-  await typeAndSpeak(titleEl, 'Gratidão por Caminhar com Luz', 40);
-  await sleep(800);
-
-  // === 2. PARÁGRAFOS (UM POR VEZ) ===
-  const ps = messageEl.querySelectorAll('p');
-  for (const p of ps) {
-    const txt = p.getAttribute('data-original')?.trim();
-    if (!txt) continue;
-
-    p.textContent = ''; // limpa (nunca teve texto visível)
-    p.style.opacity = '1'; // só agora aparece
-    await typeAndSpeak(p, txt, 22);
-    await sleep(500);
-  }
-
-  // === 3. SÓ AGORA LIBERA OS BOTÕES ===
-  const buttons = document.querySelectorAll('.final-acoes button');
-  buttons.forEach((btn, i) => {
-    setTimeout(() => {
-      btn.disabled = false;
-      btn.style.opacity = '1';
-      btn.style.transform = 'translateY(0)';
-      btn.style.pointerEvents = 'auto';
-    }, i * 250);
-  });
-
-  console.log('[FINAL] Jornada completa. Botões liberados com luz!');
-}
 
   // Geração de PDF/HQ
   async function generateArtifacts() {
@@ -222,7 +231,7 @@ async function startFinalSequence() {
     video.style.cssText = `
       width: 100% !important;
       height: 100% !important;
-      object-fit: cover !important;
+      object-fit: contain !important;
       display: block !important;
     `;
 
