@@ -1,4 +1,4 @@
-/* section-final.js — FINAL v1.6 | TUDO FUNCIONA + PERGAMINHO VISÍVEL */
+/* section-final.js — FINAL v1.7 | VISÍVEL, COM CSS FORÇADO */
 (function () {
   'use strict';
 
@@ -11,11 +11,18 @@
 
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-  // === CSS FORÇADO (GARANTE VISUAL) ===
-  const injectCSS = () => {
+  // === INJETA CSS FORÇADO (GARANTE VISUAL) ===
+  const injectCriticalCSS = () => {
+    const existing = document.getElementById('final-critical-css');
+    if (existing) return;
+
     const style = document.createElement('style');
-    style.id = 'section-final-forced-css';
+    style.id = 'final-critical-css';
     style.textContent = `
+      /* FUNDO ESCURO */
+      body, html { background: #000 !important; margin:0; padding:0; overflow:hidden; }
+
+      /* SECTION FINAL */
       #${SECTION_ID} {
         position: fixed !important;
         top: 0 !important; left: 0 !important;
@@ -26,33 +33,41 @@
         justify-content: center !important;
         z-index: 99999 !important;
         opacity: 1 !important;
-        overflow: hidden !important;
+        font-family: 'BerkshireSwash', cursive !important;
       }
+
+      /* PERGAMINHO */
       .pergaminho-vertical {
         background: center/contain no-repeat url('/assets/img/pergaminho-rasgado-vert.png') !important;
-        width: 90vw !important; max-width: 560px !important;
-        height: 92vh !important; max-height: 860px !important;
+        background-color: rgba(245,235,200,0.1) !important;
+        width: 90vw !important;
+        max-width: 560px !important;
+        height: 92vh !important;
+        max-height: 860px !important;
         padding: 60px 40px !important;
         border-radius: 20px !important;
         box-shadow: 0 0 60px rgba(212,175,55,0.8) !important;
-        position: relative !important;
-        background-color: rgba(245,235,200,0.1) !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
+        text-align: center !important;
+        color: #ffd700 !important;
       }
-      .final-title {
+
+      /* TÍTULO */
+      #final-title {
         font-size: 2.4em !important;
         text-shadow: 0 0 20px gold !important;
-        color: #ffd700 !important;
-        font-family: 'BerkshireSwash', cursive !important;
-        text-align: center !important;
+        margin: 0 0 20px 0 !important;
         opacity: 0;
+        transition: opacity 0.6s ease;
       }
+
+      /* PARÁGRAFOS */
       .final-message p {
         font-size: 1.3em !important;
         line-height: 1.6 !important;
-        color: #ffd700 !important;
+        margin: 12px 0 !important;
         text-shadow: 0 0 10px rgba(255,215,0,0.5) !important;
         opacity: 0;
         transform: translateY(10px);
@@ -62,6 +77,8 @@
         opacity: 1 !important;
         transform: translateY(0) !important;
       }
+
+      /* BOTÕES */
       .final-acoes {
         margin-top: 30px !important;
         display: flex !important;
@@ -75,14 +92,16 @@
         opacity: 1 !important;
         transform: translateY(0) !important;
       }
+
+      /* ESTILO DOS BOTÕES */
       .btn-gold, .btn-light {
         padding: 14px 24px !important;
         border-radius: 12px !important;
         font-weight: bold !important;
-        border: none !important;
-        cursor: pointer !important;
         font-size: 1.1em !important;
+        cursor: pointer !important;
         transition: all 0.3s !important;
+        border: none !important;
       }
       .btn-gold {
         background: linear-gradient(45deg, #d4af37, #f4e04d) !important;
@@ -95,17 +114,17 @@
         border: 1px solid #d4af37 !important;
         backdrop-filter: blur(5px) !important;
       }
+
+      /* SPINNER */
       .spinner {
         display: inline-block; width: 12px; height: 12px;
         border: 2px solid #d4af37; border-top-color: transparent;
         border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px;
       }
       @keyframes spin { to { transform: rotate(360deg); } }
-      #final-video-container, #final-video-overlay {
-        transition: opacity 1s ease-out !important;
-      }
     `;
     document.head.appendChild(style);
+    console.log('[FINAL] CSS crítico injetado com sucesso!');
   };
 
   // === FALA ===
@@ -153,20 +172,18 @@
     await speakText(text);
   }
 
-  const pauseTyping = () => { typingPaused = true; };
-  const resumeTyping = () => { typingPaused = false; };
-  ['mousedown', 'touchstart'].forEach(ev => document.addEventListener(ev, pauseTyping));
-  ['mouseup', 'touchend', 'keydown'].forEach(ev => document.addEventListener(ev, resumeTyping));
+  // === PAUSA AO INTERAGIR ===
+  ['mousedown', 'touchstart'].forEach(ev => document.addEventListener(ev, () => typingPaused = true));
+  ['mouseup', 'touchend', 'keydown'].forEach(ev => document.addEventListener(ev, () => typingPaused = false));
 
   // === ESCONDE TUDO ===
-  function hideAllExceptFinal() {
+  const hideAll = () => {
     document.querySelectorAll('body > *').forEach(el => {
       if (!['section-final', 'final-video-container', 'final-video-overlay'].includes(el.id)) {
         el.style.display = 'none';
       }
     });
-    document.body.style.overflow = 'hidden';
-  }
+  };
 
   // === SEQUÊNCIA FINAL ===
   async function startFinalSequence() {
@@ -175,41 +192,47 @@
 
     const section = document.getElementById(SECTION_ID);
     if (!section) {
+      console.warn('[FINAL] #section-final não encontrado. Tentando novamente...');
       setTimeout(startFinalSequence, 500);
       return;
     }
 
-    injectCSS(); // FORÇA O CSS
-    hideAllExceptFinal();
+    console.log('[FINAL] #section-final encontrado! Iniciando...');
+    injectCriticalCSS();
+    hideAll();
 
-    section.style.display = 'flex';
-    section.style.opacity = '1';
+    // FORÇA VISIBILIDADE
+    section.style.cssText = 'display:flex !important; opacity:1 !important; z-index:99999 !important;';
 
     const titleEl = document.getElementById('final-title');
     const messageEl = document.getElementById('final-message');
 
     if (!titleEl || !messageEl) {
-      console.warn('[FINAL] Elementos não encontrados.');
+      console.error('[FINAL] Elementos #final-title ou .final-message não encontrados!');
       return;
     }
 
-    // Botões
+    // Desabilita botões
     document.querySelectorAll('.final-acoes button').forEach(btn => {
       btn.disabled = true;
       btn.style.opacity = '0';
       btn.style.transform = 'translateY(20px)';
-      btn.style.pointerEvents = 'none';
     });
 
     try {
+      // TÍTULO
       titleEl.style.opacity = '1';
       await typeAndSpeak(titleEl, 'Gratidão por Caminhar com Luz', 40);
       await sleep(800);
 
+      // PARÁGRAFOS
       const ps = messageEl.querySelectorAll('p');
       for (const p of ps) {
-        const txt = p.getAttribute('data-original')?.trim() || p.textContent.trim();
-        if (!p.getAttribute('data-original')) p.setAttribute('data-original', txt);
+        let txt = p.getAttribute('data-original');
+        if (!txt) {
+          txt = p.textContent.trim();
+          p.setAttribute('data-original', txt);
+        }
         p.textContent = '';
         p.style.opacity = '1';
         await typeAndSpeak(p, txt, 22);
@@ -217,8 +240,11 @@
         await sleep(500);
       }
 
-      const buttons = document.querySelectorAll('.final-acoes button');
-      buttons.forEach((btn, i) => {
+      // LIBERA BOTÕES
+      const acoes = document.querySelector('.final-acoes');
+      if (acoes) acoes.classList.add('show');
+
+      document.querySelectorAll('.final-acoes button').forEach((btn, i) => {
         setTimeout(() => {
           btn.disabled = false;
           btn.style.opacity = '1';
@@ -227,12 +253,9 @@
         }, i * 250);
       });
 
-      const acoes = document.querySelector('.final-acoes');
-      if (acoes) acoes.classList.add('show');
-
       console.log('[FINAL] Jornada completa. Botões liberados com luz!');
     } catch (err) {
-      console.error('[FINAL] Erro:', err);
+      console.error('[FINAL] Erro na sequência:', err);
     }
   }
 
@@ -244,7 +267,6 @@
     const original = btn.innerHTML;
     btn.innerHTML = '<span class="spinner"></span> Gerando...';
     btn.disabled = true;
-
     try {
       const res = await fetch('https://lumen-backend-api.onrender.com/api/jornada/finalizar', {
         method: 'POST',
@@ -271,18 +293,15 @@
   function playFinalVideo() {
     if (videoPlaying) return;
     videoPlaying = true;
-
     const container = Object.assign(document.createElement('div'), { id: 'final-video-container' });
-    container.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:92vw;height:92vh;max-width:92vw;max-height:92vh;z-index:99999;border:12px solid #d4af37;border-radius:16px;box-shadow:0 0 60px rgba(212,175,55,0.9);overflow:hidden;background:#000;display:flex;justify-content:center;align-items:center;`;
-    const video = Object.assign(document.createElement('video'), { id: 'final-video', src: VIDEO_SRC, playsInline: true, preload: 'auto', autoplay: true });
+    container.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:92vw;height:92vh;z-index:99999;border:12px solid #d4af37;border-radius:16px;box-shadow:0 0 60px rgba(212,175,55,0.9);overflow:hidden;background:#000;display:flex;justify-content:center;align-items:center;`;
+    const video = Object.assign(document.createElement('video'), { src: VIDEO_SRC, playsInline: true, preload: 'auto', autoplay: true });
     video.style.cssText = `width:100%;height:100%;object-fit:contain;`;
     const overlay = Object.assign(document.createElement('div'), { id: 'final-video-overlay' });
     overlay.style.cssText = `position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.95);z-index:99998;`;
-
     container.appendChild(video);
     document.body.appendChild(container);
     document.body.appendChild(overlay);
-
     const goHome = () => {
       container.style.opacity = '0';
       overlay.style.opacity = '0';
@@ -303,9 +322,11 @@
   const tryStart = () => {
     if (started) return;
     const sec = document.getElementById(SECTION_ID);
-    if (sec && sec.offsetParent !== null) {
+    if (sec) {
+      console.log('[FINAL] Seção encontrada! Iniciando sequência...');
       startFinalSequence();
     } else {
+      console.log('[FINAL] Aguardando #section-final...');
       setTimeout(tryStart, 300);
     }
   };
