@@ -74,17 +74,29 @@
   await sleep(600);
 
   // PARÁGRAFOS
-  const ps = messageEl.querySelectorAll('p');
-  for (let i = 0; i < ps.length; i++) {
-    const p = ps[i];
-    const txt = p.getAttribute('data-original') || p.textContent.trim();
-    if (!p.getAttribute('data-original')) {
-      p.setAttribute('data-original', txt);
-    }
-    await typeText(p, txt, 25, true);  // <-- AQUI ESTAVA O ERRO: typeAndSpeak
-    p.classList.add('revealed');
-    await sleep(300);
+ // PARÁGRAFOS
+const ps = messageEl.querySelectorAll('p');
+for (let i = 0; i < ps.length; i++) {
+  const p = ps[i];
+  const txt = p.getAttribute('data-original')?.trim();
+  if (!txt) continue;
+
+  p.textContent = '';
+  p.classList.remove('revealed');
+
+  await sleep(500); // pausa entre parágrafos
+
+  await typeText(p, txt, 65, true);  // 65ms = ritmo perfeito
+
+  p.classList.add('revealed');
+
+  // Pausa maior após frases importantes
+  if (txt.includes('Você é a luz')) {
+    await sleep(1200);
+  } else {
+    await sleep(800);
   }
+}
 
   // LIBERA BOTÕES
   if (botoes) {
