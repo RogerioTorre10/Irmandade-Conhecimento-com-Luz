@@ -42,40 +42,47 @@
   }
 
   async function startFinalSequence() {
-    if (started) return;
-    started = true;
+  if (started) return;
+  started = true;
 
-    const section = document.getElementById(SECTION_ID);
-    if (!section) return;
+  const section = document.getElementById(SECTION_ID);
+  if (!section) return;
 
-    section.classList.add('show');
+  section.classList.add('show');
 
-    const titleEl = document.getElementById('final-title');
-    const messageEl = document.getElementById('final-message');
-    const botoes = document.querySelector('.final-acoes');
+  const titleEl = document.getElementById('final-title');
+  const messageEl = document.getElementById('final-message');
+  const botoes = document.querySelector('.final-acoes');
 
-    if (!titleEl || !messageEl) return;
+  if (!titleEl || !messageEl) return;
 
-    // Título
-    await typeText(titleEl, 'Gratidão por Caminhar com Luz', 45, true);
-    await sleep(600);
+  // TÍTULO
+  await typeText(titleEl, 'Gratidão por Caminhar com Luz', 45, true);
+  await sleep(600);
 
-    // Parágrafos com reveal
-    const ps = messageEl.querySelectorAll('p');
-    for (let i = 0; i < ps.length; i++) {
-      const p = ps[i];
-      const txt = p.getAttribute('data-original') || p.textContent.trim();
-      await typeText(p, txt, 25, true);
-      p.classList.add('revealed');
-      await sleep(300);
+  // PARÁGRAFOS
+  const ps = messageEl.querySelectorAll('p');
+  for (let i = 0; i < ps.length; i++) {
+    const p = ps[i];
+    const txt = p.getAttribute('data-original') || p.textContent.trim();
+    if (!p.getAttribute('data-original')) {
+      p.setAttribute('data-original', txt);
     }
+    await typeText(p, txt, 25, true);  // <-- AQUI ESTAVA O ERRO: typeAndSpeak
+    p.classList.add('revealed');
+    await sleep(300);
+  }
 
-    // Libera botões com animação
+  // LIBERA BOTÕES
+  if (botoes) {
     botoes.classList.add('show');
     document.querySelectorAll('.final-acoes button').forEach(btn => {
       btn.disabled = false;
     });
   }
+
+  console.log('[FINAL] Sequência concluída com sucesso!');
+}
 
   async function generateArtifacts() {
     const btn = document.getElementById('btnBaixarPDFHQ');
