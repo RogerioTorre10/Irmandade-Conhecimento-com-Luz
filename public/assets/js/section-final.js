@@ -23,90 +23,59 @@
     speechSynthesis.cancel();
     speechSynthesis.speak(utter);
   }
- 
-async function typeText(el, text, delay = 60, withVoice = false) {
-  if (!el || !text) return;
-  el.textContent = '';
-  el.style.opacity = '0';
-  el.classList.add('typing-active');
 
-  // Revela o elemento suavemente
-  setTimeout(() => { el.style.opacity = '1'; el.style.transition = 'opacity 0.6s ease'; }, 100);
+  async function typeText(el, text, delay = 35, withVoice = false) {
+    if (!el || !text) return;
+    el.textContent = '';
+    el.classList.add('typing-active');
 
-  if (withVoice) {
-    // Fala mais devagar e com pausas
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = 'pt-BR';
-    utter.rate = 0.8;
-    utter.pitch = 1.1;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(utter);
+    if (withVoice) speakText(text);
+
+    for (let i = 0; i < text.length; i++) {
+      el.textContent += text[i];
+      if (i % 3 === 0) await sleep(delay);
+    }
+
+    el.classList.remove('typing-active');
+    el.classList.add('typing-done');
+    return sleep(100);
   }
 
-  for (let i = 0; i < text.length; i++) {
-    el.textContent += text[i];
-    if (i % 2 === 0) await sleep(delay); // Mais lento = mais impacto
-  }
+  async function startFinalSequence() {
+    if (started) return;
+    started = true;
 
-  el.classList.remove('typing-active');
-  el.classList.add('typing-done');
-  return sleep(400);
-}
+    const section = document.getElementById(SECTION_ID);
+    if (!section) return;
 
-// === SUBSTITUA startFinalSequence POR ESTA (COM REVEAL + PAUSAS) ===
-async function startFinalSequence() {
-  if (started) return;
-  started = true;
+    section.classList.add('show');
 
-  const section = document.getElementById(SECTION_ID);
-  if (!section) return;
+    const titleEl = document.getElementById('final-title');
+    const messageEl = document.getElementById('final-message');
+    const botoes = document.querySelector('.final-acoes');
 
-  section.classList.add('show');
-  await sleep(500);
+    if (!titleEl || !messageEl) return;
 
-  const titleEl = document.getElementById('final-title');
-  const ps = document.querySelectorAll('#final-message p');
-  const botoes = document.querySelector('.final-acoes');
-
-  // TÍTULO COM GRANDE ENTRADA
-  titleEl.style.opacity = '0';
-  titleEl.style.transform = 'translateY(-20px)';
-  await sleep(300);
-  titleEl.style.transition = 'all 1s ease';
-  titleEl.style.opacity = '1';
-  titleEl.style.transform = 'translateY(0)';
-  await typeText(titleEl, 'Gratidão por Caminhar com Luz', 70, true);
-  await sleep(800);
-
-  // PARÁGRAFOS COM REVEAL + VOZ
-  for (let i = 0; i < ps.length; i++) {
-    const p = ps[i];
-    p.style.opacity = '0';
-    p.style.transform = 'translateX(-30px)';
-    await sleep(400);
-    p.style.transition = 'all 0.8s ease';
-    p.style.opacity = '1';
-    p.style.transform = 'translateX(0)';
-    await typeText(p, p.getAttribute('data-original'), 55, true);
+    // Título
+    await typeText(titleEl, 'Gratidão por Caminhar com Luz', 45, true);
     await sleep(600);
+
+    // Parágrafos com reveal
+    const ps = messageEl.querySelectorAll('p');
+    for (let i = 0; i < ps.length; i++) {
+      const p = ps[i];
+      const txt = p.getAttribute('data-original') || p.textContent.trim();
+      await typeText(p, txt, 25, true);
+      p.classList.add('revealed');
+      await sleep(300);
+    }
+
+    // Libera botões com animação
+    botoes.classList.add('show');
+    document.querySelectorAll('.final-acoes button').forEach(btn => {
+      btn.disabled = false;
+    });
   }
-
-  // BOTÕES COM BRILHO
-  botoes.style.opacity = '0';
-  botoes.style.transform = 'scale(0.8)';
-  await sleep(500);
-  botoes.style.transition = 'all 0.8s ease';
-  botoes.style.opacity = '1';
-  botoes.style.transform = 'scale(1)';
-  botoes.classList.add('show');
-
-  document.querySelectorAll('.final-acoes button').forEach(btn => {
-    btn.disabled = false;
-  });
-}
-
-  console.log('[FINAL] Sequência concluída com sucesso!');
-}
 
   async function generateArtifacts() {
     const btn = document.getElementById('btnBaixarPDFHQ');
