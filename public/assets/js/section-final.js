@@ -24,21 +24,35 @@
     speechSynthesis.speak(utter);
   }
 
-  async function typeText(el, text, delay = 35, withVoice = false) {
+ async function typeText(el, text, delay = 60, withVoice = false) {  // 60ms = lento e mágico
   if (!el || !text) return;
   el.textContent = '';
   el.classList.add('typing-active');
 
-  if (withVoice) speakText(text);
+  // VOZ: começa ANTES da digitação (mais natural)
+  if (withVoice && 'speechSynthesis' in window) {
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'pt-BR';
+    utter.rate = 0.85;    // voz mais calma
+    utter.pitch = 1.0;
+    utter.volume = 0.9;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(utter);
+  }
 
   for (let i = 0; i < text.length; i++) {
     el.textContent += text[i];
-    if (i % 3 === 0) await sleep(delay);
+    // Pausa maior em vírgulas, pontos, etc.
+    if ('.,!?'.includes(text[i])) {
+      await sleep(180);
+    } else if (i % 2 === 0) {  // ritmo suave
+      await sleep(delay);
+    }
   }
 
   el.classList.remove('typing-active');
   el.classList.add('typing-done');
-  return sleep(100);
+  return sleep(200);  // pausa final antes do próximo
 }
   async function startFinalSequence() {
   if (started) return;
