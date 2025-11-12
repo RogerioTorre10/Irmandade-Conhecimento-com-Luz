@@ -7,9 +7,9 @@
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  overflow: hidden;
-  padding: 20px; /* ← ESPAÇO NAS BORDAS */
+  padding: 30px; /* ← ESPAÇO EXTRA NAS BORDAS */
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .final-pergaminho-wrapper {
@@ -18,23 +18,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px;
+  padding: 15px;
 }
 
 .pergaminho-vertical {
   background: center/contain no-repeat url('/assets/img/pergaminho-rasgado-vert.png');
-  width: 88vw;           /* ← MENOR QUE ANTES */
-  max-width: 460px;      /* ← LIMITA NO DESKTOP */
-  height: 88vh;
-  max-height: 740px;
-  padding: 70px 45px;    /* ← MAIS ESPAÇO INTERNO */
-  border-radius: 20px;
-  box-shadow: 0 0 70px rgba(212,175,55,0.9);
+  width: 85vw;           /* ← MENOR QUE ANTES */
+  max-width: 440px;      /* ← LIMITA NO DESKTOP */
+  height: 86vh;
+  max-height: 720px;
+  padding: 75px 50px;    /* ← MAIS ESPAÇO INTERNO */
+  border-radius: 22px;
+  box-shadow: 0 0 80px rgba(212,175,55,1);
   position: relative;
-  background-color: rgba(245, 235, 200, 0.15);
+  background-color: rgba(245, 235, 200, 0.2);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  backdrop-filter: blur(1px);
 }
 
 .pergaminho-content {
@@ -98,3 +99,59 @@
   .final-title { font-size: 1.9em; }
   .final-message p { font-size: 1.15em; line-height: 1.6; }
 }
+
+.btn-gold, .btn-light {
+  padding: 15px 28px;
+  border-radius: 14px;
+  font-weight: bold;
+  font-size: 1.15em;
+  border: none;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.btn-gold {
+  background: linear-gradient(45deg, #b8860b, #ffd700, #b8860b);
+  background-size: 200% 200%;
+  color: #000;
+  box-shadow: 
+    0 0 20px rgba(255,215,0,0.6),
+    0 0 40px rgba(255,215,0,0.4),
+    inset 0 0 15px rgba(255,255,255,0.3);
+  text-shadow: 0 0 8px rgba(255,215,0,0.8);
+  animation: goldPulse 3s infinite;
+}
+
+.btn-gold:hover:not(:disabled) {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 
+    0 0 35px gold,
+    0 0 60px rgba(255,215,0,0.8),
+    inset 0 0 20px rgba(255,255,255,0.5);
+  background-position: 100% 0;
+}
+
+.btn-light {
+  background: rgba(255,255,255,0.12);
+  color: #ffd700;
+  border: 2px solid #d4af37;
+  backdrop-filter: blur(8px);
+  text-shadow: 0 0 6px rgba(255,215,0,0.6);
+}
+
+.btn-light:hover {
+  background: #d4af37;
+  color: #000;
+  box-shadow: 0 0 25px rgba(212,175,55,0.8);
+  transform: translateY(-2px);
+}
+
+/* ANIMAÇÃO DE PULSO DOURADO */
+@keyframes goldPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(255,215,0,0.6), 0 0 40px rgba(255,215,0,0.4); }
+  50% { box-shadow: 0 0 30px gold, 0 0 60px rgba(255,215,0,0.7); }
+}
+
