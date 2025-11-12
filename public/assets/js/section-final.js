@@ -61,17 +61,25 @@
   await sleep(600);
 
   // PARÁGRAFOS
-  const ps = messageEl.querySelectorAll('p');
-  for (let i = 0; i < ps.length; i++) {
-    const p = ps[i];
-    const txt = p.getAttribute('data-original') || p.textContent.trim();
-    if (!p.getAttribute('data-original')) {
-      p.setAttribute('data-original', txt);
-    }
-    await typeText(p, txt, 25, true);  // <-- AQUI ESTAVA O ERRO: typeAndSpeak
-    p.classList.add('revealed');
-    await sleep(300);
-  }
+const ps = messageEl.querySelectorAll('p');
+for (let i = 0; i < ps.length; i++) {
+  const p = ps[i];
+  const txt = p.getAttribute('data-original') || '';
+  
+  if (!txt) continue;
+
+  // Garante que começa invisível
+  p.textContent = '';
+  p.classList.remove('revealed');
+
+  // Digita e fala
+  await typeText(p, txt, 25, true);
+  
+  // Só agora revela visualmente
+  p.classList.add('revealed');
+  
+  await sleep(400); // Pausa entre parágrafos
+}
 
   // LIBERA BOTÕES
   if (botoes) {
