@@ -44,45 +44,63 @@
   }
 
   // Sequência final (título + parágrafos)
-  async function startFinalSequence() {
-    if (started) return;
-    started = true;
+  // === SEQUÊNCIA FINAL: TEXTO INVISÍVEL + BOTÕES SÓ NO FIM ===
+async function startFinalSequence() {
+  if (started) return;
+  started = true;
 
-    const section = document.getElementById(SECTION_ID);
-    if (!section) {
-      started = false;
-      return;
-    }
-
-    const titleEl = document.getElementById('final-title');
-    const messageEl = document.getElementById('final-message');
-
-    if (!titleEl || !messageEl) {
-      console.warn('[FINAL] Elementos de título ou mensagem não encontrados.');
-      return;
-    }
-
-    // Título
-    await typeText(titleEl, 'Gratidão por Caminhar com Luz', 40, true);
-
-    // Parágrafos
-    const ps = messageEl.querySelectorAll('p');
-    for (const p of ps) {
-      const txt = (p.getAttribute('data-original') || p.textContent || '').trim();
-      if (!p.getAttribute('data-original')) {
-        p.setAttribute('data-original', txt);
-      }
-      await typeText(p, txt, 22, true);
-      await sleep(250);
-    }
-
-    // Libera botões
-    document.querySelectorAll('.final-acoes button').forEach(btn => {
-      btn.disabled = false;
-    });
-
-    console.log('[FINAL] Sequência concluída, botões liberados.');
+  const section = document.getElementById(SECTION_ID);
+  if (!section) {
+    started = false;
+    return;
   }
+
+  const titleEl = document.getElementById('final-title');
+  const messageEl = document.getElementById('final-message');
+
+  if (!titleEl || !messageEl) {
+    console.warn('[FINAL] Elementos não encontrados.');
+    return;
+  }
+
+  // === GARANTE QUE BOTÕES ESTÃO DESABILITADOS ===
+  document.querySelectorAll('.final-acoes button').forEach(btn => {
+    btn.disabled = true;
+    btn.style.opacity = '0';
+    btn.style.transform = 'translateY(20px)';
+    btn.style.pointerEvents = 'none';
+  });
+
+  // === 1. TÍTULO ===
+  titleEl.style.opacity = '1';
+  await typeAndSpeak(titleEl, 'Gratidão por Caminhar com Luz', 40);
+  await sleep(800);
+
+  // === 2. PARÁGRAFOS (UM POR VEZ) ===
+  const ps = messageEl.querySelectorAll('p');
+  for (const p of ps) {
+    const txt = p.getAttribute('data-original')?.trim();
+    if (!txt) continue;
+
+    p.textContent = ''; // limpa (nunca teve texto visível)
+    p.style.opacity = '1'; // só agora aparece
+    await typeAndSpeak(p, txt, 22);
+    await sleep(500);
+  }
+
+  // === 3. SÓ AGORA LIBERA OS BOTÕES ===
+  const buttons = document.querySelectorAll('.final-acoes button');
+  buttons.forEach((btn, i) => {
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.style.transform = 'translateY(0)';
+      btn.style.pointerEvents = 'auto';
+    }, i * 250);
+  });
+
+  console.log('[FINAL] Jornada completa. Botões liberados com luz!');
+}
 
   // Geração de PDF/HQ (placeholder integrado ao backend)
   async function generateArtifacts() {
