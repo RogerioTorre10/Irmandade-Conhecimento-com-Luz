@@ -414,53 +414,49 @@
   // FINALIZAÇÃO — FALLBACK LIMPO PARA SECTION-FINAL
   // --------------------------------------------------
 
-  function ensureFinalSectionExists() {
-    let finalEl = document.getElementById(FINAL_SECTION_ID);
+ function ensureFinalSectionExists() {
+  let finalEl = document.getElementById(FINAL_SECTION_ID);
 
-    if (finalEl) {
-      log('section-final já existe, usando versão existente.');
-      return finalEl;
-    }
+  // SE JÁ EXISTE → NÃO RECRIA NADA (RESPEITA O HTML ORIGINAL)
+  if (finalEl) {
+    console.log('[FINAL] section-final já existe → usando versão original com data-original');
+    return finalEl;
+  }
 
-    // Cria a seção final com o mesmo layout da section-final.html
-    finalEl = document.createElement('section');
-    finalEl.id = FINAL_SECTION_ID;
-    finalEl.className = 'section section-final';
-    finalEl.dataset.section = 'final';
+  // SE NÃO EXISTE → CRIA COM data-original (NUNCA texto direto)
+  console.log('[FINAL] Criando fallback com data-original (efeito garantido)');
 
-    finalEl.innerHTML = `
-      <div class="final-pergaminho-wrapper">
-        <div class="pergaminho-vertical">
-          <div class="pergaminho-content">
+  finalEl = document.createElement('section');
+  finalEl.id = FINAL_SECTION_ID;
+  finalEl.className = 'section section-final';
+  finalEl.dataset.section = 'final';
 
-            <h1 id="final-title" class="final-title"></h1>
-
-            <div id="final-message" class="final-message">
-              <p>Suas respostas foram recebidas com honra pela Irmandade.</p>
-              <p>Você plantou sementes de confiança, coragem e luz.</p>
-              <p>Continue caminhando. A jornada nunca termina.</p>
-              <p>Volte quando precisar reacender a chama.</p>
-              <p class="final-bold">Você é a luz. Você é a mudança.</p>
-            </div>
-
-            <div class="final-acoes">
-              <button id="btnBaixarPDFHQ" class="btn btn-gold" disabled>Baixar PDF e HQ</button>
-              <button id="btnVoltarInicio" class="btn btn-light">Voltar ao Início</button>
-            </div>
-
+  finalEl.innerHTML = `
+    <div class="final-pergaminho-wrapper">
+      <div class="pergaminho-vertical">
+        <div class="pergaminho-content">
+          <h1 id="final-title" class="final-title"></h1>
+          <div id="final-message" class="final-message">
+            <p data-original="Suas respostas foram recebidas com honra pela Irmandade."></p>
+            <p data-original="Você plantou sementes de confiança, coragem e luz."></p>
+            <p data-original="Continue caminhando. A jornada nunca termina."></p>
+            <p data-original="Volte quando precisar reacender a chama."></p>
+            <p class="final-bold" data-original="Você é a luz. Você é a mudança."></p>
+          </div>
+          <div class="final-acoes">
+            <button id="btnBaixarPDFHQ" class="btn btn-gold" disabled>Baixar PDF e HQ</button>
+            <button id="btnVoltarInicio" class="btn btn-light">Voltar ao Início</button>
           </div>
         </div>
       </div>
+    </div>
+    <video id="final-video" playsinline preload="auto" style="display:none;"></video>
+  `;
 
-      <video id="final-video" playsinline preload="auto" style="display:none;"></video>
-    `;
-
-    const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
-    wrapper.appendChild(finalEl);
-
-    log('section-final criada com HTML completo (fallback FINAL).');
-    return finalEl;
-  }
+  const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
+  wrapper.appendChild(finalEl);
+  return finalEl;
+}
 
   function showFinalSection() {
     const finalEl = ensureFinalSectionExists();
