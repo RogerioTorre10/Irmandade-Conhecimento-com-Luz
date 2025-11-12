@@ -7,7 +7,7 @@
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  padding: 30px; /* ← ESPAÇO EXTRA NAS BORDAS */
+  padding: 25px; /* ← ESPAÇO EXTRA NAS BORDAS */
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -18,24 +18,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 15px;
+  padding: 20px;
 }
 
 .pergaminho-vertical {
   background: center/contain no-repeat url('/assets/img/pergaminho-rasgado-vert.png');
-  width: 85vw;           /* ← MENOR QUE ANTES */
-  max-width: 440px;      /* ← LIMITA NO DESKTOP */
-  height: 86vh;
-  max-height: 720px;
-  padding: 75px 50px;    /* ← MAIS ESPAÇO INTERNO */
-  border-radius: 22px;
-  box-shadow: 0 0 80px rgba(212,175,55,1);
+  width: 78vw;           /* MENOR E MAIS SEGURO */
+  max-width: 420px;      /* LIMITE NO DESKTOP */
+  height: 84vh;
+  max-height: 700px;
+  padding: 70px 48px;    /* ESPAÇO INTERNO IDEAL */
+  border-radius: 24px;
+  box-shadow: 0 0 90px rgba(212,175,55,1.1);
   position: relative;
-  background-color: rgba(245, 235, 200, 0.2);
+  background-color: rgba(245, 235, 200, 0.22);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  backdrop-filter: blur(1px);
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;        /* CENTRALIZA HORIZONTALMENTE */
+  backdrop-filter: blur(1.5px);
+  overflow: hidden;
 }
 
 .pergaminho-content {
@@ -90,11 +93,11 @@
 /* RESPONSIVO */
 @media (max-width: 480px) {
   .pergaminho-vertical {
-    width: 92vw;
-    max-width: 420px;
-    height: 92vh;
-    max-height: 700px;
-    padding: 50px 30px;
+    width: 88vw;
+    max-width: 380px;
+    height: 88vh;
+    max-height: 660px;
+    padding: 55px 35px;
   }
   .final-title { font-size: 1.9em; }
   .final-message p { font-size: 1.15em; line-height: 1.6; }
