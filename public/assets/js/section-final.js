@@ -1,4 +1,4 @@
-/* section-final.js — FINAL v1.2 */
+/* section-final.js — FINAL v2.0 MÁGICO */
 (function () {
   'use strict';
 
@@ -11,110 +11,104 @@
 
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
+  // === VOZ ===
   function speakText(text) {
     if (!('speechSynthesis' in window) || isSpeaking || !text) return;
     isSpeaking = true;
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'pt-BR';
-    utter.rate = 0.95;
-    utter.pitch = 1;
+    utter.rate = 0.85;
+    utter.pitch = 1.0;
     utter.volume = 0.9;
     utter.onend = () => { isSpeaking = false; };
     speechSynthesis.cancel();
     speechSynthesis.speak(utter);
   }
 
- async function typeText(el, text, delay = 60, withVoice = false) {  // 60ms = lento e mágico
-  if (!el || !text) return;
-  el.textContent = '';
-  el.classList.add('typing-active');
+  // === DATILOGRAFIA LENTA E NATURAL ===
+  async function typeText(el, text, delay = 65, withVoice = false) {
+    if (!el || !text) return;
+    el.textContent = '';
+    el.classList.add('typing-active');
 
-  // VOZ: começa ANTES da digitação (mais natural)
-  if (withVoice && 'speechSynthesis' in window) {
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = 'pt-BR';
-    utter.rate = 0.85;    // voz mais calma
-    utter.pitch = 1.0;
-    utter.volume = 0.9;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(utter);
-  }
+    if (withVoice) speakText(text);
 
-  for (let i = 0; i < text.length; i++) {
-    el.textContent += text[i];
-    // Pausa maior em vírgulas, pontos, etc.
-    if ('.,!?'.includes(text[i])) {
-      await sleep(180);
-    } else if (i % 2 === 0) {  // ritmo suave
-      await sleep(delay);
+    for (let i = 0; i < text.length; i++) {
+      el.textContent += text[i];
+      if ('.,!?'.includes(text[i])) {
+        await sleep(180);
+      } else if (i % 2 === 0) {
+        await sleep(delay);
+      }
     }
+
+    el.classList.remove('typing-active');
+    el.classList.add('typing-done');
+    return sleep(200);
   }
 
-  el.classList.remove('typing-active');
-  el.classList.add('typing-done');
-  return sleep(200);  // pausa final antes do próximo
-}
+  // === SEQUÊNCIA FINAL ===
   async function startFinalSequence() {
-  if (started) return;
-  started = true;
+    if (started) return;
+    started = true;
 
-  const section = document.getElementById(SECTION_ID);
-  if (!section) return;
+    const section = document.getElementById(SECTION_ID);
+    if (!section) return;
 
-  section.classList.add('show');
+    section.classList.add('show');
 
-  const titleEl = document.getElementById('final-title');
-  const messageEl = document.getElementById('final-message');
-  const botoes = document.querySelector('.final-acoes');
+    const titleEl = document.getElementById('final-title');
+    const messageEl = document.getElementById('final-message');
+    const botoes = document.querySelector('.final-acoes');
 
-  if (!titleEl || !messageEl) return;
+    if (!titleEl || !messageEl) return;
 
-  // TÍTULO
-  await typeText(titleEl, 'Gratidão por Caminhar com Luz', 45, true);
-  await sleep(600);
+    // TÍTULO
+    await typeText(titleEl, 'Gratidão por Caminhar com Luz', 50, true);
+    await sleep(700);
 
- // PARÁGRAFOS
-const ps = messageEl.querySelectorAll('p');
-for (let i = 0; i < ps.length; i++) {
-  const p = ps[i];
-  const txt = p.getAttribute('data-original')?.trim();
-  if (!txt) continue;
+    // PARÁGRAFOS
+    const ps = messageEl.querySelectorAll('p');
+    for (let i = 0; i < ps.length; i++) {
+      const p = ps[i];
+      const txt = p.getAttribute('data-original')?.trim();
+      if (!txt) continue;
 
-  p.textContent = '';
-  p.classList.remove('revealed');
+      p.textContent = '';
+      p.classList.remove('revealed');
 
-  await sleep(500); // pausa entre parágrafos
+      await sleep(500);
+      await typeText(p, txt, 65, true);
+      p.classList.add('revealed');
 
-  await typeText(p, txt, 65, true);  // 65ms = ritmo perfeito
+      if (txt.includes('Você é a luz')) {
+        await sleep(1400); // MOMENTO ÉPICO
+      } else {
+        await sleep(800);
+      }
+    }
 
-  p.classList.add('revealed');
+    // BOTÕES SÓ AGORA
+    if (botoes) {
+      botoes.classList.add('show');
+      setTimeout(() => {
+        document.querySelectorAll('.final-acoes button').forEach(btn => {
+          btn.disabled = false;
+        });
+      }, 600);
+    }
 
-  // Pausa maior após frases importantes
-  if (txt.includes('Você é a luz')) {
-    await sleep(1200);
-  } else {
-    await sleep(800);
+    console.log('[FINAL] Sequência mágica concluída!');
   }
-}
 
-  // LIBERA BOTÕES
-  if (botoes) {
-    botoes.classList.add('show');
-    document.querySelectorAll('.final-acoes button').forEach(btn => {
-      btn.disabled = false;
-    });
-  }
-
-  console.log('[FINAL] Sequência concluída com sucesso!');
-}
-
+  // === DOWNLOAD PDF/HQ ===
   async function generateArtifacts() {
     const btn = document.getElementById('btnBaixarPDFHQ');
     if (!btn || btn.dataset.loading === '1') return;
 
     btn.dataset.loading = '1';
     const original = btn.textContent;
-    btn.textContent = 'Gerando sua Jornada...';
+    btn.textContent = 'Invocando a luz...';
     btn.disabled = true;
 
     try {
@@ -133,11 +127,11 @@ for (let i = 0; i < ps.length; i++) {
       if (data.pdfUrl) window.open(data.pdfUrl, '_blank');
       if (data.hqUrl) window.open(data.hqUrl, '_blank');
       if (!data.pdfUrl && !data.hqUrl) {
-        alert('Jornada concluída! PDF/HQ em breve disponível.');
+        alert('A luz está se manifestando... Em breve!');
       }
     } catch (e) {
       console.error(e);
-      alert('Erro temporário. Tente novamente em 10s.');
+      alert('A conexão com a luz falhou. Tente novamente.');
     } finally {
       btn.textContent = original;
       btn.disabled = false;
@@ -145,10 +139,15 @@ for (let i = 0; i < ps.length; i++) {
     }
   }
 
+  // === FILME FINAL COM LOADING DOURADO ===
   function playFinalVideo() {
     let video = document.getElementById('final-video');
     if (!video) {
-      video = Object.assign(document.createElement('video'), { id: 'final-video', playsInline: true });
+      video = Object.assign(document.createElement('video'), { 
+        id: 'final-video', 
+        playsInline: true,
+        muted: true
+      });
       document.body.appendChild(video);
     }
 
@@ -167,24 +166,90 @@ for (let i = 0; i < ps.length; i++) {
       if (el.id !== 'final-video') el.style.opacity = '0';
     });
 
-    video.play().catch(() => {
-      setTimeout(() => { window.location.href = HOME_URL; }, 1000);
-    });
+    // LOADING DOURADO
+    const loading = document.createElement('div');
+    loading.id = 'final-video-loading';
+    loading.innerHTML = `
+      <div style="
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        color: #ffd700; font-family: 'BerkshireSwash', cursive; font-size: 1.5em;
+        text-align: center; z-index: 9999999; text-shadow: 0 0 20px gold;
+        animation: pulse 2s infinite;
+      ">
+        <div>Carregando a luz final</div>
+        <div style="margin-top: 15px; font-size: 2.2em;">Loading</div>
+      </div>
+      <style>
+        @keyframes pulse { 0%,100% { opacity: 0.7; } 50% { opacity: 1; } }
+      </style>
+    `;
+    document.body.appendChild(loading);
 
-    video.onended = () => {
-      window.location.href = HOME_URL;
+    let hasPlayed = false;
+
+    const startVideo = () => {
+      if (hasPlayed) return;
+      hasPlayed = true;
+      loading.remove();
+      video.play().catch(() => {});
+      video.onended = () => {
+        window.location.href = HOME_URL;
+      };
     };
+
+    const onCanPlay = () => {
+      console.log('[FILME] Luz carregada → iniciando');
+      video.removeEventListener('canplaythrough', onCanPlay);
+      startVideo();
+    };
+
+    const onError = () => {
+      console.warn('[FILME] A luz está oculta');
+      loading.innerHTML = `
+        <div style="color: #ffd700; font-family: 'BerkshireSwash'; text-shadow: 0 0 15px gold; text-align: center;">
+          A luz está temporariamente oculta.<br><br>
+          <button onclick="window.location.href='${HOME_URL}'" 
+                  style="padding: 14px 28px; background: #d4af37; color: #000; border: none; border-radius: 14px; font-weight: bold; cursor: pointer; font-size: 1.1em;">
+            Voltar ao Portal da Luz
+          </button>
+        </div>
+      `;
+    };
+
+    video.addEventListener('canplaythrough', onCanPlay);
+    video.addEventListener('error', onError);
+
+    video.load();
+
+    // TIMEOUT DE SEGURANÇA
+    setTimeout(() => {
+      if (!hasPlayed) onError();
+    }, 15000);
+
+    // TENTA INICIAR RÁPIDO
+    setTimeout(() => {
+      if (video.readyState >= 3) onCanPlay();
+    }, 500);
   }
 
-  // Eventos
+  // === EVENTOS ===
   document.addEventListener('click', (e) => {
     const t = e.target;
-    if (t.id === 'btnBaixarPDFHQ') { e.preventDefault(); generateArtifacts(); }
-    if (t.id === 'btnVoltarInicio') { e.preventDefault(); playFinalVideo(); }
+    console.log('[CLICK]', t.id);
+
+    if (t.id === 'btnBaixarPDFHQ') {
+      e.preventDefault();
+      generateArtifacts();
+    }
+    if (t.id === 'btnVoltarInicio') {
+      e.preventDefault();
+      console.log('[BOTÃO] Iniciando filme final...');
+      playFinalVideo();
+    }
   });
 
   document.addEventListener('section:shown', (e) => {
-    const id = e.detail?.sectionId || e.detail?.id || e.detail;
+    const id = e.detail?.sectionId || e.detail;
     if (id === SECTION_ID) startFinalSequence();
   });
 
@@ -192,14 +257,14 @@ for (let i = 0; i < ps.length; i++) {
     const sec = document.getElementById(SECTION_ID);
     if (sec && sec.style.display !== 'none') startFinalSequence();
   });
-  
- // FORÇA INÍCIO SE A SEÇÃO JÁ ESTIVER VISÍVEL
+
+  // FALLBACK FORÇADO
   setTimeout(() => {
-   const sec = document.getElementById('section-final');
-   if (sec && !sec.classList.contains('sequence-started')) {
-     sec.classList.add('sequence-started');
-     startFinalSequence();
-   }
- }, 500);  
+    const sec = document.getElementById(SECTION_ID);
+    if (sec && !started && sec.classList.contains('show')) {
+      console.log('[FALLBACK] Iniciando sequência final...');
+      startFinalSequence();
+    }
+  }, 1000);
 
 })();
