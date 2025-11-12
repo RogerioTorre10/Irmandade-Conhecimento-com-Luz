@@ -10,21 +10,26 @@
   let started = false;
 
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-  
+
+  function speakText(text) {
+    if (!('speechSynthesis' in window) || isSpeaking || !text) return;
+    isSpeaking = true;
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'pt-BR';
+    utter.rate = 0.95;
+    utter.pitch = 1;
+    utter.volume = 0.9;
+    utter.onend = () => { isSpeaking = false; };
+    speechSynthesis.cancel();
+    speechSynthesis.speak(utter);
+  }
+
  async function typeText(el, text, delay = 35, withVoice = false) {
   if (!el || !text) return;
   el.textContent = '';
   el.classList.add('typing-active');
 
-  if (withVoice && 'speechSynthesis' in window) {
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = 'pt-BR';
-    utter.rate = 0.9;
-    utter.pitch = 1;
-    utter.volume = 0.9;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(utter);
-  }
+  if (withVoice) speakText(text);
 
   for (let i = 0; i < text.length; i++) {
     el.textContent += text[i];
@@ -56,30 +61,17 @@
   await sleep(600);
 
   // PARÁGRAFOS
-// === PARÁGRAFOS: DIGITAÇÃO + REVELAÇÃO + VOZ ===
-const ps = messageEl.querySelectorAll('p');
-for (let i = 0; i < ps.length; i++) {
-  const p = ps[i];
-  const txt = p.getAttribute('data-original')?.trim();
-
-  if (!txt) continue;
-
-  // 1. Garante que começa vazio e invisível
-  p.textContent = '';
-  p.classList.remove('revealed');
-
-  // 2. Espera um pouquinho antes de começar (efeito natural)
-  await sleep(300);
-
-  // 3. DIGITA com voz
-  await typeText(p, txt, 30, true);
-
-  // 4. Só agora revela visualmente (animação suave)
-  p.classList.add('revealed');
-
-  // 5. Pausa entre parágrafos (harmonia com voz)
-  await sleep(600);
-}
+  const ps = messageEl.querySelectorAll('p');
+  for (let i = 0; i < ps.length; i++) {
+    const p = ps[i];
+    const txt = p.getAttribute('data-original') || p.textContent.trim();
+    if (!p.getAttribute('data-original')) {
+      p.setAttribute('data-original', txt);
+    }
+    await typeText(p, txt, 25, true);  // <-- AQUI ESTAVA O ERRO: typeAndSpeak
+    p.classList.add('revealed');
+    await sleep(300);
+  }
 
   // LIBERA BOTÕES
   if (botoes) {
