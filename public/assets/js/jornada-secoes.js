@@ -188,10 +188,20 @@ function loadDynamicBlocks() {
   }
 
   function goNext() {
-    if (isTransitioning) { log('Transição em andamento, ignorando'); return; }
-    isTransitioning = true;
-    // ... (lógica completa de avanço entre perguntas/blocos) ...
-  }
+  if (isTransitioning) return;
+  isTransitioning = true;
+
+  // ... sua lógica de salvar resposta, avançar pergunta ...
+
+  // SALVA NO LOCALSTORAGE
+  localStorage.setItem('jornada.perguntaAtual', novaPergunta);
+  localStorage.setItem('jornada.blocoAtual', novoBloco);
+
+  // ATUALIZA PROGRESSO
+  updateProgress();
+
+  isTransitioning = false;
+}
   
   function playTransition(src, onEnd) {
     // ... (mantido)
@@ -223,6 +233,38 @@ function loadDynamicBlocks() {
     window.G = window.G || {};
     window.G.__typingLock = false;
   }
+
+  // =========================================
+// ATUALIZA CONTADORES E BARRAS DE PROGRESSO
+// =========================================
+function updateProgress() {
+  const totalBlocos = window.JORNADA_BLOCO?.length || 5;
+  const totalPerguntas = 50;
+
+  const blocoAtual = parseInt(localStorage.getItem('jornada.blocoAtual') || '1');
+  const perguntaAtual = parseInt(localStorage.getItem('jornada.perguntaAtual') || '1');
+
+  // Atualiza BADGE (ex: 3/50)
+  const badge = document.getElementById('jprog-pct') || document.getElementById('badgeProgressoBlocos');
+  if (badge) {
+    badge.textContent = `${perguntaAtual}/${totalPerguntas}`;
+  }
+
+  // Atualiza META (ex: Pergunta 3 de 50)
+  const meta = document.getElementById('j-meta') || document.querySelector('.j-progress-meta');
+  if (meta) {
+    meta.textContent = `Pergunta ${perguntaAtual} de ${totalPerguntas} | Bloco ${blocoAtual} de ${totalBlocos}`;
+  }
+
+  // Atualiza BARRA DE PROGRESSO (preenchimento)
+  const bar = document.querySelector('.j-progress__fill') || document.querySelector('.progress-bar .progress-fill');
+  if (bar) {
+    const percent = ((perguntaAtual - 1) / (totalPerguntas - 1)) * 100;
+    bar.style.width = `${percent}%`;
+  }
+
+  console.log('[Progress] Atualizado:', { blocoAtual, perguntaAtual, totalBlocos, totalPerguntas });
+}
 
   window.JSecoes = {
     checkImage,
