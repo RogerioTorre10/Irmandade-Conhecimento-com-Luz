@@ -1,8 +1,8 @@
-/* /assets/js/section-card.js — v4.3-merge (CORRIGIDO)
+/* /assets/js/section-card.js — v4.4-final (LOOP CORRIGIDO)
    - Botão FORA do card, ABAIXO do rodapé
-   - Sem erro de sintaxe (Unexpected token ')')
-   - Compatível com guias.json, storage, vídeo, datilografia
-   - Mantém toda sua lógica original
+   - Sem loop no storage
+   - Renderiza ao carregar e ao sync
+   - Compatível com guias.json, storage, vídeo
 */
 (function () {
   'use strict';
@@ -22,34 +22,40 @@
   const log = (...a) => console.log(`%c[${MOD}]`, 'color:#7dd3fc', ...a);
 
   let GUIA_BG_CACHE = null;
+  let isRendering = false;
 
- async function maybeLoadGuias() {
-  if (GUIA_BG_CACHE) return GUIA_BG_CACHE;
-  try {
-    const res = await fetch(GUIAS_JSON, { cache: 'no-store' });
-    if (!res.ok) throw new Error('guias.json não encontrado');
-    const arr = await res.json();
-    GUIA_BG_CACHE = {};
-    for (const g of arr) {
-      const key = (g.id || g.key || (g.nome || '').toLowerCase() || '').toString().toLowerCase();
-      const bg = g.bgImage || g.bg || g.image;
-      if (key && bg) GUIA_BG_CACHE[key] = bg.startsWith('/') ? bg : `/assets/img/${bg}`;
+  async function maybeLoadGuias() {
+    if (GUIA_BG_CACHE) return GUIA_BG_CACHE;
+    try {
+      const res = await fetch(GUIAS_JSON, { cache: 'no-store' });
+      if (!res.ok) throw new Error('guias.json não encontrado');
+      const arr = await res.json();
+      GUIA_BG_CACHE = {};
+      for (const g of arr) {
+        const key = (g.id || g.key || (g.nome || '').toLowerCase() || '').toString().toLowerCase();
+        const bg = g.bgImage || g.bg || g.image;
+        if (key && bg) GUIA_BG_CACHE[key] = bg.startsWith('/') ? bg : `/assets/img/${bg}`;
+      }
+      log('guias.json carregado', GUIA_BG_CACHE);
+    } catch (e) {
+      GUIA_BG_CACHE = {};
+      log('Usando BGs estáticos (sem guias.json)');
     }
-    log('guias.json carregado', GUIA_BG_CACHE);
-  } catch (e) {
-    GUIA_BG_CACHE = {};
-    log('Usando BGs estáticos (sem guias.json)');
+    return GUIA_BG_CACHE;
   }
 
-  // CHAME RENDER AQUI!
-  renderCard();
-
-  return GUIA_BG_CACHE;
-}
-
+  // SYNC SEM LOOP
   window.addEventListener('storage', (e) => {
-    if (e.key === 'jc.guia' || e.key === 'jc.nome' || e.key === 'jc.selfieDataUrl') {
-      log('SYNC: dados atualizados', e);
+    if (!['jc.guia', 'jc.nome', 'jc.selfieDataUrl'].includes(e.key)) return;
+
+    const current = getUserData();
+    const shouldRender = 
+      (e.key === 'jc.guia' && e.newValue !== current.guia) ||
+      (e.key === 'jc.nome' && e.newValue !== current.nome) ||
+      (e.key === 'jc.selfieDataUrl');
+
+    if (shouldRender) {
+      log('SYNC: dados mudaram, re-renderizando');
       renderCard();
     }
   });
@@ -153,9 +159,7 @@
       }
     }
 
-    // =========================================
-    // BOTÃO CONTINUAR — FORA DO CARD, ABAIXO
-    // =========================================
+    // BOTÃO CONTINUAR — FORA DO CARD
     let actionsBelow = qs('.card-actions-below', root);
     if (!actionsBelow) {
       actionsBelow = document.createElement('div');
@@ -198,23 +202,37 @@
   }
 
   async function renderCard() {
-    const section = qs('#section-card') || qs('#section-eu-na-irmandade');
-    if (!section) return;
-    ensureStructure(section);
-    const { nome, guia } = getUserData();
-    await applyGuideBG(section, guia);
-    const selfieImg = qs('#selfieImage', section);
-    if (selfieImg) {
-      const url = window.JC?.data?.selfieDataUrl || localStorage.getItem('jc.selfieDataUrl');
-      selfieImg.src = url || PLACEHOLDER_SELFIE;
-      const flameLayer = selfieImg.closest('.flame-layer');
-      if (flameLayer) flameLayer.classList.add('show');
+    if (isRendering) {
+      log('renderCard já em execução, ignorando');
+      return;
     }
-    const el1 = qs('#cardName', section);
-    const el2 = qs('#userNameSlot', section);
-    if (el1) el1.textContent = nome;
-    if (el2) el2.textContent = nome;
-    log('Renderizado', { guia, nome });
+    isRendering = true;
+
+    try {
+      const section = qs('#section-card') || qs('#section-eu-na-irmandade');
+      if (!section) return;
+
+      ensureStructure(section);
+      const { nome, guia } = getUserData();
+      await applyGuideBG(section, guia);
+
+      const selfieImg = qs('#selfieImage', section);
+      if (selfieImg) {
+        const url = window.JC?.data?.selfieDataUrl || localStorage.getItem('jc.selfieDataUrl');
+        selfieImg.src = url || PLACEHOLDER_SELFIE;
+        const flameLayer = selfieImg.closest('.flame-layer');
+        if (flameLayer) flameLayer.classList.add('show');
+      }
+
+      const el1 = qs('#cardName', section);
+      const el2 = qs('#userNameSlot', section);
+      if (el1) el1.textContent = nome;
+      if (el2) el2.textContent = nome;
+
+      log('Renderizado', { guia, nome });
+    } finally {
+      isRendering = false;
+    }
   }
 
   function goNext() {
@@ -247,27 +265,24 @@
     }
   }
 
- document.addEventListener('section:shown', e => {
-  const id = e.detail.sectionId;
-  if (SECTION_IDS.includes(id)) {
-    const root = e.detail.node || qs(`#${id}`) || document.body;
-
-    // GARANTE ESTRUTURA + RENDERIZA
-    ensureStructure(root);
-    renderCard(); // ou renderCard(root) se preferir
-
-    initCard(root);
-  }
-});
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const visible = SECTION_IDS.map(id => qs(`#${id}`)).find(el => el && el.offsetParent !== null);
-    if (visible) initCard(visible);
+  // EVENTO PRINCIPAL
+  document.addEventListener('section:shown', e => {
+    const id = e.detail.sectionId;
+    if (SECTION_IDS.includes(id)) {
+      const root = e.detail.node || qs(`#${id}`) || document.body;
+      ensureStructure(root);
+      renderCard();
+      initCard(root);
+    }
   });
 
- // Renderiza automaticamente ao carregar
+  // AUTOINIT
   document.addEventListener('DOMContentLoaded', () => {
-    maybeLoadGuias(); // Isso agora chama renderCard()
+    const sec = qs('#section-card') || qs('#section-eu-na-irmandade');
+    if (sec && !sec.querySelector('.card-stage')) {
+      ensureStructure(sec);
+      renderCard();
+    }
   });
 
   log('carregado e pronto!');
