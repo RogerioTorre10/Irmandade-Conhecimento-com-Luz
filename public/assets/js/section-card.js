@@ -172,29 +172,31 @@
       }
     }
 
-    // Botão continuar garantido
-    let actions = qs('.card-actions', root);
-    if (!actions) {
-      actions = document.createElement('div');
-      actions.className = 'card-actions';
-      actions.style.cssText =
-        'position:absolute;left:50%;transform:translateX(-50%);bottom:48px;z-index:6;';
-      root.appendChild(actions);
-    }
-    let btnNext = qs('#btnNext', actions) || qs('.btn-next-card', actions);
-    if (!btnNext) {
-      btnNext = document.createElement('button');
-      btnNext.id = 'btnNext';
-      btnNext.className = 'btn btn-stone';
-      btnNext.textContent = 'Continuar';
-      actions.appendChild(btnNext);
-    }
-    btnNext.style.pointerEvents = 'auto';
-    btnNext.disabled = false;
-    btnNext.onclick = goNext;
+    // =========================================
+// BOTÃO CONTINUAR — FORA DO CARD, ABAIXO
+// =========================================
+let actionsBelow = qs('.card-actions-below', root);
+if (!actionsBelow) {
+  actionsBelow = document.createElement('div');
+  actionsBelow.className = 'card-actions-below';
+  root.appendChild(actionsBelow); // adiciona ao final do conteúdo
+}
 
-    return { stage, guideBg };
-  }
+let btnNext = qs('#btnNext', actionsBelow);
+if (!btnNext) {
+  btnNext = document.createElement('button');
+  btnNext.id = 'btnNext';
+  btnNext.className = 'btn btn-stone';
+  btnNext.textContent = 'Continuar';
+  actionsBelow.appendChild(btnNext);
+}
+
+// Garante funcionalidade
+btnNext.style.pointerEvents = 'auto';
+btnNext.disabled = false;
+btnNext.onclick = goNext; // ou () => JC.next()
+
+return { stage, guideBg };
  
   // --- Aplica o BG do guia (guias.json > CARD_BG) ---
   async function applyGuideBG(section, guia) {
