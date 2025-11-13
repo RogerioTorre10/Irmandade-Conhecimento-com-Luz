@@ -39,14 +39,14 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
 #section-senha.pergaminho-v::before,
 #sec-final.pergaminho-v::before {
   background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important;
-  background-size: cover !important;
+  background-size: cover;
   min-height: 80vh;
 }
 
 #sec-perguntas.pergaminho-h::before,
 #sec-wizard.pergaminho-h::before {
   background-image: url('/assets/img/pergaminho-rasgado-horiz.png') !important;
-  background-size: cover !important;
+  background-size: cover;
   min-height: 80vh;
 }
 
@@ -59,7 +59,7 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
   visibility: visible;
   display: block;
   font-family: 'BerkshireSwash', cursive;
-  text-align: left !important;
+  text-align: left;
   background: transparent;
   line-height: 1.4;
 }
@@ -69,22 +69,22 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
   margin-bottom: 10px;
   color: #fff;
   opacity: 0;
-  text-align: left !important;
+  text-align: left;
 }
 
 .parchment-rough {
-  background: transparent !important;
+  background: transparent;
   border-radius: 16px;
-  height: 100% !important;
-  width: 100% !important;
+  height: 100%;
+  width: 100%;
 }
 
 .parchment-inner-rough {
-  background: transparent !important;
+  background: transparent;
   box-shadow: none;
-  overflow: hidden !important;
-  height: 100% !important;
-  width: 100% !important;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
   box-sizing: border-box;
 }
 
@@ -92,25 +92,25 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
   display: flex;
   flex-direction: column;
   justify-content: center;
-  height: 100% !important;
+  height: 100%;
 }
 
 .parchment-title-rough {
   color: #fff;
   font-size: 20px;
   margin-bottom: 12px;
-  opacity: 0 !important;
-  display: none !important;
-  visibility: hidden !important;
-  text-align: left !important;
+  opacity: 0;
+  display: none;
+  visibility: hidden;
+  text-align: left;
 }
 
 .section-termos .parchment-title-rough,
 .section-termos .parchment-text-rough {
-  opacity: 0 !important;
-  display: none !important;
-  visibility: hidden !important;
-  text-align: left !important;
+  opacity: 0;
+  display: none;
+  visibility: hidden;
+  text-align: left;
 }
 
 .parchment-title-rough.typing-active,
@@ -119,10 +119,10 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
 .section-termos .parchment-title-rough.typing-done,
 .section-termos .parchment-text-rough.typing-active,
 .section-termos .parchment-text-rough.typing-done {
-  opacity: 1 !important;
-  display: block !important;
-  visibility: visible !important;
-  text-align: left !important;
+  opacity: 1;
+  display: block;
+  visibility: visible;
+  text-align: left;
 }
 
 .parchment-text-rough {
@@ -130,18 +130,18 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
   font-size: 13px;
   margin-bottom: 8px;
   line-height: 1.4;
-  opacity: 0 !important;
-  display: none !important;
-  visibility: hidden !important;
-  text-align: left !important;
+  opacity: 0;
+  display: none;
+  visibility: hidden;
+  text-align: left;
 }
 
 .parchment-text-rough.typing-active,
 .parchment-text-rough.typing-done {
-  opacity: 1 !important;
-  display: block !important;
-  visibility: visible !important;
-  text-align: left !important;
+  opacity: 1;
+  display: block;
+  visibility: visible;
+  text-align: left;
 }
 
 .parchment-input-rough {
@@ -155,21 +155,21 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
 }
 
 .parchment-actions-rough {
-  display: flex !important;
+  display: flex;
   justify-content: center;
   gap: 8px;
   margin-top: 12px;
   position: sticky;
   bottom: 0;
-  background: transparent !important;
-  opacity: 1 !important;
-  visibility: visible !important;
+  background: transparent;
+  opacity: 1;
+  visibility: visible;
 }
 
 .section-termos .parchment-actions-rough {
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: flex !important;
+  opacity: 1;
+  visibility: visible;
+  display: flex;
 }
 
 /* ========== SEÇÃO GUIA – LAYOUT E ESTILOS ========== */
@@ -181,30 +181,30 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
 }
 
 .guia-name-input label {
-  background-color: #3e2723 !important;
-  color: #fff !important;
-  padding: 8px 18px !important;
-  border-radius: 6px !important;
-  display: block !important;
+  background-color: #3e2723;
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 6px;
+  display: block;
   width: fit-content;
-  margin: 0 auto 10px auto !important;
-  font-family: 'ManufacturingConsent', sans-serif !important;
-  font-size: 1.2em !important;
+  margin: 0 auto 10px auto;
+  font-family: 'ManufacturingConsent', sans-serif;
+  font-size: 1.2em;
   font-variant: small-caps;
 }
 
 .guia-name-input input {
-  width: 65% !important;
-  max-width: 250px !important;
-  background-color: rgba(255, 255, 255, 0.95) !important;
-  color: #3e2723 !important;
-  border: 1px solid #c8a488 !important;
+  width: 65%;
+  max-width: 250px;
+  background-color: rgba(255, 255, 255, 0.95);
+  color: #3e2723;
+  border: 1px solid #c8a488;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15);
-  padding: 12px !important;
-  font-size: 18px !important;
-  font-family: 'Cardo', serif !important;
-  text-align: center !important;
-  margin: 0 auto !important;
+  padding: 12px;
+  font-size: 18px;
+  font-family: 'Cardo', serif;
+  text-align: center;
+  margin: 0 auto;
 }
 
 .titulo-pergaminho {
@@ -249,7 +249,7 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
 .guia-descricao-medieval {
   width: 100%;
   max-width: 640px;
-  text-align: left !important;
+  text-align: left;
   color: #fff;
 }
 
@@ -315,27 +315,27 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
 
 /* Evita fundo duplicado nas seções com vídeo (como a selfie) */
 section.selfie-page {
-  background: none !important;
-  box-shadow: none !important;
+  background: none ;
+  box-shadow: none ;
 }
 
 /* Garante contraste e hierarquia correta */
 .selfie-page .parchment-inner-rough {
-  background: transparent !important;
-  box-shadow: none !important;
+  background: transparent;
+  box-shadow: none;
   z-index: 2;
 }
 
 /* Remove texturas ou overlays que possam interferir na câmera */
 .selfie-page::before,
 .selfie-page::after {
-  display: none !important;
-  content: none !important;
+  display: none;
+  content: none;
 }
 /* === Complementos globais usados pelos .js === */
 
 /* classe que o JS usa para esconder nós */
-.hidden { display: none !important; }
+.hidden { display: none; }
 
 /* pulso padrão para qualquer botão “liberado” por efeito */
 .btn-ready-pulse { animation: btnReadyPulse .8s ease-out 1; }
