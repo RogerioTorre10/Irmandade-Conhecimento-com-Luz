@@ -70,15 +70,15 @@ p, li {
 
 /* ========== PERGAMINHO ========== */
 .pergaminho {
-  position: relative;
+  pposition: relative;
   padding: 24px 20px;
   width: 100%;
-  max-width: 600px !important;
+  max-width: 600px;
   margin: 12px auto;
-  min-height: 80vh !important;
-  height: 80vh !important;
+  min-height: 80vh;
+  height: 80vh;
   box-sizing: border-box;
-  overflow: hidden !important;
+  overflow: hidden;
   contain: layout;
 }
 
