@@ -534,3 +534,47 @@
   opacity: 0.85;
   white-space: nowrap;
 }
+.j-progress-inline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0;
+  font-family: 'Cardo', serif;
+  color: #ffd700;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+}
+
+.j-progress-badge {
+  font-weight: bold;
+  font-size: 1.1em;
+  padding: 4px 12px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,215,0,0.3);
+  border-radius: 8px;
+  backdrop-filter: blur(2px);
+}
+
+.j-progress-meta {
+  font-size: 0.9em;
+  opacity: 0.9;
+}
+
+.j-progress-bar {
+  width: 100%;
+  max-width: 400px;
+  height: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.j-progress__fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #d4af37, #ffd700);
+  border-radius: 3px;
+  transition: width 0.6s ease;
+  box-shadow: 0 0 8px rgba(255,215,0,0.5);
+}
