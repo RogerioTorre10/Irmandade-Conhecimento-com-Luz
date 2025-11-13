@@ -1,33 +1,26 @@
-/* /assets/js/section-card.js — v4.2-merge (robusto + compatível)
-   - Mantém sua lógica sem globals, storage sync e transição com vídeo
-   - Alinha com a versão Lumen: auto-monta estrutura se faltar, garante botão, nome no rodapé
-   - Lê dados em ordem: sessionStorage → localStorage → JC.data (com fallbacks)
-   - Suporta #cardName e #userNameSlot (ambos atualizados)
-   - BG: tenta /assets/data/guias.json (se existir); senão usa constantes CARD_BG
+/* /assets/js/section-card.js — v4.3-merge (CORRIGIDO)
+   - Botão FORA do card, ABAIXO do rodapé
+   - Sem erro de sintaxe (Unexpected token ')')
+   - Compatível com guias.json, storage, vídeo, datilografia
+   - Mantém toda sua lógica original
 */
 (function () {
   'use strict';
-
   const MOD = 'section-card.js';
   const SECTION_IDS = ['section-card', 'section-eu-na-irmandade'];
   const NEXT_SECTION_ID = 'section-perguntas';
   const VIDEO_SRC = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
-
-  // Fallbacks de BG (se guias.json não estiver disponível)
   const CARD_BG = {
     arian: '/assets/img/irmandade-quarteto-bg-arian.png',
     lumen: '/assets/img/irmandade-quarteto-bg-lumen.png',
-    zion:  '/assets/img/irmandade-quarteto-bg-zion.png'
+    zion: '/assets/img/irmandade-quarteto-bg-zion.png'
   };
-
   const PLACEHOLDER_SELFIE = '/assets/img/irmandade-card-placeholder.jpg';
   const GUIAS_JSON = '/assets/data/guias.json';
-
-  const qs  = (s, r = document) => r.querySelector(s);
+  const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
   const log = (...a) => console.log(`%c[${MOD}]`, 'color:#7dd3fc', ...a);
 
-  // Cache opcional de BGs vindos do guias.json
   let GUIA_BG_CACHE = null;
 
   async function maybeLoadGuias() {
@@ -38,21 +31,18 @@
       const arr = await res.json();
       GUIA_BG_CACHE = {};
       for (const g of arr) {
-        const key =
-          (g.id || g.key || (g.nome || '').toLowerCase() || '').toString().toLowerCase();
+        const key = (g.id || g.key || (g.nome || '').toLowerCase() || '').toString().toLowerCase();
         const bg = g.bgImage || g.bg || g.image;
         if (key && bg) GUIA_BG_CACHE[key] = bg.startsWith('/') ? bg : `/assets/img/${bg}`;
       }
       log('guias.json carregado', GUIA_BG_CACHE);
     } catch (e) {
-      // se não existir, seguimos com CARD_BG
       GUIA_BG_CACHE = {};
       log('Usando BGs estáticos (sem guias.json)');
     }
     return GUIA_BG_CACHE;
   }
 
-  // --- Sincronização mobile (outra aba) ---
   window.addEventListener('storage', (e) => {
     if (e.key === 'jc.guia' || e.key === 'jc.nome' || e.key === 'jc.selfieDataUrl') {
       log('SYNC: dados atualizados', e);
@@ -60,47 +50,37 @@
     }
   });
 
-  // --- Leitura de dados (com fallbacks) ---
   function getUserData() {
     let nome = 'AMOR';
-    let guia = 'zion'; // zion como base visual segura
-
+    let guia = 'zion';
     try {
       const ssNome = sessionStorage.getItem('jornada.nome');
       const ssGuia = sessionStorage.getItem('jornada.guia');
       if (ssNome) nome = ssNome;
       if (ssGuia) guia = ssGuia;
-
       const lsNome = localStorage.getItem('jc.nome');
       const lsGuia = localStorage.getItem('jc.guia');
       if (lsNome) nome = lsNome;
       if (lsGuia) guia = lsGuia;
-
       if (window.JC?.data) {
         if (window.JC.data.nome) nome = window.JC.data.nome;
         if (window.JC.data.guia) guia = window.JC.data.guia;
       }
     } catch {}
-
     nome = (nome || 'AMOR').toString().toUpperCase().trim();
     guia = (guia || 'zion').toString().toLowerCase().trim();
-
-    // Normaliza em JC + persiste para outras telas
     window.JC = window.JC || {};
     window.JC.data = window.JC.data || {};
     window.JC.data.nome = nome;
     window.JC.data.guia = guia;
-
     try {
       localStorage.setItem('jc.nome', nome);
       localStorage.setItem('jc.guia', guia);
       sessionStorage.setItem('jornada.guia', guia);
     } catch {}
-
     return { nome, guia };
   }
 
-  // --- Garantir estrutura básica do card quando HTML veio "puro" ---
   function ensureStructure(root) {
     if (!root) return {};
 
@@ -139,7 +119,6 @@
       stage.appendChild(inner);
     }
 
-    // Selfie container (se não houver na página)
     let flameLayer = qs('.flame-layer', stage);
     if (!flameLayer) {
       flameLayer = document.createElement('div');
@@ -150,7 +129,6 @@
       stage.appendChild(flameLayer);
     }
 
-    // Rodapé com nome (#cardName) — compatível com #userNameSlot
     let footer = qs('.card-footer', stage);
     if (!footer) {
       footer = document.createElement('div');
@@ -161,7 +139,6 @@
         `<span class="card-name-badge"><span id="cardName"></span></span>`;
       stage.appendChild(footer);
     } else {
-      // Se o HTML antigo usa #userNameSlot, mantemos e também criamos #cardName se faltar
       const hasCardName = qs('#cardName', footer);
       const userSlot = qs('#userNameSlot', footer);
       if (!hasCardName && !userSlot) {
@@ -173,44 +150,39 @@
     }
 
     // =========================================
-// BOTÃO CONTINUAR — FORA DO CARD, ABAIXO
-// =========================================
-let actionsBelow = qs('.card-actions-below', root);
-if (!actionsBelow) {
-  actionsBelow = document.createElement('div');
-  actionsBelow.className = 'card-actions-below';
-  root.appendChild(actionsBelow); // adiciona ao final do conteúdo
-}
+    // BOTÃO CONTINUAR — FORA DO CARD, ABAIXO
+    // =========================================
+    let actionsBelow = qs('.card-actions-below', root);
+    if (!actionsBelow) {
+      actionsBelow = document.createElement('div');
+      actionsBelow.className = 'card-actions-below';
+      root.appendChild(actionsBelow);
+    }
 
-let btnNext = qs('#btnNext', actionsBelow);
-if (!btnNext) {
-  btnNext = document.createElement('button');
-  btnNext.id = 'btnNext';
-  btnNext.className = 'btn btn-stone';
-  btnNext.textContent = 'Continuar';
-  actionsBelow.appendChild(btnNext);
-}
+    let btnNext = qs('#btnNext', actionsBelow);
+    if (!btnNext) {
+      btnNext = document.createElement('button');
+      btnNext.id = 'btnNext';
+      btnNext.className = 'btn btn-stone';
+      btnNext.textContent = 'Continuar';
+      actionsBelow.appendChild(btnNext);
+    }
 
-// Garante funcionalidade
-btnNext.style.pointerEvents = 'auto';
-btnNext.disabled = false;
-btnNext.onclick = goNext; // ou () => JC.next()
+    btnNext.style.pointerEvents = 'auto';
+    btnNext.disabled = false;
+    btnNext.onclick = goNext;
 
-return { stage, guideBg };
- 
-  // --- Aplica o BG do guia (guias.json > CARD_BG) ---
+    return { stage, guideBg };
+  }
+
   async function applyGuideBG(section, guia) {
     const guideBg = qs('#guideBg', section);
     if (!guideBg) return;
-
     const cache = await maybeLoadGuias();
     const fromJson = cache[guia];
     const fromConst = CARD_BG[guia] || CARD_BG.zion;
     const target = fromJson || fromConst;
-
-    // base segura desde o início
     if (!guideBg.src) guideBg.src = CARD_BG.zion;
-
     if (guideBg.src !== target) {
       guideBg.style.opacity = '0';
       guideBg.onload = () => { guideBg.style.opacity = '1'; guideBg.onload = null; };
@@ -221,17 +193,12 @@ return { stage, guideBg };
     }
   }
 
-  // --- Render do card (idempotente) ---
   async function renderCard() {
     const section = qs('#section-card') || qs('#section-eu-na-irmandade');
     if (!section) return;
-
     ensureStructure(section);
-
     const { nome, guia } = getUserData();
     await applyGuideBG(section, guia);
-
-    // Selfie
     const selfieImg = qs('#selfieImage', section);
     if (selfieImg) {
       const url = window.JC?.data?.selfieDataUrl || localStorage.getItem('jc.selfieDataUrl');
@@ -239,21 +206,16 @@ return { stage, guideBg };
       const flameLayer = selfieImg.closest('.flame-layer');
       if (flameLayer) flameLayer.classList.add('show');
     }
-
-    // Nome — atualiza #cardName e #userNameSlot (se existirem)
     const el1 = qs('#cardName', section);
     const el2 = qs('#userNameSlot', section);
     if (el1) el1.textContent = nome;
     if (el2) el2.textContent = nome;
-
     log('Renderizado', { guia, nome });
   }
 
-  // --- Navegação (transição com vídeo ou fallback) ---
   function goNext() {
     try { speechSynthesis.cancel(); } catch {}
     qsa('video').forEach(v => { try { v.pause(); v.src = ''; } catch {} });
-
     if (typeof window.playTransitionVideo === 'function') {
       window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
     } else {
@@ -267,11 +229,8 @@ return { stage, guideBg };
     }
   }
 
-  // --- Init da seção ---
   async function initCard(root) {
     await renderCard();
-
-    // Efeito de datilografia/voz, se disponíveis
     const typingEls = qsa('[data-typing="true"]', root);
     for (const el of typingEls) {
       const text = el.dataset.text || el.textContent || '';
@@ -284,7 +243,6 @@ return { stage, guideBg };
     }
   }
 
-  // --- Eventos do seu app ---
   document.addEventListener('section:shown', e => {
     const id = e.detail.sectionId;
     if (SECTION_IDS.includes(id)) {
@@ -298,11 +256,10 @@ return { stage, guideBg };
     if (visible) initCard(visible);
   });
 
-  // --- Fallback visual se vier só o <section id="section-card"> vazio ---
   document.addEventListener('DOMContentLoaded', () => {
     const sec = qs('#section-card');
     if (!sec || sec.querySelector('.card-stage')) return;
-    ensureStructure(sec); // monta tudo e deixa pronto
+    ensureStructure(sec);
     renderCard();
   });
 
