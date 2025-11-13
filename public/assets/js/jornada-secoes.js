@@ -1,4 +1,3 @@
-<DOCUMENT filename="jornada-secoes.js">
 (function (global) {
   'use strict';
   
