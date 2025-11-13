@@ -214,51 +214,26 @@
     if (el) el.style.width = val;
   }
 
-     function updateCounters() {
+  function updateCounters() {
     const { bloco } = getCurrent();
     const blocoTotal = bloco?.questions?.length || 1;
 
-    // ---------- BLOCO (Régua superior: 1 a 5) ----------
-    if (State.totalBlocks > 0) {
-      const blocoAtual = State.blocoIdx + 1;
-      const pctBlocos = Math.max(0, Math.min(100,
-        (blocoAtual / State.totalBlocks) * 100
-      ));
+    setText('#jp-block-num', State.blocoIdx + 1);
+    setText('#jp-block-num-2', State.blocoIdx + 1);
+    setText('#jp-block-max', State.totalBlocks || 1);
 
-      // texto "X de Y"
-      setText('#progress-block-value', `${blocoAtual} de ${State.totalBlocks}`);
+    setText('#jp-global-current', State.globalIdx + 1);
+    setText('#jp-global-total', State.totalQuestions || 1);
 
-      // barra dourada
-      const fillBloco = document.querySelector('#progress-block-fill');
-      if (fillBloco) {
-        fillBloco.style.width = pctBlocos + '%';
-      }
-    }
+    setText('#jp-block-current', State.qIdx + 1);
+    setText('#jp-block-total', blocoTotal);
 
-    // ---------- PERGUNTA DO BLOCO (Régua do meio: 1 a 10) ----------
-    {
-      const perguntaAtual = State.qIdx + 1;
-      const pctPerguntas = Math.max(0, Math.min(100,
-        (perguntaAtual / blocoTotal) * 100
-      ));
+    const pctBloco = Math.max(0, Math.min(100, ((State.qIdx + 1) / blocoTotal) * 100));
+    const pctGlobal = Math.max(0, Math.min(100, ((State.globalIdx + 1) / (State.totalQuestions || 1)) * 100));
 
-      // texto "X / Y"
-      setText('#progress-question-value', `${perguntaAtual} / ${blocoTotal}`);
-
-      // barra prateada
-      const fillPerg = document.querySelector('#progress-question-fill');
-      if (fillPerg) {
-        fillPerg.style.width = pctPerguntas + '%';
-      }
-    }
-
-    // ---------- TOTAL GERAL (Ampulheta: 1 a 50) ----------
-    if (State.totalQuestions > 0) {
-      const globalAtual = State.globalIdx + 1;
-      setText('#progress-total-value', `${globalAtual} / ${State.totalQuestions}`);
-    }
+    setWidth('#jp-block-progress-fill', pctBloco + '%');
+    setWidth('#jp-global-progress-fill', pctGlobal + '%');
   }
-
 
   async function typeQuestion(text) {
     if (completed) return;
@@ -410,59 +385,127 @@
     }
   }
 
- function finishAll() {
-  if (completed) return;
-  completed = true;
+     // --------------------------------------------------
+  // FINALIZAÇÃO — FALLBACK LIMPO PARA SECTION-FINAL
+  // --------------------------------------------------
 
-  const finishedAt = new Date().toISOString();
-  const guia = window.JC?.state?.guia || {};
-  const selfie = window.__SELFIE_DATA_URL__ || null;
+  function ensureFinalSectionExists() {
+    let finalEl = document.getElementById(FINAL_SECTION_ID);
 
-  State.meta = {
-    startedAt: State.startedAt,
-    finishedAt,
-    guia,
-    selfieUsed: !!selfie,
-    version: window.APP_CONFIG?.version || 'v1'
-  };
+    if (finalEl) {
+      log('section-final já existe, usando versão existente.');
+      return finalEl;
+    }
 
-  window.__QA_ANSWERS__ = State.answers;
-  window.__QA_META__ = State.meta;
+    // Cria a seção final com o mesmo layout da section-final.html
+    finalEl = document.createElement('section');
+    finalEl.id = FINAL_SECTION_ID;
+    finalEl.className = 'section section-final';
+    finalEl.dataset.section = 'final';
 
-  log('Jornada de perguntas concluída.', {
-    total: State.totalQuestions,
-    respondidas: Object.keys(State.answers).length
-  });
+    finalEl.innerHTML = `
+      <div class="final-pergaminho-wrapper">
+        <div class="pergaminho-vertical">
+          <div class="pergaminho-content">
 
-  if (window.JORNADA_CHAMA) {
-    window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'forte');
+            <h1 id="final-title" class="final-title"></h1>
+
+            <div id="final-message" class="final-message">
+              <p>Suas respostas foram recebidas com honra pela Irmandade.</p>
+              <p>Você plantou sementes de confiança, coragem e luz.</p>
+              <p>Continue caminhando. A jornada nunca termina.</p>
+              <p>Volte quando precisar reacender a chama.</p>
+              <p class="final-bold">Você é a luz. Você é a mudança.</p>
+            </div>
+
+            <div class="final-acoes">
+              <button id="btnBaixarPDFHQ" class="btn btn-gold" disabled>Baixar PDF e HQ</button>
+              <button id="btnVoltarInicio" class="btn btn-light">Voltar ao Início</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <video id="final-video" playsinline preload="auto" style="display:none;"></video>
+    `;
+
+    const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
+    wrapper.appendChild(finalEl);
+
+    log('section-final criada com HTML completo (fallback FINAL).');
+    return finalEl;
   }
 
-  const finalVideoSrc = resolveVideoSrc(
-    window.JORNADA_FINAL_VIDEO || FINAL_VIDEO_FALLBACK
-  );
+  function showFinalSection() {
+    const finalEl = ensureFinalSectionExists();
 
-  const triggerFinalSection = () => {
-    document.dispatchEvent(new CustomEvent('section:shown', {
-      detail: { sectionId: FINAL_SECTION_ID }
-    }));
-  };
+    const wrapper = document.getElementById('jornada-content-wrapper');
+    if (wrapper) {
+      // limpa tudo que está dentro e deixa só a final
+      wrapper.innerHTML = '';
+      wrapper.appendChild(finalEl);
+    }
 
-  if (finalVideoSrc) {
-    log('Iniciando vídeo final:', finalVideoSrc);
-    playVideoWithCallback(finalVideoSrc, triggerFinalSection);
-  } else {
-    triggerFinalSection();
+    // Fluxo oficial controlado pelo JC
+    if (window.JC && typeof window.JC.show === 'function') {
+      window.JC.show(FINAL_SECTION_ID);
+    } else {
+      // Fallback simples
+      document.querySelectorAll('section.section').forEach(sec => {
+        sec.style.display = (sec.id === FINAL_SECTION_ID) ? 'block' : 'none';
+      });
+      finalEl.scrollIntoView({ behavior: 'smooth' });
+    }
   }
 
-  try {
-    document.dispatchEvent(new CustomEvent('qa:completed', {
-      detail: { answers: State.answers, meta: State.meta }
-    }));
-  } catch (e) {
-    warn('Falha ao disparar qa:completed:', e);
+  function finishAll() {
+    if (completed) return;
+    completed = true;
+
+    const finishedAt = new Date().toISOString();
+    const guia = window.JC?.state?.guia || {};
+    const selfie = window.__SELFIE_DATA_URL__ || null;
+
+    State.meta = {
+      startedAt: State.startedAt,
+      finishedAt,
+      guia,
+      selfieUsed: !!selfie,
+      version: window.APP_CONFIG?.version || 'v1'
+    };
+
+    window.__QA_ANSWERS__ = State.answers;
+    window.__QA_META__ = State.meta;
+
+    log('Jornada de perguntas concluída.', {
+      total: State.totalQuestions,
+      respondidas: Object.keys(State.answers).length
+    });
+
+    if (window.JORNADA_CHAMA) {
+      window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'forte');
+    }
+
+    const finalVideoSrc = resolveVideoSrc(
+      window.JORNADA_FINAL_VIDEO || FINAL_VIDEO_FALLBACK
+    );
+
+    if (finalVideoSrc) {
+      log('Iniciando vídeo final:', finalVideoSrc);
+      playVideoWithCallback(finalVideoSrc, showFinalSection);
+    } else {
+      showFinalSection();
+    }
+
+    try {
+      document.dispatchEvent(new CustomEvent('qa:completed', {
+        detail: { answers: State.answers, meta: State.meta }
+      }));
+    } catch (e) {
+      warn('Falha ao disparar qa:completed:', e);
+    }
   }
-}
 
   // --------------------------------------------------
   // BIND UI
@@ -581,34 +624,6 @@
       log('Reset concluído.');
     }
   };
-  
-  (function () {
-    try {
-    const labelEl = document.querySelector('.jp-block-label');
-    if (!labelEl) return;
-
-    // tenta descobrir o bloco atual (ex.: "2 de 5")
-    const counterEl = document.querySelector('.jp-block-counter');
-    let current = 1;
-    if (counterEl) {
-      const m = counterEl.textContent.match(/(\d+)/);
-      if (m) current = parseInt(m[1], 10) || 1;
-    }
-
-    const nomes = {
-      1: 'O CAMINHO',
-      2: 'A VERDADE',
-      3: 'A VIDA',
-      4: 'A MISSÃO',
-      5: 'A ALIANÇA'
-    };
-
-    const titulo = nomes[current] || 'O CAMINHO';
-    labelEl.textContent = `BLOCO ${current}: ${titulo}`;
-  } catch (e) {
-    console.warn('[PERGUNTAS][BLOCO] Não foi possível ajustar o título dinâmico:', e);
-  }
-})();  
 
   log(MOD, 'carregado');
 })();
