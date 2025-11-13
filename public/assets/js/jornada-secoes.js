@@ -90,29 +90,29 @@
   }
 
   // Fallback seguro para evitar erro de referência
-  window.typingLog = window.typingLog || {};
+window.typingLog = window.typingLog || {};
 
-  function loadDynamicBlocks() {
-    const blocks = window.JORNADA_BLOCO || [];
-    if (!blocks.length) {
-      log('Nenhum bloco dinâmico encontrado');
-      return;
-    }
-    const container = $('#jornada-content-wrapper');
-    if (!container) return;
-    container.innerHTML = ''; // Limpa
-    blocks.forEach((b, i) => {
-      const div = document.createElement('div');
-      div.className = 'j-pergunta';
-      div.id = `pergunta-${i}`;
-      div.innerHTML = `<label class="pergunta-enunciado">${b.enunciado}</label>
-        <textarea placeholder="Digite sua resposta..." maxlength="1000"></textarea>
-        <div class="pergunta-devolutiva" style="display:none;"></div>`;
-      container.appendChild(div);
-    });
-    log('Blocos dinâmicos carregados:', blocks.length);
+// Carrega blocos dinâmicos (se existirem)
+function loadDynamicBlocks() {
+  const blocks = window.JORNADA_BLOCO || [];
+  if (!blocks.length) {
+    log('Nenhum bloco dinâmico encontrado');
+    return;
   }
-
+  const container = $('#jornada-content-wrapper');
+  if (!container) return;
+  container.innerHTML = ''; // Limpa
+  blocks.forEach((b, i) => {
+    const div = document.createElement('div');
+    div.className = 'j-pergunta';
+    div.id = `pergunta-${i}`;
+    div.innerHTML = `<label class="pergunta-enunciado">${b.enunciado}</label>
+      <textarea placeholder="Digite sua resposta..." maxlength="1000"></textarea>
+      <div class="pergunta-devolutiva" style="display:none;"></div>`;
+    container.appendChild(div);
+  });
+  log('Blocos dinâmicos carregados:', blocks.length);
+}
   function handleInput(textarea) {
     const resposta = textarea.value.trim();
     const score = analyzeSentiment(resposta);
