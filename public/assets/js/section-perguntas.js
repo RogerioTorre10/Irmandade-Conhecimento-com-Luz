@@ -214,26 +214,54 @@
     if (el) el.style.width = val;
   }
 
-  function updateCounters() {
+   function updateCounters() {
     const { bloco } = getCurrent();
     const blocoTotal = bloco?.questions?.length || 1;
 
-    setText('#jp-block-num', State.blocoIdx + 1);
-    setText('#jp-block-num-2', State.blocoIdx + 1);
-    setText('#jp-block-max', State.totalBlocks || 1);
+    const totalBlocks     = State.totalBlocks   || 1;
+    const totalQuestions  = State.totalQuestions || 1;
 
-    setText('#jp-global-current', State.globalIdx + 1);
-    setText('#jp-global-total', State.totalQuestions || 1);
+    const currentBlockNum    = State.blocoIdx  + 1; // 1–5
+    const currentQuestionNum = State.qIdx      + 1; // 1–10 dentro do bloco
+    const currentGlobalNum   = State.globalIdx + 1; // 1–50 geral
 
-    setText('#jp-block-current', State.qIdx + 1);
-    setText('#jp-block-total', blocoTotal);
+    // 1) BARRA DO TOPO — BLOCOS (1–5)
+    const elBlockValue = document.getElementById('progress-block-value');
+    if (elBlockValue) {
+      elBlockValue.textContent = `${currentBlockNum} de ${totalBlocks}`;
+    }
 
-    const pctBloco = Math.max(0, Math.min(100, ((State.qIdx + 1) / blocoTotal) * 100));
-    const pctGlobal = Math.max(0, Math.min(100, ((State.globalIdx + 1) / (State.totalQuestions || 1)) * 100));
+    const elBlockFill = document.getElementById('progress-block-fill');
+    if (elBlockFill) {
+      const pctBlock = Math.max(
+        0,
+        Math.min(100, (currentBlockNum / totalBlocks) * 100)
+      );
+      elBlockFill.style.width = pctBlock + '%';
+    }
 
-    setWidth('#jp-block-progress-fill', pctBloco + '%');
-    setWidth('#jp-global-progress-fill', pctGlobal + '%');
+    // 2) BARRA DO MEIO — PERGUNTAS DO BLOCO (1–10)
+    const elQuestionValue = document.getElementById('progress-question-value');
+    if (elQuestionValue) {
+      elQuestionValue.textContent = `${currentQuestionNum} / ${blocoTotal}`;
+    }
+
+    const elQuestionFill = document.getElementById('progress-question-fill');
+    if (elQuestionFill) {
+      const pctQuestion = Math.max(
+        0,
+        Math.min(100, (currentQuestionNum / blocoTotal) * 100)
+      );
+      elQuestionFill.style.width = pctQuestion + '%';
+    }
+
+    // 3) AMPULHETA — TOTAL GERAL (1–50)
+    const elTotal = document.getElementById('progress-total-value');
+    if (elTotal) {
+      elTotal.textContent = `${currentGlobalNum} / ${totalQuestions}`;
+    }
   }
+
 
   async function typeQuestion(text) {
     if (completed) return;
