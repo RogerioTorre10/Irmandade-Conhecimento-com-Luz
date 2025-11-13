@@ -1,22 +1,22 @@
 /* i18n.js — cabeça + detecção forçada */
-(function (global) {
+(function (window) {
   'use strict';
 
-  if (global.__i18nReadyShim) return; // evita dupla carga
-  global.__i18nReadyShim = true;
+  if (window.__i18nReadyShim) return; // evita dupla carga
+  window.__i18nReadyShim = true;
 
   const STORAGE_KEY = 'i18n_lang';
   const DEFAULT = 'pt-BR';
   const SUPPORTED = ['pt-BR', 'en-US', 'es-ES'];
 
-  // 🚩 preferências que podem forçar o idioma:
-  // - JORNADA_CFG.LANG (ex.: 'pt-BR')
-  // - atributo data-lang no <html>
-  // - variável global __FORCE_LANG
+  // Forçar idioma via:
+  // - JORNADA_CFG.LANG
+  // - data-lang no <html>
+  // - __FORCE_LANG
   const FORCE_LANG =
-    (global.JORNADA_CFG && global.JORNADA_CFG.LANG) ||
+    (window.JORNADA_CFG && window.JORNADA_CFG.LANG) ||
     (document.documentElement && document.documentElement.getAttribute('data-lang')) ||
-    global.__FORCE_LANG ||
+    window.__FORCE_LANG ||
     null;
 
   const state = {
@@ -26,14 +26,9 @@
   };
 
   function detectLang() {
-    // 1) se existe forçado e suportado → usa
     if (FORCE_LANG && SUPPORTED.includes(FORCE_LANG)) return FORCE_LANG;
-
-    // 2) se existe salvo em storage → usa
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored && SUPPORTED.includes(stored)) return stored;
-
-    // 3) caso contrário, tenta o navegador
     const nav = (navigator.language || navigator.userLanguage || DEFAULT).replace('_', '-');
     if (nav.startsWith('pt')) return 'pt-BR';
     if (nav.startsWith('en')) return 'en-US';
@@ -42,7 +37,6 @@
   }
 
   async function loadDict(lang) {
-    // tenta múltiplos caminhos (na ordem)
     const candidates = [
       `/assets/js/i18n/${lang}.json`,
       `/assets/i18n/${lang}.json`,
@@ -61,8 +55,7 @@
     throw new Error('Nenhum dicionário encontrado para ' + lang);
   }
 
-
-    async function init(lang) {
+  async function init(lang) {
     state.lang = lang || detectLang();
     try {
       state.dict = await loadDict(state.lang);
@@ -71,7 +64,7 @@
     } catch (e) {
       console.error('[i18n] Erro no init:', e);
       state.dict = {};
-      state.ready = true; // segue “vazio” para não travar
+      state.ready = true;
     }
   }
 
@@ -106,7 +99,6 @@
     apply(document.body);
   }
 
-  // atalho explícito para “forçar” via código
   async function forceLang(lang, persist = true) {
     if (persist) localStorage.setItem(STORAGE_KEY, lang);
     return setLang(lang);
@@ -128,13 +120,14 @@
     });
   }
 
-  // Exposição global
+  // Exposição no window
   const api = {
     get lang() { return state.lang; },
     get ready() { return state.ready; },
     init, t, apply, setLang, forceLang, waitForReady
   };
-  global.i18n = api;
+
+  window.i18n = api;
 
   // Autoinit com respeito ao FORCE_LANG
   document.addEventListener('DOMContentLoaded', () => {
@@ -150,4 +143,3 @@
   }, { once: true });
 
 })(window);
-
