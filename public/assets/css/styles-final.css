@@ -1,14 +1,16 @@
 /* styles-final.css */
 #section-final {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
   background: radial-gradient(circle at center, #1a1a2e, #0a0a1a);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
-  overflow: hidden;
+  z-index: 9999 !important;
+  overflow: visible !important;
   opacity: 0;
   transition: opacity 1s ease;
 }
@@ -18,7 +20,9 @@
 }
 
 .final-pergaminho-wrapper {
-  width: 100%; height: 100%;
+  width: 100% visible !important;
+  height: 100% visible !important;
+  max-width: none !important;
   display: flex;
   align-items: center;
   justify-content: center;
