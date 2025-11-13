@@ -127,6 +127,22 @@
   background: #d4af37;
   color: #000;
 }
+
+/* ADICIONE NO FINAL DO styles-final.css */
+#final-message p,
+.final-title,
+.final-acoes {
+  opacity: 0;
+  transition: all 0.8s ease;
+}
+
+#final-message p.revealed,
+.final-title.revealed,
+.final-acoes.show {
+  opacity: 1;
+  transform: translateY(0) !important;
+}
+
 const finalCSS = document.createElement('style');
 finalCSS.textContent = `
   #final-title, #final-message p {
