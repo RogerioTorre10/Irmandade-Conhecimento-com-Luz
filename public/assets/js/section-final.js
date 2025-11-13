@@ -1,4 +1,4 @@
-/* section-final.js — FINAL v1.5 | PERFEITO: VISUAL + LÓGICA + ESTABILIDADE */
+/* section-final.js — FINAL v2.0 MÁGICO */
 (function () {
   'use strict';
 
@@ -6,40 +6,27 @@
   const VIDEO_SRC = '/assets/videos/filme-5-fim-da-jornada.mp4';
   const HOME_URL = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
 
+  let isSpeaking = false;
   let started = false;
-  let videoPlaying = false;
 
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-  // Fila de fala
-  const speakQueue = [];
-  let speakingInProgress = false;
-
-  async function speakText(text) {
-    if (!('speechSynthesis' in window) || !text) return;
-    speakQueue.push(text);
-    if (speakingInProgress) return;
-    speakingInProgress = true;
-
-    while (speakQueue.length > 0) {
-      const current = speakQueue.shift();
-      await new Promise(resolve => {
-        const utter = new SpeechSynthesisUtterance(current);
-        utter.lang = 'pt-BR';
-        utter.rate = 0.95;
-        utter.onend = resolve;
-        utter.onerror = resolve;
-        speechSynthesis.cancel();
-        speechSynthesis.speak(utter);
-      });
-      await sleep(100);
-    }
-    speakingInProgress = false;
+  // === VOZ ===
+  function speakText(text) {
+    if (!('speechSynthesis' in window) || isSpeaking || !text) return;
+    isSpeaking = true;
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'pt-BR';
+    utter.rate = 0.85;
+    utter.pitch = 1.0;
+    utter.volume = 0.9;
+    utter.onend = () => { isSpeaking = false; };
+    speechSynthesis.cancel();
+    speechSynthesis.speak(utter);
   }
 
-  // Datilografia
-  let typingPaused = false;
-  async function typeText(el, text, delay = 35, withVoice = false) {
+  // === DATILOGRAFIA LENTA E NATURAL ===
+  async function typeText(el, text, delay = 65, withVoice = false) {
     if (!el || !text) return;
     el.textContent = '';
     el.classList.add('typing-active');
@@ -47,124 +34,81 @@
     if (withVoice) speakText(text);
 
     for (let i = 0; i < text.length; i++) {
-      if (typingPaused) {
-        await new Promise(r => setTimeout(r, 100));
-        i--;
-        continue;
-      }
       el.textContent += text[i];
-      await sleep(delay);
+      if ('.,!?'.includes(text[i])) {
+        await sleep(180);
+      } else if (i % 2 === 0) {
+        await sleep(delay);
+      }
     }
 
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
+    return sleep(200);
   }
 
-  async function typeAndSpeak(el, text, delay = 35) {
-    await typeText(el, text, delay, false);
-    await speakText(text);
-  }
-
-  // Pausa ao interagir
-  const pauseTyping = () => { typingPaused = true; };
-  const resumeTyping = () => { typingPaused = false; };
-  document.addEventListener('mousedown', pauseTyping);
-  document.addEventListener('touchstart', pauseTyping);
-  document.addEventListener('mouseup', resumeTyping);
-  document.addEventListener('touchend', resumeTyping);
-  document.addEventListener('keydown', resumeTyping);
-
-  // === FORÇA ESCONDER TUDO ANTES DE COMEÇAR ===
-  function hideAllExceptFinal() {
-    document.querySelectorAll('body > *').forEach(el => {
-      if (el.id !== SECTION_ID && el.id !== 'final-video-container' && el.id !== 'final-video-overlay') {
-        el.style.display = 'none';
-        el.style.opacity = '0';
-        el.style.visibility = 'hidden';
-      }
-    });
-    document.body.style.overflow = 'hidden';
-  }
-
+  // === SEQUÊNCIA FINAL ===
   async function startFinalSequence() {
     if (started) return;
     started = true;
 
     const section = document.getElementById(SECTION_ID);
-    if (!section) {
-      console.warn('[FINAL] Seção não encontrada. Aguardando...');
-      setTimeout(startFinalSequence, 500);
-      return;
-    }
+    if (!section) return;
 
-    // === FORÇA ESCONDER TUDO ===
-    hideAllExceptFinal();
-
-    // Garante que a seção final esteja visível
-    section.style.display = 'flex';
-    section.style.opacity = '1';
-    section.style.zIndex = '99999';
+    section.classList.add('show');
 
     const titleEl = document.getElementById('final-title');
     const messageEl = document.getElementById('final-message');
+    const botoes = document.querySelector('.final-acoes');
 
-    if (!titleEl || !messageEl) {
-      console.warn('[FINAL] Elementos não encontrados.');
-      return;
-    }
+    if (!titleEl || !messageEl) return;
 
-    // Desabilita botões
-    document.querySelectorAll('.final-acoes button').forEach(btn => {
-      btn.disabled = true;
-      btn.style.opacity = '0';
-      btn.style.transform = 'translateY(20px)';
-      btn.style.pointerEvents = 'none';
-    });
+    // TÍTULO
+    await typeText(titleEl, 'Gratidão por Caminhar com Luz', 50, true);
+    await sleep(700);
 
-    try {
-      // TÍTULO
-      titleEl.style.opacity = '1';
-      await typeAndSpeak(titleEl, 'Gratidão por Caminhar com Luz', 40);
-      await sleep(800);
+    // PARÁGRAFOS
+    const ps = messageEl.querySelectorAll('p');
+    for (let i = 0; i < ps.length; i++) {
+      const p = ps[i];
+      const txt = p.getAttribute('data-original')?.trim();
+      if (!txt) continue;
 
-      // PARÁGRAFOS
-      const ps = messageEl.querySelectorAll('p');
-      for (const p of ps) {
-        const txt = p.getAttribute('data-original')?.trim() || p.textContent.trim();
-        if (!p.getAttribute('data-original')) {
-          p.setAttribute('data-original', txt);
-        }
-        p.textContent = '';
-        p.style.opacity = '1';
-        await typeAndSpeak(p, txt, 22);
-        await sleep(500);
+      p.textContent = '';
+      p.classList.remove('revealed');
+
+      await sleep(500);
+      await typeText(p, txt, 65, true);
+      p.classList.add('revealed');
+
+      if (txt.includes('Você é a luz')) {
+        await sleep(1400); // MOMENTO ÉPICO
+      } else {
+        await sleep(800);
       }
-
-      // LIBERA BOTÕES
-      const buttons = document.querySelectorAll('.final-acoes button');
-      buttons.forEach((btn, i) => {
-        setTimeout(() => {
-          btn.disabled = false;
-          btn.style.opacity = '1';
-          btn.style.transform = 'translateY(0)';
-          btn.style.pointerEvents = 'auto';
-        }, i * 250);
-      });
-
-      console.log('[FINAL] Jornada completa. Botões liberados com luz!');
-    } catch (err) {
-      console.error('[FINAL] Erro:', err);
     }
+
+    // BOTÕES SÓ AGORA
+    if (botoes) {
+      botoes.classList.add('show');
+      setTimeout(() => {
+        document.querySelectorAll('.final-acoes button').forEach(btn => {
+          btn.disabled = false;
+        });
+      }, 600);
+    }
+
+    console.log('[FINAL] Sequência mágica concluída!');
   }
 
-  // Geração de PDF/HQ
+  // === DOWNLOAD PDF/HQ ===
   async function generateArtifacts() {
     const btn = document.getElementById('btnBaixarPDFHQ');
     if (!btn || btn.dataset.loading === '1') return;
 
     btn.dataset.loading = '1';
-    const original = btn.innerHTML;
-    btn.innerHTML = '<span class="spinner"></span> Gerando sua Jornada...';
+    const original = btn.textContent;
+    btn.textContent = 'Invocando a luz...';
     btn.disabled = true;
 
     try {
@@ -172,111 +116,155 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          answers: window.__QA_ANSWERS__ || { teste: 'finalizado' },
+          answers: window.JornadaAnswers || { teste: 'finalizado' },
           meta: { finishedAt: new Date().toISOString() },
           lang: 'pt-BR'
         })
       });
 
       const data = await res.json().catch(() => ({}));
+
       if (data.pdfUrl) window.open(data.pdfUrl, '_blank');
       if (data.hqUrl) window.open(data.hqUrl, '_blank');
       if (!data.pdfUrl && !data.hqUrl) {
-        alert('Jornada finalizada! PDF/HQ em breve...');
+        alert('A luz está se manifestando... Em breve!');
       }
     } catch (e) {
-      console.error('[FINAL] Erro:', e);
-      alert('Erro temporário. Tente novamente.');
+      console.error(e);
+      alert('A conexão com a luz falhou. Tente novamente.');
     } finally {
-      btn.innerHTML = original;
+      btn.textContent = original;
       btn.disabled = false;
       btn.dataset.loading = '0';
     }
   }
 
-  // Vídeo final com borda perfeita
+  // === FILME FINAL COM LOADING DOURADO ===
   function playFinalVideo() {
-    if (videoPlaying) return;
-    videoPlaying = true;
+    let video = document.getElementById('final-video');
+    if (!video) {
+      video = Object.assign(document.createElement('video'), { 
+        id: 'final-video', 
+        playsInline: true,
+        muted: true
+      });
+      document.body.appendChild(video);
+    }
 
-    const container = document.createElement('div');
-    container.id = 'final-video-container';
-    container.style.cssText = `
-      position: fixed !important; top: 50% !important; left: 50% !important;
-      transform: translate(-50%, -50%) !important; width: 92vw !important; height: 92vh !important;
-      max-width: 92vw !important; max-height: 92vh !important; z-index: 99999 !important;
-      border: 12px solid #d4af37 !important; border-radius: 16px !important;
-      box-shadow: 0 0 60px rgba(212,175,55,0.9) !important; overflow: hidden !important;
-      background: #000 !important; display: flex !important; justify-content: center !important; align-items: center !important;
-    `;
-
-    const video = document.createElement('video');
-    video.id = 'final-video';
     video.src = VIDEO_SRC;
-    video.playsInline = true;
-    video.preload = 'auto';
-    video.autoplay = true;
-    video.style.cssText = `width: 100% !important; height: 100% !important; object-fit: contain !important;`;
-
-    const overlay = document.createElement('div');
-    overlay.id = 'final-video-overlay';
-    overlay.style.cssText = `
-      position: fixed !important; top: 0 !important; left: 0 !important;
-      width: 100vw !important; height: 100vh !important; background: rgba(0,0,0,0.95) !important;
-      z-index: 99998 !important; pointer-events: none !important;
+    video.style.cssText = `
+      position: fixed !important; top: 50% !important; left: 50% !important;
+      transform: translate(-50%, -50%) !important; width: 94vw !important; height: 94vh !important;
+      max-width: 94vw !important; max-height: 94vh !important; object-fit: contain !important;
+      z-index: 999999 !important; border: 14px solid #d4af37 !important;
+      border-radius: 20px !important; box-shadow: 0 0 80px rgba(212,175,55,1) !important;
+      background: #000 !important;
     `;
 
-    container.appendChild(video);
-    document.body.appendChild(container);
-    document.body.appendChild(overlay);
+    document.body.style.overflow = 'hidden';
+    document.querySelectorAll('body > *').forEach(el => {
+      if (el.id !== 'final-video') el.style.opacity = '0';
+    });
 
-    const goHome = () => {
-      container.style.opacity = '0';
-      overlay.style.opacity = '0';
-      setTimeout(() => window.location.href = HOME_URL, 1100);
+    // LOADING DOURADO
+    const loading = document.createElement('div');
+    loading.id = 'final-video-loading';
+    loading.innerHTML = `
+      <div style="
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        color: #ffd700; font-family: 'BerkshireSwash', cursive; font-size: 1.5em;
+        text-align: center; z-index: 9999999; text-shadow: 0 0 20px gold;
+        animation: pulse 2s infinite;
+      ">
+        <div>Carregando a luz final</div>
+        <div style="margin-top: 15px; font-size: 2.2em;">Loading</div>
+      </div>
+      <style>
+        @keyframes pulse { 0%,100% { opacity: 0.7; } 50% { opacity: 1; } }
+      </style>
+    `;
+    document.body.appendChild(loading);
+
+    let hasPlayed = false;
+
+    const startVideo = () => {
+      if (hasPlayed) return;
+      hasPlayed = true;
+      loading.remove();
+      video.play().catch(() => {});
+      video.onended = () => {
+        window.location.href = HOME_URL;
+      };
     };
 
-    video.onended = goHome;
-    setTimeout(goHome, 8000); // segurança
+    const onCanPlay = () => {
+      console.log('[FILME] Luz carregada → iniciando');
+      video.removeEventListener('canplaythrough', onCanPlay);
+      startVideo();
+    };
+
+    const onError = () => {
+      console.warn('[FILME] A luz está oculta');
+      loading.innerHTML = `
+        <div style="color: #ffd700; font-family: 'BerkshireSwash'; text-shadow: 0 0 15px gold; text-align: center;">
+          A luz está temporariamente oculta.<br><br>
+          <button onclick="window.location.href='${HOME_URL}'" 
+                  style="padding: 14px 28px; background: #d4af37; color: #000; border: none; border-radius: 14px; font-weight: bold; cursor: pointer; font-size: 1.1em;">
+            Voltar ao Portal da Luz
+          </button>
+        </div>
+      `;
+    };
+
+    video.addEventListener('canplaythrough', onCanPlay);
+    video.addEventListener('error', onError);
+
+    video.load();
+
+    // TIMEOUT DE SEGURANÇA
+    setTimeout(() => {
+      if (!hasPlayed) onError();
+    }, 15000);
+
+    // TENTA INICIAR RÁPIDO
+    setTimeout(() => {
+      if (video.readyState >= 3) onCanPlay();
+    }, 500);
   }
 
-  // Eventos
+  // === EVENTOS ===
   document.addEventListener('click', (e) => {
-    const t = e.target.closest('button') || e.target;
-    if (t.id === 'btnBaixarPDFHQ') { e.preventDefault(); generateArtifacts(); }
-    if (t.id === 'btnVoltarInicio') { e.preventDefault(); playFinalVideo(); }
+    const t = e.target;
+    console.log('[CLICK]', t.id);
+
+    if (t.id === 'btnBaixarPDFHQ') {
+      e.preventDefault();
+      generateArtifacts();
+    }
+    if (t.id === 'btnVoltarInicio') {
+      e.preventDefault();
+      console.log('[BOTÃO] Iniciando filme final...');
+      playFinalVideo();
+    }
   });
 
-  // === INICIALIZAÇÃO FORTE: DOM + EVENTO + POLLING ===
-  function tryStart() {
-    if (started) return;
-    const sec = document.getElementById(SECTION_ID);
-    if (sec && sec.offsetParent !== null) {
-      startFinalSequence();
-    } else {
-      setTimeout(tryStart, 300);
-    }
-  }
-
-  // 1. DOM carregado
-  document.addEventListener('DOMContentLoaded', tryStart);
-
-  // 2. Evento do JC (se existir)
   document.addEventListener('section:shown', (e) => {
     const id = e.detail?.sectionId || e.detail;
-    if (id === SECTION_ID) tryStart();
+    if (id === SECTION_ID) startFinalSequence();
   });
 
-  // 3. Polling de segurança
-  setTimeout(tryStart, 1000);
+  document.addEventListener('DOMContentLoaded', () => {
+    const sec = document.getElementById(SECTION_ID);
+    if (sec && sec.style.display !== 'none') startFinalSequence();
+  });
 
-  // CSS
-  const style = document.createElement('style');
-  style.textContent = `
-    .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid #d4af37; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    #section-final { position: fixed !important; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, #1a1a2e, #0a0a1a); }
-  `;
-  document.head.appendChild(style);
+  // FALLBACK FORÇADO
+  setTimeout(() => {
+    const sec = document.getElementById(SECTION_ID);
+    if (sec && !started && sec.classList.contains('show')) {
+      console.log('[FALLBACK] Iniciando sequência final...');
+      startFinalSequence();
+    }
+  }, 1000);
 
 })();
