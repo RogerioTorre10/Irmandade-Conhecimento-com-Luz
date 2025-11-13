@@ -55,14 +55,20 @@
 
 /* ---------- Selfie (3:4 dentro do card) ---------- */
 #section-card .flame-layer{
-  position: absolute;
+  position: relative;
   left: 50%;
   transform: translateX(-50%);
   bottom: clamp(182px, 12vh, 740px);
   width: clamp(240px, 38%, 520px);   /* responsivo, preserva destaque */
+  min-height: 320px; /* EVITA COMPRESSÃO */
   aspect-ratio: 3 / 4;               /* mantém 3:4 */
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 0 90px 0; /* ESPAÇO PARA NOME + BOTÃO */
+  box-sizing: border-box;
   box-shadow: 0 0 18px rgba(255,215,120,.25);
   border: 2px solid rgba(255,215,0,.30);
   z-index: 30;
@@ -106,7 +112,7 @@
   ========================================= */
 #section-card .flame-layer {
   position: relative;
-  overflow: hidden;
+  overflow: visible !important;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -127,7 +133,7 @@
 #section-card .card-overlay-actions {
   position: absolute;
   left: 50%;
-  bottom: 16px;
+  bottom: 12px;
   transform: translateX(-50%);
   width: 100%;
   text-align: center;
@@ -136,33 +142,27 @@
 }
 
 #section-card #btnNext {
-  display: inline-block;
-  min-width: 160px;
-  padding: 10px 24px;
-  font-size: clamp(13px, 2.6vw, 15px);
+  display: inline-block !important;
+  min-width: 140px;
+  padding: 9px 20px;
+  font-size: 13px;
   font-weight: bold;
-  background: rgba(212, 175, 55, 0.88);
+  background: rgba(212, 175, 55, 0.92);
   color: #000;
-  border: 2px solid rgba(139, 90, 43, 0.95);
-  border-radius: 12px;
-  box-shadow: 
-    0 4px 12px rgba(0,0,0,0.45),
-    0 0 16px rgba(255,215,0,0.35),
-    inset 0 1px 1px rgba(255,255,255,0.3);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  border: 2px solid #8b5a2b;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.5), 0 0 12px rgba(255,215,0,0.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   pointer-events: auto !important;
-  transition: all 0.3s ease;
-  text-shadow: 0 1px 1px rgba(255,255,255,0.4);
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 #section-card #btnNext:hover {
-  background: rgba(255, 215, 0, 0.95);
+  background: rgba(255, 215, 0, 0.98);
   transform: translateY(-2px);
-  box-shadow: 
-    0 6px 16px rgba(0,0,0,0.55),
-    0 0 24px gold,
-    inset 0 1px 2px rgba(255,255,255,0.4);
+  box-shadow: 0 5px 12px rgba(0,0,0,0.6), 0 0 18px gold;
 }
 
 /* NÃO IMPRIME */
