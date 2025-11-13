@@ -101,19 +101,94 @@
   backdrop-filter: blur(2px);
 }
 
-/* ---------- Botão Continuar ---------- */
-#section-card .card-actions{
+/* =========================================
+   BOTÃO ABAIXO DO NOME (DENTRO DO CARD)
+  ========================================= */
+#section-card .flame-layer {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 70px; /* espaço pro nome + botão */
+  box-sizing: border-box;
+}
+
+/* NOME (mantém posição absoluta, mas com bottom fixo) */
+#section-card .card-footer {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: clamp(96px, 12vh, 140px);
-  z-index: 32;                   /* acima de tudo */
+  bottom: 70px; /* acima do botão */
+  z-index: 31;
 }
-#section-card #btnNext{
+
+/* BOTÃO ABAIXO DO NOME */
+#section-card .card-overlay-actions {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+  z-index: 40;
+}
+
+#section-card #btnNext {
+  display: inline-block;
   min-width: 160px;
-  padding: 12px 28px;
-  font-size: clamp(14px, 1.9vw, 16px);
-  pointer-events: auto !important;  /* garante clique */
+  padding: 10px 24px;
+  font-size: clamp(13px, 2.6vw, 15px);
+  font-weight: bold;
+  background: rgba(212, 175, 55, 0.88);
+  color: #000;
+  border: 2px solid rgba(139, 90, 43, 0.95);
+  border-radius: 12px;
+  box-shadow: 
+    0 4px 12px rgba(0,0,0,0.45),
+    0 0 16px rgba(255,215,0,0.35),
+    inset 0 1px 1px rgba(255,255,255,0.3);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  pointer-events: auto !important;
+  transition: all 0.3s ease;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.4);
+}
+
+#section-card #btnNext:hover {
+  background: rgba(255, 215, 0, 0.95);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 16px rgba(0,0,0,0.55),
+    0 0 24px gold,
+    inset 0 1px 2px rgba(255,255,255,0.4);
+}
+
+/* NÃO IMPRIME */
+@media print {
+  #section-card .card-overlay-actions,
+  #section-card #btnNext {
+    display: none !important;
+  }
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+  #section-card .flame-layer {
+    padding-bottom: 65px;
+  }
+  #section-card .card-footer {
+    bottom: 65px;
+  }
+  #section-card .card-overlay-actions {
+    bottom: 12px;
+  }
+  #section-card #btnNext {
+    min-width: 145px;
+    padding: 9px 20px;
+    font-size: 13px;
+  }
 }
 
 /* =========================================
