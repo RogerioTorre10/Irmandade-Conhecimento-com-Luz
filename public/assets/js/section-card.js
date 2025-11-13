@@ -23,25 +23,29 @@
 
   let GUIA_BG_CACHE = null;
 
-  async function maybeLoadGuias() {
-    if (GUIA_BG_CACHE) return GUIA_BG_CACHE;
-    try {
-      const res = await fetch(GUIAS_JSON, { cache: 'no-store' });
-      if (!res.ok) throw new Error('guias.json não encontrado');
-      const arr = await res.json();
-      GUIA_BG_CACHE = {};
-      for (const g of arr) {
-        const key = (g.id || g.key || (g.nome || '').toLowerCase() || '').toString().toLowerCase();
-        const bg = g.bgImage || g.bg || g.image;
-        if (key && bg) GUIA_BG_CACHE[key] = bg.startsWith('/') ? bg : `/assets/img/${bg}`;
-      }
-      log('guias.json carregado', GUIA_BG_CACHE);
-    } catch (e) {
-      GUIA_BG_CACHE = {};
-      log('Usando BGs estáticos (sem guias.json)');
+ async function maybeLoadGuias() {
+  if (GUIA_BG_CACHE) return GUIA_BG_CACHE;
+  try {
+    const res = await fetch(GUIAS_JSON, { cache: 'no-store' });
+    if (!res.ok) throw new Error('guias.json não encontrado');
+    const arr = await res.json();
+    GUIA_BG_CACHE = {};
+    for (const g of arr) {
+      const key = (g.id || g.key || (g.nome || '').toLowerCase() || '').toString().toLowerCase();
+      const bg = g.bgImage || g.bg || g.image;
+      if (key && bg) GUIA_BG_CACHE[key] = bg.startsWith('/') ? bg : `/assets/img/${bg}`;
     }
-    return GUIA_BG_CACHE;
+    log('guias.json carregado', GUIA_BG_CACHE);
+  } catch (e) {
+    GUIA_BG_CACHE = {};
+    log('Usando BGs estáticos (sem guias.json)');
   }
+
+  // CHAME RENDER AQUI!
+  renderCard();
+
+  return GUIA_BG_CACHE;
+}
 
   window.addEventListener('storage', (e) => {
     if (e.key === 'jc.guia' || e.key === 'jc.nome' || e.key === 'jc.selfieDataUrl') {
