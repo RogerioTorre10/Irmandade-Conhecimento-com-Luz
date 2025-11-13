@@ -349,6 +349,40 @@
       window.JORNADA_CHAMA.ensureHeroFlame(SECTION_ID);
     }
   }
+  // ====== INJETAR CORES LUMINOSAS POR GUIA ======
+(function applyGuideGlow(){
+  const guia = sessionStorage.getItem('jornada.guia')?.toLowerCase() || 'lumen';
+
+  const style = document.createElement('style');
+  style.id = 'progress-glow-style';
+
+  let color = '#00ff9d';    // padrão: Lumen
+  let glow  = '0 0 12px #00ff9d, 0 0 24px #00ff9d';
+
+  if (guia === 'arian') {
+    color = '#ff00ff';
+    glow  = '0 0 12px #ff00ff, 0 0 24px #ff55ff';
+  }
+  if (guia === 'zion') {
+    color = '#00aaff';
+    glow  = '0 0 10px #ffd65b, 0 0 18px #ffd65b, 0 0 30px #00aaff';
+  }
+
+  style.textContent = `
+    #progress-block-fill,
+    #progress-question-fill {
+      background: ${color} !important;
+      box-shadow: ${glow} !important;
+    }
+  `;
+
+  // remove estilo antigo se existir
+  const old = document.getElementById('progress-glow-style');
+  if (old) old.remove();
+
+  document.head.appendChild(style);
+})();
+
 
   // --------------------------------------------------
   // RESPOSTAS
