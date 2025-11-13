@@ -234,36 +234,51 @@ function loadDynamicBlocks() {
     window.G.__typingLock = false;
   }
 
-  // =========================================
-// ATUALIZA CONTADORES E BARRAS DE PROGRESSO
+// =========================================
+// ATUALIZA TODOS OS CONTADORES E BARRAS
 // =========================================
 function updateProgress() {
   const totalBlocos = window.JORNADA_BLOCO?.length || 5;
   const totalPerguntas = 50;
+  const perguntasPorBloco = 10;
 
   const blocoAtual = parseInt(localStorage.getItem('jornada.blocoAtual') || '1');
-  const perguntaAtual = parseInt(localStorage.getItem('jornada.perguntaAtual') || '1');
+  const perguntaGlobal = parseInt(localStorage.getItem('jornada.perguntaAtual') || '1');
+  const perguntaNoBloco = ((perguntaGlobal - 1) % perguntasPorBloco) + 1;
 
-  // Atualiza BADGE (ex: 3/50)
-  const badge = document.getElementById('jprog-pct') || document.getElementById('badgeProgressoBlocos');
-  if (badge) {
-    badge.textContent = `${perguntaAtual}/${totalPerguntas}`;
+  // 1. TOTAL GERAL: 1 / 50
+  const totalValue = document.getElementById('progress-total-value');
+  if (totalValue) totalValue.textContent = `${perguntaGlobal} / ${totalPerguntas}`;
+
+  // 2. BLOCO: 1 de 5
+  const blockValue = document.getElementById('progress-block-value');
+  if (blockValue) blockValue.textContent = `${blocoAtual} de ${totalBlocos}`;
+
+  // 3. PERGUNTA NO BLOCO: 1 / 10
+  const questionValue = document.getElementById('progress-question-value');
+  if (questionValue) questionValue.textContent = `${perguntaNoBloco} / ${perguntasPorBloco}`;
+
+  // 4. BARRA DE BLOCOS
+  const blockFill = document.getElementById('progress-block-fill');
+  if (blockFill) {
+    const percent = ((blocoAtual - 1) / (totalBlocos - 1)) * 100;
+    blockFill.style.width = `${percent}%`;
   }
 
-  // Atualiza META (ex: Pergunta 3 de 50)
-  const meta = document.getElementById('j-meta') || document.querySelector('.j-progress-meta');
-  if (meta) {
-    meta.textContent = `Pergunta ${perguntaAtual} de ${totalPerguntas} | Bloco ${blocoAtual} de ${totalBlocos}`;
+  // 5. BARRA DE PERGUNTAS NO BLOCO
+  const questionFill = document.getElementById('progress-question-fill');
+  if (questionFill) {
+    const percent = ((perguntaNoBloco - 1) / (perguntasPorBloco - 1)) * 100;
+    questionFill.style.width = `${percent}%`;
   }
 
-  // Atualiza BARRA DE PROGRESSO (preenchimento)
-  const bar = document.querySelector('.j-progress__fill') || document.querySelector('.progress-bar .progress-fill');
-  if (bar) {
-    const percent = ((perguntaAtual - 1) / (totalPerguntas - 1)) * 100;
-    bar.style.width = `${percent}%`;
-  }
-
-  console.log('[Progress] Atualizado:', { blocoAtual, perguntaAtual, totalBlocos, totalPerguntas });
+  console.log('[Progress] Atualizado:', {
+    blocoAtual,
+    perguntaGlobal,
+    perguntaNoBloco,
+    totalBlocos,
+    totalPerguntas
+  });
 }
 
   window.JSecoes = {
