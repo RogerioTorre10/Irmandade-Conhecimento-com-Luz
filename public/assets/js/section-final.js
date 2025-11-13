@@ -24,7 +24,6 @@
     speechSynthesis.speak(utter);
   }
 
-// === SUBSTITUA A FUNÇÃO typeText POR ESTA (MAIS LENTA E IMPACTANTE) ===
 async function typeText(el, text, delay = 60, withVoice = false) {
   if (!el || !text) return;
   el.textContent = '';
