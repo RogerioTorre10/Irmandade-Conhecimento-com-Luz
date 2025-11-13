@@ -21,6 +21,17 @@
   function getText(el) {
     return (el?.dataset?.text ?? el?.textContent ?? '').trim();
   }
+  // ===== Sincroniza tema do guia com o BODY em qualquer página =====
+(function syncGuiaTema(){
+  try {
+    const guia = (sessionStorage.getItem('jornada.guia') || '').toLowerCase();
+    if (guia) {
+      document.body.dataset.guia = guia; // body[data-guia="lumen|zion|arian"]
+    }
+  } catch (e) {
+    console.warn('[GUIA THEME] Não consegui ler jornada.guia:', e);
+  }
+})();
 
   async function applyTypingAndTTS(sectionId, root) {
     console.log('[JC.applyTypingAndTTS] Iniciando para:', sectionId);
