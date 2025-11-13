@@ -197,3 +197,40 @@
   min-height: 100vh !important;
   height: auto !important;
 }
+/* =========================================
+   FIX FINAL: BOTÃO VISÍVEL + SEM CORTE
+   ========================================= */
+#section-card .conteudo-pergaminho {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  min-height: 100% !important;
+  padding: 20px 20px 160px !important; /* ESPAÇO PRO BOTÃO */
+  box-sizing: border-box !important;
+}
+
+#section-card .card-actions-below {
+  margin-top: 40px !important;
+  text-align: center !important;
+  width: 100% !important;
+  pointer-events: auto !important;
+}
+
+#section-card #btnNext {
+  display: block !important;
+  min-width: 180px !important;
+  padding: 14px 32px !important;
+  font-size: 1.1em !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* PERGAMINHO NÃO CORTA */
+#section-card .pergaminho,
+#section-card .pergaminho-v {
+  overflow: visible !important;
+  padding-bottom: 200px !important;
+  min-height: 100 h !important;
+  height: auto !important;
+}
