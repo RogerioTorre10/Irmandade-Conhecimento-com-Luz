@@ -1,3 +1,4 @@
+<DOCUMENT filename="jornada-secoes.js">
 (function (global) {
   'use strict';
   
@@ -14,22 +15,21 @@
   
   let isTransitioning = false;
   
-  // Garante que a função de playTransition seja encontrada (do video-transicao.js)
+  // Garante que a função de playTransition seja encontrada
   const getPlayTransitionFn = () =>
-  global.playTransitionVideo ||
-  global.JSecoes?.playTransition ||
-  function (src, onEnd) {
-    if (!src || !src.endsWith('.mp4')) {
-      log('playTransition (fallback): caminho inválido para vídeo:', src);
+    global.playTransitionVideo ||
+    global.JSecoes?.playTransition ||
+    function (src, onEnd) {
+      if (!src || !src.endsWith('.mp4')) {
+        log('playTransition (fallback): caminho inválido para vídeo:', src);
+        onEnd?.();
+        return;
+      }
+      log('playTransition indisponível. Avançando diretamente.');
       onEnd?.();
-      return;
-    }
-    log('playTransition indisponível. Avançando diretamente.');
-    onEnd?.();
-  };
+    };
 
-  
-  // Função para análise de sentimento (usada por handleInput)
+  // Função para análise de sentimento
   function analyzeSentiment(text) {
     const POS = {
       'feliz': 2, 'alegria': 2, 'amor': 3, 'sucesso': 2, 'esperança': 3, 'paz': 2, 'fé': 3, 'gratidão': 2,
@@ -48,7 +48,7 @@
     return score;
   }
 
-  // Função para travar a orientação de vídeo
+  // Travar orientação de vídeo
   function lockVideoOrientation() {
     const video = $('#videoTransicao');
     if (!video) return;
@@ -72,10 +72,42 @@
     });
   }
 
+  // NOVA FUNÇÃO CENTRAL: mostrar seção + canvas + evento
+  function showSection(sectionId) {
+    if (!sectionId) return;
+
+    const section = document.getElementById(sectionId);
+    const canvas = $('#jornada-canvas');
+    if (!section || !canvas) {
+      log('Erro: seção ou canvas não encontrado:', sectionId);
+      return;
+    }
+
+    // Esconde todas as seções
+    $$('section').forEach(s => {
+      s.classList.remove('show');
+      s.style.display = 'none';
+    });
+
+    // Mostra a seção
+    section.style.display = 'block';
+    setTimeout(() => section.classList.add('show'), 50);
+
+    // Atualiza canvas
+    updateCanvasBackground(sectionId);
+
+    // DISPARA O EVENTO section:shown
+    const event = new CustomEvent('section:shown', {
+      detail: { sectionId }
+    });
+    document.dispatchEvent(event);
+    log(`Seção exibida e evento disparado: ${sectionId}`);
+  }
+
   function updateCanvasBackground(sectionId) {
     const canvas = $('#jornada-canvas');
-    if (!canvas || !sectionId) { log('Canvas ou sectionId não encontrados, ignorando'); return; }
-    
+    if (!canvas || !sectionId) return;
+
     if (sectionId === 'section-perguntas') {
       checkImage('/assets/img/pergaminho-rasgado-horiz.png', '/assets/img/pergaminho-rasgado-vert.png').then(bg => {
         canvas.className = `card pergaminho pergaminho-h${bg.includes('vert') ? ' fallback' : ''}`;
@@ -88,28 +120,29 @@
       log('Canvas atualizado para (V):', sectionId);
     }
   }
-  // ✅ Fallback seguro para evitar erro de referência
-   window.typingLog = window.typingLog || function () {};
+
+  // Fallback seguro
+  window.typingLog = window.typingLog || function () {};
 
   function registerCanvasListeners() {
-  document.removeEventListener('sectionLoaded', updateCanvasBackground);
-  document.removeEventListener('section:shown', updateCanvasBackground);
-  document.addEventListener('sectionLoaded', (e) => {
-    typingLog('sectionLoaded disparado:', e.detail.sectionId);
-    updateCanvasBackground(e.detail.sectionId);
-  });
-  document.addEventListener('section:shown', (e) => {
-    typingLog('section:shown disparado:', e.detail.sectionId);
-    updateCanvasBackground(e.detail.sectionId);
-  });
-  typingLog('Canvas listeners registrados');
-}
+    document.removeEventListener('sectionLoaded', updateCanvasBackground);
+    document.removeEventListener('section:shown', updateCanvasBackground);
+    document.addEventListener('sectionLoaded', (e) => {
+      typingLog('sectionLoaded disparado:', e.detail.sectionId);
+      updateCanvasBackground(e.detail.sectionId);
+    });
+    document.addEventListener('section:shown', (e) => {
+      typingLog('section:shown disparado:', e.detail.sectionId);
+      updateCanvasBackground(e.detail.sectionId);
+    });
+    typingLog('Canvas listeners registrados');
+  }
 
-document.addEventListener('DOMContentLoaded', () => {
-  initSecoes();
-  registerCanvasListeners();
-});
-  
+  document.addEventListener('DOMContentLoaded', () => {
+    initSecoes();
+    registerCanvasListeners();
+  });
+
   // Funções de blocos e devolutivas
   function loadDynamicBlocks() {
     // ... (mantido)
@@ -150,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     localStorage.setItem('JORNADA_GUIA', guia);
     global.ensureHeroFlame && global.ensureHeroFlame('section-selfie');
-    global.JC.show('section-selfie');
+    showSection('section-selfie'); // Usa showSection
     const card = $('#card-guide');
     const bgImg = $('#guideBg');
     const guideNameEl = $('#guideNameSlot');
@@ -161,25 +194,25 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function proceedAfterSelfie() {
-  log('JORNADA_VIDEOS:', window.JORNADA_VIDEOS);
-  const intro = window.JORNADA_VIDEOS?.intro || '';
-  if (!intro || window.__introPlayed) {
-    proceedToQuestions();
-    return;
-  }
-  if (!intro.endsWith('.mp4')) {
-    log('URL de vídeo inválido:', intro);
+    log('JORNADA_VIDEOS:', window.JORNADA_VIDEOS);
+    const intro = window.JORNADA_VIDEOS?.intro || '';
+    if (!intro || window.__introPlayed) {
+      proceedToQuestions();
+      return;
+    }
+    if (!intro.endsWith('.mp4')) {
+      log('URL de vídeo inválido:', intro);
+      window.__introPlayed = true;
+      proceedToQuestions();
+      return;
+    }
     window.__introPlayed = true;
-    proceedToQuestions();
-    return;
+    const _play = getPlayTransitionFn();
+    _play(intro, () => proceedToQuestions());
   }
-  window.__introPlayed = true;
-  const _play = getPlayTransitionFn();
-  _play(intro, () => proceedToQuestions());
-}
 
   function proceedToQuestions() {
-    global.JC.show('section-perguntas');
+    showSection('section-perguntas'); // Usa showSection
     loadDynamicBlocks();
     const perguntas = $$('.j-pergunta');
     if (perguntas.length) {
@@ -195,12 +228,42 @@ document.addEventListener('DOMContentLoaded', () => {
     log('Prosseguindo para section-perguntas');
   }
 
+  // NOVA FUNÇÃO: após perguntas → tela final
+  function proceedToFinal() {
+    log('Jornada concluída! Indo para tela final...');
+    showSection('section-final'); // Dispara section:shown automaticamente
+  }
+
   function goNext() {
     if (isTransitioning) { log('Transição em andamento, ignorando'); return; }
     isTransitioning = true;
-    // ... (lógica completa de avanço entre perguntas/blocos) ...
+
+    const active = $('.j-pergunta.active');
+    if (!active) {
+      log('Nenhuma pergunta ativa. Finalizando jornada.');
+      proceedToFinal();
+      isTransitioning = false;
+      return;
+    }
+
+    const next = active.nextElementSibling;
+    if (next && next.classList.contains('j-pergunta')) {
+      active.classList.remove('active');
+      next.classList.add('active');
+      const ta = next.querySelector('textarea');
+      if (ta) {
+        ta.focus();
+        handleInput(ta);
+      }
+      log('Avançando para próxima pergunta');
+    } else {
+      log('Última pergunta. Finalizando jornada.');
+      proceedToFinal();
+    }
+
+    isTransitioning = false;
   }
-  
+
   function playTransition(src, onEnd) {
     // ... (mantido)
   }
@@ -218,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   function startJourney() {
-    const next = 'section-senha'; // Alterado para section-senha
+    const next = 'section-senha';
     if (global.JC && typeof global.JC.show === 'function') {
       console.log('[JSecoes] startJourney →', next);
       global.JC.show(next);
@@ -232,6 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
     global.G.__typingLock = false;
   }
 
+  // Expor funções
   global.JSecoes = {
     checkImage,
     updateCanvasBackground,
@@ -241,10 +305,13 @@ document.addEventListener('DOMContentLoaded', () => {
     proceedAfterGuia,
     proceedAfterSelfie,
     proceedToQuestions,
+    proceedToFinal,     // NOVA
     goNext,
     playTransition,
     generatePDF,
-    startJourney
+    startJourney,
+    showSection         // NOVA: para uso externo
   };
 
 })(window);
+</DOCUMENT>
