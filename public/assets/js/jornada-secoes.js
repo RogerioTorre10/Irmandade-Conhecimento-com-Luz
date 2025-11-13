@@ -1,11 +1,12 @@
-(function (global) {
+(function (window) {
   'use strict';
-
-  if (global.__SecoesReady) {
+  
+  console.log('[Secoes] Carregando jornada-secoes.js');
+  if (window.__SecoesReady) {
     console.log('[Secoes] Já carregado, ignorando');
     return;
   }
-  global.__SecoesReady = true;
+  window.__SecoesReady = true;
 
   const log = (...args) => console.log('[Secoes]', ...args);
   const $ = s => document.querySelector(s);
@@ -14,10 +15,19 @@
   let isTransitioning = false;
   
   // Garante que a função de playTransition seja encontrada (do video-transicao.js)
-  const getPlayTransitionFn = () => global.playTransition || global.JSecoes?.playTransition || function(src, onEnd) { 
-    log('playTransition indisponível. Avançando diretamente.'); 
-    onEnd && onEnd();
-  };
+  const getPlayTransitionFn = () =>
+    window.playTransitionVideo ||
+    window.JSecoes?.playTransition ||
+    function (src, onEnd) {
+      if (!src || !src.endsWith('.mp4')) {
+        log('playTransition (fallback): caminho inválido para vídeo:', src);
+        onEnd?.();
+        return;
+      }
+      log('playTransition indisponível. Avançando diretamente.');
+      onEnd?.();
+    };
+
   
   // Função para análise de sentimento (usada por handleInput)
   function analyzeSentiment(text) {
@@ -78,34 +88,44 @@
       log('Canvas atualizado para (V):', sectionId);
     }
   }
-  
-  document.addEventListener('sectionLoaded', (e) => updateCanvasBackground(e.detail.sectionId));
-  document.addEventListener('section:shown', (e) => updateCanvasBackground(e.detail.sectionId));
 
-  // Funções de blocos e devolutivas
+  // Fallback seguro para evitar erro de referência
+  window.typingLog = window.typingLog || {};
+
   function loadDynamicBlocks() {
-    // ... (mantido)
+    const blocks = window.JORNADA_BLOCO || [];
+    if (!blocks.length) {
+      log('Nenhum bloco dinâmico encontrado');
+      return;
+    }
+    const container = $('#jornada-content-wrapper');
+    if (!container) return;
+    container.innerHTML = ''; // Limpa
+    blocks.forEach((b, i) => {
+      const div = document.createElement('div');
+      div.className = 'j-pergunta';
+      div.id = `pergunta-${i}`;
+      div.innerHTML = `<label class="pergunta-enunciado">${b.enunciado}</label>
+        <textarea placeholder="Digite sua resposta..." maxlength="1000"></textarea>
+        <div class="pergunta-devolutiva" style="display:none;"></div>`;
+      container.appendChild(div);
+    });
+    log('Blocos dinâmicos carregados:', blocks.length);
   }
 
-  async function fetchDevolutiva(pergunta, resposta, guia) {
-    // ... (mantido)
-  }
-
-  async function handleInput(textarea) {
-    const score = analyzeSentiment(textarea.value); 
-    global.updateChama && global.updateChama(score);
-    global.JGuiaSelfie && global.JGuiaSelfie.saveAnswers();
-    global.JGuiaSelfie && global.JGuiaSelfie.updateProgress();
-    const perguntaDiv = textarea.closest('.j-pergunta');
-    const devolutivaDiv = perguntaDiv.querySelector('.devolutiva-container');
+  function handleInput(textarea) {
+    const resposta = textarea.value.trim();
+    const score = analyzeSentiment(resposta);
+    const pergunta = textarea.closest('.j-pergunta');
+    const devolutivaDiv = pergunta.querySelector('.pergunta-devolutiva');
     const devolutivaP = devolutivaDiv.querySelector('p');
-    if (textarea.value.trim() && devolutivaDiv) {
+    if (resposta.length >= 10 && score > 0) {
       devolutivaDiv.style.display = 'block';
-      const pergunta = perguntaDiv.querySelector('.pergunta-enunciado')?.textContent || '';
-      const resposta = textarea.value;
       const guia = localStorage.getItem('JORNADA_GUIA') || 'zion';
-      const devolutiva = await fetchDevolutiva(pergunta, resposta, guia);
-      global.runTyping && global.runTyping(devolutivaP, devolutiva, () => log('Datilografia concluída para devolutiva'));
+      const perguntaTexto = textarea.previousSibling.textContent;
+      fetchDevolutiva(perguntaTexto, resposta, guia).then(devolutiva => {
+        window.runTyping && window.runTyping(devolutivaP, devolutiva, () => log('Datilografia concluída para devolutiva'));
+      });
     } else {
       devolutivaDiv.style.display = 'none';
     }
@@ -117,12 +137,12 @@
     if (guiaNameInput && guiaNameInput.value.trim()) {
       localStorage.setItem('JORNADA_NOME', guiaNameInput.value.trim());
     } else {
-      global.toast && global.toast('Por favor, insira seu nome antes de prosseguir.');
+      window.toast && window.toast('Por favor, insira seu nome antes de prosseguir.');
       return;
     }
     localStorage.setItem('JORNADA_GUIA', guia);
-    global.ensureHeroFlame && global.ensureHeroFlame('section-selfie');
-    global.JC.show('section-selfie');
+    window.ensureHeroFlame && window.ensureHeroFlame('section-selfie');
+    window.JC.show('section-selfie');
     const card = $('#card-guide');
     const bgImg = $('#guideBg');
     const guideNameEl = $('#guideNameSlot');
@@ -133,8 +153,15 @@
   }
 
   function proceedAfterSelfie() {
+    log('JORNADA_VIDEOS:', window.JORNADA_VIDEOS);
     const intro = window.JORNADA_VIDEOS?.intro || '';
     if (!intro || window.__introPlayed) {
+      proceedToQuestions();
+      return;
+    }
+    if (!intro.endsWith('.mp4')) {
+      log('URL de vídeo inválido:', intro);
+      window.__introPlayed = true;
       proceedToQuestions();
       return;
     }
@@ -144,7 +171,7 @@
   }
 
   function proceedToQuestions() {
-    global.JC.show('section-perguntas');
+    window.JC.show('section-perguntas');
     loadDynamicBlocks();
     const perguntas = $$('.j-pergunta');
     if (perguntas.length) {
@@ -156,7 +183,7 @@
       if (aria) aria.textContent = lbl;
       if (ta) handleInput(ta);
     }
-    global.JGuiaSelfie && global.JGuiaSelfie.updateProgress();
+    window.JGuiaSelfie && window.JGuiaSelfie.updateProgress();
     log('Prosseguindo para section-perguntas');
   }
 
@@ -181,25 +208,23 @@
     });
     log('Secoes inicializado');
   }
-
-  document.addEventListener('DOMContentLoaded', initSecoes);
-
+  
   function startJourney() {
     const next = 'section-senha'; // Alterado para section-senha
-    if (global.JC && typeof global.JC.show === 'function') {
+    if (window.JC && typeof window.JC.show === 'function') {
       console.log('[JSecoes] startJourney →', next);
-      global.JC.show(next);
-    } else if (typeof global.showSection === 'function') {
+      window.JC.show(next);
+    } else if (typeof window.showSection === 'function') {
       console.log('[JSecoes] startJourney (fallback showSection) →', next);
-      global.showSection(next);
+      window.showSection(next);
     } else {
-      global.toast && global.toast('Navegação indisponível (JC/showSection).');
+      window.toast && window.toast('Navegação indisponível (JC/showSection).');
     }
-    global.G = global.G || {};
-    global.G.__typingLock = false;
+    window.G = window.G || {};
+    window.G.__typingLock = false;
   }
 
-  global.JSecoes = {
+  window.JSecoes = {
     checkImage,
     updateCanvasBackground,
     loadDynamicBlocks,
