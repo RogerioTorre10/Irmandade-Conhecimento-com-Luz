@@ -314,4 +314,3 @@
   };
 
 })(window);
-</DOCUMENT>
