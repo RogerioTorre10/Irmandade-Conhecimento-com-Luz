@@ -173,6 +173,7 @@ function loadDynamicBlocks() {
   function proceedToQuestions() {
     window.JC.show('section-perguntas');
     loadDynamicBlocks();
+    updateProgress();
     const perguntas = $$('.j-pergunta');
     if (perguntas.length) {
       perguntas[0].classList.add('active');
