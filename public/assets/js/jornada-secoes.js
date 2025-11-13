@@ -185,6 +185,9 @@ function loadDynamicBlocks() {
     }
     window.JGuiaSelfie && window.JGuiaSelfie.updateProgress();
     log('Prosseguindo para section-perguntas');
+    
+    // ATUALIZA PROGRESSO
+    updateProgress();
   }
 
   function goNext() {
@@ -193,12 +196,12 @@ function loadDynamicBlocks() {
 
   // ... sua lógica de salvar resposta, avançar pergunta ...
 
-  // SALVA NO LOCALSTORAGE
-  localStorage.setItem('jornada.perguntaAtual', novaPergunta);
-  localStorage.setItem('jornada.blocoAtual', novoBloco);
+  // SALVA NO STORAGE
+localStorage.setItem('jornada.blocoAtual', novoBloco);
+localStorage.setItem('jornada.perguntaAtual', novaPergunta);
 
-  // ATUALIZA PROGRESSO
-  updateProgress();
+// ATUALIZA PROGRESSO
+updateProgress();
 
   isTransitioning = false;
 }
