@@ -1,5 +1,4 @@
-<link rel="stylesheet" href="/assets/css/brilho-texturas.css">
-
+@import url("/assets/css/brilho-texturas.css");
 /* ========== VARIÁVEIS GLOBAIS ========== */
 :root {
   --bg: #0b1020;
@@ -312,6 +311,3 @@ p, li {
 #toast.show {
   opacity: 1;
 }
-
-
-@import url("/assets/css/brilho-texturas.css");
