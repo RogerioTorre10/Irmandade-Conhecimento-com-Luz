@@ -167,6 +167,7 @@
 
       sessionStorage.setItem('jornada.guia', guiaId);
       localStorage.setItem('jc.guia', guiaId);
+      document.body.dataset.guia = guiaId;
     } catch (e) {
       console.warn('[JCGuia] Erro ao salvar guia:', e);
     }
