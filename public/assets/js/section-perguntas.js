@@ -410,136 +410,59 @@
     }
   }
 
-     // --------------------------------------------------
-  // FINALIZAÇÃO — FALLBACK LIMPO PARA SECTION-FINAL
-  // --------------------------------------------------
+ function finishAll() {
+  if (completed) return;
+  completed = true;
 
- function ensureFinalSectionExists() {
-  let finalEl = document.getElementById(FINAL_SECTION_ID);
+  const finishedAt = new Date().toISOString();
+  const guia = window.JC?.state?.guia || {};
+  const selfie = window.__SELFIE_DATA_URL__ || null;
 
-  // SE JÁ EXISTE → NÃO RECRIA NADA (RESPEITA O HTML ORIGINAL)
-  if (finalEl) {
-    console.log('[FINAL] section-final já existe → usando versão original com data-original');
-    return finalEl;
+  State.meta = {
+    startedAt: State.startedAt,
+    finishedAt,
+    guia,
+    selfieUsed: !!selfie,
+    version: window.APP_CONFIG?.version || 'v1'
+  };
+
+  window.__QA_ANSWERS__ = State.answers;
+  window.__QA_META__ = State.meta;
+
+  log('Jornada de perguntas concluída.', {
+    total: State.totalQuestions,
+    respondidas: Object.keys(State.answers).length
+  });
+
+  if (window.JORNADA_CHAMA) {
+    window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'forte');
   }
 
-  // SE NÃO EXISTE → CRIA COM data-original (NUNCA texto direto)
-  console.log('[FINAL] Criando fallback com data-original (efeito garantido)');
+  const finalVideoSrc = resolveVideoSrc(
+    window.JORNADA_FINAL_VIDEO || FINAL_VIDEO_FALLBACK
+  );
 
-  finalEl = document.createElement('section');
-  finalEl.id = FINAL_SECTION_ID;
-  finalEl.className = 'section section-final';
-  finalEl.dataset.section = 'final';
-
-  finalEl.innerHTML = `
-    <div class="final-pergaminho-wrapper">
-      <div class="pergaminho-vertical">
-        <div class="pergaminho-content">
-          <h1 id="final-title" class="final-title"></h1>
-          <div id="final-message" class="final-message">
-            <p data-original="Suas respostas foram recebidas com honra pela Irmandade."></p>
-            <p data-original="Você plantou sementes de confiança, coragem e luz."></p>
-            <p data-original="Continue caminhando. A jornada nunca termina."></p>
-            <p data-original="Volte quando precisar reacender a chama."></p>
-            <p class="final-bold" data-original="Você é a luz. Você é a mudança."></p>
-          </div>
-          <div class="final-acoes">
-            <button id="btnBaixarPDFHQ" class="btn btn-gold" disabled>Baixar PDF e HQ</button>
-            <button id="btnVoltarInicio" class="btn btn-light">Voltar ao Início</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <video id="final-video" playsinline preload="auto" style="display:none;"></video>
-  `;
-
-  const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
-  wrapper.appendChild(finalEl);
-  return finalEl;
-}
-
-  function showFinalSection() {
-  const finalEl = ensureFinalSectionExists();
-  const wrapper = document.getElementById('jornada-content-wrapper');
-
- function showFinalSection() {
-  const finalEl = ensureFinalSectionExists();
-
-  const wrapper = document.getElementById('jornada-content-wrapper');
-
-  // SÓ LIMPA SE AINDA NÃO TIVER A SECTION-FINAL
-  if (wrapper && !wrapper.querySelector('#section-final')) {
-    wrapper.innerHTML = '';
-    wrapper.appendChild(finalEl);
-  }
-
-  // Mostra a seção
-  if (window.JC && window.JC.show) {
-    window.JC.show(FINAL_SECTION_ID);
-  } else {
-    document.querySelectorAll('section.section').forEach(sec => {
-      sec.style.display = sec.id === FINAL_SECTION_ID ? 'flex' : 'none';
-    });
-    finalEl.scrollIntoView({ behavior: 'smooth' });
-  }
-
-  log('section-final exibida com segurança (fallback inteligente)');
-}
-  // FORÇA O EVENTO PARA INICIAR A DIGITAÇÃO
-  setTimeout(() => {
+  const triggerFinalSection = () => {
     document.dispatchEvent(new CustomEvent('section:shown', {
       detail: { sectionId: FINAL_SECTION_ID }
     }));
-  }, 200);
-}
+  };
 
-  function finishAll() {
-    if (completed) return;
-    completed = true;
-
-    const finishedAt = new Date().toISOString();
-    const guia = window.JC?.state?.guia || {};
-    const selfie = window.__SELFIE_DATA_URL__ || null;
-
-    State.meta = {
-      startedAt: State.startedAt,
-      finishedAt,
-      guia,
-      selfieUsed: !!selfie,
-      version: window.APP_CONFIG?.version || 'v1'
-    };
-
-    window.__QA_ANSWERS__ = State.answers;
-    window.__QA_META__ = State.meta;
-
-    log('Jornada de perguntas concluída.', {
-      total: State.totalQuestions,
-      respondidas: Object.keys(State.answers).length
-    });
-
-    if (window.JORNADA_CHAMA) {
-      window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'forte');
-    }
-
-    const finalVideoSrc = resolveVideoSrc(
-      window.JORNADA_FINAL_VIDEO || FINAL_VIDEO_FALLBACK
-    );
-
-    if (finalVideoSrc) {
-      log('Iniciando vídeo final:', finalVideoSrc);
-      playVideoWithCallback(finalVideoSrc, showFinalSection);
-    } else {
-      showFinalSection();
-    }
-
-    try {
-      document.dispatchEvent(new CustomEvent('qa:completed', {
-        detail: { answers: State.answers, meta: State.meta }
-      }));
-    } catch (e) {
-      warn('Falha ao disparar qa:completed:', e);
-    }
+  if (finalVideoSrc) {
+    log('Iniciando vídeo final:', finalVideoSrc);
+    playVideoWithCallback(finalVideoSrc, triggerFinalSection);
+  } else {
+    triggerFinalSection();
   }
+
+  try {
+    document.dispatchEvent(new CustomEvent('qa:completed', {
+      detail: { answers: State.answers, meta: State.meta }
+    }));
+  } catch (e) {
+    warn('Falha ao disparar qa:completed:', e);
+  }
+}
 
   // --------------------------------------------------
   // BIND UI
