@@ -260,11 +260,9 @@
     if (visible) initCard(visible);
   });
 
+ // Renderiza automaticamente ao carregar
   document.addEventListener('DOMContentLoaded', () => {
-    const sec = qs('#section-card');
-    if (!sec || sec.querySelector('.card-stage')) return;
-    ensureStructure(sec);
-    renderCard();
+    maybeLoadGuias(); // Isso agora chama renderCard()
   });
 
   log('carregado e pronto!');
