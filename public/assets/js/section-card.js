@@ -247,13 +247,18 @@
     }
   }
 
-  document.addEventListener('section:shown', e => {
-    const id = e.detail.sectionId;
-    if (SECTION_IDS.includes(id)) {
-      const root = e.detail.node || qs(`#${id}`) || document.body;
-      initCard(root);
-    }
-  });
+ document.addEventListener('section:shown', e => {
+  const id = e.detail.sectionId;
+  if (SECTION_IDS.includes(id)) {
+    const root = e.detail.node || qs(`#${id}`) || document.body;
+
+    // GARANTE ESTRUTURA + RENDERIZA
+    ensureStructure(root);
+    renderCard(); // ou renderCard(root) se preferir
+
+    initCard(root);
+  }
+});
 
   document.addEventListener('DOMContentLoaded', () => {
     const visible = SECTION_IDS.map(id => qs(`#${id}`)).find(el => el && el.offsetParent !== null);
