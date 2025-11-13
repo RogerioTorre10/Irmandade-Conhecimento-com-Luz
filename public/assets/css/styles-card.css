@@ -107,7 +107,7 @@
    BOTÃO FORA DO CARD — ABAIXO DO RODAPÉ
    ========================================= */
 #section-card .card-actions-below {
-  margin-top: 50px;
+  margin-top: 60px;
   text-align: center;
   padding: 20px 0;
   width: 100%;
@@ -194,7 +194,7 @@
 #section-card .pergaminho,
 #section-card .pergaminho-v {
   overflow: visible !important;
-  padding-bottom: 180px !important;
+  padding-bottom: 240px !important;
   min-height: 100vh !important;
   height: auto !important;
 }
