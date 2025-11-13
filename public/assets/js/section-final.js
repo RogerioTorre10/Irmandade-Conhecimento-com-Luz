@@ -173,6 +173,36 @@ async function startFinalSequence() {
     };
   }
 
+  // Adicione esta função no final do arquivo section-final.js
+function checkAndStartFinal() {
+  const section = document.getElementById(SECTION_ID);
+  if (!section || started) return;
+
+  // Verifica se a seção está visível (qualquer um desses indicadores)
+  const isVisible = 
+    section.classList.contains('show') ||
+    section.style.display !== 'none' ||
+    section.offsetParent !== null ||
+    window.getComputedStyle(section).opacity > 0;
+
+  if (isVisible) {
+    console.log('[FINAL] Seção detectada como visível. Iniciando sequência...');
+    startFinalSequence();
+  }
+}
+
+// Execute verificação periódica até iniciar
+let checkInterval = setInterval(() => {
+  if (started) {
+    clearInterval(checkInterval);
+    return;
+  }
+  checkAndStartFinal();
+}, 500);
+
+// Para após 10 segundos (segurança)
+setTimeout(() => clearInterval(checkInterval), 10000);
+
   // Eventos
   document.addEventListener('click', (e) => {
     const t = e.target;
