@@ -1,32 +1,31 @@
 /* styles-final.css */
 #section-final {
-  position: fixed !important;
-  top: 0;
-  left: 0;
-  width: 100vw !important;
-  height: 100vh !important;
+  position: relative;                /* em vez de fixed */
+  width: 100%;
+  min-height: 100vh;                 /* ocupa o alto todo, mas dentro do wrapper */
   background: radial-gradient(circle at center, #1a1a2e, #0a0a1a);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999 !important;
-  overflow: visible !important;
+  padding: 40px 16px;                /* respiro ao redor do pergaminho */
+  box-sizing: border-box;
+  z-index: 20;                       /* bem acima do fundo, mas sem exagero */
+  overflow: visible;
   opacity: 0;
   transition: opacity 1s ease;
 }
-
 #section-final.show {
   opacity: 1;
 }
 
 .final-pergaminho-wrapper {
-  width: 100% visible !important;
-  height: 100% visible !important;
-  max-width: none !important;
+  width: 100%;
+  max-width: 960px;          /* limite elegante dentro do container */
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
+  margin: 0 auto;            /* garante centralização */
   box-sizing: border-box;
 }
 
