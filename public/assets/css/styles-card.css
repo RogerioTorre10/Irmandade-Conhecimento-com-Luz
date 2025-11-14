@@ -7,6 +7,7 @@
 /* ---------- Variáveis básicas ---------- */
 :root {
   --card-max-w: 560px;
+  --card-stage-pad-bottom: 140px; /* espaço para nome + botão */
   --badge-fg: #f6e7c6;
   --badge-bg: rgba(0,0,0,.40);
   --badge-bd: rgba(255,225,180,.45);
@@ -178,6 +179,35 @@
     font-size: 14px;
   }
 }
+/* ===== FIX MOBILE — botão "Continuar" sempre livre ===== */
+@media (max-width: 640px){
+
+  /* mais espaço reservado embaixo do card */
+  :root{
+    --card-stage-pad-bottom: 220px;  /* antes era 140px */
+  }
+
+  /* garante que o palco respeite a variável */
+  #section-card .card-stage{
+    padding-bottom: var(--card-stage-pad-bottom);
+  }
+
+  /* botão e área de ações sempre acima de qualquer imagem/card */
+  #section-card .card-actions{
+    position: relative;
+    margin-top: 10px;
+    z-index: 30;
+  }
+}
+
+/* elementos visuais do card não bloqueiam o clique */
+#section-card .card-placeholder,
+#section-card .card-photo-wrap,
+#section-card .card-frame,
+#section-card .card-figure{
+  pointer-events: none;
+}
+
 
 /* =========================================
    DESKTOP (≥ 601px)
