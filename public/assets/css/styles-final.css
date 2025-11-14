@@ -71,7 +71,7 @@
 
 .final-title {
   font-size: 2.4em;
-  text-shadow: 0 0 20px gold;
+  text-shadow: 0 0 20px var(--theme-main-color, gold);
   margin: 0;
   min-height: 1.2em;
 }
@@ -80,7 +80,7 @@
   font-size: 1.3em;
   line-height: 1.6;
   margin: 10px 0;
-  text-shadow: 0 0 10px rgba(255,215,0,0.5);
+  text-shadow: 0 0 10px var(--theme-main-color, rgba(255,215,0,0.5));
   opacity: 0;
   transform: translateY(10px);
   transition: all 0.6s ease;
@@ -135,9 +135,9 @@
 }
 
 .btn-light {
-  background: rgba(255,255,255,0.1);
-  color: #ffd700;
-  border: 1px solid #d4af37;
+ background: rgba(255,255,255,0.1);
+  color: var(--theme-main-color, #ffd700);
+  border: 1px solid var(--theme-main-color, #d4af37);
   backdrop-filter: blur(5px);
 }
 
