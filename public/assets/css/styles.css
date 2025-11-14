@@ -344,3 +344,58 @@ section.selfie-page {
   60%  { transform: scale(1.05); filter: drop-shadow(0 0 26px var(--aura-gold)); }
   100% { transform: scale(1.00); filter: drop-shadow(0 0 14px var(--aura-gold)); }
 }
+/* =======================================================
+   PAINEL ÉPICO COM GLOW — usar em intro / termos / senha /
+   perguntas / etc. junto com o pergaminho
+   ======================================================= */
+.j-panel-glow{
+  position: relative;
+  margin: 0 auto;
+  max-width: 880px;
+  padding: 24px 20px;
+  border-radius: 26px;
+
+  background: linear-gradient(to bottom, #181a2c 0%, #0c0e18 70%, #05060c 100%);
+  box-shadow:
+    0 0 28px rgba(0,0,0,.9),
+    0 0 52px rgba(0,0,0,.9);
+
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* halo colorido vindo de baixo, na cor do guia */
+.j-panel-glow::after{
+  content:'';
+  position:absolute;
+  left:50%;
+  bottom:-18%;
+  transform:translateX(-50%);
+  width:135%;
+  height:70%;
+
+  background: radial-gradient(
+    ellipse at top,
+    rgba(0,0,0,0) 0%,
+    color-mix(in srgb, var(--theme-main-color) 80%, transparent) 35%,
+    transparent 80%
+  );
+
+  opacity: .9;
+  pointer-events:none;
+  z-index:-1;
+}
+
+/* leve névoa no topo */
+.j-panel-glow::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,.05),
+    rgba(0,0,0,0)
+  );
+  pointer-events:none;
+  z-index:-1;
+}
