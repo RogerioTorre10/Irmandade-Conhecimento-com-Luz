@@ -141,71 +141,47 @@
   box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 30px gold;
 }
 
-/* =========================================
-   MOBILE (≤ 600px)
-   ========================================= */
-@media (max-width: 600px) {
-  #section-card .card-stage {
-    margin-top: 0;
-    width: 92%;
-    max-width: 400px;
-    min-height: 100svh;
-    margin-inline: auto;
-    padding: 15px 0; 
-  }
-
-  #section-card .flame-layer {
-    width: min(46%, 180px);
-    min-height: 240px;
-  }
-
-  #section-card .card-footer {
-    bottom: 12px;
-  }
-
-  #section-card .card-name-badge {
-    font-size: 12px;
-    padding: 5px 10px;
-  }
-
-  #section-card .card-actions-below {
-    margin-top: 30px;
-    padding: 15px 0;
-  }
-
-  #section-card #btnNext {
-    min-width: 160px;
-    padding: 12px 24px;
-    font-size: 14px;
-  }
-}
-/* ===== FIX MOBILE — botão "Continuar" sempre livre ===== */
+/* =====================================================
+   MOBILE — Ajuste do slot da selfie no CARD do guia
+   ===================================================== */
 @media (max-width: 640px){
 
-  /* mais espaço reservado embaixo do card */
-  :root{
-    --card-stage-pad-bottom: 220px;  /* antes era 140px */
-  }
-
-  /* garante que o palco respeite a variável */
+  /* mais espaço embaixo do card para não esmagar o botão */
   #section-card .card-stage{
-    padding-bottom: var(--card-stage-pad-bottom);
+    padding-bottom: 220px; /* pode aumentar para 240 se quiser mais respiro */
   }
 
-  /* botão e área de ações sempre acima de qualquer imagem/card */
+  /* slot / máscara / placeholder da selfie no card */
+  #section-card .card-selfie-slot,
+  #section-card .card-selfie-placeholder,
+  #section-card .card-photo-mask,
+  #section-card .card-placeholder {
+    position: absolute;
+    left: 50%;
+    bottom: 14%;              /* desce um pouco, afasta do queixo */
+    transform: translateX(-50%);
+
+    width: 60%;               /* MAIS LARGO */
+    max-width: 260px;
+    aspect-ratio: 3 / 4;      /* mais “quadrado” (antes era bem alto) */
+
+    border-radius: 22px;
+  }
+
+  /* garante que o botão fique sempre clicável acima de tudo */
   #section-card .card-actions{
     position: relative;
     margin-top: 10px;
-    z-index: 30;
+    z-index: 40;
   }
-}
 
-/* elementos visuais do card não bloqueiam o clique */
-#section-card .card-placeholder,
-#section-card .card-photo-wrap,
-#section-card .card-frame,
-#section-card .card-figure{
-  pointer-events: none;
+  /* camada visual da selfie não bloqueia o clique do botão */
+  #section-card .card-selfie-slot img,
+  #section-card .card-selfie-placeholder img,
+  #section-card .card-photo-mask img,
+  #section-card .card-placeholder img{
+    pointer-events: none;
+  }
 }
 
 
