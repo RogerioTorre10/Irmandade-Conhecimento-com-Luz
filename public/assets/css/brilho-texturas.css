@@ -365,4 +365,20 @@ body[data-guia="arian"] .btn-stone-espinhos {
   box-shadow:
     inset 0 0 14p...(truncated, mas cole o conteúdo completo que você mandou)
 }
-     
+   /* ======= BARRAS DE PROGRESSO — GUIA DINÂMICO ======= */
+#progress-block-fill,
+#progress-question-fill {
+  background: var(--progress-main) !important;
+  box-shadow:
+    0 0 6px var(--progress-glow-1),
+    0 0 16px var(--progress-glow-2);
+  transition: width .25s ease-out;
+}
+
+#progress-total-value {
+  color: var(--progress-main) !important;
+  text-shadow:
+    0 0 4px rgba(0,0,0,.85),
+    0 0 10px var(--progress-glow-1);
+}
+  
