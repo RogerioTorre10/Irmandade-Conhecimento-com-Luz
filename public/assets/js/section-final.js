@@ -58,51 +58,87 @@ async function startFinalSequence() {
   if (started) return;
   started = true;
 
-  const section = document.getElementById(SECTION_ID);
-  if (!section) return;
+  const section   = document.getElementById(SECTION_ID);
+  const titleEl   = document.getElementById('final-title');
+  const messageEl = document.getElementById('final-message');
+  const botoes    = document.querySelector('.final-acoes');
 
+  if (!section || !titleEl || !messageEl) return;
+
+  // Mostra a seção final (CSS cuida do fade geral)
   section.classList.add('show');
+  await sleep(400);
+
+  // ===== TÍTULO: fade + datilografia + voz =====
+  const titleText =
+    titleEl.getAttribute('data-original') ||
+    titleEl.textContent.trim() ||
+    'Gratidão por Caminhar com Luz';
+
+  // evita texto aparecer pronto
+  titleEl.setAttribute('data-original', titleText);
+  titleEl.textContent = '';
+  titleEl.style.opacity   = '0';
+  titleEl.style.transform = 'translateY(-16px)';
+
+  await sleep(150);
+  titleEl.style.transition = 'all 0.9s ease';
+  titleEl.style.opacity    = '1';
+  titleEl.style.transform  = 'translateY(0)';
+
+  // usa seu typeText com voz no título
+  await typeText(titleEl, titleText, 60, true);
   await sleep(500);
 
-  const titleEl = document.getElementById('final-title');
-  const ps = document.querySelectorAll('#final-message p');
-  const botoes = document.querySelector('.final-acoes');
+  // ===== PARÁGRAFOS: um por um, com datilografia =====
+  const ps = messageEl.querySelectorAll('#final-message p');
 
-  // TÍTULO COM GRANDE ENTRADA
-  titleEl.style.opacity = '0';
-  titleEl.style.transform = 'translateY(-20px)';
-  await sleep(300);
-  titleEl.style.transition = 'all 1s ease';
-  titleEl.style.opacity = '1';
-  titleEl.style.transform = 'translateY(0)';
-  await typeText(titleEl, 'Gratidão por Caminhar com Luz', 70, true);
-  await sleep(800);
-
-  // PARÁGRAFOS COM REVEAL + VOZ
   for (let i = 0; i < ps.length; i++) {
     const p = ps[i];
-    p.style.opacity = '0';
-    p.style.transform = 'translateX(-30px)';
-    await sleep(400);
+
+    const txt =
+      p.getAttribute('data-original') ||
+      p.textContent.trim();
+
+    if (!txt) continue;
+
+    p.setAttribute('data-original', txt);
+
+    // evita flash de texto cheio
+    p.textContent = '';
+    p.style.opacity   = '0';
+    p.style.transform = 'translateX(-18px)';
+
+    await sleep(200);
     p.style.transition = 'all 0.8s ease';
-    p.style.opacity = '1';
-    p.style.transform = 'translateX(0)';
-    await typeText(p, p.getAttribute('data-original'), 55, true);
-    await sleep(600);
+    p.style.opacity    = '1';
+    p.style.transform  = 'translateX(0)';
+
+    // se quiser voz só no primeiro parágrafo:
+    const withVoice = (i === 0);      // true só no primeiro
+    await typeText(p, txt, 55, withVoice);
+
+    p.classList.add('revealed');
+    await sleep(350);
   }
 
-  // BOTÕES COM BRILHO
-  botoes.style.opacity = '0';
-  botoes.style.transform = 'scale(0.8)';
-  await sleep(500);
-  botoes.style.transition = 'all 0.8s ease';
-  botoes.style.opacity = '1';
-  botoes.style.transform = 'scale(1)';
-  botoes.classList.add('show');
+  // ===== BOTÕES: aparecem por último com brilho =====
+  if (botoes) {
+    botoes.style.opacity   = '0';
+    botoes.style.transform = 'scale(0.8)';
 
-  document.querySelectorAll('.final-acoes button').forEach(btn => {
-    btn.disabled = false;
-  });
+    await sleep(400);
+    botoes.style.transition = 'all 0.8s ease';
+    botoes.style.opacity    = '1';
+    botoes.style.transform  = 'scale(1)';
+    botoes.classList.add('show');
+
+    document.querySelectorAll('.final-acoes button').forEach(btn => {
+      btn.disabled = false;
+    });
+  }
+
+  console.log('[FINAL] Sequência concluída com sucesso!');
 }
 
   async function generateArtifacts() {
