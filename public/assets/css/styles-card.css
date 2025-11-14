@@ -156,11 +156,11 @@
   #section-card .flame-layer {
     position: absolute;
     left: 50%;
-    bottom: -18%;                     /* <<< AQUI DESCE DE VEZ */
+    bottom: -30% !important;                     /* <<< AQUI DESCE DE VEZ */
     transform: translateX(-50%);
     
-    width: 58%;                      /* tamanho ideal */
-    max-width: 220px;
+    width: 52%;                      /* tamanho ideal */
+    max-width: 200px;
     aspect-ratio: 1 / 1;
     
     border-radius: 22px;
