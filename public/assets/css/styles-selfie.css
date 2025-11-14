@@ -24,7 +24,7 @@
 
 .selfie-header h2 {
   font-family: 'ManufacturingConsent-Regular', 'Cardo', serif;
-  color: #f9e7c2;
+  color: var(--theme-main-color, #ffd700);
   font-size: 22px;
   margin: 0;
   text-shadow: 0 1px 3px rgba(0,0,0,0.75);
@@ -42,7 +42,7 @@
 }
 
 #selfieTexto {
-  color: #f9e7c2;
+  color: var(--theme-main-color, #ffd700);
   font-family: 'Cardo', serif;
   font-size: 15px;
   line-height: 1.5;
@@ -64,7 +64,7 @@
   border: 1px solid rgba(255,255,255,.07);
   max-width: 520px;
   margin: 10px auto 14px;
-  color: #f9e7c2;
+  color: var(--theme-main-color, #ffd700);
   font-family: 'Cardo', serif;
   font-size: 14px;
 }
