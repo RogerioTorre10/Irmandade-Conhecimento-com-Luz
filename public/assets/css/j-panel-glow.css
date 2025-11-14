@@ -1,26 +1,29 @@
-/* =========================================
-   PAINEL ÉPICO COM GLOW — padrão global
-   Usar DENTRO de sections com pergaminho-v
-   ========================================= */
-.j-panel-glow{
+/* ======================================================
+   PAINEL EXTERNO — tamanho padrão em todas as páginas
+   ====================================================== */
+.j-panel-glow {
   position: relative;
   width: min(92%, 760px);
-  margin: clamp(36px, 7vh, 64px) auto;
-  padding: clamp(24px, 4vh, 36px) clamp(18px, 4vw, 30px);
-
+  margin: clamp(32px, 6vh, 40px) auto;
+  padding: clamp(18px, 3vh, 26px);
   border-radius: 26px;
-  background: radial-gradient(circle at top,
-              rgba(255,255,255,0.06) 0%,
-              rgba(8,10,22,1) 40%,
-              rgba(3,4,10,1) 100%);
 
-  box-shadow:
-    0 0 40px rgba(0,0,0,0.85),
-    0 0 80px color-mix(in srgb, var(--theme-main-color, #ffd978) 70%, transparent);
+  background: rgba(10, 14, 32, 0.72);
+  backdrop-filter: blur(3px);
+
+  /* garante que ele não “estoure” e nem fique baixinho */
+  min-height: min(84vh, 860px);
+
+  /* centraliza o conteúdo interno (pergaminho vertical, cartão, etc.) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   overflow: hidden;
   box-sizing: border-box;
+  z-index: 5;
 }
+
 
 /* névoa suave no topo */
 .j-panel-glow::before{
@@ -122,18 +125,33 @@
   z-index: 2;
 }
 
-/* PERGAMINHO INTERNO VERTICAL */
-.j-perg-v-inner{
+/* ======================================================
+   PERGAMINHO VERTICAL INTERNO — tamanho consistente
+   ====================================================== */
+.j-perg-v-inner {
+  position: relative;
+  width: 100%;
+  max-width: 520px;                  /* largura do “totem” interno */
+  margin: 0 auto;
+
   background: center/contain no-repeat url('/assets/img/pergaminho-rasgado-vert.png');
-  background-color: rgba(245,235,200,0.05);
-  border-radius: 18px;
-  padding: clamp(32px, 5vh, 44px) clamp(20px, 4vw, 32px);
-  min-height: clamp(420px, 70vh, 760px);
+  background-color: rgba(245, 235, 200, 0.05);
+  border-radius: 22px;
+
+  /* altura padrão, igual em intro, termos, senha, etc. */
+  min-height: clamp(420px, 65vh, 720px);
+  max-height: 100%;                  /* nunca passa do painel externo */
+  padding: clamp(28px, 5vh, 40px) clamp(20px, 4vw, 32px);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;       /* se quiser bem central: center */
+  overflow-y: auto;                  /* se o conteúdo passar, vira scroll interno */
   box-shadow: 0 0 60px rgba(0,0,0,.6);
 }
 
-/* Conteúdo dentro do pergaminho vertical */
-.j-perg-v-inner .j-content{
+/* conteúdo dentro do pergaminho interno */
+.j-perg-v-inner .j-content {
   color: var(--theme-main-color, #ffd978);
   font-family: 'BerkshireSwash', cursive;
 }
@@ -199,15 +217,17 @@
 /* Mobile: reduz intensidade para não estourar */
 @media (max-width: 600px) {
   .j-panel-glow {
+    min-height: 80vh;
     margin: 24px auto;
-    padding: 24px 18px;
+    padding: 16px 10px;
   }
 
-  .j-panel-glow::before,
-  .j-panel-glow::after {
-    height: 72px;
+  .j-perg-v-inner {
+    max-width: 100%;
+    border-radius: 18px;
   }
 }
+
 /* ================================================
    CARTÃO ARCANO – místico + futurista
    Usar dentro de j-perg-v-inner ou j-perg-h-inner
