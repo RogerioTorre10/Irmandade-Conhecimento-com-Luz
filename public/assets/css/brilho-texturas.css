@@ -5,6 +5,7 @@
 
 /* -------- Variáveis (paths + aura) -------- */
 :root{
+  --espinhos-img: url('/assets/img/moldura-medieval.png');
   --espinhos-img: url('/assets/img/moldura-medieval-espinhos.png');
   --stone-img: url('/assets/img/textura-de-pedra.jpg');
 
@@ -21,7 +22,10 @@
   --btn-gold-line:  rgba(255, 215,   0, 0.32);
   --btn-text:       #f9e7c2;
 
+  --theme-main-color: #ffd700;   /* dourado da fonte final */
+
   --ink: #f5efe0;
+  
 }
 
 /* -------- Animações compartilhadas -------- */
@@ -232,6 +236,7 @@ body[data-guia="lumen"] {
   --progress-main:   #00ff9d;
   --progress-glow-1: rgba(0,255,157,.95);
   --progress-glow-2: rgba(120,255,200,.75);
+  --theme-main-color: #00ff9d;   /* verde Lumen */  
 }
 
 /* ---- ZION (azul-celeste e prata elétrica) ---- */
@@ -248,6 +253,7 @@ body[data-guia="zion"] {
   --progress-main:   #00aaff;
   --progress-glow-1: rgba(255,214,91,.85);
   --progress-glow-2: rgba(0,170,255,.9); 
+  --theme-main-color: #00aaff;   /* azul Zion */  
 }
 
 /* ---- ARIAN (magenta e violeta cósmico) ---- */
@@ -264,6 +270,7 @@ body[data-guia="arian"] {
   --progress-main:   #ff00ff;
   --progress-glow-1: rgba(255,120,255,.95);
   --progress-glow-2: rgba(255,180,255,.8);
+  --theme-main-color: #ff00ff;   /* magenta Arian */  
 }
 
 /* =======================================================
