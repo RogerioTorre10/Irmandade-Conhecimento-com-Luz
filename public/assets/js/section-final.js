@@ -12,45 +12,43 @@
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
   function speakText(text) {
-    if (!('speechSynthesis' in window) || isSpeaking || !text) return;
-    isSpeaking = true;
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = 'pt-BR';
-    utter.rate = 0.95;
-    utter.pitch = 1;
-    utter.volume = 0.9;
-    utter.onend = () => { isSpeaking = false; };
-    speechSynthesis.cancel();
-    speechSynthesis.speak(utter);
-  }
+  if (!('speechSynthesis' in window) || !text) return;
 
-async function typeText(el, text, delay = 60, withVoice = false) {
+  // sempre fala o texto atual (cancela o anterior)
+  isSpeaking = true;
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'pt-BR';
+  utter.rate = 0.9;   // um pouco mais calmo
+  utter.pitch = 1;
+  utter.volume = 0.9;
+  utter.onend = () => { isSpeaking = false; };
+
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utter);
+}
+
+
+async function typeText(el, text, delay = 55, withVoice = false) {
   if (!el || !text) return;
+
+  // prepara o elemento
   el.textContent = '';
-  el.style.opacity = '0';
+  el.style.opacity = '1';          // garante que apareça já no efeito
   el.classList.add('typing-active');
 
-  // Revela o elemento suavemente
-  setTimeout(() => { el.style.opacity = '1'; el.style.transition = 'opacity 0.6s ease'; }, 100);
-
   if (withVoice) {
-    // Fala mais devagar e com pausas
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = 'pt-BR';
-    utter.rate = 0.8;
-    utter.pitch = 1.1;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(utter);
+    speakText(text);
   }
 
   for (let i = 0; i < text.length; i++) {
     el.textContent += text[i];
-    if (i % 2 === 0) await sleep(delay); // Mais lento = mais impacto
+    // a cada 2 caracteres dá uma pausa → mais lento e épico
+    if (i % 2 === 0) await sleep(delay);
   }
 
   el.classList.remove('typing-active');
   el.classList.add('typing-done');
-  return sleep(400);
+  return sleep(200);
 }
 
 // === SUBSTITUA startFinalSequence POR ESTA (COM REVEAL + PAUSAS) ===
@@ -97,7 +95,7 @@ async function startFinalSequence() {
   titleEl.style.transition = 'all 0.9s ease';
   titleEl.style.opacity    = '1';
   titleEl.style.transform  = 'translateY(0)';
-  await typeText(titleEl, tituloOriginal, 45, true);
+  await typeText(titleEl, tituloOriginal, 65, true);
   await sleep(600);
 
   // ===== PARÁGRAFOS: um por um, datilografia =====
@@ -114,7 +112,7 @@ async function startFinalSequence() {
 
     // voz só no primeiro parágrafo (se quiser em todos, troque false por true)
     const withVoice = (i === 0);
-    await typeText(p, txt, 30, withVoice);
+    await typeText(p, txt, 55, true);
 
     p.classList.add('revealed');
     await sleep(300);
