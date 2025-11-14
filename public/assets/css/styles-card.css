@@ -141,68 +141,64 @@
   box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 30px gold;
 }
 
-/* ===================== MOBILE AJUSTES (UNIFICADO) ===================== */
+/* ===================== MOBILE AJUSTES (PERFEITO) ===================== */
 @media (max-width: 640px) {
 
-  /* palco do card */
+  /* palco */
   #section-card .card-stage {
-    margin-top: -32px;
+    margin-top: -12px;
+    padding-bottom: 240px; /* deixa espaço pro botão */
     min-height: 100svh;
-    padding-bottom: 220px; /* espaço pro nome + botão */
   }
 
-  /* container da chama + selfie (slot) */
+  /* SLOT QUADRADO – bem mais para baixo */
   #section-card .flame-layer {
     position: absolute;
     left: 50%;
-    bottom: 10%;                 /* mais perto do peito, longe do rosto */
-    top: auto;
+    bottom: 4%;                 /* <<< DESCEU (antes era 10%) */
     transform: translateX(-50%);
-    width: min(56%, 230px);      /* mais largo, mas não gigante */
-    aspect-ratio: 1 / 1;         /* QUADRADO */
-    margin: 0 auto;
-    text-align: center;
+    width: 68%;                 /* <<< mais largo */
+    max-width: 260px;
+    aspect-ratio: 1 / 1;        /* QUADRADO REAL */
+    border-radius: 22px;
+    overflow: hidden;
+    z-index: 5;
   }
 
-  /* imagem/selfie dentro do slot */
+  /* imagem da selfie */
   #section-card .flame-selfie {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 35%;
-    border-radius: 18px;
-    pointer-events: none;        /* nunca bloqueia o clique do botão */
+    object-position: center 40%; /* recuo pra não cortar testa */
+    border-radius: 22px;
+    pointer-events: none;
   }
 
-  /* rodapé do card (copyright etc.) */
-  #section-card .card-footer {
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 72px);
-  }
-
-  /* badge com o nome da pessoa */
+  /* nome */
   #section-card .card-name-badge {
+    margin-top: 8px;
     font-size: 14px;
     padding: 5px 12px;
   }
 
-  /* botão CONTINUAR sempre acima de tudo */
+  /* botão continuar */
   #section-card #btnNext {
     position: fixed;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
     left: 50%;
     transform: translateX(-50%);
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
-    z-index: 40;
+    z-index: 50;                /* SEMPRE no topo */
   }
 
-  /* bloco de ações do card (se houver) */
+  /* ações do card */
   #section-card .card-actions,
   #section-card .card-actions-below {
     position: relative;
-    margin-top: 10px;
-    z-index: 30;
+    z-index: 40;
+    margin-top: 14px;
   }
 }
-
 
 /* =========================================
    DESKTOP (≥ 601px)
