@@ -51,7 +51,7 @@
 
 .pergaminho-content {
   text-align: center;
-  color: #ffd700;
+  color: var(--theme-main-color, #ffd700);
   font-family: 'BerkshireSwash', cursive;
   display: flex;
   flex-direction: column;
@@ -94,7 +94,7 @@
 .final-bold {
   font-weight: bold;
   font-size: 1.5em !important;
-  color: #ffeb3b;
+  color: var(--theme-main-color, #ffeb3b);
 }
 
 /* BOTÕES */
