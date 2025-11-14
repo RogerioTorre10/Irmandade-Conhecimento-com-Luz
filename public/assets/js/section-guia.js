@@ -416,35 +416,48 @@
     });
 
     // ===== CLIQUE: ARMAR / DUPLUCLIQUE: CONFIRMAR =====
-    guideButtons.forEach(btn => {
-      const label = (btn.dataset.nome || btn.textContent || 'guia').toUpperCase();
+   // ===== CLIQUE: ARMAR / DUPLUCLIQUE: CONFIRMAR =====
+guideButtons.forEach(btn => {
+  const label = (btn.dataset.nome || btn.textContent || 'guia').toUpperCase();
+  const guiaId = (btn.dataset.guia || '').toLowerCase();
 
-      btn.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        if (btn.disabled) return;
-        armGuide(root, btn, label);
-      });
+  btn.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    if (btn.disabled) return;
+    armGuide(root, btn, label);
+  });
 
-      btn.addEventListener('dblclick', (ev) => {
-        ev.preventDefault();
-        if (btn.disabled) return;
-        const id = (btn.dataset.guia || '').toLowerCase();
-        confirmGuide(root, id, label);
-        cancelArm(root);
-      });
+  btn.addEventListener('dblclick', (ev) => {
+    ev.preventDefault();
+    if (btn.disabled) return;
+    confirmGuide(root, guiaId, label);
+    cancelArm(root);
+  });
 
-      btn.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          if (btn.disabled) return;
-          armGuide(root, btn, label);
-        }
-      });
+  btn.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter' || ev.key === ' ') {
+      ev.preventDefault();
+      if (btn.disabled) return;
+      armGuide(root, btn, label);
+    }
+  });
 
-      btn.setAttribute('role', 'button');
-      btn.setAttribute('tabindex', '0');
-      btn.setAttribute('aria-pressed', 'false');
-    });
+  // ===== PREVIEW DE TEMA AO PASSAR O MOUSE =====
+  btn.addEventListener('mouseenter', () => {
+    if (btn.disabled || !guiaId) return;
+    applyGuiaTheme(guiaId);    // aplica cor/tema temporário
+  });
+
+  btn.addEventListener('mouseleave', () => {
+    if (btn.disabled) return;
+    applyGuiaTheme(null);      // volta para o tema oficial (ou dourado)
+  });
+
+  btn.setAttribute('role', 'button');
+  btn.setAttribute('tabindex', '0');
+  btn.setAttribute('aria-pressed', 'false');
+});
+
 
     // ===== CANCELA AO CLICAR FORA =====
     document.addEventListener('click', (e) => {
@@ -454,6 +467,27 @@
 
     console.log('[JCGuia] Inicializado com sucesso: nome + guia salvos + 2 cliques + TTS + aura');
   }
+  // ===== TEMA DINÂMICO DOS GUIAS (preview ao passar o mouse) =====
+function applyGuiaTheme(guiaIdOrNull) {
+  if (guiaIdOrNull) {
+    // aplica tema do guia passado
+    document.body.dataset.guia = guiaIdOrNull.toLowerCase();
+    return;
+  }
+
+  // sem parâmetro: restaura o tema "oficial" (já escolhido ou nenhum)
+  const saved =
+    (window.JC && window.JC.data && window.JC.data.guia) ||
+    sessionStorage.getItem('jornada.guia') ||
+    '';
+
+  if (saved) {
+    document.body.dataset.guia = saved.toLowerCase();
+  } else {
+    // remove o data-guia → volta pro padrão dourado
+    delete document.body.dataset.guia;
+  }
+}
 
   function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
