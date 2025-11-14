@@ -65,81 +65,87 @@ async function startFinalSequence() {
 
   if (!section || !titleEl || !messageEl) return;
 
-  // Mostra a seção final (CSS cuida do fade geral)
-  section.classList.add('show');
-  await sleep(400);
+  // ===== PREPARO: garante que nada apareça pronto =====
+  const ps = Array.from(messageEl.querySelectorAll('p'));
 
-  // ===== TÍTULO: fade + datilografia + voz =====
-  const titleText =
+  // guarda o texto original e limpa o conteúdo visual
+  ps.forEach(p => {
+    const txt = (p.getAttribute('data-original') || p.textContent || '').trim();
+    p.setAttribute('data-original', txt);
+    p.textContent = '';
+    p.classList.remove('revealed');
+    p.style.opacity   = '0';
+    p.style.transform = 'translateY(10px)';
+  });
+
+  // título também começa limpinho
+  const tituloOriginal =
     titleEl.getAttribute('data-original') ||
     titleEl.textContent.trim() ||
     'Gratidão por Caminhar com Luz';
 
-  // evita texto aparecer pronto
-  titleEl.setAttribute('data-original', titleText);
+  titleEl.setAttribute('data-original', tituloOriginal);
   titleEl.textContent = '';
   titleEl.style.opacity   = '0';
   titleEl.style.transform = 'translateY(-16px)';
 
-  await sleep(150);
+  // mostra a seção
+  section.classList.add('show');
+  await sleep(200);
+
+  // ===== TÍTULO: entra com datilografia + voz =====
   titleEl.style.transition = 'all 0.9s ease';
   titleEl.style.opacity    = '1';
   titleEl.style.transform  = 'translateY(0)';
+  await typeText(titleEl, tituloOriginal, 45, true);
+  await sleep(600);
 
-  // usa seu typeText com voz no título
-  await typeText(titleEl, titleText, 60, true);
-  await sleep(500);
-
-  // ===== PARÁGRAFOS: um por um, com datilografia =====
-  const ps = messageEl.querySelectorAll('#final-message p');
-
+  // ===== PARÁGRAFOS: um por um, datilografia =====
   for (let i = 0; i < ps.length; i++) {
-    const p = ps[i];
-
-    const txt =
-      p.getAttribute('data-original') ||
-      p.textContent.trim();
+    const p   = ps[i];
+    const txt = p.getAttribute('data-original') || '';
 
     if (!txt) continue;
 
-    p.setAttribute('data-original', txt);
-
-    // evita flash de texto cheio
-    p.textContent = '';
-    p.style.opacity   = '0';
-    p.style.transform = 'translateX(-18px)';
-
-    await sleep(200);
+    // pequena animação de entrada
     p.style.transition = 'all 0.8s ease';
     p.style.opacity    = '1';
-    p.style.transform  = 'translateX(0)';
+    p.style.transform  = 'translateY(0)';
 
-    // se quiser voz só no primeiro parágrafo:
-    const withVoice = (i === 0);      // true só no primeiro
-    await typeText(p, txt, 55, withVoice);
+    // voz só no primeiro parágrafo (se quiser em todos, troque false por true)
+    const withVoice = (i === 0);
+    await typeText(p, txt, 30, withVoice);
 
     p.classList.add('revealed');
-    await sleep(350);
+    await sleep(300);
   }
 
-  // ===== BOTÕES: aparecem por último com brilho =====
+  // ===== BOTÕES: aparecem e são liberados =====
   if (botoes) {
-    botoes.style.opacity   = '0';
-    botoes.style.transform = 'scale(0.8)';
+    botoes.style.opacity       = '0';
+    botoes.style.transform     = 'scale(0.9)';
+    botoes.style.transition    = 'all 0.8s ease';
+    botoes.style.pointerEvents = 'none';
 
     await sleep(400);
-    botoes.style.transition = 'all 0.8s ease';
-    botoes.style.opacity    = '1';
-    botoes.style.transform  = 'scale(1)';
-    botoes.classList.add('show');
 
-    document.querySelectorAll('.final-acoes button').forEach(btn => {
-      btn.disabled = false;
+    botoes.classList.add('show');
+    botoes.style.opacity       = '1';
+    botoes.style.transform     = 'scale(1)';
+    botoes.style.pointerEvents = 'auto';
+
+    // garante que TODOS fiquem clicáveis
+    botoes.querySelectorAll('button, a').forEach(el => {
+      el.disabled = false;
+      el.classList.remove('disabled');
+      el.removeAttribute('aria-disabled');
+      el.style.pointerEvents = 'auto';
     });
   }
 
   console.log('[FINAL] Sequência concluída com sucesso!');
 }
+
 
   async function generateArtifacts() {
     const btn = document.getElementById('btnBaixarPDFHQ');
