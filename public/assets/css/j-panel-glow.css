@@ -357,3 +357,54 @@
     opacity: 0.30;
   }
 }
+
+/* PAINEL EXTERNO — largura maior e centralizado */
+.j-panel-outer {
+  width: min(92%, 780px) !important;      /* antes ~620px */
+  margin: 0 auto !important;
+}
+
+/* PAINEL INTERMEDIÁRIO — acompanha expansão */
+.j-panel-mid {
+  width: 100% !important;
+  padding: 28px !important;
+  border-radius: 26px !important;
+}
+/* PAINEL INTERNO — mais largo e proporcionado */
+.j-panel-inner {
+  width: 100% !important;
+  max-width: 660px !important;    /* aumenta conteúdo */
+  margin: 0 auto !important;
+
+  padding: 38px 32px !important;
+
+  border-radius: 26px !important;
+  background-size: cover !important;
+}
+/* PERGAMINHO INTERNO PADRÃO */
+.j-panel-inner.pergaminho-v {
+  background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important;
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: 100% auto;
+}
+/* garante que o conteúdo não fique colado no topo */
+.j-panel-inner > *:first-child {
+  margin-top: 12px !important;
+}
+
+.j-panel-inner > *:last-child {
+  margin-bottom: 22px !important;
+}
+@media (max-width: 640px) {
+  .j-panel-outer {
+    width: 94% !important;
+  }
+
+  .j-panel-inner {
+    max-width: 92% !important;
+    padding: 32px 20px !important;
+  }
+}
+
+
