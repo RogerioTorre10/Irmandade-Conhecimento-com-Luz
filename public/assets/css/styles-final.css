@@ -1,31 +1,38 @@
 /* styles-final.css */
 #section-final {
-  position: relative;                /* em vez de fixed */
+  position: relative;
   width: 100%;
-  min-height: 100vh;                 /* ocupa o alto todo, mas dentro do wrapper */
-  background: radial-gradient(circle at center, #1a1a2e, #0a0a1a);
+  min-height: 100vh;
+
   display: flex;
+  flex-direction: column;        /* empilha */
   align-items: center;
-  justify-content: center;
-  padding: 40px 16px;                /* respiro ao redor do pergaminho */
+  justify-content: flex-start;   /* começa no topo da tela */
+  padding: 80px 16px 60px;       /* espaço elegante */
+
+  background: radial-gradient(circle at top, #1a1a2e, #0a0a1a);
   box-sizing: border-box;
-  z-index: 20;                       /* bem acima do fundo, mas sem exagero */
-  overflow: visible;
+  z-index: 20;
+  overflow-x: hidden;
+  overflow-y: auto;
   opacity: 0;
-  transition: opacity 1s ease;
+  transition: opacity .8s ease;
 }
+
 #section-final.show {
   opacity: 1;
 }
 
 .final-pergaminho-wrapper {
   width: 100%;
-  max-width: 960px;          /* limite elegante dentro do container */
+  max-width: 520px;            /* largura ideal do pergaminho */
+  margin: 0 auto;              /* mantém centralizado */
+  
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 20px;
-  margin: 0 auto;            /* garante centralização */
+  align-items: flex-start;      /* começa do topo, não do meio */
+
+  padding: 0;
   box-sizing: border-box;
 }
 
