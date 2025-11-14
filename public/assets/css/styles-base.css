@@ -311,3 +311,17 @@ p, li {
 #toast.show {
   opacity: 1;
 }
+/* ===== REMOVER TEXTO/ÍCONE AUTOMÁTICO DO JORNADA_MICRO ===== */
+.microphone,
+[data-microphone],
+[aria-label="microphone"],
+[aria-label="Microphone"],
+button.microphone,
+span.microphone {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  pointer-events: none !important;
+}
