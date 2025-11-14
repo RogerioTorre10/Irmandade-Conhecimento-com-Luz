@@ -141,49 +141,52 @@
   box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 30px gold;
 }
 
-/* =====================================================
-   MOBILE — Ajuste do slot da selfie no CARD do guia
-   ===================================================== */
+/* ================================================
+   MOBILE — Slot da selfie quadrado e mais abaixo
+   ================================================ */
 @media (max-width: 640px){
 
-  /* mais espaço embaixo do card para não esmagar o botão */
+  /* abre espaço embaixo pra não esmagar o botão */
   #section-card .card-stage{
-    padding-bottom: 220px; /* pode aumentar para 240 se quiser mais respiro */
+    padding-bottom: 220px;
   }
 
-  /* slot / máscara / placeholder da selfie no card */
+  /* SLOT / PLACEHOLDER da selfie no card */
   #section-card .card-selfie-slot,
   #section-card .card-selfie-placeholder,
   #section-card .card-photo-mask,
   #section-card .card-placeholder {
     position: absolute;
     left: 50%;
-    bottom: 14%;              /* desce um pouco, afasta do queixo */
+    bottom: 8%;                /* mais perto do peito, longe do rosto */
     transform: translateX(-50%);
 
-    width: 60%;               /* MAIS LARGO */
-    max-width: 260px;
-    aspect-ratio: 3 / 4;      /* mais “quadrado” (antes era bem alto) */
-
+    width: 52%;                /* mais largo que antes, mas menor que o corpo todo */
+    max-width: 210px;
+    aspect-ratio: 1 / 1;       /* QUADRADO */
     border-radius: 22px;
+
+    overflow: hidden;
   }
 
-  /* garante que o botão fique sempre clicável acima de tudo */
+  /* imagem da selfie dentro do slot */
+  #section-card .card-selfie-slot img,
+  #section-card .card-selfie-placeholder img,
+  #section-card .card-photo-mask img,
+  #section-card .card-placeholder img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;      /* nunca rouba o clique do botão */
+  }
+
+  /* garante que o botão continue clicável */
   #section-card .card-actions{
     position: relative;
     margin-top: 10px;
     z-index: 40;
   }
-
-  /* camada visual da selfie não bloqueia o clique do botão */
-  #section-card .card-selfie-slot img,
-  #section-card .card-selfie-placeholder img,
-  #section-card .card-photo-mask img,
-  #section-card .card-placeholder img{
-    pointer-events: none;
-  }
 }
-
 
 /* =========================================
    DESKTOP (≥ 601px)
