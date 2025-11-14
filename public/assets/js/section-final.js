@@ -190,14 +190,20 @@ async function startFinalSequence() {
     }
 
     video.src = VIDEO_SRC;
-    video.style.cssText = `
-      position: fixed !important; top: 50% !important; left: 50% !important;
-      transform: translate(-50%, -50%) !important; width: 94vw !important; height: 94vh !important;
-      max-width: 94vw !important; max-height: 94vh !important; object-fit: contain !important;
-      z-index: 999999 !important; border: 14px solid #d4af37 !important;
-      border-radius: 20px !important; box-shadow: 0 0 80px rgba(212,175,55,1) !important;
-      background: #000 !important;
-    `;
+   overlay.style.cssText = `
+  position: fixed !important;
+  top: 0 !important; left: 0 !important;
+  width: 100vw !important; height: 100vh !important;
+  background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.9) 55%, #000 100%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 99999 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.6s ease !important;
+`;
+
 
     document.body.style.overflow = 'hidden';
     document.querySelectorAll('body > *').forEach(el => {
