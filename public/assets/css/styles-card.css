@@ -143,68 +143,70 @@
   box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 30px gold;
 }
 
-/* ==========================================================
-   FIX MOBILE DEFINITIVO — CARD + SELFIE + BOTÃO (Lumen)
-   ========================================================== */
-
+/* ===================== MOBILE AJUSTES FINAIS ===================== */
 @media (max-width: 640px) {
 
-  /* Ajusta o palco para não cortar nada */
+  /* palco do card - espaço extra */
   #section-card .card-stage {
-    position: relative !important;
+    margin-top: -8px;
+    padding-bottom: 260px !important;   /* MAIS espaço para o botão */
     overflow: visible !important;
-    padding-bottom: 200px !important;   /* espaço real pro botão */
-    margin-top: 0 !important;
+    min-height: 100svh;
   }
 
-  /* QUADRO da selfie — centralizado e quadrado */
+  /* container da selfie (flame-layer) */
   #section-card .flame-layer {
-    position: absolute !important;
-    top: 46% !important;                 /* abaixa para não pegar o rosto */
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-
-    width: 72% !important;               /* tamanho ideal */
-    max-width: 260px !important;
-    aspect-ratio: 1 / 1 !important;      /* QUADRADO */
-    border-radius: 24px !important;
-    overflow: hidden !important;
-    z-index: 12 !important;
+    position: absolute;
+    left: 50%;
+    bottom: -6%;                     /* <<< AQUI DESCE DE VEZ */
+    transform: translateX(-50%);
+    
+    width: 72%;                      /* tamanho ideal */
+    max-width: 300px;
+    aspect-ratio: 1 / 1;
+    
+    border-radius: 24px;
+    overflow: hidden;
+    z-index: 15 !important;          /* abaixo do botão, acima do card */
   }
 
-  /* A imagem da selfie dentro do quadro */
+  /* imagem da selfie */
   #section-card .flame-selfie {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    object-position: center 30% !important;   /* NÃO corta testa/nariz */
-    pointer-events: none !important;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;     /* centraliza, sem cortar testa */
+    border-radius: 24px;
+    pointer-events: none;
   }
 
-  /* Garante que o rosto do guia fique visível */
-  #section-card #guideBg,
-  #section-card .card-bg {
-    z-index: 1 !important;
+  /* nome */
+  #section-card .card-name-badge {
+    margin-top: 18px;
+    font-size: 15px;
+    z-index: 20;
+    position: relative;
   }
 
-  /* Botão sempre por cima */
+  /* BOTÃO CONTINUAR – sempre visível */
   #section-card #btnNext {
     position: fixed !important;
-    bottom: 20px !important;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 28px) !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    z-index: 9999 !important;
+    z-index: 99999 !important;
     pointer-events: auto !important;
   }
 
-  /* Área dos botões / ações */
+  /* ações do card */
   #section-card .card-actions,
   #section-card .card-actions-below {
-    position: relative !important;
-    z-index: 100 !important;
-    margin-top: 16px !important;
+    position: relative;
+    z-index: 30;
+    margin-top: 22px;
   }
 }
+
 
 /* =========================================
    DESKTOP (≥ 601px)
