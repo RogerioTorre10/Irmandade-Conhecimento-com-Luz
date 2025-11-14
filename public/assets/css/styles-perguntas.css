@@ -628,3 +628,20 @@
   color: #ffd700;
   font-weight: bold;
 }
+/* Barras de progresso puxando a cor do guia */
+#progress-block-fill,
+#progress-question-fill{
+  background: var(--progress-main, #f5d47b) !important;
+  box-shadow:
+    0 0 6px  var(--progress-glow-1, rgba(255,230,180,.85)),
+    0 0 16px var(--progress-glow-2, rgba(255,210,120,.75));
+  transition: width .25s ease-out;
+}
+
+/* Ampulheta (texto 1/50) */
+#progress-total-value{
+  color: var(--progress-main, #f5d47b);
+  text-shadow:
+    0 0 4px rgba(0,0,0,.85),
+    0 0 10px var(--progress-glow-1, rgba(255,230,180,.75));
+}
