@@ -143,65 +143,66 @@
   box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 30px gold;
 }
 
-/* ===================== MOBILE AJUSTES (PERFEITO) ===================== */
+/* ==========================================================
+   FIX MOBILE DEFINITIVO — CARD + SELFIE + BOTÃO (Lumen)
+   ========================================================== */
+
 @media (max-width: 640px) {
 
-  /* palco */
+  /* Ajusta o palco para não cortar nada */
   #section-card .card-stage {
-  position: relative;
-  margin-top: -12px;
-  padding-bottom: 240px; /* pode reduzir depois se ficar muito alto */
-  min-height: 100svh;
-  overflow: visible;      /* garante que nada corte o botão */
-}
+    position: relative !important;
+    overflow: visible !important;
+    padding-bottom: 200px !important;   /* espaço real pro botão */
+    margin-top: 0 !important;
+  }
 
-  /* SLOT QUADRADO – bem mais para baixo */
+  /* QUADRO da selfie — centralizado e quadrado */
   #section-card .flame-layer {
-    position: absolute;
-    left: 50%;
-    bottom: 4%;                 /* <<< DESCEU (antes era 10%) */
-    transform: translateX(-50%);
-    width: 68%;                 /* <<< mais largo */
-    max-width: 260px;
-    aspect-ratio: 1 / 1;        /* QUADRADO REAL */
-    border-radius: 22px;
-    overflow: hidden;
-    z-index: 5;
+    position: absolute !important;
+    top: 46% !important;                 /* abaixa para não pegar o rosto */
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+
+    width: 72% !important;               /* tamanho ideal */
+    max-width: 260px !important;
+    aspect-ratio: 1 / 1 !important;      /* QUADRADO */
+    border-radius: 24px !important;
+    overflow: hidden !important;
+    z-index: 12 !important;
   }
 
-  /* imagem da selfie */
+  /* A imagem da selfie dentro do quadro */
   #section-card .flame-selfie {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center 40%; /* recuo pra não cortar testa */
-    border-radius: 22px;
-    pointer-events: none;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center 30% !important;   /* NÃO corta testa/nariz */
+    pointer-events: none !important;
   }
 
-  /* nome */
-  #section-card .card-name-badge {
-    margin-top: 8px;
-    font-size: 14px;
-    padding: 5px 12px;
+  /* Garante que o rosto do guia fique visível */
+  #section-card #guideBg,
+  #section-card .card-bg {
+    z-index: 1 !important;
   }
 
-  /* botão continuar */
+  /* Botão sempre por cima */
   #section-card #btnNext {
-  position: fixed;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999 !important;   /* Força ficar acima do card e da selfie */
-  pointer-events: auto !important; /* garante clique mesmo com overlay perto */
-}
+    position: fixed !important;
+    bottom: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 9999 !important;
+    pointer-events: auto !important;
+  }
 
-  /* ações do card */
+  /* Área dos botões / ações */
   #section-card .card-actions,
   #section-card .card-actions-below {
-    position: relative;
-    z-index: 40;
-    margin-top: 14px;
+    position: relative !important;
+    z-index: 100 !important;
+    margin-top: 16px !important;
   }
 }
 
