@@ -148,10 +148,12 @@
 
   /* palco */
   #section-card .card-stage {
-    margin-top: -12px;
-    padding-bottom: 240px; /* deixa espaço pro botão */
-    min-height: 100svh;
-  }
+  position: relative;
+  margin-top: -12px;
+  padding-bottom: 240px; /* pode reduzir depois se ficar muito alto */
+  min-height: 100svh;
+  overflow: visible;      /* garante que nada corte o botão */
+}
 
   /* SLOT QUADRADO – bem mais para baixo */
   #section-card .flame-layer {
@@ -186,12 +188,13 @@
 
   /* botão continuar */
   #section-card #btnNext {
-    position: fixed;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 50;                /* SEMPRE no topo */
-  }
+  position: fixed;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999 !important;   /* Força ficar acima do card e da selfie */
+  pointer-events: auto !important; /* garante clique mesmo com overlay perto */
+}
 
   /* ações do card */
   #section-card .card-actions,
