@@ -344,58 +344,67 @@ section.selfie-page {
   60%  { transform: scale(1.05); filter: drop-shadow(0 0 26px var(--aura-gold)); }
   100% { transform: scale(1.00); filter: drop-shadow(0 0 14px var(--aura-gold)); }
 }
-/* =======================================================
-   PAINEL ÉPICO COM GLOW — usar em intro / termos / senha /
-   perguntas / etc. junto com o pergaminho
-   ======================================================= */
+/* =========================================
+   PAINEL ÉPICO COM GLOW — padrão global
+   Usar DENTRO de sections com pergaminho-v
+   ========================================= */
 .j-panel-glow{
   position: relative;
-  margin: 0 auto;
-  max-width: 880px;
-  padding: 24px 20px;
-  border-radius: 26px;
+  width: min(92%, 760px);
+  margin: clamp(36px, 7vh, 64px) auto;
+  padding: clamp(24px, 4vh, 36px) clamp(18px, 4vw, 30px);
 
-  background: linear-gradient(to bottom, #181a2c 0%, #0c0e18 70%, #05060c 100%);
+  border-radius: 26px;
+  background: radial-gradient(circle at top,
+              rgba(255,255,255,0.06) 0%,
+              rgba(8,10,22,1) 40%,
+              rgba(3,4,10,1) 100%);
+
   box-shadow:
-    0 0 28px rgba(0,0,0,.9),
-    0 0 52px rgba(0,0,0,.9);
+    0 0 40px rgba(0,0,0,0.85),
+    0 0 80px color-mix(in srgb, var(--theme-main-color, #ffd978) 70%, transparent);
 
   overflow: hidden;
   box-sizing: border-box;
 }
 
-/* halo colorido vindo de baixo, na cor do guia */
-.j-panel-glow::after{
-  content:'';
-  position:absolute;
-  left:50%;
-  bottom:-18%;
-  transform:translateX(-50%);
-  width:135%;
-  height:70%;
-
-  background: radial-gradient(
-    ellipse at top,
-    rgba(0,0,0,0) 0%,
-    color-mix(in srgb, var(--theme-main-color) 80%, transparent) 35%,
-    transparent 80%
-  );
-
-  opacity: .9;
-  pointer-events:none;
-  z-index:-1;
-}
-
-/* leve névoa no topo */
+/* névoa suave no topo */
 .j-panel-glow::before{
   content:'';
   position:absolute;
   inset:0;
   background: linear-gradient(
     to bottom,
-    rgba(255,255,255,.05),
-    rgba(0,0,0,0)
+    rgba(255,255,255,0.08),
+    transparent 40%,
+    transparent 100%
   );
   pointer-events:none;
-  z-index:-1;
+  z-index:1;
 }
+
+/* glow forte vindo de baixo na cor do guia */
+.j-panel-glow::after{
+  content:'';
+  position:absolute;
+  left:50%;
+  bottom:-18%;
+  transform:translateX(-50%);
+  width:140%;
+  height:70%;
+  background: radial-gradient(
+    ellipse at top,
+    color-mix(in srgb, var(--theme-main-color, #ffd978) 85%, transparent) 0%,
+    transparent 65%
+  );
+  opacity: 0.95;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* conteúdo dentro do painel sempre acima das peles */
+.j-panel-glow > *{
+  position: relative;
+  z-index: 2;
+}
+
