@@ -37,16 +37,18 @@
 }
 
 .pergaminho-vertical {
- background: center/contain no-repeat url('/assets/img/pergaminho-rasgado-vert.png');
-  width: 90vw !important;
-  max-width: 500px !important;
-  height: 90vh !important;
-  max-height: 800px !important;
+  background: center/contain no-repeat url('/assets/img/pergaminho-rasgado-vert.png');
+  width: 90vw;
+  max-width: 500px;
+  height: 90vh;
+  max-height: 800px;
   padding: 60px 40px;
   border-radius: 20px;
-  box-shadow: 0 0 60px rgba(212,175,55,0.8);
+  box-shadow:
+    0 0 40px rgba(0,0,0,.85),
+    0 0 60px color-mix(in srgb, var(--theme-main-color) 75%, transparent);
   position: relative;
-  background-color: rgba(245, 235, 200, 0.1);
+  background-color: rgba(245, 235, 200, 0.08);
 }
 
 .pergaminho-content {
@@ -61,6 +63,7 @@
   overflow: hidden;
 }
 
+
 #section-final .final-pergaminho-wrapper {
   width: 100vw;
   height: 100vh;
@@ -71,20 +74,25 @@
 
 .final-title {
   font-size: 2.4em;
-  text-shadow: 0 0 20px var(--theme-main-color, gold);
+  color: var(--theme-main-color, #ffd700);
+  text-shadow:
+    0 0 12px var(--theme-main-color, gold),
+    0 0 26px color-mix(in srgb, var(--theme-main-color) 70%, #000);
   margin: 0;
-  min-height: 1.2em;
 }
+
 
 .final-message p {
   font-size: 1.3em;
   line-height: 1.6;
   margin: 10px 0;
-  text-shadow: 0 0 10px var(--theme-main-color, rgba(255,215,0,0.5));
+  color: var(--theme-main-color, #ffd700);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--theme-main-color) 70%, #000);
   opacity: 0;
   transform: translateY(10px);
   transition: all 0.6s ease;
 }
+
 
 .final-message p.revealed {
   opacity: 1;
@@ -96,6 +104,7 @@
   font-size: 1.5em !important;
   color: var(--theme-main-color, #ffeb3b);
 }
+
 
 /* BOTÕES */
 .final-acoes {
@@ -135,7 +144,7 @@
 }
 
 .btn-light {
- background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.08);
   color: var(--theme-main-color, #ffd700);
   border: 1px solid var(--theme-main-color, #d4af37);
   backdrop-filter: blur(5px);
