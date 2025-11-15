@@ -147,9 +147,9 @@
   /* palco do card */
   #section-card .card-stage {
     position: relative;
-    width: 92vw;
+    width: 86vw !important;
     margin-top: 8px;                
-    max-width: 380px;
+    max-width: 340px !important;
     margin: 32px auto 0;
     aspect-ratio: 9 / 16;        
     border-radius: 28px;
@@ -181,7 +181,7 @@
     height: 100%;
     display: block;
     object-fit: cover;
-    object-position: 62% 44%;
+    object-position: 62% 14%;
   }
 
   /* dá um respiro no topo do card para não colar no limite */
