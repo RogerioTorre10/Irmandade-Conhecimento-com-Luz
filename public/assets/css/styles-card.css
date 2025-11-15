@@ -147,12 +147,12 @@
   /* palco do card */
   #section-card .card-stage {
     position: relative;
-    width: 86vw !important;
+    width: 78vw !important;
     margin-top: 8px;                
-    max-width: 340px !important;
+    max-width: 300px !important;
     margin: 32px auto 0;
     aspect-ratio: 9 / 16;        
-    border-radius: 28px;
+    border-radius: 24px;
     padding-bottom: 160px;          
     min-height: 100svh;
     overflow: hidden;
