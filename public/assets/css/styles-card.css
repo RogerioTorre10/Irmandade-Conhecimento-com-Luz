@@ -147,10 +147,15 @@
   /* palco do card */
   #section-card .card-stage {
     position: relative;
-    margin-top: 8px;                 /* tira o corte no topo */
-    padding-bottom: 160px;           /* espaço pro nome + botão */
+    width: 92vw;
+    margin-top: 8px;                
+    max-width: 380px;
+    margin: 32px auto 0;
+    aspect-ratio: 9 / 16;        
+    border-radius: 28px;
+    padding-bottom: 160px;          
     min-height: 100svh;
-    overflow: visible;
+    overflow: hidden;
     background-position: 50% 8%;
   }
 
@@ -172,8 +177,11 @@
 
 /* recua um pouco o retrato do guia dentro do card */
   #section-card #guideBg {
+    width: 100%;
+    height: 100%;
+    display: block;
     object-fit: cover;
-    object-position: 50% 8%;  /* puxa visão mais pro topo, mostra o nome inteiro */
+    object-position: 50% 14%;
   }
 
   /* dá um respiro no topo do card para não colar no limite */
