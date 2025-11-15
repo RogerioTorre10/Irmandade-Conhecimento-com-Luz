@@ -141,31 +141,32 @@
   box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 30px gold;
 }
 
-/* ===================== MOBILE AJUSTES FINAIS ===================== */
+/* ===================== MOBILE CARD – RESET LINDO ===================== */
 @media (max-width: 640px) {
 
-  /* palco do card - espaço extra */
+  /* palco do card */
   #section-card .card-stage {
-    margin-top: -8px;
-    padding-bottom: 260px !important;   /* MAIS espaço para o botão */
-    overflow: visible !important;
+    position: relative;
+    margin-top: 8px;                 /* tira o corte no topo */
+    padding-bottom: 160px;           /* espaço pro nome + botão */
     min-height: 100svh;
+    overflow: visible;
   }
 
   /* container da selfie (flame-layer) */
   #section-card .flame-layer {
     position: absolute;
+    top: 68%;                         /* centro da selfie na altura do peito */
     left: 50%;
-    bottom: -30% !important;                     /* <<< AQUI DESCE DE VEZ */
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
     
-    width: 52%;                      /* tamanho ideal */
-    max-width: 200px;
+    width: 54%;
+    max-width: 210px;
     aspect-ratio: 1 / 1;
-    
+
     border-radius: 22px;
     overflow: hidden;
-    z-index: 15 !important;          /* abaixo do botão, acima do card */
+    z-index: 15;
   }
 
   /* imagem da selfie */
@@ -173,38 +174,40 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 20%;     /* centraliza, sem cortar testa */
-    border-radius: 24px;
+    object-position: center 15%;      /* não corta a testa */
+    border-radius: 22px;
     pointer-events: none;
   }
 
-  /* nome */
+  /* nome do participante */
   #section-card .card-name-badge {
+    position: relative;
     margin-top: 18px;
     font-size: 15px;
     z-index: 20;
-    position: relative;
   }
 
-  /* BOTÃO CONTINUAR – sempre visível */
+  /* BOTÃO CONTINUAR – logo abaixo do nome */
   #section-card #btnNext {
-    position: fixed !important;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 28px) !important;
+    position: relative !important;
+    bottom: auto !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    z-index: 99999 !important;
+    margin-top: 16px;
+    z-index: 30 !important;
     pointer-events: auto !important;
+    display: inline-block;
   }
 
-  /* ações do card */
+  /* wrapper das ações, só garante a ordem */
   #section-card .card-actions,
   #section-card .card-actions-below {
     position: relative;
-    z-index: 30;
-    margin-top: 22px;
+    z-index: 25;
+    text-align: center;
+    margin-top: 0;
   }
 }
-
 
 /* =========================================
    DESKTOP (≥ 601px)
