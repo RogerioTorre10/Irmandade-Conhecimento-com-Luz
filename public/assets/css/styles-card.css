@@ -151,6 +151,7 @@
     padding-bottom: 160px;           /* espaço pro nome + botão */
     min-height: 100svh;
     overflow: visible;
+    background-position: 50% 8%;
   }
 
   /* container da selfie (flame-layer) */
@@ -169,6 +170,18 @@
     z-index: 15;
   }
 
+/* recua um pouco o retrato do guia dentro do card */
+  #section-card #guideBg {
+    object-fit: cover;
+    object-position: 50% 8%;  /* puxa visão mais pro topo, mostra o nome inteiro */
+  }
+
+  /* dá um respiro no topo do card para não colar no limite */
+  #section-card .card-stage {
+    margin-top: 24px;
+  }
+   
+   
   /* imagem da selfie */
   #section-card .flame-selfie {
     width: 100%;
