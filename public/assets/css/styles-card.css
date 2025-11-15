@@ -181,7 +181,7 @@
     height: 100%;
     display: block;
     object-fit: cover;
-    object-position: 50% 14%;
+    object-position: 48% 14%;
   }
 
   /* dá um respiro no topo do card para não colar no limite */
