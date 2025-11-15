@@ -23,6 +23,23 @@
   box-sizing: border-box;
   z-index: 5;
 }
+/* ================================================================
+   BORDA SLIM PREMIUM — para todas as seções com pergaminho
+   Deixa a moldura interna mais delicada, elegante e moderna
+   ================================================================ */
+
+.j-panel-frame,
+.j-panel-inner,
+.j-panel-container {
+  border-width: 2px !important;                        /* <<< FININHA */
+  border-style: solid !important;
+  border-color: rgba(255, 230, 180, 0.45) !important;  /* dourado suave */
+  
+  border-radius: 18px !important;                      /* canto mais clean */
+  box-shadow:
+    0 0 14px rgba(255, 240, 190, 0.18),
+    inset 0 0 16px rgba(255, 255, 255, 0.10) !important; /* glow interno bonito */
+}
 
 
 /* névoa suave no topo */
