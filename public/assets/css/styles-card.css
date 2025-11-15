@@ -141,92 +141,101 @@
   box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 30px gold;
 }
 
-/* ===================== MOBILE CARD – RESET LINDO ===================== */
+/* ===================== MOBILE CARD – CORRIGIDO ===================== */
 @media (max-width: 640px) {
 
-  /* palco do card */
+  /* Palco do card */
   #section-card .card-stage {
     position: relative;
     width: 78vw !important;
-    margin-top: 8px;                
     max-width: 300px !important;
     margin: 32px auto 0;
-    aspect-ratio: 9 / 16;        
-    border-radius: 24px;
-    padding-bottom: 160px;          
+    aspect-ratio: 9 / 16;
     min-height: 100svh;
     overflow: hidden;
-    background-position: 50% 8%;
+    border-radius: 24px;
+    padding-bottom: 180px; /* espaço para nome + botão */
+    background-position: center top;
   }
 
-  /* container da selfie (flame-layer) */
-  #section-card .flame-layer {
-    position: absolute;
-    top: 68%;                         /* centro da selfie na altura do peito */
-    left: 50%;
-    transform: translate(-50%, -50%);
-    
-    width: 54%;
-    max-width: 210px;
-    aspect-ratio: 1 / 1;
-
-    border-radius: 22px;
-    overflow: hidden;
-    z-index: 15;
-  }
-
-/* recua um pouco o retrato do guia dentro do card */
+  /* Fundo do guia (ajustado para não interferir) */
   #section-card #guideBg {
     width: 100%;
     height: 100%;
-    display: block;
     object-fit: cover;
-    object-position: 58% 14%;
+    object-position: center 12%; /* ajusta o fundo para não cortar cabeça */
+    border-radius: 24px;
   }
 
-  /* dá um respiro no topo do card para não colar no limite */
-  #section-card .card-stage {
-    margin-top: 24px;
+  /* Container da selfie (AGORA COM PROPORÇÃO 3:4 CORRETA) */
+  #section-card .flame-layer {
+    position: absolute;
+    top: 50%;                          /* centraliza verticalmente */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 58%;                        /* um pouco maior que antes */
+    max-width: 220px;
+    aspect-ratio: 3 / 4;               /* <<< PROPORÇÃO CORRETA (retrato) */
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 0 18px rgba(255,215,120,.3);
+    border: 2px solid rgba(255,215,120,.35);
+    z-index: 15;
   }
-   
-   
-  /* imagem da selfie */
+
+  /* Selfie com enquadramento perfeito */
   #section-card .flame-selfie {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 15%;      /* não corta a testa */
-    border-radius: 22px;
+    object-position: center 20%;       /* <<< mostra testa + olhos */
+    border-radius: 20px;
     pointer-events: none;
   }
 
-  /* nome do participante */
-  #section-card .card-name-badge {
-    position: relative;
-    margin-top: 18px;
-    font-size: 15px;
+  /* Nome do participante (abaixo da selfie) */
+  #section-card .card-footer {
+    position: absolute;
+    bottom: 100px;                     /* acima do botão */
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 20;
   }
 
-  /* BOTÃO CONTINUAR – logo abaixo do nome */
-  #section-card #btnNext {
-    position: relative !important;
-    bottom: auto !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    margin-top: 16px;
-    z-index: 30 !important;
-    pointer-events: auto !important;
-    display: inline-block;
+  #section-card .card-name-badge {
+    font-size: 15px;
+    padding: 6px 16px;
+    border-radius: 12px;
   }
 
-  /* wrapper das ações, só garante a ordem */
-  #section-card .card-actions,
+  /* Botão abaixo do nome */
   #section-card .card-actions-below {
-    position: relative;
-    z-index: 25;
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
     text-align: center;
-    margin-top: 0;
+    z-index: 30;
+  }
+
+  #section-card #btnNext {
+    min-width: 180px;
+    padding: 14px 32px;
+    font-size: 1.1em;
+    font-weight: bold;
+    background: linear-gradient(to bottom, #d4af37, #b8860b);
+    color: #000;
+    border: 2px solid #8b5a2b;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.5), 0 0 20px rgba(212,175,55,0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  #section-card #btnNext:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 30px gold;
   }
 }
 
