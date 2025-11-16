@@ -153,7 +153,9 @@
     max-width: 380px !important;
     margin: 0 auto !important;
     transform: translateX(0) !important;
+    padding-bottom: 160px !important;
   }
+   
 
   /* Ajusta o recorte da imagem do guia */
   #section-card .guide-photo {
@@ -175,6 +177,36 @@
     font-size: 1.4rem !important;
     padding-top: 8px !important;
     text-align: center !important;
+  }
+}
+
+/* SLOT DA SELFIE (placeholder)  
+     👉 Se o seu slot tiver outro nome de classe,
+        troque ".card-selfie-slot" pelo nome real.  */
+  #section-card .card-selfie-slot,
+  #section-card .selfie-placeholder,
+  #section-card .card-selfie-placeholder {
+    width: 56% !important;        /* mais estreito */
+    max-width: 220px !important;
+    aspect-ratio: 3 / 4;          /* formato retrato */
+    height: auto !important;
+    margin: 18px auto 0 !important;  /* desce um pouco, fica no peito */
+    border-radius: 26px !important;
+    position: relative;
+    z-index: 5;
+  }
+
+  /* Bloco do botão "Continuar" */
+  #section-card .card-actions{
+    margin-top: 18px !important;
+    text-align: center;
+    position: relative;
+    z-index: 20;                  /* acima do placeholder */
+  }
+
+  #section-card .card-actions .btn{
+    min-width: 180px;
+    pointer-events: auto !important;
   }
 }
 
