@@ -141,125 +141,43 @@
   box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 30px gold;
 }
 
-/* ===================== MOBILE CARD – VERSÃO FINAL (SEM CORTE, SEM DISTORÇÃO) ===================== */
-@media (max-width: 640px) {
+/* ==========================
+   MOBILE FIX — CARD GUIS
+   Mantém proporção, centraliza
+   ========================== */
+@media (max-width: 600px) {
 
-  /* Palco do card */
+  /* Estreia o card sem distorcer */
   #section-card .card-stage {
-    position: relative;
-    width: 78vw !important;
-    max-width: 300px !important;
-    margin: 32px auto 0;
-    aspect-ratio: 9 / 16;
-    min-height: 100svh;
-    overflow: visible;
-    border-radius: 24px;
-    padding-bottom: 200px; /* espaço para nome + botão */
-    background: transparent;
+    width: 88vw !important;         /* antes estava maior */
+    max-width: 380px !important;
+    margin: 0 auto !important;
+    transform: translateX(0) !important;
   }
 
-  /* Fundo do guia (LUMEN) */
-  #section-card #guideBg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center top;
-    border-radius: 24px;
-    z-index: 1;
+  /* Ajusta o recorte da imagem do guia */
+  #section-card .guide-photo {
+    width: 100% !important;
+    height: auto !important;
+    border-radius: 26px !important;
   }
 
-  /* Container da selfie - PROPORÇÃO FIXA 3:4 */
-  #section-card .flame-layer {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 58%;
-    max-width: 220px;
-    aspect-ratio: 3 / 4;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 0 18px rgba(255,215,120,.3);
-    border: 2px solid rgba(255,215,120,.35);
-    z-index: 15;
-    background: #000; /* fallback caso imagem falhe */
+  /* Ajuste do placeholder para NÃO tampar o nome */
+  #section-card .selfie-placeholder {
+    width: 58% !important;
+    height: 150px !important;
+    margin-top: -60px !important;  /* sobe o placeholder */
+    z-index: 5 !important;
   }
 
-  /* SELFIE: SEM CORTE, SEM DISTORÇÃO */
-  #section-card .flame-selfie {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;           /* <<< MUDANÇA CRUCIAL */
-    object-position: center 18%;   /* ajusta para mostrar testa */
-    background: transparent;
-    border-radius: 20px;
-    pointer-events: none;
-  }
-
-  /* Nome do participante */
-  #section-card .card-footer {
-    position: absolute;
-    bottom: 110px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 20;
-    width: 100%;
-    text-align: center;
-  }
-
-  #section-card .card-name-badge {
-    display: inline-block;
-    font-size: 15px;
-    padding: 7px 18px;
-    border-radius: 12px;
-    background: var(--badge-bg);
-    border: 1px solid var(--badge-bd);
-    color: var(--badge-fg);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    backdrop-filter: blur(2px);
-  }
-
-  /* Botão abaixo do nome */
-  #section-card .card-actions-below {
-    position: absolute;
-    bottom: 50px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    text-align: center;
-    z-index: 30;
-  }
-
-  #section-card #btnNext {
-    min-width: 180px;
-    padding: 14px 32px;
-    font-size: 1.1em;
-    font-weight: bold;
-    background: linear-gradient(to bottom, #d4af37, #b8860b);
-    color: #000;
-    border: 2px solid #8b5a2b;
-    border-radius: 12px;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.5), 0 0 20px rgba(212,175,55,0.3);
-    transition: all 0.3s ease;
-    cursor: pointer;
-  }
-
-  #section-card #btnNext:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 30px gold;
-  }
-
-  /* Garante que o pergaminho não corte */
-  #section-card.pergaminho,
-  #section-card.pergaminho-v {
-    padding-bottom: 260px !important;
-    min-height: auto !important;
+  /* Nome do guia sempre 100% visível */
+  #section-card .guide-name {
+    font-size: 1.4rem !important;
+    padding-top: 8px !important;
+    text-align: center !important;
   }
 }
+
 
 /* =========================================
    DESKTOP (≥ 601px)
