@@ -146,94 +146,57 @@
    ========================================= */
 @media (max-width: 600px) {
 
-  /* 1. FORÇA O CARD-STAGE TER ESPAÇO SUFICIENTE */
+  /* Ajusta o palco do card */
   #section-card .card-stage {
-    width: 88vw !important;
-    max-width: 380px !important;
-    min-height: 580px !important;
-    margin: 20px auto !important;
-    padding-bottom: 260px !important; /* ESPAÇO PRO NOME + BOTÃO FORA */
-    position: relative !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
+    padding-bottom: 190px !important;
   }
 
-  /* 2. PLACEHOLDER NO PEITO (ROSTO LIVRE) */
-  #section-card .selfie-placeholder,
+  /* Reposiciona o placeholder para altura do peito */
   #section-card .card-selfie-slot,
+  #section-card .selfie-placeholder,
   #section-card .card-selfie-placeholder {
-    position: absolute !important;
-    top: 42% !important;           /* COMEÇA NO PEITO */
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 58% !important;
-    max-width: 210px !important;
-    height: 36% !important;        /* COBRE ATÉ ANTES DO NOME */
-    background: rgba(255, 255, 255, 0.94) !important;
-    border-radius: 18px !important;
-    z-index: 10 !important;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.25) !important;
-    pointer-events: none !important;
+    margin: 160px auto 0 !important; /* antes estava 200px */
   }
 
-  /* 3. NOME DENTRO DO CARD (ABAIXO DO PLACEHOLDER) */
+  /* Nome do participante dentro do card, abaixo do placeholder */
   #section-card .card-footer {
-    position: absolute !important;
-    bottom: 18px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 100% !important;
-    text-align: center !important;
-    z-index: 31 !important;
+    bottom: 12px !important;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 31;
+    text-align: center;
+    pointer-events: none;
   }
 
-  #section-card .card-name-badge {
-    font-size: 1.05rem !important;
-    padding: 7px 16px !important;
-    border-radius: 12px !important;
-  }
-
-  /* 4. BOTÃO "CONTINUAR" FORA DO CARD — VISÍVEL! */
+  /* Botão continuar fora do card */
   #section-card .card-actions-below {
-    position: relative !important;
-    margin-top: 70px !important;   /* ESPAÇO APÓS O CARD */
+    margin-top: 60px !important;
     padding: 20px 0 !important;
-    width: 100% !important;
     text-align: center !important;
-    z-index: 100 !important;       /* ACIMA DE TUDO */
-    pointer-events: auto !important;
+    width: 100% !important;
   }
 
-  #section-card #btnNext {
-    display: inline-block !important;
-    min-width: 190px !important;
-    padding: 14px 32px !important;
-    font-size: 1.1em !important;
-    font-weight: bold !important;
-    background: linear-gradient(to bottom, #d4af37, #b8860b) !important;
-    color: #000 !important;
-    border: 2.5px solid #8b5a2b !important;
-    border-radius: 14px !important;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.5), 0 0 22px rgba(212,175,55,0.4) !important;
-    cursor: pointer !important;
-    pointer-events: auto !important;
-    transition: all 0.3s ease !important;
+  #section-card .card-actions-below #btnNext {
+    min-width: 180px;
+    padding: 14px 32px;
+    font-size: 1.1em;
+    font-weight: bold;
+    background: linear-gradient(to bottom, #d4af37, #b8860b);
+    color: #000;
+    border: 2px solid #8b5a2b;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.5), 0 0 20px rgba(212,175,55,0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
   }
 
-  #section-card #btnNext:hover {
-    transform: translateY(-4px) !important;
-    box-shadow: 0 12px 24px rgba(0,0,0,0.6), 0 0 32px gold !important;
-  }
-
-  /* 5. GARANTE QUE O PERGAMINHO NÃO CORTA */
-  #section-card.pergaminho,
-  #section-card.pergaminho-v {
-    padding-bottom: 320px !important;
-    min-height: auto !important;
-    overflow: visible !important;
+  #section-card .card-actions-below #btnNext:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 30px gold;
   }
 }
+
 
 
 /* =========================================
