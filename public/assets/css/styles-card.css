@@ -142,74 +142,69 @@
 }
 
 /* =========================================
-   SECTION-CARD — MOBILE FIX DEFINITIVO
+   SECTION-CARD — MOBILE PERFEITO (ARIAN APROVOU)
    ========================================= */
 @media (max-width: 600px) {
-
-  /* Palco do card (pai do placeholder) */
   #section-card .card-stage {
     position: relative !important;
-    width: 88vw;
-    max-width: 380px;
-    margin: 0 auto;
-    padding-bottom: 200px;      /* espaço pro nome + botão */
-    overflow: visible;
+    width: 88vw !important;
+    max-width: 380px !important;
+    margin: 0 auto !important;
+    padding-bottom: 250px !important;   /* espaço generoso pro botão */
+    overflow: visible !important;
+    align-items: flex-start !important;  /* impede centramento vertical */
   }
 
-   #section-card .card-name {
-  outline: 1px solid lime !important;
-}
-
-  /* Placeholder agora se posiciona ACIMA do nome */
+  /* PLACEHOLDER DA SELFIE — posição exata que a Arian pediu (coração) */
   #section-card .card-selfie-slot,
   #section-card .selfie-placeholder,
-  #section-card .card-selfie-placeholder,
-  #section-card .card-selfie,
-  #section-card .card-selfie-mask,
-  #section-card .selfie-slot {
+  #section-card .card-selfie-placeholder {
     position: absolute !important;
     left: 50% !important;
+    top: 380px !important;                    /* ← desceu mais 20px = coração perfeito */
     transform: translateX(-50%) !important;
-
-    bottom: calc(100% - 40px) !important;
-    /* 100% = topo do nome, -40px = sobe até o peito */
-
-    width: 52% !important;
-    max-width: 210px !important;
-    aspect-ratio: 2 / 3;
-    height: auto !important;
-
-    border-radius: 26px !important;
-    z-index: 5;
+    width: 168px !important;
+    height: 252px !important;
+    border: 8px solid #d4af37 !important;
+    border-radius: 28px !important;
+    background: rgba(255,255,255,0.94) !important;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important;
+    z-index: 10 !important;
   }
-}
 
-  /* Nome do participante continua perfeito */
-  #section-card .card-name,
-  #section-card .guide-name {
+  /* NOME DO PARTICIPANTE — continua perfeito */
+  #section-card .guide-name,
+  #section-card .card-name {
     position: relative !important;
-    display: block !important;
+    margin-top: 400px !important;     /* desceu junto com o placeholder */
+    font-size: 1.95rem !important;
+    font-weight: 900 !important;
+    color: #d4af37 !important;
+    text-shadow: 0 4px 14px rgba(0,0,0,0.9) !important;
     text-align: center !important;
-    margin-top: 0 !important; /* deixa ele no mesmo lugar */
-    z-index: 10;
+    z-index: 15 !important;
   }
 
-  /* Botão CONTINUAR fixo no rodapé do card */
+  /* Botão Continuar — TOTALMENTE LIVRE e majestoso */
   #section-card .card-actions {
-    position: absolute;
-    left: 50%;
-    bottom: 32px;
-    transform: translateX(-50%);
-    text-align: center;
-    width: 100%;
-    z-index: 15;
+    position: absolute !important;
+    left: 50% !important;
+    bottom: 50px !important;
+    transform: translateX(-50%) !important;
+    width: 100% !important;
+    text-align: center !important;
+    z-index: 30 !important;
+    pointer-events: none !important;
   }
 
   #section-card .card-actions .btn {
-    min-width: 180px;
+    min-width: 260px !important;
+    padding: 20px 50px !important;
+    font-size: 1.65rem !important;
     pointer-events: auto !important;
   }
 }
+
 
 /* =========================================
    DESKTOP (≥ 601px)
