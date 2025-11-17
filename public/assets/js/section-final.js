@@ -143,6 +143,15 @@ async function startFinalSequence() {
 
   console.log('[FINAL] Sequência concluída com sucesso!');
 }
+  
+if (botoes) {
+  botoes.classList.add('show');
+  // Roda o vídeo automaticamente após 1.5s (tempo de animação + typing)
+  setTimeout(() => {
+    console.log('[FINAL] Iniciando vídeo automaticamente...');
+    playFinalVideo();
+  }, 1500);
+}
 
 
   async function generateArtifacts() {
