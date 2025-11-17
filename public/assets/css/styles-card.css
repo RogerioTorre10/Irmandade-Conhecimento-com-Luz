@@ -146,57 +146,52 @@
    ========================================= */
 @media (max-width: 600px) {
 
-  /* Ajusta o palco do card */
-  #section-card .card-stage {
-    padding-bottom: 190px !important;
+  /* Espaço interno do card no mobile */
+  #section-card .card-stage{
+    padding-top: 20px !important;
+    padding-bottom: 210px !important;  /* reserva espaço p/ nome + botão */
+    position: relative;
   }
 
-  /* Reposiciona o placeholder para altura do peito */
+  /* SLOT DA SELFIE — posição no PEITO da guia */
   #section-card .card-selfie-slot,
   #section-card .selfie-placeholder,
   #section-card .card-selfie-placeholder {
-    margin: 160px auto 0 !important; /* antes estava 200px */
+    width: 56% !important;
+    max-width: 220px !important;
+    aspect-ratio: 3 / 4;
+    height: auto !important;
+
+    margin: 0 auto !important;      /* centralizado horizontal */
+    position: relative !important;
+    top: 90px !important;           /* DESCE o slot (ajuste fino aqui) */
+    border-radius: 26px !important;
+    z-index: 5;
   }
 
-  /* Nome do participante dentro do card, abaixo do placeholder */
-  #section-card .card-footer {
-    bottom: 12px !important;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 31;
+  /* Nome do participante acima do rodapé */
+  #section-card .guide-name,
+  #section-card .card-name {
+    margin-top: 150px !important;   /* vem logo abaixo do slot */
+    margin-bottom: 16px !important;
+    position: relative;
+    z-index: 20;
     text-align: center;
-    pointer-events: none;
   }
 
-  /* Botão continuar fora do card */
-  #section-card .card-actions-below {
-    margin-top: 60px !important;
-    padding: 20px 0 !important;
-    text-align: center !important;
-    width: 100% !important;
+  /* Botão CONTINUAR logo abaixo do nome */
+  #section-card .card-actions{
+    margin-top: 4px !important;
+    text-align: center;
+    position: relative;
+    z-index: 20;
   }
 
-  #section-card .card-actions-below #btnNext {
+  #section-card .card-actions .btn{
     min-width: 180px;
-    padding: 14px 32px;
-    font-size: 1.1em;
-    font-weight: bold;
-    background: linear-gradient(to bottom, #d4af37, #b8860b);
-    color: #000;
-    border: 2px solid #8b5a2b;
-    border-radius: 12px;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.5), 0 0 20px rgba(212,175,55,0.3);
-    transition: all 0.3s ease;
-    cursor: pointer;
-  }
-
-  #section-card .card-actions-below #btnNext:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 30px gold;
+    pointer-events: auto !important;
   }
 }
-
 
 
 /* =========================================
