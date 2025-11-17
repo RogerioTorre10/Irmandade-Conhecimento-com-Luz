@@ -141,6 +141,7 @@
   box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 30px gold;
 }
 
+/* ===================== MOBILE AJUSTES ===================== */
 @media (max-width: 600px) {
 
   /* Espaço interno do card no mobile */
@@ -148,6 +149,7 @@
     padding-top: 20px !important;
     padding-bottom: 210px !important;  /* reserva espaço p/ nome + botão */
     position: relative;
+    transform: translateY(-30px) !important;
   }
 
   /* SLOT DA SELFIE — posição no PEITO da guia */
@@ -158,10 +160,9 @@
     max-width: 220px !important;
     aspect-ratio: 3 / 4;
     height: auto !important;
-
     margin: 0 auto !important;      /* centralizado horizontal */
     position: relative !important;
-    top: 90px !important;           /* DESCE o slot (ajuste fino aqui) */
+    top: 130px !important;           /* DESCE o slot (ajuste fino aqui) */
     border-radius: 26px !important;
     z-index: 5;
   }
