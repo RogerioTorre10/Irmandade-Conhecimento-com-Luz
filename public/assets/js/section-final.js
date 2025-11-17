@@ -228,8 +228,8 @@ if (botoes) {
 
   // Esconda outros elementos
   document.body.style.overflow = 'hidden';
-  document.querySelectorAll('body > *').forEach(el => {
-    if (el.id !== 'final-video') el.style.opacity = '0';
+  const wrapper = document.getElementById('jornada-content-wrapper');
+  if (wrapper) wrapper.style.opacity = '0';
   });
 
   // Adicione logs para debug (remova após teste)
