@@ -164,8 +164,9 @@
 #section-card .selfie-slot {
   position: absolute !important;
   left: 50% !important;
-  top: 92% !important;
-  transform: translate(-50%, -50%) !important;
+  top: 65% !important;                     /* altura base: meio peito */
+  transform: translateX(-50%) !important;  /* só centraliza na horizontal */
+
 
   width: 52% !important;
   max-width: 210px !important;
