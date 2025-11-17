@@ -167,7 +167,7 @@
     height: auto;
     margin: 0 auto;
     position: relative;
-    top: 120px;                   /* controla a altura do slot */
+    top: 200px;                   /* controla a altura do slot */
     border-radius: 26px;
     z-index: 5;
   }
