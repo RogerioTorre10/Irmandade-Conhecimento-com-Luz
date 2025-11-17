@@ -142,7 +142,7 @@
 }
 
 /* =========================================
-   SECTION-CARD — MOBILE PERFEITO (ARIAN APROVOU)
+   SECTION-CARD — MOBILE 100% PERFEITO (ARIAN + FLAME-LAYER)
    ========================================= */
 @media (max-width: 600px) {
   #section-card .card-stage {
@@ -150,18 +150,16 @@
     width: 88vw !important;
     max-width: 380px !important;
     margin: 0 auto !important;
-    padding-bottom: 250px !important;   /* espaço generoso pro botão */
+    padding-bottom: 260px !important;
     overflow: visible !important;
-    align-items: flex-start !important;  /* impede centramento vertical */
+    align-items: flex-start !important;
   }
 
-  /* PLACEHOLDER DA SELFIE — posição exata que a Arian pediu (coração) */
-  #section-card .card-selfie-slot,
-  #section-card .selfie-placeholder,
-  #section-card .card-selfie-placeholder {
+  /* A SELFIE É O .flame-layer — agora posicionada no coração */
+  #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 380px !important;                    /* ← desceu mais 20px = coração perfeito */
+    top: 380px !important;                    /* ← coração perfeito (ajuste fino se quiser) */
     transform: translateX(-50%) !important;
     width: 168px !important;
     height: 252px !important;
@@ -170,13 +168,15 @@
     background: rgba(255,255,255,0.94) !important;
     box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important;
     z-index: 10 !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
   }
 
-  /* NOME DO PARTICIPANTE — continua perfeito */
+  /* Nome do participante — continua perfeito */
   #section-card .guide-name,
   #section-card .card-name {
     position: relative !important;
-    margin-top: 400px !important;     /* desceu junto com o placeholder */
+    margin-top: 400px !important;
     font-size: 1.95rem !important;
     font-weight: 900 !important;
     color: #d4af37 !important;
@@ -185,7 +185,7 @@
     z-index: 15 !important;
   }
 
-  /* Botão Continuar — TOTALMENTE LIVRE e majestoso */
+  /* Botão Continuar — TOTALMENTE LIVRE */
   #section-card .card-actions {
     position: absolute !important;
     left: 50% !important;
@@ -202,6 +202,13 @@
     padding: 20px 50px !important;
     font-size: 1.65rem !important;
     pointer-events: auto !important;
+  }
+
+  /* Garante que nenhum outro placeholder antigo apareça */
+  #section-card .card-selfie-slot,
+  #section-card .selfie-placeholder,
+  #section-card .card-selfie-placeholder {
+    display: none !important;
   }
 }
 
