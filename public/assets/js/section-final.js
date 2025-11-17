@@ -230,8 +230,7 @@ if (botoes) {
   document.body.style.overflow = 'hidden';
   const wrapper = document.getElementById('jornada-content-wrapper');
   if (wrapper) wrapper.style.opacity = '0';
-  });
-
+  
   // Adicione logs para debug (remova após teste)
   video.addEventListener('loadeddata', () => console.log('[FINAL-VIDEO] Dados carregados'));
   video.addEventListener('play', () => console.log('[FINAL-VIDEO] Iniciou reprodução'));
