@@ -88,7 +88,7 @@
       p.style.transition = 'all 0.8s ease';
       p.style.opacity = '1';
       p.style.transform = 'translateY(0)';
-      await typeText(p, txt, 55, i === 0);
+      await typeText(p, txt, 55, true);
       p.classList.add('revealed');
       await sleep(300);
     }
@@ -156,56 +156,59 @@
   }
 
   function playFinalVideo() {
-    const existingOverlay = document.getElementById('videoOverlay');
-    if (existingOverlay) existingOverlay.remove();
+  // Remove qualquer overlay antigo
+  document.querySelectorAll('#videoOverlay, #final-video').forEach(el => el.remove());
 
-    let video = document.getElementById('final-video');
-    if (!video) {
-      video = Object.assign(document.createElement('video'), { id: 'final-video', playsInline: true });
-      document.body.appendChild(video);
-    }
+  const video = document.createElement('video');
+  video.id = 'final-video';
+  video.playsInline = true;
+  video.autoplay = true;
+  video.muted = false;
+  video.preload = 'auto';
+  video.controls = false; // pode deixar true só pra testar
 
-    let src = VIDEO_SRC;
-    if (src.startsWith('/assets/img/') && src.endsWith('.mp4')) {
-      src = src.replace('/assets/img/', '/assets/videos/');
-    }
-    video.src = src;
-    video.preload = 'auto';
-    video.muted = false;
+  // FORÇA O SRC COM ?t= para burlar cache e forçar Range Requests
+  video.src = VIDEO_SRC + '?t=' + Date.now();
 
-    video.style.cssText = `
-      position:fixed !important;top:50%!important;left:50%!important;
-      transform:translate(-50%,-50%)!important;
-      width:94vw!important;height:94vh!important;
-      max-width:94vw!important;max-height:94vh!important;
-      object-fit:contain!important;
-      z-index:9999999!important;
-      border:14px solid #d4af37!important;
-      border-radius:20px!important;
-      box-shadow:0 0 80px rgba(212,175,55,1)!important;
-      background:transparent!important;
-    `;
+  video.style.cssText = `
+    position:fixed !important;top:50%!important;left:50%!important;
+    transform:translate(-50%,-50%)!important;
+    width:94vw!important;height:94vh!important;
+    max-width:94vw!important;max-height:94vh!important;
+    object-fit:contain!important;
+    z-index:9999999!important;
+    border:14px solid #d4af37!important;
+    border-radius:20px!important;
+    box-shadow:0 0 80px rgba(212,175,55,1)!important;
+    background:#000!important;
+  `;
 
-    document.body.style.overflow = 'hidden';
-    const wrapper = document.getElementById('jornada-content-wrapper');
-    if (wrapper) wrapper.style.opacity = '0';
+  document.body.appendChild(video);
+  document.body.style.overflow = 'hidden';
+  const wrapper = document.getElementById('jornada-content-wrapper');
+  if (wrapper) wrapper.style.opacity = '0';
 
-    video.addEventListener('loadeddata', () => console.log('[FINAL-VIDEO] Dados carregados'));
-    video.addEventListener('play', () => console.log('[FINAL-VIDEO] Reproduzindo'));
-    video.addEventListener('error', e => console.error('[FINAL-VIDEO] Erro:', e));
-    video.addEventListener('ended', () => console.log('[FINAL-VIDEO] Terminou'));
+  // Logs pra você ver no console
+  video.onloadeddata = () => console.log('Vídeo carregou dados');
+  video.oncanplay = () => console.log('Vídeo pode tocar');
+  video.onplay = () => console.log('Vídeo tocando!');
+  video.onerror = (e) => console.error('Erro no vídeo:', e);
+  video.onended = () => {
+    video.remove();
+    location.href = HOME_URL;
+  };
 
-    video.play().catch(err => {
-      console.error('[FINAL-VIDEO] Erro no play:', err);
-      alert('Vídeo não carregou. Redirecionando...');
-      setTimeout(() => location.href = HOME_URL, 1000);
+  // Força o play com múltiplas tentativas
+  const tentarPlay = () => {
+    video.play().then(() => {
+      console.log('Vídeo rodando com glória!');
+    }).catch(err => {
+      console.warn('Play falhou, tentando de novo...', err);
+      setTimeout(tentarPlay, 500);
     });
-
-    video.onended = () => {
-      video.remove();
-      location.href = HOME_URL;
-    };
-  }
+  };
+  tentarPlay();
+}
 
   // EVENTOS
   document.addEventListener('section:shown', e => {
