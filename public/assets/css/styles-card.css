@@ -153,7 +153,7 @@
     max-width: 380px !important;
     margin: 0 auto !important;
     transform: translateX(0) !important;
-    padding-bottom: 160px !important;
+    padding-bottom: 190px !important;
   }
    
 
@@ -190,7 +190,7 @@
     max-width: 220px !important;
     aspect-ratio: 3 / 4;          /* formato retrato */
     height: auto !important;
-    margin: 120px auto 0 !important;  /* desce um pouco, fica no peito */
+    margin: 200px auto 0 !important;  /* desce um pouco, fica no peito */
     border-radius: 26px !important;
     position: relative;
     z-index: 5;
