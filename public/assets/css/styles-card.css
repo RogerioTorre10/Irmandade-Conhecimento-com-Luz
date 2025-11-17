@@ -145,26 +145,28 @@
    SECTION-CARD — MOBILE 100% PERFEITO (ARIAN + FLAME-LAYER)
    ========================================= */
 @media (max-width: 600px) {
+  /* Palco do card (pai) */
   #section-card .card-stage {
     position: relative !important;
     width: 88vw !important;
     max-width: 380px !important;
     margin: 0 auto !important;
-    padding-bottom: 260px !important;
+    padding-bottom: 260px !important; /* Mantém espaço para nome + botão externo */
     overflow: visible !important;
     align-items: flex-start !important;
+    padding-top: 60px;
   }
 
-  /* A SELFIE É O .flame-layer — agora posicionada no coração */
+  /* A SELFIE É O .flame-layer — mantido */
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 380px !important;                    /* ← coração perfeito (ajuste fino se quiser) */
+    top: 380px !important;
     transform: translateX(-50%) !important;
     width: 60% !important;
     max-width: 240px !important;
     height: auto !important;
-    aspect-ratio: 3 / 4 !important; 
+    aspect-ratio: 3 / 4 !important;
     border: 8px solid #d4af37 !important;
     border-radius: 28px !important;
     background: rgba(255,255,255,0.94) !important;
@@ -172,39 +174,41 @@
     z-index: 10 !important;
     pointer-events: none !important;
     overflow: hidden !important;
-    margin: 0 !important; 
+    margin: 0 !important;
   }
 
-  /* Nome do participante — continua perfeito */
+  /* Nome do participante — Posicionado ACIMA do local onde o botão externo aparecerá */
   #section-card .guide-name,
   #section-card .card-name {
-    position: relative !important;
-    margin-top: 400px !important;
+    position: absolute !important; 
+    left: 50% !important; 
+    transform: translateX(-50%) !important; 
+    bottom: 150px !important; /* Ajuste para centralizar visualmente sobre o rodapé do card */
     font-size: 1.95rem !important;
     font-weight: 900 !important;
     color: #d4af37 !important;
     text-shadow: 0 4px 14px rgba(0,0,0,0.9) !important;
     text-align: center !important;
     z-index: 15 !important;
+    margin-top: 0 !important;
+    display: block !important;
   }
 
-  /* Botão Continuar — TOTALMENTE LIVRE */
+  /* 1. Botão DENTRO do card — DESATIVADO */
   #section-card .card-actions {
-    position: absolute !important;
-    left: 50% !important;
-    bottom: 50px !important;
-    transform: translateX(-50%) !important;
-    width: 100% !important;
+    display: none !important;
+  }
+
+  /* 2. Botão FORA do card (.card-actions-below) — ESTILIZADO */
+  #section-card .card-actions-below {
+    position: relative !important; /* Permite que ele siga o fluxo da página, logo após o card-stage */
+    margin-top: 40px !important;
+    padding: 0 !important;
     text-align: center !important;
-    z-index: 30 !important;
-    pointer-events: none !important;
+    width: 100% !important;
   }
-   #section-card .card-stage {
-    align-items: flex-start !important;
-    padding-top: 60px;  
-  }
-      
-  #section-card .card-actions .btn {
+
+  #section-card #btnNext {
     min-width: 260px !important;
     padding: 20px 50px !important;
     font-size: 1.65rem !important;
