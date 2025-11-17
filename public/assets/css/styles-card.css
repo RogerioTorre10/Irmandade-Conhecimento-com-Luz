@@ -141,9 +141,6 @@
   box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 30px gold;
 }
 
-/* =========================================
-   MOBILE FIX FORÇADO — PLACEHOLDER NO PEITO + BOTÃO VISÍVEL
-   ========================================= */
 @media (max-width: 600px) {
 
   /* Espaço interno do card no mobile */
@@ -192,7 +189,6 @@
     pointer-events: auto !important;
   }
 }
-
 
 /* =========================================
    DESKTOP (≥ 601px)
