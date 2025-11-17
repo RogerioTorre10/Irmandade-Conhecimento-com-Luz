@@ -156,32 +156,41 @@
     overflow: visible;
   }
 
-  /* Placeholder / slot da selfie
-     -> posição ABSOLUTA, presa no peito da guia */
-  #section-card .card-selfie-slot,
-#section-card .selfie-placeholder,
-#section-card .card-selfie-placeholder {
-  position: absolute !important;
-  left: 50% !important;
-  top: 100% !important;              /* está assim */
-  transform: translate(-50%, -50%) !important;
-
-  width: 52% !important;
-  max-width: 210px !important;
-  aspect-ratio: 2 / 3;
-  height: auto !important;
-
-  border-radius: 26px !important;
-  z-index: 5;
+   #section-card .card-name {
+  outline: 1px solid lime !important;
 }
 
-  /* Nome do participante */
-  #section-card .guide-name,
-  #section-card .card-name {
-    position: relative;
-    margin-top: 150px;               /* vem depois do slot */
-    margin-bottom: 12px;
-    text-align: center;
+  /* Placeholder agora se posiciona ACIMA do nome */
+  #section-card .card-selfie-slot,
+  #section-card .selfie-placeholder,
+  #section-card .card-selfie-placeholder,
+  #section-card .card-selfie,
+  #section-card .card-selfie-mask,
+  #section-card .selfie-slot {
+    position: absolute !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+
+    bottom: calc(100% - 40px) !important;
+    /* 100% = topo do nome, -40px = sobe até o peito */
+
+    width: 52% !important;
+    max-width: 210px !important;
+    aspect-ratio: 2 / 3;
+    height: auto !important;
+
+    border-radius: 26px !important;
+    z-index: 5;
+  }
+}
+
+  /* Nome do participante continua perfeito */
+  #section-card .card-name,
+  #section-card .guide-name {
+    position: relative !important;
+    display: block !important;
+    text-align: center !important;
+    margin-top: 0 !important; /* deixa ele no mesmo lugar */
     z-index: 10;
   }
 
@@ -201,8 +210,6 @@
     pointer-events: auto !important;
   }
 }
-
-
 
 /* =========================================
    DESKTOP (≥ 601px)
