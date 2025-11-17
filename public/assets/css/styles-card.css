@@ -142,55 +142,58 @@
 }
 
 /* =========================================
-   SECTION-CARD — MOBILE RESET v1
+   SECTION-CARD — MOBILE FIX DEFINITIVO
    ========================================= */
 @media (max-width: 600px) {
 
-  /* Palco do card no mobile */
+  /* Palco do card (pai do placeholder) */
   #section-card .card-stage {
-    position: relative;
+    position: relative !important;
     width: 88vw;
     max-width: 380px;
     margin: 0 auto;
-    padding-top: 16px;
-    padding-bottom: 170px;        /* espaço para nome + botão */
-    transform: translateY(-10px); /* sobe um pouco o card inteiro */
+    padding-bottom: 200px;      /* espaço pro nome + botão */
+    overflow: visible;
   }
 
-  /* Placeholder / slot da selfie (no peito)  */
+  /* Placeholder / slot da selfie
+     -> posição ABSOLUTA, presa no peito da guia */
   #section-card .card-selfie-slot,
   #section-card .selfie-placeholder,
   #section-card .card-selfie-placeholder {
-    width: 52%;
-    max-width: 210px;
-    aspect-ratio: 2 / 3;          /* um pouco mais baixinho */
-    height: auto;
-    margin: 0 auto;
-    position: relative;
-    top: 200px;                   /* controla a altura do slot */
-    border-radius: 26px;
+    position: absolute !important;
+    left: 50% !important;
+    top: 63% !important;              /* controla a altura (peito) */
+    transform: translate(-50%, -50%) !important;
+
+    width: 52% !important;
+    max-width: 210px !important;
+    aspect-ratio: 2 / 3;
+    height: auto !important;
+
+    border-radius: 26px !important;
     z-index: 5;
   }
 
   /* Nome do participante */
   #section-card .guide-name,
   #section-card .card-name {
-    margin-top: 145px;            /* vem logo abaixo do slot */
+    position: relative;
+    margin-top: 150px;               /* vem depois do slot */
     margin-bottom: 12px;
     text-align: center;
-    position: relative;
     z-index: 10;
   }
 
-  /* Botão CONTINUAR sempre visível (fixado no rodapé do card) */
+  /* Botão CONTINUAR fixo no rodapé do card */
   #section-card .card-actions {
     position: absolute;
     left: 50%;
-    bottom: 32px;                 /* distância do fundo do card */
+    bottom: 32px;
     transform: translateX(-50%);
-    z-index: 15;
     text-align: center;
     width: 100%;
+    z-index: 15;
   }
 
   #section-card .card-actions .btn {
@@ -198,6 +201,7 @@
     pointer-events: auto !important;
   }
 }
+
 
 
 /* =========================================
