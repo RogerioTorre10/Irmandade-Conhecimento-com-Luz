@@ -163,7 +163,7 @@
   #section-card .card-selfie-placeholder {
     position: absolute !important;
     left: 50% !important;
-    top: 63% !important;              /* controla a altura (peito) */
+    top: 90% !important;              /* controla a altura (peito) */
     transform: translate(-50%, -50%) !important;
 
     width: 52% !important;
