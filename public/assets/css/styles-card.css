@@ -141,55 +141,64 @@
   box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 30px gold;
 }
 
-/* ===================== MOBILE AJUSTES ===================== */
+/* =========================================
+   SECTION-CARD — MOBILE RESET v1
+   ========================================= */
 @media (max-width: 600px) {
 
-  /* Espaço interno do card no mobile */
-  #section-card .card-stage{
-    padding-top: 20px !important;
-    padding-bottom: 210px !important;  /* reserva espaço p/ nome + botão */
+  /* Palco do card no mobile */
+  #section-card .card-stage {
     position: relative;
-    transform: translateY(-30px) !important;
+    width: 88vw;
+    max-width: 380px;
+    margin: 0 auto;
+    padding-top: 16px;
+    padding-bottom: 170px;        /* espaço para nome + botão */
+    transform: translateY(-10px); /* sobe um pouco o card inteiro */
   }
 
-  /* SLOT DA SELFIE — posição no PEITO da guia */
+  /* Placeholder / slot da selfie (no peito)  */
   #section-card .card-selfie-slot,
   #section-card .selfie-placeholder,
   #section-card .card-selfie-placeholder {
-    width: 56% !important;
-    max-width: 220px !important;
-    aspect-ratio: 3 / 4;
-    height: auto !important;
-    margin: 0 auto !important;      /* centralizado horizontal */
-    position: relative !important;
-    top: 130px !important;           /* DESCE o slot (ajuste fino aqui) */
-    border-radius: 26px !important;
+    width: 52%;
+    max-width: 210px;
+    aspect-ratio: 2 / 3;          /* um pouco mais baixinho */
+    height: auto;
+    margin: 0 auto;
+    position: relative;
+    top: 120px;                   /* controla a altura do slot */
+    border-radius: 26px;
     z-index: 5;
   }
 
-  /* Nome do participante acima do rodapé */
+  /* Nome do participante */
   #section-card .guide-name,
   #section-card .card-name {
-    margin-top: 150px !important;   /* vem logo abaixo do slot */
-    margin-bottom: 16px !important;
-    position: relative;
-    z-index: 20;
-    text-align: center;
-  }
-
-  /* Botão CONTINUAR logo abaixo do nome */
-  #section-card .card-actions{
-    margin-top: 4px !important;
+    margin-top: 145px;            /* vem logo abaixo do slot */
+    margin-bottom: 12px;
     text-align: center;
     position: relative;
-    z-index: 20;
+    z-index: 10;
   }
 
-  #section-card .card-actions .btn{
+  /* Botão CONTINUAR sempre visível (fixado no rodapé do card) */
+  #section-card .card-actions {
+    position: absolute;
+    left: 50%;
+    bottom: 32px;                 /* distância do fundo do card */
+    transform: translateX(-50%);
+    z-index: 15;
+    text-align: center;
+    width: 100%;
+  }
+
+  #section-card .card-actions .btn {
     min-width: 180px;
     pointer-events: auto !important;
   }
 }
+
 
 /* =========================================
    DESKTOP (≥ 601px)
