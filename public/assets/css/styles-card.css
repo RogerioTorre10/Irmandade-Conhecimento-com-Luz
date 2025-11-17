@@ -161,8 +161,10 @@
     left: 50% !important;
     top: 380px !important;                    /* ← coração perfeito (ajuste fino se quiser) */
     transform: translateX(-50%) !important;
-    width: 168px !important;
-    height: 252px !important;
+    width: 60% !important;
+    max-width: 240px !important;
+    height: auto !important;
+    aspect-ratio: 3 / 4 !important; 
     border: 8px solid #d4af37 !important;
     border-radius: 28px !important;
     background: rgba(255,255,255,0.94) !important;
@@ -170,6 +172,7 @@
     z-index: 10 !important;
     pointer-events: none !important;
     overflow: hidden !important;
+    margin: 0 !important; 
   }
 
   /* Nome do participante — continua perfeito */
@@ -196,7 +199,11 @@
     z-index: 30 !important;
     pointer-events: none !important;
   }
-
+   #section-card .card-stage {
+    align-items: flex-start !important;
+    padding-top: 60px;  
+  }
+      
   #section-card .card-actions .btn {
     min-width: 260px !important;
     padding: 20px 50px !important;
