@@ -142,7 +142,7 @@
 }
 
 /* =========================================
-   SECTION-CARD — MOBILE 100% PERFEITO (POSIÇÃO FIXA)
+   SECTION-CARD — MOBILE DEFINITIVO (USA A MESMA MÉTRICA DO NOME)
    ========================================= */
 @media (max-width: 600px) {
   #section-card .card-stage {
@@ -150,32 +150,15 @@
     width: 88vw !important;
     max-width: 380px !important;
     margin: 0 auto !important;
-    padding-bottom: 240px !important;   /* espaço generoso pro botão */
+    padding-bottom: 240px !important;
     overflow: visible !important;
   }
 
-  /* PLACEHOLDER — POSIÇÃO FIXA EM PIXELS (peito perfeito) */
-  #section-card .card-selfie-slot,
-  #section-card .selfie-placeholder,
-  #section-card .card-selfie-placeholder {
-    position: absolute !important;
-    left: 50% !important;
-    margin-left: -84px !important;     /* metade da largura (168px / 2) */
-    top: 340px !important;             /* ← agora desce de verdade! */
-    width: 168px !important;           /* tamanho fixo perfeito */
-    height: 252px !important;
-    border: 8px solid #d4af37 !important;
-    border-radius: 28px !important;
-    background: rgba(255,255,255,0.94) !important;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important;
-    z-index: 10 !important;
-  }
-
-  /* Nome do participante */
+  /* NOME DO PARTICIPANTE — posição que você já ama (mantém exatamente assim) */
   #section-card .guide-name,
   #section-card .card-name {
     position: relative !important;
-    margin-top: 370px !important;
+    margin-top: 360px !important;     /* ← essa é a sua posição perfeita */
     font-size: 1.95rem !important;
     font-weight: 900 !important;
     color: #d4af37 !important;
@@ -184,7 +167,24 @@
     z-index: 15 !important;
   }
 
-  /* Botão Continuar — TOTALMENTE LIVRE */
+  /* PLACEHOLDER DA SELFIE — usa a mesma métrica do nome, só que 135px acima */
+  #section-card .card-selfie-slot,
+  #section-card .selfie-placeholder,
+  #section-card .card-selfie-placeholder {
+    position: absolute !important;
+    left: 50% !important;
+    top: calc(360px - 135px) !important;     /* ← MESMA BASE DO NOME - 135px */
+    transform: translateX(-50%) !important;
+    width: 168px !important;
+    height: 252px !important;
+    border: 8px solid #d4af37 !important;
+    border-radius: 28px !important;
+    background: rgba(255,255,255,0.94) !important;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important;
+    z-index: 10 !important;
+  }
+
+  /* Botão Continuar — livre e majestoso */
   #section-card .card-actions {
     position: absolute !important;
     left: 50% !important;
@@ -203,7 +203,6 @@
     pointer-events: auto !important;
   }
 }
-
 /* =========================================
    DESKTOP (≥ 601px)
    ========================================= */
