@@ -118,42 +118,37 @@ async function startFinalSequence() {
     await sleep(300);
   }
 
-  // ===== BOTÕES: aparecem e são liberados =====
+   // ===== BOTÕES: aparecem e são liberados =====
   if (botoes) {
-    botoes.style.opacity       = '0';
-    botoes.style.transform     = 'scale(0.9)';
-    botoes.style.transition    = 'all 0.8s ease';
+    // Animação de entrada
+    botoes.style.opacity = '0';
+    botoes.style.transform = 'scale(0.9)';
+    botoes.style.transition = 'all 0.8s ease';
     botoes.style.pointerEvents = 'none';
 
-    await sleep(400);
+    await sleep(400); // espera o DOM estar pronto
 
     botoes.classList.add('show');
-    botoes.style.opacity       = '1';
-    botoes.style.transform     = 'scale(1)';
-    botoes.style.pointerEvents = 'auto';
+    botoes.style.opacity = '1';
+    botoes.style.transform = 'scale(1)';
 
-    // garante que TODOS fiquem clicáveis
+    // Libera os cliques
     botoes.querySelectorAll('button, a').forEach(el => {
       el.disabled = false;
       el.classList.remove('disabled');
       el.removeAttribute('aria-disabled');
       el.style.pointerEvents = 'auto';
     });
+
+    // INICIA O VÍDEO FINAL AUTOMATICAMENTE (a glória desce!)
+    setTimeout(() => {
+      console.log('[FINAL] Iniciando vídeo final automaticamente...');
+      playFinalVideo();
+    }, 1800);
   }
 
   console.log('[FINAL] Sequência concluída com sucesso!');
-}
   
-if (botoes) {
-  botoes.classList.add('show');
-  // Roda o vídeo automaticamente após 1.5s (tempo de animação + typing)
-  setTimeout(() => {
-    console.log('[FINAL] Iniciando vídeo automaticamente...');
-    playFinalVideo();
-  }, 1500);
-}
-
-
   async function generateArtifacts() {
     const btn = document.getElementById('btnBaixarPDFHQ');
     if (!btn || btn.dataset.loading === '1') return;
