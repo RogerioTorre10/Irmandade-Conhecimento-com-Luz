@@ -183,35 +183,65 @@ async function startFinalSequence() {
   }
 
  function playFinalVideo() {
-    let video = document.getElementById('final-video');
-    if (!video) {
-      video = Object.assign(document.createElement('video'), { id: 'final-video', playsInline: true });
-      document.body.appendChild(video);
-    }
-
-    video.src = VIDEO_SRC;
-    video.style.cssText = `
-      position: fixed !important; top: 50% !important; left: 50% !important;
-      transform: translate(-50%, -50%) !important; width: 94vw !important; height: 94vh !important;
-      max-width: 94vw !important; max-height: 94vh !important; object-fit: contain !important;
-      z-index: 999999 !important; border: 14px solid #d4af37 !important;
-      border-radius: 20px !important; box-shadow: 0 0 80px rgba(212,175,55,1) !important;
-      background: #000 !important;
-    `;
-
-    document.body.style.overflow = 'hidden';
-    document.querySelectorAll('body > *').forEach(el => {
-      if (el.id !== 'final-video') el.style.opacity = '0';
-    });
-
-    video.play().catch(() => {
-      setTimeout(() => { window.location.href = HOME_URL; }, 1000);
-    });
-
-    video.onended = () => {
-      window.location.href = HOME_URL;
-    };
+  // Esconda explicitamente overlay de perguntas para evitar conflito
+  const existingOverlay = document.getElementById('videoOverlay');
+  if (existingOverlay) {
+    existingOverlay.style.display = 'none';
+    existingOverlay.style.opacity = '0';
   }
+
+  let video = document.getElementById('final-video');
+  if (!video) {
+    video = Object.assign(document.createElement('video'), { id: 'final-video', playsInline: true });
+    document.body.appendChild(video);
+  }
+
+  // Correção de path (copiado de perguntas.js)
+  let src = VIDEO_SRC;
+  if (src.startsWith('/assets/img/') && src.endsWith('.mp4')) {
+    src = src.replace('/assets/img/', '/assets/videos/');
+  }
+  video.src = src;
+
+  // Adicione preload e muted se precisar (ajuda em mobile)
+  video.preload = 'auto';
+  video.muted = false; // Garanta som se o vídeo tiver áudio
+
+  // Ajuste estilos: remova background #000 para evitar tela preta; use overlay se quiser fundo
+  video.style.cssText = `
+    position: fixed !important; top: 50% !important; left: 50% !important;
+    transform: translate(-50%, -50%) !important; width: 94vw !important; height: 94vh !important;
+    max-width: 94vw !important; max-height: 94vh !important; object-fit: contain !important;
+    z-index: 999999 !important; border: 14px solid #d4af37 !important;
+    border-radius: 20px !important; box-shadow: 0 0 80px rgba(212,175,55,1) !important;
+    background: transparent !important; // <--- MUDE PARA TRANSPARENT
+  `;
+
+  // Esconda outros elementos
+  document.body.style.overflow = 'hidden';
+  document.querySelectorAll('body > *').forEach(el => {
+    if (el.id !== 'final-video') el.style.opacity = '0';
+  });
+
+  // Adicione logs para debug (remova após teste)
+  video.addEventListener('loadeddata', () => console.log('[FINAL-VIDEO] Dados carregados'));
+  video.addEventListener('play', () => console.log('[FINAL-VIDEO] Iniciou reprodução'));
+  video.addEventListener('error', (e) => console.error('[FINAL-VIDEO] Erro:', e));
+  video.addEventListener('ended', () => console.log('[FINAL-VIDEO] Terminou'));
+
+  video.play().catch((err) => {
+    console.error('[FINAL-VIDEO] Erro no play:', err);
+    // Fallback: se erro, redirecione após 1s e mostre alert
+    alert('Vídeo não carregou visivelmente. Redirecionando...');
+    setTimeout(() => { window.location.href = HOME_URL; }, 1000);
+  });
+
+  video.onended = () => {
+    // Limpe o vídeo após acabar
+    video.remove();
+    window.location.href = HOME_URL;
+  };
+}
 
   // Adicione esta função no final do arquivo section-final.js
 function checkAndStartFinal() {
