@@ -154,6 +154,8 @@
     margin: 0 auto;
     padding-bottom: 200px;      /* espaço pro nome + botão */
     overflow: visible;
+    align-items: initial !important;
+    justify-content: flex-start !important;     
   }
 
   /* Placeholder / slot da selfie
