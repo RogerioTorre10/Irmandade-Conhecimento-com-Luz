@@ -142,7 +142,7 @@
 }
 
 /* =========================================
-   SECTION-CARD — MOBILE 100% PERFEITO (NOVEMBRO 2025)
+   SECTION-CARD — MOBILE 100% PERFEITO (POSIÇÃO FIXA)
    ========================================= */
 @media (max-width: 600px) {
   #section-card .card-stage {
@@ -150,61 +150,56 @@
     width: 88vw !important;
     max-width: 380px !important;
     margin: 0 auto !important;
-    padding-bottom: 220px !important;   /* ← aumentei pra dar espaço pro botão */
+    padding-bottom: 240px !important;   /* espaço generoso pro botão */
     overflow: visible !important;
   }
 
-  /* Placeholder da selfie — agora BEM ABAIXO do rosto (coração/peito) */
+  /* PLACEHOLDER — POSIÇÃO FIXA EM PIXELS (peito perfeito) */
   #section-card .card-selfie-slot,
   #section-card .selfie-placeholder,
   #section-card .card-selfie-placeholder {
     position: absolute !important;
     left: 50% !important;
-    top: 290px !important;                    /* ← desceu mais → rosto livre! */
-    transform: translateX(-50%) !important;
-    width: 44% !important;
-    max-width: 168px !important;
+    margin-left: -84px !important;     /* metade da largura (168px / 2) */
+    top: 340px !important;             /* ← agora desce de verdade! */
+    width: 168px !important;           /* tamanho fixo perfeito */
     height: 252px !important;
-    border: 7px solid #d4af37 !important;
-    border-radius: 26px !important;
+    border: 8px solid #d4af37 !important;
+    border-radius: 28px !important;
     background: rgba(255,255,255,0.94) !important;
-    box-shadow: 0 12px 35px rgba(0,0,0,0.6) !important;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important;
     z-index: 10 !important;
   }
 
-  /* Nome do participante — logo abaixo do placeholder */
+  /* Nome do participante */
   #section-card .guide-name,
   #section-card .card-name {
     position: relative !important;
-    margin-top: 320px !important;    /* desceu junto */
-    font-size: 1.9rem !important;
-    font-weight: 800 !important;
+    margin-top: 370px !important;
+    font-size: 1.95rem !important;
+    font-weight: 900 !important;
     color: #d4af37 !important;
-    text-shadow: 0 3px 12px rgba(0,0,0,0.8) !important;
+    text-shadow: 0 4px 14px rgba(0,0,0,0.9) !important;
     text-align: center !important;
     z-index: 15 !important;
   }
 
-  /* Botão CONTINUAR — agora TOTALMENTE FORA do card, sempre visível */
+  /* Botão Continuar — TOTALMENTE LIVRE */
   #section-card .card-actions {
     position: absolute !important;
     left: 50% !important;
-    bottom: 50px !important;                 /* ← subiu um pouco, mas fora do pergaminho */
+    bottom: 40px !important;
     transform: translateX(-50%) !important;
     width: 100% !important;
     text-align: center !important;
-    z-index: 30 !important;                  /* acima de tudo */
+    z-index: 30 !important;
     pointer-events: none !important;
   }
 
   #section-card .card-actions .btn {
-    min-width: 240px !important;
-    padding: 18px 44px !important;
-    font-size: 1.55rem !important;
-    background: linear-gradient(135deg, #d4af37, #b8972e) !important;
-    border: 4px solid #fff !important;
-    border-radius: 50px !important;
-    box-shadow: 0 12px 30px rgba(212,175,55,0.7) !important;
+    min-width: 250px !important;
+    padding: 18px 48px !important;
+    font-size: 1.6rem !important;
     pointer-events: auto !important;
   }
 }
