@@ -141,75 +141,97 @@
   box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 30px gold;
 }
 
-/* ==========================
-   MOBILE FIX — CARD GUIS
-   Mantém proporção, centraliza
-   ========================== */
+/* =========================================
+   MOBILE FIX FORÇADO — PLACEHOLDER NO PEITO + BOTÃO VISÍVEL
+   ========================================= */
 @media (max-width: 600px) {
 
-  /* Estreia o card sem distorcer */
+  /* 1. FORÇA O CARD-STAGE TER ESPAÇO SUFICIENTE */
   #section-card .card-stage {
-    width: 88vw !important;         /* antes estava maior */
+    width: 88vw !important;
     max-width: 380px !important;
-    margin: 0 auto !important;
-    transform: translateX(0) !important;
-    padding-bottom: 220px !important;
-  }
-   
-
-  /* Ajusta o recorte da imagem do guia */
-  #section-card .guide-photo {
-    width: 100% !important;
-    height: auto !important;
-    border-radius: 26px !important;
+    min-height: 580px !important;
+    margin: 20px auto !important;
+    padding-bottom: 260px !important; /* ESPAÇO PRO NOME + BOTÃO FORA */
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
   }
 
-  /* Ajuste do placeholder para NÃO tampar o nome */
-  #section-card .selfie-placeholder {
-    width: 58% !important;
-    height: 150px !important;
-    margin-top: -60px !important;  /* sobe o placeholder */
-    z-index: 5 !important;
-  }
-
-  /* Nome do guia sempre 100% visível */
-  #section-card .guide-name {
-    font-size: 1.1rem !important;
-    padding: 6px 14px !important;
-    text-align: center !important;
-  }
-}
-
-/* SLOT DA SELFIE (placeholder)  
-     👉 Se o seu slot tiver outro nome de classe,
-        troque ".card-selfie-slot" pelo nome real.  */
-  #section-card .card-selfie-slot,
+  /* 2. PLACEHOLDER NO PEITO (ROSTO LIVRE) */
   #section-card .selfie-placeholder,
+  #section-card .card-selfie-slot,
   #section-card .card-selfie-placeholder {
-    width: 60% !important;        /* mais estreito */
-    max-width: 220px !important;
-    aspect-ratio: 3 / 4;          /* formato retrato */
-    height: 35% !important;
-    top: 40% !important;
-    margin: 200px auto 0 !important;  /* desce um pouco, fica no peito */
-    border-radius: 26px !important;
-    position: relative;
-    z-index: 5;
+    position: absolute !important;
+    top: 42% !important;           /* COMEÇA NO PEITO */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 58% !important;
+    max-width: 210px !important;
+    height: 36% !important;        /* COBRE ATÉ ANTES DO NOME */
+    background: rgba(255, 255, 255, 0.94) !important;
+    border-radius: 18px !important;
+    z-index: 10 !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25) !important;
+    pointer-events: none !important;
   }
 
-  /* Bloco do botão "Continuar" */
-  #section-card .card-actions{
-    margin-top: 60px !important;
-    text-align: center;
-    position: relative;
-    z-index: 20;                  /* acima do placeholder */
+  /* 3. NOME DENTRO DO CARD (ABAIXO DO PLACEHOLDER) */
+  #section-card .card-footer {
+    position: absolute !important;
+    bottom: 18px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 100% !important;
+    text-align: center !important;
+    z-index: 31 !important;
   }
 
-  #section-card .card-actions .btn{
-    min-width: 180px;
+  #section-card .card-name-badge {
+    font-size: 1.05rem !important;
+    padding: 7px 16px !important;
+    border-radius: 12px !important;
+  }
+
+  /* 4. BOTÃO "CONTINUAR" FORA DO CARD — VISÍVEL! */
+  #section-card .card-actions-below {
+    position: relative !important;
+    margin-top: 70px !important;   /* ESPAÇO APÓS O CARD */
+    padding: 20px 0 !important;
+    width: 100% !important;
+    text-align: center !important;
+    z-index: 100 !important;       /* ACIMA DE TUDO */
     pointer-events: auto !important;
-    padding: 14px 32px;
-    font-size: 1.1em;
+  }
+
+  #section-card #btnNext {
+    display: inline-block !important;
+    min-width: 190px !important;
+    padding: 14px 32px !important;
+    font-size: 1.1em !important;
+    font-weight: bold !important;
+    background: linear-gradient(to bottom, #d4af37, #b8860b) !important;
+    color: #000 !important;
+    border: 2.5px solid #8b5a2b !important;
+    border-radius: 14px !important;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.5), 0 0 22px rgba(212,175,55,0.4) !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    transition: all 0.3s ease !important;
+  }
+
+  #section-card #btnNext:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 12px 24px rgba(0,0,0,0.6), 0 0 32px gold !important;
+  }
+
+  /* 5. GARANTE QUE O PERGAMINHO NÃO CORTA */
+  #section-card.pergaminho,
+  #section-card.pergaminho-v {
+    padding-bottom: 320px !important;
+    min-height: auto !important;
+    overflow: visible !important;
   }
 }
 
