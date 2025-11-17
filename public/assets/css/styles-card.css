@@ -142,67 +142,68 @@
 }
 
 /* =========================================
-   SECTION-CARD — MOBILE DEFINITIVO (USA A MESMA MÉTRICA DO NOME)
+   SECTION-CARD — MOBILE FIX DEFINITIVO
    ========================================= */
 @media (max-width: 600px) {
+
+  /* Palco do card (pai do placeholder) */
   #section-card .card-stage {
     position: relative !important;
-    width: 88vw !important;
-    max-width: 380px !important;
-    margin: 0 auto !important;
-    padding-bottom: 240px !important;
-    overflow: visible !important;
+    width: 88vw;
+    max-width: 380px;
+    margin: 0 auto;
+    padding-bottom: 200px;      /* espaço pro nome + botão */
+    overflow: visible;
   }
 
-  /* NOME DO PARTICIPANTE — posição que você já ama (mantém exatamente assim) */
+  /* Placeholder / slot da selfie
+     -> posição ABSOLUTA, presa no peito da guia */
+  #section-card .card-selfie-slot,
+#section-card .selfie-placeholder,
+#section-card .card-selfie-placeholder {
+  position: absolute !important;
+  left: 50% !important;
+  top: 100% !important;              /* está assim */
+  transform: translate(-50%, -50%) !important;
+
+  width: 52% !important;
+  max-width: 210px !important;
+  aspect-ratio: 2 / 3;
+  height: auto !important;
+
+  border-radius: 26px !important;
+  z-index: 5;
+}
+
+  /* Nome do participante */
   #section-card .guide-name,
   #section-card .card-name {
-    position: relative !important;
-    margin-top: 360px !important;     /* ← essa é a sua posição perfeita */
-    font-size: 1.95rem !important;
-    font-weight: 900 !important;
-    color: #d4af37 !important;
-    text-shadow: 0 4px 14px rgba(0,0,0,0.9) !important;
-    text-align: center !important;
-    z-index: 15 !important;
+    position: relative;
+    margin-top: 150px;               /* vem depois do slot */
+    margin-bottom: 12px;
+    text-align: center;
+    z-index: 10;
   }
 
-  /* PLACEHOLDER DA SELFIE — usa a mesma métrica do nome, só que 135px acima */
-  #section-card .card-selfie-slot,
-  #section-card .selfie-placeholder,
-  #section-card .card-selfie-placeholder {
-    position: absolute !important;
-    left: 50% !important;
-    top: calc(360px - 135px) !important;     /* ← MESMA BASE DO NOME - 135px */
-    transform: translateX(-50%) !important;
-    width: 168px !important;
-    height: 252px !important;
-    border: 8px solid #d4af37 !important;
-    border-radius: 28px !important;
-    background: rgba(255,255,255,0.94) !important;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important;
-    z-index: 10 !important;
-  }
-
-  /* Botão Continuar — livre e majestoso */
+  /* Botão CONTINUAR fixo no rodapé do card */
   #section-card .card-actions {
-    position: absolute !important;
-    left: 50% !important;
-    bottom: 40px !important;
-    transform: translateX(-50%) !important;
-    width: 100% !important;
-    text-align: center !important;
-    z-index: 30 !important;
-    pointer-events: none !important;
+    position: absolute;
+    left: 50%;
+    bottom: 32px;
+    transform: translateX(-50%);
+    text-align: center;
+    width: 100%;
+    z-index: 15;
   }
 
   #section-card .card-actions .btn {
-    min-width: 250px !important;
-    padding: 18px 48px !important;
-    font-size: 1.6rem !important;
+    min-width: 180px;
     pointer-events: auto !important;
   }
 }
+
+
+
 /* =========================================
    DESKTOP (≥ 601px)
    ========================================= */
