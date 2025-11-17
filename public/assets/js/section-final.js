@@ -274,20 +274,31 @@ let checkInterval = setInterval(() => {
 setTimeout(() => clearInterval(checkInterval), 10000);
 
   // Eventos
-  document.addEventListener('click', (e) => {
+ document.addEventListener('section:shown', (e) => {
+  const id = e.detail?.sectionId || e.detail?.id || e.detail;
+  if (id === SECTION_ID) {
+    console.log('[FINAL] Seção final exibida → iniciando vídeo automaticamente');
+    setTimeout(playFinalVideo, 800); // pequeno delay pra garantir que DOM está pronto
+  }
+});
+
+// Também mantém o clique no botão como fallback
+document.addEventListener('click', (e) => {
+  const t = e.target;
+  if (t.id === 'btnVoltarInicio' || t.closest('#btnVoltarInicio')) {
+    e.preventDefault();
+    console.log('[FINAL] Botão "Voltar ao Início" clicado → playFinalVideo');
+    playFinalVideo();
+  }
+  if (t.id === 'btnBaixarPDFHQ') {
+    e.preventDefault();
+    generateArtifacts();
+  }
+});
+   document.addEventListener('click', (e) => {
     const t = e.target;
     if (t.id === 'btnBaixarPDFHQ') { e.preventDefault(); generateArtifacts(); }
     if (t.id === 'btnVoltarInicio') { e.preventDefault(); playFinalVideo(); }
-  });
-
-  document.addEventListener('section:shown', (e) => {
-    const id = e.detail?.sectionId || e.detail?.id || e.detail;
-    if (id === SECTION_ID) startFinalSequence();
-  });
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const sec = document.getElementById(SECTION_ID);
-    if (sec && sec.style.display !== 'none') startFinalSequence();
   });
 
 })();
