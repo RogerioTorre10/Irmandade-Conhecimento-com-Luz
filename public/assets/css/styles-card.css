@@ -145,6 +145,9 @@
    SECTION-CARD — MOBILE PERFEITO (LUMEN, ARIAN, ZION)
    ========================================= */
 @media (max-width: 600px) {
+   #section-card {
+    outline: 3px solid red !important;
+  }
   #section-card .card-stage {
     position: relative !important;
     width: 88vw !important;
