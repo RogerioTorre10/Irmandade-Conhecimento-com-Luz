@@ -158,7 +158,7 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 335px !important;        /* <=== AJUSTE PRINCIPAL (ponha entre 320-350px dependendo do fundo) */
+    top: 340px !important;        /* <=== AJUSTE PRINCIPAL (ponha entre 320-350px dependendo do fundo) */
     transform: translateX(-50%) !important;
     width: 58% !important;        /* tamanho ideal pro peito da ilustração Lumen */
     max-width: 215px !important;
@@ -186,19 +186,20 @@
 
   /* ====== NOME DO PARTICIPANTE ====== */
   #section-card .card-footer {
-    position: absolute !important;
-    left: 50% !important;
-    bottom: 130px !important;     /* distância do fundo do card */
-    transform: translateX(-50%) !important;
-    width: 80% !important;
-    text-align: center !important;
-    z-index: 7 !important;
-    font-size: 1.8rem !important;
-    font-weight: 700;
-    color: #fff;
-    text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
-    pointer-events: none;
-  }
+  position: absolute !important;
+  left: 50% !important;
+  bottom: 80px !important;           /* <─ BAIXOU pra ficar 100% abaixo da selfie */
+  transform: translateX(-50%) !important;
+  width: 90% !important;
+  text-align: center !important;
+  z-index: 7 !important;
+  font-size: 1.9rem !important;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
+  pointer-events: none;
+  padding: 0 10px;
+}
 
   /* ====== BOTÃO FORA DO CARD ====== */
   #section-card .card-actions {
