@@ -145,101 +145,83 @@
    SECTION-CARD — MOBILE PERFEITO (TOQUE DO ZION)
    ========================================= */
 @media (max-width: 600px) {
-  /* Palco principal */
+  /* Palco do card (pai) */
   #section-card .card-stage {
     position: relative !important;
     width: 88vw !important;
     max-width: 380px !important;
     margin: 0 auto !important;
-    padding-bottom: 280px !important;   /* só o necessário pro nome */
+    padding-bottom: 260px !important;
     overflow: visible !important;
     align-items: flex-start !important;
+    padding-top: 60px;
   }
 
-  /* PLACEHOLDER DA SELFIE — toque do Zion: menor, mais elegante, no coração */
+  /* A SELFIE É O .flame-layer — AJUSTE DE POSIÇÃO (SUBIR) */
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 372px !important;                     /* coração perfeito em todas as guias */
+    top: 300px !important; /* <-- Ajustado de 380px para 300px */
     transform: translateX(-50%) !important;
-    width: 152px !important;                   /* ← menor e mais refinado (Zion style) */
-    height: 228px !important;
-    border: 9px solid #d4af37 !important;
-    border-radius: 30px !important;
-    background: rgba(255,255,255,0.96) !important;
-    box-shadow: 
-      0 20px 50px rgba(0,0,0,0.6),
-      0 0 30px rgba(212,175,55,0.8) !important;  /* brilho dourado extra */
+    width: 60% !important;
+    max-width: 240px !important;
+    height: auto !important;
+    aspect-ratio: 3 / 4 !important; /* Mantido, altere se precisar diminuir a altura */
+    border: 8px solid #d4af37 !important;
+    border-radius: 28px !important;
+    background: rgba(255,255,255,0.94) !important;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important;
     z-index: 10 !important;
     pointer-events: none !important;
     overflow: hidden !important;
+    margin: 0 !important;
   }
 
-  /* NOME DO PARTICIPANTE — majestoso, estilo Zion */
+  /* Nome do participante — AJUSTE DE POSIÇÃO (SUBIR) */
   #section-card .guide-name,
   #section-card .card-name {
-    position: absolute !important;
-    left: 50% !important;
-    bottom: 135px !important;                  /* logo abaixo do placeholder */
-    transform: translateX(-50%) !important;
-    font-size: 2.1rem !important;
+    position: absolute !important; 
+    left: 50% !important; 
+    transform: translateX(-50%) !important; 
+    bottom: 110px !important; /* <-- Ajustado de 150px para 110px */
+    font-size: 1.95rem !important;
     font-weight: 900 !important;
     color: #d4af37 !important;
-    text-shadow: 
-      0 4px 12px rgba(0,0,0,0.9),
-      0 0 20px rgba(212,175,55,0.6) !important;
-    letter-spacing: 2px !important;
+    text-shadow: 0 4px 14px rgba(0,0,0,0.9) !important;
     text-align: center !important;
     z-index: 15 !important;
-    margin-top: 395px !important; 
-    font-family: 'Cinzel', serif !important;   /* opcional: fonte mais épica */
+    margin-top: 0 !important;
+    display: block !important;
   }
 
-  /* Botão CONTINUAR FORA DO CARD — grande, dourado e pulsante */
-  #section-card .card-actions-below {
-    margin-top: 60px !important;
-    text-align: center !important;
-    width: 100% !important;
-    z-index: 30 !important;
-  }
-
-  #section-card #btnNext {
-    min-width: 280px !important;
-    padding: 22px 60px !important;
-    font-size: 1.75rem !important;
-    font-weight: 800 !important;
-    background: linear-gradient(135deg, #d4af37, #ffd700, #b8972e) !important;
-    color: #000 !important;
-    border: 5px solid #fff !important;
-    border-radius: 60px !important;
-    box-shadow: 
-      0 15px 35px rgba(0,0,0,0.6),
-      0 0 40px rgba(212,175,55,0.9) !important;
-    text-transform: uppercase !important;
-    letter-spacing: 3px !important;
-    pointer-events: auto !important;
-    transition: all 0.4s ease !important;
-  }
-
-  #section-card #btnNext:hover,
-  #section-card #btnNext:active {
-    transform: translateY(-5px) scale(1.05) !important;
-    box-shadow: 0 20px 50px rgba(212,175,55,1) !important;
-  }
-
-  /* Esconde o botão antigo dentro do card */
+  /* Botão DENTRO do card — DESATIVADO (Correto para selfie) */
   #section-card .card-actions {
     display: none !important;
   }
 
-  /* Esconde placeholders antigos */
+  /* Botão FORA do card (.card-actions-below) — Estilizado */
+  #section-card .card-actions-below {
+    position: relative !important;
+    margin-top: 40px !important;
+    padding: 0 !important;
+    text-align: center !important;
+    width: 100% !important;
+  }
+
+  #section-card #btnNext {
+    min-width: 260px !important;
+    padding: 20px 50px !important;
+    font-size: 1.65rem !important;
+    pointer-events: auto !important;
+  }
+
+  /* Garante que nenhum outro placeholder antigo apareça */
   #section-card .card-selfie-slot,
   #section-card .selfie-placeholder,
   #section-card .card-selfie-placeholder {
     display: none !important;
   }
 }
-
 
 /* =========================================
    DESKTOP (≥ 601px)
