@@ -167,8 +167,11 @@
     left: 50% !important;
     top: 360px !important;              /* <- ajusta a altura (peito) */
     transform: translateX(-50%) !important;
-    width: min(78%, 310px) !important;
+    width: 62% !important;
+    max-width: 210px !important;
+    aspect-ratio: 3 / 4 !important;
     height: auto !important;
+    border-radius: 18px !important;
     text-align: center;
     z-index: 6 !important;
     opacity: 1 !important;
@@ -179,8 +182,9 @@
   #section-card .flame-layer .flame-selfie {
     display: block;
     margin: 0 auto;
-    width: 100%;
-    height: auto;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
   }
 
   /* Quando for SÓ placeholder (sem selfie), usa tamanho menor */
