@@ -151,7 +151,7 @@
     width: 88vw !important;
     max-width: 380px !important;
     margin: 0 auto !important;
-    padding-bottom: 200px !important;
+    padding-bottom: 160px !important;
     overflow: visible !important;
     align-items: flex-start !important;
     padding-top: 30px !important;
@@ -183,7 +183,7 @@
     position: absolute !important; 
     left: 50% !important; 
     transform: translateX(-50%) !important; 
-    bottom: 130px !important; /* <-- Ajustado de 150px para 110px */
+    bottom: 150px !important; /* <-- Ajustado de 150px para 110px */
     font-size: 1.95rem !important;
     font-weight: 900 !important;
     color: #d4af37 !important;
@@ -202,16 +202,16 @@
   /* Botão FORA do card (.card-actions-below) — Estilizado */
   #section-card .card-actions-below {
     position: relative !important;
-    margin-top: 10px !important;
+    margin-top: 25px !important;
     padding: 0 !important;
     text-align: center !important;
     width: 100% !important;
   }
 
   #section-card #btnNext {
-    min-width: 230px !important;
-    padding: 20px 50px !important;
-    font-size: 1.45rem !important;
+    min-width: 260px !important;
+    padding: 18px 50px !important;
+    font-size: 1.55rem !important;
     pointer-events: auto !important;
   }
 
