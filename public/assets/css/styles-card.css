@@ -154,9 +154,10 @@
     margin-top: 0 !important;
     margin-bottom: 0 !important;
     padding-top: 30px !important;
-    padding-bottom: 100px !important;
+    padding-bottom: clamp(36px, 8svh, 84px) !important;
     overflow: visible !important;
-    align-items: flex-start !important;    
+    align-items: flex-start !important;
+    min-height: 100svh;  
   }
 
   /* 0) Fundo ligeiramente deslocado pra baixo (evita corte do topo) */
@@ -167,7 +168,7 @@
   /* 1) Camada da chama centralizada e estável */
   #section-card .flame-layer {
     position: absolute;
-    top: 58.5%;
+    top: 61%;
     left: 0;
     right: 0;
     transform: translateY(-50%);
@@ -179,9 +180,9 @@
   }
 
   /* 1.1) Ajuste fino por guia */
-  #section-card.guide-zion  .flame-layer { top: 70%; }
-  #section-card.guide-lumen .flame-layer { top: 68%; }
-  #section-card.guide-arian .flame-layer { top: 66%; }
+  #section-card.guide-zion  .flame-layer { top: 60%; }
+  #section-card.guide-lumen .flame-layer { top: 60%; }
+  #section-card.guide-arian .flame-layer { top: 60%; }
 
   /* 2) Placeholder menor quando não há selfie */
   #section-card .flame-layer.placeholder-only .flame-selfie {
