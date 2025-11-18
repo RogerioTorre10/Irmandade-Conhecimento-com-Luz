@@ -165,10 +165,10 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 330px !important;              /* <- ajusta a altura (peito) */
+    top: 350px !important;              /* <- ajusta a altura (peito) */
     transform: translateX(-50%) !important;
-    width: 54% !important;
-    max-width: 190px !important;
+    width: 60% !important;
+    max-width: 210px !important;
     aspect-ratio: 3 / 4 !important; 
     height: auto !important;
     text-align: center;
