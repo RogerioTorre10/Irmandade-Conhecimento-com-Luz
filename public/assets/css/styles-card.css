@@ -165,10 +165,10 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 360px !important;              /* <- ajusta a altura (peito) */
+    top: 340px !important;              /* <- ajusta a altura (peito) */
     transform: translateX(-50%) !important;
-    width: 62% !important;
-    max-width: 210px !important;
+    width: 58% !important;
+    max-width: 200px !important;
     aspect-ratio: 3 / 4 !important;
     height: auto !important;
     border-radius: 18px !important;
@@ -197,7 +197,7 @@
     position: absolute !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    bottom: 110px !important;
+    bottom: 120px !important;
     text-align: center;
     z-index: 7;
     pointer-events: none;
@@ -211,7 +211,7 @@
   /* Botão FORA do card (.card-actions-below) — logo abaixo do card */
   #section-card .card-actions-below {
     position: relative !important;
-    margin-top: 18px !important;      /* espaço entre card e botão */
+    margin-top: 24px !important;      /* espaço entre card e botão */
     padding: 0 !important;
     text-align: center !important;
     width: 100% !important;
