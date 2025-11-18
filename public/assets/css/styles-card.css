@@ -161,17 +161,29 @@
 
   /* A SELFIE É O .flame-layer — AJUSTE DE POSIÇÃO (SUBIR) */
    #section-card .flame-layer {
- #section-card .flame-layer {
     position: absolute;
-    top: 59%;
+    top: 58,5%;
     left: 0;
     right: 0;
+    bottom: auto !important;
     transform: translateY(-50%);
     width: auto;
     text-align: center;
     z-index: 6 !important;
     opacity: 1 !important;
     pointer-events: none; /* impede bloqueio de cliques */
+  }
+    /* Centraliza a imagem em si */
+  #section-card .flame-layer .flame-selfie{
+    display: block;
+    margin: 0 auto;             /* centralizado */
+    width: min(78%, 310px);     /* tamanho com selfie */
+    height: auto;
+  }
+   
+   /* Quando for SÓ placeholder (sem selfie), usa tamanho menor */
+  #section-card .flame-layer.placeholder-only .flame-selfie{
+    width: min(66%, 280px);
   }
       
     /* Nome do participante levemente mais baixo */
