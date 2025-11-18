@@ -251,19 +251,46 @@
     }
   }
 
-  async function initCard(root) {
-    await renderCard();
-    const typingEls = qsa('[data-typing="true"]', root);
-    for (const el of typingEls) {
-      const text = el.dataset.text || el.textContent || '';
-      if (typeof window.runTyping === 'function') {
-        await new Promise(res => window.runTyping(el, text, res, { speed: 40, cursor: true }));
-      } else {
-        el.textContent = text;
-      }
-      if (typeof window.speak === 'function') window.speak(text);
-    }
+  // ---------- Inicialização ----------
+async function initCard(root) {
+  const section = SECTION_IDS.find(id => root.id === id) ? root : qs('#section-card');
+  const nome = (sessionStorage.getItem('jornada.nome') || 'USUÁRIO').toUpperCase();
+  const guia = await resolveSelectedGuide(); // usa o guia armazenado corretamente
+
+  const { stage, guideBg, guideNameSlot, flameLayer, flameSelfie, userNameSlot, btnNext } = ensureStructure(section);
+
+  // aplica imagem de fundo do guia escolhido
+  if (guideBg && guia?.bgImage) {
+    guideBg.src = guia.bgImage;
+    guideBg.alt = `${guia.nome} — Card da Irmandade`;
   }
+
+  // exibe nome do guia no topo
+  if (guideNameSlot) guideNameSlot.textContent = guia.nome?.toUpperCase() || 'GUIA';
+
+  // nome do participante no rodapé
+  if (userNameSlot) userNameSlot.textContent = nome;
+
+  // define classe do guia no root (para CSS específico)
+  section.classList.remove('guide-zion', 'guide-lumen', 'guide-arian');
+  section.classList.add(`guide-${guia.id}`);
+
+  // selfie ou placeholder
+  const url = readSelfieUrlOrPlaceholder();
+  if (flameSelfie && url) {
+    const isPlaceholder = url === PLACEHOLDER_SELFIE;
+    flameSelfie.src = url;
+    flameLayer?.classList.add('show');
+    if (isPlaceholder) flameLayer?.classList.add('placeholder-only');
+    flameSelfie.addEventListener?.('error', () => {
+      flameSelfie.src = PLACEHOLDER_SELFIE;
+      flameLayer?.classList.add('placeholder-only');
+    });
+  }
+
+  console.log(`[${MOD}] Card exibido · guia=${guia.id} (${guia.nome}) · participante=${nome}`);
+}
+
 
   // EVENTO PRINCIPAL
   document.addEventListener('section:shown', e => {
