@@ -161,7 +161,7 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 300px !important; /* <-- Ajustado de 380px para 300px */
+    top: 380px !important; /* <-- Ajustado de 380px para 300px */
     transform: translateX(-50%) !important;
     width: 60% !important;
     max-width: 240px !important;
