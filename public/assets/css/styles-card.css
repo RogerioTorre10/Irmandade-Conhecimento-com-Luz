@@ -159,9 +159,9 @@
   /* Selfie exatamente na região do peito do guia */
   #section-card .flame-layer {
     position: absolute;
-    top: 54% !important;        /* ← ajuste principal: subiu mais */
+    top: 59% !important;        /* ← ajuste principal: subiu mais */
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateY(-50%) !important;
     width: 100%;
     max-width: 310px;
     text-align: center;
@@ -203,8 +203,8 @@
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 20px 20px calc(env(safe-area-inset-bottom) + 20px);
-    background: linear-gradient(transparent, rgba(0,0,0,0.6));
+    padding: 20px 20px calc(env(safe-area-inset-bottom) + 20px) !important;
+    background: linear-gradient(transparent, rgba(0,0,0,0.5));
     text-align: center;
     z-index: 9999 !important;             /* acima de TUDO */
     pointer-events: none;                 /* só o botão recebe clique */
