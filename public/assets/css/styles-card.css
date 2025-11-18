@@ -154,78 +154,87 @@
     margin-top: 0 !important;
     margin-bottom: 0 !important;
     padding-top: 30px !important;
-    padding-bottom: clamp(36px, 8svh, 84px) !important;
+    padding-bottom: 100px !important;
     overflow: visible !important;
-    align-items: flex-start !important;
-    min-height: 100svh;  
+    align-items: flex-start !important;    
   }
 
-  /* 0) Fundo ligeiramente deslocado pra baixo (evita corte do topo) */
-  #section-card #guideBg {
-    transform: translateY(3.5svh);
-  }
-
-  /* 1) Camada da chama centralizada e estável */
-  #section-card .flame-layer {
+  /* A SELFIE É O .flame-layer — AJUSTE DE POSIÇÃO (SUBIR) */
+   #section-card .flame-layer {
     position: absolute;
-    top: 61%;
+    top: 58,5%;
     left: 0;
     right: 0;
-    transform: translateY(-50%);
     bottom: auto !important;
+    transform: translateY(-50%);
     width: auto;
     text-align: center;
     z-index: 6 !important;
     opacity: 1 !important;
+    pointer-events: none; /* impede bloqueio de cliques */
   }
-
-  /* 1.1) Ajuste fino por guia */
-  #section-card.guide-zion  .flame-layer { top: 60%; }
-  #section-card.guide-lumen .flame-layer { top: 60%; }
-  #section-card.guide-arian .flame-layer { top: 60%; }
-
-  /* 2) Placeholder menor quando não há selfie */
-  #section-card .flame-layer.placeholder-only .flame-selfie {
-    width: min(68%, 280px);
-    height: auto;
-    border-radius: 14px;
-    transform: scale(0.94);
-    opacity: 0.95;
-    margin: 0 auto;
-    transition: transform 0.4s ease, opacity 0.4s ease;
-  }
-
-  /* 3) Centralização extra de segurança */
-  #section-card .flame-layer .flame-selfie {
+    /* Centraliza a imagem em si */
+  #section-card .flame-layer .flame-selfie{
     display: block;
-    margin: 0 auto;
-    width: min(78%, 310px);
+    margin: 0 auto;             /* centralizado */
+    width: min(78%, 310px);     /* tamanho com selfie */
     height: auto;
   }
-
-  /* 4) Nome e botão — posições ajustadas */
+   
+   /* Quando for SÓ placeholder (sem selfie), usa tamanho menor */
+  #section-card .flame-layer.placeholder-only .flame-selfie{
+    width: min(66%, 280px);
+  }
+      
+    /* Nome do participante levemente mais baixo */
   #section-card .card-footer {
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 84px) !important;
-    left: 50%;
-    transform: translateX(-50%);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 72px) !important;
     text-align: center;
     z-index: 7;
     pointer-events: none;
   }
 
-  #section-card #btnStartJourney,
-  #section-card #btnNext {
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 18px) !important;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 8;
-    position: absolute;
+  /* Botão DENTRO do card — DESATIVADO (Correto para selfie) */
+  #section-card .card-actions {
+    display: none !important;
   }
 
-  /* 5) Palco com altura segura e respiro */
-  #section-card .card-stage {
-    padding-bottom: clamp(28px, 6svh, 80px) !important;
-    min-height: 100svh;
+  /* Botão FORA do card (.card-actions-below) — Estilizado */
+  #section-card .card-actions-below {
+    position: relative !important;
+    margin-top: 30px !important;
+    padding: 0 !important;
+    padding-top: 0 !important;  
+    text-align: center !important;
+    width: 100% !important;
+  }
+
+  #section-card #btnStartJourney,
+  #section-card #btnNext {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 18px) !important;
+    z-index: 15;           /* acima de tudo */
+    pointer-events: auto;  /* clicável */
+  }
+
+  /* Garante que nenhum outro placeholder antigo apareça */
+  #section-card .card-selfie-slot,
+  #section-card .selfie-placeholder,
+  #section-card .card-selfie-placeholder {
+    display: none !important;
+  }
+   
+   /* LIBERA O RODAPÉ DO CARD */
+  #section-card.pergaminho,
+  #section-card.pergaminho-v,
+  #section-card .pergaminho,
+  #section-card .pergaminho-v {
+    padding-bottom: 20px !important;   /* era 240px */
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
   }
 }
 
