@@ -160,9 +160,9 @@
   /* A SELFIE É O .flame-layer — AJUSTE DE POSIÇÃO (SUBIR) */
    #section-card .flame-layer {
   position: relative;
-  width: clamp(90px, 38%, 720px);
+  width: clamp(90px, 58%, 720px);
   aspect-ratio: 3 / 4;
-  min-height: 320px;
+  min-height: 240px;
   border-radius: 12px;
   overflow: visible !important;
   box-shadow: 0 0 18px rgba(255,215,120,.25);
