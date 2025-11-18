@@ -183,8 +183,8 @@
     position: absolute !important; 
     left: 50% !important; 
     transform: translateX(-50%) !important; 
-    bottom: 110px !important; /* <-- Ajustado de 150px para 110px */
-    font-size: 1.95rem !important;
+    bottom: 210px !important;  /* sobe o nome p/ logo abaixo da flame-layer */
+    font-size: 1.8rem !important;
     font-weight: 900 !important;
     color: #d4af37 !important;
     text-shadow: 0 4px 14px rgba(0,0,0,0.9) !important;
@@ -202,7 +202,8 @@
   /* Botão FORA do card (.card-actions-below) — Estilizado */
   #section-card .card-actions-below {
     position: relative !important;
-    margin-top: 40px !important;
+    margin-top: 12px !important;   /* mais pertinho do nome */
+    margin-bottom: 24px !important;
     padding: 0 !important;
     text-align: center !important;
     width: 100% !important;
