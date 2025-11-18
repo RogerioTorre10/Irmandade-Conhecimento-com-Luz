@@ -151,7 +151,7 @@
     width: 88vw !important;
     max-width: 380px !important;
     margin: 0 auto !important;
-    padding-bottom: 100px !important;   /* só o necessário pro nome */
+    padding-bottom: 280px !important;   /* só o necessário pro nome */
     overflow: visible !important;
     align-items: flex-start !important;
   }
@@ -160,10 +160,10 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 365px !important;                     /* coração perfeito em todas as guias */
+    top: 372px !important;                     /* coração perfeito em todas as guias */
     transform: translateX(-50%) !important;
-    width: 148px !important;                   /* ← menor e mais refinado (Zion style) */
-    height: 222px !important;
+    width: 152px !important;                   /* ← menor e mais refinado (Zion style) */
+    height: 228px !important;
     border: 9px solid #d4af37 !important;
     border-radius: 30px !important;
     background: rgba(255,255,255,0.96) !important;
@@ -191,6 +191,7 @@
     letter-spacing: 2px !important;
     text-align: center !important;
     z-index: 15 !important;
+    margin-top: 395px !important; 
     font-family: 'Cinzel', serif !important;   /* opcional: fonte mais épica */
   }
 
