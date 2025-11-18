@@ -154,14 +154,14 @@
     padding-bottom: 260px !important;
     overflow: visible !important;
     align-items: flex-start !important;
-    padding-top: 60px;
+    padding-top: 30px !important;
   }
 
   /* A SELFIE É O .flame-layer — AJUSTE DE POSIÇÃO (SUBIR) */
    #section-card .flame-layer {
   position: absolute !important;
   left: 50% !important;
-  top: 300px !important;
+  top: 320px !important;
   transform: translateX(-50%) !important;    
   width: clamp(90px, 58%, 720px);
   max-width: 240px !important;
@@ -183,7 +183,7 @@
     position: absolute !important; 
     left: 50% !important; 
     transform: translateX(-50%) !important; 
-    bottom: 120px !important; /* <-- Ajustado de 150px para 110px */
+    bottom: 100px !important; /* <-- Ajustado de 150px para 110px */
     font-size: 1.95rem !important;
     font-weight: 900 !important;
     color: #d4af37 !important;
