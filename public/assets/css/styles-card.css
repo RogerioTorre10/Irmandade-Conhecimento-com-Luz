@@ -161,7 +161,7 @@
    #section-card .flame-layer {
   position: absolute !important;
   left: 50% !important;
-  top: 320px !important;
+  top: 380px !important;
   transform: translateX(-50%) !important;    
   width: clamp(90px, 58%, 720px);
   max-width: 240px !important;
@@ -183,7 +183,7 @@
     position: absolute !important; 
     left: 50% !important; 
     transform: translateX(-50%) !important; 
-    bottom: 100px !important; /* <-- Ajustado de 150px para 110px */
+    bottom: 80px !important; /* <-- Ajustado de 150px para 110px */
     font-size: 1.95rem !important;
     font-weight: 900 !important;
     color: #d4af37 !important;
