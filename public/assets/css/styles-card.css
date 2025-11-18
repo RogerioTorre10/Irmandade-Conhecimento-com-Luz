@@ -164,9 +164,9 @@
     top: 380px !important; /* <-- Ajustado de 380px para 300px */
     transform: translateX(-50%) !important;
     width: 60% !important;
-    max-width: 240px !important;
+    max-width: 280px !important;
     height: auto !important;
-    aspect-ratio: 3 / 4 !important; /* Mantido, altere se precisar diminuir a altura */
+    aspect-ratio: 3 / 3.5 !important; /* Mantido, altere se precisar diminuir a altura */
     border: 8px solid #d4af37 !important;
     border-radius: 28px !important;
     background: rgba(255,255,255,0.94) !important;
@@ -183,7 +183,7 @@
     position: absolute !important; 
     left: 50% !important; 
     transform: translateX(-50%) !important; 
-    bottom: 210px !important;  /* sobe o nome p/ logo abaixo da flame-layer */
+    bottom: 120px !important;  /* sobe o nome p/ logo abaixo da flame-layer */
     font-size: 1.8rem !important;
     font-weight: 900 !important;
     color: #d4af37 !important;
@@ -202,7 +202,7 @@
   /* Botão FORA do card (.card-actions-below) — Estilizado */
   #section-card .card-actions-below {
     position: relative !important;
-    margin-top: 12px !important;   /* mais pertinho do nome */
+    margin-top: 30px !important;   /* mais pertinho do nome */
     margin-bottom: 24px !important;
     padding: 0 !important;
     text-align: center !important;
