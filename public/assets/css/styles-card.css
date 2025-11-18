@@ -165,9 +165,11 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 360px !important;              /* <- ajusta a altura (peito) */
+    top: 330px !important;              /* <- ajusta a altura (peito) */
     transform: translateX(-50%) !important;
-    width: min(78%, 310px) !important;
+    width: 54% !important;
+    max-width: 190px !important;
+    aspect-ratio: 3 / 4 !important; 
     height: auto !important;
     text-align: center;
     z-index: 6 !important;
@@ -179,8 +181,9 @@
   #section-card .flame-layer .flame-selfie {
     display: block;
     margin: 0 auto;
-    width: 100%;
-    height: auto;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
   }
 
   /* Quando for SÓ placeholder (sem selfie), usa tamanho menor */
@@ -193,7 +196,7 @@
     position: absolute !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    bottom: 110px !important;
+    bottom: 120px !important;
     text-align: center;
     z-index: 7;
     pointer-events: none;
@@ -207,7 +210,7 @@
   /* Botão FORA do card (.card-actions-below) — logo abaixo do card */
   #section-card .card-actions-below {
     position: relative !important;
-    margin-top: 18px !important;      /* espaço entre card e botão */
+    margin-top: 24px !important;      /* espaço entre card e botão */
     padding: 0 !important;
     text-align: center !important;
     width: 100% !important;
