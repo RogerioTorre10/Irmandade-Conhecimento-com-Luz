@@ -151,8 +151,12 @@
     width: 88vw !important;
     max-width: 380px !important;
     margin: 0 auto !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
     padding: 30px 0 120px !important; /* mais espaço embaixo */
+    padding-bottom: 100px !important;
     overflow: visible !important;
+    align-items: flex-start !important;
     min-height: 100vh;
   }
 
@@ -167,9 +171,13 @@
     text-align: center;
     z-index: 6 !important;
     pointer-events: none;
+    opacity: 1 !important;
+     
   }
 
   #section-card .flame-layer .flame-selfie {
+    display: block;
+    margin: 0 auto;  
     width: min(78%, 310px);
     height: auto;
     border-radius: 12px;
@@ -199,29 +207,33 @@
 
   /* Botão FORA do card - agora 100% visível e clicável */
   #section-card .card-actions-below {
-    position: fixed !important;           /* ← mudou pra fixed */
+    position: relative !important;           /* ← mudou pra fixed */
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 20px 20px calc(env(safe-area-inset-bottom) + 20px) !important;
-    background: linear-gradient(transparent, rgba(0,0,0,0.5));
-    text-align: center;
+    margin-top: 30px !important;
+    padding: 0 !important;
+    padding-top: 0 !important;  
+    text-align: center !important;
+    width: 100% !important;
     z-index: 9999 !important;             /* acima de TUDO */
     pointer-events: none;                 /* só o botão recebe clique */
   }
 
   #section-card #btnStartJourney,
   #section-card #btnNext {
-    position: relative !important;        /* agora é relative dentro do fixed */
+    position: absolute !important;        /* agora é relative dentro do fixed */
     display: inline-block !important;
-    left: auto !important;
-    transform: none !important;
+    left: 50% !important;
+    transform: translateX(-50%)!important;
     pointer-events: auto !important;      /* só ele é clicável */
     min-height: 56px;
     padding: 16px 32px !important;
     font-size: 18px !important;
     z-index: 9999 !important;
+    pointer-events: auto;
   }
+   
 
   /* Libera completamente o pergaminho de qualquer overflow ou padding excessivo */
   #section-card.pergaminho,
@@ -232,6 +244,7 @@
     min-height: 100vh !important;
     overflow: visible !important;
     background: transparent !important;
+    height: auto !important;
   }
 
   /* Esconde placeholders antigos */
