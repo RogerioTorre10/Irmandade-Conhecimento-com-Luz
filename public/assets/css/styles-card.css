@@ -158,33 +158,26 @@
   }
 
   /* A SELFIE É O .flame-layer — AJUSTE DE POSIÇÃO (SUBIR) */
-  #section-card .flame-layer {
-    position: absolute !important;
-    left: 50% !important;
-    top: 380px !important; /* <-- Ajustado de 380px para 300px */
-    transform: translateX(-50%) !important;
-    width: 60% !important;
-    max-width: 280px !important;
-    height: auto !important;
-    aspect-ratio: 3 / 3.5 !important; /* Mantido, altere se precisar diminuir a altura */
-    border: 8px solid #d4af37 !important;
-    border-radius: 28px !important;
-    background: rgba(255,255,255,0.94) !important;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important;
-    z-index: 10 !important;
-    pointer-events: none !important;
-    overflow: hidden !important;
-    margin: 0 !important;
-  }
-
+   #section-card .flame-layer {
+  position: relative;
+  width: clamp(240px, 38%, 520px);
+  aspect-ratio: 3 / 4;
+  min-height: 320px;
+  border-radius: 12px;
+  overflow: visible !important;
+  box-shadow: 0 0 18px rgba(255,215,120,.25);
+  border: 2px solid rgba(255,215WORKDIR,0,.30);
+  z-index: 30;
+  pointer-events: none;
+}
   /* Nome do participante — AJUSTE DE POSIÇÃO (SUBIR) */
   #section-card .guide-name,
   #section-card .card-name {
     position: absolute !important; 
     left: 50% !important; 
     transform: translateX(-50%) !important; 
-    bottom: 120px !important;  /* sobe o nome p/ logo abaixo da flame-layer */
-    font-size: 1.8rem !important;
+    bottom: 120px !important; /* <-- Ajustado de 150px para 110px */
+    font-size: 1.95rem !important;
     font-weight: 900 !important;
     color: #d4af37 !important;
     text-shadow: 0 4px 14px rgba(0,0,0,0.9) !important;
@@ -202,8 +195,7 @@
   /* Botão FORA do card (.card-actions-below) — Estilizado */
   #section-card .card-actions-below {
     position: relative !important;
-    margin-top: 30px !important;   /* mais pertinho do nome */
-    margin-bottom: 24px !important;
+    margin-top: 40px !important;
     padding: 0 !important;
     text-align: center !important;
     width: 100% !important;
@@ -223,7 +215,6 @@
     display: none !important;
   }
 }
-
 /* =========================================
    DESKTOP (≥ 601px)
    ========================================= */
