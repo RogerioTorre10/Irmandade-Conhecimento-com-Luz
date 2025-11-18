@@ -158,10 +158,10 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 340px !important;        /* <=== AJUSTE PRINCIPAL (ponha entre 320-350px dependendo do fundo) */
+    top: 338px !important;        /* <=== AJUSTE PRINCIPAL (ponha entre 320-350px dependendo do fundo) */
     transform: translateX(-50%) !important;
-    width: 58% !important;        /* tamanho ideal pro peito da ilustração Lumen */
-    max-width: 215px !important;
+    width: 59% !important;        /* tamanho ideal pro peito da ilustração Lumen */
+    max-width: 218px !important;
     aspect-ratio: 3 / 4 !important;
     z-index: 6 !important;
     pointer-events: none;
@@ -188,15 +188,16 @@
   #section-card .card-footer {
   position: absolute !important;
   left: 50% !important;
-  bottom: 80px !important;           /* <─ BAIXOU pra ficar 100% abaixo da selfie */
+  bottom: 95px !important;           /* <─ BAIXOU pra ficar 100% abaixo da selfie */
   transform: translateX(-50%) !important;
-  width: 90% !important;
+  width: 86% !important;
   text-align: center !important;
   z-index: 7 !important;
-  font-size: 1.9rem !important;
-  font-weight: 800;
-  color: #fff;
-  text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
+  font-size: 2rem !important;
+  font-weight: 900;
+  color: #fffff;
+  text-shadow: 0 3px 8px rgba(0,0,0,0.9);
+  letter-spacing: 1px;  
   pointer-events: none;
   padding: 0 10px;
 }
@@ -232,8 +233,9 @@
   /* Libera o pergaminho pra não cortar nada */
   #section-card.pergaminho,
   #section-card.pergaminho-v {
-    min-height: 100vh !important;
-    padding-bottom: 80px !important;
+    min-height: 110vh !important;
+    padding-bottom: 220px !important;
+    height: auto !important;  
     overflow: visible !important;
   }
 }
