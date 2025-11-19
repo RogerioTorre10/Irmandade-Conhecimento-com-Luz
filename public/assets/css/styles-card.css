@@ -149,29 +149,30 @@
   /* CONTAINER PRINCIPAL – vira referência de posicionamento */
   #section-card .card-stage {
     position: relative !important;
-    min-height: 80vh !important;
+    min-height: 100vh !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-start !important;
     align-items: center !important;
+    padding: 0;
     padding-top: 40px !important; 
     padding-bottom: 140px !important;
   }
 
   /* GUIA DE FUNDO */
   #section-card .guide-bg {
-    width: 88% !important;
+    width: 90% !important;
     max-width: 400px !important;
   }
 
   /* PLACEHOLDER DOURADO – POSIÇÃO FIXA NO PEITO (NUNCA MAIS SOBE) */
   #section-card .flame-layer {
     position: absolute !important;
-    top: 430px !important;        /* valor em PX fixo = nunca mais mexe em % */
+    top: 380px !important;        /* valor em PX fixo = nunca mais mexe em % */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    width: 170px !important;      /* tamanho perfeito pro peito */
-    height: 227px !important;     /* 3:4 exato */
+    width: 174px !important;      /* tamanho perfeito pro peito */
+    height: 232px !important;     /* 3:4 exato */
     border: 9px solid #d4af37 !important;
     border-radius: 26px !important;
     box-shadow: 0 20px 50px rgba(0,0,0,0.7) !important;
@@ -181,7 +182,7 @@
   /* TIRA O CARD-FOOTER DE DENTRO DO FLAME-LAYER DE UMA VEZ */
   #section-card .card-footer {
     position: absolute !important;
-    top: 680px !important;        /* logo abaixo do placeholder (336px de distância) */
+    top: 630px !important;        /* logo abaixo do placeholder (336px de distância) */
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 100% !important;
@@ -208,11 +209,12 @@
   /* BOTÃO NA BASE MESMO */
   #section-card .card-actions-below {
     position: absolute !important;
-    bottom: 100px !important;      /* fixo na base da tela */
+    bottom: 90px !important;      /* fixo na base da tela */
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 100% !important;
     text-align: center !important;
+    z-index: 20 !important; 
   }
 
    #section-card #btnNext {
