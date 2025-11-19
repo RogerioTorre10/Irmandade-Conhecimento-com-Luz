@@ -144,68 +144,51 @@
 /* =========================================
    SECTION-CARD — MOBILE PERFEITO (selfie no peito + nome + botão fora)
    ========================================= */
-@media (max-width: 600px)
-{ /* Palco do card (pai)
-   */ #section-card .card-stage {
-   position: relative !important;
-   width: 88vw !important; 
-   max-width: 380px !important;
-   margin: 0 auto !important;
-   margin-top: 0 !important;
-   margin-bottom: 0 !important;
-   display: flex !important;
-   flex-direction: column !important;
-   align-items: center !important;
-   padding-top: 20px !important;
-   padding-bottom: 40px !important; 
-   overflow: visible !important; 
-}
+@media (max-width: 600px) {
+  /* 🔧 Palco do card — layout fluido */
+  #section-card .card-stage {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    padding-top: 20px !important;
+    padding-bottom: 60px !important;
+    position: relative !important;
+    overflow: visible !important;
+  }
 
-  /* A SELFIE É O .flame-layer — AJUSTE DE POSIÇÃO (SUBIR) */
-   #section-card .flame-layer {
-  position: relative !important;
-  left: 50% !important;
-  top: auto !important;
-  transform: none !important;    
-  width: 58% !important;
-  max-width: 240px !important;
-  height: auto !important;    
-  aspect-ratio: 3 / 4;
-  margin: 0 !important;
-  margin-top: 20px !important;
-  min-height: 220px !important;
-  border: 8px solid #d4af37 !important;    
-  border-radius: 28px !important;
-  background: rgba(255,255,255,0.94) !important;    
-  overflow: hidden !important;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important;
-  z-index: 10 !important;
-  pointer-events: none !important;    
-}  
-   
-   /* Nome do participante — AJUSTE DE POSIÇÃO (SUBIR) */
-  #section-card .guide-name, 
-   #section-card .card-name { 
-   position: relative !important;
-   left: 50% !important; 
-   transform: translateX(-50%) !important;      
-   bottom: 180px !important; /* <-- Ajustado de 150px para 110px */ 
-   font-size: 1.95rem !important;
-   font-weight: 900 !important;
-   color: #d4af37 !important;
-   text-shadow: 0 4px 14px rgba(0,0,0,0.9) !important;
-   text-align: center !important;
-   z-index: 15 !important;
-   margin-top: 16px !important;
-   display: block !important; 
-   }
-   
-   /* Campo de input para nome do participante */
+  /* 📸 Placeholder da selfie — fixo e obediente */
+  #section-card .flame-layer {
+    position: relative !important;
+    margin-top: 32px !important; /* distância do topo */
+    width: 58% !important;
+    max-width: 240px !important;
+    min-height: 220px !important;
+    aspect-ratio: 3 / 4 !important;
+    border: 8px solid #d4af37 !important;
+    border-radius: 28px !important;
+    background: rgba(255,255,255,0.94) !important;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important;
+    z-index: 10 !important;
+    pointer-events: none !important;
+  }
+
+  /* 🧍 Nome do participante — abaixo da selfie */
+  #section-card .guide-name,
+  #section-card .card-name {
+    position: relative !important;
+    margin-top: 16px !important;
+    font-size: 1.95rem !important;
+    font-weight: 900 !important;
+    color: #d4af37 !important;
+    text-shadow: 0 4px 14px rgba(0,0,0,0.9) !important;
+    text-align: center !important;
+    z-index: 15 !important;
+  }
+
+  /* ✍️ Input do nome — abaixo do nome */
   #section-card .card-name-input {
     position: relative !important;
-    display: block !important;
-    margin: 16px auto 0 auto !important;
-    margin-top: 12px !important; 
+    margin-top: 12px !important;
     width: 80% !important;
     max-width: 320px !important;
     font-size: 1.2rem !important;
@@ -213,49 +196,32 @@
     border: 2px solid #d4af37 !important;
     border-radius: 12px !important;
     background: #fff !important;
-    z-index: 20 !important;
     text-align: center !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important; 
+    z-index: 20 !important;
   }
 
-  /* Botão DENTRO do card — DESATIVADO (Correto para selfie) */
-  #section-card .card-actions {
-    display: none !important;
-  }
-
-  /* Botão FORA do card (.card-actions-below) — Estilizado */
+  /* 🔘 Botão “Continuar” — abaixo do input */
   #section-card .card-actions-below {
     position: relative !important;
     margin-top: 20px !important;
     text-align: center !important;
     width: 100% !important;
-    z-index: 25 !important;  
+    z-index: 25 !important;
   }
 
   #section-card #btnNext {
     min-width: 260px !important;
     padding: 18px 40px !important;
     font-size: 1.6rem !important;
-    background-color: #d4af37 !important; 
+    background-color: #d4af37 !important;
     color: #fff !important;
     border: none !important;
     border-radius: 14px !important;
     box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important;
     pointer-events: auto !important;
   }
-   
-   #section-card #btnNext:hover {
-    transform: scale(1.05);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-  }
-
-  /* Garante que nenhum outro placeholder antigo apareça */
-  #section-card .card-selfie-slot,
-  #section-card .selfie-placeholder,
-  #section-card .card-selfie-placeholder {
-    display: none !important;
-  }
 }
+
 
 /* =========================================
    DESKTOP (≥ 601px)
