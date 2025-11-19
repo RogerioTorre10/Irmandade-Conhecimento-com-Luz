@@ -175,12 +175,13 @@
     width: 52% !important;                 /* MAIS LARGO (mais quadrado) */
     max-width: 195px !important;
     aspect-ratio: 3 / 2.1 !important;      /* menos “altão” */
-
+    height: 170px !important;
     border-radius: 22px !important;
     background: rgba(255,255,255,0.95) !important;
     border: 6px solid #d4af37 !important;
     box-shadow: 0 15px 35px rgba(0,0,0,0.6) !important;
     z-index: 10 !important;
+    overflow: hidden !important;   
     pointer-events: none !important;
   }
 
@@ -243,8 +244,14 @@
     box-shadow: 0 10px 28px rgba(0,0,0,0.4) !important;
     pointer-events: auto !important;
   }
-
-
+    #section-card .flame-layer img,
+    #section-card .flame-layer canvas,
+    #section-card .flame-layer video {
+     width: 100% !important;
+     height: 100% !important;
+     object-fit: cover !important;
+   }
+ }
 
    
 /* =========================================
