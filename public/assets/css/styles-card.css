@@ -181,7 +181,7 @@
   /* TIRA O CARD-FOOTER DE DENTRO DO FLAME-LAYER DE UMA VEZ */
   #section-card .card-footer {
     position: absolute !important;
-    top: 670px !important;        /* logo abaixo do placeholder (336px de distância) */
+    top: 680px !important;        /* logo abaixo do placeholder (336px de distância) */
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 100% !important;
@@ -190,11 +190,19 @@
   }
 
   #section-card #userNameSlot {
-    font-size: 1.9rem !important;
+    font-size: 1.85rem !important;
     font-weight: 900 !important;
     color: #d4af37 !important;
-    display: none !important;
     text-shadow: 0 4px 12px rgba(0,0,0,0.9) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1.2px !important;
+    background: rgba(0,0,0,0.35) !important;
+    border: 3px solid #d4af37 !important;
+    border-radius: 16px !important;
+    padding: 14px 30px !important;
+    max-width: 280px !important;
+    text-align: center !important;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.6) !important;
   }
 
   /* BOTÃO NA BASE MESMO */
@@ -206,7 +214,17 @@
     width: 100% !important;
     text-align: center !important;
   }
+
+   #section-card #btnNext {
+    min-width: 300px !important;
+    padding: 20px 50px !important;
+    font-size: 1.8rem !important;
+    background: linear-gradient(145deg, #f0d878, #d4af37) !important;
+    border-radius: 22px !important;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5) !important;
+  }
 }
+
    
 /* =========================================
    DESKTOP (≥ 601px)
