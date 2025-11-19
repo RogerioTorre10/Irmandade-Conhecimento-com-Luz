@@ -144,48 +144,10 @@
 /* =========================================
    SECTION-CARD — MOBILE PERFEITO (versão corrigida 2025)
    ========================================= */
-@media (max-width: 600px) {
-
-  /* Container principal */
-  #section-card .card-stage {
-    position: relative !important;
-    width: 100% !important;
-    max-width: 350px !important;      /* card mais estreito e equilibrado */
-    margin: 0 auto !important;
-    padding: 20px 0 60px 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    overflow: visible !important;
-  }
-
-  /* Fundo do guia (Lumen/Zion/Arian) */
-  #section-card .guide-bg {
-    width: 100% !important;
-    max-width: 350px !important;
-  }
-
-  /* ===== PLACEHOLDER ===== */
-  #section-card .flame-layer {
-    position: absolute !important;
-    top: 330px !important;                /* AJUSTE REAL: NÃO PEGA NO ROSTO */
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 50% !important;
-    max-width: 180px !important;
-    aspect-ratio: 3/4 !important;
-    border-radius: 20px !important;
-    background: rgba(255,255,255,0.95) !important;
-    border: 6px solid #d4af37 !important;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.6) !important;
-    z-index: 10 !important;
-    pointer-events: none !important;
-  }
-
   /* ===== NOME DO USUÁRIO ===== */
   #section-card .card-footer {
     position: absolute !important;
-    top: 520px !important;               /* FICA LOGO ABAIXO DO PLACEHOLDER */
+    top: 540px !important;            /* logo depois do fim do placeholder */
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 100% !important;
@@ -199,12 +161,14 @@
     color: #d4af37 !important;
     text-shadow: 0 4px 10px rgba(0,0,0,0.8) !important;
     text-transform: uppercase !important;
+    letter-spacing: 1px !important;
   }
 
-  /* ===== BOTÃO CONTINUAR ===== */
+  /* ===== BOTÃO CONTINUAR DENTRO DO PERGAMINHO ===== */
   #section-card .card-actions-below {
     position: absolute !important;
-    top: 600px !important;                /* FICA DENTRO DO PERGAMINHO */
+    top: 605px !important;            /* aparece dentro do pergaminho,
+                                         logo abaixo do nome */
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 100% !important;
@@ -222,10 +186,10 @@
     border: none !important;
     border-radius: 18px !important;
     box-shadow: 0 10px 28px rgba(0,0,0,0.4) !important;
-    pointer-events: auto !important;     /* GARANTE QUE FUNCIONA */
+    pointer-events: auto !important;
     z-index: 40 !important;
   }
-}
+
 
 
    
