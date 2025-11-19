@@ -174,7 +174,7 @@
 
     width: 55% !important;                 /* MAIS LARGO (mais quadrado) */
     max-width: 210px !important;
-    aspect-ratio: 3 / 3.8 !important;      /* menos “altão” */
+    aspect-ratio: 3 / 3.5 !important;      /* menos “altão” */
 
     border-radius: 22px !important;
     background: rgba(255,255,255,0.95) !important;
@@ -187,7 +187,7 @@
    /* ===== NOME DO USUÁRIO ===== */
    #section-card .card-footer {
     position: absolute !important;
-    top: 575px !important;                 /* encosta na base do placeholder */
+    top: 610px !important;                 /* encosta na base do placeholder */
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 100% !important;
@@ -207,7 +207,7 @@
   /* ===== BOTÃO CONTINUAR DENTRO DO PERGAMINHO ===== */
     #section-card .card-actions-below {
     position: absolute !important;
-    top: 650px !important;                 /* abaixo do nome, fora da área do card */
+    top: 700px !important;                 /* abaixo do nome, fora da área do card */
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 100% !important;
