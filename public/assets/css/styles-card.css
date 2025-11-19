@@ -153,23 +153,27 @@
    margin: 0 auto !important;
    margin-top: 0 !important;
    margin-bottom: 0 !important;
-   padding-top: 30px !important; 
-   padding-bottom: 100px !important; 
+   display: flex !important;
+   flex-direction: column !important;
+   align-items: center !important;
+   padding-top: 20px !important;
+   padding-bottom: 40px !important; 
    overflow: visible !important; 
-   align-items: flex-start !important;
 }
 
   /* A SELFIE É O .flame-layer — AJUSTE DE POSIÇÃO (SUBIR) */
    #section-card .flame-layer {
-  position: absolute !important;
+  position: relative !important;
   left: 50% !important;
-  top: 200px !important;
-  transform: translateX(-50%) !important;    
+  top: auto !important;
+  transform: none !important;    
   width: clamp(90px, 58%, 720px);
   max-width: 240px !important;
   height: auto !important;    
   aspect-ratio: 3 / 4;
-  min-height: 190px !important;
+  margin: 0 !important;
+  margin-top: 40px !important;
+  min-height: 220px !important;
   border: 8px solid #d4af37 !important;    
   border-radius: 28px;
   background: rgba(255,255,255,0.94) !important;    
@@ -177,13 +181,13 @@
   box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important;
   z-index: 10 !important;
   pointer-events: none !important;
-  margin: 0 !important;   
+    
 }  
    
    /* Nome do participante — AJUSTE DE POSIÇÃO (SUBIR) */
   #section-card .guide-name, 
    #section-card .card-name { 
-   position: absolute !important;
+   position: relative !important;
    left: 50% !important; 
    transform: translateX(-50%) !important;      
    bottom: 180px !important; /* <-- Ajustado de 150px para 110px */ 
@@ -193,15 +197,17 @@
    text-shadow: 0 4px 14px rgba(0,0,0,0.9) !important;
    text-align: center !important;
    z-index: 15 !important;
-   margin-top: 0 !important;
+   margin-top: 16px !important;
    display: block !important; 
    }
+   
    /* Campo de input para nome do participante */
   #section-card .card-name-input {
     position: relative !important;
     display: block !important;
     margin: 16px auto 0 auto !important;
-    width: 82% !important;
+    margin-top: 12px !important; 
+    width: 80% !important;
     max-width: 320px !important;
     font-size: 1.2rem !important;
     padding: 12px 16px !important;
@@ -221,8 +227,7 @@
   /* Botão FORA do card (.card-actions-below) — Estilizado */
   #section-card .card-actions-below {
     position: relative !important;
-    margin-top: 24px !important;
-    padding: 0 !important;
+    margin-top: 20px !important;
     text-align: center !important;
     width: 100% !important;
     z-index: 25 !important;  
@@ -238,7 +243,6 @@
     border-radius: 14px !important;
     box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important;
     pointer-events: auto !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease; 
   }
    
    #section-card #btnNext:hover {
