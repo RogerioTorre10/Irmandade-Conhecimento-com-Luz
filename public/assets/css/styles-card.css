@@ -145,73 +145,81 @@
    SECTION-CARD — MOBILE PERFEITO (selfie no peito + nome + botão fora)
    ========================================= */
 @media (max-width: 600px) {
-   /* Palco do card (pai) */
+  /* Palco do card (pai) */
   #section-card .card-stage {
     position: relative !important;
     width: 88vw !important;
     max-width: 380px !important;
     margin: 0 auto !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    padding-top: 30px !important;
-    padding-bottom: 150px !important; /* espaço interno pro nome */
+    padding-bottom: 260px !important;
     overflow: visible !important;
     align-items: flex-start !important;
-  }
-  /* Centralização e segurança de cliques */
-  #section-card .flame-layer {
-    position: absolute;
-    top: 59%;
-    left: 0;
-    right: 0;
-    transform: translateY(-50%);
-    width: auto;
-    text-align: center;
-    z-index: 6 !important;
-    opacity: 1 !important;
-    pointer-events: none; /* impede bloqueio de cliques */
+    padding-top: 60px;
   }
 
-  /* Selfie ou placeholder: imagem centralizada e inofensiva */
-  #section-card .flame-layer .flame-selfie {
-    display: block;
-    margin: 0 auto;
-    width: min(78%, 310px);
-    height: auto;
-    border-radius: 12px;
-    pointer-events: none; /* garante que ela não capture toques */
+  /* A SELFIE É O .flame-layer — AJUSTE DE POSIÇÃO (SUBIR) */
+   #section-card .flame-layer {
+  position: absolute !important;
+  left: 50% !important;
+  top: 300px !important;
+  transform: translateX(-50%) !important;    
+  width: clamp(90px, 58%, 720px);
+  max-width: 240px !important;
+  height: auto !important;    
+  aspect-ratio: 3 / 4;
+  min-height: 280px;
+  border: 8px solid #d4af37 !important;    
+  border-radius: 28px;
+  background: rgba(255,255,255,0.94) !important;    
+  overflow: hidden !important;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important;
+  z-index: 10 !important;
+  pointer-events: none !important;
+  margin: 0 !important;   
+}
+  /* Nome do participante — AJUSTE DE POSIÇÃO (SUBIR) */
+  #section-card .guide-name,
+  #section-card .card-name {
+    position: absolute !important; 
+    left: 50% !important; 
+    transform: translateX(-50%) !important; 
+    bottom: 120px !important; /* <-- Ajustado de 150px para 110px */
+    font-size: 1.95rem !important;
+    font-weight: 900 !important;
+    color: #d4af37 !important;
+    text-shadow: 0 4px 14px rgba(0,0,0,0.9) !important;
+    text-align: center !important;
+    z-index: 15 !important;
+    margin-top: 0 !important;
+    display: block !important;
   }
 
-  /* Placeholder menor e sem clique */
-  #section-card .flame-layer.placeholder-only .flame-selfie {
-    width: min(68%, 280px);
-    opacity: 0.95;
-    transform: scale(0.94);
+  /* Botão DENTRO do card — DESATIVADO (Correto para selfie) */
+  #section-card .card-actions {
+    display: none !important;
   }
 
-  /* Nome do participante levemente mais baixo */
-  #section-card .card-footer {
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 56px) !important;
-    text-align: center;
-    z-index: 7;
-    pointer-events: none;
+  /* Botão FORA do card (.card-actions-below) — Estilizado */
+  #section-card .card-actions-below {
+    position: relative !important;
+    margin-top: 40px !important;
+    padding: 0 !important;
+    text-align: center !important;
+    width: 100% !important;
   }
 
-  /* Botão “Continuar” sempre visível e clicável */
-  #section-card #btnStartJourney,
   #section-card #btnNext {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 18px) !important;
-    z-index: 15;           /* acima de tudo */
-    pointer-events: auto;  /* clicável */
+    min-width: 260px !important;
+    padding: 20px 50px !important;
+    font-size: 1.65rem !important;
+    pointer-events: auto !important;
   }
 
-  /* Espaço extra no palco */
-  #section-card .card-stage {
-    padding-bottom: clamp(52px, 10svh, 120px) !important;
-    min-height: 100svh;
+  /* Garante que nenhum outro placeholder antigo apareça */
+  #section-card .card-selfie-slot,
+  #section-card .selfie-placeholder,
+  #section-card .card-selfie-placeholder {
+    display: none !important;
   }
 }
 
