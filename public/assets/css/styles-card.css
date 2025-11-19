@@ -150,14 +150,13 @@
     width: 90vw !important;
     max-width: 380px !important;
     margin: 0 auto !important;
-    padding: 20px 0 50px 0 !important;
+    padding: 20px 0 70px 0 !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    overflow: visible !important;
   }
 
-  /* ===== SELFIE (flame-layer) — fica no peito ===== */
+  /* Selfie no peito – tamanho e posição perfeitos */
   #section-card .flame-layer {
     position: relative !important;
     width: 58% !important;
@@ -165,64 +164,56 @@
     aspect-ratio: 3/4 !important;
     border: 8px solid #d4af37 !important;
     border-radius: 28px !important;
-    background: rgba(255,255,255,0.94) !important;
+    background: rgba(255,255,255,0.96) !important;
     box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important;
-    z-index: 10 !important;
-    margin-top: 30px !important;
+    margin-top: 32px !important;
+    overflow: hidden !important;
   }
 
-  /* ===== CONTAINER DO INPUT (dentro do card, logo abaixo da selfie) ===== */
-  #section-card .input-container {
+  /* NOME DO PARTICIPANTE – coladinho embaixo da selfie, dentro do card */
+  #section-card .card-footer {
     position: relative !important;
-    width: 80% !important;
-    max-width: 300px !important;
-    margin-top: -40px !important;   /* sobe o input pra ficar colado na selfie */
-    z-index: 20 !important;
-  }
-
-  /* ===== INPUT DO NOME (dentro do card) ===== */
-  #section-card .card-name-input {
-    width: 100% !important;
-    padding: 14px 20px !important;
-    font-size: 1.35rem !important;
-    font-weight: 600 !important;
+    margin-top: -12px !important;   /* sobe pra ficar quase encostado na borda */
+    padding: 8px 16px 14px !important;
     text-align: center !important;
-    border: 2px solid #d4af37 !important;
-    border-radius: 16px !important;
-    background: #fff !important;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.25) !important;
-    margin-bottom: 20px !important;
+    background: rgba(255,255,255,0.85) !important;
+    border-radius: 0 0 20px 20px !important; /* só cantos inferiores arredondados */
   }
 
-  /* ===== BOTÃO FORA DO CARD (lá embaixo) ===== */
+  #section-card .card-name-badge {
+    display: block !important;
+  }
+
+  #section-card #userNameSlot {
+    font-size: 1.55rem !important;     /* tamanho perfeito pro mobile */
+    font-weight: 900 !important;
+    color: #d4af37 !important;
+    text-shadow: 0 3px 10px rgba(0,0,0,0.7) !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Botão FORA do card – com espaço generoso */
   #section-card .card-actions-below {
-    position: relative !important;
-    margin-top: 40px !important;   /* espaço grande entre o card e o botão */
-    width: 100% !important;
+    margin-top: 50px !important;   /* ← esse valor controla o quanto o botão fica "lá embaixo" */
     text-align: center !important;
-    z-index: 30 !important;
   }
 
   #section-card #btnNext {
     min-width: 280px !important;
     padding: 18px 50px !important;
-    font-size: 1.7rem !important;
+    font-size: 1.65rem !important;
     font-weight: 800 !important;
-    background: linear-gradient(145deg, #e6c04a, #d4af37) !important;
+    background: linear-gradient(145deg, #f0d878, #d4af37) !important;
     color: #fff !important;
     border: none !important;
     border-radius: 18px !important;
     box-shadow: 0 10px 30px rgba(0,0,0,0.4) !important;
-    cursor: pointer !important;
   }
-
-  /* Remove qualquer .card-name ou .guide-name que esteja atrapalhando */
-  #section-card .card-name,
-  #section-card .guide-name {
-    display: none !important;
-  }
-}
-   
+} 
    
 /* =========================================
    DESKTOP (≥ 601px)
