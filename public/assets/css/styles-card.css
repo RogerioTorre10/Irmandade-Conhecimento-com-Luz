@@ -193,15 +193,25 @@
     width: 100% !important;
     text-align: center !important;
     z-index: 20 !important;
+    background: transparent !important;
+    border: none !important;      
   }
 
   #section-card #userNameSlot {
+    position: absolute !important;
+    top: 600px !important;             /* ajusta fino: 590–620 se quiser */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 30 !important;
+    background: transparent !important;
+    padding: 0 !important;
     font-size: 1.8rem !important;
     font-weight: 900 !important;
     color: #d4af37 !important;
     text-shadow: 0 4px 10px rgba(0,0,0,0.8) !important;
     text-transform: uppercase !important;
     letter-spacing: 1px !important;
+    border: none !important;
   }
 
   /* ===== BOTÃO CONTINUAR DENTRO DO PERGAMINHO ===== */
@@ -216,6 +226,11 @@
   }
 
   #section-card #btnNext {
+    position: absolute !important;
+    top: 680px !important;             /* se subir o nome, sobe esse também */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 40 !important;
     min-width: 260px !important;
     padding: 16px 30px !important;
     font-size: 1.5rem !important;
@@ -226,7 +241,6 @@
     border-radius: 18px !important;
     box-shadow: 0 10px 28px rgba(0,0,0,0.4) !important;
     pointer-events: auto !important;
-    z-index: 40 !important;
   }
 
 
