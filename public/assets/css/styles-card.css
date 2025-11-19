@@ -144,75 +144,63 @@
 /* =========================================
    SECTION-CARD — MOBILE PERFEITO (selfie no peito + nome + botão fora)
    ========================================= */
-@media (max-width: 640px) {
-
-  /* palco do card - espaço extra */
-  #section-card .card-stage {
-    position: relative !important;
-    width: 88vw;
-    max-width: 380px;
-    margin: 0 auto;
-    margin-top: -8px;
-    padding-bottom: 260px !important;   /* MAIS espaço para o botão */
-    overflow: visible !important;
-    min-height: 100svh;
-  }
-
-  /* container da selfie (flame-layer) */
+@media (max-width: 600px) {
+  /* Centralização e segurança de cliques */
   #section-card .flame-layer {
     position: absolute;
-    left: 50%;
-    bottom: -6%;                     /* <<< AQUI DESCE DE VEZ */
-    transform: translateX(-50%);
-    
-    width: 72%;                      /* tamanho ideal */
-    max-width: 300px;
-    aspect-ratio: 1 / 1;
-    
-    border-radius: 24px;
-    overflow: hidden;
-    z-index: 15 !important;          /* abaixo do botão, acima do card */
+    top: 59%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    width: auto;
+    text-align: center;
+    z-index: 6 !important;
+    opacity: 1 !important;
+    pointer-events: none; /* impede bloqueio de cliques */
   }
 
-  /* imagem da selfie */
-  #section-card .flame-selfie {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center 20%;     /* centraliza, sem cortar testa */
-    border-radius: 24px;
+  /* Selfie ou placeholder: imagem centralizada e inofensiva */
+  #section-card .flame-layer .flame-selfie {
+    display: block;
+    margin: 0 auto;
+    width: min(78%, 310px);
+    height: auto;
+    border-radius: 12px;
+    pointer-events: none; /* garante que ela não capture toques */
+  }
+
+  /* Placeholder menor e sem clique */
+  #section-card .flame-layer.placeholder-only .flame-selfie {
+    width: min(68%, 280px);
+    opacity: 0.95;
+    transform: scale(0.94);
+  }
+
+  /* Nome do participante levemente mais baixo */
+  #section-card .card-footer {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 56px) !important;
+    text-align: center;
+    z-index: 7;
     pointer-events: none;
   }
 
-  /* nome */
-  #section-card .card-name-badge {
-    margin-top: 18px;
-    font-size: 15px;
-    z-index: 20;
-    position: relative;
-  }
-
-  /* BOTÃO CONTINUAR – sempre visível */
+  /* Botão “Continuar” sempre visível e clicável */
+  #section-card #btnStartJourney,
   #section-card #btnNext {
-    position: fixed !important;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 28px) !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    z-index: 99999 !important;
-    pointer-events: auto !important;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 18px) !important;
+    z-index: 15;           /* acima de tudo */
+    pointer-events: auto;  /* clicável */
   }
 
-  /* ações do card */
-  #section-card .card-actions,
-  #section-card .card-actions-below {
-    position: relative;
-    z-index: 30;
-    margin-top: 22px;
+  /* Espaço extra no palco */
+  #section-card .card-stage {
+    padding-bottom: clamp(52px, 10svh, 120px) !important;
+    min-height: 100svh;
   }
 }
-
-
-
 
 
 /* =========================================
