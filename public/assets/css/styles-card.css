@@ -145,7 +145,7 @@
    SECTION-CARD — MOBILE PERFEITO (selfie no peito + nome + botão fora)
    ========================================= */
 @media (max-width: 600px) {
-  /* Palco do card — layout vertical fluido */
+  /* Palco do card — layout fluido e vertical */
   #section-card .card-stage {
     display: flex !important;
     flex-direction: column !important;
@@ -156,7 +156,7 @@
     overflow: visible !important;
   }
 
-  /* Placeholder da selfie — fixo e obediente */
+  /* Placeholder da selfie — fixo e centralizado */
   #section-card .flame-layer {
     position: relative !important;
     margin-top: 36px !important;
