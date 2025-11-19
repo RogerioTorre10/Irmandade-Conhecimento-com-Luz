@@ -166,11 +166,11 @@
   /* PLACEHOLDER DOURADO – POSIÇÃO FIXA NO PEITO (NUNCA MAIS SOBE) */
   #section-card .flame-layer {
     position: absolute !important;
-    top: 380px !important;        /* valor em PX fixo = nunca mais mexe em % */
+    top: 410px !important;        /* valor em PX fixo = nunca mais mexe em % */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    width: 168px !important;      /* tamanho perfeito pro peito */
-    height: 224px !important;     /* 3:4 exato */
+    width: 172px !important;      /* tamanho perfeito pro peito */
+    height: 229px !important;     /* 3:4 exato */
     border: 9px solid #d4af37 !important;
     border-radius: 26px !important;
     box-shadow: 0 20px 50px rgba(0,0,0,0.7) !important;
@@ -180,7 +180,7 @@
   /* TIRA O CARD-FOOTER DE DENTRO DO FLAME-LAYER DE UMA VEZ */
   #section-card .card-footer {
     position: absolute !important;
-    top: 620px !important;        /* logo abaixo do placeholder (336px de distância) */
+    top: 650px !important;        /* logo abaixo do placeholder (336px de distância) */
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 100% !important;
@@ -198,7 +198,7 @@
   /* BOTÃO NA BASE MESMO */
   #section-card .card-actions-below {
     position: absolute !important;
-    bottom: 80px !important;      /* fixo na base da tela */
+    bottom: 100px !important;      /* fixo na base da tela */
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 100% !important;
