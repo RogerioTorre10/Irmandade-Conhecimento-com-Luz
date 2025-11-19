@@ -145,55 +145,79 @@
    SECTION-CARD — MOBILE PERFEITO (versão corrigida 2025)
    ========================================= */
 @media (max-width: 600px) {
-  #section-card * { box-sizing: border-box !important; }
-
+  /* Container principal centralizado */
   #section-card .card-stage {
     position: relative !important;
-    min-height: 100vh !important;
-    padding: 20px 0 150px !important;
-  }
-
-  #section-card .guide-bg {
-    width: 88% !important;
-    max-width: 400px !important;
+    width: 100% !important;
+    max-width: 380px !important;
     margin: 0 auto !important;
-    display: block !important;
+    padding: 20px 0 100px 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
   }
 
-  /* PLACEHOLDER – TRAVADO NO PEITO (NUNCA MAIS SOBE) */
+  /* Fundo do guia (Lumen, etc) – rosto totalmente livre */
+  #section-card .guide-bg {
+    width: 92% !important;
+    max-width: 400px !important;
+    margin-top: 10px !important;
+  }
+
+  /* PLACEHOLDER DOURADO – pequeno e exatamente no peito */
   #section-card .flame-layer {
     position: absolute !important;
-    top: 395px !important;     /* valor testado com seu último print */
+    top: 42% !important;                 /* desce até o peito */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    width: 178px !important;
-    height: 237px !important;
-    border: 9px solid #d4af37 !important;
+    width: 42% !important;               /* menor que antes */
+    max-width: 200px !important;
+    aspect-ratio: 3/4 !important;
+    border: 8px solid #d4af37 !important;
     border-radius: 26px !important;
+    background: rgba(255,255,255,0.96) !important;
     box-shadow: 0 20px 50px rgba(0,0,0,0.7) !important;
-    z-index: 999 !important;
+    z-index: 10 !important;
   }
 
-  /* NOME – LOGO ABAIXO DO PLACEHOLDER */
+  /* Tira o footer de dentro do flame-layer (nome sai do quadro dourado) */
   #section-card .card-footer {
     position: absolute !important;
-    top: 650px !important;     /* 255px abaixo do placeholder = perfeito */
+    top: 64% !important;                 /* logo abaixo do placeholder */
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 100% !important;
     text-align: center !important;
-    z-index: 999 !important;
+    z-index: 15 !important;
   }
 
-  /* BOTÃO – BASE DA TELA */
+  #section-card #userNameSlot {
+    font-size: 1.85rem !important;
+    font-weight: 900 !important;
+    color: #d4af37 !important;
+    text-shadow: 0 4px 12px rgba(0,0,0.9) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+  }
+
+  /* Botão bem na base da tela */
   #section-card .card-actions-below {
-    position: absolute !important;
-    bottom: 100px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 100% !important;
+    position: relative !important;
+    margin-top: 100px !important;        /* controla a distância da base */
     text-align: center !important;
-    z-index: 999 !important;
+    width: 100% !important;
+  }
+
+  #section-card #btnNext {
+    min-width: 300px !important;
+    padding: 20px 50px !important;
+    font-size: 1.75rem !important;
+    font-weight: 800 !important;
+    background: linear-gradient(145deg, #f0d878, #d4af37) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 20px !important;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5) !important;
   }
 }
 
