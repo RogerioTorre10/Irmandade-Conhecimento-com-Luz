@@ -145,85 +145,55 @@
    SECTION-CARD — MOBILE PERFEITO (versão corrigida 2025)
    ========================================= */
 @media (max-width: 600px) {
+  #section-card * { box-sizing: border-box !important; }
 
-  /* CONTAINER PRINCIPAL – vira referência de posicionamento */
   #section-card .card-stage {
     position: relative !important;
     min-height: 100vh !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-start !important;
-    align-items: center !important;
-    padding: 0;
-    padding-top: 40px !important; 
-    padding-bottom: 140px !important;
+    padding: 20px 0 150px !important;
   }
 
-  /* GUIA DE FUNDO */
   #section-card .guide-bg {
-    width: 90% !important;
+    width: 88% !important;
     max-width: 400px !important;
+    margin: 0 auto !important;
+    display: block !important;
   }
 
-  /* PLACEHOLDER DOURADO – POSIÇÃO FIXA NO PEITO (NUNCA MAIS SOBE) */
+  /* PLACEHOLDER – TRAVADO NO PEITO (NUNCA MAIS SOBE) */
   #section-card .flame-layer {
     position: absolute !important;
-    top: 380px !important;        /* valor em PX fixo = nunca mais mexe em % */
+    top: 395px !important;     /* valor testado com seu último print */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    width: 174px !important;      /* tamanho perfeito pro peito */
-    height: 232px !important;     /* 3:4 exato */
+    width: 178px !important;
+    height: 237px !important;
     border: 9px solid #d4af37 !important;
     border-radius: 26px !important;
     box-shadow: 0 20px 50px rgba(0,0,0,0.7) !important;
-    z-index: 10 !important;
+    z-index: 999 !important;
   }
 
-  /* TIRA O CARD-FOOTER DE DENTRO DO FLAME-LAYER DE UMA VEZ */
+  /* NOME – LOGO ABAIXO DO PLACEHOLDER */
   #section-card .card-footer {
     position: absolute !important;
-    top: 630px !important;        /* logo abaixo do placeholder (336px de distância) */
+    top: 650px !important;     /* 255px abaixo do placeholder = perfeito */
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 100% !important;
     text-align: center !important;
-    z-index: 15 !important;
+    z-index: 999 !important;
   }
 
-  #section-card #userNameSlot {
-    font-size: 1.85rem !important;
-    font-weight: 900 !important;
-    color: #d4af37 !important;
-    text-shadow: 0 4px 12px rgba(0,0,0,0.9) !important;
-    text-transform: uppercase !important;
-    letter-spacing: 1.2px !important;
-    background: rgba(0,0,0,0.35) !important;
-    border: 3px solid #d4af37 !important;
-    border-radius: 16px !important;
-    padding: 14px 30px !important;
-    max-width: 280px !important;
-    text-align: center !important;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.6) !important;
-  }
-
-  /* BOTÃO NA BASE MESMO */
+  /* BOTÃO – BASE DA TELA */
   #section-card .card-actions-below {
     position: absolute !important;
-    bottom: 90px !important;      /* fixo na base da tela */
+    bottom: 100px !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 100% !important;
     text-align: center !important;
-    z-index: 20 !important; 
-  }
-
-   #section-card #btnNext {
-    min-width: 300px !important;
-    padding: 20px 50px !important;
-    font-size: 1.8rem !important;
-    background: linear-gradient(145deg, #f0d878, #d4af37) !important;
-    border-radius: 22px !important;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.5) !important;
+    z-index: 999 !important;
   }
 }
 
