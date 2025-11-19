@@ -167,11 +167,11 @@
   /* PLACEHOLDER DOURADO – pequeno e exatamente no peito */
   #section-card .flame-layer {
     position: absolute !important;
-    top: 42% !important;                 /* desce até o peito */
+    top: 46% !important;                 /* desce até o peito */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    width: 42% !important;               /* menor que antes */
-    max-width: 200px !important;
+    width: 41% !important;               /* menor que antes */
+    max-width: 195px !important;
     aspect-ratio: 3/4 !important;
     border: 8px solid #d4af37 !important;
     border-radius: 26px !important;
@@ -183,7 +183,7 @@
   /* Tira o footer de dentro do flame-layer (nome sai do quadro dourado) */
   #section-card .card-footer {
     position: absolute !important;
-    top: 64% !important;                 /* logo abaixo do placeholder */
+    top: 68% !important;                 /* logo abaixo do placeholder */
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 100% !important;
@@ -203,7 +203,7 @@
   /* Botão bem na base da tela */
   #section-card .card-actions-below {
     position: relative !important;
-    margin-top: 100px !important;        /* controla a distância da base */
+    margin-top: 130px !important;        /* controla a distância da base */
     text-align: center !important;
     width: 100% !important;
   }
