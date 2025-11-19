@@ -220,6 +220,25 @@
     box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important;
     pointer-events: auto !important;
   }
+   /* Pergaminho não interfere */
+#section-card.pergaminho::before,
+#section-card.pergaminho-v::before {
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+   #section-card .pergaminho,
+#section-card .pergaminho-v {
+  overflow: visible !important;
+  padding-bottom: 240px !important;
+  min-height: 100vh !important;
+  height: auto !important;
+}
+  /* Garante que nenhum outro placeholder antigo apareça */
+  #section-card .card-selfie-slot,
+  #section-card .selfie-placeholder,
+  #section-card .card-selfie-placeholder {
+    display: none !important;
+  } 
 }
 
 
