@@ -145,75 +145,78 @@
    SECTION-CARD — MOBILE PERFEITO (versão corrigida 2025)
    ========================================= */
 @media (max-width: 600px) {
-  #section-card .card-stage {
+  /* =============== GUIA DE FUNDO (fica inteiro, rosto livre) =============== */
+  #section-card .guide-bg {
     position: relative !important;
-    width: 90vw !important;
-    max-width: 380px !important;
+    width: 100% !important;
+    max-width: 400px !important;
     margin: 0 auto !important;
-    padding: 20px 0 70px 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-  }
-
-  /* Selfie no peito – tamanho e posição perfeitos */
-  #section-card .flame-layer {
-    position: relative !important;
-    width: 58% !important;
-    max-width: 240px !important;
-    aspect-ratio: 3/4 !important;
-    border: 8px solid #d4af37 !important;
-    border-radius: 28px !important;
-    background: rgba(255,255,255,0.96) !important;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important;
-    margin-top: 32px !important;
-    overflow: hidden !important;
-  }
-
-  /* NOME DO PARTICIPANTE – coladinho embaixo da selfie, dentro do card */
-  #section-card .card-footer {
-    position: relative !important;
-    margin-top: -12px !important;   /* sobe pra ficar quase encostado na borda */
-    padding: 8px 16px 14px !important;
-    text-align: center !important;
-    background: rgba(255,255,255,0.85) !important;
-    border-radius: 0 0 20px 20px !important; /* só cantos inferiores arredondados */
-  }
-
-  #section-card .card-name-badge {
     display: block !important;
   }
 
-  #section-card #userNameSlot {
-    font-size: 1.55rem !important;     /* tamanho perfeito pro mobile */
-    font-weight: 900 !important;
-    color: #d4af37 !important;
-    text-shadow: 0 3px 10px rgba(0,0,0,0.7) !important;
-    letter-spacing: 0.5px !important;
-    text-transform: uppercase !important;
-    white-space: nowrap !important;
+  /* =============== PLACEHOLDER DOURADO — EXATAMENTE NO PEITO =============== */
+  #section-card .flame-layer {
+    position: absolute !important;     /* agora absoluto em relação ao guide-bg */
+    top: 38% !important;               /* ← esse valor é o ouro: desce até o peito */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 46% !important;             /* um pouco menor que antes pra não cobrir ombros */
+    max-width: 210px !important;
+    aspect-ratio: 3/4 !important;
+    border: 9px solid #d4af37 !important;
+    border-radius: 28px !important;
+    background: rgba(255,255,255,0.96) !important;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.7) !important;
+    z-index: 10 !important;
     overflow: hidden !important;
-    text-overflow: ellipsis !important;
   }
 
-  /* Botão FORA do card – com espaço generoso */
-  #section-card .card-actions-below {
-    margin-top: 50px !important;   /* ← esse valor controla o quanto o botão fica "lá embaixo" */
+  /* Selfie dentro do placeholder */
+  #section-card .flame-selfie {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  /* =============== NOME DO PARTICIPANTE — coladinho embaixo do placeholder =============== */
+  #section-card .card-footer {
+    position: absolute !important;
+    bottom: 12% !important;            /* fica logo abaixo do quadro dourado */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 56% !important;
+    max-width: 240px !important;
     text-align: center !important;
+    z-index: 15 !important;
+  }
+
+  #section-card #userNameSlot {
+    font-size: 1.75rem !important;
+    font-weight: 900 !important;
+    color: #d4af37 !important;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.9) !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+  }
+
+  /* =============== BOTÃO CONTINUAR — lá embaixo mesmo =============== */
+  #section-card .card-actions-below {
+    position: relative !important;
+    margin-top: 110px !important;      /* espaço generoso embaixo do guia inteiro */
+    text-align: center !important;
+    z-index: 20 !important;
   }
 
   #section-card #btnNext {
-    min-width: 280px !important;
-    padding: 18px 50px !important;
-    font-size: 1.65rem !important;
+    min-width: 290px !important;
+    padding: 20px 50px !important;
+    font-size: 1.7rem !important;
     font-weight: 800 !important;
     background: linear-gradient(145deg, #f0d878, #d4af37) !important;
-    color: #fff !important;
-    border: none !important;
-    border-radius: 18px !important;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.5) !important;
   }
-} 
+}
    
 /* =========================================
    DESKTOP (≥ 601px)
