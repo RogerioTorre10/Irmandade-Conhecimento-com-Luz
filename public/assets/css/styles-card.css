@@ -174,7 +174,7 @@
 
     width: 52% !important;                 /* MAIS LARGO (mais quadrado) */
     max-width: 195px !important;
-    aspect-ratio: 3 / 2.6 !important;      /* menos “altão” */
+    aspect-ratio: 3 / 2.75 !important;      /* menos “altão” */
 
     border-radius: 22px !important;
     background: rgba(255,255,255,0.95) !important;
@@ -199,10 +199,10 @@
 
   #section-card #userNameSlot {
     position: absolute !important;
-    top: 610px !important;             /* ajusta fino: 590–620 se quiser */
+    top: 602px !important;             /* ajusta fino: 590–620 se quiser */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    z-index: 30 !important;
+    z-index: 50 !important;
     background: transparent !important;
     padding: 0 !important;
     font-size: 1.8rem !important;
@@ -227,10 +227,10 @@
 
   #section-card #btnNext {
     position: absolute !important;
-    top: 700px !important;             /* se subir o nome, sobe esse também */
+    top: 675px !important;             /* se subir o nome, sobe esse também */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    z-index: 99999 !important;
+    z-index: 9999 !important;
     opacity: 1 !important; 
     min-width: 260px !important;
     padding: 16px 30px !important;
