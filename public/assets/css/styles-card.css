@@ -161,25 +161,20 @@
 
   /* A SELFIE É O .flame-layer — AJUSTE DE POSIÇÃO (SUBIR) */
    #section-card .flame-layer {
-  position: absolute !important;
-  left: 50% !important;
-  top: 300px !important;
-  transform: translateX(-50%) !important;    
-  width: clamp(90px, 58%, 720px);
-  max-width: 240px !important;
-  height: auto !important;    
-  aspect-ratio: 3 / 4;
-  min-height: 280px;
-  border: 8px solid #d4af37 !important;    
-  border-radius: 28px;
-  background: rgba(255,255,255,0.94) !important;    
-  overflow: hidden !important;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important;
-  z-index: 10 !important;
-  pointer-events: none !important;
-  margin: 0 !important;   
-}
-  /* Nome do participante — AJUSTE DE POSIÇÃO (SUBIR) */
+   position: absolute;
+   top: 58,5%; 
+   left: 0; 
+   right: 0; 
+   bottom: auto !important; 
+   transform: translateY(-50%); 
+   width: auto; 
+   text-align: center; 
+   z-index: 6 !important; 
+   opacity: 1 !important; 
+   pointer-events: none; /* impede bloqueio de cliques */ }
+  
+   
+   /* Nome do participante — AJUSTE DE POSIÇÃO (SUBIR) */
   #section-card .guide-name,
   #section-card .card-name {
     position: absolute !important; 
