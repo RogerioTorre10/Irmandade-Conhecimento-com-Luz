@@ -146,29 +146,28 @@
    ========================================= */
 @media (max-width: 640px) {
 
-  /* palco do card */
+  /* palco do card - espaço extra */
   #section-card .card-stage {
-    position: relative;
-    margin-top: 8px;                 /* tira o corte no topo */
-    padding-bottom: 160px;           /* espaço pro nome + botão */
+    margin-top: -8px;
+    padding-bottom: 260px !important;   /* MAIS espaço para o botão */
+    overflow: visible !important;
     min-height: 100svh;
-    overflow: visible;
   }
 
   /* container da selfie (flame-layer) */
   #section-card .flame-layer {
     position: absolute;
-    top: 68%;                         /* centro da selfie na altura do peito */
     left: 50%;
-    transform: translate(-50%, -50%);
+    bottom: -6%;                     /* <<< AQUI DESCE DE VEZ */
+    transform: translateX(-50%);
     
-    width: 54%;
-    max-width: 210px;
+    width: 72%;                      /* tamanho ideal */
+    max-width: 300px;
     aspect-ratio: 1 / 1;
-
-    border-radius: 22px;
+    
+    border-radius: 24px;
     overflow: hidden;
-    z-index: 15;
+    z-index: 15 !important;          /* abaixo do botão, acima do card */
   }
 
   /* imagem da selfie */
@@ -176,40 +175,38 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 15%;      /* não corta a testa */
-    border-radius: 22px;
+    object-position: center 20%;     /* centraliza, sem cortar testa */
+    border-radius: 24px;
     pointer-events: none;
   }
 
-  /* nome do participante */
+  /* nome */
   #section-card .card-name-badge {
-    position: relative;
     margin-top: 18px;
     font-size: 15px;
     z-index: 20;
+    position: relative;
   }
 
-  /* BOTÃO CONTINUAR – logo abaixo do nome */
+  /* BOTÃO CONTINUAR – sempre visível */
   #section-card #btnNext {
-    position: relative !important;
-    bottom: auto !important;
+    position: fixed !important;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 28px) !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    margin-top: 16px;
-    z-index: 30 !important;
+    z-index: 99999 !important;
     pointer-events: auto !important;
-    display: inline-block;
   }
 
-  /* wrapper das ações, só garante a ordem */
+  /* ações do card */
   #section-card .card-actions,
   #section-card .card-actions-below {
     position: relative;
-    z-index: 25;
-    text-align: center;
-    margin-top: 0;
+    z-index: 30;
+    margin-top: 22px;
   }
 }
+
 
 
 
