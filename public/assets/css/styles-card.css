@@ -166,7 +166,7 @@
   /* PLACEHOLDER DOURADO – POSIÇÃO FIXA NO PEITO (NUNCA MAIS SOBE) */
   #section-card .flame-layer {
     position: absolute !important;
-    top: 320px !important;        /* valor em PX fixo = nunca mais mexe em % */
+    top: 380px !important;        /* valor em PX fixo = nunca mais mexe em % */
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 168px !important;      /* tamanho perfeito pro peito */
@@ -180,7 +180,7 @@
   /* TIRA O CARD-FOOTER DE DENTRO DO FLAME-LAYER DE UMA VEZ */
   #section-card .card-footer {
     position: absolute !important;
-    top: 560px !important;        /* logo abaixo do placeholder (336px de distância) */
+    top: 620px !important;        /* logo abaixo do placeholder (336px de distância) */
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 100% !important;
