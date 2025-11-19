@@ -167,21 +167,20 @@
   left: 50% !important;
   top: auto !important;
   transform: none !important;    
-  width: clamp(90px, 58%, 720px);
+  width: 58% !important;
   max-width: 240px !important;
   height: auto !important;    
   aspect-ratio: 3 / 4;
   margin: 0 !important;
-  margin-top: 40px !important;
+  margin-top: 20px !important;
   min-height: 220px !important;
   border: 8px solid #d4af37 !important;    
-  border-radius: 28px;
+  border-radius: 28px !important;
   background: rgba(255,255,255,0.94) !important;    
   overflow: hidden !important;
   box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important;
   z-index: 10 !important;
-  pointer-events: none !important;
-    
+  pointer-events: none !important;    
 }  
    
    /* Nome do participante — AJUSTE DE POSIÇÃO (SUBIR) */
