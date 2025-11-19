@@ -142,96 +142,86 @@
 }
 
 /* =========================================
-   SECTION-CARD — MOBILE PERFEITO (selfie no peito + nome + botão fora)
+   SECTION-CARD — MOBILE PERFEITO (versão corrigida 2025)
    ========================================= */
-@media (max-width: 600px)
-{ /* Palco do card (pai)
-   */ #section-card .card-stage {
-   position: relative !important;
-   width: 88vw !important; 
-   max-width: 380px !important;
-   margin: 0 auto !important;
-   margin-top: 0 !important;
-   margin-bottom: 0 !important;
-   display: flex !important;
-   flex-direction: column !important;
-   align-items: center !important;
-   padding-top: 20px !important;
-   padding-bottom: 40px !important; 
-   overflow: visible !important; 
-}
+@media (max-width: 600px) {
+  #section-card .card-stage {
+    position: relative !important;
+    width: 90vw !important;
+    max-width: 380px !important;
+    margin: 0 auto !important;
+    padding: 20px 0 50px 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    overflow: visible !important;
+  }
 
-  /* A SELFIE É O .flame-layer — AJUSTE DE POSIÇÃO (SUBIR) */
-   #section-card .flame-layer {
-  position: relative !important;
-    margin-top: 36px !important;
+  /* ===== SELFIE (flame-layer) — fica no peito ===== */
+  #section-card .flame-layer {
+    position: relative !important;
     width: 58% !important;
     max-width: 240px !important;
-    min-height: 220px !important;
-    aspect-ratio: 3 / 4 !important;
+    aspect-ratio: 3/4 !important;
     border: 8px solid #d4af37 !important;
     border-radius: 28px !important;
     background: rgba(255,255,255,0.94) !important;
     box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important;
-    z-index: 10 !important; 
-}  
-   
-   /* Nome do participante — AJUSTE DE POSIÇÃO (SUBIR) */
-  #section-card .guide-name, 
-   #section-card .card-name { 
-   position: relative !important;
-   left: 50% !important; 
-   transform: translateX(-50%) !important;      
-   bottom: 180px !important; /* <-- Ajustado de 150px para 110px */ 
-   font-size: 1.95rem !important;
-   font-weight: 900 !important;
-   color: #d4af37 !important;
-   text-shadow: 0 4px 14px rgba(0,0,0,0.9) !important;
-   text-align: center !important;
-   z-index: 15 !important;
-   margin-top: 16px !important;
-   display: block !important; 
-   }
-   
-   /* Campo de input para nome do participante */
-  #section-card .card-name-input {
-    position: relative !important;
-    display: block !important;
-    margin: 16px auto 0 auto !important;
-    margin-top: 12px !important; 
-    width: 80% !important;
-    max-width: 320px !important;
-    font-size: 1.2rem !important;
-    padding: 12px 16px !important;
-    border: 2px solid #d4af37 !important;
-    border-radius: 12px !important;
-    background: #fff !important;
-    z-index: 20 !important;
-    text-align: center !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important; 
+    z-index: 10 !important;
+    margin-top: 30px !important;
   }
 
- 
-  /* Botão FORA do card (.card-actions-below) — Estilizado */
+  /* ===== CONTAINER DO INPUT (dentro do card, logo abaixo da selfie) ===== */
+  #section-card .input-container {
+    position: relative !important;
+    width: 80% !important;
+    max-width: 300px !important;
+    margin-top: -40px !important;   /* sobe o input pra ficar colado na selfie */
+    z-index: 20 !important;
+  }
+
+  /* ===== INPUT DO NOME (dentro do card) ===== */
+  #section-card .card-name-input {
+    width: 100% !important;
+    padding: 14px 20px !important;
+    font-size: 1.35rem !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    border: 2px solid #d4af37 !important;
+    border-radius: 16px !important;
+    background: #fff !important;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25) !important;
+    margin-bottom: 20px !important;
+  }
+
+  /* ===== BOTÃO FORA DO CARD (lá embaixo) ===== */
   #section-card .card-actions-below {
     position: relative !important;
-    margin-top: 24px !important;
-    text-align: center !important;
+    margin-top: 40px !important;   /* espaço grande entre o card e o botão */
     width: 100% !important;
-    z-index: 25 !important;  
+    text-align: center !important;
+    z-index: 30 !important;
   }
 
   #section-card #btnNext {
-    min-width: 260px !important;
-    padding: 18px 40px !important;
-    font-size: 1.6rem !important;
-    background-color: #d4af37 !important; 
+    min-width: 280px !important;
+    padding: 18px 50px !important;
+    font-size: 1.7rem !important;
+    font-weight: 800 !important;
+    background: linear-gradient(145deg, #e6c04a, #d4af37) !important;
     color: #fff !important;
     border: none !important;
-    border-radius: 14px !important;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important;
-    pointer-events: auto !important;
+    border-radius: 18px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4) !important;
+    cursor: pointer !important;
   }
+
+  /* Remove qualquer .card-name ou .guide-name que esteja atrapalhando */
+  #section-card .card-name,
+  #section-card .guide-name {
+    display: none !important;
+  }
+}
    
    
 /* =========================================
