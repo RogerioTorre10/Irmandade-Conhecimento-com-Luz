@@ -148,6 +148,10 @@
 
   /* palco do card - espaço extra */
   #section-card .card-stage {
+    position: relative !important;
+    width: 88vw;
+    max-width: 380px;
+    margin: 0 auto;
     margin-top: -8px;
     padding-bottom: 260px !important;   /* MAIS espaço para o botão */
     overflow: visible !important;
