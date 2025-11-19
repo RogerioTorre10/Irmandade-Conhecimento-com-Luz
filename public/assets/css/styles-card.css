@@ -144,90 +144,70 @@
 /* =========================================
    SECTION-CARD — MOBILE PERFEITO (selfie no peito + nome + botão fora)
    ========================================= */
-@media (max-width: 600px) {
+@media (max-width: 640px) {
+
   /* palco do card */
   #section-card .card-stage {
     position: relative;
-    width: 82vw;
-    max-width: 320px;
-    margin: 24px auto 0;
-    border-radius: 22px;
-
-    /* altura vem do conteúdo, não força tela cheia */
-    min-height: auto;
-    aspect-ratio: auto;
-    padding-bottom: 140px;   /* espaço pro nome + botão */
+    margin-top: 8px;                 /* tira o corte no topo */
+    padding-bottom: 160px;           /* espaço pro nome + botão */
+    min-height: 100svh;
     overflow: visible;
   }
 
-  /* fundo do guia (LUMEN) */
-  #section-card #guideBg {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 3 / 4;
-    display: block;
-    object-fit: cover;
-    object-position: 50% 18%;   /* ajusta o enquadramento rosto/peito */
-  }
-
-  /* container da selfie / placeholder */
+  /* container da selfie (flame-layer) */
   #section-card .flame-layer {
     position: absolute;
-    top: 75%;
+    top: 68%;                         /* centro da selfie na altura do peito */
     left: 50%;
     transform: translate(-50%, -50%);
-
-    width: 56%;
+    
+    width: 54%;
     max-width: 210px;
-    aspect-ratio: 3 / 4;
-    border-radius: 20px;
+    aspect-ratio: 1 / 1;
+
+    border-radius: 22px;
     overflow: hidden;
     z-index: 15;
   }
 
-  /* imagem da selfie / placeholder */
+  /* imagem da selfie */
   #section-card .flame-selfie {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 20%;
-    border-radius: 20px;
+    object-position: center 15%;      /* não corta a testa */
+    border-radius: 22px;
     pointer-events: none;
   }
 
-  /* rodapé com o nome */
-  #section-card .card-footer {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 26px;
-    z-index: 20;
-    text-align: center;
-    pointer-events: none;
-  }
-
+  /* nome do participante */
   #section-card .card-name-badge {
-    margin-top: 12px;
-    font-size: 14px;
-  }
-
-  /* botão continuar logo abaixo do card, bem centralizado */
-  #section-card .card-actions,
-  #section-card .card-actions-below {
     position: relative;
-    z-index: 25;
-    text-align: center;
-    margin-top: 12px;
+    margin-top: 18px;
+    font-size: 15px;
+    z-index: 20;
   }
 
+  /* BOTÃO CONTINUAR – logo abaixo do nome */
   #section-card #btnNext {
     position: relative !important;
     bottom: auto !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    margin-top: 8px;
-    display: inline-block;
+    margin-top: 16px;
+    z-index: 30 !important;
     pointer-events: auto !important;
+    display: inline-block;
+  }
+
+  /* wrapper das ações, só garante a ordem */
+  #section-card .card-actions,
+  #section-card .card-actions-below {
+    position: relative;
+    z-index: 25;
+    text-align: center;
+    margin-top: 0;
   }
 }
 
