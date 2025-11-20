@@ -175,7 +175,7 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 320px !important;                 /* altura do peito */
+    top: 80px !important;                 /* altura do peito */
     transform: translateX(-50%) !important;
     width: clamp(90px, 58%, 720px);
     max-width: 240px !important;
@@ -207,8 +207,32 @@
     transform: translateX(-50%) !important;
     bottom: 110px !important;
     text-align: center;
-    z-index: 11;
-    pointer-events: none;
+    display: block !important; 
+    pointer-events: auto !important;
+    top: 540px !important;
+    width: 80% !important;
+    max-width: 210px !important;
+    z-index: 60 !important; 
+  }
+   
+    #section-card #userNameSlot {
+    position: absolute !important;    
+    top: 380px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 140px !important; 
+    height: 140px !important;
+    aspect-ratio: 1/1 !important;  
+    font-size: 1.55rem !important;         /* tamanho perfeito pro espaço pequeno */
+    font-weight: 900 !important;
+    color: #d4af37 !important;
+    text-align: center !important;
+    font-size: 1.55rem !important;
+    font-weight: 900 !important;   
+    text-shadow: 0 3px 8px rgba(0,0,0,0.9) !important;
+    letter-spacing: 1.5px !important;
+    display: block !important;
+    z-index: 55 !important;
   }
 
   /* Botão antigo dentro do card some */
@@ -219,15 +243,17 @@
   /* Área do botão FORA do card */
   #section-card .card-actions-below {
     position: relative !important;
-    margin-top: 12px !important;
+    margin-top: 100px !important;
     padding: 0 !important;
     text-align: center !important;
     width: 100% !important;
+    top: 535px !important; 
   }
 
   /* Botão CONTINUAR — bloco normal abaixo do card */
   #section-card #btnStartJourney,
   #section-card #btnNext {
+    top: 522px !important; 
     position: static !important;
     transform: none !important;
     bottom: auto !important;
