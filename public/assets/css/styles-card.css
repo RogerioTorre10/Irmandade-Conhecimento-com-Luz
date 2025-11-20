@@ -161,6 +161,7 @@
     max-width: 380px !important;
     margin: 0 auto !important;
     padding: 40px 0 180px !important; /* espaço pro nome + botão externo */
+    padding-bottom: 120px !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -253,19 +254,21 @@
   }
 
   /* ==================== BOTÃO CONTINUAR (FORA DO CARD) ==================== */
-  #section-card .card-actions-below {
+#section-card .card-actions-below {
   position: fixed !important;
+  bottom: 0 !important;
   left: 0 !important;
   right: 0 !important;
-  bottom: 0 !important;
   width: 100% !important;
   text-align: center !important;
   padding: 12px 0 calc(12px + env(safe-area-inset-bottom)) !important;
-  background: transparent !important;
-  z-index: 999 !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  z-index: 9999 !important;
 }
 
-  #section-card #btnStartJourney,
+
+
+ #section-card #btnStartJourney,
 #section-card #btnNext {
   display: inline-block !important;
   min-width: 260px !important;
