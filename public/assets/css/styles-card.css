@@ -147,6 +147,7 @@
    ========================================= */
 @media (max-width: 600px) {
   #section-card {
+    position: relative !important;
     min-height: 100vh !important;
     height: auto !important;
     padding: 20px 0 80px !important; /* só o necessário */
@@ -175,7 +176,7 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 252px !important;
+    top: 330px !important;
     transform: translateX(-50%) !important;
     width: clamp(142px, 66%, 275px) !important;
     height: auto !important;
@@ -204,7 +205,7 @@
   #section-card .card-footer {
     position: absolute !important;
     left: 50% !important;
-    top: 602px !important;
+    top: 680px !important;
     transform: translateX(-50%) !important;
     width: clamp(142px, 66%, 275px) !important;
     max-width: 300px !important;
@@ -261,8 +262,10 @@
 
   #section-card #btnStartJourney,
   #section-card #btnNext {
-    position: static !important;
-    transform: none !important;
+    position: absolute !important;
+    left: 50% !important;
+    bottom: 24px !important; 
+    transform: translateX(-50%) !important;
     display: inline-block !important;
     min-width: 260px !important;
     padding: 18px 50px !important;
@@ -275,12 +278,13 @@
     box-shadow: 0 8px 25px rgba(0,0,0,0.5) !important;
     cursor: pointer !important;
     transition: all 0.3s !important;
+    z-index: 30 !important;  
   }
 
   /* Hover/touch feedback */
   #section-card #btnStartJourney:active,
   #section-card #btnNext:active {
-    transform: translateY(4px) !important;
+    transform: translate(-50%, 4px) !important;
     box-shadow: 0 4px 12px rgba(0,0,0,0.6) !important;
   }
 
