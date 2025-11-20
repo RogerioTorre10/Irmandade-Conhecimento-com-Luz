@@ -206,18 +206,21 @@
     left: 50% !important;
     transform: translateX(-50%) !important;
     bottom: auto !important;
-    text-align: center;
     display: block !important; 
     pointer-events: auto !important;
-    top: 615px !important;
+    top: 625px !important;
     width: 80% !important;
     max-width: 210px !important;
-    z-index: 60 !important; 
+    z-index: 9999 !important;
+    color: #d4af37 !important;
+    font-weight: 900 !important;
+    text-align: center;
+    text-shadow: 0 3px 8px rgba(0,0,0,0.9) !important; 
   }
    
     #section-card #userNameSlot {
     position: absolute !important;    
-    top: 470px !important;
+    top: 480px !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 140px !important; 
