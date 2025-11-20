@@ -171,14 +171,15 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 78px !important;
+    top: 88px !important;
     transform: translateX(-50%) !important;
-    width: clamp(118px, 56%, 240px) !important;
+    width: clamp(122px, 58%, 245px) !important;
     height: auto !important;
     aspect-ratio: 3 / 4 !important;     /* retrato clássico de celular */
     max-height: 380px !important;
-    border: 9px solid #d4af37 !important;
-    border-radius: 26px !important;
+    max-width: 245px !important; 
+    border: 10px solid #d4af37 !important;
+    border-radius: 28px !important;
     background: #fff !important;
     overflow: hidden !important;
     box-shadow: 0 18px 45px rgba(0,0,0,0.7) !important;
@@ -199,7 +200,7 @@
   #section-card .card-footer {
     position: absolute !important;
     left: 50% !important;
-    top: 378px !important;
+    top: 392px !important;
     transform: translateX(-50%) !important;
     width: clamp(118px, 56%, 240px) !important;
     max-width: 300px !important;
@@ -226,13 +227,13 @@
     left: auto !important;
     transform: none !important;
     width: 100% !important;
-    height: 48px !important;
+    height: 52px !important;
     line-height: 48px !important; 
     padding: 0 !important;
     background: rgba(0,0,0,0.72) !important;
-    border-radius: 0 0 22px 22px !important;
+    border-radius: 0 0 24px 24px !important;
     color: #d4af37 !important;
-    font-size: 1.48rem !important;
+    font-size: 1.52rem !important;
     font-weight: 900 !important;
     text-align: center !important;
     text-transform: uppercase !important;
