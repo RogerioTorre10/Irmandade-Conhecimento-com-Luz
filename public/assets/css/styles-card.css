@@ -145,24 +145,29 @@
    SECTION-CARD — MOBILE PERFEITO (versão corrigida 2025)
    ========================================= */
 @media (max-width: 600px) {
+  /* 1. CONTAINER PRINCIPAL: Define a referência para todos os elementos internos. */
   #section-card .card-stage {
-    position: relative !important;
+    position: relative !important; /* ESSENCIAL! Torna-o o ponto de referência (0,0) para elementos absolutos internos. */
     width: 100% !important;
     max-width: 350px !important;
     margin: 0 auto !important;
-    padding: 20px 0 120px 0 !important;
+    /* Redefina o padding: remova o padding-bottom grande e deixe a altura do card ser definida pelo conteúdo. */
+    padding: 20px 0 0 0 !important; 
     overflow: visible !important;
+    /* Se a imagem for o primeiro filho, o tamanho do card será o tamanho da imagem. */
   }
 
-  /* PERGAMINHO MUITO PEQUENO (agora sim igual ao seu print) */
+  /* 2. PERGAMINHO INFERIOR (Onde está o nome) */
   #section-card .flame-layer {
     position: absolute !important;
-    top: 440px !important;                 /* posição exata no peito */
+    /* Use porcentagem para o TOP para que a posição seja relativa à altura total do CARD (a imagem da garota).
+       (Se 58% é a altura da garota, 80% deve colocá-lo sobre o peito, experimente!) */
+    top: 78% !important; /* Ajuste este valor em porcentagem (Ex: 78%) */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    width: 54% !important;                  /* bem estreitinho */
+    width: 54% !important;
     max-width: 190px !important;
-    height: 70px !important;                /* ALTURA FINAL = mini-selo */
+    height: 70px !important;
     border-radius: 18px !important;
     background: rgba(255,255,255,0.98) !important;
     border: 7px solid #d4af37 !important;
@@ -171,37 +176,43 @@
     pointer-events: none !important;
   }
 
-  /* INPUT DO NOME – perfeitamente dentro do mini-pergaminho */
-  #section-card .card-footer {
-    top: 492px !important;
-    width: 62% !important;
-    max-width: 210px !important;
-    z-index: 20 !important;
-  }
-
+  /* 3. INPUT/SLOT DO NOME */
   #section-card #userNameSlot {
-    top: 472px !important;
+    position: absolute !important; /* Deve ser absoluto, mas sua referência é o CARD */
+    top: 79.5% !important; /* Ajuste este TOP para ficar alinhado com o pergaminho. Deve ser um pouco maior que o TOP do pergaminho. */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    font-size: 1.55rem !important;         /* tamanho perfeito pro espaço pequeno */
+    width: 90% !important; /* Ajuste se necessário */
+    text-align: center !important;
+    font-size: 1.55rem !important;
     font-weight: 900 !important;
     color: #d4af37 !important;
     text-shadow: 0 3px 8px rgba(0,0,0,0.9) !important;
     letter-spacing: 1.5px !important;
     z-index: 50 !important;
   }
-
-  /* BOTÃO CONTINUAR – fora do card, coladinho embaixo */
-  #section-card .card-actions-below { top: 535px !important; }
+  
+  /* Remova .card-footer se não contiver nada além do #userNameSlot e se for um elemento obsoleto. */
+  #section-card .card-footer { display: none !important; }
+  
+  /* 4. BOTÃO CONTINUAR: Fora do card. Use margin-top para empurrá-lo ou ajuste sua posição. */
+  #section-card .card-actions-below { 
+    position: absolute !important; 
+    top: calc(78% + 100px) !important; /* Exemplo: Topo do pergaminho + um espaçamento (100px) */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 5 !important;
+  }
+  
   #section-card #btnNext {
-    top: 522px !important;                 /* só 10–12px de distância do pergaminho */
+    /* Mantenha o estilo do botão */
     min-width: 260px !important;
     padding: 15px 30px !important;
     font-size: 1.45rem !important;
     border-radius: 20px !important;
+    /* Remova `top` se estiver usando o `.card-actions-below` para o posicionamento */
   }
 }
-   
 /* =========================================
    DESKTOP (≥ 601px)
    ========================================= */
