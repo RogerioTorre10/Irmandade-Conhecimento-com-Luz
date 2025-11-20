@@ -161,6 +161,8 @@
     max-width: 380px !important;
     margin: 0 auto !important;
     padding: 40px 0 180px !important; /* espaço pro nome + botão externo */
+    padding-top: 20px !important;
+    padding-bottom: 220px !important; 
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -171,18 +173,18 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 88px !important;
+    top: 165px !important;
     transform: translateX(-50%) !important;
-    width: clamp(122px, 58%, 245px) !important;
+    width: clamp(132px, 62%, 260px) !important;
     height: auto !important;
     aspect-ratio: 3 / 4 !important;     /* retrato clássico de celular */
     max-height: 380px !important;
-    max-width: 245px !important; 
-    border: 10px solid #d4af37 !important;
-    border-radius: 28px !important;
+    max-width: 260px !important; 
+    border: 11px solid #d4af37 !important;
+    border-radius: 30px !important;
     background: #fff !important;
     overflow: hidden !important;
-    box-shadow: 0 18px 45px rgba(0,0,0,0.7) !important;
+    box-shadow: 0 22px 55px rgba(0,0,0,0.8) !important;
     z-index: 10 !important;
     margin-bottom: 30px !important; /* espaço pro nome abaixo */
     margin: 0 !important;
@@ -200,9 +202,9 @@
   #section-card .card-footer {
     position: absolute !important;
     left: 50% !important;
-    top: 392px !important;
+    top: 492px !important;
     transform: translateX(-50%) !important;
-    width: clamp(118px, 56%, 240px) !important;
+    width: clamp(132px, 62%, 260px) !important;
     max-width: 300px !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -227,17 +229,17 @@
     left: auto !important;
     transform: none !important;
     width: 100% !important;
-    height: 52px !important;
-    line-height: 48px !important; 
+    height: 56px !important;
+    line-height: 56px !important; 
     padding: 0 !important;
     background: rgba(0,0,0,0.72) !important;
-    border-radius: 0 0 24px 24px !important;
+    border-radius: 0 0 28px 28px !important;
     color: #d4af37 !important;
-    font-size: 1.52rem !important;
+    font-size: 1.58rem !important;
     font-weight: 900 !important;
     text-align: center !important;
     text-transform: uppercase !important;
-    letter-spacing: 1.8px !important;
+    letter-spacing: 2.2px !important;
     text-shadow: 0 3px 10px rgba(0,0,0,0.95) !important;
     z-index: 20 !important;
     pointer-events: none !important; /* só exibição */
@@ -251,7 +253,7 @@
     position: relative !important;
     width: 100% !important;
     text-align: center !important;
-    margin-top: 20px !important;
+    margin-top: 80px !important;
     padding: 0 !important;
   }
 
