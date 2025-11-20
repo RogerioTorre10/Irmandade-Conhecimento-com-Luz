@@ -164,7 +164,7 @@
     margin-top: 0 !important;
     margin-bottom: 0 !important;
     padding-top: 40px !important;
-    padding-bottom: 150px !important; /* espaço interno pro nome */
+    padding-bottom: 250px !important; /* espaço interno pro nome */
     overflow: visible !important;
     display: flex !important;
     align-items: flex-start !important;
@@ -209,7 +209,7 @@
     text-align: center;
     display: block !important; 
     pointer-events: auto !important;
-    top: 570px !important;
+    top: 615px !important;
     width: 80% !important;
     max-width: 210px !important;
     z-index: 60 !important; 
@@ -217,7 +217,7 @@
    
     #section-card #userNameSlot {
     position: absolute !important;    
-    top: 420px !important;
+    top: 470px !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 140px !important; 
@@ -243,7 +243,7 @@
   /* Área do botão FORA do card */
   #section-card .card-actions-below {
     position: relative !important;
-    margin-top: 40px !important;
+    margin-top: 100px !important;
     padding: 0 !important;
     text-align: center !important;
     width: 100% !important;
