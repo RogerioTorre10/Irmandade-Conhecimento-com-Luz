@@ -150,55 +150,55 @@
     width: 100% !important;
     max-width: 350px !important;
     margin: 0 auto !important;
-    padding: 20px 0 110px 0 !important;
+    padding: 20px 0 120px 0 !important;
     overflow: visible !important;
   }
 
-  /* PERGAMINHO PEQUENO (agora é um selo mesmo) */
+  /* PERGAMINHO MUITO PEQUENO (agora sim igual ao seu print) */
   #section-card .flame-layer {
     position: absolute !important;
-    top: 428px !important;                /* subiu mais um pouquinho */
+    top: 440px !important;                 /* posição exata no peito */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    width: 62% !important;
-    max-width: 216px !important;
-    height: 82px !important;               /* ALTURA FINAL = selo perfeito */
-    border-radius: 20px !important;
+    width: 54% !important;                  /* bem estreitinho */
+    max-width: 190px !important;
+    height: 70px !important;                /* ALTURA FINAL = mini-selo */
+    border-radius: 18px !important;
     background: rgba(255,255,255,0.98) !important;
     border: 7px solid #d4af37 !important;
-    box-shadow: 0 12px 32px rgba(0,0,0,0.75) !important;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.8) !important;
     z-index: 10 !important;
     pointer-events: none !important;
   }
 
-  /* INPUT DO NOME – agora fica TOTALMENTE dentro do selo */
+  /* INPUT DO NOME – perfeitamente dentro do mini-pergaminho */
   #section-card .card-footer {
-    top: 492px !important;                 /* centralizado perfeitamente */
-    width: 70% !important;
-    max-width: 240px !important;
+    top: 492px !important;
+    width: 62% !important;
+    max-width: 210px !important;
     z-index: 20 !important;
   }
 
   #section-card #userNameSlot {
-    top: 472px !important;                 /* ajuste fino pra não vazar */
+    top: 472px !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    font-size: 1.75rem !important;         /* diminuí um tico pra caber certinho */
+    font-size: 1.55rem !important;         /* tamanho perfeito pro espaço pequeno */
     font-weight: 900 !important;
     color: #d4af37 !important;
-    text-shadow: 0 3px 10px rgba(0,0,0,0.8) !important;
-    letter-spacing: 1.4px !important;
+    text-shadow: 0 3px 8px rgba(0,0,0,0.9) !important;
+    letter-spacing: 1.5px !important;
     z-index: 50 !important;
   }
 
-  /* BOTÃO CONTINUAR – bem coladinho embaixo (12–15px) */
-  #section-card .card-actions-below { top: 540px !important; }
+  /* BOTÃO CONTINUAR – fora do card, coladinho embaixo */
+  #section-card .card-actions-below { top: 535px !important; }
   #section-card #btnNext {
-    top: 528px !important;                 /* distância perfeita do selo */
-    min-width: 270px !important;
-    padding: 16px 32px !important;
-    font-size: 1.5rem !important;
-    border-radius: 22px !important;
+    top: 522px !important;                 /* só 10–12px de distância do pergaminho */
+    min-width: 260px !important;
+    padding: 15px 30px !important;
+    font-size: 1.45rem !important;
+    border-radius: 20px !important;
   }
 }
    
