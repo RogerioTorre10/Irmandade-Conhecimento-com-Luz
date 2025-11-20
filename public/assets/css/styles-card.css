@@ -145,82 +145,89 @@
    SECTION-CARD — MOBILE PERFEITO (versão corrigida 2025)
    ========================================= */
 @media (max-width: 600px) {
-  /* Container principal */
   #section-card .card-stage {
     position: relative !important;
     width: 100% !important;
     max-width: 350px !important;
     margin: 0 auto !important;
-    padding: 20px 0 80px 0 !important; /* aumentei um pouco o padding inferior pra respirar */
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
+    padding: 20px 0 90px 0 !important;
     overflow: visible !important;
   }
 
-  /* Fundo do guia */
-  #section-card .guide-bg {
-    width: 100% !important;
-    max-width: 350px !important;
-  }
-
-  /* ===== PLACEHOLDER / PERGAMINHO QUASE QUADRADO ===== */
+  /* ===== PLACEHOLDER QUASE QUADRADO (exatamente como nas suas imagens) ===== */
   #section-card .flame-layer {
     position: absolute !important;
-    top: 380px !important;           /* subiu o pergaminho */
+    top: 395px !important;              /* posição perfeita no peito */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    width: 76% !important;            /* mais largo = mais quadrado */
-    max-width: 270px !important;      /* limite bonito */
-    height: 135px !important;         /* ALTURA REDUZIDA DRÁSTICA (era 170px) */
-    aspect-ratio: 1 / 0.75 !important; /* agora fica quase quadrado com bordas arredondadas */
-    border-radius: 24px !important;
-    background: rgba(255,255,255,0.96) !important;
-    border: 7px solid #d4af37 !important;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.65) !important;
+    width: 74% !important;
+    max-width: 258px !important;
+    height: 112px !important;            /* ALTURA FINAL – ficou lindo e compacto */
+    aspect-ratio: 1 / 0.85 !important;
+    border-radius: 26px !important;
+    background: rgba(255,255,255,0.97) !important;
+    border: 8px solid #d4af37 !important;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.7) !important;
     z-index: 10 !important;
     pointer-events: none !important;
   }
 
-  /* ===== INPUT DO NOME (agora bem mais em cima) ===== */
+  /* ===== INPUT DO NOME (agora aparece dentro do pergaminho) ===== */
   #section-card .card-footer {
     position: absolute !important;
-    top: 494px !important;    /* era 585px → subiu ~90px */
+    top: 488px !important;      /* exatamente no meio do pergaminho */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    width: 100% !important;
-    text-align: center !important;
+    width: 82% !important;
+    max-width: 290px !important;
     z-index: 20 !important;
   }
 
   #section-card #userNameSlot {
-    top: 474px !important;     /* era 565px → acompanha o pergaminho */
-    font-size: 1.9rem !important;
+    position: absolute !important;
+    top: 468px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 100% !important;
+    padding: 0 12px !important;
+    font-size: 1.95rem !important;
+    font-weight: 900 !important;
+    color: #d4af37 !important;
+    background: transparent !important;
+    border: none !important;
+    text-align: center !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1.2px !important;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.8) !important;
     z-index: 50 !important;
   }
 
-  /* ===== BOTÃO CONTINUAR (agora logo abaixo do pergaminho) ===== */
+  /* ===== BOTÃO CONTINUAR (logo abaixo do pergaminho, como nas imagens) ===== */
   #section-card .card-actions-below {
-    top: 560px !important;     /* era 655px → subiu muito */
+    position: absolute !important;
+    top: 535px !important;      /* exatamente onde você queria */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 100% !important;
+    text-align: center !important;
     z-index: 30 !important;
   }
 
   #section-card #btnNext {
-    top: 550px !important;     /* botão bem pertinho do pergaminho */
+    position: absolute !important;
+    top: 522px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
     min-width: 280px !important;
-    padding: 18px 32px !important;
-    font-size: 1.55rem !important;
-    border-radius: 22px !important;
-  }
-
-  /* Garante que imagem/vídeo do pergaminho não distorça */
-  #section-card .flame-layer img,
-  #section-card .flame-layer canvas,
-  #section-card .flame-layer video {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    border-radius: 18px !important;
+    padding: 18px 36px !important;
+    font-size: 1.6rem !important;
+    font-weight: 800 !important;
+    background: linear-gradient(145deg, #f0d878, #d4af37) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 24px !important;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.5) !important;
+    z-index: 9999 !important;
   }
 }
    
