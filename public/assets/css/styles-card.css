@@ -150,82 +150,61 @@
     width: 100% !important;
     max-width: 350px !important;
     margin: 0 auto !important;
-    padding: 20px 0 90px 0 !important;
+    padding: 20px 0 100px 0 !important;
     overflow: visible !important;
   }
 
-  /* ===== PLACEHOLDER QUASE QUADRADO (exatamente como nas suas imagens) ===== */
+  /* PLACEHOLDER PEQUENO E QUASE QUADRADO (exatamente como no seu print) */
   #section-card .flame-layer {
     position: absolute !important;
-    top: 395px !important;              /* posição perfeita no peito */
+    top: 420px !important;                 /* posição perfeita (bem no peito) */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    width: 74% !important;
-    max-width: 258px !important;
-    height: 112px !important;            /* ALTURA FINAL – ficou lindo e compacto */
-    aspect-ratio: 1 / 0.85 !important;
-    border-radius: 26px !important;
-    background: rgba(255,255,255,0.97) !important;
-    border: 8px solid #d4af37 !important;
-    box-shadow: 0 16px 40px rgba(0,0,0,0.7) !important;
+    width: 68% !important;
+    max-width: 238px !important;
+    height: 98px !important;                /* ALTURA FINAL: ficou minizinho e lindo */
+    border-radius: 22px !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    border: 7px solid #d4af37 !important;
+    box-shadow: 0 14px 36px rgba(0,0,0,0.7) !important;
     z-index: 10 !important;
     pointer-events: none !important;
   }
 
-  /* ===== INPUT DO NOME (agora aparece dentro do pergaminho) ===== */
+  /* INPUT DO NOME DENTRO DO PERGAMINO PEQUENO */
   #section-card .card-footer {
     position: absolute !important;
-    top: 488px !important;      /* exatamente no meio do pergaminho */
+    top: 490px !important;                 /* centralizado verticalmente no pergaminho */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    width: 82% !important;
-    max-width: 290px !important;
+    width: 76% !important;
+    max-width: 270px !important;
     z-index: 20 !important;
   }
 
   #section-card #userNameSlot {
-    position: absolute !important;
-    top: 468px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 100% !important;
-    padding: 0 12px !important;
-    font-size: 1.95rem !important;
+    top: 470px !important;
+    font-size: 1.85rem !important;
     font-weight: 900 !important;
     color: #d4af37 !important;
-    background: transparent !important;
-    border: none !important;
-    text-align: center !important;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.8) !important;
+    letter-spacing: 1.3px !important;
     text-transform: uppercase !important;
-    letter-spacing: 1.2px !important;
-    text-shadow: 0 4px 12px rgba(0,0,0,0.8) !important;
     z-index: 50 !important;
   }
 
-  /* ===== BOTÃO CONTINUAR (logo abaixo do pergaminho, como nas imagens) ===== */
+  /* BOTÃO FORA DO CARD – logo abaixo do pergaminho */
   #section-card .card-actions-below {
-    position: absolute !important;
-    top: 535px !important;      /* exatamente onde você queria */
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 100% !important;
-    text-align: center !important;
+    top: 545px !important;
     z-index: 30 !important;
   }
 
   #section-card #btnNext {
-    position: absolute !important;
-    top: 522px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    min-width: 280px !important;
-    padding: 18px 36px !important;
-    font-size: 1.6rem !important;
-    font-weight: 800 !important;
-    background: linear-gradient(145deg, #f0d878, #d4af37) !important;
-    color: #fff !important;
-    border: none !important;
-    border-radius: 24px !important;
+    top: 535px !important;                 /* exatamente como no seu print */
+    min-width: 270px !important;
+    padding: 17px 34px !important;
+    font-size: 1.55rem !important;
+    border-radius: 22px !important;
     box-shadow: 0 12px 30px rgba(0,0,0,0.5) !important;
     z-index: 9999 !important;
   }
