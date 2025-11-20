@@ -142,77 +142,110 @@
 }
 
 /* =========================================
-   SECTION-CARD — MOBILE PERFEITO (versão corrigida 2025)
+   SECTION-CARD — MOBILE ALINHADO
+   Placeholder no peito + nome visível + botão fora
    ========================================= */
 @media (max-width: 600px) {
-  /* 1. CARD STAGE: O principal ponto de referência */
+
+  /* Palco do card (pai) */
   #section-card .card-stage {
     position: relative !important;
-    width: 100% !important;
-    max-width: 350px !important;
+    width: 88vw !important;
+    max-width: 380px !important;
     margin: 0 auto !important;
-    padding: 20px 0 0 0 !important; /* Mantenha o padding para cima, mas zere o de baixo */
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 30px !important;
+    padding-bottom: 150px !important; /* espaço interno pro nome */
     overflow: visible !important;
+    align-items: flex-start !important;
   }
 
-  /* 2. PERGAMINHO INFERIOR (Onde o nome DEVE ficar) */
+  /* A SELFIE É O .flame-layer — NO PEITO */
   #section-card .flame-layer {
     position: absolute !important;
-    /* Usamos uma PORCENTAGEM (relativa à altura do card) para que ele acompanhe a imagem. */
-    top: 73% !important; /* Ajuste este valor em porcentagem (Ex: 78% – Coloca ele no peito) */
     left: 50% !important;
+    top: 360px !important;              /* <- ajusta a altura (peito) */
     transform: translateX(-50%) !important;
-    width: 54% !important;
-    max-width: 190px !important;
-    height: 70px !important;
-    border-radius: 18px !important;
-    background: rgba(255, 255, 255, 0.98) !important;
-    border: 7px solid #d4af37 !important;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8) !important;
-    z-index: 10 !important; /* O pergaminho fica no Z-INDEX 10 */
-    pointer-events: none !important;
+    width: min(78%, 310px) !important;
+    height: auto !important;
+    text-align: center;
+    z-index: 6 !important;
+    opacity: 1 !important;
+    pointer-events: none;               /* não bloqueia cliques */
   }
 
-  /* 3. INPUT/SLOT DO NOME (O elemento que sumiu) */
-  #section-card #userNameSlot {
-    position: absolute !important; /* Mantenha o posicionamento absoluto */
-    /* Este TOP deve ser um pouco abaixo do TOP do pergaminho, para centralizar. */
-    top: 76% !important; /* Ajuste este valor em porcentagem (Ex: 80.5%) */
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 90% !important;
-    text-align: center !important;
-    font-size: 1.55rem !important;
-    font-weight: 900 !important;
-    color: #d4af37 !important;
-    text-shadow: 0 3px 8px rgba(0, 0, 0, 0.9) !important;
-    letter-spacing: 1.5px !important;
-    z-index: 20 !important; /* CRÍTICO: Deve ser MAIOR que o Z-INDEX do pergaminho (10) para aparecer ACIMA dele. */
-    /* Se for um INPUT real e não apenas um slot de texto, verifique se ele está visível/habilitado. */
+  /* Centraliza a imagem em si */
+  #section-card .flame-layer .flame-selfie {
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+    height: auto;
   }
 
-  /* O seu código original tinha card-footer e userNameSlot com top fixo e diferentes. Vamos simplificar. */
+  /* Quando for SÓ placeholder (sem selfie), usa tamanho menor */
+  #section-card .flame-layer.placeholder-only .flame-selfie {
+    width: 100%;
+  }
+
+  /* Nome do participante um pouco acima do rodapé do card */
   #section-card .card-footer {
-    display: none !important; /* Esconda se não for necessário, ou garanta que ele não interfira. */
-  }
-
-  /* 4. BOTÃO CONTINUAR (Fora do card) */
-  #section-card .card-actions-below {
     position: absolute !important;
-    /* Use a função calc() para garantir uma distância do elemento posicionado mais baixo (pergaminho) */
-    top: calc(78% + 100px) !important; /* TOP do pergaminho (78%) + Espaçamento (100px) */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    z-index: 5 !important;
+    bottom: 110px !important;
+    text-align: center;
+    z-index: 7;
+    pointer-events: none;
   }
 
+  /* Botão DENTRO do card — continua oculto */
+  #section-card .card-actions {
+    display: none !important;
+  }
+
+  /* Botão FORA do card (.card-actions-below) — logo abaixo do card */
+  #section-card .card-actions-below {
+    position: relative !important;
+    margin-top: 18px !important;      /* espaço entre card e botão */
+    padding: 0 !important;
+    text-align: center !important;
+    width: 100% !important;
+  }
+
+  #section-card #btnStartJourney,
   #section-card #btnNext {
-    min-width: 260px !important;
-    padding: 15px 30px !important;
-    font-size: 1.45rem !important;
-    border-radius: 20px !important;
+    position: static !important;      /* deixa fluir normalmente */
+    left: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    display: inline-block !important;
+    min-width: 240px !important;
+    padding: 16px 40px !important;
+    font-size: 1.5rem !important;
+    z-index: 15;
+    pointer-events: auto;             /* clicável */
+  }
+
+  /* Garante que nenhum outro placeholder antigo apareça */
+  #section-card .card-selfie-slot,
+  #section-card .selfie-placeholder,
+  #section-card .card-selfie-placeholder {
+    display: none !important;
+  }
+
+  /* LIBERA O RODAPÉ DO CARD */
+  #section-card.pergaminho,
+  #section-card.pergaminho-v,
+  #section-card .pergaminho,
+  #section-card .pergaminho-v {
+    padding-bottom: 40px !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
   }
 }
+
 
 /* =========================================
    DESKTOP (≥ 601px)
