@@ -205,11 +205,11 @@
     position: absolute !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    bottom: 110px !important;
+    bottom: auto !important;
     text-align: center;
     display: block !important; 
     pointer-events: auto !important;
-    top: 540px !important;
+    top: 570px !important;
     width: 80% !important;
     max-width: 210px !important;
     z-index: 60 !important; 
@@ -217,7 +217,7 @@
    
     #section-card #userNameSlot {
     position: absolute !important;    
-    top: 380px !important;
+    top: 420px !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 140px !important; 
@@ -243,17 +243,17 @@
   /* Área do botão FORA do card */
   #section-card .card-actions-below {
     position: relative !important;
-    margin-top: 100px !important;
+    margin-top: 40px !important;
     padding: 0 !important;
     text-align: center !important;
     width: 100% !important;
-    top: 535px !important; 
+    top: auto !important; 
   }
 
   /* Botão CONTINUAR — bloco normal abaixo do card */
   #section-card #btnStartJourney,
   #section-card #btnNext {
-    top: 522px !important; 
+    top: auto !important; 
     position: static !important;
     transform: none !important;
     bottom: auto !important;
