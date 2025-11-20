@@ -159,7 +159,7 @@
   #section-card .flame-layer {
     position: absolute !important;
     /* Usamos uma PORCENTAGEM (relativa à altura do card) para que ele acompanhe a imagem. */
-    top: 78% !important; /* Ajuste este valor em porcentagem (Ex: 78% – Coloca ele no peito) */
+    top: 73% !important; /* Ajuste este valor em porcentagem (Ex: 78% – Coloca ele no peito) */
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 54% !important;
@@ -177,7 +177,7 @@
   #section-card #userNameSlot {
     position: absolute !important; /* Mantenha o posicionamento absoluto */
     /* Este TOP deve ser um pouco abaixo do TOP do pergaminho, para centralizar. */
-    top: 80.5% !important; /* Ajuste este valor em porcentagem (Ex: 80.5%) */
+    top: 76% !important; /* Ajuste este valor em porcentagem (Ex: 80.5%) */
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 90% !important;
