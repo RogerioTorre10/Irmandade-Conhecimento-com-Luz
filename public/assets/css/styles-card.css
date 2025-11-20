@@ -145,74 +145,75 @@
    SECTION-CARD — MOBILE PERFEITO (versão corrigida 2025)
    ========================================= */
 @media (max-width: 600px) {
-  /* 1. CONTAINER PRINCIPAL: Define a referência para todos os elementos internos. */
+  /* 1. CARD STAGE: O principal ponto de referência */
   #section-card .card-stage {
-    position: relative !important; /* ESSENCIAL! Torna-o o ponto de referência (0,0) para elementos absolutos internos. */
+    position: relative !important;
     width: 100% !important;
     max-width: 350px !important;
     margin: 0 auto !important;
-    /* Redefina o padding: remova o padding-bottom grande e deixe a altura do card ser definida pelo conteúdo. */
-    padding: 20px 0 0 0 !important; 
+    padding: 20px 0 0 0 !important; /* Mantenha o padding para cima, mas zere o de baixo */
     overflow: visible !important;
-    /* Se a imagem for o primeiro filho, o tamanho do card será o tamanho da imagem. */
   }
 
-  /* 2. PERGAMINHO INFERIOR (Onde está o nome) */
+  /* 2. PERGAMINHO INFERIOR (Onde o nome DEVE ficar) */
   #section-card .flame-layer {
     position: absolute !important;
-    /* Use porcentagem para o TOP para que a posição seja relativa à altura total do CARD (a imagem da garota).
-       (Se 58% é a altura da garota, 80% deve colocá-lo sobre o peito, experimente!) */
-    top: 78% !important; /* Ajuste este valor em porcentagem (Ex: 78%) */
+    /* Usamos uma PORCENTAGEM (relativa à altura do card) para que ele acompanhe a imagem. */
+    top: 78% !important; /* Ajuste este valor em porcentagem (Ex: 78% – Coloca ele no peito) */
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 54% !important;
     max-width: 190px !important;
     height: 70px !important;
     border-radius: 18px !important;
-    background: rgba(255,255,255,0.98) !important;
+    background: rgba(255, 255, 255, 0.98) !important;
     border: 7px solid #d4af37 !important;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.8) !important;
-    z-index: 10 !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8) !important;
+    z-index: 10 !important; /* O pergaminho fica no Z-INDEX 10 */
     pointer-events: none !important;
   }
 
-  /* 3. INPUT/SLOT DO NOME */
+  /* 3. INPUT/SLOT DO NOME (O elemento que sumiu) */
   #section-card #userNameSlot {
-    position: absolute !important; /* Deve ser absoluto, mas sua referência é o CARD */
-    top: 79.5% !important; /* Ajuste este TOP para ficar alinhado com o pergaminho. Deve ser um pouco maior que o TOP do pergaminho. */
+    position: absolute !important; /* Mantenha o posicionamento absoluto */
+    /* Este TOP deve ser um pouco abaixo do TOP do pergaminho, para centralizar. */
+    top: 80.5% !important; /* Ajuste este valor em porcentagem (Ex: 80.5%) */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    width: 90% !important; /* Ajuste se necessário */
+    width: 90% !important;
     text-align: center !important;
     font-size: 1.55rem !important;
     font-weight: 900 !important;
     color: #d4af37 !important;
-    text-shadow: 0 3px 8px rgba(0,0,0,0.9) !important;
+    text-shadow: 0 3px 8px rgba(0, 0, 0, 0.9) !important;
     letter-spacing: 1.5px !important;
-    z-index: 50 !important;
+    z-index: 20 !important; /* CRÍTICO: Deve ser MAIOR que o Z-INDEX do pergaminho (10) para aparecer ACIMA dele. */
+    /* Se for um INPUT real e não apenas um slot de texto, verifique se ele está visível/habilitado. */
   }
-  
-  /* Remova .card-footer se não contiver nada além do #userNameSlot e se for um elemento obsoleto. */
-  #section-card .card-footer { display: none !important; }
-  
-  /* 4. BOTÃO CONTINUAR: Fora do card. Use margin-top para empurrá-lo ou ajuste sua posição. */
-  #section-card .card-actions-below { 
-    position: absolute !important; 
-    top: calc(78% + 100px) !important; /* Exemplo: Topo do pergaminho + um espaçamento (100px) */
+
+  /* O seu código original tinha card-footer e userNameSlot com top fixo e diferentes. Vamos simplificar. */
+  #section-card .card-footer {
+    display: none !important; /* Esconda se não for necessário, ou garanta que ele não interfira. */
+  }
+
+  /* 4. BOTÃO CONTINUAR (Fora do card) */
+  #section-card .card-actions-below {
+    position: absolute !important;
+    /* Use a função calc() para garantir uma distância do elemento posicionado mais baixo (pergaminho) */
+    top: calc(78% + 100px) !important; /* TOP do pergaminho (78%) + Espaçamento (100px) */
     left: 50% !important;
     transform: translateX(-50%) !important;
     z-index: 5 !important;
   }
-  
+
   #section-card #btnNext {
-    /* Mantenha o estilo do botão */
     min-width: 260px !important;
     padding: 15px 30px !important;
     font-size: 1.45rem !important;
     border-radius: 20px !important;
-    /* Remova `top` se estiver usando o `.card-actions-below` para o posicionamento */
   }
 }
+
 /* =========================================
    DESKTOP (≥ 601px)
    ========================================= */
