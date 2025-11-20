@@ -262,9 +262,9 @@
 
   #section-card #btnStartJourney,
   #section-card #btnNext {
-    position: absolute !important;
+    position: fixed !important;
     left: 50% !important;
-    bottom: 24px !important; 
+    bottom: 20px !important; 
     transform: translateX(-50%) !important;
     display: inline-block !important;
     min-width: 260px !important;
@@ -278,7 +278,7 @@
     box-shadow: 0 8px 25px rgba(0,0,0,0.5) !important;
     cursor: pointer !important;
     transition: all 0.3s !important;
-    z-index: 30 !important;  
+    z-index: 999 !important;  
   }
 
   /* Hover/touch feedback */
@@ -288,13 +288,21 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.6) !important;
   }
 
-  /* Esconde tudo que não deve aparecer mais */
-  #section-card .card-actions,
+    /* Esconde só os slots antigos da selfie */
   #section-card .card-selfie-slot,
   #section-card .selfie-placeholder,
   #section-card .card-selfie-placeholder {
     display: none !important;
   }
+
+  /* Mantém a área do botão ativa */
+  #section-card .card-actions {
+    display: block !important;
+    width: 100% !important;
+    text-align: center !important;
+    margin-top: 18px !important;
+  }
+
 
   /* Pergaminhos sem altura fixa */
   #section-card.pergaminho,
