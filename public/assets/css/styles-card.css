@@ -149,7 +149,7 @@
   #section-card {
     min-height: 100vh !important;
     height: auto !important;
-    padding: 20px 0 80px !important; /* só o necessário */
+    padding: 20px 0 20px !important; /* só o necessário */
     overflow: visible !important;
     background: transparent !important;
   }
@@ -258,7 +258,7 @@
    position: relative !important;
    width: 100% !important;
    text-align: center !important;
-   margin-top: 20px !important;
+   margin-top: 100px !important;
    padding: 0 !important;
 }
 
