@@ -150,7 +150,7 @@
     min-height: 100vh !important;
     height: auto !important;
     padding: 20px 0 80px !important; /* só o necessário */
-    padding-bottom: 60px !important; 
+    padding-bottom: 20px !important; 
     overflow: visible !important;
     background: transparent !important;
   }
@@ -161,9 +161,10 @@
     width: 90vw !important;
     max-width: 380px !important;
     margin: 0 auto !important;
+    min-height: auto !important; 
     padding: 40px 0 180px !important; /* espaço pro nome + botão externo */
     padding-top: 20px !important;
-    padding-bottom: 120px !important; 
+    padding-bottom: 90px !important; 
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -174,15 +175,15 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 300px !important;
+    top: 252px !important;
     transform: translateX(-50%) !important;
-    width: clamp(140px, 68%, 300px) !important;
+    width: clamp(142px, 66%, 275px) !important;
     height: auto !important;
     aspect-ratio: 3 / 4 !important;     /* retrato clássico de celular */
     max-height: 380px !important;
-    max-width: 260px !important; 
-    border: 15px solid #d4af37 !important;
-    border-radius: 40px !important;
+    max-width: 275px !important; 
+    border: 12px solid #d4af37 !important;
+    border-radius: 34px !important;
     background: #fff !important;
     overflow: hidden !important;
     box-shadow: 0 22px 55px rgba(0,0,0,0.8) !important;
@@ -203,9 +204,9 @@
   #section-card .card-footer {
     position: absolute !important;
     left: 50% !important;
-    top: 568px !important;
+    top: 602px !important;
     transform: translateX(-50%) !important;
-    width: clamp(140px, 68%, 300px) !important;
+    width: clamp(142px, 66%, 275px) !important;
     max-width: 300px !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -230,13 +231,13 @@
     left: auto !important;
     transform: none !important;
     width: 100% !important;
-    height: 65px !important;
-    line-height: 65px !important; 
+    height: 64px !important;
+    line-height: 64px !important; 
     padding: 0 !important;
     background: rgba(0,0,0,0.90) !important;
     border-radius: 0 0 30px 30px !important;
     color: #d4af37 !important;
-    font-size: 1.68rem !important;
+    font-size: 1.72rem !important;
     font-weight: 900 !important;
     text-align: center !important;
     text-transform: uppercase !important;
@@ -254,7 +255,7 @@
     position: relative !important;
     width: 100% !important;
     text-align: center !important;
-    margin-top: 30px !important;
+    margin-top: 20px !important;
     padding: 0 !important;
   }
 
