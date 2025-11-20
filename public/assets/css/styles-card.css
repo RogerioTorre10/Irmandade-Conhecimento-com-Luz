@@ -147,11 +147,9 @@
    ========================================= */
 @media (max-width: 600px) {
   #section-card {
-    position: relative !important;
     min-height: 100vh !important;
     height: auto !important;
     padding: 20px 0 80px !important; /* só o necessário */
-    padding-bottom: 20px !important; 
     overflow: visible !important;
     background: transparent !important;
   }
@@ -162,10 +160,7 @@
     width: 90vw !important;
     max-width: 380px !important;
     margin: 0 auto !important;
-    min-height: auto !important; 
     padding: 40px 0 180px !important; /* espaço pro nome + botão externo */
-    padding-top: 20px !important;
-    padding-bottom: 90px !important; 
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -176,18 +171,17 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 330px !important;
+    top: 78px !important;              /* ajustei pra ficar exatamente no peito */
     transform: translateX(-50%) !important;
-    width: clamp(142px, 66%, 275px) !important;
+    width: clamp(118px, 56%, 240px) !important;
     height: auto !important;
     aspect-ratio: 3 / 4 !important;     /* retrato clássico de celular */
     max-height: 380px !important;
-    max-width: 275px !important; 
-    border: 12px solid #d4af37 !important;
-    border-radius: 34px !important;
+    border: 9px solid #d4af37 !important;
+    border-radius: 26px !important;
     background: #fff !important;
     overflow: hidden !important;
-    box-shadow: 0 22px 55px rgba(0,0,0,0.8) !important;
+    box-shadow: 0 18px 45px rgba(0,0,0,0.7) !important;
     z-index: 10 !important;
     margin-bottom: 30px !important; /* espaço pro nome abaixo */
     margin: 0 !important;
@@ -205,14 +199,46 @@
   #section-card .card-footer {
     position: absolute !important;
     left: 50% !important;
-    top: 680px !important;
+    top: auto !important;
+    transform: none !important;
+    width: 84% !important;
     transform: translateX(-50%) !important;
-    width: clamp(142px, 66%, 275px) !important;
-    max-width: 300px !important;
+    bottom: auto !important;
+    top: 378px !important;               /* exatamente na base da moldura */
+    width: clamp(118px, 56%, 240px) !important;  /* mesma largura da selfie */
     margin: 0 !important;
     padding: 0 !important;
-    z-index: 11 !important; 
+    z-index: 11 !important;
+    max-width: 300px !important; 
   }
+
+  #section-card #userNameSlot {
+    position: relative !important;
+    top: auto !important;
+    width: 100% !important;
+    left: auto !important;
+    transform: none !important;
+     height: 48px !important;
+    line-height: 48px !important;
+    background: rgba(0,0,0,0.72) !important;
+    border-radius: 0 0 22px 22px !important;   /* arredonda só a parte de baixo */
+    color: #d4af37 !important;
+    font-size: 1.48rem !important;            /* tamanho perfeito pro espaço */
+    font-weight: 900 !important;
+    text-align: center !important; 
+    text-transform: uppercase !important;
+    letter-spacing: 1.8px !important;
+    text-shadow: 0 3px 10px rgba(0,0,0,0.95) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;  
+    z-index: 20 !important;
+    pointer-events: none !important; /* só exibição */
+  }
+   
    /* Garante que o nome fique exatamente grudado na moldura */
   #section-card .card-footer::before {
     content: "";
@@ -226,31 +252,6 @@
     z-index: -1;
   }
 
-  #section-card #userNameSlot {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    transform: none !important;
-    width: 100% !important;
-    height: 64px !important;
-    line-height: 64px !important; 
-    padding: 0 !important;
-    background: rgba(0,0,0,0.90) !important;
-    border-radius: 0 0 30px 30px !important;
-    color: #d4af37 !important;
-    font-size: 1.72rem !important;
-    font-weight: 900 !important;
-    text-align: center !important;
-    text-transform: uppercase !important;
-    letter-spacing: 2.4px !important;
-    text-shadow: 0 3px 10px rgba(0,0,0,0.95) !important;
-    z-index: 20 !important;
-    pointer-events: none !important; /* só exibição */
-    overflow: hidden !important;
-    white-space: nowrap !important;
-    text-overflow: ellipsis !important; 
-  }
-
   /* ==================== BOTÃO CONTINUAR (FORA DO CARD) ==================== */
   #section-card .card-actions-below {
     position: relative !important;
@@ -262,10 +263,8 @@
 
   #section-card #btnStartJourney,
   #section-card #btnNext {
-    position: fixed !important;
-    left: 50% !important;
-    bottom: 20px !important; 
-    transform: translateX(-50%) !important;
+    position: static !important;
+    transform: none !important;
     display: inline-block !important;
     min-width: 260px !important;
     padding: 18px 50px !important;
@@ -278,31 +277,22 @@
     box-shadow: 0 8px 25px rgba(0,0,0,0.5) !important;
     cursor: pointer !important;
     transition: all 0.3s !important;
-    z-index: 999 !important;  
   }
 
   /* Hover/touch feedback */
   #section-card #btnStartJourney:active,
   #section-card #btnNext:active {
-    transform: translate(-50%, 4px) !important;
+    transform: translateY(4px) !important;
     box-shadow: 0 4px 12px rgba(0,0,0,0.6) !important;
   }
 
-    /* Esconde só os slots antigos da selfie */
+  /* Esconde tudo que não deve aparecer mais */
+  #section-card .card-actions,
   #section-card .card-selfie-slot,
   #section-card .selfie-placeholder,
   #section-card .card-selfie-placeholder {
     display: none !important;
   }
-
-  /* Mantém a área do botão ativa */
-  #section-card .card-actions {
-    display: block !important;
-    width: 100% !important;
-    text-align: center !important;
-    margin-top: 18px !important;
-  }
-
 
   /* Pergaminhos sem altura fixa */
   #section-card.pergaminho,
@@ -314,9 +304,6 @@
     padding-bottom: 40px !important;
   }
 }
-
-
-
 
 /* =========================================
    DESKTOP (≥ 601px)
