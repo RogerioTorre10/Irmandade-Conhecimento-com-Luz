@@ -156,32 +156,43 @@
   }
 
   /* Palco principal do card */
-  #section-card .card-stage {
-  padding: 40px 0 120px !important; /* mais curto */
-  overflow: visible !important;
-  align-items: center !important;
-}
+   #section-card .card-stage{
+    position: relative !important;
+    width: 90vw !important;
+    max-width: 380px !important;
+    margin: 0 auto !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+
+    min-height: 640px !important;     /* segura placeholder+nome+botão */
+    padding: 40px 0 40px !important;  /* sem empurrar nada pra fora */
+    overflow: visible !important;
+  }
 
   /* ==================== SELFIE NO PEITO ==================== */
-  #section-card .flame-layer {
-  position: absolute !important;
-  left: 50% !important;
-  top: 132px !important;             /* peito perfeito */
-  transform: translateX(-50%) !important;
+  #section-card .flame-layer{
+    position: absolute !important;
+    left: 50% !important;
+    top: 170px !important;                 /* desce pro peito */
+    transform: translateX(-50%) !important;
 
-  width: clamp(120px, 54vw, 210px) !important; /* menor e equilibrado */
-  aspect-ratio: 3/4 !important;
-  max-height: 300px !important;
+    width: clamp(105px, 46vw, 175px) !important; /* MENOR de verdade */
+    aspect-ratio: 3 / 4 !important;
+    max-height: 245px !important;
 
-  border: 8px solid #d4af37 !important;
-  border-radius: 22px !important;
-  background: #fff !important;
-  overflow: hidden !important;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.65) !important;
+    border: 7px solid #d4af37 !important;
+    border-radius: 20px !important;
 
-  z-index: 10 !important;
-  pointer-events: none !important;
-}
+    background: #fff !important;
+    overflow: hidden !important;
+    box-shadow: 0 14px 34px rgba(0,0,0,.65) !important;
+
+    z-index: 10 !important;
+    pointer-events: none !important;
+    margin: 0 !important;
+  }
 
   #section-card .flame-layer .flame-selfie {
     width: 100% !important;
@@ -191,31 +202,34 @@
   }
 
   /* ==================== NOME DO PARTICIPANTE (DENTRO DO CARD) ==================== */
-  #section-card .card-footer {
-  position: absolute !important;
-  top: calc(132px + 300px - 8px) !important; /* base exata da moldura */
-  left: 50% !important;
-  transform: translateX(-50%) !important;
+ #section-card .card-footer{
+    position: absolute !important;
+    left: 50% !important;
+    top: 410px !important;                 /* base perfeita pro novo tamanho */
+    transform: translateX(-50%) !important;
 
-  width: clamp(120px, 54vw, 210px) !important;
-  z-index: 20 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-}
+    width: clamp(105px, 46vw, 175px) !important;
+    z-index: 20 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+   
+ #section-card #userNameSlot{
+    height: 42px !important;
+    line-height: 42px !important;
+    font-size: 1.25rem !important;
 
- #section-card #userNameSlot {
-  height: 44px !important;
-  line-height: 44px !important;
-  background: rgba(0,0,0,0.75) !important;
-  border-radius: 0 0 20px 20px !important;
-  color: #d4af37 !important;
-  font-size: 1.35rem !important;
-  font-weight: 900 !important;
-  text-align: center !important;
-  letter-spacing: 1.5px !important;
-  text-shadow: 0 3px 6px rgba(0,0,0,0.9) !important;
-  pointer-events: none !important;
-}
+    background: rgba(0,0,0,.75) !important;
+    color: #d4af37 !important;
+
+    border-radius: 0 0 18px 18px !important;
+    font-weight: 900 !important;
+    text-align: center !important;
+
+    pointer-events: none !important;
+    margin: 0 !important;
+  }
+
 
    
    /* Garante que o nome fique exatamente grudado na moldura */
@@ -232,28 +246,30 @@
   }
 
   /* ==================== BOTÃO CONTINUAR (FORA DO CARD) ==================== */
-#section-card .card-actions-below {
-  position: relative !important;
-  width: 100% !important;
-  margin-top: 20px !important;  /* sobe o botão */
-  margin-bottom: 40px !important;
-  text-align: center !important;
-  z-index: 9999 !important;
-  pointer-events: auto !important;
-}
+#section-card .card-actions-below{
+    position: relative !important;
+    width: 100% !important;
+    text-align: center !important;
 
-#section-card #btnNext {
-  min-width: 280px !important;
-  padding: 16px 32px !important;
-  font-size: 1.5rem !important;
-  border-radius: 50px !important;
-  background: linear-gradient(to bottom, #d4af37, #b8972e) !important;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
-  pointer-events: auto !important;
-  z-index: 99999 !important;
-}
+    margin-top: auto !important;   /* cola no “chão” do palco */
+    padding-top: 18px !important;
+    z-index: 9999 !important;
+    pointer-events: auto !important;
+  }
 
+#section-card #btnNext{
+    display: block !important;
+    margin: 0 auto !important;
 
+    min-width: 280px !important;
+    max-width: 92vw !important;
+    padding: 16px 28px !important;
+    font-size: 1.5rem !important;
+
+    border-radius: 50px !important;
+    pointer-events: auto !important;
+    z-index: 99999 !important;
+  }
 
   /* Hover/touch feedback */
   #section-card #btnStartJourney:active,
