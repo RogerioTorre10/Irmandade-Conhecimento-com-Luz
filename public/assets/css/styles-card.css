@@ -13,9 +13,9 @@
   --card-max-w: 560px;
 
   /* Desktop */
-  --selfie-top-d: 210px;
-  --selfie-w-d: 260px;
-  --selfie-h-d: 330px;
+  --selfie-top-d: 290px !important;  /* antes 210px → agora peito */
+  --selfie-h-d: 320px !important;    /* mantém proporção boa */
+  --selfie-w-d: 250px !important;    /* levinho menor */
 
   /* Mobile */
   --selfie-top-m: 170px;
@@ -89,7 +89,7 @@
 #section-card .flame-layer{
   position: absolute;
   left: 50%;
-  top: var(--selfie-top-d);
+  top: var(--selfie-top-d) !important;
   transform: translateX(-50%);
 
   display: block !important;
@@ -97,8 +97,9 @@
   visibility: visible !important;
   z-index: 6 !important;
    
-  width: var(--selfie-w-d);
-  height: var(--selfie-h-d);
+  width: var(--selfie-w-d) !important;
+  height: var(--selfie-h-d) !important;
+  max-height: var(--selfie-h-d) !important;
   aspect-ratio: 3 / 4;
 
   border: 8px solid var(--gold);
@@ -124,7 +125,7 @@
 #section-card .card-footer{
   position: absolute;
   left: 50%;
-  top: calc(var(--selfie-top-d) + var(--selfie-h-d) - 6px);
+ top: calc(var(--selfie-top-d) + var(--selfie-h-d) - 6px) !important;
   transform: translateX(-50%);
 
   display: block !important;
@@ -132,7 +133,7 @@
   visibility: visible !important;
   z-index: 7 !important;
    
-  width: var(--selfie-w-d);
+   width: var(--selfie-w-d) !important;
   z-index: 20;
   margin: 0;
   padding: 0;
@@ -178,36 +179,33 @@
 /* ---------- Botão FORA do card-stage ----------
    Assim não entra na foto da selfie */
 #section-card .card-actions-below{
-  position: relative;
-  width: 100%;
-  text-align: center;
-
-  margin-top: 14px;  /* fica logo abaixo do nome */
-  margin-bottom: 36px;
-
   display: block !important;
+  position: relative !important;
+  width: 100% !important;
+  text-align: center !important;
+  margin-top: 22px !important;  
+  margin-bottom: 36px;
   opacity: 1 !important;
   visibility: visible !important;
-  z-index: 9999 !important;
+  padding-bottom: 24px !important;
+  z-index: 99999 !important;
   pointer-events: auto !important;
 }
 
 #section-card #btnStartJourney,
 #section-card #btnNext{
-  display: block;
+  display: inline-block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
   margin: 0 auto;
-
   min-width: 290px;
   max-width: 92vw;
   padding: 16px 28px;
-
   font-size: 1.55rem;
   font-weight: 800;
-
   border-radius: 50px;
   background: linear-gradient(to bottom, #d4af37, #b8972e);
   box-shadow: 0 10px 30px rgba(0,0,0,.6);
-
   pointer-events: auto !important;
   z-index: 99999 !important;
 }
