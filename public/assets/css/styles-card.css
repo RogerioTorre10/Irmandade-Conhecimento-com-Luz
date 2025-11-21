@@ -303,54 +303,43 @@
     height: auto !important;
     padding-bottom: 40px !important;
   }
-   /* ====== MOLDURA DA SELFIE → MAIS QUADRADA E MENOR (no peito perfeito) ====== */
-  #section-card .flame-layer {
-    top: 112px !important;
-    width: clamp(140px, 54vw, 240px) !important;
-    height: clamp(180px, 68vw, 300px) !important;   /* mais quadrada (não tão alta) */
-    max-height: 310px !important;
-    aspect-ratio: 4 / 5 !important;                /* quase quadrada, fica lindo */
-    border: 10px solid #d4af37 !important;
-    border-radius: 20px !important;
-    box-shadow: 0 16px 40px rgba(0,0,0,0.75) !important;
+  /* 1. Sobe o botão mais ainda pra ficar dentro da área branca segura */
+  #section-card .card-actions-below {
+    margin-top: -28px !important;   /* era -8px → agora sobe bastante */
+    margin-bottom: 30px !important;
+    position: relative !important;
+    z-index: 9999 !important;       /* fica por cima de qualquer coisa */
+    pointer-events: auto !important;
   }
 
-  /* ====== NOME DO PARTICIPANTE DENTRO DA MOLDURA (base preta interna) ====== */
-  #section-card .card-footer {
-    position: absolute !important;
-    top: auto !important;
-    bottom: 8px !important;               /* colado na base interna da moldura */
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: calc(100% - 32px) !important;  /* respeita as bordas internas */
-    height: 46px !important;
-    line-height: 46px !important;
-    background: rgba(0,0,0,0.82) !important;
-    border-radius: 0 0 14px 14px !important;
-    color: #d4af37 !important;
-    font-size: 1.4rem !important;
-    font-weight: 900 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 1.6px !important;
-    z-index: 20 !important;
+  /* 2. Força o botão a ser sempre clicável (mata qualquer overlay do pergaminho) */
+  #section-card #btnStartJourney,
+  #section-card #btnNext {
+    position: relative !important;
+    z-index: 99999 !important;
+    pointer-events: auto !important;
+    touch-action: manipulation !important;
+  }
+
+  /* 3. Se o pergaminho tiver uma camada invisível no fundo que rouba clique, mata ela */
+  #section-card .pergaminho::before,
+  #section-card .pergaminho::after,
+  #section-card.pergaminho-v::before,
+  #section-card.pergaminho-v::after,
+  #section-card [class*="pergaminho"]::before,
+  #section-card [class*="pergaminho"]::after {
     pointer-events: none !important;
   }
 
-  /* ====== BOTÃO CONTINUAR → MENOR, MAIS ESTREITO E DISCRETO ====== */
-  #section-card .card-actions-below {
-    margin-top: 16px !important;     /* espaço leve depois da moldura */
-    margin-bottom: 40px !important;
+  /* Extra: se ainda tiver algum container pai roubando clique */
+  #section-card,
+  #section-card .card-stage {
+    pointer-events: none !important;   /* desativa clique no fundo */
   }
 
-  #section-card #btnStartJourney,
-  #section-card #btnNext {
-    min-width: 220px !important;     /* mais estreito */
-    max-width: 78vw !important;
-    padding: 14px 32px !important;   /* um pouco menor */
-    font-size: 1.38rem !important;
-    border-radius: 50px !important;
-    background: linear-gradient(to bottom, #d4af37, #b8972e) !important;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.5) !important;
+  #section-card .card-actions-below,
+  #section-card .card-actions-below * {
+    pointer-events: auto !important;   /* reativa só no botão e no container dele */
   }
  }
 
