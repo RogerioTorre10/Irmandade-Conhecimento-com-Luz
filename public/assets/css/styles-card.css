@@ -59,7 +59,7 @@
 /* ---------- Selfie (3:4 dentro do card) ---------- */
 #section-card .flame-layer {
   position: absolute;
-  top: 40%; /* ajusta para abaixo dos ombros */
+  top: 60%; /* ajusta para abaixo dos ombros */
   transform: translate(-50%, 0);
   left: 50%;   
   width: clamp(240px, 38%, 520px);
@@ -195,7 +195,7 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 78px !important;              /* ajustei pra ficar exatamente no peito */
+    top: 250px !important;              /* ajustei pra ficar exatamente no peito */
     transform: translateX(-50%) !important;
     width: clamp(118px, 56%, 240px) !important;
     height: auto !important;
