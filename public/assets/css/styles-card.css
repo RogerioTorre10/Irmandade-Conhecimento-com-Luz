@@ -161,7 +161,7 @@
     max-width: 380px !important;
     margin: 0 auto !important;
     padding: 40px 0 180px !important; /* espaço pro nome + botão externo */
-    padding-bottom: 80px !important;
+    padding-bottom: 50px !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -258,7 +258,7 @@
    position: relative !important;
    width: 100% !important;
    text-align: center !important;
-   margin-top: 100px !important;
+   margin-top: 30px !important;
    padding: 0 !important;
 }
 
