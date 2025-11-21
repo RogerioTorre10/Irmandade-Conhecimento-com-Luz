@@ -59,7 +59,7 @@
 /* ---------- Selfie (3:4 dentro do card) ---------- */
 #section-card .flame-layer {
   position: absolute;
-  top: 52%; /* ajusta para abaixo dos ombros */
+  top: 46%; /* ajusta para abaixo dos ombros */
   transform: translate(-50%, 0);
   left: 50%;   
   width: clamp(240px, 38%, 520px);
@@ -92,6 +92,18 @@
   text-align: center;
   pointer-events: none;
 }
+
+ #section-card .card-footer::before {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    height: 9px;
+    background: #d4af37;
+    border-radius: 22px 22px 0 0;
+    z-index: -1;
+  }
 
 #section-card .card-name-badge {
   display: inline-block;
@@ -160,8 +172,8 @@
   /* Palco principal do card */
   #section-card .card-stage {
     position: relative !important;
-    top: 52% !important; /* desce o placeholder para o peito */
-    transform: translateX(-50%) !important; 
+    top: 50% !important; /* desce o placeholder para o peito */
+    transform: translate(-50%, -50%) !important; 
     width: 90vw !important;
     max-width: 380px !important;
     margin: 0 auto !important;
