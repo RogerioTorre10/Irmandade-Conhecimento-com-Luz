@@ -59,11 +59,11 @@
 /* ---------- Selfie (3:4 dentro do card) ---------- */
 #section-card .flame-layer {
   position: absolute;
-  top: 60%; /* ajusta para abaixo dos ombros */
+  top: 80%; /* ajusta para abaixo dos ombros */
   transform: translate(-50%, 0);
   left: 50%;   
-  width: clamp(240px, 38%, 520px);
-  aspect-ratio: 3 / 4;
+  width: clamp(200px, 28%, 420px);
+  aspect-ratio: 2 / 2;
   min-height: 320px;
   border-radius: 12px;
   overflow: visible !important;
@@ -195,11 +195,11 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 250px !important;              /* ajustei pra ficar exatamente no peito */
+    top: 260px !important;              /* ajustei pra ficar exatamente no peito */
     transform: translateX(-50%) !important;
-    width: clamp(118px, 56%, 240px) !important;
+    width: clamp(100px, 45%, 180px) !important;
     height: auto !important;
-    aspect-ratio: 3 / 4 !important;     /* retrato clássico de celular */
+    aspect-ratio: 2 / 2 !important;     /* retrato clássico de celular */
     max-height: 380px !important;
     border: 9px solid #d4af37 !important;
     border-radius: 26px !important;
