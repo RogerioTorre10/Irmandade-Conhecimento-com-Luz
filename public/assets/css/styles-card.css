@@ -300,8 +300,6 @@
    z-index: 50 !important;
 }
 
-
-
  #section-card #btnStartJourney,
 #section-card #btnNext {
  display: block !important;
@@ -340,7 +338,8 @@
     height: auto !important;
     padding-bottom: 40px !important;
   }
- 
+ }
+
 /* =========================================
    DESKTOP (≥ 601px)
    ========================================= */
