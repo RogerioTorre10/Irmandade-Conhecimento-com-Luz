@@ -214,7 +214,7 @@
     transform: translateX(-50%) !important;
     width: clamp(100px, 45%, 180px) !important;
     height: auto !important;
-    aspect-ratio: 1 / 1 !important;     /* retrato clássico de celular */
+    aspect-ratio: 2 / 1 !important;     /* retrato clássico de celular */
     max-height: 380px !important;
     border: 9px solid #d4af37 !important;
     border-radius: 26px !important;
