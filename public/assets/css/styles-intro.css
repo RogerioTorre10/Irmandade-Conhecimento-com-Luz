@@ -3,9 +3,9 @@
 /* ========== ESTILOS ESPECÍFICOS PARA SECTION-INTRO ========== */
 #section-intro {
   background: transparent !important;
-  padding: 24px;
+  padding: 12px;
   border-radius: 12px;
-  max-width: 720px;              /* + respiro para o pergaminho vertical */
+  max-width: 600px;              /* + respiro para o pergaminho vertical */
   margin: 0 auto;
   text-align: left !important;
   box-shadow: none;
@@ -15,15 +15,16 @@
   visibility: visible;
   z-index: 2;
   overflow: hidden;
-  min-height: 80vh;
+  min-height: 60vh;
 }
 
 /* Corrige o seletor: antes era .section-intro ... */
 #section-intro .parchment-inner-rough {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  min-height: 80vh;
+  justify-content: flex-start;
+  min-height: auto; /* AJUSTE 4: Deixa o flexbox se expandir apenas com o conteúdo */
+  height: 100%;  
   text-align: left !important;
   /* pan sutil do pergaminho durante a intro */
   animation: introPan 9s ease-in-out 1;
