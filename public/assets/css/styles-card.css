@@ -59,12 +59,12 @@
 /* ---------- Selfie (3:4 dentro do card) ---------- */
 #section-card .flame-layer {
   position: absolute;
-  top: 70%; /* ajusta para abaixo dos ombros */
+  top: 62%; /* ajusta para abaixo dos ombros */
   transform: translate(-50%, 0);
   left: 50%;   
   width: clamp(200px, 28%, 420px);
   aspect-ratio: 1 / 1;
-  min-height: 320px;
+  min-height: 200px;
   border-radius: 12px;
   overflow: visible !important;
   box-shadow: 0 0 18px rgba(255,215,120,.25);
@@ -96,6 +96,7 @@
 /* ---------- Nome do participante ---------- */
 #section-card .card-footer {
   position: absolute;
+  top: 68%; 
   left: 50%;
   transform: translateX(-50%);
   bottom: 16px;
@@ -339,19 +340,3 @@
   }
 }
 
-/* =========================================
-   DESKTOP (≥ 601px)
-   ========================================= */
-@media (min-width: 601px) {
-  #section-card .card-stage {
-    width: min(92%, var(--card-max-w));
-  }
-
-  #section-card .flame-layer {
-    width: clamp(260px, 36%, 520px);
-  }
-
-  #section-card .card-actions-below {
-    margin-top: 50px;
-  }
-}
