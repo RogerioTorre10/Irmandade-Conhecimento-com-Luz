@@ -125,7 +125,7 @@
   border: 1px solid rgba(212, 175, 55, 0.45);
   background: varrgba(0,0,0,0.72);
   color: #d4af37;
-  font: 700 clamp(16px, 2.6vw, 24px)/1 "Cardo", serif;
+  font: 700 clamp(18px, 3.0vw, 26px)/1 "Cardo", serif;
   letter-spacing: .08em;
   text-transform: uppercase;
   text-shadow: 0 1px 4px rgba(0,0,0,.9);
@@ -209,7 +209,7 @@
   /* ==================== SELFIE NO PEITO ==================== */
   #section-card .flame-layer {
     position: absolute !important;
-    left: 70% !important;
+    left: 50% !important;
     top: 260px !important;              /* ajustei pra ficar exatamente no peito */
     transform: translateX(-50%) !important;
     width: clamp(100px, 45%, 180px) !important;
@@ -239,8 +239,8 @@
     position: absolute !important;
     left: 50% !important;
     bottom: auto !important;
-    top: 260px !important;               /* exatamente na base da moldura */
-    width: clamp(100px, 45%, 180px) !important;  /* mesma largura da selfie */
+    top: 450px !important;               /* exatamente na base da moldura */
+    width: 100% !important; /* Para garantir que o left: 50% funcione corretamente */
     margin: 0 !important;
     max-width: 300px !important;
     padding: 0 !important;
@@ -253,13 +253,13 @@
     left: auto !important;
     transform: none !important;
     width: 100% !important;
-    height: 48px !important;
-    line-height: 48px !important; 
+    height: auto !important;
+    line-height: normal !important;
     padding: 0 !important;
-    background: rgba(0,0,0,0.72) !important;
-    border-radius: 0 0 22px 22px !important;
+    background: transparent !important; /* Se o nome for envolvido por um badge externo */
+    border-radius: 0 !important;
     color: #d4af37 !important;
-    font-size: 1.48rem !important;
+    font-size: 1.2rem !important;
     font-weight: 900 !important;
     text-align: center !important;
     text-transform: uppercase !important;
@@ -276,7 +276,7 @@
   }
    /* Garante que o nome fique exatamente grudado na moldura */
   #section-card .card-footer::before {
-    content: "";
+    content: none;
     position: absolute;
     bottom: 100%;
     left: 0;
