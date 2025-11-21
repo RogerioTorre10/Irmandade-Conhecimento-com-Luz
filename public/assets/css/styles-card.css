@@ -156,42 +156,38 @@
   }
 
   /* Palco principal do card */
-   #section-card .card-stage{
+  #section-card .card-stage {
     position: relative !important;
     width: 90vw !important;
     max-width: 380px !important;
     margin: 0 auto !important;
-
+    padding: 40px 0 180px !important; /* espaço pro nome + botão externo */
+    padding-bottom: 15px !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-
-    min-height: 640px !important;     /* segura placeholder+nome+botão */
-    padding: 40px 0 40px !important;  /* sem empurrar nada pra fora */
     overflow: visible !important;
   }
 
   /* ==================== SELFIE NO PEITO ==================== */
-  #section-card .flame-layer{
+  #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 170px !important;                 /* desce pro peito */
+    top: 78px !important;              /* ajustei pra ficar exatamente no peito */
     transform: translateX(-50%) !important;
-
-    width: clamp(105px, 46vw, 175px) !important; /* MENOR de verdade */
-    aspect-ratio: 3 / 4 !important;
-    max-height: 245px !important;
-
-    border: 7px solid #d4af37 !important;
-    border-radius: 20px !important;
-
+    width: clamp(118px, 56%, 240px) !important;
+    height: auto !important;
+    aspect-ratio: 3 / 4 !important;     /* retrato clássico de celular */
+    max-height: 380px !important;
+    border: 9px solid #d4af37 !important;
+    border-radius: 26px !important;
     background: #fff !important;
     overflow: hidden !important;
-    box-shadow: 0 14px 34px rgba(0,0,0,.65) !important;
-
+    box-shadow: 0 18px 45px rgba(0,0,0,0.7) !important;
     z-index: 10 !important;
-    pointer-events: none !important;
+    margin-bottom: 30px !important; /* espaço pro nome abaixo */
     margin: 0 !important;
+    pointer-events: none !important; 
   }
 
   #section-card .flame-layer .flame-selfie {
@@ -202,35 +198,48 @@
   }
 
   /* ==================== NOME DO PARTICIPANTE (DENTRO DO CARD) ==================== */
- #section-card .card-footer{
+  #section-card .card-footer {
     position: absolute !important;
     left: 50% !important;
-    top: 410px !important;                 /* base perfeita pro novo tamanho */
+    top: auto !important;
+    transform: none !important;
+    width: 84% !important;
     transform: translateX(-50%) !important;
-
-    width: clamp(105px, 46vw, 175px) !important;
-    z-index: 20 !important;
+    bottom: auto !important;
+    top: 378px !important;               /* exatamente na base da moldura */
+    width: clamp(118px, 56%, 240px) !important;  /* mesma largura da selfie */
     margin: 0 !important;
     padding: 0 !important;
+    z-index: 11 !important;
+    max-width: 300px !important; 
   }
-   
- #section-card #userNameSlot{
-    height: 42px !important;
-    line-height: 42px !important;
-    font-size: 1.25rem !important;
 
-    background: rgba(0,0,0,.75) !important;
+  #section-card #userNameSlot {
+    position: relative !important;
+    top: auto !important;
+    width: 100% !important;
+    left: auto !important;
+    transform: none !important;
+     height: 48px !important;
+    line-height: 48px !important;
+    background: rgba(0,0,0,0.72) !important;
+    border-radius: 0 0 22px 22px !important;   /* arredonda só a parte de baixo */
     color: #d4af37 !important;
-
-    border-radius: 0 0 18px 18px !important;
+    font-size: 1.48rem !important;            /* tamanho perfeito pro espaço */
     font-weight: 900 !important;
-    text-align: center !important;
-
-    pointer-events: none !important;
+    text-align: center !important; 
+    text-transform: uppercase !important;
+    letter-spacing: 1.8px !important;
+    text-shadow: 0 3px 10px rgba(0,0,0,0.95) !important;
     margin: 0 !important;
+    padding: 0 !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;  
+    z-index: 20 !important;
+    pointer-events: none !important; /* só exibição */
   }
-
-
    
    /* Garante que o nome fique exatamente grudado na moldura */
   #section-card .card-footer::before {
@@ -246,30 +255,29 @@
   }
 
   /* ==================== BOTÃO CONTINUAR (FORA DO CARD) ==================== */
-#section-card .card-actions-below{
-    position: relative !important;
-    width: 100% !important;
-    text-align: center !important;
+#section-card .card-actions-below {
+   position: relative !important;
+   width: 100% !important;
+   text-align: center !important;
+   margin-top: -5px !important;
+   margin-bottom: 20px !important;
+   padding: 0 !important;
+   z-index: 50 !important;
+}
 
-    margin-top: auto !important;   /* cola no “chão” do palco */
-    padding-top: 18px !important;
-    z-index: 9999 !important;
-    pointer-events: auto !important;
-  }
-
-#section-card #btnNext{
-    display: block !important;
+ #section-card #btnStartJourney,
+#section-card #btnNext {
+ display: block !important;
     margin: 0 auto !important;
-
-    min-width: 280px !important;
+    min-width: 290px !important;
     max-width: 92vw !important;
-    padding: 16px 28px !important;
-    font-size: 1.5rem !important;
-
+    padding: 18px 20px !important;
+    font-size: 1.6rem !important;
     border-radius: 50px !important;
-    pointer-events: auto !important;
-    z-index: 99999 !important;
+    background: linear-gradient(to bottom, #d4af37, #b8972e) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
   }
+
 
   /* Hover/touch feedback */
   #section-card #btnStartJourney:active,
