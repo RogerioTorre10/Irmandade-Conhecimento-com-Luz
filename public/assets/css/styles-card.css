@@ -146,6 +146,7 @@
    Placeholder no peito + nome visível + botão fora
    ========================================= */
 @media (max-width: 600px) {
+   
   #section-card {
     min-height: 100vh !important;
     height: auto !important;
@@ -264,8 +265,6 @@
    z-index: 50 !important;
 }
 
-
-
  #section-card #btnStartJourney,
 #section-card #btnNext {
  display: block !important;
@@ -304,7 +303,66 @@
     height: auto !important;
     padding-bottom: 40px !important;
   }
- 
+   /* 1. Remove de vez o avatar grande do guia que ficava no topo */
+  #section-card .guide-avatar,
+  #section-card .guide-photo,
+  #section-card .card-guide-photo,
+  #section-card .avatar-guide,
+  #section-card img[src*="placeholder-guide"],
+  #section-card .guide-header {
+    display: none !important;
+  }
+
+  /* 2. Selfie do participante bem no peito da Virgem (posição exata) */
+  #section-card .flame-layer {
+    top: 118px !important;            /* posição perfeita pro peito */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: clamp(130px, 58%, 250px) !important;
+    max-height: 360px !important;
+    z-index: 10 !important;
+  }
+
+  /* 3. Nome do participante (ROGÉRIO) coladinho embaixo da moldura */
+  #section-card .card-footer {
+    top: 118px + 352px !important;   /* 118 (top da selfie) + altura da moldura */
+    top: 470px !important;           /* valor mágico que funciona em todos os celulares */
+    width: clamp(130px, 58%, 250px) !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 11 !important;
+  }
+
+  /* 4. Botão Continuar logo abaixo do nome e DENTRO da área branca clicável */
+  #section-card .card-actions-below {
+    margin-top: -20px !important;    /* sobe bem pra ficar seguro */
+    margin-bottom: 40px !important;
+    z-index: 99999 !important;
+    pointer-events: auto !important;
+  }
+
+  #section-card #btnStartJourney,
+  #section-card #btnNext {
+    z-index: 99999 !important;
+    pointer-events: auto !important;
+    min-width: 290px !important;
+    padding: 18px 40px !important;
+    font-size: 1.6rem !important;
+  }
+
+  /* 5. Mata qualquer coisa do pergaminho que roube clique na parte de baixo */
+  #section-card.pergaminho::after,
+  #section-card.pergaminho-v::after,
+  #section-card .pergaminho::after {
+    pointer-events: none !important;
+  }
+
+  /* Respiração final pra não cortar nada */
+  #section-card {
+    padding-bottom: 60px !important;
+  }
+ }
+
 /* =========================================
    DESKTOP (≥ 601px)
    ========================================= */
