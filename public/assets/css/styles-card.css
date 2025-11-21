@@ -27,10 +27,11 @@
 
 /* ---------- Container da seção ---------- */
 #section-card{
-  position: relative;
+  isolation: isolate !important;   /* cria contexto de camadas */
+  position: relative !important;
   min-height: 100vh;
   background: transparent;
-  z-index: 10;
+  z-index: 10 !important;
   overflow: visible;
 }
 
@@ -39,12 +40,17 @@
 #section-card.pergaminho-v::before,
 #section-card.pergaminho::after,
 #section-card.pergaminho-v::after{
+  z-index: 0 !important;
   pointer-events: none !important;
 }
 
 /* ---------- Palco do card (onde a selfie é capturada) ---------- */
 #section-card .card-stage{
-  position: relative;
+  position: relative !important;
+  z-index: 2 !important;
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
   width: min(92vw, var(--card-max-w));
   margin: 0 auto;
   padding-top: 40px;
@@ -59,10 +65,14 @@
 /* Fundo do guia */
 #section-card #guideBg,
 #section-card .card-guide-bg{
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 18px;
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  position: relative !important;
+  z-index: 1 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  border-radius: 18px !important;;
 }
 
 /* Esconde qualquer avatar extra antigo que atrapalhe */
@@ -82,6 +92,11 @@
   top: var(--selfie-top-d);
   transform: translateX(-50%);
 
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 6 !important;
+   
   width: var(--selfie-w-d);
   height: var(--selfie-h-d);
   aspect-ratio: 3 / 4;
@@ -112,6 +127,11 @@
   top: calc(var(--selfie-top-d) + var(--selfie-h-d) - 6px);
   transform: translateX(-50%);
 
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 7 !important;
+   
   width: var(--selfie-w-d);
   z-index: 20;
   margin: 0;
@@ -165,8 +185,11 @@
   margin-top: 14px;  /* fica logo abaixo do nome */
   margin-bottom: 36px;
 
-  z-index: 9999;
-  pointer-events: auto;
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 9999 !important;
+  pointer-events: auto !important;
 }
 
 #section-card #btnStartJourney,
@@ -185,8 +208,8 @@
   background: linear-gradient(to bottom, #d4af37, #b8972e);
   box-shadow: 0 10px 30px rgba(0,0,0,.6);
 
-  z-index: 99999;
-  pointer-events: auto;
+  pointer-events: auto !important;
+  z-index: 99999 !important;
 }
 
 /* feedback toque */
