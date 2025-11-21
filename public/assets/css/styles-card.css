@@ -96,7 +96,7 @@
 /* ---------- Nome do participante ---------- */
 #section-card .card-footer {
   position: absolute;
-  top: 80%; 
+  top: 90%; 
   left: 50%;
   transform: translateX(-50%);
   bottom: 16px;
