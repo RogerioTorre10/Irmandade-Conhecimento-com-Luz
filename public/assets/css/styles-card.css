@@ -2,9 +2,7 @@
    STYLES-CARD v8 — VERSÃO FINAL DESKTOP PERFEITA
    ========================================= */
 :root{
-  --card-max-w: 560px;
-  
-  /* DESKTOP - posição exata pro peito da guia do print */
+   /* DESKTOP - posição exata pro peito da guia do print */
   --card-max-w: 560px;
   --selfie-top-d: 345px;     /* ERA 282 → agora 345px pra descer pro peito! */
   --selfie-h-d: 335px;       /* altura boa pra cobrir até abaixo do peito */
@@ -30,16 +28,15 @@
 
 /* Palco onde a selfie é capturada - IMPORTANTE: altura fixa pra garantir que o botão fique FORA */
 #section-card .card-stage{
-  position: relative;
+ position: relative;
   width: min(92vw, var(--card-max-w));
   margin: 0 auto;
-  padding: 40px;
-  min-height: 780px;        /* ← crucial: garante que o botão fique fora da captura */
+  padding: 40px 0 180px;         /* ← AUMENTEI MUITO O PADDING INFERIOR */
   display: flex;
-  flex-direction: column;        /* ← coluna pra botão ficar abaixo */
-  align-items: center; 
-  justify-content: center;
-  z-index: 2;
+  flex-direction: column;
+  align-items: center;
+  min-height: 900px !important;  /* garante espaço total pro botão aparecer inteiro */
+  background: transparent;
 }
 
 /* Fundo da guia (a imagem grande com LUMEN) */
@@ -156,28 +153,30 @@
    BOTÃO FORA DA SELFIE (nunca aparece no download)
    ========================================= */
 #section-card .card-actions-below{
-  position: relative;
   width: 100%;
   text-align: center;
-  margin-top: 80px;           /* espaço depois do card-stage */
-  padding: 20px 0 60px;
+  margin-top: 60px;           /* espaço depois do card */
+  padding: 40px 0 80px;       /* mais espaço ainda embaixo */
   z-index: 999;
+  opacity: 1 !important;
+  visibility: visible !important; 
 }
 
 #section-card #btnStartJourney,
 #section-card #btnNext{
   display: inline-block !important;
-  min-width: 320px;
-  padding: 18px 40px;
-  font-size: 1.65rem;
+  min-width: 340px;
+  padding: 20px 50px !important;
+  font-size: 1.7rem !important;
   font-weight: 800;
   color: white;
   background: linear-gradient(to bottom, #d4af37, #b8972e);
   border: none;
   border-radius: 50px;
-  box-shadow: 0 12px 35px rgba(0,0,0,0.65);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.7);
   cursor: pointer;
-  transition: all 0.2s;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 #section-card #btnStartJourney:active,
