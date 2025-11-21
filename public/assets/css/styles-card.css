@@ -199,7 +199,7 @@
     width: 90vw !important;
     max-width: 380px !important;
     margin: 0 auto !important;
-    padding: 40px 0 60px !important; /* espaço pro nome + botão externo */
+    padding: 40px 0 50px !important; /* espaço pro nome + botão externo */
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -210,7 +210,7 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 320px !important;              /* ajustei pra ficar exatamente no peito */
+    top: 340px !important;              /* ajustei pra ficar exatamente no peito */
     transform: translateX(-50%) !important;
     width: clamp(100px, 45%, 180px) !important;
     height: auto !important;
@@ -239,7 +239,7 @@
     position: absolute !important;
     left: 50% !important;
     bottom: auto !important;
-    top: 520px !important;               /* exatamente na base da moldura */
+    top: 540px !important;               /* exatamente na base da moldura */
     width: 100% !important; /* Para garantir que o left: 50% funcione corretamente */
     margin: 0 !important;
     max-width: 300px !important;
