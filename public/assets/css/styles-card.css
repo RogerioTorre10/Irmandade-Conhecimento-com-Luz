@@ -303,63 +303,54 @@
     height: auto !important;
     padding-bottom: 40px !important;
   }
-   /* 1. Remove de vez o avatar grande do guia que ficava no topo */
-  #section-card .guide-avatar,
-  #section-card .guide-photo,
-  #section-card .card-guide-photo,
-  #section-card .avatar-guide,
-  #section-card img[src*="placeholder-guide"],
-  #section-card .guide-header {
-    display: none !important;
-  }
-
-  /* 2. Selfie do participante bem no peito da Virgem (posição exata) */
+   /* ====== MOLDURA DA SELFIE → MAIS QUADRADA E MENOR (no peito perfeito) ====== */
   #section-card .flame-layer {
-    top: 118px !important;            /* posição perfeita pro peito */
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: clamp(130px, 58%, 250px) !important;
-    max-height: 360px !important;
-    z-index: 10 !important;
+    top: 112px !important;
+    width: clamp(140px, 54vw, 240px) !important;
+    height: clamp(180px, 68vw, 300px) !important;   /* mais quadrada (não tão alta) */
+    max-height: 310px !important;
+    aspect-ratio: 4 / 5 !important;                /* quase quadrada, fica lindo */
+    border: 10px solid #d4af37 !important;
+    border-radius: 20px !important;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.75) !important;
   }
 
-  /* 3. Nome do participante (ROGÉRIO) coladinho embaixo da moldura */
+  /* ====== NOME DO PARTICIPANTE DENTRO DA MOLDURA (base preta interna) ====== */
   #section-card .card-footer {
-    top: 118px + 352px !important;   /* 118 (top da selfie) + altura da moldura */
-    top: 470px !important;           /* valor mágico que funciona em todos os celulares */
-    width: clamp(130px, 58%, 250px) !important;
+    position: absolute !important;
+    top: auto !important;
+    bottom: 8px !important;               /* colado na base interna da moldura */
     left: 50% !important;
     transform: translateX(-50%) !important;
-    z-index: 11 !important;
+    width: calc(100% - 32px) !important;  /* respeita as bordas internas */
+    height: 46px !important;
+    line-height: 46px !important;
+    background: rgba(0,0,0,0.82) !important;
+    border-radius: 0 0 14px 14px !important;
+    color: #d4af37 !important;
+    font-size: 1.4rem !important;
+    font-weight: 900 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1.6px !important;
+    z-index: 20 !important;
+    pointer-events: none !important;
   }
 
-  /* 4. Botão Continuar logo abaixo do nome e DENTRO da área branca clicável */
+  /* ====== BOTÃO CONTINUAR → MENOR, MAIS ESTREITO E DISCRETO ====== */
   #section-card .card-actions-below {
-    margin-top: -20px !important;    /* sobe bem pra ficar seguro */
+    margin-top: 16px !important;     /* espaço leve depois da moldura */
     margin-bottom: 40px !important;
-    z-index: 99999 !important;
-    pointer-events: auto !important;
   }
 
   #section-card #btnStartJourney,
   #section-card #btnNext {
-    z-index: 99999 !important;
-    pointer-events: auto !important;
-    min-width: 290px !important;
-    padding: 18px 40px !important;
-    font-size: 1.6rem !important;
-  }
-
-  /* 5. Mata qualquer coisa do pergaminho que roube clique na parte de baixo */
-  #section-card.pergaminho::after,
-  #section-card.pergaminho-v::after,
-  #section-card .pergaminho::after {
-    pointer-events: none !important;
-  }
-
-  /* Respiração final pra não cortar nada */
-  #section-card {
-    padding-bottom: 60px !important;
+    min-width: 220px !important;     /* mais estreito */
+    max-width: 78vw !important;
+    padding: 14px 32px !important;   /* um pouco menor */
+    font-size: 1.38rem !important;
+    border-radius: 50px !important;
+    background: linear-gradient(to bottom, #d4af37, #b8972e) !important;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5) !important;
   }
  }
 
