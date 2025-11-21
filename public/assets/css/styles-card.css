@@ -59,7 +59,7 @@
 /* ---------- Selfie (3:4 dentro do card) ---------- */
 #section-card .flame-layer {
   position: absolute;
-  top: 46%; /* ajusta para abaixo dos ombros */
+  top: 40%; /* ajusta para abaixo dos ombros */
   transform: translate(-50%, 0);
   left: 50%;   
   width: clamp(240px, 38%, 520px);
@@ -72,6 +72,17 @@
   z-index: 30;
   pointer-events: none;
 }
+#section-card .flame-layer::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  background: rgba(20, 0, 40, 0.45);     /* bem leve, só pra dar profundidade */
+  border: 2px dashed rgba(212, 175, 55, 0.35);
+  border-radius: 14px;
+  pointer-events: none;
+  z-index: 0;
+}
+
 
 #section-card .flame-selfie {
   width: 100%;
@@ -104,6 +115,17 @@
   text-transform: uppercase;
   text-shadow: 0 1px 2px rgba(0,0,0,.6);
   backdrop-filter: blur(2px);
+}
+/* Faixa dourada em cima do nome */
+#section-card .card-footer::before{
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 9px;
+  background: var(--gold);
+  border-radius: 18px 18px 0 0;
 }
 
 /* =========================================
@@ -176,8 +198,8 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 78px !important;              /* ajustei pra ficar exatamente no peito */
-    transform: translateX(-50%) !important;
+    top: 48px !important;              /* ajustei pra ficar exatamente no peito */
+    transform: translate(-50%, -50%) !important;
     width: clamp(118px, 56%, 240px) !important;
     height: auto !important;
     aspect-ratio: 3 / 4 !important;     /* retrato clássico de celular */
@@ -199,6 +221,17 @@
     object-fit: cover !important;
     display: block !important;
   }
+#section-card .flame-layer::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  background: rgba(20, 0, 40, 0.45);     /* bem leve, só pra dar profundidade */
+  border: 2px dashed rgba(212, 175, 55, 0.35);
+  border-radius: 14px;
+  pointer-events: none;
+  z-index: 0;
+}
+   
 
   /* ==================== NOME DO PARTICIPANTE (DENTRO DO CARD) ==================== */
   #section-card .card-footer {
@@ -243,6 +276,17 @@
     z-index: 20 !important;
     pointer-events: none !important; /* só exibição */
   }
+   /* Faixa dourada em cima do nome */
+#section-card .card-footer::before{
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 9px;
+  background: var(--gold);
+  border-radius: 18px 18px 0 0;
+}
     
 
   /* ==================== BOTÃO CONTINUAR (FORA DO CARD) ==================== */
