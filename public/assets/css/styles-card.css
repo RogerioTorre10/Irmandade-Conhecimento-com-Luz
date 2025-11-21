@@ -173,12 +173,13 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 78px !important;              /* ajustei pra ficar exatamente no peito */
+    top: 118px !important;              /* ajustei pra ficar exatamente no peito */
     transform: translateX(-50%) !important;
-    width: clamp(118px, 56%, 240px) !important;
-    height: auto !important;
-    aspect-ratio: 3 / 4 !important;     /* retrato clássico de celular */
-    max-height: 380px !important;
+    width: clamp(130px, 58%, 250px) !important;
+    height: clamp(130px, 58%, 250px)!important;
+    aspect-ratio: 1 / 1 !important;     /* retrato clássico de celular */
+    max-height: 250px !important;
+    max-width: 250px !important; 
     border: 9px solid #d4af37 !important;
     border-radius: 26px !important;
     background: #fff !important;
