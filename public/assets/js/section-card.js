@@ -1,4 +1,4 @@
-/* /assets/js/section-card.js — CSS manda, JS só preenche dados e navega */
+/* /assets/js/section-card.js — CSS manda, JS só garante estrutura + dados + navegação */
 (function () {
   'use strict';
 
@@ -20,7 +20,6 @@
   if (window.__JC_CARD_BOUND__) return;
   window.__JC_CARD_BOUND__ = true;
 
-  // Reage a mudanças de dados sem interferir em layout
   window.addEventListener('storage', (e) => {
     if (e.key === 'jc.guia' || e.key === 'jc.nome' || e.key === 'jc.selfieDataUrl') {
       renderCard();
@@ -61,21 +60,104 @@
     return { nome, guia };
   }
 
+  function ensureStructure(section) {
+    if (!section) return null;
+
+    // 1) card-stage
+    let stage = qs('.card-stage', section);
+    if (!stage) {
+      stage = document.createElement('div');
+      stage.className = 'card-stage';
+      section.appendChild(stage);
+    }
+
+    // 2) imagem de fundo do guia
+    let guideBg = qs('#guideBg', stage) || qs('img.card-guide-bg', stage);
+    if (!guideBg) {
+      guideBg = document.createElement('img');
+      guideBg.id = 'guideBg';
+      guideBg.className = 'card-guide-bg';
+      guideBg.alt = 'Guia';
+      stage.appendChild(guideBg);
+    }
+
+    // 3) flame-layer + selfieImage
+    let flameLayer = qs('.flame-layer', stage);
+    if (!flameLayer) {
+      flameLayer = document.createElement('div');
+      flameLayer.className = 'flame-layer';
+      stage.appendChild(flameLayer);
+    }
+
+    let selfieImg = qs('#selfieImage', flameLayer) || qs('#selfieImage', stage);
+    if (!selfieImg) {
+      selfieImg = document.createElement('img');
+      selfieImg.id = 'selfieImage';
+      selfieImg.className = 'flame-selfie';
+      selfieImg.alt = 'Selfie do participante';
+      flameLayer.appendChild(selfieImg);
+    } else if (selfieImg.parentElement !== flameLayer) {
+      flameLayer.appendChild(selfieImg);
+    }
+
+    // 4) rodapé com nome
+    let footer = qs('.card-footer', stage);
+    if (!footer) {
+      footer = document.createElement('div');
+      footer.className = 'card-footer';
+      stage.appendChild(footer);
+    }
+
+    let nameSlot = qs('#userNameSlot', footer) || qs('#userNameSlot', stage);
+    if (!nameSlot) {
+      nameSlot = document.createElement('div');
+      nameSlot.id = 'userNameSlot';
+      footer.appendChild(nameSlot);
+    } else if (nameSlot.parentElement !== footer) {
+      footer.appendChild(nameSlot);
+    }
+
+    // 5) ações abaixo do card (fora da selfie)
+    let actionsBelow = qs('.card-actions-below', section);
+    if (!actionsBelow) {
+      actionsBelow = document.createElement('div');
+      actionsBelow.className = 'card-actions-below';
+      section.appendChild(actionsBelow);
+    }
+
+    // 6) botão continuar
+    let btnNext = qs('#btnNext', actionsBelow) || qs('.btn-next-card', actionsBelow);
+    if (!btnNext) {
+      btnNext = document.createElement('button');
+      btnNext.id = 'btnNext';
+      btnNext.className = 'btn btn-stone btn-next-card';
+      btnNext.textContent = 'Continuar';
+      actionsBelow.appendChild(btnNext);
+    }
+
+    return stage;
+  }
+
   function renderCard() {
     const section = qs('#section-card') || qs('#section-eu-na-irmandade');
     if (!section) return;
 
+    ensureStructure(section);
+
     const { nome, guia } = getUserData();
 
-    // 1) Fundo do guia (sem efeito/opacity via JS)
-    const guideBg = qs('#guideBg', section);
+    const stage = qs('.card-stage', section);
+    if (!stage) return;
+
+    // fundo do guia
+    const guideBg = qs('#guideBg', stage) || qs('img.card-guide-bg', stage);
     if (guideBg) {
       const bgUrl = CARD_BG[guia] || CARD_BG.zion;
       if (guideBg.src !== bgUrl) guideBg.src = bgUrl;
     }
 
-    // 2) Selfie (ou placeholder)
-    const selfieImg = qs('#selfieImage', section);
+    // selfie / placeholder
+    const selfieImg = qs('#selfieImage', stage);
     if (selfieImg) {
       const url =
         window.JC?.data?.selfieDataUrl ||
@@ -85,11 +167,11 @@
       if (selfieImg.src !== finalUrl) selfieImg.src = finalUrl;
 
       const flameLayer = selfieImg.closest('.flame-layer');
-      if (flameLayer) flameLayer.classList.add('show'); // só visibilidade, sem layout
+      if (flameLayer) flameLayer.classList.add('show');
     }
 
-    // 3) Nome do participante
-    const nameSlot = qs('#userNameSlot', section);
+    // nome
+    const nameSlot = qs('#userNameSlot', stage);
     if (nameSlot) nameSlot.textContent = nome;
   }
 
@@ -108,7 +190,6 @@
     v.playsInline = true;
     v.autoplay = true;
 
-    // não define estilo nenhum via JS (usa CSS global do overlay se existir)
     v.onended = () => {
       v.remove();
       if (typeof window.JC?.show === 'function') {
@@ -129,6 +210,7 @@
     if (!root || root.dataset.cardInit === 'true') return;
     root.dataset.cardInit = 'true';
 
+    ensureStructure(root);
     renderCard();
 
     const btnNext = qs('#btnNext', root);
