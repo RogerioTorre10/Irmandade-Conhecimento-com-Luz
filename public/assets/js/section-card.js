@@ -1,289 +1,174 @@
-/* /assets/js/section-card.js — v4.4-final (LOOP CORRIGIDO)
-   - Botão FORA do card, ABAIXO do rodapé
-   - Sem loop no storage
-   - Renderiza ao carregar e ao sync
-   - Compatível com guias.json, storage, vídeo
-*/
+/* /assets/js/section-card.js — VERSÃO FINAL 100% LIMPA E FUNCIONAL */
 (function () {
   'use strict';
+
   const MOD = 'section-card.js';
   const SECTION_IDS = ['section-card', 'section-eu-na-irmandade'];
   const NEXT_SECTION_ID = 'section-perguntas';
   const VIDEO_SRC = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
+
   const CARD_BG = {
     arian: '/assets/img/irmandade-quarteto-bg-arian.png',
     lumen: '/assets/img/irmandade-quarteto-bg-lumen.png',
-    zion: '/assets/img/irmandade-quarteto-bg-zion.png'
+    zion:  '/assets/img/irmandade-quarteto-bg-zion.png'
   };
   const PLACEHOLDER_SELFIE = '/assets/img/irmandade-card-placeholder.jpg';
-  const GUIAS_JSON = '/assets/data/guias.json';
+
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
-  const log = (...a) => console.log(`%c[${MOD}]`, 'color:#7dd3fc', ...a);
 
-  let GUIA_BG_CACHE = null;
-  let isRendering = false;
-
-  async function maybeLoadGuias() {
-    if (GUIA_BG_CACHE) return GUIA_BG_CACHE;
-    try {
-      const res = await fetch(GUIAS_JSON, { cache: 'no-store' });
-      if (!res.ok) throw new Error('guias.json não encontrado');
-      const arr = await res.json();
-      GUIA_BG_CACHE = {};
-      for (const g of arr) {
-        const key = (g.id || g.key || (g.nome || '').toLowerCase() || '').toString().toLowerCase();
-        const bg = g.bgImage || g.bg || g.image;
-        if (key && bg) GUIA_BG_CACHE[key] = bg.startsWith('/') ? bg : `/assets/img/${bg}`;
-      }
-      log('guias.json carregado', GUIA_BG_CACHE);
-    } catch (e) {
-      GUIA_BG_CACHE = {};
-      log('Usando BGs estáticos (sem guias.json)');
-    }
-    return GUIA_BG_CACHE;
-  }
-
-  // SYNC SEM LOOP
+  // === SYNC MOBILE ===
   window.addEventListener('storage', (e) => {
-    if (!['jc.guia', 'jc.nome', 'jc.selfieDataUrl'].includes(e.key)) return;
-
-    const current = getUserData();
-    const shouldRender = 
-      (e.key === 'jc.guia' && e.newValue !== current.guia) ||
-      (e.key === 'jc.nome' && e.newValue !== current.nome) ||
-      (e.key === 'jc.selfieDataUrl');
-
-    if (shouldRender) {
-      log('SYNC: dados mudaram, re-renderizando');
-      renderCard();
+    if (e.key?.startsWith('jc.') || e.key === 'jornada.guia') {
+      setTimeout(renderCard, 100);
     }
   });
 
+  // === PEGA DADOS DO USUÁRIO ===
   function getUserData() {
     let nome = 'AMOR';
     let guia = 'zion';
-    try {
-      const ssNome = sessionStorage.getItem('jornada.nome');
-      const ssGuia = sessionStorage.getItem('jornada.guia');
-      if (ssNome) nome = ssNome;
-      if (ssGuia) guia = ssGuia;
-      const lsNome = localStorage.getItem('jc.nome');
-      const lsGuia = localStorage.getItem('jc.guia');
-      if (lsNome) nome = lsNome;
-      if (lsGuia) guia = lsGuia;
-      if (window.JC?.data) {
-        if (window.JC.data.nome) nome = window.JC.data.nome;
-        if (window.JC.data.guia) guia = window.JC.data.guia;
-      }
-    } catch {}
-    nome = (nome || 'AMOR').toString().toUpperCase().trim();
-    guia = (guia || 'zion').toString().toLowerCase().trim();
-    window.JC = window.JC || {};
-    window.JC.data = window.JC.data || {};
+
+    if (window.JC?.data?.nome) nome = window.JC.data.nome;
+    if (window.JC?.data?.guia) guia = window.JC.data.guia;
+
+    const lsNome = localStorage.getItem('jc.nome');
+    const lsGuia = localStorage.getItem('jc.guia');
+    if (lsNome) nome = lsNome;
+    if (lsGuia) guia = lsGuia;
+
+    const ssGuia = sessionStorage.getItem('jornada.guia');
+    if (ssGuia) guia = ssGuia;
+
+    nome = nome.toUpperCase().trim();
+    guia = guia.toLowerCase().trim();
+
+    // Salva pra garantir
+    window.JC = window.JC || { data: {} };
     window.JC.data.nome = nome;
     window.JC.data.guia = guia;
+
     try {
       localStorage.setItem('jc.nome', nome);
       localStorage.setItem('jc.guia', guia);
-      sessionStorage.setItem('jornada.guia', guia);
-    } catch {}
+    } catch (e) {}
+
     return { nome, guia };
   }
 
-  function ensureStructure(root) {
-    if (!root) return {};
+  // === RENDERIZA O CARD NOVO ===
+  function renderCard() {
+    const container = qs('.new-card-container');
+    if (!container) return;
 
-    let stage = qs('.card-stage', root);
-    if (!stage) {
-      stage = document.createElement('div');
-      stage.className = 'card-stage';
-      stage.style.position = 'relative';
-      root.appendChild(stage);
+    const { nome, guia } = getUserData();
+
+    // Fundo do guia
+    const bgUrl = CARD_BG[guia] || CARD_BG.zion;
+    if (container.style.backgroundImage !== `url("${bgUrl}")`) {
+      container.style.backgroundImage = `url('${bgUrl}')`;
     }
 
-    let guideBg = qs('#guideBg', stage);
-    if (!guideBg) {
-      guideBg = document.createElement('img');
-      guideBg.id = 'guideBg';
-      guideBg.alt = 'Fundo do guia';
-      guideBg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;';
-      stage.appendChild(guideBg);
+    // Selfie
+    const selfieImg = qs('#selfieImage', container);
+    if (selfieImg) {
+      const selfieData = window.JC?.data?.selfieDataUrl || localStorage.getItem('jc.selfieDataUrl');
+      selfieImg.src = selfieData || PLACEHOLDER_SELFIE;
     }
 
-    let overlay = qs('#cardOverlay', stage);
-    if (!overlay) {
-      overlay = document.createElement('div');
-      overlay.id = 'cardOverlay';
-      overlay.className = 'card-overlay';
-      overlay.style.cssText = 'position:absolute;inset:0;z-index:2;pointer-events:none;';
-      stage.appendChild(overlay);
-    }
+    // Nome
+    const nameSlot = qs('#userNameSlot', container);
+    if (nameSlot) nameSlot.textContent = nome;
 
-    let inner = qs('#cardInner', stage);
-    if (!inner) {
-      inner = document.createElement('div');
-      inner.id = 'cardInner';
-      inner.className = 'card-inner';
-      inner.style.cssText = 'position:relative;z-index:3;';
-      stage.appendChild(inner);
-    }
-
-    let flameLayer = qs('.flame-layer', stage);
-    if (!flameLayer) {
-      flameLayer = document.createElement('div');
-      flameLayer.className = 'flame-layer';
-      flameLayer.style.cssText =
-        'position:absolute;left:50%;bottom:160px;transform:translateX(-50%);width:38%;z-index:3;';
-      flameLayer.innerHTML = `<img id="selfieImage" class="flame-selfie" src="${PLACEHOLDER_SELFIE}" alt="Selfie">`;
-      stage.appendChild(flameLayer);
-    }
-
-    let footer = qs('.card-footer', stage);
-    if (!footer) {
-      footer = document.createElement('div');
-      footer.className = 'card-footer';
-      footer.style.cssText =
-        'position:absolute;left:50%;bottom:72px;transform:translateX(-50%);z-index:4;';
-      footer.innerHTML =
-        `<span class="card-name-badge"><span id="cardName"></span></span>`;
-      stage.appendChild(footer);
-    } else {
-      const hasCardName = qs('#cardName', footer);
-      const userSlot = qs('#userNameSlot', footer);
-      if (!hasCardName && !userSlot) {
-        const span = document.createElement('span');
-        span.className = 'card-name-badge';
-        span.innerHTML = `<span id="cardName"></span>`;
-        footer.appendChild(span);
-      }
-    }
-
-    // BOTÃO CONTINUAR — FORA DO CARD
-    let actionsBelow = qs('.card-actions-below', root);
-    if (!actionsBelow) {
-      actionsBelow = document.createElement('div');
-      actionsBelow.className = 'card-actions-below';
-      root.appendChild(actionsBelow);
-    }
-
-    let btnNext = qs('#btnNext', actionsBelow);
-    if (!btnNext) {
-      btnNext = document.createElement('button');
-      btnNext.id = 'btnNext';
-      btnNext.className = 'btn btn-stone';
-      btnNext.textContent = 'Continuar';
-      actionsBelow.appendChild(btnNext);
-    }
-
-    btnNext.style.pointerEvents = 'auto';
-    btnNext.disabled = false;
-    btnNext.onclick = goNext;
-
-    return { stage, guideBg };
+    console.log('%c[CARD] Card renderizado com sucesso!', 'color: gold; font-weight: bold', { nome, guia });
   }
 
-  async function applyGuideBG(section, guia) {
-    const guideBg = qs('#guideBg', section);
-    if (!guideBg) return;
-    const cache = await maybeLoadGuias();
-    const fromJson = cache[guia];
-    const fromConst = CARD_BG[guia] || CARD_BG.zion;
-    const target = fromJson || fromConst;
-    if (!guideBg.src) guideBg.src = CARD_BG.zion;
-    if (guideBg.src !== target) {
-      guideBg.style.opacity = '0';
-      guideBg.onload = () => { guideBg.style.opacity = '1'; guideBg.onload = null; };
-      guideBg.onerror = () => { guideBg.src = CARD_BG.zion; guideBg.style.opacity = '1'; };
-      guideBg.src = target;
-    } else {
-      guideBg.style.opacity = '1';
-    }
-  }
-
-  async function renderCard() {
-    if (isRendering) {
-      log('renderCard já em execução, ignorando');
-      return;
-    }
-    isRendering = true;
-
-    try {
-      const section = qs('#section-card') || qs('#section-eu-na-irmandade');
-      if (!section) return;
-
-      ensureStructure(section);
-      const { nome, guia } = getUserData();
-      await applyGuideBG(section, guia);
-
-      const selfieImg = qs('#selfieImage', section);
-      if (selfieImg) {
-        const url = window.JC?.data?.selfieDataUrl || localStorage.getItem('jc.selfieDataUrl');
-        selfieImg.src = url || PLACEHOLDER_SELFIE;
-        const flameLayer = selfieImg.closest('.flame-layer');
-        if (flameLayer) flameLayer.classList.add('show');
-      }
-
-      const el1 = qs('#cardName', section);
-      const el2 = qs('#userNameSlot', section);
-      if (el1) el1.textContent = nome;
-      if (el2) el2.textContent = nome;
-
-      log('Renderizado', { guia, nome });
-    } finally {
-      isRendering = false;
-    }
-  }
-
+  // === NAVEGAÇÃO ===
   function goNext() {
     try { speechSynthesis.cancel(); } catch {}
-    qsa('video').forEach(v => { try { v.pause(); v.src = ''; } catch {} });
+    qsa('video').forEach(v => { try { v.pause(); v.currentTime = 0; } catch {} });
+
     if (typeof window.playTransitionVideo === 'function') {
       window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
     } else {
       const v = document.createElement('video');
       v.src = VIDEO_SRC;
-      v.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:9999;background:#000;';
-      v.muted = true; v.playsInline = true;
+      v.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;z-index:99999;background:#000;';
+      v.muted = true;
+      v.playsInline = true;
       v.onended = () => { v.remove(); window.JC?.show?.(NEXT_SECTION_ID, { force: true }); };
       document.body.appendChild(v);
       v.play().catch(() => { v.remove(); window.JC?.show?.(NEXT_SECTION_ID, { force: true }); });
     }
   }
 
-  async function initCard(root) {
-    await renderCard();
-    const typingEls = qsa('[data-typing="true"]', root);
-    for (const el of typingEls) {
-      const text = el.dataset.text || el.textContent || '';
-      if (typeof window.runTyping === 'function') {
-        await new Promise(res => window.runTyping(el, text, res, { speed: 40, cursor: true }));
-      } else {
-        el.textContent = text;
-      }
-      if (typeof window.speak === 'function') window.speak(text);
-    }
+  // === CRIA O CARD DO ZERO (SÓ UMA VEZ) ===
+  function createNewCard() {
+    const sec = qs('#section-card') || qs('#section-eu-na-irmandade');
+    if (!sec || qs('.new-card-container')) return;
+
+    // Remove qualquer resquício antigo
+    qsa('.card-stage, .flame-layer, .card-footer, .card-actions-below').forEach(el => el.remove());
+
+    const { guia = 'zion' } = getUserData();
+
+    const container = document.createElement('div');
+    container.className = 'new-card-container';
+    container.style.cssText = `
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      min-height: 100vh;
+      background: url('${CARD_BG[guia]}') center/cover no-repeat;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding-bottom: 80px;
+      box-sizing: border-box;
+      overflow: hidden;
+    `;
+
+    container.innerHTML = `
+      <!-- Selfie no peito -->
+      <div class="flame-layer show" style="position:absolute;top:118px;left:50%;transform:translateX(-50%);width:clamp(130px,58%,250px);aspect-ratio:3/4;border:9px solid #d4af37;border-radius:26px;overflow:hidden;box-shadow:0 18px 45px rgba(0,0,0,0.7);z-index:10;">
+        <img id="selfieImage" class="flame-selfie" src="${PLACEHOLDER_SELFIE}" style="width:100%;height:100%;object-fit:cover;display:block;">
+      </div>
+
+      <!-- Nome colado embaixo -->
+      <div class="card-footer" style="position:absolute;top:470px;left:50%;transform:translateX(-50%);width:clamp(130px,58%,250px);z-index:11;">
+        <div style="background:rgba(0,0,0,0.75);color:#d4af37;font:900 1.48rem/48px 'Cardo',serif;text-align:center;text-transform:uppercase;letter-spacing:1.8px;border-radius:0 0 22px 22px;height:48px;text-shadow:0 3px 10px rgba(0,0,0,0.95);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
+          <span id="userNameSlot">CARREGANDO...</span>
+        </div>
+        <div style="position:absolute;bottom:100%;left:0;right:0;height:9px;background:#d4af37;border-radius:22px 22px 0 0;"></div>
+      </div>
+
+      <!-- Botão FORA do card -->
+      <div class="card-actions-below" style="margin-top:20px;z-index:999;">
+        <button id="btnNext" style="min-width:290px;padding:18px 40px;font-size:1.6rem;font-weight:bold;background:linear-gradient(to bottom,#d4af37,#b8972e);color:#000;border:2px solid #8b5a2b;border-radius:50px;box-shadow:0 10px 30px rgba(0,0,0,0.6);cursor:pointer;">Continuar</button>
+      </div>
+    `;
+
+    sec.appendChild(container);
+    renderCard();
+
+    // Evento do botão
+    const btn = qs('#btnNext', container);
+    if (btn) btn.onclick = goNext;
   }
 
-  // EVENTO PRINCIPAL
-  document.addEventListener('section:shown', e => {
-    const id = e.detail.sectionId;
-    if (SECTION_IDS.includes(id)) {
-      const root = e.detail.node || qs(`#${id}`) || document.body;
-      ensureStructure(root);
-      renderCard();
-      initCard(root);
+  // === INIT ===
+  document.addEventListener('section:shown', (e) => {
+    if (SECTION_IDS.includes(e.detail.sectionId)) {
+      createNewCard();
     }
   });
 
-  // AUTOINIT
   document.addEventListener('DOMContentLoaded', () => {
-    const sec = qs('#section-card') || qs('#section-eu-na-irmandade');
-    if (sec && !sec.querySelector('.card-stage')) {
-      ensureStructure(sec);
-      renderCard();
+    if (SECTION_IDS.some(id => qs('#' + id))) {
+      createNewCard();
     }
   });
 
-  log('carregado e pronto!');
+  console.log(`%c[${MOD}] carregado e pronto!`, 'color: cyan; font-weight: bold');
 })();
