@@ -304,50 +304,7 @@
     height: auto !important;
     padding-bottom: 40px !important;
   }
-   /* ====== REMOVE O PLACEHOLDER/AVATAR DO GUIA (círculo grande no topo) ====== */
-  #section-card .guide-avatar,
-  #section-card .guide-photo,
-  #section-card .avatar-guide,
-  #section-card .guide-placeholder,
-  #section-card [class*="guide"] img,
-  #section-card .card-guide-photo,
-  #section-card .pergaminho-header img,
-  #section-card img[src*="placeholder"],
-  #section-card .guide-face {
-    display: none !important;
-  }
-
-  /* Remove qualquer container que só servia pro avatar do guia */
-  #section-card .guide-header,
-  #section-card .header-guide {
-    display: none !important;
-    height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  /* ====== GARANTE QUE A SELFIE FIQUE NO PEITO (posição perfeita) ====== */
-  #section-card .flame-layer {
-    top: 82px !important;           /* sobe um tiquinho mais porque tirou o avatar de cima */
-    margin-bottom: 0 !important;
-  }
-
-  /* Nome fica coladinho na base da moldura */
-  #section-card .card-footer {
-    top: 382px !important;          /* ajustado pro novo posicionamento sem o avatar do guia */
-  }
-
-  /* ====== BOTÃO CONTINUAR SOBE AINDA MAIS (fica perfeito agora) ====== */
-  #section-card .card-stage {
-    padding-top: 20px !important;    /* tira espaço inútil do topo */
-    padding-bottom: 20px !important;
-  }
-
-  #section-card .card-actions-below {
-    margin-top: -8px !important;     /* sobe mais ainda agora que não tem nada empurrando */
-  }
-}
-
+ 
 /* =========================================
    DESKTOP (≥ 601px)
    ========================================= */
