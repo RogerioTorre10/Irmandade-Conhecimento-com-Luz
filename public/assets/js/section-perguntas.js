@@ -38,128 +38,51 @@
   let completed = false;
 
   // --------------------------------------------------
-  // OVERLAY DE VÍDEO (entre blocos e final)
-  // --------------------------------------------------
+// OVERLAY DE VÍDEO (entre blocos e final) — PORTAL GLOBAL
+// --------------------------------------------------
 
- function ensureVideoOverlay() {
-  let overlay = document.getElementById('videoOverlay');
-  let video = document.getElementById('videoTransicao');
-
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'videoOverlay';
-    document.body.appendChild(overlay);
+function resolveVideoSrc(src) {
+  if (!src) return null;
+  let url = String(src).trim();
+  if (url.startsWith('/assets/img/') && url.endsWith('.mp4')) {
+    url = url.replace('/assets/img/', '/assets/videos/');
   }
-
-  if (!video) {
-    video = document.createElement('video');
-    video.id = 'videoTransicao';
-    video.playsInline = true;
-    video.preload = 'auto';
-    video.controls = false;
-    overlay.appendChild(video);
-  }
-
-  return { overlay, video };
+  return url;
 }
 
-  function resolveVideoSrc(src) {
-    if (!src) return null;
-    let url = String(src).trim();
-    if (url.startsWith('/assets/img/') && url.endsWith('.mp4')) {
-      url = url.replace('/assets/img/', '/assets/videos/');
-    }
-    return url;
-  }
-  
- function playVideoWithCallback(src, onEnded) {
+// usa o portal dourado FULL + limelight
+function playVideoWithCallback(src, onEnded, nextSectionId = null) {
   src = resolveVideoSrc(src);
   if (!src) {
     if (typeof onEnded === 'function') onEnded();
     return;
   }
 
-  const { overlay, video } = ensureVideoOverlay();
-
-  // FORÇA ESTILO INLINE (ignora tudo)
-  overlay.style.cssText = `
-    position: fixed !important;
-    top: 0 !important; left: 0 !important;
-    width: 100vw !important; height: 100vh !important;
-    background: rgba(0,0,0,0.98) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    z-index: 99999 !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    transition: opacity 0.6s ease !important;
-  `;
-
-  video.style.cssText = `
-  width: 94vw !important;
-  height: auto !important;
-  max-width: 94vw !important;
-  max-height: 90vh !important;
-  border: 8px solid #d4af37 !important;
-  border-radius: 12px !important;
-  box-shadow: 0 0 30px rgba(212,175,55,0.7) !important;
-  object-fit: contain !important;
-`;
-
-  // Remove qualquer outro conteúdo visível
-  document.body.style.overflow = 'hidden';
-  document.querySelectorAll('section, div, header, footer').forEach(el => {
-    if (el.id !== 'videoOverlay') {
-      el.style.display = 'none';
-    }
-  });
-
-  // Mostra overlay
-  overlay.style.display = 'flex';
-  overlay.style.pointerEvents = 'all';
-
-  // Força render antes de opacity
-  requestAnimationFrame(() => {
-    overlay.style.opacity = '1';
-  });
-
-  video.src = src;
-  video.load();
-
-  const endHandler = () => {
-    video.onended = null;
-    overlay.style.opacity = '0';
-    setTimeout(() => {
-      overlay.style.display = 'none';
-      // Restaura visibilidade
-      document.body.style.overflow = '';
-      document.querySelectorAll('section, div, header, footer').forEach(el => {
-        if (el.id !== 'videoOverlay') {
-          el.style.display = '';
-        }
-      });
+  // Se existir player global cinematográfico, usa ele
+  if (typeof window.playTransitionVideo === 'function') {
+    window.playTransitionVideo(src, nextSectionId);
+    // quando o portal fecha ele navega; aqui só chamamos callback depois
+    document.addEventListener('transition:ended', function handler() {
+      document.removeEventListener('transition:ended', handler);
       if (typeof onEnded === 'function') onEnded();
-    }, 600);
-  };
+    });
+    return;
+  }
 
-  video.onended = endHandler;
-
-  video.play().catch(e => {
-    console.error('[PERGUNTAS] Erro ao tocar vídeo:', e);
-    endHandler();
-  });
+  // fallback (raríssimo): sem portal → só chama callback
+  if (typeof onEnded === 'function') onEnded();
 }
 
-  window.playBlockTransition = function(videoSrc, onDone) {
-    const src = resolveVideoSrc(videoSrc);
-    if (!src) {
-      if (typeof onDone === 'function') onDone();
-      return;
-    }
-    log('Transição entre blocos:', src);
-    playVideoWithCallback(src, onDone);
-  };
+window.playBlockTransition = function(videoSrc, onDone) {
+  const src = resolveVideoSrc(videoSrc);
+  if (!src) {
+    if (typeof onDone === 'function') onDone();
+    return;
+  }
+  log('Transição entre blocos (PORTAL GLOBAL):', src);
+  playVideoWithCallback(src, onDone);
+};
+
 
   // --------------------------------------------------
   // BLOCS / PERGUNTAS
