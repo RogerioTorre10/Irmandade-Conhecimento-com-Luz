@@ -23,21 +23,18 @@
   box-sizing: border-box;
   z-index: 5;
 }
-/* =========================================
+//* =========================================
    PORTAL DOURADO — FRAME PARA VÍDEOS
-   Aplica borda + glow e força vídeo a ocupar tudo
    ========================================= */
 .jp-video-overlay {
   position: fixed !important;
   inset: 0 !important;
   z-index: 999999 !important;
-  background: #000 !important;
+  background: rgba(0,0,0,0.92) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   overflow: hidden !important;
-
-  /* safe-area iPhone etc */
   padding:
     env(safe-area-inset-top)
     env(safe-area-inset-right)
@@ -49,35 +46,40 @@
   position: relative !important;
   width: min(96vw, 1200px) !important;
   height: min(96vh, 720px) !important;
-
   border: 14px solid #d4af37 !important;
   border-radius: 22px !important;
-
   box-shadow:
     0 0 35px rgba(212,175,55,.9),
     0 0 120px rgba(212,175,55,.65),
     inset 0 0 25px rgba(255,230,160,.55) !important;
-
   background: #000 !important;
   overflow: hidden !important;
 }
 
-/* o vídeo ocupa TODO o frame */
 .jp-video-frame video {
   position: absolute !important;
   inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
-
-  /* preenche o quadro sem barras */
   object-fit: cover !important;
-
-  /* se quiser preservar tudo sem cortar, troque por contain */
-  /* object-fit: contain !important; */
-
+  object-position: center !important;
   background: #000 !important;
 }
 
+.jp-video-skip {
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
+  padding: 8px 12px !important;
+  border-radius: 10px !important;
+  border: 0 !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  background: rgba(255,255,255,0.15) !important;
+  backdrop-filter: blur(6px) !important;
+  color: #fff !important;
+  z-index: 5 !important;
+}
 
 
 /* névoa suave no topo */
@@ -493,6 +495,41 @@
     max-width: 100% !important;
     padding: 24px 18px !important;
   }
+}
+/* =========================================
+   GLAMOUR TRANSIÇÕES — PÁGINAS + PORTAL
+   ========================================= */
+
+/* 1) Conteúdo da jornada some/volta suave */
+#jornada-content-wrapper {
+  transition: opacity .55s ease, filter .55s ease, transform .55s ease;
+  will-change: opacity, filter, transform;
+}
+
+body.vt-fade-out #jornada-content-wrapper {
+  opacity: 0;
+  filter: blur(2px) brightness(.75);
+  transform: translateY(6px) scale(0.995);
+}
+
+body.vt-fade-in #jornada-content-wrapper {
+  opacity: 1;
+  filter: none;
+  transform: none;
+}
+
+/* 2) Portal dourado entra/saí em fade */
+.jp-video-overlay {
+  opacity: 0;
+  transition: opacity .35s ease;
+}
+
+.jp-video-overlay.show {
+  opacity: 1;
+}
+
+.jp-video-overlay.hide {
+  opacity: 0;
 }
 
 
