@@ -286,6 +286,8 @@
 .jp-video-frame{
   position: relative !important;
   width: min(96vw, 1200px) !important;
+  aspect-ratio: 16 / 9 !important;
+  min-height: 240px !important;
   height: auto !important;                 /* <<< remove travamento */
   max-height: 96vh !important;             /* <<< segurança mobile */
   border: 14px solid #d4af37 !important;
