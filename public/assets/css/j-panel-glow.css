@@ -163,4 +163,29 @@
     max-width: 94% !important;
     padding: 18px 14px !important;
   }
+   
+   /* ======================================================
+   REFORÇO DO BLACK + FEIXE DE LUZ (não perde o clima)
+   ====================================================== */
+.j-panel-glow{
+  background: radial-gradient(circle at 50% 40%,
+              rgba(255,255,255,0.04) 0%,
+              #121324 38%,
+              #03040a 100%) !important;  /* black mais profundo */
+}
+
+/* feixe/sinalizador vindo do topo */
+.j-panel-glow::before{
+  background: radial-gradient(ellipse at top,
+              rgba(255,255,255,0.12) 0%,
+              rgba(255,255,255,0.05) 25%,
+              transparent 55%) !important;
+  opacity: .9 !important;
+}
+
+/* luz forte de base (halo do guia) */
+.j-panel-glow::after{
+  opacity: 1 !important;
+  bottom: -22% !important; /* puxa um pouco mais a luz de baixo */
+}
 }
