@@ -53,6 +53,9 @@
     if (started) return;
     started = true;
 
+    speechSynthesis.cancel();
+    speechChain = Promise.resolve();
+
     const section   = document.getElementById(SECTION_ID);
     const titleEl   = document.getElementById('final-title');
     const messageEl = document.getElementById('final-message');
