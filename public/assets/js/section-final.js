@@ -1,4 +1,4 @@
-/* section-final.js — FINAL v1.3 (CORRIGIDO E FUNCIONAL) */
+/* section-final.js — FINAL v1.4 (espera clique para vídeo final) */
 (function () {
   'use strict';
 
@@ -93,7 +93,7 @@
       await sleep(300);
     }
 
-    // BOTÕES + VÍDEO AUTOMÁTICO
+    // BOTÕES APARECEM — MAS SEM VÍDEO AUTOMÁTICO
     if (botoes) {
       botoes.style.opacity = '0';
       botoes.style.transform = 'scale(0.9)';
@@ -113,11 +113,7 @@
         el.style.pointerEvents = 'auto';
       });
 
-      // VÍDEO FINAL AUTOMÁTICO
-      setTimeout(() => {
-        console.log('[FINAL] Iniciando vídeo final automaticamente...');
-        playFinalVideo();
-      }, 1800);
+      console.log('[FINAL] Botões liberados. Aguardando clique do participante para o vídeo final.');
     }
 
     console.log('[FINAL] Sequência concluída com sucesso!');
@@ -156,59 +152,59 @@
   }
 
   function playFinalVideo() {
-  // Remove qualquer overlay antigo
-  document.querySelectorAll('#videoOverlay, #final-video').forEach(el => el.remove());
+    // Remove qualquer overlay antigo
+    document.querySelectorAll('#videoOverlay, #final-video').forEach(el => el.remove());
 
-  const video = document.createElement('video');
-  video.id = 'final-video';
-  video.playsInline = true;
-  video.autoplay = true;
-  video.muted = false;
-  video.preload = 'auto';
-  video.controls = false; // pode deixar true só pra testar
+    const video = document.createElement('video');
+    video.id = 'final-video';
+    video.playsInline = true;
+    video.autoplay = true;
+    video.muted = false;
+    video.preload = 'auto';
+    video.controls = false; // pode deixar true só pra testar
 
-  // FORÇA O SRC COM ?t= para burlar cache e forçar Range Requests
-  video.src = VIDEO_SRC + '?t=' + Date.now();
+    // FORÇA O SRC COM ?t= para burlar cache e forçar Range Requests
+    video.src = VIDEO_SRC + '?t=' + Date.now();
 
-  video.style.cssText = `
-    position:fixed !important;top:50%!important;left:50%!important;
-    transform:translate(-50%,-50%)!important;
-    width:94vw!important;height:94vh!important;
-    max-width:94vw!important;max-height:94vh!important;
-    object-fit:contain!important;
-    z-index:9999999!important;
-    border:14px solid #d4af37!important;
-    border-radius:20px!important;
-    box-shadow:0 0 80px rgba(212,175,55,1)!important;
-    background:#000!important;
-  `;
+    video.style.cssText = `
+      position:fixed !important;top:50%!important;left:50%!important;
+      transform:translate(-50%,-50%)!important;
+      width:94vw!important;height:94vh!important;
+      max-width:94vw!important;max-height:94vh!important;
+      object-fit:contain!important;
+      z-index:9999999!important;
+      border:14px solid #d4af37!important;
+      border-radius:20px!important;
+      box-shadow:0 0 80px rgba(212,175,55,1)!important;
+      background:#000!important;
+    `;
 
-  document.body.appendChild(video);
-  document.body.style.overflow = 'hidden';
-  const wrapper = document.getElementById('jornada-content-wrapper');
-  if (wrapper) wrapper.style.opacity = '0';
+    document.body.appendChild(video);
+    document.body.style.overflow = 'hidden';
+    const wrapper = document.getElementById('jornada-content-wrapper');
+    if (wrapper) wrapper.style.opacity = '0';
 
-  // Logs pra você ver no console
-  video.onloadeddata = () => console.log('Vídeo carregou dados');
-  video.oncanplay = () => console.log('Vídeo pode tocar');
-  video.onplay = () => console.log('Vídeo tocando!');
-  video.onerror = (e) => console.error('Erro no vídeo:', e);
-  video.onended = () => {
-    video.remove();
-    location.href = HOME_URL;
-  };
+    // Logs
+    video.onloadeddata = () => console.log('Vídeo carregou dados');
+    video.oncanplay = () => console.log('Vídeo pode tocar');
+    video.onplay = () => console.log('Vídeo tocando!');
+    video.onerror = (e) => console.error('Erro no vídeo:', e);
+    video.onended = () => {
+      video.remove();
+      location.href = HOME_URL;
+    };
 
-  // Força o play com múltiplas tentativas
-  const tentarPlay = () => {
-    video.play().then(() => {
-      console.log('Vídeo rodando com glória!');
-    }).catch(err => {
-      console.warn('Play falhou, tentando de novo...', err);
-      setTimeout(tentarPlay, 500);
-    });
-  };
-  tentarPlay();
-}
+    // Força o play com múltiplas tentativas
+    const tentarPlay = () => {
+      video.play().then(() => {
+        console.log('Vídeo rodando com glória!');
+      }).catch(err => {
+        console.warn('Play falhou, tentando de novo...', err);
+        setTimeout(tentarPlay, 500);
+      });
+    };
+    tentarPlay();
+  }
 
   // EVENTOS
   document.addEventListener('section:shown', e => {
@@ -218,10 +214,13 @@
 
   document.addEventListener('click', e => {
     const t = e.target;
+
     if (t.id === 'btnBaixarPDFHQ' || t.closest('#btnBaixarPDFHQ')) {
       e.preventDefault();
       generateArtifacts();
     }
+
+    // Clique consciente do participante para assistir o filme final
     if (t.id === 'btnVoltarInicio' || t.closest('#btnVoltarInicio')) {
       e.preventDefault();
       playFinalVideo();
