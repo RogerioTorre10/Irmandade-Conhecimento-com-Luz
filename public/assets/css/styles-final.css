@@ -72,4 +72,58 @@
   z-index: 5;
   position: relative;
 }
+/* =========================================
+   FINAL — GLAMOUR DOS BOTÕES + TOQUE MOBILE
+   ========================================= */
+
+/* hit-area maior e clique suave */
+.final-acoes .btn-gold,
+.final-acoes .btn-light{
+  min-height: 52px;                 /* dedo agradece */
+  width: 100%;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  z-index: 10;
+}
+
+/* glow forte do dourado (sempre) */
+.final-acoes .btn-gold{
+  box-shadow:
+    0 0 18px rgba(212,175,55,0.95),
+    0 0 42px rgba(212,175,55,0.75),
+    inset 0 0 10px rgba(255,240,180,0.65);
+}
+
+/* mantém glamour mesmo desabilitado */
+.final-acoes .btn-gold:disabled{
+  opacity: 0.95;
+  filter: none;
+  box-shadow:
+    0 0 18px rgba(212,175,55,0.95),
+    0 0 42px rgba(212,175,55,0.75),
+    inset 0 0 10px rgba(255,240,180,0.65);
+  cursor: not-allowed;
+}
+
+/* glow elegante do botão claro */
+.final-acoes .btn-light{
+  box-shadow:
+    0 0 10px rgba(212,175,55,0.6),
+    0 0 26px rgba(212,175,55,0.35);
+}
+
+/* feedback de toque */
+.final-acoes .btn-gold:active,
+.final-acoes .btn-light:active{
+  transform: translateY(1px) scale(0.98);
+}
+
+/* garante que o último botão não fique “colado” no fim da tela */
+.final-acoes{
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+.final-acoes .btn-light{
+  margin-bottom: 6px;
+}
 
