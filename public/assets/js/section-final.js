@@ -1,37 +1,35 @@
-/* section-final.js — FINAL v1.4 (espera clique para vídeo final) */
+/* section-final.js — FINAL v1.3 (CORRIGIDO E FUNCIONAL) */
 (function () {
   'use strict';
-  
-  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-  
+
   const SECTION_ID = 'section-final';
   const VIDEO_SRC = '/assets/videos/filme-5-fim-da-jornada.mp4';
   const HOME_URL = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
 
- let isSpeaking = false; 
- let started = false;    
+  let started = false;
 
-// Fila de fala: garante que um texto só fala depois do outro terminar
- let speechChain = Promise.resolve();
+  // Utilitário de pausa (necessário para datilografia / efeitos)
+  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
- function queueSpeak(text) {
-  if (!('speechSynthesis' in window) || !text) return Promise.resolve();
+  // Fila de fala: garante sincronismo da leitura por parágrafo
+  let speechChain = Promise.resolve();
 
-  speechChain = speechChain.then(() => new Promise((resolve) => {
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = 'pt-BR';
-    utter.rate = 0.9;
-    utter.pitch = 1;
-    utter.volume = 0.9;
-    utter.onend = resolve;
-    utter.onerror = resolve;
-    window.speechSynthesis.speak(utter);
-  }));
+  function queueSpeak(text) {
+    if (!('speechSynthesis' in window) || !text) return Promise.resolve();
 
-  return speechChain;
-}
+    speechChain = speechChain.then(() => new Promise((resolve) => {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'pt-BR';
+      utter.rate = 0.9;
+      utter.pitch = 1;
+      utter.volume = 0.9;
+      utter.onend = resolve;
+      utter.onerror = resolve;
+      window.speechSynthesis.speak(utter);
+    }));
 
-
+    return speechChain;
+  }
 
   async function typeText(el, text, delay = 55, withVoice = false) {
     if (!el || !text) return;
@@ -39,12 +37,17 @@
     el.style.opacity = '1';
     el.classList.add('typing-active');
 
-    if (withVoice) queueSpeak(text);
+    // Inicia leitura e datilografia juntas, mas só libera o próximo parágrafo ao fim da leitura
+    let speechPromise = Promise.resolve();
+    if (withVoice) speechPromise = queueSpeak(text);
 
     for (let i = 0; i < text.length; i++) {
       el.textContent += text[i];
       if (i % 2 === 0) await sleep(delay);
     }
+
+    // Espera a voz terminar antes de concluir este parágrafo
+    await speechPromise;
 
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
@@ -55,7 +58,8 @@
     if (started) return;
     started = true;
 
-    speechSynthesis.cancel();
+    // Reseta qualquer fala pendente de outras seções
+    try { speechSynthesis.cancel(); } catch(e) {}
     speechChain = Promise.resolve();
 
     const section   = document.getElementById(SECTION_ID);
@@ -85,14 +89,14 @@
     section.classList.add('show');
     await sleep(200);
 
-    // TÍTULO
+    // TÍTULO (datilografa + lê, e só segue quando terminar de ler)
     titleEl.style.transition = 'all 0.9s ease';
     titleEl.style.opacity = '1';
     titleEl.style.transform = 'translateY(0)';
     await typeText(titleEl, tituloOriginal, 65, true);
     await sleep(600);
 
-    // PARÁGRAFOS
+    // PARÁGRAFOS (um por vez: lê + datilografa juntos, e só passa pro próximo ao fim da leitura)
     for (let i = 0; i < ps.length; i++) {
       const p = ps[i];
       const txt = p.getAttribute('data-original') || '';
@@ -105,7 +109,7 @@
       await sleep(300);
     }
 
-    // BOTÕES APARECEM — MAS SEM VÍDEO AUTOMÁTICO
+    // BOTÕES APARECEM — SEM VÍDEO AUTOMÁTICO
     if (botoes) {
       botoes.style.opacity = '0';
       botoes.style.transform = 'scale(0.9)';
@@ -164,7 +168,6 @@
   }
 
   function playFinalVideo() {
-    // Remove qualquer overlay antigo
     document.querySelectorAll('#videoOverlay, #final-video').forEach(el => el.remove());
 
     const video = document.createElement('video');
@@ -173,9 +176,8 @@
     video.autoplay = true;
     video.muted = false;
     video.preload = 'auto';
-    video.controls = false; // pode deixar true só pra testar
+    video.controls = false;
 
-    // FORÇA O SRC COM ?t= para burlar cache e forçar Range Requests
     video.src = VIDEO_SRC + '?t=' + Date.now();
 
     video.style.cssText = `
@@ -196,7 +198,6 @@
     const wrapper = document.getElementById('jornada-content-wrapper');
     if (wrapper) wrapper.style.opacity = '0';
 
-    // Logs
     video.onloadeddata = () => console.log('Vídeo carregou dados');
     video.oncanplay = () => console.log('Vídeo pode tocar');
     video.onplay = () => console.log('Vídeo tocando!');
@@ -206,7 +207,6 @@
       location.href = HOME_URL;
     };
 
-    // Força o play com múltiplas tentativas
     const tentarPlay = () => {
       video.play().then(() => {
         console.log('Vídeo rodando com glória!');
@@ -218,7 +218,6 @@
     tentarPlay();
   }
 
-  // EVENTOS
   document.addEventListener('section:shown', e => {
     const id = e.detail?.sectionId || e.detail;
     if (id === SECTION_ID) startFinalSequence();
@@ -232,7 +231,6 @@
       generateArtifacts();
     }
 
-    // Clique consciente do participante para assistir o filme final
     if (t.id === 'btnVoltarInicio' || t.closest('#btnVoltarInicio')) {
       e.preventDefault();
       playFinalVideo();
