@@ -1,4 +1,4 @@
-// /assets/js/video-transicao.js — PORTAL DOURADO + GLAMOUR + LIMELIGHT (versão final cinematográfica)
+// /assets/js/video-transicao.js — PORTAL ARCANUM FULL + LIMELIGHT (FINAL)
 (function () {
   'use strict';
 
@@ -7,11 +7,10 @@
   const warn = (...a) => console.warn(NS, ...a);
 
   let isPlaying = false;
-  let cleaned   = false;
+  let cleaned = false;
 
   // ----------------------------- UTILIDADES -----------------------------
   const isMp4 = (src) => /\.mp4(\?|#|$)/i.test(src || '');
-
   const resolveHref = (src) => {
     try { return new URL(src, window.location.origin).href; }
     catch { return src; }
@@ -47,30 +46,6 @@
     }
   }
 
-  // Ajusta moldura à proporção real do vídeo (sem fullscreen nativo)
-  function fitFrameToVideo(frame, video) {
-    const vw = window.innerWidth  * 0.96;
-    const vh = window.innerHeight * 0.96;
-
-    // fallback inicial (16:9) se metadata ainda não carregou
-    const w = video.videoWidth  || 16;
-    const h = video.videoHeight ||  9;
-
-    const ar = w / h;
-
-    let width, height;
-    if (vw / ar <= vh) {
-      width  = vw;
-      height = vw / ar;
-    } else {
-      height = vh;
-      width  = vh * ar;
-    }
-
-    frame.style.width  = Math.round(width)  + 'px';
-    frame.style.height = Math.round(height) + 'px';
-  }
-
   // ---------------------------- LIMPEZA --------------------------------
   function cleanup(overlay) {
     if (cleaned) return;
@@ -88,19 +63,19 @@
     log('Overlay removido e estado resetado');
   }
 
-  // -------------------------- PORTAL DOURADO ---------------------------
+  // -------------------------- PORTAL ARCANUM ---------------------------
   function buildPortal() {
-    // Overlay escuro
+    // Overlay escuro com classe (CSS pega!)
     const overlay = document.createElement('div');
     overlay.id = 'vt-overlay';
     overlay.className = 'jp-video-overlay';
     overlay.setAttribute('role', 'dialog');
 
-    // Moldura dourada
+    // Frame dourado fullscreen (CSS pega!)
     const frame = document.createElement('div');
     frame.className = 'jp-video-frame';
 
-    // Vídeo ambiente (limelight)
+    // Vídeo ambiente (limelight desfocada)
     const ambient = document.createElement('video');
     ambient.className = 'jp-video-ambient';
     ambient.playsInline = true;
@@ -110,32 +85,33 @@
     ambient.loop = true;
     ambient.preload = 'auto';
 
-    // Vídeo principal (cenário completo)
+    // Vídeo principal
     const video = document.createElement('video');
     video.id = 'vt-video';
     video.playsInline = true;
     video.autoplay = false;
     video.controls = false;
-    video.muted = true;       // autoplay confiável
+    video.muted = true;     // autoplay confiável
     video.preload = 'auto';
-
-    // Injeta vídeos dentro da moldura
-    frame.appendChild(ambient); // fundo primeiro
-    frame.appendChild(video);   // principal por cima
 
     // Botão “Pular”
     const skip = document.createElement('button');
     skip.textContent = 'Pular';
     skip.setAttribute('aria-label', 'Pular vídeo');
     skip.className = 'jp-video-skip';
-    frame.appendChild(skip);
 
-    // Adiciona frame e overlay no body
+    // Montagem
+    frame.appendChild(ambient);
+    frame.appendChild(video);
+    frame.appendChild(skip);
     overlay.appendChild(frame);
     document.body.appendChild(overlay);
 
     // Glamour: portal aparece suave
     requestAnimationFrame(() => overlay.classList.add('show'));
+
+    // Travar scroll
+    document.documentElement.style.overflow = 'hidden';
 
     return { overlay, frame, video, ambient, skip };
   }
@@ -144,7 +120,6 @@
   function playTransitionVideo(src, nextSectionId) {
     log('Recebido src:', src, 'nextSectionId:', nextSectionId);
 
-    // Se não for MP4 → navega direto
     if (!src || !isMp4(src)) {
       warn('Fonte não é MP4 (ou ausente). Pulando player e navegando direto…');
       navigateTo(nextSectionId);
@@ -167,25 +142,13 @@
     window.__TRANSITION_LOCK = true;
     document.dispatchEvent(new CustomEvent('transition:started'));
     try { window.speechSynthesis?.cancel(); } catch {}
-    document.documentElement.style.overflow = 'hidden';
 
     const href = resolveHref(src);
     log('Vídeo resolvido para:', href);
 
-    const { overlay, frame, video, ambient, skip } = buildPortal();
-
-    // fallback imediato para evitar "barra dourada"
-    fitFrameToVideo(frame, { videoWidth: 16, videoHeight: 9 });
-
-    // Ajuste responsivo do frame ao vídeo
-    const onResize = () => fitFrameToVideo(frame, video);
-    window.addEventListener('resize', onResize);
+    const { overlay, video, ambient, skip } = buildPortal();
 
     const finishAndGo = safeOnce(() => {
-      window.removeEventListener('resize', onResize);
-      try { ambient.pause(); } catch {}
-
-      // Glamour: portal sai suave
       overlay.classList.remove('show');
       overlay.classList.add('hide');
 
@@ -206,20 +169,14 @@
     });
     document.addEventListener('keydown', onKeydown, true);
 
-    // EVENTOS
+    // Eventos
     const onCanPlay = safeOnce(() => {
       log('Vídeo carregado, iniciando reprodução:', href);
-
-      // moldura abraça proporção real
-      try { fitFrameToVideo(frame, video); } catch {}
-
-      // toca fundo + principal
-      ambient.play().catch(()=>{});
+      ambient.play().catch(() => {});
       video.play().catch(err => {
         warn('Falha ao dar play (autoplay?):', err);
         video.muted = true;
         ambient.muted = true;
-        ambient.play().catch(()=>{});
         video.play().catch(() => warn('Play ainda bloqueado.'));
       });
     });
@@ -234,13 +191,12 @@
       finishAndGo();
     });
 
-    video.addEventListener('loadedmetadata', () => fitFrameToVideo(frame, video), { once: true });
     video.addEventListener('canplaythrough', onCanPlay, { once: true });
     video.addEventListener('loadeddata', onCanPlay, { once: true });
     video.addEventListener('ended', onEnded, { once: true });
     video.addEventListener('error', onError, { once: true });
 
-    // Cache-buster para evitar travas de Range/codec
+    // Cache-buster
     const finalSrc = href + (href.includes('?') ? '&' : '?') + 't=' + Date.now();
     video.src = finalSrc;
     ambient.src = finalSrc;
@@ -256,5 +212,4 @@
     log('Transição simples (sem vídeo) para:', nextSectionId);
     navigateTo(nextSectionId);
   };
-
 })();
