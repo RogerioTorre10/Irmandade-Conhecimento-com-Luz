@@ -1,31 +1,272 @@
 /* ======================================================
-   PAINEL EXTERNO — tamanho padrão em todas as páginas
+   J-PANEL-GLOW.css — LIMPO + ORGANIZADO (versão unificada)
+   Mantém o visual atual: painel slim/largo + névoa/radar,
+   pergaminhos internos, arcane-card, portal dourado e glamour.
+   ====================================================== */
+
+/* ======================================================
+   1) PAINEL EXTERNO — Glow universal (desktop + mobile)
    ====================================================== */
 .j-panel-glow {
   position: relative;
-  width: min(92%, 760px);
-  margin: clamp(32px, 6vh, 40px) auto;
-  padding: clamp(18px, 3vh, 26px);
-  border-radius: 26px;
+  width: 98%;
+  max-width: 980px;
+  margin: 10px auto;
+  padding: 12px;
+  border-radius: 22px;
+  box-sizing: border-box;
+  overflow: hidden;
+  z-index: 5;
 
-  background: rgba(10, 14, 32, 0.72);
-  backdrop-filter: blur(3px);
+  /* Fundo épico (mantém o look atual) */
+  background: radial-gradient(
+    circle at top,
+    rgba(255,255,255,0.06) 0%,
+    #181a2c 40%,
+    #05060c 100%
+  );
 
-  /* garante que ele não “estoure” e nem fique baixinho */
+  /* Aura/Glow do guia */
+  box-shadow:
+    0 0 38px rgba(0,0,0,0.9),
+    0 0 72px color-mix(in srgb, var(--theme-main-color, #ffd978) 75%, transparent);
+
+  /* garante presença visual e centralização do conteúdo */
   min-height: min(84vh, 860px);
-
-  /* centraliza o conteúdo interno (pergaminho vertical, cartão, etc.) */
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Névoa suave no topo */
+.j-panel-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.10),
+    transparent 40%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Glow forte vindo de baixo na cor do guia */
+.j-panel-glow::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -18%;
+  transform: translateX(-50%);
+  width: 140%;
+  height: 70%;
+  background: radial-gradient(
+    ellipse at top,
+    color-mix(in srgb, var(--theme-main-color, #ffd978) 85%, transparent) 0%,
+    transparent 65%
+  );
+  opacity: 0.95;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Conteúdo dentro do painel sempre acima das “peles” */
+.j-panel-glow > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* ======================================================
+   2) PERGAMINHOS INTERNOS — Vertical e Horizontal
+   ====================================================== */
+
+/* Pergaminho vertical interno (intro, termos, senha, selfie, card, final) */
+.j-perg-v-inner {
+  position: relative;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+
+  background: center/contain no-repeat url('/assets/img/pergaminho-rasgado-vert.png');
+  background-color: rgba(245, 235, 200, 0.05);
+  border-radius: 20px;
+
+  min-height: clamp(420px, 65vh, 720px);
+  max-height: 100%;
+  padding: 30px 26px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow-y: auto;
+
+  box-shadow: 0 0 60px rgba(0,0,0,0.6);
+}
+
+/* Conteúdo dentro do pergaminho interno */
+.j-perg-v-inner .j-content {
+  color: var(--theme-main-color, #ffd978);
+  font-family: 'BerkshireSwash', cursive;
+}
+
+/* Pergaminho horizontal interno (perguntas) */
+.j-perg-h-inner {
+  background: center/contain no-repeat url('/assets/img/pergaminho-rasgado-horiz.png');
+  background-color: rgba(245,235,200,0.05);
+  border-radius: 18px;
+  padding: clamp(20px, 3vh, 28px) clamp(18px, 4vw, 28px);
+  box-shadow: 0 0 40px rgba(0,0,0,0.55);
+}
+
+/* ======================================================
+   3) CARTÃO ARCANO — místico + futurista
+   ====================================================== */
+.j-arcane-card {
+  position: relative;
+  max-width: 460px;
+  margin: 0 auto clamp(18px, 3vh, 26px);
+  padding: clamp(18px, 3vh, 24px) clamp(16px, 4vw, 24px);
+  border-radius: 24px;
+
+  background:
+    radial-gradient(circle at top, rgba(255,255,255,0.16), transparent 55%),
+    linear-gradient(145deg, #151724, #05060c);
+
+  border: 1px solid color-mix(
+    in srgb,
+    var(--theme-main-color, #ffd978) 75%,
+    #ffffff 10%
+  );
+
+  box-shadow:
+    0 0 16px rgba(0,0,0,0.9),
+    0 0 40px color-mix(in srgb, var(--theme-main-color, #ffd978) 80%, transparent),
+    0 0 90px color-mix(in srgb, var(--theme-main-color, #ffd978) 35%, transparent);
 
   overflow: hidden;
-  box-sizing: border-box;
-  z-index: 5;
 }
-//* =========================================
-   PORTAL DOURADO — FRAME PARA VÍDEOS
-   ========================================= */
+
+/* brilho correndo na borda */
+.j-arcane-card::before {
+  content: '';
+  position: absolute;
+  inset: -40%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    color-mix(in srgb, var(--theme-main-color, #ffd978) 90%, #ffffff 10%) 60deg,
+    transparent 120deg
+  );
+  opacity: 0.35;
+  mix-blend-mode: screen;
+  animation: jArcaneSweep 7s linear infinite;
+  pointer-events: none;
+}
+
+/* máscara interna pra deixar só glow nas bordas */
+.j-arcane-card::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 22px;
+  background: radial-gradient(circle at top,
+              rgba(255,255,255,0.04),
+              rgba(0,0,0,0.9));
+  box-shadow: inset 0 0 24px rgba(0,0,0,0.85);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.j-arcane-card > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Títulos dentro do cartão */
+.j-arcane-card h1,
+.j-arcane-card h2,
+.j-arcane-card h3 {
+  font-family: 'ManufacturingConsent', serif;
+  letter-spacing: 1.5px;
+  color: var(--theme-main-color, #ffd978);
+  text-align: center;
+  text-shadow:
+    0 0 6px color-mix(in srgb, var(--theme-main-color, #ffd978) 85%, transparent),
+    0 0 14px rgba(0,0,0,0.9);
+  margin-bottom: 10px;
+}
+
+/* texto normal */
+.j-arcane-card p,
+.j-arcane-card label,
+.j-arcane-card span {
+  color: #f5f1e5;
+}
+
+/* inputs */
+.j-arcane-card input[type="text"],
+.j-arcane-card input[type="password"],
+.j-arcane-card textarea {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.4);
+  background: rgba(5,5,10,0.85);
+  color: #fdf7e5;
+  padding: 10px 12px;
+  font-family: 'Cardo', serif;
+  box-shadow:
+    0 0 10px rgba(0,0,0,0.9),
+    0 0 22px color-mix(in srgb, var(--theme-main-color, #ffd978) 40%, transparent);
+}
+
+.j-arcane-card .btn-primary,
+.j-arcane-card .btn-stone-espinhos {
+  margin-top: 14px;
+}
+
+@keyframes jArcaneSweep {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ======================================================
+   4) PAINÉIS AUXILIARES — Outer / Mid / Inner (se usados)
+   ====================================================== */
+.j-panel-outer {
+  width: min(92%, 780px);
+  margin: 0 auto;
+}
+
+.j-panel-mid {
+  width: 100%;
+  padding: 28px;
+  border-radius: 26px;
+}
+
+.j-panel-inner {
+  width: 100%;
+  max-width: 660px;
+  margin: 0 auto;
+  padding: 38px 32px;
+  border-radius: 26px;
+  background-size: cover;
+}
+
+.j-panel-inner.pergaminho-v {
+  background-image: url('/assets/img/pergaminho-rasgado-vert.png');
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: 100% auto;
+}
+
+.j-panel-inner > *:first-child { margin-top: 12px; }
+.j-panel-inner > *:last-child  { margin-bottom: 22px; }
+
+/* ======================================================
+   5) PORTAL DOURADO — Frame para vídeos (transições)
+   ====================================================== */
 .jp-video-overlay {
   position: fixed !important;
   inset: 0 !important;
@@ -40,7 +281,13 @@
     env(safe-area-inset-right)
     env(safe-area-inset-bottom)
     env(safe-area-inset-left) !important;
+
+  opacity: 0;
+  transition: opacity .35s ease;
 }
+
+.jp-video-overlay.show { opacity: 1; }
+.jp-video-overlay.hide { opacity: 0; }
 
 .jp-video-frame {
   position: relative !important;
@@ -81,426 +328,9 @@
   z-index: 5 !important;
 }
 
-
-/* névoa suave no topo */
-.j-panel-glow::before{
-  content:'';
-  position:absolute;
-  inset:0;
-  background: linear-gradient(
-    to bottom,
-    rgba(255,255,255,0.08),
-    transparent 40%,
-    transparent 100%
-  );
-  pointer-events:none;
-  z-index:1;
-}
-
-/* glow forte vindo de baixo na cor do guia */
-.j-panel-glow::after{
-  content:'';
-  position:absolute;
-  left:50%;
-  bottom:-18%;
-  transform:translateX(-50%);
-  width:140%;
-  height:70%;
-  background: radial-gradient(
-    ellipse at top,
-    color-mix(in srgb, var(--theme-main-color, #ffd978) 85%, transparent) 0%,
-    transparent 65%
-  );
-  opacity: 0.95;
-  pointer-events:none;
-  z-index:0;
-}
-
-/* conteúdo dentro do painel sempre acima das peles */
-.j-panel-glow > *{
-  position: relative;
-  z-index: 2;
-}
-
-/* ================================================
-   PAINEL ÉPICO UNIVERSAL — Glow + Pergaminho Interno
-   ================================================ */
-
-.j-panel-glow{
-  position: relative;
-  width: min(92%, 760px);
-  margin: clamp(32px, 7vh, 56px) auto;
-  padding: clamp(20px, 3.5vh, 30px);
-  border-radius: 26px;
-
-  background: radial-gradient(circle at top,
-              rgba(255,255,255,0.06) 0%,
-              #181a2c 40%,
-              #05060c 100%);
-
-  box-shadow:
-    0 0 38px rgba(0,0,0,.9),
-    0 0 72px color-mix(in srgb, var(--theme-main-color, #ffd978) 75%, transparent);
-  overflow: hidden;
-  box-sizing: border-box;
-}
-
-.j-panel-glow::after{
-  content:'';
-  position:absolute;
-  left:50%;
-  bottom:-18%;
-  transform:translateX(-50%);
-  width:140%;
-  height:70%;
-  background: radial-gradient(
-    ellipse at top,
-    color-mix(in srgb, var(--theme-main-color, #ffd978) 85%, transparent) 0%,
-    transparent 65%
-  );
-  opacity:.95;
-  pointer-events:none;
-  z-index:0;
-}
-
-.j-panel-glow::before{
-  content:'';
-  position:absolute;
-  inset:0;
-  background: linear-gradient(
-    to bottom,
-    rgba(255,255,255,.10),
-    transparent 40%,
-    transparent 100%
-  );
-  pointer-events:none;
-  z-index:1;
-}
-
-.j-panel-glow > *{
-  position: relative;
-  z-index: 2;
-}
-
 /* ======================================================
-   PERGAMINHO VERTICAL INTERNO — tamanho consistente
+   6) GLAMOUR — Fade suave entre páginas e filmes
    ====================================================== */
-.j-perg-v-inner {
-  position: relative;
-  width: 100%;
-  max-width: 520px;                  /* largura do “totem” interno */
-  margin: 0 auto;
-
-  background: center/contain no-repeat url('/assets/img/pergaminho-rasgado-vert.png');
-  background-color: rgba(245, 235, 200, 0.05);
-  border-radius: 22px;
-
-  /* altura padrão, igual em intro, termos, senha, etc. */
-  min-height: clamp(420px, 65vh, 720px);
-  max-height: 100%;                  /* nunca passa do painel externo */
-  padding: clamp(28px, 5vh, 40px) clamp(20px, 4vw, 32px);
-
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;       /* se quiser bem central: center */
-  overflow-y: auto;                  /* se o conteúdo passar, vira scroll interno */
-  box-shadow: 0 0 60px rgba(0,0,0,.6);
-}
-
-/* conteúdo dentro do pergaminho interno */
-.j-perg-v-inner .j-content {
-  color: var(--theme-main-color, #ffd978);
-  font-family: 'BerkshireSwash', cursive;
-}
-
-/* PERGAMINHO INTERNO HORIZONTAL (perguntas) */
-.j-perg-h-inner{
-  background: center/contain no-repeat url('/assets/img/pergaminho-rasgado-horiz.png');
-  background-color: rgba(245,235,200,0.05);
-  border-radius: 18px;
-  padding: clamp(20px, 3vh, 28px) clamp(18px, 4vw, 28px);
-  box-shadow: 0 0 40px rgba(0,0,0,.55);
-}
-/* ============================================================
-   PAINEL ÉPICO — GLOW LUMINOSO
-   ============================================================ */
-
-.j-panel-glow {
-  position: relative;
-  width: min(92%, 760px);
-  margin: 40px auto;
-  padding: 32px 28px;
-
-  border-radius: 18px;
-
-  /* Permitir ver o glow por baixo */
-  background: rgba(10, 14, 32, 0.72);
-  backdrop-filter: blur(3px);
-
-  z-index: 5;
-}
-
-/* Glow superior e inferior */
-.j-panel-glow::before,
-.j-panel-glow::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 95px;
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: -1;
-}
-
-.j-panel-glow::before {
-  top: -20px;
-  background: radial-gradient(
-    ellipse at 50% 0%,
-    rgba(255, 217, 120, .85),
-    rgba(255, 217, 120, .0) 65%
-  );
-}
-
-.j-panel-glow::after {
-  bottom: -20px;
-  background: radial-gradient(
-    ellipse at 50% 100%,
-    rgba(255, 217, 120, .85),
-    rgba(255, 217, 120, .0) 65%
-  );
-}
-
-/* Mobile: reduz intensidade para não estourar */
-@media (max-width: 600px) {
-  .j-panel-glow {
-    min-height: 80vh;
-    margin: 24px auto;
-    padding: 16px 10px;
-  }
-
-  .j-perg-v-inner {
-    max-width: 100%;
-    border-radius: 18px;
-  }
-}
-
-/* ================================================
-   CARTÃO ARCANO – místico + futurista
-   Usar dentro de j-perg-v-inner ou j-perg-h-inner
-   ================================================ */
-.j-arcane-card {
-  position: relative;
-  max-width: 460px;
-  margin: 0 auto clamp(18px, 3vh, 26px);
-  padding: clamp(18px, 3vh, 24px) clamp(16px, 4vw, 24px);
-  border-radius: 24px;
-
-  /* fundo escuro com leve névoa */
-  background:
-    radial-gradient(circle at top,
-      rgba(255,255,255,0.16),
-      transparent 55%),
-    linear-gradient(145deg, #151724, #05060c);
-
-  /* borda + aura na cor do guia */
-  border: 1px solid color-mix(
-    in srgb,
-    var(--theme-main-color, #ffd978) 75%,
-    #ffffff 10%
-  );
-
-  box-shadow:
-    0 0 16px rgba(0,0,0,0.9),
-    0 0 40px color-mix(in srgb, var(--theme-main-color, #ffd978) 80%, transparent),
-    0 0 90px color-mix(in srgb, var(--theme-main-color, #ffd978) 35%, transparent);
-
-  overflow: hidden;
-}
-
-/* brilho correndo na borda */
-.j-arcane-card::before {
-  content: '';
-  position: absolute;
-  inset: -40%;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    color-mix(in srgb, var(--theme-main-color, #ffd978) 90%, #ffffff 10%) 60deg,
-    transparent 120deg
-  );
-  opacity: 0.35;
-  mix-blend-mode: screen;
-  animation: jArcaneSweep 7s linear infinite;
-  pointer-events: none;
-}
-
-/* máscara interna pra deixar só um glow nas bordas */
-.j-arcane-card::after {
-  content: '';
-  position: absolute;
-  inset: 2px;
-  border-radius: 22px;
-  background: radial-gradient(circle at top,
-              rgba(255,255,255,0.04),
-              rgba(0,0,0,0.9));
-  box-shadow: inset 0 0 24px rgba(0,0,0,0.85);
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* conteúdo do cartão sempre acima da magia */
-.j-arcane-card > * {
-  position: relative;
-  z-index: 2;
-}
-
-/* Títulos dentro do cartão */
-.j-arcane-card h1,
-.j-arcane-card h2,
-.j-arcane-card h3 {
-  font-family: 'ManufacturingConsent', serif;
-  letter-spacing: 1.5px;
-  color: var(--theme-main-color, #ffd978);
-  text-align: center;
-  text-shadow:
-    0 0 6px color-mix(in srgb, var(--theme-main-color, #ffd978) 85%, transparent),
-    0 0 14px rgba(0,0,0,0.9);
-  margin-bottom: 10px;
-}
-
-/* texto normal */
-.j-arcane-card p,
-.j-arcane-card label,
-.j-arcane-card span {
-  color: #f5f1e5;
-}
-
-/* inputs dentro do cartão */
-.j-arcane-card input[type="text"],
-.j-arcane-card input[type="password"],
-.j-arcane-card textarea {
-  width: 100%;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.4);
-  background: rgba(5,5,10,0.85);
-  color: #fdf7e5;
-  padding: 10px 12px;
-  font-family: 'Cardo', serif;
-  box-shadow:
-    0 0 10px rgba(0,0,0,0.9),
-    0 0 22px color-mix(in srgb, var(--theme-main-color, #ffd978) 40%, transparent);
-}
-
-/* botão principal dentro do cartão (pode casar com seu btn-stone-espinhos) */
-.j-arcane-card .btn-primary,
-.j-arcane-card .btn-stone-espinhos {
-  margin-top: 14px;
-}
-
-/* animação do brilho correndo na borda */
-@keyframes jArcaneSweep {
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* MOBILE – segura o brilho pra não estourar */
-@media (max-width: 600px) {
-  .j-arcane-card {
-    max-width: 100%;
-    padding: 16px 14px;
-  }
-  .j-arcane-card::before {
-    opacity: 0.30;
-  }
-}
-
-/* PAINEL EXTERNO — largura maior e centralizado */
-.j-panel-outer {
-  width: min(92%, 780px) !important;      /* antes ~620px */
-  margin: 0 auto !important;
-}
-
-/* PAINEL INTERMEDIÁRIO — acompanha expansão */
-.j-panel-mid {
-  width: 100% !important;
-  padding: 28px !important;
-  border-radius: 26px !important;
-}
-/* PAINEL INTERNO — mais largo e proporcionado */
-.j-panel-inner {
-  width: 100% !important;
-  max-width: 660px !important;    /* aumenta conteúdo */
-  margin: 0 auto !important;
-
-  padding: 38px 32px !important;
-
-  border-radius: 26px !important;
-  background-size: cover !important;
-}
-/* PERGAMINHO INTERNO PADRÃO */
-.j-panel-inner.pergaminho-v {
-  background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important;
-  background-repeat: no-repeat;
-  background-position: center top;
-  background-size: 100% auto;
-}
-/* garante que o conteúdo não fique colado no topo */
-.j-panel-inner > *:first-child {
-  margin-top: 12px !important;
-}
-
-.j-panel-inner > *:last-child {
-  margin-bottom: 22px !important;
-}
-@media (max-width: 640px) {
-  .j-panel-outer {
-    width: 94% !important;
-  }
-
-  .j-panel-inner {
-    max-width: 92% !important;
-    padding: 32px 20px !important;
-  }
-}
-/* =========================================
-   FINAL OVERRIDE — painéis slim e colados ao pergaminho
-   (mantém nevoa/radar original)
-   ========================================= */
-
-.j-panel-glow{
-  width: 98% !important;                 /* encosta no pergaminho */
-  max-width: 980px !important;           /* mais largo no desktop */
-  margin: 10px auto !important;          /* reduz bordas externas */
-  padding: 12px !important;              /* borda slim */
-  border-radius: 22px !important;
-}
-
-/* pergaminho vertical interno acompanha expansão */
-.j-perg-v-inner{
-  max-width: 860px !important;           /* mais largo */
-  width: 100% !important;
-  padding: 30px 26px !important;         /* slim por dentro */
-  border-radius: 20px !important;
-}
-
-/* mobile também slim */
-@media (max-width: 640px){
-  .j-panel-glow{
-    width: 96% !important;
-    padding: 8px !important;
-    margin: 8px auto !important;
-  }
-  .j-perg-v-inner{
-    max-width: 100% !important;
-    padding: 24px 18px !important;
-  }
-}
-/* =========================================
-   GLAMOUR TRANSIÇÕES — PÁGINAS + PORTAL
-   ========================================= */
-
-/* 1) Conteúdo da jornada some/volta suave */
 #jornada-content-wrapper {
   transition: opacity .55s ease, filter .55s ease, transform .55s ease;
   will-change: opacity, filter, transform;
@@ -518,18 +348,32 @@ body.vt-fade-in #jornada-content-wrapper {
   transform: none;
 }
 
-/* 2) Portal dourado entra/saí em fade */
-.jp-video-overlay {
-  opacity: 0;
-  transition: opacity .35s ease;
+/* ======================================================
+   7) MOBILE — ajustes finos
+   ====================================================== */
+@media (max-width: 640px) {
+  .j-panel-glow {
+    width: 96%;
+    padding: 8px;
+    margin: 8px auto;
+    min-height: 80vh;
+  }
+
+  .j-perg-v-inner {
+    max-width: 100%;
+    padding: 24px 18px;
+    border-radius: 18px;
+  }
+
+  .j-panel-outer { width: 94%; }
+  .j-panel-inner {
+    max-width: 92%;
+    padding: 32px 20px;
+  }
+
+  .j-arcane-card {
+    max-width: 100%;
+    padding: 16px 14px;
+  }
+  .j-arcane-card::before { opacity: 0.30; }
 }
-
-.jp-video-overlay.show {
-  opacity: 1;
-}
-
-.jp-video-overlay.hide {
-  opacity: 0;
-}
-
-
