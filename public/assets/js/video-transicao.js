@@ -9,6 +9,9 @@
   let isPlaying = false;
   let cleaned = false;
 
+  document.body.classList.remove('vt-fade-in');
+  document.body.classList.add('vt-fade-out');
+
   // ----------------------------- UTILIDADES -----------------------------
   const isMp4 = (src) => /\.mp4(\?|#|$)/i.test(src || '');
   const resolveHref = (src) => {
@@ -87,20 +90,29 @@
     video.muted = true;
     video.preload = 'auto';
 
-    // Inject vídeo dentro da moldura
-    frame.appendChild(video);
+    // Injeta vídeo dentro da moldura
+frame.appendChild(video);
 
-    // Botão “Pular”
-    const skip = document.createElement('button');
-    skip.textContent = 'Pular';
-    skip.setAttribute('aria-label', 'Pular vídeo');
-    skip.className = 'jp-video-skip'; // classe que cria estilo bonito via CSS
-    frame.appendChild(skip);
+// Botão “Pular”
+const skip = document.createElement('button');
+skip.textContent = 'Pular';
+skip.setAttribute('aria-label', 'Pular vídeo');
+skip.className = 'jp-video-skip';
+frame.appendChild(skip);
 
-    overlay.appendChild(frame);
-    document.body.appendChild(overlay);
+// Adiciona frame e overlay no body
+overlay.appendChild(frame);
+document.body.appendChild(overlay);
 
-    document.documentElement.style.overflow = 'hidden';
+// ESTO É O PONTO PERFEITO 🌟
+// Faz o portal dourado aparecer suave
+requestAnimationFrame(() => {
+  overlay.classList.add('show');  // <— ANIMAÇÃO GLAMOUROSA AQUI
+});
+
+// Travar scroll
+document.documentElement.style.overflow = 'hidden';
+
 
     return { overlay, frame, video, skip };
   }
@@ -139,9 +151,21 @@
     const { overlay, video, skip } = buildPortal();
 
     const finishAndGo = safeOnce(() => {
-      cleanup(overlay);
-      navigateTo(nextSectionId);
-    });
+  // glamour: portal sai suave
+  overlay.classList.remove('show');
+  overlay.classList.add('hide');
+
+  setTimeout(() => {
+    cleanup(overlay);
+    navigateTo(nextSectionId);
+
+    // glamour: nova página entra suave
+    document.body.classList.remove('vt-fade-out');
+    document.body.classList.add('vt-fade-in');
+    setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
+  }, 360); // tempo do fade do portal
+});
+
 
     skip.addEventListener('click', finishAndGo);
     overlay.addEventListener('click', (e) => {
