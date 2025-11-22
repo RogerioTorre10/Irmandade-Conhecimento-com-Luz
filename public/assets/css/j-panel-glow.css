@@ -332,7 +332,6 @@
   z-index: 2 !important;
 }
 
-
 .jp-video-skip {
   position: absolute !important;
   top: 12px !important;
@@ -346,21 +345,6 @@
   backdrop-filter: blur(6px) !important;
   color: #fff !important;
   z-index: 5 !important;
-}
-/* =========================================
-   LIMELIGHT — fundo desfocado com o mesmo vídeo
-   ========================================= */
-.jp-video-ambient {
-  position: absolute !important;
-  inset: -8% !important;              /* passa um pouco pra evitar borda preta */
-  width: 116% !important;
-  height: 116% !important;
-  object-fit: cover !important;       /* esse PODE cortar porque é só “luz” */
-  filter: blur(22px) brightness(.75) saturate(1.15);
-  opacity: 0.55;
-  transform: scale(1.06);
-  z-index: 0 !important;
-  pointer-events: none !important;
 }
 
 /* uma vinheta suave pra dar foco no centro */
