@@ -6,10 +6,13 @@
   const VIDEO_SRC = '/assets/videos/filme-5-fim-da-jornada.mp4';
   const HOME_URL = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
 
-  let started = false;
-  let speechChain = Promise.resolve();
+ let isSpeaking = false; 
+ let started = false;    
 
-function queueSpeak(text) {
+// Fila de fala: garante que um texto só fala depois do outro terminar
+ let speechChain = Promise.resolve();
+
+ function queueSpeak(text) {
   if (!('speechSynthesis' in window) || !text) return Promise.resolve();
 
   speechChain = speechChain.then(() => new Promise((resolve) => {
@@ -20,11 +23,12 @@ function queueSpeak(text) {
     utter.volume = 0.9;
     utter.onend = resolve;
     utter.onerror = resolve;
-    speechSynthesis.speak(utter);
+    window.speechSynthesis.speak(utter);
   }));
 
   return speechChain;
 }
+
 
 
   async function typeText(el, text, delay = 55, withVoice = false) {
