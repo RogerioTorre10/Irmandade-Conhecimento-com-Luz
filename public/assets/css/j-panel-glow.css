@@ -507,3 +507,39 @@ body.vt-fade-in #jornada-content-wrapper {
     color-mix(in srgb, var(--portal-gold) 40%, var(--theme-main-color) 60%) 100%
   );
 }
+/* ======================================================
+   ALTURA REAL DE TELA — CORREÇÃO GLOBAL DE BORDA
+   ====================================================== */
+
+/* Portal de vídeo */
+.jp-video-overlay,
+.jp-video-frame {
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+}
+
+/* Para garantir que as sombras e bordas apareçam sempre */
+.jp-video-frame {
+  box-sizing: border-box !important;
+}
+
+/* Limelight fullscreen */
+.jp-video-ambient {
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+}
+
+/* Vídeo principal também segue a viewport dinâmica */
+#vt-video,
+#global-video {
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+}
+
+/* Evita cortes e garante espaço clean */
+body, html {
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  overscroll-behavior: contain;
+}
+
