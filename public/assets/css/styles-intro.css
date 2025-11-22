@@ -284,3 +284,34 @@
 .btn-stone:disabled{
   opacity:.6; pointer-events:none; animation:none;
 }
+/* ======================================================
+   CAMADAS ANTIGAS DO PAINEL — versão slim e fluida
+   ====================================================== */
+.j-panel-outer{
+  width: min(96%, 780px) !important;
+  margin: 0 auto !important;
+}
+
+.j-panel-mid{
+  width: 100% !important;
+  padding: clamp(14px, 2.8vh, 20px) !important;
+  border-radius: 22px !important;
+}
+
+.j-panel-inner{
+  width: 100% !important;
+  max-width: 640px !important;
+  margin: 0 auto !important;
+  padding: clamp(20px, 3.8vh, 28px) !important;
+  border-radius: 22px !important;
+  background-size: 100% auto !important;
+}
+
+@media (max-width: 640px){
+  .j-panel-outer{ width: 96% !important; }
+  .j-panel-inner{
+    max-width: 94% !important;
+    padding: 18px 14px !important;
+  }
+}
+
