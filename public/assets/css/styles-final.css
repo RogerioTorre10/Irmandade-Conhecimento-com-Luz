@@ -126,4 +126,39 @@
 .final-acoes .btn-light{
   margin-bottom: 6px;
 }
+/* =========================================
+   FINAL — BOTÕES LADO A LADO (PADRÃO)
+   ========================================= */
+
+.final-acoes{
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  align-items: stretch !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: 420px !important;  /* fica bonito no pergaminho */
+  margin: 12px auto 0 !important;
+}
+
+/* cada botão ocupa metade certinha */
+.final-acoes .btn-gold,
+.final-acoes .btn-light{
+  flex: 1 1 0 !important;
+  width: 50% !important;
+  min-height: 52px !important;
+  padding: 14px 10px !important;
+  white-space: nowrap !important;
+}
+
+/* se a tela for MUITO estreita, volta a empilhar */
+@media (max-width: 360px){
+  .final-acoes{
+    flex-direction: column !important;
+  }
+  .final-acoes .btn-gold,
+  .final-acoes .btn-light{
+    width: 100% !important;
+  }
+}
 
