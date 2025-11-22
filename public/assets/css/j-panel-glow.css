@@ -310,6 +310,28 @@
   object-position: center !important;
   background: #000 !important;
 }
+/* ================================
+   LIMELIGHT — correção final
+   (coloque APÓS .jp-video-frame video)
+   ================================ */
+
+/* 1) vídeo ambiente (limelight) */
+.jp-video-frame .jp-video-ambient{
+  object-fit: cover !important; /* pode cortar porque é só luz */
+  filter: blur(22px) brightness(.75) saturate(1.15) !important;
+  opacity: .70 !important;
+  transform: scale(1.06) !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+
+/* 2) vídeo principal por cima, sem fundo preto */
+.jp-video-frame #vt-video{
+  object-fit: contain !important;     /* cenário inteiro */
+  background: transparent !important; /* deixa a limelight aparecer */
+  z-index: 2 !important;
+}
+
 
 .jp-video-skip {
   position: absolute !important;
