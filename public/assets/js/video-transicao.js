@@ -1,4 +1,4 @@
-// /assets/js/video-transicao.js — PORTAL DOURADO (versão unificada)
+// /assets/js/video-transicao.js — PORTAL DOURADO + GLAMOUR (versão final)
 (function () {
   'use strict';
 
@@ -8,9 +8,6 @@
 
   let isPlaying = false;
   let cleaned = false;
-
-  document.body.classList.remove('vt-fade-in');
-  document.body.classList.add('vt-fade-out');
 
   // ----------------------------- UTILIDADES -----------------------------
   const isMp4 = (src) => /\.mp4(\?|#|$)/i.test(src || '');
@@ -67,9 +64,6 @@
   }
 
   // -------------------------- PORTAL DOURADO ---------------------------
-  /**
-   * Cria o overlay + frame dourado + vídeo
-   */
   function buildPortal() {
     // Overlay escuro
     const overlay = document.createElement('div');
@@ -87,43 +81,36 @@
     video.playsInline = true;
     video.autoplay = false;
     video.controls = false;
-    video.muted = true;
+    video.muted = true;     // autoplay confiável
     video.preload = 'auto';
 
     // Injeta vídeo dentro da moldura
-frame.appendChild(video);
+    frame.appendChild(video);
 
-// Botão “Pular”
-const skip = document.createElement('button');
-skip.textContent = 'Pular';
-skip.setAttribute('aria-label', 'Pular vídeo');
-skip.className = 'jp-video-skip';
-frame.appendChild(skip);
+    // Botão “Pular”
+    const skip = document.createElement('button');
+    skip.textContent = 'Pular';
+    skip.setAttribute('aria-label', 'Pular vídeo');
+    skip.className = 'jp-video-skip';
+    frame.appendChild(skip);
 
-// Adiciona frame e overlay no body
-overlay.appendChild(frame);
-document.body.appendChild(overlay);
+    // Adiciona frame e overlay no body
+    overlay.appendChild(frame);
+    document.body.appendChild(overlay);
 
-// ESTO É O PONTO PERFEITO 🌟
-// Faz o portal dourado aparecer suave
-requestAnimationFrame(() => {
-  overlay.classList.add('show');  // <— ANIMAÇÃO GLAMOUROSA AQUI
-});
-
-// Travar scroll
-document.documentElement.style.overflow = 'hidden';
-
+    // Glamour: portal aparece suave
+    requestAnimationFrame(() => {
+      overlay.classList.add('show');
+    });
 
     return { overlay, frame, video, skip };
   }
 
   // ------------------------- PLAYER PRINCIPAL ---------------------------
-  /**
-   * Reproduz um vídeo MP4 usando o portal dourado.
-   */
   function playTransitionVideo(src, nextSectionId) {
     log('Recebido src:', src, 'nextSectionId:', nextSectionId);
 
+    // Se não for MP4 → navega direto, sem glamour
     if (!src || !isMp4(src)) {
       warn('Fonte não é MP4 (ou ausente). Pulando player e navegando direto…');
       navigateTo(nextSectionId);
@@ -138,10 +125,13 @@ document.documentElement.style.overflow = 'hidden';
     isPlaying = true;
     cleaned = false;
 
+    // Glamour: some a página antes do filme
+    document.body.classList.remove('vt-fade-in');
+    document.body.classList.add('vt-fade-out');
+
     // 🔒 trava transições e cancela TTS
     window.__TRANSITION_LOCK = true;
     document.dispatchEvent(new CustomEvent('transition:started'));
-
     try { window.speechSynthesis?.cancel(); } catch {}
     document.documentElement.style.overflow = 'hidden';
 
@@ -151,27 +141,25 @@ document.documentElement.style.overflow = 'hidden';
     const { overlay, video, skip } = buildPortal();
 
     const finishAndGo = safeOnce(() => {
-  // glamour: portal sai suave
-  overlay.classList.remove('show');
-  overlay.classList.add('hide');
+      // Glamour: portal sai suave
+      overlay.classList.remove('show');
+      overlay.classList.add('hide');
 
-  setTimeout(() => {
-    cleanup(overlay);
-    navigateTo(nextSectionId);
+      setTimeout(() => {
+        cleanup(overlay);
+        navigateTo(nextSectionId);
 
-    // glamour: nova página entra suave
-    document.body.classList.remove('vt-fade-out');
-    document.body.classList.add('vt-fade-in');
-    setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
-  }, 360); // tempo do fade do portal
-});
-
+        // Glamour: nova página entra suave
+        document.body.classList.remove('vt-fade-out');
+        document.body.classList.add('vt-fade-in');
+        setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
+      }, 360); // tempo do fade do portal
+    });
 
     skip.addEventListener('click', finishAndGo);
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) finishAndGo();
     });
-
     document.addEventListener('keydown', onKeydown, true);
 
     // EVENTOS
@@ -211,4 +199,5 @@ document.documentElement.style.overflow = 'hidden';
     log('Transição simples (sem vídeo) para:', nextSectionId);
     navigateTo(nextSectionId);
   };
+
 })();
