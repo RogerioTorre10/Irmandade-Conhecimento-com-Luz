@@ -1,7 +1,9 @@
 /* section-final.js — FINAL v1.4 (espera clique para vídeo final) */
 (function () {
   'use strict';
-
+  
+  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  
   const SECTION_ID = 'section-final';
   const VIDEO_SRC = '/assets/videos/filme-5-fim-da-jornada.mp4';
   const HOME_URL = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
