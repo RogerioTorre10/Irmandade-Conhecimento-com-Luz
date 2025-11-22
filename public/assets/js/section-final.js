@@ -6,23 +6,26 @@
   const VIDEO_SRC = '/assets/videos/filme-5-fim-da-jornada.mp4';
   const HOME_URL = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
 
-  let isSpeaking = false;
   let started = false;
+  let speechChain = Promise.resolve();
 
-  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+function queueSpeak(text) {
+  if (!('speechSynthesis' in window) || !text) return Promise.resolve();
 
-  function speakText(text) {
-    if (!('speechSynthesis' in window) || isSpeaking || !text) return;
-    isSpeaking = true;
+  speechChain = speechChain.then(() => new Promise((resolve) => {
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'pt-BR';
     utter.rate = 0.9;
     utter.pitch = 1;
     utter.volume = 0.9;
-    utter.onend = () => { isSpeaking = false; };
-    speechSynthesis.cancel();
+    utter.onend = resolve;
+    utter.onerror = resolve;
     speechSynthesis.speak(utter);
-  }
+  }));
+
+  return speechChain;
+}
+
 
   async function typeText(el, text, delay = 55, withVoice = false) {
     if (!el || !text) return;
@@ -30,7 +33,7 @@
     el.style.opacity = '1';
     el.classList.add('typing-active');
 
-    if (withVoice) speakText(text);
+    if (withVoice) queueSpeak(text);
 
     for (let i = 0; i < text.length; i++) {
       el.textContent += text[i];
