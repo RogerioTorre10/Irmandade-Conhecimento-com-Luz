@@ -1,211 +1,75 @@
-/* styles-final.css */
+/* styles-final.css — FINAL RESPONSIVO (desktop + mobile) */
 #section-final {
-  position: relative;
+  position: fixed;
+  inset: 0;
   width: 100%;
-  min-height: 100vh;
-
+  height: 100dvh;                 /* ✅ viewport dinâmica do mobile */
+  min-height: 100dvh;
+  background: radial-gradient(circle at center, #1a1a2e, #0a0a1a);
   display: flex;
-  flex-direction: column;        /* empilha */
   align-items: center;
-  justify-content: flex-start;   /* começa no topo da tela */
-  padding: 80px 16px 60px;       /* espaço elegante */
-
-  background: radial-gradient(circle at top, #1a1a2e, #0a0a1a);
-  box-sizing: border-box;
-  z-index: 20;
-  overflow-x: hidden;
-  overflow-y: auto;
+  justify-content: center;
+  z-index: 9999;
+  overflow: auto;                /* ✅ deixa rolar se precisar */
+  -webkit-overflow-scrolling: touch;
   opacity: 0;
-  transition: opacity .8s ease;
+  transition: opacity 1s ease;
+  pointer-events: auto;          /* ✅ garante toque */
+  touch-action: manipulation;    /* ✅ melhora clique */
 }
 
-#section-final.show {
-  opacity: 1;
-}
+#section-final.show { opacity: 1; }
 
 .final-pergaminho-wrapper {
   width: 100%;
-  max-width: 520px;            /* largura ideal do pergaminho */
-  margin: 0 auto;              /* mantém centralizado */
-  
+  min-height: 100dvh;
   display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: flex-start;      /* começa do topo, não do meio */
-
-  padding: 0;
+  padding:
+    max(16px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
   box-sizing: border-box;
 }
 
 .pergaminho-vertical {
   background: center/contain no-repeat url('/assets/img/pergaminho-rasgado-vert.png');
-  width: 90vw;
-  max-width: 500px;
-  height: 90vh;
-  max-height: 800px;
-  padding: 60px 40px;
+
+  width: min(92vw, 520px);
+  height: auto;
+  max-height: calc(100dvh - 40px);   /* ✅ nunca estoura a tela */
+  aspect-ratio: 3 / 4.6;             /* ✅ mantém proporção bonita */
+
+  padding: clamp(36px, 6vw, 60px) clamp(22px, 5vw, 40px);
   border-radius: 20px;
-  box-shadow:
-    0 0 40px rgba(0,0,0,.85),
-    0 0 60px color-mix(in srgb, var(--theme-main-color) 75%, transparent);
+  box-shadow: 0 0 60px rgba(212,175,55,0.8);
   position: relative;
-  background-color: rgba(245, 235, 200, 0.08);
+  background-color: rgba(245, 235, 200, 0.1);
+
+  display: flex;                     /* ✅ conteúdo sempre centralizado */
 }
 
 .pergaminho-content {
   text-align: center;
-  color: var(--theme-main-color, #ffd700);
+  color: #ffd700;
   font-family: 'BerkshireSwash', cursive;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 22px;
+  gap: clamp(14px, 2.8vh, 22px);
+  width: 100%;
   height: 100%;
-  overflow: hidden;
+
+  overflow: visible;                /* ✅ não corta botões */
+  pointer-events: auto;
 }
 
-
-#section-final .final-pergaminho-wrapper {
-  width: 100vw;
-  height: 100vh;
-  max-width: none !important;
-  padding: 20px;
-  margin: 0;
+.final-acoes,
+.final-acoes * {
+  pointer-events: auto !important;
+  z-index: 5;
+  position: relative;
 }
 
-.final-title {
-  font-size: 2.4em;
-  color: var(--theme-main-color, #ffd700);
-  text-shadow:
-    0 0 12px var(--theme-main-color, gold),
-    0 0 26px color-mix(in srgb, var(--theme-main-color) 70%, #000);
-  margin: 0;
-}
-
-
-.final-message p {
-  font-size: 1.3em;
-  line-height: 1.6;
-  margin: 10px 0;
-  color: var(--theme-main-color, #ffd700);
-  text-shadow: 0 0 10px color-mix(in srgb, var(--theme-main-color) 70%, #000);
-  opacity: 0;
-  transform: translateY(10px);
-  transition: all 0.6s ease;
-}
-
-
-.final-message p.revealed {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.final-bold {
-  font-weight: bold;
-  font-size: 1.5em !important;
-  color: var(--theme-main-color, #ffeb3b);
-}
-
-
-/* BOTÕES */
-.final-acoes {
-  margin-top: 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.8s ease;
-}
-
-.final-acoes.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.btn-gold, .btn-light {
-  padding: 14px 24px;
-  border-radius: 12px;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s;
-  font-size: 1.1em;
-}
-
-.btn-gold {
-  background: linear-gradient(45deg, #d4af37, #f4e04d);
-  color: #000;
-  box-shadow: 0 0 20px gold;
-}
-
-.btn-gold:hover:not(:disabled) {
-  transform: translateY(-3px);
-  box-shadow: 0 0 30px gold;
-}
-
-.btn-light {
-  background: rgba(255,255,255,0.08);
-  color: var(--theme-main-color, #ffd700);
-  border: 1px solid var(--theme-main-color, #d4af37);
-  backdrop-filter: blur(5px);
-}
-
-.btn-light:hover {
-  background: #d4af37;
-  color: #000;
-}
-
-/* ADICIONE NO FINAL DO styles-final.css */
-#final-message p,
-.final-title,
-.final-acoes {
-  opacity: 0;
-  transition: all 0.8s ease;
-}
-
-#final-message p.revealed,
-.final-title.revealed,
-.final-acoes.show {
-  opacity: 1;
-  transform: translateY(0) !important;
-}
-
-const finalCSS = document.createElement('style');
-finalCSS.textContent = `
-  #final-title, #final-message p {
-    opacity: 0;
-    transition: opacity 0.6s ease;
-  }
-  #final-title.typing-active, #final-message p.typing-active {
-    opacity: 1 !important;
-  }
-  .final-acoes button {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.6s ease;
-    pointer-events: auto;
-  }
-  .final-acoes button:not(:disabled) {
-    opacity: 1 !important;
-    transform: translateY(0) !important;
-    pointerEvents: auto !important;
-  }
-`;
-document.head.appendChild(finalCSS);
-
-#section-final #final-message p {
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-/* Responsivo */
-@media (max-width: 480px) {
-  .pergaminho-vertical {
-    padding: 40px 25px;
-    width: 95vw;
-    height: 95vh;
-  }
-  .final-title { font-size: 2em; }
-  .final-message p { font-size: 1.1em; }
-  .final-bold { font-size: 1.3em !important; }
-}
