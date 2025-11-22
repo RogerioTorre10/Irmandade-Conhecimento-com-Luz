@@ -283,22 +283,24 @@
 .jp-video-overlay.show { opacity: 1; }
 .jp-video-overlay.hide { opacity: 0; }
 
-.jp-video-frame{
-  position: relative !important;
-  width: min(96vw, 1200px) !important;
-  aspect-ratio: 16 / 9 !important;
-  min-height: 240px !important;
-  height: auto !important;                 /* <<< remove travamento */
-  max-height: 96vh !important;             /* <<< segurança mobile */
-  border: 14px solid #d4af37 !important;
-  border-radius: 22px !important;
+.jp-video-frame {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 22px solid #d4af37 !important;
+  border-radius: 0 !important;
   box-shadow:
-    0 0 35px rgba(212,175,55,.9),
-    0 0 120px rgba(212,175,55,.65),
-    inset 0 0 25px rgba(255,230,160,.55) !important;
+    0 0 45px rgba(212,175,55,0.9),
+    inset 0 0 35px rgba(255,235,180,0.55),
+    inset 0 0 70px rgba(212,175,55,0.45),
+    0 0 160px rgba(212,175,55,0.65) !important;
   background: #000 !important;
   overflow: hidden !important;
-  transition: width .2s ease, height .2s ease;
+  z-index: 999999 !important;
 }
 
 .jp-video-frame video{
@@ -317,6 +319,10 @@
 
 /* 1) vídeo ambiente (limelight) */
 .jp-video-frame .jp-video-ambient{
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
   object-fit: cover !important; /* pode cortar porque é só luz */
   filter: blur(22px) brightness(.75) saturate(1.15) !important;
   opacity: .70 !important;
@@ -327,6 +333,9 @@
 
 /* 2) vídeo principal por cima, sem fundo preto */
 .jp-video-frame #vt-video{
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
   object-fit: contain !important;     /* cenário inteiro */
   background: transparent !important; /* deixa a limelight aparecer */
   z-index: 2 !important;
