@@ -341,6 +341,17 @@
   z-index: 2 !important;
 }
 
+/* GLOBAL-VIDEO dentro do portal cinematográfico */
+.jp-video-frame #global-video{
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;      /* cenário inteiro */
+  background: transparent !important;  /* deixa a limelight aparecer */
+  z-index: 2 !important;
+}
+
+
 .jp-video-skip {
   position: absolute !important;
   top: 12px !important;
