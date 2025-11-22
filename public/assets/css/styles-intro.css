@@ -284,4 +284,32 @@
 .btn-stone:disabled{
   opacity:.6; pointer-events:none; animation:none;
 }
+/* ==========================
+   INTRO – BORDAS SLIM
+   ========================== */
+
+/* Frame externo */
+.inner-frame {
+    padding: 6px !important;   /* era 18px ou 20px – AGORA SLIM */
+    border-width: 3px !important;
+    border-style: solid;
+    border-color: rgba(255, 220, 150, 0.65);
+    box-shadow: 0 0 12px rgba(0,0,0,0.45) !important; /* reduzido */
+}
+
+/* Frame médio */
+.middle-frame {
+    padding: 6px !important;
+    border-width: 3px !important;
+    box-shadow: 0 0 10px rgba(0,0,0,0.35) !important;
+}
+
+/* Frame interno (onde está o conteúdo da intro) */
+.inner-content-frame {
+    padding: 18px 14px !important; /* antes era mais largo */
+    border-width: 2px !important;
+    box-shadow: 0 0 6px rgba(0,0,0,0.3) !important;
+    max-width: 76% !important;  /* AFINA elegantemente */
+    margin: 0 auto !important;
+}
 
