@@ -570,8 +570,7 @@ window.playBlockTransition = function(videoSrc, onDone) {
       return;
     }
 
-    ensureVideoOverlay();
-
+    
     State.startedAt = new Date().toISOString();
     State.blocoIdx = 0;
     State.qIdx = 0;
