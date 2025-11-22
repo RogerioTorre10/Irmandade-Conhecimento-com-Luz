@@ -283,25 +283,35 @@
 .jp-video-overlay.show { opacity: 1; }
 .jp-video-overlay.hide { opacity: 0; }
 
+/* ==========================================================
+   PORTAL DOURADO FULLSCREEN — GRADIENTE ARCANUM
+   ========================================================== */
 .jp-video-frame {
   position: fixed !important;
   inset: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
+
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  border: 22px solid #d4af37 !important;
-  border-radius: 0 !important;
+
+  /* Borda mágica (ouro → cor do guia) */
+  border: 22px solid transparent !important;
+  border-image: var(--portal-border-gradient) 1 !important;
+
+  /* Glow vivo */
   box-shadow:
-    0 0 45px rgba(212,175,55,0.9),
-    inset 0 0 35px rgba(255,235,180,0.55),
-    inset 0 0 70px rgba(212,175,55,0.45),
-    0 0 160px rgba(212,175,55,0.65) !important;
+    0 0 55px color-mix(in srgb, var(--portal-glow-color) 90%, transparent),
+    0 0 160px color-mix(in srgb, var(--portal-glow-color) 55%, transparent),
+    inset 0 0 40px color-mix(in srgb, var(--portal-border-color) 65%, transparent),
+    inset 0 0 90px color-mix(in srgb, var(--portal-glow-color) 55%, transparent) !important;
+
   background: #000 !important;
   overflow: hidden !important;
   z-index: 999999 !important;
 }
+
 
 .jp-video-frame video{
   position: absolute !important;
@@ -350,6 +360,22 @@
   background: transparent !important;  /* deixa a limelight aparecer */
   z-index: 2 !important;
 }
+/* Névoa mística sobre a limelight */
+.jp-video-frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+
+  background: radial-gradient(
+    circle at center,
+    color-mix(in srgb, var(--theme-main-color, transparent) 40%, transparent) 0%,
+    rgba(0,0,0,0) 75%
+  );
+
+  opacity: 0.20; /* intensidade perfeita */
+}
 
 
 .jp-video-skip {
@@ -366,6 +392,31 @@
   color: #fff !important;
   z-index: 5 !important;
 }
+
+.jp-video-ambient {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+
+  object-fit: cover !important;
+  filter: blur(22px) brightness(.65) saturate(1.15) !important;
+  opacity: .70 !important;
+
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+#vt-video,
+#global-video {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  background: transparent !important;
+  z-index: 2 !important;
+}
+
 
 /* uma vinheta suave pra dar foco no centro */
 .jp-video-overlay::after{
@@ -431,4 +482,28 @@ body.vt-fade-in #jornada-content-wrapper {
     padding: 16px 14px;
   }
   .j-arcane-card::before { opacity: 0.30; }
+}
+:root {
+  --portal-gold: #d4af37;
+
+  /* Cor principal dinâmica (ouro + guia) */
+  --portal-border-color: color-mix(
+    in srgb,
+    var(--portal-gold) 70%,
+    var(--theme-main-color, var(--portal-gold)) 30%
+  );
+
+  /* Brilho principal */
+  --portal-glow-color: color-mix(
+    in srgb,
+    var(--portal-gold) 55%,
+    var(--theme-main-color, var(--portal-gold)) 45%
+  );
+
+  /* Para gradiente elegante */
+  --portal-border-gradient: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--portal-gold) 90%, var(--theme-main-color) 10%) 0%,
+    color-mix(in srgb, var(--portal-gold) 40%, var(--theme-main-color) 60%) 100%
+  );
 }
