@@ -1,16 +1,17 @@
-// /assets/js/video-transicao.js — PORTAL DOURADO + GLAMOUR + LIMELIGHT
+// /assets/js/video-transicao.js — PORTAL DOURADO + GLAMOUR + LIMELIGHT (versão final cinematográfica)
 (function () {
   'use strict';
 
   const NS = '[VIDEO_TRANSICAO]';
-  const log = (...a) => console.log(NS, ...a);
+  const log  = (...a) => console.log(NS, ...a);
   const warn = (...a) => console.warn(NS, ...a);
 
   let isPlaying = false;
-  let cleaned = false;
+  let cleaned   = false;
 
   // ----------------------------- UTILIDADES -----------------------------
   const isMp4 = (src) => /\.mp4(\?|#|$)/i.test(src || '');
+
   const resolveHref = (src) => {
     try { return new URL(src, window.location.origin).href; }
     catch { return src; }
@@ -47,16 +48,17 @@
   }
 
   // Ajusta moldura à proporção real do vídeo (sem fullscreen nativo)
-  function fitFrameToVideo(frame, video){
-    const vw = window.innerWidth * 0.96;
+  function fitFrameToVideo(frame, video) {
+    const vw = window.innerWidth  * 0.96;
     const vh = window.innerHeight * 0.96;
 
-    const ar = (video.videoWidth && video.videoHeight)
-      ? (video.videoWidth / video.videoHeight)
-      : (16/9);
+    // fallback inicial (16:9) se metadata ainda não carregou
+    const w = video.videoWidth  || 16;
+    const h = video.videoHeight ||  9;
+
+    const ar = w / h;
 
     let width, height;
-
     if (vw / ar <= vh) {
       width  = vw;
       height = vw / ar;
@@ -65,7 +67,7 @@
       width  = vh * ar;
     }
 
-    frame.style.width  = Math.round(width) + 'px';
+    frame.style.width  = Math.round(width)  + 'px';
     frame.style.height = Math.round(height) + 'px';
   }
 
@@ -98,7 +100,7 @@
     const frame = document.createElement('div');
     frame.className = 'jp-video-frame';
 
-    // Vídeo do fundo (limelight)
+    // Vídeo ambiente (limelight)
     const ambient = document.createElement('video');
     ambient.className = 'jp-video-ambient';
     ambient.playsInline = true;
@@ -108,13 +110,13 @@
     ambient.loop = true;
     ambient.preload = 'auto';
 
-    // Vídeo principal (o que o usuário vê)
+    // Vídeo principal (cenário completo)
     const video = document.createElement('video');
     video.id = 'vt-video';
     video.playsInline = true;
     video.autoplay = false;
     video.controls = false;
-    video.muted = true;     // autoplay confiável
+    video.muted = true;       // autoplay confiável
     video.preload = 'auto';
 
     // Injeta vídeos dentro da moldura
@@ -133,9 +135,7 @@
     document.body.appendChild(overlay);
 
     // Glamour: portal aparece suave
-    requestAnimationFrame(() => {
-      overlay.classList.add('show');
-    });
+    requestAnimationFrame(() => overlay.classList.add('show'));
 
     return { overlay, frame, video, ambient, skip };
   }
@@ -174,7 +174,10 @@
 
     const { overlay, frame, video, ambient, skip } = buildPortal();
 
-    // Ajuste responsivo do frame ao vídeo (sem fullscreen nativo)
+    // fallback imediato para evitar "barra dourada"
+    fitFrameToVideo(frame, { videoWidth: 16, videoHeight: 9 });
+
+    // Ajuste responsivo do frame ao vídeo
     const onResize = () => fitFrameToVideo(frame, video);
     window.addEventListener('resize', onResize);
 
@@ -207,7 +210,7 @@
     const onCanPlay = safeOnce(() => {
       log('Vídeo carregado, iniciando reprodução:', href);
 
-      // moldura abraça a proporção real
+      // moldura abraça proporção real
       try { fitFrameToVideo(frame, video); } catch {}
 
       // toca fundo + principal
