@@ -39,10 +39,10 @@
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(255,255,255,0.10),
-    transparent 40%,
+    rgba(255,255,255,0.16),  /* antes ~0.08/0.10 */
+    transparent 45%,
     transparent 100%
-  );
+  ) !important;
   pointer-events: none;
   z-index: 1;
 }
