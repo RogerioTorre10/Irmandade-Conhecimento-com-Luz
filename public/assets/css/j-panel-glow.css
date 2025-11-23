@@ -1,6 +1,11 @@
 /* ======================================================
    1) PAINEL EXTERNO — Glow universal (desktop + mobile)
    ====================================================== */
+
+:root{
+  --luz-intensity: 1;
+}
+
 .j-panel-glow {
   position: relative;
   width: 98%;
