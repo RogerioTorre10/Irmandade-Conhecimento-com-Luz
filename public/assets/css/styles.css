@@ -298,18 +298,21 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
 /* ========== FOOTER ========== */
 .site-footer {
   position: fixed;
+  margin-top:2px;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 24px 16px;
+  padding: 4px 0;
+  line-height: 1.1
   text-align: center;
-  background: var(--bg);
+  background: transparent;
   z-index: 1000;
   border-top: 1px solid rgba(255,255,255,.1);
   display: block;
-  opacity: 0.6;
+  opacity:.55;
   color: #fff;
-  font-size: 14px;
+  font-size: 12px;
+  
 }
 /* ===== Correção global para evitar fundo duplo ===== */
 
