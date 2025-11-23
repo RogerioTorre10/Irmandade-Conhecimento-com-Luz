@@ -36,6 +36,7 @@
   position: relative;
   width: min(1024px, 100%);
   margin: 0 auto;
+  padding-bottom: 96px !important;
   padding: 74px 14px 78px;  /* topo HUD + ampulheta | base HUD inferior */
   border-radius: 18px;
   background: rgba(0,0,0,0.45);
@@ -92,13 +93,28 @@
 
 /* ---------- BARRA INFERIOR (PERGUNTAS NO BLOCO) ---------- */
 .progress-middle{
-  bottom: 12px;
-  width: min(88%, 560px); /* um pouco mais larga */
+  position: absolute;
+  left: 50%;
+  bottom: -6px;          /* joga pra BAIXO dos botões */
+  transform: translateX(-50%);
+
+  width: min(90%, 560px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 12.5px;     /* ✅ maior */
+  font-family: "Cinzel", serif;
   z-index: 12;
+
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .progress-middle .progress-bar{
-  height: 8px; /* era 7px */
+  height: 8px !important;
   border-radius: 999px;
   background: rgba(0,0,0,0.65);
   box-shadow:
@@ -121,6 +137,9 @@
   left: auto;
   margin-left: 6px;
   white-space: nowrap;
+  font-size: 12.5px;     /* ✅ maior */
+  font-weight: 800;
+  letter-spacing: .04em;  
 }
 /* ===========================================================
     --- Ampulheta total ---
@@ -344,6 +363,7 @@
 
   .section-perguntas .perguntas-wrap{
     padding: 64px 8px 72px; /* HUD topo + inferior compactos */
+    padding-bottom: 92px; 
   }
 
   .perguntas-pergaminho{
@@ -360,7 +380,8 @@
   /* HUD inferior mais compacto */
   .progress-middle{
     width: min(92%, 440px);
-    bottom: 8px;
+    bottom: -4px;
+    font-size: 12px; 
   }
 
   /* botões: 2 em cima, confirmar centralizado embaixo */
@@ -374,7 +395,7 @@
   }
   .progress-top .progress-value{
     top: -4px !important;
-    font-size: 10.5px !important;
+    font-size: 12px !important;
   }  
 }
 /* ===========================================================
