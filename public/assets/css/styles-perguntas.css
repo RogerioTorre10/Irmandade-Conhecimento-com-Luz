@@ -1046,4 +1046,120 @@
     display: none !important;
   }
 }
+/* ===========================================================
+   PROGRESSO — TOPO + INFERIOR (HUD) COM COR DO GUIA
+   =========================================================== */
+
+/* 1) TOPO fica como está (só refinando visual) */
+.progress-top{
+  position: absolute !important;
+  top: 14px !important;
+  left: 14px !important;
+  right: 74px !important;  /* respeita ampulheta */
+  width: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  z-index: 102 !important;
+  background: transparent !important;
+}
+
+/* barra topo mais elegante */
+.progress-top .progress-bar{
+  height: 6px !important;
+  border-radius: 999px !important;
+  background: rgba(0,0,0,0.55) !important;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.95) !important;
+}
+.progress-top .progress-label{
+  font-size: 10px !important;
+  opacity: .85 !important;
+}
+
+/* 2) A BARRA DO BLOCO (progress-middle) VAI PRA PARTE INFERIOR */
+.progress-middle{
+  position: absolute !important;
+  left: 50% !important;
+  bottom: 10px !important;     /* inferior do pergaminho */
+  transform: translateX(-50%) !important;
+
+  width: min(86%, 520px) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+
+  z-index: 102 !important;
+  background: transparent !important;
+}
+
+/* não polui: some com label embaixo */
+.progress-middle .progress-label{
+  display: none !important;
+}
+
+/* barra inferior bem fina e “viva” */
+.progress-middle .progress-bar{
+  height: 7px !important;
+  border-radius: 999px !important;
+  background: rgba(0,0,0,0.65) !important;
+  box-shadow: inset 0 0 10px rgba(0,0,0,1) !important;
+}
+
+/* valor do meio menor, só pra referencia */
+.progress-middle .progress-value{
+  font-size: 11px !important;
+  opacity: .9 !important;
+}
+
+/* 3) COR DO GUIA NAS DUAS BARRAS (usa variável global do guia)
+   - se existir --theme-main-color no body, ela domina.
+   - se não existir, cai no gradiente gold/silver que já tá no CSS.
+*/
+.progress-bar.gold .progress-fill,
+.progress-bar.silver .progress-fill{
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--theme-main-color, #d4af37) 65%, #ffffff 0%),
+      color-mix(in srgb, var(--theme-main-color, #d4af37) 90%, #000000 0%)
+    ) !important;
+
+  animation: guiaGlow 2.6s ease-in-out infinite !important;
+  box-shadow:
+    0 0 10px color-mix(in srgb, var(--theme-main-color, #d4af37) 80%, transparent),
+    0 0 22px color-mix(in srgb, var(--theme-main-color, #d4af37) 60%, transparent),
+    inset 0 0 6px rgba(255,255,255,0.35) !important;
+}
+
+/* pulso luminoso do guia */
+@keyframes guiaGlow{
+  0%,100%{
+    filter: brightness(1) saturate(1.05);
+  }
+  50%{
+    filter: brightness(1.25) saturate(1.25);
+  }
+}
+
+/* 4) Garante espaço pro HUD inferior não encostar nos botões */
+.section-perguntas .perguntas-wrap{
+  padding-bottom: 68px !important;  /* reserva pra barra inferior */
+}
+
+/* mobile: mantém tudo compacto */
+@media (max-width: 600px){
+  .progress-top{
+    left: 10px !important;
+    right: 62px !important;
+  }
+  .progress-top .progress-label{ display:none !important; }
+
+  .progress-middle{
+    width: min(90%, 420px) !important;
+    bottom: 8px !important;
+  }
+}
 
