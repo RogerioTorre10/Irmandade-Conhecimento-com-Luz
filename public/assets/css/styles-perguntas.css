@@ -847,4 +847,141 @@
     max-width: 340px !important;
   }
 }
+/* ===========================================================
+   HUD DE PROGRESSO DISCRETO + ÁREA DA API + BOTÕES MOBILE
+   (colar no final do styles-perguntas.css)
+   =========================================================== */
+
+/* ---------- 1) PROGRESSO VIRA HUD FINO NO TOPO ---------- */
+/* ambos viram blocos compactos no topo do wrap */
+.section-perguntas .perguntas-wrap{
+  position: relative;
+  padding-top: 70px !important; /* espaço pro HUD + ampulheta */
+}
+
+/* bloco superior (blocos) — discreto */
+.progress-top{
+  position: absolute !important;
+  top: 14px !important;
+  left: 14px !important;
+  right: 74px !important;       /* deixa a ampulheta respirar */
+  width: auto !important;
+
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+
+  font-size: 11px !important;
+  opacity: .9 !important;
+  z-index: 102 !important;
+}
+
+/* régua do meio (pergunta do bloco) sobe pro HUD também */
+.progress-middle{
+  position: absolute !important;
+  top: 38px !important;
+  left: 14px !important;
+  right: 74px !important;
+  width: auto !important;
+
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+
+  font-size: 11px !important;
+  opacity: .9 !important;
+  z-index: 102 !important;
+
+  margin: 0 !important;         /* tira margem antiga do miolo */
+}
+
+/* barras mais finas pra não chamar atenção demais */
+.progress-top .progress-bar,
+.progress-middle .progress-bar{
+  height: 6px !important;
+  border-radius: 999px !important;
+}
+
+/* labels menores e sem gritaria */
+.progress-top .progress-label,
+.progress-middle .progress-label{
+  min-width: auto !important;
+  font-size: 10px !important;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  opacity: .85;
+}
+
+/* no mobile, some com os textos e deixa só barrinha + número */
+@media (max-width: 600px){
+  .progress-top .progress-label,
+  .progress-middle .progress-label{
+    display: none !important;
+  }
+  .progress-top,
+  .progress-middle{
+    left: 10px !important;
+    right: 62px !important;
+  }
+}
+
+/* ---------- 2) ÁREA DA DEVOLUTIVA DA API (MI0LO LIVRE) ---------- */
+#jp-ai-response{
+  display: block !important;
+  width: 100%;
+  margin: 10px auto 12px !important;
+  padding: 10px 12px !important;
+
+  min-height: 88px;                 /* reserva espaço mesmo vazia */
+  border-radius: 12px;
+
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,215,120,0.35);
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+
+  font-family: "Cardo", serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #f7e7c4;
+  text-shadow: 0 1px 2px #000;
+
+  overflow: hidden;
+}
+
+/* quando hidden pelo JS, a gente só remove o conteúdo, não o espaço */
+#jp-ai-response[hidden]{
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* ---------- 3) BOTÕES COM MESMA DIMENSÃO + MOBILE SIDE-BY-SIDE ---------- */
+.perguntas-controls{
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 8px !important;
+  width: 100% !important;
+  max-width: 520px !important;
+  margin: 0 auto !important;
+}
+
+.perguntas-controls .btn-perguntas{
+  height: 42px !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  font-size: 12px !important;
+  padding: 0 8px !important;
+  white-space: nowrap !important;
+}
+
+/* mobile: 2 botões lado a lado + 1 centralizado abaixo (mesmo tamanho) */
+@media (max-width: 600px){
+  .perguntas-controls{
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  #jp-btn-confirmar{
+    grid-column: 1 / -1 !important; /* ocupa a linha inteira */
+    width: 50% !important;          /* mas fica com mesmo tamanho visual */
+    justify-self: center !important;
+  }
+}
 
