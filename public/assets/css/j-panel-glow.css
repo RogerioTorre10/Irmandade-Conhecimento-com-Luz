@@ -2,8 +2,32 @@
    1) PAINEL EXTERNO — Glow universal (desktop + mobile)
    ====================================================== */
 
+/* 1) Variável global da luz (se já existir acima, ok) */
 :root{
   --luz-intensity: 1;
+}
+
+/* 2) Painel glow (o “vidro” das páginas) respira com a luz */
+.j-panel-glow::before{
+  opacity: calc(0.18 * var(--luz-intensity)) !important;
+}
+
+/* 3) Portal de vídeo (moldura dourada) respira com a luz */
+.jp-video-frame::before{
+  opacity: calc(0.25 * var(--luz-intensity)) !important;
+}
+
+/* 4) Névoa do painel (seu CSS pode usar outro nome,
+   então deixo 2 opções seguras)
+*/
+.j-panel-glow .glow-fog,
+.j-panel-glow::after{
+  opacity: calc(0.45 * var(--luz-intensity)) !important;
+}
+
+/* 5) Barras de progresso respiram com a luz */
+.progress-fill{
+  filter: brightness(calc(0.75 * var(--luz-intensity))) !important;
 }
 
 .j-panel-glow {
