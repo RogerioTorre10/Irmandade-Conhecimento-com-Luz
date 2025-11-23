@@ -122,27 +122,9 @@
   margin-left: 6px;
   white-space: nowrap;
 }
-
-/* ---------- MOBILE REFINO ---------- */
-@media (max-width: 600px){
-  .progress-top{
-    left: 10px;
-    right: 72px;
-  }
-  .progress-top .progress-label{ display:none; }
-
-  .progress-top .progress-value{
-    top: -4px;
-    font-size: 10.5px;
-  }
-
-  .progress-middle{
-    width: min(92%, 440px);
-    bottom: 8px;
-  }
-}
-
-/* --- Ampulheta total --- */
+/* ===========================================================
+    --- Ampulheta total ---
+   =========================================================== */
 .progress-total{
   position: absolute;
   top: 14px;
@@ -372,12 +354,12 @@
   .progress-top .progress-label{ display: none; }
   .progress-top{
     left: 10px;
-    right: 62px;
+    right: 72px;
   }
 
   /* HUD inferior mais compacto */
   .progress-middle{
-    width: min(90%, 420px);
+    width: min(92%, 440px);
     bottom: 8px;
   }
 
@@ -390,16 +372,53 @@
     width: 50%;
     justify-self: center;
   }
+  .progress-top .progress-value{
+    top: -4px !important;
+    font-size: 10.5px !important;
+  }  
+}
+/* ===========================================================
+   PULSO DO GUIA — MAIS INTENSO E VIVO
+   (colar no FIM do styles-perguntas.css)
+   =========================================================== */
+
+/* substitui o guiaGlow antigo por um batimento mais forte */
+@keyframes guiaGlow{
+  0%{
+    filter: brightness(1) saturate(1.05);
+    box-shadow:
+      0 0 8px  color-mix(in srgb, var(--theme-main-color, #ffd700) 70%, transparent),
+      0 0 18px color-mix(in srgb, var(--theme-main-color, #ffd700) 50%, transparent),
+      inset 0 0 4px rgba(255,255,255,0.25);
+  }
+  35%{
+    filter: brightness(1.45) saturate(1.45);
+    box-shadow:
+      0 0 14px color-mix(in srgb, var(--theme-main-color, #ffd700) 90%, transparent),
+      0 0 34px color-mix(in srgb, var(--theme-main-color, #ffd700) 70%, transparent),
+      0 0 70px color-mix(in srgb, var(--theme-main-color, #ffd700) 45%, transparent),
+      inset 0 0 8px rgba(255,255,255,0.40);
+  }
+  70%{
+    filter: brightness(1.2) saturate(1.25);
+    box-shadow:
+      0 0 11px color-mix(in srgb, var(--theme-main-color, #ffd700) 80%, transparent),
+      0 0 26px color-mix(in srgb, var(--theme-main-color, #ffd700) 60%, transparent),
+      inset 0 0 6px rgba(255,255,255,0.32);
+  }
+  100%{
+    filter: brightness(1) saturate(1.05);
+    box-shadow:
+      0 0 8px  color-mix(in srgb, var(--theme-main-color, #ffd700) 70%, transparent),
+      0 0 18px color-mix(in srgb, var(--theme-main-color, #ffd700) 50%, transparent),
+      inset 0 0 4px rgba(255,255,255,0.25);
+  }
 }
 
-/* ===========================================================
-   DESATIVA BARRAS ANTIGAS (caso algum HTML antigo exista)
-   =========================================================== */
-.perguntas-progress,
-.jp-global-progress,
-.jp-block-progress,
-#progress-inline,
-.progress-inline,
-.j-progress-inline{
-  display: none !important;
+/* garante que os dois fills usem esse pulso mais forte */
+.progress-top .progress-fill,
+.progress-middle .progress-fill{
+  animation: guiaGlow 1.9s ease-in-out infinite !important; /* mais rápido e vivo */
 }
+
+
