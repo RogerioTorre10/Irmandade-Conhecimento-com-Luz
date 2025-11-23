@@ -984,4 +984,66 @@
     justify-self: center !important;
   }
 }
+/* ===========================================================
+   RESET DEFINITIVO DO PROGRESSO (remove riscos no meio)
+   =========================================================== */
+
+.progress-top,
+.progress-middle{
+  position: absolute !important;
+  left: 14px !important;
+  right: 74px !important;
+  width: auto !important;
+  transform: none !important;       /* mata translate antigo */
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  z-index: 102 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.progress-top{ top: 14px !important; }
+.progress-middle{ top: 38px !important; }
+
+/* barras SEMPRE horizontais */
+.progress-top .progress-bar,
+.progress-middle .progress-bar{
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  height: 6px !important;           /* fixa altura pequena */
+  min-height: 6px !important;
+  max-height: 6px !important;
+  border-radius: 999px !important;
+  overflow: hidden !important;
+  position: relative !important;
+  transform: none !important;
+}
+
+/* fill só na horizontal (altura total da trilha) */
+.progress-top .progress-fill,
+.progress-middle .progress-fill{
+  height: 100% !important;
+  width: 0% !important;             /* JS controla width */
+  max-height: 100% !important;
+  position: relative !important;
+  transform: none !important;
+}
+
+/* mobile: HUD mais compacto */
+@media (max-width: 600px){
+  .progress-top,
+  .progress-middle{
+    left: 10px !important;
+    right: 62px !important;
+  }
+  .progress-top .progress-label,
+  .progress-middle .progress-label{
+    display: none !important;
+  }
+}
 
