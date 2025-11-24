@@ -65,51 +65,50 @@
 
   // -------------------------- PORTAL ARCANUM ---------------------------
   function buildOverlay() {
-  const overlay = document.createElement('div');
-  overlay.id = 'vt-overlay';
-  overlay.className = 'jp-video-overlay';
-  overlay.setAttribute('role', 'dialog');
+    const overlay = document.createElement('div');
+    overlay.id = 'vt-overlay';
+    overlay.className = 'jp-video-overlay';
+    overlay.setAttribute('role', 'dialog');
 
-  const frame = document.createElement('div');
-  frame.className = 'jp-video-frame';
+    const frame = document.createElement('div');
+    frame.className = 'jp-video-frame';
 
-  // vídeo principal (miolo)
-  const video = document.createElement('video');
-  video.id = 'vt-video';
-  video.playsInline = true;
-  video.autoplay = false;
-  video.controls = false;
-  video.muted = true;
-  video.preload = 'auto';
-  video.className = 'jp-video-core';
+    // vídeo principal (miolo)
+    const video = document.createElement('video');
+    video.id = 'vt-video';
+    video.playsInline = true;
+    video.autoplay = false;
+    video.controls = false;
+    video.muted = true;
+    video.preload = 'auto';
+    video.className = 'jp-video-core';
 
-  // “reflexo” desfocado pra preencher topo/baixo
-  const ambient = document.createElement('video');
-  ambient.className = 'jp-video-ambient';
-  ambient.playsInline = true;
-  ambient.autoplay = false;
-  ambient.controls = false;
-  ambient.muted = true;
-  ambient.preload = 'auto';
+    // “reflexo” desfocado pra preencher topo/baixo
+    const ambient = document.createElement('video');
+    ambient.className = 'jp-video-ambient';
+    ambient.playsInline = true;
+    ambient.autoplay = false;
+    ambient.controls = false;
+    ambient.muted = true;
+    ambient.preload = 'auto';
 
-  // botão pular
-  const skip = document.createElement('button');
-  skip.textContent = 'Pular';
-  skip.setAttribute('aria-label', 'Pular vídeo');
-  skip.className = 'jp-video-skip';
+    // botão pular
+    const skip = document.createElement('button');
+    skip.textContent = 'Pular';
+    skip.setAttribute('aria-label', 'Pular vídeo');
+    skip.className = 'jp-video-skip';
 
-  frame.appendChild(ambient);
-  frame.appendChild(video);
-  frame.appendChild(skip);
-  overlay.appendChild(frame);
-  document.body.appendChild(overlay);
+    frame.appendChild(ambient);
+    frame.appendChild(video);
+    frame.appendChild(skip);
+    overlay.appendChild(frame);
+    document.body.appendChild(overlay);
 
-  // glamour fade-in do portal
-  requestAnimationFrame(() => overlay.classList.add('show'));
+    // glamour fade-in do portal
+    requestAnimationFrame(() => overlay.classList.add('show'));
 
-  return { overlay, frame, video, ambient, skip };
-}
-
+    return { overlay, frame, video, ambient, skip };
+  }
 
   // ------------------------- PLAYER PRINCIPAL ---------------------------
   function playTransitionVideo(src, nextSectionId) {
@@ -141,51 +140,63 @@
     const href = resolveHref(src);
     log('Vídeo resolvido para:', href);
 
-    const { overlay, frame, video, ambient, skip } = buildOverlay();
+    const { overlay, video, ambient, skip } = buildOverlay();
 
-    // aplica src também no ambient (reflexo)
-    ambient.src = href;
-    ambient.load();
+    // Cache-buster (mesmo src pros dois)
+    const finalSrc = href + (href.includes('?') ? '&' : '?') + 't=' + Date.now();
+    video.src = finalSrc;
+    ambient.src = finalSrc;
 
-   // quando vídeo puder tocar, o ambient toca junto
+    // ---------------- EVENTOS (SÓ 1 onCanPlay!) ----------------
     const onCanPlay = safeOnce(() => {
-    log('Vídeo carregado, iniciando reprodução:', href);
+      log('Vídeo carregado, iniciando reprodução:', finalSrc);
 
-   // glamour: portal com cor do guia (se já escolhido)
-    try {
-    const g = window.JC?.state?.guia || window.selectedGuide || localStorage.getItem('guiaEscolhido');
-    if (g) overlay.setAttribute('data-guia', g);
-  } catch {}
+      // limelight: cor do guia no overlay (se já escolhido)
+      try {
+        const g =
+          window.JC?.state?.guia ||
+          window.selectedGuide ||
+          localStorage.getItem('guiaEscolhido');
+        if (g) overlay.setAttribute('data-guia', g);
+      } catch {}
 
-  // luz viva entra em pulso enquanto toca
-    try { window.Luz?.startPulse({ min:1, max:1.5, speed:120 }); } catch {}
+      // luz viva enquanto toca
+      try { window.Luz?.startPulse({ min: 1, max: 1.5, speed: 120 }); } catch {}
 
-    video.play().catch(err => {
-    warn('Falha ao dar play (autoplay?):', err);
-    video.muted = true;
-    video.play().catch(() => warn('Play ainda bloqueado.'));
-  });
+      // play core + reflexo
+      video.play().catch(err => {
+        warn('Falha ao dar play (autoplay?):', err);
+        video.muted = true;
+        video.play().catch(() => warn('Play ainda bloqueado.'));
+      });
+      ambient.play().catch(() => {});
+    });
 
-    ambient.play().catch(()=>{});
-  });
-
-    
     const finishAndGo = safeOnce(() => {
-    overlay.classList.remove('show');
-    overlay.classList.add('hide');
+      overlay.classList.remove('show');
+      overlay.classList.add('hide');
 
-    setTimeout(() => {
-    try { window.Luz?.stopPulse(); } catch {}
-    cleanup(overlay);
-    navigateTo(nextSectionId);
+      setTimeout(() => {
+        try { window.Luz?.stopPulse(); } catch {}
+        cleanup(overlay);
+        navigateTo(nextSectionId);
 
-    // glamour fade-in na página nova
-    document.body.classList.remove('vt-fade-out');
-    document.body.classList.add('vt-fade-in');
-    setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
-  }, 360);
-});
+        // glamour fade-in na página nova
+        document.body.classList.remove('vt-fade-out');
+        document.body.classList.add('vt-fade-in');
+        setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
+      }, 360);
+    });
 
+    const onEnded = safeOnce(() => {
+      log('Vídeo finalizado:', finalSrc);
+      finishAndGo();
+    });
+
+    const onError = safeOnce((ev) => {
+      warn('Erro ao carregar vídeo:', finalSrc, ev);
+      finishAndGo();
+    });
 
     skip.addEventListener('click', finishAndGo);
     overlay.addEventListener('click', (e) => {
@@ -193,43 +204,10 @@
     });
     document.addEventListener('keydown', onKeydown, true);
 
-    // Eventos
-    const onCanPlay = safeOnce(() => {
-  log('Vídeo carregado, iniciando reprodução:', href);
-
-  // 🔥 luz viva enquanto toca
-  try { window.Luz?.startPulse({ min:1, max:1.5, speed:120 }); } catch {}
-
-  video.play().catch(err => {
-    warn('Falha ao dar play (autoplay?):', err);
-    video.muted = true;
-    video.play().catch(() => warn('Play ainda bloqueado.'));
-  });
-
-  // reflexo desfocado acompanha
-  try { ambient?.play(); } catch {}
-});
-
-
-    const onEnded = safeOnce(() => {
-      log('Vídeo finalizado:', href);
-      finishAndGo();
-    });
-
-    const onError = safeOnce((ev) => {
-      warn('Erro ao carregar vídeo:', href, ev);
-      finishAndGo();
-    });
-
     video.addEventListener('canplaythrough', onCanPlay, { once: true });
     video.addEventListener('loadeddata', onCanPlay, { once: true });
     video.addEventListener('ended', onEnded, { once: true });
     video.addEventListener('error', onError, { once: true });
-
-    // Cache-buster
-    const finalSrc = href + (href.includes('?') ? '&' : '?') + 't=' + Date.now();
-    video.src = finalSrc;
-    ambient.src = finalSrc;
 
     video.load();
     ambient.load();
