@@ -119,74 +119,72 @@
     });
   };
 
-  // ===== FUNÇÕES TTS AUXILIARES (Para o EffectCoordinator) =====
-  window.EffectCoordinator = window.EffectCoordinator || {};
+   // ===========================================================
+  // EffectCoordinator (TTS)
+  // ===========================================================
+  global.EffectCoordinator = global.EffectCoordinator || {};
 
-  let ultimoTexto = '';
-  let ultimoTempo = 0;
+  global.EffectCoordinator.speak = (text, options = {}) => {
+    if (!text || !('speechSynthesis' in window)) return;
+    try { speechSynthesis.cancel(); } catch {}
 
-  window.EffectCoordinator.speak = (text, options = {}) => {
-    if (!('speechSynthesis' in window) || !text || window.isMuted) return;
-    const agora = Date.now();
-    if (text === ultimoTexto && agora - ultimoTempo < 1000) {
-      typingLog('TTS ignorado, texto repetido:', text.substring(0, 30) + '...');
-      return;
-    }
-    ultimoTexto = text;
-    ultimoTempo = agora;
-    const utt = new SpeechSynthesisUtterance(text.trim());
+    const utt = new SpeechSynthesisUtterance(String(text).trim());
     utt.lang = i18n.lang || 'pt-BR';
     utt.rate = options.rate || 1.03;
     utt.pitch = options.pitch || 1.0;
     utt.volume = 1;
+
+    // 🔥 luz viva durante a fala
+    utt.onboundary = () => {
+      try { window.Luz?.startPulse({ min: 1, max: 1.45, speed: 120 }); } catch {}
+    };
+    utt.onend = () => {
+      try { window.Luz?.stopPulse(); } catch {}
+    };
+
     speechSynthesis.speak(utt);
     typingLog('TTS disparado:', text.substring(0, 30) + '...');
   };
 
-  window.EffectCoordinator.stopAll = () => {
+  global.EffectCoordinator.stopAll = () => {
     if ('speechSynthesis' in window) {
       speechSynthesis.cancel();
       typingLog('TTS cancelado');
     }
     if (abortCurrent) abortCurrent();
     unlock();
+    try { window.Luz?.stopPulse(); } catch {}
   };
-// ===========================================================
-// TYPE AND SPEAK — Datilografa um parágrafo e só avança quando a voz acabar
-// ===========================================================
-global.typeAndSpeak = async function(element, text, speed = 36) {
 
-  if (!text || !element) return;
+  // ===========================================================
+  // typeAndSpeak — parágrafo só avança quando voz terminar
+  // ===========================================================
+  global.typeAndSpeak = async function(element, text, speed = 36){
+    if (!text || !element) return;
 
-  // Cancela TTS anterior
-  try { speechSynthesis.cancel(); } catch {}
+    // cancela fala anterior
+    try { speechSynthesis.cancel(); } catch {}
 
-  // dispara voz
-  let terminou = false;
-  if ('speechSynthesis' in window) {
-    const utt = new SpeechSynthesisUtterance(text.trim());
-    utt.lang = i18n.lang || 'pt-BR';
-    utt.rate = 0.95;
-    utt.pitch = 1.0;
+    let terminou = false;
+    if ('speechSynthesis' in window){
+      const utt = new SpeechSynthesisUtterance(String(text).trim());
+      utt.lang = i18n.lang || 'pt-BR';
+      utt.rate = 0.95;
+      utt.pitch = 1.0;
+      utt.onend = () => { terminou = true; };
 
-    utt.onend = () => { terminou = true; };
+      speechSynthesis.speak(utt);
+    } else {
+      terminou = true;
+    }
 
-    speechSynthesis.speak(utt);
-  } else {
-    terminou = true;
-  }
+    await global.runTyping(element, text, null, { speed });
 
-  // ------ datilografar ------
-  await global.runTyping(element, text, null, { speed });
-
-  // ------ aguardar voz terminar ------
-  while (!terminou) {
-    await new Promise(r => setTimeout(r, 80));
-  }
-};
-
-  
+    while(!terminou){
+      await new Promise(r => setTimeout(r, 80));
+    }
+  };
 
   typingLog('Pronto');
-
 })(window);
+
