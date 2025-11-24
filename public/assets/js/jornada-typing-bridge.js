@@ -112,6 +112,7 @@
 
     typeText(element, text, speed, cursor).then(() => {
       typingLog('Typing concluído');
+      try { window.Luz?.stopPulse(); } catch {}
       unlock();
       if (callback) callback();
     });
@@ -149,6 +150,41 @@
     if (abortCurrent) abortCurrent();
     unlock();
   };
+// ===========================================================
+// TYPE AND SPEAK — Datilografa um parágrafo e só avança quando a voz acabar
+// ===========================================================
+global.typeAndSpeak = async function(element, text, speed = 36) {
+
+  if (!text || !element) return;
+
+  // Cancela TTS anterior
+  try { speechSynthesis.cancel(); } catch {}
+
+  // dispara voz
+  let terminou = false;
+  if ('speechSynthesis' in window) {
+    const utt = new SpeechSynthesisUtterance(text.trim());
+    utt.lang = i18n.lang || 'pt-BR';
+    utt.rate = 0.95;
+    utt.pitch = 1.0;
+
+    utt.onend = () => { terminou = true; };
+
+    speechSynthesis.speak(utt);
+  } else {
+    terminou = true;
+  }
+
+  // ------ datilografar ------
+  await global.runTyping(element, text, null, { speed });
+
+  // ------ aguardar voz terminar ------
+  while (!terminou) {
+    await new Promise(r => setTimeout(r, 80));
+  }
+};
+
+  
 
   typingLog('Pronto');
 
