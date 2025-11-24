@@ -141,22 +141,51 @@
     const href = resolveHref(src);
     log('Vídeo resolvido para:', href);
 
-    const { overlay, video, ambient, skip } = buildPortal();
+    const { overlay, frame, video, ambient, skip } = buildOverlay();
 
+    // aplica src também no ambient (reflexo)
+    ambient.src = href;
+    ambient.load();
+
+   // quando vídeo puder tocar, o ambient toca junto
+    const onCanPlay = safeOnce(() => {
+    log('Vídeo carregado, iniciando reprodução:', href);
+
+   // glamour: portal com cor do guia (se já escolhido)
+    try {
+    const g = window.JC?.state?.guia || window.selectedGuide || localStorage.getItem('guiaEscolhido');
+    if (g) overlay.setAttribute('data-guia', g);
+  } catch {}
+
+  // luz viva entra em pulso enquanto toca
+    try { window.Luz?.startPulse({ min:1, max:1.5, speed:120 }); } catch {}
+
+    video.play().catch(err => {
+    warn('Falha ao dar play (autoplay?):', err);
+    video.muted = true;
+    video.play().catch(() => warn('Play ainda bloqueado.'));
+  });
+
+    ambient.play().catch(()=>{});
+  });
+
+    
     const finishAndGo = safeOnce(() => {
-      overlay.classList.remove('show');
-      overlay.classList.add('hide');
+    overlay.classList.remove('show');
+    overlay.classList.add('hide');
 
-      setTimeout(() => {
-        cleanup(overlay);
-        navigateTo(nextSectionId);
+    setTimeout(() => {
+    try { window.Luz?.stopPulse(); } catch {}
+    cleanup(overlay);
+    navigateTo(nextSectionId);
 
-        // Glamour: nova página entra suave
-        document.body.classList.remove('vt-fade-out');
-        document.body.classList.add('vt-fade-in');
-        setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
-      }, 360);
-    });
+    // glamour fade-in na página nova
+    document.body.classList.remove('vt-fade-out');
+    document.body.classList.add('vt-fade-in');
+    setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
+  }, 360);
+});
+
 
     skip.addEventListener('click', finishAndGo);
     overlay.addEventListener('click', (e) => {
