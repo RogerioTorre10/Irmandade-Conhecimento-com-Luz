@@ -108,6 +108,8 @@
     typingLog('Iniciando runTyping para elemento:', element);
     lock();
 
+    try { window.Luz?.startPulse({ min: 1, max: 1.25, speed: 140 }); } catch {}
+
     typeText(element, text, speed, cursor).then(() => {
       typingLog('Typing concluído');
       unlock();
