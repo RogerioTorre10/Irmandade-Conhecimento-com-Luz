@@ -530,59 +530,7 @@ body.vt-fade-in #jornada-content-wrapper {
   transform: none;
 }
 
-/* ======================================================
-   7) MOBILE — ajustes finos
-   ====================================================== */
-@media (max-width: 640px) {
-  .j-panel-glow {
-    width: 96%;
-    padding: 8px;
-    margin: 8px auto;
-    min-height: 80vh;
-  }
 
-  .j-perg-v-inner {
-    max-width: 100%;
-    padding: 24px 18px;
-    border-radius: 18px;
-  }
-
-  .j-panel-outer { width: 94%; }
-  .j-panel-inner {
-    max-width: 92%;
-    padding: 32px 20px;
-  }
-
-  .j-arcane-card {
-    max-width: 100%;
-    padding: 16px 14px;
-  }
-  .j-arcane-card::before { opacity: 0.30; }
-}
-:root {
-  --portal-gold: #d4af37;
-
-  /* Cor principal dinâmica (ouro + guia) */
-  --portal-border-color: color-mix(
-    in srgb,
-    var(--portal-gold) 70%,
-    var(--theme-main-color, var(--portal-gold)) 30%
-  );
-
-  /* Brilho principal */
-  --portal-glow-color: color-mix(
-    in srgb,
-    var(--portal-gold) 55%,
-    var(--theme-main-color, var(--portal-gold)) 45%
-  );
-
-  /* Para gradiente elegante */
-  --portal-border-gradient: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--portal-gold) 90%, var(--theme-main-color) 10%) 0%,
-    color-mix(in srgb, var(--portal-gold) 40%, var(--theme-main-color) 60%) 100%
-  );
-}
 /* ======================================================
    ALTURA REAL DE TELA — CORREÇÃO GLOBAL DE BORDA
    ====================================================== */
