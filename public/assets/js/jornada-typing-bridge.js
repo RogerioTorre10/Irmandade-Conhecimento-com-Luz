@@ -83,13 +83,14 @@
         }
 
         const currentText = text.slice(0, i + 1);
+        try { window.Luz?.bump({ peak: 1.18, ms: 120 }); } catch {}
         if (showCursor) {
           element.textContent = currentText;
           element.appendChild(caret);
         } else {
           element.textContent = currentText;
         }
-
+                      
         i++;
         if (i >= text.length) {
           clearInterval(interval);
