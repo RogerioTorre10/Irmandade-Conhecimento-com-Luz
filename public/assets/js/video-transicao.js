@@ -195,15 +195,21 @@
 
     // Eventos
     const onCanPlay = safeOnce(() => {
-      log('Vídeo carregado, iniciando reprodução:', href);
-      ambient.play().catch(() => {});
-      video.play().catch(err => {
-        warn('Falha ao dar play (autoplay?):', err);
-        video.muted = true;
-        ambient.muted = true;
-        video.play().catch(() => warn('Play ainda bloqueado.'));
-      });
-    });
+  log('Vídeo carregado, iniciando reprodução:', href);
+
+  // 🔥 luz viva enquanto toca
+  try { window.Luz?.startPulse({ min:1, max:1.5, speed:120 }); } catch {}
+
+  video.play().catch(err => {
+    warn('Falha ao dar play (autoplay?):', err);
+    video.muted = true;
+    video.play().catch(() => warn('Play ainda bloqueado.'));
+  });
+
+  // reflexo desfocado acompanha
+  try { ambient?.play(); } catch {}
+});
+
 
     const onEnded = safeOnce(() => {
       log('Vídeo finalizado:', href);
