@@ -13,6 +13,16 @@
   background: transparent !important;
   padding: 10px 0 30px;
   box-sizing: border-box;
+  justify-content: center; 
+}
+
+#section-selfie .j-panel-glow.selfie-panel{
+  overflow: visible !important;
+  padding-bottom: max(22px, env(safe-area-inset-bottom)) !important;
+}
+
+#section-selfie .selfie-wrap{
+  padding-bottom: 22px !important;
 }
 
 .selfie-header {
