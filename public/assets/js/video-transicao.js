@@ -64,57 +64,52 @@
   }
 
   // -------------------------- PORTAL ARCANUM ---------------------------
-  function buildPortal() {
-    // Overlay escuro com classe (CSS pega!)
-    const overlay = document.createElement('div');
-    overlay.id = 'vt-overlay';
-    overlay.className = 'jp-video-overlay';
-    overlay.setAttribute('role', 'dialog');
+  function buildOverlay() {
+  const overlay = document.createElement('div');
+  overlay.id = 'vt-overlay';
+  overlay.className = 'jp-video-overlay';
+  overlay.setAttribute('role', 'dialog');
 
-    // Frame dourado fullscreen (CSS pega!)
-    const frame = document.createElement('div');
-    frame.className = 'jp-video-frame';
+  const frame = document.createElement('div');
+  frame.className = 'jp-video-frame';
 
-    // Vídeo ambiente (limelight desfocada)
-    const ambient = document.createElement('video');
-    ambient.className = 'jp-video-ambient';
-    ambient.playsInline = true;
-    ambient.autoplay = false;
-    ambient.controls = false;
-    ambient.muted = true;
-    ambient.loop = true;
-    ambient.preload = 'auto';
+  // vídeo principal (miolo)
+  const video = document.createElement('video');
+  video.id = 'vt-video';
+  video.playsInline = true;
+  video.autoplay = false;
+  video.controls = false;
+  video.muted = true;
+  video.preload = 'auto';
+  video.className = 'jp-video-core';
 
-    // Vídeo principal
-    const video = document.createElement('video');
-    video.id = 'vt-video';
-    video.playsInline = true;
-    video.autoplay = false;
-    video.controls = false;
-    video.muted = true;     // autoplay confiável
-    video.preload = 'auto';
+  // “reflexo” desfocado pra preencher topo/baixo
+  const ambient = document.createElement('video');
+  ambient.className = 'jp-video-ambient';
+  ambient.playsInline = true;
+  ambient.autoplay = false;
+  ambient.controls = false;
+  ambient.muted = true;
+  ambient.preload = 'auto';
 
-    // Botão “Pular”
-    const skip = document.createElement('button');
-    skip.textContent = 'Pular';
-    skip.setAttribute('aria-label', 'Pular vídeo');
-    skip.className = 'jp-video-skip';
+  // botão pular
+  const skip = document.createElement('button');
+  skip.textContent = 'Pular';
+  skip.setAttribute('aria-label', 'Pular vídeo');
+  skip.className = 'jp-video-skip';
 
-    // Montagem
-    frame.appendChild(ambient);
-    frame.appendChild(video);
-    frame.appendChild(skip);
-    overlay.appendChild(frame);
-    document.body.appendChild(overlay);
+  frame.appendChild(ambient);
+  frame.appendChild(video);
+  frame.appendChild(skip);
+  overlay.appendChild(frame);
+  document.body.appendChild(overlay);
 
-    // Glamour: portal aparece suave
-    requestAnimationFrame(() => overlay.classList.add('show'));
+  // glamour fade-in do portal
+  requestAnimationFrame(() => overlay.classList.add('show'));
 
-    // Travar scroll
-    document.documentElement.style.overflow = 'hidden';
+  return { overlay, frame, video, ambient, skip };
+}
 
-    return { overlay, frame, video, ambient, skip };
-  }
 
   // ------------------------- PLAYER PRINCIPAL ---------------------------
   function playTransitionVideo(src, nextSectionId) {
