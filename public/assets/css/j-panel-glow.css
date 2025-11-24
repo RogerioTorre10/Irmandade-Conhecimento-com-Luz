@@ -2,47 +2,20 @@
    1) PAINEL EXTERNO — Glow universal (desktop + mobile)
    ====================================================== */
 
-/* 1) Variável global da luz (se já existir acima, ok) */
 :root{
   --luz-intensity: 1;
 }
 
-/* 2) Painel glow (o “vidro” das páginas) respira com a luz */
-.j-panel-glow::before{
-  opacity: calc(0.18 * var(--luz-intensity)) !important;
-}
-
-/* 3) Portal de vídeo (moldura dourada) respira com a luz */
-.jp-video-frame::before{
-  opacity: calc(0.25 * var(--luz-intensity)) !important;
-}
-
-/* 4) Névoa do painel (seu CSS pode usar outro nome,
-   então deixo 2 opções seguras)
-*/
-.j-panel-glow .glow-fog,
-.j-panel-glow::after{
-   position: absolute;
-  inset: 0;
-  background: url('/assets/img/fog-loop.mp4');
-  mix-blend-mode: screen;
-  pointer-events: none;
-  opacity: calc(0.45 * var(--luz-intensity)) !important;
-}
-
-/* 5) Barras de progresso respiram com a luz */
-.progress-fill{
-  filter: brightness(calc(0.75 * var(--luz-intensity))) !important;
-}
-
+/* Painel principal (vidro black + moldura dourada) */
 .j-panel-glow {
   position: relative;
-  width: min(92vw, 520px);           /* mesmo padrão intro */  max-width: 980px;
+  width: min(92vw, 520px);           /* mesmo padrão intro */
+  max-width: 980px;
   margin: 0 auto;
   padding: 32px 26px;
   border-radius: 26px;
   box-sizing: border-box;
-  overflow: hidden;
+
   z-index: 5;
   background: rgba(10,10,20,0.78);   /* vidro black elegante */
   box-shadow:
@@ -55,20 +28,6 @@
 
   overflow: hidden;
   transition: all .35s ease;
-}
-
-  /* Fundo épico (mantém o look atual) */
-  background: radial-gradient(
-    circle at top,
-    rgba(255,255,255,0.06) 0%,
-    #181a2c 40%,
-    #05060c 100%
-  );
-
-  /* Aura/Glow do guia */
-  box-shadow:
-    0 0 38px rgba(0,0,0,0.9),
-    0 0 72px color-mix(in srgb, var(--theme-main-color, #ffd978) 75%, transparent);
 
   /* garante presença visual e centralização do conteúdo */
   min-height: min(84vh, 860px);
@@ -81,686 +40,92 @@
 .j-panel-glow::before {
   content: '';
   position: absolute;
+  inset: -30% -30% auto -30%;
+  height: 55%;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(255,255,255,0.14), transparent 68%);
+  opacity: 0.55;
   pointer-events: none;
-  z-index: 1;
-  inset: 0;
-  border-radius: inherit;
-  border: 2px solid rgba(212,175,55,0.55);
-  box-shadow:
-    0 0 28px rgba(212,175,55,0.55),
-    inset 0 0 18px rgba(255,230,150,0.25);     
-  background: linear-gradient(
-    to bottom,
-    rgba(255,255,255,0.16),  /* antes ~0.08/0.10 */
-    transparent 45%,
-    transparent 100%
-  ) !important;
- 
+  mix-blend-mode: screen;
+  animation: fogDrift 12s ease-in-out infinite;
 }
 
-/* Glow forte vindo de baixo na cor do guia */
-.j-panel-glow::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: -18%;
-  transform: translateX(-50%);
-  width: 140%;
-  height: 70%;
-  background: radial-gradient(
-    ellipse at top,
-    color-mix(in srgb, var(--theme-main-color, #ffd978) 85%, transparent) 0%,
-    transparent 65%
-  );
-  opacity: 0.95;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Conteúdo dentro do painel sempre acima das “peles” */
-.j-panel-glow > * {
-  position: relative;
-  z-index: 2;
+@keyframes fogDrift{
+  0%,100% { transform: translateY(0) translateX(0) scale(1); }
+  50%     { transform: translateY(8px) translateX(10px) scale(1.04); }
 }
 
 /* ======================================================
-   2) PERGAMINHOS INTERNOS — Vertical e Horizontal
+   2) PAINEL INTERNO (pergaminho / conteúdo)
    ====================================================== */
-
-/* Pergaminho vertical interno (intro, termos, senha, selfie, card, final) */
-.j-perg-v-inner {
+.j-perg-v-inner{
   position: relative;
   width: 100%;
-  max-width: 860px;
-  margin: 0 auto;
-
-  background: center/contain no-repeat url('/assets/img/pergaminho-rasgado-vert.png');
-  background-color: rgba(245, 235, 200, 0.05);
+  max-width: 100%;
+  padding: 34px 26px;
   border-radius: 20px;
-
-  min-height: clamp(420px, 65vh, 720px);
-  max-height: 100%;
-  padding: 30px 26px;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  overflow-y: auto;
-
-  box-shadow: 0 0 60px rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.55);
+  box-shadow:
+    inset 0 0 24px rgba(0,0,0,0.9),
+    0 0 20px rgba(255,215,120,0.18);
 }
 
-/* Conteúdo dentro do pergaminho interno */
-.j-perg-v-inner .j-content {
-  color: var(--theme-main-color, #ffd978);
-  font-family: 'BerkshireSwash', cursive;
-}
-
-/* Pergaminho horizontal interno (perguntas) */
-.j-perg-h-inner {
-  background: center/contain no-repeat url('/assets/img/pergaminho-rasgado-horiz.png');
-  background-color: rgba(245,235,200,0.05);
-  border-radius: 18px;
-  padding: clamp(20px, 3vh, 28px) clamp(18px, 4vw, 28px);
-  box-shadow: 0 0 40px rgba(0,0,0,0.55);
-}
-
-/* ======================================================
-   3) CARTÃO ARCANO — místico + futurista
-   ====================================================== */
-.j-arcane-card {
+/* Cartão arcano base */
+.j-arcane-card{
   position: relative;
-  max-width: 460px;
-  margin: 0 auto clamp(18px, 3vh, 26px);
-  padding: clamp(18px, 3vh, 24px) clamp(16px, 4vw, 24px);
-  border-radius: 24px;
-
-  background:
-    radial-gradient(circle at top, rgba(255,255,255,0.16), transparent 55%),
-    linear-gradient(145deg, #151724, #05060c);
-
-  border: 1px solid color-mix(
-    in srgb,
-    var(--theme-main-color, #ffd978) 75%,
-    #ffffff 10%
-  );
-
-  box-shadow:
-    0 0 16px rgba(0,0,0,0.9),
-    0 0 40px color-mix(in srgb, var(--theme-main-color, #ffd978) 80%, transparent),
-    0 0 90px color-mix(in srgb, var(--theme-main-color, #ffd978) 35%, transparent);
-
-  overflow: hidden;
-}
-
-/* brilho correndo na borda */
-.j-arcane-card::before {
-  content: '';
-  position: absolute;
-  inset: -40%;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    color-mix(in srgb, var(--theme-main-color, #ffd978) 90%, #ffffff 10%) 60deg,
-    transparent 120deg
-  );
-  opacity: 0.35;
-  mix-blend-mode: screen;
-  animation: jArcaneSweep 7s linear infinite;
-  pointer-events: none;
-}
-
-/* máscara interna pra deixar só glow nas bordas */
-.j-arcane-card::after {
-  content: '';
-  position: absolute;
-  inset: 2px;
-  border-radius: 22px;
-  background: radial-gradient(circle at top,
-              rgba(255,255,255,0.04),
-              rgba(0,0,0,0.9));
-  box-shadow: inset 0 0 24px rgba(0,0,0,0.85);
-  pointer-events: none;
-  z-index: 1;
-}
-
-.j-arcane-card > * {
-  position: relative;
-  z-index: 2;
-}
-
-/* Títulos dentro do cartão */
-.j-arcane-card h1,
-.j-arcane-card h2,
-.j-arcane-card h3 {
-  font-family: 'ManufacturingConsent', serif;
-  letter-spacing: 1.5px;
-  color: var(--theme-main-color, #ffd978);
-  text-align: center;
-  text-shadow:
-    0 0 6px color-mix(in srgb, var(--theme-main-color, #ffd978) 85%, transparent),
-    0 0 14px rgba(0,0,0,0.9);
-  margin-bottom: 10px;
-}
-
-/* texto normal */
-.j-arcane-card p,
-.j-arcane-card label,
-.j-arcane-card span {
-  color: #f5f1e5;
-}
-
-/* inputs */
-.j-arcane-card input[type="text"],
-.j-arcane-card input[type="password"],
-.j-arcane-card textarea {
   width: 100%;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.4);
-  background: rgba(5,5,10,0.85);
-  color: #fdf7e5;
-  padding: 10px 12px;
-  font-family: 'Cardo', serif;
+  max-width: 100%;
+  padding: 18px 16px;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.55);
   box-shadow:
-    0 0 10px rgba(0,0,0,0.9),
-    0 0 22px color-mix(in srgb, var(--theme-main-color, #ffd978) 40%, transparent);
+    inset 0 0 18px rgba(0,0,0,0.85),
+    0 0 12px rgba(212,175,55,0.22);
 }
 
-.j-arcane-card .btn-primary,
-.j-arcane-card .btn-stone-espinhos {
-  margin-top: 14px;
-}
-
-@keyframes jArcaneSweep {
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* ======================================================
-   4) PAINÉIS AUXILIARES — Outer / Mid / Inner (se usados)
-   ====================================================== */
-.j-panel-outer {
-  width: min(92%, 780px);
-  margin: 0 auto;
-}
-
-.j-panel-mid {
-  width: 100%;
-  padding: 28px;
-  border-radius: 26px;
-}
-
-.j-panel-inner {
-  width: 100%;
-  max-width: 660px;
-  margin: 0 auto;
-  padding: 38px 32px;
-  border-radius: 26px;
-  background-size: cover;
-}
-
-.j-panel-inner.pergaminho-v {
-  background-image: url('/assets/img/pergaminho-rasgado-vert.png');
-  background-repeat: no-repeat;
-  background-position: center top;
-  background-size: 100% auto;
-}
-
-.j-panel-inner > *:first-child { margin-top: 12px; }
-.j-panel-inner > *:last-child  { margin-bottom: 22px; }
-
-/* ======================================================
-   5) PORTAL DOURADO — Frame para vídeos (transições)
-   ====================================================== */
-.jp-video-overlay {
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 999999 !important;
-  background: rgba(0,0,0,0.92) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  overflow: hidden !important;
-  padding:
-    env(safe-area-inset-top)
-    env(safe-area-inset-right)
-    env(safe-area-inset-bottom)
-    env(safe-area-inset-left) !important;
-
-  opacity: 0;
-  transition: opacity .35s ease;
-}
-
-.jp-video-overlay.show { opacity: 1; }
-.jp-video-overlay.hide { opacity: 0; }
-
-/* ==========================================================
-   PORTAL DOURADO FULLSCREEN — GRADIENTE ARCANUM
-   ========================================================== */
-.jp-video-frame {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-
-  /* Borda mágica (ouro → cor do guia) */
-  border: 22px solid transparent !important;
-  border-image: var(--portal-border-gradient) 1 !important;
-
-  /* Glow vivo */
-  box-shadow:
-    0 0 55px color-mix(in srgb, var(--portal-glow-color) 90%, transparent),
-    0 0 160px color-mix(in srgb, var(--portal-glow-color) 55%, transparent),
-    inset 0 0 40px color-mix(in srgb, var(--portal-border-color) 65%, transparent),
-    inset 0 0 90px color-mix(in srgb, var(--portal-glow-color) 55%, transparent) !important;
-
-  background: #000 !important;
-  overflow: hidden !important;
-  z-index: 999999 !important;
-}
-
-
-.jp-video-frame video{
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain !important;          /* <<< mostra tudo */
-  object-position: center !important;
-  background: #000 !important;
-}
-/* ================================
-   LIMELIGHT — correção final
-   (coloque APÓS .jp-video-frame video)
-   ================================ */
-
-/* 1) vídeo ambiente (limelight) */
-.jp-video-frame .jp-video-ambient{
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important; /* pode cortar porque é só luz */
-  filter: blur(22px) brightness(.75) saturate(1.15) !important;
-  opacity: .70 !important;
-  transform: scale(1.06) !important;
-  z-index: 0 !important;
-  pointer-events: none !important;
-}
-
-/* 2) vídeo principal por cima, sem fundo preto */
-.jp-video-frame #vt-video{
-  position: relative !important;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain !important;     /* cenário inteiro */
-  background: transparent !important; /* deixa a limelight aparecer */
-  z-index: 2 !important;
-}
-
-/* GLOBAL-VIDEO dentro do portal cinematográfico */
-.jp-video-frame #global-video{
-  position: relative !important;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain !important;      /* cenário inteiro */
-  background: transparent !important;  /* deixa a limelight aparecer */
-  z-index: 2 !important;
-}
-/* Névoa mística sobre a limelight */
-.jp-video-frame::before{
-  content:'';
-  position:absolute;
-  inset:-10%;
-  pointer-events:none;
-  z-index: 1; /* fica acima da limelight e abaixo do vídeo principal */
-
-  /* camadas de névoa */
-  background:
-    radial-gradient(
-      circle at 30% 20%,
-      color-mix(in srgb, var(--theme-main-color, #d4af37) 35%, transparent) 0%,
-      transparent 55%
-    ),
-    radial-gradient(
-      circle at 70% 80%,
-      rgba(255,255,255,0.20) 0%,
-      transparent 60%
-    ),
-    linear-gradient(
-      160deg,
-      rgba(255,255,255,0.10) 0%,
-      transparent 35%,
-      rgba(255,255,255,0.12) 70%,
-      transparent 100%
-    );
-
-  filter: blur(18px);
-  opacity: 0.32;               /* 🔥 mais intensa */
-  mix-blend-mode: screen;
-
-  animation: jpMistDrift 8s ease-in-out infinite alternate;
-}
-
-/* Movimento suave da névoa */
-@keyframes jpMistDrift{
-  0%   { transform: translateY(0) translateX(0) scale(1); }
-  50%  { transform: translateY(-2.5%) translateX(1.5%) scale(1.03); }
-  100% { transform: translateY(2%) translateX(-1%) scale(1.06); }
-}
-
-
-.jp-video-skip {
-  position: absolute !important;
-  top: 12px !important;
-  right: 12px !important;
-  padding: 8px 12px !important;
-  border-radius: 10px !important;
-  border: 0 !important;
-  font-weight: 700 !important;
-  cursor: pointer !important;
-  background: rgba(255,255,255,0.15) !important;
-  backdrop-filter: blur(6px) !important;
-  color: #fff !important;
-  z-index: 5 !important;
-}
-
-.jp-video-ambient {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-
-  object-fit: cover !important;
-  filter: blur(22px) brightness(.65) saturate(1.15) !important;
-  opacity: .70 !important;
-
-  pointer-events: none !important;
-  z-index: 0 !important;
-}
-
-#vt-video,
-#global-video {
-  position: relative !important;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain !important;
-  background: transparent !important;
-  z-index: 2 !important;
-}
-
-
-/* uma vinheta suave pra dar foco no centro */
-.jp-video-overlay::after{
+.j-arcane-card::before{
   content:'';
   position:absolute;
   inset:0;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(0,0,0,0) 0%,
-    rgba(0,0,0,0.35) 60%,
-    rgba(0,0,0,0.75) 100%
-  );
-  z-index: 1;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 2px rgba(212,175,55,0.55);
+  opacity: .36;
   pointer-events:none;
 }
 
-
 /* ======================================================
-   6) GLAMOUR — Fade suave entre páginas e filmes
-   ====================================================== */
-#jornada-content-wrapper {
-  transition: opacity .55s ease, filter .55s ease, transform .55s ease;
-  will-change: opacity, filter, transform;
-}
-
-body.vt-fade-out #jornada-content-wrapper {
-  opacity: 0;
-  filter: blur(2px) brightness(.75);
-  transform: translateY(6px) scale(0.995);
-}
-
-body.vt-fade-in #jornada-content-wrapper {
-  opacity: 1;
-  filter: none;
-  transform: none;
-}
-
-/* ======================================================
-   7) MOBILE — ajustes finos
-   ====================================================== */
-@media (max-width: 640px) {
-  .j-panel-glow {
-    width: 96%;
-    padding: 8px;
-    margin: 8px auto;
-    min-height: 80vh;
-  }
-
-  .j-perg-v-inner {
-    max-width: 100%;
-    padding: 24px 18px;
-    border-radius: 18px;
-  }
-
-  .j-panel-outer { width: 94%; }
-  .j-panel-inner {
-    max-width: 92%;
-    padding: 32px 20px;
-  }
-
-  .j-arcane-card {
-    max-width: 100%;
-    padding: 16px 14px;
-  }
-  .j-arcane-card::before { opacity: 0.30; }
-}
-:root {
-  --portal-gold: #d4af37;
-
-  /* Cor principal dinâmica (ouro + guia) */
-  --portal-border-color: color-mix(
-    in srgb,
-    var(--portal-gold) 70%,
-    var(--theme-main-color, var(--portal-gold)) 30%
-  );
-
-  /* Brilho principal */
-  --portal-glow-color: color-mix(
-    in srgb,
-    var(--portal-gold) 55%,
-    var(--theme-main-color, var(--portal-gold)) 45%
-  );
-
-  /* Para gradiente elegante */
-  --portal-border-gradient: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--portal-gold) 90%, var(--theme-main-color) 10%) 0%,
-    color-mix(in srgb, var(--portal-gold) 40%, var(--theme-main-color) 60%) 100%
-  );
-}
-/* ======================================================
-   ALTURA REAL DE TELA — CORREÇÃO GLOBAL DE BORDA
+   3) LUZ VIVA (intensidade global)
    ====================================================== */
 
-/* Portal de vídeo */
-.jp-video-overlay,
-.jp-video-frame {
-  height: 100dvh !important;
-  min-height: 100dvh !important;
-}
-
-/* Para garantir que as sombras e bordas apareçam sempre */
-.jp-video-frame {
-  box-sizing: border-box !important;
-}
-
-/* Limelight fullscreen */
-.jp-video-ambient {
-  height: 100dvh !important;
-  min-height: 100dvh !important;
-}
-
-/* Vídeo principal também segue a viewport dinâmica */
-#vt-video,
-#global-video {
-  height: 100dvh !important;
-  min-height: 100dvh !important;
-}
-
-/* Evita cortes e garante espaço clean */
-body, html {
-  height: 100dvh !important;
-  min-height: 100dvh !important;
-  overscroll-behavior: contain;
-}
-/* ===========================================================
-   FIX FINAL — BARRAS TOP + BOTTOM VISÍVEIS + GLOW DO GUIA
-   =========================================================== */
-
-/* --- BARRA SUPERIOR (blocos) --- */
-.progress-top{
-  position: absolute !important;
-  top: 14px !important;
-  left: 14px !important;
-  right: 88px !important;  /* afasta da ampulheta */
-  padding-top: 16px !important; /* espaço pro número acima */
-  z-index: 20 !important;
-}
-
-.progress-top .progress-bar{
-  flex: 1 1 auto !important;
-  height: 8px !important;
-  display: block !important;
-  border-radius: 999px !important;
-  background: rgba(0,0,0,0.60) !important;
-  overflow: hidden !important;
+/* Borda da moldura */
+.j-panel-glow::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius: inherit;
   box-shadow:
-    inset 0 0 10px rgba(0,0,0,0.95),
-    0 0 12px color-mix(in srgb, var(--theme-main-color, #d4af37) 65%, transparent),
-    0 0 26px color-mix(in srgb, var(--theme-main-color, #d4af37) 45%, transparent) !important;
+    0 0 18px rgba(212,175,55,0.9),
+    0 0 44px rgba(212,175,55,0.65),
+    inset 0 0 14px rgba(255,240,180,0.5);
+  opacity: calc(0.18 * var(--luz-intensity)) !important;
+  pointer-events:none;
 }
 
-.progress-top .progress-fill{
-  height: 100% !important;
-  width: 0% !important; /* JS controla */
-  display: block !important;
-  background:
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--theme-main-color, #ffd700) 70%, #fff 0%),
-      color-mix(in srgb, var(--theme-main-color, #ffd700) 95%, #000 0%)
-    ) !important;
-  box-shadow:
-    0 0 12px color-mix(in srgb, var(--theme-main-color, #ffd700) 85%, transparent),
-    0 0 30px color-mix(in srgb, var(--theme-main-color, #ffd700) 60%, transparent),
-    inset 0 0 8px rgba(255,255,255,0.35) !important;
-  animation: guiaGlow 1.9s ease-in-out infinite !important;
+/* Névoa interna respira */
+.j-panel-glow .glow-fog{
+  opacity: calc(0.45 * var(--luz-intensity)) !important;
 }
 
-.progress-top .progress-value{
-  position: absolute !important;
-  top: -2px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  font-size: 12.5px !important;
-  font-weight: 900 !important;
-  color: #ffe9a6 !important;
-  text-shadow: 0 1px 2px #000 !important;
-  pointer-events: none !important;
+/* Barras de progresso respiram com a luz */
+.progress-fill{
+  filter: brightness(calc(0.75 * var(--luz-intensity))) !important;
 }
 
-/* --- BARRA INFERIOR (perguntas no bloco) --- */
-.progress-middle{
-  position: absolute !important;
-  left: 50% !important;
-  bottom: -6px !important;   /* abaixo dos botões */
-  transform: translateX(-50%) !important;
-  width: min(90%, 560px) !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  z-index: 20 !important;
-  background: transparent !important;
-}
-
-.progress-middle .progress-bar{
-  flex: 1 1 auto !important;
-  height: 8px !important;
-  display: block !important;
-  border-radius: 999px !important;
-  background: rgba(0,0,0,0.65) !important;
-  overflow: hidden !important;
-  box-shadow:
-    inset 0 0 10px rgba(0,0,0,1),
-    0 0 10px color-mix(in srgb, var(--theme-main-color, #d4af37) 60%, transparent),
-    0 0 22px color-mix(in srgb, var(--theme-main-color, #d4af37) 40%, transparent) !important;
-}
-
-.progress-middle .progress-fill{
-  height: 100% !important;
-  width: 0% !important; /* JS controla */
-  display: block !important;
-  background:
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--theme-main-color, #ffd700) 65%, #fff 0%),
-      color-mix(in srgb, var(--theme-main-color, #ffd700) 90%, #000 0%)
-    ) !important;
-  box-shadow:
-    0 0 12px color-mix(in srgb, var(--theme-main-color, #ffd700) 85%, transparent),
-    0 0 28px color-mix(in srgb, var(--theme-main-color, #ffd700) 55%, transparent),
-    inset 0 0 8px rgba(255,255,255,0.35) !important;
-  animation: guiaGlow 1.9s ease-in-out infinite !important;
-}
-
-.progress-middle .progress-value{
-  font-size: 12.5px !important;
-  font-weight: 900 !important;
-  letter-spacing: .04em !important;
-  color: #ffe9a6 !important;
-  text-shadow: 0 1px 2px #000 !important;
-  white-space: nowrap !important;
-}
-
-/* reserva espaço para HUD inferior */
-.section-perguntas .perguntas-wrap{
-  padding-bottom: 96px !important;
-}
-
-/* mobile fino */
-@media (max-width: 600px){
-  .progress-top{
-    left: 10px !important;
-    right: 72px !important;
-  }
-  .progress-top .progress-label{ display:none !important; }
-
-  .progress-middle{
-    width: min(92%, 440px) !important;
-    bottom: -4px !important;
-  }
-   
-   @media (max-width: 600px) {
-  .j-panel-glow {
-    width: 92vw !important;     /* garante padrão */
-    padding: 28px 18px;
-  }
-
-  .section-perguntas .perguntas-wrap{
-    padding-bottom: 92px !important;
-  }
-}
 /* ======================================================
-   LUZ VIVA NO PORTAL DOURADO (frame real)
+   4) PORTAL DOURADO — frame real dos vídeos
    ====================================================== */
 
 .jp-video-frame{
-  /* a moldura inteira “respira” com a voz/typing */
   filter:
     brightness(calc(0.85 + (0.25 * var(--luz-intensity))))
     saturate(calc(0.9 + (0.35 * var(--luz-intensity))))
@@ -771,8 +136,62 @@ body, html {
   !important;
 }
 
-/* reforça o glow do overlay também */
 .jp-video-overlay{
   background: rgba(0,0,0, calc(0.88 - (0.10 * (var(--luz-intensity) - 1)))) !important;
 }
 
+/* ======================================================
+   MOBILE ÚNICO — até 600px (unificado, sem duplicações)
+   ====================================================== */
+@media (max-width: 600px) {
+
+  /* Painel externo (vidro black padrão) */
+  .j-panel-glow {
+    width: 92vw !important;
+    max-width: 520px !important;
+    margin: 10px auto !important;
+    padding: 26px 18px !important;
+    min-height: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    border-radius: 22px !important;
+  }
+
+  /* Pergaminho interno vertical */
+  .j-perg-v-inner {
+    max-width: 100% !important;
+    padding: 24px 18px !important;
+    border-radius: 18px !important;
+  }
+
+  /* Estruturas internas do painel (se existirem) */
+  .j-panel-outer { width: 94% !important; }
+
+  .j-panel-inner {
+    max-width: 92% !important;
+    padding: 32px 20px !important;
+  }
+
+  .j-arcane-card {
+    max-width: 100% !important;
+    padding: 16px 14px !important;
+  }
+  .j-arcane-card::before { opacity: 0.30 !important; }
+
+  /* Barras — ajustes finos no mobile */
+  .progress-top{
+    left: 10px !important;
+    right: 72px !important;
+  }
+  .progress-top .progress-label{ display:none !important; }
+
+  .progress-middle{
+    width: min(92%, 440px) !important;
+    bottom: -4px !important;
+  }
+
+  /* Perguntas: respiro inferior pros botões */
+  .section-perguntas .perguntas-wrap{
+    padding-bottom: 92px !important;
+  }
+}
