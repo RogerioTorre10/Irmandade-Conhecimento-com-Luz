@@ -145,6 +145,15 @@
   display: block !important;
   visibility: visible !important;
 }
+
+#section-senha .j-arcane-card,
+#section-senha .senha-wrap,
+#section-senha .conteudo-pergaminho{
+  width: 100%;
+  max-width: 100%;
+}
+
+
 /* =======================================================
    BRILHO + TEXTURAS — módulo universal (espinhos e pedra)
    Seguro para usar junto do styles-base.css
