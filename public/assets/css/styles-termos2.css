@@ -44,6 +44,14 @@
 .termos-actions .btn-continuar:hover {
   transform: scale(1.05);
 }
+
+.termos-panel .j-arcane-card,
+.termos-panel .termo-wrap,
+.termos-panel .conteudo-pergaminho {
+  width: 100%;
+  max-width: 100%;
+}
+
 /* Mimos */
 @keyframes btnReady {
   0% { transform: scale(0.98); filter: brightness(0.9); }
