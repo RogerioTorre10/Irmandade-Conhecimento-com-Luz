@@ -126,6 +126,14 @@
 .final-acoes .btn-light{
   margin-bottom: 6px;
 }
+
+.final-panel,
+.final-panel .j-perg-v-inner,
+.final-panel .pergaminho-content{
+  width: 100%;
+  max-width: 100%;
+}
+
 /* =========================================
    FINAL — BOTÕES LADO A LADO (PADRÃO)
    ========================================= */
