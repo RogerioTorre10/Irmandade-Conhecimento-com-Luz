@@ -161,4 +161,54 @@
     width: 100% !important;
   }
 }
+/* ============================================================
+   FINAL — BRILHO DOURADO INTENSO (ACIMA DE QUALQUER !important)
+   ============================================================ */
+
+/* brilho só quando os botões estiverem liberados */
+.final-acoes.show .btn-gold,
+.final-acoes.show .btn-light {
+  animation: finalPulse 1.8s ease-in-out infinite !important;
+  box-shadow:
+      0 0 22px rgba(255,230,150,0.9),
+      0 0 38px rgba(255,215,120,0.75),
+      inset 0 0 12px rgba(255,255,255,0.50) !important;
+  filter: brightness(1.12);
+}
+
+/* animação do pulso */
+@keyframes finalPulse {
+  0% {
+    transform: scale(1);
+    box-shadow:
+      0 0 18px rgba(255,230,160,0.8),
+      0 0 32px rgba(255,215,120,0.6),
+      inset 0 0 8px rgba(255,255,255,0.3);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow:
+      0 0 26px rgba(255,240,190,1),
+      0 0 46px rgba(255,225,150,0.85),
+      inset 0 0 14px rgba(255,255,255,0.55);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow:
+      0 0 18px rgba(255,230,160,0.8),
+      0 0 32px rgba(255,215,120,0.6),
+      inset 0 0 8px rgba(255,255,255,0.3);
+  }
+}
+
+/* quando desabilitado → continua apagado e sem pulse */
+.final-acoes .btn-gold.disabled,
+.final-acoes .btn-gold[disabled],
+.final-acoes .btn-light.disabled,
+.final-acoes .btn-light[disabled] {
+  animation: none !important;
+  box-shadow: none !important;
+  filter: grayscale(60%) brightness(.65) !important;
+  transform: scale(.95) !important;
+}
 
