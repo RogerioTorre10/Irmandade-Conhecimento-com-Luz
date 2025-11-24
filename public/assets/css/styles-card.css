@@ -20,6 +20,12 @@
   background: transparent;
   min-height: 100vh;
   z-index: 10;
+  height: auto !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: max(18px, env(safe-area-inset-bottom)) !important;
+}
 }
 
 /* Pergaminho não interfere */
@@ -341,7 +347,9 @@
   #section-card.pergaminho-v,
   #section-card .pergaminho,
   #section-card .pergaminho-v {
-    min-height: 100vh !important;
+    max-height: calc(100dvh - 32px) !important;
+    background-size: contain !important;
+    background-position: center !important;
     height: auto !important;
     padding-bottom: 40px !important;
   }
