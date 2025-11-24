@@ -22,6 +22,11 @@
 */
 .j-panel-glow .glow-fog,
 .j-panel-glow::after{
+   position: absolute;
+  inset: 0;
+  background: url('/assets/img/fog-loop.mp4');
+  mix-blend-mode: screen;
+  pointer-events: none;
   opacity: calc(0.45 * var(--luz-intensity)) !important;
 }
 
@@ -32,14 +37,25 @@
 
 .j-panel-glow {
   position: relative;
-  width: 98%;
-  max-width: 980px;
-  margin: 10px auto;
-  padding: 12px;
-  border-radius: 22px;
+  width: min(92vw, 520px);           /* mesmo padrão intro */  max-width: 980px;
+  margin: 0 auto;
+  padding: 32px 26px;
+  border-radius: 26px;
   box-sizing: border-box;
   overflow: hidden;
   z-index: 5;
+  background: rgba(10,10,20,0.78);   /* vidro black elegante */
+  box-shadow:
+    0 0 22px rgba(255,215,100,0.35),
+    0 0 55px rgba(255,215,130,0.32),
+    inset 0 0 22px rgba(255,240,190,0.18);
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  overflow: hidden;
+  transition: all .35s ease;
+}
 
   /* Fundo épico (mantém o look atual) */
   background: radial-gradient(
@@ -68,6 +84,11 @@
   pointer-events: none;
   z-index: 1;
   inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212,175,55,0.55);
+  box-shadow:
+    0 0 28px rgba(212,175,55,0.55),
+    inset 0 0 18px rgba(255,230,150,0.25);     
   background: linear-gradient(
     to bottom,
     rgba(255,255,255,0.16),  /* antes ~0.08/0.10 */
@@ -722,6 +743,12 @@ body, html {
   .progress-middle{
     width: min(92%, 440px) !important;
     bottom: -4px !important;
+  }
+   
+   @media (max-width: 600px) {
+  .j-panel-glow {
+    width: 92vw !important;     /* garante padrão */
+    padding: 28px 18px;
   }
 
   .section-perguntas .perguntas-wrap{
