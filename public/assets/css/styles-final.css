@@ -211,4 +211,97 @@
   filter: grayscale(60%) brightness(.65) !important;
   transform: scale(.95) !important;
 }
+/* ============================================================
+   FINAL — PULSO NA COR DO GUIA (PATCH SHOW)
+   Cole no FINAL do styles-final.css
+   ============================================================ */
+
+/* 1) Cor padrão (fallback dourado) */
+:root{
+  --final-glow-color: #d4af37; /* ouro padrão */
+}
+
+/* 2) Mapeamento de cores por guia
+   (pegando por data-guia OU classe — robusto)
+   Ajuste os hex se quiser mais perto do seu tom exato.
+*/
+
+/* ZION — azul celestial */
+body[data-guia="zion"],
+#section-final[data-guia="zion"],
+.jp-video-overlay[data-guia="zion"],
+.guia-zion{
+  --final-glow-color: #2aa7ff;
+}
+
+/* LUMEN — verde esmeralda */
+body[data-guia="lumen"],
+#section-final[data-guia="lumen"],
+.jp-video-overlay[data-guia="lumen"],
+.guia-lumen{
+  --final-glow-color: #20e38a;
+}
+
+/* ARION/ARIAN — magenta arcano */
+body[data-guia="arion"],
+body[data-guia="arian"],
+#section-final[data-guia="arion"],
+#section-final[data-guia="arian"],
+.jp-video-overlay[data-guia="arion"],
+.jp-video-overlay[data-guia="arian"],
+.guia-arion,
+.guia-arian{
+  --final-glow-color: #ff4fd8;
+}
+
+/* 3) Pulso com a cor do guia */
+.final-acoes.show .btn-gold,
+.final-acoes.show .btn-light{
+  animation: finalPulseGuide 1.8s ease-in-out infinite !important;
+
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--final-glow-color) 85%, transparent),
+    0 0 34px color-mix(in srgb, var(--final-glow-color) 60%, transparent),
+    inset 0 0 12px rgba(255,255,255,0.50) !important;
+
+  filter:
+    brightness(1.12)
+    saturate(1.15) !important;
+}
+
+/* animação do pulso guiado */
+@keyframes finalPulseGuide{
+  0%{
+    transform: scale(1);
+    box-shadow:
+      0 0 14px color-mix(in srgb, var(--final-glow-color) 75%, transparent),
+      0 0 26px color-mix(in srgb, var(--final-glow-color) 50%, transparent),
+      inset 0 0 8px rgba(255,255,255,0.30);
+  }
+  50%{
+    transform: scale(1.035);
+    box-shadow:
+      0 0 24px color-mix(in srgb, var(--final-glow-color) 95%, transparent),
+      0 0 44px color-mix(in srgb, var(--final-glow-color) 75%, transparent),
+      inset 0 0 14px rgba(255,255,255,0.55);
+  }
+  100%{
+    transform: scale(1);
+    box-shadow:
+      0 0 14px color-mix(in srgb, var(--final-glow-color) 75%, transparent),
+      0 0 26px color-mix(in srgb, var(--final-glow-color) 50%, transparent),
+      inset 0 0 8px rgba(255,255,255,0.30);
+  }
+}
+
+/* 4) Quando desabilitado (antes do fim da leitura) → sem pulso */
+.final-acoes .btn-gold.disabled,
+.final-acoes .btn-gold[disabled],
+.final-acoes .btn-light.disabled,
+.final-acoes .btn-light[disabled]{
+  animation: none !important;
+  box-shadow: none !important;
+  filter: grayscale(60%) brightness(.65) !important;
+  transform: scale(.95) !important;
+}
 
