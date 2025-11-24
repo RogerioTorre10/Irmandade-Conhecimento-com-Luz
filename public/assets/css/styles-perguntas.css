@@ -45,6 +45,14 @@
   box-sizing: border-box;
 }
 
+.perguntas-panel .j-arcane-card,
+.perguntas-panel .perguntas-wrap,
+.perguntas-panel #jp-blocks-wrapper{
+  width: 100%;
+  max-width: 100%;
+}
+
+
 /* ===========================================================
    HUD DE PROGRESSO (TOPO + INFERIOR) + AMPULHETA
    =========================================================== */
