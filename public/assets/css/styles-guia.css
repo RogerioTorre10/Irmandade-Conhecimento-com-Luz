@@ -1,358 +1,248 @@
 @import url("/assets/css/styles-base.css");
 
-/* ====== SEÇÃO GUIA ====== */
-.section-guia {
+/* ==========================================================
+   SECTION GUIA — CENTRALIZADA + PERGAMINHO FLUIDO + MIMOS
+   ========================================================== */
+
+#section-guia {
   background: transparent !important;
-  padding: 24px;
-  border-radius: 12px;
-  max-width: 600px;
+  padding: 24px 0;
+  width: 100%;
+  max-width: 620px;
   margin: 0 auto;
   text-align: center;
-  box-shadow: none;
-  border: none;
   display: flex;
   justify-content: center;
-  align-items: center;
-  opacity: 1;
-  visibility: visible;
-  z-index: 2;
-  overflow-y: auto;
+  align-items: flex-start;
   min-height: 80vh;
-  height: 80vh;
   box-sizing: border-box;
-}
-#section-guia .j-panel-glow.guia-panel{
-  margin-left: auto !important;
-  margin-right: auto !important;
-  left: auto !important;
-  right: auto !important;
-  transform: none !important;
+  position: relative;
+  z-index: 3;
 }
 
+/* garante que o j-panel-glow fique 100% centralizado */
+#section-guia .j-panel-glow.guia-panel {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  left: 0 !important;
+  right: 0 !important;
+  transform: none !important;
+  width: 100% !important;
+  max-width: 620px !important;
+}
+
+/* subcamadas internas */
 #section-guia .guia-wrap,
-#section-guia .conteudo-pergaminho{
+#section-guia .conteudo-pergaminho {
   width: 100%;
   max-width: 100%;
 }
 
-.conteudo-pergaminho {
-  text-align: center;
-  margin: 0 auto;
-  max-width: 720px;
-}
+/* ==========================================================
+   TÍTULO COM DOURADO + DATILOGRAFIA
+   ========================================================== */
 
 .titulo-pergaminho {
   font-family: 'ManufacturingConsent', sans-serif;
-  font-size: 20px;
-  color: #fff;
-  margin: 0 auto 12px;
+  font-size: 24px;
+  color: var(--theme-main-color, #ffd700);
   text-align: left !important;
+  margin: 0 auto 16px;
   opacity: 0;
-  visibility: visible;
-  display: block;
+  transform: translateY(4px);
+  transition: opacity .5s ease, transform .5s ease;
 }
 
-.titulo-pergaminho.lumen-typing.typing-active,
-.titulo-pergaminho.lumen-typing.typing-done {
+.titulo-pergaminho.typing-active,
+.titulo-pergaminho.typing-done {
   opacity: 1 !important;
-  display: block !important;
-  visibility: visible !important;
+  transform: translateY(0) !important;
 }
+
+/* ==========================================================
+   INPUT COM MOLDURA DE ESPINHOS
+   ========================================================== */
 
 .guia-name-input.on-pergaminho {
+  width: 100%;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 6px 0 14px;
+  justify-content: center;
+  margin: 4px auto 14px;
 }
 
 .input-espinhos {
-  width: min(70%, 420px);
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.98);
+  width: min(70%, 460px);
+  padding: 12px;
+  background: rgba(255,255,255,0.95);
   color: #3e2723;
-  font-size: 16px;
-  text-align: center;
-  outline: none;
+  font-size: 18px;
+  border-radius: 6px;
   border: 14px solid transparent;
   border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
-  border-radius: 4px;
   font-family: 'Cardo', serif;
+  text-align: center;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
 }
 
+/* ==========================================================
+   MOLDURA GRANDE — DESCRIÇÃO DO GUIA
+   ========================================================== */
+
 .moldura-grande {
-  margin: 8px auto 12px;
-  width: min(92%, 720px);
+  margin: 12px auto 14px;
+  width: min(92%, 760px);
+  padding: 28px;
   min-height: 160px;
-  padding: 26px 28px;
-  background: url('/assets/img/moldura-medieval.png') center/100% 100% no-repeat transparent;
+  background: url('/assets/img/moldura-medieval.png') center/100% 100% no-repeat;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 
 .guia-descricao-medieval {
   width: 100%;
-  max-width: 760px;
-  text-align: left !important;
+  max-width: 720px;
   color: #fff;
+  text-align: left !important;
   font-family: 'BerkshireSwash', cursive;
-  font-size: 15.5px;
+  font-size: 16px;
   line-height: 1.45;
-  margin: 0 auto;
-  padding: 12px 18px;
+  padding: 0 6px;
 }
 
-.guia-descricao-medieval p {
-  margin: 6px 0;
-}
+/* ==========================================================
+   BOTÕES DOS GUIAS — ESPINHOS + EFEITO DOURADO
+   ========================================================== */
 
 .guia-options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
-  width: min(92%, 720px);
-  margin: 4px auto 10px;
-  justify-content: center;
-}
-
-.guia-options .btn-stone-espinhos {
-  padding: 8px 12px;
-  font-weight: 600;
-  font-size: 15px;
-  color: #fff;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0.22)),
-              url('/assets/img/textura-de-pedra.jpg') center/cover no-repeat;
-  border: 12px solid transparent;
-  border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
-  border-radius: 4px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
-  transition: transform 0.12s ease, filter 0.12s ease, opacity 0.12s ease;
-  font-family: 'ManufacturingConsent', sans-serif;
-  cursor: pointer;
-  width: 140px;
-  text-align: center;
-}
-
-.guia-options .btn-stone-espinhos:hover {
-  transform: translateY(-1px);
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45));
-}
-
-.guia-options .btn-stone-espinhos:disabled {
-  opacity: 0.55;
-  filter: grayscale(0.3);
-  cursor: not-allowed;
-}
-
-#guia-error {
-  color: #ff3333;
-  margin-top: 8px;
-  font-family: 'BerkshireSwash', cursive;
-  font-size: 14px;
-  text-align: center;
-}
-
-.guia-options .btn .label {
-  position: relative;
-  z-index: 2;
-  font-family: 'BerkshireSwash', cursive;
-  color: #fff8dc;
-  text-shadow: 0 0 8px rgba(255,215,0,.8);
-}
-#guiaNameInput {
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  font-weight: 600;
-}
-
-.guia-panel .j-arcane-card,
-.guia-panel .guia-wrap,
-.guia-panel .conteudo-pergaminho {
-  width: 100%;
-  max-width: 100%;
-}
-
-/* LUMEN (verde) */
-body[data-guia="lumen"]{
-  --aura-gold-outer: rgba(140,255,140,.85);
-  --aura-gold:       rgba(120,255,160,.75);
-  --aura-gold-soft:  rgba(160,255,200,.55);
-  --aura-amber:      rgba(180,255,160,.45);
-  --btn-gold-outer:  rgba(180,255,180,.45);
-  --btn-gold-mid:    rgba(120,255,160,.45);
-  --btn-gold-line:   rgba(100,255,150,.3);
-}
-
-/* ZION (azul) */
-body[data-guia="zion"]{
-  --aura-gold-outer: rgba(120,180,255,.85);
-  --aura-gold:       rgba(80,160,255,.8);
-  --aura-gold-soft:  rgba(140,200,255,.55);
-  --aura-amber:      rgba(100,180,255,.45);
-  --btn-gold-outer:  rgba(100,180,255,.45);
-  --btn-gold-mid:    rgba(80,160,255,.45);
-  --btn-gold-line:   rgba(60,150,255,.35);
-}
-
-/* ARIAN (magenta) */
-body[data-guia="arian"]{
-  --aura-gold-outer: rgba(255,120,255,.85);
-  --aura-gold:       rgba(255,140,255,.75);
-  --aura-gold-soft:  rgba(255,160,255,.55);
-  --aura-amber:      rgba(255,100,255,.45);
-  --btn-gold-outer:  rgba(255,140,255,.45);
-  --btn-gold-mid:    rgba(255,160,255,.45);
-  --btn-gold-line:   rgba(255,100,255,.3);
-}
-
-/* =======================================================
-   BRILHO + TEXTURAS — módulo universal (espinhos e pedra)
-   Seguro para usar junto do styles-base.css
-   ======================================================= */
-
-/* -------- Variáveis (paths das texturas) -------- */
-:root{
-  --espinhos-img: url('/assets/img/moldura-medieval-espinhos.png');
-  --btn-gold-outer: rgba(255, 230, 120, 0.40);
-  --btn-gold-mid:   rgba(255, 220, 120, 0.45);
-  --btn-gold-in:    rgba(255, 255, 230, 0.25);
-  --btn-gold-line:  rgba(255, 215,   0, 0.25);
-  --btn-text:       #f9e7c2;
-}
-
-/* -------- Animações compartilhadas -------- */
-@keyframes brilhoDivino {
-  0%,100% {
-    box-shadow:
-      0 0 6px  var(--btn-gold-outer),
-      0 0 12px var(--btn-gold-mid),
-      inset 0 0 2px var(--btn-gold-in);
-  }
-  50% {
-    box-shadow:
-      0 0 10px var(--btn-gold-outer),
-      0 0 16px var(--btn-gold-mid),
-      inset 0 0 4px var(--btn-gold-in);
-  }
-}
-
-@keyframes reflexoDourado {
-  0%   { opacity: 0; transform: translate(-120%, -120%) rotate(25deg); }
-  45%,
-  55%  { opacity: .85; }
-  100% { opacity: 0; transform: translate(120%, 120%) rotate(25deg); }
-}
-
-/* =======================================================
-   A) BOTÃO — MOLDURA MEDIEVAL ESPINHOS
-   ======================================================= */
-.btn-stone-espinhos{
-  position: relative;
-  overflow: hidden;
-  display: inline-block;
-  background: transparent !important;
-  background-image: var(--espinhos-img) !important;
-  background-size: 100% 100% !important;
-  background-repeat: no-repeat !important;
-  border: none !important;
-  color: var(--btn-text) !important;
-  text-shadow: 0 1px 1px rgba(0,0,0,.75);
-  font-family: 'Cardo', serif;
-  font-weight: 700;
-  letter-spacing: .3px;
-  border-radius: 10px;
-  cursor: pointer;
-  box-shadow:
-    0 2px 8px rgba(0,0,0,.35),
-    inset 0 0 0 1px var(--btn-gold-line);
-  transition: all .25s ease-in-out;
-}
-
-/* Reflexo animado */
-.btn-stone-espinhos::before{
-  content:'';
-  position:absolute; top:0; left:0;
-  width:60%; height:200%;
-  background: linear-gradient(
-    130deg,
-    rgba(255,255,200,0) 0%,
-    rgba(255,255,180,.6) 50%,
-    rgba(255,255,200,0) 100%
-  );
-  transform: translate(-150%, -150%) rotate(25deg);
-  opacity:0; pointer-events:none;
-}
-
-/* Aro/realce interno */
-.btn-stone-espinhos::after{
-  content:'';
-  position:absolute; inset:0;
-  border-radius:10px;
-  box-shadow:
-    0 2px 8px rgba(0,0,0,.35),
-    inset 0 0 0 1px var(--btn-gold-line);
-  pointer-events:none;
-}
-
-/* Estados */
-.btn-stone-espinhos:hover:not(:disabled){
-  filter: brightness(1.08);
-  transform: translateY(-1px);
-  animation: brilhoDivino 1.8s ease-in-out infinite;
-}
-.btn-stone-espinhos:hover:not(:disabled)::before{
-  animation: reflexoDourado 2s linear forwards;
-}
-.btn-stone-espinhos:active:not(:disabled){
-  transform: translateY(0);
-  filter: brightness(.98);
-  animation: none;
-}
-.btn-stone-espinhos:disabled{
-  opacity:.7; filter: grayscale(.15);
-  cursor: not-allowed; animation:none;
-}
-/* ===== GUIA – layout dos botões alinhados ===== */
-#section-guia .guia-options{
-  /* faixa central responsiva */
   width: min(92%, 820px);
-  margin: 10px auto 4px;
-
-  /* grade robusta: 3 colunas no desktop */
+  margin: 12px auto 10px;
   display: grid;
   grid-template-columns: repeat(3, minmax(120px, 1fr));
-  gap: clamp(8px, 2.4vw, 16px);
+  gap: clamp(10px, 2vw, 18px);
 }
 
-#section-guia .guia-options .guia-option,
-#section-guia .guia-options button{
-  /* garante que NADA force quebra de linha estranha */
+.btn-stone-espinhos {
+  position: relative;
   display: inline-flex;
-  align-items: center;
   justify-content: center;
-
-  height: clamp(34px, 6.2vw, 38px);
-  padding: 0 clamp(10px, 2vw, 14px);
-  border-radius: 10px;
+  align-items: center;
+  padding: 10px 14px;
+  height: clamp(38px, 6.2vw, 44px);
+  background: transparent !important;
+  background-image: url('/assets/img/moldura-medieval-espinhos.png') !important;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  border: none;
+  color: var(--btn-text, #f9e7c2);
+  font-family: 'ManufacturingConsent', sans-serif;
+  font-size: 17px;
+  font-weight: 600;
   white-space: nowrap;
-  box-sizing: border-box;
+  cursor: pointer;
+  transition: transform .15s ease, filter .15s ease;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
 }
 
-/* 2 colunas quando a área útil for menor */
-@media (max-width: 640px){
-  #section-guia .guia-options{
-    grid-template-columns: repeat(2, minmax(120px, 1fr));
+.btn-stone-espinhos:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.6));
+}
+
+.btn-stone-espinhos:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+}
+
+/* DISPOSIÇÃO RESPONSIVA */
+@media(max-width:640px){
+  .guia-options {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
-
-/* 1 coluna nos celulares bem estreitos */
-@media (max-width: 380px){
-  #section-guia .guia-options{
+@media(max-width:380px){
+  .guia-options {
     grid-template-columns: 1fr;
   }
-  #section-guia .guia-options .guia-option,
-  #section-guia .guia-options button{
+  .btn-stone-espinhos {
     width: 100%;
   }
+}
+
+/* ==========================================================
+   ERRO DO GUIA
+   ========================================================== */
+#guia-error {
+  color: #ff4e4e;
+  font-family: 'BerkshireSwash', cursive;
+  font-size: 14px;
+  margin-top: 8px;
+  text-align: center;
+}
+
+/* ==========================================================
+   AURAS POR GUIA (ZION / LUMEN / ARIAN)
+   ========================================================== */
+
+body[data-guia="lumen"]{
+  --btn-gold-outer: rgba(160,255,180,.85);
+  --btn-gold-mid:   rgba(120,255,160,.75);
+  --btn-gold-line:  rgba(100,255,150,.35);
+}
+
+body[data-guia="zion"]{
+  --btn-gold-outer: rgba(120,180,255,.85);
+  --btn-gold-mid:   rgba(80,160,255,.75);
+  --btn-gold-line:  rgba(60,150,255,.35);
+}
+
+body[data-guia="arian"]{
+  --btn-gold-outer: rgba(255,140,255,.85);
+  --btn-gold-mid:   rgba(255,100,255,.75);
+  --btn-gold-line:  rgba(255,100,255,.35);
+}
+
+/* ==========================================================
+   MIMOS GLOBAIS — ANIMAÇÕES E CURSOR DE DATILOGRAFIA
+   ========================================================== */
+
+/* título entrando */
+@keyframes introTitleIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* leve pan */
+@keyframes introPan {
+  0%   { transform: translateY(4px); }
+  50%  { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+
+/* cursor blink */
+@keyframes caretBlink {
+  0%,45% { opacity: 1; }
+  50%,100% { opacity: 0; }
+}
+
+/* cursor slim */
+#section-guia [data-typing="true"][data-cursor="true"].typing-active::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  bottom: 2px;
+  width: 2px;
+  height: 1em;
+  background: #ffd36b;
+  border-radius: 1px;
+  animation: caretBlink 1s steps(1, end) infinite;
+}
+
+/* glow quando digitando */
+#section-guia:has(.typing-active) .j-panel-glow {
+  box-shadow:
+    0 0 18px rgba(255, 215, 0, 0.35),
+    0 0 34px rgba(255, 200, 0, 0.25);
+  transition: box-shadow .4s ease;
 }
