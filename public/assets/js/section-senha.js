@@ -3,7 +3,7 @@
 
   // ===== Config =====
   const SECTION_ID       = 'section-senha';
-  const SECTION_ID = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
+  const HOME_URL = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
   const NEXT_SECTION_ID  = 'section-guia';
   const HIDE_CLASS       = 'hidden';
 
@@ -206,7 +206,7 @@
     // voltar
     btnPrev.addEventListener('click', () => {
       if (window.speechSynthesis?.cancel) speechSynthesis.cancel();
-      window.JC?.show?.(SECTION_ID) ?? history.back();
+      window.JC?.show?.(HOME_URL) ?? history.back();
     });
 
     // avançar (valida + toca vídeo de transição)
