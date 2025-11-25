@@ -322,33 +322,5 @@
     padding: 18px 14px !important;
   }
 }
-/* ==========================================================
-   PATCH CENTRO ABSOLUTO — Intro, Termos 1/2 e Senha
-   (corrige “pendendo pra direita” no desktop e mobile)
-   ========================================================== */
 
-#section-intro,{
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  width: 100% !important;
-}
-
-/* força o painel a ficar exatamente no centro */
-#section-intro .j-panel-glow,{
-  margin-left: auto !important;
-  margin-right: auto !important;
-  left: auto !important;
-  right: auto !important;
-  transform: none !important;
-}
-
-/* se tiver algum wrapper interno deslocando */
-#section-intro .j-perg-v-inner,{
-  margin-left: auto !important;
-  margin-right: auto !important;
-  left: auto !important;
-  right: auto !important;
-  transform: none !important;
-}
 
