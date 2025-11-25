@@ -1,7 +1,7 @@
 @import url("/assets/css/styles-base.css");
 
 /* ===========================================================
-   STYLES-PERGUNTAS — REFRATORADO v2.0
+   STYLES-PERGUNTAS — REFRATORADO v2.0 (LIMPO)
    Caminho: /assets/css/styles-perguntas.css
    Objetivo: Desktop + Mobile polivalente, sem duplicações
    =========================================================== */
@@ -36,8 +36,8 @@
   position: relative;
   width: min(1024px, 100%);
   margin: 0 auto;
-  padding-bottom: 96px !important;
   padding: 74px 14px 78px;  /* topo HUD + ampulheta | base HUD inferior */
+  padding-bottom: 96px !important;
   border-radius: 18px;
   background: rgba(0,0,0,0.45);
   box-shadow: 0 18px 60px rgba(0,0,0,0.85);
@@ -45,13 +45,13 @@
   box-sizing: border-box;
 }
 
+/* não encolher nada dentro da j-panel */
 .perguntas-panel .j-arcane-card,
 .perguntas-panel .perguntas-wrap,
 .perguntas-panel #jp-blocks-wrapper{
   width: 100%;
   max-width: 100%;
 }
-
 
 /* ===========================================================
    HUD DE PROGRESSO (TOPO + INFERIOR) + AMPULHETA
@@ -68,7 +68,7 @@
 
 /* trilha mais larga e com glow forte */
 .progress-top .progress-bar{
-  height: 8px; /* era 6px */
+  height: 8px;
   border-radius: 999px;
   background: rgba(0,0,0,0.60);
   box-shadow:
@@ -77,7 +77,6 @@
     0 0 24px color-mix(in srgb, var(--theme-main-color, #d4af37) 45%, transparent);
 }
 
-/* fill com brilho estilo seleção de guia */
 .progress-top .progress-fill{
   box-shadow:
     0 0 10px color-mix(in srgb, var(--theme-main-color, #ffd700) 80%, transparent),
@@ -85,7 +84,6 @@
     inset 0 0 6px rgba(255,255,255,0.35);
 }
 
-/* valor vai para o centro, acima da barra */
 .progress-top .progress-value{
   position: absolute;
   top: -2px;
@@ -103,15 +101,15 @@
 .progress-middle{
   position: absolute;
   left: 50%;
-  bottom: -6px;          /* joga pra BAIXO dos botões */
+  bottom: -6px;          
   transform: translateX(-50%);
-
   width: min(90%, 560px);
+
   display: flex;
   align-items: center;
   gap: 8px;
 
-  font-size: 12.5px;     /* ✅ maior */
+  font-size: 12.5px;
   font-family: "Cinzel", serif;
   z-index: 12;
 
@@ -138,20 +136,16 @@
     inset 0 0 6px rgba(255,255,255,0.35);
 }
 
-/* mantém o valor no final (direita) */
 .progress-middle .progress-value{
   position: relative;
-  right: auto;
-  left: auto;
   margin-left: 6px;
   white-space: nowrap;
-  font-size: 12.5px;     /* ✅ maior */
+  font-size: 12.5px;
   font-weight: 800;
   letter-spacing: .04em;  
 }
-/* ===========================================================
-    --- Ampulheta total ---
-   =========================================================== */
+
+/* ---------- Ampulheta total ---------- */
 .progress-total{
   position: absolute;
   top: 14px;
@@ -167,16 +161,10 @@
 }
 
 .progress-total .ampulheta{
-  font-size: 1.9rem;         /* maior e protagonista */
+  font-size: 1.9rem;
   display: inline-block;
   animation: spinHourglass 8s infinite linear;
   filter: drop-shadow(0 0 10px #ffda6b);
-}
-
-/* pulso luminoso com cor do guia */
-@keyframes guiaGlow{
-  0%,100%{ filter: brightness(1) saturate(1.05); }
-  50%{ filter: brightness(1.25) saturate(1.25); }
 }
 
 @keyframes spinHourglass{
@@ -265,7 +253,7 @@
   border-radius: 8px;
   background: transparent;
   color: #f7e9c8;
-  font-size: 16px !important; /* iOS não dá zoom */
+  font-size: 16px !important;
   line-height: 1.45;
   resize: vertical;
   z-index: 5;
@@ -293,7 +281,7 @@
   margin: 10px auto 12px;
   padding: 10px 12px;
 
-  min-height: 88px;             /* reserva espaço */
+  min-height: 88px;
   border-radius: 12px;
 
   background: rgba(0,0,0,0.55);
@@ -309,7 +297,6 @@
   overflow: hidden;
 }
 
-/* quando JS usa hidden, mantém o espaço */
 #jp-ai-response[hidden]{
   visibility: hidden;
   opacity: 0;
@@ -330,7 +317,6 @@
 
 .btn-perguntas{
   height: 42px;
-  min-width: 0;
   width: 100%;
   padding: 0 8px;
   border-radius: 999px;
@@ -370,7 +356,7 @@
   }
 
   .section-perguntas .perguntas-wrap{
-    padding: 64px 8px 72px; /* HUD topo + inferior compactos */
+    padding: 64px 8px 72px;
     padding-bottom: 92px; 
   }
 
@@ -378,40 +364,38 @@
     padding: 10px 6px 8px;
   }
 
-  /* HUD topo some texto pra não poluir */
   .progress-top .progress-label{ display: none; }
   .progress-top{
     left: 10px;
     right: 72px;
   }
 
-  /* HUD inferior mais compacto */
   .progress-middle{
     width: min(92%, 440px);
     bottom: -4px;
     font-size: 12px; 
   }
 
-  /* botões: 2 em cima, confirmar centralizado embaixo */
   .perguntas-controls{
     grid-template-columns: repeat(2, 1fr);
   }
+
   #jp-btn-confirmar{
     grid-column: 1 / -1;
     width: 50%;
     justify-self: center;
   }
+
   .progress-top .progress-value{
     top: -4px !important;
     font-size: 12px !important;
-  }  
+  }
 }
+
 /* ===========================================================
    PULSO DO GUIA — MAIS INTENSO E VIVO
-   (colar no FIM do styles-perguntas.css)
+   (versão única — sem duplicar keyframes)
    =========================================================== */
-
-/* substitui o guiaGlow antigo por um batimento mais forte */
 @keyframes guiaGlow{
   0%{
     filter: brightness(1) saturate(1.05);
@@ -444,10 +428,7 @@
   }
 }
 
-/* garante que os dois fills usem esse pulso mais forte */
 .progress-top .progress-fill,
 .progress-middle .progress-fill{
-  animation: guiaGlow 1.9s ease-in-out infinite !important; /* mais rápido e vivo */
+  animation: guiaGlow 1.9s ease-in-out infinite !important;
 }
-
-
