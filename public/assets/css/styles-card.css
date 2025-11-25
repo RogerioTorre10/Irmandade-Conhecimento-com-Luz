@@ -61,6 +61,7 @@
 /* ---------- Selfie (3:4 dentro do card) ---------- */
 #section-card .flame-layer {
   position: relative;
+  top: 62%; 
   width: clamp(240px, 38%, 520px);
   aspect-ratio: 3 / 4;
   min-height: 320px;
@@ -84,9 +85,10 @@
 /* ---------- Nome do participante ---------- */
 #section-card .card-footer {
   position: absolute;
+  top: 85%;
   left: 50%;
   transform: translateX(-50%);
-  bottom: 16px;
+  bottom: auto;
   z-index: 31;
   text-align: center;
   pointer-events: none;
@@ -96,13 +98,13 @@
   display: inline-block;
   padding: 6px 14px;
   border-radius: 10px;
-  border: 1px solid var(--badge-bd);
-  background: var(--badge-bg);
-  color: var(--badge-fg);
-  font: 700 clamp(14px, 2.4vw, 22px)/1 "Cardo", serif;
-  letter-spacing: .06em;
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  background: rgba(0,0,0,0.72);
+  color: #d4af37;
+  font: 700 clamp(16px, 2.6vw, 24px)/1 "Cardo", serif;
+  letter-spacing: .08em;
   text-transform: uppercase;
-  text-shadow: 0 1px 2px rgba(0,0,0,.6);
+  text-shadow: 0 1px 2px rgba(0,0,0,.9);
   backdrop-filter: blur(2px);
 }
 
