@@ -173,4 +173,107 @@
     font-size: 15px;
   }
 }
+/* ================================
+   SECTION-CARD — FIX MASTER (Desktop + Mobile)
+   ================================ */
+
+/* reset do container principal */
+#section-card {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background: transparent !important;
+}
+
+/* pergaminho vertical sempre centralizado */
+#section-card.pergaminho-v {
+  background-size: contain !important;
+  background-position: center top !important;
+  background-repeat: no-repeat !important;
+  padding-top: 40px;
+}
+
+/* palco do card */
+#section-card .card-stage {
+  position: relative;
+  width: min(90vw, 480px);
+  margin: 0 auto;
+  padding-bottom: 140px; /* espaço pro nome + botão */
+  overflow: visible;
+}
+
+/* imagem do guia – sempre controlada */
+#section-card .guia-card-img {
+  display: block;
+  width: 100%;
+  max-width: 380px;   /* limite real */
+  margin: 0 auto;
+  border-radius: 12px;
+  object-fit: contain;
+  z-index: 1;
+}
+
+/* placeholder/selfie no peito */
+#section-card .flame-layer {
+  position: absolute;
+  left: 50%;
+  top: 46%;              /* ajuste do peito */
+  transform: translateX(-50%);
+  width: 42%;
+  max-width: 180px;
+  aspect-ratio: 3 / 4;
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: 5;
+}
+
+/* nome abaixo do placeholder */
+#section-card .card-name-input {
+  position: absolute;
+  top: calc(46% + 180px + 10px);  /* acompanha placeholder */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  text-align: center;
+  z-index: 6;
+}
+
+/* botão continuar – sempre fora do card */
+#section-card #btnNext {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+/* =======================
+   MOBILE FIX
+   ======================= */
+@media (max-width: 600px) {
+
+  #section-card .card-stage {
+    width: 92vw !important;
+    padding-bottom: 160px !important;
+  }
+
+  #section-card .guia-card-img {
+    max-width: 320px !important;
+  }
+
+  #section-card .flame-layer {
+    top: 44% !important;
+    width: 50% !important;
+    max-width: 160px !important;
+  }
+
+  #section-card .card-name-input {
+    top: calc(44% + 160px + 12px) !important;
+    width: 80% !important;
+  }
+}
 
