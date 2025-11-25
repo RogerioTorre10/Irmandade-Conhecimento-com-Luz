@@ -173,28 +173,65 @@
     }
 
     // === SALVA O NOME (GARANTIDO AQUI TAMBÉM, POR SEGURANÇA) ===
-    try {
-      const nameInput = q('#guiaNameInput', root);
-      const userName = (nameInput?.value || '').trim().toUpperCase();
-      if (userName) {
-        window.JC.data.nome = userName;
-        sessionStorage.setItem('jornada.nome', userName);
-        localStorage.setItem('jc.nome', userName);
-      }
-    } catch (e) {
-      console.warn('[JCGuia] Erro ao salvar nome (backup):', e);
+const nameInput = q('#guiaNameInput', root);
+const userName  = (nameInput?.value || '').trim().toUpperCase();
+const guiaAtual = (guiaId || '').trim().toLowerCase();
+
+if (!userName || !guiaAtual) {
+  try {
+    const errBox = q('#guia-error', root);
+    if (errBox) {
+      errBox.classList.remove('hidden');
+
+      const msg = q('#guia-notice-text', errBox) || errBox;
+      msg.textContent = !userName
+        ? 'Para seguir, digite seu nome e escolha um guia.'
+        : 'Agora escolha o guia que caminhará com você.';
     }
 
-    // === AURA DO CORPO (COR DO GUIA) ===
-    try {
-      const guiaAtual = (guiaId || '').toLowerCase();
-      if (guiaAtual) {
-        document.body.dataset.guia = guiaAtual;
-        console.log(`[AURA] Guia ativo: ${guiaAtual} · cor aplicada`);
-      }
-    } catch (err) {
-      console.warn('[AURA] Falha ao definir cor:', err);
-    }
+    // só por segurança: reabilita todos os botões da tela guia
+    const buttons = root.querySelectorAll(
+      '.guia-options button, #btn-confirmar-nome'
+    );
+    buttons.forEach(btn => {
+      btn.disabled = false;
+      btn.classList.remove('is-disabled');
+    });
+  } catch (e) {
+    console.warn('[XGuia] Falha ao mostrar aviso na tela guia:', e);
+  }
+
+  // ⚠️ ponto chave: NÃO avança, NÃO grava nome, NÃO seta dataset.guia
+  return;
+}
+
+// ======================================================
+// === SALVA O NOME (GARANTIDO AQUI TAMBÉM, POR SEGURANÇA)
+// (agora reaproveitando userName que já está lá em cima)
+// ======================================================
+try {
+  if (userName) {
+    window.xc.data.nome = userName;
+    sessionStorage.setItem('jornada.nome', userName);
+    localStorage.setItem('jc.nome', userName);
+  }
+} catch (e) {
+  console.warn('[XGuia] Erro ao salvar nome (backup):', e);
+}
+
+// ======================================================
+// === AURA DO CORPO (COR DO GUIA) ===
+// (reaproveita guiaAtual já em lowerCase)
+// ======================================================
+try {
+  if (guiaAtual) {
+    document.body.dataset.guia = guiaAtual;
+    console.log('[AURA] Guia ativo:', guiaAtual, '— cor aplicada');
+  }
+} catch (err) {
+  console.warn('[AURA] Falha ao definir cor:', err);
+}
+
 
     // === TRANSIÇÃO ===
     const src = getTransitionSrc(root);
