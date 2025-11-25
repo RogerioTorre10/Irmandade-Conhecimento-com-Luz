@@ -206,7 +206,7 @@
     // voltar
     btnPrev.addEventListener('click', () => {
       if (window.speechSynthesis?.cancel) speechSynthesis.cancel();
-      window.JC?.show?.(HOME_URL) ?? history.back();
+      window.JC?.show?.(SECTION_ID) ?? history.back();
     });
 
     // avançar (valida + toca vídeo de transição)
