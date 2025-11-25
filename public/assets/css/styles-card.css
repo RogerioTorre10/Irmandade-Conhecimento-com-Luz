@@ -61,8 +61,10 @@
 /* ---------- Selfie (3:4 dentro do card) ---------- */
 #section-card .flame-layer {
   position: relative;
-  top: 62%; 
-  width: clamp(240px, 38%, 520px);
+  top: 78px !important;
+  height: auto;
+  left: 50%; 
+  width: clamp(200px, 28%, 420px);
   aspect-ratio: 3 / 4;
   min-height: 320px;
   border-radius: 12px;
