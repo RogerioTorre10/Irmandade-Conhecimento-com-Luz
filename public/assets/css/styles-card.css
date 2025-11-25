@@ -97,19 +97,6 @@
   pointer-events: none;
 }
 
- /* Garante que o nome fique exatamente grudado na moldura */
-  #section-card .card-footer::before {
-    content: "";
-    position: absolute;
-    bottom: 100%;
-    left: 0;
-    right: 0;
-    height: 9px;
-    background: #d4af37;
-    border-radius: 22px 22px 0 0;
-    z-index: -1;
-  }
-
 #section-card .card-name-badge {
   display: inline-block;
   padding: 10px 20px;
@@ -259,20 +246,7 @@
     z-index: 20 !important;
     pointer-events: none !important; /* só exibição */
   }
-   
-   /* Garante que o nome fique exatamente grudado na moldura */
-  #section-card .card-footer::before {
-    content: "";
-    position: absolute;
-    bottom: 100%;
-    left: 0;
-    right: 0;
-    height: 9px;
-    background: #d4af37;
-    border-radius: 22px 22px 0 0;
-    z-index: -1;
-  }
-
+    
   /* ==================== BOTÃO CONTINUAR (FORA DO CARD) ==================== */
 #section-card .card-actions-below {
    position: relative !important;
