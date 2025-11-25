@@ -184,8 +184,7 @@
 }
 
 /* garante que o card não encolha a j-panel */
-#section-intro .j-arcane-card,
-#section-termos .j-arcane-card{
+#section-intro .j-arcane-card,{
   width: 100%;
   max-width: 100%;
 }
@@ -315,12 +314,5 @@
   background-size: 100% auto !important;
 }
 
-@media (max-width: 640px){
-  .j-panel-outer{ width: 96% !important; }
-  .j-panel-inner{
-    max-width: 94% !important;
-    padding: 18px 14px !important;
-  }
-}
 
 
