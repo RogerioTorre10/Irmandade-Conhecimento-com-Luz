@@ -69,19 +69,19 @@
 
 /* Responsivo */
 @media (max-width: 480px) {
-  #section-intro { padding: 16px; max-width: 92vw; }
+ #section-termos2 { padding: 16px; max-width: 92vw; }
   .intro-title { font-size: 28px; margin-top: 24px; }
   .parchment-text-rough { font-size: 12.5px; }
 }
 /* Cursor de datilografia — habilitado por data-cursor="true" */
-#section-intro [data-typing="true"][data-cursor="true"] {
+#section-termos2 [data-typing="true"][data-cursor="true"] {
   position: relative;
   display: inline-block;                 /* garante área para o cursor */
   padding-right: 0.35em;                 /* respiro para o cursor */
 }
 
 /* Mostra o cursor enquanto digita */
-#section-intro [data-typing="true"][data-cursor="true"].typing-active::after {
+#section-termos2 [data-typing="true"][data-cursor="true"].typing-active::after {
   content: '';
   position: absolute;
   right: 0.05em;
@@ -96,7 +96,7 @@
 }
 
 /* Some quando terminou a digitação */
-#section-intro [data-typing="true"][data-cursor="true"].typing-done::after {
+#section-termos2 [data-typing="true"][data-cursor="true"].typing-done::after {
   content: none;
 }
 
@@ -105,7 +105,7 @@
   50%, 100% { opacity: 0; }
 }
 /* Halo dourado no pergaminho enquanto há um bloco datilografando */
-#section-intro:has(.typing-active) .parchment-inner-rough {
+#section-termos2:has(.typing-active) .parchment-inner-rough {
   outline: 2px solid rgba(255, 204, 102, 0.25);                /* aro leve */
   outline-offset: 6px;
   box-shadow:
@@ -116,7 +116,7 @@
 }
 
 /* Ao terminar tudo, volta suave ao normal */
-#section-intro:not(:has(.typing-active)) .parchment-inner-rough {
+#section-termos2:not(:has(.typing-active)) .parchment-inner-rough {
   transition: box-shadow .35s ease, outline-color .35s ease;
 }
 
@@ -135,7 +135,7 @@
           0 0 32px rgba(255, 153, 0, 0.18); }
 }
 /* Cursor slim nos parágrafos de texto */
-#section-intro .parchment-text-rough[data-cursor="true"].typing-active::after {
+#section-termos2 .parchment-text-rough[data-cursor="true"].typing-active::after {
   width: 2px;
   height: 1em;
   border-radius: 1px;
