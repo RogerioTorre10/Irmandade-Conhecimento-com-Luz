@@ -1,5 +1,7 @@
 @import url("/assets/css/styles-base.css");
+
 /* ========== SEÇÃO SENHA ========== */
+
 .senha-input {
   position: relative;
   margin: 20px auto;
@@ -12,6 +14,8 @@
   background-blend-mode: overlay;
   border-radius: var(--radius);
   max-width: 420px;
+  width: 100%;
+  box-sizing: border-box;
   text-align: left;
 }
 
@@ -24,6 +28,7 @@
   font-family: 'BerkshireSwash', cursive;
   width: 100%;
   caret-color: var(--fg);
+  outline: none;
 }
 
 .senha-input input::placeholder {
@@ -31,6 +36,7 @@
   opacity: 0.8;
 }
 
+/* Botão olho (mostrar/esconder senha) */
 .senha-input .btn-toggle-senha {
   position: absolute;
   right: 8px;
@@ -59,6 +65,7 @@
   pointer-events: auto !important;
 }
 
+/* Linha de botões (prev / avançar) */
 .senha-actions {
   display: flex !important;
   flex-direction: row !important;
@@ -68,8 +75,11 @@
   flex-wrap: nowrap !important;
   margin: 20px auto;
   max-width: 420px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
+/* Botões herdando glamour global (.btn-stone / .btn etc.) */
 .senha-actions .btn.btn-primary.btn-stone,
 .senha-actions #btn-senha-prev,
 .senha-actions #btn-senha-avancar {
@@ -77,17 +87,21 @@
   font-size: 18px !important;
   border: 2px solid var(--card-2) !important;
   border-radius: var(--radius) !important;
+
   background-image: url('/assets/img/textura-de-pedra.jpg') !important;
   background-size: cover !important;
   background-position: center !important;
   background-color: var(--card-2) !important;
   background-blend-mode: overlay !important;
+
   color: var(--fg) !important;
   font-family: 'ManufacturingConsent', sans-serif !important;
   font-weight: bold !important;
+
   box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
   cursor: pointer !important;
   transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+
   width: 140px !important;
   text-align: center !important;
   position: relative !important;
@@ -109,10 +123,13 @@
   pointer-events: none !important;
 }
 
+/* Conteúdo do pergaminho */
 .conteudo-pergaminho {
   text-align: center;
   margin: 0 auto;
   max-width: 720px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .conteudo-pergaminho h2,
@@ -122,8 +139,10 @@
   opacity: 1 !important;
   margin: 0 auto !important;
   max-width: 560px;
+  width: 100%;
 }
 
+/* Typing / texto base da senha */
 .section-senha .parchment-title-rough.lumen-typing,
 .section-senha .lumen-typing {
   font-family: 'BerkshireSwash', cursive;
@@ -146,6 +165,7 @@
   visibility: visible !important;
 }
 
+/* PATCH largura total da j-panel nessa seção */
 #section-senha .j-arcane-card,
 #section-senha .senha-wrap,
 #section-senha .conteudo-pergaminho{
@@ -153,106 +173,18 @@
   max-width: 100%;
 }
 
-
-/* =======================================================
-   BRILHO + TEXTURAS — módulo universal (espinhos e pedra)
-   Seguro para usar junto do styles-base.css
-   ======================================================= */
-
-/* -------- Variáveis (paths das texturas) -------- */
-:root{
-  --stone-img: url('/assets/img/textura-de-pedra.jpg'); /* usada em utilitário opcional */
-  --btn-gold-outer: rgba(255, 230, 120, 0.40);
-  --btn-gold-mid:   rgba(255, 220, 120, 0.45);
-  --btn-gold-in:    rgba(255, 255, 230, 0.25);
-  --btn-gold-line:  rgba(255, 215,   0, 0.25);
-  --btn-text:       #f9e7c2;
-}
-
-/* -------- Animações compartilhadas -------- */
-@keyframes brilhoDivino {
-  0%,100% {
-    box-shadow:
-      0 0 6px  var(--btn-gold-outer),
-      0 0 12px var(--btn-gold-mid),
-      inset 0 0 2px var(--btn-gold-in);
+/* Mobile */
+@media (max-width: 480px){
+  .senha-input,
+  .senha-actions{
+    max-width: 92vw;
   }
-  50% {
-    box-shadow:
-      0 0 10px var(--btn-gold-outer),
-      0 0 16px var(--btn-gold-mid),
-      inset 0 0 4px var(--btn-gold-in);
+
+  .senha-actions .btn.btn-primary.btn-stone,
+  .senha-actions #btn-senha-prev,
+  .senha-actions #btn-senha-avancar{
+    width: 48% !important; /* mantém lado a lado no mobile */
+    font-size: 17px !important;
   }
 }
 
-@keyframes reflexoDourado {
-  0%   { opacity: 0; transform: translate(-120%, -120%) rotate(25deg); }
-  45%,
-  55%  { opacity: .85; }
-  100% { opacity: 0; transform: translate(120%, 120%) rotate(25deg); }
-}
-
-/* =======================================================
-   B) BOTÃO — TEXTURA DE PEDRA
-   Compatível com seu styles-base.css (não quebra o que já existe)
-   Basta aplicar a classe .btn-stone em qualquer botão.
-   ======================================================= */
-.btn-stone{
-  position: relative;
-  overflow: hidden;
-  display: inline-block;
-  border-radius: 8px;
-  color:#fff; text-shadow: 1px 1px 3px rgba(0,0,0,.7);
-  cursor: pointer;
-  transition: all .25s ease-in-out;
-  /* NÃO definimos background aqui para não conflitar
-     com regras existentes. Use utilitário .stone-texture se precisar. */
-}
-
-/* Utilitário opcional: aplicar textura de pedra caso o botão não tenha */
-.stone-texture{
-  background:
-    linear-gradient(to bottom, #a0a0a0, #808080),
-    var(--stone-img) center/cover;
-  background-blend-mode: overlay;
-  border: 3px solid #4a4a4a;
-  box-shadow:
-    inset 0 3px 6px rgba(0,0,0,.4),
-    0 6px 12px rgba(0,0,0,.6);
-}
-
-/* Aro dourado sutil (para casar com a família de botões) */
-.btn-stone::after{
-  content:'';
-  position:absolute; inset:0; border-radius:8px;
-  box-shadow: inset 0 0 0 1px var(--btn-gold-line);
-  pointer-events:none;
-}
-
-/* Brilho + reflexo no hover (igual aos espinhos) */
-.btn-stone:hover:not(:disabled){
-  transform: translateY(-1px);
-  animation: brilhoDivino 1.8s ease-in-out infinite;
-}
-.btn-stone:hover:not(:disabled)::before{
-  content:'';
-  position:absolute; top:0; left:0;
-  width:60%; height:200%;
-  background: linear-gradient(
-    130deg,
-    rgba(255,255,200,0) 0%,
-    rgba(255,255,180,.6) 50%,
-    rgba(255,255,200,0) 100%
-  );
-  transform: translate(-150%, -150%) rotate(25deg);
-  animation: reflexoDourado 2s linear forwards;
-  pointer-events:none;
-}
-.btn-stone:active:not(:disabled){
-  transform: translateY(0);
-  filter: brightness(.98);
-  animation: none;
-}
-.btn-stone:disabled{
-  opacity:.6; pointer-events:none; animation:none;
-}
