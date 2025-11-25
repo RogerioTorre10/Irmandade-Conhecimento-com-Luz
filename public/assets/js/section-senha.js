@@ -3,7 +3,7 @@
 
   // ===== Config =====
   const SECTION_ID       = 'section-senha';
-  const HOME_URL = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
+  const SECTION_ID = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
   const NEXT_SECTION_ID  = 'section-guia';
   const HIDE_CLASS       = 'hidden';
 
