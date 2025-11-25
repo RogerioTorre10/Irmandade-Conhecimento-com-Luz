@@ -71,7 +71,7 @@
   border-radius: 12px;
   overflow: visible !important;
   box-shadow: 0 0 18px rgba(255,215,120,.25);
-  border: 2px solid rgba(255,215WORKDIR,0,.30);
+  border: 2px solid rgba(255,215,0,.30);
   z-index: 30;
   pointer-events: none;
 }
@@ -138,7 +138,7 @@
 #section-card .pergaminho,
 #section-card .pergaminho-v {
   overflow: visible !important;
-  padding-bottom: 240px !important;
+  padding-bottom: 40px !important;
   min-height: 100vh !important;
   height: auto !important;
 }
@@ -208,12 +208,11 @@
   #section-card .card-footer {
     position: absolute !important;
     left: 50% !important;
-    top: 520px !important;
     transform: none !important;
     width: 100% !important;
     transform: translateX(-50%) !important;
     bottom: auto !important;
-    top: 378px !important;               /* exatamente na base da moldura */
+    top: 520px !important;               /* exatamente na base da moldura */
     width: 100% !important;  /* mesma largura da selfie */
     margin: 0 !important;
     padding: 0 !important;
