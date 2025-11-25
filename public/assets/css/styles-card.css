@@ -168,7 +168,7 @@
     width: 90vw !important;
     max-width: 380px !important;
     margin: 0 auto !important;
-    padding: 40px 0 180px !important; /* espaço pro nome + botão externo */
+    padding: 40px 0 60px !important; /* espaço pro nome + botão externo */
     padding-bottom: 15px !important;
     display: flex !important;
     flex-direction: column !important;
@@ -180,7 +180,7 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 260px !important;              /* ajustei pra ficar exatamente no peito */
+    top: 320px !important;              /* ajustei pra ficar exatamente no peito */
     transform: translateX(-50%) !important;
     width: clamp(100px, 45%, 180px) !important;
     height: auto !important;
@@ -208,9 +208,9 @@
   #section-card .card-footer {
     position: absolute !important;
     left: 50% !important;
-    top: 260px !important;
+    top:520px !important;
     transform: none !important;
-    width: 84% !important;
+    width: 100% !important;
     transform: translateX(-50%) !important;
     bottom: auto !important;
     top: 378px !important;               /* exatamente na base da moldura */
@@ -227,19 +227,19 @@
     width: 100% !important;
     left: auto !important;
     transform: none !important;
-     height: 48px !important;
-    line-height: 48px !important;
+    height: auto !important;
+    line-height: normal !important;
     background: rgba(0,0,0,0.72) !important;
-    border-radius: 0 0 22px 22px !important;   /* arredonda só a parte de baixo */
+    border-radius: 10px !important;
     color: #d4af37 !important;
-    font-size: 1.48rem !important;            /* tamanho perfeito pro espaço */
+    font-size: 1.2rem !important;            /* tamanho perfeito pro espaço */
     font-weight: 900 !important;
     text-align: center !important; 
     text-transform: uppercase !important;
     letter-spacing: 1.8px !important;
     text-shadow: 0 3px 10px rgba(0,0,0,0.95) !important;
     margin: 0 !important;
-    padding: 0 !important;
+    padding: 10px 20px !important;
     overflow: hidden !important;
     white-space: nowrap !important;
     text-overflow: ellipsis !important;  
@@ -265,7 +265,7 @@
    position: relative !important;
    width: 100% !important;
    text-align: center !important;
-   margin-top: 20px !important;
+   margin-top: 0 !important;
    margin-bottom: 20px !important;
    padding: 0 !important;
    z-index: 50 !important;
