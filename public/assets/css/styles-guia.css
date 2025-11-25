@@ -193,7 +193,6 @@
 
   width: 100%;             /* deixa o grid controlar o tamanho */
   max-width: 180px;        /* limite de largura */
-  font-size: 14px;         /* um tico menor ajuda o "ARIAN" caber */
   white-space: nowrap; 
   text-align: center;
 }
