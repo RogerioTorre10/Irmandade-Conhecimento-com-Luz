@@ -193,7 +193,7 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 420px !important;              /* ajustei pra ficar exatamente no peito */
+    top: 320px !important;              /* ajustei pra ficar exatamente no peito */
     transform: translateX(-50%) !important;
     width: clamp(100px, 45%, 180px) !important;
     height: auto !important;
@@ -219,9 +219,9 @@
 
   /* ==================== NOME DO PARTICIPANTE (DENTRO DO CARD) ==================== */
   #section-card .card-footer {
-    position: absolute !important;
+    position: relative !important;
     left: 50% !important;
-    top:620px !important;
+    top:520px !important;
     transform: none !important;
     width: 100% !important;
     transform: translateX(-50%) !important;
