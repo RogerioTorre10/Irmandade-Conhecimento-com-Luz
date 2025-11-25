@@ -807,4 +807,42 @@ body, html {
 .jp-video-overlay{
   background: rgba(0,0,0, calc(0.88 - (0.10 * (var(--luz-intensity) - 1)))) !important;
 }
+/* ==========================================================
+   PATCH CENTRO ABSOLUTO — Intro, Termos 1/2 e Senha
+   (corrige “pendendo pra direita” no desktop e mobile)
+   ========================================================== */
+
+#section-intro,
+#section-termos1,
+#section-termos2,
+#section-senha{
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+/* força o painel a ficar exatamente no centro */
+#section-intro .j-panel-glow,
+#section-termos1 .j-panel-glow,
+#section-termos2 .j-panel-glow,
+#section-senha .j-panel-glow{
+  margin-left: auto !important;
+  margin-right: auto !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+}
+
+/* se tiver algum wrapper interno deslocando */
+#section-intro .j-perg-v-inner,
+#section-termos1 .j-perg-v-inner,
+#section-termos2 .j-perg-v-inner,
+#section-senha .j-perg-v-inner{
+  margin-left: auto !important;
+  margin-right: auto !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+}
 
