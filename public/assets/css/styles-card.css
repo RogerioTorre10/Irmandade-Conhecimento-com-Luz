@@ -3,15 +3,6 @@
 /* =========================================
    SECTION-CARD — LAYOUT GERAL
    ========================================= */
-/* ---------- Variáveis básicas ---------- */
-:root {
-  --card-max-w: 560px;
-  --card-stage-pad-bottom: 140px; /* espaço para nome + botão */
-  --badge-fg: #f6e7c6;
-  --badge-bg: rgba(0,0,0,.40);
-  --badge-bd: rgba(255,225,180,.45);
-}
-
 #section-card {
   position: relative;
   width: 100%;
