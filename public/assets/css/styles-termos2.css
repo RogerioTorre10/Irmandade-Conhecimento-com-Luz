@@ -1,34 +1,64 @@
 @import url("/assets/css/styles-base.css");
 
-/* ========== SEÇÃO TERMOS 2 ========== */
+/* ======================================================
+   SECTION-TERMOS2 — estilos específicos e limpos
+   (sem nada da intro / sem módulos globais duplicados)
+   ====================================================== */
+
+/* Palco / painel */
+#section-termos2{
+  background: transparent !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+/* Garante que o painel interno não encolha */
+#section-termos2 .termos-panel .j-arcane-card,
+#section-termos2 .termos-panel .termo-wrap,
+#section-termos2 .termos-panel .conteudo-pergaminho{
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+}
 
 /* Título da seção */
-.termos-title {
+#section-termos2 .termos-title{
   font-family: 'ManufacturingConsent', sans-serif;
-  font-size: 32px;
+  font-size: clamp(26px, 4vw, 32px);
   text-align: center;
   color: var(--theme-main-color, #ffd700);
-  margin-top: 30px;
+  margin-top: clamp(18px, 4vh, 30px);
+  margin-bottom: 12px;
   text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
 }
 
 /* Texto dos termos */
-.termos-texto {
+#section-termos2 .termos-texto{
   font-family: 'Cardo', serif;
-  font-size: 16px;
+  font-size: clamp(14px, 2.7vw, 16px);
   color: var(--theme-main-color, #ffd700);
   line-height: 1.6;
-  margin: 20px auto;
+  margin: 18px auto;
   max-width: 680px;
   text-align: justify;
   background-color: rgba(18, 24, 50, 0.6);
-  padding: 20px;
+  padding: clamp(14px, 3vw, 20px);
   border-radius: 12px;
   box-shadow: 0 0 12px rgba(0,0,0,0.3);
 }
 
-/* Botão de continuar */
-.termos-actions .btn-continuar {
+/* Área de ações */
+#section-termos2 .termos-actions{
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+/* Botão continuar (mantém teu estilo)
+   Se quiser o brilho universal, adicione class="btn-stone" no HTML */
+#section-termos2 .termos-actions .btn-continuar{
   padding: 10px 24px;
   font-size: 18px;
   font-family: 'ManufacturingConsent', sans-serif;
@@ -41,15 +71,15 @@
   transition: transform 0.2s ease;
 }
 
-.termos-actions .btn-continuar:hover {
+#section-termos2 .termos-actions .btn-continuar:hover{
   transform: scale(1.05);
 }
 
-.termos-panel .j-arcane-card,
-.termos-panel .termo-wrap,
-.termos-panel .conteudo-pergaminho {
-  width: 100%;
-  max-width: 100%;
+/* Responsivo */
+@media (max-width: 480px){
+  #section-termos2 .termos-texto{
+    max-width: 92vw;
+  }
 }
 
 /* Mimos */
