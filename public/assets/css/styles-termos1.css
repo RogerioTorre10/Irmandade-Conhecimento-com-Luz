@@ -7,27 +7,66 @@
   font-size: 32px;
   text-align: center;
   color: var(--theme-main-color, #ffd700);
-  margin-top: 30px;
+  margin-top: 30px;@import url("/assets/css/styles-base.css");
+
+/* ======================================================
+   SECTION-TERMOS1 — estilos específicos e limpos
+   (sem nada da intro / sem módulos globais duplicados)
+   ====================================================== */
+
+/* Palco / painel */
+#section-termos1{
+  background: transparent !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+/* Garante que o painel interno não encolha */
+#section-termos1 .termos-panel .j-arcane-card,
+#section-termos1 .termos-panel .termo-wrap,
+#section-termos1 .termos-panel .conteudo-pergaminho{
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+}
+
+/* Título da seção */
+#section-termos1 .termos-title{
+  font-family: 'ManufacturingConsent', sans-serif;
+  font-size: clamp(26px, 4vw, 32px);
+  text-align: center;
+  color: var(--theme-main-color, #ffd700);
+  margin-top: clamp(18px, 4vh, 30px);
+  margin-bottom: 12px;
   text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
 }
 
 /* Texto dos termos */
-.termos-texto {
+#section-termos1 .termos-texto{
   font-family: 'Cardo', serif;
-  font-size: 16px;
+  font-size: clamp(14px, 2.7vw, 16px);
   color: var(--theme-main-color, #ffd700);
   line-height: 1.6;
-  margin: 20px auto;
+  margin: 18px auto;
   max-width: 680px;
   text-align: justify;
   background-color: rgba(18, 24, 50, 0.6);
-  padding: 20px;
+  padding: clamp(14px, 3vw, 20px);
   border-radius: 12px;
   box-shadow: 0 0 12px rgba(0,0,0,0.3);
 }
 
-/* Botão de continuar */
-.termos-actions .btn-continuar {
+/* Área de ações */
+#section-termos1 .termos-actions{
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+/* Botão continuar (mantém teu estilo, sem duplicar glow global) */
+#section-termos1 .termos-actions .btn-continuar{
   padding: 10px 24px;
   font-size: 18px;
   font-family: 'ManufacturingConsent', sans-serif;
@@ -40,15 +79,15 @@
   transition: transform 0.2s ease;
 }
 
-.termos-actions .btn-continuar:hover {
+#section-termos1 .termos-actions .btn-continuar:hover{
   transform: scale(1.05);
 }
 
-.termos-panel .j-arcane-card,
-.termos-panel .termo-wrap,
-.termos-panel .conteudo-pergaminho {
-  width: 100%;
-  max-width: 100%;
+/* Responsivo */
+@media (max-width: 480px){
+  #section-termos1 .termos-texto{
+    max-width: 92vw;
+  }
 }
 
 /* Mimos */
@@ -57,10 +96,10 @@
   60% { transform: scale(1.02); filter: brightness(1.1); }
   100% { transform: scale(1); filter: none; }
 }
-@keyframes introTitleIn {
+@keyframes termos1TitleIn {
   to { opacity: 1; transform: translateY(0); }
 }
-@keyframes introPan {
+@keyframes termos1Pan {
   0%   { transform: translateY(4px); }
   50%  { transform: translateY(-4px); }
   100% { transform: translateY(0); }
@@ -68,19 +107,19 @@
 
 /* Responsivo */
 @media (max-width: 480px) {
-  #section-intro { padding: 16px; max-width: 92vw; }
+  #section-termos1 { padding: 16px; max-width: 92vw; }
   .intro-title { font-size: 28px; margin-top: 24px; }
   .parchment-text-rough { font-size: 12.5px; }
 }
 /* Cursor de datilografia — habilitado por data-cursor="true" */
-#section-intro [data-typing="true"][data-cursor="true"] {
+#section-termos1 [data-typing="true"][data-cursor="true"] {
   position: relative;
   display: inline-block;                 /* garante área para o cursor */
   padding-right: 0.35em;                 /* respiro para o cursor */
 }
 
 /* Mostra o cursor enquanto digita */
-#section-intro [data-typing="true"][data-cursor="true"].typing-active::after {
+#section-termos1 [data-typing="true"][data-cursor="true"].typing-active::after {
   content: '';
   position: absolute;
   right: 0.05em;
@@ -95,7 +134,7 @@
 }
 
 /* Some quando terminou a digitação */
-#section-intro [data-typing="true"][data-cursor="true"].typing-done::after {
+#section-termos1 [data-typing="true"][data-cursor="true"].typing-done::after {
   content: none;
 }
 
@@ -104,7 +143,7 @@
   50%, 100% { opacity: 0; }
 }
 /* Halo dourado no pergaminho enquanto há um bloco datilografando */
-#section-intro:has(.typing-active) .parchment-inner-rough {
+#section-termos1:has(.typing-active) .parchment-inner-rough {
   outline: 2px solid rgba(255, 204, 102, 0.25);                /* aro leve */
   outline-offset: 6px;
   box-shadow:
@@ -115,7 +154,7 @@
 }
 
 /* Ao terminar tudo, volta suave ao normal */
-#section-intro:not(:has(.typing-active)) .parchment-inner-rough {
+#section-termos1:not(:has(.typing-active)) .parchment-inner-rough {
   transition: box-shadow .35s ease, outline-color .35s ease;
 }
 
@@ -134,7 +173,7 @@
           0 0 32px rgba(255, 153, 0, 0.18); }
 }
 /* Cursor slim nos parágrafos de texto */
-#section-intro .parchment-text-rough[data-cursor="true"].typing-active::after {
+#section-termos1 .parchment-text-rough[data-cursor="true"].typing-active::after {
   width: 2px;
   height: 1em;
   border-radius: 1px;
