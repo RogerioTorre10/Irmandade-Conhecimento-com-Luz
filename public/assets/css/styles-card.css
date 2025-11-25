@@ -88,7 +88,7 @@
 /* ---------- Nome do participante ---------- */
 #section-card .card-footer {
   position: absolute;
-  top: 97%;
+  top: 99%;
   left: 50%;
   transform: translateX(-50%);
   bottom: auto;
@@ -96,6 +96,19 @@
   text-align: center;
   pointer-events: none;
 }
+
+ /* Garante que o nome fique exatamente grudado na moldura */
+  #section-card .card-footer::before {
+    content: "";
+    position: relative;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    height: 9px;
+    background: #d4af37;
+    border-radius: 22px 22px 0 0;
+    z-index: -1;
+  }
 
 #section-card .card-name-badge {
   display: inline-block;
