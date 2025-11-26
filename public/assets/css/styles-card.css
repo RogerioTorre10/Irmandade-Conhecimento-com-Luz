@@ -248,11 +248,15 @@
     
   /* ==================== BOTÃO CONTINUAR (FORA DO CARD) ==================== */
 #section-card .card-actions-below {
-   position: relative !important;
-   width: 100% !important;
+   position: absolute !important;
+   left: 50% !important;
+   bottom: 26px !important;          /* distância da borda inferior do pergaminho */
+   transform: translateX(-50%) !important;
+   width: auto !important;
    text-align: center !important;
    margin-top: 0 !important;
    margin-bottom: 20px !important;
+   margin: 0 !important;
    padding: 0 !important;
    z-index: 50 !important;
 }
