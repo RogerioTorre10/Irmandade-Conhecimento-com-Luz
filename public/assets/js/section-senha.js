@@ -2,10 +2,11 @@
   'use strict';
 
   // ===== Config =====
-  const SECTION_ID       = 'section-senha';
-  const HOME_URL = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
-  const NEXT_SECTION_ID  = 'section-guia';
-  const HIDE_CLASS       = 'hidden';
+const SECTION_ID       = 'section-senha'; 
+const HOME_URL         = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
+const NEXT_SECTION_ID  = 'section-guia';
+const HIDE_CLASS       = 'hidden';
+
 
   const TYPING_SPEED     = 36;
   const INITIAL_DELAY_MS = 200;
@@ -205,9 +206,30 @@
 
     // voltar
     btnPrev.addEventListener('click', () => {
-      if (window.speechSynthesis?.cancel) speechSynthesis.cancel();
-      window.JC?.show?.(HOME_URL) ?? history.back();
-    });
+   // para leitura em voz alta, se estiver ativa
+    try {
+      if (window.speechSynthesis?.cancel) {
+      window.speechSynthesis.cancel();
+    }
+    } catch (e) {
+      console.warn('[SENHA] Erro ao cancelar TTS:', e);
+    }
+
+   // Se HOME_URL é uma URL completa, redireciona pro portal
+    if (HOME_URL && /^https?:\/\//.test(HOME_URL)) {
+      window.location.href = HOME_URL;
+    return;
+  }
+
+  // Se HOME_URL fosse um ID de seção, usaria o JC.show
+  if (window.JC?.show) {
+     window.JC.show(HOME_URL);
+   } else {
+    // fallback: volta no histórico
+    history.back();
+   }
+  });
+
 
     // avançar (valida + toca vídeo de transição)
     btnNext.addEventListener('click', () => {
