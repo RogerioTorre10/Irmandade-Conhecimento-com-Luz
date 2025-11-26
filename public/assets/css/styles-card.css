@@ -212,7 +212,7 @@
     width: 100% !important;
     transform: translateX(-50%) !important;
     bottom: auto !important;
-    top: 52px !important;               /* exatamente na base da moldura */
+    top: 460px !important;               /* exatamente na base da moldura */
     width: 100% !important;  /* mesma largura da selfie */
     margin: 0 !important;
     padding: 0 !important;
@@ -299,7 +299,7 @@
   #section-card .pergaminho-v {
     min-height: 100vh !important;
     height: auto !important;
-    padding-bottom: 40px !important;
+    padding-bottom: 240px !important;
   }
   /* 1. Remove de vez o avatar grande do guia que ficava no topo */
   #section-card .guide-avatar,
