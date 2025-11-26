@@ -1,35 +1,20 @@
 @import url("/assets/css/styles-base.css");
 
-/* ========== ESTILOS ESPECÍFICOS PARA SECTION-INTRO ========== */
+/* ========== SEÇÃO INTRO (TIPOGRAFIA + EFEITOS) ========== */
+
+/* A section em si não manda mais no tamanho, só no fundo */
 #section-intro {
   background: transparent !important;
-  padding: 12px;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 600px;              /* respiro do pergaminho vertical */
-  margin: 0 auto;
-  box-sizing: border-box;
-
-  text-align: left !important;
   box-shadow: none;
   border: none;
-
-  display: block;
-  opacity: 1;
-  visibility: visible;
-
-  z-index: 2;
-  overflow: hidden;
-  min-height: 60vh;
+  text-align: left !important;
 }
 
-/* Pergaminho interno da intro */
+/* Pergaminho interno da intro (layout vem do j-perg-v-inner global) */
 #section-intro .parchment-inner-rough {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  min-height: auto;
-  height: 100%;
   text-align: left !important;
 
   /* pan sutil do pergaminho durante a intro */
@@ -37,7 +22,6 @@
 }
 
 .intro-wrap {
-  height: 100% !important;
   width: 100% !important;
   overflow: hidden !important;
   text-align: left !important;
@@ -89,7 +73,7 @@
   transition: opacity .25s ease;
 }
 
-/* Área de ações */
+/* Área de ações (botão Iniciar) */
 #section-intro .parchment-actions-rough {
   display: flex;
   justify-content: center;
@@ -118,7 +102,6 @@
   50%  { transform: translateY(-4px); }
   100% { transform: translateY(0); }
 }
-
 
 /* Cursor de datilografia */
 #section-intro [data-typing="true"][data-cursor="true"] {
@@ -187,14 +170,9 @@
   border-radius: 1px;
   right: 0;
 }
- /* ================== RESPONSIVO INTRO (MOBILE) ================== */
-@media (max-width: 600px) {
-  #section-intro {
-    padding: 12px;
-    max-width: 88vw;
-    min-height: auto;      /* não força 60vh no mobile */
-  }
 
+/* ================== MOBILE – SÓ TIPOGRAFIA ================== */
+@media (max-width: 600px) {
   #section-intro .intro-title {
     font-size: 28px;
     margin-top: 24px;
@@ -206,19 +184,3 @@
     line-height: 1.35;
   }
 }
-/* ================== AJUSTE DESKTOP – CENTRALIZAR INTRO NO PERGAMINHO ================== */
-@media (min-width: 768px) {
-  /* Centraliza o conteúdo da intro dentro do pergaminho vertical */
-  #section-intro .j-perg-v-inner {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;   /* em vez de colar no topo */
-  }
-
-  /* Garante que o card não tenha margem empurrando pra cima/baixo */
-  #section-intro .j-arcane-card {
-    margin-top: 0;
-    margin-bottom: 0;
-  }
-}
-
