@@ -880,10 +880,9 @@ body, html {
   }
    
 .section.j-screen-vert {
-  display: flex;
-  justify-content: center;   /* centraliza horizontal */
-  align-items: center;       /* centraliza vertical */
-  min-height: 100vh;         /* ocupa a altura toda da tela */
+  display: block;
+  padding-top: 40px;   /* sobe/desce o pergaminho aqui */
+  padding-bottom: 56px;
 }
 
 .section.j-screen-vert .j-panel-glow {
@@ -926,9 +925,8 @@ body, html {
   }
   
   .section.j-screen-vert {
-    align-items: flex-start;     /* evita cortar topo em celulares muito baixos */
-    padding-top: 24px;           /* desce o pergaminho um pouquinho */
-    padding-bottom: 24px;
+    padding-top: 28px;   /* desce um pouco no mobile */
+    padding-bottom: 36px;
   }
 
   .section.j-screen-vert .j-panel-glow {
