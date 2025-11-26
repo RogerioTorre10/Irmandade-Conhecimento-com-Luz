@@ -187,43 +187,4 @@
     font-size: 17px !important;
   }
 }
-/* =========================================
-   AJUSTE MOBILE — INTRO + SENHA
-   (remove min-height gigante e zoom de desktop)
-   ========================================= */
-@media (max-width: 480px) {
-
-  /* Card principal dessas páginas */
-  #section-intro .j-arcane-card,
-  #section-senha .j-arcane-card {
-    width: 88vw !important;          /* não ocupa a tela toda */
-    max-width: 360px !important;     /* limite elegante */
-    margin: 16px auto 24px !important;
-    padding: 18px 14px 22px !important;
-
-    min-height: auto !important;     /* mata min-height de desktop */
-    height: auto !important;
-    border-width: 6px !important;    /* borda mais slim */
-    border-radius: 14px !important;
-
-    transform: none !important;      /* garante que não tem scale estranho */
-  }
-
-  /* Miolo do pergaminho dentro do card (se existir) */
-  #section-intro .parchment-inner-rough,
-  #section-senha .parchment-inner-rough {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 auto !important;
-    padding: 10px 12px 18px !important;
-    min-height: auto !important;
-  }
-
-  /* Texto ajustado pro mobile */
-  #section-intro .parchment-text-rough,
-  #section-senha .parchment-text-rough {
-    font-size: 13px !important;
-    line-height: 1.35 !important;
-  }
-}
 
