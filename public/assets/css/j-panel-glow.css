@@ -884,13 +884,17 @@ body, html {
   }
    
 .section.j-screen-vert {
-  display: block;
+  display: flex;
+  justify-content: center;   /* centro horizontal */
+  align-items: center;       /* centro vertical */
+  min-height: 100vh;
   padding-top: 40px;   /* sobe/desce o pergaminho aqui */
   padding-bottom: 56px;
 }
 
 .section.j-screen-vert .j-panel-glow {
   margin: 0 auto;
+  transform: translateY(0);
 }
 }
 
@@ -931,13 +935,14 @@ body, html {
   }
   
   .section.j-screen-vert {
+    min-height: 100vh;
     padding-top: 28px;   /* desce um pouco no mobile */
     padding-bottom: 36px;
   }
 
   .section.j-screen-vert .j-panel-glow {
     width: min(330px, 86vw);     /* dá uma leve enxugada */
-    margin: 0 auto;
+    transform: translateY(-10px);  
   }
 }
 
