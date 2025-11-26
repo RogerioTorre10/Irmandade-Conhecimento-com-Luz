@@ -130,25 +130,40 @@
 /* Pergaminho vertical interno (intro, termos, senha, selfie, card, final) */
 .j-perg-v-inner {
   position: relative;
-  width: 100%;
-  max-width: 860px;
+
+  /* largura controlada, mas sem exagero */
+  width: min(100%, 860px);
   margin: 0 auto;
 
   background: center/contain no-repeat url('/assets/img/pergaminho-rasgado-vert.png');
   background-color: rgba(245, 235, 200, 0.05);
   border-radius: 20px;
 
-  min-height: clamp(420px, 65vh, 720px);
-  max-height: 100%;
+  /* 🔓 DESTRAVA ALTURA – deixa crescer conforme o conteúdo */
+  min-height: auto;
+  max-height: none;
   padding: 30px 26px;
 
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  overflow-y: auto;
+  align-items: stretch;
+
+  /* não queremos scroll interno, queremos o pergaminho crescer */
+  overflow: visible;
 
   box-shadow: 0 0 60px rgba(0,0,0,0.6);
 }
+
+@media (max-width: 600px) {
+  .j-perg-v-inner {
+    width: 88vw;
+    max-width: 360px;
+    padding: 22px 14px;
+    border-radius: 18px;
+  }
+}
+
 
 /* Conteúdo dentro do pergaminho interno */
 .j-perg-v-inner .j-content {
