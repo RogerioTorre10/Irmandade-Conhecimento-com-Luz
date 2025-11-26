@@ -836,5 +836,39 @@ body, html {
   max-width: 520px !important;
   width: 92vw !important;
 }
+/* ======================================================
+   PATCH MOBILE — Intro + Senha mais “enxutas”
+   (sem quebrar perguntas / outras telas)
+   ====================================================== */
+@media (max-width: 600px) {
+
+  /* Painel principal nessas duas páginas */
+  #section-intro .j-panel-glow,
+  #section-senha .j-panel-glow {
+    width: 88vw !important;          /* um pouco menor que 92vw */
+    max-width: 320px !important;     /* limite real de largura */
+    margin: 16px auto 24px !important;
+    padding: 20px 16px !important;
+    min-height: auto !important;
+    height: auto !important;
+    border-radius: 20px !important;
+  }
+
+  /* Pergaminho vertical interno dentro do painel */
+  #section-intro .j-perg-v-inner,
+  #section-senha .j-perg-v-inner {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 18px 12px !important;
+    min-height: auto !important;
+  }
+
+  /* Cartão arcano dessas páginas (texto + botões) */
+  #section-intro .j-arcane-card,
+  #section-senha .j-arcane-card {
+    max-width: 100% !important;
+    padding: 14px 12px !important;
+  }
+}
 
 
