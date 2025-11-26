@@ -303,7 +303,7 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
   left: 0;
   right: 0;
   padding: 4px 0;
-  line-height: 1.1
+  line-height: 1.1;
   text-align: center;
   background: transparent;
   z-index: 1000;
@@ -346,38 +346,5 @@ section.selfie-page {
   0%   { transform: scale(.97); filter: drop-shadow(0 0 10px var(--aura-gold)); }
   60%  { transform: scale(1.05); filter: drop-shadow(0 0 26px var(--aura-gold)); }
   100% { transform: scale(1.00); filter: drop-shadow(0 0 14px var(--aura-gold)); }
-}
-
-/* =========================================
-   PADRÃO MOBILE — TODOS OS PERGAMINHOS
-   (Intro, Termos, Senha, etc.)
-   ========================================= */
-@media (max-width: 480px) {
-
-  /* Miolo do pergaminho (preto com texto) */
-  .parchment-inner-rough {
-    width: 88vw !important;        /* ocupa quase toda a tela */
-    max-width: 360px !important;   /* limite pra não ficar gigante */
-    margin: 16px auto 24px !important;  /* centralizado */
-    padding: 18px 14px 22px !important; /* menos gordura interna */
-
-    min-height: auto !important;   /* some com aquela altura fixa absurda */
-    border-width: 6px !important;  /* borda mais slim */
-    border-radius: 14px !important;
-  }
-
-  /* Texto dentro do pergaminho */
-  .parchment-text-rough {
-    font-size: 13px !important;
-    line-height: 1.35 !important;
-    word-break: normal !important; /* não quebrar no meio da palavra */
-    hyphens: auto;
-  }
-
-  /* Botão do rodapé dentro do pergaminho */
-  .parchment-inner-rough .btn {
-    transform: scale(0.9);
-    margin-top: 8px;
-  }
 }
 
