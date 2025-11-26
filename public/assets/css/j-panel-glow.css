@@ -894,7 +894,7 @@ body, html {
 
 .section.j-screen-vert .j-panel-glow {
   margin: 0 auto;
-  transform: translateY(0);
+ transform: translateY(-32px);
 }
 }
 
@@ -941,8 +941,8 @@ body, html {
   }
 
   .section.j-screen-vert .j-panel-glow {
-    width: min(330px, 86vw);     /* dá uma leve enxugada */
-    transform: translateY(-10px);  
+    width: min(310px, 82vw);    /* mais estreito => mais baixo também */
+    transform: translateY(-6px);  
   }
 }
 
