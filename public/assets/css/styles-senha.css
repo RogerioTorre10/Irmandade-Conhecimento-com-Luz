@@ -177,7 +177,7 @@
 @media (max-width: 480px){
   .senha-input,
   .senha-actions{
-    max-width: 92vw;
+    max-width: 88vw;
   }
 
   .senha-actions .btn.btn-primary.btn-stone,
