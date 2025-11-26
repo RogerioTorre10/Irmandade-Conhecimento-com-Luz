@@ -132,9 +132,27 @@
     margin-top: 24px;
   }
 
-  .parchment-text-rough {
-    font-size: 12.5px;
+  #section-intro .parchment-inner-rough {
+    width: 88vw !important;       /* ENCOLHE o painel */
+    max-width: 360px !important;  /* limite elegante */
+    margin: 0 auto !important;    /* centraliza */
+    padding: 18px 14px 22px !important; /* remove a gordura */
+    border-width: 6px !important; /* borda slim no mobile */
+    border-radius: 14px !important;
   }
+
+  /* Ajuste no texto para não estourar */
+  #section-intro .parchment-text-rough {
+    font-size: 13px !important;
+    line-height: 1.35 !important;
+  }
+
+  /* Botão sem estourar */
+  #section-intro .btn {
+    transform: scale(0.92);
+    margin-top: 6px;
+  }
+}
 
   /* 💡 AQUI enxugamos o container preto no mobile */
   #section-intro .j-arcane-card {
