@@ -165,10 +165,10 @@
   /* Palco principal do card */
   #section-card .card-stage {
     position: relative !important;
-    width: 90vw !important;
-    max-width: 380px !important;
+    width: 84vw !important;
+    max-width: 340px !important;
     margin: 0 auto !important;
-    padding: 40px 0 60px !important; /* espaço pro nome + botão externo */
+    padding: 32px 0 52px !important; /* espaço pro nome + botão externo */
     padding-bottom: 15px !important;
     display: flex !important;
     flex-direction: column !important;
