@@ -866,17 +866,21 @@ body, html {
   .j-screen-vert .j-perg-v-inner {
     width: 100%;
     max-width: 100%;
-    margin: 0 auto;
-    padding: 30px 26px;
+    margin: 0 auto;   
     min-height: clamp(420px, 65vh, 720px);
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    padding: 30px 26px;
+    padding-top: 40px;   /* quanto maior, mais desce o card */
+    padding-bottom: 80px; 
   }
 
   .j-screen-vert .j-arcane-card {
     max-width: 100%;
     margin: 0 auto;
+    margin-top: 8px;     /* tira aquele grudado no topo do pergaminho */
+    margin-bottom: 0; 
   }
    
 .section.j-screen-vert {
@@ -907,6 +911,8 @@ body, html {
     width: 100% !important;
     max-width: 100% !important;
     padding: 20px 14px 24px !important;
+    padding-top: 32px;    /* sobe/desce o bloco no mobile */
+    padding-bottom: 64px; 
     min-height: auto !important;
     border-radius: 18px; 
   }
