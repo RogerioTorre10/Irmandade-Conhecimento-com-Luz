@@ -191,7 +191,7 @@
 @media (max-width: 600px) {
   #section-intro {
     padding: 12px;
-    max-width: 92vw;
+    max-width: 88vw;
     min-height: auto;      /* não força 60vh no mobile */
   }
 
