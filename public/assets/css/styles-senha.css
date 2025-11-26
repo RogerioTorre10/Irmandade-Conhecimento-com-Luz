@@ -187,4 +187,19 @@
     font-size: 17px !important;
   }
 }
+/* ================== AJUSTE DESKTOP – CENTRALIZAR INTRO NO PERGAMINHO ================== */
+@media (min-width: 768px) {
+  /* Centraliza o conteúdo da intro dentro do pergaminho vertical */
+  #section-intro .j-perg-v-inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;   /* em vez de colar no topo */
+  }
+
+  /* Garante que o card não tenha margem empurrando pra cima/baixo */
+  #section-intro .j-arcane-card {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
 
