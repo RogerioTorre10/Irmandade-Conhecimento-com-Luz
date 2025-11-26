@@ -679,115 +679,6 @@ body, html {
 .section-perguntas .perguntas-wrap{
   padding-bottom: 96px !important;
 }
-
-/* ==========================================================
-   PATCH DESKTOP — evita painel deslocado/cortado na direita
-   (não mexe nos efeitos, só conserta enquadre)
-   ========================================================== */
-@media (min-width: 601px){
-  .j-panel-glow{
-    box-sizing: border-box !important;
-    max-width: min(980px, 96vw) !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-
-    /* mata qualquer deslocamento fantasma */
-    left: auto !important;
-    right: auto !important;
-    transform: none !important;
-  }
-
-  /* pais não podem cortar o painel */
-  .pergaminho,
-  .pergaminho-v,
-  .pergaminho-vertical,
-  .final-pergaminho-wrapper,
-  .parchment-inner-rough{
-    overflow: visible !important;
-  }
-}
-
-
-
-/* ======================================================
-   7) MOBILE — ajustes finos
-   ====================================================== */
-@media (max-width: 600px){
-  .progress-top{
-    left: 10px !important;
-    right: 72px !important;
-  }
-  .progress-top .progress-label{ display:none !important; }
-
-  .progress-middle{
-    width: min(92%, 440px) !important;
-    bottom: -4px !important;
-  }
-    
-   .j-panel-glow{
-     width: 88vw !important;          /* um pouco menor que 92vw */
-    max-width: 360px !important;     /* limite real de largura */
-    margin: 16px auto 24px !important;
-    padding: 20px 16px !important;
-    min-height: auto !important;
-    height: auto !important;
-    border-radius: 20px !important;
-    overflow: visible !important;
- 
-  }
-
-  .section-perguntas .perguntas-wrap{
-    padding-bottom: 92px !important;
-  } 
-      
-  .j-perg-v-inner{
-   width: 100% !important;
-    max-width: 100% !important;
-    padding: 18px 12px !important;
-    min-height: auto !important;
-  }
-
-  .j-panel-outer { width: 94%; }
-  .j-panel-inner {
-    max-width: 92% !important;
-    padding: 32px 20px !important;
-  }
-
-  .j-arcane-card {
-    max-width: 100% !important;
-    padding: 14px 12px !important;
-  }
-  .j-arcane-card::before { opacity: 0.30; }
-   
-   body, html{
-    overflow-x: hidden !important;
-  }
-}
-
-:root {
-  --portal-gold: #d4af37;
-
-  /* Cor principal dinâmica (ouro + guia) */
-  --portal-border-color: color-mix(
-    in srgb,
-    var(--portal-gold) 70%,
-    var(--theme-main-color, var(--portal-gold)) 30%
-  );
-
-  /* Brilho principal */
-  --portal-glow-color: color-mix(
-    in srgb,
-    var(--portal-gold) 55%,
-    var(--theme-main-color, var(--portal-gold)) 45%
-  );
-
-  /* Para gradiente elegante */
-  --portal-border-gradient: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--portal-gold) 90%, var(--theme-main-color) 10%) 0%,
-    color-mix(in srgb, var(--portal-gold) 40%, var(--theme-main-color) 60%) 100%
-  );
-}
    
 /* ======================================================
    LUZ VIVA NO PORTAL DOURADO (frame real)
@@ -836,17 +727,116 @@ body, html {
   max-width: 520px !important;
   width: 92vw !important;
 }
-/* ======================================================
-   PATCH MOBILE — Intro + Senha mais “enxutas”
-   (sem quebrar perguntas / outras telas)
-   ====================================================== */
-@media (max-width: 600px) {
 
-  /* Painel principal nessas duas páginas */
-  #section-intro .j-panel-glow,
-  #section-senha .j-panel-glow {
-    width: 88vw !important;          /* um pouco menor que 92vw */
-    max-width: 320px !important;     /* limite real de largura */
+/* ==========================================================
+   PATCH DESKTOP — evita painel deslocado/cortado na direita
+   (não mexe nos efeitos, só conserta enquadre)
+   ========================================================== */
+@media (min-width: 601px){
+  .j-panel-glow{
+    box-sizing: border-box !important;
+    max-width: min(980px, 96vw) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    /* mata qualquer deslocamento fantasma */
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+  }
+
+  /* pais não podem cortar o painel */
+  .pergaminho,
+  .pergaminho-v,
+  .pergaminho-vertical,
+  .final-pergaminho-wrapper,
+  .parchment-inner-rough{
+    overflow: visible !important;
+  }
+
+  .j-screen-vert .j-panel-glow {
+    width: min(520px, 92vw);
+    max-width: 520px;
+    margin: 32px auto;
+    position: relative;
+    float: none;
+    display: block;
+  }
+
+  .j-screen-vert .j-perg-v-inner {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 30px 26px;
+    min-height: clamp(420px, 65vh, 720px);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .j-screen-vert .j-arcane-card {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+}
+
+/* ======================================================
+    MOBILE — ajustes finos
+   ====================================================== */
+@media (max-width: 600px){
+    .progress-top{
+    left: 10px !important;
+    right: 72px !important;
+  }
+  .progress-top .progress-label{ display:none !important; }
+
+  .progress-middle{
+    width: min(92%, 440px) !important;
+    bottom: -4px !important;
+  }
+    
+   .j-panel-glow{
+     width: 88vw !important;          /* um pouco menor que 92vw */
+    max-width: 360px !important;     /* limite real de largura */
+    margin: 16px auto 24px !important;
+    padding: 20px 16px !important;
+    min-height: auto !important;
+    height: auto !important;
+    border-radius: 20px !important;
+    overflow: visible !important;
+ 
+  }
+
+  .section-perguntas .perguntas-wrap{
+    padding-bottom: 92px !important;
+  } 
+      
+  .j-perg-v-inner{
+   width: 100% !important;
+    max-width: 100% !important;
+    padding: 18px 12px !important;
+    min-height: auto !important;
+  }
+
+  .j-panel-outer { width: 94%; }
+  .j-panel-inner {
+    max-width: 92% !important;
+    padding: 32px 20px !important;
+  }
+
+  .j-arcane-card {
+    max-width: 100% !important;
+    padding: 14px 12px !important;
+  }
+  .j-arcane-card::before { opacity: 0.30; }
+   
+   body, html{
+    overflow-x: hidden !important;
+  }
+
+  .j-screen-vert .j-panel-glow {
+    width: 88vw !important;
+    max-width: 360px !important;
     margin: 16px auto 24px !important;
     padding: 20px 16px !important;
     min-height: auto !important;
@@ -854,21 +844,46 @@ body, html {
     border-radius: 20px !important;
   }
 
-  /* Pergaminho vertical interno dentro do painel */
-  #section-intro .j-perg-v-inner,
-  #section-senha .j-perg-v-inner {
+  .j-screen-vert .j-perg-v-inner {
     width: 100% !important;
     max-width: 100% !important;
-    padding: 18px 12px !important;
+    padding: 18px 14px !important;
     min-height: auto !important;
   }
 
-  /* Cartão arcano dessas páginas (texto + botões) */
-  #section-intro .j-arcane-card,
-  #section-senha .j-arcane-card {
+  .j-screen-vert .j-arcane-card {
     max-width: 100% !important;
     padding: 14px 12px !important;
   }
+
+  .j-screen-vert .parchment-text-rough {
+    font-size: 13px !important;
+    line-height: 1.35 !important;
+  }
 }
 
+:root {
+  --portal-gold: #d4af37;
+
+  /* Cor principal dinâmica (ouro + guia) */
+  --portal-border-color: color-mix(
+    in srgb,
+    var(--portal-gold) 70%,
+    var(--theme-main-color, var(--portal-gold)) 30%
+  );
+
+  /* Brilho principal */
+  --portal-glow-color: color-mix(
+    in srgb,
+    var(--portal-gold) 55%,
+    var(--theme-main-color, var(--portal-gold)) 45%
+  );
+
+  /* Para gradiente elegante */
+  --portal-border-gradient: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--portal-gold) 90%, var(--theme-main-color) 10%) 0%,
+    color-mix(in srgb, var(--portal-gold) 40%, var(--theme-main-color) 60%) 100%
+  );
+}
 
