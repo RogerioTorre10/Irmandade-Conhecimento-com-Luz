@@ -121,10 +121,28 @@
 
 /* Responsivo */
 @media (max-width: 480px) {
-  #section-intro { padding: 16px; max-width: 92vw; }
-  .intro-title { font-size: 28px; margin-top: 24px; }
-  .parchment-text-rough { font-size: 12.5px; }
-}
+  #section-intro {
+    padding: 16px;
+    max-width: 92vw;
+    margin: 0 auto;
+  }
+
+  .intro-title {
+    font-size: 28px;
+    margin-top: 24px;
+  }
+
+  .parchment-text-rough {
+    font-size: 12.5px;
+  }
+
+  /* 💡 AQUI enxugamos o container preto no mobile */
+  #section-intro .j-arcane-card {
+    width: 100%;
+    max-width: 360px;   /* antes era 100%, ficava gigante */
+    margin: 12px auto 24px;
+  }
+
 
 /* Cursor de datilografia */
 #section-intro [data-typing="true"][data-cursor="true"] {
@@ -193,18 +211,6 @@
   border-radius: 1px;
   right: 0;
 }
-
-/* ✅ Correção de sintaxe + evita encolher a j-panel */
-#section-intro .j-arcane-card {
-  width: 100%;
-  max-width: 100%;
-}
-
-/* =========================================
-   AJUSTE DO PAINEL NO MOBILE
-   Deixa o container mais estreito e baixinho
-   ========================================= */
-@media (max-width: 600px) {
 
   /* Painel principal (glow preto) */
   .j-panel-glow {
