@@ -1,0 +1,107 @@
+/* =========================================================
+   JORNADA – LAYOUT UNIFICADO DE PERGAMINHO VERTICAL
+   Intro, Termos 1, Termos 2, Senha
+   (não mexe em cores, brilhos nem fontes)
+   ========================================================= */
+
+/* 1) BASE – garante que o pergaminho e o card fiquem centralizados
+      na largura, sem empurrar nada pra esquerda/direita            */
+
+#section-intro .j-perg-v-inner,
+#section-termos1 .j-perg-v-inner,
+#section-termos2 .j-perg-v-inner,
+#section-senha  .j-perg-v-inner {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#section-intro .j-panel-glow,
+#section-termos1 .j-panel-glow,
+#section-termos2 .j-panel-glow,
+#section-senha  .j-panel-glow {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* =========================================================
+   2) DESKTOP (LARGURAS MAIORES) – posição padrão
+   Mantém o card bem dentro do pergaminho, com um respiro em cima
+   ========================================================= */
+@media (min-width: 900px) {
+
+  /* Desce um pouco o pergaminho de fundo */
+  #section-intro .j-perg-v-inner,
+  #section-termos1 .j-perg-v-inner,
+  #section-termos2 .j-perg-v-inner,
+  #section-senha  .j-perg-v-inner {
+    transform: translateY(40px);
+  }
+
+  /* Sobe levemente o “vidro” dentro desse pergaminho */
+  #section-intro .j-panel-glow,
+  #section-termos1 .j-panel-glow,
+  #section-termos2 .j-panel-glow,
+  #section-senha  .j-panel-glow {
+    transform: translateY(-10px);
+  }
+}
+
+/* =========================================================
+   3) MOBILE – BASE COMUM
+   Deixa todos os cards no mesmo tamanho e alinhamento
+   ========================================================= */
+@media (max-width: 600px) {
+
+  /* Tamanho padrão do card (vidro) no mobile */
+  #section-intro .j-panel-glow,
+  #section-termos1 .j-panel-glow,
+  #section-termos2 .j-panel-glow,
+  #section-senha  .j-panel-glow {
+    width: min(320px, 84vw);
+    max-width: 320px;
+    margin: 18px auto 26px;
+    padding: 18px 14px 22px;
+  }
+
+  /* Por padrão, não mexe no fundo (pergaminho) */
+  #section-intro .j-perg-v-inner,
+  #section-termos1 .j-perg-v-inner,
+  #section-termos2 .j-perg-v-inner,
+  #section-senha  .j-perg-v-inner {
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   4) AJUSTES FINOS POR PÁGINA – MOBILE
+   (valores próximos do que você já aprovou nos prints)
+   ========================================================= */
+
+/* 4.1 INTRO – já estava quase perfeita, só um toque no Y */
+@media (max-width: 600px) {
+  #section-intro .j-panel-glow {
+    transform: translate(-6px, -16px);
+  }
+}
+
+/* 4.2 TERMOS 1 E 2 – sobem um pouco mais dentro do pergaminho */
+@media (max-width: 600px) {
+  #section-termos1 .j-panel-glow,
+  #section-termos2 .j-panel-glow {
+    transform: translate(-6px, -26px);
+  }
+}
+
+/* 4.3 SENHA – sobe e centraliza melhor no eixo X */
+@media (max-width: 600px) {
+
+  /* corrige leve deslocamento do pergaminho de fundo */
+  #section-senha .j-perg-v-inner {
+    transform: translate(-10px, 4px);
+  }
+
+  /* card levemente mais alto e mais centralizado */
+  #section-senha .j-panel-glow {
+    transform: translate(-4px, -24px);
+  }
+}
