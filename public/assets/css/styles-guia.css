@@ -1,5 +1,5 @@
 @import url("/assets/css/styles-base.css");
-
+@import url("/assets/css/styles-layout.css");
 /* ====== SEÇÃO GUIA – PAINEL CENTRALIZADO ====== */
 .section-guia {
   background: transparent !important;
