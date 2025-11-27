@@ -88,5 +88,9 @@
   #section-termos2 .j-panel-glow {
     margin-top: -52px !important;
   }
-}
 
+  #section-termos1 .j-perg-v-inner,
+  #section-termos2 .j-perg-v-inner {
+    transform: translateY(-36px) !important; /* ajuste fino */
+  }
+}
