@@ -86,6 +86,12 @@
 @media (max-width: 600px) {
    #section-termos1 .j-perg-v-inner,
   #section-termos2 .j-perg-v-inner {
-   transform: translate(-10px, -100px) !important; /* ajuste fino */
+   transform: translate(-10px, -105px) !important; /* ajuste fino */
+  }
+   
+   #section-termos1 .j-panel-glow,
+  #section-termos2 .j-panel-glow {
+    /* mesmo X da intro, só um pouco mais alto no Y */
+    transform: translate(-6px, -26px) !important;
   }
 }
