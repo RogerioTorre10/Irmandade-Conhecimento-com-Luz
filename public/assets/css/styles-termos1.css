@@ -87,11 +87,10 @@
   #section-termos1 .j-panel-glow,
   #section-termos2 .j-panel-glow {
     margin-top: -32px !important;
-    transform: translate(-16px, -130px) !important; 
   }
 
   #section-termos1 .j-perg-v-inner,
   #section-termos2 .j-perg-v-inner {
-   transform: translate(-11px, -35px) !important; /* ajuste fino */
+   transform: translate(-11px, -65px) !important; /* ajuste fino */
   }
 }
