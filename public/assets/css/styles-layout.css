@@ -171,3 +171,19 @@
     transform: translate(-6px, -30px);
   }
 }
+/* =========================================================
+   AJUSTE FINO – SENHA (DESKTOP)
+   Deixa o card um pouco mais para baixo dentro do pergaminho
+   ========================================================= */
+@media (min-width: 900px) {
+
+  /* Desce mais o pergaminho de fundo da SENHA */
+  #section-senha .j-perg-v-inner {
+    transform: translateY(60px);  /* estava 40px no global */
+  }
+
+  /* E não sobe o vidro tanto quanto as outras */
+  #section-senha .j-panel-glow {
+    transform: translateY(0px);   /* estava -10px no global */
+  }
+}
