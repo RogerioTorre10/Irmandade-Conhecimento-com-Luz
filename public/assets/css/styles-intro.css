@@ -184,13 +184,4 @@
     font-size: 12.5px;
     line-height: 1.35;
   }
-  
-  #section-intro .j-perg-v-inner {
-   transform: translate(-3x, -80px) !important; /* ajuste fino */
-  }   
-   
-  #section-intro .j-panel-glow {
-    /* mesmo X da intro, só um pouco mais alto no Y */
-    transform: translate(-3px, -80px) !important;
-  }
 }
