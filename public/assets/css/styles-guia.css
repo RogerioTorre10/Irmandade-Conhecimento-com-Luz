@@ -345,3 +345,32 @@ body[data-guia-hover="arian"] {
   opacity:.7; filter: grayscale(.15);
   cursor: not-allowed; animation:none;
 }
+
+/* =========================================================
+   AJUSTE FINO – BOTÕES DO GUIA (DESKTOP)
+   ========================================================= */
+@media (min-width: 900px) {
+
+  /* Linha onde ficam os 3 botões (Lumen, Zion, Arian) */
+  #section-guia .guia-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 0 18px 16px;  /* dá um respiro lateral dentro do vidro */
+  }
+
+  /* Cada botão ocupa ~1/3, sem passar da borda do card */
+  #section-guia .guia-actions button {
+    flex: 1 1 0;
+    max-width: 32%;
+    padding: 6px 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+
+  /* Garante que nada seja “cortado” na lateral direita */
+  #section-guia .j-panel-glow,
+  #section-guia .j-panel-glow .j-panel-inner {
+    overflow: visible;
+  }
+}
