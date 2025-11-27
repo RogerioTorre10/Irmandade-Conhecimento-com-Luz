@@ -895,8 +895,8 @@ body, html {
 .section.j-screen-vert .j-panel-glow {
   max-width: 520px !important;          /* mantém o padrão que você já gostou */
   width: min(520px, 78vw) !important;   /* um pouco menos largo visualmente */
-  margin: -16px auto 60px !important;
-  transform: translate(-14px, -86px);  
+  margin: -12px auto 40px !important;
+  transform: translate(-18px, -160px);  
 }
 }
 
