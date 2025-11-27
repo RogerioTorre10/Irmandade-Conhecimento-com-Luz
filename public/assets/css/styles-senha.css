@@ -185,7 +185,7 @@
    
  /* sobe o card inteiro (vidro + inputs + botões) */
   #section-senha .j-panel-glow {
-    transform: translate(-8px, -28px) !important;
+    transform: translate(-2px, -28px) !important;
   }
   }
 
