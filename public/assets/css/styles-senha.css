@@ -173,6 +173,22 @@
   max-width: 100%;
 }
 
+/* =========================================
+   AJUSTE MOBILE – POSIÇÃO DO CARD DA SENHA
+   ========================================= */
+@media (max-width: 600px) {
+
+  /* garante que o miolo não esteja com transform estranho */
+  #section-senha .j-perg-v-inner {
+    transform: none !important;
+  }
+
+  /* sobe o card inteiro (vidro + inputs + botões) */
+  #section-senha .j-panel-glow {
+    transform: translate(-4px, -26px) !important;
+  }
+}
+
 /* Mobile */
 @media (max-width: 480px){
   .senha-input,
