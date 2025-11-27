@@ -176,20 +176,6 @@
 /* =========================================
    AJUSTE MOBILE – POSIÇÃO DO CARD DA SENHA
    ========================================= */
-@media (max-width: 600px) {
-
-  /* Alinha o pergaminho vertical para a esquerda */
-  #section-senha .j-perg-v-inner {
-    transform: translate(-14px, -10px) !important;
-  }
-
-  /* Ajuste fino do card dentro do pergaminho */
-  #section-senha .j-panel-glow {
-    transform: translate(-4px, -22px) !important;
-  }
-}
-
-
 /* Mobile */
 @media (max-width: 480px){
   .senha-input,
