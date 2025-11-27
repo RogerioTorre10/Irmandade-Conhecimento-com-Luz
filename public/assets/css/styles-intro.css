@@ -182,15 +182,13 @@
   #section-intro .parchment-text-rough {
     font-size: 12.5px;
     line-height: 1.35;
-  }
- 
-   #section-termos1 .j-perg-v-inner,
-  #section-termos2 .j-perg-v-inner {
-   transform: translate(-3x, -80px) !important; /* ajuste fino */
-  }
+  } 
    
-   #section-termos1 .j-panel-glow,
-  #section-termos2 .j-panel-glow {
+ #section-intro .j-perg-v-inner {
+   transform: translate(-3x, -80px) !important; /* ajuste fino */
+  }   
+   
+  #section-intro .j-panel-glow {
     /* mesmo X da intro, só um pouco mais alto no Y */
     transform: translate(-3px, -80px) !important;
   }
