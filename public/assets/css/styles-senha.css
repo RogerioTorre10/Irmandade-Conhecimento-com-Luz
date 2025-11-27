@@ -170,3 +170,34 @@
   width: 100%;
   max-width: 100%;
 }
+/* =========================================================
+   AJUSTE FINO – LAYOUT DA PÁGINA SENHA (DESKTOP)
+   ========================================================= */
+@media (min-width: 900px) {
+
+  /* Pergaminho de fundo da senha */
+  #section-senha .j-perg-v-inner {
+    position: relative !important;
+    transform: translateY(80px) !important;
+    top: 80px !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    overflow: visible !important;
+    z-index: 5 !important;
+  }
+
+  /* Card (vidro) da senha */
+  #section-senha .j-panel-glow {
+    position: relative !important;
+    transform: translateY(40px) !important;
+    top: 40px !important;
+    margin-top: 0 !important;
+    width: 90% !important;
+    max-width: 470px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    z-index: 6 !important;
+  }
+}
+
+
