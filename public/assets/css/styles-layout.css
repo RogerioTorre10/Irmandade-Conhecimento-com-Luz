@@ -209,7 +209,7 @@
   /* Pergaminho de fundo da página Selfie */
   #section-selfie .j-perg-v-inner {
     position: relative !important;
-    transform: translate(-12px, -40px) !important; /* sobe o bloco dentro do pergaminho */
+    transform: translate(-12px, -80px) !important; /* sobe o bloco dentro do pergaminho */
     margin-top: 0 !important;
     padding-top: 0 !important;
     overflow: visible !important;
@@ -219,9 +219,8 @@
   /* Vidro (card) da Selfie */
   #section-selfie .j-panel-glow {
     position: relative !important;
-    transform: translate(-16px, -30px) !important; /* acompanha o pergaminho */
+    transform: translate(-16px, -70px) !important; /* acompanha o pergaminho */
     margin-top: 0 !important;
-
     width: 90% !important;
     max-width: 470px !important;
     margin-left: auto !important;
@@ -231,29 +230,51 @@
   }
 }
 
-/* =========================================================
-   AJUSTE PÁGINA GUIA – DESCOLAR BOTÃO DA LATERAL DIREITA
-   ========================================================= */
+/* =========================================
+   GUIA – alinhar botões no vidro (desktop)
+   ========================================= */
 @media (min-width: 900px) {
 
-  /* Card principal do GUIA */
-  #section-guia .j-arcane-card {
-    padding-right: 20px !important; /* afastamento perfeito */
-    padding-left: 20px !important;  /* mantém simetria */
-    box-sizing: border-box !important;
+  /* Linha dos 3 guias (Lumen/Zion/Arian) */
+  #section-guia .guia-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 0 16px 18px;   /* respiro lateral dentro do vidro */
+    box-sizing: border-box;
   }
 
-  /* Linha dos botões (Lumen / Zion / Arian) */
-  #section-guia .guia-actions,
-  #section-guia .btn-guia,
-  #section-guia button {
-    margin-right: 12px !important; /* afasta do vidro */
+  /* Cada botão ocupa 1/3 sem vazar pra fora */
+  #section-guia .guia-actions button {
+    flex: 1 1 0;
+    max-width: 32%;
+    margin: 0 !important;
   }
 
-  /* Se quiser garantir o encaixe total sem corte */
+  /* Card do guia centralizado no pergaminho */
   #section-guia .j-panel-glow {
     max-width: 470px !important;
     margin-left: auto !important;
     margin-right: auto !important;
   }
 }
+
+/* =========================================
+   CARD – pergaminho menos “comprido” (desktop)
+   ========================================= */
+@media (min-width: 900px) {
+
+  /* Limita a área útil do pergaminho no Card */
+  #section-card .j-perg-v-inner {
+    max-height: 540px !important;     /* encurta o pergaminho */
+    margin: 60px auto 40px !important;
+    overflow: hidden !important;      /* esconde excesso pra baixo */
+  }
+
+  /* Garante que o vidro fique centrado dentro desse recorte */
+  #section-card .j-panel-glow {
+    margin-top: 0 !important;
+    transform: translate(-16px, -10px) !important;
+  }
+}
+
