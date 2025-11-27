@@ -172,37 +172,3 @@
   width: 100%;
   max-width: 100%;
 }
-
-/* =========================================
-   AJUSTE MOBILE – POSIÇÃO DO CARD DA SENHA
-   ========================================= */
-/* Mobile */
-@media (max-width: 480px){
-  .senha-input,
-  .senha-actions{
-    max-width: 88vw;
-  }
-
-  .senha-actions .btn.btn-primary.btn-stone,
-  .senha-actions #btn-senha-prev,
-  .senha-actions #btn-senha-avancar{
-    width: 48% !important; /* mantém lado a lado no mobile */
-    font-size: 17px !important;
-  }
-}
-/* ================== AJUSTE DESKTOP – CENTRALIZAR INTRO NO PERGAMINHO ================== */
-@media (min-width: 768px) {
-  /* Centraliza o conteúdo da intro dentro do pergaminho vertical */
-  #section-senha .j-perg-v-inner {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;   /* em vez de colar no topo */
-  }
-
-  /* Garante que o card não tenha margem empurrando pra cima/baixo */
-  #section-senha .j-arcane-card {
-    margin-top: 0;
-    margin-bottom: 0;
-  }
-}
-
