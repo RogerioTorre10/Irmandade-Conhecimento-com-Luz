@@ -123,12 +123,6 @@
   background: linear-gradient(180deg, #b45309, #92400e);
 }
 
-/* Responsivo */
-@media (max-width: 720px) {
-  .parchment-rough { padding: 16px; }
-  .parchment-inner-rough { padding: 12px; }
-}
-
 /* Animação */
 .parchment-rough, .parchment-inner-rough { animation: parchmentRoughFade .35s ease both; }
 @keyframes parchmentRoughFade {
