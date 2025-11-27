@@ -1,16 +1,22 @@
 /* =========================================================
-   styles-layout.css UNIFICADO DE PERGAMINHO VERTICAL
-   Intro, Termos 1, Termos 2, Senha
-   (não mexe em cores, brilhos nem fontes)
+   STYLES-LAYOUT — LAYOUT UNIFICADO DAS SEÇÕES DA JORNADA
+   Intro, Termos 1, Termos 2, Senha, Guia, Selfie, Card,
+   Perguntas, Final
    ========================================================= */
 
-/* 1) BASE – garante que o pergaminho e o card fiquem centralizados
-      na largura, sem empurrar nada pra esquerda/direita            */
+/* ---------------------------------------------------------
+   1) CENTRALIZAÇÃO BASE (vale para todas as seções verticais)
+   --------------------------------------------------------- */
 
 #section-intro .j-perg-v-inner,
 #section-termos1 .j-perg-v-inner,
 #section-termos2 .j-perg-v-inner,
-#section-senha  .j-perg-v-inner {
+#section-senha  .j-perg-v-inner,
+#section-guia   .j-perg-v-inner,
+#section-selfie .j-perg-v-inner,
+#section-card   .j-perg-v-inner,
+#section-perguntas .j-perg-v-inner,
+#section-final  .j-perg-v-inner {
   margin-left: auto;
   margin-right: auto;
 }
@@ -18,90 +24,150 @@
 #section-intro .j-panel-glow,
 #section-termos1 .j-panel-glow,
 #section-termos2 .j-panel-glow,
-#section-senha  .j-panel-glow {
+#section-senha  .j-panel-glow,
+#section-guia   .j-panel-glow,
+#section-selfie .j-panel-glow,
+#section-card   .j-panel-glow,
+#section-perguntas .j-panel-glow,
+#section-final  .j-panel-glow {
   margin-left: auto;
   margin-right: auto;
 }
 
 /* =========================================================
-   2) DESKTOP (LARGURAS MAIORES) – posição padrão
-   Mantém o card bem dentro do pergaminho, com um respiro em cima
+   2) DESKTOP (>= 900px)
+   Pergaminho um pouco mais baixo, card centrado
    ========================================================= */
 @media (min-width: 900px) {
 
-  /* Desce um pouco o pergaminho de fundo */
   #section-intro .j-perg-v-inner,
   #section-termos1 .j-perg-v-inner,
   #section-termos2 .j-perg-v-inner,
-  #section-senha  .j-perg-v-inner {
+  #section-senha  .j-perg-v-inner,
+  #section-guia   .j-perg-v-inner,
+  #section-selfie .j-perg-v-inner,
+  #section-card   .j-perg-v-inner,
+  #section-perguntas .j-perg-v-inner,
+  #section-final  .j-perg-v-inner {
     transform: translateY(40px);
   }
 
-  /* Sobe levemente o “vidro” dentro desse pergaminho */
   #section-intro .j-panel-glow,
   #section-termos1 .j-panel-glow,
   #section-termos2 .j-panel-glow,
-  #section-senha  .j-panel-glow {
+  #section-senha  .j-panel-glow,
+  #section-guia   .j-panel-glow,
+  #section-selfie .j-panel-glow,
+  #section-card   .j-panel-glow,
+  #section-perguntas .j-panel-glow,
+  #section-final  .j-panel-glow {
     transform: translateY(-10px);
   }
 }
 
 /* =========================================================
-   3) MOBILE – BASE COMUM
-   Deixa todos os cards no mesmo tamanho e alinhamento
+   3) MOBILE BASE (<= 600px)
+   Mesma largura/altura de card pra TODAS as seções
    ========================================================= */
 @media (max-width: 600px) {
 
-  /* Tamanho padrão do card (vidro) no mobile */
   #section-intro .j-panel-glow,
   #section-termos1 .j-panel-glow,
   #section-termos2 .j-panel-glow,
-  #section-senha  .j-panel-glow {
+  #section-senha  .j-panel-glow,
+  #section-guia   .j-panel-glow,
+  #section-selfie .j-panel-glow,
+  #section-card   .j-panel-glow,
+  #section-perguntas .j-panel-glow,
+  #section-final  .j-panel-glow {
     width: min(320px, 84vw);
     max-width: 320px;
     margin: 18px auto 26px;
     padding: 18px 14px 22px;
   }
 
-  /* Por padrão, não mexe no fundo (pergaminho) */
   #section-intro .j-perg-v-inner,
   #section-termos1 .j-perg-v-inner,
   #section-termos2 .j-perg-v-inner,
-  #section-senha  .j-perg-v-inner {
-    transform: translateY(0);
+  #section-senha  .j-perg-v-inner,
+  #section-guia   .j-perg-v-inner,
+  #section-selfie .j-perg-v-inner,
+  #section-card   .j-perg-v-inner,
+  #section-perguntas .j-perg-v-inner,
+  #section-final  .j-perg-v-inner {
+    transform: translateY(0); /* base neutra; overrides abaixo */
   }
 }
 
 /* =========================================================
-   4) AJUSTES FINOS POR PÁGINA – MOBILE
-   (valores próximos do que você já aprovou nos prints)
+   4) AJUSTES FINOS – MOBILE
+   (valores calibrados pelos teus prints)
    ========================================================= */
 
-/* 4.1 INTRO – já estava quase perfeita, só um toque no Y */
+/* ---- INTRO: subir um pouco mais ---- */
 @media (max-width: 600px) {
   #section-intro .j-panel-glow {
-    transform: translate(-6px, -16px);
-  }
-}
-
-/* 4.2 TERMOS 1 E 2 – sobem um pouco mais dentro do pergaminho */
-@media (max-width: 600px) {
-  #section-termos1 .j-panel-glow,
-  #section-termos2 .j-panel-glow {
+    /* estava -16, subimos mais um pouco */
     transform: translate(-6px, -26px);
   }
 }
 
-/* 4.3 SENHA – sobe e centraliza melhor no eixo X */
+/* ---- TERMOS 1 e TERMOS 2: sobem um pouco mais ainda ---- */
+@media (max-width: 600px) {
+  #section-termos1 .j-panel-glow,
+  #section-termos2 .j-panel-glow {
+    /* estava -26, agora um pouco mais alto */
+    transform: translate(-6px, -32px);
+  }
+}
+
+/* ---- SENHA: sobe e centraliza melhor ---- */
 @media (max-width: 600px) {
 
-  /* corrige leve deslocamento do pergaminho de fundo */
+  /* pergaminho estava levemente deslocado; mantemos o X,
+     mas alinhamos um pouco mais no Y */
   #section-senha .j-perg-v-inner {
-    transform: translate(-10px, 4px);
+    transform: translate(-10px, -4px);
   }
 
-  /* card levemente mais alto e mais centralizado */
   #section-senha .j-panel-glow {
-    transform: translate(-4px, -24px);
+    /* sobe mais um pouquinho em relação ao -24 anterior */
+    transform: translate(-4px, -32px);
+  }
+}
+
+/* ---- GUIA: card com nome/inputs – segue padrão alto e central ---- */
+@media (max-width: 600px) {
+  #section-guia .j-panel-glow {
+    transform: translate(-6px, -30px);
+  }
+}
+
+/* ---- SELFIE: geralmente o conteúdo é mais alto, mas
+       mantemos alinhado com o mesmo eixo do pergaminho ---- */
+@media (max-width: 600px) {
+  #section-selfie .j-panel-glow {
+    transform: translate(-6px, -30px);
+  }
+}
+
+/* ---- CARD: placeholder + nome + botão – alinhado no mesmo eixo ---- */
+@media (max-width: 600px) {
+  #section-card .j-panel-glow {
+    transform: translate(-6px, -30px);
+  }
+}
+
+/* ---- PERGUNTAS: card com perguntas – um pouco mais central ---- */
+@media (max-width: 600px) {
+  #section-perguntas .j-panel-glow {
+    transform: translate(-6px, -30px);
+  }
+}
+
+/* ---- FINAL: tela de encerramento – segue mesmo eixo ---- */
+@media (max-width: 600px) {
+  #section-final .j-panel-glow {
+    transform: translate(-6px, -30px);
   }
 }
