@@ -172,23 +172,32 @@
   }
 }
 /* =========================================================
-   AJUSTE FINO – SENHA (DESKTOP)
-   Deixa o card um pouco mais para baixo dentro do pergaminho
-   ========================================================= */
+   AJUSTE DEFINITIVO – SELFIE (DESKTOP)
+   ================================================================= */
 @media (min-width: 900px) {
 
-  /* Desce mais o pergaminho de fundo da SENHA */
-   #section-selfie .j-perg-v-inner {
-    transform: translateY(90px);  /* pode testar 80 / 90 / 100 se quiser refinar */
-    overflow: visible;            /* evita cortar o conteúdo nas laterais */
+  /* PERGAMINHO DE FUNDO — força total, prioridade máxima */
+  #section-selfie .j-perg-v-inner {
+    position: relative !important;
+    transform: translateY(120px) !important; /* Ajuste forte */
+    top: 120px !important; 
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    overflow: visible !important;
+    z-index: 5 !important;
   }
 
-  /* Card (vidro) da selfie mais para baixo e centralizado */
+  /* VIDRO (CARD) DA SELFIE — independentemente do global */
   #section-selfie .j-panel-glow {
-    transform: translateY(30px);  /* estava -10px no global */
-    max-width: 460px;
-    width: 90%;
-    margin-left: auto;
-    margin-right: auto;
+    position: relative !important;
+    transform: translateY(80px) !important;
+    top: 80px !important;
+    margin-top: 0 !important;
+    width: 90% !important;
+    max-width: 470px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    z-index: 6 !important;
   }
 }
+
