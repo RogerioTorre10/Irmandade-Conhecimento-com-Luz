@@ -84,9 +84,9 @@
 }
 
 @media (max-width: 600px) {
-  #section-termos1 .j-panel-glow,
-  #section-termos2 .j-panel-glow {
-    transform: translate(-10px, -54px) !important; /* SUBIR */
+  #section-termos1 .j-perg-v-inner ,
+  #section-termos2 .j-perg-v-inner {
+    transform: translate(-6px, -34px) !important; /* SUBIR */
   }
 }
 
