@@ -180,14 +180,14 @@
 
   /* garante que o miolo não esteja com transform estranho */
   #section-senha .j-perg-v-inner {
-    transform: none !important;
-  }
-
-  /* sobe o card inteiro (vidro + inputs + botões) */
+   transform: translate(-3x, -80px) !important; /* ajuste fino */
+  }   
+   
+ /* sobe o card inteiro (vidro + inputs + botões) */
   #section-senha .j-panel-glow {
-    transform: translate(-4px, -26px) !important;
+    transform: translate(-3px, -80px) !important;
   }
-}
+  }
 
 /* Mobile */
 @media (max-width: 480px){
