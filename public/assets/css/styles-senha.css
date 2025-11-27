@@ -178,16 +178,17 @@
    ========================================= */
 @media (max-width: 600px) {
 
-  /* garante que o miolo não esteja com transform estranho */
+  /* Alinha o pergaminho vertical para a esquerda */
   #section-senha .j-perg-v-inner {
-   transform:  none !important;
-  }   
-   
- /* sobe o card inteiro (vidro + inputs + botões) */
+    transform: translate(-14px, -10px) !important;
+  }
+
+  /* Ajuste fino do card dentro do pergaminho */
   #section-senha .j-panel-glow {
-    transform: translate(-10px, -28px) !important;
+    transform: translate(-4px, -22px) !important;
   }
-  }
+}
+
 
 /* Mobile */
 @media (max-width: 480px){
