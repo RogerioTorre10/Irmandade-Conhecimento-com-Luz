@@ -231,3 +231,29 @@
   }
 }
 
+/* =========================================================
+   AJUSTE PÁGINA GUIA – DESCOLAR BOTÃO DA LATERAL DIREITA
+   ========================================================= */
+@media (min-width: 900px) {
+
+  /* Card principal do GUIA */
+  #section-guia .j-arcane-card {
+    padding-right: 18px !important; /* afastamento perfeito */
+    padding-left: 18px !important;  /* mantém simetria */
+    box-sizing: border-box !important;
+  }
+
+  /* Linha dos botões (Lumen / Zion / Arian) */
+  #section-guia .guia-actions,
+  #section-guia .btn-guia,
+  #section-guia button {
+    margin-right: 10px !important; /* afasta do vidro */
+  }
+
+  /* Se quiser garantir o encaixe total sem corte */
+  #section-guia .j-panel-glow {
+    max-width: 470px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
