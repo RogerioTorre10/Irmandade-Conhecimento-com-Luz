@@ -77,19 +77,25 @@
 /* =====================================================
    AJUSTE MOBILE — APENAS TERMOS 1 e 2 (não afeta a INTRO)
    ===================================================== */
-@media (max-width: 480px){
-  #section-termos1 .termos-texto{
-    max-width: 92vw;
-  }
-}
-
 @media (max-width: 600px) {
-   #section-termos1 .j-perg-v-inner,
+  #section-termos1 .termos1-title,
+  #section-termos2 .termos2-title {
+    font-size: 28px;
+    margin-top: 24px;
+    margin-bottom: 16px;
+  }
+   
+  #section-termos1 .parchment-text-rough
+  #section-termos2 .parchment-text-rough {
+    font-size: 12.5px;
+    line-height: 1.35;
+  } 
+  #section-termos1 .j-perg-v-inner,
   #section-termos2 .j-perg-v-inner {
    transform: translate(-3x, -80px) !important; /* ajuste fino */
   }
    
-   #section-termos1 .j-panel-glow,
+  #section-termos1 .j-panel-glow,
   #section-termos2 .j-panel-glow {
     /* mesmo X da intro, só um pouco mais alto no Y */
     transform: translate(-3px, -80px) !important;
