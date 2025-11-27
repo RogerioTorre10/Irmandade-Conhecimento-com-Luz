@@ -86,6 +86,6 @@
 @media (max-width: 600px) {
    #section-termos1 .j-perg-v-inner,
   #section-termos2 .j-perg-v-inner {
-   transform: translate(-6px, -60px) !important; /* ajuste fino */
+   transform: translate(-20px, -80px) !important; /* ajuste fino */
   }
 }
