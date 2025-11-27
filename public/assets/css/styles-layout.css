@@ -201,3 +201,33 @@
   }
 }
 
+/* =========================================================
+   AJUSTE SELFIE – ALINHAR COM INTRO / TERMOS / SENHA (DESKTOP)
+   ========================================================= */
+@media (min-width: 900px) {
+
+  /* Pergaminho de fundo da página Selfie */
+  #section-selfie .j-perg-v-inner {
+    position: relative !important;
+    transform: translate(-12px, -40px) !important; /* sobe o bloco dentro do pergaminho */
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    overflow: visible !important;
+    z-index: 5 !important;
+  }
+
+  /* Vidro (card) da Selfie */
+  #section-selfie .j-panel-glow {
+    position: relative !important;
+    transform: translate(-16px, -30px) !important; /* acompanha o pergaminho */
+    margin-top: 0 !important;
+
+    width: 90% !important;
+    max-width: 470px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    z-index: 6 !important;
+  }
+}
+
