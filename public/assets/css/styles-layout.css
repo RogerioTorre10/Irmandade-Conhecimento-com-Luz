@@ -178,12 +178,17 @@
 @media (min-width: 900px) {
 
   /* Desce mais o pergaminho de fundo da SENHA */
-  #section-senha .j-perg-v-inner {
-    transform: translateY(60px);  /* estava 40px no global */
+   #section-selfie .j-perg-v-inner {
+    transform: translateY(90px);  /* pode testar 80 / 90 / 100 se quiser refinar */
+    overflow: visible;            /* evita cortar o conteúdo nas laterais */
   }
 
-  /* E não sobe o vidro tanto quanto as outras */
-  #section-senha .j-panel-glow {
-    transform: translateY(0px);   /* estava -10px no global */
+  /* Card (vidro) da selfie mais para baixo e centralizado */
+  #section-selfie .j-panel-glow {
+    transform: translateY(30px);  /* estava -10px no global */
+    max-width: 460px;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
   }
 }
