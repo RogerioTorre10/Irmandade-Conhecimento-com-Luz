@@ -238,8 +238,8 @@
 
   /* Card principal do GUIA */
   #section-guia .j-arcane-card {
-    padding-right: 18px !important; /* afastamento perfeito */
-    padding-left: 18px !important;  /* mantém simetria */
+    padding-right: 20px !important; /* afastamento perfeito */
+    padding-left: 20px !important;  /* mantém simetria */
     box-sizing: border-box !important;
   }
 
@@ -247,7 +247,7 @@
   #section-guia .guia-actions,
   #section-guia .btn-guia,
   #section-guia button {
-    margin-right: 10px !important; /* afasta do vidro */
+    margin-right: 12px !important; /* afasta do vidro */
   }
 
   /* Se quiser garantir o encaixe total sem corte */
