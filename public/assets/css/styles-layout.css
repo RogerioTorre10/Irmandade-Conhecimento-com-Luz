@@ -173,6 +173,38 @@
 }
 
 /* =========================================================
+   AJUSTE FINO – LAYOUT DA PÁGINA SENHA (DESKTOP)
+   (um pouco mais alta dentro do pergaminho)
+   ========================================================= */
+@media (min-width: 900px) {
+
+  /* Pergaminho de fundo da senha */
+  #section-senha .j-perg-v-inner {
+    position: relative !important;
+    transform: translateY(40px) !important; /* antes 80px */
+    top: 40px !important;                   /* antes 80px */
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    overflow: visible !important;
+    z-index: 5 !important;
+  }
+
+  /* Card (vidro) da senha */
+  #section-senha .j-panel-glow {
+    position: relative !important;
+    transform: translate(-16px, -70px) !important; /* antes 40px */
+    top: 10px !important;                   /* antes 40px */
+    margin-top: 0 !important;
+    width: 90% !important;
+    max-width: 470px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    z-index: 6 !important;
+  }
+}
+
+
+/* =========================================================
    AJUSTE SELFIE – ALINHAR COM INTRO / TERMOS / SENHA (DESKTOP)
    ========================================================= */
 @media (min-width: 900px) {
@@ -180,7 +212,7 @@
   /* Pergaminho de fundo da página Selfie */
   #section-selfie .j-perg-v-inner {
     position: relative !important;
-    transform: translate(-10px, -50px) !important; /* sobe o bloco dentro do pergaminho */
+    transform: translate(-12px, -40px) !important; /* sobe o bloco dentro do pergaminho */
     margin-top: 0 !important;
     padding-top: 0 !important;
     overflow: visible !important;
@@ -190,7 +222,7 @@
   /* Vidro (card) da Selfie */
   #section-selfie .j-panel-glow {
     position: relative !important;
-    transform: translate(-10px, -50px) !important; /* acompanha o pergaminho */
+    transform: translate(-16px, -50px) !important; /* acompanha o pergaminho */
     margin-top: 0 !important;
     width: 90% !important;
     max-width: 470px !important;
@@ -206,24 +238,28 @@
    ========================================= */
 @media (min-width: 900px) {
 
-  #section-guia .guia-actions {
+ #section-guia .guia-options,
+  #section-guia .guia-buttons-row,
+  #section-guia .card-actions {
     display: flex;
+    justify-content: center;
+    gap: 10px;                  /* espaço igual entre eles */
+    padding: 0 18px 18px 
     justify-content: space-between;
     align-items: center;
-    gap: 6px;
-    padding: 0 8px 8px;    /* respiro lateral */
     width: 100%;
     box-sizing: border-box;
   }
 
   /* Cada botão ocupa ~1/3 e não “vaza” pra fora do card */
-  #section-guia .guia-actions .btn,
-  #section-guia .guia-actions button {
+  #section-guia .guia-options button,
+  #section-guia .guia-buttons-row button,
+  #section-guia .card-actions .btn {
     flex: 1 1 0;
     max-width: 32%;
     margin: 0 !important;
     box-sizing: border-box;
-  }
+  }   
 }
 
 /* =========================================
@@ -257,6 +293,21 @@
   #section-card .card-stage,
   #section-card .card-shell {
     margin: 40px auto 40px !important;
+  }
+}
+
+/* === AJUSTE FINO DESKTOP – CARD (CORTAR PERGAMINHO EMBAIXO) === */
+@media (min-width: 900px) {
+  #section-card .j-perg-v-inner {
+    max-height: 620px;      /* altura máxima visível do pergaminho */
+    overflow: hidden;       /* corta o pedaço que sobra lá embaixo */
+    margin: 0 auto;
+  }
+
+  /* garante que o card em si fique centralizado nessa área */
+  #section-card .card-stage,
+  #section-card .card-wrapper {
+    margin: 40px auto 32px;
   }
 }
 
