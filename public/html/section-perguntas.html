@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="/assets/css/brilho-texturas.css">
 <link rel="stylesheet" href="/assets/css/j-panel-glow.css">
 <link rel="stylesheet" href="/assets/css/styles-perguntas.css">
+
 <script src="/assets/js/jornada-chama.js"></script>
 <script src="/assets/js/jornada-progress-inline.js"></script>
 <script src="/assets/js/jornada-micro.js"></script>
@@ -12,56 +13,77 @@
   <div class="j-panel-glow perguntas-panel">
     <div class="j-perg-v-inner">
       <div class="j-arcane-card perguntas-wrap">
+
         <div id="jp-blocks-wrapper">
           <div class="jp-block j-perg-h-inner j-arcane-card">
+
+            <!-- AMPULHETA / TOTAL GERAL -->
             <div class="progress-total">
               <span class="ampulheta">⏳</span>
               <span id="progress-total-value" class="progress-value">1 / 50</span>
-            </div>   
-  <div class="perguntas-wrap">
-    <div class="progress-top">
-      <div class="progress-label">Blocos: O Caminho</div>
-      <div class="progress-bar gold">
-        <div id="progress-block-fill" class="progress-fill"></div>
-      </div>
-      <span id="progress-block-value" class="progress-value">1 de 5</span>
-    </div>
+            </div>
 
-    <div id="videoOverlay" class="video-overlay" style="display:none;">
-      <video id="videoTransicao" playsinline preload="auto" style="max-width:100%;"></video>
-    </div>
+            <!-- BLOCO + BARRA DO TOPO -->
+            <div class="progress-top">
+              <div class="progress-label">Blocos: O Caminho</div>
+              <div class="progress-bar gold">
+                <div id="progress-block-fill" class="progress-fill"></div>
+              </div>
+              <span id="progress-block-value" class="progress-value">1 de 5</span>
+            </div>
 
-    <div class="perguntas-pergaminho">
-      <div id="jp-question-typed" class="jp-question-typed" aria-live="polite">
-        Carregando pergunta...
-      </div>
+            <!-- VÍDEO TRANSIÇÃO -->
+            <div id="videoOverlay" class="video-overlay" style="display:none;">
+              <video id="videoTransicao" playsinline preload="auto" style="max-width:100%;"></video>
+            </div>
 
-      <div class="jp-answer-frame">
-        <div class="jp-answer-bg"></div>
-        <textarea id="jp-answer-input"
-                  class="jp-answer-input"
-                  rows="4"
-                  placeholder="Digite sua resposta com verdade e calma..."></textarea>
-      </div>
+            <!-- PERGUNTA + RESPOSTA -->
+            <div class="perguntas-pergaminho">
+              <div id="jp-question-typed"
+                   class="jp-question-typed"
+                   aria-live="polite">
+                Carregando pergunta...
+              </div>
 
-      <div class="progress-middle">
-        <div class="progress-label">Perguntas no Bloco</div>
-        <div class="progress-bar silver">
-          <div id="progress-question-fill" class="progress-fill"></div>
-        </div>
-        <span id="progress-question-value" class="progress-value">1 / 10</span>
-      </div>
+              <div class="jp-answer-frame">
+                <div class="jp-answer-bg"></div>
+                <textarea id="jp-answer-input"
+                          class="jp-answer-input"
+                          rows="4"
+                          placeholder="Digite sua resposta com verdade e calma..."></textarea>
+              </div>
 
-      <div id="jp-ai-response" class="jp-ai-response" hidden></div>
-    </div>
+              <!-- BARRA DO BLOCO (MEIO) -->
+              <div class="progress-middle">
+                <div class="progress-label">Perguntas no Bloco</div>
+                <div class="progress-bar silver">
+                  <div id="progress-question-fill" class="progress-fill"></div>
+                </div>
+                <span id="progress-question-value" class="progress-value">1 / 10</span>
+              </div>
 
-    <div class="perguntas-controls">
-      <button id="jp-btn-falar" class="btn-perguntas" data-action="start-mic">🎙️ Falar</button>
-      <button id="jp-btn-apagar" class="btn-perguntas" data-action="clear">🗑️ Apagar</button>
-      <button id="jp-btn-confirmar" class="btn-perguntas btn-confirm" data-action="confirm">
-        ✅ Confirmar
-      </button>
-    </div>
+              <div id="jp-ai-response" class="jp-ai-response" hidden></div>
+            </div>
 
-  </div>
+            <!-- BOTÕES -->
+            <div class="perguntas-controls">
+              <button id="jp-btn-falar" class="btn-perguntas" data-action="start-mic">
+                🎙️ Falar
+              </button>
+              <button id="jp-btn-apagar" class="btn-perguntas" data-action="clear">
+                🗑️ Apagar
+              </button>
+              <button id="jp-btn-confirmar"
+                      class="btn-perguntas btn-confirm"
+                      data-action="confirm">
+                ✅ Confirmar
+              </button>
+            </div>
+
+          </div> <!-- .jp-block -->
+        </div>   <!-- #jp-blocks-wrapper -->
+
+      </div>     <!-- .j-arcane-card -->
+    </div>       <!-- .j-perg-v-inner -->
+  </div>         <!-- .j-panel-glow -->
 </section>
