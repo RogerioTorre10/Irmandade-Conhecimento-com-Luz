@@ -199,7 +199,7 @@
   /* Pergaminho de fundo da página Selfie */
   #section-selfie .j-perg-v-inner {
     position: relative !important;
-    transform: translate(-12px, -90px) !important; /* sobe o bloco dentro do pergaminho */
+    transform: translate(-14px, -100px) !important; /* sobe o bloco dentro do pergaminho */
     margin-top: 0 !important;
     padding-top: 0 !important;
     overflow: visible !important;
@@ -209,7 +209,7 @@
   /* Vidro (card) da Selfie */
   #section-selfie .j-panel-glow {
     position: relative !important;
-    transform: translate(-16px, -90px) !important; /* acompanha o pergaminho */
+    transform: translate(-18px, -100px) !important; /* acompanha o pergaminho */
     margin-top: 0 !important;
     width: 90% !important;
     max-width: 470px !important;
