@@ -14,7 +14,6 @@
 #section-senha  .j-perg-v-inner,
 #section-guia   .j-perg-v-inner,
 #section-selfie .j-perg-v-inner,
-#section-card   .j-perg-v-inner,
 #section-perguntas .j-perg-v-inner,
 #section-final  .j-perg-v-inner {
   margin-left: auto;
@@ -27,7 +26,6 @@
 #section-senha  .j-panel-glow,
 #section-guia   .j-panel-glow,
 #section-selfie .j-panel-glow,
-#section-card   .j-panel-glow,
 #section-perguntas .j-panel-glow,
 #section-final  .j-panel-glow {
   margin-left: auto;
@@ -46,7 +44,6 @@
   #section-senha  .j-perg-v-inner,
   #section-guia   .j-perg-v-inner,
   #section-selfie .j-perg-v-inner,
-  #section-card   .j-perg-v-inner,
   #section-perguntas .j-perg-v-inner,
   #section-final  .j-perg-v-inner {
     transform: translateY(40px);
@@ -58,7 +55,6 @@
   #section-senha  .j-panel-glow,
   #section-guia   .j-panel-glow,
   #section-selfie .j-panel-glow,
-  #section-card   .j-panel-glow,
   #section-perguntas .j-panel-glow,
   #section-final  .j-panel-glow {
     transform: translateY(-10px);
@@ -77,7 +73,6 @@
   #section-senha  .j-panel-glow,
   #section-guia   .j-panel-glow,
   #section-selfie .j-panel-glow,
-  #section-card   .j-panel-glow,
   #section-perguntas .j-panel-glow,
   #section-final  .j-panel-glow {
     width: min(320px, 84vw);
@@ -92,7 +87,6 @@
   #section-senha  .j-perg-v-inner,
   #section-guia   .j-perg-v-inner,
   #section-selfie .j-perg-v-inner,
-  #section-card   .j-perg-v-inner,
   #section-perguntas .j-perg-v-inner,
   #section-final  .j-perg-v-inner {
     transform: translateY(0); /* base neutra; overrides abaixo */
@@ -147,13 +141,6 @@
        mantemos alinhado com o mesmo eixo do pergaminho ---- */
 @media (max-width: 600px) {
   #section-selfie .j-panel-glow {
-    transform: translate(-6px, -30px);
-  }
-}
-
-/* ---- CARD: placeholder + nome + botão – alinhado no mesmo eixo ---- */
-@media (max-width: 600px) {
-  #section-card .j-panel-glow {
     transform: translate(-6px, -30px);
   }
 }
@@ -262,66 +249,6 @@
   }   
 }
 
-/* =========================================
-   PÁGINA CARD — AJUSTE DO PERGAMINHO + CENTRALIZAÇÃO
-   (mantém o pergaminho, mas não deixa sobrar embaixo)
-   ========================================= */
-
-/* Regra base: dá um respiro vertical na seção */
-#section-card.j-screen-vert {
-  padding-top: 40px !important;
-  padding-bottom: 40px !important;
-}
-
-/* Limitamos a área visível do pergaminho vertical do CARD */
-#section-card .j-perg-v,
-#section-card .j-perg-v-shell,
-#section-card .j-perg-v-inner {
-  overflow: hidden !important;   /* corta qualquer sobra lá embaixo */
-  margin: 0 auto !important;
-}
-
-/* ===== DESKTOP (>= 900px) ===== */
-@media (min-width: 900px) {
-
-  /* Altura máxima do pergaminho atrás do card */
-  #section-card .j-perg-v-inner {
-    max-height: 540px !important;  /* se ainda sobrar muito, pode testar 520 / 500 */
-  }
-
-  /* Garante que o card fique centralizado nessa área */
-  #section-card .card-stage,
-  #section-card .card-shell,
-  #section-card .card-wrapper {
-    margin: 40px auto 24px !important;
-    max-width: 420px !important;
-  }
-}
-
-/* ===== MOBILE (<= 600px) ===== */
-@media (max-width: 600px) {
-
-  #section-card.j-screen-vert {
-    padding-top: 32px !important;
-    padding-bottom: 32px !important;
-  }
-
-  #section-card .j-perg-v,
-  #section-card .j-perg-v-shell {
-    max-width: 92vw !important;
-  }
-
-  #section-card .j-perg-v-inner {
-    max-height: 520px !important;
-  }
-
-  #section-card .card-stage,
-  #section-card .card-shell,
-  #section-card .card-wrapper {
-    margin: 24px auto 16px !important;
-    max-width: 420px !important;
-  }
-}
 
 
 
