@@ -35,7 +35,8 @@
   width: min(1024px, 100%);
   margin: 0 auto;
   padding: 74px 14px 78px;  /* topo HUD + ampulheta | base HUD inferior */
-  padding-bottom: 96px !important;
+  padding-top: 18px;          /* abre espaço entre o vidro e a régua */
+  padding-bottom: 16px;
   border-radius: 18px;
   background: rgba(0,0,0,0.45);
   box-shadow: 0 18px 60px rgba(0,0,0,0.85);
@@ -58,6 +59,7 @@
 .progress-top{
   position: absolute;
   top: 14px;
+  margin-bottom: 10px;        /* descola a pergunta da régua de cima */
   left: 14px;
   right: 88px;     /* mais folga pra ampulheta */
   padding-top: 14px; /* espaço pro número ficar em cima */
@@ -87,7 +89,7 @@
   top: -2px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 800;
   color: #ffe9a6;
   text-shadow: 0 1px 2px #000;
@@ -98,6 +100,7 @@
 /* ---------- BARRA INFERIOR (PERGUNTAS NO BLOCO) ---------- */
 .progress-middle{
   position: absolute;
+  margin-top: 12px; 
   left: 50%;
   bottom: -6px;          
   transform: translateX(-50%);
@@ -138,8 +141,8 @@
   position: relative;
   margin-left: 6px;
   white-space: nowrap;
-  font-size: 12.5px;
-  font-weight: 800;
+  font-size: 14px;
+  font-weight: 600;
   letter-spacing: .04em;  
 }
 
@@ -184,8 +187,9 @@
 }
 
 .jp-block-label{
+  font-size: 15px;            /* nome do bloco */
   font-weight: 600;
-  letter-spacing: .06em;
+  letter-spacing: .03em;
   text-transform: uppercase;
   color: #ffd38a;
 }
