@@ -249,41 +249,33 @@
   }   
 }
 /* =========================================
-   PÁGINA CARD — REMOVER PERGAMINHO VERTICAL
+   PAGE CARD – REMOVER O PERGAMINHO GLOBAL
    ========================================= */
 
-/* 1) tira as classes de pergaminho da section-card */
-#section-card.pergaminho,
-#section-card.pergaminho-v,
-#section-card.j-screen-vert {
+/* 1) Isola o fundo global dentro do card */
+#section-card,
+#section-card * {
+  background-image: none !important;
   background: transparent !important;
 }
 
-/* 2) remove fundo/efeitos do wrapper de pergaminho só no CARD */
-#section-card .j-perg-v,
-#section-card .j-perg-v-shell,
-#section-card .j-perg-v-inner {
+/* 2) Mas NÃO mexe no próprio CARD (mantém intacto) */
+#section-card .card-frame,
+#section-card .card-shell,
+#section-card .card-stage,
+#section-card .card-wrapper,
+#section-card .card-container {
   background: transparent !important;
-  box-shadow: none !important;
 }
 
-/* 3) se o pergaminho vier em ::before / ::after, mata também */
-#section-card .j-perg-v::before,
-#section-card .j-perg-v-shell::before,
-#section-card .j-perg-v-inner::before,
-#section-card .j-perg-v::after,
-#section-card .j-perg-v-shell::after,
-#section-card .j-perg-v-inner::after {
+/* 3) Impede qualquer pseudo-elemento global de aparecer */
+#section-card::before,
+#section-card::after,
+#section-card *::before,
+#section-card *::after {
   content: none !important;
 }
 
-/* 4) garante só o card centralizado bonitão */
-#section-card .card-stage,
-#section-card .card-wrapper,
-#section-card .card-shell {
-  margin: 40px auto 40px !important;
-  max-width: 420px !important;
-}
 
 
 
