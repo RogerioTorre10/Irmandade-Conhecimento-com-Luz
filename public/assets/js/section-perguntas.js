@@ -595,7 +595,7 @@ window.playBlockTransition = function(videoSrc, onDone) {
   // MICROFONE AUTOMÁTICO (opcional)
   //if (input && window.JORNADA_MICRO) {
   // window.JORNADA_MICRO.attach(input, { mode: 'append' });
-  }
+ // }
 }
 
   // --------------------------------------------------
