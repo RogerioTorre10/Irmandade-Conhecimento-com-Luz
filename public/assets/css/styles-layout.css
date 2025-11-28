@@ -227,21 +227,37 @@
 }
 
 /* =========================================
-   CARD – pergaminho menos “comprido” (desktop)
+   PÁGINA CARD — REMOVER PERGAMINHO VERTICAL
+   (deixa só o card bonitão sobre o fundo escuro)
    ========================================= */
+
+/* 1) Tira o pergaminho aplicado na section-card */
+#section-card.pergaminho,
+#section-card.pergaminho-v,
+#section-card.j-screen-vert {
+  background: transparent !important;
+}
+
+/* 2) Se existir wrapper de pergaminho dentro da card, limpamos também */
+#section-card .j-perg-v-inner {
+  background: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* 3) Só garante que o card fique centralizado na tela */
 @media (min-width: 900px) {
-
-  /* Limita a área útil do pergaminho no Card */
-  #section-card .j-perg-v-inner {
-    max-height: 440px !important;     /* encurta o pergaminho */
-    margin: 60px auto 100px !important;
-    overflow: hidden !important;      /* esconde excesso pra baixo */
-  }
-
-  /* Garante que o vidro fique centrado dentro desse recorte */
-  #section-card .j-panel-glow {
-    margin-top: 0 !important;
-    transform: translate(-16px, -10px) !important;
+  #section-card .card-stage,
+  #section-card .card-shell {
+    margin: 80px auto 60px !important;
   }
 }
+
+@media (max-width: 600px) {
+  #section-card .card-stage,
+  #section-card .card-shell {
+    margin: 40px auto 40px !important;
+  }
+}
+
 
