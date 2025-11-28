@@ -377,6 +377,168 @@
   text-shadow: 0 0 10px var(--theme-main-color-soft, rgba(255,216,116,0.8));
 }
 
+/* ===========================
+   SECTION-PERGUNTAS — LAYOUT
+   =========================== */
+
+#section-perguntas .perguntas-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Cabeçalho: título + contador (1 / 14) */
+#section-perguntas .perguntas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+
+/* Bloco da pergunta + textarea */
+#section-perguntas .pergunta-wrap {
+  margin-top: 4px;
+  margin-bottom: 10px;  /* abre espaço pros botões embaixo */
+}
+
+/* Rodapé: botões + régua de progresso */
+#section-perguntas .perguntas-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* linha dos botões */
+#section-perguntas .perguntas-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* régua embaixo dos botões */
+#section-perguntas .perguntas-progress-bottom {
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(0,0,0,0.5);
+}
+
+/* barra que cresce */
+#section-perguntas .perguntas-progress-fill {
+  height: 100%;
+  width: 0%;
+  transition: width 0.4s ease;
+}
+
+/* ===========================
+   TEMA POR GUIA — PERGUNTAS
+   =========================== */
+
+body.guia-lumen #section-perguntas .perguntas-progress-fill,
+body.guia-lumen #section-perguntas .btn.btn-primary,
+body.guia-lumen #section-perguntas .btn.btn-stone {
+  background: #38d996 !important;        /* verde Lumen */
+  box-shadow: 0 0 12px rgba(56,217,150,0.8) !important;
+  border-color: #2ea87a !important;
+}
+
+body.guia-zion #section-perguntas .perguntas-progress-fill,
+body.guia-zion #section-perguntas .btn.btn-primary,
+body.guia-zion #section-perguntas .btn.btn-stone {
+  background: #ffd166 !important;        /* dourado Zion */
+  box-shadow: 0 0 12px rgba(255,209,102,0.8) !important;
+  border-color: #e5b93c !important;
+}
+
+body.guia-arion #section-perguntas .perguntas-progress-fill,
+body.guia-arion #section-perguntas .btn.btn-primary,
+body.guia-arion #section-perguntas .btn.btn-stone {
+  background: #ff6ad5 !important;        /* magenta Arion */
+  box-shadow: 0 0 12px rgba(255,106,213,0.8) !important;
+  border-color: #e04ab3 !important;
+}
+
+
+/* ===========================
+   SECTION-FINAL — ALINHAMENTO
+   =========================== */
+
+/* Desktop */
+@media (min-width: 900px) {
+  #section-final.j-screen-vert .j-perg-v-inner {
+    transform: translate(-12px, -80px) !important;  /* sobe o pergaminho */
+  }
+
+  #section-final.j-screen-vert .j-panel-glow {
+    transform: translate(-16px, -90px) !important;  /* acompanha o vidro */
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  #section-final .j-perg-v-inner {
+    transform: translate(-4px, -40px) !important;
+  }
+
+  #section-final .j-panel-glow {
+    transform: translate(-6px, -42px) !important;
+  }
+}
+/* ===========================
+   VÍDEO FINAL EM TELA CHEIA
+   =========================== */
+
+#final-video {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 92vw !important;
+  height: 92vh !important;
+  max-width: 92vw !important;
+  max-height: 92vh !important;
+
+  object-fit: contain !important;
+  background: #000 !important;
+
+  z-index: 99999 !important;
+  border: 12px solid #d4af37 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 0 40px rgba(255, 215, 0, 0.9) !important;
+}
+
+/* Barras escuras suavizadas em cima e embaixo */
+#final-video::before,
+#final-video::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 16%;
+  pointer-events: none;
+}
+
+#final-video::before {
+  top: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.95), transparent);
+}
+
+#final-video::after {
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
+}
+
+/* Quando o vídeo estiver tocando, some com a página final e com o botão */
+body.is-playing-final-video #section-final {
+  opacity: 0;
+  pointer-events: none;
+}
+
+body.is-playing-final-video #btn-voltar-portal {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 
 
 
