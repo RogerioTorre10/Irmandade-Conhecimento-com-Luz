@@ -171,33 +171,6 @@
     transform: translate(-6px, -30px);
   }
 }
-/* =========================================================
-   AJUSTE DEFINITIVO – SELFIE (DESKTOP)
-   ================================================================= */
-@media (min-width: 900px) {
-
-  /* PERGAMINHO DE FUNDO — força total, prioridade máxima */
-  #section-selfie .j-perg-v-inner {
-    position: relative !important;
-    transform: translate(-12px, -80px) !important;  /* sobe mais */
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-    overflow: visible !important;
-    z-index: 5 !important;
-  }
-
-
-  /* VIDRO (CARD) DA SELFIE — independentemente do global */
-  #section-selfie .j-panel-glow {
-    position: relative !important;
-    transform: translate(-16px, -70px) !important;  /* acompanha o pergaminho */
-    width: 90% !important;
-    max-width: 470px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    z-index: 6 !important;
-  }
-}
 
 /* =========================================================
    AJUSTE SELFIE – ALINHAR COM INTRO / TERMOS / SENHA (DESKTOP)
@@ -207,7 +180,7 @@
   /* Pergaminho de fundo da página Selfie */
   #section-selfie .j-perg-v-inner {
     position: relative !important;
-    transform: translate(-12px, -130px) !important; /* sobe o bloco dentro do pergaminho */
+    transform: translate(-10px, -90px) !important; /* sobe o bloco dentro do pergaminho */
     margin-top: 0 !important;
     padding-top: 0 !important;
     overflow: visible !important;
@@ -217,7 +190,7 @@
   /* Vidro (card) da Selfie */
   #section-selfie .j-panel-glow {
     position: relative !important;
-    transform: translate(-16px, -120px) !important; /* acompanha o pergaminho */
+    transform: translate(-12px, -80px) !important; /* acompanha o pergaminho */
     margin-top: 0 !important;
     width: 90% !important;
     max-width: 470px !important;
@@ -238,7 +211,7 @@
     justify-content: space-between;
     align-items: center;
     gap: 6px;
-    padding: 0 16px 16px;    /* respiro lateral */
+    padding: 0 14px 14px;    /* respiro lateral */
     width: 100%;
     box-sizing: border-box;
   }
@@ -260,7 +233,7 @@
 
   /* Limita a área útil do pergaminho no Card */
   #section-card .j-perg-v-inner {
-    max-height: 540px !important;     /* encurta o pergaminho */
+    max-height: 480px !important;     /* encurta o pergaminho */
     margin: 60px auto 40px !important;
     overflow: hidden !important;      /* esconde excesso pra baixo */
   }
