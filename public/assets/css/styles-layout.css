@@ -179,20 +179,18 @@
   /* PERGAMINHO DE FUNDO — força total, prioridade máxima */
   #section-selfie .j-perg-v-inner {
     position: relative !important;
-    transform: translateY(120px) !important; /* Ajuste forte */
-    top: 120px !important; 
+    transform: translate(-12px, -80px) !important;  /* sobe mais */
     margin-top: 0 !important;
     padding-top: 0 !important;
     overflow: visible !important;
     z-index: 5 !important;
   }
 
+
   /* VIDRO (CARD) DA SELFIE — independentemente do global */
   #section-selfie .j-panel-glow {
     position: relative !important;
-    transform: translateY(80px) !important;
-    top: 80px !important;
-    margin-top: 0 !important;
+    transform: translate(-16px, -70px) !important;  /* acompanha o pergaminho */
     width: 90% !important;
     max-width: 470px !important;
     margin-left: auto !important;
@@ -240,7 +238,7 @@
     display: flex;
     justify-content: space-between;
     gap: 8px;
-    padding: 0 18px 20px;   /* respiro lateral dentro do vidro */
+    padding: 0 12px 16px;   /* respiro lateral dentro do vidro */
     box-sizing: border-box;
   }
 
@@ -266,7 +264,7 @@
 
   /* Limita a área útil do pergaminho no Card */
   #section-card .j-perg-v-inner {
-    max-height: 500px !important;     /* encurta o pergaminho */
+    max-height: 480px !important;     /* encurta o pergaminho */
     margin: 60px auto 40px !important;
     overflow: hidden !important;      /* esconde excesso pra baixo */
   }
