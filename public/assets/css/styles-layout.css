@@ -377,147 +377,203 @@
   text-shadow: 0 0 10px var(--theme-main-color-soft, rgba(255,216,116,0.8));
 }
 
-/* ===========================
-   SECTION-PERGUNTAS — LAYOUT
-   =========================== */
+/* ===============================
+   LAYOUT PERGUNTAS – DESKTOP BASE
+   =============================== */
 
-#section-perguntas .perguntas-card {
+#section-perguntas .perguntas-panel {
+  padding: 24px 0;
+}
+
+#section-perguntas .j-perg-v-inner {
+  padding: 18px 14px;
+}
+
+#section-perguntas .perguntas-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+#section-perguntas .jp-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+/* TOPO – AMPULHETA + BLOCO */
+#section-perguntas .progress-total {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+}
+
+#section-perguntas .progress-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+#section-perguntas .progress-label {
+  font-size: 0.85rem;
+  color: #f6e7c6;
+}
+
+/* BARRAS GENÉRICAS */
+#section-perguntas .progress-bar {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(0,0,0,0.45);
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.7);
+}
+
+#section-perguntas .progress-bar.gold {
+  background: rgba(60, 40, 0, 0.75);
+}
+
+#section-perguntas .progress-bar.silver {
+  background: rgba(50, 50, 50, 0.8);
+}
+
+#section-perguntas .progress-fill {
+  width: 0%;
+  height: 100%;
+  transition: width 0.35s ease;
+}
+
+#section-perguntas .progress-value {
+  font-size: 0.8rem;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* PERGAMINHO DA PERGUNTA */
+#section-perguntas .perguntas-pergaminho {
+  margin-top: 4px;
+  padding: 10px 6px 8px;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-/* Cabeçalho: título + contador (1 / 14) */
-#section-perguntas .perguntas-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 6px;
+#section-perguntas .jp-question-typed {
+  font-size: 1rem;
+  color: #fff;
+  min-height: 40px;
 }
 
-/* Bloco da pergunta + textarea */
-#section-perguntas .pergunta-wrap {
-  margin-top: 4px;
-  margin-bottom: 10px;  /* abre espaço pros botões embaixo */
+/* FRAME & TEXTAREA */
+#section-perguntas .jp-answer-frame {
+  position: relative;
+  padding: 14px 10px;
 }
 
-/* Rodapé: botões + régua de progresso */
-#section-perguntas .perguntas-footer {
+#section-perguntas .jp-answer-bg {
+  position: absolute;
+  inset: 0;
+  background: url('/assets/img/pergaminho-rasgado-horiz.png') center/cover no-repeat;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+#section-perguntas .jp-answer-input {
+  position: relative;
+  width: 100%;
+  min-height: 120px;
+  background: rgba(0,0,0,0.9);
+  color: #fff;
+  border-radius: 8px;
+  border: 2px solid #4a3b2b;
+  padding: 10px 12px;
+  resize: none;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+}
+
+/* PROGRESSO DO MEIO */
+#section-perguntas .progress-middle {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 6px;
 }
 
-/* linha dos botões */
-#section-perguntas .perguntas-actions {
+/* BOTÕES */
+#section-perguntas .perguntas-controls {
   display: flex;
   justify-content: space-between;
   gap: 8px;
+  margin-top: 6px;
 }
 
-/* régua embaixo dos botões */
-#section-perguntas .perguntas-progress-bottom {
-  height: 8px;
+#section-perguntas .btn-perguntas {
+  flex: 1;
+  padding: 8px 10px;
+  font-size: 0.9rem;
   border-radius: 999px;
-  overflow: hidden;
-  background: rgba(0,0,0,0.5);
+  border: 2px solid #3b2d1a;
+  background-image: url('/assets/img/textura-de-pedra.jpg');
+  background-size: cover;
+  background-position: center;
+  color: #f6e7c6;
+  text-shadow: 0 0 4px rgba(0,0,0,0.7);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* barra que cresce */
-#section-perguntas .perguntas-progress-fill {
-  height: 100%;
-  width: 0%;
-  transition: width 0.4s ease;
+#section-perguntas .btn-perguntas:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.6);
 }
 
-/* ======================================
-   LAYOUT DA PÁGINA PERGUNTAS — V3 LUMEN
-   ====================================== */
-
-#section-perguntas .perguntas-card {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 10px 6px;
+#section-perguntas .btn-perguntas.btn-confirm {
+  font-weight: bold;
 }
 
-#section-perguntas .perguntas-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* MOBILE */
+@media (max-width: 600px) {
+  #section-perguntas .j-perg-v-inner {
+    padding: 12px 8px;
+  }
+
+  #section-perguntas .progress-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #section-perguntas .progress-middle {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #section-perguntas .perguntas-controls {
+    flex-direction: column;
+  }
 }
 
-#section-perguntas .pergunta-titulo {
-  font-size: 1.25rem;
-  color: #fff;
-  line-height: 1.3;
-}
-
-#section-perguntas .progress-bar {
-  background: rgba(0, 0, 0, 0.4);
-  height: 8px;
-  width: 110px;
-  border-radius: 999px;
-  overflow: hidden;
-  margin-left: 6px;
-}
-
-#section-perguntas .progress-bar div {
-  height: 100%;
-  width: 0%;
-  transition: width 0.4s ease;
-}
-
-#section-perguntas .area-resposta-frame {
-  background: url('/assets/img/pergaminho-rasgado-horiz.png') center/contain no-repeat;
-  padding: 18px 10px;
-}
-
-#resposta {
-  width: 100%;
-  min-height: 115px;
-  background: #000;
-  color: #fff;
-  border: 2px solid #645444;
-  border-radius: 6px;
-  padding: 10px;
-  resize: none;
-  font-size: 15px;
-}
-
-#section-perguntas .perguntas-footer {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-#section-perguntas .perguntas-actions {
-  display: flex;
-  justify-content: space-between;
-  gap: 6px;
-}
-
-#section-perguntas .progress-bottom .progress-bar {
-  width: 100%;
-}
-/* LUMEN — verde */
-body.guia-lumen #section-perguntas .progress-bar div {
-  background: #39eaa9 !important;
+/* LUMEN (verde) */
+body.guia-lumen #section-perguntas .progress-fill {
+  background: #39eaa9;
   box-shadow: 0 0 12px rgba(57,234,169,0.9);
 }
 
-/* ZION — dourado */
-body.guia-zion #section-perguntas .progress-bar div {
-  background: #ffd166 !important;
+/* ZION (dourado) */
+body.guia-zion #section-perguntas .progress-fill {
+  background: #ffd166;
   box-shadow: 0 0 12px rgba(255,209,102,0.9);
 }
 
-/* ARIAN — magenta */
-body.guia-arion #section-perguntas .progress-bar div {
-  background: #ff6ad5 !important;
+/* ARIAN (magenta) */
+body.guia-arion #section-perguntas .progress-fill {
+  background: #ff6ad5;
   box-shadow: 0 0 12px rgba(255,106,213,0.9);
 }
-
 
 /* ===========================
    TEMA POR GUIA — PERGUNTAS
@@ -546,7 +602,6 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   box-shadow: 0 0 12px rgba(255,106,213,0.8) !important;
   border-color: #e04ab3 !important;
 }
-
 
 /* ===========================
    SECTION-FINAL — ALINHAMENTO
