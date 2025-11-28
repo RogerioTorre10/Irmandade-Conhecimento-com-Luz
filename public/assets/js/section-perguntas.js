@@ -137,54 +137,75 @@ window.playBlockTransition = function(videoSrc, onDone) {
     if (el) el.style.width = val;
   }
 
-   function updateCounters() {
-    const { bloco } = getCurrent();
-    const blocoTotal = bloco?.questions?.length || 1;
+  function updateCounters() {
+  const JC     = window.JC || {};
+  const blocks = window.JORNADA_BLOCKS || [];
 
-    const totalBlocks     = State.totalBlocks   || 1;
-    const totalQuestions  = State.totalQuestions || 1;
+  const blocoIdx  = JC.currentBloco    || 0;
+  const qIdx      = JC.currentPergunta || 0;
 
-    const currentBlockNum    = State.blocoIdx  + 1; // 1–5
-    const currentQuestionNum = State.qIdx      + 1; // 1–10 dentro do bloco
-    const currentGlobalNum   = State.globalIdx + 1; // 1–50 geral
+  const bloco = blocks[blocoIdx] || { questions: [] };
+  const blocoTotal = (bloco.questions && bloco.questions.length) || 1;
 
-    // 1) BARRA DO TOPO — BLOCOS (1–5)
-    const elBlockValue = document.getElementById('progress-block-value');
-    if (elBlockValue) {
-      elBlockValue.textContent = `${currentBlockNum} de ${totalBlocks}`;
-    }
+  const totalBlocks    = blocks.length || 1;
+  const totalQuestions = blocks.reduce((acc, b) => acc + (b.questions?.length || 0), 0) || 1;
 
-    const elBlockFill = document.getElementById('progress-block-fill');
-    if (elBlockFill) {
-      const pctBlock = Math.max(
-        0,
-        Math.min(100, (currentBlockNum / totalBlocks) * 100)
-      );
-      elBlockFill.style.width = pctBlock + '%';
-    }
+  const currentBlockNum    = blocoIdx + 1;      // 1–5
+  const currentQuestionNum = qIdx + 1;          // 1–N dentro do bloco
+  let   globalIdx          = 0;
 
-    // 2) BARRA DO MEIO — PERGUNTAS DO BLOCO (1–10)
-    const elQuestionValue = document.getElementById('progress-question-value');
-    if (elQuestionValue) {
-      elQuestionValue.textContent = `${currentQuestionNum} / ${blocoTotal}`;
-    }
-
-    const elQuestionFill = document.getElementById('progress-question-fill');
-    if (elQuestionFill) {
-      const pctQuestion = Math.max(
-        0,
-        Math.min(100, (currentQuestionNum / blocoTotal) * 100)
-      );
-      elQuestionFill.style.width = pctQuestion + '%';
-    }
-
-    // 3) AMPULHETA — TOTAL GERAL (1–50)
-    const elTotal = document.getElementById('progress-total-value');
-    if (elTotal) {
-      elTotal.textContent = `${currentGlobalNum} / ${totalQuestions}`;
+  // índice global (1–totalQuestions)
+  for (let i = 0; i < blocks.length; i++) {
+    if (i < blocoIdx) {
+      globalIdx += blocks[i].questions?.length || 0;
     }
   }
+  globalIdx += qIdx;
+  const currentGlobalNum = globalIdx + 1;
 
+  // --- 1) Barra do topo (blocos) ---
+  const elBlockValue = document.getElementById('progress-block-value');
+  if (elBlockValue) {
+    elBlockValue.textContent = `${currentBlockNum} de ${totalBlocks}`;
+  }
+
+  const elBlockFill = document.getElementById('progress-block-fill');
+  if (elBlockFill) {
+    const pctBlock = Math.max(
+      0,
+      Math.min(100, (currentBlockNum / totalBlocks) * 100)
+    );
+    elBlockFill.style.width = pctBlock + '%';
+  }
+
+  // Nome do bloco (usa título das traduções)
+  const elBlockLabel = document.querySelector('.progress-top .progress-label');
+  if (elBlockLabel) {
+    // ex: "Bloco 2 — Reflexões"
+    elBlockLabel.textContent = bloco.title || `Bloco ${currentBlockNum}`;
+  }
+
+  // --- 2) Barra do meio (perguntas no bloco) ---
+  const elQuestionValue = document.getElementById('progress-question-value');
+  if (elQuestionValue) {
+    elQuestionValue.textContent = `${currentQuestionNum} / ${blocoTotal}`;
+  }
+
+  const elQuestionFill = document.getElementById('progress-question-fill');
+  if (elQuestionFill) {
+    const pctQuestion = Math.max(
+      0,
+      Math.min(100, (currentQuestionNum / blocoTotal) * 100)
+    );
+    elQuestionFill.style.width = pctQuestion + '%';
+  }
+
+  // --- 3) Ampulheta (total geral) ---
+  const elTotal = document.getElementById('progress-total-value');
+  if (elTotal) {
+    elTotal.textContent = `${currentGlobalNum} / ${totalQuestions}`;
+  }
+}
 
   async function typeQuestion(text) {
     if (completed) return;
@@ -504,12 +525,36 @@ window.playBlockTransition = function(videoSrc, onDone) {
   const btnConf   = $('#jp-btn-confirmar', root);
   const input     = $('#jp-answer-input', root);
 
-  // MICROFONE
+  // ================================
+  // MICROFONE controlado pelo botão
+  // ================================
+  let micAttached = false;
+
   if (btnFalar && input && window.JORNADA_MICRO) {
+    const Micro = window.JORNADA_MICRO;
+
     btnFalar.addEventListener('click', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
-      window.JORNADA_MICRO.attach(input, { mode: 'append' });
+
+      // 1) Garante que o input está "conectado" ao módulo de voz
+      if (!micAttached && typeof Micro.attach === 'function') {
+        // se no jornada-micro.js existir alguma opção tipo "hideButton",
+        // pode passar aqui também, ex: { mode: 'append', hideButton: true }
+        Micro.attach(input, { mode: 'append' });
+        micAttached = true;
+      }
+
+      // 2) Liga / desliga a captura de voz
+      if (typeof Micro.toggle === 'function') {
+        // caminho ideal: módulo expõe um toggle()
+        Micro.toggle();
+      } else if (typeof Micro.start === 'function') {
+        // fallback: se só existir start(), chama start sempre
+        Micro.start();
+      } else {
+        console.warn('[PERGUNTAS] JORNADA_MICRO não tem toggle()/start().');
+      }
     });
   }
 
@@ -548,8 +593,8 @@ window.playBlockTransition = function(videoSrc, onDone) {
   }
 
   // MICROFONE AUTOMÁTICO (opcional)
-  if (input && window.JORNADA_MICRO) {
-    window.JORNADA_MICRO.attach(input, { mode: 'append' });
+  //if (input && window.JORNADA_MICRO) {
+  // window.JORNADA_MICRO.attach(input, { mode: 'append' });
   }
 }
 
