@@ -275,6 +275,107 @@
 #section-card *::after {
   content: none !important;
 }
+/* =========================================
+   DNA DE LUZ DOS GUIAS – CORES GLOBAIS
+   ========================================= */
+
+/* fallback (antes de escolher guia) */
+:root {
+  --theme-main-color: #ffd874;
+  --theme-main-color-soft: rgba(255, 216, 116, 0.25);
+}
+
+/* LUMEN – verde dourado */
+[data-guide="lumen"] {
+  --theme-main-color: #9dff7a;
+  --theme-main-color-soft: rgba(157, 255, 122, 0.25);
+}
+
+/* ZION – azul dourado */
+[data-guide="zion"] {
+  --theme-main-color: #7ed8ff;
+  --theme-main-color-soft: rgba(126, 216, 255, 0.25);
+}
+
+/* ARIAN – magenta dourado */
+[data-guide="arian"] {
+  --theme-main-color: #ff94ff;
+  --theme-main-color-soft: rgba(255, 148, 255, 0.25);
+}
+/* =========================================
+   BOTÕES TEMÁTICOS (perguntas, continuar, etc.)
+   ========================================= */
+
+.btn-theme,
+.btn.btn-stone-theme,
+#section-perguntas .perguntas-actions .btn {
+  background: var(--theme-main-color, #ffd874);
+  border-color: var(--theme-main-color, #ffd874);
+  box-shadow:
+    0 0 10px var(--theme-main-color-soft, rgba(255,216,116,0.25)),
+    0 0 24px var(--theme-main-color-soft, rgba(255,216,116,0.25));
+  transition:
+    transform 0.12s ease-out,
+    box-shadow 0.18s ease-out,
+    background 0.18s ease-out;
+}
+
+.btn-theme:hover,
+.btn.btn-stone-theme:hover,
+#section-perguntas .perguntas-actions .btn:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow:
+    0 0 14px var(--theme-main-color-soft, rgba(255,216,116,0.45)),
+    0 0 30px var(--theme-main-color-soft, rgba(255,216,116,0.45));
+}
+
+/* =========================================
+   REGUAS / MÉTRICAS – TOPO E BASE
+   ========================================= */
+
+/* selo 1/14, ícone de pergaminho etc. */
+#section-perguntas .perguntas-counter-top,
+#section-perguntas .perguntas-counter-badge {
+  color: #fff;
+  text-shadow: 0 0 8px var(--theme-main-color-soft, rgba(255,216,116,0.6));
+}
+
+/* barra principal de progresso */
+#section-perguntas .perg-progress-outer {
+  position: relative;
+  width: 100%;
+  max-width: 220px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+}
+
+/* preenchimento da barra (JS aumenta width) */
+#section-perguntas .perg-progress-inner {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(
+    90deg,
+    var(--theme-main-color, #ffd874),
+    #ffffff
+  );
+  box-shadow: 0 0 14px var(--theme-main-color-soft, rgba(255,216,116,0.6));
+  transition: width 0.35s ease-out;
+}
+/* CARD DAS PERGUNTAS ILUMINADO PELA COR DO GUIA */
+#section-perguntas .j-arcane-card {
+  box-shadow:
+    0 0 24px var(--theme-main-color-soft, rgba(255,216,116,0.35)),
+    0 0 60px rgba(0, 0, 0, 0.8);
+}
+
+/* título da pergunta */
+#section-perguntas .perguntas-titulo {
+  color: #fff;
+  text-shadow: 0 0 10px var(--theme-main-color-soft, rgba(255,216,116,0.8));
+}
 
 
 
