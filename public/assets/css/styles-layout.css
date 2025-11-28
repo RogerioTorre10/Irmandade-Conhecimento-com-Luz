@@ -248,6 +248,42 @@
     box-sizing: border-box;
   }   
 }
+/* =========================================
+   PÁGINA CARD — REMOVER PERGAMINHO VERTICAL
+   ========================================= */
+
+/* 1) tira as classes de pergaminho da section-card */
+#section-card.pergaminho,
+#section-card.pergaminho-v,
+#section-card.j-screen-vert {
+  background: transparent !important;
+}
+
+/* 2) remove fundo/efeitos do wrapper de pergaminho só no CARD */
+#section-card .j-perg-v,
+#section-card .j-perg-v-shell,
+#section-card .j-perg-v-inner {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* 3) se o pergaminho vier em ::before / ::after, mata também */
+#section-card .j-perg-v::before,
+#section-card .j-perg-v-shell::before,
+#section-card .j-perg-v-inner::before,
+#section-card .j-perg-v::after,
+#section-card .j-perg-v-shell::after,
+#section-card .j-perg-v-inner::after {
+  content: none !important;
+}
+
+/* 4) garante só o card centralizado bonitão */
+#section-card .card-stage,
+#section-card .card-wrapper,
+#section-card .card-shell {
+  margin: 40px auto 40px !important;
+  max-width: 420px !important;
+}
 
 
 
