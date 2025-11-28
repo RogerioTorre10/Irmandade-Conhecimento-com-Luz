@@ -359,3 +359,37 @@
     margin-top: 50px;
   }
 }
+
+/* =========================================
+   PÁGINA CARD — REMOVER PERGAMINHO VERTICAL
+   (deixa só o card bonitão sobre o fundo escuro)
+   ========================================= */
+
+/* 1) Tira o pergaminho aplicado na section-card */
+#section-card.pergaminho,
+#section-card.pergaminho-v,
+#section-card.j-screen-vert {
+  background: transparent !important;
+}
+
+/* 2) Se existir wrapper de pergaminho dentro da card, limpamos também */
+#section-card .j-perg-v-inner {
+  background: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* 3) Só garante que o card fique centralizado na tela */
+@media (min-width: 900px) {
+  #section-card .card-stage,
+  #section-card .card-shell {
+    margin: 80px auto 60px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  #section-card .card-stage,
+  #section-card .card-shell {
+    margin: 40px auto 40px !important;
+  }
+}
