@@ -616,17 +616,42 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   #section-final.j-screen-vert .j-panel-glow {
     transform: translate(-16px, -80px) !important;  /* acompanha o vidro */
   }
+
+   #section-final .j-panel-glow {
+    transform: translate(-16px, -70px) !important; /* sobe o vidro */
+  }
+
+  #section-final .j-perg-v-inner {
+    transform: translate(-12px, -50px) !important; /* ajusta pergaminho interno */
+    max-height: 520px !important;
+    margin: 0 auto !important;
+  }
 }
 
 /* Mobile */
 @media (max-width: 600px) {
   #section-final .j-perg-v-inner {
-    transform: translate(-4px, -40px) !important;
+   transform: translate(-6px, -32px) !important;
+   max-height: 480px !important;
+   margin: 0 auto !important;
   }
 
   #section-final .j-panel-glow {
-    transform: translate(-6px, -42px) !important;
+    transform: translate(-8px, -40px) !important;
   }
+   
+ #section-final .final-acoes #btnVoltarInicio {
+  background: rgba(0, 0, 0, 0.65) !important;
+  color: #f6e7c6 !important;
+  border: 2px solid #d4af37 !important;
+  box-shadow: 0 0 18px rgba(212,175,55,0.7) !important;
+  opacity: 0.9 !important;
+}
+
+ #section-final .final-acoes #btnVoltarInicio:hover {
+  opacity: 1 !important;
+  box-shadow: 0 0 26px rgba(212,175,55,0.95) !important;
+}   
 }
 /* ===========================
    VÍDEO FINAL EM TELA CHEIA
