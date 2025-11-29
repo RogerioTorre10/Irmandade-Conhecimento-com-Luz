@@ -1,6 +1,4 @@
-/* section-final.js — FINAL v1.4
- * Controle quase autônomo: layout + datilografia + voz + vídeo cinema
- */
+/* section-final.js — FINAL v1.3 (CORRIGIDO E FUNCIONAL) */
 (function () {
   'use strict';
 
@@ -56,42 +54,12 @@
     return sleep(200);
   }
 
-  // ==============================================
-  // AJUSTE DE LAYOUT DA SEÇÃO FINAL (ALTURA / EIXO)
-  // ==============================================
-  function ensureFinalLayout(section) {
-    if (!section) return;
-
-    // painel com glow
-    const panel = section.querySelector('.j-panel-glow');
-    // pergaminho interno
-    const perg = section.querySelector('.j-perg-v-inner');
-
-    // 🔧 Ajuste fino do painel (subir um pouco no pergaminho)
-    if (panel) {
-      panel.style.position = 'relative';
-      // mexe aqui se quiser subir/descer mais no DESKTOP
-      panel.style.transform = 'translate(-10px, -70px)';
-    }
-
-    if (perg) {
-      // centraliza melhor o pergaminho dentro do painel
-      perg.style.transform = 'translate(-8px, -60px)';
-      // controla a altura máxima do pergaminho pra não “cair”
-      perg.style.maxHeight = '520px';
-      perg.style.margin = '0 auto';
-    }
-  }
-
-  // ==============================================
-  // SEQUÊNCIA FINAL (TÍTULO + PARÁGRAFOS + BOTÕES)
-  // ==============================================
   async function startFinalSequence() {
     if (started) return;
     started = true;
 
     // Reseta qualquer fala pendente de outras seções
-    try { speechSynthesis.cancel(); } catch (e) {}
+    try { speechSynthesis.cancel(); } catch(e) {}
     speechChain = Promise.resolve();
 
     const section   = document.getElementById(SECTION_ID);
@@ -101,15 +69,8 @@
 
     if (!section || !titleEl || !messageEl) return;
 
-    // 🧭 deixa o container final na altura certa do pergaminho
-    ensureFinalLayout(section);
-
     // PREPARA TÍTULO E PARÁGRAFOS
-    const tituloOriginal =
-      titleEl.getAttribute('data-original') ||
-      titleEl.textContent.trim() ||
-      'Gratidão por Caminhar com Luz';
-
+    const tituloOriginal = titleEl.getAttribute('data-original') || titleEl.textContent.trim() || 'Gratidão por Caminhar com Luz';
     titleEl.setAttribute('data-original', tituloOriginal);
     titleEl.textContent = '';
     titleEl.style.opacity = '0';
@@ -135,7 +96,7 @@
     await typeText(titleEl, tituloOriginal, 65, true);
     await sleep(600);
 
-    // PARÁGRAFOS (um por vez: lê + datilografa juntos)
+    // PARÁGRAFOS (um por vez: lê + datilografa juntos, e só passa pro próximo ao fim da leitura)
     for (let i = 0; i < ps.length; i++) {
       const p = ps[i];
       const txt = p.getAttribute('data-original') || '';
@@ -148,7 +109,7 @@
       await sleep(300);
     }
 
-    // BOTÕES APARECEM — só depois de tudo
+    // BOTÕES APARECEM — SEM VÍDEO AUTOMÁTICO
     if (botoes) {
       botoes.style.opacity = '0';
       botoes.style.transform = 'scale(0.9)';
@@ -174,9 +135,6 @@
     console.log('[FINAL] Sequência concluída com sucesso!');
   }
 
-  // ==============================================
-  // GERAÇÃO DE PDF / HQ
-  // ==============================================
   async function generateArtifacts() {
     const btn = document.getElementById('btnBaixarPDFHQ');
     if (!btn || btn.dataset.loading === '1') return;
@@ -209,100 +167,46 @@
     }
   }
 
-  // ==============================================
-  // VÍDEO FINAL — MODO CINEMA + BORDA PULSANTE
-  // ==============================================
   function playFinalVideo() {
-    // remove restos de execuções anteriores
-    document
-      .querySelectorAll('#videoOverlay, #final-video, #final-video-frame')
-      .forEach(el => el.remove());
+    document.querySelectorAll('#videoOverlay, #final-video').forEach(el => el.remove());
 
-    // WRAPPER do cinema
-    const frame = document.createElement('div');
-    frame.id = 'final-video-frame';
-    frame.style.cssText = `
-      position:fixed!important;
-      top:50%!important;
-      left:50%!important;
-      transform:translate(-50%,-50%)!important;
-      width:94vw!important;
-      height:94vh!important;
-      max-width:94vw!important;
-      max-height:94vh!important;
-      z-index:9999999!important;
-      border-radius:22px!important;
-      background:#000!important;
-      box-shadow:0 0 40px rgba(212,175,55,0.9)!important;
-      overflow:hidden!important;
-    `;
+    let video = document.getElementById('final-video');
+    if (!video) {
+      video = document.createElement('video');
+      video.id = 'final-video';
+      video.playsInline = true;
+      video.autoplay = true;
+      video.muted = false;
+      video.preload = 'auto';
+      video.controls = false;
+    }
 
-    // VÍDEO em si
-    const video = document.createElement('video');
-    video.id = 'final-video';
-    video.playsInline = true;
-    video.autoplay = true;
-    video.muted = false;
-    video.preload = 'auto';
-    video.controls = false;
     video.src = VIDEO_SRC + '?t=' + Date.now();
+
     video.style.cssText = `
-      width:100%!important;
-      height:100%!important;
-      object-fit:contain!important;
-      display:block!important;
-      background:#000!important;
+      position: fixed !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      width: 92vw !important;
+      height: 92vh !important;
+      max-width: 92vw !important;
+      max-height: 92vh !important;
+      object-fit: contain !important;
+      z-index: 999999 !important;
+      border: 12px solid #d4af37 !important;
+      border-radius: 16px !important;
+      box-shadow: 0 0 40px rgba(212,175,55,0.9) !important;
+      background: #000 !important;
     `;
 
-    frame.appendChild(video);
-
-    // BARRAS desfocadas (topo e base) simulando “o mesmo filme” nas bordas
-    ['top', 'bottom'].forEach(pos => {
-      const bar = document.createElement('div');
-      bar.style.cssText = `
-        position:absolute!important;
-        left:0!important;
-        right:0!important;
-        ${pos === 'top' ? 'top:0!important;' : 'bottom:0!important;'}
-        height:16vh!important;
-        pointer-events:none!important;
-        background:linear-gradient(
-          ${pos === 'top' ? 'to bottom' : 'to top'},
-          rgba(212,175,55,0.65),
-          rgba(0,0,0,0)
-        )!important;
-        filter:blur(8px)!important;
-        mix-blend-mode:screen!important;
-      `;
-      frame.appendChild(bar);
-    });
-
-    document.body.appendChild(frame);
+    document.body.appendChild(video);
     document.body.style.overflow = 'hidden';
-
     const wrapper = document.getElementById('jornada-content-wrapper');
     if (wrapper) wrapper.style.opacity = '0';
 
-    // BORDA PULSANTE (glow)
-    let pulseUp = true;
-    const pulseInterval = setInterval(() => {
-      if (!frame.isConnected) {
-        clearInterval(pulseInterval);
-        return;
-      }
-      frame.style.boxShadow = pulseUp
-        ? '0 0 90px rgba(212,175,55,1)'
-        : '0 0 40px rgba(212,175,55,0.7)';
-      pulseUp = !pulseUp;
-    }, 700);
-
-    video.onloadeddata = () => console.log('Vídeo carregou dados');
-    video.oncanplay = () => console.log('Vídeo pode tocar');
-    video.onplay = () => console.log('Vídeo tocando!');
-    video.onerror = (e) => console.error('Erro no vídeo:', e);
     video.onended = () => {
-      clearInterval(pulseInterval);
-      frame.remove();
+      video.remove();
       document.body.style.overflow = '';
       location.href = HOME_URL;
     };
@@ -318,9 +222,6 @@
     tentarPlay();
   }
 
-  // ==============================================
-  // EVENTOS GERAIS
-  // ==============================================
   document.addEventListener('section:shown', e => {
     const id = e.detail?.sectionId || e.detail;
     if (id === SECTION_ID) startFinalSequence();
