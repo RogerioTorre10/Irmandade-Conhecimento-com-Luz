@@ -171,16 +171,15 @@
     }
   }
 
- // Vídeo final + redirecionamento cinematográfico
+// Vídeo final + redirecionamento cinematográfico
 function playFinalVideo() {
-  const VIDEO_SRC = '/assets/videos/filme-5-fim-da-jornada.mp4'; // ajusta se precisar
+  console.log('[FINAL] Iniciando vídeo final...');
 
   // Overlay
   let overlay = document.getElementById('final-video-overlay');
   if (!overlay) {
     overlay = document.createElement('div');
     overlay.id = 'final-video-overlay';
-    overlay.className = 'final-video-overlay'; // opcional, se quiser outra classe
     document.body.appendChild(overlay);
   }
 
@@ -192,24 +191,36 @@ function playFinalVideo() {
     video.playsInline = true;
     video.autoplay = true;
     video.controls = false;
-    video.muted = false; // põe true se quiser mudo
-    video.className = 'final-video-frame'; // ✨ aqui entra o efeito de cinema
+    video.muted = false; // deixa true se quiser sem som
+    video.className = 'final-video-frame';
     overlay.appendChild(video);
   }
 
   video.src = VIDEO_SRC;
   video.currentTime = 0;
 
-  // Garante que tente tocar
-  const tryPlay = () => {
-    video.play().catch(err => {
-      console.warn('[FINAL] Não consegui tocar o vídeo automaticamente:', err);
-    });
-  };
-  tryPlay();
+  video.addEventListener('loadedmetadata', () => {
+    console.log('[FINAL] Duração do vídeo:', video.duration);
+  }, { once: true });
+
+  video.addEventListener('play', () => {
+    console.log('[FINAL] Vídeo está tocando.');
+  }, { once: true });
+
+  video.addEventListener('error', (err) => {
+    console.error('[FINAL] Erro ao carregar/tocar o vídeo:', err);
+  }, { once: true });
+
+  // Tenta tocar
+  video.play().catch(err => {
+    console.warn('[FINAL] Não consegui tocar o vídeo automaticamente:', err);
+    // Se o navegador bloquear autoplay, o overlay continua na tela e o vídeo aparece parado
+    // o participante pode tocar manualmente
+  });
 
   // Ao terminar: fade-out + redireciona ao portal
   video.onended = () => {
+    console.log('[FINAL] Vídeo finalizou, retornando ao portal...');
     overlay.style.transition = 'opacity 0.8s ease-out';
     overlay.style.opacity = '0';
 
@@ -217,10 +228,11 @@ function playFinalVideo() {
       if (overlay && overlay.parentNode) {
         overlay.parentNode.removeChild(overlay);
       }
-      window.location.href = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html'; // ou o link do teu portal
+      window.location.href = HOME_URL; // já está definido no topo
     }, 850);
   };
 }
+
 
   document.addEventListener('section:shown', e => {
     const id = e.detail?.sectionId || e.detail;
