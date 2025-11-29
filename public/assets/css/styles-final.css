@@ -241,15 +241,40 @@ body[data-guia="arian"],
   transform: scale(.95) !important;
 }
 
-/* FINAL — remover rolagem interna do painel */
-#section-final .j-panel-body,
-#section-final .j-panel-scroll,
-#section-final .j-panel-inner {
-  max-height: none !important;
-  height: auto !important;
-  overflow-y: visible !important;
+/* =========================================
+   FINAL — SEM SCROLL INTERNO + CENTRALIZADO
+   ========================================= */
+
+#section-final {
+  min-height: 100vh;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 40px 0 60px !important;
 }
 
+/* Desliga qualquer rolagem interna só na seção final */
+#section-final .j-panel,
+#section-final .j-panel-inner,
+#section-final .j-panel-body,
+#section-final .j-panel-scroll,
+#section-final .jornada-scroll,
+#section-final .jornada-inner {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  background: transparent !important;
+}
+
+/* Esconde visualmente qualquer scrollzinho teimoso dentro da Final */
+#section-final * {
+  scrollbar-width: none;
+}
+#section-final *::-webkit-scrollbar {
+  display: none;
+}
+
+/* Centraliza o “cartão final” dentro do painel */
 #section-final .final-card,
 #section-final .j-panel-body {
   width: 100%;
@@ -257,18 +282,30 @@ body[data-guia="arian"],
   flex-direction: column;
   align-items: center;
 }
-/* Overlay de cinema no final */
+
+/* =========================================
+   FINAL — OVERLAY DO VÍDEO CINEMATOGRÁFICO
+   ========================================= */
+
 #final-video-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 99999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(circle at center, rgba(0,0,0,0.45), rgba(0,0,0,0.96));
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 99999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: radial-gradient(circle at center,
+    rgba(0,0,0,0.45),
+    rgba(0,0,0,0.96)
+  ) !important;
 }
 
-/* Moldura do vídeo com blur e brilho pulsante */
+/* Garantir que o vídeo fique visível */
+#final-video {
+  display: block !important;
+}
+
+/* Moldura do vídeo com brilho pulsante */
 .final-video-frame {
   width: min(92vw, 900px);
   max-height: 92vh;
@@ -282,7 +319,6 @@ body[data-guia="arian"],
   animation: finalCinemaGlow 2.6s ease-in-out infinite alternate;
 }
 
-/* Pulso da borda + leve oscilação do blur */
 @keyframes finalCinemaGlow {
   0% {
     box-shadow:
@@ -297,3 +333,4 @@ body[data-guia="arian"],
     filter: blur(2px);
   }
 }
+
