@@ -7,6 +7,7 @@
    ============================== */
 #section-final {
   position: fixed;
+  padding: 40px 0 60px; /* respiro em cima/baixo */
   inset: 0;
   width: 100%;
   height: 100dvh;                 /* viewport dinâmica do mobile */
@@ -240,3 +241,59 @@ body[data-guia="arian"],
   transform: scale(.95) !important;
 }
 
+/* FINAL — remover rolagem interna do painel */
+#section-final .j-panel-body,
+#section-final .j-panel-scroll,
+#section-final .j-panel-inner {
+  max-height: none !important;
+  height: auto !important;
+  overflow-y: visible !important;
+}
+
+#section-final .final-card,
+#section-final .j-panel-body {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+/* Overlay de cinema no final */
+#final-video-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, rgba(0,0,0,0.45), rgba(0,0,0,0.96));
+}
+
+/* Moldura do vídeo com blur e brilho pulsante */
+.final-video-frame {
+  width: min(92vw, 900px);
+  max-height: 92vh;
+  object-fit: contain;
+  border: 10px solid #d4af37;
+  border-radius: 18px;
+  box-shadow:
+    0 0 30px rgba(255, 230, 150, 0.70),
+    0 0 80px rgba(255, 180, 0, 0.55);
+  filter: blur(1px);
+  animation: finalCinemaGlow 2.6s ease-in-out infinite alternate;
+}
+
+/* Pulso da borda + leve oscilação do blur */
+@keyframes finalCinemaGlow {
+  0% {
+    box-shadow:
+      0 0 15px rgba(255, 230, 160, 0.60),
+      0 0 40px rgba(255, 180, 0, 0.45);
+    filter: blur(0.5px);
+  }
+  100% {
+    box-shadow:
+      0 0 45px rgba(255, 250, 200, 0.90),
+      0 0 120px rgba(255, 200, 40, 0.80);
+    filter: blur(2px);
+  }
+}
