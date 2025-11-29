@@ -217,8 +217,7 @@ function playFinalVideo() {
       if (overlay && overlay.parentNode) {
         overlay.parentNode.removeChild(overlay);
       }
-      window.location.href = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
-; // ou o link do teu portal
+      window.location.href = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html'; // ou o link do teu portal
     }, 850);
   };
 }
