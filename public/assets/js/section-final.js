@@ -171,62 +171,57 @@
     }
   }
 
-  function playFinalVideo() {
-    document.querySelectorAll('#videoOverlay, #final-video').forEach(el => el.remove());
+ // Vídeo final + redirecionamento cinematográfico
+function playFinalVideo() {
+  const VIDEO_SRC = '/assets/videos/filme-5-fim-da-jornada.mp4'; // ajusta se precisar
 
-    let video = document.getElementById('final-video');
-    if (!video) {
-      video = document.createElement('video');
-      video.id = 'final-video';
-      video.playsInline = true;
-      video.autoplay = true;
-      video.muted = false;
-      video.preload = 'auto';
-      video.controls = false;
-    }
-
-    video.src = VIDEO_SRC + '?t=' + Date.now();
-
-    video.style.cssText = `
-      position: fixed !important;
-      top: 50% !important;
-      left: 50% !important;
-      transform: translate(-50%, -50%) !important;
-      width: 92vw !important;
-      height: 92vh !important;
-      max-width: 92vw !important;
-      max-height: 92vh !important;
-      object-fit: contain !important;
-      z-index: 999999 !important;
-      border: 12px solid #d4af37 !important;
-      border-radius: 16px !important;
-      box-shadow: 0 0 40px rgba(212,175,55,0.9) !important;
-      background: #000 !important;
-    `;
-
-    document.body.appendChild(video);
-    document.body.style.overflow = 'hidden';
-    const wrapper = document.getElementById('jornada-content-wrapper');
-    if (wrapper) wrapper.style.opacity = '0';
-
-    video.onended = () => {
-    video.remove();
-    try {
-    document.body.classList.remove('final-lock');
-    } catch (e) {}
-    location.href = HOME_URL;
-   };    
-
-    const tentarPlay = () => {
-      video.play().then(() => {
-        console.log('Vídeo rodando com glória!');
-      }).catch(err => {
-        console.warn('Play falhou, tentando de novo...', err);
-        setTimeout(tentarPlay, 500);
-      });
-    };
-    tentarPlay();
+  // Overlay
+  let overlay = document.getElementById('final-video-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'final-video-overlay';
+    overlay.className = 'final-video-overlay'; // opcional, se quiser outra classe
+    document.body.appendChild(overlay);
   }
+
+  // Vídeo
+  let video = document.getElementById('final-video');
+  if (!video) {
+    video = document.createElement('video');
+    video.id = 'final-video';
+    video.playsInline = true;
+    video.autoplay = true;
+    video.controls = false;
+    video.muted = false; // põe true se quiser mudo
+    video.className = 'final-video-frame'; // ✨ aqui entra o efeito de cinema
+    overlay.appendChild(video);
+  }
+
+  video.src = VIDEO_SRC;
+  video.currentTime = 0;
+
+  // Garante que tente tocar
+  const tryPlay = () => {
+    video.play().catch(err => {
+      console.warn('[FINAL] Não consegui tocar o vídeo automaticamente:', err);
+    });
+  };
+  tryPlay();
+
+  // Ao terminar: fade-out + redireciona ao portal
+  video.onended = () => {
+    overlay.style.transition = 'opacity 0.8s ease-out';
+    overlay.style.opacity = '0';
+
+    setTimeout(() => {
+      if (overlay && overlay.parentNode) {
+        overlay.parentNode.removeChild(overlay);
+      }
+      window.location.href = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
+; // ou o link do teu portal
+    }, 850);
+  };
+}
 
   document.addEventListener('section:shown', e => {
     const id = e.detail?.sectionId || e.detail;
