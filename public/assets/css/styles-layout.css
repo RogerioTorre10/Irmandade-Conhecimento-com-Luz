@@ -610,19 +610,19 @@ body.guia-arion #section-perguntas .btn.btn-stone {
 /* Desktop */
 @media (min-width: 900px) {
   #section-final.j-screen-vert .j-perg-v-inner {
-    transform: translate(-12px, -80px) !important;  /* sobe o pergaminho */
+    transform: translate(-14px, -90px) !important;  /* sobe o pergaminho */
   }
 
   #section-final.j-screen-vert .j-panel-glow {
-    transform: translate(-16px, -80px) !important;  /* acompanha o vidro */
+    transform: translate(-16px, -90px) !important;  /* acompanha o vidro */
   }
 
    #section-final .j-panel-glow {
-    transform: translate(-16px, -70px) !important; /* sobe o vidro */
+    transform: translate(-16px, -90px) !important; /* sobe o vidro */
   }
 
   #section-final .j-perg-v-inner {
-    transform: translate(-12px, -50px) !important; /* ajusta pergaminho interno */
+    transform: translate(-14px, -90px) !important; /* ajusta pergaminho interno */
     max-height: 520px !important;
     margin: 0 auto !important;
   }
