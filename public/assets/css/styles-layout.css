@@ -724,6 +724,10 @@ body.is-playing-final-video #btn-voltar-portal {
   opacity: 0 !important;
   pointer-events: none !important;
 }
+   
+body.final-lock {
+  overflow-y: hidden;   /* some a barra de rolagem vertical */
+}
 
 
 
