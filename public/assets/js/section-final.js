@@ -58,6 +58,10 @@
     if (started) return;
     started = true;
 
+    try {
+    document.body.classList.add('final-lock');
+  } catch (e) {}
+    
     // Reseta qualquer fala pendente de outras seções
     try { speechSynthesis.cancel(); } catch(e) {}
     speechChain = Promise.resolve();
@@ -206,10 +210,12 @@
     if (wrapper) wrapper.style.opacity = '0';
 
     video.onended = () => {
-      video.remove();
-      document.body.style.overflow = '';
-      location.href = HOME_URL;
-    };
+    video.remove();
+    try {
+    document.body.classList.remove('final-lock');
+    } catch (e) {}
+    location.href = HOME_URL;
+   };    
 
     const tentarPlay = () => {
       video.play().then(() => {
