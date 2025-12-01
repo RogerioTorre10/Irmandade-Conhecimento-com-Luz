@@ -228,30 +228,37 @@
     }
   }
 
-  // ----------------------- VÍDEO DE SAÍDA -----------------------
+ // ----------------------- VÍDEO DE SAÍDA (PORTAL) -----------------------
+let finalReturning = false;
 
-  function handleVoltarInicio() {
-    console.log('[FINAL] Voltar ao Início acionado.');
-
-    const finalMovie = '/assets/videos/filme-5-fim-da-jornada.mp4';
-
-    // 1) Preferência: player de transição oficial
-    if (typeof window.playTransitionVideo === 'function') {
-      window.playTransitionVideo(finalMovie, null); // nextSectionId null → volta via portal
-      return;
-    }
-
-    // 2) Fallback: player global cinematográfico
-    if (typeof window.playVideo === 'function') {
-      window.playVideo(finalMovie, {
-        onEnded: () => window.location.href = HOME_URL
-      });
-      return;
-    }
-
-    // 3) Fallback final: sem vídeo
-    window.location.href = HOME_URL;
+function handleVoltarInicio() {
+  if (finalReturning) {
+    console.log('[FINAL] Voltar ao Início já em andamento, ignorando clique extra.');
+    return;
   }
+  finalReturning = true;
+
+  console.log('[FINAL] Voltar ao Início acionado.');
+
+  const finalMovie = '/assets/videos/filme-5-fim-da-jornada.mp4';
+
+  // 1) PREFERENCIAL: player cinematográfico global
+  if (typeof window.playVideo === 'function') {
+    window.playVideo(finalMovie, {
+      useGoldBorder: true,
+      pulse: true,
+      onEnded: () => {
+        console.log('[FINAL] Vídeo final concluído, redirecionando para portal.html...');
+        window.location.href = HOME_URL;
+      }
+    });
+    return;
+  }
+
+  // 2) FALLBACK: sem vídeo, vai direto pro portal
+  window.location.href = HOME_URL;
+}
+
 
   // ----------------------- EVENTOS -----------------------
 
