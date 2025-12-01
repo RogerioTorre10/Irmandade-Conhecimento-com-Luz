@@ -393,52 +393,70 @@ window.playBlockTransition = function(videoSrc, onDone) {
 
 
   function finishAll() {
-    if (completed) return;
-    completed = true;
+  if (completed) return;
+  completed = true;
 
-    const finishedAt = new Date().toISOString();
-    const guia = window.JC?.state?.guia || {};
-    const selfie = window.__SELFIE_DATA_URL__ || null;
+  const finishedAt = new Date().toISOString();
+  const guia = window.JC?.state?.guia || {};
+  const selfie = window.__SELFIE_DATA_URL__ || null;
 
-    State.meta = {
-      startedAt: State.startedAt,
-      finishedAt,
-      guia,
-      selfieUsed: !!selfie,
-      version: window.APP_CONFIG?.version || 'v1'
-    };
+  State.meta = {
+    startedAt: State.startedAt,
+    finishedAt,
+    guia,
+    selfieUsed: !!selfie,
+    version: window.APP_CONFIG?.version || 'v1'
+  };
 
-    window.__QA_ANSWERS__ = State.answers;
-    window.__QA_META__ = State.meta;
+  window.__QA_ANSWERS__ = State.answers;
+  window.__QA_META__    = State.meta;
 
-    log('Jornada de perguntas concluída.', {
-      total: State.totalQuestions,
-      respondidas: Object.keys(State.answers).length
-    });
+  log('Jornada de perguntas concluída.', {
+    total: State.totalQuestions,
+    respondidas: Object.keys(State.answers).length
+  });
 
-    if (window.JORNADA_CHAMA) {
-      window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'forte');
-    }
+  // Intensifica a chama da etapa de perguntas
+  if (window.JORNADA_CHAMA) {
+    window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'forte');
+  }
 
-    const finalVideoSrc = resolveVideoSrc(
-      window.JORNADA_FINAL_VIDEO || FINAL_VIDEO_FALLBACK
-    );
+  // ---------------- VÍDEO FINAL + NAVEGAÇÃO ----------------
+  const finalVideoSrc = window.JORNADA_FINAL_VIDEO || FINAL_VIDEO_FALLBACK;
+  const targetSectionId = FINAL_SECTION_ID; // 'section-final'
 
-    if (finalVideoSrc) {
-      log('Iniciando vídeo final:', finalVideoSrc);
-      playVideoWithCallback(finalVideoSrc, showFinalSection);
+  if (finalVideoSrc && typeof window.playTransitionVideo === 'function') {
+    // Usa o portal dourado cinematográfico e, ao terminar, navega para section-final
+    log('Iniciando vídeo final (portal → section-final):', finalVideoSrc);
+    window.playTransitionVideo(finalVideoSrc, targetSectionId);
+  } else {
+    // Sem player de transição: cai direto na página final
+    log('Sem vídeo de transição final; indo direto para section-final');
+
+    if (window.JC && typeof window.JC.show === 'function') {
+      window.JC.show(targetSectionId);
     } else {
-      showFinalSection();
-    }
-
-    try {
-      document.dispatchEvent(new CustomEvent('qa:completed', {
-        detail: { answers: State.answers, meta: State.meta }
-      }));
-    } catch (e) {
-      warn('Falha ao disparar qa:completed:', e);
+      // Fallback bruto: mostra só a section-final
+      document.querySelectorAll('section.section').forEach(sec => {
+        sec.style.display = (sec.id === targetSectionId) ? 'block' : 'none';
+      });
+      const finalEl = document.getElementById(targetSectionId);
+      if (finalEl) {
+        finalEl.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   }
+
+  // Dispara evento de conclusão (mantido)
+  try {
+    document.dispatchEvent(new CustomEvent('qa:completed', {
+      detail: { answers: State.answers, meta: State.meta }
+    }));
+  } catch (e) {
+    warn('Falha ao disparar qa:completed:', e);
+  }
+}
+
 
   // --------------------------------------------------
   // BIND UI
