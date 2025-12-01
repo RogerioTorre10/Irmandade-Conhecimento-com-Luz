@@ -278,4 +278,13 @@
     }
   });
 
+  // ------------------ EVENTO QUE DISPARA A PÁGINA FINAL ------------------
+document.addEventListener('section:shown', e => {
+  const id = e.detail?.sectionId || e.detail;
+  if (id === SECTION_ID) {
+    console.log('[FINAL] section:shown recebido para section-final, iniciando sequência...');
+    startFinalSequence();
+  }
+});
+
 })();
