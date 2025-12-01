@@ -1,33 +1,44 @@
-/* section-final.js — FINAL v3.1 (blindado: voz + datilografia + PDF/HQ + vídeo externo) */
+/* /assets/js/section-final.js — v5
+ * Página final da Jornada Essencial
+ * - Datilografia + voz
+ * - Botões de PDF/HQ
+ * - Vídeo final de retorno ao portal usando player global
+ */
+
 (function () {
   'use strict';
 
-  const SECTION_ID = 'section-final';
-  const HOME_URL   = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
+  const SECTION_ID   = 'section-final';
+  const HOME_URL     = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
+  const FINAL_MOVIE  = '/assets/videos/filme-5-fim-da-jornada.mp4';
 
-  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  let started = false;
 
-  // ----------------------- VOZ + DATILOGRAFIA -----------------------
+  // Utilitário de pausa
+  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  // Fila de fala: garante que um parágrafo termina antes do outro
   let speechChain = Promise.resolve();
 
   function queueSpeak(text) {
-    if (!window.speechSynthesis || !text) return Promise.resolve();
-    speechChain = speechChain.then(() => new Promise(resolve => {
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang   = 'pt-BR';
-      u.rate   = 0.9;
-      u.pitch  = 1;
-      u.volume = 0.9;
-      u.onend   = resolve;
-      u.onerror = resolve;
-      speechSynthesis.speak(u);
+    if (!('speechSynthesis' in window) || !text) return Promise.resolve();
+
+    speechChain = speechChain.then(() => new Promise((resolve) => {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang   = 'pt-BR';
+      utter.rate   = 0.9;
+      utter.pitch  = 1;
+      utter.volume = 0.9;
+      utter.onend  = resolve;
+      utter.onerror = resolve;
+      window.speechSynthesis.speak(utter);
     }));
+
     return speechChain;
   }
 
   async function typeText(el, text, delay = 55, withVoice = false) {
     if (!el || !text) return;
-
     el.textContent = '';
     el.style.opacity = '1';
     el.classList.add('typing-active');
@@ -37,7 +48,11 @@
 
     for (let i = 0; i < text.length; i++) {
       el.textContent += text[i];
-      if (i % 2 === 0) await sleep(delay);
+      if (i % 2 === 0) {
+        // pequena pausa para não pesar
+        // eslint-disable-next-line no-await-in-loop
+        await sleep(delay);
+      }
     }
 
     await speechPromise;
@@ -47,114 +62,40 @@
     await sleep(200);
   }
 
-  // ----------------------- GARANTIR DOM FINAL -----------------------
-
   function ensureFinalDOM() {
     const section = document.getElementById(SECTION_ID);
-    if (!section) return { section: null, titleEl: null, msgEl: null, botoes: null };
+    if (!section) return {};
 
-    // container principal
-    let container =
-      section.querySelector('.final-container') ||
-      section.querySelector('.final-pergaminho-wrap') ||
-      section.querySelector('.final-inner');
-
-    if (!container) {
-      container = document.createElement('div');
-      container.className = 'final-container';
-      section.appendChild(container);
-    }
-
-    // título
-    let titleEl = document.getElementById('final-title');
-    if (!titleEl) {
-      titleEl = document.createElement('h2');
-      titleEl.id = 'final-title';
-      titleEl.dataset.original = 'Gratidão por Caminhar com Luz';
-      container.appendChild(titleEl);
-    } else if (!titleEl.dataset.original && !titleEl.textContent.trim()) {
-      titleEl.dataset.original = 'Gratidão por Caminhar com Luz';
-    }
-
-    // mensagem
-    let msgEl = document.getElementById('final-message');
-    if (!msgEl) {
-      msgEl = document.createElement('div');
-      msgEl.id = 'final-message';
-      container.appendChild(msgEl);
-    }
-
-    // se não houver parágrafos, cria dois padrão
-    let ps = msgEl.querySelectorAll('p');
-    if (!ps.length) {
-      const p1 = document.createElement('p');
-      p1.dataset.original = 'Suas respostas foram recebidas com honra pela Irmandade.';
-      msgEl.appendChild(p1);
-
-      const p2 = document.createElement('p');
-      p2.dataset.original = 'Você ativou sementes de confiança, coragem e luz.';
-      msgEl.appendChild(p2);
-
-      ps = msgEl.querySelectorAll('p');
-    } else {
-      ps.forEach(p => {
-        if (!p.dataset.original) {
-          const txt = p.textContent.trim();
-          if (txt) p.dataset.original = txt;
-        }
-      });
-    }
-
-    // ações
-    let botoes =
-      section.querySelector('.final-acoes') ||
-      section.querySelector('.final-actions');
-
-    if (!botoes) {
-      botoes = document.createElement('div');
-      botoes.className = 'final-acoes';
-      container.appendChild(botoes);
-    }
-
-    // botão PDF/HQ
-    let btnPDF = document.getElementById('btnBaixarPDFHQ');
-    if (!btnPDF) {
-      btnPDF = document.createElement('button');
-      btnPDF.id = 'btnBaixarPDFHQ';
-      btnPDF.className = 'btn btn-stone';
-      btnPDF.textContent = 'Baixar PDF / HQ';
-      botoes.appendChild(btnPDF);
-    }
-
-    // botão voltar
-    let btnVoltar = document.getElementById('btnVoltarInicio');
-    if (!btnVoltar) {
-      btnVoltar = document.createElement('button');
-      btnVoltar.id = 'btnVoltarInicio';
-      btnVoltar.className = 'btn btn-gold';
-      btnVoltar.textContent = 'Voltar ao Início';
-      botoes.appendChild(btnVoltar);
-    }
+    const titleEl   = section.querySelector('#final-title');
+    const msgEl     = section.querySelector('#final-message');
+    const botoes    = section.querySelector('.final-acoes');
 
     return { section, titleEl, msgEl, botoes };
   }
 
-  // ----------------------- SEQUÊNCIA FINAL -----------------------
-
-  let started = false;
-
+  // ------------------------ SEQUÊNCIA FINAL ------------------------
   async function startFinalSequence() {
     if (started) return;
     started = true;
 
-    try { speechSynthesis.cancel(); } catch {}
+    try { speechSynthesis.cancel(); } catch (e) {}
+    speechChain = Promise.resolve();
 
     const { section, titleEl, msgEl, botoes } = ensureFinalDOM();
-    if (!section || !titleEl || !msgEl || !botoes) return;
+    if (!section || !titleEl || !msgEl) return;
 
-    const titulo = titleEl.dataset.original || titleEl.textContent.trim() || 'Gratidão por Caminhar com Luz';
+    // Garante que a seção esteja visível (mesmo que tenha vindo com style="display:none")
+    section.style.display = 'block';
+
+    const tituloOriginal =
+      titleEl.dataset.original ||
+      titleEl.textContent.trim() ||
+      'Gratidão por Caminhar com Luz';
+
+    titleEl.dataset.original = tituloOriginal;
     titleEl.textContent = '';
     titleEl.style.opacity = 0;
+    titleEl.style.transform = 'translateY(-16px)';
 
     const ps = msgEl.querySelectorAll('p');
     ps.forEach(p => {
@@ -162,36 +103,60 @@
       p.dataset.original = txt;
       p.textContent = '';
       p.style.opacity = 0;
+      p.style.transform = 'translateY(10px)';
+      p.classList.remove('revealed');
     });
 
+    section.classList.add('show');
     await sleep(200);
 
-    // título
-    titleEl.style.transition = 'all .9s ease';
+    // TÍTULO
+    titleEl.style.transition = 'all 0.9s ease';
     titleEl.style.opacity = 1;
-    await typeText(titleEl, titulo, 65, true);
-    await sleep(400);
+    titleEl.style.transform = 'translateY(0)';
+    await typeText(titleEl, tituloOriginal, 65, true);
+    await sleep(600);
 
-    // parágrafos
-    for (const p of ps) {
-      p.style.transition = 'all .8s ease';
+    // PARÁGRAFOS (um por vez)
+    for (let i = 0; i < ps.length; i++) {
+      const p = ps[i];
+      const txt = p.dataset.original || '';
+      if (!txt) continue;
+      p.style.transition = 'all 0.8s ease';
       p.style.opacity = 1;
-      await typeText(p, p.dataset.original, 55, true);
-      await sleep(200);
+      p.style.transform = 'translateY(0)';
+      // eslint-disable-next-line no-await-in-loop
+      await typeText(p, txt, 55, true);
+      p.classList.add('revealed');
+      // eslint-disable-next-line no-await-in-loop
+      await sleep(300);
     }
 
-    // botões
-    botoes.style.opacity = 0;
-    botoes.style.transform = 'scale(0.9)';
-    botoes.style.transition = 'all .8s ease';
-    await sleep(300);
-    botoes.classList.add('show');
-    botoes.style.opacity = 1;
-    botoes.style.transform = 'scale(1)';
+    // BOTÕES
+    if (botoes) {
+      botoes.style.opacity = '0';
+      botoes.style.transform = 'scale(0.9)';
+      botoes.style.transition = 'all 0.8s ease';
+      botoes.style.pointerEvents = 'none';
+
+      await sleep(400);
+
+      botoes.classList.add('show');
+      botoes.style.opacity = '1';
+      botoes.style.transform = 'scale(1)';
+
+      botoes.querySelectorAll('button, a').forEach(el => {
+        el.disabled = false;
+        el.classList.remove('disabled');
+        el.removeAttribute('aria-disabled');
+        el.style.pointerEvents = 'auto';
+      });
+    }
+
+    console.log('[FINAL] Sequência concluída com sucesso!');
   }
 
-  // ----------------------- PDF / HQ -----------------------
-
+  // ------------------------ PDF / HQ ------------------------
   async function generateArtifacts() {
     const btn = document.getElementById('btnBaixarPDFHQ');
     if (!btn || btn.dataset.loading === '1') return;
@@ -206,21 +171,21 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          answers: window.JornadaAnswers || {},
-          meta: { finishedAt: new Date().toISOString() },
+          answers: window.JornadaAnswers || window.__QA_ANSWERS__ || { teste: 'finalizado' },
+          meta: window.__QA_META__ || { finishedAt: new Date().toISOString() },
           lang: 'pt-BR'
         })
       });
 
       const data = await res.json().catch(() => ({}));
       if (data.pdfUrl) window.open(data.pdfUrl, '_blank');
-      if (data.hqUrl)  window.open(data.hqUrl, '_blank');
+      if (data.hqUrl) window.open(data.hqUrl, '_blank');
       if (!data.pdfUrl && !data.hqUrl) {
-        alert('PDF/HQ estarão disponíveis em instantes.');
+        alert('Jornada concluída! PDF/HQ em breve disponível.');
       }
     } catch (e) {
       console.error('[FINAL] Erro ao gerar PDF/HQ:', e);
-      alert('Erro temporário. Tente novamente em alguns segundos.');
+      alert('Erro temporário. Tente novamente em alguns instantes.');
     } finally {
       btn.textContent = original;
       btn.disabled = false;
@@ -228,47 +193,64 @@
     }
   }
 
- // ----------------------- VÍDEO DE SAÍDA (PORTAL) -----------------------
-let finalReturning = false;
+  // ------------------------ VÍDEO DE SAÍDA ------------------------
+  let finalReturning = false;
 
-function handleVoltarInicio() {
-  if (finalReturning) {
-    console.log('[FINAL] Voltar ao Início já em andamento, ignorando clique extra.');
-    return;
-  }
-  finalReturning = true;
+  function handleVoltarInicio() {
+    if (finalReturning) {
+      console.log('[FINAL] Voltar ao Início já em andamento, ignorando clique extra.');
+      return;
+    }
+    finalReturning = true;
 
-  console.log('[FINAL] Voltar ao Início acionado.');
+    console.log('[FINAL] Voltar ao Início acionado.');
 
-  const finalMovie = '/assets/videos/filme-5-fim-da-jornada.mp4';
+    const src = FINAL_MOVIE;
 
-  // 1) PREFERENCIAL: player cinematográfico global
-  if (typeof window.playVideo === 'function') {
-    window.playVideo(finalMovie, {
-      useGoldBorder: true,
-      pulse: true,
-      onEnded: () => {
-        console.log('[FINAL] Vídeo final concluído, redirecionando para portal.html...');
+    // Player cinematográfico global
+    if (typeof window.playVideo === 'function') {
+      window.playVideo(src, {
+        useGoldBorder: true,
+        pulse: true,
+        onEnded: () => {
+          console.log('[FINAL] Vídeo final concluído, redirecionando para portal...');
+          window.location.href = HOME_URL;
+        }
+      });
+      return;
+    }
+
+    // Fallback: usa playTransitionVideo se existir
+    if (typeof window.playTransitionVideo === 'function') {
+      window.playTransitionVideo(src, null);
+      setTimeout(() => {
         window.location.href = HOME_URL;
-      }
-    });
-    return;
+      }, 16000); // tempo aproximado de segurança
+      return;
+    }
+
+    // Fallback bruto: sem vídeo
+    window.location.href = HOME_URL;
   }
 
-  // 2) FALLBACK: sem vídeo, vai direto pro portal
-  window.location.href = HOME_URL;
-}
+  // ------------------------ EVENTOS ------------------------
 
-
-  // ----------------------- EVENTOS -----------------------
-
+  // Quando o JC disser que a section-final foi mostrada
   document.addEventListener('section:shown', e => {
     const id = e.detail?.sectionId || e.detail;
-    if (id === SECTION_ID) {
-      startFinalSequence();
+    if (id !== SECTION_ID) return;
+
+    console.log('[FINAL] section:shown recebido para section-final, iniciando sequência...');
+
+    const sec = document.getElementById(SECTION_ID);
+    if (sec) {
+      sec.style.display = 'block';
     }
+
+    startFinalSequence();
   });
 
+  // Clicks nos botões
   document.addEventListener('click', e => {
     const t = e.target;
 
@@ -281,17 +263,20 @@ function handleVoltarInicio() {
     if (t.id === 'btnVoltarInicio' || t.closest('#btnVoltarInicio')) {
       e.preventDefault();
       handleVoltarInicio();
-      return;
     }
   });
 
-  // ------------------ EVENTO QUE DISPARA A PÁGINA FINAL ------------------
-document.addEventListener('section:shown', e => {
-  const id = e.detail?.sectionId || e.detail;
-  if (id === SECTION_ID) {
-    console.log('[FINAL] section:shown recebido para section-final, iniciando sequência...');
-    startFinalSequence();
-  }
-});
+  // Fallback: se a página carregar já com a final visível (debug etc.)
+  document.addEventListener('DOMContentLoaded', () => {
+    const sec = document.getElementById(SECTION_ID);
+    if (!sec) return;
+
+    const visible = sec.classList.contains('show') ||
+                    getComputedStyle(sec).display !== 'none';
+
+    if (visible) {
+      startFinalSequence();
+    }
+  });
 
 })();
