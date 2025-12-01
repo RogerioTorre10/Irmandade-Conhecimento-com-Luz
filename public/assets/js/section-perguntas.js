@@ -416,38 +416,31 @@ window.playBlockTransition = function(videoSrc, onDone) {
     respondidas: Object.keys(State.answers).length
   });
 
-  // Intensifica a chama da etapa de perguntas
   if (window.JORNADA_CHAMA) {
     window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'forte');
   }
 
-  // ---------------- VÍDEO FINAL + NAVEGAÇÃO ----------------
-  const finalVideoSrc = window.JORNADA_FINAL_VIDEO || FINAL_VIDEO_FALLBACK;
+  // ---------------- VÍDEO FINAL + NAVEGAÇÃO ---------------- 
+  const finalVideoSrc   = window.JORNADA_FINAL_VIDEO || FINAL_VIDEO_FALLBACK;
   const targetSectionId = FINAL_SECTION_ID; // 'section-final'
 
   if (finalVideoSrc && typeof window.playTransitionVideo === 'function') {
-    // Usa o portal dourado cinematográfico e, ao terminar, navega para section-final
     log('Iniciando vídeo final (portal → section-final):', finalVideoSrc);
     window.playTransitionVideo(finalVideoSrc, targetSectionId);
   } else {
-    // Sem player de transição: cai direto na página final
     log('Sem vídeo de transição final; indo direto para section-final');
 
     if (window.JC && typeof window.JC.show === 'function') {
       window.JC.show(targetSectionId);
     } else {
-      // Fallback bruto: mostra só a section-final
       document.querySelectorAll('section.section').forEach(sec => {
         sec.style.display = (sec.id === targetSectionId) ? 'block' : 'none';
       });
       const finalEl = document.getElementById(targetSectionId);
-      if (finalEl) {
-        finalEl.scrollIntoView({ behavior: 'smooth' });
-      }
+      if (finalEl) finalEl.scrollIntoView({ behavior: 'smooth' });
     }
   }
 
-  // Dispara evento de conclusão (mantido)
   try {
     document.dispatchEvent(new CustomEvent('qa:completed', {
       detail: { answers: State.answers, meta: State.meta }
@@ -456,6 +449,7 @@ window.playBlockTransition = function(videoSrc, onDone) {
     warn('Falha ao disparar qa:completed:', e);
   }
 }
+
 
 
   // --------------------------------------------------
