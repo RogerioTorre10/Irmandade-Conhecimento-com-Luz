@@ -446,26 +446,22 @@ function ensureFinalSectionExists() {
 
 
   function showFinalSection() {
-    const finalEl = ensureFinalSectionExists();
+  // garante que a final exista (HTML ou fallback)
+  ensureFinalSectionExists();
 
-    const wrapper = document.getElementById('jornada-content-wrapper');
-    if (wrapper) {
-      // limpa tudo que está dentro e deixa só a final
-      wrapper.innerHTML = '';
-      wrapper.appendChild(finalEl);
-    }
-
-    // Fluxo oficial controlado pelo JC
-    if (window.JC && typeof window.JC.show === 'function') {
-      window.JC.show(FINAL_SECTION_ID);
-    } else {
-      // Fallback simples
-      document.querySelectorAll('section.section').forEach(sec => {
-        sec.style.display = (sec.id === FINAL_SECTION_ID) ? 'block' : 'none';
-      });
-      finalEl.scrollIntoView({ behavior: 'smooth' });
-    }
+  // Fluxo oficial controlado pelo JC
+  if (window.JC && typeof window.JC.show === 'function') {
+    window.JC.show(FINAL_SECTION_ID);
+  } else {
+    // Fallback simples (sem JC)
+    document.querySelectorAll('section.section').forEach(sec => {
+      sec.style.display = (sec.id === FINAL_SECTION_ID) ? 'block' : 'none';
+    });
+    const finalEl = document.getElementById(FINAL_SECTION_ID);
+    if (finalEl) finalEl.scrollIntoView({ behavior: 'smooth' });
   }
+}
+
 
   function finishAll() {
     if (completed) return;
