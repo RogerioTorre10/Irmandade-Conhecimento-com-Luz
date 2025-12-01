@@ -395,40 +395,38 @@ window.playBlockTransition = function(videoSrc, onDone) {
   // FINALIZAÇÃO — FALLBACK LIMPO PARA SECTION-FINAL
   // --------------------------------------------------
 
-  function ensureFinalSectionExists() {
-    let finalEl = document.getElementById(FINAL_SECTION_ID);
+  // Fallback FINAL — usa o HTML real fornecido
+function ensureFinalSectionExists() {
+  let finalEl = document.getElementById("section-final");
 
-    if (finalEl) {
-      log('section-final já existe, usando versão existente.');
-      return finalEl;
-    }
-
-    // Cria a seção final com o mesmo layout da section-final.html
-    finalEl = document.createElement('section');
-    finalEl.id = FINAL_SECTION_ID;
-    finalEl.className = 'section section-final';
-    finalEl.dataset.section = 'final';
+  if (!finalEl) {
+    finalEl = document.createElement("section");
+    finalEl.id = "section-final";
+    finalEl.className = "section section-final";
+    finalEl.style.display = "none";
 
     finalEl.innerHTML = `
       <div class="final-pergaminho-wrapper">
-        <div class="pergaminho-vertical">
-          <div class="pergaminho-content">
+        <div class="j-panel-glow final-panel">
+          <div class="j-perg-v-inner">
+            <div class="pergaminho-content">
 
-            <h1 id="final-title" class="final-title"></h1>
+              <h1 id="final-title" class="final-title typing-text"></h1>
 
-            <div id="final-message" class="final-message">
-              <p>Suas respostas foram recebidas com honra pela Irmandade.</p>
-              <p>Você plantou sementes de confiança, coragem e luz.</p>
-              <p>Continue caminhando. A jornada nunca termina.</p>
-              <p>Volte quando precisar reacender a chama.</p>
-              <p class="final-bold">Você é a luz. Você é a mudança.</p>
+              <div id="final-message" class="final-message">
+                <p data-original="Suas respostas foram recebidas com honra pela Irmandade."></p>
+                <p data-original="Você plantou sementes de confiança, coragem e luz."></p>
+                <p data-original="Continue caminhando. A jornada nunca termina."></p>
+                <p data-original="Volte quando precisar reacender a chama."></p>
+                <p class="final-bold" data-original="Você é a luz. Você é a mudança."></p>
+              </div>
+
+              <div class="final-acoes">
+                <button id="btnBaixarPDFHQ" class="btn btn-gold" disabled>✅Baixar PDF e HQ</button>
+                <button id="btnVoltarInicio" class="btn btn-light">🙏Voltar ao Início🚀</button>
+              </div>
+
             </div>
-
-            <div class="final-acoes">
-              <button id="btnBaixarPDFHQ" class="btn btn-gold" disabled>Baixar PDF e HQ</button>
-              <button id="btnVoltarInicio" class="btn btn-light">Voltar ao Início</button>
-            </div>
-
           </div>
         </div>
       </div>
@@ -436,12 +434,12 @@ window.playBlockTransition = function(videoSrc, onDone) {
       <video id="final-video" playsinline preload="auto" style="display:none;"></video>
     `;
 
-    const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
-    wrapper.appendChild(finalEl);
-
-    log('section-final criada com HTML completo (fallback FINAL).');
-    return finalEl;
+    document.getElementById("jornada-content-wrapper")?.appendChild(finalEl);
   }
+
+  return finalEl;
+}
+
 
   function showFinalSection() {
     const finalEl = ensureFinalSectionExists();
