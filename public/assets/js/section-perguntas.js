@@ -393,9 +393,7 @@ window.playBlockTransition = function(videoSrc, onDone) {
 
      // --------------------------------------------------
   // FINALIZAÇÃO — FALLBACK LIMPO PARA SECTION-FINAL
-  // --------------------------------------------------
-
-  // Fallback FINAL — usa o HTML real fornecido
+  // --------------------------------------------------  
 function ensureFinalSectionExists() {
   let finalEl = document.getElementById("section-final");
 
@@ -403,7 +401,6 @@ function ensureFinalSectionExists() {
     finalEl = document.createElement("section");
     finalEl.id = "section-final";
     finalEl.className = "section section-final";
-    finalEl.style.display = "none";
 
     finalEl.innerHTML = `
       <div class="final-pergaminho-wrapper">
@@ -434,11 +431,13 @@ function ensureFinalSectionExists() {
       <video id="final-video" playsinline preload="auto" style="display:none;"></video>
     `;
 
-    document.getElementById("jornada-content-wrapper")?.appendChild(finalEl);
+    const wrapper = document.getElementById("jornada-content-wrapper");
+    if (wrapper) wrapper.appendChild(finalEl);
   }
 
   return finalEl;
 }
+
 
 
   function showFinalSection() {
