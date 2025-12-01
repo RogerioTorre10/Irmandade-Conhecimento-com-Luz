@@ -1,14 +1,16 @@
-/* section-final.js — FINAL v1.3 (CORRIGIDO E FUNCIONAL) */
+/* section-final.js — FINAL v2.0 (voz + datilografia + PDF/HQ + vídeo externo) */
 (function () {
   'use strict';
 
   const SECTION_ID = 'section-final';
-  const VIDEO_SRC = '/assets/videos/filme-5-fim-da-jornada.mp4';
-  const HOME_URL = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
+  const HOME_URL   = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
 
   let started = false;
 
-  // Utilitário de pausa (necessário para datilografia / efeitos)
+  // ---------------------------------------
+  // Utilitários
+  // ---------------------------------------
+
   const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
   // Fila de fala: garante sincronismo da leitura por parágrafo
@@ -19,11 +21,11 @@
 
     speechChain = speechChain.then(() => new Promise((resolve) => {
       const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = 'pt-BR';
-      utter.rate = 0.9;
-      utter.pitch = 1;
+      utter.lang   = 'pt-BR';
+      utter.rate   = 0.9;
+      utter.pitch  = 1;
       utter.volume = 0.9;
-      utter.onend = resolve;
+      utter.onend   = resolve;
       utter.onerror = resolve;
       window.speechSynthesis.speak(utter);
     }));
@@ -33,17 +35,23 @@
 
   async function typeText(el, text, delay = 55, withVoice = false) {
     if (!el || !text) return;
+
     el.textContent = '';
     el.style.opacity = '1';
     el.classList.add('typing-active');
 
-    // Inicia leitura e datilografia juntas, mas só libera o próximo parágrafo ao fim da leitura
+    // Inicia leitura e datilografia juntas, mas só libera o próximo parágrafo
+    // quando a leitura termina
     let speechPromise = Promise.resolve();
-    if (withVoice) speechPromise = queueSpeak(text);
+    if (withVoice) {
+      speechPromise = queueSpeak(text);
+    }
 
     for (let i = 0; i < text.length; i++) {
       el.textContent += text[i];
-      if (i % 2 === 0) await sleep(delay);
+      if (i % 2 === 0) {
+        await sleep(delay);
+      }
     }
 
     // Espera a voz terminar antes de concluir este parágrafo
@@ -51,19 +59,29 @@
 
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
-    return sleep(200);
+    await sleep(200);
   }
+
+  // ---------------------------------------
+  // Sequência final (texto + voz + botões)
+  // ---------------------------------------
 
   async function startFinalSequence() {
     if (started) return;
     started = true;
 
     try {
-    document.body.classList.add('final-lock');
-  } catch (e) {}
-    
+      document.body.classList.add('final-lock');
+    } catch (e) {
+      console.warn('[FINAL] Não consegui aplicar final-lock no <body>.', e);
+    }
+
     // Reseta qualquer fala pendente de outras seções
-    try { speechSynthesis.cancel(); } catch(e) {}
+    try {
+      window.speechSynthesis && window.speechSynthesis.cancel();
+    } catch (e) {
+      console.warn('[FINAL] Erro ao cancelar speech anterior.', e);
+    }
     speechChain = Promise.resolve();
 
     const section   = document.getElementById(SECTION_ID);
@@ -71,10 +89,17 @@
     const messageEl = document.getElementById('final-message');
     const botoes    = document.querySelector('.final-acoes');
 
-    if (!section || !titleEl || !messageEl) return;
+    if (!section || !titleEl || !messageEl) {
+      console.warn('[FINAL] Elementos principais não encontrados.');
+      return;
+    }
 
     // PREPARA TÍTULO E PARÁGRAFOS
-    const tituloOriginal = titleEl.getAttribute('data-original') || titleEl.textContent.trim() || 'Gratidão por Caminhar com Luz';
+    const tituloOriginal =
+      titleEl.getAttribute('data-original') ||
+      titleEl.textContent.trim() ||
+      'Gratidão por Caminhar com Luz';
+
     titleEl.setAttribute('data-original', tituloOriginal);
     titleEl.textContent = '';
     titleEl.style.opacity = '0';
@@ -100,20 +125,22 @@
     await typeText(titleEl, tituloOriginal, 65, true);
     await sleep(600);
 
-    // PARÁGRAFOS (um por vez: lê + datilografa juntos, e só passa pro próximo ao fim da leitura)
+    // PARÁGRAFOS (um por vez: lê + datilografa juntos)
     for (let i = 0; i < ps.length; i++) {
-      const p = ps[i];
+      const p   = ps[i];
       const txt = p.getAttribute('data-original') || '';
       if (!txt) continue;
+
       p.style.transition = 'all 0.8s ease';
       p.style.opacity = '1';
       p.style.transform = 'translateY(0)';
+
       await typeText(p, txt, 55, true);
       p.classList.add('revealed');
       await sleep(300);
     }
 
-    // BOTÕES APARECEM — SEM VÍDEO AUTOMÁTICO
+    // BOTÕES APARECEM
     if (botoes) {
       botoes.style.opacity = '0';
       botoes.style.transform = 'scale(0.9)';
@@ -133,15 +160,20 @@
         el.style.pointerEvents = 'auto';
       });
 
-      console.log('[FINAL] Botões liberados. Aguardando clique do participante para o vídeo final.');
+      console.log('[FINAL] Botões liberados. Aguardando clique do participante.');
     }
 
     console.log('[FINAL] Sequência concluída com sucesso!');
   }
 
+  // ---------------------------------------
+  // Geração de PDF / HQ
+  // ---------------------------------------
+
   async function generateArtifacts() {
     const btn = document.getElementById('btnBaixarPDFHQ');
     if (!btn || btn.dataset.loading === '1') return;
+
     btn.dataset.loading = '1';
     const original = btn.textContent;
     btn.textContent = 'Gerando sua Jornada...';
@@ -157,12 +189,17 @@
           lang: 'pt-BR'
         })
       });
+
       const data = await res.json().catch(() => ({}));
+
       if (data.pdfUrl) window.open(data.pdfUrl, '_blank');
-      if (data.hqUrl) window.open(data.hqUrl, '_blank');
-      if (!data.pdfUrl && !data.hqUrl) alert('Jornada concluída! PDF/HQ em breve disponível.');
+      if (data.hqUrl)  window.open(data.hqUrl, '_blank');
+
+      if (!data.pdfUrl && !data.hqUrl) {
+        alert('Jornada concluída! PDF/HQ em breve disponível.');
+      }
     } catch (e) {
-      console.error(e);
+      console.error('[FINAL] Erro ao gerar PDF/HQ:', e);
       alert('Erro temporário. Tente novamente em 10s.');
     } finally {
       btn.textContent = original;
@@ -171,72 +208,36 @@
     }
   }
 
-// Vídeo final + redirecionamento cinematográfico
-function playFinalVideo() {
-  console.log('[FINAL] Iniciando vídeo final...');
+  // ---------------------------------------
+  // Saída: vídeo de transição (via módulo externo)
+  // ---------------------------------------
 
-  // Overlay
-  let overlay = document.getElementById('final-video-overlay');
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'final-video-overlay';
-    document.body.appendChild(overlay);
-  }
+  function handleVoltarInicio() {
+    console.log('[FINAL] Clique em Voltar ao Início.');
 
-  // Vídeo
-  let video = document.getElementById('final-video');
-  if (!video) {
-    video = document.createElement('video');
-    video.id = 'final-video';
-    video.playsInline = true;
-    video.autoplay = true;
-    video.controls = false;
-    video.muted = false; // deixa true se quiser sem som
-    video.className = 'final-video-frame';
-    overlay.appendChild(video);
-  }
-
-  video.src = VIDEO_SRC;
-  video.currentTime = 0;
-
-  video.addEventListener('loadedmetadata', () => {
-    console.log('[FINAL] Duração do vídeo:', video.duration);
-  }, { once: true });
-
-  video.addEventListener('play', () => {
-    console.log('[FINAL] Vídeo está tocando.');
-  }, { once: true });
-
-  video.addEventListener('error', (err) => {
-    console.error('[FINAL] Erro ao carregar/tocar o vídeo:', err);
-  }, { once: true });
-
-  // Tenta tocar
-  video.play().catch(err => {
-    console.warn('[FINAL] Não consegui tocar o vídeo automaticamente:', err);
-    // Se o navegador bloquear autoplay, o overlay continua na tela e o vídeo aparece parado
-    // o participante pode tocar manualmente
-  });
-
-  // Ao terminar: fade-out + redireciona ao portal
-  video.onended = () => {
-    console.log('[FINAL] Vídeo finalizou, retornando ao portal...');
-    overlay.style.transition = 'opacity 0.8s ease-out';
-    overlay.style.opacity = '0';
-
-    setTimeout(() => {
-      if (overlay && overlay.parentNode) {
-        overlay.parentNode.removeChild(overlay);
+    // Preferência: função global gerenciada por video-transicao.js
+    if (typeof window.playVideoTransicaoFinal === 'function') {
+      try {
+        window.playVideoTransicaoFinal();
+        return;
+      } catch (e) {
+        console.error('[FINAL] Erro ao chamar playVideoTransicaoFinal():', e);
       }
-      window.location.href = HOME_URL; // já está definido no topo
-    }, 850);
-  };
-}
+    }
 
+    // Fallback de segurança: vai direto para o portal
+    window.location.href = HOME_URL;
+  }
+
+  // ---------------------------------------
+  // LISTENERS GERAIS
+  // ---------------------------------------
 
   document.addEventListener('section:shown', e => {
     const id = e.detail?.sectionId || e.detail;
-    if (id === SECTION_ID) startFinalSequence();
+    if (id === SECTION_ID) {
+      startFinalSequence();
+    }
   });
 
   document.addEventListener('click', e => {
@@ -245,11 +246,13 @@ function playFinalVideo() {
     if (t.id === 'btnBaixarPDFHQ' || t.closest('#btnBaixarPDFHQ')) {
       e.preventDefault();
       generateArtifacts();
+      return;
     }
 
     if (t.id === 'btnVoltarInicio' || t.closest('#btnVoltarInicio')) {
       e.preventDefault();
-      playFinalVideo();
+      handleVoltarInicio();
+      return;
     }
   });
 
