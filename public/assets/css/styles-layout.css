@@ -815,3 +815,199 @@ body.final-lock,
     transform: translateX(-50%) !important;
   }
 }
+/* =========================================================
+   ZION PATCH – REMOVER TRANSFORM E USAR MARGIN-TOP
+   + OVERFLOW VISÍVEL + MEDIA QUERY INTERMEDIÁRIA
+   ========================================================= */
+
+/* 0) Garantir que os wrappers não cortem nada por padrão */
+#section-intro .j-perg-v-inner,
+#section-termos1 .j-perg-v-inner,
+#section-termos2 .j-perg-v-inner,
+#section-senha  .j-perg-v-inner,
+#section-guia   .j-perg-v-inner,
+#section-selfie .j-perg-v-inner,
+#section-card .j-perg-v-inner,
+#section-perguntas .j-perg-v-inner,
+#section-final  .j-perg-v-inner,
+#section-intro .j-panel-glow,
+#section-termos1 .j-panel-glow,
+#section-termos2 .j-panel-glow,
+#section-senha  .j-panel-glow,
+#section-guia   .j-panel-glow,
+#section-selfie .j-panel-glow,
+#section-card .j-panel-glow,
+#section-perguntas .j-panel-glow,
+#section-final  .j-panel-glow {
+  overflow: visible !important;
+  /* padding extra embaixo pra não cortar botões / texto */
+  padding-bottom: 40px;
+}
+
+/* =========================================================
+   1) DESKTOP (>= 900px) – trocar transform por margin-top
+   ========================================================= */
+@media (min-width: 900px) {
+
+  /* PERGAMINHO sobe um pouco dentro da viewport */
+  #section-intro .j-perg-v-inner,
+  #section-termos1 .j-perg-v-inner,
+  #section-termos2 .j-perg-v-inner,
+  #section-senha  .j-perg-v-inner,
+  #section-guia   .j-perg-v-inner,
+  #section-selfie .j-perg-v-inner,
+  #section-card .j-perg-v-inner,
+  #section-perguntas .j-perg-v-inner,
+  #section-final  .j-perg-v-inner {
+    transform: none !important;
+    margin-top: 40px;         /* era translateY(40px) */
+  }
+
+  /* CARD (vidro) desce só um pouquinho dentro do pergaminho */
+  #section-intro .j-panel-glow,
+  #section-termos1 .j-panel-glow,
+  #section-termos2 .j-panel-glow,
+  #section-senha  .j-panel-glow,
+  #section-guia   .j-panel-glow,
+  #section-selfie .j-panel-glow,
+  #section-card .j-panel-glow, 
+  #section-perguntas .j-panel-glow,
+  #section-final  .j-panel-glow {
+    transform: none !important;
+    margin-top: -10px;        /* era translateY(-10px) */
+  }
+
+  /* Ajustes mais fortes que existiam só na SENHA/SELFIE/FINAL */
+
+  /* SENHA – antes tinha translate + top; agora só margin */
+  #section-senha .j-perg-v-inner {
+    margin-top: 40px !important;
+    top: 0 !important;
+  }
+  #section-senha .j-panel-glow {
+    margin-top: -70px !important;
+    top: 0 !important;
+  }
+
+  /* SELFIE – sobe um pouco */
+  #section-selfie .j-perg-v-inner,
+  #section-selfie .j-panel-glow {
+    margin-top: -90px !important;
+    top: 0 !important;
+    transform: none !important;
+  }
+
+  /* FINAL – usa apenas margin-top, sem translateY */
+  #section-final {
+    padding-top: 60px !important;
+    padding-bottom: 80px !important;
+  }
+  #section-final .j-panel-glow,
+  #section-final .j-perg-v-inner {
+    transform: translateX(-50%) !important; /* só centro no X */
+    margin-top: -40px !important;
+    top: 0 !important;
+  }
+}
+
+/* =========================================================
+   2) MEDIA QUERY INTERMEDIÁRIA (600px – 899px)
+   ========================================================= */
+@media (min-width: 600px) and (max-width: 899px) {
+
+  /* PERGAMINHO alinha um pouco mais alto, mas menos que desktop */
+  #section-intro .j-perg-v-inner,
+  #section-termos1 .j-perg-v-inner,
+  #section-termos2 .j-perg-v-inner,
+  #section-senha  .j-perg-v-inner,
+  #section-guia   .j-perg-v-inner,
+  #section-selfie .j-perg-v-inner,
+  #section-card .j-perg-v-inner,
+  #section-perguntas .j-perg-v-inner,
+  #section-final  .j-perg-v-inner {
+    transform: none !important;
+    margin-top: 20px;
+  }
+
+  /* CARD fica levemente sobreposto ao pergaminho */
+  #section-intro .j-panel-glow,
+  #section-termos1 .j-panel-glow,
+  #section-termos2 .j-panel-glow,
+  #section-senha  .j-panel-glow,
+  #section-guia   .j-panel-glow,
+  #section-selfie .j-panel-glow,
+  #section-perguntas .j-panel-glow,
+  #section-final  .j-panel-glow {
+    transform: none !important;
+    margin-top: -12px;
+  }
+
+  /* SENHA um pouco mais alta pra caber campo + botões */
+  #section-senha .j-panel-glow {
+    margin-top: -32px !important;
+  }
+
+  /* SELFIE – centralizar cabine no centro do pergaminho */
+  #section-selfie .j-panel-glow {
+    margin-top: -26px !important;
+  }
+
+  /* FINAL – descansa um pouco mais pra baixo */
+  #section-final .j-panel-glow,
+  #section-final .j-perg-v-inner {
+    margin-top: -20px !important;
+  }
+}
+
+/* =========================================================
+   3) MOBILE (<= 600px) – remover todos os translate
+   ========================================================= */
+@media (max-width: 600px) {
+
+  #section-intro .j-panel-glow,
+  #section-termos1 .j-panel-glow,
+  #section-termos2 .j-panel-glow,
+  #section-senha  .j-panel-glow,
+  #section-guia   .j-panel-glow,
+  #section-selfie .j-panel-glow,
+  #section-card .j-panel-glow,
+  #section-perguntas .j-panel-glow,
+  #section-final  .j-panel-glow {
+    transform: none !important;
+    margin-top: -24px;           /* valor médio suave pro topo */
+  }
+
+  #section-intro .j-perg-v-inner,
+  #section-termos1 .j-perg-v-inner,
+  #section-termos2 .j-perg-v-inner,
+  #section-senha  .j-perg-v-inner,
+  #section-guia   .j-perg-v-inner,
+  #section-selfie .j-perg-v-inner,
+  #section-card .j-perg-v-inner,
+  #section-perguntas .j-perg-v-inner,
+  #section-final  .j-perg-v-inner {
+    transform: none !important;
+    margin-top: 0;               /* começa neutro, DOM manda */
+  }
+
+  /* SENHA – sobe um pouco mais no mobile pra caber tudo */
+  #section-senha .j-panel-glow {
+    margin-top: -32px !important;
+  }
+
+  /* GUIA – card com nome e botões bem centralizado */
+  #section-guia .j-panel-glow {
+    margin-top: -30px !important;
+  }
+
+  /* SELFIE – cabine fica no centro do pergaminho */
+  #section-selfie .j-panel-glow {
+    margin-top: -28px !important;
+  }
+
+  /* FINAL – leve subida pra encaixar bem no pergaminho */
+  #section-final .j-panel-glow {
+    margin-top: -20px !important;
+  }
+}
+
