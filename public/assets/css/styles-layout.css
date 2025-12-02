@@ -22,27 +22,29 @@
    1) CENTRALIZAÇÃO BASE (vale para todas as seções verticais)
    --------------------------------------------------------- */
 
-#section-intro .j-perg-v-inner,
-#section-termos1 .j-perg-v-inner,
-#section-termos2 .j-perg-v-inner,
-#section-senha  .j-perg-v-inner,
-#section-guia   .j-perg-v-inner,
-#section-selfie .j-perg-v-inner,
-#section-perguntas .j-perg-v-inner,
-#section-final  .j-perg-v-inner {
+  #section-intro .j-perg-v-inner,
+  #section-termos1 .j-perg-v-inner,
+  #section-termos2 .j-perg-v-inner,
+  #section-senha  .j-perg-v-inner,
+  #section-guia   .j-perg-v-inner,
+  #section-selfie .j-perg-v-inner,
+  #section-card .j-perg-v-inner,
+  #section-perguntas .j-perg-v-inner,
+  #section-final  .j-perg-v-inner  {
   margin-left: auto;
   margin-right: auto;
   overflow: visible; /* evita corte de conteúdo */
 }
 
 #section-intro .j-panel-glow,
-#section-termos1 .j-panel-glow,
-#section-termos2 .j-panel-glow,
-#section-senha  .j-panel-glow,
-#section-guia   .j-panel-glow,
-#section-selfie .j-panel-glow,
-#section-perguntas .j-panel-glow,
-#section-final  .j-panel-glow {
+  #section-termos1 .j-panel-glow,
+  #section-termos2 .j-panel-glow,
+  #section-senha  .j-panel-glow,
+  #section-guia   .j-panel-glow,
+  #section-selfie .j-panel-glow,
+  #section-card .j-panel-glow,
+  #section-perguntas .j-panel-glow,
+  #section-final  .j-panel-glow  {
   margin-left: auto;
   margin-right: auto;
   overflow: visible; /* garante que botões não sumam */
@@ -61,8 +63,9 @@
   #section-senha  .j-perg-v-inner,
   #section-guia   .j-perg-v-inner,
   #section-selfie .j-perg-v-inner,
+  #section-card .j-perg-v-inner,
   #section-perguntas .j-perg-v-inner,
-  #section-final  .j-perg-v-inner {
+  #section-final  .j-perg-v-inner  {
     margin-top: 40px; /* trocado de transform pra margin */
   }
 
@@ -72,8 +75,9 @@
   #section-senha  .j-panel-glow,
   #section-guia   .j-panel-glow,
   #section-selfie .j-panel-glow,
+  #section-card .j-panel-glow,
   #section-perguntas .j-panel-glow,
-  #section-final  .j-panel-glow {
+  #section-final  .j-panel-glow  {
     margin-top: -10px; /* trocado de transform */
     max-width: 720px; /* limite pra não esticar demais */
   }
@@ -90,8 +94,9 @@
   #section-senha  .j-panel-glow,
   #section-guia   .j-panel-glow,
   #section-selfie .j-panel-glow,
+  #section-card .j-panel-glow,
   #section-perguntas .j-panel-glow,
-  #section-final  .j-panel-glow {
+  #section-final  .j-panel-glow  {
     width: min(480px, 80vw);
     margin-top: -20px;
     padding: 20px 16px 28px;
@@ -110,8 +115,9 @@
   #section-senha  .j-panel-glow,
   #section-guia   .j-panel-glow,
   #section-selfie .j-panel-glow,
+  #section-card .j-panel-glow,
   #section-perguntas .j-panel-glow,
-  #section-final  .j-panel-glow {
+  #section-final  .j-panel-glow  {
     width: min(320px, 84vw);
     max-width: 320px;
     margin: 18px auto 26px;
@@ -124,8 +130,9 @@
   #section-senha  .j-perg-v-inner,
   #section-guia   .j-perg-v-inner,
   #section-selfie .j-perg-v-inner,
+  #section-card .j-perg-v-inner,
   #section-perguntas .j-perg-v-inner,
-  #section-final  .j-perg-v-inner {
+  #section-final  .j-perg-v-inner  {
     margin-top: 0; /* base neutra; overrides abaixo */
   }
 }
