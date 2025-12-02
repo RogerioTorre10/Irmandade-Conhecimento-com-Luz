@@ -1,5 +1,5 @@
 {
-   "welcome": "Welcome!",
+  "welcome": "Welcome!",
   "description": "This is an awesome website.",
   "site.title": "Journey • Brotherhood Knowledge with Light",
   "search": "Search...",
@@ -23,9 +23,8 @@
   "bloco_sintese_title": "Block 5 — Synthesis and Delivery",
   "pergunta_essencia_hoje": "Who are you today, in one true sentence?",
   "pergunta_passo_fe": "What will be your next step of faith and courage?",
-  "resposta_placeholder": "Type your answer..."
+  "resposta_placeholder": "Type your answer...",
   "page.title": "Essential Journey",
   "footer.copyright": "© 2025 Brotherhood Knowledge with Light",
   "footer.tagline": "Brotherhood Knowledge with Light"
 }
- 
