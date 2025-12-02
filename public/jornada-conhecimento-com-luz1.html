@@ -234,34 +234,60 @@
 
   
 <script>
-  // Função para aplicar tradução em tudo (inclusive conteúdo dinâmico)
-  function aplicarTraducao() {
-    if (!window.i18n || !window.i18n.ready) return;
+  // Função central que traduz TUDO que já existe no DOM
+  const traduzirTudo = () => {
+    if (!window.i18n?.ready) return;
     i18n.apply(document.body);
-    // Título da aba
-    document.title = i18n.t('page.title') + ' • ' + i18n.t('site.title', 'Jornada');
-  }
+    // Traduz título da página
+    const title = i18n.t('page.title') || 'Jornada Essencial';
+    const site = i18n.t('site.title') || 'Irmandade Conhecimento com Luz';
+    document.title = `${title} • ${site}`;
+  };
 
-  // Quando mudar o idioma
+  // 1. Quando mudar o idioma no select
   document.getElementById('language-select').addEventListener('change', async (e) => {
     const lang = e.target.value;
     document.documentElement.lang = lang.split('-')[0];
     await i18n.forceLang(lang, true);
-    aplicarTraducao();
+    traduzirTudo();
   });
 
-  // Aplicar tradução toda vez que uma nova seção for exibida (aqui está a mágica!)
-  document.addEventListener('section:shown', () => {
-    setTimeout(aplicarTraducao, 100); // dá tempo do DOM ser atualizado
-  });
-
-  // Na inicialização
+  // 2. Garantir que o select mostre o idioma atual ao carregar
   document.addEventListener('DOMContentLoaded', async () => {
-    await i18n.waitForReady();
+    await i18n.waitForReady(10000);
     document.getElementById('language-select').value = i18n.lang;
     document.documentElement.lang = i18n.lang.split('-')[0];
-    aplicarTraducao();
+    traduzirTudo();
   });
+
+  // 3. O GRANDE TRUNFO: observar TODAS as mudanças no conteúdo dinâmico
+  const observer = new MutationObserver((mutations) => {
+    let precisaTraduzir = false;
+    for (const m of mutations) {
+      if (m.type === 'childList' && m.addedNodes.length > 0) {
+        // Se algo foi adicionado dentro do wrapper da jornada → traduz
+        for (const node of m.addedNodes) {
+          if (node.nodeType === 1) { // é elemento
+            if (node.matches?.('#jornada-content-wrapper, #jornada-content-wrapper *')) {
+              precisaTraduzir = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+    if (precisaTraduzir) {
+      setTimeout(traduzirTudo, 50); // dá tempo do DOM assentar
+    }
+  });
+
+  observer.observe(document.getElementById('jornada-content-wrapper'), {
+    childList: true,
+    subtree: true
+  });
+
+  // Bonus: caso algum script dispare section:shown (continua funcionando)
+  document.addEventListener('section:shown', () => setTimeout(traduzirTudo, 100));
 </script>
 </body>
 </html>
