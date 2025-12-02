@@ -5,6 +5,20 @@
    ========================================================= */
 
 /* ---------------------------------------------------------
+   0) WRAPPER CENTRAL UNIVERSAL
+   (garante que tudo respire bem em 100% de zoom)
+   --------------------------------------------------------- */
+
+#jornada-content-wrapper {
+  max-width: 850px;
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+/* ---------------------------------------------------------
    1) CENTRALIZAÇÃO BASE (vale para todas as seções verticais)
    --------------------------------------------------------- */
 
@@ -18,6 +32,9 @@
 #section-final  .j-perg-v-inner {
   margin-left: auto;
   margin-right: auto;
+  max-width: 850px;
+  width: 100%;
+  position: relative;
 }
 
 #section-intro .j-panel-glow,
@@ -30,6 +47,16 @@
 #section-final  .j-panel-glow {
   margin-left: auto;
   margin-right: auto;
+}
+
+/* Pergaminho base (onde estiver usando a classe .pergaminho) */
+.pergaminho {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  background-size: 100% auto !important;
+  background-repeat: no-repeat;
+  background-position: top center;
 }
 
 /* =========================================================
@@ -225,14 +252,13 @@
    ========================================= */
 @media (min-width: 900px) {
 
- #section-guia .guia-options,
+  #section-guia .guia-options,
   #section-guia .guia-buttons-row,
   #section-guia .card-actions {
     display: flex;
-    justify-content: center;
-    gap: 10px;                  /* espaço igual entre eles */
-    padding: 0 18px 18px 
-    justify-content: space-between;
+    justify-content: space-between; /* corrigido: um justify só */
+    gap: 10px;                      /* espaço igual entre eles */
+    padding: 0 18px 18px;           /* corrigido ; que faltava */
     align-items: center;
     width: 100%;
     box-sizing: border-box;
@@ -246,11 +272,22 @@
     max-width: 32%;
     margin: 0 !important;
     box-sizing: border-box;
-  }   
+  }
 }
+
 /* =========================================
-   PAGE CARD – REMOVER O PERGAMINHO GLOBAL
+   PAGE CARD – LAYOUT & REMOVER O PERGAMINHO GLOBAL
    ========================================= */
+
+/* 0) Card-stage com espaço garantido pro botão (desktop + base) */
+#section-card .card-stage {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding-bottom: 220px; /* espaço pro nome + botão fora do card */
+  overflow: visible;
+}
 
 /* 1) Isola o fundo global dentro do card */
 #section-card,
@@ -275,6 +312,52 @@
 #section-card *::after {
   content: none !important;
 }
+
+/* 4) Placeholder + selfie em posição RELATIVA (sem top: 380px) */
+
+#section-card .placeholder-wrapper {
+  width: 100%;
+  max-width: 260px;
+  margin: -40px auto 12px; /* sobe um pouco, e já abre espaço pro nome */
+  position: relative;
+  z-index: 40;
+}
+
+#section-card .flame-layer {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 14px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Campo do nome logo abaixo do placeholder – controlado pelo fluxo normal */
+#section-card .card-name-wrapper {
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto 12px;
+}
+
+/* Botão continuar sempre abaixo do nome, dentro da seção */
+#section-card .card-actions {
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Mobile: ajusta o palco, mas mantém a lógica */
+@media (max-width: 600px) {
+  #section-card .card-stage {
+    max-width: 380px;
+    padding-bottom: 200px;
+  }
+
+  #section-card .placeholder-wrapper {
+    max-width: 240px;
+    margin-top: -20px;
+  }
+}
+
 /* =========================================
    DNA DE LUZ DOS GUIAS – CORES GLOBAIS
    ========================================= */
@@ -302,6 +385,7 @@
   --theme-main-color: #ff94ff;
   --theme-main-color-soft: rgba(255, 148, 255, 0.25);
 }
+
 /* =========================================
    BOTÕES TEMÁTICOS (perguntas, continuar, etc.)
    ========================================= */
@@ -364,6 +448,7 @@
   box-shadow: 0 0 14px var(--theme-main-color-soft, rgba(255,216,116,0.6));
   transition: width 0.35s ease-out;
 }
+
 /* CARD DAS PERGUNTAS ILUMINADO PELA COR DO GUIA */
 #section-perguntas .j-arcane-card {
   box-shadow:
@@ -731,7 +816,3 @@ body.final-lock,
     transform: translateX(-50%) !important;
   }
 }
-
-
-
-
