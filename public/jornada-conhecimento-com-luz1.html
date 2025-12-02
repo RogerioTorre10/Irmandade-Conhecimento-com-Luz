@@ -52,6 +52,12 @@
     </div>
     <h1>Jornada Essencial</h1>
   </header>
+  <footer class="site-footer">
+  <small data-i18n="footer.copyright">© 2025 Irmandade Conhecimento com Luz</small>
+  <div id="envTag" style="margin-top:2px;opacity:.55;font-size:12px;padding:4px 0;background:transparent;text-align:center;line-height:1.1">
+    <span data-i18n="footer.tagline">Irmandade Conhecimento com Luz</span>
+  </div>
+</footer>
   <main class="container">
     <section id="jornada-canvas" class="card pergaminho pergaminho-v">
       <div id="section-conteudo" class="conteudo-pergaminho">
@@ -225,5 +231,25 @@
   <noscript>
     <p style="text-align:center; padding:12px">Ative o JavaScript para usar esta página.</p>
   </noscript>
+  <script>
+  // Ligar o seletor de idioma ao i18n
+  document.getElementById('language-select').addEventListener('change', async (e) => {
+    const lang = e.target.value;
+    document.documentElement.lang = lang.split('-')[0]; // pt, en ou es
+    await i18n.forceLang(lang, true); // true = salva no localStorage
+    // Atualiza o título da aba também
+    document.title = i18n.t('page.title') + ' • ' + i18n.t('site.title', 'Jornada');
+  });
+
+  // Quando a página carregar, seleciona o idioma atual no <select>
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => { // espera o i18n ficar ready
+      const current = i18n.lang || 'pt-BR';
+      document.getElementById('language-select').value = current;
+      document.documentElement.lang = current.split('-')[0];
+      document.title = i18n.t('page.title') + ' • ' + i18n.t('site.title', 'Jornada');
+    }, 500);
+  });
+</script>
 </body>
 </html>
