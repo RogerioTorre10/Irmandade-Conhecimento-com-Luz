@@ -231,24 +231,36 @@
   <noscript>
     <p style="text-align:center; padding:12px">Ative o JavaScript para usar esta página.</p>
   </noscript>
-  <script>
-  // Ligar o seletor de idioma ao i18n
+
+  
+<script>
+  // Função para aplicar tradução em tudo (inclusive conteúdo dinâmico)
+  function aplicarTraducao() {
+    if (!window.i18n || !window.i18n.ready) return;
+    i18n.apply(document.body);
+    // Título da aba
+    document.title = i18n.t('page.title') + ' • ' + i18n.t('site.title', 'Jornada');
+  }
+
+  // Quando mudar o idioma
   document.getElementById('language-select').addEventListener('change', async (e) => {
     const lang = e.target.value;
-    document.documentElement.lang = lang.split('-')[0]; // pt, en ou es
-    await i18n.forceLang(lang, true); // true = salva no localStorage
-    // Atualiza o título da aba também
-    document.title = i18n.t('page.title') + ' • ' + i18n.t('site.title', 'Jornada');
+    document.documentElement.lang = lang.split('-')[0];
+    await i18n.forceLang(lang, true);
+    aplicarTraducao();
   });
 
-  // Quando a página carregar, seleciona o idioma atual no <select>
-  document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => { // espera o i18n ficar ready
-      const current = i18n.lang || 'pt-BR';
-      document.getElementById('language-select').value = current;
-      document.documentElement.lang = current.split('-')[0];
-      document.title = i18n.t('page.title') + ' • ' + i18n.t('site.title', 'Jornada');
-    }, 500);
+  // Aplicar tradução toda vez que uma nova seção for exibida (aqui está a mágica!)
+  document.addEventListener('section:shown', () => {
+    setTimeout(aplicarTraducao, 100); // dá tempo do DOM ser atualizado
+  });
+
+  // Na inicialização
+  document.addEventListener('DOMContentLoaded', async () => {
+    await i18n.waitForReady();
+    document.getElementById('language-select').value = i18n.lang;
+    document.documentElement.lang = i18n.lang.split('-')[0];
+    aplicarTraducao();
   });
 </script>
 </body>
