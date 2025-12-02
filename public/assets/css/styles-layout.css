@@ -32,9 +32,7 @@
 #section-final  .j-perg-v-inner {
   margin-left: auto;
   margin-right: auto;
-  max-width: 850px;
-  width: 100%;
-  position: relative;
+  overflow: visible; /* evita corte de conteúdo */
 }
 
 #section-intro .j-panel-glow,
@@ -47,16 +45,8 @@
 #section-final  .j-panel-glow {
   margin-left: auto;
   margin-right: auto;
-}
-
-/* Pergaminho base (onde estiver usando a classe .pergaminho) */
-.pergaminho {
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  background-size: 100% auto !important;
-  background-repeat: no-repeat;
-  background-position: top center;
+  overflow: visible; /* garante que botões não sumam */
+  padding-bottom: 32px; /* extra pro botão caber sempre */
 }
 
 /* =========================================================
@@ -73,7 +63,7 @@
   #section-selfie .j-perg-v-inner,
   #section-perguntas .j-perg-v-inner,
   #section-final  .j-perg-v-inner {
-    transform: translateY(40px);
+    margin-top: 40px; /* trocado de transform pra margin */
   }
 
   #section-intro .j-panel-glow,
@@ -84,12 +74,32 @@
   #section-selfie .j-panel-glow,
   #section-perguntas .j-panel-glow,
   #section-final  .j-panel-glow {
-    transform: translateY(-10px);
+    margin-top: -10px; /* trocado de transform */
+    max-width: 720px; /* limite pra não esticar demais */
   }
 }
 
 /* =========================================================
-   3) MOBILE BASE (<= 600px)
+   3) TABLET/MOBILE INTERMEDIÁRIO (600px - 900px)
+   Ajuste suave pra evitar cortes em zooms ou redimensões
+   ========================================================= */
+@media (min-width: 600px) and (max-width: 900px) {
+  #section-intro .j-panel-glow,
+  #section-termos1 .j-panel-glow,
+  #section-termos2 .j-panel-glow,
+  #section-senha  .j-panel-glow,
+  #section-guia   .j-panel-glow,
+  #section-selfie .j-panel-glow,
+  #section-perguntas .j-panel-glow,
+  #section-final  .j-panel-glow {
+    width: min(480px, 80vw);
+    margin-top: -20px;
+    padding: 20px 16px 28px;
+  }
+}
+
+/* =========================================================
+   4) MOBILE BASE (<= 600px)
    Mesma largura/altura de card pra TODAS as seções
    ========================================================= */
 @media (max-width: 600px) {
@@ -105,7 +115,7 @@
     width: min(320px, 84vw);
     max-width: 320px;
     margin: 18px auto 26px;
-    padding: 18px 14px 22px;
+    padding: 18px 14px 32px; /* extra no bottom pro botão */
   }
 
   #section-intro .j-perg-v-inner,
@@ -116,20 +126,21 @@
   #section-selfie .j-perg-v-inner,
   #section-perguntas .j-perg-v-inner,
   #section-final  .j-perg-v-inner {
-    transform: translateY(0); /* base neutra; overrides abaixo */
+    margin-top: 0; /* base neutra; overrides abaixo */
   }
 }
 
 /* =========================================================
-   4) AJUSTES FINOS – MOBILE
-   (valores calibrados pelos teus prints)
+   5) AJUSTES FINOS – MOBILE
+   (valores calibrados pros prints – margins em vez de translate)
    ========================================================= */
 
 /* ---- INTRO: subir um pouco mais ---- */
 @media (max-width: 600px) {
   #section-intro .j-panel-glow {
-    /* estava -16, subimos mais um pouco */
-    transform: translate(-6px, -26px);
+    /* estava -26, agora com margin */
+    margin-left: -6px;
+    margin-top: -26px;
   }
 }
 
@@ -137,52 +148,55 @@
 @media (max-width: 600px) {
   #section-termos1 .j-panel-glow,
   #section-termos2 .j-panel-glow {
-    /* estava -26, agora um pouco mais alto */
-    transform: translate(-6px, -32px);
+    margin-left: -6px;
+    margin-top: -32px;
   }
 }
 
 /* ---- SENHA: sobe e centraliza melhor ---- */
 @media (max-width: 600px) {
-
-  /* pergaminho estava levemente deslocado; mantemos o X,
-     mas alinhamos um pouco mais no Y */
   #section-senha .j-perg-v-inner {
-    transform: translate(-10px, -4px);
+    margin-left: -10px;
+    margin-top: -4px;
   }
 
   #section-senha .j-panel-glow {
-    /* sobe mais um pouquinho em relação ao -24 anterior */
-    transform: translate(-4px, -32px);
+    margin-left: -4px;
+    margin-top: -32px;
   }
 }
 
-/* ---- GUIA: card com nome/inputs – segue padrão alto e central ---- */
+/* ---- GUIA: card com nome/inputs – padrão alto e central (botão visível) ---- */
 @media (max-width: 600px) {
   #section-guia .j-panel-glow {
-    transform: translate(-6px, -30px);
+    margin-left: -6px;
+    margin-top: -30px;
+    padding-bottom: 40px; /* extra pro botão "Continuar" caber */
   }
 }
 
-/* ---- SELFIE: geralmente o conteúdo é mais alto, mas
-       mantemos alinhado com o mesmo eixo do pergaminho ---- */
+/* ---- SELFIE: conteúdo mais alto, alinhado com pergaminho ---- */
 @media (max-width: 600px) {
   #section-selfie .j-panel-glow {
-    transform: translate(-6px, -30px);
+    margin-left: -6px;
+    margin-top: -30px;
+    padding-bottom: 40px; /* pro "Continuar" na selfie */
   }
 }
 
 /* ---- PERGUNTAS: card com perguntas – um pouco mais central ---- */
 @media (max-width: 600px) {
   #section-perguntas .j-panel-glow {
-    transform: translate(-6px, -30px);
+    margin-left: -6px;
+    margin-top: -30px;
   }
 }
 
-/* ---- FINAL: tela de encerramento – segue mesmo eixo ---- */
+/* ---- FINAL: tela de encerramento – mesmo eixo ---- */
 @media (max-width: 600px) {
   #section-final .j-panel-glow {
-    transform: translate(-6px, -30px);
+    margin-left: -6px;
+    margin-top: -30px;
   }
 }
 
@@ -194,26 +208,11 @@
 
   /* Pergaminho de fundo da senha */
   #section-senha .j-perg-v-inner {
-    position: relative !important;
-    transform: translateY(40px) !important; /* antes 80px */
-    top: 40px !important;                   /* antes 80px */
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-    overflow: visible !important;
-    z-index: 5 !important;
+    margin-top: -40px; /* ajuste fino */
   }
 
-  /* Card (vidro) da senha */
   #section-senha .j-panel-glow {
-    position: relative !important;
-    transform: translate(-16px, -70px) !important; /* antes 40px */
-    top: 10px !important;                   /* antes 40px */
-    margin-top: 0 !important;
-    width: 90% !important;
-    max-width: 470px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    z-index: 6 !important;
+    margin-top: -30px;
   }
 }
 
