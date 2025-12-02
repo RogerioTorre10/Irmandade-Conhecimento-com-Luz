@@ -662,6 +662,75 @@ body.final-lock {
   overflow-y: hidden;   /* some a barra de rolagem vertical */
 }
 
+/* ============================================
+   SECTION-FINAL — CORREÇÃO DEFINITIVA
+   ============================================ */
+
+/* Remove qualquer scroll lateral */
+body.final-lock,
+#section-final {
+  overflow-x: hidden !important;
+}
+
+/* Container principal sempre centralizado */
+#section-final .final-pergaminho-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0;
+  margin: 0 auto;
+}
+
+/* Painel com glow centralizado sem deslocar para esquerda */
+#section-final .j-panel-glow {
+  position: relative !important;
+  margin: 0 auto !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  max-width: 680px !important; /* garante que não ultrapasse */
+}
+
+/* Pergaminho interno perfeitamente centralizado */
+#section-final .j-perg-v-inner {
+  position: relative !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+/* Ajustes desktop */
+@media (min-width: 900px) {
+  #section-final {
+    padding-top: 60px !important;
+    padding-bottom: 80px !important;
+  }
+
+  #section-final .j-panel-glow {
+    top: -40px !important;
+  }
+
+  #section-final .j-perg-v-inner {
+    top: -40px !important;
+  }
+}
+
+/* Ajustes mobile */
+@media (max-width: 600px) {
+  #section-final {
+    padding-top: 20px !important;
+  }
+
+  #section-final .j-panel-glow {
+    transform: translateX(-50%) !important;
+    margin-top: -20px !important;
+  }
+
+  #section-final .j-perg-v-inner {
+    transform: translateX(-50%) !important;
+  }
+}
 
 
 
