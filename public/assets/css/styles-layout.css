@@ -1017,4 +1017,43 @@ body.final-lock,
     margin-top: -20px !important;
   }
 }
+/* =========================================================
+   PATCH – ALINHAMENTO DESKTOP DAS SEÇÕES
+   Intro, Termos 1 e 2, Guia, Selfie, Perguntas
+   usando a página SENHA como referência visual
+   ========================================================= */
+
+@media (min-width: 900px) {
+
+  /* Pergaminho interno: mesma altura base da página SENHA */
+  #section-intro .j-perg-v-inner,
+  #section-termos1 .j-perg-v-inner,
+  #section-termos2 .j-perg-v-inner,
+  #section-guia   .j-perg-v-inner,
+  #section-selfie .j-perg-v-inner,
+  #section-perguntas .j-perg-v-inner {
+    margin-top: 40px !important;   /* altura do pergaminho */
+    top: 0 !important;
+    transform: none !important;
+    overflow: visible !important;  /* nada é cortado */
+  }
+
+  /* Card (vidro) em cima do pergaminho: mesma lógica da SENHA */
+  #section-intro .j-panel-glow,
+  #section-termos1 .j-panel-glow,
+  #section-termos2 .j-panel-glow,
+  #section-guia   .j-panel-glow,
+  #section-selfie .j-panel-glow,
+  #section-perguntas .j-panel-glow {
+    margin-top: -70px !important;  /* antes ficava perdido */
+    top: 0 !important;
+    transform: none !important;
+  }
+
+  /* EXTRA: espaço de respiro embaixo pra botão não sumir */
+  #section-guia .j-panel-glow,
+  #section-selfie .j-panel-glow {
+    padding-bottom: 60px !important;
+  }
+}
 
