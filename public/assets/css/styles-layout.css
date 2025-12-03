@@ -14,6 +14,7 @@
 #section-senha  .j-perg-v-inner,
 #section-guia   .j-perg-v-inner,
 #section-selfie .j-perg-v-inner,
+#section-csrd .j-perg-v-inner,
 #section-perguntas .j-perg-v-inner,
 #section-final  .j-perg-v-inner {
   margin-left: auto;
@@ -29,6 +30,7 @@
 #section-senha  .j-panel-glow,
 #section-guia   .j-panel-glow,
 #section-selfie .j-panel-glow,
+#section-card .j-panel-glow,
 #section-perguntas .j-panel-glow,
 #section-final  .j-panel-glow {
   margin-left: auto;
@@ -57,6 +59,7 @@
   #section-senha  .j-perg-v-inner,
   #section-guia   .j-perg-v-inner,
   #section-selfie .j-perg-v-inner,
+  #section-card .j-perg-v-inner, 
   #section-perguntas .j-perg-v-inner,
   #section-final  .j-perg-v-inner {
     transform: translateY(40px);
@@ -68,6 +71,7 @@
   #section-senha  .j-panel-glow,
   #section-guia   .j-panel-glow,
   #section-selfie .j-panel-glow,
+  #section-card .j-panel-glow, 
   #section-perguntas .j-panel-glow,
   #section-final  .j-panel-glow {
     transform: translateY(-10px);
@@ -86,6 +90,7 @@
   #section-senha  .j-panel-glow,
   #section-guia   .j-panel-glow,
   #section-selfie .j-panel-glow,
+  #section-card .j-panel-glow, 
   #section-perguntas .j-panel-glow,
   #section-final  .j-panel-glow {
     width: min(320px, 84vw);
@@ -100,6 +105,7 @@
   #section-senha  .j-perg-v-inner,
   #section-guia   .j-perg-v-inner,
   #section-selfie .j-perg-v-inner,
+  #section-card .j-perg-v-inner,  
   #section-perguntas .j-perg-v-inner,
   #section-final  .j-perg-v-inner {
     transform: translateY(0); /* base neutra; overrides abaixo */
@@ -822,6 +828,7 @@ body.final-lock,
   #section-senha  .j-perg-v-inner,
   #section-guia   .j-perg-v-inner,
   #section-selfie .j-perg-v-inner,
+  #section-card .j-perg-v-inner,
   #section-perguntas .j-perg-v-inner {
     position: relative !important;
     transform: translateY(40px) !important;
@@ -839,6 +846,7 @@ body.final-lock,
   #section-senha  .j-panel-glow,
   #section-guia   .j-panel-glow,
   #section-selfie .j-panel-glow,
+  #section-card .j-panel-glow, 
   #section-perguntas .j-panel-glow {
     position: relative !important;
     transform: translate(-16px, -70px) !important;
@@ -854,6 +862,7 @@ body.final-lock,
   /* Respiro extra nas seções com botões na parte de baixo */
   #section-guia .j-panel-glow,
   #section-selfie .j-panel-glow,
+  #section-card .j-panel-glow, 
   #section-perguntas .j-panel-glow {
     padding-bottom: 60px !important;
   }
