@@ -5,32 +5,17 @@
    ========================================================= */
 
 /* ---------------------------------------------------------
-   0) WRAPPER CENTRAL UNIVERSAL
-   (garante que tudo respire bem em 100% de zoom)
-   --------------------------------------------------------- */
-
-#jornada-content-wrapper {
-  max-width: 850px;
-  width: 100%;
-  margin: 0 auto;
-  position: relative;
-  padding: 0 20px;
-  box-sizing: border-box;
-}
-
-/* ---------------------------------------------------------
    1) CENTRALIZAÇÃO BASE (vale para todas as seções verticais)
    --------------------------------------------------------- */
 
 #section-intro .j-perg-v-inner,
-  #section-termos1 .j-perg-v-inner,
-  #section-termos2 .j-perg-v-inner,
-  #section-senha  .j-perg-v-inner,
-  #section-guia   .j-perg-v-inner,
-  #section-selfie .j-perg-v-inner,
-  #section-card .j-perg-v-inner,
-  #section-perguntas .j-perg-v-inner,
-  #section-final  .j-perg-v-inner {
+#section-termos1 .j-perg-v-inner,
+#section-termos2 .j-perg-v-inner,
+#section-senha  .j-perg-v-inner,
+#section-guia   .j-perg-v-inner,
+#section-selfie .j-perg-v-inner,
+#section-perguntas .j-perg-v-inner,
+#section-final  .j-perg-v-inner {
   margin-left: auto;
   margin-right: auto;
   max-width: 850px;
@@ -39,14 +24,13 @@
 }
 
 #section-intro .j-panel-glow,
-  #section-termos1 .j-panel-glow,
-  #section-termos2 .j-panel-glow,
-  #section-senha  .j-panel-glow,
-  #section-guia   .j-panel-glow,
-  #section-selfie .j-panel-glow,
-  #section-card .j-panel-glow,
-  #section-perguntas .j-panel-glow,
-  #section-final  .j-panel-glow {
+#section-termos1 .j-panel-glow,
+#section-termos2 .j-panel-glow,
+#section-senha  .j-panel-glow,
+#section-guia   .j-panel-glow,
+#section-selfie .j-panel-glow,
+#section-perguntas .j-panel-glow,
+#section-final  .j-panel-glow {
   margin-left: auto;
   margin-right: auto;
 }
@@ -73,7 +57,6 @@
   #section-senha  .j-perg-v-inner,
   #section-guia   .j-perg-v-inner,
   #section-selfie .j-perg-v-inner,
-  #section-card .j-perg-v-inner,
   #section-perguntas .j-perg-v-inner,
   #section-final  .j-perg-v-inner {
     transform: translateY(40px);
@@ -85,7 +68,6 @@
   #section-senha  .j-panel-glow,
   #section-guia   .j-panel-glow,
   #section-selfie .j-panel-glow,
-  #section-card .j-panel-glow,
   #section-perguntas .j-panel-glow,
   #section-final  .j-panel-glow {
     transform: translateY(-10px);
@@ -118,7 +100,6 @@
   #section-senha  .j-perg-v-inner,
   #section-guia   .j-perg-v-inner,
   #section-selfie .j-perg-v-inner,
-  #section-card .j-perg-v-inner,
   #section-perguntas .j-perg-v-inner,
   #section-final  .j-perg-v-inner {
     transform: translateY(0); /* base neutra; overrides abaixo */
@@ -257,13 +238,14 @@
    ========================================= */
 @media (min-width: 900px) {
 
-  #section-guia .guia-options,
+ #section-guia .guia-options,
   #section-guia .guia-buttons-row,
   #section-guia .card-actions {
     display: flex;
-    justify-content: space-between; /* corrigido: um justify só */
-    gap: 10px;                      /* espaço igual entre eles */
-    padding: 0 18px 18px;           /* corrigido ; que faltava */
+    justify-content: center;
+    gap: 10px;                  /* espaço igual entre eles */
+    padding: 0 18px 18px 
+    justify-content: space-between;
     align-items: center;
     width: 100%;
     box-sizing: border-box;
@@ -277,22 +259,11 @@
     max-width: 32%;
     margin: 0 !important;
     box-sizing: border-box;
-  }
+  }   
 }
-
 /* =========================================
-   PAGE CARD – LAYOUT & REMOVER O PERGAMINHO GLOBAL
+   PAGE CARD – REMOVER O PERGAMINHO GLOBAL
    ========================================= */
-
-/* 0) Card-stage com espaço garantido pro botão (desktop + base) */
-#section-card .card-stage {
-  position: relative;
-  width: 100%;
-  max-width: 560px;
-  margin: 0 auto;
-  padding-bottom: 220px; /* espaço pro nome + botão fora do card */
-  overflow: visible;
-}
 
 /* 1) Isola o fundo global dentro do card */
 #section-card,
@@ -316,6 +287,20 @@
 #section-card *::before,
 #section-card *::after {
   content: none !important;
+}
+
+/* =========================================
+   PAGE CARD – LAYOUT & REMOVER O PERGAMINHO GLOBAL
+   ========================================= */
+
+/* 0) Card-stage com espaço garantido pro botão (desktop + base) */
+#section-card .card-stage {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding-bottom: 220px; /* espaço pro nome + botão fora do card */
+  overflow: visible;
 }
 
 /* 4) Placeholder + selfie em posição RELATIVA (sem top: 380px) */
@@ -821,239 +806,55 @@ body.final-lock,
     transform: translateX(-50%) !important;
   }
 }
-/* =========================================================
-   ZION PATCH – REMOVER TRANSFORM E USAR MARGIN-TOP
-   + OVERFLOW VISÍVEL + MEDIA QUERY INTERMEDIÁRIA
-   ========================================================= */
-
-/* 0) Garantir que os wrappers não cortem nada por padrão */
-#section-intro .j-perg-v-inner,
-  #section-termos1 .j-perg-v-inner,
-  #section-termos2 .j-perg-v-inner,
-  #section-senha  .j-perg-v-inner,
-  #section-guia   .j-perg-v-inner,
-  #section-selfie .j-perg-v-inner,
-  #section-card .j-perg-v-inner,
-  #section-perguntas .j-perg-v-inner,
-  #section-final  .j-perg-v-inner,
-  #section-intro .j-panel-glow,
-  #section-termos1 .j-panel-glow,
-  #section-termos2 .j-panel-glow,
-  #section-senha  .j-panel-glow,
-  #section-guia   .j-panel-glow,
-  #section-selfie .j-panel-glow,
-  #section-card .j-panel-glow,
-  #section-perguntas .j-panel-glow,
-  #section-final  .j-panel-glow {
-  overflow: visible !important;
-  /* padding extra embaixo pra não cortar botões / texto */
-  padding-bottom: 40px;
-}
 
 /* =========================================================
-   1) DESKTOP (>= 900px) – trocar transform por margin-top
+   LAYOUT UNIFICADO (BASE SENHA) — DESKTOP >= 900px
+   Aplica a mesma métrica da página SENHA
+   para Intro, Termos1, Termos2, Guia, Selfie, Perguntas.
+   Mantém FINAL com seu layout especial.
    ========================================================= */
 @media (min-width: 900px) {
 
-  /* PERGAMINHO sobe um pouco dentro da viewport */
+  /* Pergaminho interno de todas as seções principais */
   #section-intro .j-perg-v-inner,
   #section-termos1 .j-perg-v-inner,
   #section-termos2 .j-perg-v-inner,
   #section-senha  .j-perg-v-inner,
-  #section-guia   .j-perg-v-inner,
-  #section-selfie .j-perg-v-inner,
-  #section-card .j-perg-v-inner,
-  #section-perguntas .j-perg-v-inner,
-  #section-final  .j-perg-v-inner {
-    transform: none !important;
-    margin-top: 40px;         /* era translateY(40px) */
-  }
-
-  /* CARD (vidro) desce só um pouquinho dentro do pergaminho */
-  #section-intro .j-panel-glow,
-  #section-termos1 .j-panel-glow,
-  #section-termos2 .j-panel-glow,
-  #section-senha  .j-panel-glow,
-  #section-guia   .j-panel-glow,
-  #section-selfie .j-panel-glow,
-  #section-card .j-panel-glow,
-  #section-perguntas .j-panel-glow,
-  #section-final  .j-panel-glow {
-    transform: none !important;
-    margin-top: -10px;        /* era translateY(-10px) */
-  }
-
-  /* Ajustes mais fortes que existiam só na SENHA/SELFIE/FINAL */
-
-  /* SENHA – antes tinha translate + top; agora só margin */
-  #section-senha .j-perg-v-inner {
-    margin-top: 40px !important;
-    top: 0 !important;
-  }
-  #section-senha .j-panel-glow {
-    margin-top: -70px !important;
-    top: 0 !important;
-  }
-
-  /* SELFIE – sobe um pouco */
-  #section-selfie .j-perg-v-inner,
-  #section-selfie .j-panel-glow {
-    margin-top: -90px !important;
-    top: 0 !important;
-    transform: none !important;
-  }
-
-  /* FINAL – usa apenas margin-top, sem translateY */
-  #section-final {
-    padding-top: 60px !important;
-    padding-bottom: 80px !important;
-  }
-  #section-final .j-panel-glow,
-  #section-final .j-perg-v-inner {
-    transform: translateX(-50%) !important; /* só centro no X */
-    margin-top: -40px !important;
-    top: 0 !important;
-  }
-}
-
-/* =========================================================
-   2) MEDIA QUERY INTERMEDIÁRIA (600px – 899px)
-   ========================================================= */
-@media (min-width: 600px) and (max-width: 899px) {
-
-  /* PERGAMINHO alinha um pouco mais alto, mas menos que desktop */
-  #section-intro .j-perg-v-inner,
-  #section-termos1 .j-perg-v-inner,
-  #section-termos2 .j-perg-v-inner,
-  #section-senha  .j-perg-v-inner,
-  #section-guia   .j-perg-v-inner,
-  #section-selfie .j-perg-v-inner,
-  #section-card .j-perg-v-inner,
-  #section-perguntas .j-perg-v-inner,
-  #section-final  .j-perg-v-inner {
-    transform: none !important;
-    margin-top: 20px;
-  }
-
-  /* CARD fica levemente sobreposto ao pergaminho */
-  #section-intro .j-panel-glow,
-  #section-termos1 .j-panel-glow,
-  #section-termos2 .j-panel-glow,
-  #section-senha  .j-panel-glow,
-  #section-guia   .j-panel-glow,
-  #section-selfie .j-panel-glow,
-  #section-card .j-panel-glow,
-  #section-perguntas .j-panel-glow,
-  #section-final  .j-panel-glow {
-    transform: none !important;
-    margin-top: -12px;
-  }
-
-  /* SENHA um pouco mais alta pra caber campo + botões */
-  #section-senha .j-panel-glow {
-    margin-top: -32px !important;
-  }
-
-  /* SELFIE – centralizar cabine no centro do pergaminho */
-  #section-selfie .j-panel-glow {
-    margin-top: -26px !important;
-  }
-
-  /* FINAL – descansa um pouco mais pra baixo */
-  #section-final .j-panel-glow,
-  #section-final .j-perg-v-inner {
-    margin-top: -20px !important;
-  }
-}
-
-/* =========================================================
-   3) MOBILE (<= 600px) – remover todos os translate
-   ========================================================= */
-@media (max-width: 600px) {
-
-  #section-intro .j-panel-glow,
-  #section-termos1 .j-panel-glow,
-  #section-termos2 .j-panel-glow,
-  #section-senha  .j-panel-glow,
-  #section-guia   .j-panel-glow,
-  #section-selfie .j-panel-glow,
-  #section-card .j-panel-glow,
-  #section-perguntas .j-panel-glow,
-  #section-final  .j-panel-glow {
-    transform: none !important;
-    margin-top: -24px;           /* valor médio suave pro topo */
-  }
-
-  #section-intro .j-perg-v-inner,
-  #section-termos1 .j-perg-v-inner,
-  #section-termos2 .j-perg-v-inner,
-  #section-senha  .j-perg-v-inner,
-  #section-guia   .j-perg-v-inner,
-  #section-selfie .j-perg-v-inner,
-  #section-card .j-perg-v-inner,
-  #section-perguntas .j-perg-v-inner,
-  #section-final  .j-perg-v-inner {
-    transform: none !important;
-    margin-top: 0;               /* começa neutro, DOM manda */
-  }
-
-  /* SENHA – sobe um pouco mais no mobile pra caber tudo */
-  #section-senha .j-panel-glow {
-    margin-top: -32px !important;
-  }
-
-  /* GUIA – card com nome e botões bem centralizado */
-  #section-guia .j-panel-glow {
-    margin-top: -30px !important;
-  }
-
-  /* SELFIE – cabine fica no centro do pergaminho */
-  #section-selfie .j-panel-glow {
-    margin-top: -28px !important;
-  }
-
-  /* FINAL – leve subida pra encaixar bem no pergaminho */
-  #section-final .j-panel-glow {
-    margin-top: -20px !important;
-  }
-}
-/* =========================================================
-   PATCH – ALINHAMENTO DESKTOP DAS SEÇÕES
-   Intro, Termos 1 e 2, Guia, Selfie, Perguntas
-   usando a página SENHA como referência visual
-   ========================================================= */
-
-@media (min-width: 900px) {
-
-  /* Pergaminho interno: mesma altura base da página SENHA */
-  #section-intro .j-perg-v-inner,
-  #section-termos1 .j-perg-v-inner,
-  #section-termos2 .j-perg-v-inner,
   #section-guia   .j-perg-v-inner,
   #section-selfie .j-perg-v-inner,
   #section-perguntas .j-perg-v-inner {
-    margin-top: 40px !important;   /* altura do pergaminho */
-    top: 0 !important;
-    transform: none !important;
-    overflow: visible !important;  /* nada é cortado */
+    position: relative !important;
+    transform: translateY(40px) !important;
+    top: 40px !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    overflow: visible !important;
+    z-index: 5 !important;
   }
 
-  /* Card (vidro) em cima do pergaminho: mesma lógica da SENHA */
+  /* Painel de vidro central com a mesma posição que a SENHA */
   #section-intro .j-panel-glow,
   #section-termos1 .j-panel-glow,
   #section-termos2 .j-panel-glow,
+  #section-senha  .j-panel-glow,
   #section-guia   .j-panel-glow,
   #section-selfie .j-panel-glow,
   #section-perguntas .j-panel-glow {
-    margin-top: -70px !important;  /* antes ficava perdido */
-    top: 0 !important;
-    transform: none !important;
+    position: relative !important;
+    transform: translate(-16px, -70px) !important;
+    top: 10px !important;
+    margin-top: 0 !important;
+    width: 90% !important;
+    max-width: 470px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    z-index: 6 !important;
   }
 
-  /* EXTRA: espaço de respiro embaixo pra botão não sumir */
+  /* Respiro extra nas seções com botões na parte de baixo */
   #section-guia .j-panel-glow,
-  #section-selfie .j-panel-glow {
+  #section-selfie .j-panel-glow,
+  #section-perguntas .j-panel-glow {
     padding-bottom: 60px !important;
   }
 }
-
