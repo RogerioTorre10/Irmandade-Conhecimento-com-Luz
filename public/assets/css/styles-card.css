@@ -1,5 +1,5 @@
 /* =========================================
-   STYLES-CARD v7 — FLUIDO
+   STYLES-CARD v8 — FLUIDO (AJUSTADO)
    Layout controlado pelo styles-layout.css
    Card só cuida da vitrine interna
    ========================================= */
@@ -27,7 +27,7 @@
   position: relative;
   width: min(100%, var(--card-max-w));
   margin: 0 auto;
-  padding: 32px 24px 96px; /* padding-bottom garante espaço pro botão */
+  padding: 32px 24px 60px; /* ↓ encurtamos o bottom pra subir o botão */
   box-sizing: border-box;
   overflow: visible;
   z-index: 20;
@@ -54,7 +54,10 @@
   z-index: 2;
 }
 
-/* ---------- Selfie / placeholder central ---------- */
+/* ---------- Selfie / placeholder central ----------
+   Aqui entra o "card final" + placeholder (cruz, moldura, etc.)
+   NÃO escondemos mais nenhuma classe de placeholder.
+----------------------------------------------------- */
 #section-card .flame-layer {
   position: relative;
   margin: 12px auto 10px;
@@ -75,10 +78,20 @@
   display: block;
 }
 
+/* Se existir um wrapper específico de placeholder, mantemos fluido */
+#section-card .card-selfie-slot,
+#section-card .selfie-placeholder,
+#section-card .card-selfie-placeholder {
+  position: relative;
+  margin: 8px auto 6px;
+  width: clamp(220px, 70%, 340px);
+  max-width: 100%;
+}
+
 /* ---------- Nome do participante ---------- */
 #section-card .card-footer {
   position: relative;
-  margin: 6px auto 4px;
+  margin: 10px auto 4px;
   text-align: center;
   z-index: 3;
 }
@@ -108,7 +121,7 @@
    ========================================= */
 #section-card .card-actions-below {
   position: relative;
-  margin: 24px auto 0;
+  margin: 18px auto 0;   /* ↓ aproximamos do card */
   text-align: center;
   z-index: 3;
 }
@@ -147,11 +160,9 @@
     0 0 18px rgba(212,175,55,0.5);
 }
 
-/* Esconde botões antigos dentro do card, se existirem */
-#section-card .card-actions,
-#section-card .card-selfie-slot,
-#section-card .selfie-placeholder,
-#section-card .card-selfie-placeholder {
+/* Esconde APENAS botões antigos dentro do card,
+   mas NÃO mexe em placeholder / slot / selfie */
+#section-card .card-actions {
   display: none !important;
 }
 
@@ -180,13 +191,15 @@
   #section-card .card-stage {
     width: 88vw;
     max-width: 360px;
-    padding: 24px 16px 80px; /* bottom um pouco menor, mobile é mais alto */
+    padding: 24px 16px 56px; /* menor bottom, botão sobe junto */
   }
 
-  #section-card .flame-layer {
+  #section-card .flame-layer,
+  #section-card .card-selfie-slot,
+  #section-card .selfie-placeholder,
+  #section-card .card-selfie-placeholder {
     width: clamp(180px, 70%, 260px);
     border-radius: 22px;
-    border-width: 5px;
   }
 
   #section-card .card-footer {
@@ -209,10 +222,13 @@
 
   #section-card .card-stage {
     width: min(92%, 480px);
-    padding: 28px 20px 90px;
+    padding: 28px 20px 60px;
   }
 
-  #section-card .flame-layer {
+  #section-card .flame-layer,
+  #section-card .card-selfie-slot,
+  #section-card .selfie-placeholder,
+  #section-card .card-selfie-placeholder {
     width: clamp(220px, 65%, 320px);
   }
 }
@@ -226,11 +242,14 @@
     width: min(100%, var(--card-max-w));
   }
 
-  #section-card .flame-layer {
+  #section-card .flame-layer,
+  #section-card .card-selfie-slot,
+  #section-card .selfie-placeholder,
+  #section-card .card-selfie-placeholder {
     width: clamp(260px, 70%, 360px);
   }
 
   #section-card .card-actions-below {
-    margin-top: 28px;
+    margin-top: 22px;
   }
 }
