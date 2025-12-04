@@ -28,10 +28,10 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important; 
-  min-height: 920px !important;         /* alonga o card */ 
+  min-height: 860px !important;         /* alonga o card */ 
   width: min(100%, 520px);
   margin: 0 auto;
-  padding: 130px 40px 180px !important;  /* mais espaço em cima e embaixo */
+  padding: 90px 40px 150px !important;  /* mais espaço em cima e embaixo */
   box-sizing: border-box;
   border-radius: 22px;
   background: radial-gradient(circle at 20% 0%, rgba(255,255,255,0.12), transparent 55%),
@@ -47,8 +47,9 @@
   position: relative;
   width: 100%;
   max-width: 540px;
-  margin: 0 auto;   
-  z-index: 2;
+  margin: 0 auto;
+  text-align: center; 
+  z-index: 2;   
 }
 
 /* ---------- Fundo do guia (imagem de fundo) ---------- */
@@ -58,7 +59,7 @@
   display: block;
   max-width: 540px;
   height: auto;
-  margin: 40px auto 0 auto;            /* descola do topo */  inset: 0;
+  margin: 8px auto 0 auto;            /* descola do topo */  inset: 0;
   width: 100%;
   object-fit: cover;
   border-radius: 32px;
@@ -75,7 +76,7 @@
 #section-card .flame-layer {
   position: absolute !important;
   left: 50% !important;
-  top: 72% !important;                  /* sobe/desce o quadrado */
+  top: 62% !important;                  /* sobe/desce o quadrado */
   transform: translate(-50%, -50%) !important;
   width: clamp(260px, 52%, 360px) !important;
   aspect-ratio: 1 / 1 !important;
@@ -96,12 +97,16 @@
 }
 
 #section-card .flame-selfie {
+  position: relative; 
   width: 100%;
+  margin: 0 auto 18px auto;
+  text-align: center; 
   height: 100%;
   object-fit: cover;
   object-position: center 32%;
   border-radius: 14px !important; 
   display: block;
+  z-index: 3; 
 }
 
 /* Nome do participante logo abaixo da vitrine */
@@ -143,7 +148,7 @@
 #section-card .card-actions-below {
   position: relative;
   margin: 22px auto 0;
-  margin-top: 100px !important; 
+  margin-top: 85px !important; 
   text-align: center;
   z-index: 3;
 }
