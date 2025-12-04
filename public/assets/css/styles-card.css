@@ -25,9 +25,13 @@
 /* Usamos .card-panel para não mexer nas outras seções */
 #section-card .card-panel {
   position: relative;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important; 
+  min-height: 780px !important;         /* alonga o card */ 
   width: min(100%, 520px);
   margin: 0 auto;
-  padding: 32px 24px 40px;
+  padding: 80px 40px 140px !important;  /* mais espaço em cima e embaixo */
   box-sizing: border-box;
   border-radius: 22px;
   background: radial-gradient(circle at 20% 0%, rgba(255,255,255,0.12), transparent 55%),
@@ -41,6 +45,9 @@
 /* Conteúdo interno do pergaminho */
 #section-card .conteudo-pergaminho {
   position: relative;
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto;   
   z-index: 2;
 }
 
@@ -48,11 +55,14 @@
 #section-card #guideBg,
 #section-card .guide-bg {
   position: absolute;
+  display: block;
+  max-width: 540px;
+  height: auto;
+  margin: 0 auto; 
   inset: 0;
   width: 100%;
-  height: 100%;
   object-fit: cover;
-  border-radius: 22px;
+  border-radius: 32px;
   opacity: 1;
   transition: opacity .6s ease;
   z-index: 1;
@@ -64,10 +74,15 @@
 
 /* A vitrine (foto) fica no fluxo normal, centralizada */
 #section-card .flame-layer {
-  position: relative;
-  margin: 18px auto 10px;
-  width: clamp(260px, 70%, 360px);
-  aspect-ratio: 3 / 4;
+  position: absolute !important;
+  left: 50% !important;
+  top: 56% !important;                  /* sobe/desce o quadrado */
+  transform: translate(-50%, -50%) !important;
+  width: clamp(280px, 55%, 380px) !important;
+  aspect-ratio: 1 / 1 !important;
+  max-width: 380px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
   border-radius: 22px;
   overflow: hidden;
   box-shadow: 0 20px 48px rgba(0,0,0,0.8);
@@ -86,14 +101,20 @@
   height: 100%;
   object-fit: cover;
   object-position: center 32%;
+  border-radius: 14px !important; 
   display: block;
 }
 
 /* Nome do participante logo abaixo da vitrine */
 #section-card .card-footer {
-  position: relative;
-  margin: 12px auto 4px;
-  text-align: center;
+ position: absolute !important;
+  bottom: -20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 80% !important;
+  text-align: center !important;
+  pointer-events: none !important;   
+  margin: 12px auto 4px; 
   z-index: 3;
 }
 
@@ -104,6 +125,7 @@
   border-radius: 999px;
   border: 1px solid rgba(212, 175, 55, 0.85);
   background: rgba(0,0,0,0.78);
+  backdrop-filter: blur(4px); 
   color: #f5d26b;
   font: 700 clamp(18px, 2.6vw, 22px)/1 "BerkshireSwash-Regular", serif;
   letter-spacing: .12em;
@@ -122,6 +144,7 @@
 #section-card .card-actions-below {
   position: relative;
   margin: 22px auto 0;
+  margin-top: 70px !important; 
   text-align: center;
   z-index: 3;
 }
@@ -129,15 +152,17 @@
 #section-card #btnNext,
 #section-card .btn-next-card {
   display: inline-block;
+  opacity: 0.75 !important;
+  backdrop-filter: blur(6px) !important;
+  background: rgba(20,20,20,0.35) !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  padding: 12px 24px !important;
+  font-size: 18px !important; 
   min-width: 220px;
-  padding: 12px 34px;
-  font-size: 1.05rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .12em;
-  background: linear-gradient(to bottom, #f7e08a, #d4af37);
   color: #25140a;
-  border: 2px solid #8b5a2b;
   border-radius: 999px;
   box-shadow:
     0 8px 20px rgba(0,0,0,0.7),
@@ -233,65 +258,6 @@
   #section-card .card-panel {
     width: min(100%, 520px);
   }
-}
-/* PLACEHOLDER 1:1 – quadrado perfeito */
-#section-card .flame-layer {
- position: relative !important;
-  margin: 0 auto !important;
-
-  /* maior, ainda quadrado */
-  width: clamp(300px, 48%, 460px) !important;
-  max-width: 460px !important;
-  aspect-ratio: 1 / 1 !important;
-
-  top: 170px !important;    /* sobe/desce o quadrado no card */
-  padding: 0 !important;
-}
-
-/* A selfie dentro do quadrado */
-#section-card .flame-selfie {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  border-radius: 14px !important;
-}
-/* Base inferior do placeholder (medalha do nome) */
-#section-card .card-footer {
-  position: absolute !important;
-  bottom: -18px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  width: 80% !important;
-  text-align: center !important;
-  pointer-events: none !important; /* não intercepta clique */
-}
-
-/* Moldura do nome */
-#section-card .card-name-badge {
-  display: inline-block;
-  padding: 6px 16px;
-  font-family: 'Cardo', serif;
-  font-size: 20px;
-  color: #ffe9a6;
-  background: rgba(0, 0, 0, 0.55);
-  border: 2px solid rgba(255, 230, 180, 0.6);
-  border-radius: 12px;
-  text-shadow: 0 0 6px #000;
-  backdrop-filter: blur(4px);
-}
-/* Botão translúcido / invisível para captura */
-#section-card .card-actions-below {
-  margin-top: 34px !important;
-  text-align: center !important;
-}
-
-#section-card #btnNext {
-  opacity: 0.75 !important;
-  backdrop-filter: blur(6px) !important;
-  background: rgba(20,20,20,0.35) !important;
-  border: 1px solid rgba(255,255,255,0.15) !important;
-  padding: 12px 24px !important;
-  font-size: 18px !important;
 }
 
 /* Não imprime */
