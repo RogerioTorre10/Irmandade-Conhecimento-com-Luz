@@ -31,7 +31,7 @@
   min-height: 960px !important;         /* alonga o card */ 
   width: min(100%, 520px);
   margin: 0 auto;
-  padding: 130px 50px 200px !important;  /* mais espaço em cima e embaixo */
+  padding: 40px 30px 80px !important;  /* mais espaço em cima e embaixo */
   box-sizing: border-box;
   border-radius: 22px;
   background: radial-gradient(circle at 20% 0%, rgba(255,255,255,0.12), transparent 55%),
