@@ -65,9 +65,11 @@
 /* A vitrine (foto) fica no fluxo normal, centralizada */
 #section-card .flame-layer {
   position: relative;
-  margin: 18px auto 10px;
-  width: clamp(260px, 70%, 360px);
-  aspect-ratio: 3 / 4;
+  margin: 0 auto !important;
+  width: 55% !important;       /* ajuste fino depois se quiser maior/menor */
+  aspect-ratio: 1 / 1;
+  top: 180px !important;       /* ajusta posição vertical */
+  padding: 0 !important;
   border-radius: 22px;
   overflow: hidden;
   box-shadow: 0 20px 48px rgba(0,0,0,0.8);
@@ -87,13 +89,19 @@
   object-fit: cover;
   object-position: center 32%;
   display: block;
+  border-radius: 14px !important; 
 }
 
 /* Nome do participante logo abaixo da vitrine */
 #section-card .card-footer {
   position: relative;
+  bottom: -12px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 80% !important;
+  text-align: center !important;
+  pointer-events: none !important; /* não intercepta clique */ 
   margin: 12px auto 4px;
-  text-align: center;
   z-index: 3;
 }
 
@@ -102,10 +110,14 @@
   display: inline-block;
   padding: 8px 22px;
   border-radius: 999px;
-  border: 1px solid rgba(212, 175, 55, 0.85);
-  background: rgba(0,0,0,0.78);
-  color: #f5d26b;
-  font: 700 clamp(18px, 2.6vw, 22px)/1 "BerkshireSwash-Regular", serif;
+  font-family: "BerkshireSwash-Regular", serif;
+  font-size: 20px;
+  color: #ffe9a6;
+  background: rgba(0, 0, 0, 0.55);
+  border: 2px solid rgba(255, 230, 180, 0.6);
+  border-radius: 12px;
+  text-shadow: 0 0 6px #000;
+  backdrop-filter: blur(4px); 
   letter-spacing: .12em;
   text-transform: uppercase;
   text-shadow: 0 1px 3px rgba(0,0,0,.9);
@@ -120,30 +132,38 @@
    BOTÃO CONTINUAR — FORA DO CARD, MAS PERTO
    ====================================================== */
 #section-card .card-actions-below {
-  position: relative;
-  margin: 22px auto 0;
-  text-align: center;
-  z-index: 3;
+ position: relative;
+ margin-top: 40px !important;
+ text-align: center !important;
 }
 
 #section-card #btnNext,
 #section-card .btn-next-card {
   display: inline-block;
+  opacity: 0.75 !important;
+  backdrop-filter: blur(6px) !important;
+  background: rgba(20,20,20,0.35) !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  padding: 12px 24px !important;
+  font-size: 18px !important;
   min-width: 220px;
-  padding: 12px 34px;
   font-size: 1.05rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .12em;
-  background: linear-gradient(to bottom, #f7e08a, #d4af37);
   color: #25140a;
-  border: 2px solid #8b5a2b;
   border-radius: 999px;
   box-shadow:
     0 8px 20px rgba(0,0,0,0.7),
     0 0 26px rgba(212,175,55,0.65);
   cursor: pointer;
   transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+/* Não imprime */
+@media print {
+  #section-card #btnNext {
+  display: none !important;
+  }
 }
 
 #section-card #btnNext:hover,
