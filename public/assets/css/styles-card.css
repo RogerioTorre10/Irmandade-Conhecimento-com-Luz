@@ -70,9 +70,10 @@
   left: 50%;
   top: 68%;                        /* posição vertical sobre o peito */
   transform: translate(-50%, -50%);
-  width: 42%;
   max-width: 180px;
-  aspect-ratio: 0.75 / 1.15;             /* quadrado 1x1 */
+  height: auto !important;
+  width: 58% !important; /* ajuste fino milimétrico */
+  aspect-ratio: auto !important;
   border-radius: 22px;
   overflow: hidden;
 
