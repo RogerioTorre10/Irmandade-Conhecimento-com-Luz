@@ -236,12 +236,15 @@
 }
 /* PLACEHOLDER 1:1 – quadrado perfeito */
 #section-card .flame-layer {
-  width: 55% !important;       /* ajuste fino depois se quiser maior/menor */
-  aspect-ratio: 1 / 1 !important;
-  max-width: 320px !important;
+ position: relative !important;
   margin: 0 auto !important;
-  top: 180px !important;       /* ajusta posição vertical */
-  position: relative !important;
+
+  /* maior, ainda quadrado */
+  width: clamp(300px, 48%, 460px) !important;
+  max-width: 460px !important;
+  aspect-ratio: 1 / 1 !important;
+
+  top: 170px !important;    /* sobe/desce o quadrado no card */
   padding: 0 !important;
 }
 
@@ -255,7 +258,7 @@
 /* Base inferior do placeholder (medalha do nome) */
 #section-card .card-footer {
   position: absolute !important;
-  bottom: -12px !important;
+  bottom: -18px !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
   width: 80% !important;
@@ -278,7 +281,7 @@
 }
 /* Botão translúcido / invisível para captura */
 #section-card .card-actions-below {
-  margin-top: 40px !important;
+  margin-top: 34px !important;
   text-align: center !important;
 }
 
