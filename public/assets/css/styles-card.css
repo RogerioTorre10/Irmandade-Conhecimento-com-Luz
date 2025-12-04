@@ -234,3 +234,67 @@
     width: min(100%, 520px);
   }
 }
+/* PLACEHOLDER 1:1 – quadrado perfeito */
+#section-card .flame-layer {
+  width: 55% !important;       /* ajuste fino depois se quiser maior/menor */
+  aspect-ratio: 1 / 1 !important;
+  max-width: 320px !important;
+  margin: 0 auto !important;
+  top: 180px !important;       /* ajusta posição vertical */
+  position: relative !important;
+  padding: 0 !important;
+}
+
+/* A selfie dentro do quadrado */
+#section-card .flame-selfie {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 14px !important;
+}
+/* Base inferior do placeholder (medalha do nome) */
+#section-card .card-footer {
+  position: absolute !important;
+  bottom: -12px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 80% !important;
+  text-align: center !important;
+  pointer-events: none !important; /* não intercepta clique */
+}
+
+/* Moldura do nome */
+#section-card .card-name-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  font-family: 'Cardo', serif;
+  font-size: 20px;
+  color: #ffe9a6;
+  background: rgba(0, 0, 0, 0.55);
+  border: 2px solid rgba(255, 230, 180, 0.6);
+  border-radius: 12px;
+  text-shadow: 0 0 6px #000;
+  backdrop-filter: blur(4px);
+}
+/* Botão translúcido / invisível para captura */
+#section-card .card-actions-below {
+  margin-top: 40px !important;
+  text-align: center !important;
+}
+
+#section-card #btnNext {
+  opacity: 0.75 !important;
+  backdrop-filter: blur(6px) !important;
+  background: rgba(20,20,20,0.35) !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  padding: 12px 24px !important;
+  font-size: 18px !important;
+}
+
+/* Não imprime */
+@media print {
+  #section-card #btnNext {
+    display: none !important;
+  }
+}
+
