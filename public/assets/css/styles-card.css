@@ -68,7 +68,7 @@
 #section-card .flame-layer {
   position: absolute;
   left: 50%;
-  top: 68%;                        /* posição vertical sobre o peito */
+  top: 70%;                        /* posição vertical sobre o peito */
   transform: translate(-50%, -50%);
   width: 42%;
   max-width: 180px;
