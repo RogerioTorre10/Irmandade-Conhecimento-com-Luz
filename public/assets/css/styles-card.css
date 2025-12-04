@@ -72,7 +72,7 @@
   transform: translate(-50%, -50%);
   width: 42%;
   max-width: 180px;
-  aspect-ratio: 1 / 0.85;             /* quadrado 1x1 */
+  aspect-ratio: 1.10 / 0.85;             /* quadrado 1x1 */
   border-radius: 22px;
   overflow: hidden;
 
