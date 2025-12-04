@@ -28,10 +28,10 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important; 
-  min-height: 780px !important;         /* alonga o card */ 
+  min-height: 920px !important;         /* alonga o card */ 
   width: min(100%, 520px);
   margin: 0 auto;
-  padding: 80px 40px 140px !important;  /* mais espaço em cima e embaixo */
+  padding: 130px 40px 180px !important;  /* mais espaço em cima e embaixo */
   box-sizing: border-box;
   border-radius: 22px;
   background: radial-gradient(circle at 20% 0%, rgba(255,255,255,0.12), transparent 55%),
@@ -58,8 +58,7 @@
   display: block;
   max-width: 540px;
   height: auto;
-  margin: 0 auto; 
-  inset: 0;
+  margin: 40px auto 0 auto;            /* descola do topo */  inset: 0;
   width: 100%;
   object-fit: cover;
   border-radius: 32px;
@@ -76,11 +75,11 @@
 #section-card .flame-layer {
   position: absolute !important;
   left: 50% !important;
-  top: 56% !important;                  /* sobe/desce o quadrado */
+  top: 72% !important;                  /* sobe/desce o quadrado */
   transform: translate(-50%, -50%) !important;
-  width: clamp(280px, 55%, 380px) !important;
+  width: clamp(260px, 52%, 360px) !important;
   aspect-ratio: 1 / 1 !important;
-  max-width: 380px !important;
+  max-width: 360px !important;
   margin: 0 auto !important;
   padding: 0 !important;
   border-radius: 22px;
@@ -108,7 +107,7 @@
 /* Nome do participante logo abaixo da vitrine */
 #section-card .card-footer {
  position: absolute !important;
-  bottom: -20px !important;
+  bottom: -22px !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
   width: 80% !important;
@@ -144,7 +143,7 @@
 #section-card .card-actions-below {
   position: relative;
   margin: 22px auto 0;
-  margin-top: 70px !important; 
+  margin-top: 100px !important; 
   text-align: center;
   z-index: 3;
 }
