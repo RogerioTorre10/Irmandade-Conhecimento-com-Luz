@@ -201,7 +201,7 @@
     padding-top: 32px !important;
     padding-left: 16px !important;
     padding-right: 16px !important;
-    padding-bottom: 220px !important;  /* novo valor */
+    padding-bottom: 320px !important;  /* novo valor */
     box-sizing: border-box;
   }
 
@@ -219,10 +219,10 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 62% !important;              /* desce até o peito */
+    top: 52% !important;              /* desce até o peito */
     transform: translate(-50%, -50%) !important;
-    width: 56% !important;            /* tamanho relativo ao card */
-    max-width: 110px !important;      /* teto pra não explodir */
+    width: 46% !important;            /* tamanho relativo ao card */
+    max-width: 90px !important;      /* teto pra não explodir */
     aspect-ratio: 3 / 4 !important;   /* formato de carta vertical */
     border-radius: 16px !important;
     overflow: hidden !important;
