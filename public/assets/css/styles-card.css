@@ -72,7 +72,7 @@
   transform: translate(-50%, -50%);
   max-width: 140px;
   width: 58% !important; /* ajuste fino milimétrico */
-  aspect-ratio: 0.75 / 0.70;
+  aspect-ratio: 1 / 1;
   border-radius: 20px;
   overflow: hidden;
 
