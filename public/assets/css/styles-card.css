@@ -224,7 +224,7 @@
   #section-card .card-panel {
     width: 88% !important;
     margin: 0 auto !important;
-    padding: 42px 18px 170px !important; /* espaço embaixo p/ botão */
+    padding: 32px 16px 150px !important; /* espaço embaixo p/ botão */
     box-sizing: border-box;
   }
 
@@ -241,11 +241,11 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 65% !important;              /* desce até o peito */
+    top: 62% !important;              /* desce até o peito */
     transform: translate(-50%, -50%) !important;
 
     width: 56% !important;            /* tamanho relativo ao card */
-    max-width: 120px !important;      /* teto pra não explodir */
+    max-width: 110px !important;      /* teto pra não explodir */
     aspect-ratio: 3 / 4 !important;   /* formato de carta vertical */
     border-radius: 16px !important;
     overflow: hidden !important;
