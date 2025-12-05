@@ -216,82 +216,65 @@
   }
 }
 /* =======================================================
-   SECTION-CARD — MOBILE PERFECT (Lumen Mobile Fix v3)
+   SECTION-CARD — MOBILE PERFECT (Lumen Mobile Fix v4)
    ======================================================= */
 @media (max-width: 600px) {
 
-  /* Palco principal */
+  /* Palco principal do card no mobile */
   #section-card .card-panel {
-    padding-top: 40px !important;
-    padding-bottom: 160px !important; /* espaço para botão */
-  }
-
-  /* Selfie (a imagem grande da pessoa) */
-  #section-card .selfie-wrapper {
-    position: relative !important;
     width: 88% !important;
     margin: 0 auto !important;
-    display: flex !important;
-    justify-content: center !important;
+    padding: 32px 16px 150px !important; /* espaço embaixo p/ botão */
+    box-sizing: border-box;
   }
 
-  /* Placeholder (sua carta dourada) */
-  #section-card .placeholder-wrapper {
+  /* Guia (cardão verde da pessoa) */
+  #section-card .guide-bg {
+    display: block;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 auto !important;
+    border-radius: 24px !important;
+  }
+
+  /* PLACEHOLDER DOURADO (a cruz com o nome) */
+  #section-card .flame-layer {
     position: absolute !important;
-    top: 330px !important;  /* DESCE OU SOBE por aqui */
     left: 50% !important;
-    transform: translateX(-50%) !important;
+    top: 73% !important;              /* desce até o peito */
+    transform: translate(-50%, -50%) !important;
 
-    width: 65% !important;         /* ajuste fino do tamanho */
-    max-width: 260px !important;
-    aspect-ratio: 0.75 / 1 !important;  /* levemente mais baixo para não cobrir o rosto */
+    width: 62% !important;            /* tamanho relativo ao card */
+    max-width: 190px !important;      /* teto pra não explodir */
+    aspect-ratio: 3 / 4 !important;   /* formato de carta vertical */
+    border-radius: 20px !important;
+    overflow: hidden !important;
 
-    z-index: 10 !important;
-    pointer-events: none !important;
-  }
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
 
-  /* Nome dentro do placeholder */
-  #section-card .placeholder-wrapper .nome-guia {
-    margin-top: 10px !important;
-    font-size: 1rem !important;
-    pointer-events: auto !important;
-  }
-
-  /* Botão continuar perfeitamente ajustado */
-  #section-card .card-actions {
-    margin-top: 40px !important;
-    padding-bottom: 40px !important;
-    text-align: center !important;
-  }
-
-  #section-card #btnNext {
-    pointer-events: auto !important;
-  }
- #section-card .flame-layer {
-    position: absolute;
-    left: 50%;
-    top: 70%;                    /* parecido com 68%, um tiquinho mais pra baixo */
-    transform: translate(-50%, -50%);
-
-    width: 60% !important;       /* segue a ideia dos 58%, levemente maior/menor */
-    max-width: 150px;            /* MESMA LÓGICA do desktop, só 1 passo menor */
-    aspect-ratio: 3 / 4;
-    border-radius: 20px;
-    overflow: hidden;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: center;
-
-    pointer-events: none;
+    pointer-events: none !important;  /* não bloqueia toques */
     box-shadow:
       0 0 30px rgba(255, 215, 0, 0.45),
       0 0 55px rgba(255, 180, 0, 0.35);
   }
 
-  /* Um respirinho pro botão não colar demais */
-  #section-card .card-actions {
-    margin-top: 28px !important;
+  /* Nome dentro do placeholder (badge GISELY) */
+  #section-card .card-name-badge {
+    margin-bottom: 10px !important;   /* sobe um tiquinho do fundo */
+    font-size: 0.9rem !important;
+  }
+
+  /* Área do botão CONTINUAR */
+  #section-card .card-actions-below {
+    margin-top: 24px !important;
+    text-align: center !important;
+  }
+
+  #section-card #btnNext {
+    pointer-events: auto !important;  /* garante clique normal */
   }
 }
+
