@@ -241,11 +241,11 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 69% !important;              /* desce até o peito */
+    top: 67% !important;              /* desce até o peito */
     transform: translate(-50%, -50%) !important;
 
-    width: 58% !important;            /* tamanho relativo ao card */
-    max-width: 180px !important;      /* teto pra não explodir */
+    width: 56% !important;            /* tamanho relativo ao card */
+    max-width: 160px !important;      /* teto pra não explodir */
     aspect-ratio: 3 / 4 !important;   /* formato de carta vertical */
     border-radius: 20px !important;
     overflow: hidden !important;
