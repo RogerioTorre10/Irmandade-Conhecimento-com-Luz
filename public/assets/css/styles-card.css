@@ -70,9 +70,9 @@
   left: 50%;
   top: 68%;                        /* posição vertical sobre o peito */
   transform: translate(-50%, -50%);
-  max-width: 160px;
+  max-width: 120px;
   width: 58% !important; /* ajuste fino milimétrico */
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 3 / 4;
   border-radius: 20px;
   overflow: hidden;
 
