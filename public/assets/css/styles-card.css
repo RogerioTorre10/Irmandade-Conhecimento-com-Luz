@@ -201,7 +201,7 @@
     padding-top: 32px !important;
     padding-left: 16px !important;
     padding-right: 16px !important;
-    padding-bottom: 320px !important;  /* novo valor */
+    padding-bottom: 520px !important;  /* novo valor */
     box-sizing: border-box;
   }
 
@@ -221,10 +221,10 @@
     left: 50% !important;
     top: 52% !important;              /* desce até o peito */
     transform: translate(-50%, -50%) !important;
-    width: 46% !important;            /* tamanho relativo ao card */
-    max-width: 90px !important;      /* teto pra não explodir */
+    width: 66% !important;            /* tamanho relativo ao card */
+    max-width: 120px !important;      /* teto pra não explodir */
     aspect-ratio: 3 / 4 !important;   /* formato de carta vertical */
-    border-radius: 16px !important;
+    border-radius: 22px !important;
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column !important;
