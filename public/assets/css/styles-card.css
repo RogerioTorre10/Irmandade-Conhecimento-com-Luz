@@ -188,49 +188,27 @@
     margin-top: 40px;
   }
 }
-
-/* ----- MOBILE (ATÉ 600px) ----- */
-
-@media (max-width: 600px) {
-  #section-card .card-panel {
-    margin: 30px auto 50px;
-    padding: 28px 16px 32px;
-  }
-
-  #section-card .guide-bg {
-    max-width: 320px;
-  }
-
-  #section-card .flame-layer {
-    top: 60%;
-    width: 70%;
-  }
-
-  #section-card .card-actions-below {
-    margin-top: 36px;
-  }
-
-  #section-card #btnNext {
-    width: auto;
-    max-width: 260px;
-  }
-}
+ 
 /* =======================================================
    SECTION-CARD — MOBILE PERFECT (Lumen Mobile Fix v4)
    ======================================================= */
 @media (max-width: 600px) {
-
+   
   /* Palco principal do card no mobile */
   #section-card .card-panel {
     width: 88% !important;
     margin: 0 auto !important;
-    padding: 32px 16px 150px !important; /* espaço embaixo p/ botão */
+    padding-top: 32px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    padding-bottom: 220px !important;  /* novo valor */
     box-sizing: border-box;
   }
 
   /* Guia (cardão verde da pessoa) */
   #section-card .guide-bg {
     display: block;
+    max-width: 320px; 
     width: 100% !important;
     height: auto !important;
     margin: 0 auto !important;
@@ -243,18 +221,15 @@
     left: 50% !important;
     top: 62% !important;              /* desce até o peito */
     transform: translate(-50%, -50%) !important;
-
     width: 56% !important;            /* tamanho relativo ao card */
     max-width: 110px !important;      /* teto pra não explodir */
     aspect-ratio: 3 / 4 !important;   /* formato de carta vertical */
     border-radius: 16px !important;
     overflow: hidden !important;
-
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-end !important;
     align-items: center !important;
-
     pointer-events: none !important;  /* não bloqueia toques */
     box-shadow:
       0 0 30px rgba(255, 215, 0, 0.45),
@@ -280,9 +255,20 @@
     margin-top: 24px !important;
     text-align: center !important;
   }
-
-  #section-card #btnNext {
+   
+ #section-card #btnNext {
+    width: auto;
+    max-width: 260px;
     pointer-events: auto !important;  /* garante clique normal */
+    padding: 10px 26px !important;   /* altura reduzida */
+    font-size: 0.95rem !important;   /* fonte levemente menor */
+    border-radius: 18px !important;  /* deixa mais slim */
   }
+   
+ #section-card .card-actions {
+    margin-top: 12px !important;   /* estava maior */
+    padding-bottom: 20px !important; /* menos espaço sobrando */
+  }
+   
 }
 
