@@ -267,4 +267,31 @@
   #section-card #btnNext {
     pointer-events: auto !important;
   }
+ #section-card .flame-layer {
+    position: absolute;
+    left: 50%;
+    top: 70%;                    /* parecido com 68%, um tiquinho mais pra baixo */
+    transform: translate(-50%, -50%);
+
+    width: 60% !important;       /* segue a ideia dos 58%, levemente maior/menor */
+    max-width: 150px;            /* MESMA LÓGICA do desktop, só 1 passo menor */
+    aspect-ratio: 3 / 4;
+    border-radius: 20px;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+
+    pointer-events: none;
+    box-shadow:
+      0 0 30px rgba(255, 215, 0, 0.45),
+      0 0 55px rgba(255, 180, 0, 0.35);
+  }
+
+  /* Um respirinho pro botão não colar demais */
+  #section-card .card-actions {
+    margin-top: 28px !important;
+  }
 }
