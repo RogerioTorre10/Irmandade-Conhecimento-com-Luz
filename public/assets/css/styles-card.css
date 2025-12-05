@@ -220,7 +220,7 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 78% !important;              /* desce até o peito */
+    top: 68% !important;              /* desce até o peito */
     transform: translate(-50%, -50%) !important;
     width: 60% !important;            /* tamanho relativo ao card */
     max-width: 180px !important;      /* teto pra não explodir */
@@ -240,7 +240,7 @@
    /* Ajusta o nome para ficar sempre colado na parte inferior da carta */
   #section-card .flame-layer .nome-guia {
     margin: 0 !important;               /* sem folga */
-    padding-bottom: 6px !important;     /* leve respiro */
+    padding-bottom: 4px !important;     /* leve respiro */
     pointer-events: auto !important;
     font-size: 0.9rem !important;      /* tamanho perfeito no mobile */
   }
@@ -267,7 +267,7 @@
   }
    
  #section-card .card-actions {
-    margin-top: 10px !important;   /* estava maior */
+    margin-top: 8px !important;   /* estava maior */
     padding-bottom: 20px !important; /* menos espaço sobrando */
   }
    
