@@ -215,3 +215,56 @@
     max-width: 260px;
   }
 }
+/* =======================================================
+   SECTION-CARD — MOBILE PERFECT (Lumen Mobile Fix v3)
+   ======================================================= */
+@media (max-width: 600px) {
+
+  /* Palco principal */
+  #section-card .card-panel {
+    padding-top: 40px !important;
+    padding-bottom: 160px !important; /* espaço para botão */
+  }
+
+  /* Selfie (a imagem grande da pessoa) */
+  #section-card .selfie-wrapper {
+    position: relative !important;
+    width: 88% !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+
+  /* Placeholder (sua carta dourada) */
+  #section-card .placeholder-wrapper {
+    position: absolute !important;
+    top: 330px !important;  /* DESCE OU SOBE por aqui */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+
+    width: 65% !important;         /* ajuste fino do tamanho */
+    max-width: 260px !important;
+    aspect-ratio: 0.75 / 1 !important;  /* levemente mais baixo para não cobrir o rosto */
+
+    z-index: 10 !important;
+    pointer-events: none !important;
+  }
+
+  /* Nome dentro do placeholder */
+  #section-card .placeholder-wrapper .nome-guia {
+    margin-top: 10px !important;
+    font-size: 1rem !important;
+    pointer-events: auto !important;
+  }
+
+  /* Botão continuar perfeitamente ajustado */
+  #section-card .card-actions {
+    margin-top: 40px !important;
+    padding-bottom: 40px !important;
+    text-align: center !important;
+  }
+
+  #section-card #btnNext {
+    pointer-events: auto !important;
+  }
+}
