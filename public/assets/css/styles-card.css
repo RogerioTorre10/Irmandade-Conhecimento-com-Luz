@@ -245,7 +245,7 @@
     transform: translate(-50%, -50%) !important;
 
     width: 56% !important;            /* tamanho relativo ao card */
-    max-width: 160px !important;      /* teto pra não explodir */
+    max-width: 150px !important;      /* teto pra não explodir */
     aspect-ratio: 3 / 4 !important;   /* formato de carta vertical */
     border-radius: 20px !important;
     overflow: hidden !important;
@@ -259,6 +259,14 @@
     box-shadow:
       0 0 30px rgba(255, 215, 0, 0.45),
       0 0 55px rgba(255, 180, 0, 0.35);
+  }
+   
+   /* Ajusta o nome para ficar sempre colado na parte inferior da carta */
+  #section-card .flame-layer .nome-guia {
+    margin: 0 !important;               /* sem folga */
+    padding-bottom: 8px !important;     /* leve respiro */
+    pointer-events: auto !important;
+    font-size: 0.88rem !important;      /* tamanho perfeito no mobile */
   }
 
   /* Nome dentro do placeholder (badge GISELY) */
