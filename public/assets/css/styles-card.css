@@ -196,34 +196,34 @@
    
   /* Palco principal do card no mobile */
   #section-card .card-panel {
-    width: 88% !important;
+    width: 110% !important;
     margin: 0 auto !important;
-    min-height: 620px !important;  
-    padding-top: 32px !important;
-    padding-left: 16px !important;
-    padding-right: 16px !important;
-    padding-bottom: 160px !important;  /* novo valor */
+    min-height: 720px !important;  
+    padding-top: 38px !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    padding-bottom: 240px !important;  /* novo valor */
     box-sizing: border-box;
   }
 
   /* Guia (cardão verde da pessoa) */
   #section-card .guide-bg {
     display: block;
-    max-width: 320px; 
+    max-width: 520px; 
     width: 100% !important;
     height: auto !important;
     margin: 0 auto !important;
-    border-radius: 24px !important;
+    border-radius: 28px !important;
   }
 
   /* PLACEHOLDER DOURADO (a cruz com o nome) */
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 78% !important;              /* desce até o peito */
+    top: 88% !important;              /* desce até o peito */
     transform: translate(-50%, -50%) !important;
     width: 60% !important;            /* tamanho relativo ao card */
-    max-width: 180px !important;      /* teto pra não explodir */
+    max-width: 200px !important;      /* teto pra não explodir */
     aspect-ratio: 3 / 3 !important;   /* formato de carta vertical */
     border-radius: 22px !important;
     overflow: hidden !important;
@@ -253,22 +253,22 @@
 
   /* Área do botão CONTINUAR */
   #section-card .card-actions-below {
-    margin-top: 24px !important;
+    margin-top: 20px !important;
     text-align: center !important;
   }
    
  #section-card #btnNext {
     width: auto;
-    max-width: 280px;
+    max-width: 260px;
     pointer-events: auto !important;  /* garante clique normal */
-    padding: 8px 22px !important;   /* altura reduzida */
-    font-size: 0.80rem !important;   /* fonte levemente menor */
-    border-radius: 16px !important;  /* deixa mais slim */
+    padding: 6px 18px !important;   /* altura reduzida */
+    font-size: 0.70rem !important;   /* fonte levemente menor */
+    border-radius: 12px !important;  /* deixa mais slim */
   }
    
  #section-card .card-actions {
-    margin-top: 12px !important;   /* estava maior */
-    padding-bottom: 20px !important; /* menos espaço sobrando */
+    margin-top: 10px !important;   /* estava maior */
+    padding-bottom: 16px !important; /* menos espaço sobrando */
   }
    
 }
