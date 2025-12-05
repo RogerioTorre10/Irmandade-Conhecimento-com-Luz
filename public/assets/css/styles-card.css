@@ -198,10 +198,11 @@
   #section-card .card-panel {
     width: 88% !important;
     margin: 0 auto !important;
+    min-height: 620px !important;  
     padding-top: 32px !important;
     padding-left: 16px !important;
     padding-right: 16px !important;
-    padding-bottom: 620px !important;  /* novo valor */
+    padding-bottom: 160px !important;  /* novo valor */
     box-sizing: border-box;
   }
 
@@ -223,7 +224,7 @@
     transform: translate(-50%, -50%) !important;
     width: 60% !important;            /* tamanho relativo ao card */
     max-width: 180px !important;      /* teto pra não explodir */
-    aspect-ratio: 3 / 4 !important;   /* formato de carta vertical */
+    aspect-ratio: 3 / 3 !important;   /* formato de carta vertical */
     border-radius: 22px !important;
     overflow: hidden !important;
     display: flex !important;
@@ -258,11 +259,11 @@
    
  #section-card #btnNext {
     width: auto;
-    max-width: 260px;
+    max-width: 280px;
     pointer-events: auto !important;  /* garante clique normal */
-    padding: 10px 26px !important;   /* altura reduzida */
-    font-size: 0.95rem !important;   /* fonte levemente menor */
-    border-radius: 18px !important;  /* deixa mais slim */
+    padding: 8px 22px !important;   /* altura reduzida */
+    font-size: 0.80rem !important;   /* fonte levemente menor */
+    border-radius: 16px !important;  /* deixa mais slim */
   }
    
  #section-card .card-actions {
