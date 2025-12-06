@@ -879,10 +879,12 @@ body.final-lock,
 #section-selfie .j-panel-glow,
 #section-final .j-panel-glow {
   position: relative;
-  width: min(92vw, 520px);      /* mesma largura do card/senha/guia */
-  margin: 70px auto 110px;      /* centralizado no pergaminho */
-  padding: 40px 30px 70px;      /* respiro interno (top, lados, bottom) */
+  width: min(460px, 92vw);
+  margin: 40px auto 140px !important;   /* SOBE e enquadra no zoom 100% */
+  padding: 32px 24px 40px !important;
+  box-sizing: border-box;
   border-radius: 26px;
+   
   overflow: visible;
 
   /* mesmo “caixão” dourado que já está funcionando nas outras páginas */
@@ -901,9 +903,10 @@ body.final-lock,
   #section-termo2 .j-panel-glow,
   #section-selfie .j-panel-glow,
   #section-final .j-panel-glow {
-    width: 92vw;                /* cola na vitrine do pergaminho */
-    margin: 40px auto 90px;
-    padding: 30px 18px 60px;
+    width: 94vw;
+    margin: 28px auto 120px !important;
+    padding: 24px 18px 32px !important;
     border-radius: 22px;
   }
 }
+
