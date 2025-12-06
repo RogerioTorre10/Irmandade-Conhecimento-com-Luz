@@ -747,55 +747,7 @@ body.final-lock {
    SECTION-FINAL — CORREÇÃO DEFINITIVA
    ============================================ */
 
-/* Remove qualquer scroll lateral */
-body.final-lock,
-#section-final {
-  overflow-x: hidden !important;
-}
 
-/* Container principal sempre centralizado */
-#section-final .final-pergaminho-wrapper {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 0;
-  margin: 0 auto;
-}
-
-/* Painel com glow centralizado sem deslocar para esquerda */
-#section-final .j-panel-glow {
-  position: relative !important;
-  margin: 0 auto !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  max-width: 680px !important; /* garante que não ultrapasse */
-}
-
-/* Pergaminho interno perfeitamente centralizado */
-#section-final .j-perg-v-inner {
-  position: relative !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  margin: 0 auto !important;
-  padding: 0 !important;
-}
-
-/* Ajustes desktop */
-@media (min-width: 900px) {
-  #section-final {
-    padding-top: 60px !important;
-    padding-bottom: 80px !important;
-  }
-
-  #section-final .j-panel-glow {
-    top: -40px !important;
-  }
-
-  #section-final .j-perg-v-inner {
-    top: -40px !important;
-  }
-}
 
 /* Ajustes mobile */
 @media (max-width: 600px) {
@@ -897,14 +849,6 @@ body.final-lock,
   box-shadow:
     0 18px 40px rgba(0,0,0,0.78),
     0 0 60px rgba(0,0,0,0.85);
-}
-   #section-final .j-panel {
-  width: min(92vw, 520px);
-  aspect-ratio: 3 / 4.6;
-  padding: clamp(32px, 6vw, 56px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 }
 
