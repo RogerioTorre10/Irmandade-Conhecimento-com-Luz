@@ -274,7 +274,7 @@
    #section-card .flame-layer .card-footer,
   #section-card .flame-layer .card-name-badge {
     margin-top: auto !important;      /* empurra o nome para a base */
-    margin-bottom: 6px !important;    /* encosta suavemente */
+    margin-bottom: 2px !important;    /* encosta suavemente */
     position: relative;
     bottom: 0 !important;
   }
