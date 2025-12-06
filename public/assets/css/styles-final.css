@@ -310,14 +310,26 @@ body[data-guia="arian"],
   width: min(92vw, 900px);
   max-height: 92vh;
   object-fit: contain;
-  border: 10px solid #d4af37;
+
   border-radius: 18px;
-  box-shadow:
-    0 0 30px rgba(255, 230, 150, 0.70),
-    0 0 80px rgba(255, 180, 0, 0.55);
-  filter: blur(1px);
-  animation: finalCinemaGlow 2.6s ease-in-out infinite alternate;
+  overflow: hidden;
+
+  /* NÃO define mais cor fixa */
+  border: 2px solid transparent;
+
+  /* Glow vem do painel */
+  background:
+    linear-gradient(#000, #000) padding-box,
+    linear-gradient(
+      45deg,
+      var(--final-glow-color),
+      rgba(255,255,255,0.6),
+      var(--final-glow-color)
+    ) border-box;
+
+  animation: jPanelGlowPulse 2.8s ease-in-out infinite;
 }
+
 
 @keyframes finalCinemaGlow {
   0% {
