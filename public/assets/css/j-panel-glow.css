@@ -951,5 +951,24 @@ body, html {
     }
 }
 
+/* ============================
+   BOTÕES FINAIS — TRANSLÚCIDOS
+   ============================ */
+
+#section-final .btn-gold,
+#section-final .btn-light {
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.18),
+    rgba(0,0,0,0.25)
+  ) !important;
+
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  border: 1px solid rgba(212,175,55,0.55);
+  color: #ffd700;
+}
+
 
 
