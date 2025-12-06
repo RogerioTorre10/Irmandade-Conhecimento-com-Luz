@@ -283,6 +283,15 @@ body[data-guia="arian"],
   align-items: center;
 }
 
+#section-final .j-panel {
+  width: min(92vw, 520px);
+  aspect-ratio: 3 / 4.6;
+  padding: clamp(32px, 6vw, 56px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* =========================================
    FINAL — OVERLAY DO VÍDEO CINEMATOGRÁFICO
    ========================================= */
