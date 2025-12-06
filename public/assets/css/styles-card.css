@@ -220,11 +220,11 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 72% !important;              /* desce até o peito */
+    top: 74% !important;              /* desce até o peito */
     transform: translate(-50%, -50%) !important;
     width: 60% !important;            /* tamanho relativo ao card */
     max-width: 180px !important;      /* teto pra não explodir */
-    aspect-ratio: 3 / 3 !important;   /* formato de carta vertical */
+    aspect-ratio: 2.5 / 2.5 !important;   /* formato de carta vertical */
     border-radius: 22px !important;
     overflow: hidden !important;
     display: flex !important;
