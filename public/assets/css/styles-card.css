@@ -220,7 +220,7 @@
   #section-card .flame-layer {
     position: absolute !important;
     left: 50% !important;
-    top: 74% !important;              /* desce até o peito */
+    top: 73% !important;              /* desce até o peito */
     transform: translate(-50%, -50%) !important;
     width: 60% !important;            /* tamanho relativo ao card */
     max-width: 180px !important;      /* teto pra não explodir */
@@ -271,5 +271,19 @@
     padding-bottom: 20px !important; /* menos espaço sobrando */
   }
    
+   #section-card .flame-layer .card-footer,
+  #section-card .flame-layer .card-name-badge {
+    margin-top: auto !important;      /* empurra o nome para a base */
+    margin-bottom: 6px !important;    /* encosta suavemente */
+    position: relative;
+    bottom: 0 !important;
+  }
+
+  #section-card #userNameSlot {
+    position: relative;
+    bottom: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
 }
 
