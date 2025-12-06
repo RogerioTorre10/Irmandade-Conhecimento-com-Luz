@@ -822,12 +822,8 @@ body.final-lock,
 @media (min-width: 900px) {
 
   /* Pergaminho interno de todas as seções principais */
-  #section-intro .j-perg-v-inner,
-  #section-termos1 .j-perg-v-inner,
-  #section-termos2 .j-perg-v-inner,
   #section-senha  .j-perg-v-inner,
   #section-guia   .j-perg-v-inner,
-  #section-selfie .j-perg-v-inner,
   #section-card .j-perg-v-inner,
   #section-perguntas .j-perg-v-inner {
     position: relative !important;
@@ -840,12 +836,8 @@ body.final-lock,
   }
 
   /* Painel de vidro central com a mesma posição que a SENHA */
-  #section-intro .j-panel-glow,
-  #section-termos1 .j-panel-glow,
-  #section-termos2 .j-panel-glow,
   #section-senha  .j-panel-glow,
   #section-guia   .j-panel-glow,
-  #section-selfie .j-panel-glow,
   #section-card .j-panel-glow, 
   #section-perguntas .j-panel-glow {
     position: relative !important;
@@ -868,22 +860,35 @@ body.final-lock,
   }
 }
 /* ============================================
-   PAINEL PADRÃO — intro, termos, selfie, final
-   Alinhado com SENHA / GUIA / CARD / PERGUNTAS
+   CONTAINER PADRÃO – INTRO / TERMOS / SELFIE / FINAL
+   (alinhado com SENHA / GUIA / CARD / PERGUNTAS)
    ============================================ */
+@media (min-width: 900px) {
 
-/* DESKTOP */
-#section-intro  .j-panel-glow,
+#section-intro,
+#section-termo1,
+#section-termo2,
+#section-selfie,
+#section-final {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 40px;       /* sobe o painel */
+  padding-bottom: 140px;   /* respiro embaixo */
+  box-sizing: border-box;
+}
+
+/* Painel interno com glow */
+#section-intro .j-panel-glow,
 #section-termo1 .j-panel-glow,
 #section-termo2 .j-panel-glow,
 #section-selfie .j-panel-glow,
 #section-final .j-panel-glow {
-  position: relative;
-  width: min(460px, 92vw);
-  margin: 40px auto 140px !important;   /* SOBE e enquadra no zoom 100% */
+  width: min(460px, 92vw) !important;
+  margin: 0 auto !important;
+  border-radius: 26px !important;
   padding: 32px 24px 40px !important;
   box-sizing: border-box;
-  border-radius: 26px;
    
   overflow: visible;
 
@@ -895,18 +900,29 @@ body.final-lock,
     0 18px 40px rgba(0,0,0,0.78),
     0 0 60px rgba(0,0,0,0.85);
 }
+}
 
-/* MOBILE */
 @media (max-width: 600px) {
-  #section-intro  .j-panel-glow,
+
+  #section-intro,
+  #section-termo1,
+  #section-termo2,
+  #section-selfie,
+  #section-final {
+    padding-top: 28px;
+    padding-bottom: 120px;
+  }
+
+  #section-intro .j-panel-glow,
   #section-termo1 .j-panel-glow,
   #section-termo2 .j-panel-glow,
   #section-selfie .j-panel-glow,
   #section-final .j-panel-glow {
-    width: 94vw;
-    margin: 28px auto 120px !important;
+    width: 94vw !important;
+    margin: 0 auto !important;
     padding: 24px 18px 32px !important;
-    border-radius: 22px;
+    border-radius: 22px !important;
   }
 }
+
 
