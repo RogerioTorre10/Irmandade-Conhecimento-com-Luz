@@ -849,4 +849,37 @@ body.final-lock {
     box-sizing: border-box !important;
   }
 }
+/* =========================================
+   BARRINHA FANTASMA — ELIMINAÇÃO FINAL
+   ========================================= */
+
+/* 1️⃣ Nunca use vw real no mobile */
+@media (max-width: 600px) {
+
+  /* trava qualquer cálculo errado de viewport */
+  body {
+    overflow-x: hidden !important;
+    position: relative;
+  }
+
+  /* substitui 100vw por largura real */
+  .j-panel-glow,
+  .j-perg-v-inner,
+  #section-final,
+  #section-final * {
+    max-width: 100% !important;
+  }
+
+  /* remove qualquer overflow gerado por sombra/backdrop */
+  #section-final {
+    clip-path: inset(0 0 0 0);
+    overflow-x: hidden !important;
+  }
+
+  /* Chrome Android BUG FIX real */
+  html {
+    overflow-x: hidden !important;
+    overscroll-behavior-x: none !important;
+  }
+}
 
