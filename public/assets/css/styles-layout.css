@@ -790,7 +790,7 @@ body.final-lock {
     align-items: flex-start !important;
     justify-content: center !important;
     margin: 0 auto !important;
-    padding: 24px 0 !important;      /* só em cima e embaixo */
+    padding: 0 !important;      /* só em cima e embaixo */
     box-sizing: border-box !important;
   }
 
@@ -814,9 +814,9 @@ body.final-lock {
   /* Pergaminho interno também centralizado */
   #section-final .j-perg-v-inner {
     position: relative !important;
-    width: 92vw !important;
-    max-width: 460px !important;
-    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
     margin-left: 0 !important;
     margin-right: 0 !important; 
     margin-top: -20px !important; 
