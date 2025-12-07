@@ -825,4 +825,17 @@ body.final-lock {
     transform: none !important;
     }
 }
+/* ===============================
+   ANTI-RISCO LATERAL (MOBILE)
+   =============================== */
+@media (max-width: 600px) {
+  html,
+  body {
+    overflow-x: hidden !important;  /* impede rolagem lateral e some a barrinha */
+  }
+
+  #section-final {
+    overflow-x: hidden !important;  /* garante que nada da final vaze pro lado */
+  }
+}
 
