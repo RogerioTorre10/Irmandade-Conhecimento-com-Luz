@@ -762,49 +762,58 @@ body.final-lock {
   }
 }
 
+/* =========================================
+   SECTION-FINAL — MOBILE CENTRAL 100%
+   (override hard)
+   ========================================= */
 @media (max-width: 600px) {
 
+  /* O próprio section-final vira um flex centralizado */
   #section-final {
-    padding-top: 24px !important;
-    padding-bottom: 110px !important;
-    overflow-x: hidden !important;  
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    padding-top: 28px !important;
+    padding-bottom: 120px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
   }
 
-  #section-final .final-pergaminho-wrapper {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
+  /* Wrapper interno ocupando a largura toda e centralizando filhos */
+  #section-final .final-pergaminho-wrapper,
+  #section-final .final-panel {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
     align-items: center !important;
     justify-content: flex-start !important;
-    padding-top: 24px !important;
-    padding-bottom: 140px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
   }
 
+  /* Painel de vidro com glow: CENTRAL NA MARRETADA */
   #section-final .j-panel-glow {
     position: relative !important;
-    left: 50% !important;
-    top: 0 !important;
-    transform: translateX(-50%) !important;  /* CENTRALIZA */
     width: 94vw !important;
     max-width: 480px !important;
+
     margin: 0 auto !important;
-    border-radius: 22px !important;
-    padding: 24px 18px 32px !important;
-    box-sizing: border-box !important;
-    right: auto !important;
-    border-radius: 22px !important;
-  }
-   
-/* Pergaminho interno também centralizado */
-  #section-final .j-perg-v-inner {
-    margin: 0 auto !important;
-  }
-   
-  /* remove QUALQUER translate herdado */
-  #section-final .j-panel-glow,
-  #section-final .j-perg-v-inner {
+    left: 0 !important;
+    right: 0 !important;
     transform: none !important;
-    top: auto !important;
-    left: auto !important;
+
+    padding: 24px 18px 32px !important;
+    border-radius: 22px !important;
+  }
+
+  /* Pergaminho interno também centralizado */
+  #section-final .j-perg-v-inner {
+    margin: 0 auto !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
   }
 }
 
