@@ -785,16 +785,20 @@ body.final-lock {
     top: 0 !important;
     transform: translateX(-50%) !important;  /* CENTRALIZA */
     width: 94vw !important;
-    max-width: 460px !important;
+    max-width: 480px !important;
     margin: 0 auto !important;
     border-radius: 22px !important;
     padding: 24px 18px 32px !important;
     box-sizing: border-box !important;
     right: auto !important;
-    transform: translateY(-6px) !important;  /* só um ajuste vertical */
     border-radius: 22px !important;
   }
-
+   
+/* Pergaminho interno também centralizado */
+  #section-final .j-perg-v-inner {
+    margin: 0 auto !important;
+  }
+   
   /* remove QUALQUER translate herdado */
   #section-final .j-panel-glow,
   #section-final .j-perg-v-inner {
