@@ -822,9 +822,6 @@ body.final-lock {
     right: 0 !important;
     left: 0 !important;
     transform: none !important;
-    box-sizing: border-box !important;
-    padding: 24px 18px 32px !important;
-    border-radius: 22px !important;
-  }
+    }
 }
 
