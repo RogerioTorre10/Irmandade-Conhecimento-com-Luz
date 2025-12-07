@@ -796,12 +796,12 @@ body.final-lock {
   /* Painel de vidro com glow: CENTRAL NA MARRETADA */
   #section-final .j-panel-glow {
     position: relative !important;
-    width: 94vw !important;
+    width: 92vw !important;
     max-width: 480px !important;
     margin: 0 !important;
     right: 0 !important;
     left: 50% !important;
-    transform: translateX(-50%) !important;
+    transform: translateX(-49%) !important;
     box-sizing: border-box !important;
     padding: 24px 18px 32px !important;
     border-radius: 22px !important;
@@ -810,9 +810,10 @@ body.final-lock {
   /* Pergaminho interno também centralizado */
   #section-final .j-perg-v-inner {
     margin: 0 !important;
+    width: 92vw !important; 
     right: 0 !important;
     left: 50% !important;
-    transform: translateX(-50%) !important;
+    transform: translateX(-49%) !important;
   }
 }
 
