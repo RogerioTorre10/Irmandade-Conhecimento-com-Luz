@@ -687,8 +687,12 @@ body.guia-arion #section-perguntas .btn.btn-stone {
 /* =========================================
    SECTION-FINAL — BASE CORRIGIDA
    ========================================= */
-
-#section-final {
+@media (min-width: 900px) {
+   
+    /* Painel final alinhado com o resto, mas um pouco mais pra cima */
+  #section-final {
+  padding-top: 32px !important;
+  padding-bottom: 120px !important;
   position: relative;
   min-height: 100vh;
   height: auto;
@@ -705,7 +709,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   justify-content: flex-start;
   align-items: center;
   padding-top: 40px;
-  padding-bottom: 40px; 
+  padding-bottom: 120px; 
   padding: 32px 16px 120px;
   box-sizing: border-box;
 }
@@ -739,12 +743,6 @@ body.final-lock {
     inset 0 0 14px rgba(255,235,190,0.45);
 }
 
-@media (min-width: 900px) {
-    /* Painel final alinhado com o resto, mas um pouco mais pra cima */
-  #section-final {
-    padding-top: 32px !important;
-    padding-bottom: 120px !important;
-  }
   #section-final .j-panel-glow {
     width: min(480px, 92vw) !important;
     margin: 0 auto !important;
@@ -757,10 +755,10 @@ body.final-lock {
     box-shadow:
       0 18px 40px rgba(0,0,0,0.78),
       0 0 60px rgba(0,0,0,0.85);
-
+    left: 50%
     position: relative !important;
-    top: -12px;                  /* sobe um pouco o painel */
-    transform: none !important;  /* garante que nada puxe pra lado nenhum */
+    top: -24px;                  /* sobe um pouco o painel */
+    transform: translateX(-50%);
   }
 }
 
@@ -769,12 +767,13 @@ body.final-lock {
   #section-final {
     padding-top: 24px !important;
     padding-bottom: 110px !important;
+    overflow-x: hidden !important;  
   }
 
   #section-final .final-pergaminho-wrapper {
-    padding-top: 0;
-    padding-bottom: 0;
-    align-items: center;      /* garante centro */
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    align-items: center !important;
     justify-content: flex-start !important;
     padding-top: 24px !important;
     padding-bottom: 140px !important;
@@ -782,15 +781,18 @@ body.final-lock {
 
   #section-final .j-panel-glow {
     position: relative !important;
+    left: 50% !important;
+    top: 0 !important;
+    transform: translateX(-50%) !important;  /* CENTRALIZA */
     width: 94vw !important;
     max-width: 460px !important;
     margin: 0 auto !important;
-    left: auto !important;      /* cancela qualquer left antigo */
+    border-radius: 22px !important;
+    padding: 24px 18px 32px !important;
+    box-sizing: border-box !important;
     right: auto !important;
     transform: translateY(-6px) !important;  /* só um ajuste vertical */
     border-radius: 22px !important;
-    padding: 24px 18px 32px !important;
-    box-sizing: border-box;
   }
 
   /* remove QUALQUER translate herdado */
