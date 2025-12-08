@@ -128,74 +128,56 @@
 /* ---- TERMOS 1 e TERMOS 2: sobem um pouco mais ainda ---- */
 @media (max-width: 600px) {
 
-  html, body {
-    overflow-x: hidden;
-    overscroll-behavior-x: none;
-  }
-
-  /* Seções dos termos */
+  /* Remove qualquer padding exagerado que esteja empurrando pra baixo */
   #section-termo1,
   #section-termo2 {
-    padding: 20px 0 140px !important;   /* mesmo respiro da final e intro */
+    padding: 20px 0 140px !important;   /* mesmo valor da intro e da final */
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;   /* ← esse é o segredo da centralização vertical */
+    min-height: 80vh !important;
     overflow: hidden !important;
   }
 
-  /* Painel de vidro – exatamente igual à intro e final */
+  /* Painel sobe e fica exatamente na mesma posição da intro */
   #section-termo1 .j-panel-glow,
   #section-termo2 .j-panel-glow {
-    width: calc(100vw - 20px) !important;      /* 10px de cada lado → padrão perfeito */
+    width: calc(100vw - 20px) !important;        /* 10px de margem lateral */
     max-width: 460px !important;
     margin: 0 auto !important;
-    padding: 36px 26px 52px 26px !important;   /* mais ar interno que a intro (porque o texto é maior) */
+    padding: 36px 26px 52px 26px !important;
     border-radius: 26px !important;
     box-sizing: border-box !important;
     position: relative !important;
-
-    /* Truque que mata o vazamento do backdrop-filter de uma vez */
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
+    transform: translateZ(0) !important;         /* fix do backdrop-filter */
+    -webkit-transform: translateZ(0) !important;
     backface-visibility: hidden;
     overflow: hidden !important;
-  }
 
-  /* Remove aquele translate antigo que estava deslocando errado */
-  #section-termo1 .j-panel-glow,
-  #section-termo2 .j-panel-glow {
+    /* Remove qualquer translate antigo que estava jogando pra baixo/esquerda */
     transform: translateZ(0) !important;
-    -webkit-transform: translateZ(0) !important;
+    top: auto !important;
+    left: auto !important;
   }
 
-  /* Pergaminho interno – ocupa tudo com conforto */
+  /* Pergaminho interno */
   #section-termo1 .j-perg-v-inner,
   #section-termo2 .j-perg-v-inner {
-    width: 100% !important;
-    max-width: 100% !important;
     padding: 0 8px !important;
-    box-sizing: border-box !important;
   }
 
-  /* Títulos e texto com mais espaço (fica lindo) */
-  #section-termo1 .j-perg-title,
-  #section-termo2 .j-perg-title {
-    margin-bottom: 24px !important;
-    font-size: 28px !important;
-    line-height: 1.2 !important;
-  }
-
-  /* Botão nunca mais corta e fica com folga perfeita */
+  /* Botão com a mesma folga da intro */
   #section-termo1 .btn,
-  #section-termo2 .btn,
-  #section-termo1 .btn-final,
-  #section-termo2 .btn-final {
+  #section-termo2 .btn {
     min-height: 58px !important;
-    padding: 0 28px !important;
     font-size: 17px !important;
-    margin-top: 28px !important;
+    margin-top: 32px !important;
     width: 100% !important;
     max-width: 320px !important;
     margin-left: auto !important;
     margin-right: auto !important;
   }
+
 
   /* Garante que nada vaze (mesmo com sombras decorativas) */
   #section-termo1 .j-panel-glow::before,
