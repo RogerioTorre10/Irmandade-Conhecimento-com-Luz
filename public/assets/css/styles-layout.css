@@ -132,24 +132,30 @@
     /* estava -26, agora um pouco mais alto */
     transform: translate(-6px, -32px);
   }
-   
-  /* Espaço vertical parecido com a intro */
+     
+    /* Seções dos termos — ajuste de respiro vertical */
   #section-termo1,
   #section-termo2 {
-    padding: 40px 0 120px !important;
+    padding: 32px 0 110px !important;
     overflow: hidden !important;
   }
 
   /* Painel de vidro central e largo, igual intro */
   #section-termo1 .j-panel-glow,
   #section-termo2 .j-panel-glow {
-    width: calc(100vw - 20px) !important;   /* respiro lateral */
+    width: calc(100vw - 20px) !important;
     max-width: 460px !important;
     margin: 0 auto !important;
-    padding: 32px 24px 48px 24px !important;
+    padding: 28px 22px 44px 22px !important;
+
+    /* 🔽 aqui vem o segredo da métrica */
+    min-height: 460px !important;  /* ajuste fino da “altura padrão” */
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+
     border-radius: 26px !important;
     box-sizing: border-box !important;
-
     position: relative !important;
     isolation: isolate;
 
@@ -166,7 +172,7 @@
   #section-termo2 .j-perg-v-inner {
     width: 100% !important;
     max-width: 100% !important;
-    padding: 0 6px !important;  /* texto não gruda na borda */
+    padding: 0 8px !important;  /* texto não gruda na borda */
     box-sizing: border-box !important;
   }
 
@@ -177,43 +183,7 @@
     font-size: 16px !important;
     margin-top: 18px !important;
   }
-
-  /* Seções dos termos — ajuste de respiro vertical */
-  #section-termo1,
-  #section-termo2 {
-    padding: 32px 0 110px !important;
-    overflow: hidden !important;
-  }
-
-  /* Painel de vidro centralizado, igual intro */
-  #section-termo1 .j-panel-glow,
-  #section-termo2 .j-panel-glow {
-    width: calc(100vw - 20px) !important;
-    max-width: 460px !important;
-    margin: 0 auto !important;
-    padding: 28px 22px 44px 22px !important;
-    border-radius: 26px !important;
-    box-sizing: border-box !important;
-
-    position: relative !important;
-    isolation: isolate;
-
-    background: rgba(0,0,0,0.72) !important;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-
-    overflow: hidden !important;
-  }
-
-  /* Pergaminho interno cheio, como na intro */
-  #section-termo1 .j-perg-v-inner,
-  #section-termo2 .j-perg-v-inner {
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 0 8px !important;
-    box-sizing: border-box !important;
-  }
-}
+ }
 
 /* ---- SENHA: sobe e centraliza melhor ---- */
 @media (max-width: 600px) {
