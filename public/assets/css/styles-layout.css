@@ -131,7 +131,7 @@
   /* Seção inteira dos termos */
   #section-termos1,
   #section-termos2 {
-    padding: 30px 0 140px !important;  /* distância do topo + espaço pro botão */
+    padding: 12px 0 140px !important;  /* distância do topo + espaço pro botão */
     overflow: hidden !important;
     min-height: 100vh !important;
   }
@@ -142,7 +142,7 @@
   #section-termos1 .termos-panel,
   #section-termos2 .termos-panel {
     width: calc(100vw - 20px) !important;  /* 10px de respiro de cada lado */
-    max-width: 460px !important;
+    max-width: 500px !important;
     margin: 0 auto !important;            /* centraliza */
     padding: 32px 24px 52px 24px !important;
     border-radius: 26px !important;
