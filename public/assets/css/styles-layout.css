@@ -126,18 +126,14 @@
 }
 
 /* ---- TERMOS 1 e TERMOS 2: sobem um pouco mais ainda ---- */
-/* VALORES MÉTRICOS PERFEITOS — TERMOS 1 e 2 MOBILE (CORRIGIDO) */
 @media (max-width: 600px) {
 
-  /* Seção dos termos: ocupa a tela e centraliza o painel */
+  /* Seção inteira dos termos */
   #section-termos1,
   #section-termos2 {
-    padding: 60px 0 120px !important;     /* respiro em cima e embaixo */
+    padding: 30px 0 140px !important;  /* distância do topo + espaço pro botão */
+    overflow: hidden !important;
     min-height: 100vh !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-start !important;   /* painel vem pro centro do pergaminho */
-    align-items: center !important;
   }
 
   /* Painel de vidro dentro do pergaminho */
@@ -145,16 +141,17 @@
   #section-termos2 .j-panel-glow,
   #section-termos1 .termos-panel,
   #section-termos2 .termos-panel {
-    width: calc(100vw - 20px) !important; /* 10px de respiro lateral */
+    width: calc(100vw - 20px) !important;  /* 10px de respiro de cada lado */
     max-width: 460px !important;
-    margin: 0 auto !important;
-    margin-top: 74px !important;            /* empurra o painel pra baixo do rasgo do pergaminho */ 
-    padding: 32px 24px 52px 24px !important; /* ar interno confortável */
+    margin: 0 auto !important;            /* centraliza */
+    padding: 32px 24px 52px 24px !important;
     border-radius: 26px !important;
-    box-sizing: border-box !important;    
+    box-sizing: border-box !important;
+
+    /* NADA de margin-top negativo, NADA de flex aqui */
     transform: translateZ(0) !important;
     -webkit-transform: translateZ(0) !important;
-    overflow: hidden !important;          /* mantém o vidro limpo */
+    overflow: hidden !important;
   }
 
   /* Conteúdo interno do pergaminho dos termos */
@@ -162,7 +159,7 @@
   #section-termos2 .j-perg-v-inner,
   #section-termos1 .conteudo-pergaminho,
   #section-termos2 .conteudo-pergaminho {
-    padding: 0 12px !important;           /* texto não gruda nas bordas */
+    padding: 0 10px !important;
     box-sizing: border-box !important;
   }
 
