@@ -763,123 +763,62 @@ body.final-lock {
 }
 
 /* =========================================
-   SECTION-FINAL — MOBILE CENTRAL 100%
-   (override hard)
-   ========================================= */
+   MATANDO A BARRINHA LATERAL NO MOBILE DE VEZ
+ ========================================= */
 @media (max-width: 600px) {
-
-  /* O próprio section-final vira um flex centralizado */
-  #section-final {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: flex-start !important;
-    padding-top: 20px !important;
-    padding-bottom: 120px !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    box-sizing: border-box !important;
+  /* 1. Força o body e html a respeitarem exatamente a largura da tela */
+  html, body {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    position: relative;
+    overscroll-behavior-x: none;
   }
 
-  /* Wrapper interno ocupando a largura toda e centralizando filhos */
-  #section-final .final-pergaminho-wrapper,
-  #section-final .final-panel {
-    width: 100% !important;
-    max-width: 100% !important; 
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    justify-content: center !important;
-    margin: 0 auto !important;
-    padding: 0 !important;      /* só em cima e embaixo */
-    box-sizing: border-box !important;
+  /* 2. Remove qualquer margem/padding que o navegador injeta */
+  body {
+    margin: 0;
+    padding: 0;
   }
 
-  /* Painel de vidro com glow: CENTRAL NA MARRETADA */
+  /* 3. O grande culpado: backdrop-filter + border-radius faz o elemento "sair" da viewport */
   #section-final .j-panel-glow {
-    position: relative !important;
-    width: 86vw !important;
+    width: calc(100vw - 32px) !important;  /* 16px de margem de segurança de cada lado */
     max-width: 460px !important;
-    margin: 0 !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    margin-top: -20px !important; 
+    margin: 0 auto !important;
     left: 0 !important;
     right: 0 !important;
     transform: none !important;
-    box-sizing: border-box !important;
-    padding: 24px 18px 32px !important;
+    
+    /* Força o backdrop-filter ficar dentro dos limites */
+    -webkit-mask-image: radial-gradient(circle, white, white);
+    mask-image: radial-gradient(circle, white, white);
+    
+    /* Alternativa mais bruta e 100% eficaz */
+    overflow: hidden !important;
     border-radius: 22px !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    overflow-x: hidden !important; 
   }
 
-  /* Pergaminho interno também centralizado */
+  /* 4. Garante que o pergaminho interno também não vaze */
   #section-final .j-perg-v-inner {
-    position: relative !important;
     width: 100% !important;
     max-width: 100% !important;
-    margin: 0 auto !important;
-    margin-left: auto !important;
-    margin-right: auto !important; 
-    margin-top: -20px !important; 
-    left: 0 !important;
-    right: 0 !important;
-    transform: none !important;
-    overflow-x: hidden !important; 
-    }
-}
-/* ===============================
-   ANTI-RISCO LATERAL (MOBILE)
-   =============================== */
-@media (max-width: 600px) {
-  html,
-  body {
-     width: 100%;
-    overflow-x: hidden !important;
-    position: relative;
-  }
-
-  #section-final {
-    overflow-x: hidden !important;  /* garante que nada da final vaze pro lado */
-  }
-   
-    *, *::before, *::after {
-    max-width: 100vw !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
     box-sizing: border-box !important;
-  }
-}
-/* =========================================
-   BARRINHA FANTASMA — ELIMINAÇÃO FINAL
-   ========================================= */
-
-/* 1️⃣ Nunca use vw real no mobile */
-@media (max-width: 600px) {
-
-  /* trava qualquer cálculo errado de viewport */
-  body {
     overflow-x: hidden !important;
-    position: relative;
   }
 
-  /* substitui 100vw por largura real */
-  .j-panel-glow,
-  .j-perg-v-inner,
-  #section-final,
-  #section-final * {
-    max-width: 100% !important;
+  /* 5. Mata qualquer sombra ou glow que possa estar vazando */
+  #section-final .j-panel-glow::before,
+  #section-final .j-panel-glow::after {
+    display: none !important;
   }
 
-  /* remove qualquer overflow gerado por sombra/backdrop */
+  /* 6. Força o container principal a clipar tudo */
   #section-final {
-    clip-path: inset(0 0 0 0);
-    overflow-x: hidden !important;
-  }
-
-  /* Chrome Android BUG FIX real */
-  html {
-    overflow-x: hidden !important;
-    overscroll-behavior-x: none !important;
+    overflow: hidden !important;
+    position: relative;
   }
 }
 
