@@ -193,6 +193,25 @@
     padding: 0 36px !important;
     border-radius: 16px !important;
   }
+/* TERMOS 1 e 2 — afinar bordas igual à INTRO */
+  #section-termos1 .j-panel-glow,
+  #section-termos2 .j-panel-glow {
+    padding: 10px !important; /* igual Intro */
+  }
+
+  #section-termos1 .j-panel-glow::before,
+  #section-termos2 .j-panel-glow::before {
+    inset: 4px !important;    /* afina o aro interno */
+    border-radius: 22px !important;
+  }
+
+  #section-termos1 .termos-panel,
+  #section-termos2 .termos-panel {
+    border: 1px solid rgba(255, 210, 140, 0.35) !important;
+    box-shadow:
+      0 0 14px rgba(255, 190, 120, 0.25),
+      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
+  }   
 }
 
 /* ---- SENHA: sobe e centraliza melhor ---- */
